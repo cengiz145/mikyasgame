@@ -1691,7 +1691,11 @@
                 function updateMobileKeysVisibility() {
                     document.body.classList.remove('show-mobile-keys', 'show-mobile-enter');
                     if (currentActiveMenu === 'game') {
-                        document.body.classList.add('show-mobile-keys');
+                        if (typeof gameIsActive !== 'undefined' && !gameIsActive) {
+                            document.body.classList.add('show-mobile-enter');
+                        } else {
+                            document.body.classList.add('show-mobile-keys');
+                        }
                     } else if (currentActiveMenu === 'practice') {
                         if (typeof isDialogPhase !== 'undefined' && isDialogPhase) {
                             document.body.classList.add('show-mobile-enter');
@@ -2115,6 +2119,7 @@
 
                 function endMainGame(isTimeOut, isWin) {
                     gameIsActive = false;
+                    updateMobileKeysVisibility();
                     clearInterval(gameInterval);
 
                     // localStorage'dan mevcut total jetonları oku
