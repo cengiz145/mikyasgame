@@ -2425,6 +2425,13 @@
                         switchMenu(achievementsMenu, mainMenu, 'main');
                         return;
                     }
+                    
+                    // Oyun bitiş ekranındayken (Oyun aktif değil ama oyun menüsündeyiz) Enter'a basınca ana menüye dön
+                    if (!gameIsActive && currentActiveMenu === 'game') {
+                        clickSound.play();
+                        switchMenu(document.getElementById('game-menu-container'), mainMenu, 'main');
+                        return;
+                    }
 
                     // Hikaye Modu diyalog aşaması mı?
                     if (isStarted && currentActiveMenu === 'story' && inStoryMode) {
