@@ -121,7 +121,8 @@
                 color: #555;
             }
 
-            .menu-button:hover, .menu-button:focus-visible {
+            .menu-button:hover,
+            .menu-button:focus-visible {
                 color: var(--text-color);
                 outline: none;
             }
@@ -134,6 +135,7 @@
             .menu-button[aria-disabled="true"] {
                 color: #333;
             }
+
             .menu-button[aria-disabled="true"]::before {
                 content: "[-] ";
                 color: #333;
@@ -181,7 +183,8 @@
 
             @media (min-width: 769px) {
                 #mobile-piano-container {
-                    display: none !important; /* Masaüstünde/büyük ekranda gizle */
+                    display: none !important;
+                    /* Masaüstünde/büyük ekranda gizle */
                 }
             }
         </style>
@@ -499,7 +502,8 @@
         </section>
 
         <!-- Mobil Piyano Tuşları Ekranı -->
-        <div id="mobile-piano-container" aria-hidden="true" role="group" aria-label="Mobil Piyano Tuşları. Oyun ekranında altta görünür.">
+        <div id="mobile-piano-container" aria-hidden="true" role="group"
+            aria-label="Mobil Piyano Tuşları. Oyun ekranında altta görünür.">
             <button class="mobile-piano-key" data-key="c" aria-label="Do Notası">Do</button>
             <button class="mobile-piano-key" data-key="d" aria-label="Re Notası">Re</button>
             <button class="mobile-piano-key" data-key="e" aria-label="Mi Notası">Mi</button>
@@ -1595,7 +1599,7 @@
 
             function switchMenu(hideMenu, showMenu, newActiveMenuName) {
                 hideMenu.style.opacity = '0';
-                
+
                 // Mobil piyano tuşları sadece oyun, pratik ve hikaye modlarında görünür olsun.
                 if (newActiveMenuName === 'game' || newActiveMenuName === 'practice' || newActiveMenuName === 'story') {
                     document.body.classList.add('show-mobile-keys');
@@ -1636,7 +1640,7 @@
                     button.addEventListener('pointerdown', (e) => {
                         e.preventDefault(); // Odaklanmayı/çift tıklamayı engelle
                         const noteKey = button.getAttribute('data-key');
-                        
+
                         // Sanal bir klavye eventi fırlat - böylece mevcut oyun mantığı aynen çalışır
                         const simulatedEvent = new KeyboardEvent('keydown', {
                             key: noteKey,
@@ -1645,7 +1649,7 @@
                             cancelable: true
                         });
                         document.dispatchEvent(simulatedEvent);
-                        
+
                         // Buton animasyonu için
                         button.style.backgroundColor = 'var(--focus-color)';
                         button.style.color = '#000';
@@ -1802,7 +1806,7 @@
                 // Rol olarak 'region' (bölüm) seçilip, aria-roledescription özelliği "sıfır genişlikli boşluk" ile (Zero-Width Space) ezildi.
                 let announcerDiv = document.createElement('div');
                 announcerDiv.id = 'sr-focus-announcer';
-                announcerDiv.setAttribute('role', 'region'); 
+                announcerDiv.setAttribute('role', 'region');
                 announcerDiv.setAttribute('aria-roledescription', '\u200B'); // Sıfır genişlikli boşluk, okuyucuyu tamamen susturur.
 
                 // focus alabilmesi için
@@ -1835,7 +1839,7 @@
                 // Hikaye modundan kalan başlıkları ve ari-label'ları varsayılana çevir
                 const gameMenuContainer = document.getElementById('game-menu-container');
                 if (gameMenuContainer) gameMenuContainer.setAttribute('aria-label', 'Oyun Alanı');
-                
+
                 const gameMenuTitle = document.getElementById('game-menu-title');
                 if (gameMenuTitle) gameMenuTitle.textContent = 'Hafızana Güven';
 
@@ -2440,7 +2444,7 @@
                                     house2Sound.stop();
                                     storyBGM.stop();
                                 }, 1000);
-                                
+
                                 doorCloseSound.play();
                                 doorCloseSound.once('end', () => {
                                     currentAutoWalkStep = 0;
@@ -2456,16 +2460,16 @@
                                 const melodyInterval = setInterval(() => {
                                     const keys = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
                                     const randomKey = keys[Math.floor(Math.random() * keys.length)];
-                                    
+
                                     if (pianoNotes[randomKey]) {
                                         pianoNotes[randomKey].volume(melodyVolume);
                                         let sndId = pianoNotes[randomKey].play();
                                         pianoNotes[randomKey].seek(0.045, sndId);
                                     }
-                                    
+
                                     melodyVolume = Math.min(1.0, melodyVolume + 0.03); // Sesi yavaşça artır
                                     melodyCount++;
-                                    
+
                                     if (melodyCount >= 30) { // Yaklaşık 10 saniye (30 * 333ms) bittiğinde
                                         clearInterval(melodyInterval);
                                     }
@@ -2476,7 +2480,7 @@
                                     isGridWalkingPhase = false;
                                 }, 10000); // 10 saniyede aç
                             }
-                            
+
                             playCurrentStoryDialog();
                             triggerStoryAnimations(currentStoryIndex);
                         } else if (currentStoryIndex === 17 && !isGridWalkingPhase) {
@@ -2492,7 +2496,7 @@
                             setTimeout(() => {
                                 const gameMenuContainer = document.getElementById('game-menu-container');
                                 gameMenuContainer.setAttribute('aria-label', 'Dağ Haritası');
-                                
+
                                 const gameMenuTitle = document.getElementById('game-menu-title');
                                 if (gameMenuTitle) gameMenuTitle.textContent = 'Dağ Haritası';
 
@@ -2755,7 +2759,7 @@
                                     // Üzerinde nota yok, o halde F tuşuyla genel durumu oku
                                     const requiredSequence = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
                                     const noteNamesTr = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
-                                    
+
                                     if (notesInPiano.length === 0) {
                                         announceToScreenReader(`Piyanoda henüz hiç nota yok. İlk olarak ${noteNamesTr[requiredSequence[0]]} notasını bulmalısın.`);
                                     } else {
@@ -2773,7 +2777,7 @@
                                         delete notesOnMap[playerX];
                                         let tempDogru = new Howl({ src: ['sounds/dogru.ogg'], volume: 1.0 }); // Özel oynatma
                                         tempDogru.play();
-                                        
+
                                         // Nota teşekkür mesajı ekleyelim (yardim.js'ten missingNotesHappyMessages)
                                         let happyMsg = "";
                                         if (typeof missingNotesHappyMessages !== 'undefined' && missingNotesHappyMessages.length > 0) {
@@ -2903,7 +2907,15 @@
             const exitBtn = document.getElementById('exit-btn');
             if (exitBtn) {
                 exitBtn.addEventListener('click', function () {
-                    window.close();
+                    clickSound.play();
+                    announceToScreenReader('Oyundan çıkış yapılıyor.');
+                    
+                    setTimeout(() => {
+                        // Tarayıcı sekmesi kendi açmadığı için window.close() reddedebilir.
+                        window.close();
+                        // Eğer close() işe yaramazsa, sayfayı boş bir adrese veya geri yönlendir:
+                        window.location.href = "about:blank"; 
+                    }, 1000);
                 });
             }           
         </script>
