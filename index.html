@@ -3,8 +3,11 @@
 
         <head>
             <meta charset="UTF-8">
-            b
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+            <meta name="mobile-web-app-capable" content="yes">
+            <meta name="apple-mobile-web-app-capable" content="yes">
+            <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+            <link rel="manifest" href="manifest.json">
             <title>Hafızana Güven - Ana Menü</title>
             <style>
                 :root {
@@ -322,7 +325,8 @@
 
 
             <div id="main-menu-container" class="menu-container" role="presentation" aria-hidden="true">
-                <h1 id="main-menu-title">Ana Menü</h1>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('exit-btn').focus(), 10);"></div>
+                <h1 id="main-menu-title" aria-hidden="true">Ana Menü</h1>
 
                 <!-- aria-labelledby ile nav bölgesini başlıkla ilişkilendiriyoruz -->
                 <nav class="menu-nav" aria-labelledby="main-menu-title" tabindex="0">
@@ -359,6 +363,7 @@
                         </li>
                     </ul>
                 </nav>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('start-game-btn').focus(), 10);"></div>
             </div>
 
             <!-- Zorluk Seçimi Menüsü -->
@@ -1315,7 +1320,7 @@
                     }
 
                     gameBackBtn.addEventListener('click', () => {
-                        endMainGame(false, false); // Kullanıcı kendi isteğiyle oyunu bitirdi
+                        endMainGame(false, false, true); // Kullanıcı kendi isteğiyle oyunu bitirdi (isUserExit = true)
 
                         // Ana menüye dönüş yapıldığında müziği baştan oynat
                         if (house2Sound.playing()) {
@@ -2117,7 +2122,7 @@
                     playNextSeqNote();
                 }
 
-                function endMainGame(isTimeOut, isWin) {
+                function endMainGame(isTimeOut, isWin, isUserExit = false) {
                     gameIsActive = false;
                     updateMobileKeysVisibility();
                     clearInterval(gameInterval);
@@ -2154,6 +2159,21 @@
                     if (gameMenuTitle) gameMenuTitle.textContent = 'Hafızana Güven';
 
                     let playUnlockSound = false;
+
+                    if (isUserExit) {
+                        for (let k in pianoNotes) pianoNotes[k].stop();
+                        if (seconsSound.playing()) seconsSound.stop();
+                        if (clockTickSound.playing()) clockTickSound.stop();
+                        if (mountainSound.playing()) mountainSound.stop();
+                        if (house2Sound.playing()) house2Sound.stop();
+                        if (notePingInterval) { clearInterval(notePingInterval); notePingInterval = null; }
+
+                        switchMenu(document.getElementById('game-menu-container'), mainMenu, 'main');
+                        
+                        endMessage = `Oyundan çıkıldı. Bu oyunda toplam ${sessionTokens} jeton kazandınız. Toplam jetonunuz ${totalTokens}. Ana menüye dönüldü.`;
+                        announceToScreenReader(endMessage);
+                        return;
+                    }
 
                     if (isWin) {
                         baseMessage = `Tebrikler! Zamanında tüm notaları tamamladınız.`;
