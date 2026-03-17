@@ -1,0 +1,11 @@
+# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+
+[v1.0.1 Beta] - 2026-03-11
+
+### Eklenenler / Değiştirilenler:
+- Ana menü ses navigasyon sistemi tamamen yenilendi.
+- **3D Ses Dağılımı (Stereo Panner):** Menü seslerinin soldan sağa doğru bir yolculuk yapması sağlandı. Menünün ilk butonunda sadece sol hoparlörden, alt seviyelere doğru inildikçe sol ve sağ ve en sonda sadece sağ hoparlör yönde ses vermesi sağlandı.  (*Not: Bu efekt Web Audio API güvenlik önlemleri gereği file:// protokülünde çalışmaz hale getirilmiştir, sadece sunucu üzerinde çalışır.*)
+- **Ana Menü Navigasyon Tuşları:** Menüdeki butonlar arası dolaşımlar için yukarı-aşağı (ArrowUp ve ArrowDown) yerine artık sol-sağ (ArrowLeft ve ArrowRight) ok tuşları tanımlanmıştır. 
+- **Müzik Ses Kontrolü (Volume):** PageUp ve PageDown tuşlarıyla ayarlanan asıl menü arka plan müziği ses artış/azalma ivmesi %10 (0.1)'luk hacimler yerine %1 (0.01)'lik kademelere ayarlandı. 
+- **Ses Spam Koruması:** Sadece PageUp ve PageDown harici diğer tuşlarda basılı tutma engellendi, tekil atış yapılması sağlandı. Sesi tamamen kısmak/artırmak için basılı tutulabilir. 
+- Telefon (Web Audio Mobile Touchstart) için yazılan ek olaylar geri çekilerek kod stabil masaüstü sürümüne indirgendi. 
