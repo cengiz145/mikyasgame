@@ -187,6 +187,44 @@
                     /* Masaüstünde/büyük ekranda gizle */
                 }
             }
+
+            /* Responsive (Mobil) Uyumlu Tasarım Eklentileri */
+            @media (max-width: 600px) {
+                h1 {
+                    font-size: 1.6rem;
+                    text-align: center;
+                    margin-bottom: 1.5rem;
+                }
+                
+                .menu-container {
+                    padding: 1rem;
+                }
+
+                .menu-button {
+                    font-size: 1rem;
+                    padding: 1rem 0.5rem;
+                    text-align: center;
+                    border: 1px solid #333;
+                    border-radius: 8px;
+                    margin-bottom: 5px;
+                }
+                
+                .menu-button::before {
+                    content: ""; /* Mobilde imleç efekti çok yer kaplamasın */
+                }
+
+                .intro-title {
+                    font-size: 2rem;
+                }
+
+                .intro-instruction {
+                    font-size: 1rem;
+                }
+                
+                #game-score-display, #game-timer-display, #game-lives-display {
+                    font-size: 1rem;
+                }
+            }
         </style>
     </head>
 
