@@ -341,13 +341,16 @@
                         için bilgisayarda <strong>ENTER</strong> tuşuna basın, telefonda ise ekrana <strong>çift
                             dokunun</strong>
                     </p>
+                    <p id="intro-version-display" aria-hidden="true" style="margin-top: 20px; font-size: 1rem; color: #888;">
+                        Sürüm bilgisi alınıyor...
+                    </p>
                 </div>
 
                 <!-- Aşama 2: Logo ve Başlık -->
                 <div id="intro-phase-2" class="intro-phase"
                     style="display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; opacity: 0; padding: 0 20px; transition: opacity 1s ease-in-out;">
                     <h1 id="intro-game-title" class="intro-title" style="font-size: 3rem; color: var(--focus-outline);"
-                        aria-hidden="true">Hafızana Güven Version 1.2</h1>
+                        aria-hidden="true">Hafızana Güven</h1>
                     <p class="intro-instruction" aria-hidden="true"
                         style="margin-top: 20px; font-size: 1.2rem; animation: fadeInOut 2s infinite;">Lütfen
                         bekleyin...
@@ -735,6 +738,10 @@
                             return response.json();
                         })
                         .then(data => {
+                            // Ekranda (Mikyas Studio/Intro) versiyon bilgisini göster (Kullanıcı bu kısmı sormuştu)
+                            const visualVersion = document.getElementById("intro-version-display");
+                            if (visualVersion) visualVersion.textContent = "Sürüm: " + data.version;
+
                             if (!mevcutSurum) {
                                 // Sayfa ilk yüklendiğinde mevcut sürümü kaydet (Örn: "1.2")
                                 mevcutSurum = data.version;
