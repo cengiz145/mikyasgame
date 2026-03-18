@@ -659,6 +659,14 @@
             <script src="yardim.js"></script>
 
             <script>
+                // Müşteri İsteği: Tüm İstatistikleri Sıfırla
+                localStorage.removeItem('hafizaGuvenModes');
+                localStorage.removeItem('hafizaGuvenAchievements');
+                localStorage.removeItem('hafizaGuvenTotalTokens');
+                localStorage.removeItem('hafizaGuvenPracticeCompleted');
+                localStorage.removeItem('hafizaGuvenHataKorumasi');
+                localStorage.removeItem('hafizaGuvenZamanKorumasi');
+
                 // Dinleyiciyi (Kullanıcı) (0,0,0) merkez noktasına koyalım.
                 // Kulaklarımız x ekseni üzerinde yatay (sağ-sol) hizalı duruyor.
                 Howler.pos(0, 0, 0);
