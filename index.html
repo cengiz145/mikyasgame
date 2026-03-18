@@ -1810,11 +1810,20 @@
                 let introReadyToStartGame = false;
                 let currentLogoSound = null;
 
-                // Ekran yüklendiğinde ekran okuyucuyu girişi başlatma butonuna odakla
+                // Ekran yüklendiğinde ekran okuyucuyu girişi başlatma butonuna odakla ve tam ekranı ayarla
                 window.addEventListener('load', () => {
                     const startIntroBtn = document.getElementById('start-intro-btn');
                     if (startIntroBtn) {
                         startIntroBtn.focus();
+                        
+                        // Oyuna girişte (kullanıcı etkileşimiyle) tam ekran modunu talep et
+                        startIntroBtn.addEventListener('click', () => {
+                            if (!document.fullscreenElement && document.body.requestFullscreen) {
+                                document.body.requestFullscreen().catch(err => {
+                                    console.log(`Tam ekran yapılamadı: ${err.message}`);
+                                });
+                            }
+                        });
                     }
 
                     // Mobil Enter tuşu için event listener (Diyalogları geçmek için Enter'ı simüle eder)
