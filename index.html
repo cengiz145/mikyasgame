@@ -1893,6 +1893,7 @@
                                 const versionHack = document.createElement("div");
                                 versionHack.tabIndex = -1;
                                 versionHack.setAttribute("aria-label", "Hafızana Güven Version 1.0 Beta");
+                                versionHack.setAttribute("aria-live", "assertive");
                                 versionHack.style.position = "absolute";
                                 versionHack.style.opacity = "0";
                                 document.body.appendChild(versionHack);
@@ -2572,9 +2573,7 @@
                             if (gameScore >= winTarget) {
                                 // HEDEFE ULAŞTI VE OYUNU KAZANDI
                                 if (gameStatus) gameStatus.textContent = "Harika!";
-                                setTimeout(() => {
-                                    endMainGame(false, true); // (timeout=false, isWin=true)
-                                }, 500);
+                                endMainGame(false, true); // (timeout=false, isWin=true)
                             } else {
                                 // YENİ TURA GEÇ - MOTİVASYON MESAJI SEÇİMİ
                                 let motivMsg = "";
