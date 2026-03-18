@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -2148,10 +2148,7 @@
                                 setTimeout(() => {
                                     phase2.style.opacity = '1';
 
-                                    // Başlığı ekran okuyucuya okut (Logo çalarken eş zamanlı okunmasını sağlıyoruz)
-                                    setTimeout(() => {
-                                        announceToScreenReader("Hafızana Güven, versiyon 1 nokta 0, beta!");
-                                    }, 50);
+                                    // Başlığı ekran okuyucuya okutma (versionHack zaten okuyor)
 
                                     // Random Logo sesi çal
                                     const randomLogoNum = Math.floor(Math.random() * 5) + 1;
@@ -2212,7 +2209,7 @@
                             // Odaklanmayı ilk butona ver (Erişilebilirlik ve klavye kullanımı için iyi bir pratik)
                             const firstButton = mainMenu.querySelector('.menu-button');
                             if (firstButton) firstButton.focus();
-                            announceToScreenReader('Hafızana güven oyununa hoş geldiniz. Öğeler arasında dolaşmak için sağ sol ok tuşlarına basın. Müzik sesini açıp kısmak için, sayfa yukarı ve sayfa aşağı tuşuna basın. Müziği susturmak için m tuşuna basın.');
+                            announceToScreenReader(window.localizeText('Hafızana güven oyununa hoş geldiniz. Öğeler arasında dolaşmak için sağ sol ok tuşlarına basın. Müzik sesini açıp kısmak için, sayfa yukarı ve sayfa aşağı tuşuna basın. Müziği susturmak için m tuşuna basın.'));
                         }, 50);
                     }, 1000); // 1000ms = 1 saniye geçiş süresi
                 }
