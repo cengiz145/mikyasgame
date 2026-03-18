@@ -791,8 +791,11 @@
                 // Oyun açıldığında (çok az gecikmeli biçimde) ilk kontrolü yap
                 setTimeout(() => guncellemeKontrolEt(false), 2000);
 
-                // Her 60 saniyede bir arka planda sessizce kontrol etmeye devam et
-                setInterval(() => guncellemeKontrolEt(false), 60000);
+                // Tarayıcı sekmesine/pencereye geri dönüldüğünde hemen kontrol et (süper agresif)
+                window.addEventListener('focus', () => guncellemeKontrolEt(false));
+
+                // Her 10 saniyede bir (agresif) arka planda sessizce kontrol etmeye devam et
+                setInterval(() => guncellemeKontrolEt(false), 10000);
 
                 // Klavye komutlarını mobil dokunmatik ekran komutlarına çevir
                 window.localizeText = function (text) {
