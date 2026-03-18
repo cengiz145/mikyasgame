@@ -1831,6 +1831,7 @@
                     if (mobileEnterBtn) {
                         mobileEnterBtn.addEventListener('pointerdown', (e) => {
                             e.preventDefault();
+                            mobileEnterBtn.focus(); // Odak sürekli butonda kalsın
                             const simulatedEnter = new KeyboardEvent('keydown', {
                                 key: 'Enter',
                                 code: 'Enter',
@@ -1847,6 +1848,7 @@
                     document.querySelectorAll('.mobile-piano-key').forEach(button => {
                         button.addEventListener('pointerdown', (e) => {
                             e.preventDefault(); // Odaklanmayı/çift tıklamayı engelle
+                            button.focus();     // Ekran okuyucu odağını bu tuşa zorla
                             const noteKey = button.getAttribute('data-key');
 
                             // Sanal bir klavye eventi fırlat - böylece mevcut oyun mantığı aynen çalışır
