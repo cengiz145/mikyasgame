@@ -1550,6 +1550,11 @@
 
                     if (btnDiffMissingNotes) {
                         btnDiffMissingNotes.addEventListener('click', () => {
+                            if (window.isMobileDevice) {
+                                alert("Bu mod telefonlar için uyumlu olmadığından devre dışı bırakılmıştır.");
+                                if(typeof announceToScreenReader === 'function') announceToScreenReader("Bu mod telefonlar için uyumlu olmadığından devre dışı bırakılmıştır.");
+                                return;
+                            }
                             switchMenu(difficultyMenu, storyMenu, 'story');
 
                             if (bgMusic.playing()) {
@@ -2503,9 +2508,9 @@
                         totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                     } catch (e) { }
 
-                    // Hard modunu tamamladıysa 100 jeton ekle, diğer modlarlar her tur eklendiği için direkt sessionTokens kullanılıyor
+                    // Hard modunu tamamladıysa 300 jeton ekle, diğer modlarlar her tur eklendiği için direkt sessionTokens kullanılıyor
                     if (activeDifficulty === 'hard' && isWin) {
-                        sessionTokens = 100;
+                        sessionTokens = 300;
                     }
 
                     // Bu el kazanılanı toplam tutara ekle (0'ın altına düşmesin)
@@ -3255,8 +3260,8 @@
                                                 // Oyun Bitti
                                                 announceToScreenReader(`Tüm notaları piyanoya ekledin! Kayıp Notalar modunu başarıyla tamamladın.`);
                                                 setTimeout(() => {
-                                                    // Kazanma Ekranına Geç (200 Puan Ekleyerek Bitir)
-                                                    sessionTokens += 200;
+                                                    // Kazanma Ekranına Geç (500 Puan Ekleyerek Bitir)
+                                                    sessionTokens += 500;
                                                     endMainGame(false, true); // End main game calls win logic and UI update
 
                                                     // UI Cleanups
