@@ -667,6 +667,38 @@
                 localStorage.removeItem('hafizaGuvenHataKorumasi');
                 localStorage.removeItem('hafizaGuvenZamanKorumasi');
 
+                // Mobil Cihaz Tespiti
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
+                window.isMobileDevice = isMobile;
+
+                // Klavye komutlarını mobil dokunmatik ekran komutlarına çevir
+                window.localizeText = function(text) {
+                    if (!window.isMobileDevice || !text) return text;
+                    return text
+                        .replace(/entıra basın/gi, "ekrana iki kez dokunun")
+                        .replace(/enter'a basın/gi, "ekrana iki kez dokunun")
+                        .replace(/entır tuşuna basın/gi, "ekrana iki kez dokunun")
+                        .replace(/entır tuşu ile/gi, "ekrana iki kez dokunarak")
+                        .replace(/sağ ve sol ok tuşlarına basın/gi, "parmağınızı sağa veya sola süpürme hareketi yapın")
+                        .replace(/sağ sol ok tuşlarına basın/gi, "parmağınızı sağa veya sola süpürme hareketi yapın")
+                        .replace(/sağ ve sol ok tuşlarıyla gezinebilir/gi, "parmağınızı sağa veya sola süpürerek gezinebilir")
+                        .replace(/sayfa yukarı ve sayfa aşağı tuşuna basın/gi, "telefonunuzun ses tuşlarına basın")
+                        .replace(/page up ve page down tuşlarıyla/gi, "telefonunuzun ses tuşlarıyla")
+                        .replace(/m tuşuna basın/gi, "sessize alma düğmesini kullanın")
+                        .replace(/S tuşu ile skorunuzu, T tuşu ile kalan sürenizi öğrenebilir, boşluk tuşu ile bir saniye ceza karşılığında ses dizisini tekrar dinleyebilirsiniz\./gi, "")
+                        .replace(/ok tuşlarını kullanın/gi, "parmağınızı sağa veya sola süpürün");
+                };
+
+                // Tüm statik Aria Labelleri mobil cihazsa çevir
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (window.isMobileDevice) {
+                        document.querySelectorAll('[aria-label]').forEach(el => {
+                            let oldLabel = el.getAttribute('aria-label');
+                            if (oldLabel) el.setAttribute('aria-label', window.localizeText(oldLabel));
+                        });
+                    }
+                });
+
                 // Dinleyiciyi (Kullanıcı) (0,0,0) merkez noktasına koyalım.
                 // Kulaklarımız x ekseni üzerinde yatay (sağ-sol) hizalı duruyor.
                 Howler.pos(0, 0, 0);
@@ -894,7 +926,7 @@
                     const practiceStatus = document.getElementById('practice-status-text');
                     if (!practiceStatus) return;
 
-                    practiceStatus.innerHTML = practiceDialogues[currentDialogIndex].replace("Devam etmek için entıra basın.", "<strong>Devam etmek için entıra basın.</strong>");
+                    practiceStatus.innerHTML = window.localizeText(practiceDialogues[currentDialogIndex].replace("Devam etmek için entıra basın.", "<strong>Devam etmek için entıra basın.</strong>"));
                     announceToScreenReader(practiceDialogues[currentDialogIndex]);
                 }
 
@@ -904,7 +936,7 @@
 
                     let appendedText = missingNotesDialogues[currentStoryIndex];
 
-                    storyStatus.innerHTML = appendedText.replace("Devam etmek için entıra basın.", "<strong>Devam etmek için entıra basın.</strong>");
+                    storyStatus.innerHTML = window.localizeText(appendedText.replace("Devam etmek için entıra basın.", "<strong>Devam etmek için entıra basın.</strong>"));
                     announceToScreenReader(appendedText);
                 }
 
@@ -2059,6 +2091,8 @@
 
                 // --- NVDA İÇİN KESİN OKUMA FONKSİYONU (FOCUS HACK) --- //
                 function announceToScreenReader(text, forceFocus = true) {
+                    text = window.localizeText(text); // Mobil cihaz ise metinleri otomatik çevirir
+
                     // Önceki odakta kalan okuyucuyu temizle
                     let oldAnnouncer = document.getElementById('sr-focus-announcer');
                     if (oldAnnouncer) {
