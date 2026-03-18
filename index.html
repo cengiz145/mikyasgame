@@ -317,6 +317,20 @@
 
         <body>
 
+            <!-- Otomatik Güncelleme Ekranı -->
+            <div id="updater-dialog" role="alertdialog" aria-modal="true" aria-labelledby="updater-title"
+                aria-describedby="updater-desc" tabindex="-1"
+                style="display: none; position: fixed; top:0; left:0; width:100vw; height:100vh; background: #111; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; color: white;">
+                <h1 id="updater-title" style="color: #ffb703; font-size: 2rem; margin-bottom: 20px;">SİTE GÜNCELLENİYOR
+                </h1>
+                <p id="updater-desc" style="font-size: 1.2rem; text-align: center; padding: 20px; color: #ccc;">
+                    Geliştirici yeni kodları gönderdi. Lütfen sitenin yeni sürümünün yüklenmesini bekleyin...<br>
+                    Bu ekran, güncelleme tamamlanınca otomatik olarak kapanıp sayfayı yenileyecektir.
+                </p>
+                <div id="updater-timer" style="font-size: 3rem; font-weight: bold; margin-top: 10px; color: #4ade80;"
+                    aria-live="polite">00:00</div>
+            </div>
+
             <!-- Başlangıç (Intro) Ekranı -->
             <div id="intro-screen" tabindex="-1">
 
@@ -348,7 +362,7 @@
                 <div id="intro-phase-2" class="intro-phase"
                     style="display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; opacity: 0; padding: 0 20px; transition: opacity 1s ease-in-out;">
                     <h1 id="intro-game-title" class="intro-title" style="font-size: 3rem; color: var(--focus-outline);"
-                        aria-hidden="true">Hafızana Güven Version 1.0 Beta</h1>
+                        aria-hidden="true">Hafızana Güven Version 1.2</h1>
                     <p class="intro-instruction" aria-hidden="true"
                         style="margin-top: 20px; font-size: 1.2rem; animation: fadeInOut 2s infinite;">Lütfen
                         bekleyin...
@@ -653,10 +667,12 @@
             <!-- Oyun Ekranı -->
             <section id="game-menu-container" class="menu-container" aria-label="Oyun Alanı" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-                <div tabindex="0" role="button" aria-label="Oyun sınırı, menüye dönülüyor. Menüye dönmek için entıra basın."
+                <div tabindex="0" role="button"
+                    aria-label="Oyun sınırı, menüye dönülüyor. Menüye dönmek için entıra basın."
                     style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
                     onclick="document.getElementById('game-back-btn').focus();"
-                    onkeydown="if(event.key==='Enter' || event.key===' ') document.getElementById('game-back-btn').focus();"></div>
+                    onkeydown="if(event.key==='Enter' || event.key===' ') document.getElementById('game-back-btn').focus();">
+                </div>
                 <h1 id="game-menu-title">Hafızana Güven</h1>
                 <div
                     style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.3rem; color: #ffb703; font-weight: bold;">
@@ -680,7 +696,8 @@
                 <div tabindex="0" role="button" aria-label="Oyun sınırı, başa dönülüyor. Başa dönmek için entıra basın."
                     style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
                     onclick="document.getElementById('game-back-btn').focus();"
-                    onkeydown="if(event.key==='Enter' || event.key===' ') document.getElementById('game-back-btn').focus();"></div>
+                    onkeydown="if(event.key==='Enter' || event.key===' ') document.getElementById('game-back-btn').focus();">
+                </div>
             </section>
 
             <!-- Mobil Piyano Tuşları Ekranı -->
@@ -712,6 +729,112 @@
                 // Mobil Cihaz Tespiti
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
                 window.isMobileDevice = isMobile;
+
+                // --- OTOMATİK GÜNCELLEME KONTROL SİSTEMİ ---
+                let isSiteUpdating = false;
+                async function checkForUpdates() {
+                    if (isSiteUpdating) return;
+                    try {
+                        const noCache = '?t=' + new Date().getTime();
+                        // 1. Live sitedeki versiyonu al
+                        const liveRes = await fetch('./version.json' + noCache);
+                        if (!liveRes.ok) return;
+                        const liveVer = await liveRes.json();
+
+                        // 2. GitHub üzerindeki en güncel (source) versiyonu al
+                        const repoRes = await fetch('https://raw.githubusercontent.com/cengiz145/mikyasgame/main/version.json' + noCache);
+                        if (!repoRes.ok) return;
+                        const repoVer = await repoRes.json();
+
+                        // 3. Karşılaştır! Eğer repo (github) > live (github pages) ise DEPLOYMENT SÜRÜYOR demektir!
+                        if (repoVer.buildId > liveVer.buildId) {
+                            startUpdateTimer(repoVer.changelog);
+                        }
+                    } catch (e) {
+                        console.error("Güncelleme kontrolü başarısız", e);
+                    }
+                }
+
+                function startUpdateTimer(changelogText) {
+                    if (isSiteUpdating) return;
+                    isSiteUpdating = true;
+
+                    // Tüm sesleri durdur
+                    if (typeof Howler !== 'undefined') {
+                        Howler.stop();
+                    }
+
+                    // Tüm menüleri gizle
+                    document.querySelectorAll('.menu-container').forEach(c => c.style.display = 'none');
+                    if (document.getElementById('mobile-piano-container')) document.getElementById('mobile-piano-container').style.display = 'none';
+                    if (document.getElementById('mobile-enter-container')) document.getElementById('mobile-enter-container').style.display = 'none';
+
+                    // Güncelleme ekranını göster
+                    const dialog = document.getElementById('updater-dialog');
+                    const descElem = document.getElementById('updater-desc');
+                    dialog.style.display = 'flex';
+                    dialog.focus();
+
+                    let secondsElapsed = 0;
+                    const timerElem = document.getElementById('updater-timer');
+
+                    let updateMessage = "Oyun güncelleniyor. Lütfen bekleyin. ";
+                    if (changelogText) {
+                        descElem.innerHTML = `Geliştirici yeni kodları gönderdi. Lütfen sitenin yeni sürümünün yüklenmesini bekleyin...<br><br><strong>Son Güncellemelerde Neler Yapıldı:</strong><br>${changelogText}<br><br>Bu ekran, güncelleme tamamlanınca otomatik olarak kapanıp sayfayı yenileyecektir.`;
+                        updateMessage += "Son güncellemelerde şunlar yapıldı: " + changelogText;
+                    } else {
+                        updateMessage += "Bu işlem yaklaşık 1 ile 2 dakika sürebilir.";
+                    }
+
+                    if (typeof announceToScreenReader === 'function') {
+                        announceToScreenReader(updateMessage);
+                    }
+
+                    const ticker = setInterval(() => {
+                        secondsElapsed++;
+                        let m = Math.floor(secondsElapsed / 60);
+                        let s = secondsElapsed % 60;
+                        let timeStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                        timerElem.textContent = timeStr;
+
+                        // Her 20 saniyede bir okut
+                        if (secondsElapsed % 20 === 0) {
+                            if (typeof announceToScreenReader === 'function') {
+                                announceToScreenReader(`Kodlar çekiliyor... ${m} dakika ${s} saniye geçti. Anlayışınız için teşekkür ederiz.`);
+                            }
+                        }
+                    }, 1000);
+
+                    // Arka planda live server'ı sürekli kontrol et (site yüklendi mi?)
+                    const pollInterval = setInterval(async () => {
+                        try {
+                            const noCache = '?t=' + new Date().getTime();
+                            const checkRes = await fetch('./version.json' + noCache);
+                            if (checkRes.ok) {
+                                const checkVer = await checkRes.json();
+                                const repoRes = await fetch('https://raw.githubusercontent.com/cengiz145/mikyasgame/main/version.json' + noCache);
+                                const repoVer = await repoRes.json();
+
+                                if (checkVer.buildId >= repoVer.buildId) {
+                                    clearInterval(pollInterval);
+                                    clearInterval(ticker);
+                                    timerElem.textContent = "TAMAMLANDI!";
+                                    if (typeof announceToScreenReader === 'function') {
+                                        announceToScreenReader("Güncelleme tamamlandı! Yeni sürüm başarıyla yüklendi. Sizi ana menüye aktarıyoruz.");
+                                    }
+                                    sessionStorage.setItem('skipIntro', 'true');
+                                    setTimeout(() => {
+                                        window.location.reload(true);
+                                    }, 4000);
+                                }
+                            }
+                        } catch (e) { }
+                    }, 5000); // 5 saniyede bir dene
+                }
+
+                // Sayfa yüklendiğinde ve her 30 saniyede bir kontrol et (İnternete bağlı olmak şartıyla)
+                setTimeout(checkForUpdates, 2000);
+                setInterval(checkForUpdates, 30000);
 
                 // Klavye komutlarını mobil dokunmatik ekran komutlarına çevir
                 window.localizeText = function (text) {
@@ -1924,8 +2047,31 @@
                 // Ekran yüklendiğinde ekran okuyucuyu girişi başlatma butonuna odakla ve tam ekranı ayarla
                 window.addEventListener('load', () => {
                     const startIntroBtn = document.getElementById('start-intro-btn');
-                    if (startIntroBtn) {
-                        startIntroBtn.focus();
+                    
+                    if (sessionStorage.getItem('skipIntro') === 'true') {
+                        sessionStorage.removeItem('skipIntro');
+                        isStarted = true;
+                        const srcIntro = document.getElementById('intro-screen');
+                        if(srcIntro) {
+                            srcIntro.style.display = 'none';
+                            srcIntro.setAttribute('aria-hidden', 'true');
+                        }
+                        const mMenu = document.getElementById('main-menu-container');
+                        if(mMenu) {
+                            mMenu.style.display = 'flex';
+                            mMenu.style.opacity = '1';
+                        }
+                        
+                        // Müziği gecikmeli başlat ki okuyucu karışmasın
+                        setTimeout(() => { if (!bgMusic.playing()) bgMusic.play(); }, 1000);
+                        setTimeout(() => {
+                            const activeButtons = getActiveButtons();
+                            if (activeButtons.length > 0) activeButtons[0].focus();
+                        }, 500);
+                    } else {
+                        if (startIntroBtn) {
+                            startIntroBtn.focus();
+                        }
                     }
 
                     // Tıklanır tıklanmaz (veya dokunulur dokunulmaz) her yerde tam ekran yap
