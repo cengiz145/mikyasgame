@@ -310,6 +310,37 @@
                 font-size: 1rem;
             }
         }
+        @media (min-width: 769px) {
+            #feedback-menu-container {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.85);
+                z-index: 2000;
+                justify-content: center;
+                align-items: center;
+                padding: 0;
+            }
+
+            .feedback-dialog-box {
+                background-color: #1a1a1a;
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+                border: 1px solid #444;
+                width: 100%;
+                max-width: 600px;
+                text-align: left;
+            }
+
+            .feedback-dialog-box h1 {
+                border-bottom: 2px solid #444;
+                margin-bottom: 20px;
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>
 
@@ -639,43 +670,45 @@
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('feedback-back-btn').focus(), 10);"></div>
-        <h1 id="feedback-menu-title">Geri Bildirim</h1>
-        
-        <div id="feedback-content" style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
-            <p id="feedback-desc" aria-live="polite">Lütfen oyun hakkında geri bildiriminizi paylaşın.</p>
+        <div class="feedback-dialog-box">
+            <h1 id="feedback-menu-title">Geri Bildirim</h1>
             
-            <form id="feedback-form" action="#" method="POST" style="margin-top: 15px;">
-                <!-- Google Form'un entegrasyonu için form oluşturulmuştur. action ve name attributeleri daha sonra Google Forms API'nize göre güncellenmelidir. -->
-                <div style="margin-bottom: 15px;">
-                    <label for="feedback-name" style="display: block; margin-bottom: 5px; color: #ffb703;">Adınız (İsteğe Bağlı):</label>
-                    <input type="text" id="feedback-name" name="entry.1166239628" aria-label="Adınızı buraya yazın" style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; font-family: inherit; font-size: 1rem;" placeholder="Adınız">
-                </div>
+            <div id="feedback-content" style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
+                <p id="feedback-desc" aria-live="polite">Lütfen oyun hakkında geri bildiriminizi paylaşın.</p>
+                
+                <form id="feedback-form" action="#" method="POST" style="margin-top: 15px;">
+                    <!-- Google Form'un entegrasyonu için form oluşturulmuştur. action ve name attributeleri daha sonra Google Forms API'nize göre güncellenmelidir. -->
+                    <div style="margin-bottom: 15px;">
+                        <label for="feedback-name" style="display: block; margin-bottom: 5px; color: #ffb703;">Adınız (İsteğe Bağlı):</label>
+                        <input type="text" id="feedback-name" name="entry.1166239628" aria-label="Adınızı buraya yazın" style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; font-family: inherit; font-size: 1rem;" placeholder="Adınız">
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <label for="feedback-category" style="display: block; margin-bottom: 5px; color: #ffb703;">Kategori Seçin:</label>
-                    <select id="feedback-category" name="entry.1001484363" style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; cursor: pointer; text-align: left; font-size: 1rem;">
-                        <option value="Hata" aria-label="Hata önerin. Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.">Hata önerin - Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.</option>
-                        <option value="Öneri" aria-label="Öneride bulunun. Oyunun gelişmesinde, eğer bir öneriniz varsa. Burası tam size göre. Harika önerilerinizi buraya gönderebilirsiniz.">Öneride bulunun - Harika önerilerinizi buraya gönderebilirsiniz.</option>
-                    </select>
-                </div>
+                    <div style="margin-bottom: 15px;">
+                        <label for="feedback-category" style="display: block; margin-bottom: 5px; color: #ffb703;">Kategori Seçin:</label>
+                        <select id="feedback-category" name="entry.1001484363" style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; cursor: pointer; text-align: left; font-size: 1rem;">
+                            <option value="Hata" aria-label="Hata önerin. Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.">Hata önerin - Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.</option>
+                            <option value="Öneri" aria-label="Öneride bulunun. Oyunun gelişmesinde, eğer bir öneriniz varsa. Burası tam size göre. Harika önerilerinizi buraya gönderebilirsiniz.">Öneride bulunun - Harika önerilerinizi buraya gönderebilirsiniz.</option>
+                        </select>
+                    </div>
 
-                <div style="margin-bottom: 15px;">
-                    <label for="feedback-text" style="display: block; margin-bottom: 5px; color: #ffb703;">Biletiniz - Mesajınız:</label>
-                    <textarea id="feedback-text" name="entry.150314719" rows="5" aria-label="Biletiniz - Mesajınızı buraya yazın" style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; resize: vertical; font-family: inherit; font-size: 1rem;" placeholder="Bildirmek istediğiniz sorunu veya harika önerilerinizi buraya yazabilirsiniz."></textarea>
-                </div>
-            </form>
+                    <div style="margin-bottom: 15px;">
+                        <label for="feedback-text" style="display: block; margin-bottom: 5px; color: #ffb703;">Biletiniz - Mesajınız:</label>
+                        <textarea id="feedback-text" name="entry.150314719" rows="5" aria-label="Biletiniz - Mesajınızı buraya yazın" style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; resize: vertical; font-family: inherit; font-size: 1rem;" placeholder="Bildirmek istediğiniz sorunu veya harika önerilerinizi buraya yazabilirsiniz."></textarea>
+                    </div>
+                </form>
+            </div>
+
+            <nav class="menu-nav" aria-labelledby="feedback-menu-title">
+                <ul>
+                    <li>
+                        <button id="feedback-submit-btn" class="menu-button" aria-label="Gönder">Gönder</button>
+                    </li>
+                    <li>
+                        <button id="feedback-back-btn" class="menu-button" aria-label="Geri">Geri</button>
+                    </li>
+                </ul>
+            </nav>
         </div>
-
-        <nav class="menu-nav" aria-labelledby="feedback-menu-title">
-            <ul>
-                <li>
-                    <button id="feedback-submit-btn" class="menu-button" aria-label="Gönder">Gönder</button>
-                </li>
-                <li>
-                    <button id="feedback-back-btn" class="menu-button" aria-label="Geri">Geri</button>
-                </li>
-            </ul>
-        </nav>
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => { const firstBtn = document.getElementById('feedback-submit-btn'); if(firstBtn) firstBtn.focus(); }, 10);"></div>
@@ -1591,12 +1624,14 @@
 
         if (feedbackBtnMain && feedbackBackBtn) {
             feedbackBtnMain.addEventListener('click', () => {
-                switchMenu(mainMenu, feedbackMenu, 'feedback');
+                switchMenu(null, feedbackMenu, 'feedback');
+                mainMenu.setAttribute('aria-hidden', 'true');
                 setTimeout(() => announceToScreenReader("Geri bildirim menüsü açıldı. Bu oyun hakkındaki hata ve önerilerinizi tab tuşuyla form alanlarında dolaşarak yazabilirsiniz."), 400);
             });
 
             feedbackBackBtn.addEventListener('click', () => {
-                switchMenu(feedbackMenu, mainMenu, 'main');
+                switchMenu(feedbackMenu, null, 'main');
+                mainMenu.removeAttribute('aria-hidden');
             });
 
             if (feedbackSubmitBtn) {
@@ -1629,7 +1664,8 @@
                     announceToScreenReader("Geri bildiriminiz başarıyla iletilmiştir. Harika öneri ve bildirimleriniz oyunu geliştirmek için kullanılacaktır. Teşekkürler. Ana menüye dönülüyor.");
                     
                     setTimeout(() => {
-                        switchMenu(feedbackMenu, mainMenu, 'main');
+                        switchMenu(feedbackMenu, null, 'main');
+                        mainMenu.removeAttribute('aria-hidden');
                     }, 2500);
                 });
             }

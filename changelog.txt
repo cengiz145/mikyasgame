@@ -4,6 +4,7 @@
 
 ### Eklenenler / Değiştirilenler:
 - Ana menüye 'Geri Bildirim' butonu ve bildirim menüsü eklendi, Google Form gönderimi aktifleştirildi.
+- Geri Bildirim menüsü bilgisayarlar için Modal (Diyalog) görünümüne kavuşturuldu.
 
 [v1.0.1 Beta] - 2026-03-11
 
