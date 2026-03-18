@@ -762,6 +762,30 @@
                                 // Anons bittikten kısa süre sonra uyarı penceresi çıkart
                                 setTimeout(() => {
                                     alert(uyariMesaji);
+                                    // Mobilde alert'i kapattıktan hemen sonra ekrana devasa ve odaklanmış bir Yenile butonu getir
+                                    if (window.isMobileDevice) {
+                                        const refreshBtn = document.createElement("button");
+                                        refreshBtn.textContent = "SAYFAYI YENİLE (GÜNCELLE)";
+                                        refreshBtn.style.position = "fixed";
+                                        refreshBtn.style.top = "50%";
+                                        refreshBtn.style.left = "50%";
+                                        refreshBtn.style.transform = "translate(-50%, -50%)";
+                                        refreshBtn.style.zIndex = "999999";
+                                        refreshBtn.style.padding = "30px 40px";
+                                        refreshBtn.style.fontSize = "1.5rem";
+                                        refreshBtn.style.fontWeight = "bold";
+                                        refreshBtn.style.backgroundColor = "#ffb703";
+                                        refreshBtn.style.color = "#000";
+                                        refreshBtn.style.border = "none";
+                                        refreshBtn.style.borderRadius = "15px";
+                                        refreshBtn.style.boxShadow = "0 0 20px rgba(0,0,0,0.8)";
+                                        refreshBtn.setAttribute("aria-label", "Yeni sürümü kullanmak için sayfayı yenileyin.");
+                                        refreshBtn.onclick = () => window.location.reload(true);
+                                        document.body.appendChild(refreshBtn);
+                                        
+                                        // Ekran okuyucu uyarıdan çıktıktan hemen sonra yenile butonuna kilitlensin
+                                        setTimeout(() => refreshBtn.focus(), 100);
+                                    }
                                 }, 500); 
                             } else {
                                 if (isManual && typeof announceToScreenReader === 'function') {
