@@ -738,54 +738,58 @@
                                     announceToScreenReader('Oyununuz güncel.');
                                 }
                             } else if (data.version !== mevcutSurum) {
-                                // Sürüm numarası değiştiyse GÜNCELLEME VAR demektir!
-                                const uyariMesaji = "Oyuna yeni bir güncelleme geldi! Test edebilmek için lütfen sayfayı yenileyin.";
-                                
-                                // Ekran okuyucu için otomatik gizli bir duyuru alanı oluştur (eğer yoksa)
-                                let ekranOkuyucuDuyuru = document.getElementById("otomatikGuncellemeDuyurusu");
-                                if (!ekranOkuyucuDuyuru) {
-                                    ekranOkuyucuDuyuru = document.createElement("div");
-                                    ekranOkuyucuDuyuru.id = "otomatikGuncellemeDuyurusu";
-                                    ekranOkuyucuDuyuru.setAttribute("aria-live", "assertive");
-                                    // Görsel olarak gizle ama ekran okuyucuya açık bırak
-                                    ekranOkuyucuDuyuru.style.position = "absolute";
-                                    ekranOkuyucuDuyuru.style.left = "-9999px"; 
-                                    document.body.appendChild(ekranOkuyucuDuyuru);
-                                }
-                                
-                                // Ekran okuyucuya mesajı okut
-                                ekranOkuyucuDuyuru.textContent = uyariMesaji;
-                                
-                                // Sürekli uyarı vermemesi için mevcut sürümü yeni sürümle güncelle
+                                // Sürüm numarası değiştiyse GÜNCELLEME ZORUNLU
                                 mevcutSurum = data.version;
+                                const uyariMesaji = "Oyuna zorunlu bir güncelleme geldi! Eski sürümle oynamaya devam edemezsiniz. Lütfen Tamam'a basarak sayfayı yenileyin.";
                                 
-                                // Anons bittikten kısa süre sonra uyarı penceresi çıkart
+                                // Oyunu anında dondur
+                                gameIsActive = false;
+                                if (typeof Howler !== 'undefined') {
+                                    Howler.stop(); // Tüm sesleri kes
+                                }
+
+                                // Ekranı tamamen kapatan bir blok at (Eski sürümle hiçbir şekilde oynanamasın)
+                                document.body.innerHTML = "";
+                                document.body.style.backgroundColor = "#111";
+                                
+                                const updateMsg = document.createElement("h1");
+                                updateMsg.textContent = "Zorunlu Güncelleme: Eski sürüm devre dışı bırakıldı.";
+                                updateMsg.style.color = "#ffb703";
+                                updateMsg.style.textAlign = "center";
+                                updateMsg.style.marginTop = "20vh";
+                                document.body.appendChild(updateMsg);
+                                
                                 setTimeout(() => {
                                     alert(uyariMesaji);
-                                    // Mobilde alert'i kapattıktan hemen sonra ekrana devasa ve odaklanmış bir Yenile butonu getir
-                                    if (window.isMobileDevice) {
-                                        const refreshBtn = document.createElement("button");
-                                        refreshBtn.textContent = "SAYFAYI YENİLE (GÜNCELLE)";
-                                        refreshBtn.style.position = "fixed";
-                                        refreshBtn.style.top = "50%";
-                                        refreshBtn.style.left = "50%";
-                                        refreshBtn.style.transform = "translate(-50%, -50%)";
-                                        refreshBtn.style.zIndex = "999999";
-                                        refreshBtn.style.padding = "30px 40px";
-                                        refreshBtn.style.fontSize = "1.5rem";
-                                        refreshBtn.style.fontWeight = "bold";
-                                        refreshBtn.style.backgroundColor = "#ffb703";
-                                        refreshBtn.style.color = "#000";
-                                        refreshBtn.style.border = "none";
-                                        refreshBtn.style.borderRadius = "15px";
-                                        refreshBtn.style.boxShadow = "0 0 20px rgba(0,0,0,0.8)";
-                                        refreshBtn.setAttribute("aria-label", "Yeni sürümü kullanmak için sayfayı yenileyin.");
-                                        refreshBtn.onclick = () => window.location.reload(true);
-                                        document.body.appendChild(refreshBtn);
-                                        
-                                        // Ekran okuyucu uyarıdan çıktıktan hemen sonra yenile butonuna kilitlensin
-                                        setTimeout(() => refreshBtn.focus(), 100);
-                                    }
+                                    
+                                    // Ortak (Hem PC Hem Mobil İçin) Devasa Odaklanmış Yenile Butonu Çıkart
+                                    const refreshBtn = document.createElement("button");
+                                    refreshBtn.textContent = "YENİ SÜRÜME GEÇ (SAYFAYI YENİLE)";
+                                    refreshBtn.style.position = "fixed";
+                                    refreshBtn.style.top = "50%";
+                                    refreshBtn.style.left = "50%";
+                                    refreshBtn.style.transform = "translate(-50%, -50%)";
+                                    refreshBtn.style.zIndex = "999999";
+                                    refreshBtn.style.padding = "30px 40px";
+                                    refreshBtn.style.fontSize = "1.5rem";
+                                    refreshBtn.style.fontWeight = "bold";
+                                    refreshBtn.style.backgroundColor = "#ffb703";
+                                    refreshBtn.style.color = "#000";
+                                    refreshBtn.style.border = "none";
+                                    refreshBtn.style.borderRadius = "15px";
+                                    refreshBtn.style.boxShadow = "0 0 20px rgba(0,0,0,0.8)";
+                                    refreshBtn.setAttribute("aria-label", "Yeni sürüme geçmek zorunludur. Lütfen sayfayı yenileyin.");
+                                    refreshBtn.onclick = () => {
+                                        window.location.href = window.location.pathname + "?v=" + new Date().getTime();
+                                    };
+                                    document.body.appendChild(refreshBtn);
+                                    
+                                    setTimeout(() => refreshBtn.focus(), 100);
+                                    
+                                    // Otomatik yenilemeyi de kışkırt (Kullanıcı alert'i geçer geçmez reload başlar)
+                                    setTimeout(() => {
+                                        window.location.href = window.location.pathname + "?v=" + new Date().getTime();
+                                    }, 1500);
                                 }, 500); 
                             } else {
                                 if (isManual && typeof announceToScreenReader === 'function') {
