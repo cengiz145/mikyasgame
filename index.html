@@ -151,14 +151,14 @@
                 #mobile-piano-container {
                     display: none;
                     position: fixed;
-                    bottom: 10px;
+                    bottom: 0px; /* Ekranın tam altına yasla */
                     left: 50%;
                     transform: translateX(-50%);
-                    width: 98%;
+                    width: 100%; /* Ekranı tam kapla */
                     max-width: 800px;
                     z-index: 1000;
                     justify-content: space-between;
-                    gap: 3px;
+                    gap: 0px; /* Butonlar arası boşluğu sıfırla */
                 }
 
                 .mobile-piano-key {
@@ -167,7 +167,8 @@
                     background-color: #333;
                     color: #fff;
                     border: 1px solid #555;
-                    border-radius: 6px;
+                    border-radius: 0; /* Arada boşluk hissi kalmaması için köşeleri sıfırla */
+                    margin: 0;
                     font-size: 1.1rem;
                     font-weight: bold;
                     text-align: center;
@@ -189,7 +190,8 @@
                     background-color: #8b0000;
                     color: #fff;
                     border: 1px solid #ff4444;
-                    border-radius: 6px;
+                    border-radius: 0; /* Arada boşluk olmaması için */
+                    margin: 0;
                     font-size: 1.1rem;
                     font-weight: bold;
                     text-align: center;
