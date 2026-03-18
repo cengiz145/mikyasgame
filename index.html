@@ -2176,7 +2176,9 @@
                                     });
                                     currentLogoSound.play();
 
-                                    introReadyToStartGame = true; // Artık enter'a basılıp geçilebilir
+                                    setTimeout(() => {
+                                        introReadyToStartGame = true; // Mobil çift dokunmanın 2. dokunuşunu sönümlemek için 1000ms geciktiriyoruz
+                                    }, 1000);
                                 }, 50);
                             }
                         }, 500); // Fade-out süresi
