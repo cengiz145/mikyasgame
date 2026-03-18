@@ -1824,7 +1824,28 @@
                     // Tıklanır tıklanmaz (veya dokunulur dokunulmaz) her yerde tam ekran yap
                     const requestFullScreenOnce = () => {
                         if (!document.fullscreenElement && document.body.requestFullscreen) {
-                            document.body.requestFullscreen().catch(err => {
+                            document.body.requestFullscreen().then(() => {
+                                // Tarayıcının 'Tam ekrandan çıkmak için Esc tuşuna basın' uyarısını ezmek (interrupt) için Focus Hack
+                                const versionHack = document.createElement("div");
+                                versionHack.tabIndex = -1;
+                                versionHack.setAttribute("aria-label", "Hafızana Güven Version 1.0 Beta");
+                                versionHack.style.position = "absolute";
+                                versionHack.style.opacity = "0";
+                                document.body.appendChild(versionHack);
+                                
+                                // Kısa bir gecikmeyle (tam ekran animasyonu anında) odağı buraya çekerek uyarıyı sustur
+                                setTimeout(() => {
+                                    versionHack.focus();
+                                    
+                                    // Okuma bittikten sonra fazlalığı temizle ve odağı asıl butona geri ver
+                                    setTimeout(() => {
+                                        if (document.body.contains(versionHack)) document.body.removeChild(versionHack);
+                                        const startBtn = document.getElementById('start-intro-btn');
+                                        if (startBtn) startBtn.focus();
+                                    }, 1000);
+                                }, 50);
+
+                            }).catch(err => {
                                 console.log(`Tam ekran yapılamadı: ${err.message}`);
                             });
                         }
