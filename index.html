@@ -152,10 +152,8 @@
                     display: none;
                     position: fixed;
                     bottom: 0px; /* Ekranın tam altına yasla */
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 100%; /* Ekranı tam kapla */
-                    max-width: 800px;
+                    left: 0;
+                    width: 100vw; /* Ekranı tam kapla (boydan boya) */
                     z-index: 1000;
                     justify-content: space-between;
                     gap: 0px; /* Butonlar arası boşluğu sıfırla */
@@ -163,13 +161,13 @@
 
                 .mobile-piano-key {
                     flex: 1;
-                    padding: 20px 0; /* Boydan boya büyük olması için padding artırıldı */
+                    padding: 30px 0; /* Butonlar çok küçükmüş, boyları uzatıldı */
                     background-color: #333;
                     color: #fff;
                     border: 1px solid #555;
                     border-radius: 0; /* Arada boşluk hissi kalmaması için köşeleri sıfırla */
                     margin: 0;
-                    font-size: 1.1rem;
+                    font-size: 1.3rem;
                     font-weight: bold;
                     text-align: center;
                     cursor: pointer;
@@ -186,13 +184,13 @@
 
                 .mobile-exit-btn {
                     flex: 1.5; /* Çıkış butonu biraz daha geniş olabilir veya aynı kalabilir */
-                    padding: 20px 0;
+                    padding: 30px 0;
                     background-color: #8b0000;
                     color: #fff;
                     border: 1px solid #ff4444;
                     border-radius: 0; /* Arada boşluk olmaması için */
                     margin: 0;
-                    font-size: 1.1rem;
+                    font-size: 1.3rem;
                     font-weight: bold;
                     text-align: center;
                     cursor: pointer;
@@ -307,7 +305,7 @@
             </style>
         </head>
 
-        <body role="application" oncontextmenu="return false;">
+        <body>
 
             <!-- Başlangıç (Intro) Ekranı -->
             <div id="intro-screen" tabindex="-1">
@@ -1833,17 +1831,15 @@
                                 versionHack.style.opacity = "0";
                                 document.body.appendChild(versionHack);
                                 
-                                // Kısa bir gecikmeyle (tam ekran animasyonu anında) odağı buraya çekerek uyarıyı sustur
+                                // Anında odağı buraya çekerek uyarıyı sustur
+                                versionHack.focus();
+                                
+                                // Okuma bittikten sonra fazlalığı temizle ve odağı asıl butona geri ver
                                 setTimeout(() => {
-                                    versionHack.focus();
-                                    
-                                    // Okuma bittikten sonra fazlalığı temizle ve odağı asıl butona geri ver
-                                    setTimeout(() => {
-                                        if (document.body.contains(versionHack)) document.body.removeChild(versionHack);
-                                        const startBtn = document.getElementById('start-intro-btn');
-                                        if (startBtn) startBtn.focus();
-                                    }, 1000);
-                                }, 50);
+                                    if (document.body.contains(versionHack)) document.body.removeChild(versionHack);
+                                    const startBtn = document.getElementById('start-intro-btn');
+                                    if (startBtn) startBtn.focus();
+                                }, 2500);
 
                             }).catch(err => {
                                 console.log(`Tam ekran yapılamadı: ${err.message}`);
@@ -2130,7 +2126,8 @@
                                 mobileExitBtn.style.display = 'block';
                                 mobileExitBtn.removeAttribute('aria-hidden');
                                 // Sadece bildirim, oyun durum yazısını (endMessage vb) değiştirmeyecek
-                                announceToScreenReader("Oyundan çık tuşu belirdi.");
+                                // Yazı okumasın gizli bir "bip" tarzı bildirim veya sadece kısa bir aria-live
+                                announceToScreenReader("Çıkış tuşu belirdi.", false);
                             }
                         }
                     }, 10000);
