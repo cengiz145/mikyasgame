@@ -354,11 +354,11 @@
 
 
             <div id="main-menu-container" class="menu-container" role="presentation" aria-hidden="true">
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('exit-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('exit-btn').focus(), 10);"></div>
                 <h1 id="main-menu-title" aria-hidden="true">Ana Menü</h1>
 
                 <!-- aria-labelledby ile nav bölgesini başlıkla ilişkilendiriyoruz -->
-                <nav class="menu-nav" aria-labelledby="main-menu-title" tabindex="0">
+                <nav class="menu-nav" aria-labelledby="main-menu-title">
                     <ul>
                         <li>
                             <button id="start-game-btn" class="menu-button" aria-label="Oyuna Başla">Oyuna
@@ -392,18 +392,18 @@
                         </li>
                     </ul>
                 </nav>
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('start-game-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('start-game-btn').focus(), 10);"></div>
             </div>
 
             <!-- Zorluk Seçimi Menüsü -->
             <div id="difficulty-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 aria-label="Zorluk Seçimi Menüsü">
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('difficulty-back-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('difficulty-back-btn').focus(), 10);"></div>
                 <h1 id="difficulty-menu-title" tabindex="-1">Lütfen bir mod seçin</h1>
 
                 <div id="difficulty-status-text" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
-                <nav class="menu-nav" aria-label="Zorluk Seviyeleri" tabindex="0">
+                <nav class="menu-nav" aria-label="Zorluk Seviyeleri">
                     <ul>
                         <li><button class="menu-button" id="btn-diff-easy">Kolay Mod</button></li>
                         <li id="li-diff-medium" style="display: none;"><button class="menu-button"
@@ -416,14 +416,14 @@
                         </li>
                     </ul>
                 </nav>
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('btn-diff-easy').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('btn-diff-easy').focus(), 10);"></div>
             </div>
 
             <!-- Skor Tablosu Alt Menüsü -->
             <div id="scoreboard-menu-container" class="menu-container" role="presentation" aria-hidden="true">
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('scoreboard-back-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('scoreboard-back-btn').focus(), 10);"></div>
                 <h1 id="scoreboard-menu-title">Skor Tablosu</h1>
-                <nav class="menu-nav" aria-labelledby="scoreboard-menu-title" tabindex="0">
+                <nav class="menu-nav" aria-labelledby="scoreboard-menu-title">
                     <ul>
                         <li>
                             <button id="btn-score-easy" class="menu-button" aria-label="Kolay Mod">Kolay Mod</button>
@@ -443,7 +443,7 @@
                         </li>
                     </ul>
                 </nav>
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('btn-score-easy').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('btn-score-easy').focus(), 10);"></div>
             </div>
 
 
@@ -453,7 +453,7 @@
             <!-- Alıştırma Modu (Piyano) Menüsü -->
             <div id="practice-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('practice-instructions').focus(); } }, 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('practice-instructions').focus(); } }, 10);"></div>
                 <h1 id="practice-menu-title">Alıştırma Modu</h1>
 
                 <div id="practice-instructions"
@@ -497,7 +497,7 @@
                     <!-- Diyalog metni buraya gelecek -->
                 </div>
 
-                <nav id="practice-nav" class="menu-nav" aria-labelledby="practice-menu-title" tabindex="0"
+                <nav id="practice-nav" class="menu-nav" aria-labelledby="practice-menu-title"
                     style="display: none;">
                     <ul>
                         <li>
@@ -505,30 +505,30 @@
                         </li>
                     </ul>
                 </nav>
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('practice-instructions').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('practice-instructions').focus(), 10);"></div>
             </div>
 
             <!-- Hikaye Modu Menüsü -->
             <div id="story-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => { if(document.getElementById('mobile-enter-btn') && document.getElementById('mobile-enter-btn').offsetParent !== null) document.getElementById('mobile-enter-btn').focus(); }, 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => { if(document.getElementById('mobile-enter-btn') && document.getElementById('mobile-enter-btn').offsetParent !== null) document.getElementById('mobile-enter-btn').focus(); }, 10);"></div>
                 <h1 id="story-menu-title">Kayıp Notalar</h1>
                 <div id="story-status-text" aria-atomic="true" aria-live="polite"
                     style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px;">
                     <!-- Diyalog metni buraya gelecek -->
                 </div>
-                <nav id="story-nav" class="menu-nav" aria-labelledby="story-menu-title" tabindex="0"
+                <nav id="story-nav" class="menu-nav" aria-labelledby="story-menu-title"
                     style="display: none;">
                     <ul>
                     </ul>
                 </nav>
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => { if(document.getElementById('mobile-enter-btn') && document.getElementById('mobile-enter-btn').offsetParent !== null) document.getElementById('mobile-enter-btn').focus(); }, 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => { if(document.getElementById('mobile-enter-btn') && document.getElementById('mobile-enter-btn').offsetParent !== null) document.getElementById('mobile-enter-btn').focus(); }, 10);"></div>
             </div>
 
             <!-- Mağaza Menüsü -->
             <div id="store-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('store-back-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('store-back-btn').focus(), 10);"></div>
                 <h1 id="store-menu-title">Mağaza</h1>
                 <div id="store-content" aria-live="polite"
                     style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
@@ -549,7 +549,7 @@
                     </div>
                 </div>
 
-                <nav class="menu-nav" aria-labelledby="store-menu-title" tabindex="0">
+                <nav class="menu-nav" aria-labelledby="store-menu-title">
                     <ul id="store-button-list">
                         <li>
                             <button id="buy-shield-btn" class="menu-button"
@@ -566,33 +566,33 @@
                         </li>
                     </ul>
                 </nav>
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('buy-shield-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('buy-shield-btn').focus(), 10);"></div>
             </div>
 
             <!-- İstatistikler Menüsü -->
             <div id="stats-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
                 <h1 id="stats-menu-title">İstatistikler</h1>
                 <div id="stats-content" aria-live="polite"
                     style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
                     <!-- İstatistik verileri dinamik eklenecek -->
                 </div>
 
-                <nav class="menu-nav" aria-labelledby="stats-menu-title" tabindex="0">
+                <nav class="menu-nav" aria-labelledby="stats-menu-title">
                     <ul>
                         <li>
                             <button id="stats-back-btn" class="menu-button" aria-label="Geri">Geri</button>
                         </li>
                     </ul>
                 </nav>
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
             </div>
 
             <!-- Başarılar Menüsü -->
             <div id="achievements-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
                 <h1 id="achievements-menu-title">Başarılar</h1>
 
                 <div id="achievements-content" aria-live="polite"
@@ -600,20 +600,20 @@
                     <!-- Dinamik içerik eklenecek -->
                 </div>
 
-                <nav class="menu-nav" aria-labelledby="achievements-menu-title" tabindex="0">
+                <nav class="menu-nav" aria-labelledby="achievements-menu-title">
                     <ul>
                         <li style="display: none;">
                             <button id="achievements-back-btn" class="menu-button" aria-label="Geri">Geri</button>
                         </li>
                     </ul>
                 </nav>
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
             </div>
 
             <!-- Oyun Ekranı -->
             <section id="game-menu-container" class="menu-container" aria-label="Oyun Alanı" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('game-back-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Oyun sınırı, menüye dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('game-back-btn').focus(), 10);"></div>
                 <h1 id="game-menu-title">Hafızana Güven</h1>
                 <div
                     style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.3rem; color: #ffb703; font-weight: bold;">
@@ -624,7 +624,7 @@
                 <p style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa;" id="game-status-text" aria-live="polite" aria-atomic="true">
                     Oyun başlıyor... İlk notayı dinleyin!
                 </p>
-                <nav class="menu-nav" aria-labelledby="game-menu-title" tabindex="0">
+                <nav class="menu-nav" aria-labelledby="game-menu-title">
                     <ul>
                         <li class="desktop-exit-li">
                             <button id="game-back-btn" class="menu-button" aria-label="Oyunu Bitir">Oyunu Bitir</button>
@@ -633,7 +633,7 @@
                 </nav>
                 <!-- S ve T kısayolları için özel ekran okuyucu bölgesi -->
                 <div id="sr-shortcut-reader" aria-live="assertive" style="position: absolute; left:-9999px;"></div>
-                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('game-back-btn').focus(), 10);"></div>
+                <div tabindex="0" role="button" aria-label="Oyun sınırı, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('game-back-btn').focus(), 10);"></div>
             </section>
 
             <!-- Mobil Piyano Tuşları Ekranı -->
