@@ -658,15 +658,6 @@
             <!-- Yardım, Alıştırma ve Motivasyon Mesajları için ayrı dosya -->
             <script src="yardim.js"></script>
 
-            <script>
-                // Müşteri İsteği: Tüm İstatistikleri Sıfırla
-                localStorage.removeItem('hafizaGuvenModes');
-                localStorage.removeItem('hafizaGuvenAchievements');
-                localStorage.removeItem('hafizaGuvenTotalTokens');
-                localStorage.removeItem('hafizaGuvenPracticeCompleted');
-                localStorage.removeItem('hafizaGuvenHataKorumasi');
-                localStorage.removeItem('hafizaGuvenZamanKorumasi');
-
                 // Mobil Cihaz Tespiti
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
                 window.isMobileDevice = isMobile;
@@ -1892,6 +1883,8 @@
                                 // Tarayıcının 'Tam ekrandan çıkmak için Esc tuşuna basın' uyarısını ezmek (interrupt) için Focus Hack
                                 const versionHack = document.createElement("div");
                                 versionHack.tabIndex = -1;
+                                versionHack.setAttribute("role", "alertdialog");
+                                versionHack.setAttribute("aria-modal", "true");
                                 versionHack.setAttribute("aria-label", "Hafızana Güven Version 1.0 Beta");
                                 versionHack.setAttribute("aria-live", "assertive");
                                 versionHack.style.position = "absolute";
