@@ -714,6 +714,32 @@
             onfocus="setTimeout(() => { const firstBtn = document.getElementById('feedback-submit-btn'); if(firstBtn) firstBtn.focus(); }, 10);"></div>
     </div>
 
+    <!-- Sunucu Mesajı / Changelog Menüsü -->
+    <div id="server-message-container" class="menu-container" role="presentation" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
+            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            onfocus="setTimeout(() => document.getElementById('server-message-continue-btn').focus(), 10);"></div>
+        <div class="feedback-dialog-box" style="border-color: #ffb703;">
+            <h1 id="server-message-title" style="color: #ffb703; border-bottom: 2px solid #ffb703;">Sunucu Mesajı</h1>
+            
+            <div id="server-message-content" style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
+                <p id="server-message-text" aria-live="polite">Güncelleme notları yükleniyor...</p>
+            </div>
+
+            <nav class="menu-nav" aria-labelledby="server-message-title">
+                <ul>
+                    <li>
+                        <button id="server-message-continue-btn" class="menu-button" aria-label="Anladım, Devam Et" style="color: #ffb703; font-weight: bold; text-align: center;">[ANLADIM, DEVAM ET]</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
+            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            onfocus="setTimeout(() => { const firstBtn = document.getElementById('server-message-continue-btn'); if(firstBtn) firstBtn.focus(); }, 10);"></div>
+    </div>
+
     <!-- Başarılar Menüsü -->
     <div id="achievements-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
@@ -801,6 +827,8 @@
 
         // --- OTOMATİK GÜNCELLEME KONTROL SİSTEMİ ---
         let mevcutSurum = null;
+        let globalChangelogVersion = null;
+        let globalChangelogMessage = null;
 
         function guncellemeKontrolEt(isManual = false) {
             if (isManual && typeof announceToScreenReader === 'function') {
@@ -819,6 +847,13 @@
                     // Ekranda (Mikyas Studio/Intro) versiyon bilgisini göster (Kullanıcı bu kısmı sormuştu)
                     const visualVersion = document.getElementById("intro-version-display");
                     if (visualVersion) visualVersion.textContent = "Sürüm: " + data.version;
+
+                    globalChangelogVersion = data.version;
+                    if(data.changelog) {
+                        globalChangelogMessage = data.changelog;
+                        const smt = document.getElementById('server-message-text');
+                        if(smt) smt.innerText = data.changelog;
+                    }
 
                     if (!mevcutSurum) {
                         // Sayfa ilk yüklendiğinde mevcut sürümü kaydet (Örn: "1.2")
@@ -951,6 +986,7 @@
         const statsMenu = document.getElementById('stats-menu-container'); // İstatistikler Modu Container
         const storeMenu = document.getElementById('store-menu-container'); // Mağaza Menüsü Container
         const feedbackMenu = document.getElementById('feedback-menu-container'); // Geri Bildirim Menüsü Container
+        const serverMessageMenu = document.getElementById('server-message-container'); // Sunucu Mesajı Container
         const achievementsMenu = document.getElementById('achievements-menu-container'); // Başarılar Menüsü Container
         const gameMenu = document.getElementById('game-menu-container'); // Ana Oyun Container
         const storyMenu = document.getElementById('story-menu-container'); // Hikaye Modu Container
@@ -1410,6 +1446,8 @@
                 buttons = Array.from(achievementsMenu.querySelectorAll('.menu-button'));
             } else if (currentActiveMenu === 'feedback') {
                 buttons = Array.from(feedbackMenu.querySelectorAll('.menu-button'));
+            } else if (currentActiveMenu === 'server-message') {
+                buttons = Array.from(serverMessageMenu.querySelectorAll('.menu-button'));
             } else if (currentActiveMenu === 'game') {
                 buttons = Array.from(gameMenu.querySelectorAll('.menu-button'));
             }
@@ -1606,6 +1644,24 @@
                 }
             });
         });
+
+        const serverMessageContinueBtn = document.getElementById('server-message-continue-btn');
+        if (serverMessageContinueBtn) {
+            serverMessageContinueBtn.addEventListener('click', () => {
+                localStorage.setItem('lastSeenChangelogVersion', globalChangelogVersion);
+                
+                switchMenu(serverMessageMenu, null, 'main');
+                mainMenu.removeAttribute('aria-hidden');
+                
+                setTimeout(() => {
+                    mainMenu.style.opacity = '1';
+
+                    const firstButton = mainMenu.querySelector('.menu-button');
+                    if (firstButton) firstButton.focus();
+                    announceToScreenReader("Yeni güncellemeleri anladım, oyuna devam et. " + window.localizeText('Hafızana güven oyununa hoş geldiniz. Öğeler arasında dolaşmak için sağ sol ok tuşlarına basın. Müzik sesini açıp kısmak için, sayfa yukarı ve sayfa aşağı tuşuna basın. Müziği susturmak için m tuşuna basın.'));
+                }, 50);
+            });
+        }
 
         const scoreboardBtnMain = document.getElementById('scoreboard-btn-main');
         const scoreboardBackBtn = document.getElementById('scoreboard-back-btn');
@@ -2400,17 +2456,31 @@
 
                 // Ana menüyü göster (Fade-in efekti)
                 mainMenu.style.display = 'flex';
-                mainMenu.removeAttribute('aria-hidden');
-
-                // Render'ın tamamlanması için çok kısa bir gecikme
-                setTimeout(() => {
+                
+                const lastSeenVersion = localStorage.getItem('lastSeenChangelogVersion');
+                if (globalChangelogVersion && lastSeenVersion !== globalChangelogVersion && globalChangelogMessage) {
+                    // Ana menüyü arkada göster ama ekran okuyucudan gizle
+                    mainMenu.setAttribute('aria-hidden', 'true');
                     mainMenu.style.opacity = '1';
+                    
+                    switchMenu(null, serverMessageMenu, 'server-message');
+                    setTimeout(() => {
+                        const firstBtn = document.getElementById('server-message-continue-btn');
+                        if(firstBtn) firstBtn.focus();
+                        announceToScreenReader("Sunucu Mesajı: " + globalChangelogMessage + " Devam etmek için butona basın.");
+                    }, 400);
+                } else {
+                    mainMenu.removeAttribute('aria-hidden');
+                    // Render'ın tamamlanması için çok kısa bir gecikme
+                    setTimeout(() => {
+                        mainMenu.style.opacity = '1';
 
-                    // Odaklanmayı ilk butona ver (Erişilebilirlik ve klavye kullanımı için iyi bir pratik)
-                    const firstButton = mainMenu.querySelector('.menu-button');
-                    if (firstButton) firstButton.focus();
-                    announceToScreenReader(window.localizeText('Hafızana güven oyununa hoş geldiniz. Öğeler arasında dolaşmak için sağ sol ok tuşlarına basın. Müzik sesini açıp kısmak için, sayfa yukarı ve sayfa aşağı tuşuna basın. Müziği susturmak için m tuşuna basın.'));
-                }, 50);
+                        // Odaklanmayı ilk butona ver (Erişilebilirlik ve klavye kullanımı için iyi bir pratik)
+                        const firstButton = mainMenu.querySelector('.menu-button');
+                        if (firstButton) firstButton.focus();
+                        announceToScreenReader(window.localizeText('Hafızana güven oyununa hoş geldiniz. Öğeler arasında dolaşmak için sağ sol ok tuşlarına basın. Müzik sesini açıp kısmak için, sayfa yukarı ve sayfa aşağı tuşuna basın. Müziği susturmak için m tuşuna basın.'));
+                    }, 50);
+                }
             }, 1000); // 1000ms = 1 saniye geçiş süresi
         }
 
@@ -3040,10 +3110,10 @@
         }
 
         document.addEventListener('keydown', function (event) {
-            // Tab (Sekme) tuşuyla menüler arası dolaşmayı/odaklanmayı engelle - Geri Bildirim menüsü form doldurma durumu hariç
+            // Tab (Sekme) tuşuyla menüler arası dolaşmayı/odaklanmayı engelle - Geri Bildirim ve Sunucu Mesajı menüsü hariç
             if (event.key === 'Tab') {
-                if (currentActiveMenu === 'feedback') {
-                    // Forms modu için Focus geçişine izin ver
+                if (currentActiveMenu === 'feedback' || currentActiveMenu === 'server-message') {
+                    // Forms/Dialog modu için Focus geçişine izin ver
                 } else {
                     event.preventDefault();
                     return;

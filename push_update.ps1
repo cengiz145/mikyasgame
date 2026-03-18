@@ -16,6 +16,7 @@ if ($currentVersion -match "^0\.(\d+)$") {
     $jsonContent.version = "0.1"
 }
 
+$jsonContent.changelog = $args[0]
 $json = $jsonContent | ConvertTo-Json -Depth 10
 Set-Content -Path $path -Value $json
 
