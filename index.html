@@ -1330,7 +1330,8 @@
                 allMenuButtons.forEach((button) => {
                     const playHover = () => {
                         ensureAudioUnlock();
-                        if (isStarted) {
+                        // Menü sesleri artık isStarted bayrağına bakmaksızın (intro ekranı hariç) çalmalı
+                        if (currentActiveMenu !== 'none') {
                             hoverSound.play();
                         }
                     };
