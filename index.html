@@ -826,7 +826,7 @@
         window.isMobileDevice = isMobile;
 
         // --- OTOMATİK GÜNCELLEME KONTROL SİSTEMİ ---
-        const UYGULAMA_SURUMU = "0.23"; // push_update tarafından otomatik yenileniyor
+        const UYGULAMA_SURUMU = "0.24"; // push_update tarafından otomatik yenileniyor
         let globalChangelogVersion = null;
         let globalChangelogMessage = null;
 
@@ -2226,24 +2226,30 @@
         }
 
         function switchMenu(hideMenu, showMenu, newActiveMenuName) {
-            hideMenu.style.opacity = '0';
+            if (hideMenu) hideMenu.style.opacity = '0';
 
             setTimeout(() => {
-                hideMenu.style.display = 'none';
-                hideMenu.setAttribute('aria-hidden', 'true');
+                if (hideMenu) {
+                    hideMenu.style.display = 'none';
+                    hideMenu.setAttribute('aria-hidden', 'true');
+                }
 
-                showMenu.style.display = 'flex';
-                showMenu.removeAttribute('aria-hidden');
+                if (showMenu) {
+                    showMenu.style.display = 'flex';
+                    showMenu.removeAttribute('aria-hidden');
+                }
 
                 setTimeout(() => {
-                    showMenu.style.opacity = '1';
-                    currentActiveMenu = newActiveMenuName;
+                    if (showMenu) showMenu.style.opacity = '1';
+                    if (newActiveMenuName) currentActiveMenu = newActiveMenuName;
                     updateMobileKeysVisibility();
-                    currentFocusIndex = 0;
-                    const firstBtn = showMenu.querySelector('.menu-button');
-                    if (firstBtn) firstBtn.focus();
+                    if (showMenu) {
+                        currentFocusIndex = 0;
+                        const firstBtn = showMenu.querySelector('.menu-button');
+                        if (firstBtn) firstBtn.focus();
+                    }
                 }, 50);
-            }, 300); // 300ms CSS transition süresi ile uyumlu
+            }, hideMenu ? 300 : 0);
         }
 
         let introPlayed = false;
@@ -3733,3 +3739,4 @@
 </body>
 
 </html>
+

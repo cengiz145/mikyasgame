@@ -1,5 +1,5 @@
 {
-    "version":  "0.23",
-    "buildId":  1773876758,
-    "changelog":  "fix: Zorunlu güncelleme kontrol sisteminin önbellek (cache) kaynaklý atlatýlabilme hatalarý tamamen giderildi."
+    "version":  "0.24",
+    "buildId":  1773878027,
+    "changelog":  "fix: Geri bildirim butonu týklamasýndaki switchMenu null hatasý (Çökmeler) giderildi."
 }
