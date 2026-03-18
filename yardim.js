@@ -1,4 +1,4 @@
-const practiceCorrectMessages = [
+﻿const practiceCorrectMessages = [
     "Harika!", "Süper!", "Mükemmel!", "Tam isabet!", "Doğru tuş!", "Çok iyi!", "Devam et!", "Aynen böyle!", "Bravo!", "Harikulade!",
     "Müthişsin!", "Doğru bildin!", "Şahane!", "Kusursuz!", "İşte bu!", "Aferin!", "Çok başarılı!", "Alkışlar sana!", "Doğru nota!",
     "Yeteneklisin!", "Odaklanman harika!", "Doğru yoldasın!", "Süper gidiyorsun!", "Çok net!", "Nefis!", "Muazzam!", "Tebrikler!",
