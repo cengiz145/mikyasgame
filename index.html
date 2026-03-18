@@ -881,7 +881,7 @@
                     volume: 1.0,
                     onplay: function() {
                         if (window.isMobileDevice && navigator.vibrate) {
-                            navigator.vibrate([300, 100, 300]); // Yanlış cevabı vurgulayan özel titreşim deseni (titre-dur-titre)
+                            navigator.vibrate(1000); // 1 saniye (1000ms) kesintisiz titreşim
                         }
                     }
                 });
