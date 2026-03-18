@@ -1817,16 +1817,22 @@
                     const startIntroBtn = document.getElementById('start-intro-btn');
                     if (startIntroBtn) {
                         startIntroBtn.focus();
-                        
-                        // Oyuna girişte (kullanıcı etkileşimiyle) tam ekran modunu talep et
-                        startIntroBtn.addEventListener('click', () => {
-                            if (!document.fullscreenElement && document.body.requestFullscreen) {
-                                document.body.requestFullscreen().catch(err => {
-                                    console.log(`Tam ekran yapılamadı: ${err.message}`);
-                                });
-                            }
-                        });
                     }
+
+                    // Tıklanır tıklanmaz (veya dokunulur dokunulmaz) her yerde tam ekran yap
+                    const requestFullScreenOnce = () => {
+                        if (!document.fullscreenElement && document.body.requestFullscreen) {
+                            document.body.requestFullscreen().catch(err => {
+                                console.log(`Tam ekran yapılamadı: ${err.message}`);
+                            });
+                        }
+                        // Sadece ilk dokunuşta/tıklamada çalışsın, sonra dinleyiciyi kaldır
+                        document.removeEventListener('click', requestFullScreenOnce);
+                        document.removeEventListener('pointerdown', requestFullScreenOnce);
+                    };
+
+                    document.addEventListener('click', requestFullScreenOnce);
+                    document.addEventListener('pointerdown', requestFullScreenOnce);
 
                     // Mobil Enter tuşu için event listener (Diyalogları geçmek için Enter'ı simüle eder)
                     const mobileEnterBtn = document.getElementById('mobile-enter-btn');
