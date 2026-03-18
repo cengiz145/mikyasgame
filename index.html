@@ -1235,10 +1235,10 @@
                         xPos = (index / (total - 1)) * 2 - 1;
                     }
 
-                    // X Ekseni (Sağ-Sol), Y Ekseni (Yukarı-Aşağı), Z Ekseni (İleri-Geri)
-                    // pos(x, y, z)
-                    hoverSound.pos(xPos, 0, -0.5); // Hafif önde (-0.5 z) daha net duyulması için
-                    clickSound.pos(xPos, 0, -0.5);
+                    // Mobil uyumluluk için pos(x,0,-0.5) yerine Z eksenini 0 yapıyoruz.
+                    // Veya daha iyisi stereo panner kullanabiliriz.
+                    hoverSound.stereo ? hoverSound.stereo(xPos) : hoverSound.pos(xPos, 0, 0); 
+                    clickSound.stereo ? clickSound.stereo(xPos) : clickSound.pos(xPos, 0, 0);
                 }
 
                 // Butonların üzerine fare ile gelince veya klavye ile odaklanınca dolaş sesi çal
@@ -1259,6 +1259,17 @@
                         playHover();
                     });
                     button.addEventListener('focus', () => {
+                        const activeButtons = getActiveButtons();
+                        const index = activeButtons.indexOf(button);
+                        if (index !== -1) {
+                            currentFocusIndex = index;
+                            updatePan(currentFocusIndex, activeButtons.length);
+                        }
+                        playHover();
+                    });
+
+                    // Mobil touch keşifleri ve normal dokunmalar için
+                    button.addEventListener('pointerdown', () => {
                         const activeButtons = getActiveButtons();
                         const index = activeButtons.indexOf(button);
                         if (index !== -1) {
