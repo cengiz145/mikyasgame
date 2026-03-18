@@ -369,6 +369,7 @@
             <!-- Zorluk Seçimi Menüsü -->
             <div id="difficulty-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 aria-label="Zorluk Seçimi Menüsü">
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('difficulty-back-btn').focus(), 10);"></div>
                 <h1 id="difficulty-menu-title" tabindex="-1">Lütfen bir mod seçin</h1>
 
                 <div id="difficulty-status-text" class="sr-only" aria-live="polite" aria-atomic="true"></div>
@@ -386,10 +387,12 @@
                         </li>
                     </ul>
                 </nav>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('btn-diff-easy').focus(), 10);"></div>
             </div>
 
             <!-- Skor Tablosu Alt Menüsü -->
             <div id="scoreboard-menu-container" class="menu-container" role="presentation" aria-hidden="true">
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('scoreboard-back-btn').focus(), 10);"></div>
                 <h1 id="scoreboard-menu-title">Skor Tablosu</h1>
                 <nav class="menu-nav" aria-labelledby="scoreboard-menu-title" tabindex="0">
                     <ul>
@@ -411,6 +414,7 @@
                         </li>
                     </ul>
                 </nav>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('btn-score-easy').focus(), 10);"></div>
             </div>
 
 
@@ -420,6 +424,7 @@
             <!-- Alıştırma Modu (Piyano) Menüsü -->
             <div id="practice-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('practice-instructions').focus(); } }, 10);"></div>
                 <h1 id="practice-menu-title">Alıştırma Modu</h1>
 
                 <div id="practice-instructions"
@@ -471,11 +476,13 @@
                         </li>
                     </ul>
                 </nav>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('practice-instructions').focus(), 10);"></div>
             </div>
 
             <!-- Hikaye Modu Menüsü -->
             <div id="story-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => { if(document.getElementById('mobile-enter-btn') && document.getElementById('mobile-enter-btn').offsetParent !== null) document.getElementById('mobile-enter-btn').focus(); }, 10);"></div>
                 <h1 id="story-menu-title">Kayıp Notalar</h1>
                 <div id="story-status-text" aria-atomic="true" aria-live="polite"
                     style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px;">
@@ -486,11 +493,13 @@
                     <ul>
                     </ul>
                 </nav>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => { if(document.getElementById('mobile-enter-btn') && document.getElementById('mobile-enter-btn').offsetParent !== null) document.getElementById('mobile-enter-btn').focus(); }, 10);"></div>
             </div>
 
             <!-- Mağaza Menüsü -->
             <div id="store-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('store-back-btn').focus(), 10);"></div>
                 <h1 id="store-menu-title">Mağaza</h1>
                 <div id="store-content" aria-live="polite"
                     style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
@@ -528,11 +537,13 @@
                         </li>
                     </ul>
                 </nav>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('buy-shield-btn').focus(), 10);"></div>
             </div>
 
             <!-- İstatistikler Menüsü -->
             <div id="stats-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
                 <h1 id="stats-menu-title">İstatistikler</h1>
                 <div id="stats-content" aria-live="polite"
                     style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
@@ -546,11 +557,13 @@
                         </li>
                     </ul>
                 </nav>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
             </div>
 
             <!-- Başarılar Menüsü -->
             <div id="achievements-menu-container" class="menu-container" role="presentation" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
                 <h1 id="achievements-menu-title">Başarılar</h1>
 
                 <div id="achievements-content" aria-live="polite"
@@ -565,11 +578,13 @@
                         </li>
                     </ul>
                 </nav>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
             </div>
 
             <!-- Oyun Ekranı -->
             <section id="game-menu-container" class="menu-container" aria-label="Oyun Alanı" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('game-back-btn').focus(), 10);"></div>
                 <h1 id="game-menu-title">Hafızana Güven</h1>
                 <div
                     style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.3rem; color: #ffb703; font-weight: bold;">
@@ -577,7 +592,7 @@
                     <span id="game-timer-display">Süre: 30</span>
                     <span id="game-lives-display">Hak: 3</span>
                 </div>
-                <p style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa;" id="game-status-text">
+                <p style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa;" id="game-status-text" aria-live="polite" aria-atomic="true">
                     Oyun başlıyor... İlk notayı dinleyin!
                 </p>
                 <nav class="menu-nav" aria-labelledby="game-menu-title" tabindex="0">
@@ -589,18 +604,19 @@
                 </nav>
                 <!-- S ve T kısayolları için özel ekran okuyucu bölgesi -->
                 <div id="sr-shortcut-reader" aria-live="assertive" style="position: absolute; left:-9999px;"></div>
+                <div tabindex="0" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('game-back-btn').focus(), 10);"></div>
             </section>
 
             <!-- Mobil Piyano Tuşları Ekranı -->
             <div id="mobile-piano-container" aria-hidden="true" role="group"
                 aria-label="Mobil Piyano Tuşları. Oyun ekranında altta görünür.">
-                <button class="mobile-piano-key" data-key="c" aria-label="Do Notası">Do</button>
-                <button class="mobile-piano-key" data-key="d" aria-label="Re Notası">Re</button>
-                <button class="mobile-piano-key" data-key="e" aria-label="Mi Notası">Mi</button>
-                <button class="mobile-piano-key" data-key="f" aria-label="Fa Notası">Fa</button>
-                <button class="mobile-piano-key" data-key="g" aria-label="Sol Notası">Sol</button>
-                <button class="mobile-piano-key" data-key="a" aria-label="La Notası">La</button>
-                <button class="mobile-piano-key" data-key="b" aria-label="Si Notası">Si</button>
+                <button class="mobile-piano-key" role="button" data-key="c" aria-label="Do Notası">Do</button>
+                <button class="mobile-piano-key" role="button" data-key="d" aria-label="Re Notası">Re</button>
+                <button class="mobile-piano-key" role="button" data-key="e" aria-label="Mi Notası">Mi</button>
+                <button class="mobile-piano-key" role="button" data-key="f" aria-label="Fa Notası">Fa</button>
+                <button class="mobile-piano-key" role="button" data-key="g" aria-label="Sol Notası">Sol</button>
+                <button class="mobile-piano-key" role="button" data-key="a" aria-label="La Notası">La</button>
+                <button class="mobile-piano-key" role="button" data-key="b" aria-label="Si Notası">Si</button>
             </div>
 
             <!-- Mobil Enter Tuşu (Sadece Diyaloglarda Görünür) -->
@@ -1694,24 +1710,38 @@
                 }
 
                 function updateMobileKeysVisibility() {
+                    const mobilePiano = document.getElementById('mobile-piano-container');
+                    const mobileEnter = document.getElementById('mobile-enter-container');
+                    
                     document.body.classList.remove('show-mobile-keys', 'show-mobile-enter');
+                    
+                    // Varsayılan olarak ikisini de SR'dan gizle
+                    if (mobilePiano) mobilePiano.setAttribute('aria-hidden', 'true');
+                    if (mobileEnter) mobileEnter.setAttribute('aria-hidden', 'true');
+
                     if (currentActiveMenu === 'game') {
                         if (typeof gameIsActive !== 'undefined' && !gameIsActive) {
                             document.body.classList.add('show-mobile-enter');
+                            if (mobileEnter) mobileEnter.removeAttribute('aria-hidden');
                         } else {
                             document.body.classList.add('show-mobile-keys');
+                            if (mobilePiano) mobilePiano.removeAttribute('aria-hidden');
                         }
                     } else if (currentActiveMenu === 'practice') {
                         if (typeof isDialogPhase !== 'undefined' && isDialogPhase) {
                             document.body.classList.add('show-mobile-enter');
+                            if (mobileEnter) mobileEnter.removeAttribute('aria-hidden');
                         } else {
                             document.body.classList.add('show-mobile-keys');
+                            if (mobilePiano) mobilePiano.removeAttribute('aria-hidden');
                         }
                     } else if (currentActiveMenu === 'story') {
                         if (typeof inStoryMode !== 'undefined' && inStoryMode && !isGridWalkingPhase) {
                             document.body.classList.add('show-mobile-enter');
+                            if (mobileEnter) mobileEnter.removeAttribute('aria-hidden');
                         } else {
                             document.body.classList.add('show-mobile-keys');
+                            if (mobilePiano) mobilePiano.removeAttribute('aria-hidden');
                         }
                     }
                 }
