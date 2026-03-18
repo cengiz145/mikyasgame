@@ -1,5 +1,5 @@
 {
-    "version":  "0.22",
-    "buildId":  1773873153,
-    "changelog":  "Yeni özellik: Oyuna ilk giriþte otomatik Sunucu Mesajý sistemi entegre edildi."
+    "version":  "0.23",
+    "buildId":  1773876758,
+    "changelog":  "fix: Zorunlu güncelleme kontrol sisteminin önbellek (cache) kaynaklý atlatýlabilme hatalarý tamamen giderildi."
 }

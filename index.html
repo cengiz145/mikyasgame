@@ -826,7 +826,7 @@
         window.isMobileDevice = isMobile;
 
         // --- OTOMATİK GÜNCELLEME KONTROL SİSTEMİ ---
-        let mevcutSurum = null;
+        const UYGULAMA_SURUMU = "0.23"; // push_update tarafından otomatik yenileniyor
         let globalChangelogVersion = null;
         let globalChangelogMessage = null;
 
@@ -855,15 +855,8 @@
                         if(smt) smt.innerText = data.changelog;
                     }
 
-                    if (!mevcutSurum) {
-                        // Sayfa ilk yüklendiğinde mevcut sürümü kaydet (Örn: "1.2")
-                        mevcutSurum = data.version;
-                        if (isManual && typeof announceToScreenReader === 'function') {
-                            announceToScreenReader('Oyununuz güncel.');
-                        }
-                    } else if (data.version !== mevcutSurum) {
+                    if (data.version !== UYGULAMA_SURUMU) {
                         // Sürüm numarası değiştiyse GÜNCELLEME ZORUNLU
-                        mevcutSurum = data.version;
                         const uyariMesaji = "Oyuna zorunlu bir güncelleme geldi! Eski sürümle oynamaya devam edemezsiniz. Lütfen Tamam'a basarak sayfayı yenileyin.";
 
                         // Oyunu anında dondur

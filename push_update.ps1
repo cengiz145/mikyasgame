@@ -20,6 +20,12 @@ $jsonContent.changelog = $args[0]
 $json = $jsonContent | ConvertTo-Json -Depth 10
 Set-Content -Path $path -Value $json
 
+$htmlPath = "index.html"
+$htmlContent = Get-Content -Path $htmlPath -Raw
+$newVersionString = "const UYGULAMA_SURUMU = `"$($jsonContent.version)`";"
+$htmlContent = $htmlContent -replace 'const UYGULAMA_SURUMU = ".*";', $newVersionString
+Set-Content -Path $htmlPath -Value $htmlContent
+
 git add .
 git commit -m $args[0]
 git push

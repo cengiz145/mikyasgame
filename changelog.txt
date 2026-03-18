@@ -5,6 +5,9 @@
 ### Eklenenler / Değiştirilenler:
 - Ana menüye 'Geri Bildirim' butonu ve bildirim menüsü eklendi, Google Form gönderimi aktifleştirildi.
 - Geri Bildirim menüsü bilgisayarlar için Modal (Diyalog) görünümüne kavuşturuldu.
+- **OTOMATİK SUNUCU MESAJI SİSTEMİ:** push_update dosyasıyla atılan Github commit güncellemelerinin oyun girişine (Intro arkasına) oyuncuya gösterilecek bir Modal (Diyalog) bilgilendirme penceresi eklendi! 
+- Oyuncu gelen yeni güncellemelerin veya özelliklerin bilgisini ilk girişinde (Ana Menüye düşmeden önce) ekran okuyucusu eşliğinde duyacak / görecek ve "Devam Et" dediğinde cihazına kaydederek o versiyon için bir daha bu uyarıyı görmeyecektir.
+- **ZORUNLU GÜNCELLEME DÜZELTMESİ (Hard Cache Fix):** Oyuna gelen güncellemelerin veya engellenen sürümlerin, tarayıcıda önbellekte (cache) takılı kalan eski dosyalar yüzünden okunamaması ve eski sürümle oyuna devam edilebilmesi hatası tamamen çözülmüştür! Artık sistem sürümü `index.html` üzerinden hardcode şekilde denetliyor ve yeni sürümü anında belirleyerek kırılmaz bir sayfa yenileme ekranı çıkartıyor.
 
 [v1.0.1 Beta] - 2026-03-11
 
