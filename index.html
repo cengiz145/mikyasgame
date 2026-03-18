@@ -147,27 +147,28 @@
                 }
 
                 /* Mobil Piyano Tuşları */
+                /* Mobil Piyano Tuşları ve Oyundan Çıkış Barı */
                 #mobile-piano-container {
                     display: none;
                     position: fixed;
                     bottom: 10px;
                     left: 50%;
                     transform: translateX(-50%);
-                    width: 95%;
-                    max-width: 600px;
+                    width: 98%;
+                    max-width: 800px;
                     z-index: 1000;
                     justify-content: space-between;
-                    gap: 5px;
+                    gap: 3px;
                 }
 
                 .mobile-piano-key {
                     flex: 1;
-                    padding: 15px 0;
+                    padding: 20px 0; /* Boydan boya büyük olması için padding artırıldı */
                     background-color: #333;
                     color: #fff;
-                    border: 2px solid #555;
-                    border-radius: 8px;
-                    font-size: 1.2rem;
+                    border: 1px solid #555;
+                    border-radius: 6px;
+                    font-size: 1.1rem;
                     font-weight: bold;
                     text-align: center;
                     cursor: pointer;
@@ -180,6 +181,29 @@
                 .mobile-piano-key:active {
                     background-color: var(--focus-color);
                     color: #000;
+                }
+
+                .mobile-exit-btn {
+                    flex: 1.5; /* Çıkış butonu biraz daha geniş olabilir veya aynı kalabilir */
+                    padding: 20px 0;
+                    background-color: #8b0000;
+                    color: #fff;
+                    border: 1px solid #ff4444;
+                    border-radius: 6px;
+                    font-size: 1.1rem;
+                    font-weight: bold;
+                    text-align: center;
+                    cursor: pointer;
+                    user-select: none;
+                    -webkit-tap-highlight-color: transparent;
+                    touch-action: manipulation;
+                    transition: background-color 0.1s;
+                    display: none; /* İlk 10 saniye gizli kalacak */
+                }
+
+                .mobile-exit-btn:active {
+                    background-color: #ff0000;
+                    color: #fff;
                 }
 
                 /* Sadece oyun veya pratik modundayken mobil tuşları göster */
@@ -224,6 +248,9 @@
 
                 .mobile-enter-btn:active {
                     background-color: #e0a300;
+                    .desktop-exit-li {
+                        display: none !important; /* Mobilde masaüstü çıkış butonunu nav'dan gizle */
+                    }
                 }
 
                 @media (min-width: 769px) {
@@ -597,7 +624,7 @@
                 </p>
                 <nav class="menu-nav" aria-labelledby="game-menu-title" tabindex="0">
                     <ul>
-                        <li>
+                        <li class="desktop-exit-li">
                             <button id="game-back-btn" class="menu-button" aria-label="Oyunu Bitir">Oyunu Bitir</button>
                         </li>
                     </ul>
@@ -609,7 +636,7 @@
 
             <!-- Mobil Piyano Tuşları Ekranı -->
             <div id="mobile-piano-container" aria-hidden="true" role="group"
-                aria-label="Mobil Piyano Tuşları. Oyun ekranında altta görünür.">
+                aria-label="Mobil Oyun Kontrolleri">
                 <button class="mobile-piano-key" role="button" data-key="c" aria-label="Do Notası">Do</button>
                 <button class="mobile-piano-key" role="button" data-key="d" aria-label="Re Notası">Re</button>
                 <button class="mobile-piano-key" role="button" data-key="e" aria-label="Mi Notası">Mi</button>
@@ -617,6 +644,7 @@
                 <button class="mobile-piano-key" role="button" data-key="g" aria-label="Sol Notası">Sol</button>
                 <button class="mobile-piano-key" role="button" data-key="a" aria-label="La Notası">La</button>
                 <button class="mobile-piano-key" role="button" data-key="b" aria-label="Si Notası">Si</button>
+                <button id="mobile-game-back-btn" class="mobile-exit-btn" role="button" aria-label="Oyunu Bitir">Çıkış</button>
             </div>
 
             <!-- Mobil Enter Tuşu (Sadece Diyaloglarda Görünür) -->
@@ -759,6 +787,9 @@
                 let isGridWalkingPhase = false;
                 let stepIntervalId = null;
                 let currentAutoWalkStep = 0;
+
+                // Oyundan Çık butonunu geciktirmek için zamanlayıcı değişkeni
+                let mobileExitBtnTimeout = null;
 
                 // Missing Notes Oyun Değişkenleri
                 let playerX = 1;
@@ -1354,6 +1385,14 @@
                         }
                         bgMusic.play();
                     });
+
+                    const mobileGameBackBtn = document.getElementById('mobile-game-back-btn');
+                    if (mobileGameBackBtn) {
+                        mobileGameBackBtn.addEventListener('pointerdown', (e) => {
+                            e.preventDefault();
+                            gameBackBtn.click(); // Masaüstü butonun tıklama olayını tetikle
+                        });
+                    }
                 }
 
                 // Zorluk menüsü buton etiketlerini güncelleyen fonksiyon
@@ -2019,6 +2058,29 @@
                     isComputerPlaying = false;
                     sessionTokens = 0;
                     turnStartTime = 0;
+
+                    // Yeni mobil çıkış butonu başlangıçta gizli
+                    const mobileExitBtn = document.getElementById('mobile-game-back-btn');
+                    if (mobileExitBtn) {
+                        mobileExitBtn.style.display = 'none';
+                        mobileExitBtn.setAttribute('aria-hidden', 'true');
+                    }
+                    if (mobileExitBtnTimeout) {
+                        clearTimeout(mobileExitBtnTimeout);
+                    }
+
+                    // 10 saniye sonra butonu görünür yap ve ekran okuyucuya çok kısa şekilde bildir
+                    mobileExitBtnTimeout = setTimeout(() => {
+                        if (currentActiveMenu === 'game' && gameIsActive && !isGridWalkingPhase) {
+                            if (mobileExitBtn) {
+                                mobileExitBtn.style.display = 'block';
+                                mobileExitBtn.removeAttribute('aria-hidden');
+                                // Sadece bildirim, oyun durum yazısını (endMessage vb) değiştirmeyecek
+                                announceToScreenReader("Oyundan çık tuşu belirdi.");
+                            }
+                        }
+                    }, 10000);
+
                     updateGameUI();
 
                     hataKorumasiCount = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
@@ -2156,6 +2218,7 @@
                     gameIsActive = false;
                     updateMobileKeysVisibility();
                     clearInterval(gameInterval);
+                    if (mobileExitBtnTimeout) clearTimeout(mobileExitBtnTimeout);
 
                     // localStorage'dan mevcut total jetonları oku
                     let totalTokens = 0;
