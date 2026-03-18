@@ -601,7 +601,7 @@
 
                 <nav class="menu-nav" aria-labelledby="achievements-menu-title">
                     <ul>
-                        <li style="display: none;">
+                        <li>
                             <button id="achievements-back-btn" class="menu-button" aria-label="Geri">Geri</button>
                         </li>
                     </ul>
@@ -1541,6 +1541,9 @@
 
                             achievementsAnnouncements.push(`${achName}. Durum: ${isCompleted ? 'Kazanıldı' : 'Kilitli'}. Açıklaması: ${description}`);
                         }
+                        
+                        // Sağ/Sol ok ile dolaşırken "Geri" butonuna da gelindiğini ve çıkılabileceğini bildirmek için listeye ekliyoruz.
+                        achievementsAnnouncements.push("Geri düğmesi. Ana menüye dönmek için entıra veya ekrana çift dokunun.");
 
                         const progressPercent = totalAch > 0 ? Math.floor((completedAch / totalAch) * 100) : 0;
 
