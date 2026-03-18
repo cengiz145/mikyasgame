@@ -658,12 +658,7 @@
             <!-- Oyun Ekranı -->
             <section id="game-menu-container" class="menu-container" aria-label="Oyun Alanı" aria-hidden="true"
                 style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-                <div tabindex="0" role="button"
-                    aria-label="Oyun sınırı, menüye dönülüyor. Menüye dönmek için entıra basın."
-                    style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-                    onclick="document.getElementById('game-back-btn').focus();"
-                    onkeydown="if(event.key==='Enter' || event.key===' ') document.getElementById('game-back-btn').focus();">
-                </div>
+
                 <h1 id="game-menu-title">Hafızana Güven</h1>
                 <div
                     style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.3rem; color: #ffb703; font-weight: bold;">
@@ -684,11 +679,6 @@
                 </nav>
                 <!-- S ve T kısayolları için özel ekran okuyucu bölgesi -->
                 <div id="sr-shortcut-reader" aria-live="assertive" style="position: absolute; left:-9999px;"></div>
-                <div tabindex="0" role="button" aria-label="Oyun sınırı, başa dönülüyor. Başa dönmek için entıra basın."
-                    style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-                    onclick="document.getElementById('game-back-btn').focus();"
-                    onkeydown="if(event.key==='Enter' || event.key===' ') document.getElementById('game-back-btn').focus();">
-                </div>
             </section>
 
             <!-- Mobil Piyano Tuşları Ekranı -->
