@@ -1,318 +1,313 @@
 <! DOCTYPE html>
     <htm l lang="tr">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <link rel="manifest" href="manifest.json">
+        <title>Hafızana Güven - Ana Menü</title>
+        <style>
+            :root {
+                --bg-color: #000000;
+                --text-color: #ffffff;
+                --focus-color: #ffb703;
+            }
 
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-            <meta name="mobile-web-app-capable" content="yes">
-            <meta name="apple-mobile-web-app-capable" content="yes">
-            <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-            <link rel="manifest" href="manifest.json">
-            <title>Hafızana Güven - Ana Menü</title>
-            <style>
-                :root {
-                    --bg-color: #000000;
-                    --text-color: #ffffff;
-                    --focus-color: #ffb703;
+            body {
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                font-family: 'Consolas', 'Courier New', monospace;
+                overflow: hidden;
+                user-select: none;
+                -webkit-user-select: none;
+                touch-action: manipulation;
+                cursor: default;
+            }
+
+            #intro-screen {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: var(--bg-color);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 100;
+                transition: opacity 1s ease-in-out;
+            }
+
+            .intro-title {
+                font-size: 3rem;
+                color: var(--text-color);
+                margin-bottom: 2rem;
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 5px;
+            }
+
+            .intro-instruction {
+                font-size: 1.5rem;
+                color: #888888;
+            }
+
+            #main-menu-container,
+            #scoreboard-menu-container,
+            #difficulty-menu-container {
+                display: none;
+                opacity: 0;
+                transition: opacity 0.3s ease-in-out;
+            }
+
+            .menu-container {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                max-width: 600px;
+                padding: 2rem;
+                box-sizing: border-box;
+                text-align: left;
+            }
+
+            h1 {
+                margin-top: 0;
+                margin-bottom: 2rem;
+                font-size: 2.2rem;
+                letter-spacing: 2px;
+                text-transform: uppercase;
+                color: var(--text-color);
+                border-bottom: 2px solid #333;
+                padding-bottom: 10px;
+            }
+
+            .menu-nav ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .menu-nav li {
+                width: 100%;
+            }
+
+            .menu-button {
+                width: 100%;
+                background-color: transparent;
+                color: #888888;
+                border: none;
+                padding: 0.8rem 1rem;
+                font-size: 1.2rem;
+                font-weight: normal;
+                cursor: default;
+                text-align: left;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-family: inherit;
+                position: relative;
+                touch-action: manipulation;
+            }
+
+            .menu-button::before {
+                content: "[ ] ";
+                color: #555;
+            }
+
+            .menu-button:hover,
+            .menu-button:focus-visible {
+                color: var(--text-color);
+                outline: none;
+            }
+
+            .menu-button:focus-visible::before {
+                content: "[X] ";
+                color: var(--focus-color);
+            }
+
+            .menu-button[aria-disabled="true"] {
+                color: #333;
+            }
+
+            .menu-button[aria-disabled="true"]::before {
+                content: "[-] ";
+                color: #333;
+            }
+
+            /* Mobil Piyano Tuşları */
+            /* Mobil Piyano Tuşları ve Oyundan Çıkış Barı */
+            #mobile-piano-container {
+                display: none;
+                position: fixed;
+                bottom: 0px;
+                /* Ekranın tam altına yasla */
+                left: 0;
+                width: 100vw;
+                /* Ekranı tam kapla (boydan boya) */
+                z-index: 1000;
+                justify-content: space-between;
+                gap: 0px;
+                /* Butonlar arası boşluğu sıfırla */
+            }
+
+            .mobile-piano-key {
+                flex: 1;
+                padding: 30px 0;
+                /* Butonlar çok küçükmüş, boyları uzatıldı */
+                background-color: #333;
+                color: #fff;
+                border: 1px solid #555;
+                border-radius: 0;
+                /* Arada boşluk hissi kalmaması için köşeleri sıfırla */
+                margin: 0;
+                font-size: 1.3rem;
+                font-weight: bold;
+                text-align: center;
+                cursor: pointer;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+                transition: background-color 0.1s;
+            }
+
+            .mobile-piano-key:active {
+                background-color: var(--focus-color);
+                color: #000;
+            }
+
+            .mobile-exit-btn {
+                flex: 1.5;
+                /* Çıkış butonu biraz daha geniş olabilir veya aynı kalabilir */
+                padding: 30px 0;
+                background-color: #8b0000;
+                color: #fff;
+                border: 1px solid #ff4444;
+                border-radius: 0;
+                /* Arada boşluk olmaması için */
+                margin: 0;
+                font-size: 1.3rem;
+                font-weight: bold;
+                text-align: center;
+                cursor: pointer;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+                transition: background-color 0.1s;
+                display: none;
+                /* İlk 10 saniye gizli kalacak */
+            }
+
+            .mobile-exit-btn:active {
+                background-color: #ff0000;
+                color: #fff;
+            }
+
+            /* Sadece oyun veya pratik modundayken mobil tuşları göster */
+            body.show-mobile-keys #mobile-piano-container {
+                display: flex;
+            }
+
+            /* Mobilde Enter tuşunu (diyaloglar için) göster */
+            body.show-mobile-enter #mobile-enter-container {
+                display: flex;
+            }
+
+            #mobile-enter-container {
+                display: none;
+                position: fixed;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 95%;
+                max-width: 600px;
+                z-index: 1000;
+                justify-content: center;
+                gap: 5px;
+            }
+
+            .mobile-enter-btn {
+                flex: 1;
+                padding: 15px 0;
+                background-color: var(--focus-color);
+                color: #000;
+                border: 2px solid #555;
+                border-radius: 8px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                text-align: center;
+                cursor: pointer;
+                user-select: none;
+                -webkit-tap-highlight-color: transparent;
+                touch-action: manipulation;
+                transition: background-color 0.1s;
+            }
+
+            .mobile-enter-btn:active {
+                background-color: #e0a300;
+
+                .desktop-exit-li {
+                    display: none !important;
+                    /* Mobilde masaüstü çıkış butonunu nav'dan gizle */
                 }
+            }
 
-                body {
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                    background-color: var(--bg-color);
-                    color: var(--text-color);
-                    font-family: 'Consolas', 'Courier New', monospace;
-                    overflow: hidden;
-                    user-select: none;
-                    -webkit-user-select: none;
-                    touch-action: manipulation;
-                    cursor: default;
+            @media (min-width: 769px) {
+
+                #mobile-piano-container,
+                #mobile-enter-container {
+                    display: none !important;
+                    /* Masaüstünde/büyük ekranda gizle */
                 }
+            }
 
-                #intro-screen {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: var(--bg-color);
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 100;
-                    transition: opacity 1s ease-in-out;
-                }
-
-                .intro-title {
-                    font-size: 3rem;
-                    color: var(--text-color);
-                    margin-bottom: 2rem;
+            /* Responsive (Mobil) Uyumlu Tasarım Eklentileri */
+            @media (max-width: 600px) {
+                h1 {
+                    font-size: 1.6rem;
                     text-align: center;
-                    text-transform: uppercase;
-                    letter-spacing: 5px;
-                }
-
-                .intro-instruction {
-                    font-size: 1.5rem;
-                    color: #888888;
-                }
-
-                #main-menu-container,
-                #scoreboard-menu-container,
-                #difficulty-menu-container {
-                    display: none;
-                    opacity: 0;
-                    transition: opacity 0.3s ease-in-out;
+                    margin-bottom: 1.5rem;
                 }
 
                 .menu-container {
-                    display: flex;
-                    flex-direction: column;
-                    width: 100%;
-                    max-width: 600px;
-                    padding: 2rem;
-                    box-sizing: border-box;
-                    text-align: left;
-                }
-
-                h1 {
-                    margin-top: 0;
-                    margin-bottom: 2rem;
-                    font-size: 2.2rem;
-                    letter-spacing: 2px;
-                    text-transform: uppercase;
-                    color: var(--text-color);
-                    border-bottom: 2px solid #333;
-                    padding-bottom: 10px;
-                }
-
-                .menu-nav ul {
-                    list-style-type: none;
-                    padding: 0;
-                    margin: 0;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                }
-
-                .menu-nav li {
-                    width: 100%;
+                    padding: 1rem;
                 }
 
                 .menu-button {
-                    width: 100%;
-                    background-color: transparent;
-                    color: #888888;
-                    border: none;
-                    padding: 0.8rem 1rem;
-                    font-size: 1.2rem;
-                    font-weight: normal;
-                    cursor: default;
-                    text-align: left;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    font-family: inherit;
-                    position: relative;
-                    touch-action: manipulation;
+                    font-size: 1rem;
+                    padding: 1rem 0.5rem;
+                    text-align: center;
+                    border: 1px solid #333;
+                    border-radius: 8px;
+                    margin-bottom: 5px;
                 }
 
                 .menu-button::before {
-                    content: "[ ] ";
-                    color: #555;
+                    content: "";
+                    /* Mobilde imleç efekti çok yer kaplamasın */
                 }
 
-                .menu-button:hover,
-                .menu-button:focus-visible {
-                    color: var(--text-color);
-                    outline: none;
+                .intro-title {
+                    font-size: 2rem;
                 }
 
-                .menu-button:focus-visible::before {
-                    content: "[X] ";
-                    color: var(--focus-color);
+                .intro-instruction {
+                    font-size: 1rem;
                 }
 
-                .menu-button[aria-disabled="true"] {
-                    color: #333;
+                #game-score-display,
+                #game-timer-display,
+                #game-lives-display {
+                    font-size: 1rem;
                 }
-
-                .menu-button[aria-disabled="true"]::before {
-                    content: "[-] ";
-                    color: #333;
-                }
-
-                /* Mobil Piyano Tuşları */
-                /* Mobil Piyano Tuşları ve Oyundan Çıkış Barı */
-                #mobile-piano-container {
-                    display: none;
-                    position: fixed;
-                    bottom: 0px;
-                    /* Ekranın tam altına yasla */
-                    left: 0;
-                    width: 100vw;
-                    /* Ekranı tam kapla (boydan boya) */
-                    z-index: 1000;
-                    justify-content: space-between;
-                    gap: 0px;
-                    /* Butonlar arası boşluğu sıfırla */
-                }
-
-                .mobile-piano-key {
-                    flex: 1;
-                    padding: 30px 0;
-                    /* Butonlar çok küçükmüş, boyları uzatıldı */
-                    background-color: #333;
-                    color: #fff;
-                    border: 1px solid #555;
-                    border-radius: 0;
-                    /* Arada boşluk hissi kalmaması için köşeleri sıfırla */
-                    margin: 0;
-                    font-size: 1.3rem;
-                    font-weight: bold;
-                    text-align: center;
-                    cursor: pointer;
-                    user-select: none;
-                    -webkit-tap-highlight-color: transparent;
-                    touch-action: manipulation;
-                    transition: background-color 0.1s;
-                }
-
-                .mobile-piano-key:active {
-                    background-color: var(--focus-color);
-                    color: #000;
-                }
-
-                .mobile-exit-btn {
-                    flex: 1.5;
-                    /* Çıkış butonu biraz daha geniş olabilir veya aynı kalabilir */
-                    padding: 30px 0;
-                    background-color: #8b0000;
-                    color: #fff;
-                    border: 1px solid #ff4444;
-                    border-radius: 0;
-                    /* Arada boşluk olmaması için */
-                    margin: 0;
-                    font-size: 1.3rem;
-                    font-weight: bold;
-                    text-align: center;
-                    cursor: pointer;
-                    user-select: none;
-                    -webkit-tap-highlight-color: transparent;
-                    touch-action: manipulation;
-                    transition: background-color 0.1s;
-                    display: none;
-                    /* İlk 10 saniye gizli kalacak */
-                }
-
-                .mobile-exit-btn:active {
-                    background-color: #ff0000;
-                    color: #fff;
-                }
-
-                /* Sadece oyun veya pratik modundayken mobil tuşları göster */
-                body.show-mobile-keys #mobile-piano-container {
-                    display: flex;
-                }
-
-                /* Mobilde Enter tuşunu (diyaloglar için) göster */
-                body.show-mobile-enter #mobile-enter-container {
-                    display: flex;
-                }
-
-                #mobile-enter-container {
-                    display: none;
-                    position: fixed;
-                    bottom: 10px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 95%;
-                    max-width: 600px;
-                    z-index: 1000;
-                    justify-content: center;
-                    gap: 5px;
-                }
-
-                .mobile-enter-btn {
-                    flex: 1;
-                    padding: 15px 0;
-                    background-color: var(--focus-color);
-                    color: #000;
-                    border: 2px solid #555;
-                    border-radius: 8px;
-                    font-size: 1.2rem;
-                    font-weight: bold;
-                    text-align: center;
-                    cursor: pointer;
-                    user-select: none;
-                    -webkit-tap-highlight-color: transparent;
-                    touch-action: manipulation;
-                    transition: background-color 0.1s;
-                }
-
-                .mobile-enter-btn:active {
-                    background-color: #e0a300;
-
-                    .desktop-exit-li {
-                        display: none !important;
-                        /* Mobilde masaüstü çıkış butonunu nav'dan gizle */
-                    }
-                }
-
-                @media (min-width: 769px) {
-
-                    #mobile-piano-container,
-                    #mobile-enter-container {
-                        display: none !important;
-                        /* Masaüstünde/büyük ekranda gizle */
-                    }
-                }
-
-                /* Responsive (Mobil) Uyumlu Tasarım Eklentileri */
-                @media (max-width: 600px) {
-                    h1 {
-                        font-size: 1.6rem;
-                        text-align: center;
-                        margin-bottom: 1.5rem;
-                    }
-
-                    .menu-container {
-                        padding: 1rem;
-                    }
-
-                    .menu-button {
-                        font-size: 1rem;
-                        padding: 1rem 0.5rem;
-                        text-align: center;
-                        border: 1px solid #333;
-                        border-radius: 8px;
-                        margin-bottom: 5px;
-                    }
-
-                    .menu-button::before {
-                        content: "";
-                        /* Mobilde imleç efekti çok yer kaplamasın */
-                    }
-
-                    .intro-title {
-                        font-size: 2rem;
-                    }
-
-                    .intro-instruction {
-                        font-size: 1rem;
-                    }
-
-                    #game-score-display,
-                    #game-timer-display,
-                    #game-lives-display {
-                        font-size: 1rem;
-                    }
-                }
-            </style>
+            }
+        </style>
         </head>
 
         <body>
@@ -406,6 +401,9 @@
                         <li>
                             <button id="stats-btn-main" class="menu-button"
                                 aria-label="İstatistikler">İstatistikler</button>
+                        </li>
+                        <li>
+                            <button id="check-updates-btn" class="menu-button" aria-label="Güncellemeleri Denetle">Güncellemeleri Denetle</button>
                         </li>
                         <li>
                             <button id="exit-btn" class="menu-button" aria-label="Çıkış">Çıkış</button>
@@ -732,28 +730,53 @@
 
                 // --- OTOMATİK GÜNCELLEME KONTROL SİSTEMİ ---
                 let isSiteUpdating = false;
-                async function checkForUpdates() {
+                async function checkForUpdates(isManual = false) {
                     if (isSiteUpdating) return;
+                    if (isManual && typeof announceToScreenReader === 'function') {
+                        announceToScreenReader('Güncellemeler denetleniyor...');
+                    }
                     try {
                         const noCache = '?t=' + new Date().getTime();
                         // 1. Live sitedeki versiyonu al
                         const liveRes = await fetch('./version.json' + noCache);
-                        if (!liveRes.ok) return;
+                        if (!liveRes.ok) {
+                            if (isManual && typeof announceToScreenReader === 'function') announceToScreenReader('Güncelleme kontrolü başarısız oldu.');
+                            return;
+                        }
                         const liveVer = await liveRes.json();
 
                         // 2. GitHub üzerindeki en güncel (source) versiyonu al
                         const repoRes = await fetch('https://raw.githubusercontent.com/cengiz145/mikyasgame/main/version.json' + noCache);
-                        if (!repoRes.ok) return;
+                        if (!repoRes.ok) {
+                            if (isManual && typeof announceToScreenReader === 'function') announceToScreenReader('Güncelleme kontrolü başarısız oldu.');
+                            return;
+                        }
                         const repoVer = await repoRes.json();
 
                         // 3. Karşılaştır! Eğer repo (github) > live (github pages) ise DEPLOYMENT SÜRÜYOR demektir!
                         if (repoVer.buildId > liveVer.buildId) {
                             startUpdateTimer(repoVer.changelog);
+                        } else {
+                            if (isManual && typeof announceToScreenReader === 'function') {
+                                announceToScreenReader('Oyununuz güncel.');
+                            }
                         }
                     } catch (e) {
                         console.error("Güncelleme kontrolü başarısız", e);
+                        if (isManual && typeof announceToScreenReader === 'function') announceToScreenReader('Güncelleme kontrolü başarısız oldu.');
                     }
                 }
+
+                // Güncellemeleri Denetle butonu için event listener
+                document.addEventListener('DOMContentLoaded', () => {
+                    const checkUpdatesBtn = document.getElementById('check-updates-btn');
+                    if (checkUpdatesBtn) {
+                        checkUpdatesBtn.addEventListener('click', () => {
+                            // Tıklandığında ana menü müziğini vs bozmadan direkt API check
+                            checkForUpdates(true);
+                        });
+                    }
+                });
 
                 function startUpdateTimer(changelogText) {
                     if (isSiteUpdating) return;
@@ -2047,21 +2070,21 @@
                 // Ekran yüklendiğinde ekran okuyucuyu girişi başlatma butonuna odakla ve tam ekranı ayarla
                 window.addEventListener('load', () => {
                     const startIntroBtn = document.getElementById('start-intro-btn');
-                    
+
                     if (sessionStorage.getItem('skipIntro') === 'true') {
                         sessionStorage.removeItem('skipIntro');
                         isStarted = true;
                         const srcIntro = document.getElementById('intro-screen');
-                        if(srcIntro) {
+                        if (srcIntro) {
                             srcIntro.style.display = 'none';
                             srcIntro.setAttribute('aria-hidden', 'true');
                         }
                         const mMenu = document.getElementById('main-menu-container');
-                        if(mMenu) {
+                        if (mMenu) {
                             mMenu.style.display = 'flex';
                             mMenu.style.opacity = '1';
                         }
-                        
+
                         // Müziği gecikmeli başlat ki okuyucu karışmasın
                         setTimeout(() => { if (!bgMusic.playing()) bgMusic.play(); }, 1000);
                         setTimeout(() => {

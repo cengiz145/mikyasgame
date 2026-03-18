@@ -1,5 +1,5 @@
 {
-    "version":  "0.1",
-    "buildId":  1773815064,
-    "changelog":  "Bu bir deneme güncellemesidir. Seslerin kesildiği, bilgilendirmenin okunduğu ve ana menüye dönüldüğü test edilmektedir."
+    "version":  "1.2",
+    "buildId":  1773815065,
+    "changelog":  "Ana menüye 'Güncellemeleri Denetle' butonu eklendi ve manuel güncelleme kontrol sistemi getirildi."
 }
