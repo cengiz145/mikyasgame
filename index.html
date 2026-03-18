@@ -1155,7 +1155,7 @@
                     } else if (currentActiveMenu === 'store') {
                         buttons = Array.from(storeMenu.querySelectorAll('.menu-button'));
                     } else if (currentActiveMenu === 'achievements') {
-                        buttons = []; // Ok tuşlarıyla menü butonlarında dolanmayı iptal ediyoruz. Özel navigasyon var.
+                        buttons = Array.from(achievementsMenu.querySelectorAll('.menu-button'));
                     } else if (currentActiveMenu === 'game') {
                         buttons = Array.from(gameMenu.querySelectorAll('.menu-button'));
                     }
@@ -1273,9 +1273,21 @@
                     clickSound.stereo ? clickSound.stereo(xPos) : clickSound.pos(xPos, 0, 0);
                 }
 
+                // Web Audio API'nin mobil tarayıcılarda uyku modundan çıkmasını (resume) garanti altına almak
+                const ensureAudioUnlock = () => {
+                    if (typeof Howler !== 'undefined' && Howler.ctx && Howler.ctx.state === 'suspended') {
+                        Howler.ctx.resume();
+                    }
+                };
+                
+                // Belgedeki ilk dokunuşta sesi aç
+                document.addEventListener('touchstart', ensureAudioUnlock, { passive: true });
+                document.addEventListener('pointerdown', ensureAudioUnlock, { passive: true });
+
                 // Butonların üzerine fare ile gelince veya klavye ile odaklanınca dolaş sesi çal
                 allMenuButtons.forEach((button) => {
                     const playHover = () => {
+                        ensureAudioUnlock();
                         if (isStarted) {
                             hoverSound.play();
                         }
@@ -1310,8 +1322,19 @@
                         }
                         playHover();
                     });
+                    
+                    button.addEventListener('touchstart', () => {
+                        const activeButtons = getActiveButtons();
+                        const index = activeButtons.indexOf(button);
+                        if (index !== -1) {
+                            currentFocusIndex = index;
+                            updatePan(currentFocusIndex, activeButtons.length);
+                        }
+                        playHover();
+                    }, { passive: true });
 
                     button.addEventListener('click', (event) => {
+                        ensureAudioUnlock();
                         // Eğer buton aria-disabled='true' ise (kilitliyse) hiçbir işlem yapma
                         if (button.getAttribute('aria-disabled') === 'true') {
                             event.preventDefault();
@@ -1463,8 +1486,6 @@
                         btnDiffEasy.innerHTML = `Kolay Mod (${winsEasy}/${reqMedium} Tamamlandı)`;
                         btnDiffEasy.setAttribute('aria-label', `Kolay mod. Orta modu açmak için ${remainingEasy} kez daha kolay modu tamamlamanız gerekiyor. Sizin tamamladığınız tur sayısı: ${winsEasy}. Seçmek için enter'a basın.`);
 
-                        announcementText += `Kolay mod aktif. Orta modu açabilmek için ${remainingEasy} kez daha oyunu tamamlamaya ihtiyacınız var. Toplam tamamlanan tur ${winsEasy}.`;
-
                         if (liDiffMedium) liDiffMedium.style.display = 'none';
                         if (liDiffHard) liDiffHard.style.display = 'none';
                     } else {
@@ -1472,7 +1493,6 @@
                         btnDiffEasy.setAttribute('aria-label', `Kolay mod tamamlandı.`);
 
                         if (liDiffMedium) liDiffMedium.style.display = 'block';
-                        announcementText += `Kolay mod tamamlandı. `;
 
                         // --- ORTA MOD KONTROLÜ ---
                         if (winsMedium < reqHard) {
@@ -1481,7 +1501,6 @@
                                 btnDiffMedium.innerHTML = `Orta Mod (${winsMedium}/${reqHard} Tamamlandı)`;
                                 btnDiffMedium.setAttribute('aria-label', `Orta mod. Hedef 5 soru. Zor modu açmak için ${remainingMedium} kez daha bu modu tamamlamanız gerekiyor. Sizin tamamladığınız tur sayısı: ${winsMedium}. Seçmek için enter'a basın.`);
                             }
-                            announcementText += `Orta mod açık. Zor modu açabilmek için ${remainingMedium} kez daha orta modu tamamlamaya ihtiyacınız var. `;
 
                             if (liDiffHard) liDiffHard.style.display = 'none';
                         } else {
@@ -1492,34 +1511,30 @@
 
                             // Orta mod tamamlandıysa Zor mod'u göster
                             if (liDiffHard) liDiffHard.style.display = 'block';
-                            announcementText += `Orta mod açık. `;
 
                             // --- ZOR MOD KONTROLÜ ---
                             if (btnDiffHard) {
                                 if (gameModes.hard.completionCount < gameModes.missing_notes.requiredToUnlock) {
                                     btnDiffHard.innerHTML = `Zor Mod (${gameModes.hard.completionCount}/${gameModes.missing_notes.requiredToUnlock} Tamamlandı)`;
                                     btnDiffHard.setAttribute('aria-label', `Zor mod. Hedef 10 soru. Kayıp Notalar modunu açmak için ${gameModes.missing_notes.requiredToUnlock - gameModes.hard.completionCount} kez daha bu modu tamamlamanız gerekiyor. Sizin tamamladığınız tur sayısı: ${gameModes.hard.completionCount}. Seçmek için enter'a basın.`);
-                                    announcementText += `Zor mod açık.`;
                                 } else {
                                     btnDiffHard.innerHTML = `Zor Mod (Tamamlandı)`;
                                     btnDiffHard.setAttribute('aria-label', `Zor mod tamamlandı.`);
-                                    announcementText += `Zor mod tamamlandı. `;
 
                                     // Zor mod tamamlandıysa Kayıp Notalar'ı göster
                                     if (liDiffMissingNotes) liDiffMissingNotes.style.display = 'block';
                                     if (btnDiffMissingNotes) {
                                         btnDiffMissingNotes.innerHTML = `Kayıp Notalar (${gameModes.missing_notes.completionCount} Tamamlandı)`;
                                         btnDiffMissingNotes.setAttribute('aria-label', `Kayıp Notalar Modu. Bili'nin gizlediği notayı bul. ${gameModes.missing_notes.completionCount} kez tamamlandı. Seçmek için enter'a basın.`);
-                                        announcementText += `Kayıp Notalar modu açık, sürprize hazır olun. `;
                                     }
                                 }
                             }
                         }
                     }
 
-                    // NVDA'ya %100 garantili (Focus Hack) ile durumu okut
+                    // Sadece kısa bir başlık okut (Eski uzun metin yerine)
                     setTimeout(() => {
-                        announceToScreenReader(announcementText);
+                        announceToScreenReader("Zorluk seçimi ekranı.");
                     }, 400); // Menü geçiş animasyonunun (300ms) bitmesini bekler
                 }
 
