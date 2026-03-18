@@ -2131,6 +2131,21 @@
                     if (introPlayed) return;
                     introPlayed = true;
 
+                    // --- MOBİL GÜVENLİK İÇİN SENKRON SES BAŞLATMA ---
+                    // Tarayıcıların (özellikle iOS) otomatik ses engellemelerine takılmamak için 
+                    // logo sesini setTimeout beklemeden, kullanıcı tıkladığı an (senkron) başlatıyoruz.
+                    const randomLogoNum = Math.floor(Math.random() * 5) + 1;
+                    currentLogoSound = new Howl({
+                        src: [`sounds/logo${randomLogoNum}.wav`],
+                        volume: 1.0,
+                        html5: false, // HTML5 true asenkron play sorunlarına yol açabiliyor, devre dışı bırakıldı
+                        onend: function () { startGame(); },
+                        onloaderror: function () { startGame(); },
+                        onplayerror: function () { startGame(); }
+                    });
+                    currentLogoSound.play();
+                    // ---------------------------------------------------
+
                     const startIntroBtn = document.getElementById('start-intro-btn');
                     if (startIntroBtn) startIntroBtn.style.display = 'none';
 
@@ -2151,26 +2166,6 @@
                                     phase2.style.opacity = '1';
 
                                     // Başlığı ekran okuyucuya okutma (versionHack zaten okuyor)
-
-                                    // Random Logo sesi çal
-                                    const randomLogoNum = Math.floor(Math.random() * 5) + 1;
-                                    currentLogoSound = new Howl({
-                                        src: [`sounds/logo${randomLogoNum}.wav`],
-                                        volume: 1.0,
-                                        html5: true, // Büyük boyutlu WAV dosyalarını beklemeden anında akış olarak çalabilmesi için
-                                        onend: function () {
-                                            startGame();
-                                        },
-                                        onloaderror: function () {
-                                            // Ses dosyası bulunamaz veya yükleme hatası olursa menüde takılı kalmasın
-                                            startGame();
-                                        },
-                                        onplayerror: function () {
-                                            // Tarayıcı otomatik çalmayı engellerse veya çalma hatası olursa menüde takılı kalmasın
-                                            startGame();
-                                        }
-                                    });
-                                    currentLogoSound.play();
 
                                     setTimeout(() => {
                                         introReadyToStartGame = true; // Mobil çift dokunmanın 2. dokunuşunu sönümlemek için 1000ms geciktiriyoruz
