@@ -3,7 +3,7 @@
 [v1.2] - 2026-03-18
 
 ### Eklenenler / Değiştirilenler:
-- **Güncellemeleri Denetle:** Ana menüye sitenin güncel olup olmadığını manuel olarak denetleyebileceğiniz yeni bir buton eklendi. Ana menüden çıkış yapmadan evvel güncellemeleri kontrol edebilirsiniz.
+- Ana menüye 'Geri Bildirim' butonu ve bildirim menüsü eklendi, Google Form gönderimi aktifleştirildi.
 
 [v1.0.1 Beta] - 2026-03-11
 
