@@ -1881,6 +1881,9 @@
                             e.preventDefault(); // Odaklanmayı/çift tıklamayı engelle
                             button.focus();     // Ekran okuyucu odağını bu tuşa zorla
                             const noteKey = button.getAttribute('data-key');
+                            
+                            // Oyun içi anonsların odağı çalmasını engellemek için geçici bir flag setle
+                            window.isMobilePianokeyPressed = true;
 
                             // Sanal bir klavye eventi fırlat - böylece mevcut oyun mantığı aynen çalışır
                             const simulatedEvent = new KeyboardEvent('keydown', {
@@ -1894,9 +1897,13 @@
                             // Buton animasyonu için
                             button.style.backgroundColor = 'var(--focus-color)';
                             button.style.color = '#000';
+                            
+                            // Event işlendikten sonra flag'i kaldır ama odağı butonda tut
                             setTimeout(() => {
                                 button.style.backgroundColor = '';
                                 button.style.color = '';
+                                window.isMobilePianokeyPressed = false;
+                                button.focus(); // Odağı sıkıca kilitle
                             }, 100);
                         });
                     });
@@ -2036,7 +2043,7 @@
                 }
 
                 // --- NVDA İÇİN KESİN OKUMA FONKSİYONU (FOCUS HACK) --- //
-                function announceToScreenReader(text) {
+                function announceToScreenReader(text, forceFocus = true) {
                     // Önceki odakta kalan okuyucuyu temizle
                     let oldAnnouncer = document.getElementById('sr-focus-announcer');
                     if (oldAnnouncer) {
@@ -2059,14 +2066,19 @@
                     announcerDiv.style.height = '1px';
                     announcerDiv.style.overflow = 'hidden';
 
-                    // Metni yerleştir
-                    announcerDiv.innerText = text;
-
-                    document.body.appendChild(announcerDiv);
-
-                    // span'a odaklanıyoruz. NVDA bu değişikliği anında algılayıp metni okumaya başlar.
-                    // ÖNEMLİ: Odağı geri "Hemen" ALMIYORUZ! Geri alırsak NVDA cümleyi kesip "Dolaşım Sınır İmi" der.
-                    announcerDiv.focus();
+                    // Modifikasyon: Eğer aktif olarak mobil piyano tuşuna basılıyorsa, fokus hırsızlığını iptal et 
+                    // ve aria-live ile okut, böylece tuş üzerindeki SR focusu kaybolmaz.
+                    if (!forceFocus || window.isMobilePianokeyPressed) {
+                        announcerDiv.setAttribute('aria-live', 'assertive');
+                        announcerDiv.innerText = text;
+                        document.body.appendChild(announcerDiv);
+                    } else {
+                        // Metni yerleştir
+                        announcerDiv.innerText = text;
+                        document.body.appendChild(announcerDiv);
+                        // span'a odaklanıyoruz. NVDA bu değişikliği anında algılayıp metni okumaya başlar.
+                        announcerDiv.focus();
+                    }
                 }
 
                 // --- ANA OYUN MANTIĞI --- //
