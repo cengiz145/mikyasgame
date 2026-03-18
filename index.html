@@ -786,10 +786,7 @@
                                     
                                     setTimeout(() => refreshBtn.focus(), 100);
                                     
-                                    // Otomatik yenilemeyi de kışkırt (Kullanıcı alert'i geçer geçmez reload başlar)
-                                    setTimeout(() => {
-                                        window.location.href = window.location.pathname + "?v=" + new Date().getTime();
-                                    }, 1500);
+                                    // Otomatik yenileme kaldırıldı, sen tekrar girene (butona/F5 basana) kadar güncellenmeyecek
                                 }, 500); 
                             } else {
                                 if (isManual && typeof announceToScreenReader === 'function') {
