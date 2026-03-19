@@ -1,5 +1,5 @@
 {
-    "version": "0.34",
-    "buildId": 1773907100,
-    "changelog": "Oyunun açılıştaki otomatik tam ekran (fullscreen) özelliği devre dışı bırakıldı. Artık telefonların kendi alt gezinme çubukları (Ana Sayfa ve Geri tuşları) görünmeye devam edecek ve telefon üzerindeki serbest dolaşımınız kısıtlanmayacak."
+    "version": "0.35",
+    "buildId": 1773907500,
+    "changelog": "Tam ekran özelliği geri getirildi fakat telefonunuzun menü gezinti (Ana Sayfa, Geri, Arka Plan Uygulamaları) tuşları açık bırakıldı; böylelikle üst saat-bildirim paneli oyun deneyimini genişletmek için gizlenirken ekranın altına mahkum kalmayıp rahatça dolaşabilecek ve oyunu kapatabileceksiniz."
 }
