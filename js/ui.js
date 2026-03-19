@@ -425,12 +425,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const startGameBtn = document.getElementById('start-game-btn');
     const gameBackBtn = document.getElementById('game-back-btn');
+    const btnContinueSaved = document.getElementById('btn-continue-saved');
+    const serverMessageContinueBtn = document.getElementById('server-message-continue-btn');
+    const mobileEnterBtn = document.getElementById('mobile-enter-btn');
 
     const btnDiffEasy = document.getElementById('btn-diff-easy');
     const btnDiffMedium = document.getElementById('btn-diff-medium');
     const btnDiffHard = document.getElementById('btn-diff-hard');
     const btnDiffMissingNotes = document.getElementById('btn-diff-missing-notes');
     const difficultyBackBtn = document.getElementById('difficulty-back-btn');
+
+    // "Kayıtlı Oyundan Devam Et"
+    if (btnContinueSaved) {
+        btnContinueSaved.addEventListener('click', () => {
+            if(window.wrongSound) window.wrongSound.play();
+            if(window.announceToScreenReader) window.announceToScreenReader("Şu an devam edebileceğiniz kayıtlı bir oyununuz bulunmuyor.");
+        });
+    }
+
+    // Mobil Enter Butonu
+    if (mobileEnterBtn) {
+        mobileEnterBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const enterEvent = new KeyboardEvent('keydown', {
+                key: 'Enter',
+                code: 'Enter',
+                keyCode: 13,
+                which: 13,
+                bubbles: true
+            });
+            document.dispatchEvent(enterEvent);
+        });
+        mobileEnterBtn.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            mobileEnterBtn.click();
+        });
+    }
+
+    // Sunucu Mesajı Devam Et Butonu
+    if (serverMessageContinueBtn) {
+        serverMessageContinueBtn.addEventListener('click', () => {
+            if (window.globalChangelogVersion) {
+                localStorage.setItem('lastSeenChangelogVersion', window.globalChangelogVersion);
+            }
+            window.switchMenu(window.serverMessageMenu, window.mainMenu, 'main');
+        });
+    }
 
     // Stats
     if (statsBtnMain && statsBackBtn) {

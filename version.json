@@ -1,5 +1,5 @@
 {
-    "version":  "0.44",
-    "buildId":  1773950503,
-    "changelog":  "Tıklanmayan menü ve mağaza butonları ile ARIA okuyucu etiket dinamikleri onarıldı."
+    "version":  "0.45",
+    "buildId":  1773950979,
+    "changelog":  "Devam et butonlarının (Mobil enter, Kayıtlı oyun ve Sunucu mesajı) çalışmama sorunları giderildi."
 }

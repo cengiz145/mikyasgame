@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.5] - 2026-03-19
+
+### Eklenenler / Değiştirilenler:
+- **ÇALIŞMAYAN YÖNLENDİRME BUTONLARININ ONARIMI:** Oyunda "Devam Et" işlevine karşılık gelen butonların işlevleri onarıldı.
+  - Ana menüdeki "Kayıtlı Oyundan Devam Et" butonuna tıklandığında uyarı verici bir ses ve mesaj okuması eklendi.
+  - Mobil cihazlardaki menü altı "Devam Et (Enter)" sanal butonuna klavyedeki "Enter" basışını simüle edecek işlev atandı.
+  - Sunucu mesajında/Güncelleme notlarında yer alan "Anladım, Devam Et" butonunun pencereyi kapatarak ana menüye aktarma işlevi düzeltildi.
+
 [v1.4] - 2026-03-19
 
 ### Eklenenler / Değiştirilenler:
