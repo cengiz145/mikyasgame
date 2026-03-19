@@ -129,24 +129,32 @@
             return text
                 .replace(/entıra basın/gi, "ekrana iki kez dokunun")
                 .replace(/enter'a basın/gi, "ekrana iki kez dokunun")
+                .replace(/enter tuşuna basın/gi, "ekrana iki kez dokunun")
                 .replace(/entır tuşuna basın/gi, "ekrana iki kez dokunun")
+                .replace(/entır tuşunu kullanabilirsiniz/gi, "ekrana iki kez dokunabilirsiniz")
                 .replace(/entır tuşu ile/gi, "ekrana iki kez dokunarak")
                 .replace(/sağ ve sol ok tuşlarına basın/gi, "parmağınızı sağa veya sola süpürme hareketi yapın")
                 .replace(/sağ sol ok tuşlarına basın/gi, "parmağınızı sağa veya sola süpürme hareketi yapın")
+                .replace(/sağ ve sol ok tuşlarıyla gezinebilirsiniz/gi, "parmağınızı sağa veya sola süpürerek gezinebilirsiniz")
                 .replace(/sağ ve sol ok tuşlarıyla gezinebilir/gi, "parmağınızı sağa veya sola süpürerek gezinebilir")
                 .replace(/sayfa yukarı ve sayfa aşağı tuşuna basın/gi, "telefonunuzun ses tuşlarına basın")
                 .replace(/Page Up ve Page Down tuşlarıyla/gi, "telefonunuzun ses tuşlarıyla")
                 .replace(/m tuşuna basın/gi, "sessize alma düğmesini kullanın")
                 .replace(/S tuşu ile skorunuzu, T tuşu ile kalan sürenizi öğrenebilir, boşluk tuşu ile bir saniye ceza karşılığında ses dizisini tekrar dinleyebilirsiniz\./gi, "")
+                .replace(/<strong>S tuşu<\/strong> ile skorunuzu, <strong>T tuşu<\/strong> ile kalan sürenizi öğrenebilir, <strong>Boşluk tuşu<\/strong> ile bir saniye ceza karşılığında ses dizisini tekrar dinleyebilirsiniz\./gi, "")
                 .replace(/ok tuşlarını kullanın/gi, "parmağınızı sağa veya sola süpürün");
         };
 
-        // Tüm statik Aria Labelleri mobil cihazsa çevir
+        // Tüm statik Aria Labelleri ve içerikleri mobil cihazsa çevir
         document.addEventListener('DOMContentLoaded', () => {
             if (window.isMobileDevice) {
                 document.querySelectorAll('[aria-label]').forEach(el => {
                     let oldLabel = el.getAttribute('aria-label');
                     if (oldLabel) el.setAttribute('aria-label', window.localizeText(oldLabel));
+                });
+                
+                document.querySelectorAll('.localize-inner').forEach(el => {
+                    el.innerHTML = window.localizeText(el.innerHTML);
                 });
             }
         });
