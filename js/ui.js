@@ -741,8 +741,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Nokta (.) kısayolu ve ESC tuşu
     document.addEventListener('keydown', (e) => {
-        // Eğer focus input/textarea/select üzerindeyse nokta tuşu kısayolu yoksay, yazı yazılsın.
-        if (e.key === '.' && (!document.activeElement || (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'SELECT'))) {
+        // Nokta (.) tuşuyla sohbeti SADECE aç
+        if (e.key === '.' && !window.isChatOpen && (!document.activeElement || (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'SELECT'))) {
             window.toggleChat();
         }
         
