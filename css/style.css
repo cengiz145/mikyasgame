@@ -300,34 +300,51 @@
                 font-size: 1rem;
             }
         }
-        @media (min-width: 769px) {
-            #feedback-menu-container {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background-color: rgba(0, 0, 0, 0.85);
-                z-index: 2000;
-                justify-content: center;
-                align-items: center;
-                padding: 0;
-            }
+        #feedback-menu-container,
+        #server-message-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
 
+        .feedback-dialog-box {
+            background-color: #1a1a1a;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+            border: 1px solid #444;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: left;
+            position: relative;
+        }
+
+        .feedback-dialog-box h1 {
+            border-bottom: 2px solid #444;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            position: sticky;
+            top: 0;
+            background-color: #1a1a1a;
+            padding-top: 10px;
+            z-index: 10;
+        }
+
+        @media (max-width: 600px) {
             .feedback-dialog-box {
-                background-color: #1a1a1a;
-                padding: 30px;
-                border-radius: 12px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
-                border: 1px solid #444;
-                width: 100%;
-                max-width: 600px;
-                text-align: left;
+                padding: 15px;
+                max-height: 95vh;
             }
-
             .feedback-dialog-box h1 {
-                border-bottom: 2px solid #444;
-                margin-bottom: 20px;
-                font-size: 2rem;
+                font-size: 1.5rem;
             }
         }

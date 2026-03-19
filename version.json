@@ -1,5 +1,5 @@
 {
-    "version": "0.32",
-    "buildId": 1773905500,
-    "changelog": "Zor modda oyunun bitmemesine ve sürenin eksiye düşmesine yol açan kritik bir zamanlayıcı hatası (hayalet sayaç) giderildi. Ayrıca mobilde 'Son 20 saniye' ve 'Son 10 saniye' uyarılarının bir buton gibi kafa karıştırıcı şekilde okunması engellendi (sadece bildirim olarak duyurulacak). Son olarak mobildeki 'Tekrar Dinle' butonunun gereksiz uzun olan gizli okuma metni sadeleştirilip doğrudan 'Tekrar Dinle' olarak düzeltildi."
+    "version": "0.33",
+    "buildId": 1773906200,
+    "changelog": "Telefonlardan oynarken Geri Bildirim mesajı gibi uzun menülerin ekrana sabitlenip aşağıya/yukarıya kaydırılamamasına sebep olan tasarım engelleri kaldırıldı."
 }
