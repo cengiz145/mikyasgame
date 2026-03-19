@@ -1,5 +1,5 @@
 {
-    "version":  "0.50",
-    "buildId":  1773954721,
-    "changelog":  "yardim.js iÃ§erisindeki okunmayan motivasyon mesajlarÄ±nÄ±n global kapsam hatasÄ± dÃ¼zeltildi."
+    "version":  "0.51",
+    "buildId":  1773960955,
+    "changelog":  "Mobil cihazlarda piyano tuşlarının ekran okuyucuyla tıklanamaması sorunu giderildi."
 }

@@ -1,6 +1,9 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
-[v1.10] - 2026-03-20
+[v1.11] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- **MOBİL ERİŞİLEBİLİRLİK (Piyano Tuşları) GÜNCELLEMESİ:** Mobil cihazlarda (telefonlarda) yer alan oyun içi piyano tuşlarının ve "Çıkış" butonunun, ekran okuyucu programları devredeyken çalışmaması sorunu giderildi. Ekran okuyucuların yapay tıklamalarını (`click`) güvenle algılayacak şekilde yenilendi.[v1.10] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:
 - **YARDIM KÜTÜPHANESİ (yardim.js) DÜZELTMELERİ:**

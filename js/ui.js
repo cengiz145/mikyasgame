@@ -9,7 +9,7 @@ window.mevcutSurum = null;
 window.globalChangelogVersion = null;
 window.globalChangelogMessage = null;
 
-window.guncellemeKontrolEt = function(isManual = false) {
+window.guncellemeKontrolEt = function (isManual = false) {
     if (isManual && typeof window.announceToScreenReader === 'function') {
         window.announceToScreenReader('Güncellemeler denetleniyor...');
     }
@@ -164,7 +164,7 @@ window.currentFocusIndex = 0;
 window.isStarted = false;
 window.currentActiveMenu = 'main';
 
-window.getActiveButtons = function() {
+window.getActiveButtons = function () {
     let buttons = [];
     if (window.currentActiveMenu === 'main') buttons = Array.from(window.mainMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'scoreboard') buttons = Array.from(window.scoreboardMenu.querySelectorAll('.menu-button'));
@@ -185,7 +185,7 @@ window.getActiveButtons = function() {
     });
 };
 
-window.updateMobileKeysVisibility = function() {
+window.updateMobileKeysVisibility = function () {
     const mobilePiano = document.getElementById('mobile-piano-container');
     const mobileEnter = document.getElementById('mobile-enter-container');
 
@@ -221,7 +221,7 @@ window.updateMobileKeysVisibility = function() {
     }
 };
 
-window.switchMenu = function(hideMenu, showMenu, newActiveMenuName) {
+window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     if (!hideMenu || !showMenu) return;
     hideMenu.style.opacity = '0';
     setTimeout(() => {
@@ -242,7 +242,7 @@ window.switchMenu = function(hideMenu, showMenu, newActiveMenuName) {
     }, 300);
 };
 
-window.announceToScreenReader = function(text, forceFocus = true) {
+window.announceToScreenReader = function (text, forceFocus = true) {
     text = window.localizeText(text);
 
     let oldAnnouncer = document.getElementById('sr-focus-announcer');
@@ -270,7 +270,7 @@ window.announceToScreenReader = function(text, forceFocus = true) {
     }
 };
 
-window.updateButtonUI = function(btnElement, modeData, unlockedLabel, lockReason) {
+window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReason) {
     if (!btnElement) return;
 
     if (modeData.isUnlocked) {
@@ -287,8 +287,8 @@ window.updateButtonUI = function(btnElement, modeData, unlockedLabel, lockReason
     }
 };
 
-window.updateScoreboardLocks = function() {
-    if(!window.gameModes) return;
+window.updateScoreboardLocks = function () {
+    if (!window.gameModes) return;
     if (window.gameModes.easy.completionCount >= window.gameModes.medium.requiredToUnlock) {
         window.gameModes.medium.isUnlocked = true;
     }
@@ -308,9 +308,9 @@ window.updateScoreboardLocks = function() {
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp notalar modu için yüksek skoru görüntüle", "Zor modu 5 kez tamamla");
 };
 
-window.updateDifficultyMenuLocks = function() {
-    if(!window.gameModes) return;
-    
+window.updateDifficultyMenuLocks = function () {
+    if (!window.gameModes) return;
+
     // Açılma koşullarını scoreboard güncellemesinde olduğu gibi kontrol et
     if (window.gameModes.easy.completionCount >= window.gameModes.medium.requiredToUnlock) {
         window.gameModes.medium.isUnlocked = true;
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hover Effects
     window.allMenuButtons.forEach((button) => {
         const playHover = () => {
-            if(window.ensureAudioUnlock) window.ensureAudioUnlock();
+            if (window.ensureAudioUnlock) window.ensureAudioUnlock();
             if (window.currentActiveMenu !== 'none' && window.hoverSound) {
                 window.hoverSound.play();
             }
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = activeButtons.indexOf(button);
             if (index !== -1) {
                 window.currentFocusIndex = index;
-                if(window.updatePan) window.updatePan(window.currentFocusIndex, activeButtons.length);
+                if (window.updatePan) window.updatePan(window.currentFocusIndex, activeButtons.length);
             }
             playHover();
         });
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = activeButtons.indexOf(button);
             if (index !== -1) {
                 window.currentFocusIndex = index;
-                if(window.updatePan) window.updatePan(window.currentFocusIndex, activeButtons.length);
+                if (window.updatePan) window.updatePan(window.currentFocusIndex, activeButtons.length);
             }
             playHover();
         });
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = activeButtons.indexOf(button);
             if (index !== -1) {
                 window.currentFocusIndex = index;
-                if(window.updatePan) window.updatePan(window.currentFocusIndex, activeButtons.length);
+                if (window.updatePan) window.updatePan(window.currentFocusIndex, activeButtons.length);
             }
             playHover();
         });
@@ -382,13 +382,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = activeButtons.indexOf(button);
             if (index !== -1) {
                 window.currentFocusIndex = index;
-                if(window.updatePan) window.updatePan(window.currentFocusIndex, activeButtons.length);
+                if (window.updatePan) window.updatePan(window.currentFocusIndex, activeButtons.length);
             }
             playHover();
         }, { passive: true });
 
         button.addEventListener('click', (event) => {
-            if(window.ensureAudioUnlock) window.ensureAudioUnlock();
+            if (window.ensureAudioUnlock) window.ensureAudioUnlock();
             if (button.getAttribute('aria-disabled') === 'true') {
                 event.preventDefault();
                 event.stopPropagation();
@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const activeButtons = window.getActiveButtons();
             const index = activeButtons.indexOf(button);
             if (index !== -1) {
-                if(window.updatePan) window.updatePan(index, activeButtons.length);
+                if (window.updatePan) window.updatePan(index, activeButtons.length);
             }
             if (window.isStarted && window.clickSound) {
                 window.clickSound.play();
@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scoreboardBackBtn = document.getElementById('scoreboard-back-btn');
     const practiceBtnMain = document.getElementById('practice-mode-btn');
     const practiceBackBtn = document.getElementById('practice-back-btn');
-    const statsBtnMain = document.getElementById('stats-btn-main'); 
+    const statsBtnMain = document.getElementById('stats-btn-main');
     const statsBackBtn = document.getElementById('stats-back-btn');
     const storeBtnMain = document.getElementById('store-btn-main');
     const storeBackBtn = document.getElementById('store-back-btn');
@@ -438,8 +438,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // "Kayıtlı Oyundan Devam Et"
     if (btnContinueSaved) {
         btnContinueSaved.addEventListener('click', () => {
-            if(window.wrongSound) window.wrongSound.play();
-            if(window.announceToScreenReader) window.announceToScreenReader("Şu an devam edebileceğiniz kayıtlı bir oyununuz bulunmuyor.");
+            if (window.wrongSound) window.wrongSound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader("Şu an devam edebileceğiniz kayıtlı bir oyununuz bulunmuyor.");
         });
     }
 
@@ -475,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Stats
     if (statsBtnMain && statsBackBtn) {
         statsBtnMain.addEventListener('click', () => {
-            if(window.updateStatsDisplay) window.updateStatsDisplay();
+            if (window.updateStatsDisplay) window.updateStatsDisplay();
             window.switchMenu(window.mainMenu, window.statsMenu, 'stats');
         });
         statsBackBtn.addEventListener('click', () => {
@@ -488,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
         storeBtnMain.addEventListener('click', () => {
             window.switchMenu(window.mainMenu, window.storeMenu, 'store');
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-            if(window.announceToScreenReader) window.announceToScreenReader(`Mağazaya hoş geldiniz. Mevcut jetonunuz: ${totalTokens}`);
+            if (window.announceToScreenReader) window.announceToScreenReader(`Mağazaya hoş geldiniz. Mevcut jetonunuz: ${totalTokens}`);
         });
         storeBackBtn.addEventListener('click', () => {
             window.switchMenu(window.storeMenu, window.mainMenu, 'main');
@@ -503,11 +503,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
                 let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
                 localStorage.setItem('hafizaGuvenHataKorumasi', hk + 1);
-                if(window.buySound) window.buySound.play();
-                if(window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Hata Koruması eklendi. Kalan jeton: ${totalTokens}`);
+                if (window.buySound) window.buySound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Hata Koruması eklendi. Kalan jeton: ${totalTokens}`);
             } else {
-                if(window.wrongSound) window.wrongSound.play();
-                if(window.announceToScreenReader) window.announceToScreenReader(`Yetersiz jeton. 50 jeton gerekli, sizin ${totalTokens} jetonunuz var.`);
+                if (window.wrongSound) window.wrongSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader(`Yetersiz jeton. 50 jeton gerekli, sizin ${totalTokens} jetonunuz var.`);
             }
         });
     }
@@ -520,11 +520,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
                 let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
                 localStorage.setItem('hafizaGuvenZamanKorumasi', zk + 1);
-                if(window.buySound) window.buySound.play();
-                if(window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Zaman Koruması eklendi. Kalan jeton: ${totalTokens}`);
+                if (window.buySound) window.buySound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Zaman Koruması eklendi. Kalan jeton: ${totalTokens}`);
             } else {
-                if(window.wrongSound) window.wrongSound.play();
-                if(window.announceToScreenReader) window.announceToScreenReader(`Yetersiz jeton. 30 jeton gerekli, sizin ${totalTokens} jetonunuz var.`);
+                if (window.wrongSound) window.wrongSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader(`Yetersiz jeton. 30 jeton gerekli, sizin ${totalTokens} jetonunuz var.`);
             }
         });
     }
@@ -535,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.switchMenu(window.mainMenu, window.achievementsMenu, 'achievements');
             let text = "Henüz açılmış bir başarınız yok.";
             if (window.userAchievements && window.userAchievements.hafizam_gucleniyor) text = "Hafızam Güçleniyor başarımını kazandınız!";
-            if(window.announceToScreenReader) window.announceToScreenReader(text);
+            if (window.announceToScreenReader) window.announceToScreenReader(text);
         });
         achievementsBackBtn.addEventListener('click', () => {
             window.switchMenu(window.achievementsMenu, window.mainMenu, 'main');
@@ -551,13 +551,13 @@ document.addEventListener('DOMContentLoaded', () => {
             window.switchMenu(window.feedbackMenu, window.mainMenu, 'main');
         });
     }
-    
+
     if (feedbackSubmitBtn) {
         feedbackSubmitBtn.addEventListener('click', () => {
             const form = document.getElementById('feedback-form');
             if (form) {
                 form.submit();
-                if(window.announceToScreenReader) window.announceToScreenReader("Geri bildirim formunuz yönlendiriliyor.");
+                if (window.announceToScreenReader) window.announceToScreenReader("Geri bildirim formunuz yönlendiriliyor.");
             }
         });
     }
@@ -567,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
         practiceBtnMain.addEventListener('click', () => {
             window.switchMenu(window.mainMenu, window.practiceMenu, 'practice');
             if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
-            
+
             window.practiceTargetIndex = 0;
             window.practicePressCount = 0;
             window.inPracticeTutorial = false;
@@ -594,7 +594,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (startGameBtn) {
         startGameBtn.addEventListener('click', () => {
             window.switchMenu(window.mainMenu, window.difficultyMenu, 'difficulty');
-            if(window.updateDifficultyMenuLocks) window.updateDifficultyMenuLocks();
+            if (window.updateDifficultyMenuLocks) window.updateDifficultyMenuLocks();
         });
     }
     if (difficultyBackBtn) {
@@ -607,20 +607,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnDiffEasy && gameBackBtn) {
         btnDiffEasy.addEventListener('click', () => {
             window.switchMenu(window.difficultyMenu, window.gameMenu, 'game');
-            if(window.startMainGame) window.startMainGame('easy');
+            if (window.startMainGame) window.startMainGame('easy');
         });
 
         if (btnDiffMedium) {
             btnDiffMedium.addEventListener('click', () => {
                 window.switchMenu(window.difficultyMenu, window.gameMenu, 'game');
-                if(window.startMainGame) window.startMainGame('medium');
+                if (window.startMainGame) window.startMainGame('medium');
             });
         }
 
         if (btnDiffHard) {
             btnDiffHard.addEventListener('click', () => {
                 window.switchMenu(window.difficultyMenu, window.gameMenu, 'game');
-                if(window.startMainGame) window.startMainGame('hard');
+                if (window.startMainGame) window.startMainGame('hard');
             });
         }
 
@@ -646,14 +646,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.inStoryMode = true;
                 window.currentStoryIndex = 0;
                 setTimeout(() => {
-                    if(window.playCurrentStoryDialog) window.playCurrentStoryDialog();
-                    if(window.triggerStoryAnimations) window.triggerStoryAnimations(0);
+                    if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
+                    if (window.triggerStoryAnimations) window.triggerStoryAnimations(0);
                 }, 350);
             });
         }
 
         gameBackBtn.addEventListener('click', () => {
-            if(window.endMainGame) window.endMainGame(false, false, true); 
+            if (window.endMainGame) window.endMainGame(false, false, true);
 
             if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
             if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
@@ -662,10 +662,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
             if (window.bgMusic) window.bgMusic.play();
         });
-        
+
         const mobileGameBackBtn = document.getElementById('mobile-game-back-btn');
         if (mobileGameBackBtn) {
-            mobileGameBackBtn.addEventListener('pointerdown', (e) => {
+            mobileGameBackBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 gameBackBtn.click();
             });
@@ -674,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Menü içi ok tuşlarıyla gezinme işlevi
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     if (document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) {
         return;
     }
