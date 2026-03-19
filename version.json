@@ -1,5 +1,5 @@
 {
-    "version": "0.36",
-    "buildId": 1773908200,
-    "changelog": "Tüm platformlar için oyuna başlarken (İlk notayı çalmadan önce) oyuncuya kendini hazırlayabilmesi için verilen süre 3 saniyeye çıkartıldı. Ayrıca mobil sürümdeki gereksiz 'Bilgisayar çalıyor' uyarı anonsu gizlenerek daha akıcı/doğrudan bir deneyim sağlandı."
+    "version": "0.37",
+    "buildId": 1773911000,
+    "changelog": "Tam ekran navigasyon çubuğu ayarları, bazı telefon modellerinde ve eski tarayıcılarda oyunu başlangıç ekranında (logoda) donduran kritik bir hataya yol açıyordu; bu çökme sorunu acil bir yamayla giderildi."
 }

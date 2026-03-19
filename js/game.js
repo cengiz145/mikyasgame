@@ -1493,31 +1493,38 @@
             // Sadece üst ekranı (durum çubuğunu) gizle, alt gezinme tuşlarını bırak (navigationUI: "show")
             const requestFullScreenOnce = () => {
                 if (!document.fullscreenElement && document.body.requestFullscreen) {
-                    document.body.requestFullscreen({ navigationUI: "show" }).then(() => {
-                        // Tarayıcının 'Tam ekrandan çıkmak için Esc tuşuna basın' uyarısını ezmek (interrupt) için Focus Hack
-                        const versionHack = document.createElement("div");
-                        versionHack.tabIndex = -1;
-                        versionHack.setAttribute("role", "alertdialog");
-                        versionHack.setAttribute("aria-modal", "true");
-                        versionHack.setAttribute("aria-label", "Hafızana Güven Yeni Sürüm");
-                        versionHack.setAttribute("aria-live", "assertive");
-                        versionHack.style.position = "absolute";
-                        versionHack.style.opacity = "0";
-                        document.body.appendChild(versionHack);
+                    try {
+                        let fsPromise = document.body.requestFullscreen({ navigationUI: "show" });
+                        if (fsPromise) {
+                            fsPromise.then(() => {
+                                // Tarayıcının 'Tam ekrandan çıkmak için Esc tuşuna basın' uyarısını ezmek (interrupt) için Focus Hack
+                                const versionHack = document.createElement("div");
+                                versionHack.tabIndex = -1;
+                                versionHack.setAttribute("role", "alertdialog");
+                                versionHack.setAttribute("aria-modal", "true");
+                                versionHack.setAttribute("aria-label", "Hafızana Güven Yeni Sürüm");
+                                versionHack.setAttribute("aria-live", "assertive");
+                                versionHack.style.position = "absolute";
+                                versionHack.style.opacity = "0";
+                                document.body.appendChild(versionHack);
 
-                        // Anında odağı buraya çekerek uyarıyı sustur
-                        versionHack.focus();
+                                // Anında odağı buraya çekerek uyarıyı sustur
+                                versionHack.focus();
 
-                        // Okuma bittikten sonra fazlalığı temizle ve odağı asıl butona geri ver
-                        setTimeout(() => {
-                            if (document.body.contains(versionHack)) document.body.removeChild(versionHack);
-                            const startBtn = document.getElementById('start-intro-btn');
-                            if (startBtn) startBtn.focus();
-                        }, 2500);
+                                // Okuma bittikten sonra fazlalığı temizle ve odağı asıl butona geri ver
+                                setTimeout(() => {
+                                    if (document.body.contains(versionHack)) document.body.removeChild(versionHack);
+                                    const startBtn = document.getElementById('start-intro-btn');
+                                    if (startBtn) startBtn.focus();
+                                }, 2500);
 
-                    }).catch(err => {
-                        console.log(`Tam ekran yapılamadı: ${err.message}`);
-                    });
+                            }).catch(err => {
+                                console.log(`Tam ekran yapılamadı: ${err.message}`);
+                            });
+                        }
+                    } catch (syncErr) {
+                        console.log(`Cihaz navigationUI desteklemiyor, tam ekran atlandı: ${syncErr.message}`);
+                    }
                 }
                 // Sadece ilk dokunuşta/tıklamada çalışsın, sonra dinleyiciyi kaldır
                 document.removeEventListener('click', requestFullScreenOnce);
