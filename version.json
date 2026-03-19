@@ -1,5 +1,5 @@
 {
-    "version": "0.30",
-    "buildId": 1773902632,
-    "changelog": "Mobil cihazlarda metin okuyucusunun yanlışlıkla 'entıra basın' şeklinde seslendirdiği birden çok diyalog sorunu giderildi; artık tamamı telefona uygun biçimde 'ekrana çift dokunun' olarak yönlendiriliyor."
+    "version": "0.31",
+    "buildId": 1773903410,
+    "changelog": "BÜYÜK MOBİL GÜNCELLEMESİ! Bu sürümle birlikte telefondan oynayan oyuncularımızın deneyimini zirveye taşıyacak tüm eksikler tamamlandı: 1) Nota ve çıkış düğmelerinin dikey uzunlukları dokunmatik ekranlar için iki katına çıkartılarak isabet kesinleştirildi. 2) Masaüstü kullanıcıları için olan 'entıra basın', 'ok tuşlarıyla gezin' gibi tüm oyun ve eğitim talimatları; mobilde baştan sona otomatik olarak 'ekrana çift dokunun', 'parmağınızı süpürün' şeklinde ekran okuyucu uyumlu komutlara çevrildi. 3) Eğitim/Hikâye diyaloglarını mobilde çok daha kolay atlayabilmeniz için ekranın altına, kalabalığı gizleyen özel bir Dokun onay butonu eklendi. 4) Görünen ancak rahatsız edici olan 'çıkış tuşu belirdi' okuyucu sorunu silindi."
 }
