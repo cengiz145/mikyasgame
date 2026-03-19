@@ -308,6 +308,37 @@ window.updateScoreboardLocks = function() {
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp notalar modu için yüksek skoru görüntüle", "Zor modu 5 kez tamamla");
 };
 
+window.updateDifficultyMenuLocks = function() {
+    if(!window.gameModes) return;
+    
+    // Açılma koşullarını scoreboard güncellemesinde olduğu gibi kontrol et
+    if (window.gameModes.easy.completionCount >= window.gameModes.medium.requiredToUnlock) {
+        window.gameModes.medium.isUnlocked = true;
+    }
+    if (window.gameModes.medium.completionCount >= window.gameModes.hard.requiredToUnlock) {
+        window.gameModes.hard.isUnlocked = true;
+    }
+    if (window.gameModes.hard.completionCount >= window.gameModes.missing_notes.requiredToUnlock) {
+        window.gameModes.missing_notes.isUnlocked = true;
+    }
+
+    const btnMedium = document.getElementById('btn-diff-medium');
+    const liMedium = document.getElementById('li-diff-medium');
+    const btnHard = document.getElementById('btn-diff-hard');
+    const liHard = document.getElementById('li-diff-hard');
+    const btnMissingNotes = document.getElementById('btn-diff-missing-notes');
+    const liMissingNotes = document.getElementById('li-diff-missing-notes');
+
+    if (liMedium) liMedium.style.display = 'block';
+    if (liHard) liHard.style.display = 'block';
+    if (liMissingNotes) liMissingNotes.style.display = 'block';
+
+    window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta Modu Oyna", "Kolay modu 1 kez tamamla");
+    window.updateButtonUI(btnHard, window.gameModes.hard, "Zor Modu Oyna", "Orta modu 5 kez tamamla");
+    window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp Notalar Modu. Hikayeli piyano modu.", "Zor modu 5 kez tamamla");
+};
+
+
 // --- EVENTS ---
 document.addEventListener('DOMContentLoaded', () => {
     // Hover Effects
