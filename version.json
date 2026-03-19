@@ -1,5 +1,5 @@
 {
-    "version":  "0.26",
-    "buildId":  1773883061,
-    "changelog":  "fix: Bozuk Türkçe karakterler ve yazım hataları onarıldı, UTF-8 uyumluluğu eklendi."
+    "version":  "0.27",
+    "buildId":  1773888024,
+    "changelog":  "fix: push_update.ps1 ANSI kodlama bozuntularÄ± UTF-8 (BOM\u0027suz) formatÄ±na Ã§evrildi ve karakter hatalarÄ± kalÄ±cÄ± olarak Ã§Ã¶zÃ¼ldÃ¼."
 }
