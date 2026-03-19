@@ -1721,10 +1721,8 @@
             }
 
             // Agresif Yöntem: NVDA focus aldığında elementin türünü ("bölüm", "metin" vs.) okumasın diye;
-            // Rol olarak 'region' (bölüm) seçilip, özelliği "sıfır genişlikli boşluk" ile (Zero-Width Space) ezildi.
             let announcerDiv = document.createElement('div');
             announcerDiv.id = 'sr-focus-announcer';
-            announcerDiv.setAttribute('role', 'region');
 
             // focus alabilmesi için
             announcerDiv.setAttribute('tabindex', '-1');
