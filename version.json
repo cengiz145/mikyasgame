@@ -1,5 +1,5 @@
 {
-    "version":  "0.27",
-    "buildId":  1773888024,
-    "changelog":  "fix: push_update.ps1 ANSI kodlama bozuntuları UTF-8 (BOM\u0027suz) formatına çevrildi ve karakter hataları kalıcı olarak çözüldü."
+    "version": "0.28",
+    "buildId": 1773899503,
+    "changelog": "Geri Bildirim menüsündeki sekme (Tab) dolaşımı düzeltildi. Zorunlu güncelleme kontrol ekranına sesli tarih anonsu ve update.ogg uyarı müziği eklendi. Bilgisayar ile telefona özel oyun talimat metinleri birbirinden dinamik bir şekilde ayrıştırılıp bağımsız bir hale getirildi."
 }
