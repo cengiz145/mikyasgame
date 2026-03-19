@@ -1,5 +1,5 @@
 {
-    "version": "0.41",
-    "buildId": 1773937100,
-    "changelog": "Zor Modda başarıyla tamamlandığında tebrikler ekranının (yazısının) gizli kalması düzeltildi. Ayrıca Zor mod tamamlandığı an artık puanınız tamamen 100 Jeton olacak şekilde güncellendi ve bu anında ekrana yansıtıldı."
+    "version":  "0.42",
+    "buildId":  1773949619,
+    "changelog":  "Ok tuşları ve kısayol gezinme hataları ile seslerin çalışmama sorunu düzeltildi."
 }

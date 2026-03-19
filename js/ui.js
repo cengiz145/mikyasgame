@@ -517,3 +517,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// Menü içi ok tuşlarıyla gezinme işlevi
+document.addEventListener('keydown', function(event) {
+    if (document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) {
+        return;
+    }
+
+    if (window.isGridWalkingPhase && window.currentActiveMenu === 'story') {
+        return;
+    }
+
+    if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) {
+        const activeButtons = window.getActiveButtons();
+        if (activeButtons.length === 0) return;
+
+        event.preventDefault();
+
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+            window.currentFocusIndex = (window.currentFocusIndex + 1) % activeButtons.length;
+            activeButtons[window.currentFocusIndex].focus();
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+            window.currentFocusIndex = (window.currentFocusIndex - 1 + activeButtons.length) % activeButtons.length;
+            activeButtons[window.currentFocusIndex].focus();
+        }
+    }
+});

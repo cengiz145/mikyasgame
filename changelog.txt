@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.3] - 2026-03-19
+
+### Eklenenler / Değiştirilenler:
+- **HATA GİDERMESİ (Bug Fix):** Modüllerin parçalanması sırasında kaybolan ve ana menülerde ok tuşlarıyla gezinmeyi sağlayan klavye mantığı onarıldı. Bu sayede S, T ve Boşluk gibi oyun içi kısayollar yeniden işlevsel hale getirildi. Ayrıca, kullanıcı etkileşimi eksikliği yüzünden tetiklenemeyen seslerin (müzik ve efektler) çalışmama sorunu tamamen çözüldü.
+
 [v1.2] - 2026-03-18
 
 ### Eklenenler / Değiştirilenler:
