@@ -1,5 +1,5 @@
 {
-    "version":  "0.45",
-    "buildId":  1773950979,
-    "changelog":  "Devam et butonlarının (Mobil enter, Kayıtlı oyun ve Sunucu mesajı) çalışmama sorunları giderildi."
+    "version":  "0.46",
+    "buildId":  1773951415,
+    "changelog":  "Ses sistemindeki mobil koruyucunun çalışmama hatası ile isim (Devanagari) yazımı kaynaklı çökmeler düzeltildi."
 }

@@ -24,7 +24,8 @@ window.clickSound = new Howl({
 });
 
 // Mobil cihazlarda menü seslerini devre dışı bırak
-if (window.isMobileDevice) {
+const isMobileLocal = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
+if (isMobileLocal) {
     window.hoverSound.play = function () { };
     window.clickSound.play = function () { };
 }
@@ -94,11 +95,10 @@ window.carpetStepSounds = [
     new Howl({ src: ['sounds/carpet7step5.ogg'], volume: 1.0 })
 ];
 
-window.enterHouse साउंड = new Howl({
+window.enterHouseSound = new Howl({
     src: ['sounds/entering_house1.ogg'],
     volume: 1.0
 });
-window.enterHouseSound = window.enterHouse साउंड; // typo fallback
 
 window.doorCloseSound = new Howl({
     src: ['sounds/doorclose6.ogg'],

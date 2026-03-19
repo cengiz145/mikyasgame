@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.6] - 2026-03-19
+
+### Eklenenler / Değiştirilenler:
+- **SES SİSTEMİ (Audio) DÜZELTMELERİ:**
+  - Mobil tarayıcılarda menü seslerinin ("Hover" ve "Tık") aynı anda üst üste binmesini engelleyen korumanın, kod çalışma sırası (isMobileDevice) yüzünden devre dışı kalması hatası giderildi. Artık mobil cihazlarda menü gezintisi ses spamı yaratmayacak.
+  - Eve girme evresindeki ses dosyası atanırken yanlışlıkla yazılmış olan Hint (Devanagari) kökenli klavye kodlaması (`window.enterHouse साउंड`) düzeltilerek evrensel JS kod standartlarına (`window.enterHouseSound`) getirildi. Olası tarayıcı çökmeleri önlendi.
+
 [v1.5] - 2026-03-19
 
 ### Eklenenler / Değiştirilenler:
