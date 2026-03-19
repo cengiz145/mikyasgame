@@ -1,5 +1,5 @@
 {
-    "version":  "0.46",
-    "buildId":  1773951415,
-    "changelog":  "Ses sistemindeki mobil koruyucunun çalışmama hatası ile isim (Devanagari) yazımı kaynaklı çökmeler düzeltildi."
+    "version":  "0.47",
+    "buildId":  1773952194,
+    "changelog":  "Oyun motoru olan game.js üzerindeki sızdırma ve mobil buton eksiklikleri tamir edildi."
 }

@@ -329,6 +329,7 @@ window.endMainGame = function(isTimeOut, isWin, isUserExit = false) {
     if(window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
     clearInterval(window.gameInterval);
     if (window.mobileExitBtnTimeout) clearTimeout(window.mobileExitBtnTimeout);
+    if (window.replayBtnTimeout) clearTimeout(window.replayBtnTimeout);
 
     let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
 
@@ -355,6 +356,7 @@ window.endMainGame = function(isTimeOut, isWin, isUserExit = false) {
     if (isUserExit) {
         if(window.pianoNotes) for (let k in window.pianoNotes) window.pianoNotes[k].stop();
         if (window.seconsSound && window.seconsSound.playing()) window.seconsSound.stop();
+        if (window.secons2Sound && window.secons2Sound.playing()) window.secons2Sound.stop();
         if (window.clockTickSound && window.clockTickSound.playing()) window.clockTickSound.stop();
         if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
         if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
@@ -440,6 +442,7 @@ window.endMainGame = function(isTimeOut, isWin, isUserExit = false) {
 
     if(window.pianoNotes) for (let k in window.pianoNotes) window.pianoNotes[k].stop();
     if (window.seconsSound && window.seconsSound.playing()) window.seconsSound.stop();
+    if (window.secons2Sound && window.secons2Sound.playing()) window.secons2Sound.stop();
     if (window.clockTickSound && window.clockTickSound.playing()) window.clockTickSound.stop();
     if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
     if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
@@ -461,6 +464,7 @@ window.updateGameUI = function() {
     if (window.activeDifficulty === 'easy') maxLen = 2;
     if (window.activeDifficulty === 'medium') maxLen = 5;
     if (window.activeDifficulty === 'hard') maxLen = 10;
+    if (window.activeDifficulty === 'missing_notes') maxLen = 10;
 
     const scoreText = `Tur: ${window.gameScore} / ${maxLen} | Jeton: ${window.sessionTokens}`;
     if (scoreDisplay) scoreDisplay.textContent = scoreText;
@@ -611,6 +615,19 @@ window.addEventListener('load', () => {
             if(window.clickSound) window.clickSound.play();
             if(window.announceToScreenReader) window.announceToScreenReader('Oyundan çıkış yapılıyor.');
             setTimeout(() => { window.close(); }, 1500);
+        });
+    }
+
+    const mobileReplayBtn = document.getElementById('mobile-replay-btn');
+    if (mobileReplayBtn) {
+        mobileReplayBtn.addEventListener('click', () => {
+            if (window.gameIsActive && !window.isComputerPlaying && window.gameSequence.length > 0) {
+                if(window.announceToScreenReader) window.announceToScreenReader("Dizi tekrar ediliyor. Saniye eksi bir.");
+                window.gameTimer = Math.max(0, window.gameTimer - 1);
+                window.updateGameUI();
+                window.playerInputIndex = 0;
+                window.playGameSequence();
+            }
         });
     }
 });

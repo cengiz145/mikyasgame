@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.7] - 2026-03-19
+
+### Eklenenler / Değiştirilenler:
+- **OYUN MOTORU (game.js) DÜZELTMELERİ:**
+  - Zaman bitimine doğru çalan stresli 20 saniye uyarı sesinin (`secons2Sound`), oyuncu "Çıkış" butonuna basıp oyunu aniden terk ettiğinde durmayıp arkada çalmaya devam etmesine neden olan kod akıntısı hatası (Memory/Audio Leak) onarıldı.
+  - Mobil cihazlarda bilgisayar oynadıktan 2.5 saniye sonra ekrana düşen "Tekrar Dinle" butonuna tıklandığında hiçbir tepki vermemesine neden olan eksik kodlama eklendi. Mobil kullanıcılar da klavye ("boşluk" tuşu) kullanan donanımlarla aynı şekilde diziyi -1 saniye cezasıyla tekrar çaldırabilecek.
+  - "Kayıp Notalar" modu ile oynarken UI tarafında tur uzunluğunun hesaplanamaması ve `undefined` göndermesi hatası düzeltildi.
+
 [v1.6] - 2026-03-19
 
 ### Eklenenler / Değiştirilenler:
