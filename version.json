@@ -1,5 +1,5 @@
 {
-    "version": "0.38",
-    "buildId": 1773934275,
-    "changelog": "Oyun içi güncelleme denetleyicisindeki saat hatası giderildi; önceki güncellemelerin saati yanlışlıkla öğlen '12' olarak hesaplanıyordu, gerçek zaman dilimine (18:30+) senkronize edildi."
+    "version": "0.39",
+    "buildId": 1773935200,
+    "changelog": "Google Meet, WhatsApp vb. sesli görüşmeler yaparken mobil cihazın sesi bloke etmesi sonucu oyunun açılış logosunda sonsuza dek takılı kalması engellendi. Artık sese izin verilmese bile oyun en fazla 6 saniye içerisinde açılacak."
 }

@@ -1597,10 +1597,23 @@
             // HTML5 Audio objesini tıklama fonksiyonunun callstack'i içinde tetikliyoruz.
             const randomLogoNum = Math.floor(Math.random() * 5) + 1;
             const audio = new window.Audio(`sounds/logo${randomLogoNum}.wav`);
-            audio.onended = () => startGame();
-            audio.onerror = () => startGame();
+
+            // VoIP (WhatsApp, Meet) vb. durumlarda ses askıya alınırsa oyun logoda kalmasın diye 5 sn bekleme süresi
+            let fallbackTimeout = setTimeout(() => {
+                startGame();
+            }, 6000); // En uzun logo sesi 5 saniye civarı, 6 saniye tam güvence oluşturur.
+
+            audio.onended = () => {
+                clearTimeout(fallbackTimeout);
+                startGame();
+            };
+            audio.onerror = () => {
+                clearTimeout(fallbackTimeout);
+                startGame();
+            };
             audio.play().catch(e => {
                 console.warn("Logo autoplay blocked by strict mobile browser policy", e);
+                clearTimeout(fallbackTimeout);
                 startGame();
             });
 
