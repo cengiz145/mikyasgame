@@ -197,7 +197,12 @@
                 <li>&#8226; La notası için <strong>A</strong> tuşuna,</li>
                 <li>&#8226; Si notası için <strong>B</strong> tuşuna basmalısınız.</li>
             </ul>
-            <p class="localize-inner">Alıştırmalara başlamadan hemen önce kontrolleri hatırlatalım. Menülerde <strong>sağ ve sol ok tuşlarıyla gezinebilirsiniz</strong>. Seçim yapmak için <strong>entır tuşunu kullanabilirsiniz</strong>. Sesi <strong>Page Up ve Page Down tuşlarıyla</strong> ayarlayabilirsiniz. Oyun içindeyken <strong>S tuşu</strong> ile skorunuzu, <strong>T tuşu</strong> ile kalan sürenizi öğrenebilir, <strong>Boşluk tuşu</strong> ile bir saniye ceza karşılığında ses dizisini tekrar dinleyebilirsiniz.
+            <p class="localize-inner">Alıştırmalara başlamadan hemen önce kontrolleri hatırlatalım. Menülerde
+                <strong>sağ ve sol ok tuşlarıyla gezinebilirsiniz</strong>. Seçim yapmak için <strong>entır tuşunu
+                    kullanabilirsiniz</strong>. Sesi <strong>Page Up ve Page Down tuşlarıyla</strong>
+                ayarlayabilirsiniz. Oyun içindeyken <strong>S tuşu</strong> ile skorunuzu, <strong>T tuşu</strong> ile
+                kalan sürenizi öğrenebilir, <strong>Boşluk tuşu</strong> ile bir saniye ceza karşılığında ses dizisini
+                tekrar dinleyebilirsiniz.
             </p>
             <p>Şimdi öğrenme vakti! Sistemi tanımak için sizden istenen tuşa 3 defa üst üste basın. 3 defa doğru
                 bastığınızda otomatik olarak bir sonraki notaya geçeceksiniz.</p>
@@ -328,28 +333,42 @@
             onfocus="setTimeout(() => document.getElementById('feedback-back-btn').focus(), 10);"></div>
         <div class="feedback-dialog-box">
             <h1 id="feedback-menu-title">Geri Bildirim</h1>
-            
-            <div id="feedback-content" style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
+
+            <div id="feedback-content"
+                style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
                 <p id="feedback-desc" aria-live="polite">Lütfen oyun hakkında geri bildiriminizi paylaşın.</p>
-                
+
                 <form id="feedback-form" action="#" method="POST" style="margin-top: 15px;">
                     <!-- Google Form'un entegrasyonu için form oluşturulmuştur. action ve name attributeleri daha sonra Google Forms API'nize göre güncellenmelidir. -->
                     <div style="margin-bottom: 15px;">
-                        <label for="feedback-name" style="display: block; margin-bottom: 5px; color: #ffb703;">Adınız (İsteğe Bağlı):</label>
-                        <input type="text" id="feedback-name" name="entry.1166239628" aria-label="Adınızı buraya yazın" style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; font-family: inherit; font-size: 1rem;" placeholder="Adınız">
+                        <label for="feedback-name" style="display: block; margin-bottom: 5px; color: #ffb703;">Adınız
+                            (İsteğe Bağlı):</label>
+                        <input type="text" id="feedback-name" name="entry.1166239628" aria-label="Adınızı buraya yazın"
+                            style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; font-family: inherit; font-size: 1rem;"
+                            placeholder="Adınız">
                     </div>
 
                     <div style="margin-bottom: 15px;">
-                        <label for="feedback-category" style="display: block; margin-bottom: 5px; color: #ffb703;">Kategori Seçin:</label>
-                        <select id="feedback-category" name="entry.1001484363" style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; cursor: pointer; text-align: left; font-size: 1rem;">
-                            <option value="Hata" aria-label="Hata önerin. Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.">Hata önerin - Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.</option>
-                            <option value="Öneri" aria-label="Öneride bulunun. Oyunun gelişmesinde, eğer bir öneriniz varsa. Burası tam size göre. Harika önerilerinizi buraya gönderebilirsiniz.">Öneride bulunun - Harika önerilerinizi buraya gönderebilirsiniz.</option>
+                        <label for="feedback-category"
+                            style="display: block; margin-bottom: 5px; color: #ffb703;">Kategori Seçin:</label>
+                        <select id="feedback-category" name="entry.1001484363"
+                            style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; cursor: pointer; text-align: left; font-size: 1rem;">
+                            <option value="Hata"
+                                aria-label="Hata önerin. Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.">
+                                Hata önerin - Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.</option>
+                            <option value="Öneri"
+                                aria-label="Öneride bulunun. Oyunun gelişmesinde, eğer bir öneriniz varsa. Burası tam size göre. Harika önerilerinizi buraya gönderebilirsiniz.">
+                                Öneride bulunun - Harika önerilerinizi buraya gönderebilirsiniz.</option>
                         </select>
                     </div>
 
                     <div style="margin-bottom: 15px;">
-                        <label for="feedback-text" style="display: block; margin-bottom: 5px; color: #ffb703;">Biletiniz - Mesajınız:</label>
-                        <textarea id="feedback-text" name="entry.150314719" rows="5" aria-label="Biletiniz - Mesajınızı buraya yazın" style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; resize: vertical; font-family: inherit; font-size: 1rem;" placeholder="Bildirmek istediğiniz sorunu veya harika önerilerinizi buraya yazabilirsiniz."></textarea>
+                        <label for="feedback-text" style="display: block; margin-bottom: 5px; color: #ffb703;">Biletiniz
+                            - Mesajınız:</label>
+                        <textarea id="feedback-text" name="entry.150314719" rows="5"
+                            aria-label="Biletiniz - Mesajınızı buraya yazın"
+                            style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; resize: vertical; font-family: inherit; font-size: 1rem;"
+                            placeholder="Bildirmek istediğiniz sorunu veya harika önerilerinizi buraya yazabilirsiniz."></textarea>
                     </div>
                 </form>
             </div>
@@ -367,7 +386,8 @@
         </div>
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const firstItem = document.getElementById('feedback-name'); if(firstItem) firstItem.focus(); }, 10);"></div>
+            onfocus="setTimeout(() => { const firstItem = document.getElementById('feedback-name'); if(firstItem) firstItem.focus(); }, 10);">
+        </div>
     </div>
 
     <!-- Sunucu Mesajı / Changelog Menüsü -->
@@ -378,22 +398,25 @@
             onfocus="setTimeout(() => document.getElementById('server-message-continue-btn').focus(), 10);"></div>
         <div class="feedback-dialog-box" style="border-color: #ffb703;">
             <h1 id="server-message-title" style="color: #ffb703; border-bottom: 2px solid #ffb703;">Sunucu Mesajı</h1>
-            
-            <div id="server-message-content" style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
+
+            <div id="server-message-content"
+                style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
                 <p id="server-message-text" aria-live="polite">Güncelleme notları yükleniyor...</p>
             </div>
 
             <nav class="menu-nav" aria-labelledby="server-message-title">
                 <ul>
                     <li>
-                        <button id="server-message-continue-btn" class="menu-button" aria-label="Anladım, Devam Et" style="color: #ffb703; font-weight: bold; text-align: center;">[ANLADIM, DEVAM ET]</button>
+                        <button id="server-message-continue-btn" class="menu-button" aria-label="Anladım, Devam Et"
+                            style="color: #ffb703; font-weight: bold; text-align: center;">[ANLADIM, DEVAM ET]</button>
                     </li>
                 </ul>
             </nav>
         </div>
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const firstBtn = document.getElementById('server-message-continue-btn'); if(firstBtn) firstBtn.focus(); }, 10);"></div>
+            onfocus="setTimeout(() => { const firstBtn = document.getElementById('server-message-continue-btn'); if(firstBtn) firstBtn.focus(); }, 10);">
+        </div>
     </div>
 
     <!-- Başarılar Menüsü -->
@@ -476,6 +499,9 @@
     <!-- Yardım, Alıştırma ve Motivasyon Mesajları için ayrı dosya -->
     <script src="yardim.js"></script>
 
+    <script src="js/audio.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/story.js"></script>
     <script src="js/game.js"></script>
 </body>
 
