@@ -1490,42 +1490,11 @@
                 }
             }
 
-            // Tıklanır tıklanmaz (veya dokunulur dokunulmaz) her yerde tam ekran yap
-            const requestFullScreenOnce = () => {
-                if (!document.fullscreenElement && document.body.requestFullscreen) {
-                    document.body.requestFullscreen().then(() => {
-                        // Tarayıcının 'Tam ekrandan çıkmak için Esc tuşuna basın' uyarısını ezmek (interrupt) için Focus Hack
-                        const versionHack = document.createElement("div");
-                        versionHack.tabIndex = -1;
-                        versionHack.setAttribute("role", "alertdialog");
-                        versionHack.setAttribute("aria-modal", "true");
-                        versionHack.setAttribute("aria-label", "Hafızana Güven Yeni Sürüm");
-                        versionHack.setAttribute("aria-live", "assertive");
-                        versionHack.style.position = "absolute";
-                        versionHack.style.opacity = "0";
-                        document.body.appendChild(versionHack);
-
-                        // Anında odağı buraya çekerek uyarıyı sustur
-                        versionHack.focus();
-
-                        // Okuma bittikten sonra fazlalığı temizle ve odağı asıl butona geri ver
-                        setTimeout(() => {
-                            if (document.body.contains(versionHack)) document.body.removeChild(versionHack);
-                            const startBtn = document.getElementById('start-intro-btn');
-                            if (startBtn) startBtn.focus();
-                        }, 2500);
-
-                    }).catch(err => {
-                        console.log(`Tam ekran yapılamadı: ${err.message}`);
-                    });
-                }
-                // Sadece ilk dokunuşta/tıklamada çalışsın, sonra dinleyiciyi kaldır
-                document.removeEventListener('click', requestFullScreenOnce);
-                document.removeEventListener('pointerdown', requestFullScreenOnce);
-            };
-
-            document.addEventListener('click', requestFullScreenOnce);
-            document.addEventListener('pointerdown', requestFullScreenOnce);
+            // Tıklanır tıklanmaz (veya dokunulur dokunulmaz) tam ekran yapma özelliği iptal edildi.
+            // Amaç: Telefonlardaki Ana Sayfa ve Geri gezinme tuşlarının (Navigation Bar) ekranda kalarak kullanıcıya serbestlik tanıması.
+            /* 
+            const requestFullScreenOnce = () => { ... }
+            */
 
             // Mobil Enter tuşu için event listener (Diyalogları geçmek için Enter'ı simüle eder)
             const mobileEnterBtn = document.getElementById('mobile-enter-btn');

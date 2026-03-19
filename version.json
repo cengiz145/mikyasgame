@@ -1,5 +1,5 @@
 {
-    "version": "0.33",
-    "buildId": 1773906200,
-    "changelog": "Telefonlardan oynarken Geri Bildirim mesajı gibi uzun menülerin ekrana sabitlenip aşağıya/yukarıya kaydırılamamasına sebep olan tasarım engelleri kaldırıldı."
+    "version": "0.34",
+    "buildId": 1773907100,
+    "changelog": "Oyunun açılıştaki otomatik tam ekran (fullscreen) özelliği devre dışı bırakıldı. Artık telefonların kendi alt gezinme çubukları (Ana Sayfa ve Geri tuşları) görünmeye devam edecek ve telefon üzerindeki serbest dolaşımınız kısıtlanmayacak."
 }
