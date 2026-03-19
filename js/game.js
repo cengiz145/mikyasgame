@@ -873,7 +873,11 @@
         if (feedbackBtnMain && feedbackBackBtn) {
             feedbackBtnMain.addEventListener('click', () => {
                 switchMenu(mainMenu, feedbackMenu, 'feedback');
-                setTimeout(() => announceToScreenReader("Geri bildirim menüsü açıldı. Bu oyun hakkındaki hata ve önerilerinizi tab tuşuyla form alanlarında dolaşarak yazabilirsiniz."), 400);
+                setTimeout(() => {
+                    announceToScreenReader("Geri bildirim menüsü açıldı. Bu oyun hakkındaki hata ve önerilerinizi tab tuşuyla form alanlarında dolaşarak yazabilirsiniz.");
+                    const firstInput = document.getElementById('feedback-name');
+                    if (firstInput) firstInput.focus();
+                }, 400);
             });
 
             feedbackBackBtn.addEventListener('click', () => {
