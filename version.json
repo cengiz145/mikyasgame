@@ -1,5 +1,5 @@
 {
-    "version":  "0.47",
-    "buildId":  1773952194,
-    "changelog":  "Oyun motoru olan game.js üzerindeki sızdırma ve mobil buton eksiklikleri tamir edildi."
+    "version":  "0.48",
+    "buildId":  1773952571,
+    "changelog":  "İlk giriş (Intro) ekranındaki yapımcı yazısının görünmeme ve 2 aşamalı tıklama mantığının atlanma hatası onarıldı."
 }

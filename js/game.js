@@ -597,16 +597,40 @@ window.handleGameInput = function(key) {
 };
 
 window.addEventListener('load', () => {
-    let playedIntro = false;
-    const fsEvent = () => {
-        if (!playedIntro) {
-            playedIntro = true;
+    let clickCount = 0;
+    const fsEvent = (e) => {
+        if (window.introPlayed) return;
+        
+        clickCount++;
+        if (clickCount === 1) {
+            if(window.clickSound) window.clickSound.play();
+            const ver = window.mevcutSurum || localStorage.getItem('lastSeenChangelogVersion') || "Bilinmiyor";
+            const vText = "Versiyon: " + ver;
+            
+            const visualVersion = document.getElementById("intro-version-display");
+            if (visualVersion) visualVersion.textContent = vText;
+            
+            if(window.announceToScreenReader) window.announceToScreenReader(vText + ". Logoyu dinlemek ve oyuna başlamak için tekrar tıklayın veya enter tuşuna basın.");
+            
+            const startIntroBtn = document.getElementById('start-intro-btn');
+            if (startIntroBtn) startIntroBtn.setAttribute('aria-label', vText + ". Devam etmek için tekrar tıklayın.");
+        } else if (clickCount === 2) {
+            document.removeEventListener('pointerdown', fsEvent);
+            document.removeEventListener('click', fsEvent);
+            document.removeEventListener('keydown', keyEvent);
             if(window.playIntro) window.playIntro();
         }
     };
-    document.addEventListener('pointerdown', fsEvent, { once: true });
-    document.addEventListener('click', fsEvent, { once: true });
-    document.addEventListener('keydown', fsEvent, { once: true });
+    
+    document.addEventListener('pointerdown', fsEvent);
+    document.addEventListener('click', fsEvent);
+    
+    const keyEvent = (e) => {
+        if (!window.introPlayed && (e.key === 'Enter' || e.key === ' ')) {
+            fsEvent(e);
+        }
+    };
+    document.addEventListener('keydown', keyEvent);
     
     // Uygulama çıkış butonu ana oyun dosyasına bağlandı (en basit işlevi gereği)
     const exitBtn = document.getElementById('exit-btn');

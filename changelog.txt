@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.8] - 2026-03-19
+
+### Eklenenler / Değiştirilenler:
+- **KARŞILAMA (Intro) EKRANI MANTIK DÜZELTMESİ:** Modül ayrıştırma aşamasında bozulan ilk giriş ekranı etkileşimi düzeltildi ve asıl planlanan iki aşamalı yapıya kavuşturuldu:
+  - **Oyun İlk Açıldığında:** Yapımcı imzası ("Bu oyun... Ümit Ekrem Mikyas tarafından...") görünür ve okunur durumunda bekler. Tıklama ile anında logoya geçiş yapması (skiplenmesi) hatası önlendi.
+  - **1. Tıklamada (veya Enter):** Versiyon uyarısı ekranda belirir ve ekran okuyucuya "Versiyon 1.x" bilgisi okunur, ikinci tıklamada logoya geçileceği haberi verilir.
+  - **2. Tıklamada (veya Enter):** Yapımcı metni silinerek Hafızana Güven logosu ve intro sesi devreye girer, ardından ana menüye gidilir.
+
 [v1.7] - 2026-03-19
 
 ### Eklenenler / Değiştirilenler:
