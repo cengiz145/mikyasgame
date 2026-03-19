@@ -53,6 +53,9 @@
                         document.body.innerHTML = "";
                         document.body.style.backgroundColor = "#111";
 
+                        const updateSound = new Howl({ src: ['sounds/update.ogg'], volume: 1.0, html5: true });
+                        updateSound.play();
+
                         const updateMsg = document.createElement("h1");
                         updateMsg.textContent = "Zorunlu Güncelleme: Eski sürüm devre dışı bırakıldı.";
                         updateMsg.style.color = "#ffb703";
@@ -835,11 +838,9 @@
             serverMessageContinueBtn.addEventListener('click', () => {
                 localStorage.setItem('lastSeenChangelogVersion', globalChangelogVersion);
                 
-                switchMenu(serverMessageMenu, null, 'main');
-                mainMenu.removeAttribute('aria-hidden');
+                switchMenu(serverMessageMenu, mainMenu, 'main');
                 
                 setTimeout(() => {
-                    mainMenu.style.opacity = '1';
 
                     const firstButton = mainMenu.querySelector('.menu-button');
                     if (firstButton) firstButton.focus();
@@ -865,14 +866,12 @@
 
         if (feedbackBtnMain && feedbackBackBtn) {
             feedbackBtnMain.addEventListener('click', () => {
-                switchMenu(null, feedbackMenu, 'feedback');
-                mainMenu.setAttribute('aria-hidden', 'true');
+                switchMenu(mainMenu, feedbackMenu, 'feedback');
                 setTimeout(() => announceToScreenReader("Geri bildirim menüsü açıldı. Bu oyun hakkındaki hata ve önerilerinizi tab tuşuyla form alanlarında dolaşarak yazabilirsiniz."), 400);
             });
 
             feedbackBackBtn.addEventListener('click', () => {
-                switchMenu(feedbackMenu, null, 'main');
-                mainMenu.removeAttribute('aria-hidden');
+                switchMenu(feedbackMenu, mainMenu, 'main');
             });
 
             if (feedbackSubmitBtn) {
@@ -905,8 +904,7 @@
                     announceToScreenReader("Geri bildiriminiz başarıyla iletilmiştir. Harika öneri ve bildirimleriniz oyunu geliştirmek için kullanılacaktır. Teşekkürler. Ana menüye dönülüyor.");
                     
                     setTimeout(() => {
-                        switchMenu(feedbackMenu, null, 'main');
-                        mainMenu.removeAttribute('aria-hidden');
+                        switchMenu(feedbackMenu, mainMenu, 'main');
                     }, 2500);
                 });
             }
@@ -1644,11 +1642,7 @@
                 
                 const lastSeenVersion = localStorage.getItem('lastSeenChangelogVersion');
                 if (globalChangelogVersion && lastSeenVersion !== globalChangelogVersion && globalChangelogMessage) {
-                    // Ana menüyü arkada göster ama ekran okuyucudan gizle
-                    mainMenu.setAttribute('aria-hidden', 'true');
-                    mainMenu.style.opacity = '1';
-                    
-                    switchMenu(null, serverMessageMenu, 'server-message');
+                    switchMenu(mainMenu, serverMessageMenu, 'server-message');
                     setTimeout(() => {
                         const firstBtn = document.getElementById('server-message-continue-btn');
                         if(firstBtn) firstBtn.focus();
