@@ -1,5 +1,5 @@
 {
-    "version": "0.37",
-    "buildId": 1773911000,
-    "changelog": "Tam ekran navigasyon çubuğu ayarları, bazı telefon modellerinde ve eski tarayıcılarda oyunu başlangıç ekranında (logoda) donduran kritik bir hataya yol açıyordu; bu çökme sorunu acil bir yamayla giderildi."
+    "version": "0.38",
+    "buildId": 1773934275,
+    "changelog": "Oyun içi güncelleme denetleyicisindeki saat hatası giderildi; önceki güncellemelerin saati yanlışlıkla öğlen '12' olarak hesaplanıyordu, gerçek zaman dilimine (18:30+) senkronize edildi."
 }
