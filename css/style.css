@@ -244,10 +244,11 @@
 
         .mobile-enter-btn:active {
             background-color: #e0a300;
+        }
 
+        @media (max-width: 768px) {
             .desktop-exit-li {
                 display: none !important;
-                /* Mobilde masaüstü çıkış butonunu nav'dan gizle */
             }
         }
 

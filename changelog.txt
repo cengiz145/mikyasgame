@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.9] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- **MOBİL GÖRÜNÜM (Piyano) DÜZELTMELERİ:** Mobil ekranlarda tuşların kaybolması ve basılmaması sorunu iki farklı kanaldan çözüldü:
+  - **CSS Görünmezlik Hatası:** `style.css` dosyasında yanlışlıkla iç içe geçirilmiş (CSS Nesting Syntax Error) bazı etiketler nedeniyle Safari vb. mobil tarayıcılarda tasarım dosyasının çökerek ekranı karartması / piyano tuşlarını saklaması hatası tamir edildi.
+  - **Oyun Motoru Tepkisizliği:** Ekranda beliren mobil piyano tuşlarına (C, D, E...) basıldığında ana oyun motoruna sinyal gitmesini sağlayan tıklama/dokunma dinleyicilerinin (event listener) eksik olduğu fark edildi. `game.js` içerisine dokunmatik ekranlara özel bir tetikleyici eklendi. Artık ekrandaki tuşlara basıldığında klavye kullanıyormuşsunuz gibi notalar doğrudan veritabanına ve oyuna işlenecek.
+
 [v1.8] - 2026-03-19
 
 ### Eklenenler / Değiştirilenler:

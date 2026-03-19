@@ -654,6 +654,23 @@ window.addEventListener('load', () => {
             }
         });
     }
+
+    const mobileKeys = document.querySelectorAll('.mobile-piano-key');
+    mobileKeys.forEach(btn => {
+        btn.addEventListener('pointerdown', function (e) {
+            e.preventDefault(); 
+            const note = btn.getAttribute('data-key');
+            if (!note) return;
+
+            if (window.isStarted && window.currentActiveMenu === 'practice') {
+                if (window.playPianoNoteSingle) window.playPianoNoteSingle(note);
+            } else if (window.isStarted && window.currentActiveMenu === 'game') {
+                if (!window.isGridWalkingPhase) {
+                    window.handleGameInput(note);
+                }
+            }
+        });
+    });
 });
 
 document.addEventListener('keydown', function (event) {
