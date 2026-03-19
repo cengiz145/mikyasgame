@@ -32,11 +32,17 @@
                         if(smt) smt.innerText = data.changelog;
                     }
 
+                    let currentMsg = 'Oyununuz güncel.';
+                    if (data.buildId) {
+                        const dateObj = new Date(data.buildId * 1000);
+                        currentMsg += ' En son ' + dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' tarihinde güncellenmiş.';
+                    }
+
                     if (!mevcutSurum) {
                         // Sayfa ilk yüklendiğinde mevcut sürümü kaydet (Örn: "1.2")
                         mevcutSurum = data.version;
                         if (isManual && typeof announceToScreenReader === 'function') {
-                            announceToScreenReader('Oyununuz güncel.');
+                            announceToScreenReader(currentMsg);
                         }
                     } else if (data.version !== mevcutSurum) {
                         // Sürüm numarası değiştiyse GÜNCELLEME ZORUNLU
@@ -94,7 +100,7 @@
                         }, 500);
                     } else {
                         if (isManual && typeof announceToScreenReader === 'function') {
-                            announceToScreenReader('Oyununuz güncel.');
+                            announceToScreenReader(currentMsg);
                         }
                     }
                 })
