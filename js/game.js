@@ -1845,6 +1845,10 @@
 
                 // Zamanlayıcıyı başlat
                 gameInterval = setInterval(() => {
+                    if (!gameIsActive) {
+                        clearInterval(gameInterval);
+                        return;
+                    }
                     // Süre sadece şu durumlarda geriye doğru akar:
                     // 1. Bilgisayar notaları çalmıyorsa (Sıra oyuncudaysa)
                     // 2. Oyuncu henüz bir harfe basmamışsa (Düşünme/Hatırlama aşamasındaysa)
@@ -1856,12 +1860,12 @@
                         // 20 Saniye uyarısı
                         if (gameTimer === 20) {
                             secons2Sound.play();
-                            announceToScreenReader("Son 20 saniye.");
+                            announceToScreenReader("Son 20 saniye.", false);
                         }
 
                         // 10 Saniye uyarısı (sadece 10 olduğunda 1 kez okur)
                         if (gameTimer === 10) {
-                            announceToScreenReader("Son 10 saniye.");
+                            announceToScreenReader("Son 10 saniye.", false);
                         }
 
                         // 10 saniye ve altındayken her saniye secons.ogg uyarı sesini çal

@@ -1,5 +1,5 @@
 {
-    "version": "0.31",
-    "buildId": 1773903410,
-    "changelog": "BÜYÜK MOBİL GÜNCELLEMESİ! Bu sürümle birlikte telefondan oynayan oyuncularımızın deneyimini zirveye taşıyacak tüm eksikler tamamlandı: 1) Nota ve çıkış düğmelerinin dikey uzunlukları dokunmatik ekranlar için iki katına çıkartılarak isabet kesinleştirildi. 2) Masaüstü kullanıcıları için olan 'entıra basın', 'ok tuşlarıyla gezin' gibi tüm oyun ve eğitim talimatları; mobilde baştan sona otomatik olarak 'ekrana çift dokunun', 'parmağınızı süpürün' şeklinde ekran okuyucu uyumlu komutlara çevrildi. 3) Eğitim/Hikâye diyaloglarını mobilde çok daha kolay atlayabilmeniz için ekranın altına, kalabalığı gizleyen özel bir Dokun onay butonu eklendi. 4) Görünen ancak rahatsız edici olan 'çıkış tuşu belirdi' okuyucu sorunu silindi."
+    "version": "0.32",
+    "buildId": 1773905500,
+    "changelog": "Zor modda oyunun bitmemesine ve sürenin eksiye düşmesine yol açan kritik bir zamanlayıcı hatası (hayalet sayaç) giderildi. Ayrıca mobilde 'Son 20 saniye' ve 'Son 10 saniye' uyarılarının bir buton gibi kafa karıştırıcı şekilde okunması engellendi (sadece bildirim olarak duyurulacak). Son olarak mobildeki 'Tekrar Dinle' butonunun gereksiz uzun olan gizli okuma metni sadeleştirilip doğrudan 'Tekrar Dinle' olarak düzeltildi."
 }
