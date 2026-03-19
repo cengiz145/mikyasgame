@@ -417,6 +417,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackBtnMain = document.getElementById('feedback-btn-main');
     const feedbackBackBtn = document.getElementById('feedback-back-btn');
     const feedbackSubmitBtn = document.getElementById('feedback-submit-btn');
+    const btnAchievementsMain = document.getElementById('btn-achievements-main');
+    const achievementsBackBtn = document.getElementById('achievements-back-btn');
+
+    const buyShieldBtn = document.getElementById('buy-shield-btn');
+    const buyTimeShieldBtn = document.getElementById('buy-time-shield-btn');
 
     const startGameBtn = document.getElementById('start-game-btn');
     const gameBackBtn = document.getElementById('game-back-btn');
@@ -435,6 +440,85 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         statsBackBtn.addEventListener('click', () => {
             window.switchMenu(window.statsMenu, window.mainMenu, 'main');
+        });
+    }
+
+    // Store
+    if (storeBtnMain && storeBackBtn) {
+        storeBtnMain.addEventListener('click', () => {
+            window.switchMenu(window.mainMenu, window.storeMenu, 'store');
+            let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+            if(window.announceToScreenReader) window.announceToScreenReader(`Mağazaya hoş geldiniz. Mevcut jetonunuz: ${totalTokens}`);
+        });
+        storeBackBtn.addEventListener('click', () => {
+            window.switchMenu(window.storeMenu, window.mainMenu, 'main');
+        });
+    }
+
+    if (buyShieldBtn) {
+        buyShieldBtn.addEventListener('click', () => {
+            let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+            if (totalTokens >= 50) {
+                totalTokens -= 50;
+                localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+                let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+                localStorage.setItem('hafizaGuvenHataKorumasi', hk + 1);
+                if(window.buySound) window.buySound.play();
+                if(window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Hata Koruması eklendi. Kalan jeton: ${totalTokens}`);
+            } else {
+                if(window.wrongSound) window.wrongSound.play();
+                if(window.announceToScreenReader) window.announceToScreenReader(`Yetersiz jeton. 50 jeton gerekli, sizin ${totalTokens} jetonunuz var.`);
+            }
+        });
+    }
+
+    if (buyTimeShieldBtn) {
+        buyTimeShieldBtn.addEventListener('click', () => {
+            let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+            if (totalTokens >= 30) {
+                totalTokens -= 30;
+                localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+                let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+                localStorage.setItem('hafizaGuvenZamanKorumasi', zk + 1);
+                if(window.buySound) window.buySound.play();
+                if(window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Zaman Koruması eklendi. Kalan jeton: ${totalTokens}`);
+            } else {
+                if(window.wrongSound) window.wrongSound.play();
+                if(window.announceToScreenReader) window.announceToScreenReader(`Yetersiz jeton. 30 jeton gerekli, sizin ${totalTokens} jetonunuz var.`);
+            }
+        });
+    }
+
+    // Achievements
+    if (btnAchievementsMain && achievementsBackBtn) {
+        btnAchievementsMain.addEventListener('click', () => {
+            window.switchMenu(window.mainMenu, window.achievementsMenu, 'achievements');
+            let text = "Henüz açılmış bir başarınız yok.";
+            if (window.userAchievements && window.userAchievements.hafizam_gucleniyor) text = "Hafızam Güçleniyor başarımını kazandınız!";
+            if(window.announceToScreenReader) window.announceToScreenReader(text);
+        });
+        achievementsBackBtn.addEventListener('click', () => {
+            window.switchMenu(window.achievementsMenu, window.mainMenu, 'main');
+        });
+    }
+
+    // Feedback
+    if (feedbackBtnMain && feedbackBackBtn) {
+        feedbackBtnMain.addEventListener('click', () => {
+            window.switchMenu(window.mainMenu, window.feedbackMenu, 'feedback');
+        });
+        feedbackBackBtn.addEventListener('click', () => {
+            window.switchMenu(window.feedbackMenu, window.mainMenu, 'main');
+        });
+    }
+    
+    if (feedbackSubmitBtn) {
+        feedbackSubmitBtn.addEventListener('click', () => {
+            const form = document.getElementById('feedback-form');
+            if (form) {
+                form.submit();
+                if(window.announceToScreenReader) window.announceToScreenReader("Geri bildirim formunuz yönlendiriliyor.");
+            }
         });
     }
 

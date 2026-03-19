@@ -1,5 +1,5 @@
 {
-    "version":  "0.43",
-    "buildId":  1773950082,
-    "changelog":  "Ekran okuyucu (ARIA) etiket kontrolü yapıldı ve dinamik etiket güncelleme fonksiyonu geri getirildi."
+    "version":  "0.44",
+    "buildId":  1773950503,
+    "changelog":  "Tıklanmayan menü ve mağaza butonları ile ARIA okuyucu etiket dinamikleri onarıldı."
 }

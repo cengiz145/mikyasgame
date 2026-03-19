@@ -1,5 +1,14 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.4] - 2026-03-19
+
+### Eklenenler / Değiştirilenler:
+- **ÇALIŞMAYAN BUTONLARIN ONARIMI (Bug Fix):** Modül parçalanması işlemi sırasında atlanan/silinen menü butonlarının işlevleri geri getirildi.
+  - "Mağaza", "Başarılar", "Geri Bildirim" butonları tıklanabilir hale getirildi ve kendi sayfalarını açmaları sağlandı.
+  - Mağaza içerisindeki alışveriş butonlarına (Hata Koruması Satın Al ve Zaman Koruması Satın Al) yetersiz bakiye ve başarılı satın alma logic'leri eklendi.
+  - Geri bildirim sayfasındaki "Gönder" butonunun HTML formuyla olan bağı kopuk olduğu için form gönderememesi hatası giderildi. 
+- **ARIA/ERİŞİLEBİLİRLİK GÜNCELLEMELERİ:** Skor tablosu veya oyunda tamamlanan modlara göre kilit açılımı olan "Zorluk Seçimi" panelindeki butonların (Örn: Orta veya Zor Mod), kilitli veya açılmış durumlarının ekran okuyucuya doğru iletilmemesi ve görsel olarak aktifleşmemesi hatası (`updateDifficultyMenuLocks` eksikliği) tamamen çözümlendi.
+
 [v1.3] - 2026-03-19
 
 ### Eklenenler / Değiştirilenler:
