@@ -1,4 +1,4 @@
-﻿const practiceCorrectMessages = [
+const practiceCorrectMessages = [
     "Harika!", "Süper!", "Mükemmel!", "Tam isabet!", "Doğru tuş!", "Çok iyi!", "Devam et!", "Aynen böyle!", "Bravo!", "Harikulade!",
     "Müthişsin!", "Doğru bildin!", "Şahane!", "Kusursuz!", "İşte bu!", "Aferin!", "Çok başarılı!", "Alkışlar sana!", "Doğru nota!",
     "Yeteneklisin!", "Odaklanman harika!", "Doğru yoldasın!", "Süper gidiyorsun!", "Çok net!", "Nefis!", "Muazzam!", "Tebrikler!",
@@ -22,12 +22,12 @@ const practiceWrongMessages = [
 ];
 
 const practiceDialogues = [
-    "Merhaba! Bu oyunda amacınız, 30 saniye içerisinde bilgisayarın çaldığı sesleri doğru harf kombinasyonlarıyla eşleştirmektir. Devam etmek için entıra basın.",
-    "Hangi sesin hangi harfe denk geldiğini öğrenmek için bu Alıştırma Modunu kullanabilirsiniz. Devam etmek için entıra basın.",
-    "Notaların karşılıkları kısaca şöyledir: Do notası C, Re notası D, Mi notası E, Fa notası F, Sol notası G, La notası A, Si notası B tuşudur. Devam etmek için entıra basın.",
-    "Alıştırmalara başlamadan hemen önce klavye kısayollarını hatırlatalım. Menülerde sağ ve sol ok tuşlarıyla gezinebilir, entır tuşu ile seçim yapabilirsiniz. Sesi page up ve page down tuşlarıyla ayarlayabilirsiniz. Oyun içindeyken S tuşu ile skorunuzu, T tuşu ile kalan sürenizi öğrenebilir, boşluk tuşu ile bir saniye ceza karşılığında ses dizisini tekrar dinleyebilirsiniz. Devam etmek için entıra basın.",
-    "Şimdi öğrenme vakti! Sistemi tanımak için sizden istenen tuşa 3 defa üst üste basın. 3 defa doğru bastığınızda otomatik olarak bir sonraki notaya geçeceksiniz. Devam etmek için entıra basın.",
-    "Eğer hangi tuşa basacağınızı unutur veya yanlış bir tuşa basarsanız, sistem size yardımcı olacaktır. Sakın hata yapmaktan korkmayın; burada sadece öğrenmek var! Devam etmek için entıra basın."
+    "Merhaba! Bu oyunda amacınız, 30 saniye içerisinde bilgisayarın çaldığı sesleri doğru harf kombinasyonlarıyla eşleştirmektir. Devam etmek için Enter'a basın.",
+    "Hangi sesin hangi harfe denk geldiğini öğrenmek için bu Alıştırma Modunu kullanabilirsiniz. Devam etmek için Enter'a basın.",
+    "Notaların karşılıkları kısaca şöyledir: Do notası C, Re notası D, Mi notası E, Fa notası F, Sol notası G, La notası A, Si notası B tuşudur. Devam etmek için Enter'a basın.",
+    "Alıştırmalara başlamadan hemen önce klavye kısayollarını hatırlatalım. Menülerde sağ ve sol ok tuşlarıyla gezinebilir, Enter tuşu ile seçim yapabilirsiniz. Sesi Page Up ve Page Down tuşlarıyla ayarlayabilirsiniz. Oyun içindeyken S tuşu ile skorunuzu, T tuşu ile kalan sürenizi öğrenebilir, Boşluk tuşu ile bir saniye ceza karşılığında ses dizisini tekrar dinleyebilirsiniz. Devam etmek için Enter'a basın.",
+    "Şimdi öğrenme vakti! Sistemi tanımak için sizden istenen tuşa 3 defa üst üste basın. 3 defa doğru bastığınızda otomatik olarak bir sonraki notaya geçeceksiniz. Devam etmek için Enter'a basın.",
+    "Eğer hangi tuşa basacağınızı unutur veya yanlış bir tuşa basarsanız, sistem size yardımcı olacaktır. Sakın hata yapmaktan korkmayın; burada sadece öğrenmek var! Devam etmek için Enter'a basın."
 ];
 
 // Motivasyon Mesajları
@@ -84,23 +84,23 @@ const msg6to9 = [
 ];
 
 const missingNotesDialogues = [
-    "Pan evinde piyano çalışmaktadır. O sırada evin küçük yaramaz çocuğu Bili odaya girer. Devam etmek için entıra basın.",
-    "Bili: heey! Şu aleti bende bir çalabilirmiyim? Devam etmek için entıra basın.",
-    "Pan cevap veriyor: hayır. O benim. Babam bana bunu doğum günümde hediye olarak aldı. Devam etmek için entıra basın.",
-    "Bili: sadece 5 dakika. Sonra söz veriyorum ki onu sana geri vereceğim. Devam etmek için entıra basın.",
-    "Pan: Tüm oyuncaklarım senin yüzünden param parça oldu. Bu çok özel bir hediye. Bunu sana veremem. Devam etmek için entıra basın.",
-    "Bili yavaş yavaş sinirlenmeye başlar. Bili: Ver şunu diyorum sana. Devam etmek için entıra basın.",
-    "Pan: dur bili ne yapıyorsun? Kıracaksın şimdi. Devam etmek için entıra basın.",
-    "O sırada çat diye bir ses duyulur. Devam etmek için entıra basın.",
-    "Pan: Bili! Sen! Sen! Sen ne yaptığını zannediyorsun? Devam etmek için entıra basın.",
-    "Bili: Ben bir şey yapmadım ki. Devam etmek için entıra basın.",
-    "Pan: Kırdın işte. Devam etmek için entıra basın.",
-    "Bili: baban sana yenisini alır merak etme.hahaha. Zaten bu işe yaramaz bir şey. Hiç bir şey anlamıyorım. Şu tuşlar felan bana çok garip geliyor. Devam etmek için entıra basın.",
-    "Pan: ah bili ah! Normal şartlarda seni affetmemem ve dışarı çıkartmam gerekiyordu. Ama neyapalım ki ben iği bir insanım. Lütfen beni biraz yalnız bırak. Rahatlamam gerekiyor. Babama bu durumu nasıl açıklayacağım? Kesinlikle bana çok kızacak. Devam etmek için entıra basın.",
-    "Bili: parçalarını toplarsın artık yollardan. ahahahah der ve kapıdan dışarıya çıkarak hızlıca uzaklaşır. Devam etmek için entıra basın.",
-    "Pan dışarı çıkar ve kaybolan tuşları aramaya koyulur. Notalarını karların içinde ararken dışarıda kendi kendine yürümeye başlar... Devam etmek için entıra basın.",
-    "Bir anda notaların konuştuğunu ve kendi aralarında müzik yaptıklarını duyar... Devam etmek için entıra basın.",
-    "Notaların seslerini duyduğunda Pan şaşkınlık içerisinde der ki: Vay canınaa. Bu tuşlar büyülü mü ne? Hemen onları bulup yerlerine koyarsam, Babam da bana kızmamış olur. Yaşasıııın. Hikaye sona erdi, oyuna başlamak için entır tuşuna basın."
+    "Pan evinde piyano çalışmaktadır. O sırada evin küçük yaramaz çocuğu Bili odaya girer. Devam etmek için Enter'a basın.",
+    "Bili: Heey! Şu aleti ben de bir çalabilir miyim? Devam etmek için Enter'a basın.",
+    "Pan cevap veriyor: Hayır. O benim. Babam bana bunu doğum günümde hediye olarak aldı. Devam etmek için Enter'a basın.",
+    "Bili: Sadece 5 dakika. Sonra söz veriyorum ki onu sana geri vereceğim. Devam etmek için Enter'a basın.",
+    "Pan: Tüm oyuncaklarım senin yüzünden paramparça oldu. Bu çok özel bir hediye. Bunu sana veremem. Devam etmek için Enter'a basın.",
+    "Bili yavaş yavaş sinirlenmeye başlar. Bili: Ver şunu diyorum sana. Devam etmek için Enter'a basın.",
+    "Pan: Dur Bili, ne yapıyorsun? Kıracaksın şimdi. Devam etmek için Enter'a basın.",
+    "O sırada çat diye bir ses duyulur. Devam etmek için Enter'a basın.",
+    "Pan: Bili! Sen! Sen! Sen ne yaptığını zannediyorsun? Devam etmek için Enter'a basın.",
+    "Bili: Ben hiçbir şey yapmadım ki. Devam etmek için Enter'a basın.",
+    "Pan: Kırdın işte. Devam etmek için Enter'a basın.",
+    "Bili: Baban sana yenisini alır merak etme hahaha. Zaten bu işe yaramaz bir şey. Hiçbir şey anlamıyorum. Şu tuşlar falan bana çok garip geliyor. Devam etmek için Enter'a basın.",
+    "Pan: Ah Bili ah! Normal şartlarda seni affetmemem ve dışarı çıkartmam gerekiyordu. Ama ne yapalım ki ben iyi bir insanım. Lütfen beni biraz yalnız bırak. Rahatlamam gerekiyor. Babama bu durumu nasıl açıklayacağım? Kesinlikle bana çok kızacak. Devam etmek için Enter'a basın.",
+    "Bili: Parçalarını toplarsın artık yollardan, ahahahah! der ve kapıdan dışarıya çıkarak hızlıca uzaklaşır. Devam etmek için Enter'a basın.",
+    "Pan dışarı çıkar ve kaybolan tuşları aramaya koyulur. Notalarını karların içinde ararken dışarıda kendi kendine yürümeye başlar... Devam etmek için Enter'a basın.",
+    "Bir anda notaların konuştuğunu ve kendi aralarında müzik yaptıklarını duyar... Devam etmek için Enter'a basın.",
+    "Notaların seslerini duyduğunda Pan şaşkınlık içerisinde der ki: Vay canına. Bu tuşlar büyülü mü ne? Hemen onları bulup yerlerine koyarsam, Babam da bana kızmamış olur. Yaşasıııın! Hikaye sona erdi, oyuna başlamak için Enter tuşuna basın."
 ];
 
 const missingNotesHappyMessages = [

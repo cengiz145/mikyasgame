@@ -1,5 +1,5 @@
 {
-    "version":  "0.25",
-    "buildId":  1773880140,
-    "changelog":  "fix: NVDA Göz Atma (Browse) Modu\u0027nun oyun mekaniðini bozmasý role=\u0027application\u0027 ile onarýldý."
+    "version":  "0.26",
+    "buildId":  1773883061,
+    "changelog":  "fix: Bozuk Türkçe karakterler ve yazým hatalarý onarýldý, UTF-8 uyumluluðu eklendi."
 }

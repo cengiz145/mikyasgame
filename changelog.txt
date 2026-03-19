@@ -10,6 +10,7 @@
 - **ZORUNLU GÜNCELLEME DÜZELTMESİ (Hard Cache Fix):** Oyuna gelen güncellemelerin veya engellenen sürümlerin, tarayıcıda önbellekte (cache) takılı kalan eski dosyalar yüzünden okunamaması ve eski sürümle oyuna devam edilebilmesi hatası tamamen çözülmüştür! Artık sistem sürümü `index.html` üzerinden hardcode şekilde denetliyor ve yeni sürümü anında belirleyerek kırılmaz bir sayfa yenileme ekranı çıkartıyor.
 - **HATA GİDERMESİ (Bug Fix):** Geri Bildirim menüsünü açan ana ekrandaki butona basıldığında arka planda menü geçiş sisteminin (switchMenu) çökmesine neden olan bir mantık hatası giderildi, form artık pürüzsüzce açılıyor.
 - **ERİŞİLEBİLİRLİK (Uyumluluk):** NVDA ve benzeri ekran okuyucularda "Göz Atma (Browse) Modu"nun oyunun klavye mekaniğini bozması/zorlaştırması üzerine HTML ana yapısına (body) `role="application"` tanımlaması yapılarak, ekran okuyucunun zorunlu olarak sürekli **"Odak (Focus) Kipi"nde** çalışması sağlandı. 
+- **YAZIM DETAYLARI / KARAKTER DÜZELTMELERİ:** Oyun içerisindeki ekran okuyucu asistan (Yardım.js) metinlerindeki tüm kaymış, bozulmuş Türkçe yapıları (Örn: \uFFFD hatası) UTF-8 olarak düzeltildi. Ayrıca yazılım bazlı "entıra, iği, param parça" gibi hatalı ifadeler tamamen "Enter'a, iyi, paramparça" şeklinde TDK'ya ve sisteme uygun olarak temizlendi.
 
 [v1.0.1 Beta] - 2026-03-11
 
