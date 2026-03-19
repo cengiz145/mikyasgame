@@ -1,5 +1,5 @@
 {
-    "version": "0.40",
-    "buildId": 1773935800,
-    "changelog": "Telefon görüşmeleri esnasında veya telefonun sesi tamamen bloke ettiği durumlarda oyunun 'Hafızana Güven' logosunda 6 saniye beklemesi hatası düzeltildi! Oyun artık telefonun ses verip vermediğini saliselik ölçebiliyor ve görüşmedeyken logoyu anında atlayarak oyunu (< 1 saniye içerisinde) direkt başlatıyor."
+    "version": "0.41",
+    "buildId": 1773937100,
+    "changelog": "Zor Modda başarıyla tamamlandığında tebrikler ekranının (yazısının) gizli kalması düzeltildi. Ayrıca Zor mod tamamlandığı an artık puanınız tamamen 100 Jeton olacak şekilde güncellendi ve bu anında ekrana yansıtıldı."
 }

@@ -2025,9 +2025,10 @@
                 totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
             } catch (e) { }
 
-            // Hard modunu tamamladıysa 300 jeton ekle, diğer modlarlar her tur eklendiği için direkt sessionTokens kullanılıyor
+            // Hard modunu tamamladıysa 100 jeton ekle (Kullanıcı talebi), diğer modlarlar her tur eklendiği için direkt sessionTokens kullanılıyor
             if (activeDifficulty === 'hard' && isWin) {
-                sessionTokens = 300;
+                // Önceden birikenleri yoksay, sadece 100 jeton ver
+                sessionTokens = 100;
             }
 
             // Bu el kazanılanı toplam tutara ekle (0'ın altına düşmesin)
@@ -2038,6 +2039,8 @@
             try {
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
             } catch (e) { }
+
+            updateGameUI(); // Skoru ve yeni güncel token miktarını görsel tepe arayüzüne (skor tablosu) hemen bas
 
             // Oyunu bitirme ekranındayız (bekliyor)
             let endMessage = "";
@@ -2119,6 +2122,7 @@
             // Ekrandaki yazıyı da güncelliyoruz
             const gameStatus = document.getElementById('game-status-text');
             if (gameStatus) {
+                gameStatus.style.display = 'block'; // Zafer ekranının GÖZÜKMESİ İÇİN display:none'ı ezdik
                 gameStatus.textContent = endMessage;
             }
 
