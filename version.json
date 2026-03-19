@@ -1,5 +1,5 @@
 {
-    "version": "0.28",
-    "buildId": 1773899503,
-    "changelog": "Geri Bildirim menüsündeki sekme (Tab) dolaşımı düzeltildi. Zorunlu güncelleme kontrol ekranına sesli tarih anonsu ve update.ogg uyarı müziği eklendi. Bilgisayar ile telefona özel oyun talimat metinleri birbirinden dinamik bir şekilde ayrıştırılıp bağımsız bir hale getirildi."
+    "version": "0.29",
+    "buildId": 1773901840,
+    "changelog": "Oyun içi mobil çıkış düğmesinin ekran okuyucu bildirimi kaldırıldı. Mobil cihazlardaki nota ve çıkış düğmelerinin dikey boyları iki katına çıkartılarak dokunmatik ekrandaki kullanım çok daha rahat ve erişilebilir hâle getirildi."
 }

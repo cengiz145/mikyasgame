@@ -152,7 +152,7 @@
 
         .mobile-piano-key {
             flex: 1;
-            padding: 30px 0;
+            padding: 60px 0;
             /* Butonlar çok küçükmüş, boyları uzatıldı */
             background-color: #333;
             color: #fff;
@@ -178,7 +178,7 @@
         .mobile-exit-btn {
             flex: 1.5;
             /* Çıkış butonu biraz daha geniş olabilir veya aynı kalabilir */
-            padding: 30px 0;
+            padding: 60px 0;
             background-color: #8b0000;
             color: #fff;
             border: 1px solid #ff4444;

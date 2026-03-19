@@ -1803,7 +1803,7 @@
                         mobileExitBtn.removeAttribute('aria-hidden');
                         // Sadece bildirim, oyun durum yazısını (endMessage vb) değiştirmeyecek
                         // Yazı okumasın gizli bir "bip" tarzı bildirim veya sadece kısa bir aria-live
-                        announceToScreenReader("Çıkış tuşu belirdi.", false);
+                        // announceToScreenReader("Çıkış tuşu belirdi.", false);
                     }
                 }
             }, 10000);
