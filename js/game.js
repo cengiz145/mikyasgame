@@ -682,6 +682,13 @@ document.addEventListener('keydown', function (event) {
         }
     }
 
+    // Chat penceresinde veya formda yazı yazarken oyun kısayollarını devre dışı bırak
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
+        if (event.key !== 'Escape' && event.key !== 'Tab') {
+            return; // Harf basışları oyuna yansımasını engeller
+        }
+    }
+
     if (window.currentActiveMenu === 'feedback') {
         if (document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT' || document.activeElement.tagName === 'INPUT')) {
             if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'Enter', 'Escape'].includes(event.key)) {

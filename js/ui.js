@@ -714,10 +714,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (chatCloseBtn) {
-        chatCloseBtn.addEventListener('click', toggleChat);
+        chatCloseBtn.addEventListener('click', window.toggleChat);
     }
 
-    function toggleChat() {
+    window.toggleChat = function() {
         if (!chatPanel) return;
 
         window.isChatOpen = !window.isChatOpen;
@@ -737,13 +737,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet kapatıldı.');
         }
-    }
+    };
 
-    // Nokta (.) kısayolu
+    // Nokta (.) kısayolu ve ESC tuşu
     document.addEventListener('keydown', (e) => {
         // Eğer focus input/textarea/select üzerindeyse nokta tuşu kısayolu yoksay, yazı yazılsın.
         if (e.key === '.' && (!document.activeElement || (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'SELECT'))) {
-            toggleChat();
+            window.toggleChat();
+        }
+        
+        // ESC tuşuyla sohbeti hızlıca kapat
+        if (e.key === 'Escape' && window.isChatOpen) {
+            window.toggleChat();
+            if (document.activeElement) document.activeElement.blur();
         }
     });
 });
