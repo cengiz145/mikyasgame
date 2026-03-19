@@ -1,4 +1,4 @@
-const practiceCorrectMessages = [
+window.practiceCorrectMessages = [
     "Harika!", "Süper!", "Mükemmel!", "Tam isabet!", "Doğru tuş!", "Çok iyi!", "Devam et!", "Aynen böyle!", "Bravo!", "Harikulade!",
     "Müthişsin!", "Doğru bildin!", "Şahane!", "Kusursuz!", "İşte bu!", "Aferin!", "Çok başarılı!", "Alkışlar sana!", "Doğru nota!",
     "Yeteneklisin!", "Odaklanman harika!", "Doğru yoldasın!", "Süper gidiyorsun!", "Çok net!", "Nefis!", "Muazzam!", "Tebrikler!",
@@ -8,7 +8,7 @@ const practiceCorrectMessages = [
     "Çok iyisin!", "Doğruluk abidesi!"
 ];
 
-const practiceWrongMessages = [
+window.practiceWrongMessages = [
     "Olsun, tekrar dene!", "Pes etme, başaracaksın!", "Biraz daha dikkat!", "Yaklaştın, bir daha!", "Yanlış oldu ama öğreniyorsun!",
     "Hata yapmak öğrenmenin yarısıdır!", "Durmak yok, dene!", "Çok az kaldı, bulacaksın!", "Yanıldın ama olsun!", "Bir şans daha!",
     "Moral bozmak yok!", "Birlikte bulacağız!", "Tekrar odaklan!", "Yanlış tuş, ama pes etmek yok!", "Bir sonrakinde yapacaksın!",
@@ -21,7 +21,7 @@ const practiceWrongMessages = [
     "Yanlışlar doğruyu öğretir!", "Biraz daha sabır!", "Pes etmek kelimesini unuttuk!", "Hadi, bir kez daha!", "Yanlışlar senin rehberindir!"
 ];
 
-const practiceDialogues = [
+window.practiceDialogues = [
     "Merhaba! Bu oyunda amacınız, 30 saniye içerisinde bilgisayarın çaldığı sesleri doğru harf kombinasyonlarıyla eşleştirmektir. Devam etmek için Enter'a basın.",
     "Hangi sesin hangi harfe denk geldiğini öğrenmek için bu Alıştırma Modunu kullanabilirsiniz. Devam etmek için Enter'a basın.",
     "Notaların karşılıkları kısaca şöyledir: Do notası C, Re notası D, Mi notası E, Fa notası F, Sol notası G, La notası A, Si notası B tuşudur. Devam etmek için Enter'a basın.",
@@ -31,7 +31,7 @@ const practiceDialogues = [
 ];
 
 // Motivasyon Mesajları
-const msg1to4 = [
+window.msg1to4 = [
     "Harika bir başlangıç!", "Güzel bir giriş!", "Aynen böyle devam!", "Kulakların çok iyi!", "Konsantrasyonun harika!",
     "Böyle ilerle!", "Süpersin!", "Tam isabet!", "Doğru nota!", "Mükemmel uyum!",
     "Tempo harika!", "Ritm efsane!", "Müzik kulağın çok iyi!", "Müthişsin!", "Hiç bozma!",
@@ -44,7 +44,7 @@ const msg1to4 = [
     "Süper başlangıç!", "Sarsılmaz odak!", "Altın kulak!", "Gümbür gümbür!", "Pes etmeden devam!"
 ];
 
-const msg5 = [
+window.msg5 = [
     "İşte bu! Yolu yarıladın efsanevi bir an!", "Yok artık! Mükemmel ötesi gidiyorsun!", "Kim tutar seni! Zirveye koşuyoruz!",
     "Alev aldın! Böyle devam et şampiyon!", "Çılgın atıyorsun! Kulakların süper güç misali!", "İnanılmaz! Nefes kesici bir hız!",
     "Enerji tavan yaptı! Durmak yok!", "Gazı kökle! Zafere sadece 5 adım kaldı!", "Sen bir efsanesin! Yarıyı devirdin!",
@@ -63,7 +63,7 @@ const msg5 = [
     "Altın değerinde bir doğru! Yarıda yarı!", "Harika ötesi! Şampiyon ruhu!", "Notalar sana boyun eğdi!", "İşte şampiyon! Tamamlayacaksın!", "Gaza geldik! Kusursuz gidiyor!"
 ];
 
-const msg6to9 = [
+window.msg6to9 = [
     "Mükemmel gidiyorsun, çok az kaldı!", "Sona çok yakınsın, sakın bozma!", "Kusursuz bir ritim, harika!",
     "İnanılmaz bir hafıza, son virajdasın!", "Notalar aklına kazınmış, mükemmel!", "Zafere ramak kala, çok iyi!",
     "Şampiyonluğa adım adım, bravo!", "Hataya yer yok, kusursuzsun!", "Az kaldı, dayan!",
@@ -83,7 +83,7 @@ const msg6to9 = [
     "Çok yeteneklisin, son notaları bekliyor!", "Hatasız gidiyorsun, kupaya çok yakın!"
 ];
 
-const missingNotesDialogues = [
+window.missingNotesDialogues = [
     "Pan evinde piyano çalışmaktadır. O sırada evin küçük yaramaz çocuğu Bili odaya girer. Devam etmek için Enter'a basın.",
     "Bili: Heey! Şu aleti ben de bir çalabilir miyim? Devam etmek için Enter'a basın.",
     "Pan cevap veriyor: Hayır. O benim. Babam bana bunu doğum günümde hediye olarak aldı. Devam etmek için Enter'a basın.",
@@ -103,7 +103,7 @@ const missingNotesDialogues = [
     "Notaların seslerini duyduğunda Pan şaşkınlık içerisinde der ki: Vay canına. Bu tuşlar büyülü mü ne? Hemen onları bulup yerlerine koyarsam, Babam da bana kızmamış olur. Yaşasıııın! Hikaye sona erdi, oyuna başlamak için Enter tuşuna basın."
 ];
 
-const missingNotesHappyMessages = [
+window.missingNotesHappyMessages = [
     "Yaşasın! Beni buldun Pan, sana çok teşekkür ederim!",
     "Ah, çok üşümüştüm! Beni kurtardığın için sağol Pan!",
     "Beni sıcak piyanomuzun yanına götüreceğin için çok mutluyum Pan!",

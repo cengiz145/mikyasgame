@@ -1,5 +1,5 @@
 {
-    "version":  "0.49",
-    "buildId":  1773953663,
-    "changelog":  "Mobil sürümdeki piyano tuşlarının ekranda görünmeme hatası ile tıklama mekanizmasının eksikliği giderildi."
+    "version":  "0.50",
+    "buildId":  1773954721,
+    "changelog":  "yardim.js içerisindeki okunmayan motivasyon mesajlarının global kapsam hatası düzeltildi."
 }

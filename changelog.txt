@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.10] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- **YARDIM KÜTÜPHANESİ (yardim.js) DÜZELTMELERİ:**
+  - Ana oyun içerisinde puan kazandıkça tetiklenmesi gereken motivasyon sözlerinin ("Harika gidişat", "Müthişsin") hiçbir zaman okunmamasına sebep olan çok büyük bir "Kapsam" (Local Scope) hatası onarıldı. `yardim.js` içerisine yazılmış metin listeleri (Array'ler) kapalı bir sistem (`const`) olarak tanımlandığı için ana oyun kodu bunları göremiyordu ve boş metin çekiyordu. Tüm mesaj listeleri `window` objesine bağlanarak oyundaki diğer tüm JS dosyalarının rahatça ulaşabileceği genel (Global) bir yapıya kavuşturuldu.
+
 [v1.9] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:
