@@ -1825,11 +1825,11 @@
 
             const gameStatus = document.getElementById('game-status-text');
             if (gameStatus) {
-                gameStatus.textContent = `Oyun başlıyor... ${hataKorumasiCount} Hata Koruması, ${zamanKorumasiCount} Zaman Koruması. İlk notayı dinleyin!`;
+                gameStatus.textContent = `Oyun 3 saniye içinde başlıyor... ${hataKorumasiCount} Hata Koruması, ${zamanKorumasiCount} Zaman Koruması. İlk notayı dinleyin!`;
                 gameStatus.setAttribute('aria-live', 'assertive');
             }
             setTimeout(() => {
-                announceToScreenReader(`Oyun başlıyor. ${hataKorumasiCount} Hata Koruması ve ${zamanKorumasiCount} Zaman Korumasına sahipsiniz. İlk notayı dinleyin!`);
+                announceToScreenReader(`Oyun 3 saniye içinde başlıyor. ${hataKorumasiCount} Hata Koruması ve ${zamanKorumasiCount} Zaman Korumasına sahipsiniz. İlk notayı dinleyin!`);
             }, 400);
 
             // Saat tik tak sesini varsayılan hızında başlat (Manuel döngü ile)
@@ -1897,7 +1897,7 @@
                         }
                     }
                 }, 1000);
-            }, 1500);
+            }, 3000);
         }
 
         function addNewNoteAndPlaySequence() {
@@ -1920,7 +1920,7 @@
             const replayBtn = document.getElementById('mobile-replay-btn');
             if (gameStatus) {
                 gameStatus.style.display = 'block';
-                gameStatus.textContent = "Bilgisayar çalıyor... Lütfen dinleyin.";
+                gameStatus.textContent = window.isMobileDevice ? "Lütfen dinleyin." : "Bilgisayar çalıyor... Lütfen dinleyin.";
             }
             if (replayBtn) replayBtn.style.display = 'none';
 

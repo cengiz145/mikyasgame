@@ -1,5 +1,5 @@
 {
-    "version": "0.35",
-    "buildId": 1773907500,
-    "changelog": "Tam ekran özelliği geri getirildi fakat telefonunuzun menü gezinti (Ana Sayfa, Geri, Arka Plan Uygulamaları) tuşları açık bırakıldı; böylelikle üst saat-bildirim paneli oyun deneyimini genişletmek için gizlenirken ekranın altına mahkum kalmayıp rahatça dolaşabilecek ve oyunu kapatabileceksiniz."
+    "version": "0.36",
+    "buildId": 1773908200,
+    "changelog": "Tüm platformlar için oyuna başlarken (İlk notayı çalmadan önce) oyuncuya kendini hazırlayabilmesi için verilen süre 3 saniyeye çıkartıldı. Ayrıca mobil sürümdeki gereksiz 'Bilgisayar çalıyor' uyarı anonsu gizlenerek daha akıcı/doğrudan bir deneyim sağlandı."
 }
