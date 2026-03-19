@@ -136,12 +136,22 @@
         window.localizeText = function (text) {
             if (!window.isMobileDevice || !text) return text;
             return text
-                .replace(/entıra basın/gi, "ekrana iki kez dokunun")
-                .replace(/enter'a basın/gi, "ekrana iki kez dokunun")
-                .replace(/enter tuşuna basın/gi, "ekrana iki kez dokunun")
-                .replace(/entır tuşuna basın/gi, "ekrana iki kez dokunun")
-                .replace(/entır tuşunu kullanabilirsiniz/gi, "ekrana iki kez dokunabilirsiniz")
-                .replace(/entır tuşu ile/gi, "ekrana iki kez dokunarak")
+                .replace(/entıra veya ekrana çift dokunun/gi, "ekrana çift dokunun")
+                .replace(/entıra veya /gi, "")
+                .replace(/entıra basın/gi, "ekrana çift dokunun")
+                .replace(/enter'a basın/gi, "ekrana çift dokunun")
+                .replace(/enter tuşuna basın/gi, "ekrana çift dokunun")
+                .replace(/entır tuşuna basın/gi, "ekrana çift dokunun")
+                .replace(/entır tuşunu kullanabilirsiniz/gi, "ekrana çift dokunabilirsiniz")
+                .replace(/entır tuşu ile/gi, "ekrana çift dokunarak")
+                .replace(/entır tuşuna bastığınızda/gi, "ekrana çift dokunduğunuzda")
+                .replace(/entıra,/gi, "ekrana çift dokunarak,")
+                // Fallbacks:
+                .replace(/entıra/gi, "ekrana çift dokunmaya")
+                .replace(/entır tuşu/gi, "ekrana çift dokunma")
+                .replace(/entır/gi, "ekrana çift dokunmak")
+                .replace(/enter/gi, "ekrana çift dokunmak")
+                // Navigations:
                 .replace(/sağ ve sol ok tuşlarına basın/gi, "parmağınızı sağa veya sola süpürme hareketi yapın")
                 .replace(/sağ sol ok tuşlarına basın/gi, "parmağınızı sağa veya sola süpürme hareketi yapın")
                 .replace(/sağ ve sol ok tuşlarıyla gezinebilirsiniz/gi, "parmağınızı sağa veya sola süpürerek gezinebilirsiniz")

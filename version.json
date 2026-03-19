@@ -1,5 +1,5 @@
 {
-    "version": "0.29",
-    "buildId": 1773901840,
-    "changelog": "Oyun içi mobil çıkış düğmesinin ekran okuyucu bildirimi kaldırıldı. Mobil cihazlardaki nota ve çıkış düğmelerinin dikey boyları iki katına çıkartılarak dokunmatik ekrandaki kullanım çok daha rahat ve erişilebilir hâle getirildi."
+    "version": "0.30",
+    "buildId": 1773902632,
+    "changelog": "Mobil cihazlarda metin okuyucusunun yanlışlıkla 'entıra basın' şeklinde seslendirdiği birden çok diyalog sorunu giderildi; artık tamamı telefona uygun biçimde 'ekrana çift dokunun' olarak yönlendiriliyor."
 }
