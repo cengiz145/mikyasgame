@@ -1598,23 +1598,35 @@
             const randomLogoNum = Math.floor(Math.random() * 5) + 1;
             const audio = new window.Audio(`sounds/logo${randomLogoNum}.wav`);
 
-            // VoIP (WhatsApp, Meet) vb. durumlarda ses askıya alınırsa oyun logoda kalmasın diye 5 sn bekleme süresi
+            // VoIP (WhatsApp, Meet) vb. durumlarda ses askıya alınırsa 6 sn bile bekleme
             let fallbackTimeout = setTimeout(() => {
                 startGame();
-            }, 6000); // En uzun logo sesi 5 saniye civarı, 6 saniye tam güvence oluşturur.
+            }, 6000);
 
-            audio.onended = () => {
+            // Eğer oynatma çağrısından 800 milisaniye sonra bile süre ("0")da donup kalmışsa direkt oyna (aramada takılma durumu)
+            let stuckCheckInterval = setInterval(() => {
+                if (audio.currentTime === 0) {
+                    console.warn("Ses donanım tarafından bloke edildi (Arama/VoIP), oyun hemen başlatılıyor.");
+                    clearInterval(stuckCheckInterval);
+                    clearTimeout(fallbackTimeout);
+                    startGame();
+                } else {
+                    // Ses 0'dan yüksekse ilerliyordur, her şey yolunda demektir, kontrolü sil
+                    clearInterval(stuckCheckInterval);
+                }
+            }, 800);
+
+            const startSafe = () => {
+                clearInterval(stuckCheckInterval);
                 clearTimeout(fallbackTimeout);
                 startGame();
             };
-            audio.onerror = () => {
-                clearTimeout(fallbackTimeout);
-                startGame();
-            };
+
+            audio.onended = startSafe;
+            audio.onerror = startSafe;
             audio.play().catch(e => {
                 console.warn("Logo autoplay blocked by strict mobile browser policy", e);
-                clearTimeout(fallbackTimeout);
-                startGame();
+                startSafe();
             });
 
             // Oyun başlarsa Stop() komutu hata vermesi diye Howler.js yapısını sahte nesne (mock) ile koruyoruz.

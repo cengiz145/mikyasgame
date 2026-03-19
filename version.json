@@ -1,5 +1,5 @@
 {
-    "version": "0.39",
-    "buildId": 1773935200,
-    "changelog": "Google Meet, WhatsApp vb. sesli görüşmeler yaparken mobil cihazın sesi bloke etmesi sonucu oyunun açılış logosunda sonsuza dek takılı kalması engellendi. Artık sese izin verilmese bile oyun en fazla 6 saniye içerisinde açılacak."
+    "version": "0.40",
+    "buildId": 1773935800,
+    "changelog": "Telefon görüşmeleri esnasında veya telefonun sesi tamamen bloke ettiği durumlarda oyunun 'Hafızana Güven' logosunda 6 saniye beklemesi hatası düzeltildi! Oyun artık telefonun ses verip vermediğini saliselik ölçebiliyor ve görüşmedeyken logoyu anında atlayarak oyunu (< 1 saniye içerisinde) direkt başlatıyor."
 }
