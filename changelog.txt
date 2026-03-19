@@ -1,9 +1,19 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.12] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- **CANLI SOHBET SİSTEMİ (Live Chat):** Oyuna 7'den 70'e herkesin şifresiz bağlanabileceği "Canlı Sohbet" arayüzü eklendi.
+  - **Erişilebilirlik:** Giriş alanlarına özel `aria-label` eklendi, sohbet akışına `aria-live` entegre edilerek NVDA'nın yeni mesajları anında "İsim: Mesaj" formatında doğal okuması sağlandı. Yazışma penceresi açıkken Tab tuşu (dolaşım) kısıtlaması kaldırıldı.
+  - **Klavye Kısayolları:** Sohbet penceresini hızlıca açıp kapatmak için Nokta (`.`) kısayolu atandı. Yazı yazarken kazara kapanmasına engel olacak güvenlik kalkanı kuruldu.
+  - **Firebase Entegrasyonu:** Gerçek zamanlı (Realtime) mesajlaşma veritabanı başarıyla aktifleşti. Sadece geçmişteki son 50 aktif mesajı bellekte tutan, zararlı komutlara (XSS) karşı özel temizleme filtresine (`escapeHTML`) sahip kesintisiz bir bulut altyapısı yazıldı.
+
 [v1.11] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:
-- **MOBİL ERİŞİLEBİLİRLİK (Piyano Tuşları) GÜNCELLEMESİ:** Mobil cihazlarda (telefonlarda) yer alan oyun içi piyano tuşlarının ve "Çıkış" butonunun, ekran okuyucu programları devredeyken çalışmaması sorunu giderildi. Ekran okuyucuların yapay tıklamalarını (`click`) güvenle algılayacak şekilde yenilendi.[v1.10] - 2026-03-20
+- **MOBİL ERİŞİLEBİLİRLİK (Piyano Tuşları) GÜNCELLEMESİ:** Mobil cihazlarda (telefonlarda) yer alan oyun içi piyano tuşlarının ve "Çıkış" butonunun, ekran okuyucu programları devredeyken çalışmaması sorunu giderildi. Ekran okuyucuların yapay tıklamalarını (`click`) güvenle algılayacak şekilde yenilendi.
+
+[v1.10] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:
 - **YARDIM KÜTÜPHANESİ (yardim.js) DÜZELTMELERİ:**

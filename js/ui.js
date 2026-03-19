@@ -698,3 +698,131 @@ document.addEventListener('keydown', function (event) {
         }
     }
 });
+
+// --- CANLI SOHBET SİSTEMİ ARAYÜZ MANTIĞI ---
+window.isChatOpen = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const chatToggleBtn = document.getElementById('chat-toggle-btn');
+    const chatPanel = document.getElementById('chat-panel');
+    const chatCloseBtn = document.getElementById('chat-close-btn');
+    const chatNicknameInput = document.getElementById('chat-nickname');
+
+    if (chatToggleBtn) {
+        chatToggleBtn.style.display = 'block';
+        chatToggleBtn.addEventListener('click', toggleChat);
+    }
+
+    if (chatCloseBtn) {
+        chatCloseBtn.addEventListener('click', toggleChat);
+    }
+
+    function toggleChat() {
+        if (!chatPanel) return;
+
+        window.isChatOpen = !window.isChatOpen;
+
+        if (window.isChatOpen) {
+            chatPanel.style.display = 'flex';
+            chatPanel.removeAttribute('aria-hidden');
+            if (chatNicknameInput) {
+                setTimeout(() => chatNicknameInput.focus(), 100);
+            }
+            if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet açıldı. Takma adınızı girin.');
+        } else {
+            chatPanel.style.display = 'none';
+            chatPanel.setAttribute('aria-hidden', 'true');
+            if (chatToggleBtn) {
+                setTimeout(() => chatToggleBtn.focus(), 100);
+            }
+            if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet kapatıldı.');
+        }
+    }
+
+    // Nokta (.) kısayolu
+    document.addEventListener('keydown', (e) => {
+        // Eğer focus input/textarea/select üzerindeyse nokta tuşu kısayolu yoksay, yazı yazılsın.
+        if (e.key === '.' && (!document.activeElement || (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'SELECT'))) {
+            toggleChat();
+        }
+    });
+});
+
+// --- CANLI SOHBET SİSTEMİ VERİTABANI (FİREBASE) MANTIĞI ---
+document.addEventListener('DOMContentLoaded', () => {
+    const chatNicknameInput = document.getElementById('chat-nickname');
+    const chatMessageInput = document.getElementById('chat-message-input');
+    const chatSendBtn = document.getElementById('chat-send-btn');
+    const chatMessagesList = document.getElementById('chat-messages');
+    const chatMessagesContainer = document.querySelector('.chat-messages-container');
+
+    // Firebase tanımlı değilse veya arayüz yoksa dur
+    if (!chatSendBtn || !chatMessagesList || !window.db) return;
+
+    // Güvenlik (XSS) Koruması (HTML etiketlerini etkisiz hale getir)
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.toString().replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+
+    // Mesaj Gönderme İşlevi
+    function sendMessage() {
+        const nickname = chatNicknameInput.value.trim();
+        const text = chatMessageInput.value.trim();
+
+        if (nickname !== '' && text !== '') {
+            const messageData = {
+                nickname: nickname,
+                text: text,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            window.db.ref('messages').push(messageData).then(() => {
+                chatMessageInput.value = ''; // Kullanıcı adı kalsın, sadece mesajı sil
+                chatMessageInput.focus(); // Art arda mesaj yazabilmesi için imleci tekrar mesaja odakla
+            }).catch(error => {
+                console.error("Mesaj gönderilirken hata oluştu:", error);
+            });
+        }
+    }
+
+    // Gönder butonuna tıklandığında
+    chatSendBtn.addEventListener('click', sendMessage);
+
+    // Mesaj kutusundayken Enter'a basıldığında
+    chatMessageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // Mesajları Dinleme İşlevi (Sadece son 50 mesaj)
+    const messagesRef = window.db.ref('messages').orderByChild('timestamp').limitToLast(50);
+    
+    messagesRef.on('child_added', (snapshot) => {
+        const data = snapshot.val();
+        
+        const li = document.createElement('li');
+        // NVDA için en doğal okuma biçimi "Batuhan: Merhaba" şeklindedir.
+        li.innerHTML = `<strong>${escapeHTML(data.nickname)}:</strong> ${escapeHTML(data.text)}`;
+        
+        chatMessagesList.appendChild(li);
+
+        // Yeni mesaj gelince otomatik olarak en alta kaydır
+        if (chatMessagesContainer) {
+            // Küçük bir gecikme eklemek DOM render olmasını bekler
+            setTimeout(() => {
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            }, 10);
+        }
+    });
+});

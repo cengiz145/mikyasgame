@@ -498,6 +498,29 @@
             (Enter)</button>
     </div>
 
+    <!-- Canlı Sohbet Butonu -->
+    <button id="chat-toggle-btn" aria-label="Canlı Sohbeti Aç veya Kapat. Kısayol: Nokta tuşu" class="chat-toggle-btn" style="display: none;">
+        💬 Canlı Sohbet (.)
+    </button>
+
+    <!-- Canlı Sohbet Penceresi -->
+    <div id="chat-panel" class="chat-panel" aria-hidden="true" style="display: none;" role="dialog" aria-label="Canlı Sohbet Penceresi">
+        <div class="chat-header">
+            <h2 id="chat-title">Canlı Sohbet</h2>
+            <button id="chat-close-btn" aria-label="Sohbeti Kapat" class="chat-close-btn">X</button>
+        </div>
+        <!-- Mesajların akacağı alan. Yeni mesaj geldiğinde ekran okuyucu otomatik okuması için aria-live polite -->
+        <div class="chat-messages-container" aria-live="polite" aria-atomic="false" aria-relevant="additions">
+            <ul id="chat-messages" aria-label="Sohbet Mesajları">
+            </ul>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-nickname" name="chat-nickname" aria-label="Takma Adınızı Girin" placeholder="Takma Ad" maxlength="20">
+            <input type="text" id="chat-message-input" name="chat-message-input" aria-label="Mesajınızı Girin" placeholder="Mesajınız..." maxlength="150">
+            <button id="chat-send-btn" aria-label="Mesajı Gönder">Gönder</button>
+        </div>
+    </div>
+
     <!-- Howler.js 3D Ses Kütüphanesi (Yerel) -->
     <script src="sounds/howler.min.js"></script>
 

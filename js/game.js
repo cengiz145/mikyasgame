@@ -675,7 +675,7 @@ window.addEventListener('load', () => {
 
 document.addEventListener('keydown', function (event) {
     if (event.key === 'Tab') {
-        if (window.currentActiveMenu === 'feedback' || window.currentActiveMenu === 'server-message') {
+        if (window.currentActiveMenu === 'feedback' || window.currentActiveMenu === 'server-message' || window.isChatOpen) {
         } else {
             event.preventDefault();
             return;
