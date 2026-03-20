@@ -1,5 +1,14 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.15] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- **CANLI SOHBET HATA AYIKLAMASI VE GÜVENLİK YAMASI:**
+  - Kendi gönderdiğiniz yeni mesajlarda (henüz Firebase'e ulaşmadan önceki mili-saniyelerde) saatin geçici olarak `[NaN:NaN]` gibi hatalı görünmesine neden olan "Optimistic Render" hatası cihazın yerel saatine başvurularak onarıldı.
+  - Gönder tuşuna basıldığında "Takma Ad" veya "Mesaj" kutusu boş ise sistemin sessiz kalması hatası düzeltildi; artık NVDA eşliğinde "Lütfen takma ad/mesaj girin" uyarısı okunacak ve imleç oraya otomatik odaklanacak.
+  - Diğer oyuncuları kandırmak amacıyla takma adı "Sistem" yaparak odaya sahte giriş/çıkış bildirimleri yollama açığı (Impersonation) tespit edilerek engellendi.
+  - İzolasyon (Modal Leak) Tamamlandı: Sadece yazı yazarken değil, sohbet ekranı açık kaldığı **tüm anlar** boyunca klavyedeki harf ve boşluk tuşlarının oyun içerisindeki nota seslerini/kısayolları (S, T, M, Enter) tetiklemesi kesin olarak bloke edildi! Sohbet açıkken sadece Sohbet kullanabilirsiniz.
+
 [v1.14] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:

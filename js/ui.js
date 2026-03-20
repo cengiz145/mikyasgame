@@ -781,7 +781,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ESC tuşuyla sohbeti hızlıca kapat
         if (e.key === 'Escape' && window.isChatOpen) {
             window.toggleChat();
-            if (document.activeElement) document.activeElement.blur();
+            // Not: activeElement.blur() özelliği focusu bozduğu için kaldırıldı, toggleChat işini yapıyor.
         }
     });
 });
@@ -819,6 +819,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function sendMessage() {
         const nickname = chatNicknameInput.value.trim();
         const text = chatMessageInput.value.trim();
+
+        if (nickname === '') {
+            if (window.announceToScreenReader) window.announceToScreenReader('Lütfen bir takma ad girin.');
+            chatNicknameInput.focus();
+            return;
+        }
+
+        if (nickname.toLowerCase() === 'sistem') {
+            if (window.announceToScreenReader) window.announceToScreenReader('Bu takma adı kullanamazsınız.');
+            chatNicknameInput.focus();
+            return;
+        }
+
+        if (text === '') {
+            if (window.announceToScreenReader) window.announceToScreenReader('Lütfen bir mesaj yazın.');
+            chatMessageInput.focus();
+            return;
+        }
 
         if (nickname !== '' && text !== '') {
             const messageData = {
@@ -869,8 +887,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = snapshot.val();
         
         let timeString = "";
-        if (data.timestamp) {
-            const dateObj = new Date(data.timestamp);
+        let ts = data.timestamp;
+        
+        // Yerel itme anında (Optimistic Render) TIMESTAMP obje veya hatalı olabilir, bu durumda geçici yerel cihaz saati kullanılır
+        if (typeof ts !== 'number') {
+            ts = Date.now();
+        }
+        
+        if (ts) {
+            const dateObj = new Date(ts);
             const hours = dateObj.getHours().toString().padStart(2, '0');
             const minutes = dateObj.getMinutes().toString().padStart(2, '0');
             timeString = `<span class="chat-time" style="color:#888; font-size:0.85em; margin-right:5px;">[${hours}:${minutes}]</span>`;

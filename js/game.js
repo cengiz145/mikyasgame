@@ -682,10 +682,15 @@ document.addEventListener('keydown', function (event) {
         }
     }
 
-    // Chat penceresinde veya formda yazı yazarken oyun kısayollarını devre dışı bırak
-    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
+    // Chat penceresi açıkken tüm oyun kısayollarını devre dışı bırak (gerçek bir Modal mantığı)
+    if (window.isChatOpen) {
+        // Sadece temel erişilebilirlik ve menü tuşlarına izin ver, harfleri/boşluğu engelle
+        if (!['Escape', 'Tab', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+            return; 
+        }
+    } else if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
         if (event.key !== 'Escape' && event.key !== 'Tab') {
-            return; // Harf basışları oyuna yansımasını engeller
+            return; // Diğer formlarda/inputlarda harf basışları oyuna yansımasını engeller
         }
     }
 

@@ -1,5 +1,5 @@
 {
-    "version": "0.54",
-    "buildId": 1773968250,
-    "changelog": "Mesaj gecmisi sorunlari, [Saat:Dakika] damgasi ve ESC guvenlik kilidi (v1.14) eklendi."
+    "version": "0.55",
+    "buildId": 1773970000,
+    "changelog": "Canli sohbet icin buyuk guvenlik, mantik ve NVDA hata ayiklama yamasi eklendi. (v1.15)"
 }
