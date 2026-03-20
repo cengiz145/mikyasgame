@@ -1,8 +1,12 @@
 const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
+// Pencere nesnesini global referansta tutuyoruz.
+// Aksi halde JavaScript Çöp Toplayıcısı (Garbage Collector) fonksiyon bitince pencereyi rastgele kapatabilir.
+let mainWindow;
+
 function createWindow () {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     fullscreen: true, // Native EXE formatını yansıtmak için pencere tam ekran açılır
@@ -15,8 +19,12 @@ function createWindow () {
   // Üst menü çubuğunu tamamen kaldırarak web / tarayıcı hissini yok et.
   Menu.setApplicationMenu(null);
   
-  // Ana HTML oyun dosyasını yükle
-  mainWindow.loadFile('index.html');
+  // Ana HTML oyun dosyasını her ortamda çalışması için path.join ile güvenli olarak yükle
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  mainWindow.on('closed', function () {
+    mainWindow = null; // Kapatılınca bellek sızıntısını önlemek için boşalt
+  });
 }
 
 app.whenReady().then(() => {

@@ -1,5 +1,5 @@
 {
-    "version":  "0.63",
-    "buildId":  1773987678,
-    "changelog":  "v1.24: Logo sesinin erken kesilerek ana menüye atlaması hatası giderildi (stuck timeout fix)."
+    "version":  "0.64",
+    "buildId":  1773987965,
+    "changelog":  "v1.25: Electron (main.js) çöp toplayıcı (Garbage Collector) kaynaklı çökme hatası ve dizin yolu hatası giderildi."
 }
