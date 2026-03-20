@@ -246,26 +246,17 @@ window.announceToScreenReader = function (text, forceFocus = true) {
     text = window.localizeText(text);
 
     if (!forceFocus || window.isMobilePianokeyPressed) {
-        // Odaklanma gerektirmeyen CANLI YAYIN anonsları (Mobil "boş" hatası ve PC otomatik okuma çözümü)
-        // Sabit bir DOM elementi kullanmak her zaman daha güvenilirdir:
-        let liveAnnouncer = document.getElementById('sr-global-live-announcer');
-        if (!liveAnnouncer) {
-            liveAnnouncer = document.createElement('div');
-            liveAnnouncer.id = 'sr-global-live-announcer';
+        // Odaklanma gerektirmeyen CANLI YAYIN anonsları (Mobil ve PC için en kararlı yöntem DOM'da hazır bulunan elementtir)
+        // index.html'de sabit olarak koyduğumuz sr-chat-reader'ı kullanıyoruz
+        let liveAnnouncer = document.getElementById('sr-chat-reader');
+        if (liveAnnouncer) {
+            // NVDA'nın yeni metni fark etmesi için bazen aria-live değerini assertive yapıp tetiklemek işe yarar
             liveAnnouncer.setAttribute('aria-live', 'assertive');
-            liveAnnouncer.setAttribute('aria-atomic', 'true');
-            // Görsel olarak gizle ama ekran okuyucuya açık bırak
-            liveAnnouncer.style.position = 'absolute';
-            liveAnnouncer.style.left = '-9999px';
-            liveAnnouncer.style.width = '1px';
-            liveAnnouncer.style.height = '1px';
-            liveAnnouncer.style.overflow = 'hidden';
-            document.body.appendChild(liveAnnouncer);
+            liveAnnouncer.textContent = '';
+            setTimeout(() => {
+                liveAnnouncer.textContent = text;
+            }, 50);
         }
-        liveAnnouncer.textContent = '';
-        setTimeout(() => {
-            liveAnnouncer.textContent = text;
-        }, 50);
     } else {
         // PC'de doğrudan Odaklanarak okutma (Eski kararlı yöntem)
         let oldAnnouncer = document.getElementById('sr-focus-announcer');
@@ -280,9 +271,13 @@ window.announceToScreenReader = function (text, forceFocus = true) {
         announcerDiv.style.width = '1px';
         announcerDiv.style.height = '1px';
         announcerDiv.style.overflow = 'hidden';
-        announcerDiv.innerText = text; // NVDA (PC) odaklanılan elementlerde innerText'i her zaman okur
+        announcerDiv.innerText = text; 
+        
+        // Elementi DOM'a ekle ve erişilebilirlik ağacının güncellenmesi için çok kısa bir süre bekleyip focusla
         document.body.appendChild(announcerDiv);
-        announcerDiv.focus();
+        setTimeout(() => {
+            announcerDiv.focus();
+        }, 50);
     }
 };
 

@@ -1,5 +1,14 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.21] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- **CANLI SOHBET ERİŞİLEBİLİRLİK (NVDA/Mobil) YAMASI:**
+  - Sohbet kutusu kapalı olsa dahi ekran okuyucunun (NVDA vb.) gelen yeni mesajları, sisteme girenleri ve çıkanları anında okuyabilmesi için arka plana gizli bir spiker (`sr-chat-reader`) atandı.
+  - Yeni mesajlarda sesli uyarı verebilmesi için sisteme `chat12.ogg` ses efekti eklendi ve mesajlar "[İsim]: [Mesaj]" formatında anons edilecek şekilde kodlandı.
+  - PC NVDA ve Mobil Ekran Okuyucularının farklı metin okuma tepkileri verdikleri ("Boş" okuma veya "Sessiz" kalma problemleri) giderilerek her iki platformda da (innerText ve textContent paylaştırılmasıyla) kusursuz çalışacak melez bir anons altyapısı geliştirildi.
+  - Oyundan çıkıp geri dönüldüğünde aynı isimle var olabilmeyi sağlayan kalıcı isim hafızası (`localStorage`) eklendi. Her girişte takma ad sorma zahmeti ortadan kalktı.
+
 [v1.20] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:
