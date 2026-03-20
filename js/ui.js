@@ -728,6 +728,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chatNicknameInput) {
                 setTimeout(() => chatNicknameInput.focus(), 100);
             }
+            // Sohbet açıldığında geçmiş mesajların görünmesi için en alta kaydır
+            const chatMessagesContainer = document.querySelector('.chat-messages-container');
+            if (chatMessagesContainer) {
+                setTimeout(() => {
+                    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                }, 50);
+            }
             if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet açıldı. Takma adınızı girin.');
 
             // Presence Aşama 2: İlk Katılım ve Çıkış Kancası
@@ -850,14 +857,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Mesajları Dinleme İşlevi (Sadece son 50 mesaj)
-    const messagesRef = window.db.ref('messages').orderByChild('timestamp').limitToLast(50);
+    // Firebase push() anahtarları zaten kronolojik olduğu için orderByChild'a gerek yoktur, bu sayede Index hatası vermez ve geçmişi kesin yükler.
+    const messagesRef = window.db.ref('messages').limitToLast(50);
     
     messagesRef.on('child_added', (snapshot) => {
         const data = snapshot.val();
         
+        let timeString = "";
+        if (data.timestamp) {
+            const dateObj = new Date(data.timestamp);
+            const hours = dateObj.getHours().toString().padStart(2, '0');
+            const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+            timeString = `<span class="chat-time" style="color:#888; font-size:0.85em; margin-right:5px;">[${hours}:${minutes}]</span>`;
+        }
+
         const li = document.createElement('li');
         // NVDA için en doğal okuma biçimi "Batuhan: Merhaba" şeklindedir.
-        li.innerHTML = `<strong>${escapeHTML(data.nickname)}:</strong> ${escapeHTML(data.text)}`;
+        li.innerHTML = `${timeString}<strong>${escapeHTML(data.nickname)}:</strong> ${escapeHTML(data.text)}`;
         
         // Eğer mesaj sistemden geliyorsa özel CSS sınıfı ekle
         if (data.nickname === "Sistem") {
@@ -867,11 +883,14 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessagesList.appendChild(li);
 
         // Yeni mesaj gelince otomatik olarak en alta kaydır
-        if (chatMessagesContainer) {
-            // Küçük bir gecikme eklemek DOM render olmasını bekler
+        if (chatMessagesContainer && window.isChatOpen) {
+            // Sadece sohbet açıksa kaydır, değilse açıldığında zaten aşağıda kalması için toggleChat içine eklenecek
             setTimeout(() => {
                 chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
             }, 10);
         }
     });
+
+    // Sohbet penceresi açıldığında geçmiş mesajların en altına kaydırmayı garantiye almak için Observer ekleyelim
+    // Veya toggleChat butonuna basıldığında scrollTop tetiklenebilir.
 });
