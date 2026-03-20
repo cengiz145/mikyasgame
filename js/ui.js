@@ -1009,6 +1009,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
             }, 10);
         }
+
+        // --- NVDA için Gizli Canlı Bölge Oku (Pencere Kapalıyken Okuma) ---
+        const srChatReader = document.getElementById('sr-chat-reader');
+        if (srChatReader) {
+            // Sadece NVDA'nın okuması gereken sade metni hazırlıyoruz
+            let messageToRead = data.nickname === "Sistem" ? `Sistem mesajı: ${data.text}` : `${data.nickname}: ${data.text}`;
+            
+            // Okuyucuyu tetiklemek için içeriği temizleyip çok kısa bir bekleme (50ms) sonrası dolduruyoruz
+            srChatReader.textContent = '';
+            setTimeout(() => {
+                srChatReader.textContent = messageToRead;
+            }, 50);
+        }
     });
 
     // Sohbet penceresi açıldığında geçmiş mesajların en altına kaydırmayı garantiye almak için Observer ekleyelim
