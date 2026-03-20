@@ -788,7 +788,36 @@ document.addEventListener('keydown', function (event) {
 
         if (window.isStarted && window.currentActiveMenu === 'story' && window.inStoryMode) {
             if (window.isGridWalkingPhase) return;
-            // Additional Story Dialog Next Logic is integrated into UI button Enter logic
+            
+            if (window.clickSound) window.clickSound.play();
+            window.currentStoryIndex++;
+            
+            if (window.missingNotesDialogues && window.currentStoryIndex < window.missingNotesDialogues.length) {
+                if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
+            } else {
+                window.isGridWalkingPhase = true;
+                window.playerX = 1;
+                window.currentAutoWalkStep = 0;
+                
+                if (window.announceToScreenReader) window.announceToScreenReader("Kayıp Notalar macerasına başlıyorsunuz. İlk notayı bulmak için sağ ok tuşuna basıp karlı zeminde yürüyün.", false);
+                
+                if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
+                
+                if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
+                if (window.storyBGM) window.storyBGM.play();
+                if (window.mountainSound) {
+                    window.mountainSound.volume(0.8);
+                    window.mountainSound.loop(true);
+                    window.mountainSound.play();
+                }
+                
+                if (window.playAutomatedWalkingScene) {
+                    window.playAutomatedWalkingScene();
+                } else {
+                    const storyStatus = document.getElementById('story-status-text');
+                    if (storyStatus) storyStatus.innerHTML = `X Konumu: ${window.playerX}`;
+                }
+            }
             return;
         }
 

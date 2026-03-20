@@ -686,7 +686,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mobileGameBackBtn) {
             mobileGameBackBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                gameBackBtn.click();
+                if (window.currentActiveMenu === 'game') {
+                    if (typeof gameBackBtn !== 'undefined' && gameBackBtn) gameBackBtn.click();
+                } else if (window.currentActiveMenu === 'practice') {
+                    const pBtn = document.getElementById('practice-back-btn');
+                    if (pBtn) pBtn.click();
+                } else if (window.currentActiveMenu === 'story') {
+                    if (window.clickSound) window.clickSound.play();
+                    window.isGridWalkingPhase = false;
+                    window.inStoryMode = false;
+                    window.gameIsActive = false;
+                    window.isStarted = false;
+
+                    if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
+                    if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
+                    
+                    if (window.switchMenu && window.storyMenu && window.mainMenu) {
+                        window.switchMenu(window.storyMenu, window.mainMenu, 'main');
+                    }
+                    if (window.bgMusic && !window.bgMusic.playing()) window.bgMusic.play();
+                }
             });
         }
     }

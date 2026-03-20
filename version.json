@@ -1,5 +1,5 @@
 {
-    "version":  "0.67",
-    "buildId":  1773989722,
-    "changelog":  "v1.28: Master Volume (Global Ses) kontrolcüsü PageUp/Down\u0027a eklendi ve üst üste binen jeton seslerinin pitch bozulmaları (cızırtılar) giderildi."
+    "version":  "0.68",
+    "buildId":  1773993573,
+    "changelog":  "v1.29: Mobil Çıkış butonunun menüleri kilitlemesi (UI Desync) ve Hikaye Modunun ilk yazısında oyunun donması (Softlock) tamamen çözüldü."
 }
