@@ -1,5 +1,15 @@
 // game.js - Ana Oyun Döngüsü ve Motor İşlevleri
 
+// --- İSTATİSTİK SIFIRLAMA (V1.33 YAMASI) ---
+if (!localStorage.getItem('hfzReset_v1_33')) {
+    localStorage.removeItem('hafizaGuvenModes');
+    localStorage.removeItem('hafizaGuvenAchievements');
+    localStorage.removeItem('hafizaGuvenTotalTokens');
+    localStorage.removeItem('hafizaGuvenHataKorumasi');
+    localStorage.removeItem('hafizaGuvenZamanKorumasi');
+    localStorage.setItem('hfzReset_v1_33', 'true');
+}
+
 // --- ANA OYUN DEĞİŞKENLERİ ---
 window.gameModes = {
     easy: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Kolay' },

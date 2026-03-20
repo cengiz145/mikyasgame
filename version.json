@@ -1,5 +1,5 @@
 {
-    "version":  "0.71",
-    "buildId":  1774043923,
-    "changelog":  "v1.32: Ekran okuyucuların gereksiz yere çift anonslu (Uyarı, Uyarı) bildirim atma hatası giderildi."
+    "version":  "0.72",
+    "buildId":  1774044534,
+    "changelog":  "v1.33: Cihazlarda kayıtlı olan tüm oyun içi jeton, kilit, başarı ve koruma istatistikleri sıfırlandı."
 }
