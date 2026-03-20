@@ -506,7 +506,7 @@
     </button>
 
     <!-- Gizli Canlı Bölge (Sohbet penceresi kapalıyken bile mesajları okumak için) -->
-    <div id="sr-chat-reader" aria-live="polite" class="sr-only"></div>
+    <div id="sr-chat-reader" aria-live="assertive" aria-atomic="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;"></div>
 
     <!-- Canlı Sohbet Penceresi -->
     <div id="chat-panel" class="chat-panel" aria-hidden="true" style="display: none;" role="dialog"

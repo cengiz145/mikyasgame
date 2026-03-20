@@ -250,8 +250,6 @@ window.announceToScreenReader = function (text, forceFocus = true) {
         // index.html'de sabit olarak koyduğumuz sr-chat-reader'ı kullanıyoruz
         let liveAnnouncer = document.getElementById('sr-chat-reader');
         if (liveAnnouncer) {
-            // NVDA'nın yeni metni fark etmesi için bazen aria-live değerini assertive yapıp tetiklemek işe yarar
-            liveAnnouncer.setAttribute('aria-live', 'assertive');
             liveAnnouncer.textContent = '';
             setTimeout(() => {
                 liveAnnouncer.textContent = text;
@@ -273,11 +271,9 @@ window.announceToScreenReader = function (text, forceFocus = true) {
         announcerDiv.style.overflow = 'hidden';
         announcerDiv.innerText = text; 
         
-        // Elementi DOM'a ekle ve erişilebilirlik ağacının güncellenmesi için çok kısa bir süre bekleyip focusla
+        // Elementi DOM'a ekle ve NVDA PC'nin atlamaması için senkron olarak anında focusla
         document.body.appendChild(announcerDiv);
-        setTimeout(() => {
-            announcerDiv.focus();
-        }, 50);
+        announcerDiv.focus();
     }
 };
 
