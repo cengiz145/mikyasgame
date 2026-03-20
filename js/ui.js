@@ -683,6 +683,11 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
+    // Sohbet penceresi açıkken ana menü yön tuşları gezinimini devre dışı bırak
+    if (window.isChatOpen) {
+        return;
+    }
+
     if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) {
         const activeButtons = window.getActiveButtons();
         if (activeButtons.length === 0) return;
