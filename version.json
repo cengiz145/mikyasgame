@@ -1,5 +1,5 @@
 {
-    "version":  "0.64",
-    "buildId":  1773987965,
-    "changelog":  "v1.25: Electron (main.js) çöp toplayıcı (Garbage Collector) kaynaklı çökme hatası ve dizin yolu hatası giderildi."
+    "version":  "0.65",
+    "buildId":  1773988340,
+    "changelog":  "v1.26: package.json içerisinde EXE derlemeyi engelleyen hatalı (bozuk JSON) metin temizlendi."
 }
