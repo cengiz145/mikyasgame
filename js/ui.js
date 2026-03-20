@@ -948,6 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mesajları Dinleme İşlevi (Sadece son 50 mesaj)
     // Firebase push() anahtarları zaten kronolojik olduğu için orderByChild'a gerek yoktur, bu sayede Index hatası vermez ve geçmişi kesin yükler.
     const messagesRef = window.db.ref('messages').limitToLast(50);
+    const chatLoadTime = Date.now();
     
     // Veritabanı boşsa "Hiç mesaj yok" uyarısı ekleme
     messagesRef.once('value', (snapshot) => {
@@ -1026,9 +1027,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- NVDA için Gizli Canlı Bölge Oku (Pencere Kapalıyken Okuma) ---
         const srChatReader = document.getElementById('sr-chat-reader');
         if (srChatReader) {
-            // Sadece NVDA'nın okuması gereken sade metni hazırlıyoruz
-            let messageToRead = data.nickname === "Sistem" ? `Sistem mesajı: ${data.text}` : `${data.nickname}: ${data.text}`;
+            const isMe = data.nickname === chatNicknameInput.value.trim() && chatNicknameInput.value.trim() !== "";
+            let messageToRead = "";
+            let isNewIncomingMessage = false;
+
+            if (data.nickname === "Sistem") {
+                messageToRead = `Sistem mesajı: ${data.text}`;
+            } else if (!isMe) {
+                // Başka kullanıcıdan gelen mesaj
+                messageToRead = `${data.nickname} size diyor ki, ${data.text}`;
+                isNewIncomingMessage = true;
+            } else {
+                // Kendi mesajımız
+                messageToRead = `${data.nickname}: ${data.text}`;
+            }
             
+            // Eğer geçmiş veri değil de yeni gelen bir veri ise ses çal
+            if (isNewIncomingMessage && (Date.now() - chatLoadTime > 2000)) {
+                if (window.chatReceiveSound) window.chatReceiveSound.play();
+            }
+
             // Okuyucuyu tetiklemek için içeriği temizleyip çok kısa bir bekleme (50ms) sonrası dolduruyoruz
             srChatReader.textContent = '';
             setTimeout(() => {

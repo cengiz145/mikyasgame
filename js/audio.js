@@ -141,6 +141,11 @@ window.dado3Sound = new Howl({
     volume: 0.8
 });
 
+window.chatReceiveSound = new Howl({
+    src: ['sounds/chat12.ogg'],
+    volume: 1.0
+});
+
 window.achievementSound = new Howl({
     src: ['sounds/dlg_open.ogg'],
     volume: 1.0
