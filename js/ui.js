@@ -936,7 +936,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Firebase push() anahtarları zaten kronolojik olduğu için orderByChild'a gerek yoktur, bu sayede Index hatası vermez ve geçmişi kesin yükler.
     const messagesRef = window.db.ref('messages').limitToLast(50);
     
+    // Veritabanı boşsa "Hiç mesaj yok" uyarısı ekleme
+    messagesRef.once('value', (snapshot) => {
+        if (!snapshot.exists()) {
+            const li = document.createElement('li');
+            li.id = 'empty-chat-warning';
+            li.classList.add('system-message');
+            const srText = `<span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Sistem mesajı: Bu sohbet kutusunda hiç mesaj yok. İlk mesajınızı göndermek için güzel bir zaman.</span>`;
+            li.innerHTML = `${srText}<div class="wp-bubble" aria-hidden="true" style="opacity: 0.8;">Bu sohbet kutusunda hiç mesaj yok.<br>İlk mesajınızı göndermek için güzel bir zaman. 👋</div>`;
+            chatMessagesList.appendChild(li);
+        }
+    });
+
     messagesRef.on('child_added', (snapshot) => {
+        // Eğer boş sohbet uyarısı ekranda duruyorsa, ilk mesaj geldiğinde onu sil!
+        const emptyWarning = document.getElementById('empty-chat-warning');
+        if (emptyWarning) {
+            emptyWarning.remove();
+        }
+
         const data = snapshot.val();
         
         let timeString = "";

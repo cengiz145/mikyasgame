@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.20] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- Sohbet sunucusu tamamen temizlendiğinde (boş iken) "Bu sohbet kutusunda hiç mesaj yok. İlk mesajınızı göndermek için güzel bir zaman." şeklinde ekrana kibar bir sistem mesajı basan ve ekran okuyucuyla okunan yeni koruma eklendi.
+- Sohbetten mesaj gönderildiği an sohbet penceresinin otomatik olarak kapanıp odaklamanın tekrar oyuna geçmesi (Mobil oyun hızı optimizasyonu) tamamlandı.
+
 [v1.17] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:

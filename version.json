@@ -1,5 +1,5 @@
 {
-    "version": "0.59",
-    "buildId": 1773980000,
-    "changelog": "Hizli oyun destegi: Mesaj gonderilince sohbet penceresi otomatik kapanir. (v1.19)"
+    "version": "0.60",
+    "buildId": 1773981000,
+    "changelog": "Bos sohbet kutusu (Empty State) gorsel uyarlamasi eklendi. (v1.20)"
 }
