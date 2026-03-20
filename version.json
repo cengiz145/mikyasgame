@@ -1,5 +1,5 @@
 {
-    "version":  "0.68",
-    "buildId":  1773993573,
-    "changelog":  "v1.29: Mobil Çıkış butonunun menüleri kilitlemesi (UI Desync) ve Hikaye Modunun ilk yazısında oyunun donması (Softlock) tamamen çözüldü."
+    "version":  "0.69",
+    "buildId":  1773994162,
+    "changelog":  "v1.30: Ekran Okuyucu (NVDA/JAWS) menü gezinim kopukluklarını çözen Dinamik ARIA Enjektörü eklendi."
 }

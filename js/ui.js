@@ -360,6 +360,29 @@ window.updateDifficultyMenuLocks = function () {
 
 // --- EVENTS ---
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Erişilebilirlik (ARIA) Dinamik Enjektörü ("Düğmelerin Soğukluğu" Düzeltmesi) ---
+    const navs = document.querySelectorAll('.menu-nav');
+    navs.forEach(nav => {
+        const ul = nav.querySelector('ul');
+        if (ul) {
+            ul.setAttribute('role', 'menu');
+            const lis = ul.querySelectorAll('li');
+            lis.forEach(li => li.setAttribute('role', 'none'));
+        }
+    });
+
+    const menuButtons = document.querySelectorAll('.menu-button');
+    menuButtons.forEach(btn => {
+        btn.setAttribute('role', 'menuitem');
+    });
+
+    const containers = document.querySelectorAll('.menu-container');
+    containers.forEach(container => {
+        if (container.getAttribute('role') === 'presentation') {
+            container.setAttribute('role', 'region');
+        }
+    });
+
     // Hover Effects
     window.allMenuButtons.forEach((button) => {
         const playHover = () => {
