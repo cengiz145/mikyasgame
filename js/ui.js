@@ -76,8 +76,8 @@ window.guncellemeKontrolEt = function (isManual = false) {
                     document.body.appendChild(refreshBtn);
                     
                     setTimeout(() => {
-                        refreshBtn.focus();
                         alert(uyariMesaji);
+                        refreshBtn.focus();
                     }, 50);
                 }, 500);
             } else {

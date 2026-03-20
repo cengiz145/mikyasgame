@@ -1,5 +1,5 @@
 {
-    "version":  "0.61",
-    "buildId":  1773986858,
-    "changelog":  "v1.22: Sohbet ekran okuyucu hataları kalıcı olarak onarıldı, NVDA ForceFocus kaldırıldı ve güncelleme sistemi entegrasyon kopukluğu giderildi."
+    "version":  "0.62",
+    "buildId":  1773987351,
+    "changelog":  "v1.23: Zorunlu güncelleme uyarısı NVDA ekran okuma atlama sorunu giderildi ve global olay örgüleri teyit edildi."
 }
