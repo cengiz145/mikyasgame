@@ -46,31 +46,24 @@ window.playIntro = function () {
     const randomLogoNum = Math.floor(Math.random() * 5) + 1;
     const audio = new window.Audio(`sounds/logo${randomLogoNum}.wav`);
 
-    let fallbackTimeout = setTimeout(() => { window.startGame(); }, 6000);
-
-    let stuckCheckInterval = setInterval(() => {
-        if (audio.currentTime === 0) {
-            console.warn("Ses donanım tarafından bloke edildi, oyun hemen başlatılıyor.");
-            clearInterval(stuckCheckInterval);
-            clearTimeout(fallbackTimeout);
-            window.startGame();
-        } else {
-            clearInterval(stuckCheckInterval);
-        }
-    }, 800);
+    // Logoların uzunluğu farklı olabileceği için yedek süreyi 15 saniyeye çıkardık.
+    let fallbackTimeout = setTimeout(() => { window.startGame(); }, 15000);
 
     const startSafe = () => {
-        clearInterval(stuckCheckInterval);
         clearTimeout(fallbackTimeout);
         window.startGame();
     };
 
     audio.onended = startSafe;
     audio.onerror = startSafe;
-    audio.play().catch(e => {
-        console.warn("Logo autoplay blocked", e);
-        startSafe();
-    });
+    
+    let playPromise = audio.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(e => {
+            console.warn("Logo autoplay blocked", e);
+            startSafe();
+        });
+    }
 
     window.currentLogoSound = {
         stop: () => {

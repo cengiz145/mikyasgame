@@ -1,5 +1,5 @@
 {
-    "version":  "0.62",
-    "buildId":  1773987351,
-    "changelog":  "v1.23: Zorunlu güncelleme uyarısı NVDA ekran okuma atlama sorunu giderildi ve global olay örgüleri teyit edildi."
+    "version":  "0.63",
+    "buildId":  1773987678,
+    "changelog":  "v1.24: Logo sesinin erken kesilerek ana menüye atlaması hatası giderildi (stuck timeout fix)."
 }
