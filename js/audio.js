@@ -2,7 +2,7 @@
 
 // Dinleyiciyi (Kullanıcı) (0,0,0) merkez noktasına koyalım.
 Howler.pos(0, 0, 0);
-H       owler.orientation(0, 0, -1, 0, 1, 0);
+Howler.orientation(0, 0, -1, 0, 1, 0);
 
 window.currentLogoSound = null;
 
@@ -106,13 +106,13 @@ window.doorCloseSound = new Howl({
 });
 
 window.storyNoteSounds = [
-    new Howl({ src: ['sounds/a.ogg'], volume: 0.15, stereo: -0.8 }),
-    new Howl({ src: ['sounds/b.ogg'], volume: 0.15, stereo: 0.5 }),
-    new Howl({ src: ['sounds/c.ogg'], volume: 0.15, stereo: -0.2 }),
-    new Howl({ src: ['sounds/d.ogg'], volume: 0.15, stereo: 0.9 }),
-    new Howl({ src: ['sounds/e.ogg'], volume: 0.15, stereo: -0.6 }),
-    new Howl({ src: ['sounds/f.ogg'], volume: 0.15, stereo: 0.2 }),
-    new Howl({ src: ['sounds/g.ogg'], volume: 0.15, stereo: 0.7 })
+    (() => { let h = new Howl({ src: ['sounds/a.ogg'], volume: 0.15 }); h.stereo(-0.8); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/b.ogg'], volume: 0.15 }); h.stereo(0.5); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/c.ogg'], volume: 0.15 }); h.stereo(-0.2); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/d.ogg'], volume: 0.15 }); h.stereo(0.9); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/e.ogg'], volume: 0.15 }); h.stereo(-0.6); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/f.ogg'], volume: 0.15 }); h.stereo(0.2); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/g.ogg'], volume: 0.15 }); h.stereo(0.7); return h; })()
 ];
 
 window.buySound = new Howl({

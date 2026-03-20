@@ -1,5 +1,5 @@
 {
-    "version":  "0.65",
-    "buildId":  1773988340,
-    "changelog":  "v1.26: package.json içerisinde EXE derlemeyi engelleyen hatalı (bozuk JSON) metin temizlendi."
+    "version":  "0.66",
+    "buildId":  1773989120,
+    "changelog":  "v1.27: Ses motorunu (Howler) tamamen çökerten klavye yazım hatası ve 3B stereo ses algoritmaları onarıldı."
 }
