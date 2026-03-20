@@ -909,8 +909,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 sessionStorage.setItem('chatNickname', nickname);
                 chatNicknameInput.style.display = 'none';
                 
-                chatMessageInput.value = ''; // Sadece mesajı sil
-                chatMessageInput.focus(); // Art arda mesaj yazabilmesi için imleci tekrar mesaja odakla
+                chatMessageInput.value = ''; // Mesaj formunu temizle
+                
+                // Oyuna hızlıca devam edilebilmesi için sohbet penceresini otomatik kapat
+                if (window.isChatOpen && typeof window.toggleChat === 'function') {
+                    window.toggleChat();
+                }
             }).catch(error => {
                 console.error("Mesaj gönderilirken hata oluştu:", error);
             });
