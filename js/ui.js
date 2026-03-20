@@ -730,8 +730,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.isChatOpen) {
             chatPanel.style.display = 'flex';
             chatPanel.removeAttribute('aria-hidden');
-            if (chatNicknameInput) {
+            const chatMessageInputLocal = document.getElementById('chat-message-input');
+            if (chatNicknameInput && chatNicknameInput.style.display !== 'none') {
                 setTimeout(() => chatNicknameInput.focus(), 100);
+            } else if (chatMessageInputLocal) {
+                setTimeout(() => chatMessageInputLocal.focus(), 100);
             }
             // Sohbet açıldığında geçmiş mesajların görünmesi için en alta kaydır
             const chatMessagesContainer = document.querySelector('.chat-messages-container');
@@ -740,7 +743,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
                 }, 50);
             }
-            if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet açıldı. Takma adınızı girin.');
+            if (window.announceToScreenReader) {
+                if (chatNicknameInput && chatNicknameInput.style.display === 'none') {
+                    window.announceToScreenReader('Canlı sohbet açıldı. Mesajınızı yazabilirsiniz.');
+                } else {
+                    window.announceToScreenReader('Canlı sohbet açıldı. Takma adınızı girin.');
+                }
+            }
 
             // Presence Aşama 2: İlk Katılım ve Çıkış Kancası
             if (window.hasJoinedChat === false && window.db) {
@@ -749,15 +758,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 // İlk katılım mesajı
                 window.db.ref('messages').push({
                     nickname: "Sistem",
-                    text: "👋 Misafir sohbete katıldı.",
+                    text: `👋 ${window.currentChatUser} sohbete katıldı.`,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
 
-                // Başlangıç Çıkış Kancası (Misafir)
+                // Başlangıç Çıkış Kancası
                 window.disconnectRef = window.db.ref('messages').push();
                 window.disconnectRef.onDisconnect().set({
                     nickname: "Sistem",
-                    text: "🚶 Misafir çevrimdışı oldu.",
+                    text: `🚶 ${window.currentChatUser} çevrimdışı oldu.`,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
             }
@@ -823,17 +832,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatMessagesContainer = document.querySelector('.chat-messages-container');
     
     // Presence (Durum) Değişkenleri (Global olarak ayarlandı)
-    window.currentChatUser = "Misafir";
+    const savedNickname = localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname');
+    window.currentChatUser = savedNickname ? savedNickname : "Misafir";
     window.hasJoinedChat = false;
 
     // Firebase tanımlı değilse veya arayüz yoksa dur
     if (!chatSendBtn || !chatMessagesList || !window.db) return;
 
-    // Oturumda (Session) daha önce kaydedilmiş bir Takma Ad varsa onu otomatik yükle ve kutuyu gizle
-    const savedNickname = sessionStorage.getItem('chatNickname');
+    // Oturumda veya kalıcı hafızada daha önce kaydedilmiş bir Takma Ad varsa onu otomatik yükle ve kutuyu gizle
     if (savedNickname) {
         chatNicknameInput.value = savedNickname;
-        chatNicknameInput.style.display = 'none'; // Kullanıcı adı bir kere girildikten sonra WhatsApp gibi gizlenir
+        chatNicknameInput.style.display = 'none'; // Kullanıcı adı bir kere girildikten sonra sekme kapanana kadar veya kalıcı olarak gizlenir
     }
 
     // Takma ad kutusundayken de Enter'a basılırsa mesaj gönderilsin
@@ -905,7 +914,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             window.db.ref('messages').push(messageData).then(() => {
-                // Başarılı gönderim sonrası Takma Adı oturuma kaydet ve kutuyu sonsuza dek gizle
+                // Başarılı gönderim sonrası Takma Adı oturuma VE KALICI DEPOLAMAYA kaydet
+                localStorage.setItem('chatUsername', nickname);
                 sessionStorage.setItem('chatNickname', nickname);
                 chatNicknameInput.style.display = 'none';
                 
