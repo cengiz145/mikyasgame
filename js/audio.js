@@ -2,7 +2,7 @@
 
 // Dinleyiciyi (Kullanıcı) (0,0,0) merkez noktasına koyalım.
 Howler.pos(0, 0, 0);
-Howler.orientation(0, 0, -1, 0, 1, 0);
+H       owler.orientation(0, 0, -1, 0, 1, 0);
 
 window.currentLogoSound = null;
 
@@ -40,7 +40,7 @@ window.wrongSound = new Howl({
     volume: 1.0,
     onplay: function () {
         if (window.isMobileDevice && navigator.vibrate) {
-            navigator.vibrate(1000); 
+            navigator.vibrate(1000);
         }
     }
 });

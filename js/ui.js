@@ -5,7 +5,7 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 window.isMobileDevice = isMobile;
 
 // --- OTOMATİK GÜNCELLEME KONTROL SİSTEMİ ---
-window.mevcutSurum = null;
+window.mevcutSurum = typeof UYGULAMA_SURUMU !== 'undefined' ? UYGULAMA_SURUMU : null;
 window.globalChangelogVersion = null;
 window.globalChangelogMessage = null;
 
@@ -58,7 +58,6 @@ window.guncellemeKontrolEt = function (isManual = false) {
                 document.body.appendChild(updateMsg);
 
                 setTimeout(() => {
-                    alert(uyariMesaji);
                     const refreshBtn = document.createElement("button");
                     refreshBtn.textContent = "YENİ SÜRÜME GEÇ (SAYFAYI YENİLE)";
                     refreshBtn.style.position = "fixed";
@@ -75,7 +74,11 @@ window.guncellemeKontrolEt = function (isManual = false) {
                     refreshBtn.setAttribute("aria-label", "Yeni sürüme geçmek zorunludur. Lütfen sayfayı yenileyin.");
                     refreshBtn.onclick = () => { window.location.href = window.location.pathname + "?v=" + new Date().getTime(); };
                     document.body.appendChild(refreshBtn);
-                    setTimeout(() => refreshBtn.focus(), 100);
+                    
+                    setTimeout(() => {
+                        refreshBtn.focus();
+                        alert(uyariMesaji);
+                    }, 50);
                 }, 500);
             } else {
                 if (isManual && typeof window.announceToScreenReader === 'function') {
@@ -250,10 +253,14 @@ window.announceToScreenReader = function (text, forceFocus = true) {
         // index.html'de sabit olarak koyduğumuz sr-chat-reader'ı kullanıyoruz
         let liveAnnouncer = document.getElementById('sr-chat-reader');
         if (liveAnnouncer) {
-            liveAnnouncer.textContent = '';
+            let msgNode = document.createElement('div');
+            msgNode.textContent = text;
+            liveAnnouncer.appendChild(msgNode);
             setTimeout(() => {
-                liveAnnouncer.textContent = text;
-            }, 50);
+                if (msgNode.parentNode) {
+                    msgNode.remove();
+                }
+            }, 10000);
         }
     } else {
         // PC'de doğrudan Odaklanarak okutma (Eski kararlı yöntem)
@@ -269,11 +276,16 @@ window.announceToScreenReader = function (text, forceFocus = true) {
         announcerDiv.style.width = '1px';
         announcerDiv.style.height = '1px';
         announcerDiv.style.overflow = 'hidden';
+        announcerDiv.setAttribute('role', 'alert'); 
         announcerDiv.innerText = text; 
         
         // Elementi DOM'a ekle ve NVDA PC'nin atlamaması için senkron olarak anında focusla
         document.body.appendChild(announcerDiv);
         announcerDiv.focus();
+        
+        setTimeout(() => {
+             if (announcerDiv.parentNode) announcerDiv.remove();
+        }, 15000);
     }
 };
 
@@ -752,9 +764,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (window.announceToScreenReader) {
                 if (chatNicknameInput && chatNicknameInput.style.display === 'none') {
-                    window.announceToScreenReader('Canlı sohbet açıldı. Mesajınızı yazabilirsiniz.');
+                    window.announceToScreenReader('Canlı sohbet açıldı. Mesajınızı yazabilirsiniz.', false);
                 } else {
-                    window.announceToScreenReader('Canlı sohbet açıldı. Takma adınızı girin.');
+                    window.announceToScreenReader('Canlı sohbet açıldı. Takma adınızı girin.', false);
                 }
             }
 
@@ -783,7 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chatToggleBtn) {
                 setTimeout(() => chatToggleBtn.focus(), 100);
             }
-            if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet kapatıldı.');
+            if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet kapatıldı.', false);
         }
     };
 
@@ -882,19 +894,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = chatMessageInput.value.trim();
 
         if (nickname === '') {
-            if (window.announceToScreenReader) window.announceToScreenReader('Lütfen bir takma ad girin.');
+            if (window.announceToScreenReader) window.announceToScreenReader('Lütfen bir takma ad girin.', false);
             chatNicknameInput.focus();
             return;
         }
 
         if (nickname.toLowerCase() === 'sistem') {
-            if (window.announceToScreenReader) window.announceToScreenReader('Bu takma adı kullanamazsınız.');
+            if (window.announceToScreenReader) window.announceToScreenReader('Bu takma adı kullanamazsınız.', false);
             chatNicknameInput.focus();
             return;
         }
 
         if (text === '') {
-            if (window.announceToScreenReader) window.announceToScreenReader('Lütfen bir mesaj yazın.');
+            if (window.announceToScreenReader) window.announceToScreenReader('Lütfen bir mesaj yazın.', false);
             chatMessageInput.focus();
             return;
         }
@@ -936,7 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Mesajın başarıyla gönderildiğini bildir (pencere kapanma anonsu ile karışmaması için 100ms gecikme)
                 setTimeout(() => {
                     if (window.announceToScreenReader) {
-                        window.announceToScreenReader('Mesaj gönderildi.');
+                        window.announceToScreenReader('Mesaj gönderildi.', false);
                     }
                 }, 100);
             }).catch(error => {
@@ -944,7 +956,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Hata durumunda uyar
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.');
+                    window.announceToScreenReader('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.', false);
                 }
                 alert('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.');
             });

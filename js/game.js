@@ -686,7 +686,7 @@ document.addEventListener('keydown', function (event) {
     if (window.isChatOpen) {
         // Sadece temel erişilebilirlik ve menü tuşlarına izin ver, harfleri/boşluğu engelle
         if (!['Escape', 'Tab', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-            return; 
+            return;
         }
     } else if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
         if (event.key !== 'Escape' && event.key !== 'Tab') {
