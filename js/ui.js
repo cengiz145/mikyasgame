@@ -1034,34 +1034,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 10);
         }
 
-        // --- NVDA için Gizli Canlı Bölge Oku (Pencere Kapalıyken Okuma) ---
-        const srChatReader = document.getElementById('sr-chat-reader');
-        if (srChatReader) {
-            const isMe = data.nickname === chatNicknameInput.value.trim() && chatNicknameInput.value.trim() !== "";
-            let messageToRead = "";
-            let isNewIncomingMessage = false;
+        // --- NVDA için Yeni Mesajları Doğrudan Anons Etme ---
+        const isMe = data.nickname === chatNicknameInput.value.trim() && chatNicknameInput.value.trim() !== "";
+        let messageToRead = "";
+        let isNewIncomingMessage = false;
 
-            if (data.nickname === "Sistem") {
-                messageToRead = `Sistem mesajı: ${data.text}`;
-            } else if (!isMe) {
-                // Başka kullanıcıdan gelen mesaj
-                messageToRead = `${data.nickname} size diyor ki, ${data.text}`;
+        if (data.nickname === "Sistem") {
+            messageToRead = `Sistem mesajı: ${data.text}`;
+        } else {
+            // GönderenKişi: Mesaj metni formatı istendiği gibi eklendi
+            messageToRead = `${data.nickname}: ${data.text}`;
+            if (!isMe) {
                 isNewIncomingMessage = true;
-            } else {
-                // Kendi mesajımız
-                messageToRead = `${data.nickname}: ${data.text}`;
+            }
+        }
+        
+        // Sadece sayfa açılışındaki geçmiş mesaj yığınını atlamak için zamanı kontrol ediyoruz
+        if (Date.now() - chatLoadTime > 2000) {
+            // Başkasından gelen mesaj ise ses çal
+            if (isNewIncomingMessage && window.chatReceiveSound) {
+                window.chatReceiveSound.play();
             }
             
-            // Eğer geçmiş veri değil de yeni gelen bir veri ise ses çal
-            if (isNewIncomingMessage && (Date.now() - chatLoadTime > 2000)) {
-                if (window.chatReceiveSound) window.chatReceiveSound.play();
+            // Focus çalmadan doğrudan ekran okuyucuya anons geçiyoruz
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader(messageToRead, false); // forceFocus = false
             }
-
-            // Okuyucuyu tetiklemek için içeriği temizleyip çok kısa bir bekleme (50ms) sonrası dolduruyoruz
-            srChatReader.textContent = '';
-            setTimeout(() => {
-                srChatReader.textContent = messageToRead;
-            }, 50);
         }
     });
 
