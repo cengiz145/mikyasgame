@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.ensureAudioUnlock) window.ensureAudioUnlock();
             if (button.getAttribute('aria-disabled') === 'true') {
                 event.preventDefault();
-                event.stopPropagation();
+                event.stopImmediatePropagation();
                 return;
             }
             const activeButtons = window.getActiveButtons();
@@ -680,6 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (btnDiffMedium) {
             btnDiffMedium.addEventListener('click', () => {
+                if (!window.gameModes.medium.isUnlocked) return;
                 window.switchMenu(window.difficultyMenu, window.gameMenu, 'game');
                 if (window.startMainGame) window.startMainGame('medium');
             });
@@ -687,6 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (btnDiffHard) {
             btnDiffHard.addEventListener('click', () => {
+                if (!window.gameModes.hard.isUnlocked) return;
                 window.switchMenu(window.difficultyMenu, window.gameMenu, 'game');
                 if (window.startMainGame) window.startMainGame('hard');
             });
@@ -694,11 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (btnDiffMissingNotes) {
             btnDiffMissingNotes.addEventListener('click', () => {
-                if (window.isMobileDevice) {
-                    alert("Bu mod telefonlar için uyumlu olmadığından devre dışı bırakılmıştır.");
-                    window.announceToScreenReader("Bu mod telefonlar için uyumlu olmadığından devre dışı bırakılmıştır.");
-                    return;
-                }
+                if (!window.gameModes.missing_notes.isUnlocked) return;
                 window.switchMenu(window.difficultyMenu, window.storyMenu, 'story');
 
                 if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();

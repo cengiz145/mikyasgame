@@ -1,5 +1,5 @@
 {
-    "version":  "0.72",
-    "buildId":  1774044534,
-    "changelog":  "v1.33: Cihazlarda kayıtlı olan tüm oyun içi jeton, kilit, başarı ve koruma istatistikleri sıfırlandı."
+    "version":  "0.73",
+    "buildId":  1774045582,
+    "changelog":  "v1.34: Kilitli modların haksız biçimde tıklanıp oynanabilmesi hatası (Progression Bypass) tamamen çözüldü."
 }
