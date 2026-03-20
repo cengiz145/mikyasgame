@@ -7,6 +7,7 @@
   - Sohbet kutusu kapalı olsa dahi ekran okuyucunun (NVDA vb.) gelen yeni mesajları, sisteme girenleri ve çıkanları anında okuyabilmesi için arka plana gizli bir spiker (`sr-chat-reader`) atandı.
   - Yeni mesajlarda sesli uyarı verebilmesi için sisteme `chat12.ogg` ses efekti eklendi ve mesajlar "[İsim]: [Mesaj]" formatında anons edilecek şekilde kodlandı.
   - PC NVDA ve Mobil Ekran Okuyucularının farklı metin okuma tepkileri verdikleri ("Boş" okuma veya "Sessiz" kalma problemleri) giderilerek her iki platformda da (innerText ve textContent paylaştırılmasıyla) kusursuz çalışacak melez bir anons altyapısı geliştirildi.
+  - PC NVDA'nın HTML'deki `.sr-only` sınıfı içindeki "clip" özelliğinden dolayı canlı elementleri tümden atlaması/görmezden gelmesi hatası tespit edildi ve standart dışı `clip` kullanımı engellenerek anında odak okuması (senkron odak) sağlandı.
   - Oyundan çıkıp geri dönüldüğünde aynı isimle var olabilmeyi sağlayan kalıcı isim hafızası (`localStorage`) eklendi. Her girişte takma ad sorma zahmeti ortadan kalktı.
 
 [v1.20] - 2026-03-20
