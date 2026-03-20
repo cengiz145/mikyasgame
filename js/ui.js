@@ -710,11 +710,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (chatToggleBtn) {
         chatToggleBtn.style.display = 'block';
-        chatToggleBtn.addEventListener('click', toggleChat);
+        chatToggleBtn.addEventListener('click', () => window.toggleChat());
     }
 
     if (chatCloseBtn) {
-        chatCloseBtn.addEventListener('click', window.toggleChat);
+        chatCloseBtn.addEventListener('click', () => window.toggleChat());
     }
 
     window.toggleChat = function() {
