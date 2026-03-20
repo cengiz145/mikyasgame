@@ -829,6 +829,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Firebase tanımlı değilse veya arayüz yoksa dur
     if (!chatSendBtn || !chatMessagesList || !window.db) return;
 
+    // Oturumda (Session) daha önce kaydedilmiş bir Takma Ad varsa onu otomatik yükle ve kutuyu gizle
+    const savedNickname = sessionStorage.getItem('chatNickname');
+    if (savedNickname) {
+        chatNicknameInput.value = savedNickname;
+        chatNicknameInput.style.display = 'none'; // Kullanıcı adı bir kere girildikten sonra WhatsApp gibi gizlenir
+    }
+
+    // Takma ad kutusundayken de Enter'a basılırsa mesaj gönderilsin
+    if (chatNicknameInput) {
+        chatNicknameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
+
     // Güvenlik (XSS) Koruması (HTML etiketlerini etkisiz hale getir)
     function escapeHTML(str) {
         if (!str) return '';
@@ -888,7 +905,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             window.db.ref('messages').push(messageData).then(() => {
-                chatMessageInput.value = ''; // Kullanıcı adı kalsın, sadece mesajı sil
+                // Başarılı gönderim sonrası Takma Adı oturuma kaydet ve kutuyu sonsuza dek gizle
+                sessionStorage.setItem('chatNickname', nickname);
+                chatNicknameInput.style.display = 'none';
+                
+                chatMessageInput.value = ''; // Sadece mesajı sil
                 chatMessageInput.focus(); // Art arda mesaj yazabilmesi için imleci tekrar mesaja odakla
             }).catch(error => {
                 console.error("Mesaj gönderilirken hata oluştu:", error);
