@@ -915,6 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = snapshot.val();
         
         let timeString = "";
+        let timeRaw = "";
         let ts = data.timestamp;
         
         // Yerel itme anında (Optimistic Render) TIMESTAMP obje veya hatalı olabilir, bu durumda geçici yerel cihaz saati kullanılır
@@ -926,18 +927,36 @@ document.addEventListener('DOMContentLoaded', () => {
             const dateObj = new Date(ts);
             const hours = dateObj.getHours().toString().padStart(2, '0');
             const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-            timeString = `<span class="chat-time" style="color:#888; font-size:0.85em; margin-right:5px;">[${hours}:${minutes}]</span>`;
+            timeRaw = `${hours}:${minutes}`;
+            timeString = `<span class="wp-time">${timeRaw}</span>`;
         }
 
         const li = document.createElement('li');
-        // NVDA için en doğal okuma biçimi "Batuhan: Merhaba" şeklindedir.
-        li.innerHTML = `${timeString}<strong>${escapeHTML(data.nickname)}:</strong> ${escapeHTML(data.text)}`;
         
-        // Eğer mesaj sistemden geliyorsa özel CSS sınıfı ekle
         if (data.nickname === "Sistem") {
             li.classList.add('system-message');
+            // Sistem mesajı için ekran okuyucu dostu gizli metin
+            const srText = `<span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Sistem mesajı: ${escapeHTML(data.text)}</span>`;
+            li.innerHTML = `${srText}<div class="wp-bubble" aria-hidden="true">${escapeHTML(data.text)}</div>`;
+        } else {
+            // Benim gönderdiğim mesaj mı yoksa başkasının mı?
+            const isMe = data.nickname === chatNicknameInput.value.trim() && chatNicknameInput.value.trim() !== "";
+            li.classList.add(isMe ? 'message-out' : 'message-in');
+            
+            // Ekran Okuyucu Kusursuz Okuma Düzeni
+            const srText = `<span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">[${timeRaw}] ${escapeHTML(data.nickname)}: ${escapeHTML(data.text)}</span>`;
+            
+            // Whatsapp Görsel Balonu
+            li.innerHTML = `
+                ${srText}
+                <div class="wp-bubble" aria-hidden="true">
+                    ${!isMe ? `<div class="wp-sender">${escapeHTML(data.nickname)}</div>` : ''}
+                    <div class="wp-text">${escapeHTML(data.text)}</div>
+                    ${timeString}
+                </div>
+            `;
         }
-        
+
         chatMessagesList.appendChild(li);
 
         // Yeni mesaj gelince otomatik olarak en alta kaydır

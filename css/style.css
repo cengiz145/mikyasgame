@@ -381,57 +381,59 @@
     position: fixed;
     bottom: 80px;
     right: 20px;
-    width: 350px;
+    width: 360px;
     max-width: 90vw;
-    height: 450px;
-    max-height: 70vh;
-    background-color: #1a1a1a;
-    border: 2px solid #444;
+    height: 500px;
+    max-height: 75vh;
+    background-color: #0b141a; /* WhatsApp Koyu Arka Plan */
+    border: none;
     border-radius: 12px;
     display: flex;
     flex-direction: column;
     z-index: 2000;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
     overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .chat-header {
-    background-color: #222;
-    padding: 15px;
-    border-bottom: 2px solid #444;
+    background-color: #202c33; /* WhatsApp Koyu Üst Bar */
+    padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid #2a3942;
 }
 
 .chat-header h2 {
     margin: 0;
-    font-size: 1.3rem;
-    color: var(--focus-color);
-    border: none;
-    padding: 0;
-    letter-spacing: 1px;
+    font-size: 1.15rem;
+    color: #e9edef;
+    font-weight: 500;
+    letter-spacing: normal;
 }
 
 .chat-close-btn {
     background: transparent;
-    color: #aaa;
+    color: #8696a0;
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0 5px;
+    transition: color 0.2s;
 }
 
 .chat-close-btn:hover, .chat-close-btn:focus-visible {
-    color: #fff;
-    outline: 2px solid var(--focus-color);
+    color: #e9edef;
+    outline: none;
 }
 
 .chat-messages-container {
     flex: 1;
-    padding: 15px;
+    padding: 16px 14px;
     overflow-y: auto;
-    background-color: #111;
+    background-color: #0b141a;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" opacity="0.04"><path d="M60 0 L120 60 L60 120 L0 60 Z" fill="%23ffffff"/></svg>');
 }
 
 #chat-messages {
@@ -440,97 +442,165 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
+/* Base Message Bubbles */
 #chat-messages li {
-    background-color: #2a2a2a;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 1rem;
-    color: #ddd;
-    word-break: break-word;
-}
-
-#chat-messages li.system-message {
-    background-color: transparent;
-    color: #ffb703;
-    font-style: italic;
-    font-weight: bold;
-    text-align: center;
-    border: 1px dashed #555;
-    padding: 6px 12px;
-}
-
-.chat-input-area {
-    padding: 15px;
-    background-color: #222;
-    border-top: 2px solid #444;
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    width: 100%;
 }
 
-.chat-input-area input {
-    background-color: #111;
-    border: 1px solid #555;
-    color: #fff;
-    padding: 10px;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 1rem;
+.wp-bubble {
+    position: relative;
+    max-width: 85%;
+    padding: 6px 9px 8px 9px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #e9edef;
+    word-break: break-word;
+    box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
 }
 
-.chat-input-area input:focus-visible {
-    outline: 2px solid var(--focus-color);
-    border-color: transparent;
+/* Diğer Kişilerin Mesajları (Sola yaslı, Koyu Gri) */
+#chat-messages li.message-in {
+    justify-content: flex-start;
+}
+#chat-messages li.message-in .wp-bubble {
+    background-color: #202c33;
+    border-top-left-radius: 0;
 }
 
-#chat-send-btn {
-    background-color: var(--focus-color);
-    color: #000;
-    border: none;
-    padding: 10px;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 1.1rem;
+/* Benim Mesajlarım (Sağa yaslı, Acı Yeşil) */
+#chat-messages li.message-out {
+    justify-content: flex-end;
+}
+#chat-messages li.message-out .wp-bubble {
+    background-color: #005c4b;
+    border-top-right-radius: 0;
+}
+
+/* Sistem Mesajları (Ortalı, Elips) */
+#chat-messages li.system-message {
+    justify-content: center;
+    margin: 8px 0;
+}
+#chat-messages li.system-message .wp-bubble {
+    background-color: #182229;
+    color: #ffd766;
+    font-size: 0.8rem;
+    font-style: italic;
+    text-align: center;
+    padding: 5px 14px;
+    border-radius: 12px;
+    box-shadow: none;
+    max-width: 90%;
+    border: 1px solid #2a3942;
+}
+
+.wp-sender {
+    font-size: 0.8rem;
     font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    color: #53bdeb; /* Typical group chat tag color */
+    margin-bottom: 2px;
 }
 
-#chat-send-btn:hover, #chat-send-btn:focus-visible {
-    background-color: #ffd766;
+.wp-text {
+    margin-bottom: 12px; /* Saat için boşluk */
+}
+
+/* WhatsApp Timestamp */
+.wp-time {
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.6);
+}
+
+/* WhatsApp Input Area (Alt Bar) */
+.chat-input-area {
+    background-color: #202c33;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: row; /* Yan yana dizilim */
+    gap: 8px;
+    align-items: center;
+    border-top: none;
+}
+
+#chat-nickname {
+    width: 25%;
+    background-color: #2a3942;
+    border: none;
+    color: #e9edef;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+#chat-message-input {
+    flex-grow: 1;
+    background-color: #2a3942;
+    border: none;
+    color: #e9edef;
+    padding: 10px 16px;
+    border-radius: 20px; /* Hap görünümü */
+    font-size: 0.95rem;
+}
+
+#chat-nickname:focus, #chat-message-input:focus {
     outline: none;
 }
 
-/* Mobil Görünüm Optimizasyonu (Kusursuz Sohbet Arayüzü) */
+#chat-send-btn {
+    background-color: #00a884;
+    color: #000;
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%; /* Gönder butonu yuvarlak */
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.2s, transform 0.2s;
+    line-height: normal;
+    padding: 0;
+}
+
+#chat-send-btn:hover, #chat-send-btn:focus-visible {
+    background-color: #008f6f;
+    transform: scale(1.05);
+    outline: none;
+}
+
+/* WhatsApp Mobil Tam Ekran Deneyimi */
 @media (max-width: 768px) {
     .chat-panel {
-        width: 95vw;
-        height: 75vh;
-        max-height: none;
-        bottom: 20px;
-        right: 2.5vw;
-        left: 2.5vw;
-        border-radius: 12px;
-        box-shadow: 0 -5px 25px rgba(0,0,0,0.9);
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
     }
     
     .chat-toggle-btn {
         bottom: 15px;
         right: 15px;
-        padding: 15px 20px; /* Mobilde parmakla basmayı kolaylaştır */
+        padding: 15px 20px;
         font-size: 1.15rem;
     }
 
     .chat-input-area input {
-        font-size: 16px !important; /* iOS Safari'nin inputlara otomatik zoom yapmasını engeller */
-        padding: 12px;
-    }
-
-    #chat-send-btn {
-        padding: 12px;
-        font-size: 1.2rem;
+        font-size: 16px !important; /* iOS Native Zoom block */
     }
 }

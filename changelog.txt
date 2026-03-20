@@ -1,5 +1,16 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.17] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- **WHATSAPP TASARIM GÜNCELLEMESİ (Canlı Sohbet):** Canlı sohbet penceresi %100 WhatsApp Web (Karanlık Mod) arayüzüne benzetildi.
+  - Sizin gönderdiğiniz mesajlar (Benim Mesajlarım) ekranın sağ tarafına **Acı Yeşil** renkli konuşma balonları (Bubble) ile yaslandı.
+  - Diğer kullanıcıların mesajları ekranın sol tarafında **Koyu Gri** balonlarla listelenecek şekilde ayrıştırıldı.
+  - Sisteme giren/çıkanların (Örn: Misafir çevrimdışı oldu) mesajları, ortalanmış küçük "hap" görünümü ile modernleştirildi.
+  - Her konuşma balonunun sağ alt köşesine efsanevi ince WhatsApp zaman damgası (`14:35`) oturtuldu. Orijinal Gönderen İsimleri (Nickname) yine aynı formatta balona eklendi.
+  - Alt kısımdaki "Gönder" butonu yuvarlak WhatsApp uçağı (➤) ikonuna dönüştürüldü ve yazma çubuğu şık bir elips haline getirildi.
+  - Tüm bu görsel harikalara rağmen, **NVDA (Ekran Okuyucu) deneyimi tamamen korundu**. Görme engelli oyuncular için görseldeki "sağ-sol" yerleşimleri atlanacak ve saf, eksiksiz, pürüzsüz metin okuması Gizli Etiketler (aria-hidden ve sr-only) hileleriyle sunulmaya devam edilecek!
+
 [v1.15] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:
