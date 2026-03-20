@@ -261,10 +261,10 @@ window.announceToScreenReader = function (text, forceFocus = true) {
 
     if (!forceFocus || window.isMobilePianokeyPressed) {
         announcerDiv.setAttribute('aria-live', 'assertive');
-        announcerDiv.innerText = text;
+        announcerDiv.textContent = text; // innerText mobilde "boş" okumaya neden olabilir
         document.body.appendChild(announcerDiv);
     } else {
-        announcerDiv.innerText = text;
+        announcerDiv.textContent = text;
         document.body.appendChild(announcerDiv);
         announcerDiv.focus();
     }
@@ -1056,9 +1056,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.chatReceiveSound.play();
             }
             
-            // Focus çalmadan doğrudan ekran okuyucuya anons geçiyoruz
-            if (window.announceToScreenReader) {
-                window.announceToScreenReader(messageToRead, false); // forceFocus = false
+            // "Boş" (empty) bug'ını tamamen bitirmek için kalıcı bir DOM ögesi olan sr-chat-reader'a yönlendiriyoruz
+            const srChatReader = document.getElementById('sr-chat-reader');
+            if (srChatReader) {
+                srChatReader.textContent = '';
+                setTimeout(() => {
+                    srChatReader.textContent = messageToRead;
+                }, 50);
             }
         }
     });
