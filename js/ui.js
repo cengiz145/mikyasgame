@@ -222,6 +222,33 @@ window.updateMobileKeysVisibility = function () {
             if (mobilePiano) mobilePiano.removeAttribute('aria-hidden');
         }
     }
+    
+    if (typeof window.updateMobileStoryKeys === 'function') {
+        window.updateMobileStoryKeys(window.currentActiveMenu === 'story' && window.inStoryMode && window.isGridWalkingPhase);
+    }
+};
+
+window.updateMobileStoryKeys = function(isStory) {
+    const keys = document.querySelectorAll('.mobile-piano-key');
+    if (keys.length < 7) return;
+
+    if (isStory) {
+        keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'Konum'; keys[0].setAttribute('aria-label', 'Konumu Sorgula');
+        keys[1].setAttribute('data-key', 'ArrowLeft'); keys[1].textContent = '< Sol'; keys[1].setAttribute('aria-label', 'Sola Yürü');
+        keys[2].setAttribute('data-key', 'ArrowRight'); keys[2].textContent = 'Sağ >'; keys[2].setAttribute('aria-label', 'Sağa Yürü');
+        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F Bul'; keys[3].setAttribute('aria-label', 'Notayı Ara veya Al');
+        keys[4].textContent = '---'; keys[4].setAttribute('aria-label', 'Devre Dışı');
+        keys[5].textContent = '---'; keys[5].setAttribute('aria-label', 'Devre Dışı');
+        keys[6].textContent = '---'; keys[6].setAttribute('aria-label', 'Devre Dışı');
+    } else {
+        keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'C'; keys[0].setAttribute('aria-label', 'C Notası');
+        keys[1].setAttribute('data-key', 'd'); keys[1].textContent = 'D'; keys[1].setAttribute('aria-label', 'D Notası');
+        keys[2].setAttribute('data-key', 'e'); keys[2].textContent = 'E'; keys[2].setAttribute('aria-label', 'E Notası');
+        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F'; keys[3].setAttribute('aria-label', 'F Notası');
+        keys[4].setAttribute('data-key', 'g'); keys[4].textContent = 'G'; keys[4].setAttribute('aria-label', 'G Notası');
+        keys[5].setAttribute('data-key', 'a'); keys[5].textContent = 'A'; keys[5].setAttribute('aria-label', 'A Notası');
+        keys[6].setAttribute('data-key', 'b'); keys[6].textContent = 'B'; keys[6].setAttribute('aria-label', 'B Notası');
+    }
 };
 
 window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {

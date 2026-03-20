@@ -661,6 +661,10 @@ window.addEventListener('load', () => {
                 if (!window.isGridWalkingPhase) {
                     window.handleGameInput(note);
                 }
+            } else if (window.isStarted && window.currentActiveMenu === 'story') {
+                if (window.isGridWalkingPhase && window.inStoryMode) {
+                    if (window.handleStoryWalking) window.handleStoryWalking(note);
+                }
             }
         });
     });

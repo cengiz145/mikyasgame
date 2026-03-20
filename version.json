@@ -1,5 +1,5 @@
 {
-    "version":  "0.69",
-    "buildId":  1773994162,
-    "changelog":  "v1.30: Ekran Okuyucu (NVDA/JAWS) menü gezinim kopukluklarını çözen Dinamik ARIA Enjektörü eklendi."
+    "version":  "0.70",
+    "buildId":  1773997014,
+    "changelog":  "v1.31: TalkBack menü dışına çıkamama döngü hatası (Focus Trap) ile Hikaye modunda mobilden yürüme/tıklanamama sorunu tamamen çözüldü."
 }
