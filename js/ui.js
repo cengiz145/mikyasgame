@@ -729,6 +729,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => chatNicknameInput.focus(), 100);
             }
             if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet açıldı. Takma adınızı girin.');
+
+            // Presence Aşama 2: İlk Katılım ve Çıkış Kancası
+            if (window.hasJoinedChat === false && window.db) {
+                window.hasJoinedChat = true;
+                
+                // İlk katılım mesajı
+                window.db.ref('messages').push({
+                    nickname: "Sistem",
+                    text: "👋 Misafir sohbete katıldı.",
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                // Başlangıç Çıkış Kancası (Misafir)
+                window.disconnectRef = window.db.ref('messages').push();
+                window.disconnectRef.onDisconnect().set({
+                    nickname: "Sistem",
+                    text: "🚶 Misafir çevrimdışı oldu.",
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+            }
         } else {
             chatPanel.style.display = 'none';
             chatPanel.setAttribute('aria-hidden', 'true');
@@ -761,6 +781,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatSendBtn = document.getElementById('chat-send-btn');
     const chatMessagesList = document.getElementById('chat-messages');
     const chatMessagesContainer = document.querySelector('.chat-messages-container');
+    
+    // Presence (Durum) Değişkenleri (Global olarak ayarlandı)
+    window.currentChatUser = "Misafir";
+    window.hasJoinedChat = false;
 
     // Firebase tanımlı değilse veya arayüz yoksa dur
     if (!chatSendBtn || !chatMessagesList || !window.db) return;
@@ -791,6 +815,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
+            // Presence Aşama 2: İsim Güncelleme ve Kanca Yenileme
+            if (nickname !== window.currentChatUser && nickname !== "Sistem") {
+                window.currentChatUser = nickname;
+                if (window.disconnectRef) {
+                    window.disconnectRef.onDisconnect().cancel();
+                    window.disconnectRef = window.db.ref('messages').push();
+                    window.disconnectRef.onDisconnect().set({
+                        nickname: "Sistem",
+                        text: "🚶 " + window.currentChatUser + " çevrimdışı oldu.",
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            }
+
             window.db.ref('messages').push(messageData).then(() => {
                 chatMessageInput.value = ''; // Kullanıcı adı kalsın, sadece mesajı sil
                 chatMessageInput.focus(); // Art arda mesaj yazabilmesi için imleci tekrar mesaja odakla
@@ -820,6 +858,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const li = document.createElement('li');
         // NVDA için en doğal okuma biçimi "Batuhan: Merhaba" şeklindedir.
         li.innerHTML = `<strong>${escapeHTML(data.nickname)}:</strong> ${escapeHTML(data.text)}`;
+        
+        // Eğer mesaj sistemden geliyorsa özel CSS sınıfı ekle
+        if (data.nickname === "Sistem") {
+            li.classList.add('system-message');
+        }
         
         chatMessagesList.appendChild(li);
 

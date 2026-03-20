@@ -452,6 +452,16 @@
     word-break: break-word;
 }
 
+#chat-messages li.system-message {
+    background-color: transparent;
+    color: #ffb703;
+    font-style: italic;
+    font-weight: bold;
+    text-align: center;
+    border: 1px dashed #555;
+    padding: 6px 12px;
+}
+
 .chat-input-area {
     padding: 15px;
     background-color: #222;

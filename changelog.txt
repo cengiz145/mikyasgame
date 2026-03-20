@@ -1,5 +1,15 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.13] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- **SİSTEME GİRİŞ BİLDİRİMLERİ (Presence):** Canlı Sohbete katılan veya ayrılan oyuncuları anlık tespit edip NVDA eşliğinde odaya fısıldayan gelişmiş bir "Durum" altyapısı eklendi.
+  - Sohbet ilk kez açıldığında (Nokta tuşu ile) odaya tek seferlik "👋 Misafir sohbete katıldı." şeklinde karşılama bildirimi düşecek.
+  - Odanın sekmesini kapatan, oyundan veya internetten kopan oyuncular otomatik tespit edilecek ve "🚶 Misafir çevrimdışı oldu." mesajı verilecek. (Firebase Smart onDisconnect Hooks).
+  - Takma Ad girip mesaj gönderen oyuncuların bu çıkış (kopma) kancaları anında iptal edilerek, "🚶 [KullanıcıAdı] çevrimdışı oldu." formatında yeni isimlerine dinamik olarak aktarılacak / güncellenecek.
+  - Odaya yollanan bu sistem mesajları normal kullanıcı mesajlarından ayrılsın diye, hafif sarımsı, italik, kesikli kutu barındıran okunaklı `.system-message` tasarımıyla bezendi.
+  - Ayrıca `version.json` okumasında meydana gelen geçersiz karakter hatası (Blank Screen / Boş Ekran Çökmesi) ASCII kodlamasıyla kalıcı olarak onarıldı.
+
 [v1.12] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:
