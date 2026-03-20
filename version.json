@@ -1,5 +1,5 @@
 {
-    "version":  "0.73",
-    "buildId":  1774045582,
-    "changelog":  "v1.34: Kilitli modların haksız biçimde tıklanıp oynanabilmesi hatası (Progression Bypass) tamamen çözüldü."
+    "version":  "0.74",
+    "buildId":  1774049448,
+    "changelog":  "v1.35: Sürüm numarası körlüğü giderildi. Geçmiş mesajların odaklanmama ve canlı sohbet bildirimlerinin seslendirilmemesi hataları çözüldü."
 }

@@ -280,6 +280,7 @@ window.announceToScreenReader = function (text, forceFocus = true) {
         // index.html'de sabit olarak koyduğumuz sr-chat-reader'ı kullanıyoruz
         let liveAnnouncer = document.getElementById('sr-chat-reader');
         if (liveAnnouncer) {
+            liveAnnouncer.innerHTML = '';
             let msgNode = document.createElement('div');
             msgNode.textContent = text;
             liveAnnouncer.appendChild(msgNode);
@@ -1084,23 +1085,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const li = document.createElement('li');
+        li.setAttribute('tabindex', '0');
         
         if (data.nickname === "Sistem") {
             li.classList.add('system-message');
-            // Sistem mesajı için ekran okuyucu dostu gizli metin
-            const srText = `<span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Sistem mesajı: ${escapeHTML(data.text)}</span>`;
-            li.innerHTML = `${srText}<div class="wp-bubble" aria-hidden="true">${escapeHTML(data.text)}</div>`;
+            li.setAttribute('aria-label', `Sistem mesajı: ${escapeHTML(data.text)}`);
+            li.innerHTML = `<div class="wp-bubble" aria-hidden="true">${escapeHTML(data.text)}</div>`;
         } else {
             // Benim gönderdiğim mesaj mı yoksa başkasının mı?
             const isMe = data.nickname === chatNicknameInput.value.trim() && chatNicknameInput.value.trim() !== "";
             li.classList.add(isMe ? 'message-out' : 'message-in');
             
-            // Ekran Okuyucu Kusursuz Okuma Düzeni
-            const srText = `<span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">[${timeRaw}] ${escapeHTML(data.nickname)}: ${escapeHTML(data.text)}</span>`;
+            li.setAttribute('aria-label', `[${timeRaw}] ${escapeHTML(data.nickname)}: ${escapeHTML(data.text)}`);
             
             // Whatsapp Görsel Balonu
             li.innerHTML = `
-                ${srText}
                 <div class="wp-bubble" aria-hidden="true">
                     ${!isMe ? `<div class="wp-sender">${escapeHTML(data.nickname)}</div>` : ''}
                     <div class="wp-text">${escapeHTML(data.text)}</div>
