@@ -26,8 +26,8 @@ window.clickSound = new Howl({
 // Mobil cihazlarda menü seslerini devre dışı bırak
 const isMobileLocal = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
 if (isMobileLocal) {
-    window.hoverSound.play = function () { };
-    window.clickSound.play = function () { };
+    window.hoverSound.volume(0);
+    window.clickSound.volume(0);
 }
 
 window.correctSound = new Howl({

@@ -90,10 +90,9 @@ window.triggerStoryAnimations = function(index) {
         }, 50);
         setTimeout(() => {
             if (window.doorCloseSound) {
-                window.doorCloseSound.rate(1.5);
-                window.doorCloseSound.volume(0.6);
-                window.doorCloseSound.play();
-                setTimeout(() => window.doorCloseSound.rate(1.0), 1000);
+                let sid = window.doorCloseSound.play();
+                window.doorCloseSound.rate(1.5, sid);
+                window.doorCloseSound.volume(0.6, sid);
             }
         }, 200);
     } else if (index === 14) {

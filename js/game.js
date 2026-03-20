@@ -413,8 +413,8 @@ window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
         function playNextCoin() {
             if (playedCount < maxSoundPlays) {
                 if (window.getCoinsSound) {
-                    window.getCoinsSound.rate(currentRate);
-                    window.getCoinsSound.play();
+                    let sid = window.getCoinsSound.play();
+                    window.getCoinsSound.rate(currentRate, sid);
                 }
 
                 currentRate += 0.1;
@@ -736,18 +736,16 @@ document.addEventListener('keydown', function (event) {
 
     if (event.key === 'PageUp') {
         event.preventDefault();
-        if (window.bgMusic) {
-            let currentVolume = window.bgMusic.volume();
-            window.bgMusic.volume(Math.min(1.0, currentVolume + 0.01));
-        }
+        let currentVolume = Howler.volume();
+        Howler.volume(Math.min(1.0, currentVolume + 0.05));
+        if (window.announceToScreenReader) window.announceToScreenReader('Ses: ' + Math.round(Howler.volume() * 100), false);
         return;
     }
     if (event.key === 'PageDown') {
         event.preventDefault();
-        if (window.bgMusic) {
-            let currentVolume = window.bgMusic.volume();
-            window.bgMusic.volume(Math.max(0.0, currentVolume - 0.01));
-        }
+        let currentVolume = Howler.volume();
+        Howler.volume(Math.max(0.0, currentVolume - 0.05));
+        if (window.announceToScreenReader) window.announceToScreenReader('Ses: ' + Math.round(Howler.volume() * 100), false);
         return;
     }
 

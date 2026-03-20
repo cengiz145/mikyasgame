@@ -1,5 +1,5 @@
 {
-    "version":  "0.66",
-    "buildId":  1773989120,
-    "changelog":  "v1.27: Ses motorunu (Howler) tamamen çökerten klavye yazım hatası ve 3B stereo ses algoritmaları onarıldı."
+    "version":  "0.67",
+    "buildId":  1773989722,
+    "changelog":  "v1.28: Master Volume (Global Ses) kontrolcüsü PageUp/Down\u0027a eklendi ve üst üste binen jeton seslerinin pitch bozulmaları (cızırtılar) giderildi."
 }
