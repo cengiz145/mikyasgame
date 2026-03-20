@@ -245,26 +245,42 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
 window.announceToScreenReader = function (text, forceFocus = true) {
     text = window.localizeText(text);
 
-    let oldAnnouncer = document.getElementById('sr-focus-announcer');
-    if (oldAnnouncer) {
-        oldAnnouncer.remove();
-    }
-
-    let announcerDiv = document.createElement('div');
-    announcerDiv.id = 'sr-focus-announcer';
-    announcerDiv.setAttribute('tabindex', '-1');
-    announcerDiv.style.position = 'absolute';
-    announcerDiv.style.left = '-9999px';
-    announcerDiv.style.width = '1px';
-    announcerDiv.style.height = '1px';
-    announcerDiv.style.overflow = 'hidden';
-
     if (!forceFocus || window.isMobilePianokeyPressed) {
-        announcerDiv.setAttribute('aria-live', 'assertive');
-        announcerDiv.textContent = text; // innerText mobilde "boş" okumaya neden olabilir
-        document.body.appendChild(announcerDiv);
+        // Odaklanma gerektirmeyen CANLI YAYIN anonsları (Mobil "boş" hatası ve PC otomatik okuma çözümü)
+        // Sabit bir DOM elementi kullanmak her zaman daha güvenilirdir:
+        let liveAnnouncer = document.getElementById('sr-global-live-announcer');
+        if (!liveAnnouncer) {
+            liveAnnouncer = document.createElement('div');
+            liveAnnouncer.id = 'sr-global-live-announcer';
+            liveAnnouncer.setAttribute('aria-live', 'assertive');
+            liveAnnouncer.setAttribute('aria-atomic', 'true');
+            // Görsel olarak gizle ama ekran okuyucuya açık bırak
+            liveAnnouncer.style.position = 'absolute';
+            liveAnnouncer.style.left = '-9999px';
+            liveAnnouncer.style.width = '1px';
+            liveAnnouncer.style.height = '1px';
+            liveAnnouncer.style.overflow = 'hidden';
+            document.body.appendChild(liveAnnouncer);
+        }
+        liveAnnouncer.textContent = '';
+        setTimeout(() => {
+            liveAnnouncer.textContent = text;
+        }, 50);
     } else {
-        announcerDiv.textContent = text;
+        // PC'de doğrudan Odaklanarak okutma (Eski kararlı yöntem)
+        let oldAnnouncer = document.getElementById('sr-focus-announcer');
+        if (oldAnnouncer) {
+            oldAnnouncer.remove();
+        }
+        let announcerDiv = document.createElement('div');
+        announcerDiv.id = 'sr-focus-announcer';
+        announcerDiv.setAttribute('tabindex', '-1');
+        announcerDiv.style.position = 'absolute';
+        announcerDiv.style.left = '-9999px';
+        announcerDiv.style.width = '1px';
+        announcerDiv.style.height = '1px';
+        announcerDiv.style.overflow = 'hidden';
+        announcerDiv.innerText = text; // NVDA (PC) odaklanılan elementlerde innerText'i her zaman okur
         document.body.appendChild(announcerDiv);
         announcerDiv.focus();
     }
@@ -1056,13 +1072,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.chatReceiveSound.play();
             }
             
-            // "Boş" (empty) bug'ını tamamen bitirmek için kalıcı bir DOM ögesi olan sr-chat-reader'a yönlendiriyoruz
-            const srChatReader = document.getElementById('sr-chat-reader');
-            if (srChatReader) {
-                srChatReader.textContent = '';
-                setTimeout(() => {
-                    srChatReader.textContent = messageToRead;
-                }, 50);
+            // "Boş" (empty) bug'ını ve PC NVDA sessizliğini uyumlu şekilde bitirmek için announceToScreenReader'ı kullanıyoruz
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader(messageToRead, false); // forceFocus = false
             }
         }
     });
