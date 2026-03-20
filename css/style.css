@@ -503,3 +503,34 @@
     background-color: #ffd766;
     outline: none;
 }
+
+/* Mobil Görünüm Optimizasyonu (Kusursuz Sohbet Arayüzü) */
+@media (max-width: 768px) {
+    .chat-panel {
+        width: 95vw;
+        height: 75vh;
+        max-height: none;
+        bottom: 20px;
+        right: 2.5vw;
+        left: 2.5vw;
+        border-radius: 12px;
+        box-shadow: 0 -5px 25px rgba(0,0,0,0.9);
+    }
+    
+    .chat-toggle-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 15px 20px; /* Mobilde parmakla basmayı kolaylaştır */
+        font-size: 1.15rem;
+    }
+
+    .chat-input-area input {
+        font-size: 16px !important; /* iOS Safari'nin inputlara otomatik zoom yapmasını engeller */
+        padding: 12px;
+    }
+
+    #chat-send-btn {
+        padding: 12px;
+        font-size: 1.2rem;
+    }
+}

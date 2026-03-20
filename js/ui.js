@@ -784,6 +784,34 @@ document.addEventListener('DOMContentLoaded', () => {
             // Not: activeElement.blur() özelliği focusu bozduğu için kaldırıldı, toggleChat işini yapıyor.
         }
     });
+
+    // Mobil: İki Parmakla Çift Dokunma (2-Finger Double Tap) Jest Algılayıcısı
+    let lastTwoFingerTap = 0;
+    document.addEventListener('touchstart', (e) => {
+        // Eğer focus input/textarea/select üzerindeyse yoksay (yazışmayı bölmesin)
+        if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
+            return;
+        }
+
+        // Tam olarak 2 parmak ekrandaysa
+        if (e.touches.length === 2) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTwoFingerTap;
+            
+            // Eğer önce iki parmak dokunup hemen ardından tekrar 2 parmak dokunduysa (Çift Dokunuş)
+            // Süre aralığı 400ms'den kısa olmalı (mobil cihazlardaki tipik çift tıklama hızı)
+            if (tapLength < 450 && tapLength > 0) {
+                if (typeof window.toggleChat === 'function') {
+                    window.toggleChat();
+                    // Ekran okuyuculardan veya Safari'den varsayılan olay sızmasını engellemek
+                    if (e.cancelable) {
+                        e.preventDefault();
+                    }
+                }
+            }
+            lastTwoFingerTap = currentTime;
+        }
+    }, { passive: false });
 });
 
 // --- CANLI SOHBET SİSTEMİ VERİTABANI (FİREBASE) MANTIĞI ---

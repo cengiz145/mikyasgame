@@ -1,5 +1,5 @@
 {
-    "version": "0.55",
-    "buildId": 1773970000,
-    "changelog": "Canli sohbet icin buyuk guvenlik, mantik ve NVDA hata ayiklama yamasi eklendi. (v1.15)"
+    "version": "0.56",
+    "buildId": 1773972000,
+    "changelog": "Mobil uyumluluk, 2 parmak testleri ve ek UI dertleri cozuldu (v1.16)."
 }
