@@ -915,8 +915,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.isChatOpen && typeof window.toggleChat === 'function') {
                     window.toggleChat();
                 }
+
+                // Mesajın başarıyla gönderildiğini bildir (pencere kapanma anonsu ile karışmaması için 100ms gecikme)
+                setTimeout(() => {
+                    if (window.announceToScreenReader) {
+                        window.announceToScreenReader('Mesaj gönderildi.');
+                    }
+                }, 100);
             }).catch(error => {
                 console.error("Mesaj gönderilirken hata oluştu:", error);
+                
+                // Hata durumunda uyar
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.');
+                }
+                alert('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.');
             });
         }
     }
