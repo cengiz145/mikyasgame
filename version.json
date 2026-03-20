@@ -1,5 +1,5 @@
 {
-    "version":  "0.70",
-    "buildId":  1773997014,
-    "changelog":  "v1.31: TalkBack menü dışına çıkamama döngü hatası (Focus Trap) ile Hikaye modunda mobilden yürüme/tıklanamama sorunu tamamen çözüldü."
+    "version":  "0.71",
+    "buildId":  1774043923,
+    "changelog":  "v1.32: Ekran okuyucuların gereksiz yere çift anonslu (Uyarı, Uyarı) bildirim atma hatası giderildi."
 }

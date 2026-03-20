@@ -303,7 +303,6 @@ window.announceToScreenReader = function (text, forceFocus = true) {
         announcerDiv.style.width = '1px';
         announcerDiv.style.height = '1px';
         announcerDiv.style.overflow = 'hidden';
-        announcerDiv.setAttribute('role', 'alert'); 
         announcerDiv.innerText = text; 
         
         // Elementi DOM'a ekle ve NVDA PC'nin atlamaması için senkron olarak anında focusla
