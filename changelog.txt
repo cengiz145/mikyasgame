@@ -1,5 +1,14 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v1.14] - 2026-03-20
+
+### Eklenenler / Değiştirilenler:
+- **MESAJ GEÇMİŞİ VE SAAT ETİKETLERİ (Live Chat):** Sohbet penceresinin önceki mesajları (mesaj geçmişini) göstermemesi hatası bütünüyle giderildi.
+  - Firebase veritabanından mesaj çekimi optimize edildi (Index filtreleri rahatlatıldı); artık 7'den 70'e herkes sohbete girdiğinde en güncel 50 mesajı görebilecek.
+  - Bütün mesajların ön kısmına orijinal gönderilme zamanı (`[14:35]` formatında) damgalandı. Ekran okuyucu bu saati ve hemen ardından takma adı doğal bir hızda aktaracak.
+  - Sohbet (Nokta tuşu ile) açıldığında geçmişin siyah ekranda gizli kalması (Scroll kaymasının tepede kalması) problemi çözüldü. Arayüz açıldığı an en yeni (en alttaki) mesaja anında fiziksel olarak kaydırılacak.
+  - Kısayol iyileştirmesi: Nokta (.) tuşu artık sadece sohbeti güvenle "açmak" için özel olarak kodlandı. Kapatmak veya iptal etmek için sisteme resmi "ESC (Escape)" kısayolu tanımlandı. Ayrıca sohbet içerisine oyun komutlarının sızması (Harf kısayolları) kilitlendi.
+
 [v1.13] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:

@@ -1,5 +1,5 @@
 {
-    "version": "0.53",
-    "buildId": 1773966000,
-    "changelog": "Canli Sohbet (Presence) Gelismis Bildirimleri Eklendi"
+    "version": "0.54",
+    "buildId": 1773968250,
+    "changelog": "Mesaj gecmisi sorunlari, [Saat:Dakika] damgasi ve ESC guvenlik kilidi (v1.14) eklendi."
 }
