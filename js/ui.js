@@ -457,28 +457,41 @@ window.updateDifficultyMenuLocks = function () {
 
 // --- EVENTS ---
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Erişilebilirlik (ARIA) Dinamik Enjektörü ("Düğmelerin Soğukluğu" Düzeltmesi) ---
-    const navs = document.querySelectorAll('.menu-nav');
-    navs.forEach(nav => {
-        const ul = nav.querySelector('ul');
-        if (ul) {
-            ul.setAttribute('role', 'menu');
-            const lis = ul.querySelectorAll('li');
-            lis.forEach(li => li.setAttribute('role', 'none'));
-        }
-    });
+    // --- Erişilebilirlik (ARIA) Dinamik Enjektörü (Sessiz Semantik / Role Gizleme) ---
+    // Kullanıcı talebi: bölüm, bölge, düğme, grup gibi element rollerinin okunmaması.
+    const applySilentRoles = (root) => {
+        const elementsToNone = root.querySelectorAll ? root.querySelectorAll('.menu-container, nav, section, ul, li, div[role="group"], div[role="region"], div[role="presentation"]') : [];
+        elementsToNone.forEach(el => el.setAttribute('role', 'none'));
 
-    const menuButtons = document.querySelectorAll('.menu-button');
-    menuButtons.forEach(btn => {
-        btn.setAttribute('role', 'menuitem');
-    });
+        const buttonsToSilence = root.querySelectorAll ? root.querySelectorAll('button, .menu-button, .mobile-piano-key, [role="button"]') : [];
+        buttonsToSilence.forEach(btn => {
+            btn.setAttribute('role', 'button');
+            btn.setAttribute('aria-roledescription', '\xA0'); // Boşluk karakteri, NVDA sessiz okur
+        });
 
-    const containers = document.querySelectorAll('.menu-container');
-    containers.forEach(container => {
-        if (container.getAttribute('role') === 'presentation') {
-            container.setAttribute('role', 'region');
-        }
+        const dialogs = root.querySelectorAll ? root.querySelectorAll('[role="dialog"]') : [];
+        dialogs.forEach(el => el.setAttribute('aria-roledescription', '\xA0'));
+    };
+
+    applySilentRoles(document);
+    
+    // Sonradan yüklenen (dinamik) öğeler için kalkan
+    const silentObserver = new MutationObserver(mutations => {
+        mutations.forEach(m => {
+            if (m.addedNodes.length) {
+                m.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) { // ELEMENT_NODE
+                        applySilentRoles(node);
+                        if (node.tagName === 'BUTTON' || node.getAttribute('role') === 'button') {
+                            node.setAttribute('role', 'button');
+                            node.setAttribute('aria-roledescription', '\xA0');
+                        }
+                    }
+                });
+            }
+        });
     });
+    silentObserver.observe(document.body, { childList: true, subtree: true });
 
     // Hover Effects
     window.allMenuButtons.forEach((button) => {
