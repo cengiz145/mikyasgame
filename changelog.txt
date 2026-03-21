@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.91.0] - 2026-03-21
+
+### Eklenenler / Değiştirilenler:
+- Yeni sürüm numaralandırma sistemi başlatıldı. Bundan sonraki tüm sürümler "ara sürüm" (0.91.x serisi vb.) olarak yayınlanacaktır.
+
 [v1.21] - 2026-03-20
 
 ### Eklenenler / Değiştirilenler:
