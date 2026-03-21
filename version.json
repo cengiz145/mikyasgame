@@ -1,5 +1,5 @@
 {
-    "version":  "0.84",
-    "buildId":  1774084056,
-    "changelog":  "Odağı Geri Çağırma (Focus Return) sistemi A11y güncellemesi eklendi."
+    "version":  "0.85",
+    "buildId":  1774084667,
+    "changelog":  "Evrensel ESC ve Mobil Geri Tuşu Koruması (History API) A11y güncellemesi eklendi."
 }

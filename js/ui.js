@@ -260,6 +260,11 @@ window.lastFocusedElement = null;
 window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     if (!hideMenu || !showMenu) return;
 
+    // Mobil Geri Tuşu Koruması (Yeni bir alt menüye geçiliyorsa History'e ekle)
+    if (newActiveMenuName !== 'main' && newActiveMenuName !== 'game' && newActiveMenuName !== 'story') {
+        history.pushState({ modalOpen: true }, "");
+    }
+
     if (window.menuFocusTimeoutId) {
         clearTimeout(window.menuFocusTimeoutId);
     }
@@ -884,6 +889,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Evrensel ESC Tuşu ve Mobil Geri Tuşu Koruması
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        // Canlı sohbet kendi ESC dinleyicisine sahip
+        if (window.isChatOpen) return;
+        
+        const menusWithBackBtns = {
+            'store': 'store-back-btn',
+            'practice': 'practice-back-btn',
+            'difficulty': 'difficulty-back-btn',
+            'scoreboard': 'scoreboard-back-btn',
+            'achievements': 'achievements-back-btn',
+            'feedback': 'feedback-back-btn',
+            'stats': 'stats-back-btn'
+        };
+
+        if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {
+             const backBtn = document.getElementById(menusWithBackBtns[window.currentActiveMenu]);
+             if (backBtn) backBtn.click();
+        }
+    }
+});
+
+window.addEventListener('popstate', (e) => {
+    // 1. Canlı sohbet açıksa kapat
+    if (window.isChatOpen && typeof window.toggleChat === 'function') {
+        window.toggleChat();
+        history.pushState(null, "", "");
+        return;
+    }
+    
+    // 2. Alt menüler açıksa kapat
+    const menusWithBackBtns = {
+        'store': 'store-back-btn',
+        'practice': 'practice-back-btn',
+        'difficulty': 'difficulty-back-btn',
+        'scoreboard': 'scoreboard-back-btn',
+        'achievements': 'achievements-back-btn',
+        'feedback': 'feedback-back-btn',
+        'stats': 'stats-back-btn'
+    };
+    
+    if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {
+         const backBtn = document.getElementById(menusWithBackBtns[window.currentActiveMenu]);
+         if (backBtn) backBtn.click();
+         history.pushState(null, "", "");
+    }
+});
+
 // Menü içi ok tuşlarıyla gezinme işlevi
 document.addEventListener('keydown', function (event) {
     if (document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) {
@@ -961,6 +1015,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.isChatOpen = !window.isChatOpen;
 
         if (window.isChatOpen) {
+            history.pushState({ modalOpen: 'chat' }, "");
             window.lastFocusedElement = document.activeElement;
             chatPanel.style.display = 'flex';
             chatPanel.removeAttribute('aria-hidden');
