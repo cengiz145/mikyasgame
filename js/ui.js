@@ -1384,58 +1384,107 @@ document.addEventListener('DOMContentLoaded', () => {
                 const totalTokensLocal = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 addLocalSystemMessage(`Cüzdanınızdaki mevcut bakiye: ${totalTokensLocal} jeton.`);
             } else if (command === '/bilet') {
-                let currentUser = window.currentChatUser;
-                let nickInputValue = chatMessageInputLocal && document.getElementById('chat-nickname') ? document.getElementById('chat-nickname').value.trim() : "";
-                if (nickInputValue !== "") currentUser = nickInputValue;
-                
-                if (!currentUser || currentUser === "Misafir") {
-                    addLocalSystemMessage("Biletlerinizi sorgulamak için bir takma ad belirlemiş olmanız gerekir.");
-                } else {
-                    addLocalSystemMessage("Biletleriniz sorgulanıyor, lütfen bekleyin...");
+                if (isDev) {
+                    addLocalSystemMessage("Sistemdeki tüm açık biletler (Geri bildirimler) taranıyor...");
                     if (window.db) {
-                        window.db.ref('biletler/' + currentUser).once('value').then(snapshot => {
+                        window.db.ref('feedbacks').once('value').then(snapshot => {
                             if (!snapshot.exists() || !snapshot.hasChildren()) {
-                                addLocalSystemMessage("Şu anda adınıza tanımlı hiçbir bilet bulunamadı.");
+                                addLocalSystemMessage("Sistemde açık hiçbir bilet/geri bildirim bulunmuyor. Harika!");
                             } else {
                                 let count = 0;
                                 snapshot.forEach(child => {
                                     count++;
-                                    let biletData = child.val();
-                                    let mesaj = "";
-                                    let durum = "Geliştiriciye ulaştı ⏳"; // Varsayılan durum
-                                    
-                                    if (typeof biletData === 'string') {
-                                        mesaj = biletData;
-                                        let lowerMesaj = mesaj.toLowerCase();
-                                        if (lowerMesaj.includes('çözüldü') || lowerMesaj.includes('tamamlandı') || lowerMesaj.includes('kapandı')) {
-                                            durum = "Çözüldü ✅ (Bu bilet sonuçlandığı için sistemden otomatik silindi)";
-                                            child.ref.remove();
-                                        }
-                                    } else {
-                                        mesaj = biletData.message || biletData.mesaj || "Tanımsız Bilet İçeriği";
-                                        
-                                        // Dinamik durum analizi (Firebase'den gelen veri)
-                                        let rawDurum = (biletData.durum || biletData.status || "").toString().trim();
-                                        let lowerDurum = rawDurum.toLowerCase();
-                                        let lowerMesaj = mesaj.toLowerCase();
-                                        
-                                        if (lowerDurum.includes('çözülme') || lowerDurum.includes('aşamasında') || lowerDurum.includes('progress') || lowerDurum.includes('inceleniyor')) {
-                                            durum = "Çözülme aşamasında 🛠️";
-                                        } else if (lowerDurum.includes('çözüldü') || lowerDurum.includes('resolved') || lowerDurum.includes('tamamlandı') || lowerDurum.includes('kapatıldı') || lowerMesaj.includes('çözüldü') || lowerMesaj.includes('tamamlandı')) {
-                                            durum = "Çözüldü ✅ (Bu bilet sonuçlandığı için sistemden otomatik silindi)";
-                                            child.ref.remove();
-                                        } else if (rawDurum !== "") {
-                                            durum = rawDurum; // Admin tarafından yazılan özel metin eklendi
-                                        }
-                                    }
-                                    addLocalSystemMessage(`Bilet #${count} | Durum: ${durum} | Mesajınız: ${mesaj}`);
+                                    let fb = child.val();
+                                    addLocalSystemMessage(`Açık Bilet #${count} [Gönderen: ${fb.nickname}] => ${fb.message}`);
                                 });
+                                addLocalSystemMessage(`Toplam ${count} adet açık bilet listelendi. Yanıtlamak ve çözmek için: /çöz <takma_ad> <mesajınız>`);
                             }
-                        }).catch(err => {
-                            addLocalSystemMessage("Bağlantı hatası: Bilet verisine erişilemedi.");
                         });
+                    }
+                } else {
+                    let currentUser = window.currentChatUser;
+                    let nickInputValue = chatMessageInputLocal && document.getElementById('chat-nickname') ? document.getElementById('chat-nickname').value.trim() : "";
+                    if (nickInputValue !== "") currentUser = nickInputValue;
+                    
+                    if (!currentUser || currentUser === "Misafir") {
+                        addLocalSystemMessage("Biletlerinizi sorgulamak için bir takma ad belirlemiş olmanız gerekir.");
                     } else {
-                        addLocalSystemMessage("Veritabanı bağlantısı yok.");
+                        addLocalSystemMessage("Biletleriniz sorgulanıyor, lütfen bekleyin...");
+                        if (window.db) {
+                            let biletFound = false;
+                            let count = 0;
+                            
+                            // 1. Henüz çözülmemiş, gönderilen açık biletleri kontrol et
+                            window.db.ref('feedbacks').once('value').then(snapshot => {
+                                if (snapshot.exists()) {
+                                    snapshot.forEach(child => {
+                                        let fb = child.val();
+                                        if (fb.nickname && fb.nickname.toLowerCase() === currentUser.toLowerCase()) {
+                                            count++;
+                                            biletFound = true;
+                                            addLocalSystemMessage(`Bilet #${count} | Durum: Geliştiriciye ulaştı, inceleniyor ⏳ | Şikayetiniz: ${fb.message}`);
+                                        }
+                                    });
+                                }
+                                
+                                // 2. Çözülmüş veya yönetici tarafından yanıtlanmış biletleri kontrol et
+                                window.db.ref('biletler/' + currentUser).once('value').then(snap2 => {
+                                    if (snap2.exists() && snap2.hasChildren()) {
+                                        snap2.forEach(child => {
+                                            count++;
+                                            biletFound = true;
+                                            let biletData = child.val();
+                                            let mesaj = typeof biletData === 'string' ? biletData : (biletData.message || biletData.mesaj || "Tanımsız");
+                                            
+                                            addLocalSystemMessage(`Bilet #${count} | Durum: Çözüldü ✅ (Otomatik silindi) | Geliştirici Yanıtı: ${mesaj}`);
+                                            child.ref.remove(); // Okunduğu için sil
+                                        });
+                                    }
+                                    
+                                    if (!biletFound) {
+                                        addLocalSystemMessage("Şu anda adınıza tanımlı açık veya yeni çözülmüş hiçbir bilet bulunamadı.");
+                                    } else {
+                                        addLocalSystemMessage(`Toplam ${count} adet bilet-kayıt listelendi.`);
+                                    }
+                                });
+                            }).catch(err => {
+                                addLocalSystemMessage("Bağlantı hatası: Bilet veritabanına ulaşılamadı.");
+                            });
+                        } else {
+                            addLocalSystemMessage("Veritabanı bağlantısı yok.");
+                        }
+                    }
+                }
+            } else if (command === '/çöz' || command === '/coz') {
+                if (!isDev) { addLocalSystemMessage("Hata: Bu işlem için 'Geliştirici' yetkiniz yok."); return; }
+                if (args.length < 3) {
+                    addLocalSystemMessage("Kullanım: /çöz <oyuncu_takma_adı> <yanıt_mesajınız>");
+                } else {
+                    let targetUser = args[1];
+                    let replyMessage = args.slice(2).join(' ');
+                    
+                    if (window.db) {
+                        // 1. Oyuncuya yanıtı ilet (Biletler kutusuna düşsün)
+                        window.db.ref('biletler/' + targetUser).push({
+                            durum: "çözüldü",
+                            message: replyMessage,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                        
+                        // 2. Admin'in gelen kutusunu (feedbacks) temizle (Bu kişiden gelen tüm açık biletleri kapat)
+                        window.db.ref('feedbacks').once('value').then(snapshot => {
+                            if (snapshot.exists()) {
+                                let deletedCount = 0;
+                                snapshot.forEach(child => {
+                                    let fb = child.val();
+                                    if (fb.nickname && fb.nickname.toLowerCase() === targetUser.toLowerCase()) {
+                                        child.ref.remove();
+                                        deletedCount++;
+                                    }
+                                });
+                                addLocalSystemMessage(`Başarılı: ${targetUser} adlı oyuncuya yanıtınız iletildi ve oyuncunun bekleyen ${deletedCount} adet açık bileti sistemden tamamen silinerek kapatıldı!`);
+                            }
+                        });
                     }
                 }
             } else if (command === '/ban') {
