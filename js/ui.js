@@ -1067,6 +1067,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const nickname = nickVal;
         const text = msgVal;
 
+        // Spam Kalkanı: 2 Saniye Bekleme Süresi
+        let now = Date.now();
+        window.lastMessageTime = window.lastMessageTime || 0;
+
+        if (now - window.lastMessageTime < 2000) {
+            if (window.wrongSound) window.wrongSound.play();
+            let spamUyari = "Çok hızlı mesaj gönderiyorsunuz. Lütfen biraz bekleyin.";
+            if (window.announceToScreenReader) window.announceToScreenReader(spamUyari);
+            return; // Gönderimi iptal et ve sistemi koru!
+        }
+
+        // Süre kuralına uyulduysa yeni zamanı kaydet ve işleme devam et
+        window.lastMessageTime = now;
+
         if (nickname.toLowerCase() === 'sistem') {
             if (window.announceToScreenReader) window.announceToScreenReader('Bu takma adı kullanamazsınız.', false);
             chatNicknameInput.focus();
