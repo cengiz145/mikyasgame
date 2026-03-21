@@ -779,7 +779,7 @@ window.handlePracticeInput = function(key) {
     if (exitBtn) {
         exitBtn.addEventListener('click', function () {
             if (window.clickSound) window.clickSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader('Oyundan çıkış yapılıyor.');
+            if (window.announceToScreenReader) window.announceToScreenReader('Oyundan çıkmak için lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
             setTimeout(() => { window.close(); }, 1500);
         });
     }

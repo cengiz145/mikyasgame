@@ -288,33 +288,42 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             window.updateMobileKeysVisibility();
             window.currentFocusIndex = 0;
             
-            // 1. Önce yeni açılan menünün H1 başlığını bul ve ekran okuyucuya anons et
+            // 1. "Boş" uyarısını engellemek için anında yeni menünün H1 başlığına odaklan
             let menuTitle = showMenu.querySelector('h1');
-            let titleText = menuTitle ? (menuTitle.innerText || menuTitle.textContent) : "";
             
-            // Dinamik Süre Hesaplama: Her harf için ortalama 60 milisaniye ver.
-            // Ancak metin çok kısaysa bile en az 1000ms (1 saniye) bekle (Math.max ile).
-            let dynamicDelay = Math.max(1000, titleText.length * 60);
-
-            if (titleText && window.announceToScreenReader) {
-                window.announceToScreenReader(titleText);
-            }
-            
-            // Sabit 1000ms yerine, hesapladığımız dynamicDelay değişkenini kullan!
-            window.menuFocusTimeoutId = setTimeout(() => {
-                // SADECE Ana Menü'ye dönüyorsak ve hafızada bir nesne varsa ona odaklan!
+            if (menuTitle) {
+                menuTitle.setAttribute('tabindex', '-1'); // Odaklanılabilir yap
+                menuTitle.focus(); // Anında odaklan, title'ı ekran okuyucuya okut
+                
+                let titleText = menuTitle.innerText || menuTitle.textContent;
+                let dynamicDelay = Math.max(1000, titleText.length * 60);
+                
+                // Başlık okunduktan sonra asıl ilk öğeye (butona) geç
+                window.menuFocusTimeoutId = setTimeout(() => {
+                    if (newActiveMenuName === 'main' && window.lastFocusedElement && document.body.contains(window.lastFocusedElement)) {
+                        window.lastFocusedElement.focus();
+                        window.lastFocusedElement = null; // Hafızayı temizle
+                    } else {
+                        let focusables = Array.from(showMenu.querySelectorAll('.menu-button, button, [tabindex="0"], input, select, textarea'));
+                        let firstFocusable = focusables.find(el => el.getAttribute('aria-label') !== 'Menü sonu, başa dönülüyor' && el !== menuTitle);
+                        if (firstFocusable) {
+                            firstFocusable.focus();
+                        }
+                    }
+                }, dynamicDelay);
+            } else {
+                // Eğer başlık yoksa doğrudan ilk öğeye odaklan, boşluğa (body) düşürme
                 if (newActiveMenuName === 'main' && window.lastFocusedElement && document.body.contains(window.lastFocusedElement)) {
                     window.lastFocusedElement.focus();
-                    window.lastFocusedElement = null; // Hafızayı temizle
+                    window.lastFocusedElement = null;
                 } else {
-                    // Güvenlik Ağı: Buton silinmişse yeni menünün ilk butonuna odaklan (Odak kapanı harici)
                     let focusables = Array.from(showMenu.querySelectorAll('.menu-button, button, [tabindex="0"], input, select, textarea'));
                     let firstFocusable = focusables.find(el => el.getAttribute('aria-label') !== 'Menü sonu, başa dönülüyor');
                     if (firstFocusable) {
                         firstFocusable.focus();
                     }
                 }
-            }, dynamicDelay); // Ekran okuyucu başlığı okurken lafı kesilmesin
+            }
         }, 50);
     }, 300);
 
