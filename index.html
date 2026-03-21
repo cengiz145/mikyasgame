@@ -345,12 +345,12 @@
                 style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
                 <p id="feedback-desc" aria-live="polite">Lütfen oyun hakkında geri bildiriminizi paylaşın.</p>
 
-                <form id="feedback-form" action="#" method="POST" style="margin-top: 15px;">
-                    <!-- Google Form'un entegrasyonu için form oluşturulmuştur. action ve name attributeleri daha sonra Google Forms API'nize göre güncellenmelidir. -->
+                <form id="feedback-form" onsubmit="event.preventDefault();">
+                    <!-- Geri bildirim formu Firebase entegrasyonuna hazırlandı -->
                     <div style="margin-bottom: 15px;">
                         <label for="feedback-name" style="display: block; margin-bottom: 5px; color: #ffb703;">Adınız
                             (İsteğe Bağlı):</label>
-                        <input type="text" id="feedback-name" name="entry.1166239628" aria-label="Adınızı buraya yazın"
+                        <input type="text" id="feedback-name" aria-label="Adınızı buraya yazın"
                             style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; font-family: inherit; font-size: 1rem;"
                             placeholder="Adınız">
                     </div>
@@ -358,7 +358,7 @@
                     <div style="margin-bottom: 15px;">
                         <label for="feedback-category"
                             style="display: block; margin-bottom: 5px; color: #ffb703;">Kategori Seçin:</label>
-                        <select id="feedback-category" name="entry.1001484363"
+                        <select id="feedback-category"
                             style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; cursor: pointer; text-align: left; font-size: 1rem;">
                             <option value="Hata"
                                 aria-label="Hata önerin. Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.">
@@ -372,7 +372,7 @@
                     <div style="margin-bottom: 15px;">
                         <label for="feedback-text" style="display: block; margin-bottom: 5px; color: #ffb703;">Biletiniz
                             - Mesajınız:</label>
-                        <textarea id="feedback-text" name="entry.150314719" rows="5"
+                        <textarea id="feedback-text" rows="5"
                             aria-label="Biletiniz - Mesajınızı buraya yazın"
                             style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; resize: vertical; font-family: inherit; font-size: 1rem;"
                             placeholder="Bildirmek istediğiniz sorunu veya harika önerilerinizi buraya yazabilirsiniz."></textarea>
@@ -538,7 +538,7 @@
     <script src="yardim.js"></script>
 
     <script>
-        const UYGULAMA_SURUMU = "0.85";
+        const UYGULAMA_SURUMU = "0.86";
     </script>
 
     <script src="js/firebase.js"></script>

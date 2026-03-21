@@ -1,5 +1,5 @@
 {
-    "version":  "0.85",
-    "buildId":  1774084667,
-    "changelog":  "Evrensel ESC ve Mobil Geri Tuşu Koruması (History API) A11y güncellemesi eklendi."
+    "version":  "0.86",
+    "buildId":  1774089022,
+    "changelog":  "Geri bildirim formu Firebase entegrasyonu için (Adım 1) HTML bazında temizlendi."
 }
