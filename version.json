@@ -1,5 +1,5 @@
 {
-    "version":  "0.89",
-    "buildId":  1774090952,
-    "changelog":  "Menü tıklama sesi panlamadan ayrıldı (Merkeze sabitlendi)"
+    "version":  "0.90",
+    "buildId":  1774091197,
+    "changelog":  "Menü açılışlarında odak tuzağının yanlışlıkla seçilmesi sorunu çözüldü."
 }

@@ -307,8 +307,9 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
                     window.lastFocusedElement.focus();
                     window.lastFocusedElement = null; // Hafızayı temizle
                 } else {
-                    // Güvenlik Ağı: Buton silinmişse yeni menünün ilk butonuna veya h1 başlığına odaklan
-                    let firstFocusable = showMenu.querySelector('.menu-button, button, [tabindex="0"], input, select, textarea');
+                    // Güvenlik Ağı: Buton silinmişse yeni menünün ilk butonuna odaklan (Odak kapanı harici)
+                    let focusables = Array.from(showMenu.querySelectorAll('.menu-button, button, [tabindex="0"], input, select, textarea'));
+                    let firstFocusable = focusables.find(el => el.getAttribute('aria-label') !== 'Menü sonu, başa dönülüyor');
                     if (firstFocusable) {
                         firstFocusable.focus();
                     }
