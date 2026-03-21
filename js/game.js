@@ -1,5 +1,15 @@
 // game.js - Ana Oyun Döngüsü ve Motor İşlevleri
 
+// Boşluk tuşuna ve yön tuşlarına basıldığında sayfanın aşağı/yukarı kaymasını engelle
+window.addEventListener('keydown', function(event) {
+    if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) {
+        // Eğer oyuncu input/textarea içindeyse engelleme
+        if (event.target.tagName !== "INPUT" && event.target.tagName !== "TEXTAREA") {
+            event.preventDefault(); 
+        }
+    }
+}, { passive: false });
+
 // --- İSTATİSTİK SIFIRLAMA (V1.33 YAMASI) ---
 if (!localStorage.getItem('hfzReset_v1_33')) {
     localStorage.removeItem('hafizaGuvenModes');
@@ -460,12 +470,28 @@ window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
             } else {
                 setTimeout(() => {
                     if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
+                    
+                    // Oyun bittiğinde imleci 'Yeniden Dene' veya 'Ana Menü' butonuna zorla
+                    setTimeout(() => {
+                        let retryBtn = document.getElementById('mobile-replay-btn'); 
+                        let backBtn = document.getElementById('game-back-btn');
+                        if (retryBtn && retryBtn.style.display !== 'none') retryBtn.focus();
+                        else if (backBtn) backBtn.focus();
+                    }, 100);
                 }, 400);
             }
         }
         playNextCoin();
     } else {
         if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
+        
+        // Oyun bittiğinde imleci 'Yeniden Dene' veya 'Ana Menü' butonuna zorla
+        setTimeout(() => {
+            let retryBtn = document.getElementById('mobile-replay-btn'); 
+            let backBtn = document.getElementById('game-back-btn');
+            if (retryBtn && retryBtn.style.display !== 'none') retryBtn.focus();
+            else if (backBtn) backBtn.focus();
+        }, 100);
     }
 
     if (window.pianoNotes) for (let k in window.pianoNotes) window.pianoNotes[k].stop();
