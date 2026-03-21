@@ -1368,8 +1368,37 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (command === '/jeton' || command === '/bakiye') {
                 const totalTokensLocal = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 addLocalSystemMessage(`Cüzdanınızdaki mevcut bakiye: ${totalTokensLocal} jeton.`);
+            } else if (command === '/bilet') {
+                let currentUser = window.currentChatUser;
+                let nickInputValue = chatMessageInputLocal && document.getElementById('chat-nickname') ? document.getElementById('chat-nickname').value.trim() : "";
+                if (nickInputValue !== "") currentUser = nickInputValue;
+                
+                if (!currentUser || currentUser === "Misafir") {
+                    addLocalSystemMessage("Biletlerinizi sorgulamak için bir takma ad belirlemiş olmanız gerekir.");
+                } else {
+                    addLocalSystemMessage("Biletleriniz sorgulanıyor, lütfen bekleyin...");
+                    if (window.db) {
+                        window.db.ref('biletler/' + currentUser).once('value').then(snapshot => {
+                            if (!snapshot.exists() || !snapshot.hasChildren()) {
+                                addLocalSystemMessage("Şu anda adınıza tanımlı hiçbir bilet bulunamadı.");
+                            } else {
+                                let count = 0;
+                                snapshot.forEach(child => {
+                                    count++;
+                                    let biletData = child.val();
+                                    let mesaj = typeof biletData === 'string' ? biletData : (biletData.message || biletData.mesaj || "Tanımsız Bilet İçeriği");
+                                    addLocalSystemMessage(`Bilet #${count}: ${mesaj}`);
+                                });
+                            }
+                        }).catch(err => {
+                            addLocalSystemMessage("Bağlantı hatası: Bilet verisine erişilemedi.");
+                        });
+                    } else {
+                        addLocalSystemMessage("Veritabanı bağlantısı yok.");
+                    }
+                }
             } else if (command === '/yardim' || command === '/yardım') {
-                addLocalSystemMessage("Mevcut komutlar: /temizle (Sohbeti siler), /saat (Zamanı gösterir), /jeton (Bakiyenizi söyler), /yardım (Bu listeyi açar).");
+                addLocalSystemMessage("Mevcut komutlar: /temizle, /saat, /jeton, /bilet, /yardım.");
             } else {
                 addLocalSystemMessage("Bilinmeyen komut. Komutları öğrenmek için /yardım yazabilirsiniz.");
             }
