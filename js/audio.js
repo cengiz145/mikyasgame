@@ -182,7 +182,7 @@ window.updatePan = function (index, total) {
         xPos = (index / (total - 1)) * 2 - 1;
     }
     window.hoverSound.stereo ? window.hoverSound.stereo(xPos) : window.hoverSound.pos(xPos, 0, 0);
-    window.clickSound.stereo ? window.clickSound.stereo(xPos) : window.clickSound.pos(xPos, 0, 0);
+    window.clickSound.stereo ? window.clickSound.stereo(0) : window.clickSound.pos(0, 0, 0); // Tıklama sesi her zaman merkezde sabitlendi
 };
 
 window.playPianoNoteSingle = function (key) {

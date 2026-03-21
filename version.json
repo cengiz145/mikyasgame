@@ -1,5 +1,5 @@
 {
-    "version":  "0.88",
-    "buildId":  1774089790,
-    "changelog":  "Geri Bildirim formu Firebase JS entegrasyonu (Adım 2) eklendi."
+    "version":  "0.89",
+    "buildId":  1774090952,
+    "changelog":  "Menü tıklama sesi panlamadan ayrıldı (Merkeze sabitlendi)"
 }
