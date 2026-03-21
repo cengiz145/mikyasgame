@@ -1,5 +1,5 @@
 {
-    "version":  "0.81",
-    "buildId":  1774079801,
-    "changelog":  "Bellek (RAM) koruma zırhı eklendi: Hayalet jeton döngüsü ve kayıp zamanlayıcılar (memory leak) düzeltildi."
+    "version":  "0.82",
+    "buildId":  1774082036,
+    "changelog":  "Mobil ekran okuyucu A11y iyileştirmeleri eklendi: Viewport kilidi ve CSS dokunma engelleri."
 }
