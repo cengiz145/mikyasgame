@@ -289,6 +289,7 @@ window.playGameSequence = function () {
     const speedMs = Math.max(200, 600 - ((window.gameSequence.length - 1) * 50));
 
     function playNextSeqNote() {
+        if (!window.isStarted) return;
         if (!window.gameIsActive) return;
         if (noteIndex < window.gameSequence.length) {
             if (window.clockTickSound && window.clockTickSound.playing()) window.clockTickSound.pause();
@@ -316,6 +317,7 @@ window.playGameSequence = function () {
 
             clearTimeout(window.replayBtnTimeout);
             window.replayBtnTimeout = setTimeout(() => {
+                if (!window.isStarted) return;
                 if (window.gameIsActive && !window.isComputerPlaying) {
                     if (gameStatus) gameStatus.style.display = 'none';
                     if (replayBtn && window.isMobileDevice) {
@@ -331,6 +333,7 @@ window.playGameSequence = function () {
 };
 
 window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
+    window.isStarted = false;
     window.isStarting = false;
     clearTimeout(window.sequenceTimeoutId);
 
