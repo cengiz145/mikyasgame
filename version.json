@@ -1,5 +1,5 @@
 {
-    "version":  "0.82",
-    "buildId":  1774082036,
-    "changelog":  "Mobil ekran okuyucu A11y iyileştirmeleri eklendi: Viewport kilidi ve CSS dokunma engelleri."
+    "version":  "0.83",
+    "buildId":  1774083040,
+    "changelog":  "Mobil ekran okuyucu ses kilidi kırıcı ve Modal odak kapanı (A11y) eklendi."
 }

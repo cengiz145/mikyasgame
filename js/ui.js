@@ -610,11 +610,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storeBtnMain && storeBackBtn) {
         storeBtnMain.addEventListener('click', () => {
             window.switchMenu(window.mainMenu, window.storeMenu, 'store');
+            document.getElementById('main-menu-container').setAttribute('aria-hidden', 'true');
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
             if (window.announceToScreenReader) window.announceToScreenReader(`Mağazaya hoş geldiniz. Mevcut jetonunuz: ${totalTokens}`);
         });
         storeBackBtn.addEventListener('click', () => {
             window.switchMenu(window.storeMenu, window.mainMenu, 'main');
+            document.getElementById('main-menu-container').removeAttribute('aria-hidden');
         });
     }
 
@@ -952,6 +954,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.isChatOpen) {
             chatPanel.style.display = 'flex';
             chatPanel.removeAttribute('aria-hidden');
+            document.getElementById('main-menu-container').setAttribute('aria-hidden', 'true');
             const chatMessageInputLocal = document.getElementById('chat-message-input');
             if (chatNicknameInput && chatNicknameInput.style.display !== 'none') {
                 setTimeout(() => chatNicknameInput.focus(), 100);
@@ -995,6 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             chatPanel.style.display = 'none';
             chatPanel.setAttribute('aria-hidden', 'true');
+            document.getElementById('main-menu-container').removeAttribute('aria-hidden');
             if (chatToggleBtn) {
                 setTimeout(() => chatToggleBtn.focus(), 100);
             }

@@ -194,3 +194,26 @@ window.playPianoNoteSingle = function (key) {
         window.pianoNotes[key].seek(0.045, soundId);
     }
 };
+
+let isAudioUnlocked = false;
+function unlockMobileAudio() {
+    if (isAudioUnlocked) return;
+    const ctx = window.audioCtx || (window.AudioContext ? new window.AudioContext() : new window.webkitAudioContext());
+    if (ctx && ctx.state === 'suspended') {
+        ctx.resume();
+    }
+    // Sessiz frekans ile kilidi aç
+    if (ctx) {
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = 0; 
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        oscillator.start(0);
+        oscillator.stop(0.001);
+    }
+    isAudioUnlocked = true;
+}
+// Sadece ilk etkileşimde çalışıp kendini imha etsin
+document.addEventListener('touchstart', unlockMobileAudio, { once: true });
+document.addEventListener('click', unlockMobileAudio, { once: true });
