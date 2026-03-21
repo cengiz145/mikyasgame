@@ -1339,6 +1339,48 @@ document.addEventListener('DOMContentLoaded', () => {
         const nickname = nickVal;
         const text = msgVal;
 
+        // --- GİZLİ SOHBET KOMUTLARI (CLIENT-SIDE) ---
+        if (text.startsWith('/')) {
+            const command = text.split(' ')[0].toLowerCase();
+            const chatMessagesListLocal = document.getElementById('chat-messages');
+            const chatMessagesContainerLocal = document.querySelector('.chat-messages-container');
+            const chatMessageInputLocal = document.getElementById('chat-message-input');
+
+            function addLocalSystemMessage(msgText) {
+                const li = document.createElement('li');
+                li.classList.add('system-message');
+                li.setAttribute('tabindex', '0');
+                li.setAttribute('aria-label', `Sistem mesajı: ${escapeHTML(msgText)}`);
+                li.innerHTML = `<div class="wp-bubble" aria-hidden="true">${escapeHTML(msgText)}</div>`;
+                if (chatMessagesListLocal) chatMessagesListLocal.appendChild(li);
+                
+                if (chatMessagesContainerLocal) {
+                    setTimeout(() => chatMessagesContainerLocal.scrollTop = chatMessagesContainerLocal.scrollHeight, 10);
+                }
+                if (window.announceToScreenReader) window.announceToScreenReader(msgText, false);
+            }
+
+            if (command === '/temizle') {
+                if (chatMessagesListLocal) chatMessagesListLocal.innerHTML = '';
+                addLocalSystemMessage("Sohbet geçmişiniz (sadece sizin ekranınızda) temizlendi.");
+            } else if (command === '/saat' || command === '/zaman') {
+                addLocalSystemMessage("Şu anki cihaz saati: " + new Date().toLocaleTimeString('tr-TR'));
+            } else if (command === '/jeton' || command === '/bakiye') {
+                const totalTokensLocal = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+                addLocalSystemMessage(`Cüzdanınızdaki mevcut bakiye: ${totalTokensLocal} jeton.`);
+            } else if (command === '/yardim' || command === '/yardım') {
+                addLocalSystemMessage("Mevcut komutlar: /temizle (Sohbeti siler), /saat (Zamanı gösterir), /jeton (Bakiyenizi söyler), /yardım (Bu listeyi açar).");
+            } else {
+                addLocalSystemMessage("Bilinmeyen komut. Komutları öğrenmek için /yardım yazabilirsiniz.");
+            }
+
+            if (chatMessageInputLocal) {
+                chatMessageInputLocal.value = '';
+                chatMessageInputLocal.focus();
+            }
+            return; // Firebase veritabanına göndermeden sadece oyuncunun ekranında çalıştır ve bitir!
+        }
+
         // Spam Kalkanı: 2 Saniye Bekleme Süresi
         let now = Date.now();
         window.lastMessageTime = window.lastMessageTime || 0;
