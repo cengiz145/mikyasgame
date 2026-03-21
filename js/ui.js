@@ -1391,17 +1391,24 @@ document.addEventListener('DOMContentLoaded', () => {
                                     
                                     if (typeof biletData === 'string') {
                                         mesaj = biletData;
+                                        let lowerMesaj = mesaj.toLowerCase();
+                                        if (lowerMesaj.includes('çözüldü') || lowerMesaj.includes('tamamlandı') || lowerMesaj.includes('kapandı')) {
+                                            durum = "Çözüldü ✅ (Bu bilet sonuçlandığı için sistemden otomatik silindi)";
+                                            child.ref.remove();
+                                        }
                                     } else {
                                         mesaj = biletData.message || biletData.mesaj || "Tanımsız Bilet İçeriği";
                                         
                                         // Dinamik durum analizi (Firebase'den gelen veri)
                                         let rawDurum = (biletData.durum || biletData.status || "").toString().trim();
                                         let lowerDurum = rawDurum.toLowerCase();
+                                        let lowerMesaj = mesaj.toLowerCase();
                                         
                                         if (lowerDurum.includes('çözülme') || lowerDurum.includes('aşamasında') || lowerDurum.includes('progress') || lowerDurum.includes('inceleniyor')) {
                                             durum = "Çözülme aşamasında 🛠️";
-                                        } else if (lowerDurum.includes('çözüldü') || lowerDurum.includes('resolved') || lowerDurum.includes('tamamlandı') || lowerDurum.includes('kapatıldı')) {
-                                            durum = "Çözüldü ✅";
+                                        } else if (lowerDurum.includes('çözüldü') || lowerDurum.includes('resolved') || lowerDurum.includes('tamamlandı') || lowerDurum.includes('kapatıldı') || lowerMesaj.includes('çözüldü') || lowerMesaj.includes('tamamlandı')) {
+                                            durum = "Çözüldü ✅ (Bu bilet sonuçlandığı için sistemden otomatik silindi)";
+                                            child.ref.remove();
                                         } else if (rawDurum !== "") {
                                             durum = rawDurum; // Admin tarafından yazılan özel metin eklendi
                                         }
