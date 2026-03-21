@@ -1,5 +1,5 @@
 {
-    "version":  "0.78",
-    "buildId":  1774075336,
-    "changelog":  "Browser ana ekranını ve sekmeleri gizlemek için Tam Ekran Modu (Immersive Mod) eklendi"
+    "version":  "0.79",
+    "buildId":  1774078230,
+    "changelog":  "Anlık ekran okuyucu uyarılarının mobil cihazlarda buton gibi tıklanabilir nesneler olarak gözükmesi (focus hijacking) onarıldı"
 }

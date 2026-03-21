@@ -313,7 +313,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     }
 };
 
-window.announceToScreenReader = function (text, forceFocus = true) {
+window.announceToScreenReader = function (text, forceFocus = false) {
     text = window.localizeText(text);
 
     if (!forceFocus || window.isMobilePianokeyPressed) {
