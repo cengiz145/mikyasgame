@@ -111,6 +111,49 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Cihaz açıldığında mevcut verileri de Firebase'e güncelle
             window.syncStatsToFirebase();
+            
+            // --- Yasaklama (Ban) Dinleyicisi ---
+            window.db.ref('banned_users').on('value', (snapshot) => {
+                let chatUser = window.currentChatUser || localStorage.getItem('chatUsername');
+                if (chatUser && snapshot.exists() && snapshot.val()[chatUser] === true) {
+                    localStorage.clear();
+                    document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalıcı olarak uzaklaştırıldınız.</h1>";
+                    if (window.announceToScreenReader) window.announceToScreenReader("Erişim engellendi. Sunucudan kalıcı olarak uzaklaştırıldınız.");
+                    setInterval(() => { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalıcı olarak uzaklaştırıldınız.</h1>"; }, 100);
+                }
+            });
+            
+            // --- Özel Mesaj (PM) Dinleyicisi ---
+            let currentChatUserForPM = window.currentChatUser || localStorage.getItem('chatUsername');
+            if (currentChatUserForPM && currentChatUserForPM !== "Misafir") {
+                let pmRef = window.db.ref('private_messages/' + currentChatUserForPM).limitToLast(1);
+                const gameLoadTimeForPM = Date.now();
+                pmRef.on('child_added', (snapshot) => {
+                    let pmData = snapshot.val();
+                    // Sadece oyun açıldıktan sonra gelen yeni mesajları al (Geçmiştekileri tekrar tekrar okumasın)
+                    if (pmData.timestamp && pmData.timestamp > gameLoadTimeForPM) {
+                        let fMessage = `[Özel Mesaj] ${pmData.from} diyor ki: ${pmData.text}`;
+                        
+                        const chatMsgList = document.getElementById('chat-messages');
+                        if (chatMsgList) {
+                            const li = document.createElement('li');
+                            li.classList.add('system-message');
+                            li.style.color = '#ffcc00'; // PM Rengi
+                            li.setAttribute('tabindex', '0');
+                            li.setAttribute('aria-label', fMessage);
+                            // Güvenlik amaçlı escapeHTML
+                            function sEscapeHTML(str) { return !str ? '' : str.toString().replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)); }
+                            li.innerHTML = `<div class="wp-bubble" aria-hidden="true" style="background:#5a4a15; border-left:4px solid #ffcc00; color:#fff;"><strong style="color:#ffcc00;">[ÖZEL MESAJ]</strong> ${sEscapeHTML(pmData.from)}: ${sEscapeHTML(pmData.text)}</div>`;
+                            chatMsgList.appendChild(li);
+                            const chatCont = document.querySelector('.chat-messages-container');
+                            if (chatCont) setTimeout(() => chatCont.scrollTop = chatCont.scrollHeight, 10);
+                        }
+                        
+                        if (window.chatReceiveSound) window.chatReceiveSound.play();
+                        if (window.announceToScreenReader) window.announceToScreenReader(fMessage, false);
+                    }
+                });
+            }
         }
     }, 1000);
 });

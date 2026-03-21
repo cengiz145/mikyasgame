@@ -1430,8 +1430,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         addLocalSystemMessage("Veritabanı bağlantısı yok.");
                     }
                 }
+            } else if (command === '/ban') {
+                if (args.length < 2) {
+                    addLocalSystemMessage("Kullanım: /ban <takma_ad>");
+                } else {
+                    let targetUser = args[1];
+                    if (window.db) {
+                        window.db.ref('banned_users/' + targetUser).set(true);
+                        addLocalSystemMessage(`${targetUser} adlı oyuncu kalıcı olarak uzaklaştırıldı.`);
+                    }
+                }
+            } else if (command === '/pm') {
+                if (args.length < 3) {
+                    addLocalSystemMessage("Kullanım: /pm <takma_ad> <mesajınız>");
+                } else {
+                    let targetUser = args[1];
+                    let pmMessage = args.slice(2).join(' ');
+                    let sender = window.currentChatUser;
+                    let nickInputValue = chatMessageInputLocal && document.getElementById('chat-nickname') ? document.getElementById('chat-nickname').value.trim() : "";
+                    if (nickInputValue !== "") sender = nickInputValue;
+                    if (!sender || sender === "Misafir") sender = "Gizli Kullanıcı";
+                    
+                    if (window.db) {
+                        window.db.ref('private_messages/' + targetUser).push({
+                            from: sender,
+                            text: pmMessage,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                        addLocalSystemMessage(`[Siz -> ${targetUser}]: ${pmMessage}`);
+                    }
+                }
             } else if (command === '/yardim' || command === '/yardım') {
-                addLocalSystemMessage("Mevcut komutlar: /temizle, /saat, /jeton, /bilet, /yardım.");
+                addLocalSystemMessage("Mevcut komutlar: /temizle, /saat, /jeton, /bilet, /ban, /pm, /yardım.");
             } else {
                 addLocalSystemMessage("Bilinmeyen komut. Komutları öğrenmek için /yardım yazabilirsiniz.");
             }
