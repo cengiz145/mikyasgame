@@ -682,8 +682,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         practiceBackBtn.addEventListener('click', () => {
+            if (window.practiceNextTimeout) {
+                clearTimeout(window.practiceNextTimeout); // Arkada bekleyen komutu yok et
+            }
+            window.inPracticeTutorial = false; // Eğitim durumunu güvenle kapat
+            window.isDialogPhase = false; // Diyalogları sıfırla
+
             window.switchMenu(window.practiceMenu, window.mainMenu, 'main');
-            window.inPracticeTutorial = false;
             if (window.bgMusic && !window.bgMusic.playing()) window.bgMusic.play();
         });
     }

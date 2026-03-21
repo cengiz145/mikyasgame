@@ -694,7 +694,7 @@ window.handlePracticeInput = function(key) {
             if (window.correctSound) window.correctSound.play();
             window.practiceTargetIndex++;
             window.practicePressCount = 0;
-            setTimeout(() => {
+            window.practiceNextTimeout = setTimeout(() => {
                 if (window.startPracticeNote) window.startPracticeNote();
             }, 1000); // 1 saniye sonra diğer notayı sor
         } else {
