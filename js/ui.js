@@ -293,6 +293,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             
             if (menuTitle) {
                 menuTitle.setAttribute('tabindex', '-1'); // Odaklanılabilir yap
+                menuTitle.setAttribute('role', 'none');   // "Başlık Seviyesi 1" ibaresini kaldır
                 menuTitle.focus(); // Anında odaklan, title'ı ekran okuyucuya okut
                 
                 let titleText = menuTitle.innerText || menuTitle.textContent;
