@@ -795,6 +795,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const playModeBackBtn = document.getElementById('play-mode-back-btn');
     if (!window.playModeMenu) window.playModeMenu = playModeMenuDOM;
 
+    const mpSelectMenuDOM = document.getElementById('multiplayer-select-menu-container');
+    const pvpPlayBtn = document.getElementById('pvp-play-btn');
+    const pveBotPlayBtn = document.getElementById('pve-bot-play-btn');
+    const mpSelectBackBtn = document.getElementById('multiplayer-select-back-btn');
+    if (!window.multiplayerSelectMenu) window.multiplayerSelectMenu = mpSelectMenuDOM;
+
     // Ana Menüden Oyun Modu Seçimine Geçiş
     if (startGameBtn) {
         startGameBtn.addEventListener('click', () => {
@@ -812,8 +818,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (multiplayerPlayBtn) {
         multiplayerPlayBtn.addEventListener('click', () => {
+            window.lastFocusedElement = document.activeElement;
+            window.switchMenu(window.playModeMenu, window.multiplayerSelectMenu, 'multiplayer-select');
+        });
+    }
+
+    if (pvpPlayBtn) {
+        pvpPlayBtn.addEventListener('click', () => {
             if (window.wrongSound) window.wrongSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader("Çok Oyunculu (Multiplayer) mod çok yakında eklenecektir!");
+            if (window.announceToScreenReader) window.announceToScreenReader("Birebir oyun motoru hazırlanıyor, yakında aktif edilecek.");
+        });
+    }
+
+    if (pveBotPlayBtn) {
+        pveBotPlayBtn.addEventListener('click', () => {
+            if (window.wrongSound) window.wrongSound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader("Bot yapay zekası hazırlanıyor, yakında aktif edilecek.");
+        });
+    }
+
+    if (mpSelectBackBtn) {
+        mpSelectBackBtn.addEventListener('click', () => {
+            window.switchMenu(window.multiplayerSelectMenu, window.playModeMenu, 'play-mode');
+            
+            setTimeout(() => {
+                if (window.lastFocusedElement) {
+                    window.lastFocusedElement.focus();
+                } else {
+                    let mpBtn = document.getElementById('multiplayer-play-btn');
+                    if (mpBtn) mpBtn.focus();
+                }
+            }, 300);
         });
     }
 
@@ -973,7 +1008,8 @@ document.addEventListener('keydown', (e) => {
             'achievements': 'achievements-back-btn',
             'feedback': 'feedback-back-btn',
             'stats': 'stats-back-btn',
-            'play-mode': 'play-mode-back-btn'
+            'play-mode': 'play-mode-back-btn',
+            'multiplayer-select': 'multiplayer-select-back-btn'
         };
 
         if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {

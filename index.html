@@ -476,6 +476,34 @@
             onfocus="setTimeout(() => document.getElementById('play-mode-back-btn').focus(), 10);"></div>
     </div>
 
+    <!-- Çok Oyunculu Mod Seçim Menüsü -->
+    <div id="multiplayer-select-menu-container" class="menu-container" role="presentation" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
+            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            onfocus="setTimeout(() => document.getElementById('multiplayer-select-back-btn').focus(), 10);"></div>
+        
+        <h1 id="multiplayer-select-title">Çok Oyunculu</h1>
+        
+        <nav class="menu-nav" aria-labelledby="multiplayer-select-title">
+            <ul>
+                <li>
+                    <button id="pvp-play-btn" class="menu-button" aria-label="Birebir Rakiple Oyna">Birebir Rakiple Oyna</button>
+                </li>
+                <li>
+                    <button id="pve-bot-play-btn" class="menu-button" aria-label="Bota Karşı Oyna">Bota Karşı Oyna</button>
+                </li>
+                <li>
+                    <button id="multiplayer-select-back-btn" class="menu-button" aria-label="Oyun Modu Seçimine Dön">Geri</button>
+                </li>
+            </ul>
+        </nav>
+        
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
+            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            onfocus="setTimeout(() => document.getElementById('multiplayer-select-back-btn').focus(), 10);"></div>
+    </div>
+
     <!-- Oyun Ekranı -->
     <section id="game-menu-container" class="menu-container" aria-label="Oyun Alanı" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
