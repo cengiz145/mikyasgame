@@ -356,16 +356,15 @@ window.announceToScreenReader = function (text, forceFocus = false) {
             }
             window.announcerTimeouts = [];
 
-            liveAnnouncer.innerHTML = ''; // Ekrani temizle
-            let msgNode = document.createElement('div');
-            msgNode.textContent = text;
-            liveAnnouncer.appendChild(msgNode);
+            // Ekran okuyucuların aynı metni tekrar okuması için içeriği anlık olarak temizle ve yeniden bas
+            liveAnnouncer.textContent = ''; 
+            setTimeout(() => {
+                liveAnnouncer.textContent = text;
+            }, 50);
 
             // Yeni zamanlayıcıyı kur ve hafızaya kaydet
             let tId = setTimeout(() => {
-                if (msgNode.parentNode) {
-                    msgNode.remove();
-                }
+                liveAnnouncer.textContent = '';
             }, 10000);
             window.announcerTimeouts.push(tId);
         }
@@ -772,6 +771,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('feedback-name').value = "";
                 document.getElementById('feedback-text').value = "";
                 btn.disabled = false;
+                
+                // Formu otomatik kapat
+                setTimeout(() => {
+                    if (window.currentActiveMenu === 'feedback') {
+                        window.switchMenu(window.feedbackMenu, window.mainMenu, 'main');
+                    }
+                }, 2500);
+                
             }).catch((error) => {
                 desc.textContent = "Bağlantı hatası: " + error.message;
                 btn.disabled = false;
