@@ -274,17 +274,23 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             
             // 1. Önce yeni açılan menünün H1 başlığını bul ve ekran okuyucuya anons et
             let menuTitle = showMenu.querySelector('h1');
-            if (menuTitle && window.announceToScreenReader) {
-                window.announceToScreenReader(menuTitle.innerText || menuTitle.textContent);
+            let titleText = menuTitle ? (menuTitle.innerText || menuTitle.textContent) : "";
+            
+            // Dinamik Süre Hesaplama: Her harf için ortalama 60 milisaniye ver.
+            // Ancak metin çok kısaysa bile en az 1000ms (1 saniye) bekle (Math.max ile).
+            let dynamicDelay = Math.max(1000, titleText.length * 60);
+
+            if (titleText && window.announceToScreenReader) {
+                window.announceToScreenReader(titleText);
             }
             
-            // 2. Butona odaklanmayı 1 saniye (1000ms) geciktirerek yap!
+            // Sabit 1000ms yerine, hesapladığımız dynamicDelay değişkenini kullan!
             setTimeout(() => {
                 let firstFocusable = showMenu.querySelector('.menu-button, button, [tabindex="0"], input, select, textarea');
                 if (firstFocusable) {
                     firstFocusable.focus();
                 }
-            }, 1000); // Ekran okuyucu başlığı okurken lafı kesilmesin
+            }, dynamicDelay); // Ekran okuyucu başlığı okurken lafı kesilmesin
         }, 50);
     }, 300);
 
