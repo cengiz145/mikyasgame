@@ -5,15 +5,14 @@ $jsonContent.buildId = $epoch
 
 # Sürüm numarasını "0.x" yapısına göre birer birer artırma (0.100'e kadar)
 $currentVersion = $jsonContent.version
-if ($currentVersion -match "^0\.(\d+)$") {
-    $minor = [int]$matches[1]
-    if ($minor -lt 100) {
-        $minor++
-    }
-    $jsonContent.version = "0." + $minor
+if ($currentVersion -match "^(\d+)\.(\d+)$") {
+    $major = [int]$matches[1]
+    $minor = [int]$matches[2]
+    $minor++
+    $jsonContent.version = "$major.$minor"
 } else {
-    # Eğer mevcut sürüm 0.x formatında değilse (örneğin 1.2), 0.1 olarak başlatır
-    $jsonContent.version = "0.1"
+    # Eğer format tamamen bozuksa kaldığı yerden kurtar
+    $jsonContent.version = "0.75" 
 }
 
 $jsonContent.changelog = $args[0]
