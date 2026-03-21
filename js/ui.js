@@ -1386,8 +1386,27 @@ document.addEventListener('DOMContentLoaded', () => {
                                 snapshot.forEach(child => {
                                     count++;
                                     let biletData = child.val();
-                                    let mesaj = typeof biletData === 'string' ? biletData : (biletData.message || biletData.mesaj || "Tanımsız Bilet İçeriği");
-                                    addLocalSystemMessage(`Bilet #${count}: ${mesaj}`);
+                                    let mesaj = "";
+                                    let durum = "Geliştiriciye ulaştı ⏳"; // Varsayılan durum
+                                    
+                                    if (typeof biletData === 'string') {
+                                        mesaj = biletData;
+                                    } else {
+                                        mesaj = biletData.message || biletData.mesaj || "Tanımsız Bilet İçeriği";
+                                        
+                                        // Dinamik durum analizi (Firebase'den gelen veri)
+                                        let rawDurum = (biletData.durum || biletData.status || "").toString().trim();
+                                        let lowerDurum = rawDurum.toLowerCase();
+                                        
+                                        if (lowerDurum.includes('çözülme') || lowerDurum.includes('aşamasında') || lowerDurum.includes('progress') || lowerDurum.includes('inceleniyor')) {
+                                            durum = "Çözülme aşamasında 🛠️";
+                                        } else if (lowerDurum.includes('çözüldü') || lowerDurum.includes('resolved') || lowerDurum.includes('tamamlandı') || lowerDurum.includes('kapatıldı')) {
+                                            durum = "Çözüldü ✅";
+                                        } else if (rawDurum !== "") {
+                                            durum = rawDurum; // Admin tarafından yazılan özel metin eklendi
+                                        }
+                                    }
+                                    addLocalSystemMessage(`Bilet #${count} | Durum: ${durum} | Mesajınız: ${mesaj}`);
                                 });
                             }
                         }).catch(err => {
