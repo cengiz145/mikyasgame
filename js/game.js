@@ -729,6 +729,15 @@ window.handlePracticeInput = function(key) {
         mobileReplayBtn.addEventListener('click', () => {
             if (window.gameIsActive && !window.isComputerPlaying && window.gameSequence.length > 0) {
                 if (window.announceToScreenReader) window.announceToScreenReader("Dizi tekrar ediliyor. Saniye eksi bir.");
+                if (isUserExit) {
+                    if (window.gameBGM && window.gameBGM.playing()) window.gameBGM.stop();
+                    window.updateGameUI();
+                    // Oyuncu kendi çıkarsa Ana Menü müziğini geri başlat
+                    if (window.bgMusic && !window.bgMusic.playing()) {
+                        window.bgMusic.play();
+                    }
+                    return;
+                }
                 window.gameTimer = Math.max(0, window.gameTimer - 1);
                 window.updateGameUI();
                 window.playerInputIndex = 0;

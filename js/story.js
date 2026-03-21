@@ -229,6 +229,7 @@ window.handleStoryWalking = function(key) {
                 window.isGridWalkingPhase = false;
                 window.inStoryMode = false;
                 
+                if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
                 if (window.switchMenu && window.storyMenu && window.mainMenu) {
                     window.switchMenu(window.storyMenu, window.mainMenu, 'main');
                 }

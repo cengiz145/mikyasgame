@@ -766,6 +766,9 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(window.storyAnimTimeout5);
             clearTimeout(window.stepIntervalId);
             clearTimeout(window.storyEntryTimeout);
+            if (window.storyWinTimeout) {
+                clearTimeout(window.storyWinTimeout);
+            }
 
             if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
             if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
@@ -803,6 +806,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     clearTimeout(window.storyAnimTimeout5);
                     clearTimeout(window.stepIntervalId);
                     clearTimeout(window.storyEntryTimeout);
+                    if (window.storyWinTimeout) {
+                        clearTimeout(window.storyWinTimeout);
+                    }
 
                     if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
                     if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
