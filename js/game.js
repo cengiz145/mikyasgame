@@ -149,6 +149,9 @@ window.startGame = function () {
 };
 
 window.startMainGame = function (difficulty = 'easy') {
+    if (window.isStarting) return;
+    window.isStarting = true;
+
     if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
 
     const gameMenuContainer = document.getElementById('game-menu-container');
@@ -328,6 +331,9 @@ window.playGameSequence = function () {
 };
 
 window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
+    window.isStarting = false;
+    clearTimeout(window.sequenceTimeoutId);
+
     window.gameIsActive = false;
     if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
     clearInterval(window.gameInterval);
