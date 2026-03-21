@@ -562,6 +562,7 @@ window.handleGameInput = function (key) {
             }
         }
     } else {
+        window.isComputerPlaying = true;
         if (window.pianoNotes) for (let k in window.pianoNotes) window.pianoNotes[k].stop();
 
         let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
