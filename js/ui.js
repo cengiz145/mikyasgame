@@ -891,7 +891,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Nokta (.) kısayolu ve ESC tuşu
+    // Nokta (.) kısayolu, ESC tuşu ve Ok Tuşlarıyla Gezinme
     document.addEventListener('keydown', (e) => {
         // Nokta (.) tuşuyla sohbeti SADECE aç
         if (e.key === '.' && !window.isChatOpen && (!document.activeElement || (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'SELECT'))) {
@@ -901,7 +901,33 @@ document.addEventListener('DOMContentLoaded', () => {
         // ESC tuşuyla sohbeti hızlıca kapat
         if (e.key === 'Escape' && window.isChatOpen) {
             window.toggleChat();
-            // Not: activeElement.blur() özelliği focusu bozduğu için kaldırıldı, toggleChat işini yapıyor.
+        }
+        
+        // Sohbet mesajlarında Yukarı/Aşağı ok tuşu ile gezinme
+        if (window.isChatOpen && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+            const chatMessages = document.querySelectorAll('#chat-messages li[tabindex="0"]');
+            if (chatMessages.length > 0) {
+                let currentIndex = Array.from(chatMessages).indexOf(document.activeElement);
+                
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentIndex > 0) {
+                        chatMessages[currentIndex - 1].focus();
+                    } else if (currentIndex === -1) {
+                        chatMessages[chatMessages.length - 1].focus();
+                    }
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (currentIndex !== -1 && currentIndex < chatMessages.length - 1) {
+                        chatMessages[currentIndex + 1].focus();
+                    } else if (currentIndex !== -1 && currentIndex === chatMessages.length - 1) {
+                        const chatInput = document.getElementById('chat-message-input');
+                        if (chatInput) chatInput.focus();
+                    } else if (currentIndex === -1) {
+                        chatMessages[0].focus();
+                    }
+                }
+            }
         }
     });
 
