@@ -256,8 +256,14 @@ window.updateMobileStoryKeys = function(isStory) {
     }
 };
 
+window.lastFocusedElement = null;
 window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     if (!hideMenu || !showMenu) return;
+
+    if (newActiveMenuName !== 'main') {
+        window.lastFocusedElement = document.activeElement;
+    }
+
     hideMenu.style.opacity = '0';
     setTimeout(() => {
         hideMenu.style.display = 'none';
@@ -286,9 +292,15 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             
             // Sabit 1000ms yerine, hesapladığımız dynamicDelay değişkenini kullan!
             setTimeout(() => {
-                let firstFocusable = showMenu.querySelector('.menu-button, button, [tabindex="0"], input, select, textarea');
-                if (firstFocusable) {
-                    firstFocusable.focus();
+                if (window.lastFocusedElement && document.body.contains(window.lastFocusedElement)) {
+                    window.lastFocusedElement.focus();
+                    window.lastFocusedElement = null; // Hafızayı temizle
+                } else {
+                    // Güvenlik Ağı: Buton silinmişse yeni menünün ilk butonuna veya h1 başlığına odaklan
+                    let firstFocusable = showMenu.querySelector('.menu-button, button, [tabindex="0"], input, select, textarea');
+                    if (firstFocusable) {
+                        firstFocusable.focus();
+                    }
                 }
             }, dynamicDelay); // Ekran okuyucu başlığı okurken lafı kesilmesin
         }, 50);
