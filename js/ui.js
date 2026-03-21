@@ -864,6 +864,28 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
+    // Mağaza miktar belirleme ('+', '-', 'ArrowRight', 'ArrowLeft') ve Okuma (Sessiz Kasiyer Koruması)
+    if (document.activeElement && document.activeElement.id === 'store-buy-quantity-display') {
+        let quantityDisplay = document.activeElement;
+        let currentQuantity = parseInt(quantityDisplay.getAttribute('aria-valuenow')) || 1;
+        
+        if (event.key === 'ArrowRight' || event.key === '+' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            let newQuantity = Math.min(99, currentQuantity + 1);
+            quantityDisplay.setAttribute('aria-valuenow', newQuantity);
+            quantityDisplay.setAttribute('aria-label', 'Miktar: ' + newQuantity);
+            quantityDisplay.innerText = newQuantity;
+            return;
+        } else if (event.key === 'ArrowLeft' || event.key === '-' || event.key === 'ArrowDown') {
+            event.preventDefault();
+            let newQuantity = Math.max(1, currentQuantity - 1);
+            quantityDisplay.setAttribute('aria-valuenow', newQuantity);
+            quantityDisplay.setAttribute('aria-label', 'Miktar: ' + newQuantity);
+            quantityDisplay.innerText = newQuantity;
+            return;
+        }
+    }
+
     if (window.isGridWalkingPhase && window.currentActiveMenu === 'story') {
         return;
     }
