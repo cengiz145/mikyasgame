@@ -41,6 +41,11 @@ window.guncellemeKontrolEt = function (isManual = false) {
                 window.mevcutSurum = data.version;
                 const uyariMesaji = "Oyuna zorunlu bir güncelleme geldi! Eski sürümle oynamaya devam edemezsiniz. Lütfen Tamam'a basarak sayfayı yenileyin.";
 
+                if (window.gameIsActive || window.inStoryMode || window.currentActiveMenu !== 'main') {
+                    window.pendingUpdate = true; // Güncellemeyi sessizce beklemeye al
+                    return; // Ekranı silme işlemini iptal et
+                }
+
                 window.gameIsActive = false;
                 if (typeof Howler !== 'undefined') Howler.stop();
 
@@ -270,6 +275,10 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             if (firstBtn) firstBtn.focus();
         }, 50);
     }, 300);
+
+    if (newActiveMenuName === 'main' && window.pendingUpdate === true) {
+        window.guncellemeKontrolEt(false); // Bekleyen güncellemeyi şimdi ekrana bas
+    }
 };
 
 window.announceToScreenReader = function (text, forceFocus = true) {
