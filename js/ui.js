@@ -576,34 +576,54 @@ document.addEventListener('DOMContentLoaded', () => {
     if (buyShieldBtn) {
         buyShieldBtn.addEventListener('click', () => {
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-            if (totalTokens >= 50) {
-                totalTokens -= 50;
-                localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
-                let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
-                localStorage.setItem('hafizaGuvenHataKorumasi', hk + 1);
-                if (window.buySound) window.buySound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Hata Koruması eklendi. Kalan jeton: ${totalTokens}`);
-            } else {
+            let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+
+            if (hk > 0) {
                 if (window.wrongSound) window.wrongSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader(`Yetersiz jeton. 50 jeton gerekli, sizin ${totalTokens} jetonunuz var.`);
+                let msg = "Bu korumaya zaten sahipsiniz. Aynı anda sadece bir tane taşıyabilirsiniz.";
+                if (window.announceToScreenReader) window.announceToScreenReader(msg);
+                return;
             }
+
+            if (totalTokens < 50) {
+                if (window.wrongSound) window.wrongSound.play();
+                let msg = "Yetersiz bakiye. Bu eşya için 50 jetona ihtiyacınız var.";
+                if (window.announceToScreenReader) window.announceToScreenReader(msg);
+                return;
+            }
+
+            totalTokens -= 50;
+            localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            localStorage.setItem('hafizaGuvenHataKorumasi', 1);
+            if (window.buySound) window.buySound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Hata Koruması eklendi. Kalan jeton: ${totalTokens}`);
         });
     }
 
     if (buyTimeShieldBtn) {
         buyTimeShieldBtn.addEventListener('click', () => {
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-            if (totalTokens >= 30) {
-                totalTokens -= 30;
-                localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
-                let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
-                localStorage.setItem('hafizaGuvenZamanKorumasi', zk + 1);
-                if (window.buySound) window.buySound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Zaman Koruması eklendi. Kalan jeton: ${totalTokens}`);
-            } else {
+            let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+
+            if (zk > 0) {
                 if (window.wrongSound) window.wrongSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader(`Yetersiz jeton. 30 jeton gerekli, sizin ${totalTokens} jetonunuz var.`);
+                let msg = "Bu korumaya zaten sahipsiniz. Aynı anda sadece bir tane taşıyabilirsiniz.";
+                if (window.announceToScreenReader) window.announceToScreenReader(msg);
+                return;
             }
+
+            if (totalTokens < 30) {
+                if (window.wrongSound) window.wrongSound.play();
+                let msg = "Yetersiz bakiye. Bu eşya için 30 jetona ihtiyacınız var.";
+                if (window.announceToScreenReader) window.announceToScreenReader(msg);
+                return;
+            }
+
+            totalTokens -= 30;
+            localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            localStorage.setItem('hafizaGuvenZamanKorumasi', 1);
+            if (window.buySound) window.buySound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Zaman Koruması eklendi. Kalan jeton: ${totalTokens}`);
         });
     }
 
