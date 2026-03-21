@@ -159,6 +159,18 @@ window.startGame = function () {
 };
 
 window.startMainGame = function (difficulty = 'easy') {
+    // Tarayıcı sekmelerini/adres çubuğunu gizlemek için Tam Ekran API devreye alınıyor
+    try {
+        let elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(() => {});
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen().catch(() => {});
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen().catch(() => {});
+        }
+    } catch (err) {}
+
     if (window.isStarting) return;
     window.isStarting = true;
 
