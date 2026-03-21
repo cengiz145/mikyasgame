@@ -1,5 +1,5 @@
 {
-    "version":  "0.79",
-    "buildId":  1774078230,
-    "changelog":  "Anlık ekran okuyucu uyarılarının mobil cihazlarda buton gibi tıklanabilir nesneler olarak gözükmesi (focus hijacking) onarıldı"
+    "version":  "0.80",
+    "buildId":  1774078407,
+    "changelog":  "Seviye 1 Yüzey Suları Temizliği: DOM yarışları durduruldu ve Gereksiz Timeout sızıntıları tamamen kapatıldı"
 }

@@ -260,6 +260,10 @@ window.lastFocusedElement = null;
 window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     if (!hideMenu || !showMenu) return;
 
+    if (window.menuFocusTimeoutId) {
+        clearTimeout(window.menuFocusTimeoutId);
+    }
+
     // Sadece ana menüden alt menülere giderken tıklanan butonu kaydet
     if (window.currentActiveMenu === 'main' && newActiveMenuName !== 'main') {
         window.lastFocusedElement = document.activeElement;
@@ -292,7 +296,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             }
             
             // Sabit 1000ms yerine, hesapladığımız dynamicDelay değişkenini kullan!
-            setTimeout(() => {
+            window.menuFocusTimeoutId = setTimeout(() => {
                 // SADECE Ana Menü'ye dönüyorsak ve hafızada bir nesne varsa ona odaklan!
                 if (newActiveMenuName === 'main' && window.lastFocusedElement && document.body.contains(window.lastFocusedElement)) {
                     window.lastFocusedElement.focus();
@@ -333,10 +337,10 @@ window.announceToScreenReader = function (text, forceFocus = false) {
         }
     } else {
         // PC'de doğrudan Odaklanarak okutma (Eski kararlı yöntem)
-        let oldAnnouncer = document.getElementById('sr-focus-announcer');
-        if (oldAnnouncer) {
-            oldAnnouncer.remove();
-        }
+        // DOM'da asılı kalmış TÜM eski anonsları acımasızca temizle (Garbage Collection)
+        const oldAnnouncers = document.querySelectorAll('#sr-focus-announcer');
+        oldAnnouncers.forEach(el => el.remove());
+
         let announcerDiv = document.createElement('div');
         announcerDiv.id = 'sr-focus-announcer';
         announcerDiv.setAttribute('tabindex', '-1');
