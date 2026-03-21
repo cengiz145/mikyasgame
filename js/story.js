@@ -45,7 +45,7 @@ window.playAutomatedWalkingScene = function() {
 window.triggerStoryAnimations = function(index) {
     if (index === 0) {
         let count = 0;
-        let pId = setInterval(() => {
+        window.storyAnimInterval1 = setInterval(() => {
             const keys = ['c', 'e', 'g', 'c', 'f', 'a', 'd', 'b', 'g'];
             const randomKey = keys[Math.floor(Math.random() * keys.length)];
             if (window.pianoNotes && window.pianoNotes[randomKey]) {
@@ -54,13 +54,13 @@ window.triggerStoryAnimations = function(index) {
                 window.pianoNotes[randomKey].seek(0.045, sndId);
             }
             count++;
-            if (count > 6) clearInterval(pId);
+            if (count > 6) clearInterval(window.storyAnimInterval1);
         }, 400);
     } else if (index === 1) {
         if (window.enterHouseSound) window.enterHouseSound.play();
-        setTimeout(() => {
+        window.storyAnimTimeout1 = setTimeout(() => {
             let stepCount = 0;
-            let sId = setInterval(() => {
+            window.storyAnimInterval2 = setInterval(() => {
                 if (window.carpetStepSounds && window.carpetStepSounds.length > 0) {
                     let s = window.carpetStepSounds[Math.floor(Math.random() * window.carpetStepSounds.length)];
                     s.volume(Math.min(1.0, 0.2 + (stepCount * 0.2)));
@@ -68,8 +68,8 @@ window.triggerStoryAnimations = function(index) {
                 }
                 stepCount++;
                 if (stepCount > 5) {
-                    clearInterval(sId);
-                    setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 200);
+                    clearInterval(window.storyAnimInterval2);
+                    window.storyAnimTimeout2 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 200);
                 }
             }, 220);
         }, 350);
@@ -81,14 +81,14 @@ window.triggerStoryAnimations = function(index) {
             window.wrongSound.play();
         }
     } else if (index === 8) {
-        setTimeout(() => {
+        window.storyAnimTimeout3 = setTimeout(() => {
             if (window.pianoNotes) {
                 if (window.pianoNotes['c']) window.pianoNotes['c'].play();
                 if (window.pianoNotes['d']) window.pianoNotes['d'].play();
                 if (window.pianoNotes['e']) window.pianoNotes['e'].play();
             }
         }, 50);
-        setTimeout(() => {
+        window.storyAnimTimeout4 = setTimeout(() => {
             if (window.doorCloseSound) {
                 let sid = window.doorCloseSound.play();
                 window.doorCloseSound.rate(1.5, sid);
@@ -97,16 +97,16 @@ window.triggerStoryAnimations = function(index) {
         }, 200);
     } else if (index === 14) {
         let stepCount = 0;
-        let sId = setInterval(() => {
+        window.storyAnimInterval3 = setInterval(() => {
             if (window.carpetStepSounds && window.carpetStepSounds.length > 0) {
                 let s = window.carpetStepSounds[Math.floor(Math.random() * window.carpetStepSounds.length)];
                 s.volume(Math.max(0.1, 1.0 - (stepCount * 0.15)));     
                 s.play();
             }
             stepCount++;
-            if (stepCount > 6) clearInterval(sId);
+            if (stepCount > 6) clearInterval(window.storyAnimInterval3);
         }, 220);
-        setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 1400); 
+        window.storyAnimTimeout5 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 1400); 
     }
 };
 

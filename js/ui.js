@@ -722,10 +722,22 @@ document.addEventListener('DOMContentLoaded', () => {
         gameBackBtn.addEventListener('click', () => {
             if (window.endMainGame) window.endMainGame(false, false, true);
 
-            if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
-            if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
-            if (window.doorCloseSound && window.doorCloseSound.playing()) window.doorCloseSound.stop();
+            clearInterval(window.storyAnimInterval1);
+            clearInterval(window.storyAnimInterval2);
+            clearInterval(window.storyAnimInterval3);
+            clearTimeout(window.storyAnimTimeout1);
+            clearTimeout(window.storyAnimTimeout2);
+            clearTimeout(window.storyAnimTimeout3);
+            clearTimeout(window.storyAnimTimeout4);
+            clearTimeout(window.storyAnimTimeout5);
             clearTimeout(window.stepIntervalId);
+
+            if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
+            if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
+            if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
+            if (window.enterHouseSound && window.enterHouseSound.playing()) window.enterHouseSound.stop();
+            if (window.doorCloseSound && window.doorCloseSound.playing()) window.doorCloseSound.stop();
+            
             if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
             if (window.bgMusic) window.bgMusic.play();
         });
@@ -746,8 +758,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.gameIsActive = false;
                     window.isStarted = false;
 
-                    if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
+                    clearInterval(window.storyAnimInterval1);
+                    clearInterval(window.storyAnimInterval2);
+                    clearInterval(window.storyAnimInterval3);
+                    clearTimeout(window.storyAnimTimeout1);
+                    clearTimeout(window.storyAnimTimeout2);
+                    clearTimeout(window.storyAnimTimeout3);
+                    clearTimeout(window.storyAnimTimeout4);
+                    clearTimeout(window.storyAnimTimeout5);
+                    clearTimeout(window.stepIntervalId);
+
                     if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
+                    if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
+                    if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
+                    if (window.enterHouseSound && window.enterHouseSound.playing()) window.enterHouseSound.stop();
+                    if (window.doorCloseSound && window.doorCloseSound.playing()) window.doorCloseSound.stop();
                     
                     if (window.switchMenu && window.storyMenu && window.mainMenu) {
                         window.switchMenu(window.storyMenu, window.mainMenu, 'main');
