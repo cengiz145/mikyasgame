@@ -3,8 +3,8 @@
 // Boşluk tuşuna ve yön tuşlarına basıldığında sayfanın aşağı/yukarı kaymasını engelle
 window.addEventListener('keydown', function(event) {
     if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) {
-        // Eğer oyuncu input/textarea içindeyse engelleme
-        if (event.target.tagName !== "INPUT" && event.target.tagName !== "TEXTAREA") {
+        // Eğer oyuncu input/textarea/BUTTON içindeyse engelleme (Butonların kendi tıklamalarını bozmamak için)
+        if (event.target.tagName !== "INPUT" && event.target.tagName !== "TEXTAREA" && event.target.tagName !== "BUTTON") {
             event.preventDefault(); 
         }
     }
@@ -920,7 +920,7 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
-    if (event.key.toLowerCase() === 'm' && window.currentActiveMenu === 'main') {
+    if (event.key.toLowerCase() === 'm') {
         if (window.bgMusic) {
             const isMuted = window.bgMusic.mute();
             if (!isMuted) {

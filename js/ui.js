@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Erişilebilirlik (ARIA) Dinamik Enjektörü (Sessiz Semantik / Role Gizleme) ---
     // Kullanıcı talebi: bölüm, bölge, düğme, grup gibi element rollerinin okunmaması.
     const applySilentRoles = (root) => {
-        const elementsToNone = root.querySelectorAll ? root.querySelectorAll('.menu-container, nav, section, ul, li, div[role="group"], div[role="region"], div[role="presentation"]') : [];
+        const elementsToNone = root.querySelectorAll ? root.querySelectorAll('.menu-container, nav, section, ul, li, div[role="group"], div[role="region"], div[role="presentation"], h1, h2, h3, h4, h5, h6') : [];
         elementsToNone.forEach(el => el.setAttribute('role', 'none'));
 
         const buttonsToSilence = root.querySelectorAll ? root.querySelectorAll('button, .menu-button, .mobile-piano-key, [role="button"]') : [];
