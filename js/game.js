@@ -216,7 +216,7 @@ window.startMainGame = function (difficulty = 'easy') {
                 clearInterval(window.gameInterval);
                 return;
             }
-            if (!window.isComputerPlaying && window.playerInputIndex === 0) {
+            if (!window.isComputerPlaying) {
                 window.gameTimer--;
                 window.updateGameUI();
 
@@ -523,7 +523,7 @@ window.handleGameInput = function (key) {
                 window.sessionTokens += earnedTokens;
             }
 
-            window.gameTimer += 2;
+            window.gameTimer += (window.gameSequence.length + 2);
             window.gameScore += 1;
             window.gameMistakes = 0;
             window.updateGameUI();
@@ -552,7 +552,7 @@ window.handleGameInput = function (key) {
                     }
                 }
 
-                if (gameStatus) gameStatus.textContent = `${motivMsg} (+2 saniye)`;
+                if (gameStatus) gameStatus.textContent = `${motivMsg} (+${window.gameSequence.length + 2} saniye)`;
                 if (window.announceToScreenReader) window.announceToScreenReader(motivMsg);
 
                 const readTimeMs = Math.max(1500, (motivMsg.length * 65) + 800);
