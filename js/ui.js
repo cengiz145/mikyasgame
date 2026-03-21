@@ -260,7 +260,8 @@ window.lastFocusedElement = null;
 window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     if (!hideMenu || !showMenu) return;
 
-    if (newActiveMenuName !== 'main') {
+    // Sadece ana menüden alt menülere giderken tıklanan butonu kaydet
+    if (window.currentActiveMenu === 'main' && newActiveMenuName !== 'main') {
         window.lastFocusedElement = document.activeElement;
     }
 
@@ -292,7 +293,8 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             
             // Sabit 1000ms yerine, hesapladığımız dynamicDelay değişkenini kullan!
             setTimeout(() => {
-                if (window.lastFocusedElement && document.body.contains(window.lastFocusedElement)) {
+                // SADECE Ana Menü'ye dönüyorsak ve hafızada bir nesne varsa ona odaklan!
+                if (newActiveMenuName === 'main' && window.lastFocusedElement && document.body.contains(window.lastFocusedElement)) {
                     window.lastFocusedElement.focus();
                     window.lastFocusedElement = null; // Hafızayı temizle
                 } else {

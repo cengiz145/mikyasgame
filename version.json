@@ -1,5 +1,5 @@
 {
-    "version":  "0.76",
-    "buildId":  1774073480,
-    "changelog":  "Ölüm Ekranı Odakları, Kalkanlar ve 0 Hata İyileştirmeleri Aktif Edildi"
+    "version":  "0.77",
+    "buildId":  1774073800,
+    "changelog":  "Odak Hafızasındaki mantık çökmesi (Girişte çalışması) giderildi ve sistem mükemmelleştirildi"
 }
