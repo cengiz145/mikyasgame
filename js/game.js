@@ -652,11 +652,33 @@ window.playCurrentDialog = function() {
             if (statusText) statusText.innerHTML = window.localizeText ? window.localizeText(text) : text;
             if (window.announceToScreenReader) window.announceToScreenReader(text);
         } else {
-            // Diyaloglar bitince şimdilik sadece haber versin (Sonraki aşamada eğitimi başlatacağız)
             window.isDialogPhase = false;
-            if (statusText) statusText.innerHTML = "Eğitim başlıyor... (Kodlar eklenecek)";
-            if (window.announceToScreenReader) window.announceToScreenReader("Eğitim başlıyor.");
+            window.inPracticeTutorial = true;
+            window.practiceTargetIndex = 0;
+            window.practicePressCount = 0;
+            if (window.startPracticeNote) window.startPracticeNote();
         }
+    }
+};
+
+window.startPracticeNote = function() {
+    const notes = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+    const statusText = document.getElementById('practice-status-text');
+    
+    if (window.practiceTargetIndex < notes.length) {
+        // Öğrenilecek nota varsa sor
+        let currentNote = notes[window.practiceTargetIndex].toUpperCase();
+        let text = "Şimdi " + currentNote + " tuşuna 3 defa bas.";
+        if (statusText) statusText.innerHTML = text;
+        if (window.announceToScreenReader) window.announceToScreenReader(text);
+    } else {
+        // Tüm notalar bittiyse tebrik et ve Geri butonunu göster
+        let text = "Tebrikler! Tüm notaları öğrendiniz. Ana menüye dönmek için Geri butonunu kullanabilirsiniz.";
+        if (statusText) statusText.innerHTML = text;
+        if (window.announceToScreenReader) window.announceToScreenReader(text);
+        const practiceNav = document.getElementById('practice-nav');
+        if (practiceNav) practiceNav.style.display = 'block';
+        window.inPracticeTutorial = false;
     }
 };
 
