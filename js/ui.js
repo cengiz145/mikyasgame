@@ -780,11 +780,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Ana Menüden Zorluk Seçimine Geçiş
+    const playModeMenuDOM = document.getElementById('play-mode-menu-container');
+    const offlinePlayBtn = document.getElementById('offline-play-btn');
+    const multiplayerPlayBtn = document.getElementById('multiplayer-play-btn');
+    const playModeBackBtn = document.getElementById('play-mode-back-btn');
+    if (!window.playModeMenu) window.playModeMenu = playModeMenuDOM;
+
+    // Ana Menüden Oyun Modu Seçimine Geçiş
     if (startGameBtn) {
         startGameBtn.addEventListener('click', () => {
-            window.switchMenu(window.mainMenu, window.difficultyMenu, 'difficulty');
+            window.lastFocusedElement = document.activeElement;
+            window.switchMenu(window.mainMenu, window.playModeMenu, 'play-mode');
+        });
+    }
+
+    if (offlinePlayBtn) {
+        offlinePlayBtn.addEventListener('click', () => {
+            window.switchMenu(window.playModeMenu, window.difficultyMenu, 'difficulty');
             if (window.updateDifficultyMenuLocks) window.updateDifficultyMenuLocks();
+        });
+    }
+
+    if (multiplayerPlayBtn) {
+        multiplayerPlayBtn.addEventListener('click', () => {
+            if (window.wrongSound) window.wrongSound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader("Çok Oyunculu (Multiplayer) mod çok yakında eklenecektir!");
+        });
+    }
+
+    if (playModeBackBtn) {
+        playModeBackBtn.addEventListener('click', () => {
+            window.switchMenu(window.playModeMenu, window.mainMenu, 'main');
+            
+            setTimeout(() => {
+                if (window.lastFocusedElement) {
+                    window.lastFocusedElement.focus();
+                } else {
+                    let startBtn = document.getElementById('start-game-btn');
+                    if (startBtn) startBtn.focus();
+                }
+            }, 300);
         });
     }
     if (difficultyBackBtn) {
@@ -928,7 +963,8 @@ document.addEventListener('keydown', (e) => {
             'scoreboard': 'scoreboard-back-btn',
             'achievements': 'achievements-back-btn',
             'feedback': 'feedback-back-btn',
-            'stats': 'stats-back-btn'
+            'stats': 'stats-back-btn',
+            'play-mode': 'play-mode-back-btn'
         };
 
         if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {

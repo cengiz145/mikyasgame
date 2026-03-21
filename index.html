@@ -451,6 +451,31 @@
             onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
     </div>
 
+    <!-- Oyun Modu Seçim Menüsü -->
+    <div id="play-mode-menu-container" class="menu-container" role="presentation" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
+            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            onfocus="setTimeout(() => document.getElementById('play-mode-back-btn').focus(), 10);"></div>
+        <h1 id="play-mode-title">Oyun Modu Seçimi</h1>
+        <nav class="menu-nav" aria-labelledby="play-mode-title">
+            <ul>
+                <li>
+                    <button id="offline-play-btn" class="menu-button" aria-label="Çevrimdışı Oyna">Çevrimdışı (Klasik) Oyna</button>
+                </li>
+                <li>
+                    <button id="multiplayer-play-btn" class="menu-button" aria-label="Çok Oyunculu Oyna">Çok Oyunculu Oyna (Yakında)</button>
+                </li>
+                <li>
+                    <button id="play-mode-back-btn" class="menu-button" aria-label="Ana Menüye Dön">Geri</button>
+                </li>
+            </ul>
+        </nav>
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
+            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            onfocus="setTimeout(() => document.getElementById('play-mode-back-btn').focus(), 10);"></div>
+    </div>
+
     <!-- Oyun Ekranı -->
     <section id="game-menu-container" class="menu-container" aria-label="Oyun Alanı" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
@@ -538,7 +563,7 @@
     <script src="yardim.js"></script>
 
     <script>
-        const UYGULAMA_SURUMU = "0.90";
+        const UYGULAMA_SURUMU = "0.91";
     </script>
 
     <script src="js/firebase.js"></script>

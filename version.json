@@ -1,5 +1,5 @@
 {
-    "version":  "0.90",
-    "buildId":  1774091197,
-    "changelog":  "Menü açılışlarında odak tuzağının yanlışlıkla seçilmesi sorunu çözüldü."
+    "version":  "0.91",
+    "buildId":  1774091777,
+    "changelog":  "Oyun Başlangıcı için Çevrimdışı ve Çok Oyunculu seçim ara menüsü (Game Mode Select) kurgulandı."
 }
