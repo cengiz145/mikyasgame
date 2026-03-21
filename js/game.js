@@ -321,7 +321,6 @@ window.startMainGame = function (difficulty = 'easy') {
     if (gameStatus) {
         gameStatus.style.display = 'block';
         gameStatus.textContent = `Oyun 3 saniye içinde başlıyor... ${hk} Hata Koruması, ${zk} Zaman Koruması. İlk notayı dinleyin!`;
-        gameStatus.setAttribute('aria-live', 'assertive');
     }
     setTimeout(() => {
         if (window.announceToScreenReader) window.announceToScreenReader(`Oyun 3 saniye içinde başlıyor. ${hk} Hata Koruması ve ${zk} Zaman Korumasına sahipsiniz. İlk notayı dinleyin!`);
@@ -714,8 +713,9 @@ window.handleGameInput = function (key) {
                     }
                 }
 
-                if (gameStatus) gameStatus.textContent = `${motivMsg} (+${window.gameSequence.length + 2} saniye)`;
-                if (window.announceToScreenReader) window.announceToScreenReader(motivMsg);
+                let fullMsg = `${motivMsg} (+${window.gameSequence.length + 2} saniye)`;
+                if (gameStatus) gameStatus.textContent = fullMsg;
+                if (window.announceToScreenReader) window.announceToScreenReader(fullMsg);
 
                 const readTimeMs = Math.max(1500, (motivMsg.length * 65) + 800);
                 setTimeout(() => {
