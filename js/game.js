@@ -502,6 +502,7 @@ window.handleGameInput = function (key) {
         window.playerInputIndex++;
 
         if (window.playerInputIndex >= window.gameSequence.length) {
+            window.isComputerPlaying = true;
             if (window.correctSound) window.correctSound.play();
 
             if (window.activeDifficulty !== 'hard') {
