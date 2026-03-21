@@ -333,6 +333,18 @@ window.playGameSequence = function () {
 };
 
 window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
+    // 1. Tüm aktif HTML5 Audio elementlerini sustur
+    const allAudios = document.querySelectorAll('audio');
+    allAudios.forEach(audio => {
+        audio.pause();
+        audio.currentTime = 0;
+    });
+
+    // 2. Varsa devam eden Web Speech API (Sesli Okuma) anonslarını bıçak gibi kes
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+    }
+
     window.isStarted = false;
     window.isStarting = false;
     clearTimeout(window.sequenceTimeoutId);
