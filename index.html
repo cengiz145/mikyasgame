@@ -455,7 +455,7 @@
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
 
         <h1 id="game-menu-title">Hafızana Güven</h1>
-        <div id="game-hud-container" tabindex="0" aria-label="Jeton: 0, Süre: 30, Hak: 3"
+        <div id="game-hud-container"
             style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.3rem; color: #ffb703; font-weight: bold;">
             <span id="game-score-display" aria-hidden="true">Jeton: 0</span>
             <span id="game-timer-display" aria-hidden="true">Süre: 30</span>
@@ -506,7 +506,8 @@
     </button>
 
     <!-- Gizli Canlı Bölge (Sohbet penceresi kapalıyken bile mesajları okumak için) -->
-    <div id="sr-chat-reader" aria-live="assertive" style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;"></div>
+    <div id="sr-chat-reader" aria-live="assertive"
+        style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;"></div>
 
     <!-- Canlı Sohbet Penceresi -->
     <div id="chat-panel" class="chat-panel" aria-hidden="true" style="display: none;" role="dialog"
