@@ -643,6 +643,23 @@ window.addEventListener('load', () => {
     };
     document.addEventListener('keydown', keyEvent);
 
+window.playCurrentDialog = function() {
+    if (!window.practiceDialogues) return;
+    const statusText = document.getElementById('practice-status-text');
+    if (window.isDialogPhase) {
+        if (window.currentDialogIndex < window.practiceDialogues.length) {
+            let text = window.practiceDialogues[window.currentDialogIndex];
+            if (statusText) statusText.innerHTML = window.localizeText ? window.localizeText(text) : text;
+            if (window.announceToScreenReader) window.announceToScreenReader(text);
+        } else {
+            // Diyaloglar bitince şimdilik sadece haber versin (Sonraki aşamada eğitimi başlatacağız)
+            window.isDialogPhase = false;
+            if (statusText) statusText.innerHTML = "Eğitim başlıyor... (Kodlar eklenecek)";
+            if (window.announceToScreenReader) window.announceToScreenReader("Eğitim başlıyor.");
+        }
+    }
+};
+
     // Uygulama çıkış butonu ana oyun dosyasına bağlandı (en basit işlevi gereği)
     const exitBtn = document.getElementById('exit-btn');
     if (exitBtn) {
@@ -719,11 +736,17 @@ document.addEventListener('keydown', function (event) {
     }
 
     if (window.isStarted && window.currentActiveMenu === 'practice') {
+        // Yeni Eklenen Enter (Diyalog) Kontrolü
+        if (window.isDialogPhase && event.key === 'Enter') {
+            window.currentDialogIndex++;
+            if (window.playCurrentDialog) window.playCurrentDialog();
+            return;
+        }
+        // Mevcut Tuş Kontrolü
         const key = event.key.toLowerCase();
         const validKeys = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-        if (validKeys.includes(key) && !event.repeat) {
+        if (validKeys.includes(key) && !event.repeat && !window.isDialogPhase) {
             if (window.playPianoNoteSingle) window.playPianoNoteSingle(key);
-            // Practice logic is simple matching
         }
     }
 
