@@ -269,15 +269,24 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
         clearTimeout(window.menuFocusTimeoutId);
     }
 
-    // Sadece ana menüden alt menülere giderken tıklanan butonu kaydet
     if (window.currentActiveMenu === 'main' && newActiveMenuName !== 'main') {
         window.lastFocusedElement = document.activeElement;
     }
 
+    // ARAYÜZ VE EKRAN OKUYUCU (NVDA) ÇAKIŞMA ENGELLEYİCİSİ:
+    // Animasyon (300ms) süresince NVDA'nın her iki menüyü de okumasını (Ghosting) engellemek için anında gizleriz.
+    hideMenu.setAttribute('aria-hidden', 'true');
+    
+    let oldFocusables = hideMenu.querySelectorAll('button, [tabindex="0"], input, textarea');
+    oldFocusables.forEach(el => el.setAttribute('tabindex', '-1'));
+
     hideMenu.style.opacity = '0';
+
     setTimeout(() => {
         hideMenu.style.display = 'none';
-        hideMenu.setAttribute('aria-hidden', 'true');
+        
+        // Sonradan menüye dönüldüğünde butonlar çalışsın diye geçici tabindex engelini kaldırıyoruz
+        oldFocusables.forEach(el => el.removeAttribute('tabindex'));
 
         showMenu.style.display = 'flex';
         showMenu.removeAttribute('aria-hidden');
