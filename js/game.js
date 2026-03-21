@@ -682,6 +682,38 @@ window.startPracticeNote = function() {
     }
 };
 
+window.handlePracticeInput = function(key) {
+    if (!window.inPracticeTutorial) return;
+    const notes = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+    if (window.practiceTargetIndex >= notes.length) return;
+
+    if (key === notes[window.practiceTargetIndex]) {
+        window.practicePressCount++;
+        if (window.practicePressCount >= 3) {
+            // 3 kere doğru basıldıysa
+            if (window.correctSound) window.correctSound.play();
+            window.practiceTargetIndex++;
+            window.practicePressCount = 0;
+            setTimeout(() => {
+                if (window.startPracticeNote) window.startPracticeNote();
+            }, 1000); // 1 saniye sonra diğer notayı sor
+        } else {
+            // Doğru ama henüz 3 olmadı
+            if (window.practiceCorrectMessages) {
+                let msg = window.practiceCorrectMessages[Math.floor(Math.random() * window.practiceCorrectMessages.length)];
+                if (window.announceToScreenReader) window.announceToScreenReader(msg + " " + (3 - window.practicePressCount) + " kaldı.");
+            }
+        }
+    } else {
+        // Yanlış tuşa basıldı
+        if (window.wrongSound) window.wrongSound.play();
+        if (window.practiceWrongMessages) {
+            let msg = window.practiceWrongMessages[Math.floor(Math.random() * window.practiceWrongMessages.length)];
+            if (window.announceToScreenReader) window.announceToScreenReader(msg);
+        }
+    }
+};
+
     // Uygulama çıkış butonu ana oyun dosyasına bağlandı (en basit işlevi gereği)
     const exitBtn = document.getElementById('exit-btn');
     if (exitBtn) {
@@ -769,6 +801,7 @@ document.addEventListener('keydown', function (event) {
         const validKeys = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
         if (validKeys.includes(key) && !event.repeat && !window.isDialogPhase) {
             if (window.playPianoNoteSingle) window.playPianoNoteSingle(key);
+            if (window.handlePracticeInput) window.handlePracticeInput(key);
         }
     }
 
