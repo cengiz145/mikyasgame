@@ -220,7 +220,7 @@ window.handleStoryWalking = function(key) {
             
             if (window.announceToScreenReader) window.announceToScreenReader("Tebrikler! Tüm notaları sırasıyla topladın ve piyanoyu onardın. Kayıp Notalar modunu başarıyla tamamladın!");
             
-            setTimeout(() => {
+            window.storyWinTimeout = setTimeout(() => {
                 if (window.gameModes && window.gameModes.missing_notes) {
                     window.gameModes.missing_notes.completionCount += 1;
                     try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}

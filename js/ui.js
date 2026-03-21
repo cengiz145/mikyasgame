@@ -765,6 +765,8 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(window.storyAnimTimeout4);
             clearTimeout(window.storyAnimTimeout5);
             clearTimeout(window.stepIntervalId);
+            clearTimeout(window.storyAnimTimeout5);
+            clearTimeout(window.stepIntervalId);
             clearTimeout(window.storyEntryTimeout);
             if (window.storyWinTimeout) {
                 clearTimeout(window.storyWinTimeout);

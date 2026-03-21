@@ -374,6 +374,10 @@ window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
 
         endMessage = `Oyundan çıkıldı. Bu oyunda toplam ${window.sessionTokens} jeton kazandınız. Toplam jetonunuz ${totalTokens}. Ana menüye dönüldü.`;
         if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
+        // Oyuncu kendi çıkarsa Ana Menü müziğini geri başlat
+        if (window.bgMusic && !window.bgMusic.playing()) {
+            window.bgMusic.play();
+        }
         return;
     }
 
