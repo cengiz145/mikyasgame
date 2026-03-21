@@ -712,12 +712,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (feedbackSubmitBtn) {
-        feedbackSubmitBtn.addEventListener('click', () => {
-            const form = document.getElementById('feedback-form');
-            if (form) {
-                form.submit();
-                if (window.announceToScreenReader) window.announceToScreenReader("Geri bildirim formunuz yönlendiriliyor.");
+        feedbackSubmitBtn.addEventListener('click', function() {
+            let name = document.getElementById('feedback-name').value.trim() || "Anonim Oyuncu";
+            let category = document.getElementById('feedback-category').value;
+            let text = document.getElementById('feedback-text').value.trim();
+            let desc = document.getElementById('feedback-desc'); // aria-live okuma alanı
+            let btn = this;
+
+            if (!text) {
+                desc.textContent = "Hata: Lütfen bilet mesajınızı boş bırakmayın.";
+                document.getElementById('feedback-text').focus();
+                return;
             }
+
+            desc.textContent = "Sunucuya bağlanılıyor, lütfen bekleyin...";
+            btn.disabled = true;
+
+            // Firebase'e veriyi gönder
+            firebase.database().ref('feedbacks').push({
+                name: name,
+                category: category,
+                message: text,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                desc.textContent = "Başarılı! Geri bildiriminiz Başyönetmen'e güvenle iletildi.";
+                document.getElementById('feedback-name').value = "";
+                document.getElementById('feedback-text').value = "";
+                btn.disabled = false;
+            }).catch((error) => {
+                desc.textContent = "Bağlantı hatası: " + error.message;
+                btn.disabled = false;
+            });
         });
     }
 
