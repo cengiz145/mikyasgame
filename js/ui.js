@@ -48,43 +48,17 @@ window.guncellemeKontrolEt = function (isManual = false) {
 
                 window.gameIsActive = false;
                 if (typeof Howler !== 'undefined') Howler.stop();
-
-                document.body.innerHTML = "";
-                document.body.style.backgroundColor = "#111";
+                if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
 
                 const updateSound = new window.Audio('sounds/update.ogg');
                 updateSound.play();
 
-                const updateMsg = document.createElement("h1");
-                updateMsg.textContent = "Zorunlu Güncelleme: Eski sürüm devre dışı bırakıldı.";
-                updateMsg.style.color = "#ffb703";
-                updateMsg.style.textAlign = "center";
-                updateMsg.style.marginTop = "20vh";
-                document.body.appendChild(updateMsg);
-
-                setTimeout(() => {
-                    const refreshBtn = document.createElement("button");
-                    refreshBtn.textContent = "YENİ SÜRÜME GEÇ (SAYFAYI YENİLE)";
-                    refreshBtn.style.position = "fixed";
-                    refreshBtn.style.top = "50%";
-                    refreshBtn.style.left = "50%";
-                    refreshBtn.style.transform = "translate(-50%, -50%)";
-                    refreshBtn.style.zIndex = "999999";
-                    refreshBtn.style.padding = "30px 40px";
-                    refreshBtn.style.fontSize = "1.5rem";
-                    refreshBtn.style.fontWeight = "bold";
-                    refreshBtn.style.backgroundColor = "#ffb703";
-                    refreshBtn.style.color = "#000";
-                    refreshBtn.style.borderRadius = "15px";
-                    refreshBtn.setAttribute("aria-label", "Yeni sürüme geçmek zorunludur. Lütfen sayfayı yenileyin.");
-                    refreshBtn.onclick = () => { window.location.href = window.location.pathname + "?v=" + new Date().getTime(); };
-                    document.body.appendChild(refreshBtn);
-                    
-                    setTimeout(() => {
-                        alert(uyariMesaji);
-                        refreshBtn.focus();
-                    }, 50);
-                }, 500);
+                if (window.updateMenu) {
+                    window.switchMenu(window.currentActiveMenu, window.updateMenu, 'update');
+                } else {
+                    alert(uyariMesaji);
+                    window.location.href = window.location.pathname + "?v=" + new Date().getTime();
+                }
             } else {
                 if (isManual && typeof window.announceToScreenReader === 'function') {
                     window.announceToScreenReader(currentMsg);
@@ -163,6 +137,7 @@ window.statsMenu = document.getElementById('stats-menu-container');
 window.storeMenu = document.getElementById('store-menu-container');
 window.feedbackMenu = document.getElementById('feedback-menu-container');
 window.serverMessageMenu = document.getElementById('server-message-container');
+window.updateMenu = document.getElementById('update-menu-container');
 window.achievementsMenu = document.getElementById('achievements-menu-container');
 window.gameMenu = document.getElementById('game-menu-container');
 window.storyMenu = document.getElementById('story-menu-container');
@@ -196,19 +171,37 @@ window.getActiveButtons = function () {
 window.updateMobileKeysVisibility = function () {
     const mobilePiano = document.getElementById('mobile-piano-container');
     const mobileEnter = document.getElementById('mobile-enter-container');
+    const mobileReplay = document.getElementById('mobile-replay-btn');
+    const desktopExitLi = document.querySelector('.desktop-exit-li');
 
     document.body.classList.remove('show-mobile-keys', 'show-mobile-enter');
 
     if (mobilePiano) mobilePiano.setAttribute('aria-hidden', 'true');
-    if (mobileEnter) mobileEnter.setAttribute('aria-hidden', 'true');
+    if (mobileEnter) {
+        mobileEnter.setAttribute('aria-hidden', 'true');
+        mobileEnter.style.display = '';
+    }
+    if (desktopExitLi) desktopExitLi.style.cssText = '';
 
     if (window.currentActiveMenu === 'game') {
-        if (typeof window.gameIsActive !== 'undefined' && !window.gameIsActive) {
-            document.body.classList.add('show-mobile-enter');
-            if (mobileEnter) mobileEnter.removeAttribute('aria-hidden');
+        if (typeof window.gameIsActive !== 'undefined' && !window.gameIsActive && window.sessionTokens !== undefined) {
+            // OYUN BITTI EKRANI (Game Over)
+            // Sadece Oyunu Bitir butonu görünmeli
+            if (mobileEnter) mobileEnter.style.display = 'none';
+            if (mobileReplay) mobileReplay.style.display = 'none';
+            if (desktopExitLi) {
+                desktopExitLi.style.display = 'block';
+                desktopExitLi.style.margin = '0 auto';
+                desktopExitLi.style.textAlign = 'center';
+            }
+        } else if (typeof window.gameIsActive !== 'undefined' && !window.gameIsActive) {
+            // OYUN BASLAMADAN ONCEKI 3 SANIYE GERI SAYIMI
+            if (desktopExitLi) desktopExitLi.style.display = 'none';
         } else {
+            // OYUN AKTIF
             document.body.classList.add('show-mobile-keys');
             if (mobilePiano) mobilePiano.removeAttribute('aria-hidden');
+            if (desktopExitLi) desktopExitLi.style.display = 'none';
         }
     } else if (window.currentActiveMenu === 'practice') {
         if (typeof window.isDialogPhase !== 'undefined' && window.isDialogPhase) {
@@ -1112,7 +1105,52 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
-    if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp'].includes(event.key)) {
+    if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Enter'].includes(event.key)) {
+        // Ok tuşlarıyla mesajı tekrar okuma ve Enter ile sessizce geçme mantığı
+        if ((window.currentActiveMenu === 'story' && window.isDialogPhase) ||
+            (window.currentActiveMenu === 'practice' && window.isDialogPhase) ||
+            window.currentActiveMenu === 'server-message' ||
+            window.currentActiveMenu === 'update') {
+            
+            event.preventDefault();
+
+            if (event.key === 'Enter') {
+                // Sadece Entıra basılınca onaylansın
+                if (window.currentActiveMenu === 'server-message') {
+                    const btn = document.getElementById('server-message-continue-btn');
+                    if (btn) btn.click();
+                } else if (window.currentActiveMenu === 'update') {
+                    const btn = document.getElementById('update-install-btn');
+                    if (btn) btn.click();
+                } else if (window.currentActiveMenu === 'story') {
+                    // Story.js enter'ı kendi game.js içinden dinliyor olabilir, ancak buraya da koyabiliriz.
+                    // Fakat story entırı karmaşık, game.js'den yönetiliyor.
+                }
+                return;
+            }
+
+            // Ok tuşlarına basıldıysa mevcut mesajı tekrar okut
+            let textToRead = "";
+            if (window.currentActiveMenu === 'story' && window.missingNotesDialogues) {
+                textToRead = window.missingNotesDialogues[window.currentStoryIndex];
+            } else if (window.currentActiveMenu === 'practice' && window.practiceDialogues) {
+                textToRead = window.practiceDialogues[window.currentDialogIndex];
+            } else if (window.currentActiveMenu === 'server-message') {
+                let p = document.getElementById('server-message-text');
+                if (p) textToRead = "Yapılan Son Değişiklik: " + (p.innerText || p.textContent);
+            } else if (window.currentActiveMenu === 'update') {
+                let p = document.getElementById('update-text');
+                if (p) textToRead = p.innerText || p.textContent;
+            }
+
+            if (textToRead && window.announceToScreenReader) {
+                window.announceToScreenReader(textToRead);
+            }
+            return;
+        }
+
+        if (event.key === 'Enter') return; // Sadece ok tuşlarını menü gezinmesine bırak
+
         const activeButtons = window.getActiveButtons();
         if (activeButtons.length === 0) return;
 
