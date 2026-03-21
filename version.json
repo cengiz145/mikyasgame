@@ -1,5 +1,5 @@
 {
-    "version":  "0.80",
-    "buildId":  1774078407,
-    "changelog":  "Seviye 1 Yüzey Suları Temizliği: DOM yarışları durduruldu ve Gereksiz Timeout sızıntıları tamamen kapatıldı"
+    "version":  "0.81",
+    "buildId":  1774079801,
+    "changelog":  "Bellek (RAM) koruma zırhı eklendi: Hayalet jeton döngüsü ve kayıp zamanlayıcılar (memory leak) düzeltildi."
 }

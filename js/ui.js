@@ -325,15 +325,24 @@ window.announceToScreenReader = function (text, forceFocus = false) {
         // index.html'de sabit olarak koyduğumuz sr-chat-reader'ı kullanıyoruz
         let liveAnnouncer = document.getElementById('sr-chat-reader');
         if (liveAnnouncer) {
-            liveAnnouncer.innerHTML = '';
+            // Hafızadaki eski silme zamanlayıcılarını bul ve yok et
+            if (window.announcerTimeouts) {
+                window.announcerTimeouts.forEach(t => clearTimeout(t));
+            }
+            window.announcerTimeouts = [];
+
+            liveAnnouncer.innerHTML = ''; // Ekrani temizle
             let msgNode = document.createElement('div');
             msgNode.textContent = text;
             liveAnnouncer.appendChild(msgNode);
-            setTimeout(() => {
+
+            // Yeni zamanlayıcıyı kur ve hafızaya kaydet
+            let tId = setTimeout(() => {
                 if (msgNode.parentNode) {
                     msgNode.remove();
                 }
             }, 10000);
+            window.announcerTimeouts.push(tId);
         }
     } else {
         // PC'de doğrudan Odaklanarak okutma (Eski kararlı yöntem)
