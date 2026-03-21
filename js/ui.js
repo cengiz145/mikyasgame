@@ -1460,8 +1460,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         addLocalSystemMessage(`[Siz -> ${targetUser}]: ${pmMessage}`);
                     }
                 }
+            } else if (command === '/unban') {
+                if (args.length < 2) {
+                    addLocalSystemMessage("Kullanım: /unban <takma_ad>");
+                } else {
+                    let targetUser = args[1];
+                    if (window.db) {
+                        window.db.ref('banned_users/' + targetUser).remove();
+                        addLocalSystemMessage(`${targetUser} adlı oyuncunun yasağı başarıyla kaldırıldı.`);
+                    }
+                }
             } else if (command === '/yardim' || command === '/yardım') {
-                addLocalSystemMessage("Mevcut komutlar: /temizle, /saat, /jeton, /bilet, /ban, /pm, /yardım.");
+                addLocalSystemMessage("Mevcut komutlar: /temizle, /saat, /jeton, /bilet, /ban, /unban, /pm, /yardım.");
             } else {
                 addLocalSystemMessage("Bilinmeyen komut. Komutları öğrenmek için /yardım yazabilirsiniz.");
             }
