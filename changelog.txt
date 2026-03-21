@@ -1,5 +1,14 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.92.0] - 2026-03-22
+
+### Eklenenler / Değiştirilenler:
+- **Zorunlu Güncelleme Ekranı Revizyonu:** Vahşi uyarılara neden olan yıkıcı alert ekranı iptal edilip yerine erişilebilir "Zorunlu Güncelleme" diyalog penceresi eklendi.
+- **Yama Notları Menüsü:** Güncelleme ekranından sonra çıkarılan Yama Notları diyalog ekranı NVDA uyumlu standart okuma alanına sahip yapıldı.
+- **Ok Tuşlarıyla Okuma:** Hikaye, Alıştırma, Güncelleme ve Yama Notları ekranlarında kullanıcı sağ, sol, aşağı, yukarı oklara bastığında mesajı baştan okuyacak NVDA destekli kısayollar eklendi. 
+- **Enter Onayı:** Sistemsel diyalog ekranlarında butona odaklanmadan, direkt Enter tuşuna basarak devam etme özelliği oyuna kazandırıldı.
+- **Mobil Oyun Sonu Arınması:** Oyun bitiş ekranında çıkan işlevsiz butonlar kaldırılarak mobil kullanıcılar için direkt Çıkış/Bitir butonu öne çıkarıldı.
+
 [v0.91.0] - 2026-03-21
 
 ### Eklenenler / Değiştirilenler:

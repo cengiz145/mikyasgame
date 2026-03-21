@@ -1,5 +1,5 @@
 {
-    "version":  "0.91.0",
-    "buildId":  1774091777,
-    "changelog":  "Oyun Başlangıcı için Çevrimdışı ve Çok Oyunculu seçim ara menüsü (Game Mode Select) kurgulandı."
+    "version": "0.92.0",
+    "buildId": 1711059292,
+    "changelog": "Zorunlu güncellemeler için NVDA uyumlu yeni diyalog penceresi eklendi. Tüm hikaye, alıştırma ve sistem pencerelerinde ok tuşlarıyla mesajı tekrar okuma özelliği getirildi. Mobil oyun sonu arayüzü sadeleştirildi."
 }
