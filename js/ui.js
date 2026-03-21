@@ -271,8 +271,20 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             window.currentActiveMenu = newActiveMenuName;
             window.updateMobileKeysVisibility();
             window.currentFocusIndex = 0;
-            const firstBtn = showMenu.querySelector('.menu-button');
-            if (firstBtn) firstBtn.focus();
+            
+            // 1. Önce yeni açılan menünün H1 başlığını bul ve ekran okuyucuya anons et
+            let menuTitle = showMenu.querySelector('h1');
+            if (menuTitle && window.announceToScreenReader) {
+                window.announceToScreenReader(menuTitle.innerText || menuTitle.textContent);
+            }
+            
+            // 2. Butona odaklanmayı 1 saniye (1000ms) geciktirerek yap!
+            setTimeout(() => {
+                let firstFocusable = showMenu.querySelector('.menu-button, button, [tabindex="0"], input, select, textarea');
+                if (firstFocusable) {
+                    firstFocusable.focus();
+                }
+            }, 1000); // Ekran okuyucu başlığı okurken lafı kesilmesin
         }, 50);
     }, 300);
 
