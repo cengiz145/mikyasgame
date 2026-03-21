@@ -609,6 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Store
     if (storeBtnMain && storeBackBtn) {
         storeBtnMain.addEventListener('click', () => {
+            window.lastFocusedElement = document.activeElement;
             window.switchMenu(window.mainMenu, window.storeMenu, 'store');
             document.getElementById('main-menu-container').setAttribute('aria-hidden', 'true');
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
@@ -617,6 +618,14 @@ document.addEventListener('DOMContentLoaded', () => {
         storeBackBtn.addEventListener('click', () => {
             window.switchMenu(window.storeMenu, window.mainMenu, 'main');
             document.getElementById('main-menu-container').removeAttribute('aria-hidden');
+            setTimeout(() => {
+                if (window.lastFocusedElement) {
+                    window.lastFocusedElement.focus();
+                } else {
+                    let startBtn = document.getElementById('start-game-btn');
+                    if (startBtn) startBtn.focus();
+                }
+            }, 350);
         });
     }
 
@@ -952,6 +961,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.isChatOpen = !window.isChatOpen;
 
         if (window.isChatOpen) {
+            window.lastFocusedElement = document.activeElement;
             chatPanel.style.display = 'flex';
             chatPanel.removeAttribute('aria-hidden');
             document.getElementById('main-menu-container').setAttribute('aria-hidden', 'true');
@@ -999,9 +1009,16 @@ document.addEventListener('DOMContentLoaded', () => {
             chatPanel.style.display = 'none';
             chatPanel.setAttribute('aria-hidden', 'true');
             document.getElementById('main-menu-container').removeAttribute('aria-hidden');
-            if (chatToggleBtn) {
-                setTimeout(() => chatToggleBtn.focus(), 100);
-            }
+            
+            setTimeout(() => {
+                if (window.lastFocusedElement) {
+                    window.lastFocusedElement.focus();
+                } else {
+                    let startBtn = document.getElementById('start-game-btn');
+                    if (startBtn) startBtn.focus();
+                }
+            }, 100);
+
             if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet kapatıldı.', false);
         }
     };

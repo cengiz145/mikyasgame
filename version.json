@@ -1,5 +1,5 @@
 {
-    "version":  "0.83",
-    "buildId":  1774083040,
-    "changelog":  "Mobil ekran okuyucu ses kilidi kırıcı ve Modal odak kapanı (A11y) eklendi."
+    "version":  "0.84",
+    "buildId":  1774084056,
+    "changelog":  "Odağı Geri Çağırma (Focus Return) sistemi A11y güncellemesi eklendi."
 }
