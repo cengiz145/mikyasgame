@@ -111,6 +111,7 @@ window.triggerStoryAnimations = function(index) {
 };
 
 window.initializeMissingNotesMap = function() {
+    window.notesInPiano = [];
     const noteNames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 
     const availableX = [];

@@ -819,6 +819,7 @@ document.addEventListener('keydown', function (event) {
             } else {
                 window.isGridWalkingPhase = true;
                 window.playerX = 1;
+                if (typeof window.initializeMissingNotesMap === 'function') window.initializeMissingNotesMap();
                 window.currentAutoWalkStep = 0;
                 
                 if (window.announceToScreenReader) window.announceToScreenReader("Kayıp Notalar macerasına başlıyorsunuz. İlk notayı bulmak için sağ ok tuşuna basıp karlı zeminde yürüyün.", false);
