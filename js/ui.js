@@ -1341,10 +1341,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- GİZLİ SOHBET KOMUTLARI (CLIENT-SIDE) ---
         if (text.startsWith('/')) {
-            const command = text.split(' ')[0].toLowerCase();
+            const args = text.split(' ');
+            const command = args[0].toLowerCase();
             const chatMessagesListLocal = document.getElementById('chat-messages');
             const chatMessagesContainerLocal = document.querySelector('.chat-messages-container');
             const chatMessageInputLocal = document.getElementById('chat-message-input');
+            
+            // Kullanıcı Geliştirici Mi Kontrolü
+            let cUserNick = window.currentChatUser || "";
+            let nickInputTemp = document.getElementById('chat-nickname');
+            if (nickInputTemp && nickInputTemp.value.trim() !== "") cUserNick = nickInputTemp.value.trim();
+            let isDev = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(cUserNick.toLowerCase());
 
             function addLocalSystemMessage(msgText) {
                 const li = document.createElement('li');
@@ -1361,6 +1368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (command === '/temizle') {
+                if (!isDev) { addLocalSystemMessage("Hata: Bu işlem için 'Geliştirici' yetkiniz yok."); return; }
                 if (chatMessagesListLocal) chatMessagesListLocal.innerHTML = '';
                 addLocalSystemMessage("Sohbet geçmişiniz (sadece sizin ekranınızda) temizlendi.");
                 
@@ -1431,6 +1439,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             } else if (command === '/ban') {
+                if (!isDev) { addLocalSystemMessage("Hata: Bu işlem için 'Geliştirici' yetkiniz yok."); return; }
                 if (args.length < 2) {
                     addLocalSystemMessage("Kullanım: /ban <takma_ad>");
                 } else {
@@ -1461,6 +1470,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             } else if (command === '/unban') {
+                if (!isDev) { addLocalSystemMessage("Hata: Bu işlem için 'Geliştirici' yetkiniz yok."); return; }
                 if (args.length < 2) {
                     addLocalSystemMessage("Kullanım: /unban <takma_ad>");
                 } else {
@@ -1638,16 +1648,21 @@ document.addEventListener('DOMContentLoaded', () => {
             li.setAttribute('aria-label', `Sistem mesajı: ${escapeHTML(data.text)}`);
             li.innerHTML = `<div class="wp-bubble" aria-hidden="true">${escapeHTML(data.text)}</div>`;
         } else {
+            // Rütbe Belirleme
+            let isimKucuk = (data.nickname || "").toLowerCase();
+            let isDevRender = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(isimKucuk);
+            let rutbe = isDevRender ? "Geliştirici" : "Oyuncu";
+            
             // Benim gönderdiğim mesaj mı yoksa başkasının mı?
             const isMe = data.nickname === chatNicknameInput.value.trim() && chatNicknameInput.value.trim() !== "";
             li.classList.add(isMe ? 'message-out' : 'message-in');
             
-            li.setAttribute('aria-label', `[${timeRaw}] ${escapeHTML(data.nickname)}: ${escapeHTML(data.text)}`);
+            li.setAttribute('aria-label', `[${timeRaw}] ${rutbe} ${escapeHTML(data.nickname)}: ${escapeHTML(data.text)}`);
             
             // Whatsapp Görsel Balonu
             li.innerHTML = `
                 <div class="wp-bubble" aria-hidden="true">
-                    ${!isMe ? `<div class="wp-sender">${escapeHTML(data.nickname)}</div>` : ''}
+                    ${!isMe ? `<div class="wp-sender"><span style="color:${isDevRender ? '#ffaa00' : '#88acb8'}; font-size:0.85em;">[${rutbe}]</span> ${escapeHTML(data.nickname)}</div>` : `<div style="font-size: 0.75em; color:${isDevRender ? '#ffaa00' : '#9bbca1'}; margin-bottom: 3px;">[${rutbe}]</div>`}
                     <div class="wp-text">${escapeHTML(data.text)}</div>
                     ${timeString}
                 </div>
@@ -1672,8 +1687,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.nickname === "Sistem") {
             messageToRead = `Sistem mesajı: ${data.text}`;
         } else {
-            // GönderenKişi: Mesaj metni formatı istendiği gibi eklendi
-            messageToRead = `${data.nickname}: ${data.text}`;
+            let isimKucuk = (data.nickname || "").toLowerCase();
+            let isDevRead = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(isimKucuk);
+            let rutbe = isDevRead ? "Geliştirici" : "Oyuncu";
+
+            messageToRead = `${rutbe} ${data.nickname}: ${data.text}`;
             if (!isMe) {
                 isNewIncomingMessage = true;
             }
