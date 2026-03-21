@@ -1373,6 +1373,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             window.db.ref('messages').push(messageData).then(() => {
+                // 50 Mesaj Kotası: Databasede 50 mesajdan fazlası varsa en eskilerini sil!
+                window.db.ref('messages').once('value').then(snapshot => {
+                    let total = snapshot.numChildren();
+                    if (total > 50) {
+                        let excessCount = total - 50;
+                        let i = 0;
+                        snapshot.forEach(child => {
+                            if (i < excessCount) {
+                                child.ref.remove();
+                            }
+                            i++;
+                        });
+                    }
+                });
+
                 // Başarılı gönderim sonrası Takma Adı oturuma VE KALICI DEPOLAMAYA kaydet
                 localStorage.setItem('chatUsername', nickname);
                 sessionStorage.setItem('chatNickname', nickname);
@@ -1522,4 +1537,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Sohbet penceresi açıldığında geçmiş mesajların en altına kaydırmayı garantiye almak için Observer ekleyelim
     // Veya toggleChat butonuna basıldığında scrollTop tetiklenebilir.
+});
+
+// Oyuncu oyundan çıkarken/sayfa kapanırken tüm sohbeti kalıcı olarak sıfırla (0'la)
+window.addEventListener('beforeunload', () => {
+    if (window.db) {
+        window.db.ref('messages').remove();
+    }
 });

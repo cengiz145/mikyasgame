@@ -779,6 +779,8 @@ window.handlePracticeInput = function(key) {
     if (exitBtn) {
         exitBtn.addEventListener('click', function () {
             if (window.clickSound) window.clickSound.play();
+            // Oyuncu oyundan çıktığı anda sohbeti 0'la
+            if (window.db) window.db.ref('messages').remove();
             if (window.announceToScreenReader) window.announceToScreenReader('Oyundan çıkmak için lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
             setTimeout(() => { window.close(); }, 1500);
         });
