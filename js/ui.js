@@ -1044,14 +1044,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mesaj Gönderme İşlevi
     function sendMessage() {
-        const nickname = chatNicknameInput.value.trim();
-        const text = chatMessageInput.value.trim();
+        let nickInput = document.getElementById('chat-nickname');
+        let msgInput = document.getElementById('chat-message-input');
 
-        if (nickname === '') {
-            if (window.announceToScreenReader) window.announceToScreenReader('Lütfen bir takma ad girin.', false);
-            chatNicknameInput.focus();
-            return;
+        // Boşlukları tıraşla
+        let nickVal = nickInput ? nickInput.value.trim() : "";
+        let msgVal = msgInput ? msgInput.value.trim() : "";
+
+        if (nickVal === "" || msgVal === "") {
+            // Mesaj veya isim tamamen boşluktan ibaretse veya boşsa
+            if (window.wrongSound) window.wrongSound.play();
+            let uyari = "Lütfen geçerli bir takma ad ve mesaj girin. Boş mesaj gönderilemez.";
+            if (window.announceToScreenReader) window.announceToScreenReader(uyari);
+            
+            // İmleci eksik olan yere odakla
+            if (nickVal === "" && nickInput) nickInput.focus();
+            else if (msgInput) msgInput.focus();
+            
+            return; // Gönderimi iptal et ve sistemi koru!
         }
+
+        const nickname = nickVal;
+        const text = msgVal;
 
         if (nickname.toLowerCase() === 'sistem') {
             if (window.announceToScreenReader) window.announceToScreenReader('Bu takma adı kullanamazsınız.', false);
