@@ -165,6 +165,7 @@ window.playIntro = function () {
     if (window.introPlayed) return;
     window.introPlayed = true;
 
+    const randomLogoNum = Math.floor(Math.random() * 5) + 1;
     const ext = randomLogoNum === 1 ? 'ogg' : 'wav';
     const audio = new window.Audio(`sounds/logo${randomLogoNum}.${ext}`);
 

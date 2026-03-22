@@ -1159,17 +1159,19 @@ document.addEventListener('keydown', function (event) {
         event.preventDefault();
 
         if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+            if (window.currentFocusIndex >= activeButtons.length) window.currentFocusIndex = 0;
             if (activeButtons.length === 1) {
-                activeButtons[window.currentFocusIndex].blur();
-                setTimeout(() => activeButtons[window.currentFocusIndex].focus(), 10);
+                activeButtons[0].blur();
+                setTimeout(() => activeButtons[0].focus(), 10);
             } else {
                 window.currentFocusIndex = (window.currentFocusIndex + 1) % activeButtons.length;
                 activeButtons[window.currentFocusIndex].focus();
             }
         } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+            if (window.currentFocusIndex >= activeButtons.length) window.currentFocusIndex = 0;
             if (activeButtons.length === 1) {
-                activeButtons[window.currentFocusIndex].blur();
-                setTimeout(() => activeButtons[window.currentFocusIndex].focus(), 10);
+                activeButtons[0].blur();
+                setTimeout(() => activeButtons[0].focus(), 10);
             } else {
                 window.currentFocusIndex = (window.currentFocusIndex - 1 + activeButtons.length) % activeButtons.length;
                 activeButtons[window.currentFocusIndex].focus();
