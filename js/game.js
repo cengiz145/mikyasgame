@@ -345,11 +345,11 @@ window.startMainGame = function (difficulty = 'easy') {
 
                 if (window.gameTimer === 20) {
                     if (window.secons2Sound) window.secons2Sound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Son 20 saniye.", false);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Son 20 saniye.", true);
                 }
 
                 if (window.gameTimer === 10) {
-                    if (window.announceToScreenReader) window.announceToScreenReader("Son 10 saniye.", false);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Son 10 saniye.", true);
                 }
 
                 if (window.gameTimer <= 10 && window.gameTimer > 0) {
@@ -684,7 +684,7 @@ window.handleGameInput = function (key) {
                 window.sessionTokens += earnedTokens;
             }
 
-            window.gameTimer += (window.gameSequence.length + 2);
+            window.gameTimer += (window.gameSequence.length + 7);
             window.gameScore += 1;
             window.gameMistakes = 0;
             window.updateGameUI();
@@ -713,9 +713,9 @@ window.handleGameInput = function (key) {
                     }
                 }
 
-                let fullMsg = `${motivMsg} (+${window.gameSequence.length + 2} saniye)`;
+                let fullMsg = `${motivMsg} (+${window.gameSequence.length + 7} saniye)`;
                 if (gameStatus) gameStatus.textContent = fullMsg;
-                if (window.announceToScreenReader) window.announceToScreenReader(fullMsg);
+                if (window.announceToScreenReader) window.announceToScreenReader(fullMsg, true);
 
                 const readTimeMs = Math.max(1500, (motivMsg.length * 65) + 800);
                 setTimeout(() => {
@@ -983,11 +983,11 @@ document.addEventListener('keydown', function (event) {
         if (!window.isGridWalkingPhase) {
             if (key === 's') {
                 event.preventDefault();
-                if (window.announceToScreenReader) window.announceToScreenReader(`Geçilen tur: ${window.gameScore}. Kazanılan jeton: ${window.sessionTokens}.`);
+                if (window.announceToScreenReader) window.announceToScreenReader(`Geçilen tur: ${window.gameScore}. Kazanılan jeton: ${window.sessionTokens}.`, true);
             } else if (key === 't') {
                 event.preventDefault();
                 const displayTime = window.gameTimer < 0 ? 0 : window.gameTimer;
-                if (window.announceToScreenReader) window.announceToScreenReader(`Kalan süre: ${displayTime} saniye.`);
+                if (window.announceToScreenReader) window.announceToScreenReader(`Kalan süre: ${displayTime} saniye.`, true);
             } else if (key === ' ') {
                 event.preventDefault();
                 if (!window.isComputerPlaying && window.gameSequence.length > 0) {

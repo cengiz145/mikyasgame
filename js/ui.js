@@ -366,10 +366,31 @@ window.announceToScreenReader = function (text, forceFocus = false) {
 window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReason) {
     if (!btnElement) return;
 
+    let targetTurns = 10;
+    if(modeData.name === 'Kolay') targetTurns = 2;
+    if(modeData.name === 'Orta') targetTurns = 5;
+    if(modeData.name === 'Zor') targetTurns = 10;
+
+    let statusText = "";
+    if (modeData.name !== 'Kayıp Notalar') {
+        if (modeData.completionCount > 0) {
+            statusText = " (Tamamlandı)";
+            unlockedLabel += ". Bu mod daha önce tamamlandı.";
+        } else {
+            statusText = ` (Hedef: ${targetTurns} Tur)`;
+            unlockedLabel += `. Modu kazanmak için ${targetTurns} tur oynamanız gerekiyor.`;
+        }
+    } else {
+        if (modeData.completionCount > 0) {
+            statusText = " (Tamamlandı)";
+            unlockedLabel += ". Bu mod daha önce tamamlandı.";
+        }
+    }
+
     if (modeData.isUnlocked) {
         btnElement.removeAttribute('aria-disabled');
         btnElement.classList.remove('locked-btn');
-        btnElement.innerHTML = modeData.name + " Mod";
+        btnElement.innerHTML = modeData.name + (modeData.name === "Hayatta Kalma" ? "" : " Mod") + statusText;
         btnElement.setAttribute('aria-label', unlockedLabel);
     } else {
         btnElement.setAttribute('aria-disabled', 'true');
@@ -415,6 +436,7 @@ window.updateDifficultyMenuLocks = function () {
         window.gameModes.missing_notes.isUnlocked = true;
     }
 
+    const btnEasy = document.getElementById('btn-diff-easy');
     const btnMedium = document.getElementById('btn-diff-medium');
     const liMedium = document.getElementById('li-diff-medium');
     const btnHard = document.getElementById('btn-diff-hard');
@@ -426,6 +448,7 @@ window.updateDifficultyMenuLocks = function () {
     if (liHard) liHard.style.display = 'block';
     if (liMissingNotes) liMissingNotes.style.display = 'block';
 
+    if (btnEasy) window.updateButtonUI(btnEasy, window.gameModes.easy, "Kolay Modu Oyna", "");
     window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta Modu Oyna", "Kolay modu 1 kez tamamla");
     window.updateButtonUI(btnHard, window.gameModes.hard, "Zor Modu Oyna", "Orta modu 5 kez tamamla");
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp Notalar Modu. Hikayeli piyano modu.", "Zor modu 5 kez tamamla");

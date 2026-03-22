@@ -1,5 +1,5 @@
 {
-    "version": "0.92.0",
-    "buildId": 1711059292,
-    "changelog": "Zorunlu güncellemeler için NVDA uyumlu yeni diyalog penceresi eklendi. Tüm hikaye, alıştırma ve sistem pencerelerinde ok tuşlarıyla mesajı tekrar okuma özelliği getirildi. Mobil oyun sonu arayüzü sadeleştirildi."
+    "version": "0.93.0",
+    "buildId": 1774166248,
+    "changelog": "Zorluk seçim ekranı menüsüne 'Tamamlandı' ve 'Kazanmak için X tur' göstergeleri eklendi. NVDA Browse modu agresif olarak kapatıldı. Müzikal doğru bilme süresi kalıcı olarak +5 saniye artırıldı. Tüm motivasyon sözleri ve süre okumaları NVDA için Acil Odaklanma kipine taşındı."
 }

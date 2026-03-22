@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.93.0] - 2026-03-22
+
+### Eklenenler / Değiştirilenler:
+- **Zorluk Menüsü Göstergeleri:** Modların üzerine tamamlanıp tamamlanmadığı, tamamlanmadıysa kazanmak için kaç tur süreceği bilgisi yazıyla ve ekran okuyucuyla okunacak şekilde eklendi.
+- **NVDA Kalkanı:** Tarayıcıyı rastgele (Browse) göz atma kipine geçiren hatalı aria tanımları temizlendi, oyunun klavye yakalayıcı yapısını korumak için sadece Odak kipiyle (Application mode) çalışacak şekilde zorlandı.
+- **Odaklı Okumalar:** Motivasyon sözleri (+X saniye) ile S ve T tuşlarındaki oyun içi ekran okumaları (Süre, Tur) normal canlı okuma alanından alınarak `forceFocus` ile gizli bir diva odaklatıldı. NVDA'nın sözleri başka işlemle yutmadan kesin okuması garantilendi.
+- **Ek Süre Bonusu:** Bir tur doğru bilindiğinde kazanılan ek sürelere +5 saniye artış sağlandı. (Örn: 3 nota bilindiğinde 5 sn hediye edilirken, artık 10 sn hediye edilecek.)
+
 [v0.92.0] - 2026-03-22
 
 ### Eklenenler / Değiştirilenler:
