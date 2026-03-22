@@ -851,8 +851,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (pvpPlayBtn) {
         pvpPlayBtn.addEventListener('click', () => {
-            if (window.wrongSound) window.wrongSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader("Birebir oyun motoru hazırlanıyor, yakında aktif edilecek.");
+            if (window.PvP) {
+                if (window.PvP.isSearching) {
+                    window.PvP.cancelQueue();
+                } else {
+                    window.PvP.joinQueue();
+                }
+            } else {
+                if (window.wrongSound) window.wrongSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme sistemi henüz yüklenmedi.");
+            }
         });
     }
 

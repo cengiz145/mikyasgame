@@ -5,6 +5,31 @@ window.currentStoryIndex = 0;
 window.isGridWalkingPhase = false;
 window.stepIntervalId = null;
 window.currentAutoWalkStep = 0;
+window.isStoryModeWon = false;
+
+window.quitStoryMode = function() {
+    window.inStoryMode = false;
+    window.isGridWalkingPhase = false;
+    window.isStoryModeWon = false;
+    
+    // Hafıza (Memory) Sızıntılarını ve Taşan Animasyonları Önle (Clear all timeouts)
+    if (window.stepIntervalId) clearTimeout(window.stepIntervalId);
+    if (window.storyAnimInterval1) clearInterval(window.storyAnimInterval1);
+    if (window.storyAnimInterval2) clearInterval(window.storyAnimInterval2);
+    if (window.storyAnimInterval3) clearInterval(window.storyAnimInterval3);
+    if (window.storyAnimTimeout1) clearTimeout(window.storyAnimTimeout1);
+    if (window.storyAnimTimeout2) clearTimeout(window.storyAnimTimeout2);
+    if (window.storyAnimTimeout3) clearTimeout(window.storyAnimTimeout3);
+    if (window.storyAnimTimeout4) clearTimeout(window.storyAnimTimeout4);
+    if (window.storyAnimTimeout5) clearTimeout(window.storyAnimTimeout5);
+    if (window.storyWinTimeout) clearTimeout(window.storyWinTimeout);
+    if (window.storyEntryTimeout) clearTimeout(window.storyEntryTimeout);
+
+    // Ortam Seslerini Kes
+    if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
+    if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
+    if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
+};
 
 window.playerX = 1;
 window.mapLength = 30;
@@ -112,6 +137,7 @@ window.triggerStoryAnimations = function(index) {
 
 window.initializeMissingNotesMap = function() {
     window.notesInPiano = [];
+    window.isStoryModeWon = false;
     const noteNames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 
     const availableX = [];
@@ -216,6 +242,10 @@ window.handleStoryWalking = function(key) {
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
     } else if (key === 'Enter') {
         if (window.playerX === window.pianoX && window.notesInPiano.length === window.MAX_NOTES) {
+            // Hızlıca (spam) basarak sonsuz tamamlama (completionCount) hilesini engelle
+            if (window.isStoryModeWon) return; 
+            window.isStoryModeWon = true;
+
             if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
             if (window.modeUnlockSound) window.modeUnlockSound.play();
             
