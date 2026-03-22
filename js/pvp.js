@@ -219,15 +219,42 @@ window.PvP = {
     },
 
     onPlayerCorrectSequence: function() {
-        window.pvpScore += 10;
+        const turnIndex = this.currentPvPTurn;
         
-        // Skor güncellemesini sunucuya gönder (Sadece puan gidiyor, notalar gitmiyor - Kural 2)
-        const matchNode = window.db.ref('matches/' + this.matchId);
-        let updateData = {};
-        if (this.isHost) updateData.hostScore = window.pvpScore;
-        else updateData.clientScore = window.pvpScore;
-        matchNode.update(updateData);
+        // Hız Yarışı Doğrulaması (Kural: Kim hızlıysa puanı o alır)
+        const turnRef = window.db.ref(`matches/${this.matchId}/turns/${turnIndex}`);
+        
+        turnRef.transaction((currentData) => {
+            if (currentData === null) {
+                // Bu turu (turnIndex) henüz kimse geçmemiş, benim adıma yaz
+                return { 
+                    winner: this.isHost ? 'host' : 'client', 
+                    timestamp: firebase.database.ServerValue.TIMESTAMP 
+                };
+            }
+            // Tur daha önce kapılmış! İşlemi iptal et (puan yok)
+            return; 
+        }, (error, committed, snapshot) => {
+            if (error) {
+                console.log("Turn transaction failed", error);
+            } else if (committed) {
+                // Puan kazandık (Turun ilk bitireni biziz)
+                window.pvpScore += 10;
+                if (window.announceToScreenReader) window.announceToScreenReader("Puan senin!");
+                
+                // Skor güncellemesini sunucuya gönder
+                const matchNode = window.db.ref('matches/' + this.matchId);
+                let updateData = {};
+                if (this.isHost) updateData.hostScore = window.pvpScore;
+                else updateData.clientScore = window.pvpScore;
+                matchNode.update(updateData);
+            } else {
+                // Çok geç kaldık, rakip turu daha önce bitirmiş!
+                if (window.announceToScreenReader) window.announceToScreenReader("Geç kaldın, rakip aldı!");
+            }
+        });
 
+        this.currentPvPTurn++;
         // Kural 1 Gereği Süreyi Sıfırlama!
         // (Aşağıda monkey patch ile korunan gameTimer devam edecek)
     },
