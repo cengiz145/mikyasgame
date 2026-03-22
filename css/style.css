@@ -261,7 +261,7 @@
 
         @media (max-width: 768px) {
             .desktop-exit-li {
-                display: none !important;
+                display: none;
             }
         }
 
