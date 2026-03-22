@@ -1,5 +1,5 @@
 {
-    "version": "0.93.1",
-    "buildId": 1774166248,
-    "changelog": "Zorluk seçim ekranı menüsüne 'Tamamlandı' ve 'Kazanmak için X tur' göstergeleri eklendi. NVDA Browse modu agresif olarak kapatıldı. Müzikal doğru bilme süresi kalıcı olarak +5 saniye artırıldı. Tüm motivasyon sözleri ve süre okumaları NVDA için Acil Odaklanma kipine taşındı."
+    "version": "0.94.0",
+    "buildId": 1774166249,
+    "changelog": "DEV GÜNCELLEME: 'Birebir Rakiple Oyna' (PvP) ve 'Bota Karşı Oyna' (PvE) oyun modları eklendi! 60 saniyelik rekabetçi Hız Yarışı sistemi kuruldu. Kazananlara yeni ganimet ödülleri, kaybedenlere teselli ödülleri eklendi."
 }

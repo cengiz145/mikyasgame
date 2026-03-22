@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.94.0] - 2026-03-22
+
+### Eklenenler / Değiştirilenler:
+- **PvP (Birebir Rakiple Oyna) Modu:** Oyuna aynı anda iki kişinin eşleşerek 60 saniyelik bir hız yarışına girebildiği yepyeni bir çok oyunculu mod eklendi! Her tur, doğru notaları bilgisunucuya (Firebase) ilk gönderen kişinin puanı kaptığı katı bir işlem (Transaction) kilidiyle süslendi. Her iki cepheye aynı notalar aktarılarak en adil yarış sağlandı.
+- **PvE (Bota Karşı Oyna) Modu:** Rakip bulamayanlar veya pratik yapmak isteyenler için kendilerine has bir hata payına ve insani tepki sürelerine (ortalama zeka) sahip, tamamen otonom bir Yapay Zeka Botu kodlandı.
+- **Oyun Sonu Ganimet Sistemi:** Birebir modda süresi dolup galip gelen oyunculara artık rastgele 100 Jeton, 2 Zaman Koruması veya 2 Hata Koruması veren dev bir kasa hediye edilecek. Kaybeden veya berabere kalan oyuncular da unutulmadı; 20 Jeton teselli ödülüne bağlandı.
+- **Kusursuz İzolasyon:** Her ne kadar rakiplere zorunlu olarak aynı notalar dinletilse de, oyuncular internet üzerinden birbirinin piyano tuşlama seslerini asla duyamaz. Sadece sistemin anlık "Puan senin!" veya "Geç kaldın, rakip aldı!" hakem bildirimleri üzerinden kusursuz bir rekabet heyecanı yaşanır.
+
 [v0.93.1] - 2026-03-22
 
 ### Eklenenler / Değiştirilenler:
