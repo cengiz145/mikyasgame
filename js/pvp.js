@@ -156,6 +156,68 @@ window.PvP = {
         }, 3000);
     },
 
+    // BOTA KARŞI OYNA (YAPAY ZEKA) BAŞLANGICI
+    startBotMatch: function() {
+        let deviceId = localStorage.getItem('hafizaGuvenDeviceId') || 'guest_' + Date.now();
+        let myName = window.currentChatUser || localStorage.getItem('chatUsername') || "Sen";
+        
+        this.isSearching = false;
+        this.isHost = true; // Her zaman ana makineyiz
+        this.isBotMode = true; // Bot bayrağı
+        this.matchId = 'bot_match_' + deviceId + '_' + Date.now();
+        this.opponentId = 'ai_bot';
+        this.opponentName = 'Yapay Zeka (Bot)';
+        this.botScore = 0;
+        
+        const matchNode = window.db.ref('matches/' + this.matchId);
+        matchNode.set({
+            host: deviceId,
+            hostName: myName,
+            client: this.opponentId,
+            clientName: this.opponentName,
+            status: 'waiting_for_client',
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            this.enterMatchRoom(this.matchId, this.opponentName);
+        });
+    },
+
+    simulateBotTurn: function(turnIndex) {
+        if (!this.isBotMode || !window.gameIsActive) return;
+        
+        // Ortalama Zeka Denklemi: Notaları Dinleme Süresi (turnIndex * 1000) + Notalara Basma Süresi (turnIndex * 400) + Reaksiyon Gecikmesi (500-2500ms arası)
+        const reactTime = (turnIndex * 1000) + (turnIndex * 400) + (Math.floor(Math.random() * 2000) + 500);
+        
+        this.botTimeout = setTimeout(() => {
+            if (!window.gameIsActive) return;
+            
+            // %15 İhtimalle Bot Hata Yapar (Kafası Karışır / Yavaşlar)
+            if (Math.random() < 0.15) {
+                // Şaşkınlık yaşasın, puanı alamasın, ancak bir süre sonra toparlanıp sonraki tura geçsin.
+                setTimeout(() => { if (window.gameIsActive) this.simulateBotTurn(turnIndex + 1); }, 2500);
+                return;
+            }
+            
+            // Bot hız testini kazandı mı diye Firebase'e istek at (İnsanın karşısına rakip çıkıyor)
+            const turnRef = window.db.ref(`matches/${this.matchId}/turns/${turnIndex}`);
+            turnRef.transaction((currentData) => {
+                if (currentData === null) {
+                    return { winner: 'client', timestamp: firebase.database.ServerValue.TIMESTAMP }; // Bot her zaman client listesinde
+                }
+                return; // Tur çoktan insan tarafından kapılmış 
+            }, (error, committed, snapshot) => {
+                if (committed) {
+                    // Bot bu turun puanını aldı
+                    this.botScore += 10;
+                    window.db.ref('matches/' + this.matchId).update({ clientScore: this.botScore });
+                }
+                // İnsan kazanmış da olsa, Bot kazanmış da olsa Bot oyuna devam eder ve sonraki turu dinlemeye başlar
+                this.simulateBotTurn(turnIndex + 1);
+            });
+            
+        }, reactTime);
+    },
+
     startPvPGame: function() {
         console.log("PvP Modu: 60 saniye başladı!");
         
@@ -191,8 +253,12 @@ window.PvP = {
                     this.fullSequence = val.fullSequence;
                     this.currentPvPTurn = 1;
                     
+                    // İlk raundu başlat
                     if (window.gameSequence.length === 0) {
                         this.playNextPvPRound();
+                        if (this.isBotMode) {
+                            this.simulateBotTurn(1); // Botun zeka döngüsünü 1. turdan tetikle
+                        }
                     }
                 }
 
@@ -200,7 +266,6 @@ window.PvP = {
                 let oppScore = 0;
                 if (this.isHost && val.clientScore) oppScore = val.clientScore;
                 if (!this.isHost && val.hostScore) oppScore = val.hostScore;
-                
                 // HUD Güncelle
                 const scoreDisplay = document.getElementById('game-score-display');
                 if (scoreDisplay) scoreDisplay.innerHTML = `Sen: ${window.pvpScore} | Rakip: ${oppScore}`;
@@ -297,6 +362,7 @@ window.PvP = {
     
     endPvPGame: function(matchData) {
         clearInterval(this.pvpInterval);
+        if (this.botTimeout) clearTimeout(this.botTimeout);
         window.gameIsActive = false;
         
         let myScore = this.isHost ? (matchData.hostScore || 0) : (matchData.clientScore || 0);

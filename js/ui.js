@@ -866,8 +866,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (pveBotPlayBtn) {
         pveBotPlayBtn.addEventListener('click', () => {
-            if (window.wrongSound) window.wrongSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader("Bot yapay zekası hazırlanıyor, yakında aktif edilecek.");
+            if (window.PvP) {
+                window.PvP.startBotMatch();
+            } else {
+                if (window.wrongSound) window.wrongSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader("Bot sistemi henüz yüklenmedi.");
+            }
         });
     }
 
