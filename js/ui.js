@@ -1873,8 +1873,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Oyuncu oyundan çıkarken/sayfa kapanırken tüm sohbeti kalıcı olarak sıfırla (0'la)
-window.addEventListener('beforeunload', () => {
-    if (window.db) {
-        window.db.ref('messages').remove();
-    }
-});
+// KRİTİK HATA DÜZELTMESİ: remove() fonksiyonu herhangi bir kullanıcı oyundan çıktığında, 
+// odayı kullanan TÜM diğer oyuncuların da canlı sohbet geçmişini veritabanından kalıcı olarak silmesine (wipe) yol açıyordu! 
+// Bu nedenle küresel temizlik fonsiyonu iptal edildi.
+// window.addEventListener('beforeunload', () => {
+//     if (window.db) {
+//         window.db.ref('messages').remove();
+//     }
+// });
