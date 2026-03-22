@@ -303,16 +303,45 @@ window.PvP = {
         let oppScore = this.isHost ? (matchData.clientScore || 0) : (matchData.hostScore || 0);
         
         let msg = `Oyun Bitti! Senin Puanın: ${myScore}, Rakibin Puanı: ${oppScore}. `;
-        if (myScore > oppScore) msg += "Kazandın!";
-        else if (myScore < oppScore) msg += "Kaybettin!";
-        else msg += "Berabere!";
+        let isWinner = false;
+        
+        if (myScore > oppScore) {
+            isWinner = true;
+            msg += "Kazandın! ";
+            
+            // Kazanan için Rastgele Ödül Çekilişi (3 İhtimal)
+            const rewardRNG = Math.floor(Math.random() * 3);
+            if (rewardRNG === 0) {
+                let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+                localStorage.setItem('hafizaGuvenZamanKorumasi', zk + 2);
+                msg += "Büyük Ödül: 2 Zaman Koruması kazandın!";
+            } else if (rewardRNG === 1) {
+                let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+                localStorage.setItem('hafizaGuvenHataKorumasi', hk + 2);
+                msg += "Büyük Ödül: 2 Hata Koruması kazandın!";
+            } else {
+                let coins = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+                localStorage.setItem('hafizaGuvenTotalTokens', coins + 100);
+                msg += "Büyük Ödül: 100 Hafıza Jetonu kazandın!";
+            }
+        } else if (myScore < oppScore) {
+            msg += "Kaybettin. ";
+            let coins = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+            localStorage.setItem('hafizaGuvenTotalTokens', coins + 20);
+            msg += "Teselli Ödülü: 20 Hafıza Jetonu kazandın.";
+        } else {
+            msg += "Berabere! ";
+            let coins = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+            localStorage.setItem('hafizaGuvenTotalTokens', coins + 20);
+            msg += "Teselli Ödülü: 20 Hafıza Jetonu kazandın.";
+        }
         
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
         
         setTimeout(() => {
-            if (window.endMainGame) window.endMainGame(true, myScore > oppScore, false);
+            if (window.endMainGame) window.endMainGame(true, isWinner, false);
             this.matchId = null; // Sıfırla
-        }, 4000);
+        }, 6000);
     }
 };
 
