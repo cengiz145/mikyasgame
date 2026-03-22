@@ -369,10 +369,10 @@ window.announceToScreenReader = function (text, forceFocus = false) {
 window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReason) {
     if (!btnElement) return;
 
-    let targetTurns = 10;
-    if(modeData.name === 'Kolay') targetTurns = 2;
+    let targetTurns = 5;
+    if(modeData.name === 'Kolay') targetTurns = 1;
     if(modeData.name === 'Orta') targetTurns = 5;
-    if(modeData.name === 'Zor') targetTurns = 10;
+    if(modeData.name === 'Zor') targetTurns = 5;
 
     let statusText = "";
     if (modeData.name !== 'Kayıp Notalar') {
