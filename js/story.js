@@ -173,7 +173,8 @@ window.handleStoryWalking = function(key) {
         } else {
             if (window.notesOnMap[window.playerX]) {
                 const foundNote = window.notesOnMap[window.playerX];
-                if (window.notesInPiano.length === Object.keys(window.pianoNotes).indexOf(foundNote)) {
+                const expectedOrder = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+                if (window.notesInPiano.length === expectedOrder.indexOf(foundNote)) {
                     window.notesInPiano.push(foundNote);
                     delete window.notesOnMap[window.playerX];
 
