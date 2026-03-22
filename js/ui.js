@@ -290,43 +290,19 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             window.updateMobileKeysVisibility();
             window.currentFocusIndex = 0;
             
-            // 1. "Boş" uyarısını engellemek için anında yeni menünün H1 başlığına odaklan
-            let menuTitle = showMenu.querySelector('h1');
-            
-            if (menuTitle) {
-                menuTitle.setAttribute('tabindex', '-1'); // Odaklanılabilir yap
-                menuTitle.setAttribute('role', 'none');   // "Başlık Seviyesi 1" ibaresini kaldır
-                menuTitle.focus(); // Anında odaklan, title'ı ekran okuyucuya okut
-                
-                let titleText = menuTitle.innerText || menuTitle.textContent;
-                let dynamicDelay = Math.max(1000, titleText.length * 60);
-                
-                // Başlık okunduktan sonra asıl ilk öğeye (butona) geç
-                window.menuFocusTimeoutId = setTimeout(() => {
-                    if (newActiveMenuName === 'main' && window.lastFocusedElement && document.body.contains(window.lastFocusedElement)) {
-                        window.lastFocusedElement.focus();
-                        window.lastFocusedElement = null; // Hafızayı temizle
-                    } else {
-                        let focusables = Array.from(showMenu.querySelectorAll('.menu-button, button, [tabindex="0"], input, select, textarea'));
-                        let firstFocusable = focusables.find(el => el.getAttribute('aria-label') !== 'Menü sonu, başa dönülüyor' && el !== menuTitle);
-                        if (firstFocusable) {
-                            firstFocusable.focus();
-                        }
-                    }
-                }, dynamicDelay);
-            } else {
-                // Eğer başlık yoksa doğrudan ilk öğeye odaklan, boşluğa (body) düşürme
+            // Doğrudan ilk öğeye odaklan, boşluğa veya H1'e düşmeksizin
+            window.menuFocusTimeoutId = setTimeout(() => {
                 if (newActiveMenuName === 'main' && window.lastFocusedElement && document.body.contains(window.lastFocusedElement)) {
                     window.lastFocusedElement.focus();
                     window.lastFocusedElement = null;
                 } else {
                     let focusables = Array.from(showMenu.querySelectorAll('.menu-button, button, [tabindex="0"], input, select, textarea'));
-                    let firstFocusable = focusables.find(el => el.getAttribute('aria-label') !== 'Menü sonu, başa dönülüyor');
+                    let firstFocusable = focusables.find(el => el.getAttribute('aria-label') !== 'Menü sonu, başa dönülüyor' && el.tagName !== 'H1');
                     if (firstFocusable) {
                         firstFocusable.focus();
                     }
                 }
-            }
+            }, 50);
         }, 50);
     }, 300);
 
