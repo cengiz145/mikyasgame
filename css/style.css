@@ -617,3 +617,30 @@
         font-size: 16px !important; /* iOS Native Zoom block */
     }
 }
+
+/* --- ANLIK BİLDİRİM (TOAST) UI --- */
+.toast-notification {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(11, 20, 26, 0.95);
+    color: #ffd766;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    border: 1px solid #2a3942;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    text-align: center;
+    max-width: 90%;
+    font-weight: bold;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-10px);
+}

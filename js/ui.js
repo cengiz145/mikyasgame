@@ -1184,6 +1184,24 @@ document.addEventListener('keydown', function (event) {
 // --- CANLI SOHBET SİSTEMİ ARAYÜZ MANTIĞI ---
 window.isChatOpen = false;
 
+// --- ANLIK BİLDİRİM (TOAST) FONKSİYONU ---
+window.showToastNotification = function(text) {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification';
+    toast.setAttribute('aria-hidden', 'true');
+    toast.innerText = text;
+    document.body.appendChild(toast);
+    
+    // Görünür yap
+    setTimeout(() => toast.classList.add('show'), 50);
+
+    // 3.5 saniye sonra kaldır
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300); // animasyon bekleme süresi
+    }, 3500);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatToggleBtn = document.getElementById('chat-toggle-btn');
     const chatPanel = document.getElementById('chat-panel');
@@ -1797,14 +1815,17 @@ document.addEventListener('DOMContentLoaded', () => {
             timeString = `<span class="wp-time">${timeRaw}</span>`;
         }
 
-        const li = document.createElement('li');
-        li.setAttribute('tabindex', '0');
-        
         if (data.nickname === "Sistem") {
-            li.classList.add('system-message');
-            li.setAttribute('aria-label', `Sistem mesajı: ${escapeHTML(data.text)}`);
-            li.innerHTML = `<div class="wp-bubble" aria-hidden="true">${escapeHTML(data.text)}</div>`;
+            // Sistem mesajlarını sohbet listesine (DOM'a) ekleme, anlık bildirim (toast) olarak yansıt
+            if (Date.now() - chatLoadTime > 2000) {
+                if (window.showToastNotification) {
+                    window.showToastNotification(data.text);
+                }
+            }
         } else {
+            const li = document.createElement('li');
+            li.setAttribute('tabindex', '0');
+            
             // Rütbe Belirleme
             let isimKucuk = (data.nickname || "").toLowerCase();
             let isDevRender = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(isimKucuk);
@@ -1824,12 +1845,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${timeString}
                 </div>
             `;
+            chatMessagesList.appendChild(li);
         }
 
-        chatMessagesList.appendChild(li);
-
         // Yeni mesaj gelince otomatik olarak en alta kaydır
-        if (chatMessagesContainer && window.isChatOpen) {
+        if (chatMessagesContainer && window.isChatOpen && data.nickname !== "Sistem") {
             // Sadece sohbet açıksa kaydır, değilse açıldığında zaten aşağıda kalması için toggleChat içine eklenecek
             setTimeout(() => {
                 chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
