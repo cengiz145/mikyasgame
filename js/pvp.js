@@ -170,27 +170,20 @@ window.PvP = {
         // KURAL 1: Süre 60 saniye olacak. (Offline resetlemeleri önlemek için özel bayrak kullanacağız)
         window.gameTimer = 60;
         if (window.updateGameUI) window.updateGameUI();
-        if (window.announceToScreenReader) window.announceToScreenReader("Oyun başladı. Kural 1: Süreniz 60 saniye! Birebir modda süreniz her tur yenilenmez! Bol şans!");
+        if (window.announceToScreenReader) window.announceToScreenReader("Kural 2 devrede: Rakipler birbirinin notalarını duyamaz ve bilemez. Oyun başladı. 60 saniyeniz var. Bol şans!");
 
         const matchNode = window.db.ref('matches/' + this.matchId);
         
-        // Host önceden 100 notalık tohum dağıtır
+        // Host ve Client oyuna aynı anda başlar (Kural 2: Herkese aynı anda çalacak)
+        // Ancak notalar tamamen yerel ve bağımsız üretilir (Kural 2: Kimse rakibin notasını bilemeyecek)
         if (this.isHost) {
-            const notes = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
-            let fullSeq = [];
-            for (let i = 0; i < 100; i++) {
-                fullSeq.push(notes[Math.floor(Math.random() * notes.length)]);
-            }
-            matchNode.update({ fullSequence: fullSeq, status: 'playing' });
+            matchNode.update({ status: 'playing' });
         }
         
-        // Ortak dizilimi dinle
+        // Ortak oyun seyrini (sadece puanları) dinle
         const listener = matchNode.on('value', snap => {
             const val = snap.val();
-            if (val && val.fullSequence && !this.fullSequence) {
-                this.fullSequence = val.fullSequence;
-                this.currentPvPTurn = 1;
-                
+            if (val) {
                 // Karşı tarafın puanını ekrana yansıtmak için
                 let oppScore = 0;
                 if (this.isHost && val.clientScore) oppScore = val.clientScore;
@@ -199,11 +192,6 @@ window.PvP = {
                 // HUD Güncelle
                 const scoreDisplay = document.getElementById('game-score-display');
                 if (scoreDisplay) scoreDisplay.innerHTML = `Sen: ${window.pvpScore} | Rakip: ${oppScore}`;
-                
-                // İlk notayı çalmaya başla
-                if (window.gameSequence.length === 0) {
-                    this.playNextPvPRound();
-                }
             }
             
             if (val && val.status === 'finished') {
@@ -211,6 +199,12 @@ window.PvP = {
                 matchNode.off('value', listener);
             }
         });
+        
+        // İlk notayı çalmaya başla (Tamamen yerel rastgele)
+        setTimeout(() => {
+            if (window.addNewNoteAndPlaySequence) window.addNewNoteAndPlaySequence();
+        }, 1000);
+        
         
         // 60 Saniyelik Katı Kronometre
         this.pvpInterval = setInterval(() => {
@@ -224,38 +218,18 @@ window.PvP = {
         }, 1000);
     },
 
-    playNextPvPRound: function() {
-        if (!window.gameIsActive) return;
-        window.playerSequence = [];
-        window.isComputerPlaying = true;
-        
-        window.gameSequence = this.fullSequence.slice(0, this.currentPvPTurn);
-        
-        const gameStatus = document.getElementById('game-status-text');
-        if (gameStatus) gameStatus.textContent = "Dinleyin...";
-
-        setTimeout(() => {
-            if (window.playGameSequence) window.playGameSequence();
-        }, 1000);
-    },
-
     onPlayerCorrectSequence: function() {
-        this.currentPvPTurn++;
         window.pvpScore += 10;
         
-        // Skor güncellemesini sunucuya gönder
+        // Skor güncellemesini sunucuya gönder (Sadece puan gidiyor, notalar gitmiyor - Kural 2)
         const matchNode = window.db.ref('matches/' + this.matchId);
         let updateData = {};
         if (this.isHost) updateData.hostScore = window.pvpScore;
         else updateData.clientScore = window.pvpScore;
         matchNode.update(updateData);
 
-        // Kural 1 Gereği Süreyi Sıfırlama! (Offline kod süreyi sıfırlar, o yüzden geri 60s mekaniğine uyumlu olması için düzeltiyoruz)
-        // CheckPlayerInput çağrısından kısa süre sonra offline'ın yaptığı timer resetini ezip orijinal PVP timer'ına çevirmek zor.
-        // O yüzden bu onPlayerCorrectSequence kancamız, offline hook tarafından tetiklendiğinde gameTimer'ı korumalıdır.
-        // window.gameTimer korundu.
-
-        this.playNextPvPRound();
+        // Kural 1 Gereği Süreyi Sıfırlama!
+        // (Aşağıda monkey patch ile korunan gameTimer devam edecek)
     },
 
     finishMatchTimeUp: function() {
@@ -308,7 +282,8 @@ window.checkPlayerInput = function(key) {
 const originalAddNewNote = window.addNewNoteAndPlaySequence;
 window.addNewNoteAndPlaySequence = function () {
     if (window.PvP && window.PvP.matchId) {
-        window.PvP.onPlayerCorrectSequence(); // Yeni nota oluşturma, ortak dizilimden (fullSequence) devam et
+        window.PvP.onPlayerCorrectSequence(); 
+        originalAddNewNote(); // Orijinal offline notayı çağırıp lokal rastgele nota üret (Kural 2: Bağımsız gizli notalar)
     } else {
         originalAddNewNote();
     }
