@@ -1430,6 +1430,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const nickname = nickVal;
         const text = msgVal;
 
+        // Firebase Yolu Kuralı: İsimlerde '.', '#', '$', '[', ']' veya '/' kullanılamaz. 
+        // Aksi takdirde uygulama sessizce ve senkron olarak çöker.
+        if (/[.#$\[\]\/]/.test(nickname)) {
+            if (window.wrongSound) window.wrongSound.play();
+            let uyari = "Kullanıcı adınızda geçersiz karakterler bulunuyor. Lütfen nokta veya köşeli parantez gibi hatalı sembolleri silin.";
+            if (window.announceToScreenReader) window.announceToScreenReader(uyari);
+            if (nickInput) {
+                // Temizleyerek otomatik düzeltilmiş halini sun
+                nickInput.value = nickname.replace(/[.#$\[\]\/]/g, '');
+                nickInput.focus();
+            }
+            return; // Çökmesini önle
+        }
+
         // KULLANICI ADI GÜVENLİK (REGISTRATION) KONTROLÜ
         let myDevId = localStorage.getItem('hafizaGuvenDeviceId');
         if (!myDevId) {

@@ -69,7 +69,10 @@ window.syncStatsToFirebase = function() {
         achievements: JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}"),
         lastUpdate: firebase.database.ServerValue.TIMESTAMP
     };
-    window.db.ref('player_stats/' + currentUser).set(stats);
+    
+    // Firebase yol hatasını önlemek için karakter temizliği (nokta, dolar vb. içeren isimler LocalStorage çökertmesin diye)
+    let safeUserId = currentUser.replace(/[.#$\[\]\/]/g, '_');
+    window.db.ref('player_stats/' + safeUserId).set(stats);
 };
 
 // LocalStorage işlemleri arasına senkronizasyon kancası atıyoruz
