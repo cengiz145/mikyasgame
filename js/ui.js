@@ -1227,7 +1227,9 @@ document.addEventListener('DOMContentLoaded', () => {
             window.lastFocusedElement = document.activeElement;
             chatPanel.style.display = 'flex';
             chatPanel.removeAttribute('aria-hidden');
-            document.getElementById('main-menu-container').setAttribute('aria-hidden', 'true');
+            const activeContainerId = (window.currentActiveMenu || 'main') + '-menu-container';
+            const activeContainer = document.getElementById(activeContainerId);
+            if (activeContainer) activeContainer.setAttribute('aria-hidden', 'true');
             const chatMessageInputLocal = document.getElementById('chat-message-input');
             if (chatNicknameInput && chatNicknameInput.style.display !== 'none') {
                 setTimeout(() => chatNicknameInput.focus(), 100);
@@ -1271,7 +1273,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             chatPanel.style.display = 'none';
             chatPanel.setAttribute('aria-hidden', 'true');
-            document.getElementById('main-menu-container').removeAttribute('aria-hidden');
+            const activeContainerId = (window.currentActiveMenu || 'main') + '-menu-container';
+            const activeContainer = document.getElementById(activeContainerId);
+            if (activeContainer) activeContainer.removeAttribute('aria-hidden');
             
             setTimeout(() => {
                 if (window.lastFocusedElement) {

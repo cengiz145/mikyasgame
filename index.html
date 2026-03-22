@@ -594,6 +594,7 @@
     <!-- Canlı Sohbet Penceresi -->
     <div id="chat-panel" class="chat-panel" aria-hidden="true" style="display: none;" role="dialog"
         aria-label="Canlı Sohbet Penceresi">
+        <div tabindex="0" role="button" aria-label="Sohbet paneli başı, sona gidiliyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('chat-send-btn').focus(), 10);"></div>
         <div class="chat-header">
             <h2 id="chat-title">Canlı Sohbet</h2>
             <button id="chat-close-btn" aria-label="Sohbeti Kapat" class="chat-close-btn">X</button><span class="sr-only"> </span>
@@ -610,6 +611,7 @@
                 placeholder="Mesajınız..." maxlength="150">
             <button id="chat-send-btn" aria-label="Mesajı Gönder">➤</button><span class="sr-only"> </span>
         </div>
+        <div tabindex="0" role="button" aria-label="Sohbet paneli sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('chat-close-btn').focus(), 10);"></div>
     </div>
 
     <!-- Howler.js 3D Ses Kütüphanesi (Yerel) -->
