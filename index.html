@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 
 <head>
@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
-    <title>HafÄ±zana GÃ¼ven - Ana MenÃ¼</title>
+    <title>Hafızana Güven - Ana Menü</title>
     <link rel="stylesheet" href="css/style.css">
 
     <!-- Firebase CDN -->
@@ -19,45 +19,45 @@
 
 
 
-    <!-- BaÅŸlangÄ±Ã§ (Intro) EkranÄ± -->
+    <!-- Başlangıç (Intro) Ekranı -->
     <div id="intro-screen" tabindex="-1">
 
-        <!-- AÅŸama 1: YapÄ±mcÄ± Ä°mzasÄ± -->
+        <!-- Aşama 1: Yapımcı İmzası -->
         <div id="intro-phase-1" class="intro-phase"
             style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; opacity: 1; padding: 0 20px; transition: opacity 0.5s ease-in-out;">
             <p id="intro-text" class="intro-instruction" style="font-size: 1.8rem; line-height: 1.6; color: #f0f0f0;"
                 aria-hidden="true">
-                Bu oyun, <span style="color: var(--focus-outline);">gÃ¶rme engelli bir mÃ¼zik Ã¶ÄŸretmeni
+                Bu oyun, <span style="color: var(--focus-outline);">görme engelli bir müzik öğretmeni
                     olan</span>
                 <strong
-                    style="font-size: 2.2rem; color: var(--focus-outline); text-shadow: 0 0 15px rgba(255, 183, 3, 0.5); padding: 0 10px;">Ãœmit
-                    Ekrem Mikyas</strong> <span style="color: #aaaaaa;">tarafÄ±ndan geliÅŸtirilmiÅŸtir.</span>
+                    style="font-size: 2.2rem; color: var(--focus-outline); text-shadow: 0 0 15px rgba(255, 183, 3, 0.5); padding: 0 10px;">Ümit
+                    Ekrem Mikyas</strong> <span style="color: #aaaaaa;">tarafından geliştirilmiştir.</span>
             </p>
 
             <button id="start-intro-btn" class="localize-inner"
-                aria-label="Bu oyun, gÃ¶rme engelli bir mÃ¼zik Ã¶ÄŸretmeni olan Ãœmit Ekrem Mikyas tarafÄ±ndan geliÅŸtirilmiÅŸtir. Logoyu dinlemek ve oyuna baÅŸlamak iÃ§in enter tuÅŸuna basÄ±n."
+                aria-label="Bu oyun, görme engelli bir müzik öğretmeni olan Ümit Ekrem Mikyas tarafından geliştirilmiştir. Logoyu dinlemek ve oyuna başlamak için enter tuşuna basın."
                 style="opacity: 0; position: absolute; top: -100px;">
-                Logoyu dinlemek ve oyuna baÅŸlamak iÃ§in enter tuÅŸuna basÄ±n.
+                Logoyu dinlemek ve oyuna başlamak için enter tuşuna basın.
             </button><span class="sr-only"> </span>
             <p class="intro-instruction localize-inner" aria-hidden="true"
                 style="margin-top: 40px; font-size: 1.2rem; animation: fadeInOut 2s infinite;">Logoyu dinlemek
-                iÃ§in <strong>ENTER tuÅŸuna basÄ±n</strong>.
+                için <strong>ENTER tuşuna basın</strong>.
             </p>
             <p id="intro-version-display" tabindex="0" style="margin-top: 20px; font-size: 1rem; color: #888;">
-                SÃ¼rÃ¼m bilgisi alÄ±nÄ±yor...
+                Sürüm bilgisi alınıyor...
             </p>
         </div>
 
-        <!-- AÅŸama 2: Logo ve BaÅŸlÄ±k -->
+        <!-- Aşama 2: Logo ve Başlık -->
         <div id="intro-phase-2" class="intro-phase"
             style="display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; opacity: 0; padding: 0 20px; transition: opacity 1s ease-in-out;">
             <h1 id="intro-game-title" class="intro-title" style="font-size: 3rem; color: var(--focus-outline);"
-                aria-hidden="true">HafÄ±zana GÃ¼ven</h1>
+                aria-hidden="true">Hafızana Güven</h1>
             <p class="intro-instruction" aria-hidden="true"
-                style="margin-top: 20px; font-size: 1.2rem; animation: fadeInOut 2s infinite;">LÃ¼tfen
+                style="margin-top: 20px; font-size: 1.2rem; animation: fadeInOut 2s infinite;">Lütfen
                 bekleyin...
             </p>
-            <!-- Ekran okuyucunun okumasÄ± iÃ§in gizli element -->
+            <!-- Ekran okuyucunun okuması için gizli element -->
             <div id="sr-title-reader" aria-live="assertive" style="position: absolute; left:-9999px;"></div>
         </div>
     </div>
@@ -66,61 +66,61 @@
 
 
     <div id="main-menu-container" class="menu-container" role="presentation" aria-hidden="true">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('exit-btn').focus(), 10);"></div>
-        <h1 id="main-menu-title">Ana MenÃ¼</h1>
+        <h1 id="main-menu-title">Ana Menü</h1>
 
 
-        <!-- aria-labelledby ile nav bÃ¶lgesini baÅŸlÄ±kla iliÅŸkilendiriyoruz -->
+        <!-- aria-labelledby ile nav bölgesini başlıkla ilişkilendiriyoruz -->
         <nav class="menu-nav" role="application" aria-labelledby="main-menu-title">
             <ul>
                 <li>
-                    <button id="start-game-btn" class="menu-button" aria-label="Oyuna BaÅŸla">Oyuna
-                        BaÅŸla</button><span class="sr-only"> </span>
+                    <button id="start-game-btn" class="menu-button" aria-label="Oyuna Başla">Oyuna
+                        Başla</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="btn-continue-saved" class="menu-button" aria-label="KayÄ±tlÄ± Oyundan Devam Et">KayÄ±tlÄ±
+                    <button id="btn-continue-saved" class="menu-button" aria-label="Kayıtlı Oyundan Devam Et">Kayıtlı
                         Oyundan Devam
                         Et</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="practice-mode-btn" class="menu-button" aria-label="AlÄ±ÅŸtÄ±rma Modu">AlÄ±ÅŸtÄ±rma
+                    <button id="practice-mode-btn" class="menu-button" aria-label="Alıştırma Modu">Alıştırma
                         Modu</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="btn-achievements-main" class="menu-button" aria-label="BaÅŸarÄ±lar">BaÅŸarÄ±lar</button><span class="sr-only"> </span>
+                    <button id="btn-achievements-main" class="menu-button" aria-label="Başarılar">Başarılar</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="store-btn-main" class="menu-button" aria-label="MaÄŸaza">MaÄŸaza</button><span class="sr-only"> </span>
+                    <button id="store-btn-main" class="menu-button" aria-label="Mağaza">Mağaza</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="stats-btn-main" class="menu-button" aria-label="Ä°statistikler">Ä°statistikler</button><span class="sr-only"> </span>
+                    <button id="stats-btn-main" class="menu-button" aria-label="İstatistikler">İstatistikler</button><span class="sr-only"> </span>
                 </li>
                 <li>
                     <button id="feedback-btn-main" class="menu-button" aria-label="Geri Bildirim">Geri Bildirim</button><span class="sr-only"> </span>
                 </li>
                 <li>
                     <button id="check-updates-btn" class="menu-button"
-                        aria-label="GÃ¼ncellemeleri Denetle">GÃ¼ncellemeleri Denetle</button><span class="sr-only"> </span>
+                        aria-label="Güncellemeleri Denetle">Güncellemeleri Denetle</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="exit-btn" class="menu-button" aria-label="Ã‡Ä±kÄ±ÅŸ">Ã‡Ä±kÄ±ÅŸ</button><span class="sr-only"> </span>
+                    <button id="exit-btn" class="menu-button" aria-label="Çıkış">Çıkış</button><span class="sr-only"> </span>
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('start-game-btn').focus(), 10);"></div>
     </div>
 
-    <!-- Zorluk SeÃ§imi MenÃ¼sÃ¼ -->
+    <!-- Zorluk Seçimi Menüsü -->
     <div id="difficulty-menu-container" class="menu-container" role="presentation" aria-hidden="true"
-        aria-label="Zorluk SeÃ§imi MenÃ¼sÃ¼">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        aria-label="Zorluk Seçimi Menüsü">
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('difficulty-back-btn').focus(), 10);"></div>
-        <h1 id="difficulty-menu-title" tabindex="-1">LÃ¼tfen bir mod seÃ§in</h1>
+        <h1 id="difficulty-menu-title" tabindex="-1">Lütfen bir mod seçin</h1>
 
         <div id="difficulty-status-text" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
@@ -132,19 +132,19 @@
                 <li id="li-diff-hard" style="display: none;"><button class="menu-button" id="btn-diff-hard">Zor
                         Mod</button><span class="sr-only"> </span></li>
                 <li id="li-diff-missing-notes" style="display: none;"><button class="menu-button"
-                        id="btn-diff-missing-notes">KayÄ±p Notalar</button><span class="sr-only"> </span></li>
-                <li><button class="menu-button" id="difficulty-back-btn">Geri DÃ¶n</button><span class="sr-only"> </span>
+                        id="btn-diff-missing-notes">Kayıp Notalar</button><span class="sr-only"> </span></li>
+                <li><button class="menu-button" id="difficulty-back-btn">Geri Dön</button><span class="sr-only"> </span>
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('btn-diff-easy').focus(), 10);"></div>
     </div>
 
-    <!-- Skor Tablosu Alt MenÃ¼sÃ¼ -->
+    <!-- Skor Tablosu Alt Menüsü -->
     <div id="scoreboard-menu-container" class="menu-container" role="presentation" aria-hidden="true">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('scoreboard-back-btn').focus(), 10);"></div>
         <h1 id="scoreboard-menu-title">Skor Tablosu</h1>
@@ -160,7 +160,7 @@
                     <button id="btn-score-hard" class="menu-button" aria-label="Zor Mod">Zor Mod</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="btn-score-missing-notes" class="menu-button" aria-label="KayÄ±p Notalar">KayÄ±p
+                    <button id="btn-score-missing-notes" class="menu-button" aria-label="Kayıp Notalar">Kayıp
                         Notalar</button><span class="sr-only"> </span>
                 </li>
                 <li>
@@ -168,7 +168,7 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('btn-score-easy').focus(), 10);"></div>
     </div>
@@ -177,48 +177,48 @@
 
 
 
-    <!-- AlÄ±ÅŸtÄ±rma Modu (Piyano) MenÃ¼sÃ¼ -->
+    <!-- Alıştırma Modu (Piyano) Menüsü -->
     <div id="practice-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('practice-instructions').focus(); } }, 10);">
         </div>
-        <h1 id="practice-menu-title">AlÄ±ÅŸtÄ±rma Modu</h1>
+        <h1 id="practice-menu-title">Alıştırma Modu</h1>
 
         <div id="practice-instructions"
             style="text-align: left; font-size: 1rem; color: #dddddd; margin-bottom: 20px; line-height: 1.5; max-height: 40vh; overflow-y: auto; padding-right: 10px;"
             tabindex="0">
-            <p style="margin-top: 0;">Merhaba! Bu oyunda amacÄ±nÄ±z, 30 saniye iÃ§erisinde bilgisayarÄ±n Ã§aldÄ±ÄŸÄ±
+            <p style="margin-top: 0;">Merhaba! Bu oyunda amacınız, 30 saniye içerisinde bilgisayarın çaldığı
                 sesleri
-                doÄŸru harf kombinasyonlarÄ±yla eÅŸleÅŸtirmektir.</p>
-            <p>Hangi sesin hangi harfe denk geldiÄŸini Ã¶ÄŸrenmek iÃ§in "AlÄ±ÅŸtÄ±rma Modu" seÃ§eneÄŸini
+                doğru harf kombinasyonlarıyla eşleştirmektir.</p>
+            <p>Hangi sesin hangi harfe denk geldiğini öğrenmek için "Alıştırma Modu" seçeneğini
                 kullanabilirsiniz.
-                AlÄ±ÅŸtÄ±rma modunda notalarÄ±n karÅŸÄ±lÄ±klarÄ± kÄ±saca ÅŸÃ¶yledir:</p>
+                Alıştırma modunda notaların karşılıkları kısaca şöyledir:</p>
             <ul style="list-style-type: none; padding-left: 10px; margin: 10px 0;">
-                <li>&#8226; Do notasÄ± iÃ§in <strong>C</strong> tuÅŸuna,</li>
-                <li>&#8226; Re notasÄ± iÃ§in <strong>D</strong> tuÅŸuna,</li>
-                <li>&#8226; Mi notasÄ± iÃ§in <strong>E</strong> tuÅŸuna,</li>
-                <li>&#8226; Fa notasÄ± iÃ§in <strong>F</strong> tuÅŸuna,</li>
-                <li>&#8226; Sol notasÄ± iÃ§in <strong>G</strong> tuÅŸuna,</li>
-                <li>&#8226; La notasÄ± iÃ§in <strong>A</strong> tuÅŸuna,</li>
-                <li>&#8226; Si notasÄ± iÃ§in <strong>B</strong> tuÅŸuna basmalÄ±sÄ±nÄ±z.</li>
+                <li>&#8226; Do notası için <strong>C</strong> tuşuna,</li>
+                <li>&#8226; Re notası için <strong>D</strong> tuşuna,</li>
+                <li>&#8226; Mi notası için <strong>E</strong> tuşuna,</li>
+                <li>&#8226; Fa notası için <strong>F</strong> tuşuna,</li>
+                <li>&#8226; Sol notası için <strong>G</strong> tuşuna,</li>
+                <li>&#8226; La notası için <strong>A</strong> tuşuna,</li>
+                <li>&#8226; Si notası için <strong>B</strong> tuşuna basmalısınız.</li>
             </ul>
-            <p class="localize-inner">AlÄ±ÅŸtÄ±rmalara baÅŸlamadan hemen Ã¶nce kontrolleri hatÄ±rlatalÄ±m. MenÃ¼lerde
-                <strong>saÄŸ ve sol ok tuÅŸlarÄ±yla gezinebilirsiniz</strong>. SeÃ§im yapmak iÃ§in <strong>entÄ±r tuÅŸunu
-                    kullanabilirsiniz</strong>. Sesi <strong>Page Up ve Page Down tuÅŸlarÄ±yla</strong>
-                ayarlayabilirsiniz. Oyun iÃ§indeyken <strong>S tuÅŸu</strong> ile skorunuzu, <strong>T tuÅŸu</strong> ile
-                kalan sÃ¼renizi Ã¶ÄŸrenebilir, <strong>BoÅŸluk tuÅŸu</strong> ile bir saniye ceza karÅŸÄ±lÄ±ÄŸÄ±nda ses dizisini
+            <p class="localize-inner">Alıştırmalara başlamadan hemen önce kontrolleri hatırlatalım. Menülerde
+                <strong>sağ ve sol ok tuşlarıyla gezinebilirsiniz</strong>. Seçim yapmak için <strong>entır tuşunu
+                    kullanabilirsiniz</strong>. Sesi <strong>Page Up ve Page Down tuşlarıyla</strong>
+                ayarlayabilirsiniz. Oyun içindeyken <strong>S tuşu</strong> ile skorunuzu, <strong>T tuşu</strong> ile
+                kalan sürenizi öğrenebilir, <strong>Boşluk tuşu</strong> ile bir saniye ceza karşılığında ses dizisini
                 tekrar dinleyebilirsiniz.
             </p>
-            <p>Åimdi Ã¶ÄŸrenme vakti! Sistemi tanÄ±mak iÃ§in sizden istenen tuÅŸa 3 defa Ã¼st Ã¼ste basÄ±n. 3 defa doÄŸru
-                bastÄ±ÄŸÄ±nÄ±zda otomatik olarak bir sonraki notaya geÃ§eceksiniz.</p>
-            <p>EÄŸer hangi tuÅŸa basacaÄŸÄ±nÄ±zÄ± unutur veya yanlÄ±ÅŸ bir tuÅŸa basarsanÄ±z, sistem size hangi tuÅŸa
-                basmanÄ±z
-                gerektiÄŸini belirten yardÄ±mcÄ± bir mesajla yol gÃ¶sterecektir.</p>
-            <p style="margin-bottom: 0;">SakÄ±n alÄ±ÅŸtÄ±rma modunda hata yapmaktan korkmayÄ±n; burada ceza yok,
+            <p>Şimdi öğrenme vakti! Sistemi tanımak için sizden istenen tuşa 3 defa üst üste basın. 3 defa doğru
+                bastığınızda otomatik olarak bir sonraki notaya geçeceksiniz.</p>
+            <p>Eğer hangi tuşa basacağınızı unutur veya yanlış bir tuşa basarsanız, sistem size hangi tuşa
+                basmanız
+                gerektiğini belirten yardımcı bir mesajla yol gösterecektir.</p>
+            <p style="margin-bottom: 0;">Sakın alıştırma modunda hata yapmaktan korkmayın; burada ceza yok,
                 sadece
-                Ã¶ÄŸrenmek ve eÄŸlenmek var!</p>
+                öğrenmek ve eğlenmek var!</p>
         </div>
 
         <div id="practice-status-text" tabindex="0"
@@ -233,19 +233,19 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('practice-instructions').focus(), 10);"></div>
     </div>
 
-    <!-- Hikaye Modu MenÃ¼sÃ¼ -->
+    <!-- Hikaye Modu Menüsü -->
     <div id="story-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => { if(document.getElementById('mobile-enter-btn') && document.getElementById('mobile-enter-btn').offsetParent !== null) document.getElementById('mobile-enter-btn').focus(); }, 10);">
         </div>
-        <h1 id="story-menu-title">KayÄ±p Notalar</h1>
+        <h1 id="story-menu-title">Kayıp Notalar</h1>
         <div id="story-status-text" tabindex="0"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px;">
             <!-- Diyalog metni buraya gelecek -->
@@ -254,35 +254,35 @@
             <ul>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => { if(document.getElementById('mobile-enter-btn') && document.getElementById('mobile-enter-btn').offsetParent !== null) document.getElementById('mobile-enter-btn').focus(); }, 10);">
         </div>
     </div>
 
-    <!-- MaÄŸaza MenÃ¼sÃ¼ -->
+    <!-- Mağaza Menüsü -->
     <div id="store-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('store-back-btn').focus(), 10);"></div>
-        <h1 id="store-menu-title">MaÄŸaza</h1>
+        <h1 id="store-menu-title">Mağaza</h1>
         <div id="store-content" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
-            <!-- Dinamik iÃ§erik eklenecek -->
+            <!-- Dinamik içerik eklenecek -->
         </div>
 
         <div id="store-buy-quantity-container" style="display: none; margin-top: 15px; padding: 0 10px;">
-            <p id="store-buy-prompt" style="font-size: 1.2rem; color: #ffb703; margin-bottom: 15px;">KaÃ§ adet
-                satÄ±n
+            <p id="store-buy-prompt" style="font-size: 1.2rem; color: #ffb703; margin-bottom: 15px;">Kaç adet
+                satın
                 almak istiyorsunuz?</p>
             <div style="display: flex; align-items: center; justify-content: flex-start; gap: 15px;">
                 <span id="store-buy-quantity-display" tabindex="0" role="spinbutton" aria-valuenow="1" aria-valuemin="1"
                     aria-valuemax="99" aria-label="Miktar: 1" aria-live="assertive"
                     style="font-size: 1.5rem; color: white; border: 2px solid var(--focus-outline); padding: 5px 15px; border-radius: 8px;">1</span>
-                <span style="color: #aaa; font-size: 0.9rem;">(SaÄŸ/sol oklarla deÄŸiÅŸtirin. Onaylamak iÃ§in
-                    entÄ±ra,
-                    iptal iÃ§in geri Ã§Ä±kÄ±n.)</span>
+                <span style="color: #aaa; font-size: 0.9rem;">(Sağ/sol oklarla değiştirin. Onaylamak için
+                    entıra,
+                    iptal için geri çıkın.)</span>
             </div>
         </div>
 
@@ -290,34 +290,34 @@
             <ul id="store-button-list">
                 <li>
                     <button id="buy-shield-btn" class="menu-button"
-                        aria-label="Hata KorumasÄ±. Hata yaptÄ±ÄŸÄ±nÄ±zda sÃ¼renizden gitmez ve size 5 saniye ek sÃ¼re kazandÄ±rÄ±r. Dikkatli olmanÄ±z gereken ÅŸey ise, bunun tek kullanÄ±mlÄ±k olmasÄ±dÄ±r. Fiyat: 50 Jeton.">Hata
-                        KorumasÄ± SatÄ±n Al (50 Jeton)</button><span class="sr-only"> </span>
+                        aria-label="Hata Koruması. Hata yaptığınızda sürenizden gitmez ve size 5 saniye ek süre kazandırır. Dikkatli olmanız gereken şey ise, bunun tek kullanımlık olmasıdır. Fiyat: 50 Jeton.">Hata
+                        Koruması Satın Al (50 Jeton)</button><span class="sr-only"> </span>
                 </li>
                 <li>
                     <button id="buy-time-shield-btn" class="menu-button"
-                        aria-label="Zaman KorumasÄ±. SÃ¼reniz bittiÄŸinde oyun bitmez, tek seferlik 15 saniye ek sÃ¼re kazanÄ±rsÄ±nÄ±z. Fiyat: 30 Jeton.">Zaman
-                        KorumasÄ± SatÄ±n Al (30 Jeton)</button><span class="sr-only"> </span>
+                        aria-label="Zaman Koruması. Süreniz bittiğinde oyun bitmez, tek seferlik 15 saniye ek süre kazanırsınız. Fiyat: 30 Jeton.">Zaman
+                        Koruması Satın Al (30 Jeton)</button><span class="sr-only"> </span>
                 </li>
                 <li>
                     <button id="store-back-btn" class="menu-button" aria-label="Geri">Geri</button><span class="sr-only"> </span>
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('buy-shield-btn').focus(), 10);"></div>
     </div>
 
-    <!-- Ä°statistikler MenÃ¼sÃ¼ -->
+    <!-- İstatistikler Menüsü -->
     <div id="stats-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
-        <h1 id="stats-menu-title">Ä°statistikler</h1>
+        <h1 id="stats-menu-title">İstatistikler</h1>
         <div id="stats-content" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
-            <!-- Ä°statistik verileri dinamik eklenecek -->
+            <!-- İstatistik verileri dinamik eklenecek -->
         </div>
 
         <nav class="menu-nav" role="application" aria-labelledby="stats-menu-title">
@@ -327,15 +327,15 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
     </div>
 
-    <!-- Geri Bildirim MenÃ¼sÃ¼ -->
+    <!-- Geri Bildirim Menüsü -->
     <div id="feedback-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('feedback-back-btn').focus(), 10);"></div>
         <div class="feedback-dialog-box">
@@ -343,39 +343,39 @@
 
             <div id="feedback-content"
                 style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
-                <p id="feedback-desc" aria-live="polite">LÃ¼tfen oyun hakkÄ±nda geri bildiriminizi paylaÅŸÄ±n.</p>
+                <p id="feedback-desc" aria-live="polite">Lütfen oyun hakkında geri bildiriminizi paylaşın.</p>
 
                 <form id="feedback-form" onsubmit="event.preventDefault();">
-                    <!-- Geri bildirim formu Firebase entegrasyonuna hazÄ±rlandÄ± -->
+                    <!-- Geri bildirim formu Firebase entegrasyonuna hazırlandı -->
                     <div style="margin-bottom: 15px;">
-                        <label for="feedback-name" style="display: block; margin-bottom: 5px; color: #ffb703;">AdÄ±nÄ±z
-                            (Ä°steÄŸe BaÄŸlÄ±):</label>
-                        <input type="text" id="feedback-name" aria-label="AdÄ±nÄ±zÄ± buraya yazÄ±n"
+                        <label for="feedback-name" style="display: block; margin-bottom: 5px; color: #ffb703;">Adınız
+                            (İsteğe Bağlı):</label>
+                        <input type="text" id="feedback-name" aria-label="Adınızı buraya yazın"
                             style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; font-family: inherit; font-size: 1rem;"
-                            placeholder="AdÄ±nÄ±z">
+                            placeholder="Adınız">
                     </div>
 
                     <div style="margin-bottom: 15px;">
                         <label for="feedback-category"
-                            style="display: block; margin-bottom: 5px; color: #ffb703;">Kategori SeÃ§in:</label>
+                            style="display: block; margin-bottom: 5px; color: #ffb703;">Kategori Seçin:</label>
                         <select id="feedback-category"
                             style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; cursor: pointer; text-align: left; font-size: 1rem;">
                             <option value="Hata"
-                                aria-label="Hata Ã¶nerin. Bu oyun oynarken yaÅŸadÄ±ÄŸÄ±nÄ±z sorunlarÄ± bildirmenizi saÄŸlar.">
-                                Hata Ã¶nerin - Bu oyun oynarken yaÅŸadÄ±ÄŸÄ±nÄ±z sorunlarÄ± bildirmenizi saÄŸlar.</option>
-                            <option value="Ã–neri"
-                                aria-label="Ã–neride bulunun. Oyunun geliÅŸmesinde, eÄŸer bir Ã¶neriniz varsa. BurasÄ± tam size gÃ¶re. Harika Ã¶nerilerinizi buraya gÃ¶nderebilirsiniz.">
-                                Ã–neride bulunun - Harika Ã¶nerilerinizi buraya gÃ¶nderebilirsiniz.</option>
+                                aria-label="Hata önerin. Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.">
+                                Hata önerin - Bu oyun oynarken yaşadığınız sorunları bildirmenizi sağlar.</option>
+                            <option value="Öneri"
+                                aria-label="Öneride bulunun. Oyunun gelişmesinde, eğer bir öneriniz varsa. Burası tam size göre. Harika önerilerinizi buraya gönderebilirsiniz.">
+                                Öneride bulunun - Harika önerilerinizi buraya gönderebilirsiniz.</option>
                         </select>
                     </div>
 
                     <div style="margin-bottom: 15px;">
                         <label for="feedback-text" style="display: block; margin-bottom: 5px; color: #ffb703;">Biletiniz
-                            - MesajÄ±nÄ±z:</label>
+                            - Mesajınız:</label>
                         <textarea id="feedback-text" rows="5"
-                            aria-label="Biletiniz - MesajÄ±nÄ±zÄ± buraya yazÄ±n"
+                            aria-label="Biletiniz - Mesajınızı buraya yazın"
                             style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; resize: vertical; font-family: inherit; font-size: 1rem;"
-                            placeholder="Bildirmek istediÄŸiniz sorunu veya harika Ã¶nerilerinizi buraya yazabilirsiniz."></textarea>
+                            placeholder="Bildirmek istediğiniz sorunu veya harika önerilerinizi buraya yazabilirsiniz."></textarea>
                     </div>
                 </form>
             </div>
@@ -383,7 +383,7 @@
             <nav class="menu-nav" role="application" aria-labelledby="feedback-menu-title">
                 <ul>
                     <li>
-                        <button id="feedback-submit-btn" class="menu-button" aria-label="GÃ¶nder">GÃ¶nder</button><span class="sr-only"> </span>
+                        <button id="feedback-submit-btn" class="menu-button" aria-label="Gönder">Gönder</button><span class="sr-only"> </span>
                     </li>
                     <li>
                         <button id="feedback-back-btn" class="menu-button" aria-label="Geri">Geri</button><span class="sr-only"> </span>
@@ -391,81 +391,81 @@
                 </ul>
             </nav>
         </div>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => { const firstItem = document.getElementById('feedback-name'); if(firstItem) firstItem.focus(); }, 10);">
         </div>
     </div>
 
-    <!-- GÃ¼ncelleme (Update) MenÃ¼sÃ¼ -->
+    <!-- Güncelleme (Update) Menüsü -->
     <div id="update-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('update-content').focus(), 10);"></div>
         <div class="feedback-dialog-box" style="border-color: #ff4444;">
-            <h1 id="update-menu-title" style="color: #ff4444; border-bottom: 2px solid #ff4444;">Zorunlu GÃ¼ncelleme</h1>
+            <h1 id="update-menu-title" style="color: #ff4444; border-bottom: 2px solid #ff4444;">Zorunlu Güncelleme</h1>
 
             <div id="update-content" tabindex="0"
                 style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
-                <p id="update-text">Yeni bir sÃ¼rÃ¼m mevcut. YÃ¼klemek iÃ§in tÄ±klayÄ±nÄ±z...</p>
+                <p id="update-text">Yeni bir sürüm mevcut. Yüklemek için tıklayınız...</p>
             </div>
 
             <nav class="menu-nav" role="application" aria-labelledby="update-menu-title">
                 <ul>
                     <li>
-                        <button id="update-install-btn" class="menu-button" aria-label="YÃ¼kle ve Yenile"
-                            style="color: #ff4444; font-weight: bold; text-align: center;">[YÃœKLE (SAYFAYI YENÄ°LE)]</button><span class="sr-only"> </span>
+                        <button id="update-install-btn" class="menu-button" aria-label="Yükle ve Yenile"
+                            style="color: #ff4444; font-weight: bold; text-align: center;">[YÜKLE (SAYFAYI YENİLE)]</button><span class="sr-only"> </span>
                     </li>
                 </ul>
             </nav>
         </div>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => { const firstBtn = document.getElementById('update-content'); if(firstBtn) firstBtn.focus(); }, 10);">
         </div>
     </div>
 
-    <!-- Sunucu MesajÄ± / Changelog MenÃ¼sÃ¼ -->
+    <!-- Sunucu Mesajı / Changelog Menüsü -->
     <div id="server-message-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('server-message-content').focus(), 10);"></div>
         <div class="feedback-dialog-box" style="border-color: #ffb703;">
-            <h1 id="server-message-title" style="color: #ffb703; border-bottom: 2px solid #ffb703;">YapÄ±lan Son DeÄŸiÅŸiklik</h1>
+            <h1 id="server-message-title" style="color: #ffb703; border-bottom: 2px solid #ffb703;">Yapılan Son Değişiklik</h1>
 
             <div id="server-message-content" tabindex="0"
                 style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
-                <p id="server-message-text">GÃ¼ncelleme notlarÄ± yÃ¼kleniyor...</p>
+                <p id="server-message-text">Güncelleme notları yükleniyor...</p>
             </div>
 
             <nav class="menu-nav" role="application" aria-labelledby="server-message-title">
                 <ul>
                     <li>
-                        <button id="server-message-continue-btn" class="menu-button" aria-label="AnladÄ±m, Devam Et"
+                        <button id="server-message-continue-btn" class="menu-button" aria-label="Anladım, Devam Et"
                             style="color: #ffb703; font-weight: bold; text-align: center;">[ANLADIM, DEVAM ET]</button><span class="sr-only"> </span>
                     </li>
                 </ul>
             </nav>
         </div>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => { const firstBtn = document.getElementById('server-message-content'); if(firstBtn) firstBtn.focus(); }, 10);">
         </div>
     </div>
 
-    <!-- BaÅŸarÄ±lar MenÃ¼sÃ¼ -->
+    <!-- Başarılar Menüsü -->
     <div id="achievements-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
-        <h1 id="achievements-menu-title">BaÅŸarÄ±lar</h1>
+        <h1 id="achievements-menu-title">Başarılar</h1>
 
         <div id="achievements-content" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
-            <!-- Dinamik iÃ§erik eklenecek -->
+            <!-- Dinamik içerik eklenecek -->
         </div>
 
         <nav class="menu-nav" role="application" aria-labelledby="achievements-menu-title">
@@ -475,44 +475,44 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
     </div>
 
-    <!-- Oyun Modu SeÃ§im MenÃ¼sÃ¼ -->
+    <!-- Oyun Modu Seçim Menüsü -->
     <div id="play-mode-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('play-mode-back-btn').focus(), 10);"></div>
-        <h1 id="play-mode-title">Oyun Modu SeÃ§imi</h1>
+        <h1 id="play-mode-title">Oyun Modu Seçimi</h1>
         <nav class="menu-nav" role="application" aria-labelledby="play-mode-title">
             <ul>
                 <li>
-                    <button id="offline-play-btn" class="menu-button" aria-label="Ã‡evrimdÄ±ÅŸÄ± Oyna">Ã‡evrimdÄ±ÅŸÄ± (Klasik) Oyna</button><span class="sr-only"> </span>
+                    <button id="offline-play-btn" class="menu-button" aria-label="Çevrimdışı Oyna">Çevrimdışı (Klasik) Oyna</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="multiplayer-play-btn" class="menu-button" aria-label="Ã‡ok Oyunculu Oyna">Ã‡ok Oyunculu Oyna (YakÄ±nda)</button><span class="sr-only"> </span>
+                    <button id="multiplayer-play-btn" class="menu-button" aria-label="Çok Oyunculu Oyna">Çok Oyunculu Oyna (Yakında)</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="play-mode-back-btn" class="menu-button" aria-label="Ana MenÃ¼ye DÃ¶n">Geri</button><span class="sr-only"> </span>
+                    <button id="play-mode-back-btn" class="menu-button" aria-label="Ana Menüye Dön">Geri</button><span class="sr-only"> </span>
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('play-mode-back-btn').focus(), 10);"></div>
     </div>
 
-    <!-- Ã‡ok Oyunculu Mod SeÃ§im MenÃ¼sÃ¼ -->
+    <!-- Çok Oyunculu Mod Seçim Menüsü -->
     <div id="multiplayer-select-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('multiplayer-select-back-btn').focus(), 10);"></div>
         
-        <h1 id="multiplayer-select-title">Ã‡ok Oyunculu</h1>
+        <h1 id="multiplayer-select-title">Çok Oyunculu</h1>
         
         <nav class="menu-nav" role="application" aria-labelledby="multiplayer-select-title">
             <ul>
@@ -520,34 +520,34 @@
                     <button id="pvp-play-btn" class="menu-button" aria-label="Birebir Rakiple Oyna">Birebir Rakiple Oyna</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="pve-bot-play-btn" class="menu-button" aria-label="Bota KarÅŸÄ± Oyna">Bota KarÅŸÄ± Oyna</button><span class="sr-only"> </span>
+                    <button id="pve-bot-play-btn" class="menu-button" aria-label="Bota Karşı Oyna">Bota Karşı Oyna</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="multiplayer-select-back-btn" class="menu-button" aria-label="Oyun Modu SeÃ§imine DÃ¶n">Geri</button><span class="sr-only"> </span>
+                    <button id="multiplayer-select-back-btn" class="menu-button" aria-label="Oyun Modu Seçimine Dön">Geri</button><span class="sr-only"> </span>
                 </li>
             </ul>
         </nav>
         
-        <div tabindex="0" role="button" aria-label="MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor"
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('multiplayer-select-back-btn').focus(), 10);"></div>
     </div>
 
-    <!-- Oyun EkranÄ± -->
-    <section id="game-menu-container" class="menu-container" aria-label="Oyun AlanÄ±" aria-hidden="true"
+    <!-- Oyun Ekranı -->
+    <section id="game-menu-container" class="menu-container" aria-label="Oyun Alanı" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
 
-        <h1 id="game-menu-title">HafÄ±zana GÃ¼ven</h1>
+        <h1 id="game-menu-title">Hafızana Güven</h1>
         <div id="game-hud-container"
             style="display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.3rem; color: #ffb703; font-weight: bold;">
             <span id="game-score-display" aria-hidden="true">Jeton: 0</span>
-            <span id="game-timer-display" aria-hidden="true">SÃ¼re: 30</span>
+            <span id="game-timer-display" aria-hidden="true">Süre: 30</span>
             <span id="game-lives-display" aria-hidden="true">Hak: 3</span>
         </div>
         <p style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa;" id="game-status-text">
-            Oyun baÅŸlÄ±yor... Ä°lk notayÄ± dinleyin!
+            Oyun başlıyor... İlk notayı dinleyin!
         </p>
-        <!-- Tekrar Dinle Butonu (Ã–zellikle mobilde oyunu tekrar dinlemek iÃ§in, SÄ±ra Sizde yazÄ±sÄ±nÄ±n ardÄ±ndan gÃ¶rÃ¼nÃ¼r) -->
+        <!-- Tekrar Dinle Butonu (Özellikle mobilde oyunu tekrar dinlemek için, Sıra Sizde yazısının ardından görünür) -->
         <button id="mobile-replay-btn" role="button" aria-label="Tekrar Dinle"
             style="display: none; margin: 0 auto 20px auto; font-size: 1.2rem; padding: 15px 30px; background-color: #219ebc; color: white; border: none; border-radius: 8px; width: 90%; max-width: 400px; font-weight: bold; cursor: pointer; text-align: center;">
             Tekrar Dinle
@@ -559,63 +559,63 @@
                 </li>
             </ul>
         </nav>
-        <!-- S ve T kÄ±sayollarÄ± iÃ§in Ã¶zel ekran okuyucu bÃ¶lgesi -->
+        <!-- S ve T kısayolları için özel ekran okuyucu bölgesi -->
         <div id="sr-shortcut-reader" aria-live="assertive" style="position: absolute; left:-9999px;"></div>
     </section>
 
-    <!-- Mobil Piyano TuÅŸlarÄ± EkranÄ± -->
+    <!-- Mobil Piyano Tuşları Ekranı -->
     <div id="mobile-piano-container" aria-hidden="true" role="group" aria-label="Mobil Oyun Kontrolleri">
-        <button id="mobile-game-back-btn" class="mobile-exit-btn" role="button" aria-label="Oyunu Bitir">Ã‡Ä±kÄ±ÅŸ</button><span class="sr-only"> </span>
-        <button class="mobile-piano-key" role="button" data-key="c" aria-label="C NotasÄ±">C</button><span class="sr-only"> </span>
-        <button class="mobile-piano-key" role="button" data-key="d" aria-label="D NotasÄ±">D</button><span class="sr-only"> </span>
-        <button class="mobile-piano-key" role="button" data-key="e" aria-label="E NotasÄ±">E</button><span class="sr-only"> </span>
-        <button class="mobile-piano-key" role="button" data-key="f" aria-label="F NotasÄ±">F</button><span class="sr-only"> </span>
-        <button class="mobile-piano-key" role="button" data-key="g" aria-label="G NotasÄ±">G</button><span class="sr-only"> </span>
-        <button class="mobile-piano-key" role="button" data-key="a" aria-label="A NotasÄ±">A</button><span class="sr-only"> </span>
-        <button class="mobile-piano-key" role="button" data-key="b" aria-label="B NotasÄ±">B</button><span class="sr-only"> </span>
+        <button id="mobile-game-back-btn" class="mobile-exit-btn" role="button" aria-label="Oyunu Bitir">Çıkış</button><span class="sr-only"> </span>
+        <button class="mobile-piano-key" role="button" data-key="c" aria-label="C Notası">C</button><span class="sr-only"> </span>
+        <button class="mobile-piano-key" role="button" data-key="d" aria-label="D Notası">D</button><span class="sr-only"> </span>
+        <button class="mobile-piano-key" role="button" data-key="e" aria-label="E Notası">E</button><span class="sr-only"> </span>
+        <button class="mobile-piano-key" role="button" data-key="f" aria-label="F Notası">F</button><span class="sr-only"> </span>
+        <button class="mobile-piano-key" role="button" data-key="g" aria-label="G Notası">G</button><span class="sr-only"> </span>
+        <button class="mobile-piano-key" role="button" data-key="a" aria-label="A Notası">A</button><span class="sr-only"> </span>
+        <button class="mobile-piano-key" role="button" data-key="b" aria-label="B Notası">B</button><span class="sr-only"> </span>
     </div>
 
-    <!-- Mobil Enter TuÅŸu (Sadece Diyaloglarda GÃ¶rÃ¼nÃ¼r) -->
-    <div id="mobile-enter-container" aria-hidden="true" role="group" aria-label="Devam Et TuÅŸu">
+    <!-- Mobil Enter Tuşu (Sadece Diyaloglarda Görünür) -->
+    <div id="mobile-enter-container" aria-hidden="true" role="group" aria-label="Devam Et Tuşu">
         <button id="mobile-enter-btn" class="mobile-enter-btn" aria-label="Devam Et (Enter)">Devam Et
             (Enter)</button><span class="sr-only"> </span>
     </div>
 
-    <!-- CanlÄ± Sohbet Butonu -->
-    <button id="chat-toggle-btn" aria-label="CanlÄ± Sohbeti AÃ§ veya Kapat. KÄ±sayol: Nokta tuÅŸu" class="chat-toggle-btn"
+    <!-- Canlı Sohbet Butonu -->
+    <button id="chat-toggle-btn" aria-label="Canlı Sohbeti Aç veya Kapat. Kısayol: Nokta tuşu" class="chat-toggle-btn"
         style="display: none;">
-        ğŸ’¬ CanlÄ± Sohbet (.)
+        💬 Canlı Sohbet (.)
     </button><span class="sr-only"> </span>
 
-    <!-- Gizli CanlÄ± BÃ¶lge (Sohbet penceresi kapalÄ±yken bile mesajlarÄ± okumak iÃ§in) -->
+    <!-- Gizli Canlı Bölge (Sohbet penceresi kapalıyken bile mesajları okumak için) -->
     <div id="sr-chat-reader" aria-live="polite" aria-atomic="true"
         style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;"></div>
 
-    <!-- CanlÄ± Sohbet Penceresi -->
+    <!-- Canlı Sohbet Penceresi -->
     <div id="chat-panel" class="chat-panel" aria-hidden="true" style="display: none;" role="dialog"
-        aria-label="CanlÄ± Sohbet Penceresi">
+        aria-label="Canlı Sohbet Penceresi">
         <div class="chat-header">
-            <h2 id="chat-title">CanlÄ± Sohbet</h2>
+            <h2 id="chat-title">Canlı Sohbet</h2>
             <button id="chat-close-btn" aria-label="Sohbeti Kapat" class="chat-close-btn">X</button><span class="sr-only"> </span>
         </div>
-        <!-- MesajlarÄ±n akacaÄŸÄ± alan. -->
+        <!-- Mesajların akacağı alan. -->
         <div class="chat-messages-container">
-            <ul id="chat-messages" aria-label="Sohbet MesajlarÄ±">
+            <ul id="chat-messages" aria-label="Sohbet Mesajları">
             </ul>
         </div>
         <div class="chat-input-area">
-            <input type="text" id="chat-nickname" name="chat-nickname" aria-label="Takma AdÄ±nÄ±zÄ± Girin"
+            <input type="text" id="chat-nickname" name="chat-nickname" aria-label="Takma Adınızı Girin"
                 placeholder="Takma Ad" maxlength="20">
-            <input type="text" id="chat-message-input" name="chat-message-input" aria-label="MesajÄ±nÄ±zÄ± Girin"
-                placeholder="MesajÄ±nÄ±z..." maxlength="150">
-            <button id="chat-send-btn" aria-label="MesajÄ± GÃ¶nder">â¤</button><span class="sr-only"> </span>
+            <input type="text" id="chat-message-input" name="chat-message-input" aria-label="Mesajınızı Girin"
+                placeholder="Mesajınız..." maxlength="150">
+            <button id="chat-send-btn" aria-label="Mesajı Gönder">➤</button><span class="sr-only"> </span>
         </div>
     </div>
 
-    <!-- Howler.js 3D Ses KÃ¼tÃ¼phanesi (Yerel) -->
+    <!-- Howler.js 3D Ses Kütüphanesi (Yerel) -->
     <script src="sounds/howler.min.js"></script>
 
-    <!-- YardÄ±m, AlÄ±ÅŸtÄ±rma ve Motivasyon MesajlarÄ± iÃ§in ayrÄ± dosya -->
+    <!-- Yardım, Alıştırma ve Motivasyon Mesajları için ayrı dosya -->
     <script src="yardim.js"></script>
 
     <script>
