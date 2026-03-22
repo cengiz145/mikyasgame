@@ -160,6 +160,9 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'feedback') buttons = Array.from(window.feedbackMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'server-message') buttons = Array.from(window.serverMessageMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'game') buttons = Array.from(window.gameMenu.querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'play-mode') buttons = Array.from(document.getElementById('play-mode-menu-container').querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'multiplayer-select') buttons = Array.from(document.getElementById('multiplayer-select-menu-container').querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('.menu-button'));
 
     return buttons.filter(btn => {
         const li = btn.closest('li');
@@ -1156,11 +1159,21 @@ document.addEventListener('keydown', function (event) {
         event.preventDefault();
 
         if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-            window.currentFocusIndex = (window.currentFocusIndex + 1) % activeButtons.length;
-            activeButtons[window.currentFocusIndex].focus();
+            if (activeButtons.length === 1) {
+                activeButtons[window.currentFocusIndex].blur();
+                setTimeout(() => activeButtons[window.currentFocusIndex].focus(), 10);
+            } else {
+                window.currentFocusIndex = (window.currentFocusIndex + 1) % activeButtons.length;
+                activeButtons[window.currentFocusIndex].focus();
+            }
         } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-            window.currentFocusIndex = (window.currentFocusIndex - 1 + activeButtons.length) % activeButtons.length;
-            activeButtons[window.currentFocusIndex].focus();
+            if (activeButtons.length === 1) {
+                activeButtons[window.currentFocusIndex].blur();
+                setTimeout(() => activeButtons[window.currentFocusIndex].focus(), 10);
+            } else {
+                window.currentFocusIndex = (window.currentFocusIndex - 1 + activeButtons.length) % activeButtons.length;
+                activeButtons[window.currentFocusIndex].focus();
+            }
         }
     }
 });
