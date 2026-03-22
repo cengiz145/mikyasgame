@@ -376,17 +376,18 @@ window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReaso
 
     let statusText = "";
     if (modeData.name !== 'Kayıp Notalar') {
-        if (modeData.completionCount > 0) {
+        if (modeData.completionCount >= targetTurns) {
             statusText = " (Tamamlandı)";
-            unlockedLabel += ". Bu mod daha önce tamamlandı.";
+            unlockedLabel += ". Bu mod uzmanlığı tamamlandı.";
         } else {
-            statusText = ` (Hedef: ${targetTurns} Tur)`;
-            unlockedLabel += `. Modu kazanmak için ${targetTurns} tur oynamanız gerekiyor.`;
+            let kalan = targetTurns - modeData.completionCount;
+            statusText = ` (Tamamlanan: ${modeData.completionCount}, Hedef: ${targetTurns})`;
+            unlockedLabel += `. Oynanan tur: ${modeData.completionCount}. Bir sonraki modu açmak için kalan tur: ${kalan}.`;
         }
     } else {
         if (modeData.completionCount > 0) {
-            statusText = " (Tamamlandı)";
-            unlockedLabel += ". Bu mod daha önce tamamlandı.";
+            statusText = ` (Tamamlanan: ${modeData.completionCount})`;
+            unlockedLabel += `. Bu modu ${modeData.completionCount} kez tamamladınız.`;
         }
     }
 
@@ -1407,11 +1408,49 @@ document.addEventListener('DOMContentLoaded', () => {
         const nickname = nickVal;
         const text = msgVal;
 
-        // --- GİZLİ SOHBET KOMUTLARI (CLIENT-SIDE) ---
-        if (text.startsWith('/')) {
-            const args = text.split(' ');
-            const command = args[0].toLowerCase();
-            const chatMessagesListLocal = document.getElementById('chat-messages');
+        // KULLANICI ADI GÜVENLİK (REGISTRATION) KONTROLÜ
+        let myDevId = localStorage.getItem('hafizaGuvenDeviceId');
+        if (!myDevId) {
+            myDevId = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+            localStorage.setItem('hafizaGuvenDeviceId', myDevId);
+        }
+
+        window.db.ref('registeredUsers/' + nickname).once('value').then(snapshot => {
+            const existingOwner = snapshot.val();
+            
+            // Eğer başkasına aitse durdur
+            if (existingOwner && existingOwner !== myDevId) {
+                if (window.wrongSound) window.wrongSound.play();
+                let uyari = `"${nickname}" kullanıcı adı daha önce başkası tarafından alınmış. Lütfen farklı bir isim seçin.`;
+                if (window.announceToScreenReader) window.announceToScreenReader(uyari);
+                let desc = document.getElementById('chat-desc') || document.getElementById('sr-chat-reader');
+                if (desc) desc.textContent = "Bağlantı Hatası: Kullanıcı adı kullanımda.";
+                
+                if (nickInput) {
+                    nickInput.value = "";
+                    nickInput.focus();
+                }
+                return;
+            }
+
+            // Yeni kullanıcı adı ise benim adıma kaydet
+            if (!existingOwner) {
+                window.db.ref('registeredUsers/' + nickname).set(myDevId);
+            }
+
+            // Artık nick bize ait. Uygulama hafızasına kalıcı kaydet.
+            localStorage.setItem('chatUsername', nickname);
+            window.currentChatUser = nickname;
+
+            if (nickInput) {
+                nickInput.style.display = 'none'; // Başarıyla kilitlendi, bir daha sorma
+            }
+
+            // --- GİZLİ SOHBET KOMUTLARI (CLIENT-SIDE) ---
+            if (text.startsWith('/')) {
+                const args = text.split(' ');
+                const command = args[0].toLowerCase();
+                const chatMessagesListLocal = document.getElementById('chat-messages');
             const chatMessagesContainerLocal = document.querySelector('.chat-messages-container');
             const chatMessageInputLocal = document.getElementById('chat-message-input');
             
@@ -1701,6 +1740,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.');
             });
         }
+        }); // END OF registeredUsers Check
     }
 
     // Gönder butonuna tıklandığında
