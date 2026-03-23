@@ -1088,6 +1088,19 @@ document.addEventListener('keydown', (e) => {
              const backBtn = document.getElementById(menusWithBackBtns[window.currentActiveMenu]);
              if (backBtn) backBtn.click();
         }
+
+        // OYUN VE HİKAYE MODUNDAN GÜVENLİ KAÇIŞ PROTOKOLÜ
+        if (window.currentActiveMenu === 'game' || window.currentActiveMenu === 'story') {
+            const mobileGameBackBtn = document.getElementById('mobile-game-back-btn');
+            const gameBackBtn = document.getElementById('game-back-btn');
+            
+            if (mobileGameBackBtn) {
+                mobileGameBackBtn.click(); // Hikaye ve Oyun çıkışını güvenle tetikler
+            } else if (gameBackBtn) {
+                gameBackBtn.click();
+            }
+            return;
+        }
     }
 });
 
