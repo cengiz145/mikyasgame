@@ -1,5 +1,5 @@
 {
-    "version": "0.94.3",
-    "buildId": 1774231000,
-    "changelog": "Sistem Dengesi ve Hata Ayıklama (Hotfix v0.94.3) yayında! Ağ gecikmesinden kaynaklanan 'Sürekli Boş Ekran' sorunu sonsuza dek çözüldü. Çevrimiçi oyun çökme noktaları kapatıldı ve Çok Oyunculu lobileri için 10/15 saniyelik sürükleyici 'bekleme simülasyonları' oyuna dahil edildi."
+    "version": "0.94.4",
+    "buildId": 1774251000,
+    "changelog": "Mobil Hikaye Modundaki piyano tuşları tam erişilebilir hale getirildi ve zorunlu güncelleme uyarı ekranındaki 'sonsuz döngü' (butonun basmaması) hatası kalıcı olarak çözüldü."
 }

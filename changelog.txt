@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.94.4] - 2026-03-23
+
+### Düzeltilen Hatalar ve Sistem Güncellemeleri:
+- **Zorunlu Güncelleme Döngüsü Çözümü:** Yeni bir sürüm geldiğinde ekrana çıkan "YÜKLE (SAYFAYI YENİLE)" butonunun hiçbir işlem yapmayıp oyuncuyu güncelleme menüsüne hapsetmesine neden olan kritik dinleyici hatası (Event Listener Bug) tamir edildi.
+- **Mobil Hikaye Modu Erişilebilirliği:** Kayıp Notalar modunda devre dışı bırakılan nota tuşlarının (örneğin G, A, B tuşları) ekran okuyucular tarafından hala erişilebilir ve tıklanabilir görünmesi sorunu, kalıcı `disabled` komutlarıyla aşıldı ve ekran okuyucudan tamamen gizlendi.
+
 [v0.94.3] - 2026-03-23
 
 ### Düzeltilen Hatalar ve Sistem Güncellemeleri:
