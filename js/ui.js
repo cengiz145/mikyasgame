@@ -1309,6 +1309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 // Başlangıç Çıkış Kancası
+                if (window.disconnectRef) { window.disconnectRef.onDisconnect().cancel(); }
                 window.disconnectRef = window.db.ref('messages').push();
                 window.disconnectRef.onDisconnect().set({
                     nickname: "Sistem",
