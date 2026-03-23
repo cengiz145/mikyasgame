@@ -38,13 +38,14 @@ window.guncellemeKontrolEt = function (isManual = false) {
                     window.announceToScreenReader(currentMsg);
                 }
             } else if (data.version !== window.mevcutSurum) {
-                window.mevcutSurum = data.version;
                 const uyariMesaji = "Oyuna zorunlu bir güncelleme geldi! Eski sürümle oynamaya devam edemezsiniz. Lütfen Tamam'a basarak sayfayı yenileyin.";
 
                 if (window.gameIsActive || window.inStoryMode || window.currentActiveMenu !== 'main') {
                     window.pendingUpdate = true; // Güncellemeyi sessizce beklemeye al
                     return; // Ekranı silme işlemini iptal et
                 }
+
+                window.mevcutSurum = data.version;
 
                 window.gameIsActive = false;
                 if (typeof Howler !== 'undefined') Howler.stop();
@@ -54,7 +55,7 @@ window.guncellemeKontrolEt = function (isManual = false) {
                 updateSound.play();
 
                 if (window.updateMenu) {
-                    window.switchMenu(window.currentActiveMenu, window.updateMenu, 'update');
+                    window.switchMenu(window.mainMenu, window.updateMenu, 'update');
                 } else {
                     alert(uyariMesaji);
                     window.location.href = window.location.pathname + "?v=" + new Date().getTime();

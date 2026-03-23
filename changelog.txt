@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.94.6] - 2026-03-24
+
+### Düzeltilen Hatalar ve Sistem Güncellemeleri:
+- **Otomatik Güncelleme (Auto-Update) Sistemi Onarıldı:** Yeni bir güncelleme geldiğinde arayüz değişikliği esnasında `TypeError` fırlatarak oyuncuyu bozuk bir menüde kilitleyen kritik bir mantık hatası (`switchMenu` metoduna element yerine metin gönderilmesi) kalıcı olarak onarıldı.
+- **Gizli Güncellemelerin Kaybolması:** Oyuncu aktif olarak hikaye veya oyun modundayken gelen güncellemelerin sessizce iptal edildikten sonra bir daha asla sorulmamasına (oyuncunun eski sürüm kodlarla oynamaya devam etmesine) neden olan çok önemli bir sürüm denetimi hatası (State Logic) düzeltildi.
+
 [v0.94.5] - 2026-03-23
 
 ### Düzeltilen Hatalar ve Sistem Güncellemeleri:

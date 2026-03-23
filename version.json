@@ -1,5 +1,5 @@
 {
-    "version": "0.94.5",
-    "buildId": 1774265000,
-    "changelog": "Giriş ekranında NVDA'nın fazladan 'bölüm' okuma hatası giderildi, oyun geri sayımı 3 saniyeye ayarlandı."
+    "version": "0.94.6",
+    "buildId": 1774268000,
+    "changelog": "Zorunlu Güncelleme sistemini kilitleyen (TypeError) geçiş hatası ve oyun içindeyken gelen güncellemelerin kaybolması sorunu giderildi."
 }
