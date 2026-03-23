@@ -494,14 +494,14 @@ window.PvP = {
 // --- GÜVENLİ KANCALAR (MONKEY PATCHING) ---
 // game.js içerisindeki orijinal çevrimdışı (offline) fonksiyonları bozmadan PVP Kurallarını (Özellikle Kural 1: 60 Saniye) dayatıyoruz.
 
-const originalCheckPlayerInput = window.checkPlayerInput;
-window.checkPlayerInput = function(key) {
+const originalHandleGameInput = window.handleGameInput;
+window.handleGameInput = function(key) {
     if (window.PvP && window.PvP.matchId) {
         let cachedTimer = window.gameTimer; // KURAL 1: 60 saniyelik zamanı korumaya al (Offline oyun her doğru tuşta 30sn'ye sıfırlar, bunu engelliyoruz)
-        originalCheckPlayerInput(key); 
+        originalHandleGameInput(key); 
         window.gameTimer = cachedTimer; // Offline resetini zorla ez ve Kural 1'i koru!
     } else {
-        originalCheckPlayerInput(key);
+        originalHandleGameInput(key);
     }
 };
 
