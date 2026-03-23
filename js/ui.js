@@ -238,21 +238,21 @@ window.updateMobileStoryKeys = function(isStory) {
     if (keys.length < 7) return;
 
     if (isStory) {
-        keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'Konum'; keys[0].setAttribute('aria-label', 'Konumu Sorgula');
-        keys[1].setAttribute('data-key', 'ArrowLeft'); keys[1].textContent = '< Sol'; keys[1].setAttribute('aria-label', 'Sola Yürü');
-        keys[2].setAttribute('data-key', 'ArrowRight'); keys[2].textContent = 'Sağ >'; keys[2].setAttribute('aria-label', 'Sağa Yürü');
-        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F Bul'; keys[3].setAttribute('aria-label', 'Notayı Ara veya Al');
-        keys[4].textContent = '---'; keys[4].setAttribute('aria-label', 'Devre Dışı');
-        keys[5].textContent = '---'; keys[5].setAttribute('aria-label', 'Devre Dışı');
-        keys[6].textContent = '---'; keys[6].setAttribute('aria-label', 'Devre Dışı');
+        keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'Konum'; keys[0].setAttribute('aria-label', 'Konumu Sorgula'); keys[0].disabled = false;
+        keys[1].setAttribute('data-key', 'ArrowLeft'); keys[1].textContent = '< Sol'; keys[1].setAttribute('aria-label', 'Sola Yürü'); keys[1].disabled = false;
+        keys[2].setAttribute('data-key', 'ArrowRight'); keys[2].textContent = 'Sağ >'; keys[2].setAttribute('aria-label', 'Sağa Yürü'); keys[2].disabled = false;
+        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F Bul'; keys[3].setAttribute('aria-label', 'Notayı Ara veya Al'); keys[3].disabled = false;
+        keys[4].textContent = '---'; keys[4].setAttribute('aria-label', 'Devre Dışı'); keys[4].disabled = true;
+        keys[5].textContent = '---'; keys[5].setAttribute('aria-label', 'Devre Dışı'); keys[5].disabled = true;
+        keys[6].textContent = '---'; keys[6].setAttribute('aria-label', 'Devre Dışı'); keys[6].disabled = true;
     } else {
-        keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'C'; keys[0].setAttribute('aria-label', 'C Notası');
-        keys[1].setAttribute('data-key', 'd'); keys[1].textContent = 'D'; keys[1].setAttribute('aria-label', 'D Notası');
-        keys[2].setAttribute('data-key', 'e'); keys[2].textContent = 'E'; keys[2].setAttribute('aria-label', 'E Notası');
-        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F'; keys[3].setAttribute('aria-label', 'F Notası');
-        keys[4].setAttribute('data-key', 'g'); keys[4].textContent = 'G'; keys[4].setAttribute('aria-label', 'G Notası');
-        keys[5].setAttribute('data-key', 'a'); keys[5].textContent = 'A'; keys[5].setAttribute('aria-label', 'A Notası');
-        keys[6].setAttribute('data-key', 'b'); keys[6].textContent = 'B'; keys[6].setAttribute('aria-label', 'B Notası');
+        keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'C'; keys[0].setAttribute('aria-label', 'C Notası'); keys[0].disabled = false;
+        keys[1].setAttribute('data-key', 'd'); keys[1].textContent = 'D'; keys[1].setAttribute('aria-label', 'D Notası'); keys[1].disabled = false;
+        keys[2].setAttribute('data-key', 'e'); keys[2].textContent = 'E'; keys[2].setAttribute('aria-label', 'E Notası'); keys[2].disabled = false;
+        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F'; keys[3].setAttribute('aria-label', 'F Notası'); keys[3].disabled = false;
+        keys[4].setAttribute('data-key', 'g'); keys[4].textContent = 'G'; keys[4].setAttribute('aria-label', 'G Notası'); keys[4].disabled = false;
+        keys[5].setAttribute('data-key', 'a'); keys[5].textContent = 'A'; keys[5].setAttribute('aria-label', 'A Notası'); keys[5].disabled = false;
+        keys[6].setAttribute('data-key', 'b'); keys[6].textContent = 'B'; keys[6].setAttribute('aria-label', 'B Notası'); keys[6].disabled = false;
     }
 };
 
@@ -650,6 +650,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('lastSeenChangelogVersion', window.globalChangelogVersion);
             }
             window.switchMenu(window.serverMessageMenu, window.mainMenu, 'main');
+        });
+    }
+
+    // Güncelleme Yükle Butonu
+    const updateInstallBtn = document.getElementById('update-install-btn');
+    if (updateInstallBtn) {
+        updateInstallBtn.addEventListener('click', () => {
+            if (window.announceToScreenReader) window.announceToScreenReader("Güncelleme yükleniyor, sayfa yenilenecek...");
+            setTimeout(() => {
+                window.location.href = window.location.pathname + "?v=" + new Date().getTime();
+            }, 1000);
         });
     }
 
