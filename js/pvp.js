@@ -142,6 +142,13 @@ window.PvP = {
             btn.innerHTML = 'Birebir Rakiple Oyna';
             btn.setAttribute('aria-label', 'Birebir Rakiple Oyna. Eşleştirme iptal edildi.');
         }
+        
+        const botBtn = document.getElementById('pve-bot-play-btn');
+        if (botBtn) {
+            botBtn.innerHTML = 'Bota Karşı Oyna';
+            botBtn.setAttribute('aria-label', 'Bota Karşı Oyna');
+        }
+
         if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme iptal edildi.");
     },
 
@@ -154,7 +161,7 @@ window.PvP = {
         if (window.correctSound) window.correctSound.play();
         if (window.announceToScreenReader) window.announceToScreenReader(`Eşleşme bulundu! Rakibiniz: ${oppName}. Karşılaşma birazdan başlayacak.`);
         
-        const btn = document.getElementById('pvp-play-btn');
+        const btn = this.isBotMode ? document.getElementById('pve-bot-play-btn') : document.getElementById('pvp-play-btn');
         if (btn) {
             btn.innerHTML = `Eşleşti: ${oppName}!`;
             btn.setAttribute('aria-label', 'Eşleşme bulundu. Maça geçiliyor...');
@@ -162,7 +169,10 @@ window.PvP = {
 
         // Kısa süre sonra oyunu başlat
         setTimeout(() => {
-            if (btn) btn.innerHTML = 'Birebir Rakiple Oyna';
+            const resetBtn = document.getElementById('pvp-play-btn');
+            if (resetBtn) resetBtn.innerHTML = 'Birebir Rakiple Oyna';
+            const resetBotBtn = document.getElementById('pve-bot-play-btn');
+            if (resetBotBtn) resetBotBtn.innerHTML = 'Bota Karşı Oyna';
             if (window.switchMenu && window.multiplayerSelectMenu && window.gameMenu) {
                 window.switchMenu(window.multiplayerSelectMenu, window.gameMenu, 'game');
             }
