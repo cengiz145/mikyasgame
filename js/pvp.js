@@ -477,9 +477,12 @@ window.PvP = {
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
         
         setTimeout(() => {
+            // PVP'DE ÇİFTE ÖDÜL ENFLASYONUNU ENGELLEME KİLİDİ
+            window.sessionTokens = 0; 
+            
             if (window.endMainGame) window.endMainGame(true, isWinner, false);
             
-            // Veritabanı Şişmesini (Database Spam) Engellemek İçin Bot Maçlarını Sil (Garbage Collection)
+            // Veritabanı Şişmesini (Database Spam) Engellemek İçin Bot Maçlarını Sil
             if (this.isBotMode && this.matchId) {
                 window.db.ref('matches/' + this.matchId).remove();
             }
