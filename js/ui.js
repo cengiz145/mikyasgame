@@ -350,6 +350,8 @@ window.announceToScreenReader = function (text, forceFocus = false) {
         const oldAnnouncers = document.querySelectorAll('#sr-focus-announcer');
         oldAnnouncers.forEach(el => el.remove());
 
+        let previousFocus = document.activeElement;
+
         let announcerDiv = document.createElement('div');
         announcerDiv.id = 'sr-focus-announcer';
         announcerDiv.setAttribute('tabindex', '-1');
@@ -365,7 +367,20 @@ window.announceToScreenReader = function (text, forceFocus = false) {
         announcerDiv.focus();
         
         setTimeout(() => {
-             if (announcerDiv.parentNode) announcerDiv.remove();
+            if (announcerDiv.parentNode) {
+                // Odak kaybını engelle (NVDA'nın body'e düşmesini önle)
+                if (document.activeElement === announcerDiv) {
+                    if (previousFocus && document.body.contains(previousFocus) && previousFocus.tagName !== 'BODY') {
+                        previousFocus.focus();
+                    } else if (window.lastFocusedElement && document.body.contains(window.lastFocusedElement) && window.lastFocusedElement.tagName !== 'BODY') {
+                        window.lastFocusedElement.focus();
+                    } else if (typeof window.getActiveButtons === 'function') {
+                        let btns = window.getActiveButtons();
+                        if (btns && btns.length > 0) btns[0].focus();
+                    }
+                }
+                announcerDiv.remove();
+            }
         }, 15000);
     }
 };
