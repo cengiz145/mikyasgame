@@ -1959,3 +1959,13 @@ document.addEventListener('DOMContentLoaded', () => {
 //         window.db.ref('messages').remove();
 //     }
 // });
+
+// --- GÖREV 1: KATI TAB TUŞU YASAKLAMASI (SIKIYÖNETİM) ---
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Tab') {
+        const activeTag = document.activeElement ? document.activeElement.tagName : '';
+        if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA' && activeTag !== 'SELECT') {
+            event.preventDefault(); // Varsayılan sekmeyi felç et
+        }
+    }
+}, true); // Yakalama (capture) evresinde, diğer tüm script'lerden önce tetiklenir
