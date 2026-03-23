@@ -1,8 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
-[v0.94.4] - 2026-03-23
+[v0.94.5] - 2026-03-23
 
 ### Düzeltilen Hatalar ve Sistem Güncellemeleri:
+- **Giriş Ekranı (Intro) Erişilebilirliği:** Ekran okuyucuların (NVDA) oyunun başlangıcında anonslara istenmeyen "bölüm" kelimesini eklemesine sebep olan HTML etiketleri (`role="none"`) ile susturuldu.
+- **Oyun Başlangıç Süresi:** Oyunun başlangıç geri sayım süresi 5 saniyeden 3 saniyeye geri çekildi ve ekran okuyucunun 3 saniye okuması sağlandı.
+- **Cache Temizliği:** Versiyon 0.94.5'e güncellendi.
+
+[v0.94.4] - 2026-03-23
 - **Zorunlu Güncelleme Döngüsü Çözümü:** Yeni bir sürüm geldiğinde ekrana çıkan "YÜKLE (SAYFAYI YENİLE)" butonunun hiçbir işlem yapmayıp oyuncuyu güncelleme menüsüne hapsetmesine neden olan kritik dinleyici hatası (Event Listener Bug) tamir edildi.
 - **Mobil Hikaye Modu Erişilebilirliği:** Kayıp Notalar modunda devre dışı bırakılan nota tuşlarının (örneğin G, A, B tuşları) ekran okuyucular tarafından hala erişilebilir ve tıklanabilir görünmesi sorunu, kalıcı `disabled` komutlarıyla aşıldı ve ekran okuyucudan tamamen gizlendi.
 

@@ -326,10 +326,10 @@ window.startMainGame = function (difficulty = 'easy') {
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
         gameStatus.style.display = 'block';
-        gameStatus.textContent = `Oyun 5 saniye içinde başlıyor... ${hk} Hata Koruması, ${zk} Zaman Koruması. İlk notayı dinleyin!`;
+        gameStatus.textContent = `Oyun 3 saniye içinde başlıyor... ${hk} Hata Koruması, ${zk} Zaman Koruması. İlk notayı dinleyin!`;
     }
     window.gameStatusTimeoutId = setTimeout(() => {
-        if (window.announceToScreenReader) window.announceToScreenReader(`Oyun 5 saniye içinde başlıyor. ${hk} Hata Koruması ve ${zk} Zaman Korumasına sahipsiniz. İlk notayı dinleyin!`);
+        if (window.announceToScreenReader) window.announceToScreenReader(`Oyun 3 saniye içinde başlıyor. ${hk} Hata Koruması ve ${zk} Zaman Korumasına sahipsiniz. İlk notayı dinleyin!`);
     }, 400);
 
     if (window.clockTickSound && window.clockTickSound.playing()) window.clockTickSound.stop();
@@ -388,7 +388,7 @@ window.startMainGame = function (difficulty = 'easy') {
                 }
             }
         }, 1000);
-    }, 5000);
+    }, 3000);
 };
 
 window.addNewNoteAndPlaySequence = function () {

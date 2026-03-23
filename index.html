@@ -17,10 +17,10 @@
 
 
     <!-- Başlangıç (Intro) Ekranı -->
-    <div id="intro-screen" tabindex="-1">
+    <div id="intro-screen" tabindex="-1" role="none">
 
         <!-- Aşama 1: Yapımcı İmzası -->
-        <div id="intro-phase-1" class="intro-phase"
+        <div id="intro-phase-1" class="intro-phase" role="none"
             style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; opacity: 1; padding: 0 20px; transition: opacity 0.5s ease-in-out;">
             <p id="intro-text" class="intro-instruction" style="font-size: 1.8rem; line-height: 1.6; color: #f0f0f0;"
                 aria-hidden="true">
@@ -46,7 +46,7 @@
         </div>
 
         <!-- Aşama 2: Logo ve Başlık -->
-        <div id="intro-phase-2" class="intro-phase"
+        <div id="intro-phase-2" class="intro-phase" role="none"
             style="display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; opacity: 0; padding: 0 20px; transition: opacity 1s ease-in-out;">
             <h1 id="intro-game-title" class="intro-title" style="font-size: 3rem; color: var(--focus-outline);"
                 aria-hidden="true">Hafızana Güven</h1>
@@ -618,7 +618,7 @@
     <script src="yardim.js"></script>
 
     <script>
-        const UYGULAMA_SURUMU = "0.94.4";
+        const UYGULAMA_SURUMU = "0.94.5";
     </script>
 
     <!-- Firebase CDN Bağlantıları (Sayfa Yüklenmesini Engellememesi İçin Sona Taşındı) -->

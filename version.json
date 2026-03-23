@@ -1,5 +1,5 @@
 {
-    "version": "0.94.4",
-    "buildId": 1774251000,
-    "changelog": "Mobil Hikaye Modundaki piyano tuşları tam erişilebilir hale getirildi ve zorunlu güncelleme uyarı ekranındaki 'sonsuz döngü' (butonun basmaması) hatası kalıcı olarak çözüldü."
+    "version": "0.94.5",
+    "buildId": 1774265000,
+    "changelog": "Giriş ekranında NVDA'nın fazladan 'bölüm' okuma hatası giderildi, oyun geri sayımı 3 saniyeye ayarlandı."
 }
