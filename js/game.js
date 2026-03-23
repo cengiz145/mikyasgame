@@ -327,7 +327,7 @@ window.startMainGame = function (difficulty = 'easy') {
         gameStatus.style.display = 'block';
         gameStatus.textContent = `Oyun 3 saniye içinde başlıyor... ${hk} Hata Koruması, ${zk} Zaman Koruması. İlk notayı dinleyin!`;
     }
-    setTimeout(() => {
+    window.gameStatusTimeoutId = setTimeout(() => {
         if (window.announceToScreenReader) window.announceToScreenReader(`Oyun 3 saniye içinde başlıyor. ${hk} Hata Koruması ve ${zk} Zaman Korumasına sahipsiniz. İlk notayı dinleyin!`);
     }, 400);
 
@@ -335,7 +335,7 @@ window.startMainGame = function (difficulty = 'easy') {
     if (window.clockTickSound) window.clockTickSound.rate(1.0);
 
     clearInterval(window.gameInterval);
-    setTimeout(() => {
+    window.gameStartTimeoutId = setTimeout(() => {
         if (!window.gameIsActive) return;
         window.addNewNoteAndPlaySequence();
 
@@ -479,6 +479,8 @@ window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
     window.isStarted = false;
     window.isStarting = false;
     clearTimeout(window.sequenceTimeoutId);
+    clearTimeout(window.gameStartTimeoutId);
+    clearTimeout(window.gameStatusTimeoutId);
 
     window.gameIsActive = false;
     if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
