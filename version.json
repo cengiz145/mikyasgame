@@ -1,5 +1,5 @@
 {
-    "version": "0.94.0",
-    "buildId": 1774166249,
-    "changelog": "DEV GÜNCELLEME: 'Birebir Rakiple Oyna' (PvP) ve 'Bota Karşı Oyna' (PvE) oyun modları eklendi! 60 saniyelik rekabetçi Hız Yarışı sistemi kuruldu. Kazananlara yeni ganimet ödülleri, kaybedenlere teselli ödülleri eklendi."
+    "version": "0.94.3",
+    "buildId": 1774231000,
+    "changelog": "Sistem Dengesi ve Hata Ayıklama (Hotfix v0.94.3) yayında! Ağ gecikmesinden kaynaklanan 'Sürekli Boş Ekran' sorunu sonsuza dek çözüldü. Çevrimiçi oyun çökme noktaları kapatıldı ve Çok Oyunculu lobileri için 10/15 saniyelik sürükleyici 'bekleme simülasyonları' oyuna dahil edildi."
 }

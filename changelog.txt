@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.94.3] - 2026-03-23
+
+### Düzeltilen Hatalar ve Sistem Güncellemeleri:
+- **Beyaz Ekran Çözümü:** İnternet yavaşlığında veya tarayıcı eklentilerinden ötürü oyunun başlangıç sırasında bembeyaz / boş bir ekranda asılı kalmasına yol açan (TCP Parsing Block) ağır altyapı sorunu saniyeler içinde çizim yapılabilecek şekilde çözüldü. Oyun artık internetsizken bile 0. saniyede ekranı yüklemeyi garanti ediyor.
+- **Sürükleyici Lobi Bekleme Odası (*Immersion*):** Bota veya gerçek rakibe karşı bir eşleştirme bulunduğunda sizi hazırlıksızca direkt 60 saniyelik savaş alanına fırlatan hantal sistem değiştirildi. Artık odaya rahatça girebilmeniz ve sandalyenize / odağınıza yerleşmeniz için sesli yanıt destekli uyarılarla beraber tam 10 saniyelik bir "Lobi Bekleme Süresi" eklendi. Ayrıca yapay zekanın (Bot Mode) 15 saniyelik organik bir aranma süresi simüle etmesi sağlandı.
+- **Sıfır Çökme (Zero-Crash) Güvenlik Protokolü:** Çevrimiçi oyun modundaki (özellikle bot sistemi ve hızlı çıkışlarda) yarışmacı bağlantı kopmalarının; menüleri kitlemesine, null (boş) veritabanı kirliliği yapmasına, "Hayalet Bot" üretmesine veya aynı odaya çift ödül dağıtmasına (*Double Reward Glitch*) mahal veren toplamda 6 adet siber açık, çökme koruyucu asenkron zırhlarla (Try-Catch / Async Locks) tam olarak kapatıldı.
+
 [v0.94.0] - 2026-03-22
 
 ### Eklenenler / Değiştirilenler:
