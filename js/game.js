@@ -294,6 +294,7 @@ window.startMainGame = function (difficulty = 'easy') {
     window.gameScore = 0;
     window.gameMistakes = 0;
     window.gameIsActive = true;
+    window.isGameEnding = false;
     window.gameSequence = [];
     window.playerInputIndex = 0;
     window.isComputerPlaying = false;
@@ -460,6 +461,9 @@ window.playGameSequence = function () {
 };
 
 window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
+    if (window.isGameEnding) return;
+    window.isGameEnding = true;
+
     // 1. Tüm aktif HTML5 Audio elementlerini sustur
     const allAudios = document.querySelectorAll('audio');
     allAudios.forEach(audio => {
