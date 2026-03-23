@@ -938,6 +938,8 @@ window.handlePracticeInput = function(key) {
             } else if (window.isStarted && window.currentActiveMenu === 'story') {
                 if (window.isGridWalkingPhase && window.inStoryMode) {
                     if (window.handleStoryWalking) window.handleStoryWalking(note);
+                } else {
+                    window.handleGameInput(note);
                 }
             }
         });
