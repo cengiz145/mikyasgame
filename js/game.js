@@ -295,6 +295,7 @@ window.startMainGame = function (difficulty = 'easy') {
     window.gameMistakes = 0;
     window.gameIsActive = true;
     window.isGameEnding = false;
+    window.isStarted = true;
     window.gameSequence = [];
     window.playerInputIndex = 0;
     window.isComputerPlaying = false;
@@ -337,6 +338,7 @@ window.startMainGame = function (difficulty = 'easy') {
     clearInterval(window.gameInterval);
     window.gameStartTimeoutId = setTimeout(() => {
         if (!window.gameIsActive) return;
+        window.isStarting = false;
         window.addNewNoteAndPlaySequence();
 
         window.gameInterval = setInterval(() => {
