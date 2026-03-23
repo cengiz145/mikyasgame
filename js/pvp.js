@@ -139,6 +139,17 @@ window.PvP = {
             this.botQueueTimer = null;
         }
 
+        if (this.lobbyWaitTimer) {
+            clearTimeout(this.lobbyWaitTimer);
+            this.lobbyWaitTimer = null;
+        }
+
+        if (this.matchId) {
+            window.db.ref('matches/' + this.matchId).update({ status: 'finished', hostFinished: true, clientFinished: true });
+            if (this.isBotMode) window.db.ref('matches/' + this.matchId).remove();
+            this.matchId = null;
+        }
+
         if (this.queueRef && !this.isBotMode) this.queueRef.off();
         if (this.myQueueId && !this.isBotMode) window.db.ref('pvp_queue/' + this.myQueueId).remove();
         
@@ -180,7 +191,8 @@ window.PvP = {
         }
 
         // 10 Saniye boyunca 'Lobi' ekranında bekletip oyunu başlat
-        setTimeout(() => {
+        this.lobbyWaitTimer = setTimeout(() => {
+            if (!this.matchId) return; // İşlem kullanıcı tarafından iptal edildiyse dur
             const resetBtn = document.getElementById('pvp-play-btn');
             if (resetBtn) resetBtn.innerHTML = 'Birebir Rakiple Oyna';
             const resetBotBtn = document.getElementById('pve-bot-play-btn');
@@ -237,13 +249,13 @@ window.PvP = {
     },
 
     simulateBotTurn: function(turnIndex) {
-        if (!this.isBotMode || !window.gameIsActive) return;
+        if (!this.isBotMode || !window.gameIsActive || !this.matchId) return;
         
         // Ortalama Zeka Denklemi: Notaları Dinleme Süresi (turnIndex * 1000) + Notalara Basma Süresi (turnIndex * 400) + Reaksiyon Gecikmesi (500-2500ms arası)
         const reactTime = (turnIndex * 1000) + (turnIndex * 400) + (Math.floor(Math.random() * 2000) + 500);
         
         this.botTimeout = setTimeout(() => {
-            if (!window.gameIsActive) return;
+            if (!window.gameIsActive || !this.matchId) return;
             
             // %15 İhtimalle Bot Hata Yapar (Kafası Karışır / Yavaşlar)
             if (Math.random() < 0.15) {
@@ -273,6 +285,7 @@ window.PvP = {
     },
 
     startPvPGame: function() {
+        if (!this.matchId) return;
         console.log("PvP Modu: 60 saniye başladı!");
         
         window.isStarted = true;
@@ -361,6 +374,7 @@ window.PvP = {
     },
 
     onPlayerCorrectSequence: function() {
+        if (!this.matchId) return;
         const turnIndex = this.currentPvPTurn;
         
         // Hız Yarışı Doğrulaması (Kural: Kim hızlıysa puanı o alır)
@@ -403,7 +417,7 @@ window.PvP = {
     },
 
     finishMatchTimeUp: function() {
-        if (!window.gameIsActive) return;
+        if (!window.gameIsActive || !this.matchId || this.gameEndingBlock) return;
         window.gameIsActive = false;
         
         const matchNode = window.db.ref('matches/' + this.matchId);
@@ -413,8 +427,12 @@ window.PvP = {
         
         matchNode.update(updateData);
     },
+    gameEndingBlock: false,
     
     endPvPGame: function(matchData) {
+        if (!this.matchId || this.gameEndingBlock) return; // Çift ödül zaafiyetini engelle
+        this.gameEndingBlock = true;
+        
         clearInterval(this.pvpInterval);
         if (this.botTimeout) clearTimeout(this.botTimeout);
         window.gameIsActive = false;
@@ -468,6 +486,7 @@ window.PvP = {
             
             this.matchId = null; // Sıfırla
             this.isBotMode = false;
+            this.gameEndingBlock = false;
         }, 6000);
     }
 };
