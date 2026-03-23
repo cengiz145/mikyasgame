@@ -257,8 +257,13 @@ window.updateMobileStoryKeys = function(isStory) {
 };
 
 window.lastFocusedElement = null;
+window.isMenuTransitioning = false;
+
 window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
+    if (window.isMenuTransitioning) return;
     if (!hideMenu || !showMenu) return;
+
+    window.isMenuTransitioning = true;
 
     // Mobil Geri Tuşu Koruması (Yeni bir alt menüye geçiliyorsa History'e ekle)
     if (newActiveMenuName !== 'main' && newActiveMenuName !== 'game' && newActiveMenuName !== 'story') {
@@ -309,6 +314,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
                         firstFocusable.focus();
                     }
                 }
+                window.isMenuTransitioning = false;
             }, 50);
         }, 50);
     }, 300);
