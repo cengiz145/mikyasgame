@@ -66,6 +66,10 @@ window.guncellemeKontrolEt = function (isManual = false) {
             }
         })
         .catch(err => {
+            const visualVersion = document.getElementById("intro-version-display");
+            if (visualVersion && visualVersion.textContent.includes("alınıyor")) {
+                visualVersion.textContent = "Sürüm: " + (window.mevcutSurum || "Bilinmiyor") + " (Çevrimdışı)";
+            }
             if (isManual && typeof window.announceToScreenReader === 'function') {
                 window.announceToScreenReader('Güncelleme kontrolü başarısız oldu.');
             }
