@@ -8,6 +8,7 @@ window.PvP = {
     queueRef: null,
     myQueueId: null,
     isSearching: false,
+    isBotMode: false, // Ghost Bot sızıntısını engellemek için ana bayrak tanımlandı!
 
     // Eşleştirme sırasına gir (Rakip Arama)
     joinQueue: function() {
@@ -29,6 +30,9 @@ window.PvP = {
         // Temiz isim
         myName = myName.replace(/[.#$\[\]\/]/g, '_');
 
+        // Eski modların sızıntı yapmasını engellemek için parametreleri sıfırla
+        this.isBotMode = false;
+        this.matchId = null;
         this.myQueueId = deviceId;
         this.isSearching = true;
 
@@ -101,6 +105,10 @@ window.PvP = {
 
                     // Maç veritabanını oluştur
                     const matchNode = window.db.ref('matches/' + this.matchId);
+                    
+                    // Ben eğer düşersem/çıkarsam odanın statüsünü direkt bitir ve temizle
+                    matchNode.onDisconnect().update({ status: 'finished', hostFinished: true });
+
                     matchNode.set({
                         host: this.myQueueId,
                         hostName: myName,
@@ -125,6 +133,7 @@ window.PvP = {
 
     cancelQueue: function() {
         this.isSearching = false;
+        this.isBotMode = false;
         if (this.queueRef) this.queueRef.off();
         if (this.myQueueId) window.db.ref('pvp_queue/' + this.myQueueId).remove();
 
@@ -137,6 +146,11 @@ window.PvP = {
     },
 
     enterMatchRoom: function(mappedMatchId, oppName) {
+        // İstemci isek sunucudaki odayı güvenceye alalım
+        if (!this.isHost) {
+            window.db.ref('matches/' + this.matchId).onDisconnect().update({ status: 'finished', clientFinished: true });
+        }
+
         if (window.correctSound) window.correctSound.play();
         if (window.announceToScreenReader) window.announceToScreenReader(`Eşleşme bulundu! Rakibiniz: ${oppName}. Karşılaşma birazdan başlayacak.`);
         
@@ -406,7 +420,14 @@ window.PvP = {
         
         setTimeout(() => {
             if (window.endMainGame) window.endMainGame(true, isWinner, false);
+            
+            // Veritabanı Şişmesini (Database Spam) Engellemek İçin Bot Maçlarını Sil (Garbage Collection)
+            if (this.isBotMode && this.matchId) {
+                window.db.ref('matches/' + this.matchId).remove();
+            }
+            
             this.matchId = null; // Sıfırla
+            this.isBotMode = false;
         }, 6000);
     }
 };
