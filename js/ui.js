@@ -852,9 +852,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pvpPlayBtn) {
         pvpPlayBtn.addEventListener('click', () => {
             if (window.PvP) {
-                if (window.PvP.isSearching) {
+                if (window.PvP.isSearching && !window.PvP.isBotMode) {
                     window.PvP.cancelQueue();
-                } else {
+                } else if (!window.PvP.isSearching) {
                     window.PvP.joinQueue();
                 }
             } else {
@@ -867,7 +867,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pveBotPlayBtn) {
         pveBotPlayBtn.addEventListener('click', () => {
             if (window.PvP) {
-                window.PvP.startBotMatch();
+                if (window.PvP.isSearching && window.PvP.isBotMode) {
+                    window.PvP.cancelQueue();
+                } else if (!window.PvP.isSearching) {
+                    window.PvP.startBotMatch();
+                }
             } else {
                 if (window.wrongSound) window.wrongSound.play();
                 if (window.announceToScreenReader) window.announceToScreenReader("Bot sistemi henüz yüklenmedi.");
@@ -877,6 +881,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (mpSelectBackBtn) {
         mpSelectBackBtn.addEventListener('click', () => {
+            // Eşleştirme sırasında geri basıp kaçarsa tüm işlemi katlet
+            if (window.PvP && window.PvP.isSearching) {
+                window.PvP.cancelQueue();
+            }
+            
             window.switchMenu(window.multiplayerSelectMenu, window.playModeMenu, 'play-mode');
             
             setTimeout(() => {

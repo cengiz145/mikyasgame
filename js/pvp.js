@@ -133,10 +133,17 @@ window.PvP = {
 
     cancelQueue: function() {
         this.isSearching = false;
-        this.isBotMode = false;
-        if (this.queueRef) this.queueRef.off();
-        if (this.myQueueId) window.db.ref('pvp_queue/' + this.myQueueId).remove();
+        
+        if (this.botQueueTimer) {
+            clearTimeout(this.botQueueTimer);
+            this.botQueueTimer = null;
+        }
 
+        if (this.queueRef && !this.isBotMode) this.queueRef.off();
+        if (this.myQueueId && !this.isBotMode) window.db.ref('pvp_queue/' + this.myQueueId).remove();
+        
+        this.isBotMode = false;
+        
         const btn = document.getElementById('pvp-play-btn');
         if (btn) {
             btn.innerHTML = 'Birebir Rakiple Oyna';
@@ -146,7 +153,7 @@ window.PvP = {
         const botBtn = document.getElementById('pve-bot-play-btn');
         if (botBtn) {
             botBtn.innerHTML = 'Bota Karşı Oyna';
-            botBtn.setAttribute('aria-label', 'Bota Karşı Oyna');
+            botBtn.setAttribute('aria-label', 'Bota Karşı Oyna. Eşleştirme iptal edildi.');
         }
 
         if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme iptal edildi.");
@@ -154,30 +161,36 @@ window.PvP = {
 
     enterMatchRoom: function(mappedMatchId, oppName) {
         // İstemci isek sunucudaki odayı güvenceye alalım
-        if (!this.isHost) {
+        if (!this.isHost && !this.isBotMode) {
             window.db.ref('matches/' + this.matchId).onDisconnect().update({ status: 'finished', clientFinished: true });
         }
 
         if (window.correctSound) window.correctSound.play();
-        if (window.announceToScreenReader) window.announceToScreenReader(`Eşleşme bulundu! Rakibiniz: ${oppName}. Karşılaşma birazdan başlayacak.`);
+        
+        let anonsMesaji = this.isBotMode ? 
+            "Bot lobiye giriş yaptı. Kısa süre sonra oyuna başlayacaksınız." : 
+            `Oyuncu oyuna giriş yaptı. Eşleşme bulundu! Rakibiniz: ${oppName}. Kısa süre sonra oyuna başlayacaksınız.`;
+
+        if (window.announceToScreenReader) window.announceToScreenReader(anonsMesaji, true);
         
         const btn = this.isBotMode ? document.getElementById('pve-bot-play-btn') : document.getElementById('pvp-play-btn');
         if (btn) {
             btn.innerHTML = `Eşleşti: ${oppName}!`;
-            btn.setAttribute('aria-label', 'Eşleşme bulundu. Maça geçiliyor...');
+            btn.setAttribute('aria-label', anonsMesaji);
         }
 
-        // Kısa süre sonra oyunu başlat
+        // 10 Saniye boyunca 'Lobi' ekranında bekletip oyunu başlat
         setTimeout(() => {
             const resetBtn = document.getElementById('pvp-play-btn');
             if (resetBtn) resetBtn.innerHTML = 'Birebir Rakiple Oyna';
             const resetBotBtn = document.getElementById('pve-bot-play-btn');
             if (resetBotBtn) resetBotBtn.innerHTML = 'Bota Karşı Oyna';
+            
             if (window.switchMenu && window.multiplayerSelectMenu && window.gameMenu) {
                 window.switchMenu(window.multiplayerSelectMenu, window.gameMenu, 'game');
             }
             this.startPvPGame();
-        }, 3000);
+        }, 10000);
     },
 
     // BOTA KARŞI OYNA (YAPAY ZEKA) BAŞLANGICI
@@ -185,25 +198,42 @@ window.PvP = {
         let deviceId = localStorage.getItem('hafizaGuvenDeviceId') || 'guest_' + Date.now();
         let myName = window.currentChatUser || localStorage.getItem('chatUsername') || "Sen";
         
-        this.isSearching = false;
-        this.isHost = true; // Her zaman ana makineyiz
-        this.isBotMode = true; // Bot bayrağı
-        this.matchId = 'bot_match_' + deviceId + '_' + Date.now();
-        this.opponentId = 'ai_bot';
-        this.opponentName = 'Yapay Zeka (Bot)';
-        this.botScore = 0;
+        this.isSearching = true; // Bot arıyormuş gibi hissettir
+        this.isHost = true; 
+        this.isBotMode = true; 
         
-        const matchNode = window.db.ref('matches/' + this.matchId);
-        matchNode.set({
-            host: deviceId,
-            hostName: myName,
-            client: this.opponentId,
-            clientName: this.opponentName,
-            status: 'waiting_for_client',
-            createdAt: firebase.database.ServerValue.TIMESTAMP
-        }).then(() => {
-            this.enterMatchRoom(this.matchId, this.opponentName);
-        });
+        // UI Bildirimleri
+        const botBtn = document.getElementById('pve-bot-play-btn');
+        if (botBtn) {
+            botBtn.innerHTML = 'Aranıyor... İptal için tıklayın';
+            botBtn.setAttribute('aria-label', 'Uygun bir yapay zeka rakibi aranıyor. İptal etmek için tekrar tıklayın.');
+        }
+        if (window.announceToScreenReader) window.announceToScreenReader("Uygun bir yapay zeka rakibi aranıyor. Lütfen bekleyin.");
+
+        // Ortalama 12-16 saniye arası yapay bekleme süresi
+        let waitTime = Math.floor(Math.random() * 4000) + 12000;
+        
+        this.botQueueTimer = setTimeout(() => {
+            if (!this.isSearching) return; // Kullanıcı beklerken odayı terkettiyse işlemi kes
+            
+            this.isSearching = false;
+            this.matchId = 'bot_match_' + deviceId + '_' + Date.now();
+            this.opponentId = 'ai_bot';
+            this.opponentName = 'Yapay Zeka (Bot)';
+            this.botScore = 0;
+            
+            const matchNode = window.db.ref('matches/' + this.matchId);
+            matchNode.set({
+                host: deviceId,
+                hostName: myName,
+                client: this.opponentId,
+                clientName: this.opponentName,
+                status: 'waiting_for_client',
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                this.enterMatchRoom(this.matchId, this.opponentName);
+            });
+        }, waitTime);
     },
 
     simulateBotTurn: function(turnIndex) {
