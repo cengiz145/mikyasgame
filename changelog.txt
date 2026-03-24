@@ -1,12 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
-[v0.95.0] - 2026-03-24
+[v0.96.4] - 2026-03-24
 
 ### Yenilikler ve Düzeltmeler:
 - **Kayıp Notalar Mobil Etkileşimi:** Artık mobil cihazlarda Kayıp Notalar modundayken (Dağa çıkıldığında veya piyanoya dönüldüğünde) ekrana iki parmağınızla aynı anda dokunarak klavyedeki "F" tuşunun görevini yapabilir, yerdeki notaları pürüzsüzce toplayabilirsiniz.
 - **Hikaye Okuma İyileştirmesi:** Hikaye modundayken ekrana tıklayarak (bilgisayarda çift tıklayarak) o anki metnin veya mevcut koordinatınızın yeniden okunması sağlandı.
 - **Yerdeki Notaları Hissetme:** Dağ haritasında yürürken (sol-sağ oklarla), o an üzerinde bulunduğunuz koordinatta bir nota varsa ekstra bir tuşa basmanıza gerek kalmadan "Ayağına sert bir şey takıldı" uyarısı doğrudan konumunuza eklendi.
-- **Sürüm Okuma Hatası (1.0 Beta Bug):** Ön bellekte kalan ve eski güncelleme dosyalarından çekilen hatalı "Versiyon 1.0.1 Beta" anonsu giderildi, oyunun 0.95.0 olan asıl sürümü ekran okuyucuya doğrudan tanıtıldı.
+- **Sürüm Okuma Hatası (1.0 Beta Bug):** Ön bellekte kalan ve eski güncelleme dosyalarından çekilen hatalı "Versiyon 1.0.1 Beta" anonsu giderildi, oyunun 0.96.4 olan asıl sürümü ekran okuyucuya doğrudan tanıtıldı.
 
 [v0.94.6] - 2026-03-24
 
