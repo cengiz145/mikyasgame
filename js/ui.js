@@ -40,14 +40,15 @@ window.guncellemeKontrolEt = function (isManual = false) {
             } else if (data.version !== window.mevcutSurum) {
                 const uyariMesaji = "Oyuna zorunlu bir güncelleme geldi! Eski sürümle oynamaya devam edemezsiniz. Lütfen Tamam'a basarak sayfayı yenileyin.";
 
-                if (window.gameIsActive || window.inStoryMode || window.currentActiveMenu !== 'main') {
-                    window.pendingUpdate = true; // Güncellemeyi sessizce beklemeye al
-                    return; // Ekranı silme işlemini iptal et
-                }
-
                 window.mevcutSurum = data.version;
 
+                // Oyuncuyu her ne olursa olsun durdur (oyunda, hikayede fark etmez)
                 window.gameIsActive = false;
+                window.inStoryMode = false;
+                window.isStarting = false;
+                if (window.gameInterval) clearInterval(window.gameInterval);
+                if (window.sequenceTimeoutId) clearTimeout(window.sequenceTimeoutId);
+
                 if (typeof Howler !== 'undefined') Howler.stop();
                 if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
 
@@ -55,7 +56,8 @@ window.guncellemeKontrolEt = function (isManual = false) {
                 updateSound.play();
 
                 if (window.updateMenu) {
-                    window.switchMenu(window.mainMenu, window.updateMenu, 'update');
+                    let activeMenuEl = document.querySelector('.menu-container:not([style*="display: none"])') || window.mainMenu;
+                    window.switchMenu(activeMenuEl, window.updateMenu, 'update');
                 } else {
                     alert(uyariMesaji);
                     window.location.href = window.location.pathname + "?v=" + new Date().getTime();
