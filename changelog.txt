@@ -4,6 +4,7 @@
 
 ### Yenilikler ve Düzeltmeler:
 - **Dağ Haritası Arka Plan Müziği:** Kayıp Notalar modunda notaları ararken karlı dağda esen rüzgara eşlik edecek yeni bir müzik (`music272.ogg`) %40 ses düzeyinde arka plana eklendi.
+- **Çalışmayan Çıkış Butonu (Oyunu Bitir):** Oyun sırasında veya oyun bittiğinde ekrana gelen "Oyunu Bitir" ve mobil "Çıkış" butonlarının hiçbir tepki vermemesine neden olan bağlantı hatası (kayıp dinleyici) giderildi; butonlar artık oyunu temiz bir şekilde sonlandırıp ana menüye dönmenizi sağlıyor.
 - **Kayıp Notalar Mobil Etkileşimi:** Artık mobil cihazlarda Kayıp Notalar modundayken (Dağa çıkıldığında veya piyanoya dönüldüğünde) ekrana iki parmağınızla aynı anda dokunarak klavyedeki "F" tuşunun görevini yapabilir, yerdeki notaları pürüzsüzce toplayabilirsiniz.
 - **Hikaye Okuma İyileştirmesi:** Hikaye modundayken ekrana tıklayarak (bilgisayarda çift tıklayarak) o anki metnin veya mevcut koordinatınızın yeniden okunması sağlandı.
 - **Yerdeki Notaları Hissetme:** Dağ haritasında yürürken (sol-sağ oklarla), o an üzerinde bulunduğunuz koordinatta bir nota varsa ekstra bir tuşa basmanıza gerek kalmadan "Ayağına sert bir şey takıldı" uyarısı doğrudan konumunuza eklendi.

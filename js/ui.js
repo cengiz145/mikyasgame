@@ -607,6 +607,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const startGameBtn = document.getElementById('start-game-btn');
     const gameBackBtn = document.getElementById('game-back-btn');
+
+    if (gameBackBtn) {
+        gameBackBtn.addEventListener('click', () => {
+            if (window.clickSound) window.clickSound.play();
+            window.gameIsActive = false;
+            window.isStarted = false;
+            window.isComputerPlaying = false;
+            
+            if (window.gameInterval) clearInterval(window.gameInterval);
+            if (window.sequenceTimeoutId) clearTimeout(window.sequenceTimeoutId);
+            if (window.gameStartTimeoutId) clearTimeout(window.gameStartTimeoutId);
+            if (window.gameStatusTimeoutId) clearTimeout(window.gameStatusTimeoutId);
+            if (window.mobileExitBtnTimeout) clearTimeout(window.mobileExitBtnTimeout);
+            
+            if (window.seconsSound && window.seconsSound.playing()) window.seconsSound.stop();
+            if (window.secons2Sound && window.secons2Sound.playing()) window.secons2Sound.stop();
+
+            // Multiplayer modundan çıkılıyorsa sunucudan kop (varsa)
+            if (window.isMultiplayerGame && typeof window.quitMultiplayerMatch === 'function') {
+                window.quitMultiplayerMatch();
+            }
+
+            if (window.switchMenu && window.mainMenu) {
+                window.switchMenu(document.getElementById('game-menu-container'), window.mainMenu, 'main');
+            }
+            
+            if (window.bgMusic && !window.bgMusic.playing()) {
+                window.bgMusic.play();
+            }
+        });
+    }
+
     const btnContinueSaved = document.getElementById('btn-continue-saved');
     const serverMessageContinueBtn = document.getElementById('server-message-continue-btn');
     const mobileEnterBtn = document.getElementById('mobile-enter-btn');
