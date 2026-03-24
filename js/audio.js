@@ -55,6 +55,12 @@ window.gameOverSound = new Howl({
     volume: 1.0
 });
 
+window.music60Sound = new Howl({
+    src: ['sounds/music60.ogg'],
+    loop: true,
+    volume: 0.5
+});
+
 window.modeUnlockSound = new Howl({
     src: ['sounds/newmotd1.ogg'],
     volume: 1.0

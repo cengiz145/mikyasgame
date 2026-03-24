@@ -281,6 +281,7 @@ window.startMainGame = function (difficulty = 'easy') {
     window.isStarting = true;
 
     if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
+    if (window.music60Sound && window.music60Sound.playing()) window.music60Sound.stop();
 
     const gameMenuContainer = document.getElementById('game-menu-container');
     if (gameMenuContainer) gameMenuContainer.setAttribute('aria-label', 'Oyun Alanı');
@@ -631,8 +632,9 @@ window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
 
     if (playUnlockSound) {
         if (window.modeUnlockSound) window.modeUnlockSound.play();
-    } else {
+    } else if (!isWin) {
         if (window.gameOverSound) window.gameOverSound.play();
+        if (window.music60Sound) window.music60Sound.play();
     }
 };
 

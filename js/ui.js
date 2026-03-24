@@ -623,6 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (window.seconsSound && window.seconsSound.playing()) window.seconsSound.stop();
             if (window.secons2Sound && window.secons2Sound.playing()) window.secons2Sound.stop();
+            if (window.music60Sound && window.music60Sound.playing()) window.music60Sound.stop();
 
             // Multiplayer modundan çıkılıyorsa sunucudan kop (varsa)
             if (window.isMultiplayerGame && typeof window.quitMultiplayerMatch === 'function') {
