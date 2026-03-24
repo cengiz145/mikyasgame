@@ -28,6 +28,7 @@ window.quitStoryMode = function() {
     // Ortam Seslerini Kes
     if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
     if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
+    if (window.music272Sound && window.music272Sound.playing()) window.music272Sound.stop();
     if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
 };
 
@@ -161,10 +162,16 @@ window.initializeMissingNotesMap = function() {
         window.announceToScreenReader(`Dışarıdasın. Kar üstünde rastgele bir noktaya ışınlandın. X konumun: ${window.playerX}. Piyanoya dönmek için X: 0 konumuna doğru yürümelisin. Etrafta rastgele yerleştirilmiş ${window.MAX_NOTES} adet nota var. Bir nota bulduğunda F tuşuna basarak onu alabilirsin. Tüm notaları sırasıyla (Do, Re, Mi, Fa, Sol, La, Si) piyanoya getirmelisin.`);
     }
 
-    if (window.mountainSound) {
-        window.mountainSound.volume(0.8);
+    if (window.mountainSound && !window.mountainSound.playing()) {
+        window.mountainSound.volume(0.4);
         window.mountainSound.loop(true);
         window.mountainSound.play();
+    }
+
+    if (window.music272Sound && !window.music272Sound.playing()) {
+        window.music272Sound.volume(0.4);
+        window.music272Sound.loop(true);
+        window.music272Sound.play();
     }
 };
 
@@ -247,6 +254,7 @@ window.handleStoryWalking = function(key) {
             window.isStoryModeWon = true;
 
             if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
+            if (window.music272Sound && window.music272Sound.playing()) window.music272Sound.stop();
             if (window.modeUnlockSound) window.modeUnlockSound.play();
             
             if (window.announceToScreenReader) window.announceToScreenReader("Tebrikler! Tüm notaları sırasıyla topladın ve piyanoyu onardın. Kayıp Notalar modunu başarıyla tamamladın!");

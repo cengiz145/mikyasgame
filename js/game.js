@@ -1093,11 +1093,7 @@ document.addEventListener('keydown', function (event) {
                 
                 if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
                 if (window.storyBGM) window.storyBGM.play();
-                if (window.mountainSound) {
-                    window.mountainSound.volume(0.8);
-                    window.mountainSound.loop(true);
-                    window.mountainSound.play();
-                }
+
                 
                 if (window.playAutomatedWalkingScene) {
                     window.playAutomatedWalkingScene();

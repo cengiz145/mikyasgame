@@ -76,7 +76,13 @@ window.house2Sound = new Howl({
 window.mountainSound = new Howl({
     src: ['sounds/mountain.ogg'],
     loop: true,
-    volume: 0.0
+    volume: 0.4 // Dağ rüzgarı sesi dengelendi
+});
+
+window.music272Sound = new Howl({
+    src: ['sounds/music272.ogg'],
+    loop: true,
+    volume: 0.4
 });
 
 window.snowStepSounds = [
