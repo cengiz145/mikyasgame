@@ -308,15 +308,20 @@ window.handleStoryWalking = function(key) {
 document.addEventListener('DOMContentLoaded', () => {
     const storyStatus = document.getElementById('story-status-text');
     if (storyStatus) {
-        const playStoryText = () => {
+        const handleStoryTextClick = () => {
             if (window.inStoryMode && !window.isGridWalkingPhase) {
-                if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
+                // Enter tuşunu simüle ederek hikayeyi atlat (Ekran okuyucu çift dokunuşu 'click' olarak algılar)
+                const enterEvent = new KeyboardEvent('keydown', {
+                    key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true
+                });
+                document.dispatchEvent(enterEvent);
             } else if (window.inStoryMode && window.isGridWalkingPhase) {
+                // Yürüme modunda sadece mevcut koordinatı oku (C tuşu simülasyonu)
                 if (window.handleStoryWalking) window.handleStoryWalking('c');
             }
         };
-        storyStatus.addEventListener('click', playStoryText);
-        storyStatus.addEventListener('dblclick', playStoryText);
+        storyStatus.addEventListener('click', handleStoryTextClick);
+        storyStatus.addEventListener('dblclick', handleStoryTextClick);
     }
 });
 
