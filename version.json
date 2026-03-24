@@ -1,5 +1,5 @@
 {
-    "version": "0.94.6",
-    "buildId": 1774268000,
-    "changelog": "Zorunlu Güncelleme sistemini kilitleyen (TypeError) geçiş hatası ve oyun içindeyken gelen güncellemelerin kaybolması sorunu giderildi."
+    "version": "0.95.0",
+    "buildId": 1774270000,
+    "changelog": "Mobil Kayıp Notalar'da 2 parmak kullanımı ve sürüm okunması sorunları düzeltildi."
 }

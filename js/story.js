@@ -284,12 +284,50 @@ window.handleStoryWalking = function(key) {
         const storyStatus = document.getElementById('story-status-text');
         if (!storyStatus) return;
 
+        let statusString = "";
+        let srString = "";
+        
         if (window.playerX === window.pianoX) {
-            storyStatus.innerHTML = `Piyanodasın.`;
-            if (window.announceToScreenReader) window.announceToScreenReader("Piyanodasın.");
+            statusString = `Piyanodasın.`;
+            srString = "Piyanodasın.";
         } else {
-            storyStatus.innerHTML = `X Konumu: ${window.playerX}`;
-            if (window.announceToScreenReader) window.announceToScreenReader(`Koordinat: ${window.playerX}`);
+            statusString = `X Konumu: ${window.playerX}`;
+            srString = `Koordinat: ${window.playerX}`;
         }
+        
+        if (window.notesOnMap && window.notesOnMap[window.playerX]) {
+            statusString += " (Ayağına sert bir şey takıldı!)";
+            srString += " Ayağına sert bir şey takıldı.";
+        }
+
+        storyStatus.innerHTML = statusString;
+        if (window.announceToScreenReader) window.announceToScreenReader(srString);
     }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    const storyStatus = document.getElementById('story-status-text');
+    if (storyStatus) {
+        const playStoryText = () => {
+            if (window.inStoryMode && !window.isGridWalkingPhase) {
+                if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
+            } else if (window.inStoryMode && window.isGridWalkingPhase) {
+                if (window.handleStoryWalking) window.handleStoryWalking('c');
+            }
+        };
+        storyStatus.addEventListener('click', playStoryText);
+        storyStatus.addEventListener('dblclick', playStoryText);
+    }
+});
+
+document.addEventListener('touchstart', (e) => {
+    if (e.touches && e.touches.length === 2) {
+        if (window.inStoryMode && window.isGridWalkingPhase) {
+            // Eğer oyun oynanıyor ve dağ haritasında yürünüyorsa 2 parmakla dokunmayı F tuşu olarak algıla.
+            e.preventDefault();
+            if (window.handleStoryWalking) window.handleStoryWalking('f');
+        }
+    }
+}, { passive: false });
+
+

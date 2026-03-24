@@ -5,7 +5,7 @@ const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/
 window.isMobileDevice = isMobile;
 
 // --- OTOMATİK GÜNCELLEME KONTROL SİSTEMİ ---
-window.mevcutSurum = typeof UYGULAMA_SURUMU !== 'undefined' ? UYGULAMA_SURUMU : null;
+window.mevcutSurum = window.UYGULAMA_SURUMU || (typeof UYGULAMA_SURUMU !== 'undefined' ? UYGULAMA_SURUMU : null);
 window.globalChangelogVersion = null;
 window.globalChangelogMessage = null;
 
