@@ -18,11 +18,16 @@ window.quitStoryMode = function() {
     if (window.storyAnimInterval1) clearInterval(window.storyAnimInterval1);
     if (window.storyAnimInterval2) clearInterval(window.storyAnimInterval2);
     if (window.storyAnimInterval3) clearInterval(window.storyAnimInterval3);
+    if (window.storyAnimInterval4) clearInterval(window.storyAnimInterval4);
+    if (window.storyAnimInterval5) clearInterval(window.storyAnimInterval5);
     if (window.storyAnimTimeout1) clearTimeout(window.storyAnimTimeout1);
     if (window.storyAnimTimeout2) clearTimeout(window.storyAnimTimeout2);
     if (window.storyAnimTimeout3) clearTimeout(window.storyAnimTimeout3);
     if (window.storyAnimTimeout4) clearTimeout(window.storyAnimTimeout4);
     if (window.storyAnimTimeout5) clearTimeout(window.storyAnimTimeout5);
+    if (window.storyAnimTimeout6) clearTimeout(window.storyAnimTimeout6);
+    if (window.storyAnimTimeout7) clearTimeout(window.storyAnimTimeout7);
+    if (window.storyAnimTimeout8) clearTimeout(window.storyAnimTimeout8);
     if (window.storyWinTimeout) clearTimeout(window.storyWinTimeout);
     if (window.storyEntryTimeout) clearTimeout(window.storyEntryTimeout);
 
@@ -81,9 +86,9 @@ window.triggerStoryAnimations = function(index) {
             count++;
             if (count > 6) clearInterval(window.storyAnimInterval1);
         }, 400);
-    } else if (index === 1) {
-        if (window.enterHouseSound) window.enterHouseSound.play();
+
         window.storyAnimTimeout1 = setTimeout(() => {
+            if (window.enterHouseSound) window.enterHouseSound.play();
             let stepCount = 0;
             window.storyAnimInterval2 = setInterval(() => {
                 if (window.carpetStepSounds && window.carpetStepSounds.length > 0) {
@@ -92,12 +97,13 @@ window.triggerStoryAnimations = function(index) {
                     s.play();
                 }
                 stepCount++;
-                if (stepCount > 5) {
+                if (stepCount > 3) {
                     clearInterval(window.storyAnimInterval2);
-                    window.storyAnimTimeout2 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 1000);
+                    window.storyAnimTimeout2 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 500);
                 }
-            }, 1000);
-        }, 1000);
+            }, 800);
+        }, 1200);
+
     } else if (index === 7) {
         if (window.storyBGM) window.storyBGM.play();
         if (window.glasshitSound) window.glasshitSound.play();
@@ -120,18 +126,56 @@ window.triggerStoryAnimations = function(index) {
                 window.doorCloseSound.volume(0.6, sid);
             }
         }, 200);
-    } else if (index === 14) {
+    } else if (index === 13) {
         let stepCount = 0;
         window.storyAnimInterval3 = setInterval(() => {
             if (window.carpetStepSounds && window.carpetStepSounds.length > 0) {
                 let s = window.carpetStepSounds[Math.floor(Math.random() * window.carpetStepSounds.length)];
-                s.volume(Math.max(0.1, 1.0 - (stepCount * 0.15)));     
+                s.volume(Math.max(0.1, 1.0 - (stepCount * 0.2)));
                 s.play();
             }
             stepCount++;
-            if (stepCount > 6) clearInterval(window.storyAnimInterval3);
+            if (stepCount > 4) {
+                clearInterval(window.storyAnimInterval3);
+                window.storyAnimTimeout5 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 200); 
+            }
+        }, 400); 
+    } else if (index === 14) {
+        if (window.enterHouseSound) window.enterHouseSound.play();
+        window.storyAnimTimeout6 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 1500);
+        
+        window.storyAnimTimeout7 = setTimeout(() => {
+            let stepCount = 0;
+            window.storyAnimInterval4 = setInterval(() => {
+                if (window.snowStepSounds && window.snowStepSounds.length > 0) {
+                    let s = window.snowStepSounds[Math.floor(Math.random() * window.snowStepSounds.length)];
+                    s.volume(0.8);
+                    s.play();
+                }
+                stepCount++;
+                if (stepCount > 4) clearInterval(window.storyAnimInterval4);
+            }, 800); 
+        }, 2000);
+    } else if (index === 15) {
+        if (window.correctSound) window.correctSound.play();
+        window.storyAnimTimeout8 = setTimeout(() => {
+            const keys = ['g', 'e', 'c', 'f'];
+            let kIdx = 0;
+            window.storyAnimInterval5 = setInterval(() => {
+                let note = keys[kIdx];
+                if (window.pianoNotes && window.pianoNotes[note]) {
+                    window.pianoNotes[note].volume(0.6);
+                    window.pianoNotes[note].play();
+                }
+                kIdx++;
+                if (kIdx >= keys.length) clearInterval(window.storyAnimInterval5);
+            }, 300);
         }, 1000);
-        window.storyAnimTimeout5 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 6000); 
+    } else if (index === 16) {
+        if (window.successSound) {
+            window.successSound.volume(0.7);
+            window.successSound.play();
+        }
     }
 };
 

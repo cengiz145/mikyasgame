@@ -1,5 +1,5 @@
 {
-    "version": "0.96.6.5",
+    "version": "0.96.6.6",
     "buildId": 1774270000,
-    "changelog": "Performans iyileştirmeleri ve küçük hata düzeltmeleri (Dağ haritası yürüyüş ayarları)."
+    "changelog": "Performans iyileştirmeleri, hikaye modu mobil hata düzeltmeleri ve 17 satırlık ses-yazı animasyon senkronizasyonu."
 }
