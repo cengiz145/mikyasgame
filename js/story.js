@@ -182,6 +182,7 @@ window.triggerStoryAnimations = function(index) {
 
 window.initializeMissingNotesMap = function() {
     window.notesInPiano = [];
+    window.carryingNote = null;
     window.isStoryModeWon = false;
     const noteNames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 
@@ -244,17 +245,40 @@ window.handleStoryWalking = function(key) {
         }
     } else if (key.toLowerCase() === 'f') {
         if (window.playerX === window.pianoX) {
-            if (window.notesInPiano.length === window.MAX_NOTES) {
-                if (window.announceToScreenReader) window.announceToScreenReader("Piyano zaten tamamlandı.");
+            if (window.carryingNote) {
+                window.notesInPiano.push(window.carryingNote);
+                let droppedNote = window.carryingNote;
+                window.carryingNote = null;
+                
+                if (window.correctSound) window.correctSound.play();
+                const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
+                let msg = `Harika! ${trNames[droppedNote]} notasını piyanoya yerleştirdiniz. `;
+                
+                if (window.notesInPiano.length === window.MAX_NOTES) {
+                    msg += "Bütün notalar piyanoya yerleştirildi. Oyunu kazanmak için Onay (Enter) tuşuna basın.";
+                } else {
+                    const expectedOrder = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+                    msg += `Sırada ${trNames[expectedOrder[window.notesInPiano.length]]} notası var. Kayıp notalar etrafta. Aramaya devam et.`;
+                }
+                if (window.announceToScreenReader) window.announceToScreenReader(msg);
             } else {
-                if (window.announceToScreenReader) window.announceToScreenReader(`Piyanodasın. Şu an piyanoda ${window.notesInPiano.length} nota var.`);
+                if (window.notesInPiano.length === window.MAX_NOTES) {
+                    if (window.announceToScreenReader) window.announceToScreenReader("Piyano zaten tamamlandı. Onay tuşuna basarak bitirebilirsin.");
+                } else {
+                    if (window.announceToScreenReader) window.announceToScreenReader(`Piyanodasın. Şu an piyanoda ${window.notesInPiano.length} nota var.`);
+                }
             }
         } else {
             if (window.notesOnMap[window.playerX]) {
+                if (window.carryingNote) {
+                    if (window.wrongSound) window.wrongSound.play();
+                    if (window.announceToScreenReader) window.announceToScreenReader("Zaten elinizde bir nota var! Önce onu X: 0 konumundaki piyanoya bırakmalısınız.");
+                    return;
+                }
                 const foundNote = window.notesOnMap[window.playerX];
                 const expectedOrder = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
                 if (window.notesInPiano.length === expectedOrder.indexOf(foundNote)) {
-                    window.notesInPiano.push(foundNote);
+                    window.carryingNote = foundNote;
                     delete window.notesOnMap[window.playerX];
 
                     if (window.pianoNotes && window.pianoNotes[foundNote]) {
@@ -263,15 +287,7 @@ window.handleStoryWalking = function(key) {
                     }
                     if (window.correctSound) window.correctSound.play();
                     
-                    const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
-                    let msg = `Harika! ${trNames[foundNote]} notasını buldunuz ve çantaya attınız. `;
-
-                    if (window.notesInPiano.length === window.MAX_NOTES) {
-                        msg += "Tüm notaları topladınız! Şimdi X: 0 konumuna (Piyanoya) dönerek notaları yerleştirin.";
-                    } else {
-                        msg += `Sırada ${Object.values(trNames)[window.notesInPiano.length]} notası var. Kayıp notalar etrafta. Aramaya devam et.`;
-                    }
-                    if (window.announceToScreenReader) window.announceToScreenReader(msg);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Notayı yerden aldınız. Şimdi piyanoya bırakmanız gerekiyor.");
 
                 } else {
                     if (window.pianoNotes && window.pianoNotes[foundNote]) {
@@ -290,10 +306,13 @@ window.handleStoryWalking = function(key) {
         }
     } else if (key.toLowerCase() === 'c') {
         let msg = `X Konumunuz: ${window.playerX}. `;
+        if (window.carryingNote) {
+            msg += "Elinizde bir nota var. Onu X: 0 konumundaki piyanoya götürmelisiniz. ";
+        }
         if (window.playerX === window.pianoX) {
             msg += `Şu an piyanodasın. `;
             if (window.notesInPiano.length === window.MAX_NOTES) {
-                msg += "Bütün notalar piyanoya yerleştirilmeye hazır. Oyunu kazanmak için entıra basın.";
+                msg += "Bütün notalar piyanoya yerleştirildi. Oyunu kazanmak için entıra basın.";
             } else {
                 msg += `Piyanodaki nota sayısı: ${window.notesInPiano.length} / ${window.MAX_NOTES}. Daha fazla nota bulmalısın.`;
             }
@@ -304,7 +323,7 @@ window.handleStoryWalking = function(key) {
         }
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
     } else if (key === 'Enter') {
-        if (window.playerX === window.pianoX && window.notesInPiano.length === window.MAX_NOTES) {
+        if (window.playerX === window.pianoX && window.notesInPiano.length === window.MAX_NOTES && !window.carryingNote) {
             // Hızlıca (spam) basarak sonsuz tamamlama (completionCount) hilesini engelle
             if (window.isStoryModeWon) return; 
             window.isStoryModeWon = true;

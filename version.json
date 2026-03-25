@@ -1,5 +1,5 @@
 {
-    "version": "0.96.6.9",
+    "version": "0.96.7.0",
     "buildId": 1774270000,
-    "changelog": "Adım süresi 500ms'ye indirildi. Kayıp Notalar haritasında notalara basıldığında nota seslerinin çalması sağlandı."
+    "changelog": "Hikaye moduna nota taşıma mekaniği eklendi. Oyuncular notaları bulduktan sonra piyanoya dönüp bırakmalılar."
 }
