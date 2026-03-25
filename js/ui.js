@@ -1091,31 +1091,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (pBtn) pBtn.click();
                 } else if (window.currentActiveMenu === 'story') {
                     if (window.clickSound) window.clickSound.play();
-                    window.isGridWalkingPhase = false;
-                    window.inStoryMode = false;
-                    window.gameIsActive = false;
-                    window.isStarted = false;
+                    if (window.quitStoryMode) window.quitStoryMode();
 
-                    clearInterval(window.storyAnimInterval1);
-                    clearInterval(window.storyAnimInterval2);
-                    clearInterval(window.storyAnimInterval3);
-                    clearTimeout(window.storyAnimTimeout1);
-                    clearTimeout(window.storyAnimTimeout2);
-                    clearTimeout(window.storyAnimTimeout3);
-                    clearTimeout(window.storyAnimTimeout4);
-                    clearTimeout(window.storyAnimTimeout5);
-                    clearTimeout(window.stepIntervalId);
-                    clearTimeout(window.storyEntryTimeout);
-                    if (window.storyWinTimeout) {
-                        clearTimeout(window.storyWinTimeout);
-                    }
-
-                    if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
-                    if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();
-                    if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
-                    if (window.enterHouseSound && window.enterHouseSound.playing()) window.enterHouseSound.stop();
-                    if (window.doorCloseSound && window.doorCloseSound.playing()) window.doorCloseSound.stop();
-                    
                     if (window.switchMenu && window.storyMenu && window.mainMenu) {
                         window.switchMenu(window.storyMenu, window.mainMenu, 'main');
                     }
