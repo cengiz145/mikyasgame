@@ -1080,6 +1080,7 @@ document.addEventListener('keydown', function (event) {
             
             if (window.missingNotesDialogues && window.currentStoryIndex < window.missingNotesDialogues.length) {
                 if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
+                if (window.triggerStoryAnimations) window.triggerStoryAnimations(window.currentStoryIndex);
             } else {
                 window.isGridWalkingPhase = true;
                 window.isDialogPhase = false;
