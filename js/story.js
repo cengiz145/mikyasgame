@@ -317,7 +317,9 @@ window.handleStoryWalking = function(key) {
                 msg += `Piyanodaki nota sayısı: ${window.notesInPiano.length} / ${window.MAX_NOTES}. Daha fazla nota bulmalısın.`;
             }
         } else if (window.notesOnMap[window.playerX]) {
-            msg += "Ayağına sert bir şey takıldı. Burada bir nota olabilir! Almak için F tuşuna bas.";
+            const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
+            const noteName = trNames[window.notesOnMap[window.playerX]];
+            msg += `Ayağına sert bir şey takıldı. Burada ${noteName} notası var! Almak için F tuşuna bas.`;
         } else {
             msg += "Burası karlı boş bir alan.";
         }

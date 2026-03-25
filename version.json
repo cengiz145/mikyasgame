@@ -1,5 +1,5 @@
 {
-    "version": "0.96.7.0",
+    "version": "0.96.7.1",
     "buildId": 1774270000,
-    "changelog": "Hikaye moduna nota taşıma mekaniği eklendi. Oyuncular notaları bulduktan sonra piyanoya dönüp bırakmalılar."
+    "changelog": "C tuşuna (Konum) basıldığında artık sadece bir nota olduğu değil, hangi nota olduğu (Do, Re vb.) söyleniyor."
 }
