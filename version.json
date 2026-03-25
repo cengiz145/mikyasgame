@@ -1,5 +1,5 @@
 {
-    "version": "0.96.6.8",
+    "version": "0.96.6.9",
     "buildId": 1774270000,
-    "changelog": "Mobil hikaye modu çıkış butonu hafıza sızıntısı giderildi."
+    "changelog": "Adım süresi 500ms'ye indirildi. Kayıp Notalar haritasında notalara basıldığında nota seslerinin çalması sağlandı."
 }

@@ -141,6 +141,7 @@ window.triggerStoryAnimations = function(index) {
             }
         }, 400); 
     } else if (index === 14) {
+        if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
         if (window.enterHouseSound) window.enterHouseSound.play();
         window.storyAnimTimeout6 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 1500);
         
@@ -219,7 +220,7 @@ window.handleStoryWalking = function(key) {
 
     if (key === 'ArrowRight' || key === 'ArrowLeft') {
         const now = Date.now();
-        if (window.lastStoryWalkTime && now - window.lastStoryWalkTime < 1000) {
+        if (window.lastStoryWalkTime && now - window.lastStoryWalkTime < 500) {
             return;
         }
         window.lastStoryWalkTime = now;
@@ -256,6 +257,10 @@ window.handleStoryWalking = function(key) {
                     window.notesInPiano.push(foundNote);
                     delete window.notesOnMap[window.playerX];
 
+                    if (window.pianoNotes && window.pianoNotes[foundNote]) {
+                        window.pianoNotes[foundNote].volume(1.0);
+                        window.pianoNotes[foundNote].play();
+                    }
                     if (window.correctSound) window.correctSound.play();
                     
                     const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
@@ -269,8 +274,14 @@ window.handleStoryWalking = function(key) {
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
 
                 } else {
-                    if (window.wrongSound) window.wrongSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Bir nota buldunuz ama sırası değil! Notaları doğru sırayla toplamalısınız.");
+                    if (window.pianoNotes && window.pianoNotes[foundNote]) {
+                        window.pianoNotes[foundNote].volume(1.0);
+                        window.pianoNotes[foundNote].play();
+                    }
+                    setTimeout(() => {
+                        if (window.wrongSound) window.wrongSound.play();
+                        if (window.announceToScreenReader) window.announceToScreenReader("Bir nota buldunuz ama sırası değil! Notaları doğru sırayla toplamalısınız.");
+                    }, 400);
                 }
             } else {
                 if (window.wrongSound) window.wrongSound.play();
