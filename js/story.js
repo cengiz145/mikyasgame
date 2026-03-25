@@ -63,9 +63,7 @@ window.playAutomatedWalkingScene = function() {
             randomStep.play();
         }
         window.currentAutoWalkStep++;
-
-        const nextWalkDelay = Math.floor(Math.random() * 200) + 200;
-        window.stepIntervalId = setTimeout(window.playAutomatedWalkingScene, nextWalkDelay);
+        window.stepIntervalId = setTimeout(window.playAutomatedWalkingScene, 1000);
     }
 };
 
@@ -96,10 +94,10 @@ window.triggerStoryAnimations = function(index) {
                 stepCount++;
                 if (stepCount > 5) {
                     clearInterval(window.storyAnimInterval2);
-                    window.storyAnimTimeout2 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 200);
+                    window.storyAnimTimeout2 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 1000);
                 }
-            }, 220);
-        }, 350);
+            }, 1000);
+        }, 1000);
     } else if (index === 7) {
         if (window.storyBGM) window.storyBGM.play();
         if (window.glasshitSound) window.glasshitSound.play();
@@ -132,8 +130,8 @@ window.triggerStoryAnimations = function(index) {
             }
             stepCount++;
             if (stepCount > 6) clearInterval(window.storyAnimInterval3);
-        }, 220);
-        window.storyAnimTimeout5 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 1400); 
+        }, 1000);
+        window.storyAnimTimeout5 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 6000); 
     }
 };
 
@@ -169,7 +167,11 @@ window.initializeMissingNotesMap = function() {
         window.mountainSound.play();
     }
 
-    // music272Sound removed to prevent overlapping wrong music in the mountain map
+    if (window.music272Sound && !window.music272Sound.playing()) {
+        window.music272Sound.volume(0.4);
+        window.music272Sound.loop(true);
+        window.music272Sound.play();
+    }
 };
 
 window.handleStoryWalking = function(key) {
@@ -249,6 +251,8 @@ window.handleStoryWalking = function(key) {
             // Hızlıca (spam) basarak sonsuz tamamlama (completionCount) hilesini engelle
             if (window.isStoryModeWon) return; 
             window.isStoryModeWon = true;
+            window.isGridWalkingPhase = false;
+            window.isDialogPhase = false;
 
             if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
             if (window.music272Sound && window.music272Sound.playing()) window.music272Sound.stop();

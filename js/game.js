@@ -1095,9 +1095,8 @@ document.addEventListener('keydown', function (event) {
                 if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
                 
                 if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
-                if (window.storyBGM) window.storyBGM.play();
-
-                
+                if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
+                if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();                
                 if (window.playAutomatedWalkingScene) {
                     window.playAutomatedWalkingScene();
                 } else {

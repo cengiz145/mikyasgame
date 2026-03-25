@@ -640,6 +640,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const storyBackBtn = document.getElementById('story-back-btn');
+    if (storyBackBtn) {
+        storyBackBtn.addEventListener('click', () => {
+            if (window.clickSound) window.clickSound.play();
+            if (window.quitStoryMode) window.quitStoryMode();
+            if (window.switchMenu && window.storyMenu && window.mainMenu) {
+                window.switchMenu(window.storyMenu, window.mainMenu, 'main');
+            }
+            if (window.bgMusic && !window.bgMusic.playing()) {
+                window.bgMusic.play();
+            }
+        });
+    }
+
     const btnContinueSaved = document.getElementById('btn-continue-saved');
     const serverMessageContinueBtn = document.getElementById('server-message-continue-btn');
     const mobileEnterBtn = document.getElementById('mobile-enter-btn');
