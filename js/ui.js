@@ -1028,6 +1028,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 window.inStoryMode = true;
+                window.isDialogPhase = true;
                 window.currentStoryIndex = 0;
                 window.storyEntryTimeout = setTimeout(() => {
                     if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();

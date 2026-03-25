@@ -1085,6 +1085,7 @@ document.addEventListener('keydown', function (event) {
                 if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
             } else {
                 window.isGridWalkingPhase = true;
+                window.isDialogPhase = false;
                 window.playerX = 1;
                 if (typeof window.initializeMissingNotesMap === 'function') window.initializeMissingNotesMap();
                 window.currentAutoWalkStep = 0;

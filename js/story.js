@@ -9,6 +9,7 @@ window.isStoryModeWon = false;
 
 window.quitStoryMode = function() {
     window.inStoryMode = false;
+    window.isDialogPhase = false;
     window.isGridWalkingPhase = false;
     window.isStoryModeWon = false;
     
@@ -49,7 +50,7 @@ window.playCurrentStoryDialog = function() {
 
     storyStatus.innerHTML = window.localizeText(appendedText.replace("Devam etmek için entıra basın.", "<strong>Devam etmek için entıra basın.</strong>"));
     if (window.announceToScreenReader) {
-        window.announceToScreenReader(appendedText);
+        window.announceToScreenReader(appendedText, true);
     }
 };
 
@@ -168,11 +169,7 @@ window.initializeMissingNotesMap = function() {
         window.mountainSound.play();
     }
 
-    if (window.music272Sound && !window.music272Sound.playing()) {
-        window.music272Sound.volume(0.4);
-        window.music272Sound.loop(true);
-        window.music272Sound.play();
-    }
+    // music272Sound removed to prevent overlapping wrong music in the mountain map
 };
 
 window.handleStoryWalking = function(key) {
