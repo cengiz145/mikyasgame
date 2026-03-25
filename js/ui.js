@@ -243,7 +243,7 @@ window.updateMobileStoryKeys = function(isStory) {
         keys[1].setAttribute('data-key', 'ArrowLeft'); keys[1].textContent = '< Sol'; keys[1].setAttribute('aria-label', 'Sola Yürü'); keys[1].disabled = false;
         keys[2].setAttribute('data-key', 'ArrowRight'); keys[2].textContent = 'Sağ >'; keys[2].setAttribute('aria-label', 'Sağa Yürü'); keys[2].disabled = false;
         keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F Bul'; keys[3].setAttribute('aria-label', 'Notayı Ara veya Al'); keys[3].disabled = false;
-        keys[4].textContent = '---'; keys[4].setAttribute('aria-label', 'Devre Dışı'); keys[4].disabled = true;
+        keys[4].setAttribute('data-key', 'Enter'); keys[4].textContent = 'Onay'; keys[4].setAttribute('aria-label', 'Onay'); keys[4].disabled = false;
         keys[5].textContent = '---'; keys[5].setAttribute('aria-label', 'Devre Dışı'); keys[5].disabled = true;
         keys[6].textContent = '---'; keys[6].setAttribute('aria-label', 'Devre Dışı'); keys[6].disabled = true;
     } else {
