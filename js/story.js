@@ -177,6 +177,14 @@ window.initializeMissingNotesMap = function() {
 window.handleStoryWalking = function(key) {
     if (!window.isGridWalkingPhase) return;
 
+    if (key === 'ArrowRight' || key === 'ArrowLeft') {
+        const now = Date.now();
+        if (window.lastStoryWalkTime && now - window.lastStoryWalkTime < 1000) {
+            return;
+        }
+        window.lastStoryWalkTime = now;
+    }
+
     if (key === 'ArrowRight') {
         if (window.playerX < window.mapLength) {
             window.playerX++;
