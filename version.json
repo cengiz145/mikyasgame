@@ -1,5 +1,5 @@
 {
-    "version": "0.96.6.4",
+    "version": "0.96.6.5",
     "buildId": 1774270000,
-    "changelog": "Dağ haritasındaki yürüme adımlarının sınırsız tekrarı (basılı tutma) tuş engeliyle, çift müzik çalma sorunu tamamen giderildi."
+    "changelog": "Performans iyileştirmeleri ve küçük hata düzeltmeleri (Dağ haritası yürüyüş ayarları)."
 }
