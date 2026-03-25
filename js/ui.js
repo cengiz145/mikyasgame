@@ -481,7 +481,7 @@ window.updateDifficultyMenuLocks = function () {
     if (btnEasy) window.updateButtonUI(btnEasy, window.gameModes.easy, "Kolay Modu Oyna", "");
     window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta Modu Oyna", "Kolay modu 1 kez tamamla");
     window.updateButtonUI(btnHard, window.gameModes.hard, "Zor Modu Oyna", "Orta modu 5 kez tamamla");
-    window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp Notalar Modu. Hikayeli piyano modu.", "Zor modu 5 kez tamamla");
+    window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp Notalar Modu. Şu an hikaye modu devre dışı.", "Şu an hikaye modu devre dışı.");
 };
 
 
@@ -1028,6 +1028,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (btnDiffMissingNotes) {
             btnDiffMissingNotes.addEventListener('click', () => {
+                if (window.wrongSound) window.wrongSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader("Şu an hikaye modu devre dışı.");
+                return;
+                
                 if (!window.gameModes.missing_notes.isUnlocked) return;
                 window.switchMenu(window.difficultyMenu, window.storyMenu, 'story');
 
