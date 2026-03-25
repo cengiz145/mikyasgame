@@ -231,7 +231,6 @@ window.handleStoryWalking = function(key) {
             playRandomSnowStep();
             updateStoryStatus();
         } else {
-            if (window.wrongSound) window.wrongSound.play();
             if (window.announceToScreenReader) window.announceToScreenReader("Haritanın sonundasın. Daha fazla sağa gidemezsin.");
         }
     } else if (key === 'ArrowLeft') {
@@ -240,7 +239,6 @@ window.handleStoryWalking = function(key) {
             playRandomSnowStep();
             updateStoryStatus();
         } else {
-            if (window.wrongSound) window.wrongSound.play();
             if (window.announceToScreenReader) window.announceToScreenReader("Piyanodasın. Daha fazla sola gidemezsin.");
         }
     } else if (key.toLowerCase() === 'f') {
