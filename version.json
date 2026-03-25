@@ -1,5 +1,5 @@
 {
-    "version": "0.96.6.3",
+    "version": "0.96.6.4",
     "buildId": 1774270000,
-    "changelog": "Dağ haritasındaki adım hızları düzenlendi ve kırık piyano sahilindeki müzik sorunu çözüldü."
+    "changelog": "Dağ haritasındaki yürüme adımlarının sınırsız tekrarı (basılı tutma) tuş engeliyle, çift müzik çalma sorunu tamamen giderildi."
 }

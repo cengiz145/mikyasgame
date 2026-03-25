@@ -1053,13 +1053,10 @@ document.addEventListener('keydown', function (event) {
     }
 
     if (event.repeat) {
-        if (window.isGridWalkingPhase && (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
-        } else {
-            if (event.key === 'Enter' || event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === ' ') {
-                event.preventDefault();
-            }
-            return;
+        if (event.key === 'Enter' || event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === ' ') {
+            event.preventDefault();
         }
+        return;
     }
 
     if (event.key === 'Enter') {

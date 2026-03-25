@@ -167,11 +167,7 @@ window.initializeMissingNotesMap = function() {
         window.mountainSound.play();
     }
 
-    if (window.music272Sound && !window.music272Sound.playing()) {
-        window.music272Sound.volume(0.4);
-        window.music272Sound.loop(true);
-        window.music272Sound.play();
-    }
+    // music272Sound removed to prevent 2 tracks playing simultaneously in mountain map
 };
 
 window.handleStoryWalking = function(key) {
