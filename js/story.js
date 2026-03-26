@@ -383,8 +383,17 @@ window.handleStoryWalking = function(key) {
         }
         
         if (window.notesOnMap && window.notesOnMap[window.playerX]) {
-            statusString += " (Ayağına sert bir şey takıldı!)";
-            srString += " Ayağına sert bir şey takıldı.";
+            const foundNote = window.notesOnMap[window.playerX];
+            const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
+            const noteName = trNames[foundNote];
+            
+            statusString += ` (Burada ${noteName} notası var!)`;
+            srString += ` Ayağına sert bir şey takıldı. Burada ${noteName} notası var.`;
+
+            if (window.pianoNotes && window.pianoNotes[foundNote]) {
+                window.pianoNotes[foundNote].volume(1.0);
+                window.pianoNotes[foundNote].play();
+            }
         }
 
         storyStatus.innerHTML = statusString;

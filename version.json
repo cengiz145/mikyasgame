@@ -1,5 +1,5 @@
 {
-    "version": "0.96.7.1",
+    "version": "0.96.7.2",
     "buildId": 1774270000,
-    "changelog": "C tuşuna (Konum) basıldığında artık sadece bir nota olduğu değil, hangi nota olduğu (Do, Re vb.) söyleniyor."
+    "changelog": "Dağ haritasında bir notanın üzerine doğrudan yüründüğünde notanın adının söylenmesi ve piyano sesinin çalması eklendi."
 }
