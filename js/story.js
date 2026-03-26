@@ -342,10 +342,10 @@ window.handleStoryWalking = function(key) {
             if (window.applauseSound) window.applauseSound.play();
             
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-            totalTokens += 50;
+            totalTokens += 300;
             try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens); } catch(e){}
             
-            let winMsg = `Tebrikler! Tüm notaları sırasıyla topladın ve piyanoyu onardın. Kayıp Notalar modunu başarıyla tamamladın! Bu hikaye için 50 jeton kazandınız. Toplam jetonunuz ${totalTokens}. Ana menüye dönülüyor...`;
+            let winMsg = `Tebrikler! Tüm notaları sırasıyla topladın ve piyanoyu onardın. Kayıp Notalar modunu başarıyla tamamladın! Bu hikaye için 300 jeton kazandınız. Toplam jetonunuz ${totalTokens}. Ana menüye dönülüyor...`;
             if (window.announceToScreenReader) window.announceToScreenReader(winMsg);
             
             window.storyWinTimeout = setTimeout(() => {
