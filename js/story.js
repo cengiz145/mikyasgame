@@ -12,6 +12,7 @@ window.quitStoryMode = function() {
     window.isDialogPhase = false;
     window.isGridWalkingPhase = false;
     window.isStoryModeWon = false;
+    window.isStoryModeFinishedWaitingForEnter = false;
     
     // Hafıza (Memory) Sızıntılarını ve Taşan Animasyonları Önle (Clear all timeouts)
     if (window.stepIntervalId) clearTimeout(window.stepIntervalId);
@@ -184,6 +185,7 @@ window.initializeMissingNotesMap = function() {
     window.notesInPiano = [];
     window.carryingNote = null;
     window.isStoryModeWon = false;
+    window.isStoryModeFinishedWaitingForEnter = false;
     const noteNames = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
 
     const availableX = [];
@@ -218,6 +220,10 @@ window.initializeMissingNotesMap = function() {
 
 window.handleStoryWalking = function(key) {
     if (!window.isGridWalkingPhase) return;
+
+    if (window.isStoryModeWon && key !== 'Enter') {
+        return;
+    }
 
     if (key === 'ArrowRight' || key === 'ArrowLeft') {
         const now = Date.now();
@@ -326,29 +332,10 @@ window.handleStoryWalking = function(key) {
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
     } else if (key === 'Enter') {
         if (window.playerX === window.pianoX && window.notesInPiano.length === window.MAX_NOTES && !window.carryingNote) {
-            // Hızlıca (spam) basarak sonsuz tamamlama (completionCount) hilesini engelle
-            if (window.isStoryModeWon) return; 
-            window.isStoryModeWon = true;
-            window.isGridWalkingPhase = false;
-            window.isDialogPhase = false;
-
-            if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
-            if (window.music272Sound && window.music272Sound.playing()) window.music272Sound.stop();
-            
-            if (window.successSound) {
-                window.successSound.volume(0.8);
-                window.successSound.play();
-            }
-            if (window.applauseSound) window.applauseSound.play();
-            
-            let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-            totalTokens += 300;
-            try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens); } catch(e){}
-            
-            let winMsg = `Tebrikler! Tüm notaları sırasıyla topladın ve piyanoyu onardın. Kayıp Notalar modunu başarıyla tamamladın! Bu hikaye için 300 jeton kazandınız. Toplam jetonunuz ${totalTokens}. Ana menüye dönülüyor...`;
-            if (window.announceToScreenReader) window.announceToScreenReader(winMsg);
-            
-            window.storyWinTimeout = setTimeout(() => {
+            if (window.isStoryModeFinishedWaitingForEnter) {
+                window.isStoryModeFinishedWaitingForEnter = false;
+                if (window.storyWinTimeout) clearTimeout(window.storyWinTimeout);
+                
                 if (window.gameModes && window.gameModes.missing_notes) {
                     window.gameModes.missing_notes.completionCount += 1;
                     try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}
@@ -364,6 +351,35 @@ window.handleStoryWalking = function(key) {
                 
                 if (window.bgMusic && !window.bgMusic.playing()) {
                     window.bgMusic.play();
+                }
+                return;
+            }
+
+            // Hızlıca (spam) basarak sonsuz tamamlama (completionCount) hilesini engelle
+            if (window.isStoryModeWon) return; 
+            window.isStoryModeWon = true;
+            window.isDialogPhase = false;
+
+            if (window.mountainSound && window.mountainSound.playing()) window.mountainSound.stop();
+            if (window.music272Sound && window.music272Sound.playing()) window.music272Sound.stop();
+            
+            if (window.successSound) {
+                window.successSound.volume(0.8);
+                window.successSound.play();
+            }
+            if (window.applauseSound) window.applauseSound.play();
+            
+            let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+            totalTokens += 300;
+            try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens); } catch(e){}
+            
+            let winMsg = `Tebrikler! Tüm notaları sırasıyla topladın ve piyanoyu onardın. Kayıp Notalar modunu başarıyla tamamladın! Bu hikaye için 300 jeton kazandınız. Toplam jetonunuz ${totalTokens}.`;
+            if (window.announceToScreenReader) window.announceToScreenReader(winMsg);
+            
+            window.storyWinTimeout = setTimeout(() => {
+                window.isStoryModeFinishedWaitingForEnter = true;
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader("Ana menüye dönmek için entıra basın.");
                 }
             }, 13000);
         }
