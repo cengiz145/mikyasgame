@@ -310,6 +310,10 @@ window.PvP = {
         window.isComputerPlaying = true;
         window.gameSequence = [];
         window.playerSequence = [];
+        
+        if (window.bgMusic && window.bgMusic.playing()) {
+            window.bgMusic.pause();
+        }
         window.pvpScore = 0;
         window.lives = 3;
         
