@@ -91,15 +91,32 @@ window.PvP = {
             // Karşıma rakip çıktıysa ve benim timestamp'im ondan daha eskiyse BİRLEŞTİR (Host benim)
             // Eğer onunki daha eskiyse, O'nun beni birleştirmesini bekle.
             if (possibleOpponents.length > 0) {
-                let opponent = possibleOpponents[0]; // Sadece ilk geleni al
+                // HATA DÜZELTMESİ: Timestamp bazen obje ({".sv": "timestamp"}) dönebildiğinden karşılaştırma bozulur.
+                // En güvenlisi lexicographical string (ID) karşılaştırmasıdır veya obje kontrollerinin yapılmasıdır.
+                let matchedOpponent = null;
 
-                if (myData.timestamp <= opponent.data.timestamp) {
+                for (let opp of possibleOpponents) {
+                    let myTime = (typeof myData.timestamp === 'number') ? myData.timestamp : Date.now();
+                    let oppTime = (typeof opp.data.timestamp === 'number') ? opp.data.timestamp : Date.now();
+
+                    let shouldBeHost = (myTime < oppTime);
+                    if (myTime === oppTime || typeof myData.timestamp === 'object' || typeof opp.data.timestamp === 'object') {
+                        shouldBeHost = (this.myQueueId < opp.id);
+                    }
+
+                    if (shouldBeHost) {
+                        matchedOpponent = opp;
+                        break;
+                    }
+                }
+
+                if (matchedOpponent) {
                     // BEN HOST'UM. Maçı kuruyorum.
                     this.isSearching = false;
                     this.isHost = true;
                     this.matchId = 'match_' + this.myQueueId + '_' + Date.now();
-                    this.opponentId = opponent.id;
-                    this.opponentName = opponent.data.name;
+                    this.opponentId = matchedOpponent.id;
+                    this.opponentName = matchedOpponent.data.name;
 
                     this.queueRef.off();
 
