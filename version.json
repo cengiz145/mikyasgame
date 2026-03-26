@@ -1,5 +1,5 @@
 {
-    "version": "0.96.7.2",
+    "version": "0.96.7.3",
     "buildId": 1774270000,
-    "changelog": "Dağ haritasında bir notanın üzerine doğrudan yüründüğünde notanın adının söylenmesi ve piyano sesinin çalması eklendi."
+    "changelog": "Hikaye modu bitirildiğinde ekran okuyucunun sözü kesilmesin diye bekleme süresi artırıldı ve oyuncuya 50 jeton ödülü eklendi."
 }
