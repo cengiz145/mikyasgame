@@ -227,7 +227,7 @@ window.handleStoryWalking = function(key) {
 
     if (key === 'ArrowRight' || key === 'ArrowLeft') {
         const now = Date.now();
-        if (window.lastStoryWalkTime && now - window.lastStoryWalkTime < 500) {
+        if (window.lastStoryWalkTime && now - window.lastStoryWalkTime < 300) {
             return;
         }
         window.lastStoryWalkTime = now;
