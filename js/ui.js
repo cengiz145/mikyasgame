@@ -324,13 +324,15 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
                     }
                 }
                 window.isMenuTransitioning = false;
+
+                // BUG FIX: Bekleyen Güncelleme varsa, ekran geçişleri bittikten SONRA (çarpışma riski olmadan) göster
+                if (newActiveMenuName === 'main' && window.pendingUpdate === true) {
+                    window.pendingUpdate = false;
+                    window.guncellemeKontrolEt(false);
+                }
             }, 50);
         }, 50);
     }, 300);
-
-    if (newActiveMenuName === 'main' && window.pendingUpdate === true) {
-        window.guncellemeKontrolEt(false); // Bekleyen güncellemeyi şimdi ekrana bas
-    }
 };
 
 window.announceToScreenReader = function (text, forceFocus = false) {
