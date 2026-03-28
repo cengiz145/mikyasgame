@@ -527,6 +527,114 @@ window.updateStatsDisplay = function() {
     if (profileStatsContent) profileStatsContent.innerHTML = html;
 };
 
+// --- PRESENCE (VARLIK) & SOSYAL LİSTE SİSTEMİ ---
+window.initPresenceSystem = function() {
+    const checkDb = setInterval(() => {
+        if (window.db) {
+            clearInterval(checkDb);
+            const connectedRef = window.db.ref('.info/connected');
+            
+            connectedRef.on('value', (snap) => {
+                let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
+                if (!myName || myName.trim() === '' || myName === "Misafir") return;
+
+                let safeId = myName.replace(/[.#$\[\]\/]/g, '_');
+                let presenceRef = window.db.ref('presence/' + safeId);
+                
+                if (snap.val() === true) {
+                    presenceRef.onDisconnect().set({ 
+                        state: 'offline', 
+                        name: myName,
+                        last_changed: firebase.database.ServerValue.TIMESTAMP 
+                    }).then(() => {
+                        presenceRef.set({ 
+                            state: 'online', 
+                            name: myName,
+                            last_changed: firebase.database.ServerValue.TIMESTAMP 
+                        });
+                    });
+                }
+            });
+
+            window.db.ref('presence').on('value', (snap) => {
+                window.lastPresenceData = snap.val() || {};
+                if (window.currentActiveMenu === 'social') {
+                    if (window.renderSocialList) window.renderSocialList();
+                }
+            });
+        }
+    }, 1000);
+};
+
+window.renderSocialList = function() {
+    const listEl = document.getElementById('social-player-list');
+    if (!listEl) return;
+
+    if (!window.lastPresenceData || Object.keys(window.lastPresenceData).length === 0) {
+        listEl.innerHTML = '<li tabindex="0">Şuan bağlı bir oyuncu yok.</li>';
+        return;
+    }
+
+    let players = Object.values(window.lastPresenceData);
+    if (players.length === 0) {
+        listEl.innerHTML = '<li tabindex="0">Şuan bağlı bir oyuncu yok.</li>';
+        return;
+    }
+
+    players.sort((a, b) => {
+        if (a.state === 'online' && b.state !== 'online') return -1;
+        if (a.state !== 'online' && b.state === 'online') return 1;
+        return (a.name || '').localeCompare(b.name || '');
+    });
+
+    listEl.innerHTML = '';
+    let foundAny = false;
+
+    players.forEach(p => {
+        if (!p.name) return;
+        foundAny = true;
+        let isOnline = (p.state === 'online');
+        
+        let li = document.createElement('li');
+        li.style.padding = "10px";
+        li.style.borderRadius = "8px";
+        li.style.marginBottom = "8px";
+        li.style.backgroundColor = isOnline ? "rgba(0, 168, 132, 0.15)" : "rgba(80, 80, 80, 0.15)";
+        li.style.borderLeft = isOnline ? "4px solid #00a884" : "4px solid #555";
+        li.style.display = "flex";
+        li.style.justifyContent = "space-between";
+        li.style.alignItems = "center";
+
+        let nameSpan = document.createElement('span');
+        nameSpan.style.fontWeight = "bold";
+        nameSpan.style.color = isOnline ? "#e9edef" : "#aaaaaa";
+        nameSpan.innerText = p.name;
+
+        let statusSpan = document.createElement('span');
+        statusSpan.style.fontSize = "0.9rem";
+        statusSpan.style.fontWeight = "bold";
+        statusSpan.style.color = isOnline ? "#00a884" : "#888888";
+        statusSpan.innerText = isOnline ? "Çevrimiçi" : "Çevrimdışı";
+
+        li.setAttribute('aria-label', `${p.name} kullanıcısı şuan ${isOnline ? "çevrimiçi" : "çevrimdışı"}`);
+        li.setAttribute('tabindex', '0');
+
+        li.appendChild(nameSpan);
+        li.appendChild(statusSpan);
+        listEl.appendChild(li);
+    });
+
+    if (!foundAny) {
+        listEl.innerHTML = '<li tabindex="0">Şuan bağlı bir oyuncu yok.</li>';
+    }
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.initPresenceSystem);
+} else {
+    window.initPresenceSystem();
+}
+
 // --- EVENTS ---
 document.addEventListener('DOMContentLoaded', () => {
     // --- Erişilebilirlik (ARIA) Dinamik Enjektörü (Sessiz Semantik / Role Gizleme) ---
@@ -792,6 +900,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.currentActiveMenu !== 'social') {
                 window.switchMenu(getMenuEl(window.currentActiveMenu), window.socialMenu, 'social');
                 updateActiveTab('nav-btn-social');
+                if (window.renderSocialList) window.renderSocialList();
                 if (window.clickSound) window.clickSound.play();
                 if (window.announceToScreenReader) window.announceToScreenReader("Sosyal menüsü");
             }
