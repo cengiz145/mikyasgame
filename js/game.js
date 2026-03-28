@@ -1039,15 +1039,21 @@ document.addEventListener('keydown', function (event) {
     }
 
     if (event.key.toLowerCase() === 'm') {
-        if (window.bgMusic) {
-            const isMuted = window.bgMusic.mute();
-            if (!isMuted) {
-                window.bgMusic.mute(true);
-                if (window.announceToScreenReader) window.announceToScreenReader('Müzik sessize alındı.');
-            } else {
-                window.bgMusic.mute(false);
-                if (window.announceToScreenReader) window.announceToScreenReader('Müzik sesi açıldı.');
-            }
+        let isMuted = false;
+        if (window.bgMusic) isMuted = window.bgMusic.mute();
+        else if (window.storyBGM) isMuted = window.storyBGM.mute();
+        
+        const setMute = !isMuted;
+
+        if (window.bgMusic) window.bgMusic.mute(setMute);
+        if (window.storyBGM) window.storyBGM.mute(setMute);
+        if (window.house2Sound) window.house2Sound.mute(setMute);
+        if (window.mountainSound) window.mountainSound.mute(setMute);
+        if (window.music60Sound) window.music60Sound.mute(setMute);
+        if (window.music272Sound) window.music272Sound.mute(setMute);
+
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader(setMute ? 'Arka plan müzikleri sessize alındı.' : 'Arka plan müziklerinin sesi açıldı.');
         }
         return;
     }
