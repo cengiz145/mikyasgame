@@ -864,6 +864,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // İstatistikler Menüsü Kontrolleri
+    if (statsBtnMain) {
+        statsBtnMain.addEventListener('click', () => {
+            if (window.clickSound) window.clickSound.play();
+            if (window.updateStatsDisplay) window.updateStatsDisplay();
+            if (window.switchMenu && window.mainMenu && window.statsMenu) {
+                window.switchMenu(window.mainMenu, window.statsMenu, 'stats');
+                if (window.announceToScreenReader) window.announceToScreenReader("İstatistikler menüsü");
+            }
+        });
+    }
+
+    if (statsBackBtn) {
+        statsBackBtn.addEventListener('click', () => {
+            if (window.clickSound) window.clickSound.play();
+            if (window.switchMenu && window.mainMenu && window.statsMenu) {
+                window.switchMenu(window.statsMenu, window.mainMenu, 'main');
+            }
+        });
+    }
+
     // Mobil alt menü (Tab bar) Event Listeners
     const btnHome = document.getElementById('nav-btn-home');
     const btnSocial = document.getElementById('nav-btn-social');
