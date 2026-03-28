@@ -10,15 +10,15 @@ window.PvP = {
     isSearching: false,
     isBotMode: false, // Ghost Bot sızıntısını engellemek için ana bayrak tanımlandı!
 
-    // Eşleştirme sırasına gir (Rakip Arama)
-    joinQueue: function() {
+    // Maç Kur (Lobi Oluşturma)
+    createMatch: function() {
         if (!window.db) {
             if (window.announceToScreenReader) window.announceToScreenReader("Bağlantı hatası. Veritabanı ulaşılamıyor.");
             return;
         }
 
         let deviceId = localStorage.getItem('hafizaGuvenDeviceId');
-        if (!deviceId) return; // Güvenli oturum yoksa başlatma
+        if (!deviceId) return;
 
         let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname');
         if (!myName || myName.trim() === "") {
@@ -27,124 +27,170 @@ window.PvP = {
             return;
         }
 
-        // Temiz isim
         myName = myName.replace(/[.#$\[\]\/]/g, '_');
 
-        // Eski modların sızıntı yapmasını engellemek için parametreleri sıfırla
         this.isBotMode = false;
-        this.matchId = null;
         this.myQueueId = deviceId;
-        this.isSearching = true;
+        this.matchId = 'match_' + this.myQueueId + '_' + Date.now();
+        this.isSearching = true; // Sadece arayüzde iptal edilebilirlik sağlamak için
+        this.isHost = true;
 
         const queueNode = window.db.ref('pvp_queue/' + this.myQueueId);
         queueNode.set({
             name: myName,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            matchedWith: null
+            hostId: this.myQueueId,
+            matchId: this.matchId,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
         });
 
-        // Bağlantı koparsa sıradan düşür
+        // Bağlantı koparsa lobi listeden düşsün
         queueNode.onDisconnect().remove();
+
+        const matchNode = window.db.ref('matches/' + this.matchId);
+        matchNode.set({
+            host: this.myQueueId,
+            hostName: myName,
+            status: 'waiting_for_client',
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        });
+        matchNode.onDisconnect().update({ status: 'finished', hostFinished: true });
 
         const btn = document.getElementById('pvp-play-btn');
         if (btn) {
-            btn.innerHTML = 'Aranıyor... Kapatmak için tıklayın';
-            btn.setAttribute('aria-label', 'Rakip aranıyor. İptal etmek için tekrar tıklayın.');
+            btn.innerHTML = 'Rakip Bekleniyor... İptal İçin Tıkla';
+            btn.setAttribute('aria-label', 'Rakip bekleniyor. İptal etmek için tekrar tıklayın.');
         }
 
-        if (window.announceToScreenReader) window.announceToScreenReader("Rakip aranıyor. Lütfen bekleyin.");
+        if (window.announceToScreenReader) window.announceToScreenReader("Rakip bekleniyor. Lütfen bekleyiniz.");
 
-        // Sırayı Dinle
-        this.queueRef = window.db.ref('pvp_queue');
-        
-        // Host (Kurucu) Algoritması: Eğer sırada başka biri varsa ve onun tarihi eskiyse o host olur, 
-        // ben sonradan geldiysem ben ona katılırım veya ben eskiysem ve o geldiyse ben host olup maçı başlatırım.
-        
-        this.queueRef.on('value', (snapshot) => {
+        // Odaya biri katıldı mı diye dinle
+        this.matchRef = window.db.ref('matches/' + this.matchId);
+        this.matchRef.on('value', (snapshot) => {
             if (!this.isSearching) return;
-            const players = snapshot.val();
-            if (!players) return;
+            const matchData = snapshot.val();
+            if (!matchData) return;
 
-            // Kendi verim
-            const myData = players[this.myQueueId];
-            if (!myData) return; // Belki sırada değilim
-
-            // Eğer birisi beni eşleştirdiyse (Ben İstemciysem / Client)
-            if (myData.matchedWith) {
+            if (matchData.client && matchData.clientName) {
+                // Müşteri (Client) katıldı!
                 this.isSearching = false;
-                this.matchId = myData.matchedWith;
-                this.isHost = false;
-                this.queueRef.off();
-                queueNode.remove(); // Sıradan çık
-                this.enterMatchRoom(this.matchId, myData.hostName);
+                this.opponentId = matchData.client;
+                this.opponentName = matchData.clientName;
+                this.matchRef.off();
+                queueNode.remove(); // Odayı kapattık, artık listede görünmesin
+                
+                this.enterMatchRoom(this.matchId, this.opponentName);
+            }
+        });
+    },
+
+    // Var Olan Maçları Getir ve Göster
+    fetchAvailableMatches: function(shouldOpenMenu) {
+        if (!window.db) {
+            if (window.announceToScreenReader) window.announceToScreenReader("Bağlantı hatası.");
+            return;
+        }
+
+        const statusText = document.getElementById('pvp-rooms-status-text');
+        if (statusText) statusText.innerText = 'Açık maçlar yükleniyor...';
+        if (window.announceToScreenReader && shouldOpenMenu) window.announceToScreenReader('Açık maçlar aranıyor, lütfen bekleyiniz.');
+
+        window.db.ref('pvp_queue').once('value').then((snapshot) => {
+            const players = snapshot.val();
+            const roomsList = document.getElementById('pvp-rooms-list');
+            
+            if (roomsList) roomsList.innerHTML = ''; // Temizle
+
+            let availableMatches = [];
+            
+            // Kendi oturumumuz hariç ve sadece matchId'si tanımlı (yeni sistem) olanları filtrele
+            let myDeviceId = localStorage.getItem('hafizaGuvenDeviceId');
+            
+            if (players) {
+                for (let id in players) {
+                    if (id !== myDeviceId && players[id].matchId) {
+                        availableMatches.push(players[id]);
+                    }
+                }
+            }
+
+            if (availableMatches.length === 0) {
+                if (statusText) statusText.innerHTML = "Şuan halihazırda açılmış bir maç yok.<br>Lütfen yeni maç oluşturun.";
+                if (window.announceToScreenReader) window.announceToScreenReader("Şuan halihazırda açılmış bir maç yok. Lütfen geri dönerek maç oluşturun.");
+                
+                if (shouldOpenMenu && window.switchMenu && window.pvpRoomsMenu && window.multiplayerSelectMenu) {
+                    window.switchMenu(window.multiplayerSelectMenu, window.pvpRoomsMenu, 'pvp-rooms');
+                }
                 return;
             }
 
-            // Eğer eşleştirilmemişsem, başkası var mı diye bak (Ben Sunucuyam / Host adayı)
-            let possibleOpponents = [];
-            for (let id in players) {
-                if (id !== this.myQueueId && !players[id].matchedWith) {
-                    possibleOpponents.push({ id: id, data: players[id] });
-                }
+            if (statusText) statusText.innerText = availableMatches.length + ' adet açık maç bulundu. Katılmak için seçiniz.';
+
+            availableMatches.forEach((match) => {
+                const li = document.createElement('li');
+                const btn = document.createElement('button');
+                btn.className = 'menu-button';
+                btn.innerHTML = `${match.name} - Katıl`;
+                btn.setAttribute('aria-label', `${match.name} adlı kurucunun maçına katıl.`);
+                
+                btn.addEventListener('click', () => {
+                    window.PvP.joinExistingMatch(match.hostId, match.matchId, match.name);
+                });
+                
+                li.appendChild(btn);
+                
+                // Menü butonlarıyla aynı animasyon ve özellikler (ui.js deki standart eklentiler)
+                btn.addEventListener('mouseenter', () => { if (window.hoverSound) window.hoverSound.play(); });
+                btn.addEventListener('focus', () => { if (window.hoverSound) window.hoverSound.play(); });
+                
+                if (roomsList) roomsList.appendChild(li);
+            });
+            
+            if (shouldOpenMenu && window.switchMenu && window.pvpRoomsMenu && window.multiplayerSelectMenu) {
+                window.switchMenu(window.multiplayerSelectMenu, window.pvpRoomsMenu, 'pvp-rooms');
             }
+            if (window.announceToScreenReader) window.announceToScreenReader(availableMatches.length + ' adet açık maç bulundu. Lütfen ok tuşlarıyla gezinerek birine tıklayıp katılın.');
+        }).catch((error) => {
+            if (statusText) statusText.innerText = 'Bir hata oluştu.';
+        });
+    },
 
-            // Karşıma rakip çıktıysa ve benim timestamp'im ondan daha eskiyse BİRLEŞTİR (Host benim)
-            // Eğer onunki daha eskiyse, O'nun beni birleştirmesini bekle.
-            if (possibleOpponents.length > 0) {
-                // HATA DÜZELTMESİ: Timestamp bazen obje ({".sv": "timestamp"}) dönebildiğinden karşılaştırma bozulur.
-                // En güvenlisi lexicographical string (ID) karşılaştırmasıdır veya obje kontrollerinin yapılmasıdır.
-                let matchedOpponent = null;
+    // Var olan odaya katıl (Client)
+    joinExistingMatch: function(hostId, targetMatchId, hostName) {
+        let deviceId = localStorage.getItem('hafizaGuvenDeviceId');
+        if (!deviceId) return;
 
-                for (let opp of possibleOpponents) {
-                    let myTime = (typeof myData.timestamp === 'number') ? myData.timestamp : Date.now();
-                    let oppTime = (typeof opp.data.timestamp === 'number') ? opp.data.timestamp : Date.now();
+        let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || "Misafir";
+        myName = myName.replace(/[.#$\[\]\/]/g, '_');
 
-                    let shouldBeHost = (myTime < oppTime);
-                    if (myTime === oppTime || typeof myData.timestamp === 'object' || typeof opp.data.timestamp === 'object') {
-                        shouldBeHost = (this.myQueueId < opp.id);
-                    }
+        const btn = document.activeElement;
+        if (btn && btn.tagName === 'BUTTON') {
+            btn.innerHTML = 'Bağlanılıyor...';
+            btn.disabled = true;
+            if (window.announceToScreenReader) window.announceToScreenReader('Bağlanılıyor...');
+        }
 
-                    if (shouldBeHost) {
-                        matchedOpponent = opp;
-                        break;
-                    }
-                }
+        // Host'un sıradaki kaydını ucuralım ki kimse göremesin
+        window.db.ref('pvp_queue/' + hostId).remove();
 
-                if (matchedOpponent) {
-                    // BEN HOST'UM. Maçı kuruyorum.
-                    this.isSearching = false;
-                    this.isHost = true;
-                    this.matchId = 'match_' + this.myQueueId + '_' + Date.now();
-                    this.opponentId = matchedOpponent.id;
-                    this.opponentName = matchedOpponent.data.name;
-
-                    this.queueRef.off();
-
-                    // Maç veritabanını oluştur
-                    const matchNode = window.db.ref('matches/' + this.matchId);
-                    
-                    // Ben eğer düşersem/çıkarsam odanın statüsünü direkt bitir ve temizle
-                    matchNode.onDisconnect().update({ status: 'finished', hostFinished: true });
-
-                    matchNode.set({
-                        host: this.myQueueId,
-                        hostName: myName,
-                        client: this.opponentId,
-                        clientName: this.opponentName,
-                        status: 'waiting_for_client',
-                        createdAt: firebase.database.ServerValue.TIMESTAMP
-                    }).then(() => {
-                        // Rakibi bu maça çek
-                        window.db.ref('pvp_queue/' + this.opponentId).update({
-                            matchedWith: this.matchId,
-                            hostName: myName
-                        });
-                        queueNode.remove(); // Kendimi sıradan çıkar
-                        
-                        this.enterMatchRoom(this.matchId, this.opponentName);
-                    });
-                }
-            }
+        // Odaya kendimizi ekleyelim
+        const matchNode = window.db.ref('matches/' + targetMatchId);
+        matchNode.update({
+            client: deviceId,
+            clientName: myName,
+            status: 'starting'
+        }).then(() => {
+            this.isSearching = false;
+            this.isBotMode = false;
+            this.isHost = false;
+            this.matchId = targetMatchId;
+            this.myQueueId = deviceId;
+            this.opponentId = hostId;
+            this.opponentName = hostName;
+            
+            this.enterMatchRoom(this.matchId, hostName);
+        }).catch(() => {
+            if (window.announceToScreenReader) window.announceToScreenReader('Bağlantı hatası, maç kurulamadı.');
+            if (btn) btn.innerHTML = 'Hata Oluştu';
         });
     },
 
@@ -167,15 +213,15 @@ window.PvP = {
             this.matchId = null;
         }
 
-        if (this.queueRef && !this.isBotMode) this.queueRef.off();
+        if (this.matchRef && !this.isBotMode) this.matchRef.off();
         if (this.myQueueId && !this.isBotMode) window.db.ref('pvp_queue/' + this.myQueueId).remove();
         
         this.isBotMode = false;
         
         const btn = document.getElementById('pvp-play-btn');
         if (btn) {
-            btn.innerHTML = 'Birebir Rakiple Oyna';
-            btn.setAttribute('aria-label', 'Birebir Rakiple Oyna. Eşleştirme iptal edildi.');
+            btn.innerHTML = 'Maç Oluştur';
+            btn.setAttribute('aria-label', 'Maç Oluştur. İşlem iptal edildi.');
         }
         
         const botBtn = document.getElementById('pve-bot-play-btn');
@@ -211,7 +257,7 @@ window.PvP = {
         this.lobbyWaitTimer = setTimeout(() => {
             if (!this.matchId) return; // İşlem kullanıcı tarafından iptal edildiyse dur
             const resetBtn = document.getElementById('pvp-play-btn');
-            if (resetBtn) resetBtn.innerHTML = 'Birebir Rakiple Oyna';
+            if (resetBtn) resetBtn.innerHTML = 'Maç Oluştur';
             const resetBotBtn = document.getElementById('pve-bot-play-btn');
             if (resetBotBtn) resetBotBtn.innerHTML = 'Bota Karşı Oyna';
             

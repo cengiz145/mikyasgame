@@ -146,6 +146,8 @@ window.updateMenu = document.getElementById('update-menu-container');
 window.achievementsMenu = document.getElementById('achievements-menu-container');
 window.gameMenu = document.getElementById('game-menu-container');
 window.storyMenu = document.getElementById('story-menu-container');
+window.profileMenu = document.getElementById('profile-menu-container');
+window.socialMenu = document.getElementById('social-menu-container');
 window.allMenuButtons = Array.from(document.querySelectorAll('.menu-button'));
 
 window.currentFocusIndex = 0;
@@ -165,6 +167,8 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'feedback') buttons = Array.from(window.feedbackMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'server-message') buttons = Array.from(window.serverMessageMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'game') buttons = Array.from(window.gameMenu.querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'profile') buttons = Array.from(window.profileMenu.querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'social') buttons = Array.from(window.socialMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'play-mode') buttons = Array.from(document.getElementById('play-mode-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'multiplayer-select') buttons = Array.from(document.getElementById('multiplayer-select-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('.menu-button'));
@@ -182,7 +186,11 @@ window.updateMobileKeysVisibility = function () {
     const mobileReplay = document.getElementById('mobile-replay-btn');
     const desktopExitLi = document.querySelector('.desktop-exit-li');
 
-    document.body.classList.remove('show-mobile-keys', 'show-mobile-enter');
+    document.body.classList.remove('show-mobile-keys', 'show-mobile-enter', 'show-bottom-nav');
+
+    if (['main', 'profile', 'social'].includes(window.currentActiveMenu)) {
+        document.body.classList.add('show-bottom-nav');
+    }
 
     if (mobilePiano) mobilePiano.setAttribute('aria-hidden', 'true');
     if (mobileEnter) {
@@ -484,6 +492,40 @@ window.updateDifficultyMenuLocks = function () {
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp Notalar Modu. Hikayeli piyano modu.", "Zor modu 5 kez tamamla");
 };
 
+window.updateStatsDisplay = function() {
+    let tokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+    let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+    let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+    
+    let easyCount = window.gameModes ? window.gameModes.easy.completionCount : 0;
+    let mediumCount = window.gameModes ? window.gameModes.medium.completionCount : 0;
+    let hardCount = window.gameModes ? window.gameModes.hard.completionCount : 0;
+    let storyCount = window.gameModes ? window.gameModes.missing_notes.completionCount : 0;
+
+    let rank = "Oyuncu";
+
+    let r_el = document.getElementById('profile-player-rank');
+    if (r_el) r_el.innerText = rank;
+
+    let html = `
+        <p><strong>Bakiye:</strong> ${tokens} Jeton</p>
+        <p><strong>Hata Koruması:</strong> ${hk} adet</p>
+        <p><strong>Zaman Koruması:</strong> ${zk} adet</p>
+        <p style="margin-top:10px; color:#ffb703;"><strong>Tamamlanan Oynanışlar:</strong></p>
+        <ul style="list-style: none; padding-left: 10px; margin-top:5px;">
+            <li>Kolay Mod: ${easyCount} kez</li>
+            <li>Orta Mod: ${mediumCount} kez</li>
+            <li>Zor Mod: ${hardCount} kez</li>
+            <li>Kayıp Notalar: ${storyCount} kez</li>
+        </ul>
+    `;
+
+    const statsContent = document.getElementById('stats-content');
+    const profileStatsContent = document.getElementById('profile-stats-content');
+
+    if (statsContent) statsContent.innerHTML = html;
+    if (profileStatsContent) profileStatsContent.innerHTML = html;
+};
 
 // --- EVENTS ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -712,6 +754,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Mobil alt menü (Tab bar) Event Listeners
+    const btnHome = document.getElementById('nav-btn-home');
+    const btnSocial = document.getElementById('nav-btn-social');
+    const btnProfile = document.getElementById('nav-btn-profile');
+
+    const updateActiveTab = (activeId) => {
+        if(btnHome) btnHome.classList.remove('active');
+        if(btnSocial) btnSocial.classList.remove('active');
+        if(btnProfile) btnProfile.classList.remove('active');
+        const activeBtn = document.getElementById(activeId);
+        if(activeBtn) activeBtn.classList.add('active');
+    };
+
+    const getMenuEl = (menuName) => {
+        if (menuName === 'main') return window.mainMenu;
+        if (menuName === 'social') return window.socialMenu;
+        if (menuName === 'profile') return window.profileMenu;
+        let p = window[menuName.replace('-','') + 'Menu'];
+        if (p) return p;
+        return document.getElementById(menuName + '-menu-container') || window.mainMenu;
+    };
+
+    if (btnHome) {
+        btnHome.addEventListener('click', () => {
+            if (window.currentActiveMenu !== 'main') {
+                window.switchMenu(getMenuEl(window.currentActiveMenu), window.mainMenu, 'main');
+                updateActiveTab('nav-btn-home');
+                if (window.clickSound) window.clickSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader("Ana menü");
+            }
+        });
+    }
+
+    if (btnSocial) {
+        btnSocial.addEventListener('click', () => {
+            if (window.currentActiveMenu !== 'social') {
+                window.switchMenu(getMenuEl(window.currentActiveMenu), window.socialMenu, 'social');
+                updateActiveTab('nav-btn-social');
+                if (window.clickSound) window.clickSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader("Sosyal menüsü");
+            }
+        });
+    }
+
+    if (btnProfile) {
+        btnProfile.addEventListener('click', () => {
+            if (window.currentActiveMenu !== 'profile') {
+                let playerName = localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
+                let nameEl = document.getElementById('profile-player-name');
+                if (nameEl) nameEl.innerText = playerName;
+
+                if (window.updateStatsDisplay) window.updateStatsDisplay();
+
+                window.switchMenu(getMenuEl(window.currentActiveMenu), window.profileMenu, 'profile');
+                updateActiveTab('nav-btn-profile');
+                if (window.clickSound) window.clickSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader("Profil menüsü");
+            }
+        });
+    }
+
     // Stats
     if (statsBtnMain && statsBackBtn) {
         statsBtnMain.addEventListener('click', () => {
@@ -907,9 +1010,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const mpSelectMenuDOM = document.getElementById('multiplayer-select-menu-container');
     const pvpPlayBtn = document.getElementById('pvp-play-btn');
+    const pvpJoinBtn = document.getElementById('pvp-join-btn');
     const pveBotPlayBtn = document.getElementById('pve-bot-play-btn');
     const mpSelectBackBtn = document.getElementById('multiplayer-select-back-btn');
     if (!window.multiplayerSelectMenu) window.multiplayerSelectMenu = mpSelectMenuDOM;
+
+    const pvpRoomsMenuDOM = document.getElementById('pvp-rooms-menu-container');
+    const pvpRoomsBackBtn = document.getElementById('pvp-rooms-back-btn');
+    const pvpRoomsRefreshBtn = document.getElementById('pvp-rooms-refresh-btn');
+    if (!window.pvpRoomsMenu) window.pvpRoomsMenu = pvpRoomsMenuDOM;
+
+    if (pvpRoomsBackBtn) {
+        pvpRoomsBackBtn.addEventListener('click', () => {
+            window.switchMenu(window.pvpRoomsMenu, window.multiplayerSelectMenu, 'multiplayer-select');
+        });
+    }
+
+    if (pvpRoomsRefreshBtn) {
+        pvpRoomsRefreshBtn.addEventListener('click', () => {
+            if (window.PvP && window.PvP.fetchAvailableMatches) {
+                window.PvP.fetchAvailableMatches(false); // false = tell it not to switch menus as we are already here
+            }
+        });
+    }
 
     // Ana Menüden Oyun Modu Seçimine Geçiş
     if (startGameBtn) {
@@ -933,13 +1056,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (pvpJoinBtn) {
+        pvpJoinBtn.addEventListener('click', () => {
+            if (window.PvP) {
+                if (window.PvP.fetchAvailableMatches) {
+                    window.PvP.fetchAvailableMatches(true); // true = open menu if successful or announce if empty
+                }
+            } else {
+                if (window.wrongSound) window.wrongSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme sistemi henüz yüklenmedi.");
+            }
+        });
+    }
+
     if (pvpPlayBtn) {
         pvpPlayBtn.addEventListener('click', () => {
             if (window.PvP) {
                 if (window.PvP.isSearching && !window.PvP.isBotMode) {
                     window.PvP.cancelQueue();
                 } else if (!window.PvP.isSearching) {
-                    window.PvP.joinQueue();
+                    window.PvP.createMatch(); // Eşleşme aramak yerine Odayı kurup bekler
                 }
             } else {
                 if (window.wrongSound) window.wrongSound.play();
@@ -1118,7 +1254,8 @@ document.addEventListener('keydown', (e) => {
             'feedback': 'feedback-back-btn',
             'stats': 'stats-back-btn',
             'play-mode': 'play-mode-back-btn',
-            'multiplayer-select': 'multiplayer-select-back-btn'
+            'multiplayer-select': 'multiplayer-select-back-btn',
+            'pvp-rooms': 'pvp-rooms-back-btn'
         };
 
         if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {
@@ -1157,7 +1294,10 @@ window.addEventListener('popstate', (e) => {
         'scoreboard': 'scoreboard-back-btn',
         'achievements': 'achievements-back-btn',
         'feedback': 'feedback-back-btn',
-        'stats': 'stats-back-btn'
+        'stats': 'stats-back-btn',
+        'play-mode': 'play-mode-back-btn',
+        'multiplayer-select': 'multiplayer-select-back-btn',
+        'pvp-rooms': 'pvp-rooms-back-btn'
     };
     
     if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {
