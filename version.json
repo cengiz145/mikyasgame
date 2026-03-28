@@ -1,5 +1,5 @@
 {
-    "version": "0.96.7.3",
+    "version": "0.96.7.4",
     "buildId": 1774270000,
-    "changelog": "Hikaye modu bitirildiğinde ekran okuyucunun sözü kesilmesin diye bekleme süresi artırıldı ve oyuncuya 50 jeton ödülü eklendi."
+    "changelog": "Mobil profil arayüzü eklendi. Sosyal sekmesinde anlık 'Çevrimiçi / Çevrimdışı' oyuncu takip sistemi aktif edildi. Ayrıca zorunlu güncelleme esnasında oluşan menü çökme hataları giderildi."
 }
