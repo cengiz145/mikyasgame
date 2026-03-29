@@ -293,7 +293,12 @@ window.handleStoryWalking = function(key) {
                     }
                     if (window.correctSound) window.correctSound.play();
                     
-                    if (window.announceToScreenReader) window.announceToScreenReader("Notayı yerden aldınız. Şimdi piyanoya bırakmanız gerekiyor.");
+                    let baseMsg = "Notayı yerden aldınız. Şimdi piyanoya bırakmanız gerekiyor.";
+                    if (window.missingNotesHappyMessages && window.missingNotesHappyMessages.length > window.notesInPiano.length) {
+                        baseMsg = window.missingNotesHappyMessages[window.notesInPiano.length] + " Şimdi onu piyanoya götürmelisin.";
+                    }
+                    
+                    if (window.announceToScreenReader) window.announceToScreenReader(baseMsg);
 
                 } else {
                     if (window.pianoNotes && window.pianoNotes[foundNote]) {
