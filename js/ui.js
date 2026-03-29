@@ -583,6 +583,8 @@ window.renderSocialList = function() {
         return;
     }
 
+    let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
+
     players.sort((a, b) => {
         if (a.state === 'online' && b.state !== 'online') return -1;
         if (a.state !== 'online' && b.state === 'online') return 1;
@@ -593,7 +595,7 @@ window.renderSocialList = function() {
     let foundAny = false;
 
     players.forEach(p => {
-        if (!p.name) return;
+        if (!p.name || p.name === myName) return; // Kendini listede gösterme
         foundAny = true;
         let isOnline = (p.state === 'online');
         
@@ -606,6 +608,7 @@ window.renderSocialList = function() {
         li.style.display = "flex";
         li.style.justifyContent = "space-between";
         li.style.alignItems = "center";
+        li.style.cursor = "pointer";
 
         let nameSpan = document.createElement('span');
         nameSpan.style.fontWeight = "bold";
@@ -618,8 +621,20 @@ window.renderSocialList = function() {
         statusSpan.style.color = isOnline ? "#00a884" : "#888888";
         statusSpan.innerText = isOnline ? "Çevrimiçi" : "Çevrimdışı";
 
-        li.setAttribute('aria-label', `${p.name} kullanıcısı şuan ${isOnline ? "çevrimiçi" : "çevrimdışı"}`);
+        li.setAttribute('aria-label', `${p.name} kullanıcısı şuan ${isOnline ? "çevrimiçi" : "çevrimdışı"}. İşlem yapmak için tıklayın veya Enter'a basın.`);
         li.setAttribute('tabindex', '0');
+
+        const triggerAction = () => {
+            if (window.openSocialActionModal) window.openSocialActionModal(p.name);
+        };
+        
+        li.addEventListener('click', triggerAction);
+        li.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                triggerAction();
+            }
+        });
 
         li.appendChild(nameSpan);
         li.appendChild(statusSpan);
@@ -627,7 +642,7 @@ window.renderSocialList = function() {
     });
 
     if (!foundAny) {
-        listEl.innerHTML = '<li tabindex="0">Şuan bağlı bir oyuncu yok.</li>';
+        listEl.innerHTML = '<li tabindex="0">Şuan bağlı başka bir oyuncu yok.</li>';
     }
 };
 
@@ -2184,6 +2199,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const data = snapshot.val();
+        if (!data) return;
+
+        let mutedUsers = JSON.parse(localStorage.getItem('hafizaGuvenMutedUsers') || "[]");
+        if (mutedUsers.includes(data.nickname)) return; // Sessize alınmış kişinin mesajını engelledik
         
         let timeString = "";
         let timeRaw = "";
@@ -2298,3 +2317,246 @@ document.addEventListener('keydown', function(event) {
         }
     }
 }, true); // Yakalama (capture) evresinde, diğer tüm script'lerden önce tetiklenir
+
+// --- ÖZEL MESAJLAŞMA (PRIVATE CHAT) VE KULLANICI İŞLEM MENÜSÜ ---
+document.addEventListener('DOMContentLoaded', () => {
+    const actionModal = document.getElementById('social-action-modal');
+    const actionTitle = document.getElementById('social-action-title');
+    const btnPm = document.getElementById('social-btn-pm');
+    const btnMute = document.getElementById('social-btn-mute');
+    const btnCancel = document.getElementById('social-btn-cancel');
+
+    const privateChatPanel = document.getElementById('private-chat-panel');
+    const privateChatTitle = document.getElementById('private-chat-title');
+    const privateChatCloseBtn = document.getElementById('private-chat-close-btn');
+    const privateChatMessages = document.getElementById('private-chat-messages');
+    const privateChatMessageInput = document.getElementById('private-chat-message-input');
+    const privateChatSendBtn = document.getElementById('private-chat-send-btn');
+
+    let currentPrivateRecipient = null;
+    let privateChatListenerRef = null;
+    window.isPrivateChatOpen = false;
+
+    const getMutedUsers = () => JSON.parse(localStorage.getItem('hafizaGuvenMutedUsers') || "[]");
+    
+    window.openSocialActionModal = function(playerName) {
+        if (!playerName || !actionModal) return;
+        window.selectedSocialPlayer = playerName;
+        
+        let isMuted = getMutedUsers().includes(playerName);
+
+        if (actionTitle) actionTitle.innerText = playerName + " İşlemleri";
+        if (btnMute) {
+            btnMute.innerText = isMuted ? "Susturmayı Kaldır" : "Kullanıcıyı Sustur";
+            btnMute.setAttribute('aria-label', isMuted ? "Kullanıcının susturmasını kaldır" : "Kullanıcıyı sustur");
+        }
+
+        if (window.clickSound) window.clickSound.play();
+        actionModal.style.display = 'flex';
+        actionModal.removeAttribute('aria-hidden');
+        setTimeout(() => {
+            actionModal.style.opacity = '1';
+            window.previousMenuBeforeModal = window.currentActiveMenu;
+            window.currentActiveMenu = 'social-action';
+            if (btnPm) btnPm.focus();
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader(playerName + " detayları açıldı. Özel mesaj gönderebilir veya susturabilirsiniz.", true);
+            }
+        }, 50);
+    };
+
+    window.closeSocialActionModal = function() {
+        if (!actionModal) return;
+        if (window.clickSound) window.clickSound.play();
+        actionModal.style.opacity = '0';
+        setTimeout(() => {
+            actionModal.style.display = 'none';
+            actionModal.setAttribute('aria-hidden', 'true');
+            if (window.previousMenuBeforeModal) {
+                window.currentActiveMenu = window.previousMenuBeforeModal;
+                setTimeout(() => {
+                    const mBtn = document.getElementById('nav-btn-social');
+                    if (mBtn) mBtn.focus();
+                }, 50);
+            }
+        }, 300);
+    };
+
+    if (btnCancel) btnCancel.addEventListener('click', window.closeSocialActionModal);
+
+    if (btnMute) {
+        btnMute.addEventListener('click', () => {
+            if (!window.selectedSocialPlayer) return;
+            let mutedUsers = getMutedUsers();
+            let isMuted = mutedUsers.includes(window.selectedSocialPlayer);
+            
+            if (isMuted) {
+                mutedUsers = mutedUsers.filter(u => u !== window.selectedSocialPlayer);
+                if (window.announceToScreenReader) window.announceToScreenReader(window.selectedSocialPlayer + " artık size mesaj gönderebilecek.");
+                if (window.showToastNotification) window.showToastNotification(window.selectedSocialPlayer + " susturması kaldırıldı.");
+            } else {
+                mutedUsers.push(window.selectedSocialPlayer);
+                if (window.announceToScreenReader) window.announceToScreenReader(window.selectedSocialPlayer + " susturuldu. Hem özel hem global mesajları engellendi.");
+                if (window.showToastNotification) window.showToastNotification(window.selectedSocialPlayer + " susturuldu.");
+            }
+            localStorage.setItem('hafizaGuvenMutedUsers', JSON.stringify(mutedUsers));
+            window.closeSocialActionModal();
+        });
+    }
+
+    if (btnPm) {
+        btnPm.addEventListener('click', () => {
+            window.closeSocialActionModal();
+            setTimeout(() => {
+                if (window.openPrivateChat) window.openPrivateChat(window.selectedSocialPlayer);
+            }, 300);
+        });
+    }
+
+    function getPrivateRoomId(user1, user2) { return [user1, user2].sort().join('_'); }
+
+    window.openPrivateChat = function(recipientName) {
+        if (!privateChatPanel || !recipientName) return;
+        
+        let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
+        if (!myName || myName === "Misafir") {
+            if (window.announceToScreenReader) window.announceToScreenReader("Özel mesajlaşmak için Küresel Sohbet menüsü üzerinden onaylı bir takma ad belirlemelisiniz.", true);
+            if (window.showToastNotification) window.showToastNotification("Önce Sohbet'ten takma ad alın!");
+            return;
+        }
+
+        currentPrivateRecipient = recipientName;
+        window.isPrivateChatOpen = true;
+
+        if (privateChatTitle) privateChatTitle.innerText = `${recipientName} ile Özel Sohbet`;
+        
+        if (privateChatListenerRef && window.db) privateChatListenerRef.off();
+
+        privateChatMessages.innerHTML = '';
+        privateChatPanel.style.display = 'flex';
+        privateChatPanel.removeAttribute('aria-hidden');
+        history.pushState({ modalOpen: 'private-chat' }, "");
+
+        if (privateChatMessageInput) {
+            privateChatMessageInput.disabled = false;
+            privateChatSendBtn.disabled = false;
+            setTimeout(() => privateChatMessageInput.focus(), 100);
+        }
+        
+        let roomId = getPrivateRoomId(myName, currentPrivateRecipient);
+        privateChatListenerRef = window.db.ref(`privateChats/${roomId}`);
+
+        if (window.clickSound) window.clickSound.play();
+
+        privateChatListenerRef.on('child_added', (snapshot) => {
+            let msg = snapshot.val();
+            if (!msg) return;
+            
+            let isMe = (msg.sender === myName);
+            if (!isMe && getMutedUsers().includes(msg.sender)) return;
+
+            let li = document.createElement('li');
+            li.tabIndex = 0;
+            li.style.marginBottom = '10px';
+            li.style.padding = '8px';
+            li.style.borderRadius = '8px';
+            li.style.backgroundColor = isMe ? 'rgba(255, 183, 3, 0.1)' : 'rgba(0, 168, 132, 0.1)';
+            li.style.borderLeft = isMe ? '4px solid #ffb703' : '4px solid #00a884';
+            
+            let color = isMe ? '#ffb703' : '#00a884';
+            
+            // XSS Protection
+            const sanitize = window.sanitizeHTML || (str => str ? str.toString().replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t] || t)) : '');
+
+            li.innerHTML = `<strong style="color: ${color};">${sanitize(msg.sender)}:</strong> ${sanitize(msg.text)}`;
+            li.setAttribute('aria-label', `${msg.sender}: ${msg.text}`);
+            privateChatMessages.appendChild(li);
+            
+            const pContainer = document.querySelector('#private-chat-panel .chat-messages-container');
+            if (pContainer) pContainer.scrollTop = pContainer.scrollHeight;
+            
+            if (!isMe && window.isPrivateChatOpen) {
+                if (window.chatReceiveSound) window.chatReceiveSound.play();
+                const liveAnnouncer = document.getElementById('sr-chat-reader');
+                if (liveAnnouncer) {
+                    liveAnnouncer.innerText = `Özel mesaj: ${msg.sender} ${msg.text} yazdı.`;
+                }
+            }
+        });
+    };
+
+    window.closePrivateChat = function() {
+        if (!privateChatPanel) return;
+        window.isPrivateChatOpen = false;
+        privateChatPanel.style.display = 'none';
+        privateChatPanel.setAttribute('aria-hidden', 'true');
+        if (privateChatListenerRef) {
+            privateChatListenerRef.off();
+            privateChatListenerRef = null;
+        }
+        currentPrivateRecipient = null;
+        if (window.clickSound) window.clickSound.play();
+    };
+
+    if (privateChatCloseBtn) privateChatCloseBtn.addEventListener('click', window.closePrivateChat);
+
+    const sendPrivateMessage = () => {
+        let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
+        if (!myName || !window.db || !privateChatMessageInput || !currentPrivateRecipient) return;
+
+        let text = privateChatMessageInput.value.trim();
+        if (text.length > 0) {
+            if (text.length > 150) text = text.substring(0, 150);
+
+            let roomId = getPrivateRoomId(myName, currentPrivateRecipient);
+            window.db.ref(`privateChats/${roomId}`).push({
+                sender: myName,
+                text: text,
+                time: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            window.db.ref(`inbox/${currentPrivateRecipient}`).push({
+                from: myName,
+                time: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            privateChatMessageInput.value = '';
+            privateChatMessageInput.focus();
+        }
+    };
+
+    if (privateChatSendBtn) privateChatSendBtn.addEventListener('click', sendPrivateMessage);
+    if (privateChatMessageInput) {
+        privateChatMessageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); sendPrivateMessage(); }
+        });
+    }
+
+    const initInboxListener = () => {
+        let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
+        if (!myName || !window.db || myName === "Misafir") return;
+        
+        let initialInboxLoad = true;
+        window.db.ref(`inbox/${myName}`).on('child_added', (snapshot) => {
+            let notif = snapshot.val();
+            if (!notif) return;
+
+            if (!initialInboxLoad) {
+                if (!getMutedUsers().includes(notif.from)) {
+                    if (!window.isPrivateChatOpen || currentPrivateRecipient !== notif.from) {
+                        if (window.chatReceiveSound) window.chatReceiveSound.play();
+                        if (window.showToastNotification) window.showToastNotification(`💬 ${notif.from} size bir özel mesaj gönderdi.`);
+                        if (window.announceToScreenReader) window.announceToScreenReader(`${notif.from} kullanıcısından yeni bir özel mesajınız var. Sosyal sekmesinden veya ona tıklayarak ulaşabilirsiniz.`);
+                    }
+                }
+            }
+            snapshot.ref.remove(); 
+        });
+
+        setTimeout(() => { initialInboxLoad = false; }, 2000);
+    };
+
+    setTimeout(() => {
+        if(window.db) initInboxListener();
+    }, 2500);
+});
