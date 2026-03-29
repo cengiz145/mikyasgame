@@ -207,6 +207,13 @@ window.PvP = {
             this.lobbyWaitTimer = null;
         }
 
+        // --- YENİ EKLENEN KİLİT: PvP Zamanlayıcısını Güvenle Kapat ---
+        if (this.pvpInterval) {
+            clearInterval(this.pvpInterval);
+            this.pvpInterval = null;
+        }
+        // -------------------------------------------------------------
+
         if (this.matchId) {
             window.db.ref('matches/' + this.matchId).update({ status: 'finished', hostFinished: true, clientFinished: true });
             if (this.isBotMode) window.db.ref('matches/' + this.matchId).remove();
