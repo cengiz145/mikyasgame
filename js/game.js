@@ -897,7 +897,11 @@ window.handlePracticeInput = function(key) {
             if (window.announceToScreenReader) window.announceToScreenReader('Oyun kapatılıyor. Lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
             
             setTimeout(() => { 
-                try { window.close(); } catch(e) {}
+                // Alt+F4 Web Hilesi: Tarayıcının sekme kapatma engelini aşmayı dener
+                try { 
+                    window.open('', '_self', ''); 
+                    window.close(); 
+                } catch(e) {}
                 
                 // Agresif web kapatması: Tamamen sekmeden ayrılmak için about:blank'e zorla
                 try { window.location.replace('about:blank'); } catch(e) {
