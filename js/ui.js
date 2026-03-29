@@ -499,10 +499,10 @@ window.updateStatsDisplay = function() {
     let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
     let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
     
-    let easyCount = window.gameModes ? window.gameModes.easy.completionCount : 0;
-    let mediumCount = window.gameModes ? window.gameModes.medium.completionCount : 0;
-    let hardCount = window.gameModes ? window.gameModes.hard.completionCount : 0;
-    let storyCount = window.gameModes ? window.gameModes.missing_notes.completionCount : 0;
+    let easyCount = (window.gameModes && window.gameModes.easy) ? window.gameModes.easy.completionCount : 0;
+    let mediumCount = (window.gameModes && window.gameModes.medium) ? window.gameModes.medium.completionCount : 0;
+    let hardCount = (window.gameModes && window.gameModes.hard) ? window.gameModes.hard.completionCount : 0;
+    let storyCount = (window.gameModes && window.gameModes.missing_notes) ? window.gameModes.missing_notes.completionCount : 0;
 
     let rank = "Oyuncu";
 

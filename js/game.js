@@ -897,13 +897,13 @@ window.handlePracticeInput = function(key) {
             if (window.announceToScreenReader) window.announceToScreenReader('Oyun kapatılıyor. Lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
             
             setTimeout(() => { 
-                // Önce Electron veya tarayıcı izin veriyorsa kapatmayı dene
                 try { window.close(); } catch(e) {}
                 
-                // Eğer tarayıcıda isek ve window.close() engellendiyse oyunu tamamen gizle.
-                document.body.innerHTML = "<h1 style='color:#e9edef;text-align:center;margin-top:20%;font-size:2rem;'>Oyun kapandı. Bu sekmeyi (veya pencereyi) güvenle kapatabilirsiniz.</h1>";
-                if (window.bgMusic) window.bgMusic.stop();
-            }, 1000);
+                // Agresif web kapatması: Tamamen sekmeden ayrılmak için about:blank'e zorla
+                try { window.location.replace('about:blank'); } catch(e) {
+                    document.documentElement.innerHTML = ""; // Tam imha yedeği
+                }
+            }, 2000); // Anonsun (2 saniye) okunabilmesi için bekle
         });
     }
 
