@@ -890,15 +890,20 @@ window.handlePracticeInput = function(key) {
     }
 };
 
-    // Uygulama çıkış butonu ana oyun dosyasına bağlandı (en basit işlevi gereği)
     const exitBtn = document.getElementById('exit-btn');
     if (exitBtn) {
         exitBtn.addEventListener('click', function () {
             if (window.clickSound) window.clickSound.play();
-            // Oyuncu oyundan çıktığı anda sohbeti 0'la
-            if (window.db) window.db.ref('messages').remove();
-            if (window.announceToScreenReader) window.announceToScreenReader('Oyundan çıkmak için lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
-            setTimeout(() => { window.close(); }, 1500);
+            if (window.announceToScreenReader) window.announceToScreenReader('Oyun kapatılıyor. Lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
+            
+            setTimeout(() => { 
+                // Önce Electron veya tarayıcı izin veriyorsa kapatmayı dene
+                try { window.close(); } catch(e) {}
+                
+                // Eğer tarayıcıda isek ve window.close() engellendiyse oyunu tamamen gizle.
+                document.body.innerHTML = "<h1 style='color:#e9edef;text-align:center;margin-top:20%;font-size:2rem;'>Oyun kapandı. Bu sekmeyi (veya pencereyi) güvenle kapatabilirsiniz.</h1>";
+                if (window.bgMusic) window.bgMusic.stop();
+            }, 1000);
         });
     }
 
