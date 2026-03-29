@@ -903,10 +903,8 @@ window.handlePracticeInput = function(key) {
                     window.close(); 
                 } catch(e) {}
                 
-                // Agresif web kapatması: Tamamen sekmeden ayrılmak için about:blank'e zorla
-                try { window.location.replace('about:blank'); } catch(e) {
-                    document.documentElement.innerHTML = ""; // Tam imha yedeği
-                }
+                // Tarayıcı sekmesinde kalıcı 'about:blank' (boş sayfa) tuzağını önlemek için sadece ekranı karart
+                document.documentElement.innerHTML = "<body style='background-color:black;'><h1 style='color:white;text-align:center;margin-top:20%;font-size:2rem;' tabindex='0'>Hafızana Güven sistemden çıkış yaptı.<br>Bu sekmeyi güvenle kapatabilirsiniz.</h1></body>";
             }, 2000); // Anonsun (2 saniye) okunabilmesi için bekle
         });
     }
