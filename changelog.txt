@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.0] - 2026-04-14
+
+### Eklenenler / Değiştirilenler:
+- **Gelişmiş Ayarlar Menüsü:** Müzik kapatma, müzik ve oyun (efekt) ses düzeyi ile başlangıçtaki uzun logoyu atlama eklendi.
+- **7 Yeni Tema:** Oyuncuların karanlık mod, yüksek kontrast aydınlık mod, okyanus, orman, hacker, retro ve gün batımı gibi renk şemaları arasında geçiş yapabileceği özellik kodlandı.
+- **Klavye Sekme Kısayolları (Tab Logic):** Menüler arası (Ana Menü, Sosyal, Profil) geçişler için bilgisayar versiyonunda `Alt + 1`, `Alt + 2` ve `Alt + 3` eklendi.
+- **Boş Sekme Uyarıları:** Sosyal ve İstatistik profillerinde listelenecek eleman olmadığında beliren erişilebilir uyarı mesajları yerleştirildi.
+
 [v0.96.4] - 2026-03-24
 
 ### Yenilikler ve Düzeltmeler:

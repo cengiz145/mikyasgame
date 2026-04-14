@@ -1,5 +1,5 @@
 {
-    "version": "0.96.7.4",
-    "buildId": 1774270000,
-    "changelog": "Mobil profil arayüzü eklendi. Sosyal sekmesinde anlık 'Çevrimiçi / Çevrimdışı' oyuncu takip sistemi aktif edildi. Ayrıca zorunlu güncelleme esnasında oluşan menü çökme hataları giderildi."
+    "version": "0.97.0.0",
+    "buildId": 1780000000,
+    "changelog": "Geliştirilmiş Ayarlar Menüsü! 7 farklı oyun teması, müzik/efekt ses düzeyleri, logo atlama ve daha fazlası. Bilgisayar için sekme klavye kısayolları eklendi."
 }
