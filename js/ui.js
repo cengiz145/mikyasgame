@@ -1172,6 +1172,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
+
+        const themeSelector = document.getElementById('theme-selector');
+        if (themeSelector) {
+            let savedTheme = localStorage.getItem('hafizaGuvenTheme') || 'default';
+            themeSelector.value = savedTheme;
+            
+            themeSelector.addEventListener('change', (e) => {
+                const newTheme = e.target.value;
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('hafizaGuvenTheme', newTheme);
+                
+                if (window.announceToScreenReader) {
+                    let selText = e.target.options[e.target.selectedIndex].text;
+                    window.announceToScreenReader("Oyun teması değiştirildi: " + selText, true);
+                }
+            });
+        }
     }
 
     // Store

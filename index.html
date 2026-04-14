@@ -9,7 +9,13 @@
     <link rel="manifest" href="manifest.json">
     <title>Hafızana Güven - Ana Menü</title>
     <link rel="stylesheet" href="css/style.css">
-
+    
+    <script>
+        (function() {
+            var theme = localStorage.getItem('hafizaGuvenTheme') || 'default';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 </head>
 
 <body role="application">
@@ -453,6 +459,19 @@
 
             <div style="margin-bottom: 20px;">
                 <button id="toggle-intro-btn" class="menu-button" aria-label="Başlangıçta logoyu atla" style="font-size: 1rem; width: 100%;">Başlangıçta logoyu atla (Kapalı)</button>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="theme-selector" style="display: block; margin-bottom: 5px; color: #fff;">Oyun Teması:</label>
+                <select id="theme-selector" style="width: 100%; padding: 10px; font-size: 1rem; background-color: #333; color: #fff; border: 1px solid #555;" aria-label="Oyun Teması Seçimi">
+                    <option value="default">Varsayılan (Karanlık)</option>
+                    <option value="light">Aydınlık (Açık Görünüm)</option>
+                    <option value="ocean">Okyanus (Mavi Ağırlıklı)</option>
+                    <option value="forest">Orman (Yeşil Ağırlıklı)</option>
+                    <option value="sunset">Gün Batımı (Turuncu/Kahve)</option>
+                    <option value="hacker">Hacker (Siyah/Açık Yeşil)</option>
+                    <option value="retro">Retro (Mor/Pembe)</option>
+                </select>
             </div>
         </div>
 
