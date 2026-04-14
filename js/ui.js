@@ -1028,6 +1028,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const musicVolumeSlider = document.getElementById('music-volume-slider');
         const musicVolumeDisplay = document.getElementById('music-volume-display');
 
+        const blockUpDown = (e) => {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') e.preventDefault();
+        };
+
         const updateMusicVolumes = (val) => {
             let scale = val / 100;
             if (window.bgMusic) window.bgMusic.volume(1.0 * scale);
@@ -1050,6 +1054,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateMusicVolumes(val);
                 localStorage.setItem('hafizaGuvenMusicVolume', val);
             });
+            
+            musicVolumeSlider.addEventListener('keydown', blockUpDown);
             
             musicVolumeSlider.addEventListener('change', () => {
                 if (window.announceToScreenReader) {
@@ -1113,6 +1119,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateSfxVolumes(val);
                 localStorage.setItem('hafizaGuvenSfxVolume', val);
             });
+            
+            sfxVolumeSlider.addEventListener('keydown', blockUpDown);
             
             sfxVolumeSlider.addEventListener('change', () => {
                 if (window.announceToScreenReader) {
@@ -1181,6 +1189,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const themeSelector = document.getElementById('theme-selector');
         if (themeSelector) {
+            themeSelector.addEventListener('keydown', blockUpDown);
             let savedTheme = localStorage.getItem('hafizaGuvenTheme') || 'default';
             themeSelector.value = savedTheme;
             
