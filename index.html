@@ -92,7 +92,7 @@
                     <button id="store-btn-main" class="menu-button" aria-label="Mağaza">Mağaza</button><span class="sr-only"> </span>
                 </li>
                 <li>
-                    <button id="stats-btn-main" class="menu-button" aria-label="İstatistikler">İstatistikler</button><span class="sr-only"> </span>
+                    <button id="settings-btn-main" class="menu-button" aria-label="Ayarlar">Ayarlar</button><span class="sr-only"> </span>
                 </li>
                 <li>
                     <button id="feedback-btn-main" class="menu-button" aria-label="Geri Bildirim">Geri Bildirim</button><span class="sr-only"> </span>
@@ -420,6 +420,55 @@
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => { const firstItem = document.getElementById('feedback-name'); if(firstItem) firstItem.focus(); }, 10);">
         </div>
+    </div>
+
+    <!-- Ayarlar Menüsü -->
+    <div id="settings-menu-container" class="menu-container" role="presentation" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
+            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            onfocus="setTimeout(() => document.getElementById('settings-back-btn').focus(), 10);"></div>
+        <h1 id="settings-menu-title">Ayarlar</h1>
+        
+        <div id="settings-content" aria-live="polite"
+            style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
+            <div style="margin-bottom: 20px;">
+                <label for="music-volume-slider" style="display: block; margin-bottom: 5px; color: #ffb703;">Müzik Sesi Düzeyi:</label>
+                <input type="range" id="music-volume-slider" name="music-volume" min="0" max="100" value="50" step="5"
+                    aria-label="Müzik Sesi Düzeyi"
+                    style="width: 100%; cursor: pointer;">
+                <span id="music-volume-display" style="display: block; margin-top: 5px; color: #fff;">%50</span>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label for="sfx-volume-slider" style="display: block; margin-bottom: 5px; color: #00a884;">Oyun Efekt Sesi Düzeyi:</label>
+                <input type="range" id="sfx-volume-slider" name="sfx-volume" min="0" max="100" value="100" step="5"
+                    aria-label="Oyun Efekt Sesi Düzeyi"
+                    style="width: 100%; cursor: pointer;">
+                <span id="sfx-volume-display" style="display: block; margin-top: 5px; color: #fff;">%100</span>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <button id="toggle-music-btn" class="menu-button" aria-label="Oyun müziğini devre dışı bırak" style="font-size: 1rem; width: 100%;">Oyun müziğini devre dışı bırak</button>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <button id="toggle-intro-btn" class="menu-button" aria-label="Başlangıçta logoyu atla" style="font-size: 1rem; width: 100%;">Başlangıçta logoyu atla (Kapalı)</button>
+            </div>
+        </div>
+
+        <nav class="menu-nav" role="application" aria-labelledby="settings-menu-title">
+            <ul>
+                <li>
+                    <button id="settings-save-btn" class="menu-button" aria-label="Ayarları Kaydet">Ayarları Kaydet</button><span class="sr-only"> </span>
+                </li>
+                <li>
+                    <button id="settings-back-btn" class="menu-button" aria-label="Geri">Geri</button><span class="sr-only"> </span>
+                </li>
+            </ul>
+        </nav>
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
+            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            onfocus="setTimeout(() => document.getElementById('settings-back-btn').focus(), 10);"></div>
     </div>
 
     <!-- Güncelleme (Update) Menüsü -->

@@ -788,6 +788,18 @@ window.addEventListener('load', () => {
     const fsEvent = (e) => {
         if (window.introPlayed) return;
 
+        let skipIntro = localStorage.getItem('hafizaGuvenSkipIntro') === 'true';
+
+        if (skipIntro) {
+            window.introPlayed = true;
+            document.removeEventListener('pointerdown', fsEvent);
+            document.removeEventListener('click', fsEvent);
+            document.removeEventListener('keydown', keyEvent);
+
+            if (window.startGame) window.startGame();
+            return;
+        }
+
         clickCount++;
         if (clickCount === 1) {
             if (window.clickSound) window.clickSound.play();
@@ -1052,15 +1064,19 @@ document.addEventListener('keydown', function (event) {
         
         const setMute = !isMuted;
 
-        if (window.bgMusic) window.bgMusic.mute(setMute);
-        if (window.storyBGM) window.storyBGM.mute(setMute);
-        if (window.house2Sound) window.house2Sound.mute(setMute);
-        if (window.mountainSound) window.mountainSound.mute(setMute);
-        if (window.music60Sound) window.music60Sound.mute(setMute);
-        if (window.music272Sound) window.music272Sound.mute(setMute);
+        if (typeof window.updateMusicMuteState === 'function') {
+            window.updateMusicMuteState(setMute);
+        } else {
+            if (window.bgMusic) window.bgMusic.mute(setMute);
+            if (window.storyBGM) window.storyBGM.mute(setMute);
+            if (window.house2Sound) window.house2Sound.mute(setMute);
+            if (window.mountainSound) window.mountainSound.mute(setMute);
+            if (window.music60Sound) window.music60Sound.mute(setMute);
+            if (window.music272Sound) window.music272Sound.mute(setMute);
+        }
 
         if (window.announceToScreenReader) {
-            window.announceToScreenReader(setMute ? 'Arka plan müzikleri sessize alındı.' : 'Arka plan müziklerinin sesi açıldı.');
+            window.announceToScreenReader(setMute ? 'Arka plan müzikleri sessize alındı.' : 'Arka plan müziklerinin sesi açıldı.', true);
         }
         return;
     }

@@ -268,8 +268,12 @@ window.PvP = {
             const resetBotBtn = document.getElementById('pve-bot-play-btn');
             if (resetBotBtn) resetBotBtn.innerHTML = 'Bota Karşı Oyna';
             
-            if (window.switchMenu && window.multiplayerSelectMenu && window.gameMenu) {
-                window.switchMenu(window.multiplayerSelectMenu, window.gameMenu, 'game');
+            if (window.switchMenu && window.gameMenu) {
+                let activeMultiMenu = window.multiplayerSelectMenu;
+                if (window.pvpRoomsMenu && window.pvpRoomsMenu.style.display !== 'none') {
+                    activeMultiMenu = window.pvpRoomsMenu;
+                }
+                window.switchMenu(activeMultiMenu, window.gameMenu, 'game');
             }
             this.startPvPGame();
         }, 10000);

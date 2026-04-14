@@ -509,18 +509,23 @@ window.updateStatsDisplay = function() {
     let r_el = document.getElementById('profile-player-rank');
     if (r_el) r_el.innerText = rank;
 
-    let html = `
-        <p><strong>Bakiye:</strong> ${tokens} Jeton</p>
-        <p><strong>Hata Koruması:</strong> ${hk} adet</p>
-        <p><strong>Zaman Koruması:</strong> ${zk} adet</p>
-        <p style="margin-top:10px; color:#ffb703;"><strong>Tamamlanan Oynanışlar:</strong></p>
-        <ul style="list-style: none; padding-left: 10px; margin-top:5px;">
-            <li>Kolay Mod: ${easyCount} kez</li>
-            <li>Orta Mod: ${mediumCount} kez</li>
-            <li>Zor Mod: ${hardCount} kez</li>
-            <li>Kayıp Notalar: ${storyCount} kez</li>
-        </ul>
-    `;
+    let html = "";
+    if (tokens === 0 && hk === 0 && zk === 0 && easyCount === 0 && mediumCount === 0 && hardCount === 0 && storyCount === 0) {
+        html = '<p tabindex="0" style="color: #ff4444; font-weight: bold; margin-top: 10px;">Hiç bir istatistiğe sahip değilsiniz.</p>';
+    } else {
+        html = `
+            <p><strong>Bakiye:</strong> ${tokens} Jeton</p>
+            <p><strong>Hata Koruması:</strong> ${hk} adet</p>
+            <p><strong>Zaman Koruması:</strong> ${zk} adet</p>
+            <p style="margin-top:10px; color:#ffb703;"><strong>Tamamlanan Oynanışlar:</strong></p>
+            <ul style="list-style: none; padding-left: 10px; margin-top:5px;">
+                <li>Kolay Mod: ${easyCount} kez</li>
+                <li>Orta Mod: ${mediumCount} kez</li>
+                <li>Zor Mod: ${hardCount} kez</li>
+                <li>Kayıp Notalar: ${storyCount} kez</li>
+            </ul>
+        `;
+    }
 
     const statsContent = document.getElementById('stats-content');
     const profileStatsContent = document.getElementById('profile-stats-content');
@@ -573,13 +578,13 @@ window.renderSocialList = function() {
     if (!listEl) return;
 
     if (!window.lastPresenceData || Object.keys(window.lastPresenceData).length === 0) {
-        listEl.innerHTML = '<li tabindex="0">Şuan bağlı bir oyuncu yok.</li>';
+        listEl.innerHTML = '<li tabindex="0">bu sekme boş</li>';
         return;
     }
 
     let players = Object.values(window.lastPresenceData);
     if (players.length === 0) {
-        listEl.innerHTML = '<li tabindex="0">Şuan bağlı bir oyuncu yok.</li>';
+        listEl.innerHTML = '<li tabindex="0">bu sekme boş</li>';
         return;
     }
 
@@ -642,7 +647,7 @@ window.renderSocialList = function() {
     });
 
     if (!foundAny) {
-        listEl.innerHTML = '<li tabindex="0">Şuan bağlı başka bir oyuncu yok.</li>';
+        listEl.innerHTML = '<li tabindex="0">bu sekme boş</li>';
     }
 };
 
@@ -962,6 +967,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // PC Sekme Geçiş Kısayolları (Alt + 1, Alt + 2, Alt + 3)
+    document.addEventListener('keydown', (e) => {
+        if (e.altKey && e.key === '1') {
+            e.preventDefault();
+            if (btnHome) btnHome.click();
+        } else if (e.altKey && e.key === '2') {
+            e.preventDefault();
+            if (btnSocial) btnSocial.click();
+        } else if (e.altKey && e.key === '3') {
+            e.preventDefault();
+            if (btnProfile) btnProfile.click();
+        }
+    });
+
     // Stats
     if (statsBtnMain && statsBackBtn) {
         statsBtnMain.addEventListener('click', () => {
@@ -971,6 +990,188 @@ document.addEventListener('DOMContentLoaded', () => {
         statsBackBtn.addEventListener('click', () => {
             window.switchMenu(window.statsMenu, window.mainMenu, 'main');
         });
+    }
+
+    // Settings
+    const settingsBtnMain = document.getElementById('settings-btn-main');
+    const settingsBackBtn = document.getElementById('settings-back-btn');
+    const settingsSaveBtn = document.getElementById('settings-save-btn');
+    const settingsMenuContainer = document.getElementById('settings-menu-container');
+
+    if (settingsBtnMain && settingsBackBtn) {
+        settingsBtnMain.addEventListener('click', () => {
+            if (window.clickSound) window.clickSound.play();
+            window.switchMenu(window.mainMenu, settingsMenuContainer, 'settings');
+            if (window.announceToScreenReader) window.announceToScreenReader("Ayarlar menüsü");
+        });
+        
+        const goBackToMenu = () => {
+            if (window.clickSound) window.clickSound.play();
+            window.switchMenu(settingsMenuContainer, window.mainMenu, 'main');
+        };
+
+        settingsBackBtn.addEventListener('click', goBackToMenu);
+        
+        if (settingsSaveBtn) {
+            settingsSaveBtn.addEventListener('click', () => {
+                if (window.announceToScreenReader) window.announceToScreenReader("Ayarlar başarıyla kaydedildi.", true);
+                goBackToMenu();
+            });
+        }
+
+        const musicVolumeSlider = document.getElementById('music-volume-slider');
+        const musicVolumeDisplay = document.getElementById('music-volume-display');
+
+        const updateMusicVolumes = (val) => {
+            let scale = val / 100;
+            if (window.bgMusic) window.bgMusic.volume(1.0 * scale);
+            if (window.storyBGM) window.storyBGM.volume(0.5 * scale);
+            if (window.music60Sound) window.music60Sound.volume(0.5 * scale);
+            if (window.music272Sound) window.music272Sound.volume(0.4 * scale);
+        };
+
+        if (musicVolumeSlider && musicVolumeDisplay) {
+            let savedVol = localStorage.getItem('hafizaGuvenMusicVolume');
+            if (savedVol !== null) {
+                musicVolumeSlider.value = savedVol;
+                musicVolumeDisplay.innerText = '%' + savedVol;
+                updateMusicVolumes(savedVol);
+            }
+
+            musicVolumeSlider.addEventListener('input', (e) => {
+                const val = e.target.value;
+                musicVolumeDisplay.innerText = '%' + val;
+                updateMusicVolumes(val);
+                localStorage.setItem('hafizaGuvenMusicVolume', val);
+            });
+            
+            musicVolumeSlider.addEventListener('change', () => {
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader("Müzik sesi: yzde " + musicVolumeSlider.value);
+                }
+            });
+        }
+
+        const sfxVolumeSlider = document.getElementById('sfx-volume-slider');
+        const sfxVolumeDisplay = document.getElementById('sfx-volume-display');
+
+        const updateSfxVolumes = (val) => {
+            let scale = val / 100;
+            
+            const isMobileLocal = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
+            if (!isMobileLocal) {
+                if (window.hoverSound) window.hoverSound.volume(0.5 * scale);
+                if (window.clickSound) window.clickSound.volume(0.5 * scale);
+            }
+            if (window.correctSound) window.correctSound.volume(1.0 * scale);
+            if (window.wrongSound) window.wrongSound.volume(1.0 * scale);
+            if (window.glasshitSound) window.glasshitSound.volume(1.0 * scale);
+            if (window.gameOverSound) window.gameOverSound.volume(1.0 * scale);
+            if (window.modeUnlockSound) window.modeUnlockSound.volume(1.0 * scale);
+            if (window.enterHouseSound) window.enterHouseSound.volume(1.0 * scale);
+            if (window.doorCloseSound) window.doorCloseSound.volume(1.0 * scale);
+            if (window.buySound) window.buySound.volume(1.0 * scale);
+            if (window.seconsSound) window.seconsSound.volume(1.0 * scale);
+            if (window.secons2Sound) window.secons2Sound.volume(1.0 * scale);
+            if (window.clockTickSound) window.clockTickSound.volume(0.5 * scale);
+            if (window.dado3Sound) window.dado3Sound.volume(0.8 * scale);
+            if (window.chatReceiveSound) window.chatReceiveSound.volume(1.0 * scale);
+            if (window.achievementSound) window.achievementSound.volume(1.0 * scale);
+            if (window.getCoinsSound) window.getCoinsSound.volume(1.0 * scale);
+            
+            if (window.pianoNotes) {
+                for (let k in window.pianoNotes) window.pianoNotes[k].volume(1.0 * scale);
+            }
+            if (window.snowStepSounds) {
+                for (let i = 0; i < window.snowStepSounds.length; i++) window.snowStepSounds[i].volume(1.0 * scale);
+            }
+            if (window.carpetStepSounds) {
+                for (let i = 0; i < window.carpetStepSounds.length; i++) window.carpetStepSounds[i].volume(1.0 * scale);
+            }
+            if (window.storyNoteSounds) {
+                for (let i = 0; i < window.storyNoteSounds.length; i++) window.storyNoteSounds[i].volume(0.15 * scale);
+            }
+        };
+
+        if (sfxVolumeSlider && sfxVolumeDisplay) {
+            let savedSfxVol = localStorage.getItem('hafizaGuvenSfxVolume');
+            if (savedSfxVol !== null) {
+                sfxVolumeSlider.value = savedSfxVol;
+                sfxVolumeDisplay.innerText = '%' + savedSfxVol;
+                updateSfxVolumes(savedSfxVol);
+            }
+
+            sfxVolumeSlider.addEventListener('input', (e) => {
+                const val = e.target.value;
+                sfxVolumeDisplay.innerText = '%' + val;
+                updateSfxVolumes(val);
+                localStorage.setItem('hafizaGuvenSfxVolume', val);
+            });
+            
+            sfxVolumeSlider.addEventListener('change', () => {
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader("Efekt sesi: yzde " + sfxVolumeSlider.value);
+                }
+            });
+        }
+
+        const toggleMusicBtn = document.getElementById('toggle-music-btn');
+
+        window.updateMusicMuteState = (forceMuteState) => {
+            let isMuted = forceMuteState !== undefined ? forceMuteState : (window.bgMusic ? window.bgMusic.mute() : false);
+            
+            if (toggleMusicBtn) {
+                toggleMusicBtn.innerText = isMuted ? "Oyun müziğini etkinleştir" : "Oyun müziğini devre dışı bırak";
+                toggleMusicBtn.setAttribute('aria-label', toggleMusicBtn.innerText);
+            }
+
+            if (forceMuteState !== undefined) {
+                if (window.bgMusic) window.bgMusic.mute(isMuted);
+                if (window.storyBGM) window.storyBGM.mute(isMuted);
+                if (window.music60Sound) window.music60Sound.mute(isMuted);
+                if (window.music272Sound) window.music272Sound.mute(isMuted);
+                if (window.house2Sound) window.house2Sound.mute(isMuted);
+                if (window.mountainSound) window.mountainSound.mute(isMuted);
+                localStorage.setItem('hafizaGuvenMusicMuted', isMuted);
+            }
+        };
+
+        if (toggleMusicBtn) {
+            let savedMute = localStorage.getItem('hafizaGuvenMusicMuted') === 'true';
+            window.updateMusicMuteState(savedMute);
+
+            toggleMusicBtn.addEventListener('click', () => {
+                if (window.clickSound) window.clickSound.play();
+                let currentMute = window.bgMusic ? window.bgMusic.mute() : false;
+                window.updateMusicMuteState(!currentMute);
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader(!currentMute ? "Oyun müziği devre dışı bırakıldı." : "Oyun müziği etkinleştirildi.", true);
+                }
+            });
+        }
+
+        const toggleIntroBtn = document.getElementById('toggle-intro-btn');
+        window.updateIntroBtnState = () => {
+            let skipIntro = localStorage.getItem('hafizaGuvenSkipIntro') === 'true';
+            if (toggleIntroBtn) {
+                toggleIntroBtn.innerText = skipIntro ? "Başlangıçta logoyu atla (Açık)" : "Başlangıçta logoyu atla (Kapalı)";
+                toggleIntroBtn.setAttribute('aria-label', toggleIntroBtn.innerText);
+            }
+        };
+
+        if (toggleIntroBtn) {
+            window.updateIntroBtnState();
+            toggleIntroBtn.addEventListener('click', () => {
+                if (window.clickSound) window.clickSound.play();
+                let skipIntro = localStorage.getItem('hafizaGuvenSkipIntro') === 'true';
+                skipIntro = !skipIntro;
+                localStorage.setItem('hafizaGuvenSkipIntro', skipIntro);
+                window.updateIntroBtnState();
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader(skipIntro ? "Oyun açılışında logo atlanacak." : "Oyun açılışında logo atlanmayacak.", true);
+                }
+            });
+        }
     }
 
     // Store
