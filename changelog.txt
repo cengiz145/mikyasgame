@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.0.2] - Hotfix 2
+
+### Düzeltmeler:
+- Ayarlar menüsünde ses ve tema öğeleri üzerindeyken yukarı ve aşağı okların değer değiştirmesi tamamen engellendi ve sadece gezinme amaçlı kullanılması sağlandı. Değerler sadece sağ ve sol oklarla değiştirilebilecek.
+
 [v0.97.0.1] - Hotfix
 
 ### Düzeltmeler:

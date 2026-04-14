@@ -1,5 +1,5 @@
 {
-    "version": "0.97.0.1",
-    "buildId": 1780000010,
-    "changelog": "Ayarlar menüsünde özel ok tuşu dolaşma mantığı eklendi! Ayrıca arka plan sistem hataları giderildi."
+    "version": "0.97.0.2",
+    "buildId": 1780000020,
+    "changelog": "Ayarlar menüsündeki ok tuşu dolaşım mantığı kalıcı olarak düzeltildi."
 }
