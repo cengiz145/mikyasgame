@@ -175,6 +175,7 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'play-mode') buttons = Array.from(document.getElementById('play-mode-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'multiplayer-select') buttons = Array.from(document.getElementById('multiplayer-select-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'settings') buttons = Array.from(document.getElementById('settings-menu-container').querySelectorAll('.menu-button, input[type="range"], select'));
 
     return buttons.filter(btn => {
         const li = btn.closest('li');
@@ -1760,6 +1761,27 @@ document.addEventListener('keydown', function (event) {
 
         const activeButtons = window.getActiveButtons();
         if (activeButtons.length === 0) return;
+
+        const activeElem = document.activeElement;
+        
+        // Ayarlar menüsünde özel ok sağ/sol davranışı (sadece değer değiştir, menü dolaşma)
+        if (window.currentActiveMenu === 'settings' && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+            if (activeElem && activeElem.tagName === 'INPUT' && activeElem.type === 'range') {
+                return; // Natively handle range inputs (fire input/change)
+            }
+            if (activeElem && activeElem.tagName === 'SELECT') {
+                event.preventDefault();
+                let step = event.key === 'ArrowRight' ? 1 : -1;
+                let newIndex = activeElem.selectedIndex + step;
+                if (newIndex >= 0 && newIndex < activeElem.options.length) {
+                    activeElem.selectedIndex = newIndex;
+                    activeElem.dispatchEvent(new Event('change'));
+                }
+                return;
+            }
+            event.preventDefault();
+            return; // Butonlardaysak sol/sağ oklar hiçbir şey yapmasın.
+        }
 
         event.preventDefault();
 
