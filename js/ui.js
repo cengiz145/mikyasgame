@@ -45,6 +45,9 @@ window.guncellemeKontrolEt = function (isManual = false) {
                     return; // Ekranı silme işlemini iptal et
                 }
 
+                let p = document.getElementById('update-text');
+                if (p) p.innerText = "Yeni bir sürüm mevcut. Geçerli sürüm: " + window.mevcutSurum + ". Yeni sürüm: " + data.version + ". Yüklemek için enter tuşuna veya yükle butonuna basın.";
+
                 window.mevcutSurum = data.version;
 
                 window.gameIsActive = false;
@@ -877,9 +880,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateInstallBtn = document.getElementById('update-install-btn');
     if (updateInstallBtn) {
         updateInstallBtn.addEventListener('click', () => {
-            if (window.announceToScreenReader) window.announceToScreenReader("Güncelleme yükleniyor, sayfa yenilenecek...");
+            if (updateInstallBtn.disabled) return;
+            updateInstallBtn.disabled = true;
+            if (window.announceToScreenReader) window.announceToScreenReader("Güncelleme yükleniyor, sayfa yenilenecek...", true);
             setTimeout(() => {
-                window.location.href = window.location.pathname + "?v=" + new Date().getTime();
+                window.location.reload(true);
             }, 1000);
         });
     }
