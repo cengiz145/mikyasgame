@@ -1,5 +1,5 @@
 {
-    "version": "0.97.0.0",
-    "buildId": 1780000000,
-    "changelog": "Geliştirilmiş Ayarlar Menüsü! 7 farklı oyun teması, müzik/efekt ses düzeyleri, logo atlama ve daha fazlası. Bilgisayar için sekme klavye kısayolları eklendi."
+    "version": "0.97.0.1",
+    "buildId": 1780000010,
+    "changelog": "Ayarlar menüsünde özel ok tuşu dolaşma mantığı eklendi! Ayrıca arka plan sistem hataları giderildi."
 }

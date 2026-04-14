@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.0.1] - Hotfix
+
+### Düzeltmeler:
+- Ayarlar menüsünde özel tuş dolaşım mantığı aktif edildi. Öğeler arası (Yukarı/Aşağı), ayar değiştirmek (Sol/Sağ ok).
+
 [v0.97.0] - 2026-04-14
 
 ### Eklenenler / Değiştirilenler:
