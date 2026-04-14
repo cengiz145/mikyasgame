@@ -1688,7 +1688,15 @@ window.addEventListener('popstate', (e) => {
 // Menü içi ok tuşlarıyla gezinme işlevi
 document.addEventListener('keydown', function (event) {
     if (document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) {
-        return;
+        let allowThrough = false;
+        if (window.currentActiveMenu === 'settings' && (document.activeElement.type === 'range' || document.activeElement.tagName === 'SELECT')) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+                allowThrough = true; // Yön tuşlarının menü gezinmesi ve değer değiştirme mantığına inmesine izin ver
+            }
+        }
+        if (!allowThrough) {
+            return;
+        }
     }
 
     // Mağaza miktar belirleme ('+', '-', 'ArrowRight', 'ArrowLeft') ve Okuma (Sessiz Kasiyer Koruması)
