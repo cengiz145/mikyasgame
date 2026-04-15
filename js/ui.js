@@ -1753,6 +1753,13 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
+    // Seçenekler (Ayarlar) menüsünde yukarı/aşağı oklarıyla dolaşmayı iptal ederek "Tab" kullanımını (standart gezinme) zorla
+    if (window.currentActiveMenu === 'settings') {
+        if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            return;
+        }
+    }
+
     if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Enter'].includes(event.key)) {
         // Ok tuşlarıyla mesajı tekrar okuma ve Enter ile sessizce geçme mantığı
         if ((window.currentActiveMenu === 'story' && window.isDialogPhase) ||
