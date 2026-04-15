@@ -515,7 +515,10 @@ window.updateStatsDisplay = function() {
 
     let html = "";
     if (tokens === 0 && hk === 0 && zk === 0 && easyCount === 0 && mediumCount === 0 && hardCount === 0 && storyCount === 0) {
-        html = '<p tabindex="0" style="color: #ff4444; font-weight: bold; margin-top: 10px;">Hiç bir istatistiğe sahip değilsiniz.</p>';
+        html = '<div id="empty-stats-alert" tabindex="0" role="alert" aria-label="İstatistik sekmesi boş. Hiç bir istatistiğe sahip değilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boş. İstatistik bulunamadı.</div>';
+        if (window.announceToScreenReader && window.currentActiveMenu === 'stats') {
+            setTimeout(() => window.announceToScreenReader("Bu sekme boş. Henüz hiç bir istatistiğiniz bulunmuyor."), 300);
+        }
     } else {
         html = `
             <p><strong>Bakiye:</strong> ${tokens} Jeton</p>
@@ -581,18 +584,22 @@ window.renderSocialList = function() {
     const listEl = document.getElementById('social-player-list');
     if (!listEl) return;
 
+    let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
+
+    const emptyHtml = (myName !== "Misafir" && myName.trim() !== "") 
+        ? `<li tabindex="0" aria-label="Sadece sen varsın. ${myName} olarak çevrimiçisin." style="padding: 10px; border-radius: 8px; margin-bottom: 8px; background-color: rgba(0, 168, 132, 0.15); border-left: 4px solid #00a884; display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Çevrimiçi</span></li>`
+        : '<li tabindex="0" aria-label="Oyuncu listesi boş. Kimse yok.">bu sekme boş</li>';
+
     if (!window.lastPresenceData || Object.keys(window.lastPresenceData).length === 0) {
-        listEl.innerHTML = '<li tabindex="0">bu sekme boş</li>';
+        listEl.innerHTML = emptyHtml;
         return;
     }
 
     let players = Object.values(window.lastPresenceData);
     if (players.length === 0) {
-        listEl.innerHTML = '<li tabindex="0">bu sekme boş</li>';
+        listEl.innerHTML = emptyHtml;
         return;
     }
-
-    let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
 
     players.sort((a, b) => {
         if (a.state === 'online' && b.state !== 'online') return -1;
@@ -651,7 +658,7 @@ window.renderSocialList = function() {
     });
 
     if (!foundAny) {
-        listEl.innerHTML = '<li tabindex="0">bu sekme boş</li>';
+        listEl.innerHTML = emptyHtml;
     }
 };
 
