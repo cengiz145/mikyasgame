@@ -1005,7 +1005,12 @@ document.addEventListener('keydown', function (event) {
             return;
         }
         // Mevcut Tuş Kontrolü
-        const key = event.key.toLowerCase();
+        let key = event.key.toLowerCase();
+        let keyboardLayout = localStorage.getItem('hafizaGuvenKeyboardLayout') || 'alpha';
+        if (keyboardLayout === 'num') {
+            const numMap = {'1': 'a', '2': 'b', '3': 'c', '4': 'd', '5': 'e', '6': 'f', '7': 'g'};
+            if (numMap[key]) key = numMap[key];
+        }
         const validKeys = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
         if (validKeys.includes(key) && !event.repeat && !window.isDialogPhase) {
             if (window.playPianoNoteSingle) window.playPianoNoteSingle(key);
@@ -1014,7 +1019,12 @@ document.addEventListener('keydown', function (event) {
     }
 
     if (window.isStarted && window.currentActiveMenu === 'game') {
-        const key = event.key.toLowerCase();
+        let key = event.key.toLowerCase();
+        let keyboardLayout = localStorage.getItem('hafizaGuvenKeyboardLayout') || 'alpha';
+        if (keyboardLayout === 'num') {
+            const numMap = {'1': 'a', '2': 'b', '3': 'c', '4': 'd', '5': 'e', '6': 'f', '7': 'g'};
+            if (numMap[key]) key = numMap[key];
+        }
         if (!window.isGridWalkingPhase) {
             if (key === 's') {
                 event.preventDefault();

@@ -1211,6 +1211,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
+
+        const keyboardLayoutSelector = document.getElementById('keyboard-layout-selector');
+        if (keyboardLayoutSelector) {
+            keyboardLayoutSelector.addEventListener('keydown', blockUpDown);
+            let savedLayout = localStorage.getItem('hafizaGuvenKeyboardLayout') || 'alpha';
+            keyboardLayoutSelector.value = savedLayout;
+            
+            keyboardLayoutSelector.addEventListener('change', (e) => {
+                const newLayout = e.target.value;
+                localStorage.setItem('hafizaGuvenKeyboardLayout', newLayout);
+                if (window.announceToScreenReader) {
+                    let selText = e.target.options[e.target.selectedIndex].text;
+                    window.announceToScreenReader("Klavye düzeni değiştirildi: " + selText, true);
+                }
+            });
+        }
     }
 
     // Store
