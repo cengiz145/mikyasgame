@@ -1151,6 +1151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.storyBGM) window.storyBGM.mute(isMuted);
                 if (window.music60Sound) window.music60Sound.mute(isMuted);
                 if (window.music272Sound) window.music272Sound.mute(isMuted);
+                if (window.music117Sound) window.music117Sound.mute(isMuted);
                 if (window.house2Sound) window.house2Sound.mute(isMuted);
                 if (window.mountainSound) window.mountainSound.mute(isMuted);
                 localStorage.setItem('hafizaGuvenMusicMuted', isMuted);
@@ -1377,6 +1378,7 @@ document.addEventListener('DOMContentLoaded', () => {
         practiceBtnMain.addEventListener('click', () => {
             window.switchMenu(window.mainMenu, window.practiceMenu, 'practice');
             if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
+            if (window.music117Sound && !window.music117Sound.playing()) window.music117Sound.play();
 
             window.practiceTargetIndex = 0;
             window.practicePressCount = 0;
@@ -1399,6 +1401,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             window.inPracticeTutorial = false; // Eğitim durumunu güvenle kapat
             window.isDialogPhase = false; // Diyalogları sıfırla
+            if (window.music117Sound && window.music117Sound.playing()) window.music117Sound.stop();
 
             window.switchMenu(window.practiceMenu, window.mainMenu, 'main');
             if (window.bgMusic && !window.bgMusic.playing()) window.bgMusic.play();

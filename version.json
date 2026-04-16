@@ -1,5 +1,5 @@
 {
-    "version": "0.97.0.2",
-    "buildId": 1780000020,
-    "changelog": "Ayarlar menüsündeki ok tuşu dolaşım mantığı kalıcı olarak düzeltildi."
+    "version": "0.97.0.3",
+    "buildId": 1780000030,
+    "changelog": "Alıştırma modu yardım mesajları diyalog yapısına geçirildi ve music117 eklendi."
 }

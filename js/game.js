@@ -853,6 +853,10 @@ window.startPracticeNote = function() {
     const notes = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
     const statusText = document.getElementById('practice-status-text');
     
+    if (window.practiceTargetIndex === 0 && window.music117Sound && window.music117Sound.playing()) {
+        window.music117Sound.stop();
+    }
+    
     if (window.practiceTargetIndex < notes.length) {
         // Öğrenilecek nota varsa sor
         let currentNote = notes[window.practiceTargetIndex].toUpperCase();
@@ -1083,6 +1087,7 @@ document.addEventListener('keydown', function (event) {
             if (window.mountainSound) window.mountainSound.mute(setMute);
             if (window.music60Sound) window.music60Sound.mute(setMute);
             if (window.music272Sound) window.music272Sound.mute(setMute);
+            if (window.music117Sound) window.music117Sound.mute(setMute);
         }
 
         if (window.announceToScreenReader) {

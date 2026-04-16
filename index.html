@@ -47,7 +47,7 @@
                 için <strong>ENTER tuşuna basın</strong>.
             </p>
             <p id="intro-version-display" tabindex="0" style="margin-top: 20px; font-size: 1rem; color: #888;">
-                Sürüm: 0.97.0.2
+                Sürüm: 0.97.0.3
             </p>
         </div>
 
@@ -210,44 +210,11 @@
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('practice-instructions').focus(); } }, 10);">
+            onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('practice-status-text').focus(); } }, 10);">
         </div>
         <h1 id="practice-menu-title">Alıştırma Modu</h1>
 
-        <div id="practice-instructions"
-            style="text-align: left; font-size: 1rem; color: #dddddd; margin-bottom: 20px; line-height: 1.5; max-height: 40vh; overflow-y: auto; padding-right: 10px;"
-            tabindex="0">
-            <p style="margin-top: 0;">Merhaba! Bu oyunda amacınız, 30 saniye içerisinde bilgisayarın çaldığı
-                sesleri
-                doğru harf kombinasyonlarıyla eşleştirmektir.</p>
-            <p>Hangi sesin hangi harfe denk geldiğini öğrenmek için "Alıştırma Modu" seçeneğini
-                kullanabilirsiniz.
-                Alıştırma modunda notaların karşılıkları kısaca şöyledir:</p>
-            <ul style="list-style-type: none; padding-left: 10px; margin: 10px 0;">
-                <li>&#8226; Do notası için <strong>C</strong> tuşuna,</li>
-                <li>&#8226; Re notası için <strong>D</strong> tuşuna,</li>
-                <li>&#8226; Mi notası için <strong>E</strong> tuşuna,</li>
-                <li>&#8226; Fa notası için <strong>F</strong> tuşuna,</li>
-                <li>&#8226; Sol notası için <strong>G</strong> tuşuna,</li>
-                <li>&#8226; La notası için <strong>A</strong> tuşuna,</li>
-                <li>&#8226; Si notası için <strong>B</strong> tuşuna basmalısınız.</li>
-            </ul>
-            <p class="localize-inner">Alıştırmalara başlamadan hemen önce kontrolleri hatırlatalım. Menülerde
-                <strong>sağ ve sol ok tuşlarıyla gezinebilirsiniz</strong>. Seçim yapmak için <strong>entır tuşunu
-                    kullanabilirsiniz</strong>. Sesi <strong>Page Up ve Page Down tuşlarıyla</strong>
-                ayarlayabilirsiniz. Oyun içindeyken <strong>S tuşu</strong> ile skorunuzu, <strong>T tuşu</strong> ile
-                kalan sürenizi öğrenebilir, <strong>Boşluk tuşu</strong> ile bir saniye ceza karşılığında ses dizisini
-                tekrar dinleyebilirsiniz.
-            </p>
-            <p>Şimdi öğrenme vakti! Sistemi tanımak için sizden istenen tuşa 3 defa üst üste basın. 3 defa doğru
-                bastığınızda otomatik olarak bir sonraki notaya geçeceksiniz.</p>
-            <p>Eğer hangi tuşa basacağınızı unutur veya yanlış bir tuşa basarsanız, sistem size hangi tuşa
-                basmanız
-                gerektiğini belirten yardımcı bir mesajla yol gösterecektir.</p>
-            <p style="margin-bottom: 0;">Sakın alıştırma modunda hata yapmaktan korkmayın; burada ceza yok,
-                sadece
-                öğrenmek ve eğlenmek var!</p>
-        </div>
+
 
         <div id="practice-status-text" tabindex="0"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px;">
@@ -263,7 +230,7 @@
         </nav>
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('practice-instructions').focus(), 10);"></div>
+            onfocus="setTimeout(() => document.getElementById('practice-status-text').focus(), 10);"></div>
     </div>
 
     <!-- Hikaye Modu Menüsü -->
@@ -794,11 +761,11 @@
     <script src="sounds/howler.min.js"></script>
 
     <!-- Yardım, Alıştırma ve Motivasyon Mesajları için ayrı dosya -->
-    <script src="js/yardim.js?v=0.97.0.2"></script>
+    <script src="js/yardim.js?v=0.97.0.3"></script>
 
     <script>
-        window.UYGULAMA_SURUMU = "0.97.0.2";
-        const UYGULAMA_SURUMU = "0.97.0.2";
+        window.UYGULAMA_SURUMU = "0.97.0.3";
+        const UYGULAMA_SURUMU = "0.97.0.3";
     </script>
 
     <!-- Firebase CDN Bağlantıları (Sayfa Yüklenmesini Engellememesi İçin Sona Taşındı) -->
