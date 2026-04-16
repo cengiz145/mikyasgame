@@ -893,7 +893,10 @@ window.handlePracticeInput = function(key) {
             // Doğru ama henüz 3 olmadı
             if (window.practiceCorrectMessages) {
                 let msg = window.practiceCorrectMessages[Math.floor(Math.random() * window.practiceCorrectMessages.length)];
-                if (window.announceToScreenReader) window.announceToScreenReader(msg + " " + (3 - window.practicePressCount) + " kaldı.");
+                let fullMsg = msg + " " + (3 - window.practicePressCount) + " kaldı.";
+                if (window.announceToScreenReader) window.announceToScreenReader(fullMsg);
+                const statusText = document.getElementById('practice-status-text');
+                if (statusText) statusText.innerHTML = fullMsg;
             }
         }
     } else {
@@ -902,6 +905,8 @@ window.handlePracticeInput = function(key) {
         if (window.practiceWrongMessages) {
             let msg = window.practiceWrongMessages[Math.floor(Math.random() * window.practiceWrongMessages.length)];
             if (window.announceToScreenReader) window.announceToScreenReader(msg);
+            const statusText = document.getElementById('practice-status-text');
+            if (statusText) statusText.innerHTML = msg;
         }
     }
 };
@@ -1003,7 +1008,7 @@ document.addEventListener('keydown', function (event) {
 
     if (window.isStarted && window.currentActiveMenu === 'practice') {
         // Yeni Eklenen Enter (Diyalog) Kontrolü
-        if (window.isDialogPhase && event.key === 'Enter') {
+        if (window.isDialogPhase && event.key === 'Enter' && !event.repeat) {
             window.currentDialogIndex++;
             if (window.playCurrentDialog) window.playCurrentDialog();
             return;

@@ -1379,6 +1379,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.switchMenu(window.mainMenu, window.practiceMenu, 'practice');
             if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
             if (window.music117Sound && !window.music117Sound.playing()) window.music117Sound.play();
+            window.isStarted = true;
 
             window.practiceTargetIndex = 0;
             window.practicePressCount = 0;
@@ -1401,6 +1402,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             window.inPracticeTutorial = false; // Eğitim durumunu güvenle kapat
             window.isDialogPhase = false; // Diyalogları sıfırla
+            window.isStarted = false; // Oyunu / alıştırmayı sonlandır
             if (window.music117Sound && window.music117Sound.playing()) window.music117Sound.stop();
 
             window.switchMenu(window.practiceMenu, window.mainMenu, 'main');
@@ -1586,6 +1588,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.inStoryMode = true;
                 window.isDialogPhase = true;
                 window.currentStoryIndex = 0;
+                window.isStarted = true;
                 window.storyEntryTimeout = setTimeout(() => {
                     if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
                     if (window.triggerStoryAnimations) window.triggerStoryAnimations(0);

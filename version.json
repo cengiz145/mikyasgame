@@ -1,5 +1,5 @@
 {
-    "version": "0.97.0.3",
-    "buildId": 1780000030,
-    "changelog": "Alıştırma modu yardım mesajları diyalog yapısına geçirildi ve music117 eklendi."
+    "version": "0.97.0.4",
+    "buildId": 1780000040,
+    "changelog": "Alıştırma ve hikaye modunda diyalogların 'Enter' tuşuyla ilerlememesi sorunu ve motivasyon mesajlarının görsel olarak yansımaması sorunu düzeltildi."
 }
