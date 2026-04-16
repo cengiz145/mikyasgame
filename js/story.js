@@ -55,9 +55,6 @@ window.playCurrentStoryDialog = function() {
     let appendedText = window.missingNotesDialogues[window.currentStoryIndex];
 
     storyStatus.innerHTML = window.localizeText(appendedText.replace("Devam etmek için entıra basın.", "<strong>Devam etmek için entıra basın.</strong>"));
-    if (window.announceToScreenReader) {
-        window.announceToScreenReader(appendedText, true);
-    }
 };
 
 window.playAutomatedWalkingScene = function() {
@@ -419,7 +416,6 @@ window.handleStoryWalking = function(key) {
             const noteName = trNames[foundNote];
             
             statusString += ` (Burada ${noteName} notası var!)`;
-            srString += ` Ayağına sert bir şey takıldı. Burada ${noteName} notası var.`;
 
             if (window.pianoNotes && window.pianoNotes[foundNote]) {
                 window.pianoNotes[foundNote].volume(1.0);
@@ -428,7 +424,6 @@ window.handleStoryWalking = function(key) {
         }
 
         storyStatus.innerHTML = statusString;
-        if (window.announceToScreenReader) window.announceToScreenReader(srString);
     }
 };
 

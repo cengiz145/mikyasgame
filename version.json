@@ -1,5 +1,5 @@
 {
-    "version": "0.97.0.8",
-    "buildId": 1780000080,
-    "changelog": "Ayarlar menüsünde Tab tuşunun (form navigasyonu) engellenmesi sorunu düzeltildi ve Esc tuşu ile menüden çıkış işlevi eklendi."
+    "version": "0.97.0.9",
+    "buildId": 1780000090,
+    "changelog": "Alıştırma ve Hikaye modu durum metinlerine (Diyaloglar) aria-live=\"assertive\" ve role=\"alert\" native ARIA özellikleri eklendi. Ekran okuyucuların form (odak) kipindeyken diyalogları anında okumaması (ESC tuşuna basma zorunluluğu) sorunu çözüldü."
 }

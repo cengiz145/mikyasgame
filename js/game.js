@@ -838,7 +838,6 @@ window.playCurrentDialog = function() {
         if (window.currentDialogIndex < window.practiceDialogues.length) {
             let text = window.practiceDialogues[window.currentDialogIndex];
             if (statusText) statusText.innerHTML = window.localizeText ? window.localizeText(text) : text;
-            if (window.announceToScreenReader) window.announceToScreenReader(text);
         } else {
             window.isDialogPhase = false;
             window.inPracticeTutorial = true;
@@ -862,12 +861,10 @@ window.startPracticeNote = function() {
         let currentNote = notes[window.practiceTargetIndex].toUpperCase();
         let text = "Şimdi " + currentNote + " tuşuna 3 defa bas.";
         if (statusText) statusText.innerHTML = text;
-        if (window.announceToScreenReader) window.announceToScreenReader(text);
     } else {
         // Tüm notalar bittiyse tebrik et ve Geri butonunu göster
         let text = "Tebrikler! Tüm notaları öğrendiniz. Ana menüye dönmek için Geri butonunu kullanabilirsiniz.";
         if (statusText) statusText.innerHTML = text;
-        if (window.announceToScreenReader) window.announceToScreenReader(text);
         const practiceNav = document.getElementById('practice-nav');
         if (practiceNav) practiceNav.style.display = 'block';
         window.inPracticeTutorial = false;
@@ -894,7 +891,6 @@ window.handlePracticeInput = function(key) {
             if (window.practiceCorrectMessages) {
                 let msg = window.practiceCorrectMessages[Math.floor(Math.random() * window.practiceCorrectMessages.length)];
                 let fullMsg = msg + " " + (3 - window.practicePressCount) + " kaldı.";
-                if (window.announceToScreenReader) window.announceToScreenReader(fullMsg);
                 const statusText = document.getElementById('practice-status-text');
                 if (statusText) statusText.innerHTML = fullMsg;
             }
@@ -904,7 +900,6 @@ window.handlePracticeInput = function(key) {
         if (window.wrongSound) window.wrongSound.play();
         if (window.practiceWrongMessages) {
             let msg = window.practiceWrongMessages[Math.floor(Math.random() * window.practiceWrongMessages.length)];
-            if (window.announceToScreenReader) window.announceToScreenReader(msg);
             const statusText = document.getElementById('practice-status-text');
             if (statusText) statusText.innerHTML = msg;
         }

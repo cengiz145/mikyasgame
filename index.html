@@ -47,7 +47,7 @@
                 için <strong>ENTER tuşuna basın</strong>.
             </p>
             <p id="intro-version-display" tabindex="0" style="margin-top: 20px; font-size: 1rem; color: #888;">
-                Sürüm: 0.97.0.8
+                Sürüm: 0.97.0.9
             </p>
         </div>
 
@@ -205,18 +205,17 @@
 
 
 
-    <!-- Alıştırma Modu (Piyano) Menüsü -->
     <div id="practice-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('practice-status-text').focus(); } }, 10);">
+            onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } }, 10);">
         </div>
         <h1 id="practice-menu-title">Alıştırma Modu</h1>
 
 
 
-        <div id="practice-status-text" tabindex="0"
+        <div id="practice-status-text" role="alert" aria-live="assertive"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px;">
             <!-- Diyalog metni buraya gelecek -->
         </div>
@@ -230,7 +229,7 @@
         </nav>
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('practice-status-text').focus(), 10);"></div>
+            onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } }, 10);"></div>
     </div>
 
     <!-- Hikaye Modu Menüsü -->
@@ -241,7 +240,7 @@
             onfocus="setTimeout(() => { if(document.getElementById('mobile-enter-btn') && document.getElementById('mobile-enter-btn').offsetParent !== null) document.getElementById('mobile-enter-btn').focus(); }, 10);">
         </div>
         <h1 id="story-menu-title">Kayıp Notalar</h1>
-        <div id="story-status-text" tabindex="0"
+        <div id="story-status-text" role="alert" aria-live="assertive"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px;">
             <!-- Diyalog metni buraya gelecek -->
         </div>
@@ -761,23 +760,23 @@
     <script src="sounds/howler.min.js"></script>
 
     <!-- Yardım, Alıştırma ve Motivasyon Mesajları için ayrı dosya -->
-    <script src="js/yardim.js?v=0.97.0.8"></script>
+    <script src="js/yardim.js?v=0.97.0.9"></script>
 
     <script>
-        window.UYGULAMA_SURUMU = "0.97.0.8";
-        const UYGULAMA_SURUMU = "0.97.0.8";
+        window.UYGULAMA_SURUMU = "0.97.0.9";
+        const UYGULAMA_SURUMU = "0.97.0.9";
     </script>
 
     <!-- Firebase CDN Bağlantıları (Sayfa Yüklenmesini Engellememesi İçin Sona Taşındı) -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
 
-    <script src="js/firebase.js?v=0.97.0.8"></script>
-    <script src="js/audio.js?v=0.97.0.8"></script>
-    <script src="js/ui.js?v=0.97.0.8"></script>
-    <script src="js/story.js?v=0.97.0.8"></script>
-    <script src="js/game.js?v=0.97.0.8"></script>
-    <script src="js/pvp.js?v=0.97.0.8"></script>
+    <script src="js/firebase.js?v=0.97.0.9"></script>
+    <script src="js/audio.js?v=0.97.0.9"></script>
+    <script src="js/ui.js?v=0.97.0.9"></script>
+    <script src="js/story.js?v=0.97.0.9"></script>
+    <script src="js/game.js?v=0.97.0.9"></script>
+    <script src="js/pvp.js?v=0.97.0.9"></script>
 </body>
 
 </html>
