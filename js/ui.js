@@ -1152,6 +1152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.music60Sound) window.music60Sound.mute(isMuted);
                 if (window.music272Sound) window.music272Sound.mute(isMuted);
                 if (window.music117Sound) window.music117Sound.mute(isMuted);
+                if (window.music38Sound) window.music38Sound.mute(isMuted);
                 if (window.house2Sound) window.house2Sound.mute(isMuted);
                 if (window.mountainSound) window.mountainSound.mute(isMuted);
                 localStorage.setItem('hafizaGuvenMusicMuted', isMuted);

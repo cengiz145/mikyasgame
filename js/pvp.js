@@ -63,6 +63,9 @@ window.PvP = {
 
         if (window.announceToScreenReader) window.announceToScreenReader("Rakip bekleniyor. Lütfen bekleyiniz.");
 
+        if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
+        if (window.music38Sound && !window.music38Sound.playing()) window.music38Sound.play();
+
         // Odaya biri katıldı mı diye dinle
         this.matchRef = window.db.ref('matches/' + this.matchId);
         this.matchRef.on('value', (snapshot) => {
@@ -117,6 +120,8 @@ window.PvP = {
                 if (statusText) statusText.innerHTML = "Şuan halihazırda açılmış bir maç yok.<br>Lütfen yeni maç oluşturun.";
                 if (window.announceToScreenReader) window.announceToScreenReader("Şuan halihazırda açılmış bir maç yok. Lütfen geri dönerek maç oluşturun.");
                 
+                if (window.music38Sound && window.music38Sound.playing()) window.music38Sound.stop();
+
                 if (shouldOpenMenu && window.switchMenu && window.pvpRoomsMenu && window.multiplayerSelectMenu) {
                     window.switchMenu(window.multiplayerSelectMenu, window.pvpRoomsMenu, 'pvp-rooms');
                 }
@@ -197,6 +202,9 @@ window.PvP = {
     cancelQueue: function() {
         this.isSearching = false;
         
+        if (window.music38Sound && window.music38Sound.playing()) window.music38Sound.stop();
+        if (window.bgMusic && !window.bgMusic.playing() && window.currentActiveMenu !== 'game' && window.currentActiveMenu !== 'story') window.bgMusic.play();
+
         if (this.botQueueTimer) {
             clearTimeout(this.botQueueTimer);
             this.botQueueTimer = null;
@@ -246,6 +254,7 @@ window.PvP = {
             window.db.ref('matches/' + this.matchId).onDisconnect().update({ status: 'finished', clientFinished: true });
         }
 
+        if (window.music38Sound && window.music38Sound.playing()) window.music38Sound.stop();
         if (window.correctSound) window.correctSound.play();
         
         let anonsMesaji = this.isBotMode ? 
@@ -295,6 +304,9 @@ window.PvP = {
             botBtn.setAttribute('aria-label', 'Uygun bir yapay zeka rakibi aranıyor. İptal etmek için tekrar tıklayın.');
         }
         if (window.announceToScreenReader) window.announceToScreenReader("Uygun bir yapay zeka rakibi aranıyor. Lütfen bekleyin.");
+
+        if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
+        if (window.music38Sound && !window.music38Sound.playing()) window.music38Sound.play();
 
         // Ortalama 12-16 saniye arası yapay bekleme süresi
         let waitTime = Math.floor(Math.random() * 4000) + 12000;
