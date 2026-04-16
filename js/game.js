@@ -978,7 +978,7 @@ window.handlePracticeInput = function(key) {
 
 document.addEventListener('keydown', function (event) {
     if (event.key === 'Tab') {
-        if (window.currentActiveMenu === 'feedback' || window.currentActiveMenu === 'server-message' || window.isChatOpen) {
+        if (window.currentActiveMenu === 'feedback' || window.currentActiveMenu === 'server-message' || window.currentActiveMenu === 'settings' || window.isChatOpen) {
         } else {
             event.preventDefault();
             return;

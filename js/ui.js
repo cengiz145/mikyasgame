@@ -1685,7 +1685,8 @@ document.addEventListener('keydown', (e) => {
             'stats': 'stats-back-btn',
             'play-mode': 'play-mode-back-btn',
             'multiplayer-select': 'multiplayer-select-back-btn',
-            'pvp-rooms': 'pvp-rooms-back-btn'
+            'pvp-rooms': 'pvp-rooms-back-btn',
+            'settings': 'settings-back-btn'
         };
 
         if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {

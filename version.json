@@ -1,5 +1,5 @@
 {
-    "version": "0.97.0.7",
-    "buildId": 1780000070,
-    "changelog": "Tarayıcı önbellek (cache) sorunu çözüldü. Javascript dosyalarının versiyonları güncellendi, ui ve diğer eklenen menü müzikleri senkronize kılındı."
+    "version": "0.97.0.8",
+    "buildId": 1780000080,
+    "changelog": "Ayarlar menüsünde Tab tuşunun (form navigasyonu) engellenmesi sorunu düzeltildi ve Esc tuşu ile menüden çıkış işlevi eklendi."
 }
