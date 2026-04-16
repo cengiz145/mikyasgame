@@ -943,6 +943,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnHome) {
         btnHome.addEventListener('click', () => {
             if (window.currentActiveMenu !== 'main') {
+                if (window.currentActiveMenu === 'store') {
+                    if (window.music25Sound && window.music25Sound.playing()) window.music25Sound.stop();
+                    if (window.bgMusic && !window.bgMusic.playing()) window.bgMusic.play();
+                }
                 window.switchMenu(getMenuEl(window.currentActiveMenu), window.mainMenu, 'main');
                 updateActiveTab('nav-btn-home');
                 if (window.clickSound) window.clickSound.play();
@@ -954,6 +958,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnSocial) {
         btnSocial.addEventListener('click', () => {
             if (window.currentActiveMenu !== 'social') {
+                if (window.currentActiveMenu === 'store') {
+                    if (window.music25Sound && window.music25Sound.playing()) window.music25Sound.stop();
+                    if (window.bgMusic && !window.bgMusic.playing()) window.bgMusic.play();
+                }
                 window.switchMenu(getMenuEl(window.currentActiveMenu), window.socialMenu, 'social');
                 updateActiveTab('nav-btn-social');
                 if (window.renderSocialList) window.renderSocialList();
@@ -966,6 +974,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnProfile) {
         btnProfile.addEventListener('click', () => {
             if (window.currentActiveMenu !== 'profile') {
+                if (window.currentActiveMenu === 'store') {
+                    if (window.music25Sound && window.music25Sound.playing()) window.music25Sound.stop();
+                    if (window.bgMusic && !window.bgMusic.playing()) window.bgMusic.play();
+                }
                 let playerName = localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
                 let nameEl = document.getElementById('profile-player-name');
                 if (nameEl) nameEl.innerText = playerName;
@@ -982,6 +994,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // PC Sekme Geçiş Kısayolları (Alt + 1, Alt + 2, Alt + 3)
     document.addEventListener('keydown', (e) => {
+        const safeMenus = ['main', 'profile', 'social', 'scoreboard', 'stats', 'achievements', 'store', 'play-mode', 'difficulty', 'settings'];
+        if (!safeMenus.includes(window.currentActiveMenu)) return;
+
         if (e.altKey && e.key === '1') {
             e.preventDefault();
             if (btnHome) btnHome.click();
@@ -1153,6 +1168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.music272Sound) window.music272Sound.mute(isMuted);
                 if (window.music117Sound) window.music117Sound.mute(isMuted);
                 if (window.music38Sound) window.music38Sound.mute(isMuted);
+                if (window.music25Sound) window.music25Sound.mute(isMuted);
                 if (window.house2Sound) window.house2Sound.mute(isMuted);
                 if (window.mountainSound) window.mountainSound.mute(isMuted);
                 localStorage.setItem('hafizaGuvenMusicMuted', isMuted);
@@ -1236,11 +1252,17 @@ document.addEventListener('DOMContentLoaded', () => {
         storeBtnMain.addEventListener('click', () => {
             window.lastFocusedElement = document.activeElement;
             window.switchMenu(window.mainMenu, window.storeMenu, 'store');
+            
+            if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
+            if (window.music25Sound && !window.music25Sound.playing()) window.music25Sound.play();
             document.getElementById('main-menu-container').setAttribute('aria-hidden', 'true');
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
             if (window.announceToScreenReader) window.announceToScreenReader(`Mağazaya hoş geldiniz. Mevcut jetonunuz: ${totalTokens}`);
         });
         storeBackBtn.addEventListener('click', () => {
+            if (window.music25Sound && window.music25Sound.playing()) window.music25Sound.stop();
+            if (window.bgMusic && !window.bgMusic.playing()) window.bgMusic.play();
+
             window.switchMenu(window.storeMenu, window.mainMenu, 'main');
             document.getElementById('main-menu-container').removeAttribute('aria-hidden');
             setTimeout(() => {

@@ -1,5 +1,5 @@
 {
-    "version": "0.97.0.5",
-    "buildId": 1780000050,
-    "changelog": "PvP ve Bota Karşı Oyna eşleşme aranırken music38 eklendi. Geri tuşuna basıldığında müzik kapatma sistemi güçlendirildi."
+    "version": "0.97.0.6",
+    "buildId": 1780000060,
+    "changelog": "Mağaza menüsüne özel müzik (music25) eklendi ve tüm navigasyon kısayollarıyla güvenli müzik geçişi sağlandı."
 }

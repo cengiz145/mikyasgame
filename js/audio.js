@@ -103,6 +103,12 @@ window.music38Sound = new Howl({
     volume: 0.7
 });
 
+window.music25Sound = new Howl({
+    src: ['sounds/music25.ogg'],
+    loop: true,
+    volume: 0.7
+});
+
 window.snowStepSounds = [
     new Howl({ src: ['sounds/snow_wetstep1.ogg'], volume: 1.0 }),
     new Howl({ src: ['sounds/snow_wetstep2.ogg'], volume: 1.0 }),

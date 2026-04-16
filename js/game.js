@@ -1094,6 +1094,7 @@ document.addEventListener('keydown', function (event) {
             if (window.music272Sound) window.music272Sound.mute(setMute);
             if (window.music117Sound) window.music117Sound.mute(setMute);
             if (window.music38Sound) window.music38Sound.mute(setMute);
+            if (window.music25Sound) window.music25Sound.mute(setMute);
         }
 
         if (window.announceToScreenReader) {
