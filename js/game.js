@@ -1056,18 +1056,52 @@ document.addEventListener('keydown', function (event) {
         }
     }
 
-    if (event.key === 'PageUp') {
+    if (event.key === 'Home') {
         event.preventDefault();
         let currentVolume = Howler.volume();
         Howler.volume(Math.min(1.0, currentVolume + 0.05));
-        if (window.announceToScreenReader) window.announceToScreenReader('Ses: ' + Math.round(Howler.volume() * 100), false);
+        if (window.announceToScreenReader) window.announceToScreenReader('Genel Ses: %' + Math.round(Howler.volume() * 100), false);
+        return;
+    }
+    if (event.key === 'End') {
+        event.preventDefault();
+        let currentVolume = Howler.volume();
+        Howler.volume(Math.max(0.0, currentVolume - 0.05));
+        if (window.announceToScreenReader) window.announceToScreenReader('Genel Ses: %' + Math.round(Howler.volume() * 100), false);
+        return;
+    }
+    if (event.key === 'PageUp') {
+        event.preventDefault();
+        let currentMusicVolume = localStorage.getItem('hafizaGuvenMusicVolume');
+        currentMusicVolume = currentMusicVolume !== null ? parseInt(currentMusicVolume) : 100;
+        currentMusicVolume = Math.min(100, currentMusicVolume + 5);
+        localStorage.setItem('hafizaGuvenMusicVolume', currentMusicVolume);
+        
+        if (window.setMusicVolume) window.setMusicVolume(currentMusicVolume);
+        
+        let slider = document.getElementById('music-volume-slider');
+        if (slider) slider.value = currentMusicVolume;
+        let display = document.getElementById('music-volume-display');
+        if (display) display.innerText = '%' + currentMusicVolume;
+
+        if (window.announceToScreenReader) window.announceToScreenReader('Müzik Sesi: %' + currentMusicVolume, false);
         return;
     }
     if (event.key === 'PageDown') {
         event.preventDefault();
-        let currentVolume = Howler.volume();
-        Howler.volume(Math.max(0.0, currentVolume - 0.05));
-        if (window.announceToScreenReader) window.announceToScreenReader('Ses: ' + Math.round(Howler.volume() * 100), false);
+        let currentMusicVolume = localStorage.getItem('hafizaGuvenMusicVolume');
+        currentMusicVolume = currentMusicVolume !== null ? parseInt(currentMusicVolume) : 100;
+        currentMusicVolume = Math.max(0, currentMusicVolume - 5);
+        localStorage.setItem('hafizaGuvenMusicVolume', currentMusicVolume);
+        
+        if (window.setMusicVolume) window.setMusicVolume(currentMusicVolume);
+        
+        let slider = document.getElementById('music-volume-slider');
+        if (slider) slider.value = currentMusicVolume;
+        let display = document.getElementById('music-volume-display');
+        if (display) display.innerText = '%' + currentMusicVolume;
+
+        if (window.announceToScreenReader) window.announceToScreenReader('Müzik Sesi: %' + currentMusicVolume, false);
         return;
     }
 
