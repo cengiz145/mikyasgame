@@ -18,8 +18,13 @@ window.hoverSound = new Howl({
     volume: 0.5
 });
 
-window.clickSound = new Howl({
-    src: ['sounds/menu-tikla.ogg'],
+window.menuEnterSound = new Howl({
+    src: ['sounds/menuenter17.ogg'],
+    volume: 0.5
+});
+
+window.menuCloseSound = new Howl({
+    src: ['sounds/menuclose.ogg'],
     volume: 0.5
 });
 
@@ -27,7 +32,8 @@ window.clickSound = new Howl({
 const isMobileLocal = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
 if (isMobileLocal) {
     window.hoverSound.volume(0);
-    window.clickSound.volume(0);
+    window.menuEnterSound.volume(0);
+    window.menuCloseSound.volume(0);
 }
 
 window.correctSound = new Howl({
@@ -212,7 +218,8 @@ window.updatePan = function (index, total) {
         xPos = (index / (total - 1)) * 2 - 1;
     }
     window.hoverSound.stereo ? window.hoverSound.stereo(xPos) : window.hoverSound.pos(xPos, 0, 0);
-    window.clickSound.stereo ? window.clickSound.stereo(0) : window.clickSound.pos(0, 0, 0); // Tıklama sesi her zaman merkezde sabitlendi
+    window.menuEnterSound.stereo ? window.menuEnterSound.stereo(0) : window.menuEnterSound.pos(0, 0, 0); // Tıklama sesi her zaman merkezde sabitlendi
+    window.menuCloseSound.stereo ? window.menuCloseSound.stereo(0) : window.menuCloseSound.pos(0, 0, 0);
 };
 
 window.playPianoNoteSingle = function (key) {

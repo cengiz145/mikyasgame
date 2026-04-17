@@ -802,7 +802,7 @@ window.addEventListener('load', () => {
 
         clickCount++;
         if (clickCount === 1) {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuEnterSound) window.menuEnterSound.play();
             const ver = window.mevcutSurum || localStorage.getItem('lastSeenChangelogVersion') || "Bilinmiyor";
             const vText = "Versiyon: " + ver;
 
@@ -909,7 +909,7 @@ window.handlePracticeInput = function(key) {
     const exitBtn = document.getElementById('exit-btn');
     if (exitBtn) {
         exitBtn.addEventListener('click', function () {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuCloseSound) window.menuCloseSound.play();
             if (window.announceToScreenReader) window.announceToScreenReader('Oyun kapatılıyor. Lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
             
             setTimeout(() => { 
@@ -1141,13 +1141,13 @@ document.addEventListener('keydown', function (event) {
 
     if (event.key === 'Enter') {
         if (window.currentActiveMenu === 'achievements') {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuCloseSound) window.menuCloseSound.play();
             if (window.switchMenu && window.achievementsMenu && window.mainMenu) window.switchMenu(window.achievementsMenu, window.mainMenu, 'main');
             return;
         }
 
         if (!window.gameIsActive && window.currentActiveMenu === 'game') {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuCloseSound) window.menuCloseSound.play();
             if (window.switchMenu && window.mainMenu) window.switchMenu(document.getElementById('game-menu-container'), window.mainMenu, 'main');
             return;
         }
@@ -1155,7 +1155,7 @@ document.addEventListener('keydown', function (event) {
         if (window.isStarted && window.currentActiveMenu === 'story' && window.inStoryMode) {
             if (window.isGridWalkingPhase) return;
             
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuEnterSound) window.menuEnterSound.play();
             window.currentStoryIndex++;
             
             if (window.missingNotesDialogues && window.currentStoryIndex < window.missingNotesDialogues.length) {

@@ -758,8 +758,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (index !== -1) {
                 if (window.updatePan) window.updatePan(index, activeButtons.length);
             }
-            if (window.isStarted && window.clickSound) {
-                window.clickSound.play();
+            if (window.isStarted) {
+                if (button.id && (button.id.includes('-back-') || button.id === 'nav-btn-home' || button.id === 'mobile-exit-btn')) {
+                    if (window.menuCloseSound) window.menuCloseSound.play();
+                } else {
+                    if (window.menuEnterSound) window.menuEnterSound.play();
+                }
             }
         });
     });
@@ -787,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (gameBackBtn) {
         gameBackBtn.addEventListener('click', () => {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuCloseSound) window.menuCloseSound.play();
             window.gameIsActive = false;
             window.isStarted = false;
             window.isComputerPlaying = false;
@@ -820,7 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const storyBackBtn = document.getElementById('story-back-btn');
     if (storyBackBtn) {
         storyBackBtn.addEventListener('click', () => {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuCloseSound) window.menuCloseSound.play();
             if (window.quitStoryMode) window.quitStoryMode();
             if (window.switchMenu && window.storyMenu && window.mainMenu) {
                 window.switchMenu(window.storyMenu, window.mainMenu, 'main');
@@ -894,7 +898,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // İstatistikler Menüsü Kontrolleri
     if (statsBtnMain) {
         statsBtnMain.addEventListener('click', () => {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuEnterSound) window.menuEnterSound.play();
             if (window.updateStatsDisplay) window.updateStatsDisplay();
             if (window.switchMenu && window.mainMenu && window.statsMenu) {
                 window.switchMenu(window.mainMenu, window.statsMenu, 'stats');
@@ -905,7 +909,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (statsBackBtn) {
         statsBackBtn.addEventListener('click', () => {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuCloseSound) window.menuCloseSound.play();
             if (window.switchMenu && window.mainMenu && window.statsMenu) {
                 window.switchMenu(window.statsMenu, window.mainMenu, 'main');
             }
@@ -943,7 +947,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 window.switchMenu(getMenuEl(window.currentActiveMenu), window.mainMenu, 'main');
                 updateActiveTab('nav-btn-home');
-                if (window.clickSound) window.clickSound.play();
+                if (window.menuCloseSound) window.menuCloseSound.play();
                 if (window.announceToScreenReader) window.announceToScreenReader("Ana menü");
             }
         });
@@ -959,7 +963,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.switchMenu(getMenuEl(window.currentActiveMenu), window.socialMenu, 'social');
                 updateActiveTab('nav-btn-social');
                 if (window.renderSocialList) window.renderSocialList();
-                if (window.clickSound) window.clickSound.play();
+                if (window.menuEnterSound) window.menuEnterSound.play();
                 if (window.announceToScreenReader) window.announceToScreenReader("Sosyal menüsü");
             }
         });
@@ -980,7 +984,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 window.switchMenu(getMenuEl(window.currentActiveMenu), window.profileMenu, 'profile');
                 updateActiveTab('nav-btn-profile');
-                if (window.clickSound) window.clickSound.play();
+                if (window.menuEnterSound) window.menuEnterSound.play();
                 if (window.announceToScreenReader) window.announceToScreenReader("Profil menüsü");
             }
         });
@@ -1022,13 +1026,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (settingsBtnMain && settingsBackBtn) {
         settingsBtnMain.addEventListener('click', () => {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuEnterSound) window.menuEnterSound.play();
             window.switchMenu(window.mainMenu, settingsMenuContainer, 'settings');
             if (window.announceToScreenReader) window.announceToScreenReader("Ayarlar menüsü");
         });
         
         const goBackToMenu = () => {
-            if (window.clickSound) window.clickSound.play();
+            if (window.menuCloseSound) window.menuCloseSound.play();
             window.switchMenu(settingsMenuContainer, window.mainMenu, 'main');
         };
 
@@ -1094,7 +1098,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isMobileLocal = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
             if (!isMobileLocal) {
                 if (window.hoverSound) window.hoverSound.volume(0.5 * scale);
-                if (window.clickSound) window.clickSound.volume(0.5 * scale);
+                if (window.menuEnterSound) window.menuEnterSound.volume(0.5 * scale);
+                if (window.menuCloseSound) window.menuCloseSound.volume(0.5 * scale);
             }
             if (window.correctSound) window.correctSound.volume(1.0 * scale);
             if (window.wrongSound) window.wrongSound.volume(1.0 * scale);
@@ -1179,7 +1184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.updateMusicMuteState(savedMute);
 
             toggleMusicBtn.addEventListener('click', () => {
-                if (window.clickSound) window.clickSound.play();
+                if (window.menuEnterSound) window.menuEnterSound.play();
                 let currentMute = window.bgMusic ? window.bgMusic.mute() : false;
                 window.updateMusicMuteState(!currentMute);
                 if (window.announceToScreenReader) {
@@ -1200,7 +1205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (toggleIntroBtn) {
             window.updateIntroBtnState();
             toggleIntroBtn.addEventListener('click', () => {
-                if (window.clickSound) window.clickSound.play();
+                if (window.menuEnterSound) window.menuEnterSound.play();
                 let skipIntro = localStorage.getItem('hafizaGuvenSkipIntro') === 'true';
                 skipIntro = !skipIntro;
                 localStorage.setItem('hafizaGuvenSkipIntro', skipIntro);
@@ -1655,7 +1660,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const pBtn = document.getElementById('practice-back-btn');
                     if (pBtn) pBtn.click();
                 } else if (window.currentActiveMenu === 'story') {
-                    if (window.clickSound) window.clickSound.play();
+                    if (window.menuCloseSound) window.menuCloseSound.play();
                     if (window.quitStoryMode) window.quitStoryMode();
 
                     if (window.switchMenu && window.storyMenu && window.mainMenu) {
@@ -2662,7 +2667,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnMute.setAttribute('aria-label', isMuted ? "Kullanıcının susturmasını kaldır" : "Kullanıcıyı sustur");
         }
 
-        if (window.clickSound) window.clickSound.play();
+        if (window.menuEnterSound) window.menuEnterSound.play();
         actionModal.style.display = 'flex';
         actionModal.removeAttribute('aria-hidden');
         setTimeout(() => {
@@ -2678,7 +2683,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.closeSocialActionModal = function() {
         if (!actionModal) return;
-        if (window.clickSound) window.clickSound.play();
+        if (window.menuEnterSound) window.menuEnterSound.play();
         actionModal.style.opacity = '0';
         setTimeout(() => {
             actionModal.style.display = 'none';
@@ -2757,7 +2762,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let roomId = getPrivateRoomId(myName, currentPrivateRecipient);
         privateChatListenerRef = window.db.ref(`privateChats/${roomId}`);
 
-        if (window.clickSound) window.clickSound.play();
+        if (window.menuEnterSound) window.menuEnterSound.play();
 
         privateChatListenerRef.on('child_added', (snapshot) => {
             let msg = snapshot.val();
@@ -2806,7 +2811,7 @@ document.addEventListener('DOMContentLoaded', () => {
             privateChatListenerRef = null;
         }
         currentPrivateRecipient = null;
-        if (window.clickSound) window.clickSound.play();
+        if (window.menuEnterSound) window.menuEnterSound.play();
     };
 
     if (privateChatCloseBtn) privateChatCloseBtn.addEventListener('click', window.closePrivateChat);
