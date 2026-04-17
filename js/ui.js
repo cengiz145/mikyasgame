@@ -358,6 +358,7 @@ window.announceToScreenReader = function (text, forceFocus = false) {
             window.announcerToggle = !window.announcerToggle;
             let finalOutput = text + (window.announcerToggle ? '\u200B' : '');
             liveAnnouncer.textContent = finalOutput;
+        }
     } else {
         // PC'de doğrudan Odaklanarak okutma (Eski kararlı yöntem)
         // DOM'da asılı kalmış TÜM eski anonsları acımasızca temizle (Garbage Collection)
