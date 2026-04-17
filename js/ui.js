@@ -2627,15 +2627,7 @@ document.addEventListener('DOMContentLoaded', () => {
 //     }
 // });
 
-// --- GÖREV 1: KATI TAB TUŞU YASAKLAMASI (SIKIYÖNETİM) ---
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'Tab') {
-        const activeTag = document.activeElement ? document.activeElement.tagName : '';
-        if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA' && activeTag !== 'SELECT') {
-            event.preventDefault(); // Varsayılan sekmeyi felç et
-        }
-    }
-}, true); // Yakalama (capture) evresinde, diğer tüm script'lerden önce tetiklenir
+// --- GÖREV 1 Kaldırıldı (Tab yönetimi game.js'deki exception'lar ile yapılıyor) ---
 
 // --- ÖZEL MESAJLAŞMA (PRIVATE CHAT) VE KULLANICI İŞLEM MENÜSÜ ---
 document.addEventListener('DOMContentLoaded', () => {
