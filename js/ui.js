@@ -353,18 +353,11 @@ window.announceToScreenReader = function (text, forceFocus = false) {
             }
             window.announcerTimeouts = [];
 
-            // Ekran okuyucuların aynı metni tekrar okuması için içeriği anlık olarak temizle ve yeniden bas
-            liveAnnouncer.textContent = ''; 
-            setTimeout(() => {
-                liveAnnouncer.textContent = text;
-            }, 50);
-
-            // Yeni zamanlayıcıyı kur ve hafızaya kaydet
-            let tId = setTimeout(() => {
-                liveAnnouncer.textContent = '';
-            }, 10000);
-            window.announcerTimeouts.push(tId);
-        }
+            // Ekran okuyucuların "boş" demesini engellemek için içeriği SİLMİYORUZ.
+            // Bunun yerine, aynı metin arka arkaya gelirse, sonuna okunamayan sıfır genişlikli boşluk (zero-width space) ekliyoruz.
+            window.announcerToggle = !window.announcerToggle;
+            let finalOutput = text + (window.announcerToggle ? '\u200B' : '');
+            liveAnnouncer.textContent = finalOutput;
     } else {
         // PC'de doğrudan Odaklanarak okutma (Eski kararlı yöntem)
         // DOM'da asılı kalmış TÜM eski anonsları acımasızca temizle (Garbage Collection)
