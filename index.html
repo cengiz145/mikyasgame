@@ -47,7 +47,7 @@
                 için <strong>ENTER tuşuna basın</strong>.
             </p>
             <p id="intro-version-display" tabindex="0" style="margin-top: 20px; font-size: 1rem; color: #888;">
-                Sürüm: 0.97.1.1
+                Sürüm: 0.97.1.2
             </p>
         </div>
 
@@ -76,7 +76,7 @@
 
 
         <!-- aria-labelledby ile nav bölgesini başlıkla ilişkilendiriyoruz -->
-        <nav class="menu-nav" role="application" aria-labelledby="main-menu-title">
+        <nav class="menu-nav"   aria-labelledby="main-menu-title">
             <ul>
                 <li>
                     <button id="start-game-btn" class="menu-button" aria-label="Oyuna Başla">Oyuna
@@ -152,7 +152,7 @@
 
         <div id="difficulty-status-text" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
-        <nav class="menu-nav" role="application" aria-label="Zorluk Seviyeleri">
+        <nav class="menu-nav"   aria-label="Zorluk Seviyeleri">
             <ul>
                 <li><button class="menu-button" id="btn-diff-easy">Kolay Mod</button></li>
                 <li id="li-diff-medium" style="display: none;"><button class="menu-button" id="btn-diff-medium">Orta
@@ -176,7 +176,7 @@
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('scoreboard-back-btn').focus(), 10);"></div>
         <h1 id="scoreboard-menu-title">Skor Tablosu</h1>
-        <nav class="menu-nav" role="application" aria-labelledby="scoreboard-menu-title">
+        <nav class="menu-nav"   aria-labelledby="scoreboard-menu-title">
             <ul>
                 <li>
                     <button id="btn-score-easy" class="menu-button" aria-label="Kolay Mod">Kolay Mod</button>
@@ -283,7 +283,7 @@
             </div>
         </div>
 
-        <nav class="menu-nav" role="application" aria-labelledby="store-menu-title">
+        <nav class="menu-nav"   aria-labelledby="store-menu-title">
             <ul id="store-button-list">
                 <li>
                     <button id="buy-shield-btn" class="menu-button"
@@ -317,7 +317,7 @@
             <!-- İstatistik verileri dinamik eklenecek -->
         </div>
 
-        <nav class="menu-nav" role="application" aria-labelledby="stats-menu-title">
+        <nav class="menu-nav"   aria-labelledby="stats-menu-title">
             <ul>
                 <li>
                     <button id="stats-back-btn" class="menu-button" aria-label="Geri">Geri</button>
@@ -377,7 +377,7 @@
                 </form>
             </div>
 
-            <nav class="menu-nav" role="application" aria-labelledby="feedback-menu-title">
+            <nav class="menu-nav"   aria-labelledby="feedback-menu-title">
                 <ul>
                     <li>
                         <button id="feedback-submit-btn" class="menu-button" aria-label="Gönder">Gönder</button>
@@ -449,7 +449,7 @@
             </div>
         </div>
 
-        <nav class="menu-nav" role="application" aria-labelledby="settings-menu-title">
+        <nav class="menu-nav"   aria-labelledby="settings-menu-title">
             <ul>
                 <li>
                     <button id="settings-save-btn" class="menu-button" aria-label="Ayarları Kaydet">Ayarları Kaydet</button>
@@ -459,9 +459,9 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
+        <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('settings-back-btn').focus(), 10);"></div>
+            onfocus="setTimeout(() => document.getElementById('music-volume-slider').focus(), 10);"></div>
     </div>
 
     <!-- Güncelleme (Update) Menüsü -->
@@ -478,7 +478,7 @@
                 <p id="update-text">Yeni bir sürüm mevcut. Sürümler denetleniyor...</p>
             </div>
 
-            <nav class="menu-nav" role="application" aria-labelledby="update-menu-title">
+            <nav class="menu-nav"   aria-labelledby="update-menu-title">
                 <ul>
                     <li>
                         <button id="update-install-btn" class="menu-button" aria-label="Yükle ve Yenile"
@@ -507,7 +507,7 @@
                 <p id="server-message-text">Güncelleme notları yükleniyor...</p>
             </div>
 
-            <nav class="menu-nav" role="application" aria-labelledby="server-message-title">
+            <nav class="menu-nav"   aria-labelledby="server-message-title">
                 <ul>
                     <li>
                         <button id="server-message-continue-btn" class="menu-button" aria-label="Anladım, Devam Et"
@@ -535,7 +535,7 @@
             <!-- Dinamik içerik eklenecek -->
         </div>
 
-        <nav class="menu-nav" role="application" aria-labelledby="achievements-menu-title">
+        <nav class="menu-nav"   aria-labelledby="achievements-menu-title">
             <ul>
                 <li>
                     <button id="achievements-back-btn" class="menu-button" aria-label="Geri">Geri</button>
@@ -554,7 +554,7 @@
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('play-mode-back-btn').focus(), 10);"></div>
         <h1 id="play-mode-title">Oyun Modu Seçimi</h1>
-        <nav class="menu-nav" role="application" aria-labelledby="play-mode-title">
+        <nav class="menu-nav"   aria-labelledby="play-mode-title">
             <ul>
                 <li>
                     <button id="offline-play-btn" class="menu-button" aria-label="Çevrimdışı Oyna">Çevrimdışı (Klasik) Oyna</button>
@@ -581,7 +581,7 @@
         
         <h1 id="multiplayer-select-title">Çok Oyunculu</h1>
         
-        <nav class="menu-nav" role="application" aria-labelledby="multiplayer-select-title">
+        <nav class="menu-nav"   aria-labelledby="multiplayer-select-title">
             <ul>
                 <li>
                     <button id="pvp-play-btn" class="menu-button" aria-label="Maç Oluştur">Maç Oluştur</button>
@@ -616,7 +616,7 @@
             Açık maç aranıyor...
         </div>
         
-        <nav class="menu-nav" role="application" aria-labelledby="pvp-rooms-title">
+        <nav class="menu-nav"   aria-labelledby="pvp-rooms-title">
             <ul id="pvp-rooms-list">
                 <!-- Odalar dinamik olarak buraya eklenecek -->
             </ul>
@@ -654,7 +654,7 @@
             style="display: none; margin: 0 auto 20px auto; font-size: 1.2rem; padding: 15px 30px; background-color: #219ebc; color: white; border: none; border-radius: 8px; width: 90%; max-width: 400px; font-weight: bold; cursor: pointer; text-align: center;">
             Tekrar Dinle
         </button>
-        <nav class="menu-nav" role="application" aria-labelledby="game-menu-title">
+        <nav class="menu-nav"   aria-labelledby="game-menu-title">
             <ul>
                 <li class="desktop-exit-li">
                     <button id="game-back-btn" class="menu-button" aria-label="Oyunu Bitir">Oyunu Bitir</button>
@@ -728,7 +728,7 @@
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('social-btn-cancel').focus(), 10);"></div>
         
         <h2 id="social-action-title" tabindex="0" style="color: #ffb703; border-bottom: 2px solid #ffb703; padding-bottom: 5px; margin-bottom: 20px; font-size: 2rem;">İşlem Seçimi</h2>
-        <nav class="menu-nav" role="application" aria-labelledby="social-action-title">
+        <nav class="menu-nav"   aria-labelledby="social-action-title">
             <ul>
                 <li><button id="social-btn-pm" class="menu-button" aria-label="Özel Mesaj Gönder">Özel Mesaj Gönder</button></li>
                 <li><button id="social-btn-mute" class="menu-button" aria-label="Kullanıcıyı Sustur">Kullanıcıyı Sustur</button></li>
@@ -760,23 +760,23 @@
     <script src="sounds/howler.min.js"></script>
 
     <!-- Yardım, Alıştırma ve Motivasyon Mesajları için ayrı dosya -->
-    <script src="js/yardim.js?v=0.97.1.1"></script>
+    <script src="js/yardim.js?v=0.97.1.2"></script>
 
     <script>
-        window.UYGULAMA_SURUMU = "0.97.1.1";
-        const UYGULAMA_SURUMU = "0.97.1.1";
+        window.UYGULAMA_SURUMU = "0.97.1.2";
+        const UYGULAMA_SURUMU = "0.97.1.2";
     </script>
 
     <!-- Firebase CDN Bağlantıları (Sayfa Yüklenmesini Engellememesi İçin Sona Taşındı) -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
 
-    <script src="js/firebase.js?v=0.97.1.1"></script>
-    <script src="js/audio.js?v=0.97.1.1"></script>
-    <script src="js/ui.js?v=0.97.1.1"></script>
-    <script src="js/story.js?v=0.97.1.1"></script>
-    <script src="js/game.js?v=0.97.1.1"></script>
-    <script src="js/pvp.js?v=0.97.1.1"></script>
+    <script src="js/firebase.js?v=0.97.1.2"></script>
+    <script src="js/audio.js?v=0.97.1.2"></script>
+    <script src="js/ui.js?v=0.97.1.2"></script>
+    <script src="js/story.js?v=0.97.1.2"></script>
+    <script src="js/game.js?v=0.97.1.2"></script>
+    <script src="js/pvp.js?v=0.97.1.2"></script>
 </body>
 
 </html>

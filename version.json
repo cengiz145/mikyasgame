@@ -1,5 +1,5 @@
 {
-    "version": "0.97.1.1",
-    "buildId": 1780000101,
-    "changelog": "Ekran okuyucuların bazen gereksiz yere 'Boş' veya 'Blank' okumasını önlemek için DOM'daki görünmez boşluklar ve canlı anons bölgelerindeki ani silinme (temizleme) süreçleri iptal edildi (Yerine zero-width space toggle algoritması getirildi)."
+    "version": "0.97.1.2",
+    "buildId": 1780000102,
+    "changelog": "Ayarlar menüsünde (ve diğer listelerde) ortaya çıkan TAB tuşu (özellikle Shift+TAB) gezinti sorunları çözüldü. Ekran okuyucusunun odak kipi tuzakları, ARIA application rolleri düzeltildi ve NVDA'nın kaydet butonunu atlaması sorunu giderildi."
 }
