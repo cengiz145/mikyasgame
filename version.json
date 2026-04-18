@@ -1,5 +1,5 @@
 {
-    "version": "0.97.1.6",
-    "buildId": 1780000106,
-    "changelog": "Yeni Eşya: Bağlama Ses Paketi mağazaya eklendi! Mağazadan 500 jetona satın alıp aktif edebilirsiniz. Ayrıca Hikaye modunda ve klavye çalmalarında sorunsuz çalışır."
+    "version": "0.97.1.7",
+    "buildId": 1780000107,
+    "changelog": "Düzeltme: Oyun Bitimindeki ses efekti döngüden çıkarılıp bir kere çalacak şekilde ayarlandı. Bağlama ses paketindeki yol/boşluk hataları giderildi."
 }

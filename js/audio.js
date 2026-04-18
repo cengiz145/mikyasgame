@@ -63,7 +63,7 @@ window.gameOverSound = new Howl({
 
 window.music60Sound = new Howl({
     src: ['sounds/music60.ogg'],
-    loop: true,
+    loop: false,
     volume: 0.5
 });
 
@@ -204,13 +204,13 @@ window.pianoNotes = {
 };
 
 window.baglamaNotes = {
-    'a': new Howl({ src: ['sounds/baglama sound pack/a.wav'], volume: 1.0 }),
-    'b': new Howl({ src: ['sounds/baglama sound pack/b.wav'], volume: 1.0 }),
-    'c': new Howl({ src: ['sounds/baglama sound pack/c.wav'], volume: 1.0 }),
-    'd': new Howl({ src: ['sounds/baglama sound pack/d.wav'], volume: 1.0 }),
-    'e': new Howl({ src: ['sounds/baglama sound pack/e.wav'], volume: 1.0 }),
-    'f': new Howl({ src: ['sounds/baglama sound pack/f.wav'], volume: 1.0 }),
-    'g': new Howl({ src: ['sounds/baglama sound pack/g.wav'], volume: 1.0 })
+    'a': new Howl({ src: ['sounds/baglama_sound_pack/a.wav'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/baglama_sound_pack/b.wav'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/baglama_sound_pack/c.wav'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/baglama_sound_pack/d.wav'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/baglama_sound_pack/e.wav'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/baglama_sound_pack/f.wav'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/baglama_sound_pack/g.wav'], volume: 1.0 })
 };
 
 

@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.1.7] - 2026-04-18
+
+### Hata Düzeltmeleri:
+- **Bağlama Sesleri Sorunu:** Bağlama paketi alındığında notaların çalmamasına sebep olan dosya yolu uyuşmazlığı giderildi.
+- **Oyun Bittiğinde Çalan Müzik:** Oyun bittiğinde çalan "Oyun bitti" (Game Over) ambiyans sesi sonsuz döngüde çalıyordu; düzeltilerek sadece 1 kere çalması sağlandı. 
+
 [v0.97.1.6] - 2026-04-18
 
 ### Eklenenler / Değiştirilenler:
