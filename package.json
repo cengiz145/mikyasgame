@@ -1,6 +1,6 @@
 {
   "name": "hafizana-guven",
-  "version": "0.97.1.5",
+  "version": "0.97.1.6",
   "description": "Görme engelliler için özel olarak tasarlanmış ses odaklı hafıza ve yetenek oyunu.",
   "main": "main.js",
   "scripts": {

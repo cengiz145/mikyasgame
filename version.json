@@ -1,5 +1,5 @@
 {
-    "version": "0.97.1.5",
-    "buildId": 1780000105,
-    "changelog": "Erişilebilirlik Düzeltmesi: Sosyal sekmesindeki oyuncular arasında yön tuşlarıyla gezinememe ve Seçenekleri Görelememe sorunu düzeltildi. Profil bilgileri artık ok tuşlarıyla okunabiliyor."
+    "version": "0.97.1.6",
+    "buildId": 1780000106,
+    "changelog": "Yeni Eşya: Bağlama Ses Paketi mağazaya eklendi! Mağazadan 500 jetona satın alıp aktif edebilirsiniz. Ayrıca Hikaye modunda ve klavye çalmalarında sorunsuz çalışır."
 }

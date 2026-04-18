@@ -76,10 +76,10 @@ window.triggerStoryAnimations = function(index) {
         window.storyAnimInterval1 = setInterval(() => {
             const keys = ['c', 'e', 'g', 'c', 'f', 'a', 'd', 'b', 'g'];
             const randomKey = keys[Math.floor(Math.random() * keys.length)];
-            if (window.pianoNotes && window.pianoNotes[randomKey]) {
-                window.pianoNotes[randomKey].volume(0.8);
-                let sndId = window.pianoNotes[randomKey].play();
-                window.pianoNotes[randomKey].seek(0.045, sndId);
+            if (window.activeNotes && window.activeNotes[randomKey]) {
+                window.activeNotes[randomKey].volume(0.8);
+                let sndId = window.activeNotes[randomKey].play();
+                window.activeNotes[randomKey].seek(0.045, sndId);
             }
             count++;
             if (count > 6) clearInterval(window.storyAnimInterval1);
@@ -111,10 +111,10 @@ window.triggerStoryAnimations = function(index) {
         }
     } else if (index === 8) {
         window.storyAnimTimeout3 = setTimeout(() => {
-            if (window.pianoNotes) {
-                if (window.pianoNotes['c']) window.pianoNotes['c'].play();
-                if (window.pianoNotes['d']) window.pianoNotes['d'].play();
-                if (window.pianoNotes['e']) window.pianoNotes['e'].play();
+            if (window.activeNotes) {
+                if (window.activeNotes['c']) window.activeNotes['c'].play();
+                if (window.activeNotes['d']) window.activeNotes['d'].play();
+                if (window.activeNotes['e']) window.activeNotes['e'].play();
             }
         }, 50);
         window.storyAnimTimeout4 = setTimeout(() => {
@@ -162,9 +162,9 @@ window.triggerStoryAnimations = function(index) {
             let kIdx = 0;
             window.storyAnimInterval5 = setInterval(() => {
                 let note = keys[kIdx];
-                if (window.pianoNotes && window.pianoNotes[note]) {
-                    window.pianoNotes[note].volume(0.6);
-                    window.pianoNotes[note].play();
+                if (window.activeNotes && window.activeNotes[note]) {
+                    window.activeNotes[note].volume(0.6);
+                    window.activeNotes[note].play();
                 }
                 kIdx++;
                 if (kIdx >= keys.length) clearInterval(window.storyAnimInterval5);
@@ -284,9 +284,9 @@ window.handleStoryWalking = function(key) {
                     window.carryingNote = foundNote;
                     delete window.notesOnMap[window.playerX];
 
-                    if (window.pianoNotes && window.pianoNotes[foundNote]) {
-                        window.pianoNotes[foundNote].volume(1.0);
-                        window.pianoNotes[foundNote].play();
+                    if (window.activeNotes && window.activeNotes[foundNote]) {
+                        window.activeNotes[foundNote].volume(1.0);
+                        window.activeNotes[foundNote].play();
                     }
                     if (window.correctSound) window.correctSound.play();
                     
@@ -298,9 +298,9 @@ window.handleStoryWalking = function(key) {
                     if (window.announceToScreenReader) window.announceToScreenReader(baseMsg);
 
                 } else {
-                    if (window.pianoNotes && window.pianoNotes[foundNote]) {
-                        window.pianoNotes[foundNote].volume(1.0);
-                        window.pianoNotes[foundNote].play();
+                    if (window.activeNotes && window.activeNotes[foundNote]) {
+                        window.activeNotes[foundNote].volume(1.0);
+                        window.activeNotes[foundNote].play();
                     }
                     setTimeout(() => {
                         if (window.wrongSound) window.wrongSound.play();
@@ -417,9 +417,9 @@ window.handleStoryWalking = function(key) {
             
             statusString += ` (Burada ${noteName} notası var!)`;
 
-            if (window.pianoNotes && window.pianoNotes[foundNote]) {
-                window.pianoNotes[foundNote].volume(1.0);
-                window.pianoNotes[foundNote].play();
+            if (window.activeNotes && window.activeNotes[foundNote]) {
+                window.activeNotes[foundNote].volume(1.0);
+                window.activeNotes[foundNote].play();
             }
         }
 

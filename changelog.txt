@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.1.6] - 2026-04-18
+
+### Eklenenler / Değiştirilenler:
+- **Bağlama Ses Paketi:** Mağazaya 500 jetona satın alınabilen **Bağlama Ses Paketi** eklendi! Satın aldıktan sonra aynı yerden kapatılıp/etkinleştirilebilir.
+- Bağlama Ses Paketi aktifken Oyun içerisindeki piyano sesleri otomatik olarak bağlama sesleriyle değişecektir.
+- Ayrıca Kayıp Notalar Hikaye modundaki notalar da dinamik olarak bağlama sesleriyle değişecektir. Notaları bağlama tınılarıyla bulmayı deneyebilirsiniz!
+
 [v0.97.1.5] - 2026-04-18
 
 ### Düzeltmeler ve İyileştirmeler (Erişilebilirlik):

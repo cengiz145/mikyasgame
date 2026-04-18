@@ -203,6 +203,27 @@ window.pianoNotes = {
     'g': new Howl({ src: ['sounds/g.ogg'], volume: 1.0 })
 };
 
+window.baglamaNotes = {
+    'a': new Howl({ src: ['sounds/baglama sound pack/a.wav'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/baglama sound pack/b.wav'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/baglama sound pack/c.wav'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/baglama sound pack/d.wav'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/baglama sound pack/e.wav'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/baglama sound pack/f.wav'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/baglama sound pack/g.wav'], volume: 1.0 })
+};
+
+
+
+window.activeInstrument = localStorage.getItem('hafizaGuvenInstrument') || 'piano';
+
+window.activeNotes = new Proxy({}, {
+    get: function(target, prop) {
+        let map = window.activeInstrument === 'baglama' ? window.baglamaNotes : window.pianoNotes;
+        return map[prop];
+    }
+});
+
 // Web Audio API'nin mobil tarayıcılarda uyku modundan çıkmasını (resume) garanti altına almak
 window.ensureAudioUnlock = () => {
     if (typeof Howler !== 'undefined' && Howler.ctx && Howler.ctx.state === 'suspended') {
@@ -223,12 +244,15 @@ window.updatePan = function (index, total) {
 };
 
 window.playPianoNoteSingle = function (key) {
-    for (let k in window.pianoNotes) {
-        window.pianoNotes[k].stop();
+    let currentMap = window.activeInstrument === 'baglama' ? window.baglamaNotes : window.pianoNotes;
+    for (let k in currentMap) {
+        currentMap[k].stop();
     }
-    if (window.pianoNotes[key]) {
-        let soundId = window.pianoNotes[key].play();
-        window.pianoNotes[key].seek(0.045, soundId);
+    if (currentMap[key]) {
+        let soundId = currentMap[key].play();
+        if (window.activeInstrument === 'piano') {
+            currentMap[key].seek(0.045, soundId);
+        }
     }
 };
 

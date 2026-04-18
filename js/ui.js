@@ -786,6 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const buyShieldBtn = document.getElementById('buy-shield-btn');
     const buyTimeShieldBtn = document.getElementById('buy-time-shield-btn');
+    const buyBaglamaPackBtn = document.getElementById('buy-baglama-pack-btn');
 
     const startGameBtn = document.getElementById('start-game-btn');
     const gameBackBtn = document.getElementById('game-back-btn');
@@ -1262,6 +1263,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.music25Sound && !window.music25Sound.playing()) window.music25Sound.play();
             document.getElementById('main-menu-container').setAttribute('aria-hidden', 'true');
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+            
+            if (buyBaglamaPackBtn) {
+                let ownsBaglama = localStorage.getItem('hafizaGuvenBaglamaPack') === 'true';
+                if (ownsBaglama) {
+                    let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'baglama';
+                    buyBaglamaPackBtn.innerText = isActive ? "Bağlama Ses Paketini Kapat" : "Bağlama Ses Paketini Etkinleştir";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
+                } else {
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketi Satın Al (500 Jeton)";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Notaları piyano yerine bağlama ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 500 Jeton.");
+                }
+            }
+            
             if (window.announceToScreenReader) window.announceToScreenReader(`Mağazaya hoş geldiniz. Mevcut jetonunuz: ${totalTokens}`);
         });
         storeBackBtn.addEventListener('click', () => {
@@ -1332,6 +1346,51 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('hafizaGuvenZamanKorumasi', 1);
             if (window.buySound) window.buySound.play();
             if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Zaman Koruması eklendi. Kalan jeton: ${totalTokens}`);
+        });
+    }
+
+    if (buyBaglamaPackBtn) {
+        buyBaglamaPackBtn.addEventListener('click', () => {
+            let ownsBaglama = localStorage.getItem('hafizaGuvenBaglamaPack') === 'true';
+            
+            if (ownsBaglama) {
+                let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'baglama';
+                if (isActive) {
+                    localStorage.setItem('hafizaGuvenInstrument', 'piano');
+                    window.activeInstrument = 'piano';
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
+                    if (window.menuEnterSound) window.menuEnterSound.play();
+                    if (window.announceToScreenReader) window.announceToScreenReader("Bağlama ses paketi kapatıldı. Tekrar piyano sesleri aktif.");
+                } else {
+                    localStorage.setItem('hafizaGuvenInstrument', 'baglama');
+                    window.activeInstrument = 'baglama';
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Kapat";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Kapatmak için tıklayın.");
+                    if (window.menuEnterSound) window.menuEnterSound.play();
+                    if (window.announceToScreenReader) window.announceToScreenReader("Bağlama ses paketi etkinleştirildi!");
+                }
+            } else {
+                let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+                if (totalTokens < 500) {
+                    if (window.wrongSound) window.wrongSound.play();
+                    let msg = "Yetersiz bakiye. Bu eşya için 500 jetona ihtiyacınız var.";
+                    if (window.announceToScreenReader) window.announceToScreenReader(msg);
+                    return;
+                }
+                
+                totalTokens -= 500;
+                localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+                localStorage.setItem('hafizaGuvenBaglamaPack', 'true');
+                localStorage.setItem('hafizaGuvenInstrument', 'baglama');
+                window.activeInstrument = 'baglama';
+                
+                buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Kapat";
+                buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Kapatmak için tıklayın.");
+                
+                if (window.buySound) window.buySound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! Bağlama ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
+            }
         });
     }
 
