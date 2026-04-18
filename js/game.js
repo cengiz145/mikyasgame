@@ -582,9 +582,6 @@ window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
         let delay = 200;
 
         function playNextCoin() {
-            // Eğer oyuncu çıkış yaptıysa jeton saymayı ve odaklamayı anında durdur
-            if (!window.gameIsActive) return; 
-
             if (playedCount < maxSoundPlays) {
                 if (window.getCoinsSound) {
                     let sid = window.getCoinsSound.play();

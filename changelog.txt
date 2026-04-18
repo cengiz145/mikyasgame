@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.1.9] - 2026-04-18
+
+### Hata Düzeltmeleri:
+- **Oyun Sonu Okuma (Anons) Hatası:** Oyun bittiğinde ekran okuyucunun mesajı okumasını engelleyen ufak bir aktiflik/pasiflik engeli tamamen kaldırıldı. Artık oyun sonlandığında jetonları verirken ekran okuyucu kesintiye uğramadan final cümlesini tamamlayacaktır.
+
+
 [v0.97.1.8] - 2026-04-18
 
 ### Hata Düzeltmeleri:

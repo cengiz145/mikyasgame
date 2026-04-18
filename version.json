@@ -1,5 +1,5 @@
 {
-    "version": "0.97.1.8",
-    "buildId": 1780000108,
-    "changelog": "Düzeltme: Oyun Bitimi ve Mod Açılışı sesleri (newmotd1 ve newmotd2) çeşitli tarayıcılarda çalmamasına yol açan medya format desteği hatası giderildi (HTML5 Audio tabanı etkinleştirildi)."
+    "version": "0.97.1.9",
+    "buildId": 1780000109,
+    "changelog": "Düzeltme: Oyun Bitti mesajının ekran okuyucu tarafından anons edilmesini engelleyen ve jeton kazanımı sırasında çalan seslerin iptal olmasına yol açan bir koşul (gameIsActive kontrolü) düzeltildi."
 }
