@@ -1911,7 +1911,8 @@ document.addEventListener('keydown', function (event) {
             }
 
             if (textToRead && window.announceToScreenReader) {
-                window.announceToScreenReader(textToRead);
+                let localized = window.localizeText ? window.localizeText(textToRead) : textToRead;
+                window.announceToScreenReader(localized, true);
             }
             return;
         }

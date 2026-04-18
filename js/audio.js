@@ -20,21 +20,19 @@ window.baglamaBgMusic = new Howl({
     html5: false
 });
 
-window.bgMusic = new Proxy({}, {
-    get: function(target, prop) {
-        let activeBg = window.activeInstrument === 'baglama' ? window.baglamaBgMusic : window.pianoBgMusic;
-        let value = activeBg[prop];
-        if (typeof value === 'function') {
-            return value.bind(activeBg);
-        }
-        return value;
-    },
-    set: function(target, prop, value) {
-        let activeBg = window.activeInstrument === 'baglama' ? window.baglamaBgMusic : window.pianoBgMusic;
-        activeBg[prop] = value;
-        return true;
+class BgMusicWrapper {
+    get current() {
+        return window.activeInstrument === 'baglama' ? window.baglamaBgMusic : window.pianoBgMusic;
     }
-});
+    play() { return this.current.play(); }
+    pause() { return this.current.pause(); }
+    stop() { return this.current.stop(); }
+    playing() { return this.current.playing(); }
+    volume(v) { return this.current.volume(v); }
+    mute(m) { return this.current.mute(m); }
+}
+
+window.bgMusic = new BgMusicWrapper();
 
 window.hoverSound = new Howl({
     src: ['sounds/menu-dolas.ogg'],

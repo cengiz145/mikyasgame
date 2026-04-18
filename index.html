@@ -69,9 +69,7 @@
 
 
     <div id="main-menu-container" class="menu-container" role="presentation" aria-hidden="true">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('exit-btn').focus(), 10);"></div>
+        <!-- Removed top focus trap -->
         <h1 id="main-menu-title">Ana Menü</h1>
 
 
@@ -112,9 +110,7 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('start-game-btn').focus(), 10);"></div>
+        <!-- Removed bottom focus trap -->
     </div>
 
     <!-- Sosyal Menüsü (Mobilde Tab) -->
@@ -145,9 +141,6 @@
     <!-- Zorluk Seçimi Menüsü -->
     <div id="difficulty-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         aria-label="Zorluk Seçimi Menüsü">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('difficulty-back-btn').focus(), 10);"></div>
         <h1 id="difficulty-menu-title" tabindex="-1">Lütfen bir mod seçin</h1>
 
         <div id="difficulty-status-text" class="sr-only" aria-live="polite" aria-atomic="true"></div>
@@ -165,16 +158,10 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('btn-diff-easy').focus(), 10);"></div>
     </div>
 
     <!-- Skor Tablosu Alt Menüsü -->
     <div id="scoreboard-menu-container" class="menu-container" role="presentation" aria-hidden="true">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('scoreboard-back-btn').focus(), 10);"></div>
         <h1 id="scoreboard-menu-title">Skor Tablosu</h1>
         <nav class="menu-nav"   aria-labelledby="scoreboard-menu-title">
             <ul>
@@ -196,9 +183,6 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('btn-score-easy').focus(), 10);"></div>
     </div>
 
 
@@ -207,10 +191,7 @@
 
     <div id="practice-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('practice-status-text').focus(); } }, 10);">
-        </div>
+        <!-- Removed top focus trap -->
         <h1 id="practice-menu-title">Alıştırma Modu</h1>
 
 
@@ -227,18 +208,13 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const btn = document.getElementById('practice-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('practice-status-text').focus(); } }, 10);"></div>
+        <!-- Removed bottom focus trap -->
     </div>
 
     <!-- Hikaye Modu Menüsü -->
     <div id="story-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const btn = document.getElementById('story-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('story-status-text').focus(); } }, 10);">
-        </div>
+        <!-- Removed top focus trap -->
         <h1 id="story-menu-title">Kayıp Notalar</h1>
         <div id="story-status-text" role="alert" aria-live="assertive" tabindex="0"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px; outline: none;">
@@ -251,18 +227,13 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const btn = document.getElementById('story-back-btn'); if(btn && btn.offsetParent !== null) { btn.focus(); } else { document.getElementById('story-status-text').focus(); } }, 10);">
-        </div>
+        <!-- Removed bottom focus trap -->
     </div>
 
     <!-- Mağaza Menüsü -->
     <div id="store-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('store-back-btn').focus(), 10);"></div>
+        <!-- Removed top focus trap -->
         <h1 id="store-menu-title">Mağaza</h1>
         <div id="store-content" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
@@ -305,17 +276,12 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('buy-shield-btn').focus(), 10);"></div>
+        <!-- Removed bottom focus trap -->
     </div>
 
     <!-- İstatistikler Menüsü -->
     <div id="stats-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
         <h1 id="stats-menu-title">İstatistikler</h1>
         <div id="stats-content" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
@@ -329,17 +295,12 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('stats-back-btn').focus(), 10);"></div>
     </div>
 
     <!-- Geri Bildirim Menüsü -->
     <div id="feedback-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('feedback-back-btn').focus(), 10);"></div>
+        <!-- Removed bottom focus trap -->
         <div class="feedback-dialog-box">
             <h1 id="feedback-menu-title">Geri Bildirim</h1>
 
@@ -393,18 +354,12 @@
                 </ul>
             </nav>
         </div>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const firstItem = document.getElementById('feedback-name'); if(firstItem) firstItem.focus(); }, 10);">
-        </div>
     </div>
 
     <!-- Ayarlar Menüsü -->
     <div id="settings-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('settings-back-btn').focus(), 10);"></div>
+        <!-- Removed top focus trap -->
         <h1 id="settings-menu-title">Ayarlar</h1>
         
         <div id="settings-content" aria-live="polite"
@@ -464,17 +419,11 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('music-volume-slider').focus(), 10);"></div>
     </div>
 
     <!-- Güncelleme (Update) Menüsü -->
     <div id="update-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('update-content').focus(), 10);"></div>
         <div class="feedback-dialog-box" style="border-color: #ff4444;">
             <h1 id="update-menu-title" style="color: #ff4444; border-bottom: 2px solid #ff4444;">Zorunlu Güncelleme</h1>
 
@@ -492,18 +441,11 @@
                 </ul>
             </nav>
         </div>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const firstBtn = document.getElementById('update-content'); if(firstBtn) firstBtn.focus(); }, 10);">
-        </div>
     </div>
 
     <!-- Sunucu Mesajı / Changelog Menüsü -->
     <div id="server-message-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('server-message-content').focus(), 10);"></div>
         <div class="feedback-dialog-box" style="border-color: #ffb703;">
             <h1 id="server-message-title" style="color: #ffb703; border-bottom: 2px solid #ffb703;">Yapılan Son Değişiklik</h1>
 
@@ -521,18 +463,12 @@
                 </ul>
             </nav>
         </div>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const firstBtn = document.getElementById('server-message-content'); if(firstBtn) firstBtn.focus(); }, 10);">
-        </div>
     </div>
 
     <!-- Başarılar Menüsü -->
     <div id="achievements-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
+        <!-- Removed top focus trap -->
         <h1 id="achievements-menu-title">Başarılar</h1>
 
         <div id="achievements-content" aria-live="polite"
@@ -547,17 +483,12 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('achievements-back-btn').focus(), 10);"></div>
+        <!-- Removed top focus trap -->
     </div>
 
     <!-- Oyun Modu Seçim Menüsü -->
     <div id="play-mode-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('play-mode-back-btn').focus(), 10);"></div>
         <h1 id="play-mode-title">Oyun Modu Seçimi</h1>
         <nav class="menu-nav"   aria-labelledby="play-mode-title">
             <ul>
@@ -572,17 +503,11 @@
                 </li>
             </ul>
         </nav>
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('offline-play-btn').focus(), 10);"></div>
     </div>
 
     <!-- Çok Oyunculu Mod Seçim Menüsü -->
     <div id="multiplayer-select-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('multiplayer-select-back-btn').focus(), 10);"></div>
         
         <h1 id="multiplayer-select-title">Çok Oyunculu</h1>
         
@@ -603,15 +528,11 @@
             </ul>
         </nav>
         
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => document.getElementById('pvp-play-btn').focus(), 10);"></div>
     </div>
 
     <!-- Açık Maçlar (Lobi) Menüsü -->
     <div id="pvp-rooms-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('pvp-rooms-back-btn').focus(), 10);"></div>
         
