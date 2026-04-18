@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.2.2] - 2026-04-18
+
+### İyileştirmeler:
+- **Erişilebilirlik (Sesli Karşılama):** Ana menüdeki giriş eğitimi mesajının okunması sırasında direkt olarak 'Oyuna Başla' düğmesine odaklanılması ve duyuruyu yarıda kesmesi engellendi. Artık açılış eğitimi dinlenirken arka planda butonlar odağa girmeyecektir. Kullanıcı ok tuşlarına veya Tab'a bastığında butonlara normal bir şekilde girmeye devam edecektir.
+
 [v0.97.2.1] - 2026-04-18
 
 ### Hata Düzeltmeleri:

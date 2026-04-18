@@ -1,5 +1,5 @@
 {
-    "version": "0.97.2.1",
-    "buildId": 1780000201,
-    "changelog": "Düzeltme: Bağlama paketindeki müziğin oynatılamamasına neden olan Türkçe karakter URL kodlama sorunu çözüldü. Alıştırma ve Hikaye modundaki diyaloglar Entır ile geçilirken ekran okuyucunun sessiz kalması ve dado efektinin çıkmaması hatası giderildi."
+    "version": "0.97.2.2",
+    "buildId": 1780000202,
+    "changelog": "Erişilebilirlik Düzeltmesi: Oyun açılışında, ana menü giriş mesajı henüz okunurken ilk düğmenin ('Oyuna Başla') odağı çalmasına engel olundu. Ekran okuyucusunun giriş eğitim mesajını eksiksiz okuması sağlandı."
 }
