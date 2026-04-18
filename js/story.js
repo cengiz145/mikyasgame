@@ -53,8 +53,15 @@ window.playCurrentStoryDialog = function() {
     if (!window.missingNotesDialogues || !window.missingNotesDialogues[window.currentStoryIndex]) return;
 
     let appendedText = window.missingNotesDialogues[window.currentStoryIndex];
+    let finalHtml = window.localizeText ? window.localizeText(appendedText.replace("Devam etmek için entıra basın.", "<strong>Devam etmek için entıra basın.</strong>")) : appendedText;
 
-    storyStatus.innerHTML = window.localizeText(appendedText.replace("Devam etmek için entıra basın.", "<strong>Devam etmek için entıra basın.</strong>"));
+    if (window.dado3Sound) window.dado3Sound.play();
+    storyStatus.innerHTML = finalHtml;
+    
+    // Explicitly announce for screen readers
+    if (window.announceToScreenReader) {
+        window.announceToScreenReader(window.localizeText(appendedText), true);
+    }
 };
 
 window.playAutomatedWalkingScene = function() {

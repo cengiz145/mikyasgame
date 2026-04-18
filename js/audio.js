@@ -14,7 +14,7 @@ window.pianoBgMusic = new Howl({
 });
 
 window.baglamaBgMusic = new Howl({
-    src: ['sounds/baglama_sound_pack/baglama-ses-paketi-müziği.mp3'],
+    src: ['sounds/baglama_sound_pack/baglama-ses-paketi-muzigi.mp3'],
     loop: true,
     volume: 1.0,
     html5: false

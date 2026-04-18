@@ -1,5 +1,5 @@
 {
-    "version": "0.97.2.0",
-    "buildId": 1780000200,
-    "changelog": "Yeni Özellik: Bağlama Ses Paketi etkinleştirildiğinde çalan Ana Menü arkaplan müziği 'baglama-ses-paketi-müziği.mp3' ile değiştirildi. Artık hangi modda olduğunuzu menü müziğinden de anlayabilirsiniz."
+    "version": "0.97.2.1",
+    "buildId": 1780000201,
+    "changelog": "Düzeltme: Bağlama paketindeki müziğin oynatılamamasına neden olan Türkçe karakter URL kodlama sorunu çözüldü. Alıştırma ve Hikaye modundaki diyaloglar Entır ile geçilirken ekran okuyucunun sessiz kalması ve dado efektinin çıkmaması hatası giderildi."
 }

@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.2.1] - 2026-04-18
+
+### Hata Düzeltmeleri:
+- **Medya Kodlama Hatası:** Bağlama modu arkaplan müziğinin dosya adındaki Türkçe karakterlerden (ğ, ü, vs.) ötürü bazı tarayıcılarda 404 (bulunamadı) hatasına sebep olması önlendi. Dosya adı standart karakterlere dönüştürülüp sistem güncellendi.
+- **Ekran Okuyucu & Dado Efekti:** Hikaye ve Alıştırma modlarında öğretici diyalogları "Enter" ile geçerken dado ses efektinin çalmaması ve metnin ekran okuyucuya *zorunlu* olarak gönderilmemesi hatası giderildi. Artık Enter'a basıldıkça sesli onay gelir ve sıradaki metin kesintisiz okunur.
+
+
 [v0.97.2.0] - 2026-04-18
 
 ### Eklenenler / Değiştirilenler:

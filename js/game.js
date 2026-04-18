@@ -834,7 +834,12 @@ window.playCurrentDialog = function() {
     if (window.isDialogPhase) {
         if (window.currentDialogIndex < window.practiceDialogues.length) {
             let text = window.practiceDialogues[window.currentDialogIndex];
-            if (statusText) statusText.innerHTML = window.localizeText ? window.localizeText(text) : text;
+            let localizedText = window.localizeText ? window.localizeText(text) : text;
+            if (statusText) statusText.innerHTML = localizedText;
+            
+            if (window.dado3Sound) window.dado3Sound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader(localizedText, true);
+
         } else {
             window.isDialogPhase = false;
             window.inPracticeTutorial = true;
@@ -1152,7 +1157,6 @@ document.addEventListener('keydown', function (event) {
         if (window.isStarted && window.currentActiveMenu === 'story' && window.inStoryMode) {
             if (window.isGridWalkingPhase) return;
             
-            if (window.menuEnterSound) window.menuEnterSound.play();
             window.currentStoryIndex++;
             
             if (window.missingNotesDialogues && window.currentStoryIndex < window.missingNotesDialogues.length) {
