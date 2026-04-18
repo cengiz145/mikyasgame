@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.2.0] - 2026-04-18
+
+### Eklenenler / Değiştirilenler:
+- **Dinamik Menü Müziği:** Bağlama Ses Paketi mağazadan etkinleştirildiğinde (veya oyun başında yüklendiğinde) oyunun Ana Menü arka plan müziği otomatik olarak 'baglama-ses-paketi-müziği.mp3' dosyasına geçiş yapacak şekilde uyarlandı.
+
+
 [v0.97.1.9] - 2026-04-18
 
 ### Hata Düzeltmeleri:

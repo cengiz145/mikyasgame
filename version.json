@@ -1,5 +1,5 @@
 {
-    "version": "0.97.1.9",
-    "buildId": 1780000109,
-    "changelog": "Düzeltme: Oyun Bitti mesajının ekran okuyucu tarafından anons edilmesini engelleyen ve jeton kazanımı sırasında çalan seslerin iptal olmasına yol açan bir koşul (gameIsActive kontrolü) düzeltildi."
+    "version": "0.97.2.0",
+    "buildId": 1780000200,
+    "changelog": "Yeni Özellik: Bağlama Ses Paketi etkinleştirildiğinde çalan Ana Menü arkaplan müziği 'baglama-ses-paketi-müziği.mp3' ile değiştirildi. Artık hangi modda olduğunuzu menü müziğinden de anlayabilirsiniz."
 }

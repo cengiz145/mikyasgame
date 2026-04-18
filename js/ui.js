@@ -1356,15 +1356,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (ownsBaglama) {
                 let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'baglama';
                 if (isActive) {
+                    let wasPlaying = (window.bgMusic && window.bgMusic.playing());
+                    if (window.bgMusic) window.bgMusic.stop();
                     localStorage.setItem('hafizaGuvenInstrument', 'piano');
                     window.activeInstrument = 'piano';
+                    if (wasPlaying && window.bgMusic) window.bgMusic.play();
+
                     buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
                     buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
                     if (window.announceToScreenReader) window.announceToScreenReader("Bağlama ses paketi kapatıldı. Tekrar piyano sesleri aktif.");
                 } else {
+                    let wasPlaying = (window.bgMusic && window.bgMusic.playing());
+                    if (window.bgMusic) window.bgMusic.stop();
                     localStorage.setItem('hafizaGuvenInstrument', 'baglama');
                     window.activeInstrument = 'baglama';
+                    if (wasPlaying && window.bgMusic) window.bgMusic.play();
+
                     buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Kapat";
                     buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Kapatmak için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();

@@ -6,11 +6,34 @@ Howler.orientation(0, 0, -1, 0, 1, 0);
 
 window.currentLogoSound = null;
 
-window.bgMusic = new Howl({
+window.pianoBgMusic = new Howl({
     src: ['sounds/menu-music.mp3'],
     loop: true,
     volume: 1.0,
     html5: false
+});
+
+window.baglamaBgMusic = new Howl({
+    src: ['sounds/baglama_sound_pack/baglama-ses-paketi-müziği.mp3'],
+    loop: true,
+    volume: 1.0,
+    html5: false
+});
+
+window.bgMusic = new Proxy({}, {
+    get: function(target, prop) {
+        let activeBg = window.activeInstrument === 'baglama' ? window.baglamaBgMusic : window.pianoBgMusic;
+        let value = activeBg[prop];
+        if (typeof value === 'function') {
+            return value.bind(activeBg);
+        }
+        return value;
+    },
+    set: function(target, prop, value) {
+        let activeBg = window.activeInstrument === 'baglama' ? window.baglamaBgMusic : window.pianoBgMusic;
+        activeBg[prop] = value;
+        return true;
+    }
 });
 
 window.hoverSound = new Howl({
