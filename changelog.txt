@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.1.8] - 2026-04-18
+
+### Hata Düzeltmeleri:
+- **newmotd1/2 Ses Efektleri:** Oyun bittiğinde/mod kilidi açıldığında çalan bazı ses dosyalarının (newmotd1 ve newmotd2) tarayıcıların bellek çözücülerinde takılması durumu (çalmaması) `HTML5 Audio` motoruna geçirilerek kesin olarak çözüldü.
+
+
 [v0.97.1.7] - 2026-04-18
 
 ### Hata Düzeltmeleri:

@@ -58,7 +58,8 @@ window.glasshitSound = new Howl({
 
 window.gameOverSound = new Howl({
     src: ['sounds/newmotd2.ogg'],
-    volume: 1.0
+    volume: 1.0,
+    html5: true
 });
 
 window.music60Sound = new Howl({
@@ -69,7 +70,8 @@ window.music60Sound = new Howl({
 
 window.modeUnlockSound = new Howl({
     src: ['sounds/newmotd1.ogg'],
-    volume: 1.0
+    volume: 1.0,
+    html5: true
 });
 
 window.storyBGM = new Howl({
