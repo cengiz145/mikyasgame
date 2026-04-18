@@ -171,7 +171,8 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'server-message') buttons = Array.from(window.serverMessageMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'game') buttons = Array.from(window.gameMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'profile') buttons = Array.from(window.profileMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'social') buttons = Array.from(window.socialMenu.querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'social') buttons = Array.from(document.getElementById('social-player-list').querySelectorAll('li[tabindex="0"]'));
+    else if (window.currentActiveMenu === 'social-action') buttons = Array.from(document.getElementById('social-action-modal') ? document.getElementById('social-action-modal').querySelectorAll('.menu-button') : []);
     else if (window.currentActiveMenu === 'play-mode') buttons = Array.from(document.getElementById('play-mode-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'multiplayer-select') buttons = Array.from(document.getElementById('multiplayer-select-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('.menu-button'));
@@ -1799,7 +1800,8 @@ document.addEventListener('keydown', function (event) {
         if ((window.currentActiveMenu === 'story' && window.isDialogPhase) ||
             (window.currentActiveMenu === 'practice' && window.isDialogPhase) ||
             window.currentActiveMenu === 'server-message' ||
-            window.currentActiveMenu === 'update') {
+            window.currentActiveMenu === 'update' ||
+            window.currentActiveMenu === 'profile') {
             
             event.preventDefault();
 
@@ -1814,6 +1816,10 @@ document.addEventListener('keydown', function (event) {
                 } else if (window.currentActiveMenu === 'story') {
                     // Story.js enter'ı kendi game.js içinden dinliyor olabilir, ancak buraya da koyabiliriz.
                     // Fakat story entırı karmaşık, game.js'den yönetiliyor.
+                } else if (window.currentActiveMenu === 'profile') {
+                    if (document.activeElement && document.activeElement.tagName === 'BUTTON') {
+                        document.activeElement.click();
+                    }
                 }
                 return;
             }
@@ -1830,6 +1836,11 @@ document.addEventListener('keydown', function (event) {
             } else if (window.currentActiveMenu === 'update') {
                 let p = document.getElementById('update-text');
                 if (p) textToRead = p.innerText || p.textContent;
+            } else if (window.currentActiveMenu === 'profile') {
+                let pName = document.getElementById('profile-player-name') ? document.getElementById('profile-player-name').innerText : "Bilinmiyor";
+                let pRank = document.getElementById('profile-player-rank') ? document.getElementById('profile-player-rank').innerText : "Oyuncu";
+                let pStats = document.getElementById('profile-stats-content') ? document.getElementById('profile-stats-content').innerText : "İstatistik verisi yok.";
+                textToRead = "Oyuncu Profili. Adınız: " + pName + ". Rütbeniz: " + pRank + ". " + pStats;
             }
 
             if (textToRead && window.announceToScreenReader) {
@@ -2674,6 +2685,7 @@ document.addEventListener('DOMContentLoaded', () => {
             actionModal.style.opacity = '1';
             window.previousMenuBeforeModal = window.currentActiveMenu;
             window.currentActiveMenu = 'social-action';
+            window.currentFocusIndex = 0;
             if (btnPm) btnPm.focus();
             if (window.announceToScreenReader) {
                 window.announceToScreenReader(playerName + " detayları açıldı. Özel mesaj gönderebilir veya susturabilirsiniz.", true);

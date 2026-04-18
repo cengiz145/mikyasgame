@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.1.5] - 2026-04-18
+
+### Düzeltmeler ve İyileştirmeler (Erişilebilirlik):
+- **Oyuncu Seçenekleri Okuma Hatası (Sosyal Sekme):** Sosyal (Oyuncu) sekmesine girildiğinde yukarı/aşağı ok tuşlarının oyuncuları gezinmekte pasif kalmasına sebep olan "Odak Kilitlenmesi" hatası düzeltildi.
+- Artık Sosyal menüsündeyken sağ veya alt oklara basarak oyuncular arası sorunsuz geçiş yapabilir ve tıkladığınızda açılan Profil menüsünde ok tuşlarıyla (Sustur/PM/İptal) seçeneklerini hatasız okuyabilirsiniz. 
+- Aynı sistemle beraber **Profil** menüsüne girildiğinde kullanıcı adı ve istatistiklerin ekrana doğrudan anons edilmesi/okunması mekanizması eklendi.
+
 [v0.97.1.4] - 2026-04-17
 
 ### Eklenenler / Değiştirilenler:
