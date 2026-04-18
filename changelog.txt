@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.2.3] - 2026-04-18
+
+### Hata Düzeltmeleri:
+- **Çok Oyunculu Lobi Geçişi:** "Açık Maçlar" (Lobi) menüsü üzerinden var olan bir maçın üstüne tıklayıp odaya katılındığında, oyuncunun menüde sıkışıp kalması veya sistemin donmuş gibi algılanması hatası giderildi. Artık odaya girildiği an başarıyla Çok Oyunculu (Lobi) ana ekranına geri döndürülecek ve maçın başlaması için geri sayımda olunduğu otomatik olarak bildirilecek. Ek olarak "Bağlanılıyor..." aşamasındaki odak kaybı da giderildi.
+
+
 [v0.97.2.2] - 2026-04-18
 
 ### İyileştirmeler:

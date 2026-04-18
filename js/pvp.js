@@ -170,8 +170,10 @@ window.PvP = {
         const btn = document.activeElement;
         if (btn && btn.tagName === 'BUTTON') {
             btn.innerHTML = 'Bağlanılıyor...';
-            btn.disabled = true;
-            if (window.announceToScreenReader) window.announceToScreenReader('Bağlanılıyor...');
+            btn.setAttribute('aria-label', 'Bağlanılıyor');
+            // Butonu tamamen kapatmıyoruz ki odak kaybolmasın, pointerEvents kesiyoruz
+            btn.style.pointerEvents = 'none';
+            if (window.announceToScreenReader) window.announceToScreenReader('Bağlanılıyor...', true);
         }
 
         // Host'un sıradaki kaydını ucuralım ki kimse göremesin
@@ -191,6 +193,15 @@ window.PvP = {
             this.myQueueId = deviceId;
             this.opponentId = hostId;
             this.opponentName = hostName;
+            
+            // Eğer "Açık Maçlar" menüsündeysek "Çok Oyunculu (Lobi)" menüsüne geri atalım
+            if (window.switchMenu && window.pvpRoomsMenu && window.multiplayerSelectMenu) {
+                window.switchMenu(window.pvpRoomsMenu, window.multiplayerSelectMenu, 'multiplayer-select');
+                setTimeout(() => {
+                    const playBtn = document.getElementById('pvp-play-btn');
+                    if (playBtn) playBtn.focus();
+                }, 400);
+            }
             
             this.enterMatchRoom(this.matchId, hostName);
         }).catch(() => {
