@@ -1,6 +1,6 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
-[v0.98.0] - 2026-04-17
+[v0.97.1.4] - 2026-04-17
 
 ### Eklenenler / Değiştirilenler:
 - **Menü Ses Efektleri Yenilendi**: Ana menü dolaşımında ve alt menü butonlarında (tıklamalar için) `menuenter17.ogg` ve geri dönüş ile kapatma işlevleri için `menuclose.ogg` oyun sistemine entegre edildi, eski `clickSound` tanımlamaları tamamen yenilendi.

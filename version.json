@@ -1,5 +1,5 @@
 {
-    "version": "0.97.1.3",
-    "buildId": 1780000103,
-    "changelog": "Menülerde Tab tuşunun düğmeler üzerinde felç olmasına (kilitlenmesine) yol açan eski 'Sıkıyönetim' kod bloğu kaldırıldı. Artık seçenekler menüsü baştan sona sorunsuz bir şekilde Tab veya Shift+Tab ile taranabilir ve butonlarda takılma yaşanmaz."
+    "version": "0.97.1.4",
+    "buildId": 1780000104,
+    "changelog": "Menü ses efektleri yenilendi: menuenter17.ogg ve menuclose.ogg eklendi."
 }
