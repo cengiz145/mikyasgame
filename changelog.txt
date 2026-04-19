@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.2.7] - 2026-04-18
+
+### İyileştirmeler:
+- **Tebrikler / Oyun Sonu Ekranı:** Oyun bittiğinde "Oyunu Bitir" veya "Devam Et" butonuna düşen odak (focus) yüzünden NVDA'nın kapanış jeton bildirilerini okumaması ve kesintiye uğraması sorunu üzerine oyun sonu bir "Diyalog Modeli"ne çekildi. Artık oyun bittiğinde puan ve jetonlarınız kesintisiz okunacak, ana menüye dönmek için herhangi bir butona gitmeye gerek kalmaksızın direkt olarak "Enter" tuşuna basmanız yeterli olacaktır.
+
+
 [v0.97.2.6] - 2026-04-18
 
 ### Hata Düzeltmeleri:

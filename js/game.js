@@ -464,10 +464,12 @@ window.playGameSequence = function () {
     playNextSeqNote();
 };
 
-window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
+window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = false) {
     if (window.isGameEnding) return;
     window.isGameEnding = true;
-
+    window.isStarted = false;
+    window.gameIsActive = false;
+    window.isGameOverPhase = true;
     // 1. Tüm aktif HTML5 Audio elementlerini sustur
     const allAudios = document.querySelectorAll('audio');
     allAudios.forEach(audio => {
@@ -598,12 +600,14 @@ window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
                 setTimeout(() => {
                     if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
                     
-                    // Oyun bittiğinde imleci 'Yeniden Dene' veya 'Ana Menü' butonuna zorla
+                    // Oyun bittiğini Dialog evresine taşıdık. Fokus butona DEĞİL mesaja atanacak.
                     setTimeout(() => {
-                        let retryBtn = document.getElementById('mobile-replay-btn'); 
-                        let backBtn = document.getElementById('game-back-btn');
-                        if (retryBtn && retryBtn.style.display !== 'none') retryBtn.focus();
-                        else if (backBtn) backBtn.focus();
+                        let gameStatus = document.getElementById('game-status-text');
+                        if (gameStatus) {
+                            gameStatus.setAttribute('tabindex', '-1');
+                            gameStatus.style.outline = 'none';
+                            gameStatus.focus();
+                        }
                     }, 100);
                 }, 400);
             }
@@ -612,12 +616,14 @@ window.endMainGame = function (isTimeOut, isWin, isUserExit = false) {
     } else {
         if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
         
-        // Oyun bittiğinde imleci 'Yeniden Dene' veya 'Ana Menü' butonuna zorla
+        // Oyun bittiğimde dialog evresi
         setTimeout(() => {
-            let retryBtn = document.getElementById('mobile-replay-btn'); 
-            let backBtn = document.getElementById('game-back-btn');
-            if (retryBtn && retryBtn.style.display !== 'none') retryBtn.focus();
-            else if (backBtn) backBtn.focus();
+            let gameStatus = document.getElementById('game-status-text');
+            if (gameStatus) {
+                gameStatus.setAttribute('tabindex', '-1');
+                gameStatus.style.outline = 'none';
+                gameStatus.focus();
+            }
         }, 100);
     }
 
@@ -1001,6 +1007,19 @@ document.addEventListener('keydown', function (event) {
                 if (event.key === 'Escape') document.activeElement.blur();
                 return;
             }
+        }
+    }
+
+    // Oyun Sonu Diyalog (Tebrikler vs.) Modu Devredeyse: Oku ve Çık (Enter)
+    if (window.isGameOverPhase) {
+        if (event.key === 'Enter' && !event.repeat) {
+            event.preventDefault();
+            window.isGameOverPhase = false;
+            // Çıkış sesini atıp ana menüye yollamak
+            if (window.menuEnterSound) window.menuEnterSound.play();
+            const backBtn = document.getElementById('game-back-btn');
+            if (backBtn) backBtn.click();
+            return;
         }
     }
 

@@ -1,5 +1,5 @@
 {
-    "version": "0.97.2.6",
-    "buildId": 1780000206,
-    "changelog": "Düzeltme: Ekran okuyucusunun yön tuşlarıyla okuma (Browse Mode) esnasında geçmişte kalan eski sunucu veya duyuru mesajlarını rastgele yeniden okuması ve ana menüde kafa karışıklığı yaratması sorunu engellendi. Okunan ARIA bildirimleri artık belli bir saniye sonra kod üzerinden temizlenmektedir."
+    "version": "0.97.2.7",
+    "buildId": 1780000207,
+    "changelog": "Oyun bitişi/Tebrikler (Game Over) ekranı, Alıştırma menüsündeki gibi bir 'Diyalog' yapısına dönüştürüldü. Artık oyun bittiğinde odak 'Ana Menüye Dön' butonuna düşmeyecek; okuyucu tebrik mesajını okuyacak ve oyuncu doğrudan 'Enter' tuşuna basarak ilerleyecektir."
 }
