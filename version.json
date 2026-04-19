@@ -1,5 +1,5 @@
 {
-    "version": "0.97.2.8",
-    "buildId": 1780000208,
-    "changelog": "Düzeltme: Ses açma ve kısma gibi oyun içi bildirimlerin NVDA odak modundayken geri bildirimde gecikmesi veya okumaması sorununa karşılık, gizli canlı okuyucu kutusuna (Role Alert) özelliği eklendi ve görünmezlik stili kusursuzlaştırıldı."
+    "version": "0.97.2.9",
+    "buildId": 1780000209,
+    "changelog": "Düzeltme: 'Açık Maçlar' (PvP Rooms) ve 'Maç Kur' menüleri klavye navigasyon mantığına dahil edildi. Menülere girildiğinde NVDA'nın 'Bölüm' diyerek gezinim moduna düşmesi engellendi ve ok tuşları ile oyuncu listesinde (aktif maç düğmeleri) dolaşılabilmesi sağlandı."
 }

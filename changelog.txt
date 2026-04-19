@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.2.9] - 2026-04-18
+
+### Hata Düzeltmeleri:
+- **PvP Lobi Menüleri:** 'Açık Maçlar' ve 'Maç Kur' menüleri ana ok gezinti sistemine dahil edildi. Artık bu menülere girildiğinde NVDA sekme içeriğini 'bölüm' vb. şeklinde okuyarak gezinim/sanal (Browse) moduna düşmeyecek. Doğrudan açık açık ok tuşlarını kullanarak oyuncuların kurduğu maçlar listesinde liste elemanı ya da düğme olarak dolaşabileceksiniz.
+
+
 [v0.97.2.8] - 2026-04-18
 
 ### Hata Düzeltmeleri:
