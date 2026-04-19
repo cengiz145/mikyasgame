@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.2.6] - 2026-04-18
+
+### Hata Düzeltmeleri:
+- **Sesli Anons Kalıntıları:** Ekran okuyucusunun yön tuşlarıyla HTML/Makale yapısında (Browse Mode) gezinirken geçmişte okunmuş olan ve HTML kodlarında takılı kalan eski Sunucu mesajlarını anlamsız yere menünün sonunda tekrar okuması ve kafa karıştırması engellendi. ARIA Live bölgesi metni artık okunduktan 20 saniye sonra bellekten silindiği için "Bu eski mesajın menüde ne işi var" karmaşası giderilmiştir.
+
+
 [v0.97.2.5] - 2026-04-18
 
 ### Hata Düzeltmeleri:

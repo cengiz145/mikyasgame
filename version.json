@@ -1,5 +1,5 @@
 {
-    "version": "0.97.2.5",
-    "buildId": 1780000205,
-    "changelog": "Erişilebilirlik Düzeltmesi: Oyun açılışında ekran okuyucunun (NVDA/JAWS) makale okuma moduna (Browse Mode) zorlanarak Form/Uygulama dışına atılması hatası giderilmiştir. Artık odak, H1 başlığı yerine oyun zeminine (Body) verilmektedir."
+    "version": "0.97.2.6",
+    "buildId": 1780000206,
+    "changelog": "Düzeltme: Ekran okuyucusunun yön tuşlarıyla okuma (Browse Mode) esnasında geçmişte kalan eski sunucu veya duyuru mesajlarını rastgele yeniden okuması ve ana menüde kafa karışıklığı yaratması sorunu engellendi. Okunan ARIA bildirimleri artık belli bir saniye sonra kod üzerinden temizlenmektedir."
 }

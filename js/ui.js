@@ -359,6 +359,13 @@ window.announceToScreenReader = function (text, forceFocus = false) {
             window.announcerToggle = !window.announcerToggle;
             let finalOutput = text + (window.announcerToggle ? '\u200B' : '');
             liveAnnouncer.textContent = finalOutput;
+
+            // 20 Saniye sonra içeriği görünmez bir boşluğa çevirerek 
+            // menü geziniminde (makale modu okuma) eski mesajların takılı kalmasını engelliyoruz
+            let timer = setTimeout(() => {
+                if (liveAnnouncer) liveAnnouncer.textContent = ' ';
+            }, 20000);
+            window.announcerTimeouts.push(timer);
         }
     } else {
         // PC'de doğrudan Odaklanarak okutma (Eski kararlı yöntem)
