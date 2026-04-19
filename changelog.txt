@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.2.8] - 2026-04-18
+
+### Hata Düzeltmeleri:
+- **Anlık Bildirimler:** Oyunda PageUp ve PageDown (Müzik sesi arttırma vb.) kullanıldığında, Focus modundayken okuyucunun bunu anlık olarak değil, sadece Sanal Okuma (Browse Modu)'na geçildiğinde okuması sorunu düzeltildi. Anonsları sağlayan zemin öğesine "Kesin Bildirim (alert/assertive)" özelliği atanarak tepkime hızlandırıldı.
+
+
 [v0.97.2.7] - 2026-04-18
 
 ### İyileştirmeler:

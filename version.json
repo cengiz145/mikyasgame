@@ -1,5 +1,5 @@
 {
-    "version": "0.97.2.7",
-    "buildId": 1780000207,
-    "changelog": "Oyun bitişi/Tebrikler (Game Over) ekranı, Alıştırma menüsündeki gibi bir 'Diyalog' yapısına dönüştürüldü. Artık oyun bittiğinde odak 'Ana Menüye Dön' butonuna düşmeyecek; okuyucu tebrik mesajını okuyacak ve oyuncu doğrudan 'Enter' tuşuna basarak ilerleyecektir."
+    "version": "0.97.2.8",
+    "buildId": 1780000208,
+    "changelog": "Düzeltme: Ses açma ve kısma gibi oyun içi bildirimlerin NVDA odak modundayken geri bildirimde gecikmesi veya okumaması sorununa karşılık, gizli canlı okuyucu kutusuna (Role Alert) özelliği eklendi ve görünmezlik stili kusursuzlaştırıldı."
 }
