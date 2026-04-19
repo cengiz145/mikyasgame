@@ -253,8 +253,9 @@ window.startGame = function () {
                 window.mainMenu.removeAttribute('aria-hidden');
                 setTimeout(() => {
                     window.mainMenu.style.opacity = '1';
-                    const title = document.getElementById('main-menu-title');
-                    if (title) title.focus();
+                    // Ekran okuyucusunun Browse Mode'a (Makale moduna) geçmesini engellemek için
+                    // odağı oyun zeminine (application) veriyoruz.
+                    document.body.focus();
                     if (window.announceToScreenReader && window.localizeText) {
                         window.announceToScreenReader(window.localizeText('Hafızana güven oyununa hoş geldiniz. Öğeler arasında dolaşmak için sağ sol ok tuşlarına basın. Müzik sesini açıp kısmak için, sayfa yukarı ve sayfa aşağı tuşuna basın. Müziği susturmak için m tuşuna basın.'));
                     }

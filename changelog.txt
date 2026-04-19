@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.2.5] - 2026-04-18
+
+### Hata Düzeltmeleri:
+- **Erişilebilirlik (Odak Yönetimi):** Oyun açılışında ekran okuyucuların (NVDA) odağı bir H1 başlığına düştüğü için zorla "Makale Okuma" moduna (Browse Mode) girmesi ve kullanıcının zorla Insert+Boşluk vb. kısayollar kullanmasına rağmen makale gibi hissetmesi sorunu çözüldü. Artık, okuyucu metni sorunsuz şekilde okurken ekran okuyucusu otomatik olarak Odak/Uygulama (Focus Mode) kipinde kalmaya devam edecektir.
+
+
 [v0.97.2.4] - 2026-04-18
 
 ### Hata Düzeltmeleri:
