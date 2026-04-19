@@ -1,5 +1,5 @@
 {
-    "version": "0.97.2.3",
-    "buildId": 1780000203,
-    "changelog": "Düzeltme: Açık Maçlar listesinden var olan bir maça katılındığında oyuncunun doğrudan 10 saniyelik lobide ('Çok Oyunculu' ana ekranına) geri yönlendirilmesi sağlandı ve bağlantı esnasında butonun odak kaybı (Bağlanılıyor bugu) giderildi."
+    "version": "0.97.2.4",
+    "buildId": 1780000204,
+    "changelog": "Düzeltme: Bağlama ses paketindeki müziğin adlandırılması 'menu-music2.mp3' şeklinde değiştirilerek okunmama/çalınmama sorunlarının önüne geçildi."
 }
