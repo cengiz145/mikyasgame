@@ -111,15 +111,15 @@ window.PvP = {
             
             if (players) {
                 for (let id in players) {
-                    if (id !== myDeviceId && players[id].matchId) {
+                    if (players[id].matchId) {
                         availableMatches.push(players[id]);
                     }
                 }
             }
 
             if (availableMatches.length === 0) {
-                if (statusText) statusText.innerHTML = "Şuan halihazırda açılmış bir maç yok.<br>Lütfen yeni maç oluşturun.";
-                if (window.announceToScreenReader) window.announceToScreenReader("Şuan halihazırda açılmış bir maç yok. Lütfen geri dönerek maç oluşturun.");
+                if (statusText) statusText.innerHTML = "Şuan halihazırda açılmış bir maç yok.<br>Lütfen bir maç oluşturun.";
+                if (window.announceToScreenReader) window.announceToScreenReader("Şuan halihazırda açılmış bir maç yok. Lütfen bir maç oluşturun.");
                 
                 if (window.music38Sound && window.music38Sound.playing()) window.music38Sound.stop();
 
