@@ -381,19 +381,24 @@ window.announceToScreenReader = function (text, forceFocus = false) {
         announcerDiv.id = 'sr-focus-announcer';
         announcerDiv.setAttribute('tabindex', '-1');
         announcerDiv.style.position = 'absolute';
-        announcerDiv.style.left = '-9999px';
-        announcerDiv.style.width = '1px';
-        announcerDiv.style.height = '1px';
-        announcerDiv.style.overflow = 'hidden';
+        announcerDiv.style.opacity = '0';
+        announcerDiv.style.pointerEvents = 'none';
         announcerDiv.innerText = text; 
         
-        // Elementi DOM'a ekle ve NVDA PC'nin atlamaması için senkron olarak anında focusla
-        document.body.appendChild(announcerDiv);
+        // Elementi doğrudan aktif menünün içine koyalım ki sekme ile gezinince boşluğa değil menüye gitsin.
+        let activeMenu = document.querySelector('.menu-container:not([style*="display: none"])') || document.body;
+        activeMenu.prepend(announcerDiv);
+        
         announcerDiv.focus();
+        
+        // Kullanıcı klavyeyle müdahale edip buradan ayrılırsa beklemeye gerek kalmasın:
+        announcerDiv.addEventListener('blur', () => {
+            if (announcerDiv.parentNode) announcerDiv.remove();
+        });
         
         setTimeout(() => {
             if (announcerDiv.parentNode) {
-                // Odak kaybını engelle (NVDA'nın body'e düşmesini önle)
+                // Sadece hala focus ondaysa geri yükle (kullanıcı manuel çıkmadıysa)
                 if (document.activeElement === announcerDiv) {
                     const isVisible = (el) => el && (el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0);
                     if (previousFocus && document.body.contains(previousFocus) && previousFocus.tagName !== 'BODY' && isVisible(previousFocus)) {
@@ -405,9 +410,9 @@ window.announceToScreenReader = function (text, forceFocus = false) {
                         if (btns && btns.length > 0) btns[0].focus();
                     }
                 }
-                announcerDiv.remove();
+                if (announcerDiv.parentNode) announcerDiv.remove();
             }
-        }, 15000);
+        }, 8000); // 15 saniyeden 8 saniyeye indirildi
     }
 };
 
