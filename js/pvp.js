@@ -252,12 +252,14 @@ window.PvP = {
         if (btn) {
             btn.innerHTML = 'Maç Oluştur';
             btn.setAttribute('aria-label', 'Maç Oluştur. İşlem iptal edildi.');
+            btn.style.pointerEvents = 'auto'; // Re-enable pointer events
         }
         
         const botBtn = document.getElementById('pve-bot-play-btn');
         if (botBtn) {
             botBtn.innerHTML = 'Bota Karşı Oyna';
             botBtn.setAttribute('aria-label', 'Bota Karşı Oyna. Eşleştirme iptal edildi.');
+            botBtn.style.pointerEvents = 'auto'; // Re-enable pointer events
         }
 
         if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme iptal edildi.");
@@ -282,15 +284,22 @@ window.PvP = {
         if (btn) {
             btn.innerHTML = `Eşleşti: ${oppName}!`;
             btn.setAttribute('aria-label', anonsMesaji);
+            btn.style.pointerEvents = 'none'; // Prevent double clicking during wait
         }
 
         // 10 Saniye boyunca 'Lobi' ekranında bekletip oyunu başlat
         this.lobbyWaitTimer = setTimeout(() => {
             if (!this.matchId) return; // İşlem kullanıcı tarafından iptal edildiyse dur
             const resetBtn = document.getElementById('pvp-play-btn');
-            if (resetBtn) resetBtn.innerHTML = 'Maç Oluştur';
+            if (resetBtn) {
+                resetBtn.innerHTML = 'Maç Oluştur';
+                resetBtn.style.pointerEvents = 'auto';
+            }
             const resetBotBtn = document.getElementById('pve-bot-play-btn');
-            if (resetBotBtn) resetBotBtn.innerHTML = 'Bota Karşı Oyna';
+            if (resetBotBtn) {
+                resetBotBtn.innerHTML = 'Bota Karşı Oyna';
+                resetBotBtn.style.pointerEvents = 'auto';
+            }
             
             if (window.switchMenu && window.gameMenu) {
                 let activeMultiMenu = window.multiplayerSelectMenu;
@@ -540,6 +549,37 @@ window.PvP = {
         
         clearInterval(this.pvpInterval);
         if (this.botTimeout) clearTimeout(this.botTimeout);
+        
+        // Eğer oyun henüz başlamadan iptal edildiyse (10 sn lobi sırasında), ödül sistemini atla
+        if (!window.gameIsActive) {
+            if (this.lobbyWaitTimer) {
+                clearTimeout(this.lobbyWaitTimer);
+                this.lobbyWaitTimer = null;
+            }
+            if (window.bgMusic && !window.bgMusic.playing() && window.currentActiveMenu !== 'game' && window.currentActiveMenu !== 'story') window.bgMusic.play();
+            
+            const btn = document.getElementById('pvp-play-btn');
+            if (btn) {
+                btn.innerHTML = 'Maç Oluştur';
+                btn.style.pointerEvents = 'auto';
+            }
+            
+            this.matchId = null;
+            this.isBotMode = false;
+            this.gameEndingBlock = false;
+            if (window.announceToScreenReader) window.announceToScreenReader("Rakip lobiden ayrıldı, maç iptal edildi.");
+            
+            // Eğer lobide veya multiplayer menülerindeyse, ana menüye atmak için tetikleyici
+            if (window.switchMenu && window.mainMenu) {
+                let currentMenu = document.querySelector('.menu-container:not([style*="display: none"])');
+                if (currentMenu && (currentMenu.id === 'pvp-rooms-menu-container' || currentMenu.id === 'multiplayer-select-menu-container')) {
+                    const backbtn = document.getElementById('multiplayer-select-back-btn') || document.getElementById('pvp-rooms-back-btn');
+                    if(backbtn) backbtn.click();
+                }
+            }
+            return;
+        }
+
         window.gameIsActive = false;
         
         let myScore = this.isHost ? (matchData.hostScore || 0) : (matchData.clientScore || 0);

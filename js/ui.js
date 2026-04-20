@@ -1676,6 +1676,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pvpPlayBtn) {
         pvpPlayBtn.addEventListener('click', () => {
             if (window.PvP) {
+                // If already waiting in lobby, do nothing
+                if (window.PvP.lobbyWaitTimer) return;
+                
                 if (window.PvP.isSearching && !window.PvP.isBotMode) {
                     window.PvP.cancelQueue();
                 } else if (!window.PvP.isSearching) {
@@ -1691,6 +1694,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pveBotPlayBtn) {
         pveBotPlayBtn.addEventListener('click', () => {
             if (window.PvP) {
+                if (window.PvP.lobbyWaitTimer) return;
+                
                 if (window.PvP.isSearching && window.PvP.isBotMode) {
                     window.PvP.cancelQueue();
                 } else if (!window.PvP.isSearching) {
@@ -1706,7 +1711,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mpSelectBackBtn) {
         mpSelectBackBtn.addEventListener('click', () => {
             // Eşleştirme sırasında geri basıp kaçarsa tüm işlemi katlet
-            if (window.PvP && window.PvP.isSearching) {
+            if (window.PvP && (window.PvP.isSearching || window.PvP.lobbyWaitTimer)) {
                 window.PvP.cancelQueue();
             }
             
