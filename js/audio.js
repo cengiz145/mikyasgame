@@ -236,13 +236,30 @@ window.baglamaNotes = {
     'g': new Howl({ src: ['sounds/baglama_sound_pack/g.wav'], volume: 1.0 })
 };
 
+window.kavalNotes = {
+    'a': new Howl({ src: ['sounds/kaval-sounds-pack/a.wav'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/kaval-sounds-pack/b.wav'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/kaval-sounds-pack/c.wav'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/kaval-sounds-pack/d.wav'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/kaval-sounds-pack/e.wav'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/kaval-sounds-pack/f.wav'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/kaval-sounds-pack/g.wav'], volume: 1.0 })
+};
+
 
 
 window.activeInstrument = localStorage.getItem('hafizaGuvenInstrument') || 'piano';
 
 window.activeNotes = new Proxy({}, {
     get: function(target, prop) {
-        let map = window.activeInstrument === 'baglama' ? window.baglamaNotes : window.pianoNotes;
+        let map;
+        if (window.activeInstrument === 'baglama') {
+            map = window.baglamaNotes;
+        } else if (window.activeInstrument === 'kaval') {
+            map = window.kavalNotes;
+        } else {
+            map = window.pianoNotes;
+        }
         return map[prop];
     }
 });
@@ -267,7 +284,14 @@ window.updatePan = function (index, total) {
 };
 
 window.playPianoNoteSingle = function (key) {
-    let currentMap = window.activeInstrument === 'baglama' ? window.baglamaNotes : window.pianoNotes;
+    let currentMap;
+    if (window.activeInstrument === 'baglama') {
+        currentMap = window.baglamaNotes;
+    } else if (window.activeInstrument === 'kaval') {
+        currentMap = window.kavalNotes;
+    } else {
+        currentMap = window.pianoNotes;
+    }
     for (let k in currentMap) {
         currentMap[k].stop();
     }

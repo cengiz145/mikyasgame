@@ -18,15 +18,12 @@ window.PvP = {
         }
 
         let deviceId = localStorage.getItem('hafizaGuvenDeviceId');
-        if (!deviceId) return;
-
-        let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname');
-        if (!myName || myName.trim() === "") {
-            if (window.wrongSound) window.wrongSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader("PvP oynamak için önce canlı sohbete bir kez katılarak bir takma ad seçmelisiniz.");
-            return;
+        if (!deviceId) {
+            deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+            localStorage.setItem('hafizaGuvenDeviceId', deviceId);
         }
 
+        let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || "Misafir";
         myName = myName.replace(/[.#$\[\]\/]/g, '_');
 
         this.isBotMode = false;
@@ -57,11 +54,11 @@ window.PvP = {
 
         const btn = document.getElementById('pvp-play-btn');
         if (btn) {
-            btn.innerHTML = 'Rakip Bekleniyor... İptal İçin Tıkla';
-            btn.setAttribute('aria-label', 'Rakip bekleniyor. İptal etmek için tekrar tıklayın.');
+            btn.innerHTML = 'Rakip Aranıyor... İptal İçin Tıkla';
+            btn.setAttribute('aria-label', 'Rakip aranıyor. İptal etmek için tekrar tıklayın.');
         }
 
-        if (window.announceToScreenReader) window.announceToScreenReader("Rakip bekleniyor. Lütfen bekleyiniz.");
+        if (window.announceToScreenReader) window.announceToScreenReader("Rakip aranıyor. Lütfen bekleyiniz.");
 
         if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
         if (window.music38Sound && !window.music38Sound.playing()) window.music38Sound.play();
@@ -107,6 +104,10 @@ window.PvP = {
             
             // Kendi oturumumuz hariç ve sadece matchId'si tanımlı (yeni sistem) olanları filtrele
             let myDeviceId = localStorage.getItem('hafizaGuvenDeviceId');
+            if (!myDeviceId) {
+                myDeviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                localStorage.setItem('hafizaGuvenDeviceId', myDeviceId);
+            }
             
             if (players) {
                 for (let id in players) {
@@ -162,7 +163,10 @@ window.PvP = {
     // Var olan odaya katıl (Client)
     joinExistingMatch: function(hostId, targetMatchId, hostName) {
         let deviceId = localStorage.getItem('hafizaGuvenDeviceId');
-        if (!deviceId) return;
+        if (!deviceId) {
+            deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+            localStorage.setItem('hafizaGuvenDeviceId', deviceId);
+        }
 
         let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || "Misafir";
         myName = myName.replace(/[.#$\[\]\/]/g, '_');
