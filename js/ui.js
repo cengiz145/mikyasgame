@@ -395,9 +395,10 @@ window.announceToScreenReader = function (text, forceFocus = false) {
             if (announcerDiv.parentNode) {
                 // Odak kaybını engelle (NVDA'nın body'e düşmesini önle)
                 if (document.activeElement === announcerDiv) {
-                    if (previousFocus && document.body.contains(previousFocus) && previousFocus.tagName !== 'BODY') {
+                    const isVisible = (el) => el && (el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0);
+                    if (previousFocus && document.body.contains(previousFocus) && previousFocus.tagName !== 'BODY' && isVisible(previousFocus)) {
                         previousFocus.focus();
-                    } else if (window.lastFocusedElement && document.body.contains(window.lastFocusedElement) && window.lastFocusedElement.tagName !== 'BODY') {
+                    } else if (window.lastFocusedElement && document.body.contains(window.lastFocusedElement) && window.lastFocusedElement.tagName !== 'BODY' && isVisible(window.lastFocusedElement)) {
                         window.lastFocusedElement.focus();
                     } else if (typeof window.getActiveButtons === 'function') {
                         let btns = window.getActiveButtons();
