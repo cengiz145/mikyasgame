@@ -280,6 +280,12 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     if (!hideMenu || !showMenu) return;
 
     window.isMenuTransitioning = true;
+    
+    // Güvenlik Subabı (Failsafe): Ne olursa olsun 1.5 saniye sonra geçiş kilidini aç (boşa düşmeyi engeller)
+    if (window.menuFailsafeTimeoutId) clearTimeout(window.menuFailsafeTimeoutId);
+    window.menuFailsafeTimeoutId = setTimeout(() => {
+        window.isMenuTransitioning = false;
+    }, 1500);
 
     // Mobil Geri Tuşu Koruması (Yeni bir alt menüye geçiliyorsa History'e ekle)
     if (newActiveMenuName !== 'main' && newActiveMenuName !== 'game' && newActiveMenuName !== 'story') {

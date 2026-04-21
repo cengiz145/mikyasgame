@@ -271,6 +271,7 @@ window.PvP = {
         if (this.myQueueId && !this.isBotMode) window.db.ref('pvp_queue/' + this.myQueueId).remove();
         
         this.isBotMode = false;
+        this.matchStarted = false;
         
         const btn = document.getElementById('pvp-play-btn');
         if (btn) {
@@ -427,6 +428,7 @@ window.PvP = {
         window.isComputerPlaying = true;
         window.gameSequence = [];
         window.playerSequence = [];
+        this.matchStarted = true;
         
         if (window.bgMusic && window.bgMusic.playing()) {
             window.bgMusic.pause();
@@ -575,7 +577,7 @@ window.PvP = {
         if (this.botTimeout) clearTimeout(this.botTimeout);
         
         // Eğer oyun henüz başlamadan iptal edildiyse (10 sn lobi sırasında), ödül sistemini atla
-        if (!window.gameIsActive) {
+        if (!this.matchStarted) {
             if (this.lobbyWaitTimer) {
                 clearTimeout(this.lobbyWaitTimer);
                 this.lobbyWaitTimer = null;
@@ -590,6 +592,7 @@ window.PvP = {
             
             this.matchId = null;
             this.isBotMode = false;
+            this.matchStarted = false;
             this.gameEndingBlock = false;
             if (window.announceToScreenReader) window.announceToScreenReader("Rakip lobiden ayrıldı, maç iptal edildi.");
             
@@ -659,6 +662,7 @@ window.PvP = {
             this.matchId = null; // Sıfırla
             this.isBotMode = false;
             this.gameEndingBlock = false;
+            this.matchStarted = false;
         }, 6000);
     }
 };

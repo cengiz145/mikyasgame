@@ -1,5 +1,5 @@
 {
-    "version": "0.97.2.9",
-    "buildId": 1780000209,
-    "changelog": "Düzeltme: 'Açık Maçlar' (PvP Rooms) ve 'Maç Kur' menüleri klavye navigasyon mantığına dahil edildi. Menülere girildiğinde NVDA'nın 'Bölüm' diyerek gezinim moduna düşmesi engellendi ve ok tuşları ile oyuncu listesinde (aktif maç düğmeleri) dolaşılabilmesi sağlandı."
+    "version": "0.97.3.0",
+    "buildId": 1780000210,
+    "changelog": "Düzeltme: PvP eşleştirmelerinin diğer cihazlarda (farklı IP'lerde) görünmemesine neden olan kritik Firebase veritabanı bağlantı (databaseURL) sorunu giderildi."
 }

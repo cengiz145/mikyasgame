@@ -5,7 +5,8 @@ const firebaseConfig = {
     projectId: "hgfz-5a1ca", 
     storageBucket: "hgfz-5a1ca.firebasestorage.app", 
     messagingSenderId: "306647848341", 
-    appId: "1:306647848341:web:2906c477450f999130129c" 
+    appId: "1:306647848341:web:2906c477450f999130129c",
+    databaseURL: "https://hgfz-5a1ca-default-rtdb.firebaseio.com"
 };
 
 // Uygulamayı güvenli başlat (Offline Çökme Koruması)
