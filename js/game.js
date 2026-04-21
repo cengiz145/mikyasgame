@@ -853,6 +853,7 @@ window.playCurrentDialog = function() {
             window.practiceTargetIndex = 0;
             window.practicePressCount = 0;
             if (window.startPracticeNote) window.startPracticeNote();
+            if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
         }
     }
 };
@@ -870,13 +871,16 @@ window.startPracticeNote = function() {
         let currentNote = notes[window.practiceTargetIndex].toUpperCase();
         let text = "Şimdi " + currentNote + " tuşuna 3 defa bas.";
         if (statusText) statusText.innerHTML = text;
+        if (window.announceToScreenReader) window.announceToScreenReader(text, true);
     } else {
         // Tüm notalar bittiyse tebrik et ve Geri butonunu göster
         let text = "Tebrikler! Tüm notaları öğrendiniz. Ana menüye dönmek için Geri butonunu kullanabilirsiniz.";
         if (statusText) statusText.innerHTML = text;
+        if (window.announceToScreenReader) window.announceToScreenReader(text, true);
         const practiceNav = document.getElementById('practice-nav');
         if (practiceNav) practiceNav.style.display = 'block';
         window.inPracticeTutorial = false;
+        if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility(); // Menüler de güncelleniyor
     }
 };
 
@@ -902,6 +906,7 @@ window.handlePracticeInput = function(key) {
                 let fullMsg = msg + " " + (3 - window.practicePressCount) + " kaldı.";
                 const statusText = document.getElementById('practice-status-text');
                 if (statusText) statusText.innerHTML = fullMsg;
+                if (window.announceToScreenReader) window.announceToScreenReader(fullMsg);
             }
         }
     } else {
@@ -911,6 +916,7 @@ window.handlePracticeInput = function(key) {
             let msg = window.practiceWrongMessages[Math.floor(Math.random() * window.practiceWrongMessages.length)];
             const statusText = document.getElementById('practice-status-text');
             if (statusText) statusText.innerHTML = msg;
+            if (window.announceToScreenReader) window.announceToScreenReader(msg);
         }
     }
 };
