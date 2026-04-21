@@ -181,16 +181,42 @@ window.PvP = {
             if (window.announceToScreenReader) window.announceToScreenReader('Bağlanılıyor...', true);
         }
 
-        // Host'un sıradaki kaydını ucuralım ki kimse göremesin
-        window.db.ref('pvp_queue/' + hostId).remove();
-
-        // Odaya kendimizi ekleyelim
+        // Odaya kendimizi güvenli şekilde ekleyelim (Race Condition Engellemesi)
         const matchNode = window.db.ref('matches/' + targetMatchId);
-        matchNode.update({
-            client: deviceId,
-            clientName: myName,
-            status: 'starting'
-        }).then(() => {
+        
+        matchNode.transaction((currentData) => {
+            if (currentData === null) {
+                return; // Oda kapanmış (Host çıkmış veya silinmiş)
+            }
+            if (currentData.client || currentData.status === 'finished') {
+                return; // Odaya zaten başkası katılmış veya maç iptal edilmiş
+            }
+            
+            // Oda boş, kendimizi atıyoruz
+            currentData.client = deviceId;
+            currentData.clientName = myName;
+            currentData.status = 'starting';
+            return currentData;
+            
+        }, (error, committed, snapshot) => {
+            if (error || !committed) {
+                // İşlem reddedildi (bizden önce biri katıldı veya maç kapandı)
+                if (window.announceToScreenReader) window.announceToScreenReader('Maç dolmuş veya kapanmış. Lütfen başka bir maça katılın.', false);
+                if (btn) {
+                    btn.innerHTML = 'Oda Dolu/Kapalı';
+                    btn.style.pointerEvents = 'auto'; 
+                }
+                // Listeyi tazelemek için otomatik yenileme tetikle
+                setTimeout(() => {
+                    this.fetchAvailableMatches(true);
+                }, 1500);
+                return;
+            }
+            
+            // İŞLEM BAŞARILI!
+            // Artık odanın sahibi biziz, arama listesinden odayı silebiliriz.
+            window.db.ref('pvp_queue/' + hostId).remove();
+
             this.isSearching = false;
             this.isBotMode = false;
             this.isHost = false;
@@ -209,9 +235,6 @@ window.PvP = {
             }
             
             this.enterMatchRoom(this.matchId, hostName);
-        }).catch(() => {
-            if (window.announceToScreenReader) window.announceToScreenReader('Bağlantı hatası, maç kurulamadı.');
-            if (btn) btn.innerHTML = 'Hata Oluştu';
         });
     },
 
