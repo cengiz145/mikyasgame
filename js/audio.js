@@ -246,6 +246,16 @@ window.kavalNotes = {
     'g': new Howl({ src: ['sounds/kaval-sounds-pack/g.wav'], volume: 1.0 })
 };
 
+window.flutNotes = {
+    'a': new Howl({ src: ['sounds/flüt-sounds-pack/A.wav'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/flüt-sounds-pack/b.wav'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/flüt-sounds-pack/c.wav'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/flüt-sounds-pack/d.wav'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/flüt-sounds-pack/e.wav'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/flüt-sounds-pack/f.wav'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/flüt-sounds-pack/g.wav'], volume: 1.0 })
+};
+
 
 
 window.activeInstrument = localStorage.getItem('hafizaGuvenInstrument') || 'piano';
@@ -257,6 +267,8 @@ window.activeNotes = new Proxy({}, {
             map = window.baglamaNotes;
         } else if (window.activeInstrument === 'kaval') {
             map = window.kavalNotes;
+        } else if (window.activeInstrument === 'flut') {
+            map = window.flutNotes;
         } else {
             map = window.pianoNotes;
         }
@@ -289,6 +301,8 @@ window.playPianoNoteSingle = function (key) {
         currentMap = window.baglamaNotes;
     } else if (window.activeInstrument === 'kaval') {
         currentMap = window.kavalNotes;
+    } else if (window.activeInstrument === 'flut') {
+        currentMap = window.flutNotes;
     } else {
         currentMap = window.pianoNotes;
     }
