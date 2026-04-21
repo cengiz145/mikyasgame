@@ -569,6 +569,27 @@
             onfocus="setTimeout(() => { const btn=document.getElementById('pvp-rooms-refresh-btn'); if(btn) btn.focus(); }, 10);"></div>
     </div>
 
+    <!-- Eşleştirme Lobisi (Bekleme Odası) -->
+    <div id="pvp-lobby-menu-container" class="menu-container" role="presentation" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <h1 id="pvp-lobby-title">Oyun Lobisi</h1>
+        <div id="pvp-lobby-status-text" tabindex="0" aria-live="polite"
+            style="margin-bottom: 20px; font-size: 1.2rem; color: #ffb703; font-weight: bold; min-height: 50px;">
+            Bekleniyor...
+        </div>
+        <p style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa;" id="pvp-lobby-info-text">
+            Oda bilgileri yükleniyor...
+        </p>
+        
+        <nav class="menu-nav" aria-labelledby="pvp-lobby-title">
+            <ul>
+                <li>
+                    <button id="pvp-lobby-cancel-btn" class="menu-button" aria-label="Lobiden Çık veya İptal Et">İptal Et</button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
     <!-- Oyun Ekranı -->
     <section id="game-menu-container" class="menu-container" aria-label="Oyun Alanı" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">

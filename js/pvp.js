@@ -11,7 +11,7 @@ window.PvP = {
     isBotMode: false, // Ghost Bot sızıntısını engellemek için ana bayrak tanımlandı!
 
     // Maç Kur (Lobi Oluşturma)
-    createMatch: function() {
+    createMatch: function () {
         if (!window.db) {
             if (window.announceToScreenReader) window.announceToScreenReader("Bağlantı hatası. Veritabanı ulaşılamıyor.");
             return;
@@ -54,11 +54,18 @@ window.PvP = {
 
         const btn = document.getElementById('pvp-play-btn');
         if (btn) {
-            btn.innerHTML = 'Rakip Aranıyor... İptal İçin Tıkla';
-            btn.setAttribute('aria-label', 'Rakip aranıyor. İptal etmek için tekrar tıklayın.');
+            btn.innerHTML = 'İptal Et / Çıkış';
         }
 
-        if (window.announceToScreenReader) window.announceToScreenReader("Rakip aranıyor. Lütfen bekleyiniz.");
+        if (window.switchMenu && window.multiplayerSelectMenu && window.pvpLobbyMenu) {
+            window.switchMenu(window.multiplayerSelectMenu, window.pvpLobbyMenu, 'pvp-lobby');
+            const statusText = document.getElementById('pvp-lobby-status-text');
+            const infoText = document.getElementById('pvp-lobby-info-text');
+            if (statusText) statusText.innerText = "Oda Kuruldu";
+            if (infoText) infoText.innerText = "Rakip aranıyor. Lütfen bekleyiniz...";
+        }
+
+        if (window.announceToScreenReader) window.announceToScreenReader("Oda kuruldu, rakip aranıyor. Lütfen bekleyiniz.");
 
         if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
         if (window.music38Sound && !window.music38Sound.playing()) window.music38Sound.play();
@@ -77,14 +84,14 @@ window.PvP = {
                 this.opponentName = matchData.clientName;
                 this.matchRef.off();
                 queueNode.remove(); // Odayı kapattık, artık listede görünmesin
-                
+
                 this.enterMatchRoom(this.matchId, this.opponentName);
             }
         });
     },
 
     // Var Olan Maçları Getir ve Göster
-    fetchAvailableMatches: function(shouldOpenMenu) {
+    fetchAvailableMatches: function (shouldOpenMenu) {
         if (!window.db) {
             if (window.announceToScreenReader) window.announceToScreenReader("Bağlantı hatası.");
             return;
@@ -97,18 +104,18 @@ window.PvP = {
         window.db.ref('pvp_queue').once('value').then((snapshot) => {
             const players = snapshot.val();
             const roomsList = document.getElementById('pvp-rooms-list');
-            
+
             if (roomsList) roomsList.innerHTML = ''; // Temizle
 
             let availableMatches = [];
-            
+
             // Kendi oturumumuz hariç ve sadece matchId'si tanımlı (yeni sistem) olanları filtrele
             let myDeviceId = localStorage.getItem('hafizaGuvenDeviceId');
             if (!myDeviceId) {
                 myDeviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
                 localStorage.setItem('hafizaGuvenDeviceId', myDeviceId);
             }
-            
+
             if (players) {
                 for (let id in players) {
                     if (players[id].matchId) {
@@ -120,7 +127,7 @@ window.PvP = {
             if (availableMatches.length === 0) {
                 if (statusText) statusText.innerHTML = "Şuan halihazırda açılmış bir maç yok.<br>Lütfen bir maç oluşturun.";
                 if (!shouldOpenMenu && window.announceToScreenReader) window.announceToScreenReader("Şuan halihazırda açılmış bir maç yok. Lütfen bir maç oluşturun.");
-                
+
                 if (window.music38Sound && window.music38Sound.playing()) window.music38Sound.stop();
 
                 if (shouldOpenMenu && window.switchMenu && window.pvpRoomsMenu && window.multiplayerSelectMenu) {
@@ -137,20 +144,20 @@ window.PvP = {
                 btn.className = 'menu-button';
                 btn.innerHTML = `${match.name} - Katıl`;
                 btn.setAttribute('aria-label', `${match.name} adlı kurucunun maçına katıl.`);
-                
+
                 btn.addEventListener('click', () => {
                     window.PvP.joinExistingMatch(match.hostId, match.matchId, match.name);
                 });
-                
+
                 li.appendChild(btn);
-                
+
                 // Menü butonlarıyla aynı animasyon ve özellikler (ui.js deki standart eklentiler)
                 btn.addEventListener('mouseenter', () => { if (window.hoverSound) window.hoverSound.play(); });
                 btn.addEventListener('focus', () => { if (window.hoverSound) window.hoverSound.play(); });
-                
+
                 if (roomsList) roomsList.appendChild(li);
             });
-            
+
             if (shouldOpenMenu && window.switchMenu && window.pvpRoomsMenu && window.multiplayerSelectMenu) {
                 window.switchMenu(window.multiplayerSelectMenu, window.pvpRoomsMenu, 'pvp-rooms');
             } else if (!shouldOpenMenu && window.announceToScreenReader) {
@@ -162,7 +169,7 @@ window.PvP = {
     },
 
     // Var olan odaya katıl (Client)
-    joinExistingMatch: function(hostId, targetMatchId, hostName) {
+    joinExistingMatch: function (hostId, targetMatchId, hostName) {
         let deviceId = localStorage.getItem('hafizaGuvenDeviceId');
         if (!deviceId) {
             deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
@@ -183,7 +190,7 @@ window.PvP = {
 
         // Odaya kendimizi güvenli şekilde ekleyelim (Race Condition Engellemesi)
         const matchNode = window.db.ref('matches/' + targetMatchId);
-        
+
         matchNode.transaction((currentData) => {
             if (currentData === null) {
                 return; // Oda kapanmış (Host çıkmış veya silinmiş)
@@ -191,20 +198,20 @@ window.PvP = {
             if (currentData.client || currentData.status === 'finished') {
                 return; // Odaya zaten başkası katılmış veya maç iptal edilmiş
             }
-            
+
             // Oda boş, kendimizi atıyoruz
             currentData.client = deviceId;
             currentData.clientName = myName;
             currentData.status = 'starting';
             return currentData;
-            
+
         }, (error, committed, snapshot) => {
             if (error || !committed) {
                 // İşlem reddedildi (bizden önce biri katıldı veya maç kapandı)
                 if (window.announceToScreenReader) window.announceToScreenReader('Maç dolmuş veya kapanmış. Lütfen başka bir maça katılın.', false);
                 if (btn) {
                     btn.innerHTML = 'Oda Dolu/Kapalı';
-                    btn.style.pointerEvents = 'auto'; 
+                    btn.style.pointerEvents = 'auto';
                 }
                 // Listeyi tazelemek için otomatik yenileme tetikle
                 setTimeout(() => {
@@ -212,7 +219,7 @@ window.PvP = {
                 }, 1500);
                 return;
             }
-            
+
             // İŞLEM BAŞARILI!
             // Artık odanın sahibi biziz, arama listesinden odayı silebiliriz.
             window.db.ref('pvp_queue/' + hostId).remove();
@@ -224,23 +231,19 @@ window.PvP = {
             this.myQueueId = deviceId;
             this.opponentId = hostId;
             this.opponentName = hostName;
-            
-            // Eğer "Açık Maçlar" menüsündeysek "Çok Oyunculu (Lobi)" menüsüne geri atalım
-            if (window.switchMenu && window.pvpRoomsMenu && window.multiplayerSelectMenu) {
-                window.switchMenu(window.pvpRoomsMenu, window.multiplayerSelectMenu, 'multiplayer-select');
-                setTimeout(() => {
-                    const playBtn = document.getElementById('pvp-play-btn');
-                    if (playBtn) playBtn.focus();
-                }, 400);
+
+            // Eğer "Açık Maçlar" menüsündeysek "Eşleştirme Lobisi" menüsüne atalım
+            if (window.switchMenu && window.pvpRoomsMenu && window.pvpLobbyMenu) {
+                window.switchMenu(window.pvpRoomsMenu, window.pvpLobbyMenu, 'pvp-lobby');
             }
-            
+
             this.enterMatchRoom(this.matchId, hostName);
         });
     },
 
-    cancelQueue: function() {
+    cancelQueue: function () {
         this.isSearching = false;
-        
+
         if (window.music38Sound && window.music38Sound.playing()) window.music38Sound.stop();
         if (window.bgMusic && !window.bgMusic.playing() && window.currentActiveMenu !== 'game' && window.currentActiveMenu !== 'story') window.bgMusic.play();
 
@@ -269,17 +272,17 @@ window.PvP = {
 
         if (this.matchRef && !this.isBotMode) this.matchRef.off();
         if (this.myQueueId && !this.isBotMode) window.db.ref('pvp_queue/' + this.myQueueId).remove();
-        
+
         this.isBotMode = false;
         this.matchStarted = false;
-        
+
         const btn = document.getElementById('pvp-play-btn');
         if (btn) {
             btn.innerHTML = 'Maç Oluştur';
             btn.setAttribute('aria-label', 'Maç Oluştur. İşlem iptal edildi.');
             btn.style.pointerEvents = 'auto'; // Re-enable pointer events
         }
-        
+
         const botBtn = document.getElementById('pve-bot-play-btn');
         if (botBtn) {
             botBtn.innerHTML = 'Bota Karşı Oyna';
@@ -287,10 +290,13 @@ window.PvP = {
             botBtn.style.pointerEvents = 'auto'; // Re-enable pointer events
         }
 
+        const cancelBtn = document.getElementById('pvp-lobby-cancel-btn');
+        if (cancelBtn) cancelBtn.style.pointerEvents = 'auto';
+
         if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme iptal edildi.");
     },
 
-    enterMatchRoom: function(mappedMatchId, oppName) {
+    enterMatchRoom: function (mappedMatchId, oppName) {
         // İstemci isek sunucudaki odayı güvenceye alalım
         if (!this.isHost && !this.isBotMode) {
             window.db.ref('matches/' + this.matchId).onDisconnect().update({ status: 'finished', clientFinished: true });
@@ -298,19 +304,20 @@ window.PvP = {
 
         if (window.music38Sound && window.music38Sound.playing()) window.music38Sound.stop();
         if (window.correctSound) window.correctSound.play();
-        
-        let anonsMesaji = this.isBotMode ? 
-            "Bot lobiye giriş yaptı. Kısa süre sonra oyuna başlayacaksınız." : 
+
+        let anonsMesaji = this.isBotMode ?
+            "Bot lobiye giriş yaptı. Kısa süre sonra oyuna başlayacaksınız." :
             `Oyuncu oyuna giriş yaptı. Eşleşme bulundu! Rakibiniz: ${oppName}. Kısa süre sonra oyuna başlayacaksınız.`;
 
         if (window.announceToScreenReader) window.announceToScreenReader(anonsMesaji, true);
+
+        const statusText = document.getElementById('pvp-lobby-status-text');
+        const infoText = document.getElementById('pvp-lobby-info-text');
+        if (statusText) statusText.innerText = "Eşleşme Bulundu!";
+        if (infoText) infoText.innerText = anonsMesaji;
         
-        const btn = this.isBotMode ? document.getElementById('pve-bot-play-btn') : document.getElementById('pvp-play-btn');
-        if (btn) {
-            btn.innerHTML = `Eşleşti: ${oppName}!`;
-            btn.setAttribute('aria-label', anonsMesaji);
-            btn.style.pointerEvents = 'none'; // Prevent double clicking during wait
-        }
+        const btn = document.getElementById('pvp-lobby-cancel-btn');
+        if (btn) btn.style.pointerEvents = 'none'; // Prevent cancelling when starting
 
         // 10 Saniye boyunca 'Lobi' ekranında bekletip oyunu başlat
         this.lobbyWaitTimer = setTimeout(() => {
@@ -325,12 +332,9 @@ window.PvP = {
                 resetBotBtn.innerHTML = 'Bota Karşı Oyna';
                 resetBotBtn.style.pointerEvents = 'auto';
             }
-            
+
             if (window.switchMenu && window.gameMenu) {
-                let activeMultiMenu = window.multiplayerSelectMenu;
-                if (window.pvpRoomsMenu && window.pvpRoomsMenu.style.display !== 'none') {
-                    activeMultiMenu = window.pvpRoomsMenu;
-                }
+                let activeMultiMenu = window.pvpLobbyMenu;
                 window.switchMenu(activeMultiMenu, window.gameMenu, 'game');
             }
             this.startPvPGame();
@@ -338,19 +342,20 @@ window.PvP = {
     },
 
     // BOTA KARŞI OYNA (YAPAY ZEKA) BAŞLANGICI
-    startBotMatch: function() {
+    startBotMatch: function () {
         let deviceId = localStorage.getItem('hafizaGuvenDeviceId') || 'guest_' + Date.now();
         let myName = window.currentChatUser || localStorage.getItem('chatUsername') || "Sen";
-        
+
         this.isSearching = true; // Bot arıyormuş gibi hissettir
-        this.isHost = true; 
-        this.isBotMode = true; 
-        
-        // UI Bildirimleri
-        const botBtn = document.getElementById('pve-bot-play-btn');
-        if (botBtn) {
-            botBtn.innerHTML = 'Aranıyor... İptal için tıklayın';
-            botBtn.setAttribute('aria-label', 'Uygun bir yapay zeka rakibi aranıyor. İptal etmek için tekrar tıklayın.');
+        this.isHost = true;
+        this.isBotMode = true;
+
+        if (window.switchMenu && window.multiplayerSelectMenu && window.pvpLobbyMenu) {
+            window.switchMenu(window.multiplayerSelectMenu, window.pvpLobbyMenu, 'pvp-lobby');
+            const statusText = document.getElementById('pvp-lobby-status-text');
+            const infoText = document.getElementById('pvp-lobby-info-text');
+            if (statusText) statusText.innerText = "Bot Aranıyor...";
+            if (infoText) infoText.innerText = "Uygun bir yapay zeka rakibi aranıyor. Lütfen bekleyin.";
         }
         if (window.announceToScreenReader) window.announceToScreenReader("Uygun bir yapay zeka rakibi aranıyor. Lütfen bekleyin.");
 
@@ -359,16 +364,16 @@ window.PvP = {
 
         // Ortalama 12-16 saniye arası yapay bekleme süresi
         let waitTime = Math.floor(Math.random() * 4000) + 12000;
-        
+
         this.botQueueTimer = setTimeout(() => {
             if (!this.isSearching) return; // Kullanıcı beklerken odayı terkettiyse işlemi kes
-            
+
             this.isSearching = false;
             this.matchId = 'bot_match_' + deviceId + '_' + Date.now();
             this.opponentId = 'ai_bot';
             this.opponentName = 'Yapay Zeka (Bot)';
             this.botScore = 0;
-            
+
             const matchNode = window.db.ref('matches/' + this.matchId);
             matchNode.set({
                 host: deviceId,
@@ -383,22 +388,22 @@ window.PvP = {
         }, waitTime);
     },
 
-    simulateBotTurn: function(turnIndex) {
+    simulateBotTurn: function (turnIndex) {
         if (!this.isBotMode || !window.gameIsActive || !this.matchId) return;
-        
+
         // Ortalama Zeka Denklemi: Notaları Dinleme Süresi (turnIndex * 1000) + Notalara Basma Süresi (turnIndex * 400) + Reaksiyon Gecikmesi (500-2500ms arası)
         const reactTime = (turnIndex * 1000) + (turnIndex * 400) + (Math.floor(Math.random() * 2000) + 500);
-        
+
         this.botTimeout = setTimeout(() => {
             if (!window.gameIsActive || !this.matchId) return;
-            
+
             // %15 İhtimalle Bot Hata Yapar (Kafası Karışır / Yavaşlar)
             if (Math.random() < 0.15) {
                 // Şaşkınlık yaşasın, puanı alamasın, ancak bir süre sonra toparlanıp sonraki tura geçsin.
                 setTimeout(() => { if (window.gameIsActive) this.simulateBotTurn(turnIndex + 1); }, 2500);
                 return;
             }
-            
+
             // Bot hız testini kazandı mı diye Firebase'e istek at (İnsanın karşısına rakip çıkıyor)
             const turnRef = window.db.ref(`matches/${this.matchId}/turns/${turnIndex}`);
             turnRef.transaction((currentData) => {
@@ -415,34 +420,34 @@ window.PvP = {
                 // İnsan kazanmış da olsa, Bot kazanmış da olsa Bot oyuna devam eder ve sonraki turu dinlemeye başlar
                 this.simulateBotTurn(turnIndex + 1);
             });
-            
+
         }, reactTime);
     },
 
-    startPvPGame: function() {
+    startPvPGame: function () {
         if (!this.matchId) return;
         console.log("PvP Modu: 60 saniye başladı!");
-        
+
         window.isStarted = true;
         window.gameIsActive = true;
         window.isComputerPlaying = true;
         window.gameSequence = [];
         window.playerSequence = [];
         this.matchStarted = true;
-        
+
         if (window.bgMusic && window.bgMusic.playing()) {
             window.bgMusic.pause();
         }
         window.pvpScore = 0;
         window.lives = 3;
-        
+
         // KURAL 1: Süre 60 saniye olacak. (Offline resetlemeleri önlemek için özel bayrak kullanacağız)
         window.gameTimer = 60;
         if (window.updateGameUI) window.updateGameUI();
         if (window.announceToScreenReader) window.announceToScreenReader("Oyun başladı. Kural 1: Süreniz 60 saniye! Birebir modda süreniz her tur yenilenmez. Notalar aynıdır, rakip duyulmaz. Bol şans!");
 
         const matchNode = window.db.ref('matches/' + this.matchId);
-        
+
         // Host ve Client oyuna aynı anda başlar (Kural 2: Herkese aynı anda tam olarak aynı dizi gidecek)
         if (this.isHost) {
             const notes = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
@@ -450,7 +455,7 @@ window.PvP = {
             for (let i = 0; i < 100; i++) fullSeq.push(notes[Math.floor(Math.random() * notes.length)]);
             matchNode.update({ fullSequence: fullSeq, status: 'playing' });
         }
-        
+
         // Ortak oyun seyrini ve ortak diziyi dinle
         const listener = matchNode.on('value', snap => {
             const val = snap.val();
@@ -459,7 +464,7 @@ window.PvP = {
                 if (val.fullSequence && !this.fullSequence) {
                     this.fullSequence = val.fullSequence;
                     this.currentPvPTurn = 1;
-                    
+
                     // İlk raundu başlat
                     if (window.gameSequence.length === 0) {
                         this.playNextPvPRound();
@@ -477,14 +482,14 @@ window.PvP = {
                 const scoreDisplay = document.getElementById('game-score-display');
                 if (scoreDisplay) scoreDisplay.innerHTML = `Sen: ${window.pvpScore} | Rakip: ${oppScore}`;
             }
-            
+
             if (val && val.status === 'finished') {
                 this.endPvPGame(val);
                 matchNode.off('value', listener);
             }
         });
-        
-        
+
+
         // 60 Saniyelik Katı Kronometre
         this.pvpInterval = setInterval(() => {
             window.gameTimer--;
@@ -497,14 +502,14 @@ window.PvP = {
         }, 1000);
     },
 
-    playNextPvPRound: function() {
+    playNextPvPRound: function () {
         if (!window.gameIsActive) return;
         window.playerSequence = [];
         window.isComputerPlaying = true;
-        
+
         // Ortak notaları kes (Firebase'den alınan 100'lük seed'den yararlanır)
         window.gameSequence = this.fullSequence.slice(0, this.currentPvPTurn);
-        
+
         const gameStatus = document.getElementById('game-status-text');
         if (gameStatus) gameStatus.textContent = "Dinleyin...";
 
@@ -513,23 +518,23 @@ window.PvP = {
         }, 1000);
     },
 
-    onPlayerCorrectSequence: function() {
+    onPlayerCorrectSequence: function () {
         if (!this.matchId) return;
         const turnIndex = this.currentPvPTurn;
-        
+
         // Hız Yarışı Doğrulaması (Kural: Kim hızlıysa puanı o alır)
         const turnRef = window.db.ref(`matches/${this.matchId}/turns/${turnIndex}`);
-        
+
         turnRef.transaction((currentData) => {
             if (currentData === null) {
                 // Bu turu (turnIndex) henüz kimse geçmemiş, benim adıma yaz
-                return { 
-                    winner: this.isHost ? 'host' : 'client', 
-                    timestamp: firebase.database.ServerValue.TIMESTAMP 
+                return {
+                    winner: this.isHost ? 'host' : 'client',
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
             }
             // Tur daha önce kapılmış! İşlemi iptal et (puan yok)
-            return; 
+            return;
         }, (error, committed, snapshot) => {
             if (error) {
                 console.log("Turn transaction failed", error);
@@ -537,7 +542,7 @@ window.PvP = {
                 // Puan kazandık (Turun ilk bitireni biziz)
                 window.pvpScore += 10;
                 if (window.announceToScreenReader) window.announceToScreenReader("Puan senin!");
-                
+
                 // Skor güncellemesini sunucuya gönder
                 const matchNode = window.db.ref('matches/' + this.matchId);
                 let updateData = {};
@@ -556,26 +561,26 @@ window.PvP = {
         // (Aşağıda monkey patch ile korunan gameTimer devam edecek)
     },
 
-    finishMatchTimeUp: function() {
+    finishMatchTimeUp: function () {
         if (!window.gameIsActive || !this.matchId || this.gameEndingBlock) return;
         window.gameIsActive = false;
-        
+
         const matchNode = window.db.ref('matches/' + this.matchId);
         let updateData = { status: 'finished' };
         if (this.isHost) updateData.hostFinished = true;
         else updateData.clientFinished = true;
-        
+
         matchNode.update(updateData);
     },
     gameEndingBlock: false,
-    
-    endPvPGame: function(matchData) {
+
+    endPvPGame: function (matchData) {
         if (!this.matchId || this.gameEndingBlock) return; // Çift ödül zaafiyetini engelle
         this.gameEndingBlock = true;
-        
+
         clearInterval(this.pvpInterval);
         if (this.botTimeout) clearTimeout(this.botTimeout);
-        
+
         // Eğer oyun henüz başlamadan iptal edildiyse (10 sn lobi sırasında), ödül sistemini atla
         if (!this.matchStarted) {
             if (this.lobbyWaitTimer) {
@@ -583,42 +588,42 @@ window.PvP = {
                 this.lobbyWaitTimer = null;
             }
             if (window.bgMusic && !window.bgMusic.playing() && window.currentActiveMenu !== 'game' && window.currentActiveMenu !== 'story') window.bgMusic.play();
-            
+
             const btn = document.getElementById('pvp-play-btn');
             if (btn) {
                 btn.innerHTML = 'Maç Oluştur';
                 btn.style.pointerEvents = 'auto';
             }
-            
+
             this.matchId = null;
             this.isBotMode = false;
             this.matchStarted = false;
             this.gameEndingBlock = false;
             if (window.announceToScreenReader) window.announceToScreenReader("Rakip lobiden ayrıldı, maç iptal edildi.");
-            
+
             // Eğer lobide veya multiplayer menülerindeyse, ana menüye atmak için tetikleyici
             if (window.switchMenu && window.mainMenu) {
                 let currentMenu = document.querySelector('.menu-container:not([style*="display: none"])');
-                if (currentMenu && (currentMenu.id === 'pvp-rooms-menu-container' || currentMenu.id === 'multiplayer-select-menu-container')) {
-                    const backbtn = document.getElementById('multiplayer-select-back-btn') || document.getElementById('pvp-rooms-back-btn');
-                    if(backbtn) backbtn.click();
+                if (currentMenu && (currentMenu.id === 'pvp-rooms-menu-container' || currentMenu.id === 'multiplayer-select-menu-container' || currentMenu.id === 'pvp-lobby-menu-container')) {
+                    const backbtn = document.getElementById('pvp-lobby-cancel-btn') || document.getElementById('multiplayer-select-back-btn') || document.getElementById('pvp-rooms-back-btn');
+                    if (backbtn) backbtn.click();
                 }
             }
             return;
         }
 
         window.gameIsActive = false;
-        
+
         let myScore = this.isHost ? (matchData.hostScore || 0) : (matchData.clientScore || 0);
         let oppScore = this.isHost ? (matchData.clientScore || 0) : (matchData.hostScore || 0);
-        
+
         let msg = `Oyun Bitti! Senin Puanın: ${myScore}, Rakibin Puanı: ${oppScore}. `;
         let isWinner = false;
-        
+
         if (myScore > oppScore) {
             isWinner = true;
             msg += "Kazandın! ";
-            
+
             // Kazanan için Rastgele Ödül Çekilişi (3 İhtimal)
             const rewardRNG = Math.floor(Math.random() * 3);
             if (rewardRNG === 0) {
@@ -645,20 +650,20 @@ window.PvP = {
             localStorage.setItem('hafizaGuvenTotalTokens', coins + 20);
             msg += "Teselli Ödülü: 20 Hafıza Jetonu kazandın.";
         }
-        
+
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
-        
+
         setTimeout(() => {
             // PVP'DE ÇİFTE ÖDÜL ENFLASYONUNU ENGELLEME KİLİDİ
-            window.sessionTokens = 0; 
-            
+            window.sessionTokens = 0;
+
             if (window.endMainGame) window.endMainGame(true, isWinner, false);
-            
+
             // Veritabanı Şişmesini (Database Spam) Engellemek İçin Bot Maçlarını Sil
             if (this.isBotMode && this.matchId) {
                 window.db.ref('matches/' + this.matchId).remove();
             }
-            
+
             this.matchId = null; // Sıfırla
             this.isBotMode = false;
             this.gameEndingBlock = false;
@@ -671,10 +676,10 @@ window.PvP = {
 // game.js içerisindeki orijinal çevrimdışı (offline) fonksiyonları bozmadan PVP Kurallarını (Özellikle Kural 1: 60 Saniye) dayatıyoruz.
 
 const originalHandleGameInput = window.handleGameInput;
-window.handleGameInput = function(key) {
+window.handleGameInput = function (key) {
     if (window.PvP && window.PvP.matchId) {
         let cachedTimer = window.gameTimer; // KURAL 1: 60 saniyelik zamanı korumaya al (Offline oyun her doğru tuşta 30sn'ye sıfırlar, bunu engelliyoruz)
-        originalHandleGameInput(key); 
+        originalHandleGameInput(key);
         window.gameTimer = cachedTimer; // Offline resetini zorla ez ve Kural 1'i koru!
     } else {
         originalHandleGameInput(key);
@@ -684,7 +689,7 @@ window.handleGameInput = function(key) {
 const originalAddNewNote = window.addNewNoteAndPlaySequence;
 window.addNewNoteAndPlaySequence = function () {
     if (window.PvP && window.PvP.matchId) {
-        window.PvP.onPlayerCorrectSequence(); 
+        window.PvP.onPlayerCorrectSequence();
         // Ortak dizilim (fullSequence) kullanıldığı için offline nota üreticisini kullanmıyoruz
     } else {
         originalAddNewNote();
@@ -692,10 +697,12 @@ window.addNewNoteAndPlaySequence = function () {
 };
 
 const originalEndMainGame = window.endMainGame;
-window.endMainGame = function(isTimeUp = false, isWin = false, isUserExit = false) {
+window.endMainGame = function (isTimeUp = false, isWin = false, isUserExit = false) {
     if (window.PvP && window.PvP.matchId) {
         window.PvP.finishMatchTimeUp(); // Sunucuya öldüğümüzü / bittiğini haber ver
-        window.PvP.matchId = null; 
+        window.PvP.matchId = null;
     }
     if (originalEndMainGame) originalEndMainGame(isTimeUp, isWin, isUserExit);
 };
+
+

@@ -151,6 +151,7 @@ window.gameMenu = document.getElementById('game-menu-container');
 window.storyMenu = document.getElementById('story-menu-container');
 window.profileMenu = document.getElementById('profile-menu-container');
 window.socialMenu = document.getElementById('social-menu-container');
+window.pvpLobbyMenu = document.getElementById('pvp-lobby-menu-container');
 window.allMenuButtons = Array.from(document.querySelectorAll('.menu-button'));
 
 window.currentFocusIndex = 0;
@@ -176,6 +177,7 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'play-mode') buttons = Array.from(document.getElementById('play-mode-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'multiplayer-select') buttons = Array.from(document.getElementById('multiplayer-select-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'pvp-rooms') buttons = Array.from(document.getElementById('pvp-rooms-menu-container').querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'pvp-lobby') buttons = Array.from(document.getElementById('pvp-lobby-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'pvp-create') buttons = Array.from(document.getElementById('pvp-create-menu-container').querySelectorAll('.menu-button, input, select'));
     else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'settings') buttons = Array.from(document.getElementById('settings-menu-container').querySelectorAll('.menu-button, input[type="range"], select'));
@@ -1727,6 +1729,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mpSelectMenuDOM = document.getElementById('multiplayer-select-menu-container');
     const pvpPlayBtn = document.getElementById('pvp-play-btn');
     const pvpJoinBtn = document.getElementById('pvp-join-btn');
+    const pvpLobbyCancelBtn = document.getElementById('pvp-lobby-cancel-btn');
     const pveBotPlayBtn = document.getElementById('pve-bot-play-btn');
     const mpSelectBackBtn = document.getElementById('multiplayer-select-back-btn');
     if (!window.multiplayerSelectMenu) window.multiplayerSelectMenu = mpSelectMenuDOM;
@@ -1782,6 +1785,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.wrongSound) window.wrongSound.play();
                 if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme sistemi henüz yüklenmedi.");
             }
+        });
+    }
+
+    if (pvpLobbyCancelBtn) {
+        pvpLobbyCancelBtn.addEventListener('click', () => {
+            if (window.PvP) {
+                window.PvP.cancelQueue();
+            }
+            window.switchMenu(window.pvpLobbyMenu, window.multiplayerSelectMenu, 'multiplayer-select');
         });
     }
 
@@ -2018,7 +2030,8 @@ window.addEventListener('popstate', (e) => {
         'stats': 'stats-back-btn',
         'play-mode': 'play-mode-back-btn',
         'multiplayer-select': 'multiplayer-select-back-btn',
-        'pvp-rooms': 'pvp-rooms-back-btn'
+        'pvp-rooms': 'pvp-rooms-back-btn',
+        'pvp-lobby': 'pvp-lobby-cancel-btn'
     };
     
     if (window.currentActiveMenu && menusWithBackBtns[window.currentActiveMenu]) {
