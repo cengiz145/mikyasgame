@@ -119,7 +119,7 @@ window.PvP = {
 
             if (availableMatches.length === 0) {
                 if (statusText) statusText.innerHTML = "Şuan halihazırda açılmış bir maç yok.<br>Lütfen bir maç oluşturun.";
-                if (window.announceToScreenReader) window.announceToScreenReader("Şuan halihazırda açılmış bir maç yok. Lütfen bir maç oluşturun.");
+                if (!shouldOpenMenu && window.announceToScreenReader) window.announceToScreenReader("Şuan halihazırda açılmış bir maç yok. Lütfen bir maç oluşturun.");
                 
                 if (window.music38Sound && window.music38Sound.playing()) window.music38Sound.stop();
 
@@ -129,7 +129,7 @@ window.PvP = {
                 return;
             }
 
-            if (statusText) statusText.innerText = availableMatches.length + ' adet açık maç bulundu. Katılmak için seçiniz.';
+            if (statusText) statusText.innerText = availableMatches.length + ' adet açık maç bulundu. Lütfen ok tuşlarıyla gezinerek birine tıklayıp katılın.';
 
             availableMatches.forEach((match) => {
                 const li = document.createElement('li');
@@ -153,8 +153,9 @@ window.PvP = {
             
             if (shouldOpenMenu && window.switchMenu && window.pvpRoomsMenu && window.multiplayerSelectMenu) {
                 window.switchMenu(window.multiplayerSelectMenu, window.pvpRoomsMenu, 'pvp-rooms');
+            } else if (!shouldOpenMenu && window.announceToScreenReader) {
+                window.announceToScreenReader(availableMatches.length + ' adet açık maç bulundu. Lütfen ok tuşlarıyla gezinerek birine tıklayıp katılın.');
             }
-            if (window.announceToScreenReader) window.announceToScreenReader(availableMatches.length + ' adet açık maç bulundu. Lütfen ok tuşlarıyla gezinerek birine tıklayıp katılın.');
         }).catch((error) => {
             if (statusText) statusText.innerText = 'Bir hata oluştu.';
         });
