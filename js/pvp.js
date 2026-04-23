@@ -95,43 +95,63 @@ window.PvP = {
         if (window.music38Sound && !window.music38Sound.playing()) window.music38Sound.play();
 
         // Odaya biri katıldı mı diye dinle
+        this.lastLobbyPlayers = {};
         this.matchRef = window.db.ref('matches/' + this.matchId);
         this.matchRef.on('value', (snapshot) => {
             if (!this.isSearching) return;
             const matchData = snapshot.val();
             if (!matchData) return;
 
-            // Gelen oyuncu varsa listele
+            let currentPlayers = {};
+            if (matchData.hostName) currentPlayers[matchData.host] = matchData.hostName;
             if (matchData.clients) {
-                const clientKeys = Object.keys(matchData.clients);
+                Object.keys(matchData.clients).forEach(k => {
+                    currentPlayers[k] = matchData.clients[k].name;
+                });
+            }
+
+            let currentKeys = Object.keys(currentPlayers);
+            let lastKeys = Object.keys(this.lastLobbyPlayers);
+
+            if (lastKeys.length > 0) {
+                currentKeys.forEach(id => {
+                    if (!this.lastLobbyPlayers[id]) {
+                        let msg = `${currentPlayers[id]} lobiye katıldı.`;
+                        if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
+                        if (window.showToastNotification) window.showToastNotification(msg);
+                    }
+                });
+                lastKeys.forEach(id => {
+                    if (!currentPlayers[id]) {
+                        let msg = `${this.lastLobbyPlayers[id]} lobiden ayrıldı.`;
+                        if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
+                        if (window.showToastNotification) window.showToastNotification(msg);
+                    }
+                });
+            }
+            this.lastLobbyPlayers = currentPlayers;
+
+            const statusText = document.getElementById('pvp-lobby-status-text');
+            const infoText = document.getElementById('pvp-lobby-info-text');
+            const startBtn = document.getElementById('pvp-lobby-start-btn');
+            
+            if (matchData.status === 'waiting_for_client') {
+                let pNames = Object.values(currentPlayers).join(', ');
+                if (statusText) statusText.innerText = `Odadakiler (${currentKeys.length}/4)`;
+                if (infoText) infoText.innerText = "Oyuncular: " + pNames;
                 
-                if (clientKeys.length > 0 && matchData.status === 'waiting_for_client') {
-                    const statusText = document.getElementById('pvp-lobby-status-text');
-                    const infoText = document.getElementById('pvp-lobby-info-text');
-                    const startBtn = document.getElementById('pvp-lobby-start-btn');
-                    
-                    if (statusText) statusText.innerText = `Bağlananlar (${clientKeys.length}/4)`;
-                    let katilanlar = clientKeys.map(k => matchData.clients[k].name).join(', ');
-                    if (infoText) infoText.innerText = "Odadakiler: " + katilanlar;
-                    
-                    if (startBtn && startBtn.style.display === 'none') {
-                        startBtn.style.display = 'inline-block';
-                        setTimeout(() => startBtn.focus(), 100);
-                    }
-                    
-                    if (clientKeys.length > this.lastClientCount) {
-                        this.lastClientCount = clientKeys.length;
-                        if (window.announceToScreenReader) window.announceToScreenReader("Yeni oyuncu katıldı. Odadakiler: " + katilanlar);
-                    }
+                if (currentKeys.length > 1 && startBtn && startBtn.style.display === 'none') {
+                    startBtn.style.display = 'inline-block';
+                    setTimeout(() => startBtn.focus(), 100);
+                } else if (currentKeys.length <= 1 && startBtn) {
+                    startBtn.style.display = 'none';
                 }
             }
-            
-            // Host maçı manuel başlattıktan sonra starting aşamasını yakala
+
             if (matchData.status === 'starting') {
                 this.isSearching = false;
                 this.matchRef.off();
-                // Rakip adını jenerik olarak belirt (hepsini yazmak sığmayabilir)
-                let oppNameStr = matchData.clients ? Object.keys(matchData.clients).length + ' Oyuncu' : 'Rakipler';
+                let oppNameStr = (currentKeys.length - 1) + ' Rakip';
                 this.enterMatchRoom(this.matchId, oppNameStr);
             }
         });
@@ -277,16 +297,62 @@ window.PvP = {
                     
                     if (window.announceToScreenReader) window.announceToScreenReader("Odaya bağlanıldı. Oda kurucusunun maçı başlatması bekleniyor.");
 
-                    // Kurucunun maçı "starting" yapmasını dinle
+                    // Kurucunun maçı "starting" yapmasını dinle ve lobi değişimlerini takip et
+                    this.lastLobbyPlayers = {};
                     this.matchRef = window.db.ref('matches/' + this.matchId);
                     this.matchRef.on('value', snap => {
                         const mData = snap.val();
-                        if (mData && mData.status === 'starting') {
+                        if (!mData) return;
+
+                        let currentPlayers = {};
+                        if (mData.hostName) currentPlayers[mData.host] = mData.hostName;
+                        if (mData.clients) {
+                            Object.keys(mData.clients).forEach(k => {
+                                currentPlayers[k] = mData.clients[k].name;
+                            });
+                        }
+
+                        let currentKeys = Object.keys(currentPlayers);
+                        let lastKeys = Object.keys(this.lastLobbyPlayers);
+
+                        if (lastKeys.length > 0) {
+                            currentKeys.forEach(id => {
+                                if (!this.lastLobbyPlayers[id]) {
+                                    let msg = `${currentPlayers[id]} lobiye katıldı.`;
+                                    if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
+                                    if (window.showToastNotification) window.showToastNotification(msg);
+                                }
+                            });
+                            lastKeys.forEach(id => {
+                                if (!currentPlayers[id]) {
+                                    let msg = `${this.lastLobbyPlayers[id]} lobiden ayrıldı.`;
+                                    if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
+                                    if (window.showToastNotification) window.showToastNotification(msg);
+                                }
+                            });
+                        }
+                        this.lastLobbyPlayers = currentPlayers;
+
+                        const statusText = document.getElementById('pvp-lobby-status-text');
+                        const infoText = document.getElementById('pvp-lobby-info-text');
+                        
+                        // Eğer kurucu odayı kapattıysa (İptal ettiyse) istemcileri güvenlice çıkar
+                        if (mData.status === 'finished') {
+                             if (window.wrongSound) window.wrongSound.play();
+                             if (window.announceToScreenReader) window.announceToScreenReader("Kurucu odayı kapattı.", true);
+                             this.cancelQueue();
+                             return;
+                        }
+
+                        if (mData.status === 'waiting_for_client') {
+                            let pNames = Object.values(currentPlayers).join(', ');
+                            if (statusText) statusText.innerText = `Odadakiler (${currentKeys.length}/4)`;
+                            if (infoText) infoText.innerText = "Oyuncular: " + pNames;
+                        }
+
+                        if (mData.status === 'starting') {
                             this.matchRef.off();
-                            
-                            // Diğer katılımcıların sayısını hesapla
-                            let katilanSayisi = mData.clients ? Object.keys(mData.clients).length : 1;
-                            let oppText = `Kurucu: ${hostName} ve ${katilanSayisi - 1} Rakip`;
+                            let oppText = `Kurucu: ${mData.hostName} ve ${currentKeys.length - 2 > 0 ? currentKeys.length - 2 : 0} Rakip`;
                             this.enterMatchRoom(this.matchId, oppText);
                         }
                     });
@@ -333,8 +399,14 @@ window.PvP = {
         // -------------------------------------------------------------
 
         if (this.matchId) {
-            window.db.ref('matches/' + this.matchId).update({ status: 'finished', hostFinished: true, clientFinished: true });
-            if (this.isBotMode) window.db.ref('matches/' + this.matchId).remove();
+            if (this.isHost) {
+                // Kurucu çıkarsa odayı tamamen kapat
+                window.db.ref('matches/' + this.matchId).update({ status: 'finished', hostFinished: true, clientFinished: true });
+                if (this.isBotMode) window.db.ref('matches/' + this.matchId).remove();
+            } else {
+                // İstemci çıkarsa sadece kendini odadan sil (Diğerleri oynamaya devam edebilsin)
+                window.db.ref('matches/' + this.matchId + '/clients/' + this.myQueueId).remove();
+            }
             this.matchId = null;
         }
 
