@@ -1811,12 +1811,24 @@ document.addEventListener('DOMContentLoaded', () => {
         pvpLobbyCopyBtn.addEventListener('click', () => {
             const codeDisplay = document.getElementById('pvp-lobby-code-display');
             if (codeDisplay && codeDisplay.innerText && codeDisplay.innerText !== '----') {
-                navigator.clipboard.writeText(codeDisplay.innerText).then(() => {
-                    if (window.announceToScreenReader) window.announceToScreenReader("Oda kodu kopyalandı: " + codeDisplay.innerText);
-                    const originalText = pvpLobbyCopyBtn.innerText;
+                const textToCopy = codeDisplay.innerText.trim();
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = textToCopy;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    if (window.announceToScreenReader) window.announceToScreenReader("Oda kodu kopyalandı: " + textToCopy);
+                    const originalText = "Kodu Kopyala";
                     pvpLobbyCopyBtn.innerText = "Kopyalandı!";
                     setTimeout(() => pvpLobbyCopyBtn.innerText = originalText, 2000);
-                });
+                } catch (err) {
+                    alert("Kopyalama işlemi desteklenmiyor. Lütfen kodu manuel olarak seçin: " + textToCopy);
+                }
             }
         });
     }
