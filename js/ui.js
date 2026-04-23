@@ -1736,7 +1736,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const pvpRoomsMenuDOM = document.getElementById('pvp-rooms-menu-container');
     const pvpRoomsBackBtn = document.getElementById('pvp-rooms-back-btn');
-    const pvpRoomsRefreshBtn = document.getElementById('pvp-rooms-refresh-btn');
+    const pvpJoinSubmitBtn = document.getElementById('pvp-join-submit-btn');
+    const pvpJoinCodeInput = document.getElementById('pvp-join-code-input');
     if (!window.pvpRoomsMenu) window.pvpRoomsMenu = pvpRoomsMenuDOM;
 
     if (pvpRoomsBackBtn) {
@@ -1745,10 +1746,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (pvpRoomsRefreshBtn) {
-        pvpRoomsRefreshBtn.addEventListener('click', () => {
-            if (window.PvP && window.PvP.fetchAvailableMatches) {
-                window.PvP.fetchAvailableMatches(false); // false = tell it not to switch menus as we are already here
+    if (pvpJoinSubmitBtn && pvpJoinCodeInput) {
+        pvpJoinSubmitBtn.addEventListener('click', () => {
+            if (window.PvP && window.PvP.joinExistingMatchByCode) {
+                const code = pvpJoinCodeInput.value.trim();
+                if (code.length === 4) {
+                    window.PvP.joinExistingMatchByCode(code);
+                } else {
+                    if (window.wrongSound) window.wrongSound.play();
+                    alert("Lütfen 4 haneli geçerli bir oda kodu girin.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Lütfen 4 haneli geçerli bir oda kodu girin.", false);
+                }
+            }
+        });
+    }
+
+    // Ekstra: Şifre alanında enter tuşu ile onSubmit tetikleme
+    if (pvpJoinCodeInput) {
+        pvpJoinCodeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && pvpJoinSubmitBtn) {
+                pvpJoinSubmitBtn.click();
             }
         });
     }
@@ -1778,12 +1795,36 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pvpJoinBtn) {
         pvpJoinBtn.addEventListener('click', () => {
             if (window.PvP) {
-                if (window.PvP.fetchAvailableMatches) {
-                    window.PvP.fetchAvailableMatches(true); // true = open menu if successful or announce if empty
-                }
+                if (pvpJoinCodeInput) pvpJoinCodeInput.value = ''; // Temizle
+                window.switchMenu(window.multiplayerSelectMenu, window.pvpRoomsMenu, 'pvp-rooms');
             } else {
                 if (window.wrongSound) window.wrongSound.play();
                 if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme sistemi henüz yüklenmedi.");
+            }
+        });
+    }
+
+    const pvpLobbyCopyBtn = document.getElementById('pvp-lobby-copy-btn');
+    const pvpLobbyStartBtn = document.getElementById('pvp-lobby-start-btn');
+
+    if (pvpLobbyCopyBtn) {
+        pvpLobbyCopyBtn.addEventListener('click', () => {
+            const codeDisplay = document.getElementById('pvp-lobby-code-display');
+            if (codeDisplay && codeDisplay.innerText && codeDisplay.innerText !== '----') {
+                navigator.clipboard.writeText(codeDisplay.innerText).then(() => {
+                    if (window.announceToScreenReader) window.announceToScreenReader("Oda kodu kopyalandı: " + codeDisplay.innerText);
+                    const originalText = pvpLobbyCopyBtn.innerText;
+                    pvpLobbyCopyBtn.innerText = "Kopyalandı!";
+                    setTimeout(() => pvpLobbyCopyBtn.innerText = originalText, 2000);
+                });
+            }
+        });
+    }
+
+    if (pvpLobbyStartBtn) {
+        pvpLobbyStartBtn.addEventListener('click', () => {
+            if (window.PvP && window.PvP.startMatchManually) {
+                window.PvP.startMatchManually();
             }
         });
     }

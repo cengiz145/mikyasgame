@@ -537,26 +537,28 @@
         
     </div>
 
-    <!-- Açık Maçlar (Lobi) Menüsü -->
+    <!-- Odaya Katıl Menüsü -->
     <div id="pvp-rooms-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
             onfocus="setTimeout(() => document.getElementById('pvp-rooms-back-btn').focus(), 10);"></div>
         
-        <h1 id="pvp-rooms-title">Açık Maçlar</h1>
+        <h1 id="pvp-rooms-title">Odaya Katıl</h1>
         <div id="pvp-rooms-status-text" tabindex="0" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px;">
-            Açık maç aranıyor...
+            Dört haneli oda kodunu girin.
         </div>
         
-        <nav class="menu-nav"   aria-labelledby="pvp-rooms-title">
-            <ul id="pvp-rooms-list" style="max-height: 40vh; overflow-y: auto; padding-right: 5px; margin-bottom: 10px;">
-                <!-- Odalar dinamik olarak buraya eklenecek -->
-            </ul>
+        <div style="margin-bottom: 20px;">
+            <input type="number" id="pvp-join-code-input" placeholder="Örn: 1492" maxlength="4" style="font-size: 2rem; padding: 10px; width: 200px; text-align: center; border-radius: 8px; border: 2px solid #555; background-color: rgba(255, 255, 255, 0.9); color: #000; font-weight: bold;" aria-label="4 Haneli Oda Kodu">
+        </div>
+
+        <nav class="menu-nav" aria-labelledby="pvp-rooms-title">
+            <ul id="pvp-rooms-list" style="display:none;"></ul>
             <ul>
                 <li>
-                    <button id="pvp-rooms-refresh-btn" class="menu-button" aria-label="Listeyi Yenile">Listeyi Yenile</button>
+                    <button id="pvp-join-submit-btn" class="menu-button" aria-label="Odaya Katıl">Katıl</button>
                 </li>
                 <li>
                     <button id="pvp-rooms-back-btn" class="menu-button" aria-label="Çok Oyunculu Menüsüne Dön">Geri</button>
@@ -566,13 +568,15 @@
         
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
             style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
-            onfocus="setTimeout(() => { const btn=document.getElementById('pvp-rooms-refresh-btn'); if(btn) btn.focus(); }, 10);"></div>
+            onfocus="setTimeout(() => { const btn=document.getElementById('pvp-join-submit-btn'); if(btn) btn.focus(); }, 10);"></div>
     </div>
 
     <!-- Eşleştirme Lobisi (Bekleme Odası) -->
     <div id="pvp-lobby-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <h1 id="pvp-lobby-title">Oyun Lobisi</h1>
+        <h2 id="pvp-lobby-code-display" style="font-size: 2.5rem; letter-spacing: 5px; color: #fff; margin-bottom: 10px; font-family: monospace;">----</h2>
+        
         <div id="pvp-lobby-status-text" tabindex="0" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.2rem; color: #ffb703; font-weight: bold; min-height: 50px;">
             Bekleniyor...
@@ -583,6 +587,12 @@
         
         <nav class="menu-nav" aria-labelledby="pvp-lobby-title">
             <ul>
+                <li>
+                    <button id="pvp-lobby-start-btn" class="menu-button highlight" aria-label="Maçı Başlat" style="display: none; background: linear-gradient(145deg, #00b4d8, #0077b6);">Maçı Başlat</button>
+                </li>
+                <li>
+                    <button id="pvp-lobby-copy-btn" class="menu-button" aria-label="Kodu Kopyala">Kodu Kopyala</button>
+                </li>
                 <li>
                     <button id="pvp-lobby-cancel-btn" class="menu-button" aria-label="Lobiden Çık veya İptal Et">İptal Et</button>
                 </li>
