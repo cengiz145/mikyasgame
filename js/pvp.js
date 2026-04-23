@@ -86,6 +86,7 @@ window.PvP = {
             if (startBtn) startBtn.style.display = 'none'; // Gizle, kimse yok
         }
 
+        if (window.arenaJoinSound) window.arenaJoinSound.play();
         if (window.announceToScreenReader) {
             let kodOkunusu = this.roomCode.split('').join(' ');
             window.announceToScreenReader("Oda kuruldu. Oda numaranız: " + kodOkunusu + " . Oyuncular aranıyor.");
@@ -119,6 +120,7 @@ window.PvP = {
                         let msg = `${currentPlayers[id]} lobiye katıldı.`;
                         if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                         if (window.showToastNotification) window.showToastNotification(msg);
+                        if (window.arenaJoinSound) window.arenaJoinSound.play();
                     }
                 });
                 lastKeys.forEach(id => {
@@ -126,6 +128,7 @@ window.PvP = {
                         let msg = `${this.lastLobbyPlayers[id]} lobiden ayrıldı.`;
                         if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                         if (window.showToastNotification) window.showToastNotification(msg);
+                        if (window.arenaLeaveSound) window.arenaLeaveSound.play();
                     }
                 });
             }
@@ -290,6 +293,7 @@ window.PvP = {
                     if (statusText) statusText.innerText = "Bağlanıldı!";
                     if (infoText) infoText.innerText = "Siz ve diğer oyuncular... Kurucunun maçı başlatması bekleniyor.";
 
+                    if (window.arenaJoinSound) window.arenaJoinSound.play();
                     if (btn) {
                         btn.innerHTML = 'Katıl';
                         btn.style.pointerEvents = 'auto';
@@ -321,6 +325,7 @@ window.PvP = {
                                     let msg = `${currentPlayers[id]} lobiye katıldı.`;
                                     if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                                     if (window.showToastNotification) window.showToastNotification(msg);
+                                    if (window.arenaJoinSound) window.arenaJoinSound.play();
                                 }
                             });
                             lastKeys.forEach(id => {
@@ -328,6 +333,7 @@ window.PvP = {
                                     let msg = `${this.lastLobbyPlayers[id]} lobiden ayrıldı.`;
                                     if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                                     if (window.showToastNotification) window.showToastNotification(msg);
+                                    if (window.arenaLeaveSound) window.arenaLeaveSound.play();
                                 }
                             });
                         }
@@ -399,6 +405,7 @@ window.PvP = {
         // -------------------------------------------------------------
 
         if (this.matchId) {
+            if (window.arenaLeaveSound) window.arenaLeaveSound.play();
             if (this.isHost) {
                 // Kurucu çıkarsa odayı tamamen kapat
                 window.db.ref('matches/' + this.matchId).update({ status: 'finished', hostFinished: true, clientFinished: true });

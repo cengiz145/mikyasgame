@@ -339,3 +339,13 @@ function unlockMobileAudio() {
 // Sadece ilk etkileşimde çalışıp kendini imha etsin
 document.addEventListener('touchstart', unlockMobileAudio, { once: true });
 document.addEventListener('click', unlockMobileAudio, { once: true });
+
+window.arenaJoinSound = new Howl({
+    src: ['sounds/arena_join.ogg'],
+    volume: 1.0
+});
+
+window.arenaLeaveSound = new Howl({
+    src: ['sounds/arena_leave.ogg'],
+    volume: 1.0
+});
