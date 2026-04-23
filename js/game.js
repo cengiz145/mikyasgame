@@ -1,5 +1,26 @@
 // game.js - Ana Oyun Döngüsü ve Motor İşlevleri
 
+window.hgfzZamanlayici = {
+    timeouts: new Set(),
+    intervals: new Set(),
+    setTimeout: function(fn, delay) {
+        const id = setTimeout(() => { this.timeouts.delete(id); fn(); }, delay);
+        this.timeouts.add(id);
+        return id;
+    },
+    setInterval: function(fn, delay) {
+        const id = setInterval(fn, delay);
+        this.intervals.add(id);
+        return id;
+    },
+    hepsiniImhaEt: function() {
+        this.timeouts.forEach(id => clearTimeout(id));
+        this.intervals.forEach(id => clearInterval(id));
+        this.timeouts.clear();
+        this.intervals.clear();
+    }
+};
+
 // Boşluk tuşuna ve yön tuşlarına basıldığında sayfanın aşağı/yukarı kaymasını engelle
 window.addEventListener('keydown', function(event) {
     if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) {
@@ -86,7 +107,7 @@ localStorage.setItem = function(key, value) {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Veritabanı hazır oluncaya kadar bekle
-    const checkDb = setInterval(() => {
+    const checkDb = window.hgfzZamanlayici.setInterval(() => {
         if (window.db) {
             clearInterval(checkDb);
             
@@ -107,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         localStorage.setItem('lastWipeTime', serverWipeTime);
                         
                         if (window.announceToScreenReader) window.announceToScreenReader("Sistem yöneticisi tarafından küresel sıfırlama yapıldı. Tüm verileriniz temizlendi, oyun baştan başlatılıyor.");
-                        setTimeout(() => location.reload(), 2000);
+                        window.hgfzZamanlayici.setTimeout(() => location.reload(), 2000);
                     }
                 }
             });
@@ -122,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.clear();
                     document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalıcı olarak uzaklaştırıldınız.</h1>";
                     if (window.announceToScreenReader) window.announceToScreenReader("Erişim engellendi. Sunucudan kalıcı olarak uzaklaştırıldınız.");
-                    setInterval(() => { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalıcı olarak uzaklaştırıldınız.</h1>"; }, 100);
+                    window.hgfzZamanlayici.setInterval(() => { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalıcı olarak uzaklaştırıldınız.</h1>"; }, 100);
                 }
             });
             
@@ -149,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             li.innerHTML = `<div class="wp-bubble" aria-hidden="true" style="background:#5a4a15; border-left:4px solid #ffcc00; color:#fff;"><strong style="color:#ffcc00;">[ÖZEL MESAJ]</strong> ${sEscapeHTML(pmData.from)}: ${sEscapeHTML(pmData.text)}</div>`;
                             chatMsgList.appendChild(li);
                             const chatCont = document.querySelector('.chat-messages-container');
-                            if (chatCont) setTimeout(() => chatCont.scrollTop = chatCont.scrollHeight, 10);
+                            if (chatCont) window.hgfzZamanlayici.setTimeout(() => chatCont.scrollTop = chatCont.scrollHeight, 10);
                         }
                         
                         if (window.chatReceiveSound) window.chatReceiveSound.play();
@@ -173,7 +194,7 @@ window.playIntro = function () {
     const audio = new window.Audio(`sounds/logo${randomLogoNum}.${ext}`);
 
     // Logoların uzunluğu farklı olabileceği için yedek süreyi 15 saniyeye çıkardık.
-    let fallbackTimeout = setTimeout(() => { window.startGame(); }, 15000);
+    let fallbackTimeout = window.hgfzZamanlayici.setTimeout(() => { window.startGame(); }, 15000);
 
     const startSafe = () => {
         clearTimeout(fallbackTimeout);
@@ -204,16 +225,16 @@ window.playIntro = function () {
     const phase1 = document.getElementById('intro-phase-1');
     if (phase1) {
         phase1.style.opacity = '0';
-        setTimeout(() => {
+        window.hgfzZamanlayici.setTimeout(() => {
             phase1.style.display = 'none';
             phase1.setAttribute('aria-hidden', 'true');
 
             const phase2 = document.getElementById('intro-phase-2');
             if (phase2) {
                 phase2.style.display = 'flex';
-                setTimeout(() => {
+                window.hgfzZamanlayici.setTimeout(() => {
                     phase2.style.opacity = '1';
-                    setTimeout(() => { window.introReadyToStartGame = true; }, 1000);
+                    window.hgfzZamanlayici.setTimeout(() => { window.introReadyToStartGame = true; }, 1000);
                 }, 50);
             }
         }, 500);
@@ -232,7 +253,7 @@ window.startGame = function () {
 
     if (window.introScreen) window.introScreen.style.opacity = '0';
 
-    setTimeout(() => {
+    window.hgfzZamanlayici.setTimeout(() => {
         if (window.introScreen) {
             window.introScreen.style.display = 'none';
             window.introScreen.setAttribute('aria-hidden', 'true');
@@ -244,14 +265,14 @@ window.startGame = function () {
             const lastSeenVersion = localStorage.getItem('lastSeenChangelogVersion');
             if (window.globalChangelogVersion && lastSeenVersion !== window.globalChangelogVersion && window.globalChangelogMessage) {
                 if (window.switchMenu && window.serverMessageMenu) window.switchMenu(window.mainMenu, window.serverMessageMenu, 'server-message');
-                setTimeout(() => {
+                window.hgfzZamanlayici.setTimeout(() => {
                     const firstBtn = document.getElementById('server-message-continue-btn');
                     if (firstBtn) firstBtn.focus();
                     if (window.announceToScreenReader) window.announceToScreenReader("Sunucu Mesajı: " + window.globalChangelogMessage + " Devam etmek için butona basın.");
                 }, 400);
             } else {
                 window.mainMenu.removeAttribute('aria-hidden');
-                setTimeout(() => {
+                window.hgfzZamanlayici.setTimeout(() => {
                     window.mainMenu.style.opacity = '1';
                     // Ekran okuyucusunun Browse Mode'a (Makale moduna) geçmesini engellemek için
                     // odağı oyun zeminine (application) veriyoruz.
@@ -311,7 +332,7 @@ window.startMainGame = function (difficulty = 'easy') {
     }
     if (window.mobileExitBtnTimeout) clearTimeout(window.mobileExitBtnTimeout);
 
-    window.mobileExitBtnTimeout = setTimeout(() => {
+    window.mobileExitBtnTimeout = window.hgfzZamanlayici.setTimeout(() => {
         if (window.currentActiveMenu === 'game' && window.gameIsActive && !window.isGridWalkingPhase) {
             if (mobileExitBtn) {
                 mobileExitBtn.style.display = 'block';
@@ -330,7 +351,7 @@ window.startMainGame = function (difficulty = 'easy') {
         gameStatus.style.display = 'block';
         gameStatus.textContent = `Oyun 3 saniye içinde başlıyor... ${hk} Hata Koruması, ${zk} Zaman Koruması. İlk notayı dinleyin!`;
     }
-    window.gameStatusTimeoutId = setTimeout(() => {
+    window.gameStatusTimeoutId = window.hgfzZamanlayici.setTimeout(() => {
         if (window.announceToScreenReader) window.announceToScreenReader(`Oyun 3 saniye içinde başlıyor. ${hk} Hata Koruması ve ${zk} Zaman Korumasına sahipsiniz. İlk notayı dinleyin!`);
     }, 400);
 
@@ -338,12 +359,12 @@ window.startMainGame = function (difficulty = 'easy') {
     if (window.clockTickSound) window.clockTickSound.rate(1.0);
 
     clearInterval(window.gameInterval);
-    window.gameStartTimeoutId = setTimeout(() => {
+    window.gameStartTimeoutId = window.hgfzZamanlayici.setTimeout(() => {
         if (!window.gameIsActive) return;
         window.isStarting = false;
         window.addNewNoteAndPlaySequence();
 
-        window.gameInterval = setInterval(() => {
+        window.gameInterval = window.hgfzZamanlayici.setInterval(() => {
             if (!window.gameIsActive) {
                 clearInterval(window.gameInterval);
                 return;
@@ -432,7 +453,7 @@ window.playGameSequence = function () {
             }
             noteIndex++;
             clearTimeout(window.sequenceTimeoutId);
-            window.sequenceTimeoutId = setTimeout(playNextSeqNote, speedMs);
+            window.sequenceTimeoutId = window.hgfzZamanlayici.setTimeout(playNextSeqNote, speedMs);
         } else {
             window.isComputerPlaying = false;
 
@@ -448,7 +469,7 @@ window.playGameSequence = function () {
             if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde");
 
             clearTimeout(window.replayBtnTimeout);
-            window.replayBtnTimeout = setTimeout(() => {
+            window.replayBtnTimeout = window.hgfzZamanlayici.setTimeout(() => {
                 if (!window.isStarted) return;
                 if (window.gameIsActive && !window.isComputerPlaying) {
                     if (gameStatus) gameStatus.style.display = 'none';
@@ -465,6 +486,7 @@ window.playGameSequence = function () {
 };
 
 window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = false) {
+    window.hgfzZamanlayici.hepsiniImhaEt();
     if (window.isGameEnding) return;
     window.isGameEnding = true;
     window.isStarted = false;
@@ -556,7 +578,7 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
             window.userAchievements.hafizam_gucleniyor = true;
             try { localStorage.setItem('hafizaGuvenAchievements', JSON.stringify(window.userAchievements)); } catch (e) { }
 
-            setTimeout(() => {
+            window.hgfzZamanlayici.setTimeout(() => {
                 if (window.achievementSound) window.achievementSound.play();
                 if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız! İlk başarınızı elde ettiniz: Hafızam güçleniyor.");
             }, 4000);
@@ -595,13 +617,13 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
                 playedCount++;
                 delay = Math.max(40, delay - 20);
 
-                setTimeout(playNextCoin, delay);
+                window.hgfzZamanlayici.setTimeout(playNextCoin, delay);
             } else {
-                setTimeout(() => {
+                window.hgfzZamanlayici.setTimeout(() => {
                     if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
                     
                     // Oyun bittiğini Dialog evresine taşıdık. Fokus butona DEĞİL mesaja atanacak.
-                    setTimeout(() => {
+                    window.hgfzZamanlayici.setTimeout(() => {
                         let gameStatus = document.getElementById('game-status-text');
                         if (gameStatus) {
                             gameStatus.setAttribute('tabindex', '-1');
@@ -617,7 +639,7 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
         if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
         
         // Oyun bittiğimde dialog evresi
-        setTimeout(() => {
+        window.hgfzZamanlayici.setTimeout(() => {
             let gameStatus = document.getElementById('game-status-text');
             if (gameStatus) {
                 gameStatus.setAttribute('tabindex', '-1');
@@ -736,7 +758,7 @@ window.handleGameInput = function (key) {
                 if (window.announceToScreenReader) window.announceToScreenReader(fullMsg, true);
 
                 const readTimeMs = Math.max(1500, (motivMsg.length * 65) + 800);
-                setTimeout(() => {
+                window.hgfzZamanlayici.setTimeout(() => {
                     window.addNewNoteAndPlaySequence();
                 }, readTimeMs);
             }
@@ -757,7 +779,7 @@ window.handleGameInput = function (key) {
             if (window.announceToScreenReader) window.announceToScreenReader("Hata koruması kullanıldı! Hak veya süre kaybı yok. Tekrar deniyoruz.");
             window.playerInputIndex = 0;
 
-            setTimeout(() => {
+            window.hgfzZamanlayici.setTimeout(() => {
                 if (window.gameIsActive) window.playGameSequence();
             }, 1200);
 
@@ -771,12 +793,12 @@ window.handleGameInput = function (key) {
             if (gameStatus) gameStatus.textContent = "Yanlış! -5 saniye. Dizi tekrar çalınıyor.";
 
             if (window.gameMistakes >= 3 || window.gameTimer <= 0) {
-                setTimeout(() => {
+                window.hgfzZamanlayici.setTimeout(() => {
                     window.endMainGame(window.gameTimer <= 0, false);
                 }, 500);
             } else {
                 window.playerInputIndex = 0;
-                setTimeout(() => {
+                window.hgfzZamanlayici.setTimeout(() => {
                     if (window.gameIsActive) {
                         if (window.announceToScreenReader) window.announceToScreenReader("Tekrar deniyoruz.");
                         window.playGameSequence();
@@ -896,7 +918,7 @@ window.handlePracticeInput = function(key) {
             if (window.correctSound) window.correctSound.play();
             window.practiceTargetIndex++;
             window.practicePressCount = 0;
-            window.practiceNextTimeout = setTimeout(() => {
+            window.practiceNextTimeout = window.hgfzZamanlayici.setTimeout(() => {
                 if (window.startPracticeNote) window.startPracticeNote();
             }, 1000); // 1 saniye sonra diğer notayı sor
         } else {
@@ -927,7 +949,7 @@ window.handlePracticeInput = function(key) {
             if (window.menuCloseSound) window.menuCloseSound.play();
             if (window.announceToScreenReader) window.announceToScreenReader('Oyun kapatılıyor. Lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
             
-            setTimeout(() => { 
+            window.hgfzZamanlayici.setTimeout(() => { 
                 // Alt+F4 Web Hilesi: Tarayıcının sekme kapatma engelini aşmayı dener
                 try { 
                     window.open('', '_self', ''); 

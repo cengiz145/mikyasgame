@@ -8,6 +8,7 @@ window.currentAutoWalkStep = 0;
 window.isStoryModeWon = false;
 
 window.quitStoryMode = function() {
+    window.hgfzZamanlayici.hepsiniImhaEt();
     window.inStoryMode = false;
     window.isDialogPhase = false;
     window.isGridWalkingPhase = false;
@@ -73,14 +74,14 @@ window.playAutomatedWalkingScene = function() {
             randomStep.play();
         }
         window.currentAutoWalkStep++;
-        window.stepIntervalId = setTimeout(window.playAutomatedWalkingScene, 1000);
+        window.stepIntervalId = window.hgfzZamanlayici.setTimeout(window.playAutomatedWalkingScene, 1000);
     }
 };
 
 window.triggerStoryAnimations = function(index) {
     if (index === 0) {
         let count = 0;
-        window.storyAnimInterval1 = setInterval(() => {
+        window.storyAnimInterval1 = window.hgfzZamanlayici.setInterval(() => {
             const keys = ['c', 'e', 'g', 'c', 'f', 'a', 'd', 'b', 'g'];
             const randomKey = keys[Math.floor(Math.random() * keys.length)];
             if (window.activeNotes && window.activeNotes[randomKey]) {
@@ -92,10 +93,10 @@ window.triggerStoryAnimations = function(index) {
             if (count > 6) clearInterval(window.storyAnimInterval1);
         }, 400);
 
-        window.storyAnimTimeout1 = setTimeout(() => {
+        window.storyAnimTimeout1 = window.hgfzZamanlayici.setTimeout(() => {
             if (window.enterHouseSound) window.enterHouseSound.play();
             let stepCount = 0;
-            window.storyAnimInterval2 = setInterval(() => {
+            window.storyAnimInterval2 = window.hgfzZamanlayici.setInterval(() => {
                 if (window.carpetStepSounds && window.carpetStepSounds.length > 0) {
                     let s = window.carpetStepSounds[Math.floor(Math.random() * window.carpetStepSounds.length)];
                     s.volume(Math.min(1.0, 0.2 + (stepCount * 0.2)));
@@ -104,7 +105,7 @@ window.triggerStoryAnimations = function(index) {
                 stepCount++;
                 if (stepCount > 3) {
                     clearInterval(window.storyAnimInterval2);
-                    window.storyAnimTimeout2 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 500);
+                    window.storyAnimTimeout2 = window.hgfzZamanlayici.setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 500);
                 }
             }, 800);
         }, 1200);
@@ -117,14 +118,14 @@ window.triggerStoryAnimations = function(index) {
             window.wrongSound.play();
         }
     } else if (index === 8) {
-        window.storyAnimTimeout3 = setTimeout(() => {
+        window.storyAnimTimeout3 = window.hgfzZamanlayici.setTimeout(() => {
             if (window.activeNotes) {
                 if (window.activeNotes['c']) window.activeNotes['c'].play();
                 if (window.activeNotes['d']) window.activeNotes['d'].play();
                 if (window.activeNotes['e']) window.activeNotes['e'].play();
             }
         }, 50);
-        window.storyAnimTimeout4 = setTimeout(() => {
+        window.storyAnimTimeout4 = window.hgfzZamanlayici.setTimeout(() => {
             if (window.doorCloseSound) {
                 let sid = window.doorCloseSound.play();
                 window.doorCloseSound.rate(1.5, sid);
@@ -133,7 +134,7 @@ window.triggerStoryAnimations = function(index) {
         }, 200);
     } else if (index === 13) {
         let stepCount = 0;
-        window.storyAnimInterval3 = setInterval(() => {
+        window.storyAnimInterval3 = window.hgfzZamanlayici.setInterval(() => {
             if (window.carpetStepSounds && window.carpetStepSounds.length > 0) {
                 let s = window.carpetStepSounds[Math.floor(Math.random() * window.carpetStepSounds.length)];
                 s.volume(Math.max(0.1, 1.0 - (stepCount * 0.2)));
@@ -142,17 +143,17 @@ window.triggerStoryAnimations = function(index) {
             stepCount++;
             if (stepCount > 4) {
                 clearInterval(window.storyAnimInterval3);
-                window.storyAnimTimeout5 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 200); 
+                window.storyAnimTimeout5 = window.hgfzZamanlayici.setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 200); 
             }
         }, 400); 
     } else if (index === 14) {
         if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
         if (window.enterHouseSound) window.enterHouseSound.play();
-        window.storyAnimTimeout6 = setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 1500);
+        window.storyAnimTimeout6 = window.hgfzZamanlayici.setTimeout(() => { if (window.doorCloseSound) window.doorCloseSound.play(); }, 1500);
         
-        window.storyAnimTimeout7 = setTimeout(() => {
+        window.storyAnimTimeout7 = window.hgfzZamanlayici.setTimeout(() => {
             let stepCount = 0;
-            window.storyAnimInterval4 = setInterval(() => {
+            window.storyAnimInterval4 = window.hgfzZamanlayici.setInterval(() => {
                 if (window.snowStepSounds && window.snowStepSounds.length > 0) {
                     let s = window.snowStepSounds[Math.floor(Math.random() * window.snowStepSounds.length)];
                     s.volume(0.8);
@@ -164,10 +165,10 @@ window.triggerStoryAnimations = function(index) {
         }, 2000);
     } else if (index === 15) {
         if (window.correctSound) window.correctSound.play();
-        window.storyAnimTimeout8 = setTimeout(() => {
+        window.storyAnimTimeout8 = window.hgfzZamanlayici.setTimeout(() => {
             const keys = ['g', 'e', 'c', 'f'];
             let kIdx = 0;
-            window.storyAnimInterval5 = setInterval(() => {
+            window.storyAnimInterval5 = window.hgfzZamanlayici.setInterval(() => {
                 let note = keys[kIdx];
                 if (window.activeNotes && window.activeNotes[note]) {
                     window.activeNotes[note].volume(0.6);
@@ -309,7 +310,7 @@ window.handleStoryWalking = function(key) {
                         window.activeNotes[foundNote].volume(1.0);
                         window.activeNotes[foundNote].play();
                     }
-                    setTimeout(() => {
+                    window.hgfzZamanlayici.setTimeout(() => {
                         if (window.wrongSound) window.wrongSound.play();
                         if (window.announceToScreenReader) window.announceToScreenReader("Bir nota buldunuz ama sırası değil! Notaları doğru sırayla toplamalısınız.");
                     }, 400);
@@ -385,7 +386,7 @@ window.handleStoryWalking = function(key) {
             let winMsg = `Tebrikler! Tüm notaları sırasıyla topladın ve piyanoyu onardın. Kayıp Notalar modunu başarıyla tamamladın! Bu hikaye için 300 jeton kazandınız. Toplam jetonunuz ${totalTokens}.`;
             if (window.announceToScreenReader) window.announceToScreenReader(winMsg);
             
-            window.storyWinTimeout = setTimeout(() => {
+            window.storyWinTimeout = window.hgfzZamanlayici.setTimeout(() => {
                 window.isStoryModeFinishedWaitingForEnter = true;
                 if (window.announceToScreenReader) {
                     window.announceToScreenReader("Ana menüye dönmek için entıra basın.");

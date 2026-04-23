@@ -76,13 +76,20 @@ window.PvP = {
             const codeDisplay = document.getElementById('pvp-lobby-code-display');
             const startBtn = document.getElementById('pvp-lobby-start-btn');
             
-            if (codeDisplay) codeDisplay.innerText = this.roomCode;
+            if (codeDisplay) {
+                codeDisplay.innerText = this.roomCode;
+                let kodOkunusu = this.roomCode.split('').join(' ');
+                codeDisplay.setAttribute('aria-label', "Oda Kodunuz: " + kodOkunusu);
+            }
             if (statusText) statusText.innerText = "Oda Kuruldu";
             if (infoText) infoText.innerText = "Oda Numaranızı paylaşın. Oyuncular bekleniyor...";
             if (startBtn) startBtn.style.display = 'none'; // Gizle, kimse yok
         }
 
-        if (window.announceToScreenReader) window.announceToScreenReader("Oda kuruldu. Oda numaranız: " + this.roomCode + " . Oyuncular aranıyor.");
+        if (window.announceToScreenReader) {
+            let kodOkunusu = this.roomCode.split('').join(' ');
+            window.announceToScreenReader("Oda kuruldu. Oda numaranız: " + kodOkunusu + " . Oyuncular aranıyor.");
+        }
 
         if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
         if (window.music38Sound && !window.music38Sound.playing()) window.music38Sound.play();
@@ -255,7 +262,11 @@ window.PvP = {
                     const infoText = document.getElementById('pvp-lobby-info-text');
                     const codeDisplay = document.getElementById('pvp-lobby-code-display');
                     
-                    if (codeDisplay) codeDisplay.innerText = code;
+                    if (codeDisplay) {
+                        codeDisplay.innerText = code;
+                        let kodOkunusu = code.split('').join(' ');
+                        codeDisplay.setAttribute('aria-label', "Bağlanılan Oda Kodu: " + kodOkunusu);
+                    }
                     if (statusText) statusText.innerText = "Bağlanıldı!";
                     if (infoText) infoText.innerText = "Siz ve diğer oyuncular... Kurucunun maçı başlatması bekleniyor.";
 

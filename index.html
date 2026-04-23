@@ -574,14 +574,16 @@
     <!-- Eşleştirme Lobisi (Bekleme Odası) -->
     <div id="pvp-lobby-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <h1 id="pvp-lobby-title">Oyun Lobisi</h1>
-        <h2 id="pvp-lobby-code-display" style="font-size: 2.5rem; letter-spacing: 5px; color: #fff; margin-bottom: 10px; font-family: monospace;">----</h2>
+        <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('pvp-lobby-cancel-btn').focus(), 10);"></div>
+        
+        <h1 id="pvp-lobby-title" tabindex="0">Oyun Lobisi</h1>
+        <h2 id="pvp-lobby-code-display" tabindex="0" style="font-size: 2.5rem; letter-spacing: 5px; color: #fff; margin-bottom: 10px; font-family: monospace;">----</h2>
         
         <div id="pvp-lobby-status-text" tabindex="0" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.2rem; color: #ffb703; font-weight: bold; min-height: 50px;">
             Bekleniyor...
         </div>
-        <p style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa;" id="pvp-lobby-info-text">
+        <p style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa;" id="pvp-lobby-info-text" tabindex="0">
             Oda bilgileri yükleniyor...
         </p>
         
@@ -598,6 +600,8 @@
                 </li>
             </ul>
         </nav>
+
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('pvp-lobby-title').focus(), 10);"></div>
     </div>
 
     <!-- Oyun Ekranı -->
