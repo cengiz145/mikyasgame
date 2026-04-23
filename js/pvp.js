@@ -697,13 +697,37 @@ window.PvP = {
 
         window.gameIsActive = false;
 
-        let myScore = this.isHost ? (matchData.hostScore || 0) : (matchData.clientScore || 0);
-        let oppScore = this.isHost ? (matchData.clientScore || 0) : (matchData.hostScore || 0);
+        let dId = localStorage.getItem('hafizaGuvenDeviceId');
+        let myScore = 0;
+        let highestOppScore = 0;
 
-        let msg = `Oyun Bitti! Senin Puanın: ${myScore}, Rakibin Puanı: ${oppScore}. `;
+        if (this.isHost) {
+            myScore = matchData.hostScore || 0;
+            if (this.isBotMode) {
+                highestOppScore = matchData.clientScore || 0;
+            } else if (matchData.clients) {
+                Object.keys(matchData.clients).forEach(k => {
+                    let s = matchData.clients[k].score || 0;
+                    if (s > highestOppScore) highestOppScore = s;
+                });
+            }
+        } else {
+            myScore = (matchData.clients && matchData.clients[dId]) ? (matchData.clients[dId].score || 0) : 0;
+            highestOppScore = matchData.hostScore || 0;
+            if (matchData.clients) {
+                Object.keys(matchData.clients).forEach(k => {
+                    if (k !== dId) {
+                        let s = matchData.clients[k].score || 0;
+                        if (s > highestOppScore) highestOppScore = s;
+                    }
+                });
+            }
+        }
+
+        let msg = `Oyun Bitti! Senin Puanın: ${myScore}, En Yüksek Rakip Puanı: ${highestOppScore}. `;
         let isWinner = false;
 
-        if (myScore > oppScore) {
+        if (myScore > highestOppScore) {
             isWinner = true;
             msg += "Kazandın! ";
 
@@ -722,7 +746,7 @@ window.PvP = {
                 localStorage.setItem('hafizaGuvenTotalTokens', coins + 100);
                 msg += "Büyük Ödül: 100 Hafıza Jetonu kazandın!";
             }
-        } else if (myScore < oppScore) {
+        } else if (myScore < highestOppScore) {
             msg += "Kaybettin. ";
             let coins = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
             localStorage.setItem('hafizaGuvenTotalTokens', coins + 20);
@@ -781,9 +805,9 @@ window.addNewNoteAndPlaySequence = function () {
 
 const originalEndMainGame = window.endMainGame;
 window.endMainGame = function (isTimeUp = false, isWin = false, isUserExit = false) {
-    if (window.PvP && window.PvP.matchId) {
+    // SADECE kullanıcı çıkışı (UserExit) ise maçı bitirme sinyali yolla, aksi halde PvP sonu (timeUp) normal akışında halledilsin
+    if (window.PvP && window.PvP.matchId && isUserExit) {
         window.PvP.finishMatchTimeUp(); // Sunucuya öldüğümüzü / bittiğini haber ver
-        window.PvP.matchId = null;
     }
     if (originalEndMainGame) originalEndMainGame(isTimeUp, isWin, isUserExit);
 };
