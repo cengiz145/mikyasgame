@@ -35,6 +35,9 @@ window.PvP = {
         // --- YENİ: Rastgele 4 Haneli Oda Kodu ---
         this.roomCode = Math.floor(1000 + Math.random() * 9000).toString();
 
+        // Odaya katılanları saymak için yerel değişken
+        this.lastClientCount = 0;
+
         const queueNode = window.db.ref('pvp_queue/' + this.roomCode);
         queueNode.set({
             name: myName,
@@ -55,8 +58,10 @@ window.PvP = {
             host: this.myQueueId,
             hostName: myName,
             status: 'waiting_for_client',
-            createdAt: firebase.database.ServerValue.TIMESTAMP
+            createdAt: firebase.database.ServerValue.TIMESTAMP,
+            clients: {} // Çoklu oyuncu altyapısı (Maks 4)
         }).catch(err => console.error("Firebase Match Set Error:", err));
+        
         matchNode.onDisconnect().update({ status: 'finished', hostFinished: true });
 
         const btn = document.getElementById('pvp-play-btn');
@@ -73,11 +78,11 @@ window.PvP = {
             
             if (codeDisplay) codeDisplay.innerText = this.roomCode;
             if (statusText) statusText.innerText = "Oda Kuruldu";
-            if (infoText) infoText.innerText = "Oda Numaranızı paylaşın. Rakip bekleniyor...";
-            if (startBtn) startBtn.style.display = 'none'; // Gizle, çünkü rakip yok
+            if (infoText) infoText.innerText = "Oda Numaranızı paylaşın. Oyuncular bekleniyor...";
+            if (startBtn) startBtn.style.display = 'none'; // Gizle, kimse yok
         }
 
-        if (window.announceToScreenReader) window.announceToScreenReader("Oda kuruldu. Oda numaranız: " + this.roomCode + " . Rakip aranıyor. Lütfen bekleyiniz.");
+        if (window.announceToScreenReader) window.announceToScreenReader("Oda kuruldu. Oda numaranız: " + this.roomCode + " . Oyuncular aranıyor.");
 
         if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
         if (window.music38Sound && !window.music38Sound.playing()) window.music38Sound.play();
@@ -89,39 +94,45 @@ window.PvP = {
             const matchData = snapshot.val();
             if (!matchData) return;
 
-            // Müşteri "ready" durumuna geldi mi?
-            if (matchData.client && matchData.clientName && matchData.status === 'ready') {
-                this.opponentId = matchData.client;
-                this.opponentName = matchData.clientName;
+            // Gelen oyuncu varsa listele
+            if (matchData.clients) {
+                const clientKeys = Object.keys(matchData.clients);
                 
-                queueNode.remove(); // Listeden gizle ki başkası girmeye çalışmasın
-
-                const statusText = document.getElementById('pvp-lobby-status-text');
-                const infoText = document.getElementById('pvp-lobby-info-text');
-                const startBtn = document.getElementById('pvp-lobby-start-btn');
-                
-                if (statusText) statusText.innerText = "Rakip Katıldı!";
-                if (infoText) infoText.innerText = `${this.opponentName} odaya girdi. Maçı başlatabilirsiniz.`;
-                if (startBtn) {
-                    startBtn.style.display = 'inline-block';
-                    setTimeout(() => startBtn.focus(), 100);
+                if (clientKeys.length > 0 && matchData.status === 'waiting_for_client') {
+                    const statusText = document.getElementById('pvp-lobby-status-text');
+                    const infoText = document.getElementById('pvp-lobby-info-text');
+                    const startBtn = document.getElementById('pvp-lobby-start-btn');
+                    
+                    if (statusText) statusText.innerText = `Bağlananlar (${clientKeys.length}/4)`;
+                    let katilanlar = clientKeys.map(k => matchData.clients[k].name).join(', ');
+                    if (infoText) infoText.innerText = "Odadakiler: " + katilanlar;
+                    
+                    if (startBtn && startBtn.style.display === 'none') {
+                        startBtn.style.display = 'inline-block';
+                        setTimeout(() => startBtn.focus(), 100);
+                    }
+                    
+                    if (clientKeys.length > this.lastClientCount) {
+                        this.lastClientCount = clientKeys.length;
+                        if (window.announceToScreenReader) window.announceToScreenReader("Yeni oyuncu katıldı. Odadakiler: " + katilanlar);
+                    }
                 }
-                
-                if (window.announceToScreenReader) window.announceToScreenReader(`${this.opponentName} odaya girdi. Maçı başlat butonuna basabilirsiniz.`);
             }
             
-            // Host maçı manuel olarak "starting" durumuna getirdi mi (kendi tuşuna bastığında tetiklenir)
-            if (matchData.status === 'starting' && this.opponentName) {
+            // Host maçı manuel başlattıktan sonra starting aşamasını yakala
+            if (matchData.status === 'starting') {
                 this.isSearching = false;
                 this.matchRef.off();
-                this.enterMatchRoom(this.matchId, this.opponentName);
+                // Rakip adını jenerik olarak belirt (hepsini yazmak sığmayabilir)
+                let oppNameStr = matchData.clients ? Object.keys(matchData.clients).length + ' Oyuncu' : 'Rakipler';
+                this.enterMatchRoom(this.matchId, oppNameStr);
             }
         });
     },
 
     // MAÇI BAŞLAT BUTONU (Sadece Host basabilir)
     startMatchManually: function() {
-        if (!this.isHost || !this.matchId || !this.opponentId) return;
+        if (!this.isHost || !this.matchId) return;
         
         const startBtn = document.getElementById('pvp-lobby-start-btn');
         if (startBtn) {
@@ -129,6 +140,8 @@ window.PvP = {
             startBtn.style.pointerEvents = 'none';
         }
         
+        // Ortak maç durumunu başlatılıyor yap ve aramayı durdurmak için pvp_queue'yi sil
+        if (this.roomCode) window.db.ref('pvp_queue/' + this.roomCode).remove();
         window.db.ref('matches/' + this.matchId).update({ status: 'starting' });
     },
 
@@ -187,9 +200,9 @@ window.PvP = {
                     return;
                 }
                 
-                if (currentData.client || currentData.status === 'finished') {
+                if (currentData.status === 'finished' || currentData.status === 'starting' || currentData.status === 'playing') {
                     if (window.wrongSound) window.wrongSound.play();
-                    alert("Oda zaten dolu veya maç sonlanmış!");
+                    alert("Maç çoktan başlamış veya bitmiş!");
                     if (btn) {
                         btn.innerHTML = 'Katıl';
                         btn.style.pointerEvents = 'auto';
@@ -197,22 +210,42 @@ window.PvP = {
                     return;
                 }
 
-                // Odaya kendimizi yazalım
-                return matchNode.update({
-                    client: deviceId,
-                    clientName: myName,
-                    status: 'ready'
-                }).then(() => {
+                // Odadaki kişi sayısını kontrol et
+                const existingClients = currentData.clients || {};
+                const clientKeys = Object.keys(existingClients);
+                
+                // Müşterinin önceden katılıp katılmadığını kontrol et
+                if (!existingClients[deviceId]) {
+                    if (clientKeys.length >= 4) {
+                        if (window.wrongSound) window.wrongSound.play();
+                        alert("Oda kapasitesi dolu! (Maksimum 4 kişi katılabilir)");
+                        if (btn) {
+                            btn.innerHTML = 'Katıl';
+                            btn.style.pointerEvents = 'auto';
+                        }
+                        return;
+                    }
+                }
+
+                // Odaya kendimizi ekleyelim
+                let updates = {};
+                updates[`clients/${deviceId}`] = {
+                    name: myName,
+                    score: 0
+                };
+                updates['status'] = 'waiting_for_client'; // Hala beklemedeyiz, host başlatacak
+
+                return matchNode.update(updates).then(() => {
                     // İŞLEM BAŞARILI!
-                    window.db.ref('pvp_queue/' + code).remove(); // Diğerlerinin girmesini engelle
+                    // Not: pvp_queue'dan silmiyoruz ki 2., 3. kişiler de girebilsin. Host başlatırken silecek.
 
                     this.isSearching = false;
                     this.isBotMode = false;
                     this.isHost = false;
                     this.matchId = targetMatchId;
                     this.myQueueId = deviceId;
-                    this.opponentId = hostId;
-                    this.opponentName = hostName;
+                    this.opponentId = hostId; // Ana ev sahibi
+                    this.opponentName = hostName; // Ana ev sahibi 
 
                     if (window.switchMenu && window.pvpRoomsMenu && window.pvpLobbyMenu) {
                         window.switchMenu(window.pvpRoomsMenu, window.pvpLobbyMenu, 'pvp-lobby');
@@ -224,7 +257,7 @@ window.PvP = {
                     
                     if (codeDisplay) codeDisplay.innerText = code;
                     if (statusText) statusText.innerText = "Bağlanıldı!";
-                    if (infoText) infoText.innerText = "Kurucunun maçı başlatması bekleniyor...";
+                    if (infoText) infoText.innerText = "Siz ve diğer oyuncular... Kurucunun maçı başlatması bekleniyor.";
 
                     if (btn) {
                         btn.innerHTML = 'Katıl';
@@ -239,7 +272,11 @@ window.PvP = {
                         const mData = snap.val();
                         if (mData && mData.status === 'starting') {
                             this.matchRef.off();
-                            this.enterMatchRoom(this.matchId, hostName);
+                            
+                            // Diğer katılımcıların sayısını hesapla
+                            let katilanSayisi = mData.clients ? Object.keys(mData.clients).length : 1;
+                            let oppText = `Kurucu: ${hostName} ve ${katilanSayisi - 1} Rakip`;
+                            this.enterMatchRoom(this.matchId, oppText);
                         }
                     });
                 });
@@ -495,12 +532,34 @@ window.PvP = {
                 }
 
                 // Karşı tarafın puanını ekrana yansıtmak için
-                let oppScore = 0;
-                if (this.isHost && val.clientScore) oppScore = val.clientScore;
-                if (!this.isHost && val.hostScore) oppScore = val.hostScore;
+                let myScoreStr = `Sen: ${window.pvpScore}`;
+                let oppScoreStr = ` | Rakipler: `;
+                
+                let dId = localStorage.getItem('hafizaGuvenDeviceId');
+
+                if (this.isHost) {
+                    if (this.isBotMode) {
+                        oppScoreStr += `Yapay Zeka: ${val.clientScore || 0}`;
+                    } else if (val.clients) {
+                        let ops = Object.keys(val.clients).map(k => `${val.clients[k].name}: ${val.clients[k].score || 0}`).join(', ');
+                        oppScoreStr += ops || 'Yok';
+                    } else {
+                        oppScoreStr += 'Yok';
+                    }
+                } else {
+                    oppScoreStr += `(Kurucu) ${val.hostName}: ${val.hostScore || 0}`;
+                    if (val.clients) {
+                        let ops = Object.keys(val.clients).filter(k => k !== dId).map(k => `${val.clients[k].name}: ${val.clients[k].score || 0}`).join(', ');
+                        if (ops) oppScoreStr += ', ' + ops;
+                    }
+                }
+                
                 // HUD Güncelle
                 const scoreDisplay = document.getElementById('game-score-display');
-                if (scoreDisplay) scoreDisplay.innerHTML = `Sen: ${window.pvpScore} | Rakip: ${oppScore}`;
+                if (scoreDisplay) {
+                    scoreDisplay.style.fontSize = '1.0rem'; // Çoklu isimler sığsın
+                    scoreDisplay.innerHTML = `${myScoreStr}${oppScoreStr}`;
+                }
             }
 
             if (val && val.status === 'finished') {
@@ -541,6 +600,7 @@ window.PvP = {
     onPlayerCorrectSequence: function () {
         if (!this.matchId) return;
         const turnIndex = this.currentPvPTurn;
+        let dId = localStorage.getItem('hafizaGuvenDeviceId');
 
         // Hız Yarışı Doğrulaması (Kural: Kim hızlıysa puanı o alır)
         const turnRef = window.db.ref(`matches/${this.matchId}/turns/${turnIndex}`);
@@ -549,7 +609,7 @@ window.PvP = {
             if (currentData === null) {
                 // Bu turu (turnIndex) henüz kimse geçmemiş, benim adıma yaz
                 return {
-                    winner: this.isHost ? 'host' : 'client',
+                    winner: this.isHost ? 'host' : dId,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
             }
@@ -566,8 +626,11 @@ window.PvP = {
                 // Skor güncellemesini sunucuya gönder
                 const matchNode = window.db.ref('matches/' + this.matchId);
                 let updateData = {};
-                if (this.isHost) updateData.hostScore = window.pvpScore;
-                else updateData.clientScore = window.pvpScore;
+                if (this.isHost) {
+                    updateData.hostScore = window.pvpScore;
+                } else {
+                    updateData[`clients/${dId}/score`] = window.pvpScore;
+                }
                 matchNode.update(updateData);
             } else {
                 // Çok geç kaldık, rakip turu daha önce bitirmiş!
