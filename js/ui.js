@@ -3240,3 +3240,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if(window.db) initInboxListener();
     }, 2500);
 });
+
+window.addEventListener('offline', () => {
+    if (window.announceToScreenReader) {
+        window.announceToScreenReader("Uyarı: İnternet bağlantınız koptu. Çok oyunculu özellikler ve sohbet şu an kullanılamaz. Çevrimdışı modda oynamaya devam edebilirsiniz.", true);
+    }
+    if (window.showToastNotification) {
+        window.showToastNotification("İnternet bağlantısı koptu!");
+    }
+});
+
+window.addEventListener('online', () => {
+    if (window.announceToScreenReader) {
+        window.announceToScreenReader("İnternet bağlantısı tekrar sağlandı. Sunucuya yeniden bağlanılıyor.", true);
+    }
+    if (window.showToastNotification) {
+        window.showToastNotification("İnternet geri geldi!");
+    }
+});
