@@ -1,5 +1,5 @@
 {
-    "version": "0.97.3.0",
-    "buildId": 1780000210,
-    "changelog": "Düzeltme: PvP eşleştirmelerinin diğer cihazlarda (farklı IP'lerde) görünmemesine neden olan kritik Firebase veritabanı bağlantı (databaseURL) sorunu giderildi."
+    "version": "0.97.4.0",
+    "buildId": 1781000000,
+    "changelog": "Güncelleme: Lobi sistemi güncellendi, giriş çıkış sesleri ve NVDA kuyruk okuma sistemleri eklendi."
 }
