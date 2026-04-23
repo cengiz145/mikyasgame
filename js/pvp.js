@@ -571,6 +571,15 @@ window.PvP = {
                     scoreDisplay.style.fontSize = '1.0rem'; // Çoklu isimler sığsın
                     scoreDisplay.innerHTML = `${myScoreStr}${oppScoreStr}`;
                 }
+
+                // Süreyi Hosttan Al (İstemci Senkronizasyonu)
+                if (val && val.timeLeft !== undefined && !this.isHost) {
+                    window.gameTimer = val.timeLeft;
+                    if (window.updateGameUI) window.updateGameUI();
+                    if (window.gameTimer <= 0) {
+                        this.finishMatchTimeUp();
+                    }
+                }
             }
 
             if (val && val.status === 'finished') {
@@ -581,15 +590,19 @@ window.PvP = {
 
 
         // 60 Saniyelik Katı Kronometre
-        this.pvpInterval = setInterval(() => {
-            window.gameTimer--;
-            if (window.gameTimer <= 0) {
-                window.gameTimer = 0;
-                clearInterval(this.pvpInterval);
-                this.finishMatchTimeUp();
-            }
-            if (window.updateGameUI) window.updateGameUI();
-        }, 1000);
+        if (this.isHost) {
+            this.pvpInterval = window.hgfzZamanlayici.setInterval(() => {
+                window.gameTimer--;
+                window.db.ref('matches/' + this.matchId).update({ timeLeft: window.gameTimer });
+                
+                if (window.gameTimer <= 0) {
+                    window.gameTimer = 0;
+                    clearInterval(this.pvpInterval);
+                    this.finishMatchTimeUp();
+                }
+                if (window.updateGameUI) window.updateGameUI();
+            }, 1000);
+        }
     },
 
     playNextPvPRound: function () {
