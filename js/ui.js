@@ -3258,3 +3258,35 @@ window.addEventListener('online', () => {
         window.showToastNotification("İnternet geri geldi!");
     }
 });
+
+// --- NVDA İÇİN MESAJ KUYRUĞU SİSTEMİ ---
+if (!window.orijinalAnnounce) {
+    window.orijinalAnnounce = window.announceToScreenReader;
+    window.srMesajKuyrugu = [];
+    window.srOkuyorMu = false;
+    
+    window.announceToScreenReader = function(text, forceFocus = false) {
+        window.srMesajKuyrugu.push({ text: text, forceFocus: forceFocus });
+        window.srKuyruguIslet();
+    };
+    
+    window.srKuyruguIslet = function() {
+        // Eğer okuma devam ediyorsa veya kuyruk boşsa dur
+        if (window.srOkuyorMu || window.srMesajKuyrugu.length === 0) return;
+        
+        window.srOkuyorMu = true;
+        const siradaki = window.srMesajKuyrugu.shift(); // Kuyruktan ilk mesajı al
+        
+        // Orijinal okuma fonksiyonunu çağır
+        window.orijinalAnnounce(siradaki.text, siradaki.forceFocus);
+        
+        // Okuma süresi tahmini: Harf başına ortalama 70ms + 1 saniye bekleme payı
+        const okumaSuresi = Math.max(1500, (siradaki.text.length * 70) + 1000);
+        
+        // Aşama 1'de kurduğumuz ajan zamanlayıcısını kullanarak sıradaki mesaja geç
+        window.hgfzZamanlayici.setTimeout(() => {
+            window.srOkuyorMu = false;
+            window.srKuyruguIslet(); // Kuyrukta bekleyen varsa devam et
+        }, okumaSuresi);
+    };
+}
