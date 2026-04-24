@@ -408,23 +408,21 @@ window.handleStoryWalking = function(key) {
         const storyStatus = document.getElementById('story-status-text');
         if (!storyStatus) return;
 
-        let statusString = "";
-        let srString = "";
+        let hasNoteOrPiano = false;
+        let finalMsg = "";
         
         if (window.playerX === window.pianoX) {
-            statusString = `Piyanodasın.`;
-            srString = "Piyanodasın.";
-        } else {
-            statusString = `X Konumu: ${window.playerX}`;
-            srString = `Koordinat: ${window.playerX}`;
+            hasNoteOrPiano = true;
+            finalMsg = "Piyanodasın. ";
         }
         
         if (window.notesOnMap && window.notesOnMap[window.playerX]) {
+            hasNoteOrPiano = true;
             const foundNote = window.notesOnMap[window.playerX];
             const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
             const noteName = trNames[foundNote];
             
-            statusString += ` (Burada ${noteName} notası var!)`;
+            finalMsg += `Ayağına sert bir şey takıldı. Burada ${noteName} notası var!`;
 
             if (window.activeNotes && window.activeNotes[foundNote]) {
                 window.activeNotes[foundNote].volume(1.0);
@@ -432,7 +430,11 @@ window.handleStoryWalking = function(key) {
             }
         }
 
-        storyStatus.innerHTML = statusString;
+        if (hasNoteOrPiano) {
+            storyStatus.innerHTML = finalMsg;
+        } else {
+            storyStatus.innerHTML = " ";
+        }
     }
 };
 

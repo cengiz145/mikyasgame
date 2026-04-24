@@ -14,7 +14,7 @@ window.pianoBgMusic = new Howl({
 });
 
 window.baglamaBgMusic = new Howl({
-    src: ['sounds/menu-music2.mp3'],
+    src: ['sounds/music3.mp3'],
     loop: true,
     volume: 1.0,
     html5: false
