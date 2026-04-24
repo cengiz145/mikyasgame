@@ -1443,7 +1443,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (totalTokens < 50) {
                 if (window.wrongSound) window.wrongSound.play();
-                let msg = "Yetersiz bakiye. Bu eşya için 50 jetona ihtiyacınız var.";
+                let msg = `Yetersiz bakiye. Bu eşya için 50 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${50 - totalTokens} jetona daha ihtiyacınız var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
                 return;
             }
@@ -1470,7 +1470,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (totalTokens < 30) {
                 if (window.wrongSound) window.wrongSound.play();
-                let msg = "Yetersiz bakiye. Bu eşya için 30 jetona ihtiyacınız var.";
+                let msg = `Yetersiz bakiye. Bu eşya için 30 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${30 - totalTokens} jetona daha ihtiyacınız var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
                 return;
             }
@@ -1529,7 +1529,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 if (totalTokens < 500) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = "Yetersiz bakiye. Bu eşya için 500 jetona ihtiyacınız var.";
+                    let msg = `Yetersiz bakiye. Bu eşya için 500 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${500 - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
@@ -1608,7 +1608,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 if (totalTokens < 100) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = "Yetersiz bakiye. Bu eşya için 100 jetona ihtiyacınız var.";
+                    let msg = `Yetersiz bakiye. Bu eşya için 100 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${100 - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
@@ -1687,7 +1687,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 if (totalTokens < 200) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = "Yetersiz bakiye. Bu eşya için 200 jetona ihtiyacınız var.";
+                    let msg = `Yetersiz bakiye. Bu eşya için 200 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${200 - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
@@ -1766,7 +1766,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 if (totalTokens < 300) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = "Yetersiz bakiye. Bu eşya için 300 jetona ihtiyacınız var.";
+                    let msg = `Yetersiz bakiye. Bu eşya için 300 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${300 - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
