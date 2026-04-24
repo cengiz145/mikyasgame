@@ -1,5 +1,5 @@
 {
-    "version": "0.97.4.0",
-    "buildId": 1781000000,
-    "changelog": "Güncelleme: Lobi sistemi güncellendi, giriş çıkış sesleri ve NVDA kuyruk okuma sistemleri eklendi."
+    "version": "0.97.4.1",
+    "buildId": 1781000001,
+    "changelog": "Güncelleme: Kaval sesi eklendi, Kayıp Notalar yürüme ve oyun bitiş düzeltmesi yapıldı. Kazanma ve kaybetme ses efetkleri iyileştirildi."
 }
