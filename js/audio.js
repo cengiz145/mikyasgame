@@ -94,7 +94,7 @@ window.glasshitSound = new Howl({
     volume: 1.0
 });
 
-window.gameOverSound = new Howl({
+window.gameWinSound = new Howl({
     src: ['sounds/newmotd2.ogg'],
     volume: 1.0,
     html5: true

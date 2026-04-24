@@ -1195,7 +1195,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.correctSound) window.correctSound.volume(1.0 * scale);
             if (window.wrongSound) window.wrongSound.volume(1.0 * scale);
             if (window.glasshitSound) window.glasshitSound.volume(1.0 * scale);
-            if (window.gameOverSound) window.gameOverSound.volume(1.0 * scale);
+            if (window.gameWinSound) window.gameWinSound.volume(1.0 * scale);
             if (window.modeUnlockSound) window.modeUnlockSound.volume(1.0 * scale);
             if (window.enterHouseSound) window.enterHouseSound.volume(1.0 * scale);
             if (window.doorCloseSound) window.doorCloseSound.volume(1.0 * scale);

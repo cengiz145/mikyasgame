@@ -659,9 +659,9 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
     if (playUnlockSound) {
         if (window.modeUnlockSound) window.modeUnlockSound.play();
     } else if (isWin) {
-        if (window.music60Sound) window.music60Sound.play();
+        if (window.gameWinSound) window.gameWinSound.play();
     } else {
-        if (window.gameOverSound) window.gameOverSound.play();
+        if (window.music60Sound) window.music60Sound.play();
     }
 };
 
