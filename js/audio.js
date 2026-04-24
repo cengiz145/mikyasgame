@@ -27,10 +27,18 @@ window.kanunBgMusic = new Howl({
     html5: false
 });
 
+window.kavalBgMusic = new Howl({
+    src: ['sounds/music4.ogg'],
+    loop: true,
+    volume: 1.0,
+    html5: false
+});
+
 class BgMusicWrapper {
     get current() {
         if (window.activeInstrument === 'baglama') return window.baglamaBgMusic;
         if (window.activeInstrument === 'kanun') return window.kanunBgMusic;
+        if (window.activeInstrument === 'kaval') return window.kavalBgMusic;
         return window.pianoBgMusic;
     }
     play() { return this.current.play(); }
