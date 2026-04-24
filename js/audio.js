@@ -7,21 +7,21 @@ Howler.orientation(0, 0, -1, 0, 1, 0);
 window.currentLogoSound = null;
 
 window.pianoBgMusic = new Howl({
-    src: ['sounds/menu-music.mp3'],
+    src: ['sounds/menu-music.ogg'],
     loop: true,
     volume: 1.0,
     html5: false
 });
 
 window.baglamaBgMusic = new Howl({
-    src: ['sounds/music3.mp3'],
+    src: ['sounds/music3.ogg'],
     loop: true,
     volume: 1.0,
     html5: false
 });
 
 window.kanunBgMusic = new Howl({
-    src: ['sounds/music2.mp3'],
+    src: ['sounds/music2.ogg'],
     loop: true,
     volume: 1.0,
     html5: false
