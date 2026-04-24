@@ -61,7 +61,7 @@ window.playCurrentStoryDialog = function() {
     
     // Explicitly announce for screen readers
     if (window.announceToScreenReader) {
-        window.announceToScreenReader(window.localizeText(appendedText), true);
+        window.announceToScreenReader(window.localizeText(appendedText));
     }
 };
 
@@ -232,7 +232,7 @@ window.handleStoryWalking = function(key) {
 
     if (key === 'ArrowRight' || key === 'ArrowLeft') {
         const now = Date.now();
-        if (window.lastStoryWalkTime && now - window.lastStoryWalkTime < 300) {
+        if (window.lastStoryWalkTime && now - window.lastStoryWalkTime < 200) {
             return;
         }
         window.lastStoryWalkTime = now;
@@ -263,13 +263,16 @@ window.handleStoryWalking = function(key) {
                 
                 if (window.correctSound) window.correctSound.play();
                 const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
-                let msg = `Harika! ${trNames[droppedNote]} notasını piyanoya yerleştirdiniz. `;
+                let placedCount = window.notesInPiano.length;
+                let remainingCount = window.MAX_NOTES - placedCount;
                 
-                if (window.notesInPiano.length === window.MAX_NOTES) {
+                let msg = `Harika! ${trNames[droppedNote]} notasını piyanoya yerleştirdiniz. Toplam ${placedCount} nota yerleştirdik, geriye ${remainingCount} nota kaldı. `;
+                
+                if (placedCount === window.MAX_NOTES) {
                     msg += "Bütün notalar piyanoya yerleştirildi. Oyunu kazanmak için Onay (Enter) tuşuna basın.";
                 } else {
                     const expectedOrder = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
-                    msg += `Sırada ${trNames[expectedOrder[window.notesInPiano.length]]} notası var. Kayıp notalar etrafta. Aramaya devam et.`;
+                    msg += `Sırada ${trNames[expectedOrder[placedCount]]} notası var. Kayıp notalar etrafta. Aramaya devam et.`;
                 }
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
             } else {
@@ -342,7 +345,7 @@ window.handleStoryWalking = function(key) {
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
     } else if (key === 'Enter') {
         if (window.playerX === window.pianoX && window.notesInPiano.length === window.MAX_NOTES && !window.carryingNote) {
-            if (window.isStoryModeFinishedWaitingForEnter) {
+            if (window.isStoryModeFinishedWaitingForEnter || window.isStoryModeWon) {
                 window.isStoryModeFinishedWaitingForEnter = false;
                 if (window.storyWinTimeout) clearTimeout(window.storyWinTimeout);
                 
@@ -365,8 +368,6 @@ window.handleStoryWalking = function(key) {
                 return;
             }
 
-            // Hızlıca (spam) basarak sonsuz tamamlama (completionCount) hilesini engelle
-            if (window.isStoryModeWon) return; 
             window.isStoryModeWon = true;
             window.isDialogPhase = false;
 
@@ -391,7 +392,7 @@ window.handleStoryWalking = function(key) {
                 if (window.announceToScreenReader) {
                     window.announceToScreenReader("Ana menüye dönmek için entıra basın.");
                 }
-            }, 13000);
+            }, 3000);
         }
     }
 
