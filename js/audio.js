@@ -20,9 +20,18 @@ window.baglamaBgMusic = new Howl({
     html5: false
 });
 
+window.kanunBgMusic = new Howl({
+    src: ['sounds/music2.mp3'],
+    loop: true,
+    volume: 1.0,
+    html5: false
+});
+
 class BgMusicWrapper {
     get current() {
-        return window.activeInstrument === 'baglama' ? window.baglamaBgMusic : window.pianoBgMusic;
+        if (window.activeInstrument === 'baglama') return window.baglamaBgMusic;
+        if (window.activeInstrument === 'kanun') return window.kanunBgMusic;
+        return window.pianoBgMusic;
     }
     play() { return this.current.play(); }
     pause() { return this.current.pause(); }
