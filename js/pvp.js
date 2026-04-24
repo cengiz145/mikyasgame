@@ -67,6 +67,7 @@ window.PvP = {
         const btn = document.getElementById('pvp-play-btn');
         if (btn) {
             btn.innerHTML = 'İptal Et / Çıkış';
+            btn.setAttribute('aria-label', 'İptal Et veya Çıkış Yap');
         }
 
         if (window.switchMenu && window.multiplayerSelectMenu && window.pvpLobbyMenu) {
@@ -472,11 +473,13 @@ window.PvP = {
             const resetBtn = document.getElementById('pvp-play-btn');
             if (resetBtn) {
                 resetBtn.innerHTML = 'Maç Oluştur';
+                resetBtn.setAttribute('aria-label', 'Maç Oluştur');
                 resetBtn.style.pointerEvents = 'auto';
             }
             const resetBotBtn = document.getElementById('pve-bot-play-btn');
             if (resetBotBtn) {
                 resetBotBtn.innerHTML = 'Bota Karşı Oyna';
+                resetBotBtn.setAttribute('aria-label', 'Bota Karşı Oyna');
                 resetBotBtn.style.pointerEvents = 'auto';
             }
 
@@ -485,6 +488,7 @@ window.PvP = {
                 window.switchMenu(activeMultiMenu, window.gameMenu, 'game');
             }
             this.startPvPGame();
+            this.lobbyWaitTimer = null;
         }, 10000);
     },
 
@@ -878,6 +882,13 @@ window.PvP = {
             this.isBotMode = false;
             this.gameEndingBlock = false;
             this.matchStarted = false;
+            this.isSearching = false;
+            this.isHost = false;
+            
+            const resetBtn = document.getElementById('pvp-play-btn');
+            if (resetBtn) resetBtn.setAttribute('aria-label', 'Maç Oluştur');
+            const resetBotBtn = document.getElementById('pve-bot-play-btn');
+            if (resetBotBtn) resetBotBtn.setAttribute('aria-label', 'Bota Karşı Oyna');
         }, 6000);
     }
 };

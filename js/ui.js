@@ -281,6 +281,10 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     if (window.isMenuTransitioning) return;
     if (!hideMenu || !showMenu) return;
 
+    if (newActiveMenuName === 'main' && window.updateInstrumentBtnText) {
+        window.updateInstrumentBtnText();
+    }
+
     window.isMenuTransitioning = true;
     
     // Güvenlik Subabı (Failsafe): Ne olursa olsun 1.5 saniye sonra geçiş kilidini aç (boşa düşmeyi engeller)
@@ -812,9 +816,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const buyBaglamaPackBtn = document.getElementById('buy-baglama-pack-btn');
     const buyKavalPackBtn = document.getElementById('buy-kaval-pack-btn');
     const buyFlutPackBtn = document.getElementById('buy-flut-pack-btn');
+    const buyKanunPackBtn = document.getElementById('buy-kanun-pack-btn');
 
     const startGameBtn = document.getElementById('start-game-btn');
     const gameBackBtn = document.getElementById('game-back-btn');
+    
+    const btnChangeInst = document.getElementById('btn-change-instrument');
+    window.updateInstrumentBtnText = function() {
+        if (btnChangeInst) {
+            let instMap = {
+                'piano': 'Piyano',
+                'baglama': 'Bağlama',
+                'kaval': 'Kaval',
+                'flut': 'Flüt',
+                'kanun': 'Kanun'
+            };
+            let curr = window.activeInstrument || localStorage.getItem('hafizaGuvenInstrument') || 'piano';
+            let n = instMap[curr] || 'Piyano';
+            btnChangeInst.innerText = "Ses Paketini Değiştir (" + n + ")";
+            btnChangeInst.setAttribute('aria-label', "Ses paketini değiştirmek için tıklayın. Geçerli paket: " + n);
+        }
+    };
+
+    if (btnChangeInst) {
+        window.updateInstrumentBtnText();
+        btnChangeInst.addEventListener('click', () => {
+            let owned = ['piano'];
+            if (localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') owned.push('baglama');
+            if (localStorage.getItem('hafizaGuvenKavalPack') === 'true') owned.push('kaval');
+            if (localStorage.getItem('hafizaGuvenFlutPack') === 'true') owned.push('flut');
+            if (localStorage.getItem('hafizaGuvenKanunPack') === 'true') owned.push('kanun');
+
+            let current = window.activeInstrument || localStorage.getItem('hafizaGuvenInstrument') || 'piano';
+            let idx = owned.indexOf(current);
+            if (idx === -1) idx = 0;
+            idx = (idx + 1) % owned.length;
+            let nextInst = owned[idx];
+
+            let wasPlaying = (window.bgMusic && window.bgMusic.playing());
+            if (window.bgMusic) window.bgMusic.stop();
+            localStorage.setItem('hafizaGuvenInstrument', nextInst);
+            window.activeInstrument = nextInst;
+            if (wasPlaying && window.bgMusic) window.bgMusic.play();
+
+            window.updateInstrumentBtnText();
+            let n = btnChangeInst.innerText.match(/\((.*?)\)/)[1];
+
+            const updateStoreBtn = (id, key, inst, instName) => {
+                const b = document.getElementById(id);
+                if (b && localStorage.getItem(key) === 'true') {
+                    b.innerText = (nextInst === inst) ? (instName + " Ses Paketini Kapat") : (instName + " Ses Paketini Etkinleştir");
+                    b.setAttribute('aria-label', instName + " Ses Paketi. " + ((nextInst === inst) ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
+                }
+            };
+            
+            updateStoreBtn('buy-baglama-pack-btn', 'hafizaGuvenBaglamaPack', 'baglama', 'Bağlama');
+            updateStoreBtn('buy-kaval-pack-btn', 'hafizaGuvenKavalPack', 'kaval', 'Kaval');
+            updateStoreBtn('buy-flut-pack-btn', 'hafizaGuvenFlutPack', 'flut', 'Flüt');
+            updateStoreBtn('buy-kanun-pack-btn', 'hafizaGuvenKanunPack', 'kanun', 'Kanun');
+
+            if (window.menuEnterSound) window.menuEnterSound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader("Ses paketi değiştirildi. " + n + " aktif.");
+        });
+    }
 
     if (gameBackBtn) {
         gameBackBtn.addEventListener('click', () => {
@@ -1153,6 +1217,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.kavalNotes) {
                 for (let k in window.kavalNotes) window.kavalNotes[k].volume(1.0 * scale);
             }
+            if (window.kanunNotes) {
+                for (let k in window.kanunNotes) window.kanunNotes[k].volume(1.0 * scale);
+            }
             if (window.snowStepSounds) {
                 for (let i = 0; i < window.snowStepSounds.length; i++) window.snowStepSounds[i].volume(1.0 * scale);
             }
@@ -1330,6 +1397,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Notaları piyano yerine flüt ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 200 Jeton.");
                 }
             }
+
+            if (buyKanunPackBtn) {
+                let ownsKanun = localStorage.getItem('hafizaGuvenKanunPack') === 'true';
+                if (ownsKanun) {
+                    let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'kanun';
+                    buyKanunPackBtn.innerText = isActive ? "Kanun Ses Paketini Kapat" : "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
+                } else {
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketi Satın Al (300 Jeton)";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Notaları piyano yerine kanun ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 300 Jeton.");
+                }
+            }
             
             if (window.announceToScreenReader) window.announceToScreenReader(`Mağazaya hoş geldiniz. Mevcut jetonunuz: ${totalTokens}`);
         });
@@ -1441,6 +1520,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
                         buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
+                    if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
+                        buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
+                    }
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
@@ -1470,6 +1553,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
                     buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
                     buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
+                }
+                if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
             }
         });
@@ -1512,6 +1599,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
                         buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
+                    if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
+                        buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
+                    }
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
@@ -1541,6 +1632,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
                     buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
                     buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
+                }
+                if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
             }
         });
@@ -1583,6 +1678,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
                         buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
+                    if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
+                        buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
+                    }
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
@@ -1612,6 +1711,89 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
                     buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
                     buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
+                }
+                if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
+                }
+            }
+        });
+    }
+
+    if (buyKanunPackBtn) {
+        buyKanunPackBtn.addEventListener('click', () => {
+            let ownsKanun = localStorage.getItem('hafizaGuvenKanunPack') === 'true';
+            
+            if (ownsKanun) {
+                let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'kanun';
+                if (isActive) {
+                    let wasPlaying = (window.bgMusic && window.bgMusic.playing());
+                    if (window.bgMusic) window.bgMusic.stop();
+                    localStorage.setItem('hafizaGuvenInstrument', 'piano');
+                    window.activeInstrument = 'piano';
+                    if (wasPlaying && window.bgMusic) window.bgMusic.play();
+
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
+                    if (window.menuEnterSound) window.menuEnterSound.play();
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi kapatıldı. Tekrar piyano sesleri aktif.");
+                } else {
+                    let wasPlaying = (window.bgMusic && window.bgMusic.playing());
+                    if (window.bgMusic) window.bgMusic.stop();
+                    localStorage.setItem('hafizaGuvenInstrument', 'kanun');
+                    window.activeInstrument = 'kanun';
+                    if (wasPlaying && window.bgMusic) window.bgMusic.play();
+
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Kapat";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak için tıklayın.");
+                    if (window.menuEnterSound) window.menuEnterSound.play();
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi etkinleştirildi!");
+                    
+                    if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
+                        buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                        buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
+                    }
+                    if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
+                        buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                        buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
+                    }
+                    if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
+                        buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                        buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
+                    }
+                }
+            } else {
+                let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+                if (totalTokens < 300) {
+                    if (window.wrongSound) window.wrongSound.play();
+                    let msg = "Yetersiz bakiye. Bu eşya için 300 jetona ihtiyacınız var.";
+                    if (window.announceToScreenReader) window.announceToScreenReader(msg);
+                    return;
+                }
+                
+                totalTokens -= 300;
+                localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+                localStorage.setItem('hafizaGuvenKanunPack', 'true');
+                localStorage.setItem('hafizaGuvenInstrument', 'kanun');
+                window.activeInstrument = 'kanun';
+                
+                buyKanunPackBtn.innerText = "Kanun Ses Paketini Kapat";
+                buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak için tıklayın.");
+                
+                if (window.buySound) window.buySound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! Kanun ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
+                
+                if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
+                }
+                if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
+                    buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
+                }
+                if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
+                    buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
             }
         });
