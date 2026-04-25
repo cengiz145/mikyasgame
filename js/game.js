@@ -1161,6 +1161,18 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
+    if (event.key.toLowerCase() === 'c') {
+        event.preventDefault();
+        let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTokens') || "0");
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader('Toplam Jetonunuz: ' + totalTokens, true);
+        }
+        if (window.showToastNotification) {
+            window.showToastNotification('Toplam Jetonunuz: ' + totalTokens);
+        }
+        return;
+    }
+
     if (event.key.toLowerCase() === 'm') {
         let isMuted = false;
         if (window.bgMusic) isMuted = window.bgMusic.mute();
