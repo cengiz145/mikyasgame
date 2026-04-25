@@ -189,6 +189,11 @@ window.playIntro = function () {
     if (window.introPlayed) return;
     window.introPlayed = true;
 
+    const phase1Element = document.getElementById('intro-phase-1');
+    if (phase1Element) phase1Element.setAttribute('aria-hidden', 'true');
+
+    if (window.announceToScreenReader) window.announceToScreenReader("Oyun yükleniyor, lütfen bekleyin...", true);
+
     const randomLogoNum = Math.floor(Math.random() * 5) + 1;
     const ext = randomLogoNum === 1 ? 'ogg' : 'wav';
     const audio = new window.Audio(`sounds/logo${randomLogoNum}.${ext}`);
