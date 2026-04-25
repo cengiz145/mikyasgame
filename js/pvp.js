@@ -466,8 +466,20 @@ window.PvP = {
         
         const btn = document.getElementById('pvp-lobby-cancel-btn');
         if (btn) btn.style.pointerEvents = 'none'; // Prevent cancelling when starting
+        
+        let secondsLeft = 3;
+        if (statusText) statusText.innerText = "Maç Başlıyor: " + secondsLeft;
+        
+        let countdownTimer = setInterval(() => {
+            secondsLeft--;
+            if (secondsLeft > 0) {
+                if (statusText) statusText.innerText = "Maç Başlıyor: " + secondsLeft;
+            } else {
+                clearInterval(countdownTimer);
+            }
+        }, 1000);
 
-        // 10 Saniye boyunca 'Lobi' ekranında bekletip oyunu başlat
+        // Bekletip oyunu başlat
         this.lobbyWaitTimer = setTimeout(() => {
             if (!this.matchId) return; // İşlem kullanıcı tarafından iptal edildiyse dur
             const resetBtn = document.getElementById('pvp-play-btn');
@@ -489,7 +501,7 @@ window.PvP = {
             }
             this.startPvPGame();
             this.lobbyWaitTimer = null;
-        }, 10000);
+        }, 3000);
     },
 
     // BOTA KARŞI OYNA (YAPAY ZEKA) BAŞLANGICI
