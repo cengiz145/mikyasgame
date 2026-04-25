@@ -357,74 +357,21 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
 window.announceToScreenReader = function (text, forceFocus = false) {
     text = window.localizeText(text);
 
-    if (!forceFocus || window.isMobilePianokeyPressed) {
-        // Odaklanma gerektirmeyen CANLI YAYIN anonsları (Mobil ve PC için en kararlı yöntem DOM'da hazır bulunan elementtir)
-        // index.html'de sabit olarak koyduğumuz sr-chat-reader'ı kullanıyoruz
-        let liveAnnouncer = document.getElementById('sr-chat-reader');
-        if (liveAnnouncer) {
-            // Hafızadaki eski silme zamanlayıcılarını bul ve yok et
-            if (window.announcerTimeouts) {
-                window.announcerTimeouts.forEach(t => clearTimeout(t));
-            }
-            window.announcerTimeouts = [];
-
-            // Ekran okuyucuların "boş" demesini engellemek için içeriği SİLMİYORUZ.
-            // Bunun yerine, aynı metin arka arkaya gelirse, sonuna okunamayan sıfır genişlikli boşluk (zero-width space) ekliyoruz.
-            window.announcerToggle = !window.announcerToggle;
-            let finalOutput = text + (window.announcerToggle ? '\u200B' : '');
-            liveAnnouncer.textContent = finalOutput;
-
-            // 20 Saniye sonra içeriği görünmez bir boşluğa çevirerek 
-            // menü geziniminde (makale modu okuma) eski mesajların takılı kalmasını engelliyoruz
-            let timer = setTimeout(() => {
-                if (liveAnnouncer) liveAnnouncer.textContent = ' ';
-            }, 20000);
-            window.announcerTimeouts.push(timer);
+    let liveAnnouncer = document.getElementById('sr-chat-reader');
+    if (liveAnnouncer) {
+        if (window.announcerTimeouts) {
+            window.announcerTimeouts.forEach(t => clearTimeout(t));
         }
-    } else {
-        // PC'de doğrudan Odaklanarak okutma (Eski kararlı yöntem)
-        // DOM'da asılı kalmış TÜM eski anonsları acımasızca temizle (Garbage Collection)
-        const oldAnnouncers = document.querySelectorAll('#sr-focus-announcer');
-        oldAnnouncers.forEach(el => el.remove());
+        window.announcerTimeouts = [];
 
-        let previousFocus = document.activeElement;
+        window.announcerToggle = !window.announcerToggle;
+        let finalOutput = text + (window.announcerToggle ? '\u200B' : '');
+        liveAnnouncer.textContent = finalOutput;
 
-        let announcerDiv = document.createElement('div');
-        announcerDiv.id = 'sr-focus-announcer';
-        announcerDiv.setAttribute('tabindex', '-1');
-        announcerDiv.style.position = 'absolute';
-        announcerDiv.style.opacity = '0';
-        announcerDiv.style.pointerEvents = 'none';
-        announcerDiv.innerText = text; 
-        
-        // Elementi doğrudan aktif menünün içine koyalım ki sekme ile gezinince boşluğa değil menüye gitsin.
-        let activeMenu = document.querySelector('.menu-container:not([style*="display: none"])') || document.body;
-        activeMenu.prepend(announcerDiv);
-        
-        announcerDiv.focus();
-        
-        // Kullanıcı klavyeyle müdahale edip buradan ayrılırsa beklemeye gerek kalmasın:
-        announcerDiv.addEventListener('blur', () => {
-            if (announcerDiv.parentNode) announcerDiv.remove();
-        });
-        
-        setTimeout(() => {
-            if (announcerDiv.parentNode) {
-                // Sadece hala focus ondaysa geri yükle (kullanıcı manuel çıkmadıysa)
-                if (document.activeElement === announcerDiv) {
-                    const isVisible = (el) => el && (el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0);
-                    if (previousFocus && document.body.contains(previousFocus) && previousFocus.tagName !== 'BODY' && isVisible(previousFocus)) {
-                        previousFocus.focus();
-                    } else if (window.lastFocusedElement && document.body.contains(window.lastFocusedElement) && window.lastFocusedElement.tagName !== 'BODY' && isVisible(window.lastFocusedElement)) {
-                        window.lastFocusedElement.focus();
-                    } else if (typeof window.getActiveButtons === 'function') {
-                        let btns = window.getActiveButtons();
-                        if (btns && btns.length > 0) btns[0].focus();
-                    }
-                }
-                if (announcerDiv.parentNode) announcerDiv.remove();
-            }
-        }, 8000); // 15 saniyeden 8 saniyeye indirildi
+        let timer = setTimeout(() => {
+            if (liveAnnouncer) liveAnnouncer.textContent = ' ';
+        }, 20000);
+        window.announcerTimeouts.push(timer);
     }
 };
 
