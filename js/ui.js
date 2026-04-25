@@ -581,7 +581,7 @@ window.initPresenceSystem = function() {
                 if (snap.val() === true) {
                     wasConnected = true;
                     presenceRef.onDisconnect().set({ 
-                        state: 'offline', 
+                        state: 'disconnected', 
                         name: myName,
                         last_changed: firebase.database.ServerValue.TIMESTAMP 
                     }).then(() => {
@@ -591,11 +591,18 @@ window.initPresenceSystem = function() {
                             last_changed: firebase.database.ServerValue.TIMESTAMP 
                         });
                     });
-                } else {
-                    if (wasConnected) {
-                        if (window.serverDisconnectSound) window.serverDisconnectSound.play();
-                        wasConnected = false;
-                    }
+                }
+            });
+
+            window.addEventListener('beforeunload', () => {
+                let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
+                if (myName && myName !== "Misafir" && window.db) {
+                    let safeId = myName.replace(/[.#$\[\]\/]/g, '_');
+                    window.db.ref('presence/' + safeId).set({ 
+                        state: 'offline', 
+                        name: myName,
+                        last_changed: firebase.database.ServerValue.TIMESTAMP 
+                    });
                 }
             });
 
@@ -614,12 +621,14 @@ window.initPresenceSystem = function() {
                                 if (window.playerOnlineSound) window.playerOnlineSound.play();
                             } else if (newP.state === 'offline' && (oldP && oldP.state === 'online')) {
                                 if (window.playerOfflineSound) window.playerOfflineSound.play();
+                            } else if (newP.state === 'disconnected' && (oldP && oldP.state === 'online')) {
+                                if (window.serverDisconnectSound) window.serverDisconnectSound.play();
                             }
                         }
                     }
                     for (let k in oldData) {
                         if (!newData[k] && oldData[k].name !== myName && oldData[k].state === 'online') {
-                            if (window.playerOfflineSound) window.playerOfflineSound.play();
+                            if (window.serverDisconnectSound) window.serverDisconnectSound.play();
                         }
                     }
                 }
