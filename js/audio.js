@@ -34,11 +34,19 @@ window.kavalBgMusic = new Howl({
     html5: false
 });
 
+window.flutBgMusic = new Howl({
+    src: ['sounds/music226.ogg'],
+    loop: true,
+    volume: 1.0,
+    html5: false
+});
+
 class BgMusicWrapper {
     get current() {
         if (window.activeInstrument === 'baglama') return window.baglamaBgMusic;
         if (window.activeInstrument === 'kanun') return window.kanunBgMusic;
         if (window.activeInstrument === 'kaval') return window.kavalBgMusic;
+        if (window.activeInstrument === 'flut') return window.flutBgMusic;
         return window.pianoBgMusic;
     }
     play() { return this.current.play(); }
