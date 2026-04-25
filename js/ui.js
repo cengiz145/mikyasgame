@@ -571,6 +571,7 @@ window.initPresenceSystem = function() {
             const connectedRef = window.db.ref('.info/connected');
             
             let wasConnected = false;
+            let initialConnectionDone = false;
             connectedRef.on('value', (snap) => {
                 let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
                 if (!myName || myName.trim() === '' || myName === "Misafir") return;
@@ -579,7 +580,11 @@ window.initPresenceSystem = function() {
                 let presenceRef = window.db.ref('presence/' + safeId);
                 
                 if (snap.val() === true) {
+                    if (wasConnected === false && initialConnectionDone) {
+                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucuya yeniden bağlandı.", true);
+                    }
                     wasConnected = true;
+                    initialConnectionDone = true;
                     presenceRef.onDisconnect().set({ 
                         state: 'disconnected', 
                         name: myName,
@@ -591,6 +596,11 @@ window.initPresenceSystem = function() {
                             last_changed: firebase.database.ServerValue.TIMESTAMP 
                         });
                     });
+                } else {
+                    if (wasConnected) {
+                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucu bağlantınız kesildi.", true);
+                        wasConnected = false;
+                    }
                 }
             });
 
@@ -619,16 +629,20 @@ window.initPresenceSystem = function() {
                         if (newP.name && newP.name !== myName) {
                             if (newP.state === 'online' && (!oldP || oldP.state !== 'online')) {
                                 if (window.playerOnlineSound) window.playerOnlineSound.play();
+                                if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimiçi.`);
                             } else if (newP.state === 'offline' && (oldP && oldP.state === 'online')) {
                                 if (window.playerOfflineSound) window.playerOfflineSound.play();
+                                if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimdışı.`);
                             } else if (newP.state === 'disconnected' && (oldP && oldP.state === 'online')) {
                                 if (window.serverDisconnectSound) window.serverDisconnectSound.play();
+                                if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} bağlantısı koptu.`);
                             }
                         }
                     }
                     for (let k in oldData) {
                         if (!newData[k] && oldData[k].name !== myName && oldData[k].state === 'online') {
                             if (window.serverDisconnectSound) window.serverDisconnectSound.play();
+                            if (window.announceToScreenReader) window.announceToScreenReader(`${oldData[k].name} bağlantısı koptu.`);
                         }
                     }
                 }
