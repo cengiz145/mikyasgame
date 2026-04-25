@@ -114,6 +114,24 @@ window.music60Sound = new Howl({
     volume: 0.5
 });
 
+window.playerOnlineSound = new Howl({
+    src: ['sounds/online.ogg'],
+    volume: 1.0,
+    html5: true
+});
+
+window.playerOfflineSound = new Howl({
+    src: ['sounds/ofline.ogg'],
+    volume: 1.0,
+    html5: true
+});
+
+window.serverDisconnectSound = new Howl({
+    src: ['sounds/disconnect.ogg'],
+    volume: 1.0,
+    html5: true
+});
+
 window.modeUnlockSound = new Howl({
     src: ['sounds/newmotd1.ogg'],
     volume: 1.0,

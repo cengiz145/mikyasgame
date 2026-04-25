@@ -570,6 +570,7 @@ window.initPresenceSystem = function() {
             clearInterval(checkDb);
             const connectedRef = window.db.ref('.info/connected');
             
+            let wasConnected = false;
             connectedRef.on('value', (snap) => {
                 let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
                 if (!myName || myName.trim() === '' || myName === "Misafir") return;
@@ -578,6 +579,7 @@ window.initPresenceSystem = function() {
                 let presenceRef = window.db.ref('presence/' + safeId);
                 
                 if (snap.val() === true) {
+                    wasConnected = true;
                     presenceRef.onDisconnect().set({ 
                         state: 'offline', 
                         name: myName,
@@ -589,11 +591,42 @@ window.initPresenceSystem = function() {
                             last_changed: firebase.database.ServerValue.TIMESTAMP 
                         });
                     });
+                } else {
+                    if (wasConnected) {
+                        if (window.serverDisconnectSound) window.serverDisconnectSound.play();
+                        wasConnected = false;
+                    }
                 }
             });
 
+            let isFirstPresenceLoad = true;
             window.db.ref('presence').on('value', (snap) => {
-                window.lastPresenceData = snap.val() || {};
+                let newData = snap.val() || {};
+                let oldData = window.lastPresenceData || {};
+                let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
+
+                if (!isFirstPresenceLoad) {
+                    for (let k in newData) {
+                        let newP = newData[k];
+                        let oldP = oldData[k];
+                        if (newP.name && newP.name !== myName) {
+                            if (newP.state === 'online' && (!oldP || oldP.state !== 'online')) {
+                                if (window.playerOnlineSound) window.playerOnlineSound.play();
+                            } else if (newP.state === 'offline' && (oldP && oldP.state === 'online')) {
+                                if (window.playerOfflineSound) window.playerOfflineSound.play();
+                            }
+                        }
+                    }
+                    for (let k in oldData) {
+                        if (!newData[k] && oldData[k].name !== myName && oldData[k].state === 'online') {
+                            if (window.playerOfflineSound) window.playerOfflineSound.play();
+                        }
+                    }
+                }
+
+                window.lastPresenceData = newData;
+                isFirstPresenceLoad = false;
+
                 if (window.currentActiveMenu === 'social') {
                     if (window.renderSocialList) window.renderSocialList();
                 }
@@ -1197,6 +1230,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.glasshitSound) window.glasshitSound.volume(1.0 * scale);
             if (window.gameWinSound) window.gameWinSound.volume(1.0 * scale);
             if (window.modeUnlockSound) window.modeUnlockSound.volume(1.0 * scale);
+            if (window.playerOnlineSound) window.playerOnlineSound.volume(1.0 * scale);
+            if (window.playerOfflineSound) window.playerOfflineSound.volume(1.0 * scale);
+            if (window.serverDisconnectSound) window.serverDisconnectSound.volume(1.0 * scale);
             if (window.enterHouseSound) window.enterHouseSound.volume(1.0 * scale);
             if (window.doorCloseSound) window.doorCloseSound.volume(1.0 * scale);
             if (window.buySound) window.buySound.volume(1.0 * scale);
