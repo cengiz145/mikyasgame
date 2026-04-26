@@ -226,13 +226,13 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'difficulty') buttons = Array.from(window.difficultyMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'practice') buttons = Array.from(window.practiceMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'story') buttons = Array.from(window.storyMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'stats') buttons = Array.from(window.statsMenu.querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'stats') buttons = Array.from(window.statsMenu.querySelectorAll('.stat-item, .stat-copy-btn, .menu-button'));
     else if (window.currentActiveMenu === 'store') buttons = Array.from(window.storeMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'achievements') buttons = Array.from(window.achievementsMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'feedback') buttons = Array.from(window.feedbackMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'server-message') buttons = Array.from(window.serverMessageMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'game') buttons = Array.from(window.gameMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'profile') buttons = Array.from(window.profileMenu.querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'profile') buttons = Array.from(window.profileMenu.querySelectorAll('.stat-item, .stat-copy-btn, .menu-button'));
     else if (window.currentActiveMenu === 'social') buttons = Array.from(document.getElementById('social-player-list').querySelectorAll('li[tabindex="0"]'));
     else if (window.currentActiveMenu === 'social-action') buttons = Array.from(document.getElementById('social-action-modal') ? document.getElementById('social-action-modal').querySelectorAll('.menu-button') : []);
     else if (window.currentActiveMenu === 'play-mode') buttons = Array.from(document.getElementById('play-mode-menu-container').querySelectorAll('.menu-button'));
@@ -552,17 +552,20 @@ window.updateStatsDisplay = function() {
             setTimeout(() => window.announceToScreenReader("Bu sekme boş. Henüz hiç bir istatistiğiniz bulunmuyor."), 300);
         }
     } else {
+    } else {
         html = `
-            <p><strong>Bakiye:</strong> ${tokens} Jeton</p>
-            <p><strong>Günlük Seri (Takvim):</strong> ${streakCount} Gün</p>
-            <p><strong>Hata Koruması:</strong> ${hk} adet</p>
-            <p><strong>Zaman Koruması:</strong> ${zk} adet</p>
-            <p style="margin-top:10px; color:#ffb703;"><strong>Tamamlanan Oynanışlar:</strong></p>
-            <ul style="list-style: none; padding-left: 10px; margin-top:5px;">
-                <li>Kolay Mod: ${easyCount} kez</li>
-                <li>Orta Mod: ${mediumCount} kez</li>
-                <li>Zor Mod: ${hardCount} kez</li>
-                <li>Kayıp Notalar: ${storyCount} kez</li>
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;" class="stats-list">
+                <li tabindex="0" class="stat-item" style="padding: 5px;">Bakiye: ${tokens} Jeton</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;">Günlük Seri (Takvim): ${streakCount} Gün</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;">Hata Koruması: ${hk} adet</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;">Zaman Koruması: ${zk} adet</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;">Kolay Mod: ${easyCount} kez tamamlandı</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;">Orta Mod: ${mediumCount} kez tamamlandı</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;">Zor Mod: ${hardCount} kez tamamlandı</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;">Kayıp Notalar: ${storyCount} kez tamamlandı</li>
+                <li style="margin-top: 15px;">
+                    <button class="menu-button stat-copy-btn" aria-label="İstatistiklerimi Kopyala">İstatistiklerimi Kopyala</button>
+                </li>
             </ul>
         `;
     }
@@ -572,6 +575,20 @@ window.updateStatsDisplay = function() {
 
     if (statsContent) statsContent.innerHTML = html;
     if (profileStatsContent) profileStatsContent.innerHTML = html;
+    
+    // Kopyalama butonu işlevini ata
+    document.querySelectorAll('.stat-copy-btn').forEach(btn => {
+        btn.onclick = function() {
+            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\nBakiye: ${tokens} Jeton\nGünlük Seri: ${streakCount} Gün\nHata Koruması: ${hk}\nZaman Koruması: ${zk}\nKolay: ${easyCount}\nOrta: ${mediumCount}\nZor: ${hardCount}\nKayıp Notalar: ${storyCount}`;
+            navigator.clipboard.writeText(copyText).then(() => {
+                if (window.announceToScreenReader) window.announceToScreenReader("İstatistikleriniz panoya kopyalandı.", true);
+                if (window.correctSound) window.correctSound.play();
+            }).catch(() => {
+                if (window.announceToScreenReader) window.announceToScreenReader("Kopyalama başarısız oldu.", true);
+                if (window.wrongSound) window.wrongSound.play();
+            });
+        };
+    });
 };
 
 // --- PRESENCE (VARLIK) & SOSYAL LİSTE SİSTEMİ ---
