@@ -1167,9 +1167,6 @@ document.addEventListener('keydown', function (event) {
         if (window.announceToScreenReader) {
             window.announceToScreenReader('Toplam Jetonunuz: ' + totalTokens, true);
         }
-        if (window.showToastNotification) {
-            window.showToastNotification('Toplam Jetonunuz: ' + totalTokens);
-        }
         return;
     }
 
