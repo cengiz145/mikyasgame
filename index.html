@@ -546,7 +546,7 @@
     <div id="pvp-rooms-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            class="sr-only"
             onfocus="setTimeout(() => document.getElementById('pvp-rooms-back-btn').focus(), 10);"></div>
         
         <h1 id="pvp-rooms-title">Odaya Katıl</h1>
@@ -572,14 +572,14 @@
         </nav>
         
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;"
+            class="sr-only"
             onfocus="setTimeout(() => { const btn=document.getElementById('pvp-join-submit-btn'); if(btn) btn.focus(); }, 10);"></div>
     </div>
 
     <!-- Eşleştirme Lobisi (Bekleme Odası) -->
     <div id="pvp-lobby-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('pvp-lobby-cancel-btn').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('pvp-lobby-cancel-btn').focus(), 10);"></div>
         
         <h1 id="pvp-lobby-title" tabindex="0">Oyun Lobisi</h1>
         <h2 id="pvp-lobby-code-display" tabindex="0" style="font-size: 2.5rem; letter-spacing: 5px; color: #fff; margin-bottom: 10px; font-family: monospace;">----</h2>
@@ -606,7 +606,7 @@
             </ul>
         </nav>
 
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('pvp-lobby-title').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('pvp-lobby-title').focus(), 10);"></div>
     </div>
 
     <!-- Oyun Ekranı -->
@@ -669,13 +669,12 @@
     </nav>
 
     <!-- Gizli Canlı Bölge (Sohbet pencereleri ve anlık ses/bildirim anonsları için) -->
-    <div id="sr-chat-reader" role="alert" aria-live="assertive" aria-atomic="true"
-        style="position: absolute; left: -9999px; top: -9999px; opacity: 0;"></div>
+    <div id="sr-chat-reader" class="sr-only" role="alert" aria-live="assertive" aria-atomic="true"></div>
 
     <!-- Canlı Sohbet Penceresi -->
     <div id="chat-panel" class="chat-panel" aria-hidden="true" style="display: none;" role="dialog"
         aria-label="Canlı Sohbet Penceresi">
-        <div tabindex="0" role="button" aria-label="Sohbet paneli başı, sona gidiliyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('chat-send-btn').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Sohbet paneli başı, sona gidiliyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('chat-send-btn').focus(), 10);"></div>
         <div class="chat-header">
             <h2 id="chat-title">Canlı Sohbet</h2>
             <button id="chat-close-btn" aria-label="Sohbeti Kapat" class="chat-close-btn">X</button>
@@ -692,12 +691,12 @@
                 placeholder="Mesajınız..." maxlength="150">
             <button id="chat-send-btn" aria-label="Mesajı Gönder">➤</button>
         </div>
-        <div tabindex="0" role="button" aria-label="Sohbet paneli sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('chat-close-btn').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Sohbet paneli sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('chat-close-btn').focus(), 10);"></div>
     </div>
 
     <!-- KULLANICI İŞLEMLERİ MENÜSÜ (Özel Mesaj / Sustur) -->
     <div id="social-action-modal" class="menu-container" role="presentation" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; z-index: 2000; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('social-btn-cancel').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('social-btn-cancel').focus(), 10);"></div>
         
         <h2 id="social-action-title" tabindex="0" style="color: #ffb703; border-bottom: 2px solid #ffb703; padding-bottom: 5px; margin-bottom: 20px; font-size: 2rem;">İşlem Seçimi</h2>
         <nav class="menu-nav"   aria-labelledby="social-action-title">
@@ -708,12 +707,12 @@
             </ul>
         </nav>
         
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('social-btn-pm').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('social-btn-pm').focus(), 10);"></div>
     </div>
 
     <!-- ÖZEL MESAJLAŞMA PENCERESİ -->
     <div id="private-chat-panel" class="chat-panel" aria-hidden="true" style="display: none; z-index: 2001;" role="dialog" aria-label="Özel Sohbet Penceresi">
-        <div tabindex="0" role="button" aria-label="Özel sohbet paneli başı, sona gidiliyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('private-chat-send-btn').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Özel sohbet paneli başı, sona gidiliyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('private-chat-send-btn').focus(), 10);"></div>
         <div class="chat-header">
             <h2 id="private-chat-title" aria-live="polite">Özel Sohbet</h2>
             <button id="private-chat-close-btn" aria-label="Özel Sohbeti Kapat" class="chat-close-btn">X</button>
@@ -725,7 +724,7 @@
             <input type="text" id="private-chat-message-input" name="private-chat-message-input" aria-label="Özel Mesajınızı Girin" placeholder="Özel mesajınız..." maxlength="150" disabled>
             <button id="private-chat-send-btn" aria-label="Mesajı Gönder" disabled>➤</button>
         </div>
-        <div tabindex="0" role="button" aria-label="Özel sohbet paneli sonu, başa dönülüyor" style="position: absolute; opacity: 0; width: 1px; height: 1px; overflow: hidden;" onfocus="setTimeout(() => document.getElementById('private-chat-close-btn').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Özel sohbet paneli sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('private-chat-close-btn').focus(), 10);"></div>
     </div>
 
     <!-- Howler.js 3D Ses Kütüphanesi (Yerel) -->
