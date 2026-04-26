@@ -15,6 +15,9 @@ window.quitStoryMode = function() {
     window.isStoryModeWon = false;
     window.isStoryModeFinishedWaitingForEnter = false;
     
+    // Zamanlayıcıyı Temizle
+    if (window.storyTimerIntervalId) clearInterval(window.storyTimerIntervalId);
+    
     // Hafıza (Memory) Sızıntılarını ve Taşan Animasyonları Önle (Clear all timeouts)
     if (window.stepIntervalId) clearTimeout(window.stepIntervalId);
     if (window.storyAnimInterval1) clearInterval(window.storyAnimInterval1);
@@ -220,7 +223,49 @@ window.initializeMissingNotesMap = function() {
         window.mountainSound.play();
     }
 
-    // music272Sound removed to prevent 2 tracks playing simultaneously in mountain map
+    // Zamanlayıcıyı başlat (3 dakika = 180 saniye)
+    if (window.storyTimerIntervalId) clearInterval(window.storyTimerIntervalId);
+    window.storyTimerValue = 180;
+    
+    window.storyTimerIntervalId = setInterval(() => {
+        if (window.isStoryModeWon) {
+            clearInterval(window.storyTimerIntervalId);
+            return;
+        }
+        
+        window.storyTimerValue--;
+        
+        if (window.storyTimerValue === 120) {
+            if (window.announceToScreenReader) window.announceToScreenReader("2 dakika kaldı.");
+        } else if (window.storyTimerValue === 60) {
+            if (window.announceToScreenReader) window.announceToScreenReader("1 dakika kaldı.");
+        } else if (window.storyTimerValue === 20) {
+            if (window.announceToScreenReader) window.announceToScreenReader("Son 20 saniye kaldı.");
+        }
+        
+        if (window.storyTimerValue <= 60 && window.storyTimerValue > 0) {
+            // Son 1 dakikada her saniye heyecan artırıcı sesi çal
+            if (window.seconsSound) window.seconsSound.play();
+        }
+        
+        if (window.storyTimerValue <= 0) {
+            clearInterval(window.storyTimerIntervalId);
+            window.quitStoryMode();
+            
+            if (window.wrongSound) window.wrongSound.play();
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader("Süre doldu! Soğuktan donmak üzereyken kurtarma ekipleri seni buldu. Kayıp Notalar modunu tamamlayamadın. Ana menüye dönülüyor.", true);
+            }
+            
+            if (window.switchMenu && window.storyMenu && window.mainMenu) {
+                window.switchMenu(window.storyMenu, window.mainMenu, 'main');
+            }
+            
+            if (window.bgMusic && !window.bgMusic.playing()) {
+                window.bgMusic.play();
+            }
+        }
+    }, 1000);
 };
 
 window.handleStoryWalking = function(key) {

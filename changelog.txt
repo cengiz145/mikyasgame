@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.5] - 2026-04-26
+
+Yeni Özellikler:
+- Kayıp Notalar moduna 3 dakikalık gizli zamanlayıcı eklendi. Arka planda sessizce işleyen bu süre, son 2 dakika, 1 dakika ve 20 saniye kala sizi uyaracak. Sürenin dolmasına 1 dakika kala heyecanı artıracak geri sayım ses efektleri duyulmaya başlanacak! Süre dolduğunda oyuncu görevden başarısız sayılacak.
+
 [v0.97.4.4] - 2026-04-26
 
 Yeni Özellikler ve Etkinlikler:
