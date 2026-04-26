@@ -1,6 +1,6 @@
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-Write-Host "Changelog dosyasından son güncelleme okunuyor..." -ForegroundColor Yellow
+Write-Host "Changelog dosyasindan son guncelleme okunuyor..." -ForegroundColor Yellow
 
 $changelogPath = "changelog.txt"
 $content = Get-Content -Path $changelogPath -Encoding UTF8
@@ -25,49 +25,49 @@ foreach ($line in $content) {
 $mesaj = $latestEntry -join "`n"
 $mesaj = $mesaj.Trim()
 
-Write-Host "`n--- GÖNDERİLECEK MESAJ ---" -ForegroundColor Cyan
+Write-Host "`n--- GONDERILECEK MESAJ ---" -ForegroundColor Cyan
 Write-Host $mesaj
 Write-Host "--------------------------`n"
 
-$commitMsg = "Güncelleme: $versionLine"
+$commitMsg = "Guncelleme: $versionLine"
 
-Write-Host "Github'a yükleniyor..." -ForegroundColor Cyan
+Write-Host "Github'a yukleniyor..." -ForegroundColor Cyan
 git add .
 git commit -m $commitMsg
 git push
-Write-Host "Github'a yüklendi!" -ForegroundColor Green
+Write-Host "Github'a yuklendi!" -ForegroundColor Green
 
-Write-Host "Telegram kanalına bildirim gönderiliyor..." -ForegroundColor Cyan
+Write-Host "Telegram kanalina bildirim gonderiliyor..." -ForegroundColor Cyan
 $token = "8797867195:AAHG65mgOhmeWh9Z-xVwCsdRVJ0bDQD86iA"
 $chat_id = "@hafizanaguven2559"
 
-$telegramMesaji = "🚀 *Yeni Güncelleme*`n`n" + $mesaj + "`n`n🎮 Oyunu Oynamak İçin Tıklayın: https://cengiz145.github.io/mikyasgame/"
+$telegramMesaji = "🚀 *Yeni Güncelleme*`n`n" + $mesaj
 
 $url = "https://api.telegram.org/bot$token/sendMessage"
 
 try {
-    # İlk deneme Markdown ile (eğer changelog'daki yıldızlar vb. sorun yaratmazsa daha şık durur)
-    $body = @{
+    $payload = @{
         chat_id = $chat_id
         text = $telegramMesaji
         parse_mode = "Markdown"
     } | ConvertTo-Json -Depth 3
-    Invoke-RestMethod -Uri $url -Method Post -Body $body -ContentType "application/json; charset=utf-8" | Out-Null
-    Write-Host "Telegram bildirimi başarıyla gönderildi!" -ForegroundColor Green
+    $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
+    Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytes -ContentType "application/json; charset=utf-8" | Out-Null
+    Write-Host "Telegram bildirimi basariyla gonderildi!" -ForegroundColor Green
 } catch {
-    Write-Host "Markdown biçimlendirmesiyle gönderilemedi, düz metin olarak deneniyor..." -ForegroundColor Yellow
+    Write-Host "Markdown bicimlendirmesiyle gonderilemedi, duz metin olarak deneniyor..." -ForegroundColor Yellow
     try {
-        # Eğer Markdown çakışması olursa düz metin at
-        $bodyPlain = @{
+        $payloadPlain = @{
             chat_id = $chat_id
             text = $telegramMesaji
         } | ConvertTo-Json -Depth 3
-        Invoke-RestMethod -Uri $url -Method Post -Body $bodyPlain -ContentType "application/json; charset=utf-8" | Out-Null
-        Write-Host "Telegram bildirimi düz metin olarak başarıyla gönderildi!" -ForegroundColor Green
+        $jsonBytesPlain = [System.Text.Encoding]::UTF8.GetBytes($payloadPlain)
+        Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytesPlain -ContentType "application/json; charset=utf-8" | Out-Null
+        Write-Host "Telegram bildirimi duz metin olarak basariyla gonderildi!" -ForegroundColor Green
     } catch {
-        Write-Host "Telegram bildirimi gönderilirken bir hata oluştu: $_" -ForegroundColor Red
+        Write-Host "Telegram bildirimi gonderilirken bir hata olustu: $_" -ForegroundColor Red
     }
 }
 
-Write-Host "İşlem tamamlandı! Çıkmak için bir tuşa basın..."
+Write-Host "Islem tamamlandi! Cikmak icin bir tusa basin..."
 $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
