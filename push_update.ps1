@@ -41,7 +41,7 @@ Write-Host "Telegram kanalina bildirim gonderiliyor..." -ForegroundColor Cyan
 $token = "8797867195:AAHG65mgOhmeWh9Z-xVwCsdRVJ0bDQD86iA"
 $chat_id = "@hafizanaguven2559"
 
-$telegramMesaji = "🚀 *Yeni Güncelleme*`n`n" + $mesaj
+$telegramMesaji = "[Yeni Güncelleme]`n`n" + $mesaj
 
 $url = "https://api.telegram.org/bot$token/sendMessage"
 
@@ -49,7 +49,6 @@ try {
     $payload = @{
         chat_id = $chat_id
         text = $telegramMesaji
-        parse_mode = "Markdown"
     } | ConvertTo-Json -Depth 3
     $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
     Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytes -ContentType "application/json; charset=utf-8" | Out-Null
