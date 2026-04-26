@@ -1250,12 +1250,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     msg = `Şu an aktif bir etkinlik bulunmuyor. Sıradaki etkinlik: "Çift Jeton Etkinliği". Başlamasına ${diffDays} gün, ${diffHours} saat, ${diffMinutes} dakika var. Her Cumartesi saat 12:00'de başlar.`;
                 }
                 
-                if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
-                alert(msg);
-                
-                // Alert kapandıktan sonra odağı tekrar butona ver
                 setTimeout(() => {
-                    eventsBtnMain.focus();
+                    if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                 }, 100);
             });
         }
