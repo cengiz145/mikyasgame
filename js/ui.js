@@ -552,7 +552,6 @@ window.updateStatsDisplay = function() {
             setTimeout(() => window.announceToScreenReader("Bu sekme boş. Henüz hiç bir istatistiğiniz bulunmuyor."), 300);
         }
     } else {
-    } else {
         html = `
             <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;" class="stats-list">
                 <li tabindex="0" class="stat-item" style="padding: 5px;">Bakiye: ${tokens} Jeton</li>
