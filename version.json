@@ -1,5 +1,5 @@
 {
-    "version": "0.97.4.3",
-    "buildId": 1781000002,
-    "changelog": "Büyük Duyuru: Artık resmi bir Telegram kanalımız var! Ayrıca yeni güncellemeleri anında haber verecek bildirim sistemimiz eklendi."
+    "version": "0.97.4.4",
+    "buildId": 1781000003,
+    "changelog": "Yeni Özellik: Günlük giriş serisi (takvim) sistemi ve Cumartesi öğleden sonradan Pazar gecesine kadar geçerli Çift Jeton Hafta Sonu Etkinliği eklendi!"
 }

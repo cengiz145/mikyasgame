@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.4] - 2026-04-26
+
+Yeni Özellikler ve Etkinlikler:
+- Günlük Giriş Serisi (Takvim) eklendi! Artık oyuna art arda girdiğiniz her gün için ekstra jeton kazanacaksınız. Seriyi bozmamaya dikkat edin!
+- Hafta Sonu Çift Jeton Etkinliği başlatıldı! Bundan böyle Cumartesi günü öğleden sonra 12.00'den Pazar gecesi 23.59'a kadar oyunlardan (Klasik mod, Hikaye modu ve PvP) kazandığınız tüm jetonlar 2 katına çıkacak.
+
 [v0.97.4.3] - 2026-04-26
 
 Büyük Duyuru ve Yenilikler:

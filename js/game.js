@@ -528,6 +528,14 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
     }
 
     window.sessionTokens = Math.max(0, window.sessionTokens);
+    
+    // Hafta Sonu Çift Jeton Etkinliği Kontrolü
+    let eventMessage = "";
+    if (window.isWeekendDoubleCoins && window.isWeekendDoubleCoins() && window.sessionTokens > 0) {
+        window.sessionTokens *= 2;
+        eventMessage = " (Çift Jeton Etkinliği Aktif!)";
+    }
+    
     totalTokens += window.sessionTokens;
     try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens); } catch (e) { }
 
@@ -553,7 +561,7 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
 
         if (window.switchMenu && window.mainMenu) window.switchMenu(document.getElementById('game-menu-container'), window.mainMenu, 'main');
 
-        endMessage = `Oyundan çıkıldı. Bu oyunda toplam ${window.sessionTokens} jeton kazandınız. Toplam jetonunuz ${totalTokens}. Ana menüye dönüldü.`;
+        endMessage = `Oyundan çıkıldı. Bu oyunda toplam ${window.sessionTokens} jeton kazandınız${eventMessage}. Toplam jetonunuz ${totalTokens}. Ana menüye dönüldü.`;
         if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
         // Oyuncu kendi çıkarsa Ana Menü müziğini geri başlat
         if (window.bgMusic && !window.bgMusic.playing()) {
@@ -596,7 +604,7 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
         baseMessage = `Oyundan çıkıldı.`;
     }
 
-    endMessage = `${baseMessage} Bu oyunda toplam ${window.sessionTokens} jeton kazandınız. Toplam jetonunuz ${totalTokens}. Ana menüye dönmek için entır tuşuna basın.`;
+    endMessage = `${baseMessage} Bu oyunda toplam ${window.sessionTokens} jeton kazandınız${eventMessage}. Toplam jetonunuz ${totalTokens}. Ana menüye dönmek için entır tuşuna basın.`;
 
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
@@ -835,7 +843,7 @@ window.addEventListener('load', () => {
         clickCount++;
         if (clickCount === 1) {
             if (window.menuEnterSound) window.menuEnterSound.play();
-            const ver = window.mevcutSurum || localStorage.getItem('lastSeenChangelogVersion') || "0.97.4.3";
+            const ver = window.mevcutSurum || localStorage.getItem('lastSeenChangelogVersion') || "0.97.4.4";
             const vText = "Versiyon: " + ver;
             const yazarText = "Bu oyun, görme engelli bir müzik öğretmeni olan Ümit Ekrem Mikyas tarafından geliştirilmiştir.";
 

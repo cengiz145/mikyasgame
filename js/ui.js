@@ -80,7 +80,68 @@ window.guncellemeKontrolEt = function (isManual = false) {
         });
 };
 
+window.isWeekendDoubleCoins = function() {
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    
+    // Cumartesi (6) 12:00'dan itibaren, Pazar (0) tüm gün (23:59'a kadar)
+    if (day === 6 && hour >= 12) return true;
+    if (day === 0) return true;
+    return false;
+};
+
+window.checkDailyStreak = function() {
+    const now = new Date();
+    const todayStr = now.toDateString();
+    const lastLoginStr = localStorage.getItem('hafizaGuvenLastLoginDate');
+    let streak = parseInt(localStorage.getItem('hafizaGuvenLoginStreak')) || 0;
+    
+    if (lastLoginStr !== todayStr) {
+        if (lastLoginStr) {
+            const lastLoginDate = new Date(lastLoginStr);
+            const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const lastMidnight = new Date(lastLoginDate.getFullYear(), lastLoginDate.getMonth(), lastLoginDate.getDate());
+            const daysPassed = Math.round((todayMidnight - lastMidnight) / (1000 * 60 * 60 * 24));
+            
+            if (daysPassed === 1) {
+                streak += 1;
+            } else if (daysPassed > 1) {
+                streak = 1;
+            }
+        } else {
+            streak = 1;
+        }
+        
+        localStorage.setItem('hafizaGuvenLastLoginDate', todayStr);
+        localStorage.setItem('hafizaGuvenLoginStreak', streak);
+        
+        let reward = streak * 10;
+        if (reward > 100) reward = 100; // max 100 jeton (etkinlik hariç)
+        
+        let rewardMsg = `Seri ${streak}. gün! ${reward} jeton kazandınız.`;
+        
+        if (window.isWeekendDoubleCoins()) {
+            reward *= 2;
+            rewardMsg = `Seri ${streak}. gün! Hafta sonu çift jeton etkinliği aktif olduğu için ${reward} jeton kazandınız.`;
+        }
+        
+        let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+        totalTokens += reward;
+        try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens); } catch(e){}
+        
+        // Sesli mesajı intro menüsü açıldıktan sonra oku
+        setTimeout(() => {
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader(`Günlük giriş ödülü: ` + rewardMsg);
+            }
+        }, 5000);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+    window.checkDailyStreak();
+    
     const checkUpdatesBtn = document.getElementById('check-updates-btn');
     if (checkUpdatesBtn) {
         checkUpdatesBtn.addEventListener('click', () => {

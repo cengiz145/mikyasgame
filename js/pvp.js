@@ -862,19 +862,25 @@ window.PvP = {
                 msg += "Büyük Ödül: 2 Hata Koruması kazandın!";
             } else {
                 let coins = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                localStorage.setItem('hafizaGuvenTotalTokens', coins + 100);
-                msg += "Büyük Ödül: 100 Hafıza Jetonu kazandın!";
+                let reward = 100;
+                if (window.isWeekendDoubleCoins && window.isWeekendDoubleCoins()) { reward *= 2; msg += " (Çift Jeton Etkinliği!) "; }
+                localStorage.setItem('hafizaGuvenTotalTokens', coins + reward);
+                msg += `Büyük Ödül: ${reward} Hafıza Jetonu kazandın!`;
             }
         } else if (myScore < highestOppScore) {
             msg += "Kaybettin. ";
             let coins = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-            localStorage.setItem('hafizaGuvenTotalTokens', coins + 20);
-            msg += "Teselli Ödülü: 20 Hafıza Jetonu kazandın.";
+            let reward = 20;
+            if (window.isWeekendDoubleCoins && window.isWeekendDoubleCoins()) { reward *= 2; msg += " (Çift Jeton!) "; }
+            localStorage.setItem('hafizaGuvenTotalTokens', coins + reward);
+            msg += `Teselli Ödülü: ${reward} Hafıza Jetonu kazandın.`;
         } else {
             msg += "Berabere! ";
             let coins = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-            localStorage.setItem('hafizaGuvenTotalTokens', coins + 20);
-            msg += "Teselli Ödülü: 20 Hafıza Jetonu kazandın.";
+            let reward = 20;
+            if (window.isWeekendDoubleCoins && window.isWeekendDoubleCoins()) { reward *= 2; msg += " (Çift Jeton!) "; }
+            localStorage.setItem('hafizaGuvenTotalTokens', coins + reward);
+            msg += `Teselli Ödülü: ${reward} Hafıza Jetonu kazandın.`;
         }
 
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
