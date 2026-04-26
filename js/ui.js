@@ -542,6 +542,8 @@ window.updateStatsDisplay = function() {
 
     let r_el = document.getElementById('profile-player-rank');
     if (r_el) r_el.innerText = rank;
+    
+    let streakCount = parseInt(localStorage.getItem('hafizaGuvenLoginStreak')) || 0;
 
     let html = "";
     if (tokens === 0 && hk === 0 && zk === 0 && easyCount === 0 && mediumCount === 0 && hardCount === 0 && storyCount === 0) {
@@ -552,6 +554,7 @@ window.updateStatsDisplay = function() {
     } else {
         html = `
             <p><strong>Bakiye:</strong> ${tokens} Jeton</p>
+            <p><strong>Günlük Seri (Takvim):</strong> ${streakCount} Gün</p>
             <p><strong>Hata Koruması:</strong> ${hk} adet</p>
             <p><strong>Zaman Koruması:</strong> ${zk} adet</p>
             <p style="margin-top:10px; color:#ffb703;"><strong>Tamamlanan Oynanışlar:</strong></p>

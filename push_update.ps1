@@ -37,34 +37,53 @@ git commit -m $commitMsg
 git push
 Write-Host "Github'a yuklendi!" -ForegroundColor Green
 
-Write-Host "Telegram kanalina bildirim gonderiliyor..." -ForegroundColor Cyan
-$token = "8797867195:AAHG65mgOhmeWh9Z-xVwCsdRVJ0bDQD86iA"
-$chat_id = "@hafizanaguven2559"
+$lastSentFile = ".last_sent_version.txt"
+$lastSentVer = ""
+if (Test-Path $lastSentFile) {
+    $lastSentVer = Get-Content $lastSentFile
+}
 
-$telegramMesaji = "[Yeni Güncelleme]`n`n" + $mesaj
+$currentVerMatches = [regex]::Match($versionLine, "\[(.*?)\]")
+if ($currentVerMatches.Success) {
+    $currentVer = $currentVerMatches.Groups[1].Value
+} else {
+    $currentVer = $versionLine
+}
 
-$url = "https://api.telegram.org/bot$token/sendMessage"
+if ($currentVer -eq $lastSentVer) {
+    Write-Host "Bu surum ($currentVer) daha once Telegram'a gonderilmis. Yeniden bildirim gonderilmiyor." -ForegroundColor Yellow
+} else {
+    Write-Host "Telegram kanalina bildirim gonderiliyor..." -ForegroundColor Cyan
+    $token = "8797867195:AAHG65mgOhmeWh9Z-xVwCsdRVJ0bDQD86iA"
+    $chat_id = "@hafizanaguven2559"
 
-try {
-    $payload = @{
-        chat_id = $chat_id
-        text = $telegramMesaji
-    } | ConvertTo-Json -Depth 3
-    $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
-    Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytes -ContentType "application/json; charset=utf-8" | Out-Null
-    Write-Host "Telegram bildirimi basariyla gonderildi!" -ForegroundColor Green
-} catch {
-    Write-Host "Markdown bicimlendirmesiyle gonderilemedi, duz metin olarak deneniyor..." -ForegroundColor Yellow
+    $telegramMesaji = "[Yeni Güncelleme]`n`n" + $mesaj
+
+    $url = "https://api.telegram.org/bot$token/sendMessage"
+
     try {
-        $payloadPlain = @{
+        $payload = @{
             chat_id = $chat_id
             text = $telegramMesaji
         } | ConvertTo-Json -Depth 3
-        $jsonBytesPlain = [System.Text.Encoding]::UTF8.GetBytes($payloadPlain)
-        Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytesPlain -ContentType "application/json; charset=utf-8" | Out-Null
-        Write-Host "Telegram bildirimi duz metin olarak basariyla gonderildi!" -ForegroundColor Green
+        $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
+        Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytes -ContentType "application/json; charset=utf-8" | Out-Null
+        Write-Host "Telegram bildirimi basariyla gonderildi!" -ForegroundColor Green
+        Set-Content -Path $lastSentFile -Value $currentVer
     } catch {
-        Write-Host "Telegram bildirimi gonderilirken bir hata olustu: $_" -ForegroundColor Red
+        Write-Host "Markdown bicimlendirmesiyle gonderilemedi, duz metin olarak deneniyor..." -ForegroundColor Yellow
+        try {
+            $payloadPlain = @{
+                chat_id = $chat_id
+                text = $telegramMesaji
+            } | ConvertTo-Json -Depth 3
+            $jsonBytesPlain = [System.Text.Encoding]::UTF8.GetBytes($payloadPlain)
+            Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytesPlain -ContentType "application/json; charset=utf-8" | Out-Null
+            Write-Host "Telegram bildirimi duz metin olarak basariyla gonderildi!" -ForegroundColor Green
+            Set-Content -Path $lastSentFile -Value $currentVer
+        } catch {
+            Write-Host "Telegram bildirimi gonderilirken bir hata olustu: $_" -ForegroundColor Red
+        }
     }
 }
 
