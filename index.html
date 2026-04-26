@@ -119,10 +119,11 @@
     </div>
 
     <!-- Sosyal Menüsü (Mobilde Tab) -->
-    <div id="social-menu-container" class="menu-container" role="presentation" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <h1 id="social-menu-title">Sosyal</h1>
-        <div id="social-content" aria-live="polite"
+    <div id="social-menu-container" class="menu-container" role="region" aria-labelledby="social-menu-title" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <h1 id="social-menu-title">Sosyal Menüsü</h1>
+        <div id="social-content" tabindex="0" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px; max-height: 50vh; overflow-y: auto;">
+            <p class="sr-only">Aşağı ok tuşlarıyla oyuncuları inceleyebilirsiniz.</p>
             <ul id="social-player-list" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;">
                 <li tabindex="0">Sistem yükleniyor...</li>
             </ul>
@@ -130,10 +131,11 @@
     </div>
 
     <!-- Profil Menüsü (Mobilde Tab) -->
-    <div id="profile-menu-container" class="menu-container" role="presentation" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <h1 id="profile-menu-title">Oyuncu Profili</h1>
-        <div id="profile-content" aria-live="polite"
+    <div id="profile-menu-container" class="menu-container" role="region" aria-labelledby="profile-menu-title" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <h1 id="profile-menu-title">Oyuncu Profili ve İstatistikler</h1>
+        <div id="profile-content" tabindex="0" aria-live="polite"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
+            <p class="sr-only">İstatistiklerinizi aşağı ok tuşuyla okuyabilirsiniz.</p>
            <p><strong>Adınız:</strong> <span id="profile-player-name">Bilinmeyen</span></p>
            <p><strong>Rütbeniz:</strong> <span id="profile-player-rank">Oyuncu</span></p>
            <hr style="border-top: 1px solid #444; margin: 15px 0;">
