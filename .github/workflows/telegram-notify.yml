@@ -1,0 +1,30 @@
+name: Telegram Notification
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Send Telegram Notification
+        env:
+          TELEGRAM_BOT_TOKEN: 8797867195:AAHG65mgOhmeWh9Z-xVwCsdRVJ0bDQD86iA
+          TELEGRAM_CHAT_ID: "@hafizanaguven2559"
+        run: |
+          # Changelog dosyasından son sürümü oku
+          LATEST_ENTRY=$(awk '/^\[v/{if (found) exit; found=1} found' changelog.txt)
+          
+          # Telegram'a gidecek mesajı hazırla
+          MESSAGE="[Yeni Güncelleme]
+
+$LATEST_ENTRY"
+
+          # Mesajı Telegram'a gönder
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+            -d chat_id="$TELEGRAM_CHAT_ID" \
+            -d text="$MESSAGE"
