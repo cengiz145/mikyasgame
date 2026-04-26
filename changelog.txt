@@ -1,15 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
-[v0.97.4.2] - 2026-04-26
+[v0.97.4.3] - 2026-04-26
 
 Büyük Duyuru ve Yenilikler:
 - Artık resmi bir Telegram kanalımız var! Oyun ana menüsündeki "Telegram Kanalına Katılın" butonu ile topluluğumuza katılabilir, bizlerle doğrudan iletişime geçebilirsiniz.
 - Özel bildirim altyapısı kuruldu: Bundan böyle oyuna eklenecek olan tüm yeni özellikleri ve güncellemeleri anında kendi kurduğumuz sistem üzerinden Telegram kanalımıza otomatik olarak duyuracağız! Yeniliklerden ilk sizin haberiniz olacak.
-
-[v0.97.4.1] - 2026-04-26
-
-Eklenenler / Değiştirilenler:
-- Ana menüye Telegram Kanalına Katılın butonu eklendi.
 - Çeşitli hata düzeltmeleri yapıldı.
 
 [v0.97.2.9] - 2026-04-18

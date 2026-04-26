@@ -835,7 +835,7 @@ window.addEventListener('load', () => {
         clickCount++;
         if (clickCount === 1) {
             if (window.menuEnterSound) window.menuEnterSound.play();
-            const ver = window.mevcutSurum || localStorage.getItem('lastSeenChangelogVersion') || "0.97.4.2";
+            const ver = window.mevcutSurum || localStorage.getItem('lastSeenChangelogVersion') || "0.97.4.3";
             const vText = "Versiyon: " + ver;
             const yazarText = "Bu oyun, görme engelli bir müzik öğretmeni olan Ümit Ekrem Mikyas tarafından geliştirilmiştir.";
 
