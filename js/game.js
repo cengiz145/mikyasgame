@@ -835,16 +835,17 @@ window.addEventListener('load', () => {
         clickCount++;
         if (clickCount === 1) {
             if (window.menuEnterSound) window.menuEnterSound.play();
-            const ver = window.mevcutSurum || localStorage.getItem('lastSeenChangelogVersion') || "Bilinmiyor";
+            const ver = window.mevcutSurum || localStorage.getItem('lastSeenChangelogVersion') || "0.97.4.1";
             const vText = "Versiyon: " + ver;
+            const yazarText = "Bu oyun, görme engelli bir müzik öğretmeni olan Ümit Ekrem Mikyas tarafından geliştirilmiştir.";
 
             const visualVersion = document.getElementById("intro-version-display");
             if (visualVersion) visualVersion.textContent = vText;
 
-            if (window.announceToScreenReader) window.announceToScreenReader(vText + ". Logoyu dinlemek ve oyuna başlamak için tekrar tıklayın veya enter tuşuna basın.");
+            if (window.announceToScreenReader) window.announceToScreenReader(yazarText + " " + vText + ". Logoyu dinlemek ve oyuna başlamak için tekrar tıklayın veya enter tuşuna basın.");
 
             const startIntroBtn = document.getElementById('start-intro-btn');
-            if (startIntroBtn) startIntroBtn.setAttribute('aria-label', vText + ". Devam etmek için tekrar tıklayın.");
+            if (startIntroBtn) startIntroBtn.setAttribute('aria-label', yazarText + " " + vText + ". Devam etmek için tekrar tıklayın veya enter tuşuna basın.");
         } else if (clickCount === 2) {
             document.removeEventListener('pointerdown', fsEvent);
             document.removeEventListener('click', fsEvent);
