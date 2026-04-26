@@ -1086,10 +1086,10 @@ document.addEventListener('keydown', function (event) {
             if (numMap[key]) key = numMap[key];
         }
         if (!window.isGridWalkingPhase) {
-            if (key === 's') {
+            if (key === 's' || (event.altKey && event.code === 'KeyS')) {
                 event.preventDefault();
                 if (window.announceToScreenReader) window.announceToScreenReader(`Geçilen tur: ${window.gameScore}. Kazanılan jeton: ${window.sessionTokens}.`, true);
-            } else if (key === 't') {
+            } else if (key === 't' || (event.altKey && event.code === 'KeyT')) {
                 event.preventDefault();
                 const displayTime = window.gameTimer < 0 ? 0 : window.gameTimer;
                 if (window.announceToScreenReader) window.announceToScreenReader(`Kalan süre: ${displayTime} saniye.`, true);
@@ -1161,7 +1161,7 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
-    if (event.key.toLowerCase() === 'c') {
+    if (event.key.toLowerCase() === 'c' || (event.altKey && event.code === 'KeyC')) {
         event.preventDefault();
         let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTokens') || "0");
         if (window.announceToScreenReader) {
@@ -1173,7 +1173,7 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
-    if (event.key.toLowerCase() === 'm') {
+    if (event.key.toLowerCase() === 'm' || (event.altKey && event.code === 'KeyM')) {
         let isMuted = false;
         if (window.bgMusic) isMuted = window.bgMusic.mute();
         else if (window.storyBGM) isMuted = window.storyBGM.mute();
