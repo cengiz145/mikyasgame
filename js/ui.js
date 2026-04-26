@@ -1200,6 +1200,66 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Aktif Etkinlikler Butonu
+        const eventsBtnMain = document.getElementById('events-btn-main');
+        if (eventsBtnMain) {
+            eventsBtnMain.addEventListener('click', () => {
+                if (window.menuEnterSound) window.menuEnterSound.play();
+                
+                const now = new Date();
+                const day = now.getDay();
+                const hour = now.getHours();
+                
+                let msg = "";
+                let isActive = false;
+                
+                // Hafta Sonu Çift Jeton Etkinliği Kontrolü
+                if ((day === 6 && hour >= 12) || day === 0) {
+                    isActive = true;
+                }
+                
+                if (isActive) {
+                    let end = new Date(now);
+                    if (day === 6) {
+                        end.setDate(now.getDate() + 1); // Pazar'a geç
+                    }
+                    end.setHours(23, 59, 59, 999);
+                    
+                    let diffMs = end - now;
+                    let diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    msg = `Şu an "Çift Jeton Etkinliği" AKTİF! Klasik, Hikaye ve PvP modlarından kazandığınız tüm jetonlar 2 katına çıkar. Etkinliğin bitmesine ${diffHours} saat ${diffMinutes} dakika kaldı. İyi oyunlar!`;
+                } else {
+                    let start = new Date(now);
+                    let daysUntilSaturday = 6 - day;
+                    if (daysUntilSaturday === 0 && hour >= 12) {
+                        daysUntilSaturday = 7;
+                    } else if (daysUntilSaturday === 0) {
+                        daysUntilSaturday = 0;
+                    }
+                    
+                    start.setDate(now.getDate() + daysUntilSaturday);
+                    start.setHours(12, 0, 0, 0);
+                    
+                    let diffMs = start - now;
+                    let diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    let diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    msg = `Şu an aktif bir etkinlik bulunmuyor. Sıradaki etkinlik: "Çift Jeton Etkinliği". Başlamasına ${diffDays} gün, ${diffHours} saat, ${diffMinutes} dakika var. Her Cumartesi saat 12:00'de başlar.`;
+                }
+                
+                if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
+                alert(msg);
+                
+                // Alert kapandıktan sonra odağı tekrar butona ver
+                setTimeout(() => {
+                    eventsBtnMain.focus();
+                }, 100);
+            });
+        }
+
         const musicVolumeSlider = document.getElementById('music-volume-slider');
         const musicVolumeDisplay = document.getElementById('music-volume-display');
 
