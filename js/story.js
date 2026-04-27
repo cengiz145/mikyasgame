@@ -7,19 +7,8 @@ window.stepIntervalId = null;
 window.currentAutoWalkStep = 0;
 window.isStoryModeWon = false;
 
-window.quitStoryMode = function() {
-    window.hgfzZamanlayici.hepsiniImhaEt();
-    window.inStoryMode = false;
-    window.isDialogPhase = false;
-    window.isGridWalkingPhase = false;
-    window.isStoryModeWon = false;
-    window.isStoryModeFinishedWaitingForEnter = false;
-    
-    // Zamanlayıcıyı Temizle
-    if (window.storyTimerIntervalId) clearInterval(window.storyTimerIntervalId);
-    
-    // Hafıza (Memory) Sızıntılarını ve Taşan Animasyonları Önle (Clear all timeouts)
-    if (window.stepIntervalId) clearTimeout(window.stepIntervalId);
+window.clearStoryAnimations = function() {
+    if (window.stepIntervalId) clearInterval(window.stepIntervalId);
     if (window.storyAnimInterval1) clearInterval(window.storyAnimInterval1);
     if (window.storyAnimInterval2) clearInterval(window.storyAnimInterval2);
     if (window.storyAnimInterval3) clearInterval(window.storyAnimInterval3);
@@ -35,6 +24,36 @@ window.quitStoryMode = function() {
     if (window.storyAnimTimeout8) clearTimeout(window.storyAnimTimeout8);
     if (window.storyWinTimeout) clearTimeout(window.storyWinTimeout);
     if (window.storyEntryTimeout) clearTimeout(window.storyEntryTimeout);
+
+    // Çalan kısa efekt seslerini ve notaları durdur (hızlı atlama sırasında birbirine girmemesi için)
+    if (window.enterHouseSound && window.enterHouseSound.playing()) window.enterHouseSound.stop();
+    if (window.doorCloseSound && window.doorCloseSound.playing()) window.doorCloseSound.stop();
+    if (window.glasshitSound && window.glasshitSound.playing()) window.glasshitSound.stop();
+    if (window.dado3Sound && window.dado3Sound.playing()) window.dado3Sound.stop();
+    
+    if (window.carpetStepSounds) {
+        window.carpetStepSounds.forEach(s => { if (s && s.playing()) s.stop(); });
+    }
+    if (window.snowStepSounds) {
+        window.snowStepSounds.forEach(s => { if (s && s.playing()) s.stop(); });
+    }
+    if (window.activeNotes) {
+        Object.values(window.activeNotes).forEach(n => { if (n && n.playing()) n.stop(); });
+    }
+};
+
+window.quitStoryMode = function() {
+    window.hgfzZamanlayici.hepsiniImhaEt();
+    window.inStoryMode = false;
+    window.isDialogPhase = false;
+    window.isGridWalkingPhase = false;
+    window.isStoryModeWon = false;
+    window.isStoryModeFinishedWaitingForEnter = false;
+    
+    // Zamanlayıcıyı Temizle
+    if (window.storyTimerIntervalId) clearInterval(window.storyTimerIntervalId);
+    
+    window.clearStoryAnimations();
 
     // Ortam Seslerini Kes
     if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
@@ -82,6 +101,8 @@ window.playAutomatedWalkingScene = function() {
 };
 
 window.triggerStoryAnimations = function(index) {
+    window.clearStoryAnimations(); // Önceki sahneden kalanları temizle ve çalan sesleri kes
+
     if (index === 0) {
         let count = 0;
         window.storyAnimInterval1 = window.hgfzZamanlayici.setInterval(() => {

@@ -1,5 +1,5 @@
 {
-    "version": "0.97.4.5",
-    "buildId": 1781000004,
-    "changelog": "Yeni Özellik: Kayıp Notalar moduna 3 dakikalık zamanlayıcı eklendi. Son 1 dakikada heyecanı artıracak ses efektleri eklendi!"
+    "version": "0.97.4.6",
+    "buildId": 1781000005,
+    "changelog": "Erişilebilirlik ve NVDA İyileştirmeleri: Ana menü anlık durum güncellemeleri, Sosyal menüsündeki navigasyon sorunları ve Kayıp Notalar modunda seslerin üst üste binmesi gibi kronik sorunlar kökten çözüldü."
 }

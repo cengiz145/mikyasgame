@@ -233,7 +233,7 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'server-message') buttons = Array.from(window.serverMessageMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'game') buttons = Array.from(window.gameMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'profile') buttons = Array.from(window.profileMenu.querySelectorAll('.stat-item, .stat-copy-btn, .menu-button'));
-    else if (window.currentActiveMenu === 'social') buttons = Array.from(document.getElementById('social-player-list').querySelectorAll('li[tabindex="0"]'));
+    else if (window.currentActiveMenu === 'social') buttons = Array.from(window.socialMenu.querySelectorAll('li[tabindex="0"], .menu-button'));
     else if (window.currentActiveMenu === 'social-action') buttons = Array.from(document.getElementById('social-action-modal') ? document.getElementById('social-action-modal').querySelectorAll('.menu-button') : []);
     else if (window.currentActiveMenu === 'play-mode') buttons = Array.from(document.getElementById('play-mode-menu-container').querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'multiplayer-select') buttons = Array.from(document.getElementById('multiplayer-select-menu-container').querySelectorAll('.menu-button'));
@@ -370,6 +370,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     // ARAYÜZ VE EKRAN OKUYUCU (NVDA) ÇAKIŞMA ENGELLEYİCİSİ:
     // Animasyon (300ms) süresince NVDA'nın her iki menüyü de okumasını (Ghosting) engellemek için anında gizleriz.
     hideMenu.setAttribute('aria-hidden', 'true');
+    hideMenu.setAttribute('inert', ''); // NVDA ve diğer araçların içeriğe erişimini kökünden keser
     
     let oldFocusables = hideMenu.querySelectorAll('button, [tabindex="0"], input, textarea');
     oldFocusables.forEach(el => el.setAttribute('tabindex', '-1'));
@@ -384,6 +385,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
 
         showMenu.style.display = 'flex';
         showMenu.removeAttribute('aria-hidden');
+        showMenu.removeAttribute('inert');
 
         setTimeout(() => {
             showMenu.style.opacity = '1';
@@ -418,22 +420,23 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
 window.announceToScreenReader = function (text, forceFocus = false) {
     text = window.localizeText(text);
 
-    let liveAnnouncer = document.getElementById('sr-chat-reader');
-    if (liveAnnouncer) {
-        if (window.announcerTimeouts) {
-            window.announcerTimeouts.forEach(t => clearTimeout(t));
+    // NVDA'nın bazen aynı elementi güncellediğimizde okumayı atlamasını engellemek için
+    // her anons için yepyeni bir element oluşturuyoruz. (Robust ARIA-Live Toast Pattern)
+    const announcer = document.createElement('div');
+    announcer.className = 'sr-only';
+    announcer.setAttribute('role', 'alert');
+    announcer.setAttribute('aria-live', 'assertive');
+    announcer.setAttribute('aria-atomic', 'true');
+    announcer.textContent = text;
+    
+    document.body.appendChild(announcer);
+
+    // Anons okunduktan sonra DOM'u temizle
+    setTimeout(() => {
+        if (announcer && announcer.parentNode) {
+            announcer.parentNode.removeChild(announcer);
         }
-        window.announcerTimeouts = [];
-
-        window.announcerToggle = !window.announcerToggle;
-        let finalOutput = text + (window.announcerToggle ? '\u200B' : '');
-        liveAnnouncer.textContent = finalOutput;
-
-        let timer = setTimeout(() => {
-            if (liveAnnouncer) liveAnnouncer.textContent = ' ';
-        }, 20000);
-        window.announcerTimeouts.push(timer);
-    }
+    }, 15000);
 };
 
 window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReason) {
@@ -554,14 +557,14 @@ window.updateStatsDisplay = function() {
     } else {
         html = `
             <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;" class="stats-list">
-                <li tabindex="0" class="stat-item" style="padding: 5px;">Bakiye: ${tokens} Jeton</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;">Günlük Seri (Takvim): ${streakCount} Gün</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;">Hata Koruması: ${hk} adet</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;">Zaman Koruması: ${zk} adet</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;">Kolay Mod: ${easyCount} kez tamamlandı</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;">Orta Mod: ${mediumCount} kez tamamlandı</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;">Zor Mod: ${hardCount} kez tamamlandı</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;">Kayıp Notalar: ${storyCount} kez tamamlandı</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Bakiye: ${tokens} Jeton">Bakiye: ${tokens} Jeton</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Günlük Seri Takvimi: ${streakCount} Gün">Günlük Seri (Takvim): ${streakCount} Gün</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Hata Koruması: ${hk} adet">Hata Koruması: ${hk} adet</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Zaman Koruması: ${zk} adet">Zaman Koruması: ${zk} adet</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Kolay Mod: ${easyCount} kez tamamlandı">Kolay Mod: ${easyCount} kez tamamlandı</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Orta Mod: ${mediumCount} kez tamamlandı">Orta Mod: ${mediumCount} kez tamamlandı</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Zor Mod: ${hardCount} kez tamamlandı">Zor Mod: ${hardCount} kez tamamlandı</li>
+                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Kayıp Notalar: ${storyCount} kez tamamlandı">Kayıp Notalar: ${storyCount} kez tamamlandı</li>
                 <li style="margin-top: 15px;">
                     <button class="menu-button stat-copy-btn" aria-label="İstatistiklerimi Kopyala">İstatistiklerimi Kopyala</button>
                 </li>
@@ -691,12 +694,27 @@ window.renderSocialList = function() {
 
     let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
 
-    const emptyHtml = (myName !== "Misafir" && myName.trim() !== "") 
-        ? `<li tabindex="0" aria-label="Sadece sen varsın. ${myName} olarak çevrimiçisin." style="padding: 10px; border-radius: 8px; margin-bottom: 8px; background-color: rgba(0, 168, 132, 0.15); border-left: 4px solid #00a884; display: flex; justify-content: space-between; align-items: center;"><span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Çevrimiçi</span></li>`
-        : '<li tabindex="0" aria-label="Oyuncu listesi boş. Kimse yok.">bu sekme boş</li>';
+    const emptyHtml = '<li tabindex="0" aria-label="Senden başka kimse yok.">Senden başka kimse yok.</li>';
 
     if (!window.lastPresenceData || Object.keys(window.lastPresenceData).length === 0) {
-        listEl.innerHTML = emptyHtml;
+        listEl.innerHTML = '';
+        if (myName !== "Misafir" && myName.trim() !== "") {
+            let meLi = document.createElement('li');
+            meLi.style.padding = "10px";
+            meLi.style.borderRadius = "8px";
+            meLi.style.marginBottom = "8px";
+            meLi.style.backgroundColor = "rgba(0, 168, 132, 0.15)";
+            meLi.style.borderLeft = "4px solid #00a884";
+            meLi.style.display = "flex";
+            meLi.style.justifyContent = "space-between";
+            meLi.style.alignItems = "center";
+            meLi.setAttribute('aria-label', `Sadece sen varsın. ${myName} olarak çevrimiçisin.`);
+            meLi.setAttribute('tabindex', '0');
+            meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Çevrimiçi</span>`;
+            listEl.appendChild(meLi);
+        } else {
+            listEl.innerHTML = emptyHtml;
+        }
         return;
     }
 
@@ -713,6 +731,24 @@ window.renderSocialList = function() {
     });
 
     listEl.innerHTML = '';
+    
+    // Kullanıcının kendisini HER ZAMAN listenin en başına ekle
+    if (myName !== "Misafir" && myName.trim() !== "") {
+        let meLi = document.createElement('li');
+        meLi.style.padding = "10px";
+        meLi.style.borderRadius = "8px";
+        meLi.style.marginBottom = "8px";
+        meLi.style.backgroundColor = "rgba(0, 168, 132, 0.15)";
+        meLi.style.borderLeft = "4px solid #00a884";
+        meLi.style.display = "flex";
+        meLi.style.justifyContent = "space-between";
+        meLi.style.alignItems = "center";
+        meLi.setAttribute('aria-label', `Sen. ${myName} olarak çevrimiçisin.`);
+        meLi.setAttribute('tabindex', '0');
+        meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Çevrimiçi</span>`;
+        listEl.appendChild(meLi);
+    }
+    
     let foundAny = false;
 
     players.forEach(p => {
@@ -762,7 +798,7 @@ window.renderSocialList = function() {
         listEl.appendChild(li);
     });
 
-    if (!foundAny) {
+    if (!foundAny && (myName === "Misafir" || myName.trim() === "")) {
         listEl.innerHTML = emptyHtml;
     }
 };
@@ -2597,13 +2633,24 @@ window.showToastNotification = function(text) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    // NVDA Hayalet Ekran Koruması: Sayfa ilk açıldığında kapalı olan tüm menüleri "inert" yap
+    document.querySelectorAll('.menu-container').forEach(menu => {
+        if (menu.id !== 'main-menu-container') {
+            menu.setAttribute('inert', '');
+        }
+    });
+
     const chatToggleBtn = document.getElementById('chat-toggle-btn');
     const chatPanel = document.getElementById('chat-panel');
     const chatCloseBtn = document.getElementById('chat-close-btn');
     const chatNicknameInput = document.getElementById('chat-nickname');
 
     if (chatToggleBtn) {
-        chatToggleBtn.style.display = 'block';
+        // Canlı Sohbet butonu oyun genelinde görünsün ama ilk açılışta okuyucu odağına takılmasın diye
+        // Sadece PvP lobisi ve genel oyun odasında aktif hale gelmeli
+        chatToggleBtn.style.display = 'none';
+        chatToggleBtn.setAttribute('inert', '');
+        chatToggleBtn.setAttribute('aria-hidden', 'true');
         chatToggleBtn.addEventListener('click', () => window.toggleChat());
     }
 
