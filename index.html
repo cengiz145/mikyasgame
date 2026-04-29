@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 
 <head>
@@ -18,7 +18,7 @@
     </script>
 </head>
 
-<body role="application">
+<body >
 
 
 
@@ -28,7 +28,7 @@
         <!-- Aşama 1: Yapımcı İmzası -->
         <div id="intro-phase-1" class="intro-phase" role="none"
             style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; text-align: center; opacity: 1; padding: 0 20px; transition: opacity 0.5s ease-in-out;">
-            <p id="intro-text" class="intro-instruction" role="alert" style="font-size: 1.8rem; line-height: 1.6; color: #f0f0f0;">
+            <p id="intro-text" class="intro-instruction" style="font-size: 1.8rem; line-height: 1.6; color: #f0f0f0;">
                 Bu oyun, <span style="color: var(--focus-outline);">görme engelli bir müzik öğretmeni
                     olan</span>
                 <strong
@@ -121,7 +121,7 @@
     <!-- Sosyal Menüsü (Mobilde Tab) -->
     <div id="social-menu-container" class="menu-container" role="region" aria-labelledby="social-menu-title" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <h1 id="social-menu-title">Sosyal Menüsü</h1>
-        <div id="social-content" aria-live="polite"
+        <div id="social-content"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px; max-height: 50vh; overflow-y: auto;">
             <p class="sr-only">Aşağı ok tuşlarıyla oyuncuları inceleyebilirsiniz.</p>
             <ul id="social-player-list" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;">
@@ -133,7 +133,7 @@
     <!-- Profil Menüsü (Mobilde Tab) -->
     <div id="profile-menu-container" class="menu-container" role="region" aria-labelledby="profile-menu-title" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <h1 id="profile-menu-title">Oyuncu Profili ve İstatistikler</h1>
-        <div id="profile-content" aria-live="polite"
+        <div id="profile-content"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
             <p class="sr-only">İstatistiklerinizi aşağı ok tuşuyla okuyabilirsiniz.</p>
            <p tabindex="0" class="stat-item" style="padding: 5px;"><strong>Adınız:</strong> <span id="profile-player-name">Bilinmeyen</span></p>
@@ -150,7 +150,7 @@
         aria-label="Zorluk Seçimi Menüsü">
         <h1 id="difficulty-menu-title" tabindex="-1">Lütfen bir mod seçin</h1>
 
-        <div id="difficulty-status-text" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+        <div id="difficulty-status-text" class="sr-only"></div>
 
         <nav class="menu-nav"   aria-label="Zorluk Seviyeleri">
             <ul>
@@ -196,14 +196,14 @@
 
 
 
-    <div id="practice-menu-container" class="menu-container" role="presentation" aria-hidden="true"
+    <div id="practice-menu-container" class="menu-container" role="application" aria-label="Alıştırma Alanı" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
         <!-- Removed top focus trap -->
         <h1 id="practice-menu-title">Alıştırma Modu</h1>
 
 
 
-        <div id="practice-status-text" tabindex="0" aria-live="assertive" aria-atomic="true"
+        <div id="practice-status-text" tabindex="0"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px; outline: none;">
             <!-- Diyalog metni buraya gelecek -->
         </div>
@@ -219,11 +219,11 @@
     </div>
 
     <!-- Hikaye Modu Menüsü -->
-    <div id="story-menu-container" class="menu-container" role="presentation" aria-hidden="true"
+    <div id="story-menu-container" class="menu-container" role="application" aria-label="Hikaye Alanı" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; max-width: 650px;">
         <!-- Removed top focus trap -->
         <h1 id="story-menu-title">Kayıp Notalar</h1>
-        <div id="story-status-text" tabindex="0" aria-live="assertive" aria-atomic="true"
+        <div id="story-status-text" tabindex="0"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px; outline: none;">
             <!-- Diyalog metni buraya gelecek -->
         </div>
@@ -242,7 +242,7 @@
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <!-- Removed top focus trap -->
         <h1 id="store-menu-title">Mağaza</h1>
-        <div id="store-content" aria-live="polite"
+        <div id="store-content"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
             <!-- Dinamik içerik eklenecek -->
         </div>
@@ -274,6 +274,11 @@
                         Koruması Satın Al (30 Jeton)</button>
                 </li>
                 <li>
+                    <button id="buy-streak-freeze-btn" class="menu-button"
+                        aria-label="Seri Dondurma. Oyuna girmediğiniz her gün için bir adet harcanarak günlük serinizin bozulmamasını sağlar. En fazla 2 adet sahip olunabilir. Fiyat: 80 Jeton.">Seri
+                        Dondurma Satın Al (80 Jeton)</button>
+                </li>
+                <li>
                     <button id="buy-baglama-pack-btn" class="menu-button"
                         aria-label="Bağlama Ses Paketi. Notaları piyano yerine bağlama ile duyarsınız. Fiyat: 500 Jeton.">Bağlama
                         Ses Paketi Satın Al (500 Jeton)</button>
@@ -303,7 +308,7 @@
     <div id="stats-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <h1 id="stats-menu-title">İstatistikler</h1>
-        <div id="stats-content" aria-live="polite"
+        <div id="stats-content"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
             <!-- İstatistik verileri dinamik eklenecek -->
         </div>
@@ -326,7 +331,7 @@
 
             <div id="feedback-content"
                 style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
-                <p id="feedback-desc" aria-live="polite">Lütfen oyun hakkında geri bildiriminizi paylaşın.</p>
+                <p id="feedback-desc">Lütfen oyun hakkında geri bildiriminizi paylaşın.</p>
 
                 <form id="feedback-form" onsubmit="event.preventDefault();">
                     <!-- Geri bildirim formu Firebase entegrasyonuna hazırlandı -->
@@ -382,7 +387,7 @@
         <!-- Removed top focus trap -->
         <h1 id="settings-menu-title">Ayarlar</h1>
         
-        <div id="settings-content" aria-live="polite"
+        <div id="settings-content"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
             <div style="margin-bottom: 20px;">
                 <label for="music-volume-slider" style="display: block; margin-bottom: 5px; color: #ffb703;">Müzik Sesi Düzeyi:</label>
@@ -485,13 +490,35 @@
         </div>
     </div>
 
+    <!-- Günlük Seri / Ödül Menüsü -->
+    <div id="daily-reward-container" class="menu-container" role="presentation" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <div class="feedback-dialog-box" style="border-color: #00ff88;">
+            <h1 id="daily-reward-title" style="color: #00ff88; border-bottom: 2px solid #00ff88;">Günlük Giriş Ödülü</h1>
+
+            <div id="daily-reward-content" tabindex="0"
+                style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
+                <p id="daily-reward-text">Ödül hesaplanıyor...</p>
+            </div>
+
+            <nav class="menu-nav" aria-labelledby="daily-reward-title">
+                <ul>
+                    <li>
+                        <button id="daily-reward-continue-btn" class="menu-button" aria-label="Devam Et"
+                            style="color: #00ff88; font-weight: bold; text-align: center;">[DEVAM ET]</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
     <!-- Başarılar Menüsü -->
     <div id="achievements-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <!-- Removed top focus trap -->
         <h1 id="achievements-menu-title">Başarılar</h1>
 
-        <div id="achievements-content" aria-live="polite"
+        <div id="achievements-content"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
             <!-- Dinamik içerik eklenecek -->
         </div>
@@ -558,7 +585,7 @@
             onfocus="setTimeout(() => document.getElementById('pvp-rooms-back-btn').focus(), 10);"></div>
         
         <h1 id="pvp-rooms-title">Odaya Katıl</h1>
-        <div id="pvp-rooms-status-text" tabindex="0" aria-live="polite"
+        <div id="pvp-rooms-status-text" tabindex="0"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px;">
             Dört haneli oda kodunu girin.
         </div>
@@ -592,7 +619,7 @@
         <h1 id="pvp-lobby-title" tabindex="0">Oyun Lobisi</h1>
         <h2 id="pvp-lobby-code-display" tabindex="0" style="font-size: 2.5rem; letter-spacing: 5px; color: #fff; margin-bottom: 10px; font-family: monospace;">----</h2>
         
-        <div id="pvp-lobby-status-text" tabindex="0" aria-live="polite"
+        <div id="pvp-lobby-status-text" tabindex="0"
             style="margin-bottom: 20px; font-size: 1.2rem; color: #ffb703; font-weight: bold; min-height: 50px;">
             Bekleniyor...
         </div>
@@ -618,7 +645,7 @@
     </div>
 
     <!-- Oyun Ekranı -->
-    <section id="game-menu-container" class="menu-container" aria-label="Oyun Alanı" aria-hidden="true"
+    <section id="game-menu-container" class="menu-container" role="application" aria-label="Oyun Alanı" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
 
         <h1 id="game-menu-title">Hafızana Güven</h1>
@@ -677,7 +704,7 @@
     </nav>
 
     <!-- Gizli Canlı Bölge (Sohbet pencereleri ve anlık ses/bildirim anonsları için) -->
-    <div id="sr-chat-reader" class="sr-only" role="alert" aria-live="assertive" aria-atomic="true"></div>
+    <div id="sr-chat-reader" class="sr-only" role="status" aria-live="assertive" aria-atomic="true"></div>
 
     <!-- Canlı Sohbet Penceresi -->
     <div id="chat-panel" class="chat-panel" aria-hidden="true" style="display: none;" role="dialog"

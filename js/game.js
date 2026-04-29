@@ -266,26 +266,54 @@ window.startGame = function () {
 
         if (window.mainMenu) {
             window.mainMenu.style.display = 'flex';
-
             const lastSeenVersion = localStorage.getItem('lastSeenChangelogVersion');
-            if (window.globalChangelogVersion && lastSeenVersion !== window.globalChangelogVersion && window.globalChangelogMessage) {
-                if (window.switchMenu && window.serverMessageMenu) window.switchMenu(window.mainMenu, window.serverMessageMenu, 'server-message');
+            let showChangelog = (window.globalChangelogVersion && lastSeenVersion !== window.globalChangelogVersion && window.globalChangelogMessage);
+
+            const showMainMenu = () => {
+                window.mainMenu.removeAttribute('aria-hidden');
+                window.hgfzZamanlayici.setTimeout(() => {
+                    window.mainMenu.style.opacity = '1';
+                    document.body.focus();
+                    if (window.announceToScreenReader && window.localizeText) {
+                        window.announceToScreenReader(window.localizeText("Hafızana Güven ana menüsüne hoş geldiniz. Yukarı aşağı oklarla gezinebilirsiniz."));
+                    }
+                }, 300);
+            };
+
+            const doChangelogShow = (fromDailyReward = false) => {
+                if (window.switchMenu && window.serverMessageMenu) window.switchMenu(fromDailyReward ? window.dailyRewardMenu : window.mainMenu, window.serverMessageMenu, 'server-message');
                 window.hgfzZamanlayici.setTimeout(() => {
                     const firstBtn = document.getElementById('server-message-continue-btn');
                     if (firstBtn) firstBtn.focus();
                     if (window.announceToScreenReader) window.announceToScreenReader("Sunucu Mesajı: " + window.globalChangelogMessage + " Devam etmek için butona basın.");
                 }, 400);
-            } else {
-                window.mainMenu.removeAttribute('aria-hidden');
+            };
+
+            if (window.pendingDailyRewardMsg) {
+                if (window.switchMenu && window.dailyRewardMenu) window.switchMenu(window.mainMenu, window.dailyRewardMenu, 'daily-reward');
+                
+                const drText = document.getElementById('daily-reward-text');
+                if (drText) drText.innerText = window.pendingDailyRewardMsg;
+
                 window.hgfzZamanlayici.setTimeout(() => {
-                    window.mainMenu.style.opacity = '1';
-                    // Ekran okuyucusunun Browse Mode'a (Makale moduna) geçmesini engellemek için
-                    // odağı oyun zeminine (application) veriyoruz.
-                    document.body.focus();
-                    if (window.announceToScreenReader && window.localizeText) {
-                        window.announceToScreenReader(window.localizeText('Hafızana güven oyununa hoş geldiniz. Öğeler arasında dolaşmak için sağ sol ok tuşlarına basın. Müzik sesini açıp kısmak için, sayfa yukarı ve sayfa aşağı tuşuna basın. Müziği susturmak için m tuşuna basın.'));
+                    const firstBtn = document.getElementById('daily-reward-continue-btn');
+                    if (firstBtn) firstBtn.focus();
+                    if (window.announceToScreenReader) window.announceToScreenReader("Günlük Giriş Ödülü: " + window.pendingDailyRewardMsg + " Devam etmek için butona basın.");
+                }, 400);
+
+                window.onDailyRewardContinue = () => {
+                    window.pendingDailyRewardMsg = null;
+                    if (showChangelog) {
+                        doChangelogShow(true);
+                    } else {
+                        if (window.switchMenu) window.switchMenu(window.dailyRewardMenu, window.mainMenu, 'main');
+                        showMainMenu();
                     }
-                }, 50);
+                };
+            } else if (showChangelog) {
+                doChangelogShow();
+            } else {
+                showMainMenu();
             }
         }
     }, 1000);
@@ -1172,7 +1200,7 @@ document.addEventListener('keydown', function (event) {
 
     if (event.key.toLowerCase() === 'c' || (event.altKey && event.code === 'KeyC')) {
         event.preventDefault();
-        let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTokens') || "0");
+        let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens') || "0");
         if (window.announceToScreenReader) {
             window.announceToScreenReader('Toplam Jetonunuz: ' + totalTokens, true);
         }

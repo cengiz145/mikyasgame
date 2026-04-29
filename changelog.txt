@@ -1,11 +1,11 @@
-﻿[v0.97.4.6] - 2026-04-27
-
-EriÅŸilebilirlik ve NVDA Ä°yileÅŸtirmeleri:
-- Ana menÃ¼deki anlÄ±k durum gÃ¼ncellemeleri (Etkinlik ve GÃ¼ncelleme kontrolleri) artÄ±k ekran okuyucular tarafÄ±ndan %100 okunacak ÅŸekilde teknik altyapÄ±sÄ± yenilendi.
-- Sosyal menÃ¼sÃ¼nde ok tuÅŸlarÄ±yla dolaÅŸÄ±rken kendinizi listenin en baÅŸÄ±nda gÃ¶rebilmeniz saÄŸlandÄ±. Geri dÃ¶n butonu ve istatistik menÃ¼sÃ¼ maddeleri ok tuÅŸlarÄ±yla dolaÅŸÄ±lÄ±rken NVDA tarafÄ±ndan atlanmamasÄ± iÃ§in onarÄ±ldÄ±.
-- KayÄ±p Notalar modunda, diyaloglarÄ± geÃ§erken Enter tuÅŸuna hÄ±zlÄ± basÄ±ldÄ±ÄŸÄ±nda ortaya Ã§Ä±kan seslerin Ã¼st Ã¼ste binme sorunu tamamen Ã§Ã¶zÃ¼ldÃ¼.
-
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
+
+[v0.97.4.6] - 2026-04-27
+
+Erişilebilirlik ve NVDA İyileştirmeleri:
+- Ana menüdeki anlık durum güncellemeleri (Etkinlik ve Güncelleme kontrolleri) artık ekran okuyucular tarafından %100 okunacak şekilde teknik altyapısı yenilendi.
+- Sosyal menüsünde ok tuşlarıyla dolaşırken kendinizi listenin en başında görebilmeniz sağlandı. Geri dön butonu ve istatistik menüsü maddeleri ok tuşlarıyla dolaşılırken NVDA tarafından atlanmaması için onarıldı.
+- Kayıp Notalar modunda, diyalogları geçerken Enter tuşuna hızlı basıldığında ortaya çıkan seslerin üst üste binme sorunu tamamen çözüldü.
 
 [v0.97.4.5] - 2026-04-26
 

@@ -91,6 +91,23 @@ window.isWeekendDoubleCoins = function() {
     return false;
 };
 
+window.milestones = [
+    { day: 7, reward: 50 },
+    { day: 14, reward: 100 },
+    { day: 21, reward: 150 },
+    { day: 30, reward: 300 },
+    { day: 60, reward: 600 },
+    { day: 80, reward: 1000 },
+    { day: 100, reward: 2000 }
+];
+
+window.getNextMilestone = function(streak) {
+    for (let m of window.milestones) {
+        if (streak < m.day) return m;
+    }
+    return null; // Eğer hepsini geçtiyse
+};
+
 window.checkDailyStreak = function() {
     const now = new Date();
     const todayStr = now.toDateString();
@@ -106,11 +123,28 @@ window.checkDailyStreak = function() {
             
             if (daysPassed === 1) {
                 streak += 1;
+                window.pendingDailyRewardMsg = `Seri ${streak}. gün! ${streak * 10} jeton kazandınız.`;
             } else if (daysPassed > 1) {
-                streak = 1;
+                let daysMissed = daysPassed - 1;
+                let freezeCount = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
+                
+                if (freezeCount >= daysMissed) {
+                    freezeCount -= daysMissed;
+                    localStorage.setItem('hafizaGuvenSeriDondurma', freezeCount);
+                    streak += 1; // Seri kurtarıldı, bugünün girişiyle artıyor
+                    window.pendingDailyRewardMsg = `${daysMissed} gün oyuna girmediniz ancak Seri Dondurma kullanıldı. Seriniz bozulmadı! Güncel seri: ${streak}. gün. ${streak * 10} jeton kazandınız. Kalan dondurma: ${freezeCount} adet.`;
+                } else {
+                    if (freezeCount > 0) {
+                        freezeCount = 0; // Hepsini kullandı ama yetmedi
+                        localStorage.setItem('hafizaGuvenSeriDondurma', freezeCount);
+                    }
+                    window.pendingDailyRewardMsg = `Maalesef yeterli Seri Dondurmanız olmadığı için günlük seriniz 0'landı! Kaybetmeden önce ${streak}. güne ulaşmıştınız. Bugünden itibaren seriniz tekrar 1. günden başlıyor. 10 jeton kazandınız.`;
+                    streak = 1;
+                }
             }
         } else {
             streak = 1;
+            window.pendingDailyRewardMsg = `Oyuna hoş geldiniz! İlk gününüz. 10 jeton kazandınız.`;
         }
         
         localStorage.setItem('hafizaGuvenLastLoginDate', todayStr);
@@ -119,23 +153,22 @@ window.checkDailyStreak = function() {
         let reward = streak * 10;
         if (reward > 100) reward = 100; // max 100 jeton (etkinlik hariç)
         
-        let rewardMsg = `Seri ${streak}. gün! ${reward} jeton kazandınız.`;
+        let milestoneReward = 0;
+        const currentMilestone = window.milestones.find(m => m.day === streak);
+        if (currentMilestone) {
+            milestoneReward = currentMilestone.reward;
+            reward += milestoneReward;
+            window.pendingDailyRewardMsg += ` İnanılmaz! ${streak}. gün dönüm noktasına ulaştığınız için özel olarak ${milestoneReward} ekstra jeton BONUS kazandınız! Toplam kazanç: ${reward} jeton.`;
+        }
         
         if (window.isWeekendDoubleCoins()) {
             reward *= 2;
-            rewardMsg = `Seri ${streak}. gün! Hafta sonu çift jeton etkinliği aktif olduğu için ${reward} jeton kazandınız.`;
+            window.pendingDailyRewardMsg += ` Hafta sonu çift jeton etkinliği aktif olduğu için kazancınız 2'ye katlandı ve ${reward} jeton kazandınız!`;
         }
         
         let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
         totalTokens += reward;
         try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens); } catch(e){}
-        
-        // Sesli mesajı intro menüsü açıldıktan sonra oku
-        setTimeout(() => {
-            if (window.announceToScreenReader) {
-                window.announceToScreenReader(`Günlük giriş ödülü: ` + rewardMsg);
-            }
-        }, 5000);
     }
 };
 
@@ -206,6 +239,7 @@ window.statsMenu = document.getElementById('stats-menu-container');
 window.storeMenu = document.getElementById('store-menu-container');
 window.feedbackMenu = document.getElementById('feedback-menu-container');
 window.serverMessageMenu = document.getElementById('server-message-container');
+window.dailyRewardMenu = document.getElementById('daily-reward-container');
 window.updateMenu = document.getElementById('update-menu-container');
 window.achievementsMenu = document.getElementById('achievements-menu-container');
 window.gameMenu = document.getElementById('game-menu-container');
@@ -230,7 +264,9 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'store') buttons = Array.from(window.storeMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'achievements') buttons = Array.from(window.achievementsMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'feedback') buttons = Array.from(window.feedbackMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'server-message') buttons = Array.from(window.serverMessageMenu.querySelectorAll('.menu-button'));
+    else if (window.currentActiveMenu === 'server-message') buttons = Array.from(window.serverMessageMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
+    else if (window.currentActiveMenu === 'daily-reward') buttons = Array.from(window.dailyRewardMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
+    else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
     else if (window.currentActiveMenu === 'game') buttons = Array.from(window.gameMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'profile') buttons = Array.from(window.profileMenu.querySelectorAll('.stat-item, .stat-copy-btn, .menu-button'));
     else if (window.currentActiveMenu === 'social') buttons = Array.from(window.socialMenu.querySelectorAll('li[tabindex="0"], .menu-button'));
@@ -547,10 +583,18 @@ window.updateStatsDisplay = function() {
     if (r_el) r_el.innerText = rank;
     
     let streakCount = parseInt(localStorage.getItem('hafizaGuvenLoginStreak')) || 0;
+    let sdCount = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
+
+    let nextM = window.getNextMilestone(streakCount);
+    let milestoneHtml = "";
+    if (nextM) {
+        let diff = nextM.day - streakCount;
+        milestoneHtml = `<li tabindex="0" class="stat-item" style="padding: 5px; color: #ffb703; font-weight: bold;" aria-label="Sonraki dönüm noktasına ${diff} gün kaldı. Hedef: ${nextM.day}. gün. Ödül: ${nextM.reward} Jeton">Hedef: ${nextM.day}. gün! Kalan: ${diff} gün. (Ödül: ${nextM.reward} Jeton)</li>`;
+    }
 
     let html = "";
     if (tokens === 0 && hk === 0 && zk === 0 && easyCount === 0 && mediumCount === 0 && hardCount === 0 && storyCount === 0) {
-        html = '<div id="empty-stats-alert" tabindex="0" role="alert" aria-label="İstatistik sekmesi boş. Hiç bir istatistiğe sahip değilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boş. İstatistik bulunamadı.</div>';
+        html = '<div id="empty-stats-alert" tabindex="0" role="status" aria-label="İstatistik sekmesi boş. Hiç bir istatistiğe sahip değilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boş. İstatistik bulunamadı.</div>';
         if (window.announceToScreenReader && window.currentActiveMenu === 'stats') {
             setTimeout(() => window.announceToScreenReader("Bu sekme boş. Henüz hiç bir istatistiğiniz bulunmuyor."), 300);
         }
@@ -559,6 +603,8 @@ window.updateStatsDisplay = function() {
             <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;" class="stats-list">
                 <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Bakiye: ${tokens} Jeton">Bakiye: ${tokens} Jeton</li>
                 <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Günlük Seri Takvimi: ${streakCount} Gün">Günlük Seri (Takvim): ${streakCount} Gün</li>
+                ${milestoneHtml}
+                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Seri Dondurma: ${sdCount} adet">Seri Dondurma: ${sdCount} adet</li>
                 <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Hata Koruması: ${hk} adet">Hata Koruması: ${hk} adet</li>
                 <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Zaman Koruması: ${zk} adet">Zaman Koruması: ${zk} adet</li>
                 <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Kolay Mod: ${easyCount} kez tamamlandı">Kolay Mod: ${easyCount} kez tamamlandı</li>
@@ -581,7 +627,7 @@ window.updateStatsDisplay = function() {
     // Kopyalama butonu işlevini ata
     document.querySelectorAll('.stat-copy-btn').forEach(btn => {
         btn.onclick = function() {
-            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\nBakiye: ${tokens} Jeton\nGünlük Seri: ${streakCount} Gün\nHata Koruması: ${hk}\nZaman Koruması: ${zk}\nKolay: ${easyCount}\nOrta: ${mediumCount}\nZor: ${hardCount}\nKayıp Notalar: ${storyCount}`;
+            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\nBakiye: ${tokens} Jeton\nGünlük Seri: ${streakCount} Gün\nSeri Dondurma: ${sdCount}\nHata Koruması: ${hk}\nZaman Koruması: ${zk}\nKolay: ${easyCount}\nOrta: ${mediumCount}\nZor: ${hardCount}\nKayıp Notalar: ${storyCount}`;
             navigator.clipboard.writeText(copyText).then(() => {
                 if (window.announceToScreenReader) window.announceToScreenReader("İstatistikleriniz panoya kopyalandı.", true);
                 if (window.correctSound) window.correctSound.play();
@@ -814,10 +860,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Erişilebilirlik (ARIA) Dinamik Enjektörü (Sessiz Semantik / Role Gizleme) ---
     // Kullanıcı talebi: bölüm, bölge, düğme, grup gibi element rollerinin okunmaması.
     const applySilentRoles = (root) => {
-        const elementsToNone = root.querySelectorAll ? root.querySelectorAll('.menu-container, nav, section, ul, li, div[role="group"], div[role="region"], div[role="presentation"], h1, h2, h3, h4, h5, h6') : [];
+        const elementsToNone = root.querySelectorAll ? root.querySelectorAll('.menu-container, nav, section, ul, div[role="group"], div[role="region"], div[role="presentation"], h1, h2, h3, h4, h5, h6') : [];
         elementsToNone.forEach(el => el.setAttribute('role', 'none'));
 
-        const buttonsToSilence = root.querySelectorAll ? root.querySelectorAll('button, .menu-button, .mobile-piano-key, [role="button"]') : [];
+        // Yalnızca tabindex'i olmayan li elemanlarının rolünü none yap.
+        const nonInteractiveLis = root.querySelectorAll ? root.querySelectorAll('li:not([tabindex="0"])') : [];
+        nonInteractiveLis.forEach(el => el.setAttribute('role', 'none'));
+
+        // NVDA'nın makale okur gibi takılmaması için etkileşimli her öğeye buton maskesi tak
+        const buttonsToSilence = root.querySelectorAll ? root.querySelectorAll('button, .menu-button, .mobile-piano-key, [role="button"], li[tabindex="0"], div[tabindex="0"]') : [];
         buttonsToSilence.forEach(btn => {
             btn.setAttribute('role', 'button');
             btn.setAttribute('aria-roledescription', '\xA0'); // Boşluk karakteri, NVDA sessiz okur
@@ -836,9 +887,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 m.addedNodes.forEach(node => {
                     if (node.nodeType === 1) { // ELEMENT_NODE
                         applySilentRoles(node);
-                        if (node.tagName === 'BUTTON' || node.getAttribute('role') === 'button') {
-                            node.setAttribute('role', 'button');
-                            node.setAttribute('aria-roledescription', '\xA0');
+                        if (node.tagName === 'BUTTON' || node.getAttribute('role') === 'button' || node.tagName === 'LI') {
+                            if (node.tagName === 'LI' && node.getAttribute('tabindex') !== "0") {
+                                node.setAttribute('role', 'none');
+                            } else if (node.getAttribute('tabindex') === "0" || node.tagName === 'BUTTON') {
+                                node.setAttribute('role', 'button');
+                                node.setAttribute('aria-roledescription', '\xA0');
+                            }
                         }
                     }
                 });
@@ -932,6 +987,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const buyShieldBtn = document.getElementById('buy-shield-btn');
     const buyTimeShieldBtn = document.getElementById('buy-time-shield-btn');
+    const buyStreakFreezeBtn = document.getElementById('buy-streak-freeze-btn');
     const buyBaglamaPackBtn = document.getElementById('buy-baglama-pack-btn');
     const buyKavalPackBtn = document.getElementById('buy-kaval-pack-btn');
     const buyFlutPackBtn = document.getElementById('buy-flut-pack-btn');
@@ -1047,6 +1103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnContinueSaved = document.getElementById('btn-continue-saved');
     const serverMessageContinueBtn = document.getElementById('server-message-continue-btn');
+    const dailyRewardContinueBtn = document.getElementById('daily-reward-continue-btn');
     const mobileEnterBtn = document.getElementById('mobile-enter-btn');
 
     const btnDiffEasy = document.getElementById('btn-diff-easy');
@@ -1089,6 +1146,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('lastSeenChangelogVersion', window.globalChangelogVersion);
             }
             window.switchMenu(window.serverMessageMenu, window.mainMenu, 'main');
+        });
+    }
+
+    if (dailyRewardContinueBtn) {
+        dailyRewardContinueBtn.addEventListener('click', () => {
+            if (window.onDailyRewardContinue) {
+                window.onDailyRewardContinue();
+            } else {
+                window.switchMenu(window.dailyRewardMenu, window.mainMenu, 'main');
+            }
         });
     }
 
@@ -1658,6 +1725,34 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('hafizaGuvenZamanKorumasi', 1);
             if (window.buySound) window.buySound.play();
             if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Zaman Koruması eklendi. Kalan jeton: ${totalTokens}`);
+        });
+    }
+
+    if (buyStreakFreezeBtn) {
+        buyStreakFreezeBtn.addEventListener('click', () => {
+            let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+            let sd = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
+
+            if (sd >= 2) {
+                if (window.wrongSound) window.wrongSound.play();
+                let msg = "Bu eşyadan en fazla 2 adet taşıyabilirsiniz.";
+                if (window.announceToScreenReader) window.announceToScreenReader(msg);
+                return;
+            }
+
+            if (totalTokens < 80) {
+                if (window.wrongSound) window.wrongSound.play();
+                let msg = `Yetersiz bakiye. Bu eşya için 80 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${80 - totalTokens} jetona daha ihtiyacınız var.`;
+                if (window.announceToScreenReader) window.announceToScreenReader(msg);
+                return;
+            }
+
+            totalTokens -= 80;
+            sd += 1;
+            localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            localStorage.setItem('hafizaGuvenSeriDondurma', sd);
+            if (window.buySound) window.buySound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Seri Dondurma eklendi. Kalan jeton: ${totalTokens}. Mevcut Seri Dondurma sayınız: ${sd}`);
         });
     }
 
@@ -2520,6 +2615,9 @@ document.addEventListener('keydown', function (event) {
                 // Sadece Entıra basılınca onaylansın
                 if (window.currentActiveMenu === 'server-message') {
                     const btn = document.getElementById('server-message-continue-btn');
+                    if (btn) btn.click();
+                } else if (window.currentActiveMenu === 'daily-reward') {
+                    const btn = document.getElementById('daily-reward-continue-btn');
                     if (btn) btn.click();
                 } else if (window.currentActiveMenu === 'update') {
                     const btn = document.getElementById('update-install-btn');
