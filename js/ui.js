@@ -460,7 +460,7 @@ window.announceToScreenReader = function (text, forceFocus = false) {
     // her anons için yepyeni bir element oluşturuyoruz. (Robust ARIA-Live Toast Pattern)
     const announcer = document.createElement('div');
     announcer.className = 'sr-only';
-    announcer.setAttribute('role', 'alert');
+    // Removed role="alert" to prevent NVDA from prefixing "Uyarı" to every message
     announcer.setAttribute('aria-live', 'assertive');
     announcer.setAttribute('aria-atomic', 'true');
     announcer.textContent = text;
@@ -2209,8 +2209,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.PvP.joinExistingMatchByCode(code);
                 } else {
                     if (window.wrongSound) window.wrongSound.play();
-                    alert("Lütfen 4 haneli geçerli bir oda kodu girin.");
-                    if (window.announceToScreenReader) window.announceToScreenReader("Lütfen 4 haneli geçerli bir oda kodu girin.", false);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Lütfen 4 haneli geçerli bir oda kodu girin.", true);
                 }
             }
         });
@@ -2282,7 +2281,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     pvpLobbyCopyBtn.innerText = "Kopyalandı!";
                     setTimeout(() => pvpLobbyCopyBtn.innerText = originalText, 2000);
                 } catch (err) {
-                    alert("Kopyalama işlemi desteklenmiyor. Lütfen kodu manuel olarak seçin: " + textToCopy);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kopyalama işlemi desteklenmiyor. Lütfen kodu manuel olarak seçin: " + textToCopy);
                 }
             }
         });
@@ -3311,9 +3310,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Hata durumunda uyar
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.', false);
+                    window.announceToScreenReader('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.', true);
                 }
-                alert('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.');
             });
         }
         }); // END OF registeredUsers Check

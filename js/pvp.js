@@ -46,7 +46,8 @@ window.PvP = {
             timestamp: firebase.database.ServerValue.TIMESTAMP
         }).catch(err => {
             console.error("Firebase PvP Queue Set Error:", err);
-            alert("Sunucuya bağlanılamadı veya eşleştirme kuralları bunu engelledi. (Firebase Rules Error)");
+            if (window.showToastNotification) window.showToastNotification("Sunucuya bağlanılamadı veya eşleştirme kuralları bunu engelledi.");
+            if (window.announceToScreenReader) window.announceToScreenReader("Sunucuya bağlanılamadı veya eşleştirme kuralları bunu engelledi.", true);
             this.cancelQueue();
         });
 
@@ -194,8 +195,8 @@ window.PvP = {
             const data = snapshot.val();
             if (!data || !data.matchId) {
                 if (window.wrongSound) window.wrongSound.play();
-                alert("Bu koda ait aktif bir oda bulunamadı veya maç başlamış!");
-                if (window.announceToScreenReader) window.announceToScreenReader("Bu koda ait açık bir oda bulunamadı.", false);
+                if (window.showToastNotification) window.showToastNotification("Bu koda ait aktif bir oda bulunamadı veya maç başlamış!");
+                if (window.announceToScreenReader) window.announceToScreenReader("Bu koda ait açık bir oda bulunamadı.", true);
                 if (btn) {
                     btn.innerHTML = 'Katıl';
                     btn.style.pointerEvents = 'auto';
@@ -223,7 +224,8 @@ window.PvP = {
                 const currentData = matchSnap.val();
                 if (!currentData) {
                     if (window.wrongSound) window.wrongSound.play();
-                    alert("Oda kapanmış! (Host çıkmış veya bağlantısı kopmuş)");
+                    if (window.showToastNotification) window.showToastNotification("Oda kapanmış! (Host çıkmış veya bağlantısı kopmuş)");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Oda kapanmış! Host çıkmış veya bağlantısı kopmuş.", true);
                     if (btn) {
                         btn.innerHTML = 'Katıl';
                         btn.style.pointerEvents = 'auto';
@@ -233,7 +235,8 @@ window.PvP = {
                 
                 if (currentData.status === 'finished' || currentData.status === 'starting' || currentData.status === 'playing') {
                     if (window.wrongSound) window.wrongSound.play();
-                    alert("Maç çoktan başlamış veya bitmiş!");
+                    if (window.showToastNotification) window.showToastNotification("Maç çoktan başlamış veya bitmiş!");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Maç çoktan başlamış veya bitmiş!", true);
                     if (btn) {
                         btn.innerHTML = 'Katıl';
                         btn.style.pointerEvents = 'auto';
@@ -249,7 +252,8 @@ window.PvP = {
                 if (!existingClients[deviceId]) {
                     if (clientKeys.length >= 4) {
                         if (window.wrongSound) window.wrongSound.play();
-                        alert("Oda kapasitesi dolu! (Maksimum 4 kişi katılabilir)");
+                        if (window.showToastNotification) window.showToastNotification("Oda kapasitesi dolu! Maksimum 4 kişi katılabilir.");
+                        if (window.announceToScreenReader) window.announceToScreenReader("Oda kapasitesi dolu! Maksimum 4 kişi katılabilir.", true);
                         if (btn) {
                             btn.innerHTML = 'Katıl';
                             btn.style.pointerEvents = 'auto';
@@ -365,7 +369,8 @@ window.PvP = {
                     });
                 });
             }).catch(err => {
-                alert("Bağlantı sırasında hata oluştu!");
+                if (window.showToastNotification) window.showToastNotification("Bağlantı sırasında hata oluştu!");
+                if (window.announceToScreenReader) window.announceToScreenReader("Bağlantı sırasında hata oluştu!", true);
                 if (btn) {
                     btn.innerHTML = 'Katıl';
                     btn.style.pointerEvents = 'auto';
@@ -374,7 +379,8 @@ window.PvP = {
 
         }).catch(err => {
             console.error(err);
-            alert("Sunucuya erişilemiyor veya yetkiniz yok!\nFirebase Hatası: " + err.message + "\nLütfen Firebase Konsolu'ndan 'Realtime Database -> Rules' sekmesine girip read ve write izinlerini true yapın.");
+            if (window.showToastNotification) window.showToastNotification("Sunucuya erişilemiyor veya yetkiniz yok!");
+            if (window.announceToScreenReader) window.announceToScreenReader("Sunucuya erişilemiyor veya yetkiniz yok!", true);
             if (btn) {
                 btn.innerHTML = 'Katıl';
                 btn.style.pointerEvents = 'auto';
