@@ -704,12 +704,15 @@ window.initPresenceSystem = function() {
                             if (newP.state === 'online' && (!oldP || oldP.state !== 'online')) {
                                 if (window.playerOnlineSound) window.playerOnlineSound.play();
                                 if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimiçi.`);
+                                if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimiçi.`, 'info');
                             } else if (newP.state === 'offline' && (oldP && oldP.state === 'online')) {
                                 if (window.playerOfflineSound) window.playerOfflineSound.play();
                                 if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimdışı.`);
+                                if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimdışı.`, 'info');
                             } else if (newP.state === 'disconnected' && (oldP && oldP.state === 'online')) {
                                 if (window.serverDisconnectSound) window.serverDisconnectSound.play();
                                 if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} bağlantısı koptu.`);
+                                if (window.showToastNotification) window.showToastNotification(`${newP.name} bağlantısı koptu.`, 'warning');
                             }
                         }
                     }
@@ -717,6 +720,7 @@ window.initPresenceSystem = function() {
                         if (!newData[k] && oldData[k].name !== myName && oldData[k].state === 'online') {
                             if (window.serverDisconnectSound) window.serverDisconnectSound.play();
                             if (window.announceToScreenReader) window.announceToScreenReader(`${oldData[k].name} bağlantısı koptu.`);
+                            if (window.showToastNotification) window.showToastNotification(`${oldData[k].name} bağlantısı koptu.`, 'warning');
                         }
                     }
                 }
@@ -2769,21 +2773,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.hasJoinedChat === false && window.db) {
                 window.hasJoinedChat = true;
                 
-                // İlk katılım mesajı
-                window.db.ref('messages').push({
-                    nickname: "Sistem",
-                    text: `👋 ${window.currentChatUser} sohbete katıldı.`,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                });
-
-                // Başlangıç Çıkış Kancası
+                // İlk katılım mesajı (Sistem bildirimleri kalıcı olarak sohbete itilmeyecek)
+                
+                // Başlangıç Çıkış Kancası (Sohbet kanalına "çevrimdışı oldu" spamlamasını kaldırdık)
                 if (window.disconnectRef) { window.disconnectRef.onDisconnect().cancel(); }
-                window.disconnectRef = window.db.ref('messages').push();
-                window.disconnectRef.onDisconnect().set({
-                    nickname: "Sistem",
-                    text: `🚶 ${window.currentChatUser} çevrimdışı oldu.`,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                });
+                // disconnectRef artık sadece presence için kullanılacak, messages kanalını kirletmeyecek.
             }
         } else {
             chatPanel.style.display = 'none';
@@ -3235,12 +3229,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.currentChatUser = nickname;
                 if (window.disconnectRef) {
                     window.disconnectRef.onDisconnect().cancel();
-                    window.disconnectRef = window.db.ref('messages').push();
-                    window.disconnectRef.onDisconnect().set({
-                        nickname: "Sistem",
-                        text: "🚶 " + window.currentChatUser + " çevrimdışı oldu.",
-                        timestamp: firebase.database.ServerValue.TIMESTAMP
-                    });
+                    // Yeni bir mesaj hook'u eklemiyoruz ki sohbeti kirletmesin.
                 }
             }
 
