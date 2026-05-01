@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.24] - 01.05.2026
+
+Yeni Özellikler ve İyileştirmeler:
+- Kayıp Notalar modunu tamamlayan oyuncular için Mağaza'daki ses paketlerinin (Bağlama, Kaval, Flüt, Kanun vb.) kilitlerinin otomatik açılması sağlandı.
+- Güncelleme sonrası tüm test oyuncularının ve yöneticilerin ilerlemelerinin sıfırdan ve eşit başlaması için "Otomatik Sıfırlama" sistemi eklendi.
+- Ana menüye ilerlemeyi silmeden tarayıcı önbelleğini tazeleyen "Oyunu Yeniden Başlat" seçeneği eklendi.
+- Profil ekranında kullanıcı adının "Bilinmeyen" olarak görünmesi hatası giderildi.
+
 [v0.97.4.23] - 01.05.2026
 
 Erişilebilirlik Optimizasyonu:

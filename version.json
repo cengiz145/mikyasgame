@@ -1,7 +1,7 @@
-﻿{
-    "version": "0.97.4.23",
-    "buildId": 1777660472,
-    "changelog": "Ekran okuyucunun sayıklama hatası düzeltildi."
+{
+    "version": "0.97.4.24",
+    "buildId": 1777660473,
+    "changelog": "Yeni ses paketleri kilit sistemi, veri sıfırlama, önbellek temizleme butonu ve profil ismi onarımı."
 }
 
 
