@@ -59,6 +59,7 @@ window.PvP = {
             host: this.myQueueId,
             hostName: myName,
             status: 'waiting_for_client',
+            mode: 'individual',
             createdAt: firebase.database.ServerValue.TIMESTAMP,
             clients: {} // Çoklu oyuncu altyapısı (Maks 4)
         }).catch(err => console.error("Firebase Match Set Error:", err));
@@ -86,6 +87,14 @@ window.PvP = {
             if (statusText) statusText.innerText = "Oda Kuruldu";
             if (infoText) infoText.innerText = "Oda Numaranızı paylaşın. Oyuncular bekleniyor...";
             if (startBtn) startBtn.style.display = 'none'; // Gizle, kimse yok
+            
+            const modeContainer = document.getElementById('pvp-lobby-mode-container');
+            if (modeContainer) modeContainer.style.display = 'block';
+            window.PvP.matchMode = 'individual';
+            const btnInd = document.getElementById('pvp-mode-individual-btn');
+            const btnTeam = document.getElementById('pvp-mode-team-btn');
+            if (btnInd) { btnInd.style.background = '#ffb703'; btnInd.style.color = '#000'; }
+            if (btnTeam) { btnTeam.style.background = ''; btnTeam.style.color = ''; }
         }
 
         if (window.arenaJoinSound) window.arenaJoinSound.play();
@@ -297,6 +306,9 @@ window.PvP = {
                     }
                     if (statusText) statusText.innerText = "Bağlanıldı!";
                     if (infoText) infoText.innerText = "Siz ve diğer oyuncular... Kurucunun maçı başlatması bekleniyor.";
+                    
+                    const modeContainer = document.getElementById('pvp-lobby-mode-container');
+                    if (modeContainer) modeContainer.style.display = 'none';
 
                     if (window.arenaJoinSound) window.arenaJoinSound.play();
                     if (btn) {
@@ -525,6 +537,8 @@ window.PvP = {
             const infoText = document.getElementById('pvp-lobby-info-text');
             if (statusText) statusText.innerText = "Bot Aranıyor...";
             if (infoText) infoText.innerText = "Uygun bir yapay zeka rakibi aranıyor. Lütfen bekleyin.";
+            const modeContainer = document.getElementById('pvp-lobby-mode-container');
+            if (modeContainer) modeContainer.style.display = 'none';
         }
         if (window.announceToScreenReader) window.announceToScreenReader("Uygun bir yapay zeka rakibi aranıyor. Lütfen bekleyin.");
 
@@ -644,25 +658,49 @@ window.PvP = {
                 }
 
                 // Karşı tarafın puanını ekrana yansıtmak için
-                let myScoreStr = `Sen: ${window.pvpScore}`;
-                let oppScoreStr = ` | Rakipler: `;
-                
+                let myScoreStr = "";
+                let oppScoreStr = "";
                 let dId = localStorage.getItem('hafizaGuvenDeviceId');
+                this.matchMode = val.mode || 'individual';
 
-                if (this.isHost) {
-                    if (this.isBotMode) {
-                        oppScoreStr += `Yapay Zeka: ${val.clientScore || 0}`;
-                    } else if (val.clients) {
-                        let ops = Object.keys(val.clients).map(k => `${val.clients[k].name}: ${val.clients[k].score || 0}`).join(', ');
-                        oppScoreStr += ops || 'Yok';
+                if (this.matchMode === 'team') {
+                    if (this.isHost) {
+                        this.myTeam = 'team_a';
                     } else {
-                        oppScoreStr += 'Yok';
+                        if (val.clients) {
+                            let sortedClients = Object.keys(val.clients).sort();
+                            let idx = sortedClients.indexOf(dId);
+                            this.myTeam = (idx % 2 === 0) ? 'team_b' : 'team_a';
+                        } else {
+                            this.myTeam = 'team_b';
+                        }
                     }
+                    let tAScore = val.team_aScore || 0;
+                    let tBScore = val.team_bScore || 0;
+                    let myTeamScore = this.myTeam === 'team_a' ? tAScore : tBScore;
+                    let oppTeamScore = this.myTeam === 'team_a' ? tBScore : tAScore;
+                    
+                    myScoreStr = `Takımın: ${myTeamScore}`;
+                    oppScoreStr = ` | Karşı Takım: ${oppTeamScore}`;
                 } else {
-                    oppScoreStr += `(Kurucu) ${val.hostName}: ${val.hostScore || 0}`;
-                    if (val.clients) {
-                        let ops = Object.keys(val.clients).filter(k => k !== dId).map(k => `${val.clients[k].name}: ${val.clients[k].score || 0}`).join(', ');
-                        if (ops) oppScoreStr += ', ' + ops;
+                    myScoreStr = `Sen: ${window.pvpScore}`;
+                    oppScoreStr = ` | Rakipler: `;
+                    
+                    if (this.isHost) {
+                        if (this.isBotMode) {
+                            oppScoreStr += `Yapay Zeka: ${val.clientScore || 0}`;
+                        } else if (val.clients) {
+                            let ops = Object.keys(val.clients).map(k => `${val.clients[k].name}: ${val.clients[k].score || 0}`).join(', ');
+                            oppScoreStr += ops || 'Yok';
+                        } else {
+                            oppScoreStr += 'Yok';
+                        }
+                    } else {
+                        oppScoreStr += `(Kurucu) ${val.hostName}: ${val.hostScore || 0}`;
+                        if (val.clients) {
+                            let ops = Object.keys(val.clients).filter(k => k !== dId).map(k => `${val.clients[k].name}: ${val.clients[k].score || 0}`).join(', ');
+                            if (ops) oppScoreStr += ', ' + ops;
+                        }
                     }
                 }
                 
@@ -735,6 +773,7 @@ window.PvP = {
                 // Bu turu (turnIndex) henüz kimse geçmemiş, benim adıma yaz
                 return {
                     winner: this.isHost ? 'host' : dId,
+                    team: this.matchMode === 'team' ? (this.myTeam || 'none') : 'individual',
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
             }
@@ -744,22 +783,25 @@ window.PvP = {
             if (error) {
                 console.log("Turn transaction failed", error);
             } else if (committed) {
-                // Puan kazandık (Turun ilk bitireni biziz)
-                window.pvpScore += 10;
-                if (window.announceToScreenReader) window.announceToScreenReader("Puan senin!");
-
-                // Skor güncellemesini sunucuya gönder
-                const matchNode = window.db.ref('matches/' + this.matchId);
-                let updateData = {};
-                if (this.isHost) {
-                    updateData.hostScore = window.pvpScore;
+                if (this.matchMode === 'team') {
+                    const matchNode = window.db.ref('matches/' + this.matchId);
+                    matchNode.child(this.myTeam + 'Score').transaction(s => (s || 0) + 10);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Takımınıza 10 puan kazandırdınız!");
                 } else {
-                    updateData[`clients/${dId}/score`] = window.pvpScore;
+                    window.pvpScore += 10;
+                    if (window.announceToScreenReader) window.announceToScreenReader("Puan senin!");
+
+                    const matchNode = window.db.ref('matches/' + this.matchId);
+                    let updateData = {};
+                    if (this.isHost) {
+                        updateData.hostScore = window.pvpScore;
+                    } else {
+                        updateData[`clients/${dId}/score`] = window.pvpScore;
+                    }
+                    matchNode.update(updateData);
                 }
-                matchNode.update(updateData);
             } else {
-                // Çok geç kaldık, rakip turu daha önce bitirmiş!
-                if (window.announceToScreenReader) window.announceToScreenReader("Geç kaldın, rakip aldı!");
+                if (window.announceToScreenReader) window.announceToScreenReader("Geç kaldın, puanı başkası aldı!");
             }
         });
 
@@ -826,26 +868,32 @@ window.PvP = {
         let myScore = 0;
         let highestOppScore = 0;
 
-        if (this.isHost) {
-            myScore = matchData.hostScore || 0;
-            if (this.isBotMode) {
-                highestOppScore = matchData.clientScore || 0;
-            } else if (matchData.clients) {
-                Object.keys(matchData.clients).forEach(k => {
-                    let s = matchData.clients[k].score || 0;
-                    if (s > highestOppScore) highestOppScore = s;
-                });
-            }
+        if (matchData.mode === 'team' && this.myTeam) {
+            myScore = matchData[this.myTeam + 'Score'] || 0;
+            let oppTeam = this.myTeam === 'team_a' ? 'team_b' : 'team_a';
+            highestOppScore = matchData[oppTeam + 'Score'] || 0;
         } else {
-            myScore = (matchData.clients && matchData.clients[dId]) ? (matchData.clients[dId].score || 0) : 0;
-            highestOppScore = matchData.hostScore || 0;
-            if (matchData.clients) {
-                Object.keys(matchData.clients).forEach(k => {
-                    if (k !== dId) {
+            if (this.isHost) {
+                myScore = matchData.hostScore || 0;
+                if (this.isBotMode) {
+                    highestOppScore = matchData.clientScore || 0;
+                } else if (matchData.clients) {
+                    Object.keys(matchData.clients).forEach(k => {
                         let s = matchData.clients[k].score || 0;
                         if (s > highestOppScore) highestOppScore = s;
-                    }
-                });
+                    });
+                }
+            } else {
+                myScore = (matchData.clients && matchData.clients[dId]) ? (matchData.clients[dId].score || 0) : 0;
+                highestOppScore = matchData.hostScore || 0;
+                if (matchData.clients) {
+                    Object.keys(matchData.clients).forEach(k => {
+                        if (k !== dId) {
+                            let s = matchData.clients[k].score || 0;
+                            if (s > highestOppScore) highestOppScore = s;
+                        }
+                    });
+                }
             }
         }
 
@@ -943,11 +991,35 @@ window.addNewNoteAndPlaySequence = function () {
 
 const originalEndMainGame = window.endMainGame;
 window.endMainGame = function (isTimeUp = false, isWin = false, isUserExit = false) {
-    // SADECE kullanıcı çıkışı (UserExit) ise maçı bitirme sinyali yolla, aksi halde PvP sonu (timeUp) normal akışında halledilsin
     if (window.PvP && window.PvP.matchId && isUserExit) {
         window.PvP.finishMatchTimeUp(); // Sunucuya öldüğümüzü / bittiğini haber ver
     }
     if (originalEndMainGame) originalEndMainGame(isTimeUp, isWin, isUserExit);
 };
 
-
+document.addEventListener('DOMContentLoaded', () => {
+    const btnInd = document.getElementById('pvp-mode-individual-btn');
+    const btnTeam = document.getElementById('pvp-mode-team-btn');
+    
+    if (btnInd) {
+        btnInd.addEventListener('click', () => {
+            if (!window.PvP || !window.PvP.isHost || !window.PvP.matchId) return;
+            window.PvP.matchMode = 'individual';
+            btnInd.style.background = '#ffb703'; btnInd.style.color = '#000';
+            btnTeam.style.background = ''; btnTeam.style.color = '';
+            window.db.ref('matches/' + window.PvP.matchId).update({ mode: 'individual' });
+            if (window.announceToScreenReader) window.announceToScreenReader("Oyun Modu: Bireysel olarak ayarlandı.");
+        });
+    }
+    
+    if (btnTeam) {
+        btnTeam.addEventListener('click', () => {
+            if (!window.PvP || !window.PvP.isHost || !window.PvP.matchId) return;
+            window.PvP.matchMode = 'team';
+            btnTeam.style.background = '#ffb703'; btnTeam.style.color = '#000';
+            btnInd.style.background = ''; btnInd.style.color = '';
+            window.db.ref('matches/' + window.PvP.matchId).update({ mode: 'team' });
+            if (window.announceToScreenReader) window.announceToScreenReader("Oyun Modu: Takım Modu olarak ayarlandı.");
+        });
+    }
+});
