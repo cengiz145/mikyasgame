@@ -409,6 +409,7 @@ window.startMainGame = function (difficulty = 'easy') {
         window.addNewNoteAndPlaySequence();
 
         window.gameInterval = window.hgfzZamanlayici.setInterval(() => {
+            if (window.gameIsPaused) return;
             if (!window.gameIsActive) {
                 clearInterval(window.gameInterval);
                 return;

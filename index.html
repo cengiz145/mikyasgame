@@ -764,6 +764,23 @@
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('social-btn-pm').focus(), 10);"></div>
     </div>
 
+    <!-- DURAKLATMA / ÇIKIŞ MENÜSÜ -->
+    <div id="pause-action-modal" class="menu-container" role="presentation" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; z-index: 2000; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('pause-btn-cancel').focus(), 10);"></div>
+        
+        <h2 id="pause-action-title" tabindex="-1" style="color: #ffb703; border-bottom: 2px solid #ffb703; padding-bottom: 5px; margin-bottom: 20px; font-size: 2rem; outline: none;">Ne yapmak istiyorsunuz?</h2>
+        <nav class="menu-nav"   aria-labelledby="pause-action-title">
+            <ul>
+                <li><button id="pause-btn-exit" class="menu-button" aria-label="Oyundan Çık">Oyundan Çık</button></li>
+                <li><button id="pause-btn-save" class="menu-button" aria-label="Oyunu Kaydet">Oyunu Kaydet</button></li>
+                <li><button id="pause-btn-cancel" class="menu-button" aria-label="İptal (Oyuna Dön)">İptal (Oyuna Dön)</button></li>
+            </ul>
+        </nav>
+        
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('pause-btn-exit').focus(), 10);"></div>
+    </div>
+
+
     <!-- ÖZEL MESAJLAŞMA PENCERESİ -->
     <div id="private-chat-panel" class="chat-panel" aria-hidden="true" style="display: none; z-index: 2001;" role="dialog" aria-label="Özel Sohbet Penceresi">
         <div tabindex="0" role="button" aria-label="Özel sohbet paneli başı, sona gidiliyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('private-chat-send-btn').focus(), 10);"></div>

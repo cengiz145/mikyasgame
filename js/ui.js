@@ -3781,3 +3781,91 @@ if (!window.orijinalAnnounce) {
         }, okumaSuresi);
     };
 }
+
+// --- DURAKLATMA / ÇIKIŞ MENÜSÜ MANTIĞI ---
+window.gameIsPaused = false;
+window.requestPauseMenu = function() {
+    window.gameIsPaused = true;
+    const modal = document.getElementById('pause-action-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        if (window.clockTickSound && window.clockTickSound.playing()) window.clockTickSound.pause();
+        
+        setTimeout(() => {
+            modal.style.opacity = '1';
+            modal.removeAttribute('aria-hidden');
+            const title = document.getElementById('pause-action-title');
+            if (title) {
+                title.focus();
+            }
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader("Oyun duraklatıldı. Ne yapmak istiyorsunuz? Seçenekler için TAB veya ok tuşlarını kullanabilirsiniz.", true);
+            }
+        }, 10);
+    }
+};
+
+window.resumeFromPause = function() {
+    const modal = document.getElementById('pause-action-modal');
+    if (modal) {
+        modal.style.opacity = '0';
+        modal.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            window.gameIsPaused = false;
+            if (window.clockTickSound && window.clockTickSound.state() === 'loaded') {
+                if (!window.clockTickSound.playing() && window.gameTimer > 0 && !window.isComputerPlaying) {
+                    window.clockTickSound.play();
+                }
+            }
+        }, 300);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const pauseInterceptor = (e) => {
+        let isMultiplayer = window.isMultiplayerGame;
+        if (window.gameIsActive && !window.isGameOverPhase && window.currentActiveMenu === 'game' && !isMultiplayer) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            window.requestPauseMenu();
+        }
+    };
+    
+    const gBtn = document.getElementById('game-back-btn');
+    if (gBtn) gBtn.addEventListener('click', pauseInterceptor, true);
+    
+    const mBtn = document.getElementById('mobile-game-back-btn');
+    if (mBtn) mBtn.addEventListener('click', pauseInterceptor, true);
+
+    const btnExit = document.getElementById('pause-btn-exit');
+    const btnSave = document.getElementById('pause-btn-save');
+    const btnCancel = document.getElementById('pause-btn-cancel');
+
+    if (btnExit) {
+        btnExit.addEventListener('click', () => {
+            window.resumeFromPause();
+            setTimeout(() => {
+                if (window.endMainGame) window.endMainGame(false, false, true);
+            }, 350);
+        });
+    }
+
+    if (btnSave) {
+        btnSave.addEventListener('click', () => {
+            if (window.saveCurrentGame) {
+                window.saveCurrentGame();
+            }
+            window.resumeFromPause();
+            setTimeout(() => {
+                if (window.endMainGame) window.endMainGame(false, false, true);
+            }, 350);
+        });
+    }
+
+    if (btnCancel) {
+        btnCancel.addEventListener('click', () => {
+            window.resumeFromPause();
+        });
+    }
+});
