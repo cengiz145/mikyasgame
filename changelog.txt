@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.26] - 02.05.2026
+
+Yeni Özellikler ve İyileştirmeler:
+- Yöneticiler için "Kalıcı Uyarı (admintell.ogg)" sistemi devreye alındı. Size özel bir mesaj geldiğinde veya yeni bir geri bildirim (bilet) açıldığında bu özel ses efekti çalmaya başlayacak ve siz bileti (/bilet komutuyla) veya mesajı (özel sohbet penceresinden) okuyana kadar her 15 saniyede bir sizi uyarmaya devam edecek.
+
 [v0.97.4.25] - 01.05.2026
 
 Yeni Özellikler ve İyileştirmeler:

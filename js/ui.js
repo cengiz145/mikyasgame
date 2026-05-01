@@ -9,6 +9,42 @@ window.mevcutSurum = window.UYGULAMA_SURUMU || (typeof UYGULAMA_SURUMU !== 'unde
 window.globalChangelogVersion = null;
 window.globalChangelogMessage = null;
 
+// --- Geliştirici Özel Bildirim Sistemi (Kalıcı Uyarı) ---
+window.adminAlertState = { ticket: false, message: false };
+window.adminAlertIntervalId = null;
+
+window.startAdminAlert = function(type) {
+    let devName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "";
+    if (!['ekrem'].includes(devName.toLowerCase())) return;
+
+    window.adminAlertState[type] = true;
+    
+    if (!window.adminAlertIntervalId) {
+        let snd = new Audio('sounds/admintell.ogg');
+        snd.play().catch(e=>{});
+        window.adminAlertIntervalId = setInterval(() => {
+            let s = new Audio('sounds/admintell.ogg');
+            s.play().catch(e=>{});
+        }, 15000); // 15 saniyede bir sürekli tekrar eder
+    }
+};
+
+window.stopAdminAlert = function(type) {
+    if (type) {
+        window.adminAlertState[type] = false;
+    } else {
+        window.adminAlertState.ticket = false;
+        window.adminAlertState.message = false;
+    }
+
+    if (!window.adminAlertState.ticket && !window.adminAlertState.message) {
+        if (window.adminAlertIntervalId) {
+            clearInterval(window.adminAlertIntervalId);
+            window.adminAlertIntervalId = null;
+        }
+    }
+};
+// --------------------------------------------------------
 window.guncellemeKontrolEt = function (isManual = false) {
     if (isManual && typeof window.announceToScreenReader === 'function') {
         window.announceToScreenReader('Güncellemeler denetleniyor...');
@@ -669,8 +705,7 @@ window.initPresenceSystem = function() {
                 window.db.ref('feedbacks').on('child_added', (snapshot) => {
                     if (!isInitialFbLoad) {
                         let fb = snapshot.val();
-                        let snd = new Audio('sounds/chat12.ogg');
-                        snd.play().catch(e => {});
+                        if (window.startAdminAlert) window.startAdminAlert('ticket');
                         let msg = `YENİ BİLET GELDİ! Gönderen: ${fb.name || fb.nickname || "Bilinmiyor"}. Okumak için sohbete /bilet yazın.`;
                         if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                         if (window.showToastNotification) window.showToastNotification(msg, "warning");
@@ -3190,6 +3225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addLocalSystemMessage(`Cüzdanınızdaki mevcut bakiye: ${totalTokensLocal} jeton.`);
             } else if (command === '/bilet') {
                 if (isDev) {
+                    if (window.stopAdminAlert) window.stopAdminAlert('ticket');
                     addLocalSystemMessage("Sistemdeki tüm açık biletler (Geri bildirimler) taranıyor...");
                     if (window.db) {
                         window.db.ref('feedbacks').once('value').then(snapshot => {
@@ -3670,6 +3706,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function getPrivateRoomId(user1, user2) { return [user1, user2].sort().join('_'); }
 
     window.openPrivateChat = function(recipientName) {
+        if (window.stopAdminAlert) window.stopAdminAlert('message');
         if (!privateChatPanel || !recipientName) return;
         
         let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
@@ -3798,6 +3835,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!initialInboxLoad) {
                 if (!getMutedUsers().includes(notif.from)) {
                     if (!window.isPrivateChatOpen || currentPrivateRecipient !== notif.from) {
+                        if (window.startAdminAlert) window.startAdminAlert('message');
                         if (window.chatReceiveSound) window.chatReceiveSound.play();
                         if (window.showToastNotification) window.showToastNotification(`💬 ${notif.from} size bir özel mesaj gönderdi.`);
                         if (window.announceToScreenReader) window.announceToScreenReader(`${notif.from} kullanıcısından yeni bir özel mesajınız var. Sosyal sekmesinden veya ona tıklayarak ulaşabilirsiniz.`);
