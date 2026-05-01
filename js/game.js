@@ -1331,7 +1331,9 @@ document.addEventListener('keydown', function (event) {
 });
 
 window.saveCurrentGame = function() {
-    if (!window.gameIsActive) {
+    let isPractice = (window.currentActiveMenu === 'practice' && window.isStarted);
+
+    if (!window.gameIsActive && !isPractice) {
         if (window.wrongSound) window.wrongSound.play();
         if (window.announceToScreenReader) window.announceToScreenReader("Şu an kaydedilecek aktif bir oyun mevcut değil.");
         return;
@@ -1356,14 +1358,20 @@ window.saveCurrentGame = function() {
     const saveObj = {
         id: Date.now(),
         dateStr: new Date().toLocaleString('tr-TR'),
-        mode: window.inStoryMode ? 'story' : 'classic',
+        mode: isPractice ? 'practice' : (window.inStoryMode ? 'story' : 'classic'),
         difficulty: window.activeDifficulty,
-        sequence: window.gameSequence.slice(),
+        sequence: window.gameSequence ? window.gameSequence.slice() : [],
         score: window.gameScore,
         mistakes: window.gameMistakes,
         lives: window.playerLives || 3,
         storyIndex: window.currentStoryIndex || 0,
-        gameTimer: window.gameTimer
+        gameTimer: window.gameTimer,
+        
+        isDialogPhase: window.isDialogPhase,
+        currentDialogIndex: window.currentDialogIndex,
+        inPracticeTutorial: window.inPracticeTutorial,
+        practiceTargetIndex: window.practiceTargetIndex,
+        practicePressCount: window.practicePressCount
     };
 
     saves.push(saveObj);
@@ -1396,11 +1404,18 @@ window.populateSavedGamesList = function() {
     saves.forEach((save, index) => {
         let li = document.createElement('li');
         li.tabIndex = 0;
-        let modeName = save.mode === 'story' ? 'Kayıp Notalar' : (window.gameModes[save.difficulty] ? window.gameModes[save.difficulty].name : save.difficulty);
-        let scoreText = save.score > 0 ? `, Skor: ${save.score}` : '';
-        li.innerText = `${save.dateStr} - ${modeName} Modu${scoreText} - Sıra: ${save.sequence ? save.sequence.length : 1}`;
         
-        li.setAttribute('aria-label', `${save.dateStr} tarihinde kaydedilmiş ${modeName} modu oyunu. Kaldığınız sıra: ${save.sequence ? save.sequence.length : 1}${scoreText}. Devam etmek için Enter'a basın.`);
+        let modeName = '';
+        if (save.mode === 'practice') modeName = 'Alıştırma';
+        else if (save.mode === 'story') modeName = 'Kayıp Notalar';
+        else modeName = (window.gameModes[save.difficulty] ? window.gameModes[save.difficulty].name : save.difficulty);
+
+        let scoreText = save.score > 0 ? `, Skor: ${save.score}` : '';
+        let sequenceText = save.mode === 'practice' ? '' : ` - Sıra: ${save.sequence ? save.sequence.length : 1}`;
+        let readSequence = save.mode === 'practice' ? '' : ` Kaldığınız sıra: ${save.sequence ? save.sequence.length : 1}${scoreText}.`;
+
+        li.innerText = `${save.dateStr} - ${modeName} Modu${scoreText}${sequenceText}`;
+        li.setAttribute('aria-label', `${save.dateStr} tarihinde kaydedilmiş ${modeName} modu oyunu.${readSequence} Devam etmek için Enter'a basın.`);
         li.className = 'menu-button';
         
         const loadAction = () => {
@@ -1424,6 +1439,29 @@ window.loadSavedGame = function(saveObj) {
         window.gameIsActive = false;
         if (window.gameInterval) clearInterval(window.gameInterval);
         if (window.pianoNotes) { for (let k in window.pianoNotes) window.pianoNotes[k].stop(); }
+    }
+    
+    if (saveObj.mode === 'practice') {
+        window.isStarted = true;
+        
+        window.isDialogPhase = saveObj.isDialogPhase;
+        window.currentDialogIndex = saveObj.currentDialogIndex;
+        window.inPracticeTutorial = saveObj.inPracticeTutorial;
+        window.practiceTargetIndex = saveObj.practiceTargetIndex || 0;
+        window.practicePressCount = saveObj.practicePressCount || 0;
+        
+        window.switchMenu(window.savedGamesMenu, window.practiceMenu, 'practice');
+        
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader("Alıştırma modu yüklendi.");
+        }
+        
+        if (window.isDialogPhase) {
+            if (window.playCurrentDialog) window.playCurrentDialog();
+        } else if (window.inPracticeTutorial) {
+            if (window.startPracticeNote) window.startPracticeNote();
+        }
+        return;
     }
     
     // Değişkenleri geri yükle
