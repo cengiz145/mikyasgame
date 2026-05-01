@@ -465,12 +465,12 @@ window.announceToScreenReader = function (text, forceFocus = false) {
     
     document.body.appendChild(announcer);
 
-    // Anons okunduktan sonra DOM'u temizle
+    // Anons okunduktan sonra DOM'u temizle (Sistemden anlık silinmesi için süreyi çok kısa tuttuk)
     setTimeout(() => {
         if (announcer && announcer.parentNode) {
             announcer.parentNode.removeChild(announcer);
         }
-    }, 15000);
+    }, 3000);
 };
 
 window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReason) {
@@ -3012,17 +3012,14 @@ document.addEventListener('DOMContentLoaded', () => {
             let isDev = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(cUserNick.toLowerCase());
 
             function addLocalSystemMessage(msgText) {
-                const li = document.createElement('li');
-                li.classList.add('system-message');
-                li.setAttribute('tabindex', '0');
-                li.setAttribute('aria-label', `Sistem mesajı: ${escapeHTML(msgText)}`);
-                li.innerHTML = `<div class="wp-bubble" aria-hidden="true">${escapeHTML(msgText)}</div>`;
-                if (chatMessagesListLocal) chatMessagesListLocal.appendChild(li);
-                
-                if (chatMessagesContainerLocal) {
-                    setTimeout(() => chatMessagesContainerLocal.scrollTop = chatMessagesContainerLocal.scrollHeight, 10);
+                // Sadece ekranda anlık (toast) gösterip ekran okuyucuya okutuyoruz.
+                // Chat listesini (DOM'u) kalıcı olarak işgal edip kalabalık yapmasını engelledik.
+                if (window.showToastNotification) {
+                    window.showToastNotification(msgText, "info");
                 }
-                if (window.announceToScreenReader) window.announceToScreenReader(msgText, false);
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader(msgText, false);
+                }
             }
 
             if (command === '/temizle') {
