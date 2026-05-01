@@ -1052,6 +1052,20 @@ window.handlePracticeInput = function(key) {
 });
 
 document.addEventListener('keydown', function (event) {
+    // CTRL+S Oyunu Kaydetme Kısayolu
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        event.preventDefault();
+        if (!window.gameIsActive) {
+            if (window.wrongSound) window.wrongSound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader("Şu an kaydedilecek aktif bir oyun mevcut değil.");
+            return;
+        }
+        if (window.saveCurrentGame) {
+            window.saveCurrentGame();
+        }
+        return;
+    }
+
     if (event.key === 'Tab') {
         if (window.currentActiveMenu === 'feedback' || window.currentActiveMenu === 'server-message' || window.currentActiveMenu === 'settings' || window.isChatOpen) {
         } else {
@@ -1318,7 +1332,8 @@ document.addEventListener('keydown', function (event) {
 
 window.saveCurrentGame = function() {
     if (!window.gameIsActive) {
-        if (window.announceToScreenReader) window.announceToScreenReader("Şu an kaydedilecek aktif bir oyun yok.");
+        if (window.wrongSound) window.wrongSound.play();
+        if (window.announceToScreenReader) window.announceToScreenReader("Şu an kaydedilecek aktif bir oyun mevcut değil.");
         return;
     }
     
