@@ -1,6 +1,7 @@
 ﻿{
-    "version": "0.97.4.18",
-    "buildId": 1777635619,
-    "changelog": "Ekran okuyucularÄ±n AlÄ±ÅŸtÄ±rma ve Oyun menÃ¼lerinde 'boÅŸ uygulama' ÅŸeklinde gereksiz spamlama yapmasÄ± sorunu giderildi."
+    "version": "0.97.4.19",
+    "buildId": 1777636091,
+    "changelog": "Sohbet kanalındaki bölü (slash) komutları kaldırılarak geliştirici komutları sosyal menüdeki oyuncu profillerine taşındı."
 }
+
 

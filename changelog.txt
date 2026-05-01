@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.19] - 01.05.2026
+
+Geliştirici İyileştirmeleri ve UI Temizliği:
+- Sohbet kanalındaki gereksiz bölü (slash) komutları (`/ban`, `/unban`, `/çöz`, `/pm`) kaldırılarak temizlendi. 
+- Bu komutların tamamı artık "Sosyal" menüsündeki oyuncu listesinde aktif hale getirildi. Oyuncu profiline tıkladığınızda, eğer rütbeniz "Geliştirici" ise doğrudan menüde "Oyuncuyu Banla", "Banı Kaldır" ve "Bilet Çöz" gibi gizli butonlar aktifleşecektir.
+- Özel Mesaj (PM) atmak içinse zaten geliştirici olmanıza gerek kalmadan menüdeki "Özel Mesaj Gönder" butonunu kullanabilirsiniz.
+
 [v0.97.4.18] - 01.05.2026
 
 Erişilebilirlik Düzeltmeleri:

@@ -43,12 +43,12 @@
         </div>
 
         <button id="start-intro-btn" class="localize-inner"
-            style="opacity: 0; position: absolute; top: -100px;" aria-label="Bu oyun, görme engelli bir müzik öğretmeni olan Ümit Ekrem Mikyas tarafından geliştirilmiştir. Sürüm: 0.97.4.18. Logoyu dinlemek ve oyuna başlamak için enter tuşuna basın." autofocus>
+            style="opacity: 0; position: absolute; top: -100px;" aria-label="Bu oyun, görme engelli bir müzik öğretmeni olan Ümit Ekrem Mikyas tarafından geliştirilmiştir. Sürüm: 0.97.4.19. Logoyu dinlemek ve oyuna başlamak için enter tuşuna basın." autofocus>
             Logoyu dinlemek ve oyuna başlamak için enter tuşuna basın.
         </button>
 
         <p id="intro-version-display" tabindex="-1" style="margin-top: 20px; font-size: 1rem; color: #888;">
-            Sürüm: 0.97.4.18
+            Sürüm: 0.97.4.19
         </p>
 
         <!-- Aşama 2: Logo ve Başlık -->
@@ -762,9 +762,12 @@
         
         <h2 id="social-action-title" tabindex="0" style="color: #ffb703; border-bottom: 2px solid #ffb703; padding-bottom: 5px; margin-bottom: 20px; font-size: 2rem;">İşlem Seçimi</h2>
         <nav class="menu-nav"   aria-labelledby="social-action-title">
-            <ul>
+            <ul id="social-action-list">
                 <li><button id="social-btn-pm" class="menu-button" aria-label="Özel Mesaj Gönder">Özel Mesaj Gönder</button></li>
                 <li><button id="social-btn-mute" class="menu-button" aria-label="Kullanıcıyı Sustur">Kullanıcıyı Sustur</button></li>
+                <li class="dev-only-action" style="display: none;"><button id="social-btn-resolve" class="menu-button" aria-label="Bilet Çöz">Bilet Çöz</button></li>
+                <li class="dev-only-action" style="display: none;"><button id="social-btn-ban" class="menu-button" aria-label="Oyuncuyu Banla">Oyuncuyu Banla</button></li>
+                <li class="dev-only-action" style="display: none;"><button id="social-btn-unban" class="menu-button" aria-label="Banı Kaldır">Banı Kaldır</button></li>
                 <li><button id="social-btn-cancel" class="menu-button" aria-label="İptal">İptal</button></li>
             </ul>
         </nav>
@@ -810,23 +813,23 @@
     <script src="sounds/howler.min.js"></script>
 
     <!-- Yardım, Alıştırma ve Motivasyon Mesajları için ayrı dosya -->
-    <script src="js/yardim.js?v=0.97.4.18"></script>
+    <script src="js/yardim.js?v=0.97.4.19"></script>
 
     <script>
-        window.UYGULAMA_SURUMU = "0.97.4.18";
-        const UYGULAMA_SURUMU = "0.97.4.18";
+        window.UYGULAMA_SURUMU = "0.97.4.19";
+        const UYGULAMA_SURUMU = "0.97.4.19";
     </script>
 
     <!-- Firebase CDN Bağlantıları (Sayfa Yüklenmesini Engellememesi İçin Sona Taşındı) -->
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
 
-    <script src="js/firebase.js?v=0.97.4.18"></script>
-    <script src="js/audio.js?v=0.97.4.18"></script>
-    <script src="js/ui.js?v=0.97.4.18"></script>
-    <script src="js/story.js?v=0.97.4.18"></script>
-    <script src="js/game.js?v=0.97.4.18"></script>
-    <script src="js/pvp.js?v=0.97.4.18"></script>
+    <script src="js/firebase.js?v=0.97.4.19"></script>
+    <script src="js/audio.js?v=0.97.4.19"></script>
+    <script src="js/ui.js?v=0.97.4.19"></script>
+    <script src="js/story.js?v=0.97.4.19"></script>
+    <script src="js/game.js?v=0.97.4.19"></script>
+    <script src="js/pvp.js?v=0.97.4.19"></script>
 </body>
 
 </html>

@@ -3166,82 +3166,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 }
-            } else if (command === '/çöz' || command === '/coz') {
-                if (!isDev) { addLocalSystemMessage("Hata: Bu işlem için 'Geliştirici' yetkiniz yok."); return; }
-                if (args.length < 3) {
-                    addLocalSystemMessage("Kullanım: /çöz <oyuncu_takma_adı> <yanıt_mesajınız>");
-                } else {
-                    let targetUser = args[1];
-                    let replyMessage = args.slice(2).join(' ');
-                    
-                    if (window.db) {
-                        // 1. Oyuncuya yanıtı ilet (Biletler kutusuna düşsün)
-                        window.db.ref('biletler/' + targetUser).push({
-                            durum: "çözüldü",
-                            message: replyMessage,
-                            timestamp: firebase.database.ServerValue.TIMESTAMP
-                        });
-                        
-                        // 2. Admin'in gelen kutusunu (feedbacks) temizle (Bu kişiden gelen tüm açık biletleri kapat)
-                        window.db.ref('feedbacks').once('value').then(snapshot => {
-                            if (snapshot.exists()) {
-                                let deletedCount = 0;
-                                snapshot.forEach(child => {
-                                    let fb = child.val();
-                                    if (fb.nickname && fb.nickname.toLowerCase() === targetUser.toLowerCase()) {
-                                        child.ref.remove();
-                                        deletedCount++;
-                                    }
-                                });
-                                addLocalSystemMessage(`Başarılı: ${targetUser} adlı oyuncuya yanıtınız iletildi ve oyuncunun bekleyen ${deletedCount} adet açık bileti sistemden tamamen silinerek kapatıldı!`);
-                            }
-                        });
-                    }
-                }
-            } else if (command === '/ban') {
-                if (!isDev) { addLocalSystemMessage("Hata: Bu işlem için 'Geliştirici' yetkiniz yok."); return; }
-                if (args.length < 2) {
-                    addLocalSystemMessage("Kullanım: /ban <takma_ad>");
-                } else {
-                    let targetUser = args[1];
-                    if (window.db) {
-                        window.db.ref('banned_users/' + targetUser).set(true);
-                        addLocalSystemMessage(`${targetUser} adlı oyuncu kalıcı olarak uzaklaştırıldı.`);
-                    }
-                }
-            } else if (command === '/pm') {
-                if (args.length < 3) {
-                    addLocalSystemMessage("Kullanım: /pm <takma_ad> <mesajınız>");
-                } else {
-                    let targetUser = args[1];
-                    let pmMessage = args.slice(2).join(' ');
-                    let sender = window.currentChatUser;
-                    let nickInputValue = chatMessageInputLocal && document.getElementById('chat-nickname') ? document.getElementById('chat-nickname').value.trim() : "";
-                    if (nickInputValue !== "") sender = nickInputValue;
-                    if (!sender || sender === "Misafir") sender = "Gizli Kullanıcı";
-                    
-                    if (window.db) {
-                        window.db.ref('private_messages/' + targetUser).push({
-                            from: sender,
-                            text: pmMessage,
-                            timestamp: firebase.database.ServerValue.TIMESTAMP
-                        });
-                        addLocalSystemMessage(`[Siz -> ${targetUser}]: ${pmMessage}`);
-                    }
-                }
-            } else if (command === '/unban') {
-                if (!isDev) { addLocalSystemMessage("Hata: Bu işlem için 'Geliştirici' yetkiniz yok."); return; }
-                if (args.length < 2) {
-                    addLocalSystemMessage("Kullanım: /unban <takma_ad>");
-                } else {
-                    let targetUser = args[1];
-                    if (window.db) {
-                        window.db.ref('banned_users/' + targetUser).remove();
-                        addLocalSystemMessage(`${targetUser} adlı oyuncunun yasağı başarıyla kaldırıldı.`);
-                    }
-                }
             } else if (command === '/yardim' || command === '/yardım') {
-                addLocalSystemMessage("Mevcut komutlar: /temizle, /saat, /jeton, /bilet, /ban, /unban, /pm, /yardım.");
+                addLocalSystemMessage("Mevcut komutlar: /temizle, /saat, /jeton, /bilet, /yardım.");
             } else {
                 addLocalSystemMessage("Bilinmeyen komut. Komutları öğrenmek için /yardım yazabilirsiniz.");
             }
@@ -3495,6 +3421,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnPm = document.getElementById('social-btn-pm');
     const btnMute = document.getElementById('social-btn-mute');
     const btnCancel = document.getElementById('social-btn-cancel');
+    const btnResolve = document.getElementById('social-btn-resolve');
+    const btnBan = document.getElementById('social-btn-ban');
+    const btnUnban = document.getElementById('social-btn-unban');
 
     const privateChatPanel = document.getElementById('private-chat-panel');
     const privateChatTitle = document.getElementById('private-chat-title');
@@ -3520,6 +3449,14 @@ document.addEventListener('DOMContentLoaded', () => {
             btnMute.innerText = isMuted ? "Susturmayı Kaldır" : "Kullanıcıyı Sustur";
             btnMute.setAttribute('aria-label', isMuted ? "Kullanıcının susturmasını kaldır" : "Kullanıcıyı sustur");
         }
+
+        let cUserNick = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
+        let isDev = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(cUserNick.toLowerCase());
+
+        const devBtns = actionModal.querySelectorAll('.dev-only-action');
+        devBtns.forEach(b => {
+            b.style.display = isDev ? 'list-item' : 'none';
+        });
 
         if (window.menuEnterSound) window.menuEnterSound.play();
         actionModal.style.display = 'flex';
@@ -3581,6 +3518,58 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 if (window.openPrivateChat) window.openPrivateChat(window.selectedSocialPlayer);
             }, 300);
+        });
+    }
+
+    if (btnResolve) {
+        btnResolve.addEventListener('click', () => {
+            let msg = prompt("Bu oyuncuya iletilecek bilet çözüm mesajını girin:");
+            if (msg && msg.trim() !== "" && window.db) {
+                let targetUser = window.selectedSocialPlayer;
+                window.db.ref('biletler/' + targetUser).push({
+                    durum: "çözüldü",
+                    message: msg,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+                window.db.ref('feedbacks').once('value').then(snapshot => {
+                    if (snapshot.exists()) {
+                        let deletedCount = 0;
+                        snapshot.forEach(child => {
+                            let fb = child.val();
+                            if (fb.nickname && fb.nickname.toLowerCase() === targetUser.toLowerCase()) {
+                                child.ref.remove();
+                                deletedCount++;
+                            }
+                        });
+                        alert(`${targetUser} kullanıcısının ${deletedCount} bileti kapatıldı ve mesaj iletildi!`);
+                    }
+                });
+            }
+            window.closeSocialActionModal();
+        });
+    }
+
+    if (btnBan) {
+        btnBan.addEventListener('click', () => {
+            if (confirm(`${window.selectedSocialPlayer} adlı oyuncuyu oyundan yasaklamak istediğinize emin misiniz?`)) {
+                if (window.db) {
+                    window.db.ref('banned_users/' + window.selectedSocialPlayer).set(true);
+                    alert(`${window.selectedSocialPlayer} yasaklandı.`);
+                }
+            }
+            window.closeSocialActionModal();
+        });
+    }
+
+    if (btnUnban) {
+        btnUnban.addEventListener('click', () => {
+            if (confirm(`${window.selectedSocialPlayer} adlı oyuncunun yasağını kaldırmak istediğinize emin misiniz?`)) {
+                if (window.db) {
+                    window.db.ref('banned_users/' + window.selectedSocialPlayer).remove();
+                    alert(`${window.selectedSocialPlayer} kullanıcısının yasağı kaldırıldı.`);
+                }
+            }
+            window.closeSocialActionModal();
         });
     }
 
