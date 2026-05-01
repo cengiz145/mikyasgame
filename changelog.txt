@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.14] - 2026-05-01
+
+Yeni Özellikler ve Düzeltmeler:
+- **Oyunu Kaydetme ve Devam Etme Sistemi:** Artık oyun esnasında ilerlemenizi anlık olarak kaydedebilirsiniz. Ana menüye yeni eklenen "Kayıtlı Oyundan Devam Et" sekmesi üzerinden, daha önce kaydettiğiniz oyunları tarih sıralamasına göre görüntüleyebilir ve istediğiniz kayıttan tam kaldığınız notalarla oynamaya devam edebilirsiniz.
+- **Sohbet Bildirimi Kalabalığı Giderildi:** Diğer oyuncuların oyuna giriş/çıkış bildirimleri ("Sohbete katıldı", "Çevrimdışı oldu") artık genel sohbet geçmişine kalıcı olarak yazılmayacak. Bu bildirimler, sadece okuyucunuzun anlık olarak fısıldayacağı ve ekranda sadece o an belirip kaybolan geçici bildirimler (toast) haline getirildi. Böylece sohbet listeniz hep temiz kalacak.
+- **Sistem İyileştirmeleri:** Türkçe karakterlerin (ö, ş, ğ, ı) ekran okuyucuda spam / anlamsız sese dönüşmesine sebep olan sürüm kodlaması hatası kalıcı olarak onarıldı.
+
 [v0.97.4.6] - 2026-04-27
 
 Erişilebilirlik ve NVDA İyileştirmeleri:
