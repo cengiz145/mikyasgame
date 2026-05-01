@@ -1069,7 +1069,10 @@ window.handlePracticeInput = function(key) {
             if (!note) return;
 
             if (window.isStarted && window.currentActiveMenu === 'practice') {
-                if (window.playPianoNoteSingle) window.playPianoNoteSingle(note);
+                if (window.inPracticeTutorial && !window.isDialogPhase) {
+                    if (window.playPianoNoteSingle) window.playPianoNoteSingle(note);
+                    if (window.handlePracticeInput) window.handlePracticeInput(note);
+                }
             } else if (window.isStarted && window.currentActiveMenu === 'game') {
                 if (!window.isGridWalkingPhase) {
                     window.handleGameInput(note);
@@ -1157,7 +1160,7 @@ document.addEventListener('keydown', function (event) {
             if (numMap[key]) key = numMap[key];
         }
         const validKeys = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-        if (validKeys.includes(key) && !event.repeat && !window.isDialogPhase) {
+        if (validKeys.includes(key) && !event.repeat && !window.isDialogPhase && window.inPracticeTutorial) {
             if (window.playPianoNoteSingle) window.playPianoNoteSingle(key);
             if (window.handlePracticeInput) window.handlePracticeInput(key);
         }
