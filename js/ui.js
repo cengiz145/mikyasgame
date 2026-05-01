@@ -2592,8 +2592,7 @@ document.addEventListener('keydown', function (event) {
         if ((window.currentActiveMenu === 'story' && window.isDialogPhase) ||
             (window.currentActiveMenu === 'practice' && window.isDialogPhase) ||
             window.currentActiveMenu === 'server-message' ||
-            window.currentActiveMenu === 'update' ||
-            window.currentActiveMenu === 'profile') {
+            window.currentActiveMenu === 'update') {
             
             event.preventDefault();
 
@@ -2609,12 +2608,7 @@ document.addEventListener('keydown', function (event) {
                     const btn = document.getElementById('update-install-btn');
                     if (btn) btn.click();
                 } else if (window.currentActiveMenu === 'story') {
-                    // Story.js enter'ı kendi game.js içinden dinliyor olabilir, ancak buraya da koyabiliriz.
-                    // Fakat story entırı karmaşık, game.js'den yönetiliyor.
-                } else if (window.currentActiveMenu === 'profile') {
-                    if (document.activeElement && document.activeElement.tagName === 'BUTTON') {
-                        document.activeElement.click();
-                    }
+                    // Story.js enter'ı kendi game.js içinden dinliyor olabilir
                 }
                 return;
             }
@@ -2631,11 +2625,6 @@ document.addEventListener('keydown', function (event) {
             } else if (window.currentActiveMenu === 'update') {
                 let p = document.getElementById('update-text');
                 if (p) textToRead = p.innerText || p.textContent;
-            } else if (window.currentActiveMenu === 'profile') {
-                let pName = document.getElementById('profile-player-name') ? document.getElementById('profile-player-name').innerText : "Bilinmiyor";
-                let pRank = document.getElementById('profile-player-rank') ? document.getElementById('profile-player-rank').innerText : "Oyuncu";
-                let pStats = document.getElementById('profile-stats-content') ? document.getElementById('profile-stats-content').innerText : "İstatistik verisi yok.";
-                textToRead = "Oyuncu Profili. Adınız: " + pName + ". Rütbeniz: " + pRank + ". " + pStats;
             }
 
             if (textToRead && window.announceToScreenReader) {
