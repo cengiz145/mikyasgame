@@ -1,92 +1,92 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
-[v0.97.4.14] - 2026-05-01
+[v0.97.4.14] - 01.05.2026
 
 Yeni Özellikler ve Düzeltmeler:
 - **Oyunu Kaydetme ve Devam Etme Sistemi:** Artık oyun esnasında ilerlemenizi anlık olarak kaydedebilirsiniz. Ana menüye yeni eklenen "Kayıtlı Oyundan Devam Et" sekmesi üzerinden, daha önce kaydettiğiniz oyunları tarih sıralamasına göre görüntüleyebilir ve istediğiniz kayıttan tam kaldığınız notalarla oynamaya devam edebilirsiniz.
 - **Sohbet Bildirimi Kalabalığı Giderildi:** Diğer oyuncuların oyuna giriş/çıkış bildirimleri ("Sohbete katıldı", "Çevrimdışı oldu") artık genel sohbet geçmişine kalıcı olarak yazılmayacak. Bu bildirimler, sadece okuyucunuzun anlık olarak fısıldayacağı ve ekranda sadece o an belirip kaybolan geçici bildirimler (toast) haline getirildi. Böylece sohbet listeniz hep temiz kalacak.
 - **Sistem İyileştirmeleri:** Türkçe karakterlerin (ö, ş, ğ, ı) ekran okuyucuda spam / anlamsız sese dönüşmesine sebep olan sürüm kodlaması hatası kalıcı olarak onarıldı.
 
-[v0.97.4.6] - 2026-04-27
+[v0.97.4.6] - 27.04.2026
 
 Erişilebilirlik ve NVDA İyileştirmeleri:
 - Ana menüdeki anlık durum güncellemeleri (Etkinlik ve Güncelleme kontrolleri) artık ekran okuyucular tarafından %100 okunacak şekilde teknik altyapısı yenilendi.
 - Sosyal menüsünde ok tuşlarıyla dolaşırken kendinizi listenin en başında görebilmeniz sağlandı. Geri dön butonu ve istatistik menüsü maddeleri ok tuşlarıyla dolaşılırken NVDA tarafından atlanmaması için onarıldı.
 - Kayıp Notalar modunda, diyalogları geçerken Enter tuşuna hızlı basıldığında ortaya çıkan seslerin üst üste binme sorunu tamamen çözüldü.
 
-[v0.97.4.5] - 2026-04-26
+[v0.97.4.5] - 26.04.2026
 
 Yeni Özellikler:
 - Kayıp Notalar moduna 3 dakikalık gizli zamanlayıcı eklendi. Arka planda sessizce işleyen bu süre, son 2 dakika, 1 dakika ve 20 saniye kala sizi uyaracak. Sürenin dolmasına 1 dakika kala heyecanı artıracak geri sayım ses efektleri duyulmaya başlanacak! Süre dolduğunda oyuncu görevden başarısız sayılacak.
 
-[v0.97.4.4] - 2026-04-26
+[v0.97.4.4] - 26.04.2026
 
 Yeni Özellikler ve Etkinlikler:
 - Günlük Giriş Serisi (Takvim) eklendi! Artık oyuna art arda girdiğiniz her gün için ekstra jeton kazanacaksınız. Seriyi bozmamaya dikkat edin!
 - Hafta Sonu Çift Jeton Etkinliği başlatıldı! Bundan böyle Cumartesi günü öğleden sonra 12.00'den Pazar gecesi 23.59'a kadar oyunlardan (Klasik mod, Hikaye modu ve PvP) kazandığınız tüm jetonlar 2 katına çıkacak.
 
-[v0.97.4.3] - 2026-04-26
+[v0.97.4.3] - 26.04.2026
 
 Büyük Duyuru ve Yenilikler:
 - Artık resmi bir Telegram kanalımız var! Oyun ana menüsündeki "Telegram Kanalına Katılın" butonu ile topluluğumuza katılabilir, bizlerle doğrudan iletişime geçebilirsiniz.
 - Özel bildirim altyapısı kuruldu: Bundan böyle oyuna eklenecek olan tüm yeni özellikleri ve güncellemeleri anında kendi kurduğumuz sistem üzerinden Telegram kanalımıza otomatik olarak duyuracağız! Yeniliklerden ilk sizin haberiniz olacak.
 - Çeşitli hata düzeltmeleri yapıldı.
 
-[v0.97.2.9] - 2026-04-18
+[v0.97.2.9] - 18.04.2026
 
 ### Hata Düzeltmeleri:
 - **PvP Lobi Menüleri:** 'Açık Maçlar' ve 'Maç Kur' menüleri ana ok gezinti sistemine dahil edildi. Artık bu menülere girildiğinde NVDA sekme içeriğini 'bölüm' vb. şeklinde okuyarak gezinim/sanal (Browse) moduna düşmeyecek. Doğrudan açık açık ok tuşlarını kullanarak oyuncuların kurduğu maçlar listesinde liste elemanı ya da düğme olarak dolaşabileceksiniz.
 
 
-[v0.97.2.8] - 2026-04-18
+[v0.97.2.8] - 18.04.2026
 
 ### Hata Düzeltmeleri:
 - **Anlık Bildirimler:** Oyunda PageUp ve PageDown (Müzik sesi arttırma vb.) kullanıldığında, Focus modundayken okuyucunun bunu anlık olarak değil, sadece Sanal Okuma (Browse Modu)'na geçildiğinde okuması sorunu düzeltildi. Anonsları sağlayan zemin öğesine "Kesin Bildirim (alert/assertive)" özelliği atanarak tepkime hızlandırıldı.
 
 
-[v0.97.2.7] - 2026-04-18
+[v0.97.2.7] - 18.04.2026
 
 ### İyileştirmeler:
 - **Tebrikler / Oyun Sonu Ekranı:** Oyun bittiğinde "Oyunu Bitir" veya "Devam Et" butonuna düşen odak (focus) yüzünden NVDA'nın kapanış jeton bildirilerini okumaması ve kesintiye uğraması sorunu üzerine oyun sonu bir "Diyalog Modeli"ne çekildi. Artık oyun bittiğinde puan ve jetonlarınız kesintisiz okunacak, ana menüye dönmek için herhangi bir butona gitmeye gerek kalmaksızın direkt olarak "Enter" tuşuna basmanız yeterli olacaktır.
 
 
-[v0.97.2.6] - 2026-04-18
+[v0.97.2.6] - 18.04.2026
 
 ### Hata Düzeltmeleri:
 - **Sesli Anons Kalıntıları:** Ekran okuyucusunun yön tuşlarıyla HTML/Makale yapısında (Browse Mode) gezinirken geçmişte okunmuş olan ve HTML kodlarında takılı kalan eski Sunucu mesajlarını anlamsız yere menünün sonunda tekrar okuması ve kafa karıştırması engellendi. ARIA Live bölgesi metni artık okunduktan 20 saniye sonra bellekten silindiği için "Bu eski mesajın menüde ne işi var" karmaşası giderilmiştir.
 
 
-[v0.97.2.5] - 2026-04-18
+[v0.97.2.5] - 18.04.2026
 
 ### Hata Düzeltmeleri:
 - **Erişilebilirlik (Odak Yönetimi):** Oyun açılışında ekran okuyucuların (NVDA) odağı bir H1 başlığına düştüğü için zorla "Makale Okuma" moduna (Browse Mode) girmesi ve kullanıcının zorla Insert+Boşluk vb. kısayollar kullanmasına rağmen makale gibi hissetmesi sorunu çözüldü. Artık, okuyucu metni sorunsuz şekilde okurken ekran okuyucusu otomatik olarak Odak/Uygulama (Focus Mode) kipinde kalmaya devam edecektir.
 
 
-[v0.97.2.4] - 2026-04-18
+[v0.97.2.4] - 18.04.2026
 
 ### Hata Düzeltmeleri:
 - **Müzik Oynatıcısı:** Bağlama ses paketindeki arka plan müziğinin isimlendirmesi yüzünden bazı cihazlarda çalınamaması sorunu üzerine dosya `menu-music2.mp3` olarak adlandırıldı ve kök dizine alındı.
 
 
-[v0.97.2.2] - 2026-04-18
+[v0.97.2.2] - 18.04.2026
 
 ### İyileştirmeler:
 - **Erişilebilirlik (Sesli Karşılama):** Ana menüdeki giriş eğitimi mesajının okunması sırasında direkt olarak 'Oyuna Başla' düğmesine odaklanılması ve duyuruyu yarıda kesmesi engellendi. Artık açılış eğitimi dinlenirken arka planda butonlar odağa girmeyecektir. Kullanıcı ok tuşlarına veya Tab'a bastığında butonlara normal bir şekilde girmeye devam edecektir.
 
-[v0.97.2.1] - 2026-04-18
+[v0.97.2.1] - 18.04.2026
 
 ### Hata Düzeltmeleri:
 - **Medya Kodlama Hatası:** Bağlama modu arkaplan müziğinin dosya adındaki Türkçe karakterlerden (ğ, ü, vs.) ötürü bazı tarayıcılarda 404 (bulunamadı) hatasına sebep olması önlendi. Dosya adı standart karakterlere dönüştürülüp sistem güncellendi.
 - **Ekran Okuyucu & Dado Efekti:** Hikaye ve Alıştırma modlarında öğretici diyalogları "Enter" ile geçerken dado ses efektinin çalmaması ve metnin ekran okuyucuya *zorunlu* olarak gönderilmemesi hatası giderildi. Artık Enter'a basıldıkça sesli onay gelir ve sıradaki metin kesintisiz okunur.
 
 
-[v0.97.2.0] - 2026-04-18
+[v0.97.2.0] - 18.04.2026
 
 ### Eklenenler / Değiştirilenler:
 - **Dinamik Menü Müziği:** Bağlama Ses Paketi mağazadan etkinleştirildiğinde (veya oyun başında yüklendiğinde) oyunun Ana Menü arka plan müziği otomatik olarak 'baglama-ses-paketi-müziği.mp3' dosyasına geçiş yapacak şekilde uyarlandı.
 
 
-[v0.97.1.9] - 2026-04-18
+[v0.97.1.9] - 18.04.2026
 
 ### Hata Düzeltmeleri:
 - **Oyun Sonu Okuma (Anons) Hatası:** Oyun bittiğinde ekran okuyucunun mesajı okumasını engelleyen ufak bir aktiflik/pasiflik engeli tamamen kaldırıldı. Artık oyun sonlandığında jetonları verirken ekran okuyucu kesintiye uğramadan final cümlesini tamamlayacaktır.

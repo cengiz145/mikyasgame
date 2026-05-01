@@ -1,5 +1,5 @@
 {
     "version": "0.97.4.14",
     "buildId": 1781000005,
-    "changelog": "Erişilebilirlik ve NVDA İyileştirmeleri: Ana menü anlık durum güncellemeleri, Sosyal menüsündeki navigasyon sorunları ve Kayıp Notalar modunda seslerin üst üste binmesi gibi kronik sorunlar kökten çözüldü."
+    "changelog": "Oyuna kayıt özelliği eklendi, sohbet bildirimleri sessizleştirildi ve ilk kez giren oyuncular için Alıştırma Modu girişi mecburi kılındı. Ayrıca UTF-8 kodlama hataları düzeltildi."
 }
