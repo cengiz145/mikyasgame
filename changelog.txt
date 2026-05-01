@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.23] - 01.05.2026
+
+Erişilebilirlik Optimizasyonu:
+- Ekran okuyucunun gereksiz yere menüler arası geçişlerde "Hafızana Güven" şeklinde oyun adını defalarca tekrar etmesine (sayıklamasına) neden olan ana etiketleme sorunu tamamen kaldırıldı.
+
 [v0.97.4.22] - 01.05.2026
 
 Ses ve Ayar Optimizasyonları:

@@ -1,8 +1,9 @@
 ﻿{
-    "version": "0.97.4.22",
-    "buildId": 1777659793,
-    "changelog": "Ses paketi değiştirildiğinde müzik ses düzeyinin korunması hatası giderildi."
+    "version": "0.97.4.23",
+    "buildId": 1777660472,
+    "changelog": "Ekran okuyucunun sayıklama hatası düzeltildi."
 }
+
 
 
 
