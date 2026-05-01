@@ -1,5 +1,5 @@
 {
-    "version": "0.97.4.14",
-    "buildId": 1777611893,
-    "changelog": "Oyuna kayıt özelliği eklendi, sohbet bildirimleri sessizleştirildi ve ilk kez giren oyuncular için Alıştırma Modu girişi mecburi kılındı. Ayrıca UTF-8 kodlama hataları düzeltildi."
+    "version": "0.97.4.15",
+    "buildId": 1777611894,
+    "changelog": "PvP Çok Oyunculu Takım Modu Eklendi: Artık oyuna Bireysel veya Takım Modu seçeneğiyle başlayabilirsiniz. Takım arkadaşınız hata yapsa dahi puan takıma eklenir."
 }
