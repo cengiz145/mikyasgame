@@ -289,7 +289,18 @@ window.startGame = function () {
                 }, 400);
             };
 
-            if (window.pendingDailyRewardMsg) {
+            let isFirstTime = (localStorage.getItem('hafizaGuvenFirstTime') !== 'false');
+
+            if (isFirstTime) {
+                if (window.switchMenu && window.firstTimeTutorialMenu) {
+                    window.switchMenu(window.mainMenu, window.firstTimeTutorialMenu, 'first-time-tutorial');
+                }
+                window.hgfzZamanlayici.setTimeout(() => {
+                    const firstBtn = document.getElementById('first-time-start-btn');
+                    if (firstBtn) firstBtn.focus();
+                    if (window.announceToScreenReader) window.announceToScreenReader("Merhaba. Oyuna ilk defa giriş yaptığınız için alıştırma modundan başlayacaksınız. Başlamak için Enter tuşuna basın.");
+                }, 400);
+            } else if (window.pendingDailyRewardMsg) {
                 if (window.switchMenu && window.dailyRewardMenu) window.switchMenu(window.mainMenu, window.dailyRewardMenu, 'daily-reward');
                 
                 const drText = document.getElementById('daily-reward-text');
@@ -928,7 +939,9 @@ window.startPracticeNote = function() {
     const statusText = document.getElementById('practice-status-text');
     
     if (window.practiceTargetIndex === 0 && window.music117Sound && window.music117Sound.playing()) {
-        window.music117Sound.stop();
+        if (!window.firstTimeMusic) {
+            window.music117Sound.stop();
+        }
     }
     
     if (window.practiceTargetIndex < notes.length) {

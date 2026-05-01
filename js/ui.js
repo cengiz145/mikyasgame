@@ -238,6 +238,7 @@ window.storeMenu = document.getElementById('store-menu-container');
 window.feedbackMenu = document.getElementById('feedback-menu-container');
 window.serverMessageMenu = document.getElementById('server-message-container');
 window.dailyRewardMenu = document.getElementById('daily-reward-container');
+window.firstTimeTutorialMenu = document.getElementById('first-time-tutorial-container');
 window.updateMenu = document.getElementById('update-menu-container');
 window.achievementsMenu = document.getElementById('achievements-menu-container');
 window.gameMenu = document.getElementById('game-menu-container');
@@ -265,6 +266,7 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'feedback') buttons = Array.from(window.feedbackMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'server-message') buttons = Array.from(window.serverMessageMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
     else if (window.currentActiveMenu === 'daily-reward') buttons = Array.from(window.dailyRewardMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
+    else if (window.currentActiveMenu === 'first-time-tutorial') buttons = Array.from(window.firstTimeTutorialMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
     else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
     else if (window.currentActiveMenu === 'game') buttons = Array.from(window.gameMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'profile') buttons = Array.from(window.profileMenu.querySelectorAll('.stat-item, .stat-copy-btn, .menu-button'));
@@ -1174,6 +1176,35 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 window.switchMenu(window.dailyRewardMenu, window.mainMenu, 'main');
             }
+        });
+    }
+
+    const firstTimeStartBtn = document.getElementById('first-time-start-btn');
+    if (firstTimeStartBtn) {
+        firstTimeStartBtn.addEventListener('click', () => {
+            if (window.menuCloseSound) window.menuCloseSound.play();
+            window.isStarted = true;
+            
+            localStorage.setItem('hafizaGuvenFirstTime', 'false'); // İşaretle
+            window.firstTimeMusic = true; // Müziğin kesilmesini engelle
+            
+            window.switchMenu(window.firstTimeTutorialMenu, window.practiceMenu, 'practice');
+            if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
+            if (window.music117Sound && !window.music117Sound.playing()) window.music117Sound.play();
+            
+            window.practiceTargetIndex = 0;
+            window.practicePressCount = 0;
+            window.inPracticeTutorial = false;
+            window.isDialogPhase = true;
+            window.currentDialogIndex = 0;
+            
+            const practiceNav = document.getElementById('practice-nav');
+            if (practiceNav) practiceNav.style.display = 'none';
+
+            const practiceMenuDOM = document.getElementById('practice-menu-container');
+            if (practiceMenuDOM) practiceMenuDOM.dataset.isPracticeOver = "false";
+            
+            setTimeout(() => { if (window.playCurrentDialog) window.playCurrentDialog(); }, 350);
         });
     }
 

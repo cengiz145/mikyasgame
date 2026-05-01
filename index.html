@@ -492,7 +492,24 @@
         </div>
     </div>
 
-    <!-- Günlük Seri / Ödül Menüsü -->
+    <!-- İlk Giriş Öğreticisi -->
+    <div id="first-time-tutorial-container" class="menu-container" role="presentation" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <div class="feedback-dialog-box" style="border-color: #219ebc; padding: 30px;">
+            <h1 id="first-time-title" style="color: #219ebc; border-bottom: 2px solid #219ebc; margin-bottom: 20px;">Hoş Geldiniz!</h1>
+            <div id="first-time-content" tabindex="0" style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
+                <p id="first-time-text">Merhaba. Oyuna ilk defa giriş yaptığınız için alıştırma modundan oyuna başlayacaksınız. Başlamak için Enter tuşuna basın.</p>
+            </div>
+            <nav class="menu-nav" aria-labelledby="first-time-title">
+                <ul>
+                    <li>
+                        <button id="first-time-start-btn" class="menu-button" aria-label="Alıştırma moduna başlamak için tıklayın veya Enter'a basın." style="color: #219ebc; font-weight: bold; text-align: center;">[BAŞLA]</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Günlük Giriş Ödülü Dialog Ekranı -->
     <div id="daily-reward-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <div class="feedback-dialog-box" style="border-color: #00ff88;">
