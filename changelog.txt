@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.21] - 01.05.2026
+
+Erişilebilirlik ve Ekran Okuyucu Düzeltmeleri:
+- Oyun yüklendikten sonra ana menüye geçerken ekran okuyucunun (NVDA) odaklanmayı kaybederek "Boş" veya "Uygulama" demesi hatası giderildi.
+- "Başlık seviyesi 1" olarak anons edilen ana menü başlığı yeniden düzenlendi. Artık oyuna girildiğinde doğrudan "Hafızana Güven oyununa hoş geldiniz" şeklinde sesli bir okuma ile karşılaşacaksınız.
+- Odak (focus) yönetimindeki gecikme ve sıçramalar düzeltilerek gereksiz sessizlikler ve menüler arası kaybolmalar engellendi.
+
 [v0.97.4.20] - 01.05.2026
 
 Hesap Güvenliği:

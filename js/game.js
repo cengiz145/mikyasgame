@@ -271,12 +271,17 @@ window.startGame = function () {
 
             const showMainMenu = () => {
                 window.mainMenu.removeAttribute('aria-hidden');
+                
+                const titleEl = document.getElementById('main-menu-title');
+                if (titleEl) {
+                    titleEl.focus();
+                } else {
+                    const firstBtn = document.getElementById('start-game-btn');
+                    if (firstBtn) firstBtn.focus();
+                }
+
                 window.hgfzZamanlayici.setTimeout(() => {
                     window.mainMenu.style.opacity = '1';
-                    document.body.focus();
-                    if (window.announceToScreenReader && window.localizeText) {
-                        window.announceToScreenReader(window.localizeText("Hafızana Güven ana menüsüne hoş geldiniz. Yukarı aşağı oklarla gezinebilirsiniz."));
-                    }
                 }, 300);
             };
 
@@ -394,6 +399,7 @@ window.startMainGame = function (difficulty = 'easy') {
     if (gameStatus) {
         gameStatus.style.display = 'block';
         gameStatus.textContent = `Oyun 3 saniye içinde başlıyor... ${hk} Hata Koruması, ${zk} Zaman Koruması. İlk notayı dinleyin!`;
+        gameStatus.focus();
     }
     window.gameStatusTimeoutId = window.hgfzZamanlayici.setTimeout(() => {
         if (window.announceToScreenReader) window.announceToScreenReader(`Oyun 3 saniye içinde başlıyor. ${hk} Hata Koruması ve ${zk} Zaman Korumasına sahipsiniz. İlk notayı dinleyin!`);

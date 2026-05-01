@@ -1,8 +1,9 @@
 ﻿{
-    "version": "0.97.4.20",
-    "buildId": 1777656725,
-    "changelog": "Güvenlik Güncellemesi: Sadece ekrem isimli hesap Geliştirici sayılacak."
+    "version": "0.97.4.21",
+    "buildId": 1777658069,
+    "changelog": "Ana menüye geçişte ekran okuyucunun boş uygulama okuması engellendi."
 }
+
 
 
 
