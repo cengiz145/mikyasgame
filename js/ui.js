@@ -661,6 +661,36 @@ window.initPresenceSystem = function() {
     const checkDb = setInterval(() => {
         if (window.db) {
             clearInterval(checkDb);
+
+            // --- Geliştirici Bilet (Geri Bildirim) Bildirimleri ---
+            let devNameForTickets = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "";
+            if (['ekrem'].includes(devNameForTickets.toLowerCase())) {
+                let isInitialFbLoad = true;
+                window.db.ref('feedbacks').on('child_added', (snapshot) => {
+                    if (!isInitialFbLoad) {
+                        let fb = snapshot.val();
+                        let snd = new Audio('sounds/chat12.ogg');
+                        snd.play().catch(e => {});
+                        let msg = `YENİ BİLET GELDİ! Gönderen: ${fb.name || fb.nickname || "Bilinmiyor"}. Okumak için sohbete /bilet yazın.`;
+                        if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
+                        if (window.showToastNotification) window.showToastNotification(msg, "warning");
+                    }
+                });
+                
+                window.db.ref('feedbacks').once('value').then(snapshot => {
+                    isInitialFbLoad = false;
+                    if (snapshot.exists() && snapshot.hasChildren()) {
+                        let totalTickets = snapshot.numChildren();
+                        setTimeout(() => {
+                            let msg = `Sistemde bekleyen ${totalTickets} adet açık bilet (geri bildirim) var. İncelemek için sohbete /bilet yazın.`;
+                            if (window.announceToScreenReader) window.announceToScreenReader(msg, false);
+                            if (window.showToastNotification) window.showToastNotification(msg, "info");
+                        }, 6000);
+                    }
+                });
+            }
+            // ----------------------------------------------------
+
             const connectedRef = window.db.ref('.info/connected');
             
             let wasConnected = false;

@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.25] - 01.05.2026
+
+Yeni Özellikler ve İyileştirmeler:
+- Yöneticiler (ekrem) için "Gerçek Zamanlı Bilet Bildirim Sistemi" eklendi! Artık oyuna giriş yaptığınızda okunmamış bilet varsa ekran okuyucu sizi otomatik uyaracak. Ayrıca siz oyundayken birisi geri bildirim yollarsa anında sesli bildirim ve ekran uyarısı alacaksınız.
+
 [v0.97.4.24] - 01.05.2026
 
 Yeni Özellikler ve İyileştirmeler:

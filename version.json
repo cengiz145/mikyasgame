@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.24",
-    "buildId": 1777660473,
-    "changelog": "Yeni ses paketleri kilit sistemi, veri sıfırlama, önbellek temizleme butonu ve profil ismi onarımı."
+    "version": "0.97.4.25",
+    "buildId": 1777660474,
+    "changelog": "Geliştirici için otomatik oyun içi bilet bildirim sistemi eklendi."
 }
 
 
