@@ -719,7 +719,7 @@ window.initPresenceSystem = function() {
                     for (let k in newData) {
                         let newP = newData[k];
                         let oldP = oldData[k];
-                        if (newP.name && newP.name !== myName) {
+                        if (newP.name && newP.name !== myName && newP.name !== "Misafir") {
                             if (newP.state === 'online' && (!oldP || oldP.state !== 'online')) {
                                 if (window.playerOnlineSound) window.playerOnlineSound.play();
                                 if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimiçi.`);
@@ -736,7 +736,7 @@ window.initPresenceSystem = function() {
                         }
                     }
                     for (let k in oldData) {
-                        if (!newData[k] && oldData[k].name !== myName && oldData[k].state === 'online') {
+                        if (!newData[k] && oldData[k].name !== myName && oldData[k].name !== "Misafir" && oldData[k].state === 'online') {
                             if (window.serverDisconnectSound) window.serverDisconnectSound.play();
                             if (window.announceToScreenReader) window.announceToScreenReader(`${oldData[k].name} bağlantısı koptu.`);
                             if (window.showToastNotification) window.showToastNotification(`${oldData[k].name} bağlantısı koptu.`, 'warning');
@@ -785,7 +785,7 @@ window.renderSocialList = function() {
         return;
     }
 
-    let players = Object.values(window.lastPresenceData);
+    let players = Object.values(window.lastPresenceData).filter(p => p.state === 'online' && p.name && p.name !== "Misafir");
     if (players.length === 0) {
         listEl.innerHTML = emptyHtml;
         return;

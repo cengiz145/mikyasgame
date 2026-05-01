@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.17] - 01.05.2026
+
+Hata Düzeltmeleri ve İyileştirmeler:
+- Sosyal Menü Temizliği: Oyuncu listesinde artık sadece o an "Çevrimiçi" olan oyuncular listelenecek. Önceden kalma çevrimdışı kullanıcılar listeden gizlendi.
+- Hayalet Kullanıcı (Misafir) Spamı Onarıldı: Oyuna henüz takma ad belirlemeden giren "Misafir" bağlantılarının "Sohbete katıldı" veya "Çevrimdışı oldu" şeklinde sürekli bildirim göndermesine (ve ekran okuyucuyu gereksiz yere meşgul etmesine) neden olan altyapı sorunu çözüldü. Artık sadece geçerli bir adı olan oyuncular anons edilecek.
+
 [v0.97.4.16] - 01.05.2026
 
 Hata Düzeltmeleri:

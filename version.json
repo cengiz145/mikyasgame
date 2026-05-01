@@ -1,5 +1,5 @@
 {
-    "version": "0.97.4.16",
-    "buildId": 1777611895,
-    "changelog": "Mobil cihazlarda oyunu duraklatma, çıkış ve kaydetme butonlarının dokunmatik ekranlarda tepki vermemesi sorunu onarıldı."
+    "version": "0.97.4.17",
+    "buildId": 1777611896,
+    "changelog": "Sosyal menü sadece aktif çevrimiçi oyuncuları gösterecek şekilde düzenlendi ve Misafir bağlantılarından gelen hayalet bildirim spamı tamamen engellendi."
 }
