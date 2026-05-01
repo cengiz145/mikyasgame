@@ -29,7 +29,22 @@ window.guncellemeKontrolEt = function (isManual = false) {
             let currentMsg = 'Oyununuz güncel.';
             if (data.buildId) {
                 const dateObj = new Date(data.buildId * 1000);
-                currentMsg += ' En son ' + dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' tarihinde güncellenmiş.';
+                const now = new Date();
+                const diffMs = Math.max(0, now - dateObj);
+                const totalSec = Math.floor(diffMs / 1000);
+                const days = Math.floor(totalSec / 86400);
+                const hours = Math.floor((totalSec % 86400) / 3600);
+                const mins = Math.floor((totalSec % 3600) / 60);
+                const secs = totalSec % 60;
+
+                let timeAgoStr = "";
+                if (days > 0) timeAgoStr += `${days} gün `;
+                if (hours > 0) timeAgoStr += `${hours} saat `;
+                if (mins > 0) timeAgoStr += `${mins} dakika `;
+                timeAgoStr += `${secs} saniye`;
+
+                const takvimStr = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                currentMsg = `Oyunun güncelleme takvimi: ${takvimStr}. Ve yaklaşık ${timeAgoStr} önce güncellendi.`;
             }
 
             const updateBtn = document.getElementById('check-updates-btn');

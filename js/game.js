@@ -918,7 +918,11 @@ window.playCurrentDialog = function() {
         if (window.currentDialogIndex < window.practiceDialogues.length) {
             let text = window.practiceDialogues[window.currentDialogIndex];
             let localizedText = window.localizeText ? window.localizeText(text) : text;
-            if (statusText) statusText.innerHTML = localizedText;
+            if (statusText) {
+                statusText.innerHTML = localizedText;
+                statusText.blur();
+                setTimeout(() => statusText.focus(), 10);
+            }
             
             if (window.dado3Sound) window.dado3Sound.play();
             if (window.announceToScreenReader) window.announceToScreenReader(localizedText, true);
@@ -948,12 +952,20 @@ window.startPracticeNote = function() {
         // Öğrenilecek nota varsa sor
         let currentNote = notes[window.practiceTargetIndex].toUpperCase();
         let text = "Şimdi " + currentNote + " tuşuna 3 defa bas.";
-        if (statusText) statusText.innerHTML = text;
+        if (statusText) {
+            statusText.innerHTML = text;
+            statusText.blur();
+            setTimeout(() => statusText.focus(), 10);
+        }
         if (window.announceToScreenReader) window.announceToScreenReader(text, true);
     } else {
         // Tüm notalar bittiyse tebrik et ve Geri butonunu göster
         let text = "Tebrikler! Tüm notaları öğrendiniz. Ana menüye dönmek için Geri butonunu kullanabilirsiniz.";
-        if (statusText) statusText.innerHTML = text;
+        if (statusText) {
+            statusText.innerHTML = text;
+            statusText.blur();
+            setTimeout(() => statusText.focus(), 10);
+        }
         if (window.announceToScreenReader) window.announceToScreenReader(text, true);
         const practiceNav = document.getElementById('practice-nav');
         if (practiceNav) practiceNav.style.display = 'block';
@@ -983,7 +995,11 @@ window.handlePracticeInput = function(key) {
                 let msg = window.practiceCorrectMessages[Math.floor(Math.random() * window.practiceCorrectMessages.length)];
                 let fullMsg = msg + " " + (3 - window.practicePressCount) + " kaldı.";
                 const statusText = document.getElementById('practice-status-text');
-                if (statusText) statusText.innerHTML = fullMsg;
+                if (statusText) {
+                    statusText.innerHTML = fullMsg;
+                    statusText.blur();
+                    setTimeout(() => statusText.focus(), 10);
+                }
                 if (window.announceToScreenReader) window.announceToScreenReader(fullMsg);
             }
         }
@@ -993,7 +1009,11 @@ window.handlePracticeInput = function(key) {
         if (window.practiceWrongMessages) {
             let msg = window.practiceWrongMessages[Math.floor(Math.random() * window.practiceWrongMessages.length)];
             const statusText = document.getElementById('practice-status-text');
-            if (statusText) statusText.innerHTML = msg;
+            if (statusText) {
+                statusText.innerHTML = msg;
+                statusText.blur();
+                setTimeout(() => statusText.focus(), 10);
+            }
             if (window.announceToScreenReader) window.announceToScreenReader(msg);
         }
     }
