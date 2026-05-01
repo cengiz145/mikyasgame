@@ -32,11 +32,14 @@ window.guncellemeKontrolEt = function (isManual = false) {
                 currentMsg += ' En son ' + dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' tarihinde güncellenmiş.';
             }
 
+            const updateBtn = document.getElementById('check-updates-btn');
+            if (updateBtn) {
+                updateBtn.innerText = "Sürüm: " + data.version + (data.buildId ? "" : " (Güncel)");
+                updateBtn.setAttribute('aria-label', currentMsg);
+            }
+
             if (!window.mevcutSurum) {
                 window.mevcutSurum = data.version;
-                if (isManual && typeof window.announceToScreenReader === 'function') {
-                    window.announceToScreenReader(currentMsg);
-                }
             } else if (data.version !== window.mevcutSurum) {
                 const uyariMesaji = "Oyuna zorunlu bir güncelleme geldi! Eski sürümle oynamaya devam edemezsiniz. Lütfen Tamam'a basarak sayfayı yenileyin.";
 
@@ -64,9 +67,7 @@ window.guncellemeKontrolEt = function (isManual = false) {
                     window.location.href = window.location.pathname + "?v=" + new Date().getTime();
                 }
             } else {
-                if (isManual && typeof window.announceToScreenReader === 'function') {
-                    window.announceToScreenReader(currentMsg);
-                }
+                // Sessizce güncelleme durumunu UI'da tuttuk.
             }
         })
         .catch(err => {
@@ -74,8 +75,10 @@ window.guncellemeKontrolEt = function (isManual = false) {
             if (visualVersion && !visualVersion.textContent.includes("Çevrimdışı")) {
                 visualVersion.textContent = "Sürüm: " + (window.mevcutSurum || "Bilinmiyor") + " (Çevrimdışı)";
             }
-            if (isManual && typeof window.announceToScreenReader === 'function') {
-                window.announceToScreenReader('Güncelleme kontrolü başarısız oldu.');
+            const updateBtn = document.getElementById('check-updates-btn');
+            if (updateBtn) {
+                updateBtn.innerText = "Güncelleme kontrolü başarısız.";
+                updateBtn.setAttribute('aria-label', "Güncelleme kontrolü başarısız oldu. Çevrimdışı olabilirsiniz.");
             }
         });
 };
@@ -175,12 +178,7 @@ window.checkDailyStreak = function() {
 document.addEventListener('DOMContentLoaded', () => {
     window.checkDailyStreak();
     
-    const checkUpdatesBtn = document.getElementById('check-updates-btn');
-    if (checkUpdatesBtn) {
-        checkUpdatesBtn.addEventListener('click', () => {
-            window.guncellemeKontrolEt(true);
-        });
-    }
+    // Güncelleme butonu artık pasif olduğu için tıklama olayı kaldırıldı.
 });
 
 setTimeout(() => window.guncellemeKontrolEt(false), 2000);
@@ -1323,60 +1321,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Aktif Etkinlikler Butonu
-        const eventsBtnMain = document.getElementById('events-btn-main');
-        if (eventsBtnMain) {
-            eventsBtnMain.addEventListener('click', () => {
-                if (window.menuEnterSound) window.menuEnterSound.play();
-                
-                const now = new Date();
-                const day = now.getDay();
-                const hour = now.getHours();
-                
-                let msg = "";
-                let isActive = false;
-                
-                // Hafta Sonu Çift Jeton Etkinliği Kontrolü
-                if ((day === 6 && hour >= 12) || day === 0) {
-                    isActive = true;
-                }
-                
-                if (isActive) {
-                    let end = new Date(now);
-                    if (day === 6) {
-                        end.setDate(now.getDate() + 1); // Pazar'a geç
-                    }
-                    end.setHours(23, 59, 59, 999);
-                    
-                    let diffMs = end - now;
-                    let diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                    let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                    
-                    msg = `Şu an "Çift Jeton Etkinliği" AKTİF! Klasik, Hikaye ve PvP modlarından kazandığınız tüm jetonlar 2 katına çıkar. Etkinliğin bitmesine ${diffHours} saat ${diffMinutes} dakika kaldı. İyi oyunlar!`;
-                } else {
-                    let start = new Date(now);
-                    let daysUntilSaturday = 6 - day;
-                    if (daysUntilSaturday === 0 && hour >= 12) {
-                        daysUntilSaturday = 7;
-                    } else if (daysUntilSaturday === 0) {
-                        daysUntilSaturday = 0;
-                    }
-                    
-                    start.setDate(now.getDate() + daysUntilSaturday);
-                    start.setHours(12, 0, 0, 0);
-                    
-                    let diffMs = start - now;
-                    let diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                    let diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                    
-                    msg = `Şu an aktif bir etkinlik bulunmuyor. Sıradaki etkinlik: "Çift Jeton Etkinliği". Başlamasına ${diffDays} gün, ${diffHours} saat, ${diffMinutes} dakika var. Her Cumartesi saat 12:00'de başlar.`;
-                }
-                
-                setTimeout(() => {
-                    if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
-                }, 100);
-            });
-        }
+        // Aktif Etkinlikler (Pasif Durum Göstergesi)
+        window.etkinlikKontrolEt = function() {
+            const eventsBtnMain = document.getElementById('events-btn-main');
+            if (!eventsBtnMain) return;
+            
+            const now = new Date();
+            const day = now.getDay();
+            const hour = now.getHours();
+            
+            let msg = "";
+            let isActive = false;
+            
+            if ((day === 6 && hour >= 12) || day === 0) {
+                isActive = true;
+            }
+            
+            if (isActive) {
+                let end = new Date(now);
+                if (day === 6) end.setDate(now.getDate() + 1);
+                end.setHours(23, 59, 59, 999);
+                let diffMs = end - now;
+                let diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                eventsBtnMain.innerText = `Etkinlik: Çift Jeton (${diffHours}sa ${diffMinutes}dk)`;
+                eventsBtnMain.setAttribute('aria-label', `Şu an Çift Jeton Etkinliği AKTİF! Etkinliğin bitmesine ${diffHours} saat ${diffMinutes} dakika kaldı.`);
+            } else {
+                let start = new Date(now);
+                let daysUntilSaturday = 6 - day;
+                if (daysUntilSaturday === 0 && hour >= 12) daysUntilSaturday = 7;
+                else if (daysUntilSaturday === 0) daysUntilSaturday = 0;
+                start.setDate(now.getDate() + daysUntilSaturday);
+                start.setHours(12, 0, 0, 0);
+                let diffMs = start - now;
+                let diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                let diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                eventsBtnMain.innerText = `Sıradaki Etkinlik: Çift Jeton (${diffDays}g ${diffHours}sa ${diffMinutes}dk)`;
+                eventsBtnMain.setAttribute('aria-label', `Şu an aktif etkinlik yok. Sıradaki etkinlik: Çift Jeton Etkinliği. Başlamasına ${diffDays} gün, ${diffHours} saat, ${diffMinutes} dakika var.`);
+            }
+        };
+        
+        window.etkinlikKontrolEt();
+        setInterval(window.etkinlikKontrolEt, 60000);
 
         const musicVolumeSlider = document.getElementById('music-volume-slider');
         const musicVolumeDisplay = document.getElementById('music-volume-display');
