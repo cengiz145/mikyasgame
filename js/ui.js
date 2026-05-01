@@ -3826,46 +3826,69 @@ document.addEventListener('DOMContentLoaded', () => {
     const pauseInterceptor = (e) => {
         let isMultiplayer = window.isMultiplayerGame;
         if (window.gameIsActive && !window.isGameOverPhase && window.currentActiveMenu === 'game' && !isMultiplayer) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
+            if (e && e.type !== 'click') { e.preventDefault(); e.stopPropagation(); }
+            else if (e) { e.preventDefault(); e.stopImmediatePropagation(); }
             window.requestPauseMenu();
         }
     };
     
     const gBtn = document.getElementById('game-back-btn');
-    if (gBtn) gBtn.addEventListener('click', pauseInterceptor, true);
+    if (gBtn) {
+        gBtn.addEventListener('click', pauseInterceptor, true);
+        gBtn.addEventListener('pointerdown', pauseInterceptor, true);
+        gBtn.addEventListener('touchstart', pauseInterceptor, {passive: false, capture: true});
+    }
     
     const mBtn = document.getElementById('mobile-game-back-btn');
-    if (mBtn) mBtn.addEventListener('click', pauseInterceptor, true);
+    if (mBtn) {
+        mBtn.addEventListener('click', pauseInterceptor, true);
+        mBtn.addEventListener('pointerdown', pauseInterceptor, true);
+        mBtn.addEventListener('touchstart', pauseInterceptor, {passive: false, capture: true});
+    }
 
     const btnExit = document.getElementById('pause-btn-exit');
     const btnSave = document.getElementById('pause-btn-save');
     const btnCancel = document.getElementById('pause-btn-cancel');
 
+    const handleExit = (e) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        window.resumeFromPause();
+        setTimeout(() => {
+            if (window.endMainGame) window.endMainGame(false, false, true);
+        }, 350);
+    };
+
     if (btnExit) {
-        btnExit.addEventListener('click', () => {
-            window.resumeFromPause();
-            setTimeout(() => {
-                if (window.endMainGame) window.endMainGame(false, false, true);
-            }, 350);
-        });
+        btnExit.addEventListener('click', handleExit);
+        btnExit.addEventListener('pointerdown', handleExit);
+        btnExit.addEventListener('touchstart', handleExit, {passive: false});
     }
+
+    const handleSave = (e) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (window.saveCurrentGame) {
+            window.saveCurrentGame();
+        }
+        window.resumeFromPause();
+        setTimeout(() => {
+            if (window.endMainGame) window.endMainGame(false, false, true);
+        }, 350);
+    };
 
     if (btnSave) {
-        btnSave.addEventListener('click', () => {
-            if (window.saveCurrentGame) {
-                window.saveCurrentGame();
-            }
-            window.resumeFromPause();
-            setTimeout(() => {
-                if (window.endMainGame) window.endMainGame(false, false, true);
-            }, 350);
-        });
+        btnSave.addEventListener('click', handleSave);
+        btnSave.addEventListener('pointerdown', handleSave);
+        btnSave.addEventListener('touchstart', handleSave, {passive: false});
     }
 
+    const handleCancel = (e) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        window.resumeFromPause();
+    };
+
     if (btnCancel) {
-        btnCancel.addEventListener('click', () => {
-            window.resumeFromPause();
-        });
+        btnCancel.addEventListener('click', handleCancel);
+        btnCancel.addEventListener('pointerdown', handleCancel);
+        btnCancel.addEventListener('touchstart', handleCancel, {passive: false});
     }
 });
