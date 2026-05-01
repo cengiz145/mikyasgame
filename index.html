@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 
 <head>
@@ -77,6 +77,9 @@
                 <li>
                     <button id="start-game-btn" class="menu-button" aria-label="Oyuna Başla">Oyuna
                         Başla</button>
+                </li>
+                <li>
+                    <button id="btn-restart-game" class="menu-button" aria-label="Oyunu Yeniden Başlat. Bu seçenek, oyuncu verilerinizi koruyarak tarayıcı önbelleğini temizler ve oyunu yeniden başlatır.">Oyunu Yeniden Başlat</button>
                 </li>
                 <li>
                     <button id="btn-change-instrument" class="menu-button" aria-label="Ses Paketini Değiştir">Ses Paketini Değiştir</button>
@@ -280,21 +283,21 @@
                         aria-label="Seri Dondurma. Oyuna girmediğiniz her gün için bir adet harcanarak günlük serinizin bozulmamasını sağlar. En fazla 2 adet sahip olunabilir. Fiyat: 80 Jeton.">Seri
                         Dondurma Satın Al (80 Jeton)</button>
                 </li>
-                <li>
+                <li id="li-baglama-pack" style="display: none;">
                     <button id="buy-baglama-pack-btn" class="menu-button"
                         aria-label="Bağlama Ses Paketi. Notaları piyano yerine bağlama ile duyarsınız. Fiyat: 500 Jeton.">Bağlama
                         Ses Paketi Satın Al (500 Jeton)</button>
                 </li>
-                <li>
+                <li id="li-kaval-pack" style="display: none;">
                     <button id="buy-kaval-pack-btn" class="menu-button"
                         aria-label="Kaval Ses Paketi. Notaları piyano yerine kaval ile duyarsınız. Fiyat: 100 Jeton.">Kaval
                         Ses Paketi Satın Al (100 Jeton)</button>
                 </li>
-                <li>
+                <li id="li-flut-pack" style="display: none;">
                     <button id="buy-flut-pack-btn" class="menu-button"
                         aria-label="Flüt Ses Paketi. Notaları piyano yerine flüt ile duyarsınız. Fiyat: 200 Jeton.">Flüt Ses Paketi Satın Al (200 Jeton)</button>
                 </li>
-                <li>
+                <li id="li-kanun-pack" style="display: none;">
                     <button id="buy-kanun-pack-btn" class="menu-button"
                         aria-label="Kanun Ses Paketi. Notaları piyano yerine kanun ile duyarsınız. Fiyat: 300 Jeton.">Kanun Ses Paketi Satın Al (300 Jeton)</button>
                 </li>

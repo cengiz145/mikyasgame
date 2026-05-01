@@ -31,14 +31,24 @@ window.addEventListener('keydown', function(event) {
     }
 }, { passive: false });
 
-// --- İSTATİSTİK SIFIRLAMA (V1.33 YAMASI) ---
-if (!localStorage.getItem('hfzReset_v1_33')) {
+// --- İSTATİSTİK SIFIRLAMA (TÜM İLERLEMELER) ---
+if (!localStorage.getItem('hfzReset_AllProgress_v2')) {
     localStorage.removeItem('hafizaGuvenModes');
     localStorage.removeItem('hafizaGuvenAchievements');
     localStorage.removeItem('hafizaGuvenTotalTokens');
     localStorage.removeItem('hafizaGuvenHataKorumasi');
     localStorage.removeItem('hafizaGuvenZamanKorumasi');
-    localStorage.setItem('hfzReset_v1_33', 'true');
+    localStorage.removeItem('hafizaGuvenSeriDondurma');
+    localStorage.removeItem('hafizaGuvenLoginStreak');
+    localStorage.removeItem('hafizaGuvenLastLoginDate');
+    localStorage.removeItem('hafizaGuvenSoundPacksUnlocked');
+    localStorage.removeItem('hafizaGuvenBaglamaPack');
+    localStorage.removeItem('hafizaGuvenKavalPack');
+    localStorage.removeItem('hafizaGuvenFlutPack');
+    localStorage.removeItem('hafizaGuvenKanunPack');
+    localStorage.removeItem('hafizaGuvenInstrument');
+    localStorage.removeItem('hafizaGuvenFirstTime_v2');
+    localStorage.setItem('hfzReset_AllProgress_v2', 'true');
 }
 
 // --- ANA OYUN DEĞİŞKENLERİ ---
@@ -132,6 +142,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             });
+            
+            // Güncelleme sonrası yöneticilerin Firebase'deki eski kalıntı verileri silmesini otomatikleştir (Hile iddialarını önlemek için)
+            let currentUserForAdminWipe = window.currentChatUser || localStorage.getItem('chatUsername') || "";
+            if (currentUserForAdminWipe.toLowerCase() === 'ekrem' && !localStorage.getItem('hfzAdmin_ServerWipe_v2')) {
+                window.db.ref('player_stats').remove();
+                localStorage.setItem('hfzAdmin_ServerWipe_v2', 'true');
+            }
             
             // Cihaz açıldığında mevcut verileri de Firebase'e güncelle
             window.syncStatsToFirebase();

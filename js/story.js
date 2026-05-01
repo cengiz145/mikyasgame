@@ -411,6 +411,23 @@ window.handleStoryWalking = function(key) {
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
     } else if (key === 'Enter') {
         if (window.playerX === window.pianoX && window.notesInPiano.length === window.MAX_NOTES && !window.carryingNote) {
+            if (window.isSoundPacksUnlockDialogWaitingForEnter) {
+                window.isSoundPacksUnlockDialogWaitingForEnter = false;
+                window.isGridWalkingPhase = false;
+                window.inStoryMode = false;
+                
+                if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
+                if (window.switchMenu && window.storyMenu && window.mainMenu) {
+                    window.switchMenu(window.storyMenu, window.mainMenu, 'main');
+                }
+                if (window.updateInstrumentBtnText) window.updateInstrumentBtnText();
+                
+                if (window.bgMusic && !window.bgMusic.playing()) {
+                    window.bgMusic.play();
+                }
+                return;
+            }
+
             if (window.isStoryModeFinishedWaitingForEnter || window.isStoryModeWon) {
                 window.isStoryModeFinishedWaitingForEnter = false;
                 if (window.storyWinTimeout) clearTimeout(window.storyWinTimeout);
@@ -418,6 +435,33 @@ window.handleStoryWalking = function(key) {
                 if (window.gameModes && window.gameModes.missing_notes) {
                     window.gameModes.missing_notes.completionCount += 1;
                     try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}
+                }
+                
+                let easyCount = (window.gameModes && window.gameModes.easy) ? window.gameModes.easy.completionCount : 0;
+                let mediumCount = (window.gameModes && window.gameModes.medium) ? window.gameModes.medium.completionCount : 0;
+                let hardCount = (window.gameModes && window.gameModes.hard) ? window.gameModes.hard.completionCount : 0;
+                let storyCount = (window.gameModes && window.gameModes.missing_notes) ? window.gameModes.missing_notes.completionCount : 0;
+                let isPacksUnlocked = localStorage.getItem('hafizaGuvenSoundPacksUnlocked') === 'true';
+
+                if (!isPacksUnlocked && easyCount >= 5 && mediumCount >= 5 && hardCount >= 5 && storyCount >= 1) {
+                    localStorage.setItem('hafizaGuvenSoundPacksUnlocked', 'true');
+                    window.isSoundPacksUnlockDialogWaitingForEnter = true;
+                    
+                    if (window.successSound) {
+                        window.successSound.volume(0.8);
+                        window.successSound.play();
+                    }
+                    if (window.applauseSound) window.applauseSound.play();
+                    
+                    let unlockMsg = "Tebrikler. Bütün seslerin hakimi olmayı başardığınız için size bir ödül olarak farklı ses paketlerinin kilidi açıldı. Bunları mağazadan satın alabilirsiniz. Keyifli oyunlar dileriz. Ana menüye dönmek için entıra basın.";
+                    
+                    const storyStatus = document.getElementById('story-status-text');
+                    if (storyStatus) storyStatus.innerHTML = unlockMsg;
+                    
+                    if (window.announceToScreenReader) {
+                        window.announceToScreenReader(unlockMsg);
+                    }
+                    return;
                 }
                 
                 window.isGridWalkingPhase = false;

@@ -1015,8 +1015,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const buyKanunPackBtn = document.getElementById('buy-kanun-pack-btn');
 
     const startGameBtn = document.getElementById('start-game-btn');
+    const btnRestartGame = document.getElementById('btn-restart-game');
     const gameBackBtn = document.getElementById('game-back-btn');
     
+    if (btnRestartGame) {
+        btnRestartGame.addEventListener('click', () => {
+            if (window.menuEnterSound) window.menuEnterSound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader("Oyun yeniden başlatılıyor, lütfen bekleyin...");
+            
+            // Arka plan kullanıcı verilerini (sessionStorage ve cache) temizle, oyuncu verilerini (localStorage) KORU.
+            sessionStorage.clear();
+            
+            if ('caches' in window) {
+                caches.keys().then((names) => {
+                    names.forEach((name) => {
+                        caches.delete(name);
+                    });
+                });
+            }
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 500);
+        });
+    }
+
     const btnChangeInst = document.getElementById('btn-change-instrument');
     window.updateInstrumentBtnText = function() {
         if (btnChangeInst) {
@@ -1031,6 +1062,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let n = instMap[curr] || 'Piyano';
             btnChangeInst.innerText = "Ses Paketini Değiştir (" + n + ")";
             btnChangeInst.setAttribute('aria-label', "Ses paketini değiştirmek için tıklayın. Geçerli paket: " + n);
+            
+            let packsUnlocked = localStorage.getItem('hafizaGuvenSoundPacksUnlocked') === 'true';
+            btnChangeInst.style.display = packsUnlocked ? 'inline-block' : 'none';
         }
     };
 
@@ -1326,7 +1360,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (window.music25Sound && window.music25Sound.playing()) window.music25Sound.stop();
                     if (window.bgMusic && !window.bgMusic.playing()) window.bgMusic.play();
                 }
-                let playerName = localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
+                let playerName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
                 let nameEl = document.getElementById('profile-player-name');
                 if (nameEl) nameEl.innerText = playerName;
 
@@ -1671,6 +1705,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.music25Sound && !window.music25Sound.playing()) window.music25Sound.play();
             document.getElementById('main-menu-container').setAttribute('aria-hidden', 'true');
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+            
+            let packsUnlocked = localStorage.getItem('hafizaGuvenSoundPacksUnlocked') === 'true';
+            
+            if (!packsUnlocked) {
+                let ownsBaglama = localStorage.getItem('hafizaGuvenBaglamaPack') === 'true';
+                let ownsKaval = localStorage.getItem('hafizaGuvenKavalPack') === 'true';
+                let ownsFlut = localStorage.getItem('hafizaGuvenFlutPack') === 'true';
+                let ownsKanun = localStorage.getItem('hafizaGuvenKanunPack') === 'true';
+                if (ownsBaglama || ownsKaval || ownsFlut || ownsKanun) {
+                    packsUnlocked = true;
+                    localStorage.setItem('hafizaGuvenSoundPacksUnlocked', 'true');
+                }
+            }
+
+            ['li-baglama-pack', 'li-kaval-pack', 'li-flut-pack', 'li-kanun-pack'].forEach(id => {
+                let el = document.getElementById(id);
+                if (el) el.style.display = packsUnlocked ? 'block' : 'none';
+            });
             
             if (buyBaglamaPackBtn) {
                 let ownsBaglama = localStorage.getItem('hafizaGuvenBaglamaPack') === 'true';
