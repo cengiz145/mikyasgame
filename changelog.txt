@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.20] - 01.05.2026
+
+Hesap Güvenliği:
+- Sadece "ekrem" isimli kullanıcı "Geliştirici" yetkilerine (banlama vb.) sahip olacak şekilde sistem yeniden ayarlandı.
+
 [v0.97.4.19] - 01.05.2026
 
 Geliştirici İyileştirmeleri ve UI Temizliği:

@@ -3065,7 +3065,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let cUserNick = window.currentChatUser || "";
             let nickInputTemp = document.getElementById('chat-nickname');
             if (nickInputTemp && nickInputTemp.value.trim() !== "") cUserNick = nickInputTemp.value.trim();
-            let isDev = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(cUserNick.toLowerCase());
+            let isDev = ['ekrem'].includes(cUserNick.toLowerCase());
 
             function addLocalSystemMessage(msgText) {
                 // Sadece ekranda anlık (toast) gösterip ekran okuyucuya okutuyoruz.
@@ -3338,7 +3338,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Rütbe Belirleme
             let isimKucuk = (data.nickname || "").toLowerCase();
-            let isDevRender = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(isimKucuk);
+            let isDevRender = ['ekrem'].includes(isimKucuk);
             let rutbe = isDevRender ? "Geliştirici" : "Oyuncu";
             
             // Benim gönderdiğim mesaj mı yoksa başkasının mı?
@@ -3375,7 +3375,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messageToRead = `Sistem mesajı: ${data.text}`;
         } else {
             let isimKucuk = (data.nickname || "").toLowerCase();
-            let isDevRead = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(isimKucuk);
+            let isDevRead = ['ekrem'].includes(isimKucuk);
             let rutbe = isDevRead ? "Geliştirici" : "Oyuncu";
 
             messageToRead = `${rutbe} ${data.nickname}: ${data.text}`;
@@ -3451,7 +3451,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let cUserNick = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
-        let isDev = ['ümit', 'umit', 'ümit ekrem mikyas', 'cengiz145'].includes(cUserNick.toLowerCase());
+        let isDev = ['ekrem'].includes(cUserNick.toLowerCase());
 
         const devBtns = actionModal.querySelectorAll('.dev-only-action');
         devBtns.forEach(b => {
