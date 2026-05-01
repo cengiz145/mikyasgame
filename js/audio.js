@@ -49,7 +49,13 @@ class BgMusicWrapper {
         if (window.activeInstrument === 'flut') return window.flutBgMusic;
         return window.pianoBgMusic;
     }
-    play() { return this.current.play(); }
+    play() { 
+        if (window.setMusicVolume) {
+            let savedVol = localStorage.getItem('hafizaGuvenMusicVolume');
+            if (savedVol !== null) window.setMusicVolume(savedVol);
+        }
+        return this.current.play(); 
+    }
     pause() { return this.current.pause(); }
     stop() { return this.current.stop(); }
     playing() { return this.current.playing(); }

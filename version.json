@@ -1,8 +1,9 @@
 ﻿{
-    "version": "0.97.4.21",
-    "buildId": 1777658069,
-    "changelog": "Ana menüye geçişte ekran okuyucunun boş uygulama okuması engellendi."
+    "version": "0.97.4.22",
+    "buildId": 1777659793,
+    "changelog": "Ses paketi değiştirildiğinde müzik ses düzeyinin korunması hatası giderildi."
 }
+
 
 
 

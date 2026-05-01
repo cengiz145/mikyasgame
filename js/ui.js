@@ -1053,6 +1053,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.bgMusic) window.bgMusic.stop();
             localStorage.setItem('hafizaGuvenInstrument', nextInst);
             window.activeInstrument = nextInst;
+            
+            // Yeni seçilen ses paketinin arka plan müziğine kullanıcının ses seviyesini uygula
+            if (window.setMusicVolume) {
+                let savedVol = localStorage.getItem('hafizaGuvenMusicVolume');
+                if (savedVol !== null) {
+                    window.setMusicVolume(savedVol);
+                }
+            }
+
             if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
             window.updateInstrumentBtnText();
@@ -1514,6 +1523,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (window.kavalNotes) {
                 for (let k in window.kavalNotes) window.kavalNotes[k].volume(1.0 * scale);
+            }
+            if (window.flutNotes) {
+                for (let k in window.flutNotes) window.flutNotes[k].volume(1.0 * scale);
             }
             if (window.kanunNotes) {
                 for (let k in window.kanunNotes) window.kanunNotes[k].volume(1.0 * scale);

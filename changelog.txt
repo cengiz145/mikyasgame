@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.22] - 01.05.2026
+
+Ses ve Ayar Optimizasyonları:
+- Oyun içi ses paketleri (Piyano, Bağlama, Kanun vb.) değiştirildiğinde arka plan müziğinin varsayılan (en yüksek) düzeye dönmesi hatası giderildi. Artık enstrüman değiştirdiğinizde daha önce ayarladığınız müzik ve efekt sesi düzeyleri aynen korunacak.
+- Flüt ses paketi de ana ses ayarı döngüsüne eklendi.
+
 [v0.97.4.21] - 01.05.2026
 
 Erişilebilirlik ve Ekran Okuyucu Düzeltmeleri:
