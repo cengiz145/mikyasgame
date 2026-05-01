@@ -1185,7 +1185,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.menuCloseSound) window.menuCloseSound.play();
             window.isStarted = true;
             
-            localStorage.setItem('hafizaGuvenFirstTime', 'false'); // İşaretle
+            localStorage.setItem('hafizaGuvenFirstTime_v2', 'false'); // İşaretle
             window.firstTimeMusic = true; // Müziğin kesilmesini engelle
             
             window.switchMenu(window.firstTimeTutorialMenu, window.practiceMenu, 'practice');

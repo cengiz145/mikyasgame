@@ -289,7 +289,7 @@ window.startGame = function () {
                 }, 400);
             };
 
-            let isFirstTime = (localStorage.getItem('hafizaGuvenFirstTime') !== 'false');
+            let isFirstTime = (localStorage.getItem('hafizaGuvenFirstTime_v2') !== 'false');
 
             if (isFirstTime) {
                 if (window.switchMenu && window.firstTimeTutorialMenu) {
