@@ -1315,3 +1315,127 @@ document.addEventListener('keydown', function (event) {
         }
     }
 });
+
+window.saveCurrentGame = function() {
+    if (!window.gameIsActive) {
+        if (window.announceToScreenReader) window.announceToScreenReader("Şu an kaydedilecek aktif bir oyun yok.");
+        return;
+    }
+    
+    if (window.isComputerPlaying) {
+        if (window.announceToScreenReader) window.announceToScreenReader("Notalar çalınırken oyunu kaydedemezsiniz. Lütfen sıranın size geçmesini bekleyin.");
+        return;
+    }
+
+    if (window.currentActiveMenu === 'pvp') {
+        if (window.announceToScreenReader) window.announceToScreenReader("Çok oyunculu modda oyunu kaydedemezsiniz.");
+        return;
+    }
+
+    let saves = [];
+    try {
+        let savedData = localStorage.getItem('hafizaGuvenSavedGames');
+        if (savedData) saves = JSON.parse(savedData);
+    } catch(e) {}
+
+    const saveObj = {
+        id: Date.now(),
+        dateStr: new Date().toLocaleString('tr-TR'),
+        mode: window.inStoryMode ? 'story' : 'classic',
+        difficulty: window.activeDifficulty,
+        sequence: window.gameSequence.slice(),
+        score: window.gameScore,
+        mistakes: window.gameMistakes,
+        lives: window.playerLives || 3,
+        storyIndex: window.currentStoryIndex || 0,
+        gameTimer: window.gameTimer
+    };
+
+    saves.push(saveObj);
+    saves.sort((a, b) => b.id - a.id); // Yeniden eskiye tarih sıralaması
+
+    localStorage.setItem('hafizaGuvenSavedGames', JSON.stringify(saves));
+
+    if (window.showToastNotification) window.showToastNotification("Oyun başarıyla kaydedildi!", "success");
+    if (window.announceToScreenReader) window.announceToScreenReader("Oyun başarıyla kaydedildi! Ana menüdeki kayıtlı oyunlar kısmından devam edebilirsiniz.");
+    if (window.correctSound) window.correctSound.play();
+};
+
+window.populateSavedGamesList = function() {
+    const listEl = document.getElementById('saved-games-list');
+    if (!listEl) return;
+    
+    listEl.innerHTML = '';
+    
+    let saves = [];
+    try {
+        let savedData = localStorage.getItem('hafizaGuvenSavedGames');
+        if (savedData) saves = JSON.parse(savedData);
+    } catch(e) {}
+    
+    if (saves.length === 0) {
+        listEl.innerHTML = '<li tabindex="0">Henüz kayıtlı oyununuz bulunmuyor.</li>';
+        return;
+    }
+    
+    saves.forEach((save, index) => {
+        let li = document.createElement('li');
+        li.tabIndex = 0;
+        let modeName = save.mode === 'story' ? 'Kayıp Notalar' : (window.gameModes[save.difficulty] ? window.gameModes[save.difficulty].name : save.difficulty);
+        let scoreText = save.score > 0 ? `, Skor: ${save.score}` : '';
+        li.innerText = `${save.dateStr} - ${modeName} Modu${scoreText} - Sıra: ${save.sequence ? save.sequence.length : 1}`;
+        
+        li.setAttribute('aria-label', `${save.dateStr} tarihinde kaydedilmiş ${modeName} modu oyunu. Kaldığınız sıra: ${save.sequence ? save.sequence.length : 1}${scoreText}. Devam etmek için Enter'a basın.`);
+        li.className = 'menu-button';
+        
+        const loadAction = () => {
+            // Remove the saved game once loaded (optional, but logical for resume)
+            saves.splice(index, 1);
+            localStorage.setItem('hafizaGuvenSavedGames', JSON.stringify(saves));
+            window.loadSavedGame(save);
+        };
+
+        li.addEventListener('click', loadAction);
+        li.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadAction();
+        });
+        
+        listEl.appendChild(li);
+    });
+};
+
+window.loadSavedGame = function(saveObj) {
+    if (window.gameIsActive) {
+        window.gameIsActive = false;
+        if (window.gameInterval) clearInterval(window.gameInterval);
+        if (window.pianoNotes) { for (let k in window.pianoNotes) window.pianoNotes[k].stop(); }
+    }
+    
+    // Değişkenleri geri yükle
+    window.gameIsActive = true;
+    window.inStoryMode = (saveObj.mode === 'story');
+    window.activeDifficulty = saveObj.difficulty || 'easy';
+    window.gameSequence = saveObj.sequence || [];
+    window.gameScore = saveObj.score || 0;
+    window.gameMistakes = saveObj.mistakes || 0;
+    window.playerLives = saveObj.lives || 3;
+    window.currentStoryIndex = saveObj.storyIndex || 0;
+    window.gameTimer = saveObj.gameTimer || ((window.activeDifficulty === 'hard') ? 15 : (window.activeDifficulty === 'missing_notes') ? 45 : 30);
+    
+    window.playerInputIndex = 0;
+    window.isComputerPlaying = true;
+    
+    window.updateGameUI();
+    
+    window.switchMenu(window.savedGamesMenu, window.gameMenu, 'game');
+    
+    if (window.announceToScreenReader) {
+        window.announceToScreenReader("Kayıtlı oyun yüklendi. Notalar çalınıyor, lütfen dinleyin.");
+    }
+    
+    window.hgfzZamanlayici.setTimeout(() => {
+        if (window.playGameSequence) {
+            window.playGameSequence();
+        }
+    }, 1500);
+};

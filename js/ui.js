@@ -243,6 +243,7 @@ window.achievementsMenu = document.getElementById('achievements-menu-container')
 window.gameMenu = document.getElementById('game-menu-container');
 window.storyMenu = document.getElementById('story-menu-container');
 window.profileMenu = document.getElementById('profile-menu-container');
+window.savedGamesMenu = document.getElementById('saved-games-menu-container');
 window.socialMenu = document.getElementById('social-menu-container');
 window.pvpLobbyMenu = document.getElementById('pvp-lobby-menu-container');
 window.allMenuButtons = Array.from(document.querySelectorAll('.menu-button'));
@@ -267,6 +268,7 @@ window.getActiveButtons = function () {
     else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
     else if (window.currentActiveMenu === 'game') buttons = Array.from(window.gameMenu.querySelectorAll('.menu-button'));
     else if (window.currentActiveMenu === 'profile') buttons = Array.from(window.profileMenu.querySelectorAll('.stat-item, .stat-copy-btn, .menu-button'));
+    else if (window.currentActiveMenu === 'saved-games') buttons = Array.from(window.savedGamesMenu.querySelectorAll('li[tabindex="0"], .menu-button'));
     else if (window.currentActiveMenu === 'social') buttons = Array.from(window.socialMenu.querySelectorAll('li[tabindex="0"], .menu-button'));
     else if (window.currentActiveMenu === 'social-action') buttons = Array.from(document.getElementById('social-action-modal') ? document.getElementById('social-action-modal').querySelectorAll('.menu-button') : []);
     else if (window.currentActiveMenu === 'play-mode') buttons = Array.from(document.getElementById('play-mode-menu-container').querySelectorAll('.menu-button'));
@@ -1117,8 +1119,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // "Kayıtlı Oyundan Devam Et"
     if (btnContinueSaved) {
         btnContinueSaved.addEventListener('click', () => {
-            if (window.wrongSound) window.wrongSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader("Şu an devam edebileceğiniz kayıtlı bir oyununuz bulunmuyor.");
+            if (window.populateSavedGamesList) window.populateSavedGamesList();
+            window.switchMenu(window.mainMenu, window.savedGamesMenu, 'saved-games');
+        });
+    }
+
+    const savedGamesBackBtn = document.getElementById('saved-games-back-btn');
+    if (savedGamesBackBtn) {
+        savedGamesBackBtn.addEventListener('click', () => {
+            window.switchMenu(window.savedGamesMenu, window.mainMenu, 'main');
+        });
+    }
+    
+    const gameSaveBtn = document.getElementById('game-save-btn');
+    if (gameSaveBtn) {
+        gameSaveBtn.addEventListener('click', () => {
+            if (window.saveCurrentGame) window.saveCurrentGame();
         });
     }
 
