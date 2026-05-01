@@ -1,5 +1,5 @@
 {
-    "version": "0.97.4.17",
-    "buildId": 1777611896,
-    "changelog": "Sosyal menü sadece aktif çevrimiçi oyuncuları gösterecek şekilde düzenlendi ve Misafir bağlantılarından gelen hayalet bildirim spamı tamamen engellendi."
+    "version": "0.97.4.18",
+    "buildId": 1777611897,
+    "changelog": "Ekran okuyucuların Alıştırma ve Oyun menülerinde 'boş uygulama' şeklinde gereksiz spamlama yapması sorunu giderildi."
 }

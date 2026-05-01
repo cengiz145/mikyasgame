@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.18] - 01.05.2026
+
+Erişilebilirlik Düzeltmeleri:
+- NVDA gibi ekran okuyucularının Alıştırma (veya Hikaye/Oyun) menülerine girildiğinde iç içe geçmiş etiketlerden dolayı gereksiz yere "boş uygulama" veya "alıştırma alanı uygulama" anonsu yapması sorunu giderildi.
+
 [v0.97.4.17] - 01.05.2026
 
 Hata Düzeltmeleri ve İyileştirmeler:
