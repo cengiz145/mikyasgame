@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.26",
-    "buildId": 1777660475,
-    "changelog": "Yönetici için admintell kalıcı alarm sistemi eklendi."
+    "version": "0.97.4.27",
+    "buildId": 1777660476,
+    "changelog": "Yönetici alarmı (admintell.ogg) döngüsü kaldırılarak oyuna girişlere özel ayarlandı."
 }
 
 

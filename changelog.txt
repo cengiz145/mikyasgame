@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.27] - 02.05.2026
+
+Yeni Özellikler ve İyileştirmeler:
+- Yöneticiler için eklenen bilet ve mesaj alarm (admintell.ogg) sistemi oyuncu talebi üzerine değiştirildi. Alarm sesi artık 15 saniyede bir döngüye girmek yerine **sadece** oyuna her girişinizde okunmamış bilet/mesaj varsa ve oyun esnasında yeni bir bildirim geldiğinde tek seferlik uyaracak şekilde ayarlandı. Ayrıca, siz oyunda yokken (çevrimdışıyken) gelen özel mesajların size bildirilmeden sessizce silinmesine yol açan önemli bir hata giderilerek, oyuna girdiğinizde "Siz yokken şu kişilerden özel mesaj geldi" anonsuyla duyurulması sağlandı.
+
 [v0.97.4.26] - 02.05.2026
 
 Yeni Özellikler ve İyileştirmeler:

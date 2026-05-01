@@ -9,40 +9,17 @@ window.mevcutSurum = window.UYGULAMA_SURUMU || (typeof UYGULAMA_SURUMU !== 'unde
 window.globalChangelogVersion = null;
 window.globalChangelogMessage = null;
 
-// --- Geliştirici Özel Bildirim Sistemi (Kalıcı Uyarı) ---
-window.adminAlertState = { ticket: false, message: false };
-window.adminAlertIntervalId = null;
-
+// --- Geliştirici Özel Bildirim Sistemi (Uyarı) ---
 window.startAdminAlert = function(type) {
     let devName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "";
     if (!['ekrem'].includes(devName.toLowerCase())) return;
 
-    window.adminAlertState[type] = true;
-    
-    if (!window.adminAlertIntervalId) {
-        let snd = new Audio('sounds/admintell.ogg');
-        snd.play().catch(e=>{});
-        window.adminAlertIntervalId = setInterval(() => {
-            let s = new Audio('sounds/admintell.ogg');
-            s.play().catch(e=>{});
-        }, 15000); // 15 saniyede bir sürekli tekrar eder
-    }
+    let snd = new Audio('sounds/admintell.ogg');
+    snd.play().catch(e=>{});
 };
 
 window.stopAdminAlert = function(type) {
-    if (type) {
-        window.adminAlertState[type] = false;
-    } else {
-        window.adminAlertState.ticket = false;
-        window.adminAlertState.message = false;
-    }
-
-    if (!window.adminAlertState.ticket && !window.adminAlertState.message) {
-        if (window.adminAlertIntervalId) {
-            clearInterval(window.adminAlertIntervalId);
-            window.adminAlertIntervalId = null;
-        }
-    }
+    // Döngü kaldırıldığı için bu fonksiyona artık gerek yok, hata vermemesi için boş bırakıldı
 };
 // --------------------------------------------------------
 window.guncellemeKontrolEt = function (isManual = false) {
@@ -717,6 +694,7 @@ window.initPresenceSystem = function() {
                     if (snapshot.exists() && snapshot.hasChildren()) {
                         let totalTickets = snapshot.numChildren();
                         setTimeout(() => {
+                            if (window.startAdminAlert) window.startAdminAlert('ticket');
                             let msg = `Sistemde bekleyen ${totalTickets} adet açık bilet (geri bildirim) var. İncelemek için sohbete /bilet yazın.`;
                             if (window.announceToScreenReader) window.announceToScreenReader(msg, false);
                             if (window.showToastNotification) window.showToastNotification(msg, "info");
@@ -3828,11 +3806,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!myName || !window.db || myName === "Misafir") return;
         
         let initialInboxLoad = true;
+        let missedSenders = new Set();
+
         window.db.ref(`inbox/${myName}`).on('child_added', (snapshot) => {
             let notif = snapshot.val();
             if (!notif) return;
 
-            if (!initialInboxLoad) {
+            if (initialInboxLoad) {
+                if (!getMutedUsers().includes(notif.from)) {
+                    missedSenders.add(notif.from);
+                }
+            } else {
                 if (!getMutedUsers().includes(notif.from)) {
                     if (!window.isPrivateChatOpen || currentPrivateRecipient !== notif.from) {
                         if (window.startAdminAlert) window.startAdminAlert('message');
@@ -3845,7 +3829,15 @@ document.addEventListener('DOMContentLoaded', () => {
             snapshot.ref.remove(); 
         });
 
-        setTimeout(() => { initialInboxLoad = false; }, 2000);
+        setTimeout(() => { 
+            initialInboxLoad = false; 
+            if (missedSenders.size > 0) {
+                let senders = Array.from(missedSenders).join(", ");
+                if (window.startAdminAlert) window.startAdminAlert('message');
+                if (window.announceToScreenReader) window.announceToScreenReader(`Siz yokken şu kişilerden özel mesaj geldi: ${senders}`, true);
+                if (window.showToastNotification) window.showToastNotification(`Kaçırdığınız mesajlar var: ${senders}`, 'info');
+            }
+        }, 3000);
     };
 
     setTimeout(() => {
