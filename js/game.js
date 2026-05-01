@@ -225,7 +225,7 @@ window.playIntro = function () {
     };
 
     const startIntroBtn = document.getElementById('start-intro-btn');
-    if (startIntroBtn) startIntroBtn.style.display = 'none';
+    // Removed style.display = 'none' to maintain focus during logo playback
 
     const phase1 = document.getElementById('intro-phase-1');
     if (phase1) {
