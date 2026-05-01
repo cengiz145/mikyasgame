@@ -50,7 +50,13 @@ if ($currentVerMatches.Success) {
     $currentVer = $versionLine
 }
 
-if ($currentVer -eq $lastSentVer) {
+$muteUntil = Get-Date "2026-05-02 12:00:00"
+$now = Get-Date
+
+if ($now -lt $muteUntil) {
+    Write-Host "Telegram bildirimleri sessize alinmistir. Bitis: 2 Mayis 2026 12:00. (Bildirim gonderilmedi)" -ForegroundColor Yellow
+    Set-Content -Path $lastSentFile -Value $currentVer
+} elseif ($currentVer -eq $lastSentVer) {
     Write-Host "Bu surum ($currentVer) daha once Telegram'a gonderilmis. Yeniden bildirim gonderilmiyor." -ForegroundColor Yellow
 } else {
     Write-Host "Telegram kanalina bildirim gonderiliyor..." -ForegroundColor Cyan
