@@ -704,6 +704,10 @@ window.initPresenceSystem = function() {
             }
             // ----------------------------------------------------
 
+            window.db.ref('.info/serverTimeOffset').on('value', snap => {
+                window.serverTimeOffset = snap.val() || 0;
+            });
+
             const connectedRef = window.db.ref('.info/connected');
             
             let wasConnected = false;
@@ -757,24 +761,31 @@ window.initPresenceSystem = function() {
                 let newData = snap.val() || {};
                 let oldData = window.lastPresenceData || {};
                 let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
+                
+                let currentServerTime = Date.now() + (window.serverTimeOffset || 0);
 
                 if (!isFirstPresenceLoad) {
                     for (let k in newData) {
                         let newP = newData[k];
                         let oldP = oldData[k];
                         if (newP.name && newP.name !== myName && newP.name !== "Misafir") {
-                            if (newP.state === 'online' && (!oldP || oldP.state !== 'online')) {
-                                if (window.playerOnlineSound) window.playerOnlineSound.play();
-                                if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimiçi.`);
-                                if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimiçi.`, 'info');
-                            } else if (newP.state === 'offline' && (oldP && oldP.state === 'online')) {
-                                if (window.playerOfflineSound) window.playerOfflineSound.play();
-                                if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimdışı.`);
-                                if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimdışı.`, 'info');
-                            } else if (newP.state === 'disconnected' && (oldP && oldP.state === 'online')) {
-                                if (window.serverDisconnectSound) window.serverDisconnectSound.play();
-                                if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} bağlantısı koptu.`);
-                                if (window.showToastNotification) window.showToastNotification(`${newP.name} bağlantısı koptu.`, 'warning');
+                            // Spam Koruması: Sadece son 15 saniye içindeki olayları anons et (Oyuna ilk girişteki birikmiş spam mesajlarını engeller)
+                            let isRecent = newP.last_changed ? (currentServerTime - newP.last_changed < 15000) : false;
+                            
+                            if (isRecent) {
+                                if (newP.state === 'online' && (!oldP || oldP.state !== 'online')) {
+                                    if (window.playerOnlineSound) window.playerOnlineSound.play();
+                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimiçi.`);
+                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimiçi.`, 'info');
+                                } else if (newP.state === 'offline' && (oldP && oldP.state === 'online')) {
+                                    if (window.playerOfflineSound) window.playerOfflineSound.play();
+                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimdışı.`);
+                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimdışı.`, 'info');
+                                } else if (newP.state === 'disconnected' && (oldP && oldP.state === 'online')) {
+                                    if (window.serverDisconnectSound) window.serverDisconnectSound.play();
+                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} bağlantısı koptu.`);
+                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} bağlantısı koptu.`, 'warning');
+                                }
                             }
                         }
                     }
