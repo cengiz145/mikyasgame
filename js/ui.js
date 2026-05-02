@@ -814,6 +814,21 @@ window.renderSocialList = function() {
 
     if (!window.lastPresenceData || Object.keys(window.lastPresenceData).length === 0) {
         listEl.innerHTML = '';
+        
+        const titleEl = document.getElementById('social-menu-title');
+        const navBtnSocial = document.getElementById('nav-btn-social');
+        let meCount = (myName !== "Misafir" && myName.trim() !== "") ? 1 : 0;
+        
+        if (titleEl) {
+            titleEl.innerText = `Sosyal (${meCount} Kişi Çevrimiçi)`;
+            titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Şuan toplam ${meCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
+        }
+        
+        if (navBtnSocial) {
+            navBtnSocial.innerText = `Sosyal (${meCount})`;
+            navBtnSocial.setAttribute('aria-label', `Sosyal Menü. ${meCount} kişi çevrimiçi.`);
+        }
+
         if (myName !== "Misafir" && myName.trim() !== "") {
             let meLi = document.createElement('li');
             meLi.style.padding = "10px";
@@ -835,6 +850,23 @@ window.renderSocialList = function() {
     }
 
     let players = Object.values(window.lastPresenceData).filter(p => p.state === 'online' && p.name && p.name !== "Misafir");
+    
+    const titleEl = document.getElementById('social-menu-title');
+    const navBtnSocial = document.getElementById('nav-btn-social');
+    
+    let totalCount = players.length;
+    if (myName !== "Misafir" && myName.trim() !== "") totalCount += 1;
+
+    if (titleEl) {
+        titleEl.innerText = `Sosyal (${totalCount} Kişi Çevrimiçi)`;
+        titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Şuan toplam ${totalCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
+    }
+    
+    if (navBtnSocial) {
+        navBtnSocial.innerText = `Sosyal (${totalCount})`;
+        navBtnSocial.setAttribute('aria-label', `Sosyal Menü. ${totalCount} kişi çevrimiçi.`);
+    }
+
     if (players.length === 0) {
         listEl.innerHTML = emptyHtml;
         return;
