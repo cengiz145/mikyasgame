@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v2 Mayıs Public Beta] - 02.05.2026
+
+Genel:
+- Oyun "2 Mayıs Public Beta" sürümü olarak isimlendirildi ve halka açık (Public) Beta sürecine geçiş yapıldı.
+- Güncellemelerin oyuncuyu rahatsız etmemesi için, "Zorunlu Güncelleme" uyarısı kaldırılarak arka planda sessiz güncelleme sistemine geçildi.
+- "Ses Paketini Değiştir" öğesi okuyucular tarafından okunurken oluşan boş menü hatası temizlendi.
+
 [v0.97.4.27] - 02.05.2026
 
 Yeni Özellikler ve İyileştirmeler:
