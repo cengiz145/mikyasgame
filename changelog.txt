@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.28] - 03.05.2026
+
+Düzeltmeler:
+- "Orta" zorluk modunun kilidini açmak için "Kolay" modun tamamlanma gereksinimi düzeltildi. Artık 1 kere değil, diğer modlarda olduğu gibi 5 kere tamamlandığında kilit açılacak.
+- Sosyal menüsündeki canlı oyuncu sayısının ekran okuyucuyla veya başlıkta anlaşılamaması sorunu giderildi. Oyuncu sayısı anlık olarak menüye ve butonlara yazdırıldı.
+
 [v0.97.4.27] - 02.05.2026
 
 Yeni Özellikler ve İyileştirmeler:

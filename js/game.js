@@ -54,7 +54,7 @@ if (!localStorage.getItem('hfzReset_AllProgress_v2')) {
 // --- ANA OYUN DEĞİŞKENLERİ ---
 window.gameModes = {
     easy: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Kolay' },
-    medium: { isUnlocked: false, completionCount: 0, requiredToUnlock: 1, name: 'Orta' },
+    medium: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Orta' },
     hard: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Zor' },
     missing_notes: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Kayıp Notalar' }
 };
@@ -86,6 +86,12 @@ try {
     const savedAchievements = localStorage.getItem('hafizaGuvenAchievements');
     if (savedAchievements) window.userAchievements = JSON.parse(savedAchievements);
 } catch (e) { }
+
+// Geçmiş sürümlerden gelen oyuncuların ayarlarını yeni değere (5) zorla
+if (window.gameModes && window.gameModes.medium && window.gameModes.medium.requiredToUnlock !== 5) {
+    window.gameModes.medium.requiredToUnlock = 5;
+    try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e) {}
+}
 
 // --- YEDEKLEME VE KÜRESEL SIFIRLAMA (KILL-SWITCH) SİSTEMİ ---
 window.syncStatsToFirebase = function() {
