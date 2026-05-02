@@ -69,30 +69,25 @@ window.guncellemeKontrolEt = function (isManual = false) {
             if (!window.mevcutSurum) {
                 window.mevcutSurum = data.version;
             } else if (data.version !== window.mevcutSurum) {
-                const uyariMesaji = "Oyuna zorunlu bir güncelleme geldi! Eski sürümle oynamaya devam edemezsiniz. Lütfen Tamam'a basarak sayfayı yenileyin.";
-
-                if (window.gameIsActive || window.inStoryMode || window.currentActiveMenu !== 'main') {
-                    window.pendingUpdate = true; // Güncellemeyi sessizce beklemeye al
-                    return; // Ekranı silme işlemini iptal et
-                }
-
-                let p = document.getElementById('update-text');
-                if (p) p.innerText = "Yeni bir sürüm mevcut. Geçerli sürüm: " + window.mevcutSurum + ". Yeni sürüm: " + data.version + ". Yüklemek için enter tuşuna veya yükle butonuna basın.";
-
+                // Kullanıcı isteği: Oyun herkese açık olduğu için güncellemeleri sessiz yap. Arka planda güncelle.
                 window.mevcutSurum = data.version;
 
-                window.gameIsActive = false;
-                if (typeof Howler !== 'undefined') Howler.stop();
-                if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
+                // Arka planda Service Worker'ı güncelliyoruz, kullanıcıyı rahatsız etmiyoruz.
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                        for(let registration of registrations) {
+                            registration.update();
+                        }
+                    });
+                }
 
-                const updateSound = new window.Audio('sounds/update.ogg');
-                updateSound.play();
-
-                if (window.updateMenu) {
-                    window.switchMenu(window.mainMenu, window.updateMenu, 'update');
-                } else {
-                    alert(uyariMesaji);
-                    window.location.href = window.location.pathname + "?v=" + new Date().getTime();
+                // Tarayıcı önbelleğini arka planda temizleyerek bir sonraki girişe hazırlayalım.
+                if ('caches' in window) {
+                    caches.keys().then((names) => {
+                        names.forEach((name) => {
+                            caches.delete(name);
+                        });
+                    });
                 }
             } else {
                 // Sessizce güncelleme durumunu UI'da tuttuk.
@@ -1118,7 +1113,13 @@ document.addEventListener('DOMContentLoaded', () => {
             btnChangeInst.setAttribute('aria-label', "Ses paketini değiştirmek için tıklayın. Geçerli paket: " + n);
             
             let packsUnlocked = localStorage.getItem('hafizaGuvenSoundPacksUnlocked') === 'true';
-            btnChangeInst.style.display = packsUnlocked ? 'inline-block' : 'none';
+            
+            const liChangeInst = document.getElementById('li-change-instrument');
+            if (liChangeInst) {
+                liChangeInst.style.display = packsUnlocked ? 'block' : 'none';
+            } else {
+                btnChangeInst.style.display = packsUnlocked ? 'inline-block' : 'none';
+            }
         }
     };
 
