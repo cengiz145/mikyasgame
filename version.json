@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.28",
-    "buildId": 1777660476,
-    "changelog": "Yönetici alarmı (admintell.ogg) döngüsü kaldırılarak oyuna girişlere özel ayarlandı."
+    "version": "0.97.4.29",
+    "buildId": 1777660477,
+    "changelog": "Kayıp Notalar modunun süresi 40 saniye uzatıldı ve geri sayım 30 saniyeden başlatıldı."
 }
 
 

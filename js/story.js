@@ -244,9 +244,9 @@ window.initializeMissingNotesMap = function() {
         window.mountainSound.play();
     }
 
-    // Zamanlayıcıyı başlat (3 dakika = 180 saniye)
+    // Zamanlayıcıyı başlat (220 saniye)
     if (window.storyTimerIntervalId) clearInterval(window.storyTimerIntervalId);
-    window.storyTimerValue = 180;
+    window.storyTimerValue = 220;
     
     window.storyTimerIntervalId = setInterval(() => {
         if (window.isStoryModeWon) {
@@ -256,16 +256,18 @@ window.initializeMissingNotesMap = function() {
         
         window.storyTimerValue--;
         
-        if (window.storyTimerValue === 120) {
+        if (window.storyTimerValue === 180) {
+            if (window.announceToScreenReader) window.announceToScreenReader("3 dakika kaldı.");
+        } else if (window.storyTimerValue === 120) {
             if (window.announceToScreenReader) window.announceToScreenReader("2 dakika kaldı.");
         } else if (window.storyTimerValue === 60) {
             if (window.announceToScreenReader) window.announceToScreenReader("1 dakika kaldı.");
-        } else if (window.storyTimerValue === 20) {
-            if (window.announceToScreenReader) window.announceToScreenReader("Son 20 saniye kaldı.");
+        } else if (window.storyTimerValue === 30) {
+            if (window.announceToScreenReader) window.announceToScreenReader("Son 30 saniye kaldı.");
         }
         
-        if (window.storyTimerValue <= 60 && window.storyTimerValue > 0) {
-            // Son 1 dakikada her saniye heyecan artırıcı sesi çal
+        if (window.storyTimerValue <= 30 && window.storyTimerValue > 0) {
+            // Son 30 saniyede her saniye heyecan artırıcı sesi çal
             if (window.seconsSound) window.seconsSound.play();
         }
         

@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.29] - 05.05.2026
+
+İyileştirmeler:
+- Kayıp Notalar modunun süresi 40 saniye uzatıldı ve heyecan artırıcı kalp atışı sesi son 1 dakika yerine son 30 saniye kala başlayacak şekilde güncellendi.
+
 [v0.97.4.28] - 03.05.2026
 
 Düzeltmeler:
