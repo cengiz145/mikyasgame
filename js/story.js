@@ -80,10 +80,12 @@ window.playCurrentStoryDialog = function() {
 
     if (window.dado3Sound) window.dado3Sound.play();
     storyStatus.innerHTML = finalHtml;
+    storyStatus.blur();
+    setTimeout(() => storyStatus.focus(), 10);
     
     // Explicitly announce for screen readers
     if (window.announceToScreenReader) {
-        window.announceToScreenReader(window.localizeText(appendedText));
+        window.announceToScreenReader(window.localizeText(appendedText), true);
     }
 };
 
@@ -500,12 +502,22 @@ window.handleStoryWalking = function(key) {
             try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens); } catch(e){}
             
             let winMsg = `Tebrikler! Tüm notaları sırasıyla topladın ve piyanoyu onardın. Kayıp Notalar modunu başarıyla tamamladın! Bu hikaye için ${reward} jeton kazandınız${eventMsg}. Toplam jetonunuz ${totalTokens}.`;
-            if (window.announceToScreenReader) window.announceToScreenReader(winMsg);
+            if (window.announceToScreenReader) window.announceToScreenReader(winMsg, true);
+            
+            const storyStatus = document.getElementById('story-status-text');
+            if (storyStatus) {
+                storyStatus.innerHTML = winMsg;
+                storyStatus.blur();
+                setTimeout(() => storyStatus.focus(), 10);
+            }
             
             window.storyWinTimeout = window.hgfzZamanlayici.setTimeout(() => {
                 window.isStoryModeFinishedWaitingForEnter = true;
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader("Ana menüye dönmek için entıra basın.");
+                    window.announceToScreenReader("Ana menüye dönmek için entıra basın.", true);
+                }
+                if (storyStatus) {
+                    storyStatus.innerHTML += "<br><br>Ana menüye dönmek için entıra basın.";
                 }
             }, 3000);
         }

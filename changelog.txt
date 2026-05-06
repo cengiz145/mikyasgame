@@ -1,5 +1,17 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.31] - 06.05.2026
+
+İyileştirmeler:
+- Seçeneklerdeki "Kayıp Notalar Hikaye Modu" ayarı "Kayıp Notalar Hikaye Diyaloğunu Atla" olarak değiştirildi. Artık bu ayar açıldığında oyun modunu tamamen kapatmak yerine sadece başlangıçtaki diyalogları atlayarak doğrudan oyuna girilmesini sağlıyor.
+
+[v0.97.4.30] - 06.05.2026
+
+İyileştirmeler ve Düzeltmeler:
+- Seçenekler menüsüne Kayıp Notalar hikaye modunu kapatma seçeneği eklendi. (Varsayılan: Açık)
+- Kayıp Notalar modunda 2. ve 3. oynanışlarda ekran okuyucunun hikayeyi bazen okumaması sorunu giderildi.
+- Kayıp Notalar modunda oyun bitiminde tebrikler ekranının çıkmaması sorunu çözüldü.
+
 [v0.97.4.29] - 05.05.2026
 
 İyileştirmeler:

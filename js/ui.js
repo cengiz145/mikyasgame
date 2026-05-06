@@ -1747,6 +1747,29 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        const toggleStoryBtn = document.getElementById('toggle-story-mode-btn');
+        window.updateStoryBtnState = () => {
+            let disableStory = localStorage.getItem('hafizaGuvenDisableStoryMode') === 'true';
+            if (toggleStoryBtn) {
+                toggleStoryBtn.innerText = disableStory ? "Kayıp Notalar Hikaye Diyaloğunu Atla (Açık)" : "Kayıp Notalar Hikaye Diyaloğunu Atla (Kapalı)";
+                toggleStoryBtn.setAttribute('aria-label', toggleStoryBtn.innerText);
+            }
+        };
+
+        if (toggleStoryBtn) {
+            window.updateStoryBtnState();
+            toggleStoryBtn.addEventListener('click', () => {
+                if (window.menuEnterSound) window.menuEnterSound.play();
+                let disableStory = localStorage.getItem('hafizaGuvenDisableStoryMode') === 'true';
+                disableStory = !disableStory;
+                localStorage.setItem('hafizaGuvenDisableStoryMode', disableStory);
+                window.updateStoryBtnState();
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader(disableStory ? "Hikaye diyalogları atlanacak." : "Hikaye diyalogları gösterilecek.", true);
+                }
+            });
+        }
+
         const themeSelector = document.getElementById('theme-selector');
         if (themeSelector) {
             themeSelector.addEventListener('keydown', blockUpDown);
@@ -2622,13 +2645,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 window.inStoryMode = true;
-                window.isDialogPhase = true;
-                window.currentStoryIndex = 0;
                 window.isStarted = true;
-                window.storyEntryTimeout = setTimeout(() => {
-                    if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
-                    if (window.triggerStoryAnimations) window.triggerStoryAnimations(0);
-                }, 350);
+                
+                let skipStoryDialogues = localStorage.getItem('hafizaGuvenDisableStoryMode') === 'true';
+                
+                if (skipStoryDialogues) {
+                    window.isGridWalkingPhase = true;
+                    window.isDialogPhase = false;
+                    window.playerX = 1;
+                    if (typeof window.initializeMissingNotesMap === 'function') window.initializeMissingNotesMap();
+                    window.currentAutoWalkStep = 0;
+                    
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kayıp Notalar macerasına başlıyorsunuz. İlk notayı bulmak için sağ ok tuşuna basıp karlı zeminde yürüyün.", false);
+                    if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
+                    
+                    if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
+                    if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
+                    if (window.house2Sound && window.house2Sound.playing()) window.house2Sound.stop();                
+                    
+                    if (window.playAutomatedWalkingScene) {
+                        window.playAutomatedWalkingScene();
+                    } else {
+                        const storyStatus = document.getElementById('story-status-text');
+                        if (storyStatus) storyStatus.innerHTML = `X Konumu: ${window.playerX}`;
+                    }
+                } else {
+                    window.isDialogPhase = true;
+                    window.currentStoryIndex = 0;
+                    window.storyEntryTimeout = setTimeout(() => {
+                        if (window.playCurrentStoryDialog) window.playCurrentStoryDialog();
+                        if (window.triggerStoryAnimations) window.triggerStoryAnimations(0);
+                    }, 350);
+                }
             });
         }
 

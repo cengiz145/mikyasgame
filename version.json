@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.29",
-    "buildId": 1777660477,
-    "changelog": "Kayıp Notalar modunun süresi 40 saniye uzatıldı ve geri sayım 30 saniyeden başlatıldı."
+    "version": "0.97.4.31",
+    "buildId": 1777660479,
+    "changelog": "Ayarlardaki hikaye modunu kapatma seçeneği sadece başlangıç diyaloglarını atlayacak şekilde değiştirildi."
 }
 
 
