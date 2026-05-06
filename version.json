@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.31",
-    "buildId": 1777660479,
-    "changelog": "Ayarlardaki hikaye modunu kapatma seçeneği sadece başlangıç diyaloglarını atlayacak şekilde değiştirildi."
+    "version": "0.97.4.32",
+    "buildId": 1777660480,
+    "changelog": "Kayıp Notalar modunda 7 nota toplandığında sürenin arka planda akmaya devam etmesi sorunu düzeltildi."
 }
 
 

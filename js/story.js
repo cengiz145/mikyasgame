@@ -251,7 +251,7 @@ window.initializeMissingNotesMap = function() {
     window.storyTimerValue = 220;
     
     window.storyTimerIntervalId = setInterval(() => {
-        if (window.isStoryModeWon) {
+        if (window.isStoryModeWon || (window.notesInPiano && window.notesInPiano.length >= window.MAX_NOTES)) {
             clearInterval(window.storyTimerIntervalId);
             return;
         }

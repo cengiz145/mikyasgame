@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.32] - 06.05.2026
+
+Düzeltmeler:
+- Kayıp Notalar modunda 7. nota piyanoya yerleştirildiğinde sürenin durmaması ve "Entıra basın" yazısını okurken oyunun kaybettin olarak sonuçlanması sorunu tamamen çözüldü. Artık tüm notalar toplandığı anda arka plandaki geri sayım anında duruyor.
+
 [v0.97.4.31] - 06.05.2026
 
 İyileştirmeler:
