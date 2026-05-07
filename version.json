@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.36",
-    "buildId": 1777660484,
-    "changelog": "Kayıp Notalar modunu bitirdiğinizde mağazadaki enstrüman paketlerinin (Bağlama, Kaval vb.) açılmamasına neden olan zorluk seviyesi şartı (Kolay, Orta, Zor 5 kez bitirme) hatası düzeltildi. Artık sadece hikayeyi bitirmek yeterli."
+    "version": "0.97.4.37",
+    "buildId": 1777660485,
+    "changelog": "Profil sekmesine kullanıcı adını pratik şekilde değiştirme butonu eklendi."
 }
 
 

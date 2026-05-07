@@ -1465,6 +1465,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const btnChangeUsername = document.getElementById('btn-change-username');
+    if (btnChangeUsername) {
+        btnChangeUsername.addEventListener('click', () => {
+            if (window.menuEnterSound) window.menuEnterSound.play();
+            let currentName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
+            
+            setTimeout(() => {
+                let newName = prompt("Yeni kullanıcı adınızı girin:", currentName !== "Bilinmeyen" ? currentName : "");
+                if (newName && newName.trim() !== "") {
+                    newName = newName.trim();
+                    window.currentChatUser = newName;
+                    localStorage.setItem('chatUsername', newName);
+                    sessionStorage.setItem('chatNickname', newName);
+                    localStorage.setItem('hafizaGuvenUserNickname', newName);
+                    
+                    let nameEl = document.getElementById('profile-player-name');
+                    if (nameEl) nameEl.innerText = newName;
+                    
+                    if (window.successSound) {
+                        window.successSound.volume(0.8);
+                        window.successSound.play();
+                    }
+                    if (window.announceToScreenReader) {
+                        window.announceToScreenReader(`Kullanıcı adınız başarıyla ${newName} olarak değiştirildi.`, true);
+                    }
+                } else if (newName !== null) {
+                    if (window.wrongSound) window.wrongSound.play();
+                    if (window.announceToScreenReader) {
+                        window.announceToScreenReader("Geçersiz veya boş bir kullanıcı adı girdiniz. İşlem iptal edildi.", true);
+                    }
+                }
+            }, 100);
+        });
+    }
+
     // PC Sekme Geçiş Kısayolları (Alt + 1, Alt + 2, Alt + 3)
     document.addEventListener('keydown', (e) => {
         const safeMenus = ['main', 'profile', 'social', 'scoreboard', 'stats', 'achievements', 'store', 'play-mode', 'difficulty', 'settings'];

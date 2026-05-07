@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.37] - 07.05.2026
+
+Yeni Özellikler ve İyileştirmeler:
+- Profil menüsüne kullanıcı adını istenildiği zaman hızlıca değiştirebilmek için yeni bir buton eklendi. Girdiğiniz yeni isim, oyun içindeki ve sosyal sohbet alanlarındaki isminizi otomatik olarak anında günceller.
+
 [v0.97.4.36] - 07.05.2026
 
 Düzeltmeler ve İyileştirmeler:
