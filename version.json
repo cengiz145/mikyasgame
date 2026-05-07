@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.35",
-    "buildId": 1777660483,
-    "changelog": "Kayıp Notalar modunda, 7. notayı yerleştirdikten sonra oyuncu piyanodan uzaklaştığında Onay (Enter) tuşunun devre dışı kalmasına neden olan kritik bir hata giderildi. Ayrıca yanlış nota bulunduğunda çıkan uyarının içeriği iyileştirildi."
+    "version": "0.97.4.36",
+    "buildId": 1777660484,
+    "changelog": "Kayıp Notalar modunu bitirdiğinizde mağazadaki enstrüman paketlerinin (Bağlama, Kaval vb.) açılmamasına neden olan zorluk seviyesi şartı (Kolay, Orta, Zor 5 kez bitirme) hatası düzeltildi. Artık sadece hikayeyi bitirmek yeterli."
 }
 
 

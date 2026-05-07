@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.36] - 07.05.2026
+
+Düzeltmeler ve İyileştirmeler:
+- Kayıp Notalar hikaye modunu bitiren oyunculara "Farklı ses paketlerinin kilidi açıldı" demesine rağmen mağazada enstrümanların (Bağlama, Kaval vb.) açılmamasına neden olan zorluk seviyesi şartı (Kolay, Orta, Zor 5 kez bitirme) hatası düzeltildi. Artık sadece Kayıp Notalar modunu 1 kez bitirmek, mağazadaki enstrüman paketlerinin kilitlerini açmak için yeterli olacak.
+
 [v0.97.4.35] - 07.05.2026
 
 Düzeltmeler ve İyileştirmeler:

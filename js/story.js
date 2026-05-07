@@ -449,13 +449,9 @@ window.handleStoryWalking = function(key) {
                     try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}
                 }
                 
-                let easyCount = (window.gameModes && window.gameModes.easy) ? window.gameModes.easy.completionCount : 0;
-                let mediumCount = (window.gameModes && window.gameModes.medium) ? window.gameModes.medium.completionCount : 0;
-                let hardCount = (window.gameModes && window.gameModes.hard) ? window.gameModes.hard.completionCount : 0;
-                let storyCount = (window.gameModes && window.gameModes.missing_notes) ? window.gameModes.missing_notes.completionCount : 0;
                 let isPacksUnlocked = localStorage.getItem('hafizaGuvenSoundPacksUnlocked') === 'true';
 
-                if (!isPacksUnlocked && easyCount >= 5 && mediumCount >= 5 && hardCount >= 5 && storyCount >= 1) {
+                if (!isPacksUnlocked) {
                     localStorage.setItem('hafizaGuvenSoundPacksUnlocked', 'true');
                     window.isSoundPacksUnlockDialogWaitingForEnter = true;
                     
