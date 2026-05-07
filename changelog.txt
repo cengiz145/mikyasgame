@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.35] - 07.05.2026
+
+Düzeltmeler ve İyileştirmeler:
+- Kayıp Notalar modunda 7. ve son notayı piyanoya yerleştirdikten sonra oyuncu yanlışlıkla piyanodan (X:0 konumundan) uzaklaştığında "Onay (Enter)" tuşunun veya mobil "Onay" butonunun çalışmasını engelleyen (oyunun bitmesini engelleyen) kritik bir hata düzeltildi. Artık 7. notayı yerleştirdiğiniz an piyanodan ayrılamayacaksınız ve Onay tuşu her koşulta başarıyla çalışacak.
+- Kayıp Notalar modunda 3 saniyelik "Tebrikler / Alkış" sesi bitmeden Onay (Enter) tuşuna art arda basıldığında, yeni enstrüman paketi hediyelerinin (Bağlama, Kaval, Flüt) kazanımını iptal eden gizli bir hata giderildi. Artık oyuncular alkış bitene (3 saniye) kadar Onay tuşuna basıp ödüllerini iptal edemeyecek.
+- Kayıp Notalar modunda, oyuncu yanlış sıradaki bir notayı bulduğunda sistem artık sadece "Bir nota buldunuz ama sırası değil" demek yerine, doğrudan hangi notayı bulduğunuzu (Örn: "Burada Mi notası var ama sırası değil!") söyleyecek. Bu sayede notaların yerlerini aklınızda tutmanız çok daha kolaylaşacak.
+- Kayıp Notalar hikaye diyaloglarını atlama seçeneği açık olduğunda, her oyuna girişte tekrarlanan 30 saniyelik uzun kurallar açıklaması kısaltıldı. Sadece oyuncunun bulunduğu X konumu okunacak.
+
 [v0.97.4.34] - 07.05.2026
 
 Yeni Özellikler:

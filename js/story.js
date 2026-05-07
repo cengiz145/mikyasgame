@@ -236,8 +236,13 @@ window.initializeMissingNotesMap = function() {
 
     window.playerX = availableX[7];
 
+    let skipStoryDialogues = localStorage.getItem('hafizaGuvenDisableStoryMode') === 'true';
     if (window.announceToScreenReader) {
-        window.announceToScreenReader(`Dışarıdasın. Kar üstünde rastgele bir noktaya ışınlandın. X konumun: ${window.playerX}. Piyanoya dönmek için X: 0 konumuna doğru yürümelisin. Etrafta rastgele yerleştirilmiş ${window.MAX_NOTES} adet nota var. Bir nota bulduğunda F tuşuna basarak onu alabilirsin. Tüm notaları sırasıyla (Do, Re, Mi, Fa, Sol, La, Si) piyanoya getirmelisin.`);
+        if (skipStoryDialogues) {
+            window.announceToScreenReader(`Dışarıdasın. X konumun: ${window.playerX}.`);
+        } else {
+            window.announceToScreenReader(`Dışarıdasın. Kar üstünde rastgele bir noktaya ışınlandın. X konumun: ${window.playerX}. Piyanoya dönmek için X: 0 konumuna doğru yürümelisin. Etrafta rastgele yerleştirilmiş ${window.MAX_NOTES} adet nota var. Bir nota bulduğunda F tuşuna basarak onu alabilirsin. Tüm notaları sırasıyla (Do, Re, Mi, Fa, Sol, La, Si) piyanoya getirmelisin.`);
+        }
     }
 
     if (window.mountainSound && !window.mountainSound.playing()) {
@@ -296,7 +301,7 @@ window.initializeMissingNotesMap = function() {
 window.handleStoryWalking = function(key) {
     if (!window.isGridWalkingPhase) return;
 
-    if (window.isStoryModeWon && key !== 'Enter') {
+    if ((window.isStoryModeWon || (window.notesInPiano && window.notesInPiano.length >= window.MAX_NOTES)) && key !== 'Enter') {
         return;
     }
 
@@ -384,9 +389,11 @@ window.handleStoryWalking = function(key) {
                         window.activeNotes[foundNote].volume(1.0);
                         window.activeNotes[foundNote].play();
                     }
+                    const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
+                    const foundName = trNames[foundNote];
                     window.hgfzZamanlayici.setTimeout(() => {
                         if (window.wrongSound) window.wrongSound.play();
-                        if (window.announceToScreenReader) window.announceToScreenReader("Bir nota buldunuz ama sırası değil! Notaları doğru sırayla toplamalısınız.");
+                        if (window.announceToScreenReader) window.announceToScreenReader(`Burada ${foundName} notası var ama sırası değil! Notaları doğru sırayla toplamalısınız.`);
                     }, 400);
                 }
             } else {
@@ -415,7 +422,7 @@ window.handleStoryWalking = function(key) {
         }
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
     } else if (key === 'Enter') {
-        if (window.playerX === window.pianoX && window.notesInPiano.length === window.MAX_NOTES && !window.carryingNote) {
+        if (window.notesInPiano.length === window.MAX_NOTES && !window.carryingNote) {
             if (window.isSoundPacksUnlockDialogWaitingForEnter) {
                 window.isSoundPacksUnlockDialogWaitingForEnter = false;
                 window.isGridWalkingPhase = false;
@@ -433,7 +440,7 @@ window.handleStoryWalking = function(key) {
                 return;
             }
 
-            if (window.isStoryModeFinishedWaitingForEnter || window.isStoryModeWon) {
+            if (window.isStoryModeFinishedWaitingForEnter) {
                 window.isStoryModeFinishedWaitingForEnter = false;
                 if (window.storyWinTimeout) clearTimeout(window.storyWinTimeout);
                 

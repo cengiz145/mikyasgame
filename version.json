@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.34",
-    "buildId": 1777660482,
-    "changelog": "Ayarlara oyun içi motivasyon mesajlarını kapatma seçeneği eklendi. Mobil cihazlarda Kayıp Notalar modunda süre sorgulama eksikliği giderildi."
+    "version": "0.97.4.35",
+    "buildId": 1777660483,
+    "changelog": "Kayıp Notalar modunda, 7. notayı yerleştirdikten sonra oyuncu piyanodan uzaklaştığında Onay (Enter) tuşunun devre dışı kalmasına neden olan kritik bir hata giderildi. Ayrıca yanlış nota bulunduğunda çıkan uyarının içeriği iyileştirildi."
 }
 
 
