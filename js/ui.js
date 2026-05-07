@@ -766,8 +766,9 @@ window.initPresenceSystem = function() {
                         if (newP.name && newP.name !== myName && newP.name !== "Misafir") {
                             // Spam Koruması: Sadece son 15 saniye içindeki olayları anons et (Oyuna ilk girişteki birikmiş spam mesajlarını engeller)
                             let isRecent = newP.last_changed ? (currentServerTime - newP.last_changed < 15000) : false;
+                            let disableOnlineStatus = localStorage.getItem('hafizaGuvenDisableOnlineStatus') === 'true';
                             
-                            if (isRecent) {
+                            if (isRecent && !disableOnlineStatus) {
                                 if (newP.state === 'online' && (!oldP || oldP.state !== 'online')) {
                                     if (window.playerOnlineSound) window.playerOnlineSound.play();
                                     if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimiçi.`);
@@ -786,9 +787,12 @@ window.initPresenceSystem = function() {
                     }
                     for (let k in oldData) {
                         if (!newData[k] && oldData[k].name !== myName && oldData[k].name !== "Misafir" && oldData[k].state === 'online') {
-                            if (window.serverDisconnectSound) window.serverDisconnectSound.play();
-                            if (window.announceToScreenReader) window.announceToScreenReader(`${oldData[k].name} bağlantısı koptu.`);
-                            if (window.showToastNotification) window.showToastNotification(`${oldData[k].name} bağlantısı koptu.`, 'warning');
+                            let disableOnlineStatus = localStorage.getItem('hafizaGuvenDisableOnlineStatus') === 'true';
+                            if (!disableOnlineStatus) {
+                                if (window.serverDisconnectSound) window.serverDisconnectSound.play();
+                                if (window.announceToScreenReader) window.announceToScreenReader(`${oldData[k].name} bağlantısı koptu.`);
+                                if (window.showToastNotification) window.showToastNotification(`${oldData[k].name} bağlantısı koptu.`, 'warning');
+                            }
                         }
                     }
                 }
@@ -1766,6 +1770,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.updateStoryBtnState();
                 if (window.announceToScreenReader) {
                     window.announceToScreenReader(disableStory ? "Hikaye diyalogları atlanacak." : "Hikaye diyalogları gösterilecek.", true);
+                }
+            });
+        }
+
+        const toggleOnlineBtn = document.getElementById('toggle-online-status-btn');
+        window.updateOnlineBtnState = () => {
+            let disableOnline = localStorage.getItem('hafizaGuvenDisableOnlineStatus') === 'true';
+            if (toggleOnlineBtn) {
+                toggleOnlineBtn.innerText = disableOnline ? "Çevrimiçi Bildirimleri: Kapalı" : "Çevrimiçi Bildirimleri: Açık";
+                toggleOnlineBtn.setAttribute('aria-label', toggleOnlineBtn.innerText);
+            }
+        };
+
+        if (toggleOnlineBtn) {
+            window.updateOnlineBtnState();
+            toggleOnlineBtn.addEventListener('click', () => {
+                if (window.menuEnterSound) window.menuEnterSound.play();
+                let disableOnline = localStorage.getItem('hafizaGuvenDisableOnlineStatus') === 'true';
+                disableOnline = !disableOnline;
+                localStorage.setItem('hafizaGuvenDisableOnlineStatus', disableOnline);
+                window.updateOnlineBtnState();
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader(disableOnline ? "Çevrimiçi bildirimleri kapatıldı." : "Çevrimiçi bildirimleri açıldı.", true);
                 }
             });
         }

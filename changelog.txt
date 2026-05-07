@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.33] - 07.05.2026
+
+Yeni Özellikler:
+- Seçenekler menüsüne "Çevrimiçi Bildirimleri" ayarı eklendi. Bu ayar sayesinde diğer oyuncuların oyuna giriş ve çıkışlarında gelen çevrimiçi/çevrimdışı mesajlarını devre dışı bırakabilirsiniz. (Varsayılan: Açık)
+
 [v0.97.4.32] - 06.05.2026
 
 Düzeltmeler:
