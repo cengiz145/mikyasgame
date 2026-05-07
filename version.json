@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.37",
-    "buildId": 1777660485,
-    "changelog": "Profil sekmesine kullanıcı adını pratik şekilde değiştirme butonu eklendi."
+    "version": "0.97.4.38",
+    "buildId": 1777660486,
+    "changelog": "Geliştirici ve Tester'lar için sohbet penceresinden rütbe atama sistemi eklendi (/rütbe komutu)."
 }
 
 

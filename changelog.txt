@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.38] - 07.05.2026
+
+Yeni Özellikler ve İyileştirmeler:
+- Geliştirici ve "Tester" yetkisine sahip kullanıcıların, diğer oyunculara rütbe atayabilmesi için komut sistemi geliştirildi. Sosyal (Sohbet) penceresine "/rütbe [isim] [rütbe_adı]" yazılarak herhangi bir oyuncunun rütbesi kalıcı olarak değiştirilebilir (Örn: /rütbe ali Tester).
+- Rütbeler sohbet alanında ismin başında renkli baloncuklar ile gösterilecek şekilde özelleştirildi (Geliştirici turuncu, Tester pembe renkli olacak).
+
 [v0.97.4.37] - 07.05.2026
 
 Yeni Özellikler ve İyileştirmeler:

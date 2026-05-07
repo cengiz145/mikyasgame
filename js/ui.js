@@ -3490,6 +3490,33 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (text.toLowerCase().startsWith('/rutbe ') || text.toLowerCase().startsWith('/rütbe ')) {
+            let cUserNick = (nickname || "").toLowerCase();
+            let isDev = ['ekrem'].includes(cUserNick) || (window.playerRanks && window.playerRanks[cUserNick] && window.playerRanks[cUserNick].toLowerCase() === 'tester');
+            
+            if (!isDev) {
+                if (window.announceToScreenReader) window.announceToScreenReader("Bu komutu kullanma yetkiniz yok.", true);
+                chatMessageInput.value = '';
+                chatMessageInput.focus();
+                return;
+            }
+
+            let parts = text.split(" ");
+            if (parts.length >= 3) {
+                let targetUser = parts[1].toLowerCase();
+                let newRank = parts.slice(2).join(" ");
+                window.db.ref('ranks/' + targetUser).set(newRank).then(() => {
+                    if (window.announceToScreenReader) window.announceToScreenReader(`${targetUser} kullanıcısının rütbesi başarıyla ${newRank} yapıldı.`, true);
+                    chatMessageInput.value = '';
+                }).catch(err => {
+                    if (window.announceToScreenReader) window.announceToScreenReader("Rütbe değiştirilirken bir hata oluştu.", true);
+                });
+            } else {
+                if (window.announceToScreenReader) window.announceToScreenReader("Kullanım: /rütbe [kullanıcı_adı] [yeni_rütbe]", true);
+            }
+            return;
+        }
+
         if (nickname !== '' && text !== '') {
             const messageData = {
                 nickname: nickname,
@@ -3565,6 +3592,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mesajları Dinleme İşlevi (Sadece son 50 mesaj)
     // Firebase push() anahtarları zaten kronolojik olduğu için orderByChild'a gerek yoktur, bu sayede Index hatası vermez ve geçmişi kesin yükler.
+    
+    window.playerRanks = {};
+    window.db.ref('ranks').on('value', snap => {
+        window.playerRanks = snap.val() || {};
+        let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
+        if (myName !== "Bilinmeyen") {
+            let myRank = "Oyuncu";
+            let isimKucuk = myName.toLowerCase();
+            if (['ekrem'].includes(isimKucuk)) {
+                myRank = "Geliştirici";
+            } else if (window.playerRanks && window.playerRanks[isimKucuk]) {
+                myRank = window.playerRanks[isimKucuk];
+            }
+            let r_el = document.getElementById('profile-player-rank');
+            if (r_el) r_el.innerText = myRank;
+        }
+    });
+
     const messagesRef = window.db.ref('messages').limitToLast(50);
     const chatLoadTime = Date.now();
     
@@ -3624,7 +3669,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Rütbe Belirleme
             let isimKucuk = (data.nickname || "").toLowerCase();
             let isDevRender = ['ekrem'].includes(isimKucuk);
-            let rutbe = isDevRender ? "Geliştirici" : "Oyuncu";
+            let rutbe = "Oyuncu";
+            if (isDevRender) {
+                rutbe = "Geliştirici";
+            } else if (window.playerRanks && window.playerRanks[isimKucuk]) {
+                rutbe = window.playerRanks[isimKucuk];
+            }
             
             // Benim gönderdiğim mesaj mı yoksa başkasının mı?
             const isMe = data.nickname === chatNicknameInput.value.trim() && chatNicknameInput.value.trim() !== "";
@@ -3632,10 +3682,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             li.setAttribute('aria-label', `[${timeRaw}] ${rutbe} ${escapeHTML(data.nickname)}: ${escapeHTML(data.text)}`);
             
+            let rankColor = isDevRender ? '#ffaa00' : (rutbe.toLowerCase() === 'tester' ? '#ff55ff' : (rutbe !== 'Oyuncu' ? '#55aaff' : (isMe ? '#9bbca1' : '#88acb8')));
+            
             // Whatsapp Görsel Balonu
             li.innerHTML = `
                 <div class="wp-bubble" aria-hidden="true">
-                    ${!isMe ? `<div class="wp-sender"><span style="color:${isDevRender ? '#ffaa00' : '#88acb8'}; font-size:0.85em;">[${rutbe}]</span> ${escapeHTML(data.nickname)}</div>` : `<div style="font-size: 0.75em; color:${isDevRender ? '#ffaa00' : '#9bbca1'}; margin-bottom: 3px;">[${rutbe}]</div>`}
+                    ${!isMe ? `<div class="wp-sender"><span style="color:${rankColor}; font-size:0.85em;">[${rutbe}]</span> ${escapeHTML(data.nickname)}</div>` : `<div style="font-size: 0.75em; color:${rankColor}; margin-bottom: 3px;">[${rutbe}]</div>`}
                     <div class="wp-text">${escapeHTML(data.text)}</div>
                     ${timeString}
                 </div>
