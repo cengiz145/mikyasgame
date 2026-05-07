@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.33",
-    "buildId": 1777660481,
-    "changelog": "Ayarlara oyuncuların çevrimiçi/çevrimdışı olma bildirimlerini kapatma seçeneği eklendi."
+    "version": "0.97.4.34",
+    "buildId": 1777660482,
+    "changelog": "Ayarlara oyun içi motivasyon mesajlarını kapatma seçeneği eklendi. Mobil cihazlarda Kayıp Notalar modunda süre sorgulama eksikliği giderildi."
 }
 
 

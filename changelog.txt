@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.34] - 07.05.2026
+
+Yeni Özellikler:
+- Seçenekler menüsüne "Oyun İçi Motivasyon Mesajları" ayarı eklendi. Ana oyunda veya Alıştırma modunda çıkan "Harika!", "Süper!" gibi bildirimleri kapatarak sadece "Doğru" veya "Yanlış" gibi sade geri bildirimler almak isteyenler bu özelliği kullanabilir.
+
+Düzeltmeler:
+- Mobil cihazlarda Kayıp Notalar modunda, oyuncuların "Kalan Süreyi" kontrol edebilecekleri (T tuşuna karşılık gelen) bir buton eksikliği giderildi. Artık mobil ekran menüsünde süre sorgulama butonu aktif.
+
 [v0.97.4.33] - 07.05.2026
 
 Yeni Özellikler:

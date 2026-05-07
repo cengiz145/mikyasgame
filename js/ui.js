@@ -383,7 +383,7 @@ window.updateMobileStoryKeys = function(isStory) {
         keys[2].setAttribute('data-key', 'ArrowRight'); keys[2].textContent = 'Sağ >'; keys[2].setAttribute('aria-label', 'Sağa Yürü'); keys[2].disabled = false;
         keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F Bul'; keys[3].setAttribute('aria-label', 'Notayı Ara veya Al'); keys[3].disabled = false;
         keys[4].setAttribute('data-key', 'Enter'); keys[4].textContent = 'Onay'; keys[4].setAttribute('aria-label', 'Onay'); keys[4].disabled = false;
-        keys[5].textContent = '---'; keys[5].setAttribute('aria-label', 'Devre Dışı'); keys[5].disabled = true;
+        keys[5].setAttribute('data-key', 't'); keys[5].textContent = 'Süre'; keys[5].setAttribute('aria-label', 'Süreyi Sorgula'); keys[5].disabled = false;
         keys[6].textContent = '---'; keys[6].setAttribute('aria-label', 'Devre Dışı'); keys[6].disabled = true;
     } else {
         keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'C'; keys[0].setAttribute('aria-label', 'C Notası'); keys[0].disabled = false;
@@ -1793,6 +1793,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.updateOnlineBtnState();
                 if (window.announceToScreenReader) {
                     window.announceToScreenReader(disableOnline ? "Çevrimiçi bildirimleri kapatıldı." : "Çevrimiçi bildirimleri açıldı.", true);
+                }
+            });
+        }
+
+        const toggleMotivationBtn = document.getElementById('toggle-motivation-btn');
+        window.updateMotivationBtnState = () => {
+            let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
+            if (toggleMotivationBtn) {
+                toggleMotivationBtn.innerText = disableMotivation ? "Oyun İçi Motivasyon Mesajları: Kapalı" : "Oyun İçi Motivasyon Mesajları: Açık";
+                toggleMotivationBtn.setAttribute('aria-label', toggleMotivationBtn.innerText);
+            }
+        };
+
+        if (toggleMotivationBtn) {
+            window.updateMotivationBtnState();
+            toggleMotivationBtn.addEventListener('click', () => {
+                if (window.menuEnterSound) window.menuEnterSound.play();
+                let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
+                disableMotivation = !disableMotivation;
+                localStorage.setItem('hafizaGuvenDisableMotivation', disableMotivation);
+                window.updateMotivationBtnState();
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader(disableMotivation ? "Motivasyon mesajları kapatıldı." : "Motivasyon mesajları açıldı.", true);
                 }
             });
         }

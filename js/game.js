@@ -824,7 +824,11 @@ window.handleGameInput = function (key) {
                 window.endMainGame(false, true);
             } else {
                 let motivMsg = "Süpersiniz!";
-                if (typeof window.msg1to4 !== 'undefined' && window.msg1to4.length > 0) {
+                let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
+
+                if (disableMotivation) {
+                    motivMsg = "Doğru!";
+                } else if (typeof window.msg1to4 !== 'undefined' && window.msg1to4.length > 0) {
                     if (window.gameScore >= 1 && window.gameScore <= 4) {
                         motivMsg = window.msg1to4[Math.floor(Math.random() * window.msg1to4.length)];
                     } else if (window.gameScore === 5 && window.msg5 && window.msg5.length > 0) {
@@ -836,11 +840,11 @@ window.handleGameInput = function (key) {
                     }
                 }
 
-                let fullMsg = `${motivMsg} (+${window.gameSequence.length + 7} saniye)`;
+                let fullMsg = disableMotivation ? `Doğru. +${window.gameSequence.length + 7} saniye` : `${motivMsg} (+${window.gameSequence.length + 7} saniye)`;
                 if (gameStatus) gameStatus.textContent = fullMsg;
                 if (window.announceToScreenReader) window.announceToScreenReader(fullMsg, true);
 
-                const readTimeMs = Math.max(1500, (motivMsg.length * 65) + 800);
+                const readTimeMs = disableMotivation ? 1000 : Math.max(1500, (motivMsg.length * 65) + 800);
                 window.hgfzZamanlayici.setTimeout(() => {
                     window.addNewNoteAndPlaySequence();
                 }, readTimeMs);
@@ -1021,9 +1025,10 @@ window.handlePracticeInput = function(key) {
             }, 1000); // 1 saniye sonra diğer notayı sor
         } else {
             // Doğru ama henüz 3 olmadı
+            let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
             if (window.practiceCorrectMessages) {
-                let msg = window.practiceCorrectMessages[Math.floor(Math.random() * window.practiceCorrectMessages.length)];
-                let fullMsg = msg + " " + (3 - window.practicePressCount) + " kaldı.";
+                let msg = disableMotivation ? "Doğru." : window.practiceCorrectMessages[Math.floor(Math.random() * window.practiceCorrectMessages.length)];
+                let fullMsg = disableMotivation ? `${3 - window.practicePressCount} kaldı.` : msg + " " + (3 - window.practicePressCount) + " kaldı.";
                 const statusText = document.getElementById('practice-status-text');
                 if (statusText) {
                     statusText.innerHTML = fullMsg;
@@ -1036,8 +1041,9 @@ window.handlePracticeInput = function(key) {
     } else {
         // Yanlış tuşa basıldı
         if (window.wrongSound) window.wrongSound.play();
+        let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
         if (window.practiceWrongMessages) {
-            let msg = window.practiceWrongMessages[Math.floor(Math.random() * window.practiceWrongMessages.length)];
+            let msg = disableMotivation ? "Yanlış." : window.practiceWrongMessages[Math.floor(Math.random() * window.practiceWrongMessages.length)];
             const statusText = document.getElementById('practice-status-text');
             if (statusText) {
                 statusText.innerHTML = msg;

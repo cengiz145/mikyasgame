@@ -372,7 +372,8 @@ window.handleStoryWalking = function(key) {
                     if (window.correctSound) window.correctSound.play();
                     
                     let baseMsg = "Notayı yerden aldınız. Şimdi piyanoya bırakmanız gerekiyor.";
-                    if (window.missingNotesHappyMessages && window.missingNotesHappyMessages.length > window.notesInPiano.length) {
+                    let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
+                    if (!disableMotivation && window.missingNotesHappyMessages && window.missingNotesHappyMessages.length > window.notesInPiano.length) {
                         baseMsg = window.missingNotesHappyMessages[window.notesInPiano.length] + " Şimdi onu piyanoya götürmelisin.";
                     }
                     
