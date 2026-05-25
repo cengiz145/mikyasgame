@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.44] - 25.05.2026
+
+Otomatik Hata Onarım (Auto-Repair) Sistemi Eklendi:
+- Oyundaki sorunlar giderildi. Artık oyunun rahatça keyfini çıkartabilirsiniz.
+
 [v0.97.4.43] - 25.05.2026
 
 Düzeltmeler:
