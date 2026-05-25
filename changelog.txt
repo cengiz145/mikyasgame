@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.39] - 25.05.2026
+
+Düzeltmeler ve İyileştirmeler:
+- İstatistik sıfırlama mekanizması devredışı bırakıldı. Oyuncuların verilerini ve ilerlemelerini yanlışlıkla sıfırlayan eski temizlik kodları (hfzReset_AllProgress_v2 ve hfzAdmin_ServerWipe_v2) kaldırıldı.
+
 [v0.97.4.38] - 07.05.2026
 
 Yeni Özellikler ve İyileştirmeler:
