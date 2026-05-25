@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.41] - 25.05.2026
+
+Yeni Özellikler ve Hata Onarımları:
+- Hata Ayıklama (Debug) Modu aktif edildi (Ctrl+Shift+D).
+- Story modundaki seslerin diğer modları bozması (Global Volume) hatası giderildi.
+- Ekran okuyucu uzun bildirim kesilme hatası onarıldı.
+- Tarayıcı performansını etkileyen Memory Leak hataları temizlendi.
+
 [v0.97.4.40] - 25.05.2026
 
 Yeni Özellikler ve Hediyeler:
