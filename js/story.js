@@ -81,7 +81,7 @@ window.playCurrentStoryDialog = function() {
     if (window.dado3Sound) window.dado3Sound.play();
     storyStatus.innerHTML = finalHtml;
     storyStatus.blur();
-    setTimeout(() => storyStatus.focus(), 10);
+    window.hgfzZamanlayici.setTimeout(() => storyStatus.focus(), 10);
     
     // Explicitly announce for screen readers
     if (window.announceToScreenReader) {
@@ -512,7 +512,7 @@ window.handleStoryWalking = function(key) {
             if (storyStatus) {
                 storyStatus.innerHTML = winMsg;
                 storyStatus.blur();
-                setTimeout(() => storyStatus.focus(), 10);
+                window.hgfzZamanlayici.setTimeout(() => storyStatus.focus(), 10);
             }
             
             window.storyWinTimeout = window.hgfzZamanlayici.setTimeout(() => {

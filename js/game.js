@@ -29,6 +29,12 @@ window.hgfzZamanlayici = {
     }
 };
 
+window.sEscapeHTML = function(str) {
+    if (!str) return '';
+    return str.toString().replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t));
+};
+
+
 window.DEBUG_MODE = false;
 
 // Boşluk tuşuna ve yön tuşlarına basıldığında sayfanın aşağı/yukarı kaymasını engelle
@@ -198,8 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             li.setAttribute('tabindex', '0');
                             li.setAttribute('aria-label', fMessage);
                             // Güvenlik amaçlı escapeHTML
-                            function sEscapeHTML(str) { return !str ? '' : str.toString().replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)); }
-                            li.innerHTML = `<div class="wp-bubble" aria-hidden="true" style="background:#5a4a15; border-left:4px solid #ffcc00; color:#fff;"><strong style="color:#ffcc00;">[ÖZEL MESAJ]</strong> ${sEscapeHTML(pmData.from)}: ${sEscapeHTML(pmData.text)}</div>`;
+                            li.innerHTML = `<div class="wp-bubble" aria-hidden="true" style="background:#5a4a15; border-left:4px solid #ffcc00; color:#fff;"><strong style="color:#ffcc00;">[ÖZEL MESAJ]</strong> ${window.sEscapeHTML(pmData.from)}: ${window.sEscapeHTML(pmData.text)}</div>`;
                             chatMsgList.appendChild(li);
                             const chatCont = document.querySelector('.chat-messages-container');
                             if (chatCont) window.hgfzZamanlayici.setTimeout(() => chatCont.scrollTop = chatCont.scrollHeight, 10);
@@ -988,7 +993,7 @@ window.playCurrentDialog = function() {
             if (statusText) {
                 statusText.innerHTML = localizedText;
                 statusText.blur();
-                setTimeout(() => statusText.focus(), 10);
+                window.hgfzZamanlayici.setTimeout(() => statusText.focus(), 10);
             }
             
             if (window.dado3Sound) window.dado3Sound.play();
@@ -1022,7 +1027,7 @@ window.startPracticeNote = function() {
         if (statusText) {
             statusText.innerHTML = text;
             statusText.blur();
-            setTimeout(() => statusText.focus(), 10);
+            window.hgfzZamanlayici.setTimeout(() => statusText.focus(), 10);
         }
         if (window.announceToScreenReader) window.announceToScreenReader(text, true);
     } else {
@@ -1031,7 +1036,7 @@ window.startPracticeNote = function() {
         if (statusText) {
             statusText.innerHTML = text;
             statusText.blur();
-            setTimeout(() => statusText.focus(), 10);
+            window.hgfzZamanlayici.setTimeout(() => statusText.focus(), 10);
         }
         if (window.announceToScreenReader) window.announceToScreenReader(text, true);
         const practiceNav = document.getElementById('practice-nav');
@@ -1053,6 +1058,9 @@ window.handlePracticeInput = function(key) {
             if (window.correctSound) window.correctSound.play();
             window.practiceTargetIndex++;
             window.practicePressCount = 0;
+            if (window.practiceNextTimeout) {
+                window.hgfzZamanlayici.clearTimeout(window.practiceNextTimeout);
+            }
             window.practiceNextTimeout = window.hgfzZamanlayici.setTimeout(() => {
                 if (window.startPracticeNote) window.startPracticeNote();
             }, 1000); // 1 saniye sonra diğer notayı sor
@@ -1066,7 +1074,7 @@ window.handlePracticeInput = function(key) {
                 if (statusText) {
                     statusText.innerHTML = fullMsg;
                     statusText.blur();
-                    setTimeout(() => statusText.focus(), 10);
+                    window.hgfzZamanlayici.setTimeout(() => statusText.focus(), 10);
                 }
                 if (window.announceToScreenReader) window.announceToScreenReader(fullMsg);
             }
@@ -1081,7 +1089,7 @@ window.handlePracticeInput = function(key) {
             if (statusText) {
                 statusText.innerHTML = msg;
                 statusText.blur();
-                setTimeout(() => statusText.focus(), 10);
+                window.hgfzZamanlayici.setTimeout(() => statusText.focus(), 10);
             }
             if (window.announceToScreenReader) window.announceToScreenReader(msg);
         }

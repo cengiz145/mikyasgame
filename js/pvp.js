@@ -27,13 +27,14 @@ window.PvP = {
         myName = myName.replace(/[.#$\[\]\/]/g, '_');
 
         this.isBotMode = false;
+        window.isComputerPlaying = false;
         this.myQueueId = deviceId;
         this.matchId = 'match_' + this.myQueueId + '_' + Date.now();
         this.isSearching = true; // Sadece arayüzde iptal edilebilirlik sağlamak için
         this.isHost = true;
         
-        // --- YENİ: Rastgele 4 Haneli Oda Kodu ---
-        this.roomCode = Math.floor(1000 + Math.random() * 9000).toString();
+        // --- YENİ: Rastgele 5 Haneli Oda Kodu ---
+        this.roomCode = Math.floor(10000 + Math.random() * 90000).toString();
 
         // Odaya katılanları saymak için yerel değişken
         this.lastClientCount = 0;
@@ -225,6 +226,7 @@ window.PvP = {
 
             let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || "Misafir";
             myName = myName.replace(/[.#$\[\]\/]/g, '_');
+            window.isComputerPlaying = false;
 
             // Maça katılma işlemi (Get & Update)
             const matchNode = window.db.ref('matches/' + targetMatchId);
