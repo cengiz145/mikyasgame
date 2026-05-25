@@ -1,11 +1,5 @@
 {
-    "version": "0.97.4.42",
+    "version": "0.97.4.43",
     "buildId": 1776722234,
-    "changelog": "Zamanlayıcı (sayaç) mantıksal hataları düzeltildi ve bellek optimizasyonu yapıldı."
+    "changelog": "Kolay mod kilit şartları 5 kez olarak güncellendi ve arayüz metinleri düzeltildi."
 }
-
-
-
-
-
-

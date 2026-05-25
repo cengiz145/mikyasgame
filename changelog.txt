@@ -1,5 +1,11 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.43] - 25.05.2026
+
+Düzeltmeler:
+- Kolay modun Orta mod kilidini açma şartı yeniden 5 kez tamamlanma olarak ayarlandı.
+- Oyun içi menülerdeki bilgilendirme metinleri "Kolay modu 5 kez tamamla" olarak düzeltildi.
+
 [v0.97.4.42] - 25.05.2026
 
 Düzeltmeler ve Optimizasyonlar:
