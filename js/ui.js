@@ -413,7 +413,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     if (window.menuFailsafeTimeoutId) clearTimeout(window.menuFailsafeTimeoutId);
     window.menuFailsafeTimeoutId = setTimeout(() => {
         window.isMenuTransitioning = false;
-    }, 1500);
+    }, 600);
 
     // Mobil Geri Tuşu Koruması (Yeni bir alt menüye geçiliyorsa History'e ekle)
     if (newActiveMenuName !== 'main' && newActiveMenuName !== 'game' && newActiveMenuName !== 'story') {
@@ -497,7 +497,7 @@ window.announceToScreenReader = function (text, forceFocus = false) {
         if (announcer && announcer.parentNode) {
             announcer.parentNode.removeChild(announcer);
         }
-    }, 3000);
+    }, 10000);
 };
 
 window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReason) {
@@ -652,7 +652,7 @@ window.updateStatsDisplay = function() {
     // Kopyalama butonu işlevini ata
     document.querySelectorAll('.stat-copy-btn').forEach(btn => {
         btn.onclick = function() {
-            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\nBakiye: ${tokens} Jeton\nGünlük Seri: ${streakCount} Gün\nSeri Dondurma: ${sdCount}\nHata Koruması: ${hk}\nZaman Koruması: ${zk}\nKolay: ${easyCount}\nOrta: ${mediumCount}\nZor: ${hardCount}\nKayıp Notalar: ${storyCount}`;
+            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\r\nBakiye: ${tokens} Jeton\r\nGünlük Seri: ${streakCount} Gün\r\nSeri Dondurma: ${sdCount}\r\nHata Koruması: ${hk}\r\nZaman Koruması: ${zk}\r\nKolay: ${easyCount}\r\nOrta: ${mediumCount}\r\nZor: ${hardCount}\r\nKayıp Notalar: ${storyCount}`;
             navigator.clipboard.writeText(copyText).then(() => {
                 if (window.announceToScreenReader) window.announceToScreenReader("İstatistikleriniz panoya kopyalandı.", true);
                 if (window.correctSound) window.correctSound.play();

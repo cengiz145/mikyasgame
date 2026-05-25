@@ -21,11 +21,28 @@ window.hgfzZamanlayici = {
     }
 };
 
+window.DEBUG_MODE = false;
+
 // Boşluk tuşuna ve yön tuşlarına basıldığında sayfanın aşağı/yukarı kaymasını engelle
 window.addEventListener('keydown', function(event) {
+    // Hata Ayıklama (Debug Mode) Kısayolu: Ctrl + Shift + D
+    if (event.ctrlKey && event.shiftKey && (event.key === 'd' || event.key === 'D')) {
+        event.preventDefault();
+        window.DEBUG_MODE = !window.DEBUG_MODE;
+        console.log("DEBUG_MODE: " + window.DEBUG_MODE);
+        if (window.showToastNotification) {
+            window.showToastNotification("Hata Ayıklama Modu " + (window.DEBUG_MODE ? "Açık" : "Kapalı"), window.DEBUG_MODE ? "info" : "warning");
+        }
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader("Hata ayıklama modu " + (window.DEBUG_MODE ? "etkinleştirildi" : "kapatıldı"));
+        }
+        if (window.correctSound) window.correctSound.play();
+        return;
+    }
+
     if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) {
-        // Eğer oyuncu input/textarea/BUTTON içindeyse engelleme (Butonların kendi tıklamalarını bozmamak için)
-        if (event.target.tagName !== "INPUT" && event.target.tagName !== "TEXTAREA" && event.target.tagName !== "BUTTON") {
+        // Eğer oyuncu form elementi içindeyse engelleme (select, input vb)
+        if (!["INPUT", "TEXTAREA", "BUTTON", "SELECT", "OPTION"].includes(event.target.tagName)) {
             event.preventDefault(); 
         }
     }

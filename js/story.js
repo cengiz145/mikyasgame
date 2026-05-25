@@ -140,8 +140,8 @@ window.triggerStoryAnimations = function(index) {
         if (window.storyBGM) window.storyBGM.play();
         if (window.glasshitSound) window.glasshitSound.play();
         if (window.wrongSound) {
-            window.wrongSound.volume(1.0);
-            window.wrongSound.play();
+            let wid = window.wrongSound.play();
+            window.wrongSound.volume(1.0, wid);
         }
     } else if (index === 8) {
         window.storyAnimTimeout3 = window.hgfzZamanlayici.setTimeout(() => {
@@ -206,8 +206,8 @@ window.triggerStoryAnimations = function(index) {
         }, 1000);
     } else if (index === 16) {
         if (window.successSound) {
-            window.successSound.volume(0.7);
-            window.successSound.play();
+            let sid = window.successSound.play();
+            window.successSound.volume(0.7, sid);
         }
     }
 };
@@ -246,9 +246,9 @@ window.initializeMissingNotesMap = function() {
     }
 
     if (window.mountainSound && !window.mountainSound.playing()) {
-        window.mountainSound.volume(0.4);
         window.mountainSound.loop(true);
-        window.mountainSound.play();
+        let mid = window.mountainSound.play();
+        window.mountainSound.volume(0.4, mid);
     }
 
     // Zamanlayıcıyı başlat (220 saniye)
@@ -456,8 +456,8 @@ window.handleStoryWalking = function(key) {
                     window.isSoundPacksUnlockDialogWaitingForEnter = true;
                     
                     if (window.successSound) {
-                        window.successSound.volume(0.8);
-                        window.successSound.play();
+                        let sid2 = window.successSound.play();
+                        window.successSound.volume(0.8, sid2);
                     }
                     if (window.applauseSound) window.applauseSound.play();
                     
@@ -493,8 +493,8 @@ window.handleStoryWalking = function(key) {
             if (window.music272Sound && window.music272Sound.playing()) window.music272Sound.stop();
             
             if (window.successSound) {
-                window.successSound.volume(0.8);
-                window.successSound.play();
+                let sid3 = window.successSound.play();
+                window.successSound.volume(0.8, sid3);
             }
             if (window.applauseSound) window.applauseSound.play();
             

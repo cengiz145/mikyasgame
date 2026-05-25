@@ -388,16 +388,20 @@ function unlockMobileAudio() {
         ctx.resume();
     }
     // Sessiz frekans ile kilidi aç
-    if (ctx) {
-        const oscillator = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        gainNode.gain.value = 0; 
-        oscillator.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        oscillator.start(0);
-        oscillator.stop(0.001);
+    if (ctx && ctx.createOscillator) {
+        try {
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            gainNode.gain.value = 0; 
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            oscillator.start(0);
+            oscillator.stop(0.001);
+        } catch (e) {}
     }
     isAudioUnlocked = true;
+    document.removeEventListener('touchstart', unlockMobileAudio);
+    document.removeEventListener('click', unlockMobileAudio);
 }
 // Sadece ilk etkileşimde çalışıp kendini imha etsin
 document.addEventListener('touchstart', unlockMobileAudio, { once: true });
