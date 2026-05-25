@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.42] - 25.05.2026
+
+Düzeltmeler ve Optimizasyonlar:
+- Zaman Koruması Hatası: Yanlış nota basıldığında alınan ceza süreyi 0'ın altına düşürürse, "Zaman Koruması" hakkının devreye girmeden oyunun bitmesi mantık hatası tamamen onarıldı.
+- Eksik Anons Hatası: Sürenin -5 saniye cezalarla ani düşmesi sebebiyle ekran okuyucunun 20sn ve 10sn uyarılarını atlaması (okumaması) sorunu çözüldü.
+- Memory Leak (Bellek Sızıntısı): Oyun motorundaki eski sayaçların bellekten silinmeden arka planda çalışmaya devam etmesi problemi `hgfzZamanlayici` sistemi güncellenerek tamamen giderildi. Oyun artık daha hafif.
+
 [v0.97.4.41] - 25.05.2026
 
 Yeni Özellikler ve Hata Onarımları:

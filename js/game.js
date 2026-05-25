@@ -13,6 +13,14 @@ window.hgfzZamanlayici = {
         this.intervals.add(id);
         return id;
     },
+    clearTimeout: function(id) {
+        clearTimeout(id);
+        this.timeouts.delete(id);
+    },
+    clearInterval: function(id) {
+        clearInterval(id);
+        this.intervals.delete(id);
+    },
     hepsiniImhaEt: function() {
         this.timeouts.forEach(id => clearTimeout(id));
         this.intervals.forEach(id => clearInterval(id));
@@ -386,6 +394,8 @@ window.startMainGame = function (difficulty = 'easy') {
 
     window.activeDifficulty = difficulty;
     window.gameTimer = (difficulty === 'hard') ? 45 : 30;
+    window.hasWarned20 = false;
+    window.hasWarned10 = false;
 
     window.gameScore = 0;
     window.gameMistakes = 0;
@@ -432,7 +442,7 @@ window.startMainGame = function (difficulty = 'easy') {
     if (window.clockTickSound && window.clockTickSound.playing()) window.clockTickSound.stop();
     if (window.clockTickSound) window.clockTickSound.rate(1.0);
 
-    clearInterval(window.gameInterval);
+    window.hgfzZamanlayici.clearInterval(window.gameInterval);
     window.gameStartTimeoutId = window.hgfzZamanlayici.setTimeout(() => {
         if (!window.gameIsActive) return;
         window.isStarting = false;
@@ -441,19 +451,21 @@ window.startMainGame = function (difficulty = 'easy') {
         window.gameInterval = window.hgfzZamanlayici.setInterval(() => {
             if (window.gameIsPaused) return;
             if (!window.gameIsActive) {
-                clearInterval(window.gameInterval);
+                window.hgfzZamanlayici.clearInterval(window.gameInterval);
                 return;
             }
             if (!window.isComputerPlaying) {
                 window.gameTimer--;
                 window.updateGameUI();
 
-                if (window.gameTimer === 20) {
+                if (window.gameTimer <= 20 && window.gameTimer > 10 && !window.hasWarned20) {
+                    window.hasWarned20 = true;
                     if (window.secons2Sound) window.secons2Sound.play();
                     if (window.announceToScreenReader) window.announceToScreenReader("Son 20 saniye.", true);
                 }
 
-                if (window.gameTimer === 10) {
+                if (window.gameTimer <= 10 && window.gameTimer > 0 && !window.hasWarned10) {
+                    window.hasWarned10 = true;
                     if (window.announceToScreenReader) window.announceToScreenReader("Son 10 saniye.", true);
                 }
 
@@ -476,6 +488,8 @@ window.startMainGame = function (difficulty = 'easy') {
                     if (zkLocal > 0) {
                         zkLocal--;
                         window.gameTimer = 15;
+                        window.hasWarned20 = false;
+                        window.hasWarned10 = false;
                         localStorage.setItem('hafizaGuvenZamanKorumasi', zkLocal);
                         if (window.seconsSound) window.seconsSound.stop();
                         if (window.announceToScreenReader) window.announceToScreenReader(`Zaman koruması kullanıldı! Süreniz bitmedi, 15 saniye ek süre kazandınız. Kalan zaman koruması: ${zkLocal}`);
@@ -809,6 +823,8 @@ window.handleGameInput = function (key) {
             }
 
             window.gameTimer += (window.gameSequence.length + 7);
+            if (window.gameTimer > 20) window.hasWarned20 = false;
+            if (window.gameTimer > 10) window.hasWarned10 = false;
             window.gameScore += 1;
             window.gameMistakes = 0;
             window.updateGameUI();
@@ -879,6 +895,22 @@ window.handleGameInput = function (key) {
 
             const gameStatus = document.getElementById('game-status-text');
             if (gameStatus) gameStatus.textContent = "Yanlış! -5 saniye. Dizi tekrar çalınıyor.";
+
+            // Hata sonrası süre kontrolü (Zaman Koruması entegrasyonu)
+            if (window.gameTimer <= 0) {
+                let zkLocal = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+                if (zkLocal > 0) {
+                    zkLocal--;
+                    window.gameTimer = 15;
+                    window.hasWarned20 = false;
+                    window.hasWarned10 = false;
+                    localStorage.setItem('hafizaGuvenZamanKorumasi', zkLocal);
+                    if (window.seconsSound) window.seconsSound.stop();
+                    if (window.announceToScreenReader) window.announceToScreenReader(`Zaman koruması kullanıldı! Süreniz bitmedi, 15 saniye ek süre kazandınız. Kalan zaman koruması: ${zkLocal}`);
+                    if (gameStatus) gameStatus.textContent = "Zaman koruması kullanıldı! +15 saniye.";
+                    window.updateGameUI();
+                }
+            }
 
             if (window.gameMistakes >= 3 || window.gameTimer <= 0) {
                 window.hgfzZamanlayici.setTimeout(() => {

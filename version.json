@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.41",
+    "version": "0.97.4.42",
     "buildId": 1776722234,
-    "changelog": "Geliştirici Tarafından Tespit Edilen 10 Kapsamlı Hata Çözüldü!"
+    "changelog": "Zamanlayıcı (sayaç) mantıksal hataları düzeltildi ve bellek optimizasyonu yapıldı."
 }
 
 
