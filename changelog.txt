@@ -502,3 +502,13 @@ Büyük Duyuru ve Yenilikler:
 - Müzik Ses Kontrolü (Volume): PageUp ve PageDown tuşlarıyla ayarlanan asıl menü arka plan müziği ses artış/azalma ivmesi %10 (0.1)'luk hacimler yerine %1 (0.01)'lik kademelere ayarlandı. 
 - Ses Spam Koruması: Sadece PageUp ve PageDown harici diğer tuşlarda basılı tutma engellendi, tekil atış yapılması sağlandı. Sesi tamamen kısmak/artırmak için basılı tutulabilir. 
 - Telefon (Web Audio Mobile Touchstart) için yazılan ek olaylar geri çekilerek kod stabil masaüstü sürümüne indirgendi. 
+
+ [ v 0 . 9 7 . 4 . 4 1 ]   -   2 5 . 0 5 . 2 0 2 6 
+ 
+ Y e n i   O z e l l i k l e r   v e   H a t a   O n a r i m l a r i : 
+ -   H a t a   A y i k l a m a   ( D e b u g )   M o d u   a k t i f   e d i l d i   ( C t r l + S h i f t + D ) . 
+ -   S t o r y   m o d u n d a k i   s e s l e r i n   d i g e r   m o d l a r i   b o z m a s i   ( G l o b a l   V o l u m e )   h a t a s i   g i d e r i l d i . 
+ -   E k r a n   o k u y u c u   u z u n   b i l d i r i m   k e s i l m e   h a t a s i   o n a r i l d i . 
+ -   T a r a y i c i   p e r f o r m a n s i n i   e t k i l e y e n   M e m o r y   L e a k   h a t a l a r i   t e m i z l e n d i . 
+ - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ 
