@@ -93,5 +93,4 @@ if ($now -lt $muteUntil) {
     }
 }
 
-Write-Host "Islem tamamlandi! Cikmak icin bir tusa basin..."
-$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
+Write-Host "Islem tamamlandi!"
