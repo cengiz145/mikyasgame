@@ -1,5 +1,10 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.40] - 25.05.2026
+
+Yeni Özellikler ve Hediyeler:
+- Veri sıfırlanması sebebiyle tüm oyunculara bir kereliğe mahsus 2000 jeton özür hediyesi eklendi. Oyuna giren herkesin bakiyesine anında yansıyacaktır.
+
 [v0.97.4.39] - 25.05.2026
 
 Düzeltmeler ve İyileştirmeler:

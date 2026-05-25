@@ -1,7 +1,7 @@
 {
-    "version": "0.97.4.39",
-    "buildId": 1777660487,
-    "changelog": "Geliştirici ve Tester'lar için sohbet penceresinden rütbe atama sistemi eklendi (/rütbe komutu)."
+    "version": "0.97.4.40",
+    "buildId": 1777660488,
+    "changelog": "Veri sıfırlanması sebebiyle tüm oyunculara bir kereliğe mahsus 2000 jeton özür hediyesi eklendi."
 }
 
 

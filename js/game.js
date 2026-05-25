@@ -31,6 +31,13 @@ window.addEventListener('keydown', function(event) {
     }
 }, { passive: false });
 
+// --- ÖZÜR HEDİYESİ (2000 JETON) ---
+if (!localStorage.getItem('hfzApologyGift_2000')) {
+    let currentTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+    localStorage.setItem('hafizaGuvenTotalTokens', currentTokens + 2000);
+    localStorage.setItem('hfzApologyGift_2000', 'true');
+}
+
 // İstatistik sıfırlama (AllProgress_v2) bloğu kaldırıldı.
 
 // --- ANA OYUN DEĞİŞKENLERİ ---
