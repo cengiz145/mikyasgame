@@ -504,7 +504,7 @@ window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReaso
     if (!btnElement) return;
 
     let targetTurns = 5;
-    if(modeData.name === 'Kolay') targetTurns = 1;
+    if(modeData.name === 'Kolay') targetTurns = 5;
     if(modeData.name === 'Orta') targetTurns = 5;
     if(modeData.name === 'Zor') targetTurns = 5;
 
@@ -555,7 +555,7 @@ window.updateScoreboardLocks = function () {
     const btnHard = document.getElementById('btn-score-hard');
     const btnMissingNotes = document.getElementById('btn-score-missing-notes');
 
-    window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta moddaki en yüksek skoru görüntüle", "Kolay modu 1 kez tamamla");
+    window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta moddaki en yüksek skoru görüntüle", "Kolay modu 5 kez tamamla");
     window.updateButtonUI(btnHard, window.gameModes.hard, "Zor moddaki yüksek skoru görüntüle", "Orta modu 5 kez tamamla");
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp notalar modu için yüksek skoru görüntüle", "Zor modu 5 kez tamamla");
 };
@@ -587,7 +587,7 @@ window.updateDifficultyMenuLocks = function () {
     if (liMissingNotes) liMissingNotes.style.display = 'block';
 
     if (btnEasy) window.updateButtonUI(btnEasy, window.gameModes.easy, "Kolay Modu Oyna", "");
-    window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta Modu Oyna", "Kolay modu 1 kez tamamla");
+    window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta Modu Oyna", "Kolay modu 5 kez tamamla");
     window.updateButtonUI(btnHard, window.gameModes.hard, "Zor Modu Oyna", "Orta modu 5 kez tamamla");
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp Notalar Modu. Hikayeli piyano modu.", "Zor modu 5 kez tamamla");
 };
