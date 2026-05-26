@@ -139,6 +139,7 @@ window.checkDailyStreak = function() {
     const todayStr = now.toDateString();
     const lastLoginStr = localStorage.getItem('hafizaGuvenLastLoginDate');
     let streak = parseInt(localStorage.getItem('hafizaGuvenLoginStreak')) || 0;
+    let buzsuzGun = parseInt(localStorage.getItem('hafizaGuvenBuzsuzGun')) || 0;
     
     if (lastLoginStr !== todayStr) {
         if (lastLoginStr) {
@@ -149,6 +150,7 @@ window.checkDailyStreak = function() {
             
             if (daysPassed === 1) {
                 streak += 1;
+                buzsuzGun += 1;
                 window.pendingDailyRewardMsg = `Seri ${streak}. gün! ${streak * 10} jeton kazandınız.`;
             } else if (daysPassed > 1) {
                 let daysMissed = daysPassed - 1;
@@ -158,6 +160,7 @@ window.checkDailyStreak = function() {
                     freezeCount -= daysMissed;
                     localStorage.setItem('hafizaGuvenSeriDondurma', freezeCount);
                     streak += 1; // Seri kurtarıldı, bugünün girişiyle artıyor
+                    buzsuzGun = 1; // Seri dondurma kullanıldığı için buzsuz serisi kırıldı, bugünden başlar
                     window.pendingDailyRewardMsg = `${daysMissed} gün oyuna girmediniz ancak Seri Dondurma kullanıldı. Seriniz bozulmadı! Güncel seri: ${streak}. gün. ${streak * 10} jeton kazandınız. Kalan dondurma: ${freezeCount} adet.`;
                 } else {
                     if (freezeCount > 0) {
@@ -166,15 +169,29 @@ window.checkDailyStreak = function() {
                     }
                     window.pendingDailyRewardMsg = `Maalesef yeterli Seri Dondurmanız olmadığı için günlük seriniz 0'landı! Kaybetmeden önce ${streak}. güne ulaşmıştınız. Bugünden itibaren seriniz tekrar 1. günden başlıyor. 10 jeton kazandınız.`;
                     streak = 1;
+                    buzsuzGun = 1;
                 }
             }
         } else {
             streak = 1;
+            buzsuzGun = 1;
             window.pendingDailyRewardMsg = `Oyuna hoş geldiniz! İlk gününüz. 10 jeton kazandınız.`;
         }
         
         localStorage.setItem('hafizaGuvenLastLoginDate', todayStr);
         localStorage.setItem('hafizaGuvenLoginStreak', streak);
+        localStorage.setItem('hafizaGuvenBuzsuzGun', buzsuzGun);
+        
+        // BAŞARI KONTROLÜ (Buzsuz 3 Gün)
+        if (!window.userAchievements) window.userAchievements = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
+        if (buzsuzGun >= 3 && !window.userAchievements.buzsuz_3_gun) {
+            window.userAchievements.buzsuz_3_gun = true;
+            try { localStorage.setItem('hafizaGuvenAchievements', JSON.stringify(window.userAchievements)); } catch(e){}
+            setTimeout(() => {
+                if (window.achievementSound) window.achievementSound.play();
+                if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız! Sadık Oyuncu: 3 Gün boyunca seri dondurma kullanmadan oyuna girdiniz.");
+            }, 6000);
+        }
         
         let reward = streak * 10;
         if (reward > 100) reward = 100; // max 100 jeton (etkinlik hariç)
@@ -2388,8 +2405,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnAchievementsMain && achievementsBackBtn) {
         btnAchievementsMain.addEventListener('click', () => {
             window.switchMenu(window.mainMenu, window.achievementsMenu, 'achievements');
-            let text = "Henüz açılmış bir başarınız yok.";
-            if (window.userAchievements && window.userAchievements.hafizam_gucleniyor) text = "Hafızam Güçleniyor başarımını kazandınız!";
+            
+            let contentDiv = document.getElementById('achievements-content');
+            if (!window.userAchievements) window.userAchievements = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
+            let bg = parseInt(localStorage.getItem('hafizaGuvenBuzsuzGun')) || 0;
+            
+            let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">';
+            
+            if (window.userAchievements.hafizam_gucleniyor) {
+                html += '<li tabindex="0" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">✅ Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
+            } else {
+                html += '<li tabindex="0" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">🔒 Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
+            }
+            
+            if (window.userAchievements.buzsuz_3_gun) {
+                html += '<li tabindex="0" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap.">✅ Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş yap)</li>';
+            } else {
+                html += `<li tabindex="0" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap. İlerleme: ${bg} bölü 3 gün.">⏳ Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş) - İlerleme: ${bg}/3</li>`;
+            }
+            
+            html += '</ul>';
+            if (contentDiv) contentDiv.innerHTML = html;
+            
+            let text = "Başarılar menüsü açıldı. Durumunuzu kontrol edebilirsiniz.";
             if (window.announceToScreenReader) window.announceToScreenReader(text);
         });
         achievementsBackBtn.addEventListener('click', () => {
