@@ -2130,6 +2130,29 @@ const Game = {
             e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.playHorn === 'function') {
                 audio.playHorn();
+                
+                // NPC'LERE KORNA TEPKİSİ
+                if (this.activeNPCs && this.activeNPCs.length > 0) {
+                    this.activeNPCs.forEach(npc => {
+                        // Eğer NPC araçsa (hayvan değilse) ve yakınlardaysa (y > -100 ve y < 400)
+                        if (!npc.isAnimal && npc.y > -100 && npc.y < 400) {
+                            if (!npc.hasHonkedBack) {
+                                npc.hasHonkedBack = true;
+                                
+                                // Kısa bir gecikmeyle kornaya karşılık versin
+                                setTimeout(() => {
+                                    if (npc.audioObj && npc.y > -200) { 
+                                        let pan = (npc.x - 50) / 30;
+                                        if (typeof audio.playNPCHorn === 'function') audio.playNPCHorn(pan);
+                                        
+                                        // Kornaya sinirlenip hızını artırsın (kızıp gitsinler)
+                                        npc.baseSpeed += 50; 
+                                    }
+                                }, 600 + Math.random() * 600);
+                            }
+                        }
+                    });
+                }
             }
         }
         if (k === 'pageup') {

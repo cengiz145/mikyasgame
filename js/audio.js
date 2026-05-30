@@ -1065,6 +1065,43 @@ class AudioSystem {
         this.playBrakeRelease(); // İmdat kitlenirken hava tahliyesi olur
     }
 
+    playNPCHorn(panValue) {
+        if (!this.ctx) return;
+        
+        // Araç kornası sentezleme
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gainNode = this.ctx.createGain();
+        
+        // Panner (Sağ-sol hoparlör yönlendirmesi)
+        const panner = this.ctx.createStereoPanner();
+        panner.pan.value = panValue || 0;
+        
+        // Korna frekansları (300Hz-500Hz arası uyumsuz akor)
+        osc1.type = 'sawtooth';
+        osc1.frequency.value = 350 + Math.random() * 50;
+        osc2.type = 'sawtooth';
+        osc2.frequency.value = osc1.frequency.value + 45;
+
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
+        
+        gainNode.connect(panner);
+        panner.connect(this.environmentMixer);
+        
+        // Sesi hemen yükselt ve yavaşça kıs (gerçekçi korna dinamiği)
+        const now = this.ctx.currentTime;
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(0.2, now + 0.05);
+        gainNode.gain.setValueAtTime(0.2, now + 0.5);
+        gainNode.gain.linearRampToValueAtTime(0, now + 0.7);
+        
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 0.7);
+        osc2.stop(now + 0.7);
+    }
+
     playHorn() {
         if (!this.hornBuffer || this.hornSource) return;
 
