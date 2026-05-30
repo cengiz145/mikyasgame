@@ -2199,7 +2199,21 @@ const Game = {
             else if (this.clockMinutes >= 720 && this.clockMinutes < 1080) timeOfDay = "Gün Ortası";
             else if (this.clockMinutes >= 1080) timeOfDay = "Akşam";
 
-            let durum = this.weather === 'sunny' ? (this.isNight ? 'Açık' : 'Güneşli') : (this.weather === 'rainy' ? 'Yağmurlu' : 'Karlı');
+            // Bulut çeşitliliği (Güneşli/Açık havaların alt kategorileri)
+            let durum = "";
+            if (this.weather === 'sunny') {
+                if (!this.sunnyType) {
+                    const cloudTypes = [this.isNight ? 'Açık' : 'Güneşli', 'Az Bulutlu', 'Parçalı Bulutlu'];
+                    this.sunnyType = cloudTypes[Math.floor(Math.random() * cloudTypes.length)];
+                }
+                durum = this.sunnyType;
+                // Gece gündüz döngüsüne göre ismi güncelle
+                if (this.isNight && durum === 'Güneşli') durum = 'Açık';
+                else if (!this.isNight && durum === 'Açık') durum = 'Güneşli';
+            } else {
+                durum = this.weather === 'rainy' ? 'Yağmurlu' : 'Karlı';
+                this.sunnyType = null; // Hava bozunca sıfırla
+            }
             let uyari = this.weather === 'snowy' ? ' Yollar buzlu.' : (this.weather === 'rainy' ? ' Yollar kaygan.' : '');
             let farDurum = this.isNight ? (this.isHeadlightsOn ? ' Farlarınız açık.' : ' Farlarınız KAPALI, görüş tehlikesi!') : '';
             
