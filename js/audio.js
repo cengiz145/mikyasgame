@@ -1171,6 +1171,7 @@ class AudioSystem {
             return {
                 howlObj: howlObj,
                 soundId: soundId,
+                filename: filename,
                 stop: () => {
                     howlObj.fade(howlObj.volume(soundId), 0, 100, soundId);
                     setTimeout(() => howlObj.stop(soundId), 100);

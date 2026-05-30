@@ -1464,13 +1464,15 @@ const Game = {
             let initialPan = (startX - 50) / 30;
             let audioObj = audio.playNPCSound(initialPan);
             if (audioObj) {
+                let isAnimal = audioObj.filename && audioObj.filename.includes('village');
                 this.activeNPCs.push({
                     x: startX,
                     y: 600, // Çarpışmaya tepki süresini artırmak için 200'den 600'e çıkarıldı
-                    baseSpeed: 40 + Math.random() * 40, // NPC'nin kendi hızı (40-80 arası)
+                    baseSpeed: isAnimal ? 5 + Math.random() * 10 : 40 + Math.random() * 40, // Hayvanlar yavaş
                     speedX: 0, // Araçlar şerit değiştirmez, dümdüz gelir
                     audioObj: audioObj,
-                    hasCollided: false
+                    hasCollided: false,
+                    isAnimal: isAnimal
                 });
 
                 // EĞER AYNI ŞERİTTE DOĞDUYSA ERKEN UYARI VER
@@ -1478,7 +1480,9 @@ const Game = {
                     const currentTime = performance.now();
                     if (!this.lastCollisionWarnTime || currentTime - this.lastCollisionWarnTime > 5000) {
                         this.lastCollisionWarnTime = currentTime;
-                        if (typeof audio.speak === 'function') audio.speak("Dikkat, önünüzde araç var!");
+                        if (typeof audio.speak === 'function') {
+                            audio.speak(isAnimal ? "Dikkat, yola hayvan çıkabilir!" : "Dikkat, önünüzde araç var!");
+                        }
                     }
                 }
             }
@@ -1559,7 +1563,7 @@ const Game = {
                             audio.speak("Sağ taraftan çarptık! Şanslıyız, cam kırılmadı.");
                         }
                     } else {
-                        audio.speak(`Önden çarpıştık! Kaporta hasar aldı!`);
+                        audio.speak(npc.isAnimal ? "Yoldaki hayvana çarptık! Kaporta hasar aldı!" : `Önden çarpıştık! Kaporta hasar aldı!`);
                         this.busDamage.front = Math.min(100, this.busDamage.front + damageAmount);
                         
                         // Önden çarpmalarda farlar
