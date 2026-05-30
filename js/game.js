@@ -1530,7 +1530,8 @@ const Game = {
             // Çarpışma (ÖLÜM VE HASAR MEKANİĞİ) - ÇEKİCİDEYKEN KAZA YAPILMAZ (0 HATA)
             if (!npc.hasCollided && npc.y <= 10 && npc.y > -10) {
                 // Hız 20'nin altındaysa veya çekici otopilotundaysak çarpışma olmaz, teğet geçer
-                if (!this.isBeingTowed && this.speed >= 20 && Math.abs(npc.x - this.lanePosition) < 20) {
+                // Sollama (overtaking) payını genişletmek için çarpışma sınırı < 20'den < 14'e düşürüldü
+                if (!this.isBeingTowed && this.speed >= 20 && Math.abs(npc.x - this.lanePosition) < 14) {
                     npc.hasCollided = true;
                     
                     // FİZİKSEL ÇARPIŞMA TEPKİSİ: NPC'yi kenara fırlat ve durdur (Ghosting engelleme)
@@ -1628,8 +1629,13 @@ const Game = {
                 }
             } 
             
-            // Araç arkamızda uzaklaştığında sil (Yanımızdan geçip gitmesi için mesafe uzatıldı)
-            if (npc.y < -400) {
+            // Sollama başarılı bildirimi (Sesli Geri Bildirim veya Rüzgar)
+            if (!npc.hasCollided && npc.y < -10 && !npc.isPassed) {
+                npc.isPassed = true;
+            }
+
+            // Araç arkamızda uzaklaştığında sil (Sesin aniden kesilmemesi için mesafe -600 yapıldı)
+            if (npc.y < -600) {
                 if (npc.audioObj) npc.audioObj.stop();
                 this.activeNPCs.splice(i, 1);
             }
