@@ -1513,10 +1513,8 @@ const Game = {
             // MÜKEMMEL STEREO VE YAKLAŞMA HİSSİ (Howler.js Spatial Audio)
             if (npc.audioObj && npc.audioObj.howlObj) {
                 let apparentX = npc.x;
-                if (this.roadCurvature) {
-                    // Viraj Simülasyonu: Yol sağa kıvrılıyorsa (roadCurvature < 0), uzaktaki araç sağa (+x) kaymış gibi duyulur
-                    apparentX -= this.roadCurvature * (npc.y / 50);
-                }
+                // BUG FIX: Viraj efekti sesi yanıltıp yanlış yöne kaçmaya (KAZAYA) sebep oluyordu.
+                // Araçların 3D pozisyonu değil, ŞERİT pozisyonu önemlidir. Bu yüzden roadCurvature etkisini İPTAL ETTİK.
                 let currentPan = (apparentX - this.lanePosition) / 30; 
                 currentPan = Math.max(-1, Math.min(1, currentPan));
                 npc.audioObj.howlObj.stereo(currentPan, npc.audioObj.soundId);
