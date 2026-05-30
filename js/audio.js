@@ -298,8 +298,6 @@ class AudioSystem {
                 this.idleSource = this.ctx.createBufferSource();
                 this.idleSource.buffer = this.idleBuffer;
                 this.idleSource.loop = true;
-                this.idleSource.loopStart = 0.05; 
-                this.idleSource.loopEnd = this.idleBuffer.duration - 0.05;
 
                 this.idleGain = this.ctx.createGain();
                 this.idleGain.gain.value = 1.0;
@@ -491,9 +489,9 @@ class AudioSystem {
         
         targetRate = Math.min(3.0, Math.max(0.6, targetRate)); // Minimum 0.6 yapalım ki boğulma belli olsun
         
-        if (!this.currentIdleRate || Math.abs(this.currentIdleRate - targetRate) > 0.03) {
-            // Boğulma efekti için anlık atlamalara izin veriyoruz
-            this.idleSource.playbackRate.setValueAtTime(targetRate, this.ctx.currentTime);
+        if (!this.currentIdleRate || Math.abs(this.currentIdleRate - targetRate) > 0.01) {
+            // Çatlama ve pürüzü önlemek için setTargetAtTime ile yumuşak geçiş
+            this.idleSource.playbackRate.setTargetAtTime(targetRate, this.ctx.currentTime, 0.1);
             this.currentIdleRate = targetRate;
         }
     }
