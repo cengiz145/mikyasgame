@@ -2203,7 +2203,7 @@ const Game = {
             let durum = "";
             if (this.weather === 'sunny') {
                 if (!this.sunnyType) {
-                    const cloudTypes = [this.isNight ? 'Açık' : 'Güneşli', 'Az Bulutlu', 'Parçalı Bulutlu', 'Çok Bulutlu', 'Kapalı', 'Rüzgarlı', 'Fırtınalı'];
+                    const cloudTypes = [this.isNight ? 'Açık' : 'Güneşli', 'Az Bulutlu', 'Parçalı Bulutlu', 'Çok Bulutlu', 'Kapalı', 'Rüzgarlı', 'Fırtınalı', 'Sisli', 'Puslu', 'Toz Fırtınası'];
                     this.sunnyType = cloudTypes[Math.floor(Math.random() * cloudTypes.length)];
                 }
                 durum = this.sunnyType;
