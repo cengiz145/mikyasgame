@@ -2199,11 +2199,11 @@ const Game = {
             else if (this.clockMinutes >= 720 && this.clockMinutes < 1080) timeOfDay = "Gün Ortası";
             else if (this.clockMinutes >= 1080) timeOfDay = "Akşam";
 
-            // Bulut çeşitliliği (Güneşli/Açık havaların alt kategorileri)
+            // Bulut çeşitliliği (Yağışsız havaların alt kategorileri)
             let durum = "";
             if (this.weather === 'sunny') {
                 if (!this.sunnyType) {
-                    const cloudTypes = [this.isNight ? 'Açık' : 'Güneşli', 'Az Bulutlu', 'Parçalı Bulutlu'];
+                    const cloudTypes = [this.isNight ? 'Açık' : 'Güneşli', 'Az Bulutlu', 'Parçalı Bulutlu', 'Çok Bulutlu', 'Kapalı'];
                     this.sunnyType = cloudTypes[Math.floor(Math.random() * cloudTypes.length)];
                 }
                 durum = this.sunnyType;
