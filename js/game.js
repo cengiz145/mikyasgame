@@ -1467,8 +1467,8 @@ const Game = {
                 let isAnimal = audioObj.filename && audioObj.filename.includes('village');
                 this.activeNPCs.push({
                     x: startX,
-                    y: 600, // Çarpışmaya tepki süresini artırmak için 200'den 600'e çıkarıldı
-                    baseSpeed: isAnimal ? 5 + Math.random() * 10 : 40 + Math.random() * 40, // Hayvanlar yavaş
+                    y: isAnimal ? 250 : 600, // Hayvanlar daha yakında belirsin (uzun süre yaklaşmaları beklenmesin)
+                    baseSpeed: isAnimal ? 0 : 40 + Math.random() * 40, // Hayvanlar yolda durur, arabalar hareket eder
                     speedX: 0, // Araçlar şerit değiştirmez, dümdüz gelir
                     audioObj: audioObj,
                     hasCollided: false,
@@ -1522,6 +1522,7 @@ const Game = {
                     
                     // FİZİKSEL ÇARPIŞMA TEPKİSİ: NPC'yi kenara fırlat ve durdur (Ghosting engelleme)
                     npc.baseSpeed = 0;
+                    if (npc.audioObj) npc.audioObj.stop(); // Çarpışma anında sesi durdur (donup kalma hissini engeller)
                     // Eğer otobüs sağdaysa NPC sola savrulur, soldaysa sağa savrulur
                     npc.x = (this.lanePosition > 50) ? Math.max(-10, npc.x - 40) : Math.min(110, npc.x + 40);
                     
