@@ -2211,8 +2211,26 @@ const Game = {
                 if (this.isNight && durum === 'Güneşli') durum = 'Açık';
                 else if (!this.isNight && durum === 'Açık') durum = 'Güneşli';
             } else {
-                durum = this.weather === 'rainy' ? 'Yağmurlu' : 'Karlı';
                 this.sunnyType = null; // Hava bozunca sıfırla
+                let intensity = this.rainIntensity || 1;
+                
+                if (this.weather === 'rainy') {
+                    if (this.temperature <= 4 && intensity >= 2) {
+                        durum = (this.temperature % 2 === 0) ? 'Dolu Yağışlı' : 'Karla Karışık Yağmur (Sulu Kar)';
+                    } else if (intensity >= 3) {
+                        durum = 'Sağanak Yağışlı';
+                    } else {
+                        durum = 'Yağmurlu';
+                    }
+                } else if (this.weather === 'snowy') {
+                    if (this.temperature >= -1) {
+                        durum = 'Sulu Kar';
+                    } else if (intensity >= 3) {
+                        durum = 'Yoğun Kar Yağışlı';
+                    } else {
+                        durum = 'Hafif Kar Yağışlı';
+                    }
+                }
             }
             let uyari = this.weather === 'snowy' ? ' Yollar buzlu.' : (this.weather === 'rainy' ? ' Yollar kaygan.' : '');
             let farDurum = this.isNight ? (this.isHeadlightsOn ? ' Farlarınız açık.' : ' Farlarınız KAPALI, görüş tehlikesi!') : '';
