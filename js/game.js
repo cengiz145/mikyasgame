@@ -2175,11 +2175,6 @@ const Game = {
             audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
             audio.speak("Cam açıldı");
         }
-        if (k === 'm') { // Mesafe öğrenme tuşu ayrıldı
-            e.preventDefault();
-            const dst = Math.max(0, Math.round(this.currentDistanceToNext));
-            audio.speak(`Sonraki durağa ${dst} metre kaldı`);
-        }
         if (k === 'f') { // Farlar
             e.preventDefault();
             if (this.busDamage.headlights >= 100) {
