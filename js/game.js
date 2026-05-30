@@ -2203,7 +2203,7 @@ const Game = {
             let durum = "";
             if (this.weather === 'sunny') {
                 if (!this.sunnyType) {
-                    const cloudTypes = [this.isNight ? 'Açık' : 'Güneşli', 'Az Bulutlu', 'Parçalı Bulutlu', 'Çok Bulutlu', 'Kapalı'];
+                    const cloudTypes = [this.isNight ? 'Açık' : 'Güneşli', 'Az Bulutlu', 'Parçalı Bulutlu', 'Çok Bulutlu', 'Kapalı', 'Rüzgarlı', 'Fırtınalı'];
                     this.sunnyType = cloudTypes[Math.floor(Math.random() * cloudTypes.length)];
                 }
                 durum = this.sunnyType;
@@ -2218,7 +2218,7 @@ const Game = {
                     if (this.temperature <= 4 && intensity >= 2) {
                         durum = (this.temperature % 2 === 0) ? 'Dolu Yağışlı' : 'Karla Karışık Yağmur (Sulu Kar)';
                     } else if (intensity >= 3) {
-                        durum = 'Sağanak Yağışlı';
+                        durum = (this.temperature % 2 === 0) ? 'Gökgürültülü Sağanak Yağış' : 'Sağanak Yağışlı';
                     } else {
                         durum = 'Yağmurlu';
                     }
