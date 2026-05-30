@@ -1458,7 +1458,20 @@ const Game = {
         if (canSpawn && this.activeNPCs.length === 0 && Math.random() < spawnChance) {
             // Araçlar artık çapraz geçmeyecek, belirli bir şeritte üstümüze gelecek!
             const lanes = [20, 50, 80]; // Sol şerit, Orta şerit, Sağ şerit
-            let startX = lanes[Math.floor(Math.random() * lanes.length)];
+            let startX;
+            
+            // %80 ihtimalle oyuncunun OLMADIĞI (güvenli) bir şeritten gelir
+            if (Math.random() < 0.80) {
+                let safeLanes = lanes.filter(lane => Math.abs(lane - this.lanePosition) > 15);
+                if (safeLanes.length > 0) {
+                    startX = safeLanes[Math.floor(Math.random() * safeLanes.length)];
+                } else {
+                    startX = lanes[Math.floor(Math.random() * lanes.length)];
+                }
+            } else {
+                // Sadece %20 ihtimalle oyuncunun bulunduğu şeride yakın çıkar ("önüne kırma" hissi)
+                startX = lanes.reduce((closest, curr) => Math.abs(curr - this.lanePosition) < Math.abs(closest - this.lanePosition) ? curr : closest);
+            }
             
             // Başlangıç pan değeri şeride göre (-1, 0, 1)
             let initialPan = (startX - 50) / 30;
