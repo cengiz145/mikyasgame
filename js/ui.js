@@ -498,23 +498,20 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
 window.announceToScreenReader = function (text, forceFocus = false) {
     text = window.localizeText(text);
 
-    // NVDA'nın bazen aynı elementi güncellediğimizde okumayı atlamasını engellemek için
-    // her anons için yepyeni bir element oluşturuyoruz. (Robust ARIA-Live Toast Pattern)
-    const announcer = document.createElement('div');
-    announcer.className = 'sr-only';
-    // Removed role="alert" to prevent NVDA from prefixing "Uyarı" to every message
-    announcer.setAttribute('aria-live', 'assertive');
-    announcer.setAttribute('aria-atomic', 'true');
-    announcer.textContent = text;
+    let globalAnnouncer = document.getElementById('global-sr-announcer');
+    if (!globalAnnouncer) {
+        globalAnnouncer = document.createElement('div');
+        globalAnnouncer.id = 'global-sr-announcer';
+        globalAnnouncer.className = 'sr-only';
+        globalAnnouncer.setAttribute('aria-live', 'assertive');
+        globalAnnouncer.setAttribute('aria-atomic', 'true');
+        document.body.appendChild(globalAnnouncer);
+    }
     
-    document.body.appendChild(announcer);
-
-    // Anons okunduktan sonra DOM'u temizle (Sistemden anlık silinmesi için süreyi çok kısa tuttuk)
+    globalAnnouncer.textContent = "";
     setTimeout(() => {
-        if (announcer && announcer.parentNode) {
-            announcer.parentNode.removeChild(announcer);
-        }
-    }, 10000);
+        globalAnnouncer.textContent = text;
+    }, 50);
 };
 
 window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReason) {
