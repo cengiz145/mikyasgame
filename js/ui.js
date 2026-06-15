@@ -568,10 +568,12 @@ window.updateScoreboardLocks = function () {
     const btnMedium = document.getElementById('btn-score-medium');
     const btnHard = document.getElementById('btn-score-hard');
     const btnMissingNotes = document.getElementById('btn-score-missing-notes');
+    const btnRhythmScore = document.getElementById('btn-score-rhythm');
 
     window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta moddaki en yüksek skoru görüntüle", "Kolay modu 5 kez tamamla");
     window.updateButtonUI(btnHard, window.gameModes.hard, "Zor moddaki yüksek skoru görüntüle", "Orta modu 5 kez tamamla");
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp notalar modu için yüksek skoru görüntüle", "Zor modu 5 kez tamamla");
+    if (btnRhythmScore) window.updateButtonUI(btnRhythmScore, window.gameModes.rhythm_mode, "Ritim Avcısı için yüksek skoru görüntüle", "");
 };
 
 window.updateDifficultyMenuLocks = function () {
@@ -595,6 +597,7 @@ window.updateDifficultyMenuLocks = function () {
     const liHard = document.getElementById('li-diff-hard');
     const btnMissingNotes = document.getElementById('btn-diff-missing-notes');
     const liMissingNotes = document.getElementById('li-diff-missing-notes');
+    const btnRhythm = document.getElementById('btn-diff-rhythm');
 
     if (liMedium) liMedium.style.display = 'block';
     if (liHard) liHard.style.display = 'block';
@@ -604,6 +607,7 @@ window.updateDifficultyMenuLocks = function () {
     window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta Modu Oyna", "Kolay modu 5 kez tamamla");
     window.updateButtonUI(btnHard, window.gameModes.hard, "Zor Modu Oyna", "Orta modu 5 kez tamamla");
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp Notalar Modu. Hikayeli piyano modu.", "Zor modu 5 kez tamamla");
+    if (btnRhythm) window.updateButtonUI(btnRhythm, window.gameModes.rhythm_mode, "Ritim Avcısı Oyna. Metronom eşliğinde çal.", "");
 };
 
 window.updateStatsDisplay = function() {
@@ -615,6 +619,7 @@ window.updateStatsDisplay = function() {
     let mediumCount = (window.gameModes && window.gameModes.medium) ? window.gameModes.medium.completionCount : 0;
     let hardCount = (window.gameModes && window.gameModes.hard) ? window.gameModes.hard.completionCount : 0;
     let storyCount = (window.gameModes && window.gameModes.missing_notes) ? window.gameModes.missing_notes.completionCount : 0;
+    let rhythmCount = (window.gameModes && window.gameModes.rhythm_mode) ? window.gameModes.rhythm_mode.completionCount : 0;
 
     let rank = "Oyuncu";
 
@@ -628,28 +633,29 @@ window.updateStatsDisplay = function() {
     let milestoneHtml = "";
     if (nextM) {
         let diff = nextM.day - streakCount;
-        milestoneHtml = `<li tabindex="0" class="stat-item" style="padding: 5px; color: #ffb703; font-weight: bold;" aria-label="Sonraki dönüm noktasına ${diff} gün kaldı. Hedef: ${nextM.day}. gün. Ödül: ${nextM.reward} Jeton">Hedef: ${nextM.day}. gün! Kalan: ${diff} gün. (Ödül: ${nextM.reward} Jeton)</li>`;
+        milestoneHtml = `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #ffb703; font-weight: bold;" aria-label="Sonraki dönüm noktasına ${diff} gün kaldı. Hedef: ${nextM.day}. gün. Ödül: ${nextM.reward} Jeton">Hedef: ${nextM.day}. gün! Kalan: ${diff} gün. (Ödül: ${nextM.reward} Jeton)</li>`;
     }
 
     let html = "";
     if (tokens === 0 && hk === 0 && zk === 0 && easyCount === 0 && mediumCount === 0 && hardCount === 0 && storyCount === 0) {
-        html = '<div id="empty-stats-alert" tabindex="0" role="status" aria-label="İstatistik sekmesi boş. Hiç bir istatistiğe sahip değilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boş. İstatistik bulunamadı.</div>';
+        html = '<div id="empty-stats-alert" tabindex="0" role="textbox" aria-readonly="true" aria-label="İstatistik sekmesi boş. Hiç bir istatistiğe sahip değilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boş. İstatistik bulunamadı.</div>';
         if (window.announceToScreenReader && window.currentActiveMenu === 'stats') {
             setTimeout(() => window.announceToScreenReader("Bu sekme boş. Henüz hiç bir istatistiğiniz bulunmuyor."), 300);
         }
     } else {
         html = `
             <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;" class="stats-list">
-                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Bakiye: ${tokens} Jeton">Bakiye: ${tokens} Jeton</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Günlük Seri Takvimi: ${streakCount} Gün">Günlük Seri (Takvim): ${streakCount} Gün</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Bakiye: ${tokens} Jeton">Bakiye: ${tokens} Jeton</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Günlük Seri Takvimi: ${streakCount} Gün">Günlük Seri (Takvim): ${streakCount} Gün</li>
                 ${milestoneHtml}
-                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Seri Dondurma: ${sdCount} adet">Seri Dondurma: ${sdCount} adet</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Hata Koruması: ${hk} adet">Hata Koruması: ${hk} adet</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Zaman Koruması: ${zk} adet">Zaman Koruması: ${zk} adet</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Kolay Mod: ${easyCount} kez tamamlandı">Kolay Mod: ${easyCount} kez tamamlandı</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Orta Mod: ${mediumCount} kez tamamlandı">Orta Mod: ${mediumCount} kez tamamlandı</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Zor Mod: ${hardCount} kez tamamlandı">Zor Mod: ${hardCount} kez tamamlandı</li>
-                <li tabindex="0" class="stat-item" style="padding: 5px;" aria-label="Kayıp Notalar: ${storyCount} kez tamamlandı">Kayıp Notalar: ${storyCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Seri Dondurma: ${sdCount} adet">Seri Dondurma: ${sdCount} adet</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Hata Koruması: ${hk} adet">Hata Koruması: ${hk} adet</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Zaman Koruması: ${zk} adet">Zaman Koruması: ${zk} adet</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Kolay Mod: ${easyCount} kez tamamlandı">Kolay Mod: ${easyCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Orta Mod: ${mediumCount} kez tamamlandı">Orta Mod: ${mediumCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Zor Mod: ${hardCount} kez tamamlandı">Zor Mod: ${hardCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Kayıp Notalar: ${storyCount} kez tamamlandı">Kayıp Notalar: ${storyCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Ritim Avcısı: ${rhythmCount} kez tamamlandı">Ritim Avcısı: ${rhythmCount} kez tamamlandı</li>
                 <li style="margin-top: 15px;">
                     <button class="menu-button stat-copy-btn" aria-label="İstatistiklerimi Kopyala">İstatistiklerimi Kopyala</button>
                 </li>
@@ -666,7 +672,7 @@ window.updateStatsDisplay = function() {
     // Kopyalama butonu işlevini ata
     document.querySelectorAll('.stat-copy-btn').forEach(btn => {
         btn.onclick = function() {
-            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\r\nBakiye: ${tokens} Jeton\r\nGünlük Seri: ${streakCount} Gün\r\nSeri Dondurma: ${sdCount}\r\nHata Koruması: ${hk}\r\nZaman Koruması: ${zk}\r\nKolay: ${easyCount}\r\nOrta: ${mediumCount}\r\nZor: ${hardCount}\r\nKayıp Notalar: ${storyCount}`;
+            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\r\nBakiye: ${tokens} Jeton\r\nGünlük Seri: ${streakCount} Gün\r\nSeri Dondurma: ${sdCount}\r\nHata Koruması: ${hk}\r\nZaman Koruması: ${zk}\r\nKolay: ${easyCount}\r\nOrta: ${mediumCount}\r\nZor: ${hardCount}\r\nKayıp Notalar: ${storyCount}\r\nRitim Avcısı: ${rhythmCount}`;
             navigator.clipboard.writeText(copyText).then(() => {
                 if (window.announceToScreenReader) window.announceToScreenReader("İstatistikleriniz panoya kopyalandı.", true);
                 if (window.correctSound) window.correctSound.play();
@@ -1846,6 +1852,41 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        const toggleMetronomeBtn = document.getElementById('toggle-metronome-btn');
+        window.updateMetronomeBtnState = () => {
+            let metronomeState = localStorage.getItem('hafizaGuvenMetronome') || 'off';
+            if (toggleMetronomeBtn) {
+                let stateText = 'Kapalı';
+                if (metronomeState === '60') stateText = '60 BPM';
+                else if (metronomeState === '90') stateText = '90 BPM';
+                else if (metronomeState === '120') stateText = '120 BPM';
+                
+                toggleMetronomeBtn.innerText = "Metronom: " + stateText;
+                toggleMetronomeBtn.setAttribute('aria-label', toggleMetronomeBtn.innerText);
+            }
+        };
+
+        if (toggleMetronomeBtn) {
+            window.updateMetronomeBtnState();
+            toggleMetronomeBtn.addEventListener('click', () => {
+                if (window.menuEnterSound) window.menuEnterSound.play();
+                let metronomeState = localStorage.getItem('hafizaGuvenMetronome') || 'off';
+                
+                if (metronomeState === 'off') metronomeState = '60';
+                else if (metronomeState === '60') metronomeState = '90';
+                else if (metronomeState === '90') metronomeState = '120';
+                else metronomeState = 'off';
+                
+                localStorage.setItem('hafizaGuvenMetronome', metronomeState);
+                window.updateMetronomeBtnState();
+                
+                let stateText = metronomeState === 'off' ? "kapatıldı" : metronomeState + " BPM olarak ayarlandı";
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader("Metronom " + stateText, true);
+                }
+            });
+        }
+
         const toggleMotivationBtn = document.getElementById('toggle-motivation-btn');
         window.updateMotivationBtnState = () => {
             let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
@@ -2410,15 +2451,15 @@ document.addEventListener('DOMContentLoaded', () => {
             let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">';
             
             if (window.userAchievements.hafizam_gucleniyor) {
-                html += '<li tabindex="0" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">✅ Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
+                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">✅ Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
             } else {
-                html += '<li tabindex="0" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">🔒 Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
+                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">🔒 Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
             }
             
             if (window.userAchievements.buzsuz_3_gun) {
-                html += '<li tabindex="0" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap.">✅ Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş yap)</li>';
+                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap.">✅ Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş yap)</li>';
             } else {
-                html += `<li tabindex="0" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap. İlerleme: ${bg} bölü 3 gün.">⏳ Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş) - İlerleme: ${bg}/3</li>`;
+                html += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap. İlerleme: ${bg} bölü 3 gün.">⏳ Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş) - İlerleme: ${bg}/3</li>`;
             }
             
             html += '</ul>';
@@ -2797,6 +2838,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.triggerStoryAnimations) window.triggerStoryAnimations(0);
                     }, 350);
                 }
+            });
+        }
+
+        const btnDiffRhythm = document.getElementById('btn-diff-rhythm');
+        if (btnDiffRhythm) {
+            btnDiffRhythm.addEventListener('click', () => {
+                window.switchMenu(window.difficultyMenu, window.gameMenu, 'game');
+                if (window.startMainGame) window.startMainGame('rhythm_mode');
             });
         }
 
@@ -4269,3 +4318,4 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCancel.addEventListener('touchstart', handleCancel, {passive: false});
     }
 });
+

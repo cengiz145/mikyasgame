@@ -1,17 +1,18 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     <title>Hafızana Güven - Ana Menü</title>
     <link rel="stylesheet" href="css/style.css">
-    
+
     <script>
-        (function() {
+        (function () {
             var theme = localStorage.getItem('hafizaGuvenTheme') || 'default';
             document.documentElement.setAttribute('data-theme', theme);
         })();
@@ -42,13 +43,14 @@
             </p>
         </div>
 
-        <button id="start-intro-btn" class="localize-inner"
-            style="opacity: 0; position: absolute; top: -100px;" aria-label="Bu oyun, görme engelli bir müzik öğretmeni olan Ümit Ekrem Mikyas tarafından geliştirilmiştir. Sürüm: 0.97.4.46. Logoyu dinlemek ve oyuna başlamak için enter tuşuna basın." autofocus>
+        <button id="start-intro-btn" class="localize-inner" style="opacity: 0; position: absolute; top: -100px;"
+            aria-label="Bu oyun, görme engelli bir müzik öğretmeni olan Ümit Ekrem Mikyas tarafından geliştirilmiştir. Sürüm: 0.97.4.48. Logoyu dinlemek ve oyuna başlamak için enter tuşuna basın."
+            autofocus>
             Logoyu dinlemek ve oyuna başlamak için enter tuşuna basın.
         </button>
 
         <p id="intro-version-display" tabindex="-1" style="margin-top: 20px; font-size: 1rem; color: #888;">
-            Sürüm: 0.97.4.46
+            Sürüm: 0.97.4.48
         </p>
 
         <!-- Aşama 2: Logo ve Başlık -->
@@ -68,21 +70,25 @@
 
     <div id="main-menu-container" class="menu-container" role="presentation" aria-hidden="true">
         <!-- Removed top focus trap -->
-        <h1 id="main-menu-title" tabindex="-1" style="outline: none;" aria-label="Hafızana Güven oyununa hoş geldiniz. Yukarı aşağı oklarla gezinebilirsiniz.">Ana Menü</h1>
+        <h1 id="main-menu-title" tabindex="-1" style="outline: none;"
+            aria-label="Hafızana Güven oyununa hoş geldiniz. Yukarı aşağı oklarla gezinebilirsiniz.">Ana Menü</h1>
 
 
         <!-- aria-labelledby ile nav bölgesini başlıkla ilişkilendiriyoruz -->
-        <nav class="menu-nav"   aria-labelledby="main-menu-title">
+        <nav class="menu-nav" aria-labelledby="main-menu-title">
             <ul>
                 <li>
                     <button id="start-game-btn" class="menu-button" aria-label="Oyuna Başla">Oyuna
                         Başla</button>
                 </li>
                 <li>
-                    <button id="btn-restart-game" class="menu-button" aria-label="Oyunu Yeniden Başlat. Bu seçenek, oyuncu verilerinizi koruyarak tarayıcı önbelleğini temizler ve oyunu yeniden başlatır.">Oyunu Yeniden Başlat</button>
+                    <button id="btn-restart-game" class="menu-button"
+                        aria-label="Oyunu Yeniden Başlat. Bu seçenek, oyuncu verilerinizi koruyarak tarayıcı önbelleğini temizler ve oyunu yeniden başlatır.">Oyunu
+                        Yeniden Başlat</button>
                 </li>
                 <li id="li-change-instrument">
-                    <button id="btn-change-instrument" class="menu-button" aria-label="Ses Paketini Değiştir">Ses Paketini Değiştir</button>
+                    <button id="btn-change-instrument" class="menu-button" aria-label="Ses Paketini Değiştir">Ses
+                        Paketini Değiştir</button>
                 </li>
                 <li>
                     <button id="btn-continue-saved" class="menu-button" aria-label="Kayıtlı Oyundan Devam Et">Kayıtlı
@@ -107,13 +113,17 @@
                 </li>
                 <li>
                     <button id="check-updates-btn" class="menu-button"
-                        aria-label="Güncelleme Durumu: Kontrol ediliyor..." tabindex="0">Güncelleme: Kontrol ediliyor...</button>
+                        aria-label="Güncelleme Durumu: Kontrol ediliyor..." tabindex="0">Güncelleme: Kontrol
+                        ediliyor...</button>
                 </li>
                 <li>
-                    <button id="events-btn-main" class="menu-button" aria-label="Aktif Etkinlik: Kontrol ediliyor..." tabindex="0">Etkinlik: Kontrol ediliyor...</button>
+                    <button id="events-btn-main" class="menu-button" aria-label="Aktif Etkinlik: Kontrol ediliyor..."
+                        tabindex="0">Etkinlik: Kontrol ediliyor...</button>
                 </li>
                 <li>
-                    <button id="telegram-btn" class="menu-button" aria-label="Telegram Kanalına Katılın" onclick="window.open('https://t.me/hafizanaguven2559', '_blank')">Telegram Kanalına Katılın</button>
+                    <button id="telegram-btn" class="menu-button" aria-label="Telegram Kanalına Katılın"
+                        onclick="window.open('https://t.me/hafizanaguven2559', '_blank')">Telegram Kanalına
+                        Katılın</button>
                 </li>
                 <li>
                     <button id="exit-btn" class="menu-button" aria-label="Çıkış">Çıkış</button>
@@ -124,30 +134,36 @@
     </div>
 
     <!-- Sosyal Menüsü (Mobilde Tab) -->
-    <div id="social-menu-container" class="menu-container" role="region" aria-labelledby="social-menu-title" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+    <div id="social-menu-container" class="menu-container" role="region" aria-labelledby="social-menu-title"
+        aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <h1 id="social-menu-title">Sosyal Menüsü</h1>
         <div id="social-content"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px; max-height: 50vh; overflow-y: auto;">
             <p class="sr-only">Aşağı ok tuşlarıyla oyuncuları inceleyebilirsiniz.</p>
-            <ul id="social-player-list" style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;">
-                <li tabindex="0">Sistem yükleniyor...</li>
+            <ul id="social-player-list"
+                style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;">
+                <li tabindex="0" role="menuitem">Sistem yükleniyor...</li>
             </ul>
         </div>
     </div>
 
     <!-- Profil Menüsü (Mobilde Tab) -->
-    <div id="profile-menu-container" class="menu-container" role="region" aria-labelledby="profile-menu-title" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+    <div id="profile-menu-container" class="menu-container" role="region" aria-labelledby="profile-menu-title"
+        aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <h1 id="profile-menu-title">Oyuncu Profili ve İstatistikler</h1>
         <div id="profile-content"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
             <p class="sr-only">İstatistiklerinizi aşağı ok tuşuyla okuyabilirsiniz.</p>
-           <p tabindex="0" class="stat-item" style="padding: 5px;"><strong>Adınız:</strong> <span id="profile-player-name">Bilinmeyen</span></p>
-           <button class="menu-button" id="btn-change-username" style="margin: 5px 0 15px 0;">Kullanıcı Adını Değiştir</button>
-           <p tabindex="0" class="stat-item" style="padding: 5px;"><strong>Rütbeniz:</strong> <span id="profile-player-rank">Oyuncu</span></p>
-           <hr style="border-top: 1px solid #444; margin: 15px 0;">
-           <div id="profile-stats-content">
-               <!-- İstatistik verileri dinamik olarak yüklenecek -->
-           </div>
+            <p tabindex="0" role="textbox" aria-readonly="true" class="stat-item" style="padding: 5px;"><strong>Adınız:</strong> <span
+                    id="profile-player-name">Bilinmeyen</span></p>
+            <button class="menu-button" id="btn-change-username" style="margin: 5px 0 15px 0;">Kullanıcı Adını
+                Değiştir</button>
+            <p tabindex="0" role="textbox" aria-readonly="true" class="stat-item" style="padding: 5px;"><strong>Rütbeniz:</strong> <span
+                    id="profile-player-rank">Oyuncu</span></p>
+            <hr style="border-top: 1px solid #444; margin: 15px 0;">
+            <div id="profile-stats-content">
+                <!-- İstatistik verileri dinamik olarak yüklenecek -->
+            </div>
         </div>
     </div>
 
@@ -158,7 +174,7 @@
 
         <div id="difficulty-status-text" class="sr-only"></div>
 
-        <nav class="menu-nav"   aria-label="Zorluk Seviyeleri">
+        <nav class="menu-nav" aria-label="Zorluk Seviyeleri">
             <ul>
                 <li><button class="menu-button" id="btn-diff-easy">Kolay Mod</button></li>
                 <li id="li-diff-medium" style="display: none;"><button class="menu-button" id="btn-diff-medium">Orta
@@ -167,6 +183,7 @@
                         Mod</button></li>
                 <li id="li-diff-missing-notes" style="display: none;"><button class="menu-button"
                         id="btn-diff-missing-notes">Kayıp Notalar</button></li>
+                <li><button class="menu-button" id="btn-diff-rhythm">Ritim Avcısı</button></li>
                 <li><button class="menu-button" id="difficulty-back-btn">Geri Dön</button>
                 </li>
             </ul>
@@ -176,7 +193,7 @@
     <!-- Skor Tablosu Alt Menüsü -->
     <div id="scoreboard-menu-container" class="menu-container" role="presentation" aria-hidden="true">
         <h1 id="scoreboard-menu-title">Skor Tablosu</h1>
-        <nav class="menu-nav"   aria-labelledby="scoreboard-menu-title">
+        <nav class="menu-nav" aria-labelledby="scoreboard-menu-title">
             <ul>
                 <li>
                     <button id="btn-score-easy" class="menu-button" aria-label="Kolay Mod">Kolay Mod</button>
@@ -190,6 +207,9 @@
                 <li>
                     <button id="btn-score-missing-notes" class="menu-button" aria-label="Kayıp Notalar">Kayıp
                         Notalar</button>
+                </li>
+                <li>
+                    <button id="btn-score-rhythm" class="menu-button" aria-label="Ritim Avcısı">Ritim Avcısı</button>
                 </li>
                 <li>
                     <button id="scoreboard-back-btn" class="menu-button" aria-label="Geri">Geri</button>
@@ -267,7 +287,7 @@
             </div>
         </div>
 
-        <nav class="menu-nav"   aria-labelledby="store-menu-title">
+        <nav class="menu-nav" aria-labelledby="store-menu-title">
             <ul id="store-button-list">
                 <li>
                     <button id="buy-shield-btn" class="menu-button"
@@ -296,11 +316,13 @@
                 </li>
                 <li id="li-flut-pack" style="display: none;">
                     <button id="buy-flut-pack-btn" class="menu-button"
-                        aria-label="Flüt Ses Paketi. Notaları piyano yerine flüt ile duyarsınız. Fiyat: 200 Jeton.">Flüt Ses Paketi Satın Al (200 Jeton)</button>
+                        aria-label="Flüt Ses Paketi. Notaları piyano yerine flüt ile duyarsınız. Fiyat: 200 Jeton.">Flüt
+                        Ses Paketi Satın Al (200 Jeton)</button>
                 </li>
                 <li id="li-kanun-pack" style="display: none;">
                     <button id="buy-kanun-pack-btn" class="menu-button"
-                        aria-label="Kanun Ses Paketi. Notaları piyano yerine kanun ile duyarsınız. Fiyat: 300 Jeton.">Kanun Ses Paketi Satın Al (300 Jeton)</button>
+                        aria-label="Kanun Ses Paketi. Notaları piyano yerine kanun ile duyarsınız. Fiyat: 300 Jeton.">Kanun
+                        Ses Paketi Satın Al (300 Jeton)</button>
                 </li>
                 <li>
                     <button id="store-back-btn" class="menu-button" aria-label="Geri">Geri</button>
@@ -319,7 +341,7 @@
             <!-- İstatistik verileri dinamik eklenecek -->
         </div>
 
-        <nav class="menu-nav"   aria-labelledby="stats-menu-title">
+        <nav class="menu-nav" aria-labelledby="stats-menu-title">
             <ul>
                 <li>
                     <button id="stats-back-btn" class="menu-button" aria-label="Geri">Geri</button>
@@ -366,15 +388,14 @@
                     <div style="margin-bottom: 15px;">
                         <label for="feedback-text" style="display: block; margin-bottom: 5px; color: #ffb703;">Biletiniz
                             - Mesajınız:</label>
-                        <textarea id="feedback-text" rows="5"
-                            aria-label="Biletiniz - Mesajınızı buraya yazın"
+                        <textarea id="feedback-text" rows="5" aria-label="Biletiniz - Mesajınızı buraya yazın"
                             style="width: 100%; background-color: #222; border: 1px solid #555; padding: 10px; color: #fff; border-radius: 5px; resize: vertical; font-family: inherit; font-size: 1rem;"
                             placeholder="Bildirmek istediğiniz sorunu veya harika önerilerinizi buraya yazabilirsiniz."></textarea>
                     </div>
                 </form>
             </div>
 
-            <nav class="menu-nav"   aria-labelledby="feedback-menu-title">
+            <nav class="menu-nav" aria-labelledby="feedback-menu-title">
                 <ul>
                     <li>
                         <button id="feedback-submit-btn" class="menu-button" aria-label="Gönder">Gönder</button>
@@ -392,49 +413,61 @@
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <!-- Removed top focus trap -->
         <h1 id="settings-menu-title">Ayarlar</h1>
-        
+
         <div id="settings-content"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px;">
             <div style="margin-bottom: 20px;">
-                <label for="music-volume-slider" style="display: block; margin-bottom: 5px; color: #ffb703;">Müzik Sesi Düzeyi:</label>
+                <label for="music-volume-slider" style="display: block; margin-bottom: 5px; color: #ffb703;">Müzik Sesi
+                    Düzeyi:</label>
                 <input type="range" id="music-volume-slider" name="music-volume" min="0" max="100" value="50" step="5"
-                    aria-label="Müzik Sesi Düzeyi"
-                    style="width: 100%; cursor: pointer;">
+                    aria-label="Müzik Sesi Düzeyi" style="width: 100%; cursor: pointer;">
                 <span id="music-volume-display" style="display: block; margin-top: 5px; color: #fff;">%50</span>
             </div>
             <div style="margin-bottom: 20px;">
-                <label for="sfx-volume-slider" style="display: block; margin-bottom: 5px; color: #00a884;">Oyun Efekt Sesi Düzeyi:</label>
+                <label for="sfx-volume-slider" style="display: block; margin-bottom: 5px; color: #00a884;">Oyun Efekt
+                    Sesi Düzeyi:</label>
                 <input type="range" id="sfx-volume-slider" name="sfx-volume" min="0" max="100" value="100" step="5"
-                    aria-label="Oyun Efekt Sesi Düzeyi"
-                    style="width: 100%; cursor: pointer;">
+                    aria-label="Oyun Efekt Sesi Düzeyi" style="width: 100%; cursor: pointer;">
                 <span id="sfx-volume-display" style="display: block; margin-top: 5px; color: #fff;">%100</span>
             </div>
-            
+
             <div style="margin-bottom: 20px;">
-                <button id="toggle-music-btn" class="menu-button" aria-label="Oyun müziğini devre dışı bırak" style="font-size: 1rem; width: 100%;">Oyun müziğini devre dışı bırak</button>
+                <button id="toggle-music-btn" class="menu-button" aria-label="Oyun müziğini devre dışı bırak"
+                    style="font-size: 1rem; width: 100%;">Oyun müziğini devre dışı bırak</button>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <button id="toggle-intro-btn" class="menu-button" aria-label="Başlangıçta logoyu atla" style="font-size: 1rem; width: 100%;">Başlangıçta logoyu atla (Kapalı)</button>
+                <button id="toggle-intro-btn" class="menu-button" aria-label="Başlangıçta logoyu atla"
+                    style="font-size: 1rem; width: 100%;">Başlangıçta logoyu atla (Kapalı)</button>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <button id="toggle-story-mode-btn" class="menu-button" aria-label="Kayıp Notalar Hikaye Diyaloğunu Atla (Kapalı)" style="font-size: 1rem; width: 100%;">Kayıp Notalar Hikaye Diyaloğunu Atla (Kapalı)</button>
+                <button id="toggle-story-mode-btn" class="menu-button"
+                    aria-label="Kayıp Notalar Hikaye Diyaloğunu Atla (Kapalı)"
+                    style="font-size: 1rem; width: 100%;">Kayıp Notalar Hikaye Diyaloğunu Atla (Kapalı)</button>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <button id="toggle-online-status-btn" class="menu-button" aria-label="Çevrimiçi Bildirimleri: Açık" style="font-size: 1rem; width: 100%;">Çevrimiçi Bildirimleri: Açık</button>
-            </div>
-
-
-
-            <div style="margin-bottom: 20px;">
-                <button id="toggle-motivation-btn" class="menu-button" aria-label="Oyun İçi Motivasyon Mesajları: Açık" style="font-size: 1rem; width: 100%;">Oyun İçi Motivasyon Mesajları: Açık</button>
+                <button id="toggle-online-status-btn" class="menu-button" aria-label="Çevrimiçi Bildirimleri: Açık"
+                    style="font-size: 1rem; width: 100%;">Çevrimiçi Bildirimleri: Açık</button>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label for="theme-selector" style="display: block; margin-bottom: 5px; color: #fff;">Oyun Teması:</label>
-                <select id="theme-selector" style="width: 100%; padding: 10px; font-size: 1rem; background-color: #333; color: #fff; border: 1px solid #555;" aria-label="Oyun Teması Seçimi">
+                <button id="toggle-metronome-btn" class="menu-button" aria-label="Metronom: Kapalı"
+                    style="font-size: 1rem; width: 100%;">Metronom: Kapalı</button>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <button id="toggle-motivation-btn" class="menu-button" aria-label="Oyun İçi Motivasyon Mesajları: Açık"
+                    style="font-size: 1rem; width: 100%;">Oyun İçi Motivasyon Mesajları: Açık</button>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label for="theme-selector" style="display: block; margin-bottom: 5px; color: #fff;">Oyun
+                    Teması:</label>
+                <select id="theme-selector"
+                    style="width: 100%; padding: 10px; font-size: 1rem; background-color: #333; color: #fff; border: 1px solid #555;"
+                    aria-label="Oyun Teması Seçimi">
                     <option value="default">Varsayılan (Karanlık)</option>
                     <option value="light">Aydınlık (Açık Görünüm)</option>
                     <option value="ocean">Okyanus (Mavi Ağırlıklı)</option>
@@ -446,18 +479,22 @@
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label for="keyboard-layout-selector" style="display: block; margin-bottom: 5px; color: #fff;">Oyun İçi Klavye Düzeni:</label>
-                <select id="keyboard-layout-selector" style="width: 100%; padding: 10px; font-size: 1rem; background-color: #333; color: #fff; border: 1px solid #555;" aria-label="Oyun İçi Klavye Düzeni Seçimi">
+                <label for="keyboard-layout-selector" style="display: block; margin-bottom: 5px; color: #fff;">Oyun İçi
+                    Klavye Düzeni:</label>
+                <select id="keyboard-layout-selector"
+                    style="width: 100%; padding: 10px; font-size: 1rem; background-color: #333; color: #fff; border: 1px solid #555;"
+                    aria-label="Oyun İçi Klavye Düzeni Seçimi">
                     <option value="alpha">Evrensel (Notalar A, B, C, D, E, F, G ile çalınır)</option>
                     <option value="num">Numaratör (Notalar 1, 2, 3, 4, 5, 6, 7 ile çalınır)</option>
                 </select>
             </div>
         </div>
 
-        <nav class="menu-nav"   aria-labelledby="settings-menu-title">
+        <nav class="menu-nav" aria-labelledby="settings-menu-title">
             <ul>
                 <li>
-                    <button id="settings-save-btn" class="menu-button" aria-label="Ayarları Kaydet">Ayarları Kaydet</button>
+                    <button id="settings-save-btn" class="menu-button" aria-label="Ayarları Kaydet">Ayarları
+                        Kaydet</button>
                 </li>
                 <li>
                     <button id="settings-back-btn" class="menu-button" aria-label="Geri">Geri</button>
@@ -477,11 +514,12 @@
                 <p id="update-text">Yeni bir sürüm mevcut. Sürümler denetleniyor...</p>
             </div>
 
-            <nav class="menu-nav"   aria-labelledby="update-menu-title">
+            <nav class="menu-nav" aria-labelledby="update-menu-title">
                 <ul>
                     <li>
                         <button id="update-install-btn" class="menu-button" aria-label="Yükle ve Yenile"
-                            style="color: #ff4444; font-weight: bold; text-align: center;">[YÜKLE (SAYFAYI YENİLE)]</button>
+                            style="color: #ff4444; font-weight: bold; text-align: center;">[YÜKLE (SAYFAYI
+                            YENİLE)]</button>
                     </li>
                 </ul>
             </nav>
@@ -492,14 +530,15 @@
     <div id="server-message-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <div class="feedback-dialog-box" style="border-color: #ffb703;">
-            <h1 id="server-message-title" style="color: #ffb703; border-bottom: 2px solid #ffb703;">Yapılan Son Değişiklik</h1>
+            <h1 id="server-message-title" style="color: #ffb703; border-bottom: 2px solid #ffb703;">Yapılan Son
+                Değişiklik</h1>
 
             <div id="server-message-content" tabindex="0"
                 style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
                 <p id="server-message-text">Güncelleme notları yükleniyor...</p>
             </div>
 
-            <nav class="menu-nav"   aria-labelledby="server-message-title">
+            <nav class="menu-nav" aria-labelledby="server-message-title">
                 <ul>
                     <li>
                         <button id="server-message-continue-btn" class="menu-button" aria-label="Anladım, Devam Et"
@@ -511,16 +550,22 @@
     </div>
 
     <!-- İlk Giriş Öğreticisi -->
-    <div id="first-time-tutorial-container" class="menu-container" role="presentation" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+    <div id="first-time-tutorial-container" class="menu-container" role="presentation" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <div class="feedback-dialog-box" style="border-color: #219ebc; padding: 30px;">
-            <h1 id="first-time-title" style="color: #219ebc; border-bottom: 2px solid #219ebc; margin-bottom: 20px;">Hoş Geldiniz!</h1>
-            <div id="first-time-content" tabindex="0" style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
-                <p id="first-time-text">Merhaba. Oyuna ilk defa giriş yaptığınız için alıştırma modundan oyuna başlayacaksınız. Başlamak için Enter tuşuna basın.</p>
+            <h1 id="first-time-title" style="color: #219ebc; border-bottom: 2px solid #219ebc; margin-bottom: 20px;">Hoş
+                Geldiniz!</h1>
+            <div id="first-time-content" tabindex="0"
+                style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
+                <p id="first-time-text">Merhaba. Oyuna ilk defa giriş yaptığınız için alıştırma modundan oyuna
+                    başlayacaksınız. Başlamak için Enter tuşuna basın.</p>
             </div>
             <nav class="menu-nav" aria-labelledby="first-time-title">
                 <ul>
                     <li>
-                        <button id="first-time-start-btn" class="menu-button" aria-label="Alıştırma moduna başlamak için tıklayın veya Enter'a basın." style="color: #219ebc; font-weight: bold; text-align: center;">[BAŞLA]</button>
+                        <button id="first-time-start-btn" class="menu-button"
+                            aria-label="Alıştırma moduna başlamak için tıklayın veya Enter'a basın."
+                            style="color: #219ebc; font-weight: bold; text-align: center;">[BAŞLA]</button>
                     </li>
                 </ul>
             </nav>
@@ -531,7 +576,8 @@
     <div id="daily-reward-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <div class="feedback-dialog-box" style="border-color: #00ff88;">
-            <h1 id="daily-reward-title" style="color: #00ff88; border-bottom: 2px solid #00ff88;">Günlük Giriş Ödülü</h1>
+            <h1 id="daily-reward-title" style="color: #00ff88; border-bottom: 2px solid #00ff88;">Günlük Giriş Ödülü
+            </h1>
 
             <div id="daily-reward-content" tabindex="0"
                 style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.5; color: #ffffff; text-align: left; padding: 10px; background-color: #222; border-radius: 8px;">
@@ -560,7 +606,7 @@
             <!-- Dinamik içerik eklenecek -->
         </div>
 
-        <nav class="menu-nav"   aria-labelledby="achievements-menu-title">
+        <nav class="menu-nav" aria-labelledby="achievements-menu-title">
             <ul>
                 <li>
                     <button id="achievements-back-btn" class="menu-button" aria-label="Geri">Geri</button>
@@ -574,13 +620,15 @@
     <div id="play-mode-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
         <h1 id="play-mode-title">Oyun Modu Seçimi</h1>
-        <nav class="menu-nav"   aria-labelledby="play-mode-title">
+        <nav class="menu-nav" aria-labelledby="play-mode-title">
             <ul>
                 <li>
-                    <button id="offline-play-btn" class="menu-button" aria-label="Çevrimdışı Oyna">Çevrimdışı (Klasik) Oyna</button>
+                    <button id="offline-play-btn" class="menu-button" aria-label="Çevrimdışı Oyna">Çevrimdışı (Klasik)
+                        Oyna</button>
                 </li>
                 <li>
-                    <button id="multiplayer-play-btn" class="menu-button" aria-label="Çok Oyunculu Oyna">Çok Oyunculu Oyna (Yakında)</button>
+                    <button id="multiplayer-play-btn" class="menu-button" aria-label="Çok Oyunculu Oyna">Çok Oyunculu
+                        Oyna (Yakında)</button>
                 </li>
                 <li>
                     <button id="play-mode-back-btn" class="menu-button" aria-label="Ana Menüye Dön">Geri</button>
@@ -592,43 +640,47 @@
     <!-- Çok Oyunculu Mod Seçim Menüsü -->
     <div id="multiplayer-select-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        
+
         <h1 id="multiplayer-select-title">Çok Oyunculu</h1>
-        
-        <nav class="menu-nav"   aria-labelledby="multiplayer-select-title">
+
+        <nav class="menu-nav" aria-labelledby="multiplayer-select-title">
             <ul>
                 <li>
                     <button id="pvp-play-btn" class="menu-button" aria-label="Maç Oluştur">Maç Oluştur</button>
                 </li>
                 <li>
-                    <button id="pvp-join-btn" class="menu-button" aria-label="Var Olan Bir Oyuna Katıl">Var Olan Bir Oyuna Katıl</button>
+                    <button id="pvp-join-btn" class="menu-button" aria-label="Var Olan Bir Oyuna Katıl">Var Olan Bir
+                        Oyuna Katıl</button>
                 </li>
                 <li>
-                    <button id="pve-bot-play-btn" class="menu-button" aria-label="Bota Karşı Oyna">Bota Karşı Oyna</button>
+                    <button id="pve-bot-play-btn" class="menu-button" aria-label="Bota Karşı Oyna">Bota Karşı
+                        Oyna</button>
                 </li>
                 <li>
-                    <button id="multiplayer-select-back-btn" class="menu-button" aria-label="Oyun Modu Seçimine Dön">Geri</button>
+                    <button id="multiplayer-select-back-btn" class="menu-button"
+                        aria-label="Oyun Modu Seçimine Dön">Geri</button>
                 </li>
             </ul>
         </nav>
-        
+
     </div>
 
     <!-- Odaya Katıl Menüsü -->
     <div id="pvp-rooms-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor"
-            class="sr-only"
+        <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor" class="sr-only"
             onfocus="setTimeout(() => document.getElementById('pvp-rooms-back-btn').focus(), 10);"></div>
-        
+
         <h1 id="pvp-rooms-title">Odaya Katıl</h1>
         <div id="pvp-rooms-status-text" tabindex="0"
             style="margin-bottom: 20px; font-size: 1.1rem; color: #ffb703; font-weight: bold; min-height: 50px;">
             Dört haneli oda kodunu girin.
         </div>
-        
+
         <div style="margin-bottom: 20px;">
-            <input type="number" id="pvp-join-code-input" placeholder="Örn: 1492" maxlength="4" style="font-size: 2rem; padding: 10px; width: 200px; text-align: center; border-radius: 8px; border: 2px solid #555; background-color: rgba(255, 255, 255, 0.9); color: #000; font-weight: bold;" aria-label="4 Haneli Oda Kodu">
+            <input type="number" id="pvp-join-code-input" placeholder="Örn: 1492" maxlength="4"
+                style="font-size: 2rem; padding: 10px; width: 200px; text-align: center; border-radius: 8px; border: 2px solid #555; background-color: rgba(255, 255, 255, 0.9); color: #000; font-weight: bold;"
+                aria-label="4 Haneli Oda Kodu">
         </div>
 
         <nav class="menu-nav" aria-labelledby="pvp-rooms-title">
@@ -638,55 +690,65 @@
                     <button id="pvp-join-submit-btn" class="menu-button" aria-label="Odaya Katıl">Katıl</button>
                 </li>
                 <li>
-                    <button id="pvp-rooms-back-btn" class="menu-button" aria-label="Çok Oyunculu Menüsüne Dön">Geri</button>
+                    <button id="pvp-rooms-back-btn" class="menu-button"
+                        aria-label="Çok Oyunculu Menüsüne Dön">Geri</button>
                 </li>
             </ul>
         </nav>
-        
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor"
-            class="sr-only"
-            onfocus="setTimeout(() => { const btn=document.getElementById('pvp-join-submit-btn'); if(btn) btn.focus(); }, 10);"></div>
+
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only"
+            onfocus="setTimeout(() => { const btn=document.getElementById('pvp-join-submit-btn'); if(btn) btn.focus(); }, 10);">
+        </div>
     </div>
 
     <!-- Eşleştirme Lobisi (Bekleme Odası) -->
     <div id="pvp-lobby-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
-        <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('pvp-lobby-cancel-btn').focus(), 10);"></div>
-        
-        <h1 id="pvp-lobby-title" tabindex="0">Oyun Lobisi</h1>
-        <h2 id="pvp-lobby-code-display" tabindex="0" style="font-size: 2.5rem; letter-spacing: 5px; color: #fff; margin-bottom: 10px; font-family: monospace;">----</h2>
-        
+        <div tabindex="0" role="button" aria-label="Menü başı, sona gidiliyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('pvp-lobby-cancel-btn').focus(), 10);"></div>
+
+        <h1 id="pvp-lobby-title" tabindex="0" role="textbox" aria-readonly="true">Oyun Lobisi</h1>
+        <h2 id="pvp-lobby-code-display" tabindex="0" role="textbox" aria-readonly="true"
+            style="font-size: 2.5rem; letter-spacing: 5px; color: #fff; margin-bottom: 10px; font-family: monospace;">
+            ----</h2>
+
         <div id="pvp-lobby-status-text" tabindex="0"
             style="margin-bottom: 20px; font-size: 1.2rem; color: #ffb703; font-weight: bold; min-height: 50px;">
             Bekleniyor...
         </div>
-        <p style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa;" id="pvp-lobby-info-text" tabindex="0">
+        <p style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa;" id="pvp-lobby-info-text" tabindex="0" role="textbox" aria-readonly="true">
             Oda bilgileri yükleniyor...
         </p>
 
         <div id="pvp-lobby-mode-container" style="display: none; margin-bottom: 20px;">
             <p style="color: #ffb703; margin-bottom: 10px;" tabindex="0" id="pvp-lobby-mode-title">Oyun Modu Seçimi</p>
             <div style="display: flex; gap: 10px; justify-content: center;">
-                <button id="pvp-mode-individual-btn" class="menu-button" aria-label="Bireysel Mod Seçili" style="background: #ffb703; color: #000; flex: 1;">Bireysel</button>
-                <button id="pvp-mode-team-btn" class="menu-button" aria-label="Takım Modu Seç" style="flex: 1;">Takım Modu</button>
+                <button id="pvp-mode-individual-btn" class="menu-button" aria-label="Bireysel Mod Seçili"
+                    style="background: #ffb703; color: #000; flex: 1;">Bireysel</button>
+                <button id="pvp-mode-team-btn" class="menu-button" aria-label="Takım Modu Seç" style="flex: 1;">Takım
+                    Modu</button>
             </div>
         </div>
-        
+
         <nav class="menu-nav" aria-labelledby="pvp-lobby-title">
             <ul>
                 <li>
-                    <button id="pvp-lobby-start-btn" class="menu-button highlight" aria-label="Maçı Başlat" style="display: none; background: linear-gradient(145deg, #00b4d8, #0077b6);">Maçı Başlat</button>
+                    <button id="pvp-lobby-start-btn" class="menu-button highlight" aria-label="Maçı Başlat"
+                        style="display: none; background: linear-gradient(145deg, #00b4d8, #0077b6);">Maçı
+                        Başlat</button>
                 </li>
                 <li>
                     <button id="pvp-lobby-copy-btn" class="menu-button" aria-label="Kodu Kopyala">Kodu Kopyala</button>
                 </li>
                 <li>
-                    <button id="pvp-lobby-cancel-btn" class="menu-button" aria-label="Lobiden Çık veya İptal Et">İptal Et</button>
+                    <button id="pvp-lobby-cancel-btn" class="menu-button" aria-label="Lobiden Çık veya İptal Et">İptal
+                        Et</button>
                 </li>
             </ul>
         </nav>
 
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('pvp-lobby-title').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('pvp-lobby-title').focus(), 10);"></div>
     </div>
 
     <!-- Oyun Ekranı -->
@@ -708,7 +770,7 @@
             style="display: none; margin: 0 auto 20px auto; font-size: 1.2rem; padding: 15px 30px; background-color: #219ebc; color: white; border: none; border-radius: 8px; width: 90%; max-width: 400px; font-weight: bold; cursor: pointer; text-align: center;">
             Tekrar Dinle
         </button>
-        <nav class="menu-nav"   aria-labelledby="game-menu-title">
+        <nav class="menu-nav" aria-labelledby="game-menu-title">
             <ul>
                 <li class="desktop-exit-li">
                     <button id="game-back-btn" class="menu-button" aria-label="Oyunu Bitir">Oyunu Bitir</button>
@@ -750,12 +812,13 @@
 
     <!-- Gizli Canlı Bölge (Sohbet pencereleri ve anlık ses/bildirim anonsları için) -->
     <div id="sr-chat-reader" class="sr-only" role="status" aria-live="assertive" aria-atomic="true"></div>
-    <div id="version-display" aria-live="polite" tabindex="0" aria-label="Sürüm 0.97.4.46">v0.97.4.46</div>
+    <div id="version-display" aria-live="polite" tabindex="0" role="textbox" aria-readonly="true" aria-label="Sürüm 0.97.4.48">v0.97.4.48</div>
 
     <!-- Canlı Sohbet Penceresi -->
     <div id="chat-panel" class="chat-panel" aria-hidden="true" style="display: none;" role="dialog"
         aria-label="Canlı Sohbet Penceresi">
-        <div tabindex="0" role="button" aria-label="Sohbet paneli başı, sona gidiliyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('chat-send-btn').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Sohbet paneli başı, sona gidiliyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('chat-send-btn').focus(), 10);"></div>
         <div class="chat-header">
             <h2 id="chat-title">Canlı Sohbet</h2>
             <button id="chat-close-btn" aria-label="Sohbeti Kapat" class="chat-close-btn">X</button>
@@ -772,48 +835,67 @@
                 placeholder="Mesajınız..." maxlength="150">
             <button id="chat-send-btn" aria-label="Mesajı Gönder">➤</button>
         </div>
-        <div tabindex="0" role="button" aria-label="Sohbet paneli sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('chat-close-btn').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Sohbet paneli sonu, başa dönülüyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('chat-close-btn').focus(), 10);"></div>
     </div>
 
     <!-- KULLANICI İŞLEMLERİ MENÜSÜ (Özel Mesaj / Sustur) -->
-    <div id="social-action-modal" class="menu-container" role="presentation" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; z-index: 2000; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('social-btn-cancel').focus(), 10);"></div>
-        
-        <h2 id="social-action-title" tabindex="0" style="color: #ffb703; border-bottom: 2px solid #ffb703; padding-bottom: 5px; margin-bottom: 20px; font-size: 2rem;">İşlem Seçimi</h2>
-        <nav class="menu-nav"   aria-labelledby="social-action-title">
+    <div id="social-action-modal" class="menu-container" role="presentation" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; z-index: 2000; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('social-btn-cancel').focus(), 10);"></div>
+
+        <h2 id="social-action-title" tabindex="0" role="textbox" aria-readonly="true"
+            style="color: #ffb703; border-bottom: 2px solid #ffb703; padding-bottom: 5px; margin-bottom: 20px; font-size: 2rem;">
+            İşlem Seçimi</h2>
+        <nav class="menu-nav" aria-labelledby="social-action-title">
             <ul id="social-action-list">
-                <li><button id="social-btn-pm" class="menu-button" aria-label="Özel Mesaj Gönder">Özel Mesaj Gönder</button></li>
-                <li><button id="social-btn-mute" class="menu-button" aria-label="Kullanıcıyı Sustur">Kullanıcıyı Sustur</button></li>
-                <li class="dev-only-action" style="display: none;"><button id="social-btn-resolve" class="menu-button" aria-label="Bilet Çöz">Bilet Çöz</button></li>
-                <li class="dev-only-action" style="display: none;"><button id="social-btn-ban" class="menu-button" aria-label="Oyuncuyu Banla">Oyuncuyu Banla</button></li>
-                <li class="dev-only-action" style="display: none;"><button id="social-btn-unban" class="menu-button" aria-label="Banı Kaldır">Banı Kaldır</button></li>
+                <li><button id="social-btn-pm" class="menu-button" aria-label="Özel Mesaj Gönder">Özel Mesaj
+                        Gönder</button></li>
+                <li><button id="social-btn-mute" class="menu-button" aria-label="Kullanıcıyı Sustur">Kullanıcıyı
+                        Sustur</button></li>
+                <li class="dev-only-action" style="display: none;"><button id="social-btn-resolve" class="menu-button"
+                        aria-label="Bilet Çöz">Bilet Çöz</button></li>
+                <li class="dev-only-action" style="display: none;"><button id="social-btn-ban" class="menu-button"
+                        aria-label="Oyuncuyu Banla">Oyuncuyu Banla</button></li>
+                <li class="dev-only-action" style="display: none;"><button id="social-btn-unban" class="menu-button"
+                        aria-label="Banı Kaldır">Banı Kaldır</button></li>
                 <li><button id="social-btn-cancel" class="menu-button" aria-label="İptal">İptal</button></li>
             </ul>
         </nav>
-        
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('social-btn-pm').focus(), 10);"></div>
+
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('social-btn-pm').focus(), 10);"></div>
     </div>
 
     <!-- DURAKLATMA / ÇIKIŞ MENÜSÜ -->
-    <div id="pause-action-modal" class="menu-container" role="presentation" aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; z-index: 2000; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('pause-btn-cancel').focus(), 10);"></div>
-        
-        <h2 id="pause-action-title" tabindex="-1" style="color: #ffb703; border-bottom: 2px solid #ffb703; padding-bottom: 5px; margin-bottom: 20px; font-size: 2rem; outline: none;">Ne yapmak istiyorsunuz?</h2>
-        <nav class="menu-nav"   aria-labelledby="pause-action-title">
+    <div id="pause-action-modal" class="menu-container" role="presentation" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; z-index: 2000; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('pause-btn-cancel').focus(), 10);"></div>
+
+        <h2 id="pause-action-title" tabindex="-1"
+            style="color: #ffb703; border-bottom: 2px solid #ffb703; padding-bottom: 5px; margin-bottom: 20px; font-size: 2rem; outline: none;">
+            Ne yapmak istiyorsunuz?</h2>
+        <nav class="menu-nav" aria-labelledby="pause-action-title">
             <ul>
                 <li><button id="pause-btn-exit" class="menu-button" aria-label="Oyundan Çık">Oyundan Çık</button></li>
                 <li><button id="pause-btn-save" class="menu-button" aria-label="Oyunu Kaydet">Oyunu Kaydet</button></li>
-                <li><button id="pause-btn-cancel" class="menu-button" aria-label="İptal (Oyuna Dön)">İptal (Oyuna Dön)</button></li>
+                <li><button id="pause-btn-cancel" class="menu-button" aria-label="İptal (Oyuna Dön)">İptal (Oyuna
+                        Dön)</button></li>
             </ul>
         </nav>
-        
-        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('pause-btn-exit').focus(), 10);"></div>
+
+        <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('pause-btn-exit').focus(), 10);"></div>
     </div>
 
 
     <!-- ÖZEL MESAJLAŞMA PENCERESİ -->
-    <div id="private-chat-panel" class="chat-panel" aria-hidden="true" style="display: none; z-index: 2001;" role="dialog" aria-label="Özel Sohbet Penceresi">
-        <div tabindex="0" role="button" aria-label="Özel sohbet paneli başı, sona gidiliyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('private-chat-send-btn').focus(), 10);"></div>
+    <div id="private-chat-panel" class="chat-panel" aria-hidden="true" style="display: none; z-index: 2001;"
+        role="dialog" aria-label="Özel Sohbet Penceresi">
+        <div tabindex="0" role="button" aria-label="Özel sohbet paneli başı, sona gidiliyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('private-chat-send-btn').focus(), 10);"></div>
         <div class="chat-header">
             <h2 id="private-chat-title" aria-live="polite">Özel Sohbet</h2>
             <button id="private-chat-close-btn" aria-label="Özel Sohbeti Kapat" class="chat-close-btn">X</button>
@@ -822,10 +904,12 @@
             <ul id="private-chat-messages" aria-label="Özel Mesajlar"></ul>
         </div>
         <div class="chat-input-area">
-            <input type="text" id="private-chat-message-input" name="private-chat-message-input" aria-label="Özel Mesajınızı Girin" placeholder="Özel mesajınız..." maxlength="150" disabled>
+            <input type="text" id="private-chat-message-input" name="private-chat-message-input"
+                aria-label="Özel Mesajınızı Girin" placeholder="Özel mesajınız..." maxlength="150" disabled>
             <button id="private-chat-send-btn" aria-label="Mesajı Gönder" disabled>➤</button>
         </div>
-        <div tabindex="0" role="button" aria-label="Özel sohbet paneli sonu, başa dönülüyor" class="sr-only" onfocus="setTimeout(() => document.getElementById('private-chat-close-btn').focus(), 10);"></div>
+        <div tabindex="0" role="button" aria-label="Özel sohbet paneli sonu, başa dönülüyor" class="sr-only"
+            onfocus="setTimeout(() => document.getElementById('private-chat-close-btn').focus(), 10);"></div>
     </div>
 
     <!-- Howler.js 3D Ses Kütüphanesi (Yerel) -->
@@ -835,11 +919,11 @@
     <script src="js/autoRepair.js"></script>
 
     <!-- Yardım, Alıştırma ve Motivasyon Mesajları -->
-    <script src="js/yardim.js?v=0.97.4.46"></script>
+    <script src="js/yardim.js?v=0.97.4.48"></script>
 
     <script>
         // OYUN SÜRÜM BİLGİSİ
-        window.UYGULAMA_SURUMU = '0.97.4.44';
+        window.UYGULAMA_SURUMU = '0.97.4.48';
         window.KAYIT_SISTEMI_SURUMU = 'v2';
     </script>
 
@@ -847,12 +931,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
 
-    <script src="js/firebase.js?v=0.97.4.46"></script>
-    <script src="js/audio.js?v=0.97.4.46"></script>
-    <script src="js/ui.js?v=0.97.4.46"></script>
-    <script src="js/story.js?v=0.97.4.46"></script>
-    <script src="js/game.js?v=0.97.4.46"></script>
-    <script src="js/pvp.js?v=0.97.4.46"></script>
+    <script src="js/firebase.js?v=0.97.4.48"></script>
+    <script src="js/audio.js?v=0.97.4.48"></script>
+    <script src="js/ui.js?v=0.97.4.48"></script>
+    <script src="js/story.js?v=0.97.4.48"></script>
+    <script src="js/game.js?v=0.97.4.48"></script>
+    <script src="js/pvp.js?v=0.97.4.48"></script>
 </body>
 
 </html>

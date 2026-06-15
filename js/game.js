@@ -76,7 +76,8 @@ window.gameModes = {
     easy: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Kolay' },
     medium: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Orta' },
     hard: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Zor' },
-    missing_notes: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Kayıp Notalar' }
+    missing_notes: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Kayıp Notalar' },
+    rhythm_mode: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Ritim Avcısı' }
 };
 
 window.userAchievements = {
@@ -101,7 +102,12 @@ window.mobileExitBtnTimeout = null;
 // Daha önce kaydedilmiş veri varsa yükle
 try {
     const savedModes = localStorage.getItem('hafizaGuvenModes');
-    if (savedModes) window.gameModes = JSON.parse(savedModes);
+    if (savedModes) {
+        window.gameModes = JSON.parse(savedModes);
+        if (!window.gameModes.rhythm_mode) {
+            window.gameModes.rhythm_mode = { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Ritim Avcısı' };
+        }
+    }
 
     const savedAchievements = localStorage.getItem('hafizaGuvenAchievements');
     if (savedAchievements) window.userAchievements = JSON.parse(savedAchievements);
@@ -373,6 +379,12 @@ window.startGame = function () {
 };
 
 window.startMainGame = function (difficulty = 'easy') {
+    if (difficulty === 'rhythm_mode') {
+        if (window.startRhythmMode) {
+            window.startRhythmMode();
+            return;
+        }
+    }
     // Tarayıcı sekmelerini/adres çubuğunu gizlemek için Tam Ekran API devreye alınıyor
     try {
         let elem = document.documentElement;
@@ -1270,7 +1282,11 @@ document.addEventListener('keydown', function (event) {
                 const validKeys = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
                 if (validKeys.includes(key)) {
                     event.preventDefault();
-                    window.handleGameInput(key);
+                    if (window.activeDifficulty === 'rhythm_mode') {
+                        if (window.handleRhythmInput) window.handleRhythmInput(key);
+                    } else {
+                        window.handleGameInput(key);
+                    }
                 }
             }
         }
@@ -1510,7 +1526,7 @@ window.populateSavedGamesList = function() {
     } catch(e) {}
     
     if (saves.length === 0) {
-        listEl.innerHTML = '<li tabindex="0">Henüz kayıtlı oyununuz bulunmuyor.</li>';
+        listEl.innerHTML = '<li tabindex="0" role="menuitem">Henüz kayıtlı oyununuz bulunmuyor.</li>';
         return;
     }
     
@@ -1604,4 +1620,145 @@ window.loadSavedGame = function(saveObj) {
             window.playGameSequence();
         }
     }, 1500);
+};
+
+window.rhythmState = {
+    bpm: 60,
+    level: 1,
+    successes: 0,
+    sequence: [],
+    playerIndex: 0,
+    beatsPerMeasure: 4,
+    measures: 2,
+    isPlaying: false,
+    intervalId: null
+};
+
+window.startRhythmMode = function() {
+    window.activeDifficulty = 'rhythm_mode';
+    window.gameIsActive = true;
+    window.isComputerPlaying = true;
+    
+    window.rhythmState.bpm = 60;
+    window.rhythmState.level = 1;
+    window.rhythmState.successes = 0;
+    
+    const gameStatus = document.getElementById('game-status-text');
+    if (gameStatus) {
+        gameStatus.style.display = 'block';
+        gameStatus.textContent = "Ritim Avcısı başlıyor... 60 BPM. Bilgisayarı dinleyin!";
+        if (window.announceToScreenReader) window.announceToScreenReader(gameStatus.textContent);
+    }
+    
+    setTimeout(() => {
+        window.playRhythmComputerTurn();
+    }, 2000);
+};
+
+window.playRhythmComputerTurn = function() {
+    window.isComputerPlaying = true;
+    window.rhythmState.playerIndex = 0;
+    window.rhythmState.sequence = [];
+    
+    let totalBeats = window.rhythmState.beatsPerMeasure * window.rhythmState.measures; // 8 beats
+    
+    let noteCount = Math.min(3 + Math.floor(window.rhythmState.level / 2), totalBeats);
+    let availableKeys = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+    
+    let noteBeats = new Set();
+    while(noteBeats.size < noteCount) {
+        noteBeats.add(Math.floor(Math.random() * totalBeats));
+    }
+    
+    let beatArray = Array.from(noteBeats).sort((a,b) => a-b);
+    let beatToNoteMap = {};
+    for (let beat of beatArray) {
+        let randomNote = availableKeys[Math.floor(Math.random() * availableKeys.length)];
+        beatToNoteMap[beat] = randomNote;
+        window.rhythmState.sequence.push(randomNote); // Oyuncunun basması gereken sıra
+    }
+    
+    const gameStatus = document.getElementById('game-status-text');
+    if (gameStatus) {
+        gameStatus.textContent = `Seviye ${window.rhythmState.level} | BPM: ${window.rhythmState.bpm} | Dinleyin...`;
+    }
+    
+    let currentBeat = 0;
+    let intervalMs = 60000 / window.rhythmState.bpm;
+    
+    window.rhythmState.intervalId = setInterval(() => {
+        let isFirstBeat = (currentBeat % window.rhythmState.beatsPerMeasure) === 0;
+        if (window.playMetronomeTick) window.playMetronomeTick(isFirstBeat);
+        
+        if (beatToNoteMap[currentBeat]) {
+            let note = beatToNoteMap[currentBeat];
+            if (window.playPianoNoteSingle) window.playPianoNoteSingle(note);
+        }
+        
+        currentBeat++;
+        if (currentBeat >= totalBeats) {
+            clearInterval(window.rhythmState.intervalId);
+            setTimeout(() => {
+                window.startRhythmPlayerTurn();
+            }, intervalMs);
+        }
+    }, intervalMs);
+};
+
+window.startRhythmPlayerTurn = function() {
+    window.isComputerPlaying = false;
+    const gameStatus = document.getElementById('game-status-text');
+    if (gameStatus) {
+        gameStatus.textContent = "Sıra sizde! Aynı sırayla çalın.";
+        if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde!");
+    }
+};
+
+window.handleRhythmInput = function(key) {
+    if (window.isComputerPlaying || window.activeDifficulty !== 'rhythm_mode') return;
+    
+    if (window.playPianoNoteSingle) window.playPianoNoteSingle(key);
+    
+    let expectedKey = window.rhythmState.sequence[window.rhythmState.playerIndex];
+    if (key === expectedKey) {
+        window.rhythmState.playerIndex++;
+        
+        if (window.rhythmState.playerIndex >= window.rhythmState.sequence.length) {
+            window.isComputerPlaying = true;
+            if (window.correctSound) window.correctSound.play();
+            window.rhythmState.successes++;
+            
+            const gameStatus = document.getElementById('game-status-text');
+            if (gameStatus) {
+                gameStatus.textContent = "Harika!";
+                if (window.announceToScreenReader) window.announceToScreenReader("Harika!");
+            }
+            
+            if (window.rhythmState.successes >= 3) {
+                window.rhythmState.successes = 0;
+                window.rhythmState.level++;
+                window.rhythmState.bpm += 10;
+                
+                if (window.gameModes.rhythm_mode.completionCount < window.rhythmState.level) {
+                    window.gameModes.rhythm_mode.completionCount = window.rhythmState.level;
+                    try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}
+                }
+                
+                setTimeout(() => {
+                    if (gameStatus) {
+                        gameStatus.textContent = `Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`;
+                        if (window.announceToScreenReader) window.announceToScreenReader(`Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`);
+                    }
+                    if (window.modeUnlockSound) window.modeUnlockSound.play();
+                    setTimeout(window.playRhythmComputerTurn, 2500);
+                }, 1000);
+            } else {
+                setTimeout(window.playRhythmComputerTurn, 1500);
+            }
+        }
+    } else {
+        if (window.wrongSound) window.wrongSound.play();
+        window.endMainGame(false, false, true); 
+        if (window.announceToScreenReader) window.announceToScreenReader("Yanlış nota! Oyun bitti.");
+    }
 };

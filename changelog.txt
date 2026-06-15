@@ -1,10 +1,10 @@
-# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+﻿# Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
-[v0.97.4.46] - 15.06.2026
+[v0.97.4.48] - 16.06.2026
 
-Hata Düzeltmesi:
-- Mobil görünümde Kayıp Notalar modunda Konumu Sorgula (C) ve Süre (T) düğmeleri düzeltildi.
-
+Yeni Ozellikler:
+- Yeni Oyun Modu: "Ritim Avcisi". Bilgisayarin 60 BPM (ve giderek hizlanan) metronom esliginde caldigi urettigi notalari tekrarlamanizi isteyen, cagri-cevap tabanli yepyeni bir ritim diktesi modu eklendi.
+- NVDA Ekran Okuyucu Ä°yilestirmesi: Uygulamanin okuma modlari arasinda yasanan anlamsiz "Belge / Uygulama" gecisleri, HTML odak rollerinin onarilmasiyla duzeltildi.
 [v0.97.4.45] - 26.05.2026
 
 Yeni Ozellikler:
@@ -811,5 +811,7 @@ Yeni Ozellikler:
  -   S t o r y   m o d u n d a k i   s e s l e r i n   d i g e r   m o d l a r i   b o z m a s i   ( G l o b a l   V o l u m e )   h a t a s i   g i d e r i l d i . 
  -   E k r a n   o k u y u c u   u z u n   b i l d i r i m   k e s i l m e   h a t a s i   o n a r i l d i . 
  -   T a r a y i c i   p e r f o r m a n s i n i   e t k i l e y e n   M e m o r y   L e a k   h a t a l a r i   t e m i z l e n d i . 
- - - - - - - - - - - - - - - - - - - - - - - - - - -  
+ - - - - - - - - - - - - - - - - - - - - - - - - - - 
  
+ 
+

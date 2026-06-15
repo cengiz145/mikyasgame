@@ -416,3 +416,51 @@ window.arenaLeaveSound = new Howl({
     src: ['sounds/arena_leave.ogg'],
     volume: 1.0
 });
+
+window.metronomeIntervalId = null;
+
+window.startMetronome = function () {
+    window.stopMetronome();
+    let metronomeState = localStorage.getItem('hafizaGuvenMetronome') || 'off';
+    if (metronomeState === 'off') return;
+    
+    let bpm = parseInt(metronomeState);
+    if (isNaN(bpm) || bpm <= 0) return;
+    
+    let intervalMs = 60000 / bpm;
+    
+    // İlk vuruşu anında yap
+    window.clockTickSound.volume(0.3);
+    window.clockTickSound.play();
+    
+    window.metronomeIntervalId = setInterval(() => {
+        window.clockTickSound.play();
+    }, intervalMs);
+};
+
+window.stopMetronome = function () {
+    if (window.metronomeIntervalId) {
+        clearInterval(window.metronomeIntervalId);
+        window.metronomeIntervalId = null;
+    }
+};
+
+window.playMetronomeTick = function (isHighPitch = false) {
+    try {
+        const ctx = window.audioCtx || (window.AudioContext ? new window.AudioContext() : new window.webkitAudioContext());
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(isHighPitch ? 1200 : 800, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.1);
+    } catch (e) {
+        if (window.clockTickSound) window.clockTickSound.play();
+    }
+};
