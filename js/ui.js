@@ -1,4 +1,4 @@
-﻿// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
+// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
 
 // Mobil Cihaz Tespiti
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
@@ -567,6 +567,9 @@ window.updateScoreboardLocks = function () {
     if (window.gameModes.hard.completionCount >= window.gameModes.missing_notes.requiredToUnlock) {
         window.gameModes.missing_notes.isUnlocked = true;
     }
+    if (window.gameModes.missing_notes.completionCount >= window.gameModes.rhythm_mode.requiredToUnlock) {
+        window.gameModes.rhythm_mode.isUnlocked = true;
+    }
 
     const btnMedium = document.getElementById('btn-score-medium');
     const btnHard = document.getElementById('btn-score-hard');
@@ -576,7 +579,7 @@ window.updateScoreboardLocks = function () {
     window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta moddaki en yüksek skoru görüntüle", "Kolay modu 5 kez tamamla");
     window.updateButtonUI(btnHard, window.gameModes.hard, "Zor moddaki yüksek skoru görüntüle", "Orta modu 5 kez tamamla");
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp notalar modu için yüksek skoru görüntüle", "Zor modu 5 kez tamamla");
-    if (btnRhythmScore) window.updateButtonUI(btnRhythmScore, window.gameModes.rhythm_mode, "Ritim Avcısı için yüksek skoru görüntüle", "");
+    if (btnRhythmScore) window.updateButtonUI(btnRhythmScore, window.gameModes.rhythm_mode, "Ritim Avcısı için yüksek skoru görüntüle", "Kayıp Notalar modunu tamamla");
 };
 
 window.updateDifficultyMenuLocks = function () {
@@ -591,6 +594,9 @@ window.updateDifficultyMenuLocks = function () {
     }
     if (window.gameModes.hard.completionCount >= window.gameModes.missing_notes.requiredToUnlock) {
         window.gameModes.missing_notes.isUnlocked = true;
+    }
+    if (window.gameModes.missing_notes.completionCount >= window.gameModes.rhythm_mode.requiredToUnlock) {
+        window.gameModes.rhythm_mode.isUnlocked = true;
     }
 
     const btnEasy = document.getElementById('btn-diff-easy');
@@ -610,7 +616,7 @@ window.updateDifficultyMenuLocks = function () {
     window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta Modu Oyna", "Kolay modu 5 kez tamamla");
     window.updateButtonUI(btnHard, window.gameModes.hard, "Zor Modu Oyna", "Orta modu 5 kez tamamla");
     window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp Notalar Modu. Hikayeli piyano modu.", "Zor modu 5 kez tamamla");
-    if (btnRhythm) window.updateButtonUI(btnRhythm, window.gameModes.rhythm_mode, "Ritim Avcısı Oyna. Metronom eşliğinde çal.", "");
+    if (btnRhythm) window.updateButtonUI(btnRhythm, window.gameModes.rhythm_mode, "Ritim Avcısı Oyna. Metronom eşliğinde çal.", "Kayıp Notalar modunu tamamla");
 };
 
 window.updateStatsDisplay = function() {

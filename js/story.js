@@ -479,7 +479,7 @@ window.handleStoryWalking = function(key) {
                     }
                     if (window.applauseSound) window.applauseSound.play();
                     
-                    let unlockMsg = "Tebrikler. Bütün seslerin hakimi olmayı başardığınız için size bir ödül olarak farklı ses paketlerinin kilidi açıldı. Bunları mağazadan satın alabilirsiniz. Keyifli oyunlar dileriz. Ana menüye dönmek için entıra basın.";
+                    let unlockMsg = "Tebrikler. Kayıp notalar modunu tamamladınız. Ve ritim avcısı modunu oynamaya hak kazandınız. Bu modu tüm ses paketleriyle özgürce oynayabilirsiniz. Keyifli oyunlar. ve bu oyunu oynadığınız için teşekkür ederiz. Ana menüye dönmek için entıra basın.";
                     
                     const storyStatus = document.getElementById('story-status-text');
                     if (storyStatus) storyStatus.innerHTML = unlockMsg;

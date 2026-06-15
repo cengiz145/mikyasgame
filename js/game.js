@@ -77,7 +77,7 @@ window.gameModes = {
     medium: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Orta' },
     hard: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Zor' },
     missing_notes: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Kayıp Notalar' },
-    rhythm_mode: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Ritim Avcısı' }
+    rhythm_mode: { isUnlocked: false, completionCount: 0, requiredToUnlock: 1, name: 'Ritim Avcısı' }
 };
 
 window.userAchievements = {
@@ -105,7 +105,7 @@ try {
     if (savedModes) {
         window.gameModes = JSON.parse(savedModes);
         if (!window.gameModes.rhythm_mode) {
-            window.gameModes.rhythm_mode = { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Ritim Avcısı' };
+            window.gameModes.rhythm_mode = { isUnlocked: false, completionCount: 0, requiredToUnlock: 1, name: 'Ritim Avcısı' };
         }
     }
 
