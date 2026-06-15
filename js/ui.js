@@ -1,4 +1,4 @@
-// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
+﻿// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
 
 // Mobil Cihaz Tespiti
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
@@ -4342,12 +4342,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.showAchievementModal = function(achName) {
-        let gameLink = "https://cengiz145.github.io/mikyasgame/";
-        let shareText = "Tebrikler! HafÄ±zana GÃ¼ven'de ' + achName + ' baÅŸarÄ±mÄ±nÄ± elde ettim! ğŸ†\n\nSen de benimle beraber bu baÅŸarÄ±yÄ± yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna:  + gameLink;
+        let gameLink = "https://mikyasstudio.com.tr/hafizanaguven.html";
+        let shareText = Tebrikler! HafÄ±zana GÃ¼ven'de " + achName + " baÅŸarÄ±mÄ±nÄ± elde ettim! ğŸ†\n\nSen de benimle beraber bu baÅŸarÄ±yÄ± yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna:  + gameLink;
         
         let textElem = document.getElementById('achievement-modal-text');
         if (textElem) {
-            textElem.textContent = "Tebrikler! '" + achName + "' baÅŸarÄ±mÄ±nÄ± elde ettiniz! Bunu arkadaÅŸlarÄ±nÄ±zla paylaÅŸabilirsiniz.";
+            textElem.textContent = Tebrikler! " + achName + " baÅŸarÄ±mÄ±nÄ± elde ettiniz! Bunu arkadaÅŸlarÄ±nÄ±zla paylaÅŸabilirsiniz.;
             textElem.focus();
         }
         
