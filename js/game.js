@@ -695,6 +695,9 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
             window.hgfzZamanlayici.setTimeout(() => {
                 if (window.achievementSound) window.achievementSound.play();
                 if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız! İlk başarınızı elde ettiniz: Hafızam güçleniyor.");
+                setTimeout(() => {
+                    if (window.showAchievementModal) window.showAchievementModal("Hafızam Güçleniyor");
+                }, 3000);
             }, 4000);
         }
     } else if (isTimeOut) {

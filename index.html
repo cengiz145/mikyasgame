@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 
 <head>
@@ -869,6 +869,20 @@
     </div>
 
     <!-- DURAKLATMA / ÇIKIŞ MENÜSÜ -->
+    <!-- Başarım Paylaşım Modalı -->
+    <div id="achievement-modal" class="menu-container" role="dialog" aria-hidden="true"
+        aria-label="Yeni Başarım Kazanıldı">
+        <h1 tabindex="-1">🏆 Yeni Başarım! 🏆</h1>
+        <p id="achievement-modal-text" tabindex="0" role="textbox" aria-readonly="true" style="margin-bottom: 20px;">Yeni bir başarım kazandınız!</p>
+        <ul class="menu-nav">
+            <li><button id="btn-ach-copy" class="menu-button">Mesajı Kopyala</button></li>
+            <li><button id="btn-ach-whatsapp" class="menu-button">WhatsApp'ta Paylaş</button></li>
+            <li><button id="btn-ach-telegram" class="menu-button">Telegram'da Paylaş</button></li>
+            <li><button id="btn-ach-close" class="menu-button">Kapat</button></li>
+        </ul>
+    </div>
+
+    <!-- Oyun İçi Duraklatma Modalı -->
     <div id="pause-action-modal" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; z-index: 2000; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
         <div tabindex="0" role="button" aria-label="Menü sonu, başa dönülüyor" class="sr-only"
