@@ -1,4 +1,9 @@
-﻿# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+
+[v0.97.4.46] - 15.06.2026
+
+Hata Düzeltmesi:
+- Mobil görünümde Kayıp Notalar modunda Konumu Sorgula (C) ve Süre (T) düğmeleri düzeltildi.
 
 [v0.97.4.45] - 26.05.2026
 
