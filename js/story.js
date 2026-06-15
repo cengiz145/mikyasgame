@@ -420,7 +420,25 @@ window.handleStoryWalking = function(key) {
         } else {
             msg += "Burası karlı boş bir alan.";
         }
+        
+        const storyStatus = document.getElementById('story-status-text');
+        if (storyStatus) {
+            storyStatus.innerHTML = msg;
+            storyStatus.blur();
+            window.hgfzZamanlayici.setTimeout(() => storyStatus.focus(), 10);
+        }
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
+    } else if (key.toLowerCase() === 't') {
+        const displayTime = window.storyTimerValue < 0 ? 0 : window.storyTimerValue;
+        let msg = `Kalan süre: ${displayTime} saniye.`;
+        
+        const storyStatus = document.getElementById('story-status-text');
+        if (storyStatus) {
+            storyStatus.innerHTML = msg;
+            storyStatus.blur();
+            window.hgfzZamanlayici.setTimeout(() => storyStatus.focus(), 10);
+        }
+        if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
     } else if (key === 'Enter') {
         if (window.notesInPiano.length === window.MAX_NOTES && !window.carryingNote) {
             if (window.isSoundPacksUnlockDialogWaitingForEnter) {
