@@ -287,6 +287,32 @@
             border-bottom-color: #fff;
         }
 
+        /* YouTube Button */
+        .btn-youtube {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            margin-top: 1.5rem;
+            box-shadow: 0 10px 20px rgba(255, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-youtube:hover, .btn-youtube:focus {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(255, 0, 0, 0.5);
+            outline: none;
+        }
+
+        .btn-youtube:focus {
+            outline: 3px solid #fff;
+            outline-offset: 4px;
+        }
+
         /* Accessibility improvements for screen readers */
         .sr-only {
             position: absolute;
@@ -323,6 +349,12 @@
             <p>Müzik öğretmeni olmanın yanı sıra kendimi geliştirmeyi ve bir şeyler üretmeyi sevdiğim için bu siteyi hayata geçirdim. Bu sitede geliştirmekte olduğum gerek sesli oyun projelerimi gerekse müziklerimi bulabileceğiniz alanlar bulacaksınız.</p>
             <p>Projelerimi geliştirirken yapay zeka kullandığımı belirtmek isterim. Yapay zekayı aktif bir şekilde kullanıyor, onun tüm nimetlerinden faydalanmaktan geri durmuyorum. Yaptığım projelerde yapay zekayı her ne kadar kullansam da fikirlerimin benim özgün fikirlerim olduğunu da belirtmek isterim.</p>
             <p>Kodlama bilmiyor olsam da hayallerim ve yapmak istediklerimi karşılayan her türlü teknolojiyi kullanıyorum. Yaptıklarımdan keyif alacağınızı umuyorum. Bu siteyi ara sıra ziyaret ederseniz, yeni şeyler bulabilirsiniz.</p>
+            
+            <div style="text-align: center; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                <a href="https://www.youtube.com/@umitekremmikyas2518" class="btn-youtube" target="_blank" rel="noopener noreferrer" aria-label="Ümit Ekrem Mikyas YouTube kanalına gitmek için tıklayın. Yeni pencerede açılır.">
+                    ▶ YouTube Bağlantıma Erişmek İçin Tıklayınız
+                </a>
+            </div>
         </section>
 
         <!-- Projelerim Butonu ve İçindeki Alt Alta Liste -->
