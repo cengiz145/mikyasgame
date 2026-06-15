@@ -664,7 +664,7 @@ window.updateStatsDisplay = function() {
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Orta Mod: ${mediumCount} kez tamamlandı">Orta Mod: ${mediumCount} kez tamamlandı</li>
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Zor Mod: ${hardCount} kez tamamlandı">Zor Mod: ${hardCount} kez tamamlandı</li>
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Kayıp Notalar: ${storyCount} kez tamamlandı">Kayıp Notalar: ${storyCount} kez tamamlandı</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Ritim Avcısı: ${rhythmCount} kez tamamlandı">Ritim Avcısı: ${rhythmCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Ritim Avcısı: En Yüksek Seviye ${rhythmCount}">Ritim Avcısı: En Yüksek Seviye ${rhythmCount}</li>
                 <li style="margin-top: 15px;">
                     <button class="menu-button stat-copy-btn" aria-label="İstatistiklerimi Kopyala">İstatistiklerimi Kopyala</button>
                 </li>
@@ -681,7 +681,7 @@ window.updateStatsDisplay = function() {
     // Kopyalama butonu işlevini ata
     document.querySelectorAll('.stat-copy-btn').forEach(btn => {
         btn.onclick = function() {
-            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\r\nBakiye: ${tokens} Jeton\r\nGünlük Seri: ${streakCount} Gün\r\nSeri Dondurma: ${sdCount}\r\nHata Koruması: ${hk}\r\nZaman Koruması: ${zk}\r\nKolay: ${easyCount}\r\nOrta: ${mediumCount}\r\nZor: ${hardCount}\r\nKayıp Notalar: ${storyCount}\r\nRitim Avcısı: ${rhythmCount}`;
+            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\r\nBakiye: ${tokens} Jeton\r\nGünlük Seri: ${streakCount} Gün\r\nSeri Dondurma: ${sdCount}\r\nHata Koruması: ${hk}\r\nZaman Koruması: ${zk}\r\nKolay: ${easyCount}\r\nOrta: ${mediumCount}\r\nZor: ${hardCount}\r\nKayıp Notalar: ${storyCount}\r\nRitim Avcısı: En Yüksek Seviye ${rhythmCount}`;
             navigator.clipboard.writeText(copyText).then(() => {
                 if (window.announceToScreenReader) window.announceToScreenReader("İstatistikleriniz panoya kopyalandı.", true);
                 if (window.correctSound) window.correctSound.play();
