@@ -704,6 +704,8 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
         baseMessage = `Süre bitti!`;
     } else if (window.gameMistakes >= 3) {
         baseMessage = `3 hakkınız bitti!`;
+    } else if (window.activeDifficulty === 'rhythm_mode') {
+        baseMessage = `Yanlış nota bastınız! Ritim Avcısı sona erdi. Ulaştığınız Seviye: ${window.rhythmState.level}`;
     } else {
         baseMessage = `Oyundan çıkıldı.`;
     }
@@ -1761,7 +1763,8 @@ window.handleRhythmInput = function(key) {
         }
     } else {
         if (window.wrongSound) window.wrongSound.play();
-        window.endMainGame(false, false, true); 
+        window.sessionTokens = (window.rhythmState.level - 1) * 5;
+        window.endMainGame(false, false, false); 
         if (window.announceToScreenReader) window.announceToScreenReader("Yanlış nota! Oyun bitti.");
     }
 };
