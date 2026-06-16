@@ -1470,7 +1470,7 @@ const Game = {
                     hasCollided: false
                 });
 
-                // EÄER AYNI ÅERÄ°TTE DOÄDUYSA ERKEN UYARI VER
+                // EÄžER AYNI ÅžERÄ°TTE DOÄžDUYSA ERKEN UYARI VER
                 if (Math.abs(startX - this.lanePosition) < 20) {
                     const currentTime = performance.now();
                     if (!this.lastCollisionWarnTime || currentTime - this.lastCollisionWarnTime > 5000) {
@@ -1484,9 +1484,21 @@ const Game = {
         for (let i = this.activeNPCs.length - 1; i >= 0; i--) {
             let npc = this.activeNPCs[i];
             
-            // Bize doğru yaklaşma (Kendi hızı + bizim hızımız)
-            // Karşıdan gelen trafik gibi düşünülüyor. Biz dursak bile onlar hareket eder.
-            npc.y -= (this.speed + npc.baseSpeed) * deltaTime * 1.5;
+            if (npc.hasCollided) {
+                if (npc.slideX) {
+                    npc.x += npc.slideX * deltaTime * 2;
+                    npc.slideX *= 0.95;
+                }
+                if (npc.slideY) {
+                    npc.y += npc.slideY * deltaTime * 2;
+                    npc.slideY *= 0.95;
+                }
+                npc.y -= this.speed * deltaTime * 1.5;
+            } else {
+                // Bize doğru yaklaşma (Kendi hızı + bizim hızımız)
+                // Karşıdan gelen trafik gibi düşünülüyor. Biz dursak bile onlar hareket eder.
+                npc.y -= (this.speed + npc.baseSpeed) * deltaTime * 1.5;
+            }
             
             // X ekseninde hareket YOK (speedX = 0). Araçlar hep kendi şeridinde kalır.
             
@@ -1516,7 +1528,12 @@ const Game = {
                     // FÄ°ZÄ°KSEL Ã‡ARPIÅMA TEPKÄ°SÄ°: NPC'yi kenara fÄ±rlat ve durdur (Ghosting engelleme)
                     npc.baseSpeed = 0;
                     // EÄŸer otobÃ¼s saÄŸdaysa NPC sola savrulur, soldaysa saÄŸa savrulur
-                    npc.x = (this.lanePosition > 50) ? Math.max(-10, npc.x - 40) : Math.min(110, npc.x + 40);
+                    npc.slideX = (this.lanePosition > 50) ? -80 : 80;
+                    npc.slideY = this.speed * 1.5;
+                    if (typeof audio !== 'undefined' && typeof audio.playTireScreech === 'function') {
+                        audio.playTireScreech(1.0);
+                        setTimeout(() => audio.stopTireScreech(), 1500);
+                    }
                     
                     // Åiddete (HÄ±zÄ±mÄ±za) gÃ¶re rastgele hasar hesaplama
                     let damageAmount = 0;

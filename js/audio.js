@@ -1144,7 +1144,7 @@ class AudioSystem {
             // BÃ¶ylece tÃ¼m tarayÄ±cÄ±larda NPC sesleri sorunsuz Ã§alacak.
             const howlObj = new Howl({
                 src: [`sounds/npc/${filename}`],
-                loop: true,
+                loop: false,
                 volume: 0.0, // BaÅŸlangÄ±Ã§ta sessiz (uzakta)
                 html5: false // MÃ¼mkÃ¼nse Web Audio API kullansÄ±n (panning iÃ§in)
             });
