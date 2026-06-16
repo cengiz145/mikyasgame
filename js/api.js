@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU API DOSYASI (API.JS)
+   TÃœRKÄ°YE TURNESÄ° - OTOBÃœS SÄ°MÃœLASYONU API DOSYASI (API.JS)
    ========================================================================== */
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -26,7 +26,7 @@ async function fetchStopsFromOverpass(queryStr) {
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 saniye mutlak sınır
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 saniye mutlak sÄ±nÄ±r
 
         const response = await fetch(url, {
             method: "POST",
@@ -37,7 +37,7 @@ async function fetchStopsFromOverpass(queryStr) {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-            throw new Error(`API Hatası: ${response.status} ${response.statusText}`);
+            throw new Error(`API HatasÄ±: ${response.status} ${response.statusText}`);
         }
 
         const veri = await response.json();
@@ -50,7 +50,7 @@ async function fetchStopsFromOverpass(queryStr) {
             .filter(d => d.type === "node" && d.tags && (d.tags.highway === "bus_stop" || d.tags.amenity === "bus_station"))
             .map(durak => {
                 return {
-                    name: durak.tags.name || "İsimsiz Durak",
+                    name: durak.tags.name || "Ä°simsiz Durak",
                     lat: durak.lat,
                     lon: durak.lon
                 };
@@ -65,14 +65,14 @@ async function fetchStopsFromOverpass(queryStr) {
         return temizDuraklar;
 
     } catch (error) {
-        console.error("Duraklar çekilirken hata oluştu:", error);
+        console.error("Duraklar Ã§ekilirken hata oluÅŸtu:", error);
         throw error;
     }
 }
 
 // Generate 30 Progressive Routes (3 Licenses x 10 Tasks) from raw API stops
 function generateRoutesFromAPI(rawStops, cityName) {
-    let filtered = rawStops.filter(d => d.name !== "İsimsiz Durak");
+    let filtered = rawStops.filter(d => d.name !== "Ä°simsiz Durak");
     
     if (filtered.length < 3) {
         return false;
@@ -84,15 +84,15 @@ function generateRoutesFromAPI(rawStops, cityName) {
             let selected = [];
             
             if (isReturn && prevRouteStops) {
-                // Dönüş rotasıysa, bir önceki gidiş rotasının duraklarını tam tersine çevir
+                // DÃ¶nÃ¼ÅŸ rotasÄ±ysa, bir Ã¶nceki gidiÅŸ rotasÄ±nÄ±n duraklarÄ±nÄ± tam tersine Ã§evir
                 selected = prevRouteStops.slice().reverse().map(s => ({
                     lat: s.lat, lon: s.lon, name: s.name
                 }));
             } else {
-                // Gidiş rotasıysa normal üret
-                // Her yeni gidiş rotasında durakları karıştır ki farklı başlangıç ve bitişler olsun
+                // GidiÅŸ rotasÄ±ysa normal Ã¼ret
+                // Her yeni gidiÅŸ rotasÄ±nda duraklarÄ± karÄ±ÅŸtÄ±r ki farklÄ± baÅŸlangÄ±Ã§ ve bitiÅŸler olsun
                 const shuffledFiltered = [...filtered].sort(() => 0.5 - Math.random());
-                // Şehirdeki toplam durak sayısını geçmeyecek şekilde sınırı belirle (A->B->A döngüsünü engeller)
+                // Åehirdeki toplam durak sayÄ±sÄ±nÄ± geÃ§meyecek ÅŸekilde sÄ±nÄ±rÄ± belirle (A->B->A dÃ¶ngÃ¼sÃ¼nÃ¼ engeller)
                 const limit = Math.min(stopCount, shuffledFiltered.length);
                 for (let i = 0; i < limit; i++) {
                     selected.push(shuffledFiltered[i]);
@@ -114,16 +114,16 @@ function generateRoutesFromAPI(rawStops, cityName) {
                 const scaledSonrakiMesafe = mesafe / 2; 
                 kumulatifMesafe += scaledSonrakiMesafe;
                 
-                const yolcuTipleri = ["Sivil", "Öğrenci", "Karışık", "Yaşlı"];
+                const yolcuTipleri = ["Sivil", "Ã–ÄŸrenci", "KarÄ±ÅŸÄ±k", "YaÅŸlÄ±"];
                 const tip = yolcuTipleri[Math.floor(Math.random() * yolcuTipleri.length)];
                 
                 // Antrenman moduysa yolcu beklemesin
                 const bekleyen = isTraining ? 0 : Math.floor(Math.random() * 40) + 10;
                 
-                const yollar = ["Asfalt Cadde", "Mahalle Sokağı", "Toprak Yol", "Kumlu Yol", "Çimenli Yol", "Sahil Şeridi Yolu", "Çakıllı Yol"];
+                const yollar = ["Asfalt Cadde", "Mahalle SokaÄŸÄ±", "Toprak Yol", "Kumlu Yol", "Ã‡imenli Yol", "Sahil Åeridi Yolu", "Ã‡akÄ±llÄ± Yol"];
                 const rastgeleYol = yollar[Math.floor(Math.random() * yollar.length)];
                 
-                // Kavşak olma ihtimali %30
+                // KavÅŸak olma ihtimali %30
                 const kavsakMevcut = Math.random() < 0.3;
                 
                 processedStops.push({
@@ -145,7 +145,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
             name: name,
             desc: desc,
             color: color,
-            zemin: "Şehir İçi",
+            zemin: "Åehir Ä°Ã§i",
             otobusKapasitesi: 80,
             taskIndex: taskIndex,
             licenseLevel: licenseLvl,
@@ -157,43 +157,43 @@ function generateRoutesFromAPI(rawStops, cityName) {
     let globalTaskIndex = 0;
     let prevStops = null;
 
-    // 4 Ehliyet Seviyesi, her birinde 10 görev (Toplam 40 görev)
+    // 4 Ehliyet Seviyesi, her birinde 10 gÃ¶rev (Toplam 40 gÃ¶rev)
     for (let lic = 1; lic <= 4; lic++) {
         for (let task = 1; task <= 10; task++) {
             
-            // Durak sayısını hesapla
+            // Durak sayÄ±sÄ±nÄ± hesapla
             let baseStops = lic === 1 ? 4 : (lic === 2 ? 8 : (lic === 3 ? 12 : 15));
             let stopCount = baseStops + (task - 1);
             
             // Renk paleti
-            let color = "#3b82f6"; // Çırak
+            let color = "#3b82f6"; // Ã‡Ä±rak
             if (lic === 2) color = "#eab308"; // Kalfa
             if (lic === 3) color = "#ef4444"; // Usta
-            if (lic === 4) color = "#a855f7"; // İlçeler Arası
+            if (lic === 4) color = "#a855f7"; // Ä°lÃ§eler ArasÄ±
             
-            let licName = lic === 1 ? "Çırak" : (lic === 2 ? "Kalfa" : (lic === 3 ? "Usta" : "İlçeler Arası"));
+            let licName = lic === 1 ? "Ã‡Ä±rak" : (lic === 2 ? "Kalfa" : (lic === 3 ? "Usta" : "Ä°lÃ§eler ArasÄ±"));
             
-            // Gidiş mi, Dönüş mü? (Çift index = Gidiş, Tek index = Dönüş)
+            // GidiÅŸ mi, DÃ¶nÃ¼ÅŸ mÃ¼? (Ã‡ift index = GidiÅŸ, Tek index = DÃ¶nÃ¼ÅŸ)
             let isReturn = (globalTaskIndex % 2 !== 0);
             
             let routeId = `${cityName.toLowerCase()}_task_${globalTaskIndex}`;
-            // Eğitim rotası mı? (1. Seviyenin ilk 3 görevi)
+            // EÄŸitim rotasÄ± mÄ±? (1. Seviyenin ilk 3 gÃ¶revi)
             let isTraining = (lic === 1 && task <= 3);
             
-            // Yolcusuz eğitim görevlerinde 2 durak yeterli
+            // Yolcusuz eÄŸitim gÃ¶revlerinde 2 durak yeterli
             if (isTraining) {
                 stopCount = 2;
             }
             
-            let directionLabel = isReturn ? "(Dönüş)" : "(Gidiş)";
-            let title = isTraining ? `1. Sınıf Ehliyet - Görev ${task} (Eğitim Sürüşü)` : `${lic}. Sınıf Ehliyet - Görev ${task} ${directionLabel}`;
-            let desc = isTraining ? `Sadece güzergahı öğrenmek için yolcusuz eğitim sürüşüdür. İki durak arası ilerleyin.` : `${licName} şoförleri için ${stopCount} duraklı ${directionLabel.toLowerCase()} rotası.`;
+            let directionLabel = isReturn ? "(DÃ¶nÃ¼ÅŸ)" : "(GidiÅŸ)";
+            let title = isTraining ? `1. SÄ±nÄ±f Ehliyet - GÃ¶rev ${task} (EÄŸitim SÃ¼rÃ¼ÅŸÃ¼)` : `${lic}. SÄ±nÄ±f Ehliyet - GÃ¶rev ${task} ${directionLabel}`;
+            let desc = isTraining ? `Sadece gÃ¼zergahÄ± Ã¶ÄŸrenmek iÃ§in yolcusuz eÄŸitim sÃ¼rÃ¼ÅŸÃ¼dÃ¼r. Ä°ki durak arasÄ± ilerleyin.` : `${licName} ÅŸofÃ¶rleri iÃ§in ${stopCount} duraklÄ± ${directionLabel.toLowerCase()} rotasÄ±.`;
             
             if (lic === 4) {
-                title = `İlçeler Arası Görev ${task} ${directionLabel}`;
-                desc = `İlçeler arası uzun mesafe seferi. Toplam ${stopCount} durak.`;
+                title = `Ä°lÃ§eler ArasÄ± GÃ¶rev ${task} ${directionLabel}`;
+                desc = `Ä°lÃ§eler arasÄ± uzun mesafe seferi. Toplam ${stopCount} durak.`;
             } else if (task === 10) {
-                desc = `DİKKAT: ${lic}. Sınıf ehliyetin FİNAL görevidir!`;
+                desc = `DÄ°KKAT: ${lic}. SÄ±nÄ±f ehliyetin FÄ°NAL gÃ¶revidir!`;
             }
 
             let newRoute = buildRoute(routeId, title, desc, globalTaskIndex, lic, stopCount, color, isReturn, prevStops, isTraining);
@@ -206,7 +206,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
 
             routes.push(newRoute);
             
-            // Sonraki döngüde dönüş rotası oluşturabilmek için gidiş rotasını kaydet
+            // Sonraki dÃ¶ngÃ¼de dÃ¶nÃ¼ÅŸ rotasÄ± oluÅŸturabilmek iÃ§in gidiÅŸ rotasÄ±nÄ± kaydet
             if (!isReturn) {
                 prevStops = newRoute.stops;
             }

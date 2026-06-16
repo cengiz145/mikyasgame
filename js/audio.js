@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU SES SİSTEMİ (AUDIO.JS)
+   TÃœRKÄ°YE TURNESÄ° - OTOBÃœS SÄ°MÃœLASYONU SES SÄ°STEMÄ° (AUDIO.JS)
    ========================================================================== */
 
 class AudioSystem {
@@ -24,17 +24,17 @@ class AudioSystem {
         
         this.currentGear = 1;
 
-        // Howler.js Ses Dosyaları (Base64 Web Audio API Garantili)
+        // Howler.js Ses DosyalarÄ± (Base64 Web Audio API Garantili)
         this.sounds = {
             nav: new Howl({ src: ['sounds/menuclick24.wav'] }),
             select: new Howl({ src: ['sounds/menuenter21.wav'] }),
             start: new Howl({ src: [typeof AUDIO_B64 !== 'undefined' ? AUDIO_B64.start : 'sounds/Bus-contac.wav'] }),
             doorOpen: new Howl({ 
-                src: [typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorOpen ? AUDIO_B64.doorOpen : 'sounds/otobüs kapı açılma sesi.mp3'],
+                src: [typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorOpen ? AUDIO_B64.doorOpen : 'sounds/otobÃ¼s kapÄ± aÃ§Ä±lma sesi.mp3'],
                 format: ['mp3']
             }),
             doorClose: new Howl({ 
-                src: [typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorClose ? AUDIO_B64.doorClose : 'sounds/otobüs kapı kapanma sesi.mp3'],
+                src: [typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorClose ? AUDIO_B64.doorClose : 'sounds/otobÃ¼s kapÄ± kapanma sesi.mp3'],
                 format: ['mp3']
             }),
             turnTick: new Howl({ src: ['sounds/vinebeep5.ogg'] }),
@@ -46,7 +46,7 @@ class AudioSystem {
             rain11: new Howl({ src: ['sounds/rain11.ogg'], loop: true, volume: 0 })
         };
 
-        // KORNA İÇİN ÖZEL WEB AUDIO API KURULUMU (Boğuk efekti ve trim için)
+        // KORNA Ä°Ã‡Ä°N Ã–ZEL WEB AUDIO API KURULUMU (BoÄŸuk efekti ve trim iÃ§in)
         this.hornBuffer = null;
         this.hornSource = null;
         
@@ -60,7 +60,7 @@ class AudioSystem {
                     bytes[i] = binaryString.charCodeAt(i);
                 }
                 
-                // ctx oluşturulmamışsa Howler üzerinden al veya yarat
+                // ctx oluÅŸturulmamÄ±ÅŸsa Howler Ã¼zerinden al veya yarat
                 if (!this.ctx) {
                     this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
                 }
@@ -68,14 +68,14 @@ class AudioSystem {
                 this.ctx.decodeAudioData(bytes.buffer, (buffer) => {
                     this.hornBuffer = buffer;
                 }, (err) => {
-                    console.error("Korna decode hatası:", err);
+                    console.error("Korna decode hatasÄ±:", err);
                 });
             } catch (e) {
-                console.error("Korna buffer yüklenirken hata:", e);
+                console.error("Korna buffer yÃ¼klenirken hata:", e);
             }
         }
 
-        // CADDE ORTAMI İÇİN ÖZEL WEB AUDIO API KURULUMU
+        // CADDE ORTAMI Ä°Ã‡Ä°N Ã–ZEL WEB AUDIO API KURULUMU
         this.streetBuffer = null;
         if (typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.street) {
             try {
@@ -94,14 +94,14 @@ class AudioSystem {
                 this.ctx.decodeAudioData(bytes.buffer, (buffer) => {
                     this.streetBuffer = buffer;
                 }, (err) => {
-                    console.error("Street decode hatası:", err);
+                    console.error("Street decode hatasÄ±:", err);
                 });
             } catch (e) {
-                console.error("Street buffer yüklenirken hata:", e);
+                console.error("Street buffer yÃ¼klenirken hata:", e);
             }
         }
 
-        // MOTOR RÖLANTİ İÇİN ÖZEL WEB AUDIO API KURULUMU
+        // MOTOR RÃ–LANTÄ° Ä°Ã‡Ä°N Ã–ZEL WEB AUDIO API KURULUMU
         if (typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.idle) {
             try {
                 const base64Data = AUDIO_B64.idle.split(',')[1];
@@ -119,10 +119,10 @@ class AudioSystem {
                 this.ctx.decodeAudioData(bytes.buffer, (buffer) => {
                     this.idleBuffer = buffer;
                 }, (err) => {
-                    console.error("Idle decode hatası:", err);
+                    console.error("Idle decode hatasÄ±:", err);
                 });
             } catch (e) {
-                console.error("Idle buffer yüklenirken hata:", e);
+                console.error("Idle buffer yÃ¼klenirken hata:", e);
             }
         }
     }
@@ -133,42 +133,42 @@ class AudioSystem {
         }
         
         if (!this.environmentMixer) {
-            // Tüm çevresel seslerin (motor, korna, trafik) toplanacağı ana mikser
+            // TÃ¼m Ã§evresel seslerin (motor, korna, trafik) toplanacaÄŸÄ± ana mikser
             this.environmentMixer = this.ctx.createGain();
             this.environmentMixer.gain.value = 1.0;
 
-            // Stereo sinyali sağ ve sol kanala ayırıcı
+            // Stereo sinyali saÄŸ ve sol kanala ayÄ±rÄ±cÄ±
             this.envSplitter = this.ctx.createChannelSplitter(2);
             this.environmentMixer.connect(this.envSplitter);
 
             // Sol Cam (Kabin) Filtresi
             this.leftFilter = this.ctx.createBiquadFilter();
             this.leftFilter.type = 'lowpass';
-            this.leftFilter.frequency.value = 1500; // Varsayılan kapalı cam
+            this.leftFilter.frequency.value = 1500; // VarsayÄ±lan kapalÄ± cam
             this.envSplitter.connect(this.leftFilter, 0);
 
-            // Sağ Cam (Kabin) Filtresi
+            // SaÄŸ Cam (Kabin) Filtresi
             this.rightFilter = this.ctx.createBiquadFilter();
             this.rightFilter.type = 'lowpass';
-            this.rightFilter.frequency.value = 1500; // Varsayılan kapalı cam
+            this.rightFilter.frequency.value = 1500; // VarsayÄ±lan kapalÄ± cam
             this.envSplitter.connect(this.rightFilter, 1);
 
-            // Filtrelenmiş sağ ve sol sesi tekrar birleştirici
+            // FiltrelenmiÅŸ saÄŸ ve sol sesi tekrar birleÅŸtirici
             this.envMerger = this.ctx.createChannelMerger(2);
             this.leftFilter.connect(this.envMerger, 0, 0); // Sol filtre -> Sol kulak
-            this.rightFilter.connect(this.envMerger, 0, 1); // Sağ filtre -> Sağ kulak
+            this.rightFilter.connect(this.envMerger, 0, 1); // SaÄŸ filtre -> SaÄŸ kulak
 
-            // Birleştirilmiş sesi ana çıkışa gönder
+            // BirleÅŸtirilmiÅŸ sesi ana Ã§Ä±kÄ±ÅŸa gÃ¶nder
             this.envMerger.connect(this.ctx.destination);
             
-            // 3D Dinleyici Ayarları
+            // 3D Dinleyici AyarlarÄ±
             if (this.ctx.listener.positionX) {
                 this.ctx.listener.positionX.value = 0;
                 this.ctx.listener.positionY.value = 0;
                 this.ctx.listener.positionZ.value = 0;
                 this.ctx.listener.forwardX.value = 0;
                 this.ctx.listener.forwardY.value = 0;
-                this.ctx.listener.forwardZ.value = 1; // Z ekseninde ileriye bakıyor
+                this.ctx.listener.forwardZ.value = 1; // Z ekseninde ileriye bakÄ±yor
             } else {
                 this.ctx.listener.setPosition(0, 0, 0);
                 this.ctx.listener.setOrientation(0, 0, 1, 0, 1, 0);
@@ -187,8 +187,8 @@ class AudioSystem {
         
         const now = this.ctx.currentTime;
         
-        // Hasar 0 ise frekans 1500Hz (Tam yalıtım - sesler boğuk ama konuşma duyulur), hasar 100 ise frekans 22050Hz (Tam açık)
-        // Eğer cam manuel olarak açıksa (isWindowOpen), hasar ne olursa olsun 22050Hz olur
+        // Hasar 0 ise frekans 1500Hz (Tam yalÄ±tÄ±m - sesler boÄŸuk ama konuÅŸma duyulur), hasar 100 ise frekans 22050Hz (Tam aÃ§Ä±k)
+        // EÄŸer cam manuel olarak aÃ§Ä±ksa (isWindowOpen), hasar ne olursa olsun 22050Hz olur
         
         const leftTargetFreq = this.isWindowOpen ? 22050 : 1500 + (leftDamage / 100) * (22050 - 1500);
         const rightTargetFreq = this.isWindowOpen ? 22050 : 1500 + (rightDamage / 100) * (22050 - 1500);
@@ -196,7 +196,7 @@ class AudioSystem {
         this.leftFilter.frequency.setTargetAtTime(leftTargetFreq, now, 0.3);
         this.rightFilter.frequency.setTargetAtTime(rightTargetFreq, now, 0.3);
         
-        // Korna çalıyorsa onun da sesini eşzamanlı olarak aç/boğ
+        // Korna Ã§alÄ±yorsa onun da sesini eÅŸzamanlÄ± olarak aÃ§/boÄŸ
         if (this.hornFilter) {
             const hornTargetFreq = this.isWindowOpen ? 22050 : 600;
             this.hornFilter.frequency.setTargetAtTime(hornTargetFreq, now, 0.3);
@@ -208,7 +208,7 @@ class AudioSystem {
         
         const now = this.ctx.currentTime;
         
-        // lanePosition 50 ise merkez (pan = 0). 15 sol şerit (pan = -1), 85 sağ şerit (pan = 1)
+        // lanePosition 50 ise merkez (pan = 0). 15 sol ÅŸerit (pan = -1), 85 saÄŸ ÅŸerit (pan = 1)
         let panValue = (lanePosition - 50) / 35;
         panValue = Math.max(-1, Math.min(1, panValue));
         
@@ -217,7 +217,7 @@ class AudioSystem {
 
     setWindowOpen(isOpen) {
         this.isWindowOpen = isOpen;
-        // Mevcut hasar değerlerini korumak için Game global objesinden verileri al
+        // Mevcut hasar deÄŸerlerini korumak iÃ§in Game global objesinden verileri al
         if (typeof Game !== 'undefined' && Game.busDamage) {
             this.updateAcoustics(Game.busDamage.leftWindow, Game.busDamage.rightWindow);
         } else {
@@ -273,7 +273,7 @@ class AudioSystem {
         this.sounds.menuMusic.volume(newVol);
         
         if (typeof UI !== 'undefined' && UI.showToast) {
-            UI.showToast(`Müzik Sesi: %${Math.round(newVol * 100)}`, 'success');
+            UI.showToast(`MÃ¼zik Sesi: %${Math.round(newVol * 100)}`, 'success');
         }
     }
 
@@ -311,15 +311,15 @@ class AudioSystem {
                 }
 
                 this.idleSource.connect(this.idleGain);
-                this.idleGain.connect(this.enginePanner); // Panner üzerinden miksere bağlanır
+                this.idleGain.connect(this.enginePanner); // Panner Ã¼zerinden miksere baÄŸlanÄ±r
                 
-                // MOTOR HASARI LFO (Vuruntu/Titreşim)
+                // MOTOR HASARI LFO (Vuruntu/TitreÅŸim)
                 this.engineDamageLfo = this.ctx.createOscillator();
                 this.engineDamageLfo.type = 'sawtooth';
                 this.engineDamageLfo.frequency.value = 5;
                 
                 this.engineDamageGain = this.ctx.createGain();
-                this.engineDamageGain.gain.value = 0; // Başlangıçta hasar yok
+                this.engineDamageGain.gain.value = 0; // BaÅŸlangÄ±Ã§ta hasar yok
                 
                 this.engineDamageLfo.connect(this.engineDamageGain);
                 this.engineDamageGain.connect(this.idleGain.gain);
@@ -337,7 +337,7 @@ class AudioSystem {
         
         if (this.idleSource && this.idleGain) {
             const now = this.ctx.currentTime;
-            this.idleGain.gain.setTargetAtTime(0, now, 0.1); // Yumuşak sönümlenme
+            this.idleGain.gain.setTargetAtTime(0, now, 0.1); // YumuÅŸak sÃ¶nÃ¼mlenme
             const src = this.idleSource;
             const dmgLfo = this.engineDamageLfo;
             const dmgGain = this.engineDamageGain;
@@ -414,13 +414,13 @@ class AudioSystem {
             cutoff = 1500 + (speed * 8);
             targetGain *= 1.8;
             qValue = 0.8;
-        } else if (roadType === "Çakıllı Yol") {
+        } else if (roadType === "Ã‡akÄ±llÄ± Yol") {
             // Sharp Gravel: Sharp, high pitch crunch
             this.tireFilter.type = 'highpass';
             cutoff = 800 + (speed * 5);
             targetGain *= 2.0;
             qValue = 2.0;
-        } else if (roadType === "Çimenli Yol") {
+        } else if (roadType === "Ã‡imenli Yol") {
             // Grass: Soft rustling
             this.tireFilter.type = 'lowpass';
             cutoff = 200 + (speed * 3);
@@ -446,30 +446,30 @@ class AudioSystem {
     updateEngineSound(speed, rpm = null, gear = null) {
         if (!this.isEngineRunning || !this.idleSource) return;
         
-        // Vites Değişimi Kontrolü (Hava tahliye sesi)
+        // Vites DeÄŸiÅŸimi KontrolÃ¼ (Hava tahliye sesi)
         if (gear !== null && gear !== this.currentGear) {
             if (gear > this.currentGear) {
-                // Vites büyüttüğünde tıslama
+                // Vites bÃ¼yÃ¼ttÃ¼ÄŸÃ¼nde tÄ±slama
                 this.playGearShiftSound();
             }
             this.currentGear = gear;
         }
 
-        // RPM bazlı frekans cambazlığı (800 rölanti -> 1.0, 2500 max -> 2.5 vb.)
+        // RPM bazlÄ± frekans cambazlÄ±ÄŸÄ± (800 rÃ¶lanti -> 1.0, 2500 max -> 2.5 vb.)
         let targetRate = rpm !== null ? (rpm / 800) : (1.0 + (speed / 90) * 1.8);
         
-        // MOTOR HASARI EFEKTİ (Sputter / Titreşim / Tekleme)
+        // MOTOR HASARI EFEKTÄ° (Sputter / TitreÅŸim / Tekleme)
         if (typeof Game !== 'undefined' && Game.busDamage) {
             const damage = Game.busDamage.front;
             if (damage > 20) {
-                const damageRatio = damage / 100; // 0.2 ile 1.0 arası
+                const damageRatio = damage / 100; // 0.2 ile 1.0 arasÄ±
                 
-                // 1. Devir dalgalanması (Tekleme)
+                // 1. Devir dalgalanmasÄ± (Tekleme)
                 if (Math.random() < (damageRatio * 0.3)) {
-                    targetRate *= (0.6 + Math.random() * 0.3); // Anlık boğulma
+                    targetRate *= (0.6 + Math.random() * 0.3); // AnlÄ±k boÄŸulma
                 }
                 
-                // 2. Vuruntu ve titreşim (LFO genliğini ayarla)
+                // 2. Vuruntu ve titreÅŸim (LFO genliÄŸini ayarla)
                 if (this.engineDamageGain && this.engineDamageLfo) {
                     this.engineDamageGain.gain.setValueAtTime(damageRatio * 0.6, this.ctx.currentTime);
                     this.engineDamageLfo.frequency.setValueAtTime(5 + speed * 0.15, this.ctx.currentTime);
@@ -481,7 +481,7 @@ class AudioSystem {
             }
         }
         
-        // EGZOZ KOPUKSA SESİ ÇILDIRT (DISTORTION/BOĞULMA)
+        // EGZOZ KOPUKSA SESÄ° Ã‡ILDIRT (DISTORTION/BOÄULMA)
         if (this.isExhaustBroken) {
             targetRate *= (0.8 + Math.random() * 0.4);
             if (this.idleGain) this.idleGain.gain.setValueAtTime(2.5, this.ctx.currentTime);
@@ -489,16 +489,16 @@ class AudioSystem {
             if (this.idleGain) this.idleGain.gain.setValueAtTime(1.0, this.ctx.currentTime);
         }
         
-        targetRate = Math.min(3.0, Math.max(0.6, targetRate)); // Minimum 0.6 yapalım ki boğulma belli olsun
+        targetRate = Math.min(3.0, Math.max(0.6, targetRate)); // Minimum 0.6 yapalÄ±m ki boÄŸulma belli olsun
         
         if (!this.currentIdleRate || Math.abs(this.currentIdleRate - targetRate) > 0.03) {
-            // Boğulma efekti için anlık atlamalara izin veriyoruz
+            // BoÄŸulma efekti iÃ§in anlÄ±k atlamalara izin veriyoruz
             this.idleSource.playbackRate.setValueAtTime(targetRate, this.ctx.currentTime);
             this.currentIdleRate = targetRate;
         }
     }
 
-    // --- HAVA DURUMU VE SİLECEK (YENİ) ---
+    // --- HAVA DURUMU VE SÄ°LECEK (YENÄ°) ---
     startWeather(weatherType, intensity = 1) {
         this.init();
         if (this.currentWeather === weatherType) return;
@@ -520,10 +520,10 @@ class AudioSystem {
             this.weatherFilter = this.ctx.createBiquadFilter();
             
             this.weatherFilter.type = 'lowpass';
-            this.weatherFilter.frequency.value = 400; // Kar ezilme sesi (daha boğuk ve derin)
+            this.weatherFilter.frequency.value = 400; // Kar ezilme sesi (daha boÄŸuk ve derin)
 
             this.weatherGain = this.ctx.createGain();
-            this.weatherGain.gain.value = 0.0; // Başlangıçta 0
+            this.weatherGain.gain.value = 0.0; // BaÅŸlangÄ±Ã§ta 0
 
             this.weatherSource.connect(this.weatherFilter);
             this.weatherFilter.connect(this.weatherGain);
@@ -576,18 +576,18 @@ class AudioSystem {
 
     updateWeatherSound(speed, weatherType) {
         if (weatherType === 'rainy') {
-            // OGG dosyaları arka planda çaldığı için sentetik bir white noise kontrolüne gerek yok.
+            // OGG dosyalarÄ± arka planda Ã§aldÄ±ÄŸÄ± iÃ§in sentetik bir white noise kontrolÃ¼ne gerek yok.
         } else if (weatherType === 'snowy') {
             if (!this.weatherFilter || !this.weatherGain) return;
-            // Karda hız arttıkça tekerlek hışırtısı (ezilme) sesi artar
+            // Karda hÄ±z arttÄ±kÃ§a tekerlek hÄ±ÅŸÄ±rtÄ±sÄ± (ezilme) sesi artar
             let targetFreq = 300 + (speed * 10);
-            let targetVolume = speed === 0 ? 0.0 : 0.15 + (speed / 130) * 0.6; // Dururken ses çıkmaz
+            let targetVolume = speed === 0 ? 0.0 : 0.15 + (speed / 130) * 0.6; // Dururken ses Ã§Ä±kmaz
             this.weatherFilter.frequency.setValueAtTime(targetFreq, this.ctx.currentTime);
             this.weatherGain.gain.setValueAtTime(targetVolume, this.ctx.currentTime);
         }
     }
     
-    // --- SAVRULMA VE ZORLANMA EFEKTİ (SKIDDING) ---
+    // --- SAVRULMA VE ZORLANMA EFEKTÄ° (SKIDDING) ---
     playTireScreech(intensity) {
         this.init();
         if (!this.skidBuffer) {
@@ -606,7 +606,7 @@ class AudioSystem {
             
             this.skidFilter = this.ctx.createBiquadFilter();
             this.skidFilter.type = 'bandpass';
-            this.skidFilter.Q.value = 4.0; // Islıksı/cıyaklama tonu
+            this.skidFilter.Q.value = 4.0; // IslÄ±ksÄ±/cÄ±yaklama tonu
             
             this.skidGain = this.ctx.createGain();
             this.skidGain.gain.value = 0;
@@ -621,7 +621,7 @@ class AudioSystem {
             this.skidSource.start();
         }
         
-        // Şiddete göre sesi ve tonu (pitch) ayarla
+        // Åiddete gÃ¶re sesi ve tonu (pitch) ayarla
         this.skidGain.gain.setTargetAtTime(intensity * 0.5, this.ctx.currentTime, 0.1);
         this.skidFilter.frequency.setTargetAtTime(1000 + intensity * 800, this.ctx.currentTime, 0.1);
     }
@@ -634,8 +634,8 @@ class AudioSystem {
 
     toggleWipers() {
         if (typeof Game !== 'undefined' && Game.busDamage && Game.busDamage.wipers >= 100) {
-            this.playHeadlightBust(); // Arıza sesi
-            if (this.speak) this.speak("Silecek motoru arızalı. Kırık olduğu için çalışmıyor.");
+            this.playHeadlightBust(); // ArÄ±za sesi
+            if (this.speak) this.speak("Silecek motoru arÄ±zalÄ±. KÄ±rÄ±k olduÄŸu iÃ§in Ã§alÄ±ÅŸmÄ±yor.");
             this.isWiperOn = false;
             return;
         }
@@ -647,7 +647,7 @@ class AudioSystem {
         
         this.isWiperOn = !this.isWiperOn;
         if (this.speak) {
-            this.speak(this.isWiperOn ? "Silecekler açıldı" : "Silecekler kapandı");
+            this.speak(this.isWiperOn ? "Silecekler aÃ§Ä±ldÄ±" : "Silecekler kapandÄ±");
         }
         if (this.isWiperOn) {
             this.playWiperCycle();
@@ -657,7 +657,7 @@ class AudioSystem {
     playWiperCycle() {
         if (!this.isWiperOn || !this.ctx) return;
         
-        // Mekanik silecek motoru ve kauçuk sürtünme sesi (Triangle osc)
+        // Mekanik silecek motoru ve kauÃ§uk sÃ¼rtÃ¼nme sesi (Triangle osc)
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         
@@ -675,7 +675,7 @@ class AudioSystem {
         osc.start();
         osc.stop(this.ctx.currentTime + 0.6);
         
-        // Döngü
+        // DÃ¶ngÃ¼
         this.wiperTimeout = setTimeout(() => {
             this.playWiperCycle();
         }, 1200);
@@ -698,7 +698,7 @@ class AudioSystem {
 
     playHeadlightBust() {
         this.init();
-        // Cam kırılması ve kısa devre (Spark) sesi
+        // Cam kÄ±rÄ±lmasÄ± ve kÄ±sa devre (Spark) sesi
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
@@ -712,14 +712,14 @@ class AudioSystem {
         osc.stop(this.ctx.currentTime + 0.3);
     }
     
-    // --- EGZOZ VE HASAR SESLERİ ---
+    // --- EGZOZ VE HASAR SESLERÄ° ---
     
     playRearCrash() {
         this.init();
         const panner = this.ctx.createStereoPanner();
-        panner.pan.value = 0; // Merkezden ama boğuk
+        panner.pan.value = 0; // Merkezden ama boÄŸuk
         
-        // Tok ve güçlü çarpma (Arkadan)
+        // Tok ve gÃ¼Ã§lÃ¼ Ã§arpma (Arkadan)
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         const filter = this.ctx.createBiquadFilter();
@@ -729,7 +729,7 @@ class AudioSystem {
         osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.5);
         
         filter.type = 'lowpass';
-        filter.frequency.value = 400; // Sesi boğuk yapar (arkadan gelme hissi)
+        filter.frequency.value = 400; // Sesi boÄŸuk yapar (arkadan gelme hissi)
         
         gain.gain.setValueAtTime(1.5, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
@@ -742,7 +742,7 @@ class AudioSystem {
         osc.start(this.ctx.currentTime);
         osc.stop(this.ctx.currentTime + 0.5);
         
-        // Şangırtı Sesi (Kopan metal parçası)
+        // ÅangÄ±rtÄ± Sesi (Kopan metal parÃ§asÄ±)
         setTimeout(() => this.playUnderbodyHit(), 200);
     }
     
@@ -817,7 +817,7 @@ class AudioSystem {
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1; // Beyaz gürültü (tıslama/hava kaçağı)
+            data[i] = Math.random() * 2 - 1; // Beyaz gÃ¼rÃ¼ltÃ¼ (tÄ±slama/hava kaÃ§aÄŸÄ±)
         }
         
         this.exhaustWarningSource = this.ctx.createBufferSource();
@@ -826,7 +826,7 @@ class AudioSystem {
         
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'highpass';
-        filter.frequency.value = 5000; // İnce hava ıslığı/tıslama sesi
+        filter.frequency.value = 5000; // Ä°nce hava Ä±slÄ±ÄŸÄ±/tÄ±slama sesi
         
         this.exhaustWarningGain = this.ctx.createGain();
         this.exhaustWarningGain.gain.value = 0;
@@ -852,13 +852,13 @@ class AudioSystem {
         if (speed < 5) {
             this.exhaustWarningGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
         } else {
-            // Hız arttıkça tıslama daha çok duyulur
+            // HÄ±z arttÄ±kÃ§a tÄ±slama daha Ã§ok duyulur
             let targetVol = Math.min(0.3, 0.05 + (speed / 200));
             this.exhaustWarningGain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.2);
         }
     }
     
-    // --- VİTES SESİ (Hava Tahliyesi) ---
+    // --- VÄ°TES SESÄ° (Hava Tahliyesi) ---
     playGearShiftSound() {
         if (!this.ctx) return;
         
@@ -866,7 +866,7 @@ class AudioSystem {
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1; // Beyaz gürültü
+            data[i] = Math.random() * 2 - 1; // Beyaz gÃ¼rÃ¼ltÃ¼
         }
         
         const noise = this.ctx.createBufferSource();
@@ -874,7 +874,7 @@ class AudioSystem {
         
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'highpass';
-        filter.frequency.value = 6000; // İnce tıslama/hava tahliyesi
+        filter.frequency.value = 6000; // Ä°nce tÄ±slama/hava tahliyesi
         
         const gain = this.ctx.createGain();
         gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
@@ -899,7 +899,7 @@ class AudioSystem {
         this.sounds.crash.play();
     }
 
-    // --- PNÖMATİK (HAVALI FREN) SESLERİ ---
+    // --- PNÃ–MATÄ°K (HAVALI FREN) SESLERÄ° ---
     
     playBrakeRelease() {
         this.init();
@@ -930,16 +930,16 @@ class AudioSystem {
 
     startLowAirAlarm() {
         this.init();
-        if (this.lowAirOsc) return; // Zaten çalışıyorsa tekrar başlatma
+        if (this.lowAirOsc) return; // Zaten Ã§alÄ±ÅŸÄ±yorsa tekrar baÅŸlatma
         
         this.lowAirOsc = this.ctx.createOscillator();
         this.lowAirOsc.type = 'square';
-        this.lowAirOsc.frequency.value = 800; // Rahatsız edici tiz frekans
+        this.lowAirOsc.frequency.value = 800; // RahatsÄ±z edici tiz frekans
         
-        // Buzzer efekti (kesik kesik değil, sürekli ama modüle edilmiş)
+        // Buzzer efekti (kesik kesik deÄŸil, sÃ¼rekli ama modÃ¼le edilmiÅŸ)
         const lfo = this.ctx.createOscillator();
         lfo.type = 'sine';
-        lfo.frequency.value = 10; // Hızlı titreme
+        lfo.frequency.value = 10; // HÄ±zlÄ± titreme
         
         const lfoGain = this.ctx.createGain();
         lfoGain.gain.value = 50;
@@ -1001,7 +1001,7 @@ class AudioSystem {
 
     playAirGovernorCutoff() {
         this.init();
-        // TISSSS-ÇUFF efekti
+        // TISSSS-Ã‡UFF efekti
         const bufferSize = this.ctx.sampleRate * 0.8; 
         const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
         const output = buffer.getChannelData(0);
@@ -1032,7 +1032,7 @@ class AudioSystem {
 
     playEmergencyBrakeLock() {
         this.init();
-        // Sert mekanik kapanma sesi ve yüksek tıslama
+        // Sert mekanik kapanma sesi ve yÃ¼ksek tÄ±slama
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         
@@ -1048,38 +1048,38 @@ class AudioSystem {
         osc.start(0);
         osc.stop(this.ctx.currentTime + 0.3);
         
-        this.playBrakeRelease(); // İmdat kitlenirken hava tahliyesi olur
+        this.playBrakeRelease(); // Ä°mdat kitlenirken hava tahliyesi olur
     }
 
     playHorn() {
         if (!this.hornBuffer || this.hornSource) return;
 
-        this.init(); // ctx state kontrolü
+        this.init(); // ctx state kontrolÃ¼
 
         this.hornSource = this.ctx.createBufferSource();
         this.hornSource.buffer = this.hornBuffer;
         this.hornSource.loop = true;
-        this.hornSource.loopStart = 0.2; // 200ms boşluğu atla
+        this.hornSource.loopStart = 0.2; // 200ms boÅŸluÄŸu atla
         this.hornSource.loopEnd = this.hornBuffer.duration;
 
-        // Kabin içi (Boğuk) efekt için Lowpass Filtre
+        // Kabin iÃ§i (BoÄŸuk) efekt iÃ§in Lowpass Filtre
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'lowpass';
-        // Cam açıksa 22050Hz (tamamen normal net ses), kapalıysa 600Hz (boğuk)
+        // Cam aÃ§Ä±ksa 22050Hz (tamamen normal net ses), kapalÄ±ysa 600Hz (boÄŸuk)
         filter.frequency.value = this.isWindowOpen ? 22050 : 600; 
-        filter.Q.value = 0; // Rezonansı (çınlamayı) tamamen sıfırladık
+        filter.Q.value = 0; // RezonansÄ± (Ã§Ä±nlamayÄ±) tamamen sÄ±fÄ±rladÄ±k
         this.hornFilter = filter;
 
-        // Ses Seviyesi Kontrolü ve Yumuşak Kapanış için Gain
+        // Ses Seviyesi KontrolÃ¼ ve YumuÅŸak KapanÄ±ÅŸ iÃ§in Gain
         this.hornGain = this.ctx.createGain();
         this.hornGain.gain.value = 0.6;
 
-        // Bağlantılar (Korna da çevre filtresine girer)
+        // BaÄŸlantÄ±lar (Korna da Ã§evre filtresine girer)
         this.hornSource.connect(filter);
         filter.connect(this.hornGain);
         this.hornGain.connect(this.environmentMixer);
 
-        this.hornSource.start(0, 0.2); // 200ms'den başlat
+        this.hornSource.start(0, 0.2); // 200ms'den baÅŸlat
     }
 
     stopHorn() {
@@ -1106,30 +1106,30 @@ class AudioSystem {
         const source = this.ctx.createBufferSource();
         source.buffer = this.streetBuffer;
         
-        // Kanal Ayırıcı ve Birleştirici oluştur (2 kanal)
+        // Kanal AyÄ±rÄ±cÄ± ve BirleÅŸtirici oluÅŸtur (2 kanal)
         const splitter = this.ctx.createChannelSplitter(2);
         const merger = this.ctx.createChannelMerger(2);
         
         source.connect(splitter);
         
-        // %50 ihtimalle kanalları yer değiştir
+        // %50 ihtimalle kanallarÄ± yer deÄŸiÅŸtir
         const swapChannels = Math.random() > 0.5;
         
         if (swapChannels) {
-            // Sol kanalı (0) sağa (1), Sağ kanalı (1) sola (0) bağla
+            // Sol kanalÄ± (0) saÄŸa (1), SaÄŸ kanalÄ± (1) sola (0) baÄŸla
             splitter.connect(merger, 0, 1);
             splitter.connect(merger, 1, 0);
         } else {
-            // Normal bağla
+            // Normal baÄŸla
             splitter.connect(merger, 0, 0);
             splitter.connect(merger, 1, 1);
         }
         
         const gain = this.ctx.createGain();
-        gain.gain.value = 0.5; // Ses şiddeti
+        gain.gain.value = 0.5; // Ses ÅŸiddeti
         
         merger.connect(gain);
-        gain.connect(this.environmentMixer); // Ortam mikserine bağla
+        gain.connect(this.environmentMixer); // Ortam mikserine baÄŸla
         
         source.start(0);
     }
@@ -1140,13 +1140,13 @@ class AudioSystem {
         try {
             const filename = NPC_SOUNDS[Math.floor(Math.random() * NPC_SOUNDS.length)];
             
-            // BUG FIX: createMediaElementSource CORS ve file:/// hatalarına sebep olduğu için Howler.js'e geçildi
-            // Böylece tüm tarayıcılarda NPC sesleri sorunsuz çalacak.
+            // BUG FIX: createMediaElementSource CORS ve file:/// hatalarÄ±na sebep olduÄŸu iÃ§in Howler.js'e geÃ§ildi
+            // BÃ¶ylece tÃ¼m tarayÄ±cÄ±larda NPC sesleri sorunsuz Ã§alacak.
             const howlObj = new Howl({
                 src: [`sounds/npc/${filename}`],
                 loop: true,
-                volume: 0.0, // Başlangıçta sessiz (uzakta)
-                html5: false // Mümkünse Web Audio API kullansın (panning için)
+                volume: 0.0, // BaÅŸlangÄ±Ã§ta sessiz (uzakta)
+                html5: false // MÃ¼mkÃ¼nse Web Audio API kullansÄ±n (panning iÃ§in)
             });
             
             const soundId = howlObj.play();
@@ -1161,7 +1161,7 @@ class AudioSystem {
                 }
             };
         } catch (e) {
-            console.error("NPC ses hatası:", e);
+            console.error("NPC ses hatasÄ±:", e);
             return null;
         }
     }
@@ -1181,7 +1181,7 @@ class AudioSystem {
         const now = this.ctx.currentTime;
         
         if (type === 'ogrenci') {
-            // İki kısa dıt (Öğrenci)
+            // Ä°ki kÄ±sa dÄ±t (Ã–ÄŸrenci)
             osc.frequency.setValueAtTime(1200, now);
             gainNode.gain.setValueAtTime(0, now);
             gainNode.gain.setValueAtTime(0.5, now + 0.01);
@@ -1192,7 +1192,7 @@ class AudioSystem {
             osc.start(now);
             osc.stop(now + 0.3);
         } else if (type === 'yasli') {
-            // Üç kısa dıt (Serbest)
+            // ÃœÃ§ kÄ±sa dÄ±t (Serbest)
             osc.frequency.setValueAtTime(1400, now);
             gainNode.gain.setValueAtTime(0, now);
             gainNode.gain.setValueAtTime(0.5, now + 0.01);
@@ -1206,7 +1206,7 @@ class AudioSystem {
             osc.start(now);
             osc.stop(now + 0.35);
         } else {
-            // Tek dıt (Tam bilet)
+            // Tek dÄ±t (Tam bilet)
             osc.frequency.setValueAtTime(1000, now);
             gainNode.gain.setValueAtTime(0, now);
             gainNode.gain.setValueAtTime(0.5, now + 0.01);
@@ -1217,8 +1217,8 @@ class AudioSystem {
     }
 
     async speak(text) {
-        // Sadece navigasyon mesajlarına izin ver
-        if (!/(rota|durak|kavşak|hedef|metre kaldı|dönüş|sola|sağa|ileride|navigasyon|yön|çekici)/i.test(text)) {
+        // Sadece navigasyon mesajlarÄ±na izin ver
+        if (!/(rota|durak|kavÅŸak|hedef|metre kaldÄ±|dÃ¶nÃ¼ÅŸ|sola|saÄŸa|ileride|navigasyon|yÃ¶n|Ã§ekici)/i.test(text)) {
             this.updateNvdaLiveRegion(text);
             return;
         }
@@ -1268,7 +1268,7 @@ class AudioSystem {
             });
 
             if (!response.ok) {
-                throw new Error("Google TTS API Hatası");
+                throw new Error("Google TTS API HatasÄ±");
             }
 
             const data = await response.json();
@@ -1285,7 +1285,7 @@ class AudioSystem {
             ttsAudio.play().catch(e => { /* Ignore interruption */ });
             
         } catch (error) {
-            console.error("Google TTS çalışmadı, tarayıcı sesine geçiliyor:", error);
+            console.error("Google TTS Ã§alÄ±ÅŸmadÄ±, tarayÄ±cÄ± sesine geÃ§iliyor:", error);
             if (this.sequenceId !== currentSeqId) return;
             const fallbackVoice = new SpeechSynthesisUtterance(text);
             fallbackVoice.lang = 'tr-TR';
@@ -1295,13 +1295,13 @@ class AudioSystem {
     }
 
     async speakSequence(textArray) {
-        const hasNav = textArray.some(text => /(rota|durak|kavşak|hedef|metre kaldı|dönüş|sola|sağa|ileride|navigasyon|yön|çekici)/i.test(text));
+        const hasNav = textArray.some(text => /(rota|durak|kavÅŸak|hedef|metre kaldÄ±|dÃ¶nÃ¼ÅŸ|sola|saÄŸa|ileride|navigasyon|yÃ¶n|Ã§ekici)/i.test(text));
         if (!hasNav) {
             if (textArray.length > 0) this.updateNvdaLiveRegion(textArray.join(" "));
             return;
         }
 
-        // BUG FIX: Yeni bir sekans başladığında eskisini iptal et (Ses çakışmalarını önler)
+        // BUG FIX: Yeni bir sekans baÅŸladÄ±ÄŸÄ±nda eskisini iptal et (Ses Ã§akÄ±ÅŸmalarÄ±nÄ± Ã¶nler)
         this.sequenceId = (this.sequenceId || 0) + 1;
         const currentSeqId = this.sequenceId;
         
@@ -1355,7 +1355,7 @@ class AudioSystem {
                 aud.originalText = text;
                 audiosToPlay.push(aud);
             } else {
-                // Eğer hata olursa fallback için özel nesne ekle
+                // EÄŸer hata olursa fallback iÃ§in Ã¶zel nesne ekle
                 audiosToPlay.push({ fallbackText: text, originalText: text });
             }
         }
@@ -1402,7 +1402,7 @@ class AudioSystem {
     placeAmbientSources(routeData, licenseLevel) {
         this.init();
         
-        // Önceki kaynakları temizle
+        // Ã–nceki kaynaklarÄ± temizle
         if (this.ambientSources) {
             this.ambientSources.forEach(src => {
                 if (src.osc) { try { src.osc.stop(); } catch(e){} }
@@ -1420,17 +1420,17 @@ class AudioSystem {
             let stopNameLower = (stop.name || "").toLowerCase();
             let terrainType = "asfalt";
             
-            if (stopNameLower.includes("malkara") || stopNameLower.includes("çorlu") || 
-                stopNameLower.includes("çerkezköy") || stopNameLower.includes("ergene") || 
-                stopNameLower.includes("kınalı") || stopNameLower.includes("otoyol")) {
+            if (stopNameLower.includes("malkara") || stopNameLower.includes("Ã§orlu") || 
+                stopNameLower.includes("Ã§erkezkÃ¶y") || stopNameLower.includes("ergene") || 
+                stopNameLower.includes("kÄ±nalÄ±") || stopNameLower.includes("otoyol")) {
                 if (licenseLevel >= 5) terrainType = "otoyol";
             } else if (typeof sehirRotalari !== 'undefined' && sehirRotalari[Game.currentCity] && sehirRotalari[Game.currentCity].terrain) {
                 terrainType = sehirRotalari[Game.currentCity].terrain;
             }
 
             if (terrainType === "sahil" || terrainType === "toprak" || terrainType === "otoyol") {
-                // Kaynağın sağda mı (örn: +50) yoksa solda mı (örn: -50) olacağını rastgele seç
-                let xPos = (Math.random() > 0.5 ? 1 : -1) * (50 + Math.random() * 50); // 50 ile 100 birim sağ/sol
+                // KaynaÄŸÄ±n saÄŸda mÄ± (Ã¶rn: +50) yoksa solda mÄ± (Ã¶rn: -50) olacaÄŸÄ±nÄ± rastgele seÃ§
+                let xPos = (Math.random() > 0.5 ? 1 : -1) * (50 + Math.random() * 50); // 50 ile 100 birim saÄŸ/sol
                 this.createPannerSource(terrainType, currentZ, xPos);
             }
             
@@ -1470,12 +1470,12 @@ class AudioSystem {
             if (terrainType === "toprak") {
                 filter.type = 'lowpass';
                 filter.frequency.value = 600;
-                gainNode.gain.value = 0; // Hıza bağlı artacak
+                gainNode.gain.value = 0; // HÄ±za baÄŸlÄ± artacak
             } else {
                 filter.type = 'bandpass';
                 filter.frequency.value = 1000;
                 filter.Q.value = 1.0;
-                gainNode.gain.value = 0; // Hıza bağlı artacak
+                gainNode.gain.value = 0; // HÄ±za baÄŸlÄ± artacak
             }
             
             osc.connect(filter);
@@ -1508,7 +1508,7 @@ class AudioSystem {
             osc.connect(filter);
             filter.connect(gainNode);
             osc.start(0);
-            gainNode.gain.value = 1.0; // Sahil sesi hep açık, PannerNode mesafeye göre kısacak
+            gainNode.gain.value = 1.0; // Sahil sesi hep aÃ§Ä±k, PannerNode mesafeye gÃ¶re kÄ±sacak
         }
         
         this.ambientSources.push({
@@ -1527,8 +1527,8 @@ class AudioSystem {
         if (this.ctx.listener.positionZ) {
             this.ctx.listener.positionZ.value = zPos;
             
-            // Direksiyon açısına (yaw) göre kafa yönünü (Orientation) güncelle
-            // steeringAngle -30 (Sol) ile +30 (Sağ) arasında. Radyana çeviriyoruz.
+            // Direksiyon aÃ§Ä±sÄ±na (yaw) gÃ¶re kafa yÃ¶nÃ¼nÃ¼ (Orientation) gÃ¼ncelle
+            // steeringAngle -30 (Sol) ile +30 (SaÄŸ) arasÄ±nda. Radyana Ã§eviriyoruz.
             const yaw = steeringAngle * (Math.PI / 180);
             
             this.ctx.listener.forwardX.value = Math.sin(yaw);
@@ -1539,10 +1539,10 @@ class AudioSystem {
             this.ctx.listener.setOrientation(Math.sin(yaw), 0, Math.cos(yaw), 0, 1, 0);
         }
         
-        // Hıza bağlı sesleri güncelle (Sadece yakındaki kaynakları güncellesek yeter, ama hepsi de olur)
+        // HÄ±za baÄŸlÄ± sesleri gÃ¼ncelle (Sadece yakÄ±ndaki kaynaklarÄ± gÃ¼ncellesek yeter, ama hepsi de olur)
         if (this.ambientSources) {
             this.ambientSources.forEach(src => {
-                // Eğer otobüs kaynağa 2000 metreden daha yakınsa hız sesini güncelle
+                // EÄŸer otobÃ¼s kaynaÄŸa 2000 metreden daha yakÄ±nsa hÄ±z sesini gÃ¼ncelle
                 if (Math.abs(src.z - zPos) < 2000) {
                     if (src.type === "toprak") {
                         let targetVol = (speed / 80) * 0.8;
@@ -1557,7 +1557,7 @@ class AudioSystem {
                         src.gain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.1);
                     }
                 } else {
-                    // Uzaktaki dinamik kaynakları kıs
+                    // Uzaktaki dinamik kaynaklarÄ± kÄ±s
                     if (src.type === "toprak" || src.type === "otoyol") {
                         src.gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.5);
                     }
@@ -1598,7 +1598,7 @@ class AudioSystem {
 
 const audio = new AudioSystem();
 
-// Global Ses Kontrolü (Menülerde PageUp/PageDown)
+// Global Ses KontrolÃ¼ (MenÃ¼lerde PageUp/PageDown)
 window.addEventListener('keydown', (e) => {
     if (e.key === '+' || e.key === '=') {
         audio.adjustMusicVolume(0.1);
@@ -1606,7 +1606,7 @@ window.addEventListener('keydown', (e) => {
         audio.adjustMusicVolume(-0.1);
     }
     
-    // NVDA susturma tuşuna (Ctrl) basıldığında oyunun anonslarını da sustur
+    // NVDA susturma tuÅŸuna (Ctrl) basÄ±ldÄ±ÄŸÄ±nda oyunun anonslarÄ±nÄ± da sustur
     if (e.key === 'Control') {
         if (typeof audio !== 'undefined' && audio.stopSpeech) {
             audio.stopSpeech();

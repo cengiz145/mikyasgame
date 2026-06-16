@@ -1,11 +1,11 @@
 /* ==========================================================================
-   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU STİL DOSYASI
+   TÃœRKÄ°YE TURNESÄ° - OTOBÃœS SÄ°MÃœLASYONU STÄ°L DOSYASI
    ========================================================================== */
 
 :root {
     --bg-color: #08090c;
     --card-bg: rgba(15, 22, 36, 0.85);
-    --primary: #ffb703; /* Trafik Kehribar Sarısı */
+    --primary: #ffb703; /* Trafik Kehribar SarÄ±sÄ± */
     --primary-glow: rgba(255, 183, 3, 0.45);
     --secondary: #00f5d4; /* Neon Turkuaz */
     --secondary-glow: rgba(0, 245, 212, 0.4);
@@ -37,7 +37,7 @@ body {
 }
 
 /* ==========================================================================
-   BACKGROUND CANVAS (YOL EFEKTİ)
+   BACKGROUND CANVAS (YOL EFEKTÄ°)
    ========================================================================== */
 #highway-bg {
     position: absolute;
@@ -50,7 +50,7 @@ body {
 }
 
 /* ==========================================================================
-   SCREENS (Arayüz Panelleri)
+   SCREENS (ArayÃ¼z Panelleri)
    ========================================================================== */
 .screen {
     position: relative;

@@ -1,18 +1,18 @@
 /* ==========================================================================
-   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU VERİ DOSYASI (DATA.JS)
+   TÃœRKÄ°YE TURNESÄ° - OTOBÃœS SÄ°MÃœLASYONU VERÄ° DOSYASI (DATA.JS)
    ========================================================================== */
 
-const masterCitiesList = ["Tekirdağ", "Edirne", "Kırklareli", "İstanbul", "Çanakkale", "Ankara"];
+const masterCitiesList = ["TekirdaÄŸ", "Edirne", "KÄ±rklareli", "Ä°stanbul", "Ã‡anakkale", "Ankara"];
 
-// Şehirlerin sadece coğrafi komşuları ve API sorguları bulunur. Rotalar dinamik oluşturulur.
+// Åehirlerin sadece coÄŸrafi komÅŸularÄ± ve API sorgularÄ± bulunur. Rotalar dinamik oluÅŸturulur.
 const sehirRotalari = {
-    "Tekirdağ": {
+    "TekirdaÄŸ": {
         canliSorgu: `area["ISO3166-2"="TR-59"]->.tekirdag; (node["highway"="bus_stop"](area.tekirdag); node["traffic_calming"~"bump|hump"](area.tekirdag););`,
         komsular: {
             bati: "Edirne",
-            kuzey: "Kırklareli",
-            dogu: "İstanbul",
-            guney: "Çanakkale"
+            kuzey: "KÄ±rklareli",
+            dogu: "Ä°stanbul",
+            guney: "Ã‡anakkale"
         },
         terrain: "sahil",
         ucretler: { tam: 33, ogrenci: 17, yasli: 0 }
@@ -20,50 +20,50 @@ const sehirRotalari = {
     "Edirne": {
         canliSorgu: `area["ISO3166-2"="TR-22"]->.edirne; area["name"="Merkez"]->.merkez; (node["highway"="bus_stop"](area.edirne)(area.merkez); node["traffic_calming"~"bump|hump"](area.edirne)(area.merkez););`,
         komsular: {
-            dogu: "Tekirdağ",
-            kuzey: "Kırklareli"
+            dogu: "TekirdaÄŸ",
+            kuzey: "KÄ±rklareli"
         },
         terrain: "toprak",
         ucretler: { tam: 32, ogrenci: 21.5, yasli: 0 }
     },
-    "Kırklareli": {
+    "KÄ±rklareli": {
         canliSorgu: `area["ISO3166-2"="TR-39"]->.kirklareli; area["name"="Merkez"]->.merkez; (node["highway"="bus_stop"](area.kirklareli)(area.merkez); node["traffic_calming"~"bump|hump"](area.kirklareli)(area.merkez););`,
         komsular: {
-            guney: "Tekirdağ",
+            guney: "TekirdaÄŸ",
             bati: "Edirne",
-            dogu: "İstanbul"
+            dogu: "Ä°stanbul"
         },
         terrain: "toprak",
         ucretler: { tam: 25, ogrenci: 12.5, yasli: 0 }
     },
-    "İstanbul": {
-        canliSorgu: `area["ISO3166-2"="TR-34"]->.istanbul; area["name"="Kadıköy"]->.ilce; (node["highway"="bus_stop"](area.istanbul)(area.ilce); node["traffic_calming"~"bump|hump"](area.istanbul)(area.ilce););`,
+    "Ä°stanbul": {
+        canliSorgu: `area["ISO3166-2"="TR-34"]->.istanbul; area["name"="KadÄ±kÃ¶y"]->.ilce; (node["highway"="bus_stop"](area.istanbul)(area.ilce); node["traffic_calming"~"bump|hump"](area.istanbul)(area.ilce););`,
         komsular: {
-            bati: "Tekirdağ",
-            kuzey: "Kırklareli",
+            bati: "TekirdaÄŸ",
+            kuzey: "KÄ±rklareli",
             dogu: "Ankara"
         },
         terrain: "sahil",
         ucretler: { tam: 42, ogrenci: 20.5, yasli: 0 }
     },
-    "Çanakkale": {
+    "Ã‡anakkale": {
         canliSorgu: `area["ISO3166-2"="TR-17"]->.canakkale; area["name"="Merkez"]->.merkez; (node["highway"="bus_stop"](area.canakkale)(area.merkez); node["traffic_calming"~"bump|hump"](area.canakkale)(area.merkez););`,
         komsular: {
-            kuzey: "Tekirdağ"
+            kuzey: "TekirdaÄŸ"
         },
         terrain: "sahil",
         ucretler: { tam: 30, ogrenci: 19, yasli: 0 }
     },
     "Ankara": {
-        canliSorgu: `area["ISO3166-2"="TR-06"]->.ankara; area["name"="Çankaya"]->.ilce; (node["highway"="bus_stop"](area.ankara)(area.ilce); node["traffic_calming"~"bump|hump"](area.ankara)(area.ilce););`,
+        canliSorgu: `area["ISO3166-2"="TR-06"]->.ankara; area["name"="Ã‡ankaya"]->.ilce; (node["highway"="bus_stop"](area.ankara)(area.ilce); node["traffic_calming"~"bump|hump"](area.ankara)(area.ilce););`,
         komsular: {
-            bati: "İstanbul"
+            bati: "Ä°stanbul"
         },
         terrain: "asfalt",
         ucretler: { tam: 35, ogrenci: 17.5, yasli: 0 }
     }
 };
 
-// Aktif oynanabilir rotaların (API'den çekildikten sonra) tutulduğu havuz
+// Aktif oynanabilir rotalarÄ±n (API'den Ã§ekildikten sonra) tutulduÄŸu havuz
 let routesData = {};
 

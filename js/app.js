@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU BAŞLATICI (APP.JS)
+   TÃœRKÄ°YE TURNESÄ° - OTOBÃœS SÄ°MÃœLASYONU BAÅLATICI (APP.JS)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -7,22 +7,22 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('error', (e) => {
         console.error("Global JS Error:", e.message, "at", e.filename, ":", e.lineno);
         if (window.UI && typeof window.UI.showToast === 'function') {
-            window.UI.showToast(`SİSTEM HATASI: ${e.message} (Satır: ${e.lineno})`, 'danger');
+            window.UI.showToast(`SÄ°STEM HATASI: ${e.message} (SatÄ±r: ${e.lineno})`, 'danger');
         }
         if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-            audio.speak(`Kritik sistem hatası: ${e.message}. Lütfen bu hatayı bana bildirin.`);
+            audio.speak(`Kritik sistem hatasÄ±: ${e.message}. LÃ¼tfen bu hatayÄ± bana bildirin.`);
         }
     });
     
     window.addEventListener('unhandledrejection', (e) => {
         console.error("Unhandled Promise Rejection:", e.reason);
-        let msg = e.reason ? (e.reason.message || e.reason) : "Bilinmeyen Promise Hatası";
+        let msg = e.reason ? (e.reason.message || e.reason) : "Bilinmeyen Promise HatasÄ±";
         if (String(msg).indexOf('Firebase') === -1 && String(msg).indexOf('offline') === -1) {
             if (window.UI && typeof window.UI.showToast === 'function') {
-                window.UI.showToast(`SİSTEM HATASI (Promise): ${msg}`, 'danger');
+                window.UI.showToast(`SÄ°STEM HATASI (Promise): ${msg}`, 'danger');
             }
             if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                audio.speak(`Gizli arka plan hatası: ${msg}. Lütfen bu hatayı bana bildirin.`);
+                audio.speak(`Gizli arka plan hatasÄ±: ${msg}. LÃ¼tfen bu hatayÄ± bana bildirin.`);
             }
         }
     });
@@ -31,12 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Keyboard Navigation on load
     KeyboardNav.initForScreen();
 
-    // === GÜNCELLEME: Eski hatalı rotaları otomatik temizle ===
+    // === GÃœNCELLEME: Eski hatalÄ± rotalarÄ± otomatik temizle ===
     if (!localStorage.getItem('routeFixApplied_v1')) {
         localStorage.removeItem('routesData');
         localStorage.removeItem('activeRoute');
         localStorage.setItem('routeFixApplied_v1', 'true');
-        console.log("Eski hatalı rotalar başarıyla temizlendi, yeni sistem aktif.");
+        console.log("Eski hatalÄ± rotalar baÅŸarÄ±yla temizlendi, yeni sistem aktif.");
     }
     // ==========================================================
 
@@ -52,12 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let savedUser = localStorage.getItem('otobusUsername');
             if (savedUser) {
-                UI.showToast('Kullanıcı bilgileri yükleniyor...', 'info');
+                UI.showToast('KullanÄ±cÄ± bilgileri yÃ¼kleniyor...', 'info');
                 try {
                     await Game.loadFromFirebase(savedUser);
                     titleScreen.classList.remove('hidden');
-                    UI.showToast(`Tekrar hoş geldin, ${savedUser}!`, 'success');
-                    audio.speak(`Tekrar hoş geldin, ${savedUser}!`);
+                    UI.showToast(`Tekrar hoÅŸ geldin, ${savedUser}!`, 'success');
+                    audio.speak(`Tekrar hoÅŸ geldin, ${savedUser}!`);
                 } catch (err) {
                     localStorage.removeItem('otobusUsername');
                     loginScreen.classList.remove('hidden');
@@ -86,17 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btn-login').addEventListener('click', async () => {
-        // Firebase yasaklı karakterlerini temizle (. # $ [ ])
+        // Firebase yasaklÄ± karakterlerini temizle (. # $ [ ])
         let username = document.getElementById('username-input').value.trim();
         username = username.replace(/[.#$\[\]]/g, '');
         
         if (!username) {
-            UI.showToast('Lütfen geçerli bir kullanıcı adı girin.', 'error');
+            UI.showToast('LÃ¼tfen geÃ§erli bir kullanÄ±cÄ± adÄ± girin.', 'error');
             return;
         }
 
         audio.playSelect();
-        UI.showToast('Giriş yapılıyor, lütfen bekleyin...', 'info');
+        UI.showToast('GiriÅŸ yapÄ±lÄ±yor, lÃ¼tfen bekleyin...', 'info');
 
         try {
             await Game.loadFromFirebase(username);
@@ -106,13 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
             titleScreen.classList.remove('hidden');
             KeyboardNav.initForScreen();
             
-            UI.showToast(`Hoş geldin, ${username}!`, 'success');
-            audio.speak(`Hoş geldin, ${username}!`);
+            UI.showToast(`HoÅŸ geldin, ${username}!`, 'success');
+            audio.speak(`HoÅŸ geldin, ${username}!`);
         } catch (error) {
-            UI.showToast('Bağlantı hatası: Sunucuya bağlanılamadı. Çevrimdışı devam ediliyor.', 'warning');
-            if (typeof audio.speak === 'function') audio.speak("Sunucuya bağlanılamadı, yerel kayıtla oyuna giriliyor.");
+            UI.showToast('BaÄŸlantÄ± hatasÄ±: Sunucuya baÄŸlanÄ±lamadÄ±. Ã‡evrimdÄ±ÅŸÄ± devam ediliyor.', 'warning');
+            if (typeof audio.speak === 'function') audio.speak("Sunucuya baÄŸlanÄ±lamadÄ±, yerel kayÄ±tla oyuna giriliyor.");
             
-            // HATA OLSA BİLE OYUNA GİRMESİNE İZİN VER (Yerel kayıtla devam)
+            // HATA OLSA BÄ°LE OYUNA GÄ°RMESÄ°NE Ä°ZÄ°N VER (Yerel kayÄ±tla devam)
             localStorage.setItem('otobusUsername', username);
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('title-screen').classList.remove('hidden');
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.playSelect();
         
         if (Game.savedState) {
-            audio.speak("Kaldığınız yerden yola devam ediyorsunuz.");
+            audio.speak("KaldÄ±ÄŸÄ±nÄ±z yerden yola devam ediyorsunuz.");
             Game.resumeFromSave();
             return;
         }
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
         UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
         
-        // Eğer daha önce merkez üs seçilmişse, direkt o şehrin görev ekranına (oyuna başla menüsüne) at!
+        // EÄŸer daha Ã¶nce merkez Ã¼s seÃ§ilmiÅŸse, direkt o ÅŸehrin gÃ¶rev ekranÄ±na (oyuna baÅŸla menÃ¼sÃ¼ne) at!
         if (Game.unlockedCities.length > 0 && Game.currentCity) {
             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: Game.currentCity } }));
         } else {
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-clear-cache').addEventListener('click', () => {
         audio.playSelect();
         
-        // Sadece tutulması gerekenleri ayır
+        // Sadece tutulmasÄ± gerekenleri ayÄ±r
         const safeKeys = ['otobusUsername', 'licenseLevel', 'completedTasks', 'para', 'clockMinutes', 'unlockedCities', 'merkezUs'];
         const savedData = {};
         
@@ -157,19 +157,19 @@ document.addEventListener('DOMContentLoaded', () => {
             savedData[key] = localStorage.getItem(key);
         });
         
-        // Tümünü temizle (Gereksiz/bozuk veriler gider)
+        // TÃ¼mÃ¼nÃ¼ temizle (Gereksiz/bozuk veriler gider)
         localStorage.clear();
         
-        // Gerekli olanları geri yükle
+        // Gerekli olanlarÄ± geri yÃ¼kle
         safeKeys.forEach(key => {
             if (savedData[key] !== null) {
                 localStorage.setItem(key, savedData[key]);
             }
         });
         
-        UI.showToast("Önbellek temizlendi, oyun yeniden başlatılıyor...", "success");
+        UI.showToast("Ã–nbellek temizlendi, oyun yeniden baÅŸlatÄ±lÄ±yor...", "success");
         if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-            audio.speak("Gereksiz veriler temizlendi, oyun yeniden başlatılıyor.");
+            audio.speak("Gereksiz veriler temizlendi, oyun yeniden baÅŸlatÄ±lÄ±yor.");
         }
         
         setTimeout(() => {
@@ -183,19 +183,19 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.switchScreen('title-screen');
     });
 
-    // Harita ekranından rota ekranına geçiş eventi (ui.js fırlatıyor)
+    // Harita ekranÄ±ndan rota ekranÄ±na geÃ§iÅŸ eventi (ui.js fÄ±rlatÄ±yor)
     // 2.5 Mode Selection Modals
     document.getElementById('btn-mode-inner').addEventListener('click', () => {
         audio.playSelect();
         document.getElementById('mode-selection-modal').classList.add('hidden');
-        KeyboardNav.initForScreen(); // Modal kapandı, arkaplana odaklan
+        KeyboardNav.initForScreen(); // Modal kapandÄ±, arkaplana odaklan
         document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: Game.currentCity } }));
     });
 
     document.getElementById('btn-mode-cancel').addEventListener('click', () => {
         audio.playSelect();
         document.getElementById('mode-selection-modal').classList.add('hidden');
-        KeyboardNav.initForScreen(); // Modal kapandı, arkaplana odaklan
+        KeyboardNav.initForScreen(); // Modal kapandÄ±, arkaplana odaklan
     });
 
     document.getElementById('btn-mode-inter').addEventListener('click', () => {
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.padding = '15px';
             
             btn.innerHTML = `
-                <span><strong>${destCity}</strong> ${isUnlocked ? '(Açık Şehir)' : '(Keşfedilecek)'}</span>
+                <span><strong>${destCity}</strong> ${isUnlocked ? '(AÃ§Ä±k Åehir)' : '(KeÅŸfedilecek)'}</span>
                 <span style="color: var(--secondary);">15 KM Sefer</span>
             `;
             
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 routesData[intercityRouteId] = {
                     id: intercityRouteId,
                     name: `${Game.currentCity} - ${destCity} (Uzun Yol)`,
-                    desc: "Sadece kalkış ve varış otogarları. Uzun otoyol sürüşü.",
+                    desc: "Sadece kalkÄ±ÅŸ ve varÄ±ÅŸ otogarlarÄ±. Uzun otoyol sÃ¼rÃ¼ÅŸÃ¼.",
                     color: "#facc15",
                     taskIndex: Game.completedTasks,
                     otobusKapasitesi: 28,
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     isIntercity: true,
                     destCity: destCity,
                     stops: [
-                        { name: `${Game.currentCity} Kalkış Peronu`, bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: 0.1 },
+                        { name: `${Game.currentCity} KalkÄ±ÅŸ Peronu`, bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: 0.1 },
                         { name: `${destCity} Merkez Otogar`, bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 15 }
                     ]
                 };
@@ -270,9 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (hasDestinations) {
             document.getElementById('intercity-dest-modal').classList.remove('hidden');
-            KeyboardNav.initForScreen(); // Modal açıldı, odağı buraya al
+            KeyboardNav.initForScreen(); // Modal aÃ§Ä±ldÄ±, odaÄŸÄ± buraya al
         } else {
-            UI.showToast("Gidilebilecek şehir bulunamadı.", "error");
+            UI.showToast("Gidilebilecek ÅŸehir bulunamadÄ±.", "error");
             document.getElementById('mode-selection-modal').classList.remove('hidden');
             KeyboardNav.initForScreen();
         }
@@ -282,19 +282,19 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.playSelect();
         document.getElementById('intercity-dest-modal').classList.add('hidden');
         document.getElementById('mode-selection-modal').classList.remove('hidden');
-        KeyboardNav.initForScreen(); // Önceki modala geri dönüldü
+        KeyboardNav.initForScreen(); // Ã–nceki modala geri dÃ¶nÃ¼ldÃ¼
     });
 
-    // 3. Route Menu // Eğer bu şehir için önceden API'den rota çekilmemişse, çek.
+    // 3. Route Menu // EÄŸer bu ÅŸehir iÃ§in Ã¶nceden API'den rota Ã§ekilmemiÅŸse, Ã§ek.
     document.addEventListener('go-to-route-screen', async (e) => {
         const cityName = e.detail.city;
         const cityData = sehirRotalari[cityName];
         
-        // Eğer bu şehir için önceden API'den rota çekilmemişse, çek.
+        // EÄŸer bu ÅŸehir iÃ§in Ã¶nceden API'den rota Ã§ekilmemiÅŸse, Ã§ek.
         const existingRoutes = Object.values(routesData).filter(r => r.sehir === cityName);
         
         if (existingRoutes.length === 0) {
-            UI.showLoading(`${cityName} için duraklar yükleniyor...`);
+            UI.showLoading(`${cityName} iÃ§in duraklar yÃ¼kleniyor...`);
             
             try {
                 let p = 0;
@@ -307,16 +307,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.cityBumps = window.cityBumps || {};
 
                 if (cachedData) {
-                    // Hafızadan yükle
+                    // HafÄ±zadan yÃ¼kle
                     const parsed = JSON.parse(cachedData);
                     rawStops = parsed.stops || [];
                     window.cityBumps[cityName] = parsed.bumps || [];
                     
                     clearInterval(interval);
                     UI.updateLoading(100);
-                    UI.showToast(`${cityName} verileri API'ye bağlanmadan hafızadan yüklendi!`, "success");
+                    UI.showToast(`${cityName} verileri API'ye baÄŸlanmadan hafÄ±zadan yÃ¼klendi!`, "success");
                 } else {
-                    // API'den canlı çek
+                    // API'den canlÄ± Ã§ek
                     rawStops = await fetchStopsFromOverpass(cityData.canliSorgu);
                     window.cityBumps[cityName] = window.lastFetchedBumps || [];
                     
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     UI.updateLoading(100);
 
                     if (rawStops.length < 5) {
-                        UI.showToast("API'de durak bulunamadı. Yapay duraklar oluşturuluyor...", "error");
+                        UI.showToast("API'de durak bulunamadÄ±. Yapay duraklar oluÅŸturuluyor...", "error");
                         rawStops = Array.from({length: 25}, (_, i) => ({
                             name: `${cityName} Merkez Durak ${i+1}`,
                             lat: 40.0 + Math.random() * 0.1,
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }));
                     }
                     
-                    // Başarılı veya yapay, kaydet
+                    // BaÅŸarÄ±lÄ± veya yapay, kaydet
                     localStorage.setItem(cacheKey, JSON.stringify({
                         stops: rawStops,
                         bumps: window.cityBumps[cityName]
@@ -343,14 +343,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 
             } catch (err) {
                 console.error(err);
-                UI.showToast("API Hatası! Yapay duraklar oluşturuluyor...", "error");
+                UI.showToast("API HatasÄ±! Yapay duraklar oluÅŸturuluyor...", "error");
                 let fakeStops = Array.from({length: 25}, (_, i) => ({
                     name: `${cityName} Merkez Durak ${i+1}`,
                     lat: 40.0 + Math.random() * 0.1,
                     lon: 27.0 + Math.random() * 0.1
                 }));
                 
-                // Hata sonrası üretilen durakları da hafızaya al ki bir daha hata beklemesin
+                // Hata sonrasÄ± Ã¼retilen duraklarÄ± da hafÄ±zaya al ki bir daha hata beklemesin
                 localStorage.setItem(`cachedStops_v2_${cityName}`, JSON.stringify(fakeStops));
                 
                 generateRoutesFromAPI(fakeStops, cityName);
@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // Rotaları çiz ve geç
+        // RotalarÄ± Ã§iz ve geÃ§
         UI.renderRoutes(cityName, Game.completedTasks);
         UI.switchScreen('route-menu');
     });
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.switchScreen('base-selection-menu');
     });
 
-    // 4. Garage Logic (Sefer Özeti)
+    // 4. Garage Logic (Sefer Ã–zeti)
     document.getElementById('btn-garage-back').addEventListener('click', () => {
         audio.playSelect();
         if (typeof SanayiMechanic !== 'undefined') SanayiMechanic.isActive = false;
@@ -399,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.playSelect();
         UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
         
-        // BUG FIX: activeRouteId yerine sıradaki (completedTasks) taskIndex'e sahip rotayı bul
+        // BUG FIX: activeRouteId yerine sÄ±radaki (completedTasks) taskIndex'e sahip rotayÄ± bul
         let nextRouteId = Object.keys(routesData).find(k => 
             routesData[k].sehir === Game.currentCity && 
             routesData[k].taskIndex === Game.completedTasks
@@ -408,10 +408,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (nextRouteId) {
             Game.startRoute(nextRouteId);
         } else {
-            UI.showToast("Bu şehirdeki görevleri tamamladınız! Haritaya dönülüyor.", "success");
+            UI.showToast("Bu ÅŸehirdeki gÃ¶revleri tamamladÄ±nÄ±z! Haritaya dÃ¶nÃ¼lÃ¼yor.", "success");
             Game.activeRouteId = null;
             const btnStart = document.getElementById('btn-start-game');
-            if (btnStart) btnStart.innerText = "Yeni Bir Oyuna Başla";
+            if (btnStart) btnStart.innerText = "Yeni Bir Oyuna BaÅŸla";
             UI.switchScreen('route-menu');
         }
     });
@@ -421,15 +421,15 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
         UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
         
-        // BUG FIX: Görevi bitirdikten sonra ana menüdeki "Yeni Oyun" butonunu sıfırla ki hep aynı rotaya hapsetmesin!
+        // BUG FIX: GÃ¶revi bitirdikten sonra ana menÃ¼deki "Yeni Oyun" butonunu sÄ±fÄ±rla ki hep aynÄ± rotaya hapsetmesin!
         Game.activeRouteId = null;
         const btnStart = document.getElementById('btn-start-game');
         if (btnStart) {
             btnStart.onclick = null;
-            btnStart.innerText = "Yeni Bir Oyuna Başla";
+            btnStart.innerText = "Yeni Bir Oyuna BaÅŸla";
         }
         
-        UI.switchScreen('base-selection-menu'); // Başarı ekranından direkt haritaya dön
+        UI.switchScreen('base-selection-menu'); // BaÅŸarÄ± ekranÄ±ndan direkt haritaya dÃ¶n
     });
 
     // Draw Highway Canvas background
