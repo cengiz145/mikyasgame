@@ -322,7 +322,13 @@ window.addEventListener('keydown', (e) => {
     if (typeof Game !== 'undefined' && Game.isDriving) return;
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        KeyboardNav.moveNext();
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        KeyboardNav.movePrev();
+    } else if (e.key === 'Enter' || e.key === ' ') {
         // NVDA veya Tab ile odaklanÄ±lan eleman bir buton deÄŸilse (div ise) Enter native Ã§alÄ±ÅŸmaz.
         // Bu yÃ¼zden eÄŸer bir nav-item Ã¼zerinde isek tÄ±klamasÄ±nÄ± saÄŸlÄ±yoruz.
         if (document.activeElement && document.activeElement.classList.contains('nav-item')) {
