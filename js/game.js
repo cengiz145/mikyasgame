@@ -2325,9 +2325,14 @@ const SanayiMechanic = {
             } else if (e.key === 'Enter') {
                 audio.playSelect();
                 if (this.currentIndex < this.parts.length) {
-                    // ParÃ§a seÃ§imi
-                    this.state = 'confirm';
-                    if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Bu parÃ§ayÄ± onarmak ister misiniz? Onaylamak iÃ§in enter'a basÄ±n.");
+                    const selectedPart = this.parts[this.currentIndex];
+                    if (selectedPart.toRepair) {
+                        if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Bu parÃ§a zaten onarÄ±m listesinde.");
+                    } else {
+                        // ParÃ§a seÃ§imi
+                        this.state = 'confirm';
+                        if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Bu parÃ§ayÄ± onarmak ister misiniz? Onaylamak iÃ§in enter'a basÄ±n.");
+                    }
                 } else {
                     // Ä°ÅŸlemi Tamamla
                     this.startRepair();
@@ -2361,19 +2366,23 @@ const SanayiMechanic = {
         document.getElementById('sanayi-parts-list').innerHTML = '';
         
         let currentRepairIndex = 0;
+        let totalCost = 0;
         
         const repairNext = () => {
             if (currentRepairIndex >= partsToRepair.length) {
-                document.getElementById('sanayi-dialog').innerText = "TÃ¼m onarÄ±mlar tamamlandÄ±.";
-                if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Ä°ÅŸler bitti patron. Sonra gÃ¶rÃ¼ÅŸÃ¼rÃ¼z. Daha bakÄ±lacak Ã§ok araba var.");
+                Game.addMoney(-totalCost);
+                const finalMsg = `TÃ¼m onarÄ±mlar tamamlandÄ±. Toplam onarÄ±m maliyeti ${totalCost} Lira hesabÄ±nÄ±zdan dÃ¼ÅŸÃ¼ldÃ¼. Ä°ÅŸler bitti patron. Sonra gÃ¶rÃ¼ÅŸÃ¼rÃ¼z.`;
+                document.getElementById('sanayi-dialog').innerText = finalMsg;
+                if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(finalMsg);
                 setTimeout(() => this.finishRepair(), 6000);
                 return;
             }
             
             const part = partsToRepair[currentRepairIndex];
             const cost = Math.floor(part.damage * 15);
-            Game.addMoney(-cost);
-            const msg = "Su an " + part.name + " parcasini onariyorum. Onarim bedeli " + cost + " Lira hesabinizdan dusuldu.";
+            totalCost += cost;
+            
+            const msg = "Su an " + part.name + " parcasini onariyorum.";
             document.getElementById('sanayi-dialog').innerText = msg;
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
             
