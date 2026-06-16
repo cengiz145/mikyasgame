@@ -329,6 +329,10 @@ window.addEventListener('keydown', (e) => {
         e.preventDefault();
         KeyboardNav.movePrev();
     } else if (e.key === 'Enter' || e.key === ' ') {
+        if (e.repeat) {
+            e.preventDefault();
+            return;
+        }
         // NVDA veya Tab ile odaklanÄ±lan eleman bir buton deÄŸilse (div ise) Enter native Ã§alÄ±ÅŸmaz.
         // Bu yÃ¼zden eÄŸer bir nav-item Ã¼zerinde isek tÄ±klamasÄ±nÄ± saÄŸlÄ±yoruz.
         if (document.activeElement && document.activeElement.classList.contains('nav-item')) {
