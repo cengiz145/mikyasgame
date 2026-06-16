@@ -489,33 +489,32 @@
                 
                 localStorage.setItem('mikyas_studio_visited', 'true');
             }
-
-            // --- Otobüs Simülasyonu Şifreli Giriş Sistemi ---
-            const busBtn = document.getElementById('bus-game-link');
-            if (busBtn) {
-                busBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    
-                    if (localStorage.getItem('bus_access_granted') === 'true') {
-                        window.location.href = '/otobus/index.html';
-                        return;
-                    }
-                    
-                    let pwd = prompt("Bu oyun sadece yetkili kullanıcılara açıktır. Lütfen erişim şifresini giriniz:");
-                    
-                    // ŞİFRE BURADA BELİRLENİYOR
-                    if (pwd === 'otobüssimülasyonu') {
-                        localStorage.setItem('bus_access_granted', 'true');
-                        alert("Şifre doğru! Oyuna yönlendiriliyorsunuz...");
-                        window.location.href = '/otobus/index.html';
-                    } else if (pwd !== null) {
-                        alert("Hatalı şifre. Oyuna giriş izniniz yok.");
-                    }
-                });
-            }
-
         } catch(e) {
-            console.warn("Tracker skipped.");
+            console.warn("Tracker skipped: ", e);
+        }
+
+        // --- Otobüs Simülasyonu Şifreli Giriş Sistemi ---
+        const busBtn = document.getElementById('bus-game-link');
+        if (busBtn) {
+            busBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                if (localStorage.getItem('bus_access_granted') === 'true') {
+                    window.location.href = '/otobus/index.html';
+                    return;
+                }
+                
+                let pwd = prompt("Bu oyun sadece yetkili kullanıcılara açıktır. Lütfen erişim şifresini giriniz:");
+                
+                // ŞİFRE BURADA BELİRLENİYOR (Boşlukları temizleyip küçük harfe çevirerek daha esnek kontrol ediyoruz)
+                if (pwd && pwd.trim().toLowerCase() === 'otobüssimülasyonu') {
+                    localStorage.setItem('bus_access_granted', 'true');
+                    alert("Şifre doğru! Oyuna yönlendiriliyorsunuz...");
+                    window.location.href = '/otobus/index.html';
+                } else if (pwd !== null) {
+                    alert("Hatalı şifre. Oyuna giriş izniniz yok.");
+                }
+            });
         }
     </script>
 </body>
