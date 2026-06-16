@@ -337,7 +337,7 @@
 
     <!-- En baştaki Mikyas Studio Logo Alanı -->
     <nav class="navbar">
-        <div class="logo" tabindex="0" aria-label="Mikyas Studio">Mikyas Studio</div>
+        <div class="logo" id="mikyas-logo" tabindex="0" aria-label="Mikyas Studio">Mikyas Studio</div>
     </nav>
 
     <main class="container">
@@ -349,12 +349,6 @@
             <p>Müzik öğretmeni olmanın yanı sıra kendimi geliştirmeyi ve bir şeyler üretmeyi sevdiğim için bu siteyi hayata geçirdim. Bu sitede geliştirmekte olduğum gerek sesli oyun projelerimi gerekse müziklerimi bulabileceğiniz alanlar bulacaksınız.</p>
             <p>Projelerimi geliştirirken yapay zeka kullandığımı belirtmek isterim. Yapay zekayı aktif bir şekilde kullanıyor, onun tüm nimetlerinden faydalanmaktan geri durmuyorum. Yaptığım projelerde yapay zekayı her ne kadar kullansam da fikirlerimin benim özgün fikirlerim olduğunu da belirtmek isterim.</p>
             <p>Kodlama bilmiyor olsam da hayallerim ve yapmak istediklerimi karşılayan her türlü teknolojiyi kullanıyorum. Yaptıklarımdan keyif alacağınızı umuyorum. Bu siteyi ara sıra ziyaret ederseniz, yeni şeyler bulabilirsiniz.</p>
-            
-            <div style="text-align: center; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1);">
-                <a href="https://www.youtube.com/@umitekremmikyas2518" class="btn-youtube" target="_blank" rel="noopener noreferrer" aria-label="Ümit Ekrem Mikyas YouTube kanalına gitmek için tıklayın. Yeni pencerede açılır.">
-                    ▶ YouTube Bağlantıma Erişmek İçin Tıklayınız
-                </a>
-            </div>
         </section>
 
         <!-- Projelerim Butonu ve İçindeki Alt Alta Liste -->
@@ -363,7 +357,7 @@
             
             <div class="games-list" role="list">
                 <!-- Otobüs Simülasyonu Linki -->
-                <a href="/otobus/index.html" class="game-card" role="listitem" aria-label="Otobüs Simülasyonu Oyunu Oynamak İçin Tıklayın">
+                <a href="#" id="bus-game-link" class="game-card" role="listitem" aria-label="Otobüs Simülasyonu Oyunu Oynamak İçin Tıklayın">
                     <div class="game-icon" aria-hidden="true">🚌</div>
                     <div class="game-content">
                         <h2 class="game-title" aria-hidden="true">Otobüs Simülasyonu</h2>
@@ -386,7 +380,7 @@
 
         <!-- Haberler Bölümü -->
         <details class="projects-dropdown" open>
-            <summary class="btn-projects btn-news" aria-expanded="true">Haberler (Basında Biz)</summary>
+            <summary class="btn-projects btn-news" aria-expanded="true">Haberler</summary>
             
             <div class="games-list" role="list">
                 <!-- Haber 1 -->
@@ -423,6 +417,33 @@
                 </a>
             </div>
         </details>
+
+        <!-- Sosyal Bölümü -->
+        <details class="projects-dropdown" open>
+            <summary class="btn-projects" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);" aria-expanded="true">Sosyal Medya</summary>
+            
+            <div class="games-list" role="list">
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/umitekremmikyas/" class="game-card" role="listitem" aria-label="Instagram hesabıma gitmek için tıklayın" target="_blank" rel="noopener noreferrer">
+                    <div class="game-icon" aria-hidden="true" style="font-size: 2.5rem;">📸</div>
+                    <div class="game-content">
+                        <h2 class="game-title" aria-hidden="true" style="background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Instagram</h2>
+                        <p class="game-desc" aria-hidden="true">Günlük hayatımdan kareler ve güncel paylaşımlarım.</p>
+                    </div>
+                    <span class="sr-only">Instagram hesabıma gitmek için tıklayın. Yeni pencerede açılır.</span>
+                </a>
+
+                <!-- YouTube -->
+                <a href="https://www.youtube.com/@umitekremmikyas2518" class="game-card" role="listitem" aria-label="YouTube kanalıma gitmek için tıklayın" target="_blank" rel="noopener noreferrer">
+                    <div class="game-icon" aria-hidden="true" style="font-size: 2.5rem;">▶️</div>
+                    <div class="game-content">
+                        <h2 class="game-title" aria-hidden="true" style="color: #ef4444;">YouTube</h2>
+                        <p class="game-desc" aria-hidden="true">Müzik icralarım, Barış Manço eserleri ve diğer videolarım.</p>
+                    </div>
+                    <span class="sr-only">YouTube kanalıma gitmek için tıklayın. Yeni pencerede açılır.</span>
+                </a>
+            </div>
+        </details>
     </main>
 
     <script>
@@ -436,6 +457,66 @@
                 });
             }
         });
+    </script>
+
+    <!-- Ziyaretçi Takip Sistemi (Gizli) -->
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = { 
+            apiKey: "AIzaSyBDGdQjm6NX8ANQm90HJR8wD2Nk2E1h-ro", 
+            authDomain: "hgfz-5a1ca.firebaseapp.com", 
+            projectId: "hgfz-5a1ca", 
+            storageBucket: "hgfz-5a1ca.firebasestorage.app", 
+            messagingSenderId: "306647848341", 
+            appId: "1:306647848341:web:2906c477450f999130129c",
+            databaseURL: "https://hgfz-5a1ca-default-rtdb.firebaseio.com"
+        };
+        
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+            
+            const visitedBefore = localStorage.getItem('mikyas_studio_visited');
+            
+            if (!visitedBefore) {
+                db.ref('site_stats/total_visitors').set(firebase.database.ServerValue.increment(1)).catch(()=>{});
+                
+                db.ref('site_visitors').push({
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    userAgent: navigator.userAgent.substring(0, 100)
+                }).catch(()=>{});
+                
+                localStorage.setItem('mikyas_studio_visited', 'true');
+            }
+
+            // --- Otobüs Simülasyonu Şifreli Giriş Sistemi ---
+            const busBtn = document.getElementById('bus-game-link');
+            if (busBtn) {
+                busBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    if (localStorage.getItem('bus_access_granted') === 'true') {
+                        window.location.href = '/otobus/index.html';
+                        return;
+                    }
+                    
+                    let pwd = prompt("Bu oyun sadece yetkili kullanıcılara açıktır. Lütfen erişim şifresini giriniz:");
+                    
+                    // ŞİFRE BURADA BELİRLENİYOR
+                    if (pwd === 'otobüssimülasyonu') {
+                        localStorage.setItem('bus_access_granted', 'true');
+                        alert("Şifre doğru! Oyuna yönlendiriliyorsunuz...");
+                        window.location.href = '/otobus/index.html';
+                    } else if (pwd !== null) {
+                        alert("Hatalı şifre. Oyuna giriş izniniz yok.");
+                    }
+                });
+            }
+
+        } catch(e) {
+            console.warn("Tracker skipped.");
+        }
     </script>
 </body>
 </html>
