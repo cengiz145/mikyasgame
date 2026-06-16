@@ -369,7 +369,13 @@ const Game = {
         }
         
         if (!isResume) {
-            // OSRM HESAPLAMASI BAÅLIYOR (GeÃ§ici olarak oyunu duraklat)
+            if (this.isFetchingRoute) {
+                console.warn("Spam korumasÄ±: OSRM Rota ÅŸu an Ã§ekiliyor, mÃ¼kerrer istek iptal edildi.");
+                return;
+            }
+            this.isFetchingRoute = true;
+
+            // OSRM HESAPLAMASI BAÅžLIYOR (GeÃ§ici olarak oyunu duraklat)
             const wasDriving = this.isDriving;
             this.isDriving = false; // Rota hesaplanana kadar otobÃ¼s hareket etmesin
             
@@ -438,6 +444,7 @@ const Game = {
                     if (typeof UI !== 'undefined') UI.showToast("OSRM baÄŸlantÄ±sÄ± koptu, yapay rotaya dÃ¶nÃ¼ldÃ¼.", "warning");
                 })
                 .finally(() => {
+                    this.isFetchingRoute = false;
                     if (this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
                         this.currentDistanceToNext = fallbackDistance || 1000;
                     }

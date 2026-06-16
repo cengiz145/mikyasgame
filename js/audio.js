@@ -1254,6 +1254,10 @@ class AudioSystem {
             }
         } catch (e) { console.log(e); }
 
+        // Spam Korumasi: Google TTS'e gitmeden once 200ms bekle, eger baska bir ses geldiyse istegi hic atma.
+        await new Promise(r => setTimeout(r, 200));
+        if (this.sequenceId !== currentSeqId) return;
+
         try {
             const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
                 method: 'POST',
@@ -1329,6 +1333,10 @@ class AudioSystem {
             } catch (e) { }
 
             if (!audioData) {
+                // Spam Korumasi: Google TTS'e gitmeden once 200ms bekle, iptal edildiyse fetch yapma
+                await new Promise(r => setTimeout(r, 200));
+                if (this.sequenceId !== currentSeqId) return;
+
                 try {
                     const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
                         method: 'POST',

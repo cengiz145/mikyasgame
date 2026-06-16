@@ -13,7 +13,15 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
+let isFetchingStops = false;
+
 async function fetchStopsFromOverpass(queryStr) {
+    if (isFetchingStops) {
+        console.warn("Spam koruması: Harita verisi şu an çekiliyor, mükerrer istek iptal edildi.");
+        throw new Error("FETCH_IN_PROGRESS");
+    }
+    isFetchingStops = true;
+
     const url = "https://overpass-api.de/api/interpreter";
     
     let finalQuery = queryStr;
@@ -43,6 +51,7 @@ async function fetchStopsFromOverpass(queryStr) {
         const veri = await response.json();
         
         if (!veri.elements || veri.elements.length === 0) {
+            isFetchingStops = false;
             return [];
         }
 
@@ -62,9 +71,11 @@ async function fetchStopsFromOverpass(queryStr) {
                 .map(b => ({ lat: b.lat, lon: b.lon }));
         }
 
+        isFetchingStops = false;
         return temizDuraklar;
 
     } catch (error) {
+        isFetchingStops = false;
         console.error("Duraklar Ã§ekilirken hata oluÅŸtu:", error);
         throw error;
     }
