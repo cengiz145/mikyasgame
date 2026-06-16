@@ -1324,6 +1324,10 @@ class AudioSystem {
         const apiKey = "AIzaSyAMgbeG7kuhowlmPKh2nsgm_vYzL6lpgHs";
         const audiosToPlay = [];
 
+        // Spam Korumasi: Sekans baslamadan once 200ms bekle, iptal edildiyse hicbir fetch yapma
+        await new Promise(r => setTimeout(r, 200));
+        if (this.sequenceId !== currentSeqId) return;
+
         for (let text of textArray) {
             const cacheKey = "tts_ai_leda_" + text;
             let audioData = null;
@@ -1333,10 +1337,6 @@ class AudioSystem {
             } catch (e) { }
 
             if (!audioData) {
-                // Spam Korumasi: Google TTS'e gitmeden once 200ms bekle, iptal edildiyse fetch yapma
-                await new Promise(r => setTimeout(r, 200));
-                if (this.sequenceId !== currentSeqId) return;
-
                 try {
                     const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
                         method: 'POST',

@@ -344,22 +344,4 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-// ==========================================================================
-// GLOBAL BUTON SPAM / FLOOD KORUMASI (DEBOUNCE)
-// ==========================================================================
-let lastGlobalClickTime = 0;
-document.addEventListener('click', (e) => {
-    // Sadece buton niteliÄŸi taÅŸÄ±yan tÄ±klamalarÄ± filtrele
-    const isButton = e.target.closest('button') || e.target.closest('.nav-item') || e.target.closest('.menu-btn');
-    if (isButton) {
-        const now = performance.now();
-        // 300 milisaniye iÃ§inde yapÄ±lan mÃ¼kerrer tÄ±klamalarÄ± (spam) yoksay
-        if (now - lastGlobalClickTime < 300) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            return false;
-        }
-        lastGlobalClickTime = now;
-    }
-}, true); // Capture phase'de Ã§alÄ±ÅŸtÄ±r ki diÄŸer eventlerden Ã¶nce yakalasÄ±n
+
