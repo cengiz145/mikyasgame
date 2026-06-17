@@ -1,6 +1,6 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
-$mesaj = "Değerli oyuncular. Artık yeni bir başarım elde ettiğinizde bu başarınızı çevreniz ile de paylaşabileceksiniz. Keyifli oyunlar dileriz."
+$mesaj = "Artık kazanılmış bir başarınız varsa, profil sekmesinden bunu görebileceksiniz. Aksi takdirde başarınızın olmadığına dair bir uyarı alacaksınız. Bizi takip etmeye devam edin."
 
 $token = "8797867195:AAHG65mgOhmeWh9Z-xVwCsdRVJ0bDQD86iA"
 $chat_id = "@hafizanaguven2559"
