@@ -645,8 +645,25 @@ window.updateStatsDisplay = function() {
         milestoneHtml = `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #ffb703; font-weight: bold;" aria-label="Sonraki dÃ¶nÃ¼m noktasÄ±na ${diff} gÃ¼n kaldÄ±. Hedef: ${nextM.day}. gÃ¼n. Ã–dÃ¼l: ${nextM.reward} Jeton">Hedef: ${nextM.day}. gÃ¼n! Kalan: ${diff} gÃ¼n. (Ã–dÃ¼l: ${nextM.reward} Jeton)</li>`;
     }
 
+    let achievementsHtml = "";
+    let userAch = window.userAchievements;
+    if (!userAch) userAch = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
+    let earnedAch = [];
+    if (userAch.hafizam_gucleniyor) earnedAch.push("âœ… HafÄ±zam GÃ¼Ã§leniyor");
+    if (userAch.buzsuz_3_gun) earnedAch.push("âœ… SadÄ±k Oyuncu");
+    
+    if (earnedAch.length > 0) {
+        achievementsHtml = `<li style="margin-top: 15px; font-weight: bold; color: #4ade80;">KazanÄ±lan BaÅŸarÄ±mlar:</li>`;
+        earnedAch.forEach(ach => {
+            achievementsHtml += `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #4ade80;" aria-label="KazanÄ±ldÄ±: ${ach.replace('âœ… ', '')}">${ach}</li>`;
+        });
+    } else {
+        achievementsHtml = `<li style="margin-top: 15px; font-weight: bold; color: #cbd5e1;">KazanÄ±lan BaÅŸarÄ±mlar:</li>`;
+        achievementsHtml += `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #cbd5e1;" aria-label="HenÃ¼z kazandÄ±ÄŸÄ±nÄ±z bir baÅŸarÄ± yok.">HenÃ¼z kazandÄ±ÄŸÄ±nÄ±z bir baÅŸarÄ± yok.</li>`;
+    }
+
     let html = "";
-    if (tokens === 0 && hk === 0 && zk === 0 && easyCount === 0 && mediumCount === 0 && hardCount === 0 && storyCount === 0) {
+    if (tokens === 0 && hk === 0 && zk === 0 && easyCount === 0 && mediumCount === 0 && hardCount === 0 && storyCount === 0 && earnedAch.length === 0) {
         html = '<div id="empty-stats-alert" tabindex="0" role="textbox" aria-readonly="true" aria-label="Ä°statistik sekmesi boÅŸ. HiÃ§ bir istatistiÄŸe sahip deÄŸilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boÅŸ. Ä°statistik bulunamadÄ±.</div>';
         if (window.announceToScreenReader && window.currentActiveMenu === 'stats') {
             setTimeout(() => window.announceToScreenReader("Bu sekme boÅŸ. HenÃ¼z hiÃ§ bir istatistiÄŸiniz bulunmuyor."), 300);
@@ -665,6 +682,7 @@ window.updateStatsDisplay = function() {
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Zor Mod: ${hardCount} kez tamamlandÄ±">Zor Mod: ${hardCount} kez tamamlandÄ±</li>
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="KayÄ±p Notalar: ${storyCount} kez tamamlandÄ±">KayÄ±p Notalar: ${storyCount} kez tamamlandÄ±</li>
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Ritim AvcÄ±sÄ±: En YÃ¼ksek Seviye ${rhythmCount}">Ritim AvcÄ±sÄ±: En YÃ¼ksek Seviye ${rhythmCount}</li>
+                ${achievementsHtml}
                 <li style="margin-top: 15px;">
                     <button class="menu-button stat-copy-btn" aria-label="Ä°statistiklerimi Kopyala">Ä°statistiklerimi Kopyala</button>
                 </li>
