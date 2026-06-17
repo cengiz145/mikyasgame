@@ -1,6 +1,6 @@
-{
-  "name": "HafÄ±zana GÃ¼ven",
-  "short_name": "HafÄ±zaOyun",
+﻿{
+  "name": "Hafızana Güven",
+  "short_name": "HafızaOyun",
   "start_url": "./index.html",
   "display": "fullscreen",
   "background_color": "#000000",
@@ -13,3 +13,4 @@
     }
   ]
 }
+

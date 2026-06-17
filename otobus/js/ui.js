@@ -1,5 +1,5 @@
-/* ==========================================================================
-   TÃœRKÄ°YE TURNESÄ° - OTOBÃœS SÄ°MÃœLASYONU ARAYÃœZ (UI.JS)
+﻿/* ==========================================================================
+   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU ARAYÜZ (UI.JS)
    ========================================================================== */
 
 const UI = {
@@ -15,9 +15,9 @@ const UI = {
             activeScreen.classList.remove('hidden');
             KeyboardNav.initForScreen();
             
-            // EKRAN OKUYUCU DÃœZELTMESÄ° (A11Y):
-            // role="application" kullanÄ±ldÄ±ÄŸÄ± iÃ§in ekran okuyucu baÅŸlÄ±klarÄ± otomatik okumaz.
-            // Bu yÃ¼zden yeni ekrana geÃ§ildiÄŸinde baÅŸlÄ±ÄŸÄ± manuel olarak anons ediyoruz.
+            // EKRAN OKUYUCU DÜZELTMESİ (A11Y):
+            // role="application" kullanıldığı için ekran okuyucu başlıkları otomatik okumaz.
+            // Bu yüzden yeni ekrana geçildiğinde başlığı manuel olarak anons ediyoruz.
             const titleEl = activeScreen.querySelector('h1, h2, .subtitle, .main-title');
             if (titleEl && typeof audio !== 'undefined' && audio.speak) {
                 audio.speak(titleEl.innerText);
@@ -37,8 +37,8 @@ const UI = {
         
         container.appendChild(toast);
         
-        // EKRAN OKUYUCU DÃœZELTMESÄ° (A11Y):
-        // Toast mesajlarÄ± ekranda sadece gÃ¶rsel Ã§Ä±kÄ±yordu.
+        // EKRAN OKUYUCU DÜZELTMESİ (A11Y):
+        // Toast mesajları ekranda sadece görsel çıkıyordu.
         if (typeof audio !== 'undefined' && audio.speak) {
             audio.speak(message);
         }
@@ -64,10 +64,10 @@ const UI = {
         const xpFill = document.getElementById('ui-xp-fill');
 
         if (completedTasks >= 27) {
-            if (xpText) xpText.innerText = `Uzun Yol (TÃ¼m GÃ¶revler Bitti!)`;
+            if (xpText) xpText.innerText = `Uzun Yol (Tüm Görevler Bitti!)`;
             if (xpFill) xpFill.style.width = `100%`;
         } else {
-            if (xpText) xpText.innerText = `GÃ¶rev Ä°lerlemesi: ${taskInCurrentLicense} / 9`;
+            if (xpText) xpText.innerText = `Görev İlerlemesi: ${taskInCurrentLicense} / 9`;
             if (xpFill) xpFill.style.width = `${Math.min(100, (taskInCurrentLicense / 9) * 100)}%`;
         }
     },
@@ -77,17 +77,17 @@ const UI = {
         listEl.innerHTML = '';
         
         const isFirstTime = unlockedCitiesArr.length === 0;
-        const isUzunYolUnlocked = licenseLevel > 4; // Ehliyet seviye 5 olunca ÅehirlerarasÄ± aÃ§Ä±lÄ±r
+        const isUzunYolUnlocked = licenseLevel > 4; // Ehliyet seviye 5 olunca Åehirlerarası açılır
         
         document.getElementById('map-subtitle').innerText = isFirstTime 
-            ? "Maceraya BaÅŸlayacaÄŸÄ±nÄ±z Merkez ÃœssÃ¼ SeÃ§in" 
-            : "Ã‡alÄ±ÅŸmak Ä°stediÄŸiniz Åehri SeÃ§in veya HaritayÄ± GeniÅŸletin";
+            ? "Maceraya Başlayacağınız Merkez Üssü Seçin" 
+            : "Çalışmak İstediğiniz Åehri Seçin veya Haritayı Genişletin";
 
         document.getElementById('unlock-points-display').innerHTML = isUzunYolUnlocked 
-            ? `Harita KeÅŸfi: <span style="color:var(--success)">Uzun Yol ÅofÃ¶rÃ¼ (AÃ§Ä±k)</span>`
-            : `Harita KeÅŸfi: <span style="color:var(--danger)">Uzun Yol Ehliyeti Bekleniyor (3. SÄ±nÄ±fÄ± Bitir)</span>`;
+            ? `Harita Keşfi: <span style="color:var(--success)">Uzun Yol Åoförü (Açık)</span>`
+            : `Harita Keşfi: <span style="color:var(--danger)">Uzun Yol Ehliyeti Bekleniyor (3. Sınıfı Bitir)</span>`;
 
-        // Unlockable komÅŸularÄ± bul (AÃ§Ä±k olan ÅŸehirlerin komÅŸularÄ±)
+        // Unlockable komşuları bul (Açık olan şehirlerin komşuları)
         const unlockableCandidates = new Set();
         if (!isFirstTime) {
             unlockedCitiesArr.forEach(city => {
@@ -115,8 +115,8 @@ const UI = {
                 btn.innerHTML = `
                     <span class="btn-icon">ğŸ™ï¸</span>
                     <span class="btn-text">
-                        <strong>${cityName} ${isFirstTime ? "(Merkez Ãœs Yap)" : "(AÃ§Ä±k Åehir)"}</strong>
-                        <small>Bu ÅŸehre giriÅŸ yap</small>
+                        <strong>${cityName} ${isFirstTime ? "(Merkez Üs Yap)" : "(Açık Åehir)"}</strong>
+                        <small>Bu şehre giriş yap</small>
                     </span>
                 `;
                 btn.onclick = () => {
@@ -124,7 +124,7 @@ const UI = {
                     if (isFirstTime) {
                         Game.unlockCity(cityName);
                         Game.setCity(cityName);
-                        UI.showToast(`${cityName} Merkez ÃœssÃ¼ Olarak Belirlendi!`, 'success');
+                        UI.showToast(`${cityName} Merkez Üssü Olarak Belirlendi!`, 'success');
                         setTimeout(() => {
                             UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
                             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: cityName } }));
@@ -143,21 +143,21 @@ const UI = {
                 btn.innerHTML = `
                     <span class="btn-icon">ğŸ”“</span>
                     <span class="btn-text">
-                        <strong>${cityName} (Kilidi AÃ§)</strong>
-                        <small>Uzun yol izni var. Sefere baÅŸla!</small>
+                        <strong>${cityName} (Kilidi Aç)</strong>
+                        <small>Uzun yol izni var. Sefere başla!</small>
                     </span>
                 `;
                 btn.onclick = () => {
                     audio.playSelect();
                     Game.unlockCity(cityName);
-                    UI.showToast(`${cityName} Kilidi AÃ§Ä±ldÄ±!`, 'success');
+                    UI.showToast(`${cityName} Kilidi Açıldı!`, 'success');
                     UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
                 };
             } else {
                 btn.className = 'menu-btn nav-item locked-city';
                 btn.disabled = true;
                 
-                let lockReason = isNeighborButLocked ? "Ã–nce merkez Ã¼ssÃ¼nde 3. SÄ±nÄ±f Ehliyeti bitirmelisin!" : "Bu ÅŸehre henÃ¼z komÅŸu deÄŸilsiniz.";
+                let lockReason = isNeighborButLocked ? "Önce merkez üssünde 3. Sınıf Ehliyeti bitirmelisin!" : "Bu şehre henüz komşu değilsiniz.";
                 
                 btn.innerHTML = `
                     <span class="btn-icon">ğŸ”’</span>
@@ -176,20 +176,20 @@ const UI = {
     },
 
     renderRoutes: function(cityName, completedTasks) {
-        document.getElementById('route-sel-title').innerText = `${cityName} GÃ¶revleri`;
+        document.getElementById('route-sel-title').innerText = `${cityName} Görevleri`;
         const listEl = document.getElementById('dynamic-route-list');
         listEl.innerHTML = '';
         
         const cityRoutes = Object.values(routesData).filter(r => r.sehir === cityName);
         
         if (cityRoutes.length === 0) {
-            listEl.innerHTML = `<li style="text-align:center; color: white;">Bu ÅŸehir iÃ§in rota bulunamadÄ±. LÃ¼tfen API'den veri Ã§ekin.</li>`;
+            listEl.innerHTML = `<li style="text-align:center; color: white;">Bu şehir için rota bulunamadı. Lütfen API'den veri çekin.</li>`;
             return;
         }
 
         // cityRoutes 27 adet (taskIndex 0 to 26).
         cityRoutes.forEach(route => {
-            // Sadece ÅU ANKÄ° (aktif) gÃ¶revi gÃ¶ster, Ã¶ncekileri ve sonrakileri tamamen GÄ°ZLE.
+            // Sadece ÅU ANKİ (aktif) görevi göster, öncekileri ve sonrakileri tamamen GİZLE.
             if (route.taskIndex !== completedTasks) {
                 return; 
             }
@@ -199,10 +199,10 @@ const UI = {
             const li = document.createElement('li');
             const btn = document.createElement('button');
             
-            // EÄŸer tamamlanmÄ±ÅŸsa farklÄ± bir stil, ÅŸu anki gÃ¶revse vurgulu stil
+            // Eğer tamamlanmışsa farklı bir stil, şu anki görevse vurgulu stil
             let btnClass = 'menu-btn nav-item';
             if (!isCurrentTask) {
-                btnClass += ' secondary-btn'; // BitirilmiÅŸ gÃ¶revler biraz daha sÃ¶nÃ¼k gÃ¶rÃ¼nsÃ¼n
+                btnClass += ' secondary-btn'; // Bitirilmiş görevler biraz daha sönük görünsün
             }
 
             btn.className = btnClass;
@@ -212,7 +212,7 @@ const UI = {
             btn.innerHTML = `
                 <span class="btn-icon">${icon}</span>
                 <span class="btn-text">
-                    <strong style="color: ${route.color};">${route.name} ${isCurrentTask ? '(YENÄ°)' : '(TamamlandÄ±)'}</strong>
+                    <strong style="color: ${route.color};">${route.name} ${isCurrentTask ? '(YENİ)' : '(Tamamlandı)'}</strong>
                     <small>${route.desc}</small>
                 </span>
             `;
@@ -246,7 +246,7 @@ const UI = {
 };
 
 /* ==========================================================================
-   KEYBOARD NAVIGATION (MENÃœ GEZÄ°NTÄ°SÄ°)
+   KEYBOARD NAVIGATION (MENÜ GEZİNTİSİ)
    ========================================================================== */
 const KeyboardNav = {
     items: [],
@@ -256,7 +256,7 @@ const KeyboardNav = {
         this.items = [];
         this.currentIndex = 0;
         
-        // EKRAN OKUYUCU DÃœZELTMESÄ° (A11Y): AÃ§Ä±k bir modal varsa klavye odaÄŸÄ±nÄ± Ã¶nce ona hapset
+        // EKRAN OKUYUCU DÜZELTMESİ (A11Y): Açık bir modal varsa klavye odağını önce ona hapset
         const visibleModals = document.querySelectorAll('.modal:not(.hidden)');
         let activeContainer = null;
         
@@ -318,7 +318,7 @@ const KeyboardNav = {
 };
 
 window.addEventListener('keydown', (e) => {
-    // SÃ¼rÃ¼ÅŸ halindeyken veya giriÅŸ inputundayken UI klavye navigasyonunu yoksay
+    // Sürüş halindeyken veya giriş inputundayken UI klavye navigasyonunu yoksay
     if (typeof Game !== 'undefined' && Game.isDriving) return;
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
@@ -333,8 +333,8 @@ window.addEventListener('keydown', (e) => {
             e.preventDefault();
             return;
         }
-        // NVDA veya Tab ile odaklanÄ±lan eleman bir buton deÄŸilse (div ise) Enter native Ã§alÄ±ÅŸmaz.
-        // Bu yÃ¼zden eÄŸer bir nav-item Ã¼zerinde isek tÄ±klamasÄ±nÄ± saÄŸlÄ±yoruz.
+        // NVDA veya Tab ile odaklanılan eleman bir buton değilse (div ise) Enter native çalışmaz.
+        // Bu yüzden eğer bir nav-item üzerinde isek tıklamasını sağlıyoruz.
         if (document.activeElement && document.activeElement.classList.contains('nav-item')) {
             if (document.activeElement.tagName !== 'BUTTON') { 
                 e.preventDefault();
@@ -343,5 +343,6 @@ window.addEventListener('keydown', (e) => {
         }
     }
 });
+
 
 

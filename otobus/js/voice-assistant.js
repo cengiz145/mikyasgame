@@ -1,32 +1,32 @@
-class VoiceAssistant {
+﻿class VoiceAssistant {
     constructor() {
         this.recognition = null;
         this.isListening = false;
         
-        // TarayÄ±cÄ± desteÄŸi kontrolÃ¼
+        // Tarayıcı desteği kontrolü
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
             this.recognition = new SpeechRecognition();
             this.recognition.lang = 'tr-TR';
-            this.recognition.continuous = false; // KonuÅŸma bitince otomatik dursun
+            this.recognition.continuous = false; // Konuşma bitince otomatik dursun
             this.recognition.interimResults = false;
 
             this.recognition.onstart = () => {
                 this.isListening = true;
                 if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.select) {
-                    audio.sounds.select.play(); // Dinlemeye baÅŸlama sesi
+                    audio.sounds.select.play(); // Dinlemeye başlama sesi
                 }
                 console.log("Sesli Asistan: Dinliyor...");
             };
 
             this.recognition.onresult = (event) => {
                 const transcript = event.results[0][0].transcript.toLowerCase();
-                console.log("Sesli Asistan AnladÄ±: ", transcript);
+                console.log("Sesli Asistan Anladı: ", transcript);
                 this.processCommand(transcript);
             };
 
             this.recognition.onerror = (event) => {
-                console.error("Sesli Asistan HatasÄ±:", event.error);
+                console.error("Sesli Asistan Hatası:", event.error);
                 this.isListening = false;
                 if (event.error === 'not-allowed') {
                     if (typeof UI !== 'undefined') UI.showToast("Mikrofon izni reddedildi.", "error");
@@ -38,13 +38,13 @@ class VoiceAssistant {
                 console.log("Sesli Asistan: Dinleme bitti.");
             };
         } else {
-            console.error("Web Speech API bu tarayÄ±cÄ±da desteklenmiyor.");
+            console.error("Web Speech API bu tarayıcıda desteklenmiyor.");
         }
 
-        // V tuÅŸu dinleyicisi
+        // V tuşu dinleyicisi
         window.addEventListener('keydown', (e) => {
             if (e.key.toLowerCase() === 'v' && !e.repeat && !e.altKey && !e.ctrlKey) {
-                // Sadece sÃ¼rÃ¼ÅŸ ekranÄ±nda Ã§alÄ±ÅŸsÄ±n (isteÄŸe baÄŸlÄ± ama mantÄ±klÄ±)
+                // Sadece sürüş ekranında çalışsın (isteğe bağlı ama mantıklı)
                 if (typeof Game !== 'undefined' && Game.isDriving) {
                     this.toggleListening();
                 }
@@ -54,7 +54,7 @@ class VoiceAssistant {
 
     toggleListening() {
         if (!this.recognition) {
-            if (typeof UI !== 'undefined') UI.showToast("TarayÄ±cÄ±nÄ±z sesli asistanÄ± desteklemiyor.", "error");
+            if (typeof UI !== 'undefined') UI.showToast("Tarayıcınız sesli asistanı desteklemiyor.", "error");
             return;
         }
 
@@ -64,7 +64,7 @@ class VoiceAssistant {
             try {
                 this.recognition.start();
             } catch (e) {
-                console.error("Asistan baÅŸlatÄ±lamadÄ±:", e);
+                console.error("Asistan başlatılamadı:", e);
             }
         }
     }
@@ -72,67 +72,67 @@ class VoiceAssistant {
     processCommand(command) {
         if (typeof Game === 'undefined' || typeof audio === 'undefined') return;
 
-        // --- ARAÃ‡ KONTROLÃœ ---
-        if (command.includes("motor") || command.includes("Ã§alÄ±ÅŸtÄ±r") || command.includes("kontak")) {
+        // --- ARAÇ KONTROLÜ ---
+        if (command.includes("motor") || command.includes("çalıştır") || command.includes("kontak")) {
             if (!audio.isEngineRunning) {
                 document.getElementById('start-engine-btn').click();
-                // Buton zaten Ã§alÄ±ÅŸtÄ±rÄ±yor, kendi anonsu var.
+                // Buton zaten çalıştırıyor, kendi anonsu var.
             } else {
-                audio.speak("Motor zaten Ã§alÄ±ÅŸÄ±yor.");
+                audio.speak("Motor zaten çalışıyor.");
             }
             return;
         }
 
-        if (command.includes("silecek") || command.includes("camÄ± sil") || command.includes("camlarÄ± sil")) {
+        if (command.includes("silecek") || command.includes("camı sil") || command.includes("camları sil")) {
             audio.toggleWipers();
             return;
         }
 
-        if (command.includes("korna") || command.includes("dÃ¼t")) {
+        if (command.includes("korna") || command.includes("düt")) {
             audio.playHorn();
             setTimeout(() => { if (audio.stopHorn) audio.stopHorn(); }, 1500);
             return;
         }
 
-        if (command.includes("Ã¶n kapÄ±") || command.includes("Ã¶nÃ¼ aÃ§")) {
+        if (command.includes("ön kapı") || command.includes("önü aç")) {
             Game.toggleFrontDoor();
             return;
         }
 
-        if (command.includes("arka kapÄ±") || command.includes("arkayÄ± aÃ§")) {
+        if (command.includes("arka kapı") || command.includes("arkayı aç")) {
             Game.toggleRearDoor();
             return;
         }
 
-        if (command.includes("kapÄ±") && (command.includes("aÃ§") || command.includes("kapat"))) {
+        if (command.includes("kapı") && (command.includes("aç") || command.includes("kapat"))) {
             Game.toggleFrontDoor();
             setTimeout(() => Game.toggleRearDoor(), 500);
             return;
         }
 
-        // --- NAVÄ°GASYON BÄ°LGÄ°SÄ° ---
-        if (command.includes("hÄ±z") || command.includes("kaÃ§la") || command.includes("yavaÅŸ mÄ±")) {
-            audio.speak(`Åu anki hÄ±zÄ±mÄ±z saatte ${Math.floor(Game.speed)} kilometre.`);
+        // --- NAVİGASYON BİLGİSİ ---
+        if (command.includes("hız") || command.includes("kaçla") || command.includes("yavaş mı")) {
+            audio.speak(`Åu anki hızımız saatte ${Math.floor(Game.speed)} kilometre.`);
             return;
         }
 
-        if (command.includes("neredeyiz") || command.includes("mesafe") || command.includes("ne kadar kaldÄ±")) {
+        if (command.includes("neredeyiz") || command.includes("mesafe") || command.includes("ne kadar kaldı")) {
             let distance = Math.floor(Game.currentDistanceToNext);
             let unit = "metre";
             if (distance > 1000) {
                 distance = (distance / 1000).toFixed(1);
                 unit = "kilometre";
             }
-            audio.speak(`Hedefe ${distance} ${unit} kaldÄ±.`);
+            audio.speak(`Hedefe ${distance} ${unit} kaldı.`);
             return;
         }
 
         if (command.includes("durak") || command.includes("nereye") || command.includes("hedef")) {
             if (Game.activeRouteData && Game.activeRouteData.stops && Game.activeRouteData.stops[Game.currentStopIndex]) {
                 const stopName = Game.activeRouteData.stops[Game.currentStopIndex].name;
-                audio.speak(`SÄ±radaki hedefimiz: ${stopName}.`);
+                audio.speak(`Sıradaki hedefimiz: ${stopName}.`);
             } else {
-                audio.speak("Åu an aktif bir rotada deÄŸiliz.");
+                audio.speak("Åu an aktif bir rotada değiliz.");
             }
             return;
         }
@@ -140,25 +140,25 @@ class VoiceAssistant {
         if (command.includes("zaman") || command.includes("saat")) {
             const h = Math.floor(Game.clockMinutes / 60).toString().padStart(2, '0');
             const m = Math.floor(Game.clockMinutes % 60).toString().padStart(2, '0');
-            audio.speak(`Oyun saati ÅŸu an ${h}:${m}.`);
+            audio.speak(`Oyun saati şu an ${h}:${m}.`);
             return;
         }
 
-        // --- KLÄ°MA KONTROLÃœ ---
-        if (command.includes("klima") || command.includes("sÄ±cak") || command.includes("soÄŸuk") || command.includes("Ã¼ÅŸÃ¼") || command.includes("yan")) {
-            if (command.includes("kaÃ§ derece") || command.includes("sÄ±caklÄ±k ne") || command.includes("durumu")) {
-                const msg = `DÄ±ÅŸ sÄ±caklÄ±k ${Game.temperature} derece, otobÃ¼s iÃ§i ${Math.floor(Game.busTemperature)} derece. ${Game.isACOn ? "Klima aÃ§Ä±k." : "Klima kapalÄ±."}`;
+        // --- KLİMA KONTROLÜ ---
+        if (command.includes("klima") || command.includes("sıcak") || command.includes("soğuk") || command.includes("üşü") || command.includes("yan")) {
+            if (command.includes("kaç derece") || command.includes("sıcaklık ne") || command.includes("durumu")) {
+                const msg = `Dış sıcaklık ${Game.temperature} derece, otobüs içi ${Math.floor(Game.busTemperature)} derece. ${Game.isACOn ? "Klima açık." : "Klima kapalı."}`;
                 audio.speak(msg);
                 return;
             }
 
-            if (command.includes("aÃ§") || command.includes("Ã§alÄ±ÅŸtÄ±r") || command.includes("sÄ±cak") || command.includes("soÄŸuk") || command.includes("Ã¼ÅŸÃ¼") || command.includes("yan")) {
+            if (command.includes("aç") || command.includes("çalıştır") || command.includes("sıcak") || command.includes("soğuk") || command.includes("üşü") || command.includes("yan")) {
                 if (!Game.isACOn) {
                     Game.isACOn = true;
-                    audio.speak("Klima aÃ§Ä±ldÄ±. Hedef sÄ±caklÄ±k 22 derece.");
-                    if (typeof UI !== 'undefined') UI.showToast("Klima AÃ§Ä±ldÄ±", "info");
+                    audio.speak("Klima açıldı. Hedef sıcaklık 22 derece.");
+                    if (typeof UI !== 'undefined') UI.showToast("Klima Açıldı", "info");
                 } else {
-                    audio.speak("Klima zaten aÃ§Ä±k.");
+                    audio.speak("Klima zaten açık.");
                 }
                 return;
             }
@@ -166,21 +166,22 @@ class VoiceAssistant {
             if (command.includes("kapat") || command.includes("durdur")) {
                 if (Game.isACOn) {
                     Game.isACOn = false;
-                    audio.speak("Klima kapatÄ±ldÄ±.");
-                    if (typeof UI !== 'undefined') UI.showToast("Klima KapatÄ±ldÄ±", "info");
+                    audio.speak("Klima kapatıldı.");
+                    if (typeof UI !== 'undefined') UI.showToast("Klima Kapatıldı", "info");
                 } else {
-                    audio.speak("Klima zaten kapalÄ±.");
+                    audio.speak("Klima zaten kapalı.");
                 }
                 return;
             }
         }
 
-        // AnlaÅŸÄ±lamadÄ±
-        audio.speak("AnlayamadÄ±m, lÃ¼tfen tekrar et.");
+        // Anlaşılamadı
+        audio.speak("Anlayamadım, lütfen tekrar et.");
     }
 }
 
-// Global olarak baÅŸlat
+// Global olarak başlat
 document.addEventListener('DOMContentLoaded', () => {
     window.voiceAssistant = new VoiceAssistant();
 });
+

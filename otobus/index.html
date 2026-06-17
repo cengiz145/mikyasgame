@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -9,11 +9,11 @@
     <title>Otobüs Simülasyonu</title>
     
     <script>
-        // EN ERKEN AÅžAMA HATA YAKALAYICI (Syntax Error vs.)
+        // EN ERKEN AŞAMA HATA YAKALAYICI (Syntax Error vs.)
         window.addEventListener('error', function(e) {
             console.error("EARLY SYNTAX/LOAD ERROR:", e.message, "at", e.filename, ":", e.lineno);
             if (window.speechSynthesis) {
-                var u = new SpeechSynthesisUtterance("Kritik sÃ¶zdizimi hatasÄ±: " + e.message + " Dosya: " + (e.filename ? e.filename.split('/').pop() : 'Bilinmiyor'));
+                var u = new SpeechSynthesisUtterance("Kritik sözdizimi hatası: " + e.message + " Dosya: " + (e.filename ? e.filename.split('/').pop() : 'Bilinmiyor'));
                 u.lang = 'tr-TR';
                 window.speechSynthesis.speak(u);
             }
@@ -38,28 +38,28 @@
         <div class="progress-bar-container">
             <div id="global-progress-bar" class="progress-bar" style="width: 0%;"></div>
         </div>
-        <p id="global-progress-text">HazÄ±rlanÄ±yor...</p>
+        <p id="global-progress-text">Hazırlanıyor...</p>
     </div>
 
     <!-- 0. SPLASH SCREEN (KARÅILAMA EKRANI) -->
     <main id="splash-screen" class="screen" role="application">
         <div class="glass-panel" style="text-align: center; max-width: 600px;">
             <div class="logo-circle" style="margin: 0 auto 20px;">ğŸšŒ</div>
-            <h1 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 1rem;">OTOBÃœS SÄ°MÃœLASYONU</h1>
-            <p style="font-size: 1.2rem; margin-bottom: 2rem; color: var(--text-light);">Bu oyun <strong style="color:var(--primary)">Ãœmit Ekrem Mikyas</strong> tarafÄ±ndan geliÅŸtirilmiÅŸtir.</p>
-            <p class="pulse-anim" style="color: var(--secondary); font-weight: bold;">Oyunu yÃ¼klemek iÃ§in [ENTER]'a basÄ±n veya tÄ±klayÄ±n</p>
+            <h1 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 1rem;">OTOBÜS SİMÜLASYONU</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem; color: var(--text-light);">Bu oyun <strong style="color:var(--primary)">Ümit Ekrem Mikyas</strong> tarafından geliştirilmiştir.</p>
+            <p class="pulse-anim" style="color: var(--secondary); font-weight: bold;">Oyunu yüklemek için [ENTER]'a basın veya tıklayın</p>
         </div>
     </main>
 
-    <!-- 0.5. LOGIN SCREEN (KULLANICI PROFÄ°LÄ° EKRANI) -->
+    <!-- 0.5. LOGIN SCREEN (KULLANICI PROFİLİ EKRANI) -->
     <main id="login-screen" class="screen hidden" role="application">
         <div class="glass-panel" style="text-align: center; max-width: 400px; padding: 30px;">
-            <h1 style="color: var(--secondary); margin-bottom: 20px;">KullanÄ±cÄ± Profili</h1>
-            <p style="margin-bottom: 20px; font-size: 1.1rem; color: #ddd;">Oyuna devam etmek veya yeni bir profil oluÅŸturmak iÃ§in bir kullanÄ±cÄ± adÄ± girin.</p>
+            <h1 style="color: var(--secondary); margin-bottom: 20px;">Kullanıcı Profili</h1>
+            <p style="margin-bottom: 20px; font-size: 1.1rem; color: #ddd;">Oyuna devam etmek veya yeni bir profil oluşturmak için bir kullanıcı adı girin.</p>
             
             <div style="margin-bottom: 20px;">
-                <label for="username-input" style="display: block; margin-bottom: 8px; font-weight: bold; color: #fff;">KullanÄ±cÄ± AdÄ±:</label>
-                <input type="text" id="username-input" class="modern-btn" style="width: 100%; text-align: center; font-size: 1.2rem; cursor: text; background: rgba(255,255,255,0.1); border: 2px solid var(--primary);" placeholder="KullanÄ±cÄ± AdÄ± Giriniz" aria-label="KullanÄ±cÄ± adÄ±nÄ±zÄ± girin">
+                <label for="username-input" style="display: block; margin-bottom: 8px; font-weight: bold; color: #fff;">Kullanıcı Adı:</label>
+                <input type="text" id="username-input" class="modern-btn" style="width: 100%; text-align: center; font-size: 1.2rem; cursor: text; background: rgba(255,255,255,0.1); border: 2px solid var(--primary);" placeholder="Kullanıcı Adı Giriniz" aria-label="Kullanıcı adınızı girin">
             </div>
             
             <button id="btn-login" class="modern-btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.2rem;">
@@ -68,7 +68,7 @@
         </div>
     </main>
 
-    <!-- 1. TITLE SCREEN (GÄ°RÄ°Å EKRANI) -->
+    <!-- 1. TITLE SCREEN (GİRİÅ EKRANI) -->
     <main id="title-screen" class="screen hidden" role="application">
         <div class="logo-glow-wrapper" aria-hidden="true">
             <div class="logo-pulse-ring"></div>
@@ -76,27 +76,27 @@
         </div>
 
         <div class="title-container" style="margin-bottom: 40px; z-index: 1;">
-            <h1 class="main-title" style="font-size: 3.5rem;">OtobÃ¼s SimÃ¼lasyonu</h1>
+            <h1 class="main-title" style="font-size: 3.5rem;">Otobüs Simülasyonu</h1>
         </div>
 
         <div class="menu-container" style="z-index: 1;">
             <button id="btn-start-game" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: center;">
-                Yeni Bir Oyuna BaÅŸla
+                Yeni Bir Oyuna Başla
             </button>
             <button id="btn-clear-cache" class="menu-btn nav-item" style="justify-content: center; margin-top: 15px; border-color: var(--danger); color: var(--danger);">
-                Ã–nbelleÄŸi Temizle ve Yeniden BaÅŸlat
+                Önbelleği Temizle ve Yeniden Başlat
             </button>
             <button id="btn-exit-game" class="menu-btn secondary-btn nav-item" style="justify-content: center; margin-top: 15px;">
-                Oyundan Ã‡Ä±k
+                Oyundan Çık
             </button>
         </div>
     </main>
 
-    <!-- 2. CITY SELECTION (MAP / KARÄ°YER) SCREEN -->
+    <!-- 2. CITY SELECTION (MAP / KARİYER) SCREEN -->
     <main id="base-selection-menu" class="screen hidden" role="application">
         <div class="title-container">
-            <h1 class="main-title">OtobÃ¼s SimÃ¼lasyonu</h1>
-            <p class="subtitle" id="map-subtitle">BaÅŸlangÄ±Ã§ Åehrinizi (Merkez ÃœssÃ¼) SeÃ§in</p>
+            <h1 class="main-title">Otobüs Simülasyonu</h1>
+            <p class="subtitle" id="map-subtitle">Başlangıç Åehrinizi (Merkez Üssü) Seçin</p>
         </div>
         
         <!-- HUD for Map Screen -->
@@ -108,7 +108,7 @@
             </div>
             <div class="stat-card">
                 <span class="stat-icon">ğŸ’°</span>
-                <span class="stat-label">BÃ¼tÃ§e</span>
+                <span class="stat-label">Bütçe</span>
                 <span class="stat-value" id="ui-budget">0 â‚º</span>
             </div>
         </div>
@@ -118,7 +118,7 @@
         </div>
         
         <div id="unlock-points-display" class="budget-display highlight-text" style="margin-bottom: 15px;">
-            Harita KeÅŸif PuanÄ±: <span id="ui-map-points">0</span>
+            Harita Keşif Puanı: <span id="ui-map-points">0</span>
         </div>
 
         <nav>
@@ -127,15 +127,15 @@
             </ul>
         </nav>
         <button id="btn-base-back" class="menu-btn secondary-btn nav-item" style="margin-top: 20px; justify-content: center;">
-            Ana Ekrana DÃ¶n
+            Ana Ekrana Dön
         </button>
     </main>
 
     <!-- 3. ROUTE SELECTION SCREEN (API ROUTES) -->
     <main id="route-menu" class="screen hidden" role="application">
         <div class="title-container">
-            <h1 class="main-title" id="route-sel-title">GÃ¶rev SeÃ§imi</h1>
-            <p class="subtitle">API'den Ã§ekilen canlÄ± rotalardan birini seÃ§in</p>
+            <h1 class="main-title" id="route-sel-title">Görev Seçimi</h1>
+            <p class="subtitle">API'den çekilen canlı rotalardan birini seçin</p>
         </div>
 
         <nav>
@@ -145,26 +145,26 @@
         </nav>
 
         <button id="btn-route-back" class="menu-btn secondary-btn nav-item" style="margin-top: 15px; justify-content: center;">
-            Haritaya DÃ¶n
+            Haritaya Dön
         </button>
     </main>
 
-    <!-- 4. GARAGE SCREEN (ARTIK SADECE OTOBÃœS VE SEFER BÄ°LGÄ°SÄ°) -->
+    <!-- 4. GARAGE SCREEN (ARTIK SADECE OTOBÜS VE SEFER BİLGİSİ) -->
     <main id="garage-screen" class="screen hidden" role="application">
         <div class="title-container">
-            <h1 class="main-title">Sefer Ã–zeti</h1>
-            <p class="subtitle" id="garage-route-desc">Hat bilgisi yÃ¼kleniyor...</p>
+            <h1 class="main-title">Sefer Özeti</h1>
+            <p class="subtitle" id="garage-route-desc">Hat bilgisi yükleniyor...</p>
         </div>
 
         <div class="instruction-box" style="margin-bottom: 20px;">
-            <p style="margin-top: 10px; font-size: 0.9rem;">(W) ile hÄ±zlanabilir, (S) ile yavaÅŸlayabilir, (A/D) ile ÅŸerit deÄŸiÅŸtirebilirsiniz. Engellere Ã§arpmamaya ve denize uÃ§mamaya dikkat edin!</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">(W) ile hızlanabilir, (S) ile yavaşlayabilir, (A/D) ile şerit değiştirebilirsiniz. Engellere çarpmamaya ve denize uçmamaya dikkat edin!</p>
         </div>
 
         <button id="start-engine-btn" class="primary-btn pulse-btn nav-item" style="width: 100%;">
-            Motoru Ã‡alÄ±ÅŸtÄ±r ve Sefere BaÅŸla
+            Motoru Çalıştır ve Sefere Başla
         </button>
         <button id="btn-garage-back" class="menu-btn secondary-btn nav-item" style="margin-top: 15px; justify-content: center;">
-            GÃ¶rev SeÃ§imine DÃ¶n
+            Görev Seçimine Dön
         </button>
     </main>
 
@@ -179,13 +179,13 @@
             </div>
             
             <div class="dash-section">
-                <div class="dash-label">Ä°Ã‡ ISI</div>
-                <div class="dash-value" id="hud-temp">22Â°C</div>
+                <div class="dash-label">İÇ ISI</div>
+                <div class="dash-value" id="hud-temp">22°C</div>
                 <div class="dash-unit"></div>
             </div>
             
             <div class="dash-section">
-                <div class="dash-label">SONRAKÄ° DURAK</div>
+                <div class="dash-label">SONRAKİ DURAK</div>
                 <div class="dash-value stop-name" id="hud-next-stop">-</div>
                 <div class="dash-unit">
                     <span id="hud-distance">0</span> m
@@ -201,7 +201,7 @@
             <div class="dash-section">
                 <div class="dash-label">YOLCU</div>
                 <div class="dash-value" id="hud-passengers">0</div>
-                <div class="dash-unit">kiÅŸi</div>
+                <div class="dash-unit">kişi</div>
             </div>
         </div>
         
@@ -216,23 +216,23 @@
         </div>
         
         <div id="hud-warnings" class="warning-text" style="text-align: center; text-shadow: 0 0 10px rgba(255,0,0,0.8);"></div>
-        <!-- AraÃ§larÄ±n spawnlanacaÄŸÄ± container -->
+        <!-- Araçların spawnlanacağı container -->
         <div id="obstacles-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0;"></div>
     </main>
 
     <!-- 6. STOP INTERACTION SCREEN -->
     <main id="stop-screen" class="screen hidden" role="application">
         <div class="title-container">
-            <h1 class="main-title" id="stop-title">Durak AdÄ±</h1>
-            <p class="subtitle">Yolcu Ä°ÅŸlemleri</p>
+            <h1 class="main-title" id="stop-title">Durak Adı</h1>
+            <p class="subtitle">Yolcu İşlemleri</p>
         </div>
 
         <div class="door-controls" style="display: flex; gap: 15px; width: 100%; margin-bottom: 20px;">
             <button id="btn-front-door" class="menu-btn door-btn nav-item" style="flex: 1; justify-content: center;">
-                Ã–n KapÄ±yÄ± AÃ§
+                Ön Kapıyı Aç
             </button>
             <button id="btn-rear-door" class="menu-btn door-btn nav-item" style="flex: 1; justify-content: center;">
-                Arka KapÄ±yÄ± AÃ§
+                Arka Kapıyı Aç
             </button>
         </div>
 
@@ -244,49 +244,49 @@
         </div>
 
         <div class="stop-status" style="margin-top: 15px; font-size: 1.1rem; font-weight: bold;">
-            <p>Bekleyen: <span id="stop-waiting-count">0</span> | Ä°nen: <span id="stop-alighting-count">0</span></p>
+            <p>Bekleyen: <span id="stop-waiting-count">0</span> | İnen: <span id="stop-alighting-count">0</span></p>
         </div>
     </main>
 
     <!-- 7. RESULTS SCREEN -->
     <main id="results-screen" class="screen hidden" role="application">
         <div class="title-container">
-            <h1 class="main-title">Sefer TamamlandÄ±</h1>
-            <p class="subtitle">Ä°statistikleriniz</p>
+            <h1 class="main-title">Sefer Tamamlandı</h1>
+            <p class="subtitle">İstatistikleriniz</p>
         </div>
 
         <div class="stats-panel" style="flex-direction: column; gap: 15px;">
             <div class="stat-card" style="width: 100%; justify-content: space-between;">
-                <span class="stat-label">Toplam KazanÄ±lan Para:</span>
+                <span class="stat-label">Toplam Kazanılan Para:</span>
                 <span class="stat-value" id="res-money" style="color: var(--secondary);">0 â‚º</span>
             </div>
             <div class="stat-card" style="width: 100%; justify-content: space-between;">
-                <span class="stat-label">KazanÄ±lan XP:</span>
+                <span class="stat-label">Kazanılan XP:</span>
                 <span class="stat-value" id="res-xp" style="color: var(--primary);">0</span>
             </div>
             <div class="stat-card" style="width: 100%; justify-content: space-between;">
-                <span class="stat-label">HÄ±z CezalarÄ±:</span>
+                <span class="stat-label">Hız Cezaları:</span>
                 <span class="stat-value" id="res-penalties" style="color: var(--danger);">0 â‚º</span>
             </div>
         </div>
 
         <button id="btn-next-mission" class="primary-btn nav-item pulse-btn" style="margin-top: 25px; width: 100%;">
-            Sonraki GÃ¶reve GeÃ§
+            Sonraki Göreve Geç
         </button>
         <button id="btn-finish" class="secondary-btn nav-item" style="margin-top: 15px; width: 100%; border: 1px solid var(--border);">
-            Geri DÃ¶n (Ana MenÃ¼)
+            Geri Dön (Ana Menü)
         </button>
     </main>
 
-    <!-- 8. SANAYÄ° (MECHANIC) SCREEN -->
-    <main id="sanayi-screen" class="screen hidden" role="application" aria-label="Sanayi MenÃ¼sÃ¼">
+    <!-- 8. SANAYİ (MECHANIC) SCREEN -->
+    <main id="sanayi-screen" class="screen hidden" role="application" aria-label="Sanayi Menüsü">
         <div class="title-container">
-            <h1 class="main-title">TekirdaÄŸ Sanayi</h1>
-            <p class="subtitle" id="sanayi-status">AraÃ§ Durumu Ä°nceleniyor...</p>
+            <h1 class="main-title">Tekirdağ Sanayi</h1>
+            <p class="subtitle" id="sanayi-status">Araç Durumu İnceleniyor...</p>
         </div>
 
         <div id="sanayi-dialog" style="text-align: center; margin: 20px 0; font-size: 1.2rem; min-height: 50px;">
-            <!-- TTS Metni buraya yazÄ±lacak -->
+            <!-- TTS Metni buraya yazılacak -->
         </div>
 
         <div id="sanayi-report-container" class="hidden">
@@ -296,31 +296,31 @@
             </ul>
 
             <button id="btn-sanayi-complete" class="primary-btn nav-item pulse-btn hidden" style="margin-top: 25px; width: 100%;">
-                OnarÄ±mÄ± BaÅŸlat
+                Onarımı Başlat
             </button>
         </div>
     </main>
 
     <!-- EXIT MESSAGE SCREEN -->
     <div id="exit-screen" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center;">
-        <h1 style="color: var(--secondary); font-size: 3rem; text-shadow: 0 0 20px var(--secondary-glow);">OynadÄ±ÄŸÄ±nÄ±z Ä°Ã§in TeÅŸekkÃ¼rler!</h1>
+        <h1 style="color: var(--secondary); font-size: 3rem; text-shadow: 0 0 20px var(--secondary-glow);">Oynadığınız İçin Teşekkürler!</h1>
     </div>
 
     <!-- Modals for Intercity -->
     <div id="mode-selection-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <h2 style="color: var(--text-light); margin-bottom: 20px; font-size: 2rem;">GÃ¶rev Modunu SeÃ§in</h2>
-        <button id="btn-mode-inner" class="nav-item primary-btn pulse-btn" style="width: 300px; margin-bottom: 15px; font-size: 1.2rem;">Åehir Ä°Ã§i Seferler</button>
-        <button id="btn-mode-inter" class="nav-item secondary-btn" style="width: 300px; font-size: 1.2rem; border-color: var(--secondary); color: var(--secondary);">Åehirler ArasÄ± Sefer (Uzun Yol)</button>
-        <button id="btn-mode-cancel" class="nav-item menu-btn" style="margin-top: 20px; color: var(--danger); font-size: 1rem; border: none; background: transparent;">Ä°ptal Et</button>
+        <h2 style="color: var(--text-light); margin-bottom: 20px; font-size: 2rem;">Görev Modunu Seçin</h2>
+        <button id="btn-mode-inner" class="nav-item primary-btn pulse-btn" style="width: 300px; margin-bottom: 15px; font-size: 1.2rem;">Åehir İçi Seferler</button>
+        <button id="btn-mode-inter" class="nav-item secondary-btn" style="width: 300px; font-size: 1.2rem; border-color: var(--secondary); color: var(--secondary);">Åehirler Arası Sefer (Uzun Yol)</button>
+        <button id="btn-mode-cancel" class="nav-item menu-btn" style="margin-top: 20px; color: var(--danger); font-size: 1rem; border: none; background: transparent;">İptal Et</button>
     </div>
 
     <div id="intercity-dest-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
         <h2 style="color: var(--text-light); margin-bottom: 10px; font-size: 2rem;">Nereye Gidiyoruz?</h2>
-        <p style="color: var(--secondary); margin-bottom: 20px;">Sadece aÃ§Ä±k veya komÅŸu ÅŸehirlere gidebilirsiniz.</p>
+        <p style="color: var(--secondary); margin-bottom: 20px;">Sadece açık veya komşu şehirlere gidebilirsiniz.</p>
         <ul id="intercity-dest-list" style="list-style: none; padding: 0; width: 100%; max-width: 500px; max-height: 60vh; overflow-y: auto;">
             <!-- Doldurulacak -->
         </ul>
-        <button id="btn-intercity-cancel" class="nav-item menu-btn" style="margin-top: 20px; color: var(--danger);">Geri DÃ¶n</button>
+        <button id="btn-intercity-cancel" class="nav-item menu-btn" style="margin-top: 20px; color: var(--danger);">Geri Dön</button>
     </div>
 
     <!-- TOAST NOTIFICATION CONTAINER -->
@@ -343,3 +343,4 @@
     <script src="js/voice-assistant.js"></script>
 </body>
 </html>
+

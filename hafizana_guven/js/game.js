@@ -1,4 +1,4 @@
-// game.js - Ana Oyun DÃ¶ngÃ¼sÃ¼ ve Motor Ä°ÅŸlevleri
+﻿// game.js - Ana Oyun Döngüsü ve Motor İşlevleri
 
 window.hgfzZamanlayici = {
     timeouts: new Set(),
@@ -37,47 +37,47 @@ window.sEscapeHTML = function(str) {
 
 window.DEBUG_MODE = false;
 
-// BoÅŸluk tuÅŸuna ve yÃ¶n tuÅŸlarÄ±na basÄ±ldÄ±ÄŸÄ±nda sayfanÄ±n aÅŸaÄŸÄ±/yukarÄ± kaymasÄ±nÄ± engelle
+// Boşluk tuşuna ve yön tuşlarına basıldığında sayfanın aşağı/yukarı kaymasını engelle
 window.addEventListener('keydown', function(event) {
-    // Hata AyÄ±klama (Debug Mode) KÄ±sayolu: Ctrl + Shift + D
+    // Hata Ayıklama (Debug Mode) Kısayolu: Ctrl + Shift + D
     if (event.ctrlKey && event.shiftKey && (event.key === 'd' || event.key === 'D')) {
         event.preventDefault();
         window.DEBUG_MODE = !window.DEBUG_MODE;
         console.log("DEBUG_MODE: " + window.DEBUG_MODE);
         if (window.showToastNotification) {
-            window.showToastNotification("Hata AyÄ±klama Modu " + (window.DEBUG_MODE ? "AÃ§Ä±k" : "KapalÄ±"), window.DEBUG_MODE ? "info" : "warning");
+            window.showToastNotification("Hata Ayıklama Modu " + (window.DEBUG_MODE ? "Açık" : "Kapalı"), window.DEBUG_MODE ? "info" : "warning");
         }
         if (window.announceToScreenReader) {
-            window.announceToScreenReader("Hata ayÄ±klama modu " + (window.DEBUG_MODE ? "etkinleÅŸtirildi" : "kapatÄ±ldÄ±"));
+            window.announceToScreenReader("Hata ayıklama modu " + (window.DEBUG_MODE ? "etkinleştirildi" : "kapatıldı"));
         }
         if (window.correctSound) window.correctSound.play();
         return;
     }
 
     if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.code)) {
-        // EÄŸer oyuncu form elementi iÃ§indeyse engelleme (select, input vb)
+        // Eğer oyuncu form elementi içindeyse engelleme (select, input vb)
         if (!["INPUT", "TEXTAREA", "BUTTON", "SELECT", "OPTION"].includes(event.target.tagName)) {
             event.preventDefault(); 
         }
     }
 }, { passive: false });
 
-// --- Ã–ZÃœR HEDÄ°YESÄ° (2000 JETON) ---
+// --- ÖZÜR HEDİYESİ (2000 JETON) ---
 if (!localStorage.getItem('hfzApologyGift_2000')) {
     let currentTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
     localStorage.setItem('hafizaGuvenTotalTokens', currentTokens + 2000);
     localStorage.setItem('hfzApologyGift_2000', 'true');
 }
 
-// Ä°statistik sÄ±fÄ±rlama (AllProgress_v2) bloÄŸu kaldÄ±rÄ±ldÄ±.
+// İstatistik sıfırlama (AllProgress_v2) bloğu kaldırıldı.
 
-// --- ANA OYUN DEÄÄ°ÅKENLERÄ° ---
+// --- ANA OYUN DEÄİÅKENLERİ ---
 window.gameModes = {
     easy: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Kolay' },
     medium: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Orta' },
     hard: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Zor' },
-    missing_notes: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'KayÄ±p Notalar' },
-    rhythm_mode: { isUnlocked: false, completionCount: 0, requiredToUnlock: 1, name: 'Ritim AvcÄ±sÄ±' }
+    missing_notes: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Kayıp Notalar' },
+    rhythm_mode: { isUnlocked: false, completionCount: 0, requiredToUnlock: 1, name: 'Ritim Avcısı' }
 };
 
 window.userAchievements = {
@@ -99,13 +99,13 @@ window.turnStartTime = 0;
 window.sequenceTimeoutId = null;
 window.mobileExitBtnTimeout = null;
 
-// Daha Ã¶nce kaydedilmiÅŸ veri varsa yÃ¼kle
+// Daha önce kaydedilmiş veri varsa yükle
 try {
     const savedModes = localStorage.getItem('hafizaGuvenModes');
     if (savedModes) {
         window.gameModes = JSON.parse(savedModes);
         if (!window.gameModes.rhythm_mode) {
-            window.gameModes.rhythm_mode = { isUnlocked: false, completionCount: 0, requiredToUnlock: 1, name: 'Ritim AvcÄ±sÄ±' };
+            window.gameModes.rhythm_mode = { isUnlocked: false, completionCount: 0, requiredToUnlock: 1, name: 'Ritim Avcısı' };
         }
     }
 
@@ -113,13 +113,13 @@ try {
     if (savedAchievements) window.userAchievements = JSON.parse(savedAchievements);
 } catch (e) { }
 
-// GeÃ§miÅŸ sÃ¼rÃ¼mlerden gelen oyuncularÄ±n ayarlarÄ±nÄ± yeni deÄŸere (5) zorla
+// Geçmiş sürümlerden gelen oyuncuların ayarlarını yeni değere (5) zorla
 if (window.gameModes && window.gameModes.medium && window.gameModes.medium.requiredToUnlock !== 5) {
     window.gameModes.medium.requiredToUnlock = 5;
     try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e) {}
 }
 
-// --- YEDEKLEME VE KÃœRESEL SIFIRLAMA (KILL-SWITCH) SÄ°STEMÄ° ---
+// --- YEDEKLEME VE KÜRESEL SIFIRLAMA (KILL-SWITCH) SİSTEMİ ---
 window.syncStatsToFirebase = function() {
     let currentUser = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname');
     if (!currentUser || currentUser === "Misafir" || !window.db) return;
@@ -133,12 +133,12 @@ window.syncStatsToFirebase = function() {
         lastUpdate: firebase.database.ServerValue.TIMESTAMP
     };
     
-    // Firebase yol hatasÄ±nÄ± Ã¶nlemek iÃ§in karakter temizliÄŸi (nokta, dolar vb. iÃ§eren isimler LocalStorage Ã§Ã¶kertmesin diye)
+    // Firebase yol hatasını önlemek için karakter temizliği (nokta, dolar vb. içeren isimler LocalStorage çökertmesin diye)
     let safeUserId = currentUser.replace(/[.#$\[\]\/]/g, '_');
     window.db.ref('player_stats/' + safeUserId).set(stats);
 };
 
-// LocalStorage iÅŸlemleri arasÄ±na senkronizasyon kancasÄ± atÄ±yoruz
+// LocalStorage işlemleri arasına senkronizasyon kancası atıyoruz
 const originalSetItem = localStorage.setItem;
 localStorage.setItem = function(key, value) {
     originalSetItem.apply(this, arguments);
@@ -148,12 +148,12 @@ localStorage.setItem = function(key, value) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    // VeritabanÄ± hazÄ±r oluncaya kadar bekle
+    // Veritabanı hazır oluncaya kadar bekle
     const checkDb = window.hgfzZamanlayici.setInterval(() => {
         if (window.db) {
             clearInterval(checkDb);
             
-            // KÃ¼resel SÄ±fÄ±rlama Tetikleyicisini Dinle
+            // Küresel Sıfırlama Tetikleyicisini Dinle
             window.db.ref('global_wipe_timestamp').on('value', (snapshot) => {
                 if (snapshot.exists()) {
                     let serverWipeTime = snapshot.val();
@@ -169,15 +169,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (changelogVer) localStorage.setItem('lastSeenChangelogVersion', changelogVer);
                         localStorage.setItem('lastWipeTime', serverWipeTime);
                         
-                        if (window.announceToScreenReader) window.announceToScreenReader("Sistem yÃ¶neticisi tarafÄ±ndan kÃ¼resel sÄ±fÄ±rlama yapÄ±ldÄ±. TÃ¼m verileriniz temizlendi, oyun baÅŸtan baÅŸlatÄ±lÄ±yor.");
+                        if (window.announceToScreenReader) window.announceToScreenReader("Sistem yöneticisi tarafından küresel sıfırlama yapıldı. Tüm verileriniz temizlendi, oyun baştan başlatılıyor.");
                         window.hgfzZamanlayici.setTimeout(() => location.reload(), 2000);
                     }
                 }
             });
             
-            // YÃ¶netici sunucu temizleme bloÄŸu (hfzAdmin_ServerWipe_v2) kaldÄ±rÄ±ldÄ±.
+            // Yönetici sunucu temizleme bloğu (hfzAdmin_ServerWipe_v2) kaldırıldı.
             
-            // Cihaz aÃ§Ä±ldÄ±ÄŸÄ±nda mevcut verileri de Firebase'e gÃ¼ncelle
+            // Cihaz açıldığında mevcut verileri de Firebase'e güncelle
             window.syncStatsToFirebase();
             
             // --- Yasaklama (Ban) Dinleyicisi ---
@@ -185,22 +185,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 let chatUser = window.currentChatUser || localStorage.getItem('chatUsername');
                 if (chatUser && snapshot.exists() && snapshot.val()[chatUser] === true) {
                     localStorage.clear();
-                    document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalÄ±cÄ± olarak uzaklaÅŸtÄ±rÄ±ldÄ±nÄ±z.</h1>";
-                    if (window.announceToScreenReader) window.announceToScreenReader("EriÅŸim engellendi. Sunucudan kalÄ±cÄ± olarak uzaklaÅŸtÄ±rÄ±ldÄ±nÄ±z.");
-                    window.hgfzZamanlayici.setInterval(() => { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalÄ±cÄ± olarak uzaklaÅŸtÄ±rÄ±ldÄ±nÄ±z.</h1>"; }, 100);
+                    document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalıcı olarak uzaklaştırıldınız.</h1>";
+                    if (window.announceToScreenReader) window.announceToScreenReader("Erişim engellendi. Sunucudan kalıcı olarak uzaklaştırıldınız.");
+                    window.hgfzZamanlayici.setInterval(() => { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalıcı olarak uzaklaştırıldınız.</h1>"; }, 100);
                 }
             });
             
-            // --- Ã–zel Mesaj (PM) Dinleyicisi ---
+            // --- Özel Mesaj (PM) Dinleyicisi ---
             let currentChatUserForPM = window.currentChatUser || localStorage.getItem('chatUsername');
             if (currentChatUserForPM && currentChatUserForPM !== "Misafir") {
                 let pmRef = window.db.ref('private_messages/' + currentChatUserForPM).limitToLast(1);
                 const gameLoadTimeForPM = Date.now();
                 pmRef.on('child_added', (snapshot) => {
                     let pmData = snapshot.val();
-                    // Sadece oyun aÃ§Ä±ldÄ±ktan sonra gelen yeni mesajlarÄ± al (GeÃ§miÅŸtekileri tekrar tekrar okumasÄ±n)
+                    // Sadece oyun açıldıktan sonra gelen yeni mesajları al (Geçmiştekileri tekrar tekrar okumasın)
                     if (pmData.timestamp && pmData.timestamp > gameLoadTimeForPM) {
-                        let fMessage = `[Ã–zel Mesaj] ${pmData.from} diyor ki: ${pmData.text}`;
+                        let fMessage = `[Özel Mesaj] ${pmData.from} diyor ki: ${pmData.text}`;
                         
                         const chatMsgList = document.getElementById('chat-messages');
                         if (chatMsgList) {
@@ -209,8 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             li.style.color = '#ffcc00'; // PM Rengi
                             li.setAttribute('tabindex', '0');
                             li.setAttribute('aria-label', fMessage);
-                            // GÃ¼venlik amaÃ§lÄ± escapeHTML
-                            li.innerHTML = `<div class="wp-bubble" aria-hidden="true" style="background:#5a4a15; border-left:4px solid #ffcc00; color:#fff;"><strong style="color:#ffcc00;">[Ã–ZEL MESAJ]</strong> ${window.sEscapeHTML(pmData.from)}: ${window.sEscapeHTML(pmData.text)}</div>`;
+                            // Güvenlik amaçlı escapeHTML
+                            li.innerHTML = `<div class="wp-bubble" aria-hidden="true" style="background:#5a4a15; border-left:4px solid #ffcc00; color:#fff;"><strong style="color:#ffcc00;">[ÖZEL MESAJ]</strong> ${window.sEscapeHTML(pmData.from)}: ${window.sEscapeHTML(pmData.text)}</div>`;
                             chatMsgList.appendChild(li);
                             const chatCont = document.querySelector('.chat-messages-container');
                             if (chatCont) window.hgfzZamanlayici.setTimeout(() => chatCont.scrollTop = chatCont.scrollHeight, 10);
@@ -235,13 +235,13 @@ window.playIntro = function () {
     const phase1Element = document.getElementById('intro-phase-1');
     if (phase1Element) phase1Element.setAttribute('aria-hidden', 'true');
 
-    if (window.announceToScreenReader) window.announceToScreenReader("Oyun yÃ¼kleniyor, lÃ¼tfen bekleyin...", true);
+    if (window.announceToScreenReader) window.announceToScreenReader("Oyun yükleniyor, lütfen bekleyin...", true);
 
     const randomLogoNum = Math.floor(Math.random() * 5) + 1;
     const ext = randomLogoNum === 1 ? 'ogg' : 'wav';
     const audio = new window.Audio(`sounds/logo${randomLogoNum}.${ext}`);
 
-    // LogolarÄ±n uzunluÄŸu farklÄ± olabileceÄŸi iÃ§in yedek sÃ¼reyi 15 saniyeye Ã§Ä±kardÄ±k.
+    // Logoların uzunluğu farklı olabileceği için yedek süreyi 15 saniyeye çıkardık.
     let fallbackTimeout = window.hgfzZamanlayici.setTimeout(() => { window.startGame(); }, 15000);
 
     const startSafe = () => {
@@ -334,7 +334,7 @@ window.startGame = function () {
                     window.hgfzZamanlayici.setTimeout(() => {
                         const firstBtn = document.getElementById('server-message-continue-btn');
                         if (firstBtn) firstBtn.focus();
-                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucu MesajÄ±: " + window.globalChangelogMessage + " Devam etmek iÃ§in butona basÄ±n.");
+                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucu Mesajı: " + window.globalChangelogMessage + " Devam etmek için butona basın.");
                     }, 400);
                 } else {
                     showMainMenu();
@@ -350,7 +350,7 @@ window.startGame = function () {
                 window.hgfzZamanlayici.setTimeout(() => {
                     const firstBtn = document.getElementById('first-time-start-btn');
                     if (firstBtn) firstBtn.focus();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Merhaba. Oyuna ilk defa giriÅŸ yaptÄ±ÄŸÄ±nÄ±z iÃ§in alÄ±ÅŸtÄ±rma modundan baÅŸlayacaksÄ±nÄ±z. BaÅŸlamak iÃ§in Enter tuÅŸuna basÄ±n.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Merhaba. Oyuna ilk defa giriş yaptığınız için alıştırma modundan başlayacaksınız. Başlamak için Enter tuşuna basın.");
                 }, 400);
             } else {
                 if (isFirstTime) {
@@ -365,7 +365,7 @@ window.startGame = function () {
                     window.hgfzZamanlayici.setTimeout(() => {
                         const firstBtn = document.getElementById('daily-reward-continue-btn');
                         if (firstBtn) firstBtn.focus();
-                        if (window.announceToScreenReader) window.announceToScreenReader("GÃ¼nlÃ¼k GiriÅŸ Ã–dÃ¼lÃ¼: " + window.pendingDailyRewardMsg + " Devam etmek iÃ§in butona basÄ±n.");
+                        if (window.announceToScreenReader) window.announceToScreenReader("Günlük Giriş Ödülü: " + window.pendingDailyRewardMsg + " Devam etmek için butona basın.");
                     }, 400);
 
                     window.onDailyRewardContinue = () => {
@@ -394,7 +394,7 @@ window.startMainGame = function (difficulty = 'easy') {
             return;
         }
     }
-    // TarayÄ±cÄ± sekmelerini/adres Ã§ubuÄŸunu gizlemek iÃ§in Tam Ekran API devreye alÄ±nÄ±yor
+    // Tarayıcı sekmelerini/adres çubuğunu gizlemek için Tam Ekran API devreye alınıyor
     try {
         let elem = document.documentElement;
         if (elem.requestFullscreen) {
@@ -413,10 +413,10 @@ window.startMainGame = function (difficulty = 'easy') {
     if (window.music60Sound && window.music60Sound.playing()) window.music60Sound.stop();
 
     const gameMenuContainer = document.getElementById('game-menu-container');
-    if (gameMenuContainer) gameMenuContainer.setAttribute('aria-label', 'Oyun AlanÄ±');
+    if (gameMenuContainer) gameMenuContainer.setAttribute('aria-label', 'Oyun Alanı');
 
     const gameMenuTitle = document.getElementById('game-menu-title');
-    if (gameMenuTitle) gameMenuTitle.textContent = 'HafÄ±zana GÃ¼ven';
+    if (gameMenuTitle) gameMenuTitle.textContent = 'Hafızana Güven';
 
     window.activeDifficulty = difficulty;
     window.gameTimer = (difficulty === 'hard') ? 45 : 30;
@@ -458,11 +458,11 @@ window.startMainGame = function (difficulty = 'easy') {
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
         gameStatus.style.display = 'block';
-        gameStatus.textContent = `Oyun 3 saniye iÃ§inde baÅŸlÄ±yor... ${hk} Hata KorumasÄ±, ${zk} Zaman KorumasÄ±. Ä°lk notayÄ± dinleyin!`;
+        gameStatus.textContent = `Oyun 3 saniye içinde başlıyor... ${hk} Hata Koruması, ${zk} Zaman Koruması. İlk notayı dinleyin!`;
         gameStatus.focus();
     }
     window.gameStatusTimeoutId = window.hgfzZamanlayici.setTimeout(() => {
-        if (window.announceToScreenReader) window.announceToScreenReader(`Oyun 3 saniye iÃ§inde baÅŸlÄ±yor. ${hk} Hata KorumasÄ± ve ${zk} Zaman KorumasÄ±na sahipsiniz. Ä°lk notayÄ± dinleyin!`);
+        if (window.announceToScreenReader) window.announceToScreenReader(`Oyun 3 saniye içinde başlıyor. ${hk} Hata Koruması ve ${zk} Zaman Korumasına sahipsiniz. İlk notayı dinleyin!`);
     }, 400);
 
     if (window.clockTickSound && window.clockTickSound.playing()) window.clockTickSound.stop();
@@ -518,7 +518,7 @@ window.startMainGame = function (difficulty = 'easy') {
                         window.hasWarned10 = false;
                         localStorage.setItem('hafizaGuvenZamanKorumasi', zkLocal);
                         if (window.seconsSound) window.seconsSound.stop();
-                        if (window.announceToScreenReader) window.announceToScreenReader(`Zaman korumasÄ± kullanÄ±ldÄ±! SÃ¼reniz bitmedi, 15 saniye ek sÃ¼re kazandÄ±nÄ±z. Kalan zaman korumasÄ±: ${zkLocal}`);
+                        if (window.announceToScreenReader) window.announceToScreenReader(`Zaman koruması kullanıldı! Süreniz bitmedi, 15 saniye ek süre kazandınız. Kalan zaman koruması: ${zkLocal}`);
                         window.updateGameUI();
                     } else {
                         window.endMainGame(true, false);
@@ -548,7 +548,7 @@ window.playGameSequence = function () {
     const replayBtn = document.getElementById('mobile-replay-btn');
     if (gameStatus) {
         gameStatus.style.display = 'block';
-        gameStatus.textContent = window.isMobileDevice ? "LÃ¼tfen dinleyin." : "Bilgisayar Ã§alÄ±yor... LÃ¼tfen dinleyin.";
+        gameStatus.textContent = window.isMobileDevice ? "Lütfen dinleyin." : "Bilgisayar çalıyor... Lütfen dinleyin.";
     }
     if (replayBtn) replayBtn.style.display = 'none';
 
@@ -577,11 +577,11 @@ window.playGameSequence = function () {
             window.turnStartTime = Date.now();
             if (gameStatus) {
                 gameStatus.style.display = 'block';
-                gameStatus.textContent = "SÄ±ra sizde!";
+                gameStatus.textContent = "Sıra sizde!";
             }
             if (replayBtn) replayBtn.style.display = 'none';
 
-            if (window.announceToScreenReader) window.announceToScreenReader("SÄ±ra sizde");
+            if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde");
 
             clearTimeout(window.replayBtnTimeout);
             window.replayBtnTimeout = window.hgfzZamanlayici.setTimeout(() => {
@@ -607,14 +607,14 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
     window.isStarted = false;
     window.gameIsActive = false;
     window.isGameOverPhase = true;
-    // 1. TÃ¼m aktif HTML5 Audio elementlerini sustur
+    // 1. Tüm aktif HTML5 Audio elementlerini sustur
     const allAudios = document.querySelectorAll('audio');
     allAudios.forEach(audio => {
         audio.pause();
         audio.currentTime = 0;
     });
 
-    // 2. Varsa devam eden Web Speech API (Sesli Okuma) anonslarÄ±nÄ± bÄ±Ã§ak gibi kes
+    // 2. Varsa devam eden Web Speech API (Sesli Okuma) anonslarını bıçak gibi kes
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
     }
@@ -639,11 +639,11 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
 
     window.sessionTokens = Math.max(0, window.sessionTokens);
     
-    // Hafta Sonu Ã‡ift Jeton EtkinliÄŸi KontrolÃ¼
+    // Hafta Sonu Çift Jeton Etkinliği Kontrolü
     let eventMessage = "";
     if (window.isWeekendDoubleCoins && window.isWeekendDoubleCoins() && window.sessionTokens > 0) {
         window.sessionTokens *= 2;
-        eventMessage = " (Ã‡ift Jeton EtkinliÄŸi Aktif!)";
+        eventMessage = " (Çift Jeton Etkinliği Aktif!)";
     }
     
     totalTokens += window.sessionTokens;
@@ -657,9 +657,9 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
 
     window.isGridWalkingPhase = false;
     const gameMenuContainer = document.getElementById('game-menu-container');
-    if (gameMenuContainer) gameMenuContainer.setAttribute('aria-label', 'Oyun AlanÄ±');
+    if (gameMenuContainer) gameMenuContainer.setAttribute('aria-label', 'Oyun Alanı');
     const gameMenuTitle = document.getElementById('game-menu-title');
-    if (gameMenuTitle) gameMenuTitle.textContent = 'HafÄ±zana GÃ¼ven';
+    if (gameMenuTitle) gameMenuTitle.textContent = 'Hafızana Güven';
 
     if (isUserExit) {
         if (window.pianoNotes) for (let k in window.pianoNotes) window.pianoNotes[k].stop();
@@ -671,9 +671,9 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
 
         if (window.switchMenu && window.mainMenu) window.switchMenu(document.getElementById('game-menu-container'), window.mainMenu, 'main');
 
-        endMessage = `Oyundan Ã§Ä±kÄ±ldÄ±. Bu oyunda toplam ${window.sessionTokens} jeton kazandÄ±nÄ±z${eventMessage}. Toplam jetonunuz ${totalTokens}. Ana menÃ¼ye dÃ¶nÃ¼ldÃ¼.`;
+        endMessage = `Oyundan çıkıldı. Bu oyunda toplam ${window.sessionTokens} jeton kazandınız${eventMessage}. Toplam jetonunuz ${totalTokens}. Ana menüye dönüldü.`;
         if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
-        // Oyuncu kendi Ã§Ä±karsa Ana MenÃ¼ mÃ¼ziÄŸini geri baÅŸlat
+        // Oyuncu kendi çıkarsa Ana Menü müziğini geri başlat
         if (window.bgMusic && !window.bgMusic.playing()) {
             window.bgMusic.play();
         }
@@ -681,7 +681,7 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
     }
 
     if (isWin) {
-        baseMessage = `Tebrikler! ZamanÄ±nda tÃ¼m notalarÄ± tamamladÄ±nÄ±z.`;
+        baseMessage = `Tebrikler! Zamanında tüm notaları tamamladınız.`;
 
         if (window.gameModes && window.gameModes[window.activeDifficulty]) {
             window.gameModes[window.activeDifficulty].completionCount += 1;
@@ -690,10 +690,10 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
         try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch (e) { }
 
         if (window.activeDifficulty === 'easy' && window.gameModes.easy.completionCount === window.gameModes.medium.requiredToUnlock) {
-            baseMessage += " Tebrikler, ORTA MOD kilitlerini aÃ§tÄ±nÄ±z!";
+            baseMessage += " Tebrikler, ORTA MOD kilitlerini açtınız!";
             playUnlockSound = true;
         } else if (window.activeDifficulty === 'medium' && window.gameModes.medium.completionCount === window.gameModes.hard.requiredToUnlock) {
-            baseMessage += " Ä°nanÄ±lmaz, ZOR MOD kilitlerini aÃ§tÄ±nÄ±z!";
+            baseMessage += " İnanılmaz, ZOR MOD kilitlerini açtınız!";
             playUnlockSound = true;
         }
 
@@ -703,23 +703,23 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
 
             window.hgfzZamanlayici.setTimeout(() => {
                 if (window.achievementSound) window.achievementSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir BaÅŸarÄ±m KazandÄ±nÄ±z! Ä°lk baÅŸarÄ±nÄ±zÄ± elde ettiniz: HafÄ±zam gÃ¼Ã§leniyor.");
+                if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız! İlk başarınızı elde ettiniz: Hafızam güçleniyor.");
                 setTimeout(() => {
-                    if (window.showAchievementModal) window.showAchievementModal("HafÄ±zam GÃ¼Ã§leniyor");
+                    if (window.showAchievementModal) window.showAchievementModal("Hafızam Güçleniyor");
                 }, 3000);
             }, 4000);
         }
     } else if (isTimeOut) {
-        baseMessage = `SÃ¼re bitti!`;
+        baseMessage = `Süre bitti!`;
     } else if (window.gameMistakes >= 3) {
-        baseMessage = `3 hakkÄ±nÄ±z bitti!`;
+        baseMessage = `3 hakkınız bitti!`;
     } else if (window.activeDifficulty === 'rhythm_mode') {
-        baseMessage = `Ritim AvcÄ±sÄ± sona erdi. UlaÅŸtÄ±ÄŸÄ±nÄ±z Seviye: ${window.rhythmState.level}`;
+        baseMessage = `Ritim Avcısı sona erdi. Ulaştığınız Seviye: ${window.rhythmState.level}`;
     } else {
-        baseMessage = `Oyundan Ã§Ä±kÄ±ldÄ±.`;
+        baseMessage = `Oyundan çıkıldı.`;
     }
 
-    endMessage = `${baseMessage} Bu oyunda toplam ${window.sessionTokens} jeton kazandÄ±nÄ±z${eventMessage}. Toplam jetonunuz ${totalTokens}. Ana menÃ¼ye dÃ¶nmek iÃ§in entÄ±r tuÅŸuna basÄ±n.`;
+    endMessage = `${baseMessage} Bu oyunda toplam ${window.sessionTokens} jeton kazandınız${eventMessage}. Toplam jetonunuz ${totalTokens}. Ana menüye dönmek için entır tuşuna basın.`;
 
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
@@ -750,7 +750,7 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
                 window.hgfzZamanlayici.setTimeout(() => {
                     if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
                     
-                    // Oyun bittiÄŸini Dialog evresine taÅŸÄ±dÄ±k. Fokus butona DEÄÄ°L mesaja atanacak.
+                    // Oyun bittiğini Dialog evresine taşıdık. Fokus butona DEÄİL mesaja atanacak.
                     window.hgfzZamanlayici.setTimeout(() => {
                         let gameStatus = document.getElementById('game-status-text');
                         if (gameStatus) {
@@ -766,7 +766,7 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
     } else {
         if (window.announceToScreenReader) window.announceToScreenReader(endMessage);
         
-        // Oyun bittiÄŸimde dialog evresi
+        // Oyun bittiğimde dialog evresi
         window.hgfzZamanlayici.setTimeout(() => {
             let gameStatus = document.getElementById('game-status-text');
             if (gameStatus) {
@@ -809,7 +809,7 @@ window.updateGameUI = function () {
     if (scoreDisplay) scoreDisplay.textContent = scoreText;
 
     const displayTime = window.gameTimer < 0 ? 0 : window.gameTimer;
-    const timeText = `SÃ¼re: ${displayTime}`;
+    const timeText = `Süre: ${displayTime}`;
     if (timerDisplay) timerDisplay.textContent = timeText;
 
     const livesLeft = 3 - window.gameMistakes;
@@ -871,11 +871,11 @@ window.handleGameInput = function (key) {
                 if (gameStatus) gameStatus.textContent = "Harika!";
                 window.endMainGame(false, true);
             } else {
-                let motivMsg = "SÃ¼persiniz!";
+                let motivMsg = "Süpersiniz!";
                 let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
 
                 if (disableMotivation) {
-                    motivMsg = "DoÄŸru!";
+                    motivMsg = "Doğru!";
                 } else if (typeof window.msg1to4 !== 'undefined' && window.msg1to4.length > 0) {
                     if (window.gameScore >= 1 && window.gameScore <= 4) {
                         motivMsg = window.msg1to4[Math.floor(Math.random() * window.msg1to4.length)];
@@ -888,7 +888,7 @@ window.handleGameInput = function (key) {
                     }
                 }
 
-                let fullMsg = disableMotivation ? `DoÄŸru. +${window.gameSequence.length + 7} saniye` : `${motivMsg} (+${window.gameSequence.length + 7} saniye)`;
+                let fullMsg = disableMotivation ? `Doğru. +${window.gameSequence.length + 7} saniye` : `${motivMsg} (+${window.gameSequence.length + 7} saniye)`;
                 if (gameStatus) gameStatus.textContent = fullMsg;
                 if (window.announceToScreenReader) window.announceToScreenReader(fullMsg, true);
 
@@ -909,9 +909,9 @@ window.handleGameInput = function (key) {
 
             if (window.wrongSound) window.wrongSound.play();
             const gameStatus = document.getElementById('game-status-text');
-            if (gameStatus) gameStatus.textContent = "Hata korumasÄ± kullanÄ±ldÄ±! Ceza Yok. Dizi tekrar Ã§alÄ±nÄ±yor.";
+            if (gameStatus) gameStatus.textContent = "Hata koruması kullanıldı! Ceza Yok. Dizi tekrar çalınıyor.";
 
-            if (window.announceToScreenReader) window.announceToScreenReader("Hata korumasÄ± kullanÄ±ldÄ±! Hak veya sÃ¼re kaybÄ± yok. Tekrar deniyoruz.");
+            if (window.announceToScreenReader) window.announceToScreenReader("Hata koruması kullanıldı! Hak veya süre kaybı yok. Tekrar deniyoruz.");
             window.playerInputIndex = 0;
 
             window.hgfzZamanlayici.setTimeout(() => {
@@ -925,9 +925,9 @@ window.handleGameInput = function (key) {
             window.updateGameUI();
 
             const gameStatus = document.getElementById('game-status-text');
-            if (gameStatus) gameStatus.textContent = "YanlÄ±ÅŸ! -5 saniye. Dizi tekrar Ã§alÄ±nÄ±yor.";
+            if (gameStatus) gameStatus.textContent = "Yanlış! -5 saniye. Dizi tekrar çalınıyor.";
 
-            // Hata sonrasÄ± sÃ¼re kontrolÃ¼ (Zaman KorumasÄ± entegrasyonu)
+            // Hata sonrası süre kontrolü (Zaman Koruması entegrasyonu)
             if (window.gameTimer <= 0) {
                 let zkLocal = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
                 if (zkLocal > 0) {
@@ -937,8 +937,8 @@ window.handleGameInput = function (key) {
                     window.hasWarned10 = false;
                     localStorage.setItem('hafizaGuvenZamanKorumasi', zkLocal);
                     if (window.seconsSound) window.seconsSound.stop();
-                    if (window.announceToScreenReader) window.announceToScreenReader(`Zaman korumasÄ± kullanÄ±ldÄ±! SÃ¼reniz bitmedi, 15 saniye ek sÃ¼re kazandÄ±nÄ±z. Kalan zaman korumasÄ±: ${zkLocal}`);
-                    if (gameStatus) gameStatus.textContent = "Zaman korumasÄ± kullanÄ±ldÄ±! +15 saniye.";
+                    if (window.announceToScreenReader) window.announceToScreenReader(`Zaman koruması kullanıldı! Süreniz bitmedi, 15 saniye ek süre kazandınız. Kalan zaman koruması: ${zkLocal}`);
+                    if (gameStatus) gameStatus.textContent = "Zaman koruması kullanıldı! +15 saniye.";
                     window.updateGameUI();
                 }
             }
@@ -982,15 +982,15 @@ window.addEventListener('load', () => {
             if (window.menuEnterSound) window.menuEnterSound.play();
             const ver = window.mevcutSurum || localStorage.getItem('lastSeenChangelogVersion') || "0.97.4.4";
             const vText = "Versiyon: " + ver;
-            const yazarText = "Bu oyun, gÃ¶rme engelli bir mÃ¼zik Ã¶ÄŸretmeni olan Ãœmit Ekrem Mikyas tarafÄ±ndan geliÅŸtirilmiÅŸtir.";
+            const yazarText = "Bu oyun, görme engelli bir müzik öğretmeni olan Ümit Ekrem Mikyas tarafından geliştirilmiştir.";
 
             const visualVersion = document.getElementById("intro-version-display");
             if (visualVersion) visualVersion.textContent = vText;
 
-            if (window.announceToScreenReader) window.announceToScreenReader(yazarText + " " + vText + ". Logoyu dinlemek ve oyuna baÅŸlamak iÃ§in tekrar tÄ±klayÄ±n veya enter tuÅŸuna basÄ±n.");
+            if (window.announceToScreenReader) window.announceToScreenReader(yazarText + " " + vText + ". Logoyu dinlemek ve oyuna başlamak için tekrar tıklayın veya enter tuşuna basın.");
 
             const startIntroBtn = document.getElementById('start-intro-btn');
-            if (startIntroBtn) startIntroBtn.setAttribute('aria-label', yazarText + " " + vText + ". Devam etmek iÃ§in tekrar tÄ±klayÄ±n veya enter tuÅŸuna basÄ±n.");
+            if (startIntroBtn) startIntroBtn.setAttribute('aria-label', yazarText + " " + vText + ". Devam etmek için tekrar tıklayın veya enter tuşuna basın.");
         } else if (clickCount === 2) {
             document.removeEventListener('pointerdown', fsEvent);
             document.removeEventListener('click', fsEvent);
@@ -1047,9 +1047,9 @@ window.startPracticeNote = function() {
     }
     
     if (window.practiceTargetIndex < notes.length) {
-        // Ã–ÄŸrenilecek nota varsa sor
+        // Öğrenilecek nota varsa sor
         let currentNote = notes[window.practiceTargetIndex].toUpperCase();
-        let text = "Åimdi " + currentNote + " tuÅŸuna 3 defa bas.";
+        let text = "Åimdi " + currentNote + " tuşuna 3 defa bas.";
         if (statusText) {
             statusText.innerHTML = text;
             statusText.blur();
@@ -1057,8 +1057,8 @@ window.startPracticeNote = function() {
         }
         if (window.announceToScreenReader) window.announceToScreenReader(text, true);
     } else {
-        // TÃ¼m notalar bittiyse tebrik et ve Geri butonunu gÃ¶ster
-        let text = "Tebrikler! TÃ¼m notalarÄ± Ã¶ÄŸrendiniz. Ana menÃ¼ye dÃ¶nmek iÃ§in Geri butonunu kullanabilirsiniz.";
+        // Tüm notalar bittiyse tebrik et ve Geri butonunu göster
+        let text = "Tebrikler! Tüm notaları öğrendiniz. Ana menüye dönmek için Geri butonunu kullanabilirsiniz.";
         if (statusText) {
             statusText.innerHTML = text;
             statusText.blur();
@@ -1068,7 +1068,7 @@ window.startPracticeNote = function() {
         const practiceNav = document.getElementById('practice-nav');
         if (practiceNav) practiceNav.style.display = 'block';
         window.inPracticeTutorial = false;
-        if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility(); // MenÃ¼ler de gÃ¼ncelleniyor
+        if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility(); // Menüler de güncelleniyor
     }
 };
 
@@ -1080,7 +1080,7 @@ window.handlePracticeInput = function(key) {
     if (key === notes[window.practiceTargetIndex]) {
         window.practicePressCount++;
         if (window.practicePressCount >= 3) {
-            // 3 kere doÄŸru basÄ±ldÄ±ysa
+            // 3 kere doğru basıldıysa
             if (window.correctSound) window.correctSound.play();
             window.practiceTargetIndex++;
             window.practicePressCount = 0;
@@ -1089,13 +1089,13 @@ window.handlePracticeInput = function(key) {
             }
             window.practiceNextTimeout = window.hgfzZamanlayici.setTimeout(() => {
                 if (window.startPracticeNote) window.startPracticeNote();
-            }, 1000); // 1 saniye sonra diÄŸer notayÄ± sor
+            }, 1000); // 1 saniye sonra diğer notayı sor
         } else {
-            // DoÄŸru ama henÃ¼z 3 olmadÄ±
+            // Doğru ama henüz 3 olmadı
             let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
             if (window.practiceCorrectMessages) {
-                let msg = disableMotivation ? "DoÄŸru." : window.practiceCorrectMessages[Math.floor(Math.random() * window.practiceCorrectMessages.length)];
-                let fullMsg = disableMotivation ? `${3 - window.practicePressCount} kaldÄ±.` : msg + " " + (3 - window.practicePressCount) + " kaldÄ±.";
+                let msg = disableMotivation ? "Doğru." : window.practiceCorrectMessages[Math.floor(Math.random() * window.practiceCorrectMessages.length)];
+                let fullMsg = disableMotivation ? `${3 - window.practicePressCount} kaldı.` : msg + " " + (3 - window.practicePressCount) + " kaldı.";
                 const statusText = document.getElementById('practice-status-text');
                 if (statusText) {
                     statusText.innerHTML = fullMsg;
@@ -1106,11 +1106,11 @@ window.handlePracticeInput = function(key) {
             }
         }
     } else {
-        // YanlÄ±ÅŸ tuÅŸa basÄ±ldÄ±
+        // Yanlış tuşa basıldı
         if (window.wrongSound) window.wrongSound.play();
         let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
         if (window.practiceWrongMessages) {
-            let msg = disableMotivation ? "YanlÄ±ÅŸ." : window.practiceWrongMessages[Math.floor(Math.random() * window.practiceWrongMessages.length)];
+            let msg = disableMotivation ? "Yanlış." : window.practiceWrongMessages[Math.floor(Math.random() * window.practiceWrongMessages.length)];
             const statusText = document.getElementById('practice-status-text');
             if (statusText) {
                 statusText.innerHTML = msg;
@@ -1126,18 +1126,18 @@ window.handlePracticeInput = function(key) {
     if (exitBtn) {
         exitBtn.addEventListener('click', function () {
             if (window.menuCloseSound) window.menuCloseSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader('Oyun kapatÄ±lÄ±yor. LÃ¼tfen tarayÄ±cÄ± sekmenizi veya pencerenizi kapatÄ±n.');
+            if (window.announceToScreenReader) window.announceToScreenReader('Oyun kapatılıyor. Lütfen tarayıcı sekmenizi veya pencerenizi kapatın.');
             
             window.hgfzZamanlayici.setTimeout(() => { 
-                // Alt+F4 Web Hilesi: TarayÄ±cÄ±nÄ±n sekme kapatma engelini aÅŸmayÄ± dener
+                // Alt+F4 Web Hilesi: Tarayıcının sekme kapatma engelini aşmayı dener
                 try { 
                     window.open('', '_self', ''); 
                     window.close(); 
                 } catch(e) {}
                 
-                // TarayÄ±cÄ± sekmesinde kalÄ±cÄ± 'about:blank' (boÅŸ sayfa) tuzaÄŸÄ±nÄ± Ã¶nlemek iÃ§in sadece ekranÄ± karart
-                document.documentElement.innerHTML = "<body style='background-color:black;'><h1 style='color:white;text-align:center;margin-top:20%;font-size:2rem;' tabindex='0'>HafÄ±zana GÃ¼ven sistemden Ã§Ä±kÄ±ÅŸ yaptÄ±.<br>Bu sekmeyi gÃ¼venle kapatabilirsiniz.</h1></body>";
-            }, 2000); // Anonsun (2 saniye) okunabilmesi iÃ§in bekle
+                // Tarayıcı sekmesinde kalıcı 'about:blank' (boş sayfa) tuzağını önlemek için sadece ekranı karart
+                document.documentElement.innerHTML = "<body style='background-color:black;'><h1 style='color:white;text-align:center;margin-top:20%;font-size:2rem;' tabindex='0'>Hafızana Güven sistemden çıkış yaptı.<br>Bu sekmeyi güvenle kapatabilirsiniz.</h1></body>";
+            }, 2000); // Anonsun (2 saniye) okunabilmesi için bekle
         });
     }
 
@@ -1149,7 +1149,7 @@ window.handlePracticeInput = function(key) {
                 if (isUserExit) {
                     if (window.gameBGM && window.gameBGM.playing()) window.gameBGM.stop();
                     window.updateGameUI();
-                    // Oyuncu kendi Ã§Ä±karsa Ana MenÃ¼ mÃ¼ziÄŸini geri baÅŸlat
+                    // Oyuncu kendi çıkarsa Ana Menü müziğini geri başlat
                     if (window.bgMusic && !window.bgMusic.playing()) {
                         window.bgMusic.play();
                     }
@@ -1191,12 +1191,12 @@ window.handlePracticeInput = function(key) {
 });
 
 document.addEventListener('keydown', function (event) {
-    // CTRL+S Oyunu Kaydetme KÄ±sayolu
+    // CTRL+S Oyunu Kaydetme Kısayolu
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
         event.preventDefault();
         if (!window.gameIsActive) {
             if (window.wrongSound) window.wrongSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader("Åu an kaydedilecek aktif bir oyun mevcut deÄŸil.");
+            if (window.announceToScreenReader) window.announceToScreenReader("Åu an kaydedilecek aktif bir oyun mevcut değil.");
             return;
         }
         if (window.saveCurrentGame) {
@@ -1213,15 +1213,15 @@ document.addEventListener('keydown', function (event) {
         }
     }
 
-    // Chat penceresi aÃ§Ä±kken tÃ¼m oyun kÄ±sayollarÄ±nÄ± devre dÄ±ÅŸÄ± bÄ±rak (gerÃ§ek bir Modal mantÄ±ÄŸÄ±)
+    // Chat penceresi açıkken tüm oyun kısayollarını devre dışı bırak (gerçek bir Modal mantığı)
     if (window.isChatOpen) {
-        // Sadece temel eriÅŸilebilirlik ve menÃ¼ tuÅŸlarÄ±na izin ver, harfleri/boÅŸluÄŸu engelle
+        // Sadece temel erişilebilirlik ve menü tuşlarına izin ver, harfleri/boşluğu engelle
         if (!['Escape', 'Tab', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
             return;
         }
     } else if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
         if (event.key !== 'Escape' && event.key !== 'Tab') {
-            return; // DiÄŸer formlarda/inputlarda harf basÄ±ÅŸlarÄ± oyuna yansÄ±masÄ±nÄ± engeller
+            return; // Diğer formlarda/inputlarda harf basışları oyuna yansımasını engeller
         }
     }
 
@@ -1234,12 +1234,12 @@ document.addEventListener('keydown', function (event) {
         }
     }
 
-    // Oyun Sonu Diyalog (Tebrikler vs.) Modu Devredeyse: Oku ve Ã‡Ä±k (Enter)
+    // Oyun Sonu Diyalog (Tebrikler vs.) Modu Devredeyse: Oku ve Çık (Enter)
     if (window.isGameOverPhase) {
         if (event.key === 'Enter' && !event.repeat) {
             event.preventDefault();
             window.isGameOverPhase = false;
-            // Ã‡Ä±kÄ±ÅŸ sesini atÄ±p ana menÃ¼ye yollamak
+            // Çıkış sesini atıp ana menüye yollamak
             if (window.menuEnterSound) window.menuEnterSound.play();
             const backBtn = document.getElementById('game-back-btn');
             if (backBtn) backBtn.click();
@@ -1248,13 +1248,13 @@ document.addEventListener('keydown', function (event) {
     }
 
     if (window.isStarted && window.currentActiveMenu === 'practice') {
-        // Yeni Eklenen Enter (Diyalog) KontrolÃ¼
+        // Yeni Eklenen Enter (Diyalog) Kontrolü
         if (window.isDialogPhase && event.key === 'Enter' && !event.repeat) {
             window.currentDialogIndex++;
             if (window.playCurrentDialog) window.playCurrentDialog();
             return;
         }
-        // Mevcut TuÅŸ KontrolÃ¼
+        // Mevcut Tuş Kontrolü
         let key = event.key.toLowerCase();
         let keyboardLayout = localStorage.getItem('hafizaGuvenKeyboardLayout') || 'alpha';
         if (keyboardLayout === 'num') {
@@ -1278,11 +1278,11 @@ document.addEventListener('keydown', function (event) {
         if (!window.isGridWalkingPhase) {
             if (key === 's' || (event.altKey && event.code === 'KeyS')) {
                 event.preventDefault();
-                if (window.announceToScreenReader) window.announceToScreenReader(`GeÃ§ilen tur: ${window.gameScore}. KazanÄ±lan jeton: ${window.sessionTokens}.`, true);
+                if (window.announceToScreenReader) window.announceToScreenReader(`Geçilen tur: ${window.gameScore}. Kazanılan jeton: ${window.sessionTokens}.`, true);
             } else if (key === 't' || (event.altKey && event.code === 'KeyT')) {
                 event.preventDefault();
                 const displayTime = window.gameTimer < 0 ? 0 : window.gameTimer;
-                if (window.announceToScreenReader) window.announceToScreenReader(`Kalan sÃ¼re: ${displayTime} saniye.`, true);
+                if (window.announceToScreenReader) window.announceToScreenReader(`Kalan süre: ${displayTime} saniye.`, true);
             } else if (key === ' ') {
                 event.preventDefault();
                 if (!window.isComputerPlaying && window.gameSequence.length > 0) {
@@ -1334,7 +1334,7 @@ document.addEventListener('keydown', function (event) {
         let display = document.getElementById('music-volume-display');
         if (display) display.innerText = '%' + currentMusicVolume;
 
-        if (window.announceToScreenReader) window.announceToScreenReader('MÃ¼zik Sesi: %' + currentMusicVolume, false);
+        if (window.announceToScreenReader) window.announceToScreenReader('Müzik Sesi: %' + currentMusicVolume, false);
         return;
     }
     if (event.key === 'PageDown') {
@@ -1351,7 +1351,7 @@ document.addEventListener('keydown', function (event) {
         let display = document.getElementById('music-volume-display');
         if (display) display.innerText = '%' + currentMusicVolume;
 
-        if (window.announceToScreenReader) window.announceToScreenReader('MÃ¼zik Sesi: %' + currentMusicVolume, false);
+        if (window.announceToScreenReader) window.announceToScreenReader('Müzik Sesi: %' + currentMusicVolume, false);
         return;
     }
 
@@ -1386,7 +1386,7 @@ document.addEventListener('keydown', function (event) {
         }
 
         if (window.announceToScreenReader) {
-            window.announceToScreenReader(setMute ? 'Arka plan mÃ¼zikleri sessize alÄ±ndÄ±.' : 'Arka plan mÃ¼ziklerinin sesi aÃ§Ä±ldÄ±.', true);
+            window.announceToScreenReader(setMute ? 'Arka plan müzikleri sessize alındı.' : 'Arka plan müziklerinin sesi açıldı.', true);
         }
         return;
     }
@@ -1426,7 +1426,7 @@ document.addEventListener('keydown', function (event) {
                 if (typeof window.initializeMissingNotesMap === 'function') window.initializeMissingNotesMap();
                 window.currentAutoWalkStep = 0;
                 
-                if (window.announceToScreenReader) window.announceToScreenReader("KayÄ±p Notalar macerasÄ±na baÅŸlÄ±yorsunuz. Ä°lk notayÄ± bulmak iÃ§in saÄŸ ok tuÅŸuna basÄ±p karlÄ± zeminde yÃ¼rÃ¼yÃ¼n.", false);
+                if (window.announceToScreenReader) window.announceToScreenReader("Kayıp Notalar macerasına başlıyorsunuz. İlk notayı bulmak için sağ ok tuşuna basıp karlı zeminde yürüyün.", false);
                 
                 if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
                 
@@ -1478,17 +1478,17 @@ window.saveCurrentGame = function() {
 
     if (!window.gameIsActive && !isPractice) {
         if (window.wrongSound) window.wrongSound.play();
-        if (window.announceToScreenReader) window.announceToScreenReader("Åu an kaydedilecek aktif bir oyun mevcut deÄŸil.");
+        if (window.announceToScreenReader) window.announceToScreenReader("Åu an kaydedilecek aktif bir oyun mevcut değil.");
         return;
     }
     
     if (window.isComputerPlaying) {
-        if (window.announceToScreenReader) window.announceToScreenReader("Notalar Ã§alÄ±nÄ±rken oyunu kaydedemezsiniz. LÃ¼tfen sÄ±ranÄ±n size geÃ§mesini bekleyin.");
+        if (window.announceToScreenReader) window.announceToScreenReader("Notalar çalınırken oyunu kaydedemezsiniz. Lütfen sıranın size geçmesini bekleyin.");
         return;
     }
 
     if (window.currentActiveMenu === 'pvp') {
-        if (window.announceToScreenReader) window.announceToScreenReader("Ã‡ok oyunculu modda oyunu kaydedemezsiniz.");
+        if (window.announceToScreenReader) window.announceToScreenReader("Çok oyunculu modda oyunu kaydedemezsiniz.");
         return;
     }
 
@@ -1518,12 +1518,12 @@ window.saveCurrentGame = function() {
     };
 
     saves.push(saveObj);
-    saves.sort((a, b) => b.id - a.id); // Yeniden eskiye tarih sÄ±ralamasÄ±
+    saves.sort((a, b) => b.id - a.id); // Yeniden eskiye tarih sıralaması
 
     localStorage.setItem('hafizaGuvenSavedGames', JSON.stringify(saves));
 
-    if (window.showToastNotification) window.showToastNotification("Oyun baÅŸarÄ±yla kaydedildi!", "success");
-    if (window.announceToScreenReader) window.announceToScreenReader("Oyun baÅŸarÄ±yla kaydedildi! Ana menÃ¼deki kayÄ±tlÄ± oyunlar kÄ±smÄ±ndan devam edebilirsiniz.");
+    if (window.showToastNotification) window.showToastNotification("Oyun başarıyla kaydedildi!", "success");
+    if (window.announceToScreenReader) window.announceToScreenReader("Oyun başarıyla kaydedildi! Ana menüdeki kayıtlı oyunlar kısmından devam edebilirsiniz.");
     if (window.correctSound) window.correctSound.play();
 };
 
@@ -1540,7 +1540,7 @@ window.populateSavedGamesList = function() {
     } catch(e) {}
     
     if (saves.length === 0) {
-        listEl.innerHTML = '<li tabindex="0" role="menuitem">HenÃ¼z kayÄ±tlÄ± oyununuz bulunmuyor.</li>';
+        listEl.innerHTML = '<li tabindex="0" role="menuitem">Henüz kayıtlı oyununuz bulunmuyor.</li>';
         return;
     }
     
@@ -1549,16 +1549,16 @@ window.populateSavedGamesList = function() {
         li.tabIndex = 0;
         
         let modeName = '';
-        if (save.mode === 'practice') modeName = 'AlÄ±ÅŸtÄ±rma';
-        else if (save.mode === 'story') modeName = 'KayÄ±p Notalar';
+        if (save.mode === 'practice') modeName = 'Alıştırma';
+        else if (save.mode === 'story') modeName = 'Kayıp Notalar';
         else modeName = (window.gameModes[save.difficulty] ? window.gameModes[save.difficulty].name : save.difficulty);
 
         let scoreText = save.score > 0 ? `, Skor: ${save.score}` : '';
-        let sequenceText = save.mode === 'practice' ? '' : ` - SÄ±ra: ${save.sequence ? save.sequence.length : 1}`;
-        let readSequence = save.mode === 'practice' ? '' : ` KaldÄ±ÄŸÄ±nÄ±z sÄ±ra: ${save.sequence ? save.sequence.length : 1}${scoreText}.`;
+        let sequenceText = save.mode === 'practice' ? '' : ` - Sıra: ${save.sequence ? save.sequence.length : 1}`;
+        let readSequence = save.mode === 'practice' ? '' : ` Kaldığınız sıra: ${save.sequence ? save.sequence.length : 1}${scoreText}.`;
 
         li.innerText = `${save.dateStr} - ${modeName} Modu${scoreText}${sequenceText}`;
-        li.setAttribute('aria-label', `${save.dateStr} tarihinde kaydedilmiÅŸ ${modeName} modu oyunu.${readSequence} Devam etmek iÃ§in Enter'a basÄ±n.`);
+        li.setAttribute('aria-label', `${save.dateStr} tarihinde kaydedilmiş ${modeName} modu oyunu.${readSequence} Devam etmek için Enter'a basın.`);
         li.className = 'menu-button';
         
         const loadAction = () => {
@@ -1596,7 +1596,7 @@ window.loadSavedGame = function(saveObj) {
         window.switchMenu(window.savedGamesMenu, window.practiceMenu, 'practice');
         
         if (window.announceToScreenReader) {
-            window.announceToScreenReader("AlÄ±ÅŸtÄ±rma modu yÃ¼klendi.");
+            window.announceToScreenReader("Alıştırma modu yüklendi.");
         }
         
         if (window.isDialogPhase) {
@@ -1607,7 +1607,7 @@ window.loadSavedGame = function(saveObj) {
         return;
     }
     
-    // DeÄŸiÅŸkenleri geri yÃ¼kle
+    // Değişkenleri geri yükle
     window.gameIsActive = true;
     window.inStoryMode = (saveObj.mode === 'story');
     window.activeDifficulty = saveObj.difficulty || 'easy';
@@ -1626,7 +1626,7 @@ window.loadSavedGame = function(saveObj) {
     window.switchMenu(window.savedGamesMenu, window.gameMenu, 'game');
     
     if (window.announceToScreenReader) {
-        window.announceToScreenReader("KayÄ±tlÄ± oyun yÃ¼klendi. Notalar Ã§alÄ±nÄ±yor, lÃ¼tfen dinleyin.");
+        window.announceToScreenReader("Kayıtlı oyun yüklendi. Notalar çalınıyor, lütfen dinleyin.");
     }
     
     window.hgfzZamanlayici.setTimeout(() => {
@@ -1661,7 +1661,7 @@ window.startRhythmMode = function() {
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
         gameStatus.style.display = 'block';
-        gameStatus.textContent = "Ritim AvcÄ±sÄ± baÅŸlÄ±yor... 60 BPM. BilgisayarÄ± dinleyin!";
+        gameStatus.textContent = "Ritim Avcısı başlıyor... 60 BPM. Bilgisayarı dinleyin!";
         if (window.announceToScreenReader) window.announceToScreenReader(gameStatus.textContent);
     }
     
@@ -1691,7 +1691,7 @@ window.playRhythmComputerTurn = function() {
     for (let beat of beatArray) {
         let randomNote = availableKeys[Math.floor(Math.random() * availableKeys.length)];
         beatToNoteMap[beat] = randomNote;
-        window.rhythmState.sequence.push(randomNote); // Oyuncunun basmasÄ± gereken sÄ±ra
+        window.rhythmState.sequence.push(randomNote); // Oyuncunun basması gereken sıra
     }
     
     const gameStatus = document.getElementById('game-status-text');
@@ -1725,8 +1725,8 @@ window.startRhythmPlayerTurn = function() {
     window.isComputerPlaying = false;
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
-        gameStatus.textContent = "SÄ±ra sizde! AynÄ± sÄ±rayla Ã§alÄ±n.";
-        if (window.announceToScreenReader) window.announceToScreenReader("SÄ±ra sizde!");
+        gameStatus.textContent = "Sıra sizde! Aynı sırayla çalın.";
+        if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde!");
     }
     
     window.gameTimer = window.rhythmState.sequence.length + 5;
@@ -1746,8 +1746,8 @@ window.startRhythmPlayerTurn = function() {
                 localStorage.setItem('hafizaGuvenZamanKorumasi', zkLocal);
                 window.gameTimer = 10;
                 window.updateGameUI();
-                if (window.announceToScreenReader) window.announceToScreenReader("Zaman korumasÄ± kullanÄ±ldÄ±! 10 saniye eklendi.");
-                if (gameStatus) gameStatus.textContent = "Zaman korumasÄ± kullanÄ±ldÄ±! +10 saniye.";
+                if (window.announceToScreenReader) window.announceToScreenReader("Zaman koruması kullanıldı! 10 saniye eklendi.");
+                if (gameStatus) gameStatus.textContent = "Zaman koruması kullanıldı! +10 saniye.";
             } else {
                 window.hgfzZamanlayici.clearInterval(window.gameInterval);
                 if (window.wrongSound) window.wrongSound.play();
@@ -1755,10 +1755,10 @@ window.startRhythmPlayerTurn = function() {
                 if (window.rhythmState.mistakes >= 3) {
                     window.sessionTokens = (window.rhythmState.level - 1) * 5;
                     window.endMainGame(false, false, false);
-                    if (window.announceToScreenReader) window.announceToScreenReader("3 hakkÄ±nÄ±z bitti! Oyun sona erdi.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
                 } else {
-                    if (gameStatus) gameStatus.textContent = `SÃ¼re bitti! Kalan hak: ${3 - window.rhythmState.mistakes}. Ritim tekrar Ã§alÄ±nÄ±yor.`;
-                    if (window.announceToScreenReader) window.announceToScreenReader(`SÃ¼re bitti! Kalan hakkÄ±nÄ±z ${3 - window.rhythmState.mistakes}. Tekrar dinleyin.`);
+                    if (gameStatus) gameStatus.textContent = `Süre bitti! Kalan hak: ${3 - window.rhythmState.mistakes}. Ritim tekrar çalınıyor.`;
+                    if (window.announceToScreenReader) window.announceToScreenReader(`Süre bitti! Kalan hakkınız ${3 - window.rhythmState.mistakes}. Tekrar dinleyin.`);
                     
                     window.isComputerPlaying = true;
                     setTimeout(() => {
@@ -1802,8 +1802,8 @@ window.handleRhythmInput = function(key) {
                 
                 setTimeout(() => {
                     if (gameStatus) {
-                        gameStatus.textContent = `Seviye AtladÄ±nÄ±z! Yeni HÄ±z: ${window.rhythmState.bpm} BPM`;
-                        if (window.announceToScreenReader) window.announceToScreenReader(`Seviye AtladÄ±nÄ±z! Yeni HÄ±z: ${window.rhythmState.bpm} BPM`);
+                        gameStatus.textContent = `Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`;
+                        if (window.announceToScreenReader) window.announceToScreenReader(`Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`);
                     }
                     if (window.modeUnlockSound) window.modeUnlockSound.play();
                     setTimeout(window.playRhythmComputerTurn, 2500);
@@ -1821,8 +1821,8 @@ window.handleRhythmInput = function(key) {
 
             if (window.wrongSound) window.wrongSound.play();
             const gameStatus = document.getElementById('game-status-text');
-            if (gameStatus) gameStatus.textContent = "Hata korumasÄ± kullanÄ±ldÄ±! Ceza Yok. Ritim tekrar Ã§alÄ±nÄ±yor.";
-            if (window.announceToScreenReader) window.announceToScreenReader("Hata korumasÄ± kullanÄ±ldÄ±! Tekrar dinleyin.");
+            if (gameStatus) gameStatus.textContent = "Hata koruması kullanıldı! Ceza Yok. Ritim tekrar çalınıyor.";
+            if (window.announceToScreenReader) window.announceToScreenReader("Hata koruması kullanıldı! Tekrar dinleyin.");
 
             window.rhythmState.playerIndex = 0;
             setTimeout(() => {
@@ -1834,11 +1834,11 @@ window.handleRhythmInput = function(key) {
             if (window.rhythmState.mistakes >= 3) {
                 window.sessionTokens = (window.rhythmState.level - 1) * 5;
                 window.endMainGame(false, false, false); 
-                if (window.announceToScreenReader) window.announceToScreenReader("3 hakkÄ±nÄ±z bitti! Oyun sona erdi.");
+                if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
             } else {
                 const gameStatus = document.getElementById('game-status-text');
-                if (gameStatus) gameStatus.textContent = `YanlÄ±ÅŸ nota! Kalan hak: ${3 - window.rhythmState.mistakes}. Ritim tekrar Ã§alÄ±nÄ±yor.`;
-                if (window.announceToScreenReader) window.announceToScreenReader(`YanlÄ±ÅŸ nota! Kalan hakkÄ±nÄ±z ${3 - window.rhythmState.mistakes}. Tekrar dinleyin.`);
+                if (gameStatus) gameStatus.textContent = `Yanlış nota! Kalan hak: ${3 - window.rhythmState.mistakes}. Ritim tekrar çalınıyor.`;
+                if (window.announceToScreenReader) window.announceToScreenReader(`Yanlış nota! Kalan hakkınız ${3 - window.rhythmState.mistakes}. Tekrar dinleyin.`);
                 
                 window.rhythmState.playerIndex = 0;
                 setTimeout(() => {
@@ -1848,4 +1848,5 @@ window.handleRhythmInput = function(key) {
         }
     }
 };
+
 

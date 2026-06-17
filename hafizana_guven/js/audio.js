@@ -1,6 +1,6 @@
-// audio.js - Ses TanÄ±mlamalarÄ± ve Ä°ÅŸlevleri
+﻿// audio.js - Ses Tanımlamaları ve İşlevleri
 
-// Dinleyiciyi (KullanÄ±cÄ±) (0,0,0) merkez noktasÄ±na koyalÄ±m.
+// Dinleyiciyi (Kullanıcı) (0,0,0) merkez noktasına koyalım.
 Howler.pos(0, 0, 0);
 Howler.orientation(0, 0, -1, 0, 1, 0);
 
@@ -80,7 +80,7 @@ window.menuCloseSound = new Howl({
     volume: 0.5
 });
 
-// Mobil cihazlarda menÃ¼ seslerini devre dÄ±ÅŸÄ± bÄ±rak
+// Mobil cihazlarda menü seslerini devre dışı bırak
 const isMobileLocal = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
 if (isMobileLocal) {
     window.hoverSound.volume(0);
@@ -160,7 +160,7 @@ window.house2Sound = new Howl({
 window.mountainSound = new Howl({
     src: ['sounds/mountain.ogg'],
     loop: true,
-    volume: 0.4 // DaÄŸ rÃ¼zgarÄ± sesi dengelendi
+    volume: 0.4 // Dağ rüzgarı sesi dengelendi
 });
 
 window.music272Sound = new Howl({
@@ -264,7 +264,7 @@ window.getCoinsSound = new Howl({
     volume: 1.0
 });
 
-// PÄ°YANO NOTALARI (A, B, C, D, E, F, G)
+// PİYANO NOTALARI (A, B, C, D, E, F, G)
 window.pianoNotes = {
     'a': new Howl({ src: ['sounds/a.ogg'], volume: 1.0 }),
     'b': new Howl({ src: ['sounds/b.ogg'], volume: 1.0 }),
@@ -296,13 +296,13 @@ window.kavalNotes = {
 };
 
 window.flutNotes = {
-    'a': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/A.wav'], volume: 1.0 }),
-    'b': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/b.wav'], volume: 1.0 }),
-    'c': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/c.wav'], volume: 1.0 }),
-    'd': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/d.wav'], volume: 1.0 }),
-    'e': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/e.wav'], volume: 1.0 }),
-    'f': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/f.wav'], volume: 1.0 }),
-    'g': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/g.wav'], volume: 1.0 })
+    'a': new Howl({ src: ['sounds/flüt-sounds-pack/A.wav'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/flüt-sounds-pack/b.wav'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/flüt-sounds-pack/c.wav'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/flüt-sounds-pack/d.wav'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/flüt-sounds-pack/e.wav'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/flüt-sounds-pack/f.wav'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/flüt-sounds-pack/g.wav'], volume: 1.0 })
 };
 
 window.kanunNotes = {
@@ -337,7 +337,7 @@ window.activeNotes = new Proxy({}, {
     }
 });
 
-// Web Audio API'nin mobil tarayÄ±cÄ±larda uyku modundan Ã§Ä±kmasÄ±nÄ± (resume) garanti altÄ±na almak
+// Web Audio API'nin mobil tarayıcılarda uyku modundan çıkmasını (resume) garanti altına almak
 window.ensureAudioUnlock = () => {
     if (typeof Howler !== 'undefined' && Howler.ctx && Howler.ctx.state === 'suspended') {
         Howler.ctx.resume();
@@ -352,7 +352,7 @@ window.updatePan = function (index, total) {
         xPos = (index / (total - 1)) * 2 - 1;
     }
     window.hoverSound.stereo ? window.hoverSound.stereo(xPos) : window.hoverSound.pos(xPos, 0, 0);
-    window.menuEnterSound.stereo ? window.menuEnterSound.stereo(0) : window.menuEnterSound.pos(0, 0, 0); // TÄ±klama sesi her zaman merkezde sabitlendi
+    window.menuEnterSound.stereo ? window.menuEnterSound.stereo(0) : window.menuEnterSound.pos(0, 0, 0); // Tıklama sesi her zaman merkezde sabitlendi
     window.menuCloseSound.stereo ? window.menuCloseSound.stereo(0) : window.menuCloseSound.pos(0, 0, 0);
 };
 
@@ -387,7 +387,7 @@ function unlockMobileAudio() {
     if (ctx && ctx.state === 'suspended') {
         ctx.resume();
     }
-    // Sessiz frekans ile kilidi aÃ§
+    // Sessiz frekans ile kilidi aç
     if (ctx && ctx.createOscillator) {
         try {
             const oscillator = ctx.createOscillator();
@@ -403,7 +403,7 @@ function unlockMobileAudio() {
     document.removeEventListener('touchstart', unlockMobileAudio);
     document.removeEventListener('click', unlockMobileAudio);
 }
-// Sadece ilk etkileÅŸimde Ã§alÄ±ÅŸÄ±p kendini imha etsin
+// Sadece ilk etkileşimde çalışıp kendini imha etsin
 document.addEventListener('touchstart', unlockMobileAudio, { once: true });
 document.addEventListener('click', unlockMobileAudio, { once: true });
 
@@ -429,7 +429,7 @@ window.startMetronome = function () {
     
     let intervalMs = 60000 / bpm;
     
-    // Ä°lk vuruÅŸu anÄ±nda yap
+    // İlk vuruşu anında yap
     window.clockTickSound.volume(0.3);
     window.clockTickSound.play();
     
@@ -464,3 +464,4 @@ window.playMetronomeTick = function (isHighPitch = false) {
         if (window.clockTickSound) window.clockTickSound.play();
     }
 };
+

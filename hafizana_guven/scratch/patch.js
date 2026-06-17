@@ -1,5 +1,5 @@
-const fs = require('fs');
-let content = fs.readFileSync('c:/Users/Umit Ekrem Mikyas/Downloads/hafÄ±zana gÃ¼ven/js/ui.js', 'utf8');
+﻿const fs = require('fs');
+let content = fs.readFileSync('c:/Users/Umit Ekrem Mikyas/Downloads/hafızana güven/js/ui.js', 'utf8');
 
 // 1. Add buyKanunPackBtn
 content = content.replace(/const buyFlutPackBtn = document\.getElementById\('buy-flut-pack-btn'\);/,
@@ -20,11 +20,11 @@ content = content.replace(/if \(buyFlutPackBtn\) \{[\s\S]*?if \(window\.announce
                 let ownsKanun = localStorage.getItem('hafizaGuvenKanunPack') === 'true';
                 if (ownsKanun) {
                     let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'kanun';
-                    buyKanunPackBtn.innerText = isActive ? "Kanun Ses Paketini Kapat" : "Kanun Ses Paketini EtkinleÅŸtir";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. " + (isActive ? "Kapatmak" : "EtkinleÅŸtirmek") + " iÃ§in tÄ±klayÄ±n.");
+                    buyKanunPackBtn.innerText = isActive ? "Kanun Ses Paketini Kapat" : "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 } else {
-                    buyKanunPackBtn.innerText = "Kanun Ses Paketi SatÄ±n Al (300 Jeton)";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. NotalarÄ± piyano yerine kanun ile duyarsÄ±nÄ±z. KalÄ±cÄ± olarak sahip olursunuz. Fiyat: 300 Jeton.");
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketi Satın Al (300 Jeton)";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Notaları piyano yerine kanun ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 300 Jeton.");
                 }
             }
             
@@ -51,10 +51,10 @@ content = content.replace(/(\s*\/\/ Achievements\s*if \(btnAchievementsMain && a
                     window.activeInstrument = 'piano';
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
-                    buyKanunPackBtn.innerText = "Kanun Ses Paketini EtkinleÅŸtir";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi kapatÄ±ldÄ±. Tekrar piyano sesleri aktif.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi kapatıldı. Tekrar piyano sesleri aktif.");
                 } else {
                     let wasPlaying = (window.bgMusic && window.bgMusic.playing());
                     if (window.bgMusic) window.bgMusic.stop();
@@ -63,28 +63,28 @@ content = content.replace(/(\s*\/\/ Achievements\s*if \(btnAchievementsMain && a
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
                     buyKanunPackBtn.innerText = "Kanun Ses Paketini Kapat";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi etkinleÅŸtirildi!");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi etkinleştirildi!");
                     
                     if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
-                        buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                        buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                        buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
-                        buyKavalPackBtn.innerText = "Kaval Ses Paketini EtkinleÅŸtir";
-                        buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                        buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
-                        buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                        buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                        buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 if (totalTokens < 300) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = "Yetersiz bakiye. Bu eÅŸya iÃ§in 300 jetona ihtiyacÄ±nÄ±z var.";
+                    let msg = "Yetersiz bakiye. Bu eşya için 300 jetona ihtiyacınız var.";
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
@@ -96,22 +96,22 @@ content = content.replace(/(\s*\/\/ Achievements\s*if \(btnAchievementsMain && a
                 window.activeInstrument = 'kanun';
                 
                 buyKanunPackBtn.innerText = "Kanun Ses Paketini Kapat";
-                buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak için tıklayın.");
                 
                 if (window.buySound) window.buySound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader(\`SatÄ±n alma baÅŸarÄ±lÄ±! Kanun ses paketi eklendi ve aktif edildi. Kalan jeton: \${totalTokens}\`);
+                if (window.announceToScreenReader) window.announceToScreenReader(\`Satın alma başarılı! Kanun ses paketi eklendi ve aktif edildi. Kalan jeton: \${totalTokens}\`);
                 
                 if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
-                    buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                    buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
-                    buyKavalPackBtn.innerText = "Kaval Ses Paketini EtkinleÅŸtir";
-                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
-                    buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                    buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
             }
         });
@@ -121,15 +121,16 @@ content = content.replace(/(\s*\/\/ Achievements\s*if \(btnAchievementsMain && a
 );
 
 // 5. Inject kanun resets in existing instrument packs
-content = content.replace(/if \(buyFlutPackBtn && localStorage\.getItem\('hafizaGuvenFlutPack'\) === 'true'\) \{[\s\S]*?buyFlutPackBtn\.setAttribute\('aria-label', "FlÃ¼t Ses Paketi\. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n\."\);\s*\}/g,
+content = content.replace(/if \(buyFlutPackBtn && localStorage\.getItem\('hafizaGuvenFlutPack'\) === 'true'\) \{[\s\S]*?buyFlutPackBtn\.setAttribute\('aria-label', "Flüt Ses Paketi\. Etkinleştirmek için tıklayın\."\);\s*\}/g,
     match => {
         return match + `
                     if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
-                        buyKanunPackBtn.innerText = "Kanun Ses Paketini EtkinleÅŸtir";
-                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                     }`;
     }
 );
 
-fs.writeFileSync('c:/Users/Umit Ekrem Mikyas/Downloads/hafÄ±zana gÃ¼ven/js/ui.js', content, 'utf8');
+fs.writeFileSync('c:/Users/Umit Ekrem Mikyas/Downloads/hafızana güven/js/ui.js', content, 'utf8');
 console.log('Patched js/ui.js');
+

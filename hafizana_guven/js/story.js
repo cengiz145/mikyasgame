@@ -1,4 +1,4 @@
-// story.js - Hikaye Modu, YÃ¼rÃ¼me Mekanikleri ve KayÄ±p Notalar
+﻿// story.js - Hikaye Modu, Yürüme Mekanikleri ve Kayıp Notalar
 
 window.inStoryMode = false;
 window.currentStoryIndex = 0;
@@ -25,7 +25,7 @@ window.clearStoryAnimations = function() {
     if (window.storyWinTimeout) clearTimeout(window.storyWinTimeout);
     if (window.storyEntryTimeout) clearTimeout(window.storyEntryTimeout);
 
-    // Ã‡alan kÄ±sa efekt seslerini ve notalarÄ± durdur (hÄ±zlÄ± atlama sÄ±rasÄ±nda birbirine girmemesi iÃ§in)
+    // Çalan kısa efekt seslerini ve notaları durdur (hızlı atlama sırasında birbirine girmemesi için)
     if (window.enterHouseSound && window.enterHouseSound.playing()) window.enterHouseSound.stop();
     if (window.doorCloseSound && window.doorCloseSound.playing()) window.doorCloseSound.stop();
     if (window.glasshitSound && window.glasshitSound.playing()) window.glasshitSound.stop();
@@ -50,7 +50,7 @@ window.quitStoryMode = function() {
     window.isStoryModeWon = false;
     window.isStoryModeFinishedWaitingForEnter = false;
     
-    // ZamanlayÄ±cÄ±yÄ± Temizle
+    // Zamanlayıcıyı Temizle
     if (window.storyTimerIntervalId) clearInterval(window.storyTimerIntervalId);
     
     window.clearStoryAnimations();
@@ -76,7 +76,7 @@ window.playCurrentStoryDialog = function() {
     if (!window.missingNotesDialogues || !window.missingNotesDialogues[window.currentStoryIndex]) return;
 
     let appendedText = window.missingNotesDialogues[window.currentStoryIndex];
-    let finalHtml = window.localizeText ? window.localizeText(appendedText.replace("Devam etmek iÃ§in entÄ±ra basÄ±n.", "<strong>Devam etmek iÃ§in entÄ±ra basÄ±n.</strong>")) : appendedText;
+    let finalHtml = window.localizeText ? window.localizeText(appendedText.replace("Devam etmek için entıra basın.", "<strong>Devam etmek için entıra basın.</strong>")) : appendedText;
 
     if (window.dado3Sound) window.dado3Sound.play();
     storyStatus.innerHTML = finalHtml;
@@ -103,7 +103,7 @@ window.playAutomatedWalkingScene = function() {
 };
 
 window.triggerStoryAnimations = function(index) {
-    window.clearStoryAnimations(); // Ã–nceki sahneden kalanlarÄ± temizle ve Ã§alan sesleri kes
+    window.clearStoryAnimations(); // Önceki sahneden kalanları temizle ve çalan sesleri kes
 
     if (index === 0) {
         let count = 0;
@@ -239,9 +239,9 @@ window.initializeMissingNotesMap = function() {
     let skipStoryDialogues = localStorage.getItem('hafizaGuvenDisableStoryMode') === 'true';
     if (window.announceToScreenReader) {
         if (skipStoryDialogues) {
-            window.announceToScreenReader(`DÄ±ÅŸarÄ±dasÄ±n. X konumun: ${window.playerX}.`);
+            window.announceToScreenReader(`Dışarıdasın. X konumun: ${window.playerX}.`);
         } else {
-            window.announceToScreenReader(`DÄ±ÅŸarÄ±dasÄ±n. Kar Ã¼stÃ¼nde rastgele bir noktaya Ä±ÅŸÄ±nlandÄ±n. X konumun: ${window.playerX}. Piyanoya dÃ¶nmek iÃ§in X: 0 konumuna doÄŸru yÃ¼rÃ¼melisin. Etrafta rastgele yerleÅŸtirilmiÅŸ ${window.MAX_NOTES} adet nota var. Bir nota bulduÄŸunda F tuÅŸuna basarak onu alabilirsin. TÃ¼m notalarÄ± sÄ±rasÄ±yla (Do, Re, Mi, Fa, Sol, La, Si) piyanoya getirmelisin.`);
+            window.announceToScreenReader(`Dışarıdasın. Kar üstünde rastgele bir noktaya ışınlandın. X konumun: ${window.playerX}. Piyanoya dönmek için X: 0 konumuna doğru yürümelisin. Etrafta rastgele yerleştirilmiş ${window.MAX_NOTES} adet nota var. Bir nota bulduğunda F tuşuna basarak onu alabilirsin. Tüm notaları sırasıyla (Do, Re, Mi, Fa, Sol, La, Si) piyanoya getirmelisin.`);
         }
     }
 
@@ -251,7 +251,7 @@ window.initializeMissingNotesMap = function() {
         window.mountainSound.volume(0.4, mid);
     }
 
-    // ZamanlayÄ±cÄ±yÄ± baÅŸlat (220 saniye)
+    // Zamanlayıcıyı başlat (220 saniye)
     if (window.storyTimerIntervalId) clearInterval(window.storyTimerIntervalId);
     window.storyTimerValue = 220;
     
@@ -264,17 +264,17 @@ window.initializeMissingNotesMap = function() {
         window.storyTimerValue--;
         
         if (window.storyTimerValue === 180) {
-            if (window.announceToScreenReader) window.announceToScreenReader("3 dakika kaldÄ±.");
+            if (window.announceToScreenReader) window.announceToScreenReader("3 dakika kaldı.");
         } else if (window.storyTimerValue === 120) {
-            if (window.announceToScreenReader) window.announceToScreenReader("2 dakika kaldÄ±.");
+            if (window.announceToScreenReader) window.announceToScreenReader("2 dakika kaldı.");
         } else if (window.storyTimerValue === 60) {
-            if (window.announceToScreenReader) window.announceToScreenReader("1 dakika kaldÄ±.");
+            if (window.announceToScreenReader) window.announceToScreenReader("1 dakika kaldı.");
         } else if (window.storyTimerValue === 30) {
-            if (window.announceToScreenReader) window.announceToScreenReader("Son 30 saniye kaldÄ±.");
+            if (window.announceToScreenReader) window.announceToScreenReader("Son 30 saniye kaldı.");
         }
         
         if (window.storyTimerValue <= 30 && window.storyTimerValue > 0) {
-            // Son 30 saniyede her saniye heyecan artÄ±rÄ±cÄ± sesi Ã§al
+            // Son 30 saniyede her saniye heyecan artırıcı sesi çal
             if (window.seconsSound) window.seconsSound.play();
         }
         
@@ -284,7 +284,7 @@ window.initializeMissingNotesMap = function() {
             
             if (window.wrongSound) window.wrongSound.play();
             if (window.announceToScreenReader) {
-                window.announceToScreenReader("SÃ¼re doldu! SoÄŸuktan donmak Ã¼zereyken kurtarma ekipleri seni buldu. KayÄ±p Notalar modunu tamamlayamadÄ±n. Ana menÃ¼ye dÃ¶nÃ¼lÃ¼yor.", true);
+                window.announceToScreenReader("Süre doldu! Soğuktan donmak üzereyken kurtarma ekipleri seni buldu. Kayıp Notalar modunu tamamlayamadın. Ana menüye dönülüyor.", true);
             }
             
             if (window.switchMenu && window.storyMenu && window.mainMenu) {
@@ -319,7 +319,7 @@ window.handleStoryWalking = function(key) {
             playRandomSnowStep();
             updateStoryStatus();
         } else {
-            if (window.announceToScreenReader) window.announceToScreenReader("HaritanÄ±n sonundasÄ±n. Daha fazla saÄŸa gidemezsin.");
+            if (window.announceToScreenReader) window.announceToScreenReader("Haritanın sonundasın. Daha fazla sağa gidemezsin.");
         }
     } else if (key === 'ArrowLeft') {
         if (window.playerX > 0) {
@@ -327,7 +327,7 @@ window.handleStoryWalking = function(key) {
             playRandomSnowStep();
             updateStoryStatus();
         } else {
-            if (window.announceToScreenReader) window.announceToScreenReader("PiyanodasÄ±n. Daha fazla sola gidemezsin.");
+            if (window.announceToScreenReader) window.announceToScreenReader("Piyanodasın. Daha fazla sola gidemezsin.");
         }
     } else if (key.toLowerCase() === 'f') {
         if (window.playerX === window.pianoX) {
@@ -346,23 +346,23 @@ window.handleStoryWalking = function(key) {
                         if (window.handleStoryWalking) window.handleStoryWalking('Enter');
                     }, 500);
                 } else {
-                    let msg = `Harika! ${trNames[droppedNote]} notasÄ±nÄ± piyanoya yerleÅŸtirdiniz. Toplam ${placedCount} nota yerleÅŸtirdik, geriye ${remainingCount} nota kaldÄ±. `;
+                    let msg = `Harika! ${trNames[droppedNote]} notasını piyanoya yerleştirdiniz. Toplam ${placedCount} nota yerleştirdik, geriye ${remainingCount} nota kaldı. `;
                     const expectedOrder = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
-                    msg += `SÄ±rada ${trNames[expectedOrder[placedCount]]} notasÄ± var. KayÄ±p notalar etrafta. Aramaya devam et.`;
+                    msg += `Sırada ${trNames[expectedOrder[placedCount]]} notası var. Kayıp notalar etrafta. Aramaya devam et.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                 }
             } else {
                 if (window.notesInPiano.length === window.MAX_NOTES) {
-                    if (window.announceToScreenReader) window.announceToScreenReader("Piyano zaten tamamlandÄ±. Onay tuÅŸuna basarak bitirebilirsin.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Piyano zaten tamamlandı. Onay tuşuna basarak bitirebilirsin.");
                 } else {
-                    if (window.announceToScreenReader) window.announceToScreenReader(`PiyanodasÄ±n. Åu an piyanoda ${window.notesInPiano.length} nota var.`);
+                    if (window.announceToScreenReader) window.announceToScreenReader(`Piyanodasın. Åu an piyanoda ${window.notesInPiano.length} nota var.`);
                 }
             }
         } else {
             if (window.notesOnMap[window.playerX]) {
                 if (window.carryingNote) {
                     if (window.wrongSound) window.wrongSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Zaten elinizde bir nota var! Ã–nce onu X: 0 konumundaki piyanoya bÄ±rakmalÄ±sÄ±nÄ±z.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Zaten elinizde bir nota var! Önce onu X: 0 konumundaki piyanoya bırakmalısınız.");
                     return;
                 }
                 const foundNote = window.notesOnMap[window.playerX];
@@ -377,10 +377,10 @@ window.handleStoryWalking = function(key) {
                     }
                     if (window.correctSound) window.correctSound.play();
                     
-                    let baseMsg = "NotayÄ± yerden aldÄ±nÄ±z. Åimdi piyanoya bÄ±rakmanÄ±z gerekiyor.";
+                    let baseMsg = "Notayı yerden aldınız. Åimdi piyanoya bırakmanız gerekiyor.";
                     let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
                     if (!disableMotivation && window.missingNotesHappyMessages && window.missingNotesHappyMessages.length > window.notesInPiano.length) {
-                        baseMsg = window.missingNotesHappyMessages[window.notesInPiano.length] + " Åimdi onu piyanoya gÃ¶tÃ¼rmelisin.";
+                        baseMsg = window.missingNotesHappyMessages[window.notesInPiano.length] + " Åimdi onu piyanoya götürmelisin.";
                     }
                     
                     if (window.announceToScreenReader) window.announceToScreenReader(baseMsg);
@@ -394,32 +394,32 @@ window.handleStoryWalking = function(key) {
                     const foundName = trNames[foundNote];
                     window.hgfzZamanlayici.setTimeout(() => {
                         if (window.wrongSound) window.wrongSound.play();
-                        if (window.announceToScreenReader) window.announceToScreenReader(`Burada ${foundName} notasÄ± var ama sÄ±rasÄ± deÄŸil! NotalarÄ± doÄŸru sÄ±rayla toplamalÄ±sÄ±nÄ±z.`);
+                        if (window.announceToScreenReader) window.announceToScreenReader(`Burada ${foundName} notası var ama sırası değil! Notaları doğru sırayla toplamalısınız.`);
                     }, 400);
                 }
             } else {
                 if (window.wrongSound) window.wrongSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("Burada hiÃ§bir ÅŸey yok. Aramaya devam et.");
+                if (window.announceToScreenReader) window.announceToScreenReader("Burada hiçbir şey yok. Aramaya devam et.");
             }
         }
     } else if (key.toLowerCase() === 'c') {
         let msg = `X Konumunuz: ${window.playerX}. `;
         if (window.carryingNote) {
-            msg += "Elinizde bir nota var. Onu X: 0 konumundaki piyanoya gÃ¶tÃ¼rmelisiniz. ";
+            msg += "Elinizde bir nota var. Onu X: 0 konumundaki piyanoya götürmelisiniz. ";
         }
         if (window.playerX === window.pianoX) {
-            msg += `Åu an piyanodasÄ±n. `;
+            msg += `Åu an piyanodasın. `;
             if (window.notesInPiano.length === window.MAX_NOTES) {
-                msg += "BÃ¼tÃ¼n notalar piyanoya yerleÅŸtirildi. Oyunu kazanmak iÃ§in entÄ±ra basÄ±n.";
+                msg += "Bütün notalar piyanoya yerleştirildi. Oyunu kazanmak için entıra basın.";
             } else {
-                msg += `Piyanodaki nota sayÄ±sÄ±: ${window.notesInPiano.length} / ${window.MAX_NOTES}. Daha fazla nota bulmalÄ±sÄ±n.`;
+                msg += `Piyanodaki nota sayısı: ${window.notesInPiano.length} / ${window.MAX_NOTES}. Daha fazla nota bulmalısın.`;
             }
         } else if (window.notesOnMap[window.playerX]) {
             const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
             const noteName = trNames[window.notesOnMap[window.playerX]];
-            msg += `AyaÄŸÄ±na sert bir ÅŸey takÄ±ldÄ±. Burada ${noteName} notasÄ± var! Almak iÃ§in F tuÅŸuna bas.`;
+            msg += `Ayağına sert bir şey takıldı. Burada ${noteName} notası var! Almak için F tuşuna bas.`;
         } else {
-            msg += "BurasÄ± karlÄ± boÅŸ bir alan.";
+            msg += "Burası karlı boş bir alan.";
         }
         
         const storyStatus = document.getElementById('story-status-text');
@@ -431,7 +431,7 @@ window.handleStoryWalking = function(key) {
         if (window.announceToScreenReader) window.announceToScreenReader(msg);
     } else if (key.toLowerCase() === 't') {
         const displayTime = window.storyTimerValue < 0 ? 0 : window.storyTimerValue;
-        let msg = `Kalan sÃ¼re: ${displayTime} saniye.`;
+        let msg = `Kalan süre: ${displayTime} saniye.`;
         
         const storyStatus = document.getElementById('story-status-text');
         if (storyStatus) {
@@ -474,7 +474,7 @@ window.handleStoryWalking = function(key) {
                 }
                 if (window.applauseSound) window.applauseSound.play();
                 
-                let packsMsg = "AyrÄ±ca harika bir haberimiz daha var! ArtÄ±k diÄŸer ses paketlerini de oynayabileceksiniz. TÃ¼m enstrÃ¼manlarÄ± seÃ§ebilme seÃ§eneÄŸi ana menÃ¼ye eklendi ve maÄŸazada yeni enstrÃ¼man paketleri ortaya Ã§Ä±ktÄ±! Ana menÃ¼ye dÃ¶nmek iÃ§in entÄ±ra basÄ±n.";
+                let packsMsg = "Ayrıca harika bir haberimiz daha var! Artık diğer ses paketlerini de oynayabileceksiniz. Tüm enstrümanları seçebilme seçeneği ana menüye eklendi ve mağazada yeni enstrüman paketleri ortaya çıktı! Ana menüye dönmek için entıra basın.";
                 
                 const storyStatus = document.getElementById('story-status-text');
                 if (storyStatus) storyStatus.innerHTML = packsMsg;
@@ -506,7 +506,7 @@ window.handleStoryWalking = function(key) {
                     }
                     if (window.applauseSound) window.applauseSound.play();
                     
-                    let unlockMsg = "Tebrikler. KayÄ±p notalar modunu tamamladÄ±nÄ±z. Ritim avcÄ±sÄ± yeni oyun modunu aÃ§tÄ±nÄ±z. Ä°letiÅŸim kutusunu geÃ§mek iÃ§in entÄ±ra basÄ±n.";
+                    let unlockMsg = "Tebrikler. Kayıp notalar modunu tamamladınız. Ritim avcısı yeni oyun modunu açtınız. İletişim kutusunu geçmek için entıra basın.";
                     
                     const storyStatus = document.getElementById('story-status-text');
                     if (storyStatus) storyStatus.innerHTML = unlockMsg;
@@ -549,11 +549,11 @@ window.handleStoryWalking = function(key) {
             let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
             let reward = 300;
             let eventMsg = "";
-            if (window.isWeekendDoubleCoins && window.isWeekendDoubleCoins()) { reward *= 2; eventMsg = " (Ã‡ift Jeton EtkinliÄŸi!)"; }
+            if (window.isWeekendDoubleCoins && window.isWeekendDoubleCoins()) { reward *= 2; eventMsg = " (Çift Jeton Etkinliği!)"; }
             totalTokens += reward;
             try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens); } catch(e){}
             
-            let winMsg = `Tebrikler! TÃ¼m notalarÄ± sÄ±rasÄ±yla topladÄ±n ve piyanoyu onardÄ±n. KayÄ±p Notalar modunu baÅŸarÄ±yla tamamladÄ±n! Bu hikaye iÃ§in ${reward} jeton kazandÄ±nÄ±z${eventMsg}. Toplam jetonunuz ${totalTokens}.`;
+            let winMsg = `Tebrikler! Tüm notaları sırasıyla topladın ve piyanoyu onardın. Kayıp Notalar modunu başarıyla tamamladın! Bu hikaye için ${reward} jeton kazandınız${eventMsg}. Toplam jetonunuz ${totalTokens}.`;
             if (window.announceToScreenReader) window.announceToScreenReader(winMsg, true);
             
             const storyStatus = document.getElementById('story-status-text');
@@ -566,10 +566,10 @@ window.handleStoryWalking = function(key) {
             window.storyWinTimeout = window.hgfzZamanlayici.setTimeout(() => {
                 window.isStoryModeFinishedWaitingForEnter = true;
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader("Ana menÃ¼ye dÃ¶nmek iÃ§in entÄ±ra basÄ±n.", true);
+                    window.announceToScreenReader("Ana menüye dönmek için entıra basın.", true);
                 }
                 if (storyStatus) {
-                    storyStatus.innerHTML += "<br><br>Ana menÃ¼ye dÃ¶nmek iÃ§in entÄ±ra basÄ±n.";
+                    storyStatus.innerHTML += "<br><br>Ana menüye dönmek için entıra basın.";
                 }
             }, 3000);
         }
@@ -592,7 +592,7 @@ window.handleStoryWalking = function(key) {
         
         if (window.playerX === window.pianoX) {
             hasNoteOrPiano = true;
-            finalMsg = "PiyanodasÄ±n. ";
+            finalMsg = "Piyanodasın. ";
         }
         
         if (window.notesOnMap && window.notesOnMap[window.playerX]) {
@@ -601,7 +601,7 @@ window.handleStoryWalking = function(key) {
             const trNames = { 'c': 'Do', 'd': 'Re', 'e': 'Mi', 'f': 'Fa', 'g': 'Sol', 'a': 'La', 'b': 'Si' };
             const noteName = trNames[foundNote];
             
-            finalMsg += `AyaÄŸÄ±na sert bir ÅŸey takÄ±ldÄ±. Burada ${noteName} notasÄ± var!`;
+            finalMsg += `Ayağına sert bir şey takıldı. Burada ${noteName} notası var!`;
 
             if (window.activeNotes && window.activeNotes[foundNote]) {
                 window.activeNotes[foundNote].volume(1.0);
@@ -622,13 +622,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storyStatus) {
         const handleStoryTextClick = () => {
             if (window.inStoryMode && !window.isGridWalkingPhase) {
-                // Enter tuÅŸunu simÃ¼le ederek hikayeyi atlat (Ekran okuyucu Ã§ift dokunuÅŸu 'click' olarak algÄ±lar)
+                // Enter tuşunu simüle ederek hikayeyi atlat (Ekran okuyucu çift dokunuşu 'click' olarak algılar)
                 const enterEvent = new KeyboardEvent('keydown', {
                     key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true
                 });
                 document.dispatchEvent(enterEvent);
             } else if (window.inStoryMode && window.isGridWalkingPhase) {
-                // YÃ¼rÃ¼me modunda sadece mevcut koordinatÄ± oku (C tuÅŸu simÃ¼lasyonu)
+                // Yürüme modunda sadece mevcut koordinatı oku (C tuşu simülasyonu)
                 if (window.handleStoryWalking) window.handleStoryWalking('c');
             }
         };
@@ -640,11 +640,12 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('touchstart', (e) => {
     if (e.touches && e.touches.length === 2) {
         if (window.inStoryMode && window.isGridWalkingPhase) {
-            // EÄŸer oyun oynanÄ±yor ve daÄŸ haritasÄ±nda yÃ¼rÃ¼nÃ¼yorsa 2 parmakla dokunmayÄ± F tuÅŸu olarak algÄ±la.
+            // Eğer oyun oynanıyor ve dağ haritasında yürünüyorsa 2 parmakla dokunmayı F tuşu olarak algıla.
             e.preventDefault();
             if (window.handleStoryWalking) window.handleStoryWalking('f');
         }
     }
 }, { passive: false });
+
 
 

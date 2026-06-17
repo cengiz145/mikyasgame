@@ -1,15 +1,15 @@
-// ui.js - KullanÄ±cÄ± ArayÃ¼zÃ¼, Mobil Tespit ve Ekran Okuyucu FonksiyonlarÄ±
+﻿// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
 
 // Mobil Cihaz Tespiti
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
 window.isMobileDevice = isMobile;
 
-// --- OTOMATÄ°K GÃœNCELLEME KONTROL SÄ°STEMÄ° ---
+// --- OTOMATİK GÜNCELLEME KONTROL SİSTEMİ ---
 window.mevcutSurum = window.UYGULAMA_SURUMU || (typeof UYGULAMA_SURUMU !== 'undefined' ? UYGULAMA_SURUMU : null);
 window.globalChangelogVersion = null;
 window.globalChangelogMessage = null;
 
-// --- GeliÅŸtirici Ã–zel Bildirim Sistemi (UyarÄ±) ---
+// --- Geliştirici Özel Bildirim Sistemi (Uyarı) ---
 window.startAdminAlert = function(type) {
     let devName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "";
     if (!['ekrem'].includes(devName.toLowerCase())) return;
@@ -19,18 +19,18 @@ window.startAdminAlert = function(type) {
 };
 
 window.stopAdminAlert = function(type) {
-    // DÃ¶ngÃ¼ kaldÄ±rÄ±ldÄ±ÄŸÄ± iÃ§in bu fonksiyona artÄ±k gerek yok, hata vermemesi iÃ§in boÅŸ bÄ±rakÄ±ldÄ±
+    // Döngü kaldırıldığı için bu fonksiyona artık gerek yok, hata vermemesi için boş bırakıldı
 };
 // --------------------------------------------------------
 window.guncellemeKontrolEt = function (isManual = false) {
     if (isManual && typeof window.announceToScreenReader === 'function') {
-        window.announceToScreenReader('GÃ¼ncellemeler denetleniyor...');
+        window.announceToScreenReader('Güncellemeler denetleniyor...');
     }
     fetch('version.json?t=' + new Date().getTime())
         .then(response => { if (!response.ok) throw new Error('Network response bad'); return response.json(); })
         .then(data => {
             const visualVersion = document.getElementById("intro-version-display");
-            if (visualVersion) visualVersion.textContent = "SÃ¼rÃ¼m: " + data.version;
+            if (visualVersion) visualVersion.textContent = "Sürüm: " + data.version;
 
             window.globalChangelogVersion = data.version;
             if (data.changelog) {
@@ -39,7 +39,7 @@ window.guncellemeKontrolEt = function (isManual = false) {
                 if (smt) smt.innerText = data.changelog;
             }
 
-            let currentMsg = 'Oyununuz gÃ¼ncel.';
+            let currentMsg = 'Oyununuz güncel.';
             if (data.buildId) {
                 const dateObj = new Date(data.buildId * 1000);
                 const now = new Date();
@@ -51,28 +51,28 @@ window.guncellemeKontrolEt = function (isManual = false) {
                 const secs = totalSec % 60;
 
                 let timeAgoStr = "";
-                if (days > 0) timeAgoStr += `${days} gÃ¼n `;
+                if (days > 0) timeAgoStr += `${days} gün `;
                 if (hours > 0) timeAgoStr += `${hours} saat `;
                 if (mins > 0) timeAgoStr += `${mins} dakika `;
                 timeAgoStr += `${secs} saniye`;
 
                 const takvimStr = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                currentMsg = `Oyunun gÃ¼ncelleme takvimi: ${takvimStr}. Ve yaklaÅŸÄ±k ${timeAgoStr} Ã¶nce gÃ¼ncellendi.`;
+                currentMsg = `Oyunun güncelleme takvimi: ${takvimStr}. Ve yaklaşık ${timeAgoStr} önce güncellendi.`;
             }
 
             const updateBtn = document.getElementById('check-updates-btn');
             if (updateBtn) {
-                updateBtn.innerText = "SÃ¼rÃ¼m: " + data.version + (data.buildId ? "" : " (GÃ¼ncel)");
+                updateBtn.innerText = "Sürüm: " + data.version + (data.buildId ? "" : " (Güncel)");
                 updateBtn.setAttribute('aria-label', currentMsg);
             }
 
             if (!window.mevcutSurum) {
                 window.mevcutSurum = data.version;
             } else if (data.version !== window.mevcutSurum) {
-                // KullanÄ±cÄ± isteÄŸi: Oyun herkese aÃ§Ä±k olduÄŸu iÃ§in gÃ¼ncellemeleri sessiz yap. Arka planda gÃ¼ncelle.
+                // Kullanıcı isteği: Oyun herkese açık olduğu için güncellemeleri sessiz yap. Arka planda güncelle.
                 window.mevcutSurum = data.version;
 
-                // Arka planda Service Worker'Ä± gÃ¼ncelliyoruz, kullanÄ±cÄ±yÄ± rahatsÄ±z etmiyoruz.
+                // Arka planda Service Worker'ı güncelliyoruz, kullanıcıyı rahatsız etmiyoruz.
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.getRegistrations().then(function(registrations) {
                         for(let registration of registrations) {
@@ -81,7 +81,7 @@ window.guncellemeKontrolEt = function (isManual = false) {
                     });
                 }
 
-                // TarayÄ±cÄ± Ã¶nbelleÄŸini arka planda temizleyerek bir sonraki giriÅŸe hazÄ±rlayalÄ±m.
+                // Tarayıcı önbelleğini arka planda temizleyerek bir sonraki girişe hazırlayalım.
                 if ('caches' in window) {
                     caches.keys().then((names) => {
                         names.forEach((name) => {
@@ -90,18 +90,18 @@ window.guncellemeKontrolEt = function (isManual = false) {
                     });
                 }
             } else {
-                // Sessizce gÃ¼ncelleme durumunu UI'da tuttuk.
+                // Sessizce güncelleme durumunu UI'da tuttuk.
             }
         })
         .catch(err => {
             const visualVersion = document.getElementById("intro-version-display");
-            if (visualVersion && !visualVersion.textContent.includes("Ã‡evrimdÄ±ÅŸÄ±")) {
-                visualVersion.textContent = "SÃ¼rÃ¼m: " + (window.mevcutSurum || "Bilinmiyor") + " (Ã‡evrimdÄ±ÅŸÄ±)";
+            if (visualVersion && !visualVersion.textContent.includes("Çevrimdışı")) {
+                visualVersion.textContent = "Sürüm: " + (window.mevcutSurum || "Bilinmiyor") + " (Çevrimdışı)";
             }
             const updateBtn = document.getElementById('check-updates-btn');
             if (updateBtn) {
-                updateBtn.innerText = "GÃ¼ncelleme kontrolÃ¼ baÅŸarÄ±sÄ±z.";
-                updateBtn.setAttribute('aria-label', "GÃ¼ncelleme kontrolÃ¼ baÅŸarÄ±sÄ±z oldu. Ã‡evrimdÄ±ÅŸÄ± olabilirsiniz.");
+                updateBtn.innerText = "Güncelleme kontrolü başarısız.";
+                updateBtn.setAttribute('aria-label', "Güncelleme kontrolü başarısız oldu. Çevrimdışı olabilirsiniz.");
             }
         });
 };
@@ -111,7 +111,7 @@ window.isWeekendDoubleCoins = function() {
     const day = now.getDay();
     const hour = now.getHours();
     
-    // Cumartesi (6) 12:00'dan itibaren, Pazar (0) tÃ¼m gÃ¼n (23:59'a kadar)
+    // Cumartesi (6) 12:00'dan itibaren, Pazar (0) tüm gün (23:59'a kadar)
     if (day === 6 && hour >= 12) return true;
     if (day === 0) return true;
     return false;
@@ -131,7 +131,7 @@ window.getNextMilestone = function(streak) {
     for (let m of window.milestones) {
         if (streak < m.day) return m;
     }
-    return null; // EÄŸer hepsini geÃ§tiyse
+    return null; // Eğer hepsini geçtiyse
 };
 
 window.checkDailyStreak = function() {
@@ -151,7 +151,7 @@ window.checkDailyStreak = function() {
             if (daysPassed === 1) {
                 streak += 1;
                 buzsuzGun += 1;
-                window.pendingDailyRewardMsg = `Seri ${streak}. gÃ¼n! ${streak * 10} jeton kazandÄ±nÄ±z.`;
+                window.pendingDailyRewardMsg = `Seri ${streak}. gün! ${streak * 10} jeton kazandınız.`;
             } else if (daysPassed > 1) {
                 let daysMissed = daysPassed - 1;
                 let freezeCount = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
@@ -159,15 +159,15 @@ window.checkDailyStreak = function() {
                 if (freezeCount >= daysMissed) {
                     freezeCount -= daysMissed;
                     localStorage.setItem('hafizaGuvenSeriDondurma', freezeCount);
-                    streak += 1; // Seri kurtarÄ±ldÄ±, bugÃ¼nÃ¼n giriÅŸiyle artÄ±yor
-                    buzsuzGun = 1; // Seri dondurma kullanÄ±ldÄ±ÄŸÄ± iÃ§in buzsuz serisi kÄ±rÄ±ldÄ±, bugÃ¼nden baÅŸlar
-                    window.pendingDailyRewardMsg = `${daysMissed} gÃ¼n oyuna girmediniz ancak Seri Dondurma kullanÄ±ldÄ±. Seriniz bozulmadÄ±! GÃ¼ncel seri: ${streak}. gÃ¼n. ${streak * 10} jeton kazandÄ±nÄ±z. Kalan dondurma: ${freezeCount} adet.`;
+                    streak += 1; // Seri kurtarıldı, bugünün girişiyle artıyor
+                    buzsuzGun = 1; // Seri dondurma kullanıldığı için buzsuz serisi kırıldı, bugünden başlar
+                    window.pendingDailyRewardMsg = `${daysMissed} gün oyuna girmediniz ancak Seri Dondurma kullanıldı. Seriniz bozulmadı! Güncel seri: ${streak}. gün. ${streak * 10} jeton kazandınız. Kalan dondurma: ${freezeCount} adet.`;
                 } else {
                     if (freezeCount > 0) {
-                        freezeCount = 0; // Hepsini kullandÄ± ama yetmedi
+                        freezeCount = 0; // Hepsini kullandı ama yetmedi
                         localStorage.setItem('hafizaGuvenSeriDondurma', freezeCount);
                     }
-                    window.pendingDailyRewardMsg = `Maalesef yeterli Seri DondurmanÄ±z olmadÄ±ÄŸÄ± iÃ§in gÃ¼nlÃ¼k seriniz 0'landÄ±! Kaybetmeden Ã¶nce ${streak}. gÃ¼ne ulaÅŸmÄ±ÅŸtÄ±nÄ±z. BugÃ¼nden itibaren seriniz tekrar 1. gÃ¼nden baÅŸlÄ±yor. 10 jeton kazandÄ±nÄ±z.`;
+                    window.pendingDailyRewardMsg = `Maalesef yeterli Seri Dondurmanız olmadığı için günlük seriniz 0'landı! Kaybetmeden önce ${streak}. güne ulaşmıştınız. Bugünden itibaren seriniz tekrar 1. günden başlıyor. 10 jeton kazandınız.`;
                     streak = 1;
                     buzsuzGun = 1;
                 }
@@ -175,41 +175,41 @@ window.checkDailyStreak = function() {
         } else {
             streak = 1;
             buzsuzGun = 1;
-            window.pendingDailyRewardMsg = `Oyuna hoÅŸ geldiniz! Ä°lk gÃ¼nÃ¼nÃ¼z. 10 jeton kazandÄ±nÄ±z.`;
+            window.pendingDailyRewardMsg = `Oyuna hoş geldiniz! İlk gününüz. 10 jeton kazandınız.`;
         }
         
         localStorage.setItem('hafizaGuvenLastLoginDate', todayStr);
         localStorage.setItem('hafizaGuvenLoginStreak', streak);
         localStorage.setItem('hafizaGuvenBuzsuzGun', buzsuzGun);
         
-        // BAÅARI KONTROLÃœ (Buzsuz 3 GÃ¼n)
+        // BAÅARI KONTROLÜ (Buzsuz 3 Gün)
         if (!window.userAchievements) window.userAchievements = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
         if (buzsuzGun >= 3 && !window.userAchievements.buzsuz_3_gun) {
             window.userAchievements.buzsuz_3_gun = true;
             try { localStorage.setItem('hafizaGuvenAchievements', JSON.stringify(window.userAchievements)); } catch(e){}
             setTimeout(() => {
                 if (window.achievementSound) window.achievementSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir BaÅŸarÄ±m KazandÄ±nÄ±z! SadÄ±k Oyuncu: 3 GÃ¼n boyunca seri dondurma kullanmadan oyuna girdiniz.");
+                if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız! Sadık Oyuncu: 3 Gün boyunca seri dondurma kullanmadan oyuna girdiniz.");
                 setTimeout(() => {
-                    if (window.showAchievementModal) window.showAchievementModal("SadÄ±k Oyuncu");
+                    if (window.showAchievementModal) window.showAchievementModal("Sadık Oyuncu");
                 }, 3000);
             }, 6000);
         }
         
         let reward = streak * 10;
-        if (reward > 100) reward = 100; // max 100 jeton (etkinlik hariÃ§)
+        if (reward > 100) reward = 100; // max 100 jeton (etkinlik hariç)
         
         let milestoneReward = 0;
         const currentMilestone = window.milestones.find(m => m.day === streak);
         if (currentMilestone) {
             milestoneReward = currentMilestone.reward;
             reward += milestoneReward;
-            window.pendingDailyRewardMsg += ` Ä°nanÄ±lmaz! ${streak}. gÃ¼n dÃ¶nÃ¼m noktasÄ±na ulaÅŸtÄ±ÄŸÄ±nÄ±z iÃ§in Ã¶zel olarak ${milestoneReward} ekstra jeton BONUS kazandÄ±nÄ±z! Toplam kazanÃ§: ${reward} jeton.`;
+            window.pendingDailyRewardMsg += ` İnanılmaz! ${streak}. gün dönüm noktasına ulaştığınız için özel olarak ${milestoneReward} ekstra jeton BONUS kazandınız! Toplam kazanç: ${reward} jeton.`;
         }
         
         if (window.isWeekendDoubleCoins()) {
             reward *= 2;
-            window.pendingDailyRewardMsg += ` Hafta sonu Ã§ift jeton etkinliÄŸi aktif olduÄŸu iÃ§in kazancÄ±nÄ±z 2'ye katlandÄ± ve ${reward} jeton kazandÄ±nÄ±z!`;
+            window.pendingDailyRewardMsg += ` Hafta sonu çift jeton etkinliği aktif olduğu için kazancınız 2'ye katlandı ve ${reward} jeton kazandınız!`;
         }
         
         let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
@@ -221,44 +221,44 @@ window.checkDailyStreak = function() {
 document.addEventListener('DOMContentLoaded', () => {
     window.checkDailyStreak();
     
-    // GÃ¼ncelleme butonu artÄ±k pasif olduÄŸu iÃ§in tÄ±klama olayÄ± kaldÄ±rÄ±ldÄ±.
+    // Güncelleme butonu artık pasif olduğu için tıklama olayı kaldırıldı.
 });
 
 setTimeout(() => window.guncellemeKontrolEt(false), 2000);
 window.addEventListener('focus', () => window.guncellemeKontrolEt(false));
 setInterval(() => window.guncellemeKontrolEt(false), 30000);
 
-// Klavye komutlarÄ±nÄ± mobil dokunmatik ekran komutlarÄ±na Ã§evir
+// Klavye komutlarını mobil dokunmatik ekran komutlarına çevir
 window.localizeText = function (text) {
     if (!window.isMobileDevice || !text) return text;
     return text
-        .replace(/entÄ±ra veya ekrana Ã§ift dokunun/gi, "ekrana Ã§ift dokunun")
-        .replace(/entÄ±ra veya /gi, "")
-        .replace(/entÄ±ra basÄ±n/gi, "ekrana Ã§ift dokunun")
-        .replace(/enter'a basÄ±n/gi, "ekrana Ã§ift dokunun")
-        .replace(/enter tuÅŸuna basÄ±n/gi, "ekrana Ã§ift dokunun")
-        .replace(/entÄ±r tuÅŸuna basÄ±n/gi, "ekrana Ã§ift dokunun")
-        .replace(/entÄ±r tuÅŸunu kullanabilirsiniz/gi, "ekrana Ã§ift dokunabilirsiniz")
-        .replace(/entÄ±r tuÅŸu ile/gi, "ekrana Ã§ift dokunarak")
-        .replace(/entÄ±r tuÅŸuna bastÄ±ÄŸÄ±nÄ±zda/gi, "ekrana Ã§ift dokunduÄŸunuzda")
-        .replace(/entÄ±ra,/gi, "ekrana Ã§ift dokunarak,")
-        .replace(/entÄ±ra/gi, "ekrana Ã§ift dokunmaya")
-        .replace(/entÄ±r tuÅŸu/gi, "ekrana Ã§ift dokunma")
-        .replace(/entÄ±r/gi, "ekrana Ã§ift dokunmak")
-        .replace(/enter/gi, "ekrana Ã§ift dokunmak")
-        .replace(/saÄŸ ve sol ok tuÅŸlarÄ±na basÄ±n/gi, "parmaÄŸÄ±nÄ±zÄ± saÄŸa veya sola sÃ¼pÃ¼rme hareketi yapÄ±n")
-        .replace(/saÄŸ sol ok tuÅŸlarÄ±na basÄ±n/gi, "parmaÄŸÄ±nÄ±zÄ± saÄŸa veya sola sÃ¼pÃ¼rme hareketi yapÄ±n")
-        .replace(/saÄŸ ve sol ok tuÅŸlarÄ±yla gezinebilirsiniz/gi, "parmaÄŸÄ±nÄ±zÄ± saÄŸa veya sola sÃ¼pÃ¼rerek gezinebilirsiniz")
-        .replace(/saÄŸ ve sol ok tuÅŸlarÄ±yla gezinebilir/gi, "parmaÄŸÄ±nÄ±zÄ± saÄŸa veya sola sÃ¼pÃ¼rerek gezinebilir")
-        .replace(/sayfa yukarÄ± ve sayfa aÅŸaÄŸÄ± tuÅŸuna basÄ±n/gi, "telefonunuzun ses tuÅŸlarÄ±na basÄ±n")
-        .replace(/Page Up ve Page Down tuÅŸlarÄ±yla/gi, "telefonunuzun ses tuÅŸlarÄ±yla")
-        .replace(/m tuÅŸuna basÄ±n/gi, "sessize alma dÃ¼ÄŸmesini kullanÄ±n")
-        .replace(/S tuÅŸu ile skorunuzu, T tuÅŸu ile kalan sÃ¼renizi Ã¶ÄŸrenebilir, boÅŸluk tuÅŸu ile bir saniye ceza karÅŸÄ±lÄ±ÄŸÄ±nda ses dizisini tekrar dinleyebilirsiniz\./gi, "")
-        .replace(/<strong>S tuÅŸu<\/strong> ile skorunuzu, <strong>T tuÅŸu<\/strong> ile kalan sÃ¼renizi Ã¶ÄŸrenebilir, <strong>BoÅŸluk tuÅŸu<\/strong> ile bir saniye ceza karÅŸÄ±lÄ±ÄŸÄ±nda ses dizisini tekrar dinleyebilirsiniz\./gi, "")
-        .replace(/ok tuÅŸlarÄ±nÄ± kullanÄ±n/gi, "parmaÄŸÄ±nÄ±zÄ± saÄŸa veya sola sÃ¼pÃ¼rÃ¼n");
+        .replace(/entıra veya ekrana çift dokunun/gi, "ekrana çift dokunun")
+        .replace(/entıra veya /gi, "")
+        .replace(/entıra basın/gi, "ekrana çift dokunun")
+        .replace(/enter'a basın/gi, "ekrana çift dokunun")
+        .replace(/enter tuşuna basın/gi, "ekrana çift dokunun")
+        .replace(/entır tuşuna basın/gi, "ekrana çift dokunun")
+        .replace(/entır tuşunu kullanabilirsiniz/gi, "ekrana çift dokunabilirsiniz")
+        .replace(/entır tuşu ile/gi, "ekrana çift dokunarak")
+        .replace(/entır tuşuna bastığınızda/gi, "ekrana çift dokunduğunuzda")
+        .replace(/entıra,/gi, "ekrana çift dokunarak,")
+        .replace(/entıra/gi, "ekrana çift dokunmaya")
+        .replace(/entır tuşu/gi, "ekrana çift dokunma")
+        .replace(/entır/gi, "ekrana çift dokunmak")
+        .replace(/enter/gi, "ekrana çift dokunmak")
+        .replace(/sağ ve sol ok tuşlarına basın/gi, "parmağınızı sağa veya sola süpürme hareketi yapın")
+        .replace(/sağ sol ok tuşlarına basın/gi, "parmağınızı sağa veya sola süpürme hareketi yapın")
+        .replace(/sağ ve sol ok tuşlarıyla gezinebilirsiniz/gi, "parmağınızı sağa veya sola süpürerek gezinebilirsiniz")
+        .replace(/sağ ve sol ok tuşlarıyla gezinebilir/gi, "parmağınızı sağa veya sola süpürerek gezinebilir")
+        .replace(/sayfa yukarı ve sayfa aşağı tuşuna basın/gi, "telefonunuzun ses tuşlarına basın")
+        .replace(/Page Up ve Page Down tuşlarıyla/gi, "telefonunuzun ses tuşlarıyla")
+        .replace(/m tuşuna basın/gi, "sessize alma düğmesini kullanın")
+        .replace(/S tuşu ile skorunuzu, T tuşu ile kalan sürenizi öğrenebilir, boşluk tuşu ile bir saniye ceza karşılığında ses dizisini tekrar dinleyebilirsiniz\./gi, "")
+        .replace(/<strong>S tuşu<\/strong> ile skorunuzu, <strong>T tuşu<\/strong> ile kalan sürenizi öğrenebilir, <strong>Boşluk tuşu<\/strong> ile bir saniye ceza karşılığında ses dizisini tekrar dinleyebilirsiniz\./gi, "")
+        .replace(/ok tuşlarını kullanın/gi, "parmağınızı sağa veya sola süpürün");
 };
 
-// TÃ¼m statik Aria Labelleri ve iÃ§erikleri mobil cihazsa Ã§evir
+// Tüm statik Aria Labelleri ve içerikleri mobil cihazsa çevir
 document.addEventListener('DOMContentLoaded', () => {
     if (window.isMobileDevice) {
         document.querySelectorAll('[aria-label]').forEach(el => {
@@ -353,7 +353,7 @@ window.updateMobileKeysVisibility = function () {
     if (window.currentActiveMenu === 'game') {
         if (typeof window.gameIsActive !== 'undefined' && !window.gameIsActive && window.sessionTokens !== undefined) {
             // OYUN BITTI EKRANI (Game Over)
-            // Sadece Oyunu Bitir butonu gÃ¶rÃ¼nmeli
+            // Sadece Oyunu Bitir butonu görünmeli
             if (mobileEnter) mobileEnter.style.display = 'none';
             if (mobileReplay) mobileReplay.style.display = 'none';
             if (desktopExitLi) {
@@ -399,20 +399,20 @@ window.updateMobileStoryKeys = function(isStory) {
 
     if (isStory) {
         keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'Konum'; keys[0].setAttribute('aria-label', 'Konumu Sorgula'); keys[0].disabled = false;
-        keys[1].setAttribute('data-key', 'ArrowLeft'); keys[1].textContent = '< Sol'; keys[1].setAttribute('aria-label', 'Sola YÃ¼rÃ¼'); keys[1].disabled = false;
-        keys[2].setAttribute('data-key', 'ArrowRight'); keys[2].textContent = 'SaÄŸ >'; keys[2].setAttribute('aria-label', 'SaÄŸa YÃ¼rÃ¼'); keys[2].disabled = false;
-        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F Bul'; keys[3].setAttribute('aria-label', 'NotayÄ± Ara veya Al'); keys[3].disabled = false;
+        keys[1].setAttribute('data-key', 'ArrowLeft'); keys[1].textContent = '< Sol'; keys[1].setAttribute('aria-label', 'Sola Yürü'); keys[1].disabled = false;
+        keys[2].setAttribute('data-key', 'ArrowRight'); keys[2].textContent = 'Sağ >'; keys[2].setAttribute('aria-label', 'Sağa Yürü'); keys[2].disabled = false;
+        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F Bul'; keys[3].setAttribute('aria-label', 'Notayı Ara veya Al'); keys[3].disabled = false;
         keys[4].setAttribute('data-key', 'Enter'); keys[4].textContent = 'Onay'; keys[4].setAttribute('aria-label', 'Onay'); keys[4].disabled = false;
-        keys[5].setAttribute('data-key', 't'); keys[5].textContent = 'SÃ¼re'; keys[5].setAttribute('aria-label', 'SÃ¼reyi Sorgula'); keys[5].disabled = false;
-        keys[6].textContent = '---'; keys[6].setAttribute('aria-label', 'Devre DÄ±ÅŸÄ±'); keys[6].disabled = true;
+        keys[5].setAttribute('data-key', 't'); keys[5].textContent = 'Süre'; keys[5].setAttribute('aria-label', 'Süreyi Sorgula'); keys[5].disabled = false;
+        keys[6].textContent = '---'; keys[6].setAttribute('aria-label', 'Devre Dışı'); keys[6].disabled = true;
     } else {
-        keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'C'; keys[0].setAttribute('aria-label', 'C NotasÄ±'); keys[0].disabled = false;
-        keys[1].setAttribute('data-key', 'd'); keys[1].textContent = 'D'; keys[1].setAttribute('aria-label', 'D NotasÄ±'); keys[1].disabled = false;
-        keys[2].setAttribute('data-key', 'e'); keys[2].textContent = 'E'; keys[2].setAttribute('aria-label', 'E NotasÄ±'); keys[2].disabled = false;
-        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F'; keys[3].setAttribute('aria-label', 'F NotasÄ±'); keys[3].disabled = false;
-        keys[4].setAttribute('data-key', 'g'); keys[4].textContent = 'G'; keys[4].setAttribute('aria-label', 'G NotasÄ±'); keys[4].disabled = false;
-        keys[5].setAttribute('data-key', 'a'); keys[5].textContent = 'A'; keys[5].setAttribute('aria-label', 'A NotasÄ±'); keys[5].disabled = false;
-        keys[6].setAttribute('data-key', 'b'); keys[6].textContent = 'B'; keys[6].setAttribute('aria-label', 'B NotasÄ±'); keys[6].disabled = false;
+        keys[0].setAttribute('data-key', 'c'); keys[0].textContent = 'C'; keys[0].setAttribute('aria-label', 'C Notası'); keys[0].disabled = false;
+        keys[1].setAttribute('data-key', 'd'); keys[1].textContent = 'D'; keys[1].setAttribute('aria-label', 'D Notası'); keys[1].disabled = false;
+        keys[2].setAttribute('data-key', 'e'); keys[2].textContent = 'E'; keys[2].setAttribute('aria-label', 'E Notası'); keys[2].disabled = false;
+        keys[3].setAttribute('data-key', 'f'); keys[3].textContent = 'F'; keys[3].setAttribute('aria-label', 'F Notası'); keys[3].disabled = false;
+        keys[4].setAttribute('data-key', 'g'); keys[4].textContent = 'G'; keys[4].setAttribute('aria-label', 'G Notası'); keys[4].disabled = false;
+        keys[5].setAttribute('data-key', 'a'); keys[5].textContent = 'A'; keys[5].setAttribute('aria-label', 'A Notası'); keys[5].disabled = false;
+        keys[6].setAttribute('data-key', 'b'); keys[6].textContent = 'B'; keys[6].setAttribute('aria-label', 'B Notası'); keys[6].disabled = false;
     }
 };
 
@@ -429,13 +429,13 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
 
     window.isMenuTransitioning = true;
     
-    // GÃ¼venlik SubabÄ± (Failsafe): Ne olursa olsun 1.5 saniye sonra geÃ§iÅŸ kilidini aÃ§ (boÅŸa dÃ¼ÅŸmeyi engeller)
+    // Güvenlik Subabı (Failsafe): Ne olursa olsun 1.5 saniye sonra geçiş kilidini aç (boşa düşmeyi engeller)
     if (window.menuFailsafeTimeoutId) clearTimeout(window.menuFailsafeTimeoutId);
     window.menuFailsafeTimeoutId = setTimeout(() => {
         window.isMenuTransitioning = false;
     }, 600);
 
-    // Mobil Geri TuÅŸu KorumasÄ± (Yeni bir alt menÃ¼ye geÃ§iliyorsa History'e ekle)
+    // Mobil Geri Tuşu Koruması (Yeni bir alt menüye geçiliyorsa History'e ekle)
     if (newActiveMenuName !== 'main' && newActiveMenuName !== 'game' && newActiveMenuName !== 'story') {
         history.pushState({ modalOpen: true }, "");
     }
@@ -448,10 +448,10 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
         window.lastFocusedElement = document.activeElement;
     }
 
-    // ARAYÃœZ VE EKRAN OKUYUCU (NVDA) Ã‡AKIÅMA ENGELLEYÄ°CÄ°SÄ°:
-    // Animasyon (300ms) sÃ¼resince NVDA'nÄ±n her iki menÃ¼yÃ¼ de okumasÄ±nÄ± (Ghosting) engellemek iÃ§in anÄ±nda gizleriz.
+    // ARAYÜZ VE EKRAN OKUYUCU (NVDA) ÇAKIÅMA ENGELLEYİCİSİ:
+    // Animasyon (300ms) süresince NVDA'nın her iki menüyü de okumasını (Ghosting) engellemek için anında gizleriz.
     hideMenu.setAttribute('aria-hidden', 'true');
-    hideMenu.setAttribute('inert', ''); // NVDA ve diÄŸer araÃ§larÄ±n iÃ§eriÄŸe eriÅŸimini kÃ¶kÃ¼nden keser
+    hideMenu.setAttribute('inert', ''); // NVDA ve diğer araçların içeriğe erişimini kökünden keser
     
     let oldFocusables = hideMenu.querySelectorAll('button, [tabindex="0"], input, textarea');
     oldFocusables.forEach(el => el.setAttribute('tabindex', '-1'));
@@ -461,7 +461,7 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
     setTimeout(() => {
         hideMenu.style.display = 'none';
         
-        // Sonradan menÃ¼ye dÃ¶nÃ¼ldÃ¼ÄŸÃ¼nde butonlar Ã§alÄ±ÅŸsÄ±n diye geÃ§ici tabindex engelini kaldÄ±rÄ±yoruz
+        // Sonradan menüye dönüldüğünde butonlar çalışsın diye geçici tabindex engelini kaldırıyoruz
         oldFocusables.forEach(el => el.removeAttribute('tabindex'));
 
         showMenu.style.display = 'flex';
@@ -474,21 +474,21 @@ window.switchMenu = function (hideMenu, showMenu, newActiveMenuName) {
             window.updateMobileKeysVisibility();
             window.currentFocusIndex = 0;
             
-            // DoÄŸrudan ilk Ã¶ÄŸeye odaklan, boÅŸluÄŸa veya H1'e dÃ¼ÅŸmeksizin
+            // Doğrudan ilk öğeye odaklan, boşluğa veya H1'e düşmeksizin
             window.menuFocusTimeoutId = setTimeout(() => {
                 if (newActiveMenuName === 'main' && window.lastFocusedElement && document.body.contains(window.lastFocusedElement)) {
                     window.lastFocusedElement.focus();
                     window.lastFocusedElement = null;
                 } else {
                     let focusables = Array.from(showMenu.querySelectorAll('.menu-button, button, [tabindex="0"], input, select, textarea'));
-                    let firstFocusable = focusables.find(el => el.getAttribute('aria-label') !== 'MenÃ¼ sonu, baÅŸa dÃ¶nÃ¼lÃ¼yor' && el.tagName !== 'H1');
+                    let firstFocusable = focusables.find(el => el.getAttribute('aria-label') !== 'Menü sonu, başa dönülüyor' && el.tagName !== 'H1');
                     if (firstFocusable) {
                         firstFocusable.focus();
                     }
                 }
                 window.isMenuTransitioning = false;
 
-                // BUG FIX: Bekleyen GÃ¼ncelleme varsa, ekran geÃ§iÅŸleri bittikten SONRA (Ã§arpÄ±ÅŸma riski olmadan) gÃ¶ster
+                // BUG FIX: Bekleyen Güncelleme varsa, ekran geçişleri bittikten SONRA (çarpışma riski olmadan) göster
                 if (newActiveMenuName === 'main' && window.pendingUpdate === true) {
                     window.pendingUpdate = false;
                     window.guncellemeKontrolEt(false);
@@ -526,19 +526,19 @@ window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReaso
     if(modeData.name === 'Zor') targetTurns = 5;
 
     let statusText = "";
-    if (modeData.name !== 'KayÄ±p Notalar') {
+    if (modeData.name !== 'Kayıp Notalar') {
         if (modeData.completionCount >= targetTurns) {
-            statusText = " (TamamlandÄ±)";
-            unlockedLabel += ". Bu mod uzmanlÄ±ÄŸÄ± tamamlandÄ±.";
+            statusText = " (Tamamlandı)";
+            unlockedLabel += ". Bu mod uzmanlığı tamamlandı.";
         } else {
             let kalan = targetTurns - modeData.completionCount;
             statusText = ` (Tamamlanan: ${modeData.completionCount}, Hedef: ${targetTurns})`;
-            unlockedLabel += `. Oynanan tur: ${modeData.completionCount}. Bir sonraki modu aÃ§mak iÃ§in kalan tur: ${kalan}.`;
+            unlockedLabel += `. Oynanan tur: ${modeData.completionCount}. Bir sonraki modu açmak için kalan tur: ${kalan}.`;
         }
     } else {
         if (modeData.completionCount > 0) {
             statusText = ` (Tamamlanan: ${modeData.completionCount})`;
-            unlockedLabel += `. Bu modu ${modeData.completionCount} kez tamamladÄ±nÄ±z.`;
+            unlockedLabel += `. Bu modu ${modeData.completionCount} kez tamamladınız.`;
         }
     }
 
@@ -552,7 +552,7 @@ window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReaso
         btnElement.classList.add('locked-btn');
         const displayName = modeData.name === "Hayatta Kalma" ? modeData.name : modeData.name + " Mod";
         btnElement.innerHTML = displayName + " ğŸ”’";
-        btnElement.setAttribute('aria-label', `${modeData.name} modu kilitli. AÃ§mak iÃ§in ${lockReason}.`);
+        btnElement.setAttribute('aria-label', `${modeData.name} modu kilitli. Açmak için ${lockReason}.`);
     }
 };
 
@@ -576,16 +576,16 @@ window.updateScoreboardLocks = function () {
     const btnMissingNotes = document.getElementById('btn-score-missing-notes');
     const btnRhythmScore = document.getElementById('btn-score-rhythm');
 
-    window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta moddaki en yÃ¼ksek skoru gÃ¶rÃ¼ntÃ¼le", "Kolay modu 5 kez tamamla");
-    window.updateButtonUI(btnHard, window.gameModes.hard, "Zor moddaki yÃ¼ksek skoru gÃ¶rÃ¼ntÃ¼le", "Orta modu 5 kez tamamla");
-    window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "KayÄ±p notalar modu iÃ§in yÃ¼ksek skoru gÃ¶rÃ¼ntÃ¼le", "Zor modu 5 kez tamamla");
-    if (btnRhythmScore) window.updateButtonUI(btnRhythmScore, window.gameModes.rhythm_mode, "Ritim AvcÄ±sÄ± iÃ§in yÃ¼ksek skoru gÃ¶rÃ¼ntÃ¼le", "KayÄ±p Notalar modunu tamamla");
+    window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta moddaki en yüksek skoru görüntüle", "Kolay modu 5 kez tamamla");
+    window.updateButtonUI(btnHard, window.gameModes.hard, "Zor moddaki yüksek skoru görüntüle", "Orta modu 5 kez tamamla");
+    window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp notalar modu için yüksek skoru görüntüle", "Zor modu 5 kez tamamla");
+    if (btnRhythmScore) window.updateButtonUI(btnRhythmScore, window.gameModes.rhythm_mode, "Ritim Avcısı için yüksek skoru görüntüle", "Kayıp Notalar modunu tamamla");
 };
 
 window.updateDifficultyMenuLocks = function () {
     if (!window.gameModes) return;
 
-    // AÃ§Ä±lma koÅŸullarÄ±nÄ± scoreboard gÃ¼ncellemesinde olduÄŸu gibi kontrol et
+    // Açılma koşullarını scoreboard güncellemesinde olduğu gibi kontrol et
     if (window.gameModes.easy.completionCount >= window.gameModes.medium.requiredToUnlock) {
         window.gameModes.medium.isUnlocked = true;
     }
@@ -615,8 +615,8 @@ window.updateDifficultyMenuLocks = function () {
     if (btnEasy) window.updateButtonUI(btnEasy, window.gameModes.easy, "Kolay Modu Oyna", "");
     window.updateButtonUI(btnMedium, window.gameModes.medium, "Orta Modu Oyna", "Kolay modu 5 kez tamamla");
     window.updateButtonUI(btnHard, window.gameModes.hard, "Zor Modu Oyna", "Orta modu 5 kez tamamla");
-    window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "KayÄ±p Notalar Modu. Hikayeli piyano modu.", "Zor modu 5 kez tamamla");
-    if (btnRhythm) window.updateButtonUI(btnRhythm, window.gameModes.rhythm_mode, "Ritim AvcÄ±sÄ± Oyna. Metronom eÅŸliÄŸinde Ã§al.", "KayÄ±p Notalar modunu tamamla");
+    window.updateButtonUI(btnMissingNotes, window.gameModes.missing_notes, "Kayıp Notalar Modu. Hikayeli piyano modu.", "Zor modu 5 kez tamamla");
+    if (btnRhythm) window.updateButtonUI(btnRhythm, window.gameModes.rhythm_mode, "Ritim Avcısı Oyna. Metronom eşliğinde çal.", "Kayıp Notalar modunu tamamla");
 };
 
 window.updateStatsDisplay = function() {
@@ -642,7 +642,7 @@ window.updateStatsDisplay = function() {
     let milestoneHtml = "";
     if (nextM) {
         let diff = nextM.day - streakCount;
-        milestoneHtml = `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #ffb703; font-weight: bold;" aria-label="Sonraki dÃ¶nÃ¼m noktasÄ±na ${diff} gÃ¼n kaldÄ±. Hedef: ${nextM.day}. gÃ¼n. Ã–dÃ¼l: ${nextM.reward} Jeton">Hedef: ${nextM.day}. gÃ¼n! Kalan: ${diff} gÃ¼n. (Ã–dÃ¼l: ${nextM.reward} Jeton)</li>`;
+        milestoneHtml = `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #ffb703; font-weight: bold;" aria-label="Sonraki dönüm noktasına ${diff} gün kaldı. Hedef: ${nextM.day}. gün. Ödül: ${nextM.reward} Jeton">Hedef: ${nextM.day}. gün! Kalan: ${diff} gün. (Ödül: ${nextM.reward} Jeton)</li>`;
     }
 
     let achievementsHtml = "";
@@ -670,27 +670,27 @@ window.updateStatsDisplay = function() {
 
     let html = "";
     if (tokens === 0 && hk === 0 && zk === 0 && easyCount === 0 && mediumCount === 0 && hardCount === 0 && storyCount === 0 && earnedAch.length === 0) {
-        html = '<div id="empty-stats-alert" tabindex="0" role="textbox" aria-readonly="true" aria-label="Ä°statistik sekmesi boÅŸ. HiÃ§ bir istatistiÄŸe sahip deÄŸilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boÅŸ. Ä°statistik bulunamadÄ±.</div>';
+        html = '<div id="empty-stats-alert" tabindex="0" role="textbox" aria-readonly="true" aria-label="İstatistik sekmesi boş. Hiç bir istatistiğe sahip değilsiniz." style="color: #ff4444; font-weight: bold; margin-top: 10px; padding: 15px; border: 2px solid #ff4444; border-radius: 8px; text-align: center; background: rgba(255,68,68,0.1);">Bu sekme boş. İstatistik bulunamadı.</div>';
         if (window.announceToScreenReader && window.currentActiveMenu === 'stats') {
-            setTimeout(() => window.announceToScreenReader("Bu sekme boÅŸ. HenÃ¼z hiÃ§ bir istatistiÄŸiniz bulunmuyor."), 300);
+            setTimeout(() => window.announceToScreenReader("Bu sekme boş. Henüz hiç bir istatistiğiniz bulunmuyor."), 300);
         }
     } else {
         html = `
             <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;" class="stats-list">
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Bakiye: ${tokens} Jeton">Bakiye: ${tokens} Jeton</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="GÃ¼nlÃ¼k Seri Takvimi: ${streakCount} GÃ¼n">GÃ¼nlÃ¼k Seri (Takvim): ${streakCount} GÃ¼n</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Günlük Seri Takvimi: ${streakCount} Gün">Günlük Seri (Takvim): ${streakCount} Gün</li>
                 ${milestoneHtml}
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Seri Dondurma: ${sdCount} adet">Seri Dondurma: ${sdCount} adet</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Hata KorumasÄ±: ${hk} adet">Hata KorumasÄ±: ${hk} adet</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Zaman KorumasÄ±: ${zk} adet">Zaman KorumasÄ±: ${zk} adet</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Kolay Mod: ${easyCount} kez tamamlandÄ±">Kolay Mod: ${easyCount} kez tamamlandÄ±</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Orta Mod: ${mediumCount} kez tamamlandÄ±">Orta Mod: ${mediumCount} kez tamamlandÄ±</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Zor Mod: ${hardCount} kez tamamlandÄ±">Zor Mod: ${hardCount} kez tamamlandÄ±</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="KayÄ±p Notalar: ${storyCount} kez tamamlandÄ±">KayÄ±p Notalar: ${storyCount} kez tamamlandÄ±</li>
-                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Ritim AvcÄ±sÄ±: En YÃ¼ksek Seviye ${rhythmCount}">Ritim AvcÄ±sÄ±: En YÃ¼ksek Seviye ${rhythmCount}</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Hata Koruması: ${hk} adet">Hata Koruması: ${hk} adet</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Zaman Koruması: ${zk} adet">Zaman Koruması: ${zk} adet</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Kolay Mod: ${easyCount} kez tamamlandı">Kolay Mod: ${easyCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Orta Mod: ${mediumCount} kez tamamlandı">Orta Mod: ${mediumCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Zor Mod: ${hardCount} kez tamamlandı">Zor Mod: ${hardCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Kayıp Notalar: ${storyCount} kez tamamlandı">Kayıp Notalar: ${storyCount} kez tamamlandı</li>
+                <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Ritim Avcısı: En Yüksek Seviye ${rhythmCount}">Ritim Avcısı: En Yüksek Seviye ${rhythmCount}</li>
                 ${achievementsHtml}
                 <li style="margin-top: 15px;">
-                    <button class="menu-button stat-copy-btn" aria-label="Ä°statistiklerimi Kopyala">Ä°statistiklerimi Kopyala</button>
+                    <button class="menu-button stat-copy-btn" aria-label="İstatistiklerimi Kopyala">İstatistiklerimi Kopyala</button>
                 </li>
             </ul>
         `;
@@ -702,28 +702,28 @@ window.updateStatsDisplay = function() {
     if (statsContent) statsContent.innerHTML = html;
     if (profileStatsContent) profileStatsContent.innerHTML = html;
     
-    // Kopyalama butonu iÅŸlevini ata
+    // Kopyalama butonu işlevini ata
     document.querySelectorAll('.stat-copy-btn').forEach(btn => {
         btn.onclick = function() {
-            let copyText = `HafÄ±zana GÃ¼ven - Oyuncu Ä°statistikleri\r\nBakiye: ${tokens} Jeton\r\nGÃ¼nlÃ¼k Seri: ${streakCount} GÃ¼n\r\nSeri Dondurma: ${sdCount}\r\nHata KorumasÄ±: ${hk}\r\nZaman KorumasÄ±: ${zk}\r\nKolay: ${easyCount}\r\nOrta: ${mediumCount}\r\nZor: ${hardCount}\r\nKayÄ±p Notalar: ${storyCount}\r\nRitim AvcÄ±sÄ±: En YÃ¼ksek Seviye ${rhythmCount}`;
+            let copyText = `Hafızana Güven - Oyuncu İstatistikleri\r\nBakiye: ${tokens} Jeton\r\nGünlük Seri: ${streakCount} Gün\r\nSeri Dondurma: ${sdCount}\r\nHata Koruması: ${hk}\r\nZaman Koruması: ${zk}\r\nKolay: ${easyCount}\r\nOrta: ${mediumCount}\r\nZor: ${hardCount}\r\nKayıp Notalar: ${storyCount}\r\nRitim Avcısı: En Yüksek Seviye ${rhythmCount}`;
             navigator.clipboard.writeText(copyText).then(() => {
-                if (window.announceToScreenReader) window.announceToScreenReader("Ä°statistikleriniz panoya kopyalandÄ±.", true);
+                if (window.announceToScreenReader) window.announceToScreenReader("İstatistikleriniz panoya kopyalandı.", true);
                 if (window.correctSound) window.correctSound.play();
             }).catch(() => {
-                if (window.announceToScreenReader) window.announceToScreenReader("Kopyalama baÅŸarÄ±sÄ±z oldu.", true);
+                if (window.announceToScreenReader) window.announceToScreenReader("Kopyalama başarısız oldu.", true);
                 if (window.wrongSound) window.wrongSound.play();
             });
         };
     });
 };
 
-// --- PRESENCE (VARLIK) & SOSYAL LÄ°STE SÄ°STEMÄ° ---
+// --- PRESENCE (VARLIK) & SOSYAL LİSTE SİSTEMİ ---
 window.initPresenceSystem = function() {
     const checkDb = setInterval(() => {
         if (window.db) {
             clearInterval(checkDb);
 
-            // --- GeliÅŸtirici Bilet (Geri Bildirim) Bildirimleri ---
+            // --- Geliştirici Bilet (Geri Bildirim) Bildirimleri ---
             let devNameForTickets = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "";
             if (['ekrem'].includes(devNameForTickets.toLowerCase())) {
                 let isInitialFbLoad = true;
@@ -731,7 +731,7 @@ window.initPresenceSystem = function() {
                     if (!isInitialFbLoad) {
                         let fb = snapshot.val();
                         if (window.startAdminAlert) window.startAdminAlert('ticket');
-                        let msg = `YENÄ° BÄ°LET GELDÄ°! GÃ¶nderen: ${fb.name || fb.nickname || "Bilinmiyor"}. Okumak iÃ§in sohbete /bilet yazÄ±n.`;
+                        let msg = `YENİ BİLET GELDİ! Gönderen: ${fb.name || fb.nickname || "Bilinmiyor"}. Okumak için sohbete /bilet yazın.`;
                         if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                         if (window.showToastNotification) window.showToastNotification(msg, "warning");
                     }
@@ -743,7 +743,7 @@ window.initPresenceSystem = function() {
                         let totalTickets = snapshot.numChildren();
                         setTimeout(() => {
                             if (window.startAdminAlert) window.startAdminAlert('ticket');
-                            let msg = `Sistemde bekleyen ${totalTickets} adet aÃ§Ä±k bilet (geri bildirim) var. Ä°ncelemek iÃ§in sohbete /bilet yazÄ±n.`;
+                            let msg = `Sistemde bekleyen ${totalTickets} adet açık bilet (geri bildirim) var. İncelemek için sohbete /bilet yazın.`;
                             if (window.announceToScreenReader) window.announceToScreenReader(msg, false);
                             if (window.showToastNotification) window.showToastNotification(msg, "info");
                         }, 6000);
@@ -769,7 +769,7 @@ window.initPresenceSystem = function() {
                 
                 if (snap.val() === true) {
                     if (wasConnected === false && initialConnectionDone) {
-                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucuya yeniden baÄŸlandÄ±.", true);
+                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucuya yeniden bağlandı.", true);
                     }
                     wasConnected = true;
                     initialConnectionDone = true;
@@ -786,7 +786,7 @@ window.initPresenceSystem = function() {
                     });
                 } else {
                     if (wasConnected) {
-                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucu baÄŸlantÄ±nÄ±z kesildi.", true);
+                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucu bağlantınız kesildi.", true);
                         wasConnected = false;
                     }
                 }
@@ -817,23 +817,23 @@ window.initPresenceSystem = function() {
                         let newP = newData[k];
                         let oldP = oldData[k];
                         if (newP.name && newP.name !== myName && newP.name !== "Misafir") {
-                            // Spam KorumasÄ±: Sadece son 15 saniye iÃ§indeki olaylarÄ± anons et (Oyuna ilk giriÅŸteki birikmiÅŸ spam mesajlarÄ±nÄ± engeller)
+                            // Spam Koruması: Sadece son 15 saniye içindeki olayları anons et (Oyuna ilk girişteki birikmiş spam mesajlarını engeller)
                             let isRecent = newP.last_changed ? (currentServerTime - newP.last_changed < 15000) : false;
                             let disableOnlineStatus = localStorage.getItem('hafizaGuvenDisableOnlineStatus') === 'true';
                             
                             if (isRecent && !disableOnlineStatus) {
                                 if (newP.state === 'online' && (!oldP || oldP.state !== 'online')) {
                                     if (window.playerOnlineSound) window.playerOnlineSound.play();
-                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} Ã§evrimiÃ§i.`);
-                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} Ã§evrimiÃ§i.`, 'info');
+                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimiçi.`);
+                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimiçi.`, 'info');
                                 } else if (newP.state === 'offline' && (oldP && oldP.state === 'online')) {
                                     if (window.playerOfflineSound) window.playerOfflineSound.play();
-                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} Ã§evrimdÄ±ÅŸÄ±.`);
-                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} Ã§evrimdÄ±ÅŸÄ±.`, 'info');
+                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimdışı.`);
+                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimdışı.`, 'info');
                                 } else if (newP.state === 'disconnected' && (oldP && oldP.state === 'online')) {
                                     if (window.serverDisconnectSound) window.serverDisconnectSound.play();
-                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} baÄŸlantÄ±sÄ± koptu.`);
-                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} baÄŸlantÄ±sÄ± koptu.`, 'warning');
+                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} bağlantısı koptu.`);
+                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} bağlantısı koptu.`, 'warning');
                                 }
                             }
                         }
@@ -843,8 +843,8 @@ window.initPresenceSystem = function() {
                             let disableOnlineStatus = localStorage.getItem('hafizaGuvenDisableOnlineStatus') === 'true';
                             if (!disableOnlineStatus) {
                                 if (window.serverDisconnectSound) window.serverDisconnectSound.play();
-                                if (window.announceToScreenReader) window.announceToScreenReader(`${oldData[k].name} baÄŸlantÄ±sÄ± koptu.`);
-                                if (window.showToastNotification) window.showToastNotification(`${oldData[k].name} baÄŸlantÄ±sÄ± koptu.`, 'warning');
+                                if (window.announceToScreenReader) window.announceToScreenReader(`${oldData[k].name} bağlantısı koptu.`);
+                                if (window.showToastNotification) window.showToastNotification(`${oldData[k].name} bağlantısı koptu.`, 'warning');
                             }
                         }
                     }
@@ -867,7 +867,7 @@ window.renderSocialList = function() {
 
     let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
 
-    const emptyHtml = '<li tabindex="0" aria-label="Senden baÅŸka kimse yok.">Senden baÅŸka kimse yok.</li>';
+    const emptyHtml = '<li tabindex="0" aria-label="Senden başka kimse yok.">Senden başka kimse yok.</li>';
 
     if (!window.lastPresenceData || Object.keys(window.lastPresenceData).length === 0) {
         listEl.innerHTML = '';
@@ -877,13 +877,13 @@ window.renderSocialList = function() {
         let meCount = (myName !== "Misafir" && myName.trim() !== "") ? 1 : 0;
         
         if (titleEl) {
-            titleEl.innerText = `Sosyal (${meCount} KiÅŸi Ã‡evrimiÃ§i)`;
-            titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menÃ¼sÃ¼. Åuan toplam ${meCount} kiÅŸi Ã§evrimiÃ§i. YÃ¶n tuÅŸlarÄ±yla gezinebilirsiniz.`);
+            titleEl.innerText = `Sosyal (${meCount} Kişi Çevrimiçi)`;
+            titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Åuan toplam ${meCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
         }
         
         if (navBtnSocial) {
             navBtnSocial.innerText = `Sosyal (${meCount})`;
-            navBtnSocial.setAttribute('aria-label', `Sosyal MenÃ¼. ${meCount} kiÅŸi Ã§evrimiÃ§i.`);
+            navBtnSocial.setAttribute('aria-label', `Sosyal Menü. ${meCount} kişi çevrimiçi.`);
         }
 
         if (myName !== "Misafir" && myName.trim() !== "") {
@@ -896,9 +896,9 @@ window.renderSocialList = function() {
             meLi.style.display = "flex";
             meLi.style.justifyContent = "space-between";
             meLi.style.alignItems = "center";
-            meLi.setAttribute('aria-label', `Sadece sen varsÄ±n. ${myName} olarak Ã§evrimiÃ§isin.`);
+            meLi.setAttribute('aria-label', `Sadece sen varsın. ${myName} olarak çevrimiçisin.`);
             meLi.setAttribute('tabindex', '0');
-            meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Ã‡evrimiÃ§i</span>`;
+            meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Çevrimiçi</span>`;
             listEl.appendChild(meLi);
         } else {
             listEl.innerHTML = emptyHtml;
@@ -915,13 +915,13 @@ window.renderSocialList = function() {
     if (myName !== "Misafir" && myName.trim() !== "") totalCount += 1;
 
     if (titleEl) {
-        titleEl.innerText = `Sosyal (${totalCount} KiÅŸi Ã‡evrimiÃ§i)`;
-        titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menÃ¼sÃ¼. Åuan toplam ${totalCount} kiÅŸi Ã§evrimiÃ§i. YÃ¶n tuÅŸlarÄ±yla gezinebilirsiniz.`);
+        titleEl.innerText = `Sosyal (${totalCount} Kişi Çevrimiçi)`;
+        titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Åuan toplam ${totalCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
     }
     
     if (navBtnSocial) {
         navBtnSocial.innerText = `Sosyal (${totalCount})`;
-        navBtnSocial.setAttribute('aria-label', `Sosyal MenÃ¼. ${totalCount} kiÅŸi Ã§evrimiÃ§i.`);
+        navBtnSocial.setAttribute('aria-label', `Sosyal Menü. ${totalCount} kişi çevrimiçi.`);
     }
 
     if (players.length === 0) {
@@ -937,7 +937,7 @@ window.renderSocialList = function() {
 
     listEl.innerHTML = '';
     
-    // KullanÄ±cÄ±nÄ±n kendisini HER ZAMAN listenin en baÅŸÄ±na ekle
+    // Kullanıcının kendisini HER ZAMAN listenin en başına ekle
     if (myName !== "Misafir" && myName.trim() !== "") {
         let meLi = document.createElement('li');
         meLi.style.padding = "10px";
@@ -948,16 +948,16 @@ window.renderSocialList = function() {
         meLi.style.display = "flex";
         meLi.style.justifyContent = "space-between";
         meLi.style.alignItems = "center";
-        meLi.setAttribute('aria-label', `Sen. ${myName} olarak Ã§evrimiÃ§isin.`);
+        meLi.setAttribute('aria-label', `Sen. ${myName} olarak çevrimiçisin.`);
         meLi.setAttribute('tabindex', '0');
-        meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Ã‡evrimiÃ§i</span>`;
+        meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Çevrimiçi</span>`;
         listEl.appendChild(meLi);
     }
     
     let foundAny = false;
 
     players.forEach(p => {
-        if (!p.name || p.name === myName) return; // Kendini listede gÃ¶sterme
+        if (!p.name || p.name === myName) return; // Kendini listede gösterme
         foundAny = true;
         let isOnline = (p.state === 'online');
         
@@ -981,9 +981,9 @@ window.renderSocialList = function() {
         statusSpan.style.fontSize = "0.9rem";
         statusSpan.style.fontWeight = "bold";
         statusSpan.style.color = isOnline ? "#00a884" : "#888888";
-        statusSpan.innerText = isOnline ? "Ã‡evrimiÃ§i" : "Ã‡evrimdÄ±ÅŸÄ±";
+        statusSpan.innerText = isOnline ? "Çevrimiçi" : "Çevrimdışı";
 
-        li.setAttribute('aria-label', `${p.name} kullanÄ±cÄ±sÄ± ÅŸuan ${isOnline ? "Ã§evrimiÃ§i" : "Ã§evrimdÄ±ÅŸÄ±"}. Ä°ÅŸlem yapmak iÃ§in tÄ±klayÄ±n veya Enter'a basÄ±n.`);
+        li.setAttribute('aria-label', `${p.name} kullanıcısı şuan ${isOnline ? "çevrimiçi" : "çevrimdışı"}. İşlem yapmak için tıklayın veya Enter'a basın.`);
         li.setAttribute('tabindex', '0');
 
         const triggerAction = () => {
@@ -1016,21 +1016,21 @@ if (document.readyState === 'loading') {
 
 // --- EVENTS ---
 document.addEventListener('DOMContentLoaded', () => {
-    // --- EriÅŸilebilirlik (ARIA) Dinamik EnjektÃ¶rÃ¼ (Sessiz Semantik / Role Gizleme) ---
-    // KullanÄ±cÄ± talebi: bÃ¶lÃ¼m, bÃ¶lge, dÃ¼ÄŸme, grup gibi element rollerinin okunmamasÄ±.
+    // --- Erişilebilirlik (ARIA) Dinamik Enjektörü (Sessiz Semantik / Role Gizleme) ---
+    // Kullanıcı talebi: bölüm, bölge, düğme, grup gibi element rollerinin okunmaması.
     const applySilentRoles = (root) => {
         const elementsToNone = root.querySelectorAll ? root.querySelectorAll('.menu-container, nav, section, ul, div[role="group"], div[role="region"], div[role="presentation"], h1, h2, h3, h4, h5, h6') : [];
         elementsToNone.forEach(el => el.setAttribute('role', 'none'));
 
-        // YalnÄ±zca tabindex'i olmayan li elemanlarÄ±nÄ±n rolÃ¼nÃ¼ none yap.
+        // Yalnızca tabindex'i olmayan li elemanlarının rolünü none yap.
         const nonInteractiveLis = root.querySelectorAll ? root.querySelectorAll('li:not([tabindex="0"])') : [];
         nonInteractiveLis.forEach(el => el.setAttribute('role', 'none'));
 
-        // NVDA'nÄ±n makale okur gibi takÄ±lmamasÄ± iÃ§in etkileÅŸimli her Ã¶ÄŸeye buton maskesi tak
+        // NVDA'nın makale okur gibi takılmaması için etkileşimli her öğeye buton maskesi tak
         const buttonsToSilence = root.querySelectorAll ? root.querySelectorAll('button, .menu-button, .mobile-piano-key, [role="button"], li[tabindex="0"], div[tabindex="0"]') : [];
         buttonsToSilence.forEach(btn => {
             btn.setAttribute('role', 'button');
-            btn.setAttribute('aria-roledescription', '\xA0'); // BoÅŸluk karakteri, NVDA sessiz okur
+            btn.setAttribute('aria-roledescription', '\xA0'); // Boşluk karakteri, NVDA sessiz okur
         });
 
         const dialogs = root.querySelectorAll ? root.querySelectorAll('[role="dialog"]') : [];
@@ -1039,7 +1039,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     applySilentRoles(document);
     
-    // Sonradan yÃ¼klenen (dinamik) Ã¶ÄŸeler iÃ§in kalkan
+    // Sonradan yüklenen (dinamik) öğeler için kalkan
     const silentObserver = new MutationObserver(mutations => {
         mutations.forEach(m => {
             if (m.addedNodes.length) {
@@ -1129,7 +1129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // MenÃ¼ ButonlarÄ± BaÄŸlantÄ±larÄ±
+    // Menü Butonları Bağlantıları
     const scoreboardBtnMain = document.getElementById('scoreboard-btn-main');
     const scoreboardBackBtn = document.getElementById('scoreboard-back-btn');
     const practiceBtnMain = document.getElementById('practice-mode-btn');
@@ -1159,9 +1159,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnRestartGame) {
         btnRestartGame.addEventListener('click', () => {
             if (window.menuEnterSound) window.menuEnterSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader("Oyun yeniden baÅŸlatÄ±lÄ±yor, lÃ¼tfen bekleyin...");
+            if (window.announceToScreenReader) window.announceToScreenReader("Oyun yeniden başlatılıyor, lütfen bekleyin...");
             
-            // Arka plan kullanÄ±cÄ± verilerini (sessionStorage ve cache) temizle, oyuncu verilerini (localStorage) KORU.
+            // Arka plan kullanıcı verilerini (sessionStorage ve cache) temizle, oyuncu verilerini (localStorage) KORU.
             sessionStorage.clear();
             
             if ('caches' in window) {
@@ -1191,15 +1191,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btnChangeInst) {
             let instMap = {
                 'piano': 'Piyano',
-                'baglama': 'BaÄŸlama',
+                'baglama': 'Bağlama',
                 'kaval': 'Kaval',
-                'flut': 'FlÃ¼t',
+                'flut': 'Flüt',
                 'kanun': 'Kanun'
             };
             let curr = window.activeInstrument || localStorage.getItem('hafizaGuvenInstrument') || 'piano';
             let n = instMap[curr] || 'Piyano';
-            btnChangeInst.innerText = "Ses Paketini DeÄŸiÅŸtir (" + n + ")";
-            btnChangeInst.setAttribute('aria-label', "Ses paketini deÄŸiÅŸtirmek iÃ§in tÄ±klayÄ±n. GeÃ§erli paket: " + n);
+            btnChangeInst.innerText = "Ses Paketini Değiştir (" + n + ")";
+            btnChangeInst.setAttribute('aria-label', "Ses paketini değiştirmek için tıklayın. Geçerli paket: " + n);
             
             let packsUnlocked = localStorage.getItem('hafizaGuvenSoundPacksUnlocked') === 'true';
             
@@ -1232,7 +1232,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('hafizaGuvenInstrument', nextInst);
             window.activeInstrument = nextInst;
             
-            // Yeni seÃ§ilen ses paketinin arka plan mÃ¼ziÄŸine kullanÄ±cÄ±nÄ±n ses seviyesini uygula
+            // Yeni seçilen ses paketinin arka plan müziğine kullanıcının ses seviyesini uygula
             if (window.setMusicVolume) {
                 let savedVol = localStorage.getItem('hafizaGuvenMusicVolume');
                 if (savedVol !== null) {
@@ -1248,18 +1248,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const updateStoreBtn = (id, key, inst, instName) => {
                 const b = document.getElementById(id);
                 if (b && localStorage.getItem(key) === 'true') {
-                    b.innerText = (nextInst === inst) ? (instName + " Ses Paketini Kapat") : (instName + " Ses Paketini EtkinleÅŸtir");
-                    b.setAttribute('aria-label', instName + " Ses Paketi. " + ((nextInst === inst) ? "Kapatmak" : "EtkinleÅŸtirmek") + " iÃ§in tÄ±klayÄ±n.");
+                    b.innerText = (nextInst === inst) ? (instName + " Ses Paketini Kapat") : (instName + " Ses Paketini Etkinleştir");
+                    b.setAttribute('aria-label', instName + " Ses Paketi. " + ((nextInst === inst) ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 }
             };
             
-            updateStoreBtn('buy-baglama-pack-btn', 'hafizaGuvenBaglamaPack', 'baglama', 'BaÄŸlama');
+            updateStoreBtn('buy-baglama-pack-btn', 'hafizaGuvenBaglamaPack', 'baglama', 'Bağlama');
             updateStoreBtn('buy-kaval-pack-btn', 'hafizaGuvenKavalPack', 'kaval', 'Kaval');
-            updateStoreBtn('buy-flut-pack-btn', 'hafizaGuvenFlutPack', 'flut', 'FlÃ¼t');
+            updateStoreBtn('buy-flut-pack-btn', 'hafizaGuvenFlutPack', 'flut', 'Flüt');
             updateStoreBtn('buy-kanun-pack-btn', 'hafizaGuvenKanunPack', 'kanun', 'Kanun');
 
             if (window.menuEnterSound) window.menuEnterSound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader("Ses paketi deÄŸiÅŸtirildi. " + n + " aktif.");
+            if (window.announceToScreenReader) window.announceToScreenReader("Ses paketi değiştirildi. " + n + " aktif.");
         });
     }
 
@@ -1280,7 +1280,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.secons2Sound && window.secons2Sound.playing()) window.secons2Sound.stop();
             if (window.music60Sound && window.music60Sound.playing()) window.music60Sound.stop();
 
-            // Multiplayer modundan Ã§Ä±kÄ±lÄ±yorsa sunucudan kop (varsa)
+            // Multiplayer modundan çıkılıyorsa sunucudan kop (varsa)
             if (window.isMultiplayerGame && typeof window.quitMultiplayerMatch === 'function') {
                 window.quitMultiplayerMatch();
             }
@@ -1320,7 +1320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnDiffMissingNotes = document.getElementById('btn-diff-missing-notes');
     const difficultyBackBtn = document.getElementById('difficulty-back-btn');
 
-    // "KayÄ±tlÄ± Oyundan Devam Et"
+    // "Kayıtlı Oyundan Devam Et"
     if (btnContinueSaved) {
         btnContinueSaved.addEventListener('click', () => {
             if (window.populateSavedGamesList) window.populateSavedGamesList();
@@ -1361,7 +1361,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Sunucu MesajÄ± Devam Et Butonu
+    // Sunucu Mesajı Devam Et Butonu
     if (serverMessageContinueBtn) {
         serverMessageContinueBtn.addEventListener('click', () => {
             if (window.globalChangelogVersion) {
@@ -1387,8 +1387,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.menuCloseSound) window.menuCloseSound.play();
             window.isStarted = true;
             
-            localStorage.setItem('hafizaGuvenFirstTime_v2', 'false'); // Ä°ÅŸaretle
-            window.firstTimeMusic = true; // MÃ¼ziÄŸin kesilmesini engelle
+            localStorage.setItem('hafizaGuvenFirstTime_v2', 'false'); // İşaretle
+            window.firstTimeMusic = true; // Müziğin kesilmesini engelle
             
             window.switchMenu(window.firstTimeTutorialMenu, window.practiceMenu, 'practice');
             if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.pause();
@@ -1410,27 +1410,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // GÃ¼ncelleme YÃ¼kle Butonu
+    // Güncelleme Yükle Butonu
     const updateInstallBtn = document.getElementById('update-install-btn');
     if (updateInstallBtn) {
         updateInstallBtn.addEventListener('click', () => {
             if (updateInstallBtn.disabled) return;
             updateInstallBtn.disabled = true;
-            if (window.announceToScreenReader) window.announceToScreenReader("GÃ¼ncelleme yÃ¼kleniyor, sayfa yenilenecek...", true);
+            if (window.announceToScreenReader) window.announceToScreenReader("Güncelleme yükleniyor, sayfa yenilenecek...", true);
             setTimeout(() => {
                 window.location.reload(true);
             }, 1000);
         });
     }
 
-    // Ä°statistikler MenÃ¼sÃ¼ Kontrolleri
+    // İstatistikler Menüsü Kontrolleri
     if (statsBtnMain) {
         statsBtnMain.addEventListener('click', () => {
             if (window.menuEnterSound) window.menuEnterSound.play();
             if (window.updateStatsDisplay) window.updateStatsDisplay();
             if (window.switchMenu && window.mainMenu && window.statsMenu) {
                 window.switchMenu(window.mainMenu, window.statsMenu, 'stats');
-                if (window.announceToScreenReader) window.announceToScreenReader("Ä°statistikler menÃ¼sÃ¼");
+                if (window.announceToScreenReader) window.announceToScreenReader("İstatistikler menüsü");
             }
         });
     }
@@ -1444,7 +1444,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Mobil alt menÃ¼ (Tab bar) Event Listeners
+    // Mobil alt menü (Tab bar) Event Listeners
     const btnHome = document.getElementById('nav-btn-home');
     const btnSocial = document.getElementById('nav-btn-social');
     const btnProfile = document.getElementById('nav-btn-profile');
@@ -1476,7 +1476,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.switchMenu(getMenuEl(window.currentActiveMenu), window.mainMenu, 'main');
                 updateActiveTab('nav-btn-home');
                 if (window.menuCloseSound) window.menuCloseSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("Ana menÃ¼");
+                if (window.announceToScreenReader) window.announceToScreenReader("Ana menü");
             }
         });
     }
@@ -1492,7 +1492,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateActiveTab('nav-btn-social');
                 if (window.renderSocialList) window.renderSocialList();
                 if (window.menuEnterSound) window.menuEnterSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("Sosyal menÃ¼sÃ¼");
+                if (window.announceToScreenReader) window.announceToScreenReader("Sosyal menüsü");
             }
         });
     }
@@ -1513,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.switchMenu(getMenuEl(window.currentActiveMenu), window.profileMenu, 'profile');
                 updateActiveTab('nav-btn-profile');
                 if (window.menuEnterSound) window.menuEnterSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("Profil menÃ¼sÃ¼");
+                if (window.announceToScreenReader) window.announceToScreenReader("Profil menüsü");
             }
         });
     }
@@ -1525,7 +1525,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let currentName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
             
             setTimeout(() => {
-                let newName = prompt("Yeni kullanÄ±cÄ± adÄ±nÄ±zÄ± girin:", currentName !== "Bilinmeyen" ? currentName : "");
+                let newName = prompt("Yeni kullanıcı adınızı girin:", currentName !== "Bilinmeyen" ? currentName : "");
                 if (newName && newName.trim() !== "") {
                     newName = newName.trim();
                     window.currentChatUser = newName;
@@ -1541,19 +1541,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.successSound.play();
                     }
                     if (window.announceToScreenReader) {
-                        window.announceToScreenReader(`KullanÄ±cÄ± adÄ±nÄ±z baÅŸarÄ±yla ${newName} olarak deÄŸiÅŸtirildi.`, true);
+                        window.announceToScreenReader(`Kullanıcı adınız başarıyla ${newName} olarak değiştirildi.`, true);
                     }
                 } else if (newName !== null) {
                     if (window.wrongSound) window.wrongSound.play();
                     if (window.announceToScreenReader) {
-                        window.announceToScreenReader("GeÃ§ersiz veya boÅŸ bir kullanÄ±cÄ± adÄ± girdiniz. Ä°ÅŸlem iptal edildi.", true);
+                        window.announceToScreenReader("Geçersiz veya boş bir kullanıcı adı girdiniz. İşlem iptal edildi.", true);
                     }
                 }
             }, 100);
         });
     }
 
-    // PC Sekme GeÃ§iÅŸ KÄ±sayollarÄ± (Alt + 1, Alt + 2, Alt + 3)
+    // PC Sekme Geçiş Kısayolları (Alt + 1, Alt + 2, Alt + 3)
     document.addEventListener('keydown', (e) => {
         const safeMenus = ['main', 'profile', 'social', 'scoreboard', 'stats', 'achievements', 'store', 'play-mode', 'difficulty', 'settings'];
         if (!safeMenus.includes(window.currentActiveMenu)) return;
@@ -1591,7 +1591,7 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsBtnMain.addEventListener('click', () => {
             if (window.menuEnterSound) window.menuEnterSound.play();
             window.switchMenu(window.mainMenu, settingsMenuContainer, 'settings');
-            if (window.announceToScreenReader) window.announceToScreenReader("Ayarlar menÃ¼sÃ¼");
+            if (window.announceToScreenReader) window.announceToScreenReader("Ayarlar menüsü");
         });
         
         const goBackToMenu = () => {
@@ -1603,13 +1603,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (settingsSaveBtn) {
             settingsSaveBtn.addEventListener('click', () => {
-                if (window.announceToScreenReader) window.announceToScreenReader("Ayarlar baÅŸarÄ±yla kaydedildi.", true);
+                if (window.announceToScreenReader) window.announceToScreenReader("Ayarlar başarıyla kaydedildi.", true);
                 goBackToMenu();
             });
         }
 
         // Aktif Etkinlikler Butonu
-        // Aktif Etkinlikler (Pasif Durum GÃ¶stergesi)
+        // Aktif Etkinlikler (Pasif Durum Göstergesi)
         window.etkinlikKontrolEt = function() {
             const eventsBtnMain = document.getElementById('events-btn-main');
             if (!eventsBtnMain) return;
@@ -1632,8 +1632,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let diffMs = end - now;
                 let diffHours = Math.floor(diffMs / (1000 * 60 * 60));
                 let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                eventsBtnMain.innerText = `Etkinlik: Ã‡ift Jeton (${diffHours}sa ${diffMinutes}dk)`;
-                eventsBtnMain.setAttribute('aria-label', `Åu an Ã‡ift Jeton EtkinliÄŸi AKTÄ°F! EtkinliÄŸin bitmesine ${diffHours} saat ${diffMinutes} dakika kaldÄ±.`);
+                eventsBtnMain.innerText = `Etkinlik: Çift Jeton (${diffHours}sa ${diffMinutes}dk)`;
+                eventsBtnMain.setAttribute('aria-label', `Åu an Çift Jeton Etkinliği AKTİF! Etkinliğin bitmesine ${diffHours} saat ${diffMinutes} dakika kaldı.`);
             } else {
                 let start = new Date(now);
                 let daysUntilSaturday = 6 - day;
@@ -1645,8 +1645,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 let diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
                 let diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 let diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                eventsBtnMain.innerText = `SÄ±radaki Etkinlik: Ã‡ift Jeton (${diffDays}g ${diffHours}sa ${diffMinutes}dk)`;
-                eventsBtnMain.setAttribute('aria-label', `Åu an aktif etkinlik yok. SÄ±radaki etkinlik: Ã‡ift Jeton EtkinliÄŸi. BaÅŸlamasÄ±na ${diffDays} gÃ¼n, ${diffHours} saat, ${diffMinutes} dakika var.`);
+                eventsBtnMain.innerText = `Sıradaki Etkinlik: Çift Jeton (${diffDays}g ${diffHours}sa ${diffMinutes}dk)`;
+                eventsBtnMain.setAttribute('aria-label', `Åu an aktif etkinlik yok. Sıradaki etkinlik: Çift Jeton Etkinliği. Başlamasına ${diffDays} gün, ${diffHours} saat, ${diffMinutes} dakika var.`);
             }
         };
         
@@ -1692,7 +1692,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             musicVolumeSlider.addEventListener('change', () => {
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader("MÃ¼zik sesi: yzde " + musicVolumeSlider.value);
+                    window.announceToScreenReader("Müzik sesi: yzde " + musicVolumeSlider.value);
                 }
             });
         }
@@ -1784,7 +1784,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let isMuted = forceMuteState !== undefined ? forceMuteState : (window.bgMusic ? window.bgMusic.mute() : false);
             
             if (toggleMusicBtn) {
-                toggleMusicBtn.innerText = isMuted ? "Oyun mÃ¼ziÄŸini etkinleÅŸtir" : "Oyun mÃ¼ziÄŸini devre dÄ±ÅŸÄ± bÄ±rak";
+                toggleMusicBtn.innerText = isMuted ? "Oyun müziğini etkinleştir" : "Oyun müziğini devre dışı bırak";
                 toggleMusicBtn.setAttribute('aria-label', toggleMusicBtn.innerText);
             }
 
@@ -1811,7 +1811,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let currentMute = window.bgMusic ? window.bgMusic.mute() : false;
                 window.updateMusicMuteState(!currentMute);
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader(!currentMute ? "Oyun mÃ¼ziÄŸi devre dÄ±ÅŸÄ± bÄ±rakÄ±ldÄ±." : "Oyun mÃ¼ziÄŸi etkinleÅŸtirildi.", true);
+                    window.announceToScreenReader(!currentMute ? "Oyun müziği devre dışı bırakıldı." : "Oyun müziği etkinleştirildi.", true);
                 }
             });
         }
@@ -1820,7 +1820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.updateIntroBtnState = () => {
             let skipIntro = localStorage.getItem('hafizaGuvenSkipIntro') === 'true';
             if (toggleIntroBtn) {
-                toggleIntroBtn.innerText = skipIntro ? "BaÅŸlangÄ±Ã§ta logoyu atla (AÃ§Ä±k)" : "BaÅŸlangÄ±Ã§ta logoyu atla (KapalÄ±)";
+                toggleIntroBtn.innerText = skipIntro ? "Başlangıçta logoyu atla (Açık)" : "Başlangıçta logoyu atla (Kapalı)";
                 toggleIntroBtn.setAttribute('aria-label', toggleIntroBtn.innerText);
             }
         };
@@ -1834,7 +1834,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenSkipIntro', skipIntro);
                 window.updateIntroBtnState();
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader(skipIntro ? "Oyun aÃ§Ä±lÄ±ÅŸÄ±nda logo atlanacak." : "Oyun aÃ§Ä±lÄ±ÅŸÄ±nda logo atlanmayacak.", true);
+                    window.announceToScreenReader(skipIntro ? "Oyun açılışında logo atlanacak." : "Oyun açılışında logo atlanmayacak.", true);
                 }
             });
         }
@@ -1843,7 +1843,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.updateStoryBtnState = () => {
             let disableStory = localStorage.getItem('hafizaGuvenDisableStoryMode') === 'true';
             if (toggleStoryBtn) {
-                toggleStoryBtn.innerText = disableStory ? "KayÄ±p Notalar Hikaye DiyaloÄŸunu Atla (AÃ§Ä±k)" : "KayÄ±p Notalar Hikaye DiyaloÄŸunu Atla (KapalÄ±)";
+                toggleStoryBtn.innerText = disableStory ? "Kayıp Notalar Hikaye Diyaloğunu Atla (Açık)" : "Kayıp Notalar Hikaye Diyaloğunu Atla (Kapalı)";
                 toggleStoryBtn.setAttribute('aria-label', toggleStoryBtn.innerText);
             }
         };
@@ -1857,7 +1857,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenDisableStoryMode', disableStory);
                 window.updateStoryBtnState();
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader(disableStory ? "Hikaye diyaloglarÄ± atlanacak." : "Hikaye diyaloglarÄ± gÃ¶sterilecek.", true);
+                    window.announceToScreenReader(disableStory ? "Hikaye diyalogları atlanacak." : "Hikaye diyalogları gösterilecek.", true);
                 }
             });
         }
@@ -1866,7 +1866,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.updateOnlineBtnState = () => {
             let disableOnline = localStorage.getItem('hafizaGuvenDisableOnlineStatus') === 'true';
             if (toggleOnlineBtn) {
-                toggleOnlineBtn.innerText = disableOnline ? "Ã‡evrimiÃ§i Bildirimleri: KapalÄ±" : "Ã‡evrimiÃ§i Bildirimleri: AÃ§Ä±k";
+                toggleOnlineBtn.innerText = disableOnline ? "Çevrimiçi Bildirimleri: Kapalı" : "Çevrimiçi Bildirimleri: Açık";
                 toggleOnlineBtn.setAttribute('aria-label', toggleOnlineBtn.innerText);
             }
         };
@@ -1880,7 +1880,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenDisableOnlineStatus', disableOnline);
                 window.updateOnlineBtnState();
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader(disableOnline ? "Ã‡evrimiÃ§i bildirimleri kapatÄ±ldÄ±." : "Ã‡evrimiÃ§i bildirimleri aÃ§Ä±ldÄ±.", true);
+                    window.announceToScreenReader(disableOnline ? "Çevrimiçi bildirimleri kapatıldı." : "Çevrimiçi bildirimleri açıldı.", true);
                 }
             });
         }
@@ -1889,7 +1889,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.updateMetronomeBtnState = () => {
             let metronomeState = localStorage.getItem('hafizaGuvenMetronome') || 'off';
             if (toggleMetronomeBtn) {
-                let stateText = 'KapalÄ±';
+                let stateText = 'Kapalı';
                 if (metronomeState === '60') stateText = '60 BPM';
                 else if (metronomeState === '90') stateText = '90 BPM';
                 else if (metronomeState === '120') stateText = '120 BPM';
@@ -1913,7 +1913,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenMetronome', metronomeState);
                 window.updateMetronomeBtnState();
                 
-                let stateText = metronomeState === 'off' ? "kapatÄ±ldÄ±" : metronomeState + " BPM olarak ayarlandÄ±";
+                let stateText = metronomeState === 'off' ? "kapatıldı" : metronomeState + " BPM olarak ayarlandı";
                 if (window.announceToScreenReader) {
                     window.announceToScreenReader("Metronom " + stateText, true);
                 }
@@ -1924,7 +1924,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.updateMotivationBtnState = () => {
             let disableMotivation = localStorage.getItem('hafizaGuvenDisableMotivation') === 'true';
             if (toggleMotivationBtn) {
-                toggleMotivationBtn.innerText = disableMotivation ? "Oyun Ä°Ã§i Motivasyon MesajlarÄ±: KapalÄ±" : "Oyun Ä°Ã§i Motivasyon MesajlarÄ±: AÃ§Ä±k";
+                toggleMotivationBtn.innerText = disableMotivation ? "Oyun İçi Motivasyon Mesajları: Kapalı" : "Oyun İçi Motivasyon Mesajları: Açık";
                 toggleMotivationBtn.setAttribute('aria-label', toggleMotivationBtn.innerText);
             }
         };
@@ -1938,7 +1938,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenDisableMotivation', disableMotivation);
                 window.updateMotivationBtnState();
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader(disableMotivation ? "Motivasyon mesajlarÄ± kapatÄ±ldÄ±." : "Motivasyon mesajlarÄ± aÃ§Ä±ldÄ±.", true);
+                    window.announceToScreenReader(disableMotivation ? "Motivasyon mesajları kapatıldı." : "Motivasyon mesajları açıldı.", true);
                 }
             });
         }
@@ -1956,7 +1956,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (window.announceToScreenReader) {
                     let selText = e.target.options[e.target.selectedIndex].text;
-                    window.announceToScreenReader("Oyun temasÄ± deÄŸiÅŸtirildi: " + selText, true);
+                    window.announceToScreenReader("Oyun teması değiştirildi: " + selText, true);
                 }
             });
         }
@@ -1972,7 +1972,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenKeyboardLayout', newLayout);
                 if (window.announceToScreenReader) {
                     let selText = e.target.options[e.target.selectedIndex].text;
-                    window.announceToScreenReader("Klavye dÃ¼zeni deÄŸiÅŸtirildi: " + selText, true);
+                    window.announceToScreenReader("Klavye düzeni değiştirildi: " + selText, true);
                 }
             });
         }
@@ -2011,11 +2011,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 let ownsBaglama = localStorage.getItem('hafizaGuvenBaglamaPack') === 'true';
                 if (ownsBaglama) {
                     let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'baglama';
-                    buyBaglamaPackBtn.innerText = isActive ? "BaÄŸlama Ses Paketini Kapat" : "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                    buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. " + (isActive ? "Kapatmak" : "EtkinleÅŸtirmek") + " iÃ§in tÄ±klayÄ±n.");
+                    buyBaglamaPackBtn.innerText = isActive ? "Bağlama Ses Paketini Kapat" : "Bağlama Ses Paketini Etkinleştir";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 } else {
-                    buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketi SatÄ±n Al (500 Jeton)";
-                    buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. NotalarÄ± piyano yerine baÄŸlama ile duyarsÄ±nÄ±z. KalÄ±cÄ± olarak sahip olursunuz. Fiyat: 500 Jeton.");
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketi Satın Al (500 Jeton)";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Notaları piyano yerine bağlama ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 500 Jeton.");
                 }
             }
 
@@ -2023,11 +2023,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 let ownsKaval = localStorage.getItem('hafizaGuvenKavalPack') === 'true';
                 if (ownsKaval) {
                     let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'kaval';
-                    buyKavalPackBtn.innerText = isActive ? "Kaval Ses Paketini Kapat" : "Kaval Ses Paketini EtkinleÅŸtir";
-                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. " + (isActive ? "Kapatmak" : "EtkinleÅŸtirmek") + " iÃ§in tÄ±klayÄ±n.");
+                    buyKavalPackBtn.innerText = isActive ? "Kaval Ses Paketini Kapat" : "Kaval Ses Paketini Etkinleştir";
+                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 } else {
-                    buyKavalPackBtn.innerText = "Kaval Ses Paketi SatÄ±n Al (100 Jeton)";
-                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. NotalarÄ± piyano yerine kaval ile duyarsÄ±nÄ±z. KalÄ±cÄ± olarak sahip olursunuz. Fiyat: 100 Jeton.");
+                    buyKavalPackBtn.innerText = "Kaval Ses Paketi Satın Al (100 Jeton)";
+                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Notaları piyano yerine kaval ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 100 Jeton.");
                 }
             }
 
@@ -2035,11 +2035,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 let ownsFlut = localStorage.getItem('hafizaGuvenFlutPack') === 'true';
                 if (ownsFlut) {
                     let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'flut';
-                    buyFlutPackBtn.innerText = isActive ? "FlÃ¼t Ses Paketini Kapat" : "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                    buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. " + (isActive ? "Kapatmak" : "EtkinleÅŸtirmek") + " iÃ§in tÄ±klayÄ±n.");
+                    buyFlutPackBtn.innerText = isActive ? "Flüt Ses Paketini Kapat" : "Flüt Ses Paketini Etkinleştir";
+                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 } else {
-                    buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketi SatÄ±n Al (200 Jeton)";
-                    buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. NotalarÄ± piyano yerine flÃ¼t ile duyarsÄ±nÄ±z. KalÄ±cÄ± olarak sahip olursunuz. Fiyat: 200 Jeton.");
+                    buyFlutPackBtn.innerText = "Flüt Ses Paketi Satın Al (200 Jeton)";
+                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Notaları piyano yerine flüt ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 200 Jeton.");
                 }
             }
 
@@ -2047,15 +2047,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 let ownsKanun = localStorage.getItem('hafizaGuvenKanunPack') === 'true';
                 if (ownsKanun) {
                     let isActive = localStorage.getItem('hafizaGuvenInstrument') === 'kanun';
-                    buyKanunPackBtn.innerText = isActive ? "Kanun Ses Paketini Kapat" : "Kanun Ses Paketini EtkinleÅŸtir";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. " + (isActive ? "Kapatmak" : "EtkinleÅŸtirmek") + " iÃ§in tÄ±klayÄ±n.");
+                    buyKanunPackBtn.innerText = isActive ? "Kanun Ses Paketini Kapat" : "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 } else {
-                    buyKanunPackBtn.innerText = "Kanun Ses Paketi SatÄ±n Al (300 Jeton)";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. NotalarÄ± piyano yerine kanun ile duyarsÄ±nÄ±z. KalÄ±cÄ± olarak sahip olursunuz. Fiyat: 300 Jeton.");
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketi Satın Al (300 Jeton)";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Notaları piyano yerine kanun ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 300 Jeton.");
                 }
             }
             
-            if (window.announceToScreenReader) window.announceToScreenReader(`MaÄŸazaya hoÅŸ geldiniz. Mevcut jetonunuz: ${totalTokens}`);
+            if (window.announceToScreenReader) window.announceToScreenReader(`Mağazaya hoş geldiniz. Mevcut jetonunuz: ${totalTokens}`);
         });
         storeBackBtn.addEventListener('click', () => {
             if (window.music25Sound && window.music25Sound.playing()) window.music25Sound.stop();
@@ -2081,14 +2081,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (hk > 0) {
                 if (window.wrongSound) window.wrongSound.play();
-                let msg = "Bu korumaya zaten sahipsiniz. AynÄ± anda sadece bir tane taÅŸÄ±yabilirsiniz.";
+                let msg = "Bu korumaya zaten sahipsiniz. Aynı anda sadece bir tane taşıyabilirsiniz.";
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
                 return;
             }
 
             if (totalTokens < 50) {
                 if (window.wrongSound) window.wrongSound.play();
-                let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 50 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${50 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
+                let msg = `Yetersiz bakiye. Bu eşya için 50 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${50 - totalTokens} jetona daha ihtiyacınız var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
                 return;
             }
@@ -2097,7 +2097,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
             localStorage.setItem('hafizaGuvenHataKorumasi', 1);
             if (window.buySound) window.buySound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader(`SatÄ±n alma baÅŸarÄ±lÄ±! 1 Hata KorumasÄ± eklendi. Kalan jeton: ${totalTokens}`);
+            if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Hata Koruması eklendi. Kalan jeton: ${totalTokens}`);
         });
     }
 
@@ -2108,14 +2108,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (zk > 0) {
                 if (window.wrongSound) window.wrongSound.play();
-                let msg = "Bu korumaya zaten sahipsiniz. AynÄ± anda sadece bir tane taÅŸÄ±yabilirsiniz.";
+                let msg = "Bu korumaya zaten sahipsiniz. Aynı anda sadece bir tane taşıyabilirsiniz.";
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
                 return;
             }
 
             if (totalTokens < 30) {
                 if (window.wrongSound) window.wrongSound.play();
-                let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 30 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${30 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
+                let msg = `Yetersiz bakiye. Bu eşya için 30 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${30 - totalTokens} jetona daha ihtiyacınız var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
                 return;
             }
@@ -2124,7 +2124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
             localStorage.setItem('hafizaGuvenZamanKorumasi', 1);
             if (window.buySound) window.buySound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader(`SatÄ±n alma baÅŸarÄ±lÄ±! 1 Zaman KorumasÄ± eklendi. Kalan jeton: ${totalTokens}`);
+            if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Zaman Koruması eklendi. Kalan jeton: ${totalTokens}`);
         });
     }
 
@@ -2135,14 +2135,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (sd >= 2) {
                 if (window.wrongSound) window.wrongSound.play();
-                let msg = "Bu eÅŸyadan en fazla 2 adet taÅŸÄ±yabilirsiniz.";
+                let msg = "Bu eşyadan en fazla 2 adet taşıyabilirsiniz.";
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
                 return;
             }
 
             if (totalTokens < 80) {
                 if (window.wrongSound) window.wrongSound.play();
-                let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 80 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${80 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
+                let msg = `Yetersiz bakiye. Bu eşya için 80 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${80 - totalTokens} jetona daha ihtiyacınız var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
                 return;
             }
@@ -2152,7 +2152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
             localStorage.setItem('hafizaGuvenSeriDondurma', sd);
             if (window.buySound) window.buySound.play();
-            if (window.announceToScreenReader) window.announceToScreenReader(`SatÄ±n alma baÅŸarÄ±lÄ±! 1 Seri Dondurma eklendi. Kalan jeton: ${totalTokens}. Mevcut Seri Dondurma sayÄ±nÄ±z: ${sd}`);
+            if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Seri Dondurma eklendi. Kalan jeton: ${totalTokens}. Mevcut Seri Dondurma sayınız: ${sd}`);
         });
     }
 
@@ -2169,10 +2169,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.activeInstrument = 'piano';
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
-                    buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                    buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("BaÄŸlama ses paketi kapatÄ±ldÄ±. Tekrar piyano sesleri aktif.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Bağlama ses paketi kapatıldı. Tekrar piyano sesleri aktif.");
                 } else {
                     let wasPlaying = (window.bgMusic && window.bgMusic.playing());
                     if (window.bgMusic) window.bgMusic.stop();
@@ -2180,29 +2180,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.activeInstrument = 'baglama';
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
-                    buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini Kapat";
-                    buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Kapat";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Kapatmak için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("BaÄŸlama ses paketi etkinleÅŸtirildi!");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Bağlama ses paketi etkinleştirildi!");
                     
                     if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
-                        buyKavalPackBtn.innerText = "Kaval Ses Paketini EtkinleÅŸtir";
-                        buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                        buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
-                        buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                        buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                        buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
-                        buyKanunPackBtn.innerText = "Kanun Ses Paketini EtkinleÅŸtir";
-                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 if (totalTokens < 500) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 500 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${500 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
+                    let msg = `Yetersiz bakiye. Bu eşya için 500 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${500 - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
@@ -2213,23 +2213,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenInstrument', 'baglama');
                 window.activeInstrument = 'baglama';
                 
-                buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini Kapat";
-                buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Kapat";
+                buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Kapatmak için tıklayın.");
                 
                 if (window.buySound) window.buySound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader(`SatÄ±n alma baÅŸarÄ±lÄ±! BaÄŸlama ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
+                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! Bağlama ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
                 
                 if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
-                    buyKavalPackBtn.innerText = "Kaval Ses Paketini EtkinleÅŸtir";
-                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
-                    buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                    buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
-                    buyKanunPackBtn.innerText = "Kanun Ses Paketini EtkinleÅŸtir";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
             }
         });
@@ -2248,10 +2248,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.activeInstrument = 'piano';
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
-                    buyKavalPackBtn.innerText = "Kaval Ses Paketini EtkinleÅŸtir";
-                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Kaval ses paketi kapatÄ±ldÄ±. Tekrar piyano sesleri aktif.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kaval ses paketi kapatıldı. Tekrar piyano sesleri aktif.");
                 } else {
                     let wasPlaying = (window.bgMusic && window.bgMusic.playing());
                     if (window.bgMusic) window.bgMusic.stop();
@@ -2260,28 +2260,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
                     buyKavalPackBtn.innerText = "Kaval Ses Paketini Kapat";
-                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Kapatmak için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Kaval ses paketi etkinleÅŸtirildi!");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kaval ses paketi etkinleştirildi!");
                     
                     if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
-                        buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                        buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                        buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
-                        buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                        buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                        buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
-                        buyKanunPackBtn.innerText = "Kanun Ses Paketini EtkinleÅŸtir";
-                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 if (totalTokens < 100) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 100 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${100 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
+                    let msg = `Yetersiz bakiye. Bu eşya için 100 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${100 - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
@@ -2293,22 +2293,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.activeInstrument = 'kaval';
                 
                 buyKavalPackBtn.innerText = "Kaval Ses Paketini Kapat";
-                buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Kapatmak için tıklayın.");
                 
                 if (window.buySound) window.buySound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader(`SatÄ±n alma baÅŸarÄ±lÄ±! Kaval ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
+                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! Kaval ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
                 
                 if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
-                    buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                    buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
-                    buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                    buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
-                    buyKanunPackBtn.innerText = "Kanun Ses Paketini EtkinleÅŸtir";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
             }
         });
@@ -2327,10 +2327,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.activeInstrument = 'piano';
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
-                    buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                    buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("FlÃ¼t ses paketi kapatÄ±ldÄ±. Tekrar piyano sesleri aktif.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Flüt ses paketi kapatıldı. Tekrar piyano sesleri aktif.");
                 } else {
                     let wasPlaying = (window.bgMusic && window.bgMusic.playing());
                     if (window.bgMusic) window.bgMusic.stop();
@@ -2338,29 +2338,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.activeInstrument = 'flut';
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
-                    buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini Kapat";
-                    buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                    buyFlutPackBtn.innerText = "Flüt Ses Paketini Kapat";
+                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Kapatmak için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("FlÃ¼t ses paketi etkinleÅŸtirildi!");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Flüt ses paketi etkinleştirildi!");
                     
                     if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
-                        buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                        buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                        buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
-                        buyKavalPackBtn.innerText = "Kaval Ses Paketini EtkinleÅŸtir";
-                        buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                        buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
-                        buyKanunPackBtn.innerText = "Kanun Ses Paketini EtkinleÅŸtir";
-                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                        buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 if (totalTokens < 200) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 200 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${200 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
+                    let msg = `Yetersiz bakiye. Bu eşya için 200 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${200 - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
@@ -2371,23 +2371,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenInstrument', 'flut');
                 window.activeInstrument = 'flut';
                 
-                buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini Kapat";
-                buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                buyFlutPackBtn.innerText = "Flüt Ses Paketini Kapat";
+                buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Kapatmak için tıklayın.");
                 
                 if (window.buySound) window.buySound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader(`SatÄ±n alma baÅŸarÄ±lÄ±! FlÃ¼t ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
+                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! Flüt ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
                 
                 if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
-                    buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                    buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
-                    buyKavalPackBtn.innerText = "Kaval Ses Paketini EtkinleÅŸtir";
-                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyKanunPackBtn && localStorage.getItem('hafizaGuvenKanunPack') === 'true') {
-                    buyKanunPackBtn.innerText = "Kanun Ses Paketini EtkinleÅŸtir";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
             }
         });
@@ -2406,10 +2406,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.activeInstrument = 'piano';
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
-                    buyKanunPackBtn.innerText = "Kanun Ses Paketini EtkinleÅŸtir";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKanunPackBtn.innerText = "Kanun Ses Paketini Etkinleştir";
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Etkinleştirmek için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi kapatÄ±ldÄ±. Tekrar piyano sesleri aktif.");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi kapatıldı. Tekrar piyano sesleri aktif.");
                 } else {
                     let wasPlaying = (window.bgMusic && window.bgMusic.playing());
                     if (window.bgMusic) window.bgMusic.stop();
@@ -2418,28 +2418,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (wasPlaying && window.bgMusic) window.bgMusic.play();
 
                     buyKanunPackBtn.innerText = "Kanun Ses Paketini Kapat";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak için tıklayın.");
                     if (window.menuEnterSound) window.menuEnterSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi etkinleÅŸtirildi!");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kanun ses paketi etkinleştirildi!");
                     
                     if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
-                        buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                        buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                        buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
-                        buyKavalPackBtn.innerText = "Kaval Ses Paketini EtkinleÅŸtir";
-                        buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                        buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                     if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
-                        buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                        buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                        buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                        buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                     }
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
                 if (totalTokens < 300) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 300 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${300 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
+                    let msg = `Yetersiz bakiye. Bu eşya için 300 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${300 - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
@@ -2451,22 +2451,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.activeInstrument = 'kanun';
                 
                 buyKanunPackBtn.innerText = "Kanun Ses Paketini Kapat";
-                buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak iÃ§in tÄ±klayÄ±n.");
+                buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Kapatmak için tıklayın.");
                 
                 if (window.buySound) window.buySound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader(`SatÄ±n alma baÅŸarÄ±lÄ±! Kanun ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
+                if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! Kanun ses paketi eklendi ve aktif edildi. Kalan jeton: ${totalTokens}`);
                 
                 if (buyBaglamaPackBtn && localStorage.getItem('hafizaGuvenBaglamaPack') === 'true') {
-                    buyBaglamaPackBtn.innerText = "BaÄŸlama Ses Paketini EtkinleÅŸtir";
-                    buyBaglamaPackBtn.setAttribute('aria-label', "BaÄŸlama Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketini Etkinleştir";
+                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyKavalPackBtn && localStorage.getItem('hafizaGuvenKavalPack') === 'true') {
-                    buyKavalPackBtn.innerText = "Kaval Ses Paketini EtkinleÅŸtir";
-                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyKavalPackBtn.innerText = "Kaval Ses Paketini Etkinleştir";
+                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
                 if (buyFlutPackBtn && localStorage.getItem('hafizaGuvenFlutPack') === 'true') {
-                    buyFlutPackBtn.innerText = "FlÃ¼t Ses Paketini EtkinleÅŸtir";
-                    buyFlutPackBtn.setAttribute('aria-label', "FlÃ¼t Ses Paketi. EtkinleÅŸtirmek iÃ§in tÄ±klayÄ±n.");
+                    buyFlutPackBtn.innerText = "Flüt Ses Paketini Etkinleştir";
+                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Etkinleştirmek için tıklayın.");
                 }
             }
         });
@@ -2484,21 +2484,21 @@ document.addEventListener('DOMContentLoaded', () => {
             let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">';
             
             if (window.userAchievements.hafizam_gucleniyor) {
-                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="KazanÄ±ldÄ±: HafÄ±zam GÃ¼Ã§leniyor. Kolay modu 2 kez tamamla.">âœ… HafÄ±zam GÃ¼Ã§leniyor (Kolay modu 2 kez tamamla)</li>';
+                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">âœ… Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
             } else {
-                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: HafÄ±zam GÃ¼Ã§leniyor. Kolay modu 2 kez tamamla.">ğŸ”’ HafÄ±zam GÃ¼Ã§leniyor (Kolay modu 2 kez tamamla)</li>';
+                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">ğŸ”’ Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
             }
             
             if (window.userAchievements.buzsuz_3_gun) {
-                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="KazanÄ±ldÄ±: SadÄ±k Oyuncu. 3 GÃ¼n boyunca seri dondurma kullanmadan giriÅŸ yap.">âœ… SadÄ±k Oyuncu (3 GÃ¼n boyunca seri dondurma kullanmadan giriÅŸ yap)</li>';
+                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap.">âœ… Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş yap)</li>';
             } else {
-                html += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: SadÄ±k Oyuncu. 3 GÃ¼n boyunca seri dondurma kullanmadan giriÅŸ yap. Ä°lerleme: ${bg} bÃ¶lÃ¼ 3 gÃ¼n.">â³ SadÄ±k Oyuncu (3 GÃ¼n boyunca seri dondurma kullanmadan giriÅŸ) - Ä°lerleme: ${bg}/3</li>`;
+                html += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap. İlerleme: ${bg} bölü 3 gün.">â³ Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş) - İlerleme: ${bg}/3</li>`;
             }
             
             html += '</ul>';
             if (contentDiv) contentDiv.innerHTML = html;
             
-            let text = "BaÅŸarÄ±lar menÃ¼sÃ¼ aÃ§Ä±ldÄ±. Durumunuzu kontrol edebilirsiniz.";
+            let text = "Başarılar menüsü açıldı. Durumunuzu kontrol edebilirsiniz.";
             if (window.announceToScreenReader) window.announceToScreenReader(text);
         });
         achievementsBackBtn.addEventListener('click', () => {
@@ -2521,26 +2521,26 @@ document.addEventListener('DOMContentLoaded', () => {
             let name = document.getElementById('feedback-name').value.trim() || "Anonim Oyuncu";
             let category = document.getElementById('feedback-category').value;
             let text = document.getElementById('feedback-text').value.trim();
-            let desc = document.getElementById('feedback-desc'); // aria-live okuma alanÄ±
+            let desc = document.getElementById('feedback-desc'); // aria-live okuma alanı
             let btn = this;
 
             if (!text) {
-                desc.textContent = "Hata: LÃ¼tfen bilet mesajÄ±nÄ±zÄ± boÅŸ bÄ±rakmayÄ±n.";
+                desc.textContent = "Hata: Lütfen bilet mesajınızı boş bırakmayın.";
                 document.getElementById('feedback-text').focus();
                 return;
             }
 
-            desc.textContent = "Sunucuya baÄŸlanÄ±lÄ±yor, lÃ¼tfen bekleyin...";
+            desc.textContent = "Sunucuya bağlanılıyor, lütfen bekleyin...";
             btn.disabled = true;
 
-            // Firebase'e veriyi gÃ¶nder
+            // Firebase'e veriyi gönder
             firebase.database().ref('feedbacks').push({
                 name: name,
                 category: category,
                 message: text,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             }).then(() => {
-                desc.textContent = "BaÅŸarÄ±lÄ±! Geri bildiriminiz BaÅŸyÃ¶netmen'e gÃ¼venle iletildi.";
+                desc.textContent = "Başarılı! Geri bildiriminiz Başyönetmen'e güvenle iletildi.";
                 document.getElementById('feedback-name').value = "";
                 document.getElementById('feedback-text').value = "";
                 btn.disabled = false;
@@ -2553,7 +2553,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 2500);
                 
             }).catch((error) => {
-                desc.textContent = "BaÄŸlantÄ± hatasÄ±: " + error.message;
+                desc.textContent = "Bağlantı hatası: " + error.message;
                 btn.disabled = false;
             });
         });
@@ -2586,9 +2586,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.practiceNextTimeout) {
                 clearTimeout(window.practiceNextTimeout); // Arkada bekleyen komutu yok et
             }
-            window.inPracticeTutorial = false; // EÄŸitim durumunu gÃ¼venle kapat
-            window.isDialogPhase = false; // DiyaloglarÄ± sÄ±fÄ±rla
-            window.isStarted = false; // Oyunu / alÄ±ÅŸtÄ±rmayÄ± sonlandÄ±r
+            window.inPracticeTutorial = false; // Eğitim durumunu güvenle kapat
+            window.isDialogPhase = false; // Diyalogları sıfırla
+            window.isStarted = false; // Oyunu / alıştırmayı sonlandır
             if (window.music117Sound && window.music117Sound.playing()) window.music117Sound.stop();
 
             window.switchMenu(window.practiceMenu, window.mainMenu, 'main');
@@ -2630,13 +2630,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.PvP.joinExistingMatchByCode(code);
                 } else {
                     if (window.wrongSound) window.wrongSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("LÃ¼tfen 4 haneli geÃ§erli bir oda kodu girin.", true);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Lütfen 4 haneli geçerli bir oda kodu girin.", true);
                 }
             }
         });
     }
 
-    // Ekstra: Åifre alanÄ±nda enter tuÅŸu ile onSubmit tetikleme
+    // Ekstra: Åifre alanında enter tuşu ile onSubmit tetikleme
     if (pvpJoinCodeInput) {
         pvpJoinCodeInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && pvpJoinSubmitBtn) {
@@ -2645,7 +2645,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Ana MenÃ¼den Oyun Modu SeÃ§imine GeÃ§iÅŸ
+    // Ana Menüden Oyun Modu Seçimine Geçiş
     if (startGameBtn) {
         startGameBtn.addEventListener('click', () => {
             window.lastFocusedElement = document.activeElement;
@@ -2674,7 +2674,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.switchMenu(window.multiplayerSelectMenu, window.pvpRoomsMenu, 'pvp-rooms');
             } else {
                 if (window.wrongSound) window.wrongSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("EÅŸleÅŸtirme sistemi henÃ¼z yÃ¼klenmedi.");
+                if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme sistemi henüz yüklenmedi.");
             }
         });
     }
@@ -2697,12 +2697,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
                     
-                    if (window.announceToScreenReader) window.announceToScreenReader("Oda kodu kopyalandÄ±: " + textToCopy);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Oda kodu kopyalandı: " + textToCopy);
                     const originalText = "Kodu Kopyala";
-                    pvpLobbyCopyBtn.innerText = "KopyalandÄ±!";
+                    pvpLobbyCopyBtn.innerText = "Kopyalandı!";
                     setTimeout(() => pvpLobbyCopyBtn.innerText = originalText, 2000);
                 } catch (err) {
-                    if (window.announceToScreenReader) window.announceToScreenReader("Kopyalama iÅŸlemi desteklenmiyor. LÃ¼tfen kodu manuel olarak seÃ§in: " + textToCopy);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kopyalama işlemi desteklenmiyor. Lütfen kodu manuel olarak seçin: " + textToCopy);
                 }
             }
         });
@@ -2734,11 +2734,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.PvP.isSearching && !window.PvP.isBotMode) {
                     window.PvP.cancelQueue();
                 } else if (!window.PvP.isSearching) {
-                    window.PvP.createMatch(); // EÅŸleÅŸme aramak yerine OdayÄ± kurup bekler
+                    window.PvP.createMatch(); // Eşleşme aramak yerine Odayı kurup bekler
                 }
             } else {
                 if (window.wrongSound) window.wrongSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("EÅŸleÅŸtirme sistemi henÃ¼z yÃ¼klenmedi.");
+                if (window.announceToScreenReader) window.announceToScreenReader("Eşleştirme sistemi henüz yüklenmedi.");
             }
         });
     }
@@ -2755,14 +2755,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 if (window.wrongSound) window.wrongSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("Bot sistemi henÃ¼z yÃ¼klenmedi.");
+                if (window.announceToScreenReader) window.announceToScreenReader("Bot sistemi henüz yüklenmedi.");
             }
         });
     }
 
     if (mpSelectBackBtn) {
         mpSelectBackBtn.addEventListener('click', () => {
-            // EÅŸleÅŸtirme sÄ±rasÄ±nda geri basÄ±p kaÃ§arsa tÃ¼m iÅŸlemi katlet
+            // Eşleştirme sırasında geri basıp kaçarsa tüm işlemi katlet
             if (window.PvP && (window.PvP.isSearching || window.PvP.lobbyWaitTimer)) {
                 window.PvP.cancelQueue();
             }
@@ -2800,7 +2800,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Oyun BaÅŸlatma (GerÃ§ekleÅŸme)
+    // Oyun Başlatma (Gerçekleşme)
     if (btnDiffEasy && gameBackBtn) {
         btnDiffEasy.addEventListener('click', () => {
             window.switchMenu(window.difficultyMenu, window.gameMenu, 'game');
@@ -2850,7 +2850,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (typeof window.initializeMissingNotesMap === 'function') window.initializeMissingNotesMap();
                     window.currentAutoWalkStep = 0;
                     
-                    if (window.announceToScreenReader) window.announceToScreenReader("KayÄ±p Notalar macerasÄ±na baÅŸlÄ±yorsunuz. Ä°lk notayÄ± bulmak iÃ§in saÄŸ ok tuÅŸuna basÄ±p karlÄ± zeminde yÃ¼rÃ¼yÃ¼n.", false);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Kayıp Notalar macerasına başlıyorsunuz. İlk notayı bulmak için sağ ok tuşuna basıp karlı zeminde yürüyün.", false);
                     if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
                     
                     if (window.bgMusic && window.bgMusic.playing()) window.bgMusic.stop();
@@ -2932,10 +2932,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Evrensel ESC TuÅŸu ve Mobil Geri TuÅŸu KorumasÄ±
+// Evrensel ESC Tuşu ve Mobil Geri Tuşu Koruması
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        // CanlÄ± sohbet kendi ESC dinleyicisine sahip
+        // Canlı sohbet kendi ESC dinleyicisine sahip
         if (window.isChatOpen) return;
         
         const menusWithBackBtns = {
@@ -2957,13 +2957,13 @@ document.addEventListener('keydown', (e) => {
              if (backBtn) backBtn.click();
         }
 
-        // OYUN VE HÄ°KAYE MODUNDAN GÃœVENLÄ° KAÃ‡IÅ PROTOKOLÃœ
+        // OYUN VE HİKAYE MODUNDAN GÜVENLİ KAÇIÅ PROTOKOLÜ
         if (window.currentActiveMenu === 'game' || window.currentActiveMenu === 'story') {
             const mobileGameBackBtn = document.getElementById('mobile-game-back-btn');
             const gameBackBtn = document.getElementById('game-back-btn');
             
             if (mobileGameBackBtn) {
-                mobileGameBackBtn.click(); // Hikaye ve Oyun Ã§Ä±kÄ±ÅŸÄ±nÄ± gÃ¼venle tetikler
+                mobileGameBackBtn.click(); // Hikaye ve Oyun çıkışını güvenle tetikler
             } else if (gameBackBtn) {
                 gameBackBtn.click();
             }
@@ -2973,14 +2973,14 @@ document.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('popstate', (e) => {
-    // 1. CanlÄ± sohbet aÃ§Ä±ksa kapat
+    // 1. Canlı sohbet açıksa kapat
     if (window.isChatOpen && typeof window.toggleChat === 'function') {
         window.toggleChat();
         history.pushState(null, "", "");
         return;
     }
     
-    // 2. Alt menÃ¼ler aÃ§Ä±ksa kapat
+    // 2. Alt menüler açıksa kapat
     const menusWithBackBtns = {
         'store': 'store-back-btn',
         'practice': 'practice-back-btn',
@@ -3002,13 +3002,13 @@ window.addEventListener('popstate', (e) => {
     }
 });
 
-// MenÃ¼ iÃ§i ok tuÅŸlarÄ±yla gezinme iÅŸlevi
+// Menü içi ok tuşlarıyla gezinme işlevi
 document.addEventListener('keydown', function (event) {
     if (document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) {
         let allowThrough = false;
         if (window.currentActiveMenu === 'settings' && (document.activeElement.type === 'range' || document.activeElement.tagName === 'SELECT')) {
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-                allowThrough = true; // YÃ¶n tuÅŸlarÄ±nÄ±n menÃ¼ gezinmesi ve deÄŸer deÄŸiÅŸtirme mantÄ±ÄŸÄ±na inmesine izin ver
+                allowThrough = true; // Yön tuşlarının menü gezinmesi ve değer değiştirme mantığına inmesine izin ver
             }
         }
         if (!allowThrough) {
@@ -3016,7 +3016,7 @@ document.addEventListener('keydown', function (event) {
         }
     }
 
-    // MaÄŸaza miktar belirleme ('+', '-', 'ArrowRight', 'ArrowLeft') ve Okuma (Sessiz Kasiyer KorumasÄ±)
+    // Mağaza miktar belirleme ('+', '-', 'ArrowRight', 'ArrowLeft') ve Okuma (Sessiz Kasiyer Koruması)
     if (document.activeElement && document.activeElement.id === 'store-buy-quantity-display') {
         let quantityDisplay = document.activeElement;
         let currentQuantity = parseInt(quantityDisplay.getAttribute('aria-valuenow')) || 1;
@@ -3042,12 +3042,12 @@ document.addEventListener('keydown', function (event) {
         return;
     }
 
-    // Sohbet penceresi aÃ§Ä±kken ana menÃ¼ yÃ¶n tuÅŸlarÄ± gezinimini devre dÄ±ÅŸÄ± bÄ±rak
+    // Sohbet penceresi açıkken ana menü yön tuşları gezinimini devre dışı bırak
     if (window.isChatOpen) {
         return;
     }
 
-    // SeÃ§enekler (Ayarlar) menÃ¼sÃ¼nde yukarÄ±/aÅŸaÄŸÄ± oklarÄ±yla dolaÅŸmayÄ± iptal ederek "Tab" kullanÄ±mÄ±nÄ± (standart gezinme) zorla
+    // Seçenekler (Ayarlar) menüsünde yukarı/aşağı oklarıyla dolaşmayı iptal ederek "Tab" kullanımını (standart gezinme) zorla
     if (window.currentActiveMenu === 'settings') {
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
             return;
@@ -3055,7 +3055,7 @@ document.addEventListener('keydown', function (event) {
     }
 
     if (['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Enter'].includes(event.key)) {
-        // Ok tuÅŸlarÄ±yla mesajÄ± tekrar okuma ve Enter ile sessizce geÃ§me mantÄ±ÄŸÄ±
+        // Ok tuşlarıyla mesajı tekrar okuma ve Enter ile sessizce geçme mantığı
         if ((window.currentActiveMenu === 'story' && window.isDialogPhase) ||
             (window.currentActiveMenu === 'practice' && window.isDialogPhase) ||
             window.currentActiveMenu === 'server-message' ||
@@ -3064,7 +3064,7 @@ document.addEventListener('keydown', function (event) {
             event.preventDefault();
 
             if (event.key === 'Enter') {
-                // Sadece EntÄ±ra basÄ±lÄ±nca onaylansÄ±n
+                // Sadece Entıra basılınca onaylansın
                 if (window.currentActiveMenu === 'server-message') {
                     const btn = document.getElementById('server-message-continue-btn');
                     if (btn) btn.click();
@@ -3075,12 +3075,12 @@ document.addEventListener('keydown', function (event) {
                     const btn = document.getElementById('update-install-btn');
                     if (btn) btn.click();
                 } else if (window.currentActiveMenu === 'story') {
-                    // Story.js enter'Ä± kendi game.js iÃ§inden dinliyor olabilir
+                    // Story.js enter'ı kendi game.js içinden dinliyor olabilir
                 }
                 return;
             }
 
-            // Ok tuÅŸlarÄ±na basÄ±ldÄ±ysa mevcut mesajÄ± tekrar okut
+            // Ok tuşlarına basıldıysa mevcut mesajı tekrar okut
             let textToRead = "";
             if (window.currentActiveMenu === 'story' && window.missingNotesDialogues) {
                 textToRead = window.missingNotesDialogues[window.currentStoryIndex];
@@ -3088,7 +3088,7 @@ document.addEventListener('keydown', function (event) {
                 textToRead = window.practiceDialogues[window.currentDialogIndex];
             } else if (window.currentActiveMenu === 'server-message') {
                 let p = document.getElementById('server-message-text');
-                if (p) textToRead = "YapÄ±lan Son DeÄŸiÅŸiklik: " + (p.innerText || p.textContent);
+                if (p) textToRead = "Yapılan Son Değişiklik: " + (p.innerText || p.textContent);
             } else if (window.currentActiveMenu === 'update') {
                 let p = document.getElementById('update-text');
                 if (p) textToRead = p.innerText || p.textContent;
@@ -3101,14 +3101,14 @@ document.addEventListener('keydown', function (event) {
             return;
         }
 
-        if (event.key === 'Enter') return; // Sadece ok tuÅŸlarÄ±nÄ± menÃ¼ gezinmesine bÄ±rak
+        if (event.key === 'Enter') return; // Sadece ok tuşlarını menü gezinmesine bırak
 
         const activeButtons = window.getActiveButtons();
         if (activeButtons.length === 0) return;
 
         const activeElem = document.activeElement;
         
-        // Ayarlar menÃ¼sÃ¼nde Ã¶zel ok saÄŸ/sol davranÄ±ÅŸÄ± (sadece deÄŸer deÄŸiÅŸtir, menÃ¼ dolaÅŸma)
+        // Ayarlar menüsünde özel ok sağ/sol davranışı (sadece değer değiştir, menü dolaşma)
         if (window.currentActiveMenu === 'settings' && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
             if (activeElem && activeElem.tagName === 'INPUT' && activeElem.type === 'range') {
                 return; // Natively handle range inputs (fire input/change)
@@ -3124,7 +3124,7 @@ document.addEventListener('keydown', function (event) {
                 return;
             }
             event.preventDefault();
-            return; // Butonlardaysak sol/saÄŸ oklar hiÃ§bir ÅŸey yapmasÄ±n.
+            return; // Butonlardaysak sol/sağ oklar hiçbir şey yapmasın.
         }
 
         event.preventDefault();
@@ -3151,10 +3151,10 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
-// --- CANLI SOHBET SÄ°STEMÄ° ARAYÃœZ MANTIÄI ---
+// --- CANLI SOHBET SİSTEMİ ARAYÜZ MANTIÄI ---
 window.isChatOpen = false;
 
-// --- ANLIK BÄ°LDÄ°RÄ°M (TOAST) FONKSÄ°YONU ---
+// --- ANLIK BİLDİRİM (TOAST) FONKSİYONU ---
 window.showToastNotification = function(text) {
     const toast = document.createElement('div');
     toast.className = 'toast-notification';
@@ -3162,18 +3162,18 @@ window.showToastNotification = function(text) {
     toast.innerText = text;
     document.body.appendChild(toast);
     
-    // GÃ¶rÃ¼nÃ¼r yap
+    // Görünür yap
     setTimeout(() => toast.classList.add('show'), 50);
 
-    // 3.5 saniye sonra kaldÄ±r
+    // 3.5 saniye sonra kaldır
     setTimeout(() => {
         toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300); // animasyon bekleme sÃ¼resi
+        setTimeout(() => toast.remove(), 300); // animasyon bekleme süresi
     }, 3500);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    // NVDA Hayalet Ekran KorumasÄ±: Sayfa ilk aÃ§Ä±ldÄ±ÄŸÄ±nda kapalÄ± olan tÃ¼m menÃ¼leri "inert" yap
+    // NVDA Hayalet Ekran Koruması: Sayfa ilk açıldığında kapalı olan tüm menüleri "inert" yap
     document.querySelectorAll('.menu-container').forEach(menu => {
         if (menu.id !== 'main-menu-container') {
             menu.setAttribute('inert', '');
@@ -3186,8 +3186,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatNicknameInput = document.getElementById('chat-nickname');
 
     if (chatToggleBtn) {
-        // CanlÄ± Sohbet butonu oyun genelinde gÃ¶rÃ¼nsÃ¼n ama ilk aÃ§Ä±lÄ±ÅŸta okuyucu odaÄŸÄ±na takÄ±lmasÄ±n diye
-        // Sadece PvP lobisi ve genel oyun odasÄ±nda aktif hale gelmeli
+        // Canlı Sohbet butonu oyun genelinde görünsün ama ilk açılışta okuyucu odağına takılmasın diye
+        // Sadece PvP lobisi ve genel oyun odasında aktif hale gelmeli
         chatToggleBtn.style.display = 'none';
         chatToggleBtn.setAttribute('inert', '');
         chatToggleBtn.setAttribute('aria-hidden', 'true');
@@ -3217,7 +3217,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (chatMessageInputLocal) {
                 setTimeout(() => chatMessageInputLocal.focus(), 100);
             }
-            // Sohbet aÃ§Ä±ldÄ±ÄŸÄ±nda geÃ§miÅŸ mesajlarÄ±n gÃ¶rÃ¼nmesi iÃ§in en alta kaydÄ±r
+            // Sohbet açıldığında geçmiş mesajların görünmesi için en alta kaydır
             const chatMessagesContainer = document.querySelector('.chat-messages-container');
             if (chatMessagesContainer) {
                 setTimeout(() => {
@@ -3226,21 +3226,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (window.announceToScreenReader) {
                 if (chatNicknameInput && chatNicknameInput.style.display === 'none') {
-                    window.announceToScreenReader('CanlÄ± sohbet aÃ§Ä±ldÄ±. MesajÄ±nÄ±zÄ± yazabilirsiniz.', false);
+                    window.announceToScreenReader('Canlı sohbet açıldı. Mesajınızı yazabilirsiniz.', false);
                 } else {
-                    window.announceToScreenReader('CanlÄ± sohbet aÃ§Ä±ldÄ±. Takma adÄ±nÄ±zÄ± girin.', false);
+                    window.announceToScreenReader('Canlı sohbet açıldı. Takma adınızı girin.', false);
                 }
             }
 
-            // Presence AÅŸama 2: Ä°lk KatÄ±lÄ±m ve Ã‡Ä±kÄ±ÅŸ KancasÄ±
+            // Presence Aşama 2: İlk Katılım ve Çıkış Kancası
             if (window.hasJoinedChat === false && window.db) {
                 window.hasJoinedChat = true;
                 
-                // Ä°lk katÄ±lÄ±m mesajÄ± (Sistem bildirimleri kalÄ±cÄ± olarak sohbete itilmeyecek)
+                // İlk katılım mesajı (Sistem bildirimleri kalıcı olarak sohbete itilmeyecek)
                 
-                // BaÅŸlangÄ±Ã§ Ã‡Ä±kÄ±ÅŸ KancasÄ± (Sohbet kanalÄ±na "Ã§evrimdÄ±ÅŸÄ± oldu" spamlamasÄ±nÄ± kaldÄ±rdÄ±k)
+                // Başlangıç Çıkış Kancası (Sohbet kanalına "çevrimdışı oldu" spamlamasını kaldırdık)
                 if (window.disconnectRef) { window.disconnectRef.onDisconnect().cancel(); }
-                // disconnectRef artÄ±k sadece presence iÃ§in kullanÄ±lacak, messages kanalÄ±nÄ± kirletmeyecek.
+                // disconnectRef artık sadece presence için kullanılacak, messages kanalını kirletmeyecek.
             }
         } else {
             chatPanel.style.display = 'none';
@@ -3258,23 +3258,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 100);
 
-            if (window.announceToScreenReader) window.announceToScreenReader('CanlÄ± sohbet kapatÄ±ldÄ±.', false);
+            if (window.announceToScreenReader) window.announceToScreenReader('Canlı sohbet kapatıldı.', false);
         }
     };
 
-    // Nokta (.) kÄ±sayolu, ESC tuÅŸu ve Ok TuÅŸlarÄ±yla Gezinme
+    // Nokta (.) kısayolu, ESC tuşu ve Ok Tuşlarıyla Gezinme
     document.addEventListener('keydown', (e) => {
-        // Nokta (.) tuÅŸuyla sohbeti SADECE aÃ§
+        // Nokta (.) tuşuyla sohbeti SADECE aç
         if (e.key === '.' && !window.isChatOpen && (!document.activeElement || (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA' && document.activeElement.tagName !== 'SELECT'))) {
             window.toggleChat();
         }
         
-        // ESC tuÅŸuyla sohbeti hÄ±zlÄ±ca kapat
+        // ESC tuşuyla sohbeti hızlıca kapat
         if (e.key === 'Escape' && window.isChatOpen) {
             window.toggleChat();
         }
         
-        // Sohbet mesajlarÄ±nda YukarÄ±/AÅŸaÄŸÄ± ok tuÅŸu ile gezinme
+        // Sohbet mesajlarında Yukarı/Aşağı ok tuşu ile gezinme
         if (window.isChatOpen && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
             const chatMessages = document.querySelectorAll('#chat-messages li[tabindex="0"]');
             if (chatMessages.length > 0) {
@@ -3302,10 +3302,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Mobil: Ä°ki Parmakla Ã‡ift Dokunma (2-Finger Double Tap) Jest AlgÄ±layÄ±cÄ±sÄ±
+    // Mobil: İki Parmakla Çift Dokunma (2-Finger Double Tap) Jest Algılayıcısı
     let lastTwoFingerTap = 0;
     document.addEventListener('touchstart', (e) => {
-        // EÄŸer focus input/textarea/select Ã¼zerindeyse yoksay (yazÄ±ÅŸmayÄ± bÃ¶lmesin)
+        // Eğer focus input/textarea/select üzerindeyse yoksay (yazışmayı bölmesin)
         if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
             return;
         }
@@ -3315,12 +3315,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTwoFingerTap;
             
-            // EÄŸer Ã¶nce iki parmak dokunup hemen ardÄ±ndan tekrar 2 parmak dokunduysa (Ã‡ift DokunuÅŸ)
-            // SÃ¼re aralÄ±ÄŸÄ± 400ms'den kÄ±sa olmalÄ± (mobil cihazlardaki tipik Ã§ift tÄ±klama hÄ±zÄ±)
+            // Eğer önce iki parmak dokunup hemen ardından tekrar 2 parmak dokunduysa (Çift Dokunuş)
+            // Süre aralığı 400ms'den kısa olmalı (mobil cihazlardaki tipik çift tıklama hızı)
             if (tapLength < 450 && tapLength > 0) {
                 if (typeof window.toggleChat === 'function') {
                     window.toggleChat();
-                    // Ekran okuyuculardan veya Safari'den varsayÄ±lan olay sÄ±zmasÄ±nÄ± engellemek
+                    // Ekran okuyuculardan veya Safari'den varsayılan olay sızmasını engellemek
                     if (e.cancelable) {
                         e.preventDefault();
                     }
@@ -3331,7 +3331,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: false });
 });
 
-// --- CANLI SOHBET SÄ°STEMÄ° VERÄ°TABANI (FÄ°REBASE) MANTIÄI ---
+// --- CANLI SOHBET SİSTEMİ VERİTABANI (FİREBASE) MANTIÄI ---
 document.addEventListener('DOMContentLoaded', () => {
     const chatNicknameInput = document.getElementById('chat-nickname');
     const chatMessageInput = document.getElementById('chat-message-input');
@@ -3339,21 +3339,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatMessagesList = document.getElementById('chat-messages');
     const chatMessagesContainer = document.querySelector('.chat-messages-container');
     
-    // Presence (Durum) DeÄŸiÅŸkenleri (Global olarak ayarlandÄ±)
+    // Presence (Durum) Değişkenleri (Global olarak ayarlandı)
     const savedNickname = localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname');
     window.currentChatUser = savedNickname ? savedNickname : "Misafir";
     window.hasJoinedChat = false;
 
-    // Firebase tanÄ±mlÄ± deÄŸilse veya arayÃ¼z yoksa dur
+    // Firebase tanımlı değilse veya arayüz yoksa dur
     if (!chatSendBtn || !chatMessagesList || !window.db) return;
 
-    // Oturumda veya kalÄ±cÄ± hafÄ±zada daha Ã¶nce kaydedilmiÅŸ bir Takma Ad varsa onu otomatik yÃ¼kle ve kutuyu gizle
+    // Oturumda veya kalıcı hafızada daha önce kaydedilmiş bir Takma Ad varsa onu otomatik yükle ve kutuyu gizle
     if (savedNickname) {
         chatNicknameInput.value = savedNickname;
-        chatNicknameInput.style.display = 'none'; // KullanÄ±cÄ± adÄ± bir kere girildikten sonra sekme kapanana kadar veya kalÄ±cÄ± olarak gizlenir
+        chatNicknameInput.style.display = 'none'; // Kullanıcı adı bir kere girildikten sonra sekme kapanana kadar veya kalıcı olarak gizlenir
     }
 
-    // Takma ad kutusundayken de Enter'a basÄ±lÄ±rsa mesaj gÃ¶nderilsin
+    // Takma ad kutusundayken de Enter'a basılırsa mesaj gönderilsin
     if (chatNicknameInput) {
         chatNicknameInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -3363,7 +3363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // GÃ¼venlik (XSS) KorumasÄ± (HTML etiketlerini etkisiz hale getir)
+    // Güvenlik (XSS) Koruması (HTML etiketlerini etkisiz hale getir)
     function escapeHTML(str) {
         if (!str) return '';
         return str.toString().replace(/[&<>'"]/g, 
@@ -3377,46 +3377,46 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
-    // Mesaj GÃ¶nderme Ä°ÅŸlevi
+    // Mesaj Gönderme İşlevi
     function sendMessage() {
         let nickInput = document.getElementById('chat-nickname');
         let msgInput = document.getElementById('chat-message-input');
 
-        // BoÅŸluklarÄ± tÄ±raÅŸla
+        // Boşlukları tıraşla
         let nickVal = nickInput ? nickInput.value.trim() : "";
         let msgVal = msgInput ? msgInput.value.trim() : "";
 
         if (nickVal === "" || msgVal === "") {
-            // Mesaj veya isim tamamen boÅŸluktan ibaretse veya boÅŸsa
+            // Mesaj veya isim tamamen boşluktan ibaretse veya boşsa
             if (window.wrongSound) window.wrongSound.play();
-            let uyari = "LÃ¼tfen geÃ§erli bir takma ad ve mesaj girin. BoÅŸ mesaj gÃ¶nderilemez.";
+            let uyari = "Lütfen geçerli bir takma ad ve mesaj girin. Boş mesaj gönderilemez.";
             if (window.announceToScreenReader) window.announceToScreenReader(uyari);
             
-            // Ä°mleci eksik olan yere odakla
+            // İmleci eksik olan yere odakla
             if (nickVal === "" && nickInput) nickInput.focus();
             else if (msgInput) msgInput.focus();
             
-            return; // GÃ¶nderimi iptal et ve sistemi koru!
+            return; // Gönderimi iptal et ve sistemi koru!
         }
 
         const nickname = nickVal;
         const text = msgVal;
 
-        // Firebase Yolu KuralÄ±: Ä°simlerde '.', '#', '$', '[', ']' veya '/' kullanÄ±lamaz. 
-        // Aksi takdirde uygulama sessizce ve senkron olarak Ã§Ã¶ker.
+        // Firebase Yolu Kuralı: İsimlerde '.', '#', '$', '[', ']' veya '/' kullanılamaz. 
+        // Aksi takdirde uygulama sessizce ve senkron olarak çöker.
         if (/[.#$\[\]\/]/.test(nickname)) {
             if (window.wrongSound) window.wrongSound.play();
-            let uyari = "KullanÄ±cÄ± adÄ±nÄ±zda geÃ§ersiz karakterler bulunuyor. LÃ¼tfen nokta veya kÃ¶ÅŸeli parantez gibi hatalÄ± sembolleri silin.";
+            let uyari = "Kullanıcı adınızda geçersiz karakterler bulunuyor. Lütfen nokta veya köşeli parantez gibi hatalı sembolleri silin.";
             if (window.announceToScreenReader) window.announceToScreenReader(uyari);
             if (nickInput) {
-                // Temizleyerek otomatik dÃ¼zeltilmiÅŸ halini sun
+                // Temizleyerek otomatik düzeltilmiş halini sun
                 nickInput.value = nickname.replace(/[.#$\[\]\/]/g, '');
                 nickInput.focus();
             }
-            return; // Ã‡Ã¶kmesini Ã¶nle
+            return; // Çökmesini önle
         }
 
-        // KULLANICI ADI GÃœVENLÄ°K (REGISTRATION) KONTROLÃœ
+        // KULLANICI ADI GÜVENLİK (REGISTRATION) KONTROLÜ
         let myDevId = localStorage.getItem('hafizaGuvenDeviceId');
         if (!myDevId) {
             myDevId = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
@@ -3426,13 +3426,13 @@ document.addEventListener('DOMContentLoaded', () => {
         window.db.ref('registeredUsers/' + nickname).once('value').then(snapshot => {
             const existingOwner = snapshot.val();
             
-            // EÄŸer baÅŸkasÄ±na aitse durdur
+            // Eğer başkasına aitse durdur
             if (existingOwner && existingOwner !== myDevId) {
                 if (window.wrongSound) window.wrongSound.play();
-                let uyari = `"${nickname}" kullanÄ±cÄ± adÄ± daha Ã¶nce baÅŸkasÄ± tarafÄ±ndan alÄ±nmÄ±ÅŸ. LÃ¼tfen farklÄ± bir isim seÃ§in.`;
+                let uyari = `"${nickname}" kullanıcı adı daha önce başkası tarafından alınmış. Lütfen farklı bir isim seçin.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(uyari);
                 let desc = document.getElementById('chat-desc') || document.getElementById('sr-chat-reader');
-                if (desc) desc.textContent = "BaÄŸlantÄ± HatasÄ±: KullanÄ±cÄ± adÄ± kullanÄ±mda.";
+                if (desc) desc.textContent = "Bağlantı Hatası: Kullanıcı adı kullanımda.";
                 
                 if (nickInput) {
                     nickInput.value = "";
@@ -3441,20 +3441,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Yeni kullanÄ±cÄ± adÄ± ise benim adÄ±ma kaydet
+            // Yeni kullanıcı adı ise benim adıma kaydet
             if (!existingOwner) {
                 window.db.ref('registeredUsers/' + nickname).set(myDevId);
             }
 
-            // ArtÄ±k nick bize ait. Uygulama hafÄ±zasÄ±na kalÄ±cÄ± kaydet.
+            // Artık nick bize ait. Uygulama hafızasına kalıcı kaydet.
             localStorage.setItem('chatUsername', nickname);
             window.currentChatUser = nickname;
 
             if (nickInput) {
-                nickInput.style.display = 'none'; // BaÅŸarÄ±yla kilitlendi, bir daha sorma
+                nickInput.style.display = 'none'; // Başarıyla kilitlendi, bir daha sorma
             }
 
-            // --- GÄ°ZLÄ° SOHBET KOMUTLARI (CLIENT-SIDE) ---
+            // --- GİZLİ SOHBET KOMUTLARI (CLIENT-SIDE) ---
             if (text.startsWith('/')) {
                 const args = text.split(' ');
                 const command = args[0].toLowerCase();
@@ -3462,15 +3462,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const chatMessagesContainerLocal = document.querySelector('.chat-messages-container');
             const chatMessageInputLocal = document.getElementById('chat-message-input');
             
-            // KullanÄ±cÄ± GeliÅŸtirici Mi KontrolÃ¼
+            // Kullanıcı Geliştirici Mi Kontrolü
             let cUserNick = window.currentChatUser || "";
             let nickInputTemp = document.getElementById('chat-nickname');
             if (nickInputTemp && nickInputTemp.value.trim() !== "") cUserNick = nickInputTemp.value.trim();
             let isDev = ['ekrem'].includes(cUserNick.toLowerCase());
 
             function addLocalSystemMessage(msgText) {
-                // Sadece ekranda anlÄ±k (toast) gÃ¶sterip ekran okuyucuya okutuyoruz.
-                // Chat listesini (DOM'u) kalÄ±cÄ± olarak iÅŸgal edip kalabalÄ±k yapmasÄ±nÄ± engelledik.
+                // Sadece ekranda anlık (toast) gösterip ekran okuyucuya okutuyoruz.
+                // Chat listesini (DOM'u) kalıcı olarak işgal edip kalabalık yapmasını engelledik.
                 if (window.showToastNotification) {
                     window.showToastNotification(msgText, "info");
                 }
@@ -3480,37 +3480,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (command === '/temizle') {
-                if (!isDev) { addLocalSystemMessage("Hata: Bu iÅŸlem iÃ§in 'GeliÅŸtirici' yetkiniz yok."); return; }
+                if (!isDev) { addLocalSystemMessage("Hata: Bu işlem için 'Geliştirici' yetkiniz yok."); return; }
                 if (chatMessagesListLocal) chatMessagesListLocal.innerHTML = '';
-                addLocalSystemMessage("Sohbet geÃ§miÅŸiniz (sadece sizin ekranÄ±nÄ±zda) temizlendi.");
+                addLocalSystemMessage("Sohbet geçmişiniz (sadece sizin ekranınızda) temizlendi.");
                 
-                // GÄ°ZLÄ° GLOBAL SIFIRLAMA KOMUTU
+                // GİZLİ GLOBAL SIFIRLAMA KOMUTU
                 if (window.db) {
                     window.db.ref('player_stats').remove();
                     window.db.ref('global_wipe_timestamp').set(firebase.database.ServerValue.TIMESTAMP);
-                    addLocalSystemMessage("DÄ°KKAT: Global Wipe (KÃ¼resel SÄ±fÄ±rlama) Komutu Ã§alÄ±ÅŸtÄ±rÄ±ldÄ±! TÃ¼m oyuncularÄ±n istatistikleri ve Firebase bulut yedekleri siliniyor...");
+                    addLocalSystemMessage("DİKKAT: Global Wipe (Küresel Sıfırlama) Komutu çalıştırıldı! Tüm oyuncuların istatistikleri ve Firebase bulut yedekleri siliniyor...");
                 }
             } else if (command === '/saat' || command === '/zaman') {
                 addLocalSystemMessage("Åu anki cihaz saati: " + new Date().toLocaleTimeString('tr-TR'));
             } else if (command === '/jeton' || command === '/bakiye') {
                 const totalTokensLocal = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                addLocalSystemMessage(`CÃ¼zdanÄ±nÄ±zdaki mevcut bakiye: ${totalTokensLocal} jeton.`);
+                addLocalSystemMessage(`Cüzdanınızdaki mevcut bakiye: ${totalTokensLocal} jeton.`);
             } else if (command === '/bilet') {
                 if (isDev) {
                     if (window.stopAdminAlert) window.stopAdminAlert('ticket');
-                    addLocalSystemMessage("Sistemdeki tÃ¼m aÃ§Ä±k biletler (Geri bildirimler) taranÄ±yor...");
+                    addLocalSystemMessage("Sistemdeki tüm açık biletler (Geri bildirimler) taranıyor...");
                     if (window.db) {
                         window.db.ref('feedbacks').once('value').then(snapshot => {
                             if (!snapshot.exists() || !snapshot.hasChildren()) {
-                                addLocalSystemMessage("Sistemde aÃ§Ä±k hiÃ§bir bilet/geri bildirim bulunmuyor. Harika!");
+                                addLocalSystemMessage("Sistemde açık hiçbir bilet/geri bildirim bulunmuyor. Harika!");
                             } else {
                                 let count = 0;
                                 snapshot.forEach(child => {
                                     count++;
                                     let fb = child.val();
-                                    addLocalSystemMessage(`AÃ§Ä±k Bilet #${count} [GÃ¶nderen: ${fb.nickname}] => ${fb.message}`);
+                                    addLocalSystemMessage(`Açık Bilet #${count} [Gönderen: ${fb.nickname}] => ${fb.message}`);
                                 });
-                                addLocalSystemMessage(`Toplam ${count} adet aÃ§Ä±k bilet listelendi. YanÄ±tlamak ve Ã§Ã¶zmek iÃ§in: /Ã§Ã¶z <takma_ad> <mesajÄ±nÄ±z>`);
+                                addLocalSystemMessage(`Toplam ${count} adet açık bilet listelendi. Yanıtlamak ve çözmek için: /çöz <takma_ad> <mesajınız>`);
                             }
                         });
                     }
@@ -3520,14 +3520,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (nickInputValue !== "") currentUser = nickInputValue;
                     
                     if (!currentUser || currentUser === "Misafir") {
-                        addLocalSystemMessage("Biletlerinizi sorgulamak iÃ§in bir takma ad belirlemiÅŸ olmanÄ±z gerekir.");
+                        addLocalSystemMessage("Biletlerinizi sorgulamak için bir takma ad belirlemiş olmanız gerekir.");
                     } else {
-                        addLocalSystemMessage("Biletleriniz sorgulanÄ±yor, lÃ¼tfen bekleyin...");
+                        addLocalSystemMessage("Biletleriniz sorgulanıyor, lütfen bekleyin...");
                         if (window.db) {
                             let biletFound = false;
                             let count = 0;
                             
-                            // 1. HenÃ¼z Ã§Ã¶zÃ¼lmemiÅŸ, gÃ¶nderilen aÃ§Ä±k biletleri kontrol et
+                            // 1. Henüz çözülmemiş, gönderilen açık biletleri kontrol et
                             window.db.ref('feedbacks').once('value').then(snapshot => {
                                 if (snapshot.exists()) {
                                     snapshot.forEach(child => {
@@ -3535,104 +3535,104 @@ document.addEventListener('DOMContentLoaded', () => {
                                         if (fb.nickname && fb.nickname.toLowerCase() === currentUser.toLowerCase()) {
                                             count++;
                                             biletFound = true;
-                                            addLocalSystemMessage(`Bilet #${count} | Durum: GeliÅŸtiriciye ulaÅŸtÄ±, inceleniyor â³ | Åikayetiniz: ${fb.message}`);
+                                            addLocalSystemMessage(`Bilet #${count} | Durum: Geliştiriciye ulaştı, inceleniyor â³ | Åikayetiniz: ${fb.message}`);
                                         }
                                     });
                                 }
                                 
-                                // 2. Ã‡Ã¶zÃ¼lmÃ¼ÅŸ veya yÃ¶netici tarafÄ±ndan yanÄ±tlanmÄ±ÅŸ biletleri kontrol et
+                                // 2. Çözülmüş veya yönetici tarafından yanıtlanmış biletleri kontrol et
                                 window.db.ref('biletler/' + currentUser).once('value').then(snap2 => {
                                     if (snap2.exists() && snap2.hasChildren()) {
                                         snap2.forEach(child => {
                                             count++;
                                             biletFound = true;
                                             let biletData = child.val();
-                                            let mesaj = typeof biletData === 'string' ? biletData : (biletData.message || biletData.mesaj || "TanÄ±msÄ±z");
+                                            let mesaj = typeof biletData === 'string' ? biletData : (biletData.message || biletData.mesaj || "Tanımsız");
                                             
-                                            addLocalSystemMessage(`Bilet #${count} | Durum: Ã‡Ã¶zÃ¼ldÃ¼ âœ… (Otomatik silindi) | GeliÅŸtirici YanÄ±tÄ±: ${mesaj}`);
-                                            child.ref.remove(); // OkunduÄŸu iÃ§in sil
+                                            addLocalSystemMessage(`Bilet #${count} | Durum: Çözüldü âœ… (Otomatik silindi) | Geliştirici Yanıtı: ${mesaj}`);
+                                            child.ref.remove(); // Okunduğu için sil
                                         });
                                     }
                                     
                                     if (!biletFound) {
-                                        addLocalSystemMessage("Åu anda adÄ±nÄ±za tanÄ±mlÄ± aÃ§Ä±k veya yeni Ã§Ã¶zÃ¼lmÃ¼ÅŸ hiÃ§bir bilet bulunamadÄ±.");
+                                        addLocalSystemMessage("Åu anda adınıza tanımlı açık veya yeni çözülmüş hiçbir bilet bulunamadı.");
                                     } else {
-                                        addLocalSystemMessage(`Toplam ${count} adet bilet-kayÄ±t listelendi.`);
+                                        addLocalSystemMessage(`Toplam ${count} adet bilet-kayıt listelendi.`);
                                     }
                                 });
                             }).catch(err => {
-                                addLocalSystemMessage("BaÄŸlantÄ± hatasÄ±: Bilet veritabanÄ±na ulaÅŸÄ±lamadÄ±.");
+                                addLocalSystemMessage("Bağlantı hatası: Bilet veritabanına ulaşılamadı.");
                             });
                         } else {
-                            addLocalSystemMessage("VeritabanÄ± baÄŸlantÄ±sÄ± yok.");
+                            addLocalSystemMessage("Veritabanı bağlantısı yok.");
                         }
                     }
                 }
-            } else if (command === '/yardim' || command === '/yardÄ±m') {
-                addLocalSystemMessage("Mevcut komutlar: /temizle, /saat, /jeton, /bilet, /ziyaretci, /yardÄ±m.");
-            } else if (command === '/ziyaretci' || command === '/ziyaretÃ§i') {
+            } else if (command === '/yardim' || command === '/yardım') {
+                addLocalSystemMessage("Mevcut komutlar: /temizle, /saat, /jeton, /bilet, /ziyaretci, /yardım.");
+            } else if (command === '/ziyaretci' || command === '/ziyaretçi') {
                 if (!isDev) { 
-                    addLocalSystemMessage("Hata: Bu komut sadece geliÅŸtiriciye Ã¶zeldir."); 
+                    addLocalSystemMessage("Hata: Bu komut sadece geliştiriciye özeldir."); 
                 } else {
-                    addLocalSystemMessage("Site ziyaretÃ§i istatistikleri Ã§ekiliyor...");
+                    addLocalSystemMessage("Site ziyaretçi istatistikleri çekiliyor...");
                     if (window.db) {
                         window.db.ref('site_stats/total_visitors').once('value').then(snap => {
                             let total = snap.val() || 0;
-                            addLocalSystemMessage(`Mikyas Studio Web Sitenizi Toplam Ziyaret Eden KiÅŸi SayÄ±sÄ±: ${total}`);
-                        }).catch(() => addLocalSystemMessage("ZiyaretÃ§i sayacÄ± okunamadÄ±."));
+                            addLocalSystemMessage(`Mikyas Studio Web Sitenizi Toplam Ziyaret Eden Kişi Sayısı: ${total}`);
+                        }).catch(() => addLocalSystemMessage("Ziyaretçi sayacı okunamadı."));
                         
                         window.db.ref('site_visitors').orderByChild('timestamp').limitToLast(5).once('value').then(snap => {
                             if (snap.exists()) {
-                                addLocalSystemMessage("Son 5 ziyaretÃ§inin giriÅŸ saatleri:");
+                                addLocalSystemMessage("Son 5 ziyaretçinin giriş saatleri:");
                                 let count = 0;
                                 snap.forEach(child => {
                                     count++;
                                     let v = child.val();
                                     let dateStr = v.timestamp ? new Date(v.timestamp).toLocaleString('tr-TR') : "Bilinmeyen Tarih";
-                                    addLocalSystemMessage(`[ZiyaretÃ§i ${count}] GiriÅŸ: ${dateStr}`);
+                                    addLocalSystemMessage(`[Ziyaretçi ${count}] Giriş: ${dateStr}`);
                                 });
                             }
                         });
                     }
                 }
             } else {
-                addLocalSystemMessage("Bilinmeyen komut. KomutlarÄ± Ã¶ÄŸrenmek iÃ§in /yardÄ±m yazabilirsiniz.");
+                addLocalSystemMessage("Bilinmeyen komut. Komutları öğrenmek için /yardım yazabilirsiniz.");
             }
 
             if (chatMessageInputLocal) {
                 chatMessageInputLocal.value = '';
                 chatMessageInputLocal.focus();
             }
-            return; // Firebase veritabanÄ±na gÃ¶ndermeden sadece oyuncunun ekranÄ±nda Ã§alÄ±ÅŸtÄ±r ve bitir!
+            return; // Firebase veritabanına göndermeden sadece oyuncunun ekranında çalıştır ve bitir!
         }
 
-        // Spam KalkanÄ±: 2 Saniye Bekleme SÃ¼resi
+        // Spam Kalkanı: 2 Saniye Bekleme Süresi
         let now = Date.now();
         window.lastMessageTime = window.lastMessageTime || 0;
 
         if (now - window.lastMessageTime < 2000) {
             if (window.wrongSound) window.wrongSound.play();
-            let spamUyari = "Ã‡ok hÄ±zlÄ± mesaj gÃ¶nderiyorsunuz. LÃ¼tfen biraz bekleyin.";
+            let spamUyari = "Çok hızlı mesaj gönderiyorsunuz. Lütfen biraz bekleyin.";
             if (window.announceToScreenReader) window.announceToScreenReader(spamUyari);
-            return; // GÃ¶nderimi iptal et ve sistemi koru!
+            return; // Gönderimi iptal et ve sistemi koru!
         }
 
-        // SÃ¼re kuralÄ±na uyulduysa yeni zamanÄ± kaydet ve iÅŸleme devam et
+        // Süre kuralına uyulduysa yeni zamanı kaydet ve işleme devam et
         window.lastMessageTime = now;
 
         if (nickname.toLowerCase() === 'sistem') {
-            if (window.announceToScreenReader) window.announceToScreenReader('Bu takma adÄ± kullanamazsÄ±nÄ±z.', false);
+            if (window.announceToScreenReader) window.announceToScreenReader('Bu takma adı kullanamazsınız.', false);
             chatNicknameInput.focus();
             return;
         }
 
         if (text === '') {
-            if (window.announceToScreenReader) window.announceToScreenReader('LÃ¼tfen bir mesaj yazÄ±n.', false);
+            if (window.announceToScreenReader) window.announceToScreenReader('Lütfen bir mesaj yazın.', false);
             chatMessageInput.focus();
             return;
         }
 
-        if (text.toLowerCase().startsWith('/rutbe ') || text.toLowerCase().startsWith('/rÃ¼tbe ')) {
+        if (text.toLowerCase().startsWith('/rutbe ') || text.toLowerCase().startsWith('/rütbe ')) {
             let cUserNick = (nickname || "").toLowerCase();
             let isDev = ['ekrem'].includes(cUserNick) || (window.playerRanks && window.playerRanks[cUserNick] && window.playerRanks[cUserNick].toLowerCase() === 'tester');
             
@@ -3648,13 +3648,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 let targetUser = parts[1].toLowerCase();
                 let newRank = parts.slice(2).join(" ");
                 window.db.ref('ranks/' + targetUser).set(newRank).then(() => {
-                    if (window.announceToScreenReader) window.announceToScreenReader(`${targetUser} kullanÄ±cÄ±sÄ±nÄ±n rÃ¼tbesi baÅŸarÄ±yla ${newRank} yapÄ±ldÄ±.`, true);
+                    if (window.announceToScreenReader) window.announceToScreenReader(`${targetUser} kullanıcısının rütbesi başarıyla ${newRank} yapıldı.`, true);
                     chatMessageInput.value = '';
                 }).catch(err => {
-                    if (window.announceToScreenReader) window.announceToScreenReader("RÃ¼tbe deÄŸiÅŸtirilirken bir hata oluÅŸtu.", true);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Rütbe değiştirilirken bir hata oluştu.", true);
                 });
             } else {
-                if (window.announceToScreenReader) window.announceToScreenReader("KullanÄ±m: /rÃ¼tbe [kullanÄ±cÄ±_adÄ±] [yeni_rÃ¼tbe]", true);
+                if (window.announceToScreenReader) window.announceToScreenReader("Kullanım: /rütbe [kullanıcı_adı] [yeni_rütbe]", true);
             }
             return;
         }
@@ -3666,7 +3666,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             };
 
-            // Presence AÅŸama 2: Ä°sim GÃ¼ncelleme ve Kanca Yenileme
+            // Presence Aşama 2: İsim Güncelleme ve Kanca Yenileme
             if (nickname !== window.currentChatUser && nickname !== "Sistem") {
                 window.currentChatUser = nickname;
                 if (window.disconnectRef) {
@@ -3676,7 +3676,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             window.db.ref('messages').push(messageData).then(() => {
-                // 50 Mesaj KotasÄ±: Databasede 50 mesajdan fazlasÄ± varsa en eskilerini sil!
+                // 50 Mesaj Kotası: Databasede 50 mesajdan fazlası varsa en eskilerini sil!
                 window.db.ref('messages').once('value').then(snapshot => {
                     let total = snapshot.numChildren();
                     if (total > 50) {
@@ -3691,40 +3691,40 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
-                // BaÅŸarÄ±lÄ± gÃ¶nderim sonrasÄ± Takma AdÄ± oturuma VE KALICI DEPOLAMAYA kaydet
+                // Başarılı gönderim sonrası Takma Adı oturuma VE KALICI DEPOLAMAYA kaydet
                 localStorage.setItem('chatUsername', nickname);
                 sessionStorage.setItem('chatNickname', nickname);
                 chatNicknameInput.style.display = 'none';
                 
                 chatMessageInput.value = ''; // Mesaj formunu temizle
                 
-                // Oyuna hÄ±zlÄ±ca devam edilebilmesi iÃ§in sohbet penceresini otomatik kapat
+                // Oyuna hızlıca devam edilebilmesi için sohbet penceresini otomatik kapat
                 if (window.isChatOpen && typeof window.toggleChat === 'function') {
                     window.toggleChat();
                 }
 
-                // MesajÄ±n baÅŸarÄ±yla gÃ¶nderildiÄŸini bildir (pencere kapanma anonsu ile karÄ±ÅŸmamasÄ± iÃ§in 100ms gecikme)
+                // Mesajın başarıyla gönderildiğini bildir (pencere kapanma anonsu ile karışmaması için 100ms gecikme)
                 setTimeout(() => {
                     if (window.announceToScreenReader) {
-                        window.announceToScreenReader('Mesaj gÃ¶nderildi.', false);
+                        window.announceToScreenReader('Mesaj gönderildi.', false);
                     }
                 }, 100);
             }).catch(error => {
-                console.error("Mesaj gÃ¶nderilirken hata oluÅŸtu:", error);
+                console.error("Mesaj gönderilirken hata oluştu:", error);
                 
                 // Hata durumunda uyar
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader('Hata: Mesaj gÃ¶nderilemedi. LÃ¼tfen baÄŸlantÄ±nÄ±zÄ± kontrol edin.', true);
+                    window.announceToScreenReader('Hata: Mesaj gönderilemedi. Lütfen bağlantınızı kontrol edin.', true);
                 }
             });
         }
         }); // END OF registeredUsers Check
     }
 
-    // GÃ¶nder butonuna tÄ±klandÄ±ÄŸÄ±nda
+    // Gönder butonuna tıklandığında
     chatSendBtn.addEventListener('click', sendMessage);
 
-    // Mesaj kutusundayken Enter'a basÄ±ldÄ±ÄŸÄ±nda
+    // Mesaj kutusundayken Enter'a basıldığında
     chatMessageInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -3732,8 +3732,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // MesajlarÄ± Dinleme Ä°ÅŸlevi (Sadece son 50 mesaj)
-    // Firebase push() anahtarlarÄ± zaten kronolojik olduÄŸu iÃ§in orderByChild'a gerek yoktur, bu sayede Index hatasÄ± vermez ve geÃ§miÅŸi kesin yÃ¼kler.
+    // Mesajları Dinleme İşlevi (Sadece son 50 mesaj)
+    // Firebase push() anahtarları zaten kronolojik olduğu için orderByChild'a gerek yoktur, bu sayede Index hatası vermez ve geçmişi kesin yükler.
     
     window.playerRanks = {};
     window.db.ref('ranks').on('value', snap => {
@@ -3743,7 +3743,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let myRank = "Oyuncu";
             let isimKucuk = myName.toLowerCase();
             if (['ekrem'].includes(isimKucuk)) {
-                myRank = "GeliÅŸtirici";
+                myRank = "Geliştirici";
             } else if (window.playerRanks && window.playerRanks[isimKucuk]) {
                 myRank = window.playerRanks[isimKucuk];
             }
@@ -3755,20 +3755,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const messagesRef = window.db.ref('messages').limitToLast(50);
     const chatLoadTime = Date.now();
     
-    // VeritabanÄ± boÅŸsa "HiÃ§ mesaj yok" uyarÄ±sÄ± ekleme
+    // Veritabanı boşsa "Hiç mesaj yok" uyarısı ekleme
     messagesRef.once('value', (snapshot) => {
         if (!snapshot.exists()) {
             const li = document.createElement('li');
             li.id = 'empty-chat-warning';
             li.classList.add('system-message');
-            const srText = `<span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Sistem mesajÄ±: Bu sohbet kutusunda hiÃ§ mesaj yok. Ä°lk mesajÄ±nÄ±zÄ± gÃ¶ndermek iÃ§in gÃ¼zel bir zaman.</span>`;
-            li.innerHTML = `${srText}<div class="wp-bubble" aria-hidden="true" style="opacity: 0.8;">Bu sohbet kutusunda hiÃ§ mesaj yok.<br>Ä°lk mesajÄ±nÄ±zÄ± gÃ¶ndermek iÃ§in gÃ¼zel bir zaman. ğŸ‘‹</div>`;
+            const srText = `<span style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);">Sistem mesajı: Bu sohbet kutusunda hiç mesaj yok. İlk mesajınızı göndermek için güzel bir zaman.</span>`;
+            li.innerHTML = `${srText}<div class="wp-bubble" aria-hidden="true" style="opacity: 0.8;">Bu sohbet kutusunda hiç mesaj yok.<br>İlk mesajınızı göndermek için güzel bir zaman. ğŸ‘‹</div>`;
             chatMessagesList.appendChild(li);
         }
     });
 
     messagesRef.on('child_added', (snapshot) => {
-        // EÄŸer boÅŸ sohbet uyarÄ±sÄ± ekranda duruyorsa, ilk mesaj geldiÄŸinde onu sil!
+        // Eğer boş sohbet uyarısı ekranda duruyorsa, ilk mesaj geldiğinde onu sil!
         const emptyWarning = document.getElementById('empty-chat-warning');
         if (emptyWarning) {
             emptyWarning.remove();
@@ -3778,13 +3778,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!data) return;
 
         let mutedUsers = JSON.parse(localStorage.getItem('hafizaGuvenMutedUsers') || "[]");
-        if (mutedUsers.includes(data.nickname)) return; // Sessize alÄ±nmÄ±ÅŸ kiÅŸinin mesajÄ±nÄ± engelledik
+        if (mutedUsers.includes(data.nickname)) return; // Sessize alınmış kişinin mesajını engelledik
         
         let timeString = "";
         let timeRaw = "";
         let ts = data.timestamp;
         
-        // Yerel itme anÄ±nda (Optimistic Render) TIMESTAMP obje veya hatalÄ± olabilir, bu durumda geÃ§ici yerel cihaz saati kullanÄ±lÄ±r
+        // Yerel itme anında (Optimistic Render) TIMESTAMP obje veya hatalı olabilir, bu durumda geçici yerel cihaz saati kullanılır
         if (typeof ts !== 'number') {
             ts = Date.now();
         }
@@ -3798,7 +3798,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (data.nickname === "Sistem") {
-            // Sistem mesajlarÄ±nÄ± sohbet listesine (DOM'a) ekleme, anlÄ±k bildirim (toast) olarak yansÄ±t
+            // Sistem mesajlarını sohbet listesine (DOM'a) ekleme, anlık bildirim (toast) olarak yansıt
             if (Date.now() - chatLoadTime > 2000) {
                 if (window.showToastNotification) {
                     window.showToastNotification(data.text);
@@ -3808,17 +3808,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             li.setAttribute('tabindex', '0');
             
-            // RÃ¼tbe Belirleme
+            // Rütbe Belirleme
             let isimKucuk = (data.nickname || "").toLowerCase();
             let isDevRender = ['ekrem'].includes(isimKucuk);
             let rutbe = "Oyuncu";
             if (isDevRender) {
-                rutbe = "GeliÅŸtirici";
+                rutbe = "Geliştirici";
             } else if (window.playerRanks && window.playerRanks[isimKucuk]) {
                 rutbe = window.playerRanks[isimKucuk];
             }
             
-            // Benim gÃ¶nderdiÄŸim mesaj mÄ± yoksa baÅŸkasÄ±nÄ±n mÄ±?
+            // Benim gönderdiğim mesaj mı yoksa başkasının mı?
             const isMe = data.nickname === chatNicknameInput.value.trim() && chatNicknameInput.value.trim() !== "";
             li.classList.add(isMe ? 'message-out' : 'message-in');
             
@@ -3826,7 +3826,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let rankColor = isDevRender ? '#ffaa00' : (rutbe.toLowerCase() === 'tester' ? '#ff55ff' : (rutbe !== 'Oyuncu' ? '#55aaff' : (isMe ? '#9bbca1' : '#88acb8')));
             
-            // Whatsapp GÃ¶rsel Balonu
+            // Whatsapp Görsel Balonu
             li.innerHTML = `
                 <div class="wp-bubble" aria-hidden="true">
                     ${!isMe ? `<div class="wp-sender"><span style="color:${rankColor}; font-size:0.85em;">[${rutbe}]</span> ${escapeHTML(data.nickname)}</div>` : `<div style="font-size: 0.75em; color:${rankColor}; margin-bottom: 3px;">[${rutbe}]</div>`}
@@ -3837,25 +3837,25 @@ document.addEventListener('DOMContentLoaded', () => {
             chatMessagesList.appendChild(li);
         }
 
-        // Yeni mesaj gelince otomatik olarak en alta kaydÄ±r
+        // Yeni mesaj gelince otomatik olarak en alta kaydır
         if (chatMessagesContainer && window.isChatOpen && data.nickname !== "Sistem") {
-            // Sadece sohbet aÃ§Ä±ksa kaydÄ±r, deÄŸilse aÃ§Ä±ldÄ±ÄŸÄ±nda zaten aÅŸaÄŸÄ±da kalmasÄ± iÃ§in toggleChat iÃ§ine eklenecek
+            // Sadece sohbet açıksa kaydır, değilse açıldığında zaten aşağıda kalması için toggleChat içine eklenecek
             setTimeout(() => {
                 chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
             }, 10);
         }
 
-        // --- NVDA iÃ§in Yeni MesajlarÄ± DoÄŸrudan Anons Etme ---
+        // --- NVDA için Yeni Mesajları Doğrudan Anons Etme ---
         const isMe = data.nickname === chatNicknameInput.value.trim() && chatNicknameInput.value.trim() !== "";
         let messageToRead = "";
         let isNewIncomingMessage = false;
 
         if (data.nickname === "Sistem") {
-            messageToRead = `Sistem mesajÄ±: ${data.text}`;
+            messageToRead = `Sistem mesajı: ${data.text}`;
         } else {
             let isimKucuk = (data.nickname || "").toLowerCase();
             let isDevRead = ['ekrem'].includes(isimKucuk);
-            let rutbe = isDevRead ? "GeliÅŸtirici" : "Oyuncu";
+            let rutbe = isDevRead ? "Geliştirici" : "Oyuncu";
 
             messageToRead = `${rutbe} ${data.nickname}: ${data.text}`;
             if (!isMe) {
@@ -3863,37 +3863,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // Sadece sayfa aÃ§Ä±lÄ±ÅŸÄ±ndaki geÃ§miÅŸ mesaj yÄ±ÄŸÄ±nÄ±nÄ± atlamak iÃ§in zamanÄ± kontrol ediyoruz
+        // Sadece sayfa açılışındaki geçmiş mesaj yığınını atlamak için zamanı kontrol ediyoruz
         if (Date.now() - chatLoadTime > 2000) {
-            // BaÅŸkasÄ±ndan gelen mesaj ise ses Ã§al
+            // Başkasından gelen mesaj ise ses çal
             if (isNewIncomingMessage && window.chatReceiveSound) {
                 window.chatReceiveSound.play();
             }
             
-            // "BoÅŸ" (empty) bug'Ä±nÄ± ve PC NVDA sessizliÄŸini uyumlu ÅŸekilde bitirmek iÃ§in announceToScreenReader'Ä± kullanÄ±yoruz
+            // "Boş" (empty) bug'ını ve PC NVDA sessizliğini uyumlu şekilde bitirmek için announceToScreenReader'ı kullanıyoruz
             if (window.announceToScreenReader) {
                 window.announceToScreenReader(messageToRead, false); // forceFocus = false
             }
         }
     });
 
-    // Sohbet penceresi aÃ§Ä±ldÄ±ÄŸÄ±nda geÃ§miÅŸ mesajlarÄ±n en altÄ±na kaydÄ±rmayÄ± garantiye almak iÃ§in Observer ekleyelim
-    // Veya toggleChat butonuna basÄ±ldÄ±ÄŸÄ±nda scrollTop tetiklenebilir.
+    // Sohbet penceresi açıldığında geçmiş mesajların en altına kaydırmayı garantiye almak için Observer ekleyelim
+    // Veya toggleChat butonuna basıldığında scrollTop tetiklenebilir.
 });
 
-// Oyuncu oyundan Ã§Ä±karken/sayfa kapanÄ±rken tÃ¼m sohbeti kalÄ±cÄ± olarak sÄ±fÄ±rla (0'la)
-// KRÄ°TÄ°K HATA DÃœZELTMESÄ°: remove() fonksiyonu herhangi bir kullanÄ±cÄ± oyundan Ã§Ä±ktÄ±ÄŸÄ±nda, 
-// odayÄ± kullanan TÃœM diÄŸer oyuncularÄ±n da canlÄ± sohbet geÃ§miÅŸini veritabanÄ±ndan kalÄ±cÄ± olarak silmesine (wipe) yol aÃ§Ä±yordu! 
-// Bu nedenle kÃ¼resel temizlik fonsiyonu iptal edildi.
+// Oyuncu oyundan çıkarken/sayfa kapanırken tüm sohbeti kalıcı olarak sıfırla (0'la)
+// KRİTİK HATA DÜZELTMESİ: remove() fonksiyonu herhangi bir kullanıcı oyundan çıktığında, 
+// odayı kullanan TÜM diğer oyuncuların da canlı sohbet geçmişini veritabanından kalıcı olarak silmesine (wipe) yol açıyordu! 
+// Bu nedenle küresel temizlik fonsiyonu iptal edildi.
 // window.addEventListener('beforeunload', () => {
 //     if (window.db) {
 //         window.db.ref('messages').remove();
 //     }
 // });
 
-// --- GÃ–REV 1 KaldÄ±rÄ±ldÄ± (Tab yÃ¶netimi game.js'deki exception'lar ile yapÄ±lÄ±yor) ---
+// --- GÖREV 1 Kaldırıldı (Tab yönetimi game.js'deki exception'lar ile yapılıyor) ---
 
-// --- Ã–ZEL MESAJLAÅMA (PRIVATE CHAT) VE KULLANICI Ä°ÅLEM MENÃœSÃœ ---
+// --- ÖZEL MESAJLAÅMA (PRIVATE CHAT) VE KULLANICI İÅLEM MENÜSÜ ---
 document.addEventListener('DOMContentLoaded', () => {
     const actionModal = document.getElementById('social-action-modal');
     const actionTitle = document.getElementById('social-action-title');
@@ -3923,10 +3923,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let isMuted = getMutedUsers().includes(playerName);
 
-        if (actionTitle) actionTitle.innerText = playerName + " Ä°ÅŸlemleri";
+        if (actionTitle) actionTitle.innerText = playerName + " İşlemleri";
         if (btnMute) {
-            btnMute.innerText = isMuted ? "SusturmayÄ± KaldÄ±r" : "KullanÄ±cÄ±yÄ± Sustur";
-            btnMute.setAttribute('aria-label', isMuted ? "KullanÄ±cÄ±nÄ±n susturmasÄ±nÄ± kaldÄ±r" : "KullanÄ±cÄ±yÄ± sustur");
+            btnMute.innerText = isMuted ? "Susturmayı Kaldır" : "Kullanıcıyı Sustur";
+            btnMute.setAttribute('aria-label', isMuted ? "Kullanıcının susturmasını kaldır" : "Kullanıcıyı sustur");
         }
 
         let cUserNick = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
@@ -3947,7 +3947,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.currentFocusIndex = 0;
             if (btnPm) btnPm.focus();
             if (window.announceToScreenReader) {
-                window.announceToScreenReader(playerName + " detaylarÄ± aÃ§Ä±ldÄ±. Ã–zel mesaj gÃ¶nderebilir veya susturabilirsiniz.", true);
+                window.announceToScreenReader(playerName + " detayları açıldı. Özel mesaj gönderebilir veya susturabilirsiniz.", true);
             }
         }, 50);
     };
@@ -3979,11 +3979,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (isMuted) {
                 mutedUsers = mutedUsers.filter(u => u !== window.selectedSocialPlayer);
-                if (window.announceToScreenReader) window.announceToScreenReader(window.selectedSocialPlayer + " artÄ±k size mesaj gÃ¶nderebilecek.");
-                if (window.showToastNotification) window.showToastNotification(window.selectedSocialPlayer + " susturmasÄ± kaldÄ±rÄ±ldÄ±.");
+                if (window.announceToScreenReader) window.announceToScreenReader(window.selectedSocialPlayer + " artık size mesaj gönderebilecek.");
+                if (window.showToastNotification) window.showToastNotification(window.selectedSocialPlayer + " susturması kaldırıldı.");
             } else {
                 mutedUsers.push(window.selectedSocialPlayer);
-                if (window.announceToScreenReader) window.announceToScreenReader(window.selectedSocialPlayer + " susturuldu. Hem Ã¶zel hem global mesajlarÄ± engellendi.");
+                if (window.announceToScreenReader) window.announceToScreenReader(window.selectedSocialPlayer + " susturuldu. Hem özel hem global mesajları engellendi.");
                 if (window.showToastNotification) window.showToastNotification(window.selectedSocialPlayer + " susturuldu.");
             }
             localStorage.setItem('hafizaGuvenMutedUsers', JSON.stringify(mutedUsers));
@@ -4002,11 +4002,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnResolve) {
         btnResolve.addEventListener('click', () => {
-            let msg = prompt("Bu oyuncuya iletilecek bilet Ã§Ã¶zÃ¼m mesajÄ±nÄ± girin:");
+            let msg = prompt("Bu oyuncuya iletilecek bilet çözüm mesajını girin:");
             if (msg && msg.trim() !== "" && window.db) {
                 let targetUser = window.selectedSocialPlayer;
                 window.db.ref('biletler/' + targetUser).push({
-                    durum: "Ã§Ã¶zÃ¼ldÃ¼",
+                    durum: "çözüldü",
                     message: msg,
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
@@ -4020,7 +4020,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 deletedCount++;
                             }
                         });
-                        alert(`${targetUser} kullanÄ±cÄ±sÄ±nÄ±n ${deletedCount} bileti kapatÄ±ldÄ± ve mesaj iletildi!`);
+                        alert(`${targetUser} kullanıcısının ${deletedCount} bileti kapatıldı ve mesaj iletildi!`);
                     }
                 });
             }
@@ -4030,10 +4030,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnBan) {
         btnBan.addEventListener('click', () => {
-            if (confirm(`${window.selectedSocialPlayer} adlÄ± oyuncuyu oyundan yasaklamak istediÄŸinize emin misiniz?`)) {
+            if (confirm(`${window.selectedSocialPlayer} adlı oyuncuyu oyundan yasaklamak istediğinize emin misiniz?`)) {
                 if (window.db) {
                     window.db.ref('banned_users/' + window.selectedSocialPlayer).set(true);
-                    alert(`${window.selectedSocialPlayer} yasaklandÄ±.`);
+                    alert(`${window.selectedSocialPlayer} yasaklandı.`);
                 }
             }
             window.closeSocialActionModal();
@@ -4042,10 +4042,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnUnban) {
         btnUnban.addEventListener('click', () => {
-            if (confirm(`${window.selectedSocialPlayer} adlÄ± oyuncunun yasaÄŸÄ±nÄ± kaldÄ±rmak istediÄŸinize emin misiniz?`)) {
+            if (confirm(`${window.selectedSocialPlayer} adlı oyuncunun yasağını kaldırmak istediğinize emin misiniz?`)) {
                 if (window.db) {
                     window.db.ref('banned_users/' + window.selectedSocialPlayer).remove();
-                    alert(`${window.selectedSocialPlayer} kullanÄ±cÄ±sÄ±nÄ±n yasaÄŸÄ± kaldÄ±rÄ±ldÄ±.`);
+                    alert(`${window.selectedSocialPlayer} kullanıcısının yasağı kaldırıldı.`);
                 }
             }
             window.closeSocialActionModal();
@@ -4060,15 +4060,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname');
         if (!myName || myName === "Misafir") {
-            if (window.announceToScreenReader) window.announceToScreenReader("Ã–zel mesajlaÅŸmak iÃ§in KÃ¼resel Sohbet menÃ¼sÃ¼ Ã¼zerinden onaylÄ± bir takma ad belirlemelisiniz.", true);
-            if (window.showToastNotification) window.showToastNotification("Ã–nce Sohbet'ten takma ad alÄ±n!");
+            if (window.announceToScreenReader) window.announceToScreenReader("Özel mesajlaşmak için Küresel Sohbet menüsü üzerinden onaylı bir takma ad belirlemelisiniz.", true);
+            if (window.showToastNotification) window.showToastNotification("Önce Sohbet'ten takma ad alın!");
             return;
         }
 
         currentPrivateRecipient = recipientName;
         window.isPrivateChatOpen = true;
 
-        if (privateChatTitle) privateChatTitle.innerText = `${recipientName} ile Ã–zel Sohbet`;
+        if (privateChatTitle) privateChatTitle.innerText = `${recipientName} ile Özel Sohbet`;
         
         if (privateChatListenerRef && window.db) privateChatListenerRef.off();
 
@@ -4119,7 +4119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (window.chatReceiveSound) window.chatReceiveSound.play();
                 const liveAnnouncer = document.getElementById('sr-chat-reader');
                 if (liveAnnouncer) {
-                    liveAnnouncer.innerText = `Ã–zel mesaj: ${msg.sender} ${msg.text} yazdÄ±.`;
+                    liveAnnouncer.innerText = `Özel mesaj: ${msg.sender} ${msg.text} yazdı.`;
                 }
             }
         });
@@ -4192,8 +4192,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (!window.isPrivateChatOpen || currentPrivateRecipient !== notif.from) {
                         if (window.startAdminAlert) window.startAdminAlert('message');
                         if (window.chatReceiveSound) window.chatReceiveSound.play();
-                        if (window.showToastNotification) window.showToastNotification(`ğŸ’¬ ${notif.from} size bir Ã¶zel mesaj gÃ¶nderdi.`);
-                        if (window.announceToScreenReader) window.announceToScreenReader(`${notif.from} kullanÄ±cÄ±sÄ±ndan yeni bir Ã¶zel mesajÄ±nÄ±z var. Sosyal sekmesinden veya ona tÄ±klayarak ulaÅŸabilirsiniz.`);
+                        if (window.showToastNotification) window.showToastNotification(`ğŸ’¬ ${notif.from} size bir özel mesaj gönderdi.`);
+                        if (window.announceToScreenReader) window.announceToScreenReader(`${notif.from} kullanıcısından yeni bir özel mesajınız var. Sosyal sekmesinden veya ona tıklayarak ulaşabilirsiniz.`);
                     }
                 }
             }
@@ -4205,8 +4205,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (missedSenders.size > 0) {
                 let senders = Array.from(missedSenders).join(", ");
                 if (window.startAdminAlert) window.startAdminAlert('message');
-                if (window.announceToScreenReader) window.announceToScreenReader(`Siz yokken ÅŸu kiÅŸilerden Ã¶zel mesaj geldi: ${senders}`, true);
-                if (window.showToastNotification) window.showToastNotification(`KaÃ§Ä±rdÄ±ÄŸÄ±nÄ±z mesajlar var: ${senders}`, 'info');
+                if (window.announceToScreenReader) window.announceToScreenReader(`Siz yokken şu kişilerden özel mesaj geldi: ${senders}`, true);
+                if (window.showToastNotification) window.showToastNotification(`Kaçırdığınız mesajlar var: ${senders}`, 'info');
             }
         }, 3000);
     };
@@ -4218,23 +4218,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.addEventListener('offline', () => {
     if (window.announceToScreenReader) {
-        window.announceToScreenReader("UyarÄ±: Ä°nternet baÄŸlantÄ±nÄ±z koptu. Ã‡ok oyunculu Ã¶zellikler ve sohbet ÅŸu an kullanÄ±lamaz. Ã‡evrimdÄ±ÅŸÄ± modda oynamaya devam edebilirsiniz.", true);
+        window.announceToScreenReader("Uyarı: İnternet bağlantınız koptu. Çok oyunculu özellikler ve sohbet şu an kullanılamaz. Çevrimdışı modda oynamaya devam edebilirsiniz.", true);
     }
     if (window.showToastNotification) {
-        window.showToastNotification("Ä°nternet baÄŸlantÄ±sÄ± koptu!");
+        window.showToastNotification("İnternet bağlantısı koptu!");
     }
 });
 
 window.addEventListener('online', () => {
     if (window.announceToScreenReader) {
-        window.announceToScreenReader("Ä°nternet baÄŸlantÄ±sÄ± tekrar saÄŸlandÄ±. Sunucuya yeniden baÄŸlanÄ±lÄ±yor.", true);
+        window.announceToScreenReader("İnternet bağlantısı tekrar sağlandı. Sunucuya yeniden bağlanılıyor.", true);
     }
     if (window.showToastNotification) {
-        window.showToastNotification("Ä°nternet geri geldi!");
+        window.showToastNotification("İnternet geri geldi!");
     }
 });
 
-// --- NVDA Ä°Ã‡Ä°N MESAJ KUYRUÄU SÄ°STEMÄ° ---
+// --- NVDA İÇİN MESAJ KUYRUÄU SİSTEMİ ---
 if (!window.orijinalAnnounce) {
     window.orijinalAnnounce = window.announceToScreenReader;
     window.srMesajKuyrugu = [];
@@ -4246,19 +4246,19 @@ if (!window.orijinalAnnounce) {
     };
     
     window.srKuyruguIslet = function() {
-        // EÄŸer okuma devam ediyorsa veya kuyruk boÅŸsa dur
+        // Eğer okuma devam ediyorsa veya kuyruk boşsa dur
         if (window.srOkuyorMu || window.srMesajKuyrugu.length === 0) return;
         
         window.srOkuyorMu = true;
-        const siradaki = window.srMesajKuyrugu.shift(); // Kuyruktan ilk mesajÄ± al
+        const siradaki = window.srMesajKuyrugu.shift(); // Kuyruktan ilk mesajı al
         
-        // Orijinal okuma fonksiyonunu Ã§aÄŸÄ±r
+        // Orijinal okuma fonksiyonunu çağır
         window.orijinalAnnounce(siradaki.text, siradaki.forceFocus);
         
-        // Okuma sÃ¼resi tahmini: Harf baÅŸÄ±na ortalama 70ms + 1 saniye bekleme payÄ±
+        // Okuma süresi tahmini: Harf başına ortalama 70ms + 1 saniye bekleme payı
         const okumaSuresi = Math.max(1500, (siradaki.text.length * 70) + 1000);
         
-        // AÅŸama 1'de kurduÄŸumuz ajan zamanlayÄ±cÄ±sÄ±nÄ± kullanarak sÄ±radaki mesaja geÃ§
+        // Aşama 1'de kurduğumuz ajan zamanlayıcısını kullanarak sıradaki mesaja geç
         window.hgfzZamanlayici.setTimeout(() => {
             window.srOkuyorMu = false;
             window.srKuyruguIslet(); // Kuyrukta bekleyen varsa devam et
@@ -4266,7 +4266,7 @@ if (!window.orijinalAnnounce) {
     };
 }
 
-// --- DURAKLATMA / Ã‡IKIÅ MENÃœSÃœ MANTIÄI ---
+// --- DURAKLATMA / ÇIKIÅ MENÜSÜ MANTIÄI ---
 window.gameIsPaused = false;
 window.requestPauseMenu = function() {
     window.gameIsPaused = true;
@@ -4283,7 +4283,7 @@ window.requestPauseMenu = function() {
                 title.focus();
             }
             if (window.announceToScreenReader) {
-                window.announceToScreenReader("Oyun duraklatÄ±ldÄ±. Ne yapmak istiyorsunuz? SeÃ§enekler iÃ§in TAB veya ok tuÅŸlarÄ±nÄ± kullanabilirsiniz.", true);
+                window.announceToScreenReader("Oyun duraklatıldı. Ne yapmak istiyorsunuz? Seçenekler için TAB veya ok tuşlarını kullanabilirsiniz.", true);
             }
         }, 10);
     }
@@ -4398,18 +4398,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.showAchievementModal = function(achName) {
         let gameLink = "https://mikyasstudio.com.tr/hafizanaguven.html";
-        let shareText = Tebrikler! HafÃ„Â±zana GÃƒÂ¼ven'de " + achName + " baÃ…Å¸arÃ„Â±mÃ„Â±nÃ„Â± elde ettim! ÄŸÅ¸Ââ€ \n\nSen de benimle beraber bu baÃ…Å¸arÃ„Â±yÃ„Â± yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna:  + gameLink;
+        let shareText = Tebrikler! HafÃ„±zana GÃƒ¼ven'de " + achName + " baÃ…Å¸arÃ„±mÃ„±nÃ„± elde ettim! ğÅ¸â€ \n\nSen de benimle beraber bu baÃ…Å¸arÃ„±yÃ„± yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna:  + gameLink;
         
         let textElem = document.getElementById('achievement-modal-text');
         if (textElem) {
-            textElem.textContent = Tebrikler! " + achName + " baÃ…Å¸arÃ„Â±mÃ„Â±nÃ„Â± elde ettiniz! Bunu arkadaÃ…Å¸larÃ„Â±nÃ„Â±zla paylaÃ…Å¸abilirsiniz.;
+            textElem.textContent = Tebrikler! " + achName + " baÃ…Å¸arÃ„±mÃ„±nÃ„± elde ettiniz! Bunu arkadaÃ…Å¸larÃ„±nÃ„±zla paylaÃ…Å¸abilirsiniz.;
             textElem.focus();
         }
         
         if (btnAchCopy) {
             btnAchCopy.onclick = () => {
                 navigator.clipboard.writeText(shareText).then(() => {
-                    if (window.announceToScreenReader) window.announceToScreenReader("Mesaj kopyalandÃ„Â±!");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Mesaj kopyalandÃ„±!");
                     if (window.correctSound) window.correctSound.play();
                 });
             };
@@ -4437,3 +4437,4 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.modeUnlockSound) window.modeUnlockSound.play();
     };
 });
+
