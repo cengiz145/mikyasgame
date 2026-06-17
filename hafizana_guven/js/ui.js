@@ -647,10 +647,16 @@ window.updateStatsDisplay = function() {
 
     let achievementsHtml = "";
     let userAch = window.userAchievements;
-    if (!userAch) userAch = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
+    if (!userAch) {
+        try {
+            userAch = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
+        } catch(e) {
+            userAch = {};
+        }
+    }
     let earnedAch = [];
-    if (userAch.hafizam_gucleniyor) earnedAch.push("âœ… HafÄ±zam GÃ¼Ã§leniyor");
-    if (userAch.buzsuz_3_gun) earnedAch.push("âœ… SadÄ±k Oyuncu");
+    if (userAch && userAch.hafizam_gucleniyor) earnedAch.push("âœ… HafÄ±zam GÃ¼Ã§leniyor");
+    if (userAch && userAch.buzsuz_3_gun) earnedAch.push("âœ… SadÄ±k Oyuncu");
     
     if (earnedAch.length > 0) {
         achievementsHtml = `<li style="margin-top: 15px; font-weight: bold; color: #4ade80;">KazanÄ±lan BaÅŸarÄ±mlar:</li>`;
