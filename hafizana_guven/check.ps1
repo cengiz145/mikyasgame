@@ -1,0 +1,1 @@
+ = Get-Content 'js\audio.js' -Raw;  = [regex]"src:\s*\[\s*'([^']+)'\s*\]";  = .Matches();  = 0;  = 0; foreach ($m in $matches) { $file = $m.Groups[1].Value; $count++; if (-not (Test-Path $file)) { Write-Host "MISSING: $file"; $errors++ } else { Write-Host "OK: $file" } }; Write-Host "Total: $count Errors: $errors"

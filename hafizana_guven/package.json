@@ -1,0 +1,16 @@
+{
+  "name": "hafizana-guven",
+  "version": "0.97.4.48",
+  "description": "GÃ¶rme engelliler iÃ§in Ã¶zel olarak tasarlanmÄ±ÅŸ ses odaklÄ± hafÄ±za ve yetenek oyunu.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "npx electron-packager . HafizanaGuven --platform=win32 --arch=x64 --out=dist --overwrite"
+  },
+  "author": "Ãœmit Ekrem Mikyas",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.2.0",
+    "electron-packager": "^17.1.2"
+  }
+}

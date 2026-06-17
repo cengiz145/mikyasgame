@@ -1,0 +1,466 @@
+// audio.js - Ses TanÄ±mlamalarÄ± ve Ä°ÅŸlevleri
+
+// Dinleyiciyi (KullanÄ±cÄ±) (0,0,0) merkez noktasÄ±na koyalÄ±m.
+Howler.pos(0, 0, 0);
+Howler.orientation(0, 0, -1, 0, 1, 0);
+
+window.currentLogoSound = null;
+
+window.pianoBgMusic = new Howl({
+    src: ['sounds/menu-music.ogg'],
+    loop: true,
+    volume: 1.0,
+    html5: false
+});
+
+window.baglamaBgMusic = new Howl({
+    src: ['sounds/music3.ogg'],
+    loop: true,
+    volume: 1.0,
+    html5: false
+});
+
+window.kanunBgMusic = new Howl({
+    src: ['sounds/music2.ogg'],
+    loop: true,
+    volume: 1.0,
+    html5: false
+});
+
+window.kavalBgMusic = new Howl({
+    src: ['sounds/music4.ogg'],
+    loop: true,
+    volume: 1.0,
+    html5: false
+});
+
+window.flutBgMusic = new Howl({
+    src: ['sounds/music226.ogg'],
+    loop: true,
+    volume: 1.0,
+    html5: false
+});
+
+class BgMusicWrapper {
+    get current() {
+        if (window.activeInstrument === 'baglama') return window.baglamaBgMusic;
+        if (window.activeInstrument === 'kanun') return window.kanunBgMusic;
+        if (window.activeInstrument === 'kaval') return window.kavalBgMusic;
+        if (window.activeInstrument === 'flut') return window.flutBgMusic;
+        return window.pianoBgMusic;
+    }
+    play() { 
+        if (window.setMusicVolume) {
+            let savedVol = localStorage.getItem('hafizaGuvenMusicVolume');
+            if (savedVol !== null) window.setMusicVolume(savedVol);
+        }
+        return this.current.play(); 
+    }
+    pause() { return this.current.pause(); }
+    stop() { return this.current.stop(); }
+    playing() { return this.current.playing(); }
+    volume(v) { return this.current.volume(v); }
+    mute(m) { return this.current.mute(m); }
+}
+
+window.bgMusic = new BgMusicWrapper();
+
+window.hoverSound = new Howl({
+    src: ['sounds/menu-dolas.ogg'],
+    volume: 0.5
+});
+
+window.menuEnterSound = new Howl({
+    src: ['sounds/menuenter17.ogg'],
+    volume: 0.5
+});
+
+window.menuCloseSound = new Howl({
+    src: ['sounds/menuclose.ogg'],
+    volume: 0.5
+});
+
+// Mobil cihazlarda menÃ¼ seslerini devre dÄ±ÅŸÄ± bÄ±rak
+const isMobileLocal = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
+if (isMobileLocal) {
+    window.hoverSound.volume(0);
+    window.menuEnterSound.volume(0);
+    window.menuCloseSound.volume(0);
+}
+
+window.correctSound = new Howl({
+    src: ['sounds/dogru.ogg'],
+    volume: 1.0
+});
+
+window.wrongSound = new Howl({
+    src: ['sounds/yanlis.ogg'],
+    volume: 1.0,
+    onplay: function () {
+        if (window.isMobileDevice && navigator.vibrate) {
+            navigator.vibrate(1000);
+        }
+    }
+});
+
+window.glasshitSound = new Howl({
+    src: ['sounds/glasshit1.ogg'],
+    volume: 1.0
+});
+
+window.gameWinSound = new Howl({
+    src: ['sounds/newmotd2.ogg'],
+    volume: 1.0,
+    html5: true
+});
+
+window.music60Sound = new Howl({
+    src: ['sounds/music60.ogg'],
+    loop: false,
+    volume: 0.5
+});
+
+window.playerOnlineSound = new Howl({
+    src: ['sounds/online.ogg'],
+    volume: 1.0,
+    html5: true
+});
+
+window.playerOfflineSound = new Howl({
+    src: ['sounds/ofline.ogg'],
+    volume: 1.0,
+    html5: true
+});
+
+window.serverDisconnectSound = new Howl({
+    src: ['sounds/disconnect.ogg'],
+    volume: 1.0,
+    html5: true
+});
+
+window.modeUnlockSound = new Howl({
+    src: ['sounds/newmotd1.ogg'],
+    volume: 1.0,
+    html5: true
+});
+
+window.storyBGM = new Howl({
+    src: ['sounds/menumus31.ogg'],
+    loop: true,
+    volume: 0.5,
+    html5: false
+});
+
+window.house2Sound = new Howl({
+    src: ['sounds/house2.ogg'],
+    loop: true,
+    volume: 0.8
+});
+
+window.mountainSound = new Howl({
+    src: ['sounds/mountain.ogg'],
+    loop: true,
+    volume: 0.4 // DaÄŸ rÃ¼zgarÄ± sesi dengelendi
+});
+
+window.music272Sound = new Howl({
+    src: ['sounds/music272.ogg'],
+    loop: true,
+    volume: 0.4
+});
+
+window.music117Sound = new Howl({
+    src: ['sounds/music117.ogg'],
+    loop: true,
+    volume: 0.7
+});
+
+window.music38Sound = new Howl({
+    src: ['sounds/music38.ogg'],
+    loop: true,
+    volume: 0.7
+});
+
+window.music25Sound = new Howl({
+    src: ['sounds/music25.ogg'],
+    loop: true,
+    volume: 0.7
+});
+
+window.snowStepSounds = [
+    new Howl({ src: ['sounds/snow_wetstep1.ogg'], volume: 1.0 }),
+    new Howl({ src: ['sounds/snow_wetstep2.ogg'], volume: 1.0 }),
+    new Howl({ src: ['sounds/snow_wetstep3.ogg'], volume: 1.0 }),
+    new Howl({ src: ['sounds/snow_wetstep4.ogg'], volume: 1.0 }),
+    new Howl({ src: ['sounds/snow_wetstep5.ogg'], volume: 1.0 })
+];
+
+window.carpetStepSounds = [
+    new Howl({ src: ['sounds/carpet7step1.ogg'], volume: 1.0 }),
+    new Howl({ src: ['sounds/carpet7step2.ogg'], volume: 1.0 }),
+    new Howl({ src: ['sounds/carpet7step3.ogg'], volume: 1.0 }),
+    new Howl({ src: ['sounds/carpet7step4.ogg'], volume: 1.0 }),
+    new Howl({ src: ['sounds/carpet7step5.ogg'], volume: 1.0 })
+];
+
+window.enterHouseSound = new Howl({
+    src: ['sounds/entering_house1.ogg'],
+    volume: 1.0
+});
+
+window.doorCloseSound = new Howl({
+    src: ['sounds/doorclose6.ogg'],
+    volume: 1.0
+});
+
+window.storyNoteSounds = [
+    (() => { let h = new Howl({ src: ['sounds/a.ogg'], volume: 0.15 }); h.stereo(-0.8); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/b.ogg'], volume: 0.15 }); h.stereo(0.5); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/c.ogg'], volume: 0.15 }); h.stereo(-0.2); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/d.ogg'], volume: 0.15 }); h.stereo(0.9); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/e.ogg'], volume: 0.15 }); h.stereo(-0.6); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/f.ogg'], volume: 0.15 }); h.stereo(0.2); return h; })(),
+    (() => { let h = new Howl({ src: ['sounds/g.ogg'], volume: 0.15 }); h.stereo(0.7); return h; })()
+];
+
+window.buySound = new Howl({
+    src: ['sounds/buy.ogg'],
+    volume: 1.0
+});
+
+window.seconsSound = new Howl({
+    src: ['sounds/secons.ogg'],
+    volume: 1.0
+});
+
+window.secons2Sound = new Howl({
+    src: ['sounds/secons2.ogg'],
+    volume: 1.0
+});
+
+window.clockTickSound = new Howl({
+    src: ['sounds/clock_tick1.ogg'],
+    volume: 0.5,
+    loop: true
+});
+
+window.dado3Sound = new Howl({
+    src: ['sounds/dado3.ogg'],
+    volume: 0.8
+});
+
+window.chatReceiveSound = new Howl({
+    src: ['sounds/chat12.ogg'],
+    volume: 1.0
+});
+
+window.achievementSound = new Howl({
+    src: ['sounds/dlg_open.ogg'],
+    volume: 1.0
+});
+
+window.getCoinsSound = new Howl({
+    src: ['sounds/getcoins.ogg'],
+    volume: 1.0
+});
+
+// PÄ°YANO NOTALARI (A, B, C, D, E, F, G)
+window.pianoNotes = {
+    'a': new Howl({ src: ['sounds/a.ogg'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/b.ogg'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/c.ogg'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/d.ogg'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/e.ogg'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/f.ogg'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/g.ogg'], volume: 1.0 })
+};
+
+window.baglamaNotes = {
+    'a': new Howl({ src: ['sounds/baglama_sound_pack/a.wav'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/baglama_sound_pack/b.wav'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/baglama_sound_pack/c.wav'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/baglama_sound_pack/d.wav'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/baglama_sound_pack/e.wav'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/baglama_sound_pack/f.wav'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/baglama_sound_pack/g.wav'], volume: 1.0 })
+};
+
+window.kavalNotes = {
+    'a': new Howl({ src: ['sounds/kaval-sounds-pack/a.wav'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/kaval-sounds-pack/b.wav'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/kaval-sounds-pack/c.wav'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/kaval-sounds-pack/d.wav'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/kaval-sounds-pack/e.wav'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/kaval-sounds-pack/f.wav'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/kaval-sounds-pack/g.wav'], volume: 1.0 })
+};
+
+window.flutNotes = {
+    'a': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/A.wav'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/b.wav'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/c.wav'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/d.wav'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/e.wav'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/f.wav'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/flÃ¼t-sounds-pack/g.wav'], volume: 1.0 })
+};
+
+window.kanunNotes = {
+    'a': new Howl({ src: ['sounds/kanun-sound-pack/a.wav'], volume: 1.0 }),
+    'b': new Howl({ src: ['sounds/kanun-sound-pack/b.wav'], volume: 1.0 }),
+    'c': new Howl({ src: ['sounds/kanun-sound-pack/c.wav'], volume: 1.0 }),
+    'd': new Howl({ src: ['sounds/kanun-sound-pack/d.wav'], volume: 1.0 }),
+    'e': new Howl({ src: ['sounds/kanun-sound-pack/e.wav'], volume: 1.0 }),
+    'f': new Howl({ src: ['sounds/kanun-sound-pack/f.wav'], volume: 1.0 }),
+    'g': new Howl({ src: ['sounds/kanun-sound-pack/g.wav'], volume: 1.0 })
+};
+
+
+
+window.activeInstrument = localStorage.getItem('hafizaGuvenInstrument') || 'piano';
+
+window.activeNotes = new Proxy({}, {
+    get: function(target, prop) {
+        let map;
+        if (window.activeInstrument === 'baglama') {
+            map = window.baglamaNotes;
+        } else if (window.activeInstrument === 'kaval') {
+            map = window.kavalNotes;
+        } else if (window.activeInstrument === 'flut') {
+            map = window.flutNotes;
+        } else if (window.activeInstrument === 'kanun') {
+            map = window.kanunNotes;
+        } else {
+            map = window.pianoNotes;
+        }
+        return map[prop];
+    }
+});
+
+// Web Audio API'nin mobil tarayÄ±cÄ±larda uyku modundan Ã§Ä±kmasÄ±nÄ± (resume) garanti altÄ±na almak
+window.ensureAudioUnlock = () => {
+    if (typeof Howler !== 'undefined' && Howler.ctx && Howler.ctx.state === 'suspended') {
+        Howler.ctx.resume();
+    }
+};
+document.addEventListener('touchstart', window.ensureAudioUnlock, { passive: true });
+document.addEventListener('pointerdown', window.ensureAudioUnlock, { passive: true });
+
+window.updatePan = function (index, total) {
+    let xPos = 0;
+    if (total > 1) {
+        xPos = (index / (total - 1)) * 2 - 1;
+    }
+    window.hoverSound.stereo ? window.hoverSound.stereo(xPos) : window.hoverSound.pos(xPos, 0, 0);
+    window.menuEnterSound.stereo ? window.menuEnterSound.stereo(0) : window.menuEnterSound.pos(0, 0, 0); // TÄ±klama sesi her zaman merkezde sabitlendi
+    window.menuCloseSound.stereo ? window.menuCloseSound.stereo(0) : window.menuCloseSound.pos(0, 0, 0);
+};
+
+window.playPianoNoteSingle = function (key) {
+    let currentMap;
+    if (window.activeInstrument === 'baglama') {
+        currentMap = window.baglamaNotes;
+    } else if (window.activeInstrument === 'kaval') {
+        currentMap = window.kavalNotes;
+    } else if (window.activeInstrument === 'flut') {
+        currentMap = window.flutNotes;
+    } else if (window.activeInstrument === 'kanun') {
+        currentMap = window.kanunNotes;
+    } else {
+        currentMap = window.pianoNotes;
+    }
+    for (let k in currentMap) {
+        currentMap[k].stop();
+    }
+    if (currentMap[key]) {
+        let soundId = currentMap[key].play();
+        if (window.activeInstrument === 'piano') {
+            currentMap[key].seek(0.045, soundId);
+        }
+    }
+};
+
+let isAudioUnlocked = false;
+function unlockMobileAudio() {
+    if (isAudioUnlocked) return;
+    const ctx = window.audioCtx || (window.AudioContext ? new window.AudioContext() : new window.webkitAudioContext());
+    if (ctx && ctx.state === 'suspended') {
+        ctx.resume();
+    }
+    // Sessiz frekans ile kilidi aÃ§
+    if (ctx && ctx.createOscillator) {
+        try {
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            gainNode.gain.value = 0; 
+            oscillator.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            oscillator.start(0);
+            oscillator.stop(0.001);
+        } catch (e) {}
+    }
+    isAudioUnlocked = true;
+    document.removeEventListener('touchstart', unlockMobileAudio);
+    document.removeEventListener('click', unlockMobileAudio);
+}
+// Sadece ilk etkileÅŸimde Ã§alÄ±ÅŸÄ±p kendini imha etsin
+document.addEventListener('touchstart', unlockMobileAudio, { once: true });
+document.addEventListener('click', unlockMobileAudio, { once: true });
+
+window.arenaJoinSound = new Howl({
+    src: ['sounds/arena_join.ogg'],
+    volume: 1.0
+});
+
+window.arenaLeaveSound = new Howl({
+    src: ['sounds/arena_leave.ogg'],
+    volume: 1.0
+});
+
+window.metronomeIntervalId = null;
+
+window.startMetronome = function () {
+    window.stopMetronome();
+    let metronomeState = localStorage.getItem('hafizaGuvenMetronome') || 'off';
+    if (metronomeState === 'off') return;
+    
+    let bpm = parseInt(metronomeState);
+    if (isNaN(bpm) || bpm <= 0) return;
+    
+    let intervalMs = 60000 / bpm;
+    
+    // Ä°lk vuruÅŸu anÄ±nda yap
+    window.clockTickSound.volume(0.3);
+    window.clockTickSound.play();
+    
+    window.metronomeIntervalId = setInterval(() => {
+        window.clockTickSound.play();
+    }, intervalMs);
+};
+
+window.stopMetronome = function () {
+    if (window.metronomeIntervalId) {
+        clearInterval(window.metronomeIntervalId);
+        window.metronomeIntervalId = null;
+    }
+};
+
+window.playMetronomeTick = function (isHighPitch = false) {
+    try {
+        const ctx = window.audioCtx || (window.AudioContext ? new window.AudioContext() : new window.webkitAudioContext());
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(isHighPitch ? 1200 : 800, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.1);
+    } catch (e) {
+        if (window.clockTickSound) window.clockTickSound.play();
+    }
+};

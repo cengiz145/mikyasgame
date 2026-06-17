@@ -1,0 +1,753 @@
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --focus-color: #ffb703;
+        }
+
+        :root[data-theme="light"] { --bg-color: #f1f5f9; --text-color: #0f172a; --focus-color: #ea580c; }
+        :root[data-theme="ocean"] { --bg-color: #0f172a; --text-color: #e2e8f0; --focus-color: #38bdf8; }
+        :root[data-theme="forest"] { --bg-color: #064e3b; --text-color: #ecfdf5; --focus-color: #34d399; }
+        :root[data-theme="sunset"] { --bg-color: #451a03; --text-color: #ffedd5; --focus-color: #fb923c; }
+        :root[data-theme="hacker"] { --bg-color: #000000; --text-color: #22c55e; --focus-color: #16a34a; }
+        :root[data-theme="retro"] { --bg-color: #2e1065; --text-color: #f3e8ff; --focus-color: #d946ef; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Consolas', 'Courier New', monospace;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: manipulation;
+            cursor: default;
+        }
+
+        button {
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: manipulation;
+        }
+
+        .selectable {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .intro-title {
+            font-size: 3rem;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        .intro-instruction {
+            font-size: 1.5rem;
+            color: #888888;
+        }
+
+        #main-menu-container,
+        #scoreboard-menu-container,
+        #difficulty-menu-container {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            box-sizing: border-box;
+            text-align: left;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-color);
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .menu-nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .menu-nav li {
+            width: 100%;
+        }
+
+        .menu-button {
+            width: 100%;
+            background-color: transparent;
+            color: #888888;
+            border: none;
+            padding: 0.8rem 1rem;
+            font-size: 1.2rem;
+            font-weight: normal;
+            cursor: default;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: inherit;
+            position: relative;
+            touch-action: manipulation;
+        }
+
+        .menu-button::before {
+            content: "[ ] ";
+            color: #555;
+        }
+
+        .menu-button:hover,
+        .menu-button:focus-visible {
+            color: var(--text-color);
+            outline: none;
+        }
+
+        .menu-button:focus-visible::before {
+            content: "[X] ";
+            color: var(--focus-color);
+        }
+
+        .menu-button[aria-disabled="true"] {
+            color: #333;
+        }
+
+        .menu-button[aria-disabled="true"]::before {
+            content: "[-] ";
+            color: #333;
+        }
+
+        /* Mobil Piyano TuÅŸlarÄ± */
+        /* Mobil Piyano TuÅŸlarÄ± ve Oyundan Ã‡Ä±kÄ±ÅŸ BarÄ± */
+        #mobile-piano-container {
+            display: none;
+            position: fixed;
+            bottom: 0px;
+            /* EkranÄ±n tam altÄ±na yasla */
+            left: 0;
+            width: 100vw;
+            /* EkranÄ± tam kapla (boydan boya) */
+            z-index: 1000;
+            justify-content: space-between;
+            gap: 0px;
+            /* Butonlar arasÄ± boÅŸluÄŸu sÄ±fÄ±rla */
+        }
+
+        .mobile-piano-key {
+            flex: 1;
+            padding: 60px 0;
+            /* Butonlar Ã§ok kÃ¼Ã§Ã¼kmÃ¼ÅŸ, boylarÄ± uzatÄ±ldÄ± */
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 0;
+            /* Arada boÅŸluk hissi kalmamasÄ± iÃ§in kÃ¶ÅŸeleri sÄ±fÄ±rla */
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: background-color 0.1s;
+        }
+
+        .mobile-piano-key:active {
+            background-color: var(--focus-color);
+            color: #000;
+        }
+
+        .mobile-exit-btn {
+            flex: 1.5;
+            /* Ã‡Ä±kÄ±ÅŸ butonu biraz daha geniÅŸ olabilir veya aynÄ± kalabilir */
+            padding: 60px 0;
+            background-color: #8b0000;
+            color: #fff;
+            border: 1px solid #ff4444;
+            border-radius: 0;
+            /* Arada boÅŸluk olmamasÄ± iÃ§in */
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: background-color 0.1s;
+            display: none;
+            /* Ä°lk 10 saniye gizli kalacak */
+        }
+
+        .mobile-exit-btn:active {
+            background-color: #ff0000;
+            color: #fff;
+        }
+
+        /* Sadece oyun veya pratik modundayken mobil tuÅŸlarÄ± gÃ¶ster */
+        body.show-mobile-keys #mobile-piano-container {
+            display: flex;
+        }
+
+        /* Mobilde Enter tuÅŸunu (diyaloglar iÃ§in) gÃ¶ster */
+        body.show-mobile-enter #mobile-enter-container {
+            display: flex;
+        }
+
+        #mobile-enter-container {
+            display: none;
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 600px;
+            z-index: 1000;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .mobile-enter-btn {
+            flex: 1;
+            padding: 15px 0;
+            background-color: var(--focus-color);
+            color: #000;
+            border: 2px solid #555;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            transition: background-color 0.1s;
+        }
+
+        .mobile-enter-btn:active {
+            background-color: #e0a300;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-exit-li {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) {
+
+            #mobile-piano-container,
+            #mobile-enter-container {
+                display: none !important;
+                /* MasaÃ¼stÃ¼nde/bÃ¼yÃ¼k ekranda gizle */
+            }
+        }
+
+        /* Responsive (Mobil) Uyumlu TasarÄ±m Eklentileri */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.6rem;
+                text-align: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .menu-container {
+                padding: 1rem;
+            }
+
+            .menu-button {
+                font-size: 1.05rem;
+                padding: 1.2rem 1rem;
+                text-align: center;
+                background-color: rgba(128, 128, 128, 0.15);
+                color: var(--text-color);
+                border: 1px solid rgba(128, 128, 128, 0.2);
+                border-radius: 14px;
+                margin-bottom: 10px;
+                box-sizing: border-box;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+                transition: transform 0.08s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+                line-height: 1.3;
+            }
+
+            .menu-button:active {
+                background-color: rgba(128, 128, 128, 0.3);
+                transform: scale(0.96);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .menu-button:focus-visible {
+                border-color: var(--focus-color);
+                background-color: rgba(128, 128, 128, 0.25);
+                outline: none;
+            }
+            
+            .menu-button[aria-disabled="true"] {
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
+            .menu-button::before {
+                content: "";
+                /* Mobilde imleÃ§ efekti Ã§ok yer kaplamasÄ±n */
+            }
+
+            .intro-title {
+                font-size: 2rem;
+            }
+
+            .intro-instruction {
+                font-size: 1rem;
+            }
+
+            #game-score-display,
+            #game-timer-display,
+            #game-lives-display {
+                font-size: 1rem;
+            }
+        }
+
+        #feedback-menu-container,
+        #server-message-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+        }
+
+        .feedback-dialog-box {
+            background-color: #1a1a1a;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+            border: 1px solid #444;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: left;
+            position: relative;
+        }
+
+        .feedback-dialog-box h1 {
+            border-bottom: 2px solid #444;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            position: sticky;
+            top: 0;
+            background-color: #1a1a1a;
+            padding-top: 10px;
+            z-index: 10;
+        }
+
+        @media (max-width: 600px) {
+            .feedback-dialog-box {
+                padding: 15px;
+                max-height: 95vh;
+            }
+
+            .feedback-dialog-box h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+/* CanlÄ± Sohbet (Live Chat) UI */
+.chat-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--focus-color);
+    color: #000;
+    border: 2px solid #555;
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 2000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: background-color 0.2s, transform 0.2s;
+    font-family: inherit;
+}
+
+.chat-toggle-btn:hover, .chat-toggle-btn:focus-visible {
+    background-color: #ffd766;
+    transform: scale(1.05);
+    outline: none;
+}
+
+.chat-panel {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 360px;
+    max-width: 90vw;
+    height: 500px;
+    max-height: 75vh;
+    background-color: #0b141a; /* WhatsApp Koyu Arka Plan */
+    border: none;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    z-index: 2000;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.chat-header {
+    background-color: #202c33; /* WhatsApp Koyu Ãœst Bar */
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2a3942;
+}
+
+.chat-header h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: #e9edef;
+    font-weight: 500;
+    letter-spacing: normal;
+}
+
+.chat-close-btn {
+    background: transparent;
+    color: #8696a0;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 5px;
+    transition: color 0.2s;
+}
+
+.chat-close-btn:hover, .chat-close-btn:focus-visible {
+    color: #e9edef;
+    outline: none;
+}
+
+.chat-messages-container {
+    flex: 1;
+    padding: 16px 14px;
+    overflow-y: auto;
+    background-color: #0b141a;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" opacity="0.04"><path d="M60 0 L120 60 L60 120 L0 60 Z" fill="%23ffffff"/></svg>');
+}
+
+#chat-messages {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Base Message Bubbles */
+#chat-messages li {
+    display: flex;
+    width: 100%;
+}
+
+.wp-bubble {
+    position: relative;
+    max-width: 85%;
+    padding: 6px 9px 8px 9px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #e9edef;
+    word-break: break-word;
+    box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
+}
+
+/* DiÄŸer KiÅŸilerin MesajlarÄ± (Sola yaslÄ±, Koyu Gri) */
+#chat-messages li.message-in {
+    justify-content: flex-start;
+}
+#chat-messages li.message-in .wp-bubble {
+    background-color: #202c33;
+    border-top-left-radius: 0;
+}
+
+/* Benim MesajlarÄ±m (SaÄŸa yaslÄ±, AcÄ± YeÅŸil) */
+#chat-messages li.message-out {
+    justify-content: flex-end;
+}
+#chat-messages li.message-out .wp-bubble {
+    background-color: #005c4b;
+    border-top-right-radius: 0;
+}
+
+/* Sistem MesajlarÄ± (OrtalÄ±, Elips) */
+#chat-messages li.system-message {
+    justify-content: center;
+    margin: 8px 0;
+}
+#chat-messages li.system-message .wp-bubble {
+    background-color: #182229;
+    color: #ffd766;
+    font-size: 0.8rem;
+    font-style: italic;
+    text-align: center;
+    padding: 5px 14px;
+    border-radius: 12px;
+    box-shadow: none;
+    max-width: 90%;
+    border: 1px solid #2a3942;
+}
+
+.wp-sender {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #53bdeb; /* Typical group chat tag color */
+    margin-bottom: 2px;
+}
+
+.wp-text {
+    margin-bottom: 12px; /* Saat iÃ§in boÅŸluk */
+}
+
+/* WhatsApp Timestamp */
+.wp-time {
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.6);
+}
+
+/* WhatsApp Input Area (Alt Bar) */
+.chat-input-area {
+    background-color: #202c33;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: row; /* Yan yana dizilim */
+    gap: 8px;
+    align-items: center;
+    border-top: none;
+}
+
+#chat-nickname {
+    width: 25%;
+    background-color: #2a3942;
+    border: none;
+    color: #e9edef;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+#chat-message-input {
+    flex-grow: 1;
+    background-color: #2a3942;
+    border: none;
+    color: #e9edef;
+    padding: 10px 16px;
+    border-radius: 20px; /* Hap gÃ¶rÃ¼nÃ¼mÃ¼ */
+    font-size: 0.95rem;
+}
+
+#chat-nickname:focus, #chat-message-input:focus {
+    outline: none;
+}
+
+#chat-send-btn {
+    background-color: #00a884;
+    color: #000;
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%; /* GÃ¶nder butonu yuvarlak */
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background-color 0.2s, transform 0.2s;
+    line-height: normal;
+    padding: 0;
+}
+
+#chat-send-btn:hover, #chat-send-btn:focus-visible {
+    background-color: #008f6f;
+    transform: scale(1.05);
+    outline: none;
+}
+
+/* WhatsApp Mobil Tam Ekran Deneyimi */
+@media (max-width: 768px) {
+    .chat-panel {
+        width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+    }
+    
+    .chat-toggle-btn {
+        bottom: 15px;
+        right: 15px;
+        padding: 15px 20px;
+        font-size: 1.15rem;
+    }
+
+    .chat-input-area input {
+        font-size: 16px !important; /* iOS Native Zoom block */
+    }
+}
+
+/* --- ANLIK BÄ°LDÄ°RÄ°M (TOAST) UI --- */
+.toast-notification {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(11, 20, 26, 0.95);
+    color: #ffd766;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    border: 1px solid #2a3942;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    text-align: center;
+    max-width: 90%;
+    font-weight: bold;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-10px);
+}
+
+/* --- MOBÄ°L TAB BAR (HOME, SOSYAL, PROFIL) --- */
+#mobile-bottom-nav {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    body.show-bottom-nav #mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 70px;
+        background-color: #1a1a1a;
+        border-top: 1px solid #333;
+        z-index: 1500;
+        justify-content: space-around;
+        align-items: center;
+    }
+    
+    body.show-bottom-nav .chat-toggle-btn {
+        bottom: 85px; /* Sohbet butonu tab barÄ±n Ã¼stÃ¼nde Ã§Ä±ksÄ±n */
+    }
+
+    .mobile-nav-btn {
+        flex: 1;
+        height: 100%;
+        background: transparent;
+        color: #888;
+        border: none;
+        font-size: 1rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: color 0.2s, background-color 0.2s, border-top 0.2s;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-radius: 0;
+        margin: 0;
+        border-top: 3px solid transparent; /* VarsayÄ±lan ÅŸeffaf kenar */
+    }
+
+    .mobile-nav-btn:active {
+        background-color: #2a2a2a;
+    }
+
+    .mobile-nav-btn.active {
+        color: var(--focus-color);
+        border-top: 3px solid var(--focus-color);
+        background-color: #2a2a2a;
+    }
+}
+@media (min-width: 769px) {
+    #mobile-bottom-nav {
+         display: none !important;
+    }
+}
