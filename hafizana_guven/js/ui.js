@@ -655,17 +655,17 @@ window.updateStatsDisplay = function() {
         }
     }
     let earnedAch = [];
-    if (userAch && userAch.hafizam_gucleniyor) earnedAch.push("âœ… HafÄ±zam GÃ¼Ã§leniyor");
-    if (userAch && userAch.buzsuz_3_gun) earnedAch.push("âœ… SadÄ±k Oyuncu");
+    if (userAch && userAch.hafizam_gucleniyor) earnedAch.push("✅ Hafızam Güçleniyor");
+    if (userAch && userAch.buzsuz_3_gun) earnedAch.push("✅ Sadık Oyuncu");
     
     if (earnedAch.length > 0) {
-        achievementsHtml = `<li style="margin-top: 15px; font-weight: bold; color: #4ade80;">KazanÄ±lan BaÅŸarÄ±mlar:</li>`;
+        achievementsHtml = `<li style="margin-top: 15px; font-weight: bold; color: #4ade80;">Kazanılan Başarımlar:</li>`;
         earnedAch.forEach(ach => {
-            achievementsHtml += `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #4ade80;" aria-label="KazanÄ±ldÄ±: ${ach.replace('âœ… ', '')}">${ach}</li>`;
+            achievementsHtml += `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #4ade80;" aria-label="Kazanıldı: ${ach.replace('✅ ', '')}">${ach}</li>`;
         });
     } else {
-        achievementsHtml = `<li style="margin-top: 15px; font-weight: bold; color: #cbd5e1;">KazanÄ±lan BaÅŸarÄ±mlar:</li>`;
-        achievementsHtml += `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #cbd5e1;" aria-label="HenÃ¼z kazandÄ±ÄŸÄ±nÄ±z bir baÅŸarÄ± yok.">HenÃ¼z kazandÄ±ÄŸÄ±nÄ±z bir baÅŸarÄ± yok.</li>`;
+        achievementsHtml = `<li style="margin-top: 15px; font-weight: bold; color: #cbd5e1;">Kazanılan Başarımlar:</li>`;
+        achievementsHtml += `<li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px; color: #cbd5e1;" aria-label="Henüz kazandığınız bir başarı yok.">Henüz kazandığınız bir başarı yok.</li>`;
     }
 
     let html = "";
