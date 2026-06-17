@@ -1,5 +1,11 @@
 ﻿# HafÄ±zana GÃ¼ven - DeÄŸiÅŸiklik GÃ¼nlÃ¼ÄŸÃ¼ (Changelog)
 
+[v0.97.4.55] - 17.06.2026
+
+Genel:
+- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+
+
 [v0.97.4.51] - 17.06.2026
 
 Hata Düzeltmeleri ve İyileştirmeler:
