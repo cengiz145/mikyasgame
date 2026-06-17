@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OtobÃ¼s SimÃ¼lasyonu</title>
+    
+    <script>
+        // EN ERKEN AÅAMA HATA YAKALAYICI (Syntax Error vs.)
+        window.addEventListener('error', function(e) {
+            console.error("EARLY SYNTAX/LOAD ERROR:", e.message, "at", e.filename, ":", e.lineno);
+            if (window.speechSynthesis) {
+                var u = new SpeechSynthesisUtterance("Kritik sÃ¶zdizimi hatasÄ±: " + e.message + " Dosya: " + (e.filename ? e.filename.split('/').pop() : 'Bilinmiyor'));
+                u.lang = 'tr-TR';
+                window.speechSynthesis.speak(u);
+            }
+        });
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="nvda-live-region" aria-live="assertive" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
+    <!-- Background Canvas -->
+    <canvas id="highway-bg"></canvas>
+
+    <!-- Global Progress Bar -->
+    <div id="global-progress" class="hidden">
+        <div class="progress-bar-container">
+            <div id="global-progress-bar" class="progress-bar" style="width: 0%;"></div>
+        </div>
+        <p id="global-progress-text">HazÄ±rlanÄ±yor...</p>
+    </div>
+
+    <!-- 0. SPLASH SCREEN (KARÅILAMA EKRANI) -->
+    <main id="splash-screen" class="screen" role="application">
+        <div class="glass-panel" style="text-align: center; max-width: 600px;">
+            <div class="logo-circle" style="margin: 0 auto 20px;">ğŸšŒ</div>
+            <h1 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 1rem;">OTOBÃœS SÄ°MÃœLASYONU</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem; color: var(--text-light);">Bu oyun <strong style="color:var(--primary)">Ãœmit Ekrem Mikyas</strong> tarafÄ±ndan geliÅŸtirilmiÅŸtir.</p>
+            <p class="pulse-anim" style="color: var(--secondary); font-weight: bold;">Oyunu yÃ¼klemek iÃ§in [ENTER]'a basÄ±n veya tÄ±klayÄ±n</p>
+        </div>
+    </main>
+
+    <!-- 0.5. LOGIN SCREEN (KULLANICI PROFÄ°LÄ° EKRANI) -->
+    <main id="login-screen" class="screen hidden" role="application">
+        <div class="glass-panel" style="text-align: center; max-width: 400px; padding: 30px;">
+            <h1 style="color: var(--secondary); margin-bottom: 20px;">KullanÄ±cÄ± Profili</h1>
+            <p style="margin-bottom: 20px; font-size: 1.1rem; color: #ddd;">Oyuna devam etmek veya yeni bir profil oluÅŸturmak iÃ§in bir kullanÄ±cÄ± adÄ± girin.</p>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="username-input" style="display: block; margin-bottom: 8px; font-weight: bold; color: #fff;">KullanÄ±cÄ± AdÄ±:</label>
+                <input type="text" id="username-input" class="modern-btn" style="width: 100%; text-align: center; font-size: 1.2rem; cursor: text; background: rgba(255,255,255,0.1); border: 2px solid var(--primary);" placeholder="KullanÄ±cÄ± AdÄ± Giriniz" aria-label="KullanÄ±cÄ± adÄ±nÄ±zÄ± girin">
+            </div>
+            
+            <button id="btn-login" class="modern-btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.2rem;">
+                <span class="btn-icon">ğŸ‘¤</span> Oyuna Gir
+            </button>
+        </div>
+    </main>
+
+    <!-- 1. TITLE SCREEN (GÄ°RÄ°Å EKRANI) -->
+    <main id="title-screen" class="screen hidden" role="application">
+        <div class="logo-glow-wrapper" aria-hidden="true">
+            <div class="logo-pulse-ring"></div>
+            <div class="logo-circle">ğŸšŒ</div>
+        </div>
+
+        <div class="title-container" style="margin-bottom: 40px; z-index: 1;">
+            <h1 class="main-title" style="font-size: 3.5rem;">OtobÃ¼s SimÃ¼lasyonu</h1>
+        </div>
+
+        <div class="menu-container" style="z-index: 1;">
+            <button id="btn-start-game" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: center;">
+                Yeni Bir Oyuna BaÅŸla
+            </button>
+            <button id="btn-clear-cache" class="menu-btn nav-item" style="justify-content: center; margin-top: 15px; border-color: var(--danger); color: var(--danger);">
+                Ã–nbelleÄŸi Temizle ve Yeniden BaÅŸlat
+            </button>
+            <button id="btn-exit-game" class="menu-btn secondary-btn nav-item" style="justify-content: center; margin-top: 15px;">
+                Oyundan Ã‡Ä±k
+            </button>
+        </div>
+    </main>
+
+    <!-- 2. CITY SELECTION (MAP / KARÄ°YER) SCREEN -->
+    <main id="base-selection-menu" class="screen hidden" role="application">
+        <div class="title-container">
+            <h1 class="main-title">OtobÃ¼s SimÃ¼lasyonu</h1>
+            <p class="subtitle" id="map-subtitle">BaÅŸlangÄ±Ã§ Åehrinizi (Merkez ÃœssÃ¼) SeÃ§in</p>
+        </div>
+        
+        <!-- HUD for Map Screen -->
+        <div class="stats-panel" id="map-hud">
+            <div class="stat-card">
+                <span class="stat-icon">ğŸ“ˆ</span>
+                <span class="stat-label">Seviye</span>
+                <span class="stat-value" id="ui-level">1</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">ğŸ’°</span>
+                <span class="stat-label">BÃ¼tÃ§e</span>
+                <span class="stat-value" id="ui-budget">0 â‚º</span>
+            </div>
+        </div>
+        <div class="xp-bar-container" id="map-xp-container">
+            <div class="xp-bar-fill" id="ui-xp-fill"></div>
+            <span class="xp-text" id="ui-xp-text">0 / 100 XP</span>
+        </div>
+        
+        <div id="unlock-points-display" class="budget-display highlight-text" style="margin-bottom: 15px;">
+            Harita KeÅŸif PuanÄ±: <span id="ui-map-points">0</span>
+        </div>
+
+        <nav>
+            <ul class="menu-list" id="city-selection-list">
+                <!-- Dynamically generated by ui.js -->
+            </ul>
+        </nav>
+        <button id="btn-base-back" class="menu-btn secondary-btn nav-item" style="margin-top: 20px; justify-content: center;">
+            Ana Ekrana DÃ¶n
+        </button>
+    </main>
+
+    <!-- 3. ROUTE SELECTION SCREEN (API ROUTES) -->
+    <main id="route-menu" class="screen hidden" role="application">
+        <div class="title-container">
+            <h1 class="main-title" id="route-sel-title">GÃ¶rev SeÃ§imi</h1>
+            <p class="subtitle">API'den Ã§ekilen canlÄ± rotalardan birini seÃ§in</p>
+        </div>
+
+        <nav>
+            <ul class="menu-list" id="dynamic-route-list">
+                <!-- Dynamically generated by ui.js (Kolay, Orta, Zor) -->
+            </ul>
+        </nav>
+
+        <button id="btn-route-back" class="menu-btn secondary-btn nav-item" style="margin-top: 15px; justify-content: center;">
+            Haritaya DÃ¶n
+        </button>
+    </main>
+
+    <!-- 4. GARAGE SCREEN (ARTIK SADECE OTOBÃœS VE SEFER BÄ°LGÄ°SÄ°) -->
+    <main id="garage-screen" class="screen hidden" role="application">
+        <div class="title-container">
+            <h1 class="main-title">Sefer Ã–zeti</h1>
+            <p class="subtitle" id="garage-route-desc">Hat bilgisi yÃ¼kleniyor...</p>
+        </div>
+
+        <div class="instruction-box" style="margin-bottom: 20px;">
+            <p style="margin-top: 10px; font-size: 0.9rem;">(W) ile hÄ±zlanabilir, (S) ile yavaÅŸlayabilir, (A/D) ile ÅŸerit deÄŸiÅŸtirebilirsiniz. Engellere Ã§arpmamaya ve denize uÃ§mamaya dikkat edin!</p>
+        </div>
+
+        <button id="start-engine-btn" class="primary-btn pulse-btn nav-item" style="width: 100%;">
+            Motoru Ã‡alÄ±ÅŸtÄ±r ve Sefere BaÅŸla
+        </button>
+        <button id="btn-garage-back" class="menu-btn secondary-btn nav-item" style="margin-top: 15px; justify-content: center;">
+            GÃ¶rev SeÃ§imine DÃ¶n
+        </button>
+    </main>
+
+    <!-- 5. DRIVING HUD SCREEN -->
+    <main id="driving-screen" class="screen hidden" style="max-width: 900px; background: transparent; border: none; box-shadow: none;" role="application">
+        <div id="weather-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat, rgba(150,160,170,0.3); pointer-events: none; z-index: 100; opacity: 0; mix-blend-mode: multiply;"></div>
+        <div class="dashboard" style="background: rgba(15, 22, 36, 0.85);">
+            <div class="dash-section">
+                <div class="dash-label">HIZ</div>
+                <div class="dash-value" id="hud-speed">0</div>
+                <div class="dash-unit">km/s</div>
+            </div>
+            
+            <div class="dash-section">
+                <div class="dash-label">Ä°Ã‡ ISI</div>
+                <div class="dash-value" id="hud-temp">22Â°C</div>
+                <div class="dash-unit"></div>
+            </div>
+            
+            <div class="dash-section">
+                <div class="dash-label">SONRAKÄ° DURAK</div>
+                <div class="dash-value stop-name" id="hud-next-stop">-</div>
+                <div class="dash-unit">
+                    <span id="hud-distance">0</span> m
+                </div>
+            </div>
+
+            <div class="dash-section">
+                <div class="dash-label">ETA (T. VARIÅ)</div>
+                <div class="dash-value" id="hud-eta" style="font-size: 1.5rem;">--:--</div>
+                <div class="dash-unit">dk:sn</div>
+            </div>
+
+            <div class="dash-section">
+                <div class="dash-label">YOLCU</div>
+                <div class="dash-value" id="hud-passengers">0</div>
+                <div class="dash-unit">kiÅŸi</div>
+            </div>
+        </div>
+        
+        <div id="nav-feedback" aria-live="polite" style="text-align: center; font-size: 1.5rem; font-weight: bold; min-height: 30px; margin-top: 15px; text-shadow: 0 0 10px rgba(0,0,0,0.8);"></div>
+
+        <div class="driving-visual">
+            <div class="lane-container">
+                <div class="lane-line"></div>
+                <div class="lane-line"></div>
+                <div id="bus-sprite" class="bus" style="left: 50%;">ğŸšŒ</div>
+            </div>
+        </div>
+        
+        <div id="hud-warnings" class="warning-text" style="text-align: center; text-shadow: 0 0 10px rgba(255,0,0,0.8);"></div>
+        <!-- AraÃ§larÄ±n spawnlanacaÄŸÄ± container -->
+        <div id="obstacles-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0;"></div>
+    </main>
+
+    <!-- 6. STOP INTERACTION SCREEN -->
+    <main id="stop-screen" class="screen hidden" role="application">
+        <div class="title-container">
+            <h1 class="main-title" id="stop-title">Durak AdÄ±</h1>
+            <p class="subtitle">Yolcu Ä°ÅŸlemleri</p>
+        </div>
+
+        <div class="door-controls" style="display: flex; gap: 15px; width: 100%; margin-bottom: 20px;">
+            <button id="btn-front-door" class="menu-btn door-btn nav-item" style="flex: 1; justify-content: center;">
+                Ã–n KapÄ±yÄ± AÃ§
+            </button>
+            <button id="btn-rear-door" class="menu-btn door-btn nav-item" style="flex: 1; justify-content: center;">
+                Arka KapÄ±yÄ± AÃ§
+            </button>
+        </div>
+
+        <div id="passenger-interaction" class="instruction-box hidden" style="width: 100%;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">ğŸ‘¤</div>
+            <p id="passenger-dialog" aria-live="polite" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 15px;">"Merhaba, kolay gelsin."</p>
+            
+            <p id="passenger-feedback" aria-live="polite" style="margin-top: 15px; color: var(--secondary); font-weight: bold; min-height: 24px;"></p>
+        </div>
+
+        <div class="stop-status" style="margin-top: 15px; font-size: 1.1rem; font-weight: bold;">
+            <p>Bekleyen: <span id="stop-waiting-count">0</span> | Ä°nen: <span id="stop-alighting-count">0</span></p>
+        </div>
+    </main>
+
+    <!-- 7. RESULTS SCREEN -->
+    <main id="results-screen" class="screen hidden" role="application">
+        <div class="title-container">
+            <h1 class="main-title">Sefer TamamlandÄ±</h1>
+            <p class="subtitle">Ä°statistikleriniz</p>
+        </div>
+
+        <div class="stats-panel" style="flex-direction: column; gap: 15px;">
+            <div class="stat-card" style="width: 100%; justify-content: space-between;">
+                <span class="stat-label">Toplam KazanÄ±lan Para:</span>
+                <span class="stat-value" id="res-money" style="color: var(--secondary);">0 â‚º</span>
+            </div>
+            <div class="stat-card" style="width: 100%; justify-content: space-between;">
+                <span class="stat-label">KazanÄ±lan XP:</span>
+                <span class="stat-value" id="res-xp" style="color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="width: 100%; justify-content: space-between;">
+                <span class="stat-label">HÄ±z CezalarÄ±:</span>
+                <span class="stat-value" id="res-penalties" style="color: var(--danger);">0 â‚º</span>
+            </div>
+        </div>
+
+        <button id="btn-next-mission" class="primary-btn nav-item pulse-btn" style="margin-top: 25px; width: 100%;">
+            Sonraki GÃ¶reve GeÃ§
+        </button>
+        <button id="btn-finish" class="secondary-btn nav-item" style="margin-top: 15px; width: 100%; border: 1px solid var(--border);">
+            Geri DÃ¶n (Ana MenÃ¼)
+        </button>
+    </main>
+
+    <!-- 8. SANAYÄ° (MECHANIC) SCREEN -->
+    <main id="sanayi-screen" class="screen hidden" role="application" aria-label="Sanayi MenÃ¼sÃ¼">
+        <div class="title-container">
+            <h1 class="main-title">TekirdaÄŸ Sanayi</h1>
+            <p class="subtitle" id="sanayi-status">AraÃ§ Durumu Ä°nceleniyor...</p>
+        </div>
+
+        <div id="sanayi-dialog" style="text-align: center; margin: 20px 0; font-size: 1.2rem; min-height: 50px;">
+            <!-- TTS Metni buraya yazÄ±lacak -->
+        </div>
+
+        <div id="sanayi-report-container" class="hidden">
+            <h2 style="font-size: 1.5rem; text-align: center; margin-bottom: 15px; color: var(--secondary);">Hasar Raporu</h2>
+            <ul id="sanayi-parts-list" class="nav-list" role="menu">
+                <!-- Javascript ile doldurulacak -->
+            </ul>
+
+            <button id="btn-sanayi-complete" class="primary-btn nav-item pulse-btn hidden" style="margin-top: 25px; width: 100%;">
+                OnarÄ±mÄ± BaÅŸlat
+            </button>
+        </div>
+    </main>
+
+    <!-- EXIT MESSAGE SCREEN -->
+    <div id="exit-screen" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <h1 style="color: var(--secondary); font-size: 3rem; text-shadow: 0 0 20px var(--secondary-glow);">OynadÄ±ÄŸÄ±nÄ±z Ä°Ã§in TeÅŸekkÃ¼rler!</h1>
+    </div>
+
+    <!-- Modals for Intercity -->
+    <div id="mode-selection-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h2 style="color: var(--text-light); margin-bottom: 20px; font-size: 2rem;">GÃ¶rev Modunu SeÃ§in</h2>
+        <button id="btn-mode-inner" class="nav-item primary-btn pulse-btn" style="width: 300px; margin-bottom: 15px; font-size: 1.2rem;">Åehir Ä°Ã§i Seferler</button>
+        <button id="btn-mode-inter" class="nav-item secondary-btn" style="width: 300px; font-size: 1.2rem; border-color: var(--secondary); color: var(--secondary);">Åehirler ArasÄ± Sefer (Uzun Yol)</button>
+        <button id="btn-mode-cancel" class="nav-item menu-btn" style="margin-top: 20px; color: var(--danger); font-size: 1rem; border: none; background: transparent;">Ä°ptal Et</button>
+    </div>
+
+    <div id="intercity-dest-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+        <h2 style="color: var(--text-light); margin-bottom: 10px; font-size: 2rem;">Nereye Gidiyoruz?</h2>
+        <p style="color: var(--secondary); margin-bottom: 20px;">Sadece aÃ§Ä±k veya komÅŸu ÅŸehirlere gidebilirsiniz.</p>
+        <ul id="intercity-dest-list" style="list-style: none; padding: 0; width: 100%; max-width: 500px; max-height: 60vh; overflow-y: auto;">
+            <!-- Doldurulacak -->
+        </ul>
+        <button id="btn-intercity-cancel" class="nav-item menu-btn" style="margin-top: 20px; color: var(--danger);">Geri DÃ¶n</button>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="js/firebase.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/audio-base64.js"></script>
+    <script src="sounds/npc_list.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/voice-assistant.js"></script>
+</body>
+</html>
