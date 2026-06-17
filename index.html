@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -31,6 +31,7 @@
 
         body {
             font-family: 'Outfit', sans-serif;
+            font-size: 18px;
             background-color: var(--primary-bg);
             color: var(--text-main);
             min-height: 100vh;
@@ -97,8 +98,8 @@
         .container {
             margin-top: 4rem;
             margin-bottom: 4rem;
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
+            background: rgba(15, 23, 42, 0.85); /* Daha koyu arka plan */
+            backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
             padding: 3rem;
@@ -116,8 +117,8 @@
 
         /* About Section (New) */
         .about-section {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.4); /* Yazıların arkasını koyulaştırdık */
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 16px;
             padding: 2.5rem;
             margin-bottom: 3rem;
@@ -127,11 +128,12 @@
         }
 
         .about-section p {
-            font-size: 1.1rem;
-            color: var(--text-main);
-            line-height: 1.7;
-            margin-bottom: 1.25rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            font-size: 1.25rem; /* Yazı boyutu artırıldı */
+            color: #ffffff; /* Tam beyaz renk */
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8); /* Daha belirgin gölge */
+            font-weight: 400;
         }
 
         .about-section p:last-child {
@@ -190,8 +192,8 @@
         }
 
         .game-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3); /* Kartların arkasını daha koyu yaptık */
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 16px;
             padding: 1.5rem 2rem;
             text-decoration: none;
@@ -250,9 +252,10 @@
         }
 
         .game-desc {
-            font-size: 1rem;
-            color: var(--text-muted);
-            line-height: 1.4;
+            font-size: 1.1rem; /* Daha büyük açıklama yazısı */
+            color: #e2e8f0; /* Daha parlak gri */
+            line-height: 1.5;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
         /* News Section Additions */
@@ -367,7 +370,7 @@
                 </a>
 
                 <!-- Hafızana Güven Linki -->
-                <a href="https://mikyasstudio.com.tr/" class="game-card" role="listitem" aria-label="Hafızana Güven Oyunu Oynamak İçin Tıklayın" target="_blank" rel="noopener noreferrer">
+                <a href="hafizana_guven/index.html" class="game-card" role="listitem" aria-label="Hafızana Güven Oyunu Oynamak İçin Tıklayın">
                     <div class="game-icon" aria-hidden="true">🧠</div>
                     <div class="game-content">
                         <h2 class="game-title" aria-hidden="true">Hafızana Güven</h2>
@@ -389,7 +392,7 @@
                     <div class="game-content">
                         <h2 class="game-title" aria-hidden="true">Görme engelli müzik öğretmeni piyano eğitimiyle öğrencilerin hayallerine dokunuyor</h2>
                         <p class="game-desc" aria-hidden="true">Anadolu Ajansı Röportajı</p>
-                        <span class="read-more-btn" aria-hidden="true">Devamını Oku â”</span>
+                        <span class="read-more-btn" aria-hidden="true">Devamını Oku ➔</span>
                     </div>
                     <span class="sr-only">Anadolu Ajansı Haberi: Görme engelli müzik öğretmeni piyano eğitimiyle öğrencilerin hayallerine dokunuyor. Haberi okumak için tıklayın. Yeni pencerede açılır.</span>
                 </a>
@@ -400,7 +403,7 @@
                     <div class="game-content">
                         <h2 class="game-title" aria-hidden="true">Barış Manço hayranı görme engelli, müzik öğretmenliği hayaline çok yaklaştı</h2>
                         <p class="game-desc" aria-hidden="true">Anadolu Ajansı Röportajı</p>
-                        <span class="read-more-btn" aria-hidden="true">Devamını Oku â”</span>
+                        <span class="read-more-btn" aria-hidden="true">Devamını Oku ➔</span>
                     </div>
                     <span class="sr-only">Anadolu Ajansı Haberi: Barış Manço hayranı görme engelli, müzik öğretmenliği hayaline çok yaklaştı. Haberi okumak için tıklayın. Yeni pencerede açılır.</span>
                 </a>
@@ -411,7 +414,7 @@
                     <div class="game-content">
                         <h2 class="game-title" aria-hidden="true">Barış Manço hayranı görme engelli Ümit'in hayali müzik öğretmeni olmak</h2>
                         <p class="game-desc" aria-hidden="true">Anadolu Ajansı Röportajı</p>
-                        <span class="read-more-btn" aria-hidden="true">Devamını Oku â”</span>
+                        <span class="read-more-btn" aria-hidden="true">Devamını Oku ➔</span>
                     </div>
                     <span class="sr-only">Anadolu Ajansı Haberi: Barış Manço hayranı görme engelli Ümit'in hayali müzik öğretmeni olmak. Haberi okumak için tıklayın. Yeni pencerede açılır.</span>
                 </a>
@@ -460,8 +463,8 @@
     </script>
 
     <!-- Ziyaretçi Takip Sistemi (Gizli) -->
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js?v=0.97.4.53"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js?v=0.97.4.53"></script>
     <script>
         const firebaseConfig = { 
             apiKey: "AIzaSyBDGdQjm6NX8ANQm90HJR8wD2Nk2E1h-ro", 
@@ -493,24 +496,24 @@
             console.warn("Tracker skipped: ", e);
         }
 
-        // --- Otobüs Simülasyonu Åifreli Giriş Sistemi ---
+        // --- Otobüs Simülasyonu Şifreli Giriş Sistemi ---
         const busBtn = document.getElementById('bus-game-link');
         if (busBtn) {
             busBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 
                 if (localStorage.getItem('bus_access_granted') === 'true') {
-                    window.location.href = '/otobus/index.html';
+                    window.location.href = 'otobus/index.html';
                     return;
                 }
                 
                 let pwd = prompt("Bu oyun sadece yetkili kullanıcılara açıktır. Lütfen erişim şifresini giriniz:");
                 
-                // ÅİFRE BURADA BELİRLENİYOR (Boşlukları temizleyip küçük harfe çevirerek daha esnek kontrol ediyoruz)
+                // ŞİFRE BURADA BELİRLENİYOR (Boşlukları temizleyip küçük harfe çevirerek daha esnek kontrol ediyoruz)
                 if (pwd && pwd.trim().toLowerCase() === 'otobüssimülasyonu') {
                     localStorage.setItem('bus_access_granted', 'true');
-                    alert("Åifre doğru! Oyuna yönlendiriliyorsunuz...");
-                    window.location.href = '/otobus/index.html';
+                    alert("Şifre doğru! Oyuna yönlendiriliyorsunuz...");
+                    window.location.href = 'otobus/index.html';
                 } else if (pwd !== null) {
                     alert("Hatalı şifre. Oyuna giriş izniniz yok.");
                 }
@@ -519,4 +522,8 @@
     </script>
 </body>
 </html>
+
+
+
+
 
