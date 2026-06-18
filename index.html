@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -319,10 +319,16 @@
 
     <main class="container">
         
-        <!-- Hakkımda / Karşılama Bölümü -->
+        <!-- Hoş Geldiniz Bölümü -->
+        <section class="about-section" aria-label="Hoş Geldiniz" style="margin-bottom: 2rem;">
+            <h1 class="sr-only">Hoş Geldiniz</h1>
+            <p id="welcome-message" aria-live="polite">Merhaba. Saat şuan <span id="current-time-display"></span>. Sitemi bu saatte ziyaret ettiğin için teşekkür ederim. Umarım memnun kalırsın.</p>
+        </section>
+
+        <!-- Hakkımda Bölümü -->
         <section class="about-section" aria-label="Hakkımda">
-            <h1 class="sr-only">Ümit Ekrem Mikyas - Hakkımda</h1>
-            <p>Merhaba. Benim adım Ümit Ekrem Mikyas.</p>
+            <h2 class="sr-only">Ümit Ekrem Mikyas - Hakkımda</h2>
+            <p>Merhaba ben müzik öğretmeni olan Ümit Ekrem Mikyas.</p>
             <p>Müzik öğretmeni olmanın yanı sıra kendimi geliştirmeyi ve bir şeyler üretmeyi sevdiğim için bu siteyi hayata geçirdim. Bu sitede geliştirmekte olduğum gerek sesli oyun projelerimi gerekse müziklerimi bulabileceğiniz alanlar bulacaksınız.</p>
             <p>Projelerimi geliştirirken yapay zeka kullandığımı belirtmek isterim. Yapay zekayı aktif bir şekilde kullanıyor, onun tüm nimetlerinden faydalanmaktan geri durmuyorum. Yaptığım projelerde yapay zekayı her ne kadar kullansam da fikirlerimin benim özgün fikirlerim olduğunu da belirtmek isterim.</p>
             <p>Kodlama bilmiyor olsam da hayallerim ve yapmak istediklerimi karşılayan her türlü teknolojiyi kullanıyorum. Yaptıklarımdan keyif alacağınızı umuyorum. Bu siteyi ara sıra ziyaret ederseniz, yeni şeyler bulabilirsiniz.</p>
@@ -466,6 +472,17 @@
                 }
             });
         }
+
+        // Hoş Geldiniz Ekranı Saat Güncellemesi
+        function updateWelcomeClock() {
+            var timeDisplay = document.getElementById('current-time-display');
+            if (timeDisplay) {
+                var now = new Date();
+                timeDisplay.textContent = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            }
+        }
+        updateWelcomeClock();
+        setInterval(updateWelcomeClock, 10000);
     </script>
 </body>
 </html>
