@@ -315,6 +315,13 @@ window.startGame = function () {
             const lastSeenVersion = localStorage.getItem('lastSeenChangelogVersion');
             let showChangelog = (window.globalChangelogVersion && lastSeenVersion !== window.globalChangelogVersion && window.globalChangelogMessage);
 
+            const hideIntroSafely = () => {
+                if (window.introScreen) {
+                    window.introScreen.style.display = 'none';
+                    window.introScreen.setAttribute('aria-hidden', 'true');
+                }
+            };
+
             const showMainMenu = () => {
                 window.mainMenu.removeAttribute('aria-hidden');
                 
@@ -330,24 +337,18 @@ window.startGame = function () {
                         if (firstBtn) firstBtn.focus();
                     }
                     window.mainMenu.style.opacity = '1';
-
-                    // KRİTİK EKRAN OKUYUCU DÜZELTMESİ:
-                    // Odak (focus) işlemi başarılı olduktan SONRA eski ekranı gizle. 
-                    // Erken gizlenirse NVDA/TalkBack focus'u boşluğa (body) düşürür ve menüye geçmez.
-                    if (window.introScreen) {
-                        window.introScreen.style.display = 'none';
-                        window.introScreen.setAttribute('aria-hidden', 'true');
-                    }
+                    hideIntroSafely();
                 }, 300);
             };
 
             const doChangelogShow = (fromDailyReward = false) => {
-                if (window.switchMenu && window.serverMessageMenu) {
+                if (showChangelog && window.switchMenu && window.serverMessageMenu) {
                     window.switchMenu(fromDailyReward ? window.dailyRewardMenu : window.mainMenu, window.serverMessageMenu, 'server-message');
                     window.hgfzZamanlayici.setTimeout(() => {
                         const firstBtn = document.getElementById('server-message-continue-btn');
                         if (firstBtn) firstBtn.focus();
                         if (window.announceToScreenReader) window.announceToScreenReader("Sunucu Mesajı: " + window.globalChangelogMessage + " Devam etmek için butona basın.");
+                        hideIntroSafely();
                     }, 400);
                 } else {
                     showMainMenu();
@@ -360,11 +361,13 @@ window.startGame = function () {
                 if (window.switchMenu) {
                     window.switchMenu(window.mainMenu, window.firstTimeTutorialMenu, 'first-time-tutorial');
                 }
+                localStorage.setItem('hafizaGuvenFirstTime_v2', 'false');
                 window.hgfzZamanlayici.setTimeout(() => {
                     const firstBtn = document.getElementById('first-time-start-btn');
                     if (firstBtn) firstBtn.focus();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Merhaba. Oyuna ilk defa giriş yaptığınız için alıştırma modundan başlayacaksınız. Başlamak için Enter tuşuna basın.");
-                }, 400);
+                    if (window.announceToScreenReader) window.announceToScreenReader("Merhaba. Oyuna ilk defa giriş yaptığınız için alıştırma modundan başlayacaksınız. Başlamak için Enter tuşuna basın.", true);
+                    hideIntroSafely();
+                }, 300);
             } else {
                 if (isFirstTime) {
                     localStorage.setItem('hafizaGuvenFirstTime_v2', 'false');
