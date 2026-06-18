@@ -315,18 +315,17 @@ window.startGame = function () {
             const showMainMenu = () => {
                 window.mainMenu.removeAttribute('aria-hidden');
                 
-                const titleEl = document.getElementById('main-menu-title');
-                if (titleEl) {
-                    titleEl.focus();
-                } else {
-                    const firstBtn = document.getElementById('start-game-btn');
-                    if (firstBtn) firstBtn.focus();
-                }
-
                 window.currentActiveMenu = 'main';
                 if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
 
                 window.hgfzZamanlayici.setTimeout(() => {
+                    const titleEl = document.getElementById('main-menu-title');
+                    if (titleEl) {
+                        titleEl.focus();
+                    } else {
+                        const firstBtn = document.getElementById('start-game-btn');
+                        if (firstBtn) firstBtn.focus();
+                    }
                     window.mainMenu.style.opacity = '1';
                 }, 300);
             };
