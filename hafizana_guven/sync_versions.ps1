@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 $dir = ".\";
-$newVersion = "0.97.4.55"
+$newVersion = "0.97.4.56"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
@@ -44,3 +44,4 @@ for ($i=1; $i -lt $changelogContent.Length; $i++) {
 $newChangelog | Set-Content $changelogPath -Encoding UTF8
 
 Write-Host "Tüm sürümler v$newVersion olarak eşitlendi!"
+
