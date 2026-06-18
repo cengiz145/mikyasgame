@@ -237,8 +237,16 @@ window.playIntro = function () {
 
     if (window.announceToScreenReader) window.announceToScreenReader("Oyun yükleniyor, lütfen bekleyin...", true);
 
-    const randomLogoNum = Math.floor(Math.random() * 5) + 1;
-    const ext = randomLogoNum === 1 ? 'ogg' : 'wav';
+    let randomLogoNum = Math.floor(Math.random() * 5) + 1;
+    let ext = randomLogoNum === 1 ? 'ogg' : 'wav';
+
+    // iOS ve baz tarayıcılar için OGG format desteğini kontrol et
+    const audioTest = new window.Audio();
+    if (ext === 'ogg' && audioTest.canPlayType('audio/ogg') === '') {
+        randomLogoNum = 2; // Desteklenmiyorsa kesin olarak WAV olan bir logoya çevir
+        ext = 'wav';
+    }
+
     const audio = new window.Audio(`sounds/logo${randomLogoNum}.${ext}`);
 
     // Logoların uzunluğu farklı olabileceği için yedek süreyi 15 saniyeye çıkardık.
@@ -302,11 +310,6 @@ window.startGame = function () {
     if (window.introScreen) window.introScreen.style.opacity = '0';
 
     window.hgfzZamanlayici.setTimeout(() => {
-        if (window.introScreen) {
-            window.introScreen.style.display = 'none';
-            window.introScreen.setAttribute('aria-hidden', 'true');
-        }
-
         if (window.mainMenu) {
             window.mainMenu.style.display = 'flex';
             const lastSeenVersion = localStorage.getItem('lastSeenChangelogVersion');
@@ -327,6 +330,14 @@ window.startGame = function () {
                         if (firstBtn) firstBtn.focus();
                     }
                     window.mainMenu.style.opacity = '1';
+
+                    // KRİTİK EKRAN OKUYUCU DÜZELTMESİ:
+                    // Odak (focus) işlemi başarılı olduktan SONRA eski ekranı gizle. 
+                    // Erken gizlenirse NVDA/TalkBack focus'u boşluğa (body) düşürür ve menüye geçmez.
+                    if (window.introScreen) {
+                        window.introScreen.style.display = 'none';
+                        window.introScreen.setAttribute('aria-hidden', 'true');
+                    }
                 }, 300);
             };
 
