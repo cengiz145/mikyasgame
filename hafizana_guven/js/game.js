@@ -1,4 +1,4 @@
-﻿// game.js - Ana Oyun Döngüsü ve Motor İşlevleri
+// game.js - Ana Oyun Döngüsü ve Motor İşlevleri
 
 window.hgfzZamanlayici = {
     timeouts: new Set(),
@@ -322,6 +322,9 @@ window.startGame = function () {
                     const firstBtn = document.getElementById('start-game-btn');
                     if (firstBtn) firstBtn.focus();
                 }
+
+                window.currentActiveMenu = 'main';
+                if (window.updateMobileKeysVisibility) window.updateMobileKeysVisibility();
 
                 window.hgfzZamanlayici.setTimeout(() => {
                     window.mainMenu.style.opacity = '1';
