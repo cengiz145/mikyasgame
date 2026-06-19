@@ -1,5 +1,5 @@
 ﻿{
     "version":  "0.97.4.56",
-    "buildId":  1781855576,
-    "changelog":  "Agresif önbellek temizleme mekanizması eklendi. Sürüm değiştiğinde sayfa otomatik olarak kendini temizleyip yeniden başlatacak."
+    "buildId":  1781856028,
+    "changelog":  "Günlük ödül ekranında oyunun donup ana menüye geçmemesi hatası tamamen onarıldı."
 }

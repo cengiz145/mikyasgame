@@ -382,6 +382,7 @@ window.startGame = function () {
                         const firstBtn = document.getElementById('daily-reward-continue-btn');
                         if (firstBtn) firstBtn.focus();
                         if (window.announceToScreenReader) window.announceToScreenReader("Günlük Giriş Ödülü: " + window.pendingDailyRewardMsg + " Devam etmek için butona basın.");
+                        hideIntroSafely();
                     }, 400);
 
                     window.onDailyRewardContinue = () => {
