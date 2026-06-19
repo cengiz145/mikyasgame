@@ -114,3 +114,97 @@ async function checkAndSendNotifications() {
 console.log('Sistem aktif! Her 1 dakikada bir kontrol edilecek...');
 checkAndSendNotifications(); // Ilk kontrol hemen
 setInterval(checkAndSendNotifications, 60 * 1000); // Sonra her dakika
+// ==========================================
+// 3. SOHBET VE OZEL MESAJ ENTEGRASYONU (Real-Time Push)
+// ==========================================
+
+let isInitialChatLoad = true;
+setTimeout(() => { isInitialChatLoad = false; }, 5000); // Ilk acilistaki eski mesajlari atlamak icin
+
+// --- A. GENEL SOHBET (MESSAGES) ---
+db.ref('messages').on('child_added', async (snapshot) => {
+    if (isInitialChatLoad) return;
+    const msg = snapshot.val();
+    if (!msg || !msg.sender || !msg.text) return;
+    
+    try {
+        const [presenceSnap, tokensSnap, historySnap] = await Promise.all([
+            db.ref('presence').once('value'),
+            db.ref('bildirim_adresleri').once('value'),
+            db.ref('bildirim_gecmisi').once('value')
+        ]);
+        
+        const presenceData = presenceSnap.val() || {};
+        const tokensData = tokensSnap.val() || {};
+        const historyData = historySnap.val() || {};
+        const now = Date.now();
+        
+        for (const playerName in tokensData) {
+            if (playerName === msg.sender) continue; // Kendine bildirim atma
+            
+            const playerState = presenceData[playerName] ? presenceData[playerName].state : 'offline';
+            if (playerState !== 'online') {
+                const lastChatNotif = (historyData[playerName] && historyData[playerName].last_chat_notif) ? historyData[playerName].last_chat_notif : 0;
+                
+                // Genel sohbet icin SPAM KORUMASI: Bir oyuncuya genel sohbetten en fazla 2 saatte bir bildirim gitsin
+                if (now - lastChatNotif > (2 * 60 * 60 * 1000)) {
+                    await admin.messaging().send({
+                        token: tokensData[playerName].token,
+                        notification: {
+                            title: "Sohbette Yeni Mesaj!",
+                            body: msg.sender + ": " + msg.text
+                        }
+                    });
+                    await db.ref(ildirim_gecmisi/ + playerName + /last_chat_notif).set(now);
+                    console.log([SOHBET BILDIRIMI]  + playerName +  adli oyuncuya gonderildi.);
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Sohbet bildirimi gonderilirken hata:", e);
+    }
+});
+
+// --- B. OZEL MESAJLAR (INBOX) ---
+async function handleNewPrivateMessage(snapshot) {
+    if (isInitialChatLoad) return;
+    const recipient = snapshot.key;
+    const inboxItems = snapshot.val();
+    if (!inboxItems) return;
+    
+    const keys = Object.keys(inboxItems);
+    const lastKey = keys[keys.length - 1];
+    const lastMsg = inboxItems[lastKey];
+    
+    // Mesaj son 1 dakika icinde geldiyse taze mesajdir
+    if (Date.now() - lastMsg.time < 60000) {
+        try {
+            const tokenSnap = await db.ref(ildirim_adresleri/ + recipient).once('value');
+            const tokenData = tokenSnap.val();
+            
+            if (tokenData && tokenData.token) {
+                const presenceSnap = await db.ref(presence/ + recipient).once('value');
+                const presenceData = presenceSnap.val();
+                
+                // Sadece oyuncu oyunda degilse ozel mesaj bildirimi gonder
+                if (!presenceData || presenceData.state !== 'online') {
+                    await admin.messaging().send({
+                        token: tokenData.token,
+                        notification: {
+                            title: "1 Yeni Özel Mesajınız Var!",
+                            body: lastMsg.from + " size özel bir mesaj gönderdi."
+                        }
+                    });
+                    console.log([OZEL MESAJ BILDIRIMI]  + recipient +  adli oyuncuya gonderildi. Gonderen:  + lastMsg.from);
+                }
+            }
+        } catch (e) {
+            console.error("Ozel mesaj bildirimi gonderilirken hata:", e);
+        }
+    }
+}
+
+db.ref('inbox').on('child_added', handleNewPrivateMessage);
+db.ref('inbox').on('child_changed', handleNewPrivateMessage);
+
+console.log("Chat (Sohbet ve Ozel Mesaj) sistemi aktif dinleniyor...");
