@@ -1760,53 +1760,121 @@ window.playRhythmComputerTurn = function() {
     }, intervalMs);
 };
 
+window.rhythmPlayerFailed = function(reason) {
+    clearInterval(window.rhythmState.intervalId);
+    window.isComputerPlaying = true;
+    
+    let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+    const gameStatus = document.getElementById('game-status-text');
+    
+    if (hk > 0) {
+        hk--;
+        localStorage.setItem('hafizaGuvenHataKorumasi', hk);
+        if (window.wrongSound) window.wrongSound.play();
+        if (gameStatus) gameStatus.textContent = "Hata koruması kullanıldı! Ceza Yok. Ritim tekrar çalınıyor.";
+        if (window.announceToScreenReader) window.announceToScreenReader("Hata koruması kullanıldı! Tekrar dinleyin.");
+        setTimeout(() => { window.playRhythmComputerTurn(); }, 1500);
+    } else {
+        if (window.wrongSound) window.wrongSound.play();
+        window.rhythmState.mistakes++;
+        if (window.rhythmState.mistakes >= 3) {
+            window.sessionTokens = (window.rhythmState.level - 1) * 5;
+            window.endMainGame(false, false, false); 
+            if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
+        } else {
+            if (gameStatus) gameStatus.textContent = reason + ` Kalan hak: ${3 - window.rhythmState.mistakes}.`;
+            if (window.announceToScreenReader) window.announceToScreenReader(reason + ` Kalan hakkınız ${3 - window.rhythmState.mistakes}.`);
+            setTimeout(() => { window.playRhythmComputerTurn(); }, 1500);
+        }
+    }
+};
+
+window.rhythmPlayerSucceeded = function() {
+    clearInterval(window.rhythmState.intervalId);
+    window.isComputerPlaying = true;
+    if (window.correctSound) window.correctSound.play();
+    window.rhythmState.successes++;
+    
+    const gameStatus = document.getElementById('game-status-text');
+    if (gameStatus) {
+        gameStatus.textContent = "Harika!";
+        if (window.announceToScreenReader) window.announceToScreenReader("Harika!");
+    }
+    
+    if (window.rhythmState.successes >= 3) {
+        window.rhythmState.successes = 0;
+        window.rhythmState.level++;
+        window.rhythmState.bpm += 10;
+        
+        if (window.gameModes.rhythm_mode.completionCount < window.rhythmState.level) {
+            window.gameModes.rhythm_mode.completionCount = window.rhythmState.level;
+            try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}
+        }
+        
+        setTimeout(() => {
+            if (gameStatus) {
+                gameStatus.textContent = `Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`;
+                if (window.announceToScreenReader) window.announceToScreenReader(`Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`);
+            }
+            if (window.modeUnlockSound) window.modeUnlockSound.play();
+            setTimeout(window.playRhythmComputerTurn, 2500);
+        }, 1000);
+    } else {
+        setTimeout(window.playRhythmComputerTurn, 1500);
+    }
+};
+
 window.startRhythmPlayerTurn = function() {
     window.isComputerPlaying = false;
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
-        gameStatus.textContent = "Sıra sizde! Aynı sırayla çalın.";
-        if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde!");
+        gameStatus.textContent = "Sıra sizde! Metronomla eşzamanlı çalın. 'es' olan yerde bekleyin!";
+        if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde! Ritme uyun. Es olan yerde bekleyin.");
     }
     
-    window.gameTimer = window.rhythmState.sequence.length + 5;
-    window.updateGameUI();
-    
     window.hgfzZamanlayici.clearInterval(window.gameInterval);
-    window.gameInterval = window.hgfzZamanlayici.setInterval(() => {
-        if (window.gameIsPaused || !window.gameIsActive || window.isComputerPlaying) return;
+    if (window.rhythmState.intervalId) clearInterval(window.rhythmState.intervalId);
+    
+    let totalBeats = window.rhythmState.totalBeats;
+    let intervalMs = 60000 / window.rhythmState.bpm;
+    
+    window.rhythmState.playerCurrentBeat = -1; 
+    window.rhythmState.expectedNote = null;
+    window.rhythmState.playerPressedThisBeat = true; // prevent failing before beat 0 starts
+    
+    setTimeout(() => {
+        window.rhythmState.playerCurrentBeat = 0;
         
-        window.gameTimer--;
-        window.updateGameUI();
-        
-        if (window.gameTimer <= 0) {
-            let zkLocal = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
-            if (zkLocal > 0) {
-                zkLocal--;
-                localStorage.setItem('hafizaGuvenZamanKorumasi', zkLocal);
-                window.gameTimer = 10;
-                window.updateGameUI();
-                if (window.announceToScreenReader) window.announceToScreenReader("Zaman koruması kullanıldı! 10 saniye eklendi.");
-                if (gameStatus) gameStatus.textContent = "Zaman koruması kullanıldı! +10 saniye.";
-            } else {
-                window.hgfzZamanlayici.clearInterval(window.gameInterval);
-                if (window.wrongSound) window.wrongSound.play();
-                window.rhythmState.mistakes++;
-                if (window.rhythmState.mistakes >= 3) {
-                    window.sessionTokens = (window.rhythmState.level - 1) * 5;
-                    window.endMainGame(false, false, false);
-                    if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
-                } else {
-                    if (gameStatus) gameStatus.textContent = `Süre bitti! Kalan hak: ${3 - window.rhythmState.mistakes}. Ritim tekrar çalınıyor.`;
-                    if (window.announceToScreenReader) window.announceToScreenReader(`Süre bitti! Kalan hakkınız ${3 - window.rhythmState.mistakes}. Tekrar dinleyin.`);
-                    
-                    window.isComputerPlaying = true;
-                    setTimeout(() => {
-                        window.playRhythmComputerTurn();
-                    }, 1500);
-                }
+        let startTick = () => {
+            if (window.gameIsPaused || !window.gameIsActive || window.isComputerPlaying) return;
+            
+            // Check previous beat
+            if (window.rhythmState.expectedNote !== null && !window.rhythmState.playerPressedThisBeat) {
+                window.rhythmPlayerFailed("Notayı kaçırdınız (geciktiniz)!");
+                return;
             }
-        }
-    }, 1000);
+            
+            // Check if game won
+            if (window.rhythmState.playerCurrentBeat >= totalBeats) {
+                window.rhythmPlayerSucceeded();
+                return;
+            }
+            
+            // Setup current beat
+            let cBeat = window.rhythmState.playerCurrentBeat;
+            let isFirstBeat = (cBeat % window.rhythmState.beatsPerMeasure) === 0;
+            if (window.playMetronomeTick) window.playMetronomeTick(isFirstBeat);
+            
+            window.rhythmState.expectedNote = window.rhythmState.beatMap[cBeat] || null;
+            window.rhythmState.playerPressedThisBeat = false; 
+            
+            window.rhythmState.playerCurrentBeat++;
+        };
+        
+        startTick();
+        window.rhythmState.intervalId = setInterval(startTick, intervalMs);
+        
+    }, intervalMs);
 };
 
 window.handleRhythmInput = function(key) {
@@ -1814,77 +1882,18 @@ window.handleRhythmInput = function(key) {
     
     if (window.playPianoNoteSingle) window.playPianoNoteSingle(key);
     
-    let expectedKey = window.rhythmState.sequence[window.rhythmState.playerIndex];
-    if (key === expectedKey) {
-        window.rhythmState.playerIndex++;
-        
-        if (window.rhythmState.playerIndex >= window.rhythmState.sequence.length) {
-            window.isComputerPlaying = true;
-            if (window.correctSound) window.correctSound.play();
-            window.rhythmState.successes++;
-            
-            const gameStatus = document.getElementById('game-status-text');
-            if (gameStatus) {
-                gameStatus.textContent = "Harika!";
-                if (window.announceToScreenReader) window.announceToScreenReader("Harika!");
-            }
-            
-            if (window.rhythmState.successes >= 3) {
-                window.rhythmState.successes = 0;
-                window.rhythmState.level++;
-                window.rhythmState.bpm += 10;
-                
-                if (window.gameModes.rhythm_mode.completionCount < window.rhythmState.level) {
-                    window.gameModes.rhythm_mode.completionCount = window.rhythmState.level;
-                    try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}
-                }
-                
-                setTimeout(() => {
-                    if (gameStatus) {
-                        gameStatus.textContent = `Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`;
-                        if (window.announceToScreenReader) window.announceToScreenReader(`Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`);
-                    }
-                    if (window.modeUnlockSound) window.modeUnlockSound.play();
-                    setTimeout(window.playRhythmComputerTurn, 2500);
-                }, 1000);
-            } else {
-                setTimeout(window.playRhythmComputerTurn, 1500);
-            }
+    let expectedKey = window.rhythmState.expectedNote;
+    
+    if (expectedKey === null) {
+        window.rhythmPlayerFailed("Es (boşluk) anında erken tuşa bastınız!");
+    } else if (key === expectedKey) {
+        if (!window.rhythmState.playerPressedThisBeat) {
+            window.rhythmState.playerPressedThisBeat = true;
+        } else {
+             window.rhythmPlayerFailed("Aynı vuruşta fazladan tuşa bastınız!");
         }
     } else {
-        window.isComputerPlaying = true;
-        let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
-        if (hk > 0) {
-            hk--;
-            localStorage.setItem('hafizaGuvenHataKorumasi', hk);
-
-            if (window.wrongSound) window.wrongSound.play();
-            const gameStatus = document.getElementById('game-status-text');
-            if (gameStatus) gameStatus.textContent = "Hata koruması kullanıldı! Ceza Yok. Ritim tekrar çalınıyor.";
-            if (window.announceToScreenReader) window.announceToScreenReader("Hata koruması kullanıldı! Tekrar dinleyin.");
-
-            window.rhythmState.playerIndex = 0;
-            setTimeout(() => {
-                window.playRhythmComputerTurn();
-            }, 1500);
-        } else {
-            if (window.wrongSound) window.wrongSound.play();
-            window.rhythmState.mistakes++;
-            if (window.rhythmState.mistakes >= 3) {
-                window.sessionTokens = (window.rhythmState.level - 1) * 5;
-                window.endMainGame(false, false, false); 
-                if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
-            } else {
-                const gameStatus = document.getElementById('game-status-text');
-                if (gameStatus) gameStatus.textContent = `Yanlış nota! Kalan hak: ${3 - window.rhythmState.mistakes}. Ritim tekrar çalınıyor.`;
-                if (window.announceToScreenReader) window.announceToScreenReader(`Yanlış nota! Kalan hakkınız ${3 - window.rhythmState.mistakes}. Tekrar dinleyin.`);
-                
-                window.rhythmState.playerIndex = 0;
-                setTimeout(() => {
-                    window.playRhythmComputerTurn();
-                }, 1500);
-            }
-        }
+        window.rhythmPlayerFailed("Yanlış notaya bastınız!");
     }
 };
 
