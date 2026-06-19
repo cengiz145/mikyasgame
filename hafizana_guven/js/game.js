@@ -587,18 +587,20 @@ window.playGameSequence = function () {
             clearTimeout(window.sequenceTimeoutId);
             window.sequenceTimeoutId = window.hgfzZamanlayici.setTimeout(playNextSeqNote, speedMs);
         } else {
-            window.isComputerPlaying = false;
-
-            if (window.clockTickSound && !window.clockTickSound.playing()) window.clockTickSound.play();
-
-            window.turnStartTime = Date.now();
             if (gameStatus) {
                 gameStatus.style.display = 'block';
                 gameStatus.textContent = "Sıra sizde!";
             }
             if (replayBtn) replayBtn.style.display = 'none';
 
-            if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde");
+            if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde!");
+            
+            // Bilgisayar çalmayı bitirse bile "Sıra sizde" cümlesi okunana kadar süreyi duraklat.
+            window.hgfzZamanlayici.setTimeout(() => {
+                window.isComputerPlaying = false;
+                window.turnStartTime = Date.now();
+                if (window.clockTickSound && !window.clockTickSound.playing()) window.clockTickSound.play();
+            }, 1500);
 
             clearTimeout(window.replayBtnTimeout);
             window.replayBtnTimeout = window.hgfzZamanlayici.setTimeout(() => {
