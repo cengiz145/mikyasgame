@@ -1,5 +1,5 @@
 ﻿{
     "version":  "0.97.4.56",
-    "buildId":  1781857334,
-    "changelog":  "Otonom hata raporlama (Firebase Telemetri) sistemi devreye alindi. Artik kullanicilar hatalari dogrudan veritabanina gonderebilecek."
+    "buildId":  1781857645,
+    "changelog":  "Modülerleştirme (ui.js parçalama) sırasında oluşan kritik sözdizimi hatası nedeniyle sistem tek parça yapıya geri döndürüldü ve oyun onarıldı."
 }
