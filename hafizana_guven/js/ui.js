@@ -1606,7 +1606,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let scale = val / 100;
             if (window.bgMusic) window.bgMusic.volume(1.0 * scale);
             if (window.storyBGM) window.storyBGM.volume(0.5 * scale);
-            if (window.music60Sound) window.music60Sound.volume(0.5 * scale);
             if (window.music272Sound) window.music272Sound.volume(0.4 * scale);
             if (window.house2Sound) window.house2Sound.volume(0.6 * scale);
             if (window.mountainSound) window.mountainSound.volume(0.4 * scale);
@@ -1655,6 +1654,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.wrongSound) window.wrongSound.volume(1.0 * scale);
             if (window.glasshitSound) window.glasshitSound.volume(1.0 * scale);
             if (window.gameWinSound) window.gameWinSound.volume(1.0 * scale);
+            if (window.music60Sound) window.music60Sound.volume(0.5 * scale); // Kaybetme sesi artık efekt!
             if (window.modeUnlockSound) window.modeUnlockSound.volume(1.0 * scale);
             if (window.playerOnlineSound) window.playerOnlineSound.volume(1.0 * scale);
             if (window.playerOfflineSound) window.playerOfflineSound.volume(1.0 * scale);

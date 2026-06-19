@@ -1411,7 +1411,6 @@ document.addEventListener('keydown', function (event) {
             if (window.storyBGM) window.storyBGM.mute(setMute);
             if (window.house2Sound) window.house2Sound.mute(setMute);
             if (window.mountainSound) window.mountainSound.mute(setMute);
-            if (window.music60Sound) window.music60Sound.mute(setMute);
             if (window.music272Sound) window.music272Sound.mute(setMute);
             if (window.music117Sound) window.music117Sound.mute(setMute);
             if (window.music38Sound) window.music38Sound.mute(setMute);
