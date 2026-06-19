@@ -1,5 +1,5 @@
 ﻿{
     "version":  "0.97.4.56",
-    "buildId":  1781859618,
-    "changelog":  "neyzen kullanıcısına da Tester rütbesi ve kilitli özelliklere erişim (bypass) yetkisi verildi."
+    "buildId":  1781859708,
+    "changelog":  "ekrem kullanıcısına sınırsız geliştirici ayrıcalıkları tanındı; mağazadaki tüm ürünleri jetonu olmasa dahi ücretsiz satın alabilir."
 }

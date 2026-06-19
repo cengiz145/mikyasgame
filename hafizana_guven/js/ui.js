@@ -1990,7 +1990,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (totalTokens < 50) {
+            let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 50) {
                 if (window.wrongSound) window.wrongSound.play();
                 let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 50 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${50 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2017,7 +2017,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (totalTokens < 30) {
+            let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 30) {
                 if (window.wrongSound) window.wrongSound.play();
                 let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 30 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${30 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2044,7 +2044,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (totalTokens < 80) {
+            let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 80) {
                 if (window.wrongSound) window.wrongSound.play();
                 let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 80 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${80 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2104,7 +2104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                if (totalTokens < 500) {
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 500) {
                     if (window.wrongSound) window.wrongSound.play();
                     let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 500 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${500 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2183,7 +2183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                if (totalTokens < 100) {
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 100) {
                     if (window.wrongSound) window.wrongSound.play();
                     let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 100 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${100 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2262,7 +2262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                if (totalTokens < 200) {
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 200) {
                     if (window.wrongSound) window.wrongSound.play();
                     let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 200 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${200 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2341,7 +2341,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                if (totalTokens < 300) {
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 300) {
                     if (window.wrongSound) window.wrongSound.play();
                     let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 300 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${300 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -4304,6 +4304,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.modeUnlockSound) window.modeUnlockSound.play();
     };
 });
+
 
 
 
