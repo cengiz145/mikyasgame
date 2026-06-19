@@ -1419,7 +1419,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const btnChangeUsername = document.getElementById('btn-change-username');
-    if (btnChangeUsername) {
+          const btnTelegramNotify = document.getElementById('btn-telegram-notify');
+    if (btnTelegramNotify) {
+              btnTelegramNotify.addEventListener('click', () => {
+                  let myName = localStorage.getItem('hafizaGuvenUserNickname');
+                  if (!myName || myName === 'Bilinmeyen') {
+                      if (window.announceToScreenReader) window.announceToScreenReader('Lütfen önce Sohbet menüsünden bir takma ad belirleyin.', true);
+                      if (window.showToastNotification) window.showToastNotification('Önce takma ad belirleyin!');
+                      return;
+                  }
+                  if (window.announceToScreenReader) window.announceToScreenReader('Telegram botu açılıyor. Lütfen bot açıldığında BAŞLAT (Start) tuşuna basın.', true);
+                  window.open('https://t.me/hafizanaguvenbot?start=' + encodeURIComponent(myName), '_blank');
+              });
+          }
+          if (btnChangeUsername) {
         btnChangeUsername.addEventListener('click', () => {
             if (window.menuEnterSound) window.menuEnterSound.play();
             let currentName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";

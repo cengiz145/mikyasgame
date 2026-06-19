@@ -1,5 +1,5 @@
 ﻿{
     "version":  "0.97.4.56",
-    "buildId":  1781863853,
-    "changelog":  "Ekran okuyucuda Türkçe karakterlerin (ş, ı, ç, ğ) hatalı okunmasına sebep olan dosya kodlama (Mojibake) sorunu düzeltildi."
+    "buildId":  1781865802,
+    "changelog":  "Telegram bildirim sistemi entegre edildi. Profil menüsüne Telegram Bildirimlerini Aç butonu eklendi."
 }
