@@ -1698,10 +1698,7 @@ window.playRhythmComputerTurn = function() {
     window.rhythmState.sequence = [];
     
     let totalBeats = window.rhythmState.beatsPerMeasure * window.rhythmState.measures; // 8 beats
-    
     let noteCount = Math.min(3 + Math.floor(window.rhythmState.level / 2), totalBeats);
-    let availableKeys = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-    
     let noteBeats = new Set();
     while(noteBeats.size < noteCount) {
         noteBeats.add(Math.floor(Math.random() * totalBeats));
@@ -1709,10 +1706,31 @@ window.playRhythmComputerTurn = function() {
     
     let beatArray = Array.from(noteBeats).sort((a,b) => a-b);
     let beatToNoteMap = {};
+    
+    let orderedKeys = ['c', 'd', 'e', 'f', 'g', 'a', 'b']; // Müzikal siralamasi (Do-Re-Mi...)
+    let prevIndex = Math.floor(Math.random() * orderedKeys.length);
+    
     for (let beat of beatArray) {
-        let randomNote = availableKeys[Math.floor(Math.random() * availableKeys.length)];
-        beatToNoteMap[beat] = randomNote;
-        window.rhythmState.sequence.push(randomNote); // Oyuncunun basması gereken sıra
+        let nextNoteIndex;
+        let lvl = window.rhythmState.level;
+        
+        if (lvl <= 2) {
+            let step = (Math.random() > 0.5 ? 1 : -1);
+            if (Math.random() > 0.7) step = 0;
+            nextNoteIndex = (prevIndex + step + orderedKeys.length) % orderedKeys.length;
+        } else if (lvl <= 4) {
+            let stepOptions = [-2, -1, 0, 1, 2];
+            let step = stepOptions[Math.floor(Math.random() * stepOptions.length)];
+            nextNoteIndex = (prevIndex + step + orderedKeys.length) % orderedKeys.length;
+        } else {
+            nextNoteIndex = Math.floor(Math.random() * orderedKeys.length);
+        }
+        
+        let generatedNote = orderedKeys[nextNoteIndex];
+        prevIndex = nextNoteIndex;
+        
+        beatToNoteMap[beat] = generatedNote;
+        window.rhythmState.sequence.push(generatedNote);
     }
     
     const gameStatus = document.getElementById('game-status-text');
