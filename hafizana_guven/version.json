@@ -1,5 +1,5 @@
 ﻿{
     "version":  "0.97.4.56",
-    "buildId":  1781856761,
-    "changelog":  "Kod tabanında devasa modülerleşme operasyonu: ui.js dosyası 4 ayrı modüle (ui_core, ui_social, ui_chat, ui_achievements) bölündü."
+    "buildId":  1781857334,
+    "changelog":  "Otonom hata raporlama (Firebase Telemetri) sistemi devreye alindi. Artik kullanicilar hatalari dogrudan veritabanina gonderebilecek."
 }
