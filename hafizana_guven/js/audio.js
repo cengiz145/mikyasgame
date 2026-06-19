@@ -1,4 +1,4 @@
-﻿// audio.js - Ses Tanımlamaları ve İşlevleri
+// audio.js - Ses Tanımlamaları ve İşlevleri
 
 // Dinleyiciyi (Kullanıcı) (0,0,0) merkez noktasına koyalım.
 Howler.pos(0, 0, 0);
@@ -445,21 +445,24 @@ window.stopMetronome = function () {
     }
 };
 
+if (!window.audioCtx) {
+    window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
 window.playMetronomeTick = function (isHighPitch = false) {
     try {
-        const ctx = window.audioCtx || (window.AudioContext ? new window.AudioContext() : new window.webkitAudioContext());
-        if (ctx.state === 'suspended') ctx.resume();
-        const osc = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(isHighPitch ? 1200 : 800, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-        gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+        if (window.audioCtx.state === 'suspended') window.audioCtx.resume();
+        const osc = window.audioCtx.createOscillator();
+        const gainNode = window.audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(isHighPitch ? 1200 : 600, window.audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(10, window.audioCtx.currentTime + 0.05);
+        gainNode.gain.setValueAtTime(0.8, window.audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, window.audioCtx.currentTime + 0.05);
         osc.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.1);
+        gainNode.connect(window.audioCtx.destination);
+        osc.start(window.audioCtx.currentTime);
+        osc.stop(window.audioCtx.currentTime + 0.05);
     } catch (e) {
         if (window.clockTickSound) window.clockTickSound.play();
     }

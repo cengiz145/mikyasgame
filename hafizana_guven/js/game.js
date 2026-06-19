@@ -1670,6 +1670,10 @@ window.startRhythmMode = function() {
     window.gameIsActive = true;
     window.isComputerPlaying = true;
     
+    if (window.bgMusic && window.bgMusic.playing()) {
+        window.bgMusic.pause();
+    }
+    
     window.rhythmState.bpm = 60;
     window.rhythmState.level = 1;
     window.rhythmState.successes = 0;
