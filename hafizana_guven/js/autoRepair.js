@@ -67,7 +67,14 @@ window.HafizanaGuvenAutoRepair = {
         if (this.isRepairing) return;
         this.isRepairing = true;
 
-        console.error("[Global Error Reporter] Hata Yakalandı:\n" + errorLog);
+        // Kullanıcı gizliliğini korumak için bilgisayar dosya yollarını maskele (C:\Users\... veya file:///)
+        let sanitizedLog = errorLog;
+        try {
+            sanitizedLog = sanitizedLog.replace(/(?:file:\/\/\/|https?:\/\/|[a-zA-Z]:\\).*?[\/\\]([a-zA-Z0-9_\-]+\.(?:js|css|html))/gi, '[OYUN_KLASORU]/$1');
+            sanitizedLog = sanitizedLog.replace(/Users[\/\\][^\/\\]+[\/\\]/gi, 'Users/[GIZLI_KULLANICI]/');
+        } catch(e) {}
+
+        console.error("[Global Error Reporter] Hata Yakalandı:\n" + sanitizedLog);
 
         const modal = document.getElementById('error-reporter-modal');
         const textarea = document.getElementById('error-log-textarea');
@@ -89,7 +96,7 @@ window.HafizanaGuvenAutoRepair = {
             // Oyun durumunu durdur
             window.gameIsActive = false;
 
-            textarea.value = errorLog;
+            textarea.value = sanitizedLog;
             
             // Aktif olan tüm menüleri gizleyerek odağın sadece hata menüsünde kalmasını sağla
             const activeMenus = document.querySelectorAll('.menu-container:not([style*="display: none"])');
