@@ -1329,14 +1329,22 @@ document.addEventListener('keydown', function (event) {
         event.preventDefault();
         let currentVolume = Howler.volume();
         Howler.volume(Math.min(1.0, currentVolume + 0.05));
-        if (window.announceToScreenReader) window.announceToScreenReader('Genel Ses: %' + Math.round(Howler.volume() * 100), false);
+        
+        clearTimeout(window.genelSesTimeout);
+        window.genelSesTimeout = setTimeout(() => {
+            if (window.announceToScreenReader) window.announceToScreenReader('Genel Ses: %' + Math.round(Howler.volume() * 100), false);
+        }, 400);
         return;
     }
     if (event.key === 'End') {
         event.preventDefault();
         let currentVolume = Howler.volume();
         Howler.volume(Math.max(0.0, currentVolume - 0.05));
-        if (window.announceToScreenReader) window.announceToScreenReader('Genel Ses: %' + Math.round(Howler.volume() * 100), false);
+        
+        clearTimeout(window.genelSesTimeout);
+        window.genelSesTimeout = setTimeout(() => {
+            if (window.announceToScreenReader) window.announceToScreenReader('Genel Ses: %' + Math.round(Howler.volume() * 100), false);
+        }, 400);
         return;
     }
     if (event.key === 'PageUp') {
@@ -1353,7 +1361,10 @@ document.addEventListener('keydown', function (event) {
         let display = document.getElementById('music-volume-display');
         if (display) display.innerText = '%' + currentMusicVolume;
 
-        if (window.announceToScreenReader) window.announceToScreenReader('Müzik Sesi: %' + currentMusicVolume, false);
+        clearTimeout(window.muzikSesTimeout);
+        window.muzikSesTimeout = setTimeout(() => {
+            if (window.announceToScreenReader) window.announceToScreenReader('Müzik Sesi: %' + currentMusicVolume, false);
+        }, 400);
         return;
     }
     if (event.key === 'PageDown') {
@@ -1370,7 +1381,10 @@ document.addEventListener('keydown', function (event) {
         let display = document.getElementById('music-volume-display');
         if (display) display.innerText = '%' + currentMusicVolume;
 
-        if (window.announceToScreenReader) window.announceToScreenReader('Müzik Sesi: %' + currentMusicVolume, false);
+        clearTimeout(window.muzikSesTimeout);
+        window.muzikSesTimeout = setTimeout(() => {
+            if (window.announceToScreenReader) window.announceToScreenReader('Müzik Sesi: %' + currentMusicVolume, false);
+        }, 400);
         return;
     }
 
