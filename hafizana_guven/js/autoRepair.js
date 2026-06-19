@@ -1,4 +1,4 @@
-﻿// autoRepair.js - Otomatik Hata Onarım ve Teşhis Sistemi (Auto-Repair & Diagnostics)
+// autoRepair.js - Otomatik Hata Onarım ve Teşhis Sistemi (Auto-Repair & Diagnostics)
 
 window.HafizanaGuvenAutoRepair = {
     isRepairing: false,
@@ -18,93 +18,105 @@ window.HafizanaGuvenAutoRepair = {
         const self = this;
         
         window.onerror = function(message, source, lineno, colno, error) {
-            self.handleCrash("JavaScript Hatası: " + message);
+            let stack = error && error.stack ? error.stack : 'Stack trace yok';
+            let formattedMsg = `JavaScript Hatası:\nMesaj: ${message}\nDosya: ${source}\nSatır: ${lineno}:${colno}\n\nDetay:\n${stack}`;
+            self.showErrorReporter(formattedMsg);
             // Hatanın tarayıcı konsoluna düşmesini engelleme (false döndür)
             return false;
         };
 
         window.addEventListener('unhandledrejection', function(event) {
-            self.handleCrash("Asenkron İşlem Hatası: " + (event.reason ? event.reason.message : 'Bilinmeyen Hata'));
+            let reason = event.reason;
+            let formattedMsg = `Asenkron İşlem Hatası (Promise Rejection):\n`;
+            if (reason instanceof Error) {
+                formattedMsg += `Mesaj: ${reason.message}\n\nDetay:\n${reason.stack}`;
+            } else {
+                formattedMsg += `Detay: ${JSON.stringify(reason)}`;
+            }
+            self.showErrorReporter(formattedMsg);
+        });
+
+        // Hata Bildirim Butonları Event Listener'ları
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnCopy = document.getElementById('btn-copy-error');
+            const btnReload = document.getElementById('btn-reload-error');
+
+            if (btnCopy) {
+                btnCopy.addEventListener('click', () => {
+                    const errorText = document.getElementById('error-log-textarea').value;
+                    navigator.clipboard.writeText(errorText).then(() => {
+                        if (window.announceToScreenReader) window.announceToScreenReader("Hata kodu panoya kopyalandı. Geliştiriciye gönderebilirsiniz.");
+                        btnCopy.innerText = "Kopyalandı!";
+                        setTimeout(() => btnCopy.innerText = "Hatayı Kopyala", 2000);
+                    }).catch(err => {
+                        console.error('Kopyalama başarısız', err);
+                        if (window.announceToScreenReader) window.announceToScreenReader("Kopyalama başarısız oldu. Lütfen manuel olarak kopyalayın.");
+                    });
+                });
+            }
+
+            if (btnReload) {
+                btnReload.addEventListener('click', () => {
+                    window.location.reload();
+                });
+            }
         });
     },
 
-    handleCrash: function(reason) {
+    showErrorReporter: function(errorLog) {
         if (this.isRepairing) return;
-        
-        const now = Date.now();
-        if (now - this.lastErrorTime < 2000) {
-            // Saniyeler içinde çok fazla hata alıyorsak sonsuz döngüyü önle
-            this.errorCount++;
-            if (this.errorCount > 5) return;
-        } else {
-            this.errorCount = 1;
-        }
-        
-        this.lastErrorTime = now;
         this.isRepairing = true;
 
-        console.error("[AutoRepair] Kritik Hata Yakalandı: ", reason);
+        console.error("[Global Error Reporter] Hata Yakalandı:\n" + errorLog);
 
-        // Ekran okuyucuya bilgi ver
-        if (window.announceToScreenReader) {
-            window.announceToScreenReader("Sistemde ufak bir takılma algılandı, güvenliğiniz için otomatik olarak onarılıyor...", true);
-        }
+        const modal = document.getElementById('error-reporter-modal');
+        const textarea = document.getElementById('error-log-textarea');
+        const title = document.getElementById('error-modal-title');
 
-        // Oyunu güvenle temizle
-        if (window.hgfzZamanlayici && window.hgfzZamanlayici.hepsiniImhaEt) {
-            window.hgfzZamanlayici.hepsiniImhaEt();
-        }
+        if (modal && textarea) {
+            // Arkaplandaki tüm sesleri sustur
+            const allAudios = document.querySelectorAll('audio');
+            allAudios.forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
 
-        // Açık olan tüm sesleri sustur
-        const allAudios = document.querySelectorAll('audio');
-        allAudios.forEach(audio => {
-            audio.pause();
-            audio.currentTime = 0;
-        });
-
-        // Oyun durumunu sıfırla
-        window.gameIsActive = false;
-        window.isStarted = false;
-        window.isStarting = false;
-        window.isComputerPlaying = false;
-        window.gameTimer = 0;
-
-        // Ana Menüye tahliye işlemi
-        setTimeout(() => {
-            const gameContainer = document.getElementById('game-menu-container');
-            const mainMenu = document.getElementById('main-menu');
-            
-            if (window.switchMenu && gameContainer && mainMenu) {
-                // Eğer oyun veya başka bir menüdeyse ana menüye dön
-                const activeMenus = document.querySelectorAll('.menu-container:not([style*="display: none"])');
-                activeMenus.forEach(menu => {
-                    if (menu.id !== 'main-menu') {
-                        menu.style.display = 'none';
-                        menu.setAttribute('aria-hidden', 'true');
-                    }
-                });
-
-                mainMenu.style.display = 'flex';
-                mainMenu.style.opacity = '1';
-                mainMenu.removeAttribute('aria-hidden');
-
-                const titleEl = document.getElementById('main-menu-title');
-                if (titleEl) {
-                    titleEl.focus();
-                }
-                
-                if (window.announceToScreenReader) {
-                    window.announceToScreenReader("Onarım tamamlandı. Ana menüye güvenle döndünüz.");
-                }
-
-                // Ana menü müziğini başlatmayı dene
-                if (window.bgMusic && !window.bgMusic.playing()) {
-                    try { window.bgMusic.play(); } catch(e) {}
-                }
+            // Zamanlayıcıları durdur
+            if (window.hgfzZamanlayici && window.hgfzZamanlayici.hepsiniImhaEt) {
+                window.hgfzZamanlayici.hepsiniImhaEt();
             }
             
-            this.isRepairing = false;
-        }, 1500);
+            // Oyun durumunu durdur
+            window.gameIsActive = false;
+
+            textarea.value = errorLog;
+            
+            // Aktif olan tüm menüleri gizleyerek odağın sadece hata menüsünde kalmasını sağla
+            const activeMenus = document.querySelectorAll('.menu-container:not([style*="display: none"])');
+            activeMenus.forEach(menu => {
+                menu.style.display = 'none';
+                menu.setAttribute('aria-hidden', 'true');
+            });
+
+            modal.style.display = 'flex';
+            
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                modal.removeAttribute('aria-hidden');
+                
+                if (title) title.focus();
+                
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader("Sistem hatası tespit edildi. Oyun durduruldu. Lütfen ekrandaki hata kodunu kopyalayıp geliştiriciye gönderin.", true);
+                }
+            }, 100);
+        } else {
+            alert("KRİTİK HATA:\n" + errorLog);
+        }
+    },
+
+    handleCrash: function(reason) {
+        this.showErrorReporter("Sistem Tespit Hatası:\n" + reason);
     },
 
     runLocalStorageDoctor: function() {

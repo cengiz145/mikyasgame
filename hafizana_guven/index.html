@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     <title>Hafýzana Güven - Ana Menü</title>
-    <link rel="stylesheet" href="css/style.css?v=1781821136">
+    <link rel="stylesheet" href="css/style.css?v=1781821137">
 
     <script>
         (function () {
@@ -843,6 +843,20 @@
     </div>
 
     <!-- KULLANICI ÝÅžLEMLERÝ MENÜSÜ (Özel Mesaj / Sustur) -->
+        <!-- Kritik Hata Raporlama Modal -->
+    <div id="error-reporter-modal" class="menu-container" role="alertdialog" aria-modal="true" aria-labelledby="error-modal-title" aria-describedby="error-modal-desc" aria-live="assertive" aria-hidden="true"
+        style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; z-index: 9999; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(150,0,0,0.9); align-items:center; justify-content:center;">
+        <div tabindex="0" role="button" aria-label="Hata ekran sonu, baa dnlyor" class="sr-only" onfocus="document.getElementById('error-modal-title').focus()"></div>
+        <h1 id="error-modal-title" tabindex="-1" style="color: white; font-size:2rem; margin-bottom:15px; text-align:center;">Sistem Hatasi Tespit Edildi</h1>
+        <p id="error-modal-desc" tabindex="0" style="color: white; margin-bottom: 20px; font-size: 1.2rem; text-align:center;">Oyunda beklenmeyen bir hata olustu. Lutfen asagidaki hata kodunu kopyalayip gelistiriciye gonderin.</p>
+        <textarea id="error-log-textarea" readonly tabindex="0" aria-label="Hata icerigi (salt okunur)" style="width: 90%; max-width: 600px; height: 150px; margin-bottom: 20px; background: #222; color: #ff5555; padding: 10px; font-family: monospace; border: 1px solid #ffaaaa;"></textarea>
+        <ul class="menu-nav">
+            <li><button id="btn-copy-error" class="menu-button" aria-label="Hatayi Panoya Kopyala">Hatayi Kopyala</button></li>
+            <li><button id="btn-reload-error" class="menu-button" aria-label="Sayfayi Yenile ve Oyunu Tekrar Baslat">Sayfayi Yenile</button></li>
+        </ul>
+        <div tabindex="0" role="button" aria-label="Hata ekran basi, sona dnlyor" class="sr-only" onfocus="document.getElementById('btn-reload-error').focus()"></div>
+    </div>
+
     <div id="social-action-modal" class="menu-container" role="presentation" aria-hidden="true"
         style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; z-index: 2000; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); align-items:center; justify-content:center;">
         <div tabindex="0" role="button" aria-label="Menü sonu, baþa dönülüyor" class="sr-only"
@@ -930,13 +944,13 @@
     </div>
 
     <!-- Howler.js 3D Ses Kütüphanesi (Yerel) -->
-    <script src="sounds/howler.min.js?v=1781821136"></script>
+    <script src="sounds/howler.min.js?v=1781821137"></script>
 
     <!-- Otomatik Onarým Sistemi -->
-    <script src="js/autoRepair.js?v=1781821136"></script>
+    <script src="js/autoRepair.js?v=1781821137"></script>
 
     <!-- Yardým, Alýþtýrma ve Motivasyon Mesajlarý -->
-    <script src="js/yardim.js?v=1781821136"></script>
+    <script src="js/yardim.js?v=1781821137"></script>
 
     <script>
         // OYUN SÜRÜM BÝLGÝSÝ
@@ -945,19 +959,21 @@
     </script>
 
     <!-- Firebase CDN Baðlantýlarý (Sayfa Yüklenmesini Engellememesi Ýçin Sona Taþýndý) -->
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js?v=1781821136.97.4.55"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js?v=1781821136.97.4.55"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js?v=1781821137.97.4.55"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js?v=1781821137.97.4.55"></script>
 
-    <script src="js/firebase.js?v=1781821136"></script>
-    <script src="js/guncelleme.js?v=1781821136"></script>
-    <script src="js/audio.js?v=1781821136"></script>
-    <script src="js/ui.js?v=1781821136"></script>
-    <script src="js/story.js?v=1781821136"></script>
-    <script src="js/game.js?v=1781821136"></script>
-    <script src="js/pvp.js?v=1781821136"></script>
+    <script src="js/firebase.js?v=1781821137"></script>
+    <script src="js/guncelleme.js?v=1781821137"></script>
+    <script src="js/audio.js?v=1781821137"></script>
+    <script src="js/ui.js?v=1781821137"></script>
+    <script src="js/story.js?v=1781821137"></script>
+    <script src="js/game.js?v=1781821137"></script>
+    <script src="js/pvp.js?v=1781821137"></script>
 </body>
 
 </html>
+
+
 
 
 
