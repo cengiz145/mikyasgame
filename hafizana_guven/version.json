@@ -1,5 +1,5 @@
 ﻿{
     "version":  "0.97.4.56",
-    "buildId":  1781859205,
-    "changelog":  "tester 09 kullanıcısına Tester rütbesi atandı ve tüm kilitli özelliklere erişim (bypass) yetkisi verildi."
+    "buildId":  1781859421,
+    "changelog":  "Veritabanı kontrolü yapıldı, Tester 09 hesabının asıl adının \u0027beta tester 09\u0027 olduğu tespit edilerek yetkiler bu asıl hesaba da aktarıldı."
 }

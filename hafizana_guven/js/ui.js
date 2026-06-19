@@ -443,7 +443,7 @@ window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReaso
     }
 
     let myName = localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
-    let isTesterOrDev = ['ekrem', 'tester 09', 'tester_09', 'tester09'].includes(myName.toLowerCase());
+    let isTesterOrDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09'].includes(myName.toLowerCase());
     if (window.playerRanks && (window.playerRanks[myName.toLowerCase()] === 'Tester' || window.playerRanks[myName.toLowerCase()] === 'GeliÅŸtirici')) isTesterOrDev = true;
 
     if (modeData.isUnlocked || isTesterOrDev) {
@@ -3634,7 +3634,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let isimKucuk = myName.toLowerCase();
             if (['ekrem'].includes(isimKucuk)) {
                 myRank = "GeliÅŸtirici";
-            } else if (['tester 09', 'tester_09', 'tester09'].includes(isimKucuk)) { myRank = 'Tester'; } else if (window.playerRanks && window.playerRanks[isimKucuk]) {
+            } else if (['tester 09', 'tester_09', 'tester09', 'beta tester 09'].includes(isimKucuk)) { myRank = 'Tester'; } else if (window.playerRanks && window.playerRanks[isimKucuk]) {
                 myRank = window.playerRanks[isimKucuk];
             }
             let r_el = document.getElementById('profile-player-rank');
@@ -4304,6 +4304,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.modeUnlockSound) window.modeUnlockSound.play();
     };
 });
+
 
 
 
