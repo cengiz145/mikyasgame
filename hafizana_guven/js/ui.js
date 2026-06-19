@@ -443,7 +443,7 @@ window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReaso
     }
 
     let myName = localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
-    let isTesterOrDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(myName.toLowerCase());
+    let isTesterOrDev = ['ekrem', 'ümit ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(myName.toLowerCase());
     if (window.playerRanks && (window.playerRanks[myName.toLowerCase()] === 'Tester' || window.playerRanks[myName.toLowerCase()] === 'GeliÅŸtirici')) isTesterOrDev = true;
 
     if (modeData.isUnlocked || isTesterOrDev) {
@@ -629,7 +629,7 @@ window.initPresenceSystem = function() {
 
             // --- GeliÅŸtirici Bilet (Geri Bildirim) Bildirimleri ---
             let devNameForTickets = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "";
-            if (['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(devNameForTickets.toLowerCase())) {
+            if (['ekrem', 'ümit ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(devNameForTickets.toLowerCase())) {
                 let isInitialFbLoad = true;
                 window.db.ref('feedbacks').on('child_added', (snapshot) => {
                     if (!isInitialFbLoad) {
@@ -1990,7 +1990,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 50) {
+            let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 50) {
                 if (window.wrongSound) window.wrongSound.play();
                 let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 50 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${50 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2017,7 +2017,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 30) {
+            let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 30) {
                 if (window.wrongSound) window.wrongSound.play();
                 let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 30 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${30 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2044,7 +2044,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 80) {
+            let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 80) {
                 if (window.wrongSound) window.wrongSound.play();
                 let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 80 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${80 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                 if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2104,7 +2104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 500) {
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 500) {
                     if (window.wrongSound) window.wrongSound.play();
                     let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 500 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${500 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2183,7 +2183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 100) {
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 100) {
                     if (window.wrongSound) window.wrongSound.play();
                     let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 100 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${100 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2262,7 +2262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 200) {
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 200) {
                     if (window.wrongSound) window.wrongSound.play();
                     let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 200 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${200 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -2341,7 +2341,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 300) {
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 300) {
                     if (window.wrongSound) window.wrongSound.play();
                     let msg = `Yetersiz bakiye. Bu eÅŸya iÃ§in 300 jetona ihtiyacÄ±nÄ±z var. Mevcut jetonunuz: ${totalTokens}. Almak iÃ§in ${300 - totalTokens} jetona daha ihtiyacÄ±nÄ±z var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
@@ -3370,7 +3370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let cUserNick = window.currentChatUser || "";
             let nickInputTemp = document.getElementById('chat-nickname');
             if (nickInputTemp && nickInputTemp.value.trim() !== "") cUserNick = nickInputTemp.value.trim();
-            let isDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(cUserNick.toLowerCase());
+            let isDev = ['ekrem', 'ümit ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(cUserNick.toLowerCase());
 
             function addLocalSystemMessage(msgText) {
                 // Sadece ekranda anlÄ±k (toast) gÃ¶sterip ekran okuyucuya okutuyoruz.
@@ -3538,7 +3538,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (text.toLowerCase().startsWith('/rutbe ') || text.toLowerCase().startsWith('/rÃ¼tbe ')) {
             let cUserNick = (nickname || "").toLowerCase();
-            let isDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(cUserNick) || (window.playerRanks && window.playerRanks[cUserNick] && window.playerRanks[cUserNick].toLowerCase() === 'tester');
+            let isDev = ['ekrem', 'ümit ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(cUserNick) || (window.playerRanks && window.playerRanks[cUserNick] && window.playerRanks[cUserNick].toLowerCase() === 'tester');
             
             if (!isDev) {
                 if (window.announceToScreenReader) window.announceToScreenReader("Bu komutu kullanma yetkiniz yok.", true);
@@ -3632,7 +3632,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (myName !== "Bilinmeyen") {
             let myRank = "Oyuncu";
             let isimKucuk = myName.toLowerCase();
-            if (['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk)) {
+            if (['ekrem', 'ümit ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk)) {
                 myRank = "GeliÅŸtirici";
             } else if (['tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk)) { myRank = 'Tester'; } else if (window.playerRanks && window.playerRanks[isimKucuk]) {
                 myRank = window.playerRanks[isimKucuk];
@@ -3700,7 +3700,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // RÃ¼tbe Belirleme
             let isimKucuk = (data.nickname || "").toLowerCase();
-            let isDevRender = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk);
+            let isDevRender = ['ekrem', 'ümit ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk);
             let rutbe = "Oyuncu";
             if (isDevRender) {
                 rutbe = "GeliÅŸtirici";
@@ -3744,7 +3744,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messageToRead = `Sistem mesajÄ±: ${data.text}`;
         } else {
             let isimKucuk = (data.nickname || "").toLowerCase();
-            let isDevRead = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk);
+            let isDevRead = ['ekrem', 'ümit ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk);
             let rutbe = isDevRead ? "GeliÅŸtirici" : "Oyuncu";
 
             messageToRead = `${rutbe} ${data.nickname}: ${data.text}`;
@@ -3820,7 +3820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let cUserNick = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
-        let isDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(cUserNick.toLowerCase());
+        let isDev = ['ekrem', 'ümit ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(cUserNick.toLowerCase());
 
         const devBtns = actionModal.querySelectorAll('.dev-only-action');
         devBtns.forEach(b => {
