@@ -74,10 +74,10 @@ if (!localStorage.getItem('hfzApologyGift_2000')) {
 // --- ANA OYUN DEÄİÅKENLERİ ---
 window.gameModes = {
     easy: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Kolay' },
-    medium: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Orta' },
-    hard: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Zor' },
-    missing_notes: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Kayıp Notalar' },
-    rhythm_mode: { isUnlocked: true, completionCount: 0, requiredToUnlock: 0, name: 'Ritim Avcısı' }
+    medium: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Orta' },
+    hard: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Zor' },
+    missing_notes: { isUnlocked: false, completionCount: 0, requiredToUnlock: 5, name: 'Kayıp Notalar' },
+    rhythm_mode: { isUnlocked: false, completionCount: 0, requiredToUnlock: 1, name: 'Ritim Avcısı' }
 };
 
 window.userAchievements = {
@@ -113,19 +113,10 @@ try {
     if (savedAchievements) window.userAchievements = JSON.parse(savedAchievements);
 } catch (e) { }
 
-// Tüm modları zorla aç (Kullanıcı isteği üzerine serbest bırakıldı)
-if (window.gameModes) {
-    let changed = false;
-    ['medium', 'hard', 'missing_notes', 'rhythm_mode'].forEach(mode => {
-        if (window.gameModes[mode] && !window.gameModes[mode].isUnlocked) {
-            window.gameModes[mode].isUnlocked = true;
-            window.gameModes[mode].requiredToUnlock = 0;
-            changed = true;
-        }
-    });
-    if (changed) {
-        try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e) {}
-    }
+// Geçmiş sürümlerden gelen oyuncuların ayarlarını yeni değere (5) zorla
+if (window.gameModes && window.gameModes.medium && window.gameModes.medium.requiredToUnlock !== 5) {
+    window.gameModes.medium.requiredToUnlock = 5;
+    try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e) {}
 }
 
 // --- YEDEKLEME VE KÜRESEL SIFIRLAMA (KILL-SWITCH) SİSTEMİ ---
