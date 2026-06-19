@@ -1419,7 +1419,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const btnChangeUsername = document.getElementById('btn-change-username');
-    if (btnChangeUsername) {
+          const btnEnablePush = document.getElementById('btn-enable-push');
+    if (btnEnablePush) {
+              btnEnablePush.addEventListener('click', () => {
+                  let myName = localStorage.getItem('hafizaGuvenUserNickname');
+                  if (!myName || myName === 'Bilinmeyen') {
+                      if (window.announceToScreenReader) window.announceToScreenReader('Lütfen önce Sohbet menüsünden bir takma ad belirleyin.', true);
+                      if (window.showToastNotification) window.showToastNotification('Önce takma ad belirleyin!');
+                      return;
+                  }
+                  
+                  if (!firebase.messaging) {
+                      if (window.announceToScreenReader) window.announceToScreenReader('Bildirim sistemi şu an yüklenemedi. Lütfen sayfayı yenileyip tekrar deneyin.', true);
+                      return;
+                  }
+
+                  const messaging = firebase.messaging();
+                  if (window.announceToScreenReader) window.announceToScreenReader('Bildirim izni isteniyor. Lütfen tarayıcınızın üst kısmından İzin Ver butonuna basın.', true);
+                  if (window.showToastNotification) window.showToastNotification('İzin kutusunu kontrol edin!');
+
+                  Notification.requestPermission().then((permission) => {
+                      if (permission === 'granted') {
+                          const vKey = 'BGbqc36x16AmbVp3hAgpzRappJ1A7HBTJY58aI-WaRmFSLd-G3h_wfyGbuBKjfzpZF5aETXp7wTHz-yUXmn_PY4';
+                          messaging.getToken({ vapidKey: vKey }).then((currentToken) => {
+                              if (currentToken) {
+                                  window.db.ref('bildirim_adresleri/' + myName).set({
+                                      token: currentToken,
+                                      kayitTarihi: new Date().toISOString()
+                                  }).then(() => {
+                                      if (window.announceToScreenReader) window.announceToScreenReader('Harika! Bildirimler başarıyla açıldı. Artık oyuna uzun süre girmezseniz size özel mesajlar göndereceğiz.', true);
+                                      if (window.showToastNotification) window.showToastNotification('Bildirimler Aktif!');
+                                  });
+                              }
+                          }).catch((err) => {
+                              console.error('Token alınırken hata:', err);
+                              if (window.announceToScreenReader) window.announceToScreenReader('Bağlantı hatası oluştu, token alınamadı.', true);
+                          });
+                      } else {
+                          if (window.announceToScreenReader) window.announceToScreenReader('Bildirim iznini reddettiniz. İstediğiniz zaman tarayıcı ayarlarından açabilirsiniz.', true);
+                      }
+                  });
+              });
+          }
+          if (btnChangeUsername) {
         btnChangeUsername.addEventListener('click', () => {
             if (window.menuEnterSound) window.menuEnterSound.play();
             let currentName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
