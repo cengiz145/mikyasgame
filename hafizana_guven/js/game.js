@@ -1793,7 +1793,12 @@ window.rhythmPlayerFailed = function(reason) {
         if (window.wrongSound) window.wrongSound.play();
         window.rhythmState.mistakes++;
         if (window.rhythmState.mistakes >= 3) {
-            // Jetonlar artık her seviye geçildiğinde otomatik olarak ekleniyor.
+            let completedLevels = window.rhythmState.level - 1;
+            if (completedLevels > 0) {
+                window.sessionTokens = (completedLevels * (completedLevels + 1) / 2) * 25;
+            } else {
+                window.sessionTokens = 0;
+            }
             window.endMainGame(false, false, false); 
             if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
         } else {
@@ -1818,10 +1823,6 @@ window.rhythmPlayerSucceeded = function() {
     
     if (window.rhythmState.successes >= 3) {
         window.rhythmState.successes = 0;
-        
-        let awardedTokens = window.rhythmState.level * 25;
-        window.sessionTokens += awardedTokens;
-        
         window.rhythmState.level++;
         window.rhythmState.bpm += 10;
         
@@ -1832,8 +1833,8 @@ window.rhythmPlayerSucceeded = function() {
         
         setTimeout(() => {
             if (gameStatus) {
-                gameStatus.textContent = `Seviye Atladınız! +${awardedTokens} Jeton. Yeni Hız: ${window.rhythmState.bpm} BPM`;
-                if (window.announceToScreenReader) window.announceToScreenReader(`Seviye Atladınız! ${awardedTokens} Jeton kazandınız. Yeni Hız: ${window.rhythmState.bpm} BPM`);
+                gameStatus.textContent = `Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`;
+                if (window.announceToScreenReader) window.announceToScreenReader(`Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`);
             }
             if (window.modeUnlockSound) window.modeUnlockSound.play();
             setTimeout(window.playRhythmComputerTurn, 2500);
