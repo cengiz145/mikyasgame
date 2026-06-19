@@ -443,7 +443,7 @@ window.updateButtonUI = function (btnElement, modeData, unlockedLabel, lockReaso
     }
 
     let myName = localStorage.getItem('hafizaGuvenUserNickname') || "Bilinmeyen";
-    let isTesterOrDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09'].includes(myName.toLowerCase());
+    let isTesterOrDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(myName.toLowerCase());
     if (window.playerRanks && (window.playerRanks[myName.toLowerCase()] === 'Tester' || window.playerRanks[myName.toLowerCase()] === 'GeliÅŸtirici')) isTesterOrDev = true;
 
     if (modeData.isUnlocked || isTesterOrDev) {
@@ -629,7 +629,7 @@ window.initPresenceSystem = function() {
 
             // --- GeliÅŸtirici Bilet (Geri Bildirim) Bildirimleri ---
             let devNameForTickets = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "";
-            if (['ekrem'].includes(devNameForTickets.toLowerCase())) {
+            if (['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(devNameForTickets.toLowerCase())) {
                 let isInitialFbLoad = true;
                 window.db.ref('feedbacks').on('child_added', (snapshot) => {
                     if (!isInitialFbLoad) {
@@ -3370,7 +3370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let cUserNick = window.currentChatUser || "";
             let nickInputTemp = document.getElementById('chat-nickname');
             if (nickInputTemp && nickInputTemp.value.trim() !== "") cUserNick = nickInputTemp.value.trim();
-            let isDev = ['ekrem'].includes(cUserNick.toLowerCase());
+            let isDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(cUserNick.toLowerCase());
 
             function addLocalSystemMessage(msgText) {
                 // Sadece ekranda anlÄ±k (toast) gÃ¶sterip ekran okuyucuya okutuyoruz.
@@ -3538,7 +3538,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (text.toLowerCase().startsWith('/rutbe ') || text.toLowerCase().startsWith('/rÃ¼tbe ')) {
             let cUserNick = (nickname || "").toLowerCase();
-            let isDev = ['ekrem'].includes(cUserNick) || (window.playerRanks && window.playerRanks[cUserNick] && window.playerRanks[cUserNick].toLowerCase() === 'tester');
+            let isDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(cUserNick) || (window.playerRanks && window.playerRanks[cUserNick] && window.playerRanks[cUserNick].toLowerCase() === 'tester');
             
             if (!isDev) {
                 if (window.announceToScreenReader) window.announceToScreenReader("Bu komutu kullanma yetkiniz yok.", true);
@@ -3632,9 +3632,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (myName !== "Bilinmeyen") {
             let myRank = "Oyuncu";
             let isimKucuk = myName.toLowerCase();
-            if (['ekrem'].includes(isimKucuk)) {
+            if (['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk)) {
                 myRank = "GeliÅŸtirici";
-            } else if (['tester 09', 'tester_09', 'tester09', 'beta tester 09'].includes(isimKucuk)) { myRank = 'Tester'; } else if (window.playerRanks && window.playerRanks[isimKucuk]) {
+            } else if (['tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk)) { myRank = 'Tester'; } else if (window.playerRanks && window.playerRanks[isimKucuk]) {
                 myRank = window.playerRanks[isimKucuk];
             }
             let r_el = document.getElementById('profile-player-rank');
@@ -3700,7 +3700,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // RÃ¼tbe Belirleme
             let isimKucuk = (data.nickname || "").toLowerCase();
-            let isDevRender = ['ekrem'].includes(isimKucuk);
+            let isDevRender = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk);
             let rutbe = "Oyuncu";
             if (isDevRender) {
                 rutbe = "GeliÅŸtirici";
@@ -3744,7 +3744,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messageToRead = `Sistem mesajÄ±: ${data.text}`;
         } else {
             let isimKucuk = (data.nickname || "").toLowerCase();
-            let isDevRead = ['ekrem'].includes(isimKucuk);
+            let isDevRead = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(isimKucuk);
             let rutbe = isDevRead ? "GeliÅŸtirici" : "Oyuncu";
 
             messageToRead = `${rutbe} ${data.nickname}: ${data.text}`;
@@ -3820,7 +3820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let cUserNick = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
-        let isDev = ['ekrem'].includes(cUserNick.toLowerCase());
+        let isDev = ['ekrem', 'tester 09', 'tester_09', 'tester09', 'beta tester 09', 'neyzen'].includes(cUserNick.toLowerCase());
 
         const devBtns = actionModal.querySelectorAll('.dev-only-action');
         devBtns.forEach(b => {
@@ -4304,6 +4304,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.modeUnlockSound) window.modeUnlockSound.play();
     };
 });
+
+
 
 
 
