@@ -55,10 +55,9 @@ window.guncellemeKontrolEt = function (isManual = false) {
             if (!window.mevcutSurum) {
                 window.mevcutSurum = data.version;
             } else if (data.version !== window.mevcutSurum) {
-                // Kullanıcı isteği: Oyun herkese açık olduğu için güncellemeleri sessiz yap. Arka planda güncelle.
                 window.mevcutSurum = data.version;
 
-                // Arka planda Service Worker'ı güncelliyoruz, kullanıcıyı rahatsız etmiyoruz.
+                // Arka planda Service Worker'ı güncelliyoruz
                 if ('serviceWorker' in navigator) {
                     navigator.serviceWorker.getRegistrations().then(function(registrations) {
                         for(let registration of registrations) {
@@ -67,7 +66,7 @@ window.guncellemeKontrolEt = function (isManual = false) {
                     });
                 }
 
-                // Tarayıcı önbelleğini arka planda temizleyerek bir sonraki girişe hazırlayalım.
+                // Tarayıcı önbelleğini agresif bir şekilde siliyoruz
                 if ('caches' in window) {
                     caches.keys().then((names) => {
                         names.forEach((name) => {
@@ -75,6 +74,22 @@ window.guncellemeKontrolEt = function (isManual = false) {
                         });
                     });
                 }
+
+                // KULLANICI İSTEĞİ: Güncelleme bulunduğunda anında önbelleği temizleyip sayfayı yenile (Force Reload)
+                if (typeof window.announceToScreenReader === 'function') {
+                    window.announceToScreenReader("Oyun güncellendi! Yeni sürüm uygulanıyor, sayfa yenilenecek, lütfen bekleyin...", true);
+                }
+                
+                // Sesleri sustur
+                const allAudios = document.querySelectorAll('audio');
+                allAudios.forEach(audio => { audio.pause(); });
+
+                // 2 saniye sonra sayfayı tam yenile
+                setTimeout(() => {
+                    // Sayfayı serverdan zorla yenileme kodu
+                    window.location.href = window.location.href.split('?')[0] + '?v=' + new Date().getTime();
+                }, 2500);
+
             } else {
                 // Sessizce güncelleme durumunu UI'da tuttuk.
             }

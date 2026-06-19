@@ -197,7 +197,8 @@ window.HafizanaGuvenAutoRepair = {
 };
 
 // Sayfa yüklenirken onarım sistemini ayağa kaldır
-document.addEventListener('DOMContentLoaded', () => {
-    window.HafizanaGuvenAutoRepair.init();
-});
+window.HafizanaGuvenAutoRepair.init();
+
+
+
 
