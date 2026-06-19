@@ -4342,41 +4342,30 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.modeUnlockSound) window.modeUnlockSound.play();
     };
 
-    // Otomatik Bildirim Faydalari Modal Mantigi
-    setTimeout(() => {
-        let myName = localStorage.getItem('hafizaGuvenUserNickname');
-        let pushPromptAnswered = localStorage.getItem('pushPromptAnswered');
-        const benefitsModal = document.getElementById('push-benefits-modal');
-        const btnPushYes = document.getElementById('btn-push-yes');
-        const btnPushNo = document.getElementById('btn-push-no');
+    // Manuel Bildirim Faydalari Modal Mantigi (Butona tiklandiginda)
+    const btnPushYes = document.getElementById('btn-push-yes');
+    const btnPushNo = document.getElementById('btn-push-no');
+    const benefitsModal = document.getElementById('push-benefits-modal');
 
-        // Eger kullanici adini onceden belirlediyse ve daha once cevap vermediyse
-        if (myName && myName !== 'Bilinmeyen' && !pushPromptAnswered && benefitsModal) {
-            benefitsModal.style.display = 'flex';
-            setTimeout(() => {
-                benefitsModal.style.opacity = '1';
-                document.getElementById('push-benefits-title').focus();
-            }, 100);
-        }
-
-        if (btnPushYes) {
-            btnPushYes.addEventListener('click', () => {
-                localStorage.setItem('pushPromptAnswered', 'yes');
+    if (btnPushYes) {
+        btnPushYes.addEventListener('click', () => {
+            if (benefitsModal) {
                 benefitsModal.style.opacity = '0';
                 setTimeout(() => { benefitsModal.style.display = 'none'; }, 300);
-                window.requestAndSavePushToken(true);
-            });
-        }
+            }
+            window.requestAndSavePushToken(true);
+        });
+    }
 
-        if (btnPushNo) {
-            btnPushNo.addEventListener('click', () => {
-                localStorage.setItem('pushPromptAnswered', 'no');
+    if (btnPushNo) {
+        btnPushNo.addEventListener('click', () => {
+            if (benefitsModal) {
                 benefitsModal.style.opacity = '0';
                 setTimeout(() => { benefitsModal.style.display = 'none'; }, 300);
-                if (window.announceToScreenReader) window.announceToScreenReader('Bildirimler kapalı kalacak. Fikrinizi değiştirirseniz Profil menüsünden açabilirsiniz.', true);
-            });
-        }
-    }, 2500); // Oyun yuklendikten 2.5 saniye sonra goster
+            }
+            if (window.announceToScreenReader) window.announceToScreenReader('Bildirimleri açmaktan vazgeçtiniz. İstediğiniz zaman tekrar tıklayabilirsiniz.', true);
+        });
+    }
 
 });
 
