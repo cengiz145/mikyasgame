@@ -4259,13 +4259,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    window.showAchievementModal = function(achName) {
+        window.showAchievementModal = function(achName) {
         let gameLink = "https://mikyasstudio.com.tr/hafizanaguven.html";
-        let shareText = Tebrikler! HafÃ„±zana GÃƒ¼ven'de " + achName + " baÃ…Å¸arÃ„±mÃ„±nÃ„± elde ettim! ğÅ¸â€ \n\nSen de benimle beraber bu baÃ…Å¸arÃ„±yÃ„± yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna:  + gameLink;
+        let shareText = "Tebrikler! Hafizana Guven'de " + achName + " basarimini elde ettim! \n\nSen de benimle beraber bu basariyi yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna: " + gameLink;
         
         let textElem = document.getElementById('achievement-modal-text');
         if (textElem) {
-            textElem.textContent = Tebrikler! " + achName + " baÃ…Å¸arÃ„±mÃ„±nÃ„± elde ettiniz! Bunu arkadaÃ…Å¸larÃ„±nÃ„±zla paylaÃ…Å¸abilirsiniz.;
+            textElem.textContent = "Tebrikler! " + achName + " basarimini elde ettiniz! Bunu arkadaslarinizla paylasabilirsiniz.";
             textElem.focus();
         }
         
@@ -4300,5 +4300,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.modeUnlockSound) window.modeUnlockSound.play();
     };
 });
+
 
 
