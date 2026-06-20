@@ -1699,7 +1699,10 @@ window.startRhythmMode = function() {
         window.bgMusic.pause();
     }
     
-    window.playRhythmComputerTurn = function() {
+    window.playRhythmComputerTurn();
+};
+
+window.playRhythmComputerTurn = function() {
     window.hgfzZamanlayici.clearInterval(window.gameInterval);
     window.isComputerPlaying = true;
     window.rhythmState.playerIndex = 0;
