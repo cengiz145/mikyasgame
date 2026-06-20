@@ -1809,7 +1809,7 @@ window.playRhythmComputerTurn = function() {
             return;
         }
         
-        currentBeat++;
+        currentTick++;
     }, intervalMs);
 };
 
