@@ -1712,25 +1712,29 @@ window.startRhythmMode = function() {
     let noteTicks = new Set();
     let lvl = window.rhythmState.level;
     
-    if (lvl <= 2) {
-        // Seviye 1-2: Sadece 1'lik (8 tick) ve 2'lik (4 tick) notalar
-        let options = [0, 4, 8, 12];
-        let noteCount = Math.min(2 + Math.floor(lvl / 2), 4);
+    if (lvl <= 9) {
+        // Seviye 1-9: Sadece 4'lük, 2'lik veya 1'lik notalar (1, 2 veya 3 adet)
+        let options = [0, 2, 4, 6];
+        let possibleCounts = [1, 2, 3];
+        let noteCount = possibleCounts[Math.floor(Math.random() * possibleCounts.length)];
         while(noteTicks.size < noteCount) {
             noteTicks.add(options[Math.floor(Math.random() * options.length)]);
         }
-    } else if (lvl <= 5) {
-        // Seviye 3-5: 4'lük (2 tick) notalar dahil
-        let options = [0, 2, 4, 6, 8, 10, 12, 14];
-        let noteCount = Math.min(3 + Math.floor(lvl / 2), 8);
+    } else if (lvl <= 29) {
+        // Seviye 10-29: 8'lik notalar dahil (3, 4 veya 5 adet)
+        let options = [0, 1, 2, 3, 4, 5, 6, 7];
+        let possibleCounts = [3, 4, 5];
+        let noteCount = possibleCounts[Math.floor(Math.random() * possibleCounts.length)];
         while(noteTicks.size < noteCount) {
             noteTicks.add(options[Math.floor(Math.random() * options.length)]);
         }
     } else {
-        // Seviye 6+: 8'lik (1 tick) notalar dahil
-        let noteCount = Math.min(4 + Math.floor(lvl / 2), 12);
+        // Seviye 30+: Çok daha yoğun 8'lik notalar (5, 6 veya 7 adet)
+        let options = [0, 1, 2, 3, 4, 5, 6, 7];
+        let possibleCounts = [5, 6, 7];
+        let noteCount = possibleCounts[Math.floor(Math.random() * possibleCounts.length)];
         while(noteTicks.size < noteCount) {
-            noteTicks.add(Math.floor(Math.random() * totalTicks));
+            noteTicks.add(options[Math.floor(Math.random() * options.length)]);
         }
     }
     
