@@ -1768,8 +1768,9 @@ window.playRhythmComputerTurn = function() {
         currentBeat++;
         if (currentBeat >= totalBeats) {
             clearInterval(window.rhythmState.intervalId);
+            // Sadece tek bir intervalMs bekle ve oyuncunun ilk vuruşunu anında başlat.
             setTimeout(() => {
-                window.startRhythmPlayerTurn();
+                window.startRhythmPlayerTurn(intervalMs);
             }, intervalMs);
         }
     }, intervalMs);
@@ -1844,7 +1845,7 @@ window.rhythmPlayerSucceeded = function() {
     }
 };
 
-window.startRhythmPlayerTurn = function() {
+window.startRhythmPlayerTurn = function(intervalMs) {
     window.isComputerPlaying = false;
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
@@ -1856,45 +1857,41 @@ window.startRhythmPlayerTurn = function() {
     if (window.rhythmState.intervalId) clearInterval(window.rhythmState.intervalId);
     
     let totalBeats = window.rhythmState.totalBeats;
-    let intervalMs = 60000 / window.rhythmState.bpm;
+    if (!intervalMs) intervalMs = 60000 / window.rhythmState.bpm;
     
-    window.rhythmState.playerCurrentBeat = -1; 
+    window.rhythmState.playerCurrentBeat = 0; 
     window.rhythmState.expectedNote = null;
     window.rhythmState.playerPressedThisBeat = true; // prevent failing before beat 0 starts
     
-    setTimeout(() => {
-        window.rhythmState.playerCurrentBeat = 0;
+    let startTick = () => {
+        if (window.gameIsPaused || !window.gameIsActive || window.isComputerPlaying) return;
         
-        let startTick = () => {
-            if (window.gameIsPaused || !window.gameIsActive || window.isComputerPlaying) return;
-            
-            // Check previous beat
-            if (window.rhythmState.expectedNote !== null && !window.rhythmState.playerPressedThisBeat) {
-                window.rhythmPlayerFailed("Notayı kaçırdınız (geciktiniz)!");
-                return;
-            }
-            
-            // Check if game won
-            if (window.rhythmState.playerCurrentBeat >= totalBeats) {
-                window.rhythmPlayerSucceeded();
-                return;
-            }
-            
-            // Setup current beat
-            let cBeat = window.rhythmState.playerCurrentBeat;
-            let isFirstBeat = (cBeat % window.rhythmState.beatsPerMeasure) === 0;
-            if (window.playMetronomeTick) window.playMetronomeTick(isFirstBeat);
-            
-            window.rhythmState.expectedNote = window.rhythmState.beatMap[cBeat] || null;
-            window.rhythmState.playerPressedThisBeat = false; 
-            
-            window.rhythmState.playerCurrentBeat++;
-        };
+        // Check previous beat
+        if (window.rhythmState.expectedNote !== null && !window.rhythmState.playerPressedThisBeat) {
+            window.rhythmPlayerFailed("Notayı kaçırdınız (geciktiniz)!");
+            return;
+        }
         
-        startTick();
-        window.rhythmState.intervalId = setInterval(startTick, intervalMs);
+        // Check if game won
+        if (window.rhythmState.playerCurrentBeat >= totalBeats) {
+            window.rhythmPlayerSucceeded();
+            return;
+        }
         
-    }, intervalMs);
+        // Setup current beat
+        let cBeat = window.rhythmState.playerCurrentBeat;
+        let isFirstBeat = (cBeat % window.rhythmState.beatsPerMeasure) === 0;
+        if (window.playMetronomeTick) window.playMetronomeTick(isFirstBeat);
+        
+        window.rhythmState.expectedNote = window.rhythmState.beatMap[cBeat] || null;
+        window.rhythmState.playerPressedThisBeat = false; 
+        
+        window.rhythmState.playerCurrentBeat++;
+    };
+    
+    // İlk vuruşu anında başlat
+    startTick();
+    window.rhythmState.intervalId = setInterval(startTick, intervalMs);
 };
 
 window.handleRhythmInput = function(key) {
