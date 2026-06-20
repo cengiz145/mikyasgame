@@ -1760,19 +1760,23 @@ window.playRhythmComputerTurn = function() {
         let isFirstBeat = (currentBeat % window.rhythmState.beatsPerMeasure) === 0;
         if (window.playMetronomeTick) window.playMetronomeTick(isFirstBeat);
         
-        if (beatToNoteMap[currentBeat]) {
-            let note = beatToNoteMap[currentBeat];
-            if (window.playPianoNoteSingle) window.playPianoNoteSingle(note);
+        if (currentBeat < totalBeats) {
+            if (beatToNoteMap[currentBeat]) {
+                let note = beatToNoteMap[currentBeat];
+                if (window.playPianoNoteSingle) window.playPianoNoteSingle(note);
+            }
+        } else if (currentBeat === totalBeats) {
+            // Bilgisayar notalarını bitirdi. 1 Vuruşluk 'Hazır Ol' molası (Sende!)
+            if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde!", true);
+            if (window.menuEnterSound) window.menuEnterSound.play(); // Dııt sesi (hazırlık)
+        } else if (currentBeat > totalBeats) {
+            // Hazırlık vuruşu bitti, oyuncu sırası tam ritminde başlıyor.
+            clearInterval(window.rhythmState.intervalId);
+            window.startRhythmPlayerTurn(intervalMs);
+            return;
         }
         
         currentBeat++;
-        if (currentBeat >= totalBeats) {
-            clearInterval(window.rhythmState.intervalId);
-            // Sadece tek bir intervalMs bekle ve oyuncunun ilk vuruşunu anında başlat.
-            setTimeout(() => {
-                window.startRhythmPlayerTurn(intervalMs);
-            }, intervalMs);
-        }
     }, intervalMs);
 };
 
@@ -1849,8 +1853,7 @@ window.startRhythmPlayerTurn = function(intervalMs) {
     window.isComputerPlaying = false;
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
-        gameStatus.textContent = "Sıra sizde! Metronomla eşzamanlı çalın. 'es' olan yerde bekleyin!";
-        if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde! Ritme uyun. Es olan yerde bekleyin.");
+        gameStatus.textContent = "Çalmaya başlayın! Es olan yerde bekleyin!";
     }
     
     window.hgfzZamanlayici.clearInterval(window.gameInterval);
