@@ -119,6 +119,16 @@ if (window.gameModes && window.gameModes.medium && window.gameModes.medium.requi
     try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e) {}
 }
 
+// FORCED UNLOCK: Ritim Avcisi ve Ses Paketleri (Kullanici istegi uzerine)
+if (!localStorage.getItem('hafizaGuvenRhythmForceUnlocked_v2')) {
+    if (window.gameModes && window.gameModes.rhythm_mode) {
+        window.gameModes.rhythm_mode.isUnlocked = true;
+    }
+    localStorage.setItem('hafizaGuvenSoundPacksUnlocked', 'true');
+    localStorage.setItem('hafizaGuvenRhythmForceUnlocked_v2', 'true');
+    try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e) {}
+}
+
 // --- YEDEKLEME VE KÜRESEL SIFIRLAMA (KILL-SWITCH) SİSTEMİ ---
 window.syncStatsToFirebase = function() {
     let currentUser = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname');
