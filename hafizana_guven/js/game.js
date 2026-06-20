@@ -1859,7 +1859,7 @@ window.rhythmPlayerSucceeded = function() {
     if (window.rhythmState.successes >= 3) {
         window.rhythmState.successes = 0;
         window.rhythmState.level++;
-        window.rhythmState.bpm += 2;
+        window.rhythmState.bpm += 0.5;
         
         if (window.gameModes.rhythm_mode.completionCount < window.rhythmState.level) {
             window.gameModes.rhythm_mode.completionCount = window.rhythmState.level;
