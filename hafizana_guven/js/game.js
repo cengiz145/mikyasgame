@@ -1685,7 +1685,7 @@ window.rhythmState = {
     sequence: [],
     playerIndex: 0,
     beatsPerMeasure: 4,
-    measures: 2,
+    measures: 1,
     isPlaying: false,
     intervalId: null
 };
