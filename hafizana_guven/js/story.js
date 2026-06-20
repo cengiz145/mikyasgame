@@ -1,4 +1,4 @@
-﻿// story.js - Hikaye Modu, Yürüme Mekanikleri ve Kayıp Notalar
+// story.js - Hikaye Modu, Yürüme Mekanikleri ve Kayıp Notalar
 
 window.inStoryMode = false;
 window.currentStoryIndex = 0;
@@ -287,8 +287,9 @@ window.initializeMissingNotesMap = function() {
                 window.announceToScreenReader("Süre doldu! Soğuktan donmak üzereyken kurtarma ekipleri seni buldu. Kayıp Notalar modunu tamamlayamadın. Ana menüye dönülüyor.", true);
             }
             
-            if (window.switchMenu && window.storyMenu && window.mainMenu) {
-                window.switchMenu(window.storyMenu, window.mainMenu, 'main');
+            let currentContainer = (window.activeDifficulty === 'missing_notes') ? window.gameMenu : window.storyMenu;
+            if (window.switchMenu && currentContainer && window.mainMenu) {
+                window.switchMenu(currentContainer, window.mainMenu, 'main');
             }
             
             if (window.bgMusic && !window.bgMusic.playing()) {
@@ -450,8 +451,9 @@ window.handleStoryWalking = function(key) {
                 window.inStoryMode = false;
                 
                 if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
-                if (window.switchMenu && window.storyMenu && window.mainMenu) {
-                    window.switchMenu(window.storyMenu, window.mainMenu, 'main');
+                let currentContainer = (window.activeDifficulty === 'missing_notes') ? window.gameMenu : window.storyMenu;
+                if (window.switchMenu && currentContainer && window.mainMenu) {
+                    window.switchMenu(currentContainer, window.mainMenu, 'main');
                 }
                 if (window.updateInstrumentBtnText) window.updateInstrumentBtnText();
                 
@@ -521,8 +523,9 @@ window.handleStoryWalking = function(key) {
                 window.inStoryMode = false;
                 
                 if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
-                if (window.switchMenu && window.storyMenu && window.mainMenu) {
-                    window.switchMenu(window.storyMenu, window.mainMenu, 'main');
+                let currentContainer = (window.activeDifficulty === 'missing_notes') ? window.gameMenu : window.storyMenu;
+                if (window.switchMenu && currentContainer && window.mainMenu) {
+                    window.switchMenu(currentContainer, window.mainMenu, 'main');
                 }
                 
                 let changeBtn = document.getElementById('btn-change-instrument');
