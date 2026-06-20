@@ -80,8 +80,6 @@ window.playCurrentStoryDialog = function() {
 
     if (window.dado3Sound) window.dado3Sound.play();
     storyStatus.innerHTML = finalHtml;
-    storyStatus.blur();
-    window.hgfzZamanlayici.setTimeout(() => storyStatus.focus(), 10);
     
     // Explicitly announce for screen readers
     if (window.announceToScreenReader) {
@@ -320,7 +318,7 @@ window.handleStoryWalking = function(key) {
             playRandomSnowStep();
             updateStoryStatus();
         } else {
-            if (window.announceToScreenReader) window.announceToScreenReader("Haritanın sonundasın. Daha fazla sağa gidemezsin.");
+            if (window.announceToScreenReader) window.announceToScreenReader("Haritanın sonundasın. Daha fazla sağa gidemezsin.", false, true);
         }
     } else if (key === 'ArrowLeft') {
         if (window.playerX > 0) {
@@ -328,7 +326,7 @@ window.handleStoryWalking = function(key) {
             playRandomSnowStep();
             updateStoryStatus();
         } else {
-            if (window.announceToScreenReader) window.announceToScreenReader("Piyanodasın. Daha fazla sola gidemezsin.");
+            if (window.announceToScreenReader) window.announceToScreenReader("Piyanodasın. Daha fazla sola gidemezsin.", false, true);
         }
     } else if (key.toLowerCase() === 'f') {
         if (window.playerX === window.pianoX) {
@@ -426,10 +424,8 @@ window.handleStoryWalking = function(key) {
         const storyStatus = document.getElementById('story-status-text');
         if (storyStatus) {
             storyStatus.innerHTML = msg;
-            storyStatus.blur();
-            window.hgfzZamanlayici.setTimeout(() => storyStatus.focus(), 10);
         }
-        if (window.announceToScreenReader) window.announceToScreenReader(msg);
+        if (window.announceToScreenReader) window.announceToScreenReader(msg, false, true);
     } else if (key.toLowerCase() === 't') {
         const displayTime = window.storyTimerValue < 0 ? 0 : window.storyTimerValue;
         let msg = `Kalan süre: ${displayTime} saniye.`;
@@ -437,10 +433,8 @@ window.handleStoryWalking = function(key) {
         const storyStatus = document.getElementById('story-status-text');
         if (storyStatus) {
             storyStatus.innerHTML = msg;
-            storyStatus.blur();
-            window.hgfzZamanlayici.setTimeout(() => storyStatus.focus(), 10);
         }
-        if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
+        if (window.announceToScreenReader) window.announceToScreenReader(msg, true, true);
     } else if (key === 'Enter') {
         if (window.notesInPiano.length === window.MAX_NOTES && !window.carryingNote) {
             if (window.isStoryModeWon && !window.isStoryModeFinishedWaitingForEnter && !window.isRhythmUnlockDialogWaitingForEnter && !window.isSoundPacksUnlockDialogWaitingForEnter) return;
@@ -562,8 +556,6 @@ window.handleStoryWalking = function(key) {
             const storyStatus = document.getElementById('story-status-text');
             if (storyStatus) {
                 storyStatus.innerHTML = winMsg;
-                storyStatus.blur();
-                window.hgfzZamanlayici.setTimeout(() => storyStatus.focus(), 10);
             }
             
             window.storyWinTimeout = window.hgfzZamanlayici.setTimeout(() => {
@@ -614,6 +606,7 @@ window.handleStoryWalking = function(key) {
 
         if (hasNoteOrPiano) {
             storyStatus.innerHTML = finalMsg;
+            if (window.announceToScreenReader) window.announceToScreenReader(finalMsg, false, true);
         } else {
             storyStatus.innerHTML = " ";
         }

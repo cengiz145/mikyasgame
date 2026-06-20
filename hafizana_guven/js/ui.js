@@ -4145,7 +4145,11 @@ if (!window.orijinalAnnounce) {
     window.srMesajKuyrugu = [];
     window.srOkuyorMu = false;
     
-    window.announceToScreenReader = function(text, forceFocus = false) {
+    window.announceToScreenReader = function(text, forceFocus = false, interrupt = false) {
+        if (interrupt) {
+            window.srMesajKuyrugu = [];
+            window.srOkuyorMu = false;
+        }
         window.srMesajKuyrugu.push({ text: text, forceFocus: forceFocus });
         window.srKuyruguIslet();
     };
