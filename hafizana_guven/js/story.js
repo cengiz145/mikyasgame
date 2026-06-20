@@ -285,7 +285,7 @@ window.initializeMissingNotesMap = function() {
                 window.announceToScreenReader("Süre doldu! Soğuktan donmak üzereyken kurtarma ekipleri seni buldu. Kayıp Notalar modunu tamamlayamadın. Ana menüye dönülüyor.", true);
             }
             
-            let currentContainer = (window.activeDifficulty === 'missing_notes') ? window.gameMenu : window.storyMenu;
+            let currentContainer = window.storyMenu;
             if (window.switchMenu && currentContainer && window.mainMenu) {
                 window.switchMenu(currentContainer, window.mainMenu, 'main');
             }
@@ -445,7 +445,7 @@ window.handleStoryWalking = function(key) {
                 window.inStoryMode = false;
                 
                 if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
-                let currentContainer = (window.activeDifficulty === 'missing_notes') ? window.gameMenu : window.storyMenu;
+                let currentContainer = window.storyMenu;
                 if (window.switchMenu && currentContainer && window.mainMenu) {
                     window.switchMenu(currentContainer, window.mainMenu, 'main');
                 }
@@ -517,7 +517,7 @@ window.handleStoryWalking = function(key) {
                 window.inStoryMode = false;
                 
                 if (window.storyBGM && window.storyBGM.playing()) window.storyBGM.stop();
-                let currentContainer = (window.activeDifficulty === 'missing_notes') ? window.gameMenu : window.storyMenu;
+                let currentContainer = window.storyMenu;
                 if (window.switchMenu && currentContainer && window.mainMenu) {
                     window.switchMenu(currentContainer, window.mainMenu, 'main');
                 }
