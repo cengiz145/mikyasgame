@@ -1947,6 +1947,17 @@ window.handleRhythmInput = function(key) {
     
     if (foundTick !== null) {
         window.rhythmState.pressedTicks[foundTick] = true;
+        
+        let allPressed = true;
+        for (let t in map) {
+            if (!window.rhythmState.pressedTicks[t]) {
+                allPressed = false;
+                break;
+            }
+        }
+        if (allPressed) {
+            window.rhythmPlayerSucceeded();
+        }
     } else {
         if (!map[cTick] && !map[cTick-1] && !map[cTick+1]) {
             window.rhythmPlayerFailed("Es (boşluk) anında tuşa bastınız!");
