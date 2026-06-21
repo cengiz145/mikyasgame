@@ -1790,7 +1790,7 @@ window.playRhythmComputerTurn = function() {
         let isBeatTick = (currentTick % ticksPerBeat) === 0;
         let isFirstBeat = (currentTick % (window.rhythmState.beatsPerMeasure * ticksPerBeat)) === 0;
         
-        if (isBeatTick && window.playMetronomeTick) {
+        if (isBeatTick && currentTick < totalTicks && window.playMetronomeTick) {
             window.playMetronomeTick(isFirstBeat);
         }
         
