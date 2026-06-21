@@ -1816,29 +1816,32 @@ window.rhythmPlayerFailed = function(reason) {
     clearInterval(window.rhythmState.intervalId);
     window.isComputerPlaying = true;
     
-    let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
     const gameStatus = document.getElementById('game-status-text');
     
-    if (hk > 0) {
-        hk--;
-        localStorage.setItem('hafizaGuvenHataKorumasi', hk);
-        if (window.wrongSound) window.wrongSound.play();
-        if (gameStatus) gameStatus.textContent = "Hata koruması kullanıldı! Ceza Yok. Ritim tekrar çalınıyor.";
-        if (window.announceToScreenReader) window.announceToScreenReader("Hata koruması kullanıldı! Tekrar dinleyin.");
-        setTimeout(() => { window.playRhythmComputerTurn(); }, 1500);
+    if (window.wrongSound) window.wrongSound.play();
+    window.rhythmState.mistakes++;
+    
+    if (window.rhythmState.mistakes >= 3) {
+        let completedLevels = window.rhythmState.level - 1;
+        window.sessionTokens = (completedLevels > 0) ? (completedLevels * (completedLevels + 1) / 2) * 25 : 0;
+        
+        window.endMainGame(false, false, false); 
+        
+        if (gameStatus) gameStatus.textContent = "Oyun Bitti! 3 hakkınızı tükettiniz. Ana Menüye dönülüyor...";
+        if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
+        
+        // Oyun bitince ekranda takili kalmamasi icin 3 saniye sonra Ana Menuye at
+        setTimeout(() => {
+            if (window.switchMenu && window.mainMenu) {
+                window.switchMenu(document.getElementById('game-menu-container'), window.mainMenu, 'main');
+            }
+        }, 3000);
     } else {
-        if (window.wrongSound) window.wrongSound.play();
-        window.rhythmState.mistakes++;
-        if (window.rhythmState.mistakes >= 3) {
-            let completedLevels = window.rhythmState.level - 1;
-            window.sessionTokens = (completedLevels > 0) ? (completedLevels * (completedLevels + 1) / 2) * 25 : 0;
-            window.endMainGame(false, false, false); 
-            if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
-        } else {
-            if (gameStatus) gameStatus.textContent = reason + ` Kalan hak: ${3 - window.rhythmState.mistakes}.`;
-            if (window.announceToScreenReader) window.announceToScreenReader(reason + ` Kalan hakkınız ${3 - window.rhythmState.mistakes}.`);
-            setTimeout(() => { window.playRhythmComputerTurn(); }, 100);
-        }
+        if (gameStatus) gameStatus.textContent = reason + ` Kalan hak: ${3 - window.rhythmState.mistakes}.`;
+        if (window.announceToScreenReader) window.announceToScreenReader(reason + ` Kalan hakkınız ${3 - window.rhythmState.mistakes}.`);
+        
+        // Hata yaptiginda durumu gormesi ve hazirlanmasi icin 1.5 saniye bekle
+        setTimeout(() => { window.playRhythmComputerTurn(); }, 1500);
     }
 };
 
