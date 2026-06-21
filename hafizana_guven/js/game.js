@@ -1694,6 +1694,7 @@ window.startRhythmMode = function() {
     window.activeDifficulty = 'rhythm_mode';
     window.gameIsActive = true;
     window.isComputerPlaying = true;
+    window.gameTimer = 0; // Heartbeat Monitor'u devre dışı bırakmak için
     
     if (window.bgMusic && window.bgMusic.playing()) {
         window.bgMusic.pause();
