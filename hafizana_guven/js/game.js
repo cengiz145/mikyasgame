@@ -1826,16 +1826,6 @@ window.rhythmPlayerFailed = function(reason) {
         window.sessionTokens = (completedLevels > 0) ? (completedLevels * (completedLevels + 1) / 2) * 25 : 0;
         
         window.endMainGame(false, false, false); 
-        
-        if (gameStatus) gameStatus.textContent = "Oyun Bitti! 3 hakkınızı tükettiniz. Ana Menüye dönülüyor...";
-        if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
-        
-        // Oyun bitince ekranda takili kalmamasi icin 3 saniye sonra Ana Menuye at
-        setTimeout(() => {
-            if (window.switchMenu && window.mainMenu) {
-                window.switchMenu(document.getElementById('game-menu-container'), window.mainMenu, 'main');
-            }
-        }, 3000);
     } else {
         if (gameStatus) gameStatus.textContent = reason + ` Kalan hak: ${3 - window.rhythmState.mistakes}.`;
         if (window.announceToScreenReader) window.announceToScreenReader(reason + ` Kalan hakkınız ${3 - window.rhythmState.mistakes}.`);
