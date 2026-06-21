@@ -1786,7 +1786,7 @@ window.playRhythmComputerTurn = function() {
     let currentTick = 0;
     let intervalMs = (60000 / window.rhythmState.bpm) / ticksPerBeat;
     
-    window.rhythmState.intervalId = setInterval(() => {
+    let computerTick = () => {
         let isBeatTick = (currentTick % ticksPerBeat) === 0;
         let isFirstBeat = (currentTick % (window.rhythmState.beatsPerMeasure * ticksPerBeat)) === 0;
         
@@ -1800,17 +1800,16 @@ window.playRhythmComputerTurn = function() {
                 if (window.playPianoNoteSingle) window.playPianoNoteSingle(note);
             }
         } else if (currentTick === totalTicks) {
-            if (window.metronomeBellSound) window.metronomeBellSound.play();
-            if (gameStatus) gameStatus.textContent = "Sende!";
-            if (window.announceToScreenReader) window.announceToScreenReader("Sende!", true, true);
-            
             clearInterval(window.rhythmState.intervalId);
             window.startRhythmPlayerTurn(intervalMs);
             return;
         }
         
         currentTick++;
-    }, intervalMs);
+    };
+    
+    computerTick(); // Kesintisiz gecis
+    window.rhythmState.intervalId = setInterval(computerTick, intervalMs);
 };
 
 window.rhythmPlayerFailed = function(reason) {
@@ -1832,17 +1831,13 @@ window.rhythmPlayerFailed = function(reason) {
         window.rhythmState.mistakes++;
         if (window.rhythmState.mistakes >= 3) {
             let completedLevels = window.rhythmState.level - 1;
-            if (completedLevels > 0) {
-                window.sessionTokens = (completedLevels * (completedLevels + 1) / 2) * 25;
-            } else {
-                window.sessionTokens = 0;
-            }
+            window.sessionTokens = (completedLevels > 0) ? (completedLevels * (completedLevels + 1) / 2) * 25 : 0;
             window.endMainGame(false, false, false); 
             if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
         } else {
             if (gameStatus) gameStatus.textContent = reason + ` Kalan hak: ${3 - window.rhythmState.mistakes}.`;
             if (window.announceToScreenReader) window.announceToScreenReader(reason + ` Kalan hakkınız ${3 - window.rhythmState.mistakes}.`);
-            setTimeout(() => { window.playRhythmComputerTurn(); }, 1500);
+            setTimeout(() => { window.playRhythmComputerTurn(); }, 100);
         }
     }
 };
@@ -1853,34 +1848,20 @@ window.rhythmPlayerSucceeded = function() {
     if (window.correctSound) window.correctSound.play();
     window.rhythmState.successes++;
     
-    const gameStatus = document.getElementById('game-status-text');
-    if (gameStatus) {
-        gameStatus.textContent = "Harika!";
-        if (window.announceToScreenReader) window.announceToScreenReader("Harika!");
-    }
-    
     if (window.rhythmState.successes >= 3) {
         window.rhythmState.successes = 0;
         window.rhythmState.level++;
-        window.rhythmState.bpm += 0.5;
+        window.rhythmState.bpm += 1;
         if (window.rhythmState.bpm > 240) window.rhythmState.bpm = 240;
         
         if (window.gameModes.rhythm_mode.completionCount < window.rhythmState.level) {
             window.gameModes.rhythm_mode.completionCount = window.rhythmState.level;
             try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}
         }
-        
-        setTimeout(() => {
-            if (gameStatus) {
-                gameStatus.textContent = `Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`;
-                if (window.announceToScreenReader) window.announceToScreenReader(`Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`);
-            }
-            if (window.modeUnlockSound) window.modeUnlockSound.play();
-            setTimeout(window.playRhythmComputerTurn, 2500);
-        }, 1000);
-    } else {
-        setTimeout(window.playRhythmComputerTurn, 1500);
     }
+    
+    // Aninda siradaki bilgisayar turn'unu baslat, bekleme yok!
+    window.playRhythmComputerTurn();
 };
 
 window.startRhythmPlayerTurn = function(intervalMs) {
@@ -1913,8 +1894,20 @@ window.startRhythmPlayerTurn = function(intervalMs) {
             return;
         }
         
-        if (cTick >= totalTicks + 1) {
-            window.rhythmPlayerSucceeded();
+        if (cTick >= totalTicks) {
+            let map = window.rhythmState.tickMap || {};
+            let allPressed = true;
+            for (let t in map) {
+                if (!window.rhythmState.pressedTicks[t]) {
+                    allPressed = false;
+                    break;
+                }
+            }
+            if (allPressed) {
+                window.rhythmPlayerSucceeded();
+            } else {
+                window.rhythmPlayerFailed("Zaman doldu, eksik nota bıraktınız!");
+            }
             return;
         }
         
@@ -1947,17 +1940,6 @@ window.handleRhythmInput = function(key) {
     
     if (foundTick !== null) {
         window.rhythmState.pressedTicks[foundTick] = true;
-        
-        let allPressed = true;
-        for (let t in map) {
-            if (!window.rhythmState.pressedTicks[t]) {
-                allPressed = false;
-                break;
-            }
-        }
-        if (allPressed) {
-            window.rhythmPlayerSucceeded();
-        }
     } else {
         if (!map[cTick] && !map[cTick-1] && !map[cTick+1]) {
             window.rhythmPlayerFailed("Es (boşluk) anında tuşa bastınız!");
