@@ -1800,11 +1800,10 @@ window.playRhythmComputerTurn = function() {
                 if (window.playPianoNoteSingle) window.playPianoNoteSingle(note);
             }
         } else if (currentTick === totalTicks) {
-            // 1 vurusluk (2 tick) Sende! beklemesi
             if (window.metronomeBellSound) window.metronomeBellSound.play();
             if (gameStatus) gameStatus.textContent = "Sende!";
             if (window.announceToScreenReader) window.announceToScreenReader("Sende!", true, true);
-        } else if (currentTick === totalTicks + ticksPerBeat) {
+            
             clearInterval(window.rhythmState.intervalId);
             window.startRhythmPlayerTurn(intervalMs);
             return;
