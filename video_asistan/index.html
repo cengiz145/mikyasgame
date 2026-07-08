@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Erişilebilir Video Asistanı</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="header">
+            <h1 tabindex="0">Video Montaj Asistanı</h1>
+        </header>
+
+        <!-- Assistant Message Box (ARIA Live Region for Screen Readers) -->
+        <div class="assistant-box" role="status" aria-live="polite" id="assistant-message" tabindex="0">
+            Merhaba. Video Montaj Asistanına hoş geldiniz. Başlamak için lütfen Adım 1'den bir video seçin.
+        </div>
+
+        <!-- Main Wizard Flow -->
+        <main class="wizard-container" id="wizard-container">
+            
+            <!-- STEP 1: Upload -->
+            <section class="step-card active" id="step-1">
+                <h2 tabindex="0">Adım 1: Video Yükle</h2>
+                <div class="input-group">
+                    <label for="video-upload" class="btn btn-primary btn-large">
+                        Bilgisayardan veya Telefondan Video Seç
+                    </label>
+                    <input type="file" id="video-upload" accept="video/mp4,video/webm,video/ogg" style="display: none;">
+                </div>
+            </section>
+
+            <!-- STEP 2: Preview & Cut Settings -->
+            <section class="step-card hidden" id="step-2">
+                <h2 tabindex="0">Adım 2: Videoyu Kes</h2>
+                
+                <div class="info-box" id="video-info" tabindex="0">
+                    Video süresi: Bekleniyor...
+                </div>
+
+                <div class="form-group">
+                    <label for="cut-start">Kesmeye Başlanacak Saniye:</label>
+                    <input type="number" id="cut-start" class="large-input" min="0" value="0" aria-describedby="start-desc">
+                    <span id="start-desc" class="sr-only">Videonun hangi saniyeden itibaren kesileceğini rakamla yazın.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="cut-end">Kesmenin Biteceği Saniye:</label>
+                    <input type="number" id="cut-end" class="large-input" min="1" value="10" aria-describedby="end-desc">
+                    <span id="end-desc" class="sr-only">Videonun hangi saniyede biteceğini rakamla yazın.</span>
+                </div>
+
+                <div class="button-row">
+                    <button id="btn-cut" class="btn btn-warning btn-large">Parçayı Kes ve Ayır</button>
+                </div>
+            </section>
+
+            <!-- STEP 3: Timeline & Result -->
+            <section class="step-card hidden" id="step-3">
+                <h2 tabindex="0">Adım 3: Montaj Sonucu</h2>
+                
+                <div id="clip-list" class="clip-list" role="list" aria-label="Kesilmiş Parçalar Listesi">
+                    <!-- Clips will be injected here -->
+                </div>
+
+                <div class="button-row" style="margin-top: 20px;">
+                    <button id="btn-preview-all" class="btn btn-success btn-large">Tüm Parçaları Oynat</button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Hidden Video Player (Used for actual playback and duration calculation) -->
+        <div class="visually-hidden">
+            <video id="hidden-player" controls aria-label="Gizli Video Oynatıcı"></video>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

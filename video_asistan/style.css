@@ -1,0 +1,193 @@
+/* --- CSS Variables & A11y Tokens --- */
+:root {
+    --bg-base: #121212;
+    --card-bg: #1e1e1e;
+    
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    
+    --accent-primary: #3b82f6;
+    --accent-primary-hover: #60a5fa;
+    --accent-success: #10b981;
+    --accent-warning: #f59e0b;
+    --accent-danger: #ef4444;
+    
+    --focus-ring: #fbbf24; /* High contrast yellow for screen reader / keyboard focus */
+}
+
+/* --- Global Reset --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-size: 18px; /* Larger base font for readability */
+    line-height: 1.5;
+    padding: 16px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.visually-hidden {
+    display: none;
+}
+
+/* Focus Styles for Accessibility */
+*:focus {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.app-container {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Header */
+.header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent-primary);
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #333;
+}
+
+/* Assistant Message Box */
+.assistant-box {
+    background-color: #2d3748;
+    border-left: 5px solid var(--accent-success);
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* Wizard Cards */
+.step-card {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #333;
+}
+
+.step-card.hidden {
+    display: none;
+}
+
+.step-card h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.2s;
+    width: 100%;
+}
+
+.btn-large {
+    padding: 16px 20px;
+    font-size: 18px;
+}
+
+.btn-primary { background-color: var(--accent-primary); color: white; }
+.btn-success { background-color: var(--accent-success); color: white; }
+.btn-warning { background-color: var(--accent-warning); color: black; }
+.btn-danger { background-color: var(--accent-danger); color: white; }
+
+.btn:hover, .btn:focus {
+    filter: brightness(1.2);
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.large-input {
+    width: 100%;
+    padding: 12px;
+    font-size: 20px;
+    background-color: #121212;
+    border: 2px solid #444;
+    color: white;
+    border-radius: 8px;
+}
+
+.large-input:focus {
+    border-color: var(--accent-primary);
+}
+
+/* Info Box */
+.info-box {
+    background-color: #1a202c;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    border: 1px solid #2d3748;
+}
+
+/* Clip List */
+.clip-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.clip-item {
+    background-color: #2d3748;
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.clip-title {
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.clip-details {
+    font-size: 16px;
+    color: var(--text-secondary);
+}
+
+.clip-actions {
+    display: flex;
+    gap: 10px;
+}
