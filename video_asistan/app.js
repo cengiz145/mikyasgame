@@ -11,6 +11,7 @@ const state = {
     videoDuration: 0,
     cutStart: 0,
     cutEnd: 0,
+    cutMode: 'keep', // 'keep' or 'remove'
     videoVolume: 100,
     audioVolume: 50
 };
@@ -33,6 +34,9 @@ const DOM = {
     cutStart: document.getElementById('cut-start'),
     cutEnd: document.getElementById('cut-end'),
     btnCut: document.getElementById('btn-cut'),
+    modeKeep: document.getElementById('mode-keep'),
+    modeRemove: document.getElementById('mode-remove'),
+    lblCutStart: document.getElementById('lbl-cut-start'),
     
     videoVolume: document.getElementById('video-volume'),
     audioVolume: document.getElementById('audio-volume'),
@@ -120,6 +124,7 @@ DOM.videoUpload.addEventListener('change', (e) => {
 DOM.btnCut.addEventListener('click', () => {
     const startVal = parseInt(DOM.cutStart.value);
     const endVal = parseInt(DOM.cutEnd.value);
+    const mode = DOM.modeRemove.checked ? 'remove' : 'keep';
     
     if (isNaN(startVal) || isNaN(endVal) || startVal >= endVal || endVal > state.videoDuration) {
         speak("Hatalı değer girdiniz. Başlangıç saniyesi bitişten küçük olmalıdır.");
@@ -128,8 +133,10 @@ DOM.btnCut.addEventListener('click', () => {
     
     state.cutStart = startVal;
     state.cutEnd = endVal;
+    state.cutMode = mode;
     
-    speak(`Kesme alanı ayarlandı. Adım 3'e geçiliyor. İsterseniz arka plan müziği ekleyebilirsiniz.`);
+    const modeText = mode === 'remove' ? "çıkarılacak" : "saklanacak";
+    speak(`Kesme alanı ayarlandı. Seçtiğiniz ${startVal} ile ${endVal} saniyeleri arası ${modeText}. Adım 3'e geçiliyor. İsterseniz arka plan müziği ekleyebilirsiniz.`);
     showStep(3);
 });
 
@@ -187,6 +194,18 @@ DOM.btnRenderDownload.addEventListener('click', async () => {
         // 1. Write video file
         await ffmpeg.writeFile(videoName, await fetchFile(state.videoFile));
         
+        let sourceVideoName = videoName;
+
+        // EĞER "SİL (Ortayı Çıkar)" modundaysak, önce iki parçayı bölüp birleştiriyoruz.
+        if (state.cutMode === 'remove') {
+            speak("Önce istenmeyen bölüm çıkarılıyor, lütfen bekleyin...");
+            await ffmpeg.exec(['-ss', '0', '-to', state.cutStart.toString(), '-i', videoName, '-c', 'copy', 'part1.mp4']);
+            await ffmpeg.exec(['-ss', state.cutEnd.toString(), '-to', state.videoDuration.toString(), '-i', videoName, '-c', 'copy', 'part2.mp4']);
+            await ffmpeg.writeFile('concat.txt', "file 'part1.mp4'\nfile 'part2.mp4'");
+            await ffmpeg.exec(['-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c', 'copy', 'concat_output.mp4']);
+            sourceVideoName = 'concat_output.mp4';
+        }
+        
         let command = [];
         
         // 2. Prepare command
@@ -197,32 +216,54 @@ DOM.btnRenderDownload.addEventListener('click', async () => {
             const vVol = state.videoVolume / 100;
             const aVol = state.audioVolume / 100;
             
-            // Complex FFmpeg command for mixing audio and cutting
-            command = [
-                '-ss', state.cutStart.toString(),
-                '-to', state.cutEnd.toString(),
-                '-i', videoName,
-                '-i', audioName,
-                '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
-                '-map', '0:v',
-                '-map', '[a]',
-                '-c:v', 'copy', // copy video stream directly (fast!)
-                '-c:a', 'aac',
-                '-y', outName
-            ];
+            // Eğer "remove" moduysa zaten kesilmiş dosyayı (sourceVideoName) kullanıyoruz, ss ve to eklemiyoruz
+            if (state.cutMode === 'remove') {
+                command = [
+                    '-i', sourceVideoName,
+                    '-i', audioName,
+                    '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
+                    '-map', '0:v',
+                    '-map', '[a]',
+                    '-c:v', 'copy',
+                    '-c:a', 'aac',
+                    '-y', outName
+                ];
+            } else {
+                command = [
+                    '-ss', state.cutStart.toString(),
+                    '-to', state.cutEnd.toString(),
+                    '-i', sourceVideoName,
+                    '-i', audioName,
+                    '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
+                    '-map', '0:v',
+                    '-map', '[a]',
+                    '-c:v', 'copy',
+                    '-c:a', 'aac',
+                    '-y', outName
+                ];
+            }
         } else {
-            // Sadece kesme ve ses ayarı
             const vVol = state.videoVolume / 100;
             
-            command = [
-                '-ss', state.cutStart.toString(),
-                '-to', state.cutEnd.toString(),
-                '-i', videoName,
-                '-filter:a', `volume=${vVol}`,
-                '-c:v', 'copy',
-                '-c:a', 'aac',
-                '-y', outName
-            ];
+            if (state.cutMode === 'remove') {
+                command = [
+                    '-i', sourceVideoName,
+                    '-filter:a', `volume=${vVol}`,
+                    '-c:v', 'copy',
+                    '-c:a', 'aac',
+                    '-y', outName
+                ];
+            } else {
+                command = [
+                    '-ss', state.cutStart.toString(),
+                    '-to', state.cutEnd.toString(),
+                    '-i', sourceVideoName,
+                    '-filter:a', `volume=${vVol}`,
+                    '-c:v', 'copy',
+                    '-c:a', 'aac',
+                    '-y', outName
+                ];
+            }
         }
         
         // 3. Execute
@@ -272,6 +313,18 @@ DOM.btnRenderMp3.addEventListener('click', async () => {
         
         await ffmpeg.writeFile(videoName, await fetchFile(state.videoFile));
         
+        let sourceVideoName = videoName;
+
+        // EĞER "SİL (Ortayı Çıkar)" modundaysak, önce iki parçayı bölüp birleştiriyoruz.
+        if (state.cutMode === 'remove') {
+            speak("Önce istenmeyen bölüm çıkarılıyor, lütfen bekleyin...");
+            await ffmpeg.exec(['-ss', '0', '-to', state.cutStart.toString(), '-i', videoName, '-c', 'copy', 'part1.mp4']);
+            await ffmpeg.exec(['-ss', state.cutEnd.toString(), '-to', state.videoDuration.toString(), '-i', videoName, '-c', 'copy', 'part2.mp4']);
+            await ffmpeg.writeFile('concat.txt', "file 'part1.mp4'\nfile 'part2.mp4'");
+            await ffmpeg.exec(['-f', 'concat', '-safe', '0', '-i', 'concat.txt', '-c', 'copy', 'concat_output.mp4']);
+            sourceVideoName = 'concat_output.mp4';
+        }
+        
         let command = [];
         
         if (state.audioFile) {
@@ -279,32 +332,55 @@ DOM.btnRenderMp3.addEventListener('click', async () => {
             const vVol = state.videoVolume / 100;
             const aVol = state.audioVolume / 100;
             
-            // Görüntüyü at (-vn), sadece sesleri miksle ve mp3 olarak kaydet
-            command = [
-                '-ss', state.cutStart.toString(),
-                '-to', state.cutEnd.toString(),
-                '-i', videoName,
-                '-i', audioName,
-                '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
-                '-map', '[a]',
-                '-vn',
-                '-c:a', 'libmp3lame',
-                '-q:a', '2',
-                '-y', outName
-            ];
+            if (state.cutMode === 'remove') {
+                command = [
+                    '-i', sourceVideoName,
+                    '-i', audioName,
+                    '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
+                    '-map', '[a]',
+                    '-vn',
+                    '-c:a', 'libmp3lame',
+                    '-q:a', '2',
+                    '-y', outName
+                ];
+            } else {
+                command = [
+                    '-ss', state.cutStart.toString(),
+                    '-to', state.cutEnd.toString(),
+                    '-i', sourceVideoName,
+                    '-i', audioName,
+                    '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
+                    '-map', '[a]',
+                    '-vn',
+                    '-c:a', 'libmp3lame',
+                    '-q:a', '2',
+                    '-y', outName
+                ];
+            }
         } else {
             const vVol = state.videoVolume / 100;
             
-            command = [
-                '-ss', state.cutStart.toString(),
-                '-to', state.cutEnd.toString(),
-                '-i', videoName,
-                '-filter:a', `volume=${vVol}`,
-                '-vn',
-                '-c:a', 'libmp3lame',
-                '-q:a', '2',
-                '-y', outName
-            ];
+            if (state.cutMode === 'remove') {
+                command = [
+                    '-i', sourceVideoName,
+                    '-filter:a', `volume=${vVol}`,
+                    '-vn',
+                    '-c:a', 'libmp3lame',
+                    '-q:a', '2',
+                    '-y', outName
+                ];
+            } else {
+                command = [
+                    '-ss', state.cutStart.toString(),
+                    '-to', state.cutEnd.toString(),
+                    '-i', sourceVideoName,
+                    '-filter:a', `volume=${vVol}`,
+                    '-vn',
+                    '-c:a', 'libmp3lame',
+                    '-q:a', '2',
+                    '-y', outName
+                ];
+            }
         }
         
         await ffmpeg.exec(command);

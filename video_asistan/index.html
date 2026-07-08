@@ -53,8 +53,20 @@
                     Video süresi: Bekleniyor...
                 </div>
 
+                <fieldset class="form-group" style="border: 1px solid #4a5568; padding: 15px; border-radius: 8px;">
+                    <legend style="font-weight: 600; padding: 0 10px;">Kesme Modu</legend>
+                    <div style="margin-bottom: 10px;">
+                        <input type="radio" id="mode-keep" name="cut-mode" value="keep" checked>
+                        <label for="mode-keep">Seçtiğim Aralığı SAKLA (Normal Kesim)</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="mode-remove" name="cut-mode" value="remove">
+                        <label for="mode-remove">Seçtiğim Aralığı SİL (Ortayı Çıkar)</label>
+                    </div>
+                </fieldset>
+
                 <div class="form-group">
-                    <label for="cut-start">Kesmeye Başlanacak Saniye:</label>
+                    <label id="lbl-cut-start" for="cut-start">İşleme Başlanacak Saniye:</label>
                     <input type="number" id="cut-start" class="large-input" min="0" value="0" aria-describedby="start-desc">
                     <span id="start-desc" class="sr-only">Videonun hangi saniyeden itibaren kesileceğini rakamla yazın.</span>
                 </div>
