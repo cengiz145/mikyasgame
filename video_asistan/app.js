@@ -380,103 +380,32 @@ const btnAskVoice = document.getElementById('btn-ask-voice');
 const assistantInput = document.getElementById('assistant-input');
 const voiceStatus = document.getElementById('voice-status');
 
-// İleri Düzey NLP Motoru (Niyet Okuma ve Sesli Emirler)
+// İleri Düzey NLP Motoru (Sözlü Yönlendirme ve Yardım)
 function analyzeUserQuestion(question) {
     const q = question.toLowerCase();
     
     // =====================================
-    // 1. EYLEMLER (SESLİ EMİRLER / ACTIONS)
+    // 1. NASIL YAPILIR? (REHBERLİK)
     // =====================================
 
-    // A. Çift aralıklı kesim (Örn: "10 ile 25 arası kes", "10'dan 25'e")
-    let match = q.match(/(\d+)\s*(?:ile|'dan|dan|den|'den|ve)\s*(\d+)/);
-    if (match) {
-        DOM.cutStart.value = match[1];
-        DOM.cutEnd.value = match[2];
-        return `Emriniz anlaşıldı. Başlangıç saniyesi ${match[1]}, bitiş saniyesi ${match[2]} olarak ayarlandı.`;
+    if (q.includes("nasıl kes") || q.includes("kesmek") || q.includes("aralığı")) {
+        return "Videoyu kesmek için Adım 2'ye gidip, başlangıç ve bitiş saniyelerini kutucuklara yazmalısınız. Ardından 'Sadece bu aralığı sakla' veya 'Ortayı sil' seçeneklerinden birini seçebilirsiniz.";
     }
 
-    // B. Sadece Başlangıç veya Bitiş ayarlama
-    if (q.includes("başlangıc") || q.includes("başla") || q.includes("ilk")) {
-        match = q.match(/(\d+)/);
-        if (match) {
-            DOM.cutStart.value = match[1];
-            return `Emriniz anlaşıldı. Başlangıç saniyesi ${match[1]} olarak ayarlandı.`;
-        }
-    }
-    if (q.includes("bitiş") || q.includes("son") || q.includes("bitir")) {
-        match = q.match(/(\d+)/);
-        if (match) {
-            DOM.cutEnd.value = match[1];
-            return `Emriniz anlaşıldı. Bitiş saniyesi ${match[1]} olarak ayarlandı.`;
-        }
+    if (q.includes("sesi") || q.includes("müzik") || q.includes("kıs") || q.includes("aç")) {
+        return "Ses seviyelerini ayarlamak için Adım 3'teki dikey sürgüleri kullanmalısınız. Ekran okuyucu kullanıyorsanız, sürgü üzerindeyken yukarı veya aşağı kaydırma hareketiyle sesi artırıp azaltabilirsiniz.";
     }
 
-    // C. Ses Seviyesi Ayarlama
-    if (q.includes("video") && q.includes("ses")) {
-        match = q.match(/(\d+)/);
-        if (match) {
-            let val = parseInt(match[1]);
-            if (val > 100) val = 100;
-            DOM.videoVolume.value = val;
-            document.getElementById('video-volume-text').textContent = `%${val}`;
-            return `Emriniz anlaşıldı. Videonun sesi yüzde ${val} olarak ayarlandı.`;
-        }
-    }
-    if (q.includes("müzik") || q.includes("şarkı") || q.includes("arka plan")) {
-        match = q.match(/(\d+)/);
-        if (match) {
-            let val = parseInt(match[1]);
-            if (val > 100) val = 100;
-            DOM.audioVolume.value = val;
-            document.getElementById('audio-volume-text').textContent = `%${val}`;
-            return `Emriniz anlaşıldı. Müziğin sesi yüzde ${val} olarak ayarlandı.`;
-        }
-    }
-    if (q.includes("sesi") && !q.includes("video") && !q.includes("müzik")) {
-        // Genel ses komutu (Örn: "Sesi 50 yap")
-        match = q.match(/(\d+)/);
-        if (match) {
-            let val = parseInt(match[1]);
-            if (val > 100) val = 100;
-            DOM.videoVolume.value = val;
-            document.getElementById('video-volume-text').textContent = `%${val}`;
-            return `Emriniz anlaşıldı. Ana ses yüzde ${val} olarak ayarlandı.`;
-        }
-    }
-
-    // D. Kesme Modları (Ortayı Çıkar vs Normal)
-    if (q.includes("orta") || q.includes("sil") || q.includes("çıkar") || q.includes("kaldır")) {
-        DOM.modeRemove.checked = true;
-        return "Emriniz anlaşıldı. Kesme modu 'İstenmeyen Ortayı Sil' olarak değiştirildi.";
-    }
-    if (q.includes("normal") || q.includes("sakla") || q.includes("tut")) {
-        DOM.modeKeep.checked = true;
-        return "Emriniz anlaşıldı. Kesme modu 'Normal Kesim' olarak değiştirildi.";
-    }
-
-    // E. Hız Ayarları
     if (q.includes("hız")) {
-        if (q.includes("yavaş") || q.includes("0.5") || q.includes("buçuk")) {
-            DOM.videoSpeed.value = "0.5";
-            return "Emriniz anlaşıldı. Video oynatma hızı yarı yarıya yavaşlatıldı.";
-        }
-        if (q.includes("çok hızlı") || q.includes("iki kat") || q.includes("2")) {
-            DOM.videoSpeed.value = "2.0";
-            return "Emriniz anlaşıldı. Video oynatma hızı iki katına (çok hızlı) çıkarıldı.";
-        }
-        if (q.includes("hızlı") || q.includes("1.5")) {
-            DOM.videoSpeed.value = "1.5";
-            return "Emriniz anlaşıldı. Video oynatma hızı 1.5x (hızlı) olarak ayarlandı.";
-        }
-        if (q.includes("normal") || q.includes("1")) {
-            DOM.videoSpeed.value = "1.0";
-            return "Emriniz anlaşıldı. Video oynatma hızı normale döndürüldü.";
-        }
+        return "Videonuzu hızlandırmak veya yavaşlatmak istiyorsanız, Adım 3'ün en üstündeki 'Videonun Oynatma Hızı' açılır listesine tıklayarak istediğiniz hızı seçebilirsiniz.";
+    }
+
+    if (q.includes("yan") || q.includes("döndür") || q.includes("ters")) {
+        return "Eğer videonuz yan çıkıyorsa, Adım 1'deki video yükleme butonunun hemen üstünde bulunan 'Yön Ayarı' menüsünden sağa, sola döndürme veya ters çevirme işlemi yapabilirsiniz.";
     }
 
     // =====================================
-    // 2. YARDIM / SORU-CEVAP (SORU SORMACA)
+    // 2. HATA ANALİZİ VE SORUN GİDERME
     // =====================================
     
     // Niyet: Hata - Kesemiyorum, yapamıyorum
@@ -491,13 +420,10 @@ function analyzeUserQuestion(question) {
     }
     
     // Niyet: Müzik - Ses çıkmıyor, müzik ekleyemedim
-    if (q.includes("müzik") || q.includes("ses") || q.includes("şarkı") || q.includes("duyamıyorum")) {
+    if (q.includes("duyamıyorum") || q.includes("ses çıkmıyor")) {
         if (!state.videoFile) return "Henüz video yüklemediniz.";
-        if (!state.audioFile) {
-            return "Arka plana bir müzik eklemediğinizi görüyorum. Adım 3'ten bir MP3 dosyası seçerek müzik ekleyebilirsiniz.";
-        }
         if (state.videoVolume === 0 && state.audioVolume === 0) {
-            return "Hem videonun hem de müziğin sesini sıfıra indirmişsiniz. Bu yüzden ses duyamazsınız. Lütfen sürgüleri yukarı kaydırarak sesi açın.";
+            return "Hem videonun hem de müziğin sesini sıfıra indirmişsiniz. Bu yüzden ses duyamazsınız. Lütfen Adım 3'teki sürgüleri yukarı kaydırarak sesi açın.";
         }
         return "Ses ayarlarınız gayet normal görünüyor. Sorun devam ediyorsa cihazınızın kendi sesini açmayı deneyin.";
     }
@@ -505,14 +431,14 @@ function analyzeUserQuestion(question) {
     // Niyet: İndirme - İndiremiyorum, kaydetmiyor, render
     if (q.includes("indir") || q.includes("kaydet") || q.includes("render") || q.includes("kaydedemiyorum")) {
         if (!state.videoFile) return "İndirecek bir video yok. Önce video yüklemelisiniz.";
-        if (DOM.btnRenderDownload.disabled) {
-            return "Şu anda birleştirme (render) işlemi arka planda devam ediyor olabilir. Lütfen işlemin %100 olmasını bekleyin.";
+        if (DOM.btnRenderDownload && DOM.btnRenderDownload.disabled) {
+            return "Şu anda birleştirme işlemi arka planda devam ediyor olabilir. Lütfen işlemin bitmesini bekleyin.";
         }
-        return "İndirme işlemi için Adım 4'e gelip 'Videoyu Birleştir ve İndir' butonuna basmanız yeterlidir. İşlem biraz sürebilir.";
+        return "İndirme işlemi için Adım 4'e gelip 'MP4 Olarak İndir' veya 'MP3 Olarak İndir' butonuna basmanız yeterlidir.";
     }
     
     // Varsayılan Yanıt
-    return "Sorunuzu anladım ancak şu anki durumda teknik bir sorun göremiyorum. İşlemleri sırasıyla 1, 2, 3, 4 şeklinde takip ettiğinizden emin olun.";
+    return "Sorunuzu anladım. Uygulamayı kullanmak için ekranınızdaki Adım 1, 2, 3 ve 4'ü sırasıyla takip etmeniz yeterlidir. Takıldığınız yerde bana tekrar sorabilirsiniz.";
 }
 
 // Metinle Sorma
@@ -553,7 +479,7 @@ btnAskVoice.addEventListener('click', () => {
         
         // Asistan soruyu analiz etsin
         const answer = analyzeUserQuestion(transcript);
-        speak(`Sorduğunuz soru: ${transcript}. Cevabım: ${answer}`);
+        speak(`Sorunuz: ${transcript}. Cevabım: ${answer}`);
     };
 
     recognition.onerror = (event) => {
