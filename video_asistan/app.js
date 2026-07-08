@@ -13,7 +13,8 @@ const state = {
     cutEnd: 0,
     cutMode: 'keep', // 'keep' or 'remove'
     videoVolume: 100,
-    audioVolume: 50
+    audioVolume: 50,
+    videoSpeed: 1.0
 };
 
 const DOM = {
@@ -40,6 +41,8 @@ const DOM = {
     
     videoVolume: document.getElementById('video-volume'),
     audioVolume: document.getElementById('audio-volume'),
+    videoSpeed: document.getElementById('video-speed'),
+    
     btnToRender: document.getElementById('btn-to-render'),
     
     btnRenderDownload: document.getElementById('btn-render-download'),
@@ -170,8 +173,13 @@ DOM.audioVolume.addEventListener('input', (e) => {
 DOM.btnToRender.addEventListener('click', () => {
     state.videoVolume = parseInt(DOM.videoVolume.value) || 100;
     state.audioVolume = parseInt(DOM.audioVolume.value) || 50;
+    state.videoSpeed = parseFloat(DOM.videoSpeed.value) || 1.0;
     
-    speak("Ayarlar kaydedildi. Dışa aktarma adımına geçiliyor.");
+    if (state.videoSpeed !== 1.0) {
+        speak("Hız ayarı değiştirdiğiniz için sistem videoyu yeniden işleyecektir. Bu işlem normalden daha uzun sürebilir. Ayarlar kaydedildi. Dışa aktarma adımına geçiliyor.");
+    } else {
+        speak("Ayarlar kaydedildi. Dışa aktarma adımına geçiliyor.");
+    }
     showStep(4);
 });
 
@@ -207,64 +215,39 @@ DOM.btnRenderDownload.addEventListener('click', async () => {
         }
         
         let command = [];
+        const vVol = state.videoVolume / 100;
+        const aVol = state.audioVolume / 100;
+        const speed = state.videoSpeed;
+        const vpts = (1 / speed).toFixed(4);
+        const atempo = speed.toFixed(4);
         
         // 2. Prepare command
+        if (state.cutMode !== 'remove') {
+            command.push('-ss', state.cutStart.toString(), '-to', state.cutEnd.toString());
+        }
+        command.push('-i', sourceVideoName);
+        
         if (state.audioFile) {
-            // Write audio file
-            await ffmpeg.writeFile(audioName, await fetchFile(state.audioFile));
-            
-            const vVol = state.videoVolume / 100;
-            const aVol = state.audioVolume / 100;
-            
-            // Eğer "remove" moduysa zaten kesilmiş dosyayı (sourceVideoName) kullanıyoruz, ss ve to eklemiyoruz
-            if (state.cutMode === 'remove') {
-                command = [
-                    '-i', sourceVideoName,
-                    '-i', audioName,
-                    '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
-                    '-map', '0:v',
-                    '-map', '[a]',
-                    '-c:v', 'copy',
-                    '-c:a', 'aac',
-                    '-y', outName
-                ];
+            command.push('-i', audioName);
+            if (speed !== 1.0) {
+                // Hız değişimi varsa re-encode zorunlu
+                command.push('-filter_complex', `[0:v]setpts=${vpts}*PTS[v];[0:a]volume=${vVol},atempo=${atempo}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`);
+                command.push('-map', '[v]', '-map', '[a]', '-c:v', 'libx264');
             } else {
-                command = [
-                    '-ss', state.cutStart.toString(),
-                    '-to', state.cutEnd.toString(),
-                    '-i', sourceVideoName,
-                    '-i', audioName,
-                    '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
-                    '-map', '0:v',
-                    '-map', '[a]',
-                    '-c:v', 'copy',
-                    '-c:a', 'aac',
-                    '-y', outName
-                ];
+                // Sadece ses ayarı varsa c copy
+                command.push('-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`);
+                command.push('-map', '0:v', '-map', '[a]', '-c:v', 'copy');
             }
         } else {
-            const vVol = state.videoVolume / 100;
-            
-            if (state.cutMode === 'remove') {
-                command = [
-                    '-i', sourceVideoName,
-                    '-filter:a', `volume=${vVol}`,
-                    '-c:v', 'copy',
-                    '-c:a', 'aac',
-                    '-y', outName
-                ];
+            if (speed !== 1.0) {
+                command.push('-filter_complex', `[0:v]setpts=${vpts}*PTS[v];[0:a]volume=${vVol},atempo=${atempo}[a]`);
+                command.push('-map', '[v]', '-map', '[a]', '-c:v', 'libx264');
             } else {
-                command = [
-                    '-ss', state.cutStart.toString(),
-                    '-to', state.cutEnd.toString(),
-                    '-i', sourceVideoName,
-                    '-filter:a', `volume=${vVol}`,
-                    '-c:v', 'copy',
-                    '-c:a', 'aac',
-                    '-y', outName
-                ];
+                command.push('-filter:a', `volume=${vVol}`, '-c:v', 'copy');
             }
         }
+        
+        command.push('-c:a', 'aac', '-y', outName);
         
         // 3. Execute
         await ffmpeg.exec(command);
@@ -326,62 +309,34 @@ DOM.btnRenderMp3.addEventListener('click', async () => {
         }
         
         let command = [];
+        const vVol = state.videoVolume / 100;
+        const aVol = state.audioVolume / 100;
+        const speed = state.videoSpeed;
+        const atempo = speed.toFixed(4);
+        
+        if (state.cutMode !== 'remove') {
+            command.push('-ss', state.cutStart.toString(), '-to', state.cutEnd.toString());
+        }
+        command.push('-i', sourceVideoName);
         
         if (state.audioFile) {
-            await ffmpeg.writeFile(audioName, await fetchFile(state.audioFile));
-            const vVol = state.videoVolume / 100;
-            const aVol = state.audioVolume / 100;
-            
-            if (state.cutMode === 'remove') {
-                command = [
-                    '-i', sourceVideoName,
-                    '-i', audioName,
-                    '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
-                    '-map', '[a]',
-                    '-vn',
-                    '-c:a', 'libmp3lame',
-                    '-q:a', '2',
-                    '-y', outName
-                ];
+            command.push('-i', audioName);
+            if (speed !== 1.0) {
+                command.push('-filter_complex', `[0:a]volume=${vVol},atempo=${atempo}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`);
+                command.push('-map', '[a]');
             } else {
-                command = [
-                    '-ss', state.cutStart.toString(),
-                    '-to', state.cutEnd.toString(),
-                    '-i', sourceVideoName,
-                    '-i', audioName,
-                    '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
-                    '-map', '[a]',
-                    '-vn',
-                    '-c:a', 'libmp3lame',
-                    '-q:a', '2',
-                    '-y', outName
-                ];
+                command.push('-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`);
+                command.push('-map', '[a]');
             }
         } else {
-            const vVol = state.videoVolume / 100;
-            
-            if (state.cutMode === 'remove') {
-                command = [
-                    '-i', sourceVideoName,
-                    '-filter:a', `volume=${vVol}`,
-                    '-vn',
-                    '-c:a', 'libmp3lame',
-                    '-q:a', '2',
-                    '-y', outName
-                ];
+            if (speed !== 1.0) {
+                command.push('-filter:a', `volume=${vVol},atempo=${atempo}`);
             } else {
-                command = [
-                    '-ss', state.cutStart.toString(),
-                    '-to', state.cutEnd.toString(),
-                    '-i', sourceVideoName,
-                    '-filter:a', `volume=${vVol}`,
-                    '-vn',
-                    '-c:a', 'libmp3lame',
-                    '-q:a', '2',
-                    '-y', outName
-                ];
+                command.push('-filter:a', `volume=${vVol}`);
             }
         }
+        
+        command.push('-vn', '-c:a', 'libmp3lame', '-q:a', '2', '-y', outName);
         
         await ffmpeg.exec(command);
         const data = await ffmpeg.readFile(outName);
