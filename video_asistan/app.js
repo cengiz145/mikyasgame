@@ -14,7 +14,8 @@ const state = {
     cutMode: 'keep', // 'keep' or 'remove'
     videoVolume: 100,
     audioVolume: 50,
-    videoSpeed: 1.0
+    videoSpeed: 1.0,
+    videoRotate: 0
 };
 
 const DOM = {
@@ -44,6 +45,8 @@ const DOM = {
     videoSpeed: document.getElementById('video-speed'),
     
     btnToRender: document.getElementById('btn-to-render'),
+    
+    videoRotate: document.getElementById('video-rotate'),
     
     btnRenderDownload: document.getElementById('btn-render-download'),
     btnRenderMp3: document.getElementById('btn-render-mp3'),
@@ -174,6 +177,7 @@ DOM.btnToRender.addEventListener('click', () => {
     state.videoVolume = parseInt(DOM.videoVolume.value) || 100;
     state.audioVolume = parseInt(DOM.audioVolume.value) || 50;
     state.videoSpeed = parseFloat(DOM.videoSpeed.value) || 1.0;
+    state.videoRotate = parseInt(DOM.videoRotate.value) || 0;
     
     if (state.videoSpeed !== 1.0) {
         speak("Hız ayarı değiştirdiğiniz için sistem videoyu yeniden işleyecektir. Bu işlem normalden daha uzun sürebilir. Ayarlar kaydedildi. Dışa aktarma adımına geçiliyor.");
@@ -226,6 +230,11 @@ DOM.btnRenderDownload.addEventListener('click', async () => {
             command.push('-ss', state.cutStart.toString(), '-to', state.cutEnd.toString());
         }
         command.push('-i', sourceVideoName);
+        
+        // Videonun Yönünü (Rotation) Düzeltme
+        if (state.videoRotate !== 0) {
+            command.push('-metadata:s:v:0', `rotate=${state.videoRotate}`);
+        }
         
         if (state.audioFile) {
             command.push('-i', audioName);

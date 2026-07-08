@@ -36,12 +36,23 @@
             
             <!-- STEP 1: Upload Video -->
             <section class="step-card active" id="step-1">
-                <h2 tabindex="0">Adım 1: Video Yükle</h2>
+                <h2 tabindex="0">Adım 1: Video Seçimi ve Yön Ayarı</h2>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="video-rotate" style="color: var(--accent-primary);">Videonuz yan mı çıktı? Buradan düzeltebilirsiniz:</label>
+                    <select id="video-rotate" class="large-input" style="cursor: pointer;">
+                        <option value="0" selected>Normal (Düzeltme Yapma)</option>
+                        <option value="90">Sağa Döndür (90 Derece)</option>
+                        <option value="270">Sola Döndür (90 Derece)</option>
+                        <option value="180">Ters Çevir (180 Derece)</option>
+                    </select>
+                </div>
+
                 <div class="input-group">
                     <label for="video-upload" class="btn btn-primary btn-large">
                         Bilgisayardan veya Telefondan Video Seç
                     </label>
-                    <input type="file" id="video-upload" accept="video/mp4,video/webm,video/ogg,video/quicktime" style="display: none;">
+                    <input type="file" id="video-upload" accept="video/mp4,video/webm,video/ogg,video/quicktime,video/*" style="display: none;">
                 </div>
             </section>
 
