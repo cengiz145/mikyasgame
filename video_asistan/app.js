@@ -142,6 +142,23 @@ DOM.audioUpload.addEventListener('change', (e) => {
     }
 });
 
+// Sürgü (Slider) Güncellemeleri
+DOM.videoVolume.addEventListener('input', (e) => {
+    const val = e.target.value;
+    const textSpan = document.getElementById('video-volume-text');
+    textSpan.textContent = `%${val}`;
+    e.target.setAttribute('aria-valuenow', val);
+    e.target.setAttribute('aria-valuetext', `Yüzde ${val}`);
+});
+
+DOM.audioVolume.addEventListener('input', (e) => {
+    const val = e.target.value;
+    const textSpan = document.getElementById('audio-volume-text');
+    textSpan.textContent = `%${val}`;
+    e.target.setAttribute('aria-valuenow', val);
+    e.target.setAttribute('aria-valuetext', `Yüzde ${val}`);
+});
+
 DOM.btnToRender.addEventListener('click', () => {
     state.videoVolume = parseInt(DOM.videoVolume.value) || 100;
     state.audioVolume = parseInt(DOM.audioVolume.value) || 50;
