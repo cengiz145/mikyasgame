@@ -82,6 +82,27 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
+/* Progress Bar */
+#progress-container {
+    margin-bottom: 10px;
+}
+#progress-container.hidden {
+    display: none;
+}
+.progress-bar-bg {
+    width: 100%;
+    height: 20px;
+    background-color: #333;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: var(--accent-success);
+    transition: width 0.3s ease;
+}
+
 /* Wizard Cards */
 .step-card {
     background-color: var(--card-bg);
@@ -126,6 +147,11 @@ body {
     filter: brightness(1.2);
 }
 
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Forms */
 .form-group {
     margin-bottom: 20px;
@@ -160,34 +186,6 @@ body {
     font-size: 16px;
     border: 1px solid #2d3748;
 }
-
-/* Clip List */
-.clip-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.clip-item {
-    background-color: #2d3748;
-    padding: 16px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.clip-title {
-    font-weight: 700;
-    font-size: 18px;
-}
-
-.clip-details {
-    font-size: 16px;
-    color: var(--text-secondary);
-}
-
-.clip-actions {
-    display: flex;
-    gap: 10px;
+.info-box.hidden {
+    display: none;
 }

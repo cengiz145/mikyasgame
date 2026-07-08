@@ -6,6 +6,10 @@
     <title>Erişilebilir Video Asistanı</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FFmpeg WASM libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -17,24 +21,31 @@
 
         <!-- Assistant Message Box (ARIA Live Region for Screen Readers) -->
         <div class="assistant-box" role="status" aria-live="polite" id="assistant-message" tabindex="0">
-            Merhaba. Video Montaj Asistanına hoş geldiniz. Başlamak için lütfen Adım 1'den bir video seçin.
+            Merhaba. FFmpeg destekli Profesyonel Montaj Asistanına hoş geldiniz. Başlamak için lütfen Adım 1'den bir video seçin.
+        </div>
+
+        <!-- Progress Bar (Visible during render) -->
+        <div id="progress-container" class="hidden" aria-hidden="true">
+            <div class="progress-bar-bg">
+                <div id="progress-bar-fill" class="progress-bar-fill"></div>
+            </div>
         </div>
 
         <!-- Main Wizard Flow -->
         <main class="wizard-container" id="wizard-container">
             
-            <!-- STEP 1: Upload -->
+            <!-- STEP 1: Upload Video -->
             <section class="step-card active" id="step-1">
                 <h2 tabindex="0">Adım 1: Video Yükle</h2>
                 <div class="input-group">
                     <label for="video-upload" class="btn btn-primary btn-large">
                         Bilgisayardan veya Telefondan Video Seç
                     </label>
-                    <input type="file" id="video-upload" accept="video/mp4,video/webm,video/ogg" style="display: none;">
+                    <input type="file" id="video-upload" accept="video/mp4,video/webm,video/ogg,video/quicktime" style="display: none;">
                 </div>
             </section>
 
-            <!-- STEP 2: Preview & Cut Settings -->
+            <!-- STEP 2: Cut Video -->
             <section class="step-card hidden" id="step-2">
                 <h2 tabindex="0">Adım 2: Videoyu Kes</h2>
                 
@@ -55,28 +66,58 @@
                 </div>
 
                 <div class="button-row">
-                    <button id="btn-cut" class="btn btn-warning btn-large">Parçayı Kes ve Ayır</button>
+                    <button id="btn-cut" class="btn btn-warning btn-large">Kesme Alanını Onayla</button>
                 </div>
             </section>
 
-            <!-- STEP 3: Timeline & Result -->
+            <!-- STEP 3: Audio Settings -->
             <section class="step-card hidden" id="step-3">
-                <h2 tabindex="0">Adım 3: Montaj Sonucu</h2>
+                <h2 tabindex="0">Adım 3: Müzik ve Ses Ayarları</h2>
                 
-                <div id="clip-list" class="clip-list" role="list" aria-label="Kesilmiş Parçalar Listesi">
-                    <!-- Clips will be injected here -->
+                <div class="form-group">
+                    <label for="audio-upload" class="btn btn-primary btn-large" style="margin-bottom:10px;">
+                        Arka Plan Müziği Ekle (MP3) - İsteğe Bağlı
+                    </label>
+                    <input type="file" id="audio-upload" accept="audio/mp3,audio/mpeg,audio/wav" style="display: none;">
+                    <div id="audio-info" class="info-box hidden" tabindex="0">Müzik yüklenmedi.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-volume">Ana Videonun Ses Seviyesi (0 ile 100 arası):</label>
+                    <input type="number" id="video-volume" class="large-input" min="0" max="100" value="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="audio-volume">Arka Plan Müziğinin Ses Seviyesi (0 ile 100 arası):</label>
+                    <input type="number" id="audio-volume" class="large-input" min="0" max="100" value="50">
+                </div>
+
+                <div class="button-row">
+                    <button id="btn-to-render" class="btn btn-warning btn-large">Ayarları Onayla</button>
+                </div>
+            </section>
+
+            <!-- STEP 4: Render & Export -->
+            <section class="step-card hidden" id="step-4">
+                <h2 tabindex="0">Adım 4: Birleştir ve İndir</h2>
+                
+                <div class="info-box" id="render-info" tabindex="0">
+                    Ayarlar tamamlandı. Dışa aktarmaya hazırsınız.
                 </div>
 
                 <div class="button-row" style="margin-top: 20px;">
-                    <button id="btn-preview-all" class="btn btn-success btn-large">Tüm Parçaları Oynat</button>
+                    <button id="btn-render-download" class="btn btn-success btn-large">Videoyu Birleştir ve İndir (MP4)</button>
                 </div>
+                
+                <!-- This will hold the download link dynamically -->
+                <div id="download-area" style="margin-top:20px; text-align:center;"></div>
             </section>
 
         </main>
 
-        <!-- Hidden Video Player (Used for actual playback and duration calculation) -->
+        <!-- Hidden Video Player (Used for duration calculation) -->
         <div class="visually-hidden">
-            <video id="hidden-player" controls aria-label="Gizli Video Oynatıcı"></video>
+            <video id="hidden-player" aria-label="Gizli Video Oynatıcı"></video>
         </div>
 
     </div>

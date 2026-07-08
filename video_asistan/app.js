@@ -1,11 +1,18 @@
-// Erişilebilir Video Asistanı Core Logic
+// Erişilebilir Video Asistanı V3 (FFmpeg Core)
+
+const { FFmpeg } = window.FFmpeg;
+const { fetchFile } = window.FFmpegUtil;
+
+let ffmpeg = null;
 
 const state = {
-    currentStep: 1,
     videoFile: null,
-    videoUrl: null,
+    audioFile: null,
     videoDuration: 0,
-    clips: [] // { id, start, end }
+    cutStart: 0,
+    cutEnd: 0,
+    videoVolume: 100,
+    audioVolume: 50
 };
 
 const DOM = {
@@ -13,20 +20,34 @@ const DOM = {
     step1: document.getElementById('step-1'),
     step2: document.getElementById('step-2'),
     step3: document.getElementById('step-3'),
-    uploadInput: document.getElementById('video-upload'),
+    step4: document.getElementById('step-4'),
+    
+    videoUpload: document.getElementById('video-upload'),
+    audioUpload: document.getElementById('audio-upload'),
+    
     hiddenPlayer: document.getElementById('hidden-player'),
     videoInfo: document.getElementById('video-info'),
+    audioInfo: document.getElementById('audio-info'),
+    renderInfo: document.getElementById('render-info'),
+    
     cutStart: document.getElementById('cut-start'),
     cutEnd: document.getElementById('cut-end'),
     btnCut: document.getElementById('btn-cut'),
-    clipList: document.getElementById('clip-list'),
-    btnPreviewAll: document.getElementById('btn-preview-all')
+    
+    videoVolume: document.getElementById('video-volume'),
+    audioVolume: document.getElementById('audio-volume'),
+    btnToRender: document.getElementById('btn-to-render'),
+    
+    btnRenderDownload: document.getElementById('btn-render-download'),
+    downloadArea: document.getElementById('download-area'),
+    
+    progressContainer: document.getElementById('progress-container'),
+    progressBarFill: document.getElementById('progress-bar-fill')
 };
 
 // Sesli Okuma / Asistan Mesaj Güncelleme
 function speak(message) {
     DOM.assistantMsg.textContent = message;
-    // Ekran okuyucuların politle özelliğini tetiklemek için ufak bir gecikmeyle odaklanıyoruz
     setTimeout(() => {
         DOM.assistantMsg.focus();
     }, 100);
@@ -36,24 +57,48 @@ function showStep(stepNumber) {
     DOM.step1.classList.add('hidden');
     DOM.step2.classList.add('hidden');
     DOM.step3.classList.add('hidden');
+    DOM.step4.classList.add('hidden');
 
-    if (stepNumber === 1) {
-        DOM.step1.classList.remove('hidden');
-    } else if (stepNumber === 2) {
-        DOM.step2.classList.remove('hidden');
-        DOM.cutStart.focus();
-    } else if (stepNumber === 3) {
-        DOM.step3.classList.remove('hidden');
-        DOM.btnPreviewAll.focus();
+    if (stepNumber === 1) DOM.step1.classList.remove('hidden');
+    if (stepNumber === 2) { DOM.step2.classList.remove('hidden'); DOM.cutStart.focus(); }
+    if (stepNumber === 3) { DOM.step3.classList.remove('hidden'); DOM.audioUpload.focus(); }
+    if (stepNumber === 4) { DOM.step4.classList.remove('hidden'); DOM.btnRenderDownload.focus(); }
+}
+
+// FFmpeg Başlatma
+async function loadFFmpeg() {
+    if (ffmpeg === null) {
+        speak("Sistem hazırlanıyor, lütfen birkaç saniye bekleyin...");
+        ffmpeg = new FFmpeg();
+        
+        ffmpeg.on('progress', ({ progress, time }) => {
+            const percent = Math.round(progress * 100);
+            DOM.progressBarFill.style.width = `${percent}%`;
+            // Sadece %25, %50, %75, %100 de konuşsun ki çok gürültü yapmasın
+            if (percent === 25 || percent === 50 || percent === 75 || percent === 99) {
+                speak(`İşlem yüzde ${percent} tamamlandı.`);
+            }
+        });
+
+        await ffmpeg.load({
+            coreURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
+            wasmURL: 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.wasm'
+        });
+        speak("Sistem hazır. Lütfen videonuzu yükleyin.");
     }
 }
 
+// Başlangıçta FFmpeg'i yükle
+window.onload = () => {
+    loadFFmpeg();
+};
+
 // ADIM 1: Video Yükleme
-DOM.uploadInput.addEventListener('change', (e) => {
+DOM.videoUpload.addEventListener('change', (e) => {
     if (e.target.files.length > 0) {
         state.videoFile = e.target.files[0];
-        state.videoUrl = URL.createObjectURL(state.videoFile);
-        DOM.hiddenPlayer.src = state.videoUrl;
+        const url = URL.createObjectURL(state.videoFile);
+        DOM.hiddenPlayer.src = url;
         
         speak("Video yükleniyor, lütfen bekleyin.");
         
@@ -70,136 +115,122 @@ DOM.uploadInput.addEventListener('change', (e) => {
     }
 });
 
-// ADIM 2: Kesme İşlemi
+// ADIM 2: Kesme Onayı
 DOM.btnCut.addEventListener('click', () => {
     const startVal = parseInt(DOM.cutStart.value);
     const endVal = parseInt(DOM.cutEnd.value);
     
-    if (isNaN(startVal) || isNaN(endVal)) {
-        speak("Lütfen geçerli rakamlar girin.");
+    if (isNaN(startVal) || isNaN(endVal) || startVal >= endVal || endVal > state.videoDuration) {
+        speak("Hatalı değer girdiniz. Başlangıç saniyesi bitişten küçük olmalıdır.");
         return;
     }
     
-    if (startVal >= endVal) {
-        speak("Hata! Başlangıç saniyesi, bitiş saniyesinden küçük olmalıdır.");
-        return;
-    }
+    state.cutStart = startVal;
+    state.cutEnd = endVal;
     
-    if (endVal > state.videoDuration) {
-        speak(`Hata! Bitiş saniyesi videonun toplam süresinden (${state.videoDuration}) büyük olamaz.`);
-        return;
-    }
-
-    const newClip = {
-        id: Date.now().toString(),
-        start: startVal,
-        end: endVal,
-        duration: endVal - startVal
-    };
-    
-    state.clips.push(newClip);
-    
-    speak(`Kesme işlemi başarılı. ${startVal} ile ${endVal} saniyeleri arası kesildi. Parça uzunluğu ${newClip.duration} saniye. Adım 3'e geçiliyor.`);
-    renderClips();
+    speak(`Kesme alanı ayarlandı. Adım 3'e geçiliyor. İsterseniz arka plan müziği ekleyebilirsiniz.`);
     showStep(3);
 });
 
-// ADIM 3: Parçaları Gösterme
-function renderClips() {
-    DOM.clipList.innerHTML = '';
+// ADIM 3: Müzik Yükleme ve Ayarlar
+DOM.audioUpload.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        state.audioFile = e.target.files[0];
+        DOM.audioInfo.textContent = `Seçilen Müzik: ${state.audioFile.name}`;
+        DOM.audioInfo.classList.remove('hidden');
+        speak(`Müzik başarıyla yüklendi. Adı: ${state.audioFile.name}. Lütfen ses seviyelerini ayarlayın.`);
+    }
+});
+
+DOM.btnToRender.addEventListener('click', () => {
+    state.videoVolume = parseInt(DOM.videoVolume.value) || 100;
+    state.audioVolume = parseInt(DOM.audioVolume.value) || 50;
     
-    if (state.clips.length === 0) {
-        DOM.clipList.innerHTML = '<p tabindex="0">Henüz kesilmiş parça yok.</p>';
+    speak("Ayarlar kaydedildi. Dışa aktarma adımına geçiliyor.");
+    showStep(4);
+});
+
+// ADIM 4: FFmpeg Render
+DOM.btnRenderDownload.addEventListener('click', async () => {
+    if (!ffmpeg || !ffmpeg.loaded) {
+        speak("Sistem henüz yüklenmedi, lütfen bekleyin.");
         return;
     }
     
-    state.clips.forEach((clip, index) => {
-        const div = document.createElement('div');
-        div.className = 'clip-item';
-        div.innerHTML = `
-            <div class="clip-title" tabindex="0">Parça ${index + 1}</div>
-            <div class="clip-details" tabindex="0">Başlangıç: ${clip.start}. saniye. Bitiş: ${clip.end}. saniye. Uzunluk: ${clip.duration} saniye.</div>
-            <div class="clip-actions">
-                <button class="btn btn-primary" onclick="playClip('${clip.id}')" aria-label="Parça ${index + 1}'i dinle">Dinle</button>
-                <button class="btn btn-danger" onclick="deleteClip('${clip.id}')" aria-label="Parça ${index + 1}'i sil">Sil</button>
-            </div>
-        `;
-        DOM.clipList.appendChild(div);
-    });
+    DOM.btnRenderDownload.disabled = true;
+    DOM.progressContainer.classList.remove('hidden');
+    speak("Birleştirme işlemi başladı. Lütfen bekleyin. Bu işlem videonun boyutuna göre birkaç dakika sürebilir.");
     
-    // Geri dönüp yeni parça kesmek için buton
-    const backBtn = document.createElement('button');
-    backBtn.className = 'btn btn-warning';
-    backBtn.textContent = 'Yeni Parça Kes (Geri Dön)';
-    backBtn.onclick = () => {
-        speak("Adım 2'ye geri dönüldü. Lütfen yeni kesme noktalarını girin.");
-        showStep(2);
-    };
-    DOM.clipList.appendChild(backBtn);
-}
-
-// Global Actions for inline HTML
-window.playClip = function(id) {
-    const clip = state.clips.find(c => c.id === id);
-    if(clip) {
-        speak(`Parça oynatılıyor. ${clip.duration} saniye sürecek.`);
-        DOM.hiddenPlayer.currentTime = clip.start;
-        DOM.hiddenPlayer.play();
+    try {
+        const videoName = 'input.mp4';
+        const audioName = state.audioFile ? 'audio.mp3' : null;
+        const outName = 'output.mp4';
         
-        // Stop playing when clip ends
-        const checkEnd = setInterval(() => {
-            if(DOM.hiddenPlayer.currentTime >= clip.end) {
-                DOM.hiddenPlayer.pause();
-                clearInterval(checkEnd);
-                speak("Parça oynatımı tamamlandı.");
-            }
-        }, 100);
-    }
-};
-
-window.deleteClip = function(id) {
-    state.clips = state.clips.filter(c => c.id !== id);
-    speak("Parça silindi.");
-    renderClips();
-    
-    if(state.clips.length === 0) {
-        speak("Tüm parçalar silindi. Adım 2'ye geri dönülüyor.");
-        showStep(2);
-    }
-};
-
-// Tüm Parçaları Oynat (Sırayla)
-DOM.btnPreviewAll.addEventListener('click', () => {
-    if(state.clips.length === 0) return;
-    
-    speak(`Toplam ${state.clips.length} parça sırayla oynatılıyor.`);
-    
-    let currentClipIndex = 0;
-    
-    function playNextClip() {
-        if (currentClipIndex >= state.clips.length) {
-            speak("Tüm montaj oynatımı bitti.");
-            return;
+        // 1. Write video file
+        await ffmpeg.writeFile(videoName, await fetchFile(state.videoFile));
+        
+        let command = [];
+        
+        // 2. Prepare command
+        if (state.audioFile) {
+            // Write audio file
+            await ffmpeg.writeFile(audioName, await fetchFile(state.audioFile));
+            
+            const vVol = state.videoVolume / 100;
+            const aVol = state.audioVolume / 100;
+            
+            // Complex FFmpeg command for mixing audio and cutting
+            command = [
+                '-ss', state.cutStart.toString(),
+                '-to', state.cutEnd.toString(),
+                '-i', videoName,
+                '-i', audioName,
+                '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
+                '-map', '0:v',
+                '-map', '[a]',
+                '-c:v', 'copy', // copy video stream directly (fast!)
+                '-c:a', 'aac',
+                '-y', outName
+            ];
+        } else {
+            // Sadece kesme ve ses ayarı
+            const vVol = state.videoVolume / 100;
+            
+            command = [
+                '-ss', state.cutStart.toString(),
+                '-to', state.cutEnd.toString(),
+                '-i', videoName,
+                '-filter:a', `volume=${vVol}`,
+                '-c:v', 'copy',
+                '-c:a', 'aac',
+                '-y', outName
+            ];
         }
         
-        const clip = state.clips[currentClipIndex];
-        DOM.hiddenPlayer.currentTime = clip.start;
-        DOM.hiddenPlayer.play();
+        // 3. Execute
+        await ffmpeg.exec(command);
         
-        const checkEnd = setInterval(() => {
-            if(DOM.hiddenPlayer.currentTime >= clip.end) {
-                DOM.hiddenPlayer.pause();
-                clearInterval(checkEnd);
-                currentClipIndex++;
-                playNextClip();
-            }
-        }, 100);
+        // 4. Read result
+        const data = await ffmpeg.readFile(outName);
+        
+        // 5. Create download link
+        const blob = new Blob([data.buffer], { type: 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        
+        DOM.downloadArea.innerHTML = `
+            <a href="${url}" download="Mikyas_Montaj_${Date.now()}.mp4" class="btn btn-primary btn-large" tabindex="0">
+                Oluşturulan Videoyu İndir
+            </a>
+        `;
+        
+        speak("İşlem başarıyla tamamlandı! Oluşturulan videoyu indir butonuna basarak indirebilirsiniz.");
+        DOM.progressContainer.classList.add('hidden');
+        DOM.downloadArea.querySelector('a').focus();
+        
+    } catch (error) {
+        console.error(error);
+        speak("İşlem sırasında bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.");
+        DOM.btnRenderDownload.disabled = false;
+        DOM.progressContainer.classList.add('hidden');
     }
-    
-    playNextClip();
 });
-
-// İlk yüklendiğinde asistan mesajına odaklan (Ekran okuyucu için)
-window.onload = () => {
-    DOM.assistantMsg.focus();
-};
