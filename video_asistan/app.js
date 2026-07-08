@@ -39,6 +39,7 @@ const DOM = {
     btnToRender: document.getElementById('btn-to-render'),
     
     btnRenderDownload: document.getElementById('btn-render-download'),
+    btnRenderMp3: document.getElementById('btn-render-mp3'),
     downloadArea: document.getElementById('download-area'),
     
     progressContainer: document.getElementById('progress-container'),
@@ -247,6 +248,85 @@ DOM.btnRenderDownload.addEventListener('click', async () => {
     } catch (error) {
         console.error(error);
         speak("İşlem sırasında bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.");
+        DOM.btnRenderDownload.disabled = false;
+        DOM.progressContainer.classList.add('hidden');
+    }
+});
+
+// ADIM 4: FFmpeg SADECE SES (MP3) RENDER
+DOM.btnRenderMp3.addEventListener('click', async () => {
+    if (!ffmpeg || !ffmpeg.loaded) {
+        speak("Sistem henüz yüklenmedi, lütfen bekleyin.");
+        return;
+    }
+    
+    DOM.btnRenderMp3.disabled = true;
+    DOM.btnRenderDownload.disabled = true;
+    DOM.progressContainer.classList.remove('hidden');
+    speak("Sadece ses (MP3) çıkarma işlemi başladı. Lütfen bekleyin. Bu işlem videonuzdan görüntüyü silip sadece sesleri birleştirecektir.");
+    
+    try {
+        const videoName = 'input.mp4';
+        const audioName = state.audioFile ? 'audio.mp3' : null;
+        const outName = 'output.mp3'; // Çıktı MP3
+        
+        await ffmpeg.writeFile(videoName, await fetchFile(state.videoFile));
+        
+        let command = [];
+        
+        if (state.audioFile) {
+            await ffmpeg.writeFile(audioName, await fetchFile(state.audioFile));
+            const vVol = state.videoVolume / 100;
+            const aVol = state.audioVolume / 100;
+            
+            // Görüntüyü at (-vn), sadece sesleri miksle ve mp3 olarak kaydet
+            command = [
+                '-ss', state.cutStart.toString(),
+                '-to', state.cutEnd.toString(),
+                '-i', videoName,
+                '-i', audioName,
+                '-filter_complex', `[0:a]volume=${vVol}[a1];[1:a]volume=${aVol}[a2];[a1][a2]amix=inputs=2:duration=first:dropout_transition=2[a]`,
+                '-map', '[a]',
+                '-vn',
+                '-c:a', 'libmp3lame',
+                '-q:a', '2',
+                '-y', outName
+            ];
+        } else {
+            const vVol = state.videoVolume / 100;
+            
+            command = [
+                '-ss', state.cutStart.toString(),
+                '-to', state.cutEnd.toString(),
+                '-i', videoName,
+                '-filter:a', `volume=${vVol}`,
+                '-vn',
+                '-c:a', 'libmp3lame',
+                '-q:a', '2',
+                '-y', outName
+            ];
+        }
+        
+        await ffmpeg.exec(command);
+        const data = await ffmpeg.readFile(outName);
+        
+        const blob = new Blob([data.buffer], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        
+        DOM.downloadArea.innerHTML = `
+            <a href="${url}" download="Mikyas_Ses_${Date.now()}.mp3" class="btn btn-warning btn-large" tabindex="0">
+                Oluşturulan MP3 Dosyasını İndir
+            </a>
+        `;
+        
+        speak("İşlem başarıyla tamamlandı! Oluşturulan MP3 ses dosyasını indir butonuna basarak dinleyebilirsiniz.");
+        DOM.progressContainer.classList.add('hidden');
+        DOM.downloadArea.querySelector('a').focus();
+        
+    } catch (error) {
+        console.error(error);
+        speak("İşlem sırasında bir hata oluştu. Lütfen videonuzun ses formatının desteklendiğinden emin olun.");
+        DOM.btnRenderMp3.disabled = false;
         DOM.btnRenderDownload.disabled = false;
         DOM.progressContainer.classList.add('hidden');
     }
