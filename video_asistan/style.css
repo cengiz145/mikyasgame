@@ -82,6 +82,32 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
+/* Assistant Interaction Box */
+.assistant-interaction-box {
+    background-color: #1a202c;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #4a5568;
+    margin-top: -10px;
+}
+.assistant-input-group {
+    display: flex;
+    gap: 10px;
+}
+.assistant-input-group input {
+    flex: 1;
+    font-size: 16px;
+}
+.assistant-input-group button {
+    width: auto;
+    padding: 0 20px;
+    font-size: 16px;
+}
+#btn-ask-voice {
+    font-size: 24px;
+    padding: 0 15px;
+}
+
 /* Progress Bar */
 #progress-container {
     margin-bottom: 10px;

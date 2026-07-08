@@ -251,3 +251,103 @@ DOM.btnRenderDownload.addEventListener('click', async () => {
         DOM.progressContainer.classList.add('hidden');
     }
 });
+
+// ==========================================
+// V4: İNTERAKTİF AKILLI ASİSTAN (NLP & SES)
+// ==========================================
+const btnAskText = document.getElementById('btn-ask-text');
+const btnAskVoice = document.getElementById('btn-ask-voice');
+const assistantInput = document.getElementById('assistant-input');
+const voiceStatus = document.getElementById('voice-status');
+
+// Basit Intent (Niyet) Okuma Motoru
+function analyzeUserQuestion(question) {
+    const q = question.toLowerCase();
+    
+    // Niyet: Hata - Kesemiyorum, yapamıyorum
+    if (q.includes("kesemiyorum") || q.includes("yapamıyorum") || q.includes("ilerleyemiyorum") || q.includes("hata")) {
+        if (!state.videoFile) {
+            return "Şu an takıldığınızı anlıyorum. Ancak henüz sisteme bir video yüklememişsiniz. Lütfen Adım 1'den bir video seçerek işe başlayın.";
+        }
+        if (state.cutStart >= state.cutEnd) {
+            return "Kesme saniyelerinde hata yapmış olabilirsiniz. Başlangıç saniyeniz, bitiş saniyenizden büyük veya ona eşit olamaz. Lütfen Adım 2'deki saniyeleri düzeltin.";
+        }
+        return "Sistemi kontrol ettim, şu an bir hata görünmüyor. Hangi adımda olduğunuzu kontrol edip işleminize devam edebilirsiniz.";
+    }
+    
+    // Niyet: Müzik - Ses çıkmıyor, müzik ekleyemedim
+    if (q.includes("müzik") || q.includes("ses") || q.includes("şarkı") || q.includes("duyamıyorum")) {
+        if (!state.videoFile) return "Henüz video yüklemediniz.";
+        if (!state.audioFile) {
+            return "Arka plana bir müzik eklemediğinizi görüyorum. Adım 3'ten bir MP3 dosyası seçerek müzik ekleyebilirsiniz.";
+        }
+        if (state.videoVolume === 0 && state.audioVolume === 0) {
+            return "Hem videonun hem de müziğin sesini sıfıra indirmişsiniz. Bu yüzden ses duyamazsınız. Lütfen sürgüleri yukarı kaydırarak sesi açın.";
+        }
+        return "Ses ayarlarınız gayet normal görünüyor. Sorun devam ediyorsa cihazınızın kendi sesini açmayı deneyin.";
+    }
+    
+    // Niyet: İndirme - İndiremiyorum, kaydetmiyor, render
+    if (q.includes("indir") || q.includes("kaydet") || q.includes("render") || q.includes("kaydedemiyorum")) {
+        if (!state.videoFile) return "İndirecek bir video yok. Önce video yüklemelisiniz.";
+        if (DOM.btnRenderDownload.disabled) {
+            return "Şu anda birleştirme (render) işlemi arka planda devam ediyor olabilir. Lütfen işlemin %100 olmasını bekleyin.";
+        }
+        return "İndirme işlemi için Adım 4'e gelip 'Videoyu Birleştir ve İndir' butonuna basmanız yeterlidir. İşlem biraz sürebilir.";
+    }
+    
+    // Varsayılan Yanıt
+    return "Sorunuzu anladım ancak şu anki durumda teknik bir sorun göremiyorum. İşlemleri sırasıyla 1, 2, 3, 4 şeklinde takip ettiğinizden emin olun.";
+}
+
+// Metinle Sorma
+btnAskText.addEventListener('click', () => {
+    const question = assistantInput.value.trim();
+    if (!question) {
+        speak("Lütfen önce metin kutusuna bir soru yazın.");
+        return;
+    }
+    const answer = analyzeUserQuestion(question);
+    speak(answer);
+    assistantInput.value = ''; // Kutuyu temizle
+});
+
+// Mikrofonla (Sesle) Sorma
+btnAskVoice.addEventListener('click', () => {
+    // Tarayıcının Ses Tanıma (Speech API) desteğini kontrol et
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        speak("Üzgünüm, tarayıcınız mikrofonla sesli komut özelliğini desteklemiyor. Lütfen sorunuzu yazarak sorun.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'tr-TR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+        voiceStatus.textContent = "Sizi dinliyorum, lütfen konuşun...";
+        btnAskVoice.style.backgroundColor = "var(--accent-danger)"; // Kırmızıya dön (kayıt)
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        assistantInput.value = transcript;
+        voiceStatus.textContent = `Bunu dediniz: ${transcript}`;
+        
+        // Asistan soruyu analiz etsin
+        const answer = analyzeUserQuestion(transcript);
+        speak(`Sorduğunuz soru: ${transcript}. Cevabım: ${answer}`);
+    };
+
+    recognition.onerror = (event) => {
+        speak("Sizi tam olarak duyamadım veya mikrofon izni vermediniz. Lütfen tekrar deneyin.");
+    };
+
+    recognition.onend = () => {
+        btnAskVoice.style.backgroundColor = "var(--accent-warning)"; // Eski haline dön
+    };
+
+    recognition.start();
+});
