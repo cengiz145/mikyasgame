@@ -24,17 +24,6 @@
             Merhaba. FFmpeg destekli Profesyonel Montaj Asistanına hoş geldiniz. Başlamak için lütfen Adım 1'den bir video seçin.
         </div>
 
-        <!-- Smart Assistant Interaction Box -->
-        <section class="assistant-interaction-box" aria-label="Asistana Soru Sor">
-            <h2 class="sr-only">Asistana Soru Sor</h2>
-            <div class="assistant-input-group">
-                <input type="text" id="assistant-input" class="large-input" placeholder="Bir sorun mu var? Buraya yazın..." aria-label="Asistana sormak istediğiniz soruyu yazın">
-                <button id="btn-ask-text" class="btn btn-primary" aria-label="Soruyu Gönder">Sor</button>
-                <button id="btn-ask-voice" class="btn btn-warning" aria-label="Mikrofona Konuşarak Sor" title="Mikrofona Konuşarak Sor">🎙️</button>
-            </div>
-            <div id="voice-status" class="sr-only" aria-live="polite"></div>
-        </section>
-
         <!-- Progress Bar (Visible during render) -->
         <div id="progress-container" class="hidden" aria-hidden="true">
             <div class="progress-bar-bg">
@@ -131,6 +120,17 @@
             </section>
 
         </main>
+
+        <!-- Smart Assistant Interaction Box (Moved to bottom for accessibility) -->
+        <section class="assistant-interaction-box" aria-label="Asistana Soru Sor" style="margin-top: 20px;">
+            <h2 class="sr-only">Asistana Soru Sor</h2>
+            <div class="assistant-input-group">
+                <input type="text" id="assistant-input" class="large-input" placeholder="Bir sorun mu var? Buraya yazın..." aria-label="Asistana sormak istediğiniz soruyu yazın">
+                <button id="btn-ask-text" class="btn btn-primary" aria-label="Soruyu Gönder">Sor</button>
+                <button id="btn-ask-voice" class="btn btn-warning" aria-label="Mikrofona Konuşarak Sor" title="Mikrofona Konuşarak Sor">🎙️</button>
+            </div>
+            <div id="voice-status" class="sr-only" aria-live="polite"></div>
+        </section>
 
         <!-- Hidden Video Player (Used for duration calculation) -->
         <div class="visually-hidden">
