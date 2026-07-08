@@ -380,9 +380,104 @@ const btnAskVoice = document.getElementById('btn-ask-voice');
 const assistantInput = document.getElementById('assistant-input');
 const voiceStatus = document.getElementById('voice-status');
 
-// Basit Intent (Niyet) Okuma Motoru
+// İleri Düzey NLP Motoru (Niyet Okuma ve Sesli Emirler)
 function analyzeUserQuestion(question) {
     const q = question.toLowerCase();
+    
+    // =====================================
+    // 1. EYLEMLER (SESLİ EMİRLER / ACTIONS)
+    // =====================================
+
+    // A. Çift aralıklı kesim (Örn: "10 ile 25 arası kes", "10'dan 25'e")
+    let match = q.match(/(\d+)\s*(?:ile|'dan|dan|den|'den|ve)\s*(\d+)/);
+    if (match) {
+        DOM.cutStart.value = match[1];
+        DOM.cutEnd.value = match[2];
+        return `Emriniz anlaşıldı. Başlangıç saniyesi ${match[1]}, bitiş saniyesi ${match[2]} olarak ayarlandı.`;
+    }
+
+    // B. Sadece Başlangıç veya Bitiş ayarlama
+    if (q.includes("başlangıc") || q.includes("başla") || q.includes("ilk")) {
+        match = q.match(/(\d+)/);
+        if (match) {
+            DOM.cutStart.value = match[1];
+            return `Emriniz anlaşıldı. Başlangıç saniyesi ${match[1]} olarak ayarlandı.`;
+        }
+    }
+    if (q.includes("bitiş") || q.includes("son") || q.includes("bitir")) {
+        match = q.match(/(\d+)/);
+        if (match) {
+            DOM.cutEnd.value = match[1];
+            return `Emriniz anlaşıldı. Bitiş saniyesi ${match[1]} olarak ayarlandı.`;
+        }
+    }
+
+    // C. Ses Seviyesi Ayarlama
+    if (q.includes("video") && q.includes("ses")) {
+        match = q.match(/(\d+)/);
+        if (match) {
+            let val = parseInt(match[1]);
+            if (val > 100) val = 100;
+            DOM.videoVolume.value = val;
+            document.getElementById('video-volume-text').textContent = `%${val}`;
+            return `Emriniz anlaşıldı. Videonun sesi yüzde ${val} olarak ayarlandı.`;
+        }
+    }
+    if (q.includes("müzik") || q.includes("şarkı") || q.includes("arka plan")) {
+        match = q.match(/(\d+)/);
+        if (match) {
+            let val = parseInt(match[1]);
+            if (val > 100) val = 100;
+            DOM.audioVolume.value = val;
+            document.getElementById('audio-volume-text').textContent = `%${val}`;
+            return `Emriniz anlaşıldı. Müziğin sesi yüzde ${val} olarak ayarlandı.`;
+        }
+    }
+    if (q.includes("sesi") && !q.includes("video") && !q.includes("müzik")) {
+        // Genel ses komutu (Örn: "Sesi 50 yap")
+        match = q.match(/(\d+)/);
+        if (match) {
+            let val = parseInt(match[1]);
+            if (val > 100) val = 100;
+            DOM.videoVolume.value = val;
+            document.getElementById('video-volume-text').textContent = `%${val}`;
+            return `Emriniz anlaşıldı. Ana ses yüzde ${val} olarak ayarlandı.`;
+        }
+    }
+
+    // D. Kesme Modları (Ortayı Çıkar vs Normal)
+    if (q.includes("orta") || q.includes("sil") || q.includes("çıkar") || q.includes("kaldır")) {
+        DOM.modeRemove.checked = true;
+        return "Emriniz anlaşıldı. Kesme modu 'İstenmeyen Ortayı Sil' olarak değiştirildi.";
+    }
+    if (q.includes("normal") || q.includes("sakla") || q.includes("tut")) {
+        DOM.modeKeep.checked = true;
+        return "Emriniz anlaşıldı. Kesme modu 'Normal Kesim' olarak değiştirildi.";
+    }
+
+    // E. Hız Ayarları
+    if (q.includes("hız")) {
+        if (q.includes("yavaş") || q.includes("0.5") || q.includes("buçuk")) {
+            DOM.videoSpeed.value = "0.5";
+            return "Emriniz anlaşıldı. Video oynatma hızı yarı yarıya yavaşlatıldı.";
+        }
+        if (q.includes("çok hızlı") || q.includes("iki kat") || q.includes("2")) {
+            DOM.videoSpeed.value = "2.0";
+            return "Emriniz anlaşıldı. Video oynatma hızı iki katına (çok hızlı) çıkarıldı.";
+        }
+        if (q.includes("hızlı") || q.includes("1.5")) {
+            DOM.videoSpeed.value = "1.5";
+            return "Emriniz anlaşıldı. Video oynatma hızı 1.5x (hızlı) olarak ayarlandı.";
+        }
+        if (q.includes("normal") || q.includes("1")) {
+            DOM.videoSpeed.value = "1.0";
+            return "Emriniz anlaşıldı. Video oynatma hızı normale döndürüldü.";
+        }
+    }
+
+    // =====================================
+    // 2. YARDIM / SORU-CEVAP (SORU SORMACA)
+    // =====================================
     
     // Niyet: Hata - Kesemiyorum, yapamıyorum
     if (q.includes("kesemiyorum") || q.includes("yapamıyorum") || q.includes("ilerleyemiyorum") || q.includes("hata")) {
