@@ -1955,6 +1955,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 let el = document.getElementById(id);
                 if (el) el.style.display = packsUnlocked ? 'block' : 'none';
             });
+            let hasDiscount = localStorage.getItem('hafizaGuvenInstrumentDiscount') === 'true';
+            let priceBaglama = hasDiscount ? 375 : 500;
+            let priceKaval = hasDiscount ? 75 : 100;
+            let priceFlut = hasDiscount ? 150 : 200;
+            let priceKanun = hasDiscount ? 225 : 300;
             
             if (buyBaglamaPackBtn) {
                 let ownsBaglama = localStorage.getItem('hafizaGuvenBaglamaPack') === 'true';
@@ -1963,8 +1968,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     buyBaglamaPackBtn.innerText = isActive ? "Bağlama Ses Paketini Kapat" : "Bağlama Ses Paketini Etkinleştir";
                     buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 } else {
-                    buyBaglamaPackBtn.innerText = "Bağlama Ses Paketi Satın Al (500 Jeton)";
-                    buyBaglamaPackBtn.setAttribute('aria-label', "Bağlama Ses Paketi. Notaları piyano yerine bağlama ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 500 Jeton.");
+                    buyBaglamaPackBtn.innerText = `Bağlama Ses Paketi Satın Al (${priceBaglama} Jeton)` + (hasDiscount ? " - %25 İNDİRİMLİ" : "");
+                    buyBaglamaPackBtn.setAttribute('aria-label', `Bağlama Ses Paketi. Notaları piyano yerine bağlama ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: ${priceBaglama} Jeton.`);
                 }
             }
 
@@ -1975,8 +1980,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     buyKavalPackBtn.innerText = isActive ? "Kaval Ses Paketini Kapat" : "Kaval Ses Paketini Etkinleştir";
                     buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 } else {
-                    buyKavalPackBtn.innerText = "Kaval Ses Paketi Satın Al (100 Jeton)";
-                    buyKavalPackBtn.setAttribute('aria-label', "Kaval Ses Paketi. Notaları piyano yerine kaval ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 100 Jeton.");
+                    buyKavalPackBtn.innerText = `Kaval Ses Paketi Satın Al (${priceKaval} Jeton)` + (hasDiscount ? " - %25 İNDİRİMLİ" : "");
+                    buyKavalPackBtn.setAttribute('aria-label', `Kaval Ses Paketi. Notaları piyano yerine kaval ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: ${priceKaval} Jeton.`);
                 }
             }
 
@@ -1987,8 +1992,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     buyFlutPackBtn.innerText = isActive ? "Flüt Ses Paketini Kapat" : "Flüt Ses Paketini Etkinleştir";
                     buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 } else {
-                    buyFlutPackBtn.innerText = "Flüt Ses Paketi Satın Al (200 Jeton)";
-                    buyFlutPackBtn.setAttribute('aria-label', "Flüt Ses Paketi. Notaları piyano yerine flüt ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 200 Jeton.");
+                    buyFlutPackBtn.innerText = `Flüt Ses Paketi Satın Al (${priceFlut} Jeton)` + (hasDiscount ? " - %25 İNDİRİMLİ" : "");
+                    buyFlutPackBtn.setAttribute('aria-label', `Flüt Ses Paketi. Notaları piyano yerine flüt ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: ${priceFlut} Jeton.`);
                 }
             }
 
@@ -1999,8 +2004,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     buyKanunPackBtn.innerText = isActive ? "Kanun Ses Paketini Kapat" : "Kanun Ses Paketini Etkinleştir";
                     buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. " + (isActive ? "Kapatmak" : "Etkinleştirmek") + " için tıklayın.");
                 } else {
-                    buyKanunPackBtn.innerText = "Kanun Ses Paketi Satın Al (300 Jeton)";
-                    buyKanunPackBtn.setAttribute('aria-label', "Kanun Ses Paketi. Notaları piyano yerine kanun ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: 300 Jeton.");
+                    buyKanunPackBtn.innerText = `Kanun Ses Paketi Satın Al (${priceKanun} Jeton)` + (hasDiscount ? " - %25 İNDİRİMLİ" : "");
+                    buyKanunPackBtn.setAttribute('aria-label', `Kanun Ses Paketi. Notaları piyano yerine kanun ile duyarsınız. Kalıcı olarak sahip olursunuz. Fiyat: ${priceKanun} Jeton.`);
                 }
             }
             
@@ -2149,14 +2154,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 500) {
+                let hasDiscount = localStorage.getItem('hafizaGuvenInstrumentDiscount') === 'true';
+                let price = hasDiscount ? 375 : 500;
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < price) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = `Yetersiz bakiye. Bu eşya için 500 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${500 - totalTokens} jetona daha ihtiyacınız var.`;
+                    let msg = `Yetersiz bakiye. Bu eşya için ${price} jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${price - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
                 
-                totalTokens -= 500;
+                totalTokens -= price;
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
                 localStorage.setItem('hafizaGuvenBaglamaPack', 'true');
                 localStorage.setItem('hafizaGuvenInstrument', 'baglama');
@@ -2228,14 +2235,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 100) {
+                let hasDiscount = localStorage.getItem('hafizaGuvenInstrumentDiscount') === 'true';
+                let price = hasDiscount ? 75 : 100;
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < price) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = `Yetersiz bakiye. Bu eşya için 100 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${100 - totalTokens} jetona daha ihtiyacınız var.`;
+                    let msg = `Yetersiz bakiye. Bu eşya için ${price} jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${price - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
                 
-                totalTokens -= 100;
+                totalTokens -= price;
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
                 localStorage.setItem('hafizaGuvenKavalPack', 'true');
                 localStorage.setItem('hafizaGuvenInstrument', 'kaval');
@@ -2307,14 +2316,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 200) {
+                let hasDiscount = localStorage.getItem('hafizaGuvenInstrumentDiscount') === 'true';
+                let price = hasDiscount ? 150 : 200;
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < price) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = `Yetersiz bakiye. Bu eşya için 200 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${200 - totalTokens} jetona daha ihtiyacınız var.`;
+                    let msg = `Yetersiz bakiye. Bu eşya için ${price} jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${price - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
                 
-                totalTokens -= 200;
+                totalTokens -= price;
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
                 localStorage.setItem('hafizaGuvenFlutPack', 'true');
                 localStorage.setItem('hafizaGuvenInstrument', 'flut');
@@ -2386,14 +2397,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
-                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < 300) {
+                let hasDiscount = localStorage.getItem('hafizaGuvenInstrumentDiscount') === 'true';
+                let price = hasDiscount ? 225 : 300;
+                let myName = localStorage.getItem('hafizaGuvenUserNickname') || 'Bilinmeyen'; let isDev = ['ekrem', 'ümit ekrem'].includes(myName.toLowerCase()); if (!isDev && totalTokens < price) {
                     if (window.wrongSound) window.wrongSound.play();
-                    let msg = `Yetersiz bakiye. Bu eşya için 300 jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${300 - totalTokens} jetona daha ihtiyacınız var.`;
+                    let msg = `Yetersiz bakiye. Bu eşya için ${price} jetona ihtiyacınız var. Mevcut jetonunuz: ${totalTokens}. Almak için ${price - totalTokens} jetona daha ihtiyacınız var.`;
                     if (window.announceToScreenReader) window.announceToScreenReader(msg);
                     return;
                 }
                 
-                totalTokens -= 300;
+                totalTokens -= price;
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
                 localStorage.setItem('hafizaGuvenKanunPack', 'true');
                 localStorage.setItem('hafizaGuvenInstrument', 'kanun');
@@ -4439,7 +4452,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('hafizaGuvenPlaytimeRewardGiven', 'true');
                 
                 // Odulleri Ver (Rastgele 1 adet)
-                let rand = Math.floor(Math.random() * 3);
+                let baglamaOwned = localStorage.getItem('hafizaGuvenBaglamaPack') === 'true';
+                let kavalOwned = localStorage.getItem('hafizaGuvenKavalPack') === 'true';
+                let flutOwned = localStorage.getItem('hafizaGuvenFlutPack') === 'true';
+                let kanunOwned = localStorage.getItem('hafizaGuvenKanunPack') === 'true';
+                let allInstrumentsOwned = baglamaOwned && kavalOwned && flutOwned && kanunOwned;
+                let hasDiscount = localStorage.getItem('hafizaGuvenInstrumentDiscount') === 'true';
+                
+                let possibleRewards = [0, 1, 2];
+                if (!allInstrumentsOwned && !hasDiscount) {
+                    possibleRewards.push(3); // 3 = %25 İndirim
+                }
+                
+                let randIndex = Math.floor(Math.random() * possibleRewards.length);
+                let rand = possibleRewards[randIndex];
                 let rewardName = "";
                 
                 if (rand === 0) {
@@ -4450,10 +4476,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
                     localStorage.setItem('hafizaGuvenHataKorumasi', hk + 1);
                     rewardName = "1 Hata Koruması";
-                } else {
+                } else if (rand === 2) {
                     let sd = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
                     localStorage.setItem('hafizaGuvenSeriDondurma', sd + 1);
                     rewardName = "1 Seri Dondurucu";
+                } else if (rand === 3) {
+                    localStorage.setItem('hafizaGuvenInstrumentDiscount', 'true');
+                    rewardName = "Mağazadaki Tüm Enstrümanlarda Geçerli %25 Kalıcı İndirim";
                 }
                 
                 if (window.achievementSound) window.achievementSound.play();
