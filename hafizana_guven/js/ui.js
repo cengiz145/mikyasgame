@@ -4438,18 +4438,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentPlaytimeSeconds >= REQUIRED_PLAYTIME_SECONDS && !rewardGiven) {
                 localStorage.setItem('hafizaGuvenPlaytimeRewardGiven', 'true');
                 
-                // Oulleri Ver
-                let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
-                let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
-                let sd = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
+                // Odulleri Ver (Rastgele 1 adet)
+                let rand = Math.floor(Math.random() * 3);
+                let rewardName = "";
                 
-                localStorage.setItem('hafizaGuvenZamanKorumasi', zk + 1);
-                localStorage.setItem('hafizaGuvenHataKorumasi', hk + 1);
-                localStorage.setItem('hafizaGuvenSeriDondurma', sd + 1);
+                if (rand === 0) {
+                    let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+                    localStorage.setItem('hafizaGuvenZamanKorumasi', zk + 1);
+                    rewardName = "1 Zaman Koruması";
+                } else if (rand === 1) {
+                    let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+                    localStorage.setItem('hafizaGuvenHataKorumasi', hk + 1);
+                    rewardName = "1 Hata Koruması";
+                } else {
+                    let sd = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
+                    localStorage.setItem('hafizaGuvenSeriDondurma', sd + 1);
+                    rewardName = "1 Seri Dondurucu";
+                }
                 
                 if (window.achievementSound) window.achievementSound.play();
                 
-                let message = "Tebrikler! Oyunda yarım saat geçirdin ve Günlük Sadakat Ödülünü kazandın: 1 Zaman Koruması, 1 Hata Koruması, 1 Seri Dondurucu!";
+                let message = `Tebrikler! Oyunda yarım saat geçirdin ve Günlük Sadakat Ödülünü kazandın: ${rewardName}!`;
                 
                 if (window.announceToScreenReader) {
                     window.announceToScreenReader(message, true);
