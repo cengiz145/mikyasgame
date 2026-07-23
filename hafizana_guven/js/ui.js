@@ -4470,16 +4470,71 @@ document.addEventListener('DOMContentLoaded', () => {
                 let kanunOwned = localStorage.getItem('hafizaGuvenKanunPack') === 'true';
                 let allInstrumentsOwned = baglamaOwned && kavalOwned && flutOwned && kanunOwned;
                 
-                let currentDiscount = localStorage.getItem('hafizaGuvenInstrumentDiscount');
-                let hasDiscount = currentDiscount && currentDiscount !== 'false';
+                let currentDiscount = localStorage.getItem('hafizaGuvenInstrumentDiscount') === 'true';
                 
-                let possibleRewards = [0, 1, 2];
-                if (!allInstrumentsOwned && !hasDiscount) {
-                    possibleRewards.push(3); // 3 = %25 İndirim
+                let zkCount = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+                let hkCount = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+                let sdCount = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
+                let streakCount = parseInt(localStorage.getItem('hafizaGuvenLoginStreak')) || 0;
+                let tokenCount = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+                
+                let weights = [
+                    { id: 0, w: 25 }, // Zaman Koruması
+                    { id: 1, w: 25 }, // Hata Koruması
+                    { id: 2, w: 25 }  // Seri Dondurucu
+                ];
+                if (!allInstrumentsOwned && !currentDiscount) {
+                    weights.push({ id: 3, w: 25 }); // %25 İndirim
                 }
                 
-                let randIndex = Math.floor(Math.random() * possibleRewards.length);
-                let rand = possibleRewards[randIndex];
+                // Desire Sensor (İstek Sensörü) Algoritması
+                // İhtiyaç varsa ağırlığı düşür (şans azalır), ihtiyaç yoksa ağırlığı artır (şans artar)
+                
+                // 1. Seri Dondurucu İhtiyacı
+                if (streakCount >= 3 && sdCount === 0) {
+                    weights.find(x => x.id === 2).w = 5; // Çok düşük şans
+                } else if (sdCount >= 2) {
+                    weights.find(x => x.id === 2).w = 45; // Yüksek şans
+                }
+                
+                // 2. İndirim İhtiyacı
+                let discountObj = weights.find(x => x.id === 3);
+                if (discountObj) {
+                    let ownedCount = [baglamaOwned, kavalOwned, flutOwned, kanunOwned].filter(x => x).length;
+                    if (ownedCount === 0 && tokenCount >= 75) {
+                        discountObj.w = 5; // Çok düşük şans (Cüzdanda para var, enstrüman yok)
+                    } else if (ownedCount >= 2) {
+                        discountObj.w = 40; // İhtiyaç kalmamış, şansı artır
+                    }
+                }
+                
+                // 3. Oyun İçi Yardımcılar İhtiyacı
+                if (zkCount === 0) {
+                    weights.find(x => x.id === 0).w = 10;
+                } else if (zkCount >= 3) {
+                    weights.find(x => x.id === 0).w = 40;
+                }
+                
+                if (hkCount === 0) {
+                    weights.find(x => x.id === 1).w = 10;
+                } else if (hkCount >= 3) {
+                    weights.find(x => x.id === 1).w = 40;
+                }
+                
+                // Ağırlıklı Seçim (Weighted Random)
+                let totalWeight = weights.reduce((sum, item) => sum + item.w, 0);
+                let randVal = Math.random() * totalWeight;
+                let currentSum = 0;
+                let rand = 0;
+                
+                for (let item of weights) {
+                    currentSum += item.w;
+                    if (randVal <= currentSum) {
+                        rand = item.id;
+                        break;
+                    }
+                }
+                
                 let rewardName = "";
                 
                 if (rand === 0) {

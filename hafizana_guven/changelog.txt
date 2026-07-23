@@ -1,5 +1,13 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.59] - 23.07.2026
+
+Oyun İçi Denge (Desire Sensor):
+- Günlük 30 dakika görevinden düşen Sürpriz Ödüllerdeki tamamen rastgele şans sistemi kaldırıldı.
+- Yerine, oyuncunun envanterini (jeton durumu, enstrümanları, kalan hata korumaları vb.) inceleyen akıllı bir ağırlık algoritması (Desire Sensor) eklendi.
+- Sistem artık oyuncunun *en çok* ihtiyaç duyduğu ödülün düşme ihtimalini kasıtlı olarak düşürürken, çok ihtiyacı olmayanların ihtimalini artırıyor. Bu sayede ödül kazanıldığındaki tatmin hissi maksimize edildi.
+
+
 [v0.97.4.58] - 23.07.2026
 
 Yeni Özellikler ve Hediyeler:
