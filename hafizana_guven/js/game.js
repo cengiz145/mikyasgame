@@ -1208,7 +1208,7 @@ window.handlePracticeInput = function(key) {
                 if (!window.isGridWalkingPhase) {
                     window.handleGameInput(note);
                 }
-            } else if (window.isStarted && window.currentActiveMenu === 'story') {
+            } else if ((window.isStarted || window.inStoryMode) && window.currentActiveMenu === 'story') {
                 if (window.isGridWalkingPhase && window.inStoryMode) {
                     if (window.handleStoryWalking) window.handleStoryWalking(note);
                 } else {

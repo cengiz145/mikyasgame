@@ -926,15 +926,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const nonInteractiveLis = root.querySelectorAll ? root.querySelectorAll('li:not([tabindex="0"])') : [];
         nonInteractiveLis.forEach(el => el.setAttribute('role', 'none'));
 
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
         // NVDA'nın makale okur gibi takılmaması için etkileşimli her öğeye buton maskesi tak
         const buttonsToSilence = root.querySelectorAll ? root.querySelectorAll('button, .menu-button, .mobile-piano-key, [role="button"], li[tabindex="0"], div[tabindex="0"]') : [];
         buttonsToSilence.forEach(btn => {
             btn.setAttribute('role', 'button');
-            btn.setAttribute('aria-roledescription', '\xA0'); // Boşluk karakteri, NVDA sessiz okur
+            // aria-roledescription hack'i TalkBack (Android) üzerinde buton tıklamalarını tamamen bozduğu için mobilde iptal edildi.
+            if (!isMobile) {
+                btn.setAttribute('aria-roledescription', '\xA0'); // Boşluk karakteri, NVDA sessiz okur
+            }
         });
 
         const dialogs = root.querySelectorAll ? root.querySelectorAll('[role="dialog"]') : [];
-        dialogs.forEach(el => el.setAttribute('aria-roledescription', '\xA0'));
+        dialogs.forEach(el => {
+            if (!isMobile) el.setAttribute('aria-roledescription', '\xA0');
+        });
     };
 
     applySilentRoles(document);
