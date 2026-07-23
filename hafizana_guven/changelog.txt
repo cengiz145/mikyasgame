@@ -1,9 +1,9 @@
-﻿# Haf�zana G�ven - De�i�iklik G�nl��� (Changelog)
+# Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
 [v0.97.4.57] - 17.06.2026
 
-Genel:
-- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+Hata Düzeltmeleri ve İyileştirmeler:
+- Kayıp Notalar modunda mobil arayüz üzerinden oynarken "Konumu Sorgula" ve yürüme tuşlarının tepki vermemesi sorunu tamamen giderildi.
 
 
 [v0.97.4.56] - 17.06.2026
