@@ -4380,5 +4380,92 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+// 30 Dakikalik Gunluk Gorev Sistemi (Yarim Saat Cevrimici Kalma)
+document.addEventListener('DOMContentLoaded', () => {
+    const REQUIRED_PLAYTIME_SECONDS = 1800; // 30 dakika
+    
+    let todayStr = new Date().toLocaleDateString('tr-TR');
+    let savedDate = localStorage.getItem('hafizaGuvenPlaytimeDate');
+    let currentPlaytimeSeconds = parseInt(localStorage.getItem('hafizaGuvenPlaytimeSeconds')) || 0;
+    
+    if (savedDate !== todayStr) {
+        currentPlaytimeSeconds = 0;
+        localStorage.setItem('hafizaGuvenPlaytimeDate', todayStr);
+        localStorage.setItem('hafizaGuvenPlaytimeRewardGiven', 'false');
+    }
+
+    window.updatePlaytimeStatsDisplay = function() {
+        let statsList = document.querySelector('#stats-menu-container ul');
+        if (statsList) {
+            let playtimeEl = document.getElementById('stat-playtime');
+            let mins = Math.floor(currentPlaytimeSeconds / 60);
+            if (!playtimeEl) {
+                let li = document.createElement('li');
+                li.id = 'stat-playtime';
+                li.tabIndex = 0;
+                li.className = 'stat-item';
+                li.style.padding = '5px';
+                li.style.color = '#fbbf24';
+                li.innerText = `Bugün Oyunda Geçirilen Süre: ${mins} Dakika / 30 Dakika`;
+                li.setAttribute('aria-label', `Bugün Oyunda Geçirilen Süre: ${mins} Dakika bölü 30 Dakika`);
+                
+                let firstLi = statsList.querySelector('li');
+                if (firstLi) {
+                    statsList.insertBefore(li, firstLi);
+                } else {
+                    statsList.appendChild(li);
+                }
+            } else {
+                playtimeEl.innerText = `Bugün Oyunda Geçirilen Süre: ${mins} Dakika / 30 Dakika`;
+                playtimeEl.setAttribute('aria-label', `Bugün Oyunda Geçirilen Süre: ${mins} Dakika bölü 30 Dakika`);
+            }
+        }
+    };
+    
+    setTimeout(window.updatePlaytimeStatsDisplay, 1000);
+
+    setInterval(() => {
+        if (document.visibilityState === 'visible') {
+            currentPlaytimeSeconds += 10;
+            localStorage.setItem('hafizaGuvenPlaytimeSeconds', currentPlaytimeSeconds);
+            
+            if (window.currentActiveMenu === 'stats') {
+                window.updatePlaytimeStatsDisplay();
+            }
+
+            let rewardGiven = localStorage.getItem('hafizaGuvenPlaytimeRewardGiven') === 'true';
+            
+            if (currentPlaytimeSeconds >= REQUIRED_PLAYTIME_SECONDS && !rewardGiven) {
+                localStorage.setItem('hafizaGuvenPlaytimeRewardGiven', 'true');
+                
+                // Oulleri Ver
+                let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+                let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+                let sd = parseInt(localStorage.getItem('hafizaGuvenSeriDondurma')) || 0;
+                
+                localStorage.setItem('hafizaGuvenZamanKorumasi', zk + 1);
+                localStorage.setItem('hafizaGuvenHataKorumasi', hk + 1);
+                localStorage.setItem('hafizaGuvenSeriDondurma', sd + 1);
+                
+                if (window.achievementSound) window.achievementSound.play();
+                
+                let message = "Tebrikler! Oyunda yarım saat geçirdin ve Günlük Sadakat Ödülünü kazandın: 1 Zaman Koruması, 1 Hata Koruması, 1 Seri Dondurucu!";
+                
+                if (window.announceToScreenReader) {
+                    window.announceToScreenReader(message, true);
+                }
+                if (window.showAchievementModal) {
+                    window.showAchievementModal("Günlük Sadakat: 30 Dakika");
+                    setTimeout(() => {
+                        let textElem = document.getElementById('achievement-modal-text');
+                        if (textElem) textElem.innerText = message;
+                    }, 100);
+                }
+            }
+        }
+    }, 10000); 
+});
+
+
 
 
