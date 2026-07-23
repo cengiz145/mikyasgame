@@ -1,0 +1,12 @@
+﻿[v1.0.0.2] - 23.07.2026
+
+Genel:
+- SÃ¼rÃ¼m numaralarÄ± otomatik olarak gÃ¼ncellendi ve JS/CSS Ã¶nbellek (cache) parametreleri yenilendi.
+
+
+# Futbol Menajeri - Değişiklik Günlüğü (Changelog)
+
+[v1.0.0.1] - 23.07.2026
+
+Genel:
+- Otomatik sürüm senkronizasyon sistemi Futbol projesine entegre edildi.

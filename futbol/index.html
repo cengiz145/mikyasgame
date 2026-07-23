@@ -1,0 +1,2147 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futbol Simülasyonu</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- FIREBASE SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="js/firebase.js" charset="utf-8"></script>
+    <script src="js/howler.min.js" charset="utf-8"></script>
+    <script src="js/news_data.js" charset="utf-8"></script>
+    <style>
+        .menu-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .menu-button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            margin-bottom: 15px;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .menu-button:hover {
+            opacity: 0.8;
+        }
+
+        /* MASAÜSTÜ UYGULAMASI (NATIVE APP) HİSSİYATI */
+        body {
+            user-select: none;
+            /* Yazıların mavi renkle seçilmesini engeller */
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-drag: none;
+            /* Resimlerin sürüklenmesini engeller */
+        }
+
+        /* ÖZEL SCROLLBAR (Tarayıcı hissini yok eder) */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(142, 68, 173, 0.6);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(142, 68, 173, 0.9);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            /* İstenmeyen kaydırma çubuklarını gizler */
+            cursor: default;
+            /* Standart ok imleci, metin imlecini engeller */
+        }
+
+        /* H1 ve H2 gibi başlıkların ekran okuyucuda 'başlık seviye 1' demesini engellemek için */
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <script>
+        // Sağ tıklamayı engelle (Tarayıcı menüsünün açılmasını önler)
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // F5, Ctrl+R gibi sayfayı yenileme kısayollarını veya F12 geliştirici araçlarını engellemek (Opsiyonel ama masaüstü hissi verir)
+        document.addEventListener('keydown', function (e) {
+            // Sadece oyun kısayolları çalışsın (Q, W, E, S, D, Yön tuşları vs.)
+            if (e.key === 'F12' || (e.ctrlKey && e.key === 'r') || e.key === 'F5') {
+                // e.preventDefault(); // Kullanıcı F5 ile yenilemek istiyor
+            }
+        });
+
+        // Global Error Handler - Hataları otomatik olarak panoya kopyalar
+        window.addEventListener('error', function (event) {
+            // Tarayıcı eklentilerinden (Adblocker vb.) kaynaklanan dış hata (Script error. 0:0) ise yok say.
+            if (event.message === "Script error." && event.lineno === 0) return;
+
+            let errorMsg = "GLOBAL HATA: " + event.message + "\nDosya: " + event.filename + "\nSatır: " + event.lineno + "\nSütun: " + event.colno;
+            if (event.error && event.error.stack) {
+                errorMsg += "\nStack: " + event.error.stack;
+            }
+            if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(errorMsg).catch(err => console.log("Otomatik kopyalama başarısız", err));
+            }
+            console.error("Otomatik Kopyalanan Hata:", errorMsg);
+            if (typeof speak === 'function') speak("Oyun içinde bir hata oluştu. Hata detayı panoya kopyalandı!");
+        });
+
+        window.addEventListener('unhandledrejection', function (event) {
+            let errorMsg = "UNHANDLED PROMISE REJECTION: " + event.reason;
+            if (event.reason && event.reason.stack) {
+                errorMsg += "\nStack: " + event.reason.stack;
+            }
+            if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(errorMsg).catch(err => console.log("Otomatik kopyalama başarısız", err));
+            }
+            console.error("Otomatik Kopyalanan Promise Hatası:", errorMsg);
+            if (typeof speak === 'function') speak("Oyun içinde bir hata oluştu. Hata detayı panoya kopyalandı!");
+        });
+    </script>
+    <!-- Veri Sıkıştırma (Firebase kotasını rahatlatmak için LZ-String) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+</head>
+
+<body id="game-application" role="application">
+
+
+
+    <!-- ARIA Live Regions for NVDA -->
+    <div id="live-announcer" aria-live="assertive" aria-atomic="true" class="visually-hidden"
+        style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);"></div>
+
+    <!-- ERİŞİLEBİLİRLİK (A11Y) YARDIMCI FONKSİYONLARI -->
+    <script>
+        window.focusElement = function(id) {
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.tabIndex === -1 && !el.hasAttribute('tabindex')) {
+                        el.setAttribute('tabindex', '-1');
+                    }
+                    el.focus();
+                }
+            }, 50);
+        };
+
+        // Otomatik Odak (Focus), Dinamik A11y ve Odak Hapishanesi (Focus Trap) Yönetimi
+        window.activeModal = null;
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new MutationObserver(mutations => {
+                mutations.forEach(m => {
+                    // Modal/Menu Odak ve Görünürlük Yönetimi
+                    if (m.attributeName === 'style') {
+                        const el = m.target;
+                        const isVisible = (el.style.display === 'block' || el.style.display === 'flex');
+                        
+                        if (el.classList.contains('modal')) {
+                            if (isVisible) {
+                                window.activeModal = el;
+                                // Arka planı ekran okuyucudan gizle
+                                document.querySelectorAll('.menu-container').forEach(c => c.setAttribute('aria-hidden', 'true'));
+                                
+                                const heading = el.querySelector('h1, h2, h3');
+                                if (heading) {
+                                    if (heading.tabIndex === -1 && !heading.hasAttribute('tabindex')) {
+                                        heading.setAttribute('tabindex', '-1');
+                                    }
+                                    setTimeout(() => heading.focus(), 100);
+                                }
+                            } else if (window.activeModal === el) {
+                                window.activeModal = null;
+                                // Arka planı tekrar okunabilir yap
+                                document.querySelectorAll('.menu-container').forEach(c => c.removeAttribute('aria-hidden'));
+                            }
+                        } else if (el.classList.contains('menu-container') && isVisible) {
+                            const heading = el.querySelector('h1, h2, h3');
+                            if (heading) {
+                                if (heading.tabIndex === -1 && !heading.hasAttribute('tabindex')) {
+                                    heading.setAttribute('tabindex', '-1');
+                                }
+                                setTimeout(() => heading.focus(), 100);
+                            }
+                        }
+                    }
+                    // Dinamik Butonlara Otomatik Aria-Label Ekleme (A11y Maksimum Seviye)
+                    if (m.type === 'childList') {
+                        m.addedNodes.forEach(node => {
+                            if (node.nodeType === Node.ELEMENT_NODE) {
+                                const buttons = node.tagName === 'BUTTON' ? [node] : Array.from(node.querySelectorAll('button, [role="button"]'));
+                                buttons.forEach(btn => {
+                                    if (!btn.hasAttribute('aria-label') && btn.textContent && btn.textContent.trim().length > 0) {
+                                        let cleanText = btn.textContent.replace(/[\n\r]+/g, ' ').replace(/\s{2,}/g, ' ').trim();
+                                        btn.setAttribute('aria-label', cleanText + ". İşlem yapmak için enter veya boşluk tuşuna basın.");
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+            observer.observe(document.body, {attributes: true, attributeFilter: ['style'], childList: true, subtree: true});
+
+            // Global Klavye Yöneticisi (ESC kapatma ve Focus Trap)
+            document.addEventListener('keydown', function(e) {
+                // EĞER OYUNCU BİR YAZI ALANINDA (INPUT) DEĞİLSE, TÜM İSTENMEYEN TARAYICI HUYLARINI ENGELLE
+                if (!['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                    // Space (Boşluk) tuşunun sayfayı kaydırmasını engelle (Eğer bir butonun üzerinde değilsek)
+                    if (e.key === ' ' && document.activeElement.tagName !== 'BUTTON' && document.activeElement.getAttribute('role') !== 'button') {
+                        e.preventDefault();
+                    }
+                    // Backspace'in sayfayı geri atmasını engelle
+                    if (e.key === 'Backspace') {
+                        e.preventDefault();
+                    }
+                    // A'dan Z'ye kadar olan harflerin tarayıcıda "Hızlı Arama" veya eklenti tetiklemesini engelle
+                    if (e.keyCode >= 65 && e.keyCode <= 90) {
+                        e.preventDefault(); // Tarayıcı davranışını engeller ama e.stopPropagation sildik ki oyun motoru (W, A, S, D) tuşları algılayabilsin.
+                    }
+                }
+
+                // ESC ile modal kapatma
+                if (e.key === 'Escape' && window.activeModal) {
+                    // Modal kapatma butonunu bul veya gizle
+                    const closeBtn = window.activeModal.querySelector(`button[id^="btn-close"], button[id^="btn-cancel"], button[onclick*="display='none'"], button[onclick*='display="none"']`);
+                    if (closeBtn) {
+                        closeBtn.click();
+                    } else {
+                        window.activeModal.style.display = 'none';
+                        window.activeModal = null;
+                        document.querySelectorAll('.menu-container').forEach(c => c.removeAttribute('aria-hidden'));
+                    }
+                    e.preventDefault();
+                    return;
+                }
+                
+                
+                // Enter ile diyalog okuma ve geçme (Kitap/Oyun gibi Enter ile ilerleme)
+                if (e.key === 'Enter' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                    // Eğer kullanıcı Sağ/Sol oklarla zaten bir seçeneğe odaklandıysa, onu seçmesine izin ver
+                    if (document.activeElement && (document.activeElement.tagName === 'BUTTON' || document.activeElement.classList.contains('close') || document.activeElement.tagName === 'LI')) {
+                        return;
+                    }
+
+                    // Ekranda açık olan modalları bul
+                    let visibleModals = Array.from(document.querySelectorAll('.modal, .newspaper-modal, #dynamic-event-modal')).filter(m => m.style.display === 'block' || m.style.display === 'flex');
+                    
+                    if (visibleModals.length > 0) {
+                        let topModal = visibleModals[visibleModals.length - 1];
+                        e.preventDefault();
+
+                        // Story State sıfırlama (İçerik değiştiyse baştan başla)
+                        let currentContent = topModal.innerText || topModal.textContent;
+                        if (!topModal.storyState || topModal.storyState.content !== currentContent) {
+                            topModal.storyState = { textIndex: -1, buttonIndex: -1, content: currentContent };
+                        }
+
+                        // Metinleri topla
+                        let textNodes = Array.from(topModal.querySelectorAll('h1, h2, h3, h4, p, span:not(.close):not([class*="btn"])')).filter(n => {
+                            let style = window.getComputedStyle(n);
+                            return style.display !== 'none' && style.visibility !== 'hidden' && n.textContent.trim().length > 0;
+                        });
+
+                        // 1) Eğer okunacak metin kaldıysa, Enter'a basıldıkça bir sonraki cümleyi oku
+                        if (topModal.storyState.textIndex < textNodes.length - 1) {
+                            topModal.storyState.textIndex++;
+                            let targetNode = textNodes[topModal.storyState.textIndex];
+                            if(typeof speak === 'function') speak(targetNode.innerText || targetNode.textContent);
+                            return;
+                        }
+
+                        // 2) Metin tamamen bittiyse (veya metin yoksa), buton karar aşamasına geç
+                        let buttons = topModal.querySelectorAll('button:not([style*="display: none"]), .close:not([style*="display: none"])');
+                        
+                        if (buttons.length === 1) {
+                            // Sadece "Kapat" veya "Devam Et" varsa anında kapat
+                            buttons[0].click();
+                        } else if (buttons.length > 1) {
+                            // Karar verilmesi gerekiyorsa soruyu (son cümleyi) tekrar oku ve uyarı yap
+                            let lastText = textNodes.length > 0 ? (textNodes[textNodes.length - 1].innerText || textNodes[textNodes.length - 1].textContent) : "";
+                            if(typeof speak === 'function') speak(lastText + " Lütfen sağ veya sol ok tuşlarıyla bir seçim yapın. Yapacağınız seçenek oyunun gidişatını belirleyecek, unutmayın.");
+                        }
+                        return;
+                    }
+                }
+                
+                // Hikaye Modu (Görsel Roman) Yön Tuşu Navigasyonu
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                    let visibleModals = Array.from(document.querySelectorAll('.modal, .newspaper-modal, #dynamic-event-modal')).filter(m => m.style.display === 'block' || m.style.display === 'flex');
+                    if (visibleModals.length > 0) {
+                        let topModal = visibleModals[visibleModals.length - 1];
+                        e.preventDefault(); // Sayfayı kaydırmayı kesinlikle engelle!
+
+                        // Modala özel metin ve buton dizinlerini başlat (İçerik değişirse sıfırla)
+                        let currentContent = topModal.innerText || topModal.textContent;
+                        if (!topModal.storyState || topModal.storyState.content !== currentContent) {
+                            topModal.storyState = { textIndex: -1, buttonIndex: -1, content: currentContent };
+                        }
+                        
+                        // Metin okuma (Yukarı / Aşağı)
+                        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                            // Sadece metin içeren elemanları topla (Gizli olmayanları filtrele)
+                            let textNodes = Array.from(topModal.querySelectorAll('h1, h2, h3, h4, p, span:not(.close):not([class*="btn"])')).filter(n => {
+                                let style = window.getComputedStyle(n);
+                                return style.display !== 'none' && style.visibility !== 'hidden' && n.textContent.trim().length > 0;
+                            });
+                            
+                            if (textNodes.length === 0) return;
+
+                            if (e.key === 'ArrowDown') topModal.storyState.textIndex++;
+                            if (e.key === 'ArrowUp') topModal.storyState.textIndex--;
+
+                            // Sınırları koru
+                            if (topModal.storyState.textIndex < 0) topModal.storyState.textIndex = 0;
+                            if (topModal.storyState.textIndex >= textNodes.length) topModal.storyState.textIndex = textNodes.length - 1;
+
+                            let targetNode = textNodes[topModal.storyState.textIndex];
+                            if(typeof speak === 'function') speak(targetNode.innerText || targetNode.textContent);
+                        }
+
+                        // Buton seçme (Sağ / Sol)
+                        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                            let buttons = Array.from(topModal.querySelectorAll('button:not([style*="display: none"]), .close:not([style*="display: none"]), li[tabindex]')).filter(b => {
+                                let style = window.getComputedStyle(b);
+                                return style.display !== 'none' && style.visibility !== 'hidden';
+                            });
+                            
+                            if (buttons.length === 0) return;
+
+                            if (e.key === 'ArrowRight') topModal.storyState.buttonIndex++;
+                            if (e.key === 'ArrowLeft') topModal.storyState.buttonIndex--;
+
+                            // Başa veya sona sarmasını sağla
+                            if (topModal.storyState.buttonIndex < 0) topModal.storyState.buttonIndex = buttons.length - 1;
+                            if (topModal.storyState.buttonIndex >= buttons.length) topModal.storyState.buttonIndex = 0;
+
+                            let targetBtn = buttons[topModal.storyState.buttonIndex];
+                            targetBtn.focus(); // Enter'a basınca çalışması için focus atıyoruz
+                            
+                            let btnText = targetBtn.innerText || targetBtn.textContent || targetBtn.getAttribute('aria-label');
+                            if(targetBtn.classList.contains('close') && (!btnText || btnText.includes('×'))) btnText = "Pencereyi Kapat"; 
+                            if(typeof speak === 'function') speak(btnText);
+                        }
+                        return;
+                    }
+                }
+                
+                // "A" Tuşu Kısayolu: Aktif Olay / Gazete Kontrolü (Görme Engelliler için özel)
+                if ((e.key === 'a' || e.key === 'A') && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                    if (typeof speak === 'function') {
+                        let eventModal = document.getElementById('dynamic-event-modal');
+                        let npModal = document.getElementById('newspaper-modal');
+                        
+                        if (eventModal && eventModal.style.display === 'flex') {
+                            speak("Şu an ekranda bir Beklenmedik Olay açık. Karar vermeniz bekleniyor.");
+                        } else if (npModal && npModal.style.display === 'flex') {
+                            speak("Şu an ekranda Gazete açık.");
+                        } else if (window.eventQueue && window.eventQueue.length > 0) {
+                            speak("Sırada bekleyen " + window.eventQueue.length + " adet kulüp işi var.");
+                        } else if (window.newspaperQueue && window.newspaperQueue.length > 0) {
+                            speak("Okunmamış " + window.newspaperQueue.length + " adet gazete var.");
+                        } else {
+                            speak("Şu an bekleyen veya aktif hiçbir olay yok. Her şey yolunda.");
+                        }
+                    }
+                    e.preventDefault();
+                    return;
+                }
+                
+                // "B" Tuşu Kısayolu: Bütçe Kontrolü (Görme Engelliler için özel)
+                if ((e.key === 'b' || e.key === 'B') && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                    if (typeof speak === 'function' && window.myTeam) {
+                        let currentBudget = window.myTeam.budget || 0;
+                        let formattedBudget = currentBudget.toLocaleString('tr-TR', { maximumFractionDigits: 1 });
+                        speak("Güncel transfer bütçeniz: " + formattedBudget + " Milyon Euro.");
+                    } else if (typeof speak === 'function') {
+                        speak("Bütçenizi öğrenebilmek için bir kariyere başlamış olmanız gerekir.");
+                    }
+                    e.preventDefault();
+                    return;
+                }
+                
+                // "T" Tuşu Kısayolu: Maç Skoru ve Dakikası (Görme Engelliler için özel)
+                if ((e.key === 't' || e.key === 'T') && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                    if (typeof speak === 'function') {
+                        let gameContainer = document.getElementById('game-container');
+                        if (gameContainer && gameContainer.style.display !== 'none') {
+                            let homeName = document.getElementById('home-team-name') ? document.getElementById('home-team-name').innerText : "Ev Sahibi";
+                            let awayName = document.getElementById('away-team-name') ? document.getElementById('away-team-name').innerText : "Deplasman";
+                            let homeScore = document.getElementById('score-home') ? document.getElementById('score-home').innerText : "0";
+                            let awayScore = document.getElementById('score-away') ? document.getElementById('score-away').innerText : "0";
+                            let timeBoard = document.getElementById('time-board') ? document.getElementById('time-board').innerText : "00:00";
+                            
+                            speak("Dakika: " + timeBoard + ". " + homeName + " " + homeScore + " - " + awayScore + " " + awayName + ".");
+                        } else {
+                            speak("Şu anda aktif bir maç oynanmıyor.");
+                        }
+                    }
+                    e.preventDefault();
+                    return;
+                }
+                
+                // Focus Trap (Odak Hapishanesi)
+                if (e.key === 'Tab' && window.activeModal) {
+                    // Modal içindeki odaklanabilir elemanları bul
+                    const focusableElements = window.activeModal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+                    if (focusableElements.length > 0) {
+                        // Sadece görünür ve etkileşimli elemanları filtrele
+                        const visibleFocusable = Array.from(focusableElements).filter(el => el.offsetParent !== null && !el.disabled);
+                        
+                        if (visibleFocusable.length > 0) {
+                            const firstEl = visibleFocusable[0];
+                            const lastEl = visibleFocusable[visibleFocusable.length - 1];
+                            
+                            if (e.shiftKey) { // Shift + Tab
+                                if (document.activeElement === firstEl || document.activeElement === window.activeModal.querySelector('h1, h2, h3')) {
+                                    lastEl.focus();
+                                    e.preventDefault();
+                                }
+                            } else { // Tab
+                                if (document.activeElement === lastEl) {
+                                    firstEl.focus();
+                                    e.preventDefault();
+                                }
+                            }
+                        }
+                    } else {
+                        e.preventDefault(); // Odaklanacak bir şey yoksa hapset
+                    }
+                }
+                
+                // Uygulama Modu (Masaüstü) Yön Tuşları Navigasyonu
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                    // Input ve textarea içindeyken yön tuşlarını engelleme
+                    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
+                        return;
+                    }
+                    
+                    const activeContainer = window.activeModal || Array.from(document.querySelectorAll('.menu-container')).find(c => c.style.display === 'flex' || c.style.display === 'block');
+                    if (activeContainer) {
+                        const focusableElements = Array.from(activeContainer.querySelectorAll('button, [href], [tabindex="0"]')).filter(el => el.offsetParent !== null && !el.disabled);
+                        if (focusableElements.length > 0) {
+                            let currentIndex = focusableElements.indexOf(document.activeElement);
+                            if (currentIndex === -1) {
+                                focusableElements[0].focus();
+                                e.preventDefault();
+                            } else {
+                                if (e.key === 'ArrowDown') {
+                                    let nextIndex = (currentIndex + 1) % focusableElements.length;
+                                    focusableElements[nextIndex].focus();
+                                    e.preventDefault();
+                                } else if (e.key === 'ArrowUp') {
+                                    let prevIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
+                                    focusableElements[prevIndex].focus();
+                                    e.preventDefault();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+
+
+    <!-- OYUNCU SEÇİCİ MODALI -->
+    <div id="player-selector-modal" class="modal" role="dialog" aria-modal="true"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center;">
+        <div
+            style="background: #1a252f; border: 2px solid #f39c12; border-radius: 12px; padding: 30px; width: 90%; max-width: 600px; max-height: 80vh; display: flex; flex-direction: column;">
+            <h2 tabindex="-1" id="player-selector-title" style="color: #f39c12; text-align: center; margin-top: 0;">
+                Oyuncu Seçin</h2>
+            <div id="player-selector-list"
+                style="flex: 1; overflow-y: auto; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; margin: 15px 0; display: flex; flex-direction: column; gap: 10px;">
+                <!-- js/manager.js dolduracak -->
+            </div>
+            <button id="btn-close-selector" class="menu-button"
+                style="background: #c0392b; width: 100%; margin-bottom: 0;">İptal</button>
+        </div>
+    </div>
+
+    <!-- KAPTAN SEÇİCİ MODALI -->
+    <div id="captain-selector-modal" class="modal" role="dialog" aria-modal="true"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; align-items:center; justify-content:center;">
+        <div
+            style="background: #2c3e50; border: 2px solid #3498db; border-radius: 12px; padding: 30px; width: 90%; max-width: 600px; max-height: 80vh; display: flex; flex-direction: column;">
+            <h2 tabindex="-1" style="color: #3498db; text-align: center; margin-top: 0;">Kaptan Seçimi</h2>
+            <div id="captain-selector-list"
+                style="flex: 1; overflow-y: auto; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; margin: 15px 0; display: flex; flex-direction: column; gap: 10px;">
+                <!-- js/menu.js dolduracak -->
+            </div>
+            <button id="btn-close-captain" class="menu-button"
+                style="background: #c0392b; width: 100%; margin-bottom: 0;">İptal</button>
+        </div>
+    </div>
+
+    <!-- ETKİLEŞİM MODALI (Basın/Oyuncu Sohbeti vb) -->
+    <div id="interaction-modal" class="modal" role="dialog" aria-modal="true"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center;">
+        <div
+            style="background: #1a252f; border: 3px solid #9b59b6; border-radius: 15px; padding: 30px; width: 500px; text-align: center;">
+            <h2 tabindex="-1" id="interaction-title" style="color: #9b59b6; margin-top: 0;">Etkileşim</h2>
+            <p id="interaction-desc" style="color: white; font-size: 1.1rem; margin-bottom: 20px;">Bir seçenek
+                belirleyin.</p>
+            <div id="interaction-options" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- js/interactions.js dolduracak -->
+            </div>
+            <button id="btn-close-interaction" class="menu-button"
+                style="background: #c0392b; margin-top: 20px; width: 100%;"
+                onclick="document.getElementById('interaction-modal').style.display='none'">Kapat</button>
+        </div>
+    </div>
+
+    <!-- DİNAMİK OLAY MODALI -->
+    <div id="dynamic-event-modal" class="modal" role="dialog" aria-modal="true"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center;">
+        <div
+            style="background: #2c3e50; border: 3px solid #e74c3c; border-radius: 15px; padding: 30px; width: 500px; text-align: center;">
+            <h2 tabindex="-1" id="dynamic-event-title" style="color: #e74c3c; margin-top: 0;">Beklenmedik Olay!</h2>
+            <p id="dynamic-event-desc" style="color: white; font-size: 1.2rem; margin-bottom: 25px; line-height: 1.5;">
+            </p>
+            <div id="dynamic-event-options" style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- js/menu.js dolduracak -->
+            </div>
+        </div>
+    </div>
+    <!-- HATA BİLDİRİM MODALI -->
+    <div id="error-reporter-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="error-modal-title">
+        <div
+            style="background: #111; border: 3px solid #ff4444; border-radius: 12px; padding: 30px; width: 80%; max-width: 700px;">
+            <h2 tabindex="-1" id="error-modal-title" style="color: #ff4444;">KRİTİK SİSTEM HATASI</h2>
+            <textarea id="error-log-textarea" readonly
+                style="width: 100%; height: 200px; background: #000; color: #0f0;"></textarea>
+            <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 15px;">
+                <button id="btn-reload-error" class="menu-button">Oyunu Yeniden Başlat</button>
+                <button id="btn-send-error" class="menu-button" style="background: #ff4444;">Hatayı Panoya
+                    Kopyala</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOGUE MODAL -->
+    <div id="dialogue-overlay" class="modal" role="dialog" style="align-items: flex-end; padding-bottom: 20px;">
+        <div id="dialogue-box"
+            style="background: rgba(20, 25, 30, 0.95); border: 2px solid #3498db; border-radius: 20px; padding: 0; width: 450px; height: 80vh; max-height: 800px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+
+            <!-- Chat Header -->
+            <div
+                style="background: #2980b9; padding: 15px; text-align: center; border-bottom: 1px solid #1f618d; display: flex; align-items: center; justify-content: center;">
+                <h2 tabindex="-1" id="chat-header-title"
+                    style="color: white; margin: 0; font-size: 1.4rem; font-weight: bold;">Gelen Kutusu</h2>
+            </div>
+
+            <!-- Chat History -->
+            <div id="chat-history"
+                style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: url('https://www.transparenttextures.com/patterns/cubes.png');">
+                <!-- Mesaj baloncuklari dinamik olarak eklenecek -->
+            </div>
+
+            <!-- Chat Input Area -->
+            <div style="background: rgba(0,0,0,0.8); padding: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div id="dialogue-choices" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                <button id="btn-dialogue-next" class="menu-button hidden"
+                    style="margin-top: 0; width: 100%; background: #27ae60; border-radius: 20px; padding: 12px; font-size: 1.1rem;">Mesajı
+                    Oku / Devam Et</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRESIDENT BRIEFING -->
+
+
+    <!-- SPONSOR MODAL -->
+    <div id="sponsor-modal" class="modal">
+        <div
+            style="background: #1a1a2e; padding: 40px; border-radius: 10px; border: 2px solid #2980b9; text-align: center; max-width: 600px;">
+            <h2 tabindex="-1" style="color: #2980b9;">Sponsorluk Teklifleri</h2>
+            <div id="sponsor-options" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- PRESS MODAL -->
+    <div id="press-modal" class="modal">
+        <div
+            style="background: #2c3e50; padding: 40px; border-radius: 10px; border: 2px solid #f1c40f; text-align: center; max-width: 700px; display: flex; flex-direction: column;">
+            <h2 tabindex="-1" id="press-reporter-name" style="color: #f1c40f;">Basın Toplantısı</h2>
+            <p id="press-question-text" tabindex="0"
+                style="color: white; font-size: 1.2rem; font-style: italic; outline: none;"></p>
+            <div id="press-options" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- NEGOTIATION MODAL -->
+    <div id="negotiation-modal" class="modal">
+        <div
+            style="background: #2c3e50; padding: 30px; border-radius: 10px; border: 2px solid #e74c3c; width: 500px; text-align: center;">
+            <h2 tabindex="-1" style="color: #ecf0f1;">Menajerle Pazarlık</h2>
+            <p id="neg-agent-speech" style="color: #f1c40f; font-style: italic;"></p>
+            <p style="color: white;">İstenen: <strong id="neg-agent-demand"></strong></p>
+            <p style="color: #e74c3c;">Sabır: <strong id="neg-agent-patience"></strong></p>
+            <input type="number" id="neg-offer-input" placeholder="Teklifiniz" aria-label="Teklifinizi milyon Euro olarak girin"
+                style="padding: 10px; width: 80%; margin: 10px 0;">
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="btn-neg-submit" class="menu-button" style="background: #2980b9;">Teklif Yap</button>
+                <button id="btn-neg-accept" class="menu-button" style="background: #27ae60;">Kabul Et</button>
+                <button id="btn-neg-withdraw" class="menu-button" style="background: #c0392b;">Masadan Kalk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRANSFER CONFIRM MODAL -->
+    <div id="transfer-confirm-modal" class="modal">
+        <div style="background: #2c3e50; padding: 30px; border-radius: 10px; border: 2px solid #e74c3c;">
+            <p id="transfer-confirm-text" style="color: white; font-size: 1.2rem;"></p>
+            <button id="btn-confirm-transfer" class="menu-button" style="background: #27ae60;">Evet</button>
+            <button id="btn-cancel-transfer" class="menu-button" style="background: #c0392b;">Hayır</button>
+        </div>
+    </div>
+
+    <!-- TRANSFER ACTION MODAL -->
+    <div id="transfer-action-modal" class="modal">
+        <div
+            style="background: #2c3e50; padding: 30px; border-radius: 10px; border: 2px solid #3498db; text-align: center;">
+            <h2 tabindex="-1" style="color: #3498db;">Transfer Aksiyonu</h2>
+            <p id="transfer-action-text" style="color: white;"></p>
+            <div id="transfer-action-buttons"
+                style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;"></div>
+            <button onclick="document.getElementById('transfer-action-modal').style.display='none'" class="menu-button"
+                style="background: #555; margin-top: 10px;">İptal</button>
+        </div>
+    </div>
+
+    <!-- INTRO MENU -->
+    <div id="intro-container" class="menu-container" style="display: flex;">
+        <h1 tabindex="-1" style="color: #f1c40f; font-size: 3rem; margin-bottom: 40px;">FUTBOL MENAJERİ</h1>
+        <button id="btn-new-game" class="menu-button" style="background-color: #27ae60; width: 300px;">Yeni Kariyer</button>
+        <button id="btn-settings" class="menu-button" style="background-color: #8e44ad; width: 300px;">Ayarlar</button>
+        <button id="btn-exit" class="menu-button" style="background-color: #c0392b; width: 300px;" onclick="window.close();">Çıkış</button>
+    </div>
+
+    <!-- LEAGUE SELECT -->
+    <div id="league-select-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">Lig Seçimi</h1>
+        <div id="tr-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-superlig" class="menu-button"
+                style="background-color: #27ae60; width: 300px;">Trendyol Süper Lig</button>
+            <button id="btn-league-tff1" class="menu-button" style="background-color: #8e44ad; width: 300px;">Trendyol
+                1. Lig</button>
+            <button id="btn-league-tff2" class="menu-button" style="background-color: #c0392b; width: 300px;">TFF 2.
+                Lig</button>
+        </div>
+        <div id="es-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-laliga" class="menu-button" style="background-color: #d35400; width: 300px;">🇪🇸 La
+                Liga</button>
+        </div>
+        <div id="it-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-seriea" class="menu-button" style="background-color: #2980b9; width: 300px;">🇮🇹
+                Serie A</button>
+                    </div>
+        <div id="eng-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-premier" class="menu-button"
+                style="background-color: #2980b9; width: 300px;">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</button>
+        </div>
+        <div id="de-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-bundesliga" class="menu-button" style="background-color: #2980b9; width: 300px;">🇩🇪
+                Bundesliga</button>
+        </div>
+        <div id="fr-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-ligue1" class="menu-button" style="background-color: #2980b9; width: 300px;">🇫🇷
+                Ligue 1</button>
+        </div>
+        <div id="nl-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-hollanda" class="menu-button" style="background-color: #2980b9; width: 300px;">🇳🇱
+                Eredivisie</button>
+        </div>
+        <div id="br-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-brazil" class="menu-button" style="background-color: #2980b9; width: 300px;">🇧🇷
+                Brezilya Serie A</button>
+        </div>
+        <div id="saudi-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-saudipro" class="menu-button" style="background-color: #2980b9; width: 300px;">🇸🇦
+                Suudi Pro Lig</button>
+        </div>
+        <div id="pt-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-portekiz" class="menu-button" style="background-color: #2980b9; width: 300px;">🇵🇹
+                Primeira Liga</button>
+        </div>
+        <div id="usa-leagues"
+            style="display: none; flex-direction: column; gap: 15px; margin-top: 30px; align-items: center;">
+            <button id="btn-league-mls" class="menu-button" style="background-color: #e74c3c; width: 300px;">🇺🇸
+                MLS Ligi</button>
+        </div>
+        <button id="btn-back-league" class="menu-button"
+            style="background-color: #555; width: 300px; margin-top: 20px;">Geri</button>
+    </div>
+
+    <!-- CONTINENT SELECT -->
+    <div id="continent-select-container" class="menu-container" style="display: none;">
+        <h1 tabindex="-1" style="color: #f1c40f;">Kıta Seçimi</h1>
+        <button id="btn-continent-europe" class="menu-button" style="background-color: #2980b9; width: 300px;">🌍
+            Avrupa</button>
+        <button id="btn-continent-americas" class="menu-button" style="background-color: #e67e22; width: 300px;">🌎
+            Amerika</button>
+        <button id="btn-continent-asia" class="menu-button" style="background-color: #16a085; width: 300px;">🌏
+            Asya</button>
+        <button id="btn-back-continent" class="menu-button"
+            style="background-color: #555; width: 300px; margin-top: 20px;">Geri</button>
+    </div>
+
+    <!-- COUNTRY SELECT (World Stars etc) -->
+    <div id="country-select-container" class="menu-container" style="display: none;">
+        <h1 tabindex="-1" style="color: #f1c40f;">Ülke Seçimi</h1>
+        <button id="btn-country-tr" class="menu-button continent-europe" style="background-color: #c0392b; width: 300px;">🇹🇷
+            Türkiye</button>
+        <button id="btn-country-eng" class="menu-button continent-europe" style="background-color: #2980b9; width: 300px;">🏴󠁧󠁢󠁥󠁮󠁧󠁿
+            İngiltere</button>
+        <button id="btn-country-it" class="menu-button continent-europe" style="background-color: #27ae60; width: 300px;">🇮🇹
+            İtalya</button>
+
+        <button id="btn-country-es" class="menu-button continent-europe" style="background-color: #e67e22; width: 300px;">🇪🇸
+            İspanya</button>
+        <button id="btn-country-de" class="menu-button continent-europe" style="background-color: #8e44ad; width: 300px;">🇩🇪
+            Almanya</button>
+        <button id="btn-country-fr" class="menu-button continent-europe" style="background-color: #34495e; width: 300px;">🇫🇷
+            Fransa</button>
+        <button id="btn-country-nl" class="menu-button continent-europe" style="background-color: #f39c12; width: 300px;">🇳🇱
+            Hollanda</button>
+        <button id="btn-country-br" class="menu-button continent-americas" style="background-color: #27ae60; width: 300px;">🇧🇷
+            Brezilya</button>
+        <button id="btn-country-pt" class="menu-button continent-europe" style="background-color: #c0392b; width: 300px;">🇵🇹
+            Portekiz</button>
+        <button id="btn-country-usa" class="menu-button continent-americas" style="background-color: #2980b9; width: 300px;">🇺🇸
+            Amerika Birleşik Devletleri</button>
+        <button id="btn-country-saudi" class="menu-button continent-asia" style="background-color: #27ae60; width: 300px;">🇸🇦
+            Suudi Arabistan</button>
+        <button id="btn-back-country" class="menu-button"
+            style="background-color: #555; width: 300px; margin-top: 20px;">Geri</button>
+    </div>
+
+    <!-- TEAM SELECT -->
+    <div id="team-select-container" class="menu-container" style="display: none;">
+        <h1 id="team-select-title" tabindex="-1" style="outline: none; color:#f1c40f;">Takımınızı Seçin</h1>
+        <div id="team-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; width: 80%; max-height: 60vh; overflow-y: auto; margin-top: 20px; padding: 10px;">
+            <!-- JS ile doldurulacak -->
+        </div>
+        <button id="btn-back-team" class="menu-button" style="margin-top: 30px; background-color: #555;">Geri
+            Dön</button>
+    </div>
+
+    <!-- MANAGER PROFILE SELECT -->
+    <div id="manager-profile-select-container" class="menu-container" style="display: none;">
+        <h1 tabindex="-1" style="color: #f1c40f; margin-bottom: 20px;">Menajer Profilinizi Seçin</h1>
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; width: 80%; max-height: 60vh; overflow-y: auto; padding: 10px;">
+
+            <button class="menu-button btn-profile" data-profile="taktik_deha"
+                style="background-color: #2980b9; display: flex; flex-direction: column; align-items: center; padding: 15px; height: auto;"
+                aria-label="Profil Seçimi: Taktik Deha, Satranç Ustası. Hatasız pas oyunu, ancak yüksek fiziksel yorgunluk.">
+                <span style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;"><span
+                        aria-hidden="true">♟️</span> Taktik Deha (Satranç Ustası)</span>
+                <span style="font-size: 0.9rem; font-weight: normal;">Hatasız pas oyunu, ancak yüksek fiziksel
+                    yorgunluk.</span>
+            </button>
+
+            <button class="menu-button btn-profile" data-profile="motivasyon_ustasi"
+                style="background-color: #27ae60; display: flex; flex-direction: column; align-items: center; padding: 15px; height: auto;"
+                aria-label="Profil Seçimi: Motivasyon Ustası. Yüksek başlangıç sadakati. Geriye düşünce müthiş kenetlenme ve adrenalin.">
+                <span style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;"><span
+                        aria-hidden="true">🔥</span> Motivasyon Ustası</span>
+                <span style="font-size: 0.9rem; font-weight: normal;">Yüksek başlangıç sadakati. Geriye düşünce müthiş
+                    kenetlenme ve adrenalin.</span>
+            </button>
+
+            <button class="menu-button btn-profile" data-profile="pragmatist"
+                style="background-color: #34495e; display: flex; flex-direction: column; align-items: center; padding: 15px; height: auto;"
+                aria-label="Profil Seçimi: Pragmatist, Sonuç Odaklı. Savunma gücüne kalıcı katkı, ancak agresif ve kart görmeye müsait sert futbol.">
+                <span style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;"><span
+                        aria-hidden="true">🛡️</span> Pragmatist (Sonuç Odaklı)</span>
+                <span style="font-size: 0.9rem; font-weight: normal;">Savunma gücüne kalıcı katkı, ancak agresif ve kart
+                    görmeye müsait sert futbol.</span>
+            </button>
+
+            <button class="menu-button btn-profile" data-profile="proje_hocasi"
+                style="background-color: #8e44ad; display: flex; flex-direction: column; align-items: center; padding: 15px; height: auto;"
+                aria-label="Profil Seçimi: Proje Hocası, Öğretmen. Genç oyuncuların muazzam gelişimi ve ekstra Başkan Güveni.">
+                <span style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;"><span
+                        aria-hidden="true">🎓</span> Proje Hocası (Öğretmen)</span>
+                <span style="font-size: 0.9rem; font-weight: normal;">Genç oyuncuların muazzam gelişimi ve ekstra Başkan
+                    Güveni.</span>
+            </button>
+
+            <button class="menu-button btn-profile" data-profile="itfaiyeci"
+                style="background-color: #c0392b; display: flex; flex-direction: column; align-items: center; padding: 15px; height: auto;"
+                aria-label="Profil Seçimi: İtfaiyeci, Kriz Yöneticisi. Kötü gidişatta morallerin çökmesini engeller, kaos ihtimalini bitirir.">
+                <span style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;"><span
+                        aria-hidden="true">🧯</span> İtfaiyeci (Kriz Yöneticisi)</span>
+                <span style="font-size: 0.9rem; font-weight: normal;">Kötü gidişatta morallerin çökmesini engeller, kaos
+                    ihtimalini bitirir.</span>
+            </button>
+
+            <button class="menu-button btn-profile" data-profile="eski_efsane"
+                style="background-color: #f39c12; display: flex; flex-direction: column; align-items: center; padding: 15px; height: auto; color: black;"
+                aria-label="Profil Seçimi: Eski Efsane, Oyun Kurucu. Sınırsız otorite ile başlarsın. Taraftar protestoları çok zor tetiklenir.">
+                <span style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;"><span
+                        aria-hidden="true">👑</span> Eski Efsane (Oyun Kurucu)</span>
+                <span style="font-size: 0.9rem; font-weight: normal;">Sınırsız otorite ile başlarsın. Taraftar
+                    protestoları çok zor tetiklenir.</span>
+            </button>
+
+        </div>
+    </div>
+
+    <!-- MAIN MENU -->
+    <div id="main-menu-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">Yönetim Paneli</h1>
+        <div id="budget-display" style="color: #2ecc71; font-size: 1.5rem; margin-bottom: 5px; font-weight: bold;">
+            Bütçe: Yükleniyor...</div>
+        <div id="fan-display" style="color: #3498db; font-size: 1.2rem; margin-bottom: 10px; font-weight: bold;">
+            Taraftar Desteği: %50 | Kulüp Kültürü: Belirsiz</div>
+        <div id="calendar-display" style="color: #ecf0f1; font-size: 1.2rem; margin-bottom: 10px;">Tarih: Yükleniyor...
+        </div>
+        <div id="board-trust-display"
+            style="color: #e74c3c; font-size: 1.2rem; margin-bottom: 20px; font-weight: bold;">Başkan (Vizyoner) Güveni:
+            %80 (Güvende)</div>
+
+        <!-- [YENİ] GÜNLÜK HABER BANDI -->
+        <div id="daily-news-ticker" aria-live="polite"
+            style="background: rgba(0,0,0,0.6); border-left: 4px solid #f39c12; padding: 15px; border-radius: 8px; width: 100%; max-width: 800px; margin-bottom: 20px;">
+            <strong style="color: #f39c12; font-size: 1.1rem;">📰 Günün Flaş Haberi:</strong>
+            <span id="daily-news-text"
+                style="color: white; font-size: 1.1rem; margin-left: 10px; font-style: italic;">Haberler
+                yükleniyor...</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; max-width: 800px; padding: 20px;">
+            <button id="btn-next-day" class="menu-button"
+                style="background-color: #e74c3c; grid-column: span 3; font-size: 1.5rem; padding: 20px;">Sonraki Gün /
+                Maça Geç</button>
+
+            <button id="btn-squad-view" class="menu-button" style="background-color: #3498db;">Kadro</button>
+            <button id="btn-formation" class="menu-button" style="background-color: #e67e22;">Taktik Diziliş</button>
+            <button id="btn-training-facility" class="menu-button" style="background-color: #f39c12;">İdman
+                Tesisleri</button>
+
+            <button id="btn-transfer-center" class="menu-button" style="background-color: #9b59b6;">Transfer
+                Merkezi</button>
+            <button id="btn-scout-network" class="menu-button" style="background-color: #16a085;">Gözlemci Ağı</button>
+            <button id="btn-academy" class="menu-button" style="background-color: #2ecc71;">Altyapı (Akademi)</button>
+
+            <button id="btn-facilities" class="menu-button" style="background-color: #2980b9;">Stadyum
+                Tesisleri</button>
+            <button id="btn-staff" class="menu-button" style="background-color: #8e44ad;">Kurmaylar</button>
+            <button id="btn-medical-center" class="menu-button" style="background-color: #d35400;">Sağlık
+                Merkezi</button>
+
+            <button id="btn-standings" class="menu-button" style="background-color: #34495e;">Puan Durumu</button>
+            <button id="btn-world-ranking" class="menu-button" style="background-color: #8e44ad;">Dünya Sıralaması</button>
+            <button id="btn-hall-of-fame" class="menu-button" style="background-color: #d4af37; color: black; font-weight: bold;">🏆 Şeref Kürsüsü</button>
+            <button id="btn-europe" class="menu-button" style="background-color: #f1c40f; color: black; font-weight: bold; border: 2px solid #f39c12;">🌍 Avrupa Ligi</button>
+            <button id="btn-fixture" class="menu-button" style="background-color: #7f8c8d;">Fikstür</button>
+
+            <button id="btn-save-game" class="menu-button" style="background-color: #27ae60; grid-column: span 3;">Oyunu
+                Kaydet</button>
+
+            <div style="display: flex; gap: 15px; grid-column: span 3;">
+                <button id="btn-help" class="menu-button" style="background-color: #34495e; flex: 1;" onclick="window.open('yardim.html', '_blank')">Yardım (Rehber)</button>
+                <button id="btn-resign" class="menu-button" style="background-color: #c0392b; flex: 1;">İstifa Et</button>
+                <button id="btn-back-main" class="menu-button" style="background-color: #555; flex: 1;">Ana Menüye Dön</button>
+            </div>
+        </div>
+    </div>
+    <!-- SQUAD CONTAINER -->
+    <div id="squad-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">Kadro Yönetimi</h1>
+        <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <label style="color: white; font-size: 1.2rem;">Taktik Diziliş:</label>
+                <select id="formation-select" aria-label="Taktik Diziliş Seçimi"
+                    style="padding: 10px; font-size: 1.1rem; background: #34495e; color: white; border: 1px solid #f1c40f; border-radius: 8px;">
+                    <option value="4-4-2">4-4-2</option>
+                    <option value="4-3-3">4-3-3</option>
+                    <option value="3-5-2">3-5-2</option>
+                    <option value="4-2-3-1">4-2-3-1</option>
+                    <option value="5-5-0">5-5-0</option>
+                    <option value="5-4-1">5-4-1</option>
+                    <option value="5-3-2">5-3-2</option>
+                    <option value="5-2-3">5-2-3</option>
+                </select>
+            </div>
+
+            
+            
+            
+
+            
+            
+            
+        </div>
+
+        <div style="display: flex; gap: 30px; width: 100%; max-width: 1000px; justify-content: center;">
+            <div
+                style="flex: 1; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 2px solid #2ecc71;">
+                <h2 tabindex="-1" style="color: #2ecc71; text-align: center;">İlk 11</h2>
+                <ul id="formation-slots"
+                    style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px;"></ul>
+            </div>
+            <div
+                style="flex: 1; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 10px; border: 2px solid #e74c3c;">
+                <h2 tabindex="-1" style="color: #e74c3c; text-align: center;">Yedekler</h2>
+                <ul id="sub-slots"
+                    style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px;"></ul>
+            </div>
+        </div>
+
+        <button id="btn-back-squad" class="menu-button"
+            style="background-color: #555; margin-top: 30px; width: 300px;">Geri Dön</button>
+    </div>
+
+    <!-- TRAINING CONTAINER -->
+    <div id="training-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">İdman Tesisleri</h1>
+        <div id="training-budget-display" style="color: #2ecc71; font-size: 1.2rem; margin-bottom: 15px;"></div>
+        <ul id="training-list"></ul>
+        <button id="btn-back-training" class="menu-button"
+            style="background-color: #555; margin-top: 20px;">Geri</button>
+    </div>
+
+    <!-- SCOUT CONTAINER -->
+    <div id="scout-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">Gözlemci Ağı</h1>
+        <div id="scout-budget-display" style="color: #2ecc71; font-size: 1.2rem; margin-bottom: 15px;"></div>
+        <ul id="scout-list"></ul>
+        <button id="btn-back-scout" class="menu-button" style="background-color: #555; margin-top: 20px;">Geri</button>
+    </div>
+
+    <!-- TRANSFER CONTAINER -->
+    <div id="transfer-center-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">Transfer Merkezi</h1>
+        <select id="transfer-team-select" style="padding: 10px; font-size: 1.1rem; margin-bottom: 15px; width: 300px;">
+            <option value="free">Serbest Oyuncular</option>
+        </select>
+        <button id="advance-market-btn" class="menu-button"
+            style="background-color: #8e44ad; margin-bottom: 15px;">Piyasayı İlerlet</button>
+        <ul id="transfer-list"></ul>
+        <button id="btn-back-transfer" class="menu-button"
+            style="background-color: #555; margin-top: 20px;">Geri</button>
+    </div>
+
+
+    <!-- FACILITIES CONTAINER -->
+    <div id="facilities-container" class="menu-container" role="region" aria-label="Tesis Yönetimi"
+        style="display:none; text-align:center;">
+        <h2 tabindex="-1" style="color:#f1c40f;">Tesis Yönetimi</h2>
+        <div id="facilities-budget-display"
+            style="color: #2ecc71; font-size: 1.2rem; margin-bottom: 15px; font-weight: bold;"></div>
+
+        <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin-top: 20px; max-width: 1300px; margin-left: auto; margin-right: auto;">
+            <div
+                style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 12px; border: 2px solid #2980b9; width: 300px;">
+                <h3 style="color: #3498db;"><i class="fas fa-building"></i> Stadyum</h3>
+                <p style="color: #ecf0f1; font-size: 1.2rem; margin: 15px 0;">Seviye: <strong id="stadium-level-display"
+                        style="color: #f1c40f;">1</strong>/10</p>
+                <button id="btn-upgrade-stadium" class="menu-button"
+                    style="background-color: #2980b9; width: 100%;">Geliştir</button>
+            </div>
+
+            <div
+                style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 12px; border: 2px solid #27ae60; width: 300px;">
+                <h3 style="color: #2ecc71;"><i class="fas fa-dumbbell"></i> İdman Tesisleri</h3>
+                <p style="color: #ecf0f1; font-size: 1.2rem; margin: 15px 0;">Seviye: <strong
+                        id="training-level-display" style="color: #f1c40f;">1</strong>/10</p>
+                <button id="btn-upgrade-training" class="menu-button"
+                    style="background-color: #27ae60; width: 100%;">Geliştir</button>
+            </div>
+
+            <div
+                style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 12px; border: 2px solid #e74c3c; width: 300px;">
+                <h3 style="color: #e74c3c;"><i class="fas fa-clinic-medical"></i> Sağlık Tesisleri</h3>
+                <p style="color: #ecf0f1; font-size: 1.2rem; margin: 15px 0;">Seviye: <strong
+                        id="medical-level-display" style="color: #f1c40f;">1</strong>/10</p>
+                <button id="btn-upgrade-medical" class="menu-button"
+                    style="background-color: #e74c3c; width: 100%;">Geliştir</button>
+            </div>
+
+            <div
+                style="background: rgba(0,0,0,0.6); padding: 25px; border-radius: 12px; border: 2px solid #8e44ad; width: 300px;">
+                <h3 style="color: #9b59b6;"><i class="fas fa-seedling"></i> Saha Zemini</h3>
+                <p style="color: #ecf0f1; font-size: 1.2rem; margin: 15px 0;">Seviye: <strong
+                        id="pitch-level-display" style="color: #f1c40f;">1</strong>/10</p>
+                <button id="btn-upgrade-pitch" class="menu-button"
+                    style="background-color: #8e44ad; width: 100%;">Geliştir</button>
+            </div>
+        </div>
+        <button id="btn-back-facilities" class="menu-button"
+            style="background-color:#555; margin-top: 30px; width: 300px;">Geri</button>
+    </div>
+    <!-- STAFF CONTAINER -->
+
+
+    <!-- STANDINGS CONTAINER -->
+    <div id="standings-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">Puan Durumu</h1>
+        <div id="standings-content"
+            style="width: 100%; max-width: 800px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px;">
+            Puan durumu yükleniyor...
+        </div>
+        <button id="btn-back-standings" class="menu-button"
+            style="background-color: #555; margin-top: 20px;">Geri</button>
+    </div>
+
+    <!-- WORLD RANKING CONTAINER -->
+    <div id="world-ranking-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #8e44ad;">Dünya Sıralaması</h1>
+        <div id="world-ranking-content"
+            style="width: 100%; max-width: 800px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px;">
+            Sıralama yükleniyor...
+        </div>
+        <button id="btn-back-world-ranking" class="menu-button"
+            style="background-color: #555; margin-top: 20px;">Geri</button>
+    </div>
+
+    <!-- HALL OF FAME CONTAINER -->
+    <div id="hall-of-fame-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">🏆 Şeref Kürsüsü ve Kulüp Arşivi</h1>
+        
+        <div style="display:flex; justify-content:space-around; margin-bottom: 20px; width: 100%; max-width: 800px;">
+            <button class="menu-button" onclick="if(window.showHoFTab) window.showHoFTab('players')" style="background:#d4af37; color:black; font-weight:bold; width: 45%;">Kulüp Efsaneleri</button>
+            <button class="menu-button" onclick="if(window.showHoFTab) window.showHoFTab('seasons')" style="background:#3498db; color:white; font-weight:bold; width: 45%;">Geçmiş Sezonlar</button>
+        </div>
+        
+        <div id="hof-content" style="width: 100%; max-width: 800px; max-height: 500px; overflow-y: auto; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; border: 2px solid #555;">
+            <!-- İçerik JS ile doldurulacak -->
+        </div>
+        
+        <button id="btn-back-hof" class="menu-button" style="background-color: #555; margin-top: 20px;">Ana Menüye Dön</button>
+    </div>
+
+    <!-- FIXTURE CONTAINER -->
+    <div id="fixture-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">Fikstür</h1>
+        <div id="fixture-content"
+            style="width: 100%; max-width: 800px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px;">
+            Fikstür yükleniyor...
+        </div>
+        <button id="btn-back-fixture" class="menu-button"
+            style="background-color: #555; margin-top: 20px;">Geri</button>
+    </div>
+
+    <!-- MEDICAL CENTER CONTAINER -->
+    <div id="medical-center-container" class="menu-container">
+        <h1 tabindex="-1" style="color: #f1c40f;">Sağlık Merkezi</h1>
+        <div id="medical-content"
+            style="width: 100%; max-width: 800px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px;">
+            <h3 style="color: #e74c3c;">Sakat Oyuncular</h3>
+            <ul id="injured-players-list" style="list-style:none; padding:0;">Sakat oyuncu bulunmuyor.</ul>
+            <h3 style="color: #3498db; margin-top: 20px;">Psikolog Desteği</h3>
+            <button id="btn-start-psychology-sessions" class="menu-button"
+                style="background-color: #3498db; width: 100%;">Tüm Takım İçin Toplu Terapi Düzenle (-50.000€)</button>
+        </div>
+        <button id="btn-back-medical" class="menu-button"
+            style="background-color: #555; margin-top: 20px;">Geri</button>
+    </div>
+
+    <!-- GAME CONTAINER -->
+
+    <div id="game-container" class="menu-container"
+        style="background-color: #1a252f; display: none; padding: 20px; align-items: center; justify-content: flex-start;">
+        <h1 tabindex="-1"
+            style="color: #f1c40f; text-align: center; margin-bottom: 10px; font-size: 2.5rem; text-shadow: 0 0 10px rgba(241,196,15,0.5);">
+            CANLI MAÇ</h1>
+
+        <div id="score-board"
+            style="display: flex; justify-content: center; align-items: center; gap: 30px; margin-bottom: 15px; font-size: 3.5rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
+            <span id="home-team-name" style="font-size: 2rem; color: #ecf0f1; width: 250px; text-align: right;">Ev
+                Sahibi</span>
+            <div
+                style="background: rgba(0,0,0,0.6); padding: 10px 30px; border-radius: 15px; border: 2px solid #34495e; color: #f1c40f; position: relative;">
+                <span id="score-home">0</span> - <span id="score-away">0</span>
+                <div id="weather-icon" style="position: absolute; top: -15px; right: -15px; background: #2c3e50; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 2px solid #f1c40f;" title="Hava Durumu">
+                    <i class="fas fa-sun"></i>
+                </div>
+            </div>
+            <span id="away-team-name"
+                style="font-size: 2rem; color: #ecf0f1; width: 250px; text-align: left;">Deplasman</span>
+        </div>
+
+        <div id="time-board"
+            style="font-size: 2.5rem; color: #e74c3c; margin-bottom: 20px; font-weight: bold; background: rgba(0,0,0,0.5); padding: 5px 20px; border-radius: 10px; border: 1px solid #c0392b;">
+            00:00
+        </div>
+
+        <div
+            style="display: flex; flex-direction: row; gap: 20px; width: 100%; max-width: 1000px; justify-content: center;">
+            <!-- Maç Sahası (Canvas) -->
+            <div
+                style="border: 3px solid #27ae60; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #2ecc71; position: relative;">
+                <canvas id="game-canvas" width="800" height="500" style="display: block;"></canvas>
+
+                <!-- YEDEK OYUNCU DEĞİŞİKLİĞİ MODALI (Canvas Üzerinde) -->
+                <div id="sub-modal"
+                    style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:100; flex-direction:column; padding:20px; box-sizing:border-box;">
+                    <h3 style="color:#f1c40f; text-align:center; margin-bottom:15px; font-size:1.5rem;">Oyuncu
+                        Değişikliği</h3>
+                    <div style="display:flex; justify-content:space-between; flex:1; gap:15px;">
+                        <div
+                            style="flex:1; background:rgba(255,255,255,0.1); border-radius:8px; padding:10px; overflow-y:auto;">
+                            <h4 style="color:#e74c3c; text-align:center; margin-bottom:10px;">Çıkan Oyuncu (Saha)</h4>
+                            <ul id="sub-pitch-list" style="list-style:none; padding:0; margin:0;"></ul>
+                        </div>
+                        <div
+                            style="flex:1; background:rgba(255,255,255,0.1); border-radius:8px; padding:10px; overflow-y:auto;">
+                            <h4 style="color:#2ecc71; text-align:center; margin-bottom:10px;">Giren Oyuncu (Yedek)</h4>
+                            <ul id="sub-bench-list" style="list-style:none; padding:0; margin:0;"></ul>
+                        </div>
+                    </div>
+                    <div style="text-align:center; margin-top:15px;">
+                        <button id="btn-sub-confirm" class="menu-button"
+                            style="background:#27ae60; margin-right:10px; padding:10px 20px; font-size:1.1rem;">Değişikliği
+                            Onayla</button>
+                        <button id="btn-sub-close" class="menu-button"
+                            style="background:#c0392b; padding:10px 20px; font-size:1.1rem;">İptal</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spiker Metni -->
+            <div style="display: flex; flex-direction: column; gap: 15px; width: 350px;">
+                <div id="announcer-text"
+                    style="flex: 1; background: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px; border: 2px solid #34495e; color: #ecf0f1; font-size: 1.1rem; line-height: 1.5; overflow-y: auto;">
+                    Spiker maçın başlamasını bekliyor...
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: space-between;">
+                    <button id="btn-pause-sub" class="menu-button"
+                        style="background-color: #f39c12; flex: 1; padding: 10px; font-size: 1rem;">Durdur / Oyuncu
+                        Değiştir</button>
+                    <button id="btn-mute" class="menu-button"
+                        style="background-color: #34495e; flex: 1; padding: 10px; font-size: 1rem;">Sesi Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="player-profile-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="pp-name">
+        <div class="modal-content glass-panel player-profile-content"
+            style="max-width: 650px; padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+            <span class="close-btn"
+                style="position: absolute; right: 15px; top: 15px; z-index: 10; color: white; text-shadow: 0 0 5px rgba(0,0,0,0.5);"
+                role="button" tabindex="0" onclick="closePlayerProfile()"
+                onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }">&times;</span>
+
+            <div class="cv-header"
+                style="display: flex; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); padding: 30px 25px; position: relative;">
+                <div class="cv-avatar-container"
+                    style="width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 50px; color: white; border: 3px solid rgba(255,255,255,0.4); position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                    <i id="pp-avatar-icon" class="fas fa-user"></i>
+                </div>
+                <div class="cv-basic-info"
+                    style="margin-left: 20px; color: white; display: flex; flex-direction: column; justify-content: center;">
+                    <h2 tabindex="-1" id="pp-name"
+                        style="margin: 0 0 5px 0; font-size: 1.8rem; text-shadow: 1px 1px 3px rgba(0,0,0,0.5);">Oyuncu
+                        Adı</h2>
+                    <p class="cv-subtitle" style="margin: 0 0 5px 0; opacity: 0.9; font-size: 1.05rem;">
+                        <span id="pp-age">25</span> Yaş |
+                        <strong id="pp-position" style="color: #f1c40f;">Forvet</strong> |
+                        <span id="pp-role" style="color: #3498db; font-style: italic;">Rol</span> |
+                        <span id="pp-team">Galatasaray</span>
+                    </p>
+                    <p style="margin: 0 0 10px 0; font-size: 0.9rem; color: #bdc3c7;">
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i> Doğum Yeri: <span id="pp-birthplace">Bilinmiyor</span>
+                    </p>
+                    <div class="cv-market-value"
+                        style="background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; display: inline-block; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.1); width: fit-content; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);">
+                        Piyasa Değeri: <strong id="pp-market-value"
+                            style="color: #2ecc71; font-size: 1.2rem; margin-left: 5px;">-</strong>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="cv-body" style="padding: 25px; background: rgba(20, 30, 40, 0.98);">
+                <!-- TAB 1: Genel Bakış -->
+                <div id="cv-tab-genel" class="cv-tab-content" style="display: block;">
+                    <div class="profile-stats-grid">
+                        <div class="stat-box"
+                            style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                            <span class="stat-label">Güç</span>
+                            <span class="stat-value" id="pp-power" style="color: #3498db;">80</span>
+                        </div>
+                        <div class="stat-box"
+                            style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                            <span class="stat-label">Hız</span>
+                            <span class="stat-value" id="pp-speed">3.5</span>
+                        </div>
+                        <div class="stat-box"
+                            style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                            <span class="stat-label">Mental</span>
+                            <span class="stat-value" id="pp-mental" style="font-size: 1rem;">Yaratıcı</span>
+                        </div>
+                        <div class="stat-box"
+                            style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                            <span class="stat-label">Rol</span>
+                            <span class="stat-value" id="pp-role" style="font-size: 1rem;">Poacher</span>
+                        </div>
+                        <div class="stat-box"
+                            style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                            <span class="stat-label">Ruh Hali</span>
+                            <span class="stat-value" id="pp-morale" style="font-size: 0.9rem;">-</span>
+                        </div>
+                        <div class="stat-box"
+                            style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-color: #f39c12;">
+                            <span class="stat-label" style="color: #f39c12;">Deneyim</span>
+                            <span class="stat-value" id="pp-experience" style="font-size: 1rem;">-</span>
+                        </div>
+                        <div class="stat-box"
+                            style="background: rgba(241, 196, 15, 0.15); border: 1px solid rgba(241, 196, 15, 0.5);">
+                            <span class="stat-label" style="color:#f1c40f;">Form Puanı</span>
+                            <span class="stat-value" id="pp-rating" style="color:#f1c40f;">-</span>
+                        </div>
+                    </div>
+                    <div class="contract-section"
+                        style="margin-top: 25px; background: rgba(0,0,0,0.4); padding: 15px 20px; border-radius: 8px; border-left: 4px solid #9b59b6;">
+                        <h3 style="margin: 0 0 8px 0; color: #9b59b6; font-size: 1.1rem;"><i
+                                class="fas fa-file-signature"></i> Sözleşme Durumu</h3>
+                        <p style="margin: 0; color: #ecf0f1; font-size: 1rem;">Kalan Süre: <strong
+                                id="pp-contract-years" style="color: white; font-size: 1.1rem;">2 Yıl</strong></p>
+                        <p class="contract-details" id="pp-contract-details"
+                            style="margin: 5px 0 0 0; font-size: 0.9rem; color: #95a5a6;">
+                            Sözleşmesi sezon sonunda bitecek.
+                        </p>
+                    </div>
+                    <div class="profile-actions" id="pp-actions-container"
+                        style="margin-top: 20px; display: flex; gap: 10px;">
+                        <!-- Actions injected here -->
+                    </div>
+                </div>
+
+                <!-- Bölüm: İstatistikler -->
+                <div id="cv-tab-istatistik" class="cv-tab-content" style="display: block; margin-top: 30px;">
+                    <h3
+                        style="color: #3498db; margin: 0 0 15px 0; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <i class="fas fa-trophy"></i> Sezon Performansı (Lig)</h3>
+                    <div
+                        style="display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: center;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 2.5rem; color: white; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"
+                                id="pp-stat-matches">0</div>
+                            <div
+                                style="color: #bdc3c7; font-size: 0.95rem; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">
+                                Maç</div>
+                        </div>
+                        <div
+                            style="flex: 1; border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);">
+                            <div style="font-size: 2.5rem; color: #2ecc71; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"
+                                id="pp-stat-goals">0</div>
+                            <div
+                                style="color: #bdc3c7; font-size: 0.95rem; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">
+                                Gol</div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-size: 2.5rem; color: #f1c40f; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"
+                                id="pp-stat-assists">0</div>
+                            <div
+                                style="color: #bdc3c7; font-size: 0.95rem; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;">
+                                Asist</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bölüm: Kariyer (Wikipedia) -->
+                <div id="cv-tab-kariyer" class="cv-tab-content" style="display: block; margin-top: 30px;">
+                    <div
+                        style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <h3
+                            style="color: #ecf0f1; margin: 0 0 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+                            <i class="fab fa-wikipedia-w" style="color: #bdc3c7;"></i> Özgeçmiş</h3>
+                        <div id="pp-cv-text" style="color: #ecf0f1; line-height: 1.7; font-size: 1rem;">
+                            <span style=" font-style: italic;">Wikipedia bilgileri yükleniyor...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bölüm: Yönetim (Aksiyonlar) -->
+                <div id="cv-tab-yonetim" class="cv-tab-content" style="display: none; margin-top: 30px;">
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <button class="menu-button" style="background: #3498db; width: 100%;" onclick="actionTalkPlayer()">
+                            🗣️ Oyuncuyla Konuş / Motive Et
+                        </button>
+                        <button class="menu-button" id="btn-action-transfer" style="background: #f39c12; width: 100%;" onclick="actionToggleTransferList()">
+                            🛒 Transfer Listesine Durumu
+                        </button>
+                        <button class="menu-button" id="btn-action-reserves" style="background: #7f8c8d; width: 100%;" onclick="actionToggleReserves()">
+                            🚫 Kadro Dışı Bırak (Altyapıya Gönder)
+                        </button>
+                        <button class="menu-button" style="background: #c0392b; width: 100%;" onclick="actionFirePlayer()">
+                            ❌ Sözleşmeyi Feshet (Kov)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Altyapı Tesisleri (Youth Academy) Container -->
+    <div id="academy-container" class="menu-container" role="region" aria-label="Altyapı Tesisleri"
+        style="display:none; text-align:center;">
+        <h2 tabindex="-1" style="color:#f1c40f;">Altyapı Akademisi (Youth Academy)</h2>
+        <p style="color:#ecf0f1; font-size:1.1rem;">Genç yetenekler 15 yaşında tesislere girer, 17 yaşında A Takıma
+            yükselir.</p>
+        <div
+            style="background:rgba(0,0,0,0.5); border-radius:10px; padding:20px; text-align:left; max-width:800px; margin:20px auto;">
+            <ul id="academy-list" style="list-style:none; padding:0; margin:0;">
+                <!-- JS will populate this -->
+            </ul>
+        </div>
+        <button id="btn-back-academy" class="menu-button" style="background-color:#e74c3c;">Ana Menüye Dön</button>
+    </div>
+
+    <!-- Kurmaylar (Teknik Ekip) Container -->
+    <div id="staff-container" class="menu-container" role="region" aria-label="Kurmaylar"
+        style="display:none; text-align:center;">
+        <h2 tabindex="-1" style="color:#f1c40f;">Kurmaylar (Teknik Ekip Yönetimi)</h2>
+        <p style="color:#ecf0f1; font-size:1.1rem;">Kulübünüzün teknik ekibini buradan yönetebilir, yeni personellerle
+            görüşebilirsiniz.</p>
+        <div style="background:rgba(0,0,0,0.5); border-radius:10px; padding:20px; text-align:left; max-width:800px; margin:20px auto;"
+            id="staff-content">
+            <!-- JS will populate this -->
+        </div>
+        <button id="btn-back-staff" class="menu-button" style="background-color:#e74c3c;">Ana Menüye Dön</button>
+    </div>
+
+    <!-- Scriptler -->
+    <script src="js/autoRepair.js?v=1.0.0.2" charset="utf-8"></script>
+    <script src="js/data.js?v=1.0.0.2" charset="utf-8"></script>
+    <script src="js/data_superlig.js" charset="utf-8"></script>
+    <script src="js/data_tff1.js" charset="utf-8"></script>
+    <script src="js/data_tff2.js" charset="utf-8"></script>
+    <script src="js/data_premier.js" charset="utf-8"></script>
+    <script src="js/data_laliga.js" charset="utf-8"></script>
+    <script src="js/data_bundesliga.js" charset="utf-8"></script>
+    <script src="js/data_ligue1.js" charset="utf-8"></script>
+    <script src="js/data_seriea.js" charset="utf-8"></script>
+        <script src="js/data_eredivisie.js" charset="utf-8"></script>
+    <script src="js/data_portekiz.js" charset="utf-8"></script>
+    <script src="js/data_mls.js" charset="utf-8"></script>
+    <script src="js/data_saudi.js" charset="utf-8"></script>
+    <script src="js/data_brazil.js" charset="utf-8"></script>
+    <script src="js/data_world.js" charset="utf-8"></script>
+    <script src="js/data_world_stars.js" charset="utf-8"></script>
+    <script src="js/data_world_ranking.js" charset="utf-8"></script>
+    <script src="js/data_custom.js" onerror="console.log('No custom database found, using default.')" charset="utf-8"></script>
+    <script src="js/fan_engine.js" charset="utf-8"></script>
+    <!-- BÜTÇE SENKRONİZASYON YAMASI -->
+    <script>
+        let _tempBudget = 0;
+        Object.defineProperty(window, 'budget', {
+            configurable: true,
+            get: function() { 
+                let t = window.leagueData && window.leagueData.teams ? window.leagueData.teams.find(x => x.id === (window.myTeamId || (window.league ? window.league.userTeamId : "galatasaray"))) : null;
+                if (t && t.budget !== undefined) return t.budget;
+                return _tempBudget;
+            },
+            set: function(val) {
+                _tempBudget = val;
+                let t = window.leagueData && window.leagueData.teams ? window.leagueData.teams.find(x => x.id === (window.myTeamId || (window.league ? window.league.userTeamId : "galatasaray"))) : null;
+                if (t) t.budget = val;
+            }
+        });
+    </script>
+    <script src="js/save.js?v=1.0.0.2" charset="utf-8"></script>
+    <script src="js/league.js?v=1.0.0.2" charset="utf-8"></script>
+    <script src="js/game.js?v=1.0.0.2" charset="utf-8"></script>
+    <script src="js/a11y_observer.js" charset="utf-8"></script>
+    <script src="js/menu.js?v=1.0.0.2" charset="utf-8"></script>
+    <script src="js/sponsor.js" charset="utf-8"></script>
+    <script src="js/facilities.js" charset="utf-8"></script>
+    <script src="js/audio.js" charset="utf-8"></script>
+    <script src="js/dialogueData.js" charset="utf-8"></script>
+    <script src="js/dialogue.js" charset="utf-8"></script>
+    <script src="js/transfer.js" charset="utf-8"></script>
+    <script src="js/psychologist.js" charset="utf-8"></script>
+    <script src="js/training.js" charset="utf-8"></script>
+    <script src="js/scout.js" charset="utf-8"></script>
+    <script src="js/psychology.js" charset="utf-8"></script>
+    <script src="js/manager.js?v=1.0.0.2" charset="utf-8"></script>
+    <script src="js/squad.js" charset="utf-8"></script>
+    <script src="js/announcer.js" charset="utf-8"></script>
+    <script src="js/interactions.js" charset="utf-8"></script>
+    <script src="js/academy.js" charset="utf-8"></script>
+    <script src="js/staff.js" charset="utf-8"></script>
+    <script src="js/press.js" charset="utf-8"></script>
+    <script src="js/national_team.js" charset="utf-8"></script>
+    <script src="js/commentator.js" charset="utf-8"></script>
+    <script>
+        window.triggerGameOver = function () {
+            // Tüm ekranları gizle
+            const containers = document.querySelectorAll('.menu-container, #press-modal, #game-container, #transfer-confirm-modal');
+            containers.forEach(c => {
+                if (c) c.style.display = 'none';
+            });
+            // Kovulma ekranını aç
+            const gameOverModal = document.getElementById('game-over-modal');
+            if (gameOverModal) gameOverModal.style.display = 'flex';
+        };
+
+        window.triggerGameWon = function (tier = 3) {
+            // Tüm ekranları gizle
+            const containers = document.querySelectorAll('.menu-container, #press-modal, #game-container, #transfer-confirm-modal, #dynamic-event-modal, #resign-modal');
+            containers.forEach(c => {
+                if (c) c.style.display = 'none';
+            });
+
+            const gwBox = document.getElementById('gw-box');
+            const gwTitle = document.getElementById('gw-title');
+            const gwSubtitle = document.getElementById('gw-subtitle');
+            const gwDesc = document.getElementById('gw-desc');
+
+            if (tier === 1) {
+                gwBox.style.background = "linear-gradient(145deg, #7f8c8d, #2c3e50)";
+                gwBox.style.boxShadow = "0 0 50px rgba(127, 140, 141, 0.8)";
+                gwTitle.innerText = "BAŞARILI TRANSFER!";
+                gwSubtitle.innerText = "\"Hedefi Avrupa Olan İddialı Bir Kulübe Geçtiniz!\"";
+                gwDesc.innerHTML = `<p>Taktiksel istikrarınız meyvesini verdi. Göz dolduran futbolunuz ve art arda aldığınız galibiyetler sayesinde Avrupa'nın iddialı orta sıra takımlarından reddedilemez bir teklif aldınız.</p>
+                                    <p>Bu yepyeni maceranızda başarılar dileriz. Kariyer basamaklarını hızla tırmanıyorsunuz!</p>
+                                    <p style="font-weight: bold; font-size: 1.6rem; text-align: center; margin-top: 20px; color: #fff;">BAŞARIYLA OYUNU TAMAMLADINIZ! 🎖️</p>`;
+            } else if (tier === 2) {
+                gwBox.style.background = "linear-gradient(145deg, #bdc3c7, #7f8c8d)";
+                gwBox.style.boxShadow = "0 0 50px rgba(189, 195, 199, 0.8)";
+                gwTitle.innerText = "YILDIZ MENAJER!";
+                gwSubtitle.innerText = "\"Şampiyonluğa Oynayan Bir Avrupa Devine Transfer Oldunuz!\"";
+                gwDesc.innerHTML = `<p>Adınız tüm kıtada yankılanıyor. Muazzam bir takım yönettiniz ve şampiyonluğa oynayan dev kulüpler sizi takımın başına geçirmek için birbiriyle yarıştı.</p>
+                                    <p>Bugün masanıza Borussia Dortmund, Juventus gibi köklü takımların teklifi geldi ve Şampiyonlar Ligi'ne yelken açtınız!</p>
+                                    <p style="font-weight: bold; font-size: 1.6rem; text-align: center; margin-top: 20px; color: #fff;">TEBRİKLER, OYUNU KAZANDINIZ! 🥈</p>`;
+            } else {
+                gwBox.style.background = "linear-gradient(145deg, #f1c40f, #d35400)";
+                gwBox.style.boxShadow = "0 0 50px rgba(241, 196, 15, 0.8)";
+                gwTitle.innerText = "KARİYER ZİRVESİ!";
+                gwSubtitle.innerText = "\"Dünyanın En Büyük Kulübüne Transfer Oldunuz!\"";
+                gwDesc.innerHTML = `<p>Takımınızı adeta yenilmez bir makineye çevirdiniz. Mükemmel galibiyet serileriniz, sarsılmaz otoriteniz ve taraftarla olan harika bağınız Avrupa devlerinin dikkatinden kaçmadı.</p>
+                                    <p>Bugün masanıza Real Madrid, Manchester City gibi devlerin teklifi geldi ve siz efsanevi bir kararla dünyanın zirvesine çıkmayı kabul ettiniz!</p>
+                                    <p style="font-weight: bold; font-size: 1.6rem; text-align: center; margin-top: 20px; color: #fff;">TEBRİKLER, OYUNU KAZANDINIZ! 🏆</p>`;
+            }
+
+            // Şampiyonluk ekranını aç
+            const gameWonModal = document.getElementById('game-won-modal');
+            if (gameWonModal) gameWonModal.style.display = 'flex';
+        };
+
+        window.triggerHalftimeEvent = function () {
+            if (typeof isGameHalted !== 'undefined') isGameHalted = true;
+            document.getElementById('halftime-modal').style.display = 'flex';
+        };
+
+        window.resolveHalftimeEvent = function (choice) {
+            document.getElementById('halftime-modal').style.display = 'none';
+            if (typeof isGameHalted !== 'undefined') isGameHalted = false; // Maç devam etsin
+
+            // Etkileri Uygula
+            if (window.leagueData && window.leagueData.players) {
+                window.leagueData.players.forEach(p => {
+                    if (p.teamId === window.myTeamId) {
+                        if (p.loyalty === undefined) p.loyalty = 50;
+                        if (!p.psy) p.psy = { intrinsicMotivation: false, selfEfficacy: 50 };
+
+                        if (choice === 'authority') {
+                            if (window.managerAuthority !== undefined) window.managerAuthority += 2;
+                            p.loyalty -= 10;
+                            if (!p.psy.intrinsicMotivation) p.psy.selfEfficacy -= 5;
+                        } else if (choice === 'compromise') {
+                            if (window.managerAuthority !== undefined) window.managerAuthority -= 5;
+                            p.loyalty += 5;
+                            if (!p.psy.intrinsicMotivation) p.psy.selfEfficacy += 15;
+                        } else if (choice === 'motivate') {
+                            if (!p.psy.intrinsicMotivation) p.psy.selfEfficacy += 10;
+                        }
+
+                        // Sınırlar
+                        if (p.loyalty > 100) p.loyalty = 100;
+                        if (p.loyalty < 0) p.loyalty = 0;
+                        if (p.psy.selfEfficacy > 100) p.psy.selfEfficacy = 100;
+                        if (p.psy.selfEfficacy < 0) p.psy.selfEfficacy = 0;
+                    }
+                });
+            }
+            if (window.managerAuthority > 100) window.managerAuthority = 100;
+            if (window.managerAuthority < 0) window.managerAuthority = 0;
+            if (typeof updateStatsUI === 'function') updateStatsUI();
+        };
+
+        window.triggerResignation = function () {
+            const containers = document.querySelectorAll('.menu-container, #press-modal, #game-container, #transfer-confirm-modal, #dynamic-event-modal');
+            containers.forEach(c => {
+                if (c) c.style.display = 'none';
+            });
+
+            let presConf = window.presidentConfidence !== undefined ? window.presidentConfidence : 50;
+            let descEl = document.getElementById('resign-desc');
+            let optsEl = document.getElementById('resign-options');
+
+            optsEl.innerHTML = '';
+
+            if (presConf >= 80) {
+                descEl.innerHTML = "Başkan masadaki istifa dilekçenizi okudu, derin bir iç çekti ve şaşkınlıkla size baktı:<br><br><span style='color:#f1c40f;'>'Hocam yapma... Takımı dipten aldın, bizi buralara kadar getirdin. Taraftar sana tapıyor, ben sana çok güveniyorum. Lütfen bizi bırakıp gitme! İstiyorsan biraz dinlen ama istifanı kabul edemem.'</span>";
+                optsEl.innerHTML += `<button class="menu-button" style="background:#c0392b;" onclick="window.confirmResignation()">Kararım Kesin, Bırakıyorum (İstifa Et)</button>`;
+                optsEl.innerHTML += `<button class="menu-button" style="background:#27ae60;" onclick="window.cancelResignation()">Başkanı Kıramadım (Takımda Kal)</button>`;
+            } else if (presConf <= 40) {
+                descEl.innerHTML = "Başkan masadaki istifa dilekçesini görünce sinsi bir şekilde gülümsedi:<br><br><span style='color:#e74c3c;'>'Açıkçası tam zamanında getirdin bu kağıdı hoca. Tazminat ödemeden yollarımızı ayırdığımız için şanslıyız. Bu forma sana çok ağır gelmişti zaten. Eşyalarını topla ve yolun açık olsun.'</span>";
+                optsEl.innerHTML += `<button class="menu-button" style="background:#c0392b;" onclick="window.confirmResignation()">Eşyalarımı Topla ve Git (İstifa Et)</button>`;
+            } else {
+                descEl.innerHTML = "Başkan masadaki istifa dilekçesini ciddiyetle teslim aldı ve elinizi sıktı:<br><br><span style='color:#bdc3c7;'>'Kararına saygı duyuyorum hocam. Birlikte çalıştığımız süre için kulübüm adına sana teşekkür ederim. Yeni hayatında ve kariyerinde başarılar dilerim.'</span>";
+                optsEl.innerHTML += `<button class="menu-button" style="background:#c0392b;" onclick="window.confirmResignation()">Kararım Kesin (İstifa Et)</button>`;
+                optsEl.innerHTML += `<button class="menu-button" style="background:#7f8c8d;" onclick="window.cancelResignation()">Vazgeçtim (Takımda Kal)</button>`;
+            }
+
+            document.getElementById('resign-modal').style.display = 'flex';
+        };
+
+        window.confirmResignation = function () {
+            if (window.db && window.userId) {
+                window.db.ref('futbol_menajer/saves/' + window.userId).remove().then(() => {
+                    location.reload();
+                }).catch(err => {
+                    console.error("Bulut silme hatası:", err);
+                    location.reload();
+                });
+            } else {
+                localStorage.removeItem('futbol_manager_save_v1');
+                location.reload();
+            }
+        };
+
+        window.cancelResignation = function () {
+            document.getElementById('resign-modal').style.display = 'none';
+            if (typeof showContainer === 'function') showContainer('main-menu-container');
+        };
+
+        window.newspaperIssueCounter = window.newspaperIssueCounter || 1;
+        window.isNewspaperArchiveMode = false;
+
+        window.showDynamicEvent = function (title, desc, optionsArray) {
+            const modal = document.getElementById('dynamic-event-modal');
+            const titleEl = document.getElementById('dynamic-event-title');
+            const descEl = document.getElementById('dynamic-event-desc');
+            const optsContainer = document.getElementById('dynamic-event-options');
+            
+            if (!modal || !titleEl || !descEl || !optsContainer) return;
+            
+            const containers = document.querySelectorAll('.menu-container, #press-modal, #game-container, #transfer-confirm-modal, #newspaper-modal, #resign-modal');
+            containers.forEach(c => {
+                if (c) c.style.display = 'none';
+            });
+            
+            titleEl.textContent = title;
+            descEl.innerHTML = desc;
+            optsContainer.innerHTML = '';
+            
+            optionsArray.forEach((opt, index) => {
+                let btn = document.createElement('button');
+                btn.className = 'menu-button';
+                btn.style.background = '#e74c3c';
+                btn.style.width = '100%';
+                btn.textContent = opt.text;
+                btn.onclick = function() {
+                    modal.style.display = 'none';
+                    if (typeof opt.action === 'function') opt.action();
+                };
+                optsContainer.appendChild(btn);
+            });
+            
+            modal.style.display = 'flex';
+            let plainDesc = desc.replace(/<[^>]*>?/gm, '');
+            if(typeof speak === 'function') speak(title + ". " + plainDesc);
+        };
+
+        window.showNewspaper = function (archiveMode = false) {
+            window.isNewspaperArchiveMode = archiveMode;
+
+            const containers = document.querySelectorAll('.menu-container, #press-modal, #game-container, #transfer-confirm-modal, #dynamic-event-modal, #resign-modal');
+            containers.forEach(c => {
+                if (c) c.style.display = 'none';
+            });
+
+            // Normal tema sıfırlaması (Yas modundan çıkış için)
+            let npModal = document.getElementById('newspaper-modal');
+            let npHeadlineBox = document.getElementById('np-headline');
+            if (npModal) {
+                npModal.style.background = '#fcf8f2';
+                npModal.style.color = '#000';
+            }
+            if (npHeadlineBox) {
+                npHeadlineBox.style.color = '#2c3e50';
+                npHeadlineBox.style.borderBottom = '3px solid #2c3e50';
+            }
+
+            let headline = "OLAYSIZ HAFTA";
+            let subheadline = "Takımda her şey olağan seyrinde ilerliyor.";
+            let article = "Bu hafta kulüpte ekstra bir olay yaşanmadı. Takım antrenmanlarına devam ediyor ve taraftar bir sonraki maçı bekliyor.";
+
+            let w = window.consecutiveWins || 0;
+            let l = window.consecutiveLosses || 0;
+            let pres = window.presidentConfidence || 50;
+            let auth = window.managerAuthority || 50;
+            let result = window.lastMatchResult || 'draw';
+
+            let isChampion = false;
+            if (window.currentWeek >= 34) {
+                if (window.league.standings[0].id === window.league.userTeamId) {
+                    isChampion = true;
+                }
+            }
+
+            let isRetiredEvent = false;
+            let isAiResignEvent = false;
+            if (window.retiredPlayerName) isRetiredEvent = true;
+            if (window.resignedManagerTeam) isAiResignEvent = true;
+            
+            // Queue kontrolü (En yüksek öncelik)
+            window.newspaperQueue = window.newspaperQueue || [];
+            if (window.newspaperQueue.length > 0 && !archiveMode) {
+                window.newspaperQueue.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+                let customNews = window.newspaperQueue.shift();
+                headline = customNews.headline;
+                subheadline = customNews.subheadline;
+                article = customNews.article;
+                
+                if (customNews.color) {
+                    if (npHeadlineBox) {
+                        npHeadlineBox.style.color = customNews.color;
+                        npHeadlineBox.style.borderBottom = `3px solid ${customNews.color}`;
+                    }
+                }
+                if (customNews.bgColor) {
+                    if (npModal) {
+                        npModal.style.background = customNews.bgColor;
+                        npModal.style.color = customNews.textColor || '#000';
+                    }
+                }
+            } else if (isRetiredEvent) {
+                if (window.retiredPlayerBecomesManager) {
+                    headline = "EŞOFMANLARI GİYİYOR!";
+                    subheadline = `${window.retiredPlayerName} yeşil sahalara teknik direktör olarak dönüyor!`;
+                    article = `Kulübümüze büyük emek veren değerli oyuncumuz ${window.retiredPlayerName}, fiziksel olarak daha fazla devam edemeyeceğini belirterek aktif futbol kariyerini sonlandırdı. Ancak efsane isim yeşil sahalardan uzak kalamayacak. Yaptığı açıklamada UEFA Pro Lisans eğitimlerine başladığını ve hedefinin teknik direktörlük olduğunu duyurdu. "Öğrenecek çok şeyim var ama bir gün bu kulübeyi yönetmek en büyük hayalim," diyen efsaneye yeni kariyerinde başarılar dileriz.`;
+                } else {
+                    headline = "KRAMPONLARINI ASTI";
+                    subheadline = "Bir dönemin efsanesi futbola tamamen veda etti...";
+                    article = `Kulübümüze büyük emek veren değerli oyuncumuz ${window.retiredPlayerName}, fiziksel olarak daha fazla devam edemeyeceğini belirterek profesyonel futbol kariyerini sonlandırdığını açıkladı. "Artık vücudum eskisi gibi tepki vermiyor. Takıma zarar vermek istemem, zirvede bırakmak en iyisi," diyerek yeşil sahalara duygusal bir şekilde veda etti. Taraftarlarımız ona verdiği hizmetlerden dolayı minnettar. Yeni hayatında başarılar dileriz.`;
+                }
+
+                // Emeklilik Teması (Sepia / Klasik)
+                if (npModal) {
+                    npModal.style.background = '#e8dcb8';
+                    npModal.style.color = '#3e2723';
+                }
+                if (npHeadlineBox) {
+                    npHeadlineBox.style.color = '#5d4037';
+                    npHeadlineBox.style.borderBottom = '3px solid #795548';
+                }
+
+                window.retiredPlayerName = null;
+                window.retiredPlayerBecomesManager = false;
+            } else if (isAiResignEvent) {
+                headline = "DEPREM! İPLER KOPTU!";
+                subheadline = `${window.resignedManagerTeam} cephesinde sular durulmuyor! Şok İstifa!`;
+                article = `Saha sonuçlarındaki büyük hüsranın ve yönetimle yaşanan derin çatlakların ardından ${window.resignedManagerTeam}'de beklenen son gerçekleşti. Teknik direktör zehir zemberek açıklamalarla istifa etti: "İçeriden vurulduk! Bu kulüpte futbol oynamak değil siyaset yapmak önemli hale gelmiş. Verilen sözlerin hiçbiri tutulmadı, hakkımı helal etmiyorum!" Taraftarlar tesisleri basarken yönetim olağanüstü toplanma kararı aldı.`;
+
+                // Kriz/Kaos Teması (Koyu Kırmızı/Siyah)
+                if (npModal) {
+                    npModal.style.background = '#1a0505';
+                    npModal.style.color = '#f5c6c6';
+                }
+                if (npHeadlineBox) {
+                    npHeadlineBox.style.color = '#ff4d4d';
+                    npHeadlineBox.style.borderBottom = '3px solid #800000';
+                }
+
+                window.resignedManagerTeam = null;
+            } else if (isChampion) {
+                // ŞAMPİYONLUK ÖZEL HAVUZU
+                const champHeadlines = [
+                    "TARİH YAZILDI!", "EFENDİMİZ DİYİN!", "EN BÜYÜK BİZİZ!", "SÖZ VERDİK VE ALDIK!",
+                    "ŞAMPİYON!", "KUPANIN SAHİBİ", "MUHTEŞEM ZAFER", "KRAL GERİ DÖNDÜ", "KUPAYI GETİRDİLER", "KİMSE DURDURAMADI"
+                ];
+                const champSublines = [
+                    "Kusursuz bir sezonun ardından zafer sarhoşluğu yaşanıyor.",
+                    "Sokaklar meşalelerle aydınlandı, şehir uyumuyor.",
+                    "Hocanın dehası ve oyuncuların yüreği kupayı getirdi.",
+                    "Eleştirenleri susturdular ve kupayı havaya kaldırdılar.",
+                    "Bu şampiyonluk yıllarca unutulmayacak bir destan.",
+                    "Bütün otoriteleri yanılttılar, işte asıl şampiyon!",
+                    "Gözyaşları sel oldu, bu gurur tüm şehre yeter.",
+                    "Başkanın güveni boşa çıkmadı, altın sezon tamamlandı.",
+                    "Zirvenin tek sahibi olduklarını tüm ülkeye kanıtladılar.",
+                    "Bu zafer, inancın ve alın terinin en büyük eseridir."
+                ];
+                const champArticles = [
+                    "Sezon başından beri gösterilen muazzam efor, taktiksel disiplin ve takım ruhu meyvesini verdi. Oyuncular kupa töreninde hocayı omuzlarına alarak havalara fırlattı. Taraftarlar stadyumdan ayrılmıyor.",
+                    "Yazılan bu destanın baş mimarı şüphesiz teknik direktördür. En zor anlarda bile takımı ayakta tutmayı bildi. Şimdi şehir meydanında sabaha kadar sürecek kutlamalar başlıyor.",
+                    "Milyonlarca taraftar sokaklara döküldü. Kazanılan bu kupa sadece bir başarı değil, bir devrimin başlangıcı. Önümüzdeki sezon Şampiyonlar Ligi'nde bu rüzgarın devam edeceği konuşuluyor.",
+                    "Zorlu virajlar, sakatlıklar ve medyanın baskısı... Hiçbiri bu takımı durduramadı. İnanmış bir oyuncu grubu ve onlara liderlik eden efsanevi bir hocanın hikayesi mutlu sonla bitti.",
+                    "Kupa töreninde gözyaşlarına hakim olamayan başkan, hocaya övgüler yağdırdı. 'Bize inananları mahcup etmedik' diyen hocanın heykeli dikilse yeridir.",
+                    "Sezonun bazı bölümlerinde düşüş yaşansa da inançlarını asla kaybetmediler. Bu kupa, formanın hakkını son terine kadar veren o aslan yürekli oyuncularındır.",
+                    "Şehirde adeta bayram havası var. Dükkanlar kapandı, herkes formalarıyla sokaklarda. Bu şampiyonluk, yıllardır bu anı bekleyen o cefakar taraftara armağan edildi.",
+                    "Spor yorumcuları sezon başında onlara şans vermiyordu. Ancak sahada konuşan takım, rakiplerini tek tek dize getirerek şampiyonluk kupasını bileğinin hakkıyla aldı.",
+                    "Tarih sadece kazananları yazar. Ve bugün tarih, bu muhteşem takımı altın harflerle yazıyor. Hoca ve talebeleri, alınlarının akıyla bir sezonu daha zirvede kapattılar.",
+                    "Kupa stadyuma getirildiğinde yer yerinden oynadı. Havai fişekler geceyi aydınlatırken, futbolcular şampiyonluk şarkılarını taraftarla hep bir ağızdan söyledi."
+                ];
+
+                headline = champHeadlines[Math.floor(Math.random() * champHeadlines.length)];
+                subheadline = champSublines[Math.floor(Math.random() * champSublines.length)];
+                article = champArticles[Math.floor(Math.random() * champArticles.length)];
+
+                // Şampiyonluk rengi altın sarısı
+                document.getElementById('np-headline').style.color = "#f1c40f";
+
+            } else if (l > 0) {
+                // KÖTÜ GİDİŞAT ÖLÇEĞİ (Yumuşaktan Serte)
+                document.getElementById('np-headline').style.color = "#000"; // Normale dön
+
+                if (l >= 6 || pres <= 20) {
+                    const hPool = ["TARİHİN EN BÜYÜK REZALETİ", "O FORMAYI ÇIKARIN!", "SOKAĞA ÇIKACAK YÜZÜNÜZ YOK", "İSTİFA EDİN!"];
+                    const sPool = ["Sabırlar tamamen tükendi. Kulüp tarihinin en karanlık günlerinden geçiyor.", "Stadyumda koltuklar kırıldı, taraftar tesisleri bastı."];
+                    headline = hPool[Math.floor(Math.random() * hPool.length)];
+                    subheadline = sPool[Math.floor(Math.random() * sPool.length)];
+                    article = "Bu takım bu formayı hak etmiyor! Sahada gezinmeye mecali olmayan oyuncular ve kenarda hiçbir şey yapamayan bir teknik direktör. Şanlı tarihimize sürülen bu kara leke asla unutulmayacak. Acilen radikal kararlar alınmalı!";
+                } else if (l >= 4 || pres <= 35) {
+                    const hPool = ["BÜYÜK HÜSRAN", "REZALET!", "TARAFTAR İSYANDA", "KULÜP YANIYOR"];
+                    const sPool = ["Üst üste gelen puan kayıpları sonrası koltuklar sallanıyor.", "Hocanın kredisinin bittiği konuşuluyor, yönetim acil toplantıda."];
+                    headline = hPool[Math.floor(Math.random() * hPool.length)];
+                    subheadline = sPool[Math.floor(Math.random() * sPool.length)];
+                    article = "Oynanan ruhsuz futbol ve hocanın taktiksel hataları takımı uçuruma sürüklüyor. Taraftar maç sonu hocayı ıslıklayarak istifa çağrısı yaptı. Bir sonraki maç hocanın son maçı olabilir.";
+                } else if (l >= 3) {
+                    const hPool = ["TEHLİKE ÇANLARI", "ALARM VERİYORUZ", "KARA BULUTLAR"];
+                    const sPool = ["Takımın formu hızla düşüyor, toparlanma şart.", "Soyunma odasında moraller bozuk, oyuncular inancını kaybediyor."];
+                    headline = hPool[Math.floor(Math.random() * hPool.length)];
+                    subheadline = sPool[Math.floor(Math.random() * sPool.length)];
+                    article = "Son haftalarda alınan kötü sonuçlar camiada homurdanmalara sebep oldu. Rakipler arayı açarken takımın bu denli formsuz olması büyük endişe yaratıyor. Hocanın acilen bir reaksiyon vermesi bekleniyor.";
+                } else {
+                    const hPool = ["TÖKEZLEDİK", "UFAK ÇAPLI KRİZ", "BEKLENMEYEN KAYIP"];
+                    const sPool = ["İş kazası mı, yoksa düşüşün başlangıcı mı?", "Hoca maç sonu hakeme ve zemine yüklendi."];
+                    headline = hPool[Math.floor(Math.random() * hPool.length)];
+                    subheadline = sPool[Math.floor(Math.random() * sPool.length)];
+                    article = "Böyle puan kayıpları futbolda her zaman olur ancak oyun planındaki tıkanıklıklar göze çarpıyor. Önümüzdeki antrenmanlarda takımın hatalarından ders çıkarması gerekiyor.";
+                }
+            } else if (window.myBigTransferEvent) {
+                // KENDİ BOMBA TRANSFERİMİZ!
+                document.getElementById('np-headline').style.color = "#27ae60"; // Yeşil vurgu
+                headline = "YILIN TRANSFERİ!";
+                let p = window.myBigTransferEvent;
+                let myTeamName = window.leagueData.teams.find(t => t.id === window.myTeamId).name;
+                subheadline = "Taraftarlar havalimanına akın etti, " + p.name + " " + myTeamName + " formasıyla imzayı attı!";
+                article = "Teknik direktörün ısrarla istediği süper yıldız " + p.name + " resmen açıklandı. Kulüp bu transferle şampiyonluk yolundaki ciddiyetini kanıtladı. " + p.power + " genel güce sahip olan yıldız oyuncunun formaları ilk günden mağazalarda kapış kapış satıldı.";
+                window.myBigTransferEvent = null; // Haberi sadece 1 kez göster
+            } else if (window.pendingDrawNews) {
+                // KURA ÇEKİMİ HABERLERİ
+                document.getElementById('np-headline').style.color = "#8e44ad"; // Mor vurgu
+                headline = "KURALAR ÇEKİLDİ!";
+                subheadline = "Avrupa arenasında devlerin rakipleri belli oldu.";
+                article = "Şampiyonlar Ligi kura çekimi İsviçre'nin Nyon kentinde gerçekleşti. Temsilcimizin ve Avrupa devlerinin eşleşmeleri futbolseverlerde büyük heyecan yarattı. Zorlu bir fikstür bizi bekliyor!";
+                window.pendingDrawNews = false; // Bir kere gösterilsin
+            } else if (((window.currentWeek <= 3) || (window.currentWeek >= 17 && window.currentWeek <= 19)) && Math.random() < 0.4) {
+                // TRANSFER DÖNEMİNDE RAKİP TRANSFER HABERİ
+                let bigTeams = window.leagueData.teams.filter(t => t.id !== window.myTeamId && t.budget >= 70 && t.id !== 'free_agent');
+                if (bigTeams.length > 0) {
+                    let rival = bigTeams[Math.floor(Math.random() * bigTeams.length)];
+                    rival.budget += 2;
+                    document.getElementById('np-headline').style.color = "#d35400";
+                    headline = "BOMBA TRANSFER!";
+                    subheadline = rival.name + " Avrupa'nın yıldızını kadrosuna kattı.";
+                    article = "Transfer döneminin en flaş hamlesi " + rival.name + " takımından geldi! Taraftarlar yeni yıldızlarını havalimanında meşalelerle karşıladı. Yapılan bu kritik hamle, ligdeki güç dengelerini tamamen değiştirecek gibi görünüyor.";
+                } else {
+                    document.getElementById('np-headline').style.color = "#000";
+                    headline = "TRANSFER SESSİZLİĞİ";
+                    subheadline = "Kulüpler bütçelerini dengelemek için ince eleyip sık dokuyor.";
+                    article = "Transfer döneminin hareketli günleri geride kalırken, takımlar nokta atışı hamleler için bekleyişe geçti. Fırsat transferleri kovalayan menajerler son ana kadar mesai yapacak.";
+                }
+            } else if (window.currentWeek > 0 && window.currentWeek < 34) {
+                // LİG OYNANIRKEN MAÇ HABERLERİ
+                if (w >= 5) {
+                    document.getElementById('np-headline').style.color = "#000";
+                    headline = "YENİLMEZ ARMADA!";
+                    subheadline = "Takım fırtına gibi esiyor, rakiplerin korkulu rüyası oldular.";
+                    article = "Kusursuz bir taktik ve müthiş bir oyuncu motivasyonuyla takım arka arkaya galibiyetler almaya devam ediyor. Taraftarlar şampiyonluk şarkıları söylemeye başladı bile. Hoca adeta takımı baştan yarattı!";
+                } else if (result === 'win') {
+                    document.getElementById('np-headline').style.color = "#000";
+                    headline = "TAKTİK DEHASI!";
+                    subheadline = "Sahada resital sunan takım izleyenleri büyüledi.";
+                    article = "Hafta sonu oynanan maçta alınan net galibiyet yüzleri güldürdü. Özellikle hocanın saha kenarındaki hamleleri ve oyuncuların oyun planına sadakati spor yorumcularından tam not aldı.";
+                } else if (result === 'loss') {
+                    headline = "BÜYÜK HÜSRAN!";
+                    subheadline = "Beklenmedik puan kaybı taraftarı kızdırdı.";
+                    article = "Sahadaki ruhsuz futbol ve teknik direktörün oyuncu değişikliklerindeki geç kalışı mağlubiyeti getirdi. Maç sonu tribünlerden yükselen ıslık sesleri, takımın toparlanması gerektiğinin en büyük sinyaliydi.";
+                } else if (result === 'draw') {
+                    document.getElementById('np-headline').style.color = "#000";
+                    headline = "SESSİZ GECE";
+                    subheadline = "İki takım da birbiriyle yenişemedi, sahadaki futbol uyuttu.";
+                    article = "Bol mücadelenin olduğu ancak net gol fırsatlarının yakalanamadığı maçta iki taraf da birer puana razı oldu. Taraftarlar daha ofansif bir futbol beklediklerini dile getirdi.";
+                } else {
+                    document.getElementById('np-headline').style.color = "#000";
+                    headline = "OLAYSIZ HAFTA";
+                    subheadline = "Takımda her şey olağan seyrinde ilerliyor.";
+                    article = "Bu hafta kulüpte ekstra bir olay yaşanmadı. Takım antrenmanlarına devam ediyor ve taraftar bir sonraki maçı bekliyor.";
+                }
+            } else if ((window.currentWeek === 4 || window.currentWeek === 20)) {
+                document.getElementById('np-headline').style.color = "#c0392b"; // Kırmızı vurgu
+                headline = "TRANSFER DEFTERİ KAPANDI!";
+                subheadline = "Takımlar ellerindeki kadrolara mahkum oldu.";
+                article = "Son dakika fırsatları ve çılgın bonservis bedelleriyle geçen hareketli bir transfer döneminin daha sonuna geldik. Tahta resmen kapandı! Artık hiçbir takım dışarıdan oyuncu alamayacak. Hatalı kadro kuranlar veya oyuncusu sakatlananlar devre arasını beklemek zorunda.";
+            }
+
+            // YENİ: Gol Detayları ve Skor Eklentisi
+            if (window.lastMatchScore && !archiveMode) {
+                let myScore = window.lastMatchScore.home;
+                let oppScore = window.lastMatchScore.away;
+                let scoreDiff = myScore - oppScore;
+
+                // Farklı galibiyet manşeti
+                if (result === 'win' && scoreDiff >= 3) {
+                    document.getElementById('np-headline').style.color = "#000";
+                    const hPool = ["GOL YAĞMURU!", "FARKLI TARİFE!", "SAHADAN SİLDİLER!", "MÜTHİŞ ŞOV!"];
+                    headline = hPool[Math.floor(Math.random() * hPool.length)];
+                    subheadline = "Rakip takım sahada neye uğradığını şaşırdı. Taraftar futbola doydu.";
+                } else if (result === 'loss' && scoreDiff <= -3) {
+                    document.getElementById('np-headline').style.color = "#000";
+                    headline = "TARİHİ HEZİMET!";
+                    subheadline = "Rakip takım sahada şov yaptı, bizimkiler sadece izledi.";
+                }
+
+                // Skor ve Golleri metne ekle
+                let myGoalsStr = "";
+                let oppGoalsStr = "";
+                if (window.lastMatchGoalEvents && window.lastMatchGoalEvents.length > 0) {
+                    let homeEvents = window.lastMatchGoalEvents.filter(e => e.team === 'home');
+                    let awayEvents = window.lastMatchGoalEvents.filter(e => e.team === 'away');
+
+                    if (homeEvents.length > 0) {
+                        myGoalsStr = "⚽ " + homeEvents.map(e => e.min + "' " + e.scorer).join(", ");
+                    }
+                    if (awayEvents.length > 0) {
+                        oppGoalsStr = "⚽ " + awayEvents.map(e => e.min + "' " + e.scorer).join(", ");
+                    }
+                }
+
+                let myTeamName = window.leagueData ? window.leagueData.teams.find(t => t.id === window.myTeamId).name : "Takımımız";
+                let oppName = window.lastMatchOpponentName || "Rakip";
+
+                article = article + "MAÇ SKORU: " + myTeamName + " " + myScore + " - " + oppScore + " " + oppName;
+                if (myGoalsStr || oppGoalsStr) {
+                    article = article + "Goller: " + (myGoalsStr || "-") + " | " + (oppGoalsStr || "-");
+                }
+                // YENİ: TV Yorumcusu Köşesi
+                let quote = "";
+                if (typeof window.generateCommentatorQuote === 'function') {
+                    quote = window.generateCommentatorQuote(result, scoreDiff);
+                } else {
+                    quote = "Yorumcu değerlendirmesi alınamadı.";
+                }
+
+                article = article + "<div style='background: #f1f2f6; padding: 15px; border-left: 4px solid #34495e; border-radius: 4px; font-style: italic; color: #333;'><strong>📺 100% Futbol Yorumu:</strong><br>\"" + quote + "\"</div>";
+
+                window.lastMatchScore = null;
+                window.lastMatchGoalEvents = null;
+            }
+
+            document.getElementById('np-headline').innerText = headline;
+            document.getElementById('np-subheadline').innerText = '"' + subheadline + '"';
+            document.getElementById('np-article').innerHTML = article.replace(/\n/g, '<br>');
+
+            // --- KRİZDEKİ TAKIM SİSTEMİ ---
+            let npCrisisBlock = document.getElementById('np-crisis-block');
+            npCrisisBlock.style.display = 'none';
+            window.currentCrisisTeamId = null;
+
+            // Eğer arşiv modunda değilsek ve lig durumu varsa %35 ihtimalle veya her zaman test için bir kriz haberi çıkar
+            if (!archiveMode && window.leagueTable && window.leagueData && window.leagueData.teams) {
+                if (Math.random() < 0.35) {
+                    let sortedTeams = Object.keys(window.leagueTable)
+                        .filter(id => id !== window.myTeamId && id !== 'free_agent')
+                        .sort((a, b) => window.leagueTable[b].pts - window.leagueTable[a].pts);
+                    if (sortedTeams.length > 0) {
+                        let crisisTeamId = sortedTeams[sortedTeams.length - 1]; // Sonuncu takım
+                        let crisisTeam = window.leagueData.teams.find(t => t.id === crisisTeamId);
+                        window.currentCrisisTeamId = crisisTeam ? crisisTeam.id : null;
+                        if (crisisTeam) {
+
+                        const crisisHeadlines = [
+                            `${crisisTeam.name.toUpperCase()} KARIŞTI! YENİ HOCA ARANIYOR.`,
+                            `İSTİFA DEPREMİ! ${crisisTeam.name.toUpperCase()} HOCASI HAVLU ATTI.`,
+                            `BÖYLE REZALET GÖRÜLMEDİ! ${crisisTeam.name.toUpperCase()} HOCASINI KOVDU.`
+                        ];
+                        const crisisDescriptions = [
+                            `${crisisTeam.name} üst üste alınan kötü sonuçların ardından hocasıyla yollarını ayırdı. Kulüp acilen takımı toparlayacak yeni bir menajer arayışına girdi!`,
+                            `${crisisTeam.name} teknik direktörü, takımın üzerindeki baskılara daha fazla dayanamayarak zehir zemberek açıklamalarla istifa ettiğini duyurdu. Yönetim yeni bir hoca arıyor.`,
+                            `${crisisTeam.name} yönetimi, taraftarın istifa çağrılarına kulak vererek sabaha karşı hocanın görevine son verdi. Taraftar yeni bir umut bekliyor.`
+                        ];
+
+                        let randomIdx = Math.floor(Math.random() * crisisHeadlines.length);
+
+                        document.getElementById('np-crisis-title').innerText = crisisHeadlines[randomIdx];
+                        document.getElementById('np-crisis-desc').innerText = crisisDescriptions[randomIdx];
+                        npCrisisBlock.style.display = 'block';
+                        }
+                    }
+                }
+            }
+            // ---------------------------------
+
+            if (!archiveMode) {
+                document.getElementById('np-issue').innerText = window.newspaperIssueCounter++;
+            }
+
+            // Haberi Oku Butonunu Sıfırla
+            let readMoreContainer = document.getElementById('np-read-more-container');
+            let articleContainer = document.getElementById('np-article-container');
+            if (readMoreContainer && articleContainer) {
+                readMoreContainer.style.display = 'block';
+                articleContainer.style.display = 'none';
+
+                document.getElementById('btn-read-article').onclick = function () {
+                    readMoreContainer.style.display = 'none';
+                    articleContainer.style.display = 'block';
+                    // Haberin detayını otomatik oku
+                    if (typeof speak === 'function') {
+                        let cleanArticle = article.replace(/<[^>]*>?/gm, ''); // HTML etiketlerini temizle
+                        speak("Haberin detayı: " + cleanArticle);
+                    }
+                };
+
+                let btnHide = document.getElementById('btn-hide-article');
+                if (btnHide) {
+                    btnHide.onclick = function () {
+                        readMoreContainer.style.display = 'block';
+                        articleContainer.style.display = 'none';
+                    };
+                }
+            }
+
+            document.getElementById('newspaper-modal').style.display = 'flex';
+            
+            // "Gazetenin beynine takılan çip" - Manşeti otomatik oku
+            if (typeof speak === 'function') {
+                speak("Yeni Gazete Manşeti: " + headline + ". " + subheadline);
+            }
+        };
+
+        window.closeNewspaper = function () {
+            document.getElementById('newspaper-modal').style.display = 'none';
+            if (!window.isNewspaperArchiveMode) {
+                // Eğer kuyrukta okunmamış gazete varsa onu göster, haftayı atlama!
+                if (window.newspaperQueue && window.newspaperQueue.length > 0) {
+                    window.showNewspaper(false);
+                    return;
+                }
+                
+                if (window.currentWeek >= 34 && typeof window.showSeasonEndModal === 'function') {
+                    window.showSeasonEndModal();
+                } else if (typeof window.advanceWeek === 'function') {
+                    window.advanceWeek();
+                }
+            }
+            if (typeof showContainer === 'function') showContainer('main-menu-container');
+        };
+
+        // --- BAŞVURU SİSTEMİ EYLEMİ ---
+        document.getElementById('btn-apply-job')?.addEventListener('click', function () {
+            if (!window.currentCrisisTeamId) return;
+
+            let auth = window.managerAuthority || 50;
+            if (auth >= 60) {
+                alert("BAŞVURU KABUL EDİLDİ!Otoriteniz yeterli görüldü. Eski kulübünüzle yollarınız ayrıldı ve yeni takımınızın başındasınız!");
+                if (window.league) {
+                    window.league.userTeamId = window.currentCrisisTeamId;
+                }
+                if (window.leagueData) {
+                    window.leagueData.userTeamId = window.currentCrisisTeamId;
+                }
+                window.myTeamId = window.currentCrisisTeamId;
+
+                // İstatistikleri Sıfırla
+                window.managerAuthority = 50;
+                window.presidentConfidence = 50;
+                window.consecutiveWins = 0;
+                window.consecutiveLosses = 0;
+                window.teamConfidence = 100;
+
+                // Kaydet ve Yenile
+                if (typeof saveGame === 'function') saveGame(true);
+                location.reload();
+            } else {
+                alert("BAŞVURU REDDEDİLDİ!Otoriteniz bu takımı yönetmek ve krizden çıkarmak için yeterli görülmedi (En az %60 Otorite Gerekli).");
+                document.getElementById('np-crisis-block').style.display = 'none';
+            }
+        });
+    </script>
+
+    
+
+
+
+    <!-- AYARLAR MODAL -->
+    <div id="settings-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <div
+            style="background: rgba(30,30,40,0.95); padding: 40px; border-radius: 15px; border: 2px solid #8e44ad; box-shadow: 0 0 30px rgba(142,68,173,0.5); width: 400px; text-align: center;">
+            <h2 tabindex="-1"
+                style="color: #f1c40f; margin-bottom: 25px; border-bottom: 1px solid #555; padding-bottom: 10px;">OYUN
+                AYARLARI</h2>
+
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label style="color: white; font-size: 1.1rem; display: block; margin-bottom: 8px;">Spiker (Sesli
+                    Anlatım):</label>
+                <select id="setting-announcer"
+                    style="width: 100%; padding: 10px; background: #2c3e50; color: white; border: 1px solid #8e44ad; border-radius: 5px;">
+                    <option value="on">Açık</option>
+                    <option value="off">Kapalı</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label style="color: white; font-size: 1.1rem; display: block; margin-bottom: 8px;">Stadyum
+                    Sesleri:</label>
+                <select id="setting-crowd"
+                    style="width: 100%; padding: 10px; background: #2c3e50; color: white; border: 1px solid #8e44ad; border-radius: 5px;">
+                    <option value="on">Açık</option>
+                    <option value="off">Kapalı</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 30px; text-align: left;">
+                <label style="color: white; font-size: 1.1rem; display: block; margin-bottom: 8px;">Maç Hızı
+                    (Yakında):</label>
+                <select id="setting-speed"
+                    style="width: 100%; padding: 10px; background: #2c3e50; color: white; border: 1px solid #8e44ad; border-radius: 5px;"
+                    disabled>
+                    <option value="normal">Normal (1x)</option>
+                    <option value="fast">Hızlı (1.5x)</option>
+                </select>
+            </div>
+
+            <button onclick="saveSettings()" class="menu-button" style="background: #27ae60; width: 100%;">Kaydet ve
+                Kapat</button>
+        </div>
+    </div>
+
+    <script>
+        function saveSettings() {
+            const announcer = document.getElementById('setting-announcer').value;
+            const crowd = document.getElementById('setting-crowd').value;
+
+            window.speechEnabled = (announcer === 'on');
+            if (window.audioEngine) {
+                window.audioEngine.crowdEnabled = (crowd === 'on');
+                if (!window.audioEngine.crowdEnabled && window.audioEngine.crowdGainNode) {
+                    window.audioEngine.crowdGainNode.gain.value = 0;
+                }
+            }
+
+            // Override speak
+            const originalSpeak = window.speak;
+            window.speak = function (text, priority = false) {
+                if (!window.speechEnabled && 'speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    // Update UI text only
+                    const uiText = document.getElementById('announcer-text');
+                    if (uiText) uiText.textContent = text;
+                    const liveRegion = document.getElementById('live-announcer');
+                    if (liveRegion) liveRegion.textContent = text;
+                    return;
+                }
+                if(typeof originalSpeak === 'function') { originalSpeak(text, priority); } else {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'tr-TR';
+                    window.speechSynthesis.speak(utterance);
+                }
+            };
+
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+    </script>
+
+    <script>
+        // Tıklama (Enter) Sesi
+        document.addEventListener('click', function (e) {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('.menu-button') || e.target.closest('button')) {
+                if (window.audioEngine && window.audioEngine.playEnterSound) {
+                    window.audioEngine.playEnterSound();
+                }
+            }
+        });
+
+        // Gezinme (Hover/Focus) Sesi
+        function playHoverSound(e) {
+            if (e.target.tagName === 'BUTTON' || (e.target.classList && e.target.classList.contains('menu-button'))) {
+                if (window.audioEngine && window.audioEngine.playClickSound) {
+                    window.audioEngine.playClickSound();
+                }
+            }
+        }
+
+        document.addEventListener('mouseover', playHoverSound, true);
+        document.addEventListener('focus', playHoverSound, true);
+    </script>
+</body>
+
+</html>
