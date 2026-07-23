@@ -1,5 +1,12 @@
 # Hafızana Güven - Değişiklik Günlüğü (Changelog)
 
+[v0.97.4.58] - 23.07.2026
+
+Yeni Özellikler ve Hediyeler:
+- Günlük 30 dakika çevrimiçi kalma başarısı ve Sürpriz Ödüller sistemi eklendi!
+- Oyunda aralıksız veya parça parça toplam 30 dakikayı doldurduğunuzda; 1 Zaman Koruması, 1 Hata Koruması, 1 Seri Dondurucu veya mağazadaki tüm enstrüman paketlerinde geçerli **Tek Kullanımlık %25 İndirim** kazanma şansınız var.
+- İndirim kazandığınızda mağazadaki tüm paketler %25 indirime girer, ancak herhangi bir paketi indirimli aldığınız an diğer paketler eski fiyatına döner (Tek Kullanımlık).
+
 [v0.97.4.57] - 23.07.2026
 
 Hata Düzeltmeleri ve İyileştirmeler:
