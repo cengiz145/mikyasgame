@@ -1,5 +1,5 @@
 ﻿{
-    "version":  "0.97.4.56",
+    "version":  "0.97.4.57",
     "buildId":  1781863853,
-    "changelog":  "Ekran okuyucuda Türkçe karakterlerin (ş, ı, ç, ğ) hatalı okunmasına sebep olan dosya kodlama (Mojibake) sorunu düzeltildi."
+    "changelog":  "TÃ¼m sistemlerde versiyon numaralarÄ± eÅŸitlendi ve senkronize edildi."
 }
