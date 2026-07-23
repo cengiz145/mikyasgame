@@ -1,10 +1,16 @@
 $ErrorActionPreference = "Stop"
 $dir = ".\";
-$newVersion = "0.97.4.57"
-
-Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
 $vJson = Get-Content $vJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$currentVersion = $vJson.version
+$parts = $currentVersion.Split('.')
+$lastPart = [int]$parts[-1]
+$lastPart++
+$parts[-1] = $lastPart.ToString()
+$newVersion = $parts -join '.'
+
+Write-Host "Mevcut sürüm: $currentVersion -> Yeni sürüm: $newVersion"
+Write-Host "Updating version.json..."
 $vJson.version = $newVersion
 $vJson.changelog = "Tüm sistemlerde versiyon numaraları eşitlendi ve senkronize edildi."
 $vJson | ConvertTo-Json -Depth 5 | Set-Content $vJsonPath -Encoding UTF8

@@ -47,6 +47,14 @@ if ($otobusSource -and (Test-Path $otobusSource)) {
 Write-Host "3. Dosyalar GitHub'a (Internete) gonderiliyor..." -ForegroundColor Yellow
 Set-Location -Path $websiteDir
 
+# Git komutlari öncesi otomatik sürüm atlat
+if (Test-Path "$websiteDir\hafizana_guven\sync_versions.ps1") {
+    Write-Host "Hafizana Guven sürümü otomatik artırılıyor..." -ForegroundColor Yellow
+    Set-Location -Path "$websiteDir\hafizana_guven"
+    powershell -ExecutionPolicy Bypass -File .\sync_versions.ps1
+    Set-Location -Path $websiteDir
+}
+
 # Git komutlari
 git add .
 $commitMsg = "Otomatik Guncelleme: " + (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
