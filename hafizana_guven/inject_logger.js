@@ -1,0 +1,1 @@
+const fs = require('fs'); let c = fs.readFileSync('js/autoRepair.js', 'utf8'); c = c.replace('self.showErrorReporter(formattedMsg);', 'self.showErrorReporter(formattedMsg); try { if (window.db) { window.db.ref('auto_error_logs').push({ timestamp: Date.now(), log: formattedMsg }); } } catch(e){}'); fs.writeFileSync('js/autoRepair.js', c);

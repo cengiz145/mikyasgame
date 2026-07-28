@@ -1,4 +1,10 @@
-# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+﻿# Hafızana Güven - Değişiklik Günlüğü (Changelog)
+
+[v0.97.4.60] - 29.07.2026
+
+Genel:
+- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+
 
 [v0.97.4.59] - 23.07.2026
 

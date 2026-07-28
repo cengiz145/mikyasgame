@@ -23,7 +23,7 @@ $pJson | ConvertTo-Json -Depth 5 | Set-Content $pJsonPath -Encoding UTF8
 
 Write-Host "Updating index.html..."
 $htmlPath = Join-Path $dir "index.html"
-(Get-Content $htmlPath -Encoding UTF8) -replace '\?v=\d+\.\d+\.\d+\.\d+', "?v=$newVersion" | Set-Content $htmlPath -Encoding UTF8
+(Get-Content $htmlPath -Encoding UTF8) -replace '\?v=[0-9\.]+', "?v=$newVersion" | Set-Content $htmlPath -Encoding UTF8
 
 Write-Host "Updating .last_sent_version.txt..."
 $lvPath = Join-Path $dir ".last_sent_version.txt"
