@@ -89,7 +89,7 @@ window.HafizanaGuvenAutoRepair = {
         // KullanÄ±cÄ± gizliliÄŸini korumak iÃ§in bilgisayar dosya yollarÄ±nÄ± maskele (C:\Users\... veya file:///)
         let sanitizedLog = errorLog;
         try {
-            sanitizedLog = sanitizedLog.replace(/(?:file:\/\/\/|https?:\/\/|[a-zA-Z]:\\).*?[\/\\]([a-zA-Z0-9_\-]+\.(?:js|css|html))/gi, '[OYUN_KLASORU]/$1');
+            sanitizedLog = sanitizedLog.replace(/(?:file:\/\/\/|https?:\/\/|[a-zA-Z]:\\).*?[\/\\]([a-zA-Z0-9_\-]+\.(?:js|css|html)(?:\?[^\s:)]+)?)/gi, '[OYUN_KLASORU]/$1');
             sanitizedLog = sanitizedLog.replace(/Users[\/\\][^\/\\]+[\/\\]/gi, 'Users/[GIZLI_KULLANICI]/');
         } catch(e) {}
 
