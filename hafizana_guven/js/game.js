@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     let serverWipeTime = snapshot.val();
                     let localWipeTime = parseInt(localStorage.getItem('lastWipeTime')) || 0;
                     
-                    if (serverWipeTime > localWipeTime) {
+                    if (serverWipeTime && Number(serverWipeTime) > localWipeTime) {
                         let chatUser = localStorage.getItem('chatUsername');
                         let changelogVer = localStorage.getItem('lastSeenChangelogVersion');
                         
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         if (chatUser) localStorage.setItem('chatUsername', chatUser);
                         if (changelogVer) localStorage.setItem('lastSeenChangelogVersion', changelogVer);
-                        localStorage.setItem('lastWipeTime', serverWipeTime);
+                        localStorage.setItem('lastWipeTime', Number(serverWipeTime));
                         
                         if (window.announceToScreenReader) window.announceToScreenReader("Sistem yöneticisi tarafından küresel sıfırlama yapıldı. Tüm verileriniz temizlendi, oyun baştan başlatılıyor.");
                         window.hgfzZamanlayici.setTimeout(() => location.reload(), 2000);
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     localStorage.clear();
                     document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalıcı olarak uzaklaştırıldınız.</h1>";
                     if (window.announceToScreenReader) window.announceToScreenReader("Erişim engellendi. Sunucudan kalıcı olarak uzaklaştırıldınız.");
-                    window.hgfzZamanlayici.setInterval(() => { document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:50px;' aria-live='assertive'>Oyundan ve sunucudan kalıcı olarak uzaklaştırıldınız.</h1>"; }, 100);
+                    // EKRAN OKUYUCUYU ÇÖKERTEN setInterval KALDIRILDI!
                 }
             });
             
