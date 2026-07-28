@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.db.ref('global_wipe_timestamp').on('value', (snapshot) => {
                 if (snapshot.exists()) {
                     let serverWipeTime = snapshot.val();
-                    let localWipeTime = parseInt(localStorage.getItem('lastWipeTime')) || 0;
+                    let localWipeTime = Number(localStorage.getItem('lastWipeTime')) || 0;
                     
                     if (serverWipeTime && Number(serverWipeTime) > localWipeTime) {
                         let chatUser = localStorage.getItem('chatUsername');
