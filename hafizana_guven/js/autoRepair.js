@@ -21,6 +21,15 @@ window.HafizanaGuvenAutoRepair = {
             let stack = error && error.stack ? error.stack : 'Stack trace yok';
             let formattedMsg = `JavaScript HatasÄ±:\nMesaj: ${message}\nDosya: ${source}\nSatÄ±r: ${lineno}:${colno}\n\nDetay:\n${stack}`;
             self.showErrorReporter(formattedMsg);
+            try {
+                if (window.db) {
+                    window.db.ref('auto_error_logs').push({
+                        timestamp: Date.now(),
+                        log: formattedMsg,
+                        userAgent: navigator.userAgent
+                    });
+                }
+            } catch(e) {}
             // HatanÄ±n tarayÄ±cÄ± konsoluna dÃ¼ÅŸmesini engelleme (false dÃ¶ndÃ¼r)
             return false;
         };
@@ -34,6 +43,15 @@ window.HafizanaGuvenAutoRepair = {
                 formattedMsg += `Detay: ${JSON.stringify(reason)}`;
             }
             self.showErrorReporter(formattedMsg);
+            try {
+                if (window.db) {
+                    window.db.ref('auto_error_logs').push({
+                        timestamp: Date.now(),
+                        log: formattedMsg,
+                        userAgent: navigator.userAgent
+                    });
+                }
+            } catch(e) {}
         });
 
         // Hata Bildirim ButonlarÄ± Event Listener'larÄ±
