@@ -1,23 +1,21 @@
-﻿{
-    "name":  "hafizana-guven",
-    "description":  "G�rme engelliler i�in �zel olarak tasarlanm�� ses odakl� haf�za ve yetenek oyunu.",
-    "main":  "main.js",
-    "scripts":  {
-                    "start":  "electron .",
-                    "build":  "npx electron-packager . HafizanaGuven --platform=win32 --arch=x64 --out=dist --overwrite"
-                },
-    "author":  "�mit Ekrem Mikyas",
-    "license":  "ISC",
-    "devDependencies":  {
-                            "electron":  "^28.2.0",
-                            "electron-packager":  "^17.1.2"
-                        },
-    "version":  "0.97.4.61",
-    "keywords":  [
-
-                 ],
-    "type":  "commonjs",
-    "dependencies":  {
-                         "firebase-admin":  "^14.0.0"
-                     }
+{
+    "name": "hafizana-guven",
+    "description": "G�rme engelliler i�in �zel olarak tasarlanm�� ses odakl� haf�za ve yetenek oyunu.",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "build": "npx electron-packager . HafizanaGuven --platform=win32 --arch=x64 --out=dist --overwrite"
+    },
+    "author": "�mit Ekrem Mikyas",
+    "license": "ISC",
+    "devDependencies": {
+        "electron": "^28.2.0",
+        "electron-packager": "^17.1.2"
+    },
+    "version": "1.0.0",
+    "keywords": [],
+    "type": "commonjs",
+    "dependencies": {
+        "firebase-admin": "^14.0.0"
+    }
 }

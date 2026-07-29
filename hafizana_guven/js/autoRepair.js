@@ -21,15 +21,6 @@ window.HafizanaGuvenAutoRepair = {
             let stack = error && error.stack ? error.stack : 'Stack trace yok';
             let formattedMsg = `JavaScript HatasÄ±:\nMesaj: ${message}\nDosya: ${source}\nSatÄ±r: ${lineno}:${colno}\n\nDetay:\n${stack}`;
             self.showErrorReporter(formattedMsg);
-            try {
-                if (window.db) {
-                    window.db.ref('auto_error_logs').push({
-                        timestamp: Date.now(),
-                        log: formattedMsg,
-                        userAgent: navigator.userAgent
-                    });
-                }
-            } catch(e) {}
             // HatanÄ±n tarayÄ±cÄ± konsoluna dÃ¼ÅŸmesini engelleme (false dÃ¶ndÃ¼r)
             return false;
         };
@@ -43,15 +34,6 @@ window.HafizanaGuvenAutoRepair = {
                 formattedMsg += `Detay: ${JSON.stringify(reason)}`;
             }
             self.showErrorReporter(formattedMsg);
-            try {
-                if (window.db) {
-                    window.db.ref('auto_error_logs').push({
-                        timestamp: Date.now(),
-                        log: formattedMsg,
-                        userAgent: navigator.userAgent
-                    });
-                }
-            } catch(e) {}
         });
 
         // Hata Bildirim ButonlarÄ± Event Listener'larÄ±
@@ -107,7 +89,7 @@ window.HafizanaGuvenAutoRepair = {
         // KullanÄ±cÄ± gizliliÄŸini korumak iÃ§in bilgisayar dosya yollarÄ±nÄ± maskele (C:\Users\... veya file:///)
         let sanitizedLog = errorLog;
         try {
-            sanitizedLog = sanitizedLog.replace(/(?:file:\/\/\/|https?:\/\/|[a-zA-Z]:\\).*?[\/\\]([a-zA-Z0-9_\-]+\.(?:js|css|html)(?:\?[^\s:)]+)?)/gi, '[OYUN_KLASORU]/$1');
+            sanitizedLog = sanitizedLog.replace(/(?:file:\/\/\/|https?:\/\/|[a-zA-Z]:\\).*?[\/\\]([a-zA-Z0-9_\-]+\.(?:js|css|html))/gi, '[OYUN_KLASORU]/$1');
             sanitizedLog = sanitizedLog.replace(/Users[\/\\][^\/\\]+[\/\\]/gi, 'Users/[GIZLI_KULLANICI]/');
         } catch(e) {}
 
