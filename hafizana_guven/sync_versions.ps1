@@ -26,8 +26,9 @@ Set-Content $lvPath -Value "v$newVersion" -Encoding UTF8
 Write-Host "Updating changelog.txt..."
 $changelogPath = Join-Path $dir "changelog.txt"
 $changelogContent = Get-Content $changelogPath -Encoding UTF8
+$todayDate = (Get-Date).ToString('dd.MM.yyyy')
 $newEntry = @"
-[v$newVersion] - 17.06.2026
+[v$newVersion] - $todayDate
 
 Genel:
 - Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
