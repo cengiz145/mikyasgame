@@ -1,10 +1,10 @@
-﻿// --- PRESENCE (VARLIK) & SOSYAL LÄ°STE SÄ°STEMÄ° ---
+﻿// --- PRESENCE (VARLIK) & SOSYAL LİSTE SİSTEMİ ---
 window.initPresenceSystem = function() {
     const checkDb = setInterval(() => {
         if (window.db) {
             clearInterval(checkDb);
 
-            // --- GeliÅŸtirici Bilet (Geri Bildirim) Bildirimleri ---
+            // --- Geliştirici Bilet (Geri Bildirim) Bildirimleri ---
             let devNameForTickets = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "";
             if (['ekrem'].includes(devNameForTickets.toLowerCase())) {
                 let isInitialFbLoad = true;
@@ -12,7 +12,7 @@ window.initPresenceSystem = function() {
                     if (!isInitialFbLoad) {
                         let fb = snapshot.val();
                         if (window.startAdminAlert) window.startAdminAlert('ticket');
-                        let msg = `YENÄ° BÄ°LET GELDÄ°! GÃ¶nderen: ${fb.name || fb.nickname || "Bilinmiyor"}. Okumak iÃ§in sohbete /bilet yazÄ±n.`;
+                        let msg = `YENİ BİLET GELDİ! Gönderen: ${fb.name || fb.nickname || "Bilinmiyor"}. Okumak için sohbete /bilet yazın.`;
                         if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                         if (window.showToastNotification) window.showToastNotification(msg, "warning");
                     }
@@ -24,7 +24,7 @@ window.initPresenceSystem = function() {
                         let totalTickets = snapshot.numChildren();
                         setTimeout(() => {
                             if (window.startAdminAlert) window.startAdminAlert('ticket');
-                            let msg = `Sistemde bekleyen ${totalTickets} adet aÃ§Ä±k bilet (geri bildirim) var. Ä°ncelemek iÃ§in sohbete /bilet yazÄ±n.`;
+                            let msg = `Sistemde bekleyen ${totalTickets} adet açık bilet (geri bildirim) var. İncelemek için sohbete /bilet yazın.`;
                             if (window.announceToScreenReader) window.announceToScreenReader(msg, false);
                             if (window.showToastNotification) window.showToastNotification(msg, "info");
                         }, 6000);
@@ -50,7 +50,7 @@ window.initPresenceSystem = function() {
                 
                 if (snap.val() === true) {
                     if (wasConnected === false && initialConnectionDone) {
-                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucuya yeniden baÄŸlandÄ±.", true);
+                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucuya yeniden bağlandı.", true);
                     }
                     wasConnected = true;
                     initialConnectionDone = true;
@@ -67,7 +67,7 @@ window.initPresenceSystem = function() {
                     });
                 } else {
                     if (wasConnected) {
-                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucu baÄŸlantÄ±nÄ±z kesildi.", true);
+                        if (window.announceToScreenReader) window.announceToScreenReader("Sunucu bağlantınız kesildi.", true);
                         wasConnected = false;
                     }
                 }
@@ -98,23 +98,23 @@ window.initPresenceSystem = function() {
                         let newP = newData[k];
                         let oldP = oldData[k];
                         if (newP.name && newP.name !== myName && newP.name !== "Misafir") {
-                            // Spam KorumasÄ±: Sadece son 15 saniye iÃ§indeki olaylarÄ± anons et (Oyuna ilk giriÅŸteki birikmiÅŸ spam mesajlarÄ±nÄ± engeller)
+                            // Spam Koruması: Sadece son 15 saniye içindeki olayları anons et (Oyuna ilk girişteki birikmiş spam mesajlarını engeller)
                             let isRecent = newP.last_changed ? (currentServerTime - newP.last_changed < 15000) : false;
                             let disableOnlineStatus = localStorage.getItem('hafizaGuvenDisableOnlineStatus') === 'true';
                             
                             if (isRecent && !disableOnlineStatus) {
                                 if (newP.state === 'online' && (!oldP || oldP.state !== 'online')) {
                                     if (window.playerOnlineSound) window.playerOnlineSound.play();
-                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} Ã§evrimiÃ§i.`);
-                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} Ã§evrimiÃ§i.`, 'info');
+                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimiçi.`);
+                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimiçi.`, 'info');
                                 } else if (newP.state === 'offline' && (oldP && oldP.state === 'online')) {
                                     if (window.playerOfflineSound) window.playerOfflineSound.play();
-                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} Ã§evrimdÄ±ÅŸÄ±.`);
-                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} Ã§evrimdÄ±ÅŸÄ±.`, 'info');
+                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} çevrimdışı.`);
+                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} çevrimdışı.`, 'info');
                                 } else if (newP.state === 'disconnected' && (oldP && oldP.state === 'online')) {
                                     if (window.serverDisconnectSound) window.serverDisconnectSound.play();
-                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} baÄŸlantÄ±sÄ± koptu.`);
-                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} baÄŸlantÄ±sÄ± koptu.`, 'warning');
+                                    if (window.announceToScreenReader) window.announceToScreenReader(`${newP.name} bağlantısı koptu.`);
+                                    if (window.showToastNotification) window.showToastNotification(`${newP.name} bağlantısı koptu.`, 'warning');
                                 }
                             }
                         }
@@ -124,8 +124,8 @@ window.initPresenceSystem = function() {
                             let disableOnlineStatus = localStorage.getItem('hafizaGuvenDisableOnlineStatus') === 'true';
                             if (!disableOnlineStatus) {
                                 if (window.serverDisconnectSound) window.serverDisconnectSound.play();
-                                if (window.announceToScreenReader) window.announceToScreenReader(`${oldData[k].name} baÄŸlantÄ±sÄ± koptu.`);
-                                if (window.showToastNotification) window.showToastNotification(`${oldData[k].name} baÄŸlantÄ±sÄ± koptu.`, 'warning');
+                                if (window.announceToScreenReader) window.announceToScreenReader(`${oldData[k].name} bağlantısı koptu.`);
+                                if (window.showToastNotification) window.showToastNotification(`${oldData[k].name} bağlantısı koptu.`, 'warning');
                             }
                         }
                     }
@@ -148,7 +148,7 @@ window.renderSocialList = function() {
 
     let myName = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname') || localStorage.getItem('hafizaGuvenUserNickname') || "Misafir";
 
-    const emptyHtml = '<li tabindex="0" aria-label="Senden baÅŸka kimse yok.">Senden baÅŸka kimse yok.</li>';
+    const emptyHtml = '<li tabindex="0" aria-label="Senden başka kimse yok.">Senden başka kimse yok.</li>';
 
     if (!window.lastPresenceData || Object.keys(window.lastPresenceData).length === 0) {
         listEl.innerHTML = '';
@@ -158,13 +158,13 @@ window.renderSocialList = function() {
         let meCount = (myName !== "Misafir" && myName.trim() !== "") ? 1 : 0;
         
         if (titleEl) {
-            titleEl.innerText = `Sosyal (${meCount} KiÅŸi Ã‡evrimiÃ§i)`;
-            titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menÃ¼sÃ¼. Ã…Âuan toplam ${meCount} kiÅŸi Ã§evrimiÃ§i. YÃ¶n tuÅŸlarÄ±yla gezinebilirsiniz.`);
+            titleEl.innerText = `Sosyal (${meCount} Kişi Çevrimiçi)`;
+            titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Ã…Âuan toplam ${meCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
         }
         
         if (navBtnSocial) {
             navBtnSocial.innerText = `Sosyal (${meCount})`;
-            navBtnSocial.setAttribute('aria-label', `Sosyal MenÃ¼. ${meCount} kiÅŸi Ã§evrimiÃ§i.`);
+            navBtnSocial.setAttribute('aria-label', `Sosyal Menü. ${meCount} kişi çevrimiçi.`);
         }
 
         if (myName !== "Misafir" && myName.trim() !== "") {
@@ -177,9 +177,9 @@ window.renderSocialList = function() {
             meLi.style.display = "flex";
             meLi.style.justifyContent = "space-between";
             meLi.style.alignItems = "center";
-            meLi.setAttribute('aria-label', `Sadece sen varsÄ±n. ${myName} olarak Ã§evrimiÃ§isin.`);
+            meLi.setAttribute('aria-label', `Sadece sen varsın. ${myName} olarak çevrimiçisin.`);
             meLi.setAttribute('tabindex', '0');
-            meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Ã‡evrimiÃ§i</span>`;
+            meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Çevrimiçi</span>`;
             listEl.appendChild(meLi);
         } else {
             listEl.innerHTML = emptyHtml;
@@ -196,13 +196,13 @@ window.renderSocialList = function() {
     if (myName !== "Misafir" && myName.trim() !== "") totalCount += 1;
 
     if (titleEl) {
-        titleEl.innerText = `Sosyal (${totalCount} KiÅŸi Ã‡evrimiÃ§i)`;
-        titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menÃ¼sÃ¼. Ã…Âuan toplam ${totalCount} kiÅŸi Ã§evrimiÃ§i. YÃ¶n tuÅŸlarÄ±yla gezinebilirsiniz.`);
+        titleEl.innerText = `Sosyal (${totalCount} Kişi Çevrimiçi)`;
+        titleEl.setAttribute('aria-label', `Sosyal ve oyuncu menüsü. Ã…Âuan toplam ${totalCount} kişi çevrimiçi. Yön tuşlarıyla gezinebilirsiniz.`);
     }
     
     if (navBtnSocial) {
         navBtnSocial.innerText = `Sosyal (${totalCount})`;
-        navBtnSocial.setAttribute('aria-label', `Sosyal MenÃ¼. ${totalCount} kiÅŸi Ã§evrimiÃ§i.`);
+        navBtnSocial.setAttribute('aria-label', `Sosyal Menü. ${totalCount} kişi çevrimiçi.`);
     }
 
     if (players.length === 0) {
@@ -218,7 +218,7 @@ window.renderSocialList = function() {
 
     listEl.innerHTML = '';
     
-    // KullanÄ±cÄ±nÄ±n kendisini HER ZAMAN listenin en baÅŸÄ±na ekle
+    // Kullanıcının kendisini HER ZAMAN listenin en başına ekle
     if (myName !== "Misafir" && myName.trim() !== "") {
         let meLi = document.createElement('li');
         meLi.style.padding = "10px";
@@ -229,16 +229,16 @@ window.renderSocialList = function() {
         meLi.style.display = "flex";
         meLi.style.justifyContent = "space-between";
         meLi.style.alignItems = "center";
-        meLi.setAttribute('aria-label', `Sen. ${myName} olarak Ã§evrimiÃ§isin.`);
+        meLi.setAttribute('aria-label', `Sen. ${myName} olarak çevrimiçisin.`);
         meLi.setAttribute('tabindex', '0');
-        meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Ã‡evrimiÃ§i</span>`;
+        meLi.innerHTML = `<span style="font-weight: bold; color: #e9edef;">${myName} (Sen)</span><span style="font-size: 0.9rem; font-weight: bold; color: #00a884;">Çevrimiçi</span>`;
         listEl.appendChild(meLi);
     }
     
     let foundAny = false;
 
     players.forEach(p => {
-        if (!p.name || p.name === myName) return; // Kendini listede gÃ¶sterme
+        if (!p.name || p.name === myName) return; // Kendini listede gösterme
         foundAny = true;
         let isOnline = (p.state === 'online');
         
@@ -262,9 +262,9 @@ window.renderSocialList = function() {
         statusSpan.style.fontSize = "0.9rem";
         statusSpan.style.fontWeight = "bold";
         statusSpan.style.color = isOnline ? "#00a884" : "#888888";
-        statusSpan.innerText = isOnline ? "Ã‡evrimiÃ§i" : "Ã‡evrimdÄ±ÅŸÄ±";
+        statusSpan.innerText = isOnline ? "Çevrimiçi" : "Çevrimdışı";
 
-        li.setAttribute('aria-label', `${p.name} kullanÄ±cÄ±sÄ± ÅŸuan ${isOnline ? "Ã§evrimiÃ§i" : "Ã§evrimdÄ±ÅŸÄ±"}. Ä°ÅŸlem yapmak iÃ§in tÄ±klayÄ±n veya Enter'a basÄ±n.`);
+        li.setAttribute('aria-label', `${p.name} kullanıcısı şuan ${isOnline ? "çevrimiçi" : "çevrimdışı"}. İşlem yapmak için tıklayın veya Enter'a basın.`);
         li.setAttribute('tabindex', '0');
 
         const triggerAction = () => {

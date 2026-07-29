@@ -3,7 +3,7 @@
 [v0.97.4.61] - 29.07.2026
 
 Genel:
-- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+- Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
 
 
 [v0.97.4.56] - 17.06.2026
