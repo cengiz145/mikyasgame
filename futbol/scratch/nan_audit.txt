@@ -1,0 +1,130 @@
+academy.js:89: p.power += (baseGain * coachMultiplier);
+academy.js:128: window.myTeam.budget -= coach.cost;
+champions_league.js:252: ht.gf += hScore; ht.ga += aScore; ht.gd = ht.gf - ht.ga;
+champions_league.js:253: at.gf += aScore; at.ga += hScore; at.gd = at.gf - at.ga;
+facilities.js:135: myTeam.budget -= nextStadium.cost;
+facilities.js:154: myTeam.budget -= nextMedical.cost;
+facilities.js:173: myTeam.budget -= nextTraining.cost;
+game.js:711: else if (xp >= 80) p.power += 5; // Kurtlar coşar
+game.js:719: else if (xp >= 80) p.power += 5;
+game.js:820: hp.power += 5; // Derbi gerginliği gücü artırır
+game.js:822: if (hp.mentalTrait === 'fragile' && Math.random() < 0.3) hp.power -= 8; // Kırılganlar bazen derbiyi kaldıramaz
+game.js:906: p.power += 10;
+game.js:913: p.power += 10;
+game.js:1245: homePlayers.forEach(p => p.power += 2);
+game.js:1412: strikerConfidence -= 25;
+game.js:1805: if(window.managerData) window.managerData.budget -= 1000000;
+game.js:3207: window.managerAuthority -= 0.01; // Saniye saniye erir
+game.js:3208: window.presidentConfidence -= 0.01;
+game.js:4363: window.budget += 2800000;
+game.js:4366: window.budget += 900000;
+game.js:4447: myTeam.budget += revenue;
+game.js:4466: window.managerAuthority -= 15;
+game.js:4467: window.presidentConfidence -= 20;
+game.js:4470: window.managerAuthority -= 10;
+game.js:4471: window.presidentConfidence -= 15;
+game.js:4474: window.managerAuthority -= 5;
+game.js:4475: window.presidentConfidence -= 5;
+game.js:4495: window.managerAuthority += 10; // Kaptan hocayı korudu
+game.js:4552: window.budget -= wageCost;
+game.js:4602: window.presidentConfidence -= 15;
+game.js:4612: window.presidentConfidence += 10;
+game.js:4755: myTeam.budget += fine;
+game.js:5436: window.myTeam.budget -= compensation;
+interactions.js:50: p.loyalty += 7; // Gönlü alındı
+interactions.js:57: p.loyalty -= 7; // Ters tepti
+interactions.js:76: p.loyalty += 7;
+interactions.js:84: p.loyalty -= 7;
+interactions.js:85: if (p.mentalTrait === 'aggressive') p.power += 0.5; // Hırslanır
+interactions.js:103: p.loyalty += 7;
+interactions.js:104: p.condition += 25;
+interactions.js:111: p.loyalty -= 7;
+interactions.js:112: if (p.mentalTrait === 'elite') p.power += 1.0;
+interactions.js:113: p.condition -= 10;
+interactions.js:127: { text: "Bunu onunla konuşacağım, sahadaki bencilliğe asla müsamaha göstermem.", action: (p) => { p.loyalty += 5; return "Haklısınız hocam, takım oyunu her şeydir."; } },
+interactions.js:128: { text: "Sahada şut atmak forvetin işidir, sen kendi pozisyonuna odaklan.", action: (p) => { p.loyalty -= 5; return "Öyle mi? Anlaşıldı hocam, biz boşuna koşuyoruz..."; } }
+interactions.js:135: { text: "Antrenmanda tatlı sertlik olur ama kasıt varsa cezasını ben veririm. Merak etme.", action: (p) => { p.loyalty += 5; p.condition += 5; return "Bana sahip çıktığınız için teşekkürler hocam."; } },
+interactions.js:136: { text: "Futbol bale değildir! Ayakta kalmayı öğreneceksin.", action: (p) => { p.loyalty -= 8; if(p.mentalTrait === 'aggressive') p.power += 0.5; return "Bale değil anladık ama bacağımı kırıyordu!"; } }
+interactions.js:143: { text: "Bugün müzik listesini sen yapıyorsun, itiraz eden olursa bana gönder.", action: (p) => { p.loyalty += 8; return "İşte beklediğim adalet! Teşekkürler hocam."; } },
+interactions.js:144: { text: "Böyle çocukça şeylerle bana gelmeyin, kendi aranızda çözün.", action: (p) => { p.loyalty -= 3; return "Peki hocam, biz kendi aramızda hallederiz o zaman..."; } }
+interactions.js:151: { text: "Henüz adapte olamadı, kaptan olarak onu aranıza alıp kaynaştırmak sana düşer.", action: (p) => { p.loyalty += 5; return "Haklısınız, ona biraz daha zaman ve şans vereceğiz."; } },
+interactions.js:152: { text: "Sen onun işine karışma, sahada işini yapsın yeter.", action: (p) => { p.loyalty -= 5; return "Takım ruhu olmadan nasıl şampiyon olacağız ki?"; } }
+interactions.js:159: { text: "Performansını böyle yüksek tutmaya devam et, sözleşme yenilerken bizzat yönetimle konuşacağım.", action: (p) => { p.loyalty += 10; return "Sözünüze güveniyorum hocam, sahada her şeyimi vereceğim."; } },
+interactions.js:160: { text: "Parayı değil formayı düşün! Sözleşmeye imza atarken bana mı sordun?", action: (p) => { p.loyalty -= 15; return "Demek öyle... Artık ne kadar ekmek, o kadar köfte!"; } }
+interactions.js:167: { text: "Haklısın evlat. İkinci kaptanımız sensin, takımın saha içindeki gizli lideri olacaksın.", action: (p) => { p.loyalty += 8; return "Gizli liderlik de fena değil... Teşekkürler hocam."; } },
+interactions.js:168: { text: "Pazubent sadece bir kumaş parçasıdır, liderlik ruhta biter.", action: (p) => { p.loyalty -= 5; return "O kumaş parçasının bir anlamı var ama neyse..."; } }
+interactions.js:175: { text: "Basının ne yazdığı umurumda değil, benim raporumda maçın yıldızı sensin.", action: (p) => { p.loyalty += 10; p.condition += 5; return "Sizin bu sözleriniz manşetlerden çok daha değerli hocam!"; } },
+interactions.js:176: { text: "Şov yapmak yerine futbol oynamaya odaklan, manşetleri değil maçları kazanıyoruz.", action: (p) => { p.loyalty -= 7; return "Herkes şov yapıyor da bir ben mi battım gözünüze?"; } }
+interactions.js:183: { text: "Benim tek prensim formayı en çok terletendir. Kimseye ayrıcalık yok, bunu tüm takıma söyle.", action: (p) => { p.loyalty += 5; return "Umarım öyledir hocam, takım olarak bunu duymaya ihtiyacımız vardı."; } },
+interactions.js:184: { text: "Haddini bil! Kararlarımı sorgulamak senin işin değil.", action: (p) => { p.loyalty -= 10; return "Nasıl isterseniz 'imparator'... Ben sadece uyarmak istemiştim."; } }
+interactions.js:191: { text: "Harika bir fikir, hesaplar benden. Gerçek bir takım böyle günlerde belli olur.", action: (p) => { p.loyalty += 12; return "Adamsınız hocam! Bu takım için canımızı veririz."; } },
+interactions.js:192: { text: "Yemeği boşver, sahada ayağına hakim olmayı öğrensin. Kampa erken girin.", action: (p) => { p.loyalty -= 8; return "En ufak bir moral desteğine bile izin vermiyorsunuz..."; } }
+interactions.js:199: { text: "Golü atın da, isterseniz amuda kalkın! Taraftar bunu sevecektir.", action: (p) => { p.loyalty += 8; return "Harika! Hafta sonu size güzel bir sürprizimiz olacak."; } },
+interactions.js:200: { text: "Sirke çevirmeyin sahayı! Ciddiyetinizi koruyun ve yerinize dönün.", action: (p) => { p.loyalty -= 5; return "Peki hocam, biz işimize bakalım..."; } }
+interactions.js:207: { text: "Çok asil bir davranış. Pankartı hazırlatıyorum, maçı da onun için kazanın!", action: (p) => { p.loyalty += 10; if(p.power < 90) p.power += 1; return "İşte gerçek takım ruhu! Bu maçı parçalayacağız!"; } },
+interactions.js:208: { text: "Kuralları çiğneyemeyiz, sahaya çıkın ve sadece futbolunuza odaklanın.", action: (p) => { p.loyalty -= 6; return "Duygusuzluğunuza inanamıyorum hocam."; } }
+interactions.js:215: { text: "Çok çalışanın hakkı yenmez. Sahanın ışıklarını açık bırakıyorum, kolay gelsin.", action: (p) => { p.loyalty += 8; p.condition -= 5; return "Çok teşekkürler hocam, hafta sonu o frikik gol olacak!"; } },
+interactions.js:216: { text: "Hayır, herkesle aynı anda idmanı bitirip dinleneceksin. Sakatlık riskine giremem.", action: (p) => { p.loyalty -= 3; p.condition += 5; return "Biraz ekstra çalışmaktan zarar gelmezdi ama siz bilirsiniz."; } }
+interactions.js:223: { text: "İşte benim kaptanım! O çocukların sana ihtiyacı var, tecrübelerini onlara aktar.", action: (p) => { p.loyalty += 10; return "Gururla hocam. Kulübün geleceği emin ellerde."; } },
+interactions.js:224: { text: "Sen kendi futboluna odaklan, altyapı koçları o işi halleder.", action: (p) => { p.loyalty -= 5; return "Yardımcı olmak istemiştim sadece..."; } }
+interactions.js:231: { text: "Muazzam bir liderlik örneği! Faturayı bana gönder, takım ruhunu sen inşa ediyorsun.", action: (p) => { p.loyalty += 12; return "Teşekkürler hocam, aramızdaki bağ çok daha güçlenecek."; } },
+interactions.js:232: { text: "Özel hayatını işine karıştırma. Sahada birbirinizi anlamanız yeterli.", action: (p) => { p.loyalty -= 6; return "Buz gibi bir takımız sizin yüzünüzden."; } }
+interactions.js:239: { text: "Böyle takım arkadaşlarına can kurban. İstediğiniz kadar tesisleri kullanabilirsiniz.", action: (p) => { p.loyalty += 8; return "Süper! Onu çok daha iyi bir oyuncu yapacağız."; } },
+interactions.js:240: { text: "Yeteneksiz adamla vakit kaybetme, bu takımın hedefleri var.", action: (p) => { p.loyalty -= 10; return "Sizin futbol felsefeniz çok acımasız hocam."; } }
+interactions.js:247: { text: "Sen arkadaşça uyarını yap, baktın olmuyor topu bana at ben cezasını keserim.", action: (p) => { p.loyalty += 7; return "Tamamdır hocam, olayı çözmeye çalışacağım."; } },
+interactions.js:248: { text: "Onun avukatı mısın sen? Disiplin benim işim, karışma!", action: (p) => { p.loyalty -= 5; return "Bir daha takım arkadaşlarımı düşünmeyeceğim, anlaşıldı."; } }
+interactions.js:255: { text: "Hemen yarın akşam tüm takıma barbekü partisi veriyoruz. Bu sorunu kökünden çözeceğiz.", action: (p) => { p.loyalty += 10; return "Müthiş fikir! Etler benden hocam."; } },
+interactions.js:256: { text: "Bana böyle dedikodularla gelmeyin, sahaya çıkıp topunuzu oynayın.", action: (p) => { p.loyalty -= 8; return "Sorunları halı altına süpürürsek daha çok kaybederiz."; } }
+interactions.js:263: { text: "Bunu takım kaptanıyla konuşacağım, kimsenin moralinizi bozmasına izin vermem.", action: (p) => { p.loyalty += 8; return "Arkamızda durduğunuz için sağ olun hocam."; } },
+interactions.js:264: { text: "Tecrübeye saygı duyacaksınız! Onlar ne derse yapmak zorundasınız.", action: (p) => { p.loyalty -= 8; return "Bu takımda gençlerin hiç değeri yokmuş..."; } }
+interactions.js:271: { text: "Antrenmanda onları farklı takımlara böleceğim. Bu çeteleşmeyi bitireceğim, merak etme.", action: (p) => { p.loyalty += 7; return "Oh be, sonunda biri duruma el atıyor."; } },
+interactions.js:272: { text: "Onların oyun görüşü daha iyi olduğu içindir, bence onlara ayak uydurmaya çalış.", action: (p) => { p.loyalty -= 10; return "Siz de o çetenin bir parçasıymışsınız meğer."; } }
+interactions.js:279: { text: "Benim köstebeğe ihtiyacım yok, sizin hocanız olarak her şeyi hissederim. Bana güvenin.", action: (p) => { p.loyalty += 5; return "Haklısınız hocam, galiba paranoya yapıyoruz..."; } },
+interactions.js:280: { text: "Siz ne konuşursanız anında haberim olur, adımınızı denk atın!", action: (p) => { p.loyalty -= 12; return "Soyunma odasında diktatörlük var demek... Güvenimiz sıfır."; } }
+interactions.js:300: p.loyalty += 7;
+interactions.js:301: p.condition += 5; // Moral motivasyon
+interactions.js:308: p.loyalty -= 7;
+manager.js:385: window.myTeam.budget -= 0.5;
+menu.js:724: t.budget -= weeklyWage;
+menu.js:784: p.power += 1;
+menu.js:793: p.power -= (p.age >= 35 ? Math.floor(Math.random() * 3) + 1 : 1);
+menu.js:843: p.loyalty -= 7;
+menu.js:859: window.leagueTable[window.myTeamId].pts -= 3;
+menu.js:1382: window.managerAuthority += 15;
+menu.js:1386: window.managerAuthority -= 15;
+menu.js:1460: window.budget += 10; // Bütçeyi geri ver (resolve içinde düştüğü için)
+menu.js:1899: window.budget += eff.budget;
+menu.js:1906: window.managerAuthority += eff.authority;
+menu.js:1912: window.presidentConfidence += eff.president;
+menu.js:1927: p.loyalty += loyaltyChange;
+national_team.js:85: p.morale += 20;
+national_team.js:95: p.condition -= 25; // Yorgun döndü
+national_team.js:106: p.morale -= 30; // Büyük yıkım
+press.js:384: p.loyalty += totalLoyalty; // Bu totalLoyalty zaten özel soru seçeneklerinde -100 veya +15 olarak ayarlı
+press.js:390: p.morale += totalMorale;
+press.js:397: p.loyalty += totalLoyalty;
+press.js:412: p.morale += totalMorale;
+press.js:431: window.userTeam.budget -= fineInMillions;
+press.js:443: window.userTeam.budget -= damageCost;
+scout.js:238: window.budget += forcedSaleValue;
+scout.js:333: window.myTeam.budget -= loc.cost;
+sponsor.js:50: window.budget += sp.upfront;
+sponsor.js:110: window.budget += earnings;
+squad.js:179: p.condition += (10 + medRecoveryBoost); // Cryotherapy boost
+squad.js:199: p.power -= powerDrop;
+squad.js:210: p.condition += (25 + medRecoveryBoost); // Tesis destekli aktif dinlenme
+squad.js:223: p.condition -= drop;
+squad.js:513: p.condition += 25;
+squad.js:519: p.morale -= 5;
+squad.js:521: p.morale -= 2;
+squad.js:541: window.budget += matchdayRevenue;
+staff.js:125: window.myTeam.budget -= candidate.cost;
+training.js:129: window.myTeam.budget -= moneyCost;
+training.js:156: p.power += totalGain;
+training.js:161: p.power += (gain * 0.1); // Her idman genel gücü minik artırır
+training.js:163: window.myTeam.budget -= moneyCost;
+transfer.js:388: myTeam.budget -= fee;
+transfer.js:458: myTeam.budget += price;
+transfer.js:614: myTeam.budget += offerPrice;
+transfer.js:732: myTeam.budget -= task.price;
+transfer.js:759: myTeam.budget += task.requestedPrice;

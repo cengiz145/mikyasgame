@@ -3,17 +3,19 @@ $ErrorActionPreference = "Stop"
 $downloads = [System.Environment]::GetFolderPath("UserProfile") + "\Downloads"
 $websiteDir = "$downloads\wep sitem"
 
-try {
-    $hafizanaGuvenSource = (Resolve-Path "$downloads\haf*zana g*ven\hafizana_guven").Path
-} catch {
-    $hafizanaGuvenSource = $null
-}
+    $targetPath = "$downloads\hafızana güven\hafizana_guven"
+    if (Test-Path $targetPath) {
+        $hafizanaGuvenSource = $targetPath
+    } else {
+        $hafizanaGuvenSource = $null
+    }
 
-try {
-    $otobusSource = (Resolve-Path "$downloads\otob*s sim*lasyonu").Path
-} catch {
-    $otobusSource = $null
-}
+    $otobusTargetPath = "$downloads\otobüs simülasyonu"
+    if (Test-Path $otobusTargetPath) {
+        $otobusSource = $otobusTargetPath
+    } else {
+        $otobusSource = $null
+    }
 
 Write-Host "===================================================" -ForegroundColor Cyan
 Write-Host "   TUM OYUNLARI VE SITEYI GITHUB'A YUKLEME ARACI   " -ForegroundColor Cyan

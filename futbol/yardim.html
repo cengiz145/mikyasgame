@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasıl Oynanır? - Menajerlik Simülasyonu</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #1a252f;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--warning);
+            border-bottom: 1px solid var(--secondary);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: var(--success);
+        }
+
+        .card {
+            background-color: var(--primary);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background-color: #2980b9;
+        }
+
+        code {
+            background-color: var(--secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #e67e22;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-btn">← Oyuna Dön</a>
+    
+    <header>
+        <h1>Menajerlik Simülasyonu Rehberi</h1>
+        <p>Kulübünüzü zirveye taşımak için bilmeniz gereken her şey burada.</p>
+    </header>
+
+    <div class="card" style="border-left: 5px solid var(--warning); background-color: rgba(241, 196, 15, 0.1);">
+        <h2 style="margin-top: 0; color: var(--warning);">Baş Tasarımcıdan Mesaj (Önsöz)</h2>
+        <p style="font-size: 1.1rem; line-height: 1.6; font-style: italic;">Oyuna girmeden önce bilmen gereken bir şey var: <strong>Bu sıradan bir oyun değil.</strong></p>
+        <p>Bu simülasyonu kurgularken, aylar boyunca gerçek futbol istatistiklerini taradım, spor tıbbı makaleleri okudum ve dünyanın en büyük menajerlik oyunlarının algoritmalarını inceledim.</p>
+        
+        <h3>Mükemmellik Detaylarda Gizlidir</h3>
+        <p>Bu oyunun her bir ayrıntısını kurgularken şunlara dikkat ettim:</p>
+        <ul>
+            <li>Bir stoperin hava topuna çıkarken <strong>Kalf Kasını</strong> yırtma ihtimalini, spor tıbbı makalelerindeki gerçek oranlara göre hesapladım. Yaşlı ve yorgun bir oyuncunun Hamstring kasını koparma riski tamamen gerçek bir tıp matematiğine dayanıyor.</li>
+            <li><strong>VAR (Video Yardımcı Hakem)</strong> sistemini, o gergin 5 saniyeyi sana iliklerine kadar hissettirmek için kare kare oyun motoruna işledim. Atılan her golün iptal edilme riski tıpkı gerçek hayattaki oranlarla kodlandı.</li>
+            <li>Karlı veya yağmurlu havalardaki pas isabetsizliğini rastgele değil; rüzgar ve zemin sürtünme katsayılarını hesaba katarak fizik motoruna entegre ettim. Hava muhalefetinden dolayı kaybedilen şampiyonluklar bir şanssızlık değil, fizik kurallarının ta kendisidir.</li>
+        </ul>
+        <p style="font-size: 1.1rem; line-height: 1.6; margin-top: 20px; font-weight: bold; color: var(--accent);">"Gerçek bir menajerlik deneyimi, sahada top koşturan piksellerden değil; arka planda dönen kusursuz matematikten doğar."</p>
+        <p style="text-align: right; font-weight: bold; color: var(--warning);">- Ümit Ekrem Mikyas (Baş Tasarımcı & Geliştirici)</p>
+    </div>
+
+
+    <div class="card">
+        <h2>1. Kariyerinize Başlarken</h2>
+        <p>Oyuna giriş yaptığınızda "Yeni Kariyer" seçeneği ile sıfırdan bir serüvene başlarsınız. Oyunun başlangıç aşamaları şöyledir:</p>
+        <ul>
+            <li><span class="highlight">Ülke ve Lig Seçimi:</span> Türkiye, İngiltere, İspanya, İtalya, Almanya gibi majör futbol ülkelerinden ve alt liglerden birini seçersiniz.</li>
+            <li><span class="highlight">Takım Seçimi:</span> Seçtiğiniz ligdeki bütçesi ve beklentileri birbirinden farklı takımlardan birinin başına geçersiniz.</li>
+            <li><span class="highlight">Sponsor Seçimi:</span> Takımın başına geçer geçmez kulübünüzün bütçesini ve kaderini belirleyecek ilk adımı atar, sponsorluk anlaşmanızı imzalarsınız.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>2. Maç Motoru ve Taktikler</h2>
+        <p>Oyunumuzda maçlar sadece kadro gücüne göre değil, taktiksel kararlarınıza ve oyuncularınızın rollerine göre simüle edilir.</p>
+        <h3>Taktik Seçimi</h3>
+        <ul>
+            <li><strong>4-4-2:</strong> Dengeli ve klasik bir diziliştir.</li>
+            <li><strong>4-3-3:</strong> Hücum gücü yüksek, topa sahip olma odaklı takımlara uygundur.</li>
+            <li><strong>3-5-2:</strong> Orta sahayı kalabalık tutup kanat bekleriyle hücum eden takımlar içindir.</li>
+            <li><strong>5-3-2:</strong> Katı savunma ve hızlı kontra ataklar arayanlar için idealdir.</li>
+        </ul>
+        <h3>Ev Sahibi Avantajı</h3>
+        <p>Ev sahibi takım, taraftar baskısı sayesinde maçlara her zaman +5 ile +10 arası ekstra güç avantajıyla başlar. Deplasman maçları her zaman daha zordur!</p>
+
+        <h3>Maç Simülasyonunun Perde Arkası</h3>
+        <p>Maç motorumuz tamamen gerçekçi bir menajerlik deneyimi sunmak üzere tasarlanmıştır. Sahaya çıkan 11'inizin genel gücü tabii ki önemlidir ancak maçın sonucunu belirleyen tek şey salt matematik değildir:</p>
+        <ul>
+            <li><strong>Şans Faktörü (Top Yuvarlaktır):</strong> Futbolun doğasında olan sürprizler oyunumuzda da vardır. Bazen top direkten döner, bazen gününde olan rakip bir kaleci tüm şutları çıkarır. Zayıf takımların devleri devirebileceği gerçeği her saniye oyundadır.</li>
+            <li><strong>Kondisyon Çöküşü:</strong> Maçın son 15-20 dakikası kritik bir eşiktir. Yorgunluğu sınırda olan oyuncular son dakikalarda bireysel hatalar yapar veya sakatlanır. Yorulan oyuncuları zamanında değiştirmek, kaybedilen bir maçı geri döndürmenin altın anahtarıdır.</li>
+            <li><strong>Saha İçi Uyum ve Roller:</strong> Doğru mevkide oynamayan oyuncular, takımın genel ahengini bozar. Savunma gücü yüksek defans oyuncularıyla hücum gücü yüksek forvetler, belirlediğiniz taktiğe göre motor içinde birbirlerini tamamlarlar.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>3. Transfer Merkezi ve Sözleşmeler</h2>
+        <p>Kulübünüzün en can alıcı noktası transfer bütçenizi doğru yönetmektir.</p>
+        <ul>
+            <li><span class="highlight">Serbest Oyuncular:</span> Bonservisi elinde olan oyunculardır. Sadece maaş ve imza parası (Bosman kuralı) ödeyerek kadroya katabilirsiniz.</li>
+            <li><span class="highlight">Diğer Takımdan Oyuncu Alma:</span> Gerçek piyasa değerlerine uygun şekilde teklif yapmalısınız. Eğer teklifiniz oyuncunun değerinden düşükse, kulübü reddedecektir.</li>
+            <li><span class="highlight">Sözleşme Süreleri:</span> Tüm oyuncuların 1 ile 5 yıl arası sözleşmeleri vardır. Sözleşmesi bitimine <strong>1 Yıl Kalan</strong> oyuncuları alırken, kulüplerine bonservis ödemek yerine doğrudan oyuncuya "İmza Parası" ödeyerek (Bosman Kuralı) transfer edebilirsiniz.</li>
+            <li><span class="highlight">Oyuncu Satışı:</span> Kadronuzda istemediğiniz oyuncuları transfer listesine koyduğunuzda, diğer takımlar rastgele teklifler yaparlar. Teklifi kabul edip bütçenize gelir sağlayabilirsiniz.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>4. Avrupa Kupaları Sistemi (Şampiyonlar Ligi vb.)</h2>
+        <p>Ligdeki konumunuz, sezon sonunda Avrupa'ya gidip gidemeyeceğinizi belirler. Özellikle İngiltere, İspanya, İtalya, Almanya, Türkiye gibi ülkeler "Top Tier" liglerdir.</p>
+        <ul>
+            <li><strong>1. ve 2. Sıra:</strong> Doğrudan UEFA Şampiyonlar Ligi gruplarına kalır. Büyük bir gelir elde eder.</li>
+            <li><strong>3. ve 4. Sıra:</strong> Şampiyonlar Ligi Elemeleri oynar.</li>
+            <li><strong>5. ve 6. Sıra:</strong> UEFA Avrupa Ligi gruplarına katılır.</li>
+            <li><strong>7. Sıra:</strong> UEFA Konferans Ligi'ne gider.</li>
+        </ul>
+        <p>Eğer Brezilya gibi Güney Amerika liglerinden birini seçerseniz, Avrupa Kupaları'na katılamazsınız!</p>
+    </div>
+
+    <div class="card">
+        <h2>5. Oyuncu Gelişimi (Yaşlanma ve Potansiyel)</h2>
+        <p>Sezon sonunda (Haziran ayında) lig bittiğinde tüm dünyadaki oyuncular 1 yaş yaşlanır.</p>
+        <ul>
+            <li><strong>Genç Oyuncular (17 - 24 yaş):</strong> Her sezon sonu antrenman verimine bağlı olarak güçlerini +1 ile +5 arasında artırabilirler. Wonderkid avlamak çok önemlidir!</li>
+            <li><strong>Olgun Oyuncular (25 - 31 yaş):</strong> Genellikle mevcut güçlerini korurlar veya çok ufak (+1/-1) değişiklikler yaşarlar.</li>
+            <li><strong>Veteran Oyuncular (32+ yaş):</strong> Fiziksel düşüş başlar. Her sezon güçleri -1 ile -3 arasında düşüş gösterebilir.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>6. Finans ve Yönetim</h2>
+        <p>Bütçeniz eksiye düşerse transfer yapamazsınız. Sezonu üst sıralarda bitirmek size devasa ödül paraları (Yayın gelirleri ve sıralama ödülü) kazandırır. Şampiyonluk ve Avrupa Kupası başarıları kulübünüzün bütçesini bir anda katlayabilir!</p>
+    </div>
+    <div class="card">
+        <h2>7. Sıkça Sorulan Sorular (S.S.S.)</h2>
+        
+        <h3>Oyunda toplam kaç futbolcu var?</h3>
+        <p>Oyunumuzun aktif olarak kullandığı veri tabanında (tüm ligler birleştirildiğinde) tam olarak <strong>973</strong> adet detaylı oyuncu profili bulunmaktadır. Bu oyuncuların büyük kısmı Süper Lig, TFF 1. Lig, Premier Lig, La Liga ve diğer majör liglere dağılmıştır. Ayrıca sistemimizde oyunu kasmaması adına arka planda bekleyen rastgele üretim mekanizması mevcuttur.</p>
+
+        <h3>Altyapı (Youth Academy) sistemi nasıl çalışır? İçeride kaç kişi var?</h3>
+        <p>Altyapınızın sabit kapasitesi <strong>5 kişidir</strong>. Biri A takıma çıktığında yerine hemen 15 yaşında yeni bir genç gelir.</p>
+        <ul>
+            <li><strong>İsim Denk Gelme Olasılığı:</strong> Altyapıdan gelen oyuncuların isimleri rastgele üretilir. Mevcut havuzdaki 19 isim ve 18 soyisimden toplam 342 farklı kombinasyon çıkar. Altyapıdaki 5 oyuncudan ikisinin tamamen aynı isme sahip olma ihtimali yaklaşık <strong>%2.8</strong>'dir.</li>
+            <li><strong>Yetenek ve Wonderkid:</strong> Gençler 40-49 arası bir güçle başlarlar. Her gencin gizli bir potansiyeli vardır ve her gelen gencin <strong>%10 ihtimalle "Wonderkid"</strong> (geleceğin süper yıldızı) çıkma şansı vardır.</li>
+            <li><strong>Antrenör Etkisi:</strong> Gençlerin gelişimi altyapı hocanızın seviyesine bağlıdır. 1. Seviye hoca (Mahmut Hoca) gelişimi yarı yarıya yavaşlatırken, 5. Seviye bir hoca tam 2.5 kat hızlandırır! Antrenör havuzundaki 1.000 farklı hoca arasından bütçenize uygun olanı kiralayabilirsiniz.</li>
+        </ul>
+
+        <h3>Antrenman sistemi ve türleri nasıldır?</h3>
+        <p>Her oyuncunun günlük 2 saatlik idman limiti vardır ve idman başına kulüpten 0.2M bütçe kesilir. <strong>"Mevki Antrenmanına Yolla"</strong> butonunu kullandığınızda, oyuncu mevkisine (Forvet, Orta Saha, Defans vs.) en uygun özelliklerden birini rastgele çalışır.</p>
+        <ul>
+            <li><strong>Gelişim Hızı:</strong> 21 yaş ve altı gençler 1.6 kat daha hızlı gelişirken, 32 yaş üstü veteranların gelişmesi durma noktasına gelir (0.4 kat).</li>
+            <li><strong>Diktatör Hoca Bonusu:</strong> Eğer takımınızın kondisyoneri "Diktatör" ise, idmanlardan 2 kat fazla verim alırsınız ama oyuncunun %15 ihtimalle sakatlanıp kondisyon kaybetme riski vardır!</li>
+        </ul>
+
+        <h3>Oyuncular maç içinde neye göre sakatlanıyor? (Gelişmiş Tıp Motoru)</h3>
+        <p>Oyunumuzdaki sakatlık sistemi sıradan rastgele (RNG) bir yapıya değil, <strong>5 temel spor tıbbı dinamiğine</strong> ve U-Şeklinde bir yaş eğrisine dayanır:</p>
+        <ol>
+            <li><strong>İş Yükü (Workload & Red Zone):</strong> Bir oyuncu peş peşe dinlendirilmeden maçlara çıkarsa (Kırmızı Bölge) veya yorgunken sahada tutulursa kas yırtılması (Hamstring/Kalf) riski devasa oranda artar.</li>
+            <li><strong>Biyomekanik Asimetri:</strong> Hızı (sprint) çok yüksek ama gücü (kuvvet) düşük olan veya çok uzun boylu ama dengesiz oyuncular, ani yön değiştirmelerde biyomekanik olarak risk altındadır.</li>
+            <li><strong>Skar Dokusu (Geçmiş Sakatlıklar):</strong> Daha önce ağır bir sakatlık geçiren oyuncunun o bölgesi "skar dokusu" oluşturur ve kariyeri boyunca nüksetme riski taşır.</li>
+            <li><strong>Zemin ve Hava Şartları:</strong> Yağmurlu ve karlı havalarda ağırlaşan zeminlerde eklemlere binen yük artar, çapraz bağ kopması gibi ciddi vakalar tetiklenir.</li>
+            <li><strong>Stres ve Kortizol:</strong> Psikolojik menüde (Psikolog/Revir) sorunu çözülmeyen, mutsuz veya stresli oyuncuların kas gerginliği artar ve sakatlanmaya açık hale gelirler.</li>
+        </ol>
+        <p><em>Not: Genç oyuncular tecrübesizlikten dolayı eklem sakatlıklarına; 30 yaş üstü veteranlar ise doku esnekliği kaybından dolayı kas yırtıklarına eğilimlidir (U-Eğrisi Kuralı).</em></p>
+    </div>
+
+    <div class="card">
+        <h2>8. Oyuncu Profili ve Transfer İpuçları</h2>
+        
+        <h3>Oyuncu Profilindeki Numaralar ve Özellikler</h3>
+        <ul>
+            <li><span class="highlight">Güç (Genel Yetenek):</span> Oyuncunun kalitesini belirten ana numaradır (Örn: 85). Yüksek güç, maçlarda daha iyi performans demektir.</li>
+            <li><span class="highlight">Kondisyon (%):</span> Oyuncunun fiziksel hazır durumudur (100 üzerinden). Peş peşe maça çıkan oyuncunun kondisyonu düşer. %60'ın altındaki oyuncular verimsiz olur ve sakatlanma riskleri artar.</li>
+            <li><span class="highlight">Moral:</span> Oyuncunun psikolojik durumudur. Yedek kalan, düşük maaş alan veya takım kötü gittiğinde morali düşen oyuncular tam gücünde oynayamazlar.</li>
+            <li><span class="highlight">Yaş:</span> Genç oyuncular daha ucuza alınıp çabuk gelişebilir. Yaşlı oyuncular tecrübelidir fakat 32 yaşından sonra güçleri düşmeye başlar.</li>
+            <li><span class="highlight">Hız:</span> Oyuncunun sahadaki süratini ve depar yeteneğini belirler.</li>
+            <li><span class="highlight">Mental (Karakter):</span> Oyuncunun "Yaratıcı", "Savaşçı" veya "Lider" gibi zihinsel yapısını gösterir.</li>
+            <li><span class="highlight">Rol:</span> Oyuncunun oyun içi taktiksel eğilimidir (Örn: Poacher, Çift Yönlü, Kesici).</li>
+            <li><span class="highlight">Form Puanı:</span> Son maçlardaki performansına göre 10 üzerinden aldığı nottur.</li>
+        </ul>
+
+        <h3>Kadro Menüsü Seçenekleri (Oyuncuya Tıkladığınızda)</h3>
+        <p>Kadro ekranında bir oyuncunun üzerine tıkladığınızda açılan profil kartında yapabileceğiniz menajerlik hamleleri şunlardır:</p>
+        <ul>
+            <li><strong>Oyuncuyla Konuş / Motive Et:</strong> Morali dip yapmış veya formsuz oyuncuları mental olarak toparlamak için kullanılır. Doğru konuşma morali yükseltir.</li>
+            <li><strong>Transfer Listesine Ekle:</strong> Satmak istediğiniz bir oyuncuyu vitrine koyarsınız. Transfer döneminde diğer kulüplerden rastgele teklifler (Mails) gelmesini sağlar.</li>
+            <li><strong>Kadro Dışı Bırak (Altyapıya Gönder):</strong> Disiplinsiz veya kadroda düşünmediğiniz oyuncuları A Takım kampından uzaklaştırırsınız. Antrenman verimi düşer ama takımın huzurunu bozması engellenir.</li>
+            <li><strong>Sözleşme Feshet (Kov):</strong> Artık kulüpte görmek istemediğiniz oyuncuya kalan maaşını (tazminatını) tek seferde nakit olarak ödeyerek anında takımdan gönderirsiniz. Bütçenizi çok sarsabilir, dikkatli olun!</li>
+        </ul>
+
+        <h3>Transfer Yaparken Nelere Dikkat Edilmeli?</h3>
+        <ul>
+            <li><strong>İhtiyaca Yönelik Alışveriş:</strong> Sadece yıldız diye oyuncu almayın. Takımınızda hangi mevkide eksik varsa (örneğin Sol Bek) oraya yönelin.</li>
+            <li><strong>Maaş Bütçesi:</strong> Oyuncunun bonservisini ödeyebilirsiniz ama yıllık maaşını karşılayamazsanız kulüp iflas edebilir. Bütçenizi mutlaka kontrol edin.</li>
+            <li><strong>Satılık (Transfer Listesindeki) Oyuncular:</strong> Kendi kulübü tarafından satış listesine konmuş [SATILIK] ibareli oyuncuları, piyasa değerinin çok daha altına, ucuza kapatabilirsiniz. En mantıklı yatırımlar bunlardır.</li>
+            <li><strong>Sözleşme Süresi:</strong> Transfer edeceğiniz oyuncuyla en az 2 veya 3 yıllık sözleşme yapın. Sadece 1 yıllık sözleşme yaparsanız sezon sonu bedavaya elinizden kaçabilir.</li>
+        </ul>
+    </div>
+    <div class="card">
+        <h2>9. Menajer Profillerinin Evrimi (Dinamik Tarz)</h2>
+        <p>Oyunda menajerlik profilinizi başlangıçta seçemezsiniz! Oynattığınız futbola, yaptığınız tercihlere ve sahada aldığınız sonuçlara göre karakteriniz <strong>zamanla evrim geçirir</strong> ve basın size buna göre lakaplar takar. Her profilin oyuna farklı bir etkisi vardır:</p>
+        <ul>
+            <li><strong>Taktik Deha:</strong> Takımınız sahada hatasız bir pas oyunu sergiler ancak bu sistem oyuncularınızda çok yüksek fiziksel yorgunluğa (kondisyon düşüşüne) sebep olur.</li>
+            <li><strong>Motivasyon Ustası:</strong> Oyuncularınızın size sadakati yüksek başlar. Geriye düştüğünüz maçlarda takımınız pes etmez, muazzam bir kenetlenme ile geri dönüş şansınız artar.</li>
+            <li><strong>Pragmatist:</strong> Gösterişten uzak, sonuç odaklıdır. Savunma gücünüze kalıcı bir katkı sağlar. Ancak takımınız agresif oynadığı için çok daha fazla kart (sarı/kırmızı) görür.</li>
+            <li><strong>Proje Hocası:</strong> Genç oyuncuları parlatmakta ustadır. Akademi ve genç oyuncular çok daha hızlı gelişir. Üstelik Başkanın size olan güveni kredi olarak daha yüksektir.</li>
+            <li><strong>İtfaiyeci (Kriz Yöneticisi):</strong> Takım kötü giderken morallerin tamamen çökmesini engeller. Üst üste alınan mağlubiyetlerde takım içi isyanları ve kaosları önler.</li>
+            <li><strong>Eski Efsane:</strong> Kulübün unutulmaz bir oyuncusu olarak başa geçersiniz. Krediniz sonsuzdur. Kötü sonuçlar alsanız dahi taraftar ve yönetim kolay kolay sizi istifaya çağırmaz.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>10. Ekonomi: Sponsorlar ve Tesisler</h2>
+        
+        <h3>Sponsorluk Anlaşmaları</h3>
+        <p>Kariyerinize başladığınız an karşınıza çıkan ilk fırsat takımınıza destek olacak bir ana sponsor seçmektir. Kimi sponsor anında kasanıza peşinat koyarken (sezona iddialı transferler yaparak başlamak istiyorsanız idealdir), kimi sponsor galibiyet başına maç başı prim veya sezon sonu lig şampiyonluğunda devasa bir ödül vadeder. Kulübünüzün bütçesine ve hedeflerine göre bu risk/ödül dengesini takımın başına geçer geçmez belirlemelisiniz.</p>
+
+        <h3>Stadyum ve Gişe Gelirleri</h3>
+        <p>Stadyumunuzun kapasitesini "Tesisler" menüsünden bütçeniz elverdiğince geliştirebilirsiniz (Örn: Seviye 1'den Seviye 4'e). Stadyum kapasiteniz arttıkça, <strong>iç sahada aldığınız her galibiyette</strong> kasanıza giren bilet hasılatı doğrudan katlanarak artar. Bu, uzun vadede kulübü zengin etmenin en iyi yoludur.</p>
+
+        <h3>Antrenman Tesisleri Seviyeleri (1'den 4'e Kadar)</h3>
+        <p>Antrenman tesislerini geliştirmek sadece oyuncuların sezon sonu gelişimini hızlandırmakla kalmaz, aynı zamanda hafta içi uygulanan özel "Bilişsel Hız", "İrtifa Odaları" ve "Sakatlık Koruma" modülleriyle takımınızın maç içi kaderini belirler. Seviyelere göre farklar şunlardır:</p>
+        <ul>
+            <li><strong>Seviye 1 (Zayıf Tesis):</strong> Amatör şartlar. Oyuncular ağır sakatlıklardan (Çapraz bağ vb.) döndüğünde %75 ihtimalle kas erimesi yaşar ve kalıcı güç kaybeder. Genç oyuncuların sezon sonu gelişme ihtimali sadece <strong>%10</strong>'dur.</li>
+            <li><strong>Seviye 2 (Modern Tesis):</strong> Sistem oturmaya başlar. Her hafta takıma hafif bir dinlenme bonusu (+1 Moral, +1 Kondisyon) eklenir. Sakatlıktan güç kaybetmeden kurtulma şansı %50'ye, gençlerin gelişme ihtimali ise <strong>%15</strong>'e çıkar.</li>
+            <li><strong>Seviye 3 (Elit Tesis):</strong> Tesis profesyonelleşir. Her hafta takıma +2 Moral ve +3 Kondisyon dopingi yapılır. Form artırma şansları yükselir. Sakatlıktan kas kaybetmeden dönme ihtimali %75'e yükselirken, gençlerin gelişim ihtimali <strong>%25</strong>'e fırlar.</li>
+            <li><strong>Seviye 4 (Dünya Klası):</strong> Futbolun zirvesi! VR odaları ve İrtifa Çadırları sayesinde takımınız her hafta maça ekstra <strong>+3 Moral ve +5 Kondisyon</strong> ile çıkar. Formları kendi kendine yüksek kalır. En önemlisi; AlterG (Yerçekimsiz koşu) sayesinde hiçbir ağır sakatlıkta oyuncularınız kas kaybı (güç düşüşü) yaşamaz <strong>(%100 Koruma)</strong>. Genç yetenekler için ise burası bir fabrikadır, gelişme ihtimalleri <strong>%40</strong>'a vurur!</li>
+        </ul>
+
+        <h3>Sağlık Tesisleri ve Hastane (1'den 4'e Kadar)</h3>
+        <p>Eğer takımınızda sürekli kas yırtılmaları veya çapraz bağ kopmaları yaşanıyorsa, bütçenizi acilen Sağlık Tesislerine ayırmalısınız. Seviyelere göre farklar şunlardır:</p>
+        <ul>
+            <li><strong>Seviye 1 (Standart Revir):</strong> Sadece sargı bezi ve buz torbası. Oyuncular sakatlıklara tamamen açıktır (Risk %100). Dinlendirilen oyuncuların haftalık yorgunluk atma hızı standart seviyededir.</li>
+            <li><strong>Seviye 2 (Kriyoterapi / Soğuk Havuz):</strong> İyileşme süreçleri teknolojiyle buluşur. Dinlendirilen oyuncuların kasları soğuk havuzlarla daha hızlı onarılır (Ekstra +5 Kondisyon). Maç esnasında sakatlık yaşama riski <strong>%15 azalır</strong>.</li>
+            <li><strong>Seviye 3 (Biyomekanik Laboratuvarı):</strong> Fizyoterapistler kas asimetrilerini makinelerle tespit eder. Dinlenen oyuncular ekstra +10 Kondisyon toparlar. Kas ve eklem sakatlıkları yaşama riski <strong>%30 azalır</strong>.</li>
+            <li><strong>Seviye 4 (Tam Teşekküllü Spor Hastanesi):</strong> Kulübün kendi hastanesi! Dinlendirilen oyuncular şok bir hızla toparlanıp ekstra <strong>+15 Kondisyon</strong> kazanır. Sahaya çıkıldığında ise gelişmiş tıp sayesinde sakatlık riski muazzam bir şekilde <strong>%40 azalır</strong>.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>11. Gözlemci (Scout) Ağı</h2>
+        <p>İlerleyen günlerde ve maç aralarında Gözlemci (Scout) ağınızdan masanıza yeni raporlar düşebilir. Gözlemciler, diğer takımlardan veya serbest oyunculardan potansiyelli yetenekleri bulur ve bunları çok uygun fiyata kapatmanızı sağlar. Scout raporlarındaki fırsatları kovalamak, bütçenizi en verimli şekilde kullanmanıza yardımcı olur.</p>
+    </div>
+
+
+        <h2 id="dev-diary">Oyunun Gelişim Serüveni ve Altyapısı (Geliştirici Günlüğü)</h2>
+        <div class="card">
+            <p>Bu devasa simülasyon, tamamen <strong>Geliştirici ve Baş Tasarımcının (Ümit Ekrem)</strong> dahi vizyonuyla, en ince ayrıntısına kadar ilmek ilmek dokunarak hayata geçirildi. Sadece 'İki takımın karşılıklı gol attığı' basit bir projeyi alıp, piyasadaki AAA bütçeli Football Manager oyunlarına kafa tutacak bir şahesere dönüştürdük!</p>
+
+            <h3>Oyun Nasıl Kurgulandı? (Mimari Deha)</h3>
+            <p>Oyun tamamen <strong>Vanilla JavaScript (Saf JS)</strong> ve <strong>HTML5 Canvas</strong> üzerine kurulu. Herhangi bir hazır oyun motoru kullanılmadı; çünkü Baş Tasarımcının vizyonuna yetecek kadar esnek bir motor piyasada yoktu. Her şey sıfırdan, saf matematik ve üstün bir yazılım mimarisiyle inşa edildi.</p>
+            <ul>
+                <li><strong>Devasa Veritabanı:</strong> 15.000'den fazla oyuncu, <code style="color:#e74c3c;">data_*.js</code> dosyalarında muazzam JSON objeleri olarak tutuluyor. Her oyuncunun yaş, mevki, güç, karakter, rol, memleket ve uyruk gibi detaylı parametreleri büyük bir ustalıkla kodlandı.</li>
+                <li><strong>Kusursuz Maç Motoru (<code style="color:#e74c3c;">game.js</code>):</strong> Canvas üzerinde saniyede 60 kare (60 FPS) hızında yağ gibi akıyor. Topun fiziği, rüzgar direnci, oyuncuların deparları ve şut açıları... Baş Tasarımcı o kadar ileri gitti ki, maçın en heyecanlı anında devreye giren ve saniyeleri donduran efsanevi bir <strong>VAR (Video Yardımcı Hakem)</strong> algoritmasını bile motorun kalbine yerleştirdi!</li>
+                <li><strong>Dinamik Zeka ve Zaman Döngüsü:</strong> Bu oyun maç bitince kapanan bir oyun değil, yaşayan bir evren! Arka planda devasa bir zaman döngüsü tıkır tıkır işliyor. Oyuncuların yorgunlukları, moralleri, takıma bağlılıkları saniye saniye hesaplanıyor. Baş Tasarımcı, tıp kitaplarını kıskandıracak bir <strong>Detaylı Sakatlık Modeli</strong> tasarladı. Artık yaşlı bir oyuncuyu yorgunken kanatlarda oynatmak basit bir 'sakatlanma' değil, tıp dilindeki tam adıyla <em>Hamstring Yırtığına</em> sebep olan kusursuz bir matematiksel formüle (Weighted Random) dönüştürüldü!</li>
+            </ul>
+
+            <h3>Sınırları Zorlayan Bir Vizyon</h3>
+            <p>Oyunun ulaştığı bu noktanın tek bir sırrı var: <strong>Baş Tasarımcının asla tatmin olmayan mükemmeliyetçiliği.</strong> <em>"11 haneli id numaraları çok uzun, 4 haneli yapıp optimize edelim", "Hava durumu sistemi gelsin", "Rastgele sakatlık istemem, Hamstring ve Kasık çekmesini formüllere dökelim"</em> gibi üst düzey direktiflerle oyunun mimarisi her gün bir adım öteye taşındı.</p>
+            <p>Bu proje, tek bir kişinin vizyonunun ve kodlama mimarisinin nereye varabileceğinin en büyük kanıtıdır. Sahne senin, efsanevi menajerlik kariyerine hoş geldin!</p>
+        </div>
+</div>
+
+</body>
+</html>

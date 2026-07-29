@@ -1,0 +1,85 @@
+Created At: 2026-06-26T20:42:51Z
+Completed At: 2026-06-26T20:42:51Z
+File Path: `file:///C:/Users/Umit%20Ekrem%20Mikyas/Downloads/wep%20sitem/futbol/index.html`
+Total Lines: 533
+Total Bytes: 30886
+Showing lines 1 to 533
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: JavaScript Hatası:
+2: Mesaj: Script error.
+3: Dosya:
+4: Satır: 0:0
+5: 
+6: Detay:
+7: Stack trace yok
+8: 
+9: <!DOCTYPE html>
+10: <html lang="tr">
+11: 
+12: <head>
+13:     <meta charset="UTF-8">
+14:     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+15:     <title>Gerçek Lig Prototipi - Erişilebilir Menü</title>
+16:     <link rel="stylesheet" href="style.css">
+17:     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+18: </head>
+19: 
+20: <body role="application" tabindex="0" id="game-application">
+21:     <!-- HATA BİLDİRİM MODALI (AutoRepair) -->
+22:     <div id="error-reporter-modal"
+23:         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(139, 0, 0, 0.95); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; opacity: 0; transition: opacity 0.5s ease;"
+24:         role="dialog" aria-modal="true" aria-labelledby="error-modal-title">
+25:         <div
+26:             style="background: #111; border: 3px solid #ff4444; border-radius: 12px; padding: 30px; width: 80%; max-width: 700px; box-shadow: 0 0 50px rgba(255, 0, 0, 0.5); text-align: left;">
+27:             <h2 id="error-modal-title"
+28:                 style="color: #ff4444; margin-top: 0; font-size: 2rem; border-bottom: 1px solid #ff4444; padding-bottom: 10px;">
+29:                 KRİTİK SİSTEM HATASI</h2>
+30:             <p style="color: #fff; font-size: 1.2rem; margin-bottom: 15px;">Oyun motorunda beklenmeyen bir hata oluştu.
+31:               
+<truncated 29891 bytes>
+iv>
+490:                     <div class="stat-box">
+491:                         <span class="stat-label">Rol</span>
+492:                         <span class="stat-value" id="pp-role">poacher</span>
+493:                     </div>
+494:                 </div>
+495: 
+496:                 <div class="contract-section">
+497:                     <h3>Sözleşme Durumu</h3>
+498:                     <div class="contract-counter">
+499:                         <i class="fas fa-file-contract"></i> Kalan Süre: <strong id="pp-contract-years">2 Yıl</strong>
+500:                     </div>
+501:                     <p class="contract-details" id="pp-contract-details">
+502:                         Sözleşmesi sezon sonunda (Yaz Transfer Dönemi) bitecek ve boşa düşecek.
+503:                     </p>
+504:                 </div>
+505: 
+506:                 <div class="profile-actions" id="pp-actions-container">
+507:                     <!-- Actions will be injected here via JS (Transfer listesine koy, Kov) -->
+508:                 </div>
+509:             </div>
+510:         </div>
+511:     </div>
+512: 
+513:     <!-- Scriptler -->
+514:     <script src="js/autoRepair.js"></script>
+515:     <script src="js/data.js"></script>
+516:     <script src="js/save.js"></script>
+517:     <script src="js/league.js"></script>
+518:     <script src="js/audio.js"></script>
+519:     <script src="js/dialogueData.js"></script>
+520:     <script src="js/dialogue.js"></script>
+521:     <script src="js/transfer.js"></script>
+522:     <script src="js/psychologist.js"></script>
+523:     <script src="js/training.js"></script>
+524:     <script src="js/scout.js"></script>
+525:     <script src="js/psychology.js"></script>
+526:     <script src="js/manager.js"></script>
+527:     <script src="js/squad.js"></script>
+528:     <script src="js/announcer.js"></script>
+529:     <script src="js/game.js"></script>
+530:     <script src="js/menu.js"></script>
+531: </body>
+532: 
+533: </html>
+The above content shows the entire, complete file contents of the requested file.

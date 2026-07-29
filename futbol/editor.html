@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futbol Simülasyonu - Veritabanı Editörü</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background-color: #1a1a2e; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; }
+        .editor-container { max-width: 1200px; margin: 0 auto; display: flex; gap: 20px; }
+        .list-panel, .edit-panel { background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; flex: 1; height: 85vh; overflow-y: auto; border: 1px solid #333; }
+        .edit-panel { position: sticky; top: 20px; display: none; }
+        .search-box { width: 100%; padding: 12px; margin-bottom: 20px; font-size: 16px; border-radius: 5px; border: none; background: #fff; color: #000; }
+        .player-item { padding: 10px; border-bottom: 1px solid #333; cursor: pointer; display: flex; justify-content: space-between; }
+        .player-item:hover { background: rgba(255,255,255,0.1); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #aaa; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #444; background: #222; color: white; }
+        .btn { padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .btn-save { background: #27ae60; color: white; }
+        .btn-export { background: #e74c3c; color: white; font-size: 18px; margin-top: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; max-width: 1200px; margin: 0 auto 20px auto; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚙️ Veritabanı Editörü (Transfer Editor)</h1>
+        <button class="btn btn-export" onclick="exportDatabase()" style="width: auto;">💾 Veritabanını İndir (data_custom.js)</button>
+    </div>
+    
+    <div class="editor-container">
+        <div class="list-panel">
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="search-input" class="search-box" placeholder="Oyuncu veya Takım Ara... (En az 2 harf)" oninput="searchPlayers()">
+                <select id="search-type" class="search-box" style="width:150px;" onchange="searchPlayers()">
+                    <option value="players">Oyuncular</option>
+                    <option value="teams">Takımlar (Bütçe)</option>
+                </select>
+            </div>
+            <div id="results-list">Lütfen arama yapın. (İlk 200 sonuç gösterilir)</div>
+        </div>
+        
+        <div class="edit-panel" id="player-edit-panel">
+            <h2>Oyuncu Düzenle</h2>
+            <input type="hidden" id="edit-player-index">
+            <div class="form-group">
+                <label>İsim</label>
+                <input type="text" id="edit-name">
+            </div>
+            <div class="form-group">
+                <label>Mevki</label>
+                <select id="edit-position">
+                    <option value="Kaleci">Kaleci</option>
+                    <option value="Stoper">Stoper</option>
+                    <option value="Sağ Bek">Sağ Bek</option>
+                    <option value="Sol Bek">Sol Bek</option>
+                    <option value="Ön Libero">Ön Libero</option>
+                    <option value="Merkez Orta Saha">Merkez Orta Saha</option>
+                    <option value="10 Numara">10 Numara</option>
+                    <option value="Sağ Açık">Sağ Açık</option>
+                    <option value="Sol Açık">Sol Açık</option>
+                    <option value="Santrfor">Santrfor</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Takım</label>
+                <select id="edit-team"></select>
+            </div>
+            <div class="form-group">
+                <label>Yaş</label>
+                <input type="number" id="edit-age" min="15" max="45">
+            </div>
+            <div class="form-group">
+                <label>Güç (1-100)</label>
+                <input type="number" id="edit-power" min="1" max="100">
+            </div>
+            <div class="form-group">
+                <label>Hız (1-100)</label>
+                <input type="number" id="edit-speed" min="1" max="100">
+            </div>
+            <button class="btn btn-save" onclick="savePlayer()">Değişiklikleri Uygula (Hafızaya Al)</button>
+        </div>
+
+        <div class="edit-panel" id="team-edit-panel">
+            <h2>Takım Düzenle</h2>
+            <input type="hidden" id="edit-team-index">
+            <div class="form-group">
+                <label>Takım Adı</label>
+                <input type="text" id="edit-team-name" readonly disabled>
+            </div>
+            <div class="form-group">
+                <label>Transfer Bütçesi (Milyon €)</label>
+                <input type="number" id="edit-team-budget" min="0" max="9999">
+            </div>
+            <button class="btn btn-save" onclick="saveTeam()">Takımı Kaydet (Hafızaya Al)</button>
+        </div>
+    </div>
+
+    <!-- VERİTABANI YÜKLENİYOR -->
+    <script src="js/data.js?v=2" charset="utf-8"></script>
+    <script src="js/data_superlig.js" charset="utf-8"></script>
+    <script src="js/data_tff1.js" charset="utf-8"></script>
+    <script src="js/data_tff2.js" charset="utf-8"></script>
+    <script src="js/data_premier.js" charset="utf-8"></script>
+    <script src="js/data_laliga.js" charset="utf-8"></script>
+    <script src="js/data_bundesliga.js" charset="utf-8"></script>
+    <script src="js/data_ligue1.js" charset="utf-8"></script>
+    <script src="js/data_seriea.js" charset="utf-8"></script>
+    <script src="js/data_eredivisie.js" charset="utf-8"></script>
+    <script src="js/data_portekiz.js" charset="utf-8"></script>
+    <script src="js/data_brazil.js" charset="utf-8"></script>
+    <script src="js/data_world.js" charset="utf-8"></script>
+    <script src="js/data_world_stars.js" charset="utf-8"></script>
+    <script src="js/data_world_ranking.js" charset="utf-8"></script>
+
+    <script>
+        let allPlayers = [];
+        let allTeams = [];
+        
+        window.onload = () => {
+            if(!window.leagueData) {
+                alert("Hata: leagueData yüklenemedi. Javascript dosyaları okunamıyor.");
+                return;
+            }
+            allPlayers = window.leagueData.players || [];
+            allTeams = window.leagueData.teams || [];
+            
+            // Populate Team Dropdown
+            const teamSelect = document.getElementById('edit-team');
+            teamSelect.innerHTML = '<option value="free_agent">--- Serbest Oyuncu ---</option>';
+            allTeams.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.name;
+                teamSelect.appendChild(opt);
+            });
+            console.log("Loaded " + allPlayers.length + " players.");
+        };
+
+        function getTeamName(tid) {
+            if(tid === 'free_agent') return 'Serbest';
+            const t = allTeams.find(x => x.id === tid);
+            return t ? t.name : tid;
+        }
+
+        function searchPlayers() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const type = document.getElementById('search-type').value;
+            const list = document.getElementById('results-list');
+            list.innerHTML = '';
+            
+            if(query.length < 2) {
+                list.innerHTML = 'Lütfen arama yapmak için en az 2 harf girin.';
+                return;
+            }
+
+            let count = 0;
+            if(type === 'players') {
+                for(let i=0; i<allPlayers.length; i++) {
+                    const p = allPlayers[i];
+                    if(p.name.toLowerCase().includes(query)) {
+                        const div = document.createElement('div');
+                        div.className = 'player-item';
+                        div.innerHTML = `<div><b>${p.name}</b> (${p.age || 25}) - ${getTeamName(p.teamId)}</div><div>${p.power} Güç</div>`;
+                        div.onclick = () => openPlayerEdit(i);
+                        list.appendChild(div);
+                        count++;
+                        if(count > 200) break;
+                    }
+                }
+            } else {
+                for(let i=0; i<allTeams.length; i++) {
+                    const t = allTeams[i];
+                    if(t.name.toLowerCase().includes(query) || t.id.toLowerCase().includes(query)) {
+                        const div = document.createElement('div');
+                        div.className = 'player-item';
+                        div.innerHTML = `<div><b>${t.name}</b></div><div>${t.budget}M Bütçe</div>`;
+                        div.onclick = () => openTeamEdit(i);
+                        list.appendChild(div);
+                        count++;
+                        if(count > 200) break;
+                    }
+                }
+            }
+            if(count === 0) list.innerHTML = 'Sonuç bulunamadı.';
+        }
+
+        function openPlayerEdit(index) {
+            document.getElementById('team-edit-panel').style.display = 'none';
+            document.getElementById('player-edit-panel').style.display = 'block';
+            const p = allPlayers[index];
+            document.getElementById('edit-player-index').value = index;
+            document.getElementById('edit-name').value = p.name;
+            document.getElementById('edit-position').value = p.position;
+            document.getElementById('edit-team').value = p.teamId;
+            document.getElementById('edit-age').value = p.age || 25;
+            document.getElementById('edit-power').value = p.power;
+            document.getElementById('edit-speed').value = p.speed || 70;
+        }
+
+        function savePlayer() {
+            const index = parseInt(document.getElementById('edit-player-index').value);
+            const p = allPlayers[index];
+            p.name = document.getElementById('edit-name').value;
+            p.position = document.getElementById('edit-position').value;
+            p.teamId = document.getElementById('edit-team').value;
+            p.age = parseInt(document.getElementById('edit-age').value);
+            p.power = parseInt(document.getElementById('edit-power').value);
+            p.speed = parseInt(document.getElementById('edit-speed').value);
+            alert(p.name + " başarıyla hafızaya kaydedildi! Başka düzenlemeler yapabilir veya Veritabanını İndirebilirsiniz.");
+            searchPlayers();
+        }
+
+        function openTeamEdit(index) {
+            document.getElementById('player-edit-panel').style.display = 'none';
+            document.getElementById('team-edit-panel').style.display = 'block';
+            const t = allTeams[index];
+            document.getElementById('edit-team-index').value = index;
+            document.getElementById('edit-team-name').value = t.name;
+            document.getElementById('edit-team-budget').value = t.budget;
+        }
+
+        function saveTeam() {
+            const index = parseInt(document.getElementById('edit-team-index').value);
+            const t = allTeams[index];
+            t.budget = parseInt(document.getElementById('edit-team-budget').value);
+            alert(t.name + " bütçesi başarıyla güncellendi!");
+            searchPlayers();
+        }
+
+        function exportDatabase() {
+            const obj = {
+                teams: allTeams,
+                players: allPlayers
+            };
+            const codeStr = `// KUSURSUZ TRANSFER EDITOR TARAFINDAN URETILMISTIR
+window.leagueData = window.leagueData || {};
+window.leagueData.teams = ${JSON.stringify(obj.teams, null, 2)};
+window.leagueData.players = ${JSON.stringify(obj.players)};
+console.log("data_custom.js yüklendi! Custom veritabanı aktif.");
+`;
+            const blob = new Blob([codeStr], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data_custom.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert("data_custom.js dosyası bilgisayarınıza İNDİRİLDİ!\n\nLütfen bu dosyayı kopyalayıp oyunun 'js/' klasörünün içine YAPIN. (Eğer zaten indirme klasörünüz orasıysa sorun yok)\n\nSonra oyuna dönüp F5 atın ve 'Yeni Kariyer' başlatın!");
+        }
+    </script>
+</body>
+</html>
