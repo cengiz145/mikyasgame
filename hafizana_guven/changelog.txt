@@ -6,6 +6,12 @@ Genel:
 - Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
 
 
+[v0.97.4.61] - 30.07.2026
+
+Genel:
+- Sistem genelindeki tÃ¼m versiyon numaralarÄ± (index.html, package.json, version.json) senkronize edildi ve eÅŸitlendi.
+
+
 [v0.97.4.61] - 29.07.2026
 
 Genel:
