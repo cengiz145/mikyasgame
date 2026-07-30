@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Hunter - Kelime Hazinesi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1 id="main-title" tabindex="0">Word Hunter</h1>
+    
+    <!-- Ekran okuyuculara anlık durum bildirmek için gizli canlı bölge -->
+    <div id="sr-announcer" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
+
+    <!-- Kat Bilgisi -->
+    <h2 id="floor-display" tabindex="0" style="margin-bottom: 10px; color: #ffb703;" aria-live="polite">Maden Katı: 1 / 120</h2>
+
+    <p id="game-intro" tabindex="0" style="margin-bottom: 20px; text-align: center; max-width: 600px;">
+        Yerdeki taşları kırarak yeni İngilizce kelimeler keşfet! Taşlar arasında gezinmek için Tab veya Yön tuşlarını, kırmak için Enter veya Boşluk tuşunu kullan.
+    </p>
+
+    <div id="game-screen" style="width: 100%; display: flex; justify-content: center; align-items: center;">
+        
+        <div id="stone-container" role="application" aria-label="Taş Alanı. İçeri girmek için tıklayın ve yön tuşlarıyla taşlar arasında dolaşın.">
+            <!-- Taşlar JavaScript ile buraya eklenecek -->
+        </div>
+
+        <!-- Sınav Katı (Boss Level) Konteyneri -->
+        <div id="exam-container" style="display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%;">
+            <h2 id="exam-title" style="color: #fca311; font-size: 2.5rem; margin-bottom: 20px;" tabindex="0">Sınav Katı: Soru 1/5</h2>
+            <div id="exam-question-box" tabindex="0" role="button" aria-label="İngilizce kelimeyi tekrar dinlemek için Enter'a basın" style="background: rgba(0,0,0,0.6); padding: 30px; border-radius: 15px; margin-bottom: 40px; cursor: pointer; text-align: center; border: 2px solid #4cc9f0;">
+                <p style="color: #e5e5e5; font-size: 1.5rem; margin: 0;">Bu kelimenin Türkçe anlamı nedir?</p>
+                <p id="exam-word" style="color: #4cc9f0; font-size: 3.5rem; font-weight: bold; margin: 15px 0 0 0;"></p>
+            </div>
+            
+            <div id="exam-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 90%; max-width: 800px;">
+                <!-- Şıklar JS ile zorluk derecesine göre dinamik olarak üretilecek (4, 5, 6 veya 8 şık) -->
+            </div>
+            <div tabindex="0" class="sr-only" onfocus="document.getElementById('exam-title').focus()"></div>
+        </div>
+    </div>
+
+    <!-- Oyun Sonu Ekranı (Başlangıçta gizli) -->
+    <div id="game-over-screen" class="sr-only" tabindex="-1" style="text-align: center; margin-top: 50px;">
+        <h2 style="color: #ffb703; font-size: 2rem; margin-bottom: 20px;">Oyun Bitti!</h2>
+        <p id="game-over-stats" style="font-size: 1.2rem; margin-bottom: 30px;">İstatistikler hesaplanıyor...</p>
+        <button onclick="location.reload()" class="close-btn" aria-label="Oyuna baştan başla">Baştan Başla</button>
+    </div>
+
+    <!-- Kelime İletişim Kutusu (Modal) -->
+    <div id="word-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-en" aria-describedby="modal-tr" aria-hidden="true">
+        <div class="modal-content">
+            <!-- Modal içi dolaşımı hapsetmek için -->
+            <div tabindex="0" class="sr-only" onfocus="document.getElementById('modal-close-btn').focus()"></div>
+            
+            <div id="modal-en" class="word-en" tabindex="0" role="button" style="cursor: pointer;" aria-label="İngilizce telaffuzu dinlemek için tıklayın veya enter'a basın">Apple</div>
+            <div id="modal-tr" class="word-tr" tabindex="0" role="button" style="cursor: pointer;" aria-label="Türkçe telaffuzu dinlemek için tıklayın veya enter'a basın">Elma</div>
+            
+            <div class="modal-buttons" style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <button id="btn-learned" class="close-btn" style="background-color: #2a9d8f;" aria-label="Bu kelimeyi öğrendim, bir daha çıkarma">Öğrendim</button>
+                <button id="btn-confused" class="close-btn" style="background-color: #f4a261;" aria-label="Bu kelimeyi daha sonra tekrar edeceğim, ileride tekrar çıksın">Daha Sonra Tekrar Edeceğim</button>
+                <button id="btn-example" class="close-btn" style="background-color: #3f37c9;" aria-label="Bu kelimeyle ilgili örnek bir cümle bul ve dinle">Örnek Cümle Dinle</button>
+                <button id="modal-quit-btn" class="close-btn" style="background-color: #d62828;" aria-label="Oyundan çık">Oyundan Çık</button>
+            </div>
+            
+            <div id="example-container" style="display: none; margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 8px; text-align: left;" tabindex="-1">
+                <p id="example-en" style="color: #4cc9f0; font-size: 1.2rem; margin: 0 0 10px 0; font-weight: bold; cursor: pointer;" tabindex="0" role="button" aria-label="İngilizce cümleyi tekrar dinle"></p>
+                <p id="example-tr" style="color: #fca311; font-size: 1.1rem; margin: 0; cursor: pointer;" tabindex="0" role="button" aria-label="Türkçe çeviriyi tekrar dinle"></p>
+            </div>
+            
+            <div tabindex="0" class="sr-only" onfocus="document.getElementById('btn-learned').focus()"></div>
+        </div>
+    </div>
+
+    <!-- Veri ve Mantık -->
+    <script src="words.js"></script>
+    <script src="app.js?v=2"></script>
+</body>
+</html>
