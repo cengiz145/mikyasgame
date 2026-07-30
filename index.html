@@ -340,13 +340,13 @@
             
             <div class="games-list" role="list">
                 <!-- Otobüs Simülasyonu Linki -->
-                <a href="javascript:void(0)" class="game-card" style="opacity: 0.6; cursor: default;" role="listitem" aria-label="Otobüs Simülasyonu - Tamamlanma Aşamasında">
+                <a href="#" id="bus-game-link" class="game-card" style="opacity: 0.6;" role="listitem" aria-label="Otobüs Simülasyonu - Tamamlanma Aşamasında (Geliştirici Girişi)">
                     <div class="game-icon" aria-hidden="true">🚌</div>
                     <div class="game-content">
                         <h2 class="game-title" aria-hidden="true">Otobüs Simülasyonu <span style="font-size: 0.8em; color: #f59e0b;">(Tamamlanma Aşamasında)</span></h2>
                         <p class="game-desc" aria-hidden="true">Türkiye'nin yollarında gerçekçi bir otobüs sürüş deneyimi yaşayın. (Şu an oynanabilir değil, tamamlanma aşamasında.)</p>
                     </div>
-                    <span class="sr-only">Otobüs Simülasyonu projesi şu an tamamlanma aşamasındadır, henüz oynanabilir değildir.</span>
+                    <span class="sr-only">Otobüs Simülasyonu projesi şu an tamamlanma aşamasındadır, yalnızca geliştirici erişimine açıktır.</span>
                 </a>
 
                 <!-- Hafızana Güven Linki -->
@@ -360,13 +360,13 @@
                 </a>
 
                 <!-- Erişilebilir Video Asistanı Linki -->
-                <a href="javascript:void(0)" class="game-card" style="opacity: 0.6; cursor: default;" role="listitem" aria-label="Erişilebilir Video Asistanı - Tamamlanma Aşamasında">
+                <a href="#" id="video-game-link" class="game-card" style="opacity: 0.6;" role="listitem" aria-label="Erişilebilir Video Asistanı - Tamamlanma Aşamasında (Geliştirici Girişi)">
                     <div class="game-icon" aria-hidden="true">🎬</div>
                     <div class="game-content">
                         <h2 class="game-title" aria-hidden="true">Erişilebilir Video Asistanı <span style="font-size: 0.8em; color: #f59e0b;">(Tamamlanma Aşamasında)</span></h2>
                         <p class="game-desc" aria-hidden="true">Görme engelli bireyler için özel tasarlanmış, adım adım sesli yönlendirme yapan video kesme aracı. (Şu an kullanılabilir değil, tamamlanma aşamasında.)</p>
                     </div>
-                    <span class="sr-only">Erişilebilir Video Asistanı projesi şu an tamamlanma aşamasındadır, henüz kullanılabilir değildir.</span>
+                    <span class="sr-only">Erişilebilir Video Asistanı projesi şu an tamamlanma aşamasındadır, yalnızca geliştirici erişimine açıktır.</span>
                 </a>
             </div>
         </details>
@@ -495,29 +495,43 @@
 
     <script>
         const busBtn = document.getElementById('bus-game-link');
+        const videoBtn = document.getElementById('video-game-link');
         const pwdModal = document.getElementById('password-modal');
         const pwdForm = document.getElementById('password-form');
         const pwdInput = document.getElementById('pwd-input');
         const pwdCancel = document.getElementById('pwd-cancel');
+        let targetUrl = '';
+
+        function openModalForUrl(url, accessKey) {
+            if (localStorage.getItem(accessKey) === 'true') {
+                window.location.href = url;
+                return;
+            }
+            targetUrl = url;
+            pwdModal.style.display = 'flex';
+            setTimeout(() => {
+                pwdInput.focus();
+            }, 100);
+        }
 
         if (busBtn) {
             busBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (localStorage.getItem('bus_access_granted') === 'true') {
-                    window.location.href = 'otobus/index.html';
-                    return;
-                }
-                pwdModal.style.display = 'flex';
-                setTimeout(() => {
-                    pwdInput.focus();
-                }, 100);
+                openModalForUrl('otobus/index.html', 'bus_access_granted');
+            });
+        }
+
+        if (videoBtn) {
+            videoBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openModalForUrl('video_asistan/index.html', 'video_access_granted');
             });
         }
 
         if (pwdCancel) {
             pwdCancel.addEventListener('click', () => {
                 pwdModal.style.display = 'none';
-                busBtn.focus();
+                targetUrl = '';
             });
         }
 
@@ -525,10 +539,13 @@
             pwdForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 let pwd = pwdInput.value.trim().toLowerCase();
-                if (pwd === 'otobÃ¼ssimÃ¼lasyonu' || pwd === 'otobussimulasyonu') {
-                    localStorage.setItem('bus_access_granted', 'true');
+                // "mikyas" şifresi her iki proje için de geçerli
+                if (pwd === 'mikyas' || pwd === 'otobÃ¼ssimÃ¼lasyonu' || pwd === 'otobussimulasyonu') {
+                    if (targetUrl.includes('otobus')) localStorage.setItem('bus_access_granted', 'true');
+                    if (targetUrl.includes('video')) localStorage.setItem('video_access_granted', 'true');
+                    
                     pwdModal.style.display = 'none';
-                    window.location.href = 'otobus/index.html';
+                    window.location.href = targetUrl;
                 } else {
                     alert("HatalÄ± yetkilendirme anahtarÄ±! LÃ¼tfen tekrar deneyin.");
                     pwdInput.value = '';
