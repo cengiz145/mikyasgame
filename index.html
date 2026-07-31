@@ -141,153 +141,217 @@
             margin-bottom: 0;
         }
 
-        /* Details / Projects Button */
-        .projects-dropdown {
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .btn-projects {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2));
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 600;
-            padding: 1rem 3rem;
-            border-radius: 50px;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            list-style: none; /* Hides native arrow */
-            user-select: none;
-            margin-bottom: 2rem;
-        }
-
-        .btn-projects::-webkit-details-marker {
-            display: none;
-        }
-
-        .btn-projects:hover, .btn-projects:focus {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
-            outline: none;
-        }
-
-        .btn-projects:focus {
-            outline: 3px solid #fff;
-            outline-offset: 4px;
-        }
-
-        /* Vertical Games List */
-        .games-list {
+        /* App Header & Layout */
+        .app-header {
             display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--glass-border);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .radio-btn a {
+            color: #f8fafc;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1rem;
+            background: linear-gradient(135deg, #ef4444, #f59e0b);
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+            transition: all 0.3s;
+        }
+
+        .radio-btn a:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .profile-info {
+            text-align: left;
+        }
+
+        .profile-info .username {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .profile-info .stats {
+            font-size: 0.85rem;
+            color: #a5b4fc;
+        }
+
+        .suits-decoration {
+            font-size: 1.8rem;
+            letter-spacing: 5px;
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .portal-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .welcome-text {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        .category-title {
+            text-align: left;
+            font-size: 1.3rem;
+            color: #f8fafc;
+            margin: 2.5rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
             animation: fadeIn 0.5s ease-in-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .game-card {
+        .app-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
-            padding: 1.5rem 2rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            transition: all 0.3s ease;
             text-decoration: none;
             color: var(--text-main);
-            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .app-card-top {
             display: flex;
-            align-items: center;
-            text-align: left;
-            position: relative;
-            overflow: hidden;
+            align-items: flex-start;
+            gap: 1.2rem;
+            margin-bottom: 1.2rem;
         }
 
-        .game-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-            opacity: 0;
-            transition: opacity 0.4s;
+        .app-icon {
+            font-size: 2.5rem;
+            background: rgba(0,0,0,0.3);
+            padding: 0.8rem;
+            border-radius: 14px;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
         }
 
-        .game-card:hover, .game-card:focus {
-            transform: translateX(10px);
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.3);
-            outline: none;
-        }
-
-        .game-card:focus {
-            box-shadow: 0 0 0 3px var(--gradient-1);
-        }
-
-        .game-card:hover::before, .game-card:focus::before {
-            opacity: 1;
-        }
-
-        .game-icon {
-            font-size: 3rem;
-            margin-right: 1.5rem;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
-            transition: transform 0.3s;
-        }
-
-        .game-card:hover .game-icon, .game-card:focus .game-icon {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .game-content {
+        .app-info {
             flex: 1;
         }
 
-        .game-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .game-desc {
-            font-size: 1rem;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-
-        /* News Section Additions */
-        .btn-news {
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-        }
-        
-        .btn-news:hover, .btn-news:focus {
-            box-shadow: 0 15px 30px rgba(239, 68, 68, 0.4);
-            transform: translateY(-3px) scale(1.02);
-            outline: none;
-        }
-
-        .news-card .game-title {
-            font-size: 1.2rem;
-            line-height: 1.3;
-            margin-bottom: 0.5rem;
-        }
-
-        .read-more-btn {
-            display: inline-block;
-            margin-top: 0.75rem;
-            color: #a5b4fc;
-            font-weight: 600;
-            font-size: 0.95rem;
-            border-bottom: 1px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .news-card:hover .read-more-btn, .news-card:focus .read-more-btn {
+        .app-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.4rem;
             color: #fff;
-            border-bottom-color: #fff;
+        }
+
+        .app-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .app-action {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-play {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.7rem 2.5rem;
+            border-radius: 25px;
+            font-size: 1.05rem;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-play:hover {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            transform: scale(1.05);
+        }
+
+        .btn-play.disabled {
+            background: #475569;
+            color: #cbd5e1;
+            box-shadow: none;
+        }
+
+        .btn-news-play {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+        .btn-news-play:hover {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        }
+
+        .btn-social-play {
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+        }
+        .btn-social-play:hover {
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
         }
 
         /* Accessibility improvements for screen readers */
@@ -319,151 +383,186 @@
 
     <main class="container">
         
-        <!-- Hoş Geldiniz Bölümü -->
-        <section class="about-section" aria-label="Hoş Geldiniz" style="margin-bottom: 2rem;">
-            <h1 class="sr-only">Hoş Geldiniz</h1>
-            <p id="welcome-message" aria-live="polite">Merhaba. Saat şuan <span id="current-time-display"></span>. Sitemi bu saatte ziyaret ettiğin için teşekkür ederim. Umarım memnun kalırsın.</p>
-        </section>
+        <!-- App Header (Üst Bar) -->
+        <div class="app-header">
+            <div class="radio-btn">
+                <a href="javascript:alert('📻 Gaddar Radyo çok yakında burada olacak!');">📻 GADDAR RADYO</a>
+            </div>
+            <div class="profile-section">
+                <div class="avatar" aria-hidden="true">Ü</div>
+                <div class="profile-info">
+                    <div class="username">umitekrem</div>
+                    <div class="stats">Skor: 22 (Galibiyet: 0)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Karşılama ve Title -->
+        <div class="suits-decoration" aria-hidden="true">♥♠♦♣</div>
+        <h1 class="portal-title">MİKYAS STUDIO PORTAL</h1>
+        <p class="welcome-text" id="welcome-message" aria-live="polite">Hoş Geldiniz. Saat şuan <span id="current-time-display"></span></p>
 
         <!-- Hakkımda Bölümü -->
         <section class="about-section" aria-label="Hakkımda">
             <h2 class="sr-only">Ümit Ekrem Mikyas - Hakkımda</h2>
             <p>Merhaba. Benim adım Ümit Ekrem Mikyas. 26 yaşındayım ve müzik öğretmeniyim.</p>
-            <p>Müzik öğretmeni olmanın yanı sıra kendimi geliştirmeyi ve bir şeyler üretmeyi sevdiğim için bu siteyi hayata geçirdim. Bu sitede geliştirmekte olduğum gerek sesli oyun projelerimi gerekse müziklerimi bulabileceğiniz alanlar bulacaksınız.</p>
-            <p>Projelerimi geliştirirken yapay zeka kullandığımı belirtmek isterim. Yapay zekayı aktif bir şekilde kullanıyor, onun tüm nimetlerinden faydalanmaktan geri durmuyorum. Yaptığım projelerde yapay zekayı her ne kadar kullansam da fikirlerimin benim özgün fikirlerim olduğunu da belirtmek isterim.</p>
-            <p>Kodlama bilmiyor olsam da hayallerim ve yapmak istediklerimi karşılayan her türlü teknolojiyi kullanıyorum. Yaptıklarımdan keyif alacağınızı umuyorum. Bu siteyi ara sıra ziyaret ederseniz, yeni şeyler bulabilirsiniz.</p>
+            <p>Bu portalda geliştirmekte olduğum sesli oyun projelerimi ve müziklerimi bulacaksınız. Projelerimde yapay zekanın gücünü aktif bir şekilde kullanıyorum, ancak fikirlerimin tamamen bana ait, özgün düşünceler olduğunu da belirtmek isterim.</p>
         </section>
 
-        <!-- Projelerim Butonu ve İçindeki Alt Alta Liste -->
-        <details class="projects-dropdown" open>
-            <summary class="btn-projects" aria-expanded="true">Projelerim</summary>
+        <!-- KATEGORİ: Projelerim -->
+        <h2 class="category-title">PROJELERİM</h2>
+        <div class="games-grid">
             
-            <div class="games-list" role="list">
-                <!-- Otobüs Simülasyonu Linki -->
-                <a href="#" id="bus-game-link" class="game-card" style="opacity: 0.6;" role="listitem" aria-label="Otobüs Simülasyonu - Tamamlanma Aşamasında (Geliştirici Girişi)">
-                    <div class="game-icon" aria-hidden="true">🚌</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true">Otobüs Simülasyonu <span style="font-size: 0.8em; color: #f59e0b;">(Tamamlanma Aşamasında)</span></h2>
-                        <p class="game-desc" aria-hidden="true">Türkiye'nin yollarında gerçekçi bir otobüs sürüş deneyimi yaşayın. (Şu an oynanabilir değil, tamamlanma aşamasında.)</p>
+            <!-- Otobüs Simülasyonu -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">🚌</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Otobüs Simülasyonu</h3>
+                        <p class="app-desc">Türkiye'nin yollarında gerçekçi bir otobüs sürüş deneyimi yaşayın. (Tamamlanma Aşamasında)</p>
                     </div>
-                    <span class="sr-only">Otobüs Simülasyonu projesi şu an tamamlanma aşamasındadır, yalnızca geliştirici erişimine açıktır.</span>
-                </a>
-
-                <!-- Hafızana Güven Linki -->
-                <a href="hafizana_guven/" class="game-card" role="listitem" aria-label="Hafızana Güven Oyunu Oynamak İçin Tıklayın" target="_blank" rel="noopener noreferrer">
-                    <div class="game-icon" aria-hidden="true">🧠</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true">Hafızana Güven</h2>
-                        <p class="game-desc" aria-hidden="true">Sesleri ve ipuçlarını takip ederek hafızanızı test edin.</p>
-                    </div>
-                    <span class="sr-only">Hafızana Güven Oyunu Oynamak İçin Tıklayın</span>
-                </a>
-
-                <!-- Erişilebilir Video Asistanı Linki -->
-                <a href="#" id="video-game-link" class="game-card" style="opacity: 0.6;" role="listitem" aria-label="Erişilebilir Video Asistanı - Tamamlanma Aşamasında (Geliştirici Girişi)">
-                    <div class="game-icon" aria-hidden="true">🎬</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true">Erişilebilir Video Asistanı <span style="font-size: 0.8em; color: #f59e0b;">(Tamamlanma Aşamasında)</span></h2>
-                        <p class="game-desc" aria-hidden="true">Görme engelli bireyler için özel tasarlanmış, adım adım sesli yönlendirme yapan video kesme aracı. (Şu an kullanılabilir değil, tamamlanma aşamasında.)</p>
-                    </div>
-                    <span class="sr-only">Erişilebilir Video Asistanı projesi şu an tamamlanma aşamasındadır, yalnızca geliştirici erişimine açıktır.</span>
-                </a>
+                </div>
+                <div class="app-action">
+                    <button id="bus-game-link" class="btn-play disabled" aria-label="Otobüs Simülasyonu - Tamamlanma Aşamasında (Geliştirici Girişi)">Oyna</button>
+                </div>
             </div>
-        </details>
 
-        <!-- Desteklediğim Projeler Bölümü -->
-        <details class="projects-dropdown" open>
-            <summary class="btn-projects" style="background: linear-gradient(135deg, #10b981, #059669);" aria-expanded="true">Desteklediğim Projeler</summary>
+            <!-- Hafızana Güven -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">🧠</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Hafızana Güven</h3>
+                        <p class="app-desc">Sesleri ve ipuçlarını takip ederek hafızanızı test edin.</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="hafizana_guven/" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Hafızana Güven Oyunu Oynamak İçin Tıklayın">Oyna</a>
+                </div>
+            </div>
+
+            <!-- Erişilebilir Video Asistanı -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">🎬</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Erişilebilir Video Asistanı</h3>
+                        <p class="app-desc">Görme engelli bireyler için özel tasarlanmış, adım adım sesli yönlendirme yapan video kesme aracı.</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <button id="video-game-link" class="btn-play disabled" aria-label="Erişilebilir Video Asistanı - Tamamlanma Aşamasında (Geliştirici Girişi)">Aç</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KATEGORİ: Desteklediğim Projeler -->
+        <h2 class="category-title">DESTEKLEDİĞİM PROJELER</h2>
+        <div class="games-grid">
+            <!-- Gaddar Bilgi -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">📱</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Gaddar Bilgi</h3>
+                        <p class="app-desc">Gaddar Bilgi uygulamasını indirmek için tıklayın.</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://play.google.com/store/apps/details?id=com.gaddarbilgimobil" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Gaddar Bilgi uygulamasını indir">İndir</a>
+                </div>
+            </div>
+
+            <!-- Keleş Pişti -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">🃏</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Keleş Pişti</h3>
+                        <p class="app-desc">Keleş Pişti uygulamasını indirmek için tıklayın.</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://play.google.com/store/apps/details?id=com.scelik.kelespisti&hl=tr" target="_blank" rel="noopener noreferrer" class="btn-play" aria-label="Keleş Pişti uygulamasını indir">İndir</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- KATEGORİ: Haberler (Basında Biz) -->
+        <h2 class="category-title">HABERLER (BASINDA BİZ)</h2>
+        <div class="games-grid">
+            <!-- Haber 1 -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">📰</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Görme engelli müzik öğretmeni piyano eğitimiyle öğrencilerin hayallerine dokunuyor</h3>
+                        <p class="app-desc">Anadolu Ajansı Röportajı</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.aa.com.tr/tr/yasam/gorme-engelli-muzik-ogretmeni-piyano-egitimiyle-ogrencilerin-hayallerine-dokunuyor/3779375" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
+                </div>
+            </div>
+
+            <!-- Haber 2 -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">📰</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Barış Manço hayranı görme engelli, müzik öğretmenliği hayaline çok yaklaştı</h3>
+                        <p class="app-desc">Anadolu Ajansı Röportajı</p>
+                    </div>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.aa.com.tr/tr/ayrimcilikhatti/ayrimcilik/baris-manco-hayrani-gorme-engelli-muzik-ogretmenligi-hayaline-cok-yaklasti-/1820538" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
+                </div>
+            </div>
             
-            <div class="games-list" role="list">
-                <!-- Gaddar Bilgi -->
-                <a href="https://play.google.com/store/apps/details?id=com.gaddarbilgimobil" class="game-card" role="listitem" aria-label="Gaddar Bilgi uygulamasını indirmek için tıklayın" target="_blank" rel="noopener noreferrer">
-                    <div class="game-icon" aria-hidden="true">📱</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true">Gaddar Bilgi</h2>
-                        <p class="game-desc" aria-hidden="true">Gaddar Bilgi uygulamasını indirmek için tıklayın.</p>
+            <!-- Haber 3 -->
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">📰</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Barış Manço hayranı görme engelli Ümit'in hayali müzik öğretmeni olmak</h3>
+                        <p class="app-desc">Anadolu Ajansı Röportajı</p>
                     </div>
-                    <span class="sr-only">Gaddar Bilgi uygulamasını indirmek için Google Play Store'a gidin. Yeni pencerede açılır.</span>
-                </a>
-
-                <!-- Keleş Pişti -->
-                <a href="https://play.google.com/store/apps/details?id=com.scelik.kelespisti&hl=tr" class="game-card" role="listitem" aria-label="Keleş Pişti uygulamasını indirmek için tıklayın" target="_blank" rel="noopener noreferrer">
-                    <div class="game-icon" aria-hidden="true">🃏</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true">Keleş Pişti</h2>
-                        <p class="game-desc" aria-hidden="true">Keleş Pişti uygulamasını indirmek için tıklayın.</p>
-                    </div>
-                    <span class="sr-only">Keleş Pişti uygulamasını indirmek için Google Play Store'a gidin. Yeni pencerede açılır.</span>
-                </a>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.aa.com.tr/tr/yasam/baris-manco-hayrani-gorme-engelli-umitin-hayali-muzik-ogretmeni-olmak-/1975038" target="_blank" rel="noopener noreferrer" class="btn-play btn-news-play" aria-label="Haberi Okumak İçin Tıklayın">Haberi Oku</a>
+                </div>
             </div>
-        </details>
+        </div>
 
-        <!-- Haberler Bölümü -->
-        <details class="projects-dropdown" open>
-            <summary class="btn-projects btn-news" aria-expanded="true">Haberler (Basında Biz)</summary>
-            
-            <div class="games-list" role="list">
-                <!-- Haber 1 -->
-                <a href="https://www.aa.com.tr/tr/yasam/gorme-engelli-muzik-ogretmeni-piyano-egitimiyle-ogrencilerin-hayallerine-dokunuyor/3779375" class="game-card news-card" role="listitem" aria-label="Anadolu Ajansı Haberi: Görme engelli müzik öğretmeni piyano eğitimiyle öğrencilerin hayallerine dokunuyor. Haberin tamamını okumak için tıklayın." target="_blank" rel="noopener noreferrer">
-                    <div class="game-icon" aria-hidden="true">📰</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true">Görme engelli müzik öğretmeni piyano eğitimiyle öğrencilerin hayallerine dokunuyor</h2>
-                        <p class="game-desc" aria-hidden="true">Anadolu Ajansı Röportajı</p>
-                        <span class="read-more-btn" aria-hidden="true">Devamını Oku ➔</span>
+        <!-- KATEGORİ: Sosyal Medya -->
+        <h2 class="category-title">SOSYAL MEDYA</h2>
+        <div class="games-grid">
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">📸</div>
+                    <div class="app-info">
+                        <h3 class="app-title">Instagram</h3>
+                        <p class="app-desc">Günlük hayatımdan kareler ve güncel paylaşımlarım.</p>
                     </div>
-                    <span class="sr-only">Anadolu Ajansı Haberi: Görme engelli müzik öğretmeni piyano eğitimiyle öğrencilerin hayallerine dokunuyor. Haberi okumak için tıklayın. Yeni pencerede açılır.</span>
-                </a>
-
-                <!-- Haber 2 -->
-                <a href="https://www.aa.com.tr/tr/ayrimcilikhatti/ayrimcilik/baris-manco-hayrani-gorme-engelli-muzik-ogretmenligi-hayaline-cok-yaklasti-/1820538" class="game-card news-card" role="listitem" aria-label="Anadolu Ajansı Haberi: Barış Manço hayranı görme engelli, müzik öğretmenliği hayaline çok yaklaştı. Haberin tamamını okumak için tıklayın." target="_blank" rel="noopener noreferrer">
-                    <div class="game-icon" aria-hidden="true">📰</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true">Barış Manço hayranı görme engelli, müzik öğretmenliği hayaline çok yaklaştı</h2>
-                        <p class="game-desc" aria-hidden="true">Anadolu Ajansı Röportajı</p>
-                        <span class="read-more-btn" aria-hidden="true">Devamını Oku ➔</span>
-                    </div>
-                    <span class="sr-only">Anadolu Ajansı Haberi: Barış Manço hayranı görme engelli, müzik öğretmenliği hayaline çok yaklaştı. Haberi okumak için tıklayın. Yeni pencerede açılır.</span>
-                </a>
-
-                <!-- Haber 3 -->
-                <a href="https://www.aa.com.tr/tr/yasam/baris-manco-hayrani-gorme-engelli-umitin-hayali-muzik-ogretmeni-olmak-/1975038" class="game-card news-card" role="listitem" aria-label="Anadolu Ajansı Haberi: Barış Manço hayranı görme engelli Ümit'in hayali müzik öğretmeni olmak. Haberin tamamını okumak için tıklayın." target="_blank" rel="noopener noreferrer">
-                    <div class="game-icon" aria-hidden="true">📰</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true">Barış Manço hayranı görme engelli Ümit'in hayali müzik öğretmeni olmak</h2>
-                        <p class="game-desc" aria-hidden="true">Anadolu Ajansı Röportajı</p>
-                        <span class="read-more-btn" aria-hidden="true">Devamını Oku ➔</span>
-                    </div>
-                    <span class="sr-only">Anadolu Ajansı Haberi: Barış Manço hayranı görme engelli Ümit'in hayali müzik öğretmeni olmak. Haberi okumak için tıklayın. Yeni pencerede açılır.</span>
-                </a>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.instagram.com/umitekremmikyas/" target="_blank" rel="noopener noreferrer" class="btn-play btn-social-play" aria-label="Instagram hesabıma git">Takip Et</a>
+                </div>
             </div>
-        </details>
 
-        <!-- Sosyal Bölümü -->
-        <details class="projects-dropdown" open>
-            <summary class="btn-projects" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);" aria-expanded="true">Sosyal Medya</summary>
-            
-            <div class="games-list" role="list">
-                <!-- Instagram -->
-                <a href="https://www.instagram.com/umitekremmikyas/" class="game-card" role="listitem" aria-label="Instagram hesabıma gitmek için tıklayın" target="_blank" rel="noopener noreferrer">
-                    <div class="game-icon" aria-hidden="true" style="font-size: 2.5rem;">📸</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true" style="background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Instagram</h2>
-                        <p class="game-desc" aria-hidden="true">Günlük hayatımdan kareler ve güncel paylaşımlarım.</p>
+            <div class="app-card">
+                <div class="app-card-top">
+                    <div class="app-icon" aria-hidden="true">▶️</div>
+                    <div class="app-info">
+                        <h3 class="app-title">YouTube</h3>
+                        <p class="app-desc">Müzik icralarım, Barış Manço eserleri ve diğer videolarım.</p>
                     </div>
-                    <span class="sr-only">Instagram hesabıma gitmek için tıklayın. Yeni pencerede açılır.</span>
-                </a>
-
-                <!-- YouTube -->
-                <a href="https://www.youtube.com/@umitekremmikyas2518" class="game-card" role="listitem" aria-label="YouTube kanalıma gitmek için tıklayın" target="_blank" rel="noopener noreferrer">
-                    <div class="game-icon" aria-hidden="true" style="font-size: 2.5rem;">▶️</div>
-                    <div class="game-content">
-                        <h2 class="game-title" aria-hidden="true" style="color: #ef4444;">YouTube</h2>
-                        <p class="game-desc" aria-hidden="true">Müzik icralarım, Barış Manço eserleri ve diğer videolarım.</p>
-                    </div>
-                    <span class="sr-only">YouTube kanalıma gitmek için tıklayın. Yeni pencerede açılır.</span>
-                </a>
+                </div>
+                <div class="app-action">
+                    <a href="https://www.youtube.com/@umitekremmikyas2518" target="_blank" rel="noopener noreferrer" class="btn-play btn-social-play" aria-label="YouTube kanalıma git">Abone Ol</a>
+                </div>
             </div>
-        </details>
+        </div>
 
         <!-- Teşekkür Bölümü -->
         <section class="about-section" aria-label="Teşekkür" style="margin-top: 3rem; background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2);">
@@ -475,16 +574,6 @@
     </main>
 
     <script>
-        // Detaylar (details) etiketi toggle olduğunda erişilebilirlik aria statüsünü güncelle
-        const detailsElements = document.querySelectorAll('.projects-dropdown');
-        detailsElements.forEach(detailsEl => {
-            const summaryEl = detailsEl.querySelector('summary');
-            if (summaryEl) {
-                detailsEl.addEventListener('toggle', (e) => {
-                    summaryEl.setAttribute('aria-expanded', detailsEl.open ? "true" : "false");
-                });
-            }
-        });
     </script>
     <!-- EriÅŸilebilir Åifre ModalÄ± -->
     <div id="password-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center;">
