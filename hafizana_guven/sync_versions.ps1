@@ -1,12 +1,12 @@
 $ErrorActionPreference = "Stop"
 $dir = ".\";
-$newVersion = "0.97.4.61"
+$newVersion = "0.97.4.62"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
 $vJson = Get-Content $vJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $vJson.version = $newVersion
-$vJson.changelog = "Tüm sistemlerde versiyon numaraları eşitlendi ve senkronize edildi."
+$vJson.changelog = "Sohbet geçmişi yüklenirken çalınan ses spam sorunu düzeltildi."
 $vJson | ConvertTo-Json -Depth 5 | Set-Content $vJsonPath -Encoding UTF8
 
 Write-Host "Updating package.json..."
@@ -31,7 +31,7 @@ $newEntry = @"
 [v$newVersion] - $todayDate
 
 Genel:
-- Sistem genelindeki tüm versiyon numaraları (index.html, package.json, version.json) senkronize edildi ve eşitlendi.
+- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
 
 "@
 

@@ -1,5 +1,5 @@
 ﻿{
-    "version":  "0.97.4.61",
+    "version":  "0.97.4.62",
     "buildId":  1781863853,
-    "changelog":  "TÃ¼m sistemlerde versiyon numaralarÄ± eÅŸitlendi ve senkronize edildi."
+    "changelog":  "Sohbet geÃ§miÅŸi yÃ¼klenirken Ã§alÄ±nan ses spam sorunu dÃ¼zeltildi."
 }
