@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Erişilebilir Mobil Video Asistanı V5</title>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- PWA Service Worker Kaydı -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW Registered!', reg))
+                    .catch(err => console.log('SW Registration failed:', err));
+            });
+        }
+    </script>
+    
+    <!-- FFmpeg WASM Yüklenmesi -->
+    <script src="ffmpeg_core/ffmpeg.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/umd/index.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="header">
+            <h1 tabindex="0">Video Montaj Asistanı</h1>
+        </header>
+
+        <!-- Assistant Message Box (ARIA Live Region for Screen Readers) -->
+        <div class="assistant-box" role="status" aria-live="polite" id="assistant-message" tabindex="0">
+            Merhaba. FFmpeg destekli Profesyonel Montaj Asistanına hoş geldiniz. Başlamak için lütfen Adım 1'den bir video seçin.
+        </div>
+
+        <!-- Progress Bar (Visible during render) -->
+        <div id="progress-container" class="hidden" aria-hidden="true">
+            <div class="progress-bar-bg">
+                <div id="progress-bar-fill" class="progress-bar-fill"></div>
+            </div>
+        </div>
+
+        <!-- Main Wizard Flow -->
+        <main class="wizard-container" id="wizard-container">
+            
+            <!-- STEP 1: Upload Video -->
+            <section class="step-card active" id="step-1">
+                <h2 tabindex="0">Adım 1: Video Seçimi ve Yön Ayarı</h2>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="video-rotate" style="color: var(--accent-primary);">Videonuz yan mı çıktı? Buradan düzeltebilirsiniz:</label>
+                    <select id="video-rotate" class="large-input" style="cursor: pointer;">
+                        <option value="0" selected>Normal (Düzeltme Yapma)</option>
+                        <option value="90">Sağa Döndür (90 Derece)</option>
+                        <option value="270">Sola Döndür (90 Derece)</option>
+                        <option value="180">Ters Çevir (180 Derece)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="video-upload" class="btn btn-primary btn-large">
+                        Bilgisayardan veya Telefondan Video Seç
+                    </label>
+                    <input type="file" id="video-upload" accept="video/mp4,video/webm,video/ogg,video/quicktime,video/*" style="display: none;">
+                </div>
+            </section>
+
+            <!-- STEP 2: Cut Video -->
+            <section class="step-card hidden" id="step-2">
+                <h2 tabindex="0">Adım 2: Videoyu Kes</h2>
+                
+                <div class="info-box" id="video-info" tabindex="0">
+                    Video süresi: Bekleniyor...
+                </div>
+
+                <fieldset class="form-group" style="border: 1px solid #4a5568; padding: 15px; border-radius: 8px;">
+                    <legend style="font-weight: 600; padding: 0 10px;">Kesme Modu</legend>
+                    <div style="margin-bottom: 10px;">
+                        <input type="radio" id="mode-keep" name="cut-mode" value="keep" checked>
+                        <label for="mode-keep">Seçtiğim Aralığı SAKLA (Normal Kesim)</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="mode-remove" name="cut-mode" value="remove">
+                        <label for="mode-remove">Seçtiğim Aralığı SİL (Ortayı Çıkar)</label>
+                    </div>
+                </fieldset>
+
+                <div class="form-group">
+                    <label id="lbl-cut-start" for="cut-start">İşleme Başlanacak Saniye:</label>
+                    <input type="number" id="cut-start" class="large-input" min="0" value="0" aria-describedby="start-desc">
+                    <span id="start-desc" class="sr-only">Videonun hangi saniyeden itibaren kesileceğini rakamla yazın.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="cut-end">Kesmenin Biteceği Saniye:</label>
+                    <input type="number" id="cut-end" class="large-input" min="1" value="10" aria-describedby="end-desc">
+                    <span id="end-desc" class="sr-only">Videonun hangi saniyede biteceğini rakamla yazın.</span>
+                </div>
+
+                <div class="button-row">
+                    <button id="btn-cut" class="btn btn-warning btn-large">Kesme Alanını Onayla</button>
+                </div>
+            </section>
+
+            <!-- STEP 3: Audio Settings -->
+            <section class="step-card hidden" id="step-3">
+                <h2 tabindex="0">Adım 3: Hız, Müzik ve Ses Ayarları</h2>
+                
+                <div class="form-group" style="background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 8px; border: 1px solid var(--accent-primary); margin-bottom: 20px;">
+                    <label for="video-speed" style="color: var(--accent-primary);">Videonun Oynatma Hızı:</label>
+                    <select id="video-speed" class="large-input" style="cursor: pointer;">
+                        <option value="0.5">0.5x (Yavaşlatılmış)</option>
+                        <option value="1.0" selected>1.0x (Normal Hız - Önerilen)</option>
+                        <option value="1.5">1.5x (Hızlı)</option>
+                        <option value="2.0">2.0x (Çok Hızlı)</option>
+                    </select>
+                    <span class="sr-only" id="speed-desc">Videonun hızını değiştirmek, işleme süresini uzatabilir.</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="audio-upload" class="btn btn-primary btn-large" style="margin-bottom:10px;">
+                        Arka Plan Müziği Ekle (MP3) - İsteğe Bağlı
+                    </label>
+                    <input type="file" id="audio-upload" accept="audio/mp3,audio/mpeg,audio/wav" style="display: none;">
+                    <div id="audio-info" class="info-box hidden" tabindex="0">Müzik yüklenmedi.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-volume">Ana Videonun Ses Seviyesi (Sürgü):</label>
+                    <div class="slider-container">
+                        <input type="range" id="video-volume" class="slider" min="0" max="100" value="100" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="Yüzde 100">
+                        <span id="video-volume-text" aria-live="polite" style="font-weight: bold; width: 50px;">%100</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="audio-volume">Arka Plan Müziğinin Ses Seviyesi (Sürgü):</label>
+                    <div class="slider-container">
+                        <input type="range" id="audio-volume" class="slider" min="0" max="100" value="50" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" aria-valuetext="Yüzde 50">
+                        <span id="audio-volume-text" aria-live="polite" style="font-weight: bold; width: 50px;">%50</span>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button id="btn-to-render" class="btn btn-warning btn-large">Ayarları Onayla</button>
+                </div>
+            </section>
+
+            <!-- STEP 4: Render & Export -->
+            <section class="step-card hidden" id="step-4">
+                <h2 tabindex="0">Adım 4: Birleştir ve İndir</h2>
+                
+                <div class="info-box" id="render-info" tabindex="0">
+                    Ayarlar tamamlandı. Dışa aktarmaya hazırsınız.
+                </div>
+
+                <div class="button-row" style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+                    <button id="btn-render-download" class="btn btn-success btn-large">Görüntü ve Sesi Birleştir (MP4 Olarak İndir)</button>
+                    <button id="btn-render-mp3" class="btn btn-warning btn-large">Sadece Sesi Çıkar (MP3 Olarak İndir)</button>
+                </div>
+                
+                <!-- This will hold the download link dynamically -->
+                <div id="download-area" style="margin-top:20px; text-align:center;"></div>
+            </section>
+
+        </main>
+
+        <!-- Smart Assistant Interaction Box (Moved to bottom for accessibility) -->
+        <section class="assistant-interaction-box" aria-label="Asistana Soru Sor" style="margin-top: 20px;">
+            <h2 class="sr-only">Asistana Soru Sor</h2>
+            <div class="assistant-input-group">
+                <input type="text" id="assistant-input" class="large-input" placeholder="Bir sorun mu var? Buraya yazın..." aria-label="Asistana sormak istediğiniz soruyu yazın">
+                <button id="btn-ask-text" class="btn btn-primary" aria-label="Soruyu Gönder">Sor</button>
+                <button id="btn-ask-voice" class="btn btn-warning" aria-label="Mikrofona Konuşarak Sor" title="Mikrofona Konuşarak Sor">🎙️</button>
+            </div>
+            <div id="voice-status" class="sr-only" aria-live="polite"></div>
+        </section>
+
+        <!-- Hidden Video Player (Used for duration calculation) -->
+        <div class="visually-hidden">
+            <video id="hidden-player" aria-label="Gizli Video Oynatıcı"></video>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

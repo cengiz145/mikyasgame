@@ -1,0 +1,130 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+h1 {
+    margin-bottom: 30px;
+    color: #4db8ff;
+}
+
+/* Erişilebilirlik için ekranda görünmeyen ama okuyucunun gördüğü sınıf */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Taş Alanı (Grid) */
+#stone-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+}
+
+.stone {
+    background-color: #555;
+    border: 3px solid #777;
+    border-radius: 10px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.2s;
+}
+
+.stone:focus {
+    outline: 4px solid #4db8ff;
+    outline-offset: 2px;
+    background-color: #666;
+}
+
+.stone.broken {
+    background-color: #222;
+    border-color: #333;
+    color: #555;
+    transform: scale(0.95);
+}
+
+/* İletişim Kutusu (Modal) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: #1e1e1e;
+    border: 2px solid #4db8ff;
+    border-radius: 12px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.word-en {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ffb703;
+    margin-bottom: 10px;
+}
+
+.word-tr {
+    font-size: 1.8rem;
+    color: #8ecae6;
+    margin-bottom: 30px;
+}
+
+.close-btn {
+    background-color: #4db8ff;
+    color: #121212;
+    border: none;
+    padding: 10px 25px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.close-btn:hover, .close-btn:focus {
+    background-color: #219ebc;
+    outline: 3px solid #ffb703;
+    outline-offset: 2px;
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "file": "autoRepair.js",
+    "type": "getElementById",
+    "id": "time-left"
+  },
+  {
+    "file": "game.js",
+    "type": "getElementById",
+    "id": "derby-style"
+  },
+  {
+    "file": "game.js",
+    "type": "getElementById",
+    "id": "derby-overlay"
+  },
+  {
+    "file": "league.js",
+    "type": "getElementById",
+    "id": "btn-playoff-sim"
+  },
+  {
+    "file": "league.js",
+    "type": "getElementById",
+    "id": "btn-next-season"
+  },
+  {
+    "file": "menu.js",
+    "type": "getElementById",
+    "id": "btn-new-career"
+  },
+  {
+    "file": "menu.js",
+    "type": "getElementById",
+    "id": "btn-league-tff2"
+  },
+  {
+    "file": "menu.js",
+    "type": "getElementById",
+    "id": "btn-tactics"
+  },
+  {
+    "file": "menu.js",
+    "type": "getElementById",
+    "id": "btn-press-news"
+  },
+  {
+    "file": "menu.js",
+    "type": "getElementById",
+    "id": "btn-open-captain-modal"
+  },
+  {
+    "file": "menu.js",
+    "type": "getElementById",
+    "id": "btn-continue-league"
+  },
+  {
+    "file": "scout.js",
+    "type": "getElementById",
+    "id": "btn-advance-day"
+  },
+  {
+    "file": "scout.js",
+    "type": "getElementById",
+    "id": "btn-play-match"
+  },
+  {
+    "file": "squad.js",
+    "type": "getElementById",
+    "id": "squad-list"
+  }
+]

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 
 <head>
@@ -176,6 +176,80 @@
         </div>
     </div>
 
+    <!-- Terminoloji Kategori Seçimi Menüsü -->
+    <div id="terminology-categories-container" class="menu-container" role="presentation" aria-hidden="true"
+        aria-label="Terminoloji Kategori Menüsü">
+        <h1 id="terminology-categories-title" tabindex="-1">Hangi Kategoriyi Çalışmak İstersin?</h1>
+        <nav class="menu-nav" aria-label="Terminoloji Kategorileri">
+            <ul>
+                <li><button class="menu-button btn-category" data-category="Tempo">⏱️ Tempo (Hız)</button></li>
+                <li><button class="menu-button btn-category" data-category="Dinamik">🔊 Dinamik (Nüans)</button></li>
+                <li><button class="menu-button btn-category" data-category="Artikülasyon">🎻 Artikülasyon</button></li>
+                <li><button class="menu-button btn-category" data-category="İfade">🎭 İfade (Duygu)</button></li>
+                <li><button class="menu-button btn-category" data-category="Tümü">📚 Tüm Terimleri Göster</button></li>
+                <li><button class="menu-button" id="terminology-categories-back-btn">Geri Dön</button></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Terminoloji Menüsü -->
+    <div id="terminology-menu-container" class="menu-container" role="region" aria-labelledby="terminology-menu-title"
+        aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out;">
+        <h1 id="terminology-menu-title" tabindex="-1">Müzik Terminolojisi Sözlüğü</h1>
+        <div id="terminology-content"
+            style="margin-bottom: 20px; font-size: 1.1rem; color: #aaaaaa; text-align: left; padding: 0 10px; max-height: 50vh; overflow-y: auto;" tabindex="0">
+            <p class="sr-only">Aşağı ve yukarı ok tuşlarıyla terimleri inceleyebilirsiniz.</p>
+            <ul id="terminology-list"
+                style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;">
+                <!-- Terimler JS ile buraya yüklenecek -->
+            </ul>
+        </div>
+        <button class="menu-button" id="btn-terminology-learn" style="background-color: #2a9d8f; color: white; margin-bottom: 10px;">Öğrenme Moduna Gir (Kartlar)</button>
+        <button class="menu-button" id="btn-terminology-exam" style="background-color: #e76f51; color: white; margin-bottom: 10px;">Kendini Test Et (Sınav)</button>
+        <button class="menu-button" id="terminology-back-btn">Kategorilere Dön</button>
+    </div>
+
+    <!-- Öğrenme Modu (Hafıza Kartları) Menüsü -->
+    <div id="learning-mode-container" class="menu-container" role="region" aria-labelledby="learning-mode-title"
+        aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; text-align: center;">
+        <h1 id="learning-mode-title" class="sr-only">Öğrenme Modu</h1>
+        
+        <div id="learning-card" tabindex="0" style="background: rgba(0,0,0,0.5); border: 2px solid #e9c46a; border-radius: 15px; padding: 40px 20px; margin: 20px auto; width: 90%; max-width: 500px; box-shadow: 0 0 20px rgba(233, 196, 106, 0.3);">
+            <h2 id="learning-card-term" style="font-size: 3rem; color: #e9c46a; margin-bottom: 20px;">Allegro</h2>
+            <p id="learning-card-meaning" style="font-size: 1.5rem; color: #ffffff; margin-bottom: 10px;">Hızlı, neşeli</p>
+            <p id="learning-card-category" style="font-size: 1rem; color: #888888; font-style: italic;">Kategori: Tempo</p>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+            <button class="menu-button" id="btn-learning-prev" style="width: auto; padding: 10px 20px;" aria-label="Önceki Terim (Sol Ok)">&larr; Önceki</button>
+            <button class="menu-button" id="btn-learning-next" style="width: auto; padding: 10px 20px; background-color: #2a9d8f; color: white;" aria-label="Sonraki Terim (Sağ Ok)">Sonraki &rarr;</button>
+        </div>
+        <button class="menu-button" id="learning-back-btn" style="margin-top: 30px;">Sözlüğe Dön</button>
+    </div>
+
+    <!-- Terminoloji Sınav Modu (Hafıza Kartları Eşleştirme) Menüsü -->
+    <div id="terminology-exam-container" class="menu-container" role="region" aria-labelledby="terminology-exam-title"
+        aria-hidden="true" style="display: none; opacity: 0; transition: opacity 0.3s ease-in-out; text-align: center;">
+        <h1 id="terminology-exam-title" class="sr-only">Hafıza Kartları Eşleştirme Modu</h1>
+        
+        <!-- Üst Bilgi Barı -->
+        <div id="terminology-exam-status-bar" style="display: flex; justify-content: center; margin-bottom: 20px; font-size: 1.5rem; color: #e9c46a;" aria-live="polite">
+            Kartları açarak ezberleyin...
+        </div>
+
+        <!-- 8 Kartlık Grid (4x2) -->
+        <div id="terminology-exam-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; max-width: 800px; margin: 0 auto; margin-bottom: 30px;" role="group" aria-label="Hafıza Kartları">
+            <!-- Kartlar JS ile buraya yüklenecek -->
+        </div>
+
+        <button class="menu-button" id="btn-terminology-ready" style="display: none; background-color: #2a9d8f; color: white; margin-bottom: 20px; font-size: 1.5rem;">Hazırım, Kartları Kapat!</button>
+
+        <div id="terminology-exam-feedback" aria-live="assertive" style="font-size: 1.2rem; min-height: 2rem; color: #aaa;">
+        </div>
+
+        <button class="menu-button" id="btn-terminology-exam-quit" style="margin-top: 15px; background-color: #555;">Sınavdan Çık</button>
+    </div>
+
     <!-- Zorluk Seçimi Menüsü -->
     <div id="difficulty-menu-container" class="menu-container" role="presentation" aria-hidden="true"
         aria-label="Zorluk Seçimi Menüsü">
@@ -193,6 +267,7 @@
                 <li id="li-diff-missing-notes" style="display: none;"><button class="menu-button"
                         id="btn-diff-missing-notes">Kayıp Notalar</button></li>
                 <li><button class="menu-button" id="btn-diff-rhythm">Ritim Avcısı</button></li>
+                <li><button class="menu-button" id="btn-terminology-main" aria-label="Müzik Terminolojisi Modu">Müzik Terminolojisi</button></li>
                 <li><button class="menu-button" id="difficulty-back-btn">Geri Dön</button>
                 </li>
             </ul>
@@ -954,6 +1029,8 @@
     <script src="js/story.js?v=0.97.4.61"></script>
     <script src="js/game.js?v=0.97.4.61"></script>
     <script src="js/pvp.js?v=0.97.4.61"></script>
+    <script src="js/terminology.js?v=0.97.4.61"></script>
+    <script src="js/game_terminology.js?v=0.97.4.61"></script>
 </body>
 
 </html>

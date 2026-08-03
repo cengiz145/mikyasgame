@@ -3,17 +3,19 @@ $ErrorActionPreference = "Stop"
 $downloads = [System.Environment]::GetFolderPath("UserProfile") + "\Downloads"
 $websiteDir = "$downloads\wep sitem"
 
-try {
-    $hafizanaGuvenSource = (Resolve-Path "$downloads\haf*zana g*ven\hafizana_guven").Path
-} catch {
-    $hafizanaGuvenSource = $null
-}
+    $targetPath = "$downloads\hafızana güven\hafizana_guven"
+    if (Test-Path $targetPath) {
+        $hafizanaGuvenSource = $targetPath
+    } else {
+        $hafizanaGuvenSource = $null
+    }
 
-try {
-    $otobusSource = (Resolve-Path "$downloads\otob*s sim*lasyonu").Path
-} catch {
-    $otobusSource = $null
-}
+    $otobusTargetPath = "$downloads\otobüs simülasyonu"
+    if (Test-Path $otobusTargetPath) {
+        $otobusSource = $otobusTargetPath
+    } else {
+        $otobusSource = $null
+    }
 
 Write-Host "===================================================" -ForegroundColor Cyan
 Write-Host "   TUM OYUNLARI VE SITEYI GITHUB'A YUKLEME ARACI   " -ForegroundColor Cyan
@@ -46,6 +48,14 @@ if ($otobusSource -and (Test-Path $otobusSource)) {
 
 Write-Host "3. Dosyalar GitHub'a (Internete) gonderiliyor..." -ForegroundColor Yellow
 Set-Location -Path $websiteDir
+
+# Git komutlari öncesi otomatik sürüm atlat
+if (Test-Path "$websiteDir\hafizana_guven\sync_versions.ps1") {
+    Write-Host "Hafizana Guven sürümü otomatik artırılıyor..." -ForegroundColor Yellow
+    Set-Location -Path "$websiteDir\hafizana_guven"
+    powershell -ExecutionPolicy Bypass -File .\sync_versions.ps1
+    Set-Location -Path $websiteDir
+}
 
 # Git komutlari
 git add .
