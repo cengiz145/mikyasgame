@@ -17,7 +17,10 @@ $pJson | ConvertTo-Json -Depth 5 | Set-Content $pJsonPath -Encoding UTF8
 
 Write-Host "Updating index.html..."
 $htmlPath = Join-Path $dir "index.html"
-(Get-Content $htmlPath -Encoding UTF8) -replace '\?v=[\d\.]+', "?v=$newVersion" | Set-Content $htmlPath -Encoding UTF8
+$htmlContent = Get-Content $htmlPath -Encoding UTF8
+$htmlContent = $htmlContent -replace '\?v=[\d\.]+', "?v=$newVersion"
+$htmlContent = $htmlContent -replace "window\.UYGULAMA_SURUMU\s*=\s*'[\d\.]+';", "window.UYGULAMA_SURUMU = '$newVersion';"
+$htmlContent | Set-Content $htmlPath -Encoding UTF8
 
 Write-Host "Updating .last_sent_version.txt..."
 $lvPath = Join-Path $dir ".last_sent_version.txt"
