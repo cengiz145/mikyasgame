@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Veritabanı boşsa "Hiç mesaj yok" uyarısı ekleme
     messagesRef.once('value', (snapshot) => {
-        isChatHistoryLoaded = true;
+        setTimeout(() => { isChatHistoryLoaded = true; }, 1000);
         if (!snapshot.exists()) {
             const li = document.createElement('li');
             li.id = 'empty-chat-warning';

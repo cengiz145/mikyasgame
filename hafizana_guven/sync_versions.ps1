@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 $dir = ".\";
-$newVersion = "0.97.4.62"
+$newVersion = "0.97.4.63"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
