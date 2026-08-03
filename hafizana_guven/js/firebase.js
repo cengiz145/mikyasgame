@@ -18,7 +18,7 @@ try {
         throw new Error("Firebase kütüphanesi yüklenemedi.");
     }
 } catch (error) {
-    console.warn("[ÇEVRİMDİÅžİ MOD AKTİF] Veritabanı bağlantısı yok veya internet koptu:", error);
+    console.warn("[ÇEVRİMDİŞİ MOD AKTİF] Veritabanı bağlantısı yok veya internet koptu:", error);
     window.db = null; // Sistem çevrimdışı oynanış için db'yi nazikçe atlar
 }
 

@@ -119,6 +119,16 @@ if (window.gameModes && window.gameModes.medium && window.gameModes.medium.requi
     try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e) {}
 }
 
+// FORCED UNLOCK: Ritim Avcisi ve Ses Paketleri (Kullanici istegi uzerine)
+if (!localStorage.getItem('hafizaGuvenRhythmForceUnlocked_v2')) {
+    if (window.gameModes && window.gameModes.rhythm_mode) {
+        window.gameModes.rhythm_mode.isUnlocked = true;
+    }
+    localStorage.setItem('hafizaGuvenSoundPacksUnlocked', 'true');
+    localStorage.setItem('hafizaGuvenRhythmForceUnlocked_v2', 'true');
+    try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e) {}
+}
+
 // --- YEDEKLEME VE KÜRESEL SIFIRLAMA (KILL-SWITCH) SİSTEMİ ---
 window.syncStatsToFirebase = function() {
     let currentUser = window.currentChatUser || localStorage.getItem('chatUsername') || sessionStorage.getItem('chatNickname');
@@ -1675,7 +1685,7 @@ window.rhythmState = {
     sequence: [],
     playerIndex: 0,
     beatsPerMeasure: 4,
-    measures: 2,
+    measures: 1,
     isPlaying: false,
     intervalId: null
 };
@@ -1684,56 +1694,74 @@ window.startRhythmMode = function() {
     window.activeDifficulty = 'rhythm_mode';
     window.gameIsActive = true;
     window.isComputerPlaying = true;
+    window.gameTimer = 0; // Heartbeat Monitor'u devre dışı bırakmak için
     
     if (window.bgMusic && window.bgMusic.playing()) {
         window.bgMusic.pause();
     }
     
-    window.rhythmState.bpm = 60;
-    window.rhythmState.level = 1;
-    window.rhythmState.successes = 0;
-    window.rhythmState.mistakes = 0;
-    
-    const gameStatus = document.getElementById('game-status-text');
-    if (gameStatus) {
-        gameStatus.style.display = 'block';
-        gameStatus.textContent = "Ritim Avcısı başlıyor... 60 BPM. Bilgisayarı dinleyin!";
-        if (window.announceToScreenReader) window.announceToScreenReader(gameStatus.textContent);
-    }
-    
-    setTimeout(() => {
-        window.playRhythmComputerTurn();
-    }, 2000);
+    window.playRhythmComputerTurn();
 };
 
 window.playRhythmComputerTurn = function() {
-    window.hgfzZamanlayici.clearInterval(window.gameInterval); // Clear timer when computer plays
+    window.hgfzZamanlayici.clearInterval(window.gameInterval);
     window.isComputerPlaying = true;
     window.rhythmState.playerIndex = 0;
     window.rhythmState.sequence = [];
     
-    let totalBeats = window.rhythmState.beatsPerMeasure * window.rhythmState.measures; // 8 beats
-    let noteCount = Math.min(3 + Math.floor(window.rhythmState.level / 2), totalBeats);
-    let noteBeats = new Set();
-    while(noteBeats.size < noteCount) {
-        noteBeats.add(Math.floor(Math.random() * totalBeats));
+    let ticksPerBeat = 8; // 32'lik nota destegi (1 vurusta 8 tick)
+    let totalTicks = window.rhythmState.beatsPerMeasure * window.rhythmState.measures * ticksPerBeat; // 4 * 1 * 8 = 32 ticks
+    window.rhythmState.totalTicks = totalTicks;
+    
+    let noteTicks = new Set();
+    let lvl = window.rhythmState.level;
+    
+    if (lvl <= 5) {
+        let options = [0];
+        let noteCount = 1;
+        while(noteTicks.size < noteCount) noteTicks.add(options[Math.floor(Math.random() * options.length)]);
+    } else if (lvl <= 14) {
+        let options = [0, 16];
+        let possibleCounts = [1, 2];
+        let noteCount = possibleCounts[Math.floor(Math.random() * possibleCounts.length)];
+        while(noteTicks.size < noteCount) noteTicks.add(options[Math.floor(Math.random() * options.length)]);
+    } else if (lvl <= 24) {
+        let options = [0, 8, 16, 24];
+        let possibleCounts = [2, 3, 4];
+        let noteCount = possibleCounts[Math.floor(Math.random() * possibleCounts.length)];
+        while(noteTicks.size < noteCount) noteTicks.add(options[Math.floor(Math.random() * options.length)]);
+    } else if (lvl <= 44) {
+        let options = [0, 4, 8, 12, 16, 20, 24, 28];
+        let possibleCounts = [4, 5, 6];
+        let noteCount = possibleCounts[Math.floor(Math.random() * possibleCounts.length)];
+        while(noteTicks.size < noteCount) noteTicks.add(options[Math.floor(Math.random() * options.length)]);
+    } else if (lvl <= 54) {
+        let options = [];
+        for (let i = 0; i < 32; i += 2) options.push(i);
+        let possibleCounts = [6, 8, 10];
+        let noteCount = possibleCounts[Math.floor(Math.random() * possibleCounts.length)];
+        while(noteTicks.size < noteCount) noteTicks.add(options[Math.floor(Math.random() * options.length)]);
+    } else {
+        let options = [];
+        for (let i = 0; i < 32; i++) options.push(i);
+        let possibleCounts = [8, 12, 16];
+        let noteCount = possibleCounts[Math.floor(Math.random() * possibleCounts.length)];
+        while(noteTicks.size < noteCount) noteTicks.add(options[Math.floor(Math.random() * options.length)]);
     }
     
-    let beatArray = Array.from(noteBeats).sort((a,b) => a-b);
-    let beatToNoteMap = {};
+    let tickArray = Array.from(noteTicks).sort((a,b) => a-b);
+    let tickToNoteMap = {};
     
-    let orderedKeys = ['c', 'd', 'e', 'f', 'g', 'a', 'b']; // Müzikal siralamasi (Do-Re-Mi...)
+    let orderedKeys = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
     let prevIndex = Math.floor(Math.random() * orderedKeys.length);
     
-    for (let beat of beatArray) {
+    for (let tick of tickArray) {
         let nextNoteIndex;
-        let lvl = window.rhythmState.level;
-        
-        if (lvl <= 2) {
+        if (lvl <= 3) {
             let step = (Math.random() > 0.5 ? 1 : -1);
             if (Math.random() > 0.7) step = 0;
             nextNoteIndex = (prevIndex + step + orderedKeys.length) % orderedKeys.length;
-        } else if (lvl <= 4) {
+        } else if (lvl <= 6) {
             let stepOptions = [-2, -1, 0, 1, 2];
             let step = stepOptions[Math.floor(Math.random() * stepOptions.length)];
             nextNoteIndex = (prevIndex + step + orderedKeys.length) % orderedKeys.length;
@@ -1744,73 +1772,66 @@ window.playRhythmComputerTurn = function() {
         let generatedNote = orderedKeys[nextNoteIndex];
         prevIndex = nextNoteIndex;
         
-        beatToNoteMap[beat] = generatedNote;
+        tickToNoteMap[tick] = generatedNote;
         window.rhythmState.sequence.push(generatedNote);
     }
     
+    window.rhythmState.tickMap = tickToNoteMap;
+    
     const gameStatus = document.getElementById('game-status-text');
     if (gameStatus) {
-        gameStatus.textContent = `Seviye ${window.rhythmState.level} | BPM: ${window.rhythmState.bpm} | Dinleyin...`;
+        gameStatus.textContent = `Seviye ${lvl} | BPM: ${window.rhythmState.bpm} | Dinleyin...`;
     }
     
-    let currentBeat = 0;
-    let intervalMs = 60000 / window.rhythmState.bpm;
+    let currentTick = 0;
+    let intervalMs = (60000 / window.rhythmState.bpm) / ticksPerBeat;
     
-    window.rhythmState.intervalId = setInterval(() => {
-        let isFirstBeat = (currentBeat % window.rhythmState.beatsPerMeasure) === 0;
-        if (window.playMetronomeTick) window.playMetronomeTick(isFirstBeat);
+    let computerTick = () => {
+        let isBeatTick = (currentTick % ticksPerBeat) === 0;
+        let isFirstBeat = (currentTick % (window.rhythmState.beatsPerMeasure * ticksPerBeat)) === 0;
         
-        if (currentBeat < totalBeats) {
-            if (beatToNoteMap[currentBeat]) {
-                let note = beatToNoteMap[currentBeat];
+        if (isBeatTick && currentTick < totalTicks && window.playMetronomeTick) {
+            window.playMetronomeTick(isFirstBeat);
+        }
+        
+        if (currentTick < totalTicks) {
+            if (tickToNoteMap[currentTick]) {
+                let note = tickToNoteMap[currentTick];
                 if (window.playPianoNoteSingle) window.playPianoNoteSingle(note);
             }
-        } else if (currentBeat === totalBeats) {
-            // Bilgisayar notalarını bitirdi. 1 Vuruşluk 'Hazır Ol' molası (Sende!)
-            if (window.announceToScreenReader) window.announceToScreenReader("Sıra sizde!", true);
-            if (window.menuEnterSound) window.menuEnterSound.play(); // Dııt sesi (hazırlık)
-        } else if (currentBeat > totalBeats) {
-            // Hazırlık vuruşu bitti, oyuncu sırası tam ritminde başlıyor.
+        } else if (currentTick === totalTicks) {
             clearInterval(window.rhythmState.intervalId);
             window.startRhythmPlayerTurn(intervalMs);
             return;
         }
         
-        currentBeat++;
-    }, intervalMs);
+        currentTick++;
+    };
+    
+    computerTick(); // Kesintisiz gecis
+    window.rhythmState.intervalId = setInterval(computerTick, intervalMs);
 };
 
 window.rhythmPlayerFailed = function(reason) {
     clearInterval(window.rhythmState.intervalId);
     window.isComputerPlaying = true;
     
-    let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
     const gameStatus = document.getElementById('game-status-text');
     
-    if (hk > 0) {
-        hk--;
-        localStorage.setItem('hafizaGuvenHataKorumasi', hk);
-        if (window.wrongSound) window.wrongSound.play();
-        if (gameStatus) gameStatus.textContent = "Hata koruması kullanıldı! Ceza Yok. Ritim tekrar çalınıyor.";
-        if (window.announceToScreenReader) window.announceToScreenReader("Hata koruması kullanıldı! Tekrar dinleyin.");
-        setTimeout(() => { window.playRhythmComputerTurn(); }, 1500);
+    if (window.wrongSound) window.wrongSound.play();
+    window.rhythmState.mistakes++;
+    
+    if (window.rhythmState.mistakes >= 3) {
+        let completedLevels = window.rhythmState.level - 1;
+        window.sessionTokens = (completedLevels > 0) ? (completedLevels * (completedLevels + 1) / 2) * 25 : 0;
+        
+        window.endMainGame(false, false, false); 
     } else {
-        if (window.wrongSound) window.wrongSound.play();
-        window.rhythmState.mistakes++;
-        if (window.rhythmState.mistakes >= 3) {
-            let completedLevels = window.rhythmState.level - 1;
-            if (completedLevels > 0) {
-                window.sessionTokens = (completedLevels * (completedLevels + 1) / 2) * 25;
-            } else {
-                window.sessionTokens = 0;
-            }
-            window.endMainGame(false, false, false); 
-            if (window.announceToScreenReader) window.announceToScreenReader("3 hakkınız bitti! Oyun sona erdi.");
-        } else {
-            if (gameStatus) gameStatus.textContent = reason + ` Kalan hak: ${3 - window.rhythmState.mistakes}.`;
-            if (window.announceToScreenReader) window.announceToScreenReader(reason + ` Kalan hakkınız ${3 - window.rhythmState.mistakes}.`);
-            setTimeout(() => { window.playRhythmComputerTurn(); }, 1500);
-        }
+        if (gameStatus) gameStatus.textContent = reason + ` Kalan hak: ${3 - window.rhythmState.mistakes}.`;
+        if (window.announceToScreenReader) window.announceToScreenReader(reason + ` Kalan hakkınız ${3 - window.rhythmState.mistakes}.`);
+        
+        // Hata yaptiginda durumu gormesi ve hazirlanmasi icin 1.5 saniye bekle
+        setTimeout(() => { window.playRhythmComputerTurn(); }, 1500);
     }
 };
 
@@ -1820,33 +1841,20 @@ window.rhythmPlayerSucceeded = function() {
     if (window.correctSound) window.correctSound.play();
     window.rhythmState.successes++;
     
-    const gameStatus = document.getElementById('game-status-text');
-    if (gameStatus) {
-        gameStatus.textContent = "Harika!";
-        if (window.announceToScreenReader) window.announceToScreenReader("Harika!");
-    }
-    
     if (window.rhythmState.successes >= 3) {
         window.rhythmState.successes = 0;
         window.rhythmState.level++;
-        window.rhythmState.bpm += 10;
+        window.rhythmState.bpm += 1;
+        if (window.rhythmState.bpm > 240) window.rhythmState.bpm = 240;
         
         if (window.gameModes.rhythm_mode.completionCount < window.rhythmState.level) {
             window.gameModes.rhythm_mode.completionCount = window.rhythmState.level;
             try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch(e){}
         }
-        
-        setTimeout(() => {
-            if (gameStatus) {
-                gameStatus.textContent = `Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`;
-                if (window.announceToScreenReader) window.announceToScreenReader(`Seviye Atladınız! Yeni Hız: ${window.rhythmState.bpm} BPM`);
-            }
-            if (window.modeUnlockSound) window.modeUnlockSound.play();
-            setTimeout(window.playRhythmComputerTurn, 2500);
-        }, 1000);
-    } else {
-        setTimeout(window.playRhythmComputerTurn, 1500);
     }
+    
+    // Aninda siradaki bilgisayar turn'unu baslat, bekleme yok!
+    window.playRhythmComputerTurn();
 };
 
 window.startRhythmPlayerTurn = function(intervalMs) {
@@ -1859,40 +1867,53 @@ window.startRhythmPlayerTurn = function(intervalMs) {
     window.hgfzZamanlayici.clearInterval(window.gameInterval);
     if (window.rhythmState.intervalId) clearInterval(window.rhythmState.intervalId);
     
-    let totalBeats = window.rhythmState.totalBeats;
-    if (!intervalMs) intervalMs = 60000 / window.rhythmState.bpm;
+    let ticksPerBeat = 8;
+    let totalTicks = window.rhythmState.totalTicks || (window.rhythmState.beatsPerMeasure * window.rhythmState.measures * ticksPerBeat);
+    if (!intervalMs) intervalMs = (60000 / window.rhythmState.bpm) / ticksPerBeat;
     
-    window.rhythmState.playerCurrentBeat = 0; 
-    window.rhythmState.expectedNote = null;
-    window.rhythmState.playerPressedThisBeat = true; // prevent failing before beat 0 starts
+    window.rhythmState.playerCurrentTick = 0; 
+    window.rhythmState.pressedTicks = {};
     
     let startTick = () => {
         if (window.gameIsPaused || !window.gameIsActive || window.isComputerPlaying) return;
         
-        // Check previous beat
-        if (window.rhythmState.expectedNote !== null && !window.rhythmState.playerPressedThisBeat) {
+        let cTick = window.rhythmState.playerCurrentTick;
+        let map = window.rhythmState.tickMap || {};
+        
+        // Gecikme kontrolü: cTick - 2'deki nota hala basılmadıysa kaçırmıştır!
+        let checkTick = cTick - 2;
+        if (checkTick >= 0 && map[checkTick] && !window.rhythmState.pressedTicks[checkTick]) {
             window.rhythmPlayerFailed("Notayı kaçırdınız (geciktiniz)!");
             return;
         }
         
-        // Check if game won
-        if (window.rhythmState.playerCurrentBeat >= totalBeats) {
-            window.rhythmPlayerSucceeded();
+        if (cTick >= totalTicks) {
+            let map = window.rhythmState.tickMap || {};
+            let allPressed = true;
+            for (let t in map) {
+                if (!window.rhythmState.pressedTicks[t]) {
+                    allPressed = false;
+                    break;
+                }
+            }
+            if (allPressed) {
+                window.rhythmPlayerSucceeded();
+            } else {
+                window.rhythmPlayerFailed("Zaman doldu, eksik nota bıraktınız!");
+            }
             return;
         }
         
-        // Setup current beat
-        let cBeat = window.rhythmState.playerCurrentBeat;
-        let isFirstBeat = (cBeat % window.rhythmState.beatsPerMeasure) === 0;
-        if (window.playMetronomeTick) window.playMetronomeTick(isFirstBeat);
+        let isBeatTick = (cTick % ticksPerBeat) === 0;
+        let isFirstBeat = (cTick % (window.rhythmState.beatsPerMeasure * ticksPerBeat)) === 0;
         
-        window.rhythmState.expectedNote = window.rhythmState.beatMap[cBeat] || null;
-        window.rhythmState.playerPressedThisBeat = false; 
+        if (isBeatTick && cTick < totalTicks && window.playMetronomeTick) {
+            window.playMetronomeTick(isFirstBeat);
+        }
         
-        window.rhythmState.playerCurrentBeat++;
+        window.rhythmState.playerCurrentTick++;
     };
     
-    // İlk vuruşu anında başlat
     startTick();
     window.rhythmState.intervalId = setInterval(startTick, intervalMs);
 };
@@ -1902,18 +1923,22 @@ window.handleRhythmInput = function(key) {
     
     if (window.playPianoNoteSingle) window.playPianoNoteSingle(key);
     
-    let expectedKey = window.rhythmState.expectedNote;
+    let cTick = window.rhythmState.playerCurrentTick - 1; // current tick
+    let map = window.rhythmState.tickMap || {};
     
-    if (expectedKey === null) {
-        window.rhythmPlayerFailed("Es (boşluk) anında erken tuşa bastınız!");
-    } else if (key === expectedKey) {
-        if (!window.rhythmState.playerPressedThisBeat) {
-            window.rhythmState.playerPressedThisBeat = true;
-        } else {
-             window.rhythmPlayerFailed("Aynı vuruşta fazladan tuşa bastınız!");
-        }
+    let foundTick = null;
+    if (map[cTick] === key && !window.rhythmState.pressedTicks[cTick]) foundTick = cTick;
+    else if (map[cTick - 1] === key && !window.rhythmState.pressedTicks[cTick - 1]) foundTick = cTick - 1;
+    else if (map[cTick + 1] === key && !window.rhythmState.pressedTicks[cTick + 1]) foundTick = cTick + 1;
+    
+    if (foundTick !== null) {
+        window.rhythmState.pressedTicks[foundTick] = true;
     } else {
-        window.rhythmPlayerFailed("Yanlış notaya bastınız!");
+        if (!map[cTick] && !map[cTick-1] && !map[cTick+1]) {
+            window.rhythmPlayerFailed("Es (boşluk) anında tuşa bastınız!");
+        } else {
+            window.rhythmPlayerFailed("Yanlış notaya veya fazladan tuşa bastınız!");
+        }
     }
 };
 

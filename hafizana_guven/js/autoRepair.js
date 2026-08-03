@@ -1,4 +1,4 @@
-// autoRepair.js - Otomatik Hata OnarÄ±m ve TeÅŸhis Sistemi (Auto-Repair & Diagnostics)
+// autoRepair.js - Otomatik Hata Onarım ve Teşhis Sistemi (Auto-Repair & Diagnostics)
 
 window.HafizanaGuvenAutoRepair = {
     isRepairing: false,
@@ -11,7 +11,7 @@ window.HafizanaGuvenAutoRepair = {
         this.setupGlobalErrorHandler();
         this.runLocalStorageDoctor();
         this.startHeartbeatMonitor();
-        console.log("[AutoRepair] Otomatik onarÄ±m sistemi aktif.");
+        console.log("[AutoRepair] Otomatik onarım sistemi aktif.");
     },
 
     setupGlobalErrorHandler: function() {
@@ -19,15 +19,15 @@ window.HafizanaGuvenAutoRepair = {
         
         window.onerror = function(message, source, lineno, colno, error) {
             let stack = error && error.stack ? error.stack : 'Stack trace yok';
-            let formattedMsg = `JavaScript HatasÄ±:\nMesaj: ${message}\nDosya: ${source}\nSatÄ±r: ${lineno}:${colno}\n\nDetay:\n${stack}`;
+            let formattedMsg = `JavaScript Hatası:\nMesaj: ${message}\nDosya: ${source}\nSatır: ${lineno}:${colno}\n\nDetay:\n${stack}`;
             self.showErrorReporter(formattedMsg);
-            // HatanÄ±n tarayÄ±cÄ± konsoluna dÃ¼ÅŸmesini engelleme (false dÃ¶ndÃ¼r)
+            // Hatanın tarayıcı konsoluna düşmesini engelleme (false döndür)
             return false;
         };
 
         window.addEventListener('unhandledrejection', function(event) {
             let reason = event.reason;
-            let formattedMsg = `Asenkron Ä°ÅŸlem HatasÄ± (Promise Rejection):\n`;
+            let formattedMsg = `Asenkron İşlem Hatası (Promise Rejection):\n`;
             if (reason instanceof Error) {
                 formattedMsg += `Mesaj: ${reason.message}\n\nDetay:\n${reason.stack}`;
             } else {
@@ -36,7 +36,7 @@ window.HafizanaGuvenAutoRepair = {
             self.showErrorReporter(formattedMsg);
         });
 
-        // Hata Bildirim ButonlarÄ± Event Listener'larÄ±
+        // Hata Bildirim Butonları Event Listener'ları
         document.addEventListener('DOMContentLoaded', () => {
             const btnSend = document.getElementById('btn-send-error');
             const btnReload = document.getElementById('btn-reload-error');
@@ -86,28 +86,28 @@ window.HafizanaGuvenAutoRepair = {
         if (this.isRepairing) return;
         this.isRepairing = true;
 
-        // KullanÄ±cÄ± gizliliÄŸini korumak iÃ§in bilgisayar dosya yollarÄ±nÄ± maskele (C:\Users\... veya file:///)
+        // Kullanıcı gizliliğini korumak için bilgisayar dosya yollarını maskele (C:\Users\... veya file:///)
         let sanitizedLog = errorLog;
         try {
             sanitizedLog = sanitizedLog.replace(/(?:file:\/\/\/|https?:\/\/|[a-zA-Z]:\\).*?[\/\\]([a-zA-Z0-9_\-]+\.(?:js|css|html))/gi, '[OYUN_KLASORU]/$1');
             sanitizedLog = sanitizedLog.replace(/Users[\/\\][^\/\\]+[\/\\]/gi, 'Users/[GIZLI_KULLANICI]/');
         } catch(e) {}
 
-        console.error("[Global Error Reporter] Hata YakalandÄ±:\n" + sanitizedLog);
+        console.error("[Global Error Reporter] Hata Yakalandı:\n" + sanitizedLog);
 
         const modal = document.getElementById('error-reporter-modal');
         const textarea = document.getElementById('error-log-textarea');
         const title = document.getElementById('error-modal-title');
 
         if (modal && textarea) {
-            // Arkaplandaki tÃ¼m sesleri sustur
+            // Arkaplandaki tüm sesleri sustur
             const allAudios = document.querySelectorAll('audio');
             allAudios.forEach(audio => {
                 audio.pause();
                 audio.currentTime = 0;
             });
 
-            // ZamanlayÄ±cÄ±larÄ± durdur
+            // Zamanlayıcıları durdur
             if (window.hgfzZamanlayici && window.hgfzZamanlayici.hepsiniImhaEt) {
                 window.hgfzZamanlayici.hepsiniImhaEt();
             }
@@ -117,7 +117,7 @@ window.HafizanaGuvenAutoRepair = {
 
             textarea.value = sanitizedLog;
             
-            // Aktif olan tÃ¼m menÃ¼leri gizleyerek odaÄŸÄ±n sadece hata menÃ¼sÃ¼nde kalmasÄ±nÄ± saÄŸla
+            // Aktif olan tüm menüleri gizleyerek odağın sadece hata menüsünde kalmasını sağla
             const activeMenus = document.querySelectorAll('.menu-container:not([style*="display: none"])');
             activeMenus.forEach(menu => {
                 menu.style.display = 'none';
@@ -133,74 +133,74 @@ window.HafizanaGuvenAutoRepair = {
                 if (title) title.focus();
                 
                 if (window.announceToScreenReader) {
-                    window.announceToScreenReader("Sistem hatasÄ± tespit edildi. Oyun durduruldu. LÃ¼tfen ekrandaki hata kodunu kopyalayÄ±p geliÅŸtiriciye gÃ¶nderin.", true);
+                    window.announceToScreenReader("Sistem hatası tespit edildi. Oyun durduruldu. Lütfen ekrandaki hata kodunu kopyalayıp geliştiriciye gönderin.", true);
                 }
             }, 100);
         } else {
-            alert("KRÄ°TÄ°K HATA:\n" + errorLog);
+            alert("KRİTİK HATA:\n" + errorLog);
         }
     },
 
     handleCrash: function(reason) {
-        this.showErrorReporter("Sistem Tespit HatasÄ±:\n" + reason);
+        this.showErrorReporter("Sistem Tespit Hatası:\n" + reason);
     },
 
     runLocalStorageDoctor: function() {
-        // KayÄ±tlÄ± verilerin formatÄ±nÄ± ve veri tiplerini tarar
+        // Kayıtlı verilerin formatını ve veri tiplerini tarar
         try {
-            // 1. Jetonlar KontrolÃ¼ (NaN hatasÄ± kalkanÄ±)
+            // 1. Jetonlar Kontrolü (NaN hatası kalkanı)
             let tokens = localStorage.getItem('hafizaGuvenTotalTokens');
             if (tokens !== null) {
                 let parsedTokens = parseInt(tokens);
                 if (isNaN(parsedTokens) || parsedTokens < 0) {
-                    console.warn("[AutoRepair] Bozuk jeton verisi tespit edildi. OnarÄ±lÄ±yor...");
+                    console.warn("[AutoRepair] Bozuk jeton verisi tespit edildi. Onarılıyor...");
                     localStorage.setItem('hafizaGuvenTotalTokens', '0');
                 }
             }
 
-            // 2. Oyun ModlarÄ± (JSON Format HatasÄ± KorumasÄ±)
+            // 2. Oyun Modları (JSON Format Hatası Koruması)
             let modes = localStorage.getItem('hafizaGuvenModes');
             if (modes) {
                 try {
                     let parsedModes = JSON.parse(modes);
                     if (typeof parsedModes !== 'object' || !parsedModes.easy) {
-                        throw new Error("GeÃ§ersiz oyun modu yapÄ±sÄ±");
+                        throw new Error("Geçersiz oyun modu yapısı");
                     }
                 } catch (e) {
-                    console.warn("[AutoRepair] Bozuk oyun modlarÄ± verisi tespit edildi. VarsayÄ±lana dÃ¶ndÃ¼rÃ¼lÃ¼yor...");
+                    console.warn("[AutoRepair] Bozuk oyun modları verisi tespit edildi. Varsayılana döndürülüyor...");
                     localStorage.removeItem('hafizaGuvenModes');
                 }
             }
             
-            // 3. BaÅŸarÄ±mlar (JSON Format HatasÄ±)
+            // 3. Başarımlar (JSON Format Hatası)
             let achievements = localStorage.getItem('hafizaGuvenAchievements');
             if (achievements) {
                 try {
                     JSON.parse(achievements);
                 } catch (e) {
-                    console.warn("[AutoRepair] Bozuk baÅŸarÄ±m verisi tespit edildi. Temizleniyor...");
+                    console.warn("[AutoRepair] Bozuk başarım verisi tespit edildi. Temizleniyor...");
                     localStorage.removeItem('hafizaGuvenAchievements');
                 }
             }
 
         } catch (e) {
-            console.error("[AutoRepair] LocalStorage Doctor Ã§alÄ±ÅŸÄ±rken hata:", e);
+            console.error("[AutoRepair] LocalStorage Doctor çalışırken hata:", e);
         }
     },
 
     startHeartbeatMonitor: function() {
-        // Oyunun takÄ±lÄ±p takÄ±lmadÄ±ÄŸÄ±nÄ± (deadlock) her 5 saniyede bir denetler
+        // Oyunun takılıp takılmadığını (deadlock) her 5 saniyede bir denetler
         setInterval(() => {
             if (window.gameIsActive && window.gameTimer > 0) {
                 
-                // EÄŸer oyun aktifse ve 10 saniye boyunca zamanlayÄ±cÄ± aynÄ± kaldÄ±ysa (takÄ±ldÄ±ysa)
+                // Eğer oyun aktifse ve 10 saniye boyunca zamanlayıcı aynı kaldıysa (takıldıysa)
                 if (this.lastHeartbeatState && this.lastHeartbeatState.timer === window.gameTimer && !window.gameIsPaused) {
                     this.lastHeartbeatState.frozenCount = (this.lastHeartbeatState.frozenCount || 0) + 1;
                     
                     // 15 saniye boyunca oyun ilerlemediyse donma ilan et ve kurtar
                     if (this.lastHeartbeatState.frozenCount >= 3) {
-                        console.warn("[AutoRepair] Oyun zamanlayÄ±cÄ±sÄ±nÄ±n donduÄŸu tespit edildi. Sistem zorla yeniden baÅŸlatÄ±lÄ±yor.");
-                        this.handleCrash("Oyun zamanlayÄ±cÄ±sÄ± dondu (Heartbeat Fail).");
+                        console.warn("[AutoRepair] Oyun zamanlayıcısının donduğu tespit edildi. Sistem zorla yeniden başlatılıyor.");
+                        this.handleCrash("Oyun zamanlayıcısı dondu (Heartbeat Fail).");
                     }
                 } else {
                     this.lastHeartbeatState = {
@@ -209,13 +209,13 @@ window.HafizanaGuvenAutoRepair = {
                     };
                 }
             } else {
-                this.lastHeartbeatState = null; // Oyun aktif deÄŸilse sÄ±fÄ±rla
+                this.lastHeartbeatState = null; // Oyun aktif değilse sıfırla
             }
         }, 5000);
     }
 };
 
-// Sayfa yÃ¼klenirken onarÄ±m sistemini ayaÄŸa kaldÄ±r
+// Sayfa yüklenirken onarım sistemini ayağa kaldır
 window.HafizanaGuvenAutoRepair.init();
 
 
