@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "palmeiras", name: "Palmeiras", budget: 70, leagueId: "brezilya", players: ["Weverton", "Gustavo Gomez", "Murilo", "Marcos Rocha", "Joaquin Piquerez", "Ze Rafael", "Richard Rios", "Raphael Veiga", "Dudu", "Endrick", "Rony", "Jose Manuel Lopez", "Mayke", "Luan", "Gabriel Menino"] },

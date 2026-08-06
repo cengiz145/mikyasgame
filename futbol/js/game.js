@@ -1,4 +1,4 @@
-
+﻿
 // --- AUDIO MANAGER ---
 window.AudioManager = {
     ambiance: null,
@@ -391,7 +391,7 @@ window.traitorAssigned = false;
 let selectedPauseIndex = 0;
 const pauseMenuOptions = ['Devam Et', 'Taktik Değiştir', 'Oyuncu Değiştir', 'Maçtan Çekil', 'Oyuncularla Konuş (Fırça/Motivasyon)'];
 
-// AÅžAMA 42: OYUN DURAKSAMA MEKANİÄžİ
+// AŞAMA 42: OYUN DURAKSAMA MEKANİĞİ
 let isGameHalted = false;
 let gameHaltTimer = 0;
 let haltReason = "";
@@ -415,10 +415,10 @@ window.updateCrowdForm = function() {
 
     // Sabır puanına göre ana form belirleniyor
     
-      window.isHistoricalClub = window.isHistoricalClub || (Math.random() < 0.5); // Åžimdilik simüle etmek için %50 ihtimal veya dışarıdan atanabilir
+      window.isHistoricalClub = window.isHistoricalClub || (Math.random() < 0.5); // Şimdilik simüle etmek için %50 ihtimal veya dışarıdan atanabilir
       window.seasonPoints = window.seasonPoints || (window.currentWeek * 1.5); // Geçici puan hesabı
       
-      // FORM 7: Absürt Karnaval (Skorun Ölümü) - Åžampiyonluk garantiyse veya küme düşmüşse
+      // FORM 7: Absürt Karnaval (Skorun Ölümü) - Şampiyonluk garantiyse veya küme düşmüşse
       if (window.currentWeek > 30 && (window.seasonPoints > 85 || window.seasonPoints < 25)) {
           newForm = 7;
       }
@@ -475,7 +475,7 @@ window.updateCrowdForm = function() {
       if (window.CrowdForm !== newForm) {
         window.CrowdForm = newForm;
         if (typeof announcerText !== 'undefined') {
-            let formNames = ["", "TRİBÜN FORMU 1: ROMANTİK İYİMSERLİK", "TRİBÜN FORMU 2: TAKTİKSEL HOMURDANMA", "TRİBÜN FORMU 3: YIKILAN KALE (TRAVMA)", "TRİBÜN FORMU 4: TOKSİK İSYAN", "TRİBÜN FORMU 5: RUHSUZ KABULLENİÅž", "TRİBÜN FORMU 6: GEÇMİÅžİN HAYALETLERİ", "TRİBÜN FORMU 7: ABSÜRT KARNAVAL"];
+            let formNames = ["", "TRİBÜN FORMU 1: ROMANTİK İYİMSERLİK", "TRİBÜN FORMU 2: TAKTİKSEL HOMURDANMA", "TRİBÜN FORMU 3: YIKILAN KALE (TRAVMA)", "TRİBÜN FORMU 4: TOKSİK İSYAN", "TRİBÜN FORMU 5: RUHSUZ KABULLENİŞ", "TRİBÜN FORMU 6: GEÇMİŞİN HAYALETLERİ", "TRİBÜN FORMU 7: ABSÜRT KARNAVAL"];
             if (window.isFriendlyMatch) { announcerText.textContent = "HAZIRLIK MAÇI | " + formNames[newForm]; } else { announcerText.textContent = "HAFTA " + window.currentWeek + " | " + formNames[newForm]; }
         }
         window.lastFrameVx = ball.vx;
@@ -495,13 +495,13 @@ let teamPsychology = 'normal';
 let awayTeamPsychology = 'normal';
 let prevPsychology = 'normal';
 let historicWorstDeficit = 0;
-let fatigueAnnounced = false; // AÅžAMA 28: Yorgunluk anonsu yapıldı mı?
+let fatigueAnnounced = false; // AŞAMA 28: Yorgunluk anonsu yapıldı mı?
 
 let strikerRunActive = false;
 let strikerRunTimer = 0;
 let currentStriker = null;
 
-// AÅžAMA 27: Forvet Psikolojisi
+// AŞAMA 27: Forvet Psikolojisi
 let strikerConfidence = 100;
 let strikerMissedShots = 0;
 let lastShooter = null;
@@ -581,7 +581,7 @@ function initGame() {
         }
         */
           
-          // AÅžAMA 73: Sessizlik Protestosu
+          // AŞAMA 73: Sessizlik Protestosu
           window.isSilentProtest = false;
           if ((window.consecutiveLosses >= 2 && Math.random() < 0.6) || (window.managerAuthority < 40 && Math.random() < 0.5)) {
               window.isSilentProtest = true;
@@ -659,7 +659,7 @@ function initGame() {
           window.refereeExperience = window.currentReferee.profile === 'caylak' ? 'rookie' : 'veteran';
 
           
-          // AÅžAMA 68: İşitsel Koreografi (Cehenneme Hoş Geldin) - SADECE DERBİ VE KRİTİK MAÇLARDA
+          // AŞAMA 68: İşitsel Koreografi (Cehenneme Hoş Geldin) - SADECE DERBİ VE KRİTİK MAÇLARDA
           setTimeout(() => {
               let isCriticalMatch = window.isDerbyMatch || window.isChampionsLeague;
                 
@@ -826,7 +826,7 @@ function initGame() {
         }
         // --- DERBİ ADRENALİNİ SONU ---
         
-        // AÅžAMA 36 & 37: İSTİKRAR & TIER 2
+        // AŞAMA 36 & 37: İSTİKRAR & TIER 2
         let isWorldClass = hp.power >= 90 && hp.mentalTrait === 'elite';
         let isTier2 = hp.power >= 80 && hp.power < 90;
         let isTier3 = hp.power < 80 && hp.power >= 55;
@@ -1033,7 +1033,7 @@ function initGame() {
     prevPsychology = 'normal';
     historicWorstDeficit = 0;
     
-    // AÅžAMA 27: Psikoloji Sıfırlama
+    // AŞAMA 27: Psikoloji Sıfırlama
     strikerConfidence = 100;
     strikerMissedShots = 0;
     lastShooter = null;
@@ -1050,7 +1050,7 @@ function initGame() {
     }
 }
 
-// AÅžAMA 32: Rakip Bot Menajer Yapay Zekası
+// AŞAMA 32: Rakip Bot Menajer Yapay Zekası
 let isBotManagerAnnounced = false;
 function processOpponentManager() {
     if (timeLeft > 70) return; // İlk 20 dakika taktik değişmez
@@ -1711,7 +1711,7 @@ window.addEventListener('keydown', (e) => {
                     p.y += (Math.random() - 0.5) * 100;
                     if(p.y < 50) p.y = 50; if(p.y > 450) p.y = 450;
                     
-                    // AÅžAMA 36: Taktiksel Adaptasyon
+                    // AŞAMA 36: Taktiksel Adaptasyon
                     if (!p.isWorldClass) {
                         p.isStunned = true; // Sıradan oyuncular sistemi kurana kadar afallar
                         setTimeout(() => { if(p) p.isStunned = false; }, 2000);
@@ -1864,14 +1864,14 @@ function updatePlayer(p, teamType) {
         window.lastFrameVy = ball.vy;
     }
     
-    // AÅžAMA 36: AURA ETKİSİ VE CLUTCH
+    // AŞAMA 36: AURA ETKİSİ VE CLUTCH
     let teamArray = teamType === 'home' ? homePlayers : awayPlayers;
     p.hasAura = teamArray.some(mate => mate.isWorldClass && !mate.isRedCarded);
     
     let isClutchMoment = (timeLeft <= 15 && ((teamType === 'home' && window.playerScore < window.enemyScore) || (teamType === 'away' && window.enemyScore < window.playerScore)));
     let isBigMatch = (timeLeft <= 15 && Math.abs(window.playerScore - window.enemyScore) <= 1); // Fark 1 veya Beraberlik
     
-    // AÅžAMA 37: Büyük Maç Sendromu
+    // AŞAMA 37: Büyük Maç Sendromu
     if (isBigMatch && p.isTier2 && !p.isWorldClass) {
         if (Math.random() < 0.015) { // Panik donması
             p.isStunned = true;
@@ -1882,7 +1882,7 @@ function updatePlayer(p, teamType) {
         window.lastFrameVy = ball.vy;
     }
     
-    // AÅžAMA 39: TIER 4 (Çaylaklar ve Gizlenme)
+    // AŞAMA 39: TIER 4 (Çaylaklar ve Gizlenme)
     if (p.isTier4) {
         // Saklanma Mekaniği: Takım hücuma kalkarken rakip stoperin arkasına gizlen (koyun sürüsü)
         if (ball.team === teamType && !p.isUserControlled) {
@@ -1899,14 +1899,14 @@ function updatePlayer(p, teamType) {
             p.x += ((nearestEnemy.x + hideOffsetX) - p.x) * 0.08; 
             p.y += ((nearestEnemy.y + 30) - p.y) * 0.08;
             
-            // AÅžAMA 41: SPİKER YORUMU
+            // AŞAMA 41: SPİKER YORUMU
             if (Math.random() < 0.0005 && !p.hidingCommentaryDone) {
                 p.hidingCommentaryDone = true;
                 if(typeof speak === 'function') speak("Genç " + p.name + " toptan kaçıyor, sorumluluk almamak için rakip savunmanın arasına saklanıyor!");
             }
         }
 
-        // AÅžAMA 39 EK: Çaylak Åžansı (Miracle) - Kullanıcının isteği
+        // AŞAMA 39 EK: Çaylak Şansı (Miracle) - Kullanıcının isteği
         if (Math.random() < 0.001 && !p.miracleActive && ball.team === teamType) {
             p.miracleActive = true;
             if(typeof speak === 'function') speak(p.name + " inanılmaz bir depara kalktı! Gençlik ateşi mi, çaylak şansı mı!?");
@@ -1924,7 +1924,7 @@ function updatePlayer(p, teamType) {
         }
     }
 
-    // AÅžAMA 38: KORKU VE ÇARESİZLİK
+    // AŞAMA 38: KORKU VE ÇARESİZLİK
     if (p.isTier3) {
         let oppArray = teamType === 'home' ? awayPlayers : homePlayers;
         let nearestEnemy = null;
@@ -2022,7 +2022,7 @@ function updatePlayer(p, teamType) {
               foulChance = 0.80; // Sinirden deliye dönmüş durumdalar, topla alakaları yok doğrudan adama girerler!
           } // İki kat faul
         
-        // AÅžAMA 46: Hakem Korkusu
+        // AŞAMA 46: Hakem Korkusu
         if (window.refereeFear > 50 && teamType === 'home') {
             foulChance *= 0.1; // Hakem %90 oranında lehimize faul çalmaya (bize kart vermeye) korkar
         }
@@ -2033,7 +2033,7 @@ function updatePlayer(p, teamType) {
             if (dist < 30 && Math.random() < foulChance) {
                 ball.vx = 0; ball.vy = 0; ball.team = 'none';
                 
-                // KURAL 2: DOGSO (Bariz Gol Åžansını Engelleme)
+                // KURAL 2: DOGSO (Bariz Gol Şansını Engelleme)
                 let isDOGSO = false;
                 if (teamType === 'home' && ball.x < 250) { // Sadece kalemize yakınken
                     let lastMan = true;
@@ -2074,7 +2074,7 @@ function updatePlayer(p, teamType) {
                         gameHaltTimer = Date.now() + 6000;
                         haltReason = finalCard === 'red' ? "KIRMIZI KART (" + p.name + ")" : "SARI KART (" + p.name + ")";
                         if(typeof speak === 'function' && finalCard === 'red') speak("Hakem düdüğünü çaldı ve tereddütsüz kırmızı kart! Forvet kaleciyle karşı karşıyaydı. Bariz gol şansını son adam olarak engellediği için kural gereği doğrudan kırmızı kart görüyor!");
-                        if(typeof announcerText !== 'undefined') announcerText.textContent = finalCard === 'red' ? "KIRMIZI KART (Bariz Gol Åžansını Engelleme)" : "SARI KART (Kaptan İkna Etti)";
+                        if(typeof announcerText !== 'undefined') announcerText.textContent = finalCard === 'red' ? "KIRMIZI KART (Bariz Gol Şansını Engelleme)" : "SARI KART (Kaptan İkna Etti)";
                     }
                     return; // Skip normal foul
                 }
@@ -2134,7 +2134,7 @@ function updatePlayer(p, teamType) {
                     // KURAL 1: Ciddi Faullü Oyun (Aşırı Güç)
                     if(typeof speak === 'function' && finalCard === 'red') speak("Kırmızı Kart! İnanılmaz sert bir hareket, rakibin sağlığını tehlikeye atacak aşırı güç kullanımı var! Ciddi faullü oyun nedeniyle doğrudan kırmızı kart!");
                     
-                    // AÅžAMA 46: Hakem Baskısı
+                    // AŞAMA 46: Hakem Baskısı
                     if (teamType === 'home') {
                         window.refereeFear += 30;
                         if(typeof speak === 'function') setTimeout(() => {
@@ -2149,12 +2149,12 @@ function updatePlayer(p, teamType) {
                     }
                     announcerText.textContent = p.name + " Kırmızı Kart gördü!";
                     
-                    // AÅžAMA 42: OYUN DURMASI
+                    // AŞAMA 42: OYUN DURMASI
                     if (typeof isGameHalted !== 'undefined') {
                         isGameHalted = true; if (ball.x > 650) window.pendingPenalty = true;
                         gameHaltTimer = Date.now() + 5000;
                         haltReason = "KIRMIZI KART (" + p.name + ")";
-                        // AÅžAMA 43: Adalet ve Haksızlık Sistemi (Hakem Hatası)
+                        // AŞAMA 43: Adalet ve Haksızlık Sistemi (Hakem Hatası)
                         setTimeout(() => {
                             let isRefMistake = Math.random() < 0.2; // Normal Hata
                             let rPro = window.currentReferee ? window.currentReferee.profile : "kuralci";
@@ -2172,7 +2172,7 @@ function updatePlayer(p, teamType) {
                             let msgs;
                             
                             if (isRefMistake) {
-                                  // AÅžAMA 79: Dış Düşman Etkisi (Ani Kenetlenme)
+                                  // AŞAMA 79: Dış Düşman Etkisi (Ani Kenetlenme)
                                   let isHomePlayer = (typeof homePlayers !== 'undefined' && typeof p !== 'undefined' && homePlayers.includes(p));
                                   if (isHomePlayer && typeof window.CrowdForm !== 'undefined' && window.CrowdForm >= 3) {
                                       window.CrowdForm = 1; // Form 1'e geri dön (Kenetlenme)
@@ -2248,7 +2248,7 @@ function updatePlayer(p, teamType) {
                         }, 2500);
                     }
                     
-                    // AÅžAMA 40: AURA KIRILMASI (One-Man Team Çöküşü)
+                    // AŞAMA 40: AURA KIRILMASI (One-Man Team Çöküşü)
                     if (p.isWorldClass && teamType === 'home') {
                         teamPsychology = 'broken';
                         homePlayers.forEach(mate => {
@@ -2269,14 +2269,14 @@ function updatePlayer(p, teamType) {
                         isGameHalted = true; if (ball.x > 650) window.pendingPenalty = true;
                         gameHaltTimer = Date.now() + 4000;
                         haltReason = "SARI KART (" + p.name + ")";
-                        // AÅžAMA 43: Adalet ve Haksızlık Sistemi (Hakem Hatası)
+                        // AŞAMA 43: Adalet ve Haksızlık Sistemi (Hakem Hatası)
                         setTimeout(() => {
                             let isRefMistake = Math.random() < 0.2; // %20 İhtimalle hakem haksız karar verir
                             let rand = Math.random();
                             let msgs;
                             
                             if (isRefMistake) {
-                                  // AÅžAMA 79: Dış Düşman Etkisi (Ani Kenetlenme)
+                                  // AŞAMA 79: Dış Düşman Etkisi (Ani Kenetlenme)
                                   let isHomePlayer = (typeof homePlayers !== 'undefined' && typeof p !== 'undefined' && homePlayers.includes(p));
                                   if (isHomePlayer && typeof window.CrowdForm !== 'undefined' && window.CrowdForm >= 3) {
                                       window.CrowdForm = 1; // Form 1'e geri dön (Kenetlenme)
@@ -2359,14 +2359,14 @@ function updatePlayer(p, teamType) {
     }
 
     if (!p.isUserControlled) {
-        // AÅžAMA 40: DÜNYA YILDIZI TEMBELLİÄžİ (Defansa gelmez)
+        // AŞAMA 40: DÜNYA YILDIZI TEMBELLİĞİ (Defansa gelmez)
         if (teamType === 'home' && ball.team === 'away' && p.isWorldClass) {
             let isAttacker = (p.position === 'Forvet' || p.position === 'Sol Kanat' || p.position === 'Sağ Kanat' || p.tacticalRole === 'playmaker' || p.tacticalRole === 'inside_forward');
             if (isAttacker) {
                 p.x += (600 - p.x) * 0.02; // İleride pas bekle
                 p.y += (250 - p.y) * 0.02;
                 
-                // AÅžAMA 41: SPİKER YORUMU
+                // AŞAMA 41: SPİKER YORUMU
                 if (Math.random() < 0.0005 && !p.lazyCommentaryDone) {
                     p.lazyCommentaryDone = true;
                     if(typeof speak === 'function') speak(p.name + " defansa dönmüyor, tamamen ileride pas bekliyor. Yıldız forvet, takımını adeta eksik oynatıyor!");
@@ -2399,7 +2399,7 @@ function updatePlayer(p, teamType) {
         }
         if (ball.team === teamType) { ball.x = p.x + 10; ball.y = p.y; }
     } else {
-        // AÅžAMA 44: Otorite Düşüşü ve Taktiksel İtaatsizlik
+        // AŞAMA 44: Otorite Düşüşü ve Taktiksel İtaatsizlik
         let isDisobeying = false;
         if (teamType === 'home' && p !== homePlayers[0] && typeof window.managerAuthority !== 'undefined') {
             let disobedienceChance = 0;
@@ -2545,7 +2545,7 @@ function updatePlayer(p, teamType) {
                         ball.isDeflectedShot = true;
                         ball.vy = (Math.random() - 0.5) * 30; 
                         ball.passCooldown = Date.now() + 500; 
-                        if(typeof speak === 'function') speak("Åžutunu çekti... Savunmaya çarpıyor!");
+                        if(typeof speak === 'function') speak("Şutunu çekti... Savunmaya çarpıyor!");
                     } else {
                         let wasEpicMiss = false;
                         if (ball.team !== 'away' && typeof lastShooter !== 'undefined' && lastShooter === homePlayers[10]) {
@@ -2664,7 +2664,7 @@ function updatePlayer(p, teamType) {
         p.prevX = p.x; p.prevY = p.y;
         if (isEarlyDefeat) staminaDecay *= 2.0; // Ev sahibi avantajı gitti, yorgunluk katlandı
         
-      // AÅžAMA 75: Stadyumu Terk Etme (En Ağır Ceza)
+      // AŞAMA 75: Stadyumu Terk Etme (En Ağır Ceza)
       let isStadiumAbandoned = (window.CrowdForm === 4) && (typeof timeLeft !== 'undefined' && timeLeft <= 30);
       
       if (window.currentFanProfile) {
@@ -2682,7 +2682,7 @@ function updatePlayer(p, teamType) {
               window.abandonmentAnnounced = true;
               if (window.AudioManager && window.AudioManager.ambiance) window.AudioManager.ambiance.volume = 0.0;
               if(typeof speak === 'function') speak("İnanılmaz görüntüler! Stadyumdaki on binlerce taraftar, takımlarının bu rezil futbolunu daha fazla izlememek için tribünleri boşaltıyor! Yuhalamıyorlar, ıslıklamıyorlar, sadece terk ediyorlar! Futbolcular için yerin dibine girme anı.");
-              if(typeof announcerText !== 'undefined') announcerText.textContent = "STADYUM BOÅžALIYOR! TARAFTAR TERK ETTİ!";
+              if(typeof announcerText !== 'undefined') announcerText.textContent = "STADYUM BOŞALIYOR! TARAFTAR TERK ETTİ!";
               
               // Yönetime büyük darbe
               window.managerAuthority = 0;
@@ -2695,7 +2695,7 @@ function updatePlayer(p, teamType) {
               homePlayers.forEach(p => {
                   // p.stamina = 0; kaldırıldı
                   p.speed = (p.baseSpeed || 3) * 0.85; // Hafif moral çöküntüsü
-                  p.power = 1; // Åžut veya pas atamazlar
+                  p.power = 1; // Şut veya pas atamazlar
               });
           }
       } else if (isProtestActive) {
@@ -2724,9 +2724,9 @@ function updatePlayer(p, teamType) {
         if (p.hasAura) staminaDecay *= 0.85; // Aura kondisyon koruması (%15)
         
         if (p.isTier2) staminaDecay *= 1.5; 
-        if (p.isTier4) staminaDecay *= 3.0; // AÅžAMA 39: Çaylakların panik eforu
+        if (p.isTier4) staminaDecay *= 3.0; // AŞAMA 39: Çaylakların panik eforu
         
-        // AÅžAMA 70: %5'lik Kemik Kadro Direnci (Deplasman Ele Geçirmesi)
+        // AŞAMA 70: %5'lik Kemik Kadro Direnci (Deplasman Ele Geçirmesi)
         if (typeof isEarlyDefeat !== 'undefined' && isEarlyDefeat && teamType === 'away') {
             staminaDecay *= 0.1; // Deplasman takımı yorulmaz, muazzam direnç kazanır
             spd *= 1.2; // Gelen destekle hızlanırlar
@@ -2766,7 +2766,7 @@ function updatePlayer(p, teamType) {
             }
         }
         
-        // AÅžAMA 45: Comeback Buff
+        // AŞAMA 45: Comeback Buff
         if (typeof window.isComebackActive !== 'undefined' && window.isComebackActive) {
             if (Date.now() > window.comebackTimer) {
                 window.isComebackActive = false;
@@ -2777,7 +2777,7 @@ function updatePlayer(p, teamType) {
         
         if (p.stamina <= 0) {
             p.stamina = 0;
-            // AÅžAMA 42: YORGUNLUK KAYNAKLI SAKATLIK
+            // AŞAMA 42: YORGUNLUK KAYNAKLI SAKATLIK
             if (typeof isGameHalted !== 'undefined' && !isGameHalted && !p.isInjured && Math.random() < 0.0001) {
                 p.isInjured = true;
                 isGameHalted = true; if (ball.x > 650) window.pendingPenalty = true;
@@ -2807,7 +2807,7 @@ function updatePlayer(p, teamType) {
 }
 
 
-// AÅžAMA 86: VAR Sistemi ve Toplu İtiraz (İsyan)
+// AŞAMA 86: VAR Sistemi ve Toplu İtiraz (İsyan)
 window.triggerVAR = function(scoringTeam) {
     if (Math.random() > 0.2) return; // %20 ihtimalle VAR'a takılır
     
@@ -2896,7 +2896,7 @@ function tickMatchMinute() {
                     if(typeof speak === 'function') speak("Maçta son 10 dakikaya giriyoruz ve takım mağlup durumda! Menajer risk alıyor, stoperler bile rakip ceza sahasına gidiyor! Ölüm kalım futbolu başladı! Doldur boşalt taktiği izliyoruz!");
                 }
                 
-                // AÅžAMA 83: Biyokimyasal Motor Güncellemesi
+                // AŞAMA 83: Biyokimyasal Motor Güncellemesi
                 let updateBiochemistry = function(p, isHome) {
                     if (!p || p.isRedCarded || p.x === -1000) return;
                     if (!p.bio) p.bio = { adrenaline: 0, cortisol: 0, dopamine: 50, testosterone: 50, lacticAcid: 0 };
@@ -2941,7 +2941,7 @@ function tickMatchMinute() {
                     p.mistakes = (p.mistakes || 0);
                     if (p.bio.cortisol > 80 && Math.random() < 0.2) p.mistakes++;
                     
-                    // AÅžAMA 84: Duygu Motoru Güncellemesi
+                    // AŞAMA 84: Duygu Motoru Güncellemesi
                     if (!p.emotions) p.emotions = { happiness: 50, sadness: 0, fear: 0, anger: 0, surprise: 0, disgust: 0 };
                     
                     // Duyguların Doğal Erimesi
@@ -3009,7 +3009,7 @@ function tickMatchMinute() {
                 
                 if (typeof window.updateCrowdForm === 'function') window.updateCrowdForm();
                 
-                // AÅžAMA 78: Bölünmüş Tribün Kaosu
+                // AŞAMA 78: Bölünmüş Tribün Kaosu
                 if (window.isCrowdDivided && typeof isGameHalted !== 'undefined' && !isGameHalted && Math.random() < 0.15) {
                     if (window.AudioManager) {
                         let c = new Audio('sounds/cheer.ogg'); c.volume = 0.5; c.play().catch(e=>{});
@@ -3025,9 +3025,9 @@ function tickMatchMinute() {
                     }
                 }
                 
-                // AÅžAMA 77: Form 5 (Umursamazlık Paradoksu)
+                // AŞAMA 77: Form 5 (Umursamazlık Paradoksu)
                 
-                // AÅžAMA 81: Yan Form 4 (Organize Boykot)
+                // AŞAMA 81: Yan Form 4 (Organize Boykot)
                 window.isOrganizedBoycott = false;
                 if (typeof window.presidentConfidence !== 'undefined' && window.presidentConfidence < 30 && timeLeft > 45) {
                     window.isOrganizedBoycott = true;
@@ -3044,7 +3044,7 @@ function tickMatchMinute() {
                 if (window.CrowdForm === 6) {
                     if (typeof homePlayers !== 'undefined') {
                         homePlayers.forEach(p => {
-                            p.power = (p.power || 50) * 0.5; // Formanın kurşun gibi ağırlaşması (Åžut çekemez)
+                            p.power = (p.power || 50) * 0.5; // Formanın kurşun gibi ağırlaşması (Şut çekemez)
                             // İnisiyatif almaz
                             p.mistakes = 0; // Yan pas yapar
                         });
@@ -3114,7 +3114,7 @@ function tickMatchMinute() {
                   }
               }
             
-            // AÅžAMA 28: Spiker Yorgunluk Uyarısı
+            // AŞAMA 28: Spiker Yorgunluk Uyarısı
             if (timeLeft === 30 && !fatigueAnnounced) {
                 fatigueAnnounced = true;
                 let msg = "Maçta son bölümlere giriyoruz. Oyuncuların pilleri bitti, sahada yürümeye başladılar. Hoca değişiklik yapmalı!";
@@ -3122,7 +3122,7 @@ function tickMatchMinute() {
                 announcerText.textContent = msg;
             }
             
-            // AÅžAMA 32: Rakip Bot Menajer Taktik Müdahalesi (Her 5 saniyede bir analiz)
+            // AŞAMA 32: Rakip Bot Menajer Taktik Müdahalesi (Her 5 saniyede bir analiz)
             if (timeLeft % 5 === 0) {
                 processOpponentManager();
             }
@@ -3289,7 +3289,7 @@ function gameLoop(timestamp) {
                 }
                 
                 if (closestHome.p.mistakes >= mistakeThreshold && !closestHome.p.isBooedByOwnFans) {
-                    // AÅžAMA 80: Yan Form 2 - Mesih Kompleksi (Kurtarıcıya Tapınma)
+                    // AŞAMA 80: Yan Form 2 - Mesih Kompleksi (Kurtarıcıya Tapınma)
                     if (window.CrowdForm >= 3 && closestHome.p.isWorldClass) {
                          closestHome.p.isMessiah = true;
                          closestHome.p.mistakes = 0; // Taraftar hatasını anında siler
@@ -3300,7 +3300,7 @@ function gameLoop(timestamp) {
                          if(typeof speak === 'function') {
                              let msg = "İnanılmaz bir çifte standart! Diğer oyuncular hata yapınca yuhalanıyor, ama stadyumun sevgilisi " + closestHome.p.name + " topu ezdiğinde büyük bir destek alkışı aldı!";
                              speak(msg);
-                             if(typeof announcerText !== 'undefined') announcerText.textContent = "ÇİFTE STANDART: MESİH ALKIÅžLANDI!";
+                             if(typeof announcerText !== 'undefined') announcerText.textContent = "ÇİFTE STANDART: MESİH ALKIŞLANDI!";
                          }
                          
                          // Takım içi ihanet ve kıskançlık
@@ -3318,7 +3318,7 @@ function gameLoop(timestamp) {
                     } else if (window.CrowdForm >= 3) {
                         closestHome.p.isBooedByOwnFans = true;
                     } 
-                    // AÅžAMA 82: Yan Form 5 - Formayı Çıkarttırma Terörü
+                    // AŞAMA 82: Yan Form 5 - Formayı Çıkarttırma Terörü
                     if (closestHome.p.isBooedByOwnFans && closestHome.p.mistakes >= 6 && window.CrowdForm >= 4) {
                         if (!closestHome.p.isJerseyStripped) {
                             closestHome.p.isJerseyStripped = true;
@@ -3389,7 +3389,7 @@ function gameLoop(timestamp) {
         window.lastFrameVy = ball.vy;
     }
     
-    // AÅžAMA 47: Yönetim İstifa ve Sırt Dönme
+    // AŞAMA 47: Yönetim İstifa ve Sırt Dönme
     let deficit = window.enemyScore - window.playerScore;
     if (deficit >= 4) {
         if (!window.yonetimIstifaTriggered) {
@@ -3435,7 +3435,7 @@ function gameLoop(timestamp) {
     "Tüm stadyum ritmik alkışa başladı, büyük bir baskı var!",
     "Bütün stadyum elleriyle aynı ritmi tutuyor! Hücum için müthiş bir itici güç!",
     "Tribünlerden yükselen ritmik alkışlar, rakip savunmanın dizlerini titretiyor.",
-    "Taraftar takımı adeta ittiriyor! Åžut açısı arayan oyunculara muazzam bir destek!"
+    "Taraftar takımı adeta ittiriyor! Şut açısı arayan oyunculara muazzam bir destek!"
 ];
 speak(msgs[Math.floor(Math.random() * msgs.length)]);
             }
@@ -3446,7 +3446,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
         window.isRhythmicClapping = false;
     }
 
-    // AÅžAMA 46: Düşmanca Tribünler - Islık ve Hain Yuhalaması
+    // AŞAMA 46: Düşmanca Tribünler - Islık ve Hain Yuhalaması
     if (!window.traitorAssigned && typeof awayPlayers !== 'undefined' && awayPlayers.length > 0) {
         let exPlayer = awayPlayers.find(p => p.wasInUserTeam);
         if (exPlayer) {
@@ -3458,7 +3458,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
     if (ball.team === 'away') {
         window.awayPossessionTime += 16; 
         
-        // AÅžAMA 65: Rakibi İzole Etme (Sağır Edici Islık)
+        // AŞAMA 65: Rakibi İzole Etme (Sağır Edici Islık)
         if (window.awayPossessionTime > 200) { 
             if (Math.random() < 0.05) { 
                 if (window.AudioManager && window.AudioManager.triggerPossessionReaction) window.AudioManager.triggerPossessionReaction('away');
@@ -3532,7 +3532,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
         window.awayPossessionTime = 0;
     }
 
-    // AÅžAMA 42: OYUN DURAKSAMA KONTROLÜ
+    // AŞAMA 42: OYUN DURAKSAMA KONTROLÜ
     if (typeof isGameHalted !== 'undefined' && isGameHalted) {
         if (haltReason === "VAR İNCELEMESİ" && !window.varDisciplineEventTriggered && Date.now() > gameHaltTimer - 4000) {
             window.varDisciplineEventTriggered = true;
@@ -3570,7 +3570,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                     if(typeof speak === 'function') speak("Hakem monitörden ayrıldı... Oyunu devam ettiriyor! Müdahalenin temiz olduğuna karar verdi.");
                     ball.team = 'none';
                 }
-            } else if (haltReason === "OYUNCU DEÄžİÅžİKLİÄžİ") {
+            } else if (haltReason === "OYUNCU DEĞİŞİKLİĞİ") {
                 if(typeof speak === 'function') speak("Hakem işaretini verdi, yeni oyuncu sahada. Oyun tekrar başlıyor.");
                 ball.team = 'none';
             } else if (haltReason === "KORNER") {
@@ -3643,8 +3643,8 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                     if(typeof speak === 'function') speak("Hakem işaretini verdi, oyun kaldığı yerden devam ediyor.");
                     ball.team = 'none'; // Serbest bırak
                 }
-            } else if (haltReason === "BARAJ VE İTİÅžME") {
-                if(typeof speak === 'function') speak("Hakem oyuncuları sert bir dille uyardı. Åžimdi işaretini verdi, atış kullanılacak.");
+            } else if (haltReason === "BARAJ VE İTİŞME") {
+                if(typeof speak === 'function') speak("Hakem oyuncuları sert bir dille uyardı. Şimdi işaretini verdi, atış kullanılacak.");
                 ball.team = 'none';
                 window.isFreeKickZone = true;
                 window.freeKickTimer = Date.now() + 5000;
@@ -3653,8 +3653,8 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                 let hasAggressivePlayer = typeof homePlayers !== 'undefined' && (homePlayers.some(p => p.mentalTrait === 'aggressive') || awayPlayers.some(p => p.mentalTrait === 'aggressive'));
 
                 if (isDangerousFreeKick && hasAggressivePlayer && Math.random() < 0.4) {
-                    // AÅžAMA 62: Baraj ve Ceza Sahası İçi İtişmeler
-                    haltReason = "BARAJ VE İTİÅžME";
+                    // AŞAMA 62: Baraj ve Ceza Sahası İçi İtişmeler
+                    haltReason = "BARAJ VE İTİŞME";
                     gameHaltTimer = Date.now() + 6000;
                     isGameHalted = true; // Oyunu tekrar durdur
                     if(typeof speak === 'function') speak("Çok tehlikeli bir nokta! Hakem düdüğünü çaldı ve barajı 9.15'e çekiyor. Ceza sahası içi şu an adeta bir güreş minderi gibi. Hakem oyuncuları uyarmak için oyunu durdurdu, atışın yapılmasına henüz izin vermiyor.");
@@ -3794,7 +3794,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                 }
             }
             
-            // GK Dokunulmazlık (Altıpas İçi Åžarj Faulü)
+            // GK Dokunulmazlık (Altıpas İçi Şarj Faulü)
             if (p1.position === 'Kaleci' && dist < 30) {
                 let isHome = homePlayers.includes(p1);
                 let in6yd = false;
@@ -3812,7 +3812,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                             if (pDist < 15 && Math.random() < 0.2) {
                                 p2.hasYellowCard = true;
                                 isGameHalted = true;
-                                haltReason = "KALECİYE ÅžARJ (HÜCUM FAUL)";
+                                haltReason = "KALECİYE ŞARJ (HÜCUM FAUL)";
                                 if(typeof gameHaltTimer !== 'undefined') gameHaltTimer = Date.now() + 4000;
                                 if(typeof speak === 'function') speak("Hakem düdüğünü çalıyor! Altıpas içinde kaleciye şarj var. Bu bir hücum faul ve sarı kart çıkıyor!");
                             }
@@ -3896,7 +3896,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
     });
 
     
-    // AÅžAMA 63: Ateşleyici Uğultu (Momentum Dalgası)
+    // AŞAMA 63: Ateşleyici Uğultu (Momentum Dalgası)
     if (window.playerScore < window.enemyScore || window.isCornerKickZone) {
         if (!window.momentumActive) {
             window.momentumActive = true;
@@ -3921,12 +3921,12 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
     }
     
     
-    // AÅžAMA 67: Protesto ve Erken Teslimiyet Ses Efektleri
+    // AŞAMA 67: Protesto ve Erken Teslimiyet Ses Efektleri
     let isEarlyDefeat = window.CrowdForm >= 3;
           let isProtestActive = window.CrowdForm === 4;
 
     
-      // AÅžAMA 75: Stadyumu Terk Etme (En Ağır Ceza)
+      // AŞAMA 75: Stadyumu Terk Etme (En Ağır Ceza)
       let isStadiumAbandoned = (window.CrowdForm === 4) && (typeof timeLeft !== 'undefined' && timeLeft <= 30);
       
       if (isStadiumAbandoned) {
@@ -3934,7 +3934,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
               window.abandonmentAnnounced = true;
               if (window.AudioManager && window.AudioManager.ambiance) window.AudioManager.ambiance.volume = 0.0;
               if(typeof speak === 'function') speak("İnanılmaz görüntüler! Stadyumdaki on binlerce taraftar, takımlarının bu rezil futbolunu daha fazla izlememek için tribünleri boşaltıyor! Yuhalamıyorlar, ıslıklamıyorlar, sadece terk ediyorlar! Futbolcular için yerin dibine girme anı.");
-              if(typeof announcerText !== 'undefined') announcerText.textContent = "STADYUM BOÅžALIYOR! TARAFTAR TERK ETTİ!";
+              if(typeof announcerText !== 'undefined') announcerText.textContent = "STADYUM BOŞALIYOR! TARAFTAR TERK ETTİ!";
               
               // Yönetime büyük darbe
               window.managerAuthority = 0;
@@ -3947,7 +3947,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
               homePlayers.forEach(p => {
                   // p.stamina = 0; kaldırıldı
                   p.speed = (p.baseSpeed || 3) * 0.85; // Hafif moral çöküntüsü
-                  p.power = 1; // Åžut veya pas atamazlar
+                  p.power = 1; // Şut veya pas atamazlar
               });
           }
       } else if (isProtestActive) {
@@ -3977,7 +3977,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
     }
 
     
-    // AÅžAMA 69: Tribün Penaltı Baskısı (Desibel ile Karar Bükme)
+    // AŞAMA 69: Tribün Penaltı Baskısı (Desibel ile Karar Bükme)
     if (window.CrowdForm <= 2 && ball.team === 'away' && ball.x > 650 && typeof isGameHalted !== 'undefined' && !isGameHalted && Math.random() < 0.005) {
         if (window.AudioManager && window.AudioManager.triggerPossessionReaction) window.AudioManager.triggerPossessionReaction('away');
         
@@ -4112,7 +4112,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                 window.isPenaltyReboundActive = false;
             } else if (ball.isBicycleKick) {
                 if(typeof speak === 'function') speak("Top ağlarda! Bu gol yıllarca unutulmaz! Akıllara zarar bir röveşata golü!");
-                if(typeof announcerText !== 'undefined') announcerText.textContent = "YILIN GOLÜ! RÖVEÅžATA!";
+                if(typeof announcerText !== 'undefined') announcerText.textContent = "YILIN GOLÜ! RÖVEŞATA!";
             } else if (ball.isZeroAngleShot) {
                 if(typeof speak === 'function') speak("İmkansız bir açı! Oradan nasıl vurdu?! Fizik kurallarına aykırı bir gol! Kaleci bile topun oradan nasıl geçtiğini anlayamadı!");
                 if(typeof announcerText !== 'undefined') announcerText.textContent = "İMKANSIZ AÇI! SIFIRDAN GOL!";
@@ -4121,7 +4121,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                 if(typeof announcerText !== 'undefined') announcerText.textContent = "KLAS TOPUK GOLÜ!";
             } else if (ball.isChipShot) {
                 if(typeof speak === 'function') speak("Ne yaptın sen! Kaleciyi adeta ipe dizdi, üzerinden zarifçe aşırtıyor... Bu bir gol değil, bir sanat eseri!");
-                if(typeof announcerText !== 'undefined') announcerText.textContent = "AÅžIRTMA KLAS GOL!";
+                if(typeof announcerText !== 'undefined') announcerText.textContent = "AŞIRTMA KLAS GOL!";
             } else if (ball.shotOriginX && ball.shotOriginX < 600) { // Ceza sahası dışı (Uzaktan)
                 if(typeof speak === 'function') speak("Vurduuu ve gol! İnanılmaz bir füze! Kalecinin bunu görmesi bile imkansızdı!");
                 if(typeof announcerText !== 'undefined') announcerText.textContent = "UZAKTAN FÜZE!";
@@ -4133,11 +4133,11 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
             }
             
             if (deficitBeforeGoal >= 2) {
-                // AÅžAMA 45: Comeback (Geri Dönüş) Uğultusu
+                // AŞAMA 45: Comeback (Geri Dönüş) Uğultusu
                 window.isComebackActive = true;
                 window.comebackTimer = Date.now() + 30000; // 30 saniye sürer
                 if(typeof speak === 'function') setTimeout(() => speak("Tribünler çıldırdı! Fark 1'e indi! Bu stadyum artık rakipler için bir cehennem, takım uçuşa geçti!"), 2000);
-                if(typeof announcerText !== 'undefined') announcerText.textContent = "STADYUM YIKILIYOR! GERİ DÖNÜÅž ATEÅžİ!";
+                if(typeof announcerText !== 'undefined') announcerText.textContent = "STADYUM YIKILIYOR! GERİ DÖNÜŞ ATEŞİ!";
             }
             
             if (lastShooter === homePlayers[10]) {
@@ -4146,7 +4146,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
             }
             lastShooter = null;
         } else if (ball.x > 800) {
-            // AÅžAMA 50: Direkten Dönme ve Karambol
+            // AŞAMA 50: Direkten Dönme ve Karambol
             let isPenaltyRebound = window.wasPenaltyKick && Math.random() < 0.40;
             if (isPenaltyRebound || (Math.random() < 0.25 && ball.y > 150 && ball.y < 350)) { // Kale direğine yakınsa veya penaltı rebound ise
                 ball.x = 790;
@@ -4174,7 +4174,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                       window.triggerReliefEvent('home');
                 } else {
                     
-                      // AÅžAMA 71: Ritmik Islık ve Oyunu Soğutmayı Engelleme
+                      // AŞAMA 71: Ritmik Islık ve Oyunu Soğutmayı Engelleme
                       let isLateGame = typeof timeLeft !== 'undefined' && timeLeft < 45;
                       let isWastingTime = window.enemyScore >= window.playerScore && isLateGame && window.CrowdForm <= 2;
 
@@ -4207,7 +4207,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                 }
             }
         } else if (ball.x < 0) {
-            // AÅžAMA 53: Kendi Kalesine Gol / Normal Gol
+            // AŞAMA 53: Kendi Kalesine Gol / Normal Gol
             if (ball.y > 200 && ball.y < 300) {
                 
                 // KURAL 3: Topu Çizgiden Elle Kesme (Suarez Kurtarışı) - Ev Sahibi
@@ -4238,7 +4238,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                   
               if (typeof window.triggerVAR === 'function') window.triggerVAR('away');
                   
-                  // AÅžAMA 72: Rakibi Ayakta Alkışlama (Standing Ovation)
+                  // AŞAMA 72: Rakibi Ayakta Alkışlama (Standing Ovation)
                   if (window.CrowdForm === 5 && Math.random() < 0.6) {
                         if (window.AudioManager) {
                             let clap = new Audio('sounds/cheer.ogg');
@@ -4269,7 +4269,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                   }
                 if(typeof announcerText !== 'undefined') announcerText.textContent = "KENDİ KALESİNE GOL!";
 } else {
-                  // AÅžAMA 74: Kornerde Yabancı Madde Yağmuru
+                  // AŞAMA 74: Kornerde Yabancı Madde Yağmuru
                   if (typeof isGameHalted !== 'undefined' && Math.random() < 0.2) {
                       isGameHalted = true;
                       window.pendingPenalty = false;
@@ -4278,7 +4278,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
                       
                       let isBerserk = (typeof teamPsychology !== 'undefined' && teamPsychology === 'berserk');
                       if (isBerserk || Math.random() < 0.15) {
-                          haltReason = "YABANCI MADDE YAÄžMURU";
+                          haltReason = "YABANCI MADDE YAĞMURU";
                           gameHaltTimer = Date.now() + 8000;
                           
                           if (window.AudioManager && window.AudioManager.triggerPossessionReaction) window.AudioManager.triggerPossessionReaction('away');
@@ -4328,7 +4328,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
         window.varScoringTeam = team;
     }
 
-    // AÅžAMA 62: TARAFTAR ATIÅžMASI (BANTER)
+    // AŞAMA 62: TARAFTAR ATIŞMASI (BANTER)
     if (typeof isGameHalted !== 'undefined' && !isGameHalted && Math.random() < 0.002 && window.AudioManager && !window.AudioManager.isChanting) {
         if (Math.abs(window.playerScore - window.enemyScore) <= 1) {
             window.AudioManager.triggerBanter('away', window.myTeamId || 'home');
@@ -4341,7 +4341,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
         window.substitutionDone = true;
         isGameHalted = true;
         gameHaltTimer = Date.now() + 6000;
-        haltReason = "OYUNCU DEÄžİÅžİKLİÄžİ";
+        haltReason = "OYUNCU DEĞİŞİKLİĞİ";
         
         let timeWasting = (typeof window.playerScore !== 'undefined' && typeof window.enemyScore !== 'undefined' && window.playerScore !== window.enemyScore);
         if (timeWasting) {
@@ -4349,10 +4349,10 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
         } else {
             if(typeof speak === 'function') speak("Kenarda hareketlilik var, teknik direktörden taktiksel bir hamle geliyor. Yorulan oyuncu alkışlarla kenara alındı.");
         }
-        if(typeof announcerText !== 'undefined') announcerText.textContent = "OYUNCU DEÄžİÅžİKLİÄžİ!";
+        if(typeof announcerText !== 'undefined') announcerText.textContent = "OYUNCU DEĞİŞİKLİĞİ!";
     }
 
-    // AÅžAMA 63: Spontane İhlaller (Ekipman, Kulübe, Degaj, Aldatma, İzinsiz Giriş, Kavga, Isırmak, VOR)
+    // AŞAMA 63: Spontane İhlaller (Ekipman, Kulübe, Degaj, Aldatma, İzinsiz Giriş, Kavga, Isırmak, VOR)
     if (typeof isGameHalted !== 'undefined' && !isGameHalted && Math.random() < 0.002) {
         let randRule = Math.random();
         if (randRule < 0.15) {
@@ -4370,7 +4370,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
         } else if (randRule < 0.45) {
             isGameHalted = true;
             gameHaltTimer = Date.now() + 5000;
-            haltReason = "SPORTMENLİÄžE AYKIRI (ALDATMA)";
+            haltReason = "SPORTMENLİĞE AYKIRI (ALDATMA)";
             if(typeof speak === 'function') speak("Hakem düdüğünü çaldı ve sarı kartını çıkarıyor! Oyuncu ceza sahası yakınında kendini çok bariz bir şekilde yere bıraktı. Hakemi aldatmaya yönelik hareket!");
             if(typeof announcerText !== 'undefined') announcerText.textContent = "SARI KART (Aldatmaya Yönelik Hareket)";
         } else if (randRule < 0.60) {
@@ -4380,17 +4380,17 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
             if(typeof speak === 'function') speak("Hakem oyunu sinirle durdurdu! Kenarda tedavisi biten oyuncu, hakemin işaretini beklemeden sahaya daldı. Kurallar gereği sarı kart görüyor.");
             if(typeof announcerText !== 'undefined') announcerText.textContent = "SARI KART (İzinsiz Sahaya Girme)";
         } else if (randRule < 0.70) {
-            // KURAL 4: Åžiddetli Hareket (Kavga)
+            // KURAL 4: Şiddetli Hareket (Kavga)
             isGameHalted = true;
             gameHaltTimer = Date.now() + 6000;
             haltReason = "KIRMIZI KART (KAVGA)";
             if(typeof speak === 'function') speak("İnanılmaz görüntüler! Oyun durmuşken iki oyuncu arasında topsuz alanda büyük bir kavga çıktı. Yumruklar konuşuyor! Hakem koşarak geldi ve şiddetli hareketten dolayı doğrudan kırmızı kartını çıkardı!");
-            if(typeof announcerText !== 'undefined') announcerText.textContent = "KIRMIZI KART (Åžiddetli Hareket)";
+            if(typeof announcerText !== 'undefined') announcerText.textContent = "KIRMIZI KART (Şiddetli Hareket)";
         } else if (randRule < 0.80) {
             // KURAL 6: Tükürmek veya Isırmak
             isGameHalted = true;
             gameHaltTimer = Date.now() + 6000;
-            haltReason = "KIRMIZI KART (İNSANLIK DIÅžI HAREKET)";
+            haltReason = "KIRMIZI KART (İNSANLIK DIŞI HAREKET)";
             if(typeof speak === 'function') speak("Sayın seyirciler çok çirkin bir olay yaşanıyor. Bir oyuncu rakibine tükürdü! Hakem bunu gördü ve tereddütsüz kırmızı kart göstererek onu sahadan atıyor. Futbol sahalarında görmek istemediğimiz hareketler!");
             if(typeof announcerText !== 'undefined') announcerText.textContent = "KIRMIZI KART (Tükürmek/Isırmak)";
         } else if (randRule < 0.90) {
@@ -4413,7 +4413,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
         window.lastFrameVy = ball.vy;
     }
     
-    // AÅžAMA 64: Serbest Vuruş İhlalleri (Düdüğü Beklememek, Mesafeye Uymamak, Vakit Geçirmek)
+    // AŞAMA 64: Serbest Vuruş İhlalleri (Düdüğü Beklememek, Mesafeye Uymamak, Vakit Geçirmek)
     if (typeof window.isFreeKickZone !== 'undefined' && window.isFreeKickZone && Date.now() < window.freeKickTimer - 1000) {
         let fkRand = Math.random();
         if (fkRand < 0.005 && !window.earlyFreeKickWarned) {
@@ -4421,7 +4421,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
             window.isFreeKickZone = false;
             isGameHalted = true;
             gameHaltTimer = Date.now() + 4000;
-            haltReason = "DÜDÜÄžÜ BEKLEMEMEK";
+            haltReason = "DÜDÜĞÜ BEKLEMEMEK";
             if(typeof speak === 'function') speak("Hakem düdüğümü bekle işareti yapmıştı! Erken vuruş yapan hücum oyuncusu sarı kart gördü, atış tekrarlanacak.");
             if(typeof announcerText !== 'undefined') announcerText.textContent = "SARI KART (Erken Vuruş)";
         } else if (fkRand > 0.995 && !window.earlyFreeKickWarned) {
@@ -4445,7 +4445,7 @@ speak(msgs[Math.floor(Math.random() * msgs.length)]);
         window.lastFrameVy = ball.vy;
     }
 
-    if (typeof isGameHalted !== 'undefined' && isGameHalted && (haltReason === "DÜDÜÄžÜ BEKLEMEMEK" || haltReason === "MESAFEYE UYMAMAK" || haltReason === "OYUNU GECİKTİRMEK") && Date.now() > gameHaltTimer) {
+    if (typeof isGameHalted !== 'undefined' && isGameHalted && (haltReason === "DÜDÜĞÜ BEKLEMEMEK" || haltReason === "MESAFEYE UYMAMAK" || haltReason === "OYUNU GECİKTİRMEK") && Date.now() > gameHaltTimer) {
         isGameHalted = false;
         window.earlyFreeKickWarned = false;
         window.isFreeKickZone = true;
@@ -4644,7 +4644,7 @@ function endGame() {
     if(matchEventTimer) clearInterval(matchEventTimer);
     if(typeof speak === 'function') speak("Maç sona erdi. Sonuç: Biz " + window.playerScore + " - " + window.enemyScore + " Rakip");
     
-    // AÅžAMA 44: Kariyer Puanı ve Başkan Güveni Değerlendirmesi
+    // AŞAMA 44: Kariyer Puanı ve Başkan Güveni Değerlendirmesi
     let scoreDiff = window.playerScore - window.enemyScore;
     let isLoss = scoreDiff < 0;
     let isHeavyDefeat = scoreDiff <= -3;
@@ -4710,7 +4710,7 @@ function endGame() {
                 // Sadece kazanılınca veya büyük statta getiri çok olacağı için bütçeye ekle
                 if (revenue > 0) {
                     myTeam.budget += revenue;
-                    alert(` [STADYUM]  İÇ SAHA GİÅžE HASILATI  [STADYUM] 
+                    alert(` [STADYUM]  İÇ SAHA GİŞE HASILATI  [STADYUM] 
 
 Stadyumunuzdaki sadık taraftarlar sayesinde kulübün kasasına ${revenue.toFixed(2)} Milyon Euro bilet ve loca geliri eklendi!`);
                 }
@@ -4789,15 +4789,15 @@ Stadyumunuzdaki sadık taraftarlar sayesinde kulübün kasasına ${revenue.toFix
     // Başkanın Uyarı Mesajı (UI)
     if (window.presidentConfidence < 40) {
         setTimeout(() => {
-            alert("BAÅžKAN'DAN MESAJ: Sayın hocam, bu kulübün genlerinde böyle bir tablo yoktur. Sonuçlar düzelmezse yollarımızı ayırmak zorunda kalacağız.");
+            alert("BAŞKAN'DAN MESAJ: Sayın hocam, bu kulübün genlerinde böyle bir tablo yoktur. Sonuçlar düzelmezse yollarımızı ayırmak zorunda kalacağız.");
         }, 6000);
     } else if (window.presidentConfidence < 70 && isLoss) {
         setTimeout(() => {
-            alert("BAÅžKAN'DAN MESAJ: Bu mağlubiyet hiç hoşuma gitmedi. Taraftar homurdanıyor, toparlanmamız lazım.");
+            alert("BAŞKAN'DAN MESAJ: Bu mağlubiyet hiç hoşuma gitmedi. Taraftar homurdanıyor, toparlanmamız lazım.");
         }, 6000);
     }
     
-    // AÅžAMA 35: Psikoloji Güncellemesi
+    // AŞAMA 35: Psikoloji Güncellemesi
     if (typeof squadEngine !== 'undefined') {
         squadEngine.processMatch(homePlayers.map(p => p.id));
     }
@@ -4806,7 +4806,7 @@ Stadyumunuzdaki sadık taraftarlar sayesinde kulübün kasasına ${revenue.toFix
         processBenchPsychology();
     }
     
-    // AÅžAMA 40: EKONOMİK KARADELİK (Maaş Ödemesi)
+    // AŞAMA 40: EKONOMİK KARADELİK (Maaş Ödemesi)
     if (window.leagueData) {
         let myTeam = window.leagueData.teams.find(t => t.id === window.myTeamId);
         if (!myTeam) myTeam = window.leagueData.teams.find(t => t.id === 'galatasaray');

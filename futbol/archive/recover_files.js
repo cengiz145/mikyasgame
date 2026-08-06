@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const transcriptPath = "C:\\\\Users\\\\Umit Ekrem Mikyas\\\\.gemini\\\\antigravity-ide\\\\brain\\\\f5dad394-43eb-4e57-9a75-55881090fe3f\\\\.system_generated\\\\logs\\\\transcript_full.jsonl";
 

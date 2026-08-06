@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const brazilTeams = [
     { id: "flamengo", name: "Flamengo", budget: 60, leagueId: "brezilya" },

@@ -1,4 +1,4 @@
-const SAVE_KEY = 'futbol_manager_save_v1';
+﻿const SAVE_KEY = 'futbol_manager_save_v1';
 
 // Oyunu Kaydet
 function saveGame(autoSave = false) {

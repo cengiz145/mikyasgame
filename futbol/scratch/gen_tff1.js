@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 // 1. Patch index.html to add TFF 2. Lig button
 let htmlContent = fs.readFileSync('index.html', 'utf8');

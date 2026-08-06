@@ -28,18 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.showAchievementModal = function(achName) {
         let gameLink = "https://mikyasstudio.com.tr/hafizanaguven.html";
-        let shareText = `Tebrikler! HafÄ±zana GÃ¼ven'de "` + achName + `" baÅŸarÄ±mÄ±nÄ± elde ettim! ğŸ†\n\nSen de benimle beraber bu baÅŸarÄ±yÄ± yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna: ` + gameLink;
+        let shareText = `Tebrikler! Hafızana Güven'de "` + achName + `" başarımını elde ettim! ğŸ†\n\nSen de benimle beraber bu başarıyı yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna: ` + gameLink;
         
         let textElem = document.getElementById('achievement-modal-text');
         if (textElem) {
-            textElem.textContent = `Tebrikler! "` + achName + `" baÅŸarÄ±mÄ±nÄ± elde ettiniz! Bunu arkadaÅŸlarÄ±nÄ±zla paylaÅŸabilirsiniz.`;
+            textElem.textContent = `Tebrikler! "` + achName + `" başarımını elde ettiniz! Bunu arkadaşlarınızla paylaşabilirsiniz.`;
             textElem.focus();
         }
         
         if (btnAchCopy) {
             btnAchCopy.onclick = () => {
                 navigator.clipboard.writeText(shareText).then(() => {
-                    if (window.announceToScreenReader) window.announceToScreenReader("Mesaj kopyalandÄ±!");
+                    if (window.announceToScreenReader) window.announceToScreenReader("Mesaj kopyalandı!");
                     if (window.correctSound) window.correctSound.play();
                 });
             };

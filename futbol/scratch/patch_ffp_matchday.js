@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 
 // 1. FFP & BANKRUPTCY in scout.js (advanceDateAndEvents)

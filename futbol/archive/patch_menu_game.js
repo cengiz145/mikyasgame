@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 // --- 1. MENU.JS DÜZELTMELERİ (Takım Atama ve Rakip Bulma) ---
 const menuFile = 'C:\\Users\\Umit Ekrem Mikyas\\Downloads\\wep sitem\\futbol\\js\\menu.js';

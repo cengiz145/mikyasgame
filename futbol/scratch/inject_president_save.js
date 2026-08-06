@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let code = fs.readFileSync('js/save.js', 'utf8');
 
 let targetSave = `            boardTrust: window.boardTrust,`;

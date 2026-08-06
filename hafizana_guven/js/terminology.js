@@ -1,4 +1,4 @@
-const musicTerminology = [
+﻿const musicTerminology = [
     // 1. Tempo (Hız) Terimleri
     { term: "Grave", meaning: "Çok yavaş, ağırbaşlı", category: "Tempo" },
     { term: "Largo", meaning: "Çok yavaş ve geniş", category: "Tempo" },

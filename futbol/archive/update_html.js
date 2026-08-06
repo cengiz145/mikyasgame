@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let html = fs.readFileSync('index.html', 'utf8');
 
 const newModal = `    <div id="player-profile-modal" class="modal hidden">

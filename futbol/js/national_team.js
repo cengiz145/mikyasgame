@@ -1,4 +1,4 @@
-// milli takim sistemi
+﻿// milli takim sistemi
 window.nationalities = {
     TR: { name: "Türkiye", flag: "🇹🇷" },
     BR: { name: "Brezilya", flag: "🇧🇷" },

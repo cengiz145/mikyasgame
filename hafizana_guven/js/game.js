@@ -1,4 +1,4 @@
-// game.js - Ana Oyun Döngüsü ve Motor İşlevleri
+﻿// game.js - Ana Oyun Döngüsü ve Motor İşlevleri
 
 window.hgfzZamanlayici = {
     timeouts: new Set(),

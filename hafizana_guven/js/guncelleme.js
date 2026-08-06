@@ -1,4 +1,4 @@
-// guncelleme.js - Otomatik Güncelleme ve Sürüm Kontrol Sistemi
+﻿// guncelleme.js - Otomatik Güncelleme ve Sürüm Kontrol Sistemi
 
 // --- Ekran Okuyucu Notu ---
 // Bu dosya, oyunun yeni bir versiyonu çıktığında arka planda sessizce kontrol yapıp önbelleği temizlemek içindir.

@@ -6,9 +6,9 @@ $date = Get-Date -Format "dd.MM.yyyy"
 $newLog = @"
 [v0.97.4.48] - $date
 
-Yeni Ã–zellikler:
-- Yeni Oyun Modu: "Ritim AvcÄ±sÄ±". BilgisayarÄ±n 60 BPM (ve giderek hÄ±zlanan) metronom eÅŸliÄŸinde Ã§aldÄ±ÄŸÄ± Ã¼rettiÄŸi notalarÄ± tekrarlamanÄ±zÄ± isteyen, Ã§aÄŸrÄ±-cevap tabanlÄ± yepyeni bir ritim diktesi modu eklendi.
-- NVDA Ekran Okuyucu Ä°yileÅŸtirmesi: UygulamanÄ±n okuma modlarÄ± arasÄ±nda yaÅŸanan anlamsÄ±z "Belge / Uygulama" geÃ§iÅŸleri, HTML odak rollerinin onarÄ±lmasÄ±yla dÃ¼zeltildi.
+Yeni Özellikler:
+- Yeni Oyun Modu: "Ritim Avcısı". Bilgisayarın 60 BPM (ve giderek hızlanan) metronom eşliğinde çaldığı ürettiği notaları tekrarlamanızı isteyen, çağrı-cevap tabanlı yepyeni bir ritim diktesi modu eklendi.
+- NVDA Ekran Okuyucu İyileştirmesi: Uygulamanın okuma modları arasında yaşanan anlamsız "Belge / Uygulama" geçişleri, HTML odak rollerinin onarılmasıyla düzeltildi.
 
 "@
 

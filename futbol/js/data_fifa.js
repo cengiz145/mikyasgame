@@ -1,4 +1,4 @@
-// GERCEK FIFA 15.000+ YILDIZ VERILERI
+﻿// GERCEK FIFA 15.000+ YILDIZ VERILERI
 window.leagueData = window.leagueData || { teams: [], players: [] };
 
 const worldTeams = [

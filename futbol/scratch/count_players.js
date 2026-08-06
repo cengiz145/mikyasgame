@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let c = 0;
 fs.readdirSync('js').filter(f => f.startsWith('data')).forEach(f => {
     const s = fs.readFileSync('js/' + f, 'utf8');

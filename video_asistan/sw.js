@@ -1,4 +1,4 @@
-// PWA kurulumu için gerekli temel Service Worker
+﻿// PWA kurulumu için gerekli temel Service Worker
 // Gelişmiş önbellekleme (caching) eklenebilir, ancak uygulamanın yüklenebilir (Installable)
 // olması için bu boş veya basit SW bile yeterlidir.
 

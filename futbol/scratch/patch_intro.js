@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = 'c:/Users/Umit Ekrem Mikyas/Downloads/wep sitem/futbol/index.html';
 let html = fs.readFileSync(path, 'utf8');
 

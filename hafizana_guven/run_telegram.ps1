@@ -14,7 +14,7 @@ $body = @{
 try {
     $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($body)
     Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytes -ContentType "application/json; charset=utf-8" | Out-Null
-    Write-Host "Telegram mesajÄ± baÅŸarÄ±yla gÃ¶nderildi!" -ForegroundColor Green
+    Write-Host "Telegram mesajı başarıyla gönderildi!" -ForegroundColor Green
 } catch {
-    Write-Host "Mesaj gÃ¶nderilirken hata oluÅŸtu: $_" -ForegroundColor Red
+    Write-Host "Mesaj gönderilirken hata oluştu: $_" -ForegroundColor Red
 }

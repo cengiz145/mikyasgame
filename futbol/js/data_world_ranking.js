@@ -1,4 +1,4 @@
-// js/data_world_ranking.js
+﻿// js/data_world_ranking.js
 // Arka plan simülasyonu ve Dünya Sıralaması için gerçek dünyadaki tüm ülkelerden takımlar.
 window.worldRankingTeams = [
     {

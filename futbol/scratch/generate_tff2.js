@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const tff2Teams = [
     {"id": "bucaspor", "name": "Bucaspor 1928", "color": "#FFFF00", "budget": 10, "city": "Izmir", "leagueId": "tff2"},

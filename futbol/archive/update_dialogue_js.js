@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const content = `// İletişim Kutusu (Chat) Sistemi
 

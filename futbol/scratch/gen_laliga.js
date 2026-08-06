@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const missingTeams = [
     { "id": "valencia", "name": "Valencia CF", "color": "#FFFFFF", "budget": 20, "leagueId": "laliga", "starLevel": 3 },

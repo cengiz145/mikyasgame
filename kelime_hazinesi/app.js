@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('stone-container');
     const modal = document.getElementById('word-modal');
     const modalEn = document.getElementById('modal-en');

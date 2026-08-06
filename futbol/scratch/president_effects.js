@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 // 1. index.html Güncellemesi
 let html = fs.readFileSync('index.html', 'utf8');

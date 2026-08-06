@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let content = fs.readFileSync('js/menu.js', 'utf8');
 
 const targetStr = `                    // Oyunu başlat (lig sistemini sadece filteredTeams'e göre başlat)

@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let code = fs.readFileSync('js/press.js', 'utf8');
 
 // Sakatlık mantığını koddan tamamen temizle

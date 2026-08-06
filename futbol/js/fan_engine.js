@@ -1,4 +1,4 @@
-// Taraftar Duygu Motoru (Fan Emotion Engine) - Otonom Sistem
+﻿// Taraftar Duygu Motoru (Fan Emotion Engine) - Otonom Sistem
 // Bu script, tüm data_*.js dosyalarından SONRA yüklenmelidir.
 
 (function initFanEngine() {

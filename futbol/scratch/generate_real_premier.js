@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "mancity", name: "Manchester City", budget: 95, leagueId: "premier", players: ["Ederson", "Ruben Dias", "John Stones", "Josko Gvardiol", "Kyle Walker", "Rodri", "Kevin De Bruyne", "Phil Foden", "Bernardo Silva", "Erling Haaland", "Jeremy Doku", "Nathan Ake", "Manuel Akanji", "Mateo Kovacic", "Jack Grealish", "Savio", "Oscar Bobb"] },

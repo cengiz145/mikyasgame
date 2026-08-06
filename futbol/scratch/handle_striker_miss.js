@@ -1,4 +1,4 @@
-function handleStrikerMiss(reason = 'save') {
+﻿function handleStrikerMiss(reason = 'save') {
     if (lastShooter !== homePlayers[10]) return false;
     lastShooter = null;
     strikerMissedShots++;

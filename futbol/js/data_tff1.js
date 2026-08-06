@@ -1,4 +1,4 @@
-// js/data_tff1.js
+﻿// js/data_tff1.js
 window.leagueData = window.leagueData || { teams: [], players: [] };
 // window.leagueData.teams = window.leagueData.teams.filter(t => t.leagueId !== 'tff1'); // Patched to keep relegated teams
 

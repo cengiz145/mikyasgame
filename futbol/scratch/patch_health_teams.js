@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 // --- MANAGER.JS PATCH (Medical Profile / Koruyucu Hekim) ---
 let managerContent = fs.readFileSync('c:\\\\Users\\\\Umit Ekrem Mikyas\\\\Downloads\\\\wep sitem\\\\futbol\\\\js\\\\manager.js', 'utf8');

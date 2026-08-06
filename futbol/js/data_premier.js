@@ -1,4 +1,4 @@
-// js/data_premier.js
+﻿// js/data_premier.js
 // GERCEK 2026/2027 PREMIER LIG VERILERI
 window.leagueData = window.leagueData || { teams: [], players: [] };
 window.leagueData.teams = window.leagueData.teams.filter(t => t.leagueId !== 'premier');

@@ -1,4 +1,4 @@
-// AŞAMA 35: İnteraktif Oyuncu Psikolojisi ve Yüzleşme Sistemi
+﻿// AŞAMA 35: İnteraktif Oyuncu Psikolojisi ve Yüzleşme Sistemi
 
 function processBenchPsychology() {
     let myTeamId = window.league ? window.league.userTeamId : "galatasaray";

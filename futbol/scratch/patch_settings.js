@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 // 1. Patch menu.js
 let menuContent = fs.readFileSync('js/menu.js', 'utf8');

@@ -1,4 +1,4 @@
-// js/data_portekiz.js
+﻿// js/data_portekiz.js
 // GERCEK PORTEKIZ VERILERI
 window.leagueData = window.leagueData || { teams: [], players: [] };
 const portekizTeams = [

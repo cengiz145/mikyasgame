@@ -1,11 +1,11 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 let content = fs.readFileSync('c:\\\\Users\\\\Umit Ekrem Mikyas\\\\Downloads\\\\wep sitem\\\\futbol\\\\js\\\\game.js', 'utf8');
 
 let target = `                // Sadece kazanılınca veya büyük statta getiri çok olacağı için bütçeye ekle
                 if (revenue > 0) {
                     myTeam.budget += revenue;
-                    alert(\`ğŸ Ÿï¸  İÇ SAHA GİÅžE HASILATI ğŸ Ÿï¸ \\n\\nStadyumunuzdaki sadık taraftarlar sayesinde kulübün kasasına \${revenue.toFixed(2)} Milyon Euro bilet ve loca geliri eklendi!\`);
+                    alert(\`ğŸ Ÿï¸  İÇ SAHA GİŞE HASILATI ğŸ Ÿï¸ \\n\\nStadyumunuzdaki sadık taraftarlar sayesinde kulübün kasasına \${revenue.toFixed(2)} Milyon Euro bilet ve loca geliri eklendi!\`);
                 }
             }
         }
@@ -14,7 +14,7 @@ let target = `                // Sadece kazanılınca veya büyük statta getiri
 let replacement = `                // Sadece kazanılınca veya büyük statta getiri çok olacağı için bütçeye ekle
                 if (revenue > 0) {
                     myTeam.budget += revenue;
-                    alert(\`ğŸ Ÿï¸  İÇ SAHA GİÅžE HASILATI ğŸ Ÿï¸ \\n\\nStadyumunuzdaki sadık taraftarlar sayesinde kulübün kasasına \${revenue.toFixed(2)} Milyon Euro bilet ve loca geliri eklendi!\`);
+                    alert(\`ğŸ Ÿï¸  İÇ SAHA GİŞE HASILATI ğŸ Ÿï¸ \\n\\nStadyumunuzdaki sadık taraftarlar sayesinde kulübün kasasına \${revenue.toFixed(2)} Milyon Euro bilet ve loca geliri eklendi!\`);
                 }
             }
         }

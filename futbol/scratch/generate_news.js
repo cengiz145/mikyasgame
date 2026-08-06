@@ -1,4 +1,4 @@
-const subjects = [
+﻿const subjects = [
     "Avrupa devi", "Ligin flaş takımı", "Ünlü teknik adam", "Yıldız golcü", 
     "Genç yetenek", "Efsane kaptan", "Milli kaleci", "Şampiyonluk adayı", 
     "Süper Lig ekibi", "Federasyon başkanı", "Hakem komitesi", "Spor yazarları",

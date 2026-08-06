@@ -1,4 +1,4 @@
-window.generateCommentatorQuote = function(result, scoreDiff) {
+﻿window.generateCommentatorQuote = function(result, scoreDiff) {
     let pool = {
         heavy_win: {
             intro: [

@@ -1,4 +1,4 @@
-// autoRepair.js - Otomatik Hata Onarım ve Teşhis Sistemi (Auto-Repair & Diagnostics)
+﻿// autoRepair.js - Otomatik Hata Onarım ve Teşhis Sistemi (Auto-Repair & Diagnostics)
 
 window.HafizanaGuvenAutoRepair = {
     isRepairing: false,

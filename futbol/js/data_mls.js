@@ -1,4 +1,4 @@
-window.leagueData = window.leagueData || { teams: [], players: [] };
+﻿window.leagueData = window.leagueData || { teams: [], players: [] };
 
 // MLS (Amerika) verileri
 window.leagueData.teams = window.leagueData.teams.filter(t => t.leagueId !== 'mls');

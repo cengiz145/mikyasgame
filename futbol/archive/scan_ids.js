@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 
 const htmlContent = fs.readFileSync('index.html', 'utf8');

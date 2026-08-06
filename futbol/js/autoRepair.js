@@ -1,4 +1,4 @@
-// autoRepair.js - Futbol Projesi Otomatik Hata Onarım ve Teşhis Sistemi
+﻿// autoRepair.js - Futbol Projesi Otomatik Hata Onarım ve Teşhis Sistemi
 
 window.FutbolAutoRepair = {
     isRepairing: false,

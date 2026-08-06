@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const lines = fs.readFileSync('C:\\Users\\Umit Ekrem Mikyas\\Downloads\\wep sitem\\futbol\\js\\game.js', 'utf8').split('\n');
 let depth = 0;
 for(let i=2400; i<lines.length; i++) {

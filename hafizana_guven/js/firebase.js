@@ -1,4 +1,4 @@
-// Firebase Bağlantı Ayarları
+﻿// Firebase Bağlantı Ayarları
 const firebaseConfig = { 
     apiKey: "AIzaSyBDGdQjm6NX8ANQm90HJR8wD2Nk2E1h-ro", 
     authDomain: "hgfz-5a1ca.firebaseapp.com", 

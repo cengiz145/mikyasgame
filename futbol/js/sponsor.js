@@ -1,4 +1,4 @@
-
+﻿
 // js/sponsor.js
 // Finans ve Sponsorluk Yapay Zeka Sistemi
 

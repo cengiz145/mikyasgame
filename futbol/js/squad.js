@@ -1,4 +1,4 @@
-// squad.js - Takım Kadrosu ve Satış Sistemi
+﻿// squad.js - Takım Kadrosu ve Satış Sistemi
 
 let playerToTransfer = null;
 

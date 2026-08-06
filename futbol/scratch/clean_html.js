@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let html = fs.readFileSync('index.html', 'utf8');
 
 // Sadece container tanımlarındaki aria-hidden="true" ve role="presentation" özelliklerini temizleyelim.

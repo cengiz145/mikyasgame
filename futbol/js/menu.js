@@ -1,4 +1,4 @@
-// menu.js - Restored Core UI & Kura Animations
+﻿// menu.js - Restored Core UI & Kura Animations
 function hideAllContainers() {
     const containers = document.querySelectorAll('.menu-container');
     containers.forEach(el => {

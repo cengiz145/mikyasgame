@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const content = fs.readFileSync('js/data_laliga.js', 'utf8');
 const teamMatch = content.match(/"teamId":\s*"([^"]+)"/g);
 if (teamMatch) {

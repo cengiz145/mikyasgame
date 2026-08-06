@@ -1,4 +1,4 @@
-// js/facilities.js - Stadyum ve Antrenman Tesisleri Yönetimi
+﻿// js/facilities.js - Stadyum ve Antrenman Tesisleri Yönetimi
 
 window.FacilitiesManager = {
     stadiumLevels: [

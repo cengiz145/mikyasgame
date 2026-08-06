@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const eredivisieTeams = [
     { id: "az_alkmaar", name: "AZ Alkmaar", budget: 45, leagueId: "hollanda" },

@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let content = fs.readFileSync('js/game.js', 'utf8');
 
 // 1. initGame buffs (Pragmatist, Proje Hocası, Eski Efsane)

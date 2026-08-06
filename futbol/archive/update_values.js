@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const dataPath = 'js/data.js';
 let content = fs.readFileSync(dataPath, 'utf8');

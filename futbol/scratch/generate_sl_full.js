@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const slTeams = [
     {"id": "galatasaray", "name": "Galatasaray", "color": "#A90432", "budget": 65, "city": "Istanbul", "leagueId": "superlig"},

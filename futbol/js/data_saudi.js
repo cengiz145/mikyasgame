@@ -1,4 +1,4 @@
-// Saudi Pro League Database
+﻿// Saudi Pro League Database
 
 const saudiTeams = [
     { "id": "alnassr", "name": "Al-Nassr", "power": 85, "budget": 500, "stadium": "Al-Awwal Park", "country": "saudi", "leagueId": "saudipro", "tactics": "4-2-3-1" },

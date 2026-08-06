@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = 'js/announcer.js';
 
 let content = fs.readFileSync(path, 'utf8');

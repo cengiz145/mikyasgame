@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "bayern", name: "Bayern Münih", budget: 95, leagueId: "bundesliga", players: ["Manuel Neuer", "Dayot Upamecano", "Kim Min-jae", "Matthijs de Ligt", "Alphonso Davies", "Joshua Kimmich", "Leon Goretzka", "Jamal Musiala", "Leroy Sane", "Kingsley Coman", "Harry Kane", "Thomas Muller", "Serge Gnabry", "Konrad Laimer", "Aleksandar Pavlovic"] },

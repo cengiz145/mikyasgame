@@ -1,4 +1,4 @@
-const winPrefixes = [
+﻿const winPrefixes = [
     "Sayın Teknik Direktör", 
     "Kıymetli Hocam", 
     "Saygıdeğer Menajer", 

@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 global.window = {
     addEventListener: () => {},
     localStorage: { getItem: () => null, setItem: () => {} },

@@ -1,4 +1,4 @@
-body {
+﻿body {
     margin: 0;
     padding: 0;
     background-color: #0d1117;
@@ -15,7 +15,7 @@ body {
     overflow: hidden;
 }
 
-/* Glassmorphism MenÃ¼ Konteyneri */
+/* Glassmorphism Menü Konteyneri */
 .menu-container {
     background: rgba(13, 17, 23, 0.75);
     backdrop-filter: blur(12px);
@@ -79,7 +79,7 @@ li { margin-bottom: 15px; }
     border: 1px solid #fff;
     transform: translateY(-2px);
     box-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
-    outline: none; /* EriÅŸilebilirlik iÃ§in outline'Ä± kaldÄ±rÄ±p gÃ¶rsel focus veriyoruz */
+    outline: none; /* Erişilebilirlik için outline'ı kaldırıp görsel focus veriyoruz */
 }
 
 .menu-button:focus {

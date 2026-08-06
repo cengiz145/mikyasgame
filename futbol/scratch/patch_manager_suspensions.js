@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = require('path');
 
 const managerPath = path.join(__dirname, '..', 'js', 'manager.js');

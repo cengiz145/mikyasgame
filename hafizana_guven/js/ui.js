@@ -1,4 +1,4 @@
-// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
+﻿// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
 
 // Mobil Cihaz Tespiti
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
@@ -3682,11 +3682,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const messagesRef = window.db.ref('messages').limitToLast(50);
     const chatLoadTime = Date.now();
-    let isChatHistoryLoaded = false;
     
     // Veritabanı boşsa "Hiç mesaj yok" uyarısı ekleme
     messagesRef.once('value', (snapshot) => {
-        setTimeout(() => { isChatHistoryLoaded = true; }, 1000);
         if (!snapshot.exists()) {
             const li = document.createElement('li');
             li.id = 'empty-chat-warning';
@@ -3729,7 +3727,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data.nickname === "Sistem") {
             // Sistem mesajlarını sohbet listesine (DOM'a) ekleme, anlık bildirim (toast) olarak yansıt
-            if (isChatHistoryLoaded) {
+            if (Date.now() - chatLoadTime > 2000) {
                 if (window.showToastNotification) {
                     window.showToastNotification(data.text);
                 }
@@ -3794,7 +3792,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Sadece sayfa açılışındaki geçmiş mesaj yığınını atlamak için zamanı kontrol ediyoruz
-        if (isChatHistoryLoaded) {
+        if (Date.now() - chatLoadTime > 2000) {
             // Başkasından gelen mesaj ise ses çal
             if (isNewIncomingMessage && window.chatReceiveSound) {
                 window.chatReceiveSound.play();

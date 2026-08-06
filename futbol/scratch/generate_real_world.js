@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "inter_miami", name: "Inter Miami CF", budget: 150, leagueId: "mls", players: ["Lionel Messi", "Luis Suarez", "Sergio Busquets", "Jordi Alba", "Drake Callender", "Tomas Aviles", "Federico Redondo", "Diego Gomez", "Julian Gressel", "Matías Rojas", "Leonardo Campana", "Sergii Kryvtsov", "Marcelo Weigandt", "David Ruiz", "Benjamin Cremaschi"] },

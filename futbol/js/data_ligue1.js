@@ -1,4 +1,4 @@
-// js/data_ligue1.js
+﻿// js/data_ligue1.js
 // GERCEK LIGUE 1 VERILERI (2026/2027)
 
 window.leagueData = window.leagueData || { teams: [], players: [] };

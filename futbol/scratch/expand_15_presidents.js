@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 // 1. UPDATE LEAGUE.JS
 let leagueJs = fs.readFileSync('js/league.js', 'utf8');

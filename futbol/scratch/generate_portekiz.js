@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const portekizTeams = [
     { id: "braga", name: "SC Braga", budget: 45, leagueId: "portekiz" },

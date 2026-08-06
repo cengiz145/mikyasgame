@@ -1,9 +1,9 @@
 param (
-    [Parameter(Mandatory=$true, HelpMessage="Kanala gÃ¶ndermek istediÄŸiniz mesajÄ± yazÄ±n")]
+    [Parameter(Mandatory=$true, HelpMessage="Kanala göndermek istediğiniz mesajı yazın")]
     [string]$Mesaj
 )
 
-# Konsolun TÃ¼rkÃ§e karakterleri desteklemesi iÃ§in
+# Konsolun Türkçe karakterleri desteklemesi için
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 $token = "8797867195:AAHG65mgOhmeWh9Z-xVwCsdRVJ0bDQD86iA"
@@ -18,10 +18,10 @@ $body = @{
 try {
     $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($body)
     Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytes -ContentType "application/json; charset=utf-8" | Out-Null
-    Write-Host "Telegram mesajÄ± baÅŸarÄ±yla gÃ¶nderildi!" -ForegroundColor Green
+    Write-Host "Telegram mesajı başarıyla gönderildi!" -ForegroundColor Green
 } catch {
-    Write-Host "Mesaj gÃ¶nderilirken hata oluÅŸtu: $_" -ForegroundColor Red
+    Write-Host "Mesaj gönderilirken hata oluştu: $_" -ForegroundColor Red
 }
 
-Write-Host "Ã‡Ä±kmak iÃ§in bir tuÅŸa basÄ±n..."
+Write-Host "Çıkmak için bir tuşa basın..."
 $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null

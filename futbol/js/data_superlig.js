@@ -1,4 +1,4 @@
-// js/data_superlig.js
+﻿// js/data_superlig.js
 // GERCEK 2026/2027 SUPER LIG VERILERI
 window.leagueData = window.leagueData || { teams: [], players: [] };
 window.leagueData.teams = window.leagueData.teams.filter(t => t.leagueId !== 'superlig');

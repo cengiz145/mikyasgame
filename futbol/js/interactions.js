@@ -1,4 +1,4 @@
-// interactions.js - Oyuncu İletişim ve Menajere Bağlılık Sistemi
+﻿// interactions.js - Oyuncu İletişim ve Menajere Bağlılık Sistemi
 
 window.openPlayerInteraction = function(player) {
     if (player.talkedThisWeek) {

@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let js = fs.readFileSync('js/menu.js', 'utf8');
 
 // Odak zorlama scriptlerini silelim

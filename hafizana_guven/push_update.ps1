@@ -1,6 +1,6 @@
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-Write-Host "Changelog dosyasÄ±ndan son gÃ¼ncelleme okunuyor..." -ForegroundColor Yellow
+Write-Host "Changelog dosyasından son güncelleme okunuyor..." -ForegroundColor Yellow
 
 $changelogPath = "changelog.txt"
 $content = Get-Content -Path $changelogPath -Encoding UTF8
@@ -29,13 +29,13 @@ Write-Host "`n--- GONDERILECEK MESAJ ---" -ForegroundColor Cyan
 Write-Host $mesaj
 Write-Host "--------------------------`n"
 
-$commitMsg = "GÃ¼ncelleme: $versionLine"
+$commitMsg = "Güncelleme: $versionLine"
 
-Write-Host "Github'a yÃ¼kleniyor..." -ForegroundColor Cyan
+Write-Host "Github'a yükleniyor..." -ForegroundColor Cyan
 git add .
 git commit -m $commitMsg
 git push
-Write-Host "Github'a yÃ¼klendi!" -ForegroundColor Green
+Write-Host "Github'a yüklendi!" -ForegroundColor Green
 
 $lastSentFile = ".last_sent_version.txt"
 $lastSentVer = ""
@@ -54,16 +54,16 @@ $muteUntil = Get-Date "2026-05-02 12:00:00"
 $now = Get-Date
 
 if ($now -lt $muteUntil) {
-    Write-Host "Telegram bildirimleri sessize alÄ±nmÄ±ÅŸtÄ±r. BitiÅŸ: 2 MayÄ±s 2026 12:00. (Bildirim gÃ¶nderilmedi)" -ForegroundColor Yellow
+    Write-Host "Telegram bildirimleri sessize alınmıştır. Bitiş: 2 Mayıs 2026 12:00. (Bildirim gönderilmedi)" -ForegroundColor Yellow
     Set-Content -Path $lastSentFile -Value $currentVer
 } elseif ($currentVer -eq $lastSentVer) {
-    Write-Host "Bu sÃ¼rÃ¼m ($currentVer) daha Ã¶nce Telegram'a gÃ¶nderilmiÅŸ. Yeniden bildirim gÃ¶nderilmiyor." -ForegroundColor Yellow
+    Write-Host "Bu sürüm ($currentVer) daha önce Telegram'a gönderilmiş. Yeniden bildirim gönderilmiyor." -ForegroundColor Yellow
 } else {
-    Write-Host "Telegram kanalÄ±na bildirim gÃ¶nderiliyor..." -ForegroundColor Cyan
+    Write-Host "Telegram kanalına bildirim gönderiliyor..." -ForegroundColor Cyan
     $token = "8797867195:AAHG65mgOhmeWh9Z-xVwCsdRVJ0bDQD86iA"
     $chat_id = "@hafizanaguven2559"
 
-    $telegramMesaji = "[Yeni GÃ¼ncelleme]`n`n" + $mesaj
+    $telegramMesaji = "[Yeni Güncelleme]`n`n" + $mesaj
 
     $url = "https://api.telegram.org/bot$token/sendMessage"
 
@@ -74,10 +74,10 @@ if ($now -lt $muteUntil) {
         } | ConvertTo-Json -Depth 3
         $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
         Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytes -ContentType "application/json; charset=utf-8" | Out-Null
-        Write-Host "Telegram bildirimi baÅŸarÄ±yla gÃ¶nderildi!" -ForegroundColor Green
+        Write-Host "Telegram bildirimi başarıyla gönderildi!" -ForegroundColor Green
         Set-Content -Path $lastSentFile -Value $currentVer
     } catch {
-        Write-Host "Markdown biÃ§imlendirmesiyle gÃ¶nderilemedi, dÃ¼z metin olarak deneniyor..." -ForegroundColor Yellow
+        Write-Host "Markdown biçimlendirmesiyle gönderilemedi, düz metin olarak deneniyor..." -ForegroundColor Yellow
         try {
             $payloadPlain = @{
                 chat_id = $chat_id
@@ -85,12 +85,12 @@ if ($now -lt $muteUntil) {
             } | ConvertTo-Json -Depth 3
             $jsonBytesPlain = [System.Text.Encoding]::UTF8.GetBytes($payloadPlain)
             Invoke-RestMethod -Uri $url -Method Post -Body $jsonBytesPlain -ContentType "application/json; charset=utf-8" | Out-Null
-            Write-Host "Telegram bildirimi dÃ¼z metin olarak baÅŸarÄ±yla gÃ¶nderildi!" -ForegroundColor Green
+            Write-Host "Telegram bildirimi düz metin olarak başarıyla gönderildi!" -ForegroundColor Green
             Set-Content -Path $lastSentFile -Value $currentVer
         } catch {
-            Write-Host "Telegram bildirimi gÃ¶nderilirken bir hata oluÅŸtu: $_" -ForegroundColor Red
+            Write-Host "Telegram bildirimi gönderilirken bir hata oluştu: $_" -ForegroundColor Red
         }
     }
 }
 
-Write-Host "Ä°ÅŸlem tamamlandÄ±!"
+Write-Host "İşlem tamamlandı!"

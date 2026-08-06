@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const path = 'js/data_superlig.js';
 
 let content = fs.readFileSync(path, 'utf8');

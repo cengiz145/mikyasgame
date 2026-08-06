@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "psv", name: "PSV Eindhoven", budget: 70, leagueId: "hollanda", players: ["Walter Benitez", "Olivier Boscagli", "Andre Ramalho", "Jordan Teze", "Sergino Dest", "Jerdy Schouten", "Joey Veerman", "Ismael Saibari", "Johan Bakayoko", "Luuk de Jong", "Hirving Lozano", "Malik Tillman", "Guus Til", "Armando Obispo", "Patrick van Aanholt"] },

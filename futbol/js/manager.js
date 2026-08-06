@@ -1,4 +1,4 @@
-// manager.js - NVDA Uyumlu Dinamik Kadro Yönetimi
+﻿// manager.js - NVDA Uyumlu Dinamik Kadro Yönetimi
 
 let selectedSlotIndex = null;
 let isSelectingForSub = false;

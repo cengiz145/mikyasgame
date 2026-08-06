@@ -1,4 +1,4 @@
-// Web Audio API Context
+﻿// Web Audio API Context
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 

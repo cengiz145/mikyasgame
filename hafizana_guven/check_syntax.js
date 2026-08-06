@@ -1,4 +1,4 @@
-try {
+﻿try {
     var fso = new ActiveXObject("Scripting.FileSystemObject");
     var f = fso.OpenTextFile("js/ui.js", 1);
     var content = f.ReadAll();

@@ -1,4 +1,4 @@
-window.dailyNewsPool = [
+﻿window.dailyNewsPool = [
     "MİLLİ HEYECAN! Turnuvanın ev sahibi sakatlanan iki önemli ismi kadrodan çıkardı. Taraftarlar bu turnuvada tarihi bir başarı bekliyor.",
     "TRİBÜNLERDEN GÖZDAĞI! Kale arkası tribünü rakip takımı korkutan devasa bir üç boyutlu koreografi hazırladı. Stadyumda oluşan bu muazzam atmosfer Avrupa basınında bile yer buldu.",
     "xG VERİLERİ ŞOK ETTİ! Teknik ekip yeni 3-5-2 sisteminin takımın kimyasına uymadığını raporladı. Modern futbolun gereksinimlerine ayak uyduramayanlar elenmeye mahkum.",

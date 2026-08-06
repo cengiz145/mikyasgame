@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let text = fs.readFileSync('js/game.js', 'utf8');
 
 let lines = text.split('\n');

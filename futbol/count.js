@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const files = ['data.js','data_superlig.js','data_tff1.js','data_tff2.js','data_premier.js','data_laliga.js','data_bundesliga.js','data_ligue1.js','data_seriea.js','data_eredivisie.js','data_portekiz.js','data_brazil.js','data_world.js','data_world_stars.js'];
 let total = 0;
 files.forEach(f => {

@@ -1,4 +1,4 @@
-// audio.js - Ses Tanımlamaları ve İşlevleri
+﻿// audio.js - Ses Tanımlamaları ve İşlevleri
 
 // Dinleyiciyi (Kullanıcı) (0,0,0) merkez noktasına koyalım.
 Howler.pos(0, 0, 0);

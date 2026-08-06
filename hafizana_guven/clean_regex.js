@@ -1,1 +1,1 @@
-const fs = require('fs'); let c = fs.readFileSync('js/autoRepair.js', 'utf8'); c = c.replace(/\[a-zA-Z0-9_\\\\-\]+\\\.\\(\?:js\\|css\\|html\\)/g, '[a-zA-Z0-9_\\\\-]+\\\\.(?:js|css|html)(?:\\\\?[^\\\\s:)]+)?'); fs.writeFileSync('js/autoRepair.js', c);
+﻿const fs = require('fs'); let c = fs.readFileSync('js/autoRepair.js', 'utf8'); c = c.replace(/\[a-zA-Z0-9_\\\\-\]+\\\.\\(\?:js\\|css\\|html\\)/g, '[a-zA-Z0-9_\\\\-]+\\\\.(?:js|css|html)(?:\\\\?[^\\\\s:)]+)?'); fs.writeFileSync('js/autoRepair.js', c);

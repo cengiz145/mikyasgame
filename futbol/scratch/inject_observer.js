@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let html = fs.readFileSync('index.html', 'utf8');
 
 if (!html.includes('a11y_observer.js')) {

@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "psg", name: "Paris Saint-Germain", budget: 95, leagueId: "ligue1", players: ["Gianluigi Donnarumma", "Marquinhos", "Milan Skriniar", "Lucas Hernandez", "Achraf Hakimi", "Nuno Mendes", "Warren Zaire-Emery", "Vitinha", "Fabian Ruiz", "Ousmane Dembele", "Bradley Barcola", "Goncalo Ramos", "Randal Kolo Muani", "Lucas Beraldo", "Marco Asensio"] },

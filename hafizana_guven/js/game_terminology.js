@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
     const btnTerminologyMain = document.getElementById('btn-terminology-main');
     const terminologyCategoriesContainer = document.getElementById('terminology-categories-container');
     const terminologyCategoriesBackBtn = document.getElementById('terminology-categories-back-btn');

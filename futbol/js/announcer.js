@@ -1,4 +1,4 @@
-// announcer.js
+﻿// announcer.js
 // Grme engelliler iin optimize edilmi 0 Hata (Zero-Crash) Spiker Yapay Zekas
 
 // Global speak fonksiyonu (Görme engelliler için erişilebilirlik garantili)

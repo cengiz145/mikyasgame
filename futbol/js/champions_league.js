@@ -1,4 +1,4 @@
-// champions_league.js
+﻿// champions_league.js
 // Şampiyonlar Ligi İsviçre Sistemi ve Eleme Turları (Knockout) Motoru
 
 window.championsLeague = {

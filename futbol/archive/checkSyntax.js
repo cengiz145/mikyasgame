@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const vm = require('vm');
 
 let text = fs.readFileSync('js/game.js', 'utf8');

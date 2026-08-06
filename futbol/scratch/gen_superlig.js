@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const allTeams = [
     { id: "galatasaray", name: "Galatasaray", color: "#A90432", budget: 75, city: "Istanbul", leagueId: "superlig", starLevel: 5 },

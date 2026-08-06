@@ -1,4 +1,4 @@
-// AŞAMA 33: İlişkisel Veritabanı Uyumlu Sıfır Hata Transfer Merkezi
+﻿// AŞAMA 33: İlişkisel Veritabanı Uyumlu Sıfır Hata Transfer Merkezi
 
 let userTeamIdForTransfer = null;
 window.pendingTransfers = window.pendingTransfers || [];

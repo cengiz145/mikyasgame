@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let code = fs.readFileSync('js/manager.js', 'utf8');
 
 // Replace init function

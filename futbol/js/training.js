@@ -1,4 +1,4 @@
-// training.js - Gerçekçi Antrenman Sistemi (Zaman Sınırlamalı)
+﻿// training.js - Gerçekçi Antrenman Sistemi (Zaman Sınırlamalı)
 
 function openTrainingFacility() {
     let container = document.getElementById('training-container');

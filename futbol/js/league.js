@@ -1,4 +1,4 @@
-window.generateFixture = function(teamIds) {
+﻿window.generateFixture = function(teamIds) {
     let teams = [...teamIds];
     if (teams.length % 2 !== 0) teams.push(null);
     let numDays = teams.length - 1;

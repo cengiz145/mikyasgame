@@ -1,23 +1,5 @@
 ﻿# Haf�zana G�ven - De�i�iklik G�nl��� (Changelog)
 
-[v0.97.4.63] - 03.08.2026
-
-Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
-
-
-[v0.97.4.62] - 03.08.2026
-
-Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
-
-
-[v0.97.4.62] - 03.08.2026
-
-Genel:
-- Sohbet ekranÄ±nda eski mesajlar yÃ¼klenirken oluÅŸan bildirim sesi spamlama hatasÄ± Ã§Ã¶zÃ¼ldÃ¼.
-
-
 [v0.97.4.61] - 31.07.2026
 
 Genel:

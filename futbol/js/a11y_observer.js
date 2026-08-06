@@ -1,4 +1,4 @@
-// a11y_observer.js - Global Accessibility Observer for Modals and Overlays
+﻿// a11y_observer.js - Global Accessibility Observer for Modals and Overlays
 // Bu script, oyunda herhangi bir açılır pencere (modal) açıldığında arka plandaki tüm menülerin
 // ekran okuyucu (NVDA/JAWS) tarafından yanlışlıkla okunmasını %100 engeller.
 

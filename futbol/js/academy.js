@@ -1,4 +1,4 @@
-// academy.js - Altyapı (Youth Academy) Sistemi
+﻿// academy.js - Altyapı (Youth Academy) Sistemi
 
 window.youthAcademy = window.youthAcademy || [];
 window.coachesPool = window.coachesPool || [];

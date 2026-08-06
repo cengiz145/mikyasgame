@@ -1,4 +1,4 @@
-// story.js - Hikaye Modu, Yürüme Mekanikleri ve Kayıp Notalar
+﻿// story.js - Hikaye Modu, Yürüme Mekanikleri ve Kayıp Notalar
 
 window.inStoryMode = false;
 window.currentStoryIndex = 0;

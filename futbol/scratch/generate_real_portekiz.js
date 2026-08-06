@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "benfica", name: "SL Benfica", budget: 75, leagueId: "portekiz", players: ["Anatoliy Trubin", "Antonio Silva", "Nicolas Otamendi", "Alexander Bah", "Fredrik Aursnes", "Joao Neves", "Florentino Luis", "Orkun Kokcu", "Kerem Akturkoglu", "Vangelis Pavlidis", "Angel Di Maria", "Arthur Cabral", "Marcos Leonardo", "David Neres", "Tomas Araujo"] },

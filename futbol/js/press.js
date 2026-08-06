@@ -1,4 +1,4 @@
-// İki Aşamalı Basın Toplantısı Sistemi (Açılış Konuşması -> Soru Cevap) ve Oyuncu Reaksiyonları
+﻿// İki Aşamalı Basın Toplantısı Sistemi (Açılış Konuşması -> Soru Cevap) ve Oyuncu Reaksiyonları
 
 // --- 1. AŞAMA: AÇILIŞ KONUŞMALARI (STATEMENTS) ---
 const preMatchStatements = [

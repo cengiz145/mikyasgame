@@ -1,4 +1,4 @@
-const leagueData = {
+﻿const leagueData = {
     teams: [
         { id: "galatasaray", name: "Galatasaray", color: "#A90432", budget: 50, city: "Istanbul", leagueId: "superlig" , tacticalRole: "playmaker" },
         { id: "fenerbahce", name: "Fenerbahçe", color: "#000080", budget: 50, city: "Istanbul", leagueId: "superlig" , tacticalRole: "playmaker" },

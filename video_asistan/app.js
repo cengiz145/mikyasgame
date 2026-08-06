@@ -1,4 +1,4 @@
-// Erişilebilir Video Asistanı V3 (FFmpeg Core)
+﻿// Erişilebilir Video Asistanı V3 (FFmpeg Core)
 
 const { FFmpeg } = window.FFmpeg;
 const { fetchFile } = window.FFmpegUtil;

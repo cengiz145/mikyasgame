@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let text = fs.readFileSync('js/game.js', 'utf8');
 
 const targetRegex = /if \(window\.isFriendlyMatch\) \{\s*window\.isFriendlyMatch = false;\s*document\.getElementById\('game-screen'\)\.classList\.add\('hidden'\);\s*document\.getElementById\('menu-screen'\)\.classList\.remove\('hidden'\);\s*if \(typeof speak === 'function'\) speak\("Hazırlık maçı sona erdi\."\);\s*\}/g;

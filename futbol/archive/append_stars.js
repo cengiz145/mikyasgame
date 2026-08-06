@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const newRaw = [
     { name: 'Enzo Fernández', position: 'Merkez Orta Saha', age: 25, teamId: 'chelsea', value: 90, role: 'maestro', trait: 'elite' },

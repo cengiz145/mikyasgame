@@ -1,4 +1,4 @@
-// psychologist.js - Otonom Spor Psikoloğu ve Revir İşlemleri
+﻿// psychologist.js - Otonom Spor Psikoloğu ve Revir İşlemleri
 
 document.addEventListener("DOMContentLoaded", () => {
     let psychologyQueue = [];

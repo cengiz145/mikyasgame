@@ -1,4 +1,4 @@
-const wordList = [
+﻿const wordList = [
     { en: "I'd like...", tr: "...istiyorum veya almak istiyorum." },
     { en: "Can I get a...? veya Can I have a...?", tr: "...alabilir miyim?" },
     { en: "Black tea", tr: "Siyah çay." },

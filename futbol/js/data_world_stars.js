@@ -1,4 +1,4 @@
-// js/data_world_stars.js
+﻿// js/data_world_stars.js
 
 const worldStarsRaw = [
     {"name":"Enzo Fernández","position":"Merkez Orta Saha","age":25,birthplace: "Buenos Aires, Arjantin", "teamId":"chelsea","value":90,"role":"maestro","trait":"elite"},

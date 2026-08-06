@@ -1,4 +1,4 @@
-// scout.js - Takvim ve Gözlemci (Scout) Sistemi
+﻿// scout.js - Takvim ve Gözlemci (Scout) Sistemi
 
 window.currentDay = 1;
 window.currentMonth = 8; // Ağustos (8. ay)

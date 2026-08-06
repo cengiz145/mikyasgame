@@ -1,4 +1,4 @@
-// İletişim Kutusu (Chat) Sistemi
+﻿// İletişim Kutusu (Chat) Sistemi
 
 let dialogueQueue = [];
 let onDialogueComplete = null;

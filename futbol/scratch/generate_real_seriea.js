@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "inter", name: "Inter Milan", budget: 90, leagueId: "seriea", players: ["Yann Sommer", "Alessandro Bastoni", "Francesco Acerbi", "Benjamin Pavard", "Federico Dimarco", "Denzel Dumfries", "Hakan Calhanoglu", "Nicolo Barella", "Henrikh Mkhitaryan", "Davide Frattesi", "Lautaro Martinez", "Marcus Thuram", "Marko Arnautovic", "Stefan de Vrij", "Carlos Augusto"] },

@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 let code = fs.readFileSync('js/game.js', 'utf8');
 
 // 1. Inject Referees Database in initGame()

@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "real_madrid", name: "Real Madrid", budget: 100, leagueId: "laliga", players: ["Thibaut Courtois", "Eder Militao", "Antonio Rudiger", "Dani Carvajal", "Ferland Mendy", "Aurelien Tchouameni", "Jude Bellingham", "Federico Valverde", "Eduardo Camavinga", "Vinicius Junior", "Kylian Mbappe", "Rodrygo", "Endrick", "Arda Guler", "Brahim Diaz", "Luka Modric", "Andriy Lunin"] },

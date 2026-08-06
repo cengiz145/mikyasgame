@@ -1,4 +1,4 @@
-// game2.js - Tamamen Baştan Yazılmış Gelişmiş Futbol Motoru (Aşama 1-20)
+﻿// game2.js - Tamamen Baştan Yazılmış Gelişmiş Futbol Motoru (Aşama 1-20)
 
 let canvas = document.getElementById('game-canvas');
 let ctx = canvas ? canvas.getContext('2d') : null;

@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 const content = fs.readFileSync('transcript_extract.txt', 'utf8');
 const regex = /<div id="game-container"[\s\S]*?<canvas id="game-canvas"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/g;
 const matches = content.match(regex);

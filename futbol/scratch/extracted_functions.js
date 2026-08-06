@@ -1,4 +1,4 @@
-function switchPlayerManual() {
+﻿function switchPlayerManual() {
     let closestTeammate = null;
     let minD = Infinity;
     homePlayers.forEach(p => {

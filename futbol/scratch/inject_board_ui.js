@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 // 1. Update index.html
 let htmlContent = fs.readFileSync('index.html', 'utf8');

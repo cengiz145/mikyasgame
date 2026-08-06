@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 const teams = [
     { id: "galatasaray", name: "Galatasaray", color: "#A90432", budget: 75, city: "Istanbul", leagueId: "superlig", players: ["Fernando Muslera", "Davinson Sanchez", "Victor Nelsson", "Kaan Ayhan", "Ismail Jakobs", "Lucas Torreira", "Gabriel Sara", "Dries Mertens", "Kerem Demirbay", "Baris Alper Yilmaz", "Hakim Ziyech", "Victor Osimhen", "Mauro Icardi", "Michy Batshuayi", "Berkan Kutlu", "Yunus Akgun", "Elias Jelert"] },

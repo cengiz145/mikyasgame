@@ -1,4 +1,4 @@
-const fs = require('fs');
+﻿const fs = require('fs');
 
 // 1. Patch scout.js
 let scoutContent = fs.readFileSync('js/scout.js', 'utf8');
