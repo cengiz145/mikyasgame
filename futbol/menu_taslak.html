@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futbol Menajer - Ana Menü Taslağı</title>
+    <style>
+        /* Standart Erişilebilir Menü CSS Taslağı (Hafızana Güven Tarzı) */
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --focus-outline: #f59e0b; /* Yüksek kontrastlı odak rengi */
+            --btn-bg: rgba(255, 255, 255, 0.05);
+            --btn-hover-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .menu-container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        /* Ekran okuyucu odaklanması için outline kaldırıp kendi outline'ımızı veriyoruz */
+        h1:focus {
+            outline: 2px solid var(--focus-outline);
+            outline-offset: 4px;
+        }
+
+        .menu-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .menu-button {
+            width: 100%;
+            background-color: var(--btn-bg);
+            color: var(--text-color);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            font-size: 1.3rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .menu-button:hover {
+            background-color: var(--btn-hover-bg);
+            transform: scale(1.02);
+        }
+
+        .menu-button:focus {
+            outline: 3px solid var(--focus-outline);
+            outline-offset: 2px;
+            background-color: var(--btn-hover-bg);
+        }
+
+        /* Sadece ekran okuyucular için metinler (Görselde gizli) */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
+</head>
+<body role="application">
+
+    <!-- Ana Menü Alanı -->
+    <div id="main-menu-container" class="menu-container" role="presentation">
+        
+        <!-- Menü Başlığı -->
+        <h1 id="main-menu-title" tabindex="-1" aria-label="Kör Futbol Menajer oyununa hoş geldiniz. Menüde gezinmek için yukarı ve aşağı ok tuşlarını kullanabilirsiniz.">
+            Kör Futbol Menajer
+        </h1>
+
+        <!-- aria-labelledby ile nav'ı başlığa bağlıyoruz, ekran okuyucu burayı bir menü bölgesi olarak anlıyor -->
+        <nav class="menu-nav" aria-labelledby="main-menu-title">
+            <ul>
+                <li>
+                    <button id="btn-new-career" class="menu-button" aria-label="Yeni Kariyer Oluştur">
+                        Yeni Kariyer
+                    </button>
+                </li>
+                <li>
+                    <button id="btn-load-career" class="menu-button" aria-label="Kayıtlı Kariyeri Yükle">
+                        Kariyer Yükle
+                    </button>
+                </li>
+                <li>
+                    <button id="btn-settings" class="menu-button" aria-label="Ayarlar Menüsü">
+                        Ayarlar
+                    </button>
+                </li>
+                <li>
+                    <button id="btn-achievements" class="menu-button" aria-label="Başarılar ve Kupalar">
+                        Başarılar
+                    </button>
+                </li>
+                <li>
+                    <button id="btn-about" class="menu-button" aria-label="Oyun Hakkında">
+                        Oyun Hakkında
+                    </button>
+                </li>
+                <li>
+                    <button id="btn-exit" class="menu-button" aria-label="Oyundan Çıkış Yap">
+                        Çıkış
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Ekran okuyucuların dikkatini çekecek, okudukları durum metinleri (ör. 'Yeni kariyer yükleniyor...') için -->
+        <div id="aria-status" aria-live="polite" class="sr-only"></div>
+    </div>
+
+    <!-- Örnek JavaScript: Tuş navigasyonu ve menü etkileşimleri -->
+    <script>
+        // Sayfa yüklendiğinde ilk butona (veya başlığa) odaklanmasını sağlayın
+        document.addEventListener('DOMContentLoaded', () => {
+            const title = document.getElementById('main-menu-title');
+            if (title) {
+                title.focus();
+            }
+        });
+
+        // Menü butonları için tıklama/enter simülasyonları
+        const buttons = document.querySelectorAll('.menu-button');
+        const ariaStatus = document.getElementById('aria-status');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const actionName = e.target.innerText;
+                
+                // Ekran okuyucuya bilgi veriyoruz (örn: "Yeni Kariyer seçildi, lütfen bekleyin...")
+                ariaStatus.innerText = actionName + " seçildi.";
+
+                // Burada tıklama sesleri veya menü değiştirme fonksiyonları çağrılabilir
+                console.log(actionName + " butonuna tıklandı.");
+            });
+        });
+    </script>
+</body>
+</html>
