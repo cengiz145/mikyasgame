@@ -3,10 +3,10 @@
 [v0.98.0.0] - 16.09.2026
 
 Genel:
-- BaÅŸarÄ±mlar sistemi baÅŸtan aÅŸaÄŸÄ± yenilendi, modÃ¼ler bir yapÄ±ya geÃ§ildi.
-- Oyuna farklÄ± zorluk ve kategorilerde toplam 100 yeni baÅŸarÄ±m eklendi.
-- BaÅŸarÄ±lar menÃ¼sÃ¼ artÄ±k kilitli baÅŸarÄ±mlarÄ± ve ilerleme oranlarÄ±nÄ± detaylÄ± gÃ¶steriyor.
-- Turun sonunda baÅŸarÄ±m analizi yapan otomatik duyuru sistemi entegre edildi.
+- Başarımlar sistemi baştan aşağı yenilendi, modüler bir yapıya geçildi.
+- Oyuna farklı zorluk ve kategorilerde toplam 100 yeni başarım eklendi.
+- Başarılar menüsü artık kilitli başarımları ve ilerleme oranlarını detaylı gösteriyor.
+- Turun sonunda başarım analizi yapan otomatik duyuru sistemi entegre edildi.
 
 
 [v0.97.4.61] - 31.07.2026
