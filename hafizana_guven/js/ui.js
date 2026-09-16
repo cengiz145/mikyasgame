@@ -2423,15 +2423,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!window.userAchievements) window.userAchievements = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
             let bg = parseInt(localStorage.getItem('hafizaGuvenBuzsuzGun')) || 0;
             
-                        let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">';
+                                    let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">';
             if (window.achievementsList) {
                 window.achievementsList.forEach(ach => {
                     let isUnlocked = window.userAchievements && window.userAchievements[ach.id];
                     if (isUnlocked) {
-                        html += <li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="KazanÄ±ldÄ±: \. \">âœ… \ (\)</li>;
+                        html += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: ${ach.title}. ${ach.description}">✅ ${ach.title} (${ach.description})</li>`;
                     } else {
-                        let progress = ach.progressText ?  - \ : "";
-                        html += <li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: \. \. \">ğŸ”’ \ (\)\</li>;
+                        let progress = ach.progressText ? ` - ${ach.progressText()}` : "";
+                        html += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: ${ach.title}. ${ach.description}. ${progress.replace('-', '')}">🔒 ${ach.title} (${ach.description})${progress}</li>`;
                     }
                 });
             }
