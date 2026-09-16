@@ -80,9 +80,7 @@ window.gameModes = {
     rhythm_mode: { isUnlocked: false, completionCount: 0, requiredToUnlock: 1, name: 'Ritim Avcısı' }
 };
 
-window.userAchievements = {
-    hafizam_gucleniyor: false,
-};
+
 
 window.activeDifficulty = 'easy';
 window.gameTimer = 30;
@@ -718,25 +716,23 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
 
         try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch (e) { }
 
-        if (window.activeDifficulty === 'easy' && window.gameModes.easy.completionCount === window.gameModes.medium.requiredToUnlock) {
-            baseMessage += " Tebrikler, ORTA MOD kilitlerini açtınız!";
-            playUnlockSound = true;
-        } else if (window.activeDifficulty === 'medium' && window.gameModes.medium.completionCount === window.gameModes.hard.requiredToUnlock) {
-            baseMessage += " İnanılmaz, ZOR MOD kilitlerini açtınız!";
-            playUnlockSound = true;
-        }
+                if (window.achievementsList && window.userAchievements) {
+            let delayAcc = 4000;
+            window.achievementsList.forEach(ach => {
+                if (!window.userAchievements[ach.id] && ach.checkCondition()) {
+                    window.userAchievements[ach.id] = true;
+                    try { localStorage.setItem('hafizaGuvenAchievements', JSON.stringify(window.userAchievements)); } catch (e) { }
 
-        if (window.activeDifficulty === 'easy' && window.gameModes.easy.completionCount >= 2 && window.userAchievements && !window.userAchievements.hafizam_gucleniyor) {
-            window.userAchievements.hafizam_gucleniyor = true;
-            try { localStorage.setItem('hafizaGuvenAchievements', JSON.stringify(window.userAchievements)); } catch (e) { }
-
-            window.hgfzZamanlayici.setTimeout(() => {
-                if (window.achievementSound) window.achievementSound.play();
-                if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız! İlk başarınızı elde ettiniz: Hafızam güçleniyor.");
-                setTimeout(() => {
-                    if (window.showAchievementModal) window.showAchievementModal("Hafızam Güçleniyor");
-                }, 3000);
-            }, 4000);
+                    window.hgfzZamanlayici.setTimeout(() => {
+                        if (window.achievementSound) window.achievementSound.play();
+                        if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir BaÅŸarÄ±m KazandÄ±nÄ±z: " + ach.title);
+                        setTimeout(() => {
+                            if (window.showAchievementModal) window.showAchievementModal(ach.title);
+                        }, 3000);
+                    }, delayAcc);
+                    delayAcc += 4000;
+                }
+            });
         }
     } else if (isTimeOut) {
         baseMessage = `Süre bitti!`;
@@ -1941,5 +1937,8 @@ window.handleRhythmInput = function(key) {
         }
     }
 };
+
+
+
 
 

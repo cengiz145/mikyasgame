@@ -2084,20 +2084,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!window.userAchievements) window.userAchievements = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
             let bg = parseInt(localStorage.getItem('hafizaGuvenBuzsuzGun')) || 0;
             
-            let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">';
-            
-            if (window.userAchievements.hafizam_gucleniyor) {
-                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">âÅ“â€¦ Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
-            } else {
-                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Hafızam Güçleniyor. Kolay modu 2 kez tamamla.">ğÅ¸â€â€™ Hafızam Güçleniyor (Kolay modu 2 kez tamamla)</li>';
+                        let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">';
+            if (window.achievementsList) {
+                window.achievementsList.forEach(ach => {
+                    let isUnlocked = window.userAchievements && window.userAchievements[ach.id];
+                    if (isUnlocked) {
+                        html += <li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="KazanÄ±ldÄ±: \. \">âœ… \ (\)</li>;
+                    } else {
+                        let progress = ach.progressText ?  - \ : "";
+                        html += <li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: \. \. \">ğŸ”’ \ (\)\</li>;
+                    }
+                });
             }
-            
-            if (window.userAchievements.buzsuz_3_gun) {
-                html += '<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap.">âÅ“â€¦ Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş yap)</li>';
-            } else {
-                html += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Sadık Oyuncu. 3 Gün boyunca seri dondurma kullanmadan giriş yap. İlerleme: ${bg} bölü 3 gün.">âÂÂ³ Sadık Oyuncu (3 Gün boyunca seri dondurma kullanmadan giriş) - İlerleme: ${bg}/3</li>`;
-            }
-            
             html += '</ul>';
             if (contentDiv) contentDiv.innerHTML = html;
             
@@ -2857,3 +2855,4 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         window.resumeFromPause();
     };
+
