@@ -114,7 +114,8 @@ window.checkDailyStreak = function() {
         
         let totalTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
         totalTokens += reward;
-        try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens); } catch(e){}
+        try { localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            if (window.checkAllAchievements) window.checkAllAchievements(); } catch(e){}
     }
 };
 
@@ -1698,6 +1699,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             totalTokens -= 50;
             localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            if (window.checkAllAchievements) window.checkAllAchievements();
             localStorage.setItem('hafizaGuvenHataKorumasi', 1);
             if (window.buySound) window.buySound.play();
             if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Hata Koruması eklendi. Kalan jeton: ${totalTokens}`);
@@ -1725,6 +1727,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             totalTokens -= 30;
             localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            if (window.checkAllAchievements) window.checkAllAchievements();
             localStorage.setItem('hafizaGuvenZamanKorumasi', 1);
             if (window.buySound) window.buySound.play();
             if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Zaman Koruması eklendi. Kalan jeton: ${totalTokens}`);
@@ -1753,6 +1756,7 @@ document.addEventListener('DOMContentLoaded', () => {
             totalTokens -= 80;
             sd += 1;
             localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            if (window.checkAllAchievements) window.checkAllAchievements();
             localStorage.setItem('hafizaGuvenSeriDondurma', sd);
             if (window.buySound) window.buySound.play();
             if (window.announceToScreenReader) window.announceToScreenReader(`Satın alma başarılı! 1 Seri Dondurma eklendi. Kalan jeton: ${totalTokens}. Mevcut Seri Dondurma sayınız: ${sd}`);
@@ -1812,6 +1816,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 totalTokens -= 500;
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            if (window.checkAllAchievements) window.checkAllAchievements();
                 localStorage.setItem('hafizaGuvenBaglamaPack', 'true');
                 localStorage.setItem('hafizaGuvenInstrument', 'baglama');
                 window.activeInstrument = 'baglama';
@@ -1891,6 +1896,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 totalTokens -= 100;
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            if (window.checkAllAchievements) window.checkAllAchievements();
                 localStorage.setItem('hafizaGuvenKavalPack', 'true');
                 localStorage.setItem('hafizaGuvenInstrument', 'kaval');
                 window.activeInstrument = 'kaval';
@@ -1970,6 +1976,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 totalTokens -= 200;
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            if (window.checkAllAchievements) window.checkAllAchievements();
                 localStorage.setItem('hafizaGuvenFlutPack', 'true');
                 localStorage.setItem('hafizaGuvenInstrument', 'flut');
                 window.activeInstrument = 'flut';
@@ -2049,6 +2056,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 totalTokens -= 300;
                 localStorage.setItem('hafizaGuvenTotalTokens', totalTokens);
+            if (window.checkAllAchievements) window.checkAllAchievements();
                 localStorage.setItem('hafizaGuvenKanunPack', 'true');
                 localStorage.setItem('hafizaGuvenInstrument', 'kanun');
                 window.activeInstrument = 'kanun';

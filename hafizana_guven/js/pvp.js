@@ -132,6 +132,7 @@ window.PvP = {
                         let msg = `${currentPlayers[id]} lobiye katıldı.`;
                         if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                         if (window.showToastNotification) window.showToastNotification(msg);
+        if (window.checkAllAchievements) window.checkAllAchievements();
                         if (window.arenaJoinSound) window.arenaJoinSound.play();
                     }
                 });
@@ -140,6 +141,7 @@ window.PvP = {
                         let msg = `${this.lastLobbyPlayers[id]} lobiden ayrıldı.`;
                         if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                         if (window.showToastNotification) window.showToastNotification(msg);
+        if (window.checkAllAchievements) window.checkAllAchievements();
                         if (window.arenaLeaveSound) window.arenaLeaveSound.play();
                     }
                 });
@@ -344,6 +346,7 @@ window.PvP = {
                                     let msg = `${currentPlayers[id]} lobiye katıldı.`;
                                     if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                                     if (window.showToastNotification) window.showToastNotification(msg);
+        if (window.checkAllAchievements) window.checkAllAchievements();
                                     if (window.arenaJoinSound) window.arenaJoinSound.play();
                                 }
                             });
@@ -352,6 +355,7 @@ window.PvP = {
                                     let msg = `${this.lastLobbyPlayers[id]} lobiden ayrıldı.`;
                                     if (window.announceToScreenReader) window.announceToScreenReader(msg, true);
                                     if (window.showToastNotification) window.showToastNotification(msg);
+        if (window.checkAllAchievements) window.checkAllAchievements();
                                     if (window.arenaLeaveSound) window.arenaLeaveSound.play();
                                 }
                             });
@@ -902,8 +906,13 @@ window.PvP = {
         let msg = `Oyun Bitti! Senin Puanın: ${myScore}, En Yüksek Rakip Puanı: ${highestOppScore}. `;
         let isWinner = false;
 
+        let pm = parseInt(localStorage.getItem('hafizaGuvenPvpMatches')) || 0;
+        localStorage.setItem('hafizaGuvenPvpMatches', pm + 1);
+
         if (myScore > highestOppScore) {
             isWinner = true;
+            let pw = parseInt(localStorage.getItem('hafizaGuvenPvpWins')) || 0;
+            localStorage.setItem('hafizaGuvenPvpWins', pw + 1);
             msg += "Kazandın! ";
 
             // Kazanan için Rastgele Ödül Çekilişi (3 İhtimal)

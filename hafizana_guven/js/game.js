@@ -710,30 +710,24 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
     if (isWin) {
         baseMessage = `Tebrikler! Zamanında tüm notaları tamamladınız.`;
 
+
         if (window.gameModes && window.gameModes[window.activeDifficulty]) {
             window.gameModes[window.activeDifficulty].completionCount += 1;
         }
+        
+        let ts = parseInt(localStorage.getItem('hafizaGuvenLifetimeScore')) || 0;
+        ts += window.score;
+        localStorage.setItem('hafizaGuvenLifetimeScore', ts);
+
+        if (window.gameMistakes === 0) {
+            let fw = parseInt(localStorage.getItem('hafizaGuvenFlawlessWins')) || 0;
+            localStorage.setItem('hafizaGuvenFlawlessWins', fw + 1);
+        }
+
 
         try { localStorage.setItem('hafizaGuvenModes', JSON.stringify(window.gameModes)); } catch (e) { }
 
-                if (window.achievementsList && window.userAchievements) {
-            let delayAcc = 4000;
-            window.achievementsList.forEach(ach => {
-                if (!window.userAchievements[ach.id] && ach.checkCondition()) {
-                    window.userAchievements[ach.id] = true;
-                    try { localStorage.setItem('hafizaGuvenAchievements', JSON.stringify(window.userAchievements)); } catch (e) { }
-
-                    window.hgfzZamanlayici.setTimeout(() => {
-                        if (window.achievementSound) window.achievementSound.play();
-                        if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir BaÅŸarÄ±m KazandÄ±nÄ±z: " + ach.title);
-                        setTimeout(() => {
-                            if (window.showAchievementModal) window.showAchievementModal(ach.title);
-                        }, 3000);
-                    }, delayAcc);
-                    delayAcc += 4000;
-                }
-            });
-        }
+                if (window.checkAllAchievements) window.checkAllAchievements();
     } else if (isTimeOut) {
         baseMessage = `Süre bitti!`;
     } else if (window.gameMistakes >= 3) {

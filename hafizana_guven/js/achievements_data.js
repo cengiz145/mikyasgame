@@ -795,3 +795,26 @@ window.userAchievements = {
     "total_score_50000": false,
     "total_score_100000": false,
 };
+
+window.checkAllAchievements = function() {
+    if (window.achievementsList && window.userAchievements) {
+        let delayAcc = 0;
+        window.achievementsList.forEach(ach => {
+            if (!window.userAchievements[ach.id] && ach.checkCondition()) {
+                window.userAchievements[ach.id] = true;
+                try { localStorage.setItem('hafizaGuvenAchievements', JSON.stringify(window.userAchievements)); } catch (e) { }
+
+                let timerFunction = window.hgfzZamanlayici ? window.hgfzZamanlayici.setTimeout : setTimeout;
+                
+                timerFunction(() => {
+                    if (window.achievementSound) window.achievementSound.play();
+                    if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız: " + ach.title);
+                    setTimeout(() => {
+                        if (window.showAchievementModal) window.showAchievementModal(ach.title);
+                    }, 3000);
+                }, delayAcc);
+                delayAcc += 4000;
+            }
+        });
+    }
+};
