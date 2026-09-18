@@ -1,5 +1,5 @@
 ﻿{
-    "version": "0.99.0.0",
-    "buildId": 1781863854,
-    "changelog": "Başarımlarla ilgili hatalar giderildi. Skorlarınız, hatalarınız ve PvP zaferleriniz artık sorunsuz şekilde kaydediliyor ve mağaza alışverişi gibi eylemlerde de anında başarı kazanabiliyorsunuz!"
+    "version":  "0.97.4.63",
+    "buildId":  1781863854,
+    "changelog":  "Sohbet geÃ§miÅŸi yÃ¼klenirken Ã§alÄ±nan ses spam sorunu dÃ¼zeltildi."
 }
