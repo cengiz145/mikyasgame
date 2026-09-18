@@ -1,0 +1,15 @@
+map:sanctuary_of_artemis
+maxx:51
+maxy:20
+platform:0:51:0:carpet
+wall:0:0:20:wallnone
+wall:51:0:20:wallnone
+platform:1:50:0:concrete5
+zone:1:50:0:20:Santuario de Artemisa.
+zone:1:1:0:20:Salida del santuario.
+travelpoint:1:1:0:0:100:150:mount_olympus:Regresas al monte olimpo.
+disable:coordenadas
+disable:camera
+disable:bicicleta
+ceiling:none
+sound_source:1:50:0:20:calm.ogg

@@ -1,0 +1,14 @@
+map:general_items_shop
+maxx:11
+maxy:10
+platform:0:11:0:carpet2
+wall:0:0:15:wallgeneric
+wall:11:0:15:wallgeneric
+ceiling:none
+text:1:0:0
+zone:0:11:0:10:minishop
+mapdoor:1:1:0:0:2:0:music_room:back to musicroom:metal
+text:1:2:exith you can go tomusic room
+text:1:0:exitdoor
+text:1:0:exit door
+zone:1:1:0:0:exit door

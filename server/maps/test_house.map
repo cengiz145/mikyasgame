@@ -1,0 +1,201 @@
+map:test_house
+maxx:500
+maxy:500
+platform:0:500:0:carpet
+wall:0:0:500:wallnone
+wall:500:0:500:wallnone
+zone:1:500:0:500:Casa de prueba.
+platform:1:40:0:grass
+wall:0:0:500:wallfence
+zone:1:40:0:30:Jardín.
+zone:1:1:0:20:Salida de la casa.
+staircase:5:5:0:10:grass
+zone:5:5:0:20:Un lindo botón de oro está plantado aquí.
+staircase:15:15:0:10:grass
+zone:15:15:0:20:Aquí se planta una delicada caléndula. Sus hermosas flores naranjas y amarillas florecen maravillosamente en este magnífico jardín.
+staircase:20:20:0:10:grass
+zone:20:20:0:20:Un hermoso árbol de clavel. Los pétalos de las flores coloridas y pequeñas se mezclan en los colores blanco, rojo y rosa.
+staircase:25:25:0:10:grass
+zone:25:25:0:20:Un magnífico árbol de girasol.
+staircase:30:30:0:10:grass
+zone:30:30:0:20:Exudando un aroma embriagador, aquí hay un hermoso árbol de lavanda.
+zone:35:35:0:20:Una hermosa plantación de alisso. Su maravilloso aroma hace que nunca quieras salir de este jardín.
+staircase:41:45:0:50:sand
+wall:46:0:49:wallfence
+wall:40:1:69:wallfence
+zone:41:45:0:69:Un pequeño camino que conduce hacia arriba.
+platform:46:54:50:dirt
+zone:46:54:50:69:Pequeño camino de piedras que conduce a la casa.
+zone:54:54:50:69:En la entrada de la casa.
+platform:55:111:50:carpet
+wall:112:50:69:walldoor2
+wall:55:50:69:wallglass
+door:54:50:56:50:10:none:none:door6open.ogg:door6close.ogg
+door:56:50:54:50:10:none:none:door6open.ogg:door6close.ogg
+zone:56:56:50:69:Puerta acceso al exterior de la casa.
+zone:57:70:50:69:Sala.
+zone:62:62:50:69:Smart tv.
+zone:64:64:0:69:Sillón.
+zone:67:69:50:69:Un magnífico piano de cola está aquí.
+zone:71:84:50:69:Pasillo.
+staircase:75:77:50:70:concreto2
+wall:74:51:69:wallcone
+wall:78:51:69:wallcone
+zone:75:77:50:90:Escalera al segundo piso.
+zone:85:111:50:69:Cocina.
+zone:88:88:50:69:Silla.
+platform:89:92:50:wood
+zone:89:92:50:69:Una gran mesa de comedor.
+zone:93:93:50:69:Silla.
+zone:95:95:50:69:Refrigerador.
+zone:98:100:50:69:Fregadero de la cocina.
+zone:103:103:0:69:Microondas.
+zone:104:104:0:69:Horno eléctrico.
+zone:105:105:50:69:Estufa.
+zone:107:110:50:69:Armario de acero inoxidable.
+zone:111:111:50:69:Salida para el balcón de la casa.
+platform:113:199:50:concrete
+door:111:50:113:50:10:none:none:door6open.ogg:door6close.ogg
+door:113:50:111:50:10:none:noneç:door6open.ogg:door6close.ogg
+zone:113:113:50:69:Entrada a la cocina de la casa.
+zone:114:144:50:69:Balcón.
+zone:120:120:50:69:Lavadora.
+zone:125:127:50:69:Lavabo.
+zone:130:135:50:69:Secadora de ropas.
+zone:145:199:50:80:Zona de recreo.
+zone:150:150:0:80:Silla.
+platform:151:153:50:cement
+zone:151:153:50:80:Mesa.
+zone:154:154:50:80:Silla.
+zone:158:158:50:80:Silla.
+platform:159:162:50:cement
+zone:159:162:50:80:Mesa.
+zone:163:162:50:80:Silla.
+zone:170:173:50:80:Fogón de leña.
+zone:174:176:50:80:Parrilla.
+zone:180:182:50:80:Frigobar,
+zone:185:187:50:80:Mesa de sonido.
+zone:188:191:50:80:Una gran caja de sonido se encuentra aquí.
+staircase:195:195:50:70:branch
+zone:195:195:50:80:Un árbol gigante da sombra a toda esta área.
+staircase:200:205:50:60:dirt
+wall:199:51:80:wallfence
+wall:206:51:80:wallfence
+zone:200:205:50:80:Escalones de piedra que conducen a la oficina.
+zone:205:205:60:80:Entrada a la oficina.
+platform:200:250:81:carpet2
+wall:199:81:100:wallglass
+wall:251:81:100:wallglass
+door:205:60:205:81:15:none:none:door4open.ogg:door4close.ogg
+door:205:81:205:60:15:none:none:door4open.ogg:door4close.ogg
+zone:200:250:81:100:Oficina.
+zone:205:205:81:100:Salida al exterior de la oficina.
+zone:250:250:81:100:Computadora.
+platform:206:249:50:dirt2
+zone:206:249:50:80:Patio de tierra de la casa.
+platform:250:330:50:areia
+zone:250:279:50:80:Arena suave.
+zone:280:300:50:80:A lo lejos ves una pequeña playa.
+zone:301:330:50:80:Playa.
+platform:331:354:50:marsh
+zone:331:354:50:80:Arena mojada de la playa.
+platform:355:365:50:brejo
+zone:355:365:50:80:Aquí las olas rompen a tus pies.
+platform:366:399:50:shallow
+wall:400:50:400:wallwater
+zone:366:380:50:80:Parte más profunda del mar.
+zone:381:399:50:80:Aquí el mar se vuelve impetuoso e inexorable. Las olas gigantescas y fuertes van y vienen chocando entre sí.
+platform:20:74:70:carpet
+wall:19:70:100:camerawall
+zone:20:74:70:100:Pasillo.
+zone:30:30:70:100:Entrada a la suite privada.
+platform:20:31:81:carpet2
+door:30:70:30:81:10:none:none:door2open.ogg:door2close.ogg
+door:30:81:30:70:10:none:none:door2open.ogg:door2close.ogg
+zone:20:20:81:100:Computadora.
+zone:21:21:81:100:Mesita de noche.
+zone:22:31:81:100:Habitación.
+zone:23:24:81:100:Cama matrimonial.
+zone:25:25:81:100:Un gran baúl de madera. Parece cerrado.
+zone:27:27:81:100:Entrada del closet.
+zone:30:30:81:100:Salida de la habitación.
+zone:31:31:81:100:Entrada al baño.
+platform:32:50:81:cement
+wall:32:81:100:wallscreen
+wall:51:81:100:camerawall
+door:31:81:33:81:10:none:none:door2open.ogg:door2close.ogg
+door:33:81:31:81:10:none:none:door2open.ogg:door2close.ogg
+zone:33:33:81:100:Salida del baño.
+zone:34:50:81:100:Baño.
+zone:35:35:81:100:Lavabo.
+zone:37:37:81:100:Retrete.
+zone:49:49:81:100:Presiona enter para entrar en el jacuzzi.
+zone:50:50:81:100:Ducha.
+platform:20:35:92:concrete4
+wall:36:92:100:camerawall
+door:27:81:27:92:10:none:none:door13open.ogg:door13close.ogg
+door:27:92:27:81:10:none:none:door13open.ogg:door13close.ogg
+zone:20:35:92:100:Closet.
+zone:27:27:92:100:Salida del closet.
+zone:29:29:92:100:Ropero.
+platform:40:49:92:shallow
+wall:39:92:100:wallwater
+wall:50:92:100:wallwater
+door:49:81:49:92:10:none:none:door16open.ogg:door16close.ogg
+door:49:92:49:81:10:none:none:door16open.ogg:door16close.ogg
+zone:40:49:92:100:jacuzzi.
+zone:49:49:92:100:Para salir del jacuzzi, presiona enter.
+zone:55:55:70:100:Entrada a una habitación.
+platform:55:65:81:carpet2
+wall:54:81:100:camerawall
+wall:66:81:100:camerawall
+door:55:70:55:81:10:none:none:door2open.ogg:door2close.ogg
+door:55:81:55:70:10:none:none:door2open.ogg:door2close.ogg
+zone:55:55:81:100:Salida de la habitación.
+zone:56:65:81:100:Habitación.
+zone:58:58:81:100:Cama.
+zone:59:59:81:100:Mesita de noche.
+zone:60:60:81:100:Un gran espejo.
+zone:62:65:81:100:Un gran ropero.
+platform:78:120:70:carpet
+wall:121:70:100:wallcone
+zone:78:120:70:100:Pasillo.
+zone:85:85:70:100:Entrada a una habitación.
+platform:85:95:81:carpet2
+wall:84:81:100:camerawall
+wall:96:81:100:camerawall
+door:85:70:85:81:10:none:none:door2open.ogg:door2close.ogg
+door:85:81:85:70:10:none:none:door2open.ogg:door2close.ogg
+zone:85:85:81:100:Salida de la habitación.
+zone:86:95:81:100:Habitación.
+zone:88:88:81:100:Cama.
+zone:89:89:81:100:Mesita de noche.
+zone:90:90:81:100:Un gran espejo.
+zone:91:95:81:100:Un gran ropero.
+zone:100:100:70:100:Entrada al baño.
+platform:100:115:81:cement
+wall:99:81:100:camerawall
+wall:116:81:100:camerawall
+door:100:70:100:81:10:none:none:door2open.ogg:door2close.ogg
+door:100:81:100:70:10:none:none:door2open.ogg:door2close.ogg
+zone:100:100:81:100:Salida del baño.
+zone:101:115:81:100:Baño.
+zone:105:105:81:100:Lavabo.
+zone:110:110:81:100:Retrete.
+zone:115:115:81:100:Ducha.
+platform:122:140:70:concreto2
+wall:141:70:100:camerawall
+door:120:70:122:70:10:none:none:door6open.ogg:door6close.ogg
+door:122:70:120:70:10:none:none:door6open.ogg:door6close.ogg
+zone:122:122:70:100:Puerta de acceso al pasillo.
+zone:123:140:70:100:Biblioteca.
+zone:125:127:70:100:Gran mesa.
+zone:129:129:70:100:Silla.
+zone:130:130:70:100:Mesa.
+zone:131:131:70:100:Silla.
+zone:134:136:70:100ç:Una alta estantería con varios libros.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:varinha
+disable:camera

@@ -1,0 +1,88 @@
+map:house_2
+maxx:85
+maxy:75
+platform:0:85:0:carpet2
+wall:0:0:15:wallnone
+wall:85:0:15:wallnone
+platform:1:20:0:capim
+wall:0:0:75:walldirt
+zone:1:20:0:20:Hierva.
+zone:1:1:0:4:Salida de la casa.
+staircase:1:1:5:21:plank
+zone:1:1:5:20:Escalera.
+platform:2:4:20:plank
+platform:1:10:21:plank
+wall:11:21:30:camerawall
+zone:1:10:21:40:Entrada secreta.
+zone:2:2:21:40:Computador.
+zone:6:6:21:40:Un gran baúl de madera. parece cerrado.
+platform:21:25:0:concrete
+zone:21:25:0:20:Acera alrededor de la casa.
+zone:25:27:0:20:Puerta.
+wall:26:0:20:walldoor
+door:25:0:27:0:15:none:none:door2open.ogg:door2close.ogg
+door:27:0:25:0:15:nonr:nonr:door2open.ogg:door2close.ogg
+platform:27:38:0:concreto2
+zone:28:36:0:20:Sala de estár.
+zone:32:32:0:20:Mini componente.
+zone:36:38:0:20:Puerta.
+wall:37:0:20:walldoor2
+door:36:0:38:0:15:none:none:door2open.ogg:door2close.ogg
+door:38:0:36:0:15:none:none:door2open.ogg:door2close.ogg
+staircase:39:40:0:30:caverna2
+wall:38:1:29:camerawall
+wall:41:1:29:camerawall
+zone:39:40:0:75:Escalera.
+platform:41:49:0:concrete5
+zone:41:48:0:20:Pasillo.
+zone:48:50:0:20:Puerta.
+wall:49:0:20:walldoor
+door:48:0:50:0:15:none:none:door2open.ogg:door2close.ogg
+door:50:0:48:0:15:none:none:door2open.ogg:door2close.ogg
+platform:50:70:0:caverna2
+zone:51:70:0:20:Cocina.
+platform:53:55:0:wood
+zone:53:55ç:0:20:Mesa.
+zone:59:59:0:20:Refrigerador.
+zone:62:62:0:20:Lavabo.
+zone:65:66:0:20:Parrilla.
+zone:70:72:0:20:Puerta.
+wall:71:0:20:walldoor
+door:70:0:72:0:15:none:none:door2open.ogg:door2close.ogg
+door:72:0:70:0:15:none:none:door2open.ogg:door2close.ogg
+platform:72:83:0:concrete5
+zone:73:83:0:20:Patio trasero.
+wall:84:0:75:wallcone
+platform:1:38:30:concrete4
+zone:1:38:30:50:Pasillo.
+zone:1:1:30:50:Puerta de la habitación.
+platform:1:15:41:concreto2
+wall:0:41:50:walldoor2
+wall:16:41:50:walldoor2
+door:1:30:1:41:15:none:none:door2open.ogg:door2close.ogg
+door:1:41:1:30:15:none:none:door2open.ogg:door2close.ogg
+zone:2:15:41:50:Habitación.
+zone:4:4:41:50:Computador.
+zone:9:9:41:50:Mesita de noche.
+zone:10:11:41:50:Cama matrimonial.
+zone:15:15:41:50:Ropero.
+zone:20:20:30:50:Puerta del baño.
+platform:20:30:41:calcada
+wall:19:41:50:camerawall
+wall:31:41:50:wallscreen
+door:20:30:20:41:15:none:none:door2open.ogg:door2close.ogg
+door:20:41:20:30:15:none:none:door2open.ogg:door2close.ogg
+zone:20:20:41:50:Puerta de regreso al pasillo.
+zone:21:30:41:50:Cuarto de baño.
+zone:23:23:41:50:Lavabo.
+zone:26:26:41:50:Retrete.
+zone:30:30:41:50:Ducha.
+platform:41:70:30:concrete4
+wall:71:30:75:walldirt
+zone:41:70:30:50:Pasillo.
+safezone:1:84:0:75
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera
+disable:varinha

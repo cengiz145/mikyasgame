@@ -1,0 +1,38 @@
+map:rainforest
+maxx:101
+maxy:50
+platform:1:100:50:wallnone
+platform:1:100:-1:wallnone
+wall:0:0:50:wallarvore
+wall:101:0:50:wallarvore
+platform:1:100:0:grass
+sound_source:72:74:5:50:birds5.ogg
+sound_source:44:48:3:50:birds2.ogg
+sound_source:0:100:0:50:birds.ogg
+zone:0:100:0:50:tropical forest
+zone:1:1:0:50:Press the enter key to return to the rural town of Santa Bertalina.
+sound_source:0:100:0:50:forest.ogg
+staircase:50:50:0:10:branch
+zone:50:50:0:50:Árvore.
+platform:49:51:10:branch
+zone:49:49:10:50:branch.
+zone:51:51:10:50:tree
+staircase:45:45:0:15:branch
+zone:45:45:0:50:Coqueiro.
+staircase:30:30:0:20:branch
+zone:30:30:0:50:Árvore.
+staircase:20:20:0:10:branch
+zone:20:20:0:50:tree.
+platform:52:60:13:branch
+zone:52:60:13:50:tree.
+staircase:70:70:0:6:branch
+zone:70:70:0:50:Árvore.
+staircase:90:92:0:15:branch
+zone:90:92:0:50:Árvore.
+travelpoint:1:1:0:0:150:0:santa_bertalina_city:You are returning to the town.
+travelpoint:100:100:0:0:1:0:indigenous_village:You pass through the vegetation, dodge some thorns, and enter a place that looks like an Indian village.
+zone:100:100:0:50:Dense vegetation has accumulated here, as if it was done on purpose. But maybe you can get over it.
+mapdoor:6:6:0:0:1:10:the_engineer's_house:You enter a house abandoned by a retired engineer, now forgotten.:door11open
+zone:6:6:0:50:Você está de fronte à uma casa com as janelas sujas de poeira.
+disable:coordenadas
+disable:camera

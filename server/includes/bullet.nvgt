@@ -1,0 +1,734 @@
+bullet@[] bullets;
+class bullet{
+int distance;
+string owner, somarma, mapname, loopid, loopsound;
+int sx, sy, weapon, x, y, facing, range, damage_value, speed_value;
+bullet(int d, int r, int s1, int s2,int fa, string own,int weap,string map,int spee=2, string weapon_sound_sarm="", string lsound=""){
+this.speed_value=spee;
+this.loopid=lsound;
+mapname=map;
+facing=fa;
+sx=s1;
+sy=s2;
+x=s1;
+y=s2;
+if(this.loopid!="") this.loopid=spawn_moving_sound(this.loopid,this.x,this.y,this.mapname);
+damage_value=d;
+range=r;
+owner=own;
+weapon=weap;
+somarma=weapon_sound_sarm;
+}
+}
+void bullet_loop(){
+if(!pvp)return;
+if(canhaos.length()>0)cannon_loop();
+for(uint ie5=0;ie5<bullets.length();ie5++){
+if (bullets[ie5].facing==Left){
+bullets[ie5].x-=1;
+bullets[ie5].distance+=1;
+if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
+if (bullets[ie5].damage_value>2) bullets[ie5].damage_value-=3;
+bullet_check(ie5);
+}
+else if (bullets[ie5].facing==Right){
+bullets[ie5].x+=1;
+bullets[ie5].distance+=1;
+if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
+if (bullets[ie5].damage_value>2)bullets[ie5].damage_value-=3;
+bullet_check(ie5);
+}
+else if (bullets[ie5].facing==Forward){
+bullets[ie5].y+=1;
+bullets[ie5].distance+=1;
+if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
+if (bullets[ie5].damage_value>2)bullets[ie5].damage_value-=3;
+bullet_check(ie5);
+}
+else if (bullets[ie5].facing==Back){
+bullets[ie5].y-=1;
+bullets[ie5].distance+=1;
+if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
+if (bullets[ie5].damage_value>2)bullets[ie5].damage_value-=3;
+bullet_check(ie5);
+}
+}
+}
+void bullet_check(int b){
+string surface=get_tile_at(bullets[b].x,bullets[b].y,bullets[b].mapname);
+string loc=get_zone_at(bullets[b].x,bullets[b].y,bullets[b].mapname);
+int ba2=get_player_index_from(bullets[b].owner);
+string ricochet_sound;
+if (string_contains(loc,"safe",1)>-1||bullets[b].distance>=bullets[b].range||ba2<0||players[ba2].map=="t nel"||players[ba2].peaceful==1){
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+if (bullets[b].weapon==1||bullets[b].weapon==0)
+{
+ricochet_sound="chuterico.ogg";
+}
+else if (bullets[b].weapon==2)
+{
+ricochet_sound="kniferico.ogg";
+}
+else if (bullets[b].weapon==6)
+{
+ricochet_sound="arcorico.ogg";
+}
+else if (bullets[b].weapon==8)
+{
+ricochet_sound="m240rico.ogg";
+}
+else if (bullets[b].weapon==9)
+{
+ricochet_sound="rocketmiss.ogg";
+}
+else if (bullets[b].weapon==12)
+{
+ricochet_sound="laserrico.ogg";
+}
+else if (bullets[b].weapon==13)
+{
+ricochet_sound="bazucarico.ogg";
+}
+else if (bullets[b].weapon==14)
+{
+ricochet_sound="grenaderico.ogg";
+}
+else if (bullets[b].weapon==15)
+{
+ricochet_sound="sniperrico.ogg";
+}
+else if (bullets[b].weapon==18){
+if(players[ba2].burst==1){
+players[ba2].burst=0;
+ricochet_sound="ricothree.ogg";
+}
+else ricochet_sound="rico"+random(1, 7)+".ogg";
+}
+else if (bullets[b].weapon==26){
+if(players[ba2].burst==1){
+players[ba2].burst=0;
+ricochet_sound="ricofive.ogg";
+}
+else ricochet_sound="rico"+random(1, 7)+".ogg";
+}
+else if (bullets[b].weapon==19)
+{
+ricochet_sound="m60rico.ogg";
+}
+else if (bullets[b].weapon==20||bullets[b].weapon==29||bullets[b].weapon==30)
+{
+ricochet_sound="espadarico.ogg";
+}
+else if (bullets[b].weapon==21)
+{
+ricochet_sound="remingtonrico.ogg";
+}
+else if (bullets[b].weapon==22)
+{
+ricochet_sound="dozerico.ogg";
+}
+else if (bullets[b].weapon==23)
+{
+ricochet_sound="vulcanrico.ogg";
+}
+else if (bullets[b].weapon==28)
+{
+ricochet_sound="chuterico.ogg";
+}
+else if(bullets[b].weapon==34)ricochet_sound="molotovexplode.ogg";
+else if(bullets[b].weapon==35)ricochet_sound="";
+else
+{
+ricochet_sound="rico"+random(1,7)+".ogg";
+}
+int damage_value=bullets[b].damage_value;
+for(uint bu=0; bu < torre_de_babels.length(); bu++){
+if(bullets[b].x==torre_de_babels[bu].x&&torre_de_babels[bu].map==bullets[b].mapname){
+if(bullets[b].y==0)torre_de_babels[bu].health_points-=damage_value;
+if(ricochet_sound!="")send_packet3(0, "play "+ricochet_sound+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < walls.length(); bu++){
+if(bullets[b].x==walls[bu].x&&walls[bu].map==bullets[b].mapname){
+if(bullets[b].y==0)walls[bu].health_points-=damage_value;
+if(ricochet_sound!="")send_packet3(0, "play "+ricochet_sound+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < projeteis.length(); bu++){
+if(bullets[b].x==projeteis[bu].x&&bullets[b].y==projeteis[bu].y&&bullets[b].mapname==projeteis[bu].map){
+destroy_moving_sound(projeteis[bu].projectile_sound);
+projeteis.remove_at(bu);
+send_packet_unreliable(0, bullets[b].x,"rs 18 "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+if(bullets[b].weapon==35){
+for(uint n=0;n<fogoqueimars.length();n++){
+if(fogoqueimars[n].x==bullets[b].x&&fogoqueimars[n].y==bullets[b].y&&fogoqueimars[n].map==bullets[b].mapname){
+destroy_moving_sound(fogoqueimars[n].somfogo);
+fogoqueimars.remove_at(n);
+}
+}
+}
+int amount=(bullets[b].damage_value);
+int pozic;
+for(uint bu=0; bu < dragonsauros.length(); bu++){
+if(bullets[b].x==dragonsauros[bu].x&&bullets[b].y==dragonsauros[bu].y&&bullets[b].mapname==dragonsauros[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rico dragonsauroapanhando.ogg "+bullets[b].x+" "+bullets[b].y+" "+bullets[b].mapname, bullets[b].mapname);
+if(bu>dragonsauros.length())return;
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>dragonsauros.length())return;
+dragonsauros[bu].health_points-=damage_value;
+dragonsauros[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu <megadragonsauros.length(); bu++){
+if(bullets[b].x==megadragonsauros[bu].x&&bullets[b].y==megadragonsauros[bu].y&&bullets[b].mapname==megadragonsauros[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rico dragonsauroapanhando.ogg "+bullets[b].x+" "+bullets[b].y+" "+bullets[b].mapname, bullets[b].mapname);
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+megadragonsauros[bu].health_points-=damage_value;
+megadragonsauros[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < robo_coletores.length(); bu++){
+if(bullets[b].x==robo_coletores[bu].x&&bullets[b].y==robo_coletores[bu].y&&bullets[b].mapname==robo_coletores[bu].map_data){
+send_packet_unreliable(0, bullets[b].x,"rico roboapanhando1.ogg "+bullets[b].x+" "+bullets[b].y+" "+bullets[b].mapname, bullets[b].mapname);
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+robo_coletores[bu].health_points-=damage_value;
+robo_coletores[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < sharks.length(); bu++){
+if(bullets[b].x==sharks[bu].x&&bullets[b].y==sharks[bu].y&&bullets[b].mapname==sharks[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rico tubaraoapanhando"+random(1, 3)+".ogg "+bullets[b].x+" "+bullets[b].y+" "+bullets[b].mapname, bullets[b].mapname);
+if(bu>sharks.length())return;
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>sharks.length())return;
+sharks[bu].health_points-=damage_value;
+sharks[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < babysaurs.length(); bu++){
+if(bullets[b].x==babysaurs[bu].x&&bullets[b].y==babysaurs[bu].y&&bullets[b].mapname==babysaurs[bu].map&&babysaurs[bu].born){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>babysaurs.length())return;
+send_packet_unreliable(0, bullets[b].x,"play bbsauroapanhando"+random(1, 2)+".ogg "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>babysaurs.length())return;
+babysaurs[bu].hit_by=bullets[b].owner;
+babysaurs[bu].health_points-=damage_value;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0;bu<hcavernas.length();bu++){
+if(bullets[b].x==hcavernas[bu].x&&bullets[b].y==hcavernas[bu].y&&bullets[b].mapname==hcavernas[bu].map_data&&hcavernas[bu].died==0&&hcavernas[bu].morrendo==0){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+hcavernas[bu].health_points-=damage_value;
+hcavernas[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < armored_cars.length(); bu++){
+if(bullets[b].x==armored_cars[bu].x&&bullets[b].y==armored_cars[bu].y&&bullets[b].mapname==armored_cars[bu].map_data){
+string s=bullets[b].somarma;
+if(s=="8")s="robothitfive.ogg";
+else if(s=="9")s="robothitthree.ogg";
+else s="robothit"+random(1, 6)+".ogg";
+send_packet_unreliable(0, bullets[b].x,"play "+s+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+armored_cars[bu].hit_by=bullets[b].owner;
+armored_cars[bu].health_points-=damage_value;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < helicopters.length(); bu++){
+if(bullets[b].x==helicopters[bu].x&&bullets[b].y==helicopters[bu].y&&bullets[b].mapname==helicopters[bu].map){
+string s=bullets[b].somarma;
+if(s=="8")s="robothitfive.ogg";
+else if(s=="9")s="robothitthree.ogg";
+else s="robothit"+random(1, 6)+".ogg";
+send_packet_unreliable(0, bullets[b].x,"play "+s+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+helicopters[bu].health_points-=damage_value;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+int aa=bullets[b].weapon;
+if(aa==3||aa==10||aa==11||aa==15||aa==21||aa==22)damage_value=999999;
+for(uint bu=0; bu < guards_walk.length(); bu++){
+if(bullets[b].x==guards_walk[bu].x&&bullets[b].y==guards_walk[bu].y&&bullets[b].mapname==guards_walk[bu].map_data){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>guards_walk.length())return;
+guards_walk[bu].health_points-=damage_value;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < rats.length(); bu++){
+if(bullets[b].x==rats[bu].x&&bullets[b].y==rats[bu].y&&bullets[b].mapname==rats[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>rats.length())return;
+rats[bu].hit_by=bullets[b].owner;
+rats[bu].health_points-=damage_value;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < monkeys.length(); bu++){
+if(bullets[b].x==monkeys[bu].x&&bullets[b].y==monkeys[bu].y&&bullets[b].mapname==monkeys[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rico macacoapanhando"+random(1, 3)+".ogg "+bullets[b].x+" "+bullets[b].y+" "+bullets[b].mapname, bullets[b].mapname);
+if(bu>monkeys.length())return;
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>monkeys.length())return;
+monkeys[bu].health_points-=damage_value;
+monkeys[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < wolves.length(); bu++){
+if(bullets[b].x==wolves[bu].x&&bullets[b].y==wolves[bu].y&&bullets[b].mapname==wolves[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rico loboapanhando"+random(1, 3)+".ogg "+bullets[b].x+" "+bullets[b].y+" "+bullets[b].mapname, bullets[b].mapname);
+if(bu>wolves.length())return;
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>wolves.length())return;
+wolves[bu].health_points-=damage_value;
+wolves[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < amon_ras.length(); bu++){
+if(bullets[b].x==amon_ras[bu].x&&bullets[b].y==amon_ras[bu].y&&bullets[b].mapname==amon_ras[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>amon_ras.length())return;
+amon_ras[bu].health_points-=damage_value;
+amon_ras[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < custom_monsters.length(); bu++){
+if(bullets[b].x==custom_monsters[bu].x&&bullets[b].y==custom_monsters[bu].y&&bullets[b].mapname==custom_monsters[bu].map_data&&custom_monsters[bu].dead==false){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>custom_monsters.length())return;
+custom_monsters[bu].health_points-=damage_value;
+custom_monsters[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < gods.length(); bu++){
+if(bullets[b].x==gods[bu].x&&bullets[b].y==gods[bu].y&&bullets[b].mapname==gods[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>gods.length())return;
+gods[bu].health_points-=damage_value;
+gods[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < dragons.length(); bu++){
+if(bullets[b].x==dragons[bu].x&&bullets[b].y==dragons[bu].y&&bullets[b].mapname==dragons[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>dragons.length())return;
+dragons[bu].health_points-=damage_value;
+dragons[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < irroadiums.length(); bu++){
+if(bullets[b].x==irroadiums[bu].x&&bullets[b].y==irroadiums[bu].y&&bullets[b].mapname==irroadiums[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>irroadiums.length())return;
+irroadiums[bu].health_points-=damage_value;
+irroadiums[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < fantozaurs.length(); bu++){
+if(bullets[b].x==fantozaurs[bu].x&&bullets[b].y==fantozaurs[bu].y&&bullets[b].mapname==fantozaurs[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>fantozaurs.length())return;
+fantozaurs[bu].health_points-=damage_value;
+fantozaurs[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < deciceds.length(); bu++){
+if(bullets[b].x==deciceds[bu].x&&bullets[b].y==deciceds[bu].y&&bullets[b].mapname==deciceds[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>deciceds.length())return;
+deciceds[bu].health_points-=damage_value;
+deciceds[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < tabaluss.length(); bu++){
+if(bullets[b].x==tabaluss[bu].x&&bullets[b].y==tabaluss[bu].y&&bullets[b].mapname==tabaluss[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>tabaluss.length())return;
+tabaluss[bu].health_points-=damage_value;
+tabaluss[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < gatos.length(); bu++){
+if(bullets[b].x==gatos[bu].x&&bullets[b].y==gatos[bu].y&&bullets[b].mapname==gatos[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>gatos.length())return;
+gatos[bu].health_points-=damage_value;
+gatos[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < dragon_blancos.length(); bu++){
+if(bullets[b].x==dragon_blancos[bu].x&&bullets[b].y==dragon_blancos[bu].y&&bullets[b].mapname==dragon_blancos[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>dragon_blancos.length())return;
+dragon_blancos[bu].health_points-=damage_value;
+dragon_blancos[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < attack_dogs.length(); bu++){
+if(bullets[b].x==attack_dogs[bu].x&&bullets[b].y==attack_dogs[bu].y&&bullets[b].mapname==attack_dogs[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>attack_dogs.length())return;
+send_packet_unreliable(0, bullets[b].x,"rs cachorroapanhando"+random(1, 2)+".ogg "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>attack_dogs.length())return;
+attack_dogs[bu].health_points-=damage_value;
+attack_dogs[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0;bu<rabbits.length();bu++){
+if(bullets[b].x==rabbits[bu].x&&bullets[b].y==rabbits[bu].y&&bullets[b].mapname==rabbits[bu].map_data){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+send_packet_unreliable(0, bullets[b].x,"rs coelhoapanha.ogg "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+rabbits[bu].health_points-=damage_value;
+rabbits[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0;bu<zumbis.length();bu++){
+if(bullets[b].x==zumbis[bu].x&&bullets[b].y==zumbis[bu].y&&bullets[b].mapname==zumbis[bu].map_data&&zumbis[bu].died==0&&zumbis[bu].morrendo==0){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+send_packet_unreliable(0, bullets[b].x,"rs z_apanha.ogg "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+zumbis[bu].health_points-=damage_value;
+zumbis[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0;bu<sequestrador2s.length();bu++){
+if(bullets[b].x==sequestrador2s[bu].x&&bullets[b].y==sequestrador2s[bu].y&&bullets[b].mapname==sequestrador2s[bu].map_data&&sequestrador2s[bu].died==0&&sequestrador2s[bu].morrendo==0
+){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+sequestrador2s[bu].health_points-=damage_value;
+sequestrador2s[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < sequestradors.length(); bu++){
+if(bullets[b].x==sequestradors[bu].x&&bullets[b].y==sequestradors[bu].y&&bullets[b].mapname==sequestradors[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>sequestradors.length())return;
+sequestradors[bu].health_points-=damage_value;
+sequestradors[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < mercenarios.length(); bu++){
+if(bullets[b].x==mercenarios[bu].x&&bullets[b].y==mercenarios[bu].y&&bullets[b].mapname==mercenarios[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>mercenarios.length())return;
+mercenarios[bu].health_points-=damage_value;
+mercenarios[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+for(uint bu=0; bu < bears.length(); bu++){
+if(bullets[b].x==bears[bu].x&&bullets[b].y==bears[bu].y&&bullets[b].mapname==bears[bu].map){
+send_packet_unreliable(0, bullets[b].x,"rs "+bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bu>bears.length())return;
+bears[bu].health_points-=damage_value;
+bears[bu].hit_by=bullets[b].owner;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+if(pvp==false)return;
+damage_value=amount;
+for (uint ie4=0; ie4<players.length(); ie4++){
+ba2=get_player_index_from(bullets[b].owner);
+if(bullets[b].weapon==13&&bullets[b].x==players[ie4].x&&bullets[b].owner!=players[ie4].charname&&!players[ie4].in_safe_zone
+&&bullets[b].mapname==players[ie4].map&&!players[ie4].newbie
+&&!players[ie4].afk&&bullets[b].mapname!=initial_map&&players[ie4].map!=initial_map&&get_bullet_y_distance(bullets[b], players[ie4])>-1&&
+get_bullet_y_distance(bullets[b], players[ie4])<=3&&(ba2>-1&&players[ba2].x!=players[ie4].x)||
+bullets[b].x==players[ie4].x&&bullets[b].y==players[ie4].y&&bullets[b].owner!=players[ie4].charname&&!players[ie4].in_safe_zone
+&&bullets[b].mapname==players[ie4].map&&!players[ie4].newbie
+&&!players[ie4].afk&&bullets[b].mapname!=initial_map&&players[ie4].map!=initial_map){
+for(uint bunda=0;bunda<players[ba2].nomesequipe.length();bunda++){
+if(players[ba2].nomesequipe[bunda]==players[ie4].charname){
+return;
+}
+}
+for(uint bunda=0;bunda<players.length();bunda++){
+if(players[bunda].charname!=bullets[b].owner&&bullets[b].x==players[bunda].x&&bullets[b].y==players[bunda].y&&bullets[b].mapname==players[bunda].map&&players[bunda].equipedesafio==
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+players[ba2].equipedesafio&&players[bunda].mortal_team==players[ba2].mortal_team&&bullets[b].mapname=="constant_battle")return;
+}
+if(players[ie4].peaceful==1) return;
+if(players[ie4].star==true){
+send_packet_unreliable(0, bullets[b].x, "play lih.ogg "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+int d=2;
+if(string_contains(players[ie4].weapon_sound_tarma, "mp7", 1)>-1||string_contains(players[ie4].weapon_sound_tarma, "ak48", 1)>-1||string_contains(players[ie4].weapon_sound_tarma, "bazooka", 1)>-1||string_contains(players
+
+
+
+
+
+
+
+[ie4].weapon_sound_tarma, "galil", 1)>-1)d=1;
+pozic=random(d, 6);
+if(pozic==2&&players[ie4].police_helmet==0) amount=(amount*4);
+else if(pozic==3&&players[ie4].military_boot==0) amount=(amount*3);
+else if(pozic>=4&&players[ie4].military_vest==0&&players[ie4].camouflage_vest==0) amount=(amount*2-5);
+if(players[ie4].star2){
+ba2=get_player_index_from(bullets[b].owner);
+if(ba2<0)return;
+if(pozic==1){
+if(aa==10||aa==15)amount=999999;
+}
+send_packet_unreliable(0, bullets[b].x, "play lih.ogg "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+players[ba2].health-=amount;
+send_packet(0,"inithurt "+players[ba2].voice+" "+players[ba2].x+" "+players[ba2].y, players[ba2].map);
+players[ba2].lasthit=players[ie4].charname;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+if(pozic==1){
+send_packet_unreliable(0, bullets[b].x, "play ba.ogg "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(ie4>players.length())return;
+if(bullets[b].weapon==13)
+{
+if(players[ie4].bazuca>0)players[ie4].bazuca-=1;
+else
+{
+send_packet_unreliable(0, bullets[b].x, "play arma_quebrada.ogg "+players[ie4].x+" "+players[ie4].y, players[ie4].map);
+players[ie4].inv_add_item("bazooka", -1, false);
+players[ie4].inv_add_item("broken_bazooka", 1);
+players[ie4].bazuca=50000;
+}
+}
+else if(bullets[b].weapon==31)
+{
+if(players[ie4].mp7>0)players[ie4].mp7-=1;
+else
+{
+send_packet_unreliable(0, bullets[b].x, "play arma_quebrada.ogg "+players[ie4].x+" "+players[ie4].y, players[ie4].map);
+players[ie4].inv_add_item("mp7", -1, false);
+players[ie4].inv_add_item("broken_mp7", 1);
+players[ie4].mp7=50000;
+}
+}
+else if(bullets[b].weapon==36){
+if(players[ie4].galil>0)players[ie4].galil-=1;
+else
+{
+send_packet_unreliable(0, bullets[b].x, "play arma_quebrada.ogg "+players[ie4].x+" "+players[ie4].y, players[ie4].map);
+players[ie4].inv_add_item("galil", -1, false);
+players[ie4].inv_add_item("broken_galil", 1);
+players[ie4].galil=50000;
+}
+}
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+else if(pozic>=4&&players[ie4].colete_aprova_de_balas==1&&players[ie4].ncolete>0&&bullets[b].weapon!=13&&bullets[b].weapon!=14&&bullets[b].weapon!=9&&bullets[b].weapon!=12&&bullets
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[b].weapon!=34&&bullets[b].weapon!=23&&bullets[b].weapon!=27&&bullets[b].weapon!=28&&bullets[b].weapon!=29&&bullets[b].weapon!=30&&bullets[b].weapon!=20&&bullets[b].weapon!=
+6&&bullets[b].weapon!=1&&bullets[b].weapon!=2&&bullets[b].weapon!=35){
+send_packet_unreliable(0, bullets[b].x, "rs 59 "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+players[ie4].ncolete-=1;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+else if (bullets[b].weapon==6&&players[ba2].arrow==1){
+players[ba2].arrow=0;
+players[ie4].nveneno+=6;
+players[ie4].envenenado=true;
+}
+else if (bullets[b].weapon==18){
+if(players[ba2].burst==1){
+players[ba2].burst=0;
+}
+}
+else if (bullets[b].weapon==26){
+if(players[ba2].burst==1){
+players[ba2].burst=0;
+}
+}
+else if (bullets[b].weapon==27){
+send_reliable(players[ie4].peer_id, "stopmoving", 0);
+players[ie4].paralyzed=true;
+players[ie4].paralyzed_count+=15000;
+players[ie4].paralyzed_timer.restart();
+}
+else if (bullets[b].weapon==28){
+if(bullets[b].facing==Left)players[ie4].x-=1;
+else if(bullets[b].facing==Right)players[ie4].x+=1;
+send_packet(0,"update_player2 "+players[ie4].charname+" "+players[ie4].x+" "        +players[ie4].y+" "+players[ie4].map,players[ie4].map);
+}
+else if (bullets[b].weapon==34){
+if(string_contains(surface, "wood", 1)>-1||string_contains(surface, "carpet", 1)>-1||string_contains(surface, "bransh", 1)>-1||string_contains(surface, "bridge",
+1)>-1||string_contains(surface, "deck", 1)>-1||string_contains(surface, "plank", 1)>-1||string_contains(surface, "stairs", 1)>-1)place_fire_burn(bullets[b].x,
+bullets[b].y, 70000, bullets[b].mapname);
+else if(string_contains(surface, "water", 1)>-1||string_contains(surface, "swamp", 1)>-1||string_contains(surface, "mud", 1)>-1||string_contains(surface, "shallow",
+1)>-1||string_contains(surface, "snow", 1)>-1)place_fire_burn(bullets[b].x, bullets[b].y, 2000, bullets[b].mapname);
+else if(string_contains(surface, "ice", 1)>-1) place_fire_burn(bullets[b].x, bullets[b].y, 22000, bullets[b].mapname);
+else place_fire_burn(bullets[b].x, bullets[b].y, 40000, bullets[b].mapname);
+amount=(players[ie4].health/10);
+}
+string a=bullets[b].somarma+" "+bullets[b].x+" "+bullets[b].y;
+send_packet2(0, "finalhit "+a, players[ie4].voice, bullets[b].mapname);
+players[ie4].lasthit=bullets[b].owner;
+if(pozic==2){
+if(aa==10||aa==15)amount=999999;
+}
+if(amount<=2)amount=random(20, 30);
+players[ie4].health-=amount;
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+surface=get_tile_at(bullets[b].x,bullets[b].y,bullets[b].mapname);
+if(string_contains(surface, "wall", 1)>-1||string_contains(surface, "pwall", 1)>-1){
+if(ricochet_sound!="")send_packet3(0, "play "+ricochet_sound+" "+bullets[b].x+" "+bullets[b].y, bullets[b].mapname);
+if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
+bullets.remove_at(b);
+return;
+}
+}
+void spawn_bullet(int p1, int p2, int p3, int p4, int p5, string p6,int p7, string p8,int p9=20, string p11="", string p10=""){
+bullet b1(p1,p2,p3,p4,p5,p6,p7,p8,p9,p11, p10);
+bullets.insert_last(b1);
+}

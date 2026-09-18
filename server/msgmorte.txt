@@ -1,0 +1,2 @@
+msgmorte.insert_last("aaaaaiiiii! o fogo queima... não há mais escapatória possível... terei mesmo que me transformar em churrasco?");
+msgmorte.insert_last("Eu não consigo parar de pé, meus ossos estão torrando!");

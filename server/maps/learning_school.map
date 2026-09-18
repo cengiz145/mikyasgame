@@ -1,0 +1,45 @@
+map:learning_school
+maxx:110
+maxy:20
+platform:1:110:0:concrete4
+wall:0:0:20:wallnone
+wall:109:0:20:wallnone
+zone:1:110:0:40:Escuela de aprendisaje.
+zone:5:5:0:20:Profesor de la escuela.
+zone:10:11:0:20:Comandos del juego.
+zone:15:15:0:20:Para colocar modo pacifista, presione shift + f2. El mismo comando se usa para quitar este modo.
+zone:20:20:0:20:Para verificar su inventario, pulse la letra I.
+zone:25:25:0:20:para dirijir a su personaje hacia la derecha, o hacia la izquierda, presione shift juntamente con las flechas del lado correspondiente.
+zone:30:30:0:20:Para cargar sus armas, presione la letra r, y para habilitar el silenciador, presione la letra t.
+zone:35:35:0:20:Para efectuar una subasta, abra su inventario, colóquese sobre el objeto que quiere subastar, y presione shift + enter. coloca la cantidad de objetos a vender, presiona nuevamente enter, y coloca la cantidad a la cual quiere vender dicho, o dichos items.
+zone:40:40:0:20:Para que su personaje corra, presione alt juntamente con las flechas derecha o izquierda.
+zone:45:45:0:20:En el baño. para levantar la tapa, presione la letra e, para sentarse o levantarse, letra q, para hacer sus necesidades, letra e, para hechar la descarga del agua, enter, y para labarse las manos, letra e enfrente del lavabo.
+zone:50:50:0:20:para comprar items en alguna tienda del juego, presione la letra l. para navegar entre los items, flechas arriba y abajo, y para comprar lo deseado, enter.
+zone:55:55:0:20:comandos de chat:
+zone:60:60:0:20:Para hablar en el chat público, presione el guión.
+zone:65:65:0:20:Para mandar un mensage privado, presione f5, y en la lista de los jugadores conectados presione enter sobre el nombre del jugador al cual va a mandar el mensaje, luego escriba el mensage, y finalmente, enter para enviar.
+zone:70:70:0:20:Para mandar un mensage a los administradores, en el chat público dijite el comando /adm, escriba el mensage a ser enviado, y enter para enviarlo.
+zone:75:75:0:20:Para verificar su salud, presione la letra s.
+zone:80:80:0:20:para saber en qué nivel está su personaje, tiene sed, hambre, o está enfermo, presione la letra v.
+zone:108:108:0:20:Para salir de la estcuela, pulsa enter.
+platform:15:15:0:diamond
+platform:20:20:0:diamond
+platform:25:25:0:diamond
+platform:30:30:0:diamond
+platform:35:35:0:diamond
+platform:40:40:0:diamond
+platform:45:45:0:diamond
+platform:50:50:0:diamond
+platform:55:55:0:diamond
+platform:60:60:0:diamond
+platform:65:65:0:diamond
+platform:70:70:0:diamond
+platform:75:75:0:diamond
+platform:80:80:0:diamond
+travelpoint:108:108:0:0:1:41:safe_zone_es:Sales de la escuela.
+sound_source:1:100:0:30:office.ogg
+ceiling:none
+disable:bicicleta
+disable:camera
+disable:coordenadas
+disable:varinha

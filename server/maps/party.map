@@ -1,0 +1,9 @@
+map:party
+maxx:100
+maxy:10
+platform:0:100:0:carpet
+wall:0:0:15:wallgeneric
+wall:100:0:15:wallgeneric
+zone:1:100:0:10:.
+safezone:1:100:0:10
+

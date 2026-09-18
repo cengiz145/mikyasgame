@@ -1,0 +1,16 @@
+map:classroom
+maxx:51
+maxy:20
+wall:0:0:20:wallnone
+wall:51:0:20:wallnone
+platform:1:50:0:concrete3
+zone:1:50:0:20:Un enorme salón de clases.
+wall:0:0:20:walldoor
+zone:1:1:0:20:Puerta de salida.
+zone:10:42:0:20:Miles de mesas y sillas están repartidas en este lugar.
+zone:43:45:0:20:Mesa del profesor.
+zone:46:46:0:20:Silla.
+zone:47:50:0:20:Un armario grande de fierro.
+wall:51:0:20:wallmetal
+ceiling:none
+mapdoor:1:1:0:20:40:20:safe_zone_es:Sales del salón de clases.:door6close

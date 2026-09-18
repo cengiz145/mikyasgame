@@ -1,0 +1,29 @@
+map:beach_playa
+maxx:206
+maxy:200
+platform:0:206:0:carpet
+wall:0:0:15:wallnone
+wall:206:0:15:wallnone
+zone:1:206:0:50:Playa.
+platform:1:61:6:concrete2
+wall:62:6:50:wallnone
+zone:1:61:6:50:Camino que lleva a la playa.
+zone:1:1:6:50:Puertas del puerto.
+travelpoint:1:1:6:6:1:0:port_of_copa_cabana:Entras en el puerto.
+wall:50:0:5:camerawall
+staircase:51:51:0:6:concrete2
+wall:52:1:5ç:camerawall
+zone:51:51:0:50:Escalera.
+zone:61:61:6:50:Entrada a la avenida beira mar.
+travelpoint:61:61:6:6:1:0:seaside_avenue:Entras en la avenida_beira_mar.
+platform:52:99:0:areia
+zone:52:99:0:5:Arena blanca y suabe.
+platform:100:116:0:mud
+zone:100:116:0:5:Arena mojada.
+platform:117:155:0:water2
+zone:117:155:0:5:Caminando en aguas tranquilas.
+platform:156:205:0:shallow
+wall:206:0:50:wallwater
+zone:156:205:0:5:Caminando en aguas profundas.
+zone:205:205:0:5:El mar se pone más fuerte aquí.
+travelpoint:205:205:0:0:1:50:sea:El suelo se aleja de tus pies, a medida que nadas por las aguas más profundas.

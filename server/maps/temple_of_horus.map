@@ -1,0 +1,19 @@
+map:temple_of_horus
+maxx:150
+maxy:50
+platform:0:150:0:carpet
+wall:0:0:50:wallnone
+wall:150:0:50:wallnone
+platform:1:100:0:caverna
+zone:1:150:0:50:Templo de Horus.
+zone:1:1:0:50:Salida del templo.
+wall:101:0:19:camerawall
+staircase:100:100:0:20:concrete5
+zone:100:100:0:50:Escaleras al altar.
+platform:101:149:20:cement
+zone:101:149:20:50:Altar del templo.
+travelpoint:1:1:0:0:330:30:egypt:Regresas a las escaleras.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera

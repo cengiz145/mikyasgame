@@ -1,0 +1,39 @@
+map:river_styx
+maxx:261
+maxy:250
+platform:0:261:0:carpet
+wall:0:0:250:wallnone
+wall:261:0:250:wallnone
+zone:1:261:0:250:Río estigia.
+platform:1:101:220:caverna
+zone:1:1:220:250:Salida de este infierno.
+travelpoint:1:1:220:220:300:0:path_to_mount_olympus:sales de este terrible y sofocante infierno.
+zone:2:101:220:250:Una cueva. Cada paso que des aquí será terriblemente agotador. Todo el tiempo en este ambiente sombrío sientes como si estuvieras siendo observado.
+staircase:101:101:30:220:caverna
+wall:100:0:219:walldirt
+wall:102:31:250:wallmina
+zone:101:101:30:250:Un descenso repentino. Con cada paso parece que una fuerza superior te atrae hacia abajo.
+platform:101:125:30:gravel
+zone:102:125:30:50:rocas irregulares. En medio de esta espantosa oscuridad puedes escuchar la corriente de un río a lo lejos.
+platform:126:140:30:sand
+zone:126:140:30:50:en este punto la oscuridad es total, y sientes un impulso incontrolable de salir corriendo de aquí.
+platform:141:156:30:dirt
+zone:141:156:30:50:Piedras resbaladizas. Un viento frío sopla desde las profundidades de este lugar trayendo consigo un horrible temor de continuar.
+zone:151:156:30:50:A la orilla de un río. Mirando hacia abajo, ves las aguas negras que fluyen furiosamente hacia una oscuridad más aterradora que la anterior.
+staircase:157:260:0:30:shallow
+wall:158:30:250:wallfence
+wall:258:30:250:wallfence
+wall:156:0:29:wallwater
+wall:261:0:250:wallwater
+zone:157:260:0:29:En este punto, ya no puedes ver la orilla del río.
+platform:260:260:33:dirt
+zone:260:260:33:50:Un pico de roca en medio del río. Aquí hay un pequeño pasaje, y un miedo adormecedor te hace dudar un poco. Pero decides seguir adelante.
+travelpoint:260:260:33:33:1:100:underworld:El viento golpea furiosamente alrededor, igual que la fuerza de las frías aguas negras de este lado del río. Se oyen susurros inaudibles que son completamente imposibles de interpretar. Almas asfixiadas que claman por sus vidas, se mezclan con los sonidos de palabras incomprensibles, y sientes tal fuerza y poder sobrenatural en lo poco que tus oídos pueden recoger, que decides concluir la travesía en el más completo y absoluto silencio.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera
+sound_source:1:101:40:230:a2.ogg
+sound_source:157:260:15:27:water4.ogg
+sound_source:157:260:0:11:water4.ogg
+sound_source:157:260:0:20:a4.ogg

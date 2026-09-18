@@ -1,0 +1,62 @@
+map:mount_vesuvius
+maxx:251
+maxy:100
+platform:0:251:0:carpet
+wall:0:0:100:wallnone
+wall:251:0:100:wallnone
+zone:1:250:0:100:Monte vesuvio.
+staircase:1:1:0:40:rocks
+wall:0:0:6:wallwater
+wall:0:7:100:walldirt
+wall:2:0:39:wallnone
+zone:1:1:0:39:subiendo.
+zone:1:1:40:100:Presiona enter para regresar a Roma.
+travelpoint:1:1:40:40:760:0:rome:Te sientes aliviado al dejar este terrible ambiente.
+zone:3:198:0:20:Fuego.
+zone:3:198:21:39:Callendo en labas fervientes.
+platform:2:18:40:rocks
+zone:2:200:40:100:Vesuvio.
+platform:19:20:40:marsh
+platform:22:23:40:marsh
+platform:24:28:40:rocks
+platform:29:30:40:marsh
+platform:32:33:40:marsh
+platform:34:48:40:rocks
+platform:49:50:40:marsh
+platform:53:54:40:marsh
+platform:55:63:40:rocks
+platform:64:65:40:marsh
+platform:69:70:40:marsh
+platform:71:83:40:rocks
+platform:84:85:40:marsh
+platform:88:89:40:marsh
+platform:90:98:40:rocks
+platform:99:100:40:marsh
+platform:105:106:40:marsh
+platform:107:114:40:rocks
+platform:115:116:40:marsh
+platform:119:120:40:marsh
+platform:121:134:40:rocks
+platform:135:136:40:marsh
+platform:140:141:40:marsh
+platform:142:149:40:rocks
+platform:150:151:40:marsh
+platform:156:157:40:marsh
+platform:158:168:40:rocks
+platform:169:170:40:marsh
+platform:174:175:40:marsh
+platform:176:182:40:rocks
+platform:183:184:40:marsh
+platform:189:190:40:marsh
+platform:191:199:40:rocks
+staircase:200:200:0:40:gravel
+wall:199:0:49:wallnone
+wall:201:7:100:walldirt
+zone:200:200:0:100:Descenso del monte. A lo lejos puedes ver la ciudad de Pompeya.
+platform:201:250:0:concrete
+zone:201:250:0:100:Carretera a la ciudad de Pompeya.
+zone:250:250:0:100:Entrada a la ciudad.
+travelpoint:250:250:0:0:1:0:pompeya:Después de seguir este camino volcánico, llegas a la ciudad de Pompeya.
+ceiling:none
+disable:coordenadas
+disable:bicicleta

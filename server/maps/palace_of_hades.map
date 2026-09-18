@@ -1,0 +1,72 @@
+map:palace_of_hades
+maxx:201
+maxy:100
+platform:0:201:0:carpet
+wall:0:0:100:wallnone
+wall:201:0:100:wallnone
+zone:1:200:0:100:Palacio de Hades.
+platform:1:200:0:concrete3
+zone:1:1:0:100:Salida del castillo.
+travelpoint:1:1:0:0:401:0:underworld:Sales de este infierno aterrador.
+zone:2:80:0:100:Un largo pasillo de piedras negras. El aire helado atraviesa tu piel cuando entras en este lugar.
+zone:71:120:0:100:Salón de las sombras. Aquí ves a través de las paredes dibujos de varios cuerpos mutilados y en el suelo, varias manchas que tienes la aterradora certeza de que es sangre.
+staircase:121:125:0:50:corpse
+wall:120:1:49:wallfence
+wall:126:1:49:wallfence
+zone:121:125:0:100:Estás parado ante una escalera hecha de huesos de todos los tamaños. Te hace temblar, incluso la idea de intentar escalarla. Tus pensamientos comienzan a conducirte por caminos oscuros, y un escalofrío desagradable recorre todo tu cuerpo mientras empiezas a preguntarte qué podrías encontrar allí.
+zone:126:200:0:100:Un largo pasillo de piedras negras, el aire helado atraviesa tu piel al entrar en este lugar.
+zone:160:160:0:100:Oculta por una siniestra oscuridad, aquí está la entrada a la habitación de la muerte.
+platform:150:190:10:concrete3
+wall:149:10:49:wallnone
+wall:191:10:49:wallnone
+door:160:0:160:10:10:none:none:door2open.ogg:door2close.ogg
+door:160:10:160:0:10:none:none:door2open.ogg:door2close.ogg
+zone:150:190:10:100:Sala donde vive la muerte. Aquí se traen los que no son dignos de vivir. Si has venido aquí, entonces no te irás.
+zone:160:160:10:100:Si eres capaz de salir, aquí hay un punto oculto para que escapes de esta habitación.
+platform:1:120:50:concrete2
+zone:1:120:50:100:Largo pasillo de piedras frías.
+zone:20:20:50:100:Entrada al cuarto oscuro.
+platform:20:50:60:carpet2
+wall:19:60:100:wallnone
+wall:51:60:100:wallnone
+door:20:50:20:60:10:none:none:door2open.ogg:door2close.ogg
+door:20:60:20:50:10:none:none:door2open.ogg:door2close.ogg
+zone:20:20:60:100:Salida de la habitación.
+zone:21:50:60:100:Habitación.
+zone:30:32:60:100:Gran baúl de hierro.
+zone:40:41:60:100:Una estantería sucia con algunos artefactos oxidados.
+zone:46:50:60:100:Un gran ataúd de madera con piedras rojas incrustadas.
+zone:60:60:50:100:Entrada al cuarto oscuro.
+platform:60:90:60:carpet2
+wall:59:60:100:wallnone
+wall:91:60:100:wallnone
+door:60:50:60:60:10:none:none:door2open.ogg:door2close.ogg
+door:60:60:60:50:10:none:none:door2open.ogg:door2close.ogg
+zone:60:60:60:100:Salida de la habitación.
+zone:61:90:60:100:Habitación.
+zone:70:72:60:100:Gran baúl de hierro.
+zone:78:80:60:100:Una estantería sucia con algunos artefactos oxidados.
+zone:85:90:60:100:Un gran ataúd de madera con piedras rojas incrustadas.
+platform:126:199:50:concrete4
+zone:126:199:50:100:Pasillo de piedras frías.
+zone:145:145:50:100:Biblioteca de magia negra.
+platform:145:165:60:wood3
+wall:144:60:100:wallnone
+wall:166:60:100:wallnone
+door:145:50:145:60:10:none:none:door6open.ogg:door6close.ogg
+door:145:60:145:50:10:none:none:door6open.ogg:door6close.ogg
+zone:145:145:60:100:Salida de la biblioteca.
+zone:146:165:60:100:Biblioteca.
+zone:150:152:60:100:Una gran mesa.
+zone:158:163:60:100:Una estantería alta de libros viejos y polvorientos. La magia parece emanar de ellos. Un aura maligna y ancestral rodea este lugar.
+zone:165:165:60:100:Un gran sofá de cuero que viene de un animal terrible.
+staircase:200:200:50:90:corpse
+wall:199:51:90:wallnone
+wall:200:91:93:wallnone
+zone:200:200:50:89:Una corta escalera que te lleva a un lugar más frío de lo habitual.
+zone:200:200:90:100:Entrada a la sala de Hades. Si no fuiste invitado a estar aquí, sal inmediatamente, a menos que quieras morir como una hormiga por el rey del submundo.
+mapdoor:200:200:90:90:1:0:hall_of_hades:Entras en la sala de Hades.:door4open
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+platform:145:165:60:concreto2

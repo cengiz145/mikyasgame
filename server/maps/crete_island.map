@@ -1,0 +1,18 @@
+map:crete_island
+maxx:101
+maxy:30
+platform:0:101:0:carpet
+wall:0:0:30:wallnone
+wall:101:0:30:wallnone
+platform:1:100:0:capim
+zone:1:100:0:30:Isla de Creta.
+zone:1:1:0:30:Salida de la isla. A lo lejos puedes ver el mar azul.
+travelpoint:1:1:0:0:286:25:greek_sea:Regresas al camino que lleva al mar.
+zone:60:65:0:30:Ves una construcción enorme y misteriosa. Su aspecto de abandono llama tu atención.
+staircase:95:100:0:15:dirt
+zone:95:100:0:14:Aquí está la base de una montaña. Sientes un deseo de escalar, y también una gran reverencia por este lugar, como si fuera una tierra sagrada.
+zone:95:100:15:30:El camino al Monte Olimpo.
+travelpoint:95:100:15:15:1:0:path_to_mount_olympus:Llegas al camino al Monte Olimpo. Una escalada intimidante te hace pensar si realmente eres digno de estar en este lugar que conduce a la montaña más sagrada de Grecia.
+disable:coordenadas
+disable:bicicleta
+disable:camera

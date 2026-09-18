@@ -1,0 +1,7 @@
+map:godfight
+maxx:100
+maxy:100
+platform:0:100:0:cement
+wall:0:0:20:wallnone
+wall:100:0:20:wallnone
+zone:1:100:0:100:godfight!

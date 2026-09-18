@@ -1,0 +1,16 @@
+map:presentation_alt
+maxx:2
+maxy:20
+platform:1:2:0:carpet
+wall:0:0:20:wallnone
+wall:2:0:20:wallnone
+zone:1:1:0:20:Antes de continuar, lea las reglas.
+travelpoint:1:1:0:20:1:40:safe_zone_es:Dejas ese lugar de acuerdo con las reglas.
+safezone:1:1:0:20
+disable:bicicleta
+disable:camera
+disable:coordenadas
+disable:varinha
+sound_source:1:2:0:20:birds.ogg
+sound_source:1:2:5:20:musica8.ogg
+sound_source:1:2:5:20:barcomovendo.ogg

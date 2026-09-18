@@ -1,0 +1,109 @@
+class Monster {
+    string name;
+    int x, y;
+    int hp, max_hp;
+    int damage;
+    int speed;
+    int spawn_delay;
+    string map_name;
+    bool is_dead = false;
+    timer movement_timer;
+    timer respawn_timer;
+    int target_player_index = -1;
+
+    Monster() {
+        // Default constructor
+    }
+}
+
+Monster[] monsters; // Global list of monsters
+
+void load_monsters_from_map(string map_name) {
+    if(!file_exists("maps/" + map_name + ".map")) return;
+    
+    file f;
+    f.open("maps/" + map_name + ".map", "r");
+    string[] map_lines = delinear(f.read());
+    f.close();
+    
+    for(uint i = 0; i < map_lines.length(); i++) {
+        string[] parsed = string_split(map_lines[i], ":", false);
+        
+        if(parsed[0] == "monster" && parsed.length() >= 7) {
+            Monster m;
+            m.name = parsed[1];
+            m.x = string_to_number(parsed[2]);
+            m.y = string_to_number(parsed[3]);
+            m.speed = string_to_number(parsed[4]);
+            m.damage = string_to_number(parsed[5]);
+            m.spawn_delay = string_to_number(parsed[6]);
+            m.hp = 100;
+            m.max_hp = 100;
+            m.map_name = map_name;
+            monsters.insert_last(m);
+        }
+    }
+}
+
+void process_monsters() {
+    for (uint i = 0; i < monsters.length(); i++) {
+        if (monsters[i].is_dead) {
+            if (monsters[i].respawn_timer.elapsed >= monsters[i].spawn_delay) {
+                monsters[i].is_dead = false;
+                monsters[i].hp = monsters[i].max_hp;
+            }
+            continue;
+        }
+
+        int target = -1;
+        double min_dist = 40;
+
+        for (uint j = 0; j < players.length(); j++) {
+            // FIX: removed the ausente check, because it is not a member of the player class
+            if (players[j].map == monsters[i].map_name) {
+                
+                // FIX: manual distance measurement instead of abs(), so there is no signature error
+                int diff_x = monsters[i].x - players[j].x;
+                if (diff_x < 0) diff_x = -diff_x;
+                
+                int diff_y = monsters[i].y - players[j].y;
+                if (diff_y < 0) diff_y = -diff_y;
+                
+                double d = double(diff_x + diff_y);
+
+                if (d < min_dist) {
+                    min_dist = d;
+                    target = j;
+                }
+            }
+        }
+
+        if (target != -1 && monsters[i].movement_timer.elapsed >= monsters[i].speed) {
+            monsters[i].movement_timer.restart();
+
+            bool moved = false;
+            
+            if (monsters[i].x > players[target].x) { monsters[i].x--; moved = true; }
+            else if (monsters[i].x < players[target].x) { monsters[i].x++; moved = true; }
+
+            if (monsters[i].y > players[target].y) { monsters[i].y--; moved = true; }
+            else if (monsters[i].y < players[target].y) { monsters[i].y++; moved = true; }
+
+            if (moved) {
+                for(uint k = 0; k < players.length(); k++) {
+                    if(players[k].map == monsters[i].map_name) {
+                        send_unreliable(players[k].peer_id, "play_monster_sound " + monsters[i].name + "_step.ogg " + monsters[i].x + " " + monsters[i].y, 0);
+                    }
+                }
+            }
+            
+            if (min_dist <= 1) {
+                for(uint k = 0; k < players.length(); k++) {
+                    if(players[k].map == monsters[i].map_name) {
+                        send_unreliable(players[k].peer_id, "play_monster_sound " + monsters[i].name + "_attack.ogg " + monsters[i].x + " " + monsters[i].y, 0);
+                    }
+                }
+            }
+        }
+    }
+}

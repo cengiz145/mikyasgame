@@ -1,0 +1,10 @@
+map:kingdom_of_thrace
+maxx:101
+maxy:20
+platform:0:101:0:carpet
+wall:0:0:20:wallnone
+wall:101:0:15:wallnoneç
+zone:1:101:0:20:Reino de Tracia.
+platform:1:100:0:grass
+zone:1:1:0:20:Salida del reino.
+travelpoint:1:1:0:0:200:0:elida:Regresas al Reino de Élida.

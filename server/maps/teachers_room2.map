@@ -1,0 +1,13 @@
+map:teachers_room2
+maxx:11
+maxy:20
+wall:0:0:15:wallnone
+wall:11:0:15:wallnone
+platform:1:10:0:carpet
+zone:1:11:0:20:Sala de profesores.
+wall:0:0:20:walldoor
+zone:1:1:0:20:Puerta de salida.
+zone:4:5:0:20:En esta enorme mesa, en medio de libros, revistas y bolígrafos, hay una cafetera.
+zone:6:6:0:20:Silla.
+zone:7:8:0:20:Copiadora.
+zone:9:10:0:20:Un antiguo escritorio.

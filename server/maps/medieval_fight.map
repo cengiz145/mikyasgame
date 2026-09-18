@@ -1,0 +1,31 @@
+map:medieval_fight
+maxx:21
+maxy:20
+wall:0:0:20:wallnone
+wall:21:0:20:wallnone
+wall:5:0:20:wallmetal
+wall:16:0:20:wallmetal
+platform:1:4:0:concrete
+platform:17:20:0:concrete
+platform:6:15:0:carpet2
+zone:6:15:0:20:O confronto final.
+zone:6:15:6:20:Nesta parte do teto da arena, as labaredas de fogo que iluminam o local lhe atinge com força total.
+zone:0:4:0:20:Área de preparação.
+zone:17:20:0:20:Área de preparação.
+zone:5:5:0:20:fogo
+zone:16:16:0:20:fogo
+sound_source:6:15:5:20:boladefogo.ogg
+sound_source:6:15:-8:-8:boladefogo.ogg
+sound_source:-6:-6:0:20:birds.ogg
+sound_source:-6:-6:0:20:park.ogg
+sound_source:24:24:0:20:birds.ogg
+sound_source:24:24:0:20:park.ogg
+safezone:0:5:0:20
+safezone:16:20:0:20
+disable:bicicleta
+disable:coordenadas
+sound_source:0:4:0:20:torcida1.ogg
+sound_source:0:4:0:20:torcida3.ogg
+sound_source:17:20:0:20:torcida1.ogg
+sound_source:17:20:0:20:torcida3.ogg
+ceiling:none

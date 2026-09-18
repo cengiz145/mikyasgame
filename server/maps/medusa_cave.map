@@ -1,0 +1,18 @@
+map:medusa_cave
+maxx:81
+maxy:60
+platform:0:81:0:carpet
+wall:0:0:60:wallnone
+wall:81:0:60:wallnone
+zone:1:81:0:60:La guarida de Medusa. Al entrar aquí, tus ojos contemplan varias estatuas de hombres y animales que adornan el ambiente convertidos en piedra... Lo que te encanta y al mismo tiempo te hace sentir un sentimiento de incomodidad, es que parecen completamente reales... Y te das cuenta de que puedes convertirte en uno de ellos, cuando te enfrentas a una mezcla de terror y belleza, del monstruo con cabellos de serpientes que con una gran impresión logras visualizar...
+platform:1:80:0:caverna2
+zone:1:1:0:60:Salida de la cueva.
+travelpoint:1:1:0:0:79:0:nemea_cave:Regresas a la cueva anterior.
+staircase:79:80:0:40:caverna
+wall:78:3:60:camerawall
+zone:79:80:40:60:Salida de la cueva. ¿Lo que te espera esta vez es mejor de lo que estás dejando atrás?
+travelpoint:79:80:40:40:1:25:greek_sea:Te sientes aliviado. Muy distinto a la guarida que has dejado atrás, frente a ti está la costa y el vasto océano azul.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera

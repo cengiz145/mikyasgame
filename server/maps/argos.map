@@ -1,0 +1,44 @@
+map:argos
+maxx:106
+maxy:100
+platform:0:106:0:carpet
+wall:0:0:100:wallnone
+wall:106:0:100:wallnone
+zone:1:106:0:100:Argos.
+platform:1:105:0:marsh
+zone:1:106:0:49:Un pantano desagradable. Sal de aquí mientras puedas, porque el barro sucio y las arenas movedizas son tus menores problemas en este lugar.
+quicksand:13:0
+quicksand:13:0
+quicksand:35:0
+quicksand:35:0
+staircase:50:55:0:50:deepsand
+zone:50:55:3:100:El descenso de un barranco. Puedes ver allí abajo un pantano oscuro que emana un olor tan desagradable que puedes sentir desde aquí arriba.
+quicksand:75:0
+quicksand:75:0
+quicksand:105:0
+quicksand:105:0
+platform:1:49:50:grass
+zone:1:1:50:100:Pasaje de regreso al camino que conduce a argos.
+travelpoint:1:1:50:50:262:0:greece:Dejas la región de argos.
+staircase:10:10:50:70:branch
+zone:10:10:50:100:Árbol.
+staircase:20:20:50:70:branch
+zone:20:20:50:100:Árbol.
+staircase:30:30:50:70:branch
+zone:30:30:50:100:Árbol.
+platform:56:100:50:grass
+staircase:60:60:50:70:branch
+zone:60:60:50:100:Árbol.
+staircase:70:70:50:70:branch
+zone:70:70:50:100:Árbol.
+staircase:80:80:50:70:branch
+zone:80:80:50:100:Árbol.
+staircase:90:90:50:70:branch
+zone:90:90:50:100:Árbol.
+zone:100:100:50:100:A lo lejos puedes ver un hermoso huerto. Lo que más te sorprende es que los frutos de los árboles son dorados, como si fueran de oro.
+wall:101:50:100:camerawall
+travelpoint:100:100:50:50:1:0:garden_of_the_hesperides:Entras en el huerto, la belleza de las frutas y su aroma te embriagan. Pero hay algo extraño en el ambiente, sientes un miedo que no corresponde con tanta belleza.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera

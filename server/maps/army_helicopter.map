@@ -1,0 +1,23 @@
+map:army_helicopter
+maxx:11
+maxy:100
+platform:0:10:0:carpet2
+wall:0:0:100:wallglass
+wall:11:0:100:wallglass
+safezone:0:100:0:100
+zone:0:10:0:100:Olá, você está aqui porquê foi convocado para uma missão, aperte shift + enter e descubra o que o aguarda!
+text:1:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+text:2:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+text:3:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+text:4:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+text:5:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+text:6:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+text:7:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+text:8:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+text:9:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+text:10:0:Pressionando enter em qualquer lugar deste helicóptero, vocês vão ser enviados a uma guerra, o seu objetivo é óbvio, vencer esta guerra, preciso que vocês destruam os helicópteros de guerra mandados por Belick, e além disso, sobreviverem ao piór, bom, acho que vocês vão ficar bem, então que deus os guardem, e agora, vão, e que se foda o resto!
+mapdoor:1:10:0:100:50:15:constant_battle:Você pula do helicóptero, caindo de para-quedas.:moved
+sound_source:0:10:0:100:aviaointerno.ogg
+disable:bicicleta
+disable:coordenadas
+ceiling:none

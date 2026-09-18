@@ -1,0 +1,22 @@
+map:favela_bar
+maxx:31
+maxy:20
+platform:1:30:20:wallnone
+platform:1:30:-1:wallnone
+platform:0:31:0:concrete
+wall:0:0:20:wallnone
+wall:31:0:20:wallnone
+zone:0:30:0:20:Pequeno Bar do seu Deni.
+zone:1:1:0:20:Porta de saída.
+zone:8:10:0:20:Uma pequena mesa.
+zone:12:12:0:20:Cadeira.
+zone:20:24:0:20:Balcão.
+sound_source:22:30:2:100:vent.ogg
+travelpoint:1:1:0:0:115:0:slum:Você sai do bar.
+sound_source:0:0:0:20:amb1.ogg
+sound_source:30:30:0:20:fridge2.ogg
+zone:30:30:0:20:Geladeira.
+disable:armas_pretas
+disable:bicicleta
+disable:coordenadas
+ceiling:none

@@ -1,0 +1,179 @@
+map:djmusical_house
+maxx:1001
+maxy:1000
+platform:0:1001:0:carpet
+wall:0:0:1000:wallnone
+wall:1001:0:1000:wallnone
+zone:1:1001:0:1000:casa de djmusical
+ceiling:none
+url:https://stream.zenolive.com/073n9p6fwqruv.aac
+platform:1:20:0:grass
+zone:1:1:0:30:Salida de la casa.
+zone:2:20:0:30:Jardín frontal.
+zone:5:9:0:30:Las plantaciones de este jardín, son las más exuverantes que se pudiese haber visto.
+staircase:5:9:0:15:grass
+zone:15:15:0:30:Una plantación de claveles, hace ver más que diferente, maravilloso este magnífico jardín.
+staircase:15:15:0:15:grass
+zone:20:20:0:30:Pulsa enter para ir al garage.
+platform:1:50:500:metal4
+travelpoint:20:20:0:30:1:500:djmusical_house:Entras, y te sorprendes de todo lo que ves dentro de este cuarto, que aunque es pequeño, guarda cosas interesantes.
+zone:1:50:500:530:Garage.
+wall:51:500:530:camerawall
+zone:1:1:500:530:Salida del garage.
+travelpoint:1:1:500:530:20:0:djmusical_house:Sales del garage.
+zone:5:9:500:530:Automóvil audy 2020.
+zone:13:20:500:530:Ferrary de lujo color azul.
+zone:25:30:500:530:Camioneta mercedes vens.
+zone:33:36:500:530:Automóvil marca niva lada.
+zone:39:43:500:530:Aquí se encuentra una estantería con repuestos para todo tipo de automóviles, y las herramientas correspondientes para las reparaciones.
+zone:45:50:500:530:Sistema de alarma profesional.
+zone:21:50:0:30:Acera al frente de la casa.
+platform:21:50:0:cement2
+zone:24:29:0:30:Fuente con adornos florales.
+platform:24:29:4:water2
+zone:33:36:0:30:Banca para disfrutar de las plantaciones aquí encontradas.
+platform:33:36:3:bridge
+zone:39:39:0:30:Un gran árbol da frezcura a esta área.
+staircase:39:39:0:20:branch
+zone:42:45:0:30:Banca para disfrutar de las plantaciones aquí encontradas.
+platform:42:45:3:bridge
+zone:50:50:0:14:Escaleras de la entrada.
+wall:51:0:14:wallnone
+staircase:50:50:0:15:concreto2
+wall:49:1:30:camerawall
+zone:50:50:15:30:Puerta de entrada.
+wall:51:15:30:wallglass
+door:50:15:52:15:15:none:none:door4open.ogg:door4close.ogg
+door:52:15:50:15:15:none:none:door4open.ogg:door4close.ogg
+platform:52:140:15:concrete12
+zone:52:52:15:30:Puerta de salida.
+zone:53:140:15:30:Pasillo.
+zone:55:62:15:30:Recividor.
+zone:56:60:15:30:Mueble con un espejo, y la figura de un perro.
+zone:62:62:15:30:Maceta con flores rojas.
+zone:64:72:15:30:Cuadro con la fotografía de djmusical y su pareja.
+zone:74:74:15:30:Puerta de la cocina.
+zone:76:81:15:30:Cuadro con la fotografía de la pareja de djmusical sonrriendo, y sosteniendo un ramo de rosas.
+zone:83:86:15:30:Cuadro con la fotografía de djmusical.
+zone:88:88:15:54:Puerta del comedor.
+zone:103:103:15:34:Puerta de la sala de estar.
+zone:105:110:15:30:Cuadro con las fotografías de mi familia.
+zone:112:115:15:30:Cuadro con la fotografía de djmusical y su pareja. él, está interpretando música en un piano, y ella, está cantando.
+zone:117:121:15:30:Cuadro con la imágen de un hermoso paisaje.
+zone:123:125:15:30:Cuadro con la fotografía de Camilo Sesto.
+zone:127:130:15:30:Cuadro con la fotografía del maestro de música de djmusical.
+zone:133:134:15:90:Escaleras de subida a las habitaciones.
+zone:139:139:5:30:Escaleras de bajada al jardín.
+zone:140:140:15:30:Ventana con cortinas blancas.
+wall:141:15:30:wallglass
+staircase:133:134:15:80:carpet3
+wall:132:16:79:camerawall
+wall:135:16:79:camerawall
+staircase:139:139:5:15:concrete5
+wall:138:6:14:camerawall
+wall:140:6:14:camerawall
+platform:125:138:5:concrete4
+zone:125:125:5:14:Entrada al sótano.
+zone:126:138:5:14:Camino al sótano.
+wall:124:5:14:walldoor
+platform:140:145:5:concrete4
+zone:140:144:5:14:Camino al jardín.
+zone:145:145:5:14:Salida al jardín.
+wall:146:5:14:wallglass
+door:74:15:74:35:15:none:none:door13open.ogg:door13close.ogg
+door:74:35:74:15:15:none:none:door13open.ogg:door13close.ogg
+wall:61:35:50:wallglass
+platform:62:87:35:calcada
+zone:62:87:35:50:Cocina.
+zone:62:62:35:50:Ventana con cortinas blancas.
+zone:63:64:35:50:Frigorífico.
+zone:65:67:35:50:Malmo con armarios por abajo y por encima.
+zone:68:72:35:50:Placa bitrocerámica con horno de leña.
+zone:74:74:35:50:Puerta de acceso al pasillo.
+zone:75:79:35:50:Malmo con cajones por abajo, y armarios por ariba.
+zone:80:85:35:50:Mesa con 4 sillas para tomar los alimentos.
+zone:87:87:35:50:Puerta del labadero.
+wall:88:35:50:walldoor2
+door:87:35:89:35:15:none:none:door1open.ogg:door1close.ogg
+door:89:35:87:35:15:none:none:door1open.ogg:door1close.ogg
+platform:89:101:35:concrete4
+zone:89:101:35:50:Labadero.
+zone:89:89:35:50:Puerta de Salida.
+zone:91:93:35:50:Labadora.
+zone:95:96:35:50:Secadora.
+zone:97:99:35:50:Armario para guardar los utencilios de limpieza.
+zone:101:101:35:50:Ventana.
+wall:102:35:50:wallglass
+door:88:15:88:55:15:none:none:door13open.ogg:door13close.ogg
+door:88:55:88:15:15:none:none:door13open.ogg:door13close.ogg
+platform:32:42:55:concrete4
+wall:31:55:60:wallrail
+zone:31:32:55:70:Varandilla.
+zone:33:41:55:70:Terraza.
+zone:42:42:55:70:Puerta de entrada.
+door:42:55:44:55:15:none:none:door5open.ogg:door5close.ogg
+door:44:55:42:55:15:none:none:door5open.ogg:door5close.ogg
+platform:44:101:55:concrete3
+wall:43:55:70:wallglass
+zone:44:101:55:70:Salón comedor.
+zone:44:44:55:70:Puerta de la terraza con cortinas azules.
+zone:46:56:55:70:Sofá de cuero.
+wall:45:58:60:wallcloth
+platform:46:56:58:bicicleta
+zone:57:61:55:70:Mesa con un televisor de 80 pulgadas, y un equipo de música con 4 altavoces.
+platform:58:61:59:wood
+zone:62:72:55:70:Sofá de cuero.
+platform:62:72:58:bicicleta
+wall:73:58:60:wallcloth
+zone:74:81:55:70:Mesa de comedor con 8 sillas.
+platform:74:81:59:wood
+zone:83:86:55:70:Chimenea.
+zone:88:88:55:70:Puerta de acceso al pasillo.
+zone:89:100:55:70:Armario de comedor con 3 cajones, 4 estanterías, y 4 puertas de madera con cristal adornadas, y con fotos de la familia.
+zone:101:101:55:70:Ventana con cortinas blancas.
+wall:102:55:70:wallglass
+platform:103:130:35:carpet2
+door:103:15:103:35:15:none:none:door13open.ogg:door13close.ogg
+door:103:35:103:15:15:none:none:door13open.ogg:door13close.ogg
+zone:103:103:35:45:Puerta de salida.
+zone:104:130:35:45:Sala de estar.
+zone:105:109:35:50:Sofá de terciopelo.
+zone:110:113:35:50:Mesita de centro.
+zone:114:118:35:50:Sofá de terciopelo.
+zone:120:125:35:50:Smart televisión de 60 pulgadas.
+zone:127:130:35:50:Vitrina con varios trofeos y diplomas musicales.
+wall:131:35:50:camerawall
+platform:99:132:80:calcada
+wall:98:80:100:camerawall
+platform:135:155:80:calcada
+wall:156:80:100:camerawall
+zone:99:132:80:100:Pasillo de las habitaciones.
+zone:99:99:80:100:Puerta de la habitación de djmusical.
+zone:109:109:80:100:Puerta de la habitación de invitados.
+zone:119:119:80:100:Puerta del baño.
+zone:135:155:80:100:segundo pasillo.
+zone:145:145:80:100:Habitación de invitados 2.
+zone:155:155:80:100:Entrada a la biblioteca.
+platform:75:99:100:carpet2
+door:99:80:99:100:15:none:none:door2open.ogg:door2close.ogg
+door:99:100:99:80:15:none:none:door2open.ogg:door2close.ogg
+wall:100:100:120:camerawall
+wall:74:100:120:wallglass
+zone:75:99:100:120:Habitación de djmusical.
+zone:99:99:100:120:Puerta de salida.
+zone:95:97:100:120:Guardaropa.
+zone:93:93:100:120:Um grande baú de madeira. Parece trancado.
+zone:90:92:100:120:Espejo.
+zone:88:89:100:120:Un pequeño mueble con instrumentos musicales.
+zone:83:86:100:120:Cama matrimonial.
+zone:80:82:100:120:Mesita de noche con un teléfono, un despertador, y la fotografía de mi pareja.
+zone:78:78:100:120:Computador.
+zone:77:77:100:120:Tomada.
+zone:75:75:100:120:Puerta de la terraza con cortinas azules.
+wall:59:100:105:wallrail
+platform:60:73:100:concrete4
+zone:59:60:100:120:Barandilla.
+zone:61:72:100:120:Terraza.
+zone:73:74:100:120:Puerta de entrada a la habitación.
+door:75:100:73:100:15:none:none:door5open.ogg:door5close.ogg
+door:73:100:75:100:15:none:none:door5open.ogg:door5close.ogg

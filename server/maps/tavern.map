@@ -1,0 +1,20 @@
+map:tavern
+maxx:61
+maxy:20
+platform:0:60:0:concrete3
+wall:0:0:20:wallnone
+wall:61:0:20:wallnone
+zone:0:61:0:20:Taberna.
+zone:1:1:0:20:Porta de saída.
+zone:10:13:0:20:Uma mesa.
+zone:18:19:0:20:Cadeira.
+zone:35:40:0:20:Balcão.
+sound_source:0:60:0:20:calm.ogg
+travelpoint:1:1:0:0:11:0:medieval_world:Você sai da taberna.
+sound_source:0:1:0:20:birds.ogg
+disable:bicicleta
+disable:coordenadas
+ceiling:chuvatelhado.ogg
+sound_source:8:61:0:20:taberna_medieval.ogg
+disable:armas_pretas
+disable:camera

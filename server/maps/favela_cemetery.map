@@ -1,0 +1,27 @@
+map:favela_cemetery
+maxx:100
+maxy:50
+platform:21:40:0:dirt2
+wall:0:0:50:wallfence
+wall:100:0:50:wallgeneric
+platform:1:20:0:grass
+platform:41:57:0:grass
+wall:60:0:9:wallfence
+staircase:58:59:0:10:concrete
+platform:60:99:10:concrete2
+wall:57:1:50:wallfence
+door:60:10:62:10:10:door.ogg:none:door2open.ogg:door2close.ogg
+wall:61:10:50:walldoor2
+door:62:10:60:10:10:door.ogg:none:door2open.ogg:door2close.ogg
+zone:1:20:0:50:Jardim.
+zone:41:57:0:50:Jardim.
+zone:21:40:0:50:Cuidado onde piza; há túmulos por toda parte.
+zone:58:59:0:50:Escadas.
+zone:60:99:10:50:Capela.
+zone:60:60:10:50:Porta de entrada da capela.
+zone:62:62:10:50:Porta de saída da capela.
+zone:1:1:0:50:Você consegue vislumbrar o movimento da favela através deste portão.
+mapdoor:1:1:0:0:60:0:slum:Você deixa o cemitério e retorna ao movimento da favela.:door11close
+sound_source:0:56:6:50:cemiterio.ogg
+safezone:0:100:0:50
+disable:coordenadas

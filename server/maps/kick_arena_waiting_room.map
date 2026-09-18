@@ -1,0 +1,17 @@
+map:kick_arena_waiting_room
+maxx:11
+maxy:10
+platform:0:11:0:carpet
+wall:0:0:10:wallnone
+wall:11:0:10:wallnone
+zone:1:10:0:10:Sala de espera de la arena de patadas.
+disable:varinha
+disable:bicicleta
+disable:camera
+disable:coordenadas
+disable:armas_pretas
+ceiling:none
+safezone:1:10:0:10
+disable:miracima
+disable:mirabaixo
+wall:5:0:5:walldirt

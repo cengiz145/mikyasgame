@@ -1,0 +1,16 @@
+map:hall_of_julius_caesar
+maxx:50
+maxy:20
+platform:1:50:0:carpet
+wall:0:0:20:wallnone
+wall:50:0:20:wallnone
+platform:1:49:0:carpet2
+zone:1:50:0:20:Sala del emperador Julio César.
+zone:1:1:0:20:Pasaje de regreso al palacio imperial...
+zone:2:49:0:20:Esta sala está rodeada de estatuas de deidades, columnas de mármol cubiertas de oro y piedras preciosas. Si no has sido invitado a entrar, sal mientras estés vivo.
+zone:30:40:0:20:Estás frente al grandioso trono de oro. si no has sido invitado a estar aquí, lucha por tu vida!
+mapdoor:1:1:0:0:340:50:imperial_palace:Dejas la sala del emperador.:door6close
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera

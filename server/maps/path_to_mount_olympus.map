@@ -1,0 +1,50 @@
+map:path_to_mount_olympus
+maxx:301
+maxy:350
+platform:0:301:0:carpet
+wall:0:0:350:wallnone
+wall:301:0:350:wallnone
+zone:1:301:0:350:Camino que te llevará a la imponente morada de los dioses. Estás frente a una montaña grande y peligrosa. Un silencio pacífico se apodera de este lugar, lo que te hace sentir que todo aquí es sagrado. Sin embargo, en medio de esta calma, te encuentras con algo que te asusta inmediatamente. Abajo, un volcán profundo y extenso vomita furiosamente un mar de burbujeantes lavas de magma. Un espeso humo tan negro como la noche flota a tu alrededor, e inquietantes sombras parecen bailar ante tus ojos. El aire caliente entra en tus pulmones, y el suelo caliente y desigual bajo tus pies hace que sea cada vez más imposible caminar. Tu visión comienza a oscurecerse gradualmente, y sientes que tu vida se desvanece cada segundo.
+platform:1:301:0:concrete100
+zone:1:1:0:2:Reconociendo tu condición de mera mortal indigna de este lugar, aquí encuentras el regreso a la Isla de Creta.
+travelpoint:1:1:0:2:97:15:crete_island:Con umillación y derrota por tu miserable condición de simple mortal, dejas atrás el camino al Monte Olimpo y regresas a la Isla de Creta. Este es tu lugar ya que no tienes ni la mitad del valor para escalar la montaña y llegar a los dioses sagrados. Mas si viniste de derrotar a los Dioses, eres un humano prodigio, ¡Recuérdalo!
+zone:2:300:0:25:fogo
+staircase:1:1:0:28:terra2
+platform:1:30:30:terra2
+platform:29:30:30:marsh
+platform:34:35:30:marsh
+platform:36:44:30:rocks
+platform:45:45:30:marsh
+staircase:47:47:30:60:dirt
+platform:48:66:60:dirt
+platform:67:67:60:marsh
+platform:72:72:60:gravel
+platform:77:77:60:rocks
+staircase:82:82:45:60:gravel
+platform:83:100:45:dirt4
+platform:101:101:45:marsh
+platform:107:119:45:rocks
+staircase:120:120:45:190:dirt
+platform:140:140:97:gravel
+staircase:145:145:97:230:dirt
+platform:70:144:230:rocks
+staircase:89:89:230:260:rocks
+platform:90:160:260:rocks
+platform:162:162:262:rocks
+platform:164:164:264:rocks
+platform:170:170:264:rocks
+staircase:172:172:264:270:rocks
+platform:173:297:270:rocks
+staircase:298:298:270:299:dirt
+staircase:300:300:0:270:gravel
+zone:300:300:0:0:Una entrada oscura en medio de un fuego terrible. ¿Será que es seguro entrar aquí?
+platform:300:300:300:gravel
+zone:300:300:300:350:Entrada al Monte Olimpo.
+travelpoint:300:300:300:300:1:0:mount_olympus:Después de vencer el largo camino, eres recompensado por tu valentía y entras en el sagrado Monte Olimpo.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:varinha
+sound_source:1:300:0:300:fire.ogg
+sound_source:300:300:300:310:wind2.ogg
+travelpoint:300:300:0:0:1:220:river_styx:cueva.

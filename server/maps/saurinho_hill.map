@@ -1,0 +1,79 @@
+map:saurinho_hill
+maxx:501
+maxy:300
+platform:0:501:0:carpet2
+wall:0:0:15:wallnone
+wall:501:0:15:wallnone
+zone:1:500:0:100:Colina del saurinho.
+platform:1:500:0:concrete4
+zone:1:1:0:20:Regreso a la avenida beira mar.
+travelpoint:1:1:0:0:100:0:seaside_avenue:Regresas al movimiento de la gran avenida.
+zone:4:5:0:20:Justo en la entrada ves una señal de tráfico grabada en letras grandes con las siguientes palabras, Saurinho es el jefe y Fander es un idiota.
+zone:6:60:0:20:Pequeña plaza de la colina, aquí muchas personas comienzan a hacer sus tareas diarias.
+platform:10:15:0:wood
+zone:10:15:0:20:Banco de madera a la sombra de un gran árbol.
+staircase:20:20:0:20:branch
+zone:20:20:0:30:Una gran palmera.
+platform:25:30:0:shortgrass
+zone:25:30:0:20:Un pequeño parche de hierva.
+staircase:26:26:0:45:branch
+zone:26:26:0:50:Un viejo limonero casi sin limones. Parece que ni siquiera un vaso de limonada servirá!
+staircase:40:40:0:50:wood3
+zone:40:40:0:60:Poste de iluminación.
+platform:35:39:50:metal2
+wall:34:50:60:wallbigmetal
+wall:41:50:60:wallbigmetal
+zone:35:39:50:60:Transformador.
+platform:43:43:0:chair
+zone:43:43:0:20:Silla.
+platform:44:45:0:cement
+zone:44:45:0:20:Una mesa vieja para jugar baraja.
+platform:46:46:0:chair
+zone:46:46:0:20:Silla.
+platform:49:49:0:chair
+zone:49:49:0:20:Silla.
+platform:50:51:0:cement
+zone:50:51:0:20:Mesa para jugar dominó.
+platform:52:52:0:chair
+zone:52:52:0:20:Silla.
+platform:54:54:0:chair
+zone:54:54:0:20:Silla.
+platform:55:56:0:cement
+zone:55:56:0:20:Mesa para jugar bingo.
+platform:57:57:0:chair
+zone:57:57:0:20:Silla.
+zone:61:100:0:20:Calle ancha por donde pasan los autos.
+zone:101:200:0:20:Calle de comercio.
+staircase:115:120:0:14:concrete5
+wall:114:1:14:wallfence
+wall:121:1:14:wallfence
+wall:115:15:20:camerawall
+wall:116:15:20:camerawall
+wall:117:15:20:camerawall
+wall:118:15:20:camerawall
+wall:119:15:20:camerawall
+wall:120:15:20:camerawall
+zone:115:120:0:13:Subida hacia la pizzería del saurinho.
+zone:115:120:14:20:Entrada a la pizzería del saurinho.
+travelpoint:115:120:14:14:1:0:pizzería_del_saurinho:Entras en la pizzería y pronto te asaltan los maravillosos aromas, ¡ven a comer! y siéntete como en tu casa.
+zone:185:195:0:20:Entrada a la tiendita de ropas de doña Marta.
+travelpoint:185:195:0:0:1:0:tienda_de_ropas_de_doña_marta:Entras en la tiendita de doña Marta, que camina de un lado a otro atendiendo a todos los clientes con una hermosa sonrisa en su rostro.
+staircase:245:255:0:75:concrete2
+wall:244:1:74:camerawall
+wall:256:1:74:camerawall
+zone:245:255:0:90:Escalada de la colina.
+platform:1:244:75:grass
+zone:1:59:75:100:Esta área está bajo el control de una de las varias pandillas al mando del Jefe Supremo de esta colina.
+staircase:1:1:75:95:branch
+zone:1:1:75:110:Un árbol cuyo tronco es perforado por las miles de balas disparadas aquí todos los días por criminales muy peligrosos.
+staircase:20:20:75:95:branch
+zone:20:20:75:110:Un árbol cuyo tronco es perforado por las miles de balas disparadas aquí todos los días por criminales muy peligrosos.
+zone:60:100:75:100:Fuego de grandes dimensiones hecho por bandidos. Las llamas intensas pueden protegerlos o reportar a un hombre valiente que decide probar el nivel de su miedo al venir a caminar aquí.
+zone:101ç:244:75:100:un matorral espeso.
+staircase:110:110:75:95:branch
+zone:110:110:75:110:Árrbol en medio del matorral.
+staircase:120:120:75:95:branch
+zone:120:120:75:110:Árrbol en medio del matorral.
+staircase:245:246:75:150:terra2
+wall:247:76:149:walldirt
+wall:244:76:149:walldirt

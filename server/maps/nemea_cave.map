@@ -1,0 +1,19 @@
+map:nemea_cave
+maxx:80
+maxy:70
+platform:0:80:0:carpet
+wall:0:0:70:wallnone
+wall:80:0:70:wallnone
+zone:1:80:0:70:Cueva.
+platform:1:79:0:caverna2
+staircase:1:1:0:50:caverna
+wall:2:1:70:wallmina
+zone:1:1:0:49:Un descenso a través de rocas sueltas. Ves rocas gigantescas en el camino, y entre ellas, algunos desniveles. Cualquier resbalón puede ser fatal.
+zone:1:1:50:70:Salida a nemea.
+travelpoint:1:1:50:50:152:0:nemea:Dejas la cueva.
+zone:79:79:0:70:Una guarida oscura y tenebrosa. Te sientes curioso por saber qué puede haber dentro... ¿Pero vale la pena arriesgar tu vida?
+travelpoint:79:79:0:0:1:0:medusa_cave:Es como una pesadilla. Entras en una cueva más oscura que la anterior.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera

@@ -1,0 +1,7 @@
+map:hall_of_faith
+maxx:201
+maxy:200
+platform:0:201:0:carpet
+wall:0:0:20:wallnone
+wall:201:0:20:wallnone
+zone:1:200:0:200:Salón de la fé.

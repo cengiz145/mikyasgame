@@ -1,0 +1,19 @@
+map:medieval_church_es
+maxx:201
+maxy:105
+platform:0:201:0:carpet
+wall:0:0:20:wallnone
+wall:201:0:20:wallnone
+zone:1:200:0:100:Iglesia medieval.
+staircase:1:200:0:100:caverna
+zone:1:100:0:48:Nave lateral.
+zone:1:1:50:52:Salida de esta imensa catedral.
+zone:2:100:50:52:Pasillo de las naves centrales.
+zone:1:100:55:100:Nave lateral.
+zone:30:100:0:45:Gran fila de asientos.
+staircase:30:100:0:45:wood
+staircase:30:100:60:100:wood
+zone:30:100:60:100:Gran fila de asientos.
+zone:101:200:0:100:La nave central se extiende a lo largo de esta inmensa catedral.
+platform:1:200:101:wallnone
+travelpoint:1:1:50:52:85:50:imperial_city:Vuelves al calor de la ciudad.

@@ -1,0 +1,19 @@
+map:lupercal_cave
+maxx:100
+maxy:20
+platform:0:100:0:carpet
+wall:0:0:15:wallnone
+wall:100:0:15:wallnone
+wall:0:0:20:walldirt
+wall:100:0:20:walldirt
+platform:1:99:0:caverna2
+zone:1:1:0:20:Salida de la cueva.
+zone:2:100:0:20:Cueva mítica donde te espera la poderosa y legendaria Loba de Roma.
+platform:31:50:0:water2
+zone:31:50:0:20:Pequeño lago dentro de la cueva. Tal vez ahí es donde se baña la loba.
+ceiling:none
+disable:bicicleta
+disable:camera
+disable:coordenadas
+sound_source:1:100:0:20:a11.ogg
+travelpoint:1:1:0:0:52:70:rome:Dejas la cueva claustrofóbica.

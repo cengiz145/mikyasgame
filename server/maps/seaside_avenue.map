@@ -1,0 +1,16 @@
+map:seaside_avenue
+maxx:101
+maxy:20
+platform:1:101:0:carpet
+wall:0:0:20:wallnone
+wall:101:0:20:wallnone
+zone:1:100:0:20:Avenida beira mar.
+platform:1:100:0:concrete
+zone:1:1:0:20:Salida de la avenida.
+travelpoint:1:1:0:0:61:6:beach_playa:Regresas a la playa.
+zone:50:55:0:20:Puertas de la terminal de autobuses.
+travelpoint:50:55:0:0:1:0:rodoviÃ¡ria:Entras a la terminal.
+zone:100:100:0:20:entrada a la colina del saurinho.
+travelpoint:100:100:0:0:1:0:saurinho_hill:Entras a la colina del saurinho, donde la vaina es loca.
+disable:coordenadas
+disable:camera

@@ -1,0 +1,70 @@
+map:forum
+maxx:100
+maxy:50
+wall:0:0:50:wallgeneric
+platform:1:100:0:carpet
+wall:100:0:100:wallgeneric
+zone:0:100:0:50:Forum
+zone:1:20:0:35:Recepção.
+zone:20:20:0:10:Porta da primeira sala.
+door:20:0:8:15:1:door.ogg:none:door2open.ogg:door2close.ogg
+platform:1:8:15:carpet
+zone:1:8:15:25:Primeira sala.
+wall:9:15:26:wallgeneric
+zone:8:8:15:25:Porta de retorno para a recepção.
+door:8:15:20:0:1:door.ogg:none:door2open.ogg:door2close.ogg
+zone:25:25:0:10:Porta da segunda sala.
+door:25:0:16:15:1:door.ogg:none:door2open.ogg:door2close.ogg
+platform:16:25:15:carpet
+zone:16:25:15:25:Segunda sala.
+door:16:15:25:0:1:door.ogg:none:door2open.ogg:door2close.ogg
+zone:16:16:15:25:Porta de saída.
+wall:15:15:25:wallgeneric
+wall:26:15:25:wallgeneric
+zone:50:51:0:20:Escada.
+staircase:50:51:0:20:wood2
+wall:49:1:19:wallnone
+wall:52:1:19:wallnone
+platform:34:49:20:carpet
+wall:33:20:30:wallgeneric
+platform:52:68:20:carpet
+wall:69:20:30:wallgeneric
+zone:34:68:20:35:Corredor.
+zone:60:60:0:6:Porta da terceira sala.
+door:60:0:60:10:1:door.ogg:none:door2open.ogg:door2close.ogg
+platform:60:75:10:carpet
+wall:59:10:18:wallgeneric
+wall:76:10:18:wallgeneric
+zone:60:75:10:18:Terceira sala.
+zone:60:60:10:15:Porta de retorno.
+door:60:10:60:0:1:door.ogg:none:door2open.ogg:door2close.ogg
+zone:70:70:0:10:Entrada da quarta sala.
+door:70:0:80:20:1:door.ogg:none:door2open.ogg:door2close.ogg
+platform:80:95:20:carpet
+wall:79:20:30:wallgeneric
+wall:96:20:30:wallgeneric
+zone:80:95:20:34:Quarta sala.
+zone:80:80:20:26:Porta de saída.
+door:80:20:70:0:1:door.ogg:none:door2open.ogg:door2close.ogg
+zone:34:34:20:25:Uma porta.
+door:34:20:34:37:1:door.ogg:none:door2open.ogg:door2close.ogg
+platform:34:34:37:carpet
+wall:33:37:50:wallgeneric
+wall:35:37:50:wallgeneric
+wall:34:37:38:wallnone
+zone:34:34:37:45:Sala.
+zone:68:68:20:26:Porta.
+door:68:20:68:32:1:door.ogg:none:door2open.ogg:door2close.ogg
+platform:68:68:32:carpet
+wall:67:32:40:wallgeneric
+wall:69:32:40:wallgeneric
+wall:68:33:33:wallnone
+zone:68:68:33:40:Segunda sala.
+zone:1:1:0:14:Porta de saída.
+sound_source:0:100:0:50:calm.ogg
+ceiling:none
+disable:varinha
+disable:camera
+disable:coordenadas
+disable:bicicleta
+safezone:0:100:0:50

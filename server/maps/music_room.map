@@ -1,0 +1,20 @@
+map:music_room
+maxx:22
+maxy:100
+platform:0:22:0:carpet
+wall:0:0:100:wallnone
+wall:22:0:100:wallnone
+ceiling:none
+platform:1:21:0:carpet2
+zone:1:22:0:10:Sala de música.
+zone:1:1:0:10:Puerta de salida.
+zone:21:21:0:10:Esta puerta conduce a una tiendita humilde.
+travelpoint:21:21:0:0:1:0:general_items_shop:Entras a una tienda bastante humilde y acojedora.
+mapdoor:1:1:0:0:15:40:safe_zone_es:Sales de la sala de música:door6close
+url:https://radio1000.tk/streamproxy/radio1000.mp3
+safezone:1:22:0:10
+disable:camera
+disable:coordenadas
+disable:bicicleta
+disable:varinha
+disable:armas_pretas

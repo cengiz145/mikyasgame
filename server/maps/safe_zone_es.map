@@ -1,0 +1,67 @@
+map:safe_zone_es
+maxx:301
+maxy:60
+ceiling:none
+disable:bicicleta
+disable:camera
+disable:coordenadas
+wall:0:50:60:walldirt
+wall:0:0:49:wallnone
+wall:301:0:60:walldirt
+zone:1:300:0:19:Área proibida.
+platform:1:300:0:montanha
+sound_source:32:300:0:10:caverna2.ogg
+platform:20:300:11:wallnone
+platform:20:300:-1:wallnone
+door:1:2:1:21:0:none:none:none:none
+door:1:3:1:21:0:none:none:none:none
+door:1:4:1:21:0:none:none:none:none
+door:1:5:1:21:0:none:none:none:none
+zone:1:100:20:39:Corredor.
+door:1:20:1:19:0:none:none:none:none
+elevator:10:20:10:40:
+elevator:10:40:10:20
+sound_source:1:30:20:40:calm.ogg
+platform:1:30:40:carpet2
+zone:1:30:40:49:Zona de segurança.
+zone:1:2:40:49:Escada.
+staircase:1:2:40:50:metal3
+wall:3:41:49:wallfence
+platform:4:30:49:wallnone
+platform:1:30:50:concrete2
+zone:1:30:50:60:Laje.
+platform:1:30:60:wallnone
+zone:10:10:20:49:Portas do elevador. Pressione enter para acioná-lo.
+zone:30:30:40:49:Voce ve uma cidade muito movimentada ao longe. Para caminhar até ela, pressione enter.
+travelpoint:30:30:40:40:1:0:city1:llegas a la movimentada ciudad. muchas personas pasan apresuradas a tu lado.
+wall:31:40:49:wallnone
+wall:31:50:60:wallfence
+sound_source:1:30:55:60:wind2.ogg
+platform:1:30:39:wallnone
+wall:0:0:19:walldirt
+platform:1:100:20:caverna2
+platform:1:1:20:bridge
+zone:40:40:20:39:Puerta del salón de clases.
+zone:50:50:20:39:Puerta de la biblioteca.
+zone:60:60:20:39:Puerta de la sala de profesores.
+zone:70:70:20:39:Puerta de la dirección.
+zone:85:85:20:39:Puerta del bano de caballeros.
+zone:90:90:20:39:Puerta del bano de damas.
+wall:101:20:39:camerawall
+zone:5:5:40:49:Puerta de la tienda.
+zone:15:15:40:49:Puerta de la sala de música.
+travelpoint:5:5:40:49:1:0:store:Entras en la tienda.
+mapdoor:15:15:40:49:1:0:music_room:Entras en la sala de música.:door6open
+mapdoor:40:40:20:39:1:0:classroom:Entras en el salón de clases.:door6open
+mapdoor:50:50:20:39:1:0:library:Entras en la biblioteca:door6open
+mapdoor:60:60:20:39:1:0:teachers_room_es:Entras en la sala de profesores.:door6open
+mapdoor:70:70:20:39:1:0:direction_office:Entras en la dirección.:door6open
+travelpoint:85:85:20:39:1:0:bano_masculino_de_la_escuela:Entras en el bano de caballeros.
+travelpoint:90:90:20:39:1:0:bano_femenino_de_la_escuela:Entras en el bano de damas.
+zone:20:20:40:49:Puerta de la sala de espera de la arena de patadas.
+disable:varinha
+zone:30:30:50:50:enter to the fighting zone
+mapdoor:30:30:50:50:1:0:fighting_zone:you enter in the fighting_zone.:cement
+staircase:1:2:40:50:metal
+staircase:1:2:40:50:metal4
+staircase:1:2:40:50:metal3

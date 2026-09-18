@@ -1,0 +1,89 @@
+map:babylon
+maxx:1000
+maxy:100
+platform:1:1000:0:carpet
+wall:0:0:50:wallnone
+wall:1000:0:50:wallnone
+wall:0:0:50:wallarvore
+wall:1000:0:50:wallarvore
+zone:1:1000:0:100:Babilonia.
+zone:1:1:50:100:Salida de Babilonia.
+platform:1:49:50:grass
+platform:50:80:50:shallow
+platform:81:139:50:grass
+zone:50:80:50:100:Río Tigre.
+platform:85:100:50:matos
+zone:85:100:50:100:Una plantación.
+platform:140:240:50:terra2
+zone:140:240:50:100:Plaza Central.
+staircase:160:165:50:80:concrete5
+wall:159:51:100:camerawall
+wall:166:51:100:camerawall
+zone:160:165:50:79:Las imponentes escaleras al templo de Ishtar.
+zone:160:165:80:100:Portones de entrada del templo.
+zone:190:195:50:100:Bancos alrededor de la plaza.
+zone:200:210:50:100:Área de comercio.
+zone:216:220:50:100:Bancos alrededor de la plaza.
+staircase:230:235:50:80:concrete5
+wall:229:51:100:camerawall
+wall:236:51:100:camerawall
+zone:230:235:50:79:Grandiosas escaleras al templo de shamas, el dios sol.
+platform:241:339:50:grass
+platform:340:400:50:terra2
+zone:340:400:50:100:Plaza de la justicia. Donde los enemigos del rey son juzgados y ejecutados.
+zone:345:355:50:100:Desde estos bancos la gente asiste a los juicios y condenas.
+zone:365:375:50:100:Entrada del pozo de los leones. Desde el fondo se escuchan los gritos de los condenados.
+zone:385:395:50:100:En esta majestuosa plataforma el rey juzga y condena a sus enemigos.
+platform:401:649:50:grass
+platform:650:705:50:terra2
+zone:650:705:50:100:Frente al palacio real.
+staircase:670:680:50:80:concrete5
+wall:669:52:100:wallfence
+wall:681:52:100:wallfence
+zone:670:680:50:79:Lujosas escaleras que conducen al palacio.
+zone:670:680:80:100:Estás en las puertas del palacio. No entres sin ser invitado, o te arrepentirás.
+staircase:700:705:50:80:concrete5
+wall:699:52:100:wallarvore
+wall:706:52:79:wallarvore
+zone:700:705:50:79:Escalera de mármol adornada con flores.
+staircase:600:602:50:60:matos
+zone:600:602:50:60:Arbusto.
+staircase:630:632:50:80:branch
+zone:630:632:50:80:Árbol.
+platform:706:784:80:grass
+zone:700:790:80:100:Jardines suspendidos de Babilonia.
+zone:712:715:80:100:Rosales.
+staircase:725:728:80:85:branch
+zone:725:728:80:85:Helechos.
+zone:735:738:80:100:Claveles.
+zone:744:747:80:100:Cactus.
+platform:750:755:80:concrete5
+zone:750:755:80:100:Bancos.
+zone:760:763:80:100:Violetas.
+zone:777:780:80:100:Jazmín.
+wall:791:52:100:wallarvore
+staircase:785:790:50:80:concrete5
+wall:784:52:79:wallarvore
+zone:785:790:50:79:Escalera de mármol adornada con flores.
+platform:706:784:50:grass
+platform:791:909:50:grass
+platform:910:960:50:shallow
+zone:910:960:50:100:Río éufrates.
+platform:961:999:50:grass
+sound_source:1:49:50:70:a9.ogg
+sound_source:50:80:50:70:water3.ogg
+travelpoint:1:1:50:60:300:0:antiquity:Regresas a la antigüedad
+travelpoint:160:165:80:85:1:0:templo_de_Ishtar:El templo de Shtar. Ishtar encarnaba la fuerza creadora y destructiva de la vida, representada por las fases de la Luna. Dueña de una belleza impresionante capaz de volver loco a un hombre y causar envidia en las mujeres, esta deidad también es conocida como la diosa del amor y la fertilidad, además de ser llamada la dama de la lucha. Entonces prepárate, vencerla no será fácil.
+zone:230:235:80:100:Entrada del templo.
+travelpoint:230:235:80:85:1:0:temple_of_shamash:Entras en el templo de Shamas. La grandeza del templo del dios sol le causa un sentimiento de intimidación.
+staircase:365:375:0:50:terra2
+wall:364:0:49:camerawall
+zone:365:375:0:49:Escaleras sucias de sangre.
+platform:376:449:0:terra
+wall:450:0:49:walldirt
+zone:376:450:0:30:Pozo de los leones.
+travelpoint:670:680:80:80:1:0:palace:Entras en el grandioso palacio real.
+disable:coordenadas
+disable:bicicleta
+disable:camera
+ceiling:none

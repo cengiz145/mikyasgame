@@ -1,0 +1,7 @@
+map:the_engineer's_house
+maxx:100
+maxy:50
+platform:0:100:0:carpet
+wall:0:0:20:wallnone
+wall:100:0:20:wallnone
+mapdoor:1:2:9:11:6:0:rainforest:You leave the house.:door11close

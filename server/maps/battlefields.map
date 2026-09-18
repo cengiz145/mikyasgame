@@ -1,0 +1,31 @@
+map:battlefields
+maxx:491
+maxy:100
+platform:0:491:0:carpet
+wall:0:0:100:wallnone
+wall:491:0:100:wallnone
+zone:1:490:0:100:Campos de batalla.
+platform:1:29:0:terra
+zone:1:1:0:50:SALIDA DE LOS CAMPOS DE BATALLA.
+zone:2:20:0:50:Aquí, en este campo, los soldados franceses e ingleses están inmersos en grandes y agotadoras batallas. Esta guerra que ha durado un siglo, ¿terminará?
+zone:21:30:0:50:Acercándose al campamento de la tropa francesa.
+ceiling:none
+platform:30:198:0:grass2
+zone:31:198:0:50:Campamento de la tropa francesa. Varios soldados habitan este lugar, preparándose para la batalla.
+staircase:60:60:0:20:branch
+zone:60:60:0:50:Árbol.
+staircase:80:80:0:20:branch
+zone:80:80:0:50:Árbol.
+platform:100:130:0:dirt2
+zone:100:130:0:50:Aquí se han instalado varias tiendas de campaña.
+zone:110:120:0:50:Hoguera.
+sound_source:110:120:0:20:fire1.ogg
+staircase:150:150:0:20:branch
+zone:150:150:0:50:Árbol.
+staircase:160:160:0:20:branch
+zone:160:160:0:50:Árbol.
+platform:175:185:0:wood
+zone:175:185:0:50:Aquí se encuentra el general de la tropa, listo para la batalla.
+staircase:199:200:0:30:wood2
+zone:199:200:0:50:Escaleras hacia el puente de un río.
+platform:201:215:30:unstableplank

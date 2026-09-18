@@ -1,0 +1,19 @@
+1. All players, administrators included, must respect one another, regardless of country, sexuality or standing in the game.
+2. Repetitive messages are forbidden, as are messages promoting pornography or glorifying crime.
+3. Blasphemy:
+Thanking someone for a kind act is allowed, but exchanging messages about religion, sanctity or similar topics is forbidden. Players involved may have their communication channels removed for an indefinite period.
+4. Bugs:
+Any bug found in the game must be reported with the /adm command.
+A bug is any command or method that crashes the game, mobs giving experience out of proportion to their difficulty, and so on.
+Obtaining an advantage for yourself or others through a bug is treated as a serious offence and may lead to the permanent deletion of the characters involved.
+5. Connections:
+Breaking these rules leads to the deletion of the characters involved.
+Creating more than one character is allowed. Connecting from several accounts at once is not.
+If more than one person plays from the same location, they must tell the administrators and wait for permission to connect from the same IP.
+Every character belongs to one person only, so giving away or lending characters to others is forbidden.
+6. Do not provoke players who do not enjoy it. If you provoke someone and they tell you they do not like it, the least you can do is respect that, in line with the first rule.
+7. When you buy an item in the shop, you automatically accept that it may be removed at any time if the administrators decide you were in the wrong.
+If you do not accept this rule and have already bought an item, you may request a refund within 10 days, with proof of purchase.
+Any other problem not covered by these rules will be assessed and judged by an administrator, whose decision is final.
+If you do not agree with these rules, please disconnect from the game immediately.
+The rules set out here must be followed strictly in the main chat to prevent future problems, and may change at any time without prior notice from an administrator.

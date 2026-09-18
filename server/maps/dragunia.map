@@ -1,0 +1,66 @@
+map:dragunia
+maxx:500
+maxy:500
+platform:0:500:0:jumpjet
+wall:0:0:20:wallnone
+wall:500:0:20:wallnone
+zone:0:500:0:500:dragunia
+platform:1:500:0:dirt4
+wall:500:0:500:walldirt
+platform:1:10:40:rocks
+platform:11:15:40:deepsand
+platform:16:30:40:sand
+platform:31:40:40:deepsand
+platform:41:49:40:rocks
+staircase:50:50:20:40:montanha
+staircase:50:50:40:60:matos
+wall:51:21:59:walldirt
+platform:51:60:60:sand
+wall:61:60:500:walldirt
+zone:60:60:60:60:entrance to dinosaurus land
+platform:51:500:20:dirt4
+wall:49:20:39:walldirt
+wall:500:20:500:walldirt
+staircase:100:100:0:20:terra
+wall:107:0:19:walldirt
+wall:99:0:19:walldirt
+staircase:120:120:0:20:terra
+wall:119:0:19:walldirt
+wall:127:0:19:walldirt
+staircase:140:140:0:20:terra
+wall:139:0:19:walldirt
+wall:147:0:19:walldirt
+staircase:160:160:0:20:terra
+wall:159:0:19:walldirt
+wall:167:0:19:walldirt
+staircase:180:180:0:20:terra
+wall:179:0:19:walldirt
+wall:187:0:19:walldirt
+staircase:200:200:0:20:terra
+wall:199:0:19:walldirt
+wall:207:0:19:walldirt
+staircase:220:220:0:20:terra
+wall:219:0:19:walldirt
+wall:227:0:19:walldirt
+staircase:240:240:0:20:terra
+wall:239:0:19:walldirt
+wall:247:0:19:walldirt
+staircase:260:260:0:20:terra
+wall:259:0:19:walldirt
+wall:267:0:19:walldirt
+staircase:280:280:0:20:terra
+wall:279:0:19:walldirt
+wall:287:0:19:walldirt
+zone:286:286:0:0:entrance to the dragons cave
+sound_source:2:40:40:50:a13.ogg
+sound_source:1:40:40:50:a3.ogg
+sound_source:50:500:15:30:montanha.ogg
+wall:0:0:500:walldirt
+zone:1:1:40:40:dragunia exit.
+staircase:1:1:0:40:rocks
+zone:1:1:0:39:up to the dragunia
+sound_source:1:1:0:35:montanha.ogg
+mapdoor:1:1:40:40:200:20:vulcan_to_dragunia:you back to the vulcan:none
+zone:1:0:0:39:upper stairs to the dragunia
+zone:1:1:0:39:upper stairs to the dragunia
+mapdoor:286:286:0:0:1:0:firstdragonscave:you enter the dragon scave.:metal

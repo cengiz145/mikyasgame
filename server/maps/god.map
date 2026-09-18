@@ -1,0 +1,8 @@
+map:god
+maxx:50
+maxy:50
+platform:0:50:0:metal2
+wall:0:0:20:wallnone
+wall:50:0:20:wallnone
+zone:1:50:0:50:god
+staircase:1:1:0:50:bleacher

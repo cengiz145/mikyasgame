@@ -1,0 +1,28 @@
+map:slum_church
+maxx:41
+maxy:40
+platform:0:41:0:concrete3
+wall:0:0:40:wallnone
+wall:41:0:40:wallnone
+zone:0:40:0:40:Uma pequena igreja silenciosa.
+zone:1:1:0:40:Porta de saída.
+travelpoint:1:1:0:0:22:50:slum:Você volta ao movimento da favela.
+zone:10:20:0:40:Bancos.
+zone:25:27:0:40:Perto do altar.
+staircase:28:28:0:5:wood
+zone:28:28:0:40:Escada.
+platform:29:34:5:concrete2
+zone:29:34:5:40:Altar.
+zone:35:35:0:40:Escada.
+staircase:35:35:0:5:wood
+zone:36:40:0:40:Detrás do altar.
+zone:40:40:0:40:Aqui há uma bacia de pedra ornamentada, cheia de água cristalina.
+safezone:0:40:0:40
+platform:29:34:0:wallnone
+platform:29:34:1:wallnone
+platform:29:34:2:wallnone
+platform:29:34:3:wallnone
+platform:29:34:4:wallnone
+disable:bicicleta
+disable:coordenadas
+ceiling:none

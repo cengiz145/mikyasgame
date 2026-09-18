@@ -1,0 +1,13 @@
+map:test
+maxx:201
+maxy:20
+platform:1:200:0:terra2
+platform:1:200:20:wallnone
+platform:1:200:-1:wallnone
+wall:0:0:20:wallnone
+wall:201:0:20:wallnone
+ceiling:none
+zone:0:200:0:20:teste!
+staircase:10:10:0:10:asfalto3
+platform:10:20:10:beam
+monster:test:50:0:500:10:3

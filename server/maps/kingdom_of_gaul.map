@@ -1,0 +1,35 @@
+map:kingdom_of_gaul
+maxx:200
+maxy:60
+platform:1:200:0:carpet
+wall:0:0:60:wallnone
+wall:200:0:60:wallnone
+platform:1:200:0:terra
+zone:1:200:0:60:Reino de Galia.
+zone:1:1:0:60:Pasaje de regreso a Roma.
+staircase:10:10:0:20:branch
+zone:10:10:0:60:Un hermoso roble.
+staircase:20:20:0:20:branch
+zone:20:20:0:60:Una higuera imponente.
+staircase:30:30:0:20:branch
+zone:30:30:0:60:Una alta granadilla.
+staircase:40:40:0:20:branch
+zone:40:40:0:60:Una alta granadilla.
+staircase:50:50:0:20:branch
+zone:50:50:0:60:hermoso manzano lleno de manzanas brillantes.
+staircase:60:60:0:20:branch
+zone:60:60:0:60:Bello platanar.
+staircase:55:55:0:40:rocks
+zone:55:55:0:60:Camino estrecho a la cima de un monte.
+platform:56:124:40:grass
+zone:56:124:40:60:Monte de los aullidos.
+staircase:125:125:0:40:rocks
+zone:125:125:0:60:Camino estrecho a la cima de un monte.
+platform:181:198:0:carpet2
+zone:181:198:0:60:Aquí está la tienda del jefe de todo el territorio de la Galia. Alfombras calientes y lana están esparcidas por el suelo. También aquí puedes ver varios tazones de sopa y grandes rebanadas de carne sobre hermosas rebanadas de pan blanco. Deliciosos manjares que se disponen en tablones de roble que se acentúan sobre los troncos cortados de los densos bosques de este lugar. Espadas, lanzas y arcos cuelgan de las paredes. Es increíble cómo son las cosas, porque estos muchachos les causan muchos problemas a los romanos y, a menudo, con menos recursos. Coraje!
+wall:199:0:60:walldebris
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera
+travelpoint:1:1:0:0:405:10:rome:Dejas el reino de galia.

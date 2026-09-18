@@ -1,0 +1,116 @@
+map:jordan_apartment
+maxx:50
+maxy:500
+
+wall:0:0:50:wallnone
+
+safezone:0:31:0:50
+
+platform:1:10:0:carpet2
+
+zone:1:10:0:20:Sala de estar.
+
+zone:1:1:0:20:Porta de saída.
+
+zone:9:10:0:20:Porta de acesso ao corredor.
+
+zone:5:5:0:20:Televisão.
+
+zone:3:3:0:20:Poltrona.
+
+zone:7:7:0:20:Poltrona.
+
+platform:11:20:0:carpet
+
+zone:11:20:0:20:Corredor.
+
+zone:11:11:0:20:Porta de acesso à sala.
+
+wall:10:0:20:walldoor2
+
+door:9:0:11:0:200:door.ogg:none:door2open.ogg:door2close.ogg
+
+door:11:0:9:0:200:door.ogg:none:door2open.ogg:door2close.ogg
+
+zone:14:14:0:20:Porta de acesso ao quarto.
+
+zone:16:16:0:20:Porta de acesso ao banheiro.
+
+door:14:0:10:21:1:door.ogg:none:door2open.ogg:door2close.ogg
+
+door:10:21:14:0:1:door.ogg:none:door2open.ogg:door2close.ogg
+
+door:16:0:20:21:1:door.ogg:none:door2open.ogg:door2close.ogg
+
+door:20:21:16:0:1:door.ogg:none:door2open.ogg:door2close.ogg
+
+platform:1:10:21:carpet2
+
+zone:1:10:21:50:Quarto.
+
+zone:1:1:21:50:Tomada.
+
+zone:2:2:21:50:Computador.
+
+zone:4:4:21:50:Criado mudo.
+
+zone:5:5:21:50:Cama.
+
+zone:6:6:21:50:Um grande baú de madeira. Parece trancado.
+
+zone:8:8:21:50:Guarda-roupa.
+
+zone:10:10:21:50:Porta de acesso ao corredor.
+
+wall:11:21:50:wallnone
+
+platform:12:20:21:cement
+
+zone:12:20:21:50:Banheiro.
+
+zone:12:12:21:50:Chuveiro.
+
+zone:14:14:21:50:Vaso sanitário.
+
+zone:16:16:21:50:Pia.
+
+zone:20:20:21:50:Porta de acesso ao corredor.
+
+wall:21:21:50:wallnone
+
+zone:21:30:0:20:Cozinha.
+
+zone:20:21:0:20:Porta de acesso a cozinha.
+
+wall:21:0:20:walldoor2
+
+door:20:0:22:0:200:door.ogg:none:door2open.ogg:door2close.ogg
+
+door:22:0:20:0:200:door.ogg:none:door2open.ogg:door2close.ogg
+
+zone:22:22:0:20:Porta de acesso ao corredor.
+
+platform:22:30:0:concrete3
+
+platform:24:24:0:chair
+
+zone:24:24:0:20:Cadeira.
+
+zone:26:26:0:20:Mesa.
+
+zone:28:28:0:20:Pia.
+
+zone:30:30:0:20:Geladeira.
+
+wall:31:0:50:wallnone
+
+disable:bicicleta
+
+disable:camera
+
+disable:coordenadas
+
+disable:varinha
+
+ceiling:none
+travelpoint:1:1:0:0:45:360:apartment_building:Você sai do apartamento.

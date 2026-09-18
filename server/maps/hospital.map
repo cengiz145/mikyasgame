@@ -1,0 +1,30 @@
+map:hospital
+maxx:101
+maxy:60
+wall:0:11:160:wallgeneric
+wall:0:0:10:wallfence
+wall:101:0:60:wallgeneric
+platform:11:100:0:concrete4
+wall:95:1:19:wallcone
+wall:95:21:39:wallcone
+staircase:96:100:0:40:concrete4
+platform:1:100:20:concrete
+platform:1:100:40:concrete
+zone:96:100:0:50:Escadas
+platform:1:10:0:concrete3
+zone:2:10:0:19:Main entrance
+zone:1:1:0:19:Portão principal
+travelpoint:30:30:40:40:1:0:icu_room:Você entra no quarto.
+sound_source:0:100:0:60:calm.ogg
+zone:11:95:0:5:recepção
+sound_source:0:8:0:5:birds.ogg
+zone:0:95:20:39:Um longo corredor, ladeado por portas e mais portas de quartos numerados.
+zone:96:100:20:20:Um longo corredor, ladeado por portas e mais portas de quartos numerados.
+zone:50:100:40:60:Centro Cirúrgico.
+zone:1:49:40:60:Centro de tratamento e terapia intensiva.
+zone:30:30:40:60:Porta conduzindo a um quarto no CTI.
+safezone:0:100:0:160
+door:10:0:12:0:1:door.ogg:none:door2open.ogg:door2close.ogg
+wall:11:0:19:wallscreen
+door:12:0:10:0:1:door.ogg:none:door2open.ogg:door2close.ogg
+ceiling:none

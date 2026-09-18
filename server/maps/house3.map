@@ -1,0 +1,223 @@
+map:house3
+maxx:401
+maxy:300
+disable:bicicleta
+disable:varinha
+disable:coordenadas
+disable:camera
+ceiling:none
+platform:0:40:0:grama
+zone:1:40:0:50:Jardim.
+b:0:0:20:bordametal2
+zone:5:5:0:20:Um lindo botao de ouro está plantado aqui.
+e:5:5:0:10:grama
+zone:15:15:0:20:Uma delicada calendula está plantada aqui. Suas lindas flores de cor laranja e amarela, desabrocham belamente neste magnífico jardim.
+e:15:15:0:10:grama
+zone:20:20:0:20:Um lindo pé de cravina. As pétalas das coloridas e pequenas flores, mesclam-se entre as cores de branco, vermelho e rosa.
+e:20:20:0:10:grama
+zone:25:25:0:20:Um magnífico pé de girassol.
+e:25:25:0:10:grama
+zone:30:30:0:20:Exalando um aroma inibriante, aqui se encontra um belo pé de lavandas.
+e:30:30:0:10:grama
+zone:35:35:0:20:Uma linda plantaçao de alisso. Seu perfume maravilhoso faz voce nunca mais querer sair deste jardim.
+e:41:45:0:50:areia
+zone:41:45:0:65:Uma pequena estradinha que conduz para o alto.
+b:46:0:49:bordametal2
+b:40:1:49:bordametal2
+platform:46:54:50:areia2
+zone:46:54:50:60:Pequeno caminho de pedras que conduz a casa.
+platform:55:111:50:carpete
+zone:55:70:50:70:Sala.
+zone:62:62:50:60:Smart tv.
+zone:64:64:50:60:Poutrona.
+zone:67:69:50:60:Um magnífico piano de calda está aqui.
+zone:71:84:50:60:Corredor.
+zone:85:110:50:60:Cozinha.
+zone:88:88:50:60:Cadeira.
+zone:89:92:50:60:Uma grande mesa de jantar.
+platform:89:92:50:madeira
+zone:93:93:50:60:Cadeira.
+zone:95:95:50:60:Geladeira.
+s:95:95:55:55:a6
+zone:98:100:50:60:Pia da cozinha.
+zone:103:103:50:60:Microondas.
+zone:104:104:50:60:Forno elétrico.
+zone:105:105:50:60:Fogao.
+zone:107:110:50:60:Armário de aço inox.
+e:75:77:50:70:carpete3
+zone:75:77:50:80:Escada para o segundo andar.
+b:74:51:69:bordacone
+b:78:51:69:bordacone
+platform:20:74:70:carpete
+b:19:70:100:jogador/cameraborda
+zone:30:30:70:80:Entrada para a suite particular.
+platform:20:31:81:carpete2
+zone:30:30:81:91:Saída do quarto.
+zone:20:29:81:91:Quarto.
+zone:20:20:81:91:Computador.
+zone:21:21:81:91:Criado mudo.
+zone:23:24:81:91:Cama de casal.
+zone:25:25:81:91:Um grande baú de madeira. Parece trancado.
+zone:27:27:81:91:Entrada do closet.
+door:54:50:56:50:200:nada:nada:6abrir:6fechar
+door:56:50:54:50:200:nada:nada:6abrir:6fechar
+door:30:70:30:81:nada:nada:nada:2abrir:2fechar
+door:30:81:30:70:nada:nada:nada:2abrir:2fechar
+door:31:81:33:81:200:nada:nada:2abrir:2fechar
+door:31:81:33:81:200:nada:nada:2abrir:2fechar
+door:33:81:31:81:200:nada:nada:2abrir:2fechar
+zone:31:74:70:80:Corredor.
+zone:20:29:70:80:Corredor.
+b:55:50:60:bordavidro1
+b:32:81:91:bordaporta3
+zone:31:31:81:91:Entrada para o banheiro.
+platform:33:50:81:concreto6
+zone:32:50:81:91:Banheiro.
+b:51:81:100:jogador/cameraborda
+zone:35:35:81:91:Pia.
+zone:37:37:81:91:Vaso sanitário.
+zone:50:50:81:91:Chuveiro.
+zone:49:49:81:91:Pressione enter para entrar na jacuzzi.
+platform:40:49:92:água3
+door:49:81:49:92:nada:nada:nada:nada:nada
+door:49:92:49:81:nada:nada:nada:nada:nada
+b:50:92:102:bordaágua
+b:39:92:102:bordaágua
+zone:40:50:92:102:Jacuzzy.
+zone:49:49:92:102:Para sair da jacuzzi pressione enter.
+zone:55:55:70:80:Entrada de um quarto.
+platform:55:65:81:carpete2
+b:54:81:91:jogador/cameraborda
+zone:55:55:81:91:saída do quarto.
+zone:56:65:81:91:Quarto.
+zone:58:58:81:91:Cama.
+zone:59:59:81:91:Criado mudo.
+zone:60:60:81:91:Um grande espelho.
+zone:62:65:81:91:Um grande guarda-roupas.
+b:66:81:91:jogador/cameraborda
+door:55:70:55:81:nada:nada:nada:2abrir:2fechar
+door:55:81:55:70:nada:nada:nada:2abrir:2fechar
+platform:78:120:70:carpete
+zone:78:120:70:80:Corredor.
+zone:85:85:70:80:Entrada de um quarto
+platform:85:95:81:carpete2
+b:84:81:91:jogador/cameraborda
+zone:85:85:81:91:Saída do quarto.
+zone:86:95:81:91:Quarto.
+zone:88:88:81:91:Cama.
+zone:89:89:81:91:Criado mudo.
+zone:90:90:81:91:Um grande espelho.
+zone:91:95:81:91:Um grande guarda-roupas.
+b:96:81:91:jogador/cameraborda
+door:85:70:85:81:nada:nada:nada:2abrir:2fechar
+door:85:81:85:70:nada:nada:nada:2abrir:2fechar
+zone:100:100:70:80:entrada para o banheiro.
+platform:100:115:81:concreto6
+b:99:81:91:jogador/cameraborda
+zone:101:115:81:91:banheiro.
+zone:105:105:81:91:Pia.
+zone:110:110:81:91:Vaso sanitário.
+b:116:81:91:jogador/cameraborda
+zone:115:115:81:91:Chuveiro.
+zone:100:100:81:91:Saída do banheiro.
+door:100:70:100:81:nada:nada:nada:2abrir:2fechar
+door:100:81:100:70:nada:nada:nada:2abrir:2fechar
+b:121:70:80:bordacone
+platform:122:140:70:carpete3
+zone:120:120:70:80:Entrada para a bibliotéca.
+door:120:70:122:70:200:nada:nada:6abrir:6fechar
+door:122:70:120:70:200:nada:nada:6abrir:6fechar
+b:141:70:80:jogador/cameraborda
+zone:122:140:70:80:Biblioteca.
+zone:125:127:70:80:Grande mesa.
+zone:129:129:70:80:Cadeira.
+zone:130:130:70:80:Mesa.
+zone:131:131:70:80:Cadeira.
+zone:134:136:70:80:Uma alta prateleira com diversos livros.
+door:27:81:27:92:nada:nada:nada:13abrir:13fechar
+door:27:92:27:81:nada:nada:nada:13abrir:13fechar
+platform:20:35:92:concreto4
+b:36:92:102:jogador/cameraborda
+zone:27:27:92:102:Saída do closet.
+zone:20:26:92:102:Closet.
+zone:28:35:92:102:Closet.
+b:112:50:60:bordaporta2
+zone:111:111:50:60:Saída para a varanda da casa.
+platform:113:200:50:concreto
+door:111:50:113:50:200:nada:nada:6abrir:6fechar
+door:113:50:111:50:200:nada:nada:6abrir:6fechar
+zone:112:200:50:65:Varanda.
+zone:120:120:50:60:Máquina de lavar roupa.
+zone:125:127:50:60:Lavatório.
+zone:130:135:50:60:Secador de roupas.
+zone:145:200:50:90:área de lazer.
+zone:150:150:50:60:Cadeira.
+zone:151:153:50:60:Mesa.
+platform:151:153:50:concreto6
+zone:154:154:50:60:Cadeira.
+zone:158:158:50:60:Cadeira.
+zone:159:162:50:60:Mesa.
+platform:159:162:50:concreto6
+zone:163:163:50:60:Cadeira.
+zone:170:173:50:60:Fogao a lenha.
+s:170:174:50:55:fire1
+zone:174:176:50:60:Churrasqueira.
+zone:180:182:50:60:Frigobar.
+zone:185:187:50:60:Mesa de som.
+zone:188:191:50:60:Uma imensa caixa de som se encontra aqui.
+zone:195:195:50:80:Uma árvore gigante faz sombra por toda esta área.
+e:195:195:50:70:árvore
+platform:200:250:50:poeira
+zone:200:250:50:60:Quintal de terra da casa.
+platform:250:300:50:areia_fina
+zone:250:300:50:60:Areia fofa.
+zone:280:300:50:60:Ao longe voce avista uma pequena praia.
+platform:301:330:50:areia_fina
+zone:301:330:50:60:Praia.
+platform:331:354:50:areia_movediça
+zone:331:354:50:60:Areia molhada da praia.
+platform:355:365:50:brejo
+zone:355:365:50:60:aqui as pequenas ondas se quebram aos seus pés.
+platform:366:380:50:água3
+zone:366:380:50:60:Parte mais funda do mar.
+e:381:400:0:50:água3
+zone:381:400:0:60:Aqui o mar se torna impetuoso e inexorável. As gigantescas e fortes ondas vem e vao se arrebentando umas contra as outras.
+s:330:360:38:40:clima9
+s:360:385:42:46:clima9
+s:380:400:0:48:fundodomar2
+b:380:0:49:bordaágua
+b:400:0:300:bordaágua
+e:200:205:50:60:areia2
+b:199:51:70:bordametal2
+b:206:51:70:bordametal2
+zone:200:205:50:70:Degraus de pedras que leva ao escritório.
+zone:205:205:60:79:Entrada para o escritório.
+platform:200:250:80:carpete2
+door:205:60:205:80:nada:nada:nada:4abrir:4fechar
+door:205:80:205:60:nada:nada:nada:4abrir:4fechar
+b:199:80:100:bordavidro1
+b:251:80:100:bordavidro1
+zone:200:250:80:100:Escritório.
+zone:205:205:80:100:Saída para a parte externa do escritório.
+b:40:50:60:bordametal2
+zone:54:54:50:60:Entrada da casa.
+zone:33:33:81:91:Saída do banheiro.
+zone:29:29:92:102:Guarda-roupas.
+b:0:0:30:bordametal2
+zone:113:112:50:60:Entrada para a cozinha da casa.
+zone:112:113:50:60:Entrada para a cozinha da casa.
+s:146:195:53:55:pássaros9
+s:145:190:54:55:pássaros12
+s:260:400:53:60:oceano2
+zone:56:56:50:60:Porta de acesso ao exterior da casa.
+zone:122:122:70:80:Porta de acesso ao corredor.
+sg:0:401:0:300
+s:1:40:0:10:pássaros26
+disable:esfera
+disable:armas_pretas
+disable:miracima
+disable:mirabaixo
+zone:1:1:0:0:Saída da casa.
+travelpoint:1:1:0:0:230:1:vila_residencial:Voce sai da casa.
+piano:montado
+zone:330:330:50:91:Computador.

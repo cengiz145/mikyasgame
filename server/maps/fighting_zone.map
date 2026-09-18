@@ -1,0 +1,16 @@
+map:fighting_zone
+maxx:100
+maxy:100
+platform:0:100:0:cement3
+wall:0:0:20:wallnone
+wall:100:0:20:wallnone
+platform:1:100:0:concrete2
+wall:0:0:40:wallbarricada
+wall:100:0:40:wallbarricada
+zone:0:100:0:100:fighting_zone
+staircase:99:99:0:20:beam
+platform:1:98:20:concrete2
+ceiling:fighting_zone
+ceiling:warfield
+disable:varinha
+disable:bicicleta

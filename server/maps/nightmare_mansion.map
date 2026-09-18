@@ -1,0 +1,64 @@
+map:nightmare_mansion
+maxx:2100
+maxy:800
+platform:1:2100:0:calcada
+platform:1:60:0:snow
+wall:0:0:800:wallbank
+zone:1:1:0:30:Gran muralla de piedra que conduce a la salida de esta mansión.
+sound_source:1:60:0:20:floresta2.ogg
+zone:2:59:0:30:patio frontal. aquí un hermoso paisaje blanco se extiende hasta donde tus ojos pueden ver. grandes capas de nieve cubren en su totalidad el bello jardín de esta mansión.
+mapdoor:1:1:0:0:360:460:mountain:Dejas la mansión atrás, regresando a los peligros de la gran montaña. tal vez habría que visitar un psicólogo, pues el volver aquí haría que cualquier persona pensara que no valoras tanto la vida, supongo...:wallborder
+zone:5:5:0:10:árbol.
+staircase:5:5:0:10:branch
+zone:15:15:0:10:árbol.
+staircase:15:15:0:10:branch
+zone:25:25:0:10:árbol.
+staircase:25:25:0:10:branch
+zone:35:35:0:10:árbol.
+staircase:35:35:0:10:branch
+zone:43:46:0:15:escaleras que llevan a la escultura del diamante.
+staircase:43:46:0:16:concrete5
+zone:43:46:16:22:Frente a ti se encuentra la escultura del gran diamante rojo. su brillo acompañado de su fuerte color te hace sentir un respeto inmenso hacia esta construcción. las leyendas cuentan que si presentas los objetos necesarios ante él, te puede dar a cambio algo de mucho valor. habría que comprobar no crees?
+ceiling:none
+sound_source:43:46:15:15:atangeria_tower.ogg
+zone:59:59:0:20:Gran puerta de entrada al interior de la mansión.
+wall:60:0:50:walldoor
+door:59:0:61:0:0:none:none:door6open.ogg:door6close.ogg
+platform:61:90:0:concrete3
+door:61:0:59:0:0:none:none:door6open.ogg:door6close.ogg
+zone:61:61:0:40:puerta que da hacia el patio.
+zone:62:63:0:40:sala de estar.
+zone:64:66:0:40:un hermoso sofá de cuero se encuentra aquí, ofreciendo comodidad a cualquiera que se siente en él.
+platform:64:66:0:cloth
+zone:67:68:0:40:sala de estar.
+zone:69:70:0:40:una hermosa chimenea hecha de ladrillos. las llamas están en su punto más alto, dejando el intenso frío del ambiente, más tolerable.
+sound_source:69:70:0:5:fire1.ogg
+zone:71:72:0:40:sala de estar.
+zone:73:75:0:70:escalera de madera. aquí se encuentra esta hermosa escalera que lleva a los pisos superiores de la mansión, donde se encuentran las habitaciones, entre otros lugares.
+staircase:73:75:0:71:wood6
+zone:76:78:0:19:sala de estar.
+zone:79:80:0:19:mesa de madera. en ella se encuentran algunas carpetas con papeles dentro de estas. también, una foto familiar y un reconocimiento se hayan sobre este mueble adornando el desorden.
+zone:81:82:0:19:sala de estar.
+zone:83:84:0:19:un armario de metal blindado con pintura estilo militar se encuentra aquí. tal vez contenga algo dentro.
+zone:85:88:0:19:sala de estar.
+zone:89:89:0:19:puerta hacia la cocina.
+wall:90:0:40:walldoor2
+door:89:0:91:0:0:none:none:door13open.ogg:door13close.ogg
+zone:91:91:0:40:puerta hacia la sala de estar.
+platform:91:120:0:concrete5
+zone:92:119:0:40:cocina. aquí está el área donde se preparan los más deliciosos y exóticos platillos que son consumidos en este lugar, pero siempre, con un toque hogareño.
+door:91:0:89:0:0:none:none:door13open.ogg:door13close.ogg
+disable:varinha
+zone:93:93:0:0:silla.
+zone:94:96:0:0:una hermosa mesa de madera fina se encuentra aquí, con platos encima de ella.
+zone:97:97:0:0:silla.
+platform:93:93:0:chair
+platform:94:96:0:wood2
+platform:97:97:0:chair
+zone:100:102:0:40:aquí se encuentra el gran horno de la mansión. en él se preparan todos los alimentos que se consumen dentro de este lugar. el fuego que está dentro de él se mantiene siempre vivo, como si algo mágico lo mantuviera así.
+platform:100:102:1:metal3
+sound_source:100:102:0:0:fire1.ogg
+wall:100:0:0:wallcounter
+wall:102:0:0:wallcounter
+zone:106:107:0:40:refrigerador. aquí es donde se guardan los alimentos peresederos tales como frutas, verduras o carnes. todos de la mejor calidad.
+sound_source:106:107:0:0:fridge2.ogg

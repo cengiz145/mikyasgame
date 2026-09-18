@@ -1,0 +1,27 @@
+map:tover
+maxx:20
+maxy:1000
+platform:0:20:0:metal
+wall:0:0:20:wallnone
+wall:20:0:20:wallnone
+elevator:0:0:0:1000
+zone:0:20:0:999:tover
+text:1:1:elevator
+elevator:1:0:1:30
+platform:1:20:300:beam
+door:1:0:1:300:15:none:none:door16open.ogg:door9close.ogg
+door:1:300:1:0:15:none:none:door15open.ogg:door16close.ogg
+zone:1:1:0:0:up to the lookout
+zone:1:1:300:300:down to the elevator
+sound_source:1:20:0:300:birds.ogg
+sound_source:1:20:300:400:birds2.ogg
+sound_source:1:20:300:400:floresta-dia.ogg
+wall:18:20:300:wallfence
+mapdoor:10:10:0:0:20:15:test:back to the test:none
+zone:10:10:0:0:back to the test
+zone:2:20:0:0:toroj alsoszinte
+zone:2:20:300:300:kilátó. innen kurva messze belátni a kruva kibaszott világot!
+ceiling:tover
+ceiling:tover
+zone:0:20:0:0:torony alsószinte
+zone:1:1:0:0:elevatordoor

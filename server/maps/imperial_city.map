@@ -1,0 +1,30 @@
+map:imperial_city
+maxx:401
+maxy:200
+platform:1:401:0:wallnone
+platform:1:401:-1:wallnone
+platform:0:401:0:concrete5
+wall:0:0:200:wallnone
+wall:401:0:200:wallnone
+ceiling:none
+disable:coordenadas
+disable:camera
+disable:bicicleta
+zone:0:401:0:200:Cidade imperial.
+zone:1:1:0:20:Aqui você pode voltar as ruas medievais.
+travelpoint:1:1:0:0:99:0:medieval_world:Com muito alívio, você sai da cidade.
+sound_source:0:200:0:20:cidade_medieval.ogg
+platform:1:400:0:dirt4
+zone:40:45:0:20:Tienda del herrero.
+travelpoint:40:45:0:0:1:0:blacksmith_shop:Entras en la herrería de la ciudad. Lugar donde se hacen diariamente una variedad de armas y armaduras para los guerreros de la realeza.
+staircase:80:90:0:50:terra2
+wall:79:1:100:walldirt
+wall:91:1:100:walldirt
+zone:80:90:0:49:Una gran elevación te conduce a la imensa catedral.
+zone:80:90:50:70:ENTRADA DE LA CATEDRAL.
+travelpoint:80:90:50:50:1:51:medieval_church_es: Entras en esta magnífica catedral. Sus inmensos muros geométricos contrastan en armonía con las elegantes bóvedas, completando un escenario lleno de belleza exponencial y arrogancia de la plenitud del arquitecto celestial unánime.
+staircase:200:240:0:80:dirt3
+wall:199:1:100:walldirt
+wall:241:1:100:walldirt
+zone:200:240:0:79:Camino ancho que conduce a los campos de batalla.
+zone:200:240:80:100:Entrada a los campos de batalla.

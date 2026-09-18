@@ -1,0 +1,30 @@
+/*
+*Class for locating an IP address
+*Written by DJT
+*/
+class localizarip{
+string locate_ip(string iplocalizar){
+if(iplocalizar=="")return "";
+string url="http://www.megadimensao.com.br/localizarip.php?ip=";
+string api_response=url_get(url+iplocalizar);
+if(api_response=="")return "";
+string[] mostrar2=string_split(api_response, "\r\n", false);
+string country="Not found", estado="Not found", cidade="Not found", prestadora="not found";
+for(uint i=0;i<mostrar2.length();i++){
+string[] show=string_split(mostrar2[i], "=", false);
+if(show[0]=="pais"&&show.length()>1)country=show[1];
+else if(show[0]=="estado"&&show.length()>1)estado=show[1];
+else if(show[0]=="cidade"&&show.length()>1)cidade=show[1];
+else if(show[0]=="prestadora"&&show.length()>1&&prestadora=="not found"){
+prestadora="";
+string[] p=string_split(show[1], " ", false);
+for(uint i2=1;i2<p.length();i2++){
+if(prestadora=="")prestadora=p[i2]+" ";
+else if(prestadora!="")prestadora+=p[i2]+" ";
+}
+prestadora=string_trim_right(prestadora, 1);
+}
+}
+return "Service provider: "+prestadora+".\r\nPaís: "+country+".\r\nEstado: "+estado+".\r\nCidade: "+cidade;
+}
+}

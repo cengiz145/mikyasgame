@@ -1,0 +1,9 @@
+map:event_grounds
+maxx:201
+maxy:50
+platform:0:201:0:carpet
+wall:0:0:50:wallnone
+wall:201:0:50:wallnone
+zone:1:201:0:50:Territorio de eventos.
+platform:1:200:0:concrete2
+zone:1:1:0:50:Salida.

@@ -1,0 +1,26 @@
+map:erymanthos_lake
+maxx:134
+maxy:20
+platform:0:134:0:carpet
+wall:0:0:20:wallnone
+wall:134:0:20:wallnone
+zone:1:134:0:20:Lago de erimanto.
+platform:1:15:0:brush2
+zone:1:1:0:20:Salida del lago.
+zone:2:15:0:20:A las orillas del lago de Erimanto.
+platform:16:30:0:mud
+zone:16:30:0:20:Barro alrededor del lago de Erimanto.
+platform:31:100:0:shallow
+zone:31ç:100:0:20:Lago de Erimanto. Te arrepientes amargamente de haber entrado aquí. El paisaje no es nada agradable, y a cada paso sientes que todo puede empeorar.
+platform:101:120:0:mud
+zone:101:120:0:20:Barro alrededor del lago.
+platform:121:133:0:matos
+zone:121:133:0:20:A las orillas del lago de Erimanto.
+zone:133:133:0:20:A lo lejos puedes ver un hermoso huerto. Lo que más te sorprende es que los frutos de los árboles son dorados, como si fueran de oro.
+wall:134:0:20:wallarvore
+travelpoint:133:133:0:0:70:0:garden_of_the_hesperides:Entras en el huerto, la belleza de las frutas y su aroma te embriagan. Sin embargo, hay algo extraño en el ambiente, sientes un miedo que no corresponde con tanta belleza.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera
+travelpoint:1:1:0:0:80:0:erymanthos:Sales del lago.

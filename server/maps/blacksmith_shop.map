@@ -1,0 +1,16 @@
+map:blacksmith_shop
+maxx:41
+maxy:20
+platform:0:41:0:carpet
+wall:0:0:20:wallnone
+wall:41:0:20:wallnone
+platform:1:40:0:concrete5
+wall:0:0:20:wallcone
+zone:1:1:0:20:Puerta de salida.
+zone:2:40:0:20:Tienda del herrero.
+zone:20:20:0:20:Pila de espadas.
+zone:30:30:0:20:Ventanilla de servicio.
+zone:39:40:0:20:Forno no qual o fogo se encontra bem vivo, onde o mestre ferreiro faz seu trabalho dobrando, moldando e mexendo no ferro.
+travelpoint:1:1:0:0:43:0:imperial_city:Regresas a la ciudad.
+ceiling:none
+sound_source:39:40:0:20:fire.ogg

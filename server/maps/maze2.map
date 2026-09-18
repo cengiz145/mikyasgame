@@ -1,0 +1,89 @@
+map:maze
+maxx:120
+maxy:120
+platform:0:120:0:carpet
+wall:0:0:15:wallgeneric
+wall:120:0:15:wallgeneric
+zone:1:120:0:120:laberinto
+platform:1:20:0:concrete9
+wall:11:0:19:wallborder
+staircase:1:10:0:10:concrete4
+zone:1:1:10:14:puerta  uno
+zone:5:5:10:15:puerta 2
+zone:10:10:10:15:puerta 3
+travelpoint:1:1:10:15:20:0:lisboa:ok te as equibocado
+platform:1:10:30:beam
+travelpoint:5:5:10:15:4:0:ciudad_de_barcelona:ok te as equibocado
+door:10:10:5:30:9:none:none:door10open.ogg:door10open.ogg
+wall:11:30:50:wallborder
+staircase:1:10:30:50:bed
+platform:11:14:50:bed
+wall:15:50:70:wallborder
+staircase:12:14:50:75:bed
+wall:11:50:100:wallborder
+platform:11:11:50:bed
+wall:15:72:100:wallborder
+platform:15:20:71:bed
+wall:21:71:85:wallborder
+staircase:16:20:71:90:bed
+wall:21:85:90:wallborder
+staircase:16:20:90:100:bed
+wall:21:91:120:wallborder
+wall:16:100:120:wallborder
+wall:17:100:120:wallborder
+wall:18:100:120:wallborder
+wall:19:100:120:wallborder
+wall:20:100:120:wallborder
+wall:17:90:100:wallborder
+platform:21:35:95:bed
+wall:35:95:110:wallborder
+wall:30:96:120:wallborder
+staircase:31:34:95:105:bed
+wall:31:106:120:wallborder
+wall:32:106:120:wallborder
+wall:33:106:120:wallborder
+wall:34:106:120:wallborder
+platform:35:50:101:bed
+wall:40:101:110:wallborder
+staircase:36:39:101:110:bed
+platform:40:50:110:bed
+wall:50:0:120:wallborder
+staircase:41:49:90:110:bed
+wall:40:90:100:wallborder
+platform:50:100:90:bed
+wall:100:0:120:wallborder
+wall:71:0:89:wallborder
+wall:71:91:120:wallborder
+wall:60:0:120:wallborder
+platform:60:60:90:bed
+staircase:61:70:90:110:bed
+platform:71:100:110:bed
+wall:73:0:120:wallborder
+staircase:72:72:90:110:bed
+platform:73:73:90:bed
+platform:101:105:100:concrete13
+door:99:90:101:100:9:none:none:door10open.ogg:door10close.ogg
+platform:111:111:90:beam
+platform:106:106:80:beam
+platform:111:111:70:beam
+zone:102:119:0:9:porfin ya lo as conseguido
+platform:114:114:60:beam
+platform:119:119:50:beam
+platform:115:115:40:beam
+platform:119:119:30:beam
+platform:114:114:20:beam
+platform:111:111:10:beam
+zone:105:105:100:120:cuidado tendras que ir saltando en unas prataformas no te caigas utiliza la camara
+travelpoint:119:119:15:15:20:20:lisboa:por fin as salido
+ceiling:none
+wall:62:90:100:wallborder
+wall:62:100:109:wallborder
+wall:64:91:120:wallborder
+wall:67:90:110:camerawall
+wall:69:90:109:wallborder
+quicksand:96:90
+quicksand:97:90
+quicksand:98:90
+quicksand:118:0
+disable:varinha
+staircase:119:119:0:15:bed

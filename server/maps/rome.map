@@ -1,0 +1,88 @@
+map:rome
+maxx:800
+maxy:100
+platform:1:800:0:carpet
+wall:0:0:100:wallnone
+wall:800:0:100:wallnone
+zone:1:800:0:100:Roma.
+platform:1:99:0:concrete
+zone:1:1:0:50:Salida de Roma.
+zone:2:99:0:50:Un camino ancho que lleva al centro del Imperio Romano.
+staircase:21:25:0:70:dirt4
+zone:21:25:0:69:Escalada al Monte Palatino.
+platform:16:90:70:grass
+zone:16:95:70:80:Monte Palatino.
+zone:50:53:70:80:Aquí hay una entrada que te conduce a una imponente cueva.
+staircase:91:95:0:70:dirt4
+zone:91:95:0:69:Escalada al Monte Palatino.
+platform:100:500:0:concrete4
+zone:100:300:0:50:Plaza central.
+staircase:120:125:0:30:concrete5
+wall:119:1:50:wallnone
+wall:126:1:50:wallnone
+zone:120:125:0:29:Escaleras al mercado de esclavos.
+zone:120:125:30:50:Entrada del mercado de esclavos. Puedes ver muchos esclavos atados esperando ser vendidos a nobles y plebeyos que puedan pagar por ellos.
+staircase:135:140:0:30:gravel
+wall:134:1:50:wallnone
+wall:141:1:50:wallnone
+zone:135:140:0:29:Escalera que conduce al coliseo romano.
+zone:135:140:30:50:Entrada al coliseo de Roma.
+zone:150:155:0:50:Bancos alrededor de la plaza.
+zone:160:170:0:50:Área de comercio.
+zone:176:180:0:50:Bancos alrededor de la plaza.
+staircase:190:195:0:30:concrete5
+wall:189:1:50:wallnone
+wall:196:1:50:wallnone
+zone:190:195:0:29:Escaleras a la alcaldía de Roma.
+zone:190:195:30:50:Entrada de la alcaldía.
+staircase:230:235:0:30:concrete5
+wall:229:1:50:wallnone
+wall:236:1:50:wallnone
+zone:230:235:0:29:Las bellas escaleras de mármol que conducen a la entrada del Senado romano.
+zone:230:235:30:50:Entrada del Senado.
+zone:301:450:0:50:Camino de Apia.
+staircase:311:315:0:50:gravel
+zone:311:315:0:60:Subida hacia el acueducto romano.
+platform:301:310:50:water
+zone:301:310:50:60:Extraordinaria estructura de piedra del magnífico acueducto romano.
+platform:316:560:50:water
+zone:316:560:50:60:Extraordinaria estructura de piedra del magnífico acueducto romano.
+staircase:561:565:0:50:gravel
+zone:561:565:0:60:Subida hacia el acueducto romano.
+platform:566:710:50:water
+zone:566:710:50:60:Extraordinaria estructura de piedra del magnífico acueducto romano.
+staircase:711:715:0:50:gravel
+zone:711:715:0:60:Subida hacia el acueducto romano.
+platform:716:755:50:water
+zone:716:755:50:60:Extraordinaria estructura de piedra del magnífico acueducto romano.
+staircase:401:410:0:10:terra2
+zone:401:410:0:9:Camino que conduce a Galia.
+zone:401:410:10:20:Entrada al reino de galia.
+zone:451:500:0:30:Camino al palacio imperial.
+platform:501:550:0:concrete5
+zone:501:550:0:20:Estás ante el palacio imperial. La gloria de este edificio te atrae, y ya te imaginas subiendo las escaleras y entrando.
+staircase:525:530:0:30:concrete5
+wall:524:1:40:wallnone
+wall:531:1:40:wallnone
+zone:525:530:0:29:Escaleras de entrada al palacio.
+zone:525:530:30:40:Entrada del palacio imperial.
+platform:551:600:0:gravel
+zone:551:560:0:20:Un camino de grava.
+zone:566:600:0:20:Un camino de grava.
+platform:601:624:0:mud
+zone:601:624:0:20:A las orillas del río Tibre.
+platform:625:690:0:shallow
+zone:625:690:0:20:Río Tibre.
+platform:691:710:0:mud
+zone:691:710:0:20:Orillas del Río Tibre.
+platform:716:760:0:rocks
+zone:716:760:0:20:Ves una montaña en la distancia.
+zone:760:760:0:20:Entrada del Vesubio.
+wall:761:0:100:camerawall
+travelpoint:1:1:0:0:600:0:antiquity:sales de roma.
+travelpoint:135:140:30:30:1:0:roman_colosseum_es:Si viniste en busca de la victoria, ciertamente ya estás derrotado. Pero quédate y observa cómo el fracaso se eleva ante tus ojos.
+travelpoint:50:53:70:70:1:0:lupercal_cave:Acabas de entrar en la cueva de tantos misterios romanos. ¿Realmente nació Roma aquí?
+travelpoint:525:530:30:30:1:0:imperial_palace:entras en el palacio imperial.
+travelpoint:401:410:10:10:1:0:kingdom_of_gaul:Entras en un reino de personas valientes. ¿Será que tienes el mismo valor?
+travelpoint:230:235:30:30:1:0:senate:entras al senado romano.
+mapdoor:190:195:30:30:1:0:rome_city_hall:enter in the senatorsoffice:metal

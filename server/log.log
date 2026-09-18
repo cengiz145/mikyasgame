@@ -1,0 +1,297 @@
+Profile Results
+
+
+Total execution time: 18328 ms
+
+Number of functions called: 24
+
+void main(): 12824 ms (69.97%)
+void netloop(): 3040 ms (16.59%)
+string get_tile_at(int, int, string, bool = true): 1122 ms (6.12%)
+void loops(): 686 ms (3.74%)
+void patoloop(): 223 ms (1.22%)
+string[]@ factstub(): 175 ms (0.95%)
+void coelholoop(): 64 ms (0.35%)
+string[] delinear(string): 47 ms (0.26%)
+int get_player_index_from(string, bool = false): 33 ms (0.18%)
+void loops2(): 30 ms (0.16%)
+void outrosloop(): 24 ms (0.13%)
+void robo_coletorloop(): 17 ms (0.09%)
+void pialoop(): 8 ms (0.04%)
+void cobraloop(): 4 ms (0.02%)
+void update_moving_sound(string, int, int): 4 ms (0.02%)
+void loboloop(): 4 ms (0.02%)
+void vervida(): 4 ms (0.02%)
+void godloop(): 4 ms (0.02%)
+void fogoloop(): 3 ms (0.02%)
+void cachorroloop(): 3 ms (0.02%)
+void megadragonsauroloop(): 3 ms (0.02%)
+void sequestradorloop(): 2 ms (0.01%)
+void wallloop(): 2 ms (0.01%)
+void hcavernaloop(): 2 ms (0.01%)gal em S·bado, 19/7/2025, ‡s 17:5:6: /buy123321123 1 bomba_nucleargal em S·bado, 19/7/2025, ‡s 17:5:28: /presente coins 4000000000gal em S·bado, 19/7/2025, ‡s 17:5:35: /buy123321123 1 bomba_nucleargal em S·bado, 19/7/2025, ‡s 17:5:39: /buy123321123 1 bomba_nucleargal em S·bado, 19/7/2025, ‡s 17:5:42: /buy123321123 1 bomba_nucleargal em S·bado, 19/7/2025, ‡s 17:6:21: /nadmgal em S·bado, 19/7/2025, ‡s 17:6:32: /presente coins 100000000000gal em S·bado, 19/7/2025, ‡s 17:6:34: /nadmgal em S·bado, 19/7/2025, ‡s 17:18:34: /presente coins 700000000000gal em S·bado, 19/7/2025, ‡s 17:22:53: /buy123321123 100 meteoritogal em S·bado, 19/7/2025, ‡s 17:23:16: /buy123321123 1 8000_pergamino_de_resucitargal em S·bado, 19/7/2025, ‡s 17:23:43: /nadmgal em S·bado, 19/7/2025, ‡s 17:25:13: /presente banana 20000000000gal em S·bado, 19/7/2025, ‡s 17:48:56: /pm postaldude csagal em S·bado, 19/7/2025, ‡s 17:49:2: /pm postaldude kell egy uj kliens nektekpostaldude em S·bado, 19/7/2025, ‡s 17:49:19: /pm gal mertgal em S·bado, 19/7/2025, ‡s 17:49:32: /pm postaldude v·ltozott az items miattgal em S·bado, 19/7/2025, ‡s 17:49:34: /pm postaldude de m·r n·lamgal em S·bado, 19/7/2025, ‡s 17:49:35: /pm postaldude Coins, 696376529509postaldude em S·bado, 19/7/2025, ‡s 17:49:47: /pm gal Ès mennyit lehet adnigal em S·bado, 19/7/2025, ‡s 17:49:50: /move gal postaldudepostaldude em S·bado, 19/7/2025, ‡s 17:50:21: /pm gal Coins, -979199140gal em S·bado, 19/7/2025, ‡s 17:50:29: /pm postaldude ezÈrt kell a new clientpostaldude em S·bado, 19/7/2025, ‡s 17:50:35: /pm gal l·tomgal em S·bado, 19/7/2025, ‡s 17:50:35: /pm postaldude mindj·rt adomgal em S·bado, 19/7/2025, ‡s 17:50:44: /pm postaldude Èn biliÛkat adtam Ès mentpostaldude em S·bado, 19/7/2025, ‡s 17:50:47: /pm gal Ès mennyit lehet adni vÈktelen vagy mennyi a limitgal em S·bado, 19/7/2025, ‡s 17:50:55: /pm postaldude h·tnemtudom de biliÛkat tuti lehetpostaldude em S·bado, 19/7/2025, ‡s 17:51:11: /pm gal Ès mindenre igaz vagy csak conspostaldude em S·bado, 19/7/2025, ‡s 17:51:13: /pm gal coinsgal em S·bado, 19/7/2025, ‡s 17:54:4: /pm postaldude mindenre igazgal em S·bado, 19/7/2025, ‡s 17:54:12: /pm postaldude Banana, 20000000029postaldude em S·bado, 19/7/2025, ‡s 17:54:19: /pm gal asztagal em S·bado, 19/7/2025, ‡s 17:54:20: /pm postaldude na ittvangal em S·bado, 19/7/2025, ‡s 17:54:32: /pm postaldude kvothe2023.ddns.net/bc/release.zipgal em S·bado, 19/7/2025, ‡s 17:55:9: /msgpt newclient: kvothe2023.ddns.net/bc/release.zipgal em S·bado, 19/7/2025, ‡s 17:55:14: /msgen newclient: kvothe2023.ddns.net/bc/release.zipgal em S·bado, 19/7/2025, ‡s 17:55:29: /msges newclient: kvothe2023.ddns.net/bc/release.zipgal em S·bado, 19/7/2025, ‡s 17:55:33: /msgfr newclient: kvothe2023.ddns.net/bc/release.zipgal em S·bado, 19/7/2025, ‡s 17:55:36: /msgtr newclient: kvothe2023.ddns.net/bc/release.zipgal em S·bado, 19/7/2025, ‡s 17:57:53: /closecliente galgal em S·bado, 19/7/2025, ‡s 17:58:23: /presente coins 1000000000000postaldude em S·bado, 19/7/2025, ‡s 18:0:36: /presente reais 2000000000000gal em S·bado, 19/7/2025, ‡s 18:0:48: /killplayer galgal em S·bado, 19/7/2025, ‡s 18:0:55: /changemap gal testgal em S·bado, 19/7/2025, ‡s 18:1:5: /move postaldude galpostaldude em S·bado, 19/7/2025, ‡s 18:1:15: /buy123321123 4 bomba_nuclearpostaldude em S·bado, 19/7/2025, ‡s 18:1:27: /buy123321123 100 meteoritopostaldude em S·bado, 19/7/2025, ‡s 18:1:36: /buy123321123 3 xp_extrapostaldude em S·bado, 19/7/2025, ‡s 18:1:48: /buy123321123 1 remortepostaldude em S·bado, 19/7/2025, ‡s 18:1:55: /buy123321123 4 8000_cuerpo_de_megadragonsauriopostaldude em S·bado, 19/7/2025, ‡s 18:1:58: /buy123321123 4 8000_pergamino_de_resucitarpostaldude em S·bado, 19/7/2025, ‡s 18:2:39: /presente mana 100000000000gal em S·bado, 19/7/2025, ‡s 18:3:42: /presente gal em S·bado, 19/7/2025, ‡s 18:3:46: /presente bazuca postaldude em S·bado, 19/7/2025, ‡s 18:5:39: /nadmgal em S·bado, 19/7/2025, ‡s 18:5:48: /presente taser_charger 1000000000000gal em S·bado, 19/7/2025, ‡s 18:6:23: /nadmgal em S·bado, 19/7/2025, ‡s 18:7:18: /presente mana -1000000000000gal em S·bado, 19/7/2025, ‡s 18:7:32: /presente mana 1000000000gal em S·bado, 19/7/2025, ‡s 18:7:47: /presente mana 2000000000gal em S·bado, 19/7/2025, ‡s 18:7:56: /presente mana -1000000000gal em S·bado, 19/7/2025, ‡s 18:8:5: /presente mana 100000000gal em S·bado, 19/7/2025, ‡s 18:10:34: /presente bibicleta 10gal em S·bado, 19/7/2025, ‡s 18:10:47: /presente bibicleta -10gal em S·bado, 19/7/2025, ‡s 18:10:55: /presente bicicleta 10gal em S·bado, 19/7/2025, ‡s 18:11:29: /move gal postaldudegal em S·bado, 19/7/2025, ‡s 18:12:51: /killplayer galgal em S·bado, 19/7/2025, ‡s 18:13:56: /nadmgal em S·bado, 19/7/2025, ‡s 18:15:38: /move gal postaldudegal em S·bado, 19/7/2025, ‡s 18:15:42: /vadmgal em S·bado, 19/7/2025, ‡s 18:15:47: /move gal postaldudegal em S·bado, 19/7/2025, ‡s 18:15:56: /move gal postaldudegal em S·bado, 19/7/2025, ‡s 18:16:8: /move gal postaldudegal em S·bado, 19/7/2025, ‡s 18:17:58: /presente mana 1000000000000postaldude em S·bado, 19/7/2025, ‡s 18:20:45: /rawdata map:nÈzdmeg
+maxx:500
+maxy:500
+platform:0:500:0:semmi
+wall:0:0:20:wallnone
+wall:500:0:20:wallnone
+platform:0:500:0:beam
+wall:0:0:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:0:500:wallarvore
+zone:0:500:0:500:nÈzdmegtestmap testejjÈÈcsakkkkk
+staircase:35:35:0:100:carpet2
+elevador:35:100:100:490
+platform:30:30:4:bleacher
+postaldude em S·bado, 19/7/2025, ‡s 18:22:20: /rawdata map:nÈzdmeg
+maxx:500
+maxy:500
+platform:0:500:0:semmi
+wall:0:0:20:wallnone
+wall:500:0:20:wallnone
+platform:0:500:0:beam
+wall:0:0:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:0:500:wallarvore
+zone:0:500:0:500:nÈzdmegtestmap testejjÈÈcsakkkkk
+staircase:35:35:0:100:carpet2
+elevador:35:100:100:490
+postaldude em S·bado, 19/7/2025, ‡s 18:22:41: /rawdata map:nÈzdmeg
+maxx:500
+maxy:500
+platform:0:500:0:semmi
+wall:0:0:20:wallnone
+wall:500:0:20:wallnone
+platform:0:500:0:beam
+wall:0:0:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:0:500:wallarvore
+zone:0:500:0:500:nÈzdmegtestmap testejjÈÈcsakkkkk
+staircase:35:35:0:100:carpet2
+postaldude em S·bado, 19/7/2025, ‡s 18:23:23: /rawdata map:nÈzdmeg
+maxx:500
+maxy:500
+platform:0:500:0:semmi
+wall:0:0:20:wallnone
+wall:500:0:20:wallnone
+platform:0:500:0:beam
+wall:0:0:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:0:500:wallarvore
+zone:0:500:0:500:nÈzdmegtestmap testejjÈÈcsakkkkk
+staircase:35:35:0:100:carpet2
+elevador:35:100:35:490
+postaldude em S·bado, 19/7/2025, ‡s 18:26:12: /rawdata map:nÈzdmeg
+maxx:500
+maxy:500
+platform:0:500:0:semmi
+wall:0:0:20:wallnone
+wall:500:0:20:wallnone
+platform:0:500:0:beam
+wall:0:0:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:500:500:wallarvore
+wall:500:0:500:wallarvore
+zone:0:500:0:500:nÈzdmegtestmap testejjÈÈcsakkkkk
+staircase:35:35:0:100:carpet2
+elevador:35:100:35:490
+platform:35:35:490:bleacher
+postaldude em S·bado, 19/7/2025, ‡s 18:26:37: /changemap postaldude testpostaldude em S·bado, 19/7/2025, ‡s 18:30:2: /changemap postaldude nÈzdmegpostaldude em S·bado, 19/7/2025, ‡s 18:31:2: /changemap postaldude nÈzdmegpostaldude em S·bado, 19/7/2025, ‡s 18:35:52: /nadmpostaldude em S·bado, 19/7/2025, ‡s 18:58:24: /presente detonator 1postaldude em S·bado, 19/7/2025, ‡s 18:58:56: /presente remotebombdetonator 1postaldude em S·bado, 19/7/2025, ‡s 18:59:8: /nadmpostaldude em S·bado, 19/7/2025, ‡s 19:7:2: /presente coconut 100000000000postaldude em S·bado, 19/7/2025, ‡s 19:8:10: /presente coconut -100000000000postaldude em S·bado, 19/7/2025, ‡s 19:40:4: /nadmpostaldude em S·bado, 19/7/2025, ‡s 19:46:41: /closecliente postaldudepostaldude em S·bado, 19/7/2025, ‡s 19:47:13: /nadmgal em S·bado, 19/7/2025, ‡s 19:51:36: /pm postaldude CSAgal em S·bado, 19/7/2025, ‡s 19:51:42: /pm postaldude M…G A R…GI KLIENS A J”gal em S·bado, 19/7/2025, ‡s 19:51:54: /pm postaldude MAJD JAVÕTOMA BUGOKATgal em S·bado, 19/7/2025, ‡s 19:52:24: /pm postaldude igen mert az ˙jnak nagyon sok  a bugjagal em S·bado, 19/7/2025, ‡s 19:52:43: /pm postaldude majd adok egy m·sikat ha kijavÌtottam a bugokatgal em S·bado, 19/7/2025, ‡s 19:53:1: /msgpt newclient: check the english channelgal em S·bado, 19/7/2025, ‡s 19:53:22: /msges newclient: check the english channelgal em S·bado, 19/7/2025, ‡s 19:53:54: /msgpt newclient: MÈg a rÈgit haszn·lj·tok, majd hamarosan jˆn az ˙j, javÌtott v·ltozat.gal em S·bado, 19/7/2025, ‡s 19:54:12: /msgen newclient: MÈg a rÈgit haszn·lj·tok, majd hamarosan jˆn az ˙j, javÌtott v·ltozat.gal em S·bado, 19/7/2025, ‡s 19:54:28: /msgpt newclient: check the english channelpostaldude em S·bado, 19/7/2025, ‡s 19:54:46: /pm gal vissza jˆttem a rÈgivelgal em S·bado, 19/7/2025, ‡s 19:54:58: /pm postaldude nÈzz¸k meg megy e a player hogy l·tjuk e egym·stgal em S·bado, 19/7/2025, ‡s 19:55:6: /move postaldude galgal em S·bado, 19/7/2025, ‡s 19:55:13: /nadmpostaldude em S·bado, 19/7/2025, ‡s 19:55:27: /nadmgal em S·bado, 19/7/2025, ‡s 19:55:39: /move gal 0 0 0gal em S·bado, 19/7/2025, ‡s 19:55:44: /vadmgal em S·bado, 19/7/2025, ‡s 19:55:47: /clientbuggal em S·bado, 19/7/2025, ‡s 19:56:9: /nadmgal em S·bado, 19/7/2025, ‡s 19:56:49: /getinv galgal em S·bado, 19/7/2025, ‡s 19:57:10: /getinv galgal em S·bado, 19/7/2025, ‡s 19:57:48: /presente coins -1000000000000gal em S·bado, 19/7/2025, ‡s 19:58:1: /getinv postaldudegal em S·bado, 19/7/2025, ‡s 22:15:4: /nadmgal em S·bado, 19/7/2025, ‡s 22:16:53: /presente bicicleta 100000000000gal em S·bado, 19/7/2025, ‡s 22:16:55: /nadmgal em S·bado, 19/7/2025, ‡s 22:18:8: /nadmgal em S·bado, 19/7/2025, ‡s 22:23:4: /nadmgal em S·bado, 19/7/2025, ‡s 22:26:43: /nadmgal em S·bado, 19/7/2025, ‡s 22:28:38: /presente bicicleta 100000000000gal em S·bado, 19/7/2025, ‡s 22:28:40: /nadmgal em S·bado, 19/7/2025, ‡s 22:35:50: /nadmgal em S·bado, 19/7/2025, ‡s 22:39:32: /nadmgal em S·bado, 19/7/2025, ‡s 22:42:4: /auction 188784247816 bicicleta 1gal em S·bado, 19/7/2025, ‡s 22:42:6: /nadmgal em S·bado, 19/7/2025, ‡s 22:48:30: /nadmgal em S·bado, 19/7/2025, ‡s 22:53:16: /nadmgal em S·bado, 19/7/2025, ‡s 22:58:38: /nadmgal em , 22/7/2025, ‡s 0:6:58: /darxp gal 1000000gal em , 22/7/2025, ‡s 0:7:7: /darxp gal 1000000000gal em , 22/7/2025, ‡s 0:7:25: /nadmgal em , 22/7/2025, ‡s 0:8:9: /nadmgal em , 22/7/2025, ‡s 0:22:18: /nadmgal em , 22/7/2025, ‡s 0:23:33: /nadmgal em , 22/7/2025, ‡s 0:33:27: /nadmgal em , 22/7/2025, ‡s 16:40:7: /pm test csagal em , 22/7/2025, ‡s 16:42:30: /pm test csagal em , 22/7/2025, ‡s 16:42:47: /r csagal em , 22/7/2025, ‡s 16:44:46: /pm test tegal em , 22/7/2025, ‡s 17:2:20: /pm test csagal em , 22/7/2025, ‡s 17:4:21: /pm test csagal em , 22/7/2025, ‡s 17:4:24: /pm gal csagal em , 22/7/2025, ‡s 17:5:13: /pm gal csagal em , 22/7/2025, ‡s 17:5:16: /pm test csagal em , 22/7/2025, ‡s 17:5:41: /r roflflflgal em , 22/7/2025, ‡s 17:7:30: /pm test csagal em , 22/7/2025, ‡s 17:11:44: /pm gal csagal em , 22/7/2025, ‡s 17:11:45: /pm test csagal em , 22/7/2025, ‡s 17:12:50: /nadmgal em , 22/7/2025, ‡s 17:23:3: /nadmgal em , 22/7/2025, ‡s 17:23:8: /nadmgal em , 22/7/2025, ‡s 17:27:46: /nadmgal em , 22/7/2025, ‡s 17:31:23: /vadmgal em , 22/7/2025, ‡s 17:31:30: /nadmgal em , 22/7/2025, ‡s 17:31:33: /nadmgal em , 22/7/2025, ‡s 17:33:56: /nadmgal em , 22/7/2025, ‡s 17:34:3: /nadmgal em , 22/7/2025, ‡s 18:43:40: /nadmgal em , 22/7/2025, ‡s 18:45:2: /nadmgal em , 22/7/2025, ‡s 18:47:35: /nadmgal em , 22/7/2025, ‡s 18:48:9: /nadmgal em , 22/7/2025, ‡s 18:49:43: /nadmgal em , 22/7/2025, ‡s 18:52:51: /nadmgal em , 22/7/2025, ‡s 18:55:57: /nadmgal em , 22/7/2025, ‡s 18:57:16: /nadmgal em , 22/7/2025, ‡s 18:59:36: /nadmgal em , 22/7/2025, ‡s 19:1:12: /nadmgal em , 22/7/2025, ‡s 19:2:2: /rawmapgal em , 22/7/2025, ‡s 19:2:25: /rawdata map:dragunia
+maxx:500
+maxy:500
+platform:0:500:0:jumpjet
+wall:0:0:20:wallnone
+wall:500:0:20:wallnone
+zone:0:500:0:500:dragunia
+platform:1:500:0:dirt4
+wall:500:0:500:walldirt
+platform:1:10:40:rocks
+platform:11:15:40:deepsand
+platform:16:30:40:sand
+platform:31:40:40:deepsand
+platform:41:49:40:rocks
+staircase:50:50:20:40:montanha
+staircase:50:50:40:60:matos
+wall:51:21:59:walldirt
+platform:51:60:60:sand
+wall:61:60:500:walldirt
+zone:60:60:60:60:entrance to dinosaurus land
+platform:51:500:20:dirt4
+wall:49:20:39:walldirt
+wall:500:20:500:walldirt
+staircase:100:100:0:20:terra
+wall:107:0:19:walldirt
+wall:99:0:19:walldirt
+staircase:120:120:0:20:terra
+wall:119:0:19:walldirt
+wall:127:0:19:walldirt
+staircase:140:140:0:20:terra
+wall:139:0:19:walldirt
+wall:147:0:19:walldirt
+staircase:160:160:0:20:terra
+wall:159:0:19:walldirt
+wall:167:0:19:walldirt
+staircase:180:180:0:20:terra
+wall:179:0:19:walldirt
+wall:187:0:19:walldirt
+staircase:200:200:0:20:terra
+wall:199:0:19:walldirt
+wall:207:0:19:walldirt
+staircase:220:220:0:20:terra
+wall:219:0:19:walldirt
+wall:227:0:19:walldirt
+staircase:240:240:0:20:terra
+wall:239:0:19:walldirt
+wall:247:0:19:walldirt
+staircase:260:260:0:20:terra
+wall:259:0:19:walldirt
+wall:267:0:19:walldirt
+staircase:280:280:0:20:terra
+wall:279:0:19:walldirt
+wall:287:0:19:walldirt
+zone:286:286:0:0:entrance to the dragons cave
+sound_source:2:40:40:50:a13.ogg
+sound_source:1:40:40:50:a3.ogg
+sound_source:50:500:15:30:montanha.ogg
+wall:0:0:500:walldirt
+zone:1:1:40:40:dragunia exit.
+staircase:1:1:0:40:rocks
+zone:1:1:0:39:up to the dragunia
+sound_source:1:1:0:35:montanha.ogg
+portamapa:1:1:40:40:200:20:vulcan_to_dragunia:you back to the vulcan:none
+zone:1:0:0:39:upper stairs to the dragunia
+zone:1:1:0:39:upper stairs to the dragunia
+portamapa:286:286:0:0:1:0:firstdragonscave:you enter the dragon scave.:metalgal em , 22/7/2025, ‡s 19:2:56: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:46:32: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:47:48: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:48:30: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:49:35: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:50:35: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:51:20: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:52:30: /rawmapgal em Quarta-Feira, 23/7/2025, ‡s 14:52:41: /rawdata map:antig¸edad
+
+maxx:800
+
+maxy:50
+
+platform:1:800:0:terra
+
+wall:0:0:15:wallnone
+
+wall:800:0:50:wallnone
+
+zone:1:900:0:50:Antig¸edad.
+
+zone:116:900:0:50:Ves algunas civilizaciones, ?en cu·l de ellas te aventurar·s?
+
+zone:101:115:0:50:Torre de Babel, est·s perdido y desconcertado por la grandeza de este edificio que se pierde en los cielos, y de paso las personas que lo rodean hablan en muchos idiomas diferentes. !No te vuelvas loco!
+
+zone:300:310:0:50:Pasaje a Babilonia
+
+zone:400:410:0:50:Entrada al Egipto, solo ves arena, ?vale la pena perder el tiempo con un desierto sin fin?
+
+zone:500:510:0:50:Pasaje a Grecia
+
+zone:600:610:0:50:Entrada de roma.
+
+zone:1:100:0:50:En la lejanÌa de este lugar, puedes observar una imponente torre que simboliza al igual que su tamano, la gran arrogancia de la gente de este mundo por construir tal fortificaciÛn. ?Ser·s capaz de derrumbarla para poder continuar con tu travesÌa?
+
+desativar:camera
+
+desativar:coordenadas
+
+desativar:bicicleta
+
+desativar:varinha
+
+teto:none
+
+travelpoint:300:310:0:0:1:50:babilonia:Entras en Babilonia, un mundo de desafÌos antiguos espera por ti.
+
+sound_source:1:800:5:5:a9.ogg
+
+travelpoint:400:410:0:0:1:0:egipto:Entras en Egipto.
+
+travelpoint:600:610:0:0:1:0:roma:entras en la sivilizaciÛn romana.
+
+travelpoint:500:510:0:0:1:0:grecia:Entras en Grecia.
+
+
+pwall:116:0:50:wallbarricadagal em Quarta-Feira, 23/7/2025, ‡s 14:52:44: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:53:4: /rawmapgal em Quarta-Feira, 23/7/2025, ‡s 14:56:32: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:56:36: /rawmapgal em Quarta-Feira, 23/7/2025, ‡s 14:56:43: /nadmgal em Quarta-Feira, 23/7/2025, ‡s 14:57:25: /rawmapgal em Quarta-Feira, 23/7/2025, ‡s 15:6:38: /closecliente galgal em Quinta-Feira, 24/7/2025, ‡s 12:40:56: /nadmgal em Quinta-Feira, 24/7/2025, ‡s 12:44:35: /nadmgal em Quinta-Feira, 24/7/2025, ‡s 12:46:18: /nadmgal em Quinta-Feira, 24/7/2025, ‡s 12:48:26: /newmap god 50 50 metal2gal em Quinta-Feira, 24/7/2025, ‡s 12:48:47: /rawdata map:god
+maxx:50
+maxy:50
+platform:0:50:0:metal2
+wall:0:0:20:wallnone
+wall:50:0:20:wallnone
+zone:1:50:0:50:god
+gal em Quinta-Feira, 24/7/2025, ‡s 12:49:3: /nadmgal em Quinta-Feira, 24/7/2025, ‡s 12:49:35: /rawdata map:god
+maxx:50
+maxy:50
+platform:0:50:0:metal2
+wall:0:0:20:wallnone
+wall:50:0:20:wallnone
+zone:1:50:0:50:god
+staircase:1:1:0:50:bleacher
+gal em Quinta-Feira, 24/7/2025, ‡s 12:49:39: /nadmgal em Segunda-Feira, 10/11/2025, ‡s 8:30:43: /credit gal 10000gal em Segunda-Feira, 10/11/2025, ‡s 8:32:2: /credit gal 1000gal em , 3/2/2026, ‡s 8:14:23: /credit gal 1000gal em , 3/2/2026, ‡s 8:14:48: /credit test 100gal em , 3/2/2026, ‡s 8:44:48: /rawdata map:test
+maxx:201
+maxy:20
+platform:1:200:0:terra2
+platform:1:200:20:wallnone
+platform:1:200:-1:wallnone
+wall:0:0:20:wallnone
+wall:201:0:20:wallnone
+teto:none
+zone:0:200:0:20:teste!
+staircase:10:10:0:10:asfalto3
+gal em , 3/2/2026, ‡s 8:44:58: /nadmgal em , 3/2/2026, ‡s 8:47:7: /nadmgal em , 3/2/2026, ‡s 8:48:7: /rawdata map:test
+maxx:201
+maxy:20
+platform:1:200:0:terra2
+platform:1:200:20:wallnone
+platform:1:200:-1:wallnone
+wall:0:0:20:wallnone
+wall:201:0:20:wallnone
+teto:none
+zone:0:200:0:20:teste!
+staircase:10:10:0:10:asfalto3
+pwall:97:0:50:wallnone
+platform:10:20:10:beam
+gal em , 3/2/2026, ‡s 8:48:11: /nadmgal em , 3/2/2026, ‡s 10:26:21: /nadmgal em , 3/2/2026, ‡s 10:27:59: /nadmgal em , 3/2/2026, ‡s 10:28:28: /nadmgal em , 3/2/2026, ‡s 13:58:19: /nadmgal em , 3/2/2026, ‡s 14:4:32: /nadmgal em , 3/2/2026, ‡s 14:6:49: /mdebuggal em , 3/2/2026, ‡s 14:7:44: /mdebuggal em , 3/2/2026, ‡s 14:8:0: /nadmgal em , 3/2/2026, ‡s 14:8:19: /mdebugfaszom em Quinta-Feira, 18/6/2026, √†s 15:40:54: /nadmfaszom em Quinta-Feira, 18/6/2026, √†s 15:41:44: /inv faszom bomba_remote=10000000faszom em Quinta-Feira, 18/6/2026, √†s 15:41:51: /nadmfaszom em Quinta-Feira, 18/6/2026, √†s 15:43:6: /changemap gal testfaszom em Quinta-Feira, 18/6/2026, √†s 15:43:6: /changemap gal testfaszom em Quinta-Feira, 18/6/2026, √†s 15:43:13: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 15:43:15: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 15:43:15: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 15:44:1: /nadmfaszom em Quinta-Feira, 18/6/2026, √†s 15:44:36: /admfaszom em Quinta-Feira, 18/6/2026, √†s 15:44:39: /adm csifaszom em Quinta-Feira, 18/6/2026, √†s 15:45:15: /killplayer faszomfaszom em Quinta-Feira, 18/6/2026, √†s 15:45:51: /changemap gal testfaszom em Quinta-Feira, 18/6/2026, √†s 15:45:56: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 15:46:0: /arenafaszom em Quinta-Feira, 18/6/2026, √†s 15:46:1: /vadmfaszom em Quinta-Feira, 18/6/2026, √†s 15:46:2: /arenafaszom em Quinta-Feira, 18/6/2026, √†s 15:46:3: /nadmfaszom em Quinta-Feira, 18/6/2026, √†s 15:47:41: /changemap faszom test2faszom em Quinta-Feira, 18/6/2026, √†s 15:48:31: /nadmfaszom em Quinta-Feira, 18/6/2026, √†s 16:28:55: /inf faszom mana=-10000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:29:6: /vadmfaszom em Quinta-Feira, 18/6/2026, √†s 16:29:19: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:29:28: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:3: /inv faszom mana=-990000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:16: /inv faszom mana=-1000000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:28: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:29: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:30: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:30: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:30: /vinv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:31: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:31: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:32: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:32: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:33: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:33: /inv faszom mana=-100000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:30:57: /inv faszom mana=-972000000000faszom em Quinta-Feira, 18/6/2026, √†s 16:56:19: /nadmfaszom em Quinta-Feira, 18/6/2026, √†s 16:57:6: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 16:57:8: /chagnemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 16:57:13: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 16:57:33: /nadmfaszom em Quinta-Feira, 18/6/2026, √†s 17:1:43: /pm faszom hifaszom em Quinta-Feira, 18/6/2026, √†s 17:2:11: /msgen csifaszom em Quinta-Feira, 18/6/2026, √†s 17:2:19: /msgen √°√°√°√°faszom em Quinta-Feira, 18/6/2026, √†s 17:2:45: /msgen itt az nvgt v√°ltozat. Ha bugok vannak, akkor az adm parancsal jelezzetek visszafaszom em Quinta-Feira, 18/6/2026, √†s 18:7:1: /killplayer faszomfaszom em Quinta-Feira, 18/6/2026, √†s 18:7:25: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 18:7:30: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 18:9:48: /killplayer faszomfaszom em Quinta-Feira, 18/6/2026, √†s 18:10:2: /changeamp faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 18:10:8: /changemap faszom tesztfaszom em Quinta-Feira, 18/6/2026, √†s 18:10:11: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 18:10:13: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 18:31:35: /killplayer faszomfaszom em Quinta-Feira, 18/6/2026, √†s 21:35:50: /helpfaszom em Quinta-Feira, 18/6/2026, √†s 21:35:55: /changemap gal testfaszom em Quinta-Feira, 18/6/2026, √†s 21:35:58: /changemap faszom testfaszom em Quinta-Feira, 18/6/2026, √†s 21:36:29: /infofaszom em Quinta-Feira, 18/6/2026, √†s 21:36:36: /infofaszom em Quinta-Feira, 18/6/2026, √†s 21:36:39: /admfaszom em Quinta-Feira, 18/6/2026, √†s 22:25:10: /helpfaszom em Quinta-Feira, 18/6/2026, √†s 22:27:0: /move faszom 0 0 0faszom em Quinta-Feira, 18/6/2026, √†s 22:28:26: /move faszom 200 0faszom em Quinta-Feira, 18/6/2026, √†s 22:33:34: /move gal 0 0 0faszom em Quinta-Feira, 18/6/2026, √†s 22:33:36: /move faszomba 0 0 0faszom em Quinta-Feira, 18/6/2026, √†s 22:33:39: /move faszom 0 0 0faszom em Quinta-Feira, 18/6/2026, √†s 22:33:50: /move faszom 0 0 0faszom em Sexta-Feira, 19/6/2026, √†s 11:5:13: /auction 900000000000 mana 1faszom em Sexta-Feira, 19/6/2026, √†s 11:5:16: /nadmfaszom em S√°bado, 20/6/2026, √†s 12:18:46: /changemap faszom testfaszom em S√°bado, 20/6/2026, √†s 12:19:12: /changemap faszom shoppingfaszom em S√°bado, 20/6/2026, √†s 12:20:14: /nadmfaszom em S√°bado, 20/6/2026, √†s 12:33:10: /nadmfaszom em S√°bado, 20/6/2026, √†s 12:33:58: /changemap faszom testfaszom em S√°bado, 20/6/2026, √†s 12:34:20: /nadmfaszom em S√°bado, 20/6/2026, √†s 12:39:29: /nadmfaszom em S√°bado, 20/6/2026, √†s 12:43:28: /nadmfaszom em S√°bado, 20/6/2026, √†s 12:44:16: /nadmfaszom em S√°bado, 20/6/2026, √†s 12:46:23: /move gal 0 0 0faszom em S√°bado, 20/6/2026, √†s 12:46:28: /move faszom 0 0 0faszom em S√°bado, 20/6/2026, √†s 12:46:39: /nadmfaszom em S√°bado, 20/6/2026, √†s 12:56:33: /nadmfaszom em S√°bado, 20/6/2026, √†s 13:13:51: /nadmfaszom em S√°bado, 20/6/2026, √†s 13:32:12: /nadmfaszom em S√°bado, 20/6/2026, √†s 13:34:20: /nadmfaszom em S√°bado, 20/6/2026, √†s 13:59:45: /nadmfaszom em S√°bado, 20/6/2026, √†s 14:3:1: /nadmfaszom em S√°bado, 20/6/2026, √†s 14:16:41: /nadmfaszom em S√°bado, 20/6/2026, √†s 15:0:15: /nadmfaszom em S√°bado, 20/6/2026, √†s 15:2:41: /nadmfaszom em S√°bado, 20/6/2026, √†s 17:22:14: /changemap faszom testfaszom em S√°bado, 20/6/2026, √†s 17:46:14: /nadmfaszom em S√°bado, 20/6/2026, √†s 17:46:30: /nadmfaszom em S√°bado, 20/6/2026, √†s 17:57:29: /nadmfaszom em S√°bado, 20/6/2026, √†s 17:57:48: /nadmfaszom em S√°bado, 20/6/2026, √†s 18:8:56: /nadmfaszom em S√°bado, 20/6/2026, √†s 18:9:39: /nadmfaszom em S√°bado, 20/6/2026, √†s 18:16:53: /nadmfaszom em S√°bado, 20/6/2026, √†s 18:17:6: /nadmfaszom em S√°bado, 20/6/2026, √†s 18:19:16: /nadmfaszom em S√°bado, 20/6/2026, √†s 18:20:57: /nadmfaszom em S√°bado, 20/6/2026, √†s 18:33:32: /nadmfaszom em S√°bado, 20/6/2026, √†s 18:59:36: /changemap faszom test2faszom em S√°bado, 20/6/2026, √†s 18:59:37: /nadmfaszom em S√°bado, 20/6/2026, √†s 19:0:44: /changemap faszom testfaszom em S√°bado, 20/6/2026, √†s 19:0:51: /nadmsaggg in Segunda-Feira, 17/8/2026, at 9:46:6: /vadminsaggg in Segunda-Feira, 17/8/2026, at 9:46:15: /helpsaggg in Segunda-Feira, 17/8/2026, at 9:47:12: /wadminsaggg in Segunda-Feira, 17/8/2026, at 9:47:17: /vadminsaggg in Segunda-Feira, 17/8/2026, at 9:47:23: /wadminsaggg in Segunda-Feira, 17/8/2026, at 9:51:58: /vadmsaggg in Segunda-Feira, 17/8/2026, at 9:52:9: /adminhelpsaggg in Segunda-Feira, 17/8/2026, at 9:52:12: /admhelpsaggg in Segunda-Feira, 17/8/2026, at 10:38:39: /clearserversaggg in Segunda-Feira, 17/8/2026, at 10:43:44: /newmap the_engineer's_house 100 50 carpetsaggg in Segunda-Feira, 17/8/2026, at 10:44:4: /mapssaggg in Segunda-Feira, 17/8/2026, at 10:44:6: /mapssaggg in Segunda-Feira, 17/8/2026, at 10:44:26: /move 0 100saggg in Segunda-Feira, 17/8/2026, at 10:44:43: /move 0 100saggg in Segunda-Feira, 17/8/2026, at 10:45:5: /go ,,,,,,,,go 0 100saggg in Segunda-Feira, 17/8/2026, at 10:46:53: /nadmsaggg in Segunda-Feira, 17/8/2026, at 10:56:38: /rawmapsaggg in Segunda-Feira, 17/8/2026, at 10:58:12: /rawmapsaggg in Segunda-Feira, 17/8/2026, at 11:5:24: /rawdata map:rainforest
+maxx:101
+maxy:50
+platform:1:100:50:wallnone
+platform:1:100:-1:wallnone
+wall:0:0:50:wallarvore
+wall:101:0:50:wallarvore
+platform:1:100:0:grass
+sound_source:72:74:5:50:birds5.ogg
+sound_source:44:48:3:50:birds2.ogg
+sound_source:0:100:0:50:birds.ogg
+zone:0:100:0:50:tropical forest
+zone:1:1:0:50:Press the enter key to return to the rural town of Santa Bertalina.
+sound_source:0:100:0:50:forest.ogg
+staircase:50:50:0:10:branch
+zone:50:50:0:50:√Årvore.
+platform:49:51:10:branch
+zone:49:49:10:50:branch.
+zone:51:51:10:50:tree
+staircase:45:45:0:15:branch
+zone:45:45:0:50:Coqueiro.
+staircase:30:30:0:20:branch
+zone:30:30:0:50:√Årvore.
+staircase:20:20:0:10:branch
+zone:20:20:0:50:tree.
+platform:52:60:13:branch
+zone:52:60:13:50:tree.
+staircase:70:70:0:6:branch
+zone:70:70:0:50:√Årvore.
+staircase:90:92:0:15:branch
+zone:90:92:0:50:√Årvore.
+travelpoint:1:1:0:0:150:0:santa_bertalina_city:You are returning to the town.
+travelpoint:100:100:0:0:1:0:indigenous_village:You pass through the vegetation, dodge some thorns, and enter a place that looks like an Indian village.
+zone:100:100:0:50:Dense vegetation has accumulated here, as if it was done on purpose. But maybe you can get over it.
+mapdoor:6:6:0:0:1:10:the_engineer's_house:You enter a house abandoned by a retired engineer, now forgotten.door11 is open
+zone:6:6:0:50:Voc√™ est√° de fronte √† uma casa com as janelas sujas de poeira.
+disable:coordenadas
+disable:camerasaggg in Segunda-Feira, 17/8/2026, at 11:33:9: /varenasaggg in Segunda-Feira, 17/8/2026, at 11:33:12: /arenasaggg in Segunda-Feira, 17/8/2026, at 11:40:0: /rawdata map:maxx:100
+maxy:50
+platform:0:100:0:carpet
+wall:0:0:20:wallnone
+wall:100:0:20:wallnone
+mapdoor:1:1:0:0:6:0:rainforest:You left the old house and returned to the tropical forest.:door14

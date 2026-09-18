@@ -1,0 +1,14 @@
+map:killing_bears
+maxx:51
+maxy:50
+platform:1:50:50:wallnone
+platform:1:50:-1:wallnone
+platform:0:51:0:capim
+wall:0:0:50:wallnone
+wall:51:0:50:wallnone
+sound_source:0:50:0:50:birds.ogg
+sound_source:0:50:0:50:birds13.ogg
+zone:0:50:0:50:Matando ursos.
+platform:24:26:10:terra2
+disable:camera
+disable:coordenadas

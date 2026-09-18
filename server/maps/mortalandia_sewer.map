@@ -1,0 +1,7 @@
+map:mortalandia_sewer
+maxx:651
+maxy:20
+platform:0:650:0:caverna
+wall:0:0:20:wallgeneric
+wall:651:0:20:wallgeneric
+zone:0:650:0:20:Esgoto.

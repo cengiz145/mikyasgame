@@ -1,0 +1,34 @@
+map:senate
+maxx:100
+maxy:20
+platform:1:100:0:carpet
+wall:0:0:20:wallnone
+wall:100:0:20:wallnone
+zone:1:100:0:20:Senado.
+platform:1:40:0:concrete5
+platform:41:99:0:carpet2
+zone:1:1:0:20:Salida del Senado.
+zone:2:38:0:20:Hall de entrada del Senado.
+zone:39:40:0:20:Entrada de la Plenaria.
+wall:40:0:20:wallglass
+door:39:0:41:0:15:none:none:door6open.ogg:door6close.ogg
+door:41:0:39:0:15:none:none:door6open.ogg:door6close.ogg
+zone:41:41:0:20:Salida de la plenaria.
+zone:42:99:0:20:Plenaria del Senado.
+platform:50:50:0:chair
+zone:50:50:0:20:Silla.
+platform:55:55:0:chair
+zone:55:55:0:20:Silla.
+platform:60:60:0:chair
+zone:60:60:0:20:Silla.
+platform:65:65:0:chair
+zone:65:65:0:20:Silla.
+platform:70:70:0:chair
+zone:70:70:0:20:Silla.
+platform:75:75:0:chair
+zone:75:75:0:20:Silla.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera
+travelpoint:1:1:0:0:233:30:rome:Regresas a la plaza central.

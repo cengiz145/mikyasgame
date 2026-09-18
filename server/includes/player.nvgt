@@ -1,0 +1,389 @@
+player@[] players(0);
+class player
+{
+bool moderator=false, achuva=false;
+int rain_count=0, ncaverna=-1;
+string arena_map;
+int resurrections=0;
+timer poison_time2, tlutar, tszona, tvelocidade, idletimer;
+int resurrection_health=25000;
+timer invisibility_timer, tmudar;
+timer pa_timer, tmaquina, thack, tpa2, tsedefome;
+timer sick_timer, tdoente2, tsvida, tsitem, tsugando, tgripe;
+timer cave_timer, tsalvar, tvarinha;
+timer field_magic_timer, tmflutuar, tmpulo, tminvs, tppeixe, tmveloz, tmcampo2;
+timer rain_magic_timer;
+timer suffocate_timer, tcongelar, tmeteoro, tmagia;
+int suffocate_count=0, ncongelar=0, in_speedboat=0;
+int inquiry_vote=0, ppeixe=0;
+int side=Right, conectou=0;
+uint fish_count=0, npescando, plinha=0;
+bool is_fishing=false, curando=false;
+double peaceful_time, nfome=0, nsede=0, ncoco=0, nurina=0;
+string chat_language, dmaquina, dbus, mapavoltar="city1", mapaatual;
+string weapon_sound_tarma="soco.ogg";
+string dalison2, anotado, cidadenatal, draw;
+string freedom_message="You have fulfilled your penalty! Do not make any more mess, You got it?";
+int mountain_quest=0, terminouquestmontanha=0, questdesaparecida=0, terminouquestdesaparecida=0, bipar=1;
+int ritual_quest=0, terminouquestritual=0;
+int cave=0, ninv=random(30000, 60000);
+int arrow=0, nveneno=0, chegoucidade, cmortal=0, lregras=0;
+int hear_footsteps=1, namaquina=0, vtempo=0, subirvida=0;
+int challenge_points=0, in_team=0, clock=0;
+double burst=0, gcoins=0, balance=0, mdor=1;
+double flu_count=0, galil=1000;
+int wand_energy=0;
+string[] nomesequipe;
+double sick=0, sujo=0;
+timer mine_timer; int mine_place_time=15000;
+bool hear_hits=true, envenenado=false, bolhaar=false;
+bool suppressed_heat=false, centado=false, horse=false, star=false, star2=false;
+bool in_safe_zone=false, dev=false, newbie=false;
+bool paralyzed=false, paralisado2=false;
+int mortal_team=0, equipedesafio=0;
+uint mp7=50000, bazuca=50000, m16=50000, sub_laser=1000;
+int has_flown=0, noaviao=0, notrem=0, jaandou=0, contabancaria=0;
+int saved_beep, vinvs;
+string muted, nconta, vconta, sugando;
+string destination, destino2, destino3, nsugador, vmap;
+int ship_arrived=0, avisanivel=1;
+// Set once the ship has released the player's movement, so the server does not
+// re-send startmoving on every tick of the crossing.
+bool ship_moving_released=false;
+uint taser_shots=0, extintor=10;
+int passport=0, vx, vy;
+int xp, xprequerida;
+int paralyzed_count=0;
+int auto_pacifist_seconds, peaceful=0;
+bool afk=false,afking=false, atpacifista=false;
+timer paralyzed_timer, atpacifistatempo;
+timer reloading_taser;
+timer plane_flying_time, tempodentrotrem;
+string computer_id;
+double credits1;
+double level;
+string inv;
+string map="school";
+int killed;
+string title;
+int chats, a10=0;
+double playtime;
+int kills;
+int deaths;
+int jumping;
+string lasthit;
+double health=5000;
+double maxhealth=5000;
+bool admin=false;
+double invisibility=0, invs2=0;
+int locked_time;
+int metal_shin_guard=0, caneleiramadeira=0;
+int police_helmet=0;
+int ring=0;
+int armband=0;
+int bracelet=0;
+int wearing_life_vest=0, colete_aprova_de_balas=0, naopodevestir=0, ncolete=0;
+int fur_coat=0;
+int mizuno_glasses=0;
+int mizuno_vest=0;
+int mizuno_pants=0;
+int mizuno_boot=0;
+int shield=0;
+int military_vest=0;
+int camouflage_vest=0;
+int nike_sneakers=0;
+int knit_shirt=0;
+int leather_jacket=0;
+int jeans_pants=0;
+int scarpin_shoes=0, sapatomagnetico=0;
+int military_boot=0;
+int legging_pants=0;
+int camouflage_pants=0;
+int gloves=0;
+int adidas_sneakers=0;
+int gold_bracelet=0;
+int silver_bracelet=0;
+int bronze_bracelet=0;
+int panama_hat=0;
+int mizuno_cap=0;
+double no_items=0;
+double negative=0;
+int prison_record=0;
+int locked=0;
+int gender, bus=0;
+string gender_suffix;
+timer prison_time;
+	timer suffocate_timer_asfixi;
+timer freeze_timer;
+timer fire_time;
+int pitch;
+int voice;
+string version;
+uint peer_id=0;
+string charname;
+int x;
+int y;
+string replyname="";
+timer pingtimer;
+timer safetimer;
+timer maptraveltimer;
+timer playtimer;
+timer startimer, bolhatimer, calortimer;
+timer magnetic_item_timer;
+uint starseconds=0;
+uint bubble_seconds=0, calorseconds=0;
+string starsoundid;
+uint telestage=0;
+timer telestagetimer;
+timer teletimer;
+string teleporter_field_id;
+string arena_map_name;
+int tx=-1,ty=-1, npasso=0, tpasso=0;
+string telemap;
+timer castingtimer,casttimer,curspelltimer;
+string curspell;
+bool floating,cloaked,superjump,cloakhiding,casting;
+timer afksecondtimer;
+uint afkseconds=0;
+player(uint id, string name, string player_version,string bannable_id){
+		suffocate_timer.force(0);
+		suffocate_timer.pause();
+tcongelar.force(0);
+tcongelar.pause();
+tppeixe.force(0);
+tppeixe.pause();
+tsugando.force(0);
+tsugando.pause();
+tmveloz.force(0);
+tmveloz.pause();
+field_magic_timer.force(0);
+field_magic_timer.pause();
+rain_magic_timer.force(0);
+rain_magic_timer.pause();
+tmcampo2.force(0);
+tmcampo2.pause();
+tmeteoro.force(0);
+tmeteoro.pause();
+tmflutuar.force(0);
+tmflutuar.pause();
+tmpulo.force(0);
+tmpulo.pause();
+tmagia.force(0);
+tmagia.pause();
+tminvs.force(0);
+tminvs.pause();
+thack.force(0);
+thack.pause();
+tlutar.force(0);
+tlutar.pause();
+tmaquina.force(0);
+tmaquina.pause();
+paralyzed_timer.force(0);
+paralyzed_timer.pause();
+reloading_taser.force(0);
+reloading_taser.pause();
+tempodentrotrem.force(0);
+tempodentrotrem.pause();
+plane_flying_time.force(0);
+teletimer.force(30000);
+casttimer.force(30000);
+magnetic_item_timer.force(60000);
+wave_time_timer.force(60000);
+fire_time.force(500);
+peer_id=id;
+charname=name;
+arena_map_name="temporary_"+name;
+version=player_version;
+computer_id=bannable_id;
+}
+bool is_admin()
+{
+return this.dev||this.admin;
+}
+void inv_add_item(string itemname, double itemvalue, bool send=true)
+{
+string content=inv;
+string[] peramitors=string_split(content, "\r\n", true);
+string[] values;
+for(double i=0; i<peramitors.length(); i++)
+{
+values.insert_at(i,string_replace(peramitors[i], string_left(peramitors[i], string_contains(peramitors[i], "=", 1)+1), "", true));
+peramitors[i]=string_replace(peramitors[i], "="+values[i], "", true);
+}
+if(inv_item_exists(itemname))
+{
+double orgval;
+if(inv_item(itemname) > -1)
+{
+orgval=string_to_number(values[inv_item(itemname)]);
+}
+else
+{
+return;
+}
+if(orgval+itemvalue < 1)
+{
+inv_delete_item(itemname);
+if (string_contains(itemname,"mm",1)==0 and string_contains(itemname,"food",1)==-1 and itemname!="mina"&&itemname!="xp")
+send_reliable(peer_id,itemvalue+" "+itemname,4);
+}
+else
+{
+values[inv_item(itemname)]=(orgval+itemvalue);
+string tempinv;
+for(double i=0; i<peramitors.length(); i++)
+{
+tempinv+=peramitors[i]+"="+values[i]+"\r\n";
+}
+inv=tempinv;
+}
+}
+else
+{
+if(itemvalue > 0)
+{
+inv+=itemname+"="+itemvalue+"\r\n";
+if (string_contains(itemname,"mm",1)==0 and string_contains(itemname,"food",1)==-1 and itemname!="mina"&&itemname!="xp")
+send_reliable(peer_id,itemvalue+" "+itemname,4);
+}
+}
+if(send==true){
+send_reliable(peer_id,"inv "+inv,0);
+string[] invsec;
+if(inv_item_number("fishing_rod")>0)invsec.insert_last("fishing_rod");
+if(inv_item_number("dart")>0)invsec.insert_last("dart");
+if(inv_item_number("poisoned_dart")>0)invsec.insert_last("poisoned_dart");
+if(inv_item_number("explosive_tape")>0)invsec.insert_last("explosive_tape");
+if(invsec.length()>0)send_reliable(peer_id, "invsec "+linear(invsec), 0);
+}
+}
+bool inv_item_exists(string itemname)
+{
+string content=inv;
+string[] peramitors=string_split(content, "\r\n", true);
+string[] values;
+for(double i=0; i<peramitors.length(); i++)
+{
+values.insert_at(i,string_replace(peramitors[i], string_left(peramitors[i], string_contains(peramitors[i], "=", 1)+1), "", true));
+peramitors[i]=string_replace(peramitors[i], "="+values[i], "", true);
+}
+for(double i=0; i<peramitors.length(); i++)
+{
+if(peramitors[i]==itemname)
+{
+return true;
+}
+}
+return false;
+}
+double inv_item_number(string itemname)
+{
+string content=inv;
+string[] peramitors=string_split(content, "\r\n", true);
+string[] values;
+for(double i=0; i<peramitors.length(); i++)
+{
+values.insert_at(i,string_replace(peramitors[i], string_left(peramitors[i], string_contains(peramitors[i], "=", 1)+1), "", true));
+peramitors[i]=string_replace(peramitors[i], "="+values[i], "", true);
+}
+for(double i=0; i<peramitors.length(); i++)
+{
+if(peramitors[i]==itemname)
+{
+return string_to_number(values[i]);
+}
+}
+return 0;
+}
+double inv_item(string itemname)
+{
+string content=inv;
+string[] peramitors=string_split(content, "\r\n", true);
+string[] values;
+for(double i=0; i<peramitors.length(); i++)
+{
+values.insert_at(i,string_replace(peramitors[i], string_left(peramitors[i], string_contains(peramitors[i], "=", 1)+1), "", true));
+peramitors[i]=string_replace(peramitors[i], "="+values[i], "", true);
+}
+for(double i=0; i<peramitors.length(); i++)
+{
+if(peramitors[i]==itemname)
+{
+return i;
+}
+}
+return -1;
+}
+void inv_delete_item(string itemname)
+{
+string content=inv;
+string[] peramitors=string_split(content, "\r\n", true);
+string[] values;
+for(double i=0; i<peramitors.length(); i++)
+{
+values.insert_at(i,string_replace(peramitors[i], string_left(peramitors[i], string_contains(peramitors[i], "=", 1)+1), "", true));
+peramitors[i]=string_replace(peramitors[i], "="+values[i], "", true);
+}
+for(double i=0; i<peramitors.length(); i++)
+{
+if(peramitors[i]==itemname)
+{
+inv=string_replace(inv, itemname+"="+values[i]+"\r\n", "", false);
+}
+}
+}
+bool has_muted(string name)
+{
+string[] m=string_split(muted,"\r\n",false);
+for (double i=0; i<m.length(); i++)
+{
+if (m[i]==name)
+{
+return true;
+}
+}
+return false;
+}
+void add_muted(string name)
+{
+muted+="\r\n"+name;
+write_to(charname,"muted.usr",muted);
+}
+bool remove_muted(string name)
+{
+string[] m=string_split(muted,"\r\n",false);
+string newmuted;
+bool succeeded;
+for (double i=0; i<m.length(); i++)
+{
+if (m[i]!=name)
+newmuted+="\r\n"+m[i];
+else
+succeeded=true;
+}
+muted=newmuted;
+write_to(charname,"muted.usr",muted);
+return succeeded;
+}
+}
+void spawn_player(double id, string name, string version_str, string thebanid){
+player player1(id, name, version_str,thebanid);
+players.insert_last(player1);
+}
+double get_player_distance(player@ p1, player@ p2)
+{
+if(p1.map!=p2.map) return -1;
+double dx,dy;
+if(p1.x<=p2.x) dx=p2.x-p1.x;
+else dx=p1.x-p2.x;
+if(p1.y<=p2.y) dy=p2.y-p1.y;
+else dy=p1.y-p2.y;
+return dx+dy;
+}
+double get_bullet_y_distance(bullet@ p1, player@ p2){
+if(p1.mapname!=p2.map) return -1;
+int dy;
+if(p1.y<=p2.y) dy=p2.y-p1.y;
+else dy=p1.y-p2.y;
+return dy;
+}

@@ -1,0 +1,19 @@
+map:temple_of_shamash
+maxx:150
+maxy:30
+platform:0:150:0:carpet
+wall:0:0:30:wallnone
+wall:150:0:30:wallnone
+zone:1:150:0:30:Templo de Shamas.
+platform:1:100:0:caverna
+staircase:100:100:0:20:concrete5
+wall:101:0:19:camerawall
+platform:101:149:20:cement
+zone:101:150:20:30:Altar del templo.
+zone:100:100:0:30:Escaleras al altar.
+zone:1:1:0:30:Salida del templo.
+travelpoint:1:1:0:5:235:30:babylon:Regresas a las escaleras.
+disable:camera
+disable:coordenadas
+disable:bicicleta
+ceiling:none

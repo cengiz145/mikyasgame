@@ -1,0 +1,146 @@
+map:royal_palace
+maxx:401
+maxy:100
+platform:0:401:0:carpet
+wall:0:0:100:wallnone
+wall:401:0:100:wallnone
+zone:1:401:0:100:Palacio.
+platform:1:400:0:concrete5
+zone:1:100:0:49:Hall de entrada del palacio.
+zone:1:1:0:49:Salida del palacio real.
+zone:92:95:0:49:Estatua del Dios nubes.
+staircase:101:110:0:50:concrete2
+wall:100:2:49:wallfence
+wall:111:2:49:wallfence
+zone:101:110:0:100:Escalera principal adornada con oro y piedras preciosas.
+zone:115:118:0:49:Estatua del Dios Marduk.
+zone:130:130:0:49:Entrada del salón de fiestas.
+zone:250:250:0:49:Puerta de acceso a la sala de la guardia.
+zone:310:310:0:49:Puerta de acceso a los aposentos de los esclavos.
+platform:130:230:20:concrete4
+door:130:0:130:20:15:none:none:door2open.ogg:door2close.ogg
+wall:129:20:49:camerawall
+zone:130:130:20:49:Puerta de acceso a los pasillos.
+door:130:20:130:0:15:none:none:door2open.ogg:door2close.ogg
+zone:131:230:20:49:Salón de fiestas.
+wall:231:20:49:camerawall
+platform:141:141:20:chair
+zone:141:141:20:49:Silla.
+platform:142:144:20:concrete8
+zone:142:144:20:49:Mesa.
+platform:145:145:20:chair
+zone:145:145:20:49:Silla.
+platform:147:147:20:chair
+zone:147:147:20:49:Silla.
+platform:148:150:20:concrete8
+zone:148:150:20:49:Mesa.
+platform:151:151:20:chair
+zone:151:151:20:49:Silla.
+platform:153:153:20:chair
+zone:153:153:20:49:Silla.
+platform:154:156:20:concrete8
+zone:154:156:20:49:Mesa.
+platform:157:157:20:chair
+zone:157:157:20:49:Silla.
+platform:159:159:20:chair
+zone:159:159:20:49:Silla.
+platform:160:162:20:concrete8
+zone:160:162:20:49:Mesa.
+platform:163:163:20:chair
+zone:163:163:20:49:Sílla.
+platform:180:200:20:carpet2
+zone:180:200:20:49:Pista de baile.
+platform:215:230:20:carpet
+zone:215:230:20:49:En esta plataforma están los músicos del rey.
+platform:250:300:20:concrete4
+door:250:0:250:20:15:none:none:door2open.ogg:door2close.ogg
+wall:249:20:49:camerawall
+zone:250:250:20:49:Puerta de acceso a los pasillos.
+door:250:20:250:0:15:none:none:door2open.ogg:door2close.ogg
+zone:251:300:20:49:Aquí la guardia del palacio está siempre dispuesta a defender el reino. Espadas y lanzas afiladas están por todas partes. Corre lo más rápido que puedas, o si tienes fuerzas, lucha por tu vida.
+wall:301:20:49:camerawall
+platform:310:360:20:brush2
+door:310:0:310:20:15:none:none:door2open.ogg:door2close.ogg
+wall:309:20:49:camerawall
+zone:310:310:20:49:Puerta de regreso a los pasillos.
+zone:311:360:20:49:Este es el lugar más miserable del palacio. Donde los esclavos duermen en montones de paja esparcidos por el suelo y sin ninguna comodidad.
+wall:361:20:49:camerawall
+door:310:20:310:0:15:none:none:door2open.ogg:door2close.ogg
+platform:1:400:50:concrete5
+zone:1:100:50:100:Pasillos.
+zone:111:400:50:100:Pasillos.
+zone:1:1:50:100:Puerta de acceso a una habitación.
+zone:40:40:50:100:Puerta de acceso a una habitación.
+zone:150:150:50:100:Puerta de acceso a una habitación.
+zone:200:200:50:100:Puerta de acceso a una habitación.
+zone:250:250:50:100:Puerta de los aposentos reales. No entres sin ser invitado.
+zone:350:350:50:100:Puerta de acceso a la biblioteca.
+zone:400:400:50:100:Puerta de acceso a la sala del trono.
+platform:1:30:70:carpet2
+door:1:50:1:70:15:none:none:door2open.ogg:door2close.ogg
+door:1:70:1:50:15:none:none:door2open.ogg:door2close.ogg
+zone:1:1:70:100:Puerta de acceso a los pasillos.
+zone:2:30:70:100:Una habitación lujosa.
+zone:7:12:70:100:Un gran baúl de ropas.
+zone:17:19:70:100:Mesita de noche.
+zone:20:30:70:100:Cama matrimonial.
+wall:31:70:100:camerawall
+platform:40:70:70:carpet2
+door:40:50:40:70:15:none:none:door2open.ogg:door2close.ogg
+door:40:70:40:50:15:none:none:door2open.ogg:door2close.ogg
+wall:39:70:100:camerawall
+zone:40:40:70:100:Puerta de acceso a los pasillos.
+zone:41:70:70:100:Una habitación lujosa.
+zone:47:52:70:100:Un gran baúl de ropas.
+zone:56:59:70:100:Mesita de noche.
+zone:60:70:70:70:Cama matrimonial.
+wall:71:70:100:camerawall
+platform:150:190:70:carpet2
+door:150:50:150:70:15:none:none:door2open.ogg:door2close.ogg
+door:150:70:150:50:15:none:none:door2open.ogg:door2close.ogg
+wall:149:70:100:camerawall
+zone:150:150:70:100:Puerta de acceso a los pasillos.
+zone:151:180:70:100:Una habitación lujosa.
+zone:157:162:70:100:Un gran baúl de ropas.
+zone:176:179:70:100:Mesita de noche.
+zone:180:190:70:100:Cama matrimonial.
+wall:191:70:100:camerawall
+platform:200:240:70:carpet2
+door:200:50:200:70:15:none:none:door2open.ogg:door2close.ogg
+door:200:70:200:50:15:none:none:door2open.ogg:door2close.ogg
+wall:199:70:100:camerawall
+zone:200:200:70:100:Puerta de acceso a los pasillos.
+zone:201:240:70:100:Una habitación lujosa.
+zone:207:212:70:100:Un gran baúl de ropas.
+zone:226:229:70:100:Mesita de noche.
+zone:230:240:70:100:Cama matrimonial.
+wall:241:70:100:camerawall
+platform:250:300:70:carpet2
+door:250:50:250:70:15:none:none:door2open.ogg:door2close.ogg
+door:250:70:250:50:15:none:none:door2open.ogg:door2close.ogg
+wall:249:70:100:camerawall
+zone:250:250:70:100:Salida de los aposentos reales.
+zone:251:300:70:100:Lujosos aposentos reales.
+zone:257:262:70:100:Un arca con incrustaciones de piedras preciosas, donde se guardan las túnicas del rey.
+zone:275:280:70:100:Un cómodo sillón dorado.
+zone:286:289:70:100:Mesita de noche.
+zone:290:300:70:100:Una lujosa cama adornada con oro, piedras preciosas y marfín.
+wall:301:70:100:camerawall
+platform:350:400:70:carpet2
+door:350:50:350:70:15:none:none:door6open.ogg:door6close.ogg
+door:350:70:350:50:15:none:none:door6open.ogg:door6close.ogg
+wall:349:70:100:walldoor
+zone:350:350:70:100:Puerta de acceso a los pasillos.
+zone:351:400:70:100:Biblioteca.
+zone:355:360:70:100:Estantería de libros.
+zone:366:370:70:100:Estantería de libros encuadernados en cuero.
+zone:374:377:70:100:Estantería con libros grabados en oro.
+zone:381:385:70:100:Estantería de manuscritos antíguos.
+zone:390:400:70:100:Mesa de lectura.
+travelpoint:1:1:0:0:675:80:babylon:Te sientes aliviado al dejar el tenebroso palacio real.
+mapdoor:400:400:50:50:1:0:throne_room:Entras en el salón del trono.:door6open
+disable:coordenadas
+disable:camera
+disable:bicicleta
+disable:varinha
+ceiling:none

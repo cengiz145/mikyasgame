@@ -1,0 +1,12 @@
+map:store
+maxx:11
+maxy:20
+platform:0:12:0:terra2
+wall:0:0:15:wallnone
+wall:11:0:15:wallnone
+wall:0:0:20:wallglass
+zone:1:10:0:20:Tienda.
+platform:1:10:0:wood3
+zone:1:1:0:20:Puerta de salida.
+travelpoint:1:1:0:20:5:40:safe_zone_es:Dejas la tienda.
+ceiling:none

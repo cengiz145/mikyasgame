@@ -1,0 +1,51 @@
+/* bc_compat.nvgt - project-specific BGT->NVGT shims for Constant Battle
+ * Provides functions that the original BGT code relied on which are not in
+ * NVGT or bgt_compat.nvgt:
+ *  - reset_all_forced_keys(): BGT had built-in forced-key simulation. The game
+ *    only ever *resets* forced keys (it never calls force_key), so this is a no-op.
+ *  - open_sound_device(): maps to NVGT's set_sound_output_device().
+ *  - position_sound_custom_1d/2d(): the classic BGT sound_positioning helpers
+ *    that the custom sound_pool in sp.nvgt calls. Reimplemented faithfully
+ *    (manual pan/volume/pitch). NVGT sound.pitch uses the same 0-100 scale as
+ *    BGT (100 = normal), matching NVGT's own sound_pool.nvgt.
+ */
+
+void reset_all_forced_keys() {
+	// no-op: project never forces keys, only resets.
+}
+
+void open_sound_device(int device) {
+	if (device >= 0) set_sound_output_device(device);
+}
+
+// BGT redirected uncaught-error/exception text to a file. NVGT has no direct
+// equivalent; the server only used it for a debug log, so this is a no-op.
+void set_error_output(const string& in filename) {
+}
+
+void position_sound_custom_1d(sound@ s, double listener_x, double source_x, double pan_step, double volume_step, double start_pan, double start_volume) {
+	if (@s == null) return;
+	double diff = source_x - listener_x;
+	double pan = start_pan + diff * pan_step;
+	if (pan > 100) pan = 100;
+	else if (pan < -100) pan = -100;
+	double vol = start_volume - abs(diff) * volume_step;
+	s.pan = pan;
+	s.volume = vol;
+}
+
+void position_sound_custom_2d(sound@ s, double listener_x, double listener_y, double source_x, double source_y, double pan_step, double volume_step, double behind_pitch_decrease, double start_pan, double start_volume, double start_pitch) {
+	if (@s == null) return;
+	double dx = source_x - listener_x;
+	double dy = source_y - listener_y;
+	double pan = start_pan + dx * pan_step;
+	if (pan > 100) pan = 100;
+	else if (pan < -100) pan = -100;
+	double dist = sqrt(dx * dx + dy * dy);
+	double vol = start_volume - dist * volume_step;
+	double pitch = start_pitch;
+	if (dy < 0) pitch -= behind_pitch_decrease;
+	s.pan = pan;
+	s.volume = vol;
+	s.pitch = pitch;
+}

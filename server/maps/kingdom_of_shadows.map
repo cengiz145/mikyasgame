@@ -1,0 +1,7 @@
+map:kingdom_of_shadows
+maxx:1001
+maxy:1000
+platform:0:1001:0:carpet
+wall:0:0:1000:wallnone
+wall:1001:0:1000:wallnone
+zone:1:1000:0:1000:El reino de las sombras.

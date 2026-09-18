@@ -1,0 +1,53 @@
+map:forum2
+maxx:201
+maxy:100
+wall:0:0:100:wallfence
+wall:201:0:100:wallnone
+ceiling:none
+zone:0:1000:0:1000:.
+zone:1:20:0:100:Estacionamento.
+zone:1:1:0:100:Porta de saída.
+sound_source:0:200:0:100:calm.ogg
+platform:1:20:0:concrete2
+platform:21:200:0:concrete4
+zone:50:50:0:19:porta 1
+door:50:0:50:20:0:none:none:door2open.ogg:door2close.ogg
+door:50:20:50:0:0:none:none:door2open.ogg:door2close.ogg
+zone:50:50:20:39:Porta de retorno.
+platform:40:50:20:carpet
+wall:39:20:39:wallnone
+wall:51:20:39:wallnone
+zone:65:65:0:19:Porta 2
+door:65:0:80:20:0:none:none:door2open.ogg:door2close.ogg
+door:80:20:65:0:0:none:none:door2open.ogg:door2close.ogg
+zone:80:80:20:39:Porta de retorno.
+platform:70:80:20:carpet
+wall:79:20:39:wallnone
+wall:81:20:39:wallnone
+zone:80:80:0:19:Porta 3
+door:80:0:110:20:0:none:none:door2open.ogg:door2close.ogg
+door:110:20:80:0:0:none:none:door2open.ogg:door2close.ogg
+zone:110:110:20:39:Porta de retorno.
+platform:100:110:20:carpet
+wall:99:20:39:wallnone
+wall:111:20:39:wallnone
+zone:100:100:0:19:Porta 4
+door:100:0:140:20:0:none:none:door2open.ogg:door2close.ogg
+door:140:20:100:0:0:none:none:door2open.ogg:door2close.ogg
+zone:140:140:20:39:Porta de retorno.
+platform:130:140:20:carpet
+wall:129:20:39:wallnone
+wall:141:20:39:wallnone
+wall:161:0:19:wallnone
+staircase:159:160:0:20:concrete4
+wall:158:1:39:wallnone
+zone:159:160:0:39:Escada.
+platform:161:200:20:concrete4
+zone:161:200:20:39:Corredor.
+zone:200:200:20:39:Porta
+door:200:20:200:40:0:none:none:door2open.ogg:door2close.ogg
+door:200:40:200:20:0:none:none:door2open.ogg:door2close.ogg
+zone:200:200:40:59:Porta de retorno.
+platform:190:200:40:carpet
+wall:189:40:59:wallnone
+

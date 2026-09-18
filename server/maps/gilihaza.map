@@ -1,0 +1,10 @@
+map:gilihaza
+maxx:100
+maxy:100
+platform:0:100:0:cement
+wall:0:0:20:wallnone
+wall:100:0:20:wallnone
+zone:0:100:0:100:gili haza
+sound_source:1:100:0:100:pessoas2.ogg
+sound_source:1:100:0:100:musica9.ogg
+ceiling:none

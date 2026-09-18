@@ -1,0 +1,72 @@
+map:egypt
+maxx:980
+maxy:100
+platform:0:980:0:carpet
+wall:0:0:100:wallnone
+wall:980:0:100:wallnone
+zone:1:1000:0:500:Egipto antiguo.
+zone:1:1:0:200:Salida del Egipto.
+travelpoint:1:1:0:0:400:0:antiquity:Regresas a la antigüedad.
+platform:1:150:0:sand
+zone:2:150:0:200:Estás en un desierto gigantesco. Por todos lados, están postrados  algunos pequeños cactus resistentes al calor y muchas dunas moviéndose por las constantes ráfagas de viento y tormentas de arena. A cada instante el desierto es diferente, y te sientes bastante desconcertado.
+zone:151:200:0:300:Egipto antiguo.
+platform:151:200:0:grass
+platform:201:679:0:terra2
+zone:201:390:0:300:Plaza Central.
+staircase:220:225:0:30:concrete5
+wall:219:1:50:camerawall
+wall:226:1:50:camerawall
+zone:220:225:0:30:Las imponentes escaleras al templo de Osiris, el Dios de los muertos y juez del inframundo...
+zone:220:225:30:50:Entrada del templo.
+travelpoint:220:225:30:30:1:0:temple_of_osiris:Entras en el templo de Osires.
+zone:250:255:0:30:Bancos alrededor de la plaza.
+zone:261:270:0:30:Área de comercio.
+zone:275:280:0:30:Bancos alrededor de la plaza.
+staircase:290:295:0:30:concrete5
+wall:289:1:50:camerawall
+wall:296:1:50:camerawall
+zone:290:295:0:50:Grandiosas escaleras al templo de Isis, la Diosa del amor.
+zone:290:295:30:50:Portones de entrada del templo.
+travelpoint:290:295:30:30:1:0:templo_de_isis:Entras en el templo de isis.
+staircase:325:330:0:30:concrete5
+wall:324:1:50:camerawall
+wall:331:1:50:camerawall
+zone:325:330:0:50:Las imponentes escaleras al templo de Horus, el Dios de la luz y del cielo.
+travelpoint:325:330:30:30:1:0:templo_de_horus:Entras en el templo de Horus.
+zone:325:350:30:50:Puertas de entrada del templo.
+zone:350:355:0:50:Bancos alrededor de la plaza.
+staircase:375:380:0:30:concrete5
+wall:374:1:50:camerawall
+wall:381:1:50:camerawall
+zone:375:380:0:50:Grandiosas escaleras al templo de Ammon-rah, el rey de los Dioses.
+zone:375:380:30:50:Entrada del templo.
+travelpoint:375:380:30:30:1:0:templo_de_amon-rá:Entras en el templo de Amon-rá.
+platform:500:506:0:mud
+zone:500:507:0:50:Orillas del río Nilo.
+platform:507:535:0:shallow
+zone:507:535:0:50:Río nilo.
+platform:536:541:0:mud
+zone:536:542:0:50:Orillas del río Nilo.
+zone:580:630:0:50:Frente al palacio.
+staircase:600:610:0:30:concrete5
+wall:599:1:50:wallfence
+wall:611:1:50:wallfence
+zone:600:610:0:50:Lujosas escaleras que conducen al palacio.
+zone:600:610:30:50:Estás en las puertas del palacio. No entres sin ser invitado, o te arrepentirás.
+zone:675:679:0:700:puedes ver a lo lejos una gran pirámide rodeada de arena blanca.
+platform:680:780:0:sand
+zone:680:780:0:10:Estás en un desierto gigantesco. Por todos lados, están postrados  algunos pequeños cactus resistentes al calor y muchas dunas moviéndose por las constantes ráfagas de viento y tormentas de arena. A cada instante el desierto es diferente, y te sientes bastante desconcertado.
+platform:151:200:0:brush2
+zone:781:880:0:10:Frente a la gran pirámide.
+platform:781:880:0:areia
+zone:800:818:0:10:Pirámide.
+zone:819:821:0:10:Entrada de la gran pirámide.
+zone:822:840:0:10:Pirámide.
+platform:881:979:0:sand
+zone:881:979:0:10:Estás en un desierto gigantesco. Por todos lados, están postrados  algunos pequeños cactus resistentes al calor y muchas dunas moviéndose por las constantes ráfagas de viento y tormentas de arena. A cada instante el desierto es diferente, y te sientes bastante desconcertado.
+wall:980:0:500:camerawall
+disable:coordenadas
+disable:bicicleta
+disable:camera
+travelpoint:819:821:0:0:1:50:pyramid:Entras en la pirámide.
+sound_source:1:150:0:20:a8.ogg

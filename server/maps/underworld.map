@@ -1,0 +1,47 @@
+map:underworld
+maxx:501
+maxy:150
+platform:0:501:0:carpet
+wall:0:0:150:wallnone
+wall:501:0:150:wallnone
+zone:1:500:0:150:Inframundo.
+staircase:1:40:50:100:shallow
+zone:1:40:50:150:Continuación del río Estigia.
+zone:1:1:100:120:Nadando a través de esta corriente, es posible regresar al otro lado del río.
+travelpoint:1:1:100:100:260:33:river_styx:Regresas.
+platform:41:41:100:dirt2
+zone:41:41:100:150:Orilla del río estigia.
+platform:42:59:100:dirt
+zone:42:59:100:150:Rocas negras y puntiagudas.
+platform:60:499:100:grass
+zone:60:499:100:150:Campo de asfódelos. La hierba negra pisoteada por edades de pies muertos, un viento helado y cortante sopla como el aliento de un vacío sin fin. Al observar una imagen así, te imaginas que algo trágico ocurrió en los bastidores. Una masa de gente susurrante sigue vagando en las sombras sin dirección.
+staircase:500:500:0:100:branch
+zone:500:500:0:150:Un árbol imponente. Adónde llevará?
+wall:149:0:99:wallarvore
+platform:150:499:0:grass2
+zone:150:499:0:99:Jardín de Perséfone. Rompiendo con la falta de colores del inframundo, este lugar es simplemente hermoso y colorido. Flores y frutos de diversas especies nunca antes vistas se distribuyen por todo el jardín, algunos brillando bajo la luz fantasmal del reino mientras que otros tienen colores intensos y llamativos, con pequeños cristales y rubíes. Sin embargo, entre las hermosas flores, hay una nefasta sensación de angustia que domina tus sentidos. Y el intenso olor que se extiende por todas partes, es capaz de debilitar cualquier mente humana. Te das cuenta del poder de la muerte que emana de las plantas de aquí. Tanto es así que, aunque sea hermoso, no es de ninguna manera atractivo para los ojos de los mortales.
+staircase:170:170:0:5:grass
+zone:170:170:0:50:Rosa chapada en oro.
+staircase:200:200:0:10:branch
+zone:200:200:0:50:Un hermoso árbol.
+staircase:250:250:0:5:branch
+zone:250:250:0:50:Un árbol pequeño.
+staircase:280:280:0:10:grass
+zone:280:280:0:50:Jardín de claveles.
+staircase:310:310:0:30:branch
+zone:310:310:0:50:Un gran árbol.
+staircase:350:350:0:5:grass
+zone:350:350:0:50:Un hermoso jardín de margaritas.
+staircase:370:370:0:10:grass
+zone:370:370:0:50:Un jardín de rosas mortales.
+staircase:400:400:0:40:branch
+zone:400:400:0:50:Un árbol frondoso.
+zone:401:401:0:50:entre estos dos inmensos árboles está la entrada al diabólico palacio de Hades. Seguramente si entras aquí, la muerte te espera en algún rincón.
+zone:402:402:0:50:Un árbol frondoso.
+staircase:420:420:0:15:grass
+staircase:450:450:0:5:grass
+zone:450:450:0:50:Una pequeña planta símbolo del inframundo.
+travelpoint:401:401:0:0:1:0:palace_of_hades:Como si ya no fuera posible, tu miedo aumenta terriblemente. El aura demoníaca es más que real en este lugar. Un silencio fantasmal habita este palacio, y el olor a muerte está impregnado en cada rincón...
+sound_source:1:40:80:95:water5.ogg
+sound_source:45:500:105:150:a3.ogg
+sound_source:150:300:3:50:a10.ogg

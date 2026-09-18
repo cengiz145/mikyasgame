@@ -1,0 +1,15 @@
+map:throne_room
+maxx:50
+maxy:20
+platform:0:50:0:carpet
+wall:0:0:15:wallnone
+wall:50:0:15:wallnone
+platform:1:49:0:carpet2
+zone:1:1:0:20:Pasaje de regreso al palacio real.
+zone:2:50:0:20:Este aposento está rodeado de estatuas de deidades, columnas de mármol cubiertas de oro y piedras preciosas. Si no has sido invitado a entrar, váyase mientras aún tiene vida.
+zone:30:40:0:20:Estás frente al gran trono de oro, si no has sido invitado a estar aquí, lucha por tu vida.
+mapdoor:1:1:0:0:400:50:palace:Dejas el salón del trono.:door6close
+disable:camera
+disable:bicicleta
+disable:coordenadas
+ceiling:none

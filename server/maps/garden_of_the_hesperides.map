@@ -1,0 +1,28 @@
+map:garden_of_the_hesperides
+maxx:71
+maxy:50
+platform:0:71:0:carpet
+wall:0:0:50:wallnone
+wall:71:0:50:wallnone
+zone:1:71:0:50:Huerto de las Hespérides.
+platform:1:70:0:grass
+wall:0:0:50:wallarvore
+wall:71:0:50:wallarvore
+zone:1:1:0:50:A lo lejos puedes ver una región de bosque pantanoso.
+travelpoint:1:1:0:0:100:50:argos:Regresas a argos.
+staircase:25:25:0:25:branch
+zone:25:25:0:50:Árbol.
+staircase:35:35:0:30:branch
+zone:35:35:0:50:Árbol.
+staircase:45:45:0:15:branch
+zone:45:45:0:50:Árbol.
+staircase:55:55:0:20:branch
+zone:55:55:0:50:Árbol.
+staircase:65:65:0:15:branch
+zone:65:65:0:50:Árbol.
+zone:70:70:0:50:A través de una espesa rama puedes ver un lago a lo lejos.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
+disable:camera
+travelpoint:70:70:0:0:133:0:erymanthos_lake:Entras en el Lago de Erimanto. Algo te dice que aquí no será nada agradable ingresar.

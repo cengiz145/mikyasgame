@@ -1,0 +1,28 @@
+map:swamp
+maxx:201
+maxy:20
+platform:1:200:20:wallnone
+platform:1:200:-1:wallnone
+platform:1:20:0:water2
+platform:21:29:0:water
+platform:30:200:0:brejo
+wall:0:0:20:wallnone
+wall:201:0:20:wallnone
+sound_source:0:200:0:20:birds24.ogg
+sound_source:0:30:0:20:water1.ogg
+zone:0:200:0:20:brejo
+travelpoint:1:1:0:0:100:0:underground_cave:Você nada pela cachoeira, se encontrando em uma passagem subterrâmea, acho melhor sair da qui!
+zone:1:1:0:20:Uma passagem de baixo da cachoeira, onde será que ela leva?
+sound_source:-4:-4:0:50:water3.ogg
+disable:coordenadas
+disable:bicicleta
+quicksand:35:0
+quicksand:50:0
+quicksand:60:0
+quicksand:80:0
+quicksand:110:0
+quicksand:140:0
+quicksand:166:0
+quicksand:195:0
+mapdoor:200:200:0:0:1:20:vulcan_to_dragunia:you entered the vulcan:none
+zone:200:200:0:0:entrance to the vulcan

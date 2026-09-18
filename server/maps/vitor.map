@@ -1,0 +1,6 @@
+map:vitor
+maxx:10
+maxy:10
+platform:0:10:0:concrete
+wall:0:0:20:wallnone
+wall:10:0:20:wallnone

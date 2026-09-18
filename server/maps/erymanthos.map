@@ -1,0 +1,35 @@
+map:erymanthos
+maxx:81
+maxy:70
+platform:0:81:0:carpet
+wall:0:0:70:wallnone
+wall:81:0:70:wallnone
+zone:1:81:0:70:Erimanto.
+platform:1:65:0:snow
+zone:1:81:0:70:Un abismo profundo.
+zone:1:1:0:150:Aquí regresas al reino de las amazonas.
+travelpoint:1:1:0:0:299:30:amazon:Regresas al reino de las amazonas.
+zone:2:65:0:15:Una enorme montaña se extiende frente a ti. La escalada te parece un poco peligrosa por la nieve que cubre el camino. Además, algo muy siniestro pende sobre este lugar... porque tienes un fuerte sentimiento de que no estás solo.
+wall:66:0:25:camerawall
+staircase:65:65:0:15:snow
+zone:65:65:0:25:Escalada de la montaña. Miras hacia arriba, y no puedes ver la parte superior. demasiada nieve. todo el cuidado es muy poco, cualquier resbalón puede ser fatal.
+platform:50:64:15:snow
+zone:50:64:15:25:Un camino difícil. El camino comienza a estrecharse. Grandes abismos llenos de rocas afiladas y cubiertas de hielo aparecen a ambos lados. Caminas con precaución, y sin embargo casi te resbalas unas cuantas veces.
+staircase:50:50:15:45:snow
+zone:50:50:15:55:Continuación de la ascensión. La niebla te impide ver el camino, y sientes un escalofrío en tu cuello. El ruido del viento y la sensación de ser observado te atormentan y piensas en regresar, pero tu instinto aventurero termina hablando más fuerte.
+platform:40:49:45:snow
+zone:40:49:45:55:Un camino nublado. A medida que das tus primeros pasos, tus pies se hunden en la nieve que se ha acumulado aquí, tu cuerpo comienza a temblar y no sabes si es por el intenso frío que comienza a congelarte por dentro, o por los espasmos del miedo ante el abismo más profundo y oscuro que tus ojos hayan visto antes. Un bloque de hielo en medio de la montaña es la única manera de salvar tu vida. Una fuerza magnética te empuja, y pensando que te has vuelto loco, decides saltar.
+platform:34:34:45:ice
+zone:34:34:45:55:Un gran bloque de hielo cerca de la cima. Puedes ver desde lejos la cima de esta gigantesca montaña, pero sientes que no es muy seguro quedarse aquí. El hielo comienza a romperse bajo tus pies. Tu mirada busca algo seguro alrededor y encuentras una franja de nieve después de un gran abismo. Tus pensamientos se vuelven conflictivos... es saltar o morir.
+staircase:27:27:45:54:ice
+zone:27:27:45:53:Escalada congelada. El suelo está cubierto de grandes rocas de hielo. Subes rápidamente, porque ya puedes ver claramente la cima de la montaña, y además, no parece muy seguro aquí.
+platform:1:26:54:snow
+platform:28:80:54:snow
+zone:1:80:54:70:La cima de la montaña. Por fin llegas a la cima de esta extensa montaña. La nieve aquí es mucho más espesa que allá abajo, y la profunda oscuridad hace que tu sentido de dirección sea un poco más difícil, y tu habilidad para discernir una extraña sombra que tus ojos pueden captar débilmente en la distancia. Un poco temeroso de lo que pueda ser, decides acercarte, y lamentas tan pronto como te encuentras con un jabalí gigante, cuyas presas son capaces de destrozar tu cuerpo con un solo ataque. Sin al menos pensar con claridad, inicias una incansable persecución a la criatura, porque sabes que no hay mucho que hacer.... es matar, o morir.
+staircase:80:80:0:54:snow
+wall:79:0:53:camerawall
+zone:80:80:0:53:Camino de regreso a la montaña. El frío te sorprende. La subida empinada y nevada que hay frente a ti te empuja hacia atrás. Pero es la única manera de volver.
+zone:80:80:0:0:a lo lejos ves un lago, ¿será que es una idea agradable bañarse en sus aguas?
+travelpoint:80:80:0:0:1:0:erymanthos_lake:entras en el lago de erimanto. Una hermosa vista emerge, pero algo te dice que sería mejor que nunca hubieras entrado aquí.
+disable:coordenadas
+disable:bicicleta

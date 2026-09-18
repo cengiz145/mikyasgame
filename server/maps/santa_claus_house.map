@@ -1,0 +1,50 @@
+map:santa_claus_house
+maxx:71
+maxy:250
+platform:1:71:0:carpet
+wall:0:0:250:wallnone
+wall:71:0:250:wallnone
+platform:1:27:0:concreto
+zone:1:1:0:39:Pressione enter para deixar a casa e retornar a sala de música.
+travelpoint:1:1:0:0:5:0:music_room:Você retorna a sala de música.
+zone:2:27:0:39:Você sente o novo tomar conta de si. Luzes dançam no céu, dando forma à beleza que o rodeia. Pessoas trajando os mais variados estilos de roupa passam por você, desejando-lhe um feliz natal.
+staircase:25:27:0:40:concreto
+wall:24:1:99:wallnone
+wall:28:0:39:wallnone
+zone:25:27:0:99:Escadas que levam ao centro da casa do papai noel. Curioso para ver o que pode encontrar, você talvez queira prosseguir...
+platform:28:70:40:concreto
+zone:28:70:40:99:Centro da casa do Papai Noel. Você avista ao longe uma belíssima árvore de natal, que está rodeada por diversas luzes. Uma placa está posicionada ao lado dela. Pressione SHIFT+ENTER para ler.
+staircase:50:50:40:80:branch
+platform:51:51:80:concreto
+wall:52:80:99:wallnone
+zone:51:51:80:99:Placa.
+platform:70:70:40:chair
+zone:70:70:40:99:Um papai Noel lindo e charmoso encontra-se aqui, sentado aproveitando a maravilhosa brisa do vento.
+staircase:65:65:40:100:concreto
+wall:64:41:200:wallnone
+wall:66:41:250:wallnone
+zone:65:65:40:139:Escadas para o segundo andar.
+platform:20:65:100:concreto
+zone:20:64:100:139:Segundo piso.
+staircase:20:20:100:140:concreto
+wall:19:100:250:wallnone
+wall:21:101:139:wallnone
+zone:20:20:100:179:Escadas para o terceiro andar.
+platform:21:65:140:concreto
+zone:21:65:140:179:Tercer piso.
+staircase:65:65:140:180:concreto
+wall:64:141:179:wallnone
+zone:65:65:140:200:Escadas para o quarto andar.
+zone:20:65:180:200:Cuarto piso.
+platform:20:65:180:concreto
+staircase:20:20:180:200:concreto
+wall:21:181:199:wallnone
+zone:20:20:180:250:Escadas para o quinto e último andar.
+platform:20:65:200:concreto
+zone:21:65:200:250:Ultimo andar.
+safezone:1:71:0:200
+ceiling:none
+disable:coordenadas
+disable:camera
+disable:bicicleta
+disable:varinha

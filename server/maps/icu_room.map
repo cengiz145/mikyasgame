@@ -1,0 +1,24 @@
+map:icu_room
+maxx:51
+maxy:20
+platform:0:50:0:carpet
+wall:0:0:20:walldoor2
+wall:51:0:20:wallgeneric
+zone:1:50:0:20:Quarto.
+zone:1:1:0:20:Porta de saída do quarto.
+zone:16:18:0:20:Leito.
+zone:40:40:0:20:Porta do banheiro.
+zone:41:50:0:20:Banheiro.
+platform:41:50:0:cement
+door:40:0:42:0:0:door.ogg:none:door2open.ogg:door2close.ogg
+wall:41:0:20:walldoor
+door:42:0:40:0:0:door.ogg:none:door2open.ogg:door2close.ogg
+sound_source:2:36:3:20:vent.ogg
+travelpoint:1:1:0:0:30:40:hospital:Você sai do quarto.
+zone:49:50:0:20:chuveiro
+zone:46:46:0:20:Vaso sanitário
+zone:44:44:0:20:pia
+safezone:0:50:0:20
+disable:bicicleta
+disable:coordenadas
+ceiling:none

@@ -1,0 +1,21 @@
+map:elida
+maxx:201
+maxy:20
+platform:0:201:0:carpet
+wall:0:0:20:wallnone
+wall:201:0:20:wallnone
+zone:1:201:0:20:Reino de élida.
+platform:1:100:0:terra
+zone:1:1:0:20:Salida de regreso a grecia.
+travelpoint:1:1:0:0:332:0:greece:Dejas el reino de élida.
+zone:50:100:0:20:Centro de la ciudad. una aglomeración de gente muy ruidosa, algunos caminando, otros comprando y vendiendo mercancías.
+platform:101:200:0:grass2
+zone:101:200:0:20:Carretera al camino rural del reino.
+zone:130:135:0:20:Aquí, ves la entrada de los establos.
+travelpoint:130:135:0:0:1:0:stables:Entras en los establos de Augias. hay estiércol por todo el suelo, y el olor te asfixia. Parece que este lugar no ha sido limpiado hace años.
+platform:200:200:0:brush2
+zone:200:200:0:20:Frontera del reino. Puedes ver mucho humo. ¿Será que es una buena idea seguir?
+travelpoint:200:200:0:0:1:0:kingdom_of_thrace:Entras en el Reino de Tracia. A lo lejos, un humo muy extraño flota en el aire.
+disable:coordenadas
+disable:bicicleta
+disable:camera

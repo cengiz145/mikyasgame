@@ -1,0 +1,25 @@
+map:nemea
+maxx:201
+maxy:50
+platform:0:201:0:carpet
+wall:0:0:50:wallnone
+wall:201:0:50:wallnone
+zone:1:201:0:50:Nemea.
+platform:1:49:0:grass
+zone:1:1:0:20:Salida de la ciudad.
+travelpoint:1:1:0:0:163:50:greece:Uma estrada íngreme.
+staircase:10:11:0:20:branch
+zone:10:11:0:50:Árbol.
+staircase:24:24:0:20:branch
+zone:24:24:0:50:Árbol.
+platform:50:100:0:terra
+zone:50:100:0:50:Centro de la ciudad. Donde se desarrollan todas las actividades sociales y políticas de la ciudad.
+platform:75:78:0:mud
+zone:75:78:0:50:Aquí hay una fuente de piedra ornamentada, llena de agua cristalina.
+platform:101ç:200:0:grass
+zone:150:153:0:50:Entrada de una cueva. Un olor a sangre y muerte viene de adentro.
+travelpoint:150:153:0:0:1:50:nemea_cave:Entras en la cueva. Inmediatamente sientes un escalofrío y un amargo arrepentimiento al entrar aquí.
+wall:201:0:50:wallarvore
+disable:coordenadas
+disable:bicicleta
+disable:camera

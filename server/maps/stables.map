@@ -1,0 +1,24 @@
+map:stables
+maxx:100
+maxy:20
+platform:0:100:0:carpet
+wall:0:0:20:wallnone
+wall:100:0:20:wallnone
+zone:1:100:0:20:Establos de Augias. El olor aquí es insoportable. Ves mucho estiércol acumulado y te da asco pensar que tienes que ir al otro lado, pero sabes que no hay otra manera de salir de aquí.
+platform:1:99:0:shortgrass
+zone:1:1:0:20:Salida de los establos.
+travelpoint:1:1:0:0:132:0:elida:Dejas los establos. El aire fresco llena tus pulmones con una sensación de alivio, porque el olor desagradable se quedó atrás.
+platform:5:9:0:mud
+platform:15:19:0:mud
+platform:25:29:0:mud
+platform:35:39:0:mud
+platform:45:49:0:mud
+platform:55:59:0:mud
+platform:65:69:0:mud
+platform:75:69:0:mud
+platform:85:89:0:mud
+platform:95:99:0:mud
+wall:100:0:20:wallbarricada
+disable:coordenadas
+disable:bicicleta
+disable:camera

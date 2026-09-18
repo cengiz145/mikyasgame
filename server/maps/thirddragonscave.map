@@ -1,0 +1,14 @@
+map:thirddragonscave
+maxx:25
+maxy:30
+platform:0:25:0:cement
+wall:0:0:20:wallnone
+wall:25:0:20:wallnone
+zone:0:25:0:30:third dragon scave
+platform:0:25:0:gravel
+wall:0:0:30:walldirt
+wall:25:0:30:walldirt
+sound_source:0:25:0:30:caverna2.ogg
+zone:1:1:0:0:third dragon scave exit.
+mapdoor:1:1:0:0:24:0:seconddragonsscave:you back to the second dragon scave.:metal
+ceiling:thirddragonscave

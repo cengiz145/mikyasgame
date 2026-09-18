@@ -1,0 +1,19 @@
+map:hall_of_hades
+maxx:40
+maxy:20
+platform:0:40:0:carpet
+wall:0:0:20:wallnone
+wall:40:0:20:wallnone
+zone:1:40:0:20:Sala de Hades.
+platform:1:39:0:caverna
+zone:1:1:0:20:En medio de tanta oscuridad, casi no te das cuenta de una puerta escondida a través de las paredes, que parece ser la salida de este atormentador lugar.
+mapdoor:1:1:0:0:200:90:palace_of_hades:Regresas al palacio.:door4close
+zone:2:28:0:20:Sala de Hades. Has llegado aquí, pero el horror es tan grande que estás paralizado por el miedo y asombrado por tal poder. Las brasas negras emanan de las paredes y si no creías en el verdadero infierno, ahora empiezas a creer.
+wall:32:0:3:wallnone
+staircase:29:31:0:4:concreto2
+zone:29:31:0:4:escaleras al pie del terrible trono de huesos humanos.
+platform:32:39:4:corpse
+zone:32:39:4:20:Trono de Hades, un lugar terrible hecho con Huesos Humanos donde ni siquiera la muerte se atrevería a poner los pies. El fuego emana de este lugar, Hades te espera para destruir toda tu vida y tu historia.
+ceiling:none
+disable:coordenadas
+disable:bicicleta
