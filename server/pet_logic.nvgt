@@ -1,0 +1,69 @@
+class Pet {
+    string owner;
+    string type;
+    int x;
+    int y;
+    string map;
+    timer movement_timer;
+    timer sound_timer;
+
+    Pet(string owner_name, string pet_type, int start_x, int start_y, string start_map) {
+        owner = owner_name;
+        type = pet_type;
+        x = start_x;
+        y = start_y;
+        map = start_map;
+    }
+    Pet() {}
+}
+
+Pet[] global_pets;
+
+void process_pets() {
+    for (uint i = 0; i < global_pets.length(); i++) {
+        int target = get_player_index_from(global_pets[i].owner);
+        if (target == -1) continue; // Owner is offline
+
+        if (players[target].map != global_pets[i].map) {
+            // Teleport pet to owner if they change maps
+            global_pets[i].map = players[target].map;
+            global_pets[i].x = players[target].x;
+            global_pets[i].y = players[target].y;
+            continue;
+        }
+
+        // Calculate distance
+        int diff_x = global_pets[i].x - players[target].x;
+        if (diff_x < 0) diff_x = -diff_x;
+        int diff_y = global_pets[i].y - players[target].y;
+        if (diff_y < 0) diff_y = -diff_y;
+        
+        double d = double(diff_x + diff_y);
+
+        if (d > 2 && global_pets[i].movement_timer.elapsed >= 350) {
+            global_pets[i].movement_timer.restart();
+            bool moved = false;
+            
+            if (global_pets[i].x > players[target].x) { global_pets[i].x--; moved = true; }
+            else if (global_pets[i].x < players[target].x) { global_pets[i].x++; moved = true; }
+
+            if (global_pets[i].y > players[target].y) { global_pets[i].y--; moved = true; }
+            else if (global_pets[i].y < players[target].y) { global_pets[i].y++; moved = true; }
+
+            if (moved) {
+                string step_sound = get_tile_at(global_pets[i].x, global_pets[i].y, global_pets[i].map) + "step" + random(1, 5) + ".ogg";
+                send_packet(0, "play " + step_sound + " " + global_pets[i].x + " " + global_pets[i].y, global_pets[i].map);
+            }
+        }
+        
+        // Random idle sounds (bark, meow)
+        if (global_pets[i].sound_timer.elapsed >= random(6000, 15000)) {
+            global_pets[i].sound_timer.restart();
+            if (global_pets[i].type == "dog") {
+                send_packet(0, "play attack_dog" + random(1, 3) + ".ogg " + global_pets[i].x + " " + global_pets[i].y, global_pets[i].map);
+            } else if (global_pets[i].type == "cat") {
+                send_packet(0, "play gato" + random(1, 3) + ".ogg " + global_pets[i].x + " " + global_pets[i].y, global_pets[i].map);
+            }
+        }
+    }
+}

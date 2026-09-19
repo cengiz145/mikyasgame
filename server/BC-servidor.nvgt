@@ -4,6 +4,7 @@
 const string version="6.1";
 #include "rotation.nvgt"
 #include "monster_logic.nvgt"
+#include "pet_logic.nvgt"
 #include "Localizar IP.nvgt"
 int battle_counter=1;
 timer arena_in_progress_timer;
@@ -162,6 +163,7 @@ timer save_configs;
 void main(){
 load_monsters_from_map("test");
 process_monsters();
+process_pets();
 set_error_output("log.md");
 if(directory_exists("players_apartamentos")==false)directory_create("players_apartamentos");
 tvaviao.force(0);
@@ -734,6 +736,7 @@ start_profiling();
 while(true){
 wait(5);
 process_monsters();
+process_pets();
 if (key_pressed(KEY_ESCAPE))
 {
 exit();
@@ -952,6 +955,30 @@ parsed[1]=maqs[random(0, maqs.length()-1)];
 }
 players[index].dmaquina=parsed[1];
 players[index].namaquina=1;
+}
+else if(parsed[0]=="spawnpet" && parsed.length() > 1){
+    // Despawn existing pet if any
+    for (uint i = 0; i < global_pets.length(); i++) {
+        if (global_pets[i].owner == players[index].charname) {
+            global_pets.remove_at(i);
+            break;
+        }
+    }
+    
+    if (parsed[1] == "despawn") {
+        send_reliable(players[index].peer_id, "msgnormal Evcil hayvaniniz geri gonderildi.", 0);
+    } else {
+        Pet p;
+        p.owner = players[index].charname;
+        p.type = parsed[1];
+        p.x = players[index].x;
+        p.y = players[index].y;
+        p.map = players[index].map;
+        p.movement_timer.restart();
+        p.sound_timer.restart();
+        global_pets.insert_last(p);
+        send_reliable(players[index].peer_id, "msgnormal Evcil hayvaniniz yaniniza cagirildi!", 0);
+    }
 }
 else if(parsed[0]=="imenu"&&players[index].afk==false&&players[index].paralyzed==false&&players[index].paralisado2==false)interact_menu(index);
 else if(parsed[0]=="zsa"&&parsed.length()>1)zsa1(index);
@@ -8734,6 +8761,7 @@ if(projeteis.length()>0)projectile_loop();
 if(oms.length()>0)magnetic_item_loop();
 if(canhaos.length()>0)cannon_loop();
 }
+
 
 
 

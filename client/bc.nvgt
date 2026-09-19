@@ -1855,6 +1855,7 @@ if(key_pressed(KEY_TAB)){
             m.add_item_tts("Kisisel Oyuncu Islemleri", "cat_personal");
             m.add_item_tts("Garaj (Arac Yonetimi)", "cat_garage");
             m.add_item_tts("Banka ve Ticaret", "cat_bank");
+            m.add_item_tts("Evcil Hayvanlar (Pets)", "cat_pet");
             if(developer_dm == 1) {
                 m.add_item_tts("Rutbe ve Harita (Yonetici)", "cat_admin");
                 m.add_item_tts("Etkinlik & Sunucu Islemleri", "cat_event");
@@ -6976,6 +6977,8 @@ return message;
 }
 return message;
 }
+
+
 
 
 
