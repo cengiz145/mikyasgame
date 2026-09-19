@@ -1852,7 +1852,10 @@ if(key_pressed(KEY_TAB)){
         setupmenu();
         if(current_category == 0) {
             m.add_item_tts("Evlilik Islemleri", "cat_evlilik");
-            if(developer_dm == 1) m.add_item_tts("Yonetici Islemleri", "cat_admin");
+            if(developer_dm == 1) {
+                m.add_item_tts("Yonetici Islemleri", "cat_admin");
+                m.add_item_tts("Etkinlik & Sunucu Islemleri", "cat_event");
+            }
             m.add_item_tts("Kapat", "close");
             
             int res = m.run("Eylem Menusu - Kategori Secin", true);
@@ -1861,6 +1864,7 @@ if(key_pressed(KEY_TAB)){
             
             if(action == "cat_evlilik") current_category = 1;
             else if(action == "cat_admin") current_category = 2;
+            else if(action == "cat_event") current_category = 3;
             else if(action == "close") break;
         }
         else if(current_category == 1) {
@@ -1910,6 +1914,31 @@ if(key_pressed(KEY_TAB)){
                 }
                 else if(action == "open_builder") {
                     open_builder = true;
+                }
+                break;
+            }
+        }
+        else if(current_category == 3) {
+            m.add_item_tts("Cifte XP (Double XP) Ac/Kapat", "doublexp");
+            m.add_item_tts("Cifte Kazanc (Double Gold) Ac/Kapat", "doublegold");
+            m.add_item_tts("Sunucu Giris Mesajini Duzenle", "edit_motd");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Etkinlik & Sunucu Islemleri", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else {
+                if(action == "doublexp") {
+                    send_reliable(peer_id, "/doublexp", 1);
+                }
+                else if(action == "doublegold") {
+                    send_reliable(peer_id, "/doublegold", 1);
+                }
+                else if(action == "edit_motd") {
+                    string msg = v.input("Yeni sunucu giris mesajini yazin:");
+                    if(msg != "") send_reliable(peer_id, "/msgpt " + msg, 1);
                 }
                 break;
             }
@@ -6730,6 +6759,7 @@ return message;
 }
 return message;
 }
+
 
 
 
