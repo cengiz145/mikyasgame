@@ -1988,6 +1988,7 @@ if(key_pressed(KEY_TAB)){
             }
         }
         else if(current_category == 5) {
+            m.add_item_tts("Yaratik Yerlestir (Create Monster)", "createmonster");
             m.add_item_tts("Sunucuyu Yeniden Baslat (Reboot)", "reboot");
             m.add_item_tts("Sunucu Verilerini Temizle (ClearServer)", "clearserver");
             m.add_item_tts("Yedek Al (Backup)", "backup");
@@ -2008,10 +2009,14 @@ if(key_pressed(KEY_TAB)){
                 else if(action == "backup") {
                     send_reliable(peer_id, "/backup", 1);
                 }
+                else if(action == "createmonster") {
+                    createmonster();
+                }
                 break;
             }
         }
         else if(current_category == 6) {
+            m.add_item_tts("Esya Uret / Gonder (Give Item)", "giveitem");
             m.add_item_tts("XP Ver (DarXP)", "darxp");
             m.add_item_tts("Can Ver (SubirVida)", "subirvida");
             m.add_item_tts("Envanter Kontrol Et (GetInv)", "getinv");
@@ -2040,6 +2045,16 @@ if(key_pressed(KEY_TAB)){
                 else if(action == "getinv") {
                     string target = v.input("Kimin envanterine bakmak istiyorsunuz?");
                     if(target != "") send_reliable(peer_id, "/getinv " + target, 1);
+                }
+                else if(action == "giveitem") {
+                    string t1 = v.input("Kime esya verilecek? (Kendinize ise isminizi yazin)");
+                    if(t1 != "") {
+                        string t2 = v.input("Hangi esya uretilecek? (Orn: sword, ak47, 9mm vb.)");
+                        if(t2 != "") {
+                            string t3 = v.input("Kac adet verilecek?");
+                            if(t3 != "") send_reliable(peer_id, "/give " + t1 + " " + t2 + " " + t3, 1);
+                        }
+                    }
                 }
                 break;
             }
@@ -6888,6 +6903,7 @@ return message;
 }
 return message;
 }
+
 
 
 
