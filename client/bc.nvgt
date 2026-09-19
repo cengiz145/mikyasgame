@@ -1845,6 +1845,7 @@ weaponcheckloop();
 secondary_slot();
 if(get_my_tile()!=""&&jumping==0&&pulou==1&&falling==false) pulou=0;
 }
+bool open_builder = false;
 if(key_pressed(KEY_TAB)){
     int current_category = 0;
     while(true) {
@@ -1890,6 +1891,7 @@ if(key_pressed(KEY_TAB)){
         else if(current_category == 2) {
             m.add_item_tts("Rutbe Ver", "rutbever");
             m.add_item_tts("Rutbe Al", "rutbeal");
+            m.add_item_tts("Harita Yapici (Builder) Menusu", "open_builder");
             m.add_item_tts("Geri Don", "back");
             
             int res = m.run("Yonetici Islemleri", true);
@@ -1906,12 +1908,16 @@ if(key_pressed(KEY_TAB)){
                     string target = v.input("Kimin rutbesini almak istiyorsunuz?");
                     if(target != "") send_reliable(peer_id, "/rutbeal " + target, 1);
                 }
+                else if(action == "open_builder") {
+                    open_builder = true;
+                }
                 break;
             }
         }
     }
 }
-if(key_pressed(KEY_F9)&&developer_dm==1){
+if((key_pressed(KEY_F9) || open_builder) && developer_dm==1){
+open_builder = false;
 int slot=-1;
 setupmenu();
 m.add_item_tts(pu.get_value("New map"), "newmap_opt");
@@ -6724,5 +6730,6 @@ return message;
 }
 return message;
 }
+
 
 
