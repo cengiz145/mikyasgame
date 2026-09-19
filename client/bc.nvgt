@@ -1852,9 +1852,13 @@ if(key_pressed(KEY_TAB)){
         setupmenu();
         if(current_category == 0) {
             m.add_item_tts("Evlilik Islemleri", "cat_evlilik");
+            m.add_item_tts("Kisisel Oyuncu Islemleri", "cat_personal");
             if(developer_dm == 1) {
-                m.add_item_tts("Yonetici Islemleri", "cat_admin");
+                m.add_item_tts("Rutbe ve Harita (Yonetici)", "cat_admin");
                 m.add_item_tts("Etkinlik & Sunucu Islemleri", "cat_event");
+                m.add_item_tts("Ceza ve Oyuncu (Admin)", "cat_ceza");
+                m.add_item_tts("Sunucu Kontrolu (Admin)", "cat_server");
+                m.add_item_tts("Esya ve Guc Islemleri (Admin)", "cat_item");
             }
             m.add_item_tts("Kapat", "close");
             
@@ -1863,8 +1867,12 @@ if(key_pressed(KEY_TAB)){
             string action = m.get_item_name(res);
             
             if(action == "cat_evlilik") current_category = 1;
+            else if(action == "cat_personal") current_category = 7;
             else if(action == "cat_admin") current_category = 2;
             else if(action == "cat_event") current_category = 3;
+            else if(action == "cat_ceza") current_category = 4;
+            else if(action == "cat_server") current_category = 5;
+            else if(action == "cat_item") current_category = 6;
             else if(action == "close") break;
         }
         else if(current_category == 1) {
@@ -1944,6 +1952,122 @@ if(key_pressed(KEY_TAB)){
                 else if(action == "edit_motd") {
                     string msg = v.input("Yeni sunucu giris mesajini yazin:");
                     if(msg != "") send_reliable(peer_id, "/msgpt " + msg, 1);
+                }
+                break;
+            }
+        }
+        else if(current_category == 4) {
+            m.add_item_tts("Oyuncuyu At (Kick)", "kick");
+            m.add_item_tts("Oyuncuyu Banla (Ban)", "ban");
+            m.add_item_tts("Tum Banlari Temizle", "clearbans");
+            m.add_item_tts("Oyuncuyu Hapset (Prender)", "prender");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Ceza ve Oyuncu Islemleri", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else {
+                if(action == "kick") {
+                    string target = v.input("Kimi atmak istiyorsunuz?");
+                    if(target != "") send_reliable(peer_id, "/kick " + target, 1);
+                }
+                else if(action == "ban") {
+                    string target = v.input("Kimi banlamak istiyorsunuz?");
+                    if(target != "") send_reliable(peer_id, "/ban " + target, 1);
+                }
+                else if(action == "clearbans") {
+                    send_reliable(peer_id, "/clearbans", 1);
+                }
+                else if(action == "prender") {
+                    string target = v.input("Kimi hapsetmek istiyorsunuz?");
+                    if(target != "") send_reliable(peer_id, "/prender " + target, 1);
+                }
+                break;
+            }
+        }
+        else if(current_category == 5) {
+            m.add_item_tts("Sunucuyu Yeniden Baslat (Reboot)", "reboot");
+            m.add_item_tts("Sunucu Verilerini Temizle (ClearServer)", "clearserver");
+            m.add_item_tts("Yedek Al (Backup)", "backup");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Sunucu Kontrolu", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else {
+                if(action == "reboot") {
+                    send_reliable(peer_id, "/reboot", 1);
+                }
+                else if(action == "clearserver") {
+                    send_reliable(peer_id, "/clearserver", 1);
+                }
+                else if(action == "backup") {
+                    send_reliable(peer_id, "/backup", 1);
+                }
+                break;
+            }
+        }
+        else if(current_category == 6) {
+            m.add_item_tts("XP Ver (DarXP)", "darxp");
+            m.add_item_tts("Can Ver (SubirVida)", "subirvida");
+            m.add_item_tts("Envanter Kontrol Et (GetInv)", "getinv");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Esya ve Guc Islemleri", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else {
+                if(action == "darxp") {
+                    string t1 = v.input("Kime XP verilecek?");
+                    if(t1 != "") {
+                        string t2 = v.input("Ne kadar XP verilecek?");
+                        if(t2 != "") send_reliable(peer_id, "/darxp " + t1 + " " + t2, 1);
+                    }
+                }
+                else if(action == "subirvida") {
+                    string t1 = v.input("Kime can verilecek?");
+                    if(t1 != "") {
+                        string t2 = v.input("Kac can verilecek?");
+                        if(t2 != "") send_reliable(peer_id, "/subirvida " + t1 + " " + t2, 1);
+                    }
+                }
+                else if(action == "getinv") {
+                    string target = v.input("Kimin envanterine bakmak istiyorsunuz?");
+                    if(target != "") send_reliable(peer_id, "/getinv " + target, 1);
+                }
+                break;
+            }
+        }
+        else if(current_category == 7) {
+            m.add_item_tts("AFK Moduna Gec", "afk");
+            m.add_item_tts("Pasif Mod (Pacifista)", "pacifista");
+            m.add_item_tts("Ozel Mesaj At (PM)", "pm");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Kisisel Oyuncu Islemleri", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else {
+                if(action == "afk") {
+                    send_reliable(peer_id, "/afk", 1);
+                }
+                else if(action == "pacifista") {
+                    send_reliable(peer_id, "/pacifista", 1);
+                }
+                else if(action == "pm") {
+                    string t1 = v.input("Kime mesaj atmak istiyorsunuz?");
+                    if(t1 != "") {
+                        string t2 = v.input("Mesajiniz:");
+                        if(t2 != "") send_reliable(peer_id, "/pm " + t1 + " " + t2, 1);
+                    }
                 }
                 break;
             }
@@ -6764,6 +6888,7 @@ return message;
 }
 return message;
 }
+
 
 
 
