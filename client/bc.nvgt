@@ -192,9 +192,8 @@ string get_server_ip() {
         return "127.0.0.1";
     }
     string ip = url_get("https://raw.githubusercontent.com/cengiz145/mikyasgame/main/server_ip.txt");
-    ip = ip.replace("", "");
-    ip = ip.replace("
-", "");
+    ip = ip.replace("\r", "");
+    ip = ip.replace("\n", "");
     if (ip == "") {
         ip = "195.174.126.26";
     }
@@ -2185,7 +2184,6 @@ if(key_pressed(KEY_TAB)){
             if(action == "back") current_category = 0;
             else if(action == "pet_despawn") send_reliable(peer_id, "spawnpet despawn", 0);
             else if(action.starts_with("pet_")) {
-                string pet_type = action.replace("pet_", "");
                 send_reliable(peer_id, "spawnpet " + pet_type, 0);
                 break;
             }
