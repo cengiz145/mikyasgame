@@ -2287,6 +2287,8 @@ else if(parsed[0]=="/kabulet" and parsed.length()>1) {
     players[index].spouse = players[target_idx].charname;
     players[target_idx].spouse = players[index].charname;
     players[target_idx].proposed_to = "";
+    give_item(players[index].charname, "evlilik_yuzugu", 1);
+    give_item(players[target_idx].charname, "evlilik_yuzugu", 1);
     for(uint i=0; i<players.length(); i++) {
         send_reliable(players[i].peer_id, "msgnormal " + players[index].charname + " ve " + players[target_idx].charname + " artik evli! Tebrikler!", 0);
     }
@@ -2307,7 +2309,9 @@ else if(parsed[0]=="/bosan") {
     if(target_idx >= 0) {
         players[target_idx].spouse = "";
         send_reliable(players[target_idx].peer_id, "msgnormal " + players[index].charname + " senden bosandi.", 0);
+        players[target_idx].inv_add_item("evlilik_yuzugu", -1);
     }
+    players[index].inv_add_item("evlilik_yuzugu", -1);
     for(uint i=0; i<players.length(); i++) {
         send_reliable(players[i].peer_id, "msgnormal " + players[index].charname + " ve " + ex_spouse + " bosandi.", 0);
     }
@@ -5828,7 +5832,7 @@ write_to(players[index].charname, "saldo.md", players[index].balance);
 }
 void use(double index, string item_number){
 if(players[index].peaceful==0&&get_safezone_at(players[index].x, players[index].y, players[index].map)==false&&players[index].newbie==false){
-if(get_tile_at(players[index].x, players[index].y, players[index].map)==""&&item_number!="teleporter"&&item_number!="r2")return;
+if(get_tile_at(players[index].x, players[index].y, players[index].map)==""&&item_number!="teleporter"&&item_number!="r2"&&item_number!="evlilik_yuzugu")return;
 if(item_number=="explosive_tape"&&players[index].map!="arena"&&players[index].inv_item_number("explosive_tape")>0){
 if(fitaativa==true){
 for(uint i=0;i<players.length();i++){
@@ -5841,6 +5845,16 @@ break;
 }
 }
 else send_reliable(players[index].peer_id, "msgnormal Explosive tapes are not being allowed at the moment.", 0);
+}
+else if(item_number=="evlilik_yuzugu"&&players[index].inv_item_number("evlilik_yuzugu")>0){
+    if(players[index].spouse == "") { send_reliable(players[index].peer_id, "msgnormal Zaten evli degilsin.", 0); return; }
+    int target_idx = get_player_index_from(players[index].spouse);
+    if(target_idx < 0) { send_reliable(players[index].peer_id, "msgnormal Esin su an cevrimici degil.", 0); return; }
+    players[index].x = players[target_idx].x;
+    players[index].y = players[target_idx].y;
+    players[index].map = players[target_idx].map;
+    send_reliable(players[index].peer_id, "msgnormal Yuzugunuzu kullanarak esinizin yanina isinlandiniz.", 0);
+    send_reliable(players[target_idx].peer_id, "msgnormal Esiniz yuzugunu kullanarak yaniniza isinlandi.", 0);
 }
 else if(item_number=="dragonsaurus_egg"&&get_tile_at(players[index].x, players[index].y, players[index].map)!=""&&players[index].inv_item_number("dragonsaurus_egg")>0){
 players[index].inv_add_item("dragonsaurus_egg", -1);
@@ -8615,3 +8629,4 @@ if(projeteis.length()>0)projectile_loop();
 if(oms.length()>0)magnetic_item_loop();
 if(canhaos.length()>0)cannon_loop();
 }
+
