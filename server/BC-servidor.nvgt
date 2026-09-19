@@ -1,4 +1,4 @@
-#include "bgt_compat.nvgt"
+﻿#include "bgt_compat.nvgt"
 #include "bc_compat.nvgt"
 					double min_version=5.7;
 const string version="6.1";
@@ -212,7 +212,7 @@ weapons[24]="m249.ogg:75:290:"+random(1, 7);
 weapons[25]="ak47.ogg:87:300:"+random(1, 7);
 weapons[26]="taser.ogg:5:100:"+random(1, 7);
 weapons[27]="chute.ogg:4:15::"+random(45, 48);
-weapons[28]="lança.ogg:4:90:49";
+weapons[28]="lanÃ§a.ogg:4:90:49";
 weapons[29]="espada_curta.ogg:4:30:50";
 weapons[30]="mp7.ogg:110:380:"+random(1, 7);
 weapons[31]="m16.ogg:68:270:"+random(1, 7);
@@ -694,7 +694,7 @@ if(string_contains(a[i], "apartamento_", 1)>-1){
 string m=string_replace(a[i], "apartamento_de_", "", false);
 m=string_replace(m, ".map", "", false);
 file z;
-z.open("players_apartamentos/"+m+"_baú.usr", "r");
+z.open("players_apartamentos/"+m+"_baÃº.usr", "r");
 place_sink(16, 21, "apartamento_de_"+m);
 place_bathroom(14, 21, "apartamento_de_"+m);
 place_apartment("apartamento_de_"+m, z.read());
@@ -726,7 +726,7 @@ create_snake(random(60, 90), 0, "sixth_cave");
 create_snake(random(60, 90), 0, "seventh_cave");
 create_snake(random(60, 90), 0, "eighth_cave");
 create_snake(random(60, 90), 0, "ninth_cave");
-create_snake(random(60, 90), 0, "déssima_caverna");
+create_snake(random(60, 90), 0, "dÃ©ssima_caverna");
 // ==== CUSTOM_MONSTER_SPAWNS (add_monster.py inserts colocar_<name>(x, y, "map") calls below this line) ====
 place_test(0, 0, "test");
 // (custom monster spawns go here)
@@ -1001,7 +1001,7 @@ has=true;
 }
 }
 }
-if(has==true)send_packet(0, "play pegou_depósito.ogg "+players[index].x+" "+players[index].y, players[index].map);
+if(has==true)send_packet(0, "play pegou_depÃ³sito.ogg "+players[index].x+" "+players[index].y, players[index].map);
 }
 else if(parsed[0]=="mudcod"&&parsed.length()>1){
 int code=string_to_number(parsed[1]);
@@ -1040,7 +1040,7 @@ else send_reliable(players[index].peer_id, "msgnormal No computer nearby.", 0);
 }
 else if(parsed[0]=="opc"&&parsed.length()>2)option_command(index, parsed);
 else if(parsed[0]=="pc")pc(index);
-else if(parsed[0]=="fbaú"){
+else if(parsed[0]=="fbaÃº"){
 for(uint i=0;i<computadors.length();i++){
 if(players[index].map==computadors[i].map){
 computadors[i].close_chest_flag=0;
@@ -1125,7 +1125,7 @@ found_flag=true;
 }
 for(uint i2=0;i2<amon_ras.length();i2++){
 if(amon_ras[i2].x==i&&amon_ras[i2].map==players[index].map){
-a+=" ;amon_rá;, ;with; "+amon_ras[i2].health_points+"; ;of health.";
+a+=" ;amon_rÃ¡;, ;with; "+amon_ras[i2].health_points+"; ;of health.";
 found_flag=true;
 }
 }
@@ -1333,7 +1333,7 @@ int id=get_player_index_from(parsed[1]);
 if(id>-1){
 string m="in "+players[id].map;
 if(m=="belick_city"||m=="belick_city2")m="in; ;Belick's city";
-else if(string_contains(m, "city1", 1)>-1||string_contains(m, "city2", 1)>-1)m="in; ;Mortalândia's city";
+else if(string_contains(m, "city1", 1)>-1||string_contains(m, "city2", 1)>-1)m="in; ;MortalÃ¢ndia's city";
 else if(string_contains(m, "medieval", 1)>-1)m="in; ;Medieval world";
 else if(string_contains(m, "train", 1)>-1||m=="bus"||string_contains(m, "plane", 1)>-1||string_contains(m, "ocean_liner", 1)>-1||m=="time_machine")m="viajando";
 else if(string_contains(m, "safe_zone_es", 1)>-1)m="In the safe zone";
@@ -1371,7 +1371,7 @@ string dd=players[id].chat_language;
 string d;
 if(dd=="ar")d="Arabic";
 else if(dd=="en")d="English";
-else if(dd=="es")d="Español";
+else if(dd=="es")d="EspaÃ±ol";
 else if(dd=="pt")d="Portuguese";
 if(dd=="Desativado")send_reliable(players[index].peer_id, "msg2 "+players[id].charname+" ;has chat disabled.", 0);
 else send_reliable(players[index].peer_id, "msg2 "+players[id].charname+" ;it is; ;in chat; ;"+d+";.", 0);
@@ -1450,7 +1450,7 @@ players[index].magnetic_item_timer.restart();
 players[index].inv_add_item("magnetic_item",-1);
 }
 else if(parsed[0]=="wand"&&players[index].inv_item_number("wand")>0){
-if(players[index].map=="medieval_castle"||string_contains(players[index].map, "prisão", 1)>-1){send_reliable(players[index].peer_id, "msgnormal This place goes far beyond the real, surreal, solid and liquid, to use your wand.", 0);return;}
+if(players[index].map=="medieval_castle"||string_contains(players[index].map, "prisÃ£o", 1)>-1){send_reliable(players[index].peer_id, "msgnormal This place goes far beyond the real, surreal, solid and liquid, to use your wand.", 0);return;}
 else if(players[index].wand_energy<10){send_reliable(players[index].peer_id, "msgnormal Your wand is still being charged", 0);return;}
 string[] spells;
 int m=players[index].inv_item_number("mana");
@@ -1466,7 +1466,7 @@ if(m>=2&&mm>=15)spells.insert_last("super jump: gives you the ability to jump ve
 if(players[index].peaceful==0&&players[index].in_safe_zone==false){
 if(!players[index].achuva&&m>=100&&mm>=100)spells.insert_last("meteor_shower: It causes an enormous destruction in the world, with rocks falling from above.");
 if(m>=4&&mm>=20)spells.insert_last("Electrobomb: electrocute any person within range, causing minor damage");
-if(m>=6&&mm>=10)spells.insert_last("Hórus_fist: Hórus's fist killed Set, his worst enemy. Perhaps this magic is so powerful, to the point of do this feat again");
+if(m>=6&&mm>=10)spells.insert_last("HÃ³rus_fist: HÃ³rus's fist killed Set, his worst enemy. Perhaps this magic is so powerful, to the point of do this feat again");
 if(m>=8&&mm>=40)spells.insert_last("Thunder: Strikes the nearest player with a bolt of lightning, causing great damage.");
 if(m>=10&&mm>=50)spells.insert_last("Fireball: hits the closest player on the side you are facing, causing a large burning destruction.");
 }
@@ -1478,12 +1478,12 @@ string[] spells2;
 spells2.insert_last("bola_de_fogo:10:50");
 spells2.insert_last("bolha_de_ar:1:50");
 spells2.insert_last("calor_reprimido:1:50");
-spells2.insert_last("campo_magnético:10:50");
+spells2.insert_last("campo_magnÃ©tico:10:50");
 spells2.insert_last("chuva_de_meteoros:100:100");
 spells2.insert_last("deslize_veloz:5:20");
 spells2.insert_last("cura_divina:10:10");
 spells2.insert_last("espelho_refletor:20:50");
-spells2.insert_last("punho_de_hórus:15:10");
+spells2.insert_last("punho_de_hÃ³rus:15:10");
 spells2.insert_last("cloak_start:6:75");
 spells2.insert_last("electrobomb:4:20");
 spells2.insert_last("float:1:100");
@@ -1511,7 +1511,7 @@ else if(parsed[0]=="usetele"&&parsed.length()>1&&players[index].inv_item_number(
 if(parsed[1]=="voltar")return;
 if(players[index].teletimer.elapsed<30000) send_packet(0,"play teleporter_fail.ogg "+players[index].x+" "+players[index].y,players[index].map);
 else if(players[index].inv_item_number("mountain_sand")>0) send_reliable(players[index].peer_id, "msgnormal Something magical you're carrying prevents you from doing this...", 0);
-else if(players[index].map=="prisão"||players[index].map=="prisão2")send_reliable(players[index].peer_id, "msgnormal But you're imprisoned!", 0);
+else if(players[index].map=="prisÃ£o"||players[index].map=="prisÃ£o2")send_reliable(players[index].peer_id, "msgnormal But you're imprisoned!", 0);
 else
 {
 players[index].telemap=parsed[1];
@@ -1631,7 +1631,7 @@ return;
 }
 else if(index>-1)
 {
-if(players[index].no_items==1||message.length()<=0||players[index].afk==true&&players[index].is_admin()==false||string_contains(players[index].map, "prisão", 1)>-1&&players[index].is_admin()==false||message[0]!="/"&&message.length()>6000)return;
+if(players[index].no_items==1||message.length()<=0||players[index].afk==true&&players[index].is_admin()==false||string_contains(players[index].map, "prisÃ£o", 1)>-1&&players[index].is_admin()==false||message[0]!="/"&&message.length()>6000)return;
 string msg=message;
 msg=string_replace(msg, "\r\n", "", true);
 msg=string_replace(msg, " ", "", true);
@@ -1644,7 +1644,7 @@ if(message[0]==";"){
 send_reliable(players[index].peer_id, "msgnormal Coloque o / primeiro!", 0);
 return;
 }
-if(players[index].map=="courthouse"||players[index].map=="prisão2"){send_reliable(players[index].peer_id, "msgnormal The walls absorb your words.", 0);return;}
+if(players[index].map=="courthouse"||players[index].map=="prisÃ£o2"){send_reliable(players[index].peer_id, "msgnormal The walls absorb your words.", 0);return;}
 if(players[index].invisibility==1) send_message=players[index].charname+" "+players[index].title+" Somebody says: "+bell+message;
 else send_message=players[index].charname+" "+players[index].title+" "+players[index].charname+" diz: "+bell+message;
 parse=true;
@@ -1733,7 +1733,7 @@ send_reliable(players[index].peer_id, "msgnormal You get in the quest!", 0);
 }
 }
 }
-else if(parsed[0]=="/equipel"||parsed[0]=="/teaml"||parsed[0]=="/équipement"){
+else if(parsed[0]=="/equipel"||parsed[0]=="/teaml"||parsed[0]=="/Ã©quipement"){
 string names;
 for(uint i=1;i<players[index].nomesequipe.length();i++){
 if(i<players[index].nomesequipe.length()-1){
@@ -1761,7 +1761,7 @@ players[index].nomesequipe.resize(0);
 players[index].nomesequipe.insert_last(players[index].charname);
 if(!found_flag)send_reliable(players[index].peer_id, "msgnormal No one on your team.", 0);
 }
-else if(parsed[0]=="/equiper"&&parsed.length()>1||parsed[0]=="/teamr"&&parsed.length()>1||parsed[0]=="/équipeur"&&parsed.length()>1){
+else if(parsed[0]=="/equiper"&&parsed.length()>1||parsed[0]=="/teamr"&&parsed.length()>1||parsed[0]=="/Ã©quipeur"&&parsed.length()>1){
 if(parsed[1]==players[index].charname)return;
 bool found_flag=false;
 string n=parsed[1];
@@ -1796,7 +1796,7 @@ writeprefs();
 }
 else if((parsed[0]=="/evento"||parsed[0]=="/event")){
 if(TIME_HOUR==16)send_reliable(players[index].peer_id, "msg2 Chief Fander wants to put an end to the gang of kidnappers (since he kidnapped and almost killed the daughter of one of his officers). For that, he will count on your help once again. -- Their gang is hiding on the camp road, since it is very well hidden and deserted. -- They use heavy calibers, you will have to be very careful,; "+players[index].charname+". ;-- Bring them in alive, or dead. It does not matter. I want them all; if you help me, I will give you a great reward.", 0);
-else if(TIME_HOUR==18)send_reliable(players[index].peer_id, "msgnormal The Mayor of Belick, heard by a traveler, of the existence of a gold mine in Mortalândia. Taken with greed and confidence, since Belick won the first war, he decided to start the second and worst war to take with force, the gold mine and their country. Then send your army to Mortalândia. The army, in turn, suggests taking the country using its war helicopters, since in the first war, it was not fair to win. The mayor accepts, and thus begins the second biggest war.", 0);
+else if(TIME_HOUR==18)send_reliable(players[index].peer_id, "msgnormal The Mayor of Belick, heard by a traveler, of the existence of a gold mine in MortalÃ¢ndia. Taken with greed and confidence, since Belick won the first war, he decided to start the second and worst war to take with force, the gold mine and their country. Then send your army to MortalÃ¢ndia. The army, in turn, suggests taking the country using its war helicopters, since in the first war, it was not fair to win. The mayor accepts, and thus begins the second biggest war.", 0);
 else if(TIME_HOUR==20)send_reliable(players[index].peer_id, "msgnormal Due to the high trade in Belick, the exchange house needs a security van to carry the money converted to the bank. The government accepts the proposal and warns that every day, at a certain time of the day will pick up the converted money with a security van to take to the bank. Also, since Belick is too big, it can be dangerous to do this every day and ask the directors of the exchange house if they still want to continue with this risk. the directors accept, and then the security van passes through the streets to arrive in the bank.", 0);
 else send_reliable(players[index].peer_id, "msgnormal There are no events in progress...", 0);
 }
@@ -1836,7 +1836,7 @@ send_reliable(0, msg, 0);
 					send_reliable(0, "pp "+players[index].charname+" "+players[index].peaceful, 0);
 					send_reliable(0,"msgdepois "+players[index].charname+" stopping being a pacifist", 0);
 				}
-else if(parsed[0]=="/equipea"&&parsed.length()>1||parsed[0]=="/teama"&&parsed.length()>1||parsed[0]=="/équipe"&&parsed.length()>1){
+else if(parsed[0]=="/equipea"&&parsed.length()>1||parsed[0]=="/teama"&&parsed.length()>1||parsed[0]=="/Ã©quipe"&&parsed.length()>1){
 if(parsed[1]==players[index].charname)return;
 string n=parsed[1];
 int a=get_player_index_from(n);
@@ -1868,7 +1868,7 @@ send_reliable(players[b].peer_id, "ps notify_startrek_transmit.ogg", 0);
 }
 }
 }
-else if(parsed[0]=="/equipes"||parsed[0]=="/teamq"||parsed[0]=="/équipes"){
+else if(parsed[0]=="/equipes"||parsed[0]=="/teamq"||parsed[0]=="/Ã©quipes"){
 bool found_flag=false;
 for(uint i=0;i<players.length();i++){
 for(uint i2=0;i2<players[i].nomesequipe.length();i2++){
@@ -1901,7 +1901,7 @@ send_reliable(0, "msgdepois "+players[index].charname+" is no longer a newbie!",
 }
 players[index].title=" ";
 }
-else if(parsed[0]=="/escreverquadro"&&parsed.length()>2||parsed[0]=="/escribircuadro"&&parsed.length()>2||parsed[0]=="/écriscadre"&&parsed.length()>2||parsed[0]=="/writeboard"&&parsed.length()>2){
+else if(parsed[0]=="/escreverquadro"&&parsed.length()>2||parsed[0]=="/escribircuadro"&&parsed.length()>2||parsed[0]=="/Ã©criscadre"&&parsed.length()>2||parsed[0]=="/writeboard"&&parsed.length()>2){
 string zone=get_zone_at(players[index].x,players[index].y,players[index].map);
 if(zone=="A large cork board, with messages fixed on it, is here on the wall. Maybe you want to write something..."){
 string a;
@@ -1957,7 +1957,7 @@ else if(msgquadro.length()==2)r="There are two messages. ";
 else r+="There are "+(msgquadro.length())+" mensagens. ";
 for (uint i=0; i<msgquadro.length(); i++){
 j=i+1;
-r+="\r\nMensagem número "+j+": "+msgquadro[i]+"\n";
+r+="\r\nMensagem nÃºmero "+j+": "+msgquadro[i]+"\n";
 }
 string r1=r;
 r1=string_replace(r1,"]]","\r\n",true);
@@ -2137,17 +2137,17 @@ if(pirates_event==1) {
 change_map("arena2", index, 1, 0);
 }
 }
-else if(parsed[0]=="/auction"&&parsed.length()<4||parsed[0]=="/leilão"&&parsed.length()<4||parsed[0]=="/subasta"&&parsed.length()<4||parsed[0]=="/vente"&&parsed.length()<4){
+else if(parsed[0]=="/auction"&&parsed.length()<4||parsed[0]=="/leilÃ£o"&&parsed.length()<4||parsed[0]=="/subasta"&&parsed.length()<4||parsed[0]=="/vente"&&parsed.length()<4){
 if (auction==false)
 {
 send_reliable(event.peer_id,"msgnormal There's no items for sale.",0);
 }
 else
 {
-send_reliable(event.peer_id, "msgnoleilão "+auctionitem+" "+auctionamount+" "+auctionbid, 0);
+send_reliable(event.peer_id, "msgnoleilÃ£o "+auctionitem+" "+auctionamount+" "+auctionbid, 0);
 }
 }
-else if(parsed[0]=="/auction" and parsed.length()>=4||parsed[0]=="/leilão" and parsed.length()>=4)
+else if(parsed[0]=="/auction" and parsed.length()>=4||parsed[0]=="/leilÃ£o" and parsed.length()>=4)
 {
 if(players[index].is_admin())return;
 string bury_item_name=parsed[2];
@@ -2246,7 +2246,7 @@ players[index].arena_map=players[index].map;
 change_map("arena", index, 1, 0);
 arena_prize+=1000000;
 send_reliable(players[index].peer_id, "stopmoving",0);
-send_reliable(0, "¡"+players[index].charname+" Now it's already in the arena! Now the prize for fighters is"+arena_prize+" coins!", 2);
+send_reliable(0, "Â¡"+players[index].charname+" Now it's already in the arena! Now the prize for fighters is"+arena_prize+" coins!", 2);
 }
 }
 else if(parsed[0]=="/g"){
@@ -2269,6 +2269,58 @@ else if(parsed[0]=="/ign" and parsed.length()>1)
 if(string_to_upper_case(parsed[1])==string_to_upper_case(players[index].charname)){send_reliable(players[index].peer_id, "msgnormal With yourself???", 0);return;}
 players[index].add_muted(parsed[1]);
 send_reliable(event.peer_id,"msgnormal Pronto.",0);
+}
+else if(parsed[0]=="/evlen" and parsed.length()>1) {
+    int target_idx = get_player_index_from(parsed[1]);
+    if(target_idx < 0) { send_reliable(players[index].peer_id, "msgnormal Oyuncu bulunamadi.", 0); return; }
+    if(target_idx == index) { send_reliable(players[index].peer_id, "msgnormal Kendinle evlenemezsin!", 0); return; }
+    if(players[index].spouse != "") { send_reliable(players[index].peer_id, "msgnormal Zaten evlisin!", 0); return; }
+    if(players[target_idx].spouse != "") { send_reliable(players[index].peer_id, "msgnormal Bu oyuncu zaten evli!", 0); return; }
+    players[index].proposed_to = players[target_idx].charname;
+    send_reliable(players[target_idx].peer_id, "msgnormal " + players[index].charname + " sana evlenme teklifi etti! Kabul etmek icin /kabulet " + players[index].charname + ", reddetmek icin /reddet " + players[index].charname + " yazabilirsin.", 0);
+    send_reliable(players[index].peer_id, "msgnormal Evlilik teklifi gonderildi.", 0);
+}
+else if(parsed[0]=="/kabulet" and parsed.length()>1) {
+    int target_idx = get_player_index_from(parsed[1]);
+    if(target_idx < 0) { send_reliable(players[index].peer_id, "msgnormal Oyuncu bulunamadi.", 0); return; }
+    if(players[target_idx].proposed_to != players[index].charname) { send_reliable(players[index].peer_id, "msgnormal Bu oyuncudan sana gelen bir teklif yok.", 0); return; }
+    players[index].spouse = players[target_idx].charname;
+    players[target_idx].spouse = players[index].charname;
+    players[target_idx].proposed_to = "";
+    for(uint i=0; i<players.length(); i++) {
+        send_reliable(players[i].peer_id, "msgnormal " + players[index].charname + " ve " + players[target_idx].charname + " artik evli! Tebrikler!", 0);
+    }
+}
+else if(parsed[0]=="/reddet" and parsed.length()>1) {
+    int target_idx = get_player_index_from(parsed[1]);
+    if(target_idx < 0) { send_reliable(players[index].peer_id, "msgnormal Oyuncu bulunamadi.", 0); return; }
+    if(players[target_idx].proposed_to != players[index].charname) { send_reliable(players[index].peer_id, "msgnormal Bu oyuncudan sana gelen bir teklif yok.", 0); return; }
+    players[target_idx].proposed_to = "";
+    send_reliable(players[target_idx].peer_id, "msgnormal " + players[index].charname + " evlilik teklifini reddetti.", 0);
+    send_reliable(players[index].peer_id, "msgnormal Teklifi reddettin.", 0);
+}
+else if(parsed[0]=="/bosan") {
+    if(players[index].spouse == "") { send_reliable(players[index].peer_id, "msgnormal Zaten evli degilsin.", 0); return; }
+    string ex_spouse = players[index].spouse;
+    players[index].spouse = "";
+    int target_idx = get_player_index_from(ex_spouse);
+    if(target_idx >= 0) {
+        players[target_idx].spouse = "";
+        send_reliable(players[target_idx].peer_id, "msgnormal " + players[index].charname + " senden bosandi.", 0);
+    }
+    for(uint i=0; i<players.length(); i++) {
+        send_reliable(players[i].peer_id, "msgnormal " + players[index].charname + " ve " + ex_spouse + " bosandi.", 0);
+    }
+}
+else if(parsed[0]=="/eseyanina") {
+    if(players[index].spouse == "") { send_reliable(players[index].peer_id, "msgnormal Zaten evli degilsin.", 0); return; }
+    int target_idx = get_player_index_from(players[index].spouse);
+    if(target_idx < 0) { send_reliable(players[index].peer_id, "msgnormal Esin su an cevrimici degil.", 0); return; }
+    players[index].x = players[target_idx].x;
+    players[index].y = players[target_idx].y;
+    players[index].map = players[target_idx].map;
+    send_reliable(players[index].peer_id, "msgnormal Esinin yanina isinlandin.", 0);
+    send_reliable(players[target_idx].peer_id, "msgnormal Esin yanina isinlandi.", 0);
 }
 else if(parsed[0]=="/deign" and parsed.length()>1)
 {
@@ -2307,7 +2359,7 @@ int index2=get_player_index_from(parsed[1]);
 if(index2>-1&&players[index2].invisibility==0){
 if(string_to_upper_case(parsed[1])==string_to_upper_case(players[index].charname)){send_reliable(players[index].peer_id, "msgnormal With yourself???", 0);return;}
 if(players[index2].has_muted(players[index].charname)==false){
-if(players[index2].map=="courthouse"||players[index2].map=="prisão2"){send_reliable(players[index].peer_id, "msgdepois "+players[index2].charname+" cannot hear you.", 0);return;}
+if(players[index2].map=="courthouse"||players[index2].map=="prisÃ£o2"){send_reliable(players[index].peer_id, "msgdepois "+players[index2].charname+" cannot hear you.", 0);return;}
 players[index2].replyname=players[index].charname;
 send_reliable(players[index2].peer_id, "private_message  from "+players[index].charname+": "+string_replace(get_event_message(), "/pm "+parsed[1]+" ", "", false), 0);
 send_reliable(event.peer_id, "private_message to "+players[index2].charname+": "+string_replace(get_event_message(), "/pm "+parsed[1]+" ", "", false), 0);
@@ -2421,7 +2473,7 @@ change_map("arena",index,random(1,60),random(21,28));
 }
 }
 }// end of the command
-else if(parsed[0]=="/rules"||parsed[0]=="/regras"||parsed[0]=="/reglas"||parsed[0]=="/règles"){
+else if(parsed[0]=="/rules"||parsed[0]=="/regras"||parsed[0]=="/reglas"||parsed[0]=="/rÃ¨gles"){
 file rules;
 rules.open("rules"+players[index].chat_language+".txt", "rb");
 string rule=rules.read();
@@ -2509,8 +2561,8 @@ else if(parsed[0]=="passagemo"){
 string[] add;
 add.reserve(3);
 add.insert_last("Choose which destination you want the ticket for.:cpassagemo");
-add.insert_last("Bus ticket to terminal mar:passagem_de_ônibus_para_terminal_mar");
-add.insert_last("Bus ticket to belick:passagem_de_ônibus_para_belick");
+add.insert_last("Bus ticket to terminal mar:passagem_de_Ã´nibus_para_terminal_mar");
+add.insert_last("Bus ticket to belick:passagem_de_Ã´nibus_para_belick");
 send_reliable(players[index].peer_id, "mnormal "+linear(add), 0);
 }
 else if(parsed[0]=="passagemb"&&parsed.length()>1){
@@ -2542,7 +2594,7 @@ send_reliable(players[index].peer_id, "msgsemcoins 1000", 0);
 }
 else{
 players[index].inv_add_item("coins", -1000);
-send_reliable(players[index].peer_id, "msgentrega 1000 coins passagem_para_mortalândia", 0);
+send_reliable(players[index].peer_id, "msgentrega 1000 coins passagem_para_mortalÃ¢ndia", 0);
 players[index].inv_add_item("ticket_to_mortalandia", 1);
 }
 }
@@ -2652,7 +2704,7 @@ string[] z=string_split(nban[i], " ", false);
 if(z[0]==un){
 cont=false;
 //event=net.request();
-send_reliable(id,"Error: You are temporarily banned. Connect at "+z[1]+":"+z[2]+" (Brasília time).", 0);
+send_reliable(id,"Error: You are temporarily banned. Connect at "+z[1]+":"+z[2]+" (BrasÃ­lia time).", 0);
 break;
 }
 }
@@ -2715,6 +2767,7 @@ dictionary@ sd=deserialize(f.read());
 f.close();
 if(sd.exists("x")){
 sd.get("x", players[index].x);
+sd.get("spouse", players[index].spouse);
 //event=net.request();
 send_reliable(id,"x:"+players[index].x,0);
 }
@@ -3397,7 +3450,7 @@ players[ie].health=-1;
 }
 if(players[ie].maptraveltimer.elapsed>=60000&&players[ie].map=="chicken_coop"){
 players[ie].prison_record+=1;
-change_map("prisão", ie, 1, 0);
+change_map("prisÃ£o", ie, 1, 0);
 send_reliable(players[ie].peer_id, "msgnormal You stayed in the henhouse too long, and were caught by the guardian."+" by the guardian.", 0);
 players[ie].prison_time.restart();
 players[ie].freedom_message="You have fulfilled your penalty and you are now at your freedom!";
@@ -3471,7 +3524,7 @@ players[ie].ship_moving_released=true;
 }
 }
 }
-if(players[ie].tmaquina.elapsed>=10059&&players[ie].map=="silêncio2"){
+if(players[ie].tmaquina.elapsed>=10059&&players[ie].map=="silÃªncio2"){
 send_reliable(players[ie].peer_id, "startmoving", 0);
 players[ie].tmaquina.force(0);
 players[ie].tmaquina.pause();
@@ -3530,7 +3583,7 @@ send_reliable(players[ie].peer_id, "startmoving", 0);
 players[ie].paralisado2=false;
 players[ie].jaandou=1;
 }
-if(players[ie].prison_time.elapsed>=players[ie].locked_time&&players[ie].map=="prisão"){
+if(players[ie].prison_time.elapsed>=players[ie].locked_time&&players[ie].map=="prisÃ£o"){
 players[ie].prison_time.force(0);
 players[ie].prison_time.pause();
 send_reliable(players[ie].peer_id, "msgnormal "+players[ie].freedom_message, 0);
@@ -3730,7 +3783,7 @@ send_reliable(players[ie].peer_id,"move "+players[ie].x+" "+players[ie].y,0);
 send_packet(0,"play spell_float_on.ogg "+players[ie].x+" "+players[ie].y,players[ie].map);
 players[ie].tmflutuar.restart();
 }
-else if(players[ie].curspell=="campo_magnético"){
+else if(players[ie].curspell=="campo_magnÃ©tico"){
 players[ie].star=true;
 destroy_moving_sound(players[ie].starsoundid);
 players[ie].starsoundid=spawn_moving_sound("limp.ogg",players[ie].x,players[ie].y,players[ie].map);
@@ -3742,7 +3795,7 @@ destroy_moving_sound(players[ie].starsoundid);
 players[ie].starsoundid=spawn_moving_sound("espelholoop.ogg",players[ie].x,players[ie].y,players[ie].map);
 players[ie].tmcampo2.restart();
 }
-else if(players[ie].curspell=="punho_de_hórus"){
+else if(players[ie].curspell=="punho_de_hÃ³rus"){
 send_packet(0,"ps chute.ogg",players[ie].map);
 for(uint j=0; j<players.length(); j++){
 if(players[j].charname!=players[ie].charname&&get_player_distance(players[ie],players[j])>-1&&get_player_distance(players[ie],players[j])<=15&&players[j].in_safe_zone==false&&players[j].peaceful==0&&players[j].newbie==false&&players[j].afk==false&&!in_team(
@@ -3763,10 +3816,10 @@ else if(players[ie].curspell=="thunder")
 {
 for(uint j=0; j<players.length(); j++){
 if(players[j].charname!=players[ie].charname&&get_player_distance(players[ie],players[j])>-1&&get_player_distance(players[ie],players[j])<=100&&players[j].in_safe_zone==false&&players[j].peaceful==0&&players[j].newbie==false&&players[j].afk==false&&!in_team(players[ie].charname, players[j].charname)){
-send_packet(0,"impact trovão8.ogg "+players[j].x+" "+players[j].y, players[j].map);
+send_packet(0,"impact trovÃ£o8.ogg "+players[j].x+" "+players[j].y, players[j].map);
 send_packet(0,"inithurt "+players[j].voice+" "+players[j].x+" "+players[j].y, players[j].map);
 players[j].health-=(players[j].health/2+random(1000, 2000));
-players[j].lasthit="trovão_"+players[ie].charname;
+players[j].lasthit="trovÃ£o_"+players[ie].charname;
 }}
 }
 players[ie].curspell="";
@@ -3979,7 +4032,7 @@ file z;
 string file_name_narqui=b[i2];
 file_name_narqui=string_replace(file_name_narqui, "apartamento_de_", "", false);
 file_name_narqui=string_replace(file_name_narqui, ".map", "", false);
-z.open("players_apartamentos/"+file_name_narqui+"_baú.usr", "w");
+z.open("players_apartamentos/"+file_name_narqui+"_baÃº.usr", "w");
 z.write(apartment_zones[i].apartment_inv);
 z.close();
 break;
@@ -4079,15 +4132,15 @@ if(msounds[iba].map==players[index].map)send_reliable(players[index].peer_id,"cm
 for(uint i=0;i<apartment_zones.length();i++){if(apartment_zones[i].map==players[index].map)send_reliable(players[index].peer_id, "apartamentoinv "+apartment_zones[i].apartment_inv, 0);}
 for(uint i=0;i<computadors.length();i++){
 if(computadors[i].map==players[index].map){
-string pc_options="Exibir estatísticas=status\r\nAlternar modo de segurança entre choque e alarme=segurança\r\nImprimir um documento=imprimir\r\nEnviar ideia=ideia";
-pc_options+="\r\n"+(computadors[i].clock==0?"Disable":"Enable")+" watch=relógio";
+string pc_options="Exibir estatÃ­sticas=status\r\nAlternar modo de seguranÃ§a entre choque e alarme=seguranÃ§a\r\nImprimir um documento=imprimir\r\nEnviar ideia=ideia";
+pc_options+="\r\n"+(computadors[i].clock==0?"Disable":"Enable")+" watch=relÃ³gio";
 if(computadors[i].alarm_timer==1)pc_options+="\r\nDesativar alarme=alarme";
 if(is_apartment_admin(players[index].dalison2, computadors[i].map)){
 pc_options+="\r\n"+(computadors[i].abau==0? "not allowing":"permitindo")+" others to open your chest";
-if(computadors[i].close_chest_flag==1)pc_options+="\r\nFechar baú=fecharbaú";
+if(computadors[i].close_chest_flag==1)pc_options+="\r\nFechar baÃº=fecharbaÃº";
 if(computadors[i].tabrir.elapsed<=0)pc_options+="\r\nAbrir porta por 5 segundos=porta";
 pc_options+="\r\nRemove players from your apartment=expulsar";
-pc_options+="\r\nTrocar código de acesso=mcod";
+pc_options+="\r\nTrocar cÃ³digo de acesso=mcod";
 }
 if(players[index].is_admin())pc_options+="\r\nLer mensagens administrativas=administrativas";
 send_reliable(players[index].peer_id, "opcoespc "+pc_options, 0);
@@ -4499,14 +4552,14 @@ if(robo_coletores.length()<6)place_collector_robot(random(90, 200), 0, "futurist
 if(advertise_timer.elapsed>=600000){
 advertise_timer.restart();
 string[] msgs;
-msgs.insert_last("Visite a nossa loja virtual! As melhores armas você encontra aqui! www.desafiomortal.com.br");
+msgs.insert_last("Visite a nossa loja virtual! As melhores armas vocÃª encontra aqui! www.desafiomortal.com.br");
 msgs.insert_last("Estamos com itens novos em nossa loja virtual! Visite para saber mais! www.desafiomortal.com.br, clicando no link loja desafio mortal.");
-msgs.insert_last("Armas mais potentes do que qualquer arma encontrada no jogo. Isso e muito mais você pode conferir acessando a nossa loja virtual no link: www.desafiomortal.com.br, clicando em loja desafio mortal!");
-msgs.insert_last("Quer uma boa arma? Quer ter um colete a prova de balas? Isso e muito mais, você encontra na nossa loja! Acesse agora mesmo: www.desafiomortal.com.br, clicando na opção loja desafio mortal!");
-msgs.insert_last("Quer ouvir uma boa música? Então ouça a rádio inmortal radio! Com músicas tocando 24 horas por dia, e um excelente repertório. Comece a ouvir agora mesmo pelo link: http://stream.inmortalteam.com:5000/live");
-msgs.insert_last("Chegou uma rádio nova pra você ouvir! A inmortal radio é uma rádio que toca de tudo. Achou interessante? Então, copie o link e ouça agora mesmo! http://stream.inmortalteam.com:5000/live");
-msgs.insert_last("Melhores músicas você só ouve aqui, na inmortal radio! Acesse e confira você mesmo! http://stream.inmortalteam.com:5000/live");
-msgs.insert_last("Sente falta de uma boa música? Ouvindo a inmortal radio, você tem acesso a um ótimo repertório. Gostou? Então ouça pelo link: http://stream.inmortalteam.com:5000/live");
+msgs.insert_last("Armas mais potentes do que qualquer arma encontrada no jogo. Isso e muito mais vocÃª pode conferir acessando a nossa loja virtual no link: www.desafiomortal.com.br, clicando em loja desafio mortal!");
+msgs.insert_last("Quer uma boa arma? Quer ter um colete a prova de balas? Isso e muito mais, vocÃª encontra na nossa loja! Acesse agora mesmo: www.desafiomortal.com.br, clicando na opÃ§Ã£o loja desafio mortal!");
+msgs.insert_last("Quer ouvir uma boa mÃºsica? EntÃ£o ouÃ§a a rÃ¡dio inmortal radio! Com mÃºsicas tocando 24 horas por dia, e um excelente repertÃ³rio. Comece a ouvir agora mesmo pelo link: http://stream.inmortalteam.com:5000/live");
+msgs.insert_last("Chegou uma rÃ¡dio nova pra vocÃª ouvir! A inmortal radio Ã© uma rÃ¡dio que toca de tudo. Achou interessante? EntÃ£o, copie o link e ouÃ§a agora mesmo! http://stream.inmortalteam.com:5000/live");
+msgs.insert_last("Melhores mÃºsicas vocÃª sÃ³ ouve aqui, na inmortal radio! Acesse e confira vocÃª mesmo! http://stream.inmortalteam.com:5000/live");
+msgs.insert_last("Sente falta de uma boa mÃºsica? Ouvindo a inmortal radio, vocÃª tem acesso a um Ã³timo repertÃ³rio. Gostou? EntÃ£o ouÃ§a pelo link: http://stream.inmortalteam.com:5000/live");
 int phrase=random(0,msgs.length()-1);
 send_reliable(0,"msg2 "+msgs[phrase],0);
 send_reliable(0,"ps notifybleeps.ogg",0);
@@ -4615,9 +4668,9 @@ t.insert_last(random(1000, 1500)+" reais");
 t.insert_last(random(15, 30)+" fita_explosiva");
 t.insert_last(random(4, 8)+" max_bomba");
 t.insert_last(random(2, 4)+" bomba_de_fogo");
-t.insert_last(random(2, 4)+" bomba_atômica");
+t.insert_last(random(2, 4)+" bomba_atÃ´mica");
 t.insert_last(random(5, 10)+" projectile");
-t.insert_last(random(3, 6)+" item_magnético");
+t.insert_last(random(3, 6)+" item_magnÃ©tico");
 t.insert_last(random(1, 2)+" teleporter");
 t.insert_last(random(20, 40)+" banana");
 t.insert_last(random(20, 50)+" mana");
@@ -5033,12 +5086,12 @@ tdragonsauro.restart();
 if(temposequestrador.elapsed>=600000&&pvp==true){
 bool found_flag=false;
 for(uint i=0;i<players.length();i++){
-if(players[i].map=="galpão_abandonado") found_flag=true;
+if(players[i].map=="galpÃ£o_abandonado") found_flag=true;
 }
 if(found_flag==false){
 temposequestrador.restart();
 sequestradors.resize(0);
-spawn_kidnapper(199, 0, "galpão_abandonado");
+spawn_kidnapper(199, 0, "galpÃ£o_abandonado");
 }
 }
 if(jogarfrutas.elapsed>=random(40000, 60000)){
@@ -5090,8 +5143,8 @@ ips.insert_last("80");
 ips.insert_last("90");
 ips.insert_last("100");
 int a=random(0, ips.length()-1);
-spawn_obj(random(12, 99),string_to_number(ips[a]),"max_bomb",1,"mortal_construções");
-spawn_obj(random(12, 99),string_to_number(ips[a]),"Time_bomb",1,"mortal_construções");
+spawn_obj(random(12, 99),string_to_number(ips[a]),"max_bomb",1,"mortal_construÃ§Ãµes");
+spawn_obj(random(12, 99),string_to_number(ips[a]),"Time_bomb",1,"mortal_construÃ§Ãµes");
 }
 if(taldeia.elapsed>=35000){
 taldeia.restart();
@@ -5697,6 +5750,7 @@ sd.set("ngripe",players[index].flu_count);
 sd.set("extintor",players[index].extintor);
 sd.set("passport",players[index].passport);
 sd.set("nchuva", players[index].rain_count);
+sd.set("spouse", players[index].spouse);
 sd.set("ncaverna", players[index].ncaverna);
 sd.set("cave", players[index].cave);
 sd.set("achuva", players[index].achuva);
@@ -5920,7 +5974,7 @@ players[index].is_fishing=true;
 else if(item_number=="parachute"&&players[index].map=="plane2"&&mapaatual!="airport"){
 players[index].mapaatual=mapaatual;
 send_reliable(players[index].peer_id, "stopmoving", 0);
-change_map("silêncio2", index, 1, 0);
+change_map("silÃªncio2", index, 1, 0);
 send_reliable(players[index].peer_id, "ps paraquedas.ogg", 0);
 players[index].tmaquina.restart();
 }
@@ -5938,7 +5992,7 @@ send_reliable(players[index].peer_id, "msgnormal You feel your muscles rising tr
 if(players[index].cave==0)players[index].ncaverna=1;
 players[index].cave_timer.restart();
 players[index].cave=1;
-send_packet10(0, players[index].charname, players[index].charname, "b_antídoto.ogg "+players[index].x+" "+players[index].y, players[index].map);
+send_packet10(0, players[index].charname, players[index].charname, "b_antÃ­doto.ogg "+players[index].x+" "+players[index].y, players[index].map);
 }
 else if(item_number=="mana_pack"&&players[index].inv_item_number("mana_pack")>0){
 players[index].inv_add_item("mana_pack", -1, false);
@@ -6020,7 +6074,7 @@ break;
 }
 else if(item_number=="antibiotic"&&players[index].inv_item_number("antibiotic")>0){
 players[index].inv_add_item("antibiotic", -1);
-send_packet(0, "play antibiótico.ogg "+players[index].x+" "+players[index].y, players[index].map);
+send_packet(0, "play antibiÃ³tico.ogg "+players[index].x+" "+players[index].y, players[index].map);
 players[index].sick=0;
 players[index].flu_count=0;
 }
@@ -6033,7 +6087,7 @@ players[i].xp+=xp;
 int health_points=random(50, 100);
 players[index].maxhealth+=health_points;
 players[index].health+=health_points;
-send_packet10(0, players[index].charname, players[index].charname, "abrindo_ovo_de_páscoa.ogg "+players[index].x+" "+players[index].y, players[index].map);
+send_packet10(0, players[index].charname, players[index].charname, "abrindo_ovo_de_pÃ¡scoa.ogg "+players[index].x+" "+players[index].y, players[index].map);
 }
 else if(item_number=="hot_dog"&&players[index].inv_item_number("hot_dog")>0){
 if(players[index].ncoco>=50){send_reliable(players[index].peer_id, "msgnormal But you are too full!"+"!", 0);return;}
@@ -6192,7 +6246,7 @@ send_reliable(players[index].peer_id, "msgalreadywearing", 0);
 }
 else
 {
-send_packet(0,"play relógiodraw.ogg "+players[index].x+" "+players[index].y,players[index].map);
+send_packet(0,"play relÃ³giodraw.ogg "+players[index].x+" "+players[index].y,players[index].map);
 players[index].clock=1;
 }
 }
@@ -6212,7 +6266,7 @@ players[index].mizuno_glasses=1;
 }
 }
 }
-else if(item_number=="Panamá hat")
+else if(item_number=="PanamÃ¡ hat")
 {
 if(players[index].inv_item_number("panama_hat")>0)
 {
@@ -6710,7 +6764,7 @@ players[index].inv_add_item("empty_coconut", 1);
 players[index].paralyzed=true;
 players[index].maxhealth+=100;
 players[index].health+=100;
-send_packet(0,"play bebendocôco.ogg "+players[index].x+" "+players[index].y,players[index].map);
+send_packet(0,"play bebendocÃ´co.ogg "+players[index].x+" "+players[index].y,players[index].map);
 players[index].paralyzed_count+=6927;
 players[index].paralyzed_timer.restart();
 players[index].nurina+=5;
@@ -6723,7 +6777,7 @@ players[index].inv_add_item("empty_coconut", -1);
 players[index].paralyzed=true;
 players[index].maxhealth+=50;
 players[index].health+=50;
-send_packet(0,"play comendocôco.ogg "+players[index].x+" "+players[index].y,players[index].map);
+send_packet(0,"play comendocÃ´co.ogg "+players[index].x+" "+players[index].y,players[index].map);
 players[index].paralyzed_count+=10839;
 players[index].paralyzed_timer.restart();
 players[index].ncoco+=2;
@@ -6752,7 +6806,7 @@ else if(item_number=="Character_machine"){
 string animals="dragonsauro\r\namon_ra\r\ndragon\r\ngod\r\nsequestrador\r\nurso\r\nguarda\r\nguardacofre\r\nprensadeira\r\nmercenario";
 send_reliable(players[index].peer_id, "manimais "+animals, 0);
 }
-else if(item_number=="time_shield"&&players[index].inv_item_number("time_shield")>0&&string_contains(players[index].map, "prisão", 1)<0){
+else if(item_number=="time_shield"&&players[index].inv_item_number("time_shield")>0&&string_contains(players[index].map, "prisÃ£o", 1)<0){
 players[index].inv_add_item("time_shield", -1);
 send_reliable(players[index].peer_id, "stopmoving", 0);
 send_reliable(players[index].peer_id, "ps escudoloop.ogg", 0);
@@ -6962,7 +7016,7 @@ send_reliable(players[index].peer_id, "msgnotwearing", 0);
 }
 else
 {
-if(string_contains(ver,"capacete",1)>-1) send_packet(0,"play retirarrelógio.ogg "+players[index].x+" "+players[index].y,players[index].map);
+if(string_contains(ver,"capacete",1)>-1) send_packet(0,"play retirarrelÃ³gio.ogg "+players[index].x+" "+players[index].y,players[index].map);
 players[index].clock=0;
 }
 }
@@ -7263,7 +7317,7 @@ if(string_contains(ver,"sneakers",1)>-1) send_packet(0,"play retirartenis.ogg "+
 players[index].nike_sneakers=0;
 }
 }
-else if(item_number=="Panamá hat")
+else if(item_number=="PanamÃ¡ hat")
 {
 if(players[index].panama_hat==0)
 {
@@ -7580,7 +7634,7 @@ return;
 newmap="quadro_"+players[index].chat_language;
 }
 else if(string_contains(newmap,"tunnels",1)>-1){
-if(players[index].mapavoltar=="cave")players[index].mapavoltar="continuação_da_montanha";
+if(players[index].mapavoltar=="cave")players[index].mapavoltar="continuaÃ§Ã£o_da_montanha";
 else if(string_contains(players[index].mapavoltar, "quadro", 1)>-1)players[index].mapavoltar="safe_zone_es";
 newmap=players[index].mapavoltar;
 if(string_contains(newmap, "train_moving", 1)>-1)newmap="train";
@@ -7599,9 +7653,9 @@ newmap="plane2";
 }
 else if(string_contains(newmap,"aeroports",1)>-1){
 if(players[index].inv_item_number("a_passport")>0){
-newmap="prisão";
+newmap="prisÃ£o";
 players[index].prison_record+=1;
-change_map("prisão", index, 1, 0);
+change_map("prisÃ£o", index, 1, 0);
 send_reliable(players[index].peer_id, "msgnormal You tried to board with a fake passport and were caught by airport security, who escorted you straight to jail!"+" by airport security, who escorted you straight to jail!", 0);
 players[index].inv_add_item("a_passport", -players[index].inv_item_number("a_passport"));
 players[index].prison_time.restart();
@@ -7609,7 +7663,7 @@ players[index].freedom_message="You have fulfilled your penalty and you are now 
 }
 else if(players[index].passport==0){
 send_reliable(players[index].peer_id, "msgnormal You tried to board without a passport and were caught by airport security, who escorted you straight to jail!"+" by airport security, who escorted you straight to jail!", 0);
-newmap="prisão";
+newmap="prisÃ£o";
 newmap2="naotemmapa";
 players[index].prison_time.restart();
 }
@@ -7724,9 +7778,9 @@ change_map(newmap, index,newx,newy);
 }
 if(string_contains(newmap, "time_machine", 1)>-1){
 string[] time_machine_menu;
-time_machine_menu.insert_last("antiquity:antigüedad");
+time_machine_menu.insert_last("antiquity:antigÃ¼edad");
 time_machine_menu.insert_last("mundo medieval:mundo_medieval");
-time_machine_menu.insert_last("Prehistoric world:pré_história");
+time_machine_menu.insert_last("Prehistoric world:prÃ©_histÃ³ria");
 send_reliable(players[index].peer_id, "mmaquina "+linear(time_machine_menu), 0);
 }
 if(newmap=="bus") send_reliable(players[index].peer_id, "ps onibosligando.ogg", 0);
@@ -7786,9 +7840,9 @@ newmap="airport";
 }
 if(string_contains(newmap,"aeroports",1)>-1){
 if(players[index].inv_item_number("a_passport")>0){
-newmap="prisão";
+newmap="prisÃ£o";
 players[index].prison_record+=1;
-string mapname="prisão";
+string mapname="prisÃ£o";
 file f;
 f.open("maps/"+mapname+".map", "rb");
 string mdata=f.read();
@@ -7805,7 +7859,7 @@ players[index].freedom_message="You have fulfilled your penalty and you are now 
 }
 else if(players[index].passport==0){
 send_reliable(players[index].peer_id, "msgnormal You tried to board without a passport and were caught by airport security, who escorted you straight to jail!"+" by airport security, who escorted you straight to jail!", 0);
-newmap="prisão";
+newmap="prisÃ£o";
 newmap2="naotemmapa";
 players[index].prison_time.restart();
 }
@@ -7953,7 +8007,7 @@ if(newmap2!="naotemmapa"||newmap!="airport"&&newmap2!="naotemmapa"||newmap!="aer
 }
 }
 void iitem(int index, string n1, string n2){
-if(n1=="caixa_eletrônico"){
+if(n1=="caixa_eletrÃ´nico"){
 if(n2=="csaldo")send_reliable(players[index].peer_id, "msg2 You have; ;"+players[index].balance+"; ;reais in your account.", 0);
 else if(n2=="dep") send_reliable(players[index].peer_id, "mtext How much do you want to deposit?:dep_r", 0);
 else if(n2=="sac") send_reliable(players[index].peer_id, "mtext How much do you want to withdraw?:sac_r", 0);
@@ -8120,7 +8174,7 @@ battle_counter+=1;
 }
 }
 if(battle_counter==1) {
-send_reliable(0, "¡"+players[ie].lasthit+" ganhou a arena! , e lleva "+arena_prize+" coins!", 2);
+send_reliable(0, "Â¡"+players[ie].lasthit+" ganhou a arena! , e lleva "+arena_prize+" coins!", 2);
 send_reliable(0, "ps cinofim.ogg", 0);
 for(uint i2=0;i2<players.length();i2++){
 if(players[i2].map=="arena") {
@@ -8338,7 +8392,7 @@ gain_xp(players[pid].charname, random(30,100));
 }
 else if(string_contains(players[ie].lasthit,"punho_",1)>-1){
 string pname=string_replace(players[ie].lasthit,"punho_","",false);
-send_reliable(0, "msg2 Hórus_fist Appears again, sending ; "+players[ie].charname+" ;To the death world.", 3);
+send_reliable(0, "msg2 HÃ³rus_fist Appears again, sending ; "+players[ie].charname+" ;To the death world.", 3);
 int pid=get_player_index_from(pname);
 if(pid>-1){
 pname=players[pid].charname;
@@ -8350,8 +8404,8 @@ gain_xp(players[pid].charname, random(30,100));
 }
 }
 }
-else if(string_contains(players[ie].lasthit,"trovão_",1)>-1){
-string pname=string_replace(players[ie].lasthit,"trovão_","",false);
+else if(string_contains(players[ie].lasthit,"trovÃ£o_",1)>-1){
+string pname=string_replace(players[ie].lasthit,"trovÃ£o_","",false);
 send_reliable(0, "msg2 "+players[ie].charname+" ;was hit"+" by the conjured lightning of; "+pname, 3);
 int pid=get_player_index_from(pname);
 if(pid>-1){
@@ -8380,7 +8434,7 @@ gain_xp(players[pid].charname, random(30,100));
 }
 else if(string_contains(players[ie].lasthit,"missil_",1)>-1){
 string pname=string_replace(players[ie].lasthit,"missil_","",false);
-send_reliable(0, "msg2 "+players[ie].charname+" ;was hit"+" by a míssil_teleguiado from; "+pname+"!", 3);
+send_reliable(0, "msg2 "+players[ie].charname+" ;was hit"+" by a mÃ­ssil_teleguiado from; "+pname+"!", 3);
 int pid=get_player_index_from(pname);
 if(pid>-1){
 pname=players[pid].charname;
