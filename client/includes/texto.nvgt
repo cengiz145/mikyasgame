@@ -1,0 +1,53 @@
+desc@[] descs;
+class desc{
+string text_value;
+int minx, maxx, miny, maxy;
+desc(int dmin_x, int dmax_x, int dmin_y, int dmax_y, string tx){
+minx=dmin_x;
+maxx=dmax_x;
+miny=dmin_y;
+maxy=dmax_y;
+text_value=tx;
+}
+}
+void destroy_all_descs(){
+descs.resize(0);
+}
+void place_desc(int minx, int maxx, int miny, int maxy, string text_value){
+desc desc1(minx, maxx, miny, maxy, text_value);
+descs.insert_last(desc1);
+}
+void check_desc(){
+for (uint i=0; i<descs.length(); i++){
+if (descs[i].minx<=me.x&&descs[i].maxy<=me.x&&descs[i].miny<=me.y&&descs[i].maxy<=me.y){
+speak(pu.get_value(descs[i].text_value));
+break;
+}
+}
+}
+txt@[] txts;
+class txt{
+string text;
+int dx;
+int dy;
+txt(int txt_x, int txt_y, string tx){
+dx=txt_x;
+dy=txt_y;
+text=tx;
+}
+}
+void destroy_all_txts(){
+txts.resize(0);
+}
+void spawn_txt(int txt_x, int txt_y, string text){
+txt txt1(txt_x, txt_y, text);
+txts.insert_last(txt1);
+}
+void check_txt(){
+for (uint i=0; i<txts.length(); i++){
+if (txts[i].dx==me.x&&txts[i].dy==me.y){
+speak(pu.get_value("You read:")+" "+pu.get_value(txts[i].text));
+break;
+}
+}
+}

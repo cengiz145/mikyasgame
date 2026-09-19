@@ -1,0 +1,2116 @@
+void call_loop(){
+netloop();
+magnetic_item_loop();
+bullet_loop();
+wuulaloop();
+wazaxloop();
+cairisloop();
+claudiusloop();
+luciusloop();
+sirixloop();
+cressusloop();
+duronloop();
+aiellusloop();
+quintosloop();
+marcusloop();
+barca_loop();
+theokoles_loop();
+crixus_loop();
+tetraites_loop();
+netloop();
+magnetic_item_loop();
+bullet_loop();
+prisco_loop();
+spiculus_loop();
+marco_loop();
+carpoforo_loop();
+flamma_loop();
+spartacus_loop();
+magnetic_item_loop();
+bullet_loop();
+netloop();
+}
+// Gladiator wuula
+wuula@[] wuulas;
+class wuula
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer wuulatimer, shoot_time, tsair;
+int wuulatime=370;
+bool flee_mode=false;
+wuula(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void wuulaloop()
+{
+for(uint i=0; i<wuulas.length(); i++)
+{
+if(wuulas[i].flee_mode==false&&wuulas[i].shoot_time.elapsed>=20000){
+wuulas[i].x-=2;
+wuulas[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+wuulas[i].x+" "+wuulas[i].y+" "+wuulas[i].map,0);
+}
+if(wuulas[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==wuulas[i].map){
+exit_game=false;
+}
+}
+if(exit_game==true){
+wuulas.remove_at(i);
+break;
+}
+else{
+wuulas[i].tsair.restart();
+}
+}
+if(wuulas[i].wuulatimer.elapsed>=wuulas[i].wuulatime&&wuulas[i].flee_mode==true)
+{
+wuulas[i].wuulatimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(wuulas[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==wuulas[i].map){
+wuulas[i].x--;
+string ss=get_tile_at(wuulas[i].x, wuulas[i].y, wuulas[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+wuulas[i].x+" "+wuulas[i].y+" "+wuulas[i].map,0);
+wuulas[i].wuulatimer.restart();
+}
+else if(wuulas[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&wuulas[i].map==players[i2].map){
+wuulas[i].x++;
+string ss=get_tile_at(wuulas[i].x, wuulas[i].y, wuulas[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+wuulas[i].x+" "+wuulas[i].y+" "+wuulas[i].map,0);
+wuulas[i].wuulatimer.restart();
+}
+if(get_wuula_distance(wuulas[i], players[i2])>-1&&get_wuula_distance(wuulas[i],players[i2])<=3&&wuulas[i].shoot_time.elapsed>=500&&wuulas[i].shots>0&&players[i2].in_safe_zone==false){
+wuulas[i].shoot_time.restart();
+send_packet(0,"play "+wuulas[i].weapon_name+" "+wuulas[i].x+" "+wuulas[i].y+" "+wuulas[i].map,wuulas[i].map);
+players[i2].health-=random(wuulas[i].min_damage, wuulas[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="wuula";
+wuulas[i].shots--;
+break;
+}
+if(wuulas[i].shots<=0){
+wuulas[i].shots=1;
+wuulas[i].shoot_time.restart();
+}
+if(wuulas[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+wuulas[i].x+" "+wuulas[i].y+" "+wuulas[i].map,wuulas[i].map);
+send_reliable(0, "msganimal "+wuulas[i].hit_by+" matou_o_gladiador Wuula!", 0);
+string hitter=wuulas[i].hit_by;
+int xx=get_player_index_from(hitter);
+if(xx>-1){
+players[xx].inv_add_item("wuula_trident", 1);
+gain_xp(players[xx].charname, random(3000, 3500));
+}
+wuulas.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_wuula(int x, int y, string map){
+wuula c(x, y, map);
+wuulas.insert_last(c);
+}
+// Gladiator wazax
+wazax@[] wazaxs;
+class wazax
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=4000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer wazaxtimer, shoot_time, tsair;
+int wazaxtime=370;
+bool flee_mode=false;
+wazax(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void wazaxloop()
+{
+for(uint i=0; i<wazaxs.length(); i++)
+{
+if(wazaxs[i].flee_mode==false&&wazaxs[i].shoot_time.elapsed>=20000){
+wazaxs[i].x-=2;
+wazaxs[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+wazaxs[i].x+" "+wazaxs[i].y+" "+wazaxs[i].map,0);
+}
+if(wazaxs[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==wazaxs[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+wazaxs.remove_at(i);
+break;
+}
+else{
+wazaxs[i].tsair.restart();
+}
+}
+if(wazaxs[i].wazaxtimer.elapsed>=wazaxs[i].wazaxtime&&wazaxs[i].flee_mode==true)
+{
+wazaxs[i].wazaxtimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(wazaxs[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==wazaxs[i].map){
+wazaxs[i].x--;
+string ss=get_tile_at(wazaxs[i].x, wazaxs[i].y, wazaxs[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+wazaxs[i].x+" "+wazaxs[i].y+" "+wazaxs[i].map,0);
+wazaxs[i].wazaxtimer.restart();
+}
+else if(wazaxs[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&wazaxs[i].map==players[i2].map){
+wazaxs[i].x++;
+string ss=get_tile_at(wazaxs[i].x, wazaxs[i].y, wazaxs[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+wazaxs[i].x+" "+wazaxs[i].y+" "+wazaxs[i].map,0);
+wazaxs[i].wazaxtimer.restart();
+}
+if(get_wazax_distance(wazaxs[i], players[i2])>-1&&get_wazax_distance(wazaxs[i],players[i2])<=3&&wazaxs[i].shoot_time.elapsed>=500&&wazaxs[i].shots>0&&players[i2].in_safe_zone==false){
+wazaxs[i].shoot_time.restart();
+send_packet(0,"play "+wazaxs[i].weapon_name+" "+wazaxs[i].x+" "+wazaxs[i].y+" "+wazaxs[i].map,wazaxs[i].map);
+players[i2].health-=random(wazaxs[i].min_damage, wazaxs[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="wazax";
+wazaxs[i].shots--;
+break;
+}
+if(wazaxs[i].shots<=0){
+wazaxs[i].shots=1;
+wazaxs[i].shoot_time.restart();
+}
+if(wazaxs[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+wazaxs[i].x+" "+wazaxs[i].y+" "+wazaxs[i].map,wazaxs[i].map);
+send_reliable(0, "msganimal "+wazaxs[i].hit_by+" matou_o_gladiador Wuula!", 0);
+wazaxs.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_wazax(int x, int y, string map){
+wazax c(x, y, map);
+wazaxs.insert_last(c);
+}
+// Gladiator cairis
+cairis@[] cairiss;
+class cairis
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer cairistimer, shoot_time, tsair;
+int cairistime=370;
+bool flee_mode=false;
+cairis(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void cairisloop()
+{
+for(uint i=0; i<cairiss.length(); i++)
+{
+if(cairiss[i].flee_mode==false&&cairiss[i].shoot_time.elapsed>=20000){
+cairiss[i].x-=2;
+cairiss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+cairiss[i].x+" "+cairiss[i].y+" "+cairiss[i].map,0);
+}
+if(cairiss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==cairiss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+cairiss.remove_at(i);
+break;
+}
+else{
+cairiss[i].tsair.restart();
+}
+}
+if(cairiss[i].cairistimer.elapsed>=cairiss[i].cairistime&&cairiss[i].flee_mode==true)
+{
+cairiss[i].cairistimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(cairiss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==cairiss[i].map){
+cairiss[i].x--;
+string ss=get_tile_at(cairiss[i].x, cairiss[i].y, cairiss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+cairiss[i].x+" "+cairiss[i].y+" "+cairiss[i].map,0);
+cairiss[i].cairistimer.restart();
+}
+else if(cairiss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&cairiss[i].map==players[i2].map){
+cairiss[i].x++;
+string ss=get_tile_at(cairiss[i].x, cairiss[i].y, cairiss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+cairiss[i].x+" "+cairiss[i].y+" "+cairiss[i].map,0);
+cairiss[i].cairistimer.restart();
+}
+if(get_cairis_distance(cairiss[i], players[i2])>-1&&get_cairis_distance(cairiss[i],players[i2])<=3&&cairiss[i].shoot_time.elapsed>=500&&cairiss[i].shots>0&&players[i2].in_safe_zone==false){
+cairiss[i].shoot_time.restart();
+send_packet(0,"play "+cairiss[i].weapon_name+" "+cairiss[i].x+" "+cairiss[i].y+" "+cairiss[i].map,cairiss[i].map);
+players[i2].health-=random(cairiss[i].min_damage, cairiss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="cairis";
+cairiss[i].shots--;
+break;
+}
+if(cairiss[i].shots<=0){
+cairiss[i].shots=1;
+cairiss[i].shoot_time.restart();
+}
+if(cairiss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+cairiss[i].x+" "+cairiss[i].y+" "+cairiss[i].map,cairiss[i].map);
+send_reliable(0, "msganimal "+cairiss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+cairiss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_cairis(int x, int y, string map){
+cairis c(x, y, map);
+cairiss.insert_last(c);
+}
+// Gladiator claudius
+claudius@[] claudiuss;
+class claudius
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer claudiustimer, shoot_time, tsair;
+int claudiustime=370;
+bool flee_mode=false;
+claudius(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void claudiusloop()
+{
+for(uint i=0; i<claudiuss.length(); i++)
+{
+if(claudiuss[i].flee_mode==false&&claudiuss[i].shoot_time.elapsed>=20000){
+claudiuss[i].x-=2;
+claudiuss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+claudiuss[i].x+" "+claudiuss[i].y+" "+claudiuss[i].map,0);
+}
+if(claudiuss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==claudiuss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+claudiuss.remove_at(i);
+break;
+}
+else{
+claudiuss[i].tsair.restart();
+}
+}
+if(claudiuss[i].claudiustimer.elapsed>=claudiuss[i].claudiustime&&claudiuss[i].flee_mode==true)
+{
+claudiuss[i].claudiustimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(claudiuss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==claudiuss[i].map){
+claudiuss[i].x--;
+string ss=get_tile_at(claudiuss[i].x, claudiuss[i].y, claudiuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+claudiuss[i].x+" "+claudiuss[i].y+" "+claudiuss[i].map,0);
+claudiuss[i].claudiustimer.restart();
+}
+else if(claudiuss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&claudiuss[i].map==players[i2].map){
+claudiuss[i].x++;
+string ss=get_tile_at(claudiuss[i].x, claudiuss[i].y, claudiuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+claudiuss[i].x+" "+claudiuss[i].y+" "+claudiuss[i].map,0);
+claudiuss[i].claudiustimer.restart();
+}
+if(get_claudius_distance(claudiuss[i], players[i2])>-1&&get_claudius_distance(claudiuss[i],players[i2])<=3&&claudiuss[i].shoot_time.elapsed>=500&&claudiuss[i].shots>0&&players[i2].in_safe_zone==false){
+claudiuss[i].shoot_time.restart();
+send_packet(0,"play "+claudiuss[i].weapon_name+" "+claudiuss[i].x+" "+claudiuss[i].y+" "+claudiuss[i].map,claudiuss[i].map);
+players[i2].health-=random(claudiuss[i].min_damage, claudiuss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="claudius";
+claudiuss[i].shots--;
+break;
+}
+if(claudiuss[i].shots<=0){
+claudiuss[i].shots=1;
+claudiuss[i].shoot_time.restart();
+}
+if(claudiuss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+claudiuss[i].x+" "+claudiuss[i].y+" "+claudiuss[i].map,claudiuss[i].map);
+send_reliable(0, "msganimal "+claudiuss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+claudiuss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_claudius(int x, int y, string map){
+claudius c(x, y, map);
+claudiuss.insert_last(c);
+}
+// Gladiator lucius
+lucius@[] luciuss;
+class lucius
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer luciustimer, shoot_time, tsair;
+int luciustime=370;
+bool flee_mode=false;
+lucius(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void luciusloop()
+{
+for(uint i=0; i<luciuss.length(); i++)
+{
+if(luciuss[i].flee_mode==false&&luciuss[i].shoot_time.elapsed>=20000){
+luciuss[i].x-=2;
+luciuss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+luciuss[i].x+" "+luciuss[i].y+" "+luciuss[i].map,0);
+}
+if(luciuss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==luciuss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+luciuss.remove_at(i);
+break;
+}
+else{
+luciuss[i].tsair.restart();
+}
+}
+if(luciuss[i].luciustimer.elapsed>=luciuss[i].luciustime&&luciuss[i].flee_mode==true)
+{
+luciuss[i].luciustimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(luciuss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==luciuss[i].map){
+luciuss[i].x--;
+string ss=get_tile_at(luciuss[i].x, luciuss[i].y, luciuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+luciuss[i].x+" "+luciuss[i].y+" "+luciuss[i].map,0);
+luciuss[i].luciustimer.restart();
+}
+else if(luciuss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&luciuss[i].map==players[i2].map){
+luciuss[i].x++;
+string ss=get_tile_at(luciuss[i].x, luciuss[i].y, luciuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+luciuss[i].x+" "+luciuss[i].y+" "+luciuss[i].map,0);
+luciuss[i].luciustimer.restart();
+}
+if(get_lucius_distance(luciuss[i], players[i2])>-1&&get_lucius_distance(luciuss[i],players[i2])<=3&&luciuss[i].shoot_time.elapsed>=500&&luciuss[i].shots>0&&players[i2].in_safe_zone==false){
+luciuss[i].shoot_time.restart();
+send_packet(0,"play "+luciuss[i].weapon_name+" "+luciuss[i].x+" "+luciuss[i].y+" "+luciuss[i].map,luciuss[i].map);
+players[i2].health-=random(luciuss[i].min_damage, luciuss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="lucius";
+luciuss[i].shots--;
+break;
+}
+if(luciuss[i].shots<=0){
+luciuss[i].shots=1;
+luciuss[i].shoot_time.restart();
+}
+if(luciuss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+luciuss[i].x+" "+luciuss[i].y+" "+luciuss[i].map,luciuss[i].map);
+send_reliable(0, "msganimal "+luciuss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+luciuss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_lucius(int x, int y, string map){
+lucius c(x, y, map);
+luciuss.insert_last(c);
+}
+// Gladiator sirix
+sirix@[] sirixs;
+class sirix
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer sirixtimer, shoot_time, tsair;
+int sirixtime=370;
+bool flee_mode=false;
+sirix(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void sirixloop()
+{
+for(uint i=0; i<sirixs.length(); i++)
+{
+if(sirixs[i].flee_mode==false&&sirixs[i].shoot_time.elapsed>=20000){
+sirixs[i].x-=2;
+sirixs[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+sirixs[i].x+" "+sirixs[i].y+" "+sirixs[i].map,0);
+}
+if(sirixs[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==sirixs[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+sirixs.remove_at(i);
+break;
+}
+else{
+sirixs[i].tsair.restart();
+}
+}
+if(sirixs[i].sirixtimer.elapsed>=sirixs[i].sirixtime&&sirixs[i].flee_mode==true)
+{
+sirixs[i].sirixtimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(sirixs[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==sirixs[i].map){
+sirixs[i].x--;
+string ss=get_tile_at(sirixs[i].x, sirixs[i].y, sirixs[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+sirixs[i].x+" "+sirixs[i].y+" "+sirixs[i].map,0);
+sirixs[i].sirixtimer.restart();
+}
+else if(sirixs[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&sirixs[i].map==players[i2].map){
+sirixs[i].x++;
+string ss=get_tile_at(sirixs[i].x, sirixs[i].y, sirixs[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+sirixs[i].x+" "+sirixs[i].y+" "+sirixs[i].map,0);
+sirixs[i].sirixtimer.restart();
+}
+if(get_sirix_distance(sirixs[i], players[i2])>-1&&get_sirix_distance(sirixs[i],players[i2])<=3&&sirixs[i].shoot_time.elapsed>=500&&sirixs[i].shots>0&&players[i2].in_safe_zone==false){
+sirixs[i].shoot_time.restart();
+send_packet(0,"play "+sirixs[i].weapon_name+" "+sirixs[i].x+" "+sirixs[i].y+" "+sirixs[i].map,sirixs[i].map);
+players[i2].health-=random(sirixs[i].min_damage, sirixs[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="sirix";
+sirixs[i].shots--;
+break;
+}
+if(sirixs[i].shots<=0){
+sirixs[i].shots=1;
+sirixs[i].shoot_time.restart();
+}
+if(sirixs[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+sirixs[i].x+" "+sirixs[i].y+" "+sirixs[i].map,sirixs[i].map);
+send_reliable(0, "msganimal "+sirixs[i].hit_by+" matou_o_gladiador Wuula!", 0);
+sirixs.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_sirix(int x, int y, string map){
+sirix c(x, y, map);
+sirixs.insert_last(c);
+}
+// Gladiator cressus
+cressus@[] cressuss;
+class cressus
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer cressustimer, shoot_time, tsair;
+int cressustime=370;
+bool flee_mode=false;
+cressus(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void cressusloop()
+{
+for(uint i=0; i<cressuss.length(); i++)
+{
+if(cressuss[i].flee_mode==false&&cressuss[i].shoot_time.elapsed>=20000){
+cressuss[i].x-=2;
+cressuss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+cressuss[i].x+" "+cressuss[i].y+" "+cressuss[i].map,0);
+}
+if(cressuss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==cressuss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+cressuss.remove_at(i);
+break;
+}
+else{
+cressuss[i].tsair.restart();
+}
+}
+if(cressuss[i].cressustimer.elapsed>=cressuss[i].cressustime&&cressuss[i].flee_mode==true)
+{
+cressuss[i].cressustimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(cressuss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==cressuss[i].map){
+cressuss[i].x--;
+string ss=get_tile_at(cressuss[i].x, cressuss[i].y, cressuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+cressuss[i].x+" "+cressuss[i].y+" "+cressuss[i].map,0);
+cressuss[i].cressustimer.restart();
+}
+else if(cressuss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&cressuss[i].map==players[i2].map){
+cressuss[i].x++;
+string ss=get_tile_at(cressuss[i].x, cressuss[i].y, cressuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+cressuss[i].x+" "+cressuss[i].y+" "+cressuss[i].map,0);
+cressuss[i].cressustimer.restart();
+}
+if(get_cressus_distance(cressuss[i], players[i2])>-1&&get_cressus_distance(cressuss[i],players[i2])<=3&&cressuss[i].shoot_time.elapsed>=500&&cressuss[i].shots>0&&players[i2].in_safe_zone==false){
+cressuss[i].shoot_time.restart();
+send_packet(0,"play "+cressuss[i].weapon_name+" "+cressuss[i].x+" "+cressuss[i].y+" "+cressuss[i].map,cressuss[i].map);
+players[i2].health-=random(cressuss[i].min_damage, cressuss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="cressus";
+cressuss[i].shots--;
+break;
+}
+if(cressuss[i].shots<=0){
+cressuss[i].shots=1;
+cressuss[i].shoot_time.restart();
+}
+if(cressuss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+cressuss[i].x+" "+cressuss[i].y+" "+cressuss[i].map,cressuss[i].map);
+send_reliable(0, "msganimal "+cressuss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+cressuss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_cressus(int x, int y, string map){
+cressus c(x, y, map);
+cressuss.insert_last(c);
+}
+// Gladiator duron
+duron@[] durons;
+class duron
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer durontimer, shoot_time, tsair;
+int durontime=370;
+bool flee_mode=false;
+duron(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void duronloop()
+{
+for(uint i=0; i<durons.length(); i++)
+{
+if(durons[i].flee_mode==false&&durons[i].shoot_time.elapsed>=20000){
+durons[i].x-=2;
+durons[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+durons[i].x+" "+durons[i].y+" "+durons[i].map,0);
+}
+if(durons[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==durons[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+durons.remove_at(i);
+break;
+}
+else{
+durons[i].tsair.restart();
+}
+}
+if(durons[i].durontimer.elapsed>=durons[i].durontime&&durons[i].flee_mode==true)
+{
+durons[i].durontimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(durons[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==durons[i].map){
+durons[i].x--;
+string ss=get_tile_at(durons[i].x, durons[i].y, durons[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+durons[i].x+" "+durons[i].y+" "+durons[i].map,0);
+durons[i].durontimer.restart();
+}
+else if(durons[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&durons[i].map==players[i2].map){
+durons[i].x++;
+string ss=get_tile_at(durons[i].x, durons[i].y, durons[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+durons[i].x+" "+durons[i].y+" "+durons[i].map,0);
+durons[i].durontimer.restart();
+}
+if(get_duron_distance(durons[i], players[i2])>-1&&get_duron_distance(durons[i],players[i2])<=3&&durons[i].shoot_time.elapsed>=500&&durons[i].shots>0&&players[i2].in_safe_zone==false){
+durons[i].shoot_time.restart();
+send_packet(0,"play "+durons[i].weapon_name+" "+durons[i].x+" "+durons[i].y+" "+durons[i].map,durons[i].map);
+players[i2].health-=random(durons[i].min_damage, durons[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="duron";
+durons[i].shots--;
+break;
+}
+if(durons[i].shots<=0){
+durons[i].shots=1;
+durons[i].shoot_time.restart();
+}
+if(durons[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+durons[i].x+" "+durons[i].y+" "+durons[i].map,durons[i].map);
+send_reliable(0, "msganimal "+durons[i].hit_by+" matou_o_gladiador Wuula!", 0);
+durons.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_duron(int x, int y, string map){
+duron c(x, y, map);
+durons.insert_last(c);
+}
+// Gladiator aiellus
+aiellus@[] aielluss;
+class aiellus
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer aiellustimer, shoot_time, tsair;
+int aiellustime=370;
+bool flee_mode=false;
+aiellus(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void aiellusloop()
+{
+for(uint i=0; i<aielluss.length(); i++)
+{
+if(aielluss[i].flee_mode==false&&aielluss[i].shoot_time.elapsed>=20000){
+aielluss[i].x-=2;
+aielluss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+aielluss[i].x+" "+aielluss[i].y+" "+aielluss[i].map,0);
+}
+if(aielluss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==aielluss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+aielluss.remove_at(i);
+break;
+}
+else{
+aielluss[i].tsair.restart();
+}
+}
+if(aielluss[i].aiellustimer.elapsed>=aielluss[i].aiellustime&&aielluss[i].flee_mode==true)
+{
+aielluss[i].aiellustimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(aielluss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==aielluss[i].map){
+aielluss[i].x--;
+string ss=get_tile_at(aielluss[i].x, aielluss[i].y, aielluss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+aielluss[i].x+" "+aielluss[i].y+" "+aielluss[i].map,0);
+aielluss[i].aiellustimer.restart();
+}
+else if(aielluss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&aielluss[i].map==players[i2].map){
+aielluss[i].x++;
+string ss=get_tile_at(aielluss[i].x, aielluss[i].y, aielluss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+aielluss[i].x+" "+aielluss[i].y+" "+aielluss[i].map,0);
+aielluss[i].aiellustimer.restart();
+}
+if(get_aiellus_distance(aielluss[i], players[i2])>-1&&get_aiellus_distance(aielluss[i],players[i2])<=3&&aielluss[i].shoot_time.elapsed>=500&&aielluss[i].shots>0&&players[i2].in_safe_zone==false){
+aielluss[i].shoot_time.restart();
+send_packet(0,"play "+aielluss[i].weapon_name+" "+aielluss[i].x+" "+aielluss[i].y+" "+aielluss[i].map,aielluss[i].map);
+players[i2].health-=random(aielluss[i].min_damage, aielluss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="aiellus";
+aielluss[i].shots--;
+break;
+}
+if(aielluss[i].shots<=0){
+aielluss[i].shots=1;
+aielluss[i].shoot_time.restart();
+}
+if(aielluss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+aielluss[i].x+" "+aielluss[i].y+" "+aielluss[i].map,aielluss[i].map);
+send_reliable(0, "msganimal "+aielluss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+aielluss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_aiellus(int x, int y, string map){
+aiellus c(x, y, map);
+aielluss.insert_last(c);
+}
+// Gladiator quintos
+quintos@[] quintoss;
+class quintos
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer quintostimer, shoot_time, tsair;
+int quintostime=370;
+bool flee_mode=false;
+quintos(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void quintosloop()
+{
+for(uint i=0; i<quintoss.length(); i++)
+{
+if(quintoss[i].flee_mode==false&&quintoss[i].shoot_time.elapsed>=20000){
+quintoss[i].x-=2;
+quintoss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+quintoss[i].x+" "+quintoss[i].y+" "+quintoss[i].map,0);
+}
+if(quintoss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==quintoss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+quintoss.remove_at(i);
+break;
+}
+else{
+quintoss[i].tsair.restart();
+}
+}
+if(quintoss[i].quintostimer.elapsed>=quintoss[i].quintostime&&quintoss[i].flee_mode==true)
+{
+quintoss[i].quintostimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(quintoss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==quintoss[i].map){
+quintoss[i].x--;
+string ss=get_tile_at(quintoss[i].x, quintoss[i].y, quintoss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+quintoss[i].x+" "+quintoss[i].y+" "+quintoss[i].map,0);
+quintoss[i].quintostimer.restart();
+}
+else if(quintoss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&quintoss[i].map==players[i2].map){
+quintoss[i].x++;
+string ss=get_tile_at(quintoss[i].x, quintoss[i].y, quintoss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+quintoss[i].x+" "+quintoss[i].y+" "+quintoss[i].map,0);
+quintoss[i].quintostimer.restart();
+}
+if(get_quintos_distance(quintoss[i], players[i2])>-1&&get_quintos_distance(quintoss[i],players[i2])<=3&&quintoss[i].shoot_time.elapsed>=500&&quintoss[i].shots>0&&players[i2].in_safe_zone==false){
+quintoss[i].shoot_time.restart();
+send_packet(0,"play "+quintoss[i].weapon_name+" "+quintoss[i].x+" "+quintoss[i].y+" "+quintoss[i].map,quintoss[i].map);
+players[i2].health-=random(quintoss[i].min_damage, quintoss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="quintos";
+quintoss[i].shots--;
+break;
+}
+if(quintoss[i].shots<=0){
+quintoss[i].shots=1;
+quintoss[i].shoot_time.restart();
+}
+if(quintoss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+quintoss[i].x+" "+quintoss[i].y+" "+quintoss[i].map,quintoss[i].map);
+send_reliable(0, "msganimal "+quintoss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+quintoss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_quintos(int x, int y, string map){
+quintos c(x, y, map);
+quintoss.insert_last(c);
+}
+// Gladiator marcus
+marcus@[] marcuss;
+class marcus
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer marcustimer, shoot_time, tsair;
+int marcustime=370;
+bool flee_mode=false;
+marcus(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void marcusloop()
+{
+for(uint i=0; i<marcuss.length(); i++)
+{
+if(marcuss[i].flee_mode==false&&marcuss[i].shoot_time.elapsed>=20000){
+marcuss[i].x-=2;
+marcuss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+marcuss[i].x+" "+marcuss[i].y+" "+marcuss[i].map,0);
+}
+if(marcuss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==marcuss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+marcuss.remove_at(i);
+break;
+}
+else{
+marcuss[i].tsair.restart();
+}
+}
+if(marcuss[i].marcustimer.elapsed>=marcuss[i].marcustime&&marcuss[i].flee_mode==true)
+{
+marcuss[i].marcustimer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(marcuss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==marcuss[i].map){
+marcuss[i].x--;
+string ss=get_tile_at(marcuss[i].x, marcuss[i].y, marcuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+marcuss[i].x+" "+marcuss[i].y+" "+marcuss[i].map,0);
+marcuss[i].marcustimer.restart();
+}
+else if(marcuss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&marcuss[i].map==players[i2].map){
+marcuss[i].x++;
+string ss=get_tile_at(marcuss[i].x, marcuss[i].y, marcuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+marcuss[i].x+" "+marcuss[i].y+" "+marcuss[i].map,0);
+marcuss[i].marcustimer.restart();
+}
+if(get_marcus_distance(marcuss[i], players[i2])>-1&&get_marcus_distance(marcuss[i],players[i2])<=3&&marcuss[i].shoot_time.elapsed>=500&&marcuss[i].shots>0&&players[i2].in_safe_zone==false){
+marcuss[i].shoot_time.restart();
+send_packet(0,"play "+marcuss[i].weapon_name+" "+marcuss[i].x+" "+marcuss[i].y+" "+marcuss[i].map,marcuss[i].map);
+players[i2].health-=random(marcuss[i].min_damage, marcuss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="marcus";
+marcuss[i].shots--;
+break;
+}
+if(marcuss[i].shots<=0){
+marcuss[i].shots=1;
+marcuss[i].shoot_time.restart();
+}
+if(marcuss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+marcuss[i].x+" "+marcuss[i].y+" "+marcuss[i].map,marcuss[i].map);
+send_reliable(0, "msganimal "+marcuss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+marcuss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_marcus(int x, int y, string map){
+marcus c(x, y, map);
+marcuss.insert_last(c);
+}
+// Gladiator barca
+barca@[] barcas;
+class barca
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer ferry_timer, shoot_time, tsair;
+int barca_time=370;
+bool flee_mode=false;
+barca(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void barca_loop()
+{
+for(uint i=0; i<barcas.length(); i++)
+{
+if(barcas[i].flee_mode==false&&barcas[i].shoot_time.elapsed>=20000){
+barcas[i].x-=2;
+barcas[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+barcas[i].x+" "+barcas[i].y+" "+barcas[i].map,0);
+}
+if(barcas[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==barcas[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+barcas.remove_at(i);
+break;
+}
+else{
+barcas[i].tsair.restart();
+}
+}
+if(barcas[i].ferry_timer.elapsed>=barcas[i].barca_time&&barcas[i].flee_mode==true)
+{
+barcas[i].ferry_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(barcas[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==barcas[i].map){
+barcas[i].x--;
+string ss=get_tile_at(barcas[i].x, barcas[i].y, barcas[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+barcas[i].x+" "+barcas[i].y+" "+barcas[i].map,0);
+barcas[i].ferry_timer.restart();
+}
+else if(barcas[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&barcas[i].map==players[i2].map){
+barcas[i].x++;
+string ss=get_tile_at(barcas[i].x, barcas[i].y, barcas[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+barcas[i].x+" "+barcas[i].y+" "+barcas[i].map,0);
+barcas[i].ferry_timer.restart();
+}
+if(get_barca_distance(barcas[i], players[i2])>-1&&get_barca_distance(barcas[i],players[i2])<=3&&barcas[i].shoot_time.elapsed>=500&&barcas[i].shots>0&&players[i2].in_safe_zone==false){
+barcas[i].shoot_time.restart();
+send_packet(0,"play "+barcas[i].weapon_name+" "+barcas[i].x+" "+barcas[i].y+" "+barcas[i].map,barcas[i].map);
+players[i2].health-=random(barcas[i].min_damage, barcas[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="barca";
+barcas[i].shots--;
+break;
+}
+if(barcas[i].shots<=0){
+barcas[i].shots=1;
+barcas[i].shoot_time.restart();
+}
+if(barcas[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+barcas[i].x+" "+barcas[i].y+" "+barcas[i].map,barcas[i].map);
+send_reliable(0, "msganimal "+barcas[i].hit_by+" matou_o_gladiador Wuula!", 0);
+barcas.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_barca(int x, int y, string map){
+barca c(x, y, map);
+barcas.insert_last(c);
+}
+// Gladiator theokoles
+theokoles@[] theokoless;
+class theokoles
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer theokoles_timer, shoot_time, tsair;
+int theokoles_time=370;
+bool flee_mode=false;
+theokoles(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void theokoles_loop()
+{
+for(uint i=0; i<theokoless.length(); i++)
+{
+if(theokoless[i].flee_mode==false&&theokoless[i].shoot_time.elapsed>=20000){
+theokoless[i].x-=2;
+theokoless[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+theokoless[i].x+" "+theokoless[i].y+" "+theokoless[i].map,0);
+}
+if(theokoless[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==theokoless[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+theokoless.remove_at(i);
+break;
+}
+else{
+theokoless[i].tsair.restart();
+}
+}
+if(theokoless[i].theokoles_timer.elapsed>=theokoless[i].theokoles_time&&theokoless[i].flee_mode==true)
+{
+theokoless[i].theokoles_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(theokoless[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==theokoless[i].map){
+theokoless[i].x--;
+string ss=get_tile_at(theokoless[i].x, theokoless[i].y, theokoless[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+theokoless[i].x+" "+theokoless[i].y+" "+theokoless[i].map,0);
+theokoless[i].theokoles_timer.restart();
+}
+else if(theokoless[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&theokoless[i].map==players[i2].map){
+theokoless[i].x++;
+string ss=get_tile_at(theokoless[i].x, theokoless[i].y, theokoless[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+theokoless[i].x+" "+theokoless[i].y+" "+theokoless[i].map,0);
+theokoless[i].theokoles_timer.restart();
+}
+if(get_theokoles_distance(theokoless[i], players[i2])>-1&&get_theokoles_distance(theokoless[i],players[i2])<=3&&theokoless[i].shoot_time.elapsed>=500&&theokoless[i].shots>0&&players[i2].in_safe_zone==false){
+theokoless[i].shoot_time.restart();
+send_packet(0,"play "+theokoless[i].weapon_name+" "+theokoless[i].x+" "+theokoless[i].y+" "+theokoless[i].map,theokoless[i].map);
+players[i2].health-=random(theokoless[i].min_damage, theokoless[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="theokoles";
+theokoless[i].shots--;
+break;
+}
+if(theokoless[i].shots<=0){
+theokoless[i].shots=1;
+theokoless[i].shoot_time.restart();
+}
+if(theokoless[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+theokoless[i].x+" "+theokoless[i].y+" "+theokoless[i].map,theokoless[i].map);
+send_reliable(0, "msganimal "+theokoless[i].hit_by+" matou_o_gladiador Wuula!", 0);
+theokoless.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_theokoles(int x, int y, string map){
+theokoles c(x, y, map);
+theokoless.insert_last(c);
+}
+// Gladiator crixus
+crixus@[] crixuss;
+class crixus
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer crixus_timer, shoot_time, tsair;
+int crixus_time=370;
+bool flee_mode=false;
+crixus(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void crixus_loop()
+{
+for(uint i=0; i<crixuss.length(); i++)
+{
+if(crixuss[i].flee_mode==false&&crixuss[i].shoot_time.elapsed>=20000){
+crixuss[i].x-=2;
+crixuss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+crixuss[i].x+" "+crixuss[i].y+" "+crixuss[i].map,0);
+}
+if(crixuss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==crixuss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+crixuss.remove_at(i);
+break;
+}
+else{
+crixuss[i].tsair.restart();
+}
+}
+if(crixuss[i].crixus_timer.elapsed>=crixuss[i].crixus_time&&crixuss[i].flee_mode==true)
+{
+crixuss[i].crixus_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(crixuss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==crixuss[i].map){
+crixuss[i].x--;
+string ss=get_tile_at(crixuss[i].x, crixuss[i].y, crixuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+crixuss[i].x+" "+crixuss[i].y+" "+crixuss[i].map,0);
+crixuss[i].crixus_timer.restart();
+}
+else if(crixuss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&crixuss[i].map==players[i2].map){
+crixuss[i].x++;
+string ss=get_tile_at(crixuss[i].x, crixuss[i].y, crixuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+crixuss[i].x+" "+crixuss[i].y+" "+crixuss[i].map,0);
+crixuss[i].crixus_timer.restart();
+}
+if(get_crixus_distance(crixuss[i], players[i2])>-1&&get_crixus_distance(crixuss[i],players[i2])<=3&&crixuss[i].shoot_time.elapsed>=500&&crixuss[i].shots>0&&players[i2].in_safe_zone==false){
+crixuss[i].shoot_time.restart();
+send_packet(0,"play "+crixuss[i].weapon_name+" "+crixuss[i].x+" "+crixuss[i].y+" "+crixuss[i].map,crixuss[i].map);
+players[i2].health-=random(crixuss[i].min_damage, crixuss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="crixus";
+crixuss[i].shots--;
+break;
+}
+if(crixuss[i].shots<=0){
+crixuss[i].shots=1;
+crixuss[i].shoot_time.restart();
+}
+if(crixuss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+crixuss[i].x+" "+crixuss[i].y+" "+crixuss[i].map,crixuss[i].map);
+send_reliable(0, "msganimal "+crixuss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+crixuss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_crixus(int x, int y, string map){
+crixus c(x, y, map);
+crixuss.insert_last(c);
+}
+// Gladiator tetraites
+tetraites@[] tetraitess;
+class tetraites
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer tetraites_timer, shoot_time, tsair;
+int tetraites_time=370;
+bool flee_mode=false;
+tetraites(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void tetraites_loop()
+{
+for(uint i=0; i<tetraitess.length(); i++)
+{
+if(tetraitess[i].flee_mode==false&&tetraitess[i].shoot_time.elapsed>=20000){
+tetraitess[i].x-=2;
+tetraitess[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+tetraitess[i].x+" "+tetraitess[i].y+" "+tetraitess[i].map,0);
+}
+if(tetraitess[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==tetraitess[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+tetraitess.remove_at(i);
+break;
+}
+else{
+tetraitess[i].tsair.restart();
+}
+}
+if(tetraitess[i].tetraites_timer.elapsed>=tetraitess[i].tetraites_time&&tetraitess[i].flee_mode==true)
+{
+tetraitess[i].tetraites_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(tetraitess[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==tetraitess[i].map){
+tetraitess[i].x--;
+string ss=get_tile_at(tetraitess[i].x, tetraitess[i].y, tetraitess[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+tetraitess[i].x+" "+tetraitess[i].y+" "+tetraitess[i].map,0);
+tetraitess[i].tetraites_timer.restart();
+}
+else if(tetraitess[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&tetraitess[i].map==players[i2].map){
+tetraitess[i].x++;
+string ss=get_tile_at(tetraitess[i].x, tetraitess[i].y, tetraitess[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+tetraitess[i].x+" "+tetraitess[i].y+" "+tetraitess[i].map,0);
+tetraitess[i].tetraites_timer.restart();
+}
+if(get_tetraites_distance(tetraitess[i], players[i2])>-1&&get_tetraites_distance(tetraitess[i],players[i2])<=3&&tetraitess[i].shoot_time.elapsed>=500&&tetraitess[i].shots>0&&players[i2].in_safe_zone==false){
+tetraitess[i].shoot_time.restart();
+send_packet(0,"play "+tetraitess[i].weapon_name+" "+tetraitess[i].x+" "+tetraitess[i].y+" "+tetraitess[i].map,tetraitess[i].map);
+players[i2].health-=random(tetraitess[i].min_damage, tetraitess[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="tetraites";
+tetraitess[i].shots--;
+break;
+}
+if(tetraitess[i].shots<=0){
+tetraitess[i].shots=1;
+tetraitess[i].shoot_time.restart();
+}
+if(tetraitess[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+tetraitess[i].x+" "+tetraitess[i].y+" "+tetraitess[i].map,tetraitess[i].map);
+send_reliable(0, "msganimal "+tetraitess[i].hit_by+" matou_o_gladiador Wuula!", 0);
+tetraitess.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_tetraites(int x, int y, string map){
+tetraites c(x, y, map);
+tetraitess.insert_last(c);
+}
+// Gladiator prisco
+prisco@[] priscos;
+class prisco
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer prisco_timer, shoot_time, tsair;
+int prisco_time=370;
+bool flee_mode=false;
+prisco(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void prisco_loop()
+{
+for(uint i=0; i<priscos.length(); i++)
+{
+if(priscos[i].flee_mode==false&&priscos[i].shoot_time.elapsed>=20000){
+priscos[i].x-=2;
+priscos[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+priscos[i].x+" "+priscos[i].y+" "+priscos[i].map,0);
+}
+if(priscos[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==priscos[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+priscos.remove_at(i);
+break;
+}
+else{
+priscos[i].tsair.restart();
+}
+}
+if(priscos[i].prisco_timer.elapsed>=priscos[i].prisco_time&&priscos[i].flee_mode==true)
+{
+priscos[i].prisco_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(priscos[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==priscos[i].map){
+priscos[i].x--;
+string ss=get_tile_at(priscos[i].x, priscos[i].y, priscos[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+priscos[i].x+" "+priscos[i].y+" "+priscos[i].map,0);
+priscos[i].prisco_timer.restart();
+}
+else if(priscos[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&priscos[i].map==players[i2].map){
+priscos[i].x++;
+string ss=get_tile_at(priscos[i].x, priscos[i].y, priscos[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+priscos[i].x+" "+priscos[i].y+" "+priscos[i].map,0);
+priscos[i].prisco_timer.restart();
+}
+if(get_prisco_distance(priscos[i], players[i2])>-1&&get_prisco_distance(priscos[i],players[i2])<=3&&priscos[i].shoot_time.elapsed>=500&&priscos[i].shots>0&&players[i2].in_safe_zone==false){
+priscos[i].shoot_time.restart();
+send_packet(0,"play "+priscos[i].weapon_name+" "+priscos[i].x+" "+priscos[i].y+" "+priscos[i].map,priscos[i].map);
+players[i2].health-=random(priscos[i].min_damage, priscos[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="prisco";
+priscos[i].shots--;
+break;
+}
+if(priscos[i].shots<=0){
+priscos[i].shots=1;
+priscos[i].shoot_time.restart();
+}
+if(priscos[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+priscos[i].x+" "+priscos[i].y+" "+priscos[i].map,priscos[i].map);
+send_reliable(0, "msganimal "+priscos[i].hit_by+" matou_o_gladiador Wuula!", 0);
+priscos.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_prisco(int x, int y, string map){
+prisco c(x, y, map);
+priscos.insert_last(c);
+}
+// Gladiator spiculus
+spiculus@[] spiculuss;
+class spiculus
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer spiculus_timer, shoot_time, tsair;
+int spiculus_time=370;
+bool flee_mode=false;
+spiculus(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void spiculus_loop()
+{
+for(uint i=0; i<spiculuss.length(); i++)
+{
+if(spiculuss[i].flee_mode==false&&spiculuss[i].shoot_time.elapsed>=20000){
+spiculuss[i].x-=2;
+spiculuss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+spiculuss[i].x+" "+spiculuss[i].y+" "+spiculuss[i].map,0);
+}
+if(spiculuss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==spiculuss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+spiculuss.remove_at(i);
+break;
+}
+else{
+spiculuss[i].tsair.restart();
+}
+}
+if(spiculuss[i].spiculus_timer.elapsed>=spiculuss[i].spiculus_time&&spiculuss[i].flee_mode==true)
+{
+spiculuss[i].spiculus_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(spiculuss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==spiculuss[i].map){
+spiculuss[i].x--;
+string ss=get_tile_at(spiculuss[i].x, spiculuss[i].y, spiculuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+spiculuss[i].x+" "+spiculuss[i].y+" "+spiculuss[i].map,0);
+spiculuss[i].spiculus_timer.restart();
+}
+else if(spiculuss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&spiculuss[i].map==players[i2].map){
+spiculuss[i].x++;
+string ss=get_tile_at(spiculuss[i].x, spiculuss[i].y, spiculuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+spiculuss[i].x+" "+spiculuss[i].y+" "+spiculuss[i].map,0);
+spiculuss[i].spiculus_timer.restart();
+}
+if(get_spiculus_distance(spiculuss[i], players[i2])>-1&&get_spiculus_distance(spiculuss[i],players[i2])<=3&&spiculuss[i].shoot_time.elapsed>=500&&spiculuss[i].shots>0&&players[i2].in_safe_zone==false){
+spiculuss[i].shoot_time.restart();
+send_packet(0,"play "+spiculuss[i].weapon_name+" "+spiculuss[i].x+" "+spiculuss[i].y+" "+spiculuss[i].map,spiculuss[i].map);
+players[i2].health-=random(spiculuss[i].min_damage, spiculuss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="spiculus";
+spiculuss[i].shots--;
+break;
+}
+if(spiculuss[i].shots<=0){
+spiculuss[i].shots=1;
+spiculuss[i].shoot_time.restart();
+}
+if(spiculuss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+spiculuss[i].x+" "+spiculuss[i].y+" "+spiculuss[i].map,spiculuss[i].map);
+send_reliable(0, "msganimal "+spiculuss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+spiculuss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_spiculus(int x, int y, string map){
+spiculus c(x, y, map);
+spiculuss.insert_last(c);
+}
+// Gladiator marco
+marco@[] marcos;
+class marco
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer marco_timer, shoot_time, tsair;
+int marco_time=370;
+bool flee_mode=false;
+marco(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void marco_loop()
+{
+for(uint i=0; i<marcos.length(); i++)
+{
+if(marcos[i].flee_mode==false&&marcos[i].shoot_time.elapsed>=20000){
+marcos[i].x-=2;
+marcos[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+marcos[i].x+" "+marcos[i].y+" "+marcos[i].map,0);
+}
+if(marcos[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==marcos[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+marcos.remove_at(i);
+break;
+}
+else{
+marcos[i].tsair.restart();
+}
+}
+if(marcos[i].marco_timer.elapsed>=marcos[i].marco_time&&marcos[i].flee_mode==true)
+{
+marcos[i].marco_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(marcos[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==marcos[i].map){
+marcos[i].x--;
+string ss=get_tile_at(marcos[i].x, marcos[i].y, marcos[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+marcos[i].x+" "+marcos[i].y+" "+marcos[i].map,0);
+marcos[i].marco_timer.restart();
+}
+else if(marcos[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&marcos[i].map==players[i2].map){
+marcos[i].x++;
+string ss=get_tile_at(marcos[i].x, marcos[i].y, marcos[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+marcos[i].x+" "+marcos[i].y+" "+marcos[i].map,0);
+marcos[i].marco_timer.restart();
+}
+if(get_marco_distance(marcos[i], players[i2])>-1&&get_marco_distance(marcos[i],players[i2])<=3&&marcos[i].shoot_time.elapsed>=500&&marcos[i].shots>0&&players[i2].in_safe_zone==false){
+marcos[i].shoot_time.restart();
+send_packet(0,"play "+marcos[i].weapon_name+" "+marcos[i].x+" "+marcos[i].y+" "+marcos[i].map,marcos[i].map);
+players[i2].health-=random(marcos[i].min_damage, marcos[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="marco";
+marcos[i].shots--;
+break;
+}
+if(marcos[i].shots<=0){
+marcos[i].shots=1;
+marcos[i].shoot_time.restart();
+}
+if(marcos[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+marcos[i].x+" "+marcos[i].y+" "+marcos[i].map,marcos[i].map);
+send_reliable(0, "msganimal "+marcos[i].hit_by+" matou_o_gladiador Wuula!", 0);
+marcos.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_marco(int x, int y, string map){
+marco c(x, y, map);
+marcos.insert_last(c);
+}
+// Gladiator carpoforo
+carpoforo@[] carpoforos;
+class carpoforo
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer carpoforo_timer, shoot_time, tsair;
+int carpoforo_time=370;
+bool flee_mode=false;
+carpoforo(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void carpoforo_loop()
+{
+for(uint i=0; i<carpoforos.length(); i++)
+{
+if(carpoforos[i].flee_mode==false&&carpoforos[i].shoot_time.elapsed>=20000){
+carpoforos[i].x-=2;
+carpoforos[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+carpoforos[i].x+" "+carpoforos[i].y+" "+carpoforos[i].map,0);
+}
+if(carpoforos[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==carpoforos[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+carpoforos.remove_at(i);
+break;
+}
+else{
+carpoforos[i].tsair.restart();
+}
+}
+if(carpoforos[i].carpoforo_timer.elapsed>=carpoforos[i].carpoforo_time&&carpoforos[i].flee_mode==true)
+{
+carpoforos[i].carpoforo_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(carpoforos[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==carpoforos[i].map){
+carpoforos[i].x--;
+string ss=get_tile_at(carpoforos[i].x, carpoforos[i].y, carpoforos[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+carpoforos[i].x+" "+carpoforos[i].y+" "+carpoforos[i].map,0);
+carpoforos[i].carpoforo_timer.restart();
+}
+else if(carpoforos[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&carpoforos[i].map==players[i2].map){
+carpoforos[i].x++;
+string ss=get_tile_at(carpoforos[i].x, carpoforos[i].y, carpoforos[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+carpoforos[i].x+" "+carpoforos[i].y+" "+carpoforos[i].map,0);
+carpoforos[i].carpoforo_timer.restart();
+}
+if(get_carpoforo_distance(carpoforos[i], players[i2])>-1&&get_carpoforo_distance(carpoforos[i],players[i2])<=3&&carpoforos[i].shoot_time.elapsed>=500&&carpoforos[i].shots>0&&players[i2].in_safe_zone==false){
+carpoforos[i].shoot_time.restart();
+send_packet(0,"play "+carpoforos[i].weapon_name+" "+carpoforos[i].x+" "+carpoforos[i].y+" "+carpoforos[i].map,carpoforos[i].map);
+players[i2].health-=random(carpoforos[i].min_damage, carpoforos[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="carpoforo";
+carpoforos[i].shots--;
+break;
+}
+if(carpoforos[i].shots<=0){
+carpoforos[i].shots=1;
+carpoforos[i].shoot_time.restart();
+}
+if(carpoforos[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+carpoforos[i].x+" "+carpoforos[i].y+" "+carpoforos[i].map,carpoforos[i].map);
+send_reliable(0, "msganimal "+carpoforos[i].hit_by+" matou_o_gladiador Wuula!", 0);
+carpoforos.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_carpoforo(int x, int y, string map){
+carpoforo c(x, y, map);
+carpoforos.insert_last(c);
+}
+// Gladiator flamma
+flamma@[] flammas;
+class flamma
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer flamma_timer, shoot_time, tsair;
+int flamma_time=370;
+bool flee_mode=false;
+flamma(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void flamma_loop()
+{
+for(uint i=0; i<flammas.length(); i++)
+{
+if(flammas[i].flee_mode==false&&flammas[i].shoot_time.elapsed>=20000){
+flammas[i].x-=2;
+flammas[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+flammas[i].x+" "+flammas[i].y+" "+flammas[i].map,0);
+}
+if(flammas[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==flammas[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+flammas.remove_at(i);
+break;
+}
+else{
+flammas[i].tsair.restart();
+}
+}
+if(flammas[i].flamma_timer.elapsed>=flammas[i].flamma_time&&flammas[i].flee_mode==true)
+{
+flammas[i].flamma_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(flammas[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==flammas[i].map){
+flammas[i].x--;
+string ss=get_tile_at(flammas[i].x, flammas[i].y, flammas[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+flammas[i].x+" "+flammas[i].y+" "+flammas[i].map,0);
+flammas[i].flamma_timer.restart();
+}
+else if(flammas[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&flammas[i].map==players[i2].map){
+flammas[i].x++;
+string ss=get_tile_at(flammas[i].x, flammas[i].y, flammas[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+flammas[i].x+" "+flammas[i].y+" "+flammas[i].map,0);
+flammas[i].flamma_timer.restart();
+}
+if(get_flamma_distance(flammas[i], players[i2])>-1&&get_flamma_distance(flammas[i],players[i2])<=3&&flammas[i].shoot_time.elapsed>=500&&flammas[i].shots>0&&players[i2].in_safe_zone==false){
+flammas[i].shoot_time.restart();
+send_packet(0,"play "+flammas[i].weapon_name+" "+flammas[i].x+" "+flammas[i].y+" "+flammas[i].map,flammas[i].map);
+players[i2].health-=random(flammas[i].min_damage, flammas[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="flamma";
+flammas[i].shots--;
+break;
+}
+if(flammas[i].shots<=0){
+flammas[i].shots=1;
+flammas[i].shoot_time.restart();
+}
+if(flammas[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+flammas[i].x+" "+flammas[i].y+" "+flammas[i].map,flammas[i].map);
+send_reliable(0, "msganimal "+flammas[i].hit_by+" matou_o_gladiador Wuula!", 0);
+flammas.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_flamma(int x, int y, string map){
+flamma c(x, y, map);
+flammas.insert_last(c);
+}
+// Gladiator spartacus
+spartacus@[] spartacuss;
+class spartacus
+{
+int x, y;
+int min_damage=50;
+int max_damage=100;
+uint shots=1;
+int health_points=3000;
+string hit_by, map;
+string weapon_name="espadahit.ogg";
+timer spartacus_timer, shoot_time, tsair;
+int spartacus_time=370;
+bool flee_mode=false;
+spartacus(int cx, int cy, string cmap)
+{
+x=cx;
+y=cy;
+map=cmap;
+}
+}
+void spartacus_loop()
+{
+for(uint i=0; i<spartacuss.length(); i++)
+{
+if(spartacuss[i].flee_mode==false&&spartacuss[i].shoot_time.elapsed>=20000){
+spartacuss[i].x-=2;
+spartacuss[i].flee_mode=true;
+send_reliable(0,"play espadadraw.ogg "+spartacuss[i].x+" "+spartacuss[i].y+" "+spartacuss[i].map,0);
+}
+if(spartacuss[i].tsair.elapsed>=10000){
+bool exit_game=true;
+for(uint iz=0; iz<players.length(); iz++){
+if(players[iz].map==spartacuss[i].map){
+exit_game=false;
+break;
+}
+}
+if(exit_game==true){
+spartacuss.remove_at(i);
+break;
+}
+else{
+spartacuss[i].tsair.restart();
+}
+}
+if(spartacuss[i].spartacus_timer.elapsed>=spartacuss[i].spartacus_time&&spartacuss[i].flee_mode==true)
+{
+spartacuss[i].spartacus_timer.restart();
+for(uint i2=0; i2 < players.length(); i2++){
+if(spartacuss[i].x>players[i2].x+1&&players[i2].in_safe_zone==false&&players[i2].map==spartacuss[i].map){
+spartacuss[i].x--;
+string ss=get_tile_at(spartacuss[i].x, spartacuss[i].y, spartacuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+spartacuss[i].x+" "+spartacuss[i].y+" "+spartacuss[i].map,0);
+spartacuss[i].spartacus_timer.restart();
+}
+else if(spartacuss[i].x<players[i2].x-1&&players[i2].in_safe_zone==false&&spartacuss[i].map==players[i2].map){
+spartacuss[i].x++;
+string ss=get_tile_at(spartacuss[i].x, spartacuss[i].y, spartacuss[i].map);
+send_reliable(0,"play "+ss+"step"+random(1, 5)+".ogg "+spartacuss[i].x+" "+spartacuss[i].y+" "+spartacuss[i].map,0);
+spartacuss[i].spartacus_timer.restart();
+}
+if(get_spartacus_distance(spartacuss[i], players[i2])>-1&&get_spartacus_distance(spartacuss[i],players[i2])<=3&&spartacuss[i].shoot_time.elapsed>=500&&spartacuss[i].shots>0&&players[i2].in_safe_zone==false){
+spartacuss[i].shoot_time.restart();
+send_packet(0,"play "+spartacuss[i].weapon_name+" "+spartacuss[i].x+" "+spartacuss[i].y+" "+spartacuss[i].map,spartacuss[i].map);
+players[i2].health-=random(spartacuss[i].min_damage, spartacuss[i].max_damage);
+send_reliable(0,"inithurt "+players[i2].charname+" "+players[i2].x+" "+players[i2].y+" "+players[i2].voice+" "+players[i2].pitch+" "+players[i2].map,0);
+players[i2].lasthit="spartacus";
+spartacuss[i].shots--;
+break;
+}
+if(spartacuss[i].shots<=0){
+spartacuss[i].shots=1;
+spartacuss[i].shoot_time.restart();
+}
+if(spartacuss[i].health_points<=0){
+send_packet(0,"play corpo_caindo.ogg "+spartacuss[i].x+" "+spartacuss[i].y+" "+spartacuss[i].map,spartacuss[i].map);
+send_reliable(0, "msganimal "+spartacuss[i].hit_by+" matou_o_gladiador Wuula!", 0);
+spartacuss.remove_at(i);
+break;
+}
+}
+}
+}
+}
+void spawn_spartacus(int x, int y, string map){
+spartacus c(x, y, map);
+spartacuss.insert_last(c);
+}
+double get_wuula_distance(wuula@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_wazax_distance(wazax@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_cairis_distance(cairis@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_claudius_distance(claudius@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_lucius_distance(lucius@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_sirix_distance(sirix@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_cressus_distance(cressus@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_duron_distance(duron@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_aiellus_distance(aiellus@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_quintos_distance(quintos@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_marcus_distance(marcus@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_barca_distance(barca@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_theokoles_distance(theokoles@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_crixus_distance(crixus@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_tetraites_distance(tetraites@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_prisco_distance(prisco@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_spiculus_distance(spiculus@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_marco_distance(marco@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_carpoforo_distance(carpoforo@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_flamma_distance(flamma@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}
+double get_spartacus_distance(spartacus@ m1, player@ p2)
+{
+if(m1.map!=p2.map) return -1;
+int dx,dy;
+if(m1.x<=p2.x) dx=p2.x-m1.x;
+else dx=m1.x-p2.x;
+if(m1.y<=p2.y) dy=p2.y-m1.y;
+else dy=m1.y-p2.y;
+return dx+dy;
+}

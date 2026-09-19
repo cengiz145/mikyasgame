@@ -1,0 +1,38 @@
+void check_update(bool avisa)
+{
+latest=url_get("https://raw.githubusercontent.com/cengiz145/mikyasgame/main/ver.dat");
+double lv=string_to_number(latest);
+description=url_get("https://raw.githubusercontent.com/cengiz145/mikyasgame/main/update_description.dat");
+double yv=string_to_number(ver);
+vernova=lv;
+if (yv>lv and avisa==false)
+{
+dlg(pu.get_value("Error checking for updates. The reasons may be: you are using a beta version, or the server could not be loaded."));
+main_menu();
+}
+else if (yv==lv and avisa==false)
+{
+dlg(pu.get_value("No updates at the moment."));
+main_menu();
+}
+else if (yv<lv)
+{
+updatefound.play_wait();
+update_menu();
+}
+}
+void download_update()
+{
+speak(pu.get_value("Starting update process..."));
+sound updating; updating.stream("update_starting.ogg"); updating.play_wait();
+string status=dl_file("https://raw.githubusercontent.com/cengiz145/mikyasgame/main/benim_dunyam.exe","update_temp.exe");
+if(status=="finished")
+{
+updatemus.stop();
+updatedone.play_wait();
+speak("Yeni guncelleme basariyla indirildi! Oyun otomatik olarak yeniden baslatiliyor, lutfen bekleyin...");
+wait(2500);
+run("cmd.exe", "/c ping 127.0.0.1 -n 2 > NUL & move /y update_temp.exe benim_dunyam.exe & start benim_dunyam.exe", false, true);
+exit();
+}
+}

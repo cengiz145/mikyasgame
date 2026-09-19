@@ -1,0 +1,44 @@
+enum NSSpeechParams{
+	NSSP_VOLUME, NSSP_VOLUME_MAX, NSSP_VOLUME_MIN,  NSSP_VOLUME_SUPPORTED,
+	NSSP_RATE, NSSP_RATE_MAX, NSSP_RATE_MIN, NSSP_RATE_SUPPORTED,
+	NSSP_PITCH, NSSP_PITCH_MAX, NSSP_PITCH_MIN, NSSP_PITCH_SUPPORTED,
+	NSSP_INFLEXION, NSSP_INFLEXION_MAX, NSSP_INFLEXION_MIN, NSSP_INFLEXION_SUPPORTED,
+	NSSP_PAUSED, NSSP_PAUSE_SUPPORTED,
+	NSSP_BUSY, NSSP_BUSY_SUPPORTED,
+	NSSP_WAIT, NSSP_WAIT_SUPPORTED,
+	NSSP_ENABLE_NATIVE_SPEECH = 0xFFFF,
+	NSSP_VOICE = 0x10000,
+	NSSP_LANGUAGE = 0x20000,
+	NSSP_SUBENGINE = 0x30000,
+	NSSP_ENGINE = 0x40000,
+	NSSP_ENGINE_AVAILABLE = 0x50000,
+	NSSP_AUTO_ENGINE = 0xFFFE,
+	NSSP_USER_PARAM = 0x1000000
+};
+// Originally an FFI wrapper around UniversalSpeech.dll. Reimplemented on top of
+// NVGT's built-in screen reader support, so no external dll is required. Public
+// method signatures are unchanged so call sites stay the same.
+class nss_speech {
+	nss_speech() {
+		// NVGT provides screen reader access natively; nothing to load.
+	}
+	void say(string s, bool interrupt=false, bool sapi_wait=false) {
+		// screen_reader_output speaks and updates the braille display at once.
+		screen_reader_output(s, interrupt);
+	}
+	void braille(string s) {
+		screen_reader_braille(s);
+	}
+	void pause() {
+		// Native screen reader pause is not exposed; closest is silencing.
+		screen_reader_silence();
+	}
+	void unpause() {
+	}
+	void stop() {
+		screen_reader_silence();
+	}
+	int get_wait_time() {
+		return 0;
+	}
+}

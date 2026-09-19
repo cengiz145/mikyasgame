@@ -1,0 +1,49 @@
+// DJT - originally a bass.dll FFI wrapper for URL music streaming.
+// Reimplemented on top of NVGT's native sound.stream_url so no bass.dll is
+// needed. Public method signatures are unchanged so call sites stay the same.
+// Handles are 1-based indices into an internal sound array (0 = failure).
+class bass {
+	private sound@[] streams;
+	private float stream_db = 0;
+
+	long init_bass() {
+		// NVGT initialises its audio engine automatically; nothing to load.
+		return 1;
+	}
+
+	long load(string url) {
+		sound@ s = sound();
+		if (!s.stream_url(url)) return 0;
+		s.volume = stream_db;
+		streams.insert_last(s);
+		return streams.length(); // 1-based handle
+	}
+
+	void play(long handle) {
+		sound@ s = get_stream(handle);
+		if (@s != null) s.play();
+	}
+
+	void stop(long handle) {
+		sound@ s = get_stream(handle);
+		if (@s != null) s.stop();
+	}
+
+	void volume(long set_volume) {
+		// BASS global stream volume was 0..10000 (10000 = full). Map to dB.
+		stream_db = vol_to_db(set_volume);
+		for (uint i = 0; i < streams.length(); i++)
+			if (@streams[i] != null) streams[i].volume = stream_db;
+	}
+
+	private sound@ get_stream(long handle) {
+		if (handle < 1 or handle > int(streams.length())) return null;
+		return streams[handle - 1];
+	}
+
+	private float vol_to_db(long v) {
+		if (v <= 0) return -100;
+		if (v >= 10000) return 0;
+		return float(20.0 * (log(double(v) / 10000.0) / log(10.0)));
+	}
+}

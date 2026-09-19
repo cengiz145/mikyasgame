@@ -1,0 +1,129 @@
+network net;
+network_event event;
+bool encryption=true;
+double id_version=2.0;
+uint peer_id=0;
+int connect_time=10000;
+timer connect_timer;
+void create()
+{
+string us=v.input(pu.get_value("Please enter the name for your new character (Spaces are not allowed."));
+if(message_invalid(us)){
+creating=false;
+main_menu();
+}
+string e_mail=v.input(pu.get_value("Please, type your e-mail address."));
+if(e_mail==""||message_invalid(e_mail)||string_contains(e_mail, "@", 1)<0){
+dlg(pu.get_value("Invalid or blank e-mail address."));
+creating=false;
+main_menu();
+}
+string password=v.input(pu.get_value("please insert a password for this character, spaces are not allowed.")+"\n"+pu.get_value("It must have at least eight characters between letters and numbers."));
+if(message_invalid(password)||password.length()<8){
+creating=false;
+dlg(pu.get_value("Invalid password. This may be because it contains less than 8 characters, has special symbols or spaces."));
+main_menu();
+}
+menu_silent();
+m.add_item_tts(pu.get_value("Mulher"), "0");
+m.add_item_tts(pu.get_value("Homem"), "1");
+int menu_result=m.run(pu.get_value("Are you Male or Female"), true);
+if(m.get_item_name(menu_result)>=0){
+speak(pu.get_value("Conectando..."));
+p.play_stationary("conectando.ogg", false);
+network net2;
+network_event event2;
+net2.setup_client(4, 100);
+net2.connect(serveraddress, serverport);
+connect_timer.restart();
+while(true)
+{
+event2=net2.request();
+if (key_pressed(KEY_ESCAPE))
+{
+reset();
+main_menu();
+}
+if(event2.type==event_connect&&connected==false)
+{
+peer_id=event2.peer_id;
+net2.send_reliable(peer_id, send("cria "+us+" "+password+" "+e_mail+" "+m.get_item_name(menu_result)), 0);
+}
+else if(event2.type==event_receive&&receive(event2.message)=="created"){
+creating=false;
+dlg(pu.get_value("Ok! The account has been created, press enter to login in the game!"));
+un=us;
+pw=password;
+writeprefs();
+reset();
+do_login();
+}
+else if(event2.type==event_receive&&string_contains(receive(event2.message),"Error",1)>-1)
+{
+dlg(pu.get_value(receive(event2.message)));
+reset();
+creating=false;
+main_menu();
+}
+if(connect_timer.elapsed>=connect_time)
+{
+dlg(pu.get_value("Server unavailable"));
+reset();
+main_menu();
+}
+}
+}
+}
+void do_login(bool localhost=true){
+if (un=="" or pw==""){
+un=v.input(pu.get_value("Enter your username"));
+pw=v.input(pu.get_value("Enter the password for your account"));
+writeprefs();
+do_login();
+}
+else{
+net.connect(serveraddress, serverport);
+connect_timer.restart();
+while(true){
+wait(5);
+if (key_pressed(KEY_ESCAPE)){
+reset();
+main_menu();
+}
+event=net.request();
+if(event.type==event_disconnect||connected==false&&connect_timer.elapsed>=connect_time){
+string reason=url_get("https://github.com/cengiz145/mikyasgame/releases/latest/servidorultrasecretoasdfg/idk.txt");
+if(get_last_error()==-29) reason="Your connection (or the server) has timed out.";
+dlg(pu.get_value("Error: Server timed out! Reasons for this:")+" "+pu.get_value(reason));
+reset();
+main_menu();
+}
+if(event.type==event_connect and connected==false){
+peer_id=event.peer_id;
+send_reliable(peer_id, "loz "+un+" "+pw+" "+gversion+" "+banned, 0);
+}
+if(event.type==event_receive){
+string[] parsed=string_split(take_message(), " ", false);
+if(parsed[0]=="x") me.x=string_to_number(parsed[1]);
+if(parsed[0]=="y") me.y=string_to_number(parsed[1]);
+if(parsed[0]=="changemap"){
+load_map(string_replace(take_message(), "changemap ", "", false));
+}
+if (parsed[0]=="usarcolete") life_vest=1;
+if(string_contains(take_message(), "loggedin", 1)>-1){
+username=un;
+game();
+}
+if(parsed[0]=="updatenow"){
+dlg(pu.get_value("Error: You need the latest version to be able to play. Please update to the latest version under check for updates, or visit")+"https://github.com/cengiz145/mikyasgame/releases/latest");
+main_menu();
+}
+if(string_contains(string_to_lower_case(take_message()),"error",1)>-1){
+dlg(pu.get_value(take_message()));
+reset();
+main_menu();
+}
+}
+}
+}
+}

@@ -1,0 +1,48 @@
+tts_voice tts;
+int found_reader=0;
+bool speak(string text, bool placeholder=false)
+{
+if(found_reader==0)
+found_reader=auto_select_screen_reader();
+if(found_reader==0)
+{
+if(interrupt==1)
+tts.speak_interrupt(text);
+else
+tts.speak(text);
+}
+if(interrupt==1)
+screen_reader_speak_interrupt(found_reader, text);
+else
+screen_reader_speak(found_reader, text);
+return true;
+}
+void stop_speech()
+{
+for (uint i=1; i<=1; i++)
+{
+if (screen_reader_is_running(i))
+{
+screen_reader_stop_speech(i);
+}
+}
+}
+int auto_select_screen_reader()
+{
+if (screen_reader_is_running(1))
+{
+return 1;
+}
+if (screen_reader_is_running(3))
+{
+return 3;
+}
+if (screen_reader_is_running(4))
+{
+return 4;
+}
+else
+{
+return 0;
+}
+}

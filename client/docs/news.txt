@@ -1,0 +1,64 @@
+New settings in your computer, available in the apartment:
+Allowing/denying other players to open your chest.
+Enable/disable clock
+Close chest
+Kick players from your apartment
+Open door for 5 seconds.
+New map: fishing port, and now, you can fish there.
+to get started with your fishing, you must have the required equipments, to get these equipments, go to santa_bertalina in the Shop for hunting and fishing equipment.
+When you buy the boat, fuel, fishing_rod and eartworms, go to the fishing port, and start catching the fishes.
+NEW: prohibited area of the game
+NEW WEAPON: Sub_laser;
+NEW WEAPON:; MK1;
+NEW WEAPON: AK48;
+NEW SPELL: divine_cure;
+now, you can check how much hits your bulletproof_vest will support, pressing ctrl+M in in the bulletproof_vest of your inventory
+NEW FEATURE: Launched guided_missile;
+New feature: Meteor_rain;
+new magic: reflector_mirror
+Bazooka hits on players who are up to 3 steps away from you while the enemy is jumping;
+Added option to toggle whether or not to listen to death messages in the profile settings;
+Added secondary inventory. To navigate between items, use TAB and SHIFT + TAB. To interact with the selected item, press Backspace;
+Added option to activate the right control to fire, in general settings;
+Removed the option to suck items from the sucker;
+A lot of weapons will not damage your bulletproof_vest.
+When only white fighting is allowed on a map, the explosives will be deactivated;
+Now, if a player is hit in his head with a certain weapon, he will die! find out what weapons do this.
+some weapons will kill animals with gust one shot;
+NEW MAGIC: hórus's fist;
+NEW MAGIC: fire_ball;
+NEW MAGIC: swift_slide;
+the inventory compartments has been modified;
+The pacifist players will sound a different beep when you are nearby then;
+NEW WEAPON: dart launcher. It will reach up to 10 squares, regardless of where the player is;
+You will not be able to speak to players on the same map if they are far from you;
+Now you can die frozen more often;
+NEW FEATURE: magnetic_shoes
+NEW EXPLOSIVE: nuclear_bomb;
+Added secret missions to earn teleporter_package;
+Soldiers are no longer sucked. This has been modified so that those who start in our world, enjoy and learn how the system works.
+increased the gold of the gold_mine;
+The wand are being recharged time-by-time, to check your wand's energy, press Shift+W;
+Now the Desafio Mortal can run as a portable. To do this, run Desafio Mortal.exe -portable;
+BUG FIXED: the ban system was not banning the players correctly, now, all banned users will be permanently banned!
+BUG FIXED: The magic that make the player as invisible, was not undone by disconnecting and connecting without restarting the client;
+BUG FIXED: When choosing option 1 on stone, paper and scissors, you would not get the money if you won;
+BUG FIXED: Players no longer will die in vehicles;
+BUG FIXED: you cannot escape from the prision if you use a age_shield;
+BUG FIXED: Destroyed walls are removed correctly;
+BUG FIXED: When using the extinguisher facing a wall, bullet sound was reproduced;;
+BUG FIXED: It's no longer possible to kill members of your team with explosive_tape;
+BUG FIXED: You can no longer bury bodies when you are in AFK
+BUG FIXED: Could hear messages with chat disabled when restarting the client;
+BUG FIXED: darts hitting pacifists;
+BUG FIXED: dragonsaur is not a fool;
+BUG FIXED: The sucker function is completely canceled when one of the two dies;
+BUG FIXED: Darts, explosives and suckers WILL NOT hit members of your team;
+BUG FIXED: you could use explosive_tapes, enter in pacifist mode and then activate the explosive tapes and kill players while pacifist, this is not allowed nomore.
+BUG FIXED: Entering as a pacifist in the game, you could recharge your weapons and shoot, even if it was not fired;
+BUG FIXED: When disconnecting, the last player who sent you PM was not saved;
+BUG FIXED: When a player disconnected or was kicked for some reason using teleporter, the sound was not removed;
+BUG FIXED: when you select "start desafio mortal With Windows" there is no more errors or alerts;
+BUG FIXED: you cannot use a removed weapon from your inventory;
+bug fixed while checking for updates;
+shift+spacebar key was removed from the inventory;

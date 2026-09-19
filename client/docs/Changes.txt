@@ -1,0 +1,48 @@
+New in 4.0:
+Important announcement: it is now possible to follow the deaths and other information of Desafio Mortal from the Twitter account @megadimensao!
+There are new maps! and the old maps have been modify!
+Launched the time machine! And with it, a new world to be explored and a new object to be used.
+New vehicles! you can now ride the bus and on the boat liner!
+And speaking of vehicles, in case your connection drops when you are inside of one, you will die automatically. That is, when you return to the game you'll be in
+the tunnel. But don't worry! All players
+will be back to where you died when you come out of the tunnel. And all the bodies will also be found where the death happened.
+New enemies! There are animals walking around the maps, ready to attack or be attacked.
+New games in the casino! Black Jack and Farkle. Ah, and now the casino is in a new location.
+New fruits! Now you have many alternatives to raise your health. And with that, we bring two modifications 
+In case your connection drops and you return to the game within the time limit of 10 minutes, your health will continue as it was, instead of the 5000 by default.
+And speaking of health, the maximum that a player can get will be of 25000 points.
+Good news for players who enjoy fighting as a team! Now the xp will be divided among the members. And in case you are 5 steps away they will be healed when one 
+of them press the letter U.
+We modified the way to become a pacifist! Search and discover for yourself.
+Now most objects contain descriptions, which you can read by pressing CTRL+Enter on the inventory.
+Launched the translator, using Google translation to translate messages instantly. To activate and deactivate, change the language of origin, among other functions,
+go to the profile settings.
+Messages preceded by the less-than sign "<" will not be translated.
+Added the option to Disable Chat in the menu F6. And now, when you open it, the cursor will be automatically positioned on the last element visited.
+Modified the function of the numbers. Now, it will be used for your favourite weapons! Just select a weapon in the  inventory and press SHIFT+a number
+in which you want to configure the gun.
+Speaking of weapons, you can see how many ammunition is in the weapon selected with the letter X, total ammunition  with SHIFT+X and reload the selected weapon 
+with SHIFT+R. thanks goes to the player Loushin for the idea.
+Added the key commands SHIFT+page down and SHIFT+page up to increase and decrease the volume of the game. Also added the command SHIFT+F3 to activate and deactivate 
+the announcements of the game in other windows.
+The ask for help key has been change, now its the letter f. some keyboards didn't have the key used before.
+The keys, comma, dot, semicolon, open bracket, close bracket, shift-comma and shift dot can now be used anywhere in the game. For example: within the inventory.
+Removed the voice Defensor. Sadly we could not get updates of the audios, so we had to remove it.
+Some maps now have different sounds for the day and night.
+the echo of the steps when the player is within 6 steps of falling from a platform has been removed, and added a slip sound for when the fall happens.
+Now coordinate and the camera can be disabled on some maps.
+Bullets more realistic! Now the bullets are fast... Very fast!
+The damage that guns cause was balanced.
+
+
+Bugs fixed:
+before it was possible to load the weapon and shoot, even loos ammo, when still being a newbie but the shots did not reach the target. That doesn't happen anymore. 
+Thanks the player Crauser for telling us about it.
+If you disconnect from the game paralyzed,  will come back in the same way.
+you can't use the item_magnet going down anymore
+you can't get out of the maps before you reach your final destination when you're in vehicles!.
+The spell repressed  heat now protects you from fire.
+The chat now does not repeat the letters beeing written.
+the items don't float in the air anymore.
+The message when you connect and disconnect doesn't show anymore.
+Finally! Fixed bug with sounds that move when you exit a map and return.

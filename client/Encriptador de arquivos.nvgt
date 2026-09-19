@@ -1,0 +1,43 @@
+pack_file parquivo;
+bool encriptar;
+string senha;
+string nomearquivo;
+string nomepasta;
+string[] todos;
+
+void main()
+{
+nomearquivo=input_box("Encriptador de arquivos","Digite o nome do arquivo a ser encriptado:");
+if(nomearquivo=="") exit();
+nomepasta=input_box("","Digite o nome da pasta onde está os arquivos:");
+if(nomepasta=="") exit();
+int pergunta=question("","Seu pacote terá senha?");
+if(pergunta==1)
+{
+senha=input_box(""," qual a senha:");
+if(senha=="") exit();
+encriptar=true;
+}
+if(!directory_exists(nomepasta))
+{
+alert("erro", "a pasta informada não existe");
+exit();
+}
+if(encriptar==true && !directory_exists(nomepasta+"/encriptados")) directory_create(nomepasta+"/encriptados");
+todos=find_files(nomepasta+"/*");
+alert("Encriptador de arquivos", "Tem na pasta "+todos.length()+" arquivos para serem adicionados no pacote. Pressione enter para iniciar a adição.");
+parquivo.create(nomearquivo+".dat");
+for(uint i=0; i<todos.length(); i++)
+{
+show_game_window("adicionando arquivo "+i+" de "+todos.length());
+if(encriptar)
+{
+file_encrypt(nomepasta+"/"+todos[i], nomepasta+"/encriptados/"+todos[i], senha);
+parquivo.add_file(nomepasta+"/encriptados/"+todos[i], todos[i]);
+}
+else{
+parquivo.add_file(nomepasta+"/"+todos[i], todos[i]);
+}
+}
+if(encriptar==true) directory_delete(nomepasta+"/encriptados");
+}

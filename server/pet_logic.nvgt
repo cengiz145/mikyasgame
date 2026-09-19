@@ -1,4 +1,4 @@
-class Pet {
+﻿class Pet {
     string owner;
     string type;
     int x;
@@ -51,8 +51,7 @@ void process_pets() {
             else if (global_pets[i].y < players[target].y) { global_pets[i].y++; moved = true; }
 
             if (moved) {
-                string step_sound = get_tile_at(global_pets[i].x, global_pets[i].y, global_pets[i].map) + "step" + random(1, 5) + ".ogg";
-                send_packet(0, "play " + step_sound + " " + global_pets[i].x + " " + global_pets[i].y, global_pets[i].map);
+                send_packet(0, "play_monster_sound " + global_pets[i].type + "_step.ogg " + global_pets[i].x + " " + global_pets[i].y, global_pets[i].map);
             }
         }
         
@@ -67,3 +66,5 @@ void process_pets() {
         }
     }
 }
+
+

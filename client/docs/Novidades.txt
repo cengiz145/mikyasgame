@@ -1,0 +1,65 @@
+Novidades:
+Criada novas opções no computador do apartamento:
+permitindo / não permitindo que os outros abram seu baú;
+Ativar / Desativar relógio;
+Fechar baú;
+Expulsar jogadores de seu apartamento;
+Abrir porta por 5 segundos.
+Lançado mapa pesqueiro e, juntamente com ele,  um sistema de pesca;
+Para pescar, você precisa de ter os acessórios necessários. Para comprar, vá em Santa_bertalina na loja de equipamentos para caça e pesca.
+Após comprar sua lancha, galão_de_gasolina, minhoca e vara_de_pesca, você pode pressionar enter na lanchonete do pesqueiro para saber mais.
+Lançada uma área proibida no jogo;
+Criada arma sub_laser;
+Criada arma MK1;
+Criada arma AK48;
+Lançada magia cura_divina;
+Você pode saber quantos tiros o seu colete_aprova_de_balas suporta, pressionando CTRL+ENTER sobre ele;
+Lançado míssil_teleguiado;
+Lançada magia chuva_de_meteoros;
+Lançada magia espelho_refletor;
+Bazuca acerta em jogadores que estão até 3 passos de distância de altura de você;
+Adicionada opção para alternar entre ouvir ou não as mensagens de morte, nas configurações do perfio;
+Adicionado inventário secundário. Para navegar entre os itens, usa-se TAB e SHIFT+TAB. Para interagir com o item selecionado, pressione Backspace;
+Adicionada opção para ativar o control direito para disparar, em opções gerais;
+Removida a opção de sugar itens do sugador;
+Diversas armas não acertarão o colete aprova de balas;
+Quando apenas a luta branca for permitida em um mapa, os explosivos serão desativados;
+Agora, se um jogador for atingido em sua cabeça com uma determinada arma, ele morrerá! descubra quais são;
+Com algumas armas, os animais morrerão com apenas um tiro;
+Lançada magia punho_de_órus;
+Lançada magia bola_de_fogo;
+Lançada magia deslize_veloz;
+Os compartimentos dos inventários foram modificados;
+Agora, os jogadores pacifistas emitem um bipe diferente;
+Criado lançador_de_dardos. Ele atingirá até 10 quadrados, independente de onde o jogador esteja;
+Você não conseguirá falar com jogadores no mesmo mapa, se eles estiverem distantes de você;
+Agora, você poderá morrer congelado com mais frequência;
+Lançado sapato_magnético;
+Lançada bomba_nuclear;
+Adicionada missões secretas para ganhar pacote_de_teleporters;
+Soldados não são mais sugados. Isso foi modificado para que quem inicie em nosso mundo, acostume com o sistema primeiro.
+Ouro da mina_de_ouro aumentado;
+A varinha agora carrega de tempos em tempos. Para checar sua energia, usa-se SHIFT+W.
+Agora, o Desafio Mortal pode ser executado como portátil. Para fazer isso, rode Desafio Mortal.exe -portable;
+Corrigido bug: Sistema de ban não bania corretamente jogadores;
+Corrigido bug: A magia que deixava invisível, não era desfeita ao desconectar e conectar sem reiniciar o cliente;
+Corrigido bug: Ao escolher a opção 1 no pedra, papel e tesoura, você não ganhava o dinheiro, caso ganhasse;
+Corrigido bug: Jogadores não morrem mais em veículos;
+Corrigido bug: Não é possível fugir mais de prisões, usando escudo_do_tempo;
+Corrigido bug: Paredes destrutíveis são removidas corretamente;
+Corrigido bug: Ao usar o extintor virado para uma parede, som de bala era reproduzido;
+Corrigido bug: Não é mais possível matar membros de sua equipe com fita explosiva;
+Corrigido bug: Não pode mais enterrar corpos quando estiver ausente;
+Corrigido bug: Era possível ouvir mensagens com o chat desativado ao reiniciar o cliente;
+Corrigido bug: Dardos atingiam pacifistas;
+Corrigido bug: Dragonsauro não é mais trouxa;
+Corrigido bug: A função do sugador é totalmente cancelada quando um dos dois morre;
+Corrigido bug: Dardos, explosivos e sugadores não acertam mais membros de sua equipe;
+Corrigido bug: Era possível ativar algum explosivo, se tornar pacifista e este explodir;
+Corrigido bug: Ao entrar como pacifista no jogo, você conseguia carregar armas e atirar, mesmo que não fosse disparado;
+Corrigido bug: Ao desconectar, não ficava salvo o último jogador que te mandou PM;
+Corrigido bug: Quando um jogador desconectava ou era chutado por algum motivo usando teleporter, o som não era removido;
+Corrigido bug: Agora, ao escolher que o Desafio Mortal seja iniciado com o Windows, não dará mais erro;
+Corrigido bug: Não é possível continuar usando arma removida do inventário;
+Corrigido bug ao checar por atualizações;
+Teclas SHIFT+ESPAÇO removidas do inventário;

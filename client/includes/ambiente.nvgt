@@ -1,0 +1,43 @@
+ambience@[] ambientes;
+sound_pool ambientepool;
+class ambience{
+string id;
+int ambience_sound;
+int lx;
+int rx;
+int miny;
+int maxy;
+string soundfile;
+ambience(int ambience_lx, int ambience_rx, int ambience_miny, int ambience_maxy, string file, string sid){
+id=sid;
+lx=ambience_lx;
+rx = ambience_rx;
+miny=ambience_miny;
+maxy= ambience_maxy;
+soundfile=file;
+ambience_sound=ambientepool.play_2d(soundfile, me.x, me.y, lx, miny, true);
+ambientepool.update_sound_range_2d(ambience_sound, (me.x-lx), (rx-lx), (me.y-miny), (maxy-miny));
+}
+}
+void ambience_check_loop(){
+for (uint i=0; i<ambientes.length(); i++){
+ambientepool.update_sound_2d(ambientes[i].ambience_sound, ambientes[i].lx, ambientes[i].miny);
+ambientepool.update_sound_range_2d(ambientes[i].ambience_sound, (me.x-ambientes[i].lx), (ambientes[i].rx-ambientes[i].lx), (me.y-ambientes[i].miny), (ambientes[i].maxy-ambientes[i].miny));
+}
+}
+void destroy_ambience(int s)
+{
+ambientepool.destroy_sound(ambientes[s].ambience_sound);
+ambientes.remove_at(s);
+}
+void destroy_all_ambiences(bool delete=true){
+for(uint i=0; i<ambientes.length(); i++){
+ambientepool.destroy_sound(ambientes[i].ambience_sound);
+}
+ambientes.resize(0);
+}
+void spawn_ambience(int ambience_lx, int ambience_rx, int ambience_miny, int ambience_maxy, string soundfile,string id){
+soundfile=string_replace(soundfile,".ogg",".ogg",true);
+ambience ambiente1(ambience_lx, ambience_rx, ambience_miny, ambience_maxy, soundfile,id);
+ambientes.insert_last(ambiente1);
+}

@@ -1,0 +1,64 @@
+Créer de nouvelles options sur l'ordinateur de l'appartement:
+permettre / ne pas permettre aux autres d'ouvrir votre coffre;
+Activer / désactiver l'horloge;
+Fermer coffre;
+Éjectez les joueurs de votre appartement;
+Ouvrez le port pendant 5 secondes.
+Lancé la carte de pêche et, avec elle, un système de pêche;
+Pour pêcher, vous devez avoir les accessoires nécessaires. Pour acheter, allez à Santa_bertalina dans le magasin d'équipement de chasse et de pêche.
+Après avoir acheté votre bateau à moteur, gallon de essence, ver de terre et canne à pêche, vous pouvez appuyer sur entrer dans le magasin de matériel de pêche pour en savoir plus.
+Lancé une zone interdite dans le jeu;
+Arme créée sub_laser;
+Arme créée MK1;
+Arme créée AK48;
+Lancé magie divine de guérison;
+Vous pouvez connaître le nombre de tirs pris en charge par votre gilet approuvé par balle en appuyant sur CTRL + ENTRÉE;
+Lancé missile guidé;;
+Lancement de la pluie de météores magiques;;
+Mirror_reflector magic a été lancé;
+Bazooka frappe sur les joueurs qui sont à moins de 3 pas de vous;
+Ajout de l'option permettant d'activer ou non l'écoute des messages de décès dans les paramètres du profil;
+Ajout d'un inventaire secondaire Pour naviguer entre les éléments, utilisez TAB et MAJ + TAB. Pour interagir avec l'élément sélectionné, appuyez sur Retour arrière;
+Ajout de l'option pour activer le bon contrôle pour tirer, dans les options générales;
+Suppression de l'option d'aspiration d'objets du ventouse;
+Diverses armes n'atteindront pas les balles approuvées par le gilet;
+Lorsque seuls les combats blancs sont autorisés sur une carte, les explosifs seront désactivés;
+Maintenant, si un joueur est frappé dans sa tête avec une certaine arme, il va mourir! découvrez ce qu'ils sont;
+Avec quelques armes, les animaux mourront d'un seul coup;
+Lancé poing magique des organes;
+Lancé boule magique de feu;
+Lancé glissé magique rapide;
+Les compartiments des inventaires ont été modifiés;
+Maintenant, les joueurs pacifistes émettent un bip différent;
+Lanceur de fléchettes créé. Il atteindra jusqu'à 10 cases, quel que soit l'endroit où se trouve le joueur;
+Vous ne pourrez pas parler aux joueurs sur la même carte s'ils sont loin de vous;
+Maintenant vous pouvez mourir plus souvent gelé;
+Lancement de chaussures magnétiques;
+Lancer une bombe nucléaire;
+Ajout de missions secrètes pour gagner des paquets de téléporteurs; 
+Les soldats ne sont plus aspirés. Cela a été modifié pour que quiconque commence dans notre monde, s'habitue d'abord au système.
+L'or de mine_de_ouro a augmenté;
+La baguette porte maintenant de temps en temps. Pour vérifier votre énergie, utilisez SHIFT + W.
+Maintenant, le Défi Mortel peut être exécuté comme un portable. Pour ce faire, exécutez Mortal.exe -portable Challenge;
+Correction d'un bug: le système d'interdiction n'interdisait pas correctement les joueurs;
+Correction d'un bug: la magie qui le rendait invisible n'était pas annulée en se déconnectant et en se connectant sans redémarrer le client
+Correction d'un bug: Lorsque vous choisissez l'option 1 sur la pierre, le papier et les ciseaux, vous ne gagnerez pas si vous avez gagné;
+Correction d'un bug: les joueurs ne meurent plus dans les véhicules;
+Correction d'un bug: Il n'est pas possible d'échapper davantage aux prisons, en utilisant Bouclier du temps
+Correction d'un bug: Détruire les murs sont supprimés correctement;
+Correction d'un bug: Lors de l'utilisation de l'extincteur face à un mur, le son d'une balle était reproduit;
+Correction d'un bug: il n'est plus possible de tuer des membres de votre équipe avec un ruban explosif;
+Correction d'un bug: Vous ne pouvez plus enterrer les corps lorsque vous êtes absent.
+Correction d'un bug: il était possible d'écouter les messages avec le chat désactivé lors du redémarrage du client;
+Correction d'un bug: les fléchettes frappaient les pacifistes;
+Correction d'un bug: Dragonsaurus n'est plus Moldu;
+Correction d'un bug: La fonction de meunier est complètement annulée quand l'une des deux matrices;
+Correction d'un bug: les fléchettes, les explosifs et les ventouses ne touchent pas plus de membres de votre équipe;
+Correction d'un bug: Il était possible d'activer un explosif, de devenir pacifiste et d'exploser;
+Correction d'un bug: En entrant en tant que pacifiste dans le jeu, vous pouviez porter des armes et tirer, même s'il n'était pas tiré;
+Correction d'un bug: lors de la déconnexion, le dernier joueur qui vous a envoyé PM n'a pas été sauvegardé;
+Correction d'un bug: lorsqu'un joueur se déconnectait ou recevait un coup de pied pour une raison quelconque à l'aide d'un téléporteur, le son n'était pas supprimé;
+Correction d'un bug: Maintenant, en choisissant que le Mortal Challenge commence avec Windows, il ne donnera pas plus d'erreur;
+Correction d'un bug: Impossible de continuer à utiliser une arme retirée de l'inventaire;
+Correction d'un bug lors de la vérification des mises à jour;
+Touches SHIFT+ ESPACE supprimées de l'inventaire;

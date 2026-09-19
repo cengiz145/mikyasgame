@@ -1,0 +1,36 @@
+class mine_obj
+{
+int x,y;
+string id,map;
+mine_obj(string mid, int mx, int my,string mm)
+{
+id=mid;
+x=mx;
+y=my;
+map=mm;
+}
+}
+mine_obj@[] mine_objs;
+void spawn_mine(string id, int x, int y,string map) {
+mine_obj m1(id,x,y,map);
+mine_objs.insert_last(m1);
+if(map==mapname) p.play_2d("mineplace.ogg",me.x,me.y,x,y,false);
+}
+void destroy_mine(string id)
+{
+for(uint i=0; i<mine_objs.length(); i++)
+{
+if(mine_objs[i].id==id)
+{
+mine_objs.remove_at(i);
+continue;
+}
+}
+}
+void destroy_all_mines()
+{
+for(uint i=0; i<mine_objs.length(); i++)
+{
+destroy_mine(mine_objs[i].id);
+}
+}

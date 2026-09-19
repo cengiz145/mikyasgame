@@ -1,0 +1,47 @@
+string admin_rules="
+Administrator rules:
+
+1. Do not help a player, except in extreme cases.
+Helping a player is forbidden, whether by giving items or moving them somewhere else, unless they have been stuck for a very long time. There is one caveat:
+Every time a player is jailed, the time they stay jailed grows by 30 real seconds. So be careful not to move them without good reason.
+
+2. Auctioning and bidding on items.
+Auctioning and bidding is not allowed, since any administrator can create whatever item they like, coins included, and profit from the bidding.
+
+3. Helping a player with commands and directions is allowed, but showing them how to complete a quest is not.
+4. You may enable DoubleXP and DoubleGold whenever you like, but do not enable them too often. When you do, tell everyone in the Skype group so the activations can be tracked and not overused.
+Breaking these rules, rule 4 excepted, may cost you your administrator rank.
+";
+string admin_help="
+Administrator commands. Please use them carefully.
+/clearserver: Clears the server, removing every player from the game.
+This command also tries to improve server performance by removing every object on the maps and deleting all bombs, projectiles and mines.
+/getinv player_name: shows that player's full inventory.
+/inv player_name item_name=quantity: gives a quantity of an item to the named player.
+/move player_name x_coordinate y_coordinate: moves the named player to the coordinates you give. If you type /move your_name another_player_name you will teleport to that player instead.
+/changemap player_name map x_coordinate y_coordinate: moves the player to the named map, at the x and y you gave.
+Typing just the map name, without coordinates, works too.
+/kick player_name: kicks that player from the game.
+
+The Portuguese spellings still work as aliases: /limparservidor, /mudarmapa, /expulsar.
+";
+string ban_guide="
+Here is how the ban system works.
+The ban system now relies on the slash commands again, namely /ban, /banned, and /unban, however it uses computer_ids and usernames instead of ips.
+Commands and help on them will be given below.
+/ban username
+bans username's computer from the server. You must only type a username, however behind the scenes it is using product ids.
+/banned
+returns a list of all banned users, by the username they were banned with.
+/clearbans
+Clears all bans.
+/unban username
+this is where it gets different from the old system. Instead of typing an ip, you type in a username that will unban their computer, again the product ids are used.
+/computer_id username
+returns the computer_id of a player, useful if you wish to initiate a global ban ask colton about that.
+/banid username
+exact same as computer_id, accept it will return the id for somebody in the bans list, not an online player.
+The ban data is stored in bandata.dat, if you want to clear the bans just kill the server, delete that file, and restart the server, or use the /clearbans command.
+The old ban system will still apply on login, but I would just recommend deleting banned.usr and banedinfo.usr now that we have this system.
+Enjoy, happy banning! Rofl.
+";

@@ -1,0 +1,32 @@
+void volume_menu()
+{
+if(music_play==1)
+{
+m.add_music("m1.ogg");
+allowmusic=true;
+}
+volumemenu=true;
+m.reset(true);
+m.open_sound="";
+m.speak_letter=true;
+m.letters_autoactivate=false;
+m.repeat_items_at_edges=false;
+m.enable_first_letter_navigation=false;
+m.allow_escape=false;
+m.wrap=false;
+m.enable_home_and_end=false;
+m.enable_up_and_down=false;
+m.enable_left_and_right=false;
+m.add_item_tts("...","...");
+int menu_result=m.run("Life Simulator. Menu Alt+l. Music volume sliding "+(menumusvol)+"%",true);
+if(menu_result==1)
+{
+volumemenu=false;
+main_menu(false);
+}
+else
+{
+volumemenu=false;
+main_menu(false);
+}
+}

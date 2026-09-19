@@ -1,0 +1,39 @@
+// Audio output device selection.
+// Rewritten: the old version was dead code (never included, never called) and
+// restarted a "Desafio Mortal.exe" that does not exist. It now applies the
+// chosen device immediately, with no restart required.
+//
+// numero_dispositivo semantics:
+//   -1 = follow the system default device (recommended; survives plugging in
+//        headphones, since NVGT re-resolves the default on its own)
+//    0+ = index into list_sound_devices(), pinned to that specific device
+void devices_exit()
+{
+	string[] dispositivos=get_sound_output_devices();
+	if(dispositivos.length()==0){
+		alert(pu.get_value("Error!"), pu.get_value("No audio device found."));
+		return;
+	}
+	setupmenu();
+	// Entry 0 of the menu is "back"; the default-device option comes first.
+	m.add_item_tts(pu.get_value("System default device (recommended)"), "default");
+	for(uint i=0; i<dispositivos.length(); i++){
+		m.add_item_tts(dispositivos[i], "dev"+i);
+	}
+	m.add_item_tts(pu.get_value("Go Back"), "back");
+	int menu_result=m.run(pu.get_value("Select an audio output device"), true);
+	string sel=m.get_item_name(menu_result);
+	if(menu_result==0 or sel=="back" or sel==""){
+		return;
+	}
+	if(sel=="default"){
+		device_number=-1;
+	}
+	else{
+		// strip the "dev" prefix to recover the device index
+		device_number=string_to_number(string_replace(sel, "dev", "", false));
+	}
+	open_sound_device(device_number);
+	writeprefs();
+	speak(pu.get_value("Audio device changed."));
+}

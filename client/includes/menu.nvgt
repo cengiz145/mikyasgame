@@ -1,0 +1,1206 @@
+dynamic_menu_pro m;
+void main_menu(bool f=true)
+{
+setupmenu(true);
+m.letters_autoactivate=true;
+m.add_item_tts(pu.get_value("character menu"),"charmenu");
+m.add_item_tts(pu.get_value("test speakers"),"testspeaks");
+m.add_item_tts(pu.get_value("Settings"),"options");
+m.add_item_tts(pu.get_value("Check for updates"), "checar");
+m.add_item_tts(pu.get_value("Exit."), "exit");
+int menu_result=m.run(pu.get_value("Menu principal"), true);
+if(m.get_item_name(menu_result)=="exit" or menu_result==0)
+{
+writeprefs();
+exit_game();
+}
+else if(m.get_item_name(menu_result)=="testspeaks")
+{
+dlgplay("altofalante.ogg");
+main_menu();
+}
+else if(m.get_item_name(menu_result)=="options")
+{
+options_menu();
+}
+else if(m.get_item_name(menu_result)=="charmenu")
+{
+char_menu();
+}
+}
+void voice_menu()
+{
+menu_silent();
+m.add_item("v1nome.ogg","1");
+m.add_item("v2nome.ogg","2");
+m.add_item("v3nome.ogg","3");
+m.add_item("v4nome.ogg", "4");
+m.add_item("v5nome.ogg", "5");
+m.add_item("v7nome.ogg", "7");
+m.add_item("v9nome.ogg", "9");
+m.add_item("v10nome.ogg", "10");
+m.add_item("v11nome.ogg", "11");
+m.add_item("v12nome.ogg", "12");
+m.add_item_tts(pu.get_value("Go Back"),"back");
+int menu_result=m.run(pu.get_value("Select a voice."),true);
+if (m.get_item_name(menu_result)=="back" or menu_result==0)
+{
+profile_menu();
+}
+else
+{
+voice=string_to_number(m.get_item_name(menu_result));
+writeprefs();
+profile_menu();
+}
+}
+string select_player(string text,bool showall=false)
+{
+if(mapname=="quadro")return "";
+menu2();
+for (uint i=0; i<players.length(); i++)
+{
+if (players[i].map==mapname and players[i].charname!=un and showall==false&&players[i].beeping==1)
+m.add_item_tts(players[i].charname,players[i].charname);
+else if (showall==true&&players[i].beeping==1)
+{
+if (players[i].charname!=un&&players[i].beeping==1)
+m.add_item_tts(players[i].charname,players[i].charname);
+}
+}
+int menu_result=m.run(pu.get_value(text),true);
+return m.get_item_name(menu_result);
+}
+void map_players_menu(int peaceful=0, string modify="Choose a player:;missil"){
+if(ausente||!moveable)return;
+setupmenu();
+string[] d=string_split(modify, ";", false);
+for (uint i=0; i<players.length(); i++){
+if (players[i].map==mapname&&players[i].charname!=un&&players[i].beeping==1&&players[i].peaceful==peaceful)m.add_item_tts(players[i].charname,players[i].charname);
+}
+int menu_result=m.run(pu.get_value(d[0]),true);
+if(menu_result>-1)send_reliable(peer_id, d[1]+" "+m.get_item_name(menu_result), 0);
+}
+void char_menu()
+{
+setupmenu(true);
+m.letters_autoactivate=true;
+m.add_item_tts(pu.get_value("login"),"logar");
+m.add_item_tts(pu.get_value("create account"),"create");
+m.add_item_tts(pu.get_value("Set up existing account"),"personagem");
+m.add_item_tts(pu.get_value("Go Back"),"back");
+int menu_result=m.run(pu.get_value("character menu."), true);
+if(m.get_item_name(menu_result)=="logar")
+{
+m.fade_music(1);
+speak(pu.get_value("Connecting to the server..."));
+do_login();
+}
+//if(m.get_item_name(mres) == "back") {
+if (m.get_item_name(menu_result)=="back" or menu_result==0)
+{
+    main_menu();
+    return;
+}
+else if(m.get_item_name(menu_result)=="create")
+{
+creating=true;
+create();
+}
+if(m.get_item_name(menu_result)=="checar") check_update(false);
+else if(m.get_item_name(menu_result)=="personagem")
+{
+string sz=v.input(pu.get_value("Enter your username."));
+string entered_password=v.input(pu.get_value("Enter your password."));
+if (entered_password=="")
+{
+char_menu();
+}
+else
+{
+pw=entered_password;
+un=sz;
+}
+writeprefs();
+char_menu();
+}
+else if(m.get_item_name(menu_result)=="back")
+{
+main_menu();
+}
+}
+void options_menu()
+{
+setupmenu();
+m.add_item_tts(pu.get_value("Global Settings"), "gerais");
+m.add_item_tts(pu.get_value("profile settings"), "perfio");
+m.add_item_tts(pu.get_value("Select a language file"), "idioma");
+m.add_item_tts(pu.get_value("Go Back"),"back");
+int menu_result=m.run(pu.get_value("Options menu, select an option"), true);
+if(m.get_item_name(menu_result)=="gerais")
+{
+general_settings();
+}
+else if(m.get_item_name(menu_result)=="idioma")
+{
+string a=languages();
+if(a==""){
+options_menu();
+}
+else{
+language_file_path="lang/"+a;
+writeprefs();
+pu.set_file(language_file_path);
+options_menu();
+}
+}
+else if(m.get_item_name(menu_result)=="perfio")
+{
+profile_menu();
+}
+else
+{
+main_menu();
+}
+}
+void options_menu2(){
+setupmenu(false);
+m.add_item_tts(pu.get_value("Change password"), "password");
+if(tradutorativo==1){
+m.add_item_tts(pu.get_value("Disable translator"), "tradutor");
+m.add_item_tts(pu.get_value("Select the source language"), "selidioma");
+}
+else if(tradutorativo==0)m.add_item_tts(pu.get_value("Enable translator"), "tradutor");
+if(interrupt==0){
+m.add_item_tts(pu.get_value("Enable	 screen reader interruption"), "interrupt");
+}
+else if(interrupt==1){
+m.add_item_tts(pu.get_value("Disable screen reader interruption."), "interrupt");
+}
+m.add_item_tts(pu.get_value("Go Back"),"back");
+int menu_result=m.run(pu.get_value("Game options menu, select an option."), true);
+if(m.get_item_name(menu_result)=="wine")
+{
+toggle_wine();
+options_menu2();
+}
+else if(m.get_item_name(menu_result)=="voz")
+{
+voice_menu();
+options_menu2();
+}
+else if(m.get_item_name(menu_result)=="ad")
+{
+asktoexit=0;
+writeprefs();
+options_menu2();
+}
+else if(m.get_item_name(menu_result)=="ae")
+{
+asktoexit=1;
+writeprefs();
+options_menu2();
+}
+else if(m.get_item_name(menu_result)=="password"){
+string new_password=v.input("Type your new password.");
+if(message_invalid(new_password)||new_password.length()<8){
+dlg(pu.get_value("Invalid password. This may be because it contains less than 8 characters, has special symbols or spaces."));
+}
+else{
+string new_password_confirm=v.input("Retype your new password.");
+if(message_invalid(new_password_confirm)||new_password_confirm.length()<8){
+dlg(pu.get_value("Invalid password. This may be because it contains less than 8 characters, has special symbols or spaces."));
+}
+else if(new_password_confirm!=new_password){
+dlg("The passwords don't match.");
+options_menu2();
+}
+else{
+add_add_item("variado", pu.get_value("Changing password..."));
+send_reliable(peer_id, "/changepassword "+pw+" "+new_password, 1);
+}
+}
+}
+else if(m.get_item_name(menu_result)=="selidioma")source_language_menu();
+else if(m.get_item_name(menu_result)=="tradutor"){
+if(tradutorativo==0)tradutorativo=1;
+else if(tradutorativo==1)tradutorativo=0;
+readprefs();
+options_menu2();
+}
+else if(m.get_item_name(menu_result)=="interrupt")
+{
+if (interrupt==1)
+interrupt=0;
+else
+interrupt=1;
+options_menu2();
+}
+}
+void exit_menu()
+{
+if (asktoexit==1)
+{
+setupmenu();
+m.add_item_tts(pu.get_value("Yes"),"yes");
+m.add_item_tts(pu.get_value("No"),"in");
+int menu_result=m.run(pu.get_value("Wold you like to exit?"),true);
+if (menu_result==1)
+{
+exitgame();
+}
+}
+else
+{
+exitgame();
+}
+}
+void store(string storeitems)
+{
+if(ausente||!moveable)return;
+setupmenu();
+string[] items=string_split(storeitems,"\r\n",true);
+for (uint i=0; i<items.length(); i++)
+{
+string[] item=string_split(items[i]," ",true);
+string it=string_replace(item[0],",","",true);
+m.add_item_tts(items[i],it);
+}
+int menu_result=m.run(pu.get_value("Shop menu. Here you have")+" "+items.length()+" "+pu.get_value("items")+".",true);
+if (menu_result!=0)
+{
+string amount=v.input(pu.get_value("How much")+" "+m.get_item_name(menu_result)+"?");
+send_reliable(peer_id,"/buy123321123 "+amount+" "+m.get_item_name(menu_result),1);
+}
+}
+// Dev menu option: create a custom monster (defined server-side in comandos.nvgt). Uses menu2() for the yes/no prompts.
+void createmonster(){
+string name=v.input(pu.get_value("Monster name (also used for its NAME_attackN.ogg and NAME_death.ogg sounds, no spaces)"));
+if(name==""||string_contains(name, " ", 1)>-1){ speak(pu.get_value("Invalid monster name.")); return; }
+string hp=v.input(pu.get_value("HP (health points)"));
+string speed=v.input(pu.get_value("Speed (milliseconds between steps, lower is faster)"));
+string damage=v.input(pu.get_value("Damage per hit"));
+string attack_count_val=v.input(pu.get_value("Number of attack sound files (e.g. 4 for NAME_attack1.ogg to NAME_attack4.ogg)"));
+string respawn=v.input(pu.get_value("Respawn time in milliseconds after it dies (0 = it does not respawn)"));
+if(hp==""||speed==""||damage==""||attack_count_val==""||respawn==""){ return; }
+string map_name_short=v.input(pu.get_value("Map name for the monster (leave blank for your current map)"));
+if(map_name_short=="") map_name_short=mapname;
+string sx=v.input(pu.get_value("Spawn X position (leave blank for your current X)"));
+if(sx=="") sx=""+me.x;
+string sy=v.input(pu.get_value("Spawn Y position (leave blank for your current Y)"));
+if(sy=="") sy=""+me.y;
+menu2();
+m.add_item_tts(pu.get_value("Yes"), "1");
+m.add_item_tts(pu.get_value("No"), "0");
+int r1=m.run(pu.get_value("Can the monster follow the player UP the stairs?"), true);
+string follow_up_stairs=m.get_item_name(r1);
+if(follow_up_stairs!="1"&&follow_up_stairs!="0"){ return; }
+menu2();
+m.add_item_tts(pu.get_value("Yes"), "1");
+m.add_item_tts(pu.get_value("No"), "0");
+int r2=m.run(pu.get_value("Can the monster follow the player DOWN the stairs?"), true);
+string follow_down_stairs=m.get_item_name(r2);
+if(follow_down_stairs!="1"&&follow_down_stairs!="0"){ return; }
+send_reliable(peer_id, "spawnmonster "+name+" "+sx+" "+sy+" "+map_name_short+" "+hp+" "+speed+" "+damage+" "+attack_count_val+" "+respawn+" "+follow_up_stairs+" "+follow_down_stairs, 2);
+speak(pu.get_value("Monster created."));
+}
+void dev_menu()
+{
+menu2();
+m.add_item_tts(pu.get_value("Clear server"), "cs");
+m.add_item_tts(pu.get_value("Force update for all clients"),"fup");
+m.add_item_tts(pu.get_value("Close this menu"),"closemenu");
+int menu_result=m.run(pu.get_value("Developer menu"),true);
+if(menu_result==0) return;
+string ret=m.get_item_name(menu_result);
+if(ret=="closemenu") return;
+if(ret=="fup") send_reliable(peer_id,"fup",0);
+if(ret=="cs")
+send_reliable(1, "/clearserver", 1);
+}
+int menu_callback_loop(dynamic_menu_pro@ j, string dat)
+{
+if(connected) mainloop();
+return 0;
+}
+void spell_menu(string data)
+{
+if(ausente||!moveable)return;
+string[] spells=string_split(data,"\r\n",false);
+menu2();
+for(uint i=0; i<spells.length(); i++)
+{
+string[] parsed=string_split(spells[i],":",false);
+m.add_item_tts(pu.get_value(spells[i]),parsed[0]);
+}
+int menu_result=m.run(pu.get_value("Choose a spell to Throw."),true);
+if(menu_result==0) return;
+else
+{
+string spell=m.get_item_name(menu_result);
+send_reliable(peer_id,"spellcast "+spell+" "+facing,0);
+}
+}
+void update_menu()
+{
+setupmenu(false);
+m.add_item_tts(pu.get_value("Yes"),"y");
+m.add_item_tts(pu.get_value("No"),"n");
+int menu_result=m.run(game_name+" "+vernova+" "+pu.get_value("Was found! Description")+" "+pu.get_value(description)+"\r\n"+pu.get_value("Do you want do download it?"),true);
+if (m.get_item_name(menu_result)=="y")
+{
+download_update();
+}
+else
+main_menu();
+}
+void clothing ()
+{
+if(ausente||!moveable)return;
+menu_silent();
+	m.add_item_tts(pu.get_value("Watch")+" - 50 reais","Watch");
+	m.add_item_tts(pu.get_value("blue_watch")+" - 50 reais","blue_watch");
+	m.add_item_tts(pu.get_value("green_watch")+" - 55 reais","green_watch");
+	m.add_item_tts(pu.get_value("black_watch")+" - 70 reais","black_watch");
+	m.add_item_tts(pu.get_value("yellow_watch")+" - 60 reais","yellow_watch");
+	m.add_item_tts(pu.get_value("PanamÃ¡ hat")+" - 30 reais","PanamÃ¡ hat");
+	m.add_item_tts(pu.get_value("blue_hat")+" - 45 reais","blue_hat");
+	m.add_item_tts(pu.get_value("black_hat")+" - 45 reais","black_hat");
+	m.add_item_tts(pu.get_value("green_hat")+" - 45 reais","green_hat");
+	m.add_item_tts(pu.get_value("silver_gray_necktie")+" - 50 reais","silver_gray_necktie");
+	m.add_item_tts(pu.get_value("blue_necktie")+" - 50 reais","blue_necktie");
+	m.add_item_tts(pu.get_value("black_necktie")+" - 50 reais","black_necktie");
+	m.add_item_tts(pu.get_value("dark_red_tie")+" - 55 reais","dark_red_tie");
+	m.add_item_tts(pu.get_value("rubber_vest")+" - 250 reais","rubber_vest");
+	m.add_item_tts(pu.get_value("camo_waistcoat")+" - 175 reais","camo_waistcoat");
+	m.add_item_tts(pu.get_value("leather_jacket")+" - 780 coins","leather_jacket");
+	m.add_item_tts(pu.get_value("knit_shirt")+" - 25 reais", "knit_shirt");
+	m.add_item_tts(pu.get_value("white_shirt")+" - 50 reais","white_shirt");
+	m.add_item_tts(pu.get_value("pink_polo_shirt")+" - 40 reais","pink_polo_shirt");
+	m.add_item_tts(pu.get_value("brown polo shirt")+" - 40 reais","brown polo shirt");
+	m.add_item_tts(pu.get_value("green_polo_shirt")+" - 40 reais","green_polo_shirt");
+	m.add_item_tts(pu.get_value("black_polo_shirt")+" - 40 reais","black_polo_shirt");
+	m.add_item_tts(pu.get_value("gray_waistcoat")+" - 65 reais","gray_waistcoat");
+	m.add_item_tts(pu.get_value("blue_waistcoat")+" - 65 reais","blue_waistcoat");
+	m.add_item_tts(pu.get_value("black_waistcoat")+" - 65 reais","black_waistcoat");
+	m.add_item_tts(pu.get_value("blue pants")+" - 35 reais","blue pants");
+	m.add_item_tts(pu.get_value("black pants")+" - 35 reais","black pants");
+	m.add_item_tts(pu.get_value("Jeans_Pants")+" - 40 reais","Jeans_Pants");
+	m.add_item_tts(pu.get_value("camouflage_pants")+" - 150 reais", "camouflage_pants");
+	m.add_item_tts(pu.get_value("blue formal pants")+" - 80 reais", "blue formal pants");
+	m.add_item_tts(pu.get_value("black_formal_shoe")+" - 90 reais", "black_formal_shoe");
+	m.add_item_tts(pu.get_value("brown dress shoe")+" - 100 reais", "brown dress shoe");
+	m.add_item_tts(pu.get_value("black_sneakers")+" - 70 reais", "black_sneakers");
+	m.add_item_tts(pu.get_value("brown sneakers")+" - 70 reais", "brown sneakers");
+	m.add_item_tts(pu.get_value("heart-shaped earrings")+" - 20 reais", "heart-shaped earrings");
+	m.add_item_tts(pu.get_value("star_shaped_earrings")+" - 20 reais", "star_shaped_earrings");
+	m.add_item_tts(pu.get_value("flower_shaped_earrings")+" - 20 reais", "flower_shaped_earrings");
+	m.add_item_tts(pu.get_value("pair_of_pearl_earrings")+" - 150 reais", "pair_of_pearl_earrings");
+	m.add_item_tts(pu.get_value("pearl_necklace")+" - 300 reais", "pearl_necklace");
+	m.add_item_tts(pu.get_value("gold_plated_necklace")+" - 300 reais", "gold_plated_necklace");
+	m.add_item_tts(pu.get_value("blue_bracelet")+" - 10 reais", "blue_bracelet");
+	m.add_item_tts(pu.get_value("white_bracelet")+" - 10 reais", "white_bracelet");
+	m.add_item_tts(pu.get_value("green_bracelet")+" - 10 reais", "green_bracelet");
+	m.add_item_tts(pu.get_value("red_bracelet")+" - 10 reais", "red_bracelet");
+	m.add_item_tts(pu.get_value("pink_bracelet")+" - 10 reais", "pink_bracelet");
+	m.add_item_tts(pu.get_value("yellow_bracelet")+" - 10 reais", "yellow_bracelet");
+	m.add_item_tts(pu.get_value("blue_bracelet_with_pendant")+" - 15 reais", "blue_bracelet_with_pendant");
+	m.add_item_tts(pu.get_value("white_bracelet_with_pendant")+" - 15 reais", "white_bracelet_with_pendant");
+	m.add_item_tts(pu.get_value("green_bracelet_with_pendant")+" - 15 reais", "green_bracelet_with_pendant");
+	m.add_item_tts(pu.get_value("red_bracelet_with_pendant")+" - 15 reais", "red_bracelet_with_pendant");
+	m.add_item_tts(pu.get_value("pink_bracelet_with_pendant")+" - 15 reais", "pink_bracelet_with_pendant");
+	m.add_item_tts(pu.get_value("yellow_bracelet_with_pendant")+" - 15 reais", "yellow_bracelet_with_pendant");
+	m.add_item_tts(pu.get_value("long_white_dress")+" - 70 reais", "long_white_dress");
+	m.add_item_tts(pu.get_value("long_red_dress_with_crystals")+" - 150 reais", "long_red_dress_with_crystals");
+	m.add_item_tts(pu.get_value("long_black_dress_with_pearls")+" - 550 reais", "long_black_dress_with_pearls");
+	m.add_item_tts(pu.get_value("long_blue_dress_with_swarovski")+" - 500 reais", "long_blue_dress_with_swarovski");
+	m.add_item_tts(pu.get_value("lilac_lace_dress_with_short_sleeves")+" - 85 reais", "lilac_lace_dress_with_short_sleeves");
+	m.add_item_tts(pu.get_value("pink_lace_dress_with_short_sleeves")+" - 85 reais", "pink_lace_dress_with_short_sleeves");
+	m.add_item_tts(pu.get_value("red_lace_dress_with_short_sleeves")+" - 85 reais", "red_lace_dress_with_short_sleeves");
+	m.add_item_tts(pu.get_value("white_lace_dress_with_short_sleeves")+" - 85 reais", "white_lace_dress_with_short_sleeves");
+	m.add_item_tts(pu.get_value("blue_lace_dress_with_short_sleeves")+" - 85 reais", "blue_lace_dress_with_short_sleeves");
+	m.add_item_tts(pu.get_value("black_lace_dress_with_short_sleeves")+" - 85 reais", "black_lace_dress_with_short_sleeves");
+	m.add_item_tts(pu.get_value("red_lace_dress")+" - 80 reais", "red_lace_dress");
+	m.add_item_tts(pu.get_value("white_lace_dress")+" - 80 reais", "white_lace_dress");
+	m.add_item_tts(pu.get_value("purple lace dress")+" - 80 reais", "purple lace dress");
+	m.add_item_tts(pu.get_value("blue_lace_dress_with_small_blue_crystals")+" - 350 reais", "blue_lace_dress_with_small_blue_crystals");
+	m.add_item_tts(pu.get_value("pink_lace_dress_with_small_pink_crystals")+" - 350 reais", "pink_lace_dress_with_small_pink_crystals");
+	m.add_item_tts(pu.get_value("black_lace_dress_with_small_pearls")+" - 550 reais", "black_lace_dress_with_small_pearls");
+	m.add_item_tts(pu.get_value("short_floral_dress")+" - 50 reais", "short_floral_dress");
+	m.add_item_tts(pu.get_value("short_floral_dress_with_short_sleeves")+" - 55 reais", "short_floral_dress_with_short_sleeves");
+	m.add_item_tts(pu.get_value("short_floral_dress_with_straps")+" - 300 reais", "short_floral_dress_with_straps");
+	m.add_item_tts(pu.get_value("short_dress_with_sleeves_and_small_flowers")+" - 55 reais", "short_dress_with_sleeves_and_small_flowers");
+	m.add_item_tts(pu.get_value("short dress with straps and rhinestones")+" - 90 reais", "short dress with straps and rhinestones");
+	m.add_item_tts(pu.get_value("white_dress_with_sleeves_and_small_flowers")+" - 320 reais", "white_dress_with_sleeves_and_small_flowers");
+	m.add_item_tts(pu.get_value("white_dress_with_straps_and_stones")+" - 490 reais", "white_dress_with_straps_and_stones");
+	m.add_item_tts(pu.get_value("short_silk_dress")+" - 600 reais", "short_silk_dress");
+	m.add_item_tts(pu.get_value("long_silk_dress")+" - 650 reais", "long_silk_dress");
+	m.add_item_tts(pu.get_value("long_formal_dress")+" - 200 reais", "long_formal_dress");
+	m.add_item_tts(pu.get_value("denim_jacket")+" - 75 reais", "denim_jacket");
+	m.add_item_tts(pu.get_value("strappy_blouse")+" - 30 reais", "strappy_blouse");
+	m.add_item_tts(pu.get_value("short_sleeve_blouse")+" - 35 reais", "short_sleeve_blouse");
+	m.add_item_tts(pu.get_value("blouse_with_stones")+" - 40 reais", "blouse_with_stones");
+	m.add_item_tts(pu.get_value("lace_blouse")+" - 50 reais", "lace_blouse");
+	m.add_item_tts(pu.get_value("short_skirt")+" - 50 reais", "short_skirt");
+	m.add_item_tts(pu.get_value("long_skirt")+" - 55 reais", "long_skirt");
+	m.add_item_tts(pu.get_value("brown shorts")+" - 45 reais", "brown shorts");
+	m.add_item_tts(pu.get_value("blue_shorts")+" - 45 reais", "blue_shorts");
+	m.add_item_tts(pu.get_value("black_shorts")+" - 45 reais", "black_shorts");
+	m.add_item_tts(pu.get_value("wide-leg pants")+" - 60 reais", "wide-leg pants");
+	m.add_item_tts(pu.get_value("skinny pants")+" - 65 reais", "skinny pants");
+	m.add_item_tts(pu.get_value("flare pants")+" - 70 reais", "flare pants");
+	m.add_item_tts(pu.get_value("black heels")+" - 70 reais", "black heels");
+	m.add_item_tts(pu.get_value("nude heels")+" - 70 reais", "nude heels");
+	m.add_item_tts(pu.get_value("brown heels")+" - 70 reais", "brown heels");
+	m.add_item_tts(pu.get_value("white_trainers")+" - 30 reais", "white_trainers");
+	m.add_item_tts(pu.get_value("pink_trainers")+" - 30 reais", "pink_trainers");
+	m.add_item_tts(pu.get_value("black_trainers")+" - 30 reais", "black_trainers");
+	m.add_item_tts(pu.get_value("black_sandals")+" - 60 reais", "black_sandals");
+	m.add_item_tts(pu.get_value("brown sandals")+" - 60 reais", "brown sandals");
+	m.add_item_tts(pu.get_value("short_black_boots")+" - 150 reais", "short_black_boots");
+	m.add_item_tts(pu.get_value("tall_black_boots")+" - 150 reais", "tall_black_boots");
+	m.add_item_tts(pu.get_value("brown belt")+" - 45 reais", "brown belt");
+	m.add_item_tts(pu.get_value("black belt")+" - 45 reais", "black belt");
+	m.add_item_tts(pu.get_value("Running shoes")+" - 360 coins","Running shoes");
+	m.add_item_tts(pu.get_value("sandal")+" - 360 coins","sandal");
+	m.add_item_tts(pu.get_value("Social_pants")+" - 230 coins","Social_pants");
+	m.add_item_tts(pu.get_value("Sun_Glasses")+" - 170 coins","Sun_Glasses");
+	m.add_item_tts(pu.get_value("dress_shoe")+" - 280 coins","dress_shoe");
+	m.add_item_tts(pu.get_value("Legging pants")+" - 130 coins", "Legging pants");
+	m.add_item_tts(pu.get_value("scarpin_shoe")+" - 160 coins", "scarpin_shoe");
+	m.add_item_tts(pu.get_value("gloves")+" - 80 coins","gloves");
+	m.add_item_tts(pu.get_value("Cap")+" - 120 coins","Cap");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Choose the clothes that you wish to buy"),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void snack_bar_drinks()
+{
+if(ausente||!moveable)return;
+menu_silent();
+m.add_item_tts(pu.get_value("soda")+" - 4 coins","soda");
+m.add_item_tts(pu.get_value("beer")+" - 6 coins","beer");
+m.add_item_tts(pu.get_value("energy drink")+" - 5 coins","energy drink");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item"),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void buy_electronics(){
+menu_silent();
+if(ausente||!moveable)return;
+m.add_item_tts(pu.get_value("taser")+" - 60000 coins","taser");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item"),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void profile_menu(){
+setupmenu();
+m.add_item_tts(pu.get_value("Selecionar voz"), "voz");
+if(hear_deaths==1)m.add_item_tts(pu.get_value("Disable death warnings"), "mortes");
+else if(hear_deaths==0)m.add_item_tts(pu.get_value("Enable death warnings"), "mortes");
+if(avisanivel==1)m.add_item_tts(pu.get_value("Disable level up sound"), "nivel");
+else if(avisanivel==0)m.add_item_tts(pu.get_value("Enable level up sound"), "nivel");
+if(mdor==0)m.add_item_tts(pu.get_value("Not hearing grunts"), "grunido");
+else if(mdor==1)m.add_item_tts(pu.get_value("Ouvindo grunidos"), "grunido");
+if(hear_footsteps==1)
+m.add_item_tts(pu.get_value("hearing to other player steps"), "passos");
+if(hear_footsteps==0)
+m.add_item_tts(pu.get_value("no hearing to other player steps"), "passos");
+if(hear_auction==1)
+m.add_item_tts(pu.get_value("Disable auctions"), "Auction");
+if(hear_auction==0)
+m.add_item_tts(pu.get_value("Enable auctions"), "Auction");
+m.add_item_tts(pu.get_value("Go Back"), "voltar");
+int menu_result=m.run(pu.get_value("Profile settings."), true);
+if(m.get_item_name(menu_result)=="voz")
+{
+voice_menu();
+}
+else if(m.get_item_name(menu_result)=="mortes"){
+if(hear_deaths==0)hear_deaths=1;
+else if(hear_deaths==1)hear_deaths=0;
+readprefs();
+profile_menu();
+}
+else if(m.get_item_name(menu_result)=="nivel"){
+if(avisanivel==1)avisanivel=0;
+else if(avisanivel==0)avisanivel=1;
+writeprefs();
+profile_menu();
+}
+else if(m.get_item_name(menu_result)=="grunido"){
+if(mdor==0){
+mdor=1;
+}
+else if(mdor==1){
+mdor=0;
+}
+writeprefs();
+profile_menu();
+}
+else if(m.get_item_name(menu_result)=="passos"){
+if(hear_footsteps==0){
+hear_footsteps=1;
+}
+else if(hear_footsteps==1){
+hear_footsteps=0;
+}
+readprefs();
+profile_menu();
+}
+else if(m.get_item_name(menu_result)=="Auction"){
+if(hear_auction==0){
+hear_auction=1;
+}
+else if(hear_auction==1){
+hear_auction=0;
+}
+readprefs();
+profile_menu();
+}
+else
+{
+options_menu();
+}
+}
+void jewelry_shop()
+{
+if(ausente||!moveable)return;
+menu_silent();
+m.add_item_tts(pu.get_value("golden_egg")+" - 2000000 coins","golden_egg");
+m.add_item_tts(pu.get_value("gold")+" - 2000 coins","gold");
+m.add_item_tts(pu.get_value("Pearl")+" - 200 coins","Pearl");
+m.add_item_tts(pu.get_value("bracelet")+" - 350 coins","bracelet");
+m.add_item_tts(pu.get_value("silver_bracelet")+" - 5298 coins", "silver_bracelet");
+m.add_item_tts(pu.get_value("bronze_bracelet")+" - 3298 coins", "bronze_bracelet");
+m.add_item_tts(pu.get_value("ring")+" - 320 coins","ring");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item."),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void pharmacy(){
+menu_silent();
+if(ausente||!moveable)return;
+m.add_item_tts(pu.get_value("antibiotic")+" - 10 "+pu.get_value("reais"),"antibiotic");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item."),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy2123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+string socials_menu(){
+menu_silent();
+m.add_item("arroto1.ogg","arroto1.ogg");
+m.add_item("arroto2.ogg","arroto2.ogg");
+m.add_item("assobio1.ogg","assobio1.ogg");
+m.add_item("assobio2.ogg","assobio2.ogg");
+m.add_item("assobio3.ogg","assobio3.ogg");
+m.add_item("peido1.ogg","peido1.ogg");
+m.add_item("peido2.ogg","peido2.ogg");
+m.add_item("peido3.ogg","peido3.ogg");
+m.add_item("risada1.ogg", "risada1.ogg");
+m.add_item("risada2.ogg", "risada2.ogg");
+m.add_item("risada3.ogg", "risada3.ogg");
+m.add_item("tosse.ogg", "tosse.ogg");
+m.add_item_tts(pu.get_value("Go Back"),"back");
+int menu_result=m.run(pu.get_value("Select a social"),true);
+if(m.get_item_name(menu_result)=="back"){
+return"";
+}
+else return m.get_item_name(menu_result);
+}
+string gender_menu(){
+menu_silent();
+m.add_item_tts("Feminino","0");
+m.add_item_tts("Masculino","1");
+m.add_item_tts("Go Back","back");
+int menu_result=m.run("Select your gender.",true);
+if(menu_result=="back")
+{
+return-1;
+}
+else return m.get_item_name(menu_result);
+}
+string joke_sounds_menu()
+{
+string[] soundfiles=find_files("upsounds/*.ogg");
+if(soundfiles.length()<=0)
+{
+speak("No file found in the uploads folder");
+return -1;
+}
+setupmenu();
+for(uint i=0; i<soundfiles.length(); i++)
+{
+m.add_item_tts(string_replace(soundfiles[i],".ogg","",true),soundfiles[i]);
+}
+int menu_result=m.run("Choose the sound file to send.",true);
+if(menu_result<=0)
+{
+return -1;
+}
+else return m.get_item_name(menu_result);
+}
+string give_item(){
+if(ausente||!moveable)return "";
+menu_silent();
+for (int i=me.x-3; i<=me.x+3; i++)
+{
+for (uint i2=0; i2<players.length(); i2++)
+{
+if (players[i2].x==i&&players[i2].charname!=un&&players[i2].map==mapname&&players[i2].y==me.y&&players[i2].beeping==1)
+{
+m.add_item_tts(players[i2].charname,players[i2].charname);
+}
+}
+}
+int menu_result=m.run(pu.get_value("Select your desired player"),true);
+if(menu_result<=0)
+{
+speak(pu.get_value("Nobody nearby"));
+return"";
+}
+else return m.get_item_name(menu_result);
+}
+string select_player_menu(){
+menu_silent();
+for (uint i2=0; i2<players.length(); i2++){
+if(players[i2].beeping==1&&developer_dm==0||developer_dm==1)m.add_item_tts(players[i2].charname,players[i2].charname);
+}
+int menu_result=m.run(pu.get_value("Select your desired player"),true);
+if(menu_result<=0)
+{
+speak(pu.get_value("Nobody nearby"));
+return"";
+}
+else return m.get_item_name(menu_result);
+}
+string teleport_menu(){
+if(!moveable)return "";
+menu2();
+m.add_item_tts(pu.get_value("safe_zone_es"), "safe_zone_es");
+m.add_item_tts(pu.get_value("snack_bar"), "snack_bar");
+m.add_item_tts(pu.get_value("club"), "club");
+m.add_item_tts(pu.get_value("barrs"), "barrs");
+m.add_item_tts(pu.get_value("shopping"), "shopping");
+// The second argument is the key sent to the server, so it must stay the
+// on-disk map name; only the spoken label is translated.
+m.add_item_tts(pu.get_value("Town square"), "town_square");
+m.add_item_tts(pu.get_value("Go Back"), "voltar");
+int menu_result=m.run(pu.get_value("Choose the map you want to teleport to."),true);
+if(menu_result<=0)
+{
+return"";
+}
+else return m.get_item_name(menu_result);
+}
+string languages()
+{
+string[] soundfiles=find_files("lang/*.lang");
+if(soundfiles.length()<=0)
+{
+speak(pu.get_value("No language file found."));
+return"";
+}
+setupmenu();
+for(uint i=0; i<soundfiles.length(); i++)
+{
+m.add_item_tts(string_replace(soundfiles[i],".lang","",true),soundfiles[i]);
+}
+m.add_item_tts(pu.get_value("Go Back"), "back");
+int menu_result=m.run(pu.get_value("select the language file that you wish to use"),true);
+if(m.get_item_name(menu_result)=="back")
+{
+return"";
+}
+else return m.get_item_name(menu_result);
+}
+string buy_plane_ticket(){// Buy a plane ticket
+menu_silent();
+// Second argument is the key sent to the server, so it must match the
+// parsed[1] test in the passagema handler.
+m.add_item_tts("Mortalandia", "Mortalandia");
+m.add_item_tts("Belick", "Belick");
+m.add_item_tts(pu.get_value("Go Back"), "back");
+int menu_result=m.run(pu.get_value("Choose the place that you wish to buy the ticket"), true);
+if(m.get_item_name(menu_result)=="back") return"";
+else return m.get_item_name(menu_result);
+}
+string buy_plane_ticket2(){// Buy a plane ticket
+menu_silent();
+m.add_item_tts("santa_bertalina", "santa_bertalina");
+m.add_item_tts("Belick", "Belick");
+m.add_item_tts(pu.get_value("Go Back"), "back");
+int menu_result=m.run(pu.get_value("Choose the place that you wish to buy the ticket"), true);
+if(m.get_item_name(menu_result)=="back") return"";
+else return m.get_item_name(menu_result);
+}
+void convert_menu(){
+menu_silent();
+if(ausente||!moveable)return;
+m.add_item_tts(pu.get_value("Coins to reais"), "coinsparareais");
+m.add_item_tts(pu.get_value("Reais to coins"), "reaisparacoins");
+m.add_item_tts(pu.get_value("Go Back"),"back");
+int menu_result=m.run(pu.get_value("What do you want to exchange ?"), true);
+if(m.get_item_name(menu_result)=="back"){
+}
+else if(m.get_item_name(menu_result)=="coinsparareais"){
+string place=v.input("How many do you want to convert?");
+if(place!="") send_reliable(peer_id, "coinsparareais "+place, 2);
+}
+else if(m.get_item_name(menu_result)=="reaisparacoins"){
+string place=v.input("How many do you want to convert?");
+if(place!="") send_reliable(peer_id, "reaisparacoins "+place, 2);
+}
+}
+string bar_phrases(){
+menu_silent();
+m.add_item("v"+voice+"ajuda1.ogg", "1");
+m.add_item("v"+voice+"ajuda2.ogg", "2");
+m.add_item_tts(pu.get_value("Go Back"), "voltar");
+int menu_result=m.run(pu.get_value("Choose the phrase you want to use to ask for help"),true);
+if(menu_result<=0)
+{
+return"";
+}
+else return m.get_item_name(menu_result);
+}
+void explosives(){
+menu_silent();
+if(ausente||!moveable)return;
+m.add_item_tts(pu.get_value("mina")+" - 20 "+pu.get_value("reais"), "mina");
+m.add_item_tts(pu.get_value("Time_bomb")+" - 100 "+pu.get_value("reais"), "Time_bomb");
+m.add_item_tts(pu.get_value("remote_bomb")+" - 200 "+pu.get_value("reais"),"remote_bomb");
+m.add_item_tts(pu.get_value("guided missile")+" - 200 "+pu.get_value("reais"),"guided missile");
+m.add_item_tts(pu.get_value("max_bomb")+" - 250 "+pu.get_value("reais"),"max_bomb");
+m.add_item_tts(pu.get_value("fire_bomb")+" - 250 "+pu.get_value("reais"),"fire_bomb");
+m.add_item_tts(pu.get_value("Atomic_bomb")+" - 300 "+pu.get_value("reais"),"Atomic_bomb");
+m.add_item_tts(pu.get_value("uzi")+" - 1160","uzi");
+m.add_item_tts(pu.get_value("m4a1")+" - 200 "+pu.get_value("reais"),"m4a1");
+m.add_item_tts(pu.get_value("mp5")+" - 1150 "+pu.get_value("reais"),"mp5");
+m.add_item_tts(pu.get_value("m14")+" - 1400 "+pu.get_value("reais"),"m14");
+m.add_item_tts(pu.get_value("ar15")+" - 1800 "+pu.get_value("reais"),"ar15");
+m.add_item_tts(pu.get_value("m249")+" 2000 "+pu.get_value("reais"), "m249");
+m.add_item_tts(pu.get_value("ak47")+" 2300 "+pu.get_value("reais"), "ak47");
+m.add_item_tts(pu.get_value("sniper")+" 2500 "+pu.get_value("reais"), "sniper");
+m.add_item_tts(pu.get_value("m60")+" 2800 "+pu.get_value("reais"), "m60");
+m.add_item_tts(pu.get_value("m240")+" 3000 "+pu.get_value("reais"), "m240");
+m.add_item_tts(pu.get_value("m16")+" 3500 "+pu.get_value("reais"), "m16");
+m.add_item_tts(pu.get_value("mk1")+" 4879 "+pu.get_value("reais"), "mk1");
+m.add_item_tts(pu.get_value("mega_laser")+" 5000 "+pu.get_value("reais"), "mega_laser");
+m.add_item_tts(pu.get_value("Grenade_launcher")+" 8000 "+pu.get_value("reais"), "Grenade_launcher");
+m.add_item_tts(pu.get_value("grenade")+" 10 "+pu.get_value("reais"), "grenade");
+m.add_item_tts(pu.get_value("Missile")+" 15 "+pu.get_value("reais"), "Missile");
+m.add_item_tts(pu.get_value("laser")+" 5 "+pu.get_value("reais"), "laser");
+m.add_item_tts(pu.get_value("7.62mm")+" 3 "+pu.get_value("reais"), "7.62mm");
+m.add_item_tts(pu.get_value("5.56mm")+" 2 "+pu.get_value("reais"), "5.56mm");
+m.add_item_tts(pu.get_value("9mm")+" - 2 "+pu.get_value("reais"),"9mm");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item"),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy2123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void source_language_menu(){
+menu_silent();
+m.add_item_tts(pu.get_value("Automatic"), "auto");
+m.add_item_tts("Arabic", "ar");
+m.add_item_tts("FranÃ§ais", "fr");
+m.add_item_tts("English", "en");
+m.add_item_tts("Türkçe", "tr");
+m.add_item_tts("Persian", "pl");
+m.add_item_tts("Portuguese", "pt-br");
+m.add_item_tts("Spanish", "es");
+m.add_item_tts(pu.get_value("Go Back"), -1);
+int menu_result=m.run(pu.get_value("Select the source file."), true);
+if(m.get_item_name(menu_result)<=0){
+options_menu2();
+}
+else{
+source_language=m.get_item_name(menu_result);
+writeprefs();
+options_menu2();
+}
+}
+void map_teleport_menu(string mapas)
+{
+menu2();
+string[] mmapas=string_split(mapas,"\r\n",true);
+for (uint i=0; i<mmapas.length(); i++)
+{
+m.add_item_tts(string_replace(mmapas[i], ".map", "", true), string_replace(mmapas[i], ".map", "", true));
+}
+m.add_item_tts(pu.get_value("Go Back"), "0");
+int menu_result=m.run(pu.get_value("Choose the map to teleport to"), true);
+if(m.get_item_name(menu_result)!="0"){
+send_reliable(peer_id, "mtester "+m.get_item_name(menu_result), 0);
+}
+}
+void animal_spawn_menu(string animals)
+{
+menu2();
+string[] manimais=string_split(animals,"\r\n",true);
+for (uint i=0; i<manimais.length(); i++)
+{
+m.add_item_tts(manimais[i], manimais[i]);
+}
+m.add_item_tts(pu.get_value("Go Back"), "0");
+int menu_result=m.run(pu.get_value("Choose the animal to spawn"), true);
+if(m.get_item_name(menu_result)!="0"){
+string q=v.input(pu.get_value("Quantos?"));
+send_reliable(peer_id, "sanimal "+m.get_item_name(menu_result)+" "+q, 0);
+}
+}
+// Every map on the server, as a menu. Requested with the "maplist" packet from
+// the builder menu; picking one teleports the admin straight there, which
+// previously meant typing /changemap yourname mapname by hand.
+void map_list_menu(string maps)
+{
+	string[] names=string_split(maps,"\r\n",true);
+	if(names.length()==0){
+		speak(pu.get_value("The server reported no maps."));
+		return;
+	}
+	setupmenu();
+	for(uint i=0;i<names.length();i++){
+		if(names[i]=="") continue;
+		m.add_item_tts(names[i], names[i]);
+	}
+	m.add_item_tts(pu.get_value("Go Back"), "back");
+	int menu_result=m.run(pu.get_value("Choose a map to go to."), true);
+	string sel=m.get_item_name(menu_result);
+	if(menu_result==0||sel=="back"||sel=="") return;
+	send_reliable(peer_id, "/changemap "+un+" "+sel, 1);
+}
+// The map the admin is standing on, one line per list item, so a single wrong
+// line can be corrected or removed without retyping the map. Requested with
+// the "mapsrc" packet; saving sends the lines back as "mapsave".
+//
+// The first line of what the server sends is the map name, kept out of the
+// editable list and returned with the save so the server can refuse to write
+// one map's code into another.
+void map_source_editor(string payload)
+{
+	int cut=string_contains(payload, "\r\n", 1);
+	if(cut<0){
+		speak(pu.get_value("The server sent no map data."));
+		return;
+	}
+	string mapname=string_left(payload, cut);
+	// Cut the name off by length, not by replacing it: the name occurs again in
+	// the map's own "map:<name>" header, and a replace-all deletes that too,
+	// fusing the header with the line after it as map:maxx:100.
+	string[] lines=string_split(string_trim_left(payload, cut+2), "\r\n", true);
+	// Map files end with a newline, and some use a bare carriage return, so
+	// drop the blanks rather than offering empty rows to edit.
+	for(uint i=0;i<lines.length();i++){
+		if(lines[i]==""){
+			lines.remove_at(i);
+			i--;
+		}
+	}
+	audio_form mf;
+	mf.create_window("", false, false);
+	emchat=true;
+	int mf_list=mf.create_list(pu.get_value("Lines of")+" "+mapname+". "+pu.get_value("Press enter to change a line, delete to remove it, control plus up or down to move it."),0);
+	for(uint i=0;i<lines.length();i++) mf.add_list_item(mf_list, lines[i], -1);
+	// The largest map runs to 600 lines, so let a letter jump to the first line
+	// starting with it - typing p reaches the platforms without arrowing there.
+	// Safe because this editor's own keys are enter, delete and control+arrows.
+	mf.set_list_multinavigation(mf_list, true, true, false);
+	int mf_edit=mf.create_input_box(pu.get_value("Line text. Change it here, then press the change button."),"","",0,false,false);
+	int mf_change=mf.create_button(pu.get_value("change line"), false, false);
+	int mf_add=mf.create_button(pu.get_value("add line"), false, false);
+	int mf_save=mf.create_button(pu.get_value("save"), false, false);
+	int mf_cancel=mf.create_button(pu.get_value("cancel"), false, true);
+	mf.focus(mf_list);
+	while(true){
+		wait(5);
+		mainloop();
+		int pos=mf.get_list_position(mf_list);
+		// Read before monitor() so the form's own alt and arrow handling does
+		// not consume these first.
+		if(mf.get_current_focus()==mf_list&&lines.length()>0){
+			// Enter copies the line into the edit box, which is how a line
+			// gets changed: BC's input prompt cannot be pre-filled with the
+			// old text, so retyping it from scratch would be the only option.
+			if(key_pressed(KEY_RETURN)&&pos>-1){
+				mf.set_text(mf_edit, lines[pos]);
+				mf.focus(mf_edit);
+				speak(pu.get_value("Editing")+" "+lines[pos]);
+			}
+			if(key_pressed(KEY_DELETE)&&pos>-1){
+				string gone=lines[pos];
+				lines.remove_at(pos);
+				mf.delete_list_item(mf_list, pos, true, false);
+				speak(pu.get_value("Removed")+" "+gone);
+			}
+			if((key_down(KEY_LCTRL)||key_down(KEY_RCTRL))&&pos>0&&key_pressed(KEY_UP)){
+				string tmp=lines[pos];
+				lines[pos]=lines[pos-1];
+				lines[pos-1]=tmp;
+				mf.edit_list_item(mf_list, lines[pos], pos);
+				mf.edit_list_item(mf_list, lines[pos-1], pos-1);
+				mf.set_list_position(mf_list, pos-1, true);
+			}
+			if((key_down(KEY_LCTRL)||key_down(KEY_RCTRL))&&pos<int(lines.length())-1&&key_pressed(KEY_DOWN)){
+				string tmp=lines[pos];
+				lines[pos]=lines[pos+1];
+				lines[pos+1]=tmp;
+				mf.edit_list_item(mf_list, lines[pos], pos);
+				mf.edit_list_item(mf_list, lines[pos+1], pos+1);
+				mf.set_list_position(mf_list, pos+1, true);
+			}
+		}
+		mf.monitor();
+		if(mf.is_pressed(mf_change)){
+			string t=mf.get_text(mf_edit);
+			if(pos>-1&&pos<int(lines.length())&&t!=""){
+				lines[pos]=t;
+				mf.edit_list_item(mf_list, t, pos);
+				speak(pu.get_value("Line changed."));
+			}
+			else speak(pu.get_value("Pick a line first, then type the new text."));
+			mf.focus(mf_list);
+		}
+		if(mf.is_pressed(mf_add)){
+			string t=mf.get_text(mf_edit);
+			if(t!=""){
+				lines.insert_last(t);
+				mf.add_list_item(mf_list, t, -1);
+				mf.set_list_position(mf_list, lines.length()-1, false);
+				mf.set_text(mf_edit, "");
+				speak(pu.get_value("Line added."));
+			}
+			else speak(pu.get_value("Type the new line in the line text box first."));
+			mf.focus(mf_list);
+		}
+		if(mf.is_pressed(mf_save)){
+			string result;
+			for(uint i=0;i<lines.length();i++) result+=lines[i]+"\r\n";
+			emchat=false;
+			mf.reset();
+			send_reliable(peer_id, "mapsave "+mapname+"\r\n"+result, 2);
+			break;
+		}
+		if(mf.is_pressed(mf_cancel)||key_pressed(KEY_ESCAPE)){
+			emchat=false;
+			mf.reset();
+			speak(pu.get_value("Cancelled, nothing was saved."));
+			break;
+		}
+	}
+}
+void time_machine_menu(string animals)
+{
+menu2();
+string[] manimais=string_split(animals,"\r\n",true);
+for (uint i=0; i<manimais.length(); i++)
+{
+string[] z=string_split(manimais[i], ":", false);
+m.add_item_tts(pu.get_value(z[0]), z[1]);
+}
+int menu_result=m.run(pu.get_value("Choose the world you want to try to go."), true);
+if(m.get_item_name(menu_result)!="0"){
+send_reliable(peer_id, "smaquina "+m.get_item_name(menu_result), 0);
+}
+}
+void normal_menu(string message_text_mensag)
+{
+setupmenu();
+string[] mmensagem=string_split(message_text_mensag,"\r\n",true);
+string[] bla=string_split(mmensagem[0], ":", false);
+for (uint i=1; i<mmensagem.length(); i++)
+{
+string[] z=string_split(mmensagem[i], ":", false);
+m.add_item_tts(pu.get_value(z[0]), z[1]);
+}
+m.add_item_tts(pu.get_value("Go Back"), "0");
+int menu_result=m.run(pu.get_value(bla[0]), true);
+if(m.get_item_name(menu_result)!="0"){
+send_reliable(peer_id, bla[1]+" "+m.get_item_name(menu_result), 0);
+}
+}
+void normal_menu2(string message_text_mensag){
+setupmenu();
+string[] mmensagem=string_split(message_text_mensag,"\r\n",true);
+string[] bla=string_split(mmensagem[0], bell2, false);
+for (uint i=1; i<mmensagem.length(); i++){
+string[] z=string_split(mmensagem[i], bell2, false);
+if(z.length()>1)m.add_item_tts(pu.get_value(z[0]), z[1]);
+}
+m.add_item_tts(pu.get_value("Go Back"), "0");
+int menu_result=m.run(pu.get_value(bla[0]), true);
+if(m.get_item_name(menu_result)!="0"){
+send_reliable(peer_id, bla[1]+" "+m.get_item_name(menu_result), 0);
+}
+}
+void bertalina_weapons(){
+menu_silent();
+if(ausente||!moveable)return;
+m.add_item_tts(pu.get_value("sword")+" - 10 "+pu.get_value("reais"),"sword");
+m.add_item_tts(pu.get_value("rifle.45")+" - 162 "+pu.get_value("reais"),"rifle.45");
+m.add_item_tts(pu.get_value("remington")+" - 150 "+pu.get_value("reais"),"remington");
+m.add_item_tts(pu.get_value("twelve")+" - 50 "+pu.get_value("reais"), "twelve");
+m.add_item_tts(pu.get_value("benelli")+" - 100 "+pu.get_value("reais"), "benelli");
+m.add_item_tts(pu.get_value("12mm")+" - 2 "+pu.get_value("reais"), "12mm");
+m.add_item_tts(pu.get_value("30mm")+" - 2 "+pu.get_value("reais"), "30mm");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item"),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy2123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void fishing(){
+menu_silent();
+if(ausente||!moveable)return;
+m.add_item_tts(pu.get_value("speedboat")+" - 30000 "+pu.get_value("reais"),"speedboat");
+m.add_item_tts(pu.get_value("Fuel")+" - 40 "+pu.get_value("reais"),"Fuel");
+m.add_item_tts(pu.get_value("fishing_rod")+" - 50 "+pu.get_value("reais"),"fishing_rod");
+m.add_item_tts(pu.get_value("earthworm")+" - 1 "+pu.get_value("real"),"earthworm");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item"),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy2123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void text_menu(string message_text_mensag){
+string[] mmensagem=string_split(message_text_mensag,"\r\n",true);
+string[] bla=string_split(mmensagem[0], ":", false);
+string z=v.input(pu.get_value(bla[0]));
+if(z!=""){
+send_reliable(peer_id, bla[1]+" "+z, 0);
+}
+}
+void snack_bar(){
+menu_silent();
+if(ausente||!moveable)return;
+m.add_item_tts(pu.get_value("soda")+" - 4 "+pu.get_value("coins"),"soda");
+m.add_item_tts(pu.get_value("french_fries")+" - 1 "+pu.get_value("real"),"french_fries");
+m.add_item_tts(pu.get_value("pork_rind")+" - 1 "+pu.get_value("real"),"pork_rind");
+m.add_item_tts(pu.get_value("enroladinho")+" - 2 "+pu.get_value("reais"),"enroladinho");
+m.add_item_tts(pu.get_value("coxinha")+" - 2 "+pu.get_value("reais"),"coxinha");
+m.add_item_tts(pu.get_value("meat_pastel")+" - 4 "+pu.get_value("reais"),"meat_pastel");
+m.add_item_tts(pu.get_value("cheese_pastel")+" - 4 "+pu.get_value("reais"),"cheese_pastel");
+m.add_item_tts(pu.get_value("hot_dog")+" - 5 "+pu.get_value("reais"),"hot_dog");
+m.add_item_tts(pu.get_value("cashew_juice")+" - 1 "+pu.get_value("real"),"cashew_juice");
+m.add_item_tts(pu.get_value("guava_juice")+" - 1 "+pu.get_value("real"),"guava_juice");
+m.add_item_tts(pu.get_value("peach_juice")+" - 4 "+pu.get_value("reais"),"peach_juice");
+m.add_item_tts(pu.get_value("strawberry_juice")+" - 4 "+pu.get_value("reais"),"strawberry_juice");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item."),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+if(m.get_item_name(menu_result)!="soda")send_reliable(peer_id,"/buy2123321123 "+value+" "+m.get_item_name(menu_result),1);
+else send_reliable(peer_id,"/buy123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void natural_items_shop ()
+{
+if(ausente||!moveable)return;
+menu_silent();
+m.add_item_tts(pu.get_value("botas_de_nieve")+" - 5000 reais","botas_de_nieve");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item"),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void various_items()
+{
+if(ausente||!moveable)return;
+menu_silent();
+m.add_item_tts(pu.get_value("nuclear_bomb")+" - 2000000000 coins","nuclear_bomb");
+m.add_item_tts(pu.get_value("meteorite")+" - 100000000 coins","meteorite");
+m.add_item_tts(pu.get_value("xp_extra")+" - 1000000000 coins","xp_extra");
+m.add_item_tts(pu.get_value("remorte")+" - 5000000000 coins","remorte");
+m.add_item_tts(pu.get_value("8000_cuerpo_de_megadragonsaurio")+" - 2000000000 coins","8000_cuerpo_de_megadragonsaurio");
+m.add_item_tts(pu.get_value("8000_resurrection_scroll")+" - 2000000000 coins","8000_resurrection_scroll");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item"),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}
+void virtual_shop()
+{
+if(ausente||!moveable)return;
+menu_silent();
+m.add_item_tts(pu.get_value("bazooka")+" - 23 creditos","bazooka");
+m.add_item_tts(pu.get_value("wand")+" - 30 creditos","wand");
+m.add_item_tts(pu.get_value("ak48")+" - 20 creditos","ak48");
+m.add_item_tts(pu.get_value("custom_magazine")+" - 5 creditos","custom_magazine");
+m.add_item_tts(pu.get_value("sub_laser")+" - 14 creditos","sub_laser");
+m.add_item_tts(pu.get_value("Go Back"),"0");
+int menu_result=m.run(pu.get_value("Select an item"),true);
+if(m.get_item_name(menu_result)=="0")
+{
+}
+else if(menu_result>0)
+{
+string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.get_item_name(menu_result))+"?");
+send_reliable(peer_id,"/buy123321123 "+value+" "+m.get_item_name(menu_result),1);
+}
+}

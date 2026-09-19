@@ -1,3 +1,16 @@
-node_modules/
+﻿node_modules/
 service-account.json
 .env
+*.dat
+client/out/
+client/bc_out/
+client/extracted_bc/
+client/temp_client/
+server/sv_out/
+server/temp_server/
+server/temp_server2/
+lib/
+client/lib/
+server/lib/
+lang/
+client/lang/

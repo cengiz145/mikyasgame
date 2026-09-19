@@ -1,0 +1,363 @@
+class speedboat{
+int x, y, saindo=0;
+int in_speedboat=0;
+timer ignition_timer, walk_timer;
+sound engine_start_sound, loops, desliga;
+string id;
+int walking=0;
+bool starting_engine=false, desligando=false, ligou=false;
+void exit_game(){
+send_reliable(peer_id, "speedboat d", 0);
+desliga.play();
+while(desliga.playing){
+wait(5);
+mainloop();
+}
+}
+void loop(){
+in_speedboat=1;
+engine_start_sound.load("lanchal.ogg");
+desliga.load("lanchad.ogg");
+loops.load("lanchaloop.ogg");
+engine_start_sound.volume=-100;
+walking=0;
+send_reliable(peer_id, "speedboat n", 0);
+while(true){
+wait(5);
+if(saindo==1){
+saindo=0;
+in_speedboat=0;
+break;
+}
+mainloop();
+secondary_slot();
+if(key_pressed(KEY_ESCAPE)&&!desligando&&!ligou){
+in_speedboat=0;
+saindo=1;
+break;
+}
+if(key_pressed(KEY_S))send_reliable(peer_id, "speedboat s", 0);
+if(key_down(KEY_RIGHT))facing=Right;
+if(key_down(KEY_LEFT))facing=Left;
+if(key_pressed(KEY_E)&&get_tile_at(me.x, me.y)!="water2"){
+if(tenter.elapsed>=2500||mapname=="gold_mine"&&tenter.elapsed>=410||mapname=="fishing_spot"&&tenter.elapsed>=1000){
+tenter.restart();
+send_reliable(peer_id, "imenu", 0);
+}
+}
+for(uint i=0;i<msounds.length();i++){
+if(msounds[i].id==id){
+p.update_sound_2d(msounds[i].loopint,me.x,me.y);
+}
+}
+if(key_pressed(KEY_UP)&&!desligando){
+if(!ligou){
+send_reliable(peer_id, "speedboat l", 0);
+engine_start_sound.play();
+ignition_timer.restart();
+starting_engine=true;
+desligando=false;
+while(engine_start_sound.playing){
+wait(5);
+if(ignition_timer.elapsed>=7184){
+send_reliable(peer_id, "speedboat ll", 0);
+ignition_timer.force(0);
+ignition_timer.pause();
+}
+mainloop();
+}
+ligou=true;
+}
+else if(walking==0)walking=1;
+}
+if(key_pressed(KEY_DOWN)&&!engine_start_sound.playing){
+if(walking==1)walking=0;
+else if(ligou){
+send_reliable(peer_id, "speedboat d", 0);
+desliga.play();
+while(desliga.playing){
+wait(5);
+mainloop();
+}
+ligou=false;
+}
+}
+if(ligou){
+if(walk_timer.elapsed>=150&&walking==1){
+if(facing==Right){
+string d=get_tile_at(me.x+1, me.y);
+if(d!=""&&string_contains(d, "mud", 1)<0){
+walk_timer.restart();
+me.x++;
+send_reliable(peer_id, "move3 "+me.x+" "+me.y, 0);
+}
+}
+else if(facing==Left){
+string d=get_tile_at(me.x-1, me.y);
+if(d!=""&&string_contains(d, "mud", 1)<0){
+walk_timer.restart();
+me.x--;
+send_reliable(peer_id, "move3 "+me.x+" "+me.y, 0);
+}
+}
+}
+}
+}
+}
+}
+itembonus@[] itensbonus;
+class itembonus{
+int x, s, pitch=100;
+timer stay_timer, tmudar;
+itembonus(int bx){
+x=bx;
+p.play_extended_2d("objcaindo.ogg", me.x, me.y, x, 0, 0, 0, 0, 0, true, 0.0, 0.0, 0.0, stay_timer.elapsed/5);
+}
+}
+void create_bonus(int x){
+itembonus b(x);
+itensbonus.insert_last(b);
+}
+void bonus_loop(){
+for(uint i=0;i<itensbonus.length();i++){
+if(itensbonus[i].tmudar.elapsed>=10){
+itensbonus[i].pitch--;
+itensbonus[i].tmudar.restart();
+}
+p.update_sound_2d(itensbonus[i].s,itensbonus[i].x,0);
+p.update_sound_start_values(itensbonus[i].s, 0, -1, itensbonus[i].pitch);
+if(itensbonus[i].stay_timer.elapsed>=1000){
+p.destroy_sound(itensbonus[i].s);
+itensbonus.remove_at(i);
+break;
+}
+if(itensbonus[i].x==me.x){
+p.destroy_sound(itensbonus[i].s);
+itensbonus.remove_at(i);
+send_reliable(peer_id, "gbonus", 0);
+p.play_stationary("get_raw.ogg", false);
+break;
+}
+}
+}
+void remove_all_bonuses(){
+for(uint i=00;i<itensbonus.length();i++){
+p.destroy_sound(itensbonus[i].s);
+itensbonus.remove_at(i);
+}
+}
+class phone
+{
+string input(string text)
+{
+int cursor;
+bool fell;
+string message;
+if(text!="")speak(pu.get_value(text));
+cursor=0;
+fell=false;
+string[] ms;
+get_characters();
+sound phone_fell_sound;
+phone_fell_sound.load("telefone2.ogg");
+send_reliable(peer_id, "playsocial telefonetirandogancho.ogg", 0);
+while(true)
+{
+mainloop();
+if(fell==true){
+phone_fell_sound.play_looped();
+}
+string char=get_characters();
+for (uint i=0; i<char.length(); i++) {
+string chars=char[i];
+if(chars!=""&&chars!="1"&&chars!="2"&&chars!="3"&&chars!="4"&&chars!="5"&&chars!="6"&&chars!="7"&&chars!="8"&&chars!="9"&&chars!="0"&&chars!="-"&&chars!="#"&&chars!="*"&&fell==false){
+fell=true;
+}
+else if(fell==false){
+if(chars=="1")
+p.play_stationary("1.ogg", false);
+if(chars=="2")
+p.play_stationary("2.ogg", false);
+if(chars=="3")
+p.play_stationary("3.ogg", false);
+if(chars=="4")
+p.play_stationary("4.ogg", false);
+if(chars=="5")
+p.play_stationary("5.ogg", false);
+if(chars=="6")
+p.play_stationary("6.ogg", false);
+if(chars=="7")
+p.play_stationary("7.ogg", false);
+if(chars=="8")
+p.play_stationary("8.ogg", false);
+if(chars=="9")
+p.play_stationary("9.ogg", false);
+if(chars=="0")
+p.play_stationary("0.ogg", false);
+if(chars=="*")
+p.play_stationary("asterisco.ogg", false);
+if(chars=="#")
+p.play_stationary("#.ogg", false);
+ms.insert_at(cursor,char);
+cursor+=1;
+}
+}
+if(key_pressed(KEY_ESCAPE))
+{
+send_reliable(peer_id, "playsocial telefonecolocandogancho.ogg", 0);
+return "";
+}
+else if(key_pressed(KEY_RETURN))
+{
+if (ms.length() > 0)
+{
+sound s;
+for (uint i=0; i<ms.length(); i++)
+{
+message+=ms[i];
+s.load(ms[i]+".ogg");
+s.play_wait();
+}
+return message;
+}
+else if (ms.length()==0)
+{
+send_reliable(peer_id, "playsocial telefonecolocandogancho.ogg", 0);
+return "";
+}
+}
+}
+return "";
+}
+}
+car@[] cars;
+class car{
+int x, y, ligado=0, sound_name;
+string map, char_name_nome;
+timer ignition_timer;
+car(int cx, int cy, string cmap, string cname){
+x=cx;
+y=cy;
+map=cmap;
+char_name_nome=cname;
+p.play_2d("carstart.ogg", me.x, me.y, me.x, me.y, false);
+}
+}
+void place_car(int x, int y, string map, string char_name_nome){
+car c(x, y, map, char_name_nome);
+cars.insert_last(c);
+}
+void car_loop(){
+for(uint i=0;i<cars.length();i++){
+if(cars[i].ignition_timer.elapsed>=900){
+cars[i].ignition_timer.force(0);
+cars[i].ignition_timer.pause();
+cars[i].sound_name=p.play_2d("car1.ogg", me.x, me.y, cars[i].x, cars[i].y, true);
+}
+}
+}
+quicksand@[] quicksands;
+class quicksand{
+int x, y, sound_name;
+string map_data;
+bool went=false;
+quicksand(int cx, int cy, string cmapa){
+x=cx;
+y=cy;
+map_data=cmapa;
+sound_name=p.play_2d("areia_movedissaloop.ogg", me.x, me.y, x, y, true);
+}
+}
+void place_quicksand(int x, int y, string map_data){
+quicksand c(x, y, map_data);
+quicksands.insert_last(c);
+}
+void destroy_quicksands(){
+for(uint i=0;i<quicksands.length();i++){
+p.destroy_sound(quicksands[i].sound_name);
+quicksands.remove_at(i);
+}
+}
+void quicksand_loop(){
+for(uint i=0;i<quicksands.length();i++){
+if(me.x==quicksands[i].x&&me.y==quicksands[i].y&&quicksands[i].map_data==mapname&&quicksands[i].went==false){
+sound s;
+moveable=false;
+s.load("morrendo_areia.ogg");
+send_reliable(peer_id, "draw morrendo_areia.ogg", 0);
+s.play_wait();
+while(s.playing){
+wait(5);
+mainloop();
+}
+send_reliable(peer_id, "died in the quicksand!", 0);
+quicksands[i].went=true;
+break;
+}
+}
+}
+computador@[] computadors;
+class computador{
+int x,y, sound_name;
+string id,map;
+int turned_on=0;
+computador(string mid, int mx, int my,string mm, int cligada){
+id=mid;
+x=mx;
+y=my;
+map=mm;
+turned_on=cligada;
+if(cligada==1&&mapname==map) sound_name=pcomputador.play_2d("desktop1.ogg", me.x, me.y, mx, my, true);
+}
+}
+void place_computer(string id, int x, int y,string map, int turned_on) {
+computador m1(id,x,y,map, turned_on);
+computadors.insert_last(m1);
+}
+void destroy_computers(){
+for(uint i=0;i<computadors.length();i++){
+pcomputador.destroy_sound(computadors[i].sound_name);
+computadors.remove_at(i);
+}
+}
+class maquinatempo
+{
+int x,y, sound_name;
+string id,map;
+int turned_on=0;
+timer turn_on_timer;
+sound turned_on_sound, sdesligada;
+maquinatempo(string mid, int mx, int my,string mm, int cligada)
+{
+id=mid;
+x=mx;
+y=my;
+map=mm;
+turned_on=cligada;
+}
+}
+maquinatempo@[] maquinatempos;
+void spawn_time_machine(string id, int x, int y,string map, int turned_on) {
+maquinatempo m1(id,x,y,map, turned_on);
+maquinatempos.insert_last(m1);
+if(turned_on==1&&mapname==map){
+maquinatempos[maquinatempos.length()-1].sound_name=pobjs.play_2d("geradorloop.ogg", me.x, me.y, x, y, true);
+}
+}
+void destroy_all_time_machines()
+{
+for(uint i=0; i<maquinatempos.length(); i++)
+{
+maquinatempos.resize(0);
+}
+pobjs.destroy_all();
+}
+void time_machine_loop(){
+for(uint i=0;i<maquinatempos.length();i++){
+if(maquinatempos[i].turn_on_timer.elapsed>=3900&&maquinatempos[i].turned_on==1&&maquinatempos[i].map==mapname){
+maquinatempos[i].turn_on_timer.force(0);
+maquinatempos[i].turn_on_timer.pause();
+maquinatempos[i].sound_name=pobjs.play_2d("geradorloop.ogg", me.x, me.y, maquinatempos[i].x, maquinatempos[i].y, true);
+}
+}
+}

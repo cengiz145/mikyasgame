@@ -1,0 +1,916 @@
+class jogoparouimpar{
+int coins, amount_value;
+string choice_type;;
+sound s, ambience;
+void finish_fim(){
+s.close();
+ambience.close();
+}
+void throw_item(){
+if(ausente)return;
+if(inv_item_number("coins")<500) return;
+add_add_item("variado", pu.get_value("Even or odd!"));
+ambience.load("musica14.ogg");
+ambience.volume=-20;
+ambience.play_looped();
+while(true){
+mainloop();
+if(ausente){
+finish_fim();
+break;
+}
+coins=inv_item_number("coins");
+if(coins<=0){
+p.play_stationary("notify_died.ogg", false);
+send_reliable(0, "draw notify_died.ogg", 0);
+finish_fim();
+break;
+}
+if(key_pressed(KEY_ESCAPE)){
+p.play_stationary("menuvolta.ogg", false);
+finish_fim();
+break;
+}
+if(key_pressed(KEY_H)){
+add_add_item("variado", pu.get_value("To choose the amount of coins that you wish to bet, press 1, type the amount and confirm with enter."));
+}
+if(key_pressed(KEY_C)) add_add_item("variado", pu.get_value("You have")+" "+coins+" "+pu.get_value("Coins to bet"));
+if(key_pressed(KEY_1)){
+string how_much=v.input("How many coins do you wish to bet ?");
+amount_value=string_to_number(how_much);
+if(amount_value>coins){
+add_add_item("variado", pu.get_value("You don't have")+" "+amount_value+" "+pu.get_value("Coins to bet"));
+amount_value=0;
+}
+if(amount_value<500||amount_value>1000){
+add_add_item("variado", pu.get_value("The bet value must be between 500 to 1000."));
+amount_value=0;
+}
+}
+if(key_pressed(KEY_2)){
+setupmenu();
+m.add_item_tts(pu.get_value("Par"), "Par");
+m.add_item_tts(pu.get_value("Odd"), "Odd");
+m.add_item_tts(pu.get_value("Go Back"), "voltar");
+int menu_result=m.run(pu.get_value("Choose the type of number you want to bet."), true);
+if(m.get_item_name(menu_result)!="voltar") choice_type=m.get_item_name(menu_result);
+}
+if(key_pressed(KEY_RETURN))
+{
+if(amount_value<500||amount_value>1000 || choice_type=="") add_add_item("variado", pu.get_value("You must set the amount and choose the type of number you will bet!"));
+else
+{
+add_add_item("variado", pu.get_value("Randomizing the numbers from 1 to 10..."));
+s.close();
+s.load("dado1.ogg");
+s.play();
+send_reliable(0, "draw dado1.ogg", 0);
+while(s.playing)
+{
+wait(5);
+mainloop();
+}
+int result_value=random(1, 10);
+if(result_value==1||result_value==3||result_value==5||result_value==7||result_value==9)
+{
+if(choice_type=="Odd")
+{
+add_add_item("variado", pu.get_value("Nice, the number is odd!"));
+send_reliable(0, "acoins "+amount_value, 2);
+choice_type="";
+finish_fim();
+break;
+}
+else if(choice_type=="Par")
+{
+add_add_item("variado", pu.get_value("The number is odd, I won!"));
+send_reliable(0, "acoins -"+amount_value, 2);
+choice_type="";
+finish_fim();
+break;
+}
+}
+else if(result_value==2||result_value==4||result_value==6||result_value==8||result_value==10)
+{
+if(choice_type=="Par")
+{
+add_add_item("variado", pu.get_value("Nice, the number is even!"));
+send_reliable(0, "acoins "+amount_value, 2);
+choice_type="";
+finish_fim();
+break;
+}
+else if(choice_type=="Odd")
+{
+add_add_item("variado", pu.get_value("The number is even, I won!"));
+send_reliable(0, "acoins -"+amount_value, 2);
+choice_type="";
+finish_fim();
+break;
+}
+}
+}
+}
+}// end of the while
+}// End of the void
+}
+class dadodasorte{
+int chances=0, coins, amount_value, nescolhido;
+sound s, ambience;
+void finish_fim(){
+s.close();
+ambience.close();
+}
+void throw_item(){
+if(inv_item_number("coins")<500) return;
+add_add_item("variado", pu.get_value("Wellcome to the lucky dice!"));
+nescolhido=random(1, 6);
+add_add_item("variado", pu.get_value("The number you will have to get is:")+" "+nescolhido);
+chances=2;
+ambience.load("musica14.ogg");
+ambience.volume=-20;
+ambience.play_looped();
+while(true){
+mainloop();
+if(ausente){
+finish_fim();
+break;
+}
+coins=inv_item_number("coins");
+if(coins<=0){
+p.play_stationary("notify_died.ogg", false);
+send_reliable(0, "draw notify_died.ogg", 0);
+finish_fim();
+break;
+}
+if(key_pressed(KEY_ESCAPE)){
+p.play_stationary("menuvolta.ogg", false);
+finish_fim();
+break;
+}
+if(key_pressed(KEY_H)){
+add_add_item("variado", pu.get_value("To choose the amount of coins that you wish to bet, press 1, type the amount and confirm with enter."));
+}
+if(key_pressed(KEY_C)) add_add_item("variado", pu.get_value("You have")+" "+coins+" "+pu.get_value("Coins to bet"));
+if(key_pressed(KEY_1)){
+string how_much=v.input("How many coins do you wish to bet ?");
+amount_value=string_to_number(how_much);
+if(amount_value>coins){
+add_add_item("variado", pu.get_value("You don't have")+" "+amount_value+" "+pu.get_value("Coins to bet"));
+amount_value=0;
+}
+if(amount_value<500||amount_value>1000){
+add_add_item("variado", pu.get_value("The bet value must be between 500 to 1000."));
+amount_value=0;
+}
+}
+if(key_pressed(KEY_RETURN)){
+if(amount_value<500||amount_value>1000) add_add_item("variado", pu.get_value("You must choose the value that you wish to bet."));
+else{
+add_add_item("variado", pu.get_value("Launching the dices..."));
+s.close();
+s.load("dado1.ogg");
+s.play();
+send_reliable(0, "draw dado1.ogg", 0);
+while(s.playing){
+wait(5);
+mainloop();
+}
+int result_value=random(1, 6);
+add_add_item("variado", pu.get_value(result_value));
+if(result_value==nescolhido)
+{
+s.close();
+s.load("dado2.ogg");
+s.play();
+add_add_item("variado", pu.get_value("Good! You're right!"));
+send_reliable(0, "acoins "+amount_value, 2);
+p.play_stationary("menuvolta.ogg", false);
+wait(200);
+finish_fim();
+break;
+}
+else if(result_value!=nescolhido){
+s.close();
+s.load("dado2.ogg");
+s.play();
+add_add_item("variado", pu.get_value("you missed"));
+if(chances>0){
+add_add_item("variado", pu.get_value("You have other chance"));
+chances-=1;
+}
+else if(chances<=0){
+add_add_item("variado", pu.get_value("You don't have other chance"));
+send_reliable(0, "acoins -"+amount_value, 2);
+amount_value=0;
+p.play_stationary("menuvolta.ogg", false);
+wait(200);
+finish_fim();
+break;
+}
+}
+
+}
+}
+}// end of the while
+}// End of the void
+}
+class jogoroletadasorte{
+int coins, amount_value;
+string bet_animal;
+sound s, ambience;
+void finish_fim(){
+s.close();
+ambience.close();
+//animais.resize(0);
+}
+void throw_item(){
+if(inv_item_number("coins")<1000) return;
+string[] animais2;
+string[] animals(51);
+animais2.insert_last("cachorro");
+animais2.insert_last("gato");
+animais2.insert_last("peacock");
+animais2.insert_last("pomba");
+animais2.insert_last("peixe");
+animais2.insert_last("ganso");
+animais2.insert_last("papagaio");
+animais2.insert_last("ovelha");
+animais2.insert_last("Hawk");
+animais2.insert_last("gaivota");
+animais2.insert_last("baleia");
+animais2.insert_last("cavalo");
+animais2.insert_last("Leon");
+animais2.insert_last("tigre");
+animais2.insert_last("onsa");
+animais2.insert_last("vulture");
+animais2.insert_last("alligator");
+animals[0]="cachorro";
+animals[1]="cachorro";
+animals[2]="cachorro";
+animals[3]="gato";
+animals[4]="gato";
+animals[5]="gato";
+animals[6]="peacock";
+animals[7]="peacock";
+animals[8]="peacock";
+animals[9]="pomba";
+animals[10]="pomba";
+animals[11]="pomba";
+animals[12]="peixe";
+animals[13]="peixe";
+animals[14]="peixe";
+animals[15]="ganso";
+animals[16]="ganso";
+animals[17]="ganso";
+animals[18]="papagaio";
+animals[19]="papagaio";
+animals[20]="papagaio";
+animals[21]="ovelha";
+animals[22]="ovelha";
+animals[23]="ovelha";
+animals[24]="Hawk";
+animals[25]="Hawk";
+animals[26]="Hawk";
+animals[27]="gaivota";
+animals[28]="gaivota";
+animals[29]="gaivota";
+animals[30]="baleia";
+animals[31]="baleia";
+animals[32]="baleia";
+animals[33]="cavalo";
+animals[34]="cavalo";
+animals[35]="cavalo";
+animals[36]="Leon";
+animals[37]="Leon";
+animals[38]="Leon";
+animals[39]="tigre";
+animals[40]="tigre";
+animals[41]="tigre";
+animals[42]="onsa";
+animals[43]="onsa";
+animals[44]="onsa";
+animals[45]="vulture";
+animals[46]="vulture";
+animals[47]="vulture";
+animals[48]="alligator";
+animals[49]="alligator";
+animals[50]="alligator";
+add_add_item("variado", pu.get_value("Welcome to the game of animals! Bet, spin the roulette And trust in the luck!"));
+ambience.load("musica14.ogg");
+ambience.volume=-20;
+ambience.play_looped();
+while(true){
+mainloop();
+if(ausente){
+finish_fim();
+break;
+}
+coins=inv_item_number("coins");
+if(coins<=0){
+p.play_stationary("notify_died.ogg", false);
+send_reliable(0, "draw notify_died.ogg", 0);
+finish_fim();
+break;
+}
+if(key_pressed(KEY_ESCAPE)){
+p.play_stationary("menuvolta.ogg", false);
+finish_fim();
+break;
+}
+if(key_pressed(KEY_H)){
+add_add_item("variado", pu.get_value("To set the amount of coins you want to bet, press 1, enter the value and press enter. To choose the animal that you will play, press 2, choose with the arrows the animal and press enter."));
+}
+if(key_pressed(KEY_C)) add_add_item("variado", pu.get_value("You have")+" "+coins+" "+pu.get_value("Coins to bet"));
+if(key_pressed(KEY_1)){
+string how_much=v.input("How many coins do you wish to bet ?");
+amount_value=string_to_number(how_much);
+if(amount_value>coins){
+add_add_item("variado", pu.get_value("You don't have")+" "+amount_value+" "+pu.get_value("Coins to bet"));
+amount_value=0;
+}
+if(amount_value<1000||amount_value>5000){
+add_add_item("variado", pu.get_value("The minimum bet must be between 1000 and maximum of 5000"));
+amount_value=0;
+}
+}
+if(key_pressed(KEY_2)){
+setupmenu();
+for(uint i=0;i<animais2.length();i++){
+m.add_item_tts(pu.get_value(animais2[i]), animais2[i]);
+}
+m.add_item_tts(pu.get_value("Go Back"), "voltar");
+int menu_result=m.run(pu.get_value("Choose the animal that you want to bet."), true);
+if(m.get_item_name(menu_result)!="voltar") bet_animal=m.get_item_name(menu_result);
+}
+if(key_pressed(KEY_RETURN)){
+if(bet_animal=="" || amount_value<1000||amount_value>5000) add_add_item("variado", pu.get_value("You must choose an animal and set the amount you will bet!"));
+else{
+add_add_item("variado", pu.get_value("Girando a roleta..."));
+s.close();
+s.load("roleta.ogg");
+s.play();
+send_reliable(0, "draw roleta.ogg", 0);
+while(s.playing){
+wait(5);
+mainloop();
+}
+int result_value=random(0, animals.length()-1);
+add_add_item("variado", pu.get_value(animals[result_value]));
+if(animals[result_value]==bet_animal)
+{
+s.close();
+s.load("acerto1.ogg");
+s.play();
+add_add_item("variado", pu.get_value("Good! You're right!"));
+send_reliable(0, "acoins "+amount_value, 2);
+}
+else if(animals[result_value]!=bet_animal){
+s.close();
+s.load("errou.ogg");
+s.play();
+send_reliable(0, "acoins -"+amount_value, 2);
+}
+bet_animal="";
+amount_value=0;
+}
+}
+}// end of the while
+}// End of the void
+}
+class jogopoker{
+int num1,num2, amount_value=0, coins;
+bool at=true;
+sound s;
+void throw_item(){
+s.load("musica11.ogg");
+s.play_looped();
+add_add_item("variado", pu.get_value("Choose 1 for stone, 2 for paper, 3 for scissors or ESC to exit. Space to define the amount that you will bet, between 100 and 1000 coins."));
+while(true){
+wait(5);
+mainloop();
+if(ausente){
+break;
+}
+coins=inv_item_number("coins");
+if(at==true){
+num2=random(1,3);
+at=false;
+}
+if(key_pressed(KEY_ESCAPE)){
+s.close();
+p.play_stationary("menuvolta.ogg", false);
+break;
+}
+if(key_pressed(KEY_SPACE)&&amount_value<=0){
+string how_much=v.input(pu.get_value("How many coins do you wish to bet ?"));
+amount_value=string_to_number(how_much);
+if(amount_value<100||amount_value>1000){
+add_add_item("variado", pu.get_value("The bet values must be between")+" 100 "+pu.get_value("to")+" 1000.");
+amount_value=0;
+}
+if(amount_value>coins){
+add_add_item("variado", pu.get_value("You don't have")+" "+amount_value+" "+pu.get_value("Coins to bet"));
+amount_value=0;
+}
+}
+if(key_pressed(KEY_1)&&amount_value>0){
+num1=1;
+check();
+}
+else if(key_pressed(KEY_2)&&amount_value>0){
+num1=2;
+check();
+}
+else if(key_pressed(KEY_3)&&amount_value>0){
+num1=3;
+check();
+}
+}
+}
+void check(){
+if(num1==1&&num2==1)
+{
+add_add_item("variado", pu.get_value("wow!, stone with stone, we have a draw!"));
+}
+else if(num1==2&&num2==2)
+{
+add_add_item("variado", pu.get_value("wow papper and paper, we have a draw"));
+}
+else if(num1==3&&num2==3)
+{
+add_add_item("variado", pu.get_value("wow Scissors and scissors! we have a draw"));
+}
+else
+{
+if(num1==1)
+{
+if(num2==2)
+{
+add_add_item("variado", pu.get_value("Yeah! Paper wraps stone! I won! you are nothing!"));
+send_reliable(0, "acoins -"+amount_value, 2);
+}
+else if(num2==3)
+{
+add_add_item("variado", pu.get_value("Oops, stone breaks scissors, congratulations, you won!"));
+send_reliable(0, "acoins "+amount_value, 0);
+}
+}
+if(num1==2)
+{
+if(num2==1)
+{
+add_add_item("variado", pu.get_value("ops papel embuelbe a la piedra, ustéd gano mui bien!"));
+send_reliable(0, "acoins "+amount_value, 2);
+}
+else if(num2==3)
+{
+add_add_item("variado", pu.get_value("Yeah! scissors cut paper! I won, you're a looser!"));
+send_reliable(0, "acoins -"+amount_value, 2);
+}
+}
+else if(num1==3)
+{
+if(num2==1)
+{
+add_add_item("variado", pu.get_value("Yeah, stone brokes the scissors, i won You're a looser."));
+send_reliable(0, "acoins -"+amount_value, 2);
+}
+else if(num2==2)
+{
+add_add_item("variado", pu.get_value("oops! Scissors cut paper, congratulations, you won!"));
+send_reliable(0, "acoins "+amount_value, 2);
+}
+}
+}
+at=true;
+}
+}
+class jogofarkle{
+bool started=false, turno1=false, vaijogar=false;// Not started yet, no turn has happened and nobody is going to play
+int your_dice=0, dadocomputador=0, quemjoga=0, ganhou=0;// Your die, the machine's die, whose turn it is and who won, all at zero.
+int amount_value=0, coins;
+sound ambience;
+void finish_fim(){
+ambience.close();
+}
+void throw_item(){
+sound d1, d2, d3;
+d1.load("dado1.ogg");
+d2.load("dado2.ogg");
+d3.load("dado3.ogg");
+ambience.load("musica12.ogg");
+ambience.volume=-15;
+ambience.play_looped();
+while(true){
+wait(5);
+mainloop();
+if(ausente){
+finish_fim();
+break;
+}
+coins=inv_item_number("coins");
+if(coins<=0){
+p.play_stationary("notify_died.ogg", false);
+send_reliable(0, "draw notify_died.ogg", 0);
+finish_fim();
+break;
+}
+if(key_pressed(KEY_ESCAPE)){
+finish_fim();
+p.play_stationary("menuvolta.ogg", false);
+break;
+}
+if(key_pressed(KEY_1)){
+string how_much=v.input("How many coins do you wish to bet ?");
+amount_value=string_to_number(how_much);
+if(amount_value>coins){
+add_add_item("variado", pu.get_value("You don't have")+" "+amount_value+" "+pu.get_value("Coins to bet"));
+amount_value=0;
+}
+if(amount_value<1000||amount_value>5000){
+add_add_item("variado", pu.get_value("The bet values must be between")+" 1000 "+pu.get_value("to")+" 5000.");
+amount_value=0;
+}
+}
+if(key_pressed(KEY_RETURN)){
+if(amount_value<=0)add_add_item("variado", pu.get_value("Set the amount you will bet first!"));
+else{
+if(!started){// If it has not been played yet
+add_add_item("variado", pu.get_value("Dice Game. Play me and see if you're strong enough to win this battle!"));
+started=true;// mark the game as started.
+}
+}
+}
+if(started&&!turno1){
+turno1=true;
+add_add_item("variado", pu.get_value("Attention! It's time to decide who will start ..."));
+wait(2000);
+p.play_stationary("dado3.ogg", false);
+wait(300);
+p.play_stationary("dado3.ogg", false);
+wait(100);
+p.play_stationary("dado3.ogg", false);
+int a=random(1, 2);
+if(a==1){
+add_add_item("variado", pu.get_value("You start."));
+quemjoga=1;
+}
+else if(a==2){
+add_add_item("variado", pu.get_value("I will start!"));
+quemjoga=2;
+}
+vaijogar=true;
+}
+if(vaijogar==true){
+if(quemjoga==1){
+add_add_item("variado", pu.get_value("It's your turn"));
+while(true){
+wait(5);
+if(ausente){
+finish_fim();
+break;
+}
+coins=inv_item_number("coins");
+mainloop();
+if(coins<=0){
+p.play_stationary("notify_died.ogg", false);
+send_reliable(0, "draw notify_died.ogg", 0);
+finish_fim();
+break;
+}
+if(key_pressed(KEY_ESCAPE)){
+finish_fim();
+p.play_stationary("menuvolta.ogg", false);
+return;
+}
+if(key_pressed(KEY_RETURN)&&ganhou<=0){
+int a=random(1, 6);
+send_reliable(0, "draw dado1.ogg", 0);
+d1.play_wait();
+d2.play();
+add_add_item("variado", pu.get_value("You release the dice and it is on")+" "+a+". "+pu.get_value("Anda")+" "+a+".");
+wait(1000);
+for(uint i=0;i<a;i++){
+d3.play_wait();
+wait(300);
+}
+your_dice+=a;
+if(your_dice>50)your_dice=50;
+add_add_item("variado", pu.get_value("You're in")+" "+your_dice+".");
+if(your_dice==50){
+send_reliable(0, "acoins "+amount_value, 2);
+add_add_item("variado", pu.get_value("You won the game!!!"));
+ganhou=1;
+}
+quemjoga=2;
+break;
+}
+}
+if(ganhou>0){
+finish_fim();
+break;
+}
+}
+if(quemjoga==2&&ganhou<=0){
+add_add_item("variado", pu.get_value("Minha vez..."));
+wait(1000);
+int a=random(1, 6);
+send_reliable(0, "draw dado1.ogg", 0);
+d1.play_wait();
+d2.play();
+add_add_item("variado", pu.get_value("I released the dice, and it is")+" "+a+". "+pu.get_value("Ando")+" "+a+".");
+for(uint i=0;i<a;i++){
+d3.play_wait();
+wait(300);
+}
+dadocomputador+=a;
+if(dadocomputador>50)dadocomputador=50;
+add_add_item("variado", pu.get_value("I am in")+" "+dadocomputador+".");
+if(dadocomputador==50){
+send_reliable(0, "acoins -"+amount_value, 2);
+add_add_item("variado", pu.get_value("I won one more time ... Like I said, you're nothing!"));
+ganhou=2;
+}
+quemjoga=1;
+}
+if(ganhou>0){
+finish_fim();
+break;
+}
+}
+}
+}
+}
+class jogoblackjack{
+string[] cartas;// Card array
+int your_points=0, pontoscomputador=0, quemjoga=0, ganhou=0, amount_value=0;// Variables at zero because nothing has started
+int you_stopped=0, pparou=0;// You and the computer have not stopped playing.
+int coins;// coins
+bool started=false, parou=false;// Not started and not stopped
+sound card;// Card sound
+sound ambience;
+void finish_fim(){
+cartas.resize(0);
+card.close();
+ambience.close();
+started=false;parou=false;
+your_points=0; pontoscomputador=0; quemjoga=0; ganhou=0; amount_value=0;
+you_stopped=0; pparou=0;
+garbage_collect();
+}
+void throw_item(){
+card.load("pegar_carta.ogg");
+ambience.load("musica15.ogg");
+ambience.volume=-20;
+ambience.play_looped();
+add_add_item("variado", pu.get_value("Black jack game, or 21."));
+while(true){
+mainloop();
+if(ausente){
+finish_fim();
+break;
+}
+coins=inv_item_number("coins");
+if(coins<=0){
+p.play_stationary("notify_died.ogg", false);
+send_reliable(0, "draw notify_died.ogg", 0);
+finish_fim();
+break;
+}
+if(key_pressed(KEY_ESCAPE)){
+p.play_stationary("menuvolta.ogg", false);
+finish_fim();
+break;
+}
+if(started==false&&amount_value>0){
+wait(1500);
+// Clear the array
+cartas.resize(0);
+// Start adding cards
+cartas.insert_last("ace of diamonds");
+cartas.insert_last("2 of diamonds");
+cartas.insert_last("3 of diamonds");
+cartas.insert_last("4 of diamonds");
+cartas.insert_last("5 of diamonds");
+cartas.insert_last("6 of diamonds");
+cartas.insert_last("7 of diamonds");
+cartas.insert_last("8 of diamonds");
+cartas.insert_last("9 of diamonds");
+cartas.insert_last("10 of diamonds");
+cartas.insert_last("jack of diamonds");
+cartas.insert_last("queen of diamonds");
+cartas.insert_last("king of diamonds");
+cartas.insert_last("ace of spades");
+cartas.insert_last("2 of spades");
+cartas.insert_last("3 of spades");
+cartas.insert_last("4 of spades");
+cartas.insert_last("5 of spades");
+cartas.insert_last("6 of spades");
+cartas.insert_last("7 of spades");
+cartas.insert_last("8 of spades");
+cartas.insert_last("9 of spades");
+cartas.insert_last("10 of spades");
+cartas.insert_last("jack of spades");
+cartas.insert_last("queen of spades");
+cartas.insert_last("king of spades");
+cartas.insert_last("ace of clubs");
+cartas.insert_last("2 of clubs");
+cartas.insert_last("3 of clubs");
+cartas.insert_last("4 of clubs");
+cartas.insert_last("5 of clubs");
+cartas.insert_last("6 of clubs");
+cartas.insert_last("7 of clubs");
+cartas.insert_last("8 of clubs");
+cartas.insert_last("9 of clubs");
+cartas.insert_last("10 of clubs");
+cartas.insert_last("jack of clubs");
+cartas.insert_last("queen of clubs");
+cartas.insert_last("king of clubs");
+cartas.insert_last("ace of hearts");
+cartas.insert_last("2 of hearts");
+cartas.insert_last("3 of hearts");
+cartas.insert_last("4 of hearts");
+cartas.insert_last("5 of hearts");
+cartas.insert_last("6 of hearts");
+cartas.insert_last("7 of hearts");
+cartas.insert_last("8 of hearts");
+cartas.insert_last("9 of hearts");
+cartas.insert_last("10 of hearts");
+cartas.insert_last("jack of hearts");
+cartas.insert_last("queen of hearts");
+cartas.insert_last("king of hearts");
+// End of adding cards
+add_add_item("variado", pu.get_value("Let's sort out who will start playing ..."));
+add_add_item("variado", pu.get_value("For this, we will use a six-sided die. Four down, I start. If you fall into four or more, who starts is you."));
+wait(500);
+p.play_stationary("dado1.ogg", false);
+int a=random(1, 6);
+if(a<=4){
+add_add_item("variado", pu.get_value("And it's me who starts! I already started well ..."));
+quemjoga=1;// Computer playing
+}
+else{
+add_add_item("variado", pu.get_value("And who starts is you, very good ..."));
+quemjoga=2;// You playing
+}
+started=true;// The match has started
+}
+if(key_pressed(KEY_1)&&amount_value<=0){
+string how_much=v.input("How many coins do you wish to bet ?");
+amount_value=string_to_number(how_much);
+if(amount_value>coins){
+add_add_item("variado", pu.get_value("You don't have")+" "+amount_value+" "+pu.get_value("Coins to bet"));
+amount_value=0;
+}
+if(amount_value<5000||amount_value>20000){
+add_add_item("variado", pu.get_value("The bid values must be between 5000 and 20000"));
+amount_value=0;
+}
+}
+if(key_pressed(KEY_RETURN)&&ganhou>0||key_pressed(KEY_RETURN)&&parou){
+ganhou=0;
+quemjoga=0;
+your_points=0;
+pontoscomputador=0;
+started=false;
+parou=false;
+you_stopped=0; pparou=0;
+amount_value=0;
+}
+if(key_pressed(KEY_H)){
+add_add_item("variado", pu.get_value("To set the amount of coins to bet press 1. To know what's your and the computer scores, press 2. To stop with the score you already have, press down arrow. To buy a card, press space. To restart the game when someone wins, press Enter. to exit, use ESCAPE."));
+}
+if(key_pressed(KEY_2))add_add_item("variado", pu.get_value("Your score:")+" "+your_points+". "+pu.get_value("Computer's score:")+" "+pontoscomputador+".");
+if(key_pressed(KEY_DOWN)&&you_stopped==0&&ganhou==0){
+if(your_points<18){
+add_add_item("variado", pu.get_value("No, you can not stop with that amount of points..."));
+}
+else if(your_points>=18){
+add_add_item("variado", pu.get_value("You decided to stop!"));
+you_stopped=1;
+}
+}
+if(key_pressed(KEY_1)){
+string how_much=v.input("How many coins do you wish to bet ?");
+amount_value=string_to_number(how_much);
+if(amount_value>coins){
+add_add_item("variado", pu.get_value("You don't have")+" "+amount_value+" "+pu.get_value("Coins to bet"));
+amount_value=0;
+}
+if(amount_value<2000||amount_value>10000){
+add_add_item("variado", pu.get_value("The bet values must be between")+" 2000 "+pu.get_value("to")+" 10000.");
+amount_value=0;
+}
+}
+if(key_pressed(KEY_SPACE)&&ganhou==0&&you_stopped==0&&quemjoga==2){
+if(amount_value<=0)add_add_item("variado", pu.get_value("Set the amount you will bet first!"));
+else{
+card.play();// Card sound playing.
+send_reliable(0, "draw pegar_carta.ogg", 0);
+int c=random(0, cartas.length()-1);
+add_add_item("variado", pu.get_value("You got.")+" "+pu.get_value(cartas[c])+".");
+if(string_contains(string_to_lower_case(cartas[c]),"ace",1)>-1)your_points+=1;
+if(string_contains(string_to_lower_case(cartas[c]),"valete",1)>-1)your_points+=10;
+if(string_contains(string_to_lower_case(cartas[c]),"dama",1)>-1)your_points+=10;
+if(string_contains(string_to_lower_case(cartas[c]),"rei",1)>-1)your_points+=10;
+if(string_contains(string_to_lower_case(cartas[c]),"10",1)>-1)your_points+=10;
+if(string_contains(string_to_lower_case(cartas[c]),"9",1)>-1)your_points+=9;
+if(string_contains(string_to_lower_case(cartas[c]),"8",1)>-1)your_points+=8;
+if(string_contains(string_to_lower_case(cartas[c]),"7",1)>-1)your_points+=7;
+if(string_contains(string_to_lower_case(cartas[c]),"6",1)>-1)your_points+=6;
+if(string_contains(string_to_lower_case(cartas[c]),"5",1)>-1)your_points+=5;
+if(string_contains(string_to_lower_case(cartas[c]),"4",1)>-1)your_points+=4;
+if(string_contains(string_to_lower_case(cartas[c]),"3",1)>-1)your_points+=3;
+if(string_contains(string_to_lower_case(cartas[c]),"2",1)>-1)your_points+=2;
+add_add_item("variado", pu.get_value("Now you have")+" "+your_points+""+pu.get_value("pontos."));
+cartas.remove_at(c);
+if(your_points==21){
+add_add_item("variado", pu.get_value("You win!"));
+send_reliable(0, "acoins "+amount_value, 2);
+ganhou=2;
+quemjoga=0;
+}
+if(your_points>21){
+add_add_item("variado", pu.get_value("You extorted the points, I won."));
+send_reliable(0, "acoins -"+amount_value, 2);
+ganhou=1;
+quemjoga=0;
+}
+else{
+if(pparou==1)quemjoga=2;
+else quemjoga=1;
+}
+}
+}// End of the space key
+if(ganhou==0&&quemjoga==1&&pparou==0||you_stopped==1&&quemjoga>0&&pparou==0){// Nobody won and it is the computer's turn
+add_add_item("variado", pu.get_value("Minha vez:"));
+wait(1800);
+card.play();// Card sound playing.
+send_reliable(0, "draw pegar_carta.ogg", 0);
+int c=random(0, cartas.length()-1);
+add_add_item("variado", pu.get_value("Eu tirei")+" "+pu.get_value(cartas[c])+".");
+if(string_contains(string_to_lower_case(cartas[c]),"ace",1)>-1)pontoscomputador+=1;
+if(string_contains(string_to_lower_case(cartas[c]),"valete",1)>-1)pontoscomputador+=10;
+if(string_contains(string_to_lower_case(cartas[c]),"dama",1)>-1)pontoscomputador+=10;
+if(string_contains(string_to_lower_case(cartas[c]),"rei",1)>-1)pontoscomputador+=10;
+if(string_contains(string_to_lower_case(cartas[c]),"10",1)>-1)pontoscomputador+=10;
+if(string_contains(string_to_lower_case(cartas[c]),"9",1)>-1)pontoscomputador+=9;
+if(string_contains(string_to_lower_case(cartas[c]),"8",1)>-1)pontoscomputador+=8;
+if(string_contains(string_to_lower_case(cartas[c]),"7",1)>-1)pontoscomputador+=7;
+if(string_contains(string_to_lower_case(cartas[c]),"6",1)>-1)pontoscomputador+=6;
+if(string_contains(string_to_lower_case(cartas[c]),"5",1)>-1)pontoscomputador+=5;
+if(string_contains(string_to_lower_case(cartas[c]),"4",1)>-1)pontoscomputador+=4;
+if(string_contains(string_to_lower_case(cartas[c]),"3",1)>-1)pontoscomputador+=3;
+if(string_contains(string_to_lower_case(cartas[c]),"2",1)>-1)pontoscomputador+=2;
+add_add_item("variado", pu.get_value("Eu tenho agora")+" "+pontoscomputador+" "+pu.get_value("pontos."));
+cartas.remove_at(c);
+if(pontoscomputador==21){
+add_add_item("variado", pu.get_value("Eu ganhei!!!"));
+send_reliable(0, "acoins -"+amount_value, 2);
+ganhou=1;
+quemjoga=0;
+}
+if(pontoscomputador>21){
+add_add_item("variado", pu.get_value("I extorted the points, you won."));
+send_reliable(0, "acoins "+amount_value, 2);
+ganhou=2;
+quemjoga=0;
+}
+else{
+if(pontoscomputador>=18&&quemjoga>0){
+int stop_action=random(1, 6);
+if(stop_action<=3){
+add_add_item("variado", pu.get_value("Eu decidi parar!"));
+pparou=1;
+ganhou=0;
+}
+}
+if(you_stopped==0&&ganhou==0||pparou==1&&ganhou==0)quemjoga=2;
+else if(you_stopped==1&&ganhou==0||pparou==0&&ganhou==0)quemjoga=1;
+//else if(vparou==1&&ganhou==0)quemjoga=1;
+}
+if(ganhou==0&&quemjoga==2&&you_stopped==0)add_add_item("variado", pu.get_value("It's your turn"));
+}// End of ganhou
+if(you_stopped==1&&pparou==1&&ganhou==0&&parou==false){
+add_add_item("variado", pu.get_value("Uh-oh, we decided to stop!"));
+wait(1000);
+parou=true;
+if(your_points>pontoscomputador){
+add_add_item("variado", pu.get_value("You got the upper hand and won!"));
+ganhou=2;
+quemjoga=0;
+}
+else if(pontoscomputador>your_points){
+add_add_item("variado", pu.get_value("Eu levei a melhor, e ganhei!"));
+}
+else{
+add_add_item("variado", pu.get_value("It's a tie! Nobody won..."));
+ganhou=3;
+quemjoga=0;
+}
+}
+}// End of the while
+// end of the jogar void
+}// End of the class
+}

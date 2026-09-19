@@ -1,0 +1,5 @@
+#include "Localizar IP.nvgt"
+localizarip ip;
+void main(){
+alert(ip.locate_ip("189.127.230.217"), "");
+}

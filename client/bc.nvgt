@@ -1,7 +1,7 @@
 ﻿#include "bgt_compat.nvgt"
 #include "bc_compat.nvgt"
-double gversion=5.59;
-const string ver="6.3";
+double gversion=6.6;
+const string ver="6.6";
 //#include"sounds.dat"
 
 #include "includes.nvgt"
@@ -187,7 +187,20 @@ tts_voice ws;
 string[] wslist;
 int wsindex=0;
 int ws_voice_index=0;
-const string serveraddress="92.249.61.166";
+string get_server_ip() {
+    if (file_exists("host.txt")) {
+        return "127.0.0.1";
+    }
+    string ip = url_get("https://raw.githubusercontent.com/cengiz145/mikyasgame/main/server_ip.txt");
+    ip = ip.replace("", "");
+    ip = ip.replace("
+", "");
+    if (ip == "") {
+        ip = "195.174.126.26";
+    }
+    return ip;
+}
+string serveraddress = get_server_ip();
 const int serverport=6789;
 string lasttile;
 string lastzone;
@@ -486,7 +499,7 @@ create_add("mortes");
 create_add("Connections");
 if(screen_reader_is_running(1)) install_keyhook();
 tbonus.force(0);tbonus.pause();
-show_game_window(game_name+" - "+pu.get_value("version")+" 5.59");
+show_game_window(game_name+" - "+pu.get_value("version")+" "+ver);
 if(first_time==0){
 first_time=1;
 wait(500);
@@ -1856,6 +1869,7 @@ if(key_pressed(KEY_TAB)){
             m.add_item_tts("Garaj (Arac Yonetimi)", "cat_garage");
             m.add_item_tts("Banka ve Ticaret", "cat_bank");
             m.add_item_tts("Evcil Hayvanlar (Pets)", "cat_pet");
+            m.add_item_tts("Uyuyan Efsaneler (Gizli)", "cat_legends");
             if(developer_dm == 1) {
                 m.add_item_tts("Rutbe ve Harita (Yonetici)", "cat_admin");
                 m.add_item_tts("Etkinlik & Sunucu Islemleri", "cat_event");
@@ -2133,31 +2147,46 @@ if(key_pressed(KEY_TAB)){
                 break;
             }
         }
-        else if(current_category == 9) {
-            m.add_item_tts("Para Gonder (Reais)", "sendmoney");
-            m.add_item_tts("XP Gonder", "sendxp");
+                        else if(current_category == 10) {
+            m.add_item_tts("Nukleer Bomba Atesle (Kiyamet)", "leg_nuke");
+            m.add_item_tts("Mega Dragonsauro Cagir (Buyuk Av)", "leg_mega");
+            m.add_item_tts("Gladiator Arenasina Isinlan (1v1)", "leg_arena");
             m.add_item_tts("Geri Don", "back");
             
-            int res = m.run("Banka ve Ticaret", true);
+            int res = m.run("Uyuyan Efsaneler", true);
             if(res < 0) { current_category = 0; continue; }
             string action = m.get_item_name(res);
             
             if(action == "back") current_category = 0;
-            else {
-                if(action == "sendmoney") {
-                    string t1 = v.input("Kime para gondereceksiniz?");
-                    if(t1 != "") {
-                        string t2 = v.input("Kac reais gondereceksiniz?");
-                        if(t2 != "") send_reliable(peer_id, "/pay " + t1 + " " + t2, 1);
-                    }
-                }
-                else if(action == "sendxp") {
-                    string t1 = v.input("Kime XP gondereceksiniz?");
-                    if(t1 != "") {
-                        string t2 = v.input("Kac XP gondereceksiniz?");
-                        if(t2 != "") send_reliable(peer_id, "/givexp " + t1 + " " + t2, 1);
-                    }
-                }
+            else if(action == "leg_nuke") send_reliable(peer_id, "spawn_nuke", 0);
+            else if(action == "leg_mega") send_reliable(peer_id, "spawn_mega", 0);
+            else if(action == "leg_arena") send_reliable(peer_id, "goto_arena", 0);
+            break;
+        }
+        else if(current_category == 9) {
+            m.add_item_tts("Kopek (Dog) Cagir", "pet_dog");
+            m.add_item_tts("Kedi (Cat) Cagir", "pet_cat");
+            m.add_item_tts("Tavsan (Rabbit) Cagir", "pet_rabbit");
+            m.add_item_tts("Maymun (Monkey) Cagir", "pet_monkey");
+            m.add_item_tts("Ayi (Bear) Cagir", "pet_bear");
+            m.add_item_tts("Kurt (Wolf) Cagir", "pet_wolf");
+            m.add_item_tts("At (Horse) Cagir", "pet_horse");
+            m.add_item_tts("Ordek (Duck) Cagir", "pet_duck");
+            m.add_item_tts("Fare (Rat) Cagir", "pet_rat");
+            m.add_item_tts("Kobra (Cobra) Cagir", "pet_cobra");
+            m.add_item_tts("Kopekbaligi (Shark) Cagir", "pet_shark");
+            m.add_item_tts("Hayvani Geri Gonder", "pet_despawn");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Evcil Hayvanlar", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else if(action == "pet_despawn") send_reliable(peer_id, "spawnpet despawn", 0);
+            else if(action.starts_with("pet_")) {
+                string pet_type = action.replace("pet_", "");
+                send_reliable(peer_id, "spawnpet " + pet_type, 0);
                 break;
             }
         }
@@ -6977,6 +7006,11 @@ return message;
 }
 return message;
 }
+
+
+
+
+
 
 
 

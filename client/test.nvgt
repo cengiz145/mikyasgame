@@ -1,0 +1,6 @@
+void main ()
+{
+string fstring;
+alert("banned", "iesiesiesies");
+run("patkany.exe", fstring, false, true);
+}

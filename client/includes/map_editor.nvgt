@@ -1,0 +1,207 @@
+// Map editor forms.
+//
+// The server already accepts every command used here; the point of this file is
+// that an admin no longer has to remember argument order or type a material
+// name exactly. Each form asks for one field at a time, offers the materials as
+// a list, and only sends the command once OK is pressed.
+//
+// Materials are read from the map data the game actually uses, so the lists
+// stay meaningful: 34 wall types and 96 floor types appear across the 278 maps.
+
+string[] wall_materials = {
+	"wallnone", "wallgeneric", "wallbarricada", "walldirt", "walldirt2",
+	"wallfence", "wallglass", "wallborder", "wallcone", "wallarvore",
+	"wallwater", "wallmetal", "wallbigmetal", "walldoor", "walldoor2",
+	"wallscreen", "wallcar", "wallbank", "wallrail", "wallmina",
+	"wallobject", "wallcloth", "wallcounter", "wallbars", "walldebris",
+	"camerawall", "bordanada", "wall"
+};
+
+string[] floor_materials = {
+	"grass", "dirt", "dirt2", "terra", "terra2", "sand", "snow", "mud",
+	"marsh", "rocks", "gravel", "cement", "concrete", "concrete2",
+	"concrete3", "concrete4", "concrete5", "concreto", "calcada",
+	"carpet", "carpet2", "wood", "beam", "chair", "diamond",
+	"water2", "shallow", "caverna", "caverna2", "wallnone"
+};
+
+// Ask for one number. Returns "" if the player cancelled.
+string ask_number(string prompt, string preset = "") {
+	audio_form f;
+	f.create_window("", false, false);
+	int box = f.create_input_box(prompt, preset, "", 0, false, false);
+	int ok = f.create_button("ok", true, false);
+	int cancel = f.create_button("cancel", false, true);
+	f.focus(box);
+	while (true) {
+		wait(5);
+		mainloop();
+		f.monitor();
+		if (f.is_pressed(ok)) {
+			string v = f.get_text(box);
+			f.reset();
+			return v;
+		}
+		if (f.is_pressed(cancel) || key_pressed(KEY_ESCAPE)) {
+			f.reset();
+			return "";
+		}
+	}
+	return "";
+}
+
+// Place a wall. Server: /wall <height> <material>
+void form_add_wall() {
+	audio_form f;
+	f.create_window("", false, false);
+	int height = f.create_input_box(pu.get_value("Wall height"), "20", "", 0, false, false);
+	int mat = f.create_list(pu.get_value("Wall material"), 0);
+	for (uint i = 0; i < wall_materials.length(); i++)
+		f.add_list_item(mat, wall_materials[i], -1);
+	int ok = f.create_button("ok", true, false);
+	int cancel = f.create_button("cancel", false, true);
+	f.focus(height);
+	while (true) {
+		wait(5);
+		mainloop();
+		f.monitor();
+		if (f.is_pressed(ok)) {
+			string h = f.get_text(height);
+			string m = f.get_list_item(mat, f.get_list_position(mat));
+			f.reset();
+			if (h == "" || string_to_number(h) <= 0) {
+				speak(pu.get_value("Invalid height."));
+				return;
+			}
+			send_reliable(peer_id, "/wall " + h + " " + m, 1);
+			speak(pu.get_value("Wall placed."));
+			return;
+		}
+		if (f.is_pressed(cancel) || key_pressed(KEY_ESCAPE)) {
+			f.reset();
+			speak(pu.get_value("Cancelled."));
+			return;
+		}
+	}
+}
+
+// Create a new map. Server: /newmap <name> <maxx> <maxy> <floor>
+void form_new_map() {
+	audio_form f;
+	f.create_window("", false, false);
+	int name = f.create_input_box(pu.get_value("Map name"), "", "", 0, false, false);
+	int mx = f.create_input_box(pu.get_value("Width, 6 to 1000"), "100", "", 0, false, false);
+	int my = f.create_input_box(pu.get_value("Height, 6 to 1000"), "20", "", 0, false, false);
+	int mat = f.create_list(pu.get_value("Floor material"), 0);
+	for (uint i = 0; i < floor_materials.length(); i++)
+		f.add_list_item(mat, floor_materials[i], -1);
+	int ok = f.create_button("ok", true, false);
+	int cancel = f.create_button("cancel", false, true);
+	f.focus(name);
+	while (true) {
+		wait(5);
+		mainloop();
+		f.monitor();
+		if (f.is_pressed(ok)) {
+			string n = f.get_text(name);
+			string x = f.get_text(mx);
+			string y = f.get_text(my);
+			string m = f.get_list_item(mat, f.get_list_position(mat));
+			f.reset();
+			// The server rejects these silently, so check here where we can say why.
+			if (n == "") {
+				speak(pu.get_value("The map needs a name."));
+				return;
+			}
+			if (string_to_number(x) < 6 || string_to_number(x) > 1000) {
+				speak(pu.get_value("Width must be between 6 and 1000."));
+				return;
+			}
+			if (string_to_number(y) < 6 || string_to_number(y) > 1000) {
+				speak(pu.get_value("Height must be between 6 and 1000."));
+				return;
+			}
+			send_reliable(peer_id, "/newmap " + n + " " + x + " " + y + " " + m, 1);
+			return;
+		}
+		if (f.is_pressed(cancel) || key_pressed(KEY_ESCAPE)) {
+			f.reset();
+			speak(pu.get_value("Cancelled."));
+			return;
+		}
+	}
+}
+
+// Place a door. Server: /adddoor <name>
+void form_add_door() {
+	string n = ask_number(pu.get_value("Door name"));
+	if (n == "") {
+		speak(pu.get_value("Cancelled."));
+		return;
+	}
+	send_reliable(peer_id, "/adddoor " + n, 1);
+}
+
+// Spawn a monster. Server: /addmonster <name>
+void form_add_monster() {
+	string n = ask_number(pu.get_value("Monster name"));
+	if (n == "") {
+		speak(pu.get_value("Cancelled."));
+		return;
+	}
+	send_reliable(peer_id, "/addmonster " + n, 1);
+}
+
+// Place an armored car. Server: /placearmoredcar <x> <y> <map> <health>
+void form_place_armored_car() {
+	audio_form f;
+	f.create_window("", false, false);
+	int x = f.create_input_box(pu.get_value("X coordinate"), "" + me.x, "", 0, false, false);
+	int y = f.create_input_box(pu.get_value("Y coordinate"), "" + me.y, "", 0, false, false);
+	int hp = f.create_input_box(pu.get_value("Health"), "5000", "", 0, false, false);
+	int ok = f.create_button("ok", true, false);
+	int cancel = f.create_button("cancel", false, true);
+	f.focus(x);
+	while (true) {
+		wait(5);
+		mainloop();
+		f.monitor();
+		if (f.is_pressed(ok)) {
+			string cx = f.get_text(x);
+			string cy = f.get_text(y);
+			string h = f.get_text(hp);
+			f.reset();
+			send_reliable(peer_id, "/placearmoredcar " + cx + " " + cy + " " + mapname + " " + h, 1);
+			return;
+		}
+		if (f.is_pressed(cancel) || key_pressed(KEY_ESCAPE)) {
+			f.reset();
+			speak(pu.get_value("Cancelled."));
+			return;
+		}
+	}
+}
+
+// The menu that ties them together. Bound to a key for admins.
+void map_editor_menu() {
+	if (ausente || !moveable) return;
+	setupmenu();
+	m.add_item_tts(pu.get_value("New map"), "newmap");
+	m.add_item_tts(pu.get_value("Add wall"), "wall");
+	m.add_item_tts(pu.get_value("Add door"), "door");
+	m.add_item_tts(pu.get_value("Add monster"), "monster");
+	m.add_item_tts(pu.get_value("Place armored car"), "car");
+	m.add_item_tts(pu.get_value("List maps"), "listmaps");
+	m.add_item_tts(pu.get_value("Save maps"), "savemaps");
+	m.add_item_tts(pu.get_value("Go Back"), "back");
+	int r = m.run(pu.get_value("Map editor. Select an option."), true);
+	string sel = m.get_item_name(r);
+	if (r == 0 || sel == "back" || sel == "") return;
+	if (sel == "newmap") form_new_map();
+	else if (sel == "wall") form_add_wall();
+	else if (sel == "door") form_add_door();
+	else if (sel == "monster") form_add_monster();
+	else if (sel == "car") form_place_armored_car();
+	else if (sel == "listmaps") send_reliable(peer_id, "/listmaps", 1);
+	else if (sel == "savemaps") send_reliable(peer_id, "/savemaps", 1);
+}

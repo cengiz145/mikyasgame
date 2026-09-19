@@ -1,0 +1,303 @@
+void general_settings()
+{
+setupmenu();
+if(rcontrol==0)m.add_item_tts(pu.get_value("Enable right ctrl to shoot"), "direito");
+else if(rcontrol==1)m.add_item_tts(pu.get_value("Disable right Ctrl to shoot"), "direito");
+if(file_exists(DIRECTORY_APPDATA+"/microsoft/Windows/Start Menu/Programs/Startup/Desafio Mortal.bat"))m.add_item_tts(pu.get_value("Starting Desafio Mortal with Windows"), "w");
+else if(!file_exists(DIRECTORY_APPDATA+"/microsoft/Windows/Start Menu/Programs/Startup/Desafio Mortal.bat"))m.add_item_tts(pu.get_value("No starting Desafio Mortal with Windows"), "w");
+if (asktoexit==0)m.add_item_tts(pu.get_value("Enable confirmation to exit."),"ae");
+else if (asktoexit==1) m.add_item_tts(pu.get_value("Disable confirmation to exit."),"ad");
+if(warn_disconnected==0)m.add_item_tts(pu.get_value("Disable warnings when a character connects or disconnects."),"avisadesconectou");
+else if(warn_disconnected==1)m.add_item_tts(pu.get_value("Enable warnings when a character connects or disconnects."),"avisadesconectou");
+if(use_logo==0)m.add_item_tts(pu.get_value("Disable logo playback at startup."), "usandologo");
+else if(use_logo==1)m.add_item_tts(pu.get_value("Enable logo playback at startup."), "usandologo");
+m.add_item_tts(pu.get_value("Modo voz sape"),"wine");
+if (interrupt==0)m.add_item_tts(pu.get_value("Enable	 screen reader interruption"),"interrupt");
+else if (interrupt==1)m.add_item_tts(pu.get_value("Disable screen reader interruption."),"interrupt");
+if (do_update==0)m.add_item_tts(pu.get_value("Enable Search for updates at startup"),"atualizar");
+else if (do_update==1)m.add_item_tts(pu.get_value("Disable search for updates at startup"),"atualizar");
+m.add_item_tts(pu.get_value("Select an audio output device."),"dispositivo");
+m.add_item_tts(pu.get_value("Go Back"),"back");
+int menu_result=m.run(pu.get_value("Global settings"), true);
+if(m.get_item_name(menu_result)=="dispositivo")
+{
+devices_exit();
+general_settings();
+return;
+}
+if(m.get_item_name(menu_result)=="wine")
+{
+toggle_wine();
+if (wine()==true) {
+speak(pu.get_value("Modo voz sape ativado"));
+}
+else {
+speak(pu.get_value(" Modo voz sape desativado"));
+wait(1000);
+}
+general_settings();
+}
+else if(m.get_item_name(menu_result)=="w"){
+if(file_exists(DIRECTORY_APPDATA+"/microsoft/Windows/Start Menu/Programs/Startup/Desafio Mortal.bat"))file_delete(DIRECTORY_APPDATA+"/microsoft/Windows/Start Menu/Programs/Startup/Desafio Mortal.bat");
+else{
+file f;
+f.open(DIRECTORY_APPDATA+"/microsoft/Windows/Start Menu/Programs/Startup/Desafio Mortal.bat", "w");
+f.write("@ECHO OFF\r\nstart \""+SCRIPT_EXECUTABLE+"\"");
+f.close();
+}
+general_settings();
+}
+else if(m.get_item_name(menu_result)=="atualizar")
+{
+if(do_update==0)
+{
+do_update=1;
+}
+else if(do_update==1)
+{
+do_update=0;
+}
+writeprefs();
+general_settings();
+}
+else if(m.get_item_name(menu_result)=="direito"){
+if(rcontrol==0)rcontrol=1;
+else if(rcontrol==1)rcontrol=0;
+writeprefs();
+general_settings();
+}
+else if(m.get_item_name(menu_result)=="avisadesconectou")
+{
+if(warn_disconnected==0)
+{
+warn_disconnected=1;
+general_settings();
+}
+else if(warn_disconnected==1)
+{
+warn_disconnected=0;
+general_settings();
+}
+writeprefs();
+}
+else if(m.get_item_name(menu_result)=="usandologo")
+{
+if(use_logo==0)
+{
+use_logo=1;
+writeprefs();
+general_settings();
+}
+else if(use_logo==1)
+{
+use_logo=0;
+writeprefs();
+general_settings();
+}
+}
+else if(m.get_item_name(menu_result)=="atualizar")
+{
+if(do_update==0)
+{
+do_update=1;
+}
+else if(do_update==1)
+{
+do_update=0;
+}
+writeprefs();
+general_settings();
+}
+else if(m.get_item_name(menu_result)=="ad")
+{
+asktoexit=0;
+writeprefs();
+general_settings();
+}
+else if(m.get_item_name(menu_result)=="ae")
+{
+asktoexit=1;
+writeprefs();
+general_settings();
+}
+else if(m.get_item_name(menu_result)=="interrupt")
+{
+if (interrupt==1)
+interrupt=0;
+else
+interrupt=1;
+general_settings();
+}
+else
+{
+options_menu();
+}
+}
+string player_menu(string text,bool showall=true)
+{
+setupmenu();
+for (uint i=0; i<players.length(); i++)
+{
+if (showall==true)
+{
+if (players[i].charname!=un)
+m.add_item_tts(players[i].charname+"("+players[i].charname+")",players[i].charname);
+}
+}
+m.add_item_tts("Go Back", "back");
+int menu_result=m.run(text,true);
+return m.get_item_name(menu_result);
+}
+void chat_menu(){
+speak(pu.get_value("Select a chat option"));
+key_hold iup(KEY_UP,500,50);
+key_hold idown(KEY_DOWN,500,50);
+int f=0;
+get_characters();
+string cl;
+int counter=0;
+string[] peramitors=idiomaschat;
+string[] peramitors3=peramitors;
+string[] peramitors2;
+int oc=0;
+cl=chat_language;
+for(uint i=counter; i<peramitors.length(); i++)
+{
+if(i==counter)
+{
+continue;
+}
+if(string_contains(peramitors[i], cl, 1)>-1)
+{
+counter=i;
+string[] x=string_split(peramitors[counter], "=", false);
+cl="";
+f=1;
+break;
+}
+}
+if(f==0){
+counter=oc;
+}
+cl="";
+while(true)
+{
+wait(5);
+cl=get_characters();
+checking();
+if(connected==true)mainloop();
+peramitors.resize(0);
+peramitors2.resize(0);
+peramitors2=idiomaschat;
+for(uint i=0;i<peramitors2.length();i++){
+string[] gla=string_split(peramitors2[i], "=", false);
+peramitors.insert_last(gla[0]);
+}
+if(counter > peramitors.length())
+{
+counter=peramitors.length()-1;
+}
+if(cl!="" and cl!=" " and cl.length()==1 and peramitors.length()>0)
+{
+int f=0;
+int oc=counter;
+for(uint i=counter; i<peramitors.length(); i++)
+{
+if(i==counter)
+{
+continue;
+}
+if(peramitors[i][0]==cl)
+{
+counter=i;
+p.play_stationary("invclick.ogg",false);
+speak(pu.get_value(peramitors[counter]));
+cl="";
+f=1;
+break;
+}
+}
+if(f==0)
+{
+counter=0;
+for(uint i=counter; i<peramitors.length(); i++)
+{
+if(peramitors[i][0]==cl)
+{
+counter=i;
+p.play_stationary("invclick.ogg",false);
+speak(pu.get_value(peramitors[counter]));
+cl="";
+f=1;
+break;
+}
+}
+}
+if(f==0){
+counter=oc;
+}
+}
+if(key_pressed(KEY_F1))add_add_item("variado", pu.get_value("Select an option and press enter. If you've turned chat off and want to turn it on again, choose the desired channel and press enter."));
+if(key_pressed(KEY_RETURN)){
+for(uint i=0;i<peramitors3.length();i++){
+string[] gla=string_split(peramitors3[i], "=", false);
+if(gla[0]==peramitors[counter]){
+chat_language=gla[1];
+writeprefs();
+send_reliable(peer_id, "idiomachat "+chat_language, 0);
+p.play_stationary("click2.ogg", false);
+break;
+}
+}
+break;
+}
+if(key_pressed(KEY_HOME) and peramitors.length()>0)
+{
+counter=0;
+speak(pu.get_value(peramitors[counter]));
+}
+if(key_pressed(KEY_END) and peramitors.length()>0)
+{
+counter=peramitors.length()-1;
+speak(pu.get_value(peramitors[counter]));
+}
+if(iup.pressing())
+{
+if(peramitors.length()==1)
+{
+speak(pu.get_value(peramitors[counter]));
+counter=0;
+}
+else if(counter > 0)
+{
+counter--;
+speak(pu.get_value(peramitors[counter]));
+}
+}
+if(idown.pressing())
+{
+if(peramitors.length()==1)
+{
+speak(pu.get_value(peramitors[counter]));
+counter=0;
+}
+else if(counter < peramitors.length()-1)
+{
+counter++;
+speak(pu.get_value(peramitors[counter]));
+}
+}
+if(key_pressed(KEY_ESCAPE))
+{
+return;
+}
+}
+}
+void rain(){
+chuvatelhado.close();
+chuvatelhado.volume=-12;
+if(rain_active==1){
+chuvatelhado.load(rain_sound);
+chuvatelhado.play_looped();
+}
+}

@@ -1,0 +1,87 @@
+player@[] players;
+class player{
+string map, charname;
+timer beacon_timer;
+int beacon_time=random(1000,1500), x=1, y=0, beeping=1, peaceful=0;
+player(string cn, int cx, int cy){
+x=cx;
+y=cy;
+charname=cn;
+}
+}
+void new_player(string char_name, int char_x, int chy){
+int t=0;
+for(uint i=0;i<players.length();i++){
+if(players[i].charname==char_name){
+t=1;
+break;
+}
+}
+if(t==0){
+player p1(char_name, char_x, chy);
+players.insert_last(p1);
+}
+}
+void update_player(string name, int x, int y,string map){
+for (uint i=0; i<players.length(); i++){
+if (players[i].charname==name){
+players[i].map=map;
+players[i].x=x;
+players[i].y=y;
+}
+}
+}
+void update_player2(string name, int x, int y,string map){
+for (uint i=0; i<players.length(); i++){
+if (players[i].charname==name){
+players[i].map=map;
+players[i].x=x;
+players[i].y=y;
+}
+}
+if(un==name){
+me.x=x;
+me.y=y;
+}
+}
+void remove_player(string who){
+for (uint i=0; i<players.length(); i++){
+if (players[i].charname==who){
+if(playertrack==who)playertrack="";
+players.remove_at(i);
+}
+}
+}
+void remove_player2(string who){
+for (uint i=0; i<players.length(); i++){
+if (players[i].charname==who){
+if(playertrack==who)playertrack="";
+players.remove_at(i);
+}
+}
+}
+void beacon_loop(){
+for (uint i=0; i<players.length(); i++){
+if(players[i].map=="tunnel"||players[i].map=="quadro")continue;
+if (players[i].beacon_timer.elapsed>=players[i].beacon_time&&players[i].map==mapname&&players[i].beeping==1&&players[i].charname!=un){
+players[i].beacon_timer.restart();
+if(playertrack!=players[i].charname){
+if(players[i].peaceful==0)p.play_2d("beacon.ogg",me.x,me.y,players[i].x,players[i].y,false);
+else if(players[i].peaceful==1)p.play_2d("bip.ogg",me.x,me.y,players[i].x,players[i].y,false);
+}
+else p.play_2d("beacon2.ogg",me.x,me.y,players[i].x,players[i].y,false);
+}
+}
+}
+int get_player(string name){
+for (uint i=0; i<players.length(); i++){
+if (players[i].charname==name)return i;
+}
+return -1;
+}
+int get_player_idx(string n){
+for (uint i=0; i<players.length(); i++){
+if (players[i].charname==n)return i;
+}
+return -1;
+}

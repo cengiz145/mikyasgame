@@ -1,0 +1,316 @@
+1.0 Introducción
+
+1.1 ¿Que es el Desafío Mortal?
+
+1.2 Requisitos del sistema
+
+1.3 Ejecutando el juego por primera vez
+
+1.4 Menú principal
+
+1.5 Opciones del juego
+
+1.6 Creando mi primer personaje
+
+1.7 Conectándo al juego
+
+2 Comandos y referencias
+
+2.1 Teclado de Portugal
+
+2.2 Teclas en el juego
+
+2.3 Teclas de movimiento
+
+2.4 Teclas de la mochila
+
+2.5 Teclas de status
+
+2.6 Comandos del chat
+
+3 Objetos
+
+4 Créditos
+
+1.0 Introducción
+
+Documento completo y detallado de Desafío Mortal
+
+Aquí verás la siguiente información
+
+Que es Desafío Mortal: una breve descripción de como es el juego y en lo que se basa
+
+Requisitos del sistema: lo que tu computadora necesita para que el programa funcione correctamente
+
+Ejecutando el juego por primera vez: descripción de algunos detalles importantes al abrir el cliente después de la instalación
+
+Menú principal: descripción detallada de cada objeto del menú principal del juego
+
+Opciones del juego: descripción detallada de cada elemento de las configuraciones disponibles
+
+Creando mi primer personaje: paso a paso de como crear tu primer personaje y poder conectarte con él
+
+Conectarse al juego: como conectar una cuenta de un jugador previamente creáda
+
+Comandos y referencias: descripción detallada de los comandos del juego, debidamente separados por categorías
+
+Objetos: una descripción general de los objetos y su utilidad para el personaje
+
+Créditos: un agradecimiento a los colaboradores del proyecto Desafío Mortal
+
+1.1 ¿Que es el Desafío Mortal?
+
+El Desafío Mortal fue pensado a partir de la idea de que, para tener un juego fresco y divertido, no es necesario que este sea de pago, pesado o un espejismo. ¡Sólo tiene que ser relleno de ideas, sugerencias de los propios jugadores, y por supuesto, mucha interacción!
+
+Se Trata de un juego multiplataforma en línea, con diversos mapas, en los que se puede caminar, correr, saltar, escalar, subir y bajar escaleras, recoger, intercambiar, vender, o incluso subastar una gama de objetos; utilizar medios de transporte público, hacer magia... Y lo más importante: ¡sobrevivir al Desafío Mortal!. ¿Y que Desafío sería ese, te preguntas? ¡Mantenerte vivo!
+
+En este juego, tu no sólo debes saber ¿Cómo enfrentarte a los demás jugadores? En una guerra interminable: ¡Gran variedad de armas a tu disposición! ¡Desde cuchillos ligeros hasta bombas muy peligrosas! ¿Piensas que puedes manejar este Desafío?
+
+1.2 Requisitos del sistema
+
+Para jugar Desafío Mortal con total rendimiento y accesibilidad,  necesitas de los siguientes requisitos:
+
+300 MB de memoria libre
+
+Bocinas  de sonido stereo o auriculares(Para el 100% de aprovechamiento).
+
+Procesador AMD C-60 APU with Radeon(tm) HD Graphics o superior
+
+Windows 7, 8, 8.1 o 10.
+
+1.3 Ejecutando el juego por primera vez
+
+Al ejecutar el juego por primera vez, se te presentará un menú con los idiomas disponibles. Selecciona con las teclas de flecha arriba / abajo, y pulsa Enter.
+
+1.4 Menú principal
+
+Una vez abierto, el juego mostrará el menú principal, donde se utilizan las teclas de flecha arriba/abajo para navegar entre las opciones y la tecla Enter para aceptar la elegida. Ellas son:
+
+Conectar: conecta tu personaje al juego
+
+Probar altavoces: reproduce un sonido estéreo para comprobar si tus 
+altavoces o auriculares están posicionados correctamente.
+
+Crear nueva cuenta: Crea una nueva cuenta en el servidor.
+
+Configuraciones: Abre el menú de las configuraciones del juego.
+
+Verificar por actualizaciones: En el caso de que tu versión del juego esté desactualizada, y a causa de eso, no te puedas conectar al servidor, utiliza esta opción para bajar la versión más reciente.
+
+Salir: Cierra el programa.
+
+1.5 Configuraciones del juego
+
+Una vez ejecutado el programa, te encontrarás en el menú principal.
+
+Dentro de los submenús disponibles, hay uno llamado configuraciones, el cual, a su vez se dibide en configuraciones generales y configuraciones del perfil. El primero (configuraciones generales) te muestra las siguientes opciones.
+
+Seleccionar un dispositivo de salida: configura el dispositivo de salida de 
+audio.
+
+No iniciando el Desafío Mortal con Windows: Esta opción permite que el Desafío Mortal se inicie junto con Windows.
+
+Desactivar la confirmación al salir: Una vez que tu cuenta esté conectada, puedes presionar escape en cualquier momento para desconectar. Por defecto, el juego pregunta si está seguro de querer salir, necesitando entonces seleccionar las opciones "sí" o "no" con las teclas de flecha arriba/abajo. Utilica esta configuración para deshabilitar esta característica y se desconecta automáticamente al pulsar escape.
+
+Desconectar. Por defecto, el juego pregunta si está seguro de querer salir, necesitando entonces seleccionar las opciones "sí" o "no" con las teclas de flecha arriba/abajo. Utiliza esta configuración para deshabilitar esta característica y se desconecta automáticamente al pulsar escape.
+
+Desactivar avisos cuando un personaje se conecta o desconecta: Por defecto,  podrás visualizar cuando un personaje se conecta o desconecta al  juego. Utiliza esta opción para cambiar esto.
+
+Desactivar la reproducción del logo al iniciar el juego: Por defecto, podrás visualizar cuando un personaje se cconecte o se ddesconecte del juego. Utiliza esta opción para cambiar esto.
+
+Desactivar chat por voz: en el juego, es posible utilizar la letra F para hablar por voz. Esta configuración permite deshabilitar el envío y la recepción de estos audios.
+
+Modo de voz sapi: Aquí se alterna entre una voz sapi instalada en tu computadora o tu lector de pantalla para leer los textos del juego.
+
+Desactivar la interrupción del lector: en el caso de que la voz de tu lector no se detenga al presionar una tecla, de forma predeterminada, esta configuración permitirá que esto suceda. Se usa para cambiar.
+
+Activar verificación de actualización al inicio: una vez activada, esta 
+configuración permite que el cliente cheque si hay una nueva 
+versión del juego disponible tan pronto como sea abierto.
+
+Siguen las opciones disponibles en el submenú Configuración del Perfil:
+
+Seleccionar la voz: Tu personaje puede emitir expresiones cuando se
+
+Hacer daño. En esta opción, se elige una voz para eso.
+
+Desactivar aviso cuando un jugador sube de nivel: Cuando un jugador sube de nivel, se reproduce un sonido. Si no deseas escuchar estos anuncios, utiliza esta opción para desactivar.
+
+Escuchando gruñidos: Cuando el jugador sufre daños, la voz que  estás utilizando emite gruñidos. Para no escuchar estos sonidos, desactiva esta opción.
+
+Escuchando los pasos de otros jugadores: Cuando un jugador camina, si esta opción está activa, los pasos de él pueden ser escuchados por tí.
+
+Desactivar las subastas: Para no escuchar la información de las subastas, accede a esta opción.
+
+1.6 Creando mi primer personaje
+
+Una vez en el menú principal, selecciona la opción "crear personaje" con las flechas y presiona Enter. El juego te pedirá que escribas el nombre de tu personaje. Después de hacerlo, a continuación, presiona Enter. Se te pedirá entonces una dirección de e-mail válido, necesario para la recuperación de contraseña. Ppresiona Enter y escriba la contraseña, con el mínimo de ocho caracteres. Selecciona el sexo de tu personaje, que aparece en un menú con las teclas de flecha arriba/abajo, ¡Y listo! ¡Tu cuenta ha sido creada y ya te puedes conectar!
+
+1.7 Conectándo al juego
+
+Por defecto, la cuenta que has creado ya estará configurada y lista para su uso. Sólo, en el menú principal, selecciona la opción "conectar" y presiona Enter sobre ella. Sin embargo, si  tienes más de una y deseas conectar con una cuenta diferente, ve a configurar personaje. Después, regresa a la opción de "conectar" en el menú principal.
+
+2 Comandos y referencias
+
+2.1 Teclado de Portugal
+
+Existen diferentes configuraciones de teclado. O sea: el orden de las teclas no es universal. El teclado utilizado en España cuenta con símbolos distintos en diferentes teclas. Ve, a continuación, estas diferencias, en relación al teclado brasileño:
+
+Acento agúdo: Señal de más
+
+Abre corchetes: Acento agúdo
+
+Punto-y-vírgula: Punto y coma
+
+Señal de mayor: Dos puntos
+
+Shift+: Dos puntos
+
+Cierra corchetes: Acento de tilde.
+ 
+Las demás teclas siguen de la misma forma.
+
+2.3 Teclas generales
+
+f1: Te informa el tiempo que tiene el servidor en línea desde la última vez que se reinició
+
+F2: Te informa el mensaje del día
+
+F3: Checa la velocidad del servidor, de acuerdo al internet del usuario
+
+F4: Te muestra la lista de personajes presentes en el mapa. Pulsando Enter sobre un nombre, automáticamente puedes rastrearlo y al pulsar la letra O puedes verificar en cuales coordenadas este personaje está
+
+F5: Te muestra la lista de jugadores en línea, dándote la posibilidad de utilizar las siguientes teclas sobre el jugador que deseas
+
+F1: Te muestra el lugar donde se encuentra el personaje
+
+F2: Te muestra el nivel del personaje
+
+F3: Te muestra el número de muertes del personaje
+
+CTRL+C: copiar el nombre para el área de transferencia
+
+Enter: Te muestra un cuadro de edición para enviar un mensaje privado al jugador seleccionado
+
+F8: Activa y desactiva un sonido que te indica la dirección de los jugadores más próximos
+
+señal de apóstrofe y números de 0 a 9: Estas teclas permiten el acceso rápido a las armas de tu inventario. Leeerás acerca de tu inventario más adelante.
+
+Enter: abre puertas, cambio de mapas, y en algunos casos, interactúa de alguna manera con el mapa. Pero tendrás que descubrir estos casos por cuenta propia...
+
+Barra de espacios: recoge un objeto del suelo.
+
+L: en el caso de estar en una tienda, abre el menú de la misma. Si deseas comprar un objeto del menú, debes dar Enter sobre el, poner la cantidad que deseas comprar, dar Enter nuevamente y listo
+
+M: Muestra las cosas más difíciles de ser destruidas.
+
+U: toma una bebida previamente seleccionada del inventario. leerás sobre bebidas más adelante, también es posible presuionar Shift+U y decidir cuantas bebidas quieres tomar de una vez.
+
+Ñ: Abre el menú de sociales, los cuales pueden ser escuchados por los jugadores más cercanos.
+
+Control izquierdo: Utiliza el arma seleccionada.
+
+R: en caso de que el arma seleccionada necesite de munición, esa letra recarga el cargador de la misma.
+
+Señal de agudo y abre corchetes: Navega entre las categorías de los mensajes disponibles.
+
+Punto y coma: Camina para atrás y para adelante respectivamente, por los mensajes de la categoría seleccionada.
+
+Dos puntos: Checa la localización de los jugadores conectados.
+
+Punto y guión: Te permite escribir en el chat.
+
+Shift+F1: Activa y desactiva el modo AFK, indicando que estás lejos del teclado. No podrás hacer nada mientras estés en modo AFK.
+
+Shift+F2: Activa y desactiva el modo pacifista: que te impide de ser dañado por balas y bombas, tú tampoco podrás atacar a los demás mientras estés pacifista.
+
+El comando de punto-y-coma, seguido de la tecla Barra y un tercer comando, permiten otras opciones, tales como participar de la subasta, cambiar el sexo del personaje, comprobar las novedades del juego, enviar o responder mensajes privados, etc. Pulse la tecla en cualquier momento, el punto y coma, la Barra y la la palabra Ayuda, sin espacios, para ver la lista de estos comandos.
+
+2.3 Teclas de movimiento.
+
+Flechas derecha e izquierda: Te permiten caminar por el mapa.
+
+Flecha arriba: Te permite subir escaleras
+
+Flecha abajo: Te permite bajar escaleras.
+
+2.4 Teclas de la mochila:
+
+Dentro de tu mochila,  puedes utilizar las siguientes teclas:
+
+Teclas de Flecha para la derecha y la izquierda: Navegan entre las categorías del inventario. Por ejemplo: armas, municiones, ropas, entre otras.
+
+Teclas de Flecha hacia arriba y hacia abajo: selecciona un objeto en la categoría actual.
+
+Enter: Da el objeto seleccionado paraun jugador que esté cerca de ti.
+
+Shift+Enter: Subasta un objeto seleccionado.
+
+Control+enter: Lee la descripción de un objeto.
+
+Barra espaziadora: interactúa con un objeto. Por ejemplo: ve las horas en el reloj, elige un arma para usar o viste una ropa.
+
+Alt+Espacio: Quita un objeto que se esté utilizando. Saca la ropa, por ejemplo.
+
+Supr: Pone un objeto del inventario en el suelo o en contenedores. También puede ser combinado con la tecla Shift para eliminar un número específico de objetos o Control para borrar todos los elementos seleccionados de una vez.
+
+Escape: Cierra el inventario.
+
+2.5 Teclas de status.
+
+B: checa la zona del mapa en el que te encuentras. Si no es la zona para la exploración, el nombre del mapa no se muestra.
+
+
+C: checa tus coordenadas en el mapa.
+
+G: Funciona para utilizar la cámara
+
+H: Si usas reloj o estás cerca de una iglesia, te permite ver la hora del juego.
+
+I: Abre tu mochila.
+
+P: Checa tu vestimenta y la de los jugadores más cercanos.
+
+S: Checa tu salud.
+
+V: Checa la sed, el hambre, la enfermedad y la suciedad. Si el hambre, la sed o la suciedad llega a 100, el personaje muere.
+
+2.6 Comandos del chat.
+
+Todos los comandos a seguir deben ser digitados tras la Barra (-), o si lo prefieres, después Mayús+signo igual. Ejemplos: :/ayuda o mayús+=, y la palabra ayuda.
+
+Pm, seguido de el nombre de otro personaje y un mensaje: envía un mensaje privado.
+
+R: Responde el último mensaje privado recibido.
+
+Novedades: checa las novedades del juego.
+
+Otros comandos deben ser consultados por el /ayuda.
+
+3 Objetos.
+
+Siendo este un juego de disparos, una gran variedad de armas no puede faltar, y no faltan. Son muchas y están en constante actualización. Sin embargo, además de las armas, y de algunos explosivos, el Desafío Mortal cuenta con otros tipos de objetos, tales como la vestimenta, para que tu personaje ande siempre elegante, o incluso protegido; dos monedas diferentes , que circulan en las subastas o en las tiendas esparcidas por los mapas. Y por fin, algunos elementos especiales. Sigue una lista de ellos y sus respectivas descripciones:
+
+Refresco, energético o cerveza: son bebidas que pueden ser consumidas para recuperar un poco de salud.
+
+Elemento magnético: este elemento actúa como una especie de imán, atrayendo 
+para sí todos los objetos de un mapa
+
+Varita: Una varita mágica que otorga a tu personaje, el poder de realizar grandes hazañas.
+
+Mana: Un elemento necesario para el uso de la varita. Es la energía consumida al realizar una magia.
+
+4 Créditos.
+
+Los sinceros agradecimientos del equipo Mega Dimensión y de la administración del Desafío Mortal a los jugadores por su contribución con el proyecto:
+
+Gabrielschuck, por la creación y edición del logo del juego.
+
+Motoqueirofantasma, por prestar su voz al logo del juego, y a otros audios.
+
+Traductores del juego: Personas que colaboran para que el Desafío Mortal sea disponible en diferentes idiomas.
+
+Ruby, por la creación de este manual.
+
+Por último, pero no menos importante: a los demás jugadores activos, por contribuir a menudo con sugerencias, nuevos mapas y la difusión del proyecto.
+

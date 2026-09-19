@@ -1,0 +1,63 @@
+Creadas nuevas opciones en  la computadora de tu departamento.
+Permitir o no permitir que los demás abran tu baúl.
+Activar/desactivar reloj.
+Cerrar baúl.
+Expulsar jugadores de tu departamento.
+Abrir puerta por 5 segundos.
+Lanzado el mapa pesquero y junto con el un sistema de pesca.
+Para pescar, debes tener los accesorios necesarios. Para comprar, ve a Santa_bertalina a la tienda de equipo para caza y pesca.
+Después de comprar tu lancha, galón_de_gasolina, carnada y caña_de_pescar, puedes pulsar Enter en la cafetería del pesquero para saber más.
+Lanzada una área prohibida en el juego.
+Creada el arma sub-laser.
+Creada el arma MK1.
+Creada el arma AK48.
+Lanzada la magia cura_divina.
+Puedes saber cuantos tiros tu chaleco a prueba de balas soporta, pulsando CTRL+Enter sobre el.
+Lanzado misil_teleguiado.
+Lanzada magia llubia_de_meteoros.
+Lanzada magia espejo_reflector.
+Bazuca acierta en jugadores que están hasta 3 pasos por encima tuyo.
+Agregada la opción para alternar entre escuchar o no los mensajes de las muertes, en las configuraciones del perfil.
+Añadido el inventario secundario. Para navegar entre los objetos, se utiliza TAB y SHIFT+TAB. Para interactuar con el elemento seleccionado usa SUPR.
+Agregada la opción de activar el control derecho para disparar, en opciones generales.
+Removida la opción de aspirar objetos con el aspirador.
+Diversas armas no acertarán en el chaleco a prueba de balas.
+Cuando solo se permite la lucha blanca en un mapa, los explosivos serán desactivados.
+Ahora, si le disparas a un jugador en la cabeza con alguna arma, ¡El morirá! Descubre cuales son.
+Con algunas armas, los animales morirán con solo un tiro.
+Lanzada magia puño_de_órus.
+Lanzada magia bola de fuego.
+Lanzada magia deslice veloz.
+Los compartimientos de los inventarios fueron modificados.
+Ahora, los jugadores pacifistas, emiten un sonido diferente.
+Creado lanzador_de_dardos, él alcanzará hasta 50 cuadrados, independientemente de donde esté el jugador.
+No podrás hablar con jugadores que estén en el mismo mapa, si estos no están cerca de ti.
+Ahora, podrás morir congelado con más frecuencia.
+Lanzado zapato_magnético.
+Lanzada bomba_nuclear.
+Agregadas misiones secretas para ganar paquetes_de_teleporters.
+Soldados ya no son más aspirados. Esto se hizo para que los nuevos jugadores que inician en nuestro mundo se familiaricen con el juego.
+El precio del oro de la mina aumentó.
+La varita ahora carga de tiempo en tiempo. Para comprobar su energía, se utiliza SHIFT+W.
+Corregido error: El sistema de baneo no baneaba correctamente a los jugadores.
+Corregido error: La magia que dejaba invisible, no era deshecha al desconectar y conectar el cliente.
+Corregido error: En el juego "Piedra, papel o tijera", al elegir la opción 1, si ganabas, no te daba el dinero.
+Corregido error: los jugadores no mueren más en vehículos.
+Corregido error: No es posible huir de prisiones usando el escudo_del_tiempo.
+Corregido error: Las paredes destructibles se quitan correctamente.
+Corregido error: Al usar el extintor apuntando a una pared, un sonido de bala era reproducido.
+Corregido error: No es posible matar miembros de tu equipo con cintas_explosivas.
+Corregido error: No puedes enterrar cuerpos cuando estás ausente.
+Corregido error: Era posible escuchar mensajes con el chat desactivado al reiniciar el cliente.
+Corregido error: Dardos dañaban pacifistas.
+Corregido error: Dragonsaurio no es más idiota.
+Corregido error: La función del aspirador es totalmente cancelada, cuando uno de los dos muere.
+Corregido error: Dardos, explosivos y aspiradores no aciertan más en miembros de tu equipo.
+Corregido error: Era posible activar algún explosivo y ponerte pacifista y hacer que el funcionara.
+Corregido error: Al entrar en el juego como pacifista, conseguías recargar armas y disparar aunque no hacías daño.
+Corregido error: Al desconectar no quedaba guardado el último jugador que te mandó PM.
+Corregido error: Cuando un jugador se desconectaba o era o expulsado, por algún motivo usando teleporter, el sonido no era removido.
+Corregido error: Ahora, al elegir que el Desafío Mortal sea iniciado con Windows, no dará más error.
+Corregido error: No es posible continuar usando las armas removidas de tu inventario.
+Corregido error al checar por actualizaciones.
+Teclas SHIFT+BARRA DE ESPACIO, removidas de tu inventario.
