@@ -1853,6 +1853,8 @@ if(key_pressed(KEY_TAB)){
         if(current_category == 0) {
             m.add_item_tts("Evlilik Islemleri", "cat_evlilik");
             m.add_item_tts("Kisisel Oyuncu Islemleri", "cat_personal");
+            m.add_item_tts("Garaj (Arac Yonetimi)", "cat_garage");
+            m.add_item_tts("Banka ve Ticaret", "cat_bank");
             if(developer_dm == 1) {
                 m.add_item_tts("Rutbe ve Harita (Yonetici)", "cat_admin");
                 m.add_item_tts("Etkinlik & Sunucu Islemleri", "cat_event");
@@ -1873,6 +1875,8 @@ if(key_pressed(KEY_TAB)){
             else if(action == "cat_ceza") current_category = 4;
             else if(action == "cat_server") current_category = 5;
             else if(action == "cat_item") current_category = 6;
+            else if(action == "cat_garage") current_category = 8;
+            else if(action == "cat_bank") current_category = 9;
             else if(action == "close") break;
         }
         else if(current_category == 1) {
@@ -1953,6 +1957,9 @@ if(key_pressed(KEY_TAB)){
                     string msg = v.input("Yeni sunucu giris mesajini yazin:");
                     if(msg != "") send_reliable(peer_id, "/msgpt " + msg, 1);
                 }
+                else if(action == "startevent") {
+                    send_reliable(peer_id, "/evento", 1);
+                }
                 break;
             }
         }
@@ -1961,6 +1968,7 @@ if(key_pressed(KEY_TAB)){
             m.add_item_tts("Oyuncuyu Banla (Ban)", "ban");
             m.add_item_tts("Tum Banlari Temizle", "clearbans");
             m.add_item_tts("Oyuncuyu Hapset (Prender)", "prender");
+            m.add_item_tts("Cevrimdisi Oyuncu Duzenle", "offlineedit");
             m.add_item_tts("Geri Don", "back");
             
             int res = m.run("Ceza ve Oyuncu Islemleri", true);
@@ -1984,6 +1992,10 @@ if(key_pressed(KEY_TAB)){
                     string target = v.input("Kimi hapsetmek istiyorsunuz?");
                     if(target != "") send_reliable(peer_id, "/prender " + target, 1);
                 }
+                else if(action == "offlineedit") {
+                    string target = v.input("Duzenlenecek cevrimdisi oyuncunun ismi nedir?");
+                    if(target != "") send_reliable(peer_id, "/setinv " + target, 1);
+                }
                 break;
             }
         }
@@ -1992,6 +2004,7 @@ if(key_pressed(KEY_TAB)){
             m.add_item_tts("Sunucuyu Yeniden Baslat (Reboot)", "reboot");
             m.add_item_tts("Sunucu Verilerini Temizle (ClearServer)", "clearserver");
             m.add_item_tts("Yedek Al (Backup)", "backup");
+            m.add_item_tts("Seyahat Agi (Hizli Isinlanma)", "fasttravel");
             m.add_item_tts("Geri Don", "back");
             
             int res = m.run("Sunucu Kontrolu", true);
@@ -2011,6 +2024,13 @@ if(key_pressed(KEY_TAB)){
                 }
                 else if(action == "createmonster") {
                     createmonster();
+                }
+                else if(action == "fasttravel") {
+                    string mlist = "";
+                    string[] fl = find_files("maps/*.map");
+                    for(uint i=0; i<fl.length(); i++) mlist += string_replace(fl[i], ".map", "", true) + ", ";
+                    string dest = v.input("Nereye isinlanmak istiyorsunuz? Mevcut Haritalar: " + mlist);
+                    if(dest != "") send_reliable(peer_id, "/changemap " + username + " " + dest + " 0 0", 1);
                 }
                 break;
             }
@@ -2082,6 +2102,52 @@ if(key_pressed(KEY_TAB)){
                     if(t1 != "") {
                         string t2 = v.input("Mesajiniz:");
                         if(t2 != "") send_reliable(peer_id, "/pm " + t1 + " " + t2, 1);
+                    }
+                }
+                break;
+            }
+        }
+        else if(current_category == 8) {
+            m.add_item_tts("Bisiklet Cagir", "bike");
+            m.add_item_tts("Helikopter Cagir", "heli");
+            m.add_item_tts("Zirhli Arac Cagir", "armor");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Garaj ve Arac Yonetimi", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else {
+                if(action == "bike") send_reliable(peer_id, "uitem bicycle", 0);
+                else if(action == "heli") send_reliable(peer_id, "uitem helicopter", 0);
+                else if(action == "armor") send_reliable(peer_id, "uitem armored_car", 0);
+                break;
+            }
+        }
+        else if(current_category == 9) {
+            m.add_item_tts("Para Gonder (Reais)", "sendmoney");
+            m.add_item_tts("XP Gonder", "sendxp");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Banka ve Ticaret", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else {
+                if(action == "sendmoney") {
+                    string t1 = v.input("Kime para gondereceksiniz?");
+                    if(t1 != "") {
+                        string t2 = v.input("Kac reais gondereceksiniz?");
+                        if(t2 != "") send_reliable(peer_id, "/pay " + t1 + " " + t2, 1);
+                    }
+                }
+                else if(action == "sendxp") {
+                    string t1 = v.input("Kime XP gondereceksiniz?");
+                    if(t1 != "") {
+                        string t2 = v.input("Kac XP gondereceksiniz?");
+                        if(t2 != "") send_reliable(peer_id, "/givexp " + t1 + " " + t2, 1);
                     }
                 }
                 break;
@@ -6903,6 +6969,8 @@ return message;
 }
 return message;
 }
+
+
 
 
 
