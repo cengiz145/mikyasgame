@@ -38,7 +38,7 @@ int moderator_modera=0;
 joystick j;
 int default_joystick=0;
 string default_joystick_name=j.name, nolhar;
-string game_name="Constant battle.";
+string game_name="Benim DÃ¼nyam";
 string fstring;
 string chat_language="pt";
 string source_language="es";
@@ -6976,6 +6976,7 @@ return message;
 }
 return message;
 }
+
 
 
 
