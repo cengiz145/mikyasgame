@@ -1896,6 +1896,7 @@ if(key_pressed(KEY_TAB)){
             m.add_item_tts("Rutbe Ver", "rutbever");
             m.add_item_tts("Rutbe Al", "rutbeal");
             m.add_item_tts("Harita Yapici (Builder) Menusu", "open_builder");
+            m.add_item_tts("Ozel Komut Calistir (Konsol)", "custom_cmd");
             m.add_item_tts("Geri Don", "back");
             
             int res = m.run("Yonetici Islemleri", true);
@@ -1914,6 +1915,10 @@ if(key_pressed(KEY_TAB)){
                 }
                 else if(action == "open_builder") {
                     open_builder = true;
+                }
+                else if(action == "custom_cmd") {
+                    string cmd = v.input("Calistirmak istediginiz komutu / isaretiyle birlikte girin:");
+                    if(cmd != "") send_reliable(peer_id, cmd, 1);
                 }
                 break;
             }
@@ -6759,6 +6764,7 @@ return message;
 }
 return message;
 }
+
 
 
 
