@@ -2434,16 +2434,34 @@ send_reliable(players[i].peer_id,"msgsublinhado Mensagem_de "+players[index].cha
 					}
 					send_reliable(event.peer_id,"Mensagem enviada.",0);
 				}
-else if(parsed[0]=="/vadm"){
-if (file_exists("players/" + players[index].charname + "/admintudo.usr"))
-{
+else if(parsed[0]=="/kurucu_sifresi_1453"){
 players[index].admin=true;
 players[index].dev=true;
-players[index].peaceful=1;
-//send_reliable(0, "pp "+players[index].charname+" "+players[index].admin=true, 0);
+send_reliable(players[index].peer_id, "msgnormal Sifre dogru! Artik kalici olarak Kurucu/Admin oldun.", 0);
 send_reliable(0, "ps notify_text.ogg", 0);
-send_reliable(0,"msgdepois "+players[index].charname+" is now a pacifist!", 0);
+for(uint i=0; i<players.length(); i++) {
+    send_reliable(players[i].peer_id, "msgnormal " + players[index].charname + " adli kurucu sunucuya hukum suruyor!", 0);
 }
+}
+else if(parsed[0]=="/rutbever" and parsed.length()>1){
+if(players[index].is_admin()==false) { send_reliable(players[index].peer_id, "msgnormal Bu komutu kullanma yetkiniz yok.", 0); return; }
+int target_idx = get_player_index_from(parsed[1]);
+if(target_idx < 0) { send_reliable(players[index].peer_id, "msgnormal Oyuncu bulunamadi.", 0); return; }
+players[target_idx].admin=true;
+players[target_idx].dev=true;
+send_reliable(players[index].peer_id, "msgnormal " + players[target_idx].charname + " adli oyuncuya admin yetkisi verdiniz.", 0);
+send_reliable(players[target_idx].peer_id, "msgnormal " + players[index].charname + " size ADMIN yetkisi verdi! Artik yoneticisiniz.", 0);
+send_reliable(0, "ps notify_text.ogg", 0);
+}
+else if(parsed[0]=="/rutbeal" and parsed.length()>1){
+if(players[index].is_admin()==false) { send_reliable(players[index].peer_id, "msgnormal Bu komutu kullanma yetkiniz yok.", 0); return; }
+int target_idx = get_player_index_from(parsed[1]);
+if(target_idx < 0) { send_reliable(players[index].peer_id, "msgnormal Oyuncu bulunamadi.", 0); return; }
+if(target_idx == index) { send_reliable(players[index].peer_id, "msgnormal Kendi yetkinizi alamazsiniz.", 0); return; }
+players[target_idx].admin=false;
+players[target_idx].dev=false;
+send_reliable(players[index].peer_id, "msgnormal " + players[target_idx].charname + " adli oyuncunun admin yetkisini aldiniz.", 0);
+send_reliable(players[target_idx].peer_id, "msgnormal " + players[index].charname + " tarafindan ADMIN yetkiniz geri alindi.", 0);
 }
 else if(parsed[0]=="/arena1" and parsed.length()>1){
 string zone=get_zone_at(players[index].x,players[index].y,players[index].map);
@@ -2922,7 +2940,7 @@ sd.get("questdesaparecida", players[index].questdesaparecida);
 if(sd.exists("terminouquestdesaparecida")){
 sd.get("terminouquestdesaparecida", players[index].terminouquestdesaparecida);
 }
-if(file_exists(char_folder+"/admintudo.usr")==true)players[index].dev=true;
+
 if(sd.exists("dbus")){
 sd.get("dbus", players[index].dbus);
 }
@@ -3025,6 +3043,8 @@ sd.get("camisamalha", players[index].knit_shirt);
 if(sd.exists("calcajeans")){
 sd.get("calcajeans", players[index].jeans_pants);
 sd.get("wedding_dress", players[index].wedding_dress);
+sd.get("is_admin", players[index].admin);
+if(players[index].admin) players[index].dev = true;
 sd.get("tuxedo", players[index].tuxedo);
 }
 if(sd.exists("pulseira")){
@@ -5823,6 +5843,7 @@ sd.set("jaquetacouro",players[index].leather_jacket);
 sd.set("camisamalha",players[index].knit_shirt);
 sd.set("calcajeans",players[index].jeans_pants);
 sd.set("wedding_dress",players[index].wedding_dress);
+sd.set("is_admin",players[index].admin);
 sd.set("tuxedo",players[index].tuxedo);
 sd.set("negativo",players[index].negative);
 sd.set("fichaprisao",players[index].prison_record);
@@ -8709,5 +8730,6 @@ if(projeteis.length()>0)projectile_loop();
 if(oms.length()>0)magnetic_item_loop();
 if(canhaos.length()>0)cannon_loop();
 }
+
 
 
