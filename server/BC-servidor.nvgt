@@ -2289,6 +2289,10 @@ else if(parsed[0]=="/kabulet" and parsed.length()>1) {
     players[target_idx].proposed_to = "";
     give_item(players[index].charname, "evlilik_yuzugu", 1);
     give_item(players[target_idx].charname, "evlilik_yuzugu", 1);
+    give_item(players[index].charname, "gelinlik", 1);
+    give_item(players[target_idx].charname, "gelinlik", 1);
+    give_item(players[index].charname, "damatlik", 1);
+    give_item(players[target_idx].charname, "damatlik", 1);
     for(uint i=0; i<players.length(); i++) {
         send_reliable(players[i].peer_id, "msgnormal " + players[index].charname + " ve " + players[target_idx].charname + " artik evli! Tebrikler!", 0);
     }
@@ -2310,8 +2314,16 @@ else if(parsed[0]=="/bosan") {
         players[target_idx].spouse = "";
         send_reliable(players[target_idx].peer_id, "msgnormal " + players[index].charname + " senden bosandi.", 0);
         players[target_idx].inv_add_item("evlilik_yuzugu", -1);
+        players[target_idx].inv_add_item("gelinlik", -1);
+        players[target_idx].inv_add_item("damatlik", -1);
+        if(players[target_idx].wedding_dress==1) players[target_idx].wedding_dress=0;
+        if(players[target_idx].tuxedo==1) players[target_idx].tuxedo=0;
     }
     players[index].inv_add_item("evlilik_yuzugu", -1);
+    players[index].inv_add_item("gelinlik", -1);
+    players[index].inv_add_item("damatlik", -1);
+    if(players[index].wedding_dress==1) players[index].wedding_dress=0;
+    if(players[index].tuxedo==1) players[index].tuxedo=0;
     for(uint i=0; i<players.length(); i++) {
         send_reliable(players[i].peer_id, "msgnormal " + players[index].charname + " ve " + ex_spouse + " bosandi.", 0);
     }
@@ -3012,6 +3024,8 @@ sd.get("camisamalha", players[index].knit_shirt);
 }
 if(sd.exists("calcajeans")){
 sd.get("calcajeans", players[index].jeans_pants);
+sd.get("wedding_dress", players[index].wedding_dress);
+sd.get("tuxedo", players[index].tuxedo);
 }
 if(sd.exists("pulseira")){
 sd.get("pulseira", players[index].bracelet);
@@ -4743,6 +4757,8 @@ if(players[ie].mizuno_boot==1&&players[ie].inv_item_number("dress_shoe")<1)playe
 if(players[ie].nike_sneakers==1&&players[ie].inv_item_number("running_shoes")<1)players[ie].nike_sneakers=0;
 if(players[ie].knit_shirt==1&&players[ie].inv_item_number("knit_shirt")<1)players[ie].knit_shirt=0;
 if(players[ie].jeans_pants==1&&players[ie].inv_item_number("jeans_pants")<1)players[ie].jeans_pants=0;
+if(players[ie].wedding_dress==1&&players[ie].inv_item_number("gelinlik")<1)players[ie].wedding_dress=0;
+if(players[ie].tuxedo==1&&players[ie].inv_item_number("damatlik")<1)players[ie].tuxedo=0;
 if(players[ie].adidas_sneakers==1&&players[ie].inv_item_number("sandal_uc")<1)players[ie].adidas_sneakers=0;
 if(players[ie].panama_hat==1&&players[ie].inv_item_number("panama_hat")<1)players[ie].panama_hat=0;
 }
@@ -5806,6 +5822,8 @@ sd.set("luvas",players[index].gloves);
 sd.set("jaquetacouro",players[index].leather_jacket);
 sd.set("camisamalha",players[index].knit_shirt);
 sd.set("calcajeans",players[index].jeans_pants);
+sd.set("wedding_dress",players[index].wedding_dress);
+sd.set("tuxedo",players[index].tuxedo);
 sd.set("negativo",players[index].negative);
 sd.set("fichaprisao",players[index].prison_record);
 sd.set("kills",players[index].kills);
@@ -6694,6 +6712,44 @@ players[index].mizuno_pants=1;
 }
 }
 }
+else if(item_number=="gelinlik")
+{
+if(players[index].inv_item_number("gelinlik")>0)
+{
+if(players[index].wedding_dress==1)
+{
+send_reliable(players[index].peer_id, "msgalreadywearing", 0);
+}
+else if(players[index].jeans_pants==1 or players[index].mizuno_pants==1 or players[index].legging_pants==1 or players[index].camouflage_pants==1 or players[index].tuxedo==1)
+{
+send_reliable(players[index].peer_id, "msgpieceoveranother", 0);
+}
+else
+{
+send_packet(0,"play calcadraw.ogg "+players[index].x+" "+players[index].y,players[index].map);
+players[index].wedding_dress=1;
+}
+}
+}
+else if(item_number=="damatlik")
+{
+if(players[index].inv_item_number("damatlik")>0)
+{
+if(players[index].tuxedo==1)
+{
+send_reliable(players[index].peer_id, "msgalreadywearing", 0);
+}
+else if(players[index].jeans_pants==1 or players[index].mizuno_pants==1 or players[index].legging_pants==1 or players[index].camouflage_pants==1 or players[index].wedding_dress==1)
+{
+send_reliable(players[index].peer_id, "msgpieceoveranother", 0);
+}
+else
+{
+send_packet(0,"play calcadraw.ogg "+players[index].x+" "+players[index].y,players[index].map);
+players[index].tuxedo=1;
+}
+}
+}
 else if(item_number=="Jeans_Pants")
 {
 if(players[index].inv_item_number("jeans_pants")>0)
@@ -7293,6 +7349,30 @@ else
 {
 if(string_contains(ver,"camisa",1)>-1) send_packet(0,"play retirarcamisa.ogg "+players[index].x+" "+players[index].y,players[index].map);
 players[index].knit_shirt=0;
+}
+}
+else if(item_number=="gelinlik")
+{
+if(players[index].wedding_dress==0)
+{
+send_reliable(players[index].peer_id, "msgnotwearing", 0);
+}
+else
+{
+if(string_contains(ver,"pants",1)>-1) send_packet(0,"play retirarcalca.ogg "+players[index].x+" "+players[index].y,players[index].map);
+players[index].wedding_dress=0;
+}
+}
+else if(item_number=="damatlik")
+{
+if(players[index].tuxedo==0)
+{
+send_reliable(players[index].peer_id, "msgnotwearing", 0);
+}
+else
+{
+if(string_contains(ver,"pants",1)>-1) send_packet(0,"play retirarcalca.ogg "+players[index].x+" "+players[index].y,players[index].map);
+players[index].tuxedo=0;
 }
 }
 else if(item_number=="Jeans_Pants")
@@ -8629,4 +8709,5 @@ if(projeteis.length()>0)projectile_loop();
 if(oms.length()>0)magnetic_item_loop();
 if(canhaos.length()>0)cannon_loop();
 }
+
 
