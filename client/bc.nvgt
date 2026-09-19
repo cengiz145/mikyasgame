@@ -2184,7 +2184,7 @@ if(key_pressed(KEY_TAB)){
             if(action == "back") current_category = 0;
             else if(action == "pet_despawn") send_reliable(peer_id, "spawnpet despawn", 0);
             else if(action.starts_with("pet_")) {
-                send_reliable(peer_id, "spawnpet " + pet_type, 0);
+                send_reliable(peer_id, "spawnpet " + action.replace("pet_", ""), 0);
                 break;
             }
         }
@@ -7004,6 +7004,7 @@ return message;
 }
 return message;
 }
+
 
 
 
