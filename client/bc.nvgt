@@ -1845,44 +1845,69 @@ weaponcheckloop();
 secondary_slot();
 if(get_my_tile()!=""&&jumping==0&&pulou==1&&falling==false) pulou=0;
 }
-if(key_pressed(KEY_F4)){
-    setupmenu();
-    m.add_item_tts("Evlilik Teklif Et", "evlilik_teklif");
-    m.add_item_tts("Evlilik Teklifini Kabul Et", "evlilik_kabul");
-    m.add_item_tts("Evliligi Reddet", "evlilik_red");
-    m.add_item_tts("Esinden Bosan", "evlilik_bosan");
-    m.add_item_tts("Esinin Yanina Isinlan", "eseyanina");
-    if(developer_dm == 1) {
-        m.add_item_tts("[ADMIN] Rutbe Ver", "rutbever");
-        m.add_item_tts("[ADMIN] Rutbe Al", "rutbeal");
-    }
-    
-    int menu_result = m.run("Eylem Menusu - Bir eylem secin", true);
-    if(menu_result > -1) {
-        string action = m.get_item_name(menu_result);
-        if(action == "evlilik_teklif") {
-            string target = v.input("Kime evlilik teklif edeceksiniz?");
-            if(target != "") send_reliable(peer_id, "/evlen " + target, 1);
+if(key_pressed(KEY_TAB)){
+    int current_category = 0;
+    while(true) {
+        setupmenu();
+        if(current_category == 0) {
+            m.add_item_tts("Evlilik Islemleri", "cat_evlilik");
+            if(developer_dm == 1) m.add_item_tts("Yonetici Islemleri", "cat_admin");
+            m.add_item_tts("Kapat", "close");
+            
+            int res = m.run("Eylem Menusu - Kategori Secin", true);
+            if(res < 0) break;
+            string action = m.get_item_name(res);
+            
+            if(action == "cat_evlilik") current_category = 1;
+            else if(action == "cat_admin") current_category = 2;
+            else if(action == "close") break;
         }
-        else if(action == "evlilik_kabul") {
-            send_reliable(peer_id, "/kabulet", 1);
+        else if(current_category == 1) {
+            m.add_item_tts("Evlilik Teklif Et", "evlilik_teklif");
+            m.add_item_tts("Evlilik Teklifini Kabul Et", "evlilik_kabul");
+            m.add_item_tts("Evliligi Reddet", "evlilik_red");
+            m.add_item_tts("Esinden Bosan", "evlilik_bosan");
+            m.add_item_tts("Esinin Yanina Isinlan", "eseyanina");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Evlilik Islemleri", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else {
+                if(action == "evlilik_teklif") {
+                    string target = v.input("Kime evlilik teklif edeceksiniz?");
+                    if(target != "") send_reliable(peer_id, "/evlen " + target, 1);
+                }
+                else if(action == "evlilik_kabul") send_reliable(peer_id, "/kabulet", 1);
+                else if(action == "evlilik_red") send_reliable(peer_id, "/reddet", 1);
+                else if(action == "evlilik_bosan") send_reliable(peer_id, "/bosan", 1);
+                else if(action == "eseyanina") send_reliable(peer_id, "/eseyanina", 1);
+                break;
+            }
         }
-        else if(action == "evlilik_red") {
-            send_reliable(peer_id, "/reddet", 1);
-        }
-        else if(action == "evlilik_bosan") {
-            send_reliable(peer_id, "/bosan", 1);
-        }
-        else if(action == "eseyanina") {
-            send_reliable(peer_id, "/eseyanina", 1);
-        }
-        else if(action == "rutbever") {
-            string target = v.input("Kime rutbe vermek istiyorsunuz?");
-            if(target != "") send_reliable(peer_id, "/rutbever " + target, 1);
-        }
-        else if(action == "rutbeal") {
-            string target = v.input("Kimin rutbesini almak istiyorsunuz?");
-            if(target != "") send_reliable(peer_id, "/rutbeal " + target, 1);
+        else if(current_category == 2) {
+            m.add_item_tts("Rutbe Ver", "rutbever");
+            m.add_item_tts("Rutbe Al", "rutbeal");
+            m.add_item_tts("Geri Don", "back");
+            
+            int res = m.run("Yonetici Islemleri", true);
+            if(res < 0) { current_category = 0; continue; }
+            string action = m.get_item_name(res);
+            
+            if(action == "back") current_category = 0;
+            else {
+                if(action == "rutbever") {
+                    string target = v.input("Kime rutbe vermek istiyorsunuz?");
+                    if(target != "") send_reliable(peer_id, "/rutbever " + target, 1);
+                }
+                else if(action == "rutbeal") {
+                    string target = v.input("Kimin rutbesini almak istiyorsunuz?");
+                    if(target != "") send_reliable(peer_id, "/rutbeal " + target, 1);
+                }
+                break;
+            }
         }
     }
 }
@@ -6699,4 +6724,5 @@ return message;
 }
 return message;
 }
+
 
