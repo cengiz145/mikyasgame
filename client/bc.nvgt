@@ -2026,11 +2026,18 @@ if(key_pressed(KEY_TAB)){
                     createmonster();
                 }
                 else if(action == "fasttravel") {
-                    string mlist = "";
+                    menu2();
                     string[] fl = find_files("maps/*.map");
-                    for(uint i=0; i<fl.length(); i++) mlist += string_replace(fl[i], ".map", "", true) + ", ";
-                    string dest = v.input("Nereye isinlanmak istiyorsunuz? Mevcut Haritalar: " + mlist);
-                    if(dest != "") send_reliable(peer_id, "/changemap " + username + " " + dest + " 0 0", 1);
+                    for(uint i=0; i<fl.length(); i++) {
+                        string mname = string_replace(fl[i], ".map", "", true);
+                        m.add_item_tts(mname, mname);
+                    }
+                    m.add_item_tts("Geri Don", "back");
+                    int res2 = m.run("Isinlanmak istediginiz haritayi secin", true);
+                    if(res2 >= 0) {
+                        string dest = m.get_item_name(res2);
+                        if(dest != "back") send_reliable(peer_id, "/changemap " + username + " " + dest + " 0 0", 1);
+                    }
                 }
                 break;
             }
@@ -6969,6 +6976,7 @@ return message;
 }
 return message;
 }
+
 
 
 
