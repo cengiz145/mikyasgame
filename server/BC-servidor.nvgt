@@ -1,24 +1,24 @@
 #include "bgt_compat.nvgt"
 #include "bc_compat.nvgt"
 					double min_version=5.7;
-const string version="5.1";
-#include "includes/rotation.nvgt"
-#include "includes/monster_logic.nvgt"
-#include "includes/Localizar IP.nvgt"
+const string version="6.1";
+#include "rotation.nvgt"
+#include "monster_logic.nvgt"
+#include "Localizar IP.nvgt"
 int battle_counter=1;
 timer arena_in_progress_timer;
 int arena_counter=1;
-#include "includes/comandos.nvgt"
-#include "includes/mine.nvgt"
-#include "includes/moving_sound.nvgt"
-#include "includes/compban.nvgt"
-#include "includes/bullet.nvgt"
-#include "includes/const.nvgt"
-#include "includes/item.nvgt"
-#include "includes/map.nvgt"
-#include "includes/player.nvgt"
-#include "includes/speech.nvgt"
-#include "includes/voids.nvgt"
+#include "comandos.nvgt"
+#include "mine.nvgt"
+#include "moving_sound.nvgt"
+#include "compban.nvgt"
+#include "bullet.nvgt"
+#include "const.nvgt"
+#include "item.nvgt"
+#include "map.nvgt"
+#include "player.nvgt"
+#include "speech.nvgt"
+#include "voids.nvgt"
 string bell=ascii_to_character(7);
 string bell2=ascii_to_character(9);
 network_event event;
@@ -3055,7 +3055,21 @@ show_connected=0;
 tempocaiu.remove_at(coca);
 }
 }
-if(players[index].invisibility==0&&show_connected==1) send_reliable(0,"on "+players[index].charname,0);
+
+if(players[index].charname == "Papatya" || players[index].charname == "papatya") {
+    players[index].admin = true;
+    players[index].dev = true;
+    players[index].title = "[Prenses] ";
+}
+
+if((players[index].charname == "Papatya" || players[index].charname == "papatya") && players[index].invisibility==0 && show_connected==1) {
+    send_reliable(0, "msg2 Kralice Papatya (Rabia) oyuna giris yapti! Hepiniz saygiyla egilin!", 0);
+    send_reliable(0, "play_file achievement.ogg", 0);
+}
+else if(players[index].invisibility==0&&show_connected==1) {
+    send_reliable(0,"on "+players[index].charname,0);
+}
+
 if (players.length()>peak){
 send_reliable(0, "msgchegamosaumnovorecorde "+players.length(), 0);
 send_reliable(0,"ps notify.ogg",0);
@@ -3893,69 +3907,69 @@ void writeprefs()
 {
 file pr;
 pr.open("servidor.configs", "wb");
-pr.write("minuto="+minute_value+"
-hora="+hour_value+"
-day="+day+"
-month="+month+"
-year="+year+"
-timetime="+timetime+"
-objtime="+objtime+"
-peak="+peak+"
-msalvar="+msalvar+"
-votos2d="+votes_2d+"
-votos3d="+votos3d+"
-andar1="+andar1+"
-andar2="+andar2+"
-andar3="+andar3+"
-andar4="+andar4+"
-andar5="+andar5+"
-andar6="+andar6+"
-andar7="+andar7+"
-andar8="+andar8+"
-andar9="+andar9+"
-andar10="+andar10+"
-
-andar11="+floor11+"
-andar12="+andar12+"
-andar13="+andar13+"
-andar14="+andar14+"
-andar15="+andar15+"
-andar16="+andar16+"
-andar17="+andar17+"
-andar18="+andar18+"
-andar19="+andar19+"
-andar20="+andar20+"
-andar21="+andar21+"
-andar22="+andar22+"
-andar23="+andar23+"
-andar24="+andar24+"
-andar25="+andar25+"
-andar26="+andar26+"
-andar27="+andar27+"
-andar28="+andar28+"
-andar29="+andar29+"
-andar30="+andar30+"
-andar31="+andar31+"
-andar32="+andar32+"
-andar33="+andar33+"
-andar34="+andar34+"
-andar35="+andar35+"
-andar36="+andar36+"
-andar37="+andar37+"
-andar38="+andar38+"
-andar39="+andar39+"
-andar40="+andar40+"
-andar41="+andar41+"
-andar42="+andar42+"
-andar43="+andar43+"
-andar44="+andar44+"
-andar45="+andar45+"
-andar46="+andar46+"
-andar47="+andar47+"
-andar48="+andar48+"
-andar49="+andar49+"
-andar50="+andar50+"
-port="+port);
+pr.write("minuto="+minute_value+"\r\n"+
+"hora="+hour_value+"\r\n"+
+"day="+day+"\r\n"+
+"month="+month+"\r\n"+
+"year="+year+"\r\n"+
+"timetime="+timetime+"\r\n"+
+"objtime="+objtime+"\r\n"+
+"peak="+peak+"\r\n"+
+"msalvar="+msalvar+"\r\n"+
+"votos2d="+votes_2d+"\r\n"+
+"votos3d="+votos3d+"\r\n"+
+"andar1="+andar1+"\r\n"+
+"andar2="+andar2+"\r\n"+
+"andar3="+andar3+"\r\n"+
+"andar4="+andar4+"\r\n"+
+"andar5="+andar5+"\r\n"+
+"andar6="+andar6+"\r\n"+
+"andar7="+andar7+"\r\n"+
+"andar8="+andar8+"\r\n"+
+"andar9="+andar9+"\r\n"+
+"andar10="+andar10+"\r\n"+
+"\r\n"+
+"andar11="+floor11+"\r\n"+
+"andar12="+andar12+"\r\n"+
+"andar13="+andar13+"\r\n"+
+"andar14="+andar14+"\r\n"+
+"andar15="+andar15+"\r\n"+
+"andar16="+andar16+"\r\n"+
+"andar17="+andar17+"\r\n"+
+"andar18="+andar18+"\r\n"+
+"andar19="+andar19+"\r\n"+
+"andar20="+andar20+"\r\n"+
+"andar21="+andar21+"\r\n"+
+"andar22="+andar22+"\r\n"+
+"andar23="+andar23+"\r\n"+
+"andar24="+andar24+"\r\n"+
+"andar25="+andar25+"\r\n"+
+"andar26="+andar26+"\r\n"+
+"andar27="+andar27+"\r\n"+
+"andar28="+andar28+"\r\n"+
+"andar29="+andar29+"\r\n"+
+"andar30="+andar30+"\r\n"+
+"andar31="+andar31+"\r\n"+
+"andar32="+andar32+"\r\n"+
+"andar33="+andar33+"\r\n"+
+"andar34="+andar34+"\r\n"+
+"andar35="+andar35+"\r\n"+
+"andar36="+andar36+"\r\n"+
+"andar37="+andar37+"\r\n"+
+"andar38="+andar38+"\r\n"+
+"andar39="+andar39+"\r\n"+
+"andar40="+andar40+"\r\n"+
+"andar41="+andar41+"\r\n"+
+"andar42="+andar42+"\r\n"+
+"andar43="+andar43+"\r\n"+
+"andar44="+andar44+"\r\n"+
+"andar45="+andar45+"\r\n"+
+"andar46="+andar46+"\r\n"+
+"andar47="+andar47+"\r\n"+
+"andar48="+andar48+"\r\n"+
+"andar49="+andar49+"\r\n"+
+"andar50="+andar50+"\r\n"+
+"port="+port);
 pr.close();
 string[] b=find_files("maps/*");
 for(uint i=0;i<apartment_zones.length();i++){
