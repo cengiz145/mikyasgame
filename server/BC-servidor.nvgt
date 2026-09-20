@@ -1,7 +1,7 @@
 ﻿#include "bgt_compat.nvgt"
 #include "bc_compat.nvgt"
 					double min_version=5.7;
-const string version="6.1";
+const string version="6.6";
 #include "rotation.nvgt"
 #include "monster_logic.nvgt"
 #include "pet_logic.nvgt"
@@ -8761,6 +8761,7 @@ if(projeteis.length()>0)projectile_loop();
 if(oms.length()>0)magnetic_item_loop();
 if(canhaos.length()>0)cannon_loop();
 }
+
 
 
 
