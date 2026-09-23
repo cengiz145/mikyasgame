@@ -1,5 +1,21 @@
 ﻿# Haf�zana G�ven - De�i�iklik G�nl��� (Changelog)
 
+[v0.98.0.0] - 23.09.2026
+
+Büyük Bilişsel ve Ekonomik Güncelleme! 🧠💰
+
+Yeni Başarılar ve Rütbe Sistemi:
+- Oyuna yepyeni "Bilişsel Başarımlar" eklendi! Kusursuz İcra, Kritik Eşik, Zihinsel Dayanıklılık gibi zekanızı ve soğukkanlılığınızı test edecek zorlu hedefler eklendi.
+- XP ve Rütbe sistemi aktif edildi. Jeton kazandıkça Tecrübe Puanı (XP) biriktirerek "Çaylak" rütbesinden "Efsane" statüsüne kadar yükselebilirsiniz! Oyuna girdiğinizde ekran okuyucu sizi kendi rütbenizle karşılayacak.
+- Başarılar sayfası tamamen yenilendi. Artık liste çok uzun değil; sadece kazanılan başarımları ve "Sıradaki Hedefleri" göstererek size her zaman ulaşılabilir bir hedef sunuyor.
+
+Oyun Ekonomisi ve Dengelemeler:
+- Zor mod oynayanların yeterince ödüllendirilmediği (sadece 1 Jeton kazandığı) büyük bir hata düzeltildi. Artık Zor modda her hamleniz 20-30 Jeton kazandırıyor.
+- Tüm başarımlara devasa Jeton ve XP ödülleri eklendi. 
+
+Oyun deneyimini çok daha sürükleyici ve rekabetçi kılan bu güncellemeyi hemen deneyin! 🚀
+
+
 [v0.97.4.63] - 19.09.2026
 
 Genel:
