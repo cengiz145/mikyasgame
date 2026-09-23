@@ -1,4 +1,30 @@
-﻿// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
+
+window.getRankInfo = function(xp) {
+    if (xp < 100) return { name: 'Çaylak', next: 100 };
+    if (xp < 300) return { name: 'Çırak', next: 300 };
+    if (xp < 600) return { name: 'Deneyimli', next: 600 };
+    if (xp < 1000) return { name: 'Hafıza Ustası', next: 1000 };
+    if (xp < 2000) return { name: 'Zihin Okuyucu', next: 2000 };
+    if (xp < 5000) return { name: 'Zeka Küpü', next: 5000 };
+    return { name: 'Efsane', next: null };
+};
+
+window.addXP = function(amount) {
+    let currentXP = parseInt(localStorage.getItem('hafizaGuvenXP')) || 0;
+    let oldRank = window.getRankInfo(currentXP).name;
+    currentXP += amount;
+    localStorage.setItem('hafizaGuvenXP', currentXP);
+    let newRank = window.getRankInfo(currentXP).name;
+    if (oldRank !== newRank) {
+        let timerFunction = window.hgfzZamanlayici ? window.hgfzZamanlayici.setTimeout : setTimeout;
+        timerFunction(() => {
+            if (window.buySound) window.buySound.play();
+            if (window.announceToScreenReader) window.announceToScreenReader(`Tebrikler! Seviye atladınız! Yeni Rütbeniz: ${newRank}`);
+        }, 1500);
+    }
+};
+
+// ui.js - Kullanıcı Arayüzü, Mobil Tespit ve Ekran Okuyucu Fonksiyonları
 
 // Mobil Cihaz Tespiti
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
@@ -75,7 +101,9 @@ window.checkDailyStreak = function() {
         } else {
             streak = 1;
             buzsuzGun = 1;
-            window.pendingDailyRewardMsg = `Oyuna hoş geldiniz! İlk gününüz. 10 jeton kazandınız.`;
+            
+    let rankName = window.getRankInfo ? window.getRankInfo(parseInt(localStorage.getItem('hafizaGuvenXP')) || 0).name : "";
+    window.pendingDailyRewardMsg = `Oyuna hoş geldin ${rankName}! İlk gününüz. 10 jeton kazandınız.`;
         }
         
         localStorage.setItem('hafizaGuvenLastLoginDate', todayStr);
@@ -578,6 +606,7 @@ window.updateStatsDisplay = function() {
         html = `
             <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 5px;" class="stats-list">
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Bakiye: ${tokens} Jeton">Bakiye: ${tokens} Jeton</li>
+                  <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Rütbe: ${window.getRankInfo(parseInt(localStorage.getItem('hafizaGuvenXP')) || 0).name} (${parseInt(localStorage.getItem('hafizaGuvenXP')) || 0} XP)">Rütbe: ${window.getRankInfo(parseInt(localStorage.getItem('hafizaGuvenXP')) || 0).name} (${parseInt(localStorage.getItem('hafizaGuvenXP')) || 0} XP)</li>
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Günlük Seri Takvimi: ${streakCount} Gün">Günlük Seri (Takvim): ${streakCount} Gün</li>
                 ${milestoneHtml}
                 <li tabindex="0" role="menuitem" class="stat-item" style="padding: 5px;" aria-label="Seri Dondurma: ${sdCount} adet">Seri Dondurma: ${sdCount} adet</li>
@@ -2416,30 +2445,76 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Achievements
     if (btnAchievementsMain && achievementsBackBtn) {
-        btnAchievementsMain.addEventListener('click', () => {
-            window.switchMenu(window.mainMenu, window.achievementsMenu, 'achievements');
+        let achievementsVisible = 20;
+
+        const renderAchievementsList = (contentDiv) => {
+            let unlockedHTML = '';
+            let lockedHTML = '';
+            let seenPrefixes = new Set();
             
-            let contentDiv = document.getElementById('achievements-content');
-            if (!window.userAchievements) window.userAchievements = JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || "{}");
-            let bg = parseInt(localStorage.getItem('hafizaGuvenBuzsuzGun')) || 0;
-            
-                                    let html = '<ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">';
             if (window.achievementsList) {
                 window.achievementsList.forEach(ach => {
                     let isUnlocked = window.userAchievements && window.userAchievements[ach.id];
+                    let rewardTxt = ach.reward ? ` [💰 ${ach.reward} Jeton]` : "";
+                    
                     if (isUnlocked) {
-                        html += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: ${ach.title}. ${ach.description}">✅ ${ach.title} (${ach.description})</li>`;
+                        unlockedHTML += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #4ade80;" aria-label="Kazanıldı: ${ach.title}. ${ach.description}. %100 Tamamlandı.${rewardTxt}">✅ ${ach.title} (${ach.description})${rewardTxt} - %100</li>`;
                     } else {
-                        let progress = ach.progressText ? ` - ${ach.progressText()}` : "";
-                        html += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: ${ach.title}. ${ach.description}. ${progress.replace('-', '')}">🔒 ${ach.title} (${ach.description})${progress}</li>`;
+                        let prefix = ach.id.split('_')[0];
+                        if (ach.id.startsWith('pvp')) prefix = 'pvp';
+                        if (ach.id.startsWith('total_score')) prefix = 'totalscore';
+                        
+                        let progressTextRaw = ach.progressText ? ach.progressText() : ""; 
+                        let percent = 0;
+                        let targetVal = 1;
+                        let match = progressTextRaw.match(/(\d+)\/(\d+)/);
+                        if (match && match.length === 3) {
+                            let current = parseInt(match[1]);
+                            let target = parseInt(match[2]);
+                            targetVal = target;
+                            if (target > 0) percent = Math.min(100, Math.round((current / target) * 100));
+                        }
+                        
+                        if (ach.isSecret) {
+                            if (!seenPrefixes.has('secret')) {
+                                lockedHTML += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: Gizli Başarım. Sürpriz!">🔒 ??? - Gizli Başarım (Sürpriz!)</li>`;
+                                seenPrefixes.add('secret');
+                            }
+                        } else if (!seenPrefixes.has(prefix)) {
+                            lockedHTML += `<li tabindex="0" role="menuitem" class="stat-item" style="color: #cbd5e1;" aria-label="Kilitli: ${ach.title}. ${ach.description}. %${percent} Tamamlandı. Gerekli: ${targetVal}${rewardTxt}">🔒 ${ach.title} (${ach.description})${rewardTxt} - %${percent}</li>`;
+                            seenPrefixes.add(prefix);
+                        }
                     }
                 });
             }
-            html += '</ul>';
-            if (contentDiv) contentDiv.innerHTML = html;
             
-            let text = "Başarılar menüsü açıldı. Durumunuzu kontrol edebilirsiniz.";
-            if (window.announceToScreenReader) window.announceToScreenReader(text);
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="color: #4ade80; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #4ade80; padding-bottom: 5px;">Kazanılanlar</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+                        ${unlockedHTML || '<li style="color:#94a3b8; font-style:italic;">Henüz kazanılmış bir başarım yok. Oynamaya başla!</li>'}
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #fca5a5; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #fca5a5; padding-bottom: 5px;">Sıradaki Hedefler</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+                        ${lockedHTML || '<li style="color:#94a3b8; font-style:italic;">Tüm hedefler tamamlandı! Efsanesin!</li>'}
+                    </ul>
+                </div>
+            `;
+
+            if (contentDiv) {
+                contentDiv.innerHTML = html;
+            }
+        };
+
+        btnAchievementsMain.addEventListener('click', () => {
+            if (window.menuEnterSound) window.menuEnterSound.play();
+            showMenu(achievementsMenu);
+            let contentDiv = document.getElementById('achievements-list-content');
+            if (contentDiv) renderAchievementsList(contentDiv);
+            if (window.announceToScreenReader) window.announceToScreenReader("Başarılar menüsü açıldı. Sınırsız hedef sistemi devrede.");
+            setTimeout(() => achievementsBackBtn.focus(), 100);
         });
         achievementsBackBtn.addEventListener('click', () => {
             window.switchMenu(window.achievementsMenu, window.mainMenu, 'main');
@@ -4303,19 +4378,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-        window.showAchievementModal = function(achName) {
+        window.showAchievementModal = function(achName, rewardVal) {
         let gameLink = "https://mikyasstudio.com.tr/hafizanaguven.html";
         let shareText = "Tebrikler! Hafizana Guven'de " + achName + " basarimini elde ettim! \n\nSen de benimle beraber bu basariyi yakalamak istiyorsan, haydi sen de oyna!\n\nOyunu Oyna: " + gameLink;
         
         let textElem = document.getElementById('achievement-modal-text');
         if (textElem) {
-            textElem.textContent = "Tebrikler! " + achName + " basarimini elde ettiniz! Bunu arkadaslarinizla paylasabilirsiniz.";
+            textElem.textContent = "Tebrikler! " + achName + " basarimini elde ettiniz! Bunu arkadaslarinizla paylasabilirsiniz." + (rewardVal ? " (Ödül: " + rewardVal + " Jeton)" : "");
             textElem.focus();
         }
         
         if (btnAchCopy) {
             btnAchCopy.onclick = () => {
                 navigator.clipboard.writeText(shareText).then(() => {
+                      localStorage.setItem('ach_social_butterfly', 'true');
+                      if (window.checkAllAchievements) window.checkAllAchievements();
                     if (window.announceToScreenReader) window.announceToScreenReader("Mesaj kopyalandÃ„±!");
                     if (window.correctSound) window.correctSound.play();
                 });
@@ -4323,7 +4400,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (btnAchWhatsapp) {
             btnAchWhatsapp.onclick = () => {
-                window.open("https://wa.me/?text=" + encodeURIComponent(shareText), '_blank');
+                localStorage.setItem('ach_social_butterfly', 'true');
+                  if (window.checkAllAchievements) window.checkAllAchievements();
+                  window.open("https://wa.me/?text=" + encodeURIComponent(shareText), '_blank');
             };
         }
         if (btnAchTelegram) {

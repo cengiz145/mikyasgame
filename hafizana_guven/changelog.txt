@@ -357,6 +357,21 @@ B�y�k Duyuru ve Yenilikler:
 [v0.97.2.9] - 18.04.2026
 
 ### Hata D�zeltmeleri:
+[v0.98.0.0] - 23.09.2026
+
+Büyük Bilişsel ve Ekonomik Güncelleme! 🧠💰
+
+Yeni Başarılar ve Rütbe Sistemi:
+- Oyuna yepyeni "Bilişsel Başarımlar" eklendi! Kusursuz İcra, Kritik Eşik, Zihinsel Dayanıklılık gibi zekanızı ve soğukkanlılığınızı test edecek zorlu hedefler eklendi.
+- XP ve Rütbe sistemi aktif edildi. Jeton kazandıkça Tecrübe Puanı (XP) biriktirerek "Çaylak" rütbesinden "Efsane" statüsüne kadar yükselebilirsiniz! Oyuna girdiğinizde ekran okuyucu sizi kendi rütbenizle karşılayacak.
+- Başarılar sayfası tamamen yenilendi. Artık liste çok uzun değil; sadece kazanılan başarımları ve "Sıradaki Hedefleri" göstererek size her zaman ulaşılabilir bir hedef sunuyor.
+
+Oyun Ekonomisi ve Dengelemeler:
+- Zor mod oynayanların yeterince ödüllendirilmediği (sadece 1 Jeton kazandığı) büyük bir hata düzeltildi. Artık Zor modda her hamleniz 20-30 Jeton kazandırıyor.
+- Tüm başarımlara devasa Jeton ve XP ödülleri eklendi. 
+
+Oyun deneyimini çok daha sürükleyici ve rekabetçi kılan bu güncellemeyi hemen deneyin! 🚀
+
 - PvP Lobi Men�leri: 'A��k Ma�lar' ve 'Ma� Kur' men�leri ana ok gezinti sistemine dahil edildi. Art�k bu men�lere girildi�inde NVDA sekme i�eri�ini 'b�l�m' vb. �eklinde okuyarak gezinim/sanal (Browse) moduna d��meyecek. Do�rudan a��k a��k ok tu�lar�n� kullanarak oyuncular�n kurdu�u ma�lar listesinde liste eleman� ya da d��me olarak dola�abileceksiniz.
 
 [v0.97.4.45] - 26.05.2026

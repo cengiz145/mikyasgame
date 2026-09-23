@@ -451,6 +451,9 @@ window.startMainGame = function (difficulty = 'easy') {
     window.gameScore = 0;
     window.gameMistakes = 0;
     window.gameIsActive = true;
+    window.hgStartTime = Date.now();
+    window.hgShieldUsed = false;
+    window.hgConsecutiveMistakes = 0;
     window.isGameEnding = false;
     window.isStarted = true;
     window.gameSequence = [];
@@ -536,6 +539,7 @@ window.startMainGame = function (difficulty = 'easy') {
 
                 if (window.gameTimer <= 0) {
                     let zkLocal = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+                  window.hgShieldUsed = true;
                     if (zkLocal > 0) {
                         zkLocal--;
                         window.gameTimer = 15;
@@ -708,6 +712,35 @@ window.endMainGame = function (isTimeOut = false, isWin = false, isUserExit = fa
     }
 
     if (isWin) {
+        if (window.activeDifficulty !== 'easy') {
+            if (window.gameMistakes === 0) {
+                let streak = (parseInt(localStorage.getItem('hafizaGuvenFlawlessStreak')) || 0) + 1;
+                localStorage.setItem('hafizaGuvenFlawlessStreak', streak);
+                if (streak >= 5) localStorage.setItem('ach_cognitive_endurance', 'true');
+            } else {
+                localStorage.setItem('hafizaGuvenFlawlessStreak', 0);
+            }
+        }
+        if (window.gameTimer <= 3 && window.gameTimer >= 0) localStorage.setItem('ach_critical_threshold', 'true');
+        if (window.activeDifficulty === 'hard' && !window.hgShieldUsed && window.gameMistakes === 0) localStorage.setItem('ach_flawless_execution', 'true');
+        let inst = localStorage.getItem('hafizaGuvenInstrument') || 'piano';
+        if (inst !== 'piano' && window.gameMistakes === 0) localStorage.setItem('ach_acoustic_isolation', 'true');
+
+        if (window.addXP) {
+            let xpGained = (window.activeDifficulty === 'hard') ? 50 : (window.activeDifficulty === 'medium') ? 25 : 10;
+            window.addXP(xpGained);
+        }
+        let elapsedTime = (Date.now() - (window.hgStartTime || Date.now())) / 1000;
+        if (elapsedTime <= 15) {
+            localStorage.setItem('ach_speed_light', 'true');
+        }
+        if (window.gameTimer <= 1) {
+            localStorage.setItem('ach_secret_time', 'true');
+        }
+        if (!window.hgShieldUsed) {
+            localStorage.setItem('ach_secret_pure', 'true');
+        }
+        if (window.checkAllAchievements) window.checkAllAchievements();
         baseMessage = `Tebrikler! Zamanında tüm notaları tamamladınız.`;
 
 
@@ -862,6 +895,10 @@ window.handleGameInput = function (key) {
                     baseTokens = Math.floor(Math.random() * 10) + 1;
                 } else if (window.activeDifficulty === 'medium') {
                     baseTokens = Math.floor(Math.random() * 11) + 10;
+                } else if (window.activeDifficulty === 'hard') {
+                    baseTokens = Math.floor(Math.random() * 11) + 20;
+                } else {
+                    baseTokens = 15;
                 }
 
                 let thinkingTime = Math.max(0, turnTime - (window.gameSequence.length * 0.5));
@@ -877,6 +914,7 @@ window.handleGameInput = function (key) {
             if (window.gameTimer > 10) window.hasWarned10 = false;
             window.gameScore += 1;
             window.gameMistakes = 0;
+            window.hgConsecutiveMistakes = 0;
             window.updateGameUI();
 
             const gameStatus = document.getElementById('game-status-text');
@@ -941,6 +979,11 @@ window.handleGameInput = function (key) {
             if (window.wrongSound) window.wrongSound.play();
             window.gameTimer -= 5;
             window.gameMistakes += 1;
+            window.hgConsecutiveMistakes = (window.hgConsecutiveMistakes || 0) + 1;
+            if (window.hgConsecutiveMistakes >= 3) {
+                localStorage.setItem('ach_secret_clumsy', 'true');
+                if (window.checkAllAchievements) window.checkAllAchievements();
+            }
             window.updateGameUI();
 
             const gameStatus = document.getElementById('game-status-text');

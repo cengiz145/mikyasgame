@@ -796,24 +796,181 @@ window.userAchievements = {
     "total_score_100000": false,
 };
 
+// Dinamik Ödül Ataması
+if (window.achievementsList) {
+    window.achievementsList.forEach(ach => {
+        if (!ach.reward) {
+            if (ach.id.includes('_100000') || ach.id.includes('_1000')) { ach.reward = 1000; }
+            else if (ach.id.includes('_50000') || ach.id.includes('_500')) { ach.reward = 500; }
+            else if (ach.id.includes('_10000') || ach.id.includes('_250') || ach.id.includes('_100')) { ach.reward = 250; }
+            else if (ach.id.includes('_5000') || ach.id.includes('_50')) { ach.reward = 100; }
+            else if (ach.id.includes('_1000') || ach.id.includes('_25')) { ach.reward = 50; }
+            else if (ach.id.includes('_10')) { ach.reward = 25; }
+            else { ach.reward = 10; }
+        }
+    });
+
+    const addAch = (obj) => {
+        if (!window.achievementsList.find(a => a.id === obj.id)) {
+            window.achievementsList.push(obj);
+        }
+    };
+
+    addAch({
+        id: "secret_time",
+        title: "Son Saniye Kahramanı",
+        description: "Sürenin bitmesine tam 1 saniye kala oyunu kazan",
+        isSecret: true,
+        reward: 500,
+        checkCondition: function() { return localStorage.getItem('ach_secret_time') === 'true'; },
+        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_secret_time') ? 1 : 0) + "/1"; }
+    });
+
+    addAch({
+        id: "secret_pure",
+        title: "Saf Zeka",
+        description: "Hiç koruma veya buz kullanmadan oyunu kazan",
+        isSecret: true,
+        reward: 500,
+        checkCondition: function() { return localStorage.getItem('ach_secret_pure') === 'true'; },
+        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_secret_pure') ? 1 : 0) + "/1"; }
+    });
+
+    addAch({
+        id: "shop_collector",
+        title: "Müzik Ziyafeti",
+        description: "Mağazadaki tüm enstrüman ses paketlerini satın al",
+        reward: 250,
+        checkCondition: function() { return localStorage.getItem('hafizaGuvenBaglamaPack') === 'true' && localStorage.getItem('hafizaGuvenKavalPack') === 'true' && localStorage.getItem('hafizaGuvenFlutPack') === 'true' && localStorage.getItem('hafizaGuvenKanunPack') === 'true'; },
+        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_shop_collector') ? 1 : 0) + "/1"; }
+    });
+
+    addAch({
+        id: "social_butterfly",
+        title: "Sosyal Kelebek",
+        description: "Bir başarımı paylaş butonuyla arkadaşlarına gönder",
+        reward: 50,
+        checkCondition: function() { return localStorage.getItem('ach_social_butterfly') === 'true'; },
+        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_social_butterfly') ? 1 : 0) + "/1"; }
+    });
+
+    addAch({
+        id: "speed_light",
+        title: "Işık Hızı",
+        description: "Herhangi bir modu 15 saniyenin altında bitir",
+        reward: 300,
+        checkCondition: function() { return localStorage.getItem('ach_speed_light') === 'true'; },
+        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_speed_light') ? 1 : 0) + "/1"; }
+    });
+
+    addAch({
+        id: "secret_clumsy",
+        title: "Biraz Dalgınım",
+        description: "Arka arkaya 3 kere alakasız karta tıkla",
+        isSecret: true,
+        reward: 100,
+        checkCondition: function() { return localStorage.getItem('ach_secret_clumsy') === 'true'; },
+        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_secret_clumsy') ? 1 : 0) + "/1"; }
+    });
+}
+
+    addAch({
+        id: "ach_flawless_execution",
+        title: "Kusursuz İcra",
+        description: "Zor modda sıfır hata ve sıfır koruma ile oyunu kazan.",
+        reward: 1000,
+        checkCondition: function() { return localStorage.getItem('ach_flawless_execution') === 'true'; },
+        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_flawless_execution') ? 1 : 0) + "/1"; }
+    });
+
+    addAch({
+        id: "ach_critical_threshold",
+        title: "Kritik Eşik",
+        description: "Süre sayacı 3 veya altındayken toparlayıp kazan.",
+        reward: 600,
+        checkCondition: function() { return localStorage.getItem('ach_critical_threshold') === 'true'; },
+        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_critical_threshold') ? 1 : 0) + "/1"; }
+    });
+
+    addAch({
+        id: "ach_cognitive_endurance",
+        title: "Zihinsel Dayanıklılık",
+        description: "Arka arkaya 5 oyunu (Kolay hariç) sıfır hatayla kazan.",
+        reward: 800,
+        checkCondition: function() { return localStorage.getItem('ach_cognitive_endurance') === 'true'; },
+        progressText: function() { return "İlerleme: " + Math.min(5, (parseInt(localStorage.getItem('hafizaGuvenFlawlessStreak')) || 0)) + "/5"; }
+    });
+
+    addAch({
+        id: "ach_systematic_investment",
+        title: "Sistematik Yatırım",
+        description: "Aynı anda 10 Hata Koruması ve 10 Zaman Koruması stokla.",
+        reward: 500,
+        checkCondition: function() { 
+            let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+            let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+            return hk >= 10 && zk >= 10; 
+        },
+        progressText: function() { 
+            let hk = parseInt(localStorage.getItem('hafizaGuvenHataKorumasi')) || 0;
+            let zk = parseInt(localStorage.getItem('hafizaGuvenZamanKorumasi')) || 0;
+            let min = Math.min(hk, zk);
+            return "İlerleme: " + Math.min(10, min) + "/10"; 
+        }
+    });
+
+    addAch({
+        id: "ach_acoustic_isolation",
+        title: "İşitsel İzolasyon",
+        description: "Farklı bir enstrüman etkinken sıfır hatayla oyun kazan.",
+        reward: 500,
+        checkCondition: function() { return localStorage.getItem('ach_acoustic_isolation') === 'true'; },
+        progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_acoustic_isolation') ? 1 : 0) + "/1"; }
+    });
+
 window.checkAllAchievements = function() {
     if (window.achievementsList && window.userAchievements) {
         let delayAcc = 0;
+        let countBefore = Object.values(window.userAchievements).filter(v => v).length;
+        
         window.achievementsList.forEach(ach => {
             if (!window.userAchievements[ach.id] && ach.checkCondition()) {
                 window.userAchievements[ach.id] = true;
                 try { localStorage.setItem('hafizaGuvenAchievements', JSON.stringify(window.userAchievements)); } catch (e) { }
 
+                // REWARD LOGIC
+                if (ach.reward) {
+                    let tTokens = parseInt(localStorage.getItem('hafizaGuvenTotalTokens')) || 0;
+                    tTokens += ach.reward;
+                    localStorage.setItem('hafizaGuvenTotalTokens', tTokens);
+                    if (window.addXP) window.addXP(ach.reward);
+                }
+
                 let timerFunction = window.hgfzZamanlayici ? window.hgfzZamanlayici.setTimeout : setTimeout;
                 
                 timerFunction(() => {
                     if (window.achievementSound) window.achievementSound.play();
-                    if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız: " + ach.title);
+                    let rewardTxt = ach.reward ? " (" + ach.reward + " Jeton Kazandırdı)" : "";
+                    if (window.announceToScreenReader) window.announceToScreenReader("Yeni Bir Başarım Kazandınız: " + ach.title + rewardTxt);
                     setTimeout(() => {
-                        if (window.showAchievementModal) window.showAchievementModal(ach.title);
+                        if (window.showAchievementModal) window.showAchievementModal(ach.title, ach.reward);
                     }, 3000);
                 }, delayAcc);
-                delayAcc += 4000;
+                delayAcc += 4500;
+            }
+        });
+
+        let countAfter = Object.values(window.userAchievements).filter(v => v).length;
+        let milestones = [20, 80, 100];
+        
+        milestones.forEach(m => {
+            if (countBefore < m && countAfter >= m) {
+                let timerFunction = window.hgfzZamanlayici ? window.hgfzZamanlayici.setTimeout : setTimeout;
+                timerFunction(() => {
+                    alert(`Tebrikler! Hafızana Güven'de toplam ${m} başarı seviyesine ulaştınız!`);
+                    if (window.announceToScreenReader) window.announceToScreenReader(`Tebrikler! Hafızana Güven'de toplam ${m} başarı seviyesine ulaştınız!`);
+                }, delayAcc + 1000);
+                delayAcc += 2000;
             }
         });
     }
