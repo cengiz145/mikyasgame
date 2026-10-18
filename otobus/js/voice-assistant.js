@@ -103,6 +103,27 @@
             return;
         }
 
+        // --- AKILLI ROTA SİSTEMİ (NEREDEN ➔ NEREYE) ---
+        if (command.includes("akıllı rota") || command.includes("nereden nereye") || command.includes("rota hesapla") || command.includes("hedef seç")) {
+            if (typeof AkilliRotaSistemi !== 'undefined' && AkilliRotaSistemi.openModal) {
+                AkilliRotaSistemi.openModal();
+                return;
+            }
+        }
+
+        // Doğrudan sesle kalkış ve varış söyleme: "spor salonundan tepekente git", "valilikten yüzüncü yıla" vb.
+        const smartMatch = command.match(/(?:nereden\s+)?(.+?)(?:'dan|'den|'tan|'ten|dan|den|tan|ten)\s+(?:nereye\s+)?(.+?)(?:'ya|'ye|'a|'e|ya|ye|a|e)\s*(?:git|sefer|sur|sür)?$/i);
+        if (smartMatch && smartMatch[1] && smartMatch[2] && !command.includes("seviye") && !command.includes("motor")) {
+            const fromQuery = smartMatch[1].trim();
+            const toQuery = smartMatch[2].trim();
+            if (fromQuery.length > 2 && toQuery.length > 2) {
+                if (typeof AkilliRotaSistemi !== 'undefined' && AkilliRotaSistemi.baslat) {
+                    const started = AkilliRotaSistemi.baslat(fromQuery, toQuery);
+                    if (started) return;
+                }
+            }
+        }
+
         // --- ŞEHİR İÇİ ANA ARTER HATTI (HAT 2/7) ---
         if (command.includes("2/7") || command.includes("iki yedi") || command.includes("yüzüncü yıl") || command.includes("tepekent") || command.includes("araştırma hastane")) {
             const isDonus = command.includes("dönüş") || command.includes("geri");
