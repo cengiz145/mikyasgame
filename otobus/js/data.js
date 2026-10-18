@@ -1036,184 +1036,454 @@ const varsayilanSehirDuraklari = {
 const ilceRotalari = {
     "Tekirdağ": [
                 {
-            id: "hat_26_suleymanpasa_saray",
-            hatNo: "26",
-            name: "26 SÜLEYMANPAŞA - SARAY",
-            destDistrict: "Saray",
-            originDistrict: "Süleymanpaşa",
-            startStop: "Süleymanpaşa Yeni Otobüs Terminali",
-            endStop: "Saray Belediyesi Otogarı",
-            intermediateStops: [
-                "Muratlı Caddesi",
-                "Tekirdağ Şehir Hastanesi & Ağız ve Diş Sağlığı Hastanesi",
-                "Yahya Kemal Beyatlı Kültür Merkezi",
-                "Fatih Sultan Mehmet Bulvarı (Baykallar)",
-                "Alkaya – Değirmenaltı Mevkii",
-                "Tekirdağ Namık Kemal Üniversitesi (NKÜ) Kampüs / Araştırma Hastanesi",
-                "D-110 / D-567 Bağlantısı (Şerefli Kavşağı)",
-                "Velimeşe Girişi",
-                "Veliköy Merkez",
-                "Kızılpınar Kahveler",
-                "Çerkezköy Otogarı & Şehir Geçişi",
-                "Kapaklı Belediyesi & Kapaklı Otogarı",
-                "Büyükyoncalı / Yeniköy",
-                "Saray Meslek Yüksekokulu (Fakülte)"
-            ],
-            desc: "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Saray Belediyesi Otogarı. Güzergâh: Muratlı Caddesi, Şehir Hastanesi, Yahya Kemal Beyatlı, Alkaya, NKÜ Kampüs, Velimeşe, Veliköy, Kızılpınar, Çerkezköy, Kapaklı, Büyükyoncalı. Toplam 16 durak, ~86 km.",
-            detailedInstructions: "TEKULAŞ 26 Numaralı Hat (Süleymanpaşa Yeni Otogar – Saray Otogar) Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otobüs Terminali durağından bekleyen 40 yolcuyu alarak hareket edin.\n2. Adım: 2.2 kilometre sonra Muratlı Caddesi durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\n3. Adım: 1.8 kilometre sonra Tekirdağ Şehir Hastanesi & Ağız ve Diş Sağlığı Hastanesi durağına gidin; yolcuları indirin ve bekleyen 12 yolcuyu alıp devam edin.\n4. Adım: 1.5 kilometre sonra Yahya Kemal Beyatlı Kültür Merkezi durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\n5. Adım: 1.5 kilometre sonra Fatih Sultan Mehmet Bulvarı (Baykallar) durağına gidin; yolcuları indirin ve bekleyen 7 yolcuyu alıp devam edin.\n6. Adım: 2 kilometre sonra Alkaya – Değirmenaltı Mevkii durağına gidin; yolcuları indirin ve bekleyen 9 yolcuyu alıp devam edin.\n7. Adım: 2 kilometre sonra Tekirdağ Namık Kemal Üniversitesi Kampüsü durağına gidin; yolcuları indirin ve bekleyen 14 yolcuyu alıp devam edin.\n8. Adım: 24.5 kilometre sonra D-110 / D-567 Bağlantısı (Şerefli Kavşağı) durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\n9. Adım: 8.5 kilometre sonra Velimeşe Girişi durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\n10. Adım: 4.5 kilometre sonra Veliköy Merkez durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\n11. Adım: 4 kilometre sonra Kızılpınar Kahveler durağına gidin; yolcuları indirin ve bekleyen 10 yolcuyu alıp devam edin.\n12. Adım: 7.5 kilometre sonra Çerkezköy Otogarı & Şehir Geçişi durağına gidin; yolcuları indirin ve bekleyen 18 yolcuyu alıp devam edin.\n13. Adım: 7 kilometre sonra Kapaklı Belediyesi & Kapaklı Otogarı durağına gidin; yolcuları indirin ve bekleyen 12 yolcuyu alıp devam edin.\n14. Adım: 10.5 kilometre sonra Büyükyoncalı / Yeniköy durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\n15. Adım: 6.5 kilometre sonra Saray Meslek Yüksekokulu (Fakülte) durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n16. Adım (Hedef Son Durak): 2 kilometre sonra hedef Saray Belediyesi Otogarı durağına gidin; tüm yolcuları indirin ve görevi başarıyla tamamlayın.",
-            speechBriefing: "TEKULAŞ 26 No'lu Süleymanpaşa Saray ekspres otobüs seferi. Kalkış: Süleymanpaşa Yeni Otobüs Terminali. Hedef son durak: Saray Belediyesi Otogarı. Toplam 16 durak ve 86 kilometre. Süleymanpaşa şehir içi, Çorlu sapağı, Velimeşe, Veliköy, Kızılpınar, Çerkezköy ve Kapaklı üzerinden Saray Otogarına ulaşılır.",
-            color: "#0284c7",
-            otobusKapasitesi: 50,
-            biletFiyat: 95,
-            biletFiyatMultiplier: 2.8,
-            isDistrict: true,
-            terrain: "otoyol",
-            stops: [
-                {
-                    name: "Süleymanpaşa Yeni Otobüs Terminali",
-                    anons: "Süleymanpaşa Yeni Otobüs Terminali kalkış peronundayız. TEKULAŞ 26 No'lu Süleymanpaşa Saray seferimiz başlıyor.",
-                    bekleyenYolcu: 40,
-                    inenYolcu: 0,
-                    gercekMesafeSonraki: 2.2,
-                    lat: 40.9950,
-                    lon: 27.5620
-                },
-                {
-                    name: "Muratlı Caddesi",
-                    anons: "Sonraki durak: Muratlı Caddesi.",
-                    bekleyenYolcu: 8,
-                    inenYolcu: 2,
-                    gercekMesafeSonraki: 1.8,
-                    lat: 40.9850,
-                    lon: 27.5380
-                },
-                {
-                    name: "Tekirdağ Şehir Hastanesi & Ağız ve Diş Sağlığı Hastanesi",
-                    anons: "Sonraki durak: Tekirdağ Şehir Hastanesi ile Ağız ve Diş Sağlığı Hastanesi.",
-                    bekleyenYolcu: 12,
-                    inenYolcu: 5,
-                    gercekMesafeSonraki: 1.5,
-                    lat: 40.9880,
-                    lon: 27.5350
-                },
-                {
-                    name: "Yahya Kemal Beyatlı Kültür Merkezi",
-                    anons: "Sonraki durak: Yahya Kemal Beyatlı Kültür Merkezi.",
-                    bekleyenYolcu: 6,
-                    inenYolcu: 3,
-                    gercekMesafeSonraki: 1.5,
-                    lat: 40.9820,
-                    lon: 27.5250
-                },
-                {
-                    name: "Fatih Sultan Mehmet Bulvarı (Baykallar)",
-                    anons: "Sonraki durak: Fatih Sultan Mehmet Bulvarı, Baykallar mevkii.",
-                    bekleyenYolcu: 7,
-                    inenYolcu: 4,
-                    gercekMesafeSonraki: 2.0,
-                    lat: 40.9800,
-                    lon: 27.5450
-                },
-                {
-                    name: "Alkaya – Değirmenaltı Mevkii",
-                    anons: "Sonraki durak: Alkaya, Değirmenaltı mevkii.",
-                    bekleyenYolcu: 9,
-                    inenYolcu: 5,
-                    gercekMesafeSonraki: 2.0,
-                    lat: 40.9910,
-                    lon: 27.5750
-                },
-                {
-                    name: "Tekirdağ Namık Kemal Üniversitesi (NKÜ) Kampüs / Araştırma Hastanesi",
-                    anons: "Sonraki durak: Namık Kemal Üniversitesi Kampüsü, KYK Yurtları ve Araştırma Hastanesi.",
-                    bekleyenYolcu: 14,
-                    inenYolcu: 10,
-                    gercekMesafeSonraki: 24.5,
-                    lat: 40.9975,
-                    lon: 27.5870
-                },
-                {
-                    name: "D-110 / D-567 Bağlantısı (Şerefli Kavşağı)",
-                    anons: "Sonraki durak: D-110 ve D-567 Bağlantısı, Şerefli Kavşağı.",
-                    bekleyenYolcu: 3,
-                    inenYolcu: 2,
-                    gercekMesafeSonraki: 8.5,
-                    lat: 41.1350,
-                    lon: 27.7300
-                },
-                {
-                    name: "Velimeşe Girişi",
-                    anons: "Sonraki durak: Velimeşe Girişi ve Organize Sanayi Bölgesi.",
-                    bekleyenYolcu: 6,
-                    inenYolcu: 5,
-                    gercekMesafeSonraki: 4.5,
-                    lat: 41.2450,
-                    lon: 27.8850
-                },
-                {
-                    name: "Veliköy Merkez",
-                    anons: "Sonraki durak: Veliköy Merkez.",
-                    bekleyenYolcu: 5,
-                    inenYolcu: 4,
-                    gercekMesafeSonraki: 4.0,
-                    lat: 41.2650,
-                    lon: 27.9250
-                },
-                {
-                    name: "Kızılpınar Kahveler",
-                    anons: "Sonraki durak: Kızılpınar Kahveler mevkii.",
-                    bekleyenYolcu: 10,
-                    inenYolcu: 6,
-                    gercekMesafeSonraki: 7.5,
-                    lat: 41.2750,
-                    lon: 27.9650
-                },
-                {
-                    name: "Çerkezköy Otogarı & Şehir Geçişi",
-                    anons: "Sonraki durak: Çerkezköy Otogarı ve Şehir Geçişi.",
-                    bekleyenYolcu: 18,
-                    inenYolcu: 15,
-                    gercekMesafeSonraki: 7.0,
-                    lat: 41.2850,
-                    lon: 27.9950
-                },
-                {
-                    name: "Kapaklı Belediyesi & Kapaklı Otogarı",
-                    anons: "Sonraki durak: Kapaklı Belediyesi ve Kapaklı Otogarı.",
-                    bekleyenYolcu: 12,
-                    inenYolcu: 10,
-                    gercekMesafeSonraki: 10.5,
-                    lat: 41.3150,
-                    lon: 27.9800
-                },
-                {
-                    name: "Büyükyoncalı / Yeniköy",
-                    anons: "Sonraki durak: Büyükyoncalı, Yeniköy mevkii.",
-                    bekleyenYolcu: 6,
-                    inenYolcu: 7,
-                    gercekMesafeSonraki: 6.5,
-                    lat: 41.3900,
-                    lon: 27.9550
-                },
-                {
-                    name: "Saray Meslek Yüksekokulu (Fakülte)",
-                    anons: "Sonraki durak: Saray Meslek Yüksekokulu Fakülte Durağı.",
-                    bekleyenYolcu: 4,
-                    inenYolcu: 10,
-                    gercekMesafeSonraki: 2.0,
-                    lat: 41.4350,
-                    lon: 27.9300
-                },
-                {
-                    name: "Saray Belediyesi Otogarı",
-                    anons: "Son durak: Saray Belediyesi Otogarı. TEKULAŞ 26 No'lu Süleymanpaşa Saray seferimiz başarıyla tamamlanmıştır. Tüm yolcularımızın inmesi rica olunur.",
-                    bekleyenYolcu: 0,
-                    inenYolcu: 35,
-                    gercekMesafeSonraki: 0,
-                    lat: 41.4450,
-                    lon: 27.9200
-                }
-            ]
+                  "id": "hat_26_suleymanpasa_saray",
+                  "hatNo": "26",
+                  "name": "26 SÜLEYMANPAŞA - ÇERKEZKÖY - KAPAKLI - SARAY",
+                  "destDistrict": "Saray",
+                  "originDistrict": "Süleymanpaşa",
+                  "startStop": "Süleymanpaşa Yeni Otobüs Terminali",
+                  "endStop": "Saray Belediyesi Otogarı",
+                  "intermediateStops": [
+                            "Muratlı Caddesi Trafo",
+                            "Göçmen Konutları Giriş",
+                            "Tekirdağ Büyükşehir Belediyesi Fen İşleri",
+                            "Tekirdağ Şehir Hastanesi Acil",
+                            "Ağız ve Diş Sağlığı Hastanesi",
+                            "Tekirdağ Şehir Hastanesi Ana Giriş",
+                            "Muratlı Caddesi / Soğancılar",
+                            "Şehit Yüzbaşı Mayadağlı Caddesi",
+                            "Yahya Kemal Beyatlı Kültür Merkezi",
+                            "Fatih Sultan Mehmet Bulvarı (Baykallar)",
+                            "Yeni Emniyet Müdürlüğü",
+                            "Alkaya – Değirmenaltı Mevkii",
+                            "Namık Kemal Üniversitesi (NKÜ) Kampüs Giriş / KYK Yurtları",
+                            "NKÜ Araştırma Hastanesi & Rektörlük",
+                            "D-110 Çevre Yolu Bağlar Mevkii",
+                            "D-110 / D-567 Bağlantısı (Şerefli Kavşağı)",
+                            "Çorlu Çevre Yolu Sapağı (Transit Geçiş)",
+                            "Velimeşe Girişi (Sanayi Bağlantısı)",
+                            "Velimeşe Sanayi Caddesi",
+                            "Velimeşe Merkez Meydan",
+                            "Veliköy Giriş",
+                            "Veliköy Merkez",
+                            "Veliköy Işıklar / OSB Bağlantısı",
+                            "Kızılpınar Giriş",
+                            "Kızılpınar Kahveler Durağı",
+                            "Kızılpınar Merkez",
+                            "Çerkezköy Narin Kavşağı",
+                            "Çerkezköy Otogarı",
+                            "Çerkezköy Şehir İçi Geçişi",
+                            "Çerkezköy Belediyesi / Atatürk Caddesi",
+                            "Çerkezköy Devlet Hastanesi Sapağı",
+                            "Kapaklı Giriş / Yıldızkent Kavşağı",
+                            "Kapaklı Belediyesi",
+                            "Kapaklı Otogarı",
+                            "Kapaklı Sanayi Kavşağı",
+                            "Pınarça Sapağı",
+                            "Büyükyoncalı Giriş",
+                            "Büyükyoncalı Merkez (Belediye)",
+                            "Yeniköy Kavşağı",
+                            "Saray Çukuryurt Sapağı",
+                            "Saray Meslek Yüksekokulu (Fakülte)"
+                  ],
+                  "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Saray Belediyesi Otogarı. Güzergâh: Şehir Hastanesi, NKÜ Araştırma, Çorlu Çevre Yolu, Velimeşe, Veliköy, Kızılpınar, Çerkezköy, Kapaklı, Büyükyoncalı. Toplam 43 durak, ~86 km.",
+                  "detailedInstructions": "TEKULAŞ 26 Numaralı Hat (Süleymanpaşa Yeni Otogar – Saray Otogar) Tam Güzergâh Adımları:\\n1. Adım: Süleymanpaşa Yeni Otobüs Terminali durağından bekleyen 40 yolcuyu alarak hareket edin.\\n2. Adım: 1.2 kilometre sonra Muratlı Caddesi Trafo durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n3. Adım: 0.9 kilometre sonra Göçmen Konutları Giriş durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n4. Adım: 0.8 kilometre sonra Tekirdağ Büyükşehir Belediyesi Fen İşleri durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n5. Adım: 0.7 kilometre sonra Tekirdağ Şehir Hastanesi Acil durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n6. Adım: 0.5 kilometre sonra Ağız ve Diş Sağlığı Hastanesi durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n7. Adım: 0.4 kilometre sonra Tekirdağ Şehir Hastanesi Ana Giriş durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\\n8. Adım: 1.1 kilometre sonra Muratlı Caddesi / Soğancılar durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n9. Adım: 0.8 kilometre sonra Şehit Yüzbaşı Mayadağlı Caddesi durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n10. Adım: 1 kilometre sonra Yahya Kemal Beyatlı Kültür Merkezi durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n11. Adım: 1.2 kilometre sonra Fatih Sultan Mehmet Bulvarı (Baykallar) durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n12. Adım: 1 kilometre sonra Yeni Emniyet Müdürlüğü durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n13. Adım: 1.2 kilometre sonra Alkaya – Değirmenaltı Mevkii durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n14. Adım: 1.1 kilometre sonra Namık Kemal Üniversitesi (NKÜ) Kampüs Giriş / KYK Yurtları durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n15. Adım: 0.9 kilometre sonra NKÜ Araştırma Hastanesi & Rektörlük durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\\n16. Adım: 8.5 kilometre sonra D-110 Çevre Yolu Bağlar Mevkii durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n17. Adım: 9.5 kilometre sonra D-110 / D-567 Bağlantısı (Şerefli Kavşağı) durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n18. Adım: 7 kilometre sonra Çorlu Çevre Yolu Sapağı (Transit Geçiş) durağına gidin; yolcuları indirin ve bekleyen 1 yolcuyu alıp devam edin.\\n19. Adım: 4 kilometre sonra Velimeşe Girişi (Sanayi Bağlantısı) durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n20. Adım: 1.5 kilometre sonra Velimeşe Sanayi Caddesi durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n21. Adım: 1.2 kilometre sonra Velimeşe Merkez Meydan durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n22. Adım: 2.5 kilometre sonra Veliköy Giriş durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n23. Adım: 1.2 kilometre sonra Veliköy Merkez durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n24. Adım: 1.1 kilometre sonra Veliköy Işıklar / OSB Bağlantısı durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n25. Adım: 2.2 kilometre sonra Kızılpınar Giriş durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n26. Adım: 1.1 kilometre sonra Kızılpınar Kahveler Durağı durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n27. Adım: 1 kilometre sonra Kızılpınar Merkez durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n28. Adım: 3.5 kilometre sonra Çerkezköy Narin Kavşağı durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n29. Adım: 1.5 kilometre sonra Çerkezköy Otogarı durağına gidin; yolcuları indirin ve bekleyen 10 yolcuyu alıp devam edin.\\n30. Adım: 1.2 kilometre sonra Çerkezköy Şehir İçi Geçişi durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n31. Adım: 1 kilometre sonra Çerkezköy Belediyesi / Atatürk Caddesi durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n32. Adım: 1.3 kilometre sonra Çerkezköy Devlet Hastanesi Sapağı durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n33. Adım: 2 kilometre sonra Kapaklı Giriş / Yıldızkent Kavşağı durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n34. Adım: 1.2 kilometre sonra Kapaklı Belediyesi durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n35. Adım: 0.9 kilometre sonra Kapaklı Otogarı durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\\n36. Adım: 1.4 kilometre sonra Kapaklı Sanayi Kavşağı durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n37. Adım: 2.5 kilometre sonra Pınarça Sapağı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n38. Adım: 4.5 kilometre sonra Büyükyoncalı Giriş durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n39. Adım: 1.5 kilometre sonra Büyükyoncalı Merkez (Belediye) durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n40. Adım: 2 kilometre sonra Yeniköy Kavşağı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n41. Adım: 3.5 kilometre sonra Saray Çukuryurt Sapağı durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n42. Adım: 2.5 kilometre sonra Saray Meslek Yüksekokulu (Fakülte) durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n43. Adım (Hedef Son Durak): 1.5 kilometre sonra hedef Saray Belediyesi Otogarı durağına gidin; tüm yolcuları indirin ve görevi başarıyla tamamlayın.",
+                  "speechBriefing": "TEKULAŞ 26 No'lu Süleymanpaşa Çerkezköy Kapaklı Saray ekspres otobüs seferi. Kalkış: Süleymanpaşa Yeni Otobüs Terminali. Hedef son durak: Saray Belediyesi Otogarı. Toplam 43 durak ve 86 kilometre.",
+                  "color": "#0284c7",
+                  "otobusKapasitesi": 50,
+                  "biletFiyat": 181,
+                  "biletFiyatMultiplier": 2.8,
+                  "isDistrict": true,
+                  "terrain": "otoyol",
+                  "stops": [
+                            {
+                                      "name": "Süleymanpaşa Yeni Otobüs Terminali",
+                                      "anons": "Süleymanpaşa Yeni Otobüs Terminali kalkış peronundayız. TEKULAŞ 26 No'lu Süleymanpaşa Çerkezköy Kapaklı Saray seferimiz başlıyor.",
+                                      "bekleyenYolcu": 40,
+                                      "inenYolcu": 0,
+                                      "gercekMesafeSonraki": 1.2,
+                                      "lat": 40.995,
+                                      "lon": 27.562
+                            },
+                            {
+                                      "name": "Muratlı Caddesi Trafo",
+                                      "anons": "Sonraki durak: Muratlı Caddesi Trafo.",
+                                      "bekleyenYolcu": 4,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 0.9,
+                                      "lat": 40.991,
+                                      "lon": 27.552
+                            },
+                            {
+                                      "name": "Göçmen Konutları Giriş",
+                                      "anons": "Sonraki durak: Göçmen Konutları Giriş.",
+                                      "bekleyenYolcu": 3,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 0.8,
+                                      "lat": 40.989,
+                                      "lon": 27.546
+                            },
+                            {
+                                      "name": "Tekirdağ Büyükşehir Belediyesi Fen İşleri",
+                                      "anons": "Sonraki durak: Tekirdağ Büyükşehir Belediyesi Fen İşleri.",
+                                      "bekleyenYolcu": 2,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 0.7,
+                                      "lat": 40.9875,
+                                      "lon": 27.541
+                            },
+                            {
+                                      "name": "Tekirdağ Şehir Hastanesi Acil",
+                                      "anons": "Sonraki durak: Tekirdağ Şehir Hastanesi Acil Servis.",
+                                      "bekleyenYolcu": 6,
+                                      "inenYolcu": 3,
+                                      "gercekMesafeSonraki": 0.5,
+                                      "lat": 40.988,
+                                      "lon": 27.536
+                            },
+                            {
+                                      "name": "Ağız ve Diş Sağlığı Hastanesi",
+                                      "anons": "Sonraki durak: Ağız ve Diş Sağlığı Hastanesi.",
+                                      "bekleyenYolcu": 4,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 0.4,
+                                      "lat": 40.9885,
+                                      "lon": 27.534
+                            },
+                            {
+                                      "name": "Tekirdağ Şehir Hastanesi Ana Giriş",
+                                      "anons": "Sonraki durak: Tekirdağ Şehir Hastanesi Ana Giriş Poliklinikler.",
+                                      "bekleyenYolcu": 8,
+                                      "inenYolcu": 4,
+                                      "gercekMesafeSonraki": 1.1,
+                                      "lat": 40.987,
+                                      "lon": 27.532
+                            },
+                            {
+                                      "name": "Muratlı Caddesi / Soğancılar",
+                                      "anons": "Sonraki durak: Muratlı Caddesi, Soğancılar mevkii.",
+                                      "bekleyenYolcu": 3,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 0.8,
+                                      "lat": 40.984,
+                                      "lon": 27.53
+                            },
+                            {
+                                      "name": "Şehit Yüzbaşı Mayadağlı Caddesi",
+                                      "anons": "Sonraki durak: Şehit Yüzbaşı Mayadağlı Caddesi.",
+                                      "bekleyenYolcu": 2,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 1,
+                                      "lat": 40.9825,
+                                      "lon": 27.527
+                            },
+                            {
+                                      "name": "Yahya Kemal Beyatlı Kültür Merkezi",
+                                      "anons": "Sonraki durak: Yahya Kemal Beyatlı Kültür Merkezi.",
+                                      "bekleyenYolcu": 4,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 1.2,
+                                      "lat": 40.982,
+                                      "lon": 27.525
+                            },
+                            {
+                                      "name": "Fatih Sultan Mehmet Bulvarı (Baykallar)",
+                                      "anons": "Sonraki durak: Fatih Sultan Mehmet Bulvarı, Baykallar mevkii.",
+                                      "bekleyenYolcu": 5,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 1,
+                                      "lat": 40.98,
+                                      "lon": 27.545
+                            },
+                            {
+                                      "name": "Yeni Emniyet Müdürlüğü",
+                                      "anons": "Sonraki durak: Yeni Emniyet Müdürlüğü.",
+                                      "bekleyenYolcu": 3,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 1.2,
+                                      "lat": 40.985,
+                                      "lon": 27.56
+                            },
+                            {
+                                      "name": "Alkaya – Değirmenaltı Mevkii",
+                                      "anons": "Sonraki durak: Alkaya, Değirmenaltı mevkii.",
+                                      "bekleyenYolcu": 6,
+                                      "inenYolcu": 3,
+                                      "gercekMesafeSonraki": 1.1,
+                                      "lat": 40.991,
+                                      "lon": 27.575
+                            },
+                            {
+                                      "name": "Namık Kemal Üniversitesi (NKÜ) Kampüs Giriş / KYK Yurtları",
+                                      "anons": "Sonraki durak: Namık Kemal Üniversitesi Kampüs Girişi ve KYK Yurtları.",
+                                      "bekleyenYolcu": 5,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 0.9,
+                                      "lat": 40.995,
+                                      "lon": 27.583
+                            },
+                            {
+                                      "name": "NKÜ Araştırma Hastanesi & Rektörlük",
+                                      "anons": "Sonraki durak: Namık Kemal Üniversitesi Araştırma Hastanesi ve Rektörlük.",
+                                      "bekleyenYolcu": 8,
+                                      "inenYolcu": 5,
+                                      "gercekMesafeSonraki": 8.5,
+                                      "lat": 40.9975,
+                                      "lon": 27.587
+                            },
+                            {
+                                      "name": "D-110 Çevre Yolu Bağlar Mevkii",
+                                      "anons": "Sonraki durak: D-110 Çevre Yolu, Bağlar mevkii.",
+                                      "bekleyenYolcu": 2,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 9.5,
+                                      "lat": 41.065,
+                                      "lon": 27.655
+                            },
+                            {
+                                      "name": "D-110 / D-567 Bağlantısı (Şerefli Kavşağı)",
+                                      "anons": "Sonraki durak: D-110 ve D-567 Bağlantısı, Şerefli Kavşağı.",
+                                      "bekleyenYolcu": 2,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 7,
+                                      "lat": 41.135,
+                                      "lon": 27.73
+                            },
+                            {
+                                      "name": "Çorlu Çevre Yolu Sapağı (Transit Geçiş)",
+                                      "anons": "Sonraki durak: Çorlu Çevre Yolu Transit Geçiş Kavşağı.",
+                                      "bekleyenYolcu": 1,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 4,
+                                      "lat": 41.155,
+                                      "lon": 27.78
+                            },
+                            {
+                                      "name": "Velimeşe Girişi (Sanayi Bağlantısı)",
+                                      "anons": "Sonraki durak: Velimeşe Girişi, Organize Sanayi Bağlantısı.",
+                                      "bekleyenYolcu": 3,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 1.5,
+                                      "lat": 41.245,
+                                      "lon": 27.885
+                            },
+                            {
+                                      "name": "Velimeşe Sanayi Caddesi",
+                                      "anons": "Sonraki durak: Velimeşe Sanayi Caddesi.",
+                                      "bekleyenYolcu": 2,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 1.2,
+                                      "lat": 41.249,
+                                      "lon": 27.892
+                            },
+                            {
+                                      "name": "Velimeşe Merkez Meydan",
+                                      "anons": "Sonraki durak: Velimeşe Merkez Meydan.",
+                                      "bekleyenYolcu": 4,
+                                      "inenYolcu": 3,
+                                      "gercekMesafeSonraki": 2.5,
+                                      "lat": 41.253,
+                                      "lon": 27.899
+                            },
+                            {
+                                      "name": "Veliköy Giriş",
+                                      "anons": "Sonraki durak: Veliköy Giriş.",
+                                      "bekleyenYolcu": 2,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 1.2,
+                                      "lat": 41.261,
+                                      "lon": 27.915
+                            },
+                            {
+                                      "name": "Veliköy Merkez",
+                                      "anons": "Sonraki durak: Veliköy Merkez.",
+                                      "bekleyenYolcu": 4,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 1.1,
+                                      "lat": 41.265,
+                                      "lon": 27.925
+                            },
+                            {
+                                      "name": "Veliköy Işıklar / OSB Bağlantısı",
+                                      "anons": "Sonraki durak: Veliköy Işıklar ve OSB Bağlantısı.",
+                                      "bekleyenYolcu": 3,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 2.2,
+                                      "lat": 41.269,
+                                      "lon": 27.938
+                            },
+                            {
+                                      "name": "Kızılpınar Giriş",
+                                      "anons": "Sonraki durak: Kızılpınar Giriş.",
+                                      "bekleyenYolcu": 4,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 1.1,
+                                      "lat": 41.272,
+                                      "lon": 27.952
+                            },
+                            {
+                                      "name": "Kızılpınar Kahveler Durağı",
+                                      "anons": "Sonraki durak: Kızılpınar Kahveler mevkii.",
+                                      "bekleyenYolcu": 6,
+                                      "inenYolcu": 3,
+                                      "gercekMesafeSonraki": 1,
+                                      "lat": 41.275,
+                                      "lon": 27.965
+                            },
+                            {
+                                      "name": "Kızılpınar Merkez",
+                                      "anons": "Sonraki durak: Kızılpınar Merkez.",
+                                      "bekleyenYolcu": 5,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 3.5,
+                                      "lat": 41.278,
+                                      "lon": 27.975
+                            },
+                            {
+                                      "name": "Çerkezköy Narin Kavşağı",
+                                      "anons": "Sonraki durak: Çerkezköy Narin Kavşağı.",
+                                      "bekleyenYolcu": 4,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 1.5,
+                                      "lat": 41.282,
+                                      "lon": 27.985
+                            },
+                            {
+                                      "name": "Çerkezköy Otogarı",
+                                      "anons": "Sonraki durak: Çerkezköy Otogarı.",
+                                      "bekleyenYolcu": 10,
+                                      "inenYolcu": 8,
+                                      "gercekMesafeSonraki": 1.2,
+                                      "lat": 41.285,
+                                      "lon": 27.995
+                            },
+                            {
+                                      "name": "Çerkezköy Şehir İçi Geçişi",
+                                      "anons": "Sonraki durak: Çerkezköy Şehir İçi Geçişi.",
+                                      "bekleyenYolcu": 5,
+                                      "inenYolcu": 4,
+                                      "gercekMesafeSonraki": 1,
+                                      "lat": 41.289,
+                                      "lon": 27.998
+                            },
+                            {
+                                      "name": "Çerkezköy Belediyesi / Atatürk Caddesi",
+                                      "anons": "Sonraki durak: Çerkezköy Belediyesi ve Atatürk Caddesi.",
+                                      "bekleyenYolcu": 6,
+                                      "inenYolcu": 5,
+                                      "gercekMesafeSonraki": 1.3,
+                                      "lat": 41.293,
+                                      "lon": 27.992
+                            },
+                            {
+                                      "name": "Çerkezköy Devlet Hastanesi Sapağı",
+                                      "anons": "Sonraki durak: Çerkezköy Devlet Hastanesi Sapağı.",
+                                      "bekleyenYolcu": 4,
+                                      "inenYolcu": 3,
+                                      "gercekMesafeSonraki": 2,
+                                      "lat": 41.302,
+                                      "lon": 27.988
+                            },
+                            {
+                                      "name": "Kapaklı Giriş / Yıldızkent Kavşağı",
+                                      "anons": "Sonraki durak: Kapaklı Giriş, Yıldızkent Kavşağı.",
+                                      "bekleyenYolcu": 5,
+                                      "inenYolcu": 3,
+                                      "gercekMesafeSonraki": 1.2,
+                                      "lat": 41.309,
+                                      "lon": 27.984
+                            },
+                            {
+                                      "name": "Kapaklı Belediyesi",
+                                      "anons": "Sonraki durak: Kapaklı Belediyesi.",
+                                      "bekleyenYolcu": 6,
+                                      "inenYolcu": 4,
+                                      "gercekMesafeSonraki": 0.9,
+                                      "lat": 41.313,
+                                      "lon": 27.981
+                            },
+                            {
+                                      "name": "Kapaklı Otogarı",
+                                      "anons": "Sonraki durak: Kapaklı Otogarı.",
+                                      "bekleyenYolcu": 8,
+                                      "inenYolcu": 6,
+                                      "gercekMesafeSonraki": 1.4,
+                                      "lat": 41.315,
+                                      "lon": 27.98
+                            },
+                            {
+                                      "name": "Kapaklı Sanayi Kavşağı",
+                                      "anons": "Sonraki durak: Kapaklı Sanayi Kavşağı.",
+                                      "bekleyenYolcu": 3,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 2.5,
+                                      "lat": 41.325,
+                                      "lon": 27.975
+                            },
+                            {
+                                      "name": "Pınarça Sapağı",
+                                      "anons": "Sonraki durak: Pınarça Sapağı.",
+                                      "bekleyenYolcu": 2,
+                                      "inenYolcu": 1,
+                                      "gercekMesafeSonraki": 4.5,
+                                      "lat": 41.355,
+                                      "lon": 27.965
+                            },
+                            {
+                                      "name": "Büyükyoncalı Giriş",
+                                      "anons": "Sonraki durak: Büyükyoncalı Giriş.",
+                                      "bekleyenYolcu": 3,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 1.5,
+                                      "lat": 41.385,
+                                      "lon": 27.958
+                            },
+                            {
+                                      "name": "Büyükyoncalı Merkez (Belediye)",
+                                      "anons": "Sonraki durak: Büyükyoncalı Merkez, Belediye Durağı.",
+                                      "bekleyenYolcu": 5,
+                                      "inenYolcu": 4,
+                                      "gercekMesafeSonraki": 2,
+                                      "lat": 41.39,
+                                      "lon": 27.955
+                            },
+                            {
+                                      "name": "Yeniköy Kavşağı",
+                                      "anons": "Sonraki durak: Yeniköy Kavşağı.",
+                                      "bekleyenYolcu": 2,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 3.5,
+                                      "lat": 41.405,
+                                      "lon": 27.945
+                            },
+                            {
+                                      "name": "Saray Çukuryurt Sapağı",
+                                      "anons": "Sonraki durak: Saray Çukuryurt Sapağı.",
+                                      "bekleyenYolcu": 3,
+                                      "inenYolcu": 2,
+                                      "gercekMesafeSonraki": 2.5,
+                                      "lat": 41.425,
+                                      "lon": 27.938
+                            },
+                            {
+                                      "name": "Saray Meslek Yüksekokulu (Fakülte)",
+                                      "anons": "Sonraki durak: Saray Meslek Yüksekokulu Fakülte Durağı.",
+                                      "bekleyenYolcu": 4,
+                                      "inenYolcu": 6,
+                                      "gercekMesafeSonraki": 1.5,
+                                      "lat": 41.435,
+                                      "lon": 27.93
+                            },
+                            {
+                                      "name": "Saray Belediyesi Otogarı",
+                                      "anons": "Son durak: Saray Belediyesi Otogarı. TEKULAŞ 26 No'lu Süleymanpaşa Saray seferimiz başarıyla tamamlanmıştır. Tüm yolcularımızın inmesi rica olunur.",
+                                      "bekleyenYolcu": 0,
+                                      "inenYolcu": 30,
+                                      "gercekMesafeSonraki": 0,
+                                      "lat": 41.445,
+                                      "lon": 27.92
+                            }
+                  ]
         },
         {
             id: "hat_corlu_ekspres",
