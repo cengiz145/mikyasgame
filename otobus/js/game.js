@@ -51,7 +51,8 @@ const Game = {
     acceleration: 0,
     lanePosition: 50, // 0 to 100 (50 is center)
     steeringAngle: 0, // Direksiyon açısı (-30 ile +30 arası)
-    driftVelocity: 0, // Rüzgar / Eğim kayma hızı
+    driftVelocity: 0,
+        roadCurvature: 0, // Rüzgar / Eğim kayma hızı
     targetDriftVelocity: 0,
     lastDriftChangeTime: 0,
     isDriving: false,
@@ -259,6 +260,7 @@ const Game = {
 
     startRoute: function(routeId) {
         this.activeRouteId = routeId;
+        this.roadCurvature = 0;
         this.activeRouteData = routesData[routeId];
         
         if (!this.activeRouteData) return;
@@ -887,6 +889,7 @@ const Game = {
                 document.getElementById('nav-feedback').style.color = '#ef4444';
                 
                 this.currentDistanceToNext += 100;
+                this.roadCurvature = 0;
                 
                 // Zaman aşıldığında dönüşü diziden çıkar ki sonsuza kadar kalmasın
                 this.upcomingTurns.shift();
@@ -1601,10 +1604,10 @@ const Game = {
             if (npc.audioObj && npc.audioObj.howlObj) {
                 let apparentX = npc.x;
                 if (this.roadCurvature) {
-                    // Viraj Simülasyonu: Yol sağa kıvrılıyorsa (roadCurvature < 0), uzaktaki araç sağa (+x) kaymış gibi duyulur
-                    apparentX -= this.roadCurvature * (npc.y / 50);
+                    let curveOffset = (this.roadCurvature || 0) * (Math.min(600, Math.max(0, npc.y)) / 600) * 0.25;
+                    apparentX -= curveOffset;
                 }
-                let currentPan = (apparentX - this.lanePosition) / 30; 
+                let currentPan = (apparentX - this.lanePosition) / 30;
                 currentPan = Math.max(-1, Math.min(1, currentPan));
                 npc.audioObj.howlObj.stereo(currentPan, npc.audioObj.soundId);
                 
@@ -1826,6 +1829,7 @@ const Game = {
             return;
         }
 
+        this.roadCurvature = 0;
         this.passengersOnBoard -= alighting;
 
         this.isDriving = false;
