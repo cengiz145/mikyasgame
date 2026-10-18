@@ -1219,6 +1219,170 @@ class AudioSystem {
         }, 100);
     }
 
+    // --- TEKERLEKLİ SANDALYE RAMPASI AÇILMA AKUSTİĞİ ---
+    playRampDeploy() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        
+        // Hidrolik motor sesi (220 Hz -> 360 Hz)
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.exponentialRampToValueAtTime(360, now + 0.8);
+        
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.3, now + 0.08);
+        gain.gain.setValueAtTime(0.3, now + 0.7);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+        
+        osc.connect(gain);
+        gain.connect(this.environmentMixer || this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.85);
+        
+        // 0.85 sn sonra metal rampanın kaldırıma oturma sesi (klank-tık)
+        setTimeout(() => {
+            if (!this.ctx) return;
+            const t = this.ctx.currentTime;
+            const metalOsc = this.ctx.createOscillator();
+            const metalGain = this.ctx.createGain();
+            metalOsc.type = 'sawtooth';
+            metalOsc.frequency.setValueAtTime(440, t);
+            metalOsc.frequency.exponentialRampToValueAtTime(120, t + 0.15);
+            metalGain.gain.setValueAtTime(0.35, t);
+            metalGain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+            metalOsc.connect(metalGain);
+            metalGain.connect(this.environmentMixer || this.ctx.destination);
+            metalOsc.start(t);
+            metalOsc.stop(t + 0.2);
+        }, 850);
+    }
+
+    // --- TEKERLEKLİ SANDALYE RAMPASI KAPANMA AKUSTİĞİ ---
+    playRampRetract() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        
+        // Hidrolik motor geri sarma sesi (360 Hz -> 240 Hz)
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(360, now);
+        osc.frequency.exponentialRampToValueAtTime(240, now + 0.75);
+        
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.28, now + 0.08);
+        gain.gain.setValueAtTime(0.28, now + 0.65);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        
+        osc.connect(gain);
+        gain.connect(this.environmentMixer || this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.8);
+        
+        // Yuvasına oturup kilitlenme kliği
+        setTimeout(() => {
+            if (!this.ctx) return;
+            const t = this.ctx.currentTime;
+            const clickOsc = this.ctx.createOscillator();
+            const clickGain = this.ctx.createGain();
+            clickOsc.type = 'square';
+            clickOsc.frequency.setValueAtTime(680, t);
+            clickGain.gain.setValueAtTime(0.25, t);
+            clickGain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+            clickOsc.connect(clickGain);
+            clickGain.connect(this.environmentMixer || this.ctx.destination);
+            clickOsc.start(t);
+            clickOsc.stop(t + 0.1);
+        }, 760);
+    }
+
+    // --- ŞEHİRLERARASI OTOBÜS PNÖMATİK BAGAJ KAPAKLARI ---
+    playLuggageBays(isOpen = true) {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        
+        // Ağır pnömatik hava tahliyesi
+        const bufferSize = Math.floor(this.ctx.sampleRate * 0.45);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(isOpen ? 1400 : 900, now);
+        filter.Q.value = 2.0;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.38, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.environmentMixer || this.ctx.destination);
+        noise.start(now);
+    }
+
+    // --- IBIS / YOLCU BİLGİLENDİRME ÇANI (DİJİTAL CHIME) ---
+    playIBISChime() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [880, 1318.5]; // A5 -> E6 modern iki tonlu bilgilendirme ding-dong
+        notes.forEach((freq, idx) => {
+            const t = now + (idx * 0.14);
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, t);
+            gain.gain.setValueAtTime(0.001, t);
+            gain.gain.linearRampToValueAtTime(0.35, t + 0.005);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+            osc.connect(gain);
+            gain.connect(this.environmentMixer || this.ctx.destination);
+            osc.start(t);
+            osc.stop(t + 0.38);
+        });
+    }
+
+    // --- KAYIP EŞYA KONTROL SESİ (ADIMLAR VE BULMA ÇANI) ---
+    playLostAndFoundWalk(foundItemCallback) {
+        this.init();
+        if (!this.ctx) {
+            if (typeof foundItemCallback === 'function') foundItemCallback();
+            return;
+        }
+        // 3 adım sesi
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => {
+                if (!this.ctx) return;
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(140, t);
+                gain.gain.setValueAtTime(0.3, t);
+                gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+                osc.connect(gain);
+                gain.connect(this.environmentMixer || this.ctx.destination);
+                osc.start(t);
+                osc.stop(t + 0.09);
+            }, i * 320);
+        }
+        
+        // 1.2 saniye sonra eşya bulma çanı
+        setTimeout(() => {
+            this.playIBISChime();
+            if (typeof foundItemCallback === 'function') foundItemCallback();
+        }, 1200);
+    }
+
     playCrash() {
         this.sounds.crash.play();
     }
