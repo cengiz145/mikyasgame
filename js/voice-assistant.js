@@ -167,6 +167,12 @@
             }
         }
 
+        // Akıllı Sistem (Doğal Dil & Popüler Merkezler & Sefer Önerisi)
+        if (typeof AkilliSistem !== 'undefined' && AkilliSistem.smartTripRequest) {
+            const handled = AkilliSistem.smartTripRequest(command);
+            if (handled) return;
+        }
+
         // Doğrudan sesle kalkış ve varış söyleme: "spor salonundan tepekente git", "valilikten yüzüncü yıla" vb.
         const smartMatch = command.match(/(?:nereden\s+)?(.+?)(?:'dan|'den|'tan|'ten|dan|den|tan|ten)\s+(?:nereye\s+)?(.+?)(?:'ya|'ye|'a|'e|ya|ye|a|e)\s*(?:git|sefer|sur|sür)?$/i);
         if (smartMatch && smartMatch[1] && smartMatch[2] && !command.includes("seviye") && !command.includes("motor")) {
