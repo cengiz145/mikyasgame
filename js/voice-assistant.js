@@ -73,12 +73,13 @@
         if (typeof Game === 'undefined' || typeof audio === 'undefined') return;
 
         // --- İLÇE HATLARI (26 NUMARALI HAT) ---
-        if (command.includes("velimeşe") || command.includes("26") || command.includes("yirmi altı")) {
-            audio.speak("26 numaralı Süleymanpaşa Velimeşe hattı devreye alınıyor.");
+        if (command.includes("saray") || command.includes("velimeşe") || command.includes("26") || command.includes("yirmi altı")) {
+            audio.speak("TEKULAŞ 26 numaralı Süleymanpaşa Saray hattı devreye alınıyor.");
             if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
                 const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26");
                 if (r26) {
                     routesData[r26.id] = r26;
+                    routesData["hat_26_suleymanpasa_velimese"] = r26;
                     Game.startRoute(r26.id);
                     return;
                 }

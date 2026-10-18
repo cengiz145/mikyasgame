@@ -349,8 +349,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 routesData[distRoute.id] = distRoute;
                 
                 if (distRoute.hatNo === "26") {
-                    audio.speak("26 numaralı Süleymanpaşa Velimeşe hattı devreye alındı. İyi yolculuklar kaptan.");
-                    UI.showToast("26 Numaralı Hat Devreye Alındı: Süleymanpaşa - Velimeşe", "success");
+                    audio.speak("TEKULAŞ 26 numaralı Süleymanpaşa Saray hattı devreye alındı. İyi yolculuklar kaptan.");
+                    UI.showToast("26 Numaralı Hat Devreye Alındı: Süleymanpaşa - Saray (86 KM)", "success");
                 } else {
                     audio.speak(`${distRoute.name} hattı devreye alındı.`);
                     UI.showToast(`${distRoute.name} Devreye Alındı`, "success");

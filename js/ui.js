@@ -28,18 +28,26 @@ const MissionReader = {
         if (!name) return "";
         let t = name.trim();
         if (dir === 'to') {
-            if (/ [Dd]urağı$/.test(t)) return t.replace(/ [Dd]urağı$/, ' durağına');
-            if (/ [Mm]eydanı$/.test(t)) return t.replace(/ [Mm]eydanı$/, ' meydanına');
-            if (/ [Tt]erminali$/.test(t)) return t.replace(/ [Tt]erminali$/, ' terminaline');
-            if (/ [Pp]arkı$/.test(t)) return t.replace(/ [Pp]arkı$/, ' parkına');
-            if (/ [Cc]addesi$/.test(t)) return t.replace(/ [Cc]addesi$/, ' caddesine');
+            if (/ [Dd]urağı$/i.test(t)) return t.replace(/ [Dd]urağı$/i, ' durağına');
+            if (/ [Mm]eydanı$/i.test(t)) return t.replace(/ [Mm]eydanı$/i, ' meydanına');
+            if (/ [Tt]erminali$/i.test(t)) return t.replace(/ [Tt]erminali$/i, ' terminaline');
+            if (/ [Pp]arkı$/i.test(t)) return t.replace(/ [Pp]arkı$/i, ' parkına');
+            if (/ [Cc]addesi$/i.test(t)) return t.replace(/ [Cc]addesi$/i, ' Caddesine');
+            if (/ [Oo]togarı$/i.test(t)) return t.replace(/ [Oo]togarı$/i, ' Otogarına');
+            if (/ [Gg]irişi$/i.test(t)) return t.replace(/ [Gg]irişi$/i, ' Girişine');
+            if (/ [Kk]avşağı$/i.test(t)) return t.replace(/ [Kk]avşağı$/i, ' Kavşağına');
+            if (/ [Mm]erkezi$/i.test(t)) return t.replace(/ [Mm]erkezi$/i, ' Merkezine');
             return t + " durağına";
         } else {
-            if (/ [Dd]urağı$/.test(t)) return t.replace(/ [Dd]urağı$/, ' durağından');
-            if (/ [Mm]eydanı$/.test(t)) return t.replace(/ [Mm]eydanı$/, ' meydanından');
-            if (/ [Tt]erminali$/.test(t)) return t.replace(/ [Tt]erminali$/, ' terminalinden');
-            if (/ [Pp]arkı$/.test(t)) return t.replace(/ [Pp]arkı$/, ' parkından');
-            if (/ [Cc]addesi$/.test(t)) return t.replace(/ [Cc]addesi$/, ' caddesinden');
+            if (/ [Dd]urağı$/i.test(t)) return t.replace(/ [Dd]urağı$/i, ' durağından');
+            if (/ [Mm]eydanı$/i.test(t)) return t.replace(/ [Mm]eydanı$/i, ' meydanından');
+            if (/ [Tt]erminali$/i.test(t)) return t.replace(/ [Tt]erminali$/i, ' terminalinden');
+            if (/ [Pp]arkı$/i.test(t)) return t.replace(/ [Pp]arkı$/i, ' parkından');
+            if (/ [Cc]addesi$/i.test(t)) return t.replace(/ [Cc]addesi$/i, ' Caddesinden');
+            if (/ [Oo]togarı$/i.test(t)) return t.replace(/ [Oo]togarı$/i, ' Otogarından');
+            if (/ [Gg]irişi$/i.test(t)) return t.replace(/ [Gg]irişi$/i, ' Girişinden');
+            if (/ [Kk]avşağı$/i.test(t)) return t.replace(/ [Kk]avşağı$/i, ' Kavşağından');
+            if (/ [Mm]erkezi$/i.test(t)) return t.replace(/ [Mm]erkezi$/i, ' Merkezinden');
             return t + " durağından";
         }
     },

@@ -149,6 +149,76 @@
       "name": "Velimeşe Meydan",
       "lat": 41.253,
       "lon": 27.899
+    },
+    {
+      "name": "Muratlı Caddesi",
+      "lat": 40.985,
+      "lon": 27.538
+    },
+    {
+      "name": "Tekirdağ Şehir Hastanesi & Ağız ve Diş Sağlığı Hastanesi",
+      "lat": 40.988,
+      "lon": 27.535
+    },
+    {
+      "name": "Yahya Kemal Beyatlı Kültür Merkezi",
+      "lat": 40.982,
+      "lon": 27.525
+    },
+    {
+      "name": "Fatih Sultan Mehmet Bulvarı (Baykallar)",
+      "lat": 40.98,
+      "lon": 27.545
+    },
+    {
+      "name": "Alkaya – Değirmenaltı Mevkii",
+      "lat": 40.991,
+      "lon": 27.575
+    },
+    {
+      "name": "Tekirdağ Namık Kemal Üniversitesi (NKÜ) Kampüs / Araştırma Hastanesi",
+      "lat": 40.9975,
+      "lon": 27.587
+    },
+    {
+      "name": "D-110 / D-567 Bağlantısı (Şerefli Kavşağı)",
+      "lat": 41.135,
+      "lon": 27.73
+    },
+    {
+      "name": "Velimeşe Girişi",
+      "lat": 41.245,
+      "lon": 27.885
+    },
+    {
+      "name": "Veliköy Merkez",
+      "lat": 41.265,
+      "lon": 27.925
+    },
+    {
+      "name": "Kızılpınar Kahveler",
+      "lat": 41.275,
+      "lon": 27.965
+    },
+    {
+      "name": "Kapaklı Belediyesi & Kapaklı Otogarı",
+      "lat": 41.315,
+      "lon": 27.98
+    },
+    {
+      "name": "Büyükyoncalı / Yeniköy",
+      "lat": 41.39,
+      "lon": 27.955
+    },
+    {
+      "name": "Saray Meslek Yüksekokulu (Fakülte)",
+      "lat": 41.435,
+      "lon": 27.93
+    },
+    {
+      "name": "Saray Belediyesi Otogarı",
+      "lat": 41.445,
+      "lon": 27.92
     }
   ],
   "Edirne": [
