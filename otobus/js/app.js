@@ -120,7 +120,97 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 1. Title Screen
+    // 1. Title Screen - Şehir İçi ve Şehirlerarası Ayrımı
+    const openCitySelection = () => {
+        Game.gameMode = 'city';
+        Game.busType = 'belediye';
+        Game.currentCity = "Tekirdağ";
+        
+        audio.playSelect();
+        audio.speak("Şehir içi ve ilçe belediye seferleri seçildi. Lütfen gitmek istediğiniz hattı seçin.");
+        UI.showToast("Belediye Seferleri (TEKULAŞ) Modu Aktif", "info");
+
+        // Doğrudan ilçe ve şehir içi belediye hatlarını listele
+        const listEl = document.getElementById('district-dest-list');
+        if (listEl && typeof ilceRotalari !== 'undefined') {
+            const districtList = ilceRotalari["Tekirdağ"] || [];
+            listEl.innerHTML = '';
+            
+            // 1. Şehir içi hatlar butonu
+            const liInner = document.createElement('li');
+            liInner.style.marginBottom = "10px";
+            const btnInner = document.createElement('button');
+            btnInner.className = 'menu-btn nav-item';
+            btnInner.style.width = '100%';
+            btnInner.style.justifyContent = 'space-between';
+            btnInner.style.padding = '15px';
+            btnInner.innerHTML = '<span><strong>🏙️ Süleymanpaşa Şehir İçi Hatları</strong> (Hastane, Sahil, Üniversite)</span><span style="color: var(--secondary);">Canlı Sefer</span>';
+            btnInner.onclick = () => {
+                audio.playSelect();
+                document.getElementById('district-dest-modal').classList.add('hidden');
+                document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
+            };
+            liInner.appendChild(btnInner);
+            listEl.appendChild(liInner);
+
+            // 2. İlçe hatları butonları
+            districtList.forEach(distRoute => {
+                const li = document.createElement('li');
+                li.style.marginBottom = "10px";
+                const btn = document.createElement('button');
+                btn.className = 'menu-btn nav-item';
+                btn.style.width = '100%';
+                btn.style.justifyContent = 'space-between';
+                btn.style.padding = '15px';
+                const totalKm = distRoute.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
+                btn.innerHTML = '<span><strong style="color: ' + distRoute.color + ';">[Hat ' + distRoute.hatNo + '] ' + distRoute.destDistrict + '</strong> (' + distRoute.originDistrict + ' - ' + distRoute.destDistrict + ')</span><span style="color: var(--secondary);">' + totalKm.toFixed(0) + ' KM İlçe Seferi</span>';
+                btn.onclick = () => {
+                    audio.playSelect();
+                    document.getElementById('district-dest-modal').classList.add('hidden');
+                    routesData[distRoute.id] = distRoute;
+                    if (distRoute.hatNo === "48") {
+                        audio.speak("TEKULAŞ 48 numaralı Velimeşe Çorlu hattı devreye alındı. İyi yolculuklar kaptan.");
+                        UI.showToast("48 Numaralı Hat: Velimeşe - Çorlu (19 KM)", "success");
+                    } else if (distRoute.hatNo === "26") {
+                        audio.speak("TEKULAŞ 26 numaralı Süleymanpaşa Saray hattı devreye alındı. İyi yolculuklar kaptan.");
+                        UI.showToast("26 Numaralı Hat Devreye Alındı: Süleymanpaşa - Saray (86 KM)", "success");
+                    } else {
+                        audio.speak(distRoute.name + " hattı devreye alındı.");
+                        UI.showToast(distRoute.name + " Devreye Alındı", "success");
+                    }
+                    Game.startRoute(distRoute.id);
+                };
+                li.appendChild(btn);
+                listEl.appendChild(li);
+            });
+
+            document.getElementById('district-dest-modal').classList.remove('hidden');
+            KeyboardNav.initForScreen();
+        } else {
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
+        }
+    };
+
+    const openIntercitySelection = () => {
+        Game.gameMode = 'intercity';
+        Game.busType = 'seyahat';
+        
+        audio.playSelect();
+        audio.speak("Şehirlerarası seyahat modu seçildi. Lütfen hareket edeceğiniz şehri ve sefer güzergâhınızı seçin.");
+        UI.showToast("Şehirler Arası Seyahat (Türkiye Turnesi) Modu Aktif", "info");
+
+        UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
+        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
+        UI.switchScreen('base-selection-menu');
+    };
+
+    if (document.getElementById('btn-start-city')) {
+        document.getElementById('btn-start-city').addEventListener('click', openCitySelection);
+    }
+    if (document.getElementById('btn-start-intercity')) {
+        document.getElementById('btn-start-intercity').addEventListener('click', openIntercitySelection);
+    }
+
     document.getElementById('btn-start-game').addEventListener('click', () => {
         audio.playSelect();
         

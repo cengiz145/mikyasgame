@@ -218,10 +218,12 @@ const Game = {
 
         const badgeEl = document.getElementById("hud-line-badge");
         if (badgeEl) {
-            if (r.hatNo) {
-                badgeEl.innerText = "🚌 [HAT " + r.hatNo + "] " + r.name;
+            if (r.isIntercity) {
+                badgeEl.innerText = "🛣️ [ŞEHİRLERARASI] " + r.name;
+            } else if (r.hatNo) {
+                badgeEl.innerText = "🏙️ [BELEDİYE - HAT " + r.hatNo + "] " + r.name;
             } else {
-                badgeEl.innerText = "🚌 " + r.name;
+                badgeEl.innerText = "🏙️ [BELEDİYE] " + r.name;
             }
         }
 
@@ -239,7 +241,8 @@ const Game = {
             }).join("");
 
             detailsContainer.innerHTML = [
-                '<div style="font-size: 1.15rem; color: #38bdf8; font-weight: bold; margin-bottom: 12px; border-bottom: 1px solid rgba(56,189,248,0.3); padding-bottom: 6px;">📋 ' + r.name + '</div>',
+                '<div style="font-size: 1.15rem; color: #38bdf8; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid rgba(56,189,248,0.3); padding-bottom: 6px;">📋 ' + r.name + '</div>',
+                (r.isIntercity ? '<div style="background: rgba(250,204,21,0.15); border: 1px solid #facc15; color: #facc15; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;">🛣️ <strong>Sefer Türü:</strong> Şehirler Arası Seyahat | <strong>Araç:</strong> Şehirlerarası Seyahat Otobüsü (Travego / Tourismo)</div>' : '<div style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;">🏙️ <strong>Sefer Türü:</strong> Şehir İçi ve İlçe Belediye Seferi | <strong>Araç:</strong> TEKULAŞ Belediye Otobüsü</div>'),
                 '<div style="margin-bottom: 8px;">📍 <strong>Kalkış (Başlangıç) Durağı:</strong> <span style="color: #38bdf8; font-weight: bold;">' + startStop + '</span></div>',
                 '<div style="margin-bottom: 8px;">🏁 <strong>Gidilecek Son Durak (Hedef):</strong> <span style="color: #22c55e; font-weight: bold;">' + endStop + '</span></div>',
                 '<div style="margin-bottom: 8px;">🛑 <strong>Durulacak Duraklar Listesi (Sırasıyla):</strong><ol style="margin-left: 20px; margin-top: 6px; margin-bottom: 6px;">' + stopsHtml + '</ol></div>',
