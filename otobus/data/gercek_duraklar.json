@@ -454,6 +454,131 @@
       "name": "Velimeşe Gölet / Mesire Alanı",
       "lat": 41.258,
       "lon": 27.895
+    },
+    {
+      "name": "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
+      "lat": 41.252,
+      "lon": 27.8985
+    },
+    {
+      "name": "Velimeşe Merkez Meydanı (Atatürk Parkı)",
+      "lat": 41.253,
+      "lon": 27.899
+    },
+    {
+      "name": "Velimeşe Dedebal Caddesi",
+      "lat": 41.2525,
+      "lon": 27.8995
+    },
+    {
+      "name": "Velimeşe Çarşı Caddesi (Merkez Camii)",
+      "lat": 41.2515,
+      "lon": 27.8975
+    },
+    {
+      "name": "Velimeşe Muhtarlık & Ergene Belediyesi Ek Hizmet Binası",
+      "lat": 41.251,
+      "lon": 27.897
+    },
+    {
+      "name": "Velimeşe İstasyon Caddesi & TCDD Tren Garı",
+      "lat": 41.2545,
+      "lon": 27.905
+    },
+    {
+      "name": "Velimeşe Aile Sağlığı Merkezi (Sağlık Ocağı)",
+      "lat": 41.2535,
+      "lon": 27.9005
+    },
+    {
+      "name": "Velimeşe Çok Programlı Anadolu Lisesi",
+      "lat": 41.255,
+      "lon": 27.8965
+    },
+    {
+      "name": "Velimeşe Ergene Velimeşespor Tesisleri & Şehir Stadyumu",
+      "lat": 41.257,
+      "lon": 27.902
+    },
+    {
+      "name": "Velimeşe Kapalı Pazar Yeri & Otopark",
+      "lat": 41.252,
+      "lon": 27.895
+    },
+    {
+      "name": "Velimeşe TOKİ Konutları (1. Etap Giriş)",
+      "lat": 41.256,
+      "lon": 27.905
+    },
+    {
+      "name": "Velimeşe TOKİ Konutları (2. Etap / Park)",
+      "lat": 41.2575,
+      "lon": 27.9065
+    },
+    {
+      "name": "Velimeşe Küçük Sanayi Sitesi Girişi",
+      "lat": 41.245,
+      "lon": 27.89
+    },
+    {
+      "name": "Velimeşe Organize Sanayi Bölgesi (OSB) 1. Kapı",
+      "lat": 41.244,
+      "lon": 27.888
+    },
+    {
+      "name": "Velimeşe OSB 2. Kapı (Fabrikalar Caddesi)",
+      "lat": 41.243,
+      "lon": 27.885
+    },
+    {
+      "name": "Velimeşe OSB Arıtma Tesisi Kavşağı",
+      "lat": 41.241,
+      "lon": 27.883
+    },
+    {
+      "name": "Velimeşe Avrupa Serbest Bölgesi (ASB) Bağlantısı",
+      "lat": 41.242,
+      "lon": 27.886
+    },
+    {
+      "name": "Velimeşe Girişi (Çorlu Bağlantısı)",
+      "lat": 41.245,
+      "lon": 27.895
+    },
+    {
+      "name": "Velimeşe - 1 Durağı (Durak Kodu 1058)",
+      "lat": 41.249,
+      "lon": 27.897
+    },
+    {
+      "name": "Velimeşe - 2 Durağı (Durak Kodu 1059)",
+      "lat": 41.2505,
+      "lon": 27.898
+    },
+    {
+      "name": "Velimeşe Barış Caddesi & Çamlık Mesire Alanı",
+      "lat": 41.254,
+      "lon": 27.901
+    },
+    {
+      "name": "Velimeşe Gölet & Piknik Alanı",
+      "lat": 41.256,
+      "lon": 27.903
+    },
+    {
+      "name": "Velimeşe Cumhuriyet Bulvarı",
+      "lat": 41.2535,
+      "lon": 27.8995
+    },
+    {
+      "name": "Velimeşe Hürriyet Caddesi",
+      "lat": 41.2528,
+      "lon": 27.8985
+    },
+    {
+      "name": "Velimeşe Fevzi Çakmak Caddesi (Meydan Dönüşü)",
+      "lat": 41.253,
+      "lon": 27.899
     }
   ],
   "Edirne": [
