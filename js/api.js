@@ -1,5 +1,5 @@
-/* ==========================================================================
-   TÃœRKÄ°YE TURNESÄ° - OTOBÃœS SÄ°MÃœLASYONU API DOSYASI (API.JS)
+﻿/* ==========================================================================
+   TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU API DOSYASI (API.JS)
    ========================================================================== */
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -34,18 +34,19 @@ async function fetchStopsFromOverpass(queryStr) {
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 saniye mutlak sÄ±nÄ±r
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 saniye mutlak sınır
 
         const response = await fetch(url, {
             method: "POST",
-            body: finalQuery,
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "data=" + encodeURIComponent(finalQuery),
             signal: controller.signal
         });
         
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-            throw new Error(`API HatasÄ±: ${response.status} ${response.statusText}`);
+            throw new Error(`API Hatası: ${response.status} ${response.statusText}`);
         }
 
         const veri = await response.json();
@@ -59,7 +60,7 @@ async function fetchStopsFromOverpass(queryStr) {
             .filter(d => d.type === "node" && d.tags && (d.tags.highway === "bus_stop" || d.tags.amenity === "bus_station"))
             .map(durak => {
                 return {
-                    name: durak.tags.name || "Ä°simsiz Durak",
+                    name: durak.tags.name || "İsimsiz Durak",
                     lat: durak.lat,
                     lon: durak.lon
                 };
@@ -76,7 +77,7 @@ async function fetchStopsFromOverpass(queryStr) {
 
     } catch (error) {
         isFetchingStops = false;
-        console.error("Duraklar Ã§ekilirken hata oluÅŸtu:", error);
+        console.error("Duraklar çekilirken hata oluştu:", error);
         throw error;
     }
 }
@@ -107,11 +108,15 @@ function generateRoutesFromAPI(rawStops, cityName) {
         }
 
         while (selected.length < 2) {
-            selected.push({
-                name: cityName + " Merkez Durak " + (selected.length + 1),
-                lat: 40.0 + Math.random() * 0.05,
-                lon: 27.0 + Math.random() * 0.05
-            });
+            const cityPool = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName]) 
+                ? varsayilanSehirDuraklari[cityName] 
+                : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
+            if (cityPool.length > 0) {
+                const pick = cityPool[selected.length % cityPool.length];
+                selected.push({ name: pick.name, lat: pick.lat, lon: pick.lon });
+            } else {
+                selected.push({ name: (cityName === "Tekirdağ" ? "Süleymanpaşa Otogar" : cityName + " Otogar"), lat: 40.0, lon: 27.0 });
+            }
         }
 
         const startStop = selected[0].name;

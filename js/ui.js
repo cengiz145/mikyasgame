@@ -288,6 +288,26 @@ const MissionReader = {
         return null;
     },
 
+        formatStop: function(name, dir) {
+        if (!name) return "";
+        let t = name.trim();
+        if (dir === 'to') {
+            if (/ [Dd]urağı$/.test(t)) return t.replace(/ [Dd]urağı$/, ' durağına');
+            if (/ [Mm]eydanı$/.test(t)) return t.replace(/ [Mm]eydanı$/, ' meydanına');
+            if (/ [Tt]erminali$/.test(t)) return t.replace(/ [Tt]erminali$/, ' terminaline');
+            if (/ [Pp]arkı$/.test(t)) return t.replace(/ [Pp]arkı$/, ' parkına');
+            if (/ [Cc]addesi$/.test(t)) return t.replace(/ [Cc]addesi$/, ' caddesine');
+            return t + " durağına";
+        } else {
+            if (/ [Dd]urağı$/.test(t)) return t.replace(/ [Dd]urağı$/, ' durağından');
+            if (/ [Mm]eydanı$/.test(t)) return t.replace(/ [Mm]eydanı$/, ' meydanından');
+            if (/ [Tt]erminali$/.test(t)) return t.replace(/ [Tt]erminali$/, ' terminalinden');
+            if (/ [Pp]arkı$/.test(t)) return t.replace(/ [Pp]arkı$/, ' parkından');
+            if (/ [Cc]addesi$/.test(t)) return t.replace(/ [Cc]addesi$/, ' caddesinden');
+            return t + " durağından";
+        }
+    },
+
     generateSteps: function(route) {
         if (!route) return ["Henüz aktif bir görev veya rota bulunamadı."];
 
@@ -311,7 +331,7 @@ const MissionReader = {
 
         // 1. Adım: Başlangıç durağından hareket
         const firstStop = stops[0];
-        let step1 = "1. Adım: " + firstStop.name + " durağından ";
+        let step1 = "1. Adım: " + this.formatStop(firstStop.name, "from") + " ";
         if (typeof firstStop.bekleyenYolcu === 'number' && firstStop.bekleyenYolcu > 0) {
             step1 += "bekleyen " + firstStop.bekleyenYolcu + " yolcuyu alarak hareket edin.";
         } else if (typeof firstStop.bekleyenYolcu === 'number' && firstStop.bekleyenYolcu === 0) {
@@ -324,7 +344,7 @@ const MissionReader = {
         // Ara Duraklar: 1'den total - 2'ye kadar
         for (let i = 1; i < total - 1; i++) {
             const stop = stops[i];
-            let step = (i + 1) + ". Adım: Sonra " + stop.name + " durağına gidin; ";
+            let step = (i + 1) + ". Adım: Sonra " + this.formatStop(stop.name, "to") + " gidin; ";
             
             const hasWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu > 0);
             const zeroWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu === 0);
@@ -347,7 +367,7 @@ const MissionReader = {
         // Son Durak: total - 1
         if (total > 1) {
             const lastStop = stops[total - 1];
-            let lastStep = total + ". Adım (Hedef Son Durak): Sonra " + lastStop.name + " durağına gidin; ";
+            let lastStep = total + ". Adım (Hedef Son Durak): Sonra " + this.formatStop(lastStop.name, "to") + " gidin; ";
             if (typeof lastStop.inenYolcu === 'number' && lastStop.inenYolcu > 0) {
                 lastStep += "tüm yolcuları indirin ve görevi tamamlayın.";
             } else {
