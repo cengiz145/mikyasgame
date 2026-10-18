@@ -124,9 +124,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const openCitySelection = () => {
         Game.gameMode = 'city';
         Game.busType = 'belediye';
-        Game.currentCity = "Tekirdağ";
+        Game.currentCity = 'Tekirdağ';
         
         audio.playSelect();
+        
+        // 10 seviye geçilmeden ilçeler, şehirler, ülkeler ve harita kesinlikle gözükmesin!
+        if (!Game.hasPassedLevel10()) {
+            audio.speak("Süleymanpaşa şehir içi belediye seferleri seçildi. Sefer görevleri listeleniyor.");
+            UI.showToast("Süleymanpaşa Şehir İçi Seferleri (10 Seviye Kuralı)", "info");
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
+            return;
+        }
+
         audio.speak("Şehir içi ve ilçe belediye seferleri seçildi. Lütfen gitmek istediğiniz hattı seçin.");
         UI.showToast("Belediye Seferleri (TEKULAŞ) Modu Aktif", "info");
 
@@ -192,6 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const openIntercitySelection = () => {
+        if (!Game.hasPassedLevel10()) {
+            audio.playSelect();
+            audio.speak("Şehirlerarası seyahat ve harita için önce şehir içi 10 seviyeyi geçmelisiniz. Mevcut seviyeniz: " + Game.licenseLevel);
+            UI.showToast("10 Seviyeyi Geçmeden Harita Açılamaz", "warning");
+            return;
+        }
         Game.gameMode = 'intercity';
         Game.busType = 'seyahat';
         
@@ -224,7 +239,13 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
         
         // Eğer daha önce merkez üs seçilmişse, direkt o şehrin görev ekranına (oyuna başla menüsüne) at!
-        if (Game.unlockedCities.length > 0 && Game.currentCity) {
+        if (!Game.hasPassedLevel10()) {
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
+        } else if (!Game.hasPassedLevel10()) {
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
+        } else if (!Game.hasPassedLevel10()) {
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
+        } else if (Game.unlockedCities.length > 0 && Game.currentCity) {
             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: Game.currentCity } }));
         } else {
             UI.switchScreen('base-selection-menu');
@@ -394,6 +415,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // === İLÇE SEFERLERİ MODAL YÖNETİCİSİ ===
     const openDistrictModal = () => {
+        if (!Game.hasPassedLevel10()) {
+            audio.playSelect();
+            audio.speak("İlçe seferleri için önce şehir içi 10 seviyeyi geçmelisiniz. Mevcut seviyeniz: " + Game.licenseLevel);
+            UI.showToast("İlçe Seferleri 10. Seviyeden Sonra Açılır", "warning");
+            return;
+        }
         audio.playSelect();
         const modeModal = document.getElementById('mode-selection-modal');
         if (modeModal) modeModal.classList.add('hidden');
@@ -596,8 +623,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Route Selection Screen
     document.getElementById('btn-route-back').addEventListener('click', () => {
         audio.playSelect();
-        UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
-        UI.switchScreen('base-selection-menu');
+        if (Game.hasPassedLevel10()) {
+            UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
+            UI.switchScreen('base-selection-menu');
+        } else {
+            UI.switchScreen('title-screen');
+        }
     });
 
     // 4. Garage Logic (Sefer Özeti)
@@ -670,9 +701,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-finish').addEventListener('click', () => {
         audio.playSelect();
         UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
-        UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
         
-        // BUG FIX: Görevi bitirdikten sonra ana menüdeki "Yeni Oyun" butonunu sıfırla ki hep aynı rotaya hapsetmesin!
         Game.activeRouteId = null;
         const btnStart = document.getElementById('btn-start-game');
         if (btnStart) {
@@ -680,7 +709,12 @@ document.addEventListener('DOMContentLoaded', () => {
             btnStart.innerText = "Yeni Bir Oyuna Başla";
         }
         
-        UI.switchScreen('base-selection-menu'); // Başarı ekranından direkt haritaya dön
+        if (Game.hasPassedLevel10()) {
+            UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
+            UI.switchScreen('base-selection-menu');
+        } else {
+            UI.switchScreen('title-screen');
+        }
     });
 
     // Draw Highway Canvas background

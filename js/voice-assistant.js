@@ -89,6 +89,13 @@
             return;
         }
 
+        // 10 Seviye Kuralı Kontrolü
+        if ((command.includes("ilçe") || command.includes("48") || command.includes("26") || command.includes("velimeşe") || command.includes("saray") || command.includes("şehirlerarası") || command.includes("turne")) && !Game.hasPassedLevel10()) {
+            audio.speak("İlçeler ve şehirlerarası seyahat için önce şehir içi 10 seviyeyi geçmelisiniz. Mevcut seviyeniz: " + Game.licenseLevel + ".");
+            if (typeof UI !== 'undefined') UI.showToast("10 Seviyeyi Geçmeden İlçe & Şehirlerarası Açılamaz", "warning");
+            return;
+        }
+
         // --- İLÇE HATLARI (48 VE 26 NUMARALI HATLARI) ---
         if (command.includes("velimeşe çorlu") || command.includes("48") || command.includes("kırk sekiz")) {
             audio.speak("TEKULAŞ 48 numaralı Velimeşe Çorlu hattı devreye alınıyor.");

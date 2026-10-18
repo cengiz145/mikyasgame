@@ -214,12 +214,40 @@ const MissionReader = {
 if (typeof window !== "undefined") window.MissionReader = MissionReader;
 
 const UI = {
+    updateTitleScreenButtons: function() {
+        const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
+        const btnCity = document.getElementById('btn-start-city');
+        const btnIntercity = document.getElementById('btn-start-intercity');
+        if (btnCity) {
+            btnCity.innerHTML = hasPassed10 
+                ? "🏙️ Şehir İçi ve İlçe Seferleri (TEKULAŞ)" 
+                : "🏙️ Şehir İçi Belediye Seferleri (Süleymanpaşa)";
+        }
+        if (btnIntercity) {
+            btnIntercity.style.display = hasPassed10 ? "flex" : "none";
+        }
+    },
+    updateRouteScreenButtons: function() {
+        const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
+        const btnDistrict = document.getElementById('btn-route-district-mode');
+        const btnBack = document.getElementById('btn-route-back');
+        if (btnDistrict) {
+            btnDistrict.style.display = hasPassed10 ? "flex" : "none";
+        }
+        if (btnBack) {
+            btnBack.innerText = hasPassed10 ? "🗺️ Haritaya Dön" : "🏠 Ana Menüye Dön";
+        }
+    },
     screens: [
         'title-screen', 'base-selection-menu', 'route-menu', 
         'garage-screen', 'driving-screen', 'stop-screen', 'results-screen', 'sanayi-screen'
     ],
     
     switchScreen: function(screenId) {
+        if (screenId === 'base-selection-menu' && typeof Game !== 'undefined' && !Game.hasPassedLevel10()) {
+            console.warn("Harita ekranı 10 seviye geçilmeden açılamaz.");
+            screenId = 'title-screen';
+        }
         document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
         const activeScreen = document.getElementById(screenId);
         if (activeScreen) {
@@ -260,22 +288,25 @@ const UI = {
         if (lvlEl) lvlEl.innerText = licenseTitle;
         
         const budgetEl = document.getElementById('ui-budget');
-        if (budgetEl) budgetEl.innerText = `${budget} â‚º`;
-        
-        const taskInCurrentLicense = (completedTasks % 9) + 1; 
-        // e.g. completed 0 -> 1/9, completed 8 -> 9/9, completed 9 -> 1/9 (next level)
-        // Except if completedTasks >= 27
+        if (budgetEl) budgetEl.innerText = `${budget} ₺`;
         
         const xpText = document.getElementById('ui-xp-text');
         const xpFill = document.getElementById('ui-xp-fill');
 
-        if (completedTasks >= 27) {
-            if (xpText) xpText.innerText = `Uzun Yol (Tüm Görevler Bitti!)`;
+        const hasPassed10 = (completedTasks >= 10 || licenseLevel > 10);
+
+        if (hasPassed10) {
+            if (xpText) xpText.innerText = `10 Seviye Geçildi! İlçe & Şehirlerarası Açık (Seviye: ${licenseLevel})`;
             if (xpFill) xpFill.style.width = `100%`;
         } else {
-            if (xpText) xpText.innerText = `Görev İlerlemesi: ${taskInCurrentLicense} / 9`;
-            if (xpFill) xpFill.style.width = `${Math.min(100, (taskInCurrentLicense / 9) * 100)}%`;
+            const currentLevelNum = Math.min(10, completedTasks + 1);
+            const remaining = 10 - completedTasks;
+            if (xpText) xpText.innerText = `Şehir İçi İlerleme: Seviye ${currentLevelNum} / 10 (${remaining} Seviye Kaldı)`;
+            if (xpFill) xpFill.style.width = `${Math.min(100, (completedTasks / 10) * 100)}%`;
         }
+
+        this.updateTitleScreenButtons();
+        this.updateRouteScreenButtons();
     },
 
     renderCityMap: function(licenseLevel, unlockedCitiesArr) {
@@ -509,7 +540,7 @@ const KeyboardNav = {
         
         const elements = activeContainer.querySelectorAll('.nav-item');
         elements.forEach(el => {
-            if (!el.disabled && !el.classList.contains('locked-route') && !el.classList.contains('hidden')) {
+            if (!el.disabled && !el.classList.contains('locked-route') && !el.classList.contains('hidden') && el.style.display !== 'none') {
                 this.items.push(el);
             }
         });

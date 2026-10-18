@@ -7,7 +7,10 @@
 const Game = {
     // --- State Variables ---
     username: null,
-    licenseLevel: parseInt(localStorage.getItem('licenseLevel')) || 1, // 1: Çırak, 2: Kalfa, 3: Usta, 4: Uzun Yol
+    licenseLevel: parseInt(localStorage.getItem('licenseLevel')) || 1,
+    hasPassedLevel10: function() {
+        return (this.completedTasks >= 10) || (this.licenseLevel > 10);
+    },
     completedTasks: parseInt(localStorage.getItem('completedTasks')) || 0, // 0 to 26
     playerBudget: parseFloat(localStorage.getItem('para')) || 0,
     clockMinutes: parseFloat(localStorage.getItem('clockMinutes')) || 480, // Varsayılan 08:00 (480 dakika)
@@ -146,19 +149,29 @@ const Game = {
     },
 
     getLicenseTitle: function() {
-        if (this.licenseLevel === 1) return "1. Sınıf Ehliyet (Çıraklık)";
-        if (this.licenseLevel === 2) return "2. Sınıf Ehliyet (Kalfalık)";
-        if (this.licenseLevel === 3) return "3. Sınıf Ehliyet (Ustalık)";
-        if (this.licenseLevel === 4) return "İlçeler Arası Åoför";
-        return "Uzun Yol Åoförü";
+        if (this.completedTasks >= 10 || this.licenseLevel > 10) {
+            return `${this.licenseLevel}. Sınıf Master Kaptan (İlçe & Şehirlerarası)`;
+        }
+        const lvl = Math.min(10, Math.max(1, this.licenseLevel));
+        const titles = [
+            "",
+            "1. Seviye Çırak Şehir İçi Sürücü",
+            "2. Seviye Stajyer Şehir İçi Sürücü",
+            "3. Seviye Acemi Şehir İçi Sürücü",
+            "4. Seviye Kalfalık Şehir İçi Sürücü",
+            "5. Seviye Deneyimli Şehir İçi Şoför",
+            "6. Seviye Kıdemli Şehir İçi Şoför",
+            "7. Seviye Uzman Şehir İçi Şoför",
+            "8. Seviye Şehir İçi Hat Kaptanı",
+            "9. Seviye Şehir İçi Başkaptan",
+            "10. Seviye Usta Şehir İçi Kaptan (Son Sınav)"
+        ];
+        return titles[lvl] || `${lvl}. Seviye Şehir İçi Sürücü`;
     },
 
     completeTask: function() {
         if (!this.activeRouteId) return;
 
-        // Find which task index the active route corresponds to
-        // If the player played the exact task they needed to progress, increment completedTasks.
-        // Route IDs are generated as `_task_0` to `_task_39`.
         const taskMatch = this.activeRouteId.match(/_task_(\d+)/);
         if (taskMatch) {
             const taskIndex = parseInt(taskMatch[1]);
@@ -166,11 +179,22 @@ const Game = {
                 this.completedTasks++;
             }
             
-            // BUG FIX 1: Ehliyet seviyesi atlama garantisi (Strict eşitlik yerine >=)
-            if (this.completedTasks >= 40) this.licenseLevel = Math.max(this.licenseLevel, 5); // Uzun Yol
-            else if (this.completedTasks >= 30) this.licenseLevel = Math.max(this.licenseLevel, 4); // İlçeler Arası
-            else if (this.completedTasks >= 20) this.licenseLevel = Math.max(this.licenseLevel, 3); // Ustalık
-            else if (this.completedTasks >= 10) this.licenseLevel = Math.max(this.licenseLevel, 2); // Kalfalık
+            // 1 görev = 1 seviye ilerleme (10 seviyeyi geçtikten sonra ilçe ve şehirlerarası açılır)
+            this.licenseLevel = Math.max(this.licenseLevel, this.completedTasks + 1);
+
+            if (this.completedTasks === 10) {
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Tebrikler kaptan! Şehir içinde 10 seviyeyi başarıyla geçtiniz! İlçe belediye hatları ve şehirlerarası harita açıldı!");
+                }
+                if (typeof UI !== 'undefined') {
+                    UI.showToast("🎉 10 Seviye Geçildi! İlçe ve Şehirlerarası Hatlar Açıldı!", "success");
+                }
+            } else if (this.completedTasks < 10) {
+                const remaining = 10 - this.completedTasks;
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak(`Görev tamamlandı. Seviye ${this.licenseLevel}'e yükseldiniz. İlçe ve şehirlerarası haritaya ${remaining} seviye kaldı.`);
+                }
+            }
 
             this.saveData();
         }
