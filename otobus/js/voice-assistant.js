@@ -72,6 +72,13 @@
     processCommand(command) {
         if (typeof Game === 'undefined' || typeof audio === 'undefined') return;
 
+        // --- PUSULA VE YÖN SORGUSU ---
+        if (command.includes("pusula") || command.includes("istikamet") || command.includes("hangi yön") || command.includes("yönüm")) {
+            const currentDir = (typeof CompassNav !== 'undefined') ? CompassNav.currentDirection : "Kuzey";
+            audio.speak("Mevcut istikametiniz " + currentDir + ". Yön kontrolü ve değişimi için Shift tuşuyla birlikte Yukarı Kuzey, Aşağı Güney, Sağ Doğu, Sol Batı oklarına basabilirsiniz.");
+            return;
+        }
+
         // --- SEFER MODLARI (ŞEHİR İÇİ / ŞEHİRLER ARASI) ---
         if (command.includes("şehir içi") || command.includes("belediye") || command.includes("tekulaş")) {
             audio.speak("Şehir içi ve ilçe belediye seferleri modu açılıyor.");
