@@ -1064,7 +1064,7 @@ const ilceRotalari = {
                     anons: "Süleymanpaşa Yeni Otobüs Terminali kalkış peronundayız. 26 numaralı hat Velimeşe seferi başlıyor.",
                     bekleyenYolcu: 35,
                     inenYolcu: 0,
-                    gercekMesafeSonraki: 3.5,
+                    gercekMesafeSonraki: 4.5,
                     lat: 40.9950,
                     lon: 27.5620
                 },
@@ -1073,7 +1073,7 @@ const ilceRotalari = {
                     anons: "Sonraki durak: Tekirdağ Dr. İsmail Fehmi Cumalıoğlu Şehir Hastanesi.",
                     bekleyenYolcu: 8,
                     inenYolcu: 5,
-                    gercekMesafeSonraki: 4.2,
+                    gercekMesafeSonraki: 5.5,
                     lat: 40.9880,
                     lon: 27.5350
                 },
@@ -1082,7 +1082,7 @@ const ilceRotalari = {
                     anons: "Sonraki durak: Namık Kemal Üniversitesi Araştırma Hastanesi.",
                     bekleyenYolcu: 10,
                     inenYolcu: 6,
-                    gercekMesafeSonraki: 18.5,
+                    gercekMesafeSonraki: 25.0,
                     lat: 40.9975,
                     lon: 27.5870
                 },
@@ -1100,7 +1100,7 @@ const ilceRotalari = {
                     anons: "Sonraki durak: Velimeşe Giriş, Organize Sanayi Bağlantısı.",
                     bekleyenYolcu: 2,
                     inenYolcu: 8,
-                    gercekMesafeSonraki: 2.8,
+                    gercekMesafeSonraki: 3.5,
                     lat: 41.2450,
                     lon: 27.8850
                 },
@@ -1134,8 +1134,8 @@ const ilceRotalari = {
             isDistrict: true,
             terrain: "otoyol",
             stops: [
-                { name: "Süleymanpaşa Yeni Otobüs Terminali", anons: "Süleymanpaşa Yeni Otogar kalkış peronundayız. Çorlu Ekspres seferi başlıyor.", bekleyenYolcu: 30, inenYolcu: 0, gercekMesafeSonraki: 4.0, lat: 40.9950, lon: 27.5620 },
-                { name: "Tekirdağ Şehir Hastanesi", anons: "Sonraki durak: Tekirdağ Şehir Hastanesi.", bekleyenYolcu: 8, inenYolcu: 4, gercekMesafeSonraki: 28.0, lat: 40.9880, lon: 27.5350 },
+                { name: "Süleymanpaşa Yeni Otobüs Terminali", anons: "Süleymanpaşa Yeni Otogar kalkış peronundayız. Çorlu Ekspres seferi başlıyor.", bekleyenYolcu: 30, inenYolcu: 0, gercekMesafeSonraki: 4.5, lat: 40.9950, lon: 27.5620 },
+                { name: "Tekirdağ Şehir Hastanesi", anons: "Sonraki durak: Tekirdağ Şehir Hastanesi.", bekleyenYolcu: 8, inenYolcu: 4, gercekMesafeSonraki: 33.5, lat: 40.9880, lon: 27.5350 },
                 { name: "Çorlu Otogar", anons: "Son durak: Çorlu Otogar. Çorlu Ekspres seferi tamamlandı.", bekleyenYolcu: 0, inenYolcu: 34, gercekMesafeSonraki: 0, lat: 41.1600, lon: 27.8000 }
             ]
         },
@@ -1158,7 +1158,7 @@ const ilceRotalari = {
             isDistrict: true,
             terrain: "otoyol",
             stops: [
-                { name: "Süleymanpaşa Yeni Otobüs Terminali", anons: "Süleymanpaşa Yeni Otogar kalkış peronundayız. Çerkezköy seferi başlıyor.", bekleyenYolcu: 32, inenYolcu: 0, gercekMesafeSonraki: 35.0, lat: 40.9950, lon: 27.5620 },
+                { name: "Süleymanpaşa Yeni Otobüs Terminali", anons: "Süleymanpaşa Yeni Otogar kalkış peronundayız. Çerkezköy seferi başlıyor.", bekleyenYolcu: 32, inenYolcu: 0, gercekMesafeSonraki: 62.0, lat: 40.9950, lon: 27.5620 },
                 { name: "Çerkezköy Otogar", anons: "Son durak: Çerkezköy Otogar. Seferimiz tamamlanmıştır.", bekleyenYolcu: 0, inenYolcu: 32, gercekMesafeSonraki: 0, lat: 41.2850, lon: 27.9950 }
             ]
         },
