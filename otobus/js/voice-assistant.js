@@ -223,9 +223,9 @@
             }
         }
         if (command.includes("80") || command.includes("seksen") || command.includes("hat 80")) {
-            audio.speak("TEKULAŞ 80 numaralı ekspres hat mahkeme kararıyla kaldırılmıştır ve işlevsizdir. Tüm seferler 26 numaralı Süleymanpaşa Saray hattına aktarılmıştır. 26 numaralı hat başlatılıyor.");
+            audio.speak("80 numaralı hat sistemden ve seferlerden tamamen kaldırılmıştır. Süleymanpaşa Saray seferi için 26 numaralı hat başlatılıyor.");
             if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
-                const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26" || r.hatNo === "226");
+                const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26");
                 if (r26) {
                     routesData[r26.id] = r26;
                     routesData["hat_26_suleymanpasa_saray"] = r26;
