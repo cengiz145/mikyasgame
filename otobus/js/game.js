@@ -1296,7 +1296,11 @@ const Game = {
                     return;
                 }
             }
-            document.getElementById('hud-distance').innerText = Math.floor(this.currentDistanceToNext);
+            if (this.currentDistanceToNext >= 1000) {
+                document.getElementById('hud-distance').innerText = (this.currentDistanceToNext / 1000).toFixed(1) + " km";
+            } else {
+                document.getElementById('hud-distance').innerText = Math.floor(this.currentDistanceToNext) + " m";
+            }
             
             // ETA (Tahmini Varış Süresi) Hesaplama
             if (this.speed < 5) {
@@ -2103,7 +2107,8 @@ const Game = {
                 const nextStop = r.stops[this.currentStopIndex];
                 const kalanDurak = r.stops.length - this.currentStopIndex;
                 const remDist = Math.max(0, Math.floor(this.currentDistanceToNext));
-                const msg = "Mevcut Görev Durumu: " + r.name + ". Kalkış noktanız: " + startStop + ". Sıradaki durulacak durak: " + (nextStop ? nextStop.name : endStop) + ", yaklaşık " + remDist + " metre kaldı. Kalan durak sayısı: " + kalanDurak + ". Gitmeniz gereken son durak: " + endStop + ". Durağa vardığınızda E ve Q tuşlarıyla kapıları açın.";
+                const distStr = remDist >= 1000 ? (remDist / 1000).toFixed(1) + " kilometre" : remDist + " metre";
+                const msg = "Mevcut Görev Durumu: " + r.name + ". Kalkış noktanız: " + startStop + ". Sıradaki durulacak durak: " + (nextStop ? nextStop.name : endStop) + ", yaklaşık " + distStr + " kaldı. Kalan durak sayısı: " + kalanDurak + ". Gitmeniz gereken son durak: " + endStop + ".";
                 if (typeof audio.speak === "function") audio.speak(msg);
                 if (typeof audio.updateNvdaLiveRegion === "function") audio.updateNvdaLiveRegion(msg);
             }
@@ -2116,7 +2121,8 @@ const Game = {
             let nextStop = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops[this.currentStopIndex] : null;
             let kalanDurak = (this.activeRouteData && this.activeRouteData.stops) ? (this.activeRouteData.stops.length - this.currentStopIndex) : 0;
             let stopName = nextStop ? nextStop.name : "";
-            let msg = (kalanDurak === 1 ? "Son durak: " : "Sıradaki durak: ") + stopName + ", " + remDistance + " metre kaldı.";
+            let distStrN = remDistance >= 1000 ? (remDistance / 1000).toFixed(1) + " kilometre" : remDistance + " metre";
+            let msg = (kalanDurak === 1 ? "Son durak: " : "Sıradaki durak: ") + stopName + ", " + distStrN + " kaldı.";
             if (typeof audio.speak === 'function') audio.speak(msg);
             return;
         }

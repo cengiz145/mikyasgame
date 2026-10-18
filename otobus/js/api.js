@@ -186,13 +186,15 @@ function generateRoutesFromAPI(rawStops, cityName) {
         for (let i = 0; i < selected.length; i++) {
             let mesafe = 0;
             if (i < selected.length - 1) {
-                let gercek = calculateDistance(selected[i].lat, selected[i].lon, selected[i+1].lat, selected[i+1].lon);
-                if (gercek === 0) gercek = 1.5;
-                mesafe = Math.max(1.0, Math.min(4.0, gercek * 2));
+                let gercekKusUcusu = calculateDistance(selected[i].lat, selected[i].lon, selected[i+1].lat, selected[i+1].lon);
+                // Gerçek karayolu kıvrım katsayısı (1.3x)
+                let gercekYol = gercekKusUcusu * 1.3;
+                if (gercekYol < 0.8) gercekYol = 0.8 + (Math.abs(Math.sin((i+1) * 7)) * 0.8);
+                mesafe = Math.round(gercekYol * 10) / 10;
             }
 
-            const currentKm = kumulatifMesafe;
-            const scaledSonrakiMesafe = mesafe / 2;
+            const currentKm = Math.round(kumulatifMesafe * 10) / 10;
+            const scaledSonrakiMesafe = mesafe;
             kumulatifMesafe += scaledSonrakiMesafe;
             
             const yolcuTipleri = ["Sivil", "Öğrenci", "Karışık", "Yaşlı"];
@@ -270,9 +272,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
             let newRoute = buildRoute(routeId, globalTaskIndex, lic, task, stopCount, color, isReturn, prevStops, isTraining);
             
             if (lic === 4) {
-                newRoute.stops.forEach(stop => {
-                    stop.gercekMesafeSonraki *= (1.5 + Math.random() * 1.5);
-                });
+                // Lisans 4 gerçek mesafeleri korur
             }
 
             routes.push(newRoute);

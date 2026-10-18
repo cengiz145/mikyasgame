@@ -80,7 +80,9 @@ const MissionReader = {
         // Ara Duraklar: 1'den total - 2'ye kadar
         for (let i = 1; i < total - 1; i++) {
             const stop = stops[i];
-            let step = (i + 1) + ". Adım: Sonra " + this.formatStop(stop.name, "to") + " gidin; ";
+            const prev = stops[i - 1];
+            const distKm = (prev && prev.gercekMesafeSonraki && prev.gercekMesafeSonraki > 0) ? prev.gercekMesafeSonraki + " kilometre sonra " : "Sonra ";
+            let step = (i + 1) + ". Adım: " + distKm + this.formatStop(stop.name, "to") + " gidin; ";
             
             const hasWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu > 0);
             const zeroWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu === 0);
@@ -103,7 +105,9 @@ const MissionReader = {
         // Son Durak: total - 1
         if (total > 1) {
             const lastStop = stops[total - 1];
-            let lastStep = total + ". Adım (Hedef Son Durak): Sonra " + this.formatStop(lastStop.name, "to") + " gidin; ";
+            const prevLast = stops[total - 2];
+            const distLast = (prevLast && prevLast.gercekMesafeSonraki && prevLast.gercekMesafeSonraki > 0) ? prevLast.gercekMesafeSonraki + " kilometre sonra hedef " : "Sonra hedef ";
+            let lastStep = total + ". Adım (Hedef Son Durak): " + distLast + this.formatStop(lastStop.name, "to") + " gidin; ";
             if (typeof lastStop.inenYolcu === 'number' && lastStop.inenYolcu > 0) {
                 lastStep += "tüm yolcuları indirin ve görevi tamamlayın.";
             } else {
@@ -128,11 +132,12 @@ const MissionReader = {
         const intermediate = route.intermediateStops || (route.stops && route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
         const totalStops = route.stops ? route.stops.length : 0;
 
+        const totalKmCalc = (route.stops && route.stops.length > 0) ? route.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0).toFixed(1) : 0;
         let msg = route.name + " açıklaması. " +
                   "Kalkış durağı: " + startStop + ". " +
                   "Gitmeniz gereken hedef son durak: " + endStop + ". " +
                   (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
-                  "Toplam " + totalStops + " durak. " +
+                  "Toplam " + totalStops + " durak, toplam güzergah mesafesi " + totalKmCalc + " kilometre. " +
                   "Görevin adımlarını formülsel olarak adım adım dinlemek için Shift + A tuşuna basın. Çıkmak için Escape tuşuna basın.";
         
         if (typeof audio !== 'undefined' && audio.speak) {
@@ -401,6 +406,8 @@ const UI = {
             const endStop = route.endStop || (route.stops[route.stops.length - 1] ? route.stops[route.stops.length - 1].name : "Varış");
             const intermediate = route.intermediateStops || (route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
             
+            const totalKmRoute = (route.stops && route.stops.length > 0) ? route.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0).toFixed(1) : 0;
+            const badgeHtml = '<span style="background: rgba(56,189,248,0.2); color: #38bdf8; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">' + route.stops.length + ' Durak | ' + totalKmRoute + ' km</span>';
             const cardSteps = (typeof MissionReader !== "undefined" && MissionReader.generateSteps) ? MissionReader.generateSteps(route) : [];
             const cardStepsHtml = cardSteps.map(s => '<div style="margin: 3px 0;">• ' + s + '</div>').join('');
             let ariaDesc = "Görev: " + route.name + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + route.stops.length + " durak. Görev Adımları: " + cardSteps.join("; ");
@@ -410,7 +417,7 @@ const UI = {
             btn.innerHTML = [
                 '<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 8px;">',
                 '    <strong style="color: ' + route.color + '; font-size: 1.2rem;">' + icon + ' ' + route.name + ' ' + (isCurrentTask ? '(AKTİF GÖREV)' : '(Tamamlandı)') + '</strong>',
-                '    <span style="background: rgba(56,189,248,0.2); color: #38bdf8; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">' + route.stops.length + ' Durak</span>',
+                '    ' + badgeHtml,
                 '</div>',
                 '<div style="font-size: 1rem; color: #f1f5f9; margin-bottom: 5px;">',
                 '    📍 <strong>Kalkış (Başlangıç) Durağı:</strong> <span style="color: #38bdf8; font-weight: bold;">' + startStop + '</span>',

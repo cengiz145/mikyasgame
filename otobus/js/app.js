@@ -258,11 +258,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     biletFiyatMultiplier: 10,
                     isIntercity: true,
                     destCity: destCity,
-                    stops: [
-                        { name: startStop, anons: startStop + " kalkış peronundayız. " + destCity + " seferi başlıyor.", bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: 0.1 },
-                        { name: endStop, anons: "Son durak: " + endStop + ". Şehirlerarası seferimiz sona ermiştir.", bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 15 }
-                    ]
+                    stops: []
                 };
+                const sehirlerarasiMesafeler = {
+                    "Tekirdağ-İstanbul": 135, "İstanbul-Tekirdağ": 135,
+                    "Tekirdağ-Edirne": 140, "Edirne-Tekirdağ": 140,
+                    "Tekirdağ-Kırklareli": 115, "Kırklareli-Tekirdağ": 115,
+                    "Tekirdağ-Çanakkale": 170, "Çanakkale-Tekirdağ": 170,
+                    "İstanbul-Ankara": 450, "Ankara-İstanbul": 450,
+                    "Edirne-Kırklareli": 65, "Kırklareli-Edirne": 65,
+                    "İstanbul-Edirne": 240, "Edirne-İstanbul": 240,
+                    "İstanbul-Kırklareli": 215, "Kırklareli-İstanbul": 215,
+                    "Çanakkale-Balıkesir": 195,
+                    "Tekirdağ-Ankara": 585, "Ankara-Tekirdağ": 585
+                };
+                const intercityKey = Game.currentCity + "-" + destCity;
+                const realDistKm = sehirlerarasiMesafeler[intercityKey] || 150;
+                
+                routesData[intercityRouteId].stops = [
+                    { name: startStop, anons: startStop + " kalkış peronundayız. " + destCity + " seferi başlıyor.", bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: realDistKm },
+                    { name: endStop, anons: "Son durak: " + endStop + ". Şehirlerarası seferimiz sona ermiştir.", bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 0 }
+                ];
                 
                 // Add to sehirRotalari temporarily so startRoute works
                 if (!sehirRotalari[Game.currentCity].routes.includes(intercityRouteId)) {
