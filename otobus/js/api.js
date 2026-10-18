@@ -84,6 +84,159 @@ async function fetchStopsFromOverpass(queryStr) {
 
 // Generate 30 Progressive Routes (3 Licenses x 10 Tasks) from raw API stops
 function generateRoutesFromAPI(rawStops, cityName) {
+    /* TEKULAŞ_PROGRESSIVE_TASKS_SYSTEM */
+    // TEKİRDAĞ İÇİN RESMİ TEKULAŞ BELEDİYE HATLARI HARİTALAMASI (183 HAT VERİTABANI)
+    if (cityName === "Tekirdağ" && typeof window !== 'undefined' && window.tekulasHatVeritabani && window.tekulasHatVeritabani.length > 0) {
+        const tekulasDb = window.tekulasHatVeritabani;
+        
+        // 1. Seviye Çırak (Süleymanpaşa Yerel Şehir İçi Hatları)
+        const spasaLocalKeywords = [
+            { no: "1", kw: "DEĞİRMENALTI-N.K.Ü" },
+            { no: "2", kw: "DEREAĞZI-YEŞİLKÖY" },
+            { no: "3", kw: "YENİCE-KARAEVLİ" },
+            { no: "6", kw: "OTOGAR-AYDOGDU" },
+            { no: "8", kw: "100.YIL-ISMAIL YAZICI" },
+            { no: "9", kw: "ESKİ OTOGAR-SGK" },
+            { no: "10", kw: "ESKİ OTOGAR-DİŞ" },
+            { no: "11", kw: "YENİ OTOGAR-BAHÇELİEVLER" },
+            { no: "12", kw: "ALTINOVA-OTOGAR" },
+            { no: "18", kw: "NKÜ ARASTIRMA-YENİ ŞEHİR" }
+        ];
+
+        // 2. Seviye Kalfa (Süleymanpaşa İleri Seviye Şehir İçi Hatları)
+        const kalfaKeywords = [
+            { no: "1/3", kw: "ALTINOVA-HÜRRİYET" },
+            { no: "2/7", kw: "100.YIL-NKU" },
+            { no: "4/15", kw: "ÇİFTLİKÖNÜ-HUZUREVI" },
+            { no: "11B", kw: "CIFTLIKONU-BEYAZKÖY" },
+            { no: "13", kw: "100.YIL-OKULLAR" },
+            { no: "17", kw: "KÖPRÜBAŞI- YENİŞEHİR" },
+            { no: "20", kw: "SÜLEYMANPAŞA-KUMBAĞ" },
+            { no: "29", kw: "YENİ OTOGAR-ALTINOVA" },
+            { no: "30", kw: "YENİ OTOGAR-DEĞİRMENALTI" },
+            { no: "97", kw: "KUMBAĞ - BARBOROS" }
+        ];
+
+        // 3. Seviye Usta (Çorlu Şehir İçi Hatları)
+        const corluKeywords = [
+            { no: "1", kw: "YESILTEPE-EMLAK" },
+            { no: "2", kw: "SAĞLIK MAH.- GÖLBAŞI" },
+            { no: "3", kw: "HAVUZLAR-HATİP" },
+            { no: "4", kw: "KIVANC-DEVLET" },
+            { no: "5", kw: "HAVUZLAR-DEVLET" },
+            { no: "6", kw: "KEMALETTİN MAH" },
+            { no: "7", kw: "DEVLET HAST.- ÇORLU PARK" },
+            { no: "8", kw: "DEVLET HAST.- SAĞLIK" },
+            { no: "13", kw: "OTOGAR-HAVALİMANI" },
+            { no: "16", kw: "ÇORLU OTOGAR-CEZAEVİ" }
+        ];
+
+        // 4. Seviye İlçeler Arası (Büyük İlçe Seferleri: Hat 26 Saray, Hat 48 Velimeşe, Hat 28, vb.)
+        const ilceKeywords = [
+            { no: "26", kw: "SÜLEYMANPASA-ÇERKEZKÖY-KAPAKLI-SARAY" },
+            { no: "48", kw: "VELİMEŞE-ÇORLU" },
+            { no: "28", kw: "CORLU-M.EREGLISI-SULEYMANPASA" },
+            { no: "35", kw: "SÜLEYMANPAŞA-MALKARA" },
+            { no: "22/1", kw: "TEKIRDAG-MURATLI" },
+            { no: "38", kw: "ÇORLU-YENİCE" },
+            { no: "138", kw: "UÇMAKDERE-SÜLEYMANPAŞA" },
+            { no: "50", kw: "HAYRABOLU-SÜLEYMANPAŞA" },
+            { no: "47", kw: "SARAY-ÇORLU" },
+            { no: "71", kw: "KIZILPINAR-ÇERKEZKÖY" }
+        ];
+
+        const allLevels = [
+            { lic: 1, name: "Çırak", list: spasaLocalKeywords, color: "#3b82f6" },
+            { lic: 2, name: "Kalfa", list: kalfaKeywords, color: "#eab308" },
+            { lic: 3, name: "Usta", list: corluKeywords, color: "#ef4444" },
+            { lic: 4, name: "İlçeler Arası", list: ilceKeywords, color: "#a855f7" }
+        ];
+
+        let taskGlobalIndex = 0;
+        routesData = {};
+
+        allLevels.forEach(lvl => {
+            lvl.list.forEach((item, tIdx) => {
+                let found = tekulasDb.find(r => r.name.includes(item.kw) || (r.hatNo === item.no && r.name.includes(item.kw)));
+                if (!found) {
+                    found = tekulasDb.find(r => r.name.includes(item.kw));
+                }
+                if (!found) {
+                    found = tekulasDb[taskGlobalIndex % tekulasDb.length];
+                }
+
+                const taskNum = tIdx + 1;
+                const isTraining = (lvl.lic === 1 && taskNum <= 3);
+                const routeId = "tekirdag_task_" + taskGlobalIndex;
+                const startStop = found.startStop || (found.stops[0] ? found.stops[0].name : "Kalkış Garajı");
+                const endStop = found.endStop || (found.stops[found.stops.length - 1] ? found.stops[found.stops.length - 1].name : "Varış Durağı");
+                const intermediate = found.intermediateStops || (found.stops.length > 2 ? found.stops.slice(1, -1).map(s => s.name) : []);
+
+                // Formülsel görev adımları
+                const formulaSteps = [];
+                formulaSteps.push("1. Adım: " + startStop + " durağından " + (isTraining ? "yolcu almadan hareket edin." : "bekleyen yolcuları alarak hareket edin."));
+                for (let sIdx = 1; sIdx < found.stops.length - 1; sIdx++) {
+                    formulaSteps.push((sIdx + 1) + ". Adım: Sonra " + found.stops[sIdx].name + " durağına gidin; " + (isTraining ? "yolcu almadan devam edin." : "yolcuları indirin ve bekleyen yolcuları alıp devam edin."));
+                }
+                if (found.stops.length > 1) {
+                    formulaSteps.push(found.stops.length + ". Adım (Hedef Son Durak): Sonra " + endStop + " durağına gidin; " + (isTraining ? "durakta durup eğitimi tamamlayın." : "tüm yolcuları indirin ve görevi tamamlayın."));
+                }
+
+                const detailedInstructions = [
+                    "<strong>Görev Tanımı:</strong> Görev " + taskNum + " (" + lvl.name + "): " + found.name + "<br>",
+                    "<strong>Kalkış (Başlangıç) Durağı:</strong> " + startStop + "<br>",
+                    "<strong>Uğranacak Ara Duraklar:</strong> " + (intermediate.length > 0 ? intermediate.join(" ➔ ") : "Ara durak bulunmamaktadır (Doğrudan varış durağına sürüş)") + "<br>",
+                    "<strong>Gitmeniz Gereken Son Durak (Hedef):</strong> " + endStop + "<br>",
+                    "<strong>Toplam Durak Sayısı:</strong> " + found.stops.length + " Durak | <strong>Mesafe:</strong> " + found.totalKm + " KM<br><br>",
+                    "<strong>Görev Adımları (A tuşu ile özet, Shift + A ile adım adım dinleyin):</strong><br>",
+                    formulaSteps.map(st => "• " + st).join("<br>"),
+                    (isTraining ? "<br><br><em>(Eğitim sürüşüdür; araçta yolcu bulunmaz.)</em>" : "")
+                ].join("");
+
+                const speechBriefing = "Görev " + taskNum + " brifingi. Hat: " + found.name + ". Kalkış durağınız: " + startStop + ". " +
+                    (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
+                    "Hedef son durak: " + endStop + ". Toplam " + found.stops.length + " durak, " + found.totalKm + " kilometre. Görev adımları: " + formulaSteps.join(". ");
+
+                const taskRoute = Object.assign({}, found, {
+                    id: routeId,
+                    sehir: "Tekirdağ",
+                    name: "Görev " + taskNum + " (" + lvl.name + "): " + found.name,
+                    taskIndex: taskGlobalIndex,
+                    licenseLevel: lvl.lic,
+                    color: lvl.color,
+                    isTraining: isTraining,
+                    detailedInstructions: detailedInstructions,
+                    speechBriefing: speechBriefing,
+                    startStop: startStop,
+                    endStop: endStop,
+                    intermediateStops: intermediate
+                });
+
+                routesData[routeId] = taskRoute;
+                routesData[found.id] = found; // Hat id'si ile de erişilebilir
+                taskGlobalIndex++;
+            });
+        });
+
+        // Ayrıca tüm TEKULAŞ hatlarını routesData içine ekle
+        tekulasDb.forEach(r => {
+            if (!routesData[r.id]) routesData[r.id] = r;
+        });
+
+        // Geriye dönük rota kimliği uyumluluğu (Alias desteği)
+        const r26 = tekulasDb.find(r => r.name.indexOf("26/SÜLEYMANPASA") !== -1 || r.hatNo === "26");
+        if (r26) {
+            routesData["hat_26_suleymanpasa_saray"] = r26;
+            routesData["hat_26_suleymanpasa_velimese"] = r26;
+        }
+        const r48 = tekulasDb.find(r => r.name.indexOf("VELİMEŞE-ÇORLU") !== -1 || r.hatNo === "48");
+        if (r48) {
+            routesData["hat_48_velimese_corlu"] = r48;
+        }
+
+        return true;
+    }
+
     if (!rawStops || !Array.isArray(rawStops) || rawStops.length === 0) {
         if (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName]) {
             rawStops = varsayilanSehirDuraklari[cityName];
