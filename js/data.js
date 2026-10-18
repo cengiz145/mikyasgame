@@ -251,6 +251,11 @@ const varsayilanSehirDuraklari = {
         }
     ,
         {
+            "name": "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
+            "lat": 41.2520,
+            "lon": 27.8985
+        },
+        {
             "name": "Velimeşe Aile Sağlığı Merkezi",
             "lat": 41.2535,
             "lon": 27.9005
@@ -1558,6 +1563,106 @@ const ilceRotalari = {
                   ]
         },
         {
+        "id": "hat_velimese_cetin_ring",
+        "hatNo": "48/R",
+        "name": "48/R VELİMEŞE ÇETİN SOKAK RİNG HATTI",
+        "destDistrict": "Velimeşe",
+        "originDistrict": "Velimeşe",
+        "startStop": "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
+        "endStop": "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
+        "intermediateStops": [
+                "Velimeşe Merkez Meydan",
+                "Velimeşe Muhtarlık & Ek Hizmet Binası",
+                "Velimeşe İstasyon & Tren Garı",
+                "Velimeşe Sanayi Caddesi",
+                "Velimeşe TOKİ Konutları",
+                "Velimeşe Aile Sağlığı Merkezi"
+        ],
+        "totalKm": 5.8,
+        "biletFiyat": 20,
+        "biletFiyatMultiplier": 1,
+        "otobusKapasitesi": 32,
+        "terrain": "Şehir İçi / Mahalle",
+        "seferSuresi": "18 Dk",
+        "desc": "Kalkış: Velimeşe Çetin Sokak ➔ Velimeşe Merkez Meydan ➔ Tren Garı ➔ Sanayi ➔ TOKİ ➔ Çetin Sokak Mahalle İçi Ring Seferi. Toplam 7 durak, 5.8 km.",
+        "detailedInstructions": "TEKULAŞ 48/R Velimeşe Çetin Sokak Ring Hattı Görev Adımları:\n1. Adım: Velimeşe Çetin Sokak (Dedebal Kavşağı) durağından bekleyen 20 yolcuyu alarak hareket edin.\n2. Adım: 0.5 kilometre sonra Velimeşe Merkez Meydan durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\n3. Adım: 0.6 kilometre sonra Velimeşe Muhtarlık & Ek Hizmet Binası durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n4. Adım: 0.8 kilometre sonra Velimeşe İstasyon & Tren Garı durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\n5. Adım: 1.1 kilometre sonra Velimeşe Sanayi Caddesi durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\n6. Adım: 1.4 kilometre sonra Velimeşe TOKİ Konutları durağına gidin; yolcuları indirin ve bekleyen 7 yolcuyu alıp devam edin.\n7. Adım: 0.9 kilometre sonra Velimeşe Aile Sağlığı Merkezi durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\n8. Adım (Hedef Son Durak): 0.5 kilometre sonra ringi tamamlayarak Velimeşe Çetin Sokak (Dedebal Kavşağı) durağına varın; tüm yolcuları indirin ve seferi başarıyla tamamlayın.",
+        "speechBriefing": "TEKULAŞ 48/R Velimeşe Çetin Sokak Mahalle Ring seferi. Kalkış ve varış durağınız: Velimeşe Çetin Sokak. Güzergâh: Merkez Meydan, Tren Garı, Sanayi, TOKİ ve Sağlık Ocağı. Toplam 7 durak ve 5.8 kilometre. İyi yolculuklar kaptan.",
+        "stops": [
+                {
+                        "name": "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
+                        "anons": "Velimeşe Çetin Sokak Dedebal Kavşağı kalkış durağındayız. 48 Taksim R Mahalle İçi Ring seferimiz başlıyor.",
+                        "bekleyenYolcu": 20,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 0.5,
+                        "lat": 41.252,
+                        "lon": 27.8985
+                },
+                {
+                        "name": "Velimeşe Merkez Meydan",
+                        "anons": "Sonraki durak: Velimeşe Merkez Meydan, Atatürk Heykeli.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 0.6,
+                        "lat": 41.253,
+                        "lon": 27.899
+                },
+                {
+                        "name": "Velimeşe Muhtarlık & Ek Hizmet Binası",
+                        "anons": "Sonraki durak: Velimeşe Muhtarlık ve Belediye Ek Hizmet Binası.",
+                        "bekleyenYolcu": 4,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 0.8,
+                        "lat": 41.2525,
+                        "lon": 27.898
+                },
+                {
+                        "name": "Velimeşe İstasyon & Tren Garı",
+                        "anons": "Sonraki durak: Velimeşe İstasyon ve TCDD Tren Garı.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 1.1,
+                        "lat": 41.248,
+                        "lon": 27.893
+                },
+                {
+                        "name": "Velimeşe Sanayi Caddesi",
+                        "anons": "Sonraki durak: Velimeşe Sanayi Caddesi.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 1.4,
+                        "lat": 41.249,
+                        "lon": 27.892
+                },
+                {
+                        "name": "Velimeşe TOKİ Konutları",
+                        "anons": "Sonraki durak: Velimeşe TOKİ Konutları.",
+                        "bekleyenYolcu": 7,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 0.9,
+                        "lat": 41.258,
+                        "lon": 27.905
+                },
+                {
+                        "name": "Velimeşe Aile Sağlığı Merkezi",
+                        "anons": "Sonraki durak: Velimeşe Aile Sağlığı Merkezi, Sağlık Ocağı.",
+                        "bekleyenYolcu": 3,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 0.5,
+                        "lat": 41.2535,
+                        "lon": 27.9005
+                },
+                {
+                        "name": "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
+                        "anons": "Son durak: Velimeşe Çetin Sokak. 48 Taksim R Mahalle İçi Ring seferimiz tamamlanmıştır. Tüm yolcularımızın inmesi rica olunur.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 25,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 41.252,
+                        "lon": 27.8985
+                }
+        ]
+},
+        {
         "id": "hat_48_velimese_corlu",
         "hatNo": "48",
         "name": "48 VELİMEŞE - ÇORLU",
@@ -1568,6 +1673,7 @@ const ilceRotalari = {
         "intermediateStops": [
                 "Velimeşe M. Kemal Atatürk Stadyumu (Velimeşespor)",
                 "Velimeşe Aile Sağlığı Merkezi",
+                "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
                 "Velimeşe Merkez Meydan",
                 "Velimeşe Muhtarlık & Ek Hizmet Binası",
                 "Velimeşe Mustafa Kemal Atatürk Caddesi",
@@ -1580,7 +1686,7 @@ const ilceRotalari = {
                 "Velimeşe Bozdoğan Petrol & D-110 Kavşağı",
                 "Çorlu Çevre Yolu Otogar Kavşağı"
         ],
-        "desc": "Kalkış: Velimeşe TOKİ Konutları ➔ Varış: Çorlu Otogar. Güzergâh: Velimeşe Merkez, Atatürk Caddesi, Tren İstasyonu, Velimeşe-1, Sanayi Caddesi, Bozdoğan Petrol, Çorlu Çevre Yolu. Toplam 15 durak, ~19 km.",
+        "desc": "Kalkış: Velimeşe TOKİ Konutları ➔ Varış: Çorlu Otogar. Güzergâh: Velimeşe Çetin Sokak, Dedebal Kavşağı, Velimeşe Merkez, Atatürk Caddesi, Tren İstasyonu, Velimeşe-1, Sanayi Caddesi, Bozdoğan Petrol, Çorlu Çevre Yolu. Toplam 15 durak, ~19 km.",
         "detailedInstructions": "TEKULAŞ 48 Numaralı Hat (Velimeşe – Çorlu) Görev Adımları:\n1. Adım: Velimeşe TOKİ Konutları durağından bekleyen 25 yolcuyu alarak hareket edin.\n2. Adım: 0.8 kilometre sonra Velimeşe Mustafa Kemal Atatürk Stadyumu durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n3. Adım: 0.7 kilometre sonra Velimeşe Aile Sağlığı Merkezi durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\n4. Adım: 0.5 kilometre sonra Velimeşe Merkez Meydan durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\n5. Adım: 0.4 kilometre sonra Velimeşe Muhtarlık & Ek Hizmet Binası durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\n6. Adım: 0.4 kilometre sonra Velimeşe Mustafa Kemal Atatürk Caddesi durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\n7. Adım: 0.6 kilometre sonra Velimeşe İlkokulu & Ortaokulu durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n8. Adım: 0.7 kilometre sonra Velimeşe İstasyon & Tren Garı durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\n9. Adım: 0.5 kilometre sonra Velimeşe - 1 Durağı durağına gidin; yolcuları indirin ve bekleyen 10 yolcuyu alıp devam edin.\n10. Adım: 0.8 kilometre sonra Velimeşe Sanayi Caddesi durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n11. Adım: 0.9 kilometre sonra Velimeşe Mezarlığı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\n12. Adım: 1.2 kilometre sonra Velimeşe Girişi durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\n13. Adım: 1.5 kilometre sonra Velimeşe Bozdoğan Petrol & D-110 Kavşağı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\n14. Adım: 7.5 kilometre sonra Çorlu Çevre Yolu Otogar Kavşağı durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n15. Adım (Hedef Son Durak): 2 kilometre sonra hedef Çorlu Otogar durağına gidin; tüm yolcuları indirin ve görevi başarıyla tamamlayın.",
         "speechBriefing": "TEKULAŞ 48 No'lu Velimeşe Çorlu seferi. Kalkış: Velimeşe TOKİ Konutları. Hedef son durak: Çorlu Otogar. Toplam 15 durak ve 19 kilometre.",
         "color": "#10b981",
@@ -1839,6 +1945,8 @@ if (typeof window !== 'undefined' && window.tekulasHatVeritabani && Array.isArra
         const r48 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "48");
         if (r48 && typeof routesData !== 'undefined') {
             routesData["hat_48_velimese_corlu"] = r48;
+        const rRing = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_velimese_cetin_ring");
+        if (rRing && typeof routesData !== "undefined") routesData["hat_velimese_cetin_ring"] = rRing;
         }
         const r2_7 = ilceRotalari["Tekirdağ"].find(r => r.id === "tekulas_152_2_7");
         const r2_7_donus = ilceRotalari["Tekirdağ"].find(r => r.id === "tekulas_152_2_7_donus");

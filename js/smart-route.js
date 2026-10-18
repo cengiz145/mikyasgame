@@ -29,6 +29,10 @@ const AkilliRotaSistemi = {
         const sNorm = this.normalizeText(stopName);
         const qNorm = this.normalizeText(query);
         const qWords = qNorm.split(' ').filter(w => w.length > 1);
+        // Velimeşe Çetin Sokak Alias Desteği
+        if ((qNorm.includes("cetin") || qNorm.includes("cetin sokak")) && sNorm.includes("cetin")) {
+            return true;
+        }
         if (qWords.length === 0) return sNorm.includes(qNorm);
         return qWords.every(w => sNorm.includes(w));
     },
