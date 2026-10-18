@@ -138,25 +138,35 @@ function generateRoutesFromAPI(rawStops, cityName) {
             ? "Kalkış: " + startStop + " ➔ Varış: " + endStop + ". Sadece güzergahı öğrenmek için yolcusuz eğitim sürüşüdür. İki durak arası ilerleyin." 
             : "Kalkış: " + startStop + " ➔ Varış: " + endStop + ". " + intermediateSummary + "Toplam " + totalStops + " durak.";
 
+        // FORMÜLSEL GÖREV ADIMLARI
+        const formulaSteps = [];
+        let fStep1 = "1. Adım: " + startStop + " durağından " + (isTraining ? "yolcu almadan hareket edin." : "bekleyen yolcuları alarak hareket edin.");
+        formulaSteps.push(fStep1);
+
+        for (let sIdx = 1; sIdx < selected.length - 1; sIdx++) {
+            let fStep = (sIdx + 1) + ". Adım: Sonra " + selected[sIdx].name + " durağına gidin; " + (isTraining ? "yolcu almadan devam edin." : "yolcuları indirin ve bekleyen yolcuları alıp devam edin.");
+            formulaSteps.push(fStep);
+        }
+
+        if (selected.length > 1) {
+            let fLast = totalStops + ". Adım (Hedef Son Durak): Sonra " + endStop + " durağına gidin; " + (isTraining ? "durakta durup eğitimi tamamlayın." : "tüm yolcuları indirin ve görevi tamamlayın.");
+            formulaSteps.push(fLast);
+        }
+
         let detailedInstructions = [
             "<strong>Görev Tanımı:</strong> " + title + "<br>",
             "<strong>Kalkış (Başlangıç) Durağı:</strong> " + startStop + "<br>",
             "<strong>Uğranacak Ara Duraklar:</strong> " + (intermediateStops.length > 0 ? intermediateStops.join(" ➔ ") : "Ara durak bulunmamaktadır (Doğrudan varış durağına kesintisiz sürüş)") + "<br>",
             "<strong>Gitmeniz Gereken Son Durak (Hedef):</strong> " + endStop + "<br>",
-            "<strong>Toplam Durak Sayısı:</strong> " + totalStops + " Durak<br>",
-            "<strong>Nasıl Yapılacak? (Sürüş ve Görev Yönergesi):</strong><br>",
-            "1. <strong>Kalkış ve Gaz:</strong> <code>W</code> veya <code>Yukarı Ok</code> tuşuna basarak kalkış yapın ve hızlanın. Şeritte kalmak için <code>A / D</code> tuşlarını kullanın.<br>",
-            "2. <strong>Durağa Yaklaşma ve Yavaşlama:</strong> Durağa 100-50 metre kala sesli mesafe uyarısı duyacaksınız. <code>S</code> veya <code>Aşağı Ok</code> ile fren yaparak hızınızı 20 km/s altına indirin ve durak hizasında tamamen durun.<br>",
-            "3. <strong>Yolcuları Alma ve İndirme:</strong> Durduğunuzda bekleyen yolcuların binmesi için <code>E</code> (veya <code>Page Up</code>) ile ön kapıyı, inen yolcular için <code>Q</code> (veya <code>Page Down</code>) ile arka kapıyı açın.<br>",
-            "4. <strong>Kapıları Kapatıp Devam Etme:</strong> Biniş ve iniş sesleri tamamlandığında aynı tuşlarla kapıları kapatın ve sonraki durağa doğru sürüşe devam edin.<br>",
-            "5. <strong>Görevi Bitirme:</strong> Sırasıyla tüm durakları tamamlayıp son durak olan <strong>" + endStop + "</strong> durağında yolcuları indirdiğinizde görev başarıyla tamamlanacaktır.",
-            (isTraining ? "<br><em>(Not: Bu bir eğitim sürüşüdür, araçta yolcu bulunmaz. Güzergahı ve durma-kalkma kontrolünü öğrenmeniz amaçlanmıştır.)</em>" : "")
+            "<strong>Toplam Durak Sayısı:</strong> " + totalStops + " Durak<br><br>",
+            "<strong>Görev Adımları (A tuşu ile özet, Shift + A ile adım adım dinleyin):</strong><br>",
+            formulaSteps.map(st => "• " + st).join("<br>"),
+            (isTraining ? "<br><br><em>(Eğitim sürüşüdür; araçta yolcu bulunmaz.)</em>" : "")
         ].join("");
 
         let speechBriefing = "Görev " + taskNum + " brifingi. Kalkış durağınız: " + startStop + ". " +
-            (intermediateStops.length > 0 ? "Sırasıyla duracağınız ara duraklar: " + intermediateStops.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
-            "Gitmeniz gereken hedef son durak: " + endStop + ". Bu görevde toplam " + totalStops + " durak bulunmaktadır. " +
-            "Nasıl yapılır: W tuşuyla gaz verin, duraklara yaklaşırken S tuşuyla fren yapıp durun. Durakta durduğunuzda E tuşuyla ön kapıyı, Q tuşuyla arka kapıyı açarak yolcuları alın. Kapıları kapatıp sonraki durağa ilerleyin. İyi yolculuklar kaptan.";
+            (intermediateStops.length > 0 ? "Durulacak ara duraklar: " + intermediateStops.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
+            "Hedef son durak: " + endStop + ". Toplam " + totalStops + " durak. Görev adımları: " + formulaSteps.join(". ");
 
         let kumulatifMesafe = 0;
         const processedStops = [];

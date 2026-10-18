@@ -213,7 +213,9 @@ const UI = {
             const endStop = route.endStop || (route.stops[route.stops.length - 1] ? route.stops[route.stops.length - 1].name : "Varış");
             const intermediate = route.intermediateStops || (route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
             
-            let ariaDesc = "Görev: " + route.name + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + route.stops.length + " durak.";
+            const cardSteps = MissionReader.generateSteps(route);
+            const cardStepsHtml = cardSteps.map(s => '<div style="margin: 3px 0;">• ' + s + '</div>').join('');
+            let ariaDesc = "Görev: " + route.name + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + route.stops.length + " durak. Görev Adımları: " + cardSteps.join("; ");
             
             btn.setAttribute("aria-label", ariaDesc);
 
@@ -232,7 +234,7 @@ const UI = {
                     '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> ' + intermediate.join(' ➔ ') + '</div>' : 
                     '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> Ara durak yok (Doğrudan varış durağına kesintisiz sürüş)</div>'),
                 '<div style="font-size: 0.88rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 6px; width: 100%; border-left: 3px solid #38bdf8;">',
-                '    🕹️ <strong>Nasıl Yapılacak:</strong> <code>W</code> ile gaz verin, duraklara yaklaşırken <code>S</code> ile fren yapıp durun. <code>E</code> (ön) ve <code>Q</code> (arka) kapıları açarak yolcuları alın, ardından kapıları kapatıp sonraki durağa ilerleyin.',
+                '    📋 <strong>Görev Adımları (A: Harita Özeti | Shift + A: Adım Adım Dinle):</strong><br>' + cardStepsHtml,
                 '</div>'
             ].join("");
 
@@ -265,7 +267,7 @@ const UI = {
 };
 
 /* ==========================================================================
-   MISSION READER (A: AÇIKLAMALARI OKU, SHIFT+A: ADIM ADIM OKU, ESC: ÇIK)
+   MISSION READER (A: AÇIKLAMALARI OKU, SHIFT+A: ADIM ADIM FORMÜLSEL OKU, ESC: ÇIK)
    ========================================================================== */
 const MissionReader = {
     currentStepIndex: 0,
@@ -275,15 +277,86 @@ const MissionReader = {
             return Game.activeRouteData;
         }
         if (typeof routesData !== 'undefined') {
-            if (typeof Game !== 'undefined' && Game.currentCity) {
-                let r = Object.values(routesData).find(x => x.sehir === Game.currentCity && x.taskIndex === Game.completedTasks);
-                if (r) return r;
-                r = Object.values(routesData).find(x => x.sehir === Game.currentCity);
-                if (r) return r;
-            }
+            const city = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
+            const task = (typeof Game !== 'undefined' && typeof Game.completedTasks === 'number') ? Game.completedTasks : 0;
+            let r = Object.values(routesData).find(x => x.sehir === city && x.taskIndex === task);
+            if (r) return r;
+            r = Object.values(routesData).find(x => x.sehir === city);
+            if (r) return r;
             return Object.values(routesData)[0] || null;
         }
         return null;
+    },
+
+    generateSteps: function(route) {
+        if (!route) return ["Henüz aktif bir görev veya rota bulunamadı."];
+
+        let stops = route.stops;
+        if (!stops || !Array.isArray(stops) || stops.length === 0) {
+            let s = [];
+            if (route.startStop) s.push({ name: route.startStop });
+            if (route.intermediateStops && Array.isArray(route.intermediateStops)) {
+                route.intermediateStops.forEach(st => s.push({ name: st }));
+            }
+            if (route.endStop) s.push({ name: route.endStop });
+            stops = s;
+        }
+
+        if (stops.length === 0) {
+            return ["Bu görev için durak adımı bulunamadı."];
+        }
+
+        const total = stops.length;
+        const steps = [];
+
+        // 1. Adım: Başlangıç durağından hareket
+        const firstStop = stops[0];
+        let step1 = "1. Adım: " + firstStop.name + " durağından ";
+        if (typeof firstStop.bekleyenYolcu === 'number' && firstStop.bekleyenYolcu > 0) {
+            step1 += "bekleyen " + firstStop.bekleyenYolcu + " yolcuyu alarak hareket edin.";
+        } else if (typeof firstStop.bekleyenYolcu === 'number' && firstStop.bekleyenYolcu === 0) {
+            step1 += "yolcu almadan hareket edin.";
+        } else {
+            step1 += "hareket edin, yolcu alın veya yolcu almadan devam edin.";
+        }
+        steps.push(step1);
+
+        // Ara Duraklar: 1'den total - 2'ye kadar
+        for (let i = 1; i < total - 1; i++) {
+            const stop = stops[i];
+            let step = (i + 1) + ". Adım: Sonra " + stop.name + " durağına gidin; ";
+            
+            const hasWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu > 0);
+            const zeroWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu === 0);
+            const hasAlighting = (typeof stop.inenYolcu === 'number' && stop.inenYolcu > 0);
+
+            if (hasWaiting && hasAlighting) {
+                step += "yolcuları indirin ve bekleyen " + stop.bekleyenYolcu + " yolcuyu alıp devam edin.";
+            } else if (hasWaiting) {
+                step += "bekleyen " + stop.bekleyenYolcu + " yolcuyu alıp devam edin.";
+            } else if (hasAlighting && zeroWaiting) {
+                step += "yolcuları indirin ve yolcu almadan devam edin.";
+            } else if (zeroWaiting) {
+                step += "yolcu almadan devam edin.";
+            } else {
+                step += "yolcu alın ya da yolcu almadan devam edin.";
+            }
+            steps.push(step);
+        }
+
+        // Son Durak: total - 1
+        if (total > 1) {
+            const lastStop = stops[total - 1];
+            let lastStep = total + ". Adım (Hedef Son Durak): Sonra " + lastStop.name + " durağına gidin; ";
+            if (typeof lastStop.inenYolcu === 'number' && lastStop.inenYolcu > 0) {
+                lastStep += "tüm yolcuları indirin ve görevi tamamlayın.";
+            } else {
+                lastStep += "durakta durup görevi tamamlayın.";
+            }
+            steps.push(lastStep);
+        }
+
+        return steps;
     },
 
     readDescription: function() {
@@ -304,7 +377,7 @@ const MissionReader = {
                   "Gitmeniz gereken hedef son durak: " + endStop + ". " +
                   (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
                   "Toplam " + totalStops + " durak. " +
-                  "Görevin adımlarını adım adım dinlemek için Shift + A tuşuna basın. Çıkmak için Escape tuşuna basın.";
+                  "Görevin adımlarını formülsel olarak adım adım dinlemek için Shift + A tuşuna basın. Çıkmak için Escape tuşuna basın.";
         
         if (typeof audio !== 'undefined' && audio.speak) {
             audio.speak(msg);
@@ -316,26 +389,25 @@ const MissionReader = {
 
     readNextStep: function() {
         const route = this.getActiveRoute();
-        const endStop = (route && route.endStop) ? route.endStop : (route && route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Hedef Son Durak");
-
-        const steps = [
-            "1. Adım: Gaz ve Kalkış: W veya Yukarı Ok tuşuna basarak gaz verin ve kalkış yapın. Şeritte kalmak için A ve D tuşlarını kullanın.",
-            "2. Adım: Durağa Yaklaşma ve Yavaşlama: Durağa yaklaşırken sesli anonsu dinleyin, S veya Aşağı Ok ile fren yaparak hızınızı 20 kilometre altına indirin ve durak hizasında tamamen durun.",
-            "3. Adım: Kapı Açma ve Yolcu Alma: Otobüs tam durduğunda E ile ön kapıyı, Q ile arka kapıyı açarak yolcuların biniş ve inişini tamamlayın.",
-            "4. Adım: Kapıları Kapatma ve İlerleme: Biniş sesleri bitince kapıları aynı tuşlarla kapatıp tekrar gaz vererek sonraki durağa ilerleyin.",
-            "5. Adım: Görevi Bitirme: Sırasıyla tüm durakları tamamlayıp son durak olan " + endStop + " durağında yolcuları indirdiğinizde görev başarıyla tamamlanır."
-        ];
+        const steps = this.generateSteps(route);
+        if (!steps || steps.length === 0) return;
 
         if (this.currentStepIndex >= steps.length) {
             this.currentStepIndex = 0;
         }
 
         let stepText = steps[this.currentStepIndex];
+
+        // Sürüş halindeyse ve şu anki durak bu adımsa belirt
+        if (typeof Game !== 'undefined' && Game.isDriving && typeof Game.currentStopIndex === 'number' && this.currentStepIndex === Game.currentStopIndex) {
+            stepText = "(Şu anki hedefiniz) " + stepText;
+        }
+
         this.currentStepIndex++;
 
         let nextNotice = (this.currentStepIndex < steps.length) 
             ? " (Sonraki adım için Shift + A, çıkmak için Escape tuşuna basın.)" 
-            : " (Tüm adımlar tamamlandı. Baştan dinlemek için Shift + A, çıkmak için Escape tuşuna basın.)";
+            : " (Tüm görev adımları tamamlandı. Baştan dinlemek için Shift + A, çıkmak için Escape tuşuna basın.)";
 
         let fullMsg = stepText + nextNotice;
 
