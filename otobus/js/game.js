@@ -1309,6 +1309,9 @@ const Game = {
         if (typeof audio.updateWeatherSound === 'function') audio.updateWeatherSound(this.speed, this.weather);
 
         document.getElementById('hud-speed').innerText = Math.floor(this.speed);
+        if (typeof AkilliSistem !== 'undefined' && AkilliSistem.onCoPilotUpdate) {
+            AkilliSistem.onCoPilotUpdate(this);
+        }
 
         // Motor Panning (Aracın yalpalamasına göre motor sesinin sağ/sol hoparlöre kayması)
         if (typeof audio.updateBusPosition === 'function') {

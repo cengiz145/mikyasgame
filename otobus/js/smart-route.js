@@ -203,6 +203,9 @@ const AkilliRotaSistemi = {
             UI.showToast(`Akıllı Rota: ${res.fromStop} ➔ ${res.toStop} (Hat ${res.route.hatNo})`, "success");
         }
 
+        if (typeof AkilliSistem !== 'undefined' && AkilliSistem.autoAssignBusForRoute) {
+            AkilliSistem.autoAssignBusForRoute(res.route);
+        }
         if (typeof Game !== 'undefined' && Game.startRoute) {
             Game.startRoute(res.route.id);
         }
@@ -301,6 +304,16 @@ const AkilliRotaSistemi = {
         const btnCancel = document.getElementById('btn-smart-cancel');
         if (btnCancel) {
             btnCancel.addEventListener('click', () => this.closeModal());
+        }
+
+        const btnRecommend = document.getElementById('btn-smart-recommend');
+        if (btnRecommend) {
+            btnRecommend.addEventListener('click', () => {
+                this.closeModal();
+                if (typeof AkilliSistem !== 'undefined' && AkilliSistem.recommendSmartRoute) {
+                    AkilliSistem.recommendSmartRoute();
+                }
+            });
         }
 
         const btnCalc = document.getElementById('btn-smart-calculate');
