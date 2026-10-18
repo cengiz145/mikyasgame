@@ -46,6 +46,7 @@ class AudioSystem {
             turnTick: new Howl({ src: ['sounds/vinebeep5.ogg'] }),
             crash: new Howl({ src: ['sounds/underwaterland.ogg'] }),
             airHorn: new Howl({ src: ['sounds/havalı korna.mp3'], volume: 0.85 }),
+            npcHorn: new Howl({ src: ['sounds/vehicle_h1.ogg'], volume: 0.80 }),
             menuMusic: new Howl({ src: ['sounds/music53.wav'], loop: true, volume: 0.2 }),
             rain8: new Howl({ src: ['sounds/rain8.ogg'], loop: true, volume: 0 }),
             rain9: new Howl({ src: ['sounds/rain9.ogg'], loop: true, volume: 0 }),
@@ -1149,6 +1150,15 @@ class AudioSystem {
         this.playBrakeRelease(); // İmdat kitlenirken hava tahliyesi olur
     }
 
+    playNPCHorn(pan = 0) {
+        if (this.sounds && this.sounds.npcHorn) {
+            const id = this.sounds.npcHorn.play();
+            if (typeof this.sounds.npcHorn.stereo === 'function') {
+                this.sounds.npcHorn.stereo(pan, id);
+            }
+        }
+    }
+
     playHorn() {
         // Eğer seçili otobüs havalı korna kullanıyorsa (Travego, Tourismo, Setra, MAN, vb.)
         const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
@@ -1247,12 +1257,10 @@ class AudioSystem {
         try {
             const filename = NPC_SOUNDS[Math.floor(Math.random() * NPC_SOUNDS.length)];
             
-            // BUG FIX: createMediaElementSource CORS ve file:/// hatalarına sebep olduğu için Howler.js'e geçildi
-            // Böylece tüm tarayıcılarda NPC sesleri sorunsuz çalacak.
             const howlObj = new Howl({
                 src: [`sounds/npc/${filename}`],
-                stereo: initialPan, // Howler StereoPannerNode doğrudan ilk anda bağlansın
-                loop: false,
+                stereo: initialPan,
+                loop: true, // Araç yaklaşıp uzaklaşırken sesin zamansız kesilmesini önler
                 volume: 0.0, // Başlangıçta sessiz (uzakta)
                 html5: false // Web Audio API StereoPanner kullansın
             });
@@ -1264,8 +1272,15 @@ class AudioSystem {
                 howlObj: howlObj,
                 soundId: soundId,
                 stop: () => {
-                    howlObj.fade(howlObj.volume(soundId), 0, 100, soundId);
-                    setTimeout(() => howlObj.stop(soundId), 100);
+                    try {
+                        howlObj.fade(howlObj.volume(soundId), 0, 350, soundId);
+                        setTimeout(() => {
+                            try {
+                                howlObj.stop(soundId);
+                                howlObj.unload();
+                            } catch (e) {}
+                        }, 400);
+                    } catch (e) {}
                 }
             };
         } catch (e) {
