@@ -285,10 +285,11 @@ const Game = {
     },
 
     deductMoney: function(amount) {
-        this.playerBudget -= amount;
-        this.sessionPenalties += amount;
-        if (this.playerBudget < 0) this.playerBudget = 0;
-        this.saveData();
+        // EĞİTİM MODU GÜVENCESİ: Eğitim aşamasında oyuncudan ceza kesilmez, insafsız ceza sistemi devre dışıdır
+        this.sessionPenalties = 0;
+        if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast("Eğitim Modu: Trafik cezası uygulanmadı (Muaf).", "info");
+        }
         UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
     },
 
@@ -1025,16 +1026,18 @@ const Game = {
 
         // --- Pnömatik Fren Sistemi ---
         if (audio.isEngineRunning) {
-            // Kompresör havayı doldurur
+            // Kompresör havayı doldurur (Eğitim Modu: Hızlı dolum, bekleme yok)
             if (this.airPressure < 120) {
                 let prevPressure = this.airPressure;
-                this.airPressure += 2 * deltaTime; // Saniyede 2 PSI dolsun
+                this.airPressure += 12 * deltaTime;
                 if (this.airPressure >= 120 && prevPressure < 120) {
                     this.airPressure = 120;
                     audio.playAirGovernorCutoff(); // Tahliye valfi çuf-tıss
                 }
             }
         }
+        // EĞİTİM MODU KORUMASI: Basınç asla kritik seviyeye (85 PSI altına) düşmez, imdat freni kilitlenmez
+        this.airPressure = Math.max(85, this.airPressure);
         
         let isBraking = (this.keys.s || this.keys.arrowdown);
         
@@ -1045,8 +1048,8 @@ const Game = {
         
         if (isBraking) {
             if (!this.isBrakeKeyDown) {
-                // Frene ilk basışta pompalama cezası (-5 PSI anlık tahliye)
-                this.airPressure -= 5;
+                // Eğitim Modu: Havalı fren sesi çalar, ceza/tahliye kilitlenmesi yaşanmaz
+                this.airPressure = Math.max(85, this.airPressure - 1);
                 this.isBrakeKeyDown = true;
                 audio.playBrakeRelease(); // Tıss
                 
@@ -1400,32 +1403,30 @@ const Game = {
             }
         }
 
-        // YOLCU KONFOR ENDEKSİ (PCI) VE TELEMETRİK G-KUVVETİ TAKİBİ
+        // YOLCU KONFOR ENDEKSİ (PCI) - EĞİTİM VE HOŞGÖRÜ SİSTEMİ
         if (this.isDriving && deltaTime > 0) {
             const decel = (this.lastRecordedSpeed - this.speed) / deltaTime;
-            if (decel > 25 && this.speed > 25) {
-                const penalty = Math.min(8, Math.round((decel - 20) * 0.4));
-                this.passengerComfort = Math.max(15, this.passengerComfort - penalty);
+            // Eğitim aşamasında sert fren yapılsa dahi ceza verilmez; taban %90 altına inmez
+            if (decel > 30 && this.speed > 30) {
+                this.passengerComfort = Math.max(90, this.passengerComfort - 0.5);
                 
                 const now = performance.now();
-                if (!this.lastHarshBrakeWarningTime || now - this.lastHarshBrakeWarningTime > 4500) {
+                if (!this.lastHarshBrakeWarningTime || now - this.lastHarshBrakeWarningTime > 8000) {
                     this.lastHarshBrakeWarningTime = now;
-                    if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                        audio.speak("Kaptan biraz yavaş lütfen, savrulduk!");
-                    }
                     if (typeof UI !== 'undefined' && UI.showToast) {
-                        UI.showToast(`Sert Fren! Konfor Düştü: %${Math.round(this.passengerComfort)}`, 'warning');
+                        UI.showToast(`Eğitim İpucu: Kademeli frenleme daha konforludur (Konfor: %${Math.round(this.passengerComfort)})`, 'info');
                     }
                 }
-            } else if (this.speed < 20 && this.isBrakeKeyDown && decel > 0 && decel < 12) {
-                this.passengerComfort = Math.min(100, this.passengerComfort + (deltaTime * 0.8));
+            } else {
+                // Konfor hızlı ve cömert biçimde %100'e toparlanır
+                this.passengerComfort = Math.min(100, this.passengerComfort + (deltaTime * 2.5));
             }
             
             const comfortEl = document.getElementById('hud-comfort-val');
             if (comfortEl) {
                 const cVal = Math.round(this.passengerComfort);
                 comfortEl.innerText = `%${cVal}`;
-                comfortEl.style.color = cVal >= 80 ? '#4ade80' : (cVal >= 50 ? '#facc15' : '#ef4444');
+                comfortEl.style.color = '#4ade80'; // Daima pozitif yeşil
             }
         }
         this.lastRecordedSpeed = this.speed;
@@ -2050,8 +2051,8 @@ const Game = {
             UI.showToast("Güvenlik Kilidi: Kapılar kilitli!", "error");
             return;
         }
-        // BUG FIX 2: Kapılar hava ile çalışır, her açıp kapamada basınç düşer (-10 PSI)
-        this.airPressure -= 10;
+        // Havalı kapı açma (Eğitim Modu: Basınç güvenli seviyede tutulur)
+        this.airPressure = Math.max(85, this.airPressure - 2);
         
         this.frontDoorOpen = !this.frontDoorOpen;
         const btn = document.getElementById('btn-front-door');
@@ -2156,8 +2157,8 @@ const Game = {
             UI.showToast("Güvenlik Kilidi: Kapılar kilitli!", "error");
             return;
         }
-        // BUG FIX 2: Arka kapı pnömatik
-        this.airPressure -= 10;
+        // Arka kapı pnömatik (Eğitim Modu: Basınç güvenli seviyede tutulur)
+        this.airPressure = Math.max(85, this.airPressure - 2);
         
         this.rearDoorOpen = !this.rearDoorOpen;
         const btn = document.getElementById('btn-rear-door');
@@ -2259,11 +2260,11 @@ const Game = {
 
             this.completeTask(); // İlerlemeyi kaydet
         } else {
-            audio.speak("Kaza yaptınız veya görev iptal edildi. Görev başarısız oldu. Lütfen tekrar deneyin.");
+            audio.speak("Eğitim seferi tamamlanamadı. Ceza uygulanmadı, istediğiniz zaman tekrar deneyebilirsiniz kaptan.");
         }
         
         if (document.getElementById('res-money')) document.getElementById('res-money').innerText = `${this.sessionMoney} â‚º`;
-        if (document.getElementById('res-penalties')) document.getElementById('res-penalties').innerText = `${this.sessionPenalties} â‚º`;
+        if (document.getElementById('res-penalties')) document.getElementById('res-penalties').innerText = '0 ₺ (Eğitimde Ceza Yok / Muaf)';
         
         if (typeof UI !== 'undefined') UI.switchScreen('results-screen');
     },
@@ -2703,11 +2704,11 @@ const SanayiMechanic = {
         
         const repairNext = () => {
             if (currentRepairIndex >= partsToRepair.length) {
-                Game.addMoney(-totalCost);
-                const finalMsg = `Tüm onarımlar tamamlandı. Toplam onarım maliyeti ${totalCost} Lira hesabınızdan düşüldü. İşler bitti patron. Sonra görüşürüz.`;
+                // EĞİTİM VE GARANTİ DESTEĞİ: Sıfır masraf, belediye eğitim desteği
+                const finalMsg = "Tüm onarımlar belediye eğitim ve garanti desteği kapsamında ücretsiz olarak tamamlandı. Aracınız hazır kaptan, iyi görevler!";
                 document.getElementById('sanayi-dialog').innerText = finalMsg;
                 if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(finalMsg);
-                setTimeout(() => this.finishRepair(), 6000);
+                setTimeout(() => this.finishRepair(), 2500);
                 return;
             }
             
@@ -2730,8 +2731,8 @@ const SanayiMechanic = {
                 if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(doneMsg);
                 
                 currentRepairIndex++;
-                setTimeout(repairNext, 4000);
-            }, 30000);
+                setTimeout(repairNext, 1200);
+            }, 2000);
         };
         
         repairNext();
