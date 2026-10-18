@@ -69,6 +69,25 @@ const AkilliRotaSistemi = {
     },
 
     hesapla: function(neredenQuery, nereyeQuery) {
+        // SÜLEYMANPAŞA MAHALLELERİ İÇİ FORMÜLSEL NAVİGASYON
+        if (typeof SuleymanpasaNavigasyon !== 'undefined' && SuleymanpasaNavigasyon.findSokak) {
+            const sFrom = SuleymanpasaNavigasyon.findSokak(neredenQuery);
+            const sTo = SuleymanpasaNavigasyon.findSokak(nereyeQuery);
+            if (sFrom && sTo && sFrom.id !== sTo.id) {
+                const sRes = SuleymanpasaNavigasyon.rotaOlustur(neredenQuery, nereyeQuery);
+                if (sRes.success) {
+                    return {
+                        success: true,
+                        route: sRes.route,
+                        originalRoute: sRes.route,
+                        fromStop: sRes.kalkis.name,
+                        toStop: sRes.varis.name,
+                        stopsCount: sRes.stopsCount,
+                        dist: sRes.totalKm
+                    };
+                }
+            }
+        }
         // VELİMEŞE 100 SOKAK İÇİ ÖNCELİKLİ KONTROL
         if (typeof VelimeseNavigasyon !== 'undefined' && VelimeseNavigasyon.findSokak) {
             const vFrom = VelimeseNavigasyon.findSokak(neredenQuery);
@@ -398,6 +417,27 @@ if (typeof document !== 'undefined') {
                     toInput.value = "Velimeşe TOKİ 233. Sokak";
                     if (typeof audio !== 'undefined' && audio.speak) {
                         audio.speak("Velimeşe 100 Sokak İçi Ulaşım Modu devrede. Kalkış: Çetin Sokak, Varış: TOKİ 233. Sokak. Dilerseniz sokakları değiştirebilirsiniz.");
+                    }
+                }
+            });
+        }
+    });
+}
+
+
+// Süleymanpaşa Hızlı Mod Butonu
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnSp = document.getElementById('btn-spasa-quick-mode');
+        if (btnSp) {
+            btnSp.addEventListener('click', () => {
+                const fromInput = document.getElementById('smart-from-input');
+                const toInput = document.getElementById('smart-to-input');
+                if (fromInput && toInput) {
+                    fromInput.value = "Üniversite Caddesi";
+                    toInput.value = "Yeni Otogar Caddesi";
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Süleymanpaşa 7 Mahalle Sefer Modu devrede. Kalkış: Üniversite Caddesi Kampüs, Varış: Yeni Otobüs Terminali. Toplam mesafe ve süre formülle hesaplanıyor.");
                     }
                 }
             });

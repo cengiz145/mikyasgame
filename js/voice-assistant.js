@@ -200,6 +200,21 @@
         }
 
         // --- İLÇE HATLARI (ÇETİN SOKAK, 48 VE 26 NUMARALI HATLARI) ---
+        // Süleymanpaşa Mahalle ve Cadde Komutları
+        if (command.includes("süleymanpaşa") || command.includes("suleymanpasa") || command.includes("kampüs") || command.includes("değirmenaltı")) {
+            if (typeof SuleymanpasaNavigasyon !== 'undefined') {
+                if (command.includes("otogar") || command.includes("terminal")) {
+                    audio.speak("Süleymanpaşa Değirmenaltı Kampüs'ten Yeni Otogar Terminaline formüle bağlı şehir içi sefer başlatılıyor.");
+                    SuleymanpasaNavigasyon.baslat("kampus", "otogar");
+                    return;
+                }
+                if (command.includes("hastane") || command.includes("şehir hastanesi")) {
+                    audio.speak("Süleymanpaşa Tarihi Merkez Çarşı'dan Şehir Hastanesine sefer başlatılıyor.");
+                    SuleymanpasaNavigasyon.baslat("hukumet caddesi", "sehir hastanesi");
+                    return;
+                }
+            }
+        }
         if (command.includes("çetin sokak") || command.includes("cetin sokak")) {
             // İki sokak arasında Velimeşe seferi kontrolü
             if (typeof VelimeseNavigasyon !== 'undefined') {
