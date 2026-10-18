@@ -199,7 +199,18 @@
             }
         }
 
-        // --- İLÇE HATLARI (48 VE 26 NUMARALI HATLARI) ---
+        // --- İLÇE HATLARI (ÇETİN SOKAK, 48 VE 26 NUMARALI HATLARI) ---
+        if (command.includes("çetin sokak") || command.includes("cetin sokak") || command.includes("çetin") || command.includes("cetin")) {
+            audio.speak("Velimeşe Mahallesi Çetin Sokak'a hizmet veren hatlar: 48 No'lu Velimeşe - Çorlu hattı, 26 No'lu Süleymanpaşa - Velimeşe ekspres hattı ve 48 Taksim R Çetin Sokak Mahalle Ring hattıdır. Rota başlatılıyor.");
+            if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
+                const rCetin = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_velimese_cetin_ring") || ilceRotalari["Tekirdağ"].find(r => r.hatNo === "48");
+                if (rCetin) {
+                    routesData[rCetin.id] = rCetin;
+                    Game.startRoute(rCetin.id);
+                    return;
+                }
+            }
+        }
         if (command.includes("velimeşe çorlu") || command.includes("48") || command.includes("kırk sekiz")) {
             audio.speak("TEKULAŞ 48 numaralı Velimeşe Çorlu hattı devreye alınıyor.");
             if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {

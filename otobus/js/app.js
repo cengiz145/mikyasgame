@@ -542,7 +542,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Rota verisini routesData havuzuna ekle
                 routesData[distRoute.id] = distRoute;
                 
-                if (distRoute.hatNo === "48") {
+                if (distRoute.id === "hat_velimese_cetin_ring" || distRoute.hatNo === "48/R") {
+                    audio.speak("TEKULAŞ 48 Taksim R Velimeşe Çetin Sokak Mahalle Ring seferi devreye alındı. İyi yolculuklar kaptan.");
+                    UI.showToast("48/R Hattı: Velimeşe Çetin Sokak Ring (6 KM)", "success");
+                } else if (distRoute.hatNo === "48") {
                     audio.speak("TEKULAŞ 48 numaralı Velimeşe Çorlu hattı devreye alındı. İyi yolculuklar kaptan.");
                     UI.showToast("48 Numaralı Hat: Velimeşe - Çorlu (19 KM)", "success");
                 } else if (distRoute.hatNo === "26") {
