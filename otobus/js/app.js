@@ -40,6 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // ==========================================================
 
+    // === HERKESİ SEVİYE 1'DEN BAŞLAT GÜNCELLEMESİ ===
+    if (localStorage.getItem('sim_season_level1') !== 'true') {
+        localStorage.setItem('sim_season_level1', 'true');
+        localStorage.setItem('licenseLevel', '1');
+        localStorage.setItem('completedTasks', '0');
+        localStorage.setItem('unlockedCities', JSON.stringify(["Tekirdağ"]));
+        localStorage.setItem('merkezUs', 'Tekirdağ');
+        if (typeof Game !== 'undefined') {
+            Game.licenseLevel = 1;
+            Game.completedTasks = 0;
+            Game.unlockedCities = ["Tekirdağ"];
+            Game.currentCity = "Tekirdağ";
+        }
+        console.log("Herkes Seviye 1'den başlatıldı.");
+    }
+    // =================================================
+
     // 0. Splash Screen
     const splashScreen = document.getElementById('splash-screen');
     const loginScreen = document.getElementById('login-screen');
@@ -58,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     titleScreen.classList.remove('hidden');
                     UI.showToast(`Tekrar hoş geldin, ${savedUser}!`, 'success');
                     audio.speak(`Tekrar hoş geldin, ${savedUser}!`);
+                    UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle()); // Login sync
                 } catch (err) {
                     localStorage.removeItem('otobusUsername');
                     loginScreen.classList.remove('hidden');
@@ -108,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             UI.showToast(`Hoş geldin, ${username}!`, 'success');
             audio.speak(`Hoş geldin, ${username}!`);
+            UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle()); // Login sync
         } catch (error) {
             UI.showToast('Bağlantı hatası: Sunucuya bağlanılamadı. Çevrimdışı devam ediliyor.', 'warning');
             if (typeof audio.speak === 'function') audio.speak("Sunucuya bağlanılamadı, yerel kayıtla oyuna giriliyor.");

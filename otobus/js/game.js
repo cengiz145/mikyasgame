@@ -1,3 +1,16 @@
+// HERKESİ SEVİYE 1'DEN BAŞLATMA PROTOKOLÜ (GLOBAL SEZON 1)
+try {
+    if (typeof localStorage !== 'undefined') {
+        if (localStorage.getItem('sim_season_level1') !== 'true') {
+            localStorage.setItem('sim_season_level1', 'true');
+            localStorage.setItem('licenseLevel', '1');
+            localStorage.setItem('completedTasks', '0');
+            localStorage.setItem('unlockedCities', JSON.stringify(["Tekirdağ"]));
+            localStorage.setItem('merkezUs', 'Tekirdağ');
+        }
+    }
+} catch(e) {}
+
 ﻿/* ==========================================================================
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU OYUN MOTORU (GAME.JS)
  ==========================================================================
@@ -92,13 +105,26 @@ const Game = {
 
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        this.licenseLevel = data.licenseLevel || 1;
-                        this.completedTasks = data.completedTasks || 0;
-                        this.playerBudget = data.playerBudget || 0;
-                        this.clockMinutes = data.clockMinutes || 480;
-                        this.unlockedCities = data.unlockedCities || ["Tekirdağ"];
-                        this.currentCity = data.currentCity || "Tekirdağ";
+                        // Herkesi Seviye 1'den başlat kuralı (Global Sezon Reset)
+                        if (data.season !== 'season_level1') {
+                            this.licenseLevel = 1;
+                            this.completedTasks = 0;
+                            this.playerBudget = data.playerBudget || 0;
+                            this.clockMinutes = data.clockMinutes || 480;
+                            this.unlockedCities = ["Tekirdağ"];
+                            this.currentCity = "Tekirdağ";
+                            this.saveData(); // Firebase bulut kaydını da Seviye 1 olarak güncelle
+                        } else {
+                            this.licenseLevel = data.licenseLevel || 1;
+                            this.completedTasks = data.completedTasks || 0;
+                            this.playerBudget = data.playerBudget || 0;
+                            this.clockMinutes = data.clockMinutes || 480;
+                            this.unlockedCities = data.unlockedCities || ["Tekirdağ"];
+                            this.currentCity = data.currentCity || "Tekirdağ";
+                        }
                     } else {
+                        this.licenseLevel = 1;
+                        this.completedTasks = 0;
                         this.saveData(); // Yeni profil
                     }
                     resolve();
@@ -119,6 +145,7 @@ const Game = {
     saveData: function() {
         // Local fallback backup (crash-proof)
         try {
+            localStorage.setItem('sim_season_level1', 'true');
             localStorage.setItem('licenseLevel', this.licenseLevel);
             localStorage.setItem('completedTasks', this.completedTasks);
             localStorage.setItem('para', this.playerBudget);
@@ -133,6 +160,7 @@ const Game = {
         try {
             if (window.db && this.username) {
                 window.db.ref('otobus_simulasyonu/kullanicilar/' + this.username).set({
+                    season: 'season_level1',
                     licenseLevel: this.licenseLevel,
                     completedTasks: this.completedTasks,
                     playerBudget: this.playerBudget,
