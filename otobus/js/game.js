@@ -114,13 +114,17 @@ const Game = {
     },
 
     saveData: function() {
-        // Local fallback backup
-        localStorage.setItem('licenseLevel', this.licenseLevel);
-        localStorage.setItem('completedTasks', this.completedTasks);
-        localStorage.setItem('para', this.playerBudget);
-        localStorage.setItem('clockMinutes', this.clockMinutes);
-        localStorage.setItem('unlockedCities', JSON.stringify(this.unlockedCities));
-        localStorage.setItem('merkezUs', this.currentCity);
+        // Local fallback backup (crash-proof)
+        try {
+            localStorage.setItem('licenseLevel', this.licenseLevel);
+            localStorage.setItem('completedTasks', this.completedTasks);
+            localStorage.setItem('para', this.playerBudget);
+            localStorage.setItem('clockMinutes', this.clockMinutes);
+            localStorage.setItem('unlockedCities', JSON.stringify(this.unlockedCities));
+            localStorage.setItem('merkezUs', this.currentCity);
+        } catch (storageErr) {
+            console.warn("Yerel depolama kayıt uyarısı:", storageErr);
+        }
 
         // Firebase Cloud Save
         try {
