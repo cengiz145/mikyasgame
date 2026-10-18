@@ -65,123 +65,970 @@ const sehirRotalari = {
 };
 
 // Aktif oynanabilir rotaların (API'den çekildikten sonra) tutulduğu havuz
-// Gerçek ve Özgün Şehir/İlçe Durak Havuzu (API Çöktüğünde veya Çevrimdışıyken Devreye Girer)
-// Tekirdağ için Merkez ilçe Süleymanpaşa'dır.
+// 190 ADET GERÇEK VE ÖZGÜN ŞEHİR/İLÇE DURAK VERİTABANI (API ÇÖKMESİNE KARŞI TAM GÜVENLİ YEDEK)
+// Tekirdağ için Süleymanpaşa, Çorlu, Çerkezköy, Muratlı gerçek durakları bulunur.
 const varsayilanSehirDuraklari = {
     "Tekirdağ": [
-        { name: "Süleymanpaşa Yeni Otobüs Terminali", lat: 40.9950, lon: 27.5620 },
-        { name: "Valilik / Hükümet Caddesi", lat: 40.9780, lon: 27.5110 },
-        { name: "Tarihi Rüstem Paşa Camii", lat: 40.9772, lon: 27.5145 },
-        { name: "Tekirdağ Sahil Dolgu Parkı", lat: 40.9730, lon: 27.5100 },
-        { name: "Değirmenaltı / Namık Kemal Evi", lat: 40.9930, lon: 27.5810 },
-        { name: "Dr. İsmail Fehmi Cumalıoğlu Şehir Hastanesi", lat: 40.9880, lon: 27.5350 },
-        { name: "Namık Kemal Üniversitesi (NKÜ) Kampüsü", lat: 40.9975, lon: 27.5870 },
-        { name: "Köprübaşı Meydanı", lat: 40.9760, lon: 27.5130 },
-        { name: "Çarşı / Bedesten Durağı", lat: 40.9765, lon: 27.5150 },
-        { name: "Barış Manço Parkı", lat: 40.9810, lon: 27.5200 },
-        { name: "Altınova Sahil Durağı", lat: 40.9620, lon: 27.4850 },
-        { name: "Eski Otogar Kavşağı", lat: 40.9820, lon: 27.5180 },
-        { name: "Cumhuriyet Meydanı", lat: 40.9770, lon: 27.5120 },
-        { name: "Tekira AVM Durağı", lat: 40.9815, lon: 27.5170 },
-        { name: "Yüzüncü Yıl Mahallesi", lat: 40.9890, lon: 27.5050 },
-        { name: "Hürriyet Mahallesi Parkı", lat: 40.9940, lon: 27.5750 },
-        { name: "Tarihi Beşevler Durağı", lat: 40.9750, lon: 27.5090 },
-        { name: "Atatürk Ormanı Girişi", lat: 40.9990, lon: 27.5500 },
-        { name: "Gündoğdu Mahallesi Meydanı", lat: 40.9850, lon: 27.5280 },
-        { name: "Yavuz Mahallesi Durağı", lat: 40.9870, lon: 27.5220 },
-        { name: "Çınarlı Mahallesi Muhtarlık", lat: 40.9840, lon: 27.5080 },
-        { name: "Aydoğdu Mahallesi", lat: 40.9790, lon: 27.5020 },
-        { name: "Karadeniz Mahallesi", lat: 40.9960, lon: 27.5380 },
-        { name: "Kumbağ Kavşağı", lat: 40.9550, lon: 27.4650 },
-        { name: "Ortacami Durağı", lat: 40.9755, lon: 27.5115 }
+        {
+            "name": "Süleymanpaşa Yeni Otobüs Terminali",
+            "lat": 40.995,
+            "lon": 27.562
+        },
+        {
+            "name": "Valilik / Hükümet Caddesi",
+            "lat": 40.978,
+            "lon": 27.511
+        },
+        {
+            "name": "Tarihi Rüstem Paşa Camii",
+            "lat": 40.9772,
+            "lon": 27.5145
+        },
+        {
+            "name": "Tekirdağ Sahil Dolgu Parkı",
+            "lat": 40.973,
+            "lon": 27.51
+        },
+        {
+            "name": "Değirmenaltı / Namık Kemal Evi",
+            "lat": 40.993,
+            "lon": 27.581
+        },
+        {
+            "name": "Dr. İsmail Fehmi Cumalıoğlu Şehir Hastanesi",
+            "lat": 40.988,
+            "lon": 27.535
+        },
+        {
+            "name": "Namık Kemal Üniversitesi (NKÜ) Kampüsü",
+            "lat": 40.9975,
+            "lon": 27.587
+        },
+        {
+            "name": "Köprübaşı Meydanı",
+            "lat": 40.976,
+            "lon": 27.513
+        },
+        {
+            "name": "Çarşı / Bedesten Durağı",
+            "lat": 40.9765,
+            "lon": 27.515
+        },
+        {
+            "name": "Barış Manço Parkı",
+            "lat": 40.981,
+            "lon": 27.52
+        },
+        {
+            "name": "Altınova Sahil Durağı",
+            "lat": 40.962,
+            "lon": 27.485
+        },
+        {
+            "name": "Eski Otogar Kavşağı",
+            "lat": 40.982,
+            "lon": 27.518
+        },
+        {
+            "name": "Cumhuriyet Meydanı",
+            "lat": 40.977,
+            "lon": 27.512
+        },
+        {
+            "name": "Tekira AVM Durağı",
+            "lat": 40.9815,
+            "lon": 27.517
+        },
+        {
+            "name": "Yüzüncü Yıl Mahallesi",
+            "lat": 40.989,
+            "lon": 27.505
+        },
+        {
+            "name": "Hürriyet Mahallesi Parkı",
+            "lat": 40.994,
+            "lon": 27.575
+        },
+        {
+            "name": "Tarihi Beşevler Durağı",
+            "lat": 40.975,
+            "lon": 27.509
+        },
+        {
+            "name": "Atatürk Ormanı Girişi",
+            "lat": 40.999,
+            "lon": 27.55
+        },
+        {
+            "name": "Gündoğdu Mahallesi Meydanı",
+            "lat": 40.985,
+            "lon": 27.528
+        },
+        {
+            "name": "Yavuz Mahallesi Durağı",
+            "lat": 40.987,
+            "lon": 27.522
+        },
+        {
+            "name": "Çınarlı Mahallesi Muhtarlık",
+            "lat": 40.984,
+            "lon": 27.508
+        },
+        {
+            "name": "Aydoğdu Mahallesi",
+            "lat": 40.979,
+            "lon": 27.502
+        },
+        {
+            "name": "Karadeniz Mahallesi",
+            "lat": 40.996,
+            "lon": 27.538
+        },
+        {
+            "name": "Kumbağ Kavşağı",
+            "lat": 40.955,
+            "lon": 27.465
+        },
+        {
+            "name": "Ortacami Durağı",
+            "lat": 40.9755,
+            "lon": 27.5115
+        },
+        {
+            "name": "Çorlu Çevre Yolu Kavşağı",
+            "lat": 41.155,
+            "lon": 27.78
+        },
+        {
+            "name": "Çorlu Otogar",
+            "lat": 41.16,
+            "lon": 27.8
+        },
+        {
+            "name": "Çerkezköy Otogar",
+            "lat": 41.285,
+            "lon": 27.995
+        },
+        {
+            "name": "Muratlı Meydan",
+            "lat": 41.171,
+            "lon": 27.502
+        },
+        {
+            "name": "Velimeşe Meydan",
+            "lat": 41.253,
+            "lon": 27.899
+        }
     ],
     "Edirne": [
-        { name: "Edirne Şehirlerarası Otobüs Terminali", lat: 41.6500, lon: 26.5900 },
-        { name: "Selimiye Camii Meydanı", lat: 41.6780, lon: 26.5555 },
-        { name: "Saraçlar Caddesi", lat: 41.6750, lon: 26.5540 },
-        { name: "Trakya Üniversitesi Balkan Yerleşkesi", lat: 41.6420, lon: 26.6180 },
-        { name: "Trakya Üniversitesi Tıp Fakültesi Hastanesi", lat: 41.6440, lon: 26.6150 },
-        { name: "Tarihi Meriç Köprüsü", lat: 41.6610, lon: 26.5520 },
-        { name: "Karaağaç Tarihi Tren Garı", lat: 41.6520, lon: 26.5270 },
-        { name: "II. Bayezid Külliyesi Sağlık Müzesi", lat: 41.6850, lon: 26.5420 },
-        { name: "Kırkpınar Er Meydanı Sarayiçi", lat: 41.6910, lon: 26.5580 },
-        { name: "Bedesten Çarşısı", lat: 41.6765, lon: 26.5545 },
-        { name: "Ali Paşa Çarşısı", lat: 41.6755, lon: 26.5535 },
-        { name: "Eski Cami Durağı", lat: 41.6760, lon: 26.5560 },
-        { name: "Üç Şerefeli Cami Durağı", lat: 41.6775, lon: 26.5530 },
-        { name: "Ayşekadın Durağı", lat: 41.6680, lon: 26.5650 },
-        { name: "Şükrüpaşa Mahallesi", lat: 41.6720, lon: 26.5820 },
-        { name: "Fatih Mahallesi", lat: 41.6650, lon: 26.5850 },
-        { name: "Kocasinan Parkı", lat: 41.6690, lon: 26.5770 },
-        { name: "Margi AVM Durağı", lat: 41.6660, lon: 26.5740 },
-        { name: "Erasta AVM Durağı", lat: 41.6675, lon: 26.5680 },
-        { name: "Gazimihal Köprüsü", lat: 41.6790, lon: 26.5390 }
+        {
+            "name": "Edirne Şehirlerarası Otobüs Terminali",
+            "lat": 41.65,
+            "lon": 26.59
+        },
+        {
+            "name": "Selimiye Camii Meydanı",
+            "lat": 41.678,
+            "lon": 26.5555
+        },
+        {
+            "name": "Saraçlar Caddesi",
+            "lat": 41.675,
+            "lon": 26.554
+        },
+        {
+            "name": "Trakya Üniversitesi Balkan Yerleşkesi",
+            "lat": 41.642,
+            "lon": 26.618
+        },
+        {
+            "name": "Trakya Üniversitesi Tıp Fakültesi Hastanesi",
+            "lat": 41.644,
+            "lon": 26.615
+        },
+        {
+            "name": "Tarihi Meriç Köprüsü",
+            "lat": 41.661,
+            "lon": 26.552
+        },
+        {
+            "name": "Karaağaç Tarihi Tren Garı",
+            "lat": 41.652,
+            "lon": 26.527
+        },
+        {
+            "name": "II. Bayezid Külliyesi Sağlık Müzesi",
+            "lat": 41.685,
+            "lon": 26.542
+        },
+        {
+            "name": "Kırkpınar Er Meydanı Sarayiçi",
+            "lat": 41.691,
+            "lon": 26.558
+        },
+        {
+            "name": "Bedesten Çarşısı",
+            "lat": 41.6765,
+            "lon": 26.5545
+        },
+        {
+            "name": "Ali Paşa Çarşısı",
+            "lat": 41.6755,
+            "lon": 26.5535
+        },
+        {
+            "name": "Eski Cami Durağı",
+            "lat": 41.676,
+            "lon": 26.556
+        },
+        {
+            "name": "Üç Şerefeli Cami Durağı",
+            "lat": 41.6775,
+            "lon": 26.553
+        },
+        {
+            "name": "Ayşekadın Durağı",
+            "lat": 41.668,
+            "lon": 26.565
+        },
+        {
+            "name": "Şükrüpaşa Mahallesi",
+            "lat": 41.672,
+            "lon": 26.582
+        },
+        {
+            "name": "Fatih Mahallesi",
+            "lat": 41.665,
+            "lon": 26.585
+        },
+        {
+            "name": "Kocasinan Parkı",
+            "lat": 41.669,
+            "lon": 26.577
+        },
+        {
+            "name": "Margi AVM Durağı",
+            "lat": 41.666,
+            "lon": 26.574
+        },
+        {
+            "name": "Erasta AVM Durağı",
+            "lat": 41.6675,
+            "lon": 26.568
+        },
+        {
+            "name": "Gazimihal Köprüsü",
+            "lat": 41.679,
+            "lon": 26.539
+        },
+        {
+            "name": "Lozan Anıtı / Karaağaç",
+            "lat": 41.6505,
+            "lon": 26.524
+        },
+        {
+            "name": "Muradiye Camii Durağı",
+            "lat": 41.682,
+            "lon": 26.563
+        },
+        {
+            "name": "Kaleiçi Tarihi Konaklar",
+            "lat": 41.673,
+            "lon": 26.551
+        },
+        {
+            "name": "Balkan Şehitliği Durağı",
+            "lat": 41.689,
+            "lon": 26.561
+        },
+        {
+            "name": "Edirne Adliyesi Durağı",
+            "lat": 41.663,
+            "lon": 26.578
+        },
+        {
+            "name": "İstasyon Mahallesi",
+            "lat": 41.66,
+            "lon": 26.571
+        },
+        {
+            "name": "Barutluk Mahallesi",
+            "lat": 41.683,
+            "lon": 26.549
+        },
+        {
+            "name": "Kıyık Caddesi",
+            "lat": 41.684,
+            "lon": 26.572
+        },
+        {
+            "name": "Kapıkule Bağlantı Yolu",
+            "lat": 41.698,
+            "lon": 26.512
+        },
+        {
+            "name": "Babademirtaş Mahallesi",
+            "lat": 41.671,
+            "lon": 26.547
+        }
     ],
     "Kırklareli": [
-        { name: "Kırklareli Şehirlerarası Otogar", lat: 41.7310, lon: 27.2180 },
-        { name: "Vilayet Meydanı / Hükümet Konağı", lat: 41.7350, lon: 27.2250 },
-        { name: "Kırklareli Üniversitesi Kayalı Kampüsü", lat: 41.7850, lon: 27.1850 },
-        { name: "Kırklareli Eğitim ve Araştırma Hastanesi", lat: 41.7280, lon: 27.2350 },
-        { name: "İstasyon Caddesi", lat: 41.7330, lon: 27.2210 },
-        { name: "Yayala Parkı", lat: 41.7380, lon: 27.2280 },
-        { name: "Tarihi Hızırbey Camii (Büyük Cami)", lat: 41.7360, lon: 27.2240 },
-        { name: "Arasta Çarşısı", lat: 41.7355, lon: 27.2235 },
-        { name: "Bademlik Parkı", lat: 41.7410, lon: 27.2190 },
-        { name: "Karahıdır Mahallesi", lat: 41.7190, lon: 27.2380 },
-        { name: "Demirtaş Mahallesi", lat: 41.7370, lon: 27.2310 },
-        { name: "Cumhuriyet Caddesi", lat: 41.7345, lon: 27.2260 },
-        { name: "Pınarhisar Yolu Kavşağı", lat: 41.7250, lon: 27.2420 },
-        { name: "Babaeski Yolu Durağı", lat: 41.7200, lon: 27.2150 }
+        {
+            "name": "Kırklareli Şehirlerarası Otogar",
+            "lat": 41.731,
+            "lon": 27.218
+        },
+        {
+            "name": "Vilayet Meydanı / Hükümet Konağı",
+            "lat": 41.735,
+            "lon": 27.225
+        },
+        {
+            "name": "Kırklareli Üniversitesi Kayalı Kampüsü",
+            "lat": 41.785,
+            "lon": 27.185
+        },
+        {
+            "name": "Kırklareli Eğitim ve Araştırma Hastanesi",
+            "lat": 41.728,
+            "lon": 27.235
+        },
+        {
+            "name": "İstasyon Caddesi",
+            "lat": 41.733,
+            "lon": 27.221
+        },
+        {
+            "name": "Yayala Parkı",
+            "lat": 41.738,
+            "lon": 27.228
+        },
+        {
+            "name": "Tarihi Hızırbey Camii (Büyük Cami)",
+            "lat": 41.736,
+            "lon": 27.224
+        },
+        {
+            "name": "Arasta Çarşısı",
+            "lat": 41.7355,
+            "lon": 27.2235
+        },
+        {
+            "name": "Bademlik Parkı",
+            "lat": 41.741,
+            "lon": 27.219
+        },
+        {
+            "name": "Karahıdır Mahallesi",
+            "lat": 41.719,
+            "lon": 27.238
+        },
+        {
+            "name": "Demirtaş Mahallesi",
+            "lat": 41.737,
+            "lon": 27.231
+        },
+        {
+            "name": "Cumhuriyet Caddesi",
+            "lat": 41.7345,
+            "lon": 27.226
+        },
+        {
+            "name": "Pınarhisar Yolu Kavşağı",
+            "lat": 41.725,
+            "lon": 27.242
+        },
+        {
+            "name": "Babaeski Yolu Durağı",
+            "lat": 41.72,
+            "lon": 27.215
+        },
+        {
+            "name": "Kırklareli Atatürk Stadyumu",
+            "lat": 41.7325,
+            "lon": 27.223
+        },
+        {
+            "name": "Kırklareli Müzesi Meydanı",
+            "lat": 41.7365,
+            "lon": 27.2225
+        },
+        {
+            "name": "Akalar Mahallesi",
+            "lat": 41.7385,
+            "lon": 27.2215
+        },
+        {
+            "name": "Karacaibrahim Mahallesi",
+            "lat": 41.734,
+            "lon": 27.229
+        },
+        {
+            "name": "Kocahıdır Mahallesi",
+            "lat": 41.732,
+            "lon": 27.228
+        },
+        {
+            "name": "Kırklareli Fen Lisesi Durağı",
+            "lat": 41.745,
+            "lon": 27.21
+        },
+        {
+            "name": "Dereköy Sınır Yolu Ayrımı",
+            "lat": 41.751,
+            "lon": 27.235
+        },
+        {
+            "name": "Lüleburgaz Çevre Yolu Durağı",
+            "lat": 41.715,
+            "lon": 27.229
+        },
+        {
+            "name": "Walldorf Kavşağı",
+            "lat": 41.7285,
+            "lon": 27.2195
+        },
+        {
+            "name": "Paşa Kafe Parkı",
+            "lat": 41.739,
+            "lon": 27.226
+        },
+        {
+            "name": "Askerlik Şubesi Durağı",
+            "lat": 41.7375,
+            "lon": 27.227
+        },
+        {
+            "name": "Kırklareli Valiliği Ek Hizmet Binası",
+            "lat": 41.7335,
+            "lon": 27.224
+        },
+        {
+            "name": "Sanayi Sitesi Durağı",
+            "lat": 41.718,
+            "lon": 27.241
+        },
+        {
+            "name": "Eski Çarşı Durağı",
+            "lat": 41.7358,
+            "lon": 27.2245
+        },
+        {
+            "name": "Karagöz Heykeli Meydanı",
+            "lat": 41.7348,
+            "lon": 27.2255
+        },
+        {
+            "name": "Çamlık Tabiat Parkı",
+            "lat": 41.748,
+            "lon": 27.215
+        }
     ],
     "İstanbul": [
-        { name: "Kadıköy Rıhtım İskele", lat: 40.9915, lon: 29.0225 },
-        { name: "Kadıköy Boğa Heykeli", lat: 40.9902, lon: 29.0290 },
-        { name: "Moda Sahil Parkı", lat: 40.9785, lon: 29.0260 },
-        { name: "Altıyol Meydanı", lat: 40.9905, lon: 29.0300 },
-        { name: "Söğütlüçeşme Metrobüs & YHT İstasyonu", lat: 40.9920, lon: 29.0380 },
-        { name: "Fenerbahçe Şükrü Saracoğlu Stadyumu", lat: 40.9880, lon: 29.0370 },
-        { name: "Kalamış Marina Durağı", lat: 40.9790, lon: 29.0430 },
-        { name: "Göztepe Parkı", lat: 40.9720, lon: 29.0610 },
-        { name: "Bağdat Caddesi Suadiye", lat: 40.9630, lon: 29.0820 },
-        { name: "Bostancı İskele Durağı", lat: 40.9530, lon: 29.0950 },
-        { name: "Marmara Üniversitesi Göztepe Kampüsü", lat: 40.9860, lon: 29.0520 },
-        { name: "Haydarpaşa Numune Eğitim Hastanesi", lat: 41.0020, lon: 29.0230 },
-        { name: "Sultan 2. Abdülhamid Han Hastanesi", lat: 41.0040, lon: 29.0250 },
-        { name: "Kozyatağı Metro İstasyonu", lat: 40.9750, lon: 29.0980 },
-        { name: "Caddebostan Sahil Durağı", lat: 40.9680, lon: 29.0680 }
+        {
+            "name": "Kadıköy Rıhtım İskele",
+            "lat": 40.9915,
+            "lon": 29.0225
+        },
+        {
+            "name": "Kadıköy Boğa Heykeli",
+            "lat": 40.9902,
+            "lon": 29.029
+        },
+        {
+            "name": "Moda Sahil Parkı",
+            "lat": 40.9785,
+            "lon": 29.026
+        },
+        {
+            "name": "Altıyol Meydanı",
+            "lat": 40.9905,
+            "lon": 29.03
+        },
+        {
+            "name": "Söğütlüçeşme Metrobüs & YHT İstasyonu",
+            "lat": 40.992,
+            "lon": 29.038
+        },
+        {
+            "name": "Fenerbahçe Şükrü Saracoğlu Stadyumu",
+            "lat": 40.988,
+            "lon": 29.037
+        },
+        {
+            "name": "Kalamış Marina Durağı",
+            "lat": 40.979,
+            "lon": 29.043
+        },
+        {
+            "name": "Göztepe Parkı",
+            "lat": 40.972,
+            "lon": 29.061
+        },
+        {
+            "name": "Bağdat Caddesi Suadiye",
+            "lat": 40.963,
+            "lon": 29.082
+        },
+        {
+            "name": "Bostancı İskele Durağı",
+            "lat": 40.953,
+            "lon": 29.095
+        },
+        {
+            "name": "Marmara Üniversitesi Göztepe Kampüsü",
+            "lat": 40.986,
+            "lon": 29.052
+        },
+        {
+            "name": "Haydarpaşa Numune Eğitim Hastanesi",
+            "lat": 41.002,
+            "lon": 29.023
+        },
+        {
+            "name": "Sultan 2. Abdülhamid Han Hastanesi",
+            "lat": 41.004,
+            "lon": 29.025
+        },
+        {
+            "name": "Kozyatağı Metro İstasyonu",
+            "lat": 40.975,
+            "lon": 29.098
+        },
+        {
+            "name": "Caddebostan Sahil Durağı",
+            "lat": 40.968,
+            "lon": 29.068
+        },
+        {
+            "name": "Acıbadem Köprüsü",
+            "lat": 41.0035,
+            "lon": 29.044
+        },
+        {
+            "name": "Ayrılık Çeşmesi Metro & Marmaray",
+            "lat": 40.998,
+            "lon": 29.031
+        },
+        {
+            "name": "Fenerbahçe Feneri Parkı",
+            "lat": 40.9695,
+            "lon": 29.039
+        },
+        {
+            "name": "Erenköy İstasyonu",
+            "lat": 40.971,
+            "lon": 29.079
+        },
+        {
+            "name": "Kuyubaşı Durağı",
+            "lat": 40.9875,
+            "lon": 29.046
+        },
+        {
+            "name": "Hasanpaşa Gazhane Müzesi",
+            "lat": 40.996,
+            "lon": 29.042
+        },
+        {
+            "name": "Fikirtepe Metrobüs Durağı",
+            "lat": 40.994,
+            "lon": 29.051
+        },
+        {
+            "name": "Bostancı Lunaparkı",
+            "lat": 40.958,
+            "lon": 29.092
+        },
+        {
+            "name": "Çiftehavuzlar Durağı",
+            "lat": 40.9725,
+            "lon": 29.058
+        },
+        {
+            "name": "Sahrayıcedit Cami Durağı",
+            "lat": 40.981,
+            "lon": 29.083
+        },
+        {
+            "name": "Ziverbey Durağı",
+            "lat": 40.989,
+            "lon": 29.044
+        },
+        {
+            "name": "Bahariye Caddesi",
+            "lat": 40.9885,
+            "lon": 29.032
+        },
+        {
+            "name": "Moda Caddesi",
+            "lat": 40.984,
+            "lon": 29.028
+        },
+        {
+            "name": "Dereağzı Tesisleri Durağı",
+            "lat": 40.9815,
+            "lon": 29.036
+        },
+        {
+            "name": "Göztepe Köprüsü",
+            "lat": 40.9895,
+            "lon": 29.072
+        },
+        {
+            "name": "Feneryolu İstasyonu",
+            "lat": 40.982,
+            "lon": 29.049
+        },
+        {
+            "name": "Selamiçeşme Özgürlük Parkı",
+            "lat": 40.9795,
+            "lon": 29.055
+        },
+        {
+            "name": "Koşuyolu Parkı",
+            "lat": 41.009,
+            "lon": 29.035
+        },
+        {
+            "name": "Tepe Nautilus AVM Durağı",
+            "lat": 40.9995,
+            "lon": 29.0325
+        },
+        {
+            "name": "Üsküdar İskele Meydanı",
+            "lat": 41.026,
+            "lon": 29.015
+        }
     ],
     "Çanakkale": [
-        { name: "Çanakkale Şehirlerarası Otobüs Terminali", lat: 40.1380, lon: 26.4350 },
-        { name: "Çanakkale İskele Meydanı", lat: 40.1510, lon: 26.4060 },
-        { name: "Aynalı Çarşı Durağı", lat: 40.1495, lon: 26.4080 },
-        { name: "Çimenlik Kalesi / Deniz Müzesi", lat: 40.1470, lon: 26.4010 },
-        { name: "Kordon Truva Atı Durağı", lat: 40.1530, lon: 26.4085 },
-        { name: "ÇOMÜ Terzioğlu Yerleşkesi", lat: 40.1120, lon: 26.4180 },
-        { name: "Mehmet Akif Ersoy Devlet Hastanesi", lat: 40.1250, lon: 26.4320 },
-        { name: "Halk Bahçesi Parkı", lat: 40.1480, lon: 26.4120 },
-        { name: "Saat Kulesi Meydanı", lat: 40.1500, lon: 26.4055 },
-        { name: "Barbaros Mahallesi", lat: 40.1350, lon: 26.4150 },
-        { name: "Cevatpaşa Durağı", lat: 40.1560, lon: 26.4180 },
-        { name: "Esenler Mahallesi", lat: 40.1420, lon: 26.4250 },
-        { name: "Kepez Meydan Durağı", lat: 40.1030, lon: 26.4050 },
-        { name: "Kepez Liman Yolu", lat: 40.0980, lon: 26.4020 }
+        {
+            "name": "Çanakkale Şehirlerarası Otobüs Terminali",
+            "lat": 40.138,
+            "lon": 26.435
+        },
+        {
+            "name": "Çanakkale İskele Meydanı",
+            "lat": 40.151,
+            "lon": 26.406
+        },
+        {
+            "name": "Aynalı Çarşı Durağı",
+            "lat": 40.1495,
+            "lon": 26.408
+        },
+        {
+            "name": "Çimenlik Kalesi / Deniz Müzesi",
+            "lat": 40.147,
+            "lon": 26.401
+        },
+        {
+            "name": "Kordon Truva Atı Durağı",
+            "lat": 40.153,
+            "lon": 26.4085
+        },
+        {
+            "name": "ÇOMÜ Terzioğlu Yerleşkesi",
+            "lat": 40.112,
+            "lon": 26.418
+        },
+        {
+            "name": "Mehmet Akif Ersoy Devlet Hastanesi",
+            "lat": 40.125,
+            "lon": 26.432
+        },
+        {
+            "name": "Halk Bahçesi Parkı",
+            "lat": 40.148,
+            "lon": 26.412
+        },
+        {
+            "name": "Saat Kulesi Meydanı",
+            "lat": 40.15,
+            "lon": 26.4055
+        },
+        {
+            "name": "Barbaros Mahallesi",
+            "lat": 40.135,
+            "lon": 26.415
+        },
+        {
+            "name": "Cevatpaşa Durağı",
+            "lat": 40.156,
+            "lon": 26.418
+        },
+        {
+            "name": "Esenler Mahallesi",
+            "lat": 40.142,
+            "lon": 26.425
+        },
+        {
+            "name": "Kepez Meydan Durağı",
+            "lat": 40.103,
+            "lon": 26.405
+        },
+        {
+            "name": "Kepez Liman Yolu",
+            "lat": 40.098,
+            "lon": 26.402
+        },
+        {
+            "name": "Dardanos Sahil Kavşağı",
+            "lat": 40.075,
+            "lon": 26.368
+        },
+        {
+            "name": "Güzelyalı Kavşağı",
+            "lat": 40.042,
+            "lon": 26.345
+        },
+        {
+            "name": "Hamidiye Tabyaları Kültür Parkı",
+            "lat": 40.136,
+            "lon": 26.403
+        },
+        {
+            "name": "ÇOMÜ Anafartalar Yerleşkesi",
+            "lat": 40.145,
+            "lon": 26.411
+        },
+        {
+            "name": "Troya Caddesi AVM Durağı",
+            "lat": 40.139,
+            "lon": 26.422
+        },
+        {
+            "name": "18 Mart Stadyumu Durağı",
+            "lat": 40.1465,
+            "lon": 26.414
+        },
+        {
+            "name": "Atatürk Caddesi",
+            "lat": 40.149,
+            "lon": 26.413
+        },
+        {
+            "name": "İnönü Caddesi",
+            "lat": 40.1515,
+            "lon": 26.41
+        },
+        {
+            "name": "Demircioğlu Caddesi",
+            "lat": 40.1485,
+            "lon": 26.4075
+        },
+        {
+            "name": "Kordon Sahil Yolu",
+            "lat": 40.154,
+            "lon": 26.407
+        },
+        {
+            "name": "Boğaz Komutanlığı Durağı",
+            "lat": 40.144,
+            "lon": 26.402
+        },
+        {
+            "name": "Hastanebayırı Durağı",
+            "lat": 40.158,
+            "lon": 26.421
+        },
+        {
+            "name": "Sarıcaeli Kavşağı",
+            "lat": 40.119,
+            "lon": 26.441
+        },
+        {
+            "name": "1915 Çanakkale Köprüsü Bağlantısı",
+            "lat": 40.32,
+            "lon": 26.63
+        },
+        {
+            "name": "Gestaş İskele Girişi",
+            "lat": 40.1505,
+            "lon": 26.4045
+        },
+        {
+            "name": "Valilik Binası Meydanı",
+            "lat": 40.1498,
+            "lon": 26.4065
+        }
     ],
     "Ankara": [
-        { name: "AŞTİ Şehirlerarası Otobüs Terminali", lat: 39.9180, lon: 32.8120 },
-        { name: "Kızılay Meydanı", lat: 39.9208, lon: 32.8540 },
-        { name: "Ulus Atatürk Heykeli", lat: 39.9415, lon: 32.8545 },
-        { name: "Anıtkabir Durağı", lat: 39.9250, lon: 32.8360 },
-        { name: "Güvenpark Durağı", lat: 39.9195, lon: 32.8530 },
-        { name: "Tunalı Hilmi Caddesi", lat: 39.9040, lon: 32.8600 },
-        { name: "Kuğulu Park", lat: 39.8990, lon: 32.8620 },
-        { name: "TBMM Çankaya Kapısı", lat: 39.9120, lon: 32.8510 },
-        { name: "Hacettepe Üniversitesi Sıhhiye Kampüsü", lat: 39.9320, lon: 32.8630 },
-        { name: "Ankara Şehir Hastanesi Bilkent", lat: 39.8890, lon: 32.7650 },
-        { name: "ODTÜ A1 Kapısı Durağı", lat: 39.9010, lon: 32.7840 },
-        { name: "Milli Kütüphane Durağı", lat: 39.9150, lon: 32.8280 },
-        { name: "Sıhhiye Abdi İpekçi Parkı", lat: 39.9280, lon: 32.8560 },
-        { name: "Atakule Meydanı", lat: 39.8860, lon: 32.8580 },
-        { name: "Dikmen Vadisi Girişi", lat: 39.8920, lon: 32.8470 }
+        {
+            "name": "AŞTİ Şehirlerarası Otobüs Terminali",
+            "lat": 39.918,
+            "lon": 32.812
+        },
+        {
+            "name": "Kızılay Meydanı",
+            "lat": 39.9208,
+            "lon": 32.854
+        },
+        {
+            "name": "Ulus Atatürk Heykeli",
+            "lat": 39.9415,
+            "lon": 32.8545
+        },
+        {
+            "name": "Anıtkabir Durağı",
+            "lat": 39.925,
+            "lon": 32.836
+        },
+        {
+            "name": "Güvenpark Durağı",
+            "lat": 39.9195,
+            "lon": 32.853
+        },
+        {
+            "name": "Tunalı Hilmi Caddesi",
+            "lat": 39.904,
+            "lon": 32.86
+        },
+        {
+            "name": "Kuğulu Park",
+            "lat": 39.899,
+            "lon": 32.862
+        },
+        {
+            "name": "TBMM Çankaya Kapısı",
+            "lat": 39.912,
+            "lon": 32.851
+        },
+        {
+            "name": "Hacettepe Üniversitesi Sıhhiye Kampüsü",
+            "lat": 39.932,
+            "lon": 32.863
+        },
+        {
+            "name": "Ankara Şehir Hastanesi Bilkent",
+            "lat": 39.889,
+            "lon": 32.765
+        },
+        {
+            "name": "ODTÜ A1 Kapısı Durağı",
+            "lat": 39.901,
+            "lon": 32.784
+        },
+        {
+            "name": "Milli Kütüphane Durağı",
+            "lat": 39.915,
+            "lon": 32.828
+        },
+        {
+            "name": "Sıhhiye Abdi İpekçi Parkı",
+            "lat": 39.928,
+            "lon": 32.856
+        },
+        {
+            "name": "Atakule Meydanı",
+            "lat": 39.886,
+            "lon": 32.858
+        },
+        {
+            "name": "Dikmen Vadisi Girişi",
+            "lat": 39.892,
+            "lon": 32.847
+        },
+        {
+            "name": "Ankara Üniversitesi Tandoğan Kampüsü",
+            "lat": 39.936,
+            "lon": 32.831
+        },
+        {
+            "name": "Gazi Üniversitesi Rektörlük Durağı",
+            "lat": 39.938,
+            "lon": 32.822
+        },
+        {
+            "name": "Kocatepe Camii Meydanı",
+            "lat": 39.9165,
+            "lon": 32.8605
+        },
+        {
+            "name": "Gençlik Parkı Girişi",
+            "lat": 39.937,
+            "lon": 32.849
+        },
+        {
+            "name": "Ankara Yüksek Hızlı Tren Garı (ATG)",
+            "lat": 39.935,
+            "lon": 32.843
+        },
+        {
+            "name": "Eski Meclis Binası (Kurtuluş Savaşı Müzesi)",
+            "lat": 39.9425,
+            "lon": 32.8535
+        },
+        {
+            "name": "Hacı Bayram Veli Camii Meydanı",
+            "lat": 39.944,
+            "lon": 32.858
+        },
+        {
+            "name": "Hamamönü Tarihi Evleri",
+            "lat": 39.931,
+            "lon": 32.868
+        },
+        {
+            "name": "Bilkent Üniversitesi Girişi",
+            "lat": 39.868,
+            "lon": 32.748
+        },
+        {
+            "name": "Armada AVM Durağı",
+            "lat": 39.913,
+            "lon": 32.809
+        },
+        {
+            "name": "Söğütözü Metro İstasyonu",
+            "lat": 39.911,
+            "lon": 32.805
+        },
+        {
+            "name": "Bakanlıklar Durağı",
+            "lat": 39.914,
+            "lon": 32.852
+        },
+        {
+            "name": "Maltepe Pazarı Durağı",
+            "lat": 39.927,
+            "lon": 32.842
+        },
+        {
+            "name": "Beşevler Metro Durağı",
+            "lat": 39.931,
+            "lon": 32.825
+        },
+        {
+            "name": "Kurtuluş Parkı Durağı",
+            "lat": 39.9275,
+            "lon": 32.867
+        },
+        {
+            "name": "Cebeci Siyasal Bilgiler Durağı",
+            "lat": 39.934,
+            "lon": 32.875
+        },
+        {
+            "name": "Kolej Kavşağı",
+            "lat": 39.923,
+            "lon": 32.862
+        },
+        {
+            "name": "Kuğulu Alt Geçit Durağı",
+            "lat": 39.9015,
+            "lon": 32.861
+        },
+        {
+            "name": "Gaziosmanpaşa Meydanı",
+            "lat": 39.897,
+            "lon": 32.869
+        },
+        {
+            "name": "Tunalı Pasajı Durağı",
+            "lat": 40.906,
+            "lon": 32.859
+        }
     ]
 };
 
