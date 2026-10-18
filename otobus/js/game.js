@@ -623,7 +623,9 @@ const Game = {
         this.upcomingTurns.sort((a,b) => b.distance - a.distance);
 
         document.getElementById('hud-next-stop').innerText = `${nextStop.name} (${this.currentStopIndex + 1}/${this.activeRouteData.stops.length})`;
-        document.getElementById('hud-passengers').innerText = `${this.passengersOnBoard} / ${this.activeRouteData.otobusKapasitesi}`;
+        const activeBusObj = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
+        const totalBusCap = activeBusObj ? activeBusObj.totalCapacity : (this.activeRouteData ? this.activeRouteData.otobusKapasitesi : 40);
+        document.getElementById('hud-passengers').innerText = `${this.passengersOnBoard} / ${totalBusCap}`;
         
         this.currentRoadType = nextStop.yolTipi || "Asfalt Cadde";
         this.upcomingIntersection = nextStop.kavsakVar || false;
@@ -1964,8 +1966,9 @@ const Game = {
                             return;
                         }
                         
-                        const seatCapacity = this.activeRouteData.otobusKapasitesi || 40;
-                        const maxStanding = 15; // BUG FIX 10: Ayakta yolcu kapasitesi sabit (max 15 kişi)
+                        const activeBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
+                        const seatCapacity = activeBus ? activeBus.seatCapacity : (this.activeRouteData.otobusKapasitesi || 40);
+                        const maxStanding = activeBus ? activeBus.standingCapacity : 15;
                         
                         if (this.passengersOnBoard < seatCapacity) {
                             // Normal biniş
