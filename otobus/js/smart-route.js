@@ -61,11 +61,33 @@ const AkilliRotaSistemi = {
             }
         });
 
+        if (typeof VelimeseNavigasyon !== 'undefined' && Array.isArray(VelimeseNavigasyon.sokaklar)) {
+            VelimeseNavigasyon.sokaklar.forEach(s => stopSet.add(s.name));
+        }
         this.allStopsCache = Array.from(stopSet).sort((a, b) => a.localeCompare(b, 'tr'));
         return this.allStopsCache;
     },
 
     hesapla: function(neredenQuery, nereyeQuery) {
+        // VELİMEŞE 100 SOKAK İÇİ ÖNCELİKLİ KONTROL
+        if (typeof VelimeseNavigasyon !== 'undefined' && VelimeseNavigasyon.findSokak) {
+            const vFrom = VelimeseNavigasyon.findSokak(neredenQuery);
+            const vTo = VelimeseNavigasyon.findSokak(nereyeQuery);
+            if (vFrom && vTo && vFrom.id !== vTo.id) {
+                const vRes = VelimeseNavigasyon.rotaOlustur(neredenQuery, nereyeQuery);
+                if (vRes.success) {
+                    return {
+                        success: true,
+                        route: vRes.route,
+                        originalRoute: vRes.route,
+                        fromStop: vRes.kalkis.name,
+                        toStop: vRes.varis.name,
+                        stopsCount: vRes.stopsCount,
+                        dist: vRes.totalKm
+                    };
+                }
+            }
+        }
         if (!neredenQuery || !nereyeQuery) {
             return { success: false, message: "Lütfen hem kalkış hem de varış durağını belirtin." };
         }
@@ -359,5 +381,26 @@ if (typeof window !== 'undefined') {
     window.AkilliRotaSistemi = AkilliRotaSistemi;
     document.addEventListener('DOMContentLoaded', () => {
         AkilliRotaSistemi.init();
+    });
+}
+
+
+// Velimeşe 100 Sokak Hızlı Mod Butonu
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnV = document.getElementById('btn-velimese-quick-mode');
+        if (btnV) {
+            btnV.addEventListener('click', () => {
+                const fromInput = document.getElementById('smart-from-input');
+                const toInput = document.getElementById('smart-to-input');
+                if (fromInput && toInput) {
+                    fromInput.value = "Velimeşe Çetin Sokak";
+                    toInput.value = "Velimeşe TOKİ 233. Sokak";
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Velimeşe 100 Sokak İçi Ulaşım Modu devrede. Kalkış: Çetin Sokak, Varış: TOKİ 233. Sokak. Dilerseniz sokakları değiştirebilirsiniz.");
+                    }
+                }
+            });
+        }
     });
 }

@@ -1,0 +1,1013 @@
+/* ==========================================================================
+   VELİMEŞE 100 SOKAK İÇİ NAVİGASYON VE DİNAMİK ROTA SİSTEMİ
+   Velimeşe Mahallesi sınırları içinde 100 sokak ve cadde arasında
+   herhangi bir noktadan herhangi bir noktaya akıllı sefer oluşturur.
+   İlçe dışına çıkış kilitlidir (Velimeşe sınır koruması).
+   ========================================================================== */
+
+const VelimeseNavigasyon = {
+    sokaklar: [
+  {
+    "name": "Dedebal Caddesi",
+    "lat": 41.2525,
+    "lon": 27.899,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_1",
+    "anons": "Sonraki durak: Dedebal Caddesi."
+  },
+  {
+    "name": "Çarşı Caddesi",
+    "lat": 41.2515,
+    "lon": 27.8975,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_2",
+    "anons": "Sonraki durak: Çarşı Caddesi."
+  },
+  {
+    "name": "Atatürk Caddesi",
+    "lat": 41.25,
+    "lon": 27.896,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_3",
+    "anons": "Sonraki durak: Atatürk Caddesi."
+  },
+  {
+    "name": "İstasyon Caddesi",
+    "lat": 41.2545,
+    "lon": 27.905,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_4",
+    "anons": "Sonraki durak: İstasyon Caddesi."
+  },
+  {
+    "name": "Sanayi Caddesi",
+    "lat": 41.246,
+    "lon": 27.891,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_5",
+    "anons": "Sonraki durak: Sanayi Caddesi."
+  },
+  {
+    "name": "Serbest Bölge Caddesi",
+    "lat": 41.242,
+    "lon": 27.886,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_6",
+    "anons": "Sonraki durak: Serbest Bölge Caddesi."
+  },
+  {
+    "name": "Zafer Caddesi",
+    "lat": 41.253,
+    "lon": 27.894,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_7",
+    "anons": "Sonraki durak: Zafer Caddesi."
+  },
+  {
+    "name": "Tatar Yolu Caddesi",
+    "lat": 41.256,
+    "lon": 27.901,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_8",
+    "anons": "Sonraki durak: Tatar Yolu Caddesi."
+  },
+  {
+    "name": "Cumhuriyet Caddesi",
+    "lat": 41.251,
+    "lon": 27.895,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_9",
+    "anons": "Sonraki durak: Cumhuriyet Caddesi."
+  },
+  {
+    "name": "İnönü Caddesi",
+    "lat": 41.249,
+    "lon": 27.8935,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_10",
+    "anons": "Sonraki durak: İnönü Caddesi."
+  },
+  {
+    "name": "Menderes Caddesi",
+    "lat": 41.248,
+    "lon": 27.8945,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_11",
+    "anons": "Sonraki durak: Menderes Caddesi."
+  },
+  {
+    "name": "Ergene Caddesi",
+    "lat": 41.2535,
+    "lon": 27.897,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_12",
+    "anons": "Sonraki durak: Ergene Caddesi."
+  },
+  {
+    "name": "Fatih Caddesi",
+    "lat": 41.254,
+    "lon": 27.898,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_13",
+    "anons": "Sonraki durak: Fatih Caddesi."
+  },
+  {
+    "name": "Namık Kemal Caddesi",
+    "lat": 41.2518,
+    "lon": 27.8965,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_14",
+    "anons": "Sonraki durak: Namık Kemal Caddesi."
+  },
+  {
+    "name": "Yanıkağıl Yolu Caddesi",
+    "lat": 41.261,
+    "lon": 27.91,
+    "cat": "Ana Cadde",
+    "id": "velimese_sokak_15",
+    "anons": "Sonraki durak: Yanıkağıl Yolu Caddesi."
+  },
+  {
+    "name": "Çetin Sokak",
+    "lat": 41.252,
+    "lon": 27.8985,
+    "cat": "Sokak",
+    "id": "velimese_sokak_16",
+    "anons": "Sonraki durak: Çetin Sokak."
+  },
+  {
+    "name": "Çardak Sokak",
+    "lat": 41.2522,
+    "lon": 27.897,
+    "cat": "Sokak",
+    "id": "velimese_sokak_17",
+    "anons": "Sonraki durak: Çardak Sokak."
+  },
+  {
+    "name": "Demet Sokak",
+    "lat": 41.251,
+    "lon": 27.898,
+    "cat": "Sokak",
+    "id": "velimese_sokak_18",
+    "anons": "Sonraki durak: Demet Sokak."
+  },
+  {
+    "name": "Derman Sokak",
+    "lat": 41.2505,
+    "lon": 27.8995,
+    "cat": "Sokak",
+    "id": "velimese_sokak_19",
+    "anons": "Sonraki durak: Derman Sokak."
+  },
+  {
+    "name": "Destan Sokak",
+    "lat": 41.2532,
+    "lon": 27.8965,
+    "cat": "Sokak",
+    "id": "velimese_sokak_20",
+    "anons": "Sonraki durak: Destan Sokak."
+  },
+  {
+    "name": "Gümüş Sokak",
+    "lat": 41.2495,
+    "lon": 27.8972,
+    "cat": "Sokak",
+    "id": "velimese_sokak_21",
+    "anons": "Sonraki durak: Gümüş Sokak."
+  },
+  {
+    "name": "Kırçiçeği Sokak",
+    "lat": 41.2485,
+    "lon": 27.898,
+    "cat": "Sokak",
+    "id": "velimese_sokak_22",
+    "anons": "Sonraki durak: Kırçiçeği Sokak."
+  },
+  {
+    "name": "Gül Sokak",
+    "lat": 41.2508,
+    "lon": 27.8962,
+    "cat": "Sokak",
+    "id": "velimese_sokak_23",
+    "anons": "Sonraki durak: Gül Sokak."
+  },
+  {
+    "name": "Lale Sokak",
+    "lat": 41.2512,
+    "lon": 27.8958,
+    "cat": "Sokak",
+    "id": "velimese_sokak_24",
+    "anons": "Sonraki durak: Lale Sokak."
+  },
+  {
+    "name": "Menekşe Sokak",
+    "lat": 41.2528,
+    "lon": 27.8955,
+    "cat": "Sokak",
+    "id": "velimese_sokak_25",
+    "anons": "Sonraki durak: Menekşe Sokak."
+  },
+  {
+    "name": "Papatya Sokak",
+    "lat": 41.2536,
+    "lon": 27.896,
+    "cat": "Sokak",
+    "id": "velimese_sokak_26",
+    "anons": "Sonraki durak: Papatya Sokak."
+  },
+  {
+    "name": "Sümbül Sokak",
+    "lat": 41.2498,
+    "lon": 27.895,
+    "cat": "Sokak",
+    "id": "velimese_sokak_27",
+    "anons": "Sonraki durak: Sümbül Sokak."
+  },
+  {
+    "name": "Karanfil Sokak",
+    "lat": 41.2502,
+    "lon": 27.8942,
+    "cat": "Sokak",
+    "id": "velimese_sokak_28",
+    "anons": "Sonraki durak: Karanfil Sokak."
+  },
+  {
+    "name": "Nilüfer Sokak",
+    "lat": 41.2488,
+    "lon": 27.8968,
+    "cat": "Sokak",
+    "id": "velimese_sokak_29",
+    "anons": "Sonraki durak: Nilüfer Sokak."
+  },
+  {
+    "name": "Zambak Sokak",
+    "lat": 41.2478,
+    "lon": 27.8975,
+    "cat": "Sokak",
+    "id": "velimese_sokak_30",
+    "anons": "Sonraki durak: Zambak Sokak."
+  },
+  {
+    "name": "Ihlamur Sokak",
+    "lat": 41.2542,
+    "lon": 27.8995,
+    "cat": "Sokak",
+    "id": "velimese_sokak_31",
+    "anons": "Sonraki durak: Ihlamur Sokak."
+  },
+  {
+    "name": "Çınar Sokak",
+    "lat": 41.255,
+    "lon": 27.9002,
+    "cat": "Sokak",
+    "id": "velimese_sokak_32",
+    "anons": "Sonraki durak: Çınar Sokak."
+  },
+  {
+    "name": "Meşe Sokak",
+    "lat": 41.2555,
+    "lon": 27.9015,
+    "cat": "Sokak",
+    "id": "velimese_sokak_33",
+    "anons": "Sonraki durak: Meşe Sokak."
+  },
+  {
+    "name": "Akasya Sokak",
+    "lat": 41.2548,
+    "lon": 27.9025,
+    "cat": "Sokak",
+    "id": "velimese_sokak_34",
+    "anons": "Sonraki durak: Akasya Sokak."
+  },
+  {
+    "name": "Defne Sokak",
+    "lat": 41.2538,
+    "lon": 27.9032,
+    "cat": "Sokak",
+    "id": "velimese_sokak_35",
+    "anons": "Sonraki durak: Defne Sokak."
+  },
+  {
+    "name": "Zeytin Sokak",
+    "lat": 41.2526,
+    "lon": 27.902,
+    "cat": "Sokak",
+    "id": "velimese_sokak_36",
+    "anons": "Sonraki durak: Zeytin Sokak."
+  },
+  {
+    "name": "Badem Sokak",
+    "lat": 41.2516,
+    "lon": 27.901,
+    "cat": "Sokak",
+    "id": "velimese_sokak_37",
+    "anons": "Sonraki durak: Badem Sokak."
+  },
+  {
+    "name": "Kiraz Sokak",
+    "lat": 41.2504,
+    "lon": 27.9005,
+    "cat": "Sokak",
+    "id": "velimese_sokak_38",
+    "anons": "Sonraki durak: Kiraz Sokak."
+  },
+  {
+    "name": "Vişne Sokak",
+    "lat": 41.2492,
+    "lon": 27.899,
+    "cat": "Sokak",
+    "id": "velimese_sokak_39",
+    "anons": "Sonraki durak: Vişne Sokak."
+  },
+  {
+    "name": "Elma Sokak",
+    "lat": 41.2482,
+    "lon": 27.8985,
+    "cat": "Sokak",
+    "id": "velimese_sokak_40",
+    "anons": "Sonraki durak: Elma Sokak."
+  },
+  {
+    "name": "Armut Sokak",
+    "lat": 41.2472,
+    "lon": 27.8992,
+    "cat": "Sokak",
+    "id": "velimese_sokak_41",
+    "anons": "Sonraki durak: Armut Sokak."
+  },
+  {
+    "name": "Şeftali Sokak",
+    "lat": 41.2465,
+    "lon": 27.898,
+    "cat": "Sokak",
+    "id": "velimese_sokak_42",
+    "anons": "Sonraki durak: Şeftali Sokak."
+  },
+  {
+    "name": "Erik Sokak",
+    "lat": 41.2458,
+    "lon": 27.897,
+    "cat": "Sokak",
+    "id": "velimese_sokak_43",
+    "anons": "Sonraki durak: Erik Sokak."
+  },
+  {
+    "name": "Ceviz Sokak",
+    "lat": 41.2468,
+    "lon": 27.8955,
+    "cat": "Sokak",
+    "id": "velimese_sokak_44",
+    "anons": "Sonraki durak: Ceviz Sokak."
+  },
+  {
+    "name": "Fındık Sokak",
+    "lat": 41.2475,
+    "lon": 27.8938,
+    "cat": "Sokak",
+    "id": "velimese_sokak_45",
+    "anons": "Sonraki durak: Fındık Sokak."
+  },
+  {
+    "name": "Şafak Sokak",
+    "lat": 41.252,
+    "lon": 27.893,
+    "cat": "Sokak",
+    "id": "velimese_sokak_46",
+    "anons": "Sonraki durak: Şafak Sokak."
+  },
+  {
+    "name": "Güneş Sokak",
+    "lat": 41.2525,
+    "lon": 27.892,
+    "cat": "Sokak",
+    "id": "velimese_sokak_47",
+    "anons": "Sonraki durak: Güneş Sokak."
+  },
+  {
+    "name": "Yıldız Sokak",
+    "lat": 41.2535,
+    "lon": 27.8915,
+    "cat": "Sokak",
+    "id": "velimese_sokak_48",
+    "anons": "Sonraki durak: Yıldız Sokak."
+  },
+  {
+    "name": "Hilal Sokak",
+    "lat": 41.2545,
+    "lon": 27.8925,
+    "cat": "Sokak",
+    "id": "velimese_sokak_49",
+    "anons": "Sonraki durak: Hilal Sokak."
+  },
+  {
+    "name": "Bahar Sokak",
+    "lat": 41.2552,
+    "lon": 27.8938,
+    "cat": "Sokak",
+    "id": "velimese_sokak_50",
+    "anons": "Sonraki durak: Bahar Sokak."
+  },
+  {
+    "name": "Huzur Sokak",
+    "lat": 41.2562,
+    "lon": 27.895,
+    "cat": "Sokak",
+    "id": "velimese_sokak_51",
+    "anons": "Sonraki durak: Huzur Sokak."
+  },
+  {
+    "name": "Barış Sokak",
+    "lat": 41.257,
+    "lon": 27.8965,
+    "cat": "Sokak",
+    "id": "velimese_sokak_52",
+    "anons": "Sonraki durak: Barış Sokak."
+  },
+  {
+    "name": "Umut Sokak",
+    "lat": 41.2575,
+    "lon": 27.898,
+    "cat": "Sokak",
+    "id": "velimese_sokak_53",
+    "anons": "Sonraki durak: Umut Sokak."
+  },
+  {
+    "name": "Sevgi Sokak",
+    "lat": 41.2568,
+    "lon": 27.8992,
+    "cat": "Sokak",
+    "id": "velimese_sokak_54",
+    "anons": "Sonraki durak: Sevgi Sokak."
+  },
+  {
+    "name": "Dostluk Sokak",
+    "lat": 41.2558,
+    "lon": 27.8985,
+    "cat": "Sokak",
+    "id": "velimese_sokak_55",
+    "anons": "Sonraki durak: Dostluk Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 221. Sokak",
+    "lat": 41.258,
+    "lon": 27.904,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_56",
+    "anons": "Sonraki durak: Velimeşe TOKİ 221. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 222. Sokak",
+    "lat": 41.2585,
+    "lon": 27.9048,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_57",
+    "anons": "Sonraki durak: Velimeşe TOKİ 222. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 223. Sokak",
+    "lat": 41.259,
+    "lon": 27.9055,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_58",
+    "anons": "Sonraki durak: Velimeşe TOKİ 223. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 224. Sokak",
+    "lat": 41.2595,
+    "lon": 27.9062,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_59",
+    "anons": "Sonraki durak: Velimeşe TOKİ 224. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 225. Sokak",
+    "lat": 41.26,
+    "lon": 27.907,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_60",
+    "anons": "Sonraki durak: Velimeşe TOKİ 225. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 231. Sokak",
+    "lat": 41.2605,
+    "lon": 27.905,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_61",
+    "anons": "Sonraki durak: Velimeşe TOKİ 231. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 232. Sokak",
+    "lat": 41.261,
+    "lon": 27.9058,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_62",
+    "anons": "Sonraki durak: Velimeşe TOKİ 232. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 233. Sokak",
+    "lat": 41.2615,
+    "lon": 27.9065,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_63",
+    "anons": "Sonraki durak: Velimeşe TOKİ 233. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 234. Sokak",
+    "lat": 41.262,
+    "lon": 27.9072,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_64",
+    "anons": "Sonraki durak: Velimeşe TOKİ 234. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 235. Sokak",
+    "lat": 41.2625,
+    "lon": 27.908,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_65",
+    "anons": "Sonraki durak: Velimeşe TOKİ 235. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 251. Sokak",
+    "lat": 41.263,
+    "lon": 27.906,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_66",
+    "anons": "Sonraki durak: Velimeşe TOKİ 251. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 252. Sokak",
+    "lat": 41.2635,
+    "lon": 27.9068,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_67",
+    "anons": "Sonraki durak: Velimeşe TOKİ 252. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 253. Sokak",
+    "lat": 41.264,
+    "lon": 27.9075,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_68",
+    "anons": "Sonraki durak: Velimeşe TOKİ 253. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 254. Sokak",
+    "lat": 41.2645,
+    "lon": 27.9082,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_69",
+    "anons": "Sonraki durak: Velimeşe TOKİ 254. Sokak."
+  },
+  {
+    "name": "Velimeşe TOKİ 255. Sokak",
+    "lat": 41.265,
+    "lon": 27.909,
+    "cat": "TOKİ Konutları",
+    "id": "velimese_sokak_70",
+    "anons": "Sonraki durak: Velimeşe TOKİ 255. Sokak."
+  },
+  {
+    "name": "Sanayi 1. Sokak",
+    "lat": 41.245,
+    "lon": 27.892,
+    "cat": "Küçük Sanayi",
+    "id": "velimese_sokak_71",
+    "anons": "Sonraki durak: Sanayi 1. Sokak."
+  },
+  {
+    "name": "Sanayi 2. Sokak",
+    "lat": 41.2445,
+    "lon": 27.8912,
+    "cat": "Küçük Sanayi",
+    "id": "velimese_sokak_72",
+    "anons": "Sonraki durak: Sanayi 2. Sokak."
+  },
+  {
+    "name": "Sanayi 3. Sokak",
+    "lat": 41.244,
+    "lon": 27.8905,
+    "cat": "Küçük Sanayi",
+    "id": "velimese_sokak_73",
+    "anons": "Sonraki durak: Sanayi 3. Sokak."
+  },
+  {
+    "name": "Sanayi 4. Sokak",
+    "lat": 41.2435,
+    "lon": 27.8898,
+    "cat": "Küçük Sanayi",
+    "id": "velimese_sokak_74",
+    "anons": "Sonraki durak: Sanayi 4. Sokak."
+  },
+  {
+    "name": "Sanayi 5. Sokak",
+    "lat": 41.243,
+    "lon": 27.889,
+    "cat": "Küçük Sanayi",
+    "id": "velimese_sokak_75",
+    "anons": "Sonraki durak: Sanayi 5. Sokak."
+  },
+  {
+    "name": "Sanayi 6. Sokak",
+    "lat": 41.2425,
+    "lon": 27.8882,
+    "cat": "Küçük Sanayi",
+    "id": "velimese_sokak_76",
+    "anons": "Sonraki durak: Sanayi 6. Sokak."
+  },
+  {
+    "name": "Sanayi 7. Sokak",
+    "lat": 41.242,
+    "lon": 27.8875,
+    "cat": "Küçük Sanayi",
+    "id": "velimese_sokak_77",
+    "anons": "Sonraki durak: Sanayi 7. Sokak."
+  },
+  {
+    "name": "Sanayi 8. Sokak",
+    "lat": 41.2415,
+    "lon": 27.8868,
+    "cat": "Küçük Sanayi",
+    "id": "velimese_sokak_78",
+    "anons": "Sonraki durak: Sanayi 8. Sokak."
+  },
+  {
+    "name": "101. Sokak",
+    "lat": 41.2505,
+    "lon": 27.8925,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_79",
+    "anons": "Sonraki durak: 101. Sokak."
+  },
+  {
+    "name": "102. Sokak",
+    "lat": 41.251,
+    "lon": 27.8918,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_80",
+    "anons": "Sonraki durak: 102. Sokak."
+  },
+  {
+    "name": "103. Sokak",
+    "lat": 41.2515,
+    "lon": 27.891,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_81",
+    "anons": "Sonraki durak: 103. Sokak."
+  },
+  {
+    "name": "104. Sokak",
+    "lat": 41.252,
+    "lon": 27.8902,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_82",
+    "anons": "Sonraki durak: 104. Sokak."
+  },
+  {
+    "name": "105. Sokak",
+    "lat": 41.2525,
+    "lon": 27.8895,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_83",
+    "anons": "Sonraki durak: 105. Sokak."
+  },
+  {
+    "name": "106. Sokak",
+    "lat": 41.253,
+    "lon": 27.8888,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_84",
+    "anons": "Sonraki durak: 106. Sokak."
+  },
+  {
+    "name": "107. Sokak",
+    "lat": 41.2535,
+    "lon": 27.888,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_85",
+    "anons": "Sonraki durak: 107. Sokak."
+  },
+  {
+    "name": "108. Sokak",
+    "lat": 41.254,
+    "lon": 27.8872,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_86",
+    "anons": "Sonraki durak: 108. Sokak."
+  },
+  {
+    "name": "109. Sokak",
+    "lat": 41.2545,
+    "lon": 27.8865,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_87",
+    "anons": "Sonraki durak: 109. Sokak."
+  },
+  {
+    "name": "110. Sokak",
+    "lat": 41.255,
+    "lon": 27.8858,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_88",
+    "anons": "Sonraki durak: 110. Sokak."
+  },
+  {
+    "name": "111. Sokak",
+    "lat": 41.2555,
+    "lon": 27.885,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_89",
+    "anons": "Sonraki durak: 111. Sokak."
+  },
+  {
+    "name": "112. Sokak",
+    "lat": 41.256,
+    "lon": 27.8842,
+    "cat": "Yerleşim",
+    "id": "velimese_sokak_90",
+    "anons": "Sonraki durak: 112. Sokak."
+  },
+  {
+    "name": "Velimeşe Merkez Meydanı (Atatürk Heykeli)",
+    "lat": 41.2515,
+    "lon": 27.8965,
+    "cat": "Meydan & Merkez",
+    "id": "velimese_sokak_91",
+    "anons": "Sonraki durak: Velimeşe Merkez Meydanı (Atatürk Heykeli)."
+  },
+  {
+    "name": "Velimeşe Aile Sağlığı Merkezi",
+    "lat": 41.2535,
+    "lon": 27.9005,
+    "cat": "Kamu & Sağlık",
+    "id": "velimese_sokak_92",
+    "anons": "Sonraki durak: Velimeşe Aile Sağlığı Merkezi."
+  },
+  {
+    "name": "Velimeşe TCDD Tren İstasyonu",
+    "lat": 41.255,
+    "lon": 27.906,
+    "cat": "Ulaşım Merkezi",
+    "id": "velimese_sokak_93",
+    "anons": "Sonraki durak: Velimeşe TCDD Tren İstasyonu."
+  },
+  {
+    "name": "Velimeşe Gölet Parkı & Mesire Alanı",
+    "lat": 41.257,
+    "lon": 27.903,
+    "cat": "Park & Yaşam",
+    "id": "velimese_sokak_94",
+    "anons": "Sonraki durak: Velimeşe Gölet Parkı & Mesire Alanı."
+  },
+  {
+    "name": "Velimeşe Futbol Sahası & Spor Kompleksi",
+    "lat": 41.258,
+    "lon": 27.899,
+    "cat": "Spor & Aktivite",
+    "id": "velimese_sokak_95",
+    "anons": "Sonraki durak: Velimeşe Futbol Sahası & Spor Kompleksi."
+  },
+  {
+    "name": "Velimeşe Kapalı Pazar Yeri",
+    "lat": 41.25,
+    "lon": 27.894,
+    "cat": "Ticaret & Yaşam",
+    "id": "velimese_sokak_96",
+    "anons": "Sonraki durak: Velimeşe Kapalı Pazar Yeri."
+  },
+  {
+    "name": "Velimeşe İlkokulu & Ortaokulu",
+    "lat": 41.2512,
+    "lon": 27.8932,
+    "cat": "Eğitim",
+    "id": "velimese_sokak_97",
+    "anons": "Sonraki durak: Velimeşe İlkokulu & Ortaokulu."
+  },
+  {
+    "name": "Velimeşe Tarihi Bozacılar Meydanı",
+    "lat": 41.2518,
+    "lon": 27.8955,
+    "cat": "Kültür & Meydan",
+    "id": "velimese_sokak_98",
+    "anons": "Sonraki durak: Velimeşe Tarihi Bozacılar Meydanı."
+  },
+  {
+    "name": "Velimeşe Küçük Sanayi Sitesi Girişi",
+    "lat": 41.247,
+    "lon": 27.893,
+    "cat": "Sanayi",
+    "id": "velimese_sokak_99",
+    "anons": "Sonraki durak: Velimeşe Küçük Sanayi Sitesi Girişi."
+  },
+  {
+    "name": "Velimeşe OSB 1. Ana Giriş Kapısı",
+    "lat": 41.244,
+    "lon": 27.888,
+    "cat": "Sanayi & OSB",
+    "id": "velimese_sokak_100",
+    "anons": "Sonraki durak: Velimeşe OSB 1. Ana Giriş Kapısı."
+  }
+],
+
+    normalizeText: function(text) {
+        if (!text) return '';
+        return text
+            .replace(/İ/g, 'i')
+            .replace(/I/g, 'i')
+            .replace(/ı/g, 'i')
+            .toLowerCase()
+            .replace(/ğ/g, 'g')
+            .replace(/ü/g, 'u')
+            .replace(/ş/g, 's')
+            .replace(/ö/g, 'o')
+            .replace(/ç/g, 'c')
+            .replace(/[^a-z0-9]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    },
+
+    findSokak: function(query) {
+        if (!query) return null;
+        const qNorm = this.normalizeText(query);
+        if (qNorm.length === 0) return null;
+
+        // 1. Tam eşleşme
+        let match = this.sokaklar.find(s => this.normalizeText(s.name) === qNorm);
+        if (match) return match;
+
+        // 2. Özel takma adlar (TOKİ, Sanayi, İstasyon, Çetin)
+        if (qNorm.includes("cetin")) {
+            match = this.sokaklar.find(s => s.name.includes("Çetin"));
+            if (match) return match;
+        }
+        if (qNorm.includes("meydan") || qNorm.includes("merkez")) {
+            match = this.sokaklar.find(s => s.name.includes("Meydanı"));
+            if (match) return match;
+        }
+        if (qNorm.includes("istasyon") || qNorm.includes("tren") || qNorm.includes("gar")) {
+            match = this.sokaklar.find(s => s.name.includes("Tren İstasyonu"));
+            if (match) return match;
+        }
+        if (qNorm.includes("saglik") || qNorm.includes("ocak") || qNorm.includes("doktor")) {
+            match = this.sokaklar.find(s => s.name.includes("Sağlığı Merkezi"));
+            if (match) return match;
+        }
+        if (qNorm.includes("pazar")) {
+            match = this.sokaklar.find(s => s.name.includes("Pazar Yeri"));
+            if (match) return match;
+        }
+
+        // 3. Kelime bazlı alt dize eşleşmesi
+        const qWords = qNorm.split(' ').filter(w => w.length > 1);
+        match = this.sokaklar.find(s => {
+            const sNorm = this.normalizeText(s.name);
+            return qWords.every(w => sNorm.includes(w));
+        });
+        if (match) return match;
+
+        // 4. Kısmi eşleşme
+        return this.sokaklar.find(s => this.normalizeText(s.name).includes(qNorm)) || null;
+    },
+
+    hesaplaMesafe: function(s1, s2) {
+        if (!s1 || !s2) return 0.5;
+        const R = 6371; // km
+        const dLat = (s2.lat - s1.lat) * Math.PI / 180;
+        const dLon = (s2.lon - s1.lon) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(s1.lat * Math.PI / 180) * Math.cos(s2.lat * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const kusUcusu = R * c;
+        // Sokak viraj ve kıvrım katsayısı: 1.35
+        const yolMesafesi = kusUcusu * 1.35;
+        return Math.max(0.3, Math.round(yolMesafesi * 10) / 10);
+    },
+
+    araDuraklariSec: function(startSokak, endSokak, totalKm) {
+        // Hedefe göre ara sokak sayısı (2 ile 6 arası)
+        const stopCount = Math.max(1, Math.min(5, Math.round(totalKm / 0.5)));
+        const candidates = this.sokaklar.filter(s => s.id !== startSokak.id && s.id !== endSokak.id);
+
+        // Başlangıç ile bitiş arasındaki vektöre göre sırala
+        candidates.sort((a, b) => {
+            const distA = this.hesaplaMesafe(startSokak, a) + this.hesaplaMesafe(a, endSokak);
+            const distB = this.hesaplaMesafe(startSokak, b) + this.hesaplaMesafe(b, endSokak);
+            return distA - distB;
+        });
+
+        // En mantıklı ara sokakları al
+        return candidates.slice(0, stopCount);
+    },
+
+    rotaOlustur: function(kalkisSorgu, varisSorgu) {
+        const kalkis = this.findSokak(kalkisSorgu);
+        const varis = this.findSokak(varisSorgu);
+
+        if (!kalkis) {
+            return { success: false, message: "Kalkış sokağı bulunamadı: " + kalkisSorgu };
+        }
+        if (!varis) {
+            return { success: false, message: "Varış sokağı bulunamadı: " + varisSorgu };
+        }
+        if (kalkis.id === varis.id) {
+            return { success: false, message: "Kalkış ve varış noktası aynı sokak olamaz." };
+        }
+
+        const totalKm = this.hesaplaMesafe(kalkis, varis);
+        const araSokaklar = this.araDuraklariSec(kalkis, varis, totalKm);
+
+        const stopSequence = [kalkis, ...araSokaklar, varis];
+        const routeStops = [];
+
+        for (let i = 0; i < stopSequence.length; i++) {
+            const current = stopSequence[i];
+            const isFirst = (i === 0);
+            const isLast = (i === stopSequence.length - 1);
+            const nextStop = isLast ? null : stopSequence[i + 1];
+            const segDist = nextStop ? this.hesaplaMesafe(current, nextStop) : 0;
+
+            routeStops.push({
+                name: current.name,
+                anons: isFirst 
+                    ? current.name + " durağındayız. Velimeşe mahalle içi seferi başlıyor."
+                    : (isLast ? "Son durak: " + current.name + ". Velimeşe mahalle içi seferimiz tamamlanmıştır." : "Sonraki durak: " + current.name + "."),
+                bekleyenYolcu: isFirst ? 12 : (isLast ? 0 : (((i * 3 + 2) % 4) + 1)),
+                inenYolcu: isFirst ? 0 : (isLast ? 12 : (((i * 2 + 1) % 3) + 1)),
+                gercekMesafeSonraki: segDist,
+                lat: current.lat,
+                lon: current.lon,
+                cat: current.cat
+            });
+        }
+
+        const calculatedKm = routeStops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
+        const finalKm = Math.round(calculatedKm * 10) / 10;
+        const routeId = "velimese_mahalle_" + kalkis.id + "_" + varis.id;
+
+        const route = {
+            id: routeId,
+            hatNo: "VM-R",
+            name: "Velimeşe Mahalle İçi: " + kalkis.name + " ➔ " + varis.name,
+            rawName: "Velimeşe 100 Sokak Seferi (" + kalkis.name + " - " + varis.name + ")",
+            district: "Velimeşe",
+            originDistrict: "Velimeşe",
+            destDistrict: "Velimeşe",
+            isDistrict: false,
+            isCity: true,
+            isVelimeseLocked: true, // Velimeşe dışına çıkış kilitli!
+            sehir: "Tekirdağ",
+            color: "#10b981",
+            startStop: kalkis.name,
+            endStop: varis.name,
+            intermediateStops: routeStops.slice(1, -1).map(s => s.name),
+            totalKm: finalKm,
+            biletFiyat: 15,
+            biletFiyatMultiplier: 1.0,
+            otobusKapasitesi: 28,
+            terrain: "mahalle_asfalt",
+            desc: "Velimeşe 100 Sokak İçi Ulaşım: " + kalkis.name + " ➔ " + varis.name + ". Toplam " + routeStops.length + " sokak durağı, " + finalKm + " km. İlçe dışına çıkış kapalıdır.",
+            speechBriefing: "Velimeşe mahalle içi seferi oluşturuldu. " + kalkis.name + " durağından " + varis.name + " durağına hareket ediliyor. Güzergâh boyunca " + routeStops.length + " sokak durağında durulacaktır. Toplam " + finalKm + " kilometre. Velimeşe dışına çıkış kilitlidir.",
+            detailedInstructions: "Velimeşe Mahalle İçi Seferi (VM-R)\n" +
+                routeStops.map((s, idx) => (idx + 1) + ". Adım: " + s.name + (idx === routeStops.length - 1 ? " (Son Durak)" : "")).join('\n'),
+            stops: routeStops
+        };
+
+        if (typeof routesData !== 'undefined') {
+            routesData[routeId] = route;
+        }
+
+        return {
+            success: true,
+            route: route,
+            kalkis: kalkis,
+            varis: varis,
+            totalKm: finalKm,
+            stopsCount: routeStops.length
+        };
+    },
+
+    baslat: function(kalkisSorgu, varisSorgu) {
+        const res = this.rotaOlustur(kalkisSorgu, varisSorgu);
+        if (!res.success) {
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(res.message);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(res.message, "warning");
+            return false;
+        }
+
+        if (typeof Game !== 'undefined' && typeof Game.startRoute === 'function') {
+            Game.isVelimeseLocked = true;
+            Game.startRoute(res.route.id);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast("🏘️ Velimeşe 100 Sokak Modu: " + res.kalkis.name + " ➔ " + res.varis.name, "success");
+            }
+            return true;
+        }
+        return false;
+    }
+};
+
+// Global erişim
+if (typeof window !== 'undefined') {
+    window.VelimeseNavigasyon = VelimeseNavigasyon;
+}
