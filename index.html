@@ -90,6 +90,9 @@
             <button id="btn-open-garage-fleet" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #facc15; color: #facc15;">
                 🚌 Otobüs Garajı ve Araç Filosu (Mercedes, Travego, Setra...)
             </button>
+            <button id="btn-open-badges" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #eab308; color: #fde047; background: rgba(234, 179, 8, 0.1);" aria-label="Kaptan Liyakat Rozetleri ve Şoför Başarıları">
+                🎖️ Kaptan Liyakat Rozetleri (Şoför Başarıları)
+            </button>
             <button id="btn-start-intercity" class="menu-btn secondary-btn nav-item" style="display: none; justify-content: center; margin-bottom: 12px; font-size: 1.2rem; border-color: #facc15; color: #facc15;">
                 🛣️ Şehirler Arası Seyahat (Türkiye Turnesi)
             </button>
@@ -318,6 +321,9 @@
         <button id="btn-next-mission" class="primary-btn nav-item pulse-btn" style="margin-top: 25px; width: 100%;">
             Sonraki Göreve Geç
         </button>
+        <button id="btn-view-badges-results" class="nav-item menu-btn" style="margin-top: 15px; width: 100%; border-color: #eab308; color: #fde047; justify-content: center;" aria-label="Kaptan Rozetlerimi Görüntüle">
+            🎖️ Şoför Rozetlerimi Görüntüle
+        </button>
         <button id="btn-finish" class="secondary-btn nav-item" style="margin-top: 15px; width: 100%; border: 1px solid var(--border);">
             Geri Dön (Ana Menü)
         </button>
@@ -399,6 +405,8 @@
     <script src="js/game.js?v=1781783292"></script>
     <script src="js/app.js?v=1781783292"></script>
     <script src="js/bus-fleet.js"></script>
+    <script src="js/map-engine.js"></script>
+    <script src="js/driver-badges.js"></script>
     <script src="js/smart-system.js"></script>
     <script src="js/smart-route.js"></script>
     <script src="js/velimese-navigation.js"></script>
@@ -487,6 +495,41 @@
         </div>
     </div>
   
+
+    <!-- KAPTAN LİYAKAT ROZETLERİ VE ŞOFÖR BAŞARILARI MODALI -->
+    <div id="driver-badges-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="driver-badges-title" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.88); z-index: 7000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-panel" style="max-width: 780px; width: 94%; padding: 25px 28px; text-align: left; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 id="driver-badges-title" class="gradient-text" style="font-size: 1.8rem; margin: 0;">🎖️ Kaptan Liyakat Rozetleri</h2>
+                <button id="btn-badges-modal-close" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 1.1rem; cursor: pointer;" aria-label="Rozetler penceresini kapat">✕</button>
+            </div>
+            <p id="driver-badges-summary" style="color: #fde047; font-size: 1.05rem; font-weight: bold; margin-bottom: 8px;">
+                Toplam 8 Rozet • Yükleniyor...
+            </p>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 16px; line-height: 1.4;">
+                Direksiyon başındaki intizamınız, yolcu nezaketiniz ve sürüş ustalığınız ile hak kazandığınız resmi şoförlük başarı ve liyakat madalyaları.
+            </p>
+
+            <!-- Kategori / Filtreleme Sekmeleri -->
+            <div style="display: flex; gap: 8px; margin-bottom: 18px;">
+                <button id="tab-badges-all" class="modern-btn nav-item" style="flex: 1; padding: 10px; font-size: 0.95rem; background: rgba(234, 179, 8, 0.25); border-color: #eab308; color: #fde047; font-weight: bold; cursor: pointer;">
+                    📋 Tümü (8 Rozet)
+                </button>
+                <button id="tab-badges-unlocked" class="modern-btn nav-item" style="flex: 1; padding: 10px; font-size: 0.95rem; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer;">
+                    ✅ Kazanılanlar
+                </button>
+                <button id="tab-badges-locked" class="modern-btn nav-item" style="flex: 1; padding: 10px; font-size: 0.95rem; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer;">
+                    🔒 Henüz Açılmamış
+                </button>
+            </div>
+
+            <!-- Rozet Listesi -->
+            <ul id="driver-badges-list" style="list-style: none; padding: 0; margin: 0; max-height: 54vh; overflow-y: auto;">
+                <!-- driver-badges.js ile dinamik doldurulacak -->
+            </ul>
+        </div>
+    </div>
+
 </body>
 </html>
 
