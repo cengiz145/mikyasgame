@@ -29,6 +29,12 @@ const AkilliRotaSistemi = {
         const sNorm = this.normalizeText(stopName);
         const qNorm = this.normalizeText(query);
         const qWords = qNorm.split(' ').filter(w => w.length > 1);
+        // Hat 226 & 26 Saray Alias Desteği
+        if (qNorm.includes("226") || qNorm.includes("saray")) {
+            if (sNorm.includes("saray") || sNorm.includes("cerkezkoy") || sNorm.includes("kapakli") || sNorm.includes("suleymanpasa")) {
+                return true;
+            }
+        }
         // Velimeşe Çetin Sokak Alias Desteği
         if ((qNorm.includes("cetin") || qNorm.includes("cetin sokak")) && sNorm.includes("cetin")) {
             return true;
@@ -134,8 +140,8 @@ const AkilliRotaSistemi = {
             smartStops.push({
                 name: orig.name,
                 anons: anons,
-                bekleyenYolcu: isFirst ? 20 : (isLast ? 0 : Math.floor(Math.random() * 5) + 1),
-                inenYolcu: isFirst ? 0 : (isLast ? 20 : Math.floor(Math.random() * 4) + 1),
+                bekleyenYolcu: isFirst ? 20 : (isLast ? 0 : (((i * 3 + 2) % 5) + 1)),
+                inenYolcu: isFirst ? 0 : (isLast ? 20 : (((i * 2 + 1) % 4) + 1)),
                 gercekMesafeSonraki: isLast ? 0 : (orig.gercekMesafeSonraki || 0.8),
                 lat: orig.lat,
                 lon: orig.lon

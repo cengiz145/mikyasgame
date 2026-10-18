@@ -224,10 +224,14 @@ function generateRoutesFromAPI(rawStops, cityName) {
         });
 
         // Geriye dönük rota kimliği uyumluluğu (Alias desteği)
-        const r26 = tekulasDb.find(r => r.name.indexOf("26/SÜLEYMANPASA") !== -1 || r.hatNo === "26");
+        const r26 = tekulasDb.find(r => r.name.indexOf("226") !== -1 || r.name.indexOf("26/SÜLEYMANPASA") !== -1 || r.hatNo === "226" || r.hatNo === "26");
         if (r26) {
+            routesData["hat_226_suleymanpasa_saray"] = r26;
             routesData["hat_26_suleymanpasa_saray"] = r26;
+            routesData["hat_226_suleymanpasa_velimese"] = r26;
             routesData["hat_26_suleymanpasa_velimese"] = r26;
+            routesData["hat_226"] = r26;
+            routesData["hat_26"] = r26;
         }
         const r48 = tekulasDb.find(r => r.name.indexOf("VELİMEŞE-ÇORLU") !== -1 || r.hatNo === "48");
         if (r48) {

@@ -1113,9 +1113,9 @@ const varsayilanSehirDuraklari = {
 const ilceRotalari = {
     "Tekirdağ": [
                 {
-                  "id": "hat_26_suleymanpasa_saray",
-                  "hatNo": "26",
-                  "name": "26 SÜLEYMANPAŞA - ÇERKEZKÖY - KAPAKLI - SARAY",
+                  "id": "hat_226_suleymanpasa_saray",
+                  "hatNo": "226",
+                  "name": "226 SÜLEYMANPAŞA - ÇERKEZKÖY - KAPAKLI - SARAY (Güncel Hat 226)",
                   "destDistrict": "Saray",
                   "originDistrict": "Süleymanpaşa",
                   "startStop": "Süleymanpaşa Yeni Otobüs Terminali",
@@ -1920,9 +1920,18 @@ let routesData = {};
 
 // Geriye dönük rota kimliği uyumluluğu (Alias desteği)
 if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
-    const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26");
+    const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "226" || r.hatNo === "26");
     if (r26) {
         ilceRotalari["Tekirdağ"].push(Object.assign({}, r26, { id: "hat_26_suleymanpasa_velimese" }));
+        ilceRotalari["Tekirdağ"].push(Object.assign({}, r26, { id: "hat_26_suleymanpasa_saray" }));
+        if (typeof routesData !== 'undefined') {
+            routesData["hat_226_suleymanpasa_saray"] = r26;
+            routesData["hat_26_suleymanpasa_saray"] = r26;
+            routesData["hat_226_suleymanpasa_velimese"] = r26;
+            routesData["hat_26_suleymanpasa_velimese"] = r26;
+            routesData["hat_226"] = r26;
+            routesData["hat_26"] = r26;
+        }
     }
 }
 
@@ -1946,10 +1955,14 @@ if (typeof window !== 'undefined' && window.tekulasHatVeritabani && Array.isArra
         });
 
         // Geriye dönük rota kimliği uyumluluğu (Alias)
-        const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26");
+        const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "226" || r.hatNo === "26");
         if (r26 && typeof routesData !== 'undefined') {
+            routesData["hat_226_suleymanpasa_saray"] = r26;
             routesData["hat_26_suleymanpasa_saray"] = r26;
+            routesData["hat_226_suleymanpasa_velimese"] = r26;
             routesData["hat_26_suleymanpasa_velimese"] = r26;
+            routesData["hat_226"] = r26;
+            routesData["hat_26"] = r26;
         }
         const r48 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "48");
         if (r48 && typeof routesData !== 'undefined') {

@@ -26939,8 +26939,8 @@ window.tekulasHatVeritabani = [
   {
     "id": "tekulas_147_26",
     "tekulasId": "147",
-    "hatNo": "26",
-    "name": "Hat 26: SÜLEYMANPAŞA YENİ OTOBÜS TERMİNALİ ➔ SARAY OTOGAR",
+    "hatNo": "226",
+    "name": "Hat 226: SÜLEYMANPAŞA YENİ OTOBÜS TERMİNALİ ➔ SARAY OTOGAR (Güncel Hat 226)",
     "rawName": "26/SÜLEYMANPASA-ÇERKEZKÖY-KAPAKLI-SARAY",
     "district": "Çerkezköy - Kapaklı",
     "originDistrict": "Çerkezköy - Kapaklı",
@@ -27397,7 +27397,7 @@ window.tekulasHatVeritabani = [
   {
     "id": "tekulas_147_26_donus",
     "tekulasId": "147",
-    "hatNo": "26",
+    "hatNo": "226",
     "name": "Hat 26: SARAY OTOGAR ➔ ŞEHİT ÇAĞRI KURT CADDESİ",
     "rawName": "26/SÜLEYMANPASA-ÇERKEZKÖY-KAPAKLI-SARAY",
     "district": "Çerkezköy - Kapaklı",
