@@ -2,7 +2,7 @@
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU VERİ DOSYASI (DATA.JS)
    ========================================================================== */
 
-const masterCitiesList = ["Yalova", "Bayburt", "Tekirdağ", "Edirne", "Kırklareli", "İstanbul", "Çanakkale", "Ankara"];
+const masterCitiesList = ["Tekirdağ", "Yalova", "Bayburt", "Edirne", "Kırklareli", "İstanbul", "Çanakkale", "Ankara"];
 
 // Åehirlerin sadece coğrafi komşuları ve API sorguları bulunur. Rotalar dinamik oluşturulur.
 const sehirRotalari = {
@@ -2011,4 +2011,436 @@ if (typeof MapEngine !== 'undefined') {
         Object.values(yalovaMapData.routes).forEach(r => routesData[r.id] = r);
         Object.values(bayburtMapData.routes).forEach(r => routesData[r.id] = r);
     }
+}
+
+
+/* VELİMEŞE MAHALLESİ TAM RİNG ROTASI (30 DURAK) */
+const velimeseTumDuraklarListesi = [
+  {
+    "id": "velimese_durak_1",
+    "durakKodu": "1050",
+    "name": "Velimeşe Merkez Meydanı (Atatürk Parkı)",
+    "cadde": "Atatürk Caddesi",
+    "lat": 41.253,
+    "lon": 27.899,
+    "pos": 0,
+    "anons": "Velimeşe Merkez Meydanı, Atatürk Parkı durağındayız. Seferimiz başlamıştır.",
+    "bekleyenYolcu": 14,
+    "inenYolcu": 0,
+    "gercekMesafeSonraki": 0.4
+  },
+  {
+    "id": "velimese_durak_2",
+    "durakKodu": "1051",
+    "name": "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
+    "cadde": "Dedebal Caddesi",
+    "lat": 41.252,
+    "lon": 27.8985,
+    "pos": 400,
+    "anons": "Sonraki durak: Velimeşe Çetin Sokak, Dedebal Caddesi Kavşağı.",
+    "bekleyenYolcu": 6,
+    "inenYolcu": 2,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_3",
+    "durakKodu": "1052",
+    "name": "Velimeşe Dedebal Caddesi",
+    "cadde": "Dedebal Caddesi",
+    "lat": 41.2525,
+    "lon": 27.8995,
+    "pos": 750,
+    "anons": "Sonraki durak: Velimeşe Dedebal Caddesi.",
+    "bekleyenYolcu": 5,
+    "inenYolcu": 2,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_4",
+    "durakKodu": "1053",
+    "name": "Velimeşe Çarşı Caddesi (Merkez Camii)",
+    "cadde": "Çarşı Caddesi",
+    "lat": 41.2515,
+    "lon": 27.8975,
+    "pos": 1100,
+    "anons": "Sonraki durak: Velimeşe Çarşı Caddesi ve Merkez Camii.",
+    "bekleyenYolcu": 8,
+    "inenYolcu": 3,
+    "gercekMesafeSonraki": 0.4
+  },
+  {
+    "id": "velimese_durak_5",
+    "durakKodu": "1054",
+    "name": "Velimeşe Muhtarlık & Ergene Belediyesi Ek Hizmet Binası",
+    "cadde": "Atatürk Caddesi",
+    "lat": 41.251,
+    "lon": 27.897,
+    "pos": 1500,
+    "anons": "Sonraki durak: Velimeşe Muhtarlık ve Ergene Belediyesi Ek Hizmet Binası.",
+    "bekleyenYolcu": 4,
+    "inenYolcu": 2,
+    "gercekMesafeSonraki": 0.3
+  },
+  {
+    "id": "velimese_durak_6",
+    "durakKodu": "1055",
+    "name": "Velimeşe Mustafa Kemal Atatürk Caddesi",
+    "cadde": "Atatürk Caddesi",
+    "lat": 41.25,
+    "lon": 27.896,
+    "pos": 1800,
+    "anons": "Sonraki durak: Velimeşe Mustafa Kemal Atatürk Caddesi.",
+    "bekleyenYolcu": 7,
+    "inenYolcu": 3,
+    "gercekMesafeSonraki": 0.45
+  },
+  {
+    "id": "velimese_durak_7",
+    "durakKodu": "1056",
+    "name": "Velimeşe İstasyon Caddesi & TCDD Tren Garı",
+    "cadde": "İstasyon Caddesi",
+    "lat": 41.2545,
+    "lon": 27.905,
+    "pos": 2250,
+    "anons": "Sonraki durak: Velimeşe İstasyon Caddesi ve TCDD Tren Garı.",
+    "bekleyenYolcu": 9,
+    "inenYolcu": 4,
+    "gercekMesafeSonraki": 0.4
+  },
+  {
+    "id": "velimese_durak_8",
+    "durakKodu": "1057",
+    "name": "Velimeşe Aile Sağlığı Merkezi (Sağlık Ocağı)",
+    "cadde": "Sağlık Caddesi",
+    "lat": 41.2535,
+    "lon": 27.9005,
+    "pos": 2650,
+    "anons": "Sonraki durak: Velimeşe Aile Sağlığı Merkezi ve Sağlık Ocağı.",
+    "bekleyenYolcu": 6,
+    "inenYolcu": 3,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_9",
+    "durakKodu": "1058",
+    "name": "Velimeşe İlkokulu & Ortaokulu",
+    "cadde": "Okul Caddesi",
+    "lat": 41.254,
+    "lon": 27.898,
+    "pos": 3000,
+    "anons": "Sonraki durak: Velimeşe İlkokulu ve Ortaokulu.",
+    "bekleyenYolcu": 10,
+    "inenYolcu": 5,
+    "gercekMesafeSonraki": 0.4
+  },
+  {
+    "id": "velimese_durak_10",
+    "durakKodu": "1059",
+    "name": "Velimeşe Çok Programlı Anadolu Lisesi",
+    "cadde": "Lise Caddesi",
+    "lat": 41.255,
+    "lon": 27.8965,
+    "pos": 3400,
+    "anons": "Sonraki durak: Velimeşe Çok Programlı Anadolu Lisesi.",
+    "bekleyenYolcu": 8,
+    "inenYolcu": 4,
+    "gercekMesafeSonraki": 0.45
+  },
+  {
+    "id": "velimese_durak_11",
+    "durakKodu": "1060",
+    "name": "Velimeşe Ergene Velimeşespor Tesisleri & Şehir Stadyumu",
+    "cadde": "Spor Caddesi",
+    "lat": 41.257,
+    "lon": 27.902,
+    "pos": 3850,
+    "anons": "Sonraki durak: Velimeşe Ergene Velimeşespor Tesisleri ve Şehir Stadyumu.",
+    "bekleyenYolcu": 7,
+    "inenYolcu": 3,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_12",
+    "durakKodu": "1061",
+    "name": "Velimeşe Kapalı Pazar Yeri & Otopark",
+    "cadde": "Pazar Caddesi",
+    "lat": 41.252,
+    "lon": 27.895,
+    "pos": 4200,
+    "anons": "Sonraki durak: Velimeşe Kapalı Pazar Yeri ve Otopark.",
+    "bekleyenYolcu": 11,
+    "inenYolcu": 4,
+    "gercekMesafeSonraki": 0.5
+  },
+  {
+    "id": "velimese_durak_13",
+    "durakKodu": "1062",
+    "name": "Velimeşe TOKİ Konutları (1. Etap Giriş)",
+    "cadde": "TOKİ Bulvarı",
+    "lat": 41.256,
+    "lon": 27.905,
+    "pos": 4700,
+    "anons": "Sonraki durak: Velimeşe TOKİ Konutları 1. Etap Girişi.",
+    "bekleyenYolcu": 12,
+    "inenYolcu": 5,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_14",
+    "durakKodu": "1063",
+    "name": "Velimeşe TOKİ Konutları (2. Etap / Park)",
+    "cadde": "TOKİ Bulvarı",
+    "lat": 41.2575,
+    "lon": 27.9065,
+    "pos": 5050,
+    "anons": "Sonraki durak: Velimeşe TOKİ Konutları 2. Etap ve Park Durağı.",
+    "bekleyenYolcu": 8,
+    "inenYolcu": 4,
+    "gercekMesafeSonraki": 0.55
+  },
+  {
+    "id": "velimese_durak_15",
+    "durakKodu": "1064",
+    "name": "Velimeşe Sanayi Caddesi",
+    "cadde": "Sanayi Caddesi",
+    "lat": 41.246,
+    "lon": 27.891,
+    "pos": 5600,
+    "anons": "Sonraki durak: Velimeşe Sanayi Caddesi.",
+    "bekleyenYolcu": 6,
+    "inenYolcu": 3,
+    "gercekMesafeSonraki": 0.4
+  },
+  {
+    "id": "velimese_durak_16",
+    "durakKodu": "1065",
+    "name": "Velimeşe Küçük Sanayi Sitesi Girişi",
+    "cadde": "Sanayi Caddesi",
+    "lat": 41.245,
+    "lon": 27.89,
+    "pos": 6000,
+    "anons": "Sonraki durak: Velimeşe Küçük Sanayi Sitesi Girişi.",
+    "bekleyenYolcu": 5,
+    "inenYolcu": 2,
+    "gercekMesafeSonraki": 0.5
+  },
+  {
+    "id": "velimese_durak_17",
+    "durakKodu": "1066",
+    "name": "Velimeşe Organize Sanayi Bölgesi (OSB) 1. Kapı",
+    "cadde": "OSB Bulvarı",
+    "lat": 41.244,
+    "lon": 27.888,
+    "pos": 6500,
+    "anons": "Sonraki durak: Velimeşe Organize Sanayi Bölgesi 1. Ana Giriş Kapısı.",
+    "bekleyenYolcu": 9,
+    "inenYolcu": 5,
+    "gercekMesafeSonraki": 0.45
+  },
+  {
+    "id": "velimese_durak_18",
+    "durakKodu": "1067",
+    "name": "Velimeşe OSB 2. Kapı (Fabrikalar Caddesi)",
+    "cadde": "Fabrikalar Caddesi",
+    "lat": 41.243,
+    "lon": 27.885,
+    "pos": 6950,
+    "anons": "Sonraki durak: Velimeşe OSB 2. Kapı ve Fabrikalar Caddesi.",
+    "bekleyenYolcu": 7,
+    "inenYolcu": 4,
+    "gercekMesafeSonraki": 0.45
+  },
+  {
+    "id": "velimese_durak_19",
+    "durakKodu": "1068",
+    "name": "Velimeşe OSB Arıtma Tesisi Kavşağı",
+    "cadde": "Çevre Caddesi",
+    "lat": 41.241,
+    "lon": 27.883,
+    "pos": 7400,
+    "anons": "Sonraki durak: Velimeşe OSB Arıtma Tesisi Kavşağı.",
+    "bekleyenYolcu": 3,
+    "inenYolcu": 2,
+    "gercekMesafeSonraki": 0.5
+  },
+  {
+    "id": "velimese_durak_20",
+    "durakKodu": "1069",
+    "name": "Velimeşe Avrupa Serbest Bölgesi (ASB) Bağlantısı",
+    "cadde": "Serbest Bölge Caddesi",
+    "lat": 41.242,
+    "lon": 27.886,
+    "pos": 7900,
+    "anons": "Sonraki durak: Velimeşe Avrupa Serbest Bölgesi Bağlantı Durağı.",
+    "bekleyenYolcu": 8,
+    "inenYolcu": 4,
+    "gercekMesafeSonraki": 0.6
+  },
+  {
+    "id": "velimese_durak_21",
+    "durakKodu": "1070",
+    "name": "Velimeşe Mezarlığı",
+    "cadde": "Mezarlık Caddesi",
+    "lat": 41.248,
+    "lon": 27.893,
+    "pos": 8500,
+    "anons": "Sonraki durak: Velimeşe Mezarlığı.",
+    "bekleyenYolcu": 3,
+    "inenYolcu": 2,
+    "gercekMesafeSonraki": 0.5
+  },
+  {
+    "id": "velimese_durak_22",
+    "durakKodu": "1071",
+    "name": "Velimeşe Girişi (Çorlu Bağlantısı)",
+    "cadde": "D-110 Yan Yol",
+    "lat": 41.245,
+    "lon": 27.895,
+    "pos": 9000,
+    "anons": "Sonraki durak: Velimeşe Girişi, Çorlu Bağlantı Noktası.",
+    "bekleyenYolcu": 6,
+    "inenYolcu": 3,
+    "gercekMesafeSonraki": 0.4
+  },
+  {
+    "id": "velimese_durak_23",
+    "durakKodu": "1072",
+    "name": "Velimeşe Bozdoğan Petrol & D-110 Kavşağı",
+    "cadde": "D-110 Karayolu",
+    "lat": 41.2435,
+    "lon": 27.898,
+    "pos": 9400,
+    "anons": "Sonraki durak: Velimeşe Bozdoğan Petrol ve D-110 Kavşağı.",
+    "bekleyenYolcu": 4,
+    "inenYolcu": 2,
+    "gercekMesafeSonraki": 0.45
+  },
+  {
+    "id": "velimese_durak_24",
+    "durakKodu": "1073",
+    "name": "Velimeşe - 1 Durağı (Durak Kodu 1058)",
+    "cadde": "Ana Cadde",
+    "lat": 41.249,
+    "lon": 27.897,
+    "pos": 9850,
+    "anons": "Sonraki durak: Velimeşe 1 Durağı.",
+    "bekleyenYolcu": 5,
+    "inenYolcu": 2,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_25",
+    "durakKodu": "1074",
+    "name": "Velimeşe - 2 Durağı (Durak Kodu 1059)",
+    "cadde": "Ana Cadde",
+    "lat": 41.2505,
+    "lon": 27.898,
+    "pos": 10200,
+    "anons": "Sonraki durak: Velimeşe 2 Durağı.",
+    "bekleyenYolcu": 5,
+    "inenYolcu": 3,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_26",
+    "durakKodu": "1075",
+    "name": "Velimeşe Barış Caddesi & Çamlık Mesire Alanı",
+    "cadde": "Barış Caddesi",
+    "lat": 41.254,
+    "lon": 27.901,
+    "pos": 10550,
+    "anons": "Sonraki durak: Velimeşe Barış Caddesi ve Çamlık Mesire Alanı.",
+    "bekleyenYolcu": 6,
+    "inenYolcu": 3,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_27",
+    "durakKodu": "1076",
+    "name": "Velimeşe Gölet & Piknik Alanı",
+    "cadde": "Gölet Yolu",
+    "lat": 41.256,
+    "lon": 27.903,
+    "pos": 10900,
+    "anons": "Sonraki durak: Velimeşe Gölet ve Piknik Alanı.",
+    "bekleyenYolcu": 4,
+    "inenYolcu": 2,
+    "gercekMesafeSonraki": 0.4
+  },
+  {
+    "id": "velimese_durak_28",
+    "durakKodu": "1077",
+    "name": "Velimeşe Cumhuriyet Bulvarı",
+    "cadde": "Cumhuriyet Bulvarı",
+    "lat": 41.2535,
+    "lon": 27.8995,
+    "pos": 11300,
+    "anons": "Sonraki durak: Velimeşe Cumhuriyet Bulvarı.",
+    "bekleyenYolcu": 7,
+    "inenYolcu": 4,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_29",
+    "durakKodu": "1078",
+    "name": "Velimeşe Hürriyet Caddesi",
+    "cadde": "Hürriyet Caddesi",
+    "lat": 41.2528,
+    "lon": 27.8985,
+    "pos": 11650,
+    "anons": "Sonraki durak: Velimeşe Hürriyet Caddesi.",
+    "bekleyenYolcu": 5,
+    "inenYolcu": 3,
+    "gercekMesafeSonraki": 0.35
+  },
+  {
+    "id": "velimese_durak_30",
+    "durakKodu": "1079",
+    "name": "Velimeşe Fevzi Çakmak Caddesi (Meydan Dönüşü)",
+    "cadde": "Fevzi Çakmak Caddesi",
+    "lat": 41.253,
+    "lon": 27.899,
+    "pos": 12000,
+    "anons": "Son durak: Velimeşe Fevzi Çakmak Caddesi ve Merkez Meydanı. Velimeşe Mahallesi seferimiz tamamlanmıştır.",
+    "bekleyenYolcu": 0,
+    "inenYolcu": 28,
+    "gercekMesafeSonraki": 0
+  }
+];
+
+const hatVelimeseMahalleRing = {
+    id: "hat_velimese_mahalle_ring",
+    hatNo: "VM-RING",
+    name: "VELİMEŞE MAHALLESİ TAM RİNG (30 DURAK)",
+    destDistrict: "Ergene / Velimeşe",
+    originDistrict: "Ergene / Velimeşe",
+    district: "Ergene / Velimeşe",
+    startStop: "Velimeşe Merkez Meydanı (Atatürk Parkı)",
+    endStop: "Velimeşe Fevzi Çakmak Caddesi (Meydan Dönüşü)",
+    isDistrict: true,
+    isCity: false,
+    isVelimeseLocked: true,
+    isHierarchical: true,
+    terrain: "asfalt",
+    totalKm: 12.0,
+    biletFiyat: 20,
+    otobusKapasitesi: 75,
+    seferSuresi: "35 dk",
+    desc: "Velimeşe Mahallesi'nin tüm cadde, okul, tren garı, stadyum, TOKİ ve OSB sanayi duraklarını birbirine bağlayan resmi ring hattı.",
+    intermediateStops: velimeseTumDuraklarListesi.slice(1, -1).map(s => s.name),
+    stops: velimeseTumDuraklarListesi
+};
+
+if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
+    // Eski ring varsa güncelle, yoksa ekle
+    const exIdx = ilceRotalari["Tekirdağ"].findIndex(r => r.id === "hat_velimese_mahalle_ring");
+    if (exIdx >= 0) {
+        ilceRotalari["Tekirdağ"][exIdx] = hatVelimeseMahalleRing;
+    } else {
+        ilceRotalari["Tekirdağ"].unshift(hatVelimeseMahalleRing);
+    }
+}
+if (typeof routesData !== 'undefined') {
+    routesData["hat_velimese_mahalle_ring"] = hatVelimeseMahalleRing;
+    routesData["hat_velimese_ring_30"] = hatVelimeseMahalleRing;
 }
