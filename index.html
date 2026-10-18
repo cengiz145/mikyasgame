@@ -81,8 +81,11 @@
         </div>
 
         <div class="menu-container" style="z-index: 1;">
-            <button id="btn-start-city" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.2rem;">
-                🏙️ Şehir İçi Belediye Seferleri (Süleymanpaşa)
+            <button id="btn-open-smart-route" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.2rem; background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8;">
+                🧭 Akıllı Rota Bulucu (Nereden ➔ Nereye)
+            </button>
+            <button id="btn-start-city" class="menu-btn secondary-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.1rem;">
+                🏙️ Tüm Süleymanpaşa Hatları Listesi
             </button>
             <button id="btn-start-intercity" class="menu-btn secondary-btn nav-item" style="display: none; justify-content: center; margin-bottom: 12px; font-size: 1.2rem; border-color: #facc15; color: #facc15;">
                 🛣️ Şehirler Arası Seyahat (Türkiye Turnesi)
@@ -370,7 +373,48 @@
     <script src="js/ui.js?v=1781783292"></script>
     <script src="js/game.js?v=1781783292"></script>
     <script src="js/app.js?v=1781783292"></script>
+    <script src="js/smart-route.js"></script>
     <script src="js/voice-assistant.js?v=1781783292"></script>
+
+    <!-- AKILLI ROTA SİSTEMİ (NEREDEN ➔ NEREYE) MODALI -->
+    <div id="smart-route-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="smart-route-title">
+        <div class="glass-panel" style="max-width: 620px; width: 92%; padding: 25px 28px; text-align: left; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 id="smart-route-title" class="gradient-text" style="font-size: 1.7rem; margin: 0;">🧭 Akıllı Rota Sistemi</h2>
+                <button id="btn-smart-modal-close" class="modern-btn" style="padding: 6px 12px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444;" aria-label="Akıllı rota penceresini kapat">✕</button>
+            </div>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 18px; line-height: 1.4;">
+                Gidiş veya dönüş seçmenize gerek yok. Nereden nereye gitmek istediğinizi yazın veya seçin; akıllı sistem en uygun TEKULAŞ hattını ve yönünü otomatik hesaplar.
+            </p>
+
+            <div style="margin-bottom: 16px;">
+                <label for="smart-from-input" style="display: block; font-weight: bold; color: #38bdf8; margin-bottom: 6px;">📍 Nereden? (Kalkış Durağı / Bölgesi):</label>
+                <input type="text" id="smart-from-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 12px 14px; background: rgba(0,0,0,0.5); border: 2px solid #38bdf8; color: #fff;" placeholder="Örn: Atatürk Spor Salonu, Valilik, Köprübaşı..." aria-label="Kalkış durağı">
+            </div>
+
+            <div style="margin-bottom: 18px;">
+                <label for="smart-to-input" style="display: block; font-weight: bold; color: #22c55e; margin-bottom: 6px;">🏁 Nereye? (Varış / Hedef Durağı):</label>
+                <input type="text" id="smart-to-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 12px 14px; background: rgba(0,0,0,0.5); border: 2px solid #22c55e; color: #fff;" placeholder="Örn: Tepekent, Değirmenaltı, Araştırma Hastanesi..." aria-label="Varış hedef durağı">
+            </div>
+
+            <datalist id="smart-stops-datalist"></datalist>
+
+            <div id="smart-popular-pills" style="margin-bottom: 18px;">
+                <span style="font-size: 0.85rem; color: #94a3b8; display: block; margin-bottom: 8px;">Hızlı Seçim (Sık Kullanılan Merkezler):</span>
+                <div id="smart-pills-container" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 15px;">
+                <button id="btn-smart-calculate" class="modern-btn btn-primary" style="flex: 2; padding: 14px; font-size: 1.15rem; font-weight: bold; background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8;">
+                    🚀 Rotayı Hesapla ve Sür
+                </button>
+                <button id="btn-smart-cancel" class="modern-btn secondary-btn" style="flex: 1; padding: 14px; font-size: 1rem;">
+                    Vazgeç
+                </button>
+            </div>
+        </div>
+    </div>
+  
 </body>
 </html>
 
