@@ -2146,6 +2146,15 @@ const Game = {
             return;
         }
 
+        if (e.shiftKey && (k === 'a')) {
+            e.preventDefault();
+            if (typeof MissionReader !== 'undefined') MissionReader.readNextStep();
+            return;
+        }
+        if (k === 'escape') {
+            if (typeof MissionReader !== 'undefined') MissionReader.exit();
+            return;
+        }
         if (this.keys.hasOwnProperty(k)) this.keys[k] = true;
 
         // Özel aksiyonlar

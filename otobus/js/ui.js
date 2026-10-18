@@ -265,6 +265,103 @@ const UI = {
 };
 
 /* ==========================================================================
+   MISSION READER (A: AÇIKLAMALARI OKU, SHIFT+A: ADIM ADIM OKU, ESC: ÇIK)
+   ========================================================================== */
+const MissionReader = {
+    currentStepIndex: 0,
+
+    getActiveRoute: function() {
+        if (typeof Game !== 'undefined' && Game.activeRouteData) {
+            return Game.activeRouteData;
+        }
+        if (typeof routesData !== 'undefined') {
+            if (typeof Game !== 'undefined' && Game.currentCity) {
+                let r = Object.values(routesData).find(x => x.sehir === Game.currentCity && x.taskIndex === Game.completedTasks);
+                if (r) return r;
+                r = Object.values(routesData).find(x => x.sehir === Game.currentCity);
+                if (r) return r;
+            }
+            return Object.values(routesData)[0] || null;
+        }
+        return null;
+    },
+
+    readDescription: function() {
+        const route = this.getActiveRoute();
+        if (!route) {
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak("Görev haritasında henüz bir rota bulunamadı.");
+            }
+            return;
+        }
+        const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Başlangıç Durağı");
+        const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Hedef Son Durak");
+        const intermediate = route.intermediateStops || (route.stops && route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
+        const totalStops = route.stops ? route.stops.length : 0;
+
+        let msg = route.name + " açıklaması. " +
+                  "Kalkış durağı: " + startStop + ". " +
+                  "Gitmeniz gereken hedef son durak: " + endStop + ". " +
+                  (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
+                  "Toplam " + totalStops + " durak. " +
+                  "Görevin adımlarını adım adım dinlemek için Shift + A tuşuna basın. Çıkmak için Escape tuşuna basın.";
+        
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak(msg);
+        }
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+            audio.updateNvdaLiveRegion(msg);
+        }
+    },
+
+    readNextStep: function() {
+        const route = this.getActiveRoute();
+        const endStop = (route && route.endStop) ? route.endStop : (route && route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Hedef Son Durak");
+
+        const steps = [
+            "1. Adım: Gaz ve Kalkış: W veya Yukarı Ok tuşuna basarak gaz verin ve kalkış yapın. Şeritte kalmak için A ve D tuşlarını kullanın.",
+            "2. Adım: Durağa Yaklaşma ve Yavaşlama: Durağa yaklaşırken sesli anonsu dinleyin, S veya Aşağı Ok ile fren yaparak hızınızı 20 kilometre altına indirin ve durak hizasında tamamen durun.",
+            "3. Adım: Kapı Açma ve Yolcu Alma: Otobüs tam durduğunda E ile ön kapıyı, Q ile arka kapıyı açarak yolcuların biniş ve inişini tamamlayın.",
+            "4. Adım: Kapıları Kapatma ve İlerleme: Biniş sesleri bitince kapıları aynı tuşlarla kapatıp tekrar gaz vererek sonraki durağa ilerleyin.",
+            "5. Adım: Görevi Bitirme: Sırasıyla tüm durakları tamamlayıp son durak olan " + endStop + " durağında yolcuları indirdiğinizde görev başarıyla tamamlanır."
+        ];
+
+        if (this.currentStepIndex >= steps.length) {
+            this.currentStepIndex = 0;
+        }
+
+        let stepText = steps[this.currentStepIndex];
+        this.currentStepIndex++;
+
+        let nextNotice = (this.currentStepIndex < steps.length) 
+            ? " (Sonraki adım için Shift + A, çıkmak için Escape tuşuna basın.)" 
+            : " (Tüm adımlar tamamlandı. Baştan dinlemek için Shift + A, çıkmak için Escape tuşuna basın.)";
+
+        let fullMsg = stepText + nextNotice;
+
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak(fullMsg);
+        }
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+            audio.updateNvdaLiveRegion(fullMsg);
+        }
+    },
+
+    exit: function() {
+        this.currentStepIndex = 0;
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        if (typeof audio !== 'undefined' && audio.stopSpeech) {
+            audio.stopSpeech();
+        }
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak("Açıklamadan çıkıldı.");
+        }
+    }
+};
+
+/* ==========================================================================
    KEYBOARD NAVIGATION (MENÜ GEZİNTİSİ)
    ========================================================================== */
 const KeyboardNav = {
@@ -337,9 +434,31 @@ const KeyboardNav = {
 };
 
 window.addEventListener('keydown', (e) => {
-    // Sürüş halindeyken veya giriş inputundayken UI klavye navigasyonunu yoksay
-    if (typeof Game !== 'undefined' && Game.isDriving) return;
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+
+    const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
+
+    // ESCAPE: Açıklamayı susturur ve çıkar
+    if (e.key === 'Escape') {
+        if (typeof MissionReader !== 'undefined') MissionReader.exit();
+        return;
+    }
+
+    // SHIFT + A: Adım adım görevin adımlarını okur (Hem menüde hem sürüşte çalışır)
+    if (e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        if (typeof MissionReader !== 'undefined') MissionReader.readNextStep();
+        return;
+    }
+
+    // A TUŞU: Görev haritasındaki açıklamaları okur (SADECE sürüşte değilken - sürüşte A sola döndürür)
+    if (!e.shiftKey && !e.ctrlKey && !e.altKey && (e.key === 'a' || e.key === 'A') && !isDriving) {
+        e.preventDefault();
+        if (typeof MissionReader !== 'undefined') MissionReader.readDescription();
+        return;
+    }
+
+    if (isDriving) return;
 
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
         e.preventDefault();
