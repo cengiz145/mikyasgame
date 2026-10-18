@@ -8,6 +8,12 @@ class AudioSystem {
         this.engineOsc = null;
         this.engineGain = null;
         this.engineFilter = null;
+        this.engineBassFilter = null;
+        this.engineCabinFilter = null;
+        this.activeSoundProfile = null;
+        this.retarderOsc = null;
+        this.retarderFilter = null;
+        this.retarderGain = null;
         
         this.isEngineRunning = false;
         this.idleBuffer = null;
@@ -39,6 +45,7 @@ class AudioSystem {
             }),
             turnTick: new Howl({ src: ['sounds/vinebeep5.ogg'] }),
             crash: new Howl({ src: ['sounds/underwaterland.ogg'] }),
+            airHorn: new Howl({ src: ['sounds/havalı korna.mp3'], volume: 0.85 }),
             menuMusic: new Howl({ src: ['sounds/music53.wav'], loop: true, volume: 0.2 }),
             rain8: new Howl({ src: ['sounds/rain8.ogg'], loop: true, volume: 0 }),
             rain9: new Howl({ src: ['sounds/rain9.ogg'], loop: true, volume: 0 }),
@@ -282,6 +289,60 @@ class AudioSystem {
         }
     }
 
+    applyBusSoundProfile(profile) {
+        if (!profile) return;
+        this.activeSoundProfile = profile;
+        if (!this.ctx) return;
+        
+        // 1. Bas Güçlendirme / Eq Ayarı (Büyük motorlarda derin sub-bass rölanti titreşimi)
+        if (this.engineBassFilter) {
+            const boost = typeof profile.bassBoost === 'number' ? profile.bassBoost : 0;
+            this.engineBassFilter.gain.setTargetAtTime(boost, this.ctx.currentTime, 0.1);
+        }
+        
+        // 2. Kabin Akustik Ses Yalıtımı (Setra, Travego gibi lüks otobüslerde tizler sönümlenir)
+        if (this.engineCabinFilter) {
+            const damping = typeof profile.cabinDamping === 'number' ? profile.cabinDamping : 1.0;
+            const targetFreq = Math.max(1200, Math.min(12000, 8000 * damping));
+            this.engineCabinFilter.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.1);
+        }
+    }
+
+    updateRetarder(speed, isBraking) {
+        if (!this.ctx) return;
+        const profile = this.activeSoundProfile;
+        if (!profile || !profile.hasRetarder) {
+            if (this.retarderGain) this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
+            return;
+        }
+
+        if (!this.retarderOsc) {
+            this.retarderOsc = this.ctx.createOscillator();
+            this.retarderOsc.type = 'sawtooth';
+            this.retarderFilter = this.ctx.createBiquadFilter();
+            this.retarderFilter.type = 'bandpass';
+            this.retarderFilter.Q.value = 3.5;
+            this.retarderGain = this.ctx.createGain();
+            this.retarderGain.gain.value = 0.0;
+
+            this.retarderOsc.connect(this.retarderFilter);
+            this.retarderFilter.connect(this.retarderGain);
+            if (this.environmentMixer) this.retarderGain.connect(this.environmentMixer);
+            else this.retarderGain.connect(this.ctx.destination);
+            this.retarderOsc.start();
+        }
+
+        if (speed > 25 && isBraking) {
+            const baseF = (profile.retarderPitch || 1.0) * (380 + (speed / 100) * 850);
+            const targetGain = Math.min(0.28, (speed / 70) * 0.28);
+            this.retarderOsc.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.1);
+            this.retarderFilter.frequency.setTargetAtTime(baseF * 1.2, this.ctx.currentTime, 0.1);
+            this.retarderGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.15);
+        } else {
+            this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.25);
+        }
+    }
+
     playNav() {
         this.init();
         this.sounds.nav.play();
@@ -315,8 +376,28 @@ class AudioSystem {
                     this.enginePanner.connect(this.environmentMixer);
                 }
 
-                this.idleSource.connect(this.idleGain);
-                this.idleGain.connect(this.enginePanner); // Panner üzerinden miksere bağlanır
+                if (!this.engineBassFilter) {
+                    this.engineBassFilter = this.ctx.createBiquadFilter();
+                    this.engineBassFilter.type = 'lowshelf';
+                    this.engineBassFilter.frequency.value = 160;
+                    this.engineBassFilter.gain.value = 0;
+                }
+                if (!this.engineCabinFilter) {
+                    this.engineCabinFilter = this.ctx.createBiquadFilter();
+                    this.engineCabinFilter.type = 'lowpass';
+                    this.engineCabinFilter.frequency.value = 8000;
+                }
+
+                this.idleSource.connect(this.engineBassFilter);
+                this.engineBassFilter.connect(this.engineCabinFilter);
+                this.engineCabinFilter.connect(this.idleGain);
+                this.idleGain.connect(this.enginePanner);
+
+                // Aktif aracın ses profilini uygula
+                const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
+                if (currentBus && currentBus.soundProfile) {
+                    this.applyBusSoundProfile(currentBus.soundProfile);
+                }
                 
                 // MOTOR HASARI LFO (Vuruntu/Titreşim)
                 this.engineDamageLfo = this.ctx.createOscillator();
@@ -462,6 +543,18 @@ class AudioSystem {
 
         // RPM bazlı frekans cambazlığı (800 rölanti -> 1.0, 2500 max -> 2.5 vb.)
         let targetRate = rpm !== null ? (rpm / 800) : (1.0 + (speed / 90) * 1.8);
+        
+        // Aktif otobüsün ses profili (küçük motorlar tiz, büyük motorlar tok ve bas)
+        if (typeof BusFleet !== 'undefined') {
+            const busObj = BusFleet.getSelectedBus();
+            if (busObj && busObj.soundProfile) {
+                targetRate *= (busObj.soundProfile.basePitch || 1.0);
+            }
+        }
+
+        // Retarder kontrolü (Frenleme esnasında)
+        const isBrakingNow = (typeof Game !== 'undefined') && (Game.acceleration < 0);
+        this.updateRetarder(speed, isBrakingNow);
         
         // MOTOR HASARI EFEKTİ (Sputter / Titreşim / Tekleme)
         if (typeof Game !== 'undefined' && Game.busDamage) {
@@ -1057,6 +1150,15 @@ class AudioSystem {
     }
 
     playHorn() {
+        // Eğer seçili otobüs havalı korna kullanıyorsa (Travego, Tourismo, Setra, MAN, vb.)
+        const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
+        if (currentBus && currentBus.soundProfile && currentBus.soundProfile.hornSound === 'air') {
+            if (this.sounds && this.sounds.airHorn) {
+                this.sounds.airHorn.play();
+                return;
+            }
+        }
+
         if (!this.hornBuffer || this.hornSource) return;
 
         this.init(); // ctx state kontrolü

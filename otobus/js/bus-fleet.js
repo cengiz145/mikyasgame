@@ -1,7 +1,7 @@
 /* ==========================================================================
    OTOBÜS FİLOSU VE ARAÇ SEÇİM SİSTEMİ (BUS FLEET SYSTEM)
    Farklı markalar (Mercedes-Benz, Otokar, BMC, MAN, Setra, Neoplan)
-   ve farklı türler (Belediye Solo, Körüklü Metrobüs, Şehirlerarası 2+1 Lüks/VIP)
+   ve her araca özel Web Audio DSP Akustik Ses Profilleri
    ========================================================================== */
 
 const BusFleet = {
@@ -26,7 +26,16 @@ const BusFleet = {
             transmission: "ZF EcoLife 6 İleri Otomatik",
             doorType: "3 Çift Kanatlı Alçak Taban Kapı",
             features: "Alçak taban, engelli rampası, Kentkart validatörü, şehir içi çevik manevra.",
-            desc: "TEKULAŞ şehir içi hatlarında standart hizmet veren alçak tabanlı yerli solo otobüs."
+            desc: "TEKULAŞ şehir içi hatlarında standart hizmet veren alçak tabanlı yerli solo otobüs.",
+            soundProfile: {
+                basePitch: 1.0,
+                bassBoost: 0,
+                hasRetarder: false,
+                hornSound: "city",
+                cabinDamping: 1.0,
+                retarderPitch: 1.0,
+                character: "Standart 6 silindirli Cummins motor sesi ve şehir içi korna"
+            }
         },
         {
             id: "bmc_neocity_10m",
@@ -47,7 +56,16 @@ const BusFleet = {
             transmission: "Allison Otomatik",
             doorType: "2 Kapılı Kompakt Giriş",
             features: "Dar mahalle sokaklarında üstün dönüş çapı, atik tork, yokuş kalkış desteği.",
-            desc: "Süleymanpaşa'nın dar sokakları ve tepe mahalle hatları için çevik kompakt otobüs."
+            desc: "Süleymanpaşa'nın dar sokakları ve tepe mahalle hatları için çevik kompakt otobüs.",
+            soundProfile: {
+                basePitch: 1.18,
+                bassBoost: -1,
+                hasRetarder: false,
+                hornSound: "city",
+                cabinDamping: 1.05,
+                retarderPitch: 1.0,
+                character: "Yüksek devirli, canlı ve atik 4 silindirli şehir içi sesi"
+            }
         },
         {
             id: "mercedes_conecto_12m",
@@ -68,7 +86,16 @@ const BusFleet = {
             transmission: "Voith DIWA 6 Otomatik",
             doorType: "3 Kapılı Geniş İniş-Biniş",
             features: "Alman bağımsız ön aks süspansiyonu, sessiz kabin, yüksek klima verimi.",
-            desc: "Yolcularına yüksek konfor sunan, dayanıklı ve güçlü standart şehir içi belediye otobüsü."
+            desc: "Yolcularına yüksek konfor sunan, dayanıklı ve güçlü standart şehir içi belediye otobüsü.",
+            soundProfile: {
+                basePitch: 0.94,
+                bassBoost: 3,
+                hasRetarder: false,
+                hornSound: "city",
+                cabinDamping: 0.85,
+                retarderPitch: 1.0,
+                character: "Tok ve pürüzsüz Alman OM 936 sesi, Voith şanzıman vınlaması"
+            }
         },
         {
             id: "mercedes_conecto_g",
@@ -89,7 +116,16 @@ const BusFleet = {
             transmission: "ZF EcoLife 6 İleri Otomatik",
             doorType: "4 Geniş Kapılı Hızlı Tahliye",
             features: "18 metre uzunluk, elektronik körük açısı stabilizasyonu, 160 dev yolcu kapasitesi.",
-            desc: "Namık Kemal Üniversitesi ve sanayi aksında yoğun yolcu trafiğini taşıyan dev körüklü kaptan aracı."
+            desc: "Namık Kemal Üniversitesi ve sanayi aksında yoğun yolcu trafiğini taşıyan dev körüklü kaptan aracı.",
+            soundProfile: {
+                basePitch: 0.88,
+                bassBoost: 6,
+                hasRetarder: false,
+                hornSound: "city",
+                cabinDamping: 0.95,
+                retarderPitch: 1.0,
+                character: "Ağır ve derin sub-bass rölantisi, 4 kapı aynı anda hava tahliyesi"
+            }
         },
 
         // --- ŞEHİRLERARASI SEYAHAT OTOBÜSLERİ (SEVİYE 10'DAN SONRA AÇILIR) ---
@@ -112,7 +148,16 @@ const BusFleet = {
             transmission: "Mercedes PowerShift 8 İleri Otomatik",
             doorType: "Pnömatik Tekli Piston Ön & Orta Kapı",
             features: "2+1 geniş deri rahat koltuklar, hidrolik Voith Retarder, hostes kabini, ikram ünitesi, geniş alt bagaj.",
-            desc: "Türkiye otoyollarının amiral gemisi. Şehirlerarası Türkiye Turnesi için 428 beygirlik lüks seyahat ikonu."
+            desc: "Türkiye otoyollarının amiral gemisi. Şehirlerarası Türkiye Turnesi için 428 beygirlik lüks seyahat ikonu.",
+            soundProfile: {
+                basePitch: 0.92,
+                bassBoost: 5,
+                hasRetarder: true,
+                hornSound: "air",
+                cabinDamping: 0.75,
+                retarderPitch: 1.0,
+                character: "428 HP BlueTec uzun yol homurtusu + Voith hidrolik retarder ıslığı ve havalı korna"
+            }
         },
         {
             id: "mercedes_tourismo_16rhd",
@@ -133,7 +178,16 @@ const BusFleet = {
             transmission: "PowerShift 8 İleri Otomatik",
             doorType: "Pnömatik Yolcu Kapısı",
             features: "54 koltuk kapasitesi, düşük yakıt tüketimi, yüksek filo dayanıklılığı, güvenli otoyol sürüşü.",
-            desc: "Otogarların en çok tercih edilen, yüksek kapasiteli ve güvenilir uzun yol yolcu otobüsü."
+            desc: "Otogarların en çok tercih edilen, yüksek kapasiteli ve güvenilir uzun yol yolcu otobüsü.",
+            soundProfile: {
+                basePitch: 0.95,
+                bassBoost: 4,
+                hasRetarder: true,
+                hornSound: "air",
+                cabinDamping: 0.80,
+                retarderPitch: 0.95,
+                character: "Dengeli uzun yol seyahat sesi + kademeli retarder ve havalı korna"
+            }
         },
         {
             id: "man_lions_coach",
@@ -154,7 +208,16 @@ const BusFleet = {
             transmission: "MAN TipMatic 12 İleri + Intarder",
             doorType: "Pnömatik Kapı",
             features: "Karakteristik güçlü MAN motor sesi, 2400 Nm devasa tork, MAN Intarder fren sistemi, rüzgar stabilitesi.",
-            desc: "Rampaları düz yol gibi tırmanan, yüksek torklu ve karizmatik Alman şehirlerarası yol canavarı."
+            desc: "Rampaları düz yol gibi tırmanan, yüksek torklu ve karizmatik Alman şehirlerarası yol canavarı.",
+            soundProfile: {
+                basePitch: 0.86,
+                bassBoost: 7,
+                hasRetarder: true,
+                hornSound: "air",
+                cabinDamping: 0.75,
+                retarderPitch: 1.1,
+                character: "470 HP yırtıcı ve hırıltılı MAN D26 sesi + güçlü MAN Intarder ve kalın havalı korna"
+            }
         },
         {
             id: "setra_topclass_s516",
@@ -175,7 +238,16 @@ const BusFleet = {
             transmission: "PowerShift 8 İleri Otomatik",
             doorType: "Elektro-Pnömatik Akıllı Kapı",
             features: "Çift dingil üstün yol tutuşu, panoramik cam tavan, fısıltı sessizliğinde kabin, ultra VIP 2+1 koltuklar.",
-            desc: "Daimler Buses zirvesi. 510 beygirlik çift dingilli ultra lüks VIP seyahat otobüsü."
+            desc: "Daimler Buses zirvesi. 510 beygirlik çift dingilli ultra lüks VIP seyahat otobüsü.",
+            soundProfile: {
+                basePitch: 0.90,
+                bassBoost: 6,
+                hasRetarder: true,
+                hornSound: "air",
+                cabinDamping: 0.55,
+                retarderPitch: 0.9,
+                character: "510 HP çift dingil, kabin içinde fısıltı sessizliğinde ultra lüks VIP tını"
+            }
         },
         {
             id: "neoplan_cityliner",
@@ -196,7 +268,16 @@ const BusFleet = {
             transmission: "TipMatic 12 İleri Otomatik",
             doorType: "Pnömatik Çift Emniyetli Kapı",
             features: "Bölünmüş fütüristik ön cam, aerodinamik tasarım, iç ambiyans aydınlatma, üst düzey prestij.",
-            desc: "Otobüs tasarımında bir sanat eseri. Seviye 20 efsane kaptanların sürdüğü filo lideri."
+            desc: "Otobüs tasarımında bir sanat eseri. Seviye 20 efsane kaptanların sürdüğü filo lideri.",
+            soundProfile: {
+                basePitch: 0.91,
+                bassBoost: 5,
+                hasRetarder: true,
+                hornSound: "air",
+                cabinDamping: 0.65,
+                retarderPitch: 1.05,
+                character: "460 HP aerodinamik rüzgar izolasyonu + TipMatic otomatik vites tahliyesi"
+            }
         }
     ],
 
@@ -231,14 +312,17 @@ const BusFleet = {
             localStorage.setItem('selectedBusId', busId);
         }
 
-        // Game özelliklerini güncelle
         if (typeof Game !== 'undefined') {
             Game.selectedBus = bus;
             Game.busType = bus.category;
-            // Kapasiteyi araca göre ayarla
             if (Game.activeRouteData) {
                 Game.activeRouteData.otobusKapasitesi = bus.seatCapacity;
             }
+        }
+
+        // AudioSystem ses profilini uygula
+        if (typeof audio !== 'undefined' && audio.applyBusSoundProfile) {
+            audio.applyBusSoundProfile(bus.soundProfile);
         }
 
         const successMsg = `Aktif otobüs seçildi: ${bus.fullName}. ${bus.categoryName}. Toplam ${bus.totalCapacity} yolcu kapasitesi.`;
@@ -324,7 +408,7 @@ const BusFleet = {
                 ? `${b.seatCapacity} Oturan + ${b.standingCapacity} Ayakta (Toplam ${b.totalCapacity} Yolcu)`
                 : `${b.seatCapacity} Koltuklu (2+1 Rahat Seyahat)`;
 
-            let ariaLabel = `${b.fullName}. ${b.categoryName}. ${capacityInfo}. Motor: ${b.engine}. ${isUnlocked ? (isSelected ? 'Şu anda seçili araç.' : 'Seçmek için Enter.') : `Kilitli, Seviye ${b.requiredLevel} gereklidir.`}`;
+            let ariaLabel = `${b.fullName}. ${b.categoryName}. ${capacityInfo}. Motor: ${b.engine}. Ses Karakteri: ${b.soundProfile ? b.soundProfile.character : ''}. ${isUnlocked ? (isSelected ? 'Şu anda seçili araç.' : 'Seçmek için Enter.') : `Kilitli, Seviye ${b.requiredLevel} gereklidir.`}`;
             btn.setAttribute('aria-label', ariaLabel);
 
             btn.innerHTML = `
@@ -344,7 +428,10 @@ const BusFleet = {
                 <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 4px;">
                     ⚙️ <strong>Motor & Vites:</strong> ${b.engine} | ${b.transmission}
                 </div>
-                <div style="font-size: 0.85rem; color: #a1a1aa; font-style: italic;">
+                <div style="font-size: 0.85rem; color: #38bdf8; font-style: italic; margin-bottom: 4px;">
+                    🔊 <strong>Ses Profili:</strong> ${b.soundProfile ? b.soundProfile.character : ''}
+                </div>
+                <div style="font-size: 0.85rem; color: #a1a1aa;">
                     💡 ${b.features}
                 </div>
             `;
@@ -396,7 +483,6 @@ const BusFleet = {
             this.renderModal('seyahat');
         });
 
-        // Başlangıçta seçili otobüsü Game'e bağla
         const sel = this.getSelectedBus();
         if (typeof Game !== 'undefined') {
             Game.selectedBus = sel;
