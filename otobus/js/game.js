@@ -897,13 +897,12 @@ const Game = {
         let deltaTime = (currentTime - this.lastFrameTime) / 1000;
         this.lastFrameTime = currentTime;
         
-        // --- ZAMANIN AKIÅI (Toplam 60 dakika: 45 dk gündüz, 15 dk gece) ---
-        if (this.speed > 5) {
-            let timeMultiplier = this.isNight ? 0.8 : (720 / 2700);
-            this.clockMinutes += deltaTime * timeMultiplier;
-            // BUG FIX 6: Zaman sınırsız büyümesin, 24 saat döngüsüne girsin
-            this.clockMinutes = this.clockMinutes % 1440; 
-        }
+        // --- ZAMANIN AKIŞI (1:4 Senkronize Simülasyon Ölçeği) ---
+        // 1 gerçek dakika = 4 oyun dakikası. 2 saatlik gerçek oynanış = Tam 8 saatlik resmi şoför vardiyası!
+        // Durakta yolcu binerken de zaman akar; mesafe ile zaman kuruşu kuruşuna kilitlidir.
+        const timeScale = 4.0;
+        this.clockMinutes += (deltaTime / 60) * timeScale;
+        this.clockMinutes = this.clockMinutes % 1440;
         
         let wasNight = this.isNight;
         this.isNight = (this.clockMinutes < 360 || this.clockMinutes >= 1080); 
