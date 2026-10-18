@@ -394,6 +394,66 @@
       "name": "Saray Çukuryurt Sapağı",
       "lat": 41.425,
       "lon": 27.938
+    },
+    {
+      "name": "Velimeşe - 1 Durağı",
+      "lat": 41.2505,
+      "lon": 27.894
+    },
+    {
+      "name": "Velimeşe Muhtarlık & Ek Hizmet Binası",
+      "lat": 41.2525,
+      "lon": 27.898
+    },
+    {
+      "name": "Velimeşe Mustafa Kemal Atatürk Caddesi",
+      "lat": 41.2515,
+      "lon": 27.8965
+    },
+    {
+      "name": "Velimeşe İstasyon & Tren Garı",
+      "lat": 41.248,
+      "lon": 27.893
+    },
+    {
+      "name": "Velimeşe TOKİ Konutları",
+      "lat": 41.256,
+      "lon": 27.905
+    },
+    {
+      "name": "Velimeşe Aile Sağlığı Merkezi",
+      "lat": 41.2535,
+      "lon": 27.9005
+    },
+    {
+      "name": "Velimeşe İlkokulu & Ortaokulu",
+      "lat": 41.254,
+      "lon": 27.897
+    },
+    {
+      "name": "Velimeşe M. Kemal Atatürk Stadyumu (Velimeşespor)",
+      "lat": 41.257,
+      "lon": 27.902
+    },
+    {
+      "name": "Velimeşe Mezarlığı",
+      "lat": 41.2465,
+      "lon": 27.889
+    },
+    {
+      "name": "Velimeşe Çerkezköy Yolu Durağı",
+      "lat": 41.255,
+      "lon": 27.908
+    },
+    {
+      "name": "Velimeşe Bozdoğan Petrol & D-110 Kavşağı",
+      "lat": 41.242,
+      "lon": 27.88
+    },
+    {
+      "name": "Velimeşe Gölet / Mesire Alanı",
+      "lat": 41.258,
+      "lon": 27.895
     }
   ],
   "Edirne": [
