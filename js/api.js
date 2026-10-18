@@ -84,7 +84,14 @@ async function fetchStopsFromOverpass(queryStr) {
 
 // Generate 30 Progressive Routes (3 Licenses x 10 Tasks) from raw API stops
 function generateRoutesFromAPI(rawStops, cityName) {
-    let filtered = rawStops.filter(d => d.name !== "İsimsiz Durak");
+    if (!rawStops || !Array.isArray(rawStops) || rawStops.length === 0) {
+        if (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName]) {
+            rawStops = varsayilanSehirDuraklari[cityName];
+        } else {
+            return false;
+        }
+    }
+    let filtered = rawStops.filter(d => d && d.name && d.name !== "İsimsiz Durak");
     
     if (filtered.length < 2) {
         return false;

@@ -2,6 +2,194 @@
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU ARAYÜZ (UI.JS)
    ========================================================================== */
 
+/* ==========================================================================
+   MISSION READER (A: AÇIKLAMALARI OKU, SHIFT+A: ADIM ADIM FORMÜLSEL OKU, ESC: ÇIK)
+   ========================================================================== */
+const MissionReader = {
+    currentStepIndex: 0,
+
+    getActiveRoute: function() {
+        if (typeof Game !== 'undefined' && Game.activeRouteData) {
+            return Game.activeRouteData;
+        }
+        if (typeof routesData !== 'undefined') {
+            const city = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
+            const task = (typeof Game !== 'undefined' && typeof Game.completedTasks === 'number') ? Game.completedTasks : 0;
+            let r = Object.values(routesData).find(x => x.sehir === city && x.taskIndex === task);
+            if (r) return r;
+            r = Object.values(routesData).find(x => x.sehir === city);
+            if (r) return r;
+            return Object.values(routesData)[0] || null;
+        }
+        return null;
+    },
+
+        formatStop: function(name, dir) {
+        if (!name) return "";
+        let t = name.trim();
+        if (dir === 'to') {
+            if (/ [Dd]urağı$/.test(t)) return t.replace(/ [Dd]urağı$/, ' durağına');
+            if (/ [Mm]eydanı$/.test(t)) return t.replace(/ [Mm]eydanı$/, ' meydanına');
+            if (/ [Tt]erminali$/.test(t)) return t.replace(/ [Tt]erminali$/, ' terminaline');
+            if (/ [Pp]arkı$/.test(t)) return t.replace(/ [Pp]arkı$/, ' parkına');
+            if (/ [Cc]addesi$/.test(t)) return t.replace(/ [Cc]addesi$/, ' caddesine');
+            return t + " durağına";
+        } else {
+            if (/ [Dd]urağı$/.test(t)) return t.replace(/ [Dd]urağı$/, ' durağından');
+            if (/ [Mm]eydanı$/.test(t)) return t.replace(/ [Mm]eydanı$/, ' meydanından');
+            if (/ [Tt]erminali$/.test(t)) return t.replace(/ [Tt]erminali$/, ' terminalinden');
+            if (/ [Pp]arkı$/.test(t)) return t.replace(/ [Pp]arkı$/, ' parkından');
+            if (/ [Cc]addesi$/.test(t)) return t.replace(/ [Cc]addesi$/, ' caddesinden');
+            return t + " durağından";
+        }
+    },
+
+    generateSteps: function(route) {
+        if (!route) return ["Henüz aktif bir görev veya rota bulunamadı."];
+
+        let stops = route.stops;
+        if (!stops || !Array.isArray(stops) || stops.length === 0) {
+            let s = [];
+            if (route.startStop) s.push({ name: route.startStop });
+            if (route.intermediateStops && Array.isArray(route.intermediateStops)) {
+                route.intermediateStops.forEach(st => s.push({ name: st }));
+            }
+            if (route.endStop) s.push({ name: route.endStop });
+            stops = s;
+        }
+
+        if (stops.length === 0) {
+            return ["Bu görev için durak adımı bulunamadı."];
+        }
+
+        const total = stops.length;
+        const steps = [];
+
+        // 1. Adım: Başlangıç durağından hareket
+        const firstStop = stops[0];
+        let step1 = "1. Adım: " + this.formatStop(firstStop.name, "from") + " ";
+        if (typeof firstStop.bekleyenYolcu === 'number' && firstStop.bekleyenYolcu > 0) {
+            step1 += "bekleyen " + firstStop.bekleyenYolcu + " yolcuyu alarak hareket edin.";
+        } else if (typeof firstStop.bekleyenYolcu === 'number' && firstStop.bekleyenYolcu === 0) {
+            step1 += "yolcu almadan hareket edin.";
+        } else {
+            step1 += "hareket edin, yolcu alın veya yolcu almadan devam edin.";
+        }
+        steps.push(step1);
+
+        // Ara Duraklar: 1'den total - 2'ye kadar
+        for (let i = 1; i < total - 1; i++) {
+            const stop = stops[i];
+            let step = (i + 1) + ". Adım: Sonra " + this.formatStop(stop.name, "to") + " gidin; ";
+            
+            const hasWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu > 0);
+            const zeroWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu === 0);
+            const hasAlighting = (typeof stop.inenYolcu === 'number' && stop.inenYolcu > 0);
+
+            if (hasWaiting && hasAlighting) {
+                step += "yolcuları indirin ve bekleyen " + stop.bekleyenYolcu + " yolcuyu alıp devam edin.";
+            } else if (hasWaiting) {
+                step += "bekleyen " + stop.bekleyenYolcu + " yolcuyu alıp devam edin.";
+            } else if (hasAlighting && zeroWaiting) {
+                step += "yolcuları indirin ve yolcu almadan devam edin.";
+            } else if (zeroWaiting) {
+                step += "yolcu almadan devam edin.";
+            } else {
+                step += "yolcu alın ya da yolcu almadan devam edin.";
+            }
+            steps.push(step);
+        }
+
+        // Son Durak: total - 1
+        if (total > 1) {
+            const lastStop = stops[total - 1];
+            let lastStep = total + ". Adım (Hedef Son Durak): Sonra " + this.formatStop(lastStop.name, "to") + " gidin; ";
+            if (typeof lastStop.inenYolcu === 'number' && lastStop.inenYolcu > 0) {
+                lastStep += "tüm yolcuları indirin ve görevi tamamlayın.";
+            } else {
+                lastStep += "durakta durup görevi tamamlayın.";
+            }
+            steps.push(lastStep);
+        }
+
+        return steps;
+    },
+
+    readDescription: function() {
+        const route = this.getActiveRoute();
+        if (!route) {
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak("Görev haritasında henüz bir rota bulunamadı.");
+            }
+            return;
+        }
+        const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Başlangıç Durağı");
+        const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Hedef Son Durak");
+        const intermediate = route.intermediateStops || (route.stops && route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
+        const totalStops = route.stops ? route.stops.length : 0;
+
+        let msg = route.name + " açıklaması. " +
+                  "Kalkış durağı: " + startStop + ". " +
+                  "Gitmeniz gereken hedef son durak: " + endStop + ". " +
+                  (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
+                  "Toplam " + totalStops + " durak. " +
+                  "Görevin adımlarını formülsel olarak adım adım dinlemek için Shift + A tuşuna basın. Çıkmak için Escape tuşuna basın.";
+        
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak(msg);
+        }
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+            audio.updateNvdaLiveRegion(msg);
+        }
+    },
+
+    readNextStep: function() {
+        const route = this.getActiveRoute();
+        const steps = this.generateSteps(route);
+        if (!steps || steps.length === 0) return;
+
+        if (this.currentStepIndex >= steps.length) {
+            this.currentStepIndex = 0;
+        }
+
+        let stepText = steps[this.currentStepIndex];
+
+        // Sürüş halindeyse ve şu anki durak bu adımsa belirt
+        if (typeof Game !== 'undefined' && Game.isDriving && typeof Game.currentStopIndex === 'number' && this.currentStepIndex === Game.currentStopIndex) {
+            stepText = "(Şu anki hedefiniz) " + stepText;
+        }
+
+        this.currentStepIndex++;
+
+        let nextNotice = (this.currentStepIndex < steps.length) 
+            ? " (Sonraki adım için Shift + A, çıkmak için Escape tuşuna basın.)" 
+            : " (Tüm görev adımları tamamlandı. Baştan dinlemek için Shift + A, çıkmak için Escape tuşuna basın.)";
+
+        let fullMsg = stepText + nextNotice;
+
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak(fullMsg);
+        }
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+            audio.updateNvdaLiveRegion(fullMsg);
+        }
+    },
+
+    exit: function() {
+        this.currentStepIndex = 0;
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        if (typeof audio !== 'undefined' && audio.stopSpeech) {
+            audio.stopSpeech();
+        }
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak("Açıklamadan çıkıldı.");
+        }
+    }
+};
+if (typeof window !== "undefined") window.MissionReader = MissionReader;
+
 const UI = {
     screens: [
         'title-screen', 'base-selection-menu', 'route-menu', 
@@ -213,7 +401,7 @@ const UI = {
             const endStop = route.endStop || (route.stops[route.stops.length - 1] ? route.stops[route.stops.length - 1].name : "Varış");
             const intermediate = route.intermediateStops || (route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
             
-            const cardSteps = MissionReader.generateSteps(route);
+            const cardSteps = (typeof MissionReader !== "undefined" && MissionReader.generateSteps) ? MissionReader.generateSteps(route) : [];
             const cardStepsHtml = cardSteps.map(s => '<div style="margin: 3px 0;">• ' + s + '</div>').join('');
             let ariaDesc = "Görev: " + route.name + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + route.stops.length + " durak. Görev Adımları: " + cardSteps.join("; ");
             
@@ -266,192 +454,7 @@ const UI = {
     }
 };
 
-/* ==========================================================================
-   MISSION READER (A: AÇIKLAMALARI OKU, SHIFT+A: ADIM ADIM FORMÜLSEL OKU, ESC: ÇIK)
-   ========================================================================== */
-const MissionReader = {
-    currentStepIndex: 0,
 
-    getActiveRoute: function() {
-        if (typeof Game !== 'undefined' && Game.activeRouteData) {
-            return Game.activeRouteData;
-        }
-        if (typeof routesData !== 'undefined') {
-            const city = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
-            const task = (typeof Game !== 'undefined' && typeof Game.completedTasks === 'number') ? Game.completedTasks : 0;
-            let r = Object.values(routesData).find(x => x.sehir === city && x.taskIndex === task);
-            if (r) return r;
-            r = Object.values(routesData).find(x => x.sehir === city);
-            if (r) return r;
-            return Object.values(routesData)[0] || null;
-        }
-        return null;
-    },
-
-        formatStop: function(name, dir) {
-        if (!name) return "";
-        let t = name.trim();
-        if (dir === 'to') {
-            if (/ [Dd]urağı$/.test(t)) return t.replace(/ [Dd]urağı$/, ' durağına');
-            if (/ [Mm]eydanı$/.test(t)) return t.replace(/ [Mm]eydanı$/, ' meydanına');
-            if (/ [Tt]erminali$/.test(t)) return t.replace(/ [Tt]erminali$/, ' terminaline');
-            if (/ [Pp]arkı$/.test(t)) return t.replace(/ [Pp]arkı$/, ' parkına');
-            if (/ [Cc]addesi$/.test(t)) return t.replace(/ [Cc]addesi$/, ' caddesine');
-            return t + " durağına";
-        } else {
-            if (/ [Dd]urağı$/.test(t)) return t.replace(/ [Dd]urağı$/, ' durağından');
-            if (/ [Mm]eydanı$/.test(t)) return t.replace(/ [Mm]eydanı$/, ' meydanından');
-            if (/ [Tt]erminali$/.test(t)) return t.replace(/ [Tt]erminali$/, ' terminalinden');
-            if (/ [Pp]arkı$/.test(t)) return t.replace(/ [Pp]arkı$/, ' parkından');
-            if (/ [Cc]addesi$/.test(t)) return t.replace(/ [Cc]addesi$/, ' caddesinden');
-            return t + " durağından";
-        }
-    },
-
-    generateSteps: function(route) {
-        if (!route) return ["Henüz aktif bir görev veya rota bulunamadı."];
-
-        let stops = route.stops;
-        if (!stops || !Array.isArray(stops) || stops.length === 0) {
-            let s = [];
-            if (route.startStop) s.push({ name: route.startStop });
-            if (route.intermediateStops && Array.isArray(route.intermediateStops)) {
-                route.intermediateStops.forEach(st => s.push({ name: st }));
-            }
-            if (route.endStop) s.push({ name: route.endStop });
-            stops = s;
-        }
-
-        if (stops.length === 0) {
-            return ["Bu görev için durak adımı bulunamadı."];
-        }
-
-        const total = stops.length;
-        const steps = [];
-
-        // 1. Adım: Başlangıç durağından hareket
-        const firstStop = stops[0];
-        let step1 = "1. Adım: " + this.formatStop(firstStop.name, "from") + " ";
-        if (typeof firstStop.bekleyenYolcu === 'number' && firstStop.bekleyenYolcu > 0) {
-            step1 += "bekleyen " + firstStop.bekleyenYolcu + " yolcuyu alarak hareket edin.";
-        } else if (typeof firstStop.bekleyenYolcu === 'number' && firstStop.bekleyenYolcu === 0) {
-            step1 += "yolcu almadan hareket edin.";
-        } else {
-            step1 += "hareket edin, yolcu alın veya yolcu almadan devam edin.";
-        }
-        steps.push(step1);
-
-        // Ara Duraklar: 1'den total - 2'ye kadar
-        for (let i = 1; i < total - 1; i++) {
-            const stop = stops[i];
-            let step = (i + 1) + ". Adım: Sonra " + this.formatStop(stop.name, "to") + " gidin; ";
-            
-            const hasWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu > 0);
-            const zeroWaiting = (typeof stop.bekleyenYolcu === 'number' && stop.bekleyenYolcu === 0);
-            const hasAlighting = (typeof stop.inenYolcu === 'number' && stop.inenYolcu > 0);
-
-            if (hasWaiting && hasAlighting) {
-                step += "yolcuları indirin ve bekleyen " + stop.bekleyenYolcu + " yolcuyu alıp devam edin.";
-            } else if (hasWaiting) {
-                step += "bekleyen " + stop.bekleyenYolcu + " yolcuyu alıp devam edin.";
-            } else if (hasAlighting && zeroWaiting) {
-                step += "yolcuları indirin ve yolcu almadan devam edin.";
-            } else if (zeroWaiting) {
-                step += "yolcu almadan devam edin.";
-            } else {
-                step += "yolcu alın ya da yolcu almadan devam edin.";
-            }
-            steps.push(step);
-        }
-
-        // Son Durak: total - 1
-        if (total > 1) {
-            const lastStop = stops[total - 1];
-            let lastStep = total + ". Adım (Hedef Son Durak): Sonra " + this.formatStop(lastStop.name, "to") + " gidin; ";
-            if (typeof lastStop.inenYolcu === 'number' && lastStop.inenYolcu > 0) {
-                lastStep += "tüm yolcuları indirin ve görevi tamamlayın.";
-            } else {
-                lastStep += "durakta durup görevi tamamlayın.";
-            }
-            steps.push(lastStep);
-        }
-
-        return steps;
-    },
-
-    readDescription: function() {
-        const route = this.getActiveRoute();
-        if (!route) {
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak("Görev haritasında henüz bir rota bulunamadı.");
-            }
-            return;
-        }
-        const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Başlangıç Durağı");
-        const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Hedef Son Durak");
-        const intermediate = route.intermediateStops || (route.stops && route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
-        const totalStops = route.stops ? route.stops.length : 0;
-
-        let msg = route.name + " açıklaması. " +
-                  "Kalkış durağı: " + startStop + ". " +
-                  "Gitmeniz gereken hedef son durak: " + endStop + ". " +
-                  (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
-                  "Toplam " + totalStops + " durak. " +
-                  "Görevin adımlarını formülsel olarak adım adım dinlemek için Shift + A tuşuna basın. Çıkmak için Escape tuşuna basın.";
-        
-        if (typeof audio !== 'undefined' && audio.speak) {
-            audio.speak(msg);
-        }
-        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
-            audio.updateNvdaLiveRegion(msg);
-        }
-    },
-
-    readNextStep: function() {
-        const route = this.getActiveRoute();
-        const steps = this.generateSteps(route);
-        if (!steps || steps.length === 0) return;
-
-        if (this.currentStepIndex >= steps.length) {
-            this.currentStepIndex = 0;
-        }
-
-        let stepText = steps[this.currentStepIndex];
-
-        // Sürüş halindeyse ve şu anki durak bu adımsa belirt
-        if (typeof Game !== 'undefined' && Game.isDriving && typeof Game.currentStopIndex === 'number' && this.currentStepIndex === Game.currentStopIndex) {
-            stepText = "(Şu anki hedefiniz) " + stepText;
-        }
-
-        this.currentStepIndex++;
-
-        let nextNotice = (this.currentStepIndex < steps.length) 
-            ? " (Sonraki adım için Shift + A, çıkmak için Escape tuşuna basın.)" 
-            : " (Tüm görev adımları tamamlandı. Baştan dinlemek için Shift + A, çıkmak için Escape tuşuna basın.)";
-
-        let fullMsg = stepText + nextNotice;
-
-        if (typeof audio !== 'undefined' && audio.speak) {
-            audio.speak(fullMsg);
-        }
-        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
-            audio.updateNvdaLiveRegion(fullMsg);
-        }
-    },
-
-    exit: function() {
-        this.currentStepIndex = 0;
-        if (typeof window !== 'undefined' && window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-        }
-        if (typeof audio !== 'undefined' && audio.stopSpeech) {
-            audio.stopSpeech();
-        }
-        if (typeof audio !== 'undefined' && audio.speak) {
-            audio.speak("Açıklamadan çıkıldı.");
-        }
-    }
-};
 
 /* ==========================================================================
    KEYBOARD NAVIGATION (MENÜ GEZİNTİSİ)
