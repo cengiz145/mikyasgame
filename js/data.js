@@ -1810,3 +1810,35 @@ if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
         ilceRotalari["Tekirdağ"].push(Object.assign({}, r26, { id: "hat_26_suleymanpasa_velimese" }));
     }
 }
+
+/* TEKULAŞ_ALL_LINES_INTEGRATION */
+// TEKİRDAĞ TEKULAŞ 183 HAT VE 3.913 GERÇEK DURAK ENTEGRASYONU
+if (typeof window !== 'undefined' && window.tekulasHatVeritabani && Array.isArray(window.tekulasHatVeritabani)) {
+    if (typeof ilceRotalari !== 'undefined') {
+        if (!ilceRotalari["Tekirdağ"]) ilceRotalari["Tekirdağ"] = [];
+        const existingHatIds = new Set(ilceRotalari["Tekirdağ"].map(r => r.id));
+
+        window.tekulasHatVeritabani.forEach(route => {
+            // routesData havuzuna doğrudan ekle
+            if (typeof routesData !== 'undefined') {
+                routesData[route.id] = route;
+            }
+            // İlçe rotaları listesine ekle
+            if (!existingHatIds.has(route.id)) {
+                existingHatIds.add(route.id);
+                ilceRotalari["Tekirdağ"].push(route);
+            }
+        });
+
+        // Geriye dönük rota kimliği uyumluluğu (Alias)
+        const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26");
+        if (r26 && typeof routesData !== 'undefined') {
+            routesData["hat_26_suleymanpasa_saray"] = r26;
+            routesData["hat_26_suleymanpasa_velimese"] = r26;
+        }
+        const r48 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "48");
+        if (r48 && typeof routesData !== 'undefined') {
+            routesData["hat_48_velimese_corlu"] = r48;
+        }
+    }
+}

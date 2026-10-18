@@ -141,12 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Title Screen - Şehir İçi ve Şehirlerarası Ayrımı
     const openCitySelection = () => {
+        /* TEKULAŞ_CATEGORIZED_MENU_SYSTEM */
         Game.gameMode = 'city';
         Game.busType = 'belediye';
-        Game.currentCity = 'Tekirdağ';
-        
-        audio.playSelect();
-        
+
         // 10 seviye geçilmeden ilçeler, şehirler, ülkeler ve harita kesinlikle gözükmesin!
         if (!Game.hasPassedLevel10()) {
             audio.speak("Süleymanpaşa şehir içi belediye seferleri seçildi. Sefer görevleri listeleniyor.");
@@ -155,68 +153,128 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        audio.speak("Şehir içi ve ilçe belediye seferleri seçildi. Lütfen gitmek istediğiniz hattı seçin.");
+        audio.speak("Şehir içi ve ilçe belediye seferleri seçildi. Lütfen gitmek istediğiniz bölgeyi veya hattı seçin.");
         UI.showToast("Belediye Seferleri (TEKULAŞ) Modu Aktif", "info");
 
-        // Doğrudan ilçe ve şehir içi belediye hatlarını listele
+        // TEKULAŞ KATEGORİLİ HAT SEÇİM MENÜSÜ
         const listEl = document.getElementById('district-dest-list');
-        if (listEl && typeof ilceRotalari !== 'undefined') {
-            const districtList = ilceRotalari["Tekirdağ"] || [];
-            listEl.innerHTML = '';
-            
-            // 1. Şehir içi hatlar butonu
-            const liInner = document.createElement('li');
-            liInner.style.marginBottom = "10px";
-            const btnInner = document.createElement('button');
-            btnInner.className = 'menu-btn nav-item';
-            btnInner.style.width = '100%';
-            btnInner.style.justifyContent = 'space-between';
-            btnInner.style.padding = '15px';
-            btnInner.innerHTML = '<span><strong>🏙️ Süleymanpaşa Şehir İçi Hatları</strong> (Hastane, Sahil, Üniversite)</span><span style="color: var(--secondary);">Canlı Sefer</span>';
-            btnInner.onclick = () => {
-                audio.playSelect();
-                document.getElementById('district-dest-modal').classList.add('hidden');
-                document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
-            };
-            liInner.appendChild(btnInner);
-            listEl.appendChild(liInner);
+        const descEl = document.getElementById('district-modal-desc');
+        const tekulasDb = (typeof window !== 'undefined' && window.tekulasHatVeritabani) ? window.tekulasHatVeritabani : (typeof ilceRotalari !== 'undefined' ? ilceRotalari["Tekirdağ"] : []);
 
-            // 2. İlçe hatları butonları
-            districtList.forEach(distRoute => {
+        const renderCategories = () => {
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            if (descEl) descEl.innerText = "Lütfen gitmek istediğiniz ilçe veya hat kategorisini seçin:";
+
+            const cats = [
+                { id: "Süleymanpaşa", icon: "🏙️", title: "Süleymanpaşa Şehir İçi Hatları", filter: r => r.district === 'Süleymanpaşa' },
+                { id: "Çorlu", icon: "🏭", title: "Çorlu Şehir İçi Hatları", filter: r => r.district === 'Çorlu' },
+                { id: "Çerkezköy - Kapaklı", icon: "🏢", title: "Çerkezköy ve Kapaklı Hatları", filter: r => r.district === 'Çerkezköy - Kapaklı' },
+                { id: "İlçeler Arası", icon: "🚌", title: "İlçeler Arası Hatlar (Hat 26 Saray, Hat 48 Velimeşe vb.)", filter: r => r.isDistrict || r.district === 'İlçeler Arası' },
+                { id: "Malkara", icon: "🌾", title: "Malkara Hatları", filter: r => r.district === 'Malkara' },
+                { id: "Saray", icon: "🌳", title: "Saray Hatları", filter: r => r.district === 'Saray' },
+                { id: "Hayrabolu", icon: "🌻", title: "Hayrabolu Hatları", filter: r => r.district === 'Hayrabolu' },
+                { id: "Şarköy", icon: "🍇", title: "Şarköy Hatları", filter: r => r.district === 'Şarköy' },
+                { id: "Muratlı", icon: "🚆", title: "Muratlı Hatları", filter: r => r.district === 'Muratlı' },
+                { id: "TÜMÜ", icon: "📋", title: "Tüm TEKULAŞ Hatları (183 Hat, 3.913 Durak)", filter: () => true }
+            ];
+
+            cats.forEach(c => {
+                const count = tekulasDb.filter(c.filter).length;
                 const li = document.createElement('li');
                 li.style.marginBottom = "10px";
                 const btn = document.createElement('button');
                 btn.className = 'menu-btn nav-item';
                 btn.style.width = '100%';
                 btn.style.justifyContent = 'space-between';
-                btn.style.padding = '15px';
-                const totalKm = distRoute.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
-                btn.innerHTML = '<span><strong style="color: ' + distRoute.color + ';">[Hat ' + distRoute.hatNo + '] ' + distRoute.destDistrict + '</strong> (' + distRoute.originDistrict + ' - ' + distRoute.destDistrict + ')</span><span style="color: var(--secondary);">' + totalKm.toFixed(0) + ' KM İlçe Seferi</span>';
+                btn.style.padding = '14px 16px';
+                btn.innerHTML = '<span><strong>' + c.icon + ' ' + c.title + '</strong></span><span style="color: var(--secondary); font-weight: bold;">' + count + ' Hat</span>';
+                btn.setAttribute('aria-label', c.title + ', ' + count + ' hat mevcut.');
                 btn.onclick = () => {
                     audio.playSelect();
-                    document.getElementById('district-dest-modal').classList.add('hidden');
-                    routesData[distRoute.id] = distRoute;
-                    if (distRoute.hatNo === "48") {
-                        audio.speak("TEKULAŞ 48 numaralı Velimeşe Çorlu hattı devreye alındı. İyi yolculuklar kaptan.");
-                        UI.showToast("48 Numaralı Hat: Velimeşe - Çorlu (19 KM)", "success");
-                    } else if (distRoute.hatNo === "26") {
-                        audio.speak("TEKULAŞ 26 numaralı Süleymanpaşa Saray hattı devreye alındı. İyi yolculuklar kaptan.");
-                        UI.showToast("26 Numaralı Hat Devreye Alındı: Süleymanpaşa - Saray (86 KM)", "success");
-                    } else {
-                        audio.speak(distRoute.name + " hattı devreye alındı.");
-                        UI.showToast(distRoute.name + " Devreye Alındı", "success");
-                    }
-                    Game.startRoute(distRoute.id);
+                    renderCategoryLines(c);
                 };
                 li.appendChild(btn);
                 listEl.appendChild(li);
             });
 
-            document.getElementById('district-dest-modal').classList.remove('hidden');
             KeyboardNav.initForScreen();
-        } else {
-            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
-        }
+        };
+
+        const renderCategoryLines = (cat) => {
+            if (!listEl) return;
+            listEl.innerHTML = '';
+            if (descEl) descEl.innerText = cat.title + " listeleniyor. Bir hat seçin:";
+            audio.speak(cat.title + " listelendi. Toplam hat sayısı: " + tekulasDb.filter(cat.filter).length);
+
+            // Geri dön butonu
+            const backLi = document.createElement('li');
+            backLi.style.marginBottom = "12px";
+            const backBtn = document.createElement('button');
+            backBtn.className = 'menu-btn nav-item';
+            backBtn.style.width = '100%';
+            backBtn.style.padding = '12px';
+            backBtn.style.background = 'rgba(255,255,255,0.1)';
+            backBtn.style.color = '#f87171';
+            backBtn.innerHTML = '<span>⬅️ <strong>Kategorilere Dön</strong></span>';
+            backBtn.setAttribute('aria-label', 'Kategorilere geri dön');
+            backBtn.onclick = () => {
+                audio.playSelect();
+                audio.speak("Kategorilere dönüldü.");
+                renderCategories();
+            };
+            backLi.appendChild(backBtn);
+            listEl.appendChild(backLi);
+
+            const filteredLines = tekulasDb.filter(cat.filter);
+            filteredLines.forEach(route => {
+                const li = document.createElement('li');
+                li.style.marginBottom = "8px";
+                const btn = document.createElement('button');
+                btn.className = 'menu-btn nav-item';
+                btn.style.width = '100%';
+                btn.style.flexDirection = 'column';
+                btn.style.alignItems = 'stretch';
+                btn.style.textAlign = 'left';
+                btn.style.padding = '12px 14px';
+
+                const totalKm = route.totalKm || (route.stops ? route.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0) : 10);
+                const stopCount = route.stops ? route.stops.length : (route.allUniqueStops ? route.allUniqueStops.length : 0);
+                const sName = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "");
+                const eName = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "");
+
+                let ariaTxt = "Hat " + route.hatNo + ": " + route.name + ". Toplam " + stopCount + " durak, " + totalKm.toFixed(1) + " kilometre. Kalkış: " + sName + ", Varış: " + eName;
+                btn.setAttribute('aria-label', ariaTxt);
+
+                btn.innerHTML = [
+                    '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">',
+                    '   <span style="font-weight: bold; color: ' + (route.color || '#38bdf8') + '; font-size: 1.05rem;">[Hat ' + route.hatNo + '] ' + route.name + '</span>',
+                    '   <span style="color: var(--secondary); font-size: 0.85rem; font-weight: bold;">' + stopCount + ' Durak | ' + totalKm.toFixed(1) + ' KM</span>',
+                    '</div>',
+                    '<div style="font-size: 0.85rem; color: #94a3b8;">',
+                    '   📍 ' + sName + ' ➔ 🏁 ' + eName,
+                    '</div>'
+                ].join('');
+
+                btn.onclick = () => {
+                    audio.playSelect();
+                    document.getElementById('district-dest-modal').classList.add('hidden');
+                    routesData[route.id] = route;
+                    audio.speak("TEKULAŞ " + route.name + " devreye alındı. İyi yolculuklar kaptan.");
+                    UI.showToast(route.name + " Devreye Alındı (" + totalKm.toFixed(1) + " KM)", "success");
+                    Game.startRoute(route.id);
+                };
+
+                li.appendChild(btn);
+                listEl.appendChild(li);
+            });
+
+            KeyboardNav.initForScreen();
+        };
+
+        renderCategories();
+        document.getElementById('district-dest-modal').classList.remove('hidden');
+        KeyboardNav.initForScreen();
     };
 
     const openIntercitySelection = () => {
