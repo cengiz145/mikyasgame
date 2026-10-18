@@ -207,13 +207,58 @@ const Game = {
         
         if (!this.activeRouteData) return;
 
-        document.getElementById('garage-route-desc').innerHTML = `
-            <strong>${this.activeRouteData.name}</strong><br>
-            <small>${this.activeRouteData.desc}</small>
-        `;
-        
-        this.mode = 'driver';
-        UI.switchScreen('garage-screen');
+        const r = this.activeRouteData;
+        const startStop = r.startStop || (r.stops[0] ? r.stops[0].name : "Başlangıç Durağı");
+        const endStop = r.endStop || (r.stops[r.stops.length - 1] ? r.stops[r.stops.length - 1].name : "Hedef Durak");
+        const intermediate = r.intermediateStops || (r.stops.length > 2 ? r.stops.slice(1, -1).map(s => s.name) : []);
+
+        const badgeEl = document.getElementById("hud-line-badge");
+        if (badgeEl) {
+            if (r.hatNo) {
+                badgeEl.innerText = "🚌 [HAT " + r.hatNo + "] " + r.name;
+            } else {
+                badgeEl.innerText = "🚌 " + r.name;
+            }
+        }
+
+        const routeDescEl = document.getElementById("garage-route-desc");
+        if (routeDescEl) {
+            routeDescEl.innerHTML = "<strong>" + r.name + "</strong><br><span style=\"color: var(--secondary); font-size: 0.95rem;\">" + startStop + " ➔ " + endStop + " (" + r.stops.length + " Durak)</span>";
+        }
+
+        const detailsContainer = document.getElementById("garage-mission-details");
+        if (detailsContainer) {
+            let stopsHtml = r.stops.map((s, idx) => {
+                let badge = idx === 0 ? " [KALKIŞ DURAĞI]" : (idx === r.stops.length - 1 ? " [VARIŞ - HEDEF SON DURAK]" : " [ARA DURAK]");
+                let color = idx === 0 ? "#38bdf8" : (idx === r.stops.length - 1 ? "#22c55e" : "#f1f5f9");
+                return "<li style=\"margin-bottom: 5px; color: " + color + ";\"><strong>" + (idx + 1) + ". Durak:</strong> " + s.name + " <span style=\"font-size: 0.85rem; opacity: 0.85;\">" + badge + "</span></li>";
+            }).join("");
+
+            detailsContainer.innerHTML = [
+                '<div style="font-size: 1.15rem; color: #38bdf8; font-weight: bold; margin-bottom: 12px; border-bottom: 1px solid rgba(56,189,248,0.3); padding-bottom: 6px;">📋 ' + r.name + '</div>',
+                '<div style="margin-bottom: 8px;">📍 <strong>Kalkış (Başlangıç) Durağı:</strong> <span style="color: #38bdf8; font-weight: bold;">' + startStop + '</span></div>',
+                '<div style="margin-bottom: 8px;">🏁 <strong>Gidilecek Son Durak (Hedef):</strong> <span style="color: #22c55e; font-weight: bold;">' + endStop + '</span></div>',
+                '<div style="margin-bottom: 8px;">🛑 <strong>Durulacak Duraklar Listesi (Sırasıyla):</strong><ol style="margin-left: 20px; margin-top: 6px; margin-bottom: 6px;">' + stopsHtml + '</ol></div>',
+                '<div style="margin-bottom: 12px;">📊 <strong>Toplam Durak Sayısı:</strong> ' + r.stops.length + ' Durak</div>',
+                '<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 12px 0;">',
+                '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Nasıl Yapılacak? (Ayrıntılı Görev ve Sürüş Yönergesi):</div>',
+                '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px;">',
+                '    <li style="margin-bottom: 6px;"><strong>Kalkış ve Hızlanma:</strong> <code>W</code> veya <code>Yukarı Ok</code> tuşuna basarak gaz verin ve kalkış yapın. Şeridinizi korumak için <code>A / D</code> veya <code>Sol / Sağ Ok</code> tuşlarını kullanın.</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Durağa Yaklaşma ve Durma:</strong> Durağa yaklaşırken mesafe uyarısını dinleyin. <code>S</code> veya <code>Aşağı Ok</code> ile fren yaparak hızınızı 20 km/s altına indirin ve durak hizasında tamamen durun.</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Yolcuları Alma ve İndirme:</strong> Araç tam durduğunda <code>E</code> (Ön Kapı) ve <code>Q</code> (Arka Kapı) tuşlarıyla kapıları açın. Yolcuların biniş ve kart basma seslerini dinleyin.</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Kapıları Kapatma ve İlerleme:</strong> Tüm yolcular tamamlandığında kapıları aynı tuşlarla kapatın. Gaz vererek sonraki durağa ilerleyin.</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Görevi Başarıyla Bitirme:</strong> Sırasıyla tüm duraklara uğrayıp son durak olan <strong>' + endStop + '</strong> durağına vardığınızda görevi tamamlamış olacaksınız!</li>',
+                '</ul>',
+                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 İpucu: Sürüş esnasında istediğiniz an <strong>G</strong> tuşuna basarak güncel görev hedefinizi, sıradaki durağı ve kalan mesafeyi sesli olarak dinleyebilirsiniz.</div>'
+            ].join("");
+        }
+
+        this.mode = "driver";
+        UI.switchScreen("garage-screen");
+
+        if (typeof audio.speak === "function") {
+            audio.speak(r.name + " brifingi. Kalkış durağınız: " + startStop + ". Gitmeniz gereken son durak: " + endStop + ". Toplam " + r.stops.length + " durak. Ayrıntılı talimatları dinlemek için B tuşuna basabilir, sefere başlamak için motoru çalıştırabilirsiniz.");
+        }
     },
 
     resumeFromSave: function() {
@@ -457,7 +502,13 @@ const Game = {
                     }
 
                     if (typeof audio.speak === 'function' && document.getElementById('garage-screen').classList.contains('hidden')) {
-                        audio.speak("Rota hazır. İlerleyebilirsiniz.");
+                        if (nextStop && nextStop.anons) {
+                            audio.speak(nextStop.anons);
+                        } else if (nextStop && nextStop.name) {
+                            audio.speak("Sonraki durak: " + nextStop.name);
+                        } else {
+                            audio.speak("Rota hazır. İlerleyebilirsiniz.");
+                        }
                     }
                 });
         } else {
@@ -540,24 +591,28 @@ const Game = {
         this.hasPoorVisibility = false;
         
         let kalanDurak = this.activeRouteData.stops.length - this.currentStopIndex;
-        
+
         if (this.currentStopIndex === 0) {
+            const startStop = this.activeRouteData.startStop || (this.activeRouteData.stops[0] ? this.activeRouteData.stops[0].name : "Başlangıç Durağı");
+            const endStop = this.activeRouteData.endStop || (this.activeRouteData.stops[this.activeRouteData.stops.length - 1] ? this.activeRouteData.stops[this.activeRouteData.stops.length - 1].name : "Son Durak");
             audio.speakSequence([
-                "Åu anki konumunuz:", `${Game.currentCity} Merkez Garajı.`, 
-                "İlk hedefiniz:", nextStop.name,
+                "Sefere başlandı.",
+                "Başlangıç durağınız:", startStop, 
+                "İlk durulacak hedef durak:", nextStop.name,
+                "Gitmeniz gereken son durak:", endStop,
                 "Bu görevde toplam", this.activeRouteData.stops.length.toString(), "durak bulunmaktadır.",
-                `Yol durumu: ${this.currentRoadType}`
+                "W ile gaz verin, duraklara yaklaşırken S ile fren yapıp durun. Durakta E ve Q ile kapıları açarak yolcuları alın.",
+                "Yol durumu: " + this.currentRoadType + ". Hayırlı yolculuklar kaptan."
             ]);
         } else {
             let sequence = ["Bir sonraki durak:", nextStop.name];
             if (kalanDurak === 1) {
-                sequence.push("Bu, görevin son durağıdır.");
+                sequence.push("Bu, görevin ve seferin son durağıdır.");
             }
             audio.speakSequence(sequence);
         }
     },
 
-    // 3 İhtimalli Kaza Sistemi (0: Hasarsız, 1: Kısmi %50 Hasar, 2: Tam %100 Kırılma)
     calculateCrashOutcome: function(damageAmount) {
         let chance = Math.random() * 100;
         
@@ -1868,6 +1923,7 @@ const Game = {
                         if (currentWaiting <= 0) {
                             clearInterval(this.boardingTimer);
                             document.getElementById('passenger-dialog').innerText = '"Tüm yolcular bindi."';
+                            audio.speak("Binişler tamamlandı. Tüm yolcular bindi.");
                             return;
                         }
                         
@@ -2063,6 +2119,22 @@ const Game = {
             return;
         }
 
+
+        if (k === 'g' || (k === 'b' && this.isDriving)) {
+            e.preventDefault();
+            const r = this.activeRouteData;
+            if (r) {
+                const startStop = r.startStop || (r.stops[0] ? r.stops[0].name : "Başlangıç");
+                const endStop = r.endStop || (r.stops[r.stops.length - 1] ? r.stops[r.stops.length - 1].name : "Son Durak");
+                const nextStop = r.stops[this.currentStopIndex];
+                const kalanDurak = r.stops.length - this.currentStopIndex;
+                const remDist = Math.max(0, Math.floor(this.currentDistanceToNext));
+                const msg = "Mevcut Görev Durumu: " + r.name + ". Kalkış noktanız: " + startStop + ". Sıradaki durulacak durak: " + (nextStop ? nextStop.name : endStop) + ", yaklaşık " + remDist + " metre kaldı. Kalan durak sayısı: " + kalanDurak + ". Gitmeniz gereken son durak: " + endStop + ". Durağa vardığınızda E ve Q tuşlarıyla kapıları açın.";
+                if (typeof audio.speak === "function") audio.speak(msg);
+                if (typeof audio.updateNvdaLiveRegion === "function") audio.updateNvdaLiveRegion(msg);
+            }
+            return;
+        }
 
         if (k === 'n') {
             e.preventDefault();

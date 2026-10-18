@@ -145,6 +145,10 @@
             </ul>
         </nav>
 
+        <button id="btn-route-district-mode" class="menu-btn nav-item" style="margin-top: 15px; border-color: #38bdf8; color: #38bdf8; justify-content: center;">
+            İlçe Seferleri (26 Numaralı Hat vb.)
+        </button>
+
         <button id="btn-route-back" class="menu-btn secondary-btn nav-item" style="margin-top: 15px; justify-content: center;">
             Haritaya Dön
         </button>
@@ -153,13 +157,17 @@
     <!-- 4. GARAGE SCREEN (ARTIK SADECE OTOBÜS VE SEFER BİLGİSİ) -->
     <main id="garage-screen" class="screen hidden" role="application">
         <div class="title-container">
-            <h1 class="main-title">Sefer Özeti</h1>
+            <h1 class="main-title" id="garage-screen-title">Görev Brifingi ve Sefer Özeti</h1>
             <p class="subtitle" id="garage-route-desc">Hat bilgisi yükleniyor...</p>
         </div>
 
-        <div class="instruction-box" style="margin-bottom: 20px;">
-            <p style="margin-top: 10px; font-size: 0.9rem;">(W) ile hızlanabilir, (S) ile yavaşlayabilir, (A/D) ile şerit değiştirebilirsiniz. Engellere çarpmamaya ve denize uçmamaya dikkat edin!</p>
+        <div id="garage-mission-details" class="instruction-box" style="margin-bottom: 20px; text-align: left; line-height: 1.6; max-height: 380px; overflow-y: auto;">
+            <!-- Dinamik doldurulacak: Başlangıç durağı, durulacak duraklar, varış durağı, nasıl yapılacağı -->
         </div>
+
+        <button id="btn-read-briefing" class="menu-btn secondary-btn nav-item" style="margin-bottom: 12px; width: 100%; justify-content: center;" aria-label="Görev brifingini sesli olarak dinle. Kısayol B tuşu">
+            🔊 Görev Brifingini Sesli Dinle (B)
+        </button>
 
         <button id="start-engine-btn" class="primary-btn pulse-btn nav-item" style="width: 100%;">
             Motoru Çalıştır ve Sefere Başla
@@ -171,6 +179,7 @@
 
     <!-- 5. DRIVING HUD SCREEN -->
     <main id="driving-screen" class="screen hidden" style="max-width: 900px; background: transparent; border: none; box-shadow: none;" role="application">
+        <div id="hud-line-badge" style="text-align: center; color: #38bdf8; font-weight: bold; font-size: 1.2rem; margin-bottom: 8px; text-shadow: 0 0 10px rgba(56,189,248,0.6);"></div>
         <div id="weather-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat, rgba(150,160,170,0.3); pointer-events: none; z-index: 100; opacity: 0; mix-blend-mode: multiply;"></div>
         <div class="dashboard" style="background: rgba(15, 22, 36, 0.85);">
             <div class="dash-section">
@@ -310,9 +319,21 @@
     <!-- Modals for Intercity -->
     <div id="mode-selection-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
         <h2 style="color: var(--text-light); margin-bottom: 20px; font-size: 2rem;">Görev Modunu Seçin</h2>
-        <button id="btn-mode-inner" class="nav-item primary-btn pulse-btn" style="width: 300px; margin-bottom: 15px; font-size: 1.2rem;">Åehir İçi Seferler</button>
-        <button id="btn-mode-inter" class="nav-item secondary-btn" style="width: 300px; font-size: 1.2rem; border-color: var(--secondary); color: var(--secondary);">Åehirler Arası Sefer (Uzun Yol)</button>
+        <button id="btn-mode-inner" class="nav-item primary-btn pulse-btn" style="width: 320px; margin-bottom: 15px; font-size: 1.2rem;">Şehir İçi Seferler</button>
+        <button id="btn-mode-district" class="nav-item secondary-btn" style="width: 320px; margin-bottom: 15px; font-size: 1.2rem; border-color: #38bdf8; color: #38bdf8;">İlçe Seferleri (İlçeler Arası)</button>
+        <button id="btn-mode-inter" class="nav-item secondary-btn" style="width: 320px; font-size: 1.2rem; border-color: var(--secondary); color: var(--secondary);">Şehirler Arası Sefer (Uzun Yol)</button>
         <button id="btn-mode-cancel" class="nav-item menu-btn" style="margin-top: 20px; color: var(--danger); font-size: 1rem; border: none; background: transparent;">İptal Et</button>
+    </div>
+
+    
+    <!-- District Selection Modal -->
+    <div id="district-dest-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+        <h2 style="color: var(--text-light); margin-bottom: 10px; font-size: 2rem;">İlçe Seferi Seçin</h2>
+        <p style="color: var(--secondary); margin-bottom: 20px;">Süleymanpaşa kalkışlı ilçeler ve beldeler arası hatlar:</p>
+        <ul id="district-dest-list" style="list-style: none; padding: 0; width: 100%; max-width: 520px; max-height: 60vh; overflow-y: auto;">
+            <!-- Javascript ile doldurulacak -->
+        </ul>
+        <button id="btn-district-cancel" class="nav-item menu-btn" style="margin-top: 20px; color: var(--danger);">Geri Dön</button>
     </div>
 
     <div id="intercity-dest-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">

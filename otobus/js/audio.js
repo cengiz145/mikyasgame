@@ -230,27 +230,32 @@ class AudioSystem {
         if (!liveRegion) {
             liveRegion = document.createElement('div');
             liveRegion.id = 'nvda-live-region';
-            liveRegion.setAttribute('aria-live', 'assertive');
+            liveRegion.setAttribute('aria-live', 'polite');
             liveRegion.setAttribute('aria-atomic', 'true');
-            liveRegion.setAttribute('role', 'alert');
+            liveRegion.setAttribute('role', 'status');
             liveRegion.style.position = 'absolute';
             liveRegion.style.left = '-9999px';
             document.body.appendChild(liveRegion);
         }
+        const clean = this.cleanSpeechText ? this.cleanSpeechText(text) : text;
         liveRegion.textContent = '';
-        setTimeout(() => { liveRegion.textContent = text; }, 50);
+        setTimeout(() => { liveRegion.textContent = clean; }, 40);
     }
 
     stopSpeech() {
+        this.sequenceId = (this.sequenceId || 0) + 1;
         if (this.currentTTSAudio) {
-            this.currentTTSAudio.pause();
+            try { this.currentTTSAudio.pause(); } catch(e){}
             this.currentTTSAudio = null;
         }
         if (this.currentSequenceAudio) {
-            this.currentSequenceAudio.pause();
+            try { this.currentSequenceAudio.pause(); } catch(e){}
             this.currentSequenceAudio = null;
         }
-        window.speechSynthesis.cancel();
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        this.activeUtterance = null;
         
         let liveRegion = document.getElementById('nvda-live-region');
         if (liveRegion) liveRegion.textContent = '';
@@ -1216,195 +1221,197 @@ class AudioSystem {
         }
     }
 
-    async speak(text) {
-        // Sadece navigasyon mesajlarına izin ver
-        if (!/(rota|durak|kavşak|hedef|metre kaldı|dönüş|sola|sağa|ileride|navigasyon|yön|çekici)/i.test(text)) {
-            this.updateNvdaLiveRegion(text);
+    
+    cleanSpeechText(text) {
+        if (!text) return "";
+        return String(text)
+            .replace(/Åž/g, 'Ş').replace(/ÅŸ/g, 'ş')
+            .replace(/Ã¼/g, 'ü').replace(/Ã¶/g, 'ö')
+            .replace(/Ã§/g, 'ç').replace(/Ä±/g, 'ı')
+            .replace(/Ãœ/g, 'Ü').replace(/Ã–/g, 'Ö')
+            .replace(/Ã‡/g, 'Ç').replace(/Ä°/g, 'İ')
+            .replace(/ÄŸ/g, 'ğ').replace(/Äž/g, 'Ğ')
+            .replace(/â€“|â€”/g, '-')
+            .replace(/â‚º/g, ' Lira')
+            .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+            .trim();
+    }
+
+    speakBrowserVoice(text, onEndCallback = null) {
+        if (typeof window === 'undefined' || !window.speechSynthesis) {
+            if (typeof onEndCallback === 'function') onEndCallback();
             return;
         }
+
+        try {
+            window.speechSynthesis.resume();
+            const cleanText = this.cleanSpeechText(text);
+            if (!cleanText) {
+                if (typeof onEndCallback === 'function') onEndCallback();
+                return;
+            }
+
+            const utter = new SpeechSynthesisUtterance(cleanText);
+            utter.lang = 'tr-TR';
+            utter.rate = 1.0;
+            utter.pitch = 1.0;
+
+            const voices = window.speechSynthesis.getVoices();
+            if (voices && voices.length > 0) {
+                const trVoice = voices.find(v => v.lang === 'tr-TR' || v.lang === 'tr_TR' || v.lang.startsWith('tr'));
+                if (trVoice) utter.voice = trVoice;
+            }
+
+            let ended = false;
+            const finish = () => {
+                if (ended) return;
+                ended = true;
+                if (this.activeUtterance === utter) this.activeUtterance = null;
+                if (typeof onEndCallback === 'function') onEndCallback();
+            };
+
+            utter.onend = finish;
+            utter.onerror = finish;
+
+            // Chrome GC bug fix: Utterance nesnesini sınıfa bağla ki konuşurken bellekten silinmesin
+            this.activeUtterance = utter;
+            window.speechSynthesis.speak(utter);
+        } catch (e) {
+            console.error("speakBrowserVoice error:", e);
+            if (typeof onEndCallback === 'function') onEndCallback();
+        }
+    }
+
+    async speak(text) {
+        if (!text) return;
+        
+        // Ekran okuyucu (NVDA) erişilebilirliği için live region'ı güncelle
+        this.updateNvdaLiveRegion(text);
+
         this.sequenceId = (this.sequenceId || 0) + 1;
         const currentSeqId = this.sequenceId;
 
         if (this.currentSequenceAudio) {
-            this.currentSequenceAudio.pause();
+            try { this.currentSequenceAudio.pause(); } catch(e){}
             this.currentSequenceAudio = null;
         }
 
         if (this.currentTTSAudio) {
-            this.currentTTSAudio.pause();
+            try { this.currentTTSAudio.pause(); } catch(e){}
             this.currentTTSAudio = null;
         }
+
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
+            window.speechSynthesis.resume();
         }
-        
-        this.updateNvdaLiveRegion(text);
-        
-        const apiKey = "AIzaSyAMgbeG7kuhowlmPKh2nsgm_vYzL6lpgHs";
+
+        // Önbellekte varsa çal
         const cacheKey = "tts_ai_leda_" + text;
-        
         try {
             const cachedAudio = localStorage.getItem(cacheKey);
             if (cachedAudio) {
                 if (this.sequenceId !== currentSeqId) return;
                 const ttsAudio = new Audio("data:audio/mp3;base64," + cachedAudio);
                 this.currentTTSAudio = ttsAudio;
-                ttsAudio.play().catch(e => { /* Ignore interruption */ });
+                ttsAudio.play().catch(e => {});
                 return;
             }
-        } catch (e) { console.log(e); }
+        } catch (e) {}
 
-        // Spam Korumasi: Google TTS'e gitmeden once 200ms bekle, eger baska bir ses geldiyse istegi hic atma.
-        await new Promise(r => setTimeout(r, 200));
-        if (this.sequenceId !== currentSeqId) return;
-
-        try {
-            const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    input: { text: text },
-                    voice: { languageCode: "tr-TR", name: "tr-TR-Chirp3-HD-Leda" },
-                    audioConfig: { audioEncoding: "MP3" }
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error("Google TTS API Hatası");
-            }
-
-            const data = await response.json();
-            if (this.sequenceId !== currentSeqId) return;
-            
+        // Google Cloud TTS denemesi (Eğer 403 veya hata almadıysak)
+        if (!this.googleTtsDisabled) {
             try {
-                localStorage.setItem(cacheKey, data.audioContent);
-            } catch (e) {
-                console.warn("Storage full, not caching TTS.");
-            }
+                const apiKey = "AIzaSyAMgbeG7kuhowlmPKh2nsgm_vYzL6lpgHs";
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 1200);
 
-            const ttsAudio = new Audio("data:audio/mp3;base64," + data.audioContent);
-            this.currentTTSAudio = ttsAudio;
-            ttsAudio.play().catch(e => { /* Ignore interruption */ });
-            
-        } catch (error) {
-            console.error("Google TTS çalışmadı, tarayıcı sesine geçiliyor:", error);
-            if (this.sequenceId !== currentSeqId) return;
-            const fallbackVoice = new SpeechSynthesisUtterance(text);
-            fallbackVoice.lang = 'tr-TR';
-            fallbackVoice.rate = 1.0;
-            window.speechSynthesis.speak(fallbackVoice);
+                const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        input: { text: text },
+                        voice: { languageCode: "tr-TR", name: "tr-TR-Chirp3-HD-Leda" },
+                        audioConfig: { audioEncoding: "MP3" }
+                    })
+                });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (this.sequenceId !== currentSeqId) return;
+                    try { localStorage.setItem(cacheKey, data.audioContent); } catch (e) {}
+                    const ttsAudio = new Audio("data:audio/mp3;base64," + data.audioContent);
+                    this.currentTTSAudio = ttsAudio;
+                    ttsAudio.play().catch(e => {});
+                    return;
+                } else {
+                    this.googleTtsDisabled = true;
+                }
+            } catch (error) {
+                this.googleTtsDisabled = true;
+            }
         }
+
+        // Yerel tarayıcı sesiyle anons yap (Sıfır gecikme, net ve kesintisiz)
+        if (this.sequenceId !== currentSeqId) return;
+        this.speakBrowserVoice(text);
     }
 
     async speakSequence(textArray) {
-        const hasNav = textArray.some(text => /(rota|durak|kavşak|hedef|metre kaldı|dönüş|sola|sağa|ileride|navigasyon|yön|çekici)/i.test(text));
-        if (!hasNav) {
-            if (textArray.length > 0) this.updateNvdaLiveRegion(textArray.join(" "));
-            return;
-        }
+        if (!textArray || textArray.length === 0) return;
 
-        // BUG FIX: Yeni bir sekans başladığında eskisini iptal et (Ses çakışmalarını önler)
         this.sequenceId = (this.sequenceId || 0) + 1;
         const currentSeqId = this.sequenceId;
-        
+
         if (this.currentSequenceAudio) {
-            this.currentSequenceAudio.pause();
+            try { this.currentSequenceAudio.pause(); } catch(e){}
             this.currentSequenceAudio = null;
         }
         if (this.currentTTSAudio) {
-            this.currentTTSAudio.pause();
+            try { this.currentTTSAudio.pause(); } catch(e){}
             this.currentTTSAudio = null;
         }
         if (window.speechSynthesis) {
             window.speechSynthesis.cancel();
+            window.speechSynthesis.resume();
         }
-        
-        const apiKey = "AIzaSyAMgbeG7kuhowlmPKh2nsgm_vYzL6lpgHs";
-        const audiosToPlay = [];
 
-        // Spam Korumasi: Sekans baslamadan once 200ms bekle, iptal edildiyse hicbir fetch yapma
-        await new Promise(r => setTimeout(r, 200));
-        if (this.sequenceId !== currentSeqId) return;
+        this.updateNvdaLiveRegion(textArray.join(" "));
 
-        for (let text of textArray) {
+        let index = 0;
+        const playNext = () => {
+            if (this.sequenceId !== currentSeqId) return;
+            if (index >= textArray.length) return;
+
+            const text = textArray[index];
+            index++;
+
             const cacheKey = "tts_ai_leda_" + text;
-            let audioData = null;
-            
-            try {
-                audioData = localStorage.getItem(cacheKey);
-            } catch (e) { }
+            let cachedAudio = null;
+            try { cachedAudio = localStorage.getItem(cacheKey); } catch (e) {}
 
-            if (!audioData) {
-                try {
-                    const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            input: { text: text },
-                            voice: { languageCode: "tr-TR", name: "tr-TR-Chirp3-HD-Leda" },
-                            audioConfig: { audioEncoding: "MP3" }
-                        })
+            if (cachedAudio) {
+                const aud = new Audio("data:audio/mp3;base64," + cachedAudio);
+                this.currentSequenceAudio = aud;
+                aud.onended = () => {
+                    if (this.sequenceId !== currentSeqId) return;
+                    setTimeout(playNext, 120);
+                };
+                aud.play().catch(e => {
+                    this.speakBrowserVoice(text, () => {
+                        if (this.sequenceId === currentSeqId) setTimeout(playNext, 120);
                     });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        audioData = data.audioContent;
-                        try { localStorage.setItem(cacheKey, audioData); } catch (e) { }
-                    }
-                } catch (error) {
-                    console.error("Sequence fetch error:", error);
-                }
-            }
-
-            if (audioData) {
-                const aud = new Audio("data:audio/mp3;base64," + audioData);
-                aud.originalText = text;
-                audiosToPlay.push(aud);
+                });
             } else {
-                // Eğer hata olursa fallback için özel nesne ekle
-                audiosToPlay.push({ fallbackText: text, originalText: text });
+                this.speakBrowserVoice(text, () => {
+                    if (this.sequenceId === currentSeqId) setTimeout(playNext, 120);
+                });
             }
-        }
+        };
 
-        if (audiosToPlay.length > 0) {
-            let currentIndex = 0;
-            const playNext = () => {
-                if (this.sequenceId !== currentSeqId) return; // Sekans iptal edildiyse dur
-                
-                if (currentIndex < audiosToPlay.length) {
-                    const item = audiosToPlay[currentIndex];
-                    if (item.originalText) {
-                        this.updateNvdaLiveRegion(item.originalText);
-                    }
-                    if (item instanceof Audio) {
-                        this.currentSequenceAudio = item;
-                        item.onended = () => {
-                            if (this.sequenceId !== currentSeqId) return;
-                            currentIndex++;
-                            playNext();
-                        };
-                        item.play().catch(e => {
-                            console.log(e);
-                            if (this.sequenceId !== currentSeqId) return;
-                            currentIndex++;
-                            playNext();
-                        });
-                    } else if (item.fallbackText) {
-                        const fallbackVoice = new SpeechSynthesisUtterance(item.fallbackText);
-                        fallbackVoice.lang = 'tr-TR';
-                        fallbackVoice.onend = () => {
-                            if (this.sequenceId !== currentSeqId) return;
-                            currentIndex++;
-                            playNext();
-                        };
-                        window.speechSynthesis.speak(fallbackVoice);
-                    }
-                }
-            };
-            playNext();
-        }
+        playNext();
     }
 
     placeAmbientSources(routeData, licenseLevel) {

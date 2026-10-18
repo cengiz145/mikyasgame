@@ -240,20 +240,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('intercity-dest-modal').classList.add('hidden');
                 
                 // GENERATE AND START INTERCITY ROUTE
-                const intercityRouteId = `intercity_${Game.currentCity}_${destCity}`;
+                const intercityRouteId = "intercity_" + Game.currentCity + "_" + destCity;
+                const startStop = Game.currentCity + " Kalkış Peronu";
+                const endStop = destCity + " Merkez Otogar";
                 routesData[intercityRouteId] = {
                     id: intercityRouteId,
-                    name: `${Game.currentCity} - ${destCity} (Uzun Yol)`,
-                    desc: "Sadece kalkış ve varış otogarları. Uzun otoyol sürüşü.",
+                    name: "Şehirlerarası Sefer: " + Game.currentCity + " ➔ " + destCity,
+                    startStop: startStop,
+                    endStop: endStop,
+                    intermediateStops: [],
+                    desc: "Kalkış: " + startStop + " ➔ Varış: " + endStop + ". Otoyol üzerinden ekspres şehirlerarası sefer.",
+                    detailedInstructions: "Kalkış: " + startStop + ", Varış: " + endStop + ". Gaz için W, fren için S kullanın.",
+                    speechBriefing: "Şehirlerarası " + Game.currentCity + " " + destCity + " seferi brifingi. Kalkış noktanız: " + startStop + ". Hedef son durak: " + endStop + ". Otoyol hız sınırına dikkat ederek sürün ve varış otogarında yolcuları indirin.",
                     color: "#facc15",
                     taskIndex: Game.completedTasks,
                     otobusKapasitesi: 28,
-                    biletFiyatMultiplier: 10, // Intercity is 10x more expensive
+                    biletFiyatMultiplier: 10,
                     isIntercity: true,
                     destCity: destCity,
                     stops: [
-                        { name: `${Game.currentCity} Kalkış Peronu`, bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: 0.1 },
-                        { name: `${destCity} Merkez Otogar`, bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 15 }
+                        { name: startStop, anons: startStop + " kalkış peronundayız. " + destCity + " seferi başlıyor.", bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: 0.1 },
+                        { name: endStop, anons: "Son durak: " + endStop + ". Şehirlerarası seferimiz sona ermiştir.", bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 15 }
                     ]
                 };
                 
@@ -277,6 +284,95 @@ document.addEventListener('DOMContentLoaded', () => {
             KeyboardNav.initForScreen();
         }
     });
+
+    
+    // === İLÇE SEFERLERİ MODAL YÖNETİCİSİ ===
+    const openDistrictModal = () => {
+        audio.playSelect();
+        const modeModal = document.getElementById('mode-selection-modal');
+        if (modeModal) modeModal.classList.add('hidden');
+        
+        const listEl = document.getElementById('district-dest-list');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+        
+        const currentCity = Game.currentCity || "Tekirdağ";
+        const districtList = (typeof ilceRotalari !== 'undefined' && ilceRotalari[currentCity]) 
+            ? ilceRotalari[currentCity] 
+            : (typeof ilceRotalari !== 'undefined' ? ilceRotalari["Tekirdağ"] : []);
+        
+        if (!districtList || districtList.length === 0) {
+            UI.showToast("Bu şehir için tanımlı ilçe hattı bulunamadı.", "error");
+            if (modeModal) modeModal.classList.remove('hidden');
+            KeyboardNav.initForScreen();
+            return;
+        }
+
+        districtList.forEach(distRoute => {
+            const li = document.createElement('li');
+            li.style.marginBottom = "10px";
+            
+            const btn = document.createElement('button');
+            btn.className = 'menu-btn nav-item';
+            btn.style.width = '100%';
+            btn.style.justifyContent = 'space-between';
+            btn.style.padding = '15px';
+            
+            const totalKm = distRoute.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
+            
+            btn.innerHTML = `
+                <span><strong style="color: ${distRoute.color};">[Hat ${distRoute.hatNo}] ${distRoute.destDistrict}</strong> (${distRoute.originDistrict} - ${distRoute.destDistrict})</span>
+                <span style="color: var(--secondary);">${totalKm.toFixed(0)} KM İlçe Seferi</span>
+            `;
+            
+            btn.onclick = () => {
+                audio.playSelect();
+                document.getElementById('district-dest-modal').classList.add('hidden');
+                
+                // Rota verisini routesData havuzuna ekle
+                routesData[distRoute.id] = distRoute;
+                
+                if (distRoute.hatNo === "26") {
+                    audio.speak("26 numaralı Süleymanpaşa Velimeşe hattı devreye alındı. İyi yolculuklar kaptan.");
+                    UI.showToast("26 Numaralı Hat Devreye Alındı: Süleymanpaşa - Velimeşe", "success");
+                } else {
+                    audio.speak(`${distRoute.name} hattı devreye alındı.`);
+                    UI.showToast(`${distRoute.name} Devreye Alındı`, "success");
+                }
+                
+                Game.startRoute(distRoute.id);
+            };
+            
+            li.appendChild(btn);
+            listEl.appendChild(li);
+        });
+        
+        document.getElementById('district-dest-modal').classList.remove('hidden');
+        KeyboardNav.initForScreen();
+        audio.speak("İlçe seferleri listelendi. Lütfen gitmek istediğiniz hattı seçin.");
+    };
+
+    const btnModeDistrict = document.getElementById('btn-mode-district');
+    if (btnModeDistrict) {
+        btnModeDistrict.addEventListener('click', openDistrictModal);
+    }
+    
+    const btnRouteDistrict = document.getElementById('btn-route-district-mode');
+    if (btnRouteDistrict) {
+        btnRouteDistrict.addEventListener('click', openDistrictModal);
+    }
+
+    const btnDistrictCancel = document.getElementById('btn-district-cancel');
+    if (btnDistrictCancel) {
+        btnDistrictCancel.addEventListener('click', () => {
+            audio.playSelect();
+            document.getElementById('district-dest-modal').classList.add('hidden');
+            const modeModal = document.getElementById('mode-selection-modal');
+            if (modeModal) modeModal.classList.remove('hidden');
+            KeyboardNav.initForScreen();
+        });
+    }
+    // ======================================
 
     document.getElementById('btn-intercity-cancel').addEventListener('click', () => {
         audio.playSelect();
@@ -374,6 +470,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 4. Garage Logic (Sefer Özeti)
+    const btnReadBriefing = document.getElementById("btn-read-briefing");
+    if (btnReadBriefing) {
+        btnReadBriefing.addEventListener("click", () => {
+            audio.playSelect();
+            if (Game.activeRouteData) {
+                const briefing = Game.activeRouteData.speechBriefing || Game.activeRouteData.desc;
+                if (typeof audio.speak === "function") {
+                    audio.speak(briefing);
+                }
+                if (typeof audio.updateNvdaLiveRegion === "function") {
+                    audio.updateNvdaLiveRegion(briefing);
+                }
+            }
+        });
+    }
+
+    // B tuşuyla garajdayken brifing dinleme
+    window.addEventListener("keydown", (e) => {
+        if (e.key && e.key.toLowerCase() === "b" && !document.getElementById("garage-screen").classList.contains("hidden")) {
+            const btn = document.getElementById("btn-read-briefing");
+            if (btn) btn.click();
+        }
+    });
+
     document.getElementById('btn-garage-back').addEventListener('click', () => {
         audio.playSelect();
         if (typeof SanayiMechanic !== 'undefined') SanayiMechanic.isActive = false;

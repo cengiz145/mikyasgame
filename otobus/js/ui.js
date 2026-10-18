@@ -131,8 +131,10 @@ const UI = {
                         }, 500);
                     } else {
                         Game.setCity(cityName);
-                        if (isUzunYolUnlocked) {
-                            document.getElementById('mode-selection-modal').classList.remove('hidden');
+                        const modeModal = document.getElementById('mode-selection-modal');
+                        if (modeModal) {
+                            modeModal.classList.remove('hidden');
+                            KeyboardNav.initForScreen();
                         } else {
                             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: cityName } }));
                         }
@@ -176,46 +178,70 @@ const UI = {
     },
 
     renderRoutes: function(cityName, completedTasks) {
-        document.getElementById('route-sel-title').innerText = `${cityName} Görevleri`;
-        const listEl = document.getElementById('dynamic-route-list');
-        listEl.innerHTML = '';
+        document.getElementById("route-sel-title").innerText = cityName + " Görevleri";
+        const listEl = document.getElementById("dynamic-route-list");
+        listEl.innerHTML = "";
         
         const cityRoutes = Object.values(routesData).filter(r => r.sehir === cityName);
         
         if (cityRoutes.length === 0) {
-            listEl.innerHTML = `<li style="text-align:center; color: white;">Bu şehir için rota bulunamadı. Lütfen API'den veri çekin.</li>`;
+            listEl.innerHTML = '<li style="text-align:center; color: white;">Bu şehir için rota bulunamadı. Lütfen API\'den veri çekin.</li>';
             return;
         }
 
-        // cityRoutes 27 adet (taskIndex 0 to 26).
         cityRoutes.forEach(route => {
-            // Sadece ÅU ANKİ (aktif) görevi göster, öncekileri ve sonrakileri tamamen GİZLE.
             if (route.taskIndex !== completedTasks) {
                 return; 
             }
 
             const isCurrentTask = route.taskIndex === completedTasks;
             
-            const li = document.createElement('li');
-            const btn = document.createElement('button');
+            const li = document.createElement("li");
+            const btn = document.createElement("button");
             
-            // Eğer tamamlanmışsa farklı bir stil, şu anki görevse vurgulu stil
-            let btnClass = 'menu-btn nav-item';
+            let btnClass = "menu-btn nav-item";
             if (!isCurrentTask) {
-                btnClass += ' secondary-btn'; // Bitirilmiş görevler biraz daha sönük görünsün
+                btnClass += " secondary-btn";
             }
 
             btn.className = btnClass;
+            btn.style.flexDirection = "column";
+            btn.style.alignItems = "stretch";
+            btn.style.textAlign = "left";
+            btn.style.padding = "18px 20px";
+            btn.style.lineHeight = "1.5";
+            btn.style.width = "100%";
 
-            let icon = isCurrentTask ? 'â–¶ï¸' : 'âœ…';
+            let icon = isCurrentTask ? "▶️" : "✅";
             
-            btn.innerHTML = `
-                <span class="btn-icon">${icon}</span>
-                <span class="btn-text">
-                    <strong style="color: ${route.color};">${route.name} ${isCurrentTask ? '(YENİ)' : '(Tamamlandı)'}</strong>
-                    <small>${route.desc}</small>
-                </span>
-            `;
+            const startStop = route.startStop || (route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
+            const endStop = route.endStop || (route.stops[route.stops.length - 1] ? route.stops[route.stops.length - 1].name : "Varış");
+            const intermediate = route.intermediateStops || (route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
+            
+            let ariaDesc = "Görev: " + route.name + ". Kalkış durağı: " + startStop + ". Gitmeniz gereken hedef son durak: " + endStop + ". " +
+                (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
+                "Toplam " + route.stops.length + " durak. Nasıl yapılır: W ile gaz verin, duraklara yaklaşırken S ile durup E ve Q ile kapıları açarak yolcuları alın. Göreve başlamak için Enter tuşuna basın.";
+            
+            btn.setAttribute("aria-label", ariaDesc);
+
+            btn.innerHTML = [
+                '<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 8px;">',
+                '    <strong style="color: ' + route.color + '; font-size: 1.2rem;">' + icon + ' ' + route.name + ' ' + (isCurrentTask ? '(AKTİF GÖREV)' : '(Tamamlandı)') + '</strong>',
+                '    <span style="background: rgba(56,189,248,0.2); color: #38bdf8; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">' + route.stops.length + ' Durak</span>',
+                '</div>',
+                '<div style="font-size: 1rem; color: #f1f5f9; margin-bottom: 5px;">',
+                '    📍 <strong>Kalkış (Başlangıç) Durağı:</strong> <span style="color: #38bdf8; font-weight: bold;">' + startStop + '</span>',
+                '</div>',
+                '<div style="font-size: 1rem; color: #f1f5f9; margin-bottom: 5px;">',
+                '    🏁 <strong>Gidilecek Hedef Son Durak:</strong> <span style="color: #22c55e; font-weight: bold;">' + endStop + '</span>',
+                '</div>',
+                (intermediate.length > 0 ? 
+                    '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> ' + intermediate.join(' ➔ ') + '</div>' : 
+                    '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> Ara durak yok (Doğrudan varış durağına kesintisiz sürüş)</div>'),
+                '<div style="font-size: 0.88rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 6px; width: 100%; border-left: 3px solid #38bdf8;">',
+                '    🕹️ <strong>Nasıl Yapılacak:</strong> <code>W</code> ile gaz verin, duraklara yaklaşırken <code>S</code> ile fren yapıp durun. <code>E</code> (ön) ve <code>Q</code> (arka) kapıları açarak yolcuları alın, ardından kapıları kapatıp sonraki durağa ilerleyin.',
+                '</div>'
+            ].join("");
 
             btn.onclick = () => {
                 audio.playSelect();
