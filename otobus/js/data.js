@@ -1724,6 +1724,15 @@ const ilceRotalari = {
                         "lon": 27.9005
                 },
                 {
+                    "name": "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
+                    "anons": "Sonraki durak: Velimeşe Çetin Sokak, Dedebal Caddesi Kavşağı.",
+                    "bekleyenYolcu": 8,
+                    "inenYolcu": 2,
+                    "gercekMesafeSonraki": 0.4,
+                    "lat": 41.2520,
+                    "lon": 27.8985
+                },
+                {
                         "name": "Velimeşe Merkez Meydan",
                         "anons": "Sonraki durak: Velimeşe Merkez Meydan, Atatürk Heykeli.",
                         "bekleyenYolcu": 8,
