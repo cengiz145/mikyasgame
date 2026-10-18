@@ -259,9 +259,22 @@ const Game = {
     },
 
     startRoute: function(routeId) {
+        // VELİMEŞE İLÇE SINIR KORUMASI: Velimeşe modundaysa dışarı çıkış kapalıdır!
+        if (this.isVelimeseLocked) {
+            const nextRoute = (typeof routesData !== 'undefined' && routesData[routeId]) || null;
+            if (nextRoute && !nextRoute.isVelimeseLocked && nextRoute.district !== 'Velimeşe' && !nextRoute.id.includes('velimese')) {
+                const lockMsg = "Velimeşe Mahalle İçi Modundasınız. İlçe dışına çıkış kapalıdır. Velimeşe'deki 100 sokak arasında serbestçe seyahat edebilirsiniz.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, 'warning');
+                return false;
+            }
+        }
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
         this.activeRouteData = routesData[routeId];
+        if (this.activeRouteData && (this.activeRouteData.isVelimeseLocked || this.activeRouteData.district === 'Velimeşe')) {
+            this.isVelimeseLocked = true;
+        }
         
         if (!this.activeRouteData) return;
 

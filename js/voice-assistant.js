@@ -200,13 +200,26 @@
         }
 
         // --- İLÇE HATLARI (ÇETİN SOKAK, 48 VE 26 NUMARALI HATLARI) ---
-        if (command.includes("çetin sokak") || command.includes("cetin sokak") || command.includes("çetin") || command.includes("cetin")) {
-            audio.speak("Velimeşe Mahallesi Çetin Sokak'a hizmet veren hatlar: 48 No'lu Velimeşe - Çorlu hattı, 26 No'lu Süleymanpaşa - Velimeşe ekspres hattı ve 48 Taksim R Çetin Sokak Mahalle Ring hattıdır. Rota başlatılıyor.");
+        if (command.includes("çetin sokak") || command.includes("cetin sokak")) {
+            // İki sokak arasında Velimeşe seferi kontrolü
+            if (typeof VelimeseNavigasyon !== 'undefined') {
+                const words = command.split(' ');
+                // Eğer "çetin sokaktan ...'ye" gibi bir kalıp varsa
+                if (command.includes("toki") || command.includes("meydan") || command.includes("istasyon") || command.includes("çarşı")) {
+                    const toTarget = command.includes("toki") ? "Velimeşe TOKİ 233. Sokak" : 
+                                     (command.includes("istasyon") ? "Velimeşe TCDD Tren İstasyonu" : 
+                                     (command.includes("çarşı") ? "Çarşı Caddesi" : "Velimeşe Merkez Meydanı"));
+                    audio.speak("Velimeşe içi Çetin Sokak'tan " + toTarget + " noktasına 100 sokak seferi başlatılıyor.");
+                    VelimeseNavigasyon.baslat("Çetin Sokak", toTarget);
+                    return;
+                }
+            }
+            audio.speak("TEKULAŞ Hat 48/R Velimeşe Çetin Sokak Mahalle Ring Hattı devreye alınıyor.");
             if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
-                const rCetin = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_velimese_cetin_ring") || ilceRotalari["Tekirdağ"].find(r => r.hatNo === "48");
-                if (rCetin) {
-                    routesData[rCetin.id] = rCetin;
-                    Game.startRoute(rCetin.id);
+                const rRing = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_velimese_cetin_ring");
+                if (rRing) {
+                    routesData[rRing.id] = rRing;
+                    Game.startRoute(rRing.id);
                     return;
                 }
             }
