@@ -34,7 +34,7 @@ async function fetchStopsFromOverpass(queryStr) {
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 saniye mutlak sınır
+        const timeoutId = setTimeout(() => controller.abort(), 4000); // Hızlı zaman aşımı: Overpass takılırsa 4 sn içinde gerçek duraklar devreye girer // 12 saniye mutlak sınır
 
         const response = await fetch(url, {
             method: "POST",
