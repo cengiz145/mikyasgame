@@ -587,6 +587,15 @@ const KeyboardNav = {
 window.addEventListener('keydown', (e) => {
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
 
+    // SHIFT + OK TUŞLARI: PUSULA VE 4 YÖN SİSTEMİ (Kuzey, Güney, Doğu, Batı)
+    if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        e.preventDefault();
+        if (typeof CompassNav !== 'undefined') {
+            CompassNav.handleDirection(e.key);
+        }
+        return;
+    }
+
     const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
 
     // ESCAPE: Açıklamayı susturur ve çıkar
@@ -635,3 +644,210 @@ window.addEventListener('keydown', (e) => {
 
 
 
+
+
+/* ==========================================================================
+   PUSULA VE 4 YÖN SİSTEMİ (COMPASSNAV)
+   Shift + Yukarı: Kuzey | Shift + Aşağı: Güney | Shift + Sağ: Doğu | Shift + Sol: Batı
+   ========================================================================== */
+const CompassNav = {
+    currentDirection: "Kuzey",
+
+    directions: {
+        ArrowUp: { key: "ArrowUp", name: "Kuzey", icon: "⬆️", angle: 0 },
+        ArrowRight: { key: "ArrowRight", name: "Doğu", icon: "➡️", angle: 90 },
+        ArrowDown: { key: "ArrowDown", name: "Güney", icon: "⬇️", angle: 180 },
+        ArrowLeft: { key: "ArrowLeft", name: "Batı", icon: "⬅️", angle: 270 }
+    },
+
+    handleDirection: function(arrowKey) {
+        const dir = this.directions[arrowKey];
+        if (!dir) return;
+
+        this.currentDirection = dir.name;
+        
+        if (typeof audio !== 'undefined' && typeof audio.playNav === 'function') {
+            audio.playNav();
+        }
+
+        const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
+        
+        if (isDriving) {
+            this.handleDrivingDirection(dir);
+        } else {
+            this.handleMenuDirection(dir);
+        }
+    },
+
+    handleDrivingDirection: function(dir) {
+        if (typeof Game !== 'undefined') {
+            Game.currentCompassDirection = dir.name;
+        }
+        
+        let desc = "";
+        const city = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
+        
+        if (city === "Tekirdağ") {
+            if (dir.name === "Kuzey") {
+                desc = "İstikamet Kuzeye çevrildi. Muratlı Caddesi, Şehir Hastanesi ve Saray yönü.";
+            } else if (dir.name === "Doğu") {
+                desc = "İstikamet Doğuya çevrildi. Değirmenaltı, Çorlu ve İstanbul yönü.";
+            } else if (dir.name === "Batı") {
+                desc = "İstikamet Batıya çevrildi. Valilik, Hükümet Caddesi ve Malkara Keşan yönü.";
+            } else if (dir.name === "Güney") {
+                desc = "İstikamet Güneye çevrildi. Marmara Denizi, Sahil Dolgu Parkı ve Çanakkale yönü.";
+            }
+        } else {
+            desc = `İstikamet ${dir.name} istikametine çevrildi.`;
+        }
+
+        if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+            audio.speak(desc);
+        }
+        if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
+            UI.showToast(`🧭 Pusula: ${dir.icon} ${dir.name} İstikameti`, 'info');
+        }
+
+        const compassHud = document.getElementById('hud-compass');
+        if (compassHud) {
+            compassHud.innerText = `${dir.icon} ${dir.name.toUpperCase()}`;
+        }
+    },
+
+    handleMenuDirection: function(dir) {
+        const baseSelection = document.getElementById('base-selection-menu');
+        const districtModal = document.getElementById('district-dest-modal');
+        const routeMenu = document.getElementById('route-menu');
+        
+        // 1. Harita Ekranı (base-selection-menu)
+        if (baseSelection && !baseSelection.classList.contains('hidden')) {
+            this.handleMapMenu(dir);
+            return;
+        }
+
+        // 2. İlçe Seçim Modalı (district-dest-modal)
+        if (districtModal && !districtModal.classList.contains('hidden')) {
+            this.handleDistrictMenu(dir);
+            return;
+        }
+
+        // 3. Şehir İçi Görev Ekranı (route-menu)
+        if (routeMenu && !routeMenu.classList.contains('hidden')) {
+            this.handleRouteMenu(dir);
+            return;
+        }
+
+        // 4. Ana Menüde veya diğer yerlerde pusula yönü bilgisi
+        let info = `${dir.icon} ${dir.name} İstikameti seçildi.`;
+        if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+            audio.speak(info);
+        }
+        if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
+            UI.showToast(info, 'info');
+        }
+    },
+
+    handleMapMenu: function(dir) {
+        const currentCity = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
+        const cityData = (typeof sehirRotalari !== 'undefined') ? sehirRotalari[currentCity] : null;
+        
+        let targetCity = null;
+        if (cityData && cityData.komsular) {
+            const dirMap = {
+                "Kuzey": cityData.komsular.kuzey,
+                "Doğu": cityData.komsular.dogu,
+                "Güney": cityData.komsular.guney,
+                "Batı": cityData.komsular.bati
+            };
+            targetCity = dirMap[dir.name];
+        }
+
+        if (targetCity) {
+            const announcement = `${dir.name}: ${targetCity} istikameti. Seçmek için Enter'a basın.`;
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announcement);
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast(`🧭 ${dir.name} ➔ ${targetCity}`, 'info');
+
+            const listEl = document.getElementById('city-selection-list');
+            if (listEl) {
+                const buttons = listEl.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    if (btn.innerText.includes(targetCity)) {
+                        btn.focus();
+                        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-focused'));
+                        btn.classList.add('nav-focused');
+                    }
+                });
+            }
+        } else {
+            const noRoute = `${currentCity} için ${dir.name} yönünde doğrudan komşu şehir hattı bulunmuyor.`;
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(noRoute);
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast(noRoute, 'warning');
+        }
+    },
+
+    handleDistrictMenu: function(dir) {
+        if (dir.name === "Kuzey") {
+            const announcement = "Kuzey Yönü: [Hat 26] Süleymanpaşa - Saray Hattı (86 KM, 43 Durak). Kapaklı ve Çerkezköy üzerinden. Başlatmak için Enter'a basın.";
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announcement);
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast("🧭 Kuzey ➔ Hat 26 Saray", 'info');
+            
+            const listEl = document.getElementById('district-dest-list');
+            if (listEl) {
+                const buttons = listEl.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    if (btn.innerText.includes('26') || btn.innerText.includes('Saray')) {
+                        btn.focus();
+                        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-focused'));
+                        btn.classList.add('nav-focused');
+                    }
+                });
+            }
+        } else if (dir.name === "Doğu") {
+            const announcement = "Doğu Yönü: [Hat 48] Velimeşe - Çorlu Hattı (19 KM, 15 Durak). Çorlu Otogar bağlantısı. Başlatmak için Enter'a basın.";
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announcement);
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast("🧭 Doğu ➔ Hat 48 Velimeşe - Çorlu", 'info');
+            
+            const listEl = document.getElementById('district-dest-list');
+            if (listEl) {
+                const buttons = listEl.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    if (btn.innerText.includes('48') || btn.innerText.includes('Velimeşe') || btn.innerText.includes('Çorlu')) {
+                        btn.focus();
+                        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-focused'));
+                        btn.classList.add('nav-focused');
+                    }
+                });
+            }
+        } else if (dir.name === "Batı") {
+            const announcement = "Batı Yönü: Malkara ve Hayrabolu ilçe hatları.";
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announcement);
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast("🧭 Batı: Malkara & Hayrabolu", 'info');
+        } else if (dir.name === "Güney") {
+            const announcement = "Güney Yönü: Şarköy ve Marmaraereğlisi sahil hatları.";
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announcement);
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast("🧭 Güney: Şarköy & Marmaraereğlisi", 'info');
+        }
+    },
+
+    handleRouteMenu: function(dir) {
+        let desc = "";
+        if (dir.name === "Kuzey") {
+            desc = "Kuzey Bölgesi: Muratlı Caddesi, Şehir Hastanesi ve Yeni Otogar durakları.";
+        } else if (dir.name === "Doğu") {
+            desc = "Doğu Bölgesi: Fatih Sultan Mehmet Bulvarı, Değirmenaltı ve Namık Kemal Üniversitesi durakları.";
+        } else if (dir.name === "Batı") {
+            desc = "Batı Bölgesi: Valilik, Rüstem Paşa Camii ve Hükümet Caddesi durakları.";
+        } else if (dir.name === "Güney") {
+            desc = "Güney Bölgesi: Sahil Dolgu Parkı ve Liman sahil şeridi durakları.";
+        }
+
+        if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(desc);
+        if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast(`🧭 ${dir.name}: ${desc}`, 'info');
+
+        const listEl = document.getElementById('dynamic-route-list');
+        if (listEl) {
+            const btn = listEl.querySelector('button');
+            if (btn) btn.focus();
+        }
+    }
+};

@@ -2116,6 +2116,14 @@ const Game = {
         if (k.startsWith('arrow') || k === ' ') {
             e.preventDefault();
         }
+
+        // Shift + Ok Tuşları Pusula Yön Değiştirme (Sürüş tuşlarını tetiklemesin)
+        if (e.shiftKey && (k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright')) {
+            if (typeof CompassNav !== 'undefined') {
+                CompassNav.handleDirection(e.key);
+            }
+            return;
+        }
         
         if (e.repeat) return; // Basılı tutulduğunda aynı aksiyonun defalarca tetiklenmesini engelle
 
@@ -2304,11 +2312,11 @@ const Game = {
     },
 
     handleKeyUp: function(e) {
+        const k = e.key.toLowerCase();
+        if (e.shiftKey && (k.startsWith('arrow'))) return;
         // BUG FIX: Oyun durumu değiştiğinde (örneğin durağa tam yanaştığımızda isDriving false olur)
         // Eğer bu kontrolü yaparsak, oyuncunun elini tuştan çekmesi algılanmaz ve tuş sonsuza kadar takılı kalır!
         // Bu yüzden keyup olayları her zaman dinlenmelidir.
-        
-        const k = e.key.toLowerCase();
         if (this.keys.hasOwnProperty(k)) this.keys[k] = false;
         
         if (k === 'l') {
