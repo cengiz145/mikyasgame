@@ -72,6 +72,23 @@
     processCommand(command) {
         if (typeof Game === 'undefined' || typeof audio === 'undefined') return;
 
+        // --- SEFER MODLARI (ŞEHİR İÇİ / ŞEHİRLER ARASI) ---
+        if (command.includes("şehir içi") || command.includes("belediye") || command.includes("tekulaş")) {
+            audio.speak("Şehir içi ve ilçe belediye seferleri modu açılıyor.");
+            if (document.getElementById('btn-start-city')) {
+                document.getElementById('btn-start-city').click();
+            }
+            return;
+        }
+
+        if (command.includes("şehirlerarası") || command.includes("şehirler arası") || command.includes("uzun yol") || command.includes("turne")) {
+            audio.speak("Şehirlerarası seyahat modu açılıyor.");
+            if (document.getElementById('btn-start-intercity')) {
+                document.getElementById('btn-start-intercity').click();
+            }
+            return;
+        }
+
         // --- İLÇE HATLARI (48 VE 26 NUMARALI HATLARI) ---
         if (command.includes("velimeşe çorlu") || command.includes("48") || command.includes("kırk sekiz")) {
             audio.speak("TEKULAŞ 48 numaralı Velimeşe Çorlu hattı devreye alınıyor.");

@@ -81,9 +81,13 @@
         </div>
 
         <div class="menu-container" style="z-index: 1;">
-            <button id="btn-start-game" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: center;">
-                Yeni Bir Oyuna Başla
+            <button id="btn-start-city" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.2rem;">
+                🏙️ Şehir İçi ve İlçe Belediye Seferleri (TEKULAŞ)
             </button>
+            <button id="btn-start-intercity" class="menu-btn secondary-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.2rem; border-color: #facc15; color: #facc15;">
+                🛣️ Şehirler Arası Seyahat (Türkiye Turnesi)
+            </button>
+            <button id="btn-start-game" class="hidden" style="display: none;"></button>
             <button id="btn-clear-cache" class="menu-btn nav-item" style="justify-content: center; margin-top: 15px; border-color: var(--danger); color: var(--danger);">
                 Önbelleği Temizle ve Yeniden Başlat
             </button>
@@ -331,7 +335,7 @@
     
     <!-- District Selection Modal -->
     <div id="district-dest-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
-        <h2 style="color: var(--text-light); margin-bottom: 10px; font-size: 2rem;">İlçe Seferi Seçin</h2>
+        <h2 style="color: var(--text-light); margin-bottom: 10px; font-size: 2rem;">🏙️ Şehir İçi ve İlçe Belediye Seferleri (TEKULAŞ)</h2>
         <p style="color: var(--secondary); margin-bottom: 20px;">Süleymanpaşa kalkışlı ilçeler ve beldeler arası hatlar:</p>
         <ul id="district-dest-list" style="list-style: none; padding: 0; width: 100%; max-width: 520px; max-height: 60vh; overflow-y: auto;">
             <!-- Javascript ile doldurulacak -->
@@ -340,7 +344,7 @@
     </div>
 
     <div id="intercity-dest-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
-        <h2 style="color: var(--text-light); margin-bottom: 10px; font-size: 2rem;">Nereye Gidiyoruz?</h2>
+        <h2 style="color: var(--text-light); margin-bottom: 10px; font-size: 2rem;">🛣️ Şehirler Arası Seyahat (Türkiye Turnesi)</h2>
         <p style="color: var(--secondary); margin-bottom: 20px;">Sadece açık veya komşu şehirlere gidebilirsiniz.</p>
         <ul id="intercity-dest-list" style="list-style: none; padding: 0; width: 100%; max-width: 500px; max-height: 60vh; overflow-y: auto;">
             <!-- Doldurulacak -->
