@@ -219,6 +219,181 @@
       "name": "Saray Belediyesi Otogarı",
       "lat": 41.445,
       "lon": 27.92
+    },
+    {
+      "name": "Muratlı Caddesi Trafo",
+      "lat": 40.991,
+      "lon": 27.552
+    },
+    {
+      "name": "Göçmen Konutları Giriş",
+      "lat": 40.989,
+      "lon": 27.546
+    },
+    {
+      "name": "Tekirdağ Büyükşehir Belediyesi Fen İşleri",
+      "lat": 40.9875,
+      "lon": 27.541
+    },
+    {
+      "name": "Tekirdağ Şehir Hastanesi Acil",
+      "lat": 40.988,
+      "lon": 27.536
+    },
+    {
+      "name": "Ağız ve Diş Sağlığı Hastanesi",
+      "lat": 40.9885,
+      "lon": 27.534
+    },
+    {
+      "name": "Tekirdağ Şehir Hastanesi Ana Giriş",
+      "lat": 40.987,
+      "lon": 27.532
+    },
+    {
+      "name": "Muratlı Caddesi / Soğancılar",
+      "lat": 40.984,
+      "lon": 27.53
+    },
+    {
+      "name": "Şehit Yüzbaşı Mayadağlı Caddesi",
+      "lat": 40.9825,
+      "lon": 27.527
+    },
+    {
+      "name": "Yeni Emniyet Müdürlüğü",
+      "lat": 40.985,
+      "lon": 27.56
+    },
+    {
+      "name": "Namık Kemal Üniversitesi (NKÜ) Kampüs Giriş / KYK Yurtları",
+      "lat": 40.995,
+      "lon": 27.583
+    },
+    {
+      "name": "NKÜ Araştırma Hastanesi & Rektörlük",
+      "lat": 40.9975,
+      "lon": 27.587
+    },
+    {
+      "name": "D-110 Çevre Yolu Bağlar Mevkii",
+      "lat": 41.065,
+      "lon": 27.655
+    },
+    {
+      "name": "Çorlu Çevre Yolu Sapağı (Transit Geçiş)",
+      "lat": 41.155,
+      "lon": 27.78
+    },
+    {
+      "name": "Velimeşe Girişi (Sanayi Bağlantısı)",
+      "lat": 41.245,
+      "lon": 27.885
+    },
+    {
+      "name": "Velimeşe Sanayi Caddesi",
+      "lat": 41.249,
+      "lon": 27.892
+    },
+    {
+      "name": "Velimeşe Merkez Meydan",
+      "lat": 41.253,
+      "lon": 27.899
+    },
+    {
+      "name": "Veliköy Giriş",
+      "lat": 41.261,
+      "lon": 27.915
+    },
+    {
+      "name": "Veliköy Işıklar / OSB Bağlantısı",
+      "lat": 41.269,
+      "lon": 27.938
+    },
+    {
+      "name": "Kızılpınar Giriş",
+      "lat": 41.272,
+      "lon": 27.952
+    },
+    {
+      "name": "Kızılpınar Kahveler Durağı",
+      "lat": 41.275,
+      "lon": 27.965
+    },
+    {
+      "name": "Kızılpınar Merkez",
+      "lat": 41.278,
+      "lon": 27.975
+    },
+    {
+      "name": "Çerkezköy Narin Kavşağı",
+      "lat": 41.282,
+      "lon": 27.985
+    },
+    {
+      "name": "Çerkezköy Otogarı",
+      "lat": 41.285,
+      "lon": 27.995
+    },
+    {
+      "name": "Çerkezköy Şehir İçi Geçişi",
+      "lat": 41.289,
+      "lon": 27.998
+    },
+    {
+      "name": "Çerkezköy Belediyesi / Atatürk Caddesi",
+      "lat": 41.293,
+      "lon": 27.992
+    },
+    {
+      "name": "Çerkezköy Devlet Hastanesi Sapağı",
+      "lat": 41.302,
+      "lon": 27.988
+    },
+    {
+      "name": "Kapaklı Giriş / Yıldızkent Kavşağı",
+      "lat": 41.309,
+      "lon": 27.984
+    },
+    {
+      "name": "Kapaklı Belediyesi",
+      "lat": 41.313,
+      "lon": 27.981
+    },
+    {
+      "name": "Kapaklı Otogarı",
+      "lat": 41.315,
+      "lon": 27.98
+    },
+    {
+      "name": "Kapaklı Sanayi Kavşağı",
+      "lat": 41.325,
+      "lon": 27.975
+    },
+    {
+      "name": "Pınarça Sapağı",
+      "lat": 41.355,
+      "lon": 27.965
+    },
+    {
+      "name": "Büyükyoncalı Giriş",
+      "lat": 41.385,
+      "lon": 27.958
+    },
+    {
+      "name": "Büyükyoncalı Merkez (Belediye)",
+      "lat": 41.39,
+      "lon": 27.955
+    },
+    {
+      "name": "Yeniköy Kavşağı",
+      "lat": 41.405,
+      "lon": 27.945
+    },
+    {
+      "name": "Saray Çukuryurt Sapağı",
+      "lat": 41.425,
+      "lon": 27.938
     }
   ],
   "Edirne": [
