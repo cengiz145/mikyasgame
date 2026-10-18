@@ -103,6 +103,19 @@
             return;
         }
 
+        // --- ŞEHİR İÇİ ANA ARTER HATTI (HAT 2/7) ---
+        if (command.includes("2/7") || command.includes("iki yedi") || command.includes("yüzüncü yıl") || command.includes("tepekent") || command.includes("araştırma hastane")) {
+            const isDonus = command.includes("dönüş") || command.includes("geri");
+            const targetId = isDonus ? "tekulas_152_2_7_donus" : "tekulas_152_2_7";
+            const r2_7 = (typeof routesData !== 'undefined' && routesData[targetId]) || (typeof window !== 'undefined' && window.getTekulasLineById && window.getTekulasLineById(targetId));
+            if (r2_7) {
+                if (typeof routesData !== 'undefined') routesData[r2_7.id] = r2_7;
+                audio.speak("TEKULAŞ Hat 2/7 " + (isDonus ? "Tepekent Yüzüncü Yıl dönüş" : "Yüzüncü Yıl Tepekent gidiş") + " ana arter hattı başlatılıyor. 43 duraklık güzergah devrede.");
+                Game.startRoute(r2_7.id);
+                return;
+            }
+        }
+
         // --- İLÇE HATLARI (48 VE 26 NUMARALI HATLARI) ---
         if (command.includes("velimeşe çorlu") || command.includes("48") || command.includes("kırk sekiz")) {
             audio.speak("TEKULAŞ 48 numaralı Velimeşe Çorlu hattı devreye alınıyor.");
