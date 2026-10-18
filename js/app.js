@@ -348,7 +348,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Rota verisini routesData havuzuna ekle
                 routesData[distRoute.id] = distRoute;
                 
-                if (distRoute.hatNo === "26") {
+                if (distRoute.hatNo === "48") {
+                    audio.speak("TEKULAŞ 48 numaralı Velimeşe Çorlu hattı devreye alındı. İyi yolculuklar kaptan.");
+                    UI.showToast("48 Numaralı Hat: Velimeşe - Çorlu (19 KM)", "success");
+                } else if (distRoute.hatNo === "26") {
                     audio.speak("TEKULAŞ 26 numaralı Süleymanpaşa Saray hattı devreye alındı. İyi yolculuklar kaptan.");
                     UI.showToast("26 Numaralı Hat Devreye Alındı: Süleymanpaşa - Saray (86 KM)", "success");
                 } else {

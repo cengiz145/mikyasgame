@@ -72,7 +72,18 @@
     processCommand(command) {
         if (typeof Game === 'undefined' || typeof audio === 'undefined') return;
 
-        // --- İLÇE HATLARI (26 NUMARALI HAT) ---
+        // --- İLÇE HATLARI (48 VE 26 NUMARALI HATLARI) ---
+        if (command.includes("velimeşe çorlu") || command.includes("48") || command.includes("kırk sekiz")) {
+            audio.speak("TEKULAŞ 48 numaralı Velimeşe Çorlu hattı devreye alınıyor.");
+            if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
+                const r48 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "48");
+                if (r48) {
+                    routesData[r48.id] = r48;
+                    Game.startRoute(r48.id);
+                    return;
+                }
+            }
+        }
         if (command.includes("saray") || command.includes("velimeşe") || command.includes("26") || command.includes("yirmi altı")) {
             audio.speak("TEKULAŞ 26 numaralı Süleymanpaşa Saray hattı devreye alınıyor.");
             if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {

@@ -219,6 +219,78 @@ const varsayilanSehirDuraklari = {
             "lat": 41.253,
             "lon": 27.899
         }
+    ,
+        {
+            "name": "Velimeşe - 1 Durağı",
+            "lat": 41.2505,
+            "lon": 27.894
+        }
+    ,
+        {
+            "name": "Velimeşe Muhtarlık & Ek Hizmet Binası",
+            "lat": 41.2525,
+            "lon": 27.898
+        }
+    ,
+        {
+            "name": "Velimeşe Mustafa Kemal Atatürk Caddesi",
+            "lat": 41.2515,
+            "lon": 27.8965
+        }
+    ,
+        {
+            "name": "Velimeşe İstasyon & Tren Garı",
+            "lat": 41.248,
+            "lon": 27.893
+        }
+    ,
+        {
+            "name": "Velimeşe TOKİ Konutları",
+            "lat": 41.256,
+            "lon": 27.905
+        }
+    ,
+        {
+            "name": "Velimeşe Aile Sağlığı Merkezi",
+            "lat": 41.2535,
+            "lon": 27.9005
+        }
+    ,
+        {
+            "name": "Velimeşe İlkokulu & Ortaokulu",
+            "lat": 41.254,
+            "lon": 27.897
+        }
+    ,
+        {
+            "name": "Velimeşe M. Kemal Atatürk Stadyumu (Velimeşespor)",
+            "lat": 41.257,
+            "lon": 27.902
+        }
+    ,
+        {
+            "name": "Velimeşe Mezarlığı",
+            "lat": 41.2465,
+            "lon": 27.889
+        }
+    ,
+        {
+            "name": "Velimeşe Çerkezköy Yolu Durağı",
+            "lat": 41.255,
+            "lon": 27.908
+        }
+    ,
+        {
+            "name": "Velimeşe Bozdoğan Petrol & D-110 Kavşağı",
+            "lat": 41.242,
+            "lon": 27.88
+        }
+    ,
+        {
+            "name": "Velimeşe Gölet / Mesire Alanı",
+            "lat": 41.258,
+            "lon": 27.895
+        }
     ],
     "Edirne": [
         {
@@ -1485,6 +1557,176 @@ const ilceRotalari = {
                             }
                   ]
         },
+        {
+        "id": "hat_48_velimese_corlu",
+        "hatNo": "48",
+        "name": "48 VELİMEŞE - ÇORLU",
+        "destDistrict": "Çorlu",
+        "originDistrict": "Velimeşe",
+        "startStop": "Velimeşe TOKİ Konutları",
+        "endStop": "Çorlu Otogar",
+        "intermediateStops": [
+                "Velimeşe M. Kemal Atatürk Stadyumu (Velimeşespor)",
+                "Velimeşe Aile Sağlığı Merkezi",
+                "Velimeşe Merkez Meydan",
+                "Velimeşe Muhtarlık & Ek Hizmet Binası",
+                "Velimeşe Mustafa Kemal Atatürk Caddesi",
+                "Velimeşe İlkokulu & Ortaokulu",
+                "Velimeşe İstasyon & Tren Garı",
+                "Velimeşe - 1 Durağı",
+                "Velimeşe Sanayi Caddesi",
+                "Velimeşe Mezarlığı",
+                "Velimeşe Girişi (Sanayi Bağlantısı)",
+                "Velimeşe Bozdoğan Petrol & D-110 Kavşağı",
+                "Çorlu Çevre Yolu Otogar Kavşağı"
+        ],
+        "desc": "Kalkış: Velimeşe TOKİ Konutları ➔ Varış: Çorlu Otogar. Güzergâh: Velimeşe Merkez, Atatürk Caddesi, Tren İstasyonu, Velimeşe-1, Sanayi Caddesi, Bozdoğan Petrol, Çorlu Çevre Yolu. Toplam 15 durak, ~19 km.",
+        "detailedInstructions": "TEKULAŞ 48 Numaralı Hat (Velimeşe – Çorlu) Görev Adımları:\n1. Adım: Velimeşe TOKİ Konutları durağından bekleyen 25 yolcuyu alarak hareket edin.\n2. Adım: 0.8 kilometre sonra Velimeşe Mustafa Kemal Atatürk Stadyumu durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n3. Adım: 0.7 kilometre sonra Velimeşe Aile Sağlığı Merkezi durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\n4. Adım: 0.5 kilometre sonra Velimeşe Merkez Meydan durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\n5. Adım: 0.4 kilometre sonra Velimeşe Muhtarlık & Ek Hizmet Binası durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\n6. Adım: 0.4 kilometre sonra Velimeşe Mustafa Kemal Atatürk Caddesi durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\n7. Adım: 0.6 kilometre sonra Velimeşe İlkokulu & Ortaokulu durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n8. Adım: 0.7 kilometre sonra Velimeşe İstasyon & Tren Garı durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\n9. Adım: 0.5 kilometre sonra Velimeşe - 1 Durağı durağına gidin; yolcuları indirin ve bekleyen 10 yolcuyu alıp devam edin.\n10. Adım: 0.8 kilometre sonra Velimeşe Sanayi Caddesi durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n11. Adım: 0.9 kilometre sonra Velimeşe Mezarlığı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\n12. Adım: 1.2 kilometre sonra Velimeşe Girişi durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\n13. Adım: 1.5 kilometre sonra Velimeşe Bozdoğan Petrol & D-110 Kavşağı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\n14. Adım: 7.5 kilometre sonra Çorlu Çevre Yolu Otogar Kavşağı durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\n15. Adım (Hedef Son Durak): 2 kilometre sonra hedef Çorlu Otogar durağına gidin; tüm yolcuları indirin ve görevi başarıyla tamamlayın.",
+        "speechBriefing": "TEKULAŞ 48 No'lu Velimeşe Çorlu seferi. Kalkış: Velimeşe TOKİ Konutları. Hedef son durak: Çorlu Otogar. Toplam 15 durak ve 19 kilometre.",
+        "color": "#10b981",
+        "otobusKapasitesi": 40,
+        "biletFiyat": 45,
+        "biletFiyatMultiplier": 1.8,
+        "isDistrict": true,
+        "terrain": "asfalt",
+        "stops": [
+                {
+                        "name": "Velimeşe TOKİ Konutları",
+                        "anons": "Velimeşe TOKİ Konutları kalkış peronundayız. 48 No'lu Çorlu seferimiz başlıyor.",
+                        "bekleyenYolcu": 25,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 0.8,
+                        "lat": 41.256,
+                        "lon": 27.905
+                },
+                {
+                        "name": "Velimeşe M. Kemal Atatürk Stadyumu (Velimeşespor)",
+                        "anons": "Sonraki durak: Velimeşe Mustafa Kemal Atatürk Stadyumu ve Ergene Velimeşespor Tesisleri.",
+                        "bekleyenYolcu": 4,
+                        "inenYolcu": 1,
+                        "gercekMesafeSonraki": 0.7,
+                        "lat": 41.257,
+                        "lon": 27.902
+                },
+                {
+                        "name": "Velimeşe Aile Sağlığı Merkezi",
+                        "anons": "Sonraki durak: Velimeşe Aile Sağlığı Merkezi, Sağlık Ocağı.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 0.5,
+                        "lat": 41.2535,
+                        "lon": 27.9005
+                },
+                {
+                        "name": "Velimeşe Merkez Meydan",
+                        "anons": "Sonraki durak: Velimeşe Merkez Meydan, Atatürk Heykeli.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 0.4,
+                        "lat": 41.253,
+                        "lon": 27.899
+                },
+                {
+                        "name": "Velimeşe Muhtarlık & Ek Hizmet Binası",
+                        "anons": "Sonraki durak: Velimeşe Muhtarlık ve Belediye Ek Hizmet Binası.",
+                        "bekleyenYolcu": 3,
+                        "inenYolcu": 1,
+                        "gercekMesafeSonraki": 0.4,
+                        "lat": 41.2525,
+                        "lon": 27.898
+                },
+                {
+                        "name": "Velimeşe Mustafa Kemal Atatürk Caddesi",
+                        "anons": "Sonraki durak: Velimeşe Mustafa Kemal Atatürk Caddesi Çarşı Durağı.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 0.6,
+                        "lat": 41.2515,
+                        "lon": 27.8965
+                },
+                {
+                        "name": "Velimeşe İlkokulu & Ortaokulu",
+                        "anons": "Sonraki durak: Velimeşe İlkokulu ve Ortaokulu.",
+                        "bekleyenYolcu": 4,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 0.7,
+                        "lat": 41.254,
+                        "lon": 27.897
+                },
+                {
+                        "name": "Velimeşe İstasyon & Tren Garı",
+                        "anons": "Sonraki durak: Velimeşe İstasyon ve TCDD Tren Garı.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 0.5,
+                        "lat": 41.248,
+                        "lon": 27.893
+                },
+                {
+                        "name": "Velimeşe - 1 Durağı",
+                        "anons": "Sonraki durak: Velimeşe - 1 Durağı (Durak Kodu 1058).",
+                        "bekleyenYolcu": 10,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 0.8,
+                        "lat": 41.2505,
+                        "lon": 27.894
+                },
+                {
+                        "name": "Velimeşe Sanayi Caddesi",
+                        "anons": "Sonraki durak: Velimeşe Sanayi Caddesi.",
+                        "bekleyenYolcu": 4,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 0.9,
+                        "lat": 41.249,
+                        "lon": 27.892
+                },
+                {
+                        "name": "Velimeşe Mezarlığı",
+                        "anons": "Sonraki durak: Velimeşe Mezarlığı.",
+                        "bekleyenYolcu": 2,
+                        "inenYolcu": 1,
+                        "gercekMesafeSonraki": 1.2,
+                        "lat": 41.2465,
+                        "lon": 27.889
+                },
+                {
+                        "name": "Velimeşe Girişi (Sanayi Bağlantısı)",
+                        "anons": "Sonraki durak: Velimeşe Girişi, Organize Sanayi Bağlantısı.",
+                        "bekleyenYolcu": 3,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 1.5,
+                        "lat": 41.245,
+                        "lon": 27.885
+                },
+                {
+                        "name": "Velimeşe Bozdoğan Petrol & D-110 Kavşağı",
+                        "anons": "Sonraki durak: Velimeşe Bozdoğan Petrol ve D-110 Kavşağı.",
+                        "bekleyenYolcu": 2,
+                        "inenYolcu": 1,
+                        "gercekMesafeSonraki": 7.5,
+                        "lat": 41.242,
+                        "lon": 27.88
+                },
+                {
+                        "name": "Çorlu Çevre Yolu Otogar Kavşağı",
+                        "anons": "Sonraki durak: Çorlu Çevre Yolu Otogar Kavşağı.",
+                        "bekleyenYolcu": 4,
+                        "inenYolcu": 8,
+                        "gercekMesafeSonraki": 2,
+                        "lat": 41.155,
+                        "lon": 27.78
+                },
+                {
+                        "name": "Çorlu Otogar",
+                        "anons": "Son durak: Çorlu Otogar. 48 No'lu Velimeşe Çorlu seferimiz tamamlanmıştır. Tüm yolcularımızın inmesi rica olunur.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 38,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 41.16,
+                        "lon": 27.8
+                }
+        ]
+},
         {
             id: "hat_corlu_ekspres",
             hatNo: "Çorlu",
