@@ -1552,35 +1552,64 @@ const Game = {
     },
 
     spawnAndMoveNPCs: function(deltaTime) {
-        let spawnChance = 0.005; // Daha dengeli bir trafik
+        let spawnChance = 0.007; // Dengeli, akıcı şehir ve otoyol trafiği
         
-        // Sadece 1 araç olsun ki kafa karışıklığı olmasın ve Hızımız 20'nin üzerindeyse yeni araç doğsun
-        if (this.speed >= 20 && this.activeNPCs.length === 0 && Math.random() < spawnChance) {
-            // Araçlar artık çapraz geçmeyecek, belirli bir şeritte üstümüze gelecek!
-            const lanes = [20, 50, 80]; // Sol şerit, Orta şerit, Sağ şerit
-            let startX = lanes[Math.floor(Math.random() * lanes.length)];
-            
-            // Başlangıç pan değeri şeride göre (-1, 0, 1)
-            let initialPan = (startX - 50) / 30;
+        // Yolda aynı anda sadece 1 aktif NPC olsun ki ses kargaşası ve kafa karışıklığı olmasın.
+        // Hızımız 15'in üzerindeyse yeni araç doğabilir.
+        if (this.speed >= 15 && this.activeNPCs.length === 0 && Math.random() < spawnChance) {
+            const roll = Math.random();
+            let npcType = 'oncoming';
+            let startX = 22; // Sol şerit (Karşı yön)
+            let startY = 650;
+            let baseSpeed = 50 + Math.random() * 30; // 50-80 km/h
+
+            if (roll < 0.72) {
+                // 1. %72 İHTİMALLE: Normal Karşı Şerit Trafiği (Sol şerit: x = 20-25)
+                // Oyuncu kendi şeridinde sürdüğü sürece güvenle solundan akar, kaza riski olmaz!
+                npcType = 'oncoming';
+                startX = 20 + Math.random() * 5;
+                startY = 650;
+                baseSpeed = 50 + Math.random() * 30;
+            } else if (roll < 0.86) {
+                // 2. %14 İHTİMALLE: Önümüzde Aynı Yönde Giden Araç (Bizden daha yavaş: 35-55 km/h)
+                // Hızlıysak arkadan yaklaşırız, sollayabilir veya korna çalabiliriz!
+                npcType = 'ahead';
+                startX = 55 + Math.random() * 18; // Orta/Sağ şerit
+                startY = 420;
+                baseSpeed = 35 + Math.random() * 20;
+            } else if (roll < 0.94) {
+                // 3. %8 İHTİMALLE: Bizi Sollayan Hızlı Araç (Arkamızdan sollayıp öne geçer)
+                npcType = 'overtaking';
+                startX = 28 + Math.random() * 5;
+                startY = -350; // Arkamızda doğar
+                baseSpeed = this.speed + 35 + Math.random() * 25;
+            } else {
+                // 4. %6 İHTİMALLE: Hatalı Sollama Yapan Karşı Araç (Orta şeride taşmış!)
+                // Korna çalar ve sesli asistan uyarır, sağa kaçılırsa kaza önlenir!
+                npcType = 'hazard';
+                startX = 46 + Math.random() * 8;
+                startY = 680;
+                baseSpeed = 55 + Math.random() * 25;
+            }
+
+            // Başlangıç pan değeri mesafeye göre dar bir açıyla başlar
+            let dx = startX - this.lanePosition;
+            let initialAngle = Math.min(1.0, 50 / (Math.abs(startY) * 0.4 + 30));
+            let initialPan = (dx / 30) * initialAngle;
+            initialPan = Math.max(-1, Math.min(1, initialPan));
+
             let audioObj = audio.playNPCSound(initialPan);
             if (audioObj) {
                 this.activeNPCs.push({
+                    type: npcType,
                     x: startX,
-                    y: 600, // Çarpışmaya tepki süresini artırmak için 200'den 600'e çıkarıldı
-                    baseSpeed: 40 + Math.random() * 40, // NPC'nin kendi hızı (40-80 arası)
-                    speedX: 0, // Araçlar şerit değiştirmez, dümdüz gelir
+                    y: startY,
+                    baseSpeed: baseSpeed,
                     audioObj: audioObj,
-                    hasCollided: false
+                    hasCollided: false,
+                    warned: false,
+                    horned: false
                 });
-
-                // EĞER AYNI ŞERİTTE DOĞDUYSA ERKEN UYARI VER
-                if (Math.abs(startX - this.lanePosition) < 20) {
-                    const currentTime = performance.now();
-                    if (!this.lastCollisionWarnTime || currentTime - this.lastCollisionWarnTime > 5000) {
-                        this.lastCollisionWarnTime = currentTime;
-                        if (typeof audio.speak === 'function') audio.speak("Dikkat, önünüzde araç var!");
-                    }
-                }
             }
         }
 
@@ -1598,39 +1627,79 @@ const Game = {
                 }
                 npc.y -= this.speed * deltaTime * 1.5;
             } else {
-                // Bize doğru yaklaşma (Kendi hızı + bizim hızımız)
-                // Karşıdan gelen trafik gibi düşünülüyor. Biz dursak bile onlar hareket eder.
-                npc.y -= (this.speed + npc.baseSpeed) * deltaTime * 1.5;
-            }
-            
-            // X ekseninde hareket YOK (speedX = 0). Araçlar hep kendi şeridinde kalır.
-            
-            // MÜKEMMEL STEREO VE YAKLAÅMA HİSSİ (Howler.js Spatial Audio)
-            if (npc.audioObj && npc.audioObj.howlObj) {
-                let apparentX = npc.x;
-                if (this.roadCurvature) {
-                    let curveOffset = (this.roadCurvature || 0) * (Math.min(600, Math.max(0, npc.y)) / 600) * 0.25;
-                    apparentX -= curveOffset;
+                // Trafik türüne göre göreceli hız hareketi
+                if (npc.type === 'oncoming' || npc.type === 'hazard') {
+                    // Karşıdan bize doğru yaklaşır (Kendi hızı + bizim hızımız)
+                    npc.y -= (this.speed + npc.baseSpeed) * deltaTime * 1.5;
+                } else if (npc.type === 'ahead') {
+                    // Önümüzde aynı yönde gider. Biz hızlıysak yaklaşırız, yavaşsak uzaklaşır
+                    npc.y -= (this.speed - npc.baseSpeed) * deltaTime * 1.5;
+                } else if (npc.type === 'overtaking') {
+                    // Arkamızdan gelip bizi sollar (Öne doğru ilerler)
+                    npc.y += (npc.baseSpeed - this.speed) * deltaTime * 1.5;
                 }
-                let currentPan = (apparentX - this.lanePosition) / 30;
-                currentPan = Math.max(-1, Math.min(1, currentPan));
-                npc.audioObj.howlObj.stereo(currentPan, npc.audioObj.soundId);
-                
-                let dist = Math.abs(npc.y);
-                let vol = 1 - (dist / 600);
-                vol = Math.max(0, Math.min(1, vol));
-                npc.audioObj.howlObj.volume(vol, npc.audioObj.soundId);
             }
 
-            // Çarpışma (ÖLÜM VE HASAR MEKANİÄİ) - ÇEKİCİDEYKEN KAZA YAPILMAZ (0 HATA)
-            if (!npc.hasCollided && npc.y <= 10 && npc.y > -10) {
-                // Hız 20'nin altındaysa veya çekici otopilotundaysak çarpışma olmaz, teğet geçer
-                if (!this.isBeingTowed && this.speed >= 20 && Math.abs(npc.x - this.lanePosition) < 20) {
+            // --- TEHLİKE VE ERKEN SESLİ UYARILAR ---
+            if (!npc.hasCollided) {
+                // Hatalı sollama yapan tehlikeli araç uyarısı
+                if (npc.type === 'hazard' && npc.y < 350 && npc.y > 100 && !npc.warned) {
+                    npc.warned = true;
+                    if (audio.playNPCHorn) audio.playNPCHorn((npc.x - this.lanePosition) / 30);
+                    if (typeof audio.speak === 'function') {
+                        audio.speak("Dikkat! Karşıdan hatalı sollama yapan araç geliyor, sağ şeride yanaşın!");
+                    }
+                }
+                // Önümüzde yavaş seyreden araç uyarısı
+                if (npc.type === 'ahead' && npc.y < 120 && npc.y > 40 && !npc.warned && Math.abs(npc.x - this.lanePosition) < 22) {
+                    npc.warned = true;
+                    if (typeof audio.speak === 'function') {
+                        audio.speak("Önünüzde yavaş seyreden araç var, sollayabilirsiniz.");
+                    }
+                }
+            }
+
+            // --- MÜKEMMEL 3D SPATIAL AUDIO & DOPPLER FORMÜLÜ ---
+            let apparentX = npc.x;
+            if (this.roadCurvature) {
+                let curveOffset = (this.roadCurvature || 0) * (Math.min(600, Math.max(0, Math.abs(npc.y))) / 600) * 0.25;
+                apparentX -= curveOffset;
+            }
+
+            // 1. Dinamik Stereo Panning (Mesafe açısına göre kademeli açılır!)
+            let dx = apparentX - this.lanePosition;
+            let angleSpread = Math.min(1.0, 50 / (Math.abs(npc.y) * 0.4 + 25));
+            let currentPan = (dx / 30) * angleSpread;
+            currentPan = Math.max(-1, Math.min(1, currentPan));
+
+            // 2. Kademeli Ses Seviyesi (Uzaklaşırken YAVAŞ YAVAŞ sönümlenir, asla pat diye kesilmez!)
+            let vol = 0;
+            if (npc.y >= 0) {
+                // Önümüzde: 650m'den 0m'ye yaklaşırken 0'dan 1'e çıkar
+                vol = 1 - (npc.y / 650);
+            } else {
+                // Arkamızda: 0m'den -500m'ye uzaklaşırken 1'den 0'a yavaş yavaş iner
+                vol = 1 - (Math.abs(npc.y) / 500);
+            }
+            vol = Math.max(0, Math.min(1, vol));
+
+            // 3. Doppler Pitch Kayması: Yaklaşırken motor daha tiz, yanımızdan geçip uzaklaşırken daha tok
+            let dopplerRate = (npc.y >= 0) ? (1.04 + Math.min(0.08, this.speed / 200)) : (0.92 - Math.min(0.06, this.speed / 200));
+
+            if (npc.audioObj && npc.audioObj.howlObj) {
+                npc.audioObj.howlObj.stereo(currentPan, npc.audioObj.soundId);
+                npc.audioObj.howlObj.volume(vol, npc.audioObj.soundId);
+                npc.audioObj.howlObj.rate(dopplerRate, npc.audioObj.soundId);
+            }
+
+            // Çarpışma (ÖLÜM VE HASAR MEKANİÄžİ) - ÇEKİCİDEYKEN KAZA YAPILMAZ (0 HATA)
+            if (!npc.hasCollided && Math.abs(npc.y) <= 12) {
+                // Hız 15'in altındaysa veya çekici otopilotundaysak çarpışma olmaz, teğet geçer
+                if (!this.isBeingTowed && this.speed >= 15 && Math.abs(npc.x - this.lanePosition) < 20) {
                     npc.hasCollided = true;
                     
-                    // FİZİKSEL ÇARPIÅMA TEPKİSİ: NPC'yi kenara fırlat ve durdur (Ghosting engelleme)
+                    // FİZİKSEL ÇARPIŞMA TEPKİSİ: NPC'yi kenara fırlat ve durdur (Ghosting engelleme)
                     npc.baseSpeed = 0;
-                    // Eğer otobüs sağdaysa NPC sola savrulur, soldaysa sağa savrulur
                     npc.slideX = (this.lanePosition > 50) ? -80 : 80;
                     npc.slideY = this.speed * 1.5;
                     if (typeof audio !== 'undefined' && typeof audio.playTireScreech === 'function') {
@@ -1638,7 +1707,7 @@ const Game = {
                         setTimeout(() => audio.stopTireScreech(), 1500);
                     }
                     
-                    // Åiddete (Hızımıza) göre rastgele hasar hesaplama
+                    // Şiddete (Hızımıza) göre rastgele hasar hesaplama
                     let damageAmount = 0;
                     if (this.speed <= 40) {
                         damageAmount = Math.floor(Math.random() * 7) + 2; 
@@ -1652,7 +1721,7 @@ const Game = {
                     this.busDamage.health -= damageAmount;
                     this.busDamage.health = Math.max(0, this.busDamage.health);
                     
-                    // Åeride göre bölgesel hasar ve uyarılar
+                    // Şeride göre bölgesel hasar ve uyarılar
                     if (npc.x === 20) {
                         let outcome = this.calculateCrashOutcome(damageAmount);
                         if (outcome === 2) {
@@ -1662,7 +1731,7 @@ const Game = {
                             this.busDamage.leftWindow = Math.max(this.busDamage.leftWindow, 50);
                             audio.speak("Sol cama çarptık! Sol cam çatladı, yüzde elli hasarlı.");
                         } else {
-                            audio.speak("Sol taraftan çarptık! Åanslıyız, cam kırılmadı.");
+                            audio.speak("Sol taraftan çarptık! Şanslıyız, cam kırılmadı.");
                         }
                     } else if (npc.x === 80) {
                         let outcome = this.calculateCrashOutcome(damageAmount);
@@ -1673,13 +1742,12 @@ const Game = {
                             this.busDamage.rightWindow = Math.max(this.busDamage.rightWindow, 50);
                             audio.speak("Sağ cama çarptık! Sağ cam çatladı, yüzde elli hasarlı.");
                         } else {
-                            audio.speak("Sağ taraftan çarptık! Åanslıyız, cam kırılmadı.");
+                            audio.speak("Sağ taraftan çarptık! Şanslıyız, cam kırılmadı.");
                         }
                     } else {
                         audio.speak(`Önden çarpıştık! Kaporta hasar aldı!`);
                         this.busDamage.front = Math.min(100, this.busDamage.front + damageAmount);
                         
-                        // Önden çarpmalarda farlar
                         let hlOutcome = this.calculateCrashOutcome(damageAmount);
                         if (hlOutcome === 2) {
                             this.busDamage.headlights = 100;
@@ -1693,12 +1761,11 @@ const Game = {
                             setTimeout(() => audio.speak("Ön farlar yüzde elli hasar aldı, bağlantıları gevşedi."), 1500);
                         }
                         
-                        // Önden çarpmalarda silecekler
                         let wpOutcome = this.calculateCrashOutcome(damageAmount);
                         if (wpOutcome === 2) {
                             this.busDamage.wipers = 100;
                             if (typeof audio.isWiperOn !== 'undefined' && audio.isWiperOn) {
-                                if (typeof audio.toggleWipers === 'function') audio.toggleWipers(); // Silecekleri zorla kapat
+                                if (typeof audio.toggleWipers === 'function') audio.toggleWipers();
                             }
                             setTimeout(() => audio.speak("Silecek motoru tamamen kırıldı, yüzde yüz hasarlı! Cam temizlenemeyecek!"), 3000);
                         } else if (wpOutcome === 1) {
@@ -1713,9 +1780,7 @@ const Game = {
                         setTimeout(() => audio.speak("Kritik Uyarı! Aracın sağlığı yüzde yirmi beşin altına düştü. Hasar kritik seviyede!"), 2500);
                     }
                     
-                    // Akustiği güncelle (Bölgesel bozulma)
                     audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
-                    
                     this.speed = 0;
                     audio.playCrash();
                     
@@ -1727,8 +1792,8 @@ const Game = {
                 }
             } 
             
-            // Araç arkamızda uzaklaştığında sil
-            if (npc.y < -40) {
+            // Araç arkamızda tamamen uzaklaşıp sesi sönümlendiğinde (veya önde çok uzaklaştığında) sil
+            if (npc.y < -520 || npc.y > 850 || (Math.abs(npc.y) > 150 && vol <= 0.01)) {
                 if (npc.audioObj) npc.audioObj.stop();
                 this.activeNPCs.splice(i, 1);
             }
@@ -2249,10 +2314,23 @@ const Game = {
             }
             if (!this.isDriving) this.checkAutoDepart();
         }
-        if (k === 'l') {
+        if (k === 'l' || k === 'h' || k === 'k') {
             e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.playHorn === 'function') {
                 audio.playHorn();
+            }
+            // Öndeki aracı uyar (korna çalınca öndeki yavaş araç sağa kaçar veya hızlanır)
+            if (this.activeNPCs && this.activeNPCs.length > 0) {
+                this.activeNPCs.forEach(npc => {
+                    if (!npc.hasCollided && npc.type === 'ahead' && npc.y > 0 && npc.y < 180) {
+                        npc.baseSpeed += 20; // Hızlanır
+                        npc.x = 82; // Sağa emniyet şeridine yanaşır
+                        if (!npc.horned && audio.playNPCHorn) {
+                            npc.horned = true;
+                            setTimeout(() => audio.playNPCHorn((npc.x - this.lanePosition) / 30), 400);
+                        }
+                    }
+                });
             }
         }
         if (k === 'pageup') {
