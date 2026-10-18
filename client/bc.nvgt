@@ -1,4 +1,4 @@
-﻿#include "bgt_compat.nvgt"
+#include "bgt_compat.nvgt"
 #include "bc_compat.nvgt"
 double gversion=6.6;
 const string ver="6.6";
@@ -6,7 +6,7 @@ const string ver="6.6";
 
 #include "includes.nvgt"
 speedboat lan;
-string initial_map="map:comeÃ§o\r\nmaxx:51\r\nmaxy:10\r\nplatform:0:50:0:carpet\r\nwall:0:0:100:wallgeneric\r\nwall:51:0:100:wallgeneric\r\nzone:0:50:0:100:Carregando jogo...\r\nsafezone:0:100:0:100";
+string initial_map="map:começo\r\nmaxx:51\r\nmaxy:10\r\nplatform:0:50:0:carpet\r\nwall:0:0:100:wallgeneric\r\nwall:51:0:100:wallgeneric\r\nzone:0:50:0:100:Carregando jogo...\r\nsafezone:0:100:0:100";
 string bonus="map:barco\r\n"+
 "maxx:17\r\n"+
 "maxy:10\r\n"+
@@ -277,7 +277,7 @@ string mapname;
 int jumping, pulou=0;
 string un, pw;
 file pf;
-string prefsdir=DIRECTORY_APPDATA+"\\Mega DimensÃ£o\\DM";
+string prefsdir=DIRECTORY_APPDATA+"\\Mega Dimensão\\DM";
 vector me(1, 0), tracker(-1,-1),camera,max;
 sound_pool p;
 sound_pool p2;
@@ -376,7 +376,7 @@ sons.insert_last("kick1.ogg:45");
 sons.insert_last("kick2.ogg:46");
 sons.insert_last("kick3.ogg:47");
 sons.insert_last("kick4.ogg:48");
-sons.insert_last("lanÃ§ahit.ogg:49");
+sons.insert_last("lançahit.ogg:49");
 sons.insert_last("espada_curtahit.ogg:50");
 sons.insert_last("sub_laserhit.ogg:51");
 sons.insert_last("molotovatinge.ogg:52");
@@ -405,13 +405,13 @@ gladiadores.insert_last("Crixus:6001:7000:500000:Crixus is the finest gladiator 
 gladiadores.insert_last("Tetraites:7001:8000:600000:Tetraites was originally discovered through graffiti found in Pompeii in 1817, depicting his courageous victory over Prudes.  Fighting in the murmillo style, he used a short sword, a large rectangular shield, a helmet, arm guards and greaves.  The full extent of Tetraites' fame was only understood in the late twentieth century, when pottery was found in places as distant as France and England bearing illustrations of the gladiator's victories.:Commander");
 gladiadores.insert_last("Prisco:7001:8000:650000:The battle between Priscus and Verus in the first century AD was the first gladiator combat held in the famous Flavian Amphitheatre, the Colosseum of Rome.  After a fierce battle that dragged on for hours, the two gladiators yielded to one another at the same moment, lowering their swords in mutual respect.  The crowd, enthralled by the fight, roared its approval, and the Emperor Titus awarded them both the rudis, a small wooden sword given to gladiators upon their retirement.  Priscus and Verus left the arena as free men.:Convict of Disgrace");
 gladiadores.insert_last("Spiculus:10000:12000:700000:Spiculus had a specially close relationship with the emperor Nero.  After countless victories by Spiculus, Nero granted him palaces, slaves and riches beyond imagination.  When Nero was deposed in 68 AD, he asked his aides to find Spiculus, because he wished to die at the hands of the famous gladiator.  But Spiculus could not be found, and so Nero was forced to take his own life.:Unreliable Madman");
-gladiadores.insert_last("Marco AtÃ­lio:10000:12000:750000:Although he was a Roman citizen by birth, Atilius chose to enter the gladiator school in an attempt to clear the heavy debts he had run up during his life.  In his first battle he defeated Hilarus, a gladiator belonging to Nero who had already won thirteen times in a row.  In another bout, Atilius defeated Raecius Felix, who had won twelve battles in a row.  The deeds of Atilius were recorded in mosaics and graffiti discovered in 2007.:Unreliable Madman");
+gladiadores.insert_last("Marco Atílio:10000:12000:750000:Although he was a Roman citizen by birth, Atilius chose to enter the gladiator school in an attempt to clear the heavy debts he had run up during his life.  In his first battle he defeated Hilarus, a gladiator belonging to Nero who had already won thirteen times in a row.  In another bout, Atilius defeated Raecius Felix, who had won twelve battles in a row.  The deeds of Atilius were recorded in mosaics and graffiti discovered in 2007.:Unreliable Madman");
 gladiadores.insert_last("Carpoforo:12001:16000:850000:While the other gladiators on this list are known for their hand-to-hand combat against other human beings, Carpophorus was a famous bestiarius.  These gladiators fought exclusively against wild animals and, as a result, had very short careers.  Fighting in the early days of the Flavian Amphitheatre, Carpophorus became famous for defeating a bear, a lion and a leopard in the same battle.  In another bout that same day, he killed a rhinoceros with a spear.  In all, it is said that he killed twenty wild animals in a single day, leading fans and fellow fighters alike to compare Carpophorus to the mythological Hercules.:Zombie");
 gladiadores.insert_last("Flamma:12001:16000:900000:Flamma, a Syrian slave, died at the age of thirty, after fighting thirty-four times and winning twenty-one of those bouts. Nine battles ended in a draw, and he was defeated only four times. Most remarkable of all is that Flamma was awarded the rudis four times. When the rudis was given to a gladiator, he was freed and could live normally among Roman citizens. Flamma, however, refused his freedom, choosing to keep fighting in the arena.:Zombie");
 gladiadores.insert_last("Spartacus:16001:20000:950000:Lentulus Batiatus of Capua must have recognized his potential, because he bought Spartacus with the intention of turning him into a gladiator.  But the fierce independence of a warrior is not easily tamed.  In 73 BC, Spartacus persuaded seventy of his fellow gladiators, Crixus among them, to rebel against their master.  In the revolt Batiatus was killed and the gladiators fled to the slopes of nearby Mount Vesuvius.  Betrayed, Spartacus is sold to the Romans as a slave and bought by a gladiator school.  But fate had greater plans for the Thracian soldier - he would become the leader of the greatest revolution of antiquity, and his name would remain forever engraved in history.  As they fled, the group gathered free men and many other slaves as well, thus becoming a large and powerful army.  The gladiators spent the winter of 72 BC training the newly freed slaves in preparation for what is now known as the Third Servile War, their ranks swelling to as many as 70,000 people.  Entire legions were sent to kill Spartacus, but they were easily defeated by the fighting spirit and experience of the gladiators.  In 71 BC, Marcus Licinius Crassus assembled 50,000 well-trained Roman soldiers to hunt down and defeat Spartacus.  Crassus cornered Spartacus in southern Italy, defeating his forces and killing the former slave (Spartacus' body, however, was never found).  Six thousand of Spartacus' followers were captured and crucified along the Appian Way, the road from Capua to Rome.:Monster");
 if(string_contains(COMMAND_LINE, "portable", 1)>-1) portable=true;
 if(!portable){
-if (!directory_exists(DIRECTORY_APPDATA+"\\Mega DimensÃ£o")){
+if (!directory_exists(DIRECTORY_APPDATA+"\\Mega Dimensão")){
 bool d=directory_create(prefsdir);
 }
 if(!directory_exists(prefsdir+"\\DM"))directory_create(prefsdir+"\\DM");
@@ -433,14 +433,14 @@ net.setup_client(4, 150);
 idiomaschat.insert_last("Disable chat=Desativado");
 idiomaschat.insert_last("Arabic=ar");
 idiomaschat.insert_last("English=en");
-idiomaschat.insert_last("Türkçe=tr");
-idiomaschat.insert_last("EspaÃ±ol=es");
+idiomaschat.insert_last("T�rk�e=tr");
+idiomaschat.insert_last("Español=es");
 idiomaschat.insert_last("French=fr");
 idiomaschat.insert_last("Persian=pl");
 idiomaschat.insert_last("Portuguese=pt");
 invcat.insert_last("Tudo");
 invcat.insert_last("Armas");
-invcat.insert_last("MuniÃ§Ãµes");
+invcat.insert_last("Munições");
 invcat.insert_last("Explosivos");
 invcat.insert_last("Roupas");
 invcat.insert_last("Comidas e bebidas");
@@ -490,7 +490,7 @@ create_add("tudo");
 create_add("chats");
 create_add("chat_local");
 create_add("pm");
-create_add("administraciÃ³n");
+create_add("administración");
 create_add("variado");
 create_add("player");
 create_add("Auction");
@@ -903,17 +903,17 @@ message_text_mensag=string_replace(message_text_mensag, parsed[0]+" ", "", true)
 message_text_mensag=string_replace(message_text_mensag, "diz:", pu.get_value("diz:")+" ", false);
 message_text_mensag=string_replace(message_text_mensag, "ADM", pu.get_value("adm"), false);
 string m=message_text_mensag;
-add_add_item("administraciÃ³n", m);
+add_add_item("administración", m);
 }
-else if(parsed[0]=="saÃºdenomÃ¡ximo"){
+else if(parsed[0]=="saúdenomáximo"){
 string m=pu.get_value("Your health are full");
 add_add_item("variado", m);
 }
-else if(parsed[0]=="nÃ£oestÃ¡vestindo"){
+else if(parsed[0]=="nãoestávestindo"){
 string m=pu.get_value("You aren't wearing this		");
 add_add_item("variado", m);
 }
-else if(parsed[0]=="noleilÃ£o"){
+else if(parsed[0]=="noleilão"){
 string m=pu.get_value("At the auction:")+" "+pu.get_value(parsed[1])+", "+pu.get_value("quantidade")+" "+parsed[2]+", "+pu.get_value("valendo")+" "+parsed[3]+" coins.";
 add_add_item("Auction", m);
 }
@@ -925,7 +925,7 @@ else if(parsed[0]=="msgnextbid"){
 string m=pu.get_value("The next offer must be")+" "+parsed[1]+" coins.";
 add_add_item("Auction", m);
 }
-else if(parsed[0]=="msgvocÃªenterra"){
+else if(parsed[0]=="msgvocêenterra"){
 string m=pu.get_value("You bury")+" "+pu.get_value(parsed[1])+". "+pu.get_value("Great job!");
 add_add_item("variado", m);
 }
@@ -974,7 +974,7 @@ a=string_replace(a, "This blow made a horrible hole in your shin.", pu.get_value
 string m=a;
 add_add_item("variado", m);
 }
-else if(parsed[0]=="msgpaje") add_add_item("variado", pu.get_value("PajÃ©: I need")+" "+pu.get_value(parsed[1])+".");
+else if(parsed[0]=="msgpaje") add_add_item("variado", pu.get_value("Pajé: I need")+" "+pu.get_value(parsed[1])+".");
 else if(parsed[0]=="msgnotwearing") add_add_item("variado", pu.get_value("You aren't wearing this		"));
 else if(parsed[0]=="msglinha"){
 string m;
@@ -1233,7 +1233,7 @@ else if(parsed[0]=="msgmagnetiniciado"){
 string m=pu.get_value("Your magnetic item was started.");
 add_add_item("variado", m);
 }
-else if(parsed[0]=="msgninguÃ©mcomesteitem"){
+else if(parsed[0]=="msgninguémcomesteitem"){
 string m=pu.get_value("No one with this item!");
 add_add_item("variado", m);
 }
@@ -1274,7 +1274,7 @@ else if(parsed[0]=="msgalreadywearing"){
 string m=pu.get_value("You already are wearing this.");
 add_add_item("variado", m);
 }
-else if(parsed[0]=="msgvocÃªenterra"){
+else if(parsed[0]=="msgvocêenterra"){
 string m=pu.get_value("You bury the")+" "+parsed[1]+". "+pu.get_value("Great job!")+" "+parsed[2];
 add_add_item("variado", m);
 }
@@ -1350,7 +1350,7 @@ else if(parsed[0]=="msgmultado"){
 string m=pu.get_value("You are surprised by a guard! \"You can't step on the grass\", he says, and hands you a fine of")+" "+parsed[1]+" coins";
 add_add_item("variado", m);
 }
-else if(parsed[0]=="vocÃªganhou"){
+else if(parsed[0]=="vocêganhou"){
 string m=pu.get_value("You won")+" "+parsed[1]+" xp!";
 if(hear_xp) add_add_item("mortes", m);
 }
@@ -1375,7 +1375,7 @@ string message2=string_replace(message_text_mensag,"answers you: ","",true);
 string message3=message2;
 message3=string_replace(message2,parsed[1]+" ","",true);
 message3=string_replace(message3,parsed[0]+" ","",true);
-add_add_item("administraciÃ³n", pu.get_value("Someone replies to you:")+message3);
+add_add_item("administración", pu.get_value("Someone replies to you:")+message3);
 }
 else if(parsed[0]=="volumechuva")
 {
@@ -1833,7 +1833,7 @@ if(tbonus.elapsed>=30000){
 tbonus.force(0);
 tbonus.pause();
 remove_all_bonuses();
-dlgplay("caiu_Ã¡gua.ogg");
+dlgplay("caiu_água.ogg");
 send_reliable(peer_id, "vbonus", 0);
 }
 if(tbonus2.elapsed>=random(500, 800)){
@@ -3092,9 +3092,9 @@ plataformas.insert_last("a17.ogg");
 plataformas.insert_last("a18.ogg");
 plataformas.insert_last("a19.ogg");
 plataformas.insert_last("amb1.ogg");
-plataformas.insert_last("aviÃ£o1.ogg");
-plataformas.insert_last("aviÃ£o2.ogg");
-plataformas.insert_last("aviÃ£o3.ogg");
+plataformas.insert_last("avião1.ogg");
+plataformas.insert_last("avião2.ogg");
+plataformas.insert_last("avião3.ogg");
 plataformas.insert_last("aviaointerno.ogg");
 plataformas.insert_last("aviaoloop.ogg");
 plataformas.insert_last("baixodagua.ogg");
@@ -3137,7 +3137,7 @@ plataformas.insert_last("cassino3.ogg");
 plataformas.insert_last("cassino4.ogg");
 plataformas.insert_last("caverna2.ogg");
 plataformas.insert_last("cemiterio.ogg");
-plataformas.insert_last("cerca_elÃ©trica.ogg");
+plataformas.insert_last("cerca_elétrica.ogg");
 plataformas.insert_last("chuva.ogg");
 plataformas.insert_last("cidade.ogg");
 plataformas.insert_last("cidade1.ogg");
@@ -3635,8 +3635,8 @@ send_reliable(peer_id, "draw descarregar_bazuca.ogg", 0);
 }
 else if(weapon==14&&granada_carregada>0){
 granada_carregada=0;
-p.play_stationary("descarregar_lanÃ§ador_de_granadas.ogg", false);
-send_reliable(peer_id, "draw descarregar_lanÃ§ador_de_granadas.ogg", 0);
+p.play_stationary("descarregar_lançador_de_granadas.ogg", false);
+send_reliable(peer_id, "draw descarregar_lançador_de_granadas.ogg", 0);
 }
 else if(weapon==15&&sniper_carregada>0){
 sniper_carregada=0;
@@ -5982,7 +5982,7 @@ peramitors.insert_last(peramitors2[i]);
 }
 }
 }
-if (category=="MuniÃ§Ãµes")
+if (category=="Munições")
 {
 if(peramitors2[i]=="arrow"||peramitors2[i]=="9mm"||peramitors2[i]=="12mm"||peramitors2[i]=="30mm"||peramitors2[i]=="5.56mm"||peramitors2[i]=="7.62mm"||peramitors2[i]=="laser"||peramitors2[i]=="Missile")
 {
@@ -6017,7 +6017,7 @@ if (string_contains(peramitors2[i],"corpo_de",1)>-1)
 peramitors.insert_last(peramitors2[i]);
 }
 }
-if (category=="PreferÃªncias")
+if (category=="Preferências")
 {
 if(peramitors2[i]=="teleporter"||peramitors2[i]=="Magnetic_item"||string_contains(peramitors2[i], "pacote_", 1)>-1||peramitors2[i]=="parachute"||peramitors2[i]=="bicycle"||peramitors2[i]=="mana"||peramitors2[i]=="time_shield"||peramitors2[i]=="antibiotic"||peramitors2[i]=="rocket"||peramitors2[i]=="fishing_rod"||peramitors2[i]=="earthworm"||peramitors2[i]=="dragonsaurus_egg"||peramitors2[i]=="Character_machine"||peramitors2[i]=="teleportador")peramitors.insert_last(peramitors2[i]);
 }
@@ -7004,6 +7004,8 @@ return message;
 }
 return message;
 }
+
+
 
 
 

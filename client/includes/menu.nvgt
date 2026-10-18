@@ -1204,3 +1204,4 @@ string value=v.input(pu.get_value("How much do you want ?")+" "+pu.get_value(m.g
 send_reliable(peer_id,"/buy123321123 "+value+" "+m.get_item_name(menu_result),1);
 }
 }
+
