@@ -312,8 +312,12 @@ class AudioSystem {
     updateRetarder(speed, isBraking) {
         if (!this.ctx) return;
         const profile = this.activeSoundProfile;
-        if (!profile || !profile.hasRetarder) {
+        // Varsayılan olarak tüm büyük belediye ve şehirlerarası otobüslerinde retarder aktiftir
+        const hasRetarder = !profile || profile.hasRetarder !== false;
+        if (!hasRetarder) {
             if (this.retarderGain) this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
+            const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
+            if (el) el.style.display = 'none';
             return;
         }
 
@@ -322,7 +326,7 @@ class AudioSystem {
             this.retarderOsc.type = 'sawtooth';
             this.retarderFilter = this.ctx.createBiquadFilter();
             this.retarderFilter.type = 'bandpass';
-            this.retarderFilter.Q.value = 3.5;
+            this.retarderFilter.Q.value = 4.2;
             this.retarderGain = this.ctx.createGain();
             this.retarderGain.gain.value = 0.0;
 
@@ -333,15 +337,37 @@ class AudioSystem {
             this.retarderOsc.start();
         }
 
-        if (speed > 25 && isBraking) {
-            const baseF = (profile.retarderPitch || 1.0) * (380 + (speed / 100) * 850);
-            const targetGain = Math.min(0.28, (speed / 70) * 0.28);
-            this.retarderOsc.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.1);
-            this.retarderFilter.frequency.setTargetAtTime(baseF * 1.2, this.ctx.currentTime, 0.1);
-            this.retarderGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.15);
+        const isEngaged = (speed > 20 && isBraking) || (this.isRetarderManuallyEngaged && speed > 15);
+        if (isEngaged) {
+            const pitchFactor = profile && profile.retarderPitch ? profile.retarderPitch : 1.0;
+            const baseF = pitchFactor * (360 + (speed / 90) * 880);
+            const targetGain = Math.min(0.32, (speed / 65) * 0.32);
+            this.retarderOsc.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.08);
+            this.retarderFilter.frequency.setTargetAtTime(baseF * 1.25, this.ctx.currentTime, 0.08);
+            this.retarderGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.12);
+
+            const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
+            if (el) el.style.display = 'inline-block';
         } else {
-            this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.25);
+            this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.22);
+            const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
+            if (el) el.style.display = 'none';
         }
+    }
+
+    playRetarder(duration = 5, speed = 50) {
+        this.init();
+        this.isRetarderManuallyEngaged = true;
+        this.updateRetarder(speed, true);
+    }
+
+    stopRetarder() {
+        this.isRetarderManuallyEngaged = false;
+        if (this.retarderGain && this.ctx) {
+            this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
+        }
+        const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
+        if (el) el.style.display = 'none';
     }
 
     playNav() {
@@ -994,6 +1020,205 @@ class AudioSystem {
         this.sounds.doorClose.play();
     }
 
+    // --- PROFESYONEL AKUSTİK: DURACAK ZİLİ (STOP REQUEST BELL) ---
+    playStopRequestBell() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        
+        // Ana akustik zil tonu (G6: 1568 Hz)
+        const bellOsc1 = this.ctx.createOscillator();
+        const bellGain1 = this.ctx.createGain();
+        bellOsc1.type = 'sine';
+        bellOsc1.frequency.setValueAtTime(1567.98, now);
+        
+        // Üst harmonik zil tınlaması (3136 Hz)
+        const bellOsc2 = this.ctx.createOscillator();
+        const bellGain2 = this.ctx.createGain();
+        bellOsc2.type = 'sine';
+        bellOsc2.frequency.setValueAtTime(3135.96, now);
+        
+        // Metalik gövde rezonansı (2349 Hz)
+        const bellOsc3 = this.ctx.createOscillator();
+        const bellGain3 = this.ctx.createGain();
+        bellOsc3.type = 'triangle';
+        bellOsc3.frequency.setValueAtTime(2349.32, now);
+        
+        // Zarf (Envelope): Çekiç vuruşu ve kristal sönüm
+        bellGain1.gain.setValueAtTime(0.001, now);
+        bellGain1.gain.exponentialRampToValueAtTime(0.48, now + 0.005);
+        bellGain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.75);
+        
+        bellGain2.gain.setValueAtTime(0.001, now);
+        bellGain2.gain.exponentialRampToValueAtTime(0.24, now + 0.004);
+        bellGain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+        
+        bellGain3.gain.setValueAtTime(0.001, now);
+        bellGain3.gain.exponentialRampToValueAtTime(0.14, now + 0.006);
+        bellGain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+        
+        const outDest = this.environmentMixer || this.ctx.destination;
+        bellOsc1.connect(bellGain1);
+        bellGain1.connect(outDest);
+        bellOsc2.connect(bellGain2);
+        bellGain2.connect(outDest);
+        bellOsc3.connect(bellGain3);
+        bellGain3.connect(outDest);
+        
+        bellOsc1.start(now);
+        bellOsc2.start(now);
+        bellOsc3.start(now);
+        bellOsc1.stop(now + 0.8);
+        bellOsc2.stop(now + 0.8);
+        bellOsc3.stop(now + 0.8);
+    }
+
+    // --- PROFESYONEL PNÖMATİK: KNEELING (YANA YATIŞ HAVA TAHLİYESİ) ---
+    playKneelingSound() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const bufferSize = Math.floor(this.ctx.sampleRate * 1.25);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1);
+        }
+        
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(950, now);
+        filter.frequency.exponentialRampToValueAtTime(420, now + 1.15);
+        filter.Q.value = 2.2;
+        
+        const gainNode = this.ctx.createGain();
+        gainNode.gain.setValueAtTime(0.01, now);
+        gainNode.gain.linearRampToValueAtTime(0.38, now + 0.12);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.22);
+        
+        noise.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(this.environmentMixer || this.ctx.destination);
+        
+        noise.start(now);
+        noise.stop(now + 1.25);
+    }
+
+    // --- PNÖMATİK KAPI AÇILMA AKUSTİĞİ ---
+    playPneumaticDoorOpen() {
+        this.init();
+        if (!this.ctx) {
+            this.playDoorOpen();
+            return;
+        }
+        const now = this.ctx.currentTime;
+        const bufferSize = Math.floor(this.ctx.sampleRate * 0.35);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1600, now);
+        filter.Q.value = 1.8;
+        
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.42, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.32);
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.environmentMixer || this.ctx.destination);
+        noise.start(now);
+        
+        try { this.sounds.doorOpen.play(); } catch(e){}
+    }
+
+    // --- PNÖMATİK KAPI KAPANMA & MÜHÜR BASINCI ---
+    playPneumaticDoorClose() {
+        this.init();
+        if (!this.ctx) {
+            this.playDoorClose();
+            return;
+        }
+        try { this.sounds.doorClose.play(); } catch(e){}
+        
+        // 0.35 sn sonra kapı kanatları yuvasına otururken pnömatik kilit sesi
+        setTimeout(() => {
+            if (!this.ctx) return;
+            const t = this.ctx.currentTime;
+            const bufferSize = Math.floor(this.ctx.sampleRate * 0.28);
+            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(2200, t);
+            const gain = this.ctx.createGain();
+            gain.gain.setValueAtTime(0.35, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.26);
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.environmentMixer || this.ctx.destination);
+            noise.start(t);
+        }, 340);
+    }
+
+    // --- RESMÎ TELSİZ AKUSTİĞİ: SQUELCH BURST (DİJİTAL MANDAL SESİ) ---
+    playRadioSquelch(isOpening = true) {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const dur = isOpening ? 0.08 : 0.06;
+        const bufferSize = Math.floor(this.ctx.sampleRate * dur);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * 0.8;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(isOpening ? 2800 : 1800, now);
+        filter.Q.value = 4.0;
+        
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
+    // --- RESMÎ DİSPEÇER TELSİZİ: ANONS & ANLIK TRAFİK YAYINI ---
+    playDispatchRadio(messageText = null) {
+        this.playRadioSquelch(true);
+        setTimeout(() => {
+            if (messageText && typeof this.speak === 'function') {
+                this.speak(messageText, () => {
+                    setTimeout(() => this.playRadioSquelch(false), 90);
+                });
+            } else {
+                setTimeout(() => this.playRadioSquelch(false), 220);
+            }
+        }, 100);
+    }
+
     playCrash() {
         this.sounds.crash.play();
     }
@@ -1293,53 +1518,94 @@ class AudioSystem {
         this.sounds.turnTick.play();
     }
 
-    playAkbil(type = 'tam') {
+    // --- RESMÎ TEKİRDAĞ KART / KENTKART VALİDATÖR SESLERİ ---
+    playValidatorSound(type = 'tam') {
         this.init();
-        const osc = this.ctx.createOscillator();
-        const gainNode = this.ctx.createGain();
-        osc.connect(gainNode);
-        gainNode.connect(this.ctx.destination);
-        
-        osc.type = 'sine';
+        if (!this.ctx) return;
         const now = this.ctx.currentTime;
-        
+        const outDest = this.ctx.destination;
+
         if (type === 'ogrenci') {
-            // İki kısa dıt (Öğrenci)
-            osc.frequency.setValueAtTime(1200, now);
-            gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.setValueAtTime(0.5, now + 0.01);
-            gainNode.gain.setValueAtTime(0, now + 0.1);
-            
-            gainNode.gain.setValueAtTime(0.5, now + 0.15);
-            gainNode.gain.setValueAtTime(0, now + 0.25);
-            osc.start(now);
-            osc.stop(now + 0.3);
-        } else if (type === 'yasli') {
-            // Üç kısa dıt (Serbest)
-            osc.frequency.setValueAtTime(1400, now);
-            gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.setValueAtTime(0.5, now + 0.01);
-            gainNode.gain.setValueAtTime(0, now + 0.08);
-            
-            gainNode.gain.setValueAtTime(0.5, now + 0.12);
-            gainNode.gain.setValueAtTime(0, now + 0.19);
-            
-            gainNode.gain.setValueAtTime(0.5, now + 0.23);
-            gainNode.gain.setValueAtTime(0, now + 0.30);
-            osc.start(now);
-            osc.stop(now + 0.35);
+            // Çift tiz bip (1250 Hz) - 60ms bip, 35ms sessizlik, 60ms bip
+            for (let i = 0; i < 2; i++) {
+                const startTime = now + (i * 0.095);
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1250, startTime);
+                
+                gain.gain.setValueAtTime(0.001, startTime);
+                gain.gain.linearRampToValueAtTime(0.45, startTime + 0.006);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.065);
+                
+                osc.connect(gain);
+                gain.connect(outDest);
+                osc.start(startTime);
+                osc.stop(startTime + 0.07);
+            }
+        } else if (type === 'yasli' || type === 'serbest') {
+            // Üç tonlu melodik arpej (880 Hz -> 1175 Hz -> 1760 Hz)
+            const freqs = [880, 1174.66, 1760];
+            freqs.forEach((freq, idx) => {
+                const startTime = now + (idx * 0.065);
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, startTime);
+                
+                gain.gain.setValueAtTime(0.001, startTime);
+                gain.gain.linearRampToValueAtTime(0.4, startTime + 0.005);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + (idx === 2 ? 0.12 : 0.055));
+                
+                osc.connect(gain);
+                gain.connect(outDest);
+                osc.start(startTime);
+                osc.stop(startTime + (idx === 2 ? 0.13 : 0.06));
+            });
+        } else if (type === 'yetersiz' || type === 'ret') {
+            // İki kalın ve sert ret tonu (280 Hz testere dalgası)
+            for (let i = 0; i < 2; i++) {
+                const startTime = now + (i * 0.16);
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const filter = this.ctx.createBiquadFilter();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(280, startTime);
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(650, startTime);
+                
+                gain.gain.setValueAtTime(0.001, startTime);
+                gain.gain.linearRampToValueAtTime(0.35, startTime + 0.008);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.12);
+                
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(outDest);
+                osc.start(startTime);
+                osc.stop(startTime + 0.13);
+            }
         } else {
-            // Tek dıt (Tam bilet)
-            osc.frequency.setValueAtTime(1000, now);
-            gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.setValueAtTime(0.5, now + 0.01);
-            gainNode.gain.setValueAtTime(0, now + 0.2);
+            // Standart Tam Bilet: Net, tok 1050 Hz sinüs sinyali
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1050, now);
+            
+            gain.gain.setValueAtTime(0.001, now);
+            gain.gain.linearRampToValueAtTime(0.45, now + 0.006);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+            
+            osc.connect(gain);
+            gain.connect(outDest);
             osc.start(now);
-            osc.stop(now + 0.25);
+            osc.stop(now + 0.15);
         }
     }
 
-    
+    playAkbil(type = 'tam') {
+        this.playValidatorSound(type);
+    }
+
     cleanSpeechText(text) {
         if (!text) return "";
         return String(text)

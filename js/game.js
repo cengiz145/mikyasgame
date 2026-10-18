@@ -69,6 +69,52 @@ const Game = {
     obstacles: [],
     
     // --- Keys State ---
+    // --- Cockpit Simulation & Telematics ---
+    stopRequestBellTriggered: false,
+    passengerComfort: 100,
+    lastRecordedSpeed: 0,
+    lastHarshBrakeWarningTime: 0,
+    radioBroadcastIndex: 0,
+
+    getComfortStatus: function() {
+        const c = Math.round(this.passengerComfort);
+        if (c >= 90) return "Mükemmel";
+        if (c >= 75) return "Çok İyi";
+        if (c >= 60) return "Normal";
+        if (c >= 45) return "Sarsıntılı";
+        return "Kritik Derecede Konforsuz";
+    },
+
+    handleRadioDispatch: function() {
+        const route = this.activeRouteData;
+        const routeName = route ? route.name : "Şehir İçi Sefer";
+        
+        const dispatchMessages = [
+            `TEKULAŞ Hareket Merkezi: ${routeName} kaptanı, sefer saatlerinize ve durak bekleme sürelerine riayet ediniz. Güzergah genelinde yol durumu akıcıdır.`,
+            `Hareket Kontrol: Tüm araçların dikkatine, Değirmenaltı ve Çorlu yönündeki kavşaklarda kontrollü geçiş yapınız. İyi nöbetler.`,
+            `Merkezden Hat 26 ve çevre hatlara: Takip mesafesini koruyunuz. Araç içi telemetri ve yolcu konfor verileriniz sisteme işlenmektedir.`,
+            `Hareket Merkezi: Süleymanpaşa sahil ve çarşı güzergahında sinyalizasyon akışı normaldir. Durak yanaşma nizamını muhafaza ediniz.`,
+            `Dispeçer: Kaptan, aracınızın hava basıncı ve fren sistemini periyodik kontrol ediniz. Hayırlı seferler dileriz.`
+        ];
+        
+        const idx = this.radioBroadcastIndex % dispatchMessages.length;
+        this.radioBroadcastIndex++;
+        const message = dispatchMessages[idx];
+        
+        if (typeof audio !== 'undefined' && typeof audio.playDispatchRadio === 'function') {
+            audio.playDispatchRadio(message);
+        } else if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+            audio.speak(message);
+        }
+        
+        const navEl = document.getElementById('nav-feedback');
+        if (navEl) navEl.innerText = "📻 TELSİZ: " + message;
+        if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+            audio.updateNvdaLiveRegion("Telsiz Anonsu: " + message);
+        }
+    },
+
+    // --- Keys State ---
     keys: { w: false, s: false, a: false, d: false, arrowup: false, arrowdown: false, arrowleft: false, arrowright: false },
 
     // --- Session Stats ---
@@ -272,6 +318,17 @@ const Game = {
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
         this.activeRouteData = routesData[routeId];
+        this.passengerComfort = 100;
+        this.stopRequestBellTriggered = false;
+        this.lastRecordedSpeed = 0;
+        this.lastHarshBrakeWarningTime = 0;
+        const bellHudInit = document.getElementById('hud-stop-request');
+        if (bellHudInit) bellHudInit.style.display = 'none';
+        const comfortElInit = document.getElementById('hud-comfort-val');
+        if (comfortElInit) {
+            comfortElInit.innerText = '%100';
+            comfortElInit.style.color = '#4ade80';
+        }
         if (this.activeRouteData && (this.activeRouteData.isVelimeseLocked || this.activeRouteData.district === 'Velimeşe')) {
             this.isVelimeseLocked = true;
         }
@@ -318,12 +375,12 @@ const Game = {
                 '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Nasıl Yapılacak? (Ayrıntılı Görev ve Sürüş Yönergesi):</div>',
                 '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px;">',
                 '    <li style="margin-bottom: 6px;"><strong>Kalkış ve Hızlanma:</strong> <code>W</code> veya <code>Yukarı Ok</code> tuşuna basarak gaz verin ve kalkış yapın. Şeridinizi korumak için <code>A / D</code> veya <code>Sol / Sağ Ok</code> tuşlarını kullanın.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Durağa Yaklaşma ve Durma:</strong> Durağa yaklaşırken mesafe uyarısını dinleyin. <code>S</code> veya <code>Aşağı Ok</code> ile fren yaparak hızınızı 20 km/s altına indirin ve durak hizasında tamamen durun.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Yolcuları Alma ve İndirme:</strong> Araç tam durduğunda <code>E</code> (Ön Kapı) ve <code>Q</code> (Arka Kapı) tuşlarıyla kapıları açın. Yolcuların biniş ve kart basma seslerini dinleyin.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Kapıları Kapatma ve İlerleme:</strong> Tüm yolcular tamamlandığında kapıları aynı tuşlarla kapatın. Gaz vererek sonraki durağa ilerleyin.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Görevi Başarıyla Bitirme:</strong> Sırasıyla tüm duraklara uğrayıp son durak olan <strong>' + endStop + '</strong> durağına vardığınızda görevi tamamlamış olacaksınız!</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Durağa Yaklaşma ve Duracak Zili:</strong> Durağa 220 metre kala inecek yolcu varsa akustik <code>DURACAK</code> zili çalar ve kokpitte kırmızı ikaz lambası yanar. Kademeli fren ve retarder ile sarsıntısız durun.</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Kneeling ve Kapılar:</strong> Araç durduğunda <code>E</code> (Ön Kapı) ve <code>Q</code> (Arka Kapı) ile kapıları açın. Araç durağa yana yatar (Kneeling). Yolcular Tekirdağ Kart basarken resmî validatör sinyallerini dinleyin.</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Kaptan Telsizi ve Konfor Takibi:</strong> <code>T</code> tuşuna basarak TEKULAŞ Hareket Merkezi telsiz anonsunu dinleyin. <code>C</code> tuşuyla anlık Yolcu Konfor Endeksinizi kontrol edin.</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Görevi Başarıyla Bitirme:</strong> Sırasıyla tüm duraklara uğrayıp son durak olan <strong>' + endStop + '</strong> durağına vardığınızda görevi tamamlayıp prim kazanın!</li>',
                 '</ul>',
-                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 İpucu: Sürüş esnasında istediğiniz an <strong>G</strong> tuşuna basarak güncel görev hedefinizi, sıradaki durağı ve kalan mesafeyi sesli olarak dinleyebilirsiniz.</div>'
+                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Profesyonel Kısayollar: <strong>G</strong> Görev özeti, <strong>T</strong> Resmî dispeçer telsizi, <strong>C</strong> Yolcu konfor endeksi, <strong>R</strong> Hız göstergesi, <strong>Shift+T</strong> Saat/Termometre.</div>'
             ].join("");
         }
 
@@ -464,6 +521,9 @@ const Game = {
 
     planNextStop: function(isResume = false) {
         this.stopApproachAnnounced = false;
+        this.stopRequestBellTriggered = false;
+        const bellHudPlan = document.getElementById('hud-stop-request');
+        if (bellHudPlan) bellHudPlan.style.display = 'none';
         if (this.currentStopIndex >= this.activeRouteData.stops.length) {
             this.finishRoute(true);
             return;
@@ -1268,6 +1328,27 @@ const Game = {
 
         if (this.speed > 0) {
             // GERÇEKÇİ OYUN ÖLÇEÄİ: 1 gerçek kilometre = Oyun içinde 250 metre sürüş süresi (4 kat hızlı)
+            // PROFESYONEL AKUSTİK: DURACAK ZİLİ VE KOKPİT İKAZ LAMBASI (220m kala)
+            if (this.currentDistanceToNext <= 220 && !this.stopRequestBellTriggered && this.speed > 8) {
+                const isFinalStop = this.activeRouteData && this.activeRouteData.stops && (this.currentStopIndex === this.activeRouteData.stops.length - 1);
+                const remainingStops = this.activeRouteData && this.activeRouteData.stops ? Math.max(1, this.activeRouteData.stops.length - this.currentStopIndex - 1) : 1;
+                const alighting = isFinalStop ? this.passengersOnBoard : Math.min(this.passengersOnBoard, Math.max(1, Math.round(this.passengersOnBoard / (remainingStops + 1))));
+                
+                if (alighting > 0 || (this.passengersOnBoard > 0 && this.currentStopIndex > 0)) {
+                    this.stopRequestBellTriggered = true;
+                    if (typeof audio !== 'undefined' && typeof audio.playStopRequestBell === 'function') {
+                        audio.playStopRequestBell();
+                    }
+                    
+                    const lamp = document.getElementById('hud-stop-request');
+                    if (lamp) lamp.style.display = 'inline-block';
+                    
+                    const bellMsg = "Duracak zili çaldı. Gelecek durakta inecek yolcu var.";
+                    if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(bellMsg);
+                    if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(bellMsg);
+                }
+            }
+
             if (this.currentDistanceToNext <= 120 && !this.stopApproachAnnounced && this.speed > 5) {
                 audio.speak("Durağa yaklaşıyorsunuz");
                 this.stopApproachAnnounced = true;
@@ -1318,6 +1399,36 @@ const Game = {
                 document.getElementById('hud-eta').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             }
         }
+
+        // YOLCU KONFOR ENDEKSİ (PCI) VE TELEMETRİK G-KUVVETİ TAKİBİ
+        if (this.isDriving && deltaTime > 0) {
+            const decel = (this.lastRecordedSpeed - this.speed) / deltaTime;
+            if (decel > 25 && this.speed > 25) {
+                const penalty = Math.min(8, Math.round((decel - 20) * 0.4));
+                this.passengerComfort = Math.max(15, this.passengerComfort - penalty);
+                
+                const now = performance.now();
+                if (!this.lastHarshBrakeWarningTime || now - this.lastHarshBrakeWarningTime > 4500) {
+                    this.lastHarshBrakeWarningTime = now;
+                    if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+                        audio.speak("Kaptan biraz yavaş lütfen, savrulduk!");
+                    }
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast(`Sert Fren! Konfor Düştü: %${Math.round(this.passengerComfort)}`, 'warning');
+                    }
+                }
+            } else if (this.speed < 20 && this.isBrakeKeyDown && decel > 0 && decel < 12) {
+                this.passengerComfort = Math.min(100, this.passengerComfort + (deltaTime * 0.8));
+            }
+            
+            const comfortEl = document.getElementById('hud-comfort-val');
+            if (comfortEl) {
+                const cVal = Math.round(this.passengerComfort);
+                comfortEl.innerText = `%${cVal}`;
+                comfortEl.style.color = cVal >= 80 ? '#4ade80' : (cVal >= 50 ? '#facc15' : '#ef4444');
+            }
+        }
+        this.lastRecordedSpeed = this.speed;
             
         // Arkadan Çarpma (Rear-end collision) Mantığı
         if (this.speed > 50 && this.acceleration < -100) {
@@ -1844,6 +1955,9 @@ const Game = {
 
         this.roadCurvature = 0;
         this.passengersOnBoard -= alighting;
+        this.stopRequestBellTriggered = false;
+        const bellHudArrive = document.getElementById('hud-stop-request');
+        if (bellHudArrive) bellHudArrive.style.display = 'none';
 
         this.isDriving = false;
         if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
@@ -1943,7 +2057,14 @@ const Game = {
         const btn = document.getElementById('btn-front-door');
         
         if (this.frontDoorOpen) {
-            audio.playDoorOpen();
+            if (typeof audio !== 'undefined' && typeof audio.playKneelingSound === 'function') audio.playKneelingSound();
+            if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorOpen === 'function') audio.playPneumaticDoorOpen();
+            else audio.playDoorOpen();
+            const kneelingHud = document.getElementById('hud-kneeling');
+            if (kneelingHud) kneelingHud.style.display = 'inline-block';
+            this.stopRequestBellTriggered = false;
+            const bellHudFront = document.getElementById('hud-stop-request');
+            if (bellHudFront) bellHudFront.style.display = 'none';
             btn.innerText = "Ön Kapıyı Kapat";
             
             // YOLCU TEPKİSİ: Kapı açıldığında nezaket
@@ -2015,8 +2136,11 @@ const Game = {
             }
         } else {
             // Kapıyı Kapat
-            audio.playDoorClose();
+            if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorClose === 'function') audio.playPneumaticDoorClose();
+            else audio.playDoorClose();
             btn.innerText = "Ön Kapıyı Aç";
+            const kneelingHudClose = document.getElementById('hud-kneeling');
+            if (kneelingHudClose) kneelingHudClose.style.display = 'none';
             if (this.boardingTimer) {
                 clearInterval(this.boardingTimer);
                 this.boardingTimer = null;
@@ -2039,13 +2163,15 @@ const Game = {
         const btn = document.getElementById('btn-rear-door');
         
         if (this.rearDoorOpen) {
-            audio.playDoorOpen();
+            if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorOpen === 'function') audio.playPneumaticDoorOpen();
+            else audio.playDoorOpen();
             btn.innerText = "Arka Kapıyı Kapat";
             if (!this.isDriving) {
                 document.getElementById('stop-alighting-count').innerText = "0";
             }
         } else {
-            audio.playDoorClose();
+            if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorClose === 'function') audio.playPneumaticDoorClose();
+            else audio.playDoorClose();
             btn.innerText = "Arka Kapıyı Aç";
             if (!this.isDriving) this.checkAutoDepart();
         }
@@ -2076,7 +2202,11 @@ const Game = {
         }
         this.passengersOnBoard++;
         
-        audio.playAkbil(pType);
+        if (typeof audio !== 'undefined' && typeof audio.playValidatorSound === 'function') {
+            audio.playValidatorSound(pType);
+        } else {
+            audio.playAkbil(pType);
+        }
         
         let label = pType === "tam" ? "Tam" : (pType === "ogrenci" ? "Öğrenci" : "Serbest");
         document.getElementById('passenger-feedback').innerText = `${label} basıldı. ${fare > 0 ? fare + ' â‚º alındı.' : 'Ücretsiz geçiş.'}`;
@@ -2108,7 +2238,19 @@ const Game = {
         this.activeNPCs = [];
         
         if (isSuccess) {
-            audio.speak("Tebrikler. Görev başarıyla tamamlandı. Bir sonraki göreve geçmek için sonraki üzerine tıklayın veya geri dönüp oyundan çıkmak için ana menü düğmesine basın.");
+            let comfortBonus = 0;
+            let comfortMsg = "";
+            if (this.passengerComfort >= 80) {
+                comfortBonus = Math.round(this.passengerComfort * 1.5);
+                this.addMoney(comfortBonus);
+                this.addXP(40);
+                comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira ve 40 tecrübe puanı kazandınız.`;
+            }
+            
+            const resComfort = document.getElementById('res-comfort');
+            if (resComfort) resComfort.innerText = `%${Math.round(this.passengerComfort)} (${this.getComfortStatus()})`;
+
+            audio.speak("Tebrikler. Görev başarıyla tamamlandı." + comfortMsg + " Bir sonraki göreve geçmek için sonraki üzerine tıklayın veya geri dönüp oyundan çıkmak için ana menü düğmesine basın.");
             
             if (this.activeRouteData && this.activeRouteData.isIntercity) {
                 this.unlockCity(this.activeRouteData.destCity);
@@ -2180,9 +2322,27 @@ const Game = {
             return;
         }
 
+        if (k === 'c') {
+            e.preventDefault();
+            const status = this.getComfortStatus();
+            const msg = `Yolcu Konfor Endeksi: Yüzde ${Math.round(this.passengerComfort)}. Sürüş kalitesi ${status}.`;
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, 'info');
+            return;
+        }
+
         if (k === 't') {
-            const msg = `Dış sıcaklık ${this.temperature} derece, otobüs içi ${Math.floor(this.busTemperature)} derece. ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
-            if (typeof audio.speak === 'function') audio.speak(msg);
+            e.preventDefault();
+            if (e.shiftKey) {
+                let hh = Math.floor(this.clockMinutes / 60);
+                let mm = Math.floor(this.clockMinutes % 60);
+                let timeStr = `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
+                let durum = this.weather === 'sunny' ? (this.isNight ? 'Açık' : 'Güneşli') : (this.weather === 'rainy' ? 'Yağmurlu' : 'Karlı');
+                const msg = `Saat ${timeStr}. Dış sıcaklık ${this.temperature} derece, otobüs içi ${Math.floor(this.busTemperature)} derece. Hava durumu: ${durum}. ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
+                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
+                return;
+            }
+            this.handleRadioDispatch();
             return;
         }
 
