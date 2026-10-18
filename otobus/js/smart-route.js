@@ -29,8 +29,14 @@ const AkilliRotaSistemi = {
         const sNorm = this.normalizeText(stopName);
         const qNorm = this.normalizeText(query);
         const qWords = qNorm.split(' ').filter(w => w.length > 1);
-        // Hat 226 & 26 Saray Alias Desteği
-        if (qNorm.includes("226") || qNorm.includes("saray")) {
+        // Hat 26 Saray & Hat 80 İptal Yönlendirmesi
+        if (qNorm.includes("80") || qNorm.includes("seksen")) {
+            // Hat 80 kaldırıldı, Hat 26'ya yönlendirilir
+            if (sNorm.includes("saray") || sNorm.includes("suleymanpasa") || sNorm.includes("cerkezkoy")) {
+                return true;
+            }
+        }
+        if (qNorm.includes("26") || qNorm.includes("saray") || qNorm.includes("226")) {
             if (sNorm.includes("saray") || sNorm.includes("cerkezkoy") || sNorm.includes("kapakli") || sNorm.includes("suleymanpasa")) {
                 return true;
             }
