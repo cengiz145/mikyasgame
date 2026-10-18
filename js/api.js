@@ -83,80 +83,141 @@ async function fetchStopsFromOverpass(queryStr) {
 
 // Generate 30 Progressive Routes (3 Licenses x 10 Tasks) from raw API stops
 function generateRoutesFromAPI(rawStops, cityName) {
-    let filtered = rawStops.filter(d => d.name !== "Ä°simsiz Durak");
+    let filtered = rawStops.filter(d => d.name !== "İsimsiz Durak");
     
-    if (filtered.length < 3) {
+    if (filtered.length < 2) {
         return false;
     }
     
     filtered.sort(() => 0.5 - Math.random());
     
-        const buildRoute = (id, name, desc, taskIndex, licenseLvl, stopCount, color, isReturn, prevRouteStops, isTraining) => {
-            let selected = [];
-            
-            if (isReturn && prevRouteStops) {
-                // DÃ¶nÃ¼ÅŸ rotasÄ±ysa, bir Ã¶nceki gidiÅŸ rotasÄ±nÄ±n duraklarÄ±nÄ± tam tersine Ã§evir
-                selected = prevRouteStops.slice().reverse().map(s => ({
-                    lat: s.lat, lon: s.lon, name: s.name
-                }));
-            } else {
-                // GidiÅŸ rotasÄ±ysa normal Ã¼ret
-                // Her yeni gidiÅŸ rotasÄ±nda duraklarÄ± karÄ±ÅŸtÄ±r ki farklÄ± baÅŸlangÄ±Ã§ ve bitiÅŸler olsun
-                const shuffledFiltered = [...filtered].sort(() => 0.5 - Math.random());
-                // Åehirdeki toplam durak sayÄ±sÄ±nÄ± geÃ§meyecek ÅŸekilde sÄ±nÄ±rÄ± belirle (A->B->A dÃ¶ngÃ¼sÃ¼nÃ¼ engeller)
-                const limit = Math.min(stopCount, shuffledFiltered.length);
-                for (let i = 0; i < limit; i++) {
-                    selected.push(shuffledFiltered[i]);
-                }
+    const buildRoute = (id, taskIndex, licenseLvl, taskNum, stopCount, color, isReturn, prevRouteStops, isTraining) => {
+        let selected = [];
+        
+        if (isReturn && prevRouteStops && prevRouteStops.length >= 2) {
+            selected = prevRouteStops.slice().reverse().map(s => ({
+                lat: s.lat, lon: s.lon, name: s.name
+            }));
+        } else {
+            const shuffledFiltered = [...filtered].sort(() => 0.5 - Math.random());
+            const limit = Math.max(2, Math.min(stopCount, shuffledFiltered.length));
+            for (let i = 0; i < limit; i++) {
+                selected.push(shuffledFiltered[i]);
             }
-            
-            let kumulatifMesafe = 0;
-            const processedStops = [];
-            
-            for (let i = 0; i < selected.length; i++) {
-                let mesafe = 0;
-                if (i < selected.length - 1) {
-                    let gercek = calculateDistance(selected[i].lat, selected[i].lon, selected[i+1].lat, selected[i+1].lon);
-                    if (gercek === 0) gercek = 1.5; 
-                    mesafe = Math.max(1.0, Math.min(4.0, gercek * 2)); 
-                }
+        }
 
-                const currentKm = kumulatifMesafe;
-                const scaledSonrakiMesafe = mesafe / 2; 
-                kumulatifMesafe += scaledSonrakiMesafe;
-                
-                const yolcuTipleri = ["Sivil", "Ã–ÄŸrenci", "KarÄ±ÅŸÄ±k", "YaÅŸlÄ±"];
-                const tip = yolcuTipleri[Math.floor(Math.random() * yolcuTipleri.length)];
-                
-                // Antrenman moduysa yolcu beklemesin
-                const bekleyen = isTraining ? 0 : Math.floor(Math.random() * 40) + 10;
-                
-                const yollar = ["Asfalt Cadde", "Mahalle SokaÄŸÄ±", "Toprak Yol", "Kumlu Yol", "Ã‡imenli Yol", "Sahil Åeridi Yolu", "Ã‡akÄ±llÄ± Yol"];
-                const rastgeleYol = yollar[Math.floor(Math.random() * yollar.length)];
-                
-                // KavÅŸak olma ihtimali %30
-                const kavsakMevcut = Math.random() < 0.3;
-                
-                processedStops.push({
-                    name: selected[i].name,
-                    lat: selected[i].lat,
-                    lon: selected[i].lon,
-                    routeKm: currentKm,
-                    bekleyenYolcu: bekleyen,
-                    gercekMesafeSonraki: scaledSonrakiMesafe,
-                    yolcuTipi: tip,
-                    yolTipi: rastgeleYol,
-                    kavsakVar: kavsakMevcut
-                });
+        while (selected.length < 2) {
+            selected.push({
+                name: cityName + " Merkez Durak " + (selected.length + 1),
+                lat: 40.0 + Math.random() * 0.05,
+                lon: 27.0 + Math.random() * 0.05
+            });
+        }
+
+        const startStop = selected[0].name;
+        const endStop = selected[selected.length - 1].name;
+        const intermediateStops = selected.slice(1, -1).map(s => s.name);
+        const totalStops = selected.length;
+        const directionLabel = isReturn ? "(Dönüş)" : "(Gidiş)";
+        const licName = licenseLvl === 1 ? "Çırak" : (licenseLvl === 2 ? "Kalfa" : (licenseLvl === 3 ? "Usta" : "İlçeler Arası"));
+        
+        let title = "";
+        if (isTraining) {
+            title = "Görev " + taskNum + " (Eğitim): " + startStop + " ➔ " + endStop;
+        } else if (licenseLvl === 4) {
+            title = "İlçeler Arası Görev " + taskNum + " " + directionLabel + ": " + startStop + " ➔ " + endStop;
+        } else {
+            title = "Görev " + taskNum + " " + directionLabel + ": " + startStop + " ➔ " + endStop;
+        }
+
+        let intermediateSummary = intermediateStops.length > 0 
+            ? "Durulacak ara duraklar: " + intermediateStops.join(", ") + ". " 
+            : "Ara durak yok, doğrudan varış durağına sürüş. ";
+
+        let desc = isTraining 
+            ? "Kalkış: " + startStop + " ➔ Varış: " + endStop + ". Sadece güzergahı öğrenmek için yolcusuz eğitim sürüşüdür. İki durak arası ilerleyin." 
+            : "Kalkış: " + startStop + " ➔ Varış: " + endStop + ". " + intermediateSummary + "Toplam " + totalStops + " durak.";
+
+        let detailedInstructions = [
+            "<strong>Görev Tanımı:</strong> " + title + "<br>",
+            "<strong>Kalkış (Başlangıç) Durağı:</strong> " + startStop + "<br>",
+            "<strong>Uğranacak Ara Duraklar:</strong> " + (intermediateStops.length > 0 ? intermediateStops.join(" ➔ ") : "Ara durak bulunmamaktadır (Doğrudan varış durağına kesintisiz sürüş)") + "<br>",
+            "<strong>Gitmeniz Gereken Son Durak (Hedef):</strong> " + endStop + "<br>",
+            "<strong>Toplam Durak Sayısı:</strong> " + totalStops + " Durak<br>",
+            "<strong>Nasıl Yapılacak? (Sürüş ve Görev Yönergesi):</strong><br>",
+            "1. <strong>Kalkış ve Gaz:</strong> <code>W</code> veya <code>Yukarı Ok</code> tuşuna basarak kalkış yapın ve hızlanın. Şeritte kalmak için <code>A / D</code> tuşlarını kullanın.<br>",
+            "2. <strong>Durağa Yaklaşma ve Yavaşlama:</strong> Durağa 100-50 metre kala sesli mesafe uyarısı duyacaksınız. <code>S</code> veya <code>Aşağı Ok</code> ile fren yaparak hızınızı 20 km/s altına indirin ve durak hizasında tamamen durun.<br>",
+            "3. <strong>Yolcuları Alma ve İndirme:</strong> Durduğunuzda bekleyen yolcuların binmesi için <code>E</code> (veya <code>Page Up</code>) ile ön kapıyı, inen yolcular için <code>Q</code> (veya <code>Page Down</code>) ile arka kapıyı açın.<br>",
+            "4. <strong>Kapıları Kapatıp Devam Etme:</strong> Biniş ve iniş sesleri tamamlandığında aynı tuşlarla kapıları kapatın ve sonraki durağa doğru sürüşe devam edin.<br>",
+            "5. <strong>Görevi Bitirme:</strong> Sırasıyla tüm durakları tamamlayıp son durak olan <strong>" + endStop + "</strong> durağında yolcuları indirdiğinizde görev başarıyla tamamlanacaktır.",
+            (isTraining ? "<br><em>(Not: Bu bir eğitim sürüşüdür, araçta yolcu bulunmaz. Güzergahı ve durma-kalkma kontrolünü öğrenmeniz amaçlanmıştır.)</em>" : "")
+        ].join("");
+
+        let speechBriefing = "Görev " + taskNum + " brifingi. Kalkış durağınız: " + startStop + ". " +
+            (intermediateStops.length > 0 ? "Sırasıyla duracağınız ara duraklar: " + intermediateStops.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
+            "Gitmeniz gereken hedef son durak: " + endStop + ". Bu görevde toplam " + totalStops + " durak bulunmaktadır. " +
+            "Nasıl yapılır: W tuşuyla gaz verin, duraklara yaklaşırken S tuşuyla fren yapıp durun. Durakta durduğunuzda E tuşuyla ön kapıyı, Q tuşuyla arka kapıyı açarak yolcuları alın. Kapıları kapatıp sonraki durağa ilerleyin. İyi yolculuklar kaptan.";
+
+        let kumulatifMesafe = 0;
+        const processedStops = [];
+        
+        for (let i = 0; i < selected.length; i++) {
+            let mesafe = 0;
+            if (i < selected.length - 1) {
+                let gercek = calculateDistance(selected[i].lat, selected[i].lon, selected[i+1].lat, selected[i+1].lon);
+                if (gercek === 0) gercek = 1.5;
+                mesafe = Math.max(1.0, Math.min(4.0, gercek * 2));
             }
+
+            const currentKm = kumulatifMesafe;
+            const scaledSonrakiMesafe = mesafe / 2;
+            kumulatifMesafe += scaledSonrakiMesafe;
+            
+            const yolcuTipleri = ["Sivil", "Öğrenci", "Karışık", "Yaşlı"];
+            const tip = yolcuTipleri[Math.floor(Math.random() * yolcuTipleri.length)];
+            
+            const bekleyen = isTraining ? 0 : Math.floor(Math.random() * 40) + 10;
+            
+            const yollar = ["Asfalt Cadde", "Mahalle Sokağı", "Toprak Yol", "Kumlu Yol", "Çimenli Yol", "Sahil Şeridi Yolu", "Çakıllı Yol"];
+            const rastgeleYol = yollar[Math.floor(Math.random() * yollar.length)];
+            
+            const kavsakMevcut = Math.random() < 0.3;
+            
+            let stopAnons = "";
+            if (i === 0) {
+                stopAnons = selected[0].name + " kalkış durağındayız. İlk durulacak hedef durak: " + (selected[1] ? selected[1].name : endStop) + ".";
+            } else if (i === selected.length - 1) {
+                stopAnons = "Son durak: " + endStop + ". Seferimiz sona ermiştir. Tüm yolcularımızın inmesi rica olunur.";
+            } else {
+                stopAnons = "Sonraki durak: " + selected[i].name + ".";
+            }
+
+            processedStops.push({
+                name: selected[i].name,
+                anons: stopAnons,
+                lat: selected[i].lat,
+                lon: selected[i].lon,
+                routeKm: currentKm,
+                bekleyenYolcu: bekleyen,
+                gercekMesafeSonraki: scaledSonrakiMesafe,
+                yolcuTipi: tip,
+                yolTipi: rastgeleYol,
+                kavsakVar: kavsakMevcut
+            });
+        }
 
         return {
             id: id,
             sehir: cityName,
-            name: name,
+            name: title,
             desc: desc,
+            startStop: startStop,
+            endStop: endStop,
+            intermediateStops: intermediateStops,
+            detailedInstructions: detailedInstructions,
+            speechBriefing: speechBriefing,
             color: color,
-            zemin: "Åehir Ä°Ã§i",
+            zemin: "Şehir İçi",
             otobusKapasitesi: 80,
             taskIndex: taskIndex,
             licenseLevel: licenseLvl,
@@ -168,56 +229,32 @@ function generateRoutesFromAPI(rawStops, cityName) {
     let globalTaskIndex = 0;
     let prevStops = null;
 
-    // 4 Ehliyet Seviyesi, her birinde 10 gÃ¶rev (Toplam 40 gÃ¶rev)
     for (let lic = 1; lic <= 4; lic++) {
         for (let task = 1; task <= 10; task++) {
-            
-            // Durak sayÄ±sÄ±nÄ± hesapla
             let baseStops = lic === 1 ? 4 : (lic === 2 ? 8 : (lic === 3 ? 12 : 15));
             let stopCount = baseStops + (task - 1);
+            let color = "#3b82f6";
+            if (lic === 2) color = "#eab308";
+            if (lic === 3) color = "#ef4444";
+            if (lic === 4) color = "#a855f7";
             
-            // Renk paleti
-            let color = "#3b82f6"; // Ã‡Ä±rak
-            if (lic === 2) color = "#eab308"; // Kalfa
-            if (lic === 3) color = "#ef4444"; // Usta
-            if (lic === 4) color = "#a855f7"; // Ä°lÃ§eler ArasÄ±
-            
-            let licName = lic === 1 ? "Ã‡Ä±rak" : (lic === 2 ? "Kalfa" : (lic === 3 ? "Usta" : "Ä°lÃ§eler ArasÄ±"));
-            
-            // GidiÅŸ mi, DÃ¶nÃ¼ÅŸ mÃ¼? (Ã‡ift index = GidiÅŸ, Tek index = DÃ¶nÃ¼ÅŸ)
             let isReturn = (globalTaskIndex % 2 !== 0);
-            
-            let routeId = `${cityName.toLowerCase()}_task_${globalTaskIndex}`;
-            // EÄŸitim rotasÄ± mÄ±? (1. Seviyenin ilk 3 gÃ¶revi)
+            let routeId = cityName.toLowerCase() + "_task_" + globalTaskIndex;
             let isTraining = (lic === 1 && task <= 3);
-            
-            // Yolcusuz eÄŸitim gÃ¶revlerinde 2 durak yeterli
             if (isTraining) {
                 stopCount = 2;
             }
-            
-            let directionLabel = isReturn ? "(DÃ¶nÃ¼ÅŸ)" : "(GidiÅŸ)";
-            let title = isTraining ? `1. SÄ±nÄ±f Ehliyet - GÃ¶rev ${task} (EÄŸitim SÃ¼rÃ¼ÅŸÃ¼)` : `${lic}. SÄ±nÄ±f Ehliyet - GÃ¶rev ${task} ${directionLabel}`;
-            let desc = isTraining ? `Sadece gÃ¼zergahÄ± Ã¶ÄŸrenmek iÃ§in yolcusuz eÄŸitim sÃ¼rÃ¼ÅŸÃ¼dÃ¼r. Ä°ki durak arasÄ± ilerleyin.` : `${licName} ÅŸofÃ¶rleri iÃ§in ${stopCount} duraklÄ± ${directionLabel.toLowerCase()} rotasÄ±.`;
-            
-            if (lic === 4) {
-                title = `Ä°lÃ§eler ArasÄ± GÃ¶rev ${task} ${directionLabel}`;
-                desc = `Ä°lÃ§eler arasÄ± uzun mesafe seferi. Toplam ${stopCount} durak.`;
-            } else if (task === 10) {
-                desc = `DÄ°KKAT: ${lic}. SÄ±nÄ±f ehliyetin FÄ°NAL gÃ¶revidir!`;
-            }
 
-            let newRoute = buildRoute(routeId, title, desc, globalTaskIndex, lic, stopCount, color, isReturn, prevStops, isTraining);
+            let newRoute = buildRoute(routeId, globalTaskIndex, lic, task, stopCount, color, isReturn, prevStops, isTraining);
             
             if (lic === 4) {
                 newRoute.stops.forEach(stop => {
-                    stop.gercekMesafeSonraki *= (1.5 + Math.random() * 1.5); // Mesafeleri 1.5x - 3x uzat
+                    stop.gercekMesafeSonraki *= (1.5 + Math.random() * 1.5);
                 });
             }
 
             routes.push(newRoute);
             
-            // Sonraki dÃ¶ngÃ¼de dÃ¶nÃ¼ÅŸ rotasÄ± oluÅŸturabilmek iÃ§in gidiÅŸ rotasÄ±nÄ± kaydet
             if (!isReturn) {
                 prevStops = newRoute.stops;
             }
@@ -226,7 +263,6 @@ function generateRoutesFromAPI(rawStops, cityName) {
         }
     }
     
-    // Global routesData objesine kaydet
     routesData = {};
     routes.forEach(r => {
         routesData[r.id] = r;
@@ -234,6 +270,3 @@ function generateRoutesFromAPI(rawStops, cityName) {
 
     return true;
 }
-
-
-
