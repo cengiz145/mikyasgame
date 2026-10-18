@@ -18,10 +18,7 @@ const UI = {
             // EKRAN OKUYUCU DÜZELTMESİ (A11Y):
             // role="application" kullanıldığı için ekran okuyucu başlıkları otomatik okumaz.
             // Bu yüzden yeni ekrana geçildiğinde başlığı manuel olarak anons ediyoruz.
-            const titleEl = activeScreen.querySelector('h1, h2, .subtitle, .main-title');
-            if (titleEl && typeof audio !== 'undefined' && audio.speak) {
-                audio.speak(titleEl.innerText);
-            }
+            // Ekran degisimlerinde konusma kaldirildi (sadece navigasyon sesli)
         }
     },
 
@@ -39,9 +36,7 @@ const UI = {
         
         // EKRAN OKUYUCU DÜZELTMESİ (A11Y):
         // Toast mesajları ekranda sadece görsel çıkıyordu.
-        if (typeof audio !== 'undefined' && audio.speak) {
-            audio.speak(message);
-        }
+        // Toast mesajlarinda sesli anons kaldirildi (sadece navigasyon sesli)
         
         setTimeout(() => {
             toast.style.animation = 'slideOut 0.3s ease forwards';
@@ -218,9 +213,7 @@ const UI = {
             const endStop = route.endStop || (route.stops[route.stops.length - 1] ? route.stops[route.stops.length - 1].name : "Varış");
             const intermediate = route.intermediateStops || (route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
             
-            let ariaDesc = "Görev: " + route.name + ". Kalkış durağı: " + startStop + ". Gitmeniz gereken hedef son durak: " + endStop + ". " +
-                (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
-                "Toplam " + route.stops.length + " durak. Nasıl yapılır: W ile gaz verin, duraklara yaklaşırken S ile durup E ve Q ile kapıları açarak yolcuları alın. Göreve başlamak için Enter tuşuna basın.";
+            let ariaDesc = "Görev: " + route.name + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + route.stops.length + " durak.";
             
             btn.setAttribute("aria-label", ariaDesc);
 

@@ -256,9 +256,7 @@ const Game = {
         this.mode = "driver";
         UI.switchScreen("garage-screen");
 
-        if (typeof audio.speak === "function") {
-            audio.speak(r.name + " brifingi. Kalkış durağınız: " + startStop + ". Gitmeniz gereken son durak: " + endStop + ". Toplam " + r.stops.length + " durak. Ayrıntılı talimatları dinlemek için B tuşuna basabilir, sefere başlamak için motoru çalıştırabilirsiniz.");
-        }
+        // Garaj brifingi otomatik konusmasi kaldirildi (sadece navigasyon sesli)
     },
 
     resumeFromSave: function() {
@@ -388,6 +386,7 @@ const Game = {
     },
 
     planNextStop: function(isResume = false) {
+        this.stopApproachAnnounced = false;
         if (this.currentStopIndex >= this.activeRouteData.stops.length) {
             this.finishRoute(true);
             return;
@@ -501,15 +500,7 @@ const Game = {
                         this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
                     }
 
-                    if (typeof audio.speak === 'function' && document.getElementById('garage-screen').classList.contains('hidden')) {
-                        if (nextStop && nextStop.anons) {
-                            audio.speak(nextStop.anons);
-                        } else if (nextStop && nextStop.name) {
-                            audio.speak("Sonraki durak: " + nextStop.name);
-                        } else {
-                            audio.speak("Rota hazır. İlerleyebilirsiniz.");
-                        }
-                    }
+                    // Cift anons engellendi (anons planNextStop icinde tek noktadan yapilir)
                 });
         } else {
             this.routeBumps = this.savedState && this.savedState.routeBumps ? this.savedState.routeBumps : [];
@@ -591,25 +582,12 @@ const Game = {
         this.hasPoorVisibility = false;
         
         let kalanDurak = this.activeRouteData.stops.length - this.currentStopIndex;
-
-        if (this.currentStopIndex === 0) {
-            const startStop = this.activeRouteData.startStop || (this.activeRouteData.stops[0] ? this.activeRouteData.stops[0].name : "Başlangıç Durağı");
-            const endStop = this.activeRouteData.endStop || (this.activeRouteData.stops[this.activeRouteData.stops.length - 1] ? this.activeRouteData.stops[this.activeRouteData.stops.length - 1].name : "Son Durak");
-            audio.speakSequence([
-                "Sefere başlandı.",
-                "Başlangıç durağınız:", startStop, 
-                "İlk durulacak hedef durak:", nextStop.name,
-                "Gitmeniz gereken son durak:", endStop,
-                "Bu görevde toplam", this.activeRouteData.stops.length.toString(), "durak bulunmaktadır.",
-                "W ile gaz verin, duraklara yaklaşırken S ile fren yapıp durun. Durakta E ve Q ile kapıları açarak yolcuları alın.",
-                "Yol durumu: " + this.currentRoadType + ". Hayırlı yolculuklar kaptan."
-            ]);
+        if (kalanDurak === 1) {
+            audio.speak("Son durak: " + nextStop.name);
+        } else if (this.currentStopIndex === 0) {
+            audio.speak("İlk durak: " + nextStop.name);
         } else {
-            let sequence = ["Bir sonraki durak:", nextStop.name];
-            if (kalanDurak === 1) {
-                sequence.push("Bu, görevin ve seferin son durağıdır.");
-            }
-            audio.speakSequence(sequence);
+            audio.speak("Sonraki durak: " + nextStop.name);
         }
     },
 
@@ -654,11 +632,7 @@ const Game = {
         
         // BUG FIX 4: Gündüz/Gece değişimi anında far uyarısı ve ambiyans değişikliği
         if (wasNight !== this.isNight) {
-            if (this.isNight) {
-                if (typeof audio.speak === 'function') audio.speak("Akşam oldu, lütfen farlarınızı açmayı unutmayın.");
-            } else {
-                if (typeof audio.speak === 'function') audio.speak("Sabah oldu, günaydın kaptan.");
-            }
+            // Zaman degisim konusmasi kaldirildi
         }
         
         // DİNAMİK HAVA DURUMU
@@ -700,18 +674,16 @@ const Game = {
                     audio.stopWeather();
                     if (this.weather === 'snowy') {
                         audio.startWeather('snowy');
-                        audio.speak("Hava bozdu, kar yağışı başladı. Yollar buzlanabilir.");
+                        // Kar anonsu kaldirildi
                     } else if (this.weather === 'rainy') {
                         this.rainIntensity = Math.floor(Math.random() * 3) + 1; // 1 ile 3 arası başlar
                         this.lastRainCheckTime = currentTime;
                         this.nextRainChangeDelay = 20000 + Math.random() * 20000;
                         audio.startWeather('rainy', this.rainIntensity);
                         
-                        if (this.rainIntensity === 1) audio.speak("Hafif bir yağmur çiselemeye başladı.");
-                        else if (this.rainIntensity === 2) audio.speak("Yağmur başladı, yollar kayganlaşabilir.");
-                        else audio.speak("Aniden bastıran şiddetli sağanak yağış başladı!");
+                        // Yagmur anonsu kaldirildi
                     } else {
-                        audio.speak(this.isNight ? "Hava açtı, bulutlar dağıldı." : "Güneş açtı, hava güzelleşiyor.");
+                        // Hava acildi anonsu kaldirildi
                     }
                 }
             }
@@ -738,15 +710,9 @@ const Game = {
                         }
                         
                         if (this.rainIntensity === 1) {
-                            audio.speak("Yağmur iyice hafifledi, sadece çiseliyor.");
+                            // Yagmur dindi anonsu kaldirildi
                         } else if (this.rainIntensity === 2) {
-                            if (oldIntensity < 2) audio.speak("Yağmur hızlandı, yollar ıslanıyor.");
-                            else audio.speak("Yağmurun şiddeti biraz azaldı.");
-                        } else if (this.rainIntensity === 3) {
-                            if (oldIntensity < 3) audio.speak("Åiddetli sağanak yağış başladı, dikkatli sürün.");
-                            else audio.speak("Fırtına dindi fakat sağanak yağış devam ediyor.");
-                        } else if (this.rainIntensity === 4) {
-                            audio.speak("Çok şiddetli fırtına ve sağanak var! Görüş mesafesi sıfır, hızınızı düşürün!");
+                            // Yagmur degisim anonsu kaldirildi
                         }
                     }
                 }
@@ -1293,6 +1259,10 @@ const Game = {
 
         if (this.speed > 0) {
             // GERÇEKÇİ OYUN ÖLÇEÄİ: 1 gerçek kilometre = Oyun içinde 250 metre sürüş süresi (4 kat hızlı)
+            if (this.currentDistanceToNext <= 120 && !this.stopApproachAnnounced && this.speed > 5) {
+                audio.speak("Durağa yaklaşıyorsunuz");
+                this.stopApproachAnnounced = true;
+            }
             const distanceScale = 4;
             const distanceCovered = (this.speed / 3.6) * deltaTime * distanceScale; 
             this.currentDistanceToNext -= distanceCovered;
@@ -1467,7 +1437,7 @@ const Game = {
                         document.getElementById('passenger-dialog').innerText = complaints[Math.floor(Math.random() * complaints.length)];
                         document.getElementById('passenger-feedback').innerText = "Yolcular sıcaktan rahatsız oldu.";
                         document.getElementById('passenger-feedback').style.color = '#ef4444';
-                        if (typeof audio.speak === 'function') audio.speak("Yolcular sıcaktan şikayet ediyor. Lütfen klimayı açın.");
+                        // Sicaklik sikayet konusmasi kaldirildi
                     } else if (this.busTemperature < (22 - comfortRange)) {
                         const complaints = [
                             '"Burası buz gibi oldu, donduracaksın bizi!"',
@@ -1477,7 +1447,7 @@ const Game = {
                         document.getElementById('passenger-dialog').innerText = complaints[Math.floor(Math.random() * complaints.length)];
                         document.getElementById('passenger-feedback').innerText = "Yolcular soğuktan rahatsız oldu.";
                         document.getElementById('passenger-feedback').style.color = '#ef4444';
-                        if (typeof audio.speak === 'function') audio.speak("Yolcular soğuktan şikayet ediyor. Lütfen klimayı açıp 22 dereceye ayarlayın.");
+                        // Sogukluk sikayet konusmasi kaldirildi
                     }
                 }
             } else {
@@ -2138,25 +2108,11 @@ const Game = {
 
         if (k === 'n') {
             e.preventDefault();
-            // Sıradaki durağa kalan mesafe zaten currentDistanceToNext'in kendisidir (geriye sayar)
-            let remDistance = Math.max(0, this.currentDistanceToNext);
-            
-            // Kalan durakların tahmini uzunluklarını ekle (Rota bitimine kadar olan tahmini mesafe)
-            let totalRemaining = remDistance;
-            if (this.activeRouteData && this.activeRouteData.stops) {
-                for (let i = this.currentStopIndex + 1; i < this.activeRouteData.stops.length; i++) {
-                    // Mevcut duraktan bir öncekine kadar olan mesafe gercekMesafeSonraki'de kayıtlıdır
-                    let prevStop = this.activeRouteData.stops[i-1];
-                    if (prevStop && prevStop.gercekMesafeSonraki) {
-                        totalRemaining += prevStop.gercekMesafeSonraki * 1000;
-                    }
-                }
-            }
-            
-            // Toplam rota uzunluğu = Åu ana kadar kat edilen TOPLAM yol + Kalan TOPLAM yol
-            let totalRoute = this.totalDistanceCovered + totalRemaining;
-
-            let msg = `Sıradaki durağa ${Math.floor(remDistance)} metre kaldı. Yolun toplam uzunluğu yaklaşık ${Math.floor(totalRoute / 1000)} kilometre.`;
+            let remDistance = Math.max(0, Math.round(this.currentDistanceToNext));
+            let nextStop = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops[this.currentStopIndex] : null;
+            let kalanDurak = (this.activeRouteData && this.activeRouteData.stops) ? (this.activeRouteData.stops.length - this.currentStopIndex) : 0;
+            let stopName = nextStop ? nextStop.name : "";
+            let msg = (kalanDurak === 1 ? "Son durak: " : "Sıradaki durak: ") + stopName + ", " + remDistance + " metre kaldı.";
             if (typeof audio.speak === 'function') audio.speak(msg);
             return;
         }
