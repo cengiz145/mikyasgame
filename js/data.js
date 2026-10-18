@@ -1840,5 +1840,14 @@ if (typeof window !== 'undefined' && window.tekulasHatVeritabani && Array.isArra
         if (r48 && typeof routesData !== 'undefined') {
             routesData["hat_48_velimese_corlu"] = r48;
         }
+        const r2_7 = ilceRotalari["Tekirdağ"].find(r => r.id === "tekulas_152_2_7");
+        const r2_7_donus = ilceRotalari["Tekirdağ"].find(r => r.id === "tekulas_152_2_7_donus");
+        if (r2_7 && typeof routesData !== 'undefined') {
+            routesData["hat_2_7"] = r2_7;
+            routesData["hat_2_7_gidis"] = r2_7;
+        }
+        if (r2_7_donus && typeof routesData !== 'undefined') {
+            routesData["hat_2_7_donus"] = r2_7_donus;
+        }
     }
 }
