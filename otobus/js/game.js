@@ -75,6 +75,101 @@ const Game = {
     lastRecordedSpeed: 0,
     lastHarshBrakeWarningTime: 0,
     radioBroadcastIndex: 0,
+    isRampDeployed: false,
+    isLuggageOpen: false,
+    hasWheelchairPassengerAtStop: false,
+    hasLostItemFound: false,
+
+    toggleWheelchairRamp: function() {
+        if (this.isDriving && this.speed > 3) {
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Güvenlik: Araç hareket halindeyken rampa açılamaz.");
+            return;
+        }
+        this.isRampDeployed = !this.isRampDeployed;
+        const rampEl = document.getElementById('hud-ramp');
+        if (this.isRampDeployed) {
+            if (typeof audio !== 'undefined' && typeof audio.playRampDeploy === 'function') audio.playRampDeploy();
+            if (rampEl) rampEl.style.display = 'inline-block';
+            this.addXP(30);
+            const msg = "Tekerlekli sandalye rampası açıldı. Yolcu güvenle biniyor: Çok teşekkür ederim kaptanım, iyi görevler. Kapatmak için tekrar U tuşuna basınız.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("♿ Rampa Açıldı (+30 XP)", "info");
+        } else {
+            if (typeof audio !== 'undefined' && typeof audio.playRampRetract === 'function') audio.playRampRetract();
+            if (rampEl) rampEl.style.display = 'none';
+            const msg = "Rampa toplandı ve kilitlendi. Güvenlik kilidi açıldı, yola devam edebilirsiniz.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        }
+    },
+
+    toggleLuggageBays: function() {
+        if (this.isDriving && this.speed > 3) {
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Güvenlik: Araç hareket halindeyken bagaj açılamaz.");
+            return;
+        }
+        this.isLuggageOpen = !this.isLuggageOpen;
+        const lugEl = document.getElementById('hud-luggage');
+        if (this.isLuggageOpen) {
+            if (typeof audio !== 'undefined' && typeof audio.playLuggageBays === 'function') audio.playLuggageBays(true);
+            if (lugEl) lugEl.style.display = 'inline-block';
+            const msg = "Alt bagaj kapakları açıldı. Yolcu valizleri yükleniyor. Kapatmak için tekrar P tuşuna basınız.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        } else {
+            if (typeof audio !== 'undefined' && typeof audio.playLuggageBays === 'function') audio.playLuggageBays(false);
+            if (lugEl) lugEl.style.display = 'none';
+            const msg = "Bagaj kapakları pnömatik olarak kilitlendi. Sefer için hazır.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        }
+    },
+
+    reportIBISStatus: function() {
+        if (typeof audio !== 'undefined' && typeof audio.playIBISChime === 'function') audio.playIBISChime();
+        const r = this.activeRouteData;
+        if (!r) {
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("IBIS: Aktif sefer bulunmuyor.");
+            return;
+        }
+        const start = r.startStop || (r.stops[0] ? r.stops[0].name : "Başlangıç");
+        const end = r.endStop || (r.stops[r.stops.length - 1] ? r.stops[r.stops.length - 1].name : "Son Durak");
+        const lineCode = (r.hatNo || "26").toUpperCase();
+        const msg = `IBIS Hat Bilgisayarı: Hat ${lineCode}. Güzergah: ${start} kalkışlı, ${end} varışlı. Dış LED tabela ve iç yolcu anons ekranı senkronize.`;
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+        if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+    },
+
+    reportScheduleAdherence: function() {
+        if (typeof audio !== 'undefined' && typeof audio.playIBISChime === 'function') audio.playIBISChime();
+        const msg = "Sefer Zamanlaması: Duraklara tam vaktinde ulaşıyorsunuz. Sıfır dakika gecikme, tebrikler kaptan.";
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+        if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+    },
+
+    checkLostAndFound: function() {
+        const isFinalStop = this.activeRouteData && (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
+        if (this.isDriving || !isFinalStop) {
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Kayıp eşya kontrolü son durakta tüm yolcular indikten sonra yapılır.");
+            return;
+        }
+        if (this.hasLostItemFound) {
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Koltuklar zaten kontrol edildi. Tüm eşyalar emanet bürosuna teslim edildi.");
+            return;
+        }
+        this.hasLostItemFound = true;
+        if (typeof audio !== 'undefined' && typeof audio.playLostAndFoundWalk === 'function') {
+            audio.playLostAndFoundWalk(() => {
+                this.addMoney(100);
+                this.addXP(50);
+                const msg = "Arka koltukta unutulan bir çanta bulundu ve TEKULAŞ Emanet Bürosuna teslim edildi! 100 Lira dürüstlük primi kazandınız.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🎒 Kayıp Eşya Bulundu (+100 ₺ / +50 XP)", "success");
+            });
+        }
+    },
 
     getComfortStatus: function() {
         const c = Math.round(this.passengerComfort);
@@ -323,6 +418,21 @@ const Game = {
         this.stopRequestBellTriggered = false;
         this.lastRecordedSpeed = 0;
         this.lastHarshBrakeWarningTime = 0;
+        this.isRampDeployed = false;
+        this.isLuggageOpen = false;
+        this.hasLostItemFound = false;
+        this.hasWheelchairPassengerAtStop = false;
+        const rampHudInit = document.getElementById('hud-ramp');
+        if (rampHudInit) rampHudInit.style.display = 'none';
+        const lugHudInit = document.getElementById('hud-luggage');
+        if (lugHudInit) lugHudInit.style.display = 'none';
+        const ibisTextEl = document.getElementById('hud-ibis-text');
+        if (ibisTextEl && this.activeRouteData) {
+            const hNo = (this.activeRouteData.hatNo || "26").toUpperCase();
+            const sSt = this.activeRouteData.startStop || (this.activeRouteData.stops[0] ? this.activeRouteData.stops[0].name : "MERKEZ");
+            const eSt = this.activeRouteData.endStop || (this.activeRouteData.stops[this.activeRouteData.stops.length - 1] ? this.activeRouteData.stops[this.activeRouteData.stops.length - 1].name : "VARIŞ");
+            ibisTextEl.innerText = `[${hNo}] ${sSt} ➔ ${eSt}`;
+        }
         const bellHudInit = document.getElementById('hud-stop-request');
         if (bellHudInit) bellHudInit.style.display = 'none';
         const comfortElInit = document.getElementById('hud-comfort-val');
@@ -381,7 +491,7 @@ const Game = {
                 '    <li style="margin-bottom: 6px;"><strong>Kaptan Telsizi ve Konfor Takibi:</strong> <code>T</code> tuşuna basarak TEKULAŞ Hareket Merkezi telsiz anonsunu dinleyin. <code>C</code> tuşuyla anlık Yolcu Konfor Endeksinizi kontrol edin.</li>',
                 '    <li style="margin-bottom: 6px;"><strong>Görevi Başarıyla Bitirme:</strong> Sırasıyla tüm duraklara uğrayıp son durak olan <strong>' + endStop + '</strong> durağına vardığınızda görevi tamamlayıp prim kazanın!</li>',
                 '</ul>',
-                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Profesyonel Kısayollar: <strong>G</strong> Görev özeti, <strong>T</strong> Resmî dispeçer telsizi, <strong>C</strong> Yolcu konfor endeksi, <strong>R</strong> Hız göstergesi, <strong>Shift+T</strong> Saat/Termometre.</div>'
+                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>U</strong> Engelli Rampası | <strong>P</strong> Pnömatik Bagaj | <strong>I</strong> IBIS Hat Tabelası | <strong>Z</strong> Zamanlama | <strong>J</strong> Kayıp Eşya | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>R</strong> Hız | <strong>Shift+T</strong> Saat.</div>'
             ].join("");
         }
 
@@ -525,6 +635,11 @@ const Game = {
         this.stopRequestBellTriggered = false;
         const bellHudPlan = document.getElementById('hud-stop-request');
         if (bellHudPlan) bellHudPlan.style.display = 'none';
+        this.isRampDeployed = false;
+        const rampHudPlan = document.getElementById('hud-ramp');
+        if (rampHudPlan) rampHudPlan.style.display = 'none';
+        // Her 3 durakta bir tekerlekli sandalye kullanan erişilebilir yolcu durakta bekler
+        this.hasWheelchairPassengerAtStop = (this.currentStopIndex > 0 && this.currentStopIndex % 3 === 1);
         if (this.currentStopIndex >= this.activeRouteData.stops.length) {
             this.finishRoute(true);
             return;
@@ -1404,6 +1519,19 @@ const Game = {
         }
 
         // YOLCU KONFOR ENDEKSİ (PCI) - EĞİTİM VE HOŞGÖRÜ SİSTEMİ
+        // Rampa açıkken hareket engeli (Güvenlik Kilidi)
+        if (this.isRampDeployed && (this.keys.w || this.keys.arrowup)) {
+            this.speed = 0;
+            this.acceleration = 0;
+            const now = performance.now();
+            if (!this.lastRampWarnTime || now - this.lastRampWarnTime > 5000) {
+                this.lastRampWarnTime = now;
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Rampa açıkken hareket edilemez. U tuşuyla rampayı kapatınız.");
+                }
+            }
+        }
+
         if (this.isDriving && deltaTime > 0) {
             const decel = (this.lastRecordedSpeed - this.speed) / deltaTime;
             // Eğitim aşamasında sert fren yapılsa dahi ceza verilmez; taban %90 altına inmez
@@ -1959,6 +2087,13 @@ const Game = {
         this.stopRequestBellTriggered = false;
         const bellHudArrive = document.getElementById('hud-stop-request');
         if (bellHudArrive) bellHudArrive.style.display = 'none';
+        
+        // Tekerlekli sandalye yolcusu uyarısı
+        if (this.hasWheelchairPassengerAtStop) {
+            const rampNotice = "Durağa yanaştınız. Durakta tekerlekli sandalyeli yolcu bekliyor. Rampayı açmak için U tuşuna basınız.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(rampNotice);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(rampNotice);
+        }
 
         this.isDriving = false;
         if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
@@ -2320,6 +2455,36 @@ const Game = {
             const msg = this.isACOn ? "Klima açıldı. Hedef sıcaklık 22 derece." : "Klima kapatıldı.";
             if (typeof audio.speak === 'function') audio.speak(msg);
             if (typeof UI !== 'undefined') UI.showToast(msg, 'info');
+            return;
+        }
+
+        if (k === 'u') {
+            e.preventDefault();
+            this.toggleWheelchairRamp();
+            return;
+        }
+
+        if (k === 'p') {
+            e.preventDefault();
+            this.toggleLuggageBays();
+            return;
+        }
+
+        if (k === 'i') {
+            e.preventDefault();
+            this.reportIBISStatus();
+            return;
+        }
+
+        if (k === 'z') {
+            e.preventDefault();
+            this.reportScheduleAdherence();
+            return;
+        }
+
+        if (k === 'j') {
+            e.preventDefault();
+            this.checkLostAndFound();
             return;
         }
 
