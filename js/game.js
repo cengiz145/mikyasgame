@@ -386,19 +386,22 @@ const Game = {
         audio.stopWeather(); // Mevcut hava olayını temizle
         this.isNight = (this.clockMinutes < 360 || this.clockMinutes >= 1080); // Gece başlangıcı kontrolü
         
-        const rand = Math.random();
-        if (rand < 0.2) {
-            this.weather = 'snowy';
-            this.temperature = Math.floor(Math.random() * 11) - 10; // -10 ile 0 arası
+        // YÜZDELİK ŞANSLAR KALDIRILDI - MEVSİM VE GÜNÜN SAATİ ASTRONOMİK SICAKLIK FORMÜLÜ
+        const currentMonth = new Date().getMonth(); // 0: Ocak, 9: Ekim vb.
+        if (currentMonth === 11 || currentMonth === 0 || currentMonth === 1) {
+            this.weather = 'snowy'; // Kış ayları (Aralık, Ocak, Şubat)
+            // Kış sıcaklık eğrisi: Gece -6, öğlen 0 derece
+            this.temperature = Math.round(-3 + Math.cos(((this.clockMinutes - 840) / 720) * Math.PI) * 3);
             audio.startWeather('snowy');
-        } else if (rand < 0.5) {
-            this.weather = 'rainy';
-            this.temperature = Math.floor(Math.random() * 11) + 5; // 5 ile 15 arası
-            audio.startWeather('rainy');
+        } else if ((currentMonth >= 2 && currentMonth <= 4) || (currentMonth >= 9 && currentMonth <= 10)) {
+            this.weather = 'rainy'; // İlkbahar ve Sonbahar ayları
+            // Bahar yağmur eğrisi: Gece 8, öğlen 16 derece
+            this.temperature = Math.round(12 + Math.cos(((this.clockMinutes - 840) / 720) * Math.PI) * 4);
+            audio.startWeather('rainy', 2);
         } else {
-            this.weather = 'sunny';
-            this.temperature = Math.floor(Math.random() * 16) + 20; // 20 ile 35 arası
-            // Güneşli havada özel ses yok
+            this.weather = 'sunny'; // Yaz ayları
+            // Yaz güneş eğrisi: Gece 20, öğlen 31 derece
+            this.temperature = Math.round(25 + Math.cos(((this.clockMinutes - 840) / 720) * Math.PI) * 6);
         }
         
         // Klima başlangıç değerleri
@@ -655,25 +658,14 @@ const Game = {
     },
 
     calculateCrashOutcome: function(damageAmount) {
-        let chance = Math.random() * 100;
-        
-        // Çok hafif çarpmalarda genelde kurtarırız
-        if (damageAmount < 20) {
-            if (chance < 80) return 0; // %80 ihtimal hasarsız (Sadece kaporta sesi)
-            return 1; // %20 ihtimal kısmi hasar
+        // YÜZDELİK ŞANSLAR KALDIRILDI - KİNETİK ENERJİ VE HASAR EŞİK FORMÜLÜ
+        // Darbenin kinetik şiddetine göre deterministik fiziksel sonuç
+        if (damageAmount >= 35) {
+            return 2; // Ağır darbe eşiği: Parça veya cam tamamen kırılır (100% hasar)
+        } else if (damageAmount >= 15) {
+            return 1; // Orta darbe eşiği: Parça çatlar / gevşer (50% hasar)
         }
-        
-        // Orta şiddetli çarpmalar
-        if (damageAmount >= 20 && damageAmount < 50) {
-            if (chance < 40) return 0; // %40 hasarsız
-            if (chance < 80) return 1; // %40 kısmi hasar
-            return 2; // %20 tam kırılma
-        }
-        
-        // Yüksek şiddetli çarpmalar
-        if (chance < 15) return 0; // %15 şansla mucizevi kurtuluş
-        if (chance < 50) return 1; // %35 kısmi hasar
-        return 2; // %50 tam kırılma
+        return 0; // Düşük darbe: Sadece hafif kaporta çizilmesi, parça sağlam kurtulur
     },
 
     gameLoop: function(currentTime) {
@@ -698,87 +690,24 @@ const Game = {
             // Zaman degisim konusmasi kaldirildi
         }
         
-        // DİNAMİK HAVA DURUMU
+        // DİNAMİK HAVA DURUMU VE SICAKLIK (YÜZDELİK ŞANSLAR KALDIRILDI - FORMÜLE BAĞLI GÜN DÖNGÜSÜ)
         if (!this.lastWeatherCheckTime) this.lastWeatherCheckTime = currentTime;
-        
-        let weatherChangeChance = this.weather === 'rainy' ? 0.2 : 0.4; // Yağmur kolay kolay bitmesin
-        if (currentTime - this.lastWeatherCheckTime > 60000) {
+        if (currentTime - this.lastWeatherCheckTime > 30000) {
             this.lastWeatherCheckTime = currentTime;
-            
-            if (Math.random() < weatherChangeChance) {
-                let oldWeather = this.weather;
-                let rand = Math.random();
-                
-                if (this.isNight) {
-                    if (rand < 0.3) {
-                        this.weather = 'snowy';
-                        this.temperature = Math.floor(Math.random() * 11) - 10;
-                    } else if (rand < 0.7) {
-                        this.weather = 'rainy';
-                        this.temperature = Math.floor(Math.random() * 11) + 5;
-                    } else {
-                        this.weather = 'sunny'; 
-                        this.temperature = Math.floor(Math.random() * 11) + 10;
-                    }
-                } else {
-                    if (rand < 0.1) {
-                        this.weather = 'snowy';
-                        this.temperature = Math.floor(Math.random() * 11) - 5;
-                    } else if (rand < 0.4) {
-                        this.weather = 'rainy';
-                        this.temperature = Math.floor(Math.random() * 11) + 10;
-                    } else {
-                        this.weather = 'sunny';
-                        this.temperature = Math.floor(Math.random() * 16) + 20;
+            // Saatin ilerleyişine göre sürekli trigonometrik sıcaklık modellemesi:
+            if (this.weather === 'snowy') {
+                this.temperature = Math.round(-3 + Math.cos(((this.clockMinutes - 840) / 720) * Math.PI) * 3);
+            } else if (this.weather === 'rainy') {
+                this.temperature = Math.round(12 + Math.cos(((this.clockMinutes - 840) / 720) * Math.PI) * 4);
+                const rainCycle = (Math.floor(this.clockMinutes / 20) % 3) + 1; // 1, 2, 3 döngüsü
+                if (this.rainIntensity !== rainCycle) {
+                    this.rainIntensity = rainCycle;
+                    if (typeof audio.setRainIntensity === 'function') {
+                        audio.setRainIntensity(this.rainIntensity);
                     }
                 }
-
-                if (oldWeather !== this.weather) {
-                    audio.stopWeather();
-                    if (this.weather === 'snowy') {
-                        audio.startWeather('snowy');
-                        // Kar anonsu kaldirildi
-                    } else if (this.weather === 'rainy') {
-                        this.rainIntensity = Math.floor(Math.random() * 3) + 1; // 1 ile 3 arası başlar
-                        this.lastRainCheckTime = currentTime;
-                        this.nextRainChangeDelay = 20000 + Math.random() * 20000;
-                        audio.startWeather('rainy', this.rainIntensity);
-                        
-                        // Yagmur anonsu kaldirildi
-                    } else {
-                        // Hava acildi anonsu kaldirildi
-                    }
-                }
-            }
-        }
-
-        // YAÄMUR ÅİDDETİ EVRİMİ
-        if (this.weather === 'rainy') {
-            if (!this.lastRainCheckTime) this.lastRainCheckTime = currentTime;
-            if (!this.nextRainChangeDelay) this.nextRainChangeDelay = 20000;
-            
-            if (currentTime - this.lastRainCheckTime > this.nextRainChangeDelay) {
-                this.lastRainCheckTime = currentTime;
-                this.nextRainChangeDelay = 15000 + Math.random() * 30000; // 15-45 saniye arası değişir
-                
-                // %60 ihtimalle şiddet değişir
-                if (Math.random() < 0.6) {
-                    let oldIntensity = this.rainIntensity || 1;
-                    let change = Math.random() < 0.5 ? 1 : -1;
-                    this.rainIntensity = Math.max(1, Math.min(4, oldIntensity + change));
-                    
-                    if (this.rainIntensity !== oldIntensity) {
-                        if (typeof audio.setRainIntensity === 'function') {
-                            audio.setRainIntensity(this.rainIntensity);
-                        }
-                        
-                        if (this.rainIntensity === 1) {
-                            // Yagmur dindi anonsu kaldirildi
-                        } else if (this.rainIntensity === 2) {
-                            // Yagmur degisim anonsu kaldirildi
-                        }
-                    }
-                }
+            } else {
+                this.temperature = Math.round(25 + Math.cos(((this.clockMinutes - 840) / 720) * Math.PI) * 6);
             }
         }
 
@@ -1405,7 +1334,8 @@ const Game = {
             
             // BUG FIX 5: Sürpriz Kasis Spam Hatası (Cooldown/Mesafe Kilidi Eklendi)
             if (!this.lastRandomKasisDistance) this.lastRandomKasisDistance = 0;
-            if (!foundRealBump && (this.totalDistanceCovered - this.lastRandomKasisDistance > 1000) && Math.random() < 0.0001) {
+            // Deterministik Kasis Formülü: Şehir içi güzergahlarda her 2200 metrede bir kasis uyarısı
+            if (!foundRealBump && (this.totalDistanceCovered - this.lastRandomKasisDistance >= 2200)) {
                 this.lastRandomKasisDistance = this.totalDistanceCovered; // En az 1 km sonra tekrar çıkabilir
                 this.kasisDistance = 300; // 300 metre ileride kasis
                 if (typeof audio.speak === 'function') audio.speak("300 metre ileride kasis var, hızınızı otuzun altına düşürün.");
@@ -1418,19 +1348,20 @@ const Game = {
             
             if (this.kasisDistance <= 0) {
                 // Kasisten geçiş anı
-                if (this.speed > 45) { // Güvenli geçiş hızı 30'dan 45'e çıkarıldı
-                    let outcome = this.calculateCrashOutcome(35);
-                    this.busDamage.health = Math.max(0, this.busDamage.health - 5);
+                if (this.speed > 45) { // 45 km/h kasis hız limiti
+                    // Hız aşımına bağlı deterministik hasar formülü
+                    const excess = this.speed - 45;
+                    this.busDamage.health = Math.max(0, this.busDamage.health - Math.round(excess * 0.35));
                     if (typeof audio.playUnderbodyHit === 'function') audio.playUnderbodyHit();
                     
-                    if (outcome === 0) {
-                        if (typeof audio.speak === 'function') audio.speak("Kasise çok hızlı girdik, otobüsün altını vurduk ama şanslıyız, egzoza bir şey olmadı!");
-                    } else if (outcome === 1) {
-                        this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 25); // %25 hasar
+                    if (excess >= 25) { // 70 km/h ve üzeri: Ağır darbe
+                        this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 50);
+                        if (typeof audio.speak === 'function') audio.speak("Kasise aşırı hızlı girdik, altını çok sert vurduk ve egzoz ağır hasar aldı!");
+                    } else if (excess >= 10) { // 55 - 70 km/h arası: Orta darbe
+                        this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 25);
                         if (typeof audio.speak === 'function') audio.speak("Kasise hızlı girdik, altını vurduk. Egzoz hasar aldı.");
-                    } else {
-                        this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 50); // %50 hasar
-                        if (typeof audio.speak === 'function') audio.speak("Kasise çok hızlı girdik, altını sert vurduk ve egzoz ağır hasar aldı!");
+                    } else { // 45 - 55 km/h arası: Hafif sıyrık
+                        if (typeof audio.speak === 'function') audio.speak("Kasisten biraz hızlı geçtik, altı hafif sürttü ama egzoz sağlam kurtuldu.");
                     }
                 } else {
                     // Güvenli geçiş sesi (Hafif zıplama)
@@ -1552,44 +1483,57 @@ const Game = {
     },
 
     spawnAndMoveNPCs: function(deltaTime) {
-        let spawnChance = 0.007; // Dengeli, akıcı şehir ve otoyol trafiği
+        // YÜZDELİK İHTİMALLER KALDIRILDI - FORMÜLE BAĞLI TRAFİK DALGABOYU MİMARİSİ
         
-        // Yolda aynı anda sadece 1 aktif NPC olsun ki ses kargaşası ve kafa karışıklığı olmasın.
-        // Hızımız 15'in üzerindeyse yeni araç doğabilir.
-        if (this.speed >= 15 && this.activeNPCs.length === 0 && Math.random() < spawnChance) {
-            const roll = Math.random();
-            let npcType = 'oncoming';
-            let startX = 22; // Sol şerit (Karşı yön)
-            let startY = 650;
-            let baseSpeed = 50 + Math.random() * 30; // 50-80 km/h
+        // 1. ZAMANA BAĞLI TRAFİK YOĞUNLUK KATSAYISI FORMÜLÜ (Rush-Hour Density Factor)
+        const hour = (this.clockMinutes || 720) / 60;
+        // Sabah zirvesi (07:30 - 09:30) ve akşam zirvesi (17:00 - 19:30) yoğunluk artışı
+        const morningRush = Math.max(0, 1 - Math.abs(hour - 8.2) / 1.5) * 0.8;
+        const eveningRush = Math.max(0, 1 - Math.abs(hour - 18.2) / 1.5) * 0.9;
+        const baseDensity = (hour >= 6 && hour <= 23) ? 0.7 : 0.25; // Gece sakin, gündüz canlı
+        const trafficDensity = baseDensity + morningRush + eveningRush; // 0.25 ile 2.1 arası deterministik katsayı
+        
+        // 2. KAT EDİLMESİ GEREKEN HEDEF DALGABOYU / MESAFE FORMÜLÜ (Wavelength in meters)
+        // Yoğun saatte her ~220 metrede bir araç; gece sakinliğinde her ~750 metrede bir araç
+        const spawnIntervalDistance = Math.round(450 / trafficDensity);
+        const distanceSinceLastSpawn = (this.totalDistanceCovered || 0) - (this.lastNPCSpawnDistance || 0);
 
-            if (roll < 0.72) {
-                // 1. %72 İHTİMALLE: Normal Karşı Şerit Trafiği (Sol şerit: x = 20-25)
-                // Oyuncu kendi şeridinde sürdüğü sürece güvenle solundan akar, kaza riski olmaz!
-                npcType = 'oncoming';
-                startX = 20 + Math.random() * 5;
-                startY = 650;
-                baseSpeed = 50 + Math.random() * 30;
-            } else if (roll < 0.86) {
-                // 2. %14 İHTİMALLE: Önümüzde Aynı Yönde Giden Araç (Bizden daha yavaş: 35-55 km/h)
-                // Hızlıysak arkadan yaklaşırız, sollayabilir veya korna çalabiliriz!
+        // Şart: Hızımız en az 15 km/h, yolda aktif araç yok ve gereken yol kat edilmiş
+        if (this.speed >= 15 && this.activeNPCs.length === 0 && distanceSinceLastSpawn >= spawnIntervalDistance) {
+            this.lastNPCSpawnDistance = this.totalDistanceCovered;
+            this.npcVehicleIndex = (this.npcVehicleIndex || 0) + 1;
+            
+            // 3. DETERMINİSTİK 10'LUK TRAFİK DÖNGÜSÜ (Sıfır İhtimal, Sabit Matematiksel Sıra)
+            const cycle = this.npcVehicleIndex % 10;
+            let npcType = 'oncoming';
+            let startX = 22;
+            let startY = 650;
+            let baseSpeed = 55;
+
+            if (cycle === 3) {
+                // Önümüzde Aynı Yönde Seyreden Yavaş Araç (Kamyonet/Taksi)
                 npcType = 'ahead';
-                startX = 55 + Math.random() * 18; // Orta/Sağ şerit
-                startY = 420;
-                baseSpeed = 35 + Math.random() * 20;
-            } else if (roll < 0.94) {
-                // 3. %8 İHTİMALLE: Bizi Sollayan Hızlı Araç (Arkamızdan sollayıp öne geçer)
+                startX = 64; // Sağ seyir şeridi
+                startY = 400;
+                baseSpeed = 42; // Otobüsten yavaş (arkadan yetişebiliriz)
+            } else if (cycle === 6) {
+                // Bizi Sollayan Hızlı Araç
                 npcType = 'overtaking';
-                startX = 28 + Math.random() * 5;
+                startX = 28; // Sol sollama şeridi
                 startY = -350; // Arkamızda doğar
-                baseSpeed = this.speed + 35 + Math.random() * 25;
-            } else {
-                // 4. %6 İHTİMALLE: Hatalı Sollama Yapan Karşı Araç (Orta şeride taşmış!)
-                // Korna çalar ve sesli asistan uyarır, sağa kaçılırsa kaza önlenir!
+                baseSpeed = this.speed + 35; // Bizim hızımızdan daima 35 km/h hızlı
+            } else if (cycle === 9) {
+                // Hatalı Sollama Yapan Karşı Araç (Erken sesli ikaz ve kornalı refleks senaryosu)
                 npcType = 'hazard';
-                startX = 46 + Math.random() * 8;
+                startX = 48; // Orta şeride taşmış
                 startY = 680;
-                baseSpeed = 55 + Math.random() * 25;
+                baseSpeed = 60;
+            } else {
+                // Normal Karşı Şerit Trafiği (Sol şerit: x = 21.0 - 24.0)
+                npcType = 'oncoming';
+                startX = 21.0 + (cycle % 3) * 1.5; // Sol şeridin içinde düzenli konum
+                startY = 650;
+                baseSpeed = 50 + (cycle * 3); // 50, 53, 56, 62, 65, 71, 74 km/h
             }
 
             // Başlangıç pan değeri mesafeye göre dar bir açıyla başlar
@@ -1627,22 +1571,18 @@ const Game = {
                 }
                 npc.y -= this.speed * deltaTime * 1.5;
             } else {
-                // Trafik türüne göre göreceli hız hareketi
+                // Trafik türüne göre deterministik bağıl hız
                 if (npc.type === 'oncoming' || npc.type === 'hazard') {
-                    // Karşıdan bize doğru yaklaşır (Kendi hızı + bizim hızımız)
                     npc.y -= (this.speed + npc.baseSpeed) * deltaTime * 1.5;
                 } else if (npc.type === 'ahead') {
-                    // Önümüzde aynı yönde gider. Biz hızlıysak yaklaşırız, yavaşsak uzaklaşır
                     npc.y -= (this.speed - npc.baseSpeed) * deltaTime * 1.5;
                 } else if (npc.type === 'overtaking') {
-                    // Arkamızdan gelip bizi sollar (Öne doğru ilerler)
                     npc.y += (npc.baseSpeed - this.speed) * deltaTime * 1.5;
                 }
             }
 
             // --- TEHLİKE VE ERKEN SESLİ UYARILAR ---
             if (!npc.hasCollided) {
-                // Hatalı sollama yapan tehlikeli araç uyarısı
                 if (npc.type === 'hazard' && npc.y < 350 && npc.y > 100 && !npc.warned) {
                     npc.warned = true;
                     if (audio.playNPCHorn) audio.playNPCHorn((npc.x - this.lanePosition) / 30);
@@ -1650,7 +1590,6 @@ const Game = {
                         audio.speak("Dikkat! Karşıdan hatalı sollama yapan araç geliyor, sağ şeride yanaşın!");
                     }
                 }
-                // Önümüzde yavaş seyreden araç uyarısı
                 if (npc.type === 'ahead' && npc.y < 120 && npc.y > 40 && !npc.warned && Math.abs(npc.x - this.lanePosition) < 22) {
                     npc.warned = true;
                     if (typeof audio.speak === 'function') {
@@ -1659,7 +1598,7 @@ const Game = {
                 }
             }
 
-            // --- MÜKEMMEL 3D SPATIAL AUDIO & DOPPLER FORMÜLÜ ---
+            // --- MÜKEMMEL 3D SPATIAL AUDIO FORMÜLÜ ---
             let apparentX = npc.x;
             if (this.roadCurvature) {
                 let curveOffset = (this.roadCurvature || 0) * (Math.min(600, Math.max(0, Math.abs(npc.y))) / 600) * 0.25;
@@ -1672,18 +1611,16 @@ const Game = {
             let currentPan = (dx / 30) * angleSpread;
             currentPan = Math.max(-1, Math.min(1, currentPan));
 
-            // 2. Kademeli Ses Seviyesi (Uzaklaşırken YAVAŞ YAVAŞ sönümlenir, asla pat diye kesilmez!)
+            // 2. Kademeli Ses Seviyesi Formülü (Uzaklaşırken YAVAŞ YAVAŞ sönümlenir)
             let vol = 0;
             if (npc.y >= 0) {
-                // Önümüzde: 650m'den 0m'ye yaklaşırken 0'dan 1'e çıkar
                 vol = 1 - (npc.y / 650);
             } else {
-                // Arkamızda: 0m'den -500m'ye uzaklaşırken 1'den 0'a yavaş yavaş iner
                 vol = 1 - (Math.abs(npc.y) / 500);
             }
             vol = Math.max(0, Math.min(1, vol));
 
-            // 3. Doppler Pitch Kayması: Yaklaşırken motor daha tiz, yanımızdan geçip uzaklaşırken daha tok
+            // 3. Doppler Pitch Formülü: Hız ve yöne bağlı frekans kayması
             let dopplerRate = (npc.y >= 0) ? (1.04 + Math.min(0.08, this.speed / 200)) : (0.92 - Math.min(0.06, this.speed / 200));
 
             if (npc.audioObj && npc.audioObj.howlObj) {
@@ -1692,13 +1629,11 @@ const Game = {
                 npc.audioObj.howlObj.rate(dopplerRate, npc.audioObj.soundId);
             }
 
-            // Çarpışma (ÖLÜM VE HASAR MEKANİÄžİ) - ÇEKİCİDEYKEN KAZA YAPILMAZ (0 HATA)
+            // --- ÇARPIŞMA VE FİZİKSEL HASAR (KİNETİK ENERJİ FORMÜLÜ) ---
             if (!npc.hasCollided && Math.abs(npc.y) <= 12) {
-                // Hız 15'in altındaysa veya çekici otopilotundaysak çarpışma olmaz, teğet geçer
                 if (!this.isBeingTowed && this.speed >= 15 && Math.abs(npc.x - this.lanePosition) < 20) {
                     npc.hasCollided = true;
                     
-                    // FİZİKSEL ÇARPIŞMA TEPKİSİ: NPC'yi kenara fırlat ve durdur (Ghosting engelleme)
                     npc.baseSpeed = 0;
                     npc.slideX = (this.lanePosition > 50) ? -80 : 80;
                     npc.slideY = this.speed * 1.5;
@@ -1707,15 +1642,8 @@ const Game = {
                         setTimeout(() => audio.stopTireScreech(), 1500);
                     }
                     
-                    // Şiddete (Hızımıza) göre rastgele hasar hesaplama
-                    let damageAmount = 0;
-                    if (this.speed <= 40) {
-                        damageAmount = Math.floor(Math.random() * 7) + 2; 
-                    } else if (this.speed <= 70) {
-                        damageAmount = Math.floor(Math.random() * 11) + 10;
-                    } else {
-                        damageAmount = Math.floor(Math.random() * 21) + 25;
-                    }
+                    // KİNETİK ENERJİ HASAR FORMÜLÜ: Hasar = v^2 / 110 (Rastgelelik sıfırlandı)
+                    let damageAmount = Math.max(5, Math.min(100, Math.round(Math.pow(this.speed, 2) / 110)));
                     
                     let oldHealth = this.busDamage.health;
                     this.busDamage.health -= damageAmount;
@@ -1745,7 +1673,7 @@ const Game = {
                             audio.speak("Sağ taraftan çarptık! Şanslıyız, cam kırılmadı.");
                         }
                     } else {
-                        audio.speak(`Önden çarpıştık! Kaporta hasar aldı!`);
+                        audio.speak(`Önden çarpıştık! Kaporta ${damageAmount} puan hasar aldı!`);
                         this.busDamage.front = Math.min(100, this.busDamage.front + damageAmount);
                         
                         let hlOutcome = this.calculateCrashOutcome(damageAmount);
@@ -1878,7 +1806,9 @@ const Game = {
         const isFinalStop = this.currentStopIndex === this.activeRouteData.stops.length - 1;
 
         // Yolcu matematiğini başta hesapla
-        const alighting = Math.floor(Math.random() * (Math.min(this.passengersOnBoard, 15) + 1));
+        // FORMÜLE BAĞLI İNİŞ: Kalan durak sayısına göre orantılı deterministik iniş formülü
+        const remainingStops = Math.max(1, this.activeRouteData.stops.length - this.currentStopIndex - 1);
+        const alighting = isFinalStop ? this.passengersOnBoard : Math.min(this.passengersOnBoard, Math.max(1, Math.round(this.passengersOnBoard / (remainingStops + 1))));
         const waiting = stopData.bekleyenYolcu;
 
         // PAS GEÇME MANTIÄI: İnecek veya binecek yoksa ve son durak değilse durmadan geç
@@ -2004,7 +1934,8 @@ const Game = {
             btn.innerText = "Ön Kapıyı Kapat";
             
             // YOLCU TEPKİSİ: Kapı açıldığında nezaket
-            if (this.passengersOnBoard > 0 && Math.random() < 0.3) {
+            // Deterministik Nezaket Formülü: Her 3 durakta bir düzenli yolcu selamı
+            if (this.passengersOnBoard > 0 && (this.currentStopIndex % 3 === 0)) {
                 audio.speak("Kolay gelsin kaptan.");
             }
             
@@ -2046,25 +1977,22 @@ const Game = {
                             document.getElementById('stop-waiting-count').innerText = currentWaiting;
                         } else {
                             // Otobüs dolu, aşırı yığılma reaksiyonları
-                            const rand = Math.random();
-                            if (rand < 0.5 && this.passengersOnBoard < (seatCapacity + maxStanding)) {
+                            // KAPASİTE EŞİTSİZLİĞİ FORMÜLÜ (Sıfır İhtimal, Kesin Kapasite Matematiği)
+                            if (this.passengersOnBoard < (seatCapacity + maxStanding)) {
+                                // Ayakta yolcu kapasitesi varsa binişe izin verilir
                                 document.getElementById('passenger-dialog').innerText = '"Ayakta giderim sorun değil."';
                                 this.automatedTicketProcess(true);
                                 currentWaiting--;
                                 stopData.bekleyenYolcu = currentWaiting;
                                 document.getElementById('stop-waiting-count').innerText = currentWaiting;
-                            } else if (rand < 0.8 || this.passengersOnBoard >= (seatCapacity + maxStanding)) {
-                                document.getElementById('passenger-dialog').innerText = '"Otobüs çok dolu, ben arkadan gelene bineceğim."';
-                                document.getElementById('passenger-feedback').innerText = "Yolcu binmekten vazgeçti.";
+                            } else {
+                                // Otobüs tamamen ve yasal olarak dolu: Bir sonrakini bekler
+                                document.getElementById('passenger-dialog').innerText = '"Otobüs tamamen dolu, bir sonrakine bineceğim."';
+                                document.getElementById('passenger-feedback').innerText = "Kapasite dolu, yolcu binemedi.";
                                 document.getElementById('passenger-feedback').style.color = '#ef4444';
                                 currentWaiting--;
                                 stopData.bekleyenYolcu = currentWaiting;
                                 document.getElementById('stop-waiting-count').innerText = currentWaiting;
-                            } else {
-                                document.getElementById('passenger-dialog').innerText = '"Burası çok dolu ve havasız oldu, ben iniyorum!"';
-                                document.getElementById('passenger-feedback').innerText = "İçeriden 1 yolcu indi.";
-                                document.getElementById('passenger-feedback').style.color = '#ef4444';
-                                if (this.passengersOnBoard > 0) this.passengersOnBoard--;
                             }
                         }
                         
@@ -2111,8 +2039,18 @@ const Game = {
     },
 
     automatedTicketProcess: function(isStanding = false) {
-        const types = ["tam", "ogrenci", "yasli"];
-        const pType = types[Math.floor(Math.random() * types.length)];
+        // FORMÜLE BAĞLI BİLET TÜRÜ: Durak adına ve biniş sırasına göre deterministik bilet
+        const currentStopName = (this.activeRouteData.stops[this.currentStopIndex]?.name || "").toLowerCase();
+        let pType = "tam";
+        if (currentStopName.includes("üniversite") || currentStopName.includes("okul") || currentStopName.includes("fakülte") || currentStopName.includes("lise")) {
+            pType = "ogrenci"; // Okul/Kampüs duraklarında öğrenci
+        } else if (currentStopName.includes("hastane") || currentStopName.includes("huzurevi") || currentStopName.includes("sağlık")) {
+            pType = "yasli"; // Hastane/Sağlık duraklarında serbest kart
+        } else {
+            // Şehir içi duraklarda deterministik 5'li döngü formülü (3 Tam, 1 Öğrenci, 1 Serbest)
+            const seq = this.passengersOnBoard % 5;
+            pType = (seq === 0) ? "yasli" : ((seq === 2) ? "ogrenci" : "tam");
+        }
         
         let fare = this.ticketPrices[pType];
         const cityName = this.activeRouteData.sehir;
