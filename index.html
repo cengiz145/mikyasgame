@@ -87,6 +87,9 @@
             <button id="btn-start-city" class="menu-btn secondary-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.1rem;">
                 🏙️ Tüm Süleymanpaşa Hatları Listesi
             </button>
+            <button id="btn-open-garage-fleet" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #facc15; color: #facc15;">
+                🚌 Otobüs Garajı ve Araç Filosu (Mercedes, Travego, Setra...)
+            </button>
             <button id="btn-start-intercity" class="menu-btn secondary-btn nav-item" style="display: none; justify-content: center; margin-bottom: 12px; font-size: 1.2rem; border-color: #facc15; color: #facc15;">
                 🛣️ Şehirler Arası Seyahat (Türkiye Turnesi)
             </button>
@@ -373,6 +376,7 @@
     <script src="js/ui.js?v=1781783292"></script>
     <script src="js/game.js?v=1781783292"></script>
     <script src="js/app.js?v=1781783292"></script>
+    <script src="js/bus-fleet.js"></script>
     <script src="js/smart-route.js"></script>
     <script src="js/voice-assistant.js?v=1781783292"></script>
 
@@ -412,6 +416,38 @@
                     Vazgeç
                 </button>
             </div>
+        </div>
+    </div>
+  
+
+    <!-- OTOBÜS GARAJI VE FİLO SEÇİM MODALI -->
+    <div id="bus-garage-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="bus-garage-title">
+        <div class="glass-panel" style="max-width: 750px; width: 94%; padding: 25px 28px; text-align: left; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h2 id="bus-garage-title" class="gradient-text" style="font-size: 1.7rem; margin: 0;">🚌 Otobüs Garajı ve Araç Filosu</h2>
+                <button id="btn-garage-modal-close" class="modern-btn" style="padding: 6px 12px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444;" aria-label="Otobüs garajını kapat">✕</button>
+            </div>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 16px; line-height: 1.4;">
+                Kariyeriniz boyunca açtığınız belediye ve şehirlerarası seyahat otobüslerini buradan inceleyebilir ve sefere çıkacağınız aracı seçebilirsiniz.
+            </p>
+
+            <!-- Kategori Sekmeleri -->
+            <div style="display: flex; gap: 8px; margin-bottom: 18px;">
+                <button id="tab-fleet-all" class="modern-btn" style="flex: 1; padding: 10px; font-size: 0.9rem; background: rgba(56,189,248,0.3); border-color: #38bdf8; color: #fff;">
+                    📋 Tüm Filo (9 Araç)
+                </button>
+                <button id="tab-fleet-city" class="modern-btn" style="flex: 1; padding: 10px; font-size: 0.9rem; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #94a3b8;">
+                    🏙️ Belediye Otobüsleri (Seviye 1-10)
+                </button>
+                <button id="tab-fleet-intercity" class="modern-btn" style="flex: 1; padding: 10px; font-size: 0.9rem; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #94a3b8;">
+                    🛣️ Şehirlerarası Seyahat (Seviye 10+)
+                </button>
+            </div>
+
+            <!-- Otobüs Listesi -->
+            <ul id="garage-bus-list" style="list-style: none; padding: 0; margin: 0; max-height: 52vh; overflow-y: auto;">
+                <!-- Dinamik doldurulacak -->
+            </ul>
         </div>
     </div>
   

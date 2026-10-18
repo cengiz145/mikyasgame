@@ -103,6 +103,62 @@
             return;
         }
 
+        // --- OTOBÜS GARAJI VE ARAÇ SEÇİMİ ---
+        if (command.includes("garaj") || command.includes("otobüsler") || command.includes("filo") || command.includes("otobüs seç")) {
+            if (typeof BusFleet !== 'undefined' && BusFleet.openModal) {
+                BusFleet.openModal();
+                return;
+            }
+        }
+        if (command.includes("travego")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("mercedes_travego_16shd");
+                return;
+            }
+        }
+        if (command.includes("tourismo")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("mercedes_tourismo_16rhd");
+                return;
+            }
+        }
+        if (command.includes("setra")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("setra_topclass_s516");
+                return;
+            }
+        }
+        if (command.includes("körüklü") || command.includes("körük")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("mercedes_conecto_g");
+                return;
+            }
+        }
+        if (command.includes("conecto")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("mercedes_conecto_12m");
+                return;
+            }
+        }
+        if (command.includes("otokar") || command.includes("kent")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("otokar_kent_lf");
+                return;
+            }
+        }
+        if (command.includes("man") || command.includes("lions coach")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("man_lions_coach");
+                return;
+            }
+        }
+        if (command.includes("neoplan") || command.includes("cityliner")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("neoplan_cityliner");
+                return;
+            }
+        }
+
         // --- AKILLI ROTA SİSTEMİ (NEREDEN ➔ NEREYE) ---
         if (command.includes("akıllı rota") || command.includes("nereden nereye") || command.includes("rota hesapla") || command.includes("hedef seç")) {
             if (typeof AkilliRotaSistemi !== 'undefined' && AkilliRotaSistemi.openModal) {
