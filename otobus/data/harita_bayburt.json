@@ -1,0 +1,86 @@
+{
+  "city": "Bayburt",
+  "district": "Merkez",
+  "scale": "küçük",
+  "memoryFootprint": "~2.5 KB aktif hat",
+  "routes": {
+    "bayburt_hat_1": {
+      "id": "bayburt_hat_1",
+      "hatNo": "1",
+      "name": "1 - Tarihi Saat Kulesi - Çoruh Nehri - Üniversite",
+      "city": "Bayburt",
+      "district": "Merkez",
+      "terrain": "asfalt",
+      "isHierarchical": true,
+      "stops": [
+        {
+          "id": 1,
+          "name": "Tarihi Saat Kulesi Meydanı",
+          "pos": 0
+        },
+        {
+          "id": 2,
+          "name": "Bayburt Valiliği / Çoruh Park",
+          "pos": 400
+        },
+        {
+          "id": 3,
+          "name": "Ulu Cami Kavşağı",
+          "pos": 850
+        },
+        {
+          "id": 4,
+          "name": "Bayburt Devlet Hastanesi",
+          "pos": 1600
+        },
+        {
+          "id": 5,
+          "name": "Bayburt Üniversitesi Baberti Külliyesi",
+          "pos": 2800
+        }
+      ],
+      "streets": [
+        "Cumhuriyet Caddesi",
+        "Çoruh Boyu Caddesi",
+        "Hastane Caddesi",
+        "Külliye Bulvarı"
+      ]
+    },
+    "bayburt_hat_2": {
+      "id": "bayburt_hat_2",
+      "hatNo": "2",
+      "name": "2 - Bayburt Kalesi - Yeni Sanayi Sitesi",
+      "city": "Bayburt",
+      "district": "Merkez",
+      "terrain": "toprak",
+      "isHierarchical": true,
+      "stops": [
+        {
+          "id": 1,
+          "name": "Tarihi Bayburt Kalesi Girişi",
+          "pos": 0
+        },
+        {
+          "id": 2,
+          "name": "Eski Erzurum Caddesi",
+          "pos": 650
+        },
+        {
+          "id": 3,
+          "name": "Yeni Sanayi Sitesi 1. Blok",
+          "pos": 1500
+        },
+        {
+          "id": 4,
+          "name": "Sanayi Kooperatif Binası",
+          "pos": 2200
+        }
+      ],
+      "streets": [
+        "Kale Yolu",
+        "Eski Erzurum Caddesi",
+        "Sanayi Bulvarı"
+      ]
+    }
+  }
+}

@@ -1387,6 +1387,33 @@ class AudioSystem {
         this.sounds.crash.play();
     }
 
+    // --- ŞOFÖR LİYAKAT VE ROZET FANFARI (ZAFER ARPEJİ) ---
+    playBadgeFanfare() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 -> E5 -> G5 -> C6 altın zafer arpeji
+        notes.forEach((freq, idx) => {
+            const t = now + (idx * 0.12);
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, t);
+            
+            const isLast = (idx === notes.length - 1);
+            const dur = isLast ? 0.75 : 0.22;
+            
+            gain.gain.setValueAtTime(0.001, t);
+            gain.gain.linearRampToValueAtTime(0.42, t + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + dur);
+            
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(t);
+            osc.stop(t + dur);
+        });
+    }
+
     // --- PNÖMATİK (HAVALI FREN) SESLERİ ---
     
     playBrakeRelease() {

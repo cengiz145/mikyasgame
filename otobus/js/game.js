@@ -89,6 +89,7 @@ const Game = {
         this.isRampDeployed = !this.isRampDeployed;
         const rampEl = document.getElementById('hud-ramp');
         if (this.isRampDeployed) {
+            this.rampUsedInRoute = true;
             if (typeof audio !== 'undefined' && typeof audio.playRampDeploy === 'function') audio.playRampDeploy();
             if (rampEl) rampEl.style.display = 'inline-block';
             this.addXP(30);
@@ -596,6 +597,8 @@ const Game = {
         this.passengerAngerTimer = 0;
         this.engineRPM = 800;
         this.currentGear = 1;
+        this.rampUsedInRoute = false;
+        this.hasLostItemFound = false;
         
         // ZAMAN VE HAVA DURUMU SİSTEMİ
         audio.stopWeather(); // Mevcut hava olayını temizle
@@ -699,6 +702,29 @@ const Game = {
             audio.currentTerrain = "asfalt";
         }
         
+                if (this.activeRouteData && this.activeRouteData.isHierarchical) {
+            // HİYERARŞİK ULTRA HAFİF HARİTA MOTORU (OSRM AĞ YÜKÜ VE GECİKME YOK)
+            const nextStop = this.activeRouteData.stops[this.currentStopIndex];
+            const prevStop = this.currentStopIndex > 0 ? this.activeRouteData.stops[this.currentStopIndex - 1] : null;
+            const stopDistance = prevStop ? (nextStop.pos - prevStop.pos) : (nextStop.pos || 450);
+            this.currentDistanceToNext = stopDistance;
+            this.hierarchicalBeepPlayed = false;
+            
+            const nextStopEl = document.getElementById('hud-next-stop');
+            if (nextStopEl) nextStopEl.innerText = `${nextStop.name} (${this.currentStopIndex + 1}/${this.activeRouteData.stops.length})`;
+            
+            const speechMsg = (this.currentStopIndex === 0)
+                ? `Sefer başladı. İlk durak: ${nextStop.name}. Mesafe: ${Math.round(stopDistance)} metre.`
+                : `Sıradaki durak: ${nextStop.name}. Mesafe: ${Math.round(stopDistance)} metre.`;
+            
+            if (typeof audio !== 'undefined') {
+                if (typeof audio.playNavChime === 'function') audio.playNavChime();
+                if (typeof audio.speak === 'function') audio.speak(speechMsg);
+                if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(speechMsg);
+            }
+            return;
+        }
+
         if (!isResume) {
             if (this.isFetchingRoute) {
                 console.warn("Spam koruması: OSRM Rota şu an çekiliyor, mükerrer istek iptal edildi.");
@@ -1497,6 +1523,18 @@ const Game = {
                     const bellMsg = "Duracak zili çaldı. Gelecek durakta inecek yolcu var.";
                     if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(bellMsg);
                     if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(bellMsg);
+                }
+            }
+
+                        // YALOVA/BAYBURT HİYERARŞİK HARİTA MOTORU DURAĞA YAKLAŞMA BİPİ (20 METRE KALA SİNYAL)
+            if (this.activeRouteData && this.activeRouteData.isHierarchical) {
+                if (this.currentDistanceToNext <= 20 && this.currentDistanceToNext > 0 && !this.hierarchicalBeepPlayed) {
+                    if (typeof MapEngine !== 'undefined' && MapEngine.playApproachingBeep) {
+                        MapEngine.playApproachingBeep();
+                    } else if (typeof audio !== 'undefined' && typeof audio.playNavChime === 'function') {
+                        audio.playNavChime();
+                    }
+                    this.hierarchicalBeepPlayed = true;
                 }
             }
 
@@ -2484,6 +2522,22 @@ const Game = {
             }
 
             this.completeTask(); // İlerlemeyi kaydet
+
+            // ŞOFÖR LİYAKAT VE ROZET SİSTEMİ KONTROLÜ
+            if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkAfterRoute === 'function') {
+                const routeStats = {
+                    isSuccess: true,
+                    punctualityScore: punctualityScore,
+                    passengerComfort: this.passengerComfort,
+                    busHealth: (this.busDamage && typeof this.busDamage.health === 'number') ? this.busDamage.health : 100,
+                    rampUsed: !!this.rampUsedInRoute,
+                    lostItemFound: !!this.hasLostItemFound,
+                    isNight: !!this.isNight,
+                    isHeadlightsOn: !!this.isHeadlightsOn,
+                    completedTasks: this.completedTasks
+                };
+                DriverBadges.checkAfterRoute(routeStats);
+            }
         } else {
             audio.speak("Eğitim seferi tamamlanamadı. Ceza uygulanmadı, istediğiniz zaman tekrar deneyebilirsiniz kaptan.");
         }

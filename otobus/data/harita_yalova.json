@@ -1,0 +1,137 @@
+{
+  "city": "Yalova",
+  "district": "Merkez",
+  "scale": "küçük",
+  "memoryFootprint": "~3 KB aktif hat",
+  "routes": {
+    "yalova_hat_1": {
+      "id": "yalova_hat_1",
+      "hatNo": "1",
+      "name": "1 - Feribot İskelesi - Gaziosmanpaşa",
+      "city": "Yalova",
+      "district": "Merkez",
+      "terrain": "sahil",
+      "isHierarchical": true,
+      "stops": [
+        {
+          "id": 1,
+          "name": "İskele Meydanı (Feribot)",
+          "pos": 0
+        },
+        {
+          "id": 2,
+          "name": "Cumhuriyet Meydanı (Heykel)",
+          "pos": 450
+        },
+        {
+          "id": 3,
+          "name": "Fatih Caddesi Kavşağı",
+          "pos": 850
+        },
+        {
+          "id": 4,
+          "name": "Yalova Devlet Hastanesi",
+          "pos": 1400
+        },
+        {
+          "id": 5,
+          "name": "Gaziosmanpaşa Son Durak",
+          "pos": 2100
+        }
+      ],
+      "streets": [
+        "İskele Caddesi",
+        "Cumhuriyet Caddesi",
+        "Fatih Caddesi",
+        "Hastane Yolu",
+        "GOP Bulvarı"
+      ]
+    },
+    "yalova_hat_2": {
+      "id": "yalova_hat_2",
+      "hatNo": "2",
+      "name": "2 - Yalova Otogar - Termal Kaplıcaları",
+      "city": "Yalova",
+      "district": "Termal",
+      "terrain": "asfalt",
+      "isHierarchical": true,
+      "stops": [
+        {
+          "id": 1,
+          "name": "Yalova Şehirlerarası Otobüs Terminali",
+          "pos": 0
+        },
+        {
+          "id": 2,
+          "name": "Yalova Üniversitesi Yerleşkesi",
+          "pos": 950
+        },
+        {
+          "id": 3,
+          "name": "Samanlı Köy Meydanı",
+          "pos": 2200
+        },
+        {
+          "id": 4,
+          "name": "Termal İlçe Meydanı",
+          "pos": 3600
+        },
+        {
+          "id": 5,
+          "name": "Tarihi Termal Kaplıcaları",
+          "pos": 4500
+        }
+      ],
+      "streets": [
+        "Bursa Yolu",
+        "Üniversite Bulvarı",
+        "Samanlı Caddesi",
+        "Termal Yolu",
+        "Kaplıcalar Caddesi"
+      ]
+    },
+    "yalova_hat_3": {
+      "id": "yalova_hat_3",
+      "hatNo": "3",
+      "name": "3 - İskele - Çınarcık Sahil",
+      "city": "Yalova",
+      "district": "Çınarcık",
+      "terrain": "sahil",
+      "isHierarchical": true,
+      "stops": [
+        {
+          "id": 1,
+          "name": "Yalova İskele Meydanı",
+          "pos": 0
+        },
+        {
+          "id": 2,
+          "name": "Dörtyol Işıklar",
+          "pos": 700
+        },
+        {
+          "id": 3,
+          "name": "Koruköy Meydanı",
+          "pos": 2500
+        },
+        {
+          "id": 4,
+          "name": "Çınarcık Çamlık",
+          "pos": 4200
+        },
+        {
+          "id": 5,
+          "name": "Çınarcık İskele Son Durak",
+          "pos": 5200
+        }
+      ],
+      "streets": [
+        "Sahil Caddesi",
+        "Yalova-Armutlu Yolu",
+        "Koruköy Yolu",
+        "Hasanbaba Caddesi",
+        "Barbaros Hayrettin Paşa Bulvarı"
+      ]
+    }
+  }
+}

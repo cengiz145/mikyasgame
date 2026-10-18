@@ -2,10 +2,23 @@
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU VERİ DOSYASI (DATA.JS)
    ========================================================================== */
 
-const masterCitiesList = ["Tekirdağ", "Edirne", "Kırklareli", "İstanbul", "Çanakkale", "Ankara"];
+const masterCitiesList = ["Yalova", "Bayburt", "Tekirdağ", "Edirne", "Kırklareli", "İstanbul", "Çanakkale", "Ankara"];
 
 // Åehirlerin sadece coğrafi komşuları ve API sorguları bulunur. Rotalar dinamik oluşturulur.
 const sehirRotalari = {
+    "Yalova": {
+        canliSorgu: "",
+        komsular: { guney: "Bursa", dogu: "Kocaeli", kuzey: "İstanbul" },
+        terrain: "sahil",
+        ucretler: { tam: 25, ogrenci: 15, yasli: 0 }
+    },
+    "Bayburt": {
+        canliSorgu: "",
+        komsular: { bati: "Gümüşhane", dogu: "Erzurum", kuzey: "Trabzon" },
+        terrain: "asfalt",
+        ucretler: { tam: 20, ogrenci: 12, yasli: 0 }
+    },
+
     "Tekirdağ": {
         canliSorgu: `area["ISO3166-2"="TR-59"]->.tekirdag; (node["highway"="bus_stop"](area.tekirdag); node["traffic_calming"~"bump|hump"](area.tekirdag););`,
         komsular: {
@@ -1979,5 +1992,23 @@ if (typeof window !== 'undefined' && window.tekulasHatVeritabani && Array.isArra
         if (r2_7_donus && typeof routesData !== 'undefined') {
             routesData["hat_2_7_donus"] = r2_7_donus;
         }
+    }
+}
+
+/* MAP_ENGINE_HIERARCHICAL_ROUTES */
+// Yalova ve Bayburt Hiyerarşik Hafif Rota Entegrasyonu
+if (typeof MapEngine !== 'undefined') {
+    const yalovaMapData = {"city":"Yalova","district":"Merkez","scale":"küçük","memoryFootprint":"~3 KB aktif hat","routes":{"yalova_hat_1":{"id":"yalova_hat_1","hatNo":"1","name":"1 - Feribot İskelesi - Gaziosmanpaşa","city":"Yalova","district":"Merkez","terrain":"sahil","isHierarchical":true,"stops":[{"id":1,"name":"İskele Meydanı (Feribot)","pos":0},{"id":2,"name":"Cumhuriyet Meydanı (Heykel)","pos":450},{"id":3,"name":"Fatih Caddesi Kavşağı","pos":850},{"id":4,"name":"Yalova Devlet Hastanesi","pos":1400},{"id":5,"name":"Gaziosmanpaşa Son Durak","pos":2100}],"streets":["İskele Caddesi","Cumhuriyet Caddesi","Fatih Caddesi","Hastane Yolu","GOP Bulvarı"]},"yalova_hat_2":{"id":"yalova_hat_2","hatNo":"2","name":"2 - Yalova Otogar - Termal Kaplıcaları","city":"Yalova","district":"Termal","terrain":"asfalt","isHierarchical":true,"stops":[{"id":1,"name":"Yalova Şehirlerarası Otobüs Terminali","pos":0},{"id":2,"name":"Yalova Üniversitesi Yerleşkesi","pos":950},{"id":3,"name":"Samanlı Köy Meydanı","pos":2200},{"id":4,"name":"Termal İlçe Meydanı","pos":3600},{"id":5,"name":"Tarihi Termal Kaplıcaları","pos":4500}],"streets":["Bursa Yolu","Üniversite Bulvarı","Samanlı Caddesi","Termal Yolu","Kaplıcalar Caddesi"]},"yalova_hat_3":{"id":"yalova_hat_3","hatNo":"3","name":"3 - İskele - Çınarcık Sahil","city":"Yalova","district":"Çınarcık","terrain":"sahil","isHierarchical":true,"stops":[{"id":1,"name":"Yalova İskele Meydanı","pos":0},{"id":2,"name":"Dörtyol Işıklar","pos":700},{"id":3,"name":"Koruköy Meydanı","pos":2500},{"id":4,"name":"Çınarcık Çamlık","pos":4200},{"id":5,"name":"Çınarcık İskele Son Durak","pos":5200}],"streets":["Sahil Caddesi","Yalova-Armutlu Yolu","Koruköy Yolu","Hasanbaba Caddesi","Barbaros Hayrettin Paşa Bulvarı"]}}};
+    const bayburtMapData = {"city":"Bayburt","district":"Merkez","scale":"küçük","memoryFootprint":"~2.5 KB aktif hat","routes":{"bayburt_hat_1":{"id":"bayburt_hat_1","hatNo":"1","name":"1 - Tarihi Saat Kulesi - Çoruh Nehri - Üniversite","city":"Bayburt","district":"Merkez","terrain":"asfalt","isHierarchical":true,"stops":[{"id":1,"name":"Tarihi Saat Kulesi Meydanı","pos":0},{"id":2,"name":"Bayburt Valiliği / Çoruh Park","pos":400},{"id":3,"name":"Ulu Cami Kavşağı","pos":850},{"id":4,"name":"Bayburt Devlet Hastanesi","pos":1600},{"id":5,"name":"Bayburt Üniversitesi Baberti Külliyesi","pos":2800}],"streets":["Cumhuriyet Caddesi","Çoruh Boyu Caddesi","Hastane Caddesi","Külliye Bulvarı"]},"bayburt_hat_2":{"id":"bayburt_hat_2","hatNo":"2","name":"2 - Bayburt Kalesi - Yeni Sanayi Sitesi","city":"Bayburt","district":"Merkez","terrain":"toprak","isHierarchical":true,"stops":[{"id":1,"name":"Tarihi Bayburt Kalesi Girişi","pos":0},{"id":2,"name":"Eski Erzurum Caddesi","pos":650},{"id":3,"name":"Yeni Sanayi Sitesi 1. Blok","pos":1500},{"id":4,"name":"Sanayi Kooperatif Binası","pos":2200}],"streets":["Kale Yolu","Eski Erzurum Caddesi","Sanayi Bulvarı"]}}};
+    MapEngine.registerCity(yalovaMapData);
+    MapEngine.registerCity(bayburtMapData);
+
+    if (typeof ilceRotalari !== 'undefined') {
+        ilceRotalari["Yalova"] = Object.values(yalovaMapData.routes);
+        ilceRotalari["Bayburt"] = Object.values(bayburtMapData.routes);
+    }
+    if (typeof routesData !== 'undefined') {
+        Object.values(yalovaMapData.routes).forEach(r => routesData[r.id] = r);
+        Object.values(bayburtMapData.routes).forEach(r => routesData[r.id] = r);
     }
 }
