@@ -1149,9 +1149,10 @@ class AudioSystem {
             // Böylece tüm tarayıcılarda NPC sesleri sorunsuz çalacak.
             const howlObj = new Howl({
                 src: [`sounds/npc/${filename}`],
+                stereo: initialPan, // Howler StereoPannerNode doğrudan ilk anda bağlansın
                 loop: false,
                 volume: 0.0, // Başlangıçta sessiz (uzakta)
-                html5: false // Mümkünse Web Audio API kullansın (panning için)
+                html5: false // Web Audio API StereoPanner kullansın
             });
             
             const soundId = howlObj.play();
