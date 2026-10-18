@@ -34,11 +34,12 @@ async function fetchStopsFromOverpass(queryStr) {
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 saniye mutlak sınır
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 saniye mutlak sınır
 
         const response = await fetch(url, {
             method: "POST",
-            body: finalQuery,
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "data=" + encodeURIComponent(finalQuery),
             signal: controller.signal
         });
         
@@ -107,11 +108,15 @@ function generateRoutesFromAPI(rawStops, cityName) {
         }
 
         while (selected.length < 2) {
-            selected.push({
-                name: cityName + " Merkez Durak " + (selected.length + 1),
-                lat: 40.0 + Math.random() * 0.05,
-                lon: 27.0 + Math.random() * 0.05
-            });
+            const cityPool = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName]) 
+                ? varsayilanSehirDuraklari[cityName] 
+                : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
+            if (cityPool.length > 0) {
+                const pick = cityPool[selected.length % cityPool.length];
+                selected.push({ name: pick.name, lat: pick.lat, lon: pick.lon });
+            } else {
+                selected.push({ name: (cityName === "Tekirdağ" ? "Süleymanpaşa Otogar" : cityName + " Otogar"), lat: 40.0, lon: 27.0 });
+            }
         }
 
         const startStop = selected[0].name;
