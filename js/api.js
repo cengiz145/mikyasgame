@@ -224,7 +224,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
         });
 
         // Geriye dönük rota kimliği uyumluluğu (Alias desteği)
-        const r26 = tekulasDb.find(r => r.name.indexOf("226") !== -1 || r.name.indexOf("26/SÜLEYMANPASA") !== -1 || r.hatNo === "226" || r.hatNo === "26");
+        const r26 = tekulasDb.find(r => r.hatNo === "26" || r.name.indexOf("26/SÜLEYMANPASA") !== -1 || r.hatNo === "226");
         if (r26) {
             routesData["hat_226_suleymanpasa_saray"] = r26;
             routesData["hat_26_suleymanpasa_saray"] = r26;

@@ -222,15 +222,27 @@
                 }
             }
         }
-        if (command.includes("226") || command.includes("iki yüz yirmi altı") || command.includes("saray") || command.includes("26") || command.includes("yirmi altı")) {
-            audio.speak("TEKULAŞ güncel 226 numaralı Süleymanpaşa Saray hattı devreye alınıyor.");
+        if (command.includes("80") || command.includes("seksen") || command.includes("hat 80")) {
+            audio.speak("TEKULAŞ 80 numaralı ekspres hat mahkeme kararıyla kaldırılmıştır ve işlevsizdir. Tüm seferler 26 numaralı Süleymanpaşa Saray hattına aktarılmıştır. 26 numaralı hat başlatılıyor.");
             if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
-                const r226 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "226" || r.hatNo === "26");
-                if (r226) {
-                    routesData[r226.id] = r226;
-                    routesData["hat_226_suleymanpasa_saray"] = r226;
-                    routesData["hat_26_suleymanpasa_saray"] = r226;
-                    Game.startRoute(r226.id);
+                const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26" || r.hatNo === "226");
+                if (r26) {
+                    routesData[r26.id] = r26;
+                    routesData["hat_26_suleymanpasa_saray"] = r26;
+                    Game.startRoute(r26.id);
+                    return;
+                }
+            }
+        }
+        if (command.includes("saray") || command.includes("26") || command.includes("yirmi altı") || command.includes("226") || command.includes("iki yüz yirmi altı")) {
+            audio.speak("TEKULAŞ 26 numaralı Süleymanpaşa Saray hattı devreye alınıyor.");
+            if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
+                const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26" || r.hatNo === "226");
+                if (r26) {
+                    routesData[r26.id] = r26;
+                    routesData["hat_26_suleymanpasa_saray"] = r26;
+                    routesData["hat_226_suleymanpasa_saray"] = r26;
+                    Game.startRoute(r26.id);
                     return;
                 }
             }

@@ -787,9 +787,9 @@ const CompassNav = {
 
     handleDistrictMenu: function(dir) {
         if (dir.name === "Kuzey") {
-            const announcement = "Kuzey Yönü: [Hat 226] Süleymanpaşa - Saray Hattı (Güncel Hat 226) (86 KM, 43 Durak). Kapaklı ve Çerkezköy üzerinden. Başlatmak için Enter'a basın.";
+            const announcement = "Kuzey Yönü: [Hat 26] Süleymanpaşa - Saray Hattı (86 KM, 43 Durak) (86 KM, 43 Durak). Kapaklı ve Çerkezköy üzerinden. Başlatmak için Enter'a basın.";
             if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announcement);
-            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast("🧭 Kuzey ➔ Hat 226 Saray", 'info');
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast("🧭 Kuzey ➔ Hat 26 Saray", 'info');
             
             const listEl = document.getElementById('district-dest-list');
             if (listEl) {
