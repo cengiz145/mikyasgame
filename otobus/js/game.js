@@ -79,6 +79,7 @@ const Game = {
     isLuggageOpen: false,
     hasWheelchairPassengerAtStop: false,
     hasLostItemFound: false,
+    timingDeviations: [],
 
     toggleWheelchairRamp: function() {
         if (this.isDriving && this.speed > 3) {
@@ -143,9 +144,28 @@ const Game = {
 
     reportScheduleAdherence: function() {
         if (typeof audio !== 'undefined' && typeof audio.playIBISChime === 'function') audio.playIBISChime();
-        const msg = "Sefer Zamanlaması: Duraklara tam vaktinde ulaşıyorsunuz. Sıfır dakika gecikme, tebrikler kaptan.";
-        if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-        if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        const stopData = this.activeRouteData && this.activeRouteData.stops ? this.activeRouteData.stops[this.currentStopIndex] : null;
+        if (!stopData || !stopData.scheduledMinutes) {
+            const defMsg = "Sefer Zamanlaması: Duraklara tam vaktinde ulaşıyorsunuz. Sıfır dakika sapma.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(defMsg);
+            return;
+        }
+        const delta = this.clockMinutes - stopData.scheduledMinutes;
+        if (Math.abs(delta) <= 1.0) {
+            const msg = "Sefer Zamanlaması: Harika gidiyorsunuz, duraklara tam vaktinde ulaşıyorsunuz. Sıfır dakika sapma.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        } else if (delta < -1.0) {
+            const early = Math.abs(Math.round(delta));
+            const msg = `Sefer Zamanlaması: Planlanan çizelgeden ${early} dakika erken gidiyorsunuz. Durakta kalkış saatini bekleyiniz.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        } else {
+            const late = Math.round(delta);
+            const msg = `Sefer Zamanlaması: ${late} dakika rötarınız var. Trafik durumuna göre durak beklemesini kısa tutunuz.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+        }
     },
 
     checkLostAndFound: function() {
@@ -450,6 +470,20 @@ const Game = {
         const startStop = r.startStop || (r.stops[0] ? r.stops[0].name : "Başlangıç Durağı");
         const endStop = r.endStop || (r.stops[r.stops.length - 1] ? r.stops[r.stops.length - 1].name : "Hedef Durak");
         const intermediate = r.intermediateStops || (r.stops.length > 2 ? r.stops.slice(1, -1).map(s => s.name) : []);
+        
+        // RESMÎ SEFER SAATİ VE DAKİKLİK ÇİZELGESİ (TIMETABLE HESABI)
+        let accumulatedMinutes = this.clockMinutes;
+        r.stops.forEach((s, idx) => {
+            if (idx === 0) {
+                s.scheduledMinutes = accumulatedMinutes;
+            } else {
+                const distKm = s.gercekMesafeSonraki || (s.distance ? s.distance / 1000 : 1.2);
+                const driveTimeMinutes = (distKm / 35) * 60;
+                accumulatedMinutes += driveTimeMinutes + 0.8;
+                s.scheduledMinutes = accumulatedMinutes;
+            }
+        });
+        this.timingDeviations = [];
 
         const badgeEl = document.getElementById("hud-line-badge");
         if (badgeEl) {
@@ -1518,6 +1552,29 @@ const Game = {
             }
         }
 
+        // DAKİKLİK VE ZAMANLAMA SAPMASI HESABI (DELTA ZAMANI)
+        if (this.isDriving && this.activeRouteData && this.activeRouteData.stops && this.activeRouteData.stops[this.currentStopIndex]) {
+            const schedTime = this.activeRouteData.stops[this.currentStopIndex].scheduledMinutes;
+            if (schedTime) {
+                const delta = this.clockMinutes - schedTime;
+                const timingEl = document.getElementById('hud-timing-val');
+                if (timingEl) {
+                    if (Math.abs(delta) <= 1.0) {
+                        timingEl.innerText = "Vaktinde (0 Dk)";
+                        timingEl.style.color = "#4ade80";
+                    } else if (delta < -1.0) {
+                        const earlyMins = Math.abs(Math.round(delta));
+                        timingEl.innerText = `-${earlyMins} Dk (Erken)`;
+                        timingEl.style.color = "#38bdf8";
+                    } else {
+                        const lateMins = Math.round(delta);
+                        timingEl.innerText = `+${lateMins} Dk (Rötar)`;
+                        timingEl.style.color = "#facc15";
+                    }
+                }
+            }
+        }
+
         // YOLCU KONFOR ENDEKSİ (PCI) - EĞİTİM VE HOŞGÖRÜ SİSTEMİ
         // Rampa açıkken hareket engeli (Güvenlik Kilidi)
         if (this.isRampDeployed && (this.keys.w || this.keys.arrowup)) {
@@ -2087,6 +2144,23 @@ const Game = {
         this.stopRequestBellTriggered = false;
         const bellHudArrive = document.getElementById('hud-stop-request');
         if (bellHudArrive) bellHudArrive.style.display = 'none';
+
+        // Dakiklik değerlendirmesi
+        let timingArrivalNotice = "";
+        if (stopData && stopData.scheduledMinutes) {
+            const delta = this.clockMinutes - stopData.scheduledMinutes;
+            this.timingDeviations.push(delta);
+            if (delta < -1.2) {
+                const early = Math.abs(Math.round(delta));
+                timingArrivalNotice = ` Durağa ${early} dakika erken vardınız. Kalkış saati bekleniyor.`;
+            } else if (delta > 1.8) {
+                const late = Math.round(delta);
+                timingArrivalNotice = ` Sefer saatinde ${late} dakika rötar var.`;
+            } else {
+                timingArrivalNotice = " Tam saatinde nizami varış!";
+                this.addMoney(20);
+            }
+        }
         
         // Tekerlekli sandalye yolcusu uyarısı
         if (this.hasWheelchairPassengerAtStop) {
@@ -2385,8 +2459,25 @@ const Game = {
             
             const resComfort = document.getElementById('res-comfort');
             if (resComfort) resComfort.innerText = `%${Math.round(this.passengerComfort)} (${this.getComfortStatus()})`;
+            
+            // Sefer Dakikliği ve Zamanlama Karnesi
+            let avgDev = 0;
+            if (this.timingDeviations && this.timingDeviations.length > 0) {
+                const sumDev = this.timingDeviations.reduce((acc, v) => acc + Math.abs(v), 0);
+                avgDev = sumDev / this.timingDeviations.length;
+            }
+            const punctualityScore = Math.max(88, Math.round(100 - (avgDev * 3)));
+            const resTiming = document.getElementById('res-timing');
+            if (resTiming) resTiming.innerText = `%${punctualityScore} (Zamanında)`;
+            
+            let timingRewardMsg = "";
+            if (punctualityScore >= 90) {
+                this.addMoney(150);
+                this.addXP(40);
+                timingRewardMsg = " Sefer saatine yüksek sadakat ve dakiklik primi: 150 Lira ve 40 tecrübe puanı kazandınız.";
+            }
 
-            audio.speak("Tebrikler. Görev başarıyla tamamlandı." + comfortMsg + " Bir sonraki göreve geçmek için sonraki üzerine tıklayın veya geri dönüp oyundan çıkmak için ana menü düğmesine basın.");
+            audio.speak("Tebrikler. Görev başarıyla tamamlandı." + comfortMsg + (typeof timingRewardMsg !== "undefined" ? timingRewardMsg : "") + " Bir sonraki göreve geçmek için sonraki üzerine tıklayın veya geri dönüp oyundan çıkmak için ana menü düğmesine basın.");
             
             if (this.activeRouteData && this.activeRouteData.isIntercity) {
                 this.unlockCity(this.activeRouteData.destCity);
