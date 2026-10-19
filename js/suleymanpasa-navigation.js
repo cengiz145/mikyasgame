@@ -338,7 +338,7 @@ const SuleymanpasaNavigasyon = {
       "kwFactor": 1.38,
       "sokaklar": [
         {
-          "name": "Hükümet Caddesi (Tarihi Merkez)",
+          "name": "Hükümet Caddesi (Süleymanpaşa Tarihi Valilik & Çarşı)",
           "lat": 40.977,
           "lon": 27.512,
           "cat": "Tarihi Ana Arter"
@@ -984,12 +984,12 @@ const SuleymanpasaNavigasyon = {
     {
       "id": "spasa_sokak_48",
       "mahalle": "Çınarlı & Çiftlikönü Mahallesi",
-      "name": "Hükümet Caddesi (Tarihi Merkez)",
+      "name": "Hükümet Caddesi (Süleymanpaşa Tarihi Valilik & Çarşı)",
       "cat": "Tarihi Ana Arter",
       "lat": 40.977,
       "lon": 27.512,
       "kwFactor": 1.38,
-      "anons": "Sonraki durak: Çınarlı & Çiftlikönü Mahallesi, Hükümet Caddesi (Tarihi Merkez)."
+      "anons": "Sonraki durak: Süleymanpaşa Hükümet Caddesi, Tarihi Valilik ve Çarşı aksı."
     },
     {
       "id": "spasa_sokak_49",
