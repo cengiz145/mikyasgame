@@ -687,6 +687,14 @@ const Game = {
         this.lastFrameTime = performance.now();
         this.nextNavSoundTime = this.lastFrameTime + 10000 + Math.random() * 20000;
         this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
+        this.copilotFirstStopWarned = false;
+        if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled) {
+            setTimeout(() => {
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Seferiniz başladı. Boşluk tuşu ile motoru çalıştırıp W tuşuna basılı tutarak hareket ediniz. Pusula için Y tuşuna, yardım için F1 tuşuna basabilirsiniz.");
+                }
+            }, 1800);
+        }
         
         this.planNextStop(true); // "true" pass to indicate resume, so it doesn't read the whole start sequence again
     },
@@ -1675,6 +1683,12 @@ const Game = {
                 }
             }
 
+            if (this.currentDistanceToNext <= 220 && !this.copilotFirstStopWarned && this.currentStopIndex === 0 && this.speed > 5) {
+                this.copilotFirstStopWarned = true;
+                if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled && typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("İlk durağınıza yaklaşıyorsunuz. S tuşuna basarak yavaşlayınız. Tam durduğunuzda 1 ve 2 tuşlarıyla kapıları açınız.");
+                }
+            }
             if (this.currentDistanceToNext <= 120 && !this.stopApproachAnnounced && this.speed > 5) {
                 audio.speak("Durağa yaklaşıyorsunuz");
                 this.stopApproachAnnounced = true;
@@ -2296,6 +2310,13 @@ const Game = {
             setTimeout(() => {
                 const goodbyeMsg = "Yolcular: 'Eline sağlık kaptan, çok rahat bir seferdi. Hayırlı günler.'";
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(goodbyeMsg);
+                if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled) {
+                    setTimeout(() => {
+                        if (typeof audio !== 'undefined' && audio.speak) {
+                            audio.speak("Son durağa vardınız. Tüm yolcular indikten sonra J tuşuna basarak kabin teftişi yapınız.");
+                        }
+                    }, 3500);
+                }
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("👋 " + goodbyeMsg, "info");
             }, 1200);
         } else if (this.clockMinutes >= 390 && this.clockMinutes <= 510) {
@@ -3063,6 +3084,13 @@ const Game = {
 };
 
 window.addEventListener('keydown', (e) => {
+    if (e.key === 'F1') {
+        e.preventDefault();
+        if (window.voiceAssistant && window.voiceAssistant.toggleTutorialModal) {
+            window.voiceAssistant.toggleTutorialModal();
+        }
+        return;
+    }
     if (SanayiMechanic.isActive) {
         SanayiMechanic.handleKeyDown(e);
     } else {
