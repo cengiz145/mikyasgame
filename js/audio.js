@@ -1388,6 +1388,375 @@ class AudioSystem {
     }
 
     // --- ŞOFÖR LİYAKAT VE ROZET FANFARI (ZAFER ARPEJİ) ---
+    
+    // =========================================================================
+    // KOKPİT VE AKUSTİK ÇEVRE SİSTEMİ (ATMOSPHERIC ACOUSTIC SUITE)
+    // =========================================================================
+
+    // 1. TERMOS ÇAY YUDUMLAMA (V TUŞU)
+    playTeaPourAndSip(onComplete) {
+        this.init();
+        if (!this.ctx) return;
+        const ctx = this.ctx;
+        const now = ctx.currentTime;
+
+        // A. Termos kapağı açılma / metal klik
+        const clickOsc = ctx.createOscillator();
+        const clickGain = ctx.createGain();
+        clickOsc.type = 'triangle';
+        clickOsc.frequency.setValueAtTime(320, now);
+        clickOsc.frequency.exponentialRampToValueAtTime(140, now + 0.08);
+        clickGain.gain.setValueAtTime(0.3, now);
+        clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        clickOsc.connect(clickGain);
+        clickGain.connect(ctx.destination);
+        clickOsc.start(now);
+        clickOsc.stop(now + 0.08);
+        clickOsc.onended = () => { try { clickOsc.disconnect(); clickGain.disconnect(); } catch(e){} };
+
+        // B. Çay doldurma şırıltısı (0.1s - 1.2s arası filtrelenmiş su gürültüsü)
+        const bufferSize = Math.floor(ctx.sampleRate * 1.1);
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.sin(i * 0.02);
+        }
+        const pourSource = ctx.createBufferSource();
+        pourSource.buffer = noiseBuffer;
+
+        const pourFilter = ctx.createBiquadFilter();
+        pourFilter.type = 'bandpass';
+        pourFilter.frequency.setValueAtTime(1200, now + 0.1);
+        pourFilter.frequency.linearRampToValueAtTime(1900, now + 1.2);
+        pourFilter.Q.value = 4.0;
+
+        const pourGain = ctx.createGain();
+        pourGain.gain.setValueAtTime(0.001, now);
+        pourGain.gain.setValueAtTime(0.001, now + 0.1);
+        pourGain.gain.linearRampToValueAtTime(0.25, now + 0.3);
+        pourGain.gain.linearRampToValueAtTime(0.18, now + 0.9);
+        pourGain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+
+        pourSource.connect(pourFilter);
+        pourFilter.connect(pourGain);
+        pourGain.connect(ctx.destination);
+        pourSource.start(now + 0.1);
+        pourSource.stop(now + 1.25);
+        pourSource.onended = () => { try { pourSource.disconnect(); pourFilter.disconnect(); pourGain.disconnect(); } catch(e){} };
+
+        // C. Çay kaşığı çınlaması (iki berrak metalik tıkırtı)
+        [1.3, 1.48].forEach(tOffset => {
+            const spoonOsc = ctx.createOscillator();
+            const spoonGain = ctx.createGain();
+            spoonOsc.type = 'sine';
+            spoonOsc.frequency.setValueAtTime(2400, now + tOffset);
+            spoonGain.gain.setValueAtTime(0.2, now + tOffset);
+            spoonGain.gain.exponentialRampToValueAtTime(0.001, now + tOffset + 0.12);
+            spoonOsc.connect(spoonGain);
+            spoonGain.connect(ctx.destination);
+            spoonOsc.start(now + tOffset);
+            spoonOsc.stop(now + tOffset + 0.12);
+            spoonOsc.onended = () => { try { spoonOsc.disconnect(); spoonGain.disconnect(); } catch(e){} };
+        });
+
+        // D. Sıcak yudumlama nefesi (1.7s)
+        const sipOsc = ctx.createOscillator();
+        const sipGain = ctx.createGain();
+        sipOsc.type = 'triangle';
+        sipOsc.frequency.setValueAtTime(180, now + 1.7);
+        sipOsc.frequency.linearRampToValueAtTime(90, now + 2.2);
+        sipGain.gain.setValueAtTime(0.001, now + 1.7);
+        sipGain.gain.linearRampToValueAtTime(0.15, now + 1.85);
+        sipGain.gain.exponentialRampToValueAtTime(0.001, now + 2.3);
+        sipOsc.connect(sipGain);
+        sipGain.connect(ctx.destination);
+        sipOsc.start(now + 1.7);
+        sipOsc.stop(now + 2.3);
+        sipOsc.onended = () => {
+            try { sipOsc.disconnect(); sipGain.disconnect(); } catch(e){}
+            if (typeof onComplete === 'function') onComplete();
+        };
+    }
+
+    // 2. KAPTAN SOL CAMI MOTORU VE AKUSTİK YALITIM
+    toggleDriverWindow() {
+        this.init();
+        const now = this.ctx.currentTime;
+        this.isWindowOpen = !this.isWindowOpen;
+
+        // Elektrikli cam motor sesi (0.5s vızıltı)
+        const motorOsc = this.ctx.createOscillator();
+        const motorGain = this.ctx.createGain();
+        motorOsc.type = 'sawtooth';
+        motorOsc.frequency.setValueAtTime(this.isWindowOpen ? 160 : 190, now);
+        motorOsc.frequency.linearRampToValueAtTime(this.isWindowOpen ? 140 : 175, now + 0.5);
+        motorGain.gain.setValueAtTime(0.1, now);
+        motorGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        motorOsc.connect(motorGain);
+        motorGain.connect(this.ctx.destination);
+        motorOsc.start(now);
+        motorOsc.stop(now + 0.5);
+        motorOsc.onended = () => { try { motorOsc.disconnect(); motorGain.disconnect(); } catch(e){} };
+
+        this.setWindowOpen(this.isWindowOpen);
+        return this.isWindowOpen;
+    }
+
+    // 3. PARKE TAŞLI SOKAK TİTREŞİMİ (RUMBLE)
+    startCobblestoneRumble(speed = 30) {
+        this.init();
+        if (!this.ctx || this.cobblestoneRunning) return;
+        this.cobblestoneRunning = true;
+
+        const ctx = this.ctx;
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const filter = ctx.createBiquadFilter();
+        const gain = ctx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(28, now);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(90, now);
+
+        const targetVol = Math.min(0.28, Math.max(0.05, (speed / 60) * 0.25));
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(targetVol, now + 0.4);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+
+        this.cobblestoneSource = osc;
+        this.cobblestoneGain = gain;
+        this.cobblestoneFilter = filter;
+    }
+
+    stopCobblestoneRumble() {
+        if (!this.cobblestoneRunning || !this.cobblestoneGain) return;
+        this.cobblestoneRunning = false;
+        const now = this.ctx.currentTime;
+        try {
+            this.cobblestoneGain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+            setTimeout(() => {
+                try {
+                    if (this.cobblestoneSource) this.cobblestoneSource.stop();
+                    if (this.cobblestoneSource) this.cobblestoneSource.disconnect();
+                    if (this.cobblestoneFilter) this.cobblestoneFilter.disconnect();
+                    if (this.cobblestoneGain) this.cobblestoneGain.disconnect();
+                } catch(e){}
+            }, 350);
+        } catch(e){}
+    }
+
+    // 4. KÖPRÜ VE ALTGEÇİT YANKISI (REVERB / ECHO LOOP)
+    enableTunnelReverb() {
+        this.init();
+        if (!this.ctx || this.tunnelActive) return;
+        this.tunnelActive = true;
+
+        const ctx = this.ctx;
+        const delay = ctx.createDelay(1.0);
+        delay.delayTime.value = 0.16; // 160ms yankı gecikmesi
+
+        const feedback = ctx.createGain();
+        feedback.gain.value = 0.38; // Yumuşak sönümlenme
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 1600; // Tünel içi beton yutumu
+
+        delay.connect(filter);
+        filter.connect(feedback);
+        feedback.connect(delay);
+        filter.connect(ctx.destination);
+
+        this.tunnelDelay = delay;
+        this.tunnelFeedback = feedback;
+        this.tunnelFilter = filter;
+
+        // Hafif tünel uğultusu
+        const ambientOsc = ctx.createOscillator();
+        const ambientGain = ctx.createGain();
+        ambientOsc.type = 'sine';
+        ambientOsc.frequency.value = 85;
+        ambientGain.gain.setValueAtTime(0.001, ctx.currentTime);
+        ambientGain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.5);
+        ambientOsc.connect(ambientGain);
+        ambientGain.connect(delay);
+        ambientOsc.start();
+        this.tunnelAmbient = ambientOsc;
+        this.tunnelAmbientGain = ambientGain;
+    }
+
+    disableTunnelReverb() {
+        if (!this.tunnelActive) return;
+        this.tunnelActive = false;
+        const now = this.ctx.currentTime;
+        try {
+            if (this.tunnelAmbientGain) this.tunnelAmbientGain.gain.linearRampToValueAtTime(0.001, now + 0.5);
+            if (this.tunnelFeedback) this.tunnelFeedback.gain.linearRampToValueAtTime(0.001, now + 0.5);
+            setTimeout(() => {
+                try {
+                    if (this.tunnelAmbient) this.tunnelAmbient.stop();
+                    if (this.tunnelAmbient) this.tunnelAmbient.disconnect();
+                    if (this.tunnelAmbientGain) this.tunnelAmbientGain.disconnect();
+                    if (this.tunnelDelay) this.tunnelDelay.disconnect();
+                    if (this.tunnelFeedback) this.tunnelFeedback.disconnect();
+                    if (this.tunnelFilter) this.tunnelFilter.disconnect();
+                } catch(e){}
+            }, 600);
+        } catch(e){}
+    }
+
+    // 5. KASİS GEÇİŞİ SÜSPANSİYON ESNEYESİ ("GÜM-PISS")
+    playSuspensionBounce() {
+        this.init();
+        if (!this.ctx) return;
+        const ctx = this.ctx;
+        const now = ctx.currentTime;
+
+        // A. Alt frekans esneme / güm
+        const thudOsc = ctx.createOscillator();
+        const thudGain = ctx.createGain();
+        thudOsc.type = 'sine';
+        thudOsc.frequency.setValueAtTime(75, now);
+        thudOsc.frequency.exponentialRampToValueAtTime(32, now + 0.22);
+        thudGain.gain.setValueAtTime(0.45, now);
+        thudGain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+        thudOsc.connect(thudGain);
+        thudGain.connect(ctx.destination);
+        thudOsc.start(now);
+        thudOsc.stop(now + 0.25);
+        thudOsc.onended = () => { try { thudOsc.disconnect(); thudGain.disconnect(); } catch(e){} };
+
+        // B. Havalı körük süspansiyon tıslaması ("pıss")
+        const bufferSize = Math.floor(ctx.sampleRate * 0.28);
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+        }
+        const hissSource = ctx.createBufferSource();
+        hissSource.buffer = noiseBuffer;
+
+        const hissFilter = ctx.createBiquadFilter();
+        hissFilter.type = 'highpass';
+        hissFilter.frequency.value = 1800;
+
+        const hissGain = ctx.createGain();
+        hissGain.gain.setValueAtTime(0.001, now);
+        hissGain.gain.setValueAtTime(0.2, now + 0.05);
+        hissGain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+        hissSource.connect(hissFilter);
+        hissFilter.connect(hissGain);
+        hissGain.connect(ctx.destination);
+        hissSource.start(now + 0.04);
+        hissSource.stop(now + 0.3);
+        hissSource.onended = () => { try { hissSource.disconnect(); hissFilter.disconnect(); hissGain.disconnect(); } catch(e){} };
+    }
+
+    // 6. KARŞIDAN GEÇEN MESLEKTAŞ OTOBÜS VE SELAMLAŞMA KORNASI
+    playPassingBus(onHonkWindow) {
+        this.init();
+        if (!this.ctx) return;
+        const ctx = this.ctx;
+        const now = ctx.currentTime;
+
+        // A. Stereo soldan vııın geçiş efekti
+        const passOsc = ctx.createOscillator();
+        const passGain = ctx.createGain();
+        const panner = ctx.createStereoPanner();
+
+        passOsc.type = 'triangle';
+        passOsc.frequency.setValueAtTime(180, now);
+        passOsc.frequency.exponentialRampToValueAtTime(95, now + 1.8);
+
+        // Soldan yaklaş ve geç: Pan -0.2 -> -0.8
+        panner.pan.setValueAtTime(-0.25, now);
+        panner.pan.linearRampToValueAtTime(-0.85, now + 1.8);
+
+        passGain.gain.setValueAtTime(0.001, now);
+        passGain.gain.linearRampToValueAtTime(0.35, now + 0.7);
+        passGain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+        passOsc.connect(passGain);
+        passGain.connect(panner);
+        panner.connect(ctx.destination);
+        passOsc.start(now);
+        passOsc.stop(now + 1.8);
+        passOsc.onended = () => { try { passOsc.disconnect(); passGain.disconnect(); panner.disconnect(); } catch(e){} };
+
+        // B. İki dostça kısa korna ("düt-düt") (0.5s ve 0.75s)
+        [0.45, 0.72].forEach(offset => {
+            const hornOsc1 = ctx.createOscillator();
+            const hornOsc2 = ctx.createOscillator();
+            const hGain = ctx.createGain();
+            const hPanner = ctx.createStereoPanner();
+            hPanner.pan.value = -0.7;
+
+            hornOsc1.type = 'sawtooth';
+            hornOsc2.type = 'sawtooth';
+            hornOsc1.frequency.value = 392; // G4
+            hornOsc2.frequency.value = 493.88; // B4
+
+            hGain.gain.setValueAtTime(0.2, now + offset);
+            hGain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.12);
+
+            hornOsc1.connect(hGain);
+            hornOsc2.connect(hGain);
+            hGain.connect(hPanner);
+            hPanner.connect(ctx.destination);
+
+            hornOsc1.start(now + offset);
+            hornOsc2.start(now + offset);
+            hornOsc1.stop(now + offset + 0.13);
+            hornOsc2.stop(now + offset + 0.13);
+
+            hornOsc1.onended = () => { try { hornOsc1.disconnect(); hornOsc2.disconnect(); hGain.disconnect(); hPanner.disconnect(); } catch(e){} };
+        });
+
+        // 4 saniyelik selamlaşma penceresini başlat
+        if (typeof onHonkWindow === 'function') {
+            setTimeout(onHonkWindow, 400);
+        }
+    }
+
+    // 7. YAĞMURDA ŞEMSİYE SİLKELEME VE KAPATMA SESİ ("ŞAK-ŞIRK")
+    playUmbrellaShake() {
+        this.init();
+        if (!this.ctx) return;
+        const ctx = this.ctx;
+        const now = ctx.currentTime;
+
+        const bufferSize = Math.floor(ctx.sampleRate * 0.35);
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.cos(i * 0.05);
+        }
+        const source = ctx.createBufferSource();
+        source.buffer = noiseBuffer;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 2400;
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        source.start(now);
+        source.stop(now + 0.38);
+        source.onended = () => { try { source.disconnect(); filter.disconnect(); gain.disconnect(); } catch(e){} };
+    }
+
     playBadgeFanfare() {
         this.init();
         if (!this.ctx) return;
