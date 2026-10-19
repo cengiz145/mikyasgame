@@ -161,6 +161,56 @@ const SoundGallery = {
             bassBoost: 0
         },
 
+        
+        // --- 3. AKBİL VE KART OKUYUCU (VALIDATOR) SESLERİ ---
+        {
+            id: 'akbil_tam',
+            category: 'akbil',
+            title: 'Tam Akbil / Standart Biniş Onay Bipi',
+            icon: '💳',
+            specs: 'Freesound ilmari_freesound #625731 Zoom H5 Stüdyo Kaydı',
+            desc: 'Şehir içi otobüse binerken tam kart basıldığında çıkan o temiz ve net tek tonlu onay sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilTam) audio.playAkbilTam();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('tam');
+            }
+        },
+        {
+            id: 'akbil_ogrenci',
+            category: 'akbil',
+            title: 'Öğrenci & İndirimli Akbil (Çift Bip)',
+            icon: '🎓',
+            specs: 'Freesound SpliceSound #369875 Orijinal Transit Kart Kaydı',
+            desc: 'Öğrenci veya indirimli kart okutulduğunda çıkan o melodik ve neşeli çift dıt-dıt onay sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilOgrenci) audio.playAkbilOgrenci();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('ogrenci');
+            }
+        },
+        {
+            id: 'akbil_hata',
+            category: 'akbil',
+            title: 'Yetersiz Bakiye / Kart Reddedildi Alarmı',
+            icon: '❌',
+            specs: 'Freesound PerMagnusLindborg #324248 Card Reject Alarm',
+            desc: 'Kartta para kalmadığında veya kart okunamadığında validatörün çaldığı o keskin ret ve uyarı alarmı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilHata) audio.playAkbilHata();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('yetersiz');
+            }
+        },
+        {
+            id: 'bus_validator',
+            category: 'akbil',
+            title: 'Gerçek Otobüs Kart Okuyucu Validatör Mekanizması',
+            icon: '📟',
+            specs: 'Freesound Robinhood76 #62589 Orijinal Otobüs Validatörü',
+            desc: 'Gerçek bir belediye otobüsü kart okuyucu cihazının iç röle ve elektronik kart okuma tepkisi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playBusValidator) audio.playBusValidator();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('serbest');
+            }
+        },
         // --- 2. PNÖMATİK & MEKANİK EFEKTLER ---
         {
             id: 'fx_air_brake',
@@ -267,6 +317,8 @@ const SoundGallery = {
         const tabAll = document.getElementById('tab-sound-all');
         const tabEngine = document.getElementById('tab-sound-engine');
         const tabFx = document.getElementById('tab-sound-fx');
+        const tabAkbil = document.getElementById('tab-sound-akbil');
+        if (tabAkbil) tabAkbil.addEventListener('click', () => this.switchTab('akbil'));
 
         if (tabAll) tabAll.addEventListener('click', () => this.switchTab('all'));
         if (tabEngine) tabEngine.addEventListener('click', () => this.switchTab('engine'));
@@ -336,7 +388,7 @@ const SoundGallery = {
 
     switchTab: function(tab) {
         this.currentTab = tab;
-        ['tab-sound-all', 'tab-sound-engine', 'tab-sound-fx'].forEach(id => {
+        ['tab-sound-all', 'tab-sound-engine', 'tab-sound-akbil', 'tab-sound-fx'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 el.style.background = 'rgba(255,255,255,0.08)';
@@ -345,7 +397,7 @@ const SoundGallery = {
             }
         });
 
-        const activeId = tab === 'engine' ? 'tab-sound-engine' : (tab === 'effect' ? 'tab-sound-fx' : 'tab-sound-all');
+        const activeId = tab === 'engine' ? 'tab-sound-engine' : (tab === 'akbil' ? 'tab-sound-akbil' : (tab === 'effect' ? 'tab-sound-fx' : 'tab-sound-all'));
         const activeEl = document.getElementById(activeId);
         if (activeEl) {
             activeEl.style.background = 'rgba(168,85,247,0.3)';
@@ -364,6 +416,7 @@ const SoundGallery = {
         const filtered = this.sounds.filter(s => {
             if (tab === 'engine') return s.category === 'engine';
             if (tab === 'effect') return s.category === 'effect';
+            if (tab === 'akbil') return s.category === 'akbil';
             return true;
         });
 

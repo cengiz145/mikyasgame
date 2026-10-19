@@ -67,6 +67,10 @@ class AudioSystem {
             crash: new Howl({ src: ['sounds/underwaterland.ogg'] }),
             airHorn: new Howl({ src: ['sounds/freesound_industrial_horn.mp3', 'sounds/havalı korna.mp3'], volume: 0.90 }),
             airBrake: new Howl({ src: ['sounds/freesound_air_brake.mp3'], volume: 0.90 }),
+            akbilTam: new Howl({ src: ['sounds/freesound_akbil_tam.mp3'], volume: 0.90 }),
+            akbilOgrenci: new Howl({ src: ['sounds/freesound_akbil_ogrenci.mp3'], volume: 0.90 }),
+            akbilHata: new Howl({ src: ['sounds/freesound_akbil_hata.mp3'], volume: 0.90 }),
+            busValidator: new Howl({ src: ['sounds/freesound_bus_validator.mp3'], volume: 0.90 }),
             npcHorn: new Howl({ src: ['sounds/vehicle_h1.ogg'], volume: 0.80 }),
             menuMusic: new Howl({ src: ['sounds/music53.wav'], loop: true, volume: 0.2 }),
             rain8: new Howl({ src: ['sounds/rain8.ogg'], loop: true, volume: 0 }),
@@ -2119,6 +2123,15 @@ class AudioSystem {
     // --- RESMÎ TEKİRDAĞ KART / KENTKART VALİDATÖR SESLERİ ---
     playValidatorSound(type = 'tam') {
         this.init();
+        if (type === 'tam' && this.sounds && this.sounds.akbilTam) {
+            try { this.sounds.akbilTam.play(); return; } catch(e){}
+        } else if (type === 'ogrenci' && this.sounds && this.sounds.akbilOgrenci) {
+            try { this.sounds.akbilOgrenci.play(); return; } catch(e){}
+        } else if ((type === 'yetersiz' || type === 'ret' || type === 'hata') && this.sounds && this.sounds.akbilHata) {
+            try { this.sounds.akbilHata.play(); return; } catch(e){}
+        } else if ((type === 'yasli' || type === 'serbest') && this.sounds && this.sounds.busValidator) {
+            try { this.sounds.busValidator.play(); return; } catch(e){}
+        }
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
         const outDest = this.ctx.destination;
@@ -2197,6 +2210,39 @@ class AudioSystem {
             gain.connect(outDest);
             osc.start(now);
             osc.stop(now + 0.15);
+        }
+    }
+
+    
+    playAkbilTam() {
+        if (this.sounds && this.sounds.akbilTam) {
+            try { this.sounds.akbilTam.play(); } catch(e){}
+        } else {
+            this.playValidatorSound('tam');
+        }
+    }
+
+    playAkbilOgrenci() {
+        if (this.sounds && this.sounds.akbilOgrenci) {
+            try { this.sounds.akbilOgrenci.play(); } catch(e){}
+        } else {
+            this.playValidatorSound('ogrenci');
+        }
+    }
+
+    playAkbilHata() {
+        if (this.sounds && this.sounds.akbilHata) {
+            try { this.sounds.akbilHata.play(); } catch(e){}
+        } else {
+            this.playValidatorSound('yetersiz');
+        }
+    }
+
+    playBusValidator() {
+        if (this.sounds && this.sounds.busValidator) {
+            try { this.sounds.busValidator.play(); } catch(e){}
+        } else {
+            this.playValidatorSound('serbest');
         }
     }
 
