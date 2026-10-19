@@ -1,18 +1,37 @@
 /* ==========================================================================
    KAPTAN LİYAKAT ROZETLERİ VE 1500 ŞOFÖR BAŞARISI SİSTEMİ (DRIVER BADGES)
-   Mikyas Simülasyon Dünyası - Şoförlük Onur ve Liyakat Ödülleri
-   Tamamen Kolaydan Zora Doğru (1 - 1500) Sıralı
-   %100 Ekran Okuyucu (NVDA) Uyumlu, Sayfalamalı ve Sesli Bildirimli
+   Mikyas Simülasyon Dünyası - İki Ana Kategoriye Ayrılmış Sistem:
+   1. AÇILMIŞ BAŞARILAR (Kazanılanlar / Gurur Tablosu)
+   2. AÇILMAYANLAR (Gizemli Mühürlü Başarılar / Sır Odası)
+   %100 Ekran Okuyucu (NVDA) Uyumlu, Sayfalamalı ve Tam Erişilebilir
    ========================================================================== */
 
 const DriverBadges = {
     STORAGE_KEY: 'tekulas_driver_badges_v2',
     STATS_KEY: 'tekulas_driver_stats_v2',
-    currentTab: 'all',
+    currentTab: 'unlocked', // 'unlocked' veya 'locked'
     currentTier: 'all',
     searchQuery: '',
     currentPage: 1,
     pageSize: 30,
+
+    mysteryClues: {
+    "sefer_azmi": "Trakya yollarında kontak kapatmadan seferden sefere koşan azimli kaptanların mührü...",
+    "yolcu_hizmeti": "Halkın sevgisini ve itimadını kazanıp yolcuları emniyetle taşıyanların mührü...",
+    "xp_tecrube": "Direksiyon başında gece gündüz alın teri dökerek tecrübe basamaklarını tırmananların mührü...",
+    "ipek_fren": "Çay bardağındaki tek damlayı taşırmayan, sarsıntısız kadife ayakların mührü...",
+    "dakiklik": "Durak saatine ve sefer tarifesine saniyesi saniyesine riayet eden intizam abidelerinin mührü...",
+    "hasarsiz_surus": "Aracına tek çizik dahi aldırmadan sanayi kapısı görmeyen dikkatli gözlerin mührü...",
+    "kazasiz_seri": "Konsantrasyonunu bir an bile bozmadan peş peşe kusursuz sefer zinciri dizenlerin mührü...",
+    "gece_nobeti": "Karanlık basınca poyrazın ve yıldızların sesini dinleyen gece muhafızlarının mührü...",
+    "engelsiz_ulasim": "Her yolcuya hürmetle yaklaşıp engelleri kaldıran koca yürekli kaptanların mührü...",
+    "durak_kesfi": "Şehrin en dar çıkmaz sokaklarını bile hafızasına kazıyan usta kaşiflerin mührü...",
+    "hasilat_butce": "Alın teri ve dürüst emekle bilet hasılatından kasa dolduranların mührü...",
+    "direksiyon_zamani": "Asfaltın üzerinde ömrünü direksiyona adayan emektar şoförlerin mührü...",
+    "yol_mesafesi": "Trakya'yı karış karış arşınlayıp kilometreleri yutan asfalt aşındırıcıların mührü...",
+    "emanet_esya": "Son durakta unutulan emaneti namus bilip sahibine ulaştıran dürüstlerin mührü...",
+    "ehliyet_prestij": "Şoförlük makamının en yüce mertebelerine erişen büyük başkaptanların mührü..."
+},
 
     get badges() {
         if (typeof window !== 'undefined' && window.ACHIEVEMENTS_1500) {
@@ -69,7 +88,6 @@ const DriverBadges = {
             }
         } catch(e) {}
 
-        // Mevcut oyun verisiyle senkronize et
         if (typeof Game !== 'undefined') {
             if (Game.completedTasks) stats.totalTrips = Math.max(stats.totalTrips, Game.completedTasks);
             if (Game.playerXP) stats.totalXP = Math.max(stats.totalXP, Game.playerXP);
@@ -133,7 +151,7 @@ const DriverBadges = {
                 audio.updateNvdaLiveRegion(msg);
             }
             if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
-                UI.showToast(`🎖️ Yeni Başarı: ${badge.title}`, 'success');
+                UI.showToast(`🎖️ Yeni Başarı Açıldı: ${badge.title}`, 'success');
             }
         }
 
@@ -146,7 +164,6 @@ const DriverBadges = {
 
         const lifetime = this.getLifetimeStats();
 
-        // İstatistikleri güncelle
         lifetime.totalTrips += 1;
         const carried = (typeof Game !== 'undefined' && Game.passengersOnBoard) ? Game.passengersOnBoard : 15;
         lifetime.totalPassengers += carried;
@@ -203,7 +220,6 @@ const DriverBadges = {
 
         this.saveLifetimeStats(lifetime);
 
-        // 1500 başarıyı tek tek kontrol et
         const data = this.getBadgesData();
         const newlyUnlocked = [];
 
@@ -228,7 +244,7 @@ const DriverBadges = {
             const topTitle = newlyUnlocked[0].title;
             const announceText = count === 1
                 ? `Tebrikler Kaptan! Yeni bir liyakat rozeti kazandınız: ${topTitle}!`
-                : `Tebrikler Kaptan! Sefer başarınızla ${count} yeni liyakat rozeti kazandınız! İlk rozetiniz: ${topTitle}.`;
+                : `Tebrikler Kaptan! Sefer başarınızla ${count} yeni liyakat rozeti açıldı! İlk rozetiniz: ${topTitle}.`;
 
             setTimeout(() => {
                 if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
@@ -238,7 +254,7 @@ const DriverBadges = {
                     audio.updateNvdaLiveRegion(announceText);
                 }
                 if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
-                    UI.showToast(`🎖️ ${count} Yeni Başarı Kazanıldı: ${topTitle}`, 'success');
+                    UI.showToast(`🎖️ ${count} Yeni Başarı Açıldı: ${topTitle}`, 'success');
                 }
             }, 1800);
         }
@@ -252,12 +268,18 @@ const DriverBadges = {
         if (!modal) return;
 
         modal.classList.remove('hidden');
+
+        // Eğer henüz kazanılan başarı yoksa doğrudan Açılmayanlar gizemli sekmesine geç
+        const unlockedCount = this.getUnlockedCount();
+        this.currentTab = (unlockedCount > 0) ? 'unlocked' : 'locked';
         this.currentPage = 1;
         this.renderModal();
 
-        const unlockedCount = this.getUnlockedCount();
         const totalCount = this.badges.length;
-        const welcomeSpeech = `1500 Kaptan Başarısı ve Liyakat Rozetleri menüsü açıldı. Toplam ${totalCount} başarıdan ${unlockedCount} tanesi kazanıldı. Başarılar kolaydan zora sıralıdır. Yön tuşlarıyla veya Tab ile ilerleyebilirsiniz. Sayfa değiştirmek için Önceki ve Sonraki düğmelerini kullanabilirsiniz. Kapatmak için Esc tuşuna basınız.`;
+        const lockedCount = totalCount - unlockedCount;
+        const currentTabName = (this.currentTab === 'unlocked') ? 'Açılmış Başarılar' : 'Açılmayan Gizemli Başarılar';
+
+        const welcomeSpeech = `Başarılar menüsü açıldı. Şu an ${currentTabName} sekmesindesiniz. Toplam ${totalCount} başarıdan ${unlockedCount} tanesi açıldı, ${lockedCount} tanesi mühürlü bekliyor. Sekmeler arasında Tab tuşu ile geçiş yapabilirsiniz. Kapatmak için Esc tuşuna basınız.`;
 
         if (typeof audio !== 'undefined') {
             if (typeof audio.playSwitchClick === 'function') audio.playSwitchClick();
@@ -265,8 +287,8 @@ const DriverBadges = {
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(welcomeSpeech);
         }
 
-        const closeBtn = document.getElementById('btn-badges-modal-close');
-        if (closeBtn) closeBtn.focus();
+        const activeTabBtn = document.getElementById(this.currentTab === 'unlocked' ? 'tab-badges-unlocked' : 'tab-badges-locked');
+        if (activeTabBtn) activeTabBtn.focus();
 
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
             KeyboardNav.initForScreen();
@@ -296,6 +318,9 @@ const DriverBadges = {
         const btnPrev = document.getElementById('btn-badge-prev-page');
         const btnNext = document.getElementById('btn-badge-next-page');
 
+        const tabUnlockedBtn = document.getElementById('tab-badges-unlocked');
+        const tabLockedBtn = document.getElementById('tab-badges-locked');
+
         if (!listEl) return;
         listEl.innerHTML = '';
 
@@ -303,7 +328,43 @@ const DriverBadges = {
         const totalCount = this.badges.length;
         const lockedCount = totalCount - unlockedCount;
 
-        // Filtreleme
+        if (tabUnlockedBtn) {
+            tabUnlockedBtn.innerText = `🏆 Açılmış Başarılar (${unlockedCount})`;
+        }
+        if (tabLockedBtn) {
+            tabLockedBtn.innerText = `🔒 Açılmayanlar (${lockedCount})`;
+        }
+
+        // Aktif sekme stilini güncelle
+        if (this.currentTab === 'unlocked') {
+            if (tabUnlockedBtn) {
+                tabUnlockedBtn.style.background = 'linear-gradient(135deg, rgba(234, 179, 8, 0.35), rgba(202, 138, 4, 0.2))';
+                tabUnlockedBtn.style.borderColor = '#eab308';
+                tabUnlockedBtn.style.color = '#fef08a';
+                tabUnlockedBtn.style.boxShadow = '0 0 15px rgba(234, 179, 8, 0.2)';
+            }
+            if (tabLockedBtn) {
+                tabLockedBtn.style.background = 'rgba(255, 255, 255, 0.06)';
+                tabLockedBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                tabLockedBtn.style.color = '#94a3b8';
+                tabLockedBtn.style.boxShadow = 'none';
+            }
+        } else {
+            if (tabLockedBtn) {
+                tabLockedBtn.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.35), rgba(126, 34, 206, 0.2))';
+                tabLockedBtn.style.borderColor = '#a855f7';
+                tabLockedBtn.style.color = '#e9d5ff';
+                tabLockedBtn.style.boxShadow = '0 0 15px rgba(168, 85, 247, 0.2)';
+            }
+            if (tabUnlockedBtn) {
+                tabUnlockedBtn.style.background = 'rgba(255, 255, 255, 0.06)';
+                tabUnlockedBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                tabUnlockedBtn.style.color = '#94a3b8';
+                tabUnlockedBtn.style.boxShadow = 'none';
+            }
+        }
+
+        // Sadece seçili sekmenin başarılarını filtrele (Açılmış vs Açılmayanlar)
         let filtered = this.badges.filter(b => {
             const isUn = this.isUnlocked(b.id);
             if (this.currentTab === 'unlocked' && !isUn) return false;
@@ -331,7 +392,9 @@ const DriverBadges = {
         if (this.currentPage < 1) this.currentPage = 1;
 
         if (summaryEl) {
-            summaryEl.innerText = `Toplam ${totalCount} Başarı • ${unlockedCount} Kazanıldı • ${lockedCount} Kilitli (Filtrelenen: ${totalFiltered})`;
+            summaryEl.innerText = (this.currentTab === 'unlocked')
+                ? `🏆 Açılmış Başarılar: Toplam ${unlockedCount} Başarı Kazanıldı (Filtrelenen: ${totalFiltered})`
+                : `🔒 Açılmayan Gizemli Başarılar: Toplam ${lockedCount} Mühürlü Başarı Bekliyor (Filtrelenen: ${totalFiltered})`;
         }
 
         if (pageIndicatorEl) {
@@ -341,18 +404,45 @@ const DriverBadges = {
         if (btnPrev) btnPrev.disabled = (this.currentPage <= 1);
         if (btnNext) btnNext.disabled = (this.currentPage >= totalPages);
 
-        this.setTabActive(this.currentTab);
-
-        // Sayfa dilimi (Pagination slice)
+        // Sayfa dilimi
         const startIndex = (this.currentPage - 1) * this.pageSize;
         const pageItems = filtered.slice(startIndex, startIndex + this.pageSize);
 
         if (pageItems.length === 0) {
             const emptyLi = document.createElement('li');
-            emptyLi.style.padding = '20px';
+            emptyLi.style.padding = '35px 20px';
             emptyLi.style.textAlign = 'center';
             emptyLi.style.color = '#94a3b8';
-            emptyLi.innerText = 'Seçilen kriterlere uygun başarı bulunamadı.';
+            emptyLi.style.fontSize = '1.05rem';
+            emptyLi.style.lineHeight = '1.6';
+
+            if (this.currentTab === 'unlocked') {
+                emptyLi.innerHTML = `
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🏆</div>
+                    <strong style="color: #fde047; font-size: 1.15rem;">Henüz Açılmış Bir Başarınız Bulunmuyor</strong><br>
+                    Seferlere çıkarak, yolcu taşıyarak ve durakları keşfederek ilk rozetlerinizi kazanmaya hemen başlayabilirsiniz!<br>
+                    <button id="btn-switch-to-locked" class="modern-btn nav-item" style="margin-top: 15px; padding: 10px 20px; background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #e9d5ff; font-weight: bold; cursor: pointer;">
+                        🔒 Açılmayan Gizemli Başarıları İncele
+                    </button>
+                `;
+                setTimeout(() => {
+                    const btnSwitch = document.getElementById('btn-switch-to-locked');
+                    if (btnSwitch) {
+                        btnSwitch.onclick = () => {
+                            this.currentTab = 'locked';
+                            this.currentPage = 1;
+                            this.renderModal();
+                        };
+                    }
+                }, 50);
+            } else {
+                emptyLi.innerHTML = `
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🎉</div>
+                    <strong style="color: #22c55e; font-size: 1.15rem;">İnanılmaz! Bu filtrede tüm başarıları açtınız!</strong><br>
+                    Kazanılan başarılarınızı görmek için "Açılmış Başarılar" sekmesine geçebilirsiniz.
+                `;
+            }
+
             listEl.appendChild(emptyLi);
             return;
         }
@@ -376,83 +466,118 @@ const DriverBadges = {
             btn.style.cursor = 'pointer';
             btn.style.transition = 'all 0.2s ease';
 
-            // Zorluk renkleri
-            let tierColor = '#22c55e'; // 1
+            let tierColor = '#22c55e';
             if (badge.tier === 2) tierColor = '#eab308';
             else if (badge.tier === 3) tierColor = '#f97316';
             else if (badge.tier === 4) tierColor = '#ef4444';
             else if (badge.tier === 5) tierColor = '#a855f7';
 
             if (isUn) {
+                // AÇILMIŞ BAŞARI TASARIMI (Altın ve Zafer Parlaması)
                 btn.style.border = '2px solid #eab308';
                 btn.style.background = 'linear-gradient(135deg, rgba(234, 179, 8, 0.18), rgba(202, 138, 4, 0.08))';
                 btn.style.boxShadow = '0 0 12px rgba(234, 179, 8, 0.15)';
-            } else {
-                btn.style.border = '1px solid rgba(255, 255, 255, 0.15)';
-                btn.style.background = 'rgba(15, 23, 42, 0.65)';
-                btn.style.opacity = '0.9';
-            }
 
-            const statusBadgeHtml = isUn
-                ? `<span style="background: linear-gradient(135deg, #eab308, #ca8a04); color: #000; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">🎖️ KAZANILDI</span>`
-                : `<span style="background: rgba(148, 163, 184, 0.2); color: #94a3b8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">🔒 KİLİTLİ</span>`;
+                const ariaLabel = `Açılmış Başarı No ${badge.difficulty}: ${badge.title}. Zorluk: ${badge.tierName}. Kategori: ${badge.category}. Açıklama: ${badge.desc}. Kazanma şartı: ${badge.requirement}. Kazanılma tarihi: ${dateStr || 'Kayıtlı'}. Dinlemek için Enter.`;
+                btn.setAttribute('aria-label', ariaLabel);
 
-            const dateHtml = (isUn && dateStr)
-                ? `<span style="color: #fde047; font-size: 0.8rem; margin-left: 6px;">(${dateStr})</span>`
-                : '';
-
-            const ariaLabel = isUn
-                ? `Başarı No ${badge.difficulty}: ${badge.title}. Zorluk: ${badge.tierName}. Durum: Kazanıldı. Tarih: ${dateStr || 'Kayıtlı'}. Kategori: ${badge.category}. Açıklama: ${badge.desc}. Kazanma şartı: ${badge.requirement}. Dinlemek için Enter.`
-                : `Başarı No ${badge.difficulty}: ${badge.title}. Zorluk: ${badge.tierName}. Durum: Kilitli. Kategori: ${badge.category}. Nasıl kazanılır: ${badge.requirement}. Dinlemek için Enter.`;
-            
-            btn.setAttribute('aria-label', ariaLabel);
-
-            btn.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 1.3rem;" aria-hidden="true">${isUn ? badge.icon : '🔒'}</span>
+                btn.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.35rem;" aria-hidden="true">${badge.icon}</span>
+                            <div>
+                                <span style="font-size: 0.8rem; color: ${tierColor}; font-weight: bold; margin-right: 6px;">
+                                    #${badge.difficulty} • ${badge.tierName}
+                                </span>
+                                <span style="font-size: 1.05rem; font-weight: bold; color: #fef08a;">
+                                    ${badge.title}
+                                </span>
+                                <span style="display: inline-block; margin-left: 6px; font-size: 0.75rem; padding: 1px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
+                                    ${badge.category}
+                                </span>
+                            </div>
+                        </div>
                         <div>
-                            <span style="font-size: 0.8rem; color: ${tierColor}; font-weight: bold; margin-right: 6px;">
-                                #${badge.difficulty} • ${badge.tierName}
-                            </span>
-                            <span style="font-size: 1.05rem; font-weight: bold; color: ${isUn ? '#fef08a' : '#cbd5e1'};">
-                                ${badge.title}
-                            </span>
-                            <span style="display: inline-block; margin-left: 6px; font-size: 0.75rem; padding: 1px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
-                                ${badge.category}
-                            </span>
+                            <span style="background: linear-gradient(135deg, #eab308, #ca8a04); color: #000; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">🎖️ AÇILDI</span>
                         </div>
                     </div>
-                    <div>${statusBadgeHtml}</div>
-                </div>
 
-                <div style="font-size: 0.9rem; color: ${isUn ? '#e2e8f0' : '#94a3b8'}; margin-bottom: 6px; line-height: 1.35;">
-                    ${badge.desc}
-                </div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.08);">
-                    <div style="color: ${isUn ? '#38bdf8' : '#facc15'};">
-                        🎯 <strong>${isUn ? 'Kazanma Şartı:' : 'Nasıl Kazanılır:'}</strong> ${badge.requirement}
+                    <div style="font-size: 0.9rem; color: #e2e8f0; margin-bottom: 6px; line-height: 1.35;">
+                        ${badge.desc}
                     </div>
-                    <div>${dateHtml}</div>
-                </div>
-            `;
 
-            btn.onclick = () => {
-                if (typeof audio !== 'undefined') {
-                    if (isUn && typeof audio.playBadgeFanfare === 'function') {
-                        audio.playBadgeFanfare();
-                    } else if (typeof audio.playSwitchClick === 'function') {
-                        audio.playSwitchClick();
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.08);">
+                        <div style="color: #38bdf8;">
+                            🎯 <strong>Kazanma Şartı:</strong> ${badge.requirement}
+                        </div>
+                        <div style="color: #fde047; font-size: 0.8rem;">
+                            📅 ${dateStr || 'Kayıtlı'}
+                        </div>
+                    </div>
+                `;
+
+                btn.onclick = () => {
+                    if (typeof audio !== 'undefined') {
+                        if (typeof audio.playBadgeFanfare === 'function') audio.playBadgeFanfare();
+                        if (typeof audio.speak === 'function') audio.speak(ariaLabel);
+                        if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(ariaLabel);
                     }
-                    if (typeof audio.speak === 'function') {
-                        audio.speak(ariaLabel);
+                };
+            } else {
+                // AÇILMAYAN GİZEMLİ BAŞARI TASARIMI (Mühürlü ve Kriptik)
+                btn.style.border = '1px dashed rgba(168, 85, 247, 0.35)';
+                btn.style.background = 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 27, 75, 0.4))';
+                btn.style.opacity = '0.92';
+
+                // Gizemli başlık ve ipucu mantığı
+                const mysteryClueText = this.mysteryClues[badge.stat] || 'Trakya yollarında direksiyon salladıkça bu mühür çözülecek...';
+                const mysteryTitle = (badge.tier >= 4)
+                    ? `🔒 ??? (Gizemli Mühür #${badge.difficulty})`
+                    : `🔒 ${badge.title}`;
+
+                const ariaLabel = `Açılmayan Gizemli Başarı No ${badge.difficulty}: ${mysteryTitle}. Zorluk Derecesi: ${badge.tierName}. Kategori: ${badge.category}. Gizemli İpucu: ${mysteryClueText}. Şart: ${badge.requirement}. Dinlemek için Enter.`;
+                btn.setAttribute('aria-label', ariaLabel);
+
+                btn.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 1.25rem; color: #c084fc;" aria-hidden="true">🗝️</span>
+                            <div>
+                                <span style="font-size: 0.8rem; color: ${tierColor}; font-weight: bold; margin-right: 6px;">
+                                    #${badge.difficulty} • ${badge.tierName}
+                                </span>
+                                <span style="font-size: 1.05rem; font-weight: bold; color: #cbd5e1;">
+                                    ${mysteryTitle}
+                                </span>
+                                <span style="display: inline-block; margin-left: 6px; font-size: 0.75rem; padding: 1px 6px; border-radius: 4px; background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">
+                                    ${badge.category}
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <span style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">🔒 MÜHÜRLÜ</span>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; margin-bottom: 6px; line-height: 1.35;">
+                        🔮 <strong>Gizemli Fısıltı:</strong> "${mysteryClueText}"
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.06);">
+                        <div style="color: #facc15;">
+                            🎯 <strong>Nasıl Açılır:</strong> ${badge.requirement}
+                        </div>
+                    </div>
+                `;
+
+                btn.onclick = () => {
+                    if (typeof audio !== 'undefined') {
+                        if (typeof audio.playSwitchClick === 'function') audio.playSwitchClick();
+                        if (typeof audio.speak === 'function') audio.speak(ariaLabel);
+                        if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(ariaLabel);
                     }
-                    if (typeof audio.updateNvdaLiveRegion === 'function') {
-                        audio.updateNvdaLiveRegion(ariaLabel);
-                    }
-                }
-            };
+                };
+            }
 
             li.appendChild(btn);
             listEl.appendChild(li);
@@ -461,28 +586,6 @@ const DriverBadges = {
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
             KeyboardNav.initForScreen();
         }
-    },
-
-    setTabActive: function(tab) {
-        const tabs = [
-            { id: 'tab-badges-all', key: 'all' },
-            { id: 'tab-badges-unlocked', key: 'unlocked' },
-            { id: 'tab-badges-locked', key: 'locked' }
-        ];
-
-        tabs.forEach(t => {
-            const el = document.getElementById(t.id);
-            if (!el) return;
-            if (t.key === tab) {
-                el.style.background = 'rgba(234, 179, 8, 0.25)';
-                el.style.borderColor = '#eab308';
-                el.style.color = '#fde047';
-            } else {
-                el.style.background = 'rgba(255, 255, 255, 0.08)';
-                el.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                el.style.color = '#94a3b8';
-            }
-        });
     },
 
     nextPage: function() {
@@ -519,24 +622,26 @@ const DriverBadges = {
             btnClose.addEventListener('click', () => this.closeModal());
         }
 
-        const tabAll = document.getElementById('tab-badges-all');
+        // İki ana sekme: Açılmış Başarılar ve Açılmayanlar
         const tabUnlocked = document.getElementById('tab-badges-unlocked');
         const tabLocked = document.getElementById('tab-badges-locked');
 
-        if (tabAll) tabAll.addEventListener('click', () => {
-            this.currentTab = 'all';
-            this.currentPage = 1;
-            this.renderModal();
-        });
         if (tabUnlocked) tabUnlocked.addEventListener('click', () => {
             this.currentTab = 'unlocked';
             this.currentPage = 1;
             this.renderModal();
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak("Açılmış başarılar sekmesine geçildi.");
+            }
         });
+
         if (tabLocked) tabLocked.addEventListener('click', () => {
             this.currentTab = 'locked';
             this.currentPage = 1;
             this.renderModal();
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak("Açılmayan gizemli başarılar sekmesine geçildi.");
+            }
         });
 
         // Zorluk filtresi
