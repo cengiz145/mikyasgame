@@ -98,8 +98,8 @@
             <button id="btn-open-smart-route" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.2rem; background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8;">
                 🧭 Akıllı Rota Bulucu (Nereden ➔ Nereye)
             </button>
-            <button id="btn-start-city" class="menu-btn secondary-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.1rem;">
-                🏙️ Tüm Süleymanpaşa Hatları Listesi
+            <button id="btn-start-city" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8;" aria-label="Seferlere Başla. Şehir İçi ve Şehirlerarası Seferler">
+                🚍 Seferlere Başla (Şehir İçi & Şehirlerarası Güzergahlar)
             </button>
             <button id="btn-open-garage-fleet" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #facc15; color: #facc15;">
                 🚌 Otobüs Garajı ve Araç Filosu (Mercedes, Travego, Setra...)
@@ -107,8 +107,8 @@
                         <button id="btn-open-stop-collection" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.1);" aria-label="Durak Keşif Albümü ve Şehir Hafızası Koleksiyonu (K kısayolu)">
                 🗺️ Durak Keşif Albümü ve Şehir Hafızası
             </button>
-                        <button id="btn-open-tutorial" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.12);" aria-label="Sesli Seyir Asistanı ve Oyun Öğreticisi (F1 kısayolu)">
-                🎓 Sesli Seyir Asistanı ve Oyun Öğreticisi (F1)
+                        <button id="btn-open-tutorial" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.12);" aria-label="Mikyas Kaptanlık Akademisi ve Pedagojik Sürüş Rehberi (F1 kısayolu)">
+                🎓 Mikyas Kaptanlık Akademisi & Pedagojik Rehber (F1)
             </button>
             <button id="btn-open-badges" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #eab308; color: #fde047; background: rgba(234, 179, 8, 0.1);" aria-label="Kaptan Liyakat Rozetleri ve Şoför Başarıları">
                 🎖️ Kaptan Liyakat Rozetleri (Şoför Başarıları)
@@ -223,7 +223,7 @@
 
         <!-- KOKPİT DURUM VE İKAZ PANELİ -->
         <div id="cockpit-status-bar" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;" role="region" aria-label="Kokpit Durum Göstergeleri">
-            <button id="btn-hud-tutorial" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer;" title="Sesli Seyir Asistanı ve Oyun Öğreticisi (Kısayol: F1)" aria-label="Sesli Seyir Asistanı ve Oyun Öğreticisi">🎓 ASİSTAN (F1)</button>
+            <button id="btn-hud-tutorial" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer;" title="Mikyas Kaptanlık Akademisi ve Pedagojik Rehber (Kısayol: F1)" aria-label="Mikyas Kaptanlık Akademisi">🎓 AKADEMİ (F1)</button>
             <div id="hud-stop-request" style="display: none; background: #dc2626; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 0 14px rgba(220, 38, 38, 0.9); border: 1px solid #f87171;" aria-live="assertive">🔴 DURACAK</div>
             <div id="hud-retarder" style="display: none; background: #059669; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 0 12px rgba(5, 150, 105, 0.8); border: 1px solid #34d399;">⚡ RETARDER AKTİF</div>
             <div id="hud-kneeling" style="display: none; background: #0284c7; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 0 12px rgba(2, 132, 199, 0.8); border: 1px solid #38bdf8;">🚌 KNEELING (YATIK)</div>
@@ -642,38 +642,62 @@
 
     <!-- SESLİ SEYİR ASİSTANI VE OYUN ÖĞRETİCİSİ MODALI -->
     <div id="tutorial-assistant-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorial-modal-title" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.88); z-index: 8000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
-        <div class="glass-panel" style="max-width: 840px; width: 95%; padding: 24px 28px; text-align: left; max-height: 92vh; overflow-y: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h2 id="tutorial-modal-title" class="gradient-text" style="font-size: 1.8rem; margin: 0; color: #34d399;">🎓 Seyir Asistanı - İnteraktif Oyun Öğreticisi</h2>
-                <button id="btn-tutorial-modal-close" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 1.1rem; cursor: pointer;" aria-label="Öğretici penceresini kapat">✕</button>
+        <div class="glass-panel" style="max-width: 860px; width: 95%; padding: 24px 28px; text-align: left; max-height: 92vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <h2 id="tutorial-modal-title" class="gradient-text" style="font-size: 1.8rem; margin: 0; color: #34d399;">🎓 Mikyas Kaptanlık Akademisi - Pedagojik Sürüş Rehberi</h2>
+                <button id="btn-tutorial-modal-close" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 1.1rem; cursor: pointer;" aria-label="Akademi penceresini kapat">✕</button>
             </div>
-            <p id="tutorial-modal-summary" style="color: #6ee7b7; font-size: 1.05rem; font-weight: bold; margin-bottom: 6px;">
-                Oyun kurallarını ve tüm araç kontrollerini harici bir kılavuza bakmadan doğrudan Seyir Asistanınızdan öğrenin.
+            <p id="tutorial-modal-summary" style="color: #6ee7b7; font-size: 1rem; font-weight: bold; margin-bottom: 4px;">
+                "Öğrenmek bir yolculuktur. Adım adım ustalaşarak mahalle hatlarından şehirlerarası otoyollara uzanan kaptanlık serüveni."
             </p>
-            <p style="color: #cbd5e1; font-size: 0.92rem; margin-bottom: 14px; line-height: 1.4;">
-                Aşağıdaki derslerden dilediğinizi seçip dinleyebilir veya tüm eğitimi tek seferde başlatabilirsiniz. Ayrıca sürüş sırasında <strong>V</strong> tuşuna basarak asistana <em>"Nasıl sürülür?", "Kapı nasıl açılır?", "Rampa nedir?"</em> gibi sorular sorabilirsiniz. Kısayol: <strong>F1</strong>.
+            <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 12px; line-height: 1.4;">
+                Öğretmen vizyonuyla hazırlanan aşamalı eğitim modüllerini inceleyebilir, <strong>Kaptanlık Gelişim Karnenizden</strong> terfi durumunuzu takip edebilirsiniz. Sürüş sırasında <strong>V</strong> tuşuyla asistana danışabilir, dilediğiniz an <strong>F1</strong> ile akademiye dönebilirsiniz.
             </p>
 
+            <!-- Pedagojik Aşama Sekmeleri -->
+            <div style="display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;">
+                <button id="tab-acad-all" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 8px 10px; font-size: 0.88rem; background: rgba(16, 185, 129, 0.35); border: 1px solid #10b981; color: #34d399; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                    📋 Tüm Dersler (12)
+                </button>
+                <button id="tab-acad-stage1" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
+                    📘 1. Temel Sürüş
+                </button>
+                <button id="tab-acad-stage2" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
+                    ♿ 2. Sosyal Duyarlılık
+                </button>
+                <button id="tab-acad-stage3" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
+                    ⏱️ 3. Zaman Yönetimi
+                </button>
+                <button id="tab-acad-stage4" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
+                    🛣️ 4. Usta Kaptanlık
+                </button>
+                <button id="tab-acad-karne" class="modern-btn nav-item" style="flex: 1.3; min-width: 170px; padding: 8px 10px; font-size: 0.88rem; background: linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(202, 138, 4, 0.2)); border: 1.5px solid #eab308; color: #fef08a; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                    🎖️ Gelişim Karnesi & Terfi
+                </button>
+            </div>
+
             <!-- Hızlı Eylem Butonları -->
-            <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
-                <button id="btn-tutorial-play-all" class="modern-btn nav-item" style="flex: 2; min-width: 220px; padding: 12px; font-size: 1rem; background: linear-gradient(135deg, #059669, #047857); border: 2px solid #10b981; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Tüm Öğreticiyi Baştan Sona Sesli Dinle">
+            <div style="display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;">
+                <button id="btn-tutorial-play-all" class="modern-btn nav-item" style="flex: 2; min-width: 220px; padding: 10px; font-size: 0.95rem; background: linear-gradient(135deg, #059669, #047857); border: 2px solid #10b981; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Tüm Eğitimi Baştan Sona Sesli Dinle">
                     ▶️ Tüm Eğitimi Baştan Sona Dinle
                 </button>
-                <button id="btn-tutorial-stop-speech" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 12px; font-size: 0.95rem; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Sesi Sustur">
+                <button id="btn-tutorial-stop-speech" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 10px; font-size: 0.92rem; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Sesi Sustur">
                     ⏹️ Anlatımı Sustur
                 </button>
-                <button id="btn-tutorial-toggle-copilot" class="modern-btn nav-item" style="flex: 1.5; min-width: 190px; padding: 12px; font-size: 0.95rem; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Canlı Seyir Koçu İpuçları Aç/Kapat">
+                <button id="btn-tutorial-toggle-copilot" class="modern-btn nav-item" style="flex: 1.5; min-width: 180px; padding: 10px; font-size: 0.92rem; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Canlı Seyir Koçu İpuçları Aç/Kapat">
                     🔔 Canlı Seyir Koçu: Açık
                 </button>
             </div>
 
+            <!-- Kaptanlık Gelişim Karnesi Alanı (Varsayılan gizli, karne sekmesine basınca görünür) -->
+            <div id="tutorial-karne-container" style="display: none; margin-bottom: 12px;"></div>
+
             <!-- Dersler Listesi -->
-            <ul id="tutorial-lessons-list" style="list-style: none; padding: 0; margin: 0; max-height: 52vh; overflow-y: auto;">
+            <ul id="tutorial-lessons-list" style="list-style: none; padding: 0; margin: 0; max-height: 50vh; overflow-y: auto;">
                 <!-- js/voice-assistant.js tarafından dinamik doldurulacak -->
             </ul>
         </div>
     </div>
-
 </body>
 </html>
 
