@@ -73,6 +73,14 @@ const DriverBadges = {
             category: 'Ustalık',
             desc: 'En az 5 farklı resmi seferi başarıyla bitirip direksiyon başında ustalığını ispatlayan kıdemli filo kaptanlarına verilir.',
             requirement: 'En az 5 resmi seferi başarıyla tamamla'
+        },
+        {
+            id: 'emektar_direksiyon',
+            title: 'Emektar Direksiyon Rozeti',
+            icon: '⏳',
+            category: 'Kıdem',
+            desc: 'Direksiyon başında saatlerce sabırla, yorulmadan ve emektarca yolcu taşıyan kıdemli kaptanlara verilir.',
+            requirement: 'Toplamda en az 30 dakika (oyun içi 2 saatlik vardiya) aktif sürüş yap'
         }
     ],
 
@@ -201,6 +209,9 @@ const DriverBadges = {
                     break;
                 case 'usta_kaptan':
                     earned = (totalTrips >= 5 || (typeof stats.completedTasks === 'number' && stats.completedTasks >= 5));
+                    break;
+                case 'emektar_direksiyon':
+                    earned = (typeof stats.totalDrivingSeconds === 'number' && stats.totalDrivingSeconds >= 1800);
                     break;
             }
 

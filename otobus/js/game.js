@@ -809,6 +809,40 @@ const Game = {
                     
                     // DURAN OYUN DÖNGÜSÜNÜ YENİDEN BAÅLAT
                     if (this.isDriving) {
+
+            // Sürüş Süresi Takibi (Emektar Direksiyon Rozeti)
+            this.totalDrivingSeconds = (this.totalDrivingSeconds || 0) + (deltaTime || 0.016);
+            if (this.totalDrivingSeconds >= 1800 && typeof DriverBadges !== 'undefined' && !DriverBadges.isUnlocked('emektar_direksiyon')) {
+                DriverBadges.unlock('emektar_direksiyon', true);
+            }
+
+            // Karşıdan Gelen Meslektaş Otobüsü (Her 4-7 dakikada bir)
+            if (!this.nextColleagueTime) {
+                this.nextColleagueTime = performance.now() + 180000 + Math.random() * 240000;
+            }
+            if (this.isDriving && this.speed > 25 && performance.now() > this.nextColleagueTime) {
+                this.nextColleagueTime = performance.now() + 240000 + Math.random() * 240000;
+                if (typeof audio !== 'undefined' && typeof audio.playPassingBus === 'function') {
+                    audio.playPassingBus(() => {
+                        this.colleagueGreetingActive = true;
+                        setTimeout(() => { this.colleagueGreetingActive = false; }, 3800);
+                    });
+                }
+            }
+
+            // Kasis Yaklaşma Sesli Uyarısı (60m kala)
+            if (this.kasisDistance !== null && this.kasisDistance <= 60 && this.kasisDistance > 0 && !this.kasisWarned) {
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak("İleride kasis var, yavaşlayınız.");
+                this.kasisWarned = true;
+            }
+            if (this.kasisDistance !== null && this.kasisDistance <= 0) {
+                if (typeof audio !== 'undefined' && typeof audio.playSuspensionBounce === 'function') {
+                    audio.playSuspensionBounce();
+                }
+                this.kasisDistance = null;
+                this.kasisWarned = false;
+            }
+
                         this.lastFrameTime = performance.now();
                         this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
                     }
@@ -2149,6 +2183,31 @@ const Game = {
     },
 
     arriveAtStop: function() {
+
+        // Yaşayan Yolcu Diyalogları (Sabah günaydın, yağmurda şemsiye, son durak vedası)
+        if (this.weather === 'rainy' && typeof audio !== 'undefined' && typeof audio.playUmbrellaShake === 'function') {
+            audio.playUmbrellaShake();
+        }
+
+        if (isFinalStop) {
+            setTimeout(() => {
+                const goodbyeMsg = "Yolcular: 'Eline sağlık kaptan, çok rahat bir seferdi. Hayırlı günler.'";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(goodbyeMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("👋 " + goodbyeMsg, "info");
+            }, 1200);
+        } else if (this.clockMinutes >= 390 && this.clockMinutes <= 510) {
+            // Sabah 06:30 - 08:30 arası
+            const morningGreetings = [
+                "Günaydın kaptanım, hayırlı işler.",
+                "Kolay gelsin kaptan, hayırlı sabahlar.",
+                "Günaydın, iyi görevler kaptan."
+            ];
+            const randGreet = morningGreetings[Math.floor(Math.random() * morningGreetings.length)];
+            setTimeout(() => {
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(randGreet);
+            }, 800);
+        }
+
         const stopData = this.activeRouteData.stops[this.currentStopIndex];
         const isFinalStop = this.currentStopIndex === this.activeRouteData.stops.length - 1;
 
@@ -2534,7 +2593,8 @@ const Game = {
                     lostItemFound: !!this.hasLostItemFound,
                     isNight: !!this.isNight,
                     isHeadlightsOn: !!this.isHeadlightsOn,
-                    completedTasks: this.completedTasks
+                    completedTasks: this.completedTasks,
+                    totalDrivingSeconds: this.totalDrivingSeconds || 0
                 };
                 DriverBadges.checkAfterRoute(routeStats);
             }
@@ -2599,6 +2659,38 @@ const Game = {
             const msg = this.isACOn ? "Klima açıldı. Hedef sıcaklık 22 derece." : "Klima kapatıldı.";
             if (typeof audio.speak === 'function') audio.speak(msg);
             if (typeof UI !== 'undefined') UI.showToast(msg, 'info');
+            return;
+        }
+
+        
+        if (k === 'v') {
+            e.preventDefault();
+            if (this.isDriving && this.speed > 3) {
+                const warnMsg = "Güvenlik: Seyir halindeyken çay içilmez kaptanım. Durakta veya duraklamada keyifle yudumlayabilirsiniz.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(warnMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
+                return;
+            }
+            if (typeof audio !== 'undefined' && typeof audio.playTeaPourAndSip === 'function') {
+                audio.playTeaPourAndSip(() => {
+                    this.passengerComfort = Math.min(100, (this.passengerComfort || 90) + 5);
+                    this.addXP(15);
+                    const teaMsg = "Sıcak demli çay yudumlandı. Afiyet olsun kaptanım, keyfiniz yerine geldi (+15 tecrübe, +5 konfor).";
+                    if (typeof audio.speak === 'function') audio.speak(teaMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("☕ Çay Yudumlandı (+15 XP, +5 Konfor)", "success");
+                });
+            }
+            return;
+        }
+
+        if (k === 'o') {
+            e.preventDefault();
+            if (typeof audio !== 'undefined' && typeof audio.toggleDriverWindow === 'function') {
+                const isOpen = audio.toggleDriverWindow();
+                const winMsg = isOpen ? "Kaptan camı açıldı. Dış sesler ve serin hava kokpite doluyor." : "Kaptan camı kapatıldı. Kabin yalıtımı sağlandı.";
+                if (typeof audio.speak === 'function') audio.speak(winMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(isOpen ? "🪟 Sol Cam Açıldı" : "🪟 Sol Cam Kapatıldı", "info");
+            }
             return;
         }
 
@@ -2738,6 +2830,15 @@ const Game = {
         if (k === 'l' || k === 'h' || k === 'k') {
             e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.playHorn === 'function') {
+            // Karşıdan gelen meslektaş kornasına selam verme
+            if (this.colleagueGreetingActive) {
+                this.colleagueGreetingActive = false;
+                this.addMoney(25);
+                this.addXP(15);
+                const greetMsg = "Meslektaşınıza selam verdiniz! Karşı hattan selektör ve dostça korna aldınız (+25 ₺, +15 XP).";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(greetMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚌 Meslektaşa Selam Verildi (+25 ₺, +15 XP)", "success");
+            }
                 audio.playHorn();
             }
             // Öndeki aracı uyar (korna çalınca öndeki yavaş araç sağa kaçar veya hızlanır)
