@@ -62,30 +62,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginScreen = document.getElementById('login-screen');
     const titleScreen = document.getElementById('title-screen');
     
-    const dismissSplash = async () => {
+        const dismissSplash = async () => {
         if (!splashScreen.classList.contains('hidden')) {
-            audio.playSelect();
+            if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
             splashScreen.classList.add('hidden');
             
             let savedUser = localStorage.getItem('otobusUsername');
             if (savedUser) {
-                UI.showToast('Kullanıcı bilgileri yükleniyor...', 'info');
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast('Kullanıcı bilgileri yükleniyor...', 'info');
                 try {
-                    await Game.loadFromFirebase(savedUser);
-                    titleScreen.classList.remove('hidden');
-                    UI.showToast(`Tekrar hoş geldin, ${savedUser}!`, 'success');
-                    audio.speak(`Tekrar hoş geldin, ${savedUser}!`);
-                    UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle()); // Login sync
+                    if (typeof Game !== 'undefined' && Game.loadFromFirebase) {
+                        await Game.loadFromFirebase(savedUser);
+                    }
                 } catch (err) {
-                    localStorage.removeItem('otobusUsername');
-                    loginScreen.classList.remove('hidden');
-                    document.getElementById('username-input').focus();
+                    console.warn("Firebase splash error:", err);
+                }
+                
+                if (typeof UI !== 'undefined' && UI.switchScreen) {
+                    UI.switchScreen('title-screen');
+                } else {
+                    titleScreen.classList.remove('hidden');
+                }
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`Tekrar hoş geldin, ${savedUser}!`, 'success');
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Tekrar hoş geldin, ${savedUser}!`);
+                if (typeof UI !== 'undefined' && UI.updatePlayerStats && typeof Game !== 'undefined') {
+                    const licenseTitle = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
+                    UI.updatePlayerStats(Game.licenseLevel || 1, Game.completedTasks || 0, Game.playerBudget || 0, licenseTitle);
                 }
             } else {
                 loginScreen.classList.remove('hidden');
-                document.getElementById('username-input').focus();
+                const userInput = document.getElementById('username-input');
+                if (userInput) userInput.focus();
             }
-            KeyboardNav.initForScreen();
+            if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+                KeyboardNav.initForScreen();
+            }
         }
     };
 
@@ -96,48 +107,64 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 0.5. Login Screen
-    document.getElementById('username-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            document.getElementById('btn-login').click();
-        }
-    });
+        // 0.5. Login Screen
+    const usernameInput = document.getElementById('username-input');
+    const btnLogin = document.getElementById('btn-login');
 
-    document.getElementById('btn-login').addEventListener('click', async () => {
-        // Firebase yasaklı karakterlerini temizle (. # $ [ ])
-        let username = document.getElementById('username-input').value.trim();
+    const handleLoginAction = async () => {
+        let username = (usernameInput && usernameInput.value) ? usernameInput.value.trim() : '';
         username = username.replace(/[.#$\[\]]/g, '');
         
+        // Asla kullanıcıyı engelleme, boşsa Kaptan yap
         if (!username) {
-            UI.showToast('Lütfen geçerli bir kullanıcı adı girin.', 'error');
-            return;
+            username = "Kaptan";
         }
 
-        audio.playSelect();
-        UI.showToast('Giriş yapılıyor, lütfen bekleyin...', 'info');
+        if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast('Giriş yapılıyor, lütfen bekleyin...', 'info');
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Giriş yapılıyor. Hoş geldin, ${username}!`);
 
         try {
-            await Game.loadFromFirebase(username);
-            localStorage.setItem('otobusUsername', username);
-            
-            loginScreen.classList.add('hidden');
-            titleScreen.classList.remove('hidden');
-            KeyboardNav.initForScreen();
-            
-            UI.showToast(`Hoş geldin, ${username}!`, 'success');
-            audio.speak(`Hoş geldin, ${username}!`);
-            UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle()); // Login sync
+            if (typeof Game !== 'undefined' && Game.loadFromFirebase) {
+                await Game.loadFromFirebase(username);
+            }
         } catch (error) {
-            UI.showToast('Bağlantı hatası: Sunucuya bağlanılamadı. Çevrimdışı devam ediliyor.', 'warning');
-            if (typeof audio.speak === 'function') audio.speak("Sunucuya bağlanılamadı, yerel kayıtla oyuna giriliyor.");
-            
-            // HATA OLSA BİLE OYUNA GİRMESİNE İZİN VER (Yerel kayıtla devam)
-            localStorage.setItem('otobusUsername', username);
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('title-screen').classList.remove('hidden');
+            console.warn("Firebase bağlantı hatası, yerel modla devam ediliyor:", error);
+        }
+
+        localStorage.setItem('otobusUsername', username);
+        
+        if (typeof UI !== 'undefined' && UI.switchScreen) {
+            UI.switchScreen('title-screen');
+        } else {
+            document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+            if (titleScreen) titleScreen.classList.remove('hidden');
+        }
+
+        if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
             KeyboardNav.initForScreen();
         }
-    });
+        
+        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`Hoş geldin, ${username}!`, 'success');
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Hoş geldin, ${username}! Ana menü açıldı.`);
+        if (typeof UI !== 'undefined' && UI.updatePlayerStats && typeof Game !== 'undefined') {
+            const licenseTitle = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
+            UI.updatePlayerStats(Game.licenseLevel || 1, Game.completedTasks || 0, Game.playerBudget || 0, licenseTitle);
+        }
+    };
+
+    if (usernameInput) {
+        usernameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleLoginAction();
+            }
+        });
+    }
+
+    if (btnLogin) {
+        btnLogin.addEventListener('click', handleLoginAction);
+    }
 
     // 1. Title Screen - Şehir İçi ve Şehirlerarası Ayrımı
     const openCitySelection = () => {

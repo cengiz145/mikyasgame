@@ -27,7 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/styles.css?v=1781783292">
+    <link rel="stylesheet" href="css/styles.css?v=1792368886586">
 </head>
 <body>
     <div id="nvda-live-region" aria-live="assertive" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
@@ -45,7 +45,7 @@
     <!-- 0. SPLASH SCREEN (KARÅILAMA EKRANI) -->
     <main id="splash-screen" class="screen" role="application">
         <div class="glass-panel" style="text-align: center; max-width: 600px;">
-            <div class="logo-circle" style="margin: 0 auto 20px;">ğŸšŒ</div>
+            <div class="logo-circle" style="margin: 0 auto 20px;">🚌</div>
             <h1 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 1rem;">OTOBÜS SİMÜLASYONU</h1>
             <p style="font-size: 1.2rem; margin-bottom: 2rem; color: var(--text-light);">Bu oyun <strong style="color:var(--primary)">Ümit Ekrem Mikyas</strong> tarafından geliştirilmiştir.</p>
             <p class="pulse-anim" style="color: var(--secondary); font-weight: bold;">Oyunu yüklemek için [ENTER]'a basın veya tıklayın</p>
@@ -53,18 +53,18 @@
     </main>
 
     <!-- 0.5. LOGIN SCREEN (KULLANICI PROFİLİ EKRANI) -->
-    <main id="login-screen" class="screen hidden" role="application">
+    <main id="login-screen" class="screen hidden" role="application" aria-label="Kullanıcı Giriş Ekranı">
         <div class="glass-panel" style="text-align: center; max-width: 400px; padding: 30px;">
             <h1 style="color: var(--secondary); margin-bottom: 20px;">Kullanıcı Profili</h1>
             <p style="margin-bottom: 20px; font-size: 1.1rem; color: #ddd;">Oyuna devam etmek veya yeni bir profil oluşturmak için bir kullanıcı adı girin.</p>
             
             <div style="margin-bottom: 20px;">
                 <label for="username-input" style="display: block; margin-bottom: 8px; font-weight: bold; color: #fff;">Kullanıcı Adı:</label>
-                <input type="text" id="username-input" class="modern-btn" style="width: 100%; text-align: center; font-size: 1.2rem; cursor: text; background: rgba(255,255,255,0.1); border: 2px solid var(--primary);" placeholder="Kullanıcı Adı Giriniz" aria-label="Kullanıcı adınızı girin">
+                <input type="text" id="username-input" class="modern-btn nav-item" style="width: 100%; text-align: center; font-size: 1.2rem; cursor: text; background: rgba(255,255,255,0.1); border: 2px solid var(--primary);" value="Kaptan" placeholder="Kullanıcı Adı Giriniz" aria-label="Kullanıcı adınız. Varsayılan olarak Kaptan belirlenmiştir.">
             </div>
             
-            <button id="btn-login" class="modern-btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.2rem;">
-                <span class="btn-icon">ğŸ‘¤</span> Oyuna Gir
+            <button id="btn-login" class="modern-btn btn-primary nav-item" style="width: 100%; padding: 15px; font-size: 1.2rem;" aria-label="Oyuna Gir">
+                <span class="btn-icon">👤</span> Oyuna Gir
             </button>
         </div>
     </main>
@@ -389,29 +389,29 @@
     <!-- TOAST NOTIFICATION CONTAINER -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- Firebase SDKs -->
+            <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="js/firebase.js?v=1781783292"></script>
+    <script src="js/firebase.js?v=1792368886586"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-    <script src="js/tekulas-data.js?v=1781783292"></script>
-    <script src="js/data.js?v=1781783292"></script>
-    <script src="js/audio-base64.js?v=1781783292"></script>
-    <script src="sounds/npc_list.js?v=1781783292"></script>
-    <script src="js/audio.js?v=1781783292"></script>
-    <script src="js/api.js?v=1781783292"></script>
-    <script src="js/ui.js?v=1781783292"></script>
-    <script src="js/game.js?v=1781783292"></script>
-    <script src="js/app.js?v=1781783292"></script>
-    <script src="js/bus-fleet.js"></script>
-    <script src="js/map-engine.js"></script>
-    <script src="js/driver-badges.js"></script>
-    <script src="js/smart-system.js"></script>
-    <script src="js/smart-route.js"></script>
-    <script src="js/velimese-navigation.js"></script>
-    <script src="js/suleymanpasa-navigation.js"></script>
-    <script src="js/voice-assistant.js?v=1781783292"></script>
+    <script src="js/map-engine.js?v=1792368886586"></script>
+    <script src="js/tekulas-data.js?v=1792368886586"></script>
+    <script src="js/data.js?v=1792368886586"></script>
+    <script src="js/audio-base64.js?v=1792368886586"></script>
+    <script src="sounds/npc_list.js?v=1792368886586"></script>
+    <script src="js/audio.js?v=1792368886586"></script>
+    <script src="js/api.js?v=1792368886586"></script>
+    <script src="js/ui.js?v=1792368886586"></script>
+    <script src="js/bus-fleet.js?v=1792368886586"></script>
+    <script src="js/driver-badges.js?v=1792368886586"></script>
+    <script src="js/smart-system.js?v=1792368886586"></script>
+    <script src="js/smart-route.js?v=1792368886586"></script>
+    <script src="js/velimese-navigation.js?v=1792368886586"></script>
+    <script src="js/suleymanpasa-navigation.js?v=1792368886586"></script>
+    <script src="js/voice-assistant.js?v=1792368886586"></script>
+    <script src="js/game.js?v=1792368886586"></script>
+    <script src="js/app.js?v=1792368886586"></script>
 
     <!-- AKILLI ROTA SİSTEMİ (NEREDEN ➔ NEREYE) MODALI -->
     <div id="smart-route-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="smart-route-title">
