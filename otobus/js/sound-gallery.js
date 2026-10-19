@@ -298,23 +298,43 @@ const SoundGallery = {
         if (tabAkbil) tabAkbil.addEventListener('click', () => this.switchTab('akbil'));
         if (tabFx) tabFx.addEventListener('click', () => this.switchTab('effect'));
 
-        // Klavye Kısayolu: [S] tuşu ile Ses Galerisi Açma
+        // Klavye Kısayolları: [S] ile Açma, [Boşluk] ile Çal/Durdur, [ESC] ile Kapatma
         window.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('sound-gallery-modal');
+            const isModalOpen = (modal && !modal.classList.contains('hidden'));
+
+            // Galeri açıkken Boşluk (Space) tuşu ile odaklanılan sesi başlat veya durdur
+            if (isModalOpen && (e.key === ' ' || e.code === 'Space')) {
+                const activeEl = document.activeElement;
+                if (activeEl && activeEl.id && activeEl.id.startsWith('btn-sound-')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    activeEl.click();
+                    return;
+                }
+                // Odak bir ses butonunda olmasa dahi çalan ses varsa Boşluk ile durdur
+                if (this.currentlyPlayingId) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.stopCurrentSound(true);
+                    return;
+                }
+            }
+
             const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
             if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
 
             if (e.key === 's' || e.key === 'S') {
                 const titleScreen = document.getElementById('title-screen');
                 if (titleScreen && !titleScreen.classList.contains('hidden')) {
-                    const modal = document.getElementById('sound-gallery-modal');
                     if (modal && modal.classList.contains('hidden')) {
                         e.preventDefault();
                         this.openModal();
                     }
                 }
             } else if (e.key === 'Escape') {
-                const modal = document.getElementById('sound-gallery-modal');
-                if (modal && !modal.classList.contains('hidden')) {
+                if (isModalOpen) {
+                    e.preventDefault();
                     this.closeModal();
                 }
             }
@@ -385,6 +405,34 @@ const SoundGallery = {
         }
     },
 
+
+    updatePlayingUI: function(activeId) {
+        this.sounds.forEach(s => {
+            const btn = document.getElementById("btn-sound-" + s.id);
+            if (!btn) return;
+            const isPlaying = (s.id === activeId);
+            btn.style.border = isPlaying ? '2.5px solid #a855f7' : '1px solid rgba(255,255,255,0.15)';
+            btn.style.background = isPlaying ? 'rgba(168, 85, 247, 0.25)' : 'rgba(15, 23, 42, 0.7)';
+            
+            const badgeContainer = document.getElementById('badge-container-' + s.id);
+            if (badgeContainer) {
+                if (isPlaying) {
+                    badgeContainer.innerHTML = '<span id="badge-countdown-' + s.id + '" style="background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; font-weight: bold; padding: 6px 12px; border-radius: 20px; font-size: 0.95rem; animation: pulse 1s infinite;">' +
+                        '🔊 ÇALIYOR (' + this.remainingSeconds + ' sn) [Durdurmak İçin Boşluk]</span>';
+                } else {
+                    badgeContainer.innerHTML = s.category === 'engine'
+                        ? '<span style="background: rgba(168,85,247,0.25); color: #e9d5ff; font-weight: bold; padding: 5px 12px; border-radius: 20px; font-size: 0.88rem;">▶️ 10 Saniye Dinle</span>'
+                        : '<span style="background: rgba(56,189,248,0.2); color: #7dd3fc; font-weight: bold; padding: 5px 12px; border-radius: 20px; font-size: 0.88rem;">▶️ Efekti Çal</span>';
+                }
+            }
+
+            const actionTip = isPlaying 
+                ? 'Şu anda çalıyor. Durdurmak için Boşluk veya Enter tuşuna basın.' 
+                : (s.category === 'engine' ? '10 saniye boyunca dinlemek için Boşluk veya Enter tuşuna basın.' : 'Efekti dinlemek için Boşluk veya Enter tuşuna basın.');
+            const ariaLabel = s.title + '. ' + s.specs + '. ' + s.desc + '. ' + actionTip;
+            btn.setAttribute('aria-label', ariaLabel);
+        });
+    },
     renderModal: function(tab = 'all') {
         const listEl = document.getElementById('sound-gallery-list');
         if (!listEl) return;
@@ -435,7 +483,10 @@ const SoundGallery = {
                     : '<span style="background: rgba(56,189,248,0.2); color: #7dd3fc; font-weight: bold; padding: 5px 12px; border-radius: 20px; font-size: 0.88rem;">▶️ Efekti Çal</span>';
             }
 
-            const ariaLabel = s.title + '. ' + s.specs + '. ' + s.desc + '. ' + (s.category === 'engine' ? '10 saniye boyunca dinlemek için Enter tuşuna basın.' : 'Efekti dinlemek için Enter tuşuna basın.') + (isPlaying ? ' Şu anda çalıyor.' : '');
+            const ariaAction = isPlaying 
+                ? 'Şu anda çalıyor. Durdurmak için Boşluk veya Enter tuşuna basın.' 
+                : (s.category === 'engine' ? '10 saniye boyunca dinlemek için Boşluk veya Enter tuşuna basın.' : 'Efekti dinlemek için Boşluk veya Enter tuşuna basın.');
+            const ariaLabel = s.title + '. ' + s.specs + '. ' + s.desc + '. ' + ariaAction;
             btn.setAttribute('aria-label', ariaLabel);
 
             btn.innerHTML = `
@@ -446,7 +497,7 @@ const SoundGallery = {
                         </span>
                         <div style="margin-top: 4px;">${categoryTag}</div>
                     </div>
-                    <div>${playBadge}</div>
+                    <div id="badge-container-${s.id}">${playBadge}</div>
                 </div>
                 <div style="font-size: 0.92rem; color: #cbd5e1; margin-bottom: 4px;">
                     ⚙️ <strong>Özellikler:</strong> <span style="color: #facc15;">${s.specs}</span>
@@ -457,7 +508,7 @@ const SoundGallery = {
             `;
 
             btn.onclick = () => {
-                if (isPlaying) {
+                if (this.currentlyPlayingId === s.id) {
                     this.stopCurrentSound(true);
                 } else {
                     this.playSoundItem(s);
@@ -579,7 +630,7 @@ const SoundGallery = {
             console.error("Motor sesi başlatılırken hata:", e);
         }
 
-        this.renderModal(this.currentTab);
+        this.updatePlayingUI(s.id);
 
         this.countdownInterval = setInterval(() => {
             this.remainingSeconds--;
@@ -618,7 +669,7 @@ const SoundGallery = {
             s.playFn();
         }
 
-        this.renderModal(this.currentTab);
+        this.updatePlayingUI(s.id);
 
         this.countdownInterval = setInterval(() => {
             this.remainingSeconds--;
@@ -655,7 +706,7 @@ const SoundGallery = {
             }
         }, 3000);
 
-        this.renderModal(this.currentTab);
+        this.updatePlayingUI(null);
     },
 
     stopCurrentSound: function(notify = true) {
@@ -702,7 +753,7 @@ const SoundGallery = {
             if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
         }
 
-        this.renderModal(this.currentTab);
+        this.updatePlayingUI(null);
     }
 };
 
