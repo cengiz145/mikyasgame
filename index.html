@@ -27,7 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/styles.css?v=1792372427779">
+    <link rel="stylesheet" href="css/styles.css?v=1792372427776">
 </head>
 <body>
     <div id="nvda-live-region" aria-live="assertive" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
@@ -106,6 +106,9 @@
             </button>
                         <button id="btn-open-stop-collection" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.1);" aria-label="Durak Keşif Albümü ve Şehir Hafızası Koleksiyonu (K kısayolu)">
                 🗺️ Durak Keşif Albümü ve Şehir Hafızası
+            </button>
+                        <button id="btn-open-tutorial" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.12);" aria-label="Sesli Seyir Asistanı ve Oyun Öğreticisi (F1 kısayolu)">
+                🎓 Sesli Seyir Asistanı ve Oyun Öğreticisi (F1)
             </button>
             <button id="btn-open-badges" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #eab308; color: #fde047; background: rgba(234, 179, 8, 0.1);" aria-label="Kaptan Liyakat Rozetleri ve Şoför Başarıları">
                 🎖️ Kaptan Liyakat Rozetleri (Şoför Başarıları)
@@ -220,6 +223,7 @@
 
         <!-- KOKPİT DURUM VE İKAZ PANELİ -->
         <div id="cockpit-status-bar" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;" role="region" aria-label="Kokpit Durum Göstergeleri">
+            <button id="btn-hud-tutorial" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer;" title="Sesli Seyir Asistanı ve Oyun Öğreticisi (Kısayol: F1)" aria-label="Sesli Seyir Asistanı ve Oyun Öğreticisi">🎓 ASİSTAN (F1)</button>
             <div id="hud-stop-request" style="display: none; background: #dc2626; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 0 14px rgba(220, 38, 38, 0.9); border: 1px solid #f87171;" aria-live="assertive">🔴 DURACAK</div>
             <div id="hud-retarder" style="display: none; background: #059669; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 0 12px rgba(5, 150, 105, 0.8); border: 1px solid #34d399;">⚡ RETARDER AKTİF</div>
             <div id="hud-kneeling" style="display: none; background: #0284c7; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 0 12px rgba(2, 132, 199, 0.8); border: 1px solid #38bdf8;">🚌 KNEELING (YATIK)</div>
@@ -410,30 +414,30 @@
             <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="js/firebase.js?v=1792372427779"></script>
+    <script src="js/firebase.js?v=1792372427776"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-    <script src="js/map-engine.js?v=1792372427779"></script>
-    <script src="js/tekulas-data.js?v=1792372427779"></script>
-    <script src="js/data.js?v=1792372427779"></script>
-    <script src="js/audio-base64.js?v=1792372427779"></script>
-    <script src="sounds/npc_list.js?v=1792372427779"></script>
-    <script src="js/audio.js?v=1792372427779"></script>
-    <script src="js/api.js?v=1792372427779"></script>
-    <script src="js/ui.js?v=1792372427779"></script>
-    <script src="js/bus-fleet.js?v=1792372427779"></script>
+    <script src="js/map-engine.js?v=1792372427776"></script>
+    <script src="js/tekulas-data.js?v=1792372427776"></script>
+    <script src="js/data.js?v=1792372427776"></script>
+    <script src="js/audio-base64.js?v=1792372427776"></script>
+    <script src="sounds/npc_list.js?v=1792372427776"></script>
+    <script src="js/audio.js?v=1792372427776"></script>
+    <script src="js/api.js?v=1792372427776"></script>
+    <script src="js/ui.js?v=1792372427776"></script>
+    <script src="js/bus-fleet.js?v=1792372427776"></script>
     <script src="js/stop-discovery.js?v=1792373000000"></script>
     <script src="js/achievements-data.js?v=1792375000000"></script>
-    <script src="js/driver-badges.js?v=1792372427779"></script>
-    <script src="js/smart-system.js?v=1792372427779"></script>
-    <script src="js/smart-route.js?v=1792372427779"></script>
-    <script src="js/velimese-navigation.js?v=1792372427779"></script>
-    <script src="js/suleymanpasa-navigation.js?v=1792372427779"></script>
-    <script src="js/saray-navigation.js?v=1792372427779"></script>
-    <script src="js/compass-system.js?v=1792372427779"></script>
-    <script src="js/voice-assistant.js?v=1792372427779"></script>
-    <script src="js/game.js?v=1792372427779"></script>
-    <script src="js/app.js?v=1792372427779"></script>
+    <script src="js/driver-badges.js?v=1792372427776"></script>
+    <script src="js/smart-system.js?v=1792372427776"></script>
+    <script src="js/smart-route.js?v=1792372427776"></script>
+    <script src="js/velimese-navigation.js?v=1792372427776"></script>
+    <script src="js/suleymanpasa-navigation.js?v=1792372427776"></script>
+    <script src="js/saray-navigation.js?v=1792372427776"></script>
+    <script src="js/compass-system.js?v=1792372427776"></script>
+    <script src="js/voice-assistant.js?v=1792372427776"></script>
+    <script src="js/game.js?v=1792372427776"></script>
+    <script src="js/app.js?v=1792372427776"></script>
 
     <!-- AKILLI ROTA SİSTEMİ (NEREDEN ➔ NEREYE) MODALI -->
     <div id="smart-route-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="smart-route-title">
@@ -633,6 +637,41 @@
         </div>
     </div>
     </div>
+    </div>
+
+
+    <!-- SESLİ SEYİR ASİSTANI VE OYUN ÖĞRETİCİSİ MODALI -->
+    <div id="tutorial-assistant-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorial-modal-title" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.88); z-index: 8000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-panel" style="max-width: 840px; width: 95%; padding: 24px 28px; text-align: left; max-height: 92vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h2 id="tutorial-modal-title" class="gradient-text" style="font-size: 1.8rem; margin: 0; color: #34d399;">🎓 Seyir Asistanı - İnteraktif Oyun Öğreticisi</h2>
+                <button id="btn-tutorial-modal-close" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 1.1rem; cursor: pointer;" aria-label="Öğretici penceresini kapat">✕</button>
+            </div>
+            <p id="tutorial-modal-summary" style="color: #6ee7b7; font-size: 1.05rem; font-weight: bold; margin-bottom: 6px;">
+                Oyun kurallarını ve tüm araç kontrollerini harici bir kılavuza bakmadan doğrudan Seyir Asistanınızdan öğrenin.
+            </p>
+            <p style="color: #cbd5e1; font-size: 0.92rem; margin-bottom: 14px; line-height: 1.4;">
+                Aşağıdaki derslerden dilediğinizi seçip dinleyebilir veya tüm eğitimi tek seferde başlatabilirsiniz. Ayrıca sürüş sırasında <strong>V</strong> tuşuna basarak asistana <em>"Nasıl sürülür?", "Kapı nasıl açılır?", "Rampa nedir?"</em> gibi sorular sorabilirsiniz. Kısayol: <strong>F1</strong>.
+            </p>
+
+            <!-- Hızlı Eylem Butonları -->
+            <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+                <button id="btn-tutorial-play-all" class="modern-btn nav-item" style="flex: 2; min-width: 220px; padding: 12px; font-size: 1rem; background: linear-gradient(135deg, #059669, #047857); border: 2px solid #10b981; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Tüm Öğreticiyi Baştan Sona Sesli Dinle">
+                    ▶️ Tüm Eğitimi Baştan Sona Dinle
+                </button>
+                <button id="btn-tutorial-stop-speech" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 12px; font-size: 0.95rem; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Sesi Sustur">
+                    ⏹️ Anlatımı Sustur
+                </button>
+                <button id="btn-tutorial-toggle-copilot" class="modern-btn nav-item" style="flex: 1.5; min-width: 190px; padding: 12px; font-size: 0.95rem; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Canlı Seyir Koçu İpuçları Aç/Kapat">
+                    🔔 Canlı Seyir Koçu: Açık
+                </button>
+            </div>
+
+            <!-- Dersler Listesi -->
+            <ul id="tutorial-lessons-list" style="list-style: none; padding: 0; margin: 0; max-height: 52vh; overflow-y: auto;">
+                <!-- js/voice-assistant.js tarafından dinamik doldurulacak -->
+            </ul>
+        </div>
     </div>
 
 </body>
