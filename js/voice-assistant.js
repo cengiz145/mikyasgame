@@ -74,8 +74,12 @@
 
         // --- PUSULA VE YÖN SORGUSU ---
         if (command.includes("pusula") || command.includes("istikamet") || command.includes("hangi yön") || command.includes("yönüm")) {
-            const currentDir = (typeof CompassNav !== 'undefined') ? CompassNav.currentDirection : "Kuzey";
-            audio.speak("Mevcut istikametiniz " + currentDir + ". Yön kontrolü ve değişimi için Shift tuşuyla birlikte Yukarı Kuzey, Aşağı Güney, Sağ Doğu, Sol Batı oklarına basabilirsiniz.");
+            if (typeof CompassSystem !== 'undefined' && typeof CompassSystem.queryCompass === 'function') {
+                CompassSystem.queryCompass();
+            } else {
+                const currentDir = (typeof CompassNav !== 'undefined') ? CompassNav.currentDirection : "Kuzey";
+                audio.speak("Mevcut istikametiniz " + currentDir + ". Yön sorgulamak için Y tuşuna, yön değiştirmek için Shift ve Ok tuşlarına basabilirsiniz.");
+            }
             return;
         }
 
