@@ -705,6 +705,7 @@ const Game = {
         }
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
+        this.totalDrivingSeconds = 0;
         this.activeRouteData = routesData[routeId];
         this.passengerComfort = 100;
         this.stopRequestBellTriggered = false;
@@ -1065,9 +1066,17 @@ const Game = {
             const nextStopEl = document.getElementById('hud-next-stop');
             if (nextStopEl) nextStopEl.innerText = `${nextStop.name} (${this.currentStopIndex + 1}/${this.activeRouteData.stops.length})`;
             
+            const avgSpeedMps = 11.1; // Ortalama 40 km/s şehir içi seyir hızı
+            const targetTotalSec = Math.max(15, Math.round(stopDistance / avgSpeedMps));
+            const targetMins = Math.floor(targetTotalSec / 60);
+            const targetSecs = targetTotalSec % 60;
+            const targetTimeStr = targetMins > 0 
+                ? `${targetMins} dakika ${targetSecs} saniye` 
+                : `${targetSecs} saniye`;
+
             const speechMsg = (this.currentStopIndex === 0)
-                ? `Sefer başladı. İlk durak: ${nextStop.name}. Mesafe: ${Math.round(stopDistance)} metre.`
-                : `Sıradaki durak: ${nextStop.name}. Mesafe: ${Math.round(stopDistance)} metre.`;
+                ? `Sefer başladı. İlk durak: ${nextStop.name}. Mesafe: ${Math.round(stopDistance)} metre. Hedef süre: ${targetTimeStr}.`
+                : `Sıradaki durak: ${nextStop.name}. Mesafe: ${Math.round(stopDistance)} metre. Hedef süre: ${targetTimeStr}.`;
             
             if (typeof audio !== 'undefined') {
                 if (typeof audio.playNavChime === 'function') audio.playNavChime();
@@ -1312,8 +1321,9 @@ const Game = {
         // --- ZAMANIN AKIŞI (1:4 Senkronize Simülasyon Ölçeği) ---
         // 1 gerçek dakika = 4 oyun dakikası. 2 saatlik gerçek oynanış = Tam 8 saatlik resmi şoför vardiyası!
         // Durakta yolcu binerken de zaman akar; mesafe ile zaman kuruşu kuruşuna kilitlidir.
-        const timeScale = 4.0;
+        const timeScale = 1.0; // 1:1 Gerçek Zamanlı Dakika ve Saniye
         this.clockMinutes += (deltaTime / 60) * timeScale;
+        this.totalDrivingSeconds = (this.totalDrivingSeconds || 0) + deltaTime;
         this.clockMinutes = this.clockMinutes % 1440;
         
         let wasNight = this.isNight;
@@ -1939,7 +1949,7 @@ const Game = {
                 audio.speak("Durağa yaklaşıyorsunuz");
                 this.stopApproachAnnounced = true;
             }
-            const distanceScale = 4;
+            const distanceScale = 1.0; // 1:1 Gerçek Fizik (Metre / Saniye)
             const distanceCovered = (this.speed / 3.6) * deltaTime * distanceScale; 
             this.currentDistanceToNext -= distanceCovered;
             this.totalDistanceCovered += distanceCovered; // 3D Ses uzayı için ilerleme kaydı
@@ -2977,9 +2987,16 @@ const Game = {
             audio.speak("Eğitim seferi tamamlanamadı. Ceza uygulanmadı, istediğiniz zaman tekrar deneyebilirsiniz kaptan.");
         }
         
-        if (document.getElementById('res-money')) document.getElementById('res-money').innerText = `${this.sessionMoney} â‚º`;
+        if (document.getElementById('res-money')) document.getElementById('res-money').innerText = `${this.sessionMoney} ₺`;
         if (document.getElementById('res-penalties')) document.getElementById('res-penalties').innerText = '0 ₺ (Eğitimde Ceza Yok / Muaf)';
         
+        const totalDriveSec = Math.round(this.totalDrivingSeconds || 0);
+        const driveMins = Math.floor(totalDriveSec / 60);
+        const driveSecs = totalDriveSec % 60;
+        const totalDurationFormatted = driveMins > 0 ? `${driveMins} Dakika ${driveSecs} Saniye` : `${driveSecs} Saniye`;
+        const resDurationEl = document.getElementById('res-duration');
+        if (resDurationEl) resDurationEl.innerText = totalDurationFormatted;
+
         if (typeof UI !== 'undefined') UI.switchScreen('results-screen');
     },
 
