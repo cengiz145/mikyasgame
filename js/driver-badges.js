@@ -1,9 +1,9 @@
 /* ==========================================================================
    KAPTAN LİYAKAT ROZETLERİ VE 1500 ŞOFÖR BAŞARISI SİSTEMİ (DRIVER BADGES)
    Mikyas Simülasyon Dünyası - İki Ana Kategoriye Ayrılmış Sistem:
-   1. AÇILMIŞ BAŞARILAR (Kazanılanlar / Gurur Tablosu)
-   2. AÇILMAYANLAR (Gizemli Mühürlü Başarılar / Sır Odası)
-   + RASTGELE GİZEMLİ HEDEF ÖNERİSİ ("Bunu açarken kazara diğerlerini de aç!")
+   1. AÇILMIŞ BAŞARILAR (Kazanılan Resmi Başarılar)
+   2. AÇILMAYANLAR (Henüz Kazanılmamış Resmi Başarılar)
+   %100 Resmi, Oyunu Öğreten Net Açıklamalar ve Tuş Kombinasyonları
    %100 Ekran Okuyucu (NVDA) Uyumlu, Sayfalamalı ve Tam Erişilebilir
    ========================================================================== */
 
@@ -16,24 +16,6 @@ const DriverBadges = {
     currentPage: 1,
     pageSize: 30,
     currentSuggestedBadge: null,
-
-    mysteryClues: {
-    "sefer_azmi": "Trakya yollarında kontak kapatmadan seferden sefere koşan azimli kaptanların mührü...",
-    "yolcu_hizmeti": "Halkın sevgisini ve itimadını kazanıp yolcuları emniyetle taşıyanların mührü...",
-    "xp_tecrube": "Direksiyon başında gece gündüz alın teri dökerek tecrübe basamaklarını tırmananların mührü...",
-    "ipek_fren": "Çay bardağındaki tek damlayı taşırmayan, sarsıntısız kadife ayakların mührü...",
-    "dakiklik": "Durak saatine ve sefer tarifesine saniyesi saniyesine riayet eden intizam abidelerinin mührü...",
-    "hasarsiz_surus": "Aracına tek çizik dahi aldırmadan sanayi kapısı görmeyen dikkatli gözlerin mührü...",
-    "kazasiz_seri": "Konsantrasyonunu bir an bile bozmadan peş peşe kusursuz sefer zinciri dizenlerin mührü...",
-    "gece_nobeti": "Karanlık basınca poyrazın ve yıldızların sesini dinleyen gece muhafızlarının mührü...",
-    "engelsiz_ulasim": "Her yolcuya hürmetle yaklaşıp engelleri kaldıran koca yürekli kaptanların mührü...",
-    "durak_kesfi": "Şehrin en dar çıkmaz sokaklarını bile hafızasına kazıyan usta kaşiflerin mührü...",
-    "hasilat_butce": "Alın teri ve dürüst emekle bilet hasılatından kasa dolduranların mührü...",
-    "direksiyon_zamani": "Asfaltın üzerinde ömrünü direksiyona adayan emektar şoförlerin mührü...",
-    "yol_mesafesi": "Trakya'yı karış karış arşınlayıp kilometreleri yutan asfalt aşındırıcıların mührü...",
-    "emanet_esya": "Son durakta unutulan emaneti namus bilip sahibine ulaştıran dürüstlerin mührü...",
-    "ehliyet_prestij": "Şoförlük makamının en yüce mertebelerine erişen büyük başkaptanların mührü..."
-},
 
     get badges() {
         if (typeof window !== 'undefined' && window.ACHIEVEMENTS_1500) {
@@ -160,7 +142,7 @@ const DriverBadges = {
         return true;
     },
 
-    // --- RASTGELE GİZEMLİ HEDEF SEÇİCİ ---
+    // --- RASTGELE HEDEF SEÇİCİ (ÖĞRETİCİ GÖREV TAVSİYESİ) ---
     pickRandomMysteryBadge: function(announce = false) {
         const data = this.getBadgesData();
         let locked = this.badges.filter(b => !(data[b.id] && data[b.id].unlocked));
@@ -180,8 +162,7 @@ const DriverBadges = {
 
         if (announce && typeof audio !== 'undefined') {
             if (typeof audio.playSwitchClick === 'function') audio.playSwitchClick();
-            const clue = this.mysteryClues[rand.stat] || 'Trakya yollarında direksiyon salladıkça mühür çözülecek.';
-            const msg = `Kaptan, yeni gizemli hedefin: Başarı No ${rand.difficulty} ${rand.title}. Şart: ${rand.requirement}. İpucu: ${clue}. Yola çıkarken bu hedefi gözet, belki kazara başka mühürleri de kırarsın!`;
+            const msg = `Tavsiye edilen hedef: Başarı No ${rand.difficulty}, ${rand.title}. Şart: ${rand.requirement}. Nasıl Yapılır: ${rand.desc}`;
             if (audio.speak) audio.speak(msg);
             if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
         }
@@ -312,12 +293,12 @@ const DriverBadges = {
 
         const totalCount = this.badges.length;
         const lockedCount = totalCount - unlockedCount;
-        const currentTabName = (this.currentTab === 'unlocked') ? 'Açılmış Başarılar' : 'Açılmayan Gizemli Başarılar';
+        const currentTabName = (this.currentTab === 'unlocked') ? 'Açılmış Başarılar' : 'Açılmayan Başarılar';
 
-        let welcomeSpeech = `Başarılar menüsü açıldı. Şu an ${currentTabName} sekmesindesiniz. Toplam ${totalCount} başarıdan ${unlockedCount} tanesi açıldı, ${lockedCount} tanesi mühürlü bekliyor.`;
+        let welcomeSpeech = `1500 Başarı Menüsü açıldı. Şu an ${currentTabName} sekmesindesiniz. Toplam ${totalCount} başarıdan ${unlockedCount} tanesi açıldı, ${lockedCount} tanesi hedeflenmeyi bekliyor.`;
 
         if (this.currentTab === 'locked' && this.currentSuggestedBadge) {
-            welcomeSpeech += ` Bugün senin için seçilen rastgele gizemli hedef: No ${this.currentSuggestedBadge.difficulty}, ${this.currentSuggestedBadge.title}. Nasıl açılır: ${this.currentSuggestedBadge.requirement}. Bu hedefi kovalarken kazara diğer başarıları da açabilirsin!`;
+            welcomeSpeech += ` Tavsiye edilen görev: No ${this.currentSuggestedBadge.difficulty}, ${this.currentSuggestedBadge.title}. Şart: ${this.currentSuggestedBadge.requirement}. Nasıl Yapılır: ${this.currentSuggestedBadge.desc}`;
         }
 
         if (typeof audio !== 'undefined') {
@@ -372,10 +353,10 @@ const DriverBadges = {
             tabUnlockedBtn.innerText = `🏆 Açılmış Başarılar (${unlockedCount})`;
         }
         if (tabLockedBtn) {
-            tabLockedBtn.innerText = `🔒 Açılmayanlar (${lockedCount})`;
+            tabLockedBtn.innerText = `🔒 Açılmayan Başarılar (${lockedCount})`;
         }
 
-        // Aktif sekme stilini güncelle
+        // Aktif sekme stili
         if (this.currentTab === 'unlocked') {
             if (tabUnlockedBtn) {
                 tabUnlockedBtn.style.background = 'linear-gradient(135deg, rgba(234, 179, 8, 0.35), rgba(202, 138, 4, 0.2))';
@@ -394,10 +375,10 @@ const DriverBadges = {
             }
         } else {
             if (tabLockedBtn) {
-                tabLockedBtn.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.35), rgba(126, 34, 206, 0.2))';
-                tabLockedBtn.style.borderColor = '#a855f7';
-                tabLockedBtn.style.color = '#e9d5ff';
-                tabLockedBtn.style.boxShadow = '0 0 15px rgba(168, 85, 247, 0.2)';
+                tabLockedBtn.style.background = 'linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(30, 58, 138, 0.3))';
+                tabLockedBtn.style.borderColor = '#38bdf8';
+                tabLockedBtn.style.color = '#bae6fd';
+                tabLockedBtn.style.boxShadow = '0 0 15px rgba(56, 189, 248, 0.2)';
             }
             if (tabUnlockedBtn) {
                 tabUnlockedBtn.style.background = 'rgba(255, 255, 255, 0.06)';
@@ -406,7 +387,7 @@ const DriverBadges = {
                 tabUnlockedBtn.style.boxShadow = 'none';
             }
 
-            // RASTGELE GİZEMLİ HEDEF KUTUSUNU GÖSTER
+            // GÖREV TAVSİYESİ KUTUSU (RESMİ VE ÖĞRETİCİ)
             if (randomTargetBox) {
                 if (!this.currentSuggestedBadge || this.isUnlocked(this.currentSuggestedBadge.id)) {
                     this.pickRandomMysteryBadge(false);
@@ -414,35 +395,29 @@ const DriverBadges = {
 
                 if (this.currentSuggestedBadge) {
                     const r = this.currentSuggestedBadge;
-                    const clue = this.mysteryClues[r.stat] || 'Trakya yollarında direksiyon salladıkça mühür çözülecek.';
                     randomTargetBox.style.display = 'block';
                     randomTargetBox.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="font-size: 1.4rem;">🎯</span>
-                                <span style="font-size: 1.05rem; font-weight: bold; color: #facc15;">
-                                    Günün Gizemli Hedefi (Rastgele Öneri)
+                                <span style="font-size: 1.3rem;">🎯</span>
+                                <span style="font-size: 1.05rem; font-weight: bold; color: #38bdf8;">
+                                    Tavsiye Edilen Görev Hedefi
                                 </span>
                             </div>
-                            <button id="btn-reroll-mystery-target" class="modern-btn nav-item" style="padding: 5px 12px; font-size: 0.85rem; background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #e9d5ff; cursor: pointer; border-radius: 6px;" aria-label="Başka bir rastgele gizemli hedef öner">
+                            <button id="btn-reroll-mystery-target" class="modern-btn nav-item" style="padding: 5px 12px; font-size: 0.85rem; background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #bae6fd; cursor: pointer; border-radius: 6px;" aria-label="Başka bir görev hedefi öner">
                                 🎲 Başka Bir Hedef Öner
                             </button>
                         </div>
                         <div style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 6px;">
-                            <strong style="color: #c084fc;">No #${r.difficulty} • ${r.tierName}:</strong> 
+                            <strong style="color: #38bdf8;">No #${r.difficulty} • ${r.tierName}:</strong> 
                             <span style="color: #fef08a; font-weight: bold;">${r.title}</span> 
                             <span style="font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; margin-left: 6px;">${r.category}</span>
                         </div>
-                        <div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; margin-bottom: 6px;">
-                            🔮 "${clue}"
+                        <div style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 6px; line-height: 1.4;">
+                            📖 <strong>Nasıl Kazanılır:</strong> ${r.desc}
                         </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            <div style="color: #38bdf8;">
-                                🎯 <strong>Nasıl Açılır:</strong> ${r.requirement}
-                            </div>
-                            <div style="color: #a78bfa; font-size: 0.8rem; font-weight: 500;">
-                                💡 Bu hedefi kovalarken kazara diğer başarıları da açabilirsin!
-                            </div>
+                        <div style="font-size: 0.85rem; color: #facc15; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            🎯 <strong>Resmi Şart:</strong> ${r.requirement}
                         </div>
                     `;
 
@@ -461,7 +436,7 @@ const DriverBadges = {
             }
         }
 
-        // Sadece seçili sekmenin başarılarını filtrele (Açılmış vs Açılmayanlar)
+        // Filtreleme
         let filtered = this.badges.filter(b => {
             const isUn = this.isUnlocked(b.id);
             if (this.currentTab === 'unlocked' && !isUn) return false;
@@ -491,7 +466,7 @@ const DriverBadges = {
         if (summaryEl) {
             summaryEl.innerText = (this.currentTab === 'unlocked')
                 ? `🏆 Açılmış Başarılar: Toplam ${unlockedCount} Başarı Kazanıldı (Filtrelenen: ${totalFiltered})`
-                : `🔒 Açılmayan Gizemli Başarılar: Toplam ${lockedCount} Mühürlü Başarı Bekliyor (Filtrelenen: ${totalFiltered})`;
+                : `🔒 Açılmayan Başarılar: Toplam ${lockedCount} Başarı Bekliyor (Filtrelenen: ${totalFiltered})`;
         }
 
         if (pageIndicatorEl) {
@@ -515,10 +490,10 @@ const DriverBadges = {
             if (this.currentTab === 'unlocked') {
                 emptyLi.innerHTML = `
                     <div style="font-size: 2.2rem; margin-bottom: 10px;">🏆</div>
-                    <strong style="color: #fde047; font-size: 1.15rem;">Henüz Açılmış Bir Başarınız Bulunmuyor</strong><br>
-                    Seferlere çıkarak, yolcu taşıyarak ve durakları keşfederek ilk rozetlerinizi kazanmaya hemen başlayabilirsiniz!<br>
-                    <button id="btn-switch-to-locked" class="modern-btn nav-item" style="margin-top: 15px; padding: 10px 20px; background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #e9d5ff; font-weight: bold; cursor: pointer;">
-                        🔒 Açılmayan Gizemli Başarıları İncele
+                    <strong style="color: #fde047; font-size: 1.15rem;">Henüz Kazanılmış Bir Başarınız Bulunmuyor</strong><br>
+                    Seferlere çıkarak, yolcu taşıyarak ve durakları tamamlayarak ilk başarılarınızı hemen kazanmaya başlayabilirsiniz.<br>
+                    <button id="btn-switch-to-locked" class="modern-btn nav-item" style="margin-top: 15px; padding: 10px 20px; background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #bae6fd; font-weight: bold; cursor: pointer;">
+                        🔒 Açılmayan Başarıları ve Görevleri İncele
                     </button>
                 `;
                 setTimeout(() => {
@@ -533,9 +508,8 @@ const DriverBadges = {
                 }, 50);
             } else {
                 emptyLi.innerHTML = `
-                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🎉</div>
-                    <strong style="color: #22c55e; font-size: 1.15rem;">İnanılmaz! Bu filtrede tüm başarıları açtınız!</strong><br>
-                    Kazanılan başarılarınızı görmek için "Açılmış Başarılar" sekmesine geçebilirsiniz.
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">✅</div>
+                    <strong style="color: #22c55e; font-size: 1.15rem;">Tebrikler! Bu kategorideki tüm başarılar kazanıldı.</strong>
                 `;
             }
 
@@ -569,11 +543,12 @@ const DriverBadges = {
             else if (badge.tier === 5) tierColor = '#a855f7';
 
             if (isUn) {
+                // AÇILMIŞ BAŞARI KARTI
                 btn.style.border = '2px solid #eab308';
                 btn.style.background = 'linear-gradient(135deg, rgba(234, 179, 8, 0.18), rgba(202, 138, 4, 0.08))';
                 btn.style.boxShadow = '0 0 12px rgba(234, 179, 8, 0.15)';
 
-                const ariaLabel = `Açılmış Başarı No ${badge.difficulty}: ${badge.title}. Zorluk: ${badge.tierName}. Kategori: ${badge.category}. Açıklama: ${badge.desc}. Kazanma şartı: ${badge.requirement}. Kazanılma tarihi: ${dateStr || 'Kayıtlı'}. Dinlemek için Enter.`;
+                const ariaLabel = `Açılmış Başarı No ${badge.difficulty}: ${badge.title}. Kategori: ${badge.category}. Zorluk: ${badge.tierName}. Nasıl Kazanıldı: ${badge.desc}. Şart: ${badge.requirement}. Tarih: ${dateStr || 'Kayıtlı'}. Dinlemek için Enter.`;
                 btn.setAttribute('aria-label', ariaLabel);
 
                 btn.innerHTML = `
@@ -593,17 +568,17 @@ const DriverBadges = {
                             </div>
                         </div>
                         <div>
-                            <span style="background: linear-gradient(135deg, #eab308, #ca8a04); color: #000; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">🎖️ AÇILDI</span>
+                            <span style="background: linear-gradient(135deg, #eab308, #ca8a04); color: #000; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">🎖️ KAZANILDI</span>
                         </div>
                     </div>
 
                     <div style="font-size: 0.9rem; color: #e2e8f0; margin-bottom: 6px; line-height: 1.35;">
-                        ${badge.desc}
+                        📖 <strong>Nasıl Kazanıldı:</strong> ${badge.desc}
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.08);">
                         <div style="color: #38bdf8;">
-                            🎯 <strong>Kazanma Şartı:</strong> ${badge.requirement}
+                            🎯 <strong>Resmi Şart:</strong> ${badge.requirement}
                         </div>
                         <div style="color: #fde047; font-size: 0.8rem;">
                             📅 ${dateStr || 'Kayıtlı'}
@@ -619,46 +594,42 @@ const DriverBadges = {
                     }
                 };
             } else {
-                btn.style.border = '1px dashed rgba(168, 85, 247, 0.35)';
-                btn.style.background = 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 27, 75, 0.4))';
-                btn.style.opacity = '0.92';
+                // AÇILMAYAN RESMİ BAŞARI KARTI (ÖĞRETİCİ TALİMATLAR)
+                btn.style.border = '1px solid rgba(56, 189, 248, 0.25)';
+                btn.style.background = 'rgba(15, 23, 42, 0.75)';
+                btn.style.opacity = '0.95';
 
-                const mysteryClueText = this.mysteryClues[badge.stat] || 'Trakya yollarında direksiyon salladıkça bu mühür çözülecek...';
-                const mysteryTitle = (badge.tier >= 4)
-                    ? `🔒 ??? (Gizemli Mühür #${badge.difficulty})`
-                    : `🔒 ${badge.title}`;
-
-                const ariaLabel = `Açılmayan Gizemli Başarı No ${badge.difficulty}: ${mysteryTitle}. Zorluk Derecesi: ${badge.tierName}. Kategori: ${badge.category}. Gizemli İpucu: ${mysteryClueText}. Şart: ${badge.requirement}. Dinlemek için Enter.`;
+                const ariaLabel = `Açılmayan Başarı No ${badge.difficulty}: ${badge.title}. Kategori: ${badge.category}. Zorluk: ${badge.tierName}. Nasıl Kazanılır: ${badge.desc}. Şart: ${badge.requirement}. Dinlemek için Enter.`;
                 btn.setAttribute('aria-label', ariaLabel);
 
                 btn.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 1.25rem; color: #c084fc;" aria-hidden="true">🗝️</span>
+                            <span style="font-size: 1.25rem;" aria-hidden="true">${badge.icon}</span>
                             <div>
                                 <span style="font-size: 0.8rem; color: ${tierColor}; font-weight: bold; margin-right: 6px;">
                                     #${badge.difficulty} • ${badge.tierName}
                                 </span>
                                 <span style="font-size: 1.05rem; font-weight: bold; color: #cbd5e1;">
-                                    ${mysteryTitle}
+                                    ${badge.title}
                                 </span>
-                                <span style="display: inline-block; margin-left: 6px; font-size: 0.75rem; padding: 1px 6px; border-radius: 4px; background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);">
+                                <span style="display: inline-block; margin-left: 6px; font-size: 0.75rem; padding: 1px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
                                     ${badge.category}
                                 </span>
                             </div>
                         </div>
                         <div>
-                            <span style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">🔒 MÜHÜRLÜ</span>
+                            <span style="background: rgba(148, 163, 184, 0.2); color: #94a3b8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">🔒 KİLİTLİ</span>
                         </div>
                     </div>
 
-                    <div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; margin-bottom: 6px; line-height: 1.35;">
-                        🔮 <strong>Gizemli Fısıltı:</strong> "${mysteryClueText}"
+                    <div style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 6px; line-height: 1.35;">
+                        📖 <strong>Nasıl Kazanılır:</strong> ${badge.desc}
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.06);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.08);">
                         <div style="color: #facc15;">
-                            🎯 <strong>Nasıl Açılır:</strong> ${badge.requirement}
+                            🎯 <strong>Resmi Şart:</strong> ${badge.requirement}
                         </div>
                     </div>
                 `;
@@ -735,7 +706,7 @@ const DriverBadges = {
             }
             this.renderModal();
             if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak("Açılmayan gizemli başarılar sekmesine geçildi.");
+                audio.speak("Açılmayan başarılar sekmesine geçildi.");
             }
         });
 
