@@ -1991,8 +1991,7 @@ let routesData = {};
 if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
     const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26" || r.hatNo === "226");
     if (r26) {
-        ilceRotalari["Tekirdağ"].push(Object.assign({}, r26, { id: "hat_26_suleymanpasa_velimese" }));
-        ilceRotalari["Tekirdağ"].push(Object.assign({}, r26, { id: "hat_26_suleymanpasa_saray" }));
+        // Sadece routesData alias haritalamasi yapilir, ilceRotalari listesine cift kopya eklenmez
         if (typeof routesData !== 'undefined') {
             const rSaray = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_saray_ekspres");
             if (rSaray) routesData["hat_saray_ekspres"] = rSaray;
