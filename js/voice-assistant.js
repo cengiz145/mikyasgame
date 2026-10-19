@@ -164,36 +164,25 @@ class VoiceAssistant {
                 return;
             }
 
-            // Atölye açıkken doğrudan klavye tuşlarıyla deney çalıştırma
+            // Atölye açıkken hedef adıma göre doğru/yanlış tuş kontrolü
             if (this.isTutorialModalOpen() && this.currentStageFilter === 'lab') {
-                const k = e.key.toLowerCase();
-                if (k === 'm') {
-                    const b = document.getElementById('btn-lab-engine');
-                    if (b) { b.click(); e.preventDefault(); return; }
-                } else if (k === 'w') {
-                    const b = document.getElementById('btn-lab-accel');
-                    if (b) { b.click(); e.preventDefault(); return; }
-                } else if (k === 's') {
-                    const b = document.getElementById('btn-lab-hard-brake');
-                    if (b) { b.click(); e.preventDefault(); return; }
-                } else if (k === 'f') {
-                    const b = document.getElementById('btn-lab-soft-brake');
-                    if (b) { b.click(); e.preventDefault(); return; }
-                } else if (k === 'k') {
-                    const b = document.getElementById('btn-lab-kneeling');
-                    if (b) { b.click(); e.preventDefault(); return; }
-                } else if (k === 'u' || k === 'r') {
-                    const b = document.getElementById('btn-lab-ramp');
-                    if (b) { b.click(); e.preventDefault(); return; }
-                } else if (k === '1') {
-                    const b = document.getElementById('btn-lab-door-front');
-                    if (b) { b.click(); e.preventDefault(); return; }
-                } else if (k === '2') {
-                    const b = document.getElementById('btn-lab-door-rear');
-                    if (b) { b.click(); e.preventDefault(); return; }
-                } else if (e.code === 'Space') {
-                    const b = document.getElementById('btn-lab-retarder');
-                    if (b) { b.click(); e.preventDefault(); return; }
+                const currentStep = (this.guidedSteps && this.guidedSteps[this.guidedStep - 1]) ? this.guidedSteps[this.guidedStep - 1] : null;
+                if (currentStep && !currentStep.isGraduation) {
+                    const k = e.key.toLowerCase();
+                    const isTarget = (k === currentStep.targetKey) || (currentStep.altTargetKey && k === currentStep.altTargetKey);
+                    
+                    // Tab, Shift, Alt, Ctrl gibi gezinme tuşlarına dokunma
+                    if (['tab', 'shift', 'control', 'alt', 'escape', 'f1', 'enter'].includes(k)) {
+                        return;
+                    }
+
+                    e.preventDefault();
+                    if (isTarget) {
+                        this.executeGuidedSuccess();
+                    } else {
+                        this.executeGuidedFail(k);
+                    }
+                    return;
                 }
             }
 
@@ -364,13 +353,10 @@ class VoiceAssistant {
     }
 
     // =========================================================================
-    // CANLI İNTERAKTİF SÜRÜŞ ATÖLYESİ (FORMÜL DENEYLERİ & SIFIR STRES PRATİĞİ)
+    // ADIM ADIM KILAVUZLU İNTERAKTİF SÜRÜŞ ATÖLYESİ (ÖĞRETMEN DİSİPLİNİ & SIFIR STRES)
     // =========================================================================
-    renderInteractiveLab() {
-        const labContainer = document.getElementById('tutorial-lab-container');
-        if (!labContainer) return;
-
-        // Atölye durum değişkenleri
+    initGuidedLab() {
+        if (typeof this.guidedStep === 'undefined') this.guidedStep = 1;
         if (typeof this.labSpeed === 'undefined') this.labSpeed = 0;
         if (typeof this.labPressure === 'undefined') this.labPressure = 0;
         if (typeof this.labComfort === 'undefined') this.labComfort = 100;
@@ -379,335 +365,393 @@ class VoiceAssistant {
         if (typeof this.labRampOpen === 'undefined') this.labRampOpen = false;
         if (typeof this.labFrontDoor === 'undefined') this.labFrontDoor = false;
         if (typeof this.labRearDoor === 'undefined') this.labRearDoor = false;
+        if (typeof this.labRetarderActive === 'undefined') this.labRetarderActive = false;
+        this.guidedFeedbackText = "";
+        this.guidedFeedbackType = "info"; // "success" | "warning" | "info"
 
+        this.guidedSteps = [
+            {
+                step: 1,
+                title: "1. Adım: Motor Marşı ve Pnömatik Basınç",
+                formula: "Hava Basıncı ≥ 85 PSI ➔ İmdat Frenleri Çözülür",
+                instruction: "Sevgili Kaptan Adayım, otobüsümüzü sefere hazırlamak için önce motoru çalıştırmalıyız. Lütfen klavyenizden M tuşuna basınız veya aşağıdaki 'Marşa Bas' butonuna tıklayınız.",
+                targetKey: "m",
+                actionBtnText: "🔑 Kontağı Aç & Marşa Bas (M)",
+                actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
+                successFeedback: "Aferin, çok güzel yaptınız! 12 litrelik dizel motor çalıştı ve hava tüpleri 120 PSI basınca ulaştı. İmdat frenleri çözüldü. Şimdi ikinci adıma geçelim.",
+                failFeedback: "Henüz doğru tuşa basmadınız kaptanım. Motoru çalıştırmak için lütfen sadece M tuşuna basınız. Başarabilirsin, tekrar dene!",
+                execute: () => {
+                    if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.start) {
+                        try { audio.sounds.start.play(); } catch(e) {}
+                    }
+                    this.labEngineRunning = true;
+                    this.labPressure = 120;
+                }
+            },
+            {
+                step: 2,
+                title: "2. Adım: Gaza Basıp Hızlanma",
+                formula: "v = a · t ➔ Ağır Tonaj Hızlanma Dinamiği",
+                instruction: "Motorumuz çalışıyor. Şimdi aracı hareket ettirmek ve hızlanmak için klavyeden W tuşuna (veya Yukarı Ok) basınız.",
+                targetKey: "w",
+                altTargetKey: "arrowup",
+                actionBtnText: "🟢 Gaza Bas: 50 km/s (W / Yukarı Ok)",
+                actionBtnStyle: "background: linear-gradient(135deg, #16a34a, #15803d); border: 1.5px solid #4ade80;",
+                successFeedback: "Harika gidiyorsun, tebrikler! Otobüsümüz hareket etti ve saatte 50 kilometre hıza ulaştı. İleride ilk durağımız görünüyor.",
+                failFeedback: "Hızlanmak için lütfen W tuşuna veya Yukarı Ok tuşuna basınız. Tekrar deneyiniz kaptanım!",
+                execute: () => {
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    this.labSpeed = 50;
+                }
+            },
+            {
+                step: 3,
+                title: "3. Adım: İpek Fren ile Yumuşak Duruş",
+                formula: "Duruş Mesafesi: d = v² / 200 | Konfor = %100",
+                instruction: "Durağa yaklaşıyoruz! Yolcuları sarsmamak için yumuşak bir ipek fren yapmalıyız. Lütfen klavyeden S tuşuna (veya Aşağı Ok) basınız.",
+                targetKey: "s",
+                altTargetKey: "arrowdown",
+                actionBtnText: "✨ İpek Fren Yap ve Dur (S / Aşağı Ok)",
+                actionBtnStyle: "background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981;",
+                successFeedback: "Mükemmel bir duruş, tebrikler! Gazı erkenden kesip ipek gibi durdun. Yolcular ayakta bile sarsılmadı, konfor puanımız yüzde yüz!",
+                failFeedback: "Durağa yumuşak yanaşmak ve durmak için lütfen S tuşuna veya Aşağı Ok tuşuna basınız. Başaracaksın, bir kez daha dene!",
+                execute: () => {
+                    if (typeof audio !== 'undefined' && audio.playAirBrake) audio.playAirBrake();
+                    this.labSpeed = 0;
+                    this.labComfort = 100;
+                }
+            },
+            {
+                step: 4,
+                title: "4. Adım: Otobüsü Sağa Yatırma (Kneeling)",
+                formula: "Kneeling (%15 Eğim) ➔ Kaldırım Hizalama",
+                instruction: "Durakta yaşlı ve engelli yolcularımız bekliyor. Otobüsün basamak yüksekliğini kaldırım seviyesine indirmek için klavyeden K tuşuna basınız.",
+                targetKey: "k",
+                actionBtnText: "⬇️ Otobüsü Sağa Yatır (K)",
+                actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
+                successFeedback: "Aferin, çok doğru yaptınız! Otobüs sağ körüklerini indirerek kaldırım hizasına eğildi. İşte sosyal duyarlılık ve usta kaptanlık budur!",
+                failFeedback: "Otobüsü kaldırım seviyesine eğmek için lütfen K tuşuna basınız. Tekrar dene kaptanım!",
+                execute: () => {
+                    if (typeof audio !== 'undefined' && audio.playKneeling) audio.playKneeling();
+                    this.labKneeling = true;
+                }
+            },
+            {
+                step: 5,
+                title: "5. Adım: Engelli Rampasını Açma",
+                formula: "1:12 Eğim Standardı ➔ Engelsiz Erişim",
+                instruction: "Tekerlekli sandalyeli yolcumuzun rahatça binebilmesi için klavyeden R tuşuna (veya U) basarak engelli rampasını açınız.",
+                targetKey: "r",
+                altTargetKey: "u",
+                actionBtnText: "🛹 Engelli Rampasını Aç (R veya U)",
+                actionBtnStyle: "background: linear-gradient(135deg, #d97706, #b45309); border: 1.5px solid #facc15;",
+                successFeedback: "Harikasınız, tebrikler! Rampa açıldı ve yolcumuz araca güvenle bindi. Yolcumuz sesleniyor: Çok teşekkür ederim kaptanım, iyi ki varsınız!",
+                failFeedback: "Engelli rampasını açmak için lütfen R veya U tuşuna basınız. Hadi bir kez daha deneyelim!",
+                execute: () => {
+                    if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
+                    this.labRampOpen = true;
+                }
+            },
+            {
+                step: 6,
+                title: "6. Adım: Rampayı Kapatma ve Doğrultma",
+                formula: "Rampa Kilitli ➔ Sürüş İzni Çözülür",
+                instruction: "Yolcumuz bindi. Güvenlik gereği rampa açıkken araç hareket etmez. Rampayı kapatmak için tekrar R tuşuna (veya U) basınız.",
+                targetKey: "r",
+                altTargetKey: "u",
+                actionBtnText: "⬆️ Rampayı Kapat ve Doğrult (R veya U)",
+                actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
+                successFeedback: "Çok güzel, tebrikler! Rampa emniyetle toplandı ve otobüsümüz normal sürüş yüksekliğine döndü.",
+                failFeedback: "Rampayı kapatmak için lütfen tekrar R veya U tuşuna basınız.",
+                execute: () => {
+                    if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
+                    this.labRampOpen = false;
+                    this.labKneeling = false;
+                }
+            },
+            {
+                step: 7,
+                title: "7. Adım: Ön Kapıyı Açma (Yolcu Binişi)",
+                formula: "Yolcu Akışı ➔ Ön Kapı Biniş (1)",
+                instruction: "Durakta bekleyen diğer yolcuları almak için klavyeden 1 tuşuna basarak ön kapıyı açınız.",
+                targetKey: "1",
+                actionBtnText: "🚪 Ön Kapıyı Aç (1)",
+                actionBtnStyle: "background: linear-gradient(135deg, #7c3aed, #6d28d9); border: 1.5px solid #a78bfa;",
+                successFeedback: "Aferin doğru yaptınız! Ön kapı açıldı ve yolcularımız kartlarını basarak bindi: Bip bip, kolay gelsin kaptan!",
+                failFeedback: "Yolcuları almak için ön kapıyı açmalıyız; lütfen klavyeden 1 tuşuna basınız.",
+                execute: () => {
+                    if (typeof audio !== 'undefined' && audio.playDoorOpen) audio.playDoorOpen();
+                    this.labFrontDoor = true;
+                }
+            },
+            {
+                step: 8,
+                title: "8. Adım: Kapıları Kapatma ve Güvenlik Kilidi",
+                formula: "Kapılar Kapalı ➔ Gaz Emniyet Kilidi Çözülür",
+                instruction: "Tüm yolcular bindi. Sürüş güvenlik kilidini çözmek için lütfen tekrar 1 tuşuna basarak ön kapıyı kapatınız.",
+                targetKey: "1",
+                actionBtnText: "🔒 Ön Kapıyı Kapat (1)",
+                actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
+                successFeedback: "Tebrikler, kapılar emniyetle kapandı ve gaz güvenlik kilidi çözüldü! Artık güvenle yola çıkabiliriz.",
+                failFeedback: "Kapıyı kapatmak için lütfen tekrar 1 tuşuna basınız.",
+                execute: () => {
+                    if (typeof audio !== 'undefined' && audio.playDoorClose) audio.playDoorClose();
+                    this.labFrontDoor = false;
+                }
+            },
+            {
+                step: 9,
+                title: "9. Adım: Manyetik Retarder (Yokuş Freni)",
+                formula: "Ağır Tonaj + Dik İniş ➔ Manyetik Retarder (Space)",
+                instruction: "Son olarak, dik yokuşlarda balataları yakmadan motor gücüyle yavaşlamak için Boşluk (Space) tuşuna basarak manyetik retarderi çekiniz.",
+                targetKey: " ",
+                actionBtnText: "⚡ Manyetik Retarderi Çek (Space / Boşluk)",
+                actionBtnStyle: "background: linear-gradient(135deg, #ea580c, #c2410c); border: 1.5px solid #f97316;",
+                successFeedback: "Muhteşem! Manyetik retarder devrede, balatalar aşınmadan güvenle yavaşladık! Bütün temel aşamaları tamamladınız!",
+                failFeedback: "Manyetik retarderi devreye sokmak için lütfen Boşluk (Space) tuşuna basınız.",
+                execute: () => {
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    this.labRetarderActive = true;
+                }
+            },
+            {
+                step: 10,
+                title: "🎓 Akademi Mezuniyeti & Resmi Kaptanlık Brövesi",
+                isGraduation: true
+            }
+        ];
+    }
+
+    renderInteractiveLab() {
+        this.initGuidedLab();
+        const labContainer = document.getElementById('tutorial-lab-container');
+        if (!labContainer) return;
+
+        const currentStep = this.guidedSteps[this.guidedStep - 1] || this.guidedSteps[0];
+        const isGraduation = !!currentStep.isGraduation;
+        const progressPct = Math.round(((this.guidedStep - 1) / 9) * 100);
+
+        if (isGraduation) {
+            // MEZUNİYET EKRANI
+            if (typeof Game !== 'undefined' && typeof Game.completeAcademy === 'function') {
+                Game.completeAcademy();
+            }
+            if (typeof audio !== 'undefined' && audio.playSuccess) audio.playSuccess();
+
+            labContainer.innerHTML = `
+                <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 78, 59, 0.5)); border: 2px solid #eab308; border-radius: 14px; padding: 26px; text-align: center; box-shadow: 0 0 30px rgba(234, 179, 8, 0.3);">
+                    <div style="font-size: 3.8rem; margin-bottom: 10px;">🏆</div>
+                    <span style="font-size: 0.88rem; color: #fde047; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">MİKYAS KAPTANLIK AKADEMİSİ MEZUNİYETİ</span>
+                    <h3 style="color: #facc15; font-size: 1.8rem; margin: 6px 0 12px 0;">🎉 TEBRİKLER KAPTANIM!</h3>
+                    
+                    <div style="background: rgba(234, 179, 8, 0.15); border: 1.5px solid #eab308; border-radius: 10px; padding: 16px; margin: 16px auto; max-width: 600px; text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <span style="font-size: 2rem;">🎖️</span>
+                            <div>
+                                <strong style="color: #fef08a; font-size: 1.15rem; display: block;">Resmî Şehir İçi Sefer Kaptanı Brövesi Verildi</strong>
+                                <span style="color: #cbd5e1; font-size: 0.9rem;">Öğrencilik aşaması tamamlandı, Süleymanpaşa hatları emrinizde!</span>
+                            </div>
+                        </div>
+                        <p style="color: #f1f5f9; font-size: 0.94rem; line-height: 1.5; margin: 8px 0 0 0;">
+                            Motor marşını, ipek freni, engelli rampası sevgi protokolünü ve kapı emniyetini üstün başarıyla kavradınız. Artık yolcularımızı güvenle ve konforla taşıyabilirsiniz.
+                        </p>
+                    </div>
+
+                    <button id="btn-lab-start-first-mission" class="modern-btn nav-item" style="padding: 14px 28px; font-size: 1.15rem; background: linear-gradient(135deg, #059669, #047857); border: 2px solid #34d399; color: #ffffff; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 10px; box-shadow: 0 0 16px rgba(52, 211, 153, 0.4);" aria-label="İlk Seferime Başla. 1. Seviye Görevini Aç">
+                        🚍 İlk Seferime Başla (Görev 1: Süleymanpaşa)
+                    </button>
+                </div>
+            `;
+
+            const btnStart = document.getElementById('btn-lab-start-first-mission');
+            if (btnStart) {
+                btnStart.onclick = () => {
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    this.closeTutorialModal();
+                    // Görev seçim ekranına git
+                    document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
+                };
+            }
+
+            if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+                KeyboardNav.initForScreen();
+            }
+            return;
+        }
+
+        // AKTİF REHBERLİ ADIM EKRANI
         labContainer.innerHTML = `
-            <div style="background: rgba(15, 23, 42, 0.7); border: 1.5px solid #10b981; border-radius: 12px; padding: 18px; margin-bottom: 16px;">
+            <div style="background: rgba(15, 23, 42, 0.85); border: 1.5px solid #10b981; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+                <!-- Başlık ve İlerleme -->
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(16, 185, 129, 0.3); padding-bottom: 10px; margin-bottom: 14px;">
                     <div>
-                        <span style="font-size: 0.8rem; color: #a7f3d0; text-transform: uppercase; letter-spacing: 1px;">Mikyas Akademi Canlı Simülasyon</span>
-                        <h3 style="color: #34d399; font-size: 1.4rem; margin: 2px 0 0 0;">🧪 İnteraktif Sürüş & Formül Atölyesi</h3>
+                        <span style="font-size: 0.8rem; color: #a7f3d0; text-transform: uppercase; letter-spacing: 1px;">Adım Adım İnteraktif Sürüş Eğitimi</span>
+                        <h3 style="color: #34d399; font-size: 1.35rem; margin: 2px 0 0 0;">${currentStep.title}</h3>
                     </div>
-                    <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
-                        🎮 Canlı Deney & Serbest Pratik
+                    <span style="background: rgba(16, 185, 129, 0.25); color: #34d399; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
+                        Adım ${this.guidedStep} / 9 (%${progressPct})
                     </span>
                 </div>
 
-                <p style="color: #cbd5e1; font-size: 0.92rem; line-height: 1.45; margin-bottom: 16px;">
-                    Aşağıdaki istasyonlarda otobüsün tüm mekanik ve fiziksel formüllerini <strong>sınav stresi olmadan</strong> butonlara tıklayarak veya klavye kısayollarına basarak anında deneyimleyebilirsiniz!
-                </p>
-
-                <!-- 1. İSTASYON: MARŞ, KONTAK VE BASINÇ FORMÜLÜ -->
-                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #38bdf8; font-size: 1.05rem;">🔑 1. İstasyon: Pnömatik Basınç ve Motor Ateşleme</strong>
-                        <span style="font-size: 0.82rem; color: #a7f3d0; background: rgba(56, 189, 248, 0.15); padding: 3px 8px; border-radius: 4px;">Formül: Basınç ≥ 85 PSI ➔ İmdat Çözülür</span>
+                <!-- Gösterge Paneli (CANLI SİMÜLASYON VERİLERİ) -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 16px;">
+                    <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">MOTOR DURUMU</span>
+                        <strong style="color: ${this.labEngineRunning ? '#4ade80' : '#f87171'}; font-size: 0.95rem;">${this.labEngineRunning ? '🟢 Çalışıyor' : '🔴 Kapalı'}</strong>
                     </div>
-                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
-                        Otobüsün frenleri hava ile kilitlenir. Hava kompresörü 85 PSI'yı geçmeden araç hareket etmez. Marşa basarak havayı doldur!
-                    </p>
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <button id="btn-lab-engine" class="modern-btn nav-item" style="padding: 10px 16px; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Kontağı Aç ve Marşa Bas (M tuşu)">
-                            🔑 Kontağı Aç & Marşa Bas (M)
-                        </button>
-                        <div style="background: rgba(0,0,0,0.4); padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem;">
-                            Hava Basıncı: <strong id="lbl-lab-pressure" style="color: #4ade80;">${this.labPressure} PSI</strong>
-                            <span id="lbl-lab-engine-status" style="margin-left: 8px; color: ${this.labEngineRunning ? '#4ade80' : '#f87171'};">${this.labEngineRunning ? '🟢 Motor Çalışıyor' : '🔴 Motor Kapalı'}</span>
-                        </div>
+                    <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">HAVA BASINCI</span>
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">${this.labPressure} PSI</strong>
                     </div>
-                </div>
-
-                <!-- 2. İSTASYON: İPEK FREN VE KONFOR FORMÜLÜ -->
-                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #facc15; font-size: 1.05rem;">✨ 2. İstasyon: İpek Fren & Yolcu Konfor Formülü</strong>
-                        <span style="font-size: 0.82rem; color: #fde047; background: rgba(250, 204, 21, 0.15); padding: 3px 8px; border-radius: 4px;">Formül: d = v² / 200 | Konfor = 100 - (Sert Fren × 20)</span>
+                    <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">HIZ GÖSTERGESİ</span>
+                        <strong style="color: #facc15; font-size: 0.95rem;">${this.labSpeed} km/s</strong>
                     </div>
-                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
-                        50 km/s hızla giden otobüste sert frene basarsan yolcular savrulur. Gazı erken kesip kademeli yumuşak 'ipek fren' yaparsan %100 konfor alırsın!
-                    </p>
-                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;">
-                        <button id="btn-lab-accel" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(34, 197, 94, 0.25); border: 1px solid #22c55e; color: #4ade80; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Gaza bas ve hızlan (W tuşu)">
-                            🟢 Gaza Bas: 50 km/s (W)
-                        </button>
-                        <button id="btn-lab-hard-brake" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #f87171; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Panik Fren Yap (Sert Duruş Deneyi)">
-                            🔴 Panik Sert Fren (S)
-                        </button>
-                        <button id="btn-lab-soft-brake" class="modern-btn nav-item" style="padding: 9px 14px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #ffffff; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="İpek Fren Yap (Yumuşak Duruş)">
-                            ✨ İpek Fren (Kademeli Duruş)
-                        </button>
+                    <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">YOLCU KONFORU</span>
+                        <strong style="color: #4ade80; font-size: 0.95rem;">%${this.labComfort}</strong>
                     </div>
-                    <div style="background: rgba(0,0,0,0.4); padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; display: flex; gap: 15px;">
-                        <span>Anlık Hız: <strong id="lbl-lab-speed" style="color: #38bdf8;">${this.labSpeed} km/s</strong></span>
-                        <span>Yolcu Konforu: <strong id="lbl-lab-comfort" style="color: #4ade80;">%${this.labComfort}</strong></span>
+                    <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">RAMPA & KÖYÜK</span>
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">${this.labRampOpen ? '🛹 Rampa Açık' : (this.labKneeling ? '🦼 Yana Yatık' : '⚪ Normal')}</strong>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">KAPILAR</span>
+                        <strong style="color: ${this.labFrontDoor || this.labRearDoor ? '#f87171' : '#4ade80'}; font-size: 0.95rem;">${this.labFrontDoor || this.labRearDoor ? '🚪 Açık (Gaz Kilitli)' : '🔒 Kapalı'}</strong>
                     </div>
                 </div>
 
-                <!-- 3. İSTASYON: ERİŞİLEBİLİRLİK VE SEVGİ FORMÜLÜ -->
-                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #34d399; font-size: 1.05rem;">🦼 3. İstasyon: Sevgi & Erişilebilirlik Formülü (Kneeling + Rampa)</strong>
-                        <span style="font-size: 0.82rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.15); padding: 3px 8px; border-radius: 4px;">Formül: Kaldırım Sıfırlama (K) + Rampa (U/R) ➔ +50 XP Primi</span>
-                    </div>
-                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
-                        Durakta tekerlekli sandalyeli yolcumuz bekliyor! Önce K ile otobüsü sağa yatır, ardından U/R ile rampayı aç.
-                    </p>
-                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                        <button id="btn-lab-kneeling" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Otobüsü Sağa Yatır Kneeling (K tuşu)">
-                            ⬇️ Otobüsü Sağa Yatır (K)
-                        </button>
-                        <button id="btn-lab-ramp" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(234, 179, 8, 0.2); border: 1px solid #eab308; color: #fde047; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Engelli Rampasını Aç (U veya R tuşu)">
-                            🛹 Engelli Rampasını Aç (U/R)
-                        </button>
-                        <button id="btn-lab-ramp-close" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;" aria-label="Rampayı Kapat ve Otobüsü Doğrult">
-                            ⬆️ Rampayı Kapat ve Doğrult
-                        </button>
-                        <span id="lbl-lab-ramp-status" style="font-size: 0.88rem; color: #a7f3d0; font-weight: bold;">
-                            ${this.labRampOpen ? '✅ Rampa Açık (Yolcu bindi!)' : (this.labKneeling ? '🦼 Otobüs Sağa Yattı' : '⚪ Normal Sürüş Yüksekliği')}
-                        </span>
-                    </div>
+                <!-- Formül Kutusu -->
+                <div style="background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; padding: 10px 14px; border-radius: 0 6px 6px 0; margin-bottom: 14px; font-size: 0.9rem; color: #38bdf8;">
+                    📐 <strong>Pedagojik Formül:</strong> ${currentStep.formula}
                 </div>
 
-                <!-- 4. İSTASYON: KAPI YÖNETİMİ VE GÜVENLİK KİLİDİ -->
-                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #a855f7; font-size: 1.05rem;">🚪 4. İstasyon: Kapı Yönetimi ve Yolcu Akış Formülü</strong>
-                        <span style="font-size: 0.82rem; color: #e9d5ff; background: rgba(168, 85, 247, 0.15); padding: 3px 8px; border-radius: 4px;">Kural: Önce Arka Kapı (İnenler) ➔ Sonra Ön Kapı (Binenler)</span>
-                    </div>
-                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
-                        Kapılar açıkken gaz güvenlik kilidi devreye girer. Kapıları kapatmadan araç hareket edemez.
-                    </p>
-                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                        <button id="btn-lab-door-rear" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Arka Kapıyı Aç İnen Yolcular (2 tuşu)">
-                            🚪 1. Arka Kapıyı Aç: İnenler (2)
-                        </button>
-                        <button id="btn-lab-door-front" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Ön Kapıyı Aç Binen Yolcular (1 tuşu)">
-                            🚪 2. Ön Kapıyı Aç: Binenler (1)
-                        </button>
-                        <button id="btn-lab-door-close" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;" aria-label="Tüm Kapıları Kapat">
-                            🔒 3. Kapıları Kapat
-                        </button>
-                        <span id="lbl-lab-door-status" style="font-size: 0.88rem; color: #cbd5e1; font-weight: bold;">
-                            ${(this.labFrontDoor || this.labRearDoor) ? '⚠️ Kapılar Açık (Gaz Kilidi Devrede)' : '✅ Kapılar Kapalı (Güvenli)'}
-                        </span>
-                    </div>
+                <!-- Talimat Kutusu -->
+                <div style="background: rgba(6, 78, 59, 0.35); border: 1.5px solid rgba(16, 185, 129, 0.4); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                    <div style="font-weight: bold; color: #a7f3d0; margin-bottom: 6px; font-size: 1rem;">📢 Öğretmen Talimatı (Şimdi Ne Yapmalısınız?):</div>
+                    <p style="color: #f1f5f9; font-size: 1.05rem; line-height: 1.5; margin: 0;">${currentStep.instruction}</p>
                 </div>
 
-                <!-- 5. İSTASYON: RETARDER VE YOKUŞ İNİŞ FORMÜLÜ -->
-                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: #f97316; font-size: 1.05rem;">⚡ 5. İstasyon: Manyetik Retarder & Yokuş İniş Formülü</strong>
-                        <span style="font-size: 0.82rem; color: #fdba74; background: rgba(249, 115, 22, 0.15); padding: 3px 8px; border-radius: 4px;">Formül: 15 Ton + Dik İniş ➔ Retarder (Space) ➔ 0 Balata Aşınması</span>
-                    </div>
-                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
-                        15 tonluk otobüs yokuş aşağı inerken sürekli frene basarsan balatalar yanar! Boşluk (Space) tuşuna basarak manyetik retarderi çek ve balatasız yavaşlamayı dinle.
-                    </p>
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <button id="btn-lab-retarder" class="modern-btn nav-item" style="padding: 10px 16px; background: linear-gradient(135deg, #ea580c, #c2410c); border: 1.5px solid #f97316; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Manyetik Retarderi Devreye Sok (Boşluk tuşu)">
-                            ⚡ Manyetik Retarderi Çek (Space)
-                        </button>
-                        <span id="lbl-lab-retarder-status" style="font-size: 0.9rem; color: #fdba74; font-weight: bold;">
-                            ${this.labRetarderActive ? '⚡ Retarder Devrede (Hız 50 km/s Sabitlendi)' : '⚪ Retarder Kapalı'}
-                        </span>
-                    </div>
+                <!-- TEK VE NET HEDEF AKSİYON BUTONU (KULLANICININ KAFASI KARIŞMAZ) -->
+                <div style="text-align: center; margin-bottom: 16px;">
+                    <button id="btn-guided-action" class="modern-btn nav-item" style="padding: 16px 32px; font-size: 1.25rem; font-weight: bold; border-radius: 10px; cursor: pointer; color: #ffffff; ${currentStep.actionBtnStyle} box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);" aria-label="${currentStep.actionBtnText}">
+                        ${currentStep.actionBtnText}
+                    </button>
+                </div>
+
+                <!-- GERİ BİLDİRİM / MOTİVASYON VE TELKİN ALANI -->
+                <div id="guided-feedback-box" style="display: ${this.guidedFeedbackText ? 'block' : 'none'}; padding: 12px 16px; border-radius: 8px; margin-bottom: 14px; font-size: 0.95rem; font-weight: bold; ${this.guidedFeedbackType === 'success' ? 'background: rgba(34, 197, 94, 0.2); border: 1.5px solid #22c55e; color: #4ade80;' : 'background: rgba(234, 179, 8, 0.2); border: 1.5px solid #eab308; color: #fde047;'}">
+                    ${this.guidedFeedbackText}
+                </div>
+
+                <!-- Yardımcı Butonlar: Sesli Dinle ve Önceki Adım -->
+                <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
+                    <button id="btn-guided-replay-audio" class="modern-btn nav-item" style="padding: 8px 14px; font-size: 0.88rem; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; border-radius: 6px; cursor: pointer;" aria-label="Talimatı Sesli Tekrar Dinle">
+                        🔊 Talimatı Tekrar Dinle
+                    </button>
+                    ${this.guidedStep > 1 ? '<button id="btn-guided-prev-step" class="modern-btn nav-item" style="padding: 8px 14px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">⬅️ Önceki Adım</button>' : ''}
                 </div>
             </div>
         `;
 
-        // Atölye Buton Olay Dinleyicileri
-        this.bindInteractiveLabEvents();
+        // Aksiyon Butonu Dinleyicisi
+        const btnAction = document.getElementById('btn-guided-action');
+        if (btnAction) {
+            btnAction.onclick = () => {
+                this.executeGuidedSuccess();
+            };
+        }
+
+        // Sesli Tekrar Dinle
+        const btnReplay = document.getElementById('btn-guided-replay-audio');
+        if (btnReplay) {
+            btnReplay.onclick = () => {
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak(currentStep.instruction);
+                }
+            };
+        }
+
+        // Önceki Adım
+        const btnPrev = document.getElementById('btn-guided-prev-step');
+        if (btnPrev) {
+            btnPrev.onclick = () => {
+                if (this.guidedStep > 1) {
+                    this.guidedStep--;
+                    this.guidedFeedbackText = "";
+                    this.renderInteractiveLab();
+                    const prevStep = this.guidedSteps[this.guidedStep - 1];
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(prevStep.instruction);
+                }
+            };
+        }
 
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
             KeyboardNav.initForScreen();
         }
     }
 
-    bindInteractiveLabEvents() {
-        // 1. Motor Marş
-        const btnEngine = document.getElementById('btn-lab-engine');
-        if (btnEngine) {
-            btnEngine.onclick = () => {
-                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.start) {
-                    audio.sounds.start.play();
-                }
-                this.labEngineRunning = true;
-                this.labPressure = 120;
-                const lblP = document.getElementById('lbl-lab-pressure');
-                const lblS = document.getElementById('lbl-lab-engine-status');
-                if (lblP) lblP.innerText = '120 PSI';
-                if (lblS) {
-                    lblS.innerText = '🟢 Motor Çalışıyor';
-                    lblS.style.color = '#4ade80';
-                }
-                const msg = "Harika! 12 litrelik dizel motor çalıştı. Kompresör hava tüplerini 120 PSI ile doldurdu. İmdat frenleri çözüldü, yola hazırsın kaptan!";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔑 Motor Çalıştı | 120 PSI Basınç Tam!", "success");
-            };
+    // Doğru Tuşa Basıldığında veya Doğru Butona Tıklandığında
+    executeGuidedSuccess() {
+        const currentStep = this.guidedSteps[this.guidedStep - 1];
+        if (!currentStep) return;
+
+        if (currentStep.execute) currentStep.execute();
+
+        this.guidedFeedbackText = "🎉 " + currentStep.successFeedback;
+        this.guidedFeedbackType = "success";
+
+        if (typeof audio !== 'undefined') {
+            if (audio.playSuccess) audio.playSuccess();
+            if (audio.speak) audio.speak(currentStep.successFeedback);
+            if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(currentStep.successFeedback);
+        }
+        if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast("Aferin! Doğru yaptınız. Sıradaki adıma geçiliyor...", "success");
         }
 
-        // 2. Hızlan
-        const btnAccel = document.getElementById('btn-lab-accel');
-        if (btnAccel) {
-            btnAccel.onclick = () => {
-                this.labSpeed = 50;
-                const lblSpd = document.getElementById('lbl-lab-speed');
-                if (lblSpd) lblSpd.innerText = '50 km/s';
-                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
-                const msg = "Gaza basıldı, hızımız saatte 50 kilometreye ulaştı. İleride durak var! Şimdi duruş tarzını seç: Sert fren mi, ipek fren mi?";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🟢 Hız: 50 km/s (Durak yaklaşıyor)", "info");
-            };
+        // 1.8 saniye sonra sıradaki adıma yumuşak geçiş
+        setTimeout(() => {
+            this.guidedStep++;
+            this.guidedFeedbackText = "";
+            this.renderInteractiveLab();
+            const nextStep = this.guidedSteps[this.guidedStep - 1];
+            if (nextStep && !nextStep.isGraduation && typeof audio !== 'undefined' && audio.speak) {
+                setTimeout(() => audio.speak(nextStep.instruction), 600);
+            }
+        }, 1800);
+    }
+
+    // Yanlış Tuşa Basıldığında Nazik ve Teşvik Edici Telkin
+    executeGuidedFail(pressedKey) {
+        const currentStep = this.guidedSteps[this.guidedStep - 1];
+        if (!currentStep || currentStep.isGraduation) return;
+
+        this.guidedFeedbackText = "💡 " + currentStep.failFeedback;
+        this.guidedFeedbackType = "warning";
+
+        if (typeof audio !== 'undefined') {
+            if (audio.playWarning) {
+                try { audio.playWarning(); } catch(e) {}
+            }
+            if (audio.speak) audio.speak(currentStep.failFeedback);
+            if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(currentStep.failFeedback);
+        }
+        if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast("Tekrar deneyiniz: " + currentStep.failFeedback, "warning");
         }
 
-        // Panik Fren
-        const btnHardBrake = document.getElementById('btn-lab-hard-brake');
-        if (btnHardBrake) {
-            btnHardBrake.onclick = () => {
-                this.labSpeed = 0;
-                this.labComfort = 40;
-                const lblSpd = document.getElementById('lbl-lab-speed');
-                const lblCmf = document.getElementById('lbl-lab-comfort');
-                if (lblSpd) lblSpd.innerText = '0 km/s';
-                if (lblCmf) {
-                    lblCmf.innerText = '%40';
-                    lblCmf.style.color = '#ef4444';
-                }
-                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.crash) {
-                    audio.sounds.crash.play();
-                }
-                const msg = "Eyvah! Ani frenle yolcular öne savruldu, konfor yüzde 40'a düştü! Formül ne diyordu: Hızın karesiyle orantılı duruş mesafesi gerekir. Şimdi bir de ipek freni dene!";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔴 Ani Fren: Konfor %40'a düştü!", "warning");
-            };
-        }
-
-        // İpek Fren
-        const btnSoftBrake = document.getElementById('btn-lab-soft-brake');
-        if (btnSoftBrake) {
-            btnSoftBrake.onclick = () => {
-                this.labSpeed = 0;
-                this.labComfort = 100;
-                const lblSpd = document.getElementById('lbl-lab-speed');
-                const lblCmf = document.getElementById('lbl-lab-comfort');
-                if (lblSpd) lblSpd.innerText = '0 km/s';
-                if (lblCmf) {
-                    lblCmf.innerText = '%100';
-                    lblCmf.style.color = '#4ade80';
-                }
-                if (typeof audio !== 'undefined' && audio.playAirBrake) audio.playAirBrake();
-                if (typeof audio !== 'undefined' && audio.playSuccess) audio.playSuccess();
-                const msg = "Harikulade bir ipek fren! Gazı erkenden kestin, yumuşakça süzülerek durdun. Yolcular ayakta bile sarsılmadı. İşte yüzde yüz Konfor Formülü budur!";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("✨ İpek Fren: %100 Konfor (+75 XP Primi)", "success");
-            };
-        }
-
-        // 3. Kneeling
-        const btnKneeling = document.getElementById('btn-lab-kneeling');
-        if (btnKneeling) {
-            btnKneeling.onclick = () => {
-                this.labKneeling = true;
-                if (typeof audio !== 'undefined' && audio.playKneeling) audio.playKneeling();
-                const lblRamp = document.getElementById('lbl-lab-ramp-status');
-                if (lblRamp) lblRamp.innerText = '🦼 Otobüs Sağa Yattı (Kaldırım Seviyesinde)';
-                const msg = "Otobüs sağ körüklerini indirerek kaldırım seviyesine eğildi. Şimdi rampayı açabilirsin kaptan!";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⬇️ Kneeling: Otobüs Kaldırıma Eğildi", "info");
-            };
-        }
-
-        // Rampa Aç
-        const btnRamp = document.getElementById('btn-lab-ramp');
-        if (btnRamp) {
-            btnRamp.onclick = () => {
-                this.labRampOpen = true;
-                if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
-                const lblRamp = document.getElementById('lbl-lab-ramp-status');
-                if (lblRamp) lblRamp.innerText = '✅ Rampa Açık (Yolcu bindi!)';
-                const msg = "Engelli rampası açıldı. Yolcumuz sesleniyor: Çok teşekkür ederim Ümit kaptanım, iyi ki varsınız! Yolcumuz güvenle bindi.";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛹 Rampa Açıldı: Yolcu Bindi (+50 XP)", "success");
-            };
-        }
-
-        // Rampa Kapat
-        const btnRampClose = document.getElementById('btn-lab-ramp-close');
-        if (btnRampClose) {
-            btnRampClose.onclick = () => {
-                this.labRampOpen = false;
-                this.labKneeling = false;
-                if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
-                if (typeof audio !== 'undefined' && audio.playSuccess) audio.playSuccess();
-                const lblRamp = document.getElementById('lbl-lab-ramp-status');
-                if (lblRamp) lblRamp.innerText = '⚪ Normal Sürüş Yüksekliği';
-                const msg = "Rampa toplandı, araç normal sürüş yüksekliğine döndü. Erişilebilirlik protokolü başarıyla tamamlandı!";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⬆️ Rampa Kapandı, Otobüs Doğruldu", "info");
-            };
-        }
-
-        // 4. Arka Kapı
-        const btnRear = document.getElementById('btn-lab-door-rear');
-        if (btnRear) {
-            btnRear.onclick = () => {
-                this.labRearDoor = true;
-                if (typeof audio !== 'undefined' && audio.playDoorOpen) audio.playDoorOpen();
-                const lblDoor = document.getElementById('lbl-lab-door-status');
-                if (lblDoor) lblDoor.innerText = '⚠️ Kapılar Açık (Gaz Kilidi Devrede)';
-                const msg = "Arka kapı açıldı. İnen yolcular güvenle tahliye ediliyor: İnecek var kaptanım, teşekkürler!";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚪 Arka Kapı Açıldı: İnenler İniyor", "info");
-            };
-        }
-
-        // Ön Kapı
-        const btnFront = document.getElementById('btn-lab-door-front');
-        if (btnFront) {
-            btnFront.onclick = () => {
-                this.labFrontDoor = true;
-                if (typeof audio !== 'undefined' && audio.playDoorOpen) audio.playDoorOpen();
-                const lblDoor = document.getElementById('lbl-lab-door-status');
-                if (lblDoor) lblDoor.innerText = '⚠️ Kapılar Açık (Gaz Kilidi Devrede)';
-                const msg = "Ön kapı açıldı. Yeni yolcular biniyor: Kart basıldı bip bip, kolay gelsin kaptan!";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚪 Ön Kapı Açıldı: Yolcular Bindi", "info");
-            };
-        }
-
-        // Kapıları Kapat
-        const btnDoorClose = document.getElementById('btn-lab-door-close');
-        if (btnDoorClose) {
-            btnDoorClose.onclick = () => {
-                this.labFrontDoor = false;
-                this.labRearDoor = false;
-                if (typeof audio !== 'undefined' && audio.playDoorClose) audio.playDoorClose();
-                const lblDoor = document.getElementById('lbl-lab-door-status');
-                if (lblDoor) lblDoor.innerText = '✅ Kapılar Kapalı (Güvenli)';
-                const msg = "Tüm kapılar kapandı ve kilitlendi. Güvenlik kilidi çözüldü, sefere devam edebilirsiniz.";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔒 Kapılar Kilitlendi (Gaz Aktif)", "success");
-            };
-        }
-
-        // 5. Retarder
-        const btnRetarder = document.getElementById('btn-lab-retarder');
-        if (btnRetarder) {
-            btnRetarder.onclick = () => {
-                this.labRetarderActive = !this.labRetarderActive;
-                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
-                const lblRet = document.getElementById('lbl-lab-retarder-status');
-                if (this.labRetarderActive) {
-                    if (lblRet) lblRet.innerText = '⚡ Retarder Devrede (Hız 50 km/s Sabitlendi)';
-                    const msg = "Manyetik retarder devrede! Balatalara dokunmadan, sürtünmesiz motor freniyle hızımız 50'ye sabitlendi. Balatalar soğuk, yolcular güvende!";
-                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⚡ Retarder Devrede (0 Balata Aşınması)", "success");
-                } else {
-                    if (lblRet) lblRet.innerText = '⚪ Retarder Kapalı';
-                    const msg = "Retarder devreden çıkarıldı.";
-                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                }
-            };
+        // Ekrandaki feedback kutusunu güncelle
+        const fBox = document.getElementById('guided-feedback-box');
+        if (fBox) {
+            fBox.style.display = 'block';
+            fBox.style.background = 'rgba(234, 179, 8, 0.2)';
+            fBox.style.border = '1.5px solid #eab308';
+            fBox.style.color = '#fde047';
+            fBox.innerText = this.guidedFeedbackText;
         }
     }
+
 
     // =========================================================================
     // KAPTANLIK SERÜVENİ & YOL ARKADAŞI (NOT KORKUSU VE SINAV STRESİ YOK!)
