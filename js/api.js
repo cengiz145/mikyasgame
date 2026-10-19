@@ -89,22 +89,35 @@ function generateRoutesFromAPI(rawStops, cityName) {
     if (cityName === "Tekirdağ" && typeof window !== 'undefined' && window.tekulasHatVeritabani && window.tekulasHatVeritabani.length > 0) {
         const tekulasDb = window.tekulasHatVeritabani;
         
-        // 1. Seviye Çırak (Süleymanpaşa Yerel Şehir İçi Hatları)
-        const spasaLocalKeywords = [
-            { no: "1", kw: "RÜSTEMPAŞA CAMİ" },
-            { no: "1/3", kw: "ALTINOVA" },
-            { no: "2/7", kw: "100. Yıl Mahallesi" },
-            { no: "6", kw: "AYDOGDU" },
-            { no: "8", kw: "SPOR SALONU" },
-            { no: "4/15", kw: "HUZUREVİ", id: "tekulas_154_4_15" },
-            { no: "10", kw: "DİŞ SAĞLIĞI" },
-            { no: "11", kw: "BAHÇELİEVLER" },
-            { no: "12", kw: "ALTINOVA-OTOGAR" },
-            { no: "30", kw: "DEĞİRMENALTI" }
+        // 1. Seviye Çıraklık: KESİNTİSİZ ŞEHİR TURU (Kaldığı Duraktan Devam Eden Zincirleme Hatlar)
+        // Hat 1 (Rüstempaşa -> NKÜ Araştırma) + Hat 18 (NKÜ -> Şehir Hastanesi) + Hat 17 (Şehir Hastanesi -> Köprübaşı)
+        const h1 = tekulasDb.find(r => r.name.includes("RÜSTEMPAŞA") && r.stops && r.stops.length >= 20) || tekulasDb[0];
+        const h18 = tekulasDb.find(r => r.id === "tekulas_175_18") || tekulasDb[1];
+        const h17 = tekulasDb.find(r => r.id === "tekulas_172_17_donus") || tekulasDb[2];
+
+        const masterLevel1Stops = [];
+        if (h1 && h1.stops) h1.stops.forEach(s => masterLevel1Stops.push(Object.assign({}, s)));
+        if (h18 && h18.stops) {
+            for (let i = 1; i < h18.stops.length; i++) masterLevel1Stops.push(Object.assign({}, h18.stops[i]));
+        }
+        if (h17 && h17.stops) {
+            for (let i = 1; i < h17.stops.length; i++) masterLevel1Stops.push(Object.assign({}, h17.stops[i]));
+        }
+
+        const continuousSlices = [
+            { name: "Hat 1: Sahil & Baykallar Etabı", start: 0, end: 3, lineRef: h1 },
+            { name: "Hat 1: Emniyet & Alkaya Sahil Etabı", start: 3, end: 7, lineRef: h1 },
+            { name: "Hat 1: Değirmenaltı Giriş Etabı", start: 7, end: 12, lineRef: h1 },
+            { name: "Hat 1: Değirmenaltı Sahil Turu", start: 12, end: 17, lineRef: h1 },
+            { name: "Hat 1: Üniversite Kampüs Tırmanışı", start: 17, end: 23, lineRef: h1 },
+            { name: "Hat 18: Kampüsten Şehre Dönüş Etabı", start: 23, end: 29, lineRef: h18 },
+            { name: "Hat 18: Bölge Trafik & FSM Bağlantısı", start: 29, end: 36, lineRef: h18 },
+            { name: "Hat 18: Belediye & Otogar Hattı", start: 36, end: 45, lineRef: h18 },
+            { name: "Hat 18: Şehir Hastanesi Ekspresi", start: 45, end: 57, lineRef: h18 },
+            { name: "Hat 17: Tarihi Çarşı & Köprübaşı Ringi", start: 57, end: masterLevel1Stops.length - 1, lineRef: h17 }
         ];
 
-        // 1. Seviye Çıraklık İçin Kademeli Durak Sayısı (4 Duraktan 14 Durağa Isınma Eğrisi)
-        const level1StopCounts = [4, 5, 6, 7, 8, 9, 10, 11, 12, 14];
+        const spasaLocalKeywords = continuousSlices;
 
         // 2. Seviye Kalfa (Süleymanpaşa İleri Seviye Şehir İçi Hatları)
         const kalfaKeywords = [
@@ -160,33 +173,34 @@ function generateRoutesFromAPI(rawStops, cityName) {
 
         allLevels.forEach(lvl => {
             lvl.list.forEach((item, tIdx) => {
-                let found = item.id ? tekulasDb.find(r => r.id === item.id) : null;
-                if (!found) found = tekulasDb.find(r => r.name.includes(item.kw) || (r.hatNo === item.no && r.name.includes(item.kw)));
-                if (!found) found = tekulasDb.find(r => r.name.includes(item.kw));
-                if (!found) found = tekulasDb[taskGlobalIndex % tekulasDb.length];
+                let found = null;
+                let routeStops = [];
+                let routeTotalKm = 0;
+
+                if (lvl.lic === 1 && item.start !== undefined && item.end !== undefined) {
+                    // KESİNTİSİZ ZİNCİRLEME ŞEHİR TURU (Kaldığı yerden devam eden etaplar)
+                    found = item.lineRef || tekulasDb[0];
+                    routeStops = masterLevel1Stops.slice(item.start, item.end + 1).map(s => Object.assign({}, s));
+                    
+                    let calcKm = 0;
+                    for (let s = 0; s < routeStops.length - 1; s++) {
+                        calcKm += (routeStops[s].gercekMesafeSonraki || 0.5);
+                    }
+                    routeTotalKm = Math.round(calcKm * 10) / 10;
+                    if (routeTotalKm < 1.0) routeTotalKm = 1.5;
+                    routeStops[routeStops.length - 1].gercekMesafeSonraki = 0;
+                } else {
+                    found = item.id ? tekulasDb.find(r => r.id === item.id) : null;
+                    if (!found) found = tekulasDb.find(r => r.name.includes(item.kw) || (r.hatNo === item.no && r.name.includes(item.kw)));
+                    if (!found) found = tekulasDb.find(r => r.name.includes(item.kw));
+                    if (!found) found = tekulasDb[taskGlobalIndex % tekulasDb.length];
+                    routeStops = found.stops;
+                    routeTotalKm = found.totalKm;
+                }
 
                 const taskNum = tIdx + 1;
                 const isTraining = (lvl.lic === 1 && taskNum <= 3);
                 const routeId = "tekirdag_task_" + taskGlobalIndex;
-
-                // Çıraklık Seviyesi (Level 1) için kademeli durak ve mesafe dilimleme
-                let routeStops = found.stops;
-                let routeTotalKm = found.totalKm;
-
-                if (lvl.lic === 1) {
-                    const targetCount = level1StopCounts[tIdx] || 6;
-                    routeStops = found.stops.slice(0, Math.min(targetCount, found.stops.length)).map(s => Object.assign({}, s));
-                    
-                    let calcKm = 0;
-                    for (let s = 0; s < routeStops.length - 1; s++) {
-                        calcKm += (routeStops[s].gercekMesafeSonraki || 0.6);
-                    }
-                    routeTotalKm = Math.round(calcKm * 10) / 10;
-                    if (routeTotalKm < 1.0) routeTotalKm = 1.5;
-                    
-                    // Son durağın kalan mesafesini 0 yap
-                    routeStops[routeStops.length - 1].gercekMesafeSonraki = 0;
-                }
 
                 const startStop = routeStops[0] ? routeStops[0].name : "Kalkış Garajı";
                 const endStop = routeStops[routeStops.length - 1] ? routeStops[routeStops.length - 1].name : "Varış Durağı";
@@ -203,7 +217,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
                 }
 
                 const detailedInstructions = [
-                    "<strong>Görev Tanımı:</strong> Görev " + taskNum + " (" + lvl.name + "): " + found.name + "<br>",
+                    "<strong>Görev Tanımı:</strong> Görev " + taskNum + " (" + lvl.name + "): " + (item.name || found.name) + "<br>",
                     "<strong>Kalkış (Başlangıç) Durağı:</strong> " + startStop + "<br>",
                     "<strong>Uğranacak Ara Duraklar:</strong> " + (intermediate.length > 0 ? intermediate.join(" ➔ ") : "Ara durak bulunmamaktadır (Doğrudan varış durağına sürüş)") + "<br>",
                     "<strong>Gitmeniz Gereken Son Durak (Hedef):</strong> " + endStop + "<br>",
@@ -213,7 +227,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
                     (isTraining ? "<br><br><em>(Eğitim sürüşüdür; araçta yolcu bulunmaz.)</em>" : "")
                 ].join("");
 
-                const speechBriefing = "Görev " + taskNum + " brifingi. Hat: " + found.name + ". Kalkış durağınız: " + startStop + ". " +
+                const speechBriefing = "Görev " + taskNum + " brifingi. Hat: " + (item.name || found.name) + ". Kalkış durağınız: " + startStop + ". " +
                     (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
                     "Hedef son durak: " + endStop + ". Toplam " + routeStops.length + " durak, " + routeTotalKm + " kilometre. Görev adımları: " + formulaSteps.join(". ");
 
@@ -223,7 +237,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
                     district: lvl.lic === 1 ? "Süleymanpaşa" : (found.district || "Süleymanpaşa"),
                     isDistrict: false,
                     isCity: true,
-                    name: "Görev " + taskNum + " (" + lvl.name + "): " + found.name,
+                    name: "Görev " + taskNum + " (" + lvl.name + "): " + (item.name || found.name),
                     taskIndex: taskGlobalIndex,
                     licenseLevel: lvl.lic,
                     color: lvl.color,
