@@ -266,6 +266,13 @@
                 }
             }
         }
+        if (command.includes("saray içi") || command.includes("saray ring") || command.includes("hat 35") || command.includes("otuz beş") || command.includes("saray mahalle")) {
+            audio.speak("Hat 35 Saray Şehir İçi 25 duraklık belediye ring seferi başlatılıyor.");
+            if (typeof Game !== 'undefined' && Game.startRoute) {
+                Game.startRoute("hat_35_saray_ici");
+                return;
+            }
+        }
         if (command.includes("saray ekspres") || command.includes("ekspres saray") || command.includes("62") || command.includes("altmış iki") || command.includes("direkt saray")) {
             audio.speak("Süleymanpaşa Saray 62 kilometre direkt ekspres seferi başlatılıyor.");
             if (typeof Game !== 'undefined' && Game.startRoute) {

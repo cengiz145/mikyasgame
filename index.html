@@ -27,7 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/styles.css?v=1792371008345">
+    <link rel="stylesheet" href="css/styles.css?v=1792371910893">
 </head>
 <body>
     <div id="nvda-live-region" aria-live="assertive" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
@@ -393,27 +393,28 @@
             <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="js/firebase.js?v=1792371008345"></script>
+    <script src="js/firebase.js?v=1792371910893"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-    <script src="js/map-engine.js?v=1792371008345"></script>
-    <script src="js/tekulas-data.js?v=1792371008345"></script>
-    <script src="js/data.js?v=1792371008345"></script>
-    <script src="js/audio-base64.js?v=1792371008345"></script>
-    <script src="sounds/npc_list.js?v=1792371008345"></script>
-    <script src="js/audio.js?v=1792371008345"></script>
-    <script src="js/api.js?v=1792371008345"></script>
-    <script src="js/ui.js?v=1792371008345"></script>
-    <script src="js/bus-fleet.js?v=1792371008345"></script>
-    <script src="js/driver-badges.js?v=1792371008345"></script>
-    <script src="js/smart-system.js?v=1792371008345"></script>
-    <script src="js/smart-route.js?v=1792371008345"></script>
-    <script src="js/velimese-navigation.js?v=1792371008345"></script>
-    <script src="js/suleymanpasa-navigation.js?v=1792371008345"></script>
-    <script src="js/compass-system.js?v=1792371008345"></script>
-    <script src="js/voice-assistant.js?v=1792371008345"></script>
-    <script src="js/game.js?v=1792371008345"></script>
-    <script src="js/app.js?v=1792371008345"></script>
+    <script src="js/map-engine.js?v=1792371910893"></script>
+    <script src="js/tekulas-data.js?v=1792371910893"></script>
+    <script src="js/data.js?v=1792371910893"></script>
+    <script src="js/audio-base64.js?v=1792371910893"></script>
+    <script src="sounds/npc_list.js?v=1792371910893"></script>
+    <script src="js/audio.js?v=1792371910893"></script>
+    <script src="js/api.js?v=1792371910893"></script>
+    <script src="js/ui.js?v=1792371910893"></script>
+    <script src="js/bus-fleet.js?v=1792371910893"></script>
+    <script src="js/driver-badges.js?v=1792371910893"></script>
+    <script src="js/smart-system.js?v=1792371910893"></script>
+    <script src="js/smart-route.js?v=1792371910893"></script>
+    <script src="js/velimese-navigation.js?v=1792371910893"></script>
+    <script src="js/suleymanpasa-navigation.js?v=1792371910893"></script>
+    <script src="js/saray-navigation.js?v=1792371910893"></script>
+    <script src="js/compass-system.js?v=1792371910893"></script>
+    <script src="js/voice-assistant.js?v=1792371910893"></script>
+    <script src="js/game.js?v=1792371910893"></script>
+    <script src="js/app.js?v=1792371910893"></script>
 
     <!-- AKILLI ROTA SİSTEMİ (NEREDEN ➔ NEREYE) MODALI -->
     <div id="smart-route-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="smart-route-title">
@@ -450,6 +451,9 @@
                     </button>
                     <button id="btn-saray-quick-mode" type="button" class="modern-btn" style="padding: 7px 14px; font-size: 0.9rem; background: rgba(14, 165, 233, 0.2); border: 1.5px solid #0ea5e9; color: #38bdf8; cursor: pointer; border-radius: 8px; margin-top: 6px;" aria-label="Süleymanpaşa Saray 62 kilometre direkt ekspres hattını seç">
                         ⚡ Süleymanpaşa ➔ Saray (62 KM Direkt Ekspres)
+                    </button>
+                    <button id="btn-saray-mahalle-mode" type="button" class="modern-btn" style="padding: 7px 14px; font-size: 0.9rem; background: rgba(6, 182, 212, 0.2); border: 1.5px solid #06b6d4; color: #67e8f9; cursor: pointer; border-radius: 8px; margin-top: 6px; margin-left: 8px;" aria-label="Saray şehir içi 25 duraklık belediye ring seferini seç">
+                        🏘️ Saray Şehir İçi Sefer Modu (25 Durak)
                     </button>
                 </div>
             </div>

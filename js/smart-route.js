@@ -55,6 +55,9 @@ const AkilliRotaSistemi = {
             }
         });
 
+        if (typeof SarayNavigasyon !== 'undefined' && Array.isArray(SarayNavigasyon.sokaklar)) {
+            SarayNavigasyon.sokaklar.forEach(s => stopSet.add(s.name));
+        }
         if (typeof VelimeseNavigasyon !== 'undefined' && Array.isArray(VelimeseNavigasyon.sokaklar)) {
             VelimeseNavigasyon.sokaklar.forEach(s => stopSet.add(s.name));
         }
@@ -63,6 +66,25 @@ const AkilliRotaSistemi = {
     },
 
     hesapla: function(neredenQuery, nereyeQuery) {
+        // SARAY İLÇE VE MAHALLELERİ İÇİ FORMÜLSEL NAVİGASYON
+        if (typeof SarayNavigasyon !== 'undefined' && SarayNavigasyon.findSokak) {
+            const sFrom = SarayNavigasyon.findSokak(neredenQuery);
+            const sTo = SarayNavigasyon.findSokak(nereyeQuery);
+            if (sFrom && sTo && sFrom.id !== sTo.id) {
+                const sRes = SarayNavigasyon.rotaOlustur(neredenQuery, nereyeQuery);
+                if (sRes.success) {
+                    return {
+                        success: true,
+                        route: sRes.route,
+                        originalRoute: sRes.route,
+                        fromStop: sRes.kalkis.name,
+                        toStop: sRes.varis.name,
+                        stopsCount: sRes.stopsCount,
+                        dist: sRes.totalKm
+                    };
+                }
+            }
+        }
         // SÜLEYMANPAŞA MAHALLELERİ İÇİ FORMÜLSEL NAVİGASYON
         if (typeof SuleymanpasaNavigasyon !== 'undefined' && SuleymanpasaNavigasyon.findSokak) {
             const sFrom = SuleymanpasaNavigasyon.findSokak(neredenQuery);
@@ -451,6 +473,26 @@ if (typeof document !== 'undefined') {
                     toInput.value = "Saray Belediyesi Otogarı";
                     if (typeof audio !== 'undefined' && audio.speak) {
                         audio.speak("Süleymanpaşa Saray 62 kilometre direkt ekspres hattı devrede. Kalkış: Süleymanpaşa Yeni Otogar, Varış: Saray Belediyesi Otogarı.");
+                    }
+                }
+            });
+        }
+    });
+}
+
+// Saray Şehir İçi Sefer Modu Butonu
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnSm = document.getElementById('btn-saray-mahalle-mode');
+        if (btnSm) {
+            btnSm.addEventListener('click', () => {
+                const fromInput = document.getElementById('smart-from-input');
+                const toInput = document.getElementById('smart-to-input');
+                if (fromInput && toInput) {
+                    fromInput.value = "Saray Otogar 1 (Giriş Peronu)";
+                    toInput.value = "Saray Devlet Hastanesi Ana Giriş";
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Saray Şehir İçi 25 Duraklı Sefer Modu devrede. Kalkış: Saray Otogarı, Varış: Saray Devlet Hastanesi. Dilerseniz durakları değiştirebilirsiniz.");
                     }
                 }
             });
