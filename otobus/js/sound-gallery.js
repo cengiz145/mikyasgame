@@ -269,6 +269,84 @@ const SoundGallery = {
                     audio.playEmergencyBrakeLock();
                 }
             }
+        },
+        // --- FREESOUND YOL VE ÇEVRE SESLERİ ---
+        {
+            id: 'road_asphalt',
+            category: 'effect',
+            title: 'Freesound Asfalt Yol & Kabin Lastik Yuvarlanması',
+            icon: '🛣️',
+            specs: 'Freesound #352863 Orijinal Asfalt Sürüş Kaydı',
+            desc: 'Otobüs asfalt yolda seyrederken kabin içine gelen o tok, tatlı lastik ve asfalt sürtünme sesi.',
+            is10Seconds: true,
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.roadAsphalt) {
+                    audio.sounds.roadAsphalt.volume(0.65);
+                    audio.sounds.roadAsphalt.rate(1.0);
+                    audio.sounds.roadAsphalt.play();
+                }
+            }
+        },
+        {
+            id: 'road_tikir_joint',
+            category: 'effect',
+            title: 'Freesound Asfalt & Köprü Derzi (Tıkır Tıkır Sesi)',
+            icon: '🌉',
+            specs: 'Freesound #866213 Orijinal Köprü ve Yol Bağlantı Kaydı',
+            desc: 'Otobüs giderken asfalt üzerindeki genleşme derzlerinden ve köprü bağlantılarından geçerken çıkan o ritmik tıkır tıkır sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playRoadJointHit) {
+                    audio.playRoadJointHit(55);
+                }
+            }
+        },
+        {
+            id: 'road_gravel',
+            category: 'effect',
+            title: 'Freesound Çakıllı Yol Sürüşü',
+            icon: '🪨',
+            specs: 'Freesound #281512 Orijinal Çakıl Zemin Kaydı',
+            desc: 'Otobüsün çakıllı ve taşlı yollarda ilerlerken lastiklerin altından gelen çıtır çıtır çakıl ezilme sesi.',
+            is10Seconds: true,
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.roadGravel) {
+                    audio.sounds.roadGravel.volume(0.70);
+                    audio.sounds.roadGravel.rate(1.0);
+                    audio.sounds.roadGravel.play();
+                }
+            }
+        },
+        {
+            id: 'road_sand_dirt',
+            category: 'effect',
+            title: 'Freesound Kumlu ve Toprak Yol Sürüşü',
+            icon: '🏜️',
+            specs: 'Freesound #233076 Orijinal Kum ve Asfalt Serpinti Kaydı',
+            desc: 'Kumlu, gevşek zeminlerde ve toprak yollarda tekerleklerin çıkardığı yumuşak ve hışırtılı sürüş sesi.',
+            is10Seconds: true,
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.roadGravelAsphalt) {
+                    audio.sounds.roadGravelAsphalt.volume(0.70);
+                    audio.sounds.roadGravelAsphalt.rate(1.0);
+                    audio.sounds.roadGravelAsphalt.play();
+                }
+            }
+        },
+        {
+            id: 'road_wind',
+            category: 'effect',
+            title: 'Freesound Hız Rüzgarı & Açık Cam Ambiyansı',
+            icon: '💨',
+            specs: 'Freesound #51247 Orijinal Yol Rüzgarı Kaydı',
+            desc: 'Hızlandıkça kabin etrafında esen aerodinamik rüzgar sesi ve sürücü penceresi açıldığında içeri dolan canlı hava akımı.',
+            is10Seconds: true,
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.roadWind) {
+                    audio.sounds.roadWind.volume(0.65);
+                    audio.sounds.roadWind.rate(1.0);
+                    audio.sounds.roadWind.play();
+                }
+            }
         }
     ],
 
@@ -738,6 +816,9 @@ const SoundGallery = {
 
         if (typeof audio !== 'undefined' && audio.stopRetarder) {
             try { audio.stopRetarder(); } catch(e){}
+        }
+        if (typeof audio !== 'undefined' && audio.stopAllRoadSounds) {
+            try { audio.stopAllRoadSounds(); } catch(e){}
         }
 
         const wasPlaying = this.currentlyPlayingId;

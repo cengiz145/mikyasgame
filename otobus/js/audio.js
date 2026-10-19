@@ -79,6 +79,10 @@ class AudioSystem {
         this.exhaustWarningGain = null;
         
         this.currentGear = 1;
+        this.roadJointDistanceCounter = 0;
+        this.nextJointDistance = 35 + Math.random() * 15;
+        this.lastTireUpdateTime = 0;
+        this.lastJointSoundToggle = false;
 
         // Howler.js Ses Dosyaları (Base64 Web Audio API Garantili)
         this.sounds = {
@@ -106,7 +110,14 @@ class AudioSystem {
             rain8: new Howl({ src: ['sounds/rain8.ogg'], loop: true, volume: 0 }),
             rain9: new Howl({ src: ['sounds/rain9.ogg'], loop: true, volume: 0 }),
             rain10: new Howl({ src: ['sounds/rain10.ogg'], loop: true, volume: 0 }),
-            rain11: new Howl({ src: ['sounds/rain11.ogg'], loop: true, volume: 0 })
+            rain11: new Howl({ src: ['sounds/rain11.ogg'], loop: true, volume: 0 }),
+            // Freesound Gerçek Çevre ve Yol Sesleri (Asfalt, Çakıl, Kum, Rüzgar, Derz)
+            roadAsphalt: new Howl({ src: ['sounds/freesound_road_asphalt.mp3'], loop: true, volume: 0 }),
+            roadGravel: new Howl({ src: ['sounds/freesound_road_gravel.mp3'], loop: true, volume: 0 }),
+            roadGravelAsphalt: new Howl({ src: ['sounds/freesound_road_gravel_asphalt.mp3'], loop: true, volume: 0 }),
+            roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 }),
+            roadJointHit1: new Howl({ src: ['sounds/freesound_road_joint_hit1.wav', 'sounds/freesound_road_joints_tikir.mp3'], loop: false, volume: 0.65 }),
+            roadJointHit2: new Howl({ src: ['sounds/freesound_road_joint_hit2.wav', 'sounds/freesound_road_joints_tikir.mp3'], loop: false, volume: 0.65 })
         };
 
         // KORNA İÇİN ÖZEL WEB AUDIO API KURULUMU (Boğuk efekti ve trim için)
@@ -285,6 +296,9 @@ class AudioSystem {
             this.updateAcoustics(Game.busDamage.leftWindow, Game.busDamage.rightWindow);
         } else {
             this.updateAcoustics(0, 0);
+        }
+        if (typeof Game !== 'undefined' && Game.speed > 0) {
+            this.updateTireNoise(Game.speed, Game.currentRoadType);
         }
     }
 
@@ -543,6 +557,9 @@ class AudioSystem {
             this.engineDamageGain = null;
         }
         this.isEngineRunning = false;
+        if (typeof this.stopAllRoadSounds === 'function') {
+            this.stopAllRoadSounds();
+        }
     }
 
     initTireNoise() {
@@ -581,54 +598,138 @@ class AudioSystem {
     updateTireNoise(speed, roadType) {
         if (!this.tireGain || !this.tireFilter) return;
         
+        // Araç duruyorsa veya hız çok düşükse tüm yol ve rüzgar seslerini yumuşakça sustur
         if (isNaN(speed) || speed < 2) {
             this.tireGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1);
+            this.stopAllRoadSounds();
+            this.lastTireUpdateTime = 0;
             return;
         }
 
-        let targetGain = (speed / 100) * 0.6; // Max gain based on speed
-        let cutoff = 400; // Default frequency
-        let qValue = 1.0;
+        // Zaman farkı ve kat edilen mesafe hesabı
+        const now = (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000;
+        let dt = 0.016;
+        if (this.lastTireUpdateTime > 0) {
+            dt = Math.min(now - this.lastTireUpdateTime, 0.1);
+        }
+        this.lastTireUpdateTime = now;
+        const metersMoved = (speed / 3.6) * dt;
 
-        if (roadType === "Toprak Yol") {
-            // Earth/Dirt: Muffled but heavy thuds
-            this.tireFilter.type = 'lowpass';
-            cutoff = 300 + (speed * 5);
-            targetGain *= 1.5;
-            qValue = 4.0; // Resonant thuds
-        } else if (roadType === "Kumlu Yol") {
-            // Gravel/Sand: High frequency crunch, loud
-            this.tireFilter.type = 'bandpass';
-            cutoff = 1500 + (speed * 8);
-            targetGain *= 1.8;
-            qValue = 0.8;
-        } else if (roadType === "Çakıllı Yol") {
-            // Sharp Gravel: Sharp, high pitch crunch
-            this.tireFilter.type = 'highpass';
-            cutoff = 800 + (speed * 5);
-            targetGain *= 2.0;
-            qValue = 2.0;
-        } else if (roadType === "Çimenli Yol") {
-            // Grass: Soft rustling
-            this.tireFilter.type = 'lowpass';
-            cutoff = 200 + (speed * 3);
-            targetGain *= 0.8;
-            qValue = 1.0;
-        } else {
-            // Asfalt / Mahalle
-            this.tireFilter.type = 'lowpass';
-            cutoff = 400 + (speed * 2);
-            targetGain *= 0.8;
-            qValue = 1.0;
+        // Yol tipi ayrıştırma
+        const isGravel = (roadType === "Çakıllı Yol");
+        const isSandDirt = (roadType === "Kumlu Yol" || roadType === "Toprak Yol");
+        const isGrass = (roadType === "Çimenli Yol");
+        const isAsphalt = !isGravel && !isSandDirt && !isGrass; // "Asfalt Cadde", "Sahil Şeridi Yolu", "Mahalle Sokağı"
+
+        const windowVolBoost = this.isWindowOpen ? 0.15 : 0;
+
+        // 1. ASFALT YOL SESİ (freesound_road_asphalt.mp3)
+        if (isAsphalt && this.sounds.roadAsphalt) {
+            const targetAsphaltVol = Math.min(0.70, (speed / 85) * 0.50 + 0.12 + windowVolBoost);
+            const targetAsphaltRate = Math.min(1.30, Math.max(0.75, 0.75 + (speed / 100) * 0.45));
+            if (!this.sounds.roadAsphalt.playing()) {
+                this.sounds.roadAsphalt.volume(0);
+                this.sounds.roadAsphalt.play();
+            }
+            this.sounds.roadAsphalt.volume(targetAsphaltVol);
+            this.sounds.roadAsphalt.rate(targetAsphaltRate);
+        } else if (this.sounds.roadAsphalt && this.sounds.roadAsphalt.playing()) {
+            this.sounds.roadAsphalt.fade(this.sounds.roadAsphalt.volume(), 0, 200);
+            setTimeout(() => { if (!isAsphalt && this.sounds.roadAsphalt) this.sounds.roadAsphalt.pause(); }, 200);
         }
 
-        // Clamp values
-        cutoff = Math.max(100, Math.min(20000, cutoff));
-        targetGain = Math.max(0, Math.min(2.0, targetGain));
+        // 2. ÇAKILLI YOL SESİ (freesound_road_gravel.mp3)
+        if (isGravel && this.sounds.roadGravel) {
+            const targetGravelVol = Math.min(0.80, (speed / 70) * 0.55 + 0.20 + windowVolBoost);
+            const targetGravelRate = Math.min(1.25, Math.max(0.80, 0.80 + (speed / 100) * 0.40));
+            if (!this.sounds.roadGravel.playing()) {
+                this.sounds.roadGravel.volume(0);
+                this.sounds.roadGravel.play();
+            }
+            this.sounds.roadGravel.volume(targetGravelVol);
+            this.sounds.roadGravel.rate(targetGravelRate);
+        } else if (this.sounds.roadGravel && this.sounds.roadGravel.playing()) {
+            this.sounds.roadGravel.fade(this.sounds.roadGravel.volume(), 0, 200);
+            setTimeout(() => { if (!isGravel && this.sounds.roadGravel) this.sounds.roadGravel.pause(); }, 200);
+        }
 
+        // 3. KUMLU / TOPRAK YOL SESİ (freesound_road_gravel_asphalt.mp3)
+        if (isSandDirt && this.sounds.roadGravelAsphalt) {
+            const targetSandVol = Math.min(0.75, (speed / 70) * 0.50 + 0.18 + windowVolBoost);
+            const targetSandRate = Math.min(1.20, Math.max(0.85, 0.85 + (speed / 100) * 0.35));
+            if (!this.sounds.roadGravelAsphalt.playing()) {
+                this.sounds.roadGravelAsphalt.volume(0);
+                this.sounds.roadGravelAsphalt.play();
+            }
+            this.sounds.roadGravelAsphalt.volume(targetSandVol);
+            this.sounds.roadGravelAsphalt.rate(targetSandRate);
+        } else if (this.sounds.roadGravelAsphalt && this.sounds.roadGravelAsphalt.playing()) {
+            this.sounds.roadGravelAsphalt.fade(this.sounds.roadGravelAsphalt.volume(), 0, 200);
+            setTimeout(() => { if (!isSandDirt && this.sounds.roadGravelAsphalt) this.sounds.roadGravelAsphalt.pause(); }, 200);
+        }
+
+        // 4. KABİN VE AÇIK CAM RÜZGAR SESİ (freesound_road_wind_ambience.mp3)
+        if (speed >= 25 && this.sounds.roadWind) {
+            let targetWindVol = Math.min(0.35, ((speed - 25) / 75) * 0.30);
+            if (this.isWindowOpen) {
+                targetWindVol = Math.min(0.80, targetWindVol + 0.35 + ((speed - 25) / 75) * 0.25);
+            }
+            const targetWindRate = Math.min(1.30, 0.90 + (speed / 100) * 0.30);
+            if (!this.sounds.roadWind.playing()) {
+                this.sounds.roadWind.volume(0);
+                this.sounds.roadWind.play();
+            }
+            this.sounds.roadWind.volume(targetWindVol);
+            this.sounds.roadWind.rate(targetWindRate);
+        } else if (this.sounds.roadWind && this.sounds.roadWind.playing()) {
+            this.sounds.roadWind.fade(this.sounds.roadWind.volume(), 0, 250);
+            setTimeout(() => { if (speed < 25 && this.sounds.roadWind) this.sounds.roadWind.pause(); }, 250);
+        }
+
+        // 5. ASVALT DERZ / KÖPRÜ BAĞLANTI "TIKIR TIKIR" SESİ
+        // Asfalt yollarda 15 km/h üzeri seyrederken her 30-50 metrede bir ritmik tıkır tıkır sesi
+        if (isAsphalt && speed >= 15) {
+            this.roadJointDistanceCounter = (this.roadJointDistanceCounter || 0) + metersMoved;
+            if (this.roadJointDistanceCounter >= this.nextJointDistance) {
+                this.playRoadJointHit(speed);
+                this.roadJointDistanceCounter = 0;
+                this.nextJointDistance = 30 + Math.random() * 20; // 30 ile 50 metre arası dinamik aralık
+            }
+        }
+
+        // 6. SENTETİK DÜŞÜK FREKANS GÖVDE TİTREŞİMİ (Arka plan dolgusu)
+        let subGain = (speed / 100) * 0.18;
+        let cutoff = 350 + (speed * 2);
+        this.tireFilter.type = 'lowpass';
         this.tireFilter.frequency.setTargetAtTime(cutoff, this.ctx.currentTime, 0.1);
-        this.tireFilter.Q.setTargetAtTime(qValue, this.ctx.currentTime, 0.1);
-        this.tireGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.1);
+        this.tireFilter.Q.setTargetAtTime(1.0, this.ctx.currentTime, 0.1);
+        this.tireGain.gain.setTargetAtTime(subGain, this.ctx.currentTime, 0.1);
+    }
+
+    playRoadJointHit(speed = 45) {
+        if (!this.sounds) return;
+        this.lastJointSoundToggle = !this.lastJointSoundToggle;
+        const sound = this.lastJointSoundToggle ? this.sounds.roadJointHit1 : this.sounds.roadJointHit2;
+        if (!sound) return;
+        
+        let vol = Math.min(0.85, 0.30 + (speed / 90) * 0.45);
+        if (this.isWindowOpen) vol = Math.min(0.95, vol + 0.15);
+        
+        const rate = Math.min(1.20, Math.max(0.85, 0.90 + (speed / 100) * 0.25 + (Math.random() * 0.1 - 0.05)));
+        sound.volume(vol);
+        sound.rate(rate);
+        sound.play();
+    }
+
+    stopAllRoadSounds() {
+        if (!this.sounds) return;
+        ['roadAsphalt', 'roadGravel', 'roadGravelAsphalt', 'roadWind'].forEach(key => {
+            const snd = this.sounds[key];
+            if (snd && snd.playing()) {
+                snd.fade(snd.volume(), 0, 200);
+                setTimeout(() => { if (snd) snd.pause(); }, 200);
+            }
+        });
     }
 
     updateEngineSound(speed, rpm = null, gear = null) {
