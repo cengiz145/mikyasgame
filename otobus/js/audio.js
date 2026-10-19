@@ -2202,7 +2202,9 @@ class AudioSystem {
 
             const voices = window.speechSynthesis.getVoices();
             if (voices && voices.length > 0) {
-                const trVoice = voices.find(v => v.lang === 'tr-TR' || v.lang === 'tr_TR' || v.lang.startsWith('tr'));
+                const trVoices = voices.filter(v => v.lang === 'tr-TR' || v.lang === 'tr_TR' || v.lang.startsWith('tr'));
+                const naturalTr = trVoices.find(v => v.name.includes('Natural') || v.name.includes('Online') || v.name.includes('Neural') || v.name.includes('Google'));
+                const trVoice = naturalTr || trVoices[0];
                 if (trVoice) utter.voice = trVoice;
             }
 
