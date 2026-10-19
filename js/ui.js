@@ -428,7 +428,7 @@ const UI = {
     renderRoutes: function(cityName, completedTasks) {
         completedTasks = (typeof completedTasks === 'number') ? completedTasks : 0;
         const titleEl = document.getElementById("route-sel-title");
-        if (titleEl) titleEl.innerText = cityName + " Sefer Görevleri ve Hatları";
+        if (titleEl) titleEl.innerText = cityName + " Sefer Görevleri (1 - 10. Seviye)";
         
         const listEl = document.getElementById("dynamic-route-list");
         if (!listEl) return;
@@ -469,14 +469,10 @@ const UI = {
         // Aktif lisans seviyesi (Çırak = 1, Kalfa = 2, Usta = 3)
         const currentLic = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
 
-        // Görevleri sırala: Aktif görev EN BAŞTA
-        cityRoutes.sort((a, b) => {
-            if (a.taskIndex === completedTasks) return -1;
-            if (b.taskIndex === completedTasks) return 1;
-            return (a.taskIndex || 0) - (b.taskIndex || 0);
-        });
+        // Görevleri doğal sayısal sırasına göre diz (Görev 1, Görev 2, ... Görev 10)
+        cityRoutes.sort((a, b) => (a.taskIndex || 0) - (b.taskIndex || 0));
 
-        // Oyuncunun görebileceği görevler: Mevcut lisans seviyesindeki veya tamamlanan görevler
+        // Oyuncunun görebileceği görevler: Mevcut lisans seviyesindeki görevler (1. Seviye için ilk 10 görev)
         const visibleRoutes = cityRoutes.filter(r => {
             if (typeof r.licenseLevel === 'number') {
                 return r.licenseLevel <= currentLic;
@@ -485,16 +481,13 @@ const UI = {
         });
 
         const routesToRender = visibleRoutes.length > 0 ? visibleRoutes : cityRoutes;
+        let activeTaskBtn = null;
 
         routesToRender.forEach(route => {
+            const taskNum = (typeof route.taskIndex === 'number') ? (route.taskIndex + 1) : 1;
             const isCurrentTask = (route.taskIndex === completedTasks);
             const isCompleted = (typeof route.taskIndex === 'number' && route.taskIndex < completedTasks);
-            const isFuture = (typeof route.taskIndex === 'number' && route.taskIndex > completedTasks);
-
-            const access = (typeof Game !== 'undefined' && typeof Game.isRouteAccessible === 'function')
-                ? Game.isRouteAccessible(route.id)
-                : { allowed: !isFuture };
-            const isLocked = !access.allowed || isFuture;
+            const isLocked = (typeof route.taskIndex === 'number' && route.taskIndex > completedTasks);
 
             const li = document.createElement("li");
             li.style.marginBottom = "10px";
@@ -516,18 +509,24 @@ const UI = {
             btn.style.padding = "16px 20px";
             btn.style.lineHeight = "1.5";
             btn.style.width = "100%";
+
             if (isCurrentTask) {
-                btn.style.borderColor = "#38bdf8";
-                btn.style.boxShadow = "0 0 16px rgba(56, 189, 248, 0.4)";
+                btn.style.borderColor = "#22c55e";
+                btn.style.boxShadow = "0 0 16px rgba(34, 197, 94, 0.4)";
+                activeTaskBtn = btn;
+            } else if (isCompleted) {
+                btn.style.borderColor = "#10b981";
             } else if (isLocked) {
-                btn.style.opacity = "0.7";
-                btn.style.border = "1.5px dashed rgba(239, 68, 68, 0.5)";
-                btn.style.background = "rgba(15, 23, 42, 0.75)";
+                btn.style.opacity = "0.75";
+                btn.style.border = "1.5px dashed rgba(239, 68, 68, 0.55)";
+                btn.style.background = "rgba(15, 23, 42, 0.85)";
                 btn.setAttribute("aria-disabled", "true");
             }
 
-            let icon = isCurrentTask ? "▶️" : (isCompleted ? "✅" : "🔒");
-            let statusText = isCurrentTask ? "(AKTİF SEFER GÖREVİ)" : (isCompleted ? "(Tamamlandı - Tekrar Sür)" : `(Kilitli - Önce Görev ${completedTasks + 1}'i Tamamlayın)`);
+            let icon = isCurrentTask ? "🟢" : (isCompleted ? "✅" : "🔒");
+            let statusText = isCurrentTask 
+                ? "(AÇIK - ŞU ANKİ GÖREVİNİZ)" 
+                : (isCompleted ? "(Tamamlandı - İsterseniz Tekrar Sürün)" : `(KİLİTLİ - KAPALI: Önce Görev ${completedTasks + 1}'i Tamamlayın)`);
             
             const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
             const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Varış");
@@ -540,19 +539,21 @@ const UI = {
             const cardStepsHtml = cardSteps.map(s => '<div style="margin: 3px 0;">• ' + s + '</div>').join('');
             
             let ariaDesc = isLocked 
-                ? ("Görev: " + route.name + " Kilitli. Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Bu seviyeye geçmek için önce Görev " + (completedTasks + 1) + " başarıyla tamamlanmalıdır. Kalkış: " + startStop + ", Varış: " + endStop + ".")
-                : ("Görev: " + route.name + " " + statusText + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + stopCount + " durak, " + totalKmRoute + " kilometre.");
+                ? (`Görev ${taskNum}: ${route.name}. KİLİTLİ VE KAPALI. Bu görevin açılması için önce Görev ${completedTasks + 1}'i başarıyla tamamlamalısınız. Kalkış: ${startStop}, Varış: ${endStop}.`)
+                : (isCurrentTask
+                    ? (`Görev ${taskNum}: ${route.name}. AÇIK - ŞU ANKİ GÖREVİNİZ. Başlamak için Enter veya Boşluk tuşuna basın. Kalkış: ${startStop}, Varış: ${endStop}. Toplam ${stopCount} durak, ${totalKmRoute} kilometre.`)
+                    : (`Görev ${taskNum}: ${route.name}. Tamamlandı. Tekrar sürmek için Enter veya Boşluk tuşuna basın. Kalkış: ${startStop}, Varış: ${endStop}.`));
             
             btn.setAttribute("aria-label", ariaDesc);
 
             const lockedNoticeHtml = isLocked ? 
                 ('<div style="font-size: 0.88rem; color: #f87171; background: rgba(239, 68, 68, 0.12); border-left: 3px solid #ef4444; padding: 8px 12px; border-radius: 4px; margin-top: 8px;">' +
-                 '    ⛔ <strong>Seviye Sırası Kuralı:</strong> Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Bu görevin kilidini açmak için önce <strong>Görev ' + (completedTasks + 1) + '</strong> seferini başarıyla tamamlamalısınız.' +
+                 '    🔒 <strong>KİLİTLİ VE KAPALI:</strong> Bu görevin kilidini açmak için önce <strong>Görev ' + (completedTasks + 1) + '</strong> seferini başarıyla tamamlamalısınız.' +
                  '</div>') : '';
 
             btn.innerHTML = [
                 '<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 8px;">',
-                '    <strong style="color: ' + (isLocked ? '#f87171' : (route.color || '#38bdf8')) + '; font-size: 1.15rem;">' + icon + ' ' + route.name + ' ' + statusText + '</strong>',
+                '    <strong style="color: ' + (isLocked ? '#f87171' : (isCurrentTask ? '#22c55e' : (route.color || '#38bdf8'))) + '; font-size: 1.15rem;">' + icon + ' ' + route.name + ' ' + statusText + '</strong>',
                 '    ' + badgeHtml,
                 '</div>',
                 '<div style="font-size: 1rem; color: #f1f5f9; margin-bottom: 5px;">',
@@ -565,7 +566,7 @@ const UI = {
                     '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> ' + intermediate.join(' ➔ ') + '</div>' : 
                     '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> Ara durak yok (Doğrudan varış durağına kesintisiz sürüş)</div>'),
                 (isCurrentTask ? 
-                '<div style="font-size: 0.88rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 6px; width: 100%; border-left: 3px solid #38bdf8; margin-top: 6px;">' +
+                '<div style="font-size: 0.88rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 6px; width: 100%; border-left: 3px solid #22c55e; margin-top: 6px;">' +
                 '    📋 <strong>Görev Adımları (A: Harita Özeti | Shift + A: Adım Adım Dinle):</strong><br>' + cardStepsHtml +
                 '</div>' : ''),
                 lockedNoticeHtml
@@ -578,9 +579,9 @@ const UI = {
                     } else if (typeof audio !== 'undefined' && audio.playSelect) {
                         audio.playSelect();
                     }
-                    const msg = (access && access.reason) ? access.reason : ("Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Bu görevi açmak için lütfen önce Görev " + (completedTasks + 1) + "'i başarıyla tamamlayın.");
+                    const msg = "Kaptanım, Görev " + taskNum + " henüz kilitli ve kapalıdır. Bu görevi açmak için lütfen önce Görev " + (completedTasks + 1) + "'i başarıyla tamamlayın.";
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Bu seviye kilitlidir. Önce Görev " + (completedTasks + 1) + "'i tamamlayın.", "warning");
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Görev " + taskNum + " Kilitli: Önce Görev " + (completedTasks + 1) + "'i tamamlayın.", "warning");
                     if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
                     return;
                 }
@@ -595,6 +596,11 @@ const UI = {
         });
         
         KeyboardNav.initForScreen();
+        if (activeTaskBtn) {
+            try {
+                activeTaskBtn.focus();
+            } catch(e) {}
+        }
     },
 
     showLoading: function(text) {

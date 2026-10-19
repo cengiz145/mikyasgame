@@ -227,22 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Game.gameMode = 'city';
         Game.busType = 'belediye';
 
-        // AKADEMİ TAMAMLANMADAN SÜRÜŞ BAŞLAYAMAZ!
-        if (typeof Game !== 'undefined' && typeof Game.isAcademyCompleted === 'function' && !Game.isAcademyCompleted()) {
-            if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
-            const msg = "Kaptanım, direksiyona geçmeden önce lütfen temel akademiyi tamamlayınız! Önce öğrenci olarak pratiklerimizi bitirmeliyiz.";
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "warning");
-            if (typeof VoiceAssistant !== 'undefined' && VoiceAssistant.instance && VoiceAssistant.instance.openTutorialModal) {
-                VoiceAssistant.instance.openTutorialModal();
-            } else {
-                const btnTut = document.getElementById('btn-open-tutorial');
-                if (btnTut) btnTut.click();
-            }
-            return;
-        }
-
-        // 10 seviye geçilmeden ilçeler, şehirler, ülkeler ve harita kesinlikle gözükmesin!
+        // 10 seviye geçilmeden ilçeler, şehirler, ülkeler ve harita kesinlikle gözükmesin! Doğrudan Süleymanpaşa görev ekranına yönlendir
         if (!Game.hasPassedLevel10()) {
             audio.speak("Süleymanpaşa şehir içi belediye seferleri seçildi. Sefer görevleri listeleniyor.");
             UI.showToast("Süleymanpaşa Şehir İçi Seferleri (10 Seviye Kuralı)", "info");
@@ -718,10 +703,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('go-to-route-screen', async (e) => {
         const cityName = e.detail.city;
         
-        // Eğer bu şehir için önceden rota üretilmemişse, yerel duraklardan anında üret (0 bekleme)
-        let existingRoutes = Object.values(routesData).filter(r => r.sehir === cityName);
+        // Bu şehir için taskIndex'e sahip sıralı sefer görevleri var mı kontrol et
+        let existingTaskRoutes = Object.values(routesData).filter(r => r.sehir === cityName && typeof r.taskIndex === 'number');
         
-        if (existingRoutes.length === 0) {
+        if (existingTaskRoutes.length === 0) {
             const realCityStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName])
                 ? varsayilanSehirDuraklari[cityName]
                 : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);

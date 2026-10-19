@@ -574,6 +574,7 @@ class VoiceAssistant {
             if (btnStart) {
                 btnStart.onclick = () => {
                     if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    if (typeof Game !== 'undefined' && Game.completeAcademy) Game.completeAcademy();
                     this.closeTutorialModal();
                     document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
                 };

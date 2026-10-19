@@ -91,16 +91,16 @@ function generateRoutesFromAPI(rawStops, cityName) {
         
         // 1. Seviye Çırak (Süleymanpaşa Yerel Şehir İçi Hatları)
         const spasaLocalKeywords = [
-            { no: "1", kw: "DEĞİRMENALTI-N.K.Ü" },
-            { no: "2", kw: "DEREAĞZI-YEŞİLKÖY" },
-            { no: "3", kw: "YENİCE-KARAEVLİ" },
-            { no: "6", kw: "OTOGAR-AYDOGDU" },
-            { no: "8", kw: "100.YIL-ISMAIL YAZICI" },
-            { no: "9", kw: "ESKİ OTOGAR-SGK" },
-            { no: "10", kw: "ESKİ OTOGAR-DİŞ" },
-            { no: "11", kw: "YENİ OTOGAR-BAHÇELİEVLER" },
+            { no: "1", kw: "RÜSTEMPAŞA" },
+            { no: "1/3", kw: "ALTINOVA" },
+            { no: "2/7", kw: "100. Yıl" },
+            { no: "6", kw: "AYDOGDU" },
+            { no: "8", kw: "SPOR SALONU" },
+            { no: "9", kw: "KÖY ARABALARI" },
+            { no: "10", kw: "DİŞ SAĞLIĞI" },
+            { no: "11", kw: "BAHÇELİEVLER" },
             { no: "12", kw: "ALTINOVA-OTOGAR" },
-            { no: "18", kw: "NKÜ ARASTIRMA-YENİ ŞEHİR" }
+            { no: "30", kw: "DEĞİRMENALTI" }
         ];
 
         // 2. Seviye Kalfa (Süleymanpaşa İleri Seviye Şehir İçi Hatları)
@@ -153,7 +153,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
         ];
 
         let taskGlobalIndex = 0;
-        routesData = {};
+        if (typeof routesData === 'undefined' || !routesData) routesData = {};
 
         allLevels.forEach(lvl => {
             lvl.list.forEach((item, tIdx) => {
@@ -200,6 +200,9 @@ function generateRoutesFromAPI(rawStops, cityName) {
                 const taskRoute = Object.assign({}, found, {
                     id: routeId,
                     sehir: "Tekirdağ",
+                    district: lvl.lic === 1 ? "Süleymanpaşa" : (found.district || "Süleymanpaşa"),
+                    isDistrict: false,
+                    isCity: true,
                     name: "Görev " + taskNum + " (" + lvl.name + "): " + found.name,
                     taskIndex: taskGlobalIndex,
                     licenseLevel: lvl.lic,
@@ -457,7 +460,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
         }
     }
     
-    routesData = {};
+    if (typeof routesData === 'undefined' || !routesData) routesData = {};
     routes.forEach(r => {
         routesData[r.id] = r;
     });

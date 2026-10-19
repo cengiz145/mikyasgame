@@ -21,7 +21,7 @@ const Game = {
     // --- State Variables ---
     academyCompleted: localStorage.getItem('academyCompleted') === 'true',
     isAcademyCompleted: function() {
-        return this.academyCompleted === true || (this.completedTasks && this.completedTasks > 0) || (this.licenseLevel && this.licenseLevel > 1);
+        return true; // Oyuncunun oyuna başlama hakkını hiçbir zaman engelleme
     },
     completeAcademy: function() {
         this.academyCompleted = true;
@@ -543,16 +543,23 @@ const Game = {
         const completed = (typeof this.completedTasks === 'number') ? this.completedTasks : 0;
         const currentLic = (typeof this.licenseLevel === 'number') ? this.licenseLevel : 1;
 
-        // 1. Sıralı Görev Kontrolü: Görev N tamamlanmadan Görev N+1 kesinlikle açılamaz
+        // 1. Sıralı Görev Kontrolü: Seviye 1 Görevleri (Görev 1'den 10'a kadar)
         if (typeof route.taskIndex === 'number') {
+            // Başlangıçta 1. Görev (taskIndex: 0) her zaman serbestçe açıktır
+            if (route.taskIndex === 0) {
+                return { allowed: true };
+            }
+            // Sıradaki görevden ilerideki tüm görevler kilitli ve kapalıdır
             if (route.taskIndex > completed) {
                 const activeTaskNumber = completed + 1;
                 const requestedTaskNumber = route.taskIndex + 1;
                 return {
                     allowed: false,
-                    reason: `Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Görev ${requestedTaskNumber} henüz kilitlidir. Lütfen önce Görev ${activeTaskNumber}'i başarıyla tamamlayın.`
+                    reason: `Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Görev ${requestedTaskNumber} henüz kilitli ve kapalıdır. Lütfen önce Görev ${activeTaskNumber}'i başarıyla tamamlayın.`
                 };
             }
+            // Tamamlanmış veya mevcut aktif görev serbestçe erişilebilir
+            return { allowed: true };
         }
 
         // 2. Ehliyet / Lisans Seviyesi Kontrolü
@@ -578,16 +585,10 @@ const Game = {
     },
 
     startRoute: function(routeId) {
-        // AKADEMİ EĞİTİM KORUMASI: Akademi bitmeden hiçbir rota başlayamaz!
-        if (typeof this.isAcademyCompleted === 'function' && !this.isAcademyCompleted()) {
-            const msg = "Kaptanım, direksiyona geçmeden önce lütfen temel akademiyi tamamlayınız! Önce öğrenci olarak pratiklerimizi bitirmeliyiz.";
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, 'warning');
-            if (typeof VoiceAssistant !== 'undefined' && VoiceAssistant.instance && VoiceAssistant.instance.openTutorialModal) {
-                VoiceAssistant.instance.openTutorialModal();
-            }
-            return false;
-        }
+        // Akademi otomatik onayı
+        this.academyCompleted = true;
+        try { localStorage.setItem('academyCompleted', 'true'); } catch(e) {}
+
         // PEDAGOJİK SEVİYE KORUMASI: Bir seviye tamamlanmadan diğer seviyelere başlanamaz!
         const accessCheck = this.isRouteAccessible(routeId);
         if (!accessCheck.allowed) {
