@@ -56,6 +56,8 @@ const Game = {
     targetDriftVelocity: 0,
     lastDriftChangeTime: 0,
     isDriving: false,
+    currentCompassDirection: "Kuzey",
+    currentCompassAngle: 0,
     isBeingTowed: false, // Çekici durumu
     savedState: null, // Kaza anı kayıt noktası
     busDamage: { leftWindow: 0, rightWindow: 0, front: 0, wipers: 0, headlights: 0, exhaust: 0, health: 100 }, // Hasar durumu
@@ -2625,13 +2627,7 @@ const Game = {
             e.preventDefault();
         }
 
-        // Shift + Ok Tuşları Pusula Yön Değiştirme (Sürüş tuşlarını tetiklemesin)
-        if (e.shiftKey && (k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright')) {
-            if (typeof CompassNav !== 'undefined') {
-                CompassNav.handleDirection(e.key);
-            }
-            return;
-        }
+        // Shift+Oklar Pusula değişimi ui.js/CompassSystem tarafından tek merkezden yönetilir
         
         if (e.repeat) return; // Basılı tutulduğunda aynı aksiyonun defalarca tetiklenmesini engelle
 
@@ -2663,6 +2659,17 @@ const Game = {
         }
 
         
+                // Y TUŞU: Tek tuşla anlık pusula ve istikamet sorgusu
+        if (k === 'y') {
+            e.preventDefault();
+            if (typeof CompassSystem !== 'undefined' && typeof CompassSystem.queryCompass === 'function') {
+                CompassSystem.queryCompass();
+            } else if (typeof CompassNav !== 'undefined' && typeof CompassNav.queryCompass === 'function') {
+                CompassNav.queryCompass();
+            }
+            return;
+        }
+
         if (k === 'v') {
             e.preventDefault();
             if (this.isDriving && this.speed > 3) {
