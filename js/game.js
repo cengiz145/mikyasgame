@@ -21,6 +21,60 @@ const Game = {
     // --- State Variables ---
     username: null,
     licenseLevel: parseInt(localStorage.getItem('licenseLevel')) || 1,
+    playerXP: parseInt(localStorage.getItem('playerXP')) || 0,
+    LEVEL_XP_THRESHOLDS: [
+        0,      // Level 1
+        250,    // Level 2 (Stajyer)
+        650,    // Level 3 (BMC Neocity 10M açılır)
+        1250,   // Level 4 (Kalfalık)
+        2100,   // Level 5 (Mercedes Conecto Solo açılır)
+        3200,   // Level 6 (Deneyimli)
+        4600,   // Level 7 (Uzman)
+        6300,   // Level 8 (Mercedes Conecto Körüklü açılır)
+        8500,   // Level 9 (Gece Kartalı)
+        11000,  // Level 10 (Master Şehirlerarası Kaptan - Travego & Saray Ekspres Açılır!)
+        14000,  // Level 11
+        17500,  // Level 12 (Tourismo)
+        21500,  // Level 13
+        26000,  // Level 14 (MAN Lion's Coach)
+        31000,  // Level 15
+        37000,  // Level 16 (Setra TopClass)
+        44000,  // Level 17
+        52000,  // Level 18
+        61000,  // Level 19
+        71000   // Level 20 (Neoplan Cityliner)
+    ],
+
+    calculateLevelFromXP: function(xp) {
+        let lvl = 1;
+        for (let i = 1; i < this.LEVEL_XP_THRESHOLDS.length; i++) {
+            if (xp >= this.LEVEL_XP_THRESHOLDS[i]) {
+                lvl = i + 1;
+            } else {
+                break;
+            }
+        }
+        return lvl;
+    },
+
+    getNextLevelXP: function(currentLevel) {
+        if (currentLevel >= this.LEVEL_XP_THRESHOLDS.length) {
+            return this.LEVEL_XP_THRESHOLDS[this.LEVEL_XP_THRESHOLDS.length - 1] + 10000;
+        }
+        return this.LEVEL_XP_THRESHOLDS[currentLevel];
+    },
+
+    getUnlockTeaser: function(currentLevel) {
+        if (currentLevel < 3) return "Seviye 3'te BMC Neocity 10M açılacak!";
+        if (currentLevel < 5) return "Seviye 5'te Mercedes Conecto Solo açılacak!";
+        if (currentLevel < 8) return "Seviye 8'de 18 Metre Körüklü Conecto açılacak!";
+        if (currentLevel < 10) return "Seviye 10'da Mercedes Travego ve İlçe Karayolları açılacak!";
+        if (currentLevel < 12) return "Seviye 12'de Mercedes Tourismo açılacak!";
+        if (currentLevel < 14) return "Seviye 14'te MAN Lion's Coach açılacak!";
+        if (currentLevel < 16) return "Seviye 16'da Setra TopClass açılacak!";
+        if (currentLevel < 20) return "Seviye 20'de Fütüristik Neoplan Cityliner açılacak!";
+        return "Efsanevi Master Kaptan unvanına sahipsiniz!";
+    },
     hasPassedLevel10: function() {
         return (this.completedTasks >= 10) || (this.licenseLevel > 10);
     },
@@ -323,6 +377,7 @@ const Game = {
         try {
             localStorage.setItem('sim_season_level1', 'true');
             localStorage.setItem('licenseLevel', this.licenseLevel);
+            localStorage.setItem('playerXP', this.playerXP);
             localStorage.setItem('completedTasks', this.completedTasks);
             localStorage.setItem('para', this.playerBudget);
             localStorage.setItem('clockMinutes', this.clockMinutes);
@@ -376,53 +431,55 @@ const Game = {
     completeTask: function() {
         if (!this.activeRouteId) return;
 
-        /* ANY_ROUTE_LICENSE_ADVANCEMENT */
-        // Sadece eski görevler değil, Akıllı Rota veya herhangi bir resmi seferi bitirmek de ehliyet seviyesini artırır!
-        this.completedTasks++;
-        this.licenseLevel = Math.max(this.licenseLevel, this.completedTasks + 1);
+        const stopsCount = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops.length : 6;
+        
+        let earnedXP = 100 + (stopsCount * 15);
+        let bonusDetails = [];
 
-        if (this.completedTasks === 10) {
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak("Tebrikler kaptan! 10 seviyeyi başarıyla tamamladınız! İlçe belediye hatları ve şehirlerarası harita açıldı!");
-            }
-            if (typeof UI !== 'undefined' && UI.showToast) {
-                UI.showToast("🎉 10 Seviye Geçildi! İlçe ve Şehirlerarası Hatlar Açıldı!", "success");
-            }
-        } else if (this.completedTasks < 10) {
-            const remaining = 10 - this.completedTasks;
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak(`Sefer tamamlandı. Seviye ${this.licenseLevel}'e yükseldiniz. İlçe ve şehirlerarası haritaya ${remaining} seviye kaldı.`);
-            }
+        // 1. İpek Fren & Yolcu Konforu Primi
+        if (this.passengerComfort >= 90) {
+            earnedXP += 75;
+            bonusDetails.push("İpek Fren & Üstün Konfor (+75 XP)");
+        } else if (this.passengerComfort >= 75) {
+            earnedXP += 35;
         }
+
+        // 2. Erişilebilirlik & Engelli Rampası Primi
+        if (this.isRampDeployed || this.hasWheelchairPassengerAtStop) {
+            earnedXP += 50;
+            bonusDetails.push("Erişilebilirlik Primi (+50 XP)");
+        }
+
+        // 3. Gece Seferi Primi
+        if (this.clockMinutes < 360 || this.clockMinutes >= 1140) {
+            earnedXP += 60;
+            bonusDetails.push("Gece Nöbet Primi (+60 XP)");
+        }
+
+        const oldLevel = this.licenseLevel;
+        this.playerXP += earnedXP;
+        const newLevel = this.calculateLevelFromXP(this.playerXP);
+        this.licenseLevel = Math.max(oldLevel, newLevel);
+        this.completedTasks++;
         this.saveData();
 
-        const taskMatch = this.activeRouteId.match(/_task_(\d+)/);
-        if (taskMatch) {
-            const taskIndex = parseInt(taskMatch[1]);
-            if (taskIndex === this.completedTasks) {
-                this.completedTasks++;
-            }
-            
-            // 1 görev = 1 seviye ilerleme (10 seviyeyi geçtikten sonra ilçe ve şehirlerarası açılır)
-            this.licenseLevel = Math.max(this.licenseLevel, this.completedTasks + 1);
+        const nextThreshold = this.getNextLevelXP(this.licenseLevel);
+        const remainingXP = Math.max(0, nextThreshold - this.playerXP);
+        const teaser = this.getUnlockTeaser(this.licenseLevel);
 
-            if (this.completedTasks === 10) {
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Tebrikler kaptan! Şehir içinde 10 seviyeyi başarıyla geçtiniz! İlçe belediye hatları ve şehirlerarası harita açıldı!");
-                }
-                if (typeof UI !== 'undefined') {
-                    UI.showToast("🎉 10 Seviye Geçildi! İlçe ve Şehirlerarası Hatlar Açıldı!", "success");
-                }
-            } else if (this.completedTasks < 10) {
-                const remaining = 10 - this.completedTasks;
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(`Görev tamamlandı. Seviye ${this.licenseLevel}'e yükseldiniz. İlçe ve şehirlerarası haritaya ${remaining} seviye kaldı.`);
-                }
+        if (newLevel > oldLevel) {
+            if (typeof audio !== 'undefined' && audio.playSuccess) {
+                try { audio.playSuccess(); } catch(e) {}
             }
-
-            this.saveData();
+            const lvlMsg = `Tebrikler kaptan! Seferden +${earnedXP} XP kazandınız ve Seviye ${newLevel}'e terfi ettiniz! Yeni unvanınız: ${this.getLicenseTitle()}. Garajda yeni araçlar sizi bekliyor!`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(lvlMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! (${this.getLicenseTitle()})`, "success");
+        } else {
+            const reportMsg = `Sefer tamamlandı! Kazanılan: +${earnedXP} XP. Seviye ${this.licenseLevel + 1}'e kalan: ${remainingXP} XP. ${teaser}`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(reportMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏁 Sefer Bitti: +${earnedXP} XP (Kalan: ${remainingXP} XP)`, "info");
         }
-        
+
         UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
     },
 
@@ -3207,3 +3264,10 @@ const SanayiMechanic = {
 };
 
 
+
+if (typeof window !== 'undefined') {
+    window.Game = Game;
+}
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Game;
+}

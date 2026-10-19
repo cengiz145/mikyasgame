@@ -16,6 +16,7 @@ const BusFleet = {
             categoryName: "Şehir İçi Belediye Solo",
             icon: "🚌",
             requiredLevel: 1,
+            price: 0,
             seatCapacity: 32,
             standingCapacity: 75,
             totalCapacity: 107,
@@ -46,6 +47,7 @@ const BusFleet = {
             categoryName: "Mahalle ve Dar Sokak Otobüsü",
             icon: "🚐",
             requiredLevel: 3,
+            price: 1500,
             seatCapacity: 26,
             standingCapacity: 50,
             totalCapacity: 76,
@@ -76,6 +78,7 @@ const BusFleet = {
             categoryName: "Şehir İçi Konfor Solo",
             icon: "🚌",
             requiredLevel: 6,
+            price: 5000,
             seatCapacity: 30,
             standingCapacity: 80,
             totalCapacity: 110,
@@ -106,6 +109,7 @@ const BusFleet = {
             categoryName: "Körüklü Üniversite & Metrobüs",
             icon: "🚎",
             requiredLevel: 8,
+            price: 15000,
             seatCapacity: 45,
             standingCapacity: 115,
             totalCapacity: 160,
@@ -138,6 +142,7 @@ const BusFleet = {
             categoryName: "Şehirlerarası Lüks Seyahat",
             icon: "🛣️",
             requiredLevel: 11,
+            price: 35000,
             seatCapacity: 46,
             standingCapacity: 0,
             totalCapacity: 46,
@@ -168,6 +173,7 @@ const BusFleet = {
             categoryName: "Klasik Şehirlerarası Yolcu",
             icon: "🛣️",
             requiredLevel: 13,
+            price: 50000,
             seatCapacity: 54,
             standingCapacity: 0,
             totalCapacity: 54,
@@ -198,6 +204,7 @@ const BusFleet = {
             categoryName: "Yüksek Güçlü Uzun Yol",
             icon: "🦁",
             requiredLevel: 15,
+            price: 75000,
             seatCapacity: 50,
             standingCapacity: 0,
             totalCapacity: 50,
@@ -228,6 +235,7 @@ const BusFleet = {
             categoryName: "Ultra VIP Premium Seyahat",
             icon: "👑",
             requiredLevel: 18,
+            price: 100000,
             seatCapacity: 42,
             standingCapacity: 0,
             totalCapacity: 42,
@@ -258,6 +266,7 @@ const BusFleet = {
             categoryName: "Efsane Fütüristik Filo Lideri",
             icon: "🚀",
             requiredLevel: 20,
+            price: 150000,
             seatCapacity: 48,
             standingCapacity: 0,
             totalCapacity: 48,
@@ -281,6 +290,76 @@ const BusFleet = {
         }
     ],
 
+        OWNED_KEY: 'tekulas_owned_buses_v1',
+
+    getOwnedBusIds: function() {
+        try {
+            const saved = localStorage.getItem(this.OWNED_KEY);
+            const arr = saved ? JSON.parse(saved) : ["otokar_kent_lf"];
+            if (!arr.includes("otokar_kent_lf")) arr.push("otokar_kent_lf");
+            return arr;
+        } catch(e) {
+            return ["otokar_kent_lf"];
+        }
+    },
+
+    isBusOwned: function(busId) {
+        return this.getOwnedBusIds().includes(busId);
+    },
+
+    buyBus: function(busId) {
+        const bus = this.buses.find(b => b.id === busId);
+        if (!bus) return false;
+
+        const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
+        const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+
+        if (currentLevel < bus.requiredLevel) {
+            const lockMsg = `Seviyeniz yetersiz! ${bus.fullName} satın almak için Seviye ${bus.requiredLevel} olmalısınız (Mevcut Seviyeniz: ${currentLevel}).`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, "warning");
+            return false;
+        }
+
+        if (currentBudget < bus.price) {
+            const needed = bus.price - currentBudget;
+            const noMoneyMsg = `Yetersiz bakiye! ${bus.fullName} için ${bus.price.toLocaleString('tr-TR')} ₺ gerekiyor. Bakiyeniz: ${currentBudget.toLocaleString('tr-TR')} ₺. Kalan: ${needed.toLocaleString('tr-TR')} ₺.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(noMoneyMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`⚠️ Yetersiz Bakiye: Kalan ${needed.toLocaleString('tr-TR')} ₺`, "warning");
+            return false;
+        }
+
+        // Parayı kes ve garaja ekle
+        if (typeof Game !== 'undefined') {
+            Game.playerBudget -= bus.price;
+            Game.saveData();
+            if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                const licenseTitle = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, licenseTitle);
+            }
+        }
+
+        const owned = this.getOwnedBusIds();
+        if (!owned.includes(busId)) {
+            owned.push(busId);
+            try { localStorage.setItem(this.OWNED_KEY, JSON.stringify(owned)); } catch(e) {}
+        }
+
+        // Yeni aracı seç
+        this.selectBus(busId);
+
+        if (typeof audio !== 'undefined' && audio.playSuccess) {
+            try { audio.playSuccess(); } catch(e) {}
+        }
+
+        const buySuccessMsg = `Hayırlı olsun kaptan! ${bus.fullName} ${bus.price.toLocaleString('tr-TR')} ₺ karşılığında satın alındı ve garajınıza eklendi! Aktif aracınız olarak seçildi.`;
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(buySuccessMsg);
+        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🎉 SATIN ALINDI: ${bus.fullName} (-${bus.price.toLocaleString('tr-TR')} ₺)`, "success");
+
+        this.renderModal(this.currentTab || 'all');
+        return true;
+    },
+
     getSelectedBusId: function() {
         if (typeof localStorage !== 'undefined') {
             const saved = localStorage.getItem('selectedBusId');
@@ -299,6 +378,10 @@ const BusFleet = {
     selectBus: function(busId) {
         const bus = this.buses.find(b => b.id === busId);
         if (!bus) return false;
+
+        if (!this.isBusOwned(busId)) {
+            return this.buyBus(busId);
+        }
 
         const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
         if (currentLevel < bus.requiredLevel) {
@@ -391,13 +474,19 @@ const BusFleet = {
             btn.style.border = isSelected ? '2px solid #22c55e' : (isUnlocked ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(239,68,68,0.3)');
             btn.style.background = isSelected ? 'rgba(34,197,94,0.15)' : (isUnlocked ? 'rgba(15,23,42,0.6)' : 'rgba(0,0,0,0.4)');
 
+            const isOwned = this.isBusOwned(b.id);
             let statusBadge = '';
             if (isSelected) {
-                statusBadge = '<span style="background: #22c55e; color: #000; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">✅ KULLANIMDA</span>';
+                statusBadge = '<span style="background: #22c55e; color: #000; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">✅ AKTİF KULLANIMDA</span>';
+            } else if (isOwned) {
+                statusBadge = '<span style="background: rgba(34,197,94,0.25); color: #22c55e; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">GARAJINIZDA (SEÇ)</span>';
             } else if (isUnlocked) {
-                statusBadge = '<span style="background: rgba(56,189,248,0.2); color: #38bdf8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">KULLANILABİLİR</span>';
+                const canAfford = (typeof Game !== 'undefined' && Game.playerBudget >= (b.price || 0));
+                statusBadge = canAfford
+                    ? `<span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🛒 SATIN AL (${(b.price || 0).toLocaleString('tr-TR')} ₺)</span>`
+                    : `<span style="background: rgba(245,158,11,0.2); color: #fbbf24; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🔒 ${(b.price || 0).toLocaleString('tr-TR')} ₺ (Yetersiz Bakiye)</span>`;
             } else {
-                statusBadge = `<span style="background: rgba(239,68,68,0.2); color: #f87171; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem;">🔒 SEVİYE ${b.requiredLevel} GEREKLİ</span>`;
+                statusBadge = `<span style="background: rgba(239,68,68,0.2); color: #f87171; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🔒 SEVİYE ${b.requiredLevel} GEREKLİ (${(b.price || 0).toLocaleString('tr-TR')} ₺)</span>`;
             }
 
             const categoryBadge = b.category === 'belediye'
@@ -408,7 +497,7 @@ const BusFleet = {
                 ? `${b.seatCapacity} Oturan + ${b.standingCapacity} Ayakta (Toplam ${b.totalCapacity} Yolcu)`
                 : `${b.seatCapacity} Koltuklu (2+1 Rahat Seyahat)`;
 
-            let ariaLabel = `${b.fullName}. ${b.categoryName}. ${capacityInfo}. Motor: ${b.engine}. Ses Karakteri: ${b.soundProfile ? b.soundProfile.character : ''}. ${isUnlocked ? (isSelected ? 'Şu anda seçili araç.' : 'Seçmek için Enter.') : `Kilitli, Seviye ${b.requiredLevel} gereklidir.`}`;
+            let ariaLabel = `${b.fullName}. ${b.categoryName}. Fiyat: ${(b.price || 0).toLocaleString('tr-TR')} TL. ${capacityInfo}. Motor: ${b.engine}. ${!isUnlocked ? `Kilitli, Seviye ${b.requiredLevel} ve ${(b.price || 0).toLocaleString('tr-TR')} TL gereklidir.` : (isOwned ? (isSelected ? 'Şu anda aktif seçili araç.' : 'Garajınızda mevcut, sefere seçmek için Enter.') : `Satın almak için Enter. Fiyat: ${(b.price || 0).toLocaleString('tr-TR')} TL.`)}`;
             btn.setAttribute('aria-label', ariaLabel);
 
             btn.innerHTML = `
