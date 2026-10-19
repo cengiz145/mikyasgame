@@ -91,17 +91,20 @@ function generateRoutesFromAPI(rawStops, cityName) {
         
         // 1. Seviye Çırak (Süleymanpaşa Yerel Şehir İçi Hatları)
         const spasaLocalKeywords = [
-            { no: "1", kw: "RÜSTEMPAŞA" },
+            { no: "1", kw: "RÜSTEMPAŞA CAMİ" },
             { no: "1/3", kw: "ALTINOVA" },
-            { no: "2/7", kw: "100. Yıl" },
+            { no: "2/7", kw: "100. Yıl Mahallesi" },
             { no: "6", kw: "AYDOGDU" },
             { no: "8", kw: "SPOR SALONU" },
-            { no: "9", kw: "KÖY ARABALARI" },
+            { no: "4/15", kw: "HUZUREVİ", id: "tekulas_154_4_15" },
             { no: "10", kw: "DİŞ SAĞLIĞI" },
             { no: "11", kw: "BAHÇELİEVLER" },
             { no: "12", kw: "ALTINOVA-OTOGAR" },
             { no: "30", kw: "DEĞİRMENALTI" }
         ];
+
+        // 1. Seviye Çıraklık İçin Kademeli Durak Sayısı (4 Duraktan 14 Durağa Isınma Eğrisi)
+        const level1StopCounts = [4, 5, 6, 7, 8, 9, 10, 11, 12, 14];
 
         // 2. Seviye Kalfa (Süleymanpaşa İleri Seviye Şehir İçi Hatları)
         const kalfaKeywords = [
@@ -157,29 +160,46 @@ function generateRoutesFromAPI(rawStops, cityName) {
 
         allLevels.forEach(lvl => {
             lvl.list.forEach((item, tIdx) => {
-                let found = tekulasDb.find(r => r.name.includes(item.kw) || (r.hatNo === item.no && r.name.includes(item.kw)));
-                if (!found) {
-                    found = tekulasDb.find(r => r.name.includes(item.kw));
-                }
-                if (!found) {
-                    found = tekulasDb[taskGlobalIndex % tekulasDb.length];
-                }
+                let found = item.id ? tekulasDb.find(r => r.id === item.id) : null;
+                if (!found) found = tekulasDb.find(r => r.name.includes(item.kw) || (r.hatNo === item.no && r.name.includes(item.kw)));
+                if (!found) found = tekulasDb.find(r => r.name.includes(item.kw));
+                if (!found) found = tekulasDb[taskGlobalIndex % tekulasDb.length];
 
                 const taskNum = tIdx + 1;
                 const isTraining = (lvl.lic === 1 && taskNum <= 3);
                 const routeId = "tekirdag_task_" + taskGlobalIndex;
-                const startStop = found.startStop || (found.stops[0] ? found.stops[0].name : "Kalkış Garajı");
-                const endStop = found.endStop || (found.stops[found.stops.length - 1] ? found.stops[found.stops.length - 1].name : "Varış Durağı");
-                const intermediate = found.intermediateStops || (found.stops.length > 2 ? found.stops.slice(1, -1).map(s => s.name) : []);
+
+                // Çıraklık Seviyesi (Level 1) için kademeli durak ve mesafe dilimleme
+                let routeStops = found.stops;
+                let routeTotalKm = found.totalKm;
+
+                if (lvl.lic === 1) {
+                    const targetCount = level1StopCounts[tIdx] || 6;
+                    routeStops = found.stops.slice(0, Math.min(targetCount, found.stops.length)).map(s => Object.assign({}, s));
+                    
+                    let calcKm = 0;
+                    for (let s = 0; s < routeStops.length - 1; s++) {
+                        calcKm += (routeStops[s].gercekMesafeSonraki || 0.6);
+                    }
+                    routeTotalKm = Math.round(calcKm * 10) / 10;
+                    if (routeTotalKm < 1.0) routeTotalKm = 1.5;
+                    
+                    // Son durağın kalan mesafesini 0 yap
+                    routeStops[routeStops.length - 1].gercekMesafeSonraki = 0;
+                }
+
+                const startStop = routeStops[0] ? routeStops[0].name : "Kalkış Garajı";
+                const endStop = routeStops[routeStops.length - 1] ? routeStops[routeStops.length - 1].name : "Varış Durağı";
+                const intermediate = routeStops.length > 2 ? routeStops.slice(1, -1).map(s => s.name) : [];
 
                 // Formülsel görev adımları
                 const formulaSteps = [];
                 formulaSteps.push("1. Adım: " + startStop + " durağından " + (isTraining ? "yolcu almadan hareket edin." : "bekleyen yolcuları alarak hareket edin."));
-                for (let sIdx = 1; sIdx < found.stops.length - 1; sIdx++) {
-                    formulaSteps.push((sIdx + 1) + ". Adım: Sonra " + found.stops[sIdx].name + " durağına gidin; " + (isTraining ? "yolcu almadan devam edin." : "yolcuları indirin ve bekleyen yolcuları alıp devam edin."));
+                for (let sIdx = 1; sIdx < routeStops.length - 1; sIdx++) {
+                    formulaSteps.push((sIdx + 1) + ". Adım: Sonra " + routeStops[sIdx].name + " durağına gidin; " + (isTraining ? "yolcu almadan devam edin." : "yolcuları indirin ve bekleyen yolcuları alıp devam edin."));
                 }
-                if (found.stops.length > 1) {
-                    formulaSteps.push(found.stops.length + ". Adım (Hedef Son Durak): Sonra " + endStop + " durağına gidin; " + (isTraining ? "durakta durup eğitimi tamamlayın." : "tüm yolcuları indirin ve görevi tamamlayın."));
+                if (routeStops.length > 1) {
+                    formulaSteps.push(routeStops.length + ". Adım (Hedef Son Durak): Sonra " + endStop + " durağına gidin; " + (isTraining ? "durakta durup eğitimi tamamlayın." : "tüm yolcuları indirin ve görevi tamamlayın."));
                 }
 
                 const detailedInstructions = [
@@ -187,7 +207,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
                     "<strong>Kalkış (Başlangıç) Durağı:</strong> " + startStop + "<br>",
                     "<strong>Uğranacak Ara Duraklar:</strong> " + (intermediate.length > 0 ? intermediate.join(" ➔ ") : "Ara durak bulunmamaktadır (Doğrudan varış durağına sürüş)") + "<br>",
                     "<strong>Gitmeniz Gereken Son Durak (Hedef):</strong> " + endStop + "<br>",
-                    "<strong>Toplam Durak Sayısı:</strong> " + found.stops.length + " Durak | <strong>Mesafe:</strong> " + found.totalKm + " KM<br><br>",
+                    "<strong>Toplam Durak Sayısı:</strong> " + routeStops.length + " Durak | <strong>Mesafe:</strong> " + routeTotalKm + " KM<br><br>",
                     "<strong>Görev Adımları (A tuşu ile özet, Shift + A ile adım adım dinleyin):</strong><br>",
                     formulaSteps.map(st => "• " + st).join("<br>"),
                     (isTraining ? "<br><br><em>(Eğitim sürüşüdür; araçta yolcu bulunmaz.)</em>" : "")
@@ -195,7 +215,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
 
                 const speechBriefing = "Görev " + taskNum + " brifingi. Hat: " + found.name + ". Kalkış durağınız: " + startStop + ". " +
                     (intermediate.length > 0 ? "Durulacak ara duraklar: " + intermediate.join(", ") + ". " : "Ara durak bulunmamaktadır. ") +
-                    "Hedef son durak: " + endStop + ". Toplam " + found.stops.length + " durak, " + found.totalKm + " kilometre. Görev adımları: " + formulaSteps.join(". ");
+                    "Hedef son durak: " + endStop + ". Toplam " + routeStops.length + " durak, " + routeTotalKm + " kilometre. Görev adımları: " + formulaSteps.join(". ");
 
                 const taskRoute = Object.assign({}, found, {
                     id: routeId,
@@ -212,7 +232,9 @@ function generateRoutesFromAPI(rawStops, cityName) {
                     speechBriefing: speechBriefing,
                     startStop: startStop,
                     endStop: endStop,
-                    intermediateStops: intermediate
+                    intermediateStops: intermediate,
+                    stops: routeStops,
+                    totalKm: routeTotalKm
                 });
 
                 routesData[routeId] = taskRoute;
