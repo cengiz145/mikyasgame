@@ -1087,6 +1087,24 @@ class VoiceAssistant {
                 return;
             }
         }
+        if (command.includes("403") || command.includes("o403") || command.includes("efsane")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("mercedes_o403_rhd");
+                return;
+            }
+        }
+        if (command.includes("safir") || command.includes("temsa")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("temsa_safir_plus");
+                return;
+            }
+        }
+        if (command.includes("isuzu") || command.includes("novo") || command.includes("midibüs")) {
+            if (typeof BusFleet !== 'undefined') {
+                BusFleet.selectBus("isuzu_novo_lux");
+                return;
+            }
+        }
         if (command.includes("travego")) {
             if (typeof BusFleet !== 'undefined') {
                 BusFleet.selectBus("mercedes_travego_16shd");

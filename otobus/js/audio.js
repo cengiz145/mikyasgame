@@ -17,6 +17,13 @@ class AudioSystem {
         
         this.isEngineRunning = false;
         this.idleBuffer = null;
+        this.bassIdleBuffer = null;
+        try {
+            fetch('sounds/bassrolanti.mp3').then(r => r.arrayBuffer()).then(b => {
+                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                return this.ctx.decodeAudioData(b);
+            }).then(decoded => { this.bassIdleBuffer = decoded; }).catch(() => {});
+        } catch(e) {}
         this.idleSource = null;
         this.idleGain = null;
         
@@ -387,9 +394,12 @@ class AudioSystem {
         this.isEngineRunning = true;
 
         this.sounds.start.once('end', () => {
-            if (this.isEngineRunning && this.idleBuffer) {
+            const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
+            const useBass = currentBus && (currentBus.soundProfile && currentBus.soundProfile.engineSample === 'bassrolanti' || currentBus.id.includes('travego') || currentBus.id.includes('o403') || currentBus.id.includes('setra') || currentBus.id.includes('safir'));
+            const activeBuffer = (useBass && this.bassIdleBuffer) ? this.bassIdleBuffer : this.idleBuffer;
+            if (this.isEngineRunning && activeBuffer) {
                 this.idleSource = this.ctx.createBufferSource();
-                this.idleSource.buffer = this.idleBuffer;
+                this.idleSource.buffer = activeBuffer;
                 this.idleSource.loop = true;
                 this.idleSource.loopStart = 0.05; 
                 this.idleSource.loopEnd = this.idleBuffer.duration - 0.05;

@@ -73,12 +73,14 @@ const Game = {
     },
 
     getUnlockTeaser: function(currentLevel) {
+        if (currentLevel < 2) return "Seviye 2'de Çevik Isuzu Novo Lux açılacak!";
         if (currentLevel < 3) return "Seviye 3'te BMC Neocity 10M açılacak!";
         if (currentLevel < 5) return "Seviye 5'te Mercedes Conecto Solo açılacak!";
         if (currentLevel < 8) return "Seviye 8'de 18 Metre Körüklü Conecto açılacak!";
+        if (currentLevel < 8) return "Seviye 8'de Efsane Mercedes O 403 açılacak!";
         if (currentLevel < 10) return "Seviye 10'da Mercedes Travego ve İlçe Karayolları açılacak!";
         if (currentLevel < 12) return "Seviye 12'de Mercedes Tourismo açılacak!";
-        if (currentLevel < 14) return "Seviye 14'te MAN Lion's Coach açılacak!";
+        if (currentLevel < 14) return "Seviye 14'te Temsa Safir Plus ve MAN Lion's Coach açılacak!";
         if (currentLevel < 16) return "Seviye 16'da Setra TopClass açılacak!";
         if (currentLevel < 20) return "Seviye 20'de Fütüristik Neoplan Cityliner açılacak!";
         return "Efsanevi Master Kaptan unvanına sahipsiniz!";
