@@ -9,6 +9,7 @@ const BusFleet = {
         // --- BELEDİYE OTOBÜSLERİ (SEVİYE 1 - 10 ARASI ŞEHİR İÇİ) ---
         {
             id: "otokar_kent_lf",
+            soundGroup: "city_cummins",
             brand: "Otokar",
             model: "Kent LF 12M",
             fullName: "Otokar Kent LF (12 Metre Solo)",
@@ -71,6 +72,7 @@ const BusFleet = {
         },
         {
             id: "mercedes_conecto_12m",
+            soundGroup: "articulated",
             brand: "Mercedes-Benz",
             model: "Conecto 12M",
             fullName: "Mercedes-Benz Conecto (12 Metre)",
@@ -135,6 +137,7 @@ const BusFleet = {
         // --- ŞEHİRLERARASI SEYAHAT OTOBÜSLERİ (SEVİYE 10'DAN SONRA AÇILIR) ---
         {
             id: "mercedes_travego_16shd",
+            soundGroup: "pure_v6",
             brand: "Mercedes-Benz",
             model: "Travego 16 SHD",
             fullName: "Mercedes-Benz Travego 16 SHD (2+1 Rahat)",
@@ -166,6 +169,7 @@ const BusFleet = {
         },
         {
             id: "mercedes_tourismo_16rhd",
+            soundGroup: "coach_terminal",
             brand: "Mercedes-Benz",
             model: "Tourismo 16 RHD",
             fullName: "Mercedes-Benz Tourismo 16 RHD",
@@ -198,6 +202,7 @@ const BusFleet = {
         },
         {
             id: "man_lions_coach",
+            soundGroup: "man_d26",
             brand: "MAN",
             model: "Lion's Coach",
             fullName: "MAN Lion's Coach (470 HP)",
@@ -260,6 +265,7 @@ const BusFleet = {
         },
                 {
             id: "isuzu_novo_lux",
+            soundGroup: "midibus",
             brand: "Isuzu",
             model: "Novo Lux",
             fullName: "Isuzu Novo Lux (İlçe & Kasaba)",
@@ -291,6 +297,7 @@ const BusFleet = {
         },
         {
             id: "mercedes_o403_rhd",
+            soundGroup: "v8_bass",
             brand: "Mercedes-Benz",
             model: "O 403 RHD",
             fullName: "Mercedes-Benz O 403 RHD (Yolların Efsanesi)",

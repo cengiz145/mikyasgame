@@ -21,28 +21,51 @@ class AudioSystem {
         this.coachIdleBuffer = null;
         this.pureIdleBuffer = null;
         this.coachTerminalIdleBuffer = null;
+        this.groupBuffers = {
+            pure_v6: null,
+            coach_terminal: null,
+            v8_bass: null,
+            city_cummins: null,
+            articulated: null,
+            midibus: null,
+            man_d26: null
+        };
         this.cityIdleBuffer = null;
         try {
             fetch('sounds/freesound_pure_bus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
                 if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
                 return this.ctx.decodeAudioData(b);
-            }).then(decoded => { this.pureIdleBuffer = decoded; this.coachIdleBuffer = decoded; }).catch(() => {});
+            }).then(d => { this.pureIdleBuffer = d; this.coachIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.pure_v6 = d; }).catch(() => {});
 
             fetch('sounds/freesound_coach_idle.mp3').then(r => r.arrayBuffer()).then(b => {
                 if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
                 return this.ctx.decodeAudioData(b);
-            }).then(decoded => { this.coachTerminalIdleBuffer = decoded; }).catch(() => {});
+            }).then(d => { this.coachTerminalIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.coach_terminal = d; }).catch(() => {});
 
-            fetch('sounds/freesound_engine_city.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(decoded => { this.cityIdleBuffer = decoded; }).catch(() => {});
-        } catch(e) {}
-        try {
             fetch('sounds/bassrolanti.mp3').then(r => r.arrayBuffer()).then(b => {
                 if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
                 return this.ctx.decodeAudioData(b);
-            }).then(decoded => { this.bassIdleBuffer = decoded; }).catch(() => {});
+            }).then(d => { this.bassIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.v8_bass = d; }).catch(() => {});
+
+            fetch('sounds/freesound_new_bus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
+                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                return this.ctx.decodeAudioData(b);
+            }).then(d => { this.cityIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.city_cummins = d; }).catch(() => {});
+
+            fetch('sounds/freesound_articulated_idle.mp3').then(r => r.arrayBuffer()).then(b => {
+                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                return this.ctx.decodeAudioData(b);
+            }).then(d => { if (this.groupBuffers) this.groupBuffers.articulated = d; }).catch(() => {});
+
+            fetch('sounds/freesound_midibus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
+                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                return this.ctx.decodeAudioData(b);
+            }).then(d => { if (this.groupBuffers) this.groupBuffers.midibus = d; }).catch(() => {});
+
+            fetch('sounds/freesound_heavy_man_idle.mp3').then(r => r.arrayBuffer()).then(b => {
+                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                return this.ctx.decodeAudioData(b);
+            }).then(d => { if (this.groupBuffers) this.groupBuffers.man_d26 = d; }).catch(() => {});
         } catch(e) {}
         this.idleSource = null;
         this.idleGain = null;
@@ -422,17 +445,21 @@ class AudioSystem {
             const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
             let activeBuffer = this.pureIdleBuffer || this.idleBuffer;
             if (currentBus) {
-                if (currentBus.id.includes('tourismo') || currentBus.id.includes('irizar') || currentBus.id.includes('neoplan')) {
-                    // Orijinal otogar peron ve hava tahliyeli rölanti sesi
-                    activeBuffer = this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
-                } else if (currentBus.id.includes('o403')) {
-                    // Efsane V8 çift egzoz bas rölantisi
-                    activeBuffer = this.bassIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
-                } else if (currentBus.id.includes('travego') || currentBus.id.includes('setra') || currentBus.id.includes('safir') || currentBus.id.includes('man')) {
-                    // Saf ağır vasıta tok rölantisi (kesintisiz tır-tır-tır)
-                    activeBuffer = this.pureIdleBuffer || this.idleBuffer;
+                const grp = currentBus.soundGroup || (currentBus.soundProfile ? currentBus.soundProfile.soundGroup : '');
+                if (grp === 'coach_terminal' || currentBus.id.includes('tourismo') || currentBus.id.includes('irizar') || currentBus.id.includes('neoplan')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.coach_terminal) || this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
+                } else if (grp === 'v8_bass' || currentBus.id.includes('o403') || currentBus.id.includes('safir')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.v8_bass) || this.bassIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
+                } else if (grp === 'articulated' || currentBus.id.includes('conecto')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.articulated) || this.cityIdleBuffer || this.idleBuffer;
+                } else if (grp === 'midibus' || currentBus.id.includes('novo')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.midibus) || this.cityIdleBuffer || this.idleBuffer;
+                } else if (grp === 'man_d26' || currentBus.id.includes('man_lions')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.man_d26) || this.pureIdleBuffer || this.idleBuffer;
+                } else if (grp === 'city_cummins' || currentBus.id.includes('kent') || currentBus.id.includes('neocity')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.city_cummins) || this.cityIdleBuffer || this.idleBuffer;
                 } else {
-                    activeBuffer = this.cityIdleBuffer || this.idleBuffer;
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.pure_v6) || this.pureIdleBuffer || this.idleBuffer;
                 }
             }
             if (this.isEngineRunning && activeBuffer) {
