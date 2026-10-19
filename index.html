@@ -107,8 +107,8 @@
                         <button id="btn-open-stop-collection" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.1);" aria-label="Durak Keşif Albümü ve Şehir Hafızası Koleksiyonu (K kısayolu)">
                 🗺️ Durak Keşif Albümü ve Şehir Hafızası
             </button>
-                        <button id="btn-open-tutorial" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.12);" aria-label="Mikyas Kaptanlık Akademisi ve Pedagojik Sürüş Rehberi (F1 kısayolu)">
-                🎓 Mikyas Kaptanlık Akademisi & Pedagojik Rehber (F1)
+                        <button id="btn-open-tutorial" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.12);" aria-label="Mikyas Kaptanlık Akademisi ve Eğlenceli İnteraktif Sürüş Atölyesi (F1 kısayolu)">
+                🎓 Mikyas Kaptanlık Akademisi & İnteraktif Atölye (F1)
             </button>
             <button id="btn-open-badges" class="menu-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.15rem; border-color: #eab308; color: #fde047; background: rgba(234, 179, 8, 0.1);" aria-label="Kaptan Liyakat Rozetleri ve Şoför Başarıları">
                 🎖️ Kaptan Liyakat Rozetleri (Şoför Başarıları)
@@ -644,35 +644,38 @@
     <div id="tutorial-assistant-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tutorial-modal-title" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.88); z-index: 8000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
         <div class="glass-panel" style="max-width: 860px; width: 95%; padding: 24px 28px; text-align: left; max-height: 92vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <h2 id="tutorial-modal-title" class="gradient-text" style="font-size: 1.8rem; margin: 0; color: #34d399;">🎓 Mikyas Kaptanlık Akademisi - Pedagojik Sürüş Rehberi</h2>
+                <h2 id="tutorial-modal-title" class="gradient-text" style="font-size: 1.8rem; margin: 0; color: #34d399;">🎓 Mikyas Kaptanlık Akademisi & Eğlenceli Sürüş Atölyesi</h2>
                 <button id="btn-tutorial-modal-close" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444; font-size: 1.1rem; cursor: pointer;" aria-label="Akademi penceresini kapat">✕</button>
             </div>
-            <p id="tutorial-modal-summary" style="color: #6ee7b7; font-size: 1rem; font-weight: bold; margin-bottom: 4px;">
-                "Öğrenmek bir yolculuktur. Adım adım ustalaşarak mahalle hatlarından şehirlerarası otoyollara uzanan kaptanlık serüveni."
+            <p id="tutorial-modal-summary" style="color: #6ee7b7; font-size: 1.05rem; font-weight: bold; margin-bottom: 4px;">
+                "Sınav stresi yok, not korkusu yok! Formüllerle dene, eğlenerek keşfet ve gerçek bir usta kaptana dönüş!"
             </p>
-            <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 12px; line-height: 1.4;">
-                Öğretmen vizyonuyla hazırlanan aşamalı eğitim modüllerini inceleyebilir, <strong>Kaptanlık Gelişim Karnenizden</strong> terfi durumunuzu takip edebilirsiniz. Sürüş sırasında <strong>V</strong> tuşuyla asistana danışabilir, dilediğiniz an <strong>F1</strong> ile akademiye dönebilirsiniz.
+            <p style="color: #cbd5e1; font-size: 0.92rem; margin-bottom: 12px; line-height: 1.45;">
+                Aşağıdaki <strong>İnteraktif Sürüş Atölyesi</strong> butonlarıyla motor marşını, ipek freni, engelli rampasını ve retarderi canlı simülasyonla deneyebilir; <strong>Kaptanlık Serüvenim</strong> sekmesinden kazandığınız unvan ve yeni otobüsleri inceleyebilirsiniz. Dilediğiniz an <strong>F1</strong> ile atölyeye dönebilirsiniz.
             </p>
 
-            <!-- Pedagojik Aşama Sekmeleri -->
+            <!-- Pedagojik Aşama ve İnteraktif Atölye Sekmeleri -->
             <div style="display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;">
-                <button id="tab-acad-all" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 8px 10px; font-size: 0.88rem; background: rgba(16, 185, 129, 0.35); border: 1px solid #10b981; color: #34d399; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                <button id="tab-acad-lab" class="modern-btn nav-item" style="flex: 1.5; min-width: 170px; padding: 8px 10px; font-size: 0.88rem; background: rgba(16, 185, 129, 0.35); border: 1.5px solid #10b981; color: #34d399; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="İnteraktif Sürüş Atölyesi ve Canlı Formül Pratikleri">
+                    🧪 İnteraktif Atölye & Pratik
+                </button>
+                <button id="tab-acad-all" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
                     📋 Tüm Dersler (12)
                 </button>
-                <button id="tab-acad-stage1" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
+                <button id="tab-acad-stage1" class="modern-btn nav-item" style="flex: 1; min-width: 120px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
                     📘 1. Temel Sürüş
                 </button>
-                <button id="tab-acad-stage2" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
+                <button id="tab-acad-stage2" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
                     ♿ 2. Sosyal Duyarlılık
                 </button>
-                <button id="tab-acad-stage3" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
+                <button id="tab-acad-stage3" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
                     ⏱️ 3. Zaman Yönetimi
                 </button>
-                <button id="tab-acad-stage4" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
+                <button id="tab-acad-stage4" class="modern-btn nav-item" style="flex: 1; min-width: 120px; padding: 8px 10px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">
                     🛣️ 4. Usta Kaptanlık
                 </button>
-                <button id="tab-acad-karne" class="modern-btn nav-item" style="flex: 1.3; min-width: 170px; padding: 8px 10px; font-size: 0.88rem; background: linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(202, 138, 4, 0.2)); border: 1.5px solid #eab308; color: #fef08a; font-weight: bold; border-radius: 6px; cursor: pointer;">
-                    🎖️ Gelişim Karnesi & Terfi
+                <button id="tab-acad-seruven" class="modern-btn nav-item" style="flex: 1.3; min-width: 170px; padding: 8px 10px; font-size: 0.88rem; background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(202, 138, 4, 0.15)); border: 1.5px solid #eab308; color: #fef08a; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Kaptanlık Serüvenim ve Keşif Haritam">
+                    🌟 Kaptanlık Serüvenim
                 </button>
             </div>
 
@@ -689,11 +692,14 @@
                 </button>
             </div>
 
-            <!-- Kaptanlık Gelişim Karnesi Alanı (Varsayılan gizli, karne sekmesine basınca görünür) -->
-            <div id="tutorial-karne-container" style="display: none; margin-bottom: 12px;"></div>
+            <!-- İnteraktif Sürüş Atölyesi Alanı (Varsayılan Açık) -->
+            <div id="tutorial-lab-container" style="display: block; margin-bottom: 12px; max-height: 52vh; overflow-y: auto;"></div>
 
-            <!-- Dersler Listesi -->
-            <ul id="tutorial-lessons-list" style="list-style: none; padding: 0; margin: 0; max-height: 50vh; overflow-y: auto;">
+            <!-- Kaptanlık Serüvenim ve Macera Günlüğü (Not stresi yok, saf gelişim ve ödüller) -->
+            <div id="tutorial-seruven-container" style="display: none; margin-bottom: 12px;"></div>
+
+            <!-- Dersler Listesi (Formüllerle zenginleştirilmiş teori) -->
+            <ul id="tutorial-lessons-list" style="display: none; list-style: none; padding: 0; margin: 0; max-height: 50vh; overflow-y: auto;">
                 <!-- js/voice-assistant.js tarafından dinamik doldurulacak -->
             </ul>
         </div>

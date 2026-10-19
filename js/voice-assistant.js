@@ -9,7 +9,7 @@ class VoiceAssistant {
         this.recognition = null;
         this.isListening = false;
         this.isCopilotEnabled = (localStorage.getItem('copilot_enabled') !== 'false');
-        this.currentStageFilter = 'all'; // 'all', 1, 2, 3, 4, 'karne'
+        this.currentStageFilter = 'lab'; // 'all', 1, 2, 3, 4, 'karne'
 
         // 4 Pedagojik Gelişim Aşamasına Ayrılmış 12 Eğitim Modülü
         this.tutorialLessons = [
@@ -164,6 +164,39 @@ class VoiceAssistant {
                 return;
             }
 
+            // Atölye açıkken doğrudan klavye tuşlarıyla deney çalıştırma
+            if (this.isTutorialModalOpen() && this.currentStageFilter === 'lab') {
+                const k = e.key.toLowerCase();
+                if (k === 'm') {
+                    const b = document.getElementById('btn-lab-engine');
+                    if (b) { b.click(); e.preventDefault(); return; }
+                } else if (k === 'w') {
+                    const b = document.getElementById('btn-lab-accel');
+                    if (b) { b.click(); e.preventDefault(); return; }
+                } else if (k === 's') {
+                    const b = document.getElementById('btn-lab-hard-brake');
+                    if (b) { b.click(); e.preventDefault(); return; }
+                } else if (k === 'f') {
+                    const b = document.getElementById('btn-lab-soft-brake');
+                    if (b) { b.click(); e.preventDefault(); return; }
+                } else if (k === 'k') {
+                    const b = document.getElementById('btn-lab-kneeling');
+                    if (b) { b.click(); e.preventDefault(); return; }
+                } else if (k === 'u' || k === 'r') {
+                    const b = document.getElementById('btn-lab-ramp');
+                    if (b) { b.click(); e.preventDefault(); return; }
+                } else if (k === '1') {
+                    const b = document.getElementById('btn-lab-door-front');
+                    if (b) { b.click(); e.preventDefault(); return; }
+                } else if (k === '2') {
+                    const b = document.getElementById('btn-lab-door-rear');
+                    if (b) { b.click(); e.preventDefault(); return; }
+                } else if (e.code === 'Space') {
+                    const b = document.getElementById('btn-lab-retarder');
+                    if (b) { b.click(); e.preventDefault(); return; }
+                }
+            }
+
             if (e.key.toLowerCase() === 'v' && !e.repeat && !e.altKey && !e.ctrlKey) {
                 if (typeof Game !== 'undefined' && Game.isDriving) {
                     this.toggleListening();
@@ -199,7 +232,7 @@ class VoiceAssistant {
         modal.classList.remove('hidden');
         this.updateCopilotButtonText();
 
-        const welcomeMsg = "Mikyas Kaptanlık Akademisi ve Pedagojik Sürüş Rehberi açıldı. 4 gelişim aşaması ve Kaptanlık Karneniz hazır. Dersleri ve terfi hedeflerinizi dinlemek için yön tuşlarıyla gezinebilirsiniz. Kapatmak için Esc veya F1 tuşuna basınız.";
+        const welcomeMsg = "Mikyas Kaptanlık Akademisi ve İnteraktif Sürüş Atölyesi açıldı. Not stresi ve sınav korkusu olmadan formülleri canlı deneyebileceğiniz atölye istasyonlarımız hazır. Yön tuşlarıyla pratik butonlarına geçebilir veya F1 tuşuyla atölyeyi kapatabilirsiniz.";
         if (typeof audio !== 'undefined' && audio.speak) {
             audio.speak(welcomeMsg);
         }
@@ -225,35 +258,56 @@ class VoiceAssistant {
         this.renderTutorialContent();
     }
 
+    setAcademyTab(tabId) {
+        this.currentStageFilter = tabId;
+        this.renderTutorialContent();
+    }
+
     renderTutorialContent() {
         const listEl = document.getElementById('tutorial-lessons-list');
-        const karneContainer = document.getElementById('tutorial-karne-container');
+        const seruvenContainer = document.getElementById('tutorial-seruven-container') || document.getElementById('tutorial-karne-container');
+        const labContainer = document.getElementById('tutorial-lab-container');
         if (!listEl) return;
 
         // Sekme butonlarının aktiflik stilini güncelle
-        const tabs = ['all', 'stage1', 'stage2', 'stage3', 'stage4', 'karne'];
+        const tabs = ['lab', 'all', 'stage1', 'stage2', 'stage3', 'stage4', 'seruven', 'karne'];
         tabs.forEach(t => {
             const btn = document.getElementById(`tab-acad-${t}`);
             if (btn) {
-                const isActive = (this.currentStageFilter === t);
-                btn.style.background = isActive ? 'rgba(16, 185, 129, 0.35)' : 'rgba(255, 255, 255, 0.08)';
+                const isActive = (this.currentStageFilter === t) || (t === 'seruven' && this.currentStageFilter === 'karne');
+                btn.style.background = isActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(255, 255, 255, 0.08)';
                 btn.style.borderColor = isActive ? '#10b981' : 'rgba(255, 255, 255, 0.2)';
                 btn.style.color = isActive ? '#34d399' : '#cbd5e1';
                 btn.style.fontWeight = isActive ? 'bold' : 'normal';
             }
         });
 
-        if (this.currentStageFilter === 'karne') {
+        // 1. İNTERAKTİF SÜRÜŞ ATÖLYESİ (CANLI FORMÜL PRATİĞİ)
+        if (this.currentStageFilter === 'lab') {
+            if (labContainer) {
+                labContainer.style.display = 'block';
+                this.renderInteractiveLab();
+            }
+            if (seruvenContainer) seruvenContainer.style.display = 'none';
             listEl.style.display = 'none';
-            if (karneContainer) {
-                karneContainer.style.display = 'block';
-                this.renderGelisimKarnesi();
+            return;
+        }
+
+        // 2. KAPTANLIK SERÜVENİ & YOL ARKADAŞI (NOT STRESİ YOK!)
+        if (this.currentStageFilter === 'seruven' || this.currentStageFilter === 'karne') {
+            if (labContainer) labContainer.style.display = 'none';
+            listEl.style.display = 'none';
+            if (seruvenContainer) {
+                seruvenContainer.style.display = 'block';
+                this.renderKaptanlikSeruveni();
             }
             return;
         }
 
+        // 3. TEORİK DERSLER LİSTESİ
+        if (labContainer) labContainer.style.display = 'none';
+        if (seruvenContainer) seruvenContainer.style.display = 'none';
         listEl.style.display = 'block';
-        if (karneContainer) karneContainer.style.display = 'none';
         listEl.innerHTML = '';
 
         let filtered = this.tutorialLessons;
@@ -270,27 +324,30 @@ class VoiceAssistant {
             btn.className = 'menu-btn nav-item';
             btn.style.width = '100%';
             btn.style.textAlign = 'left';
-            btn.style.padding = '12px 16px';
+            btn.style.padding = '14px 18px';
             btn.style.display = 'flex';
             btn.style.flexDirection = 'column';
-            btn.style.gap = '4px';
+            btn.style.gap = '6px';
             btn.style.borderRadius = '8px';
             btn.style.border = '1px solid rgba(16, 185, 129, 0.35)';
             btn.style.background = 'rgba(6, 78, 59, 0.25)';
             btn.style.cursor = 'pointer';
 
-            btn.setAttribute('aria-label', `${lesson.stageName}. ${lesson.title}. Tuşlar: ${lesson.keys}. Dinlemek için Enter'a basınız.`);
+            btn.setAttribute('aria-label', `${lesson.stageName}. ${lesson.title}. Formül: ${lesson.formula}. Tuşlar: ${lesson.keys}. Dinlemek için Enter'a basınız.`);
 
             btn.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                     <div>
                         <span style="font-size: 0.78rem; color: #a7f3d0; text-transform: uppercase; letter-spacing: 1px; display: block;">${lesson.stageName}</span>
-                        <span style="font-weight: bold; color: #34d399; font-size: 1.05rem;">${lesson.title}</span>
+                        <strong style="color: #34d399; font-size: 1.1rem;">${lesson.title}</strong>
                     </div>
                     <span style="font-size: 0.85rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.2); padding: 4px 10px; border-radius: 4px;">▶ Dinle</span>
                 </div>
-                <div style="font-size: 0.88rem; color: #fde047; margin-top: 2px;"><strong>Tuşlar / Aksiyon:</strong> ${lesson.keys}</div>
-                <div style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.35; margin-top: 2px;">${lesson.speech}</div>
+                <div style="background: rgba(15, 23, 42, 0.6); border-left: 3px solid #38bdf8; padding: 6px 10px; border-radius: 4px; font-size: 0.86rem; color: #38bdf8;">
+                    📐 <strong>Formül:</strong> ${lesson.formula}
+                </div>
+                <div style="font-size: 0.88rem; color: #fde047;"><strong>Tuşlar / Aksiyon:</strong> ${lesson.keys}</div>
+                <div style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.4;">${lesson.speech}</div>
             `;
 
             btn.addEventListener('click', () => {
@@ -306,80 +363,429 @@ class VoiceAssistant {
         }
     }
 
-    renderGelisimKarnesi() {
-        const karneContainer = document.getElementById('tutorial-karne-container');
-        if (!karneContainer) return;
+    // =========================================================================
+    // CANLI İNTERAKTİF SÜRÜŞ ATÖLYESİ (FORMÜL DENEYLERİ & SIFIR STRES PRATİĞİ)
+    // =========================================================================
+    renderInteractiveLab() {
+        const labContainer = document.getElementById('tutorial-lab-container');
+        if (!labContainer) return;
+
+        // Atölye durum değişkenleri
+        if (typeof this.labSpeed === 'undefined') this.labSpeed = 0;
+        if (typeof this.labPressure === 'undefined') this.labPressure = 0;
+        if (typeof this.labComfort === 'undefined') this.labComfort = 100;
+        if (typeof this.labEngineRunning === 'undefined') this.labEngineRunning = false;
+        if (typeof this.labKneeling === 'undefined') this.labKneeling = false;
+        if (typeof this.labRampOpen === 'undefined') this.labRampOpen = false;
+        if (typeof this.labFrontDoor === 'undefined') this.labFrontDoor = false;
+        if (typeof this.labRearDoor === 'undefined') this.labRearDoor = false;
+
+        labContainer.innerHTML = `
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1.5px solid #10b981; border-radius: 12px; padding: 18px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(16, 185, 129, 0.3); padding-bottom: 10px; margin-bottom: 14px;">
+                    <div>
+                        <span style="font-size: 0.8rem; color: #a7f3d0; text-transform: uppercase; letter-spacing: 1px;">Mikyas Akademi Canlı Simülasyon</span>
+                        <h3 style="color: #34d399; font-size: 1.4rem; margin: 2px 0 0 0;">🧪 İnteraktif Sürüş & Formül Atölyesi</h3>
+                    </div>
+                    <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem;">
+                        🎮 Canlı Deney & Serbest Pratik
+                    </span>
+                </div>
+
+                <p style="color: #cbd5e1; font-size: 0.92rem; line-height: 1.45; margin-bottom: 16px;">
+                    Aşağıdaki istasyonlarda otobüsün tüm mekanik ve fiziksel formüllerini <strong>sınav stresi olmadan</strong> butonlara tıklayarak veya klavye kısayollarına basarak anında deneyimleyebilirsiniz!
+                </p>
+
+                <!-- 1. İSTASYON: MARŞ, KONTAK VE BASINÇ FORMÜLÜ -->
+                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #38bdf8; font-size: 1.05rem;">🔑 1. İstasyon: Pnömatik Basınç ve Motor Ateşleme</strong>
+                        <span style="font-size: 0.82rem; color: #a7f3d0; background: rgba(56, 189, 248, 0.15); padding: 3px 8px; border-radius: 4px;">Formül: Basınç ≥ 85 PSI ➔ İmdat Çözülür</span>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
+                        Otobüsün frenleri hava ile kilitlenir. Hava kompresörü 85 PSI'yı geçmeden araç hareket etmez. Marşa basarak havayı doldur!
+                    </p>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <button id="btn-lab-engine" class="modern-btn nav-item" style="padding: 10px 16px; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Kontağı Aç ve Marşa Bas (M tuşu)">
+                            🔑 Kontağı Aç & Marşa Bas (M)
+                        </button>
+                        <div style="background: rgba(0,0,0,0.4); padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem;">
+                            Hava Basıncı: <strong id="lbl-lab-pressure" style="color: #4ade80;">${this.labPressure} PSI</strong>
+                            <span id="lbl-lab-engine-status" style="margin-left: 8px; color: ${this.labEngineRunning ? '#4ade80' : '#f87171'};">${this.labEngineRunning ? '🟢 Motor Çalışıyor' : '🔴 Motor Kapalı'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. İSTASYON: İPEK FREN VE KONFOR FORMÜLÜ -->
+                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #facc15; font-size: 1.05rem;">✨ 2. İstasyon: İpek Fren & Yolcu Konfor Formülü</strong>
+                        <span style="font-size: 0.82rem; color: #fde047; background: rgba(250, 204, 21, 0.15); padding: 3px 8px; border-radius: 4px;">Formül: d = v² / 200 | Konfor = 100 - (Sert Fren × 20)</span>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
+                        50 km/s hızla giden otobüste sert frene basarsan yolcular savrulur. Gazı erken kesip kademeli yumuşak 'ipek fren' yaparsan %100 konfor alırsın!
+                    </p>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px;">
+                        <button id="btn-lab-accel" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(34, 197, 94, 0.25); border: 1px solid #22c55e; color: #4ade80; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Gaza bas ve hızlan (W tuşu)">
+                            🟢 Gaza Bas: 50 km/s (W)
+                        </button>
+                        <button id="btn-lab-hard-brake" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #f87171; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Panik Fren Yap (Sert Duruş Deneyi)">
+                            🔴 Panik Sert Fren (S)
+                        </button>
+                        <button id="btn-lab-soft-brake" class="modern-btn nav-item" style="padding: 9px 14px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #ffffff; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="İpek Fren Yap (Yumuşak Duruş)">
+                            ✨ İpek Fren (Kademeli Duruş)
+                        </button>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.4); padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; display: flex; gap: 15px;">
+                        <span>Anlık Hız: <strong id="lbl-lab-speed" style="color: #38bdf8;">${this.labSpeed} km/s</strong></span>
+                        <span>Yolcu Konforu: <strong id="lbl-lab-comfort" style="color: #4ade80;">%${this.labComfort}</strong></span>
+                    </div>
+                </div>
+
+                <!-- 3. İSTASYON: ERİŞİLEBİLİRLİK VE SEVGİ FORMÜLÜ -->
+                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #34d399; font-size: 1.05rem;">🦼 3. İstasyon: Sevgi & Erişilebilirlik Formülü (Kneeling + Rampa)</strong>
+                        <span style="font-size: 0.82rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.15); padding: 3px 8px; border-radius: 4px;">Formül: Kaldırım Sıfırlama (K) + Rampa (U/R) ➔ +50 XP Primi</span>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
+                        Durakta tekerlekli sandalyeli yolcumuz bekliyor! Önce K ile otobüsü sağa yatır, ardından U/R ile rampayı aç.
+                    </p>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <button id="btn-lab-kneeling" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Otobüsü Sağa Yatır Kneeling (K tuşu)">
+                            ⬇️ Otobüsü Sağa Yatır (K)
+                        </button>
+                        <button id="btn-lab-ramp" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(234, 179, 8, 0.2); border: 1px solid #eab308; color: #fde047; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Engelli Rampasını Aç (U veya R tuşu)">
+                            🛹 Engelli Rampasını Aç (U/R)
+                        </button>
+                        <button id="btn-lab-ramp-close" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;" aria-label="Rampayı Kapat ve Otobüsü Doğrult">
+                            ⬆️ Rampayı Kapat ve Doğrult
+                        </button>
+                        <span id="lbl-lab-ramp-status" style="font-size: 0.88rem; color: #a7f3d0; font-weight: bold;">
+                            ${this.labRampOpen ? '✅ Rampa Açık (Yolcu bindi!)' : (this.labKneeling ? '🦼 Otobüs Sağa Yattı' : '⚪ Normal Sürüş Yüksekliği')}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 4. İSTASYON: KAPI YÖNETİMİ VE GÜVENLİK KİLİDİ -->
+                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #a855f7; font-size: 1.05rem;">🚪 4. İstasyon: Kapı Yönetimi ve Yolcu Akış Formülü</strong>
+                        <span style="font-size: 0.82rem; color: #e9d5ff; background: rgba(168, 85, 247, 0.15); padding: 3px 8px; border-radius: 4px;">Kural: Önce Arka Kapı (İnenler) ➔ Sonra Ön Kapı (Binenler)</span>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
+                        Kapılar açıkken gaz güvenlik kilidi devreye girer. Kapıları kapatmadan araç hareket edemez.
+                    </p>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <button id="btn-lab-door-rear" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Arka Kapıyı Aç İnen Yolcular (2 tuşu)">
+                            🚪 1. Arka Kapıyı Aç: İnenler (2)
+                        </button>
+                        <button id="btn-lab-door-front" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #d8b4fe; font-weight: bold; border-radius: 6px; cursor: pointer;" aria-label="Ön Kapıyı Aç Binen Yolcular (1 tuşu)">
+                            🚪 2. Ön Kapıyı Aç: Binenler (1)
+                        </button>
+                        <button id="btn-lab-door-close" class="modern-btn nav-item" style="padding: 9px 14px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;" aria-label="Tüm Kapıları Kapat">
+                            🔒 3. Kapıları Kapat
+                        </button>
+                        <span id="lbl-lab-door-status" style="font-size: 0.88rem; color: #cbd5e1; font-weight: bold;">
+                            ${(this.labFrontDoor || this.labRearDoor) ? '⚠️ Kapılar Açık (Gaz Kilidi Devrede)' : '✅ Kapılar Kapalı (Güvenli)'}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 5. İSTASYON: RETARDER VE YOKUŞ İNİŞ FORMÜLÜ -->
+                <div style="background: rgba(6, 78, 59, 0.2); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: #f97316; font-size: 1.05rem;">⚡ 5. İstasyon: Manyetik Retarder & Yokuş İniş Formülü</strong>
+                        <span style="font-size: 0.82rem; color: #fdba74; background: rgba(249, 115, 22, 0.15); padding: 3px 8px; border-radius: 4px;">Formül: 15 Ton + Dik İniş ➔ Retarder (Space) ➔ 0 Balata Aşınması</span>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 0.86rem; margin-bottom: 10px;">
+                        15 tonluk otobüs yokuş aşağı inerken sürekli frene basarsan balatalar yanar! Boşluk (Space) tuşuna basarak manyetik retarderi çek ve balatasız yavaşlamayı dinle.
+                    </p>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <button id="btn-lab-retarder" class="modern-btn nav-item" style="padding: 10px 16px; background: linear-gradient(135deg, #ea580c, #c2410c); border: 1.5px solid #f97316; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Manyetik Retarderi Devreye Sok (Boşluk tuşu)">
+                            ⚡ Manyetik Retarderi Çek (Space)
+                        </button>
+                        <span id="lbl-lab-retarder-status" style="font-size: 0.9rem; color: #fdba74; font-weight: bold;">
+                            ${this.labRetarderActive ? '⚡ Retarder Devrede (Hız 50 km/s Sabitlendi)' : '⚪ Retarder Kapalı'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Atölye Buton Olay Dinleyicileri
+        this.bindInteractiveLabEvents();
+
+        if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+            KeyboardNav.initForScreen();
+        }
+    }
+
+    bindInteractiveLabEvents() {
+        // 1. Motor Marş
+        const btnEngine = document.getElementById('btn-lab-engine');
+        if (btnEngine) {
+            btnEngine.onclick = () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.start) {
+                    audio.sounds.start.play();
+                }
+                this.labEngineRunning = true;
+                this.labPressure = 120;
+                const lblP = document.getElementById('lbl-lab-pressure');
+                const lblS = document.getElementById('lbl-lab-engine-status');
+                if (lblP) lblP.innerText = '120 PSI';
+                if (lblS) {
+                    lblS.innerText = '🟢 Motor Çalışıyor';
+                    lblS.style.color = '#4ade80';
+                }
+                const msg = "Harika! 12 litrelik dizel motor çalıştı. Kompresör hava tüplerini 120 PSI ile doldurdu. İmdat frenleri çözüldü, yola hazırsın kaptan!";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔑 Motor Çalıştı | 120 PSI Basınç Tam!", "success");
+            };
+        }
+
+        // 2. Hızlan
+        const btnAccel = document.getElementById('btn-lab-accel');
+        if (btnAccel) {
+            btnAccel.onclick = () => {
+                this.labSpeed = 50;
+                const lblSpd = document.getElementById('lbl-lab-speed');
+                if (lblSpd) lblSpd.innerText = '50 km/s';
+                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                const msg = "Gaza basıldı, hızımız saatte 50 kilometreye ulaştı. İleride durak var! Şimdi duruş tarzını seç: Sert fren mi, ipek fren mi?";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🟢 Hız: 50 km/s (Durak yaklaşıyor)", "info");
+            };
+        }
+
+        // Panik Fren
+        const btnHardBrake = document.getElementById('btn-lab-hard-brake');
+        if (btnHardBrake) {
+            btnHardBrake.onclick = () => {
+                this.labSpeed = 0;
+                this.labComfort = 40;
+                const lblSpd = document.getElementById('lbl-lab-speed');
+                const lblCmf = document.getElementById('lbl-lab-comfort');
+                if (lblSpd) lblSpd.innerText = '0 km/s';
+                if (lblCmf) {
+                    lblCmf.innerText = '%40';
+                    lblCmf.style.color = '#ef4444';
+                }
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.crash) {
+                    audio.sounds.crash.play();
+                }
+                const msg = "Eyvah! Ani frenle yolcular öne savruldu, konfor yüzde 40'a düştü! Formül ne diyordu: Hızın karesiyle orantılı duruş mesafesi gerekir. Şimdi bir de ipek freni dene!";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔴 Ani Fren: Konfor %40'a düştü!", "warning");
+            };
+        }
+
+        // İpek Fren
+        const btnSoftBrake = document.getElementById('btn-lab-soft-brake');
+        if (btnSoftBrake) {
+            btnSoftBrake.onclick = () => {
+                this.labSpeed = 0;
+                this.labComfort = 100;
+                const lblSpd = document.getElementById('lbl-lab-speed');
+                const lblCmf = document.getElementById('lbl-lab-comfort');
+                if (lblSpd) lblSpd.innerText = '0 km/s';
+                if (lblCmf) {
+                    lblCmf.innerText = '%100';
+                    lblCmf.style.color = '#4ade80';
+                }
+                if (typeof audio !== 'undefined' && audio.playAirBrake) audio.playAirBrake();
+                if (typeof audio !== 'undefined' && audio.playSuccess) audio.playSuccess();
+                const msg = "Harikulade bir ipek fren! Gazı erkenden kestin, yumuşakça süzülerek durdun. Yolcular ayakta bile sarsılmadı. İşte yüzde yüz Konfor Formülü budur!";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("✨ İpek Fren: %100 Konfor (+75 XP Primi)", "success");
+            };
+        }
+
+        // 3. Kneeling
+        const btnKneeling = document.getElementById('btn-lab-kneeling');
+        if (btnKneeling) {
+            btnKneeling.onclick = () => {
+                this.labKneeling = true;
+                if (typeof audio !== 'undefined' && audio.playKneeling) audio.playKneeling();
+                const lblRamp = document.getElementById('lbl-lab-ramp-status');
+                if (lblRamp) lblRamp.innerText = '🦼 Otobüs Sağa Yattı (Kaldırım Seviyesinde)';
+                const msg = "Otobüs sağ körüklerini indirerek kaldırım seviyesine eğildi. Şimdi rampayı açabilirsin kaptan!";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⬇️ Kneeling: Otobüs Kaldırıma Eğildi", "info");
+            };
+        }
+
+        // Rampa Aç
+        const btnRamp = document.getElementById('btn-lab-ramp');
+        if (btnRamp) {
+            btnRamp.onclick = () => {
+                this.labRampOpen = true;
+                if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
+                const lblRamp = document.getElementById('lbl-lab-ramp-status');
+                if (lblRamp) lblRamp.innerText = '✅ Rampa Açık (Yolcu bindi!)';
+                const msg = "Engelli rampası açıldı. Yolcumuz sesleniyor: Çok teşekkür ederim Ümit kaptanım, iyi ki varsınız! Yolcumuz güvenle bindi.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛹 Rampa Açıldı: Yolcu Bindi (+50 XP)", "success");
+            };
+        }
+
+        // Rampa Kapat
+        const btnRampClose = document.getElementById('btn-lab-ramp-close');
+        if (btnRampClose) {
+            btnRampClose.onclick = () => {
+                this.labRampOpen = false;
+                this.labKneeling = false;
+                if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
+                if (typeof audio !== 'undefined' && audio.playSuccess) audio.playSuccess();
+                const lblRamp = document.getElementById('lbl-lab-ramp-status');
+                if (lblRamp) lblRamp.innerText = '⚪ Normal Sürüş Yüksekliği';
+                const msg = "Rampa toplandı, araç normal sürüş yüksekliğine döndü. Erişilebilirlik protokolü başarıyla tamamlandı!";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⬆️ Rampa Kapandı, Otobüs Doğruldu", "info");
+            };
+        }
+
+        // 4. Arka Kapı
+        const btnRear = document.getElementById('btn-lab-door-rear');
+        if (btnRear) {
+            btnRear.onclick = () => {
+                this.labRearDoor = true;
+                if (typeof audio !== 'undefined' && audio.playDoorOpen) audio.playDoorOpen();
+                const lblDoor = document.getElementById('lbl-lab-door-status');
+                if (lblDoor) lblDoor.innerText = '⚠️ Kapılar Açık (Gaz Kilidi Devrede)';
+                const msg = "Arka kapı açıldı. İnen yolcular güvenle tahliye ediliyor: İnecek var kaptanım, teşekkürler!";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚪 Arka Kapı Açıldı: İnenler İniyor", "info");
+            };
+        }
+
+        // Ön Kapı
+        const btnFront = document.getElementById('btn-lab-door-front');
+        if (btnFront) {
+            btnFront.onclick = () => {
+                this.labFrontDoor = true;
+                if (typeof audio !== 'undefined' && audio.playDoorOpen) audio.playDoorOpen();
+                const lblDoor = document.getElementById('lbl-lab-door-status');
+                if (lblDoor) lblDoor.innerText = '⚠️ Kapılar Açık (Gaz Kilidi Devrede)';
+                const msg = "Ön kapı açıldı. Yeni yolcular biniyor: Kart basıldı bip bip, kolay gelsin kaptan!";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🚪 Ön Kapı Açıldı: Yolcular Bindi", "info");
+            };
+        }
+
+        // Kapıları Kapat
+        const btnDoorClose = document.getElementById('btn-lab-door-close');
+        if (btnDoorClose) {
+            btnDoorClose.onclick = () => {
+                this.labFrontDoor = false;
+                this.labRearDoor = false;
+                if (typeof audio !== 'undefined' && audio.playDoorClose) audio.playDoorClose();
+                const lblDoor = document.getElementById('lbl-lab-door-status');
+                if (lblDoor) lblDoor.innerText = '✅ Kapılar Kapalı (Güvenli)';
+                const msg = "Tüm kapılar kapandı ve kilitlendi. Güvenlik kilidi çözüldü, sefere devam edebilirsiniz.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔒 Kapılar Kilitlendi (Gaz Aktif)", "success");
+            };
+        }
+
+        // 5. Retarder
+        const btnRetarder = document.getElementById('btn-lab-retarder');
+        if (btnRetarder) {
+            btnRetarder.onclick = () => {
+                this.labRetarderActive = !this.labRetarderActive;
+                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                const lblRet = document.getElementById('lbl-lab-retarder-status');
+                if (this.labRetarderActive) {
+                    if (lblRet) lblRet.innerText = '⚡ Retarder Devrede (Hız 50 km/s Sabitlendi)';
+                    const msg = "Manyetik retarder devrede! Balatalara dokunmadan, sürtünmesiz motor freniyle hızımız 50'ye sabitlendi. Balatalar soğuk, yolcular güvende!";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⚡ Retarder Devrede (0 Balata Aşınması)", "success");
+                } else {
+                    if (lblRet) lblRet.innerText = '⚪ Retarder Kapalı';
+                    const msg = "Retarder devreden çıkarıldı.";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                }
+            };
+        }
+    }
+
+    // =========================================================================
+    // KAPTANLIK SERÜVENİ & YOL ARKADAŞI (NOT KORKUSU VE SINAV STRESİ YOK!)
+    // =========================================================================
+    renderKaptanlikSeruveni() {
+        const seruvenContainer = document.getElementById('tutorial-seruven-container') || document.getElementById('tutorial-karne-container');
+        if (!seruvenContainer) return;
 
         const level = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
         const xp = (typeof Game !== 'undefined' && Game.playerXP) ? Game.playerXP : 0;
         const tasks = (typeof Game !== 'undefined' && Game.completedTasks) ? Game.completedTasks : 0;
-        const title = (typeof Game !== 'undefined' && typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
+        const title = (typeof Game !== 'undefined' && typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer Sürücü';
         const nextXP = (typeof Game !== 'undefined' && typeof Game.getNextLevelXP === 'function') ? Game.getNextLevelXP(level) : 250;
         const unlockTeaser = (typeof Game !== 'undefined' && typeof Game.getUnlockTeaser === 'function') ? Game.getUnlockTeaser(level) : "Seviye 3'te BMC Neocity 10M açılacak!";
 
-        // Pedagojik Öğretmen Değerlendirmesi
-        let teacherFeedback = "";
+        // Sıcak, samimi, cesaretlendirici yol arkadaşı mentor tavsiyeleri (Sınav veya not dili YOK)
+        let companionAdvice = "";
         if (level < 3) {
-            teacherFeedback = "Öğretmen Değerlendirmesi: Sevgili Kaptanım, sürüş yolculuğunuzun başındasınız. Mahalle hatlarında duraklara yumuşak yanaşmaya, kapı kontrollerine ve pusulaya odaklanınız. Sebat ve gayretiniz sizi büyük bir kaptan yapacaktır.";
+            companionAdvice = "Kaptanım harika gidiyorsun! Şu an yolculuğunun en keyifli keşif dönemindesin. Duraklara tatlı bir süzülüşle yanaşman ve yolcuları güler yüzle karşılaman tam bir centilmenlik örneği. Sebatla sürdükçe yeni araçlar filona katılacak!";
         } else if (level < 6) {
-            teacherFeedback = "Öğretmen Değerlendirmesi: Temel sürüş refleksleriniz çok iyi gelişiyor. Engelli rampasını özenle kullanmanız ve kasislerde hızınızı 30'un altına düşürmeniz yolcu memnuniyetini zirveye taşıyor.";
+            companionAdvice = "Direksiyon hakimiyetin göz dolduruyor kaptan! Engelli rampasını özenle açman ve kasislerde ipek fren yapman yolcuların gönlünde taht kurdu. Şehir içi hatların aranan kaptanı oldun!";
         } else if (level < 10) {
-            teacherFeedback = "Öğretmen Değerlendirmesi: Artık deneyimli bir şehir içi kaptanısınız! Körüklü otobüs ve zorlu ring hatlarında dakikliği koruyarak yakında Şehirlerarası Uzun Yol ve Mercedes Travego brövesini almaya hak kazanacaksınız.";
+            companionAdvice = "Vay be, artık tecrübeli bir şehir içi başkaptanı oldun! Körüklü otobüste gösterdiğin ustalık takdire şayan. Çok yakında otoyollara çıkacak ve Mercedes Travego'nun direksiyonuna geçeceksin!";
         } else {
-            teacherFeedback = "Öğretmen Değerlendirmesi: Tebrikler Usta Kaptan! Şehirlerarası uzun yol etapları ve Türkiye Turnesi koridorlarında örnek bir kaptanlık sergiliyorsunuz. Tüm araç filosu emrinizde.";
+            companionAdvice = "Efsane bir Usta Kaptansın! Şehirlerarası uzun yol koridorlarında ve Türkiye Turnesi rotalarında tecrübenle parlıyorsun. Tüm yollar, duraklar ve filodaki dev otobüsler seninle gurur duyuyor!";
         }
 
         const xpPercent = Math.min(100, Math.round((xp / nextXP) * 100));
 
-        karneContainer.innerHTML = `
-            <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 78, 59, 0.4)); border: 2px solid #10b981; border-radius: 12px; padding: 20px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(16, 185, 129, 0.3); padding-bottom: 12px; margin-bottom: 16px;">
+        seruvenContainer.innerHTML = `
+            <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 78, 59, 0.45)); border: 2px solid #eab308; border-radius: 12px; padding: 22px; box-shadow: 0 0 24px rgba(234, 179, 8, 0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(234, 179, 8, 0.3); padding-bottom: 12px; margin-bottom: 16px;">
                     <div>
-                        <span style="font-size: 0.85rem; color: #a7f3d0; text-transform: uppercase; letter-spacing: 1px;">Mikyas Akademi Şoförlük Karnesi</span>
-                        <h3 style="color: #34d399; font-size: 1.5rem; margin: 4px 0 0 0;">🎖️ Seviye ${level} - ${title}</h3>
+                        <span style="font-size: 0.82rem; color: #fde047; text-transform: uppercase; letter-spacing: 1px;">Mikyas Akademi Yol Arkadaşı & Macera Günlüğü</span>
+                        <h3 style="color: #facc15; font-size: 1.55rem; margin: 4px 0 0 0;">🌟 Seviye ${level} - ${title}</h3>
                     </div>
-                    <button id="btn-karne-read-speech" class="modern-btn nav-item" style="padding: 10px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #34d399; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Gelişim karnemi ve öğretmen değerlendirmesini sesli dinle">
-                        🔊 Karnemi Sesli Dinle
+                    <button id="btn-seruven-read-speech" class="modern-btn nav-item" style="padding: 10px 18px; background: linear-gradient(135deg, #d97706, #b45309); border: 1.5px solid #facc15; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Kaptanlık serüvenimi ve yol arkadaşı tavsiyelerini sesli dinle">
+                        🔊 Serüvenimi Dinle
                     </button>
                 </div>
 
-                <!-- İlerleme Çubukları -->
-                <div style="margin-bottom: 16px;">
+                <!-- Tecrübe ve İlerleme Çubuğu -->
+                <div style="margin-bottom: 18px;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 6px; color: #e2e8f0;">
-                        <span>Kazanılan Tecrübe (XP): <strong>${xp} / ${nextXP} XP</strong></span>
-                        <span style="color: #38bdf8; font-weight: bold;">%${xpPercent}</span>
+                        <span>Kazanılan Tecrübe & Keşif: <strong>${xp} / ${nextXP} XP</strong></span>
+                        <span style="color: #facc15; font-weight: bold;">%${xpPercent}</span>
                     </div>
                     <div style="height: 12px; background: rgba(0,0,0,0.5); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-                        <div style="height: 100%; width: ${xpPercent}%; background: linear-gradient(90deg, #10b981, #38bdf8); transition: width 0.3s ease;"></div>
+                        <div style="height: 100%; width: ${xpPercent}%; background: linear-gradient(90deg, #eab308, #38bdf8); transition: width 0.3s ease;"></div>
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px;">
                     <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
-                        <span style="color: #94a3b8; font-size: 0.85rem; display: block;">Tamamlanan Seferler</span>
-                        <strong style="color: #facc15; font-size: 1.3rem;">${tasks} Sefer</strong>
+                        <span style="color: #94a3b8; font-size: 0.85rem; display: block;">Başarıyla Tamamlanan Seferler</span>
+                        <strong style="color: #4ade80; font-size: 1.3rem;">${tasks} Sefer</strong>
                     </div>
                     <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
-                        <span style="color: #94a3b8; font-size: 0.85rem; display: block;">Gelecek Aşama Kilidi</span>
+                        <span style="color: #94a3b8; font-size: 0.85rem; display: block;">Sıradaki Otobüs / Hat Keşfi</span>
                         <strong style="color: #38bdf8; font-size: 1rem;">${unlockTeaser}</strong>
                     </div>
                 </div>
 
-                <!-- Öğretmen Tavsiyesi Kutusu -->
-                <div style="background: rgba(16, 185, 129, 0.12); border-left: 4px solid #10b981; padding: 14px 16px; border-radius: 0 8px 8px 0; margin-bottom: 8px;">
-                    <div style="font-weight: bold; color: #a7f3d0; margin-bottom: 4px; font-size: 0.95rem;">👨‍🏫 Öğretmen Vizyonu ve Pedagojik Rehberlik:</div>
-                    <p style="color: #e2e8f0; font-size: 0.92rem; line-height: 1.45; margin: 0;">${teacherFeedback}</p>
+                <!-- Samimi Yol Arkadaşı Kutusu (Sınav veya not dili YOK) -->
+                <div style="background: rgba(234, 179, 8, 0.12); border-left: 4px solid #eab308; padding: 14px 16px; border-radius: 0 8px 8px 0;">
+                    <div style="font-weight: bold; color: #fde047; margin-bottom: 4px; font-size: 1rem;">👨‍✈️ Ümit Kaptan'dan Yol Arkadaşı Tavsiyeleri:</div>
+                    <p style="color: #f1f5f9; font-size: 0.94rem; line-height: 1.5; margin: 0;">${companionAdvice}</p>
                 </div>
             </div>
         `;
 
-        const btnReadKarne = document.getElementById('btn-karne-read-speech');
-        if (btnReadKarne) {
-            btnReadKarne.addEventListener('click', () => {
-                const speechKarne = `Mikyas Kaptanlık Akademisi Gelişim Karneniz. Mevcut seviyeniz ${level}, unvanınız ${title}. Toplam tecrübeniz ${xp} puan. Gelecek seviye için gereken puan ${nextXP}. Tamamlanan sefer sayısı ${tasks}. ${unlockTeaser}. ${teacherFeedback}`;
+        const btnRead = document.getElementById('btn-seruven-read-speech');
+        if (btnRead) {
+            btnRead.addEventListener('click', () => {
+                const speechText = `Kaptanlık Serüveniniz ve Macera Günlüğünüz. Mevcut dereceniz Seviye ${level}, ${title}. Toplam tecrübeniz ${xp} puan. Gelecek seviye için ${nextXP} puan gerekiyor. Tamamlanan sefer sayısı ${tasks}. ${unlockTeaser}. ${companionAdvice}`;
                 if (typeof audio !== 'undefined' && audio.speak) {
                     audio.stopSpeech();
-                    audio.speak(speechKarne);
+                    audio.speak(speechText);
                 }
             });
         }
@@ -506,8 +912,14 @@ class VoiceAssistant {
         const tabS4 = document.getElementById('tab-acad-stage4');
         if (tabS4) tabS4.addEventListener('click', () => this.setAcademyTab('stage4'));
 
-        const tabKarne = document.getElementById('tab-acad-karne');
-        if (tabKarne) tabKarne.addEventListener('click', () => this.setAcademyTab('karne'));
+        const tabLab = document.getElementById('tab-acad-lab');
+        if (tabLab) tabLab.addEventListener('click', () => this.setAcademyTab('lab'));
+
+        const tabKarne = document.getElementById('tab-acad-karne') || document.getElementById('tab-acad-seruven');
+        if (tabKarne) tabKarne.addEventListener('click', () => this.setAcademyTab('seruven'));
+
+        const tabSeruven = document.getElementById('tab-acad-seruven');
+        if (tabSeruven) tabSeruven.addEventListener('click', () => this.setAcademyTab('seruven'));
 
         this.updateCopilotButtonText();
     }
