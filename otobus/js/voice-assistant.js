@@ -266,6 +266,13 @@
                 }
             }
         }
+        if (command.includes("saray ekspres") || command.includes("ekspres saray") || command.includes("62") || command.includes("altmış iki") || command.includes("direkt saray")) {
+            audio.speak("Süleymanpaşa Saray 62 kilometre direkt ekspres seferi başlatılıyor.");
+            if (typeof Game !== 'undefined' && Game.startRoute) {
+                Game.startRoute("hat_saray_ekspres");
+                return;
+            }
+        }
         if (command.includes("saray") || command.includes("26") || command.includes("yirmi altı") || command.includes("226") || command.includes("iki yüz yirmi altı")) {
             audio.speak("TEKULAŞ 26 numaralı Süleymanpaşa Saray hattı devreye alınıyor.");
             if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
