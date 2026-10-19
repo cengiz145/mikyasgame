@@ -712,12 +712,33 @@ class VoiceAssistant {
             }
         }
 
+        // PEDAGOJİK SEVİYE KONTROLÜ HELPER
+        const checkVoiceRouteAccess = (routeId) => {
+            if (typeof Game !== 'undefined' && typeof Game.isRouteAccessible === 'function') {
+                const res = Game.isRouteAccessible(routeId);
+                if (!res.allowed) {
+                    if (typeof audio !== 'undefined' && audio.playWarning) {
+                        try { audio.playWarning(); } catch(e) {}
+                    }
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak(res.reason);
+                    }
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast(res.reason, "warning");
+                    }
+                    return false;
+                }
+            }
+            return true;
+        };
+
         // --- ŞEHİR İÇİ ANA ARTER HATTI (HAT 2/7) ---
         if (command.includes("2/7") || command.includes("iki yedi") || command.includes("yüzüncü yıl") || command.includes("tepekent") || command.includes("araştırma hastane")) {
             const isDonus = command.includes("dönüş") || command.includes("geri");
             const targetId = isDonus ? "tekulas_152_2_7_donus" : "tekulas_152_2_7";
             const r2_7 = (typeof routesData !== 'undefined' && routesData[targetId]) || (typeof window !== 'undefined' && window.getTekulasLineById && window.getTekulasLineById(targetId));
             if (r2_7) {
+                if (!checkVoiceRouteAccess(r2_7.id)) return;
                 if (typeof routesData !== 'undefined') routesData[r2_7.id] = r2_7;
                 audio.speak("TEKULAŞ Hat 2/7 " + (isDonus ? "Tepekent Yüzüncü Yıl dönüş" : "Yüzüncü Yıl Tepekent gidiş") + " ana arter hattı başlatılıyor. 43 duraklık güzergah devrede.");
                 Game.startRoute(r2_7.id);
@@ -766,6 +787,7 @@ class VoiceAssistant {
             if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
                 const r48 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "48");
                 if (r48) {
+                    if (!checkVoiceRouteAccess(r48.id)) return;
                     routesData[r48.id] = r48;
                     Game.startRoute(r48.id);
                     return;
@@ -777,6 +799,7 @@ class VoiceAssistant {
             if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
                 const r26 = ilceRotalari["Tekirdağ"].find(r => r.hatNo === "26");
                 if (r26) {
+                    if (!checkVoiceRouteAccess(r26.id)) return;
                     routesData[r26.id] = r26;
                     routesData["hat_26_suleymanpasa_saray"] = r26;
                     Game.startRoute(r26.id);
@@ -794,6 +817,7 @@ class VoiceAssistant {
         if (command.includes("saray ekspres") || command.includes("ekspres saray") || command.includes("62") || command.includes("altmış iki") || command.includes("direkt saray")) {
             audio.speak("Süleymanpaşa Saray 62 kilometre direkt ekspres seferi başlatılıyor.");
             if (typeof Game !== 'undefined' && Game.startRoute) {
+                if (!checkVoiceRouteAccess("hat_saray_ekspres")) return;
                 Game.startRoute("hat_saray_ekspres");
                 return;
             }

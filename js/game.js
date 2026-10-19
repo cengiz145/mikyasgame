@@ -524,7 +524,68 @@ const Game = {
         }
     },
 
+    isRouteAccessible: function(routeId) {
+        const route = (typeof routesData !== 'undefined' && routesData[routeId]) ? routesData[routeId] : null;
+        if (!route) {
+            return { allowed: true };
+        }
+
+        const completed = (typeof this.completedTasks === 'number') ? this.completedTasks : 0;
+        const currentLic = (typeof this.licenseLevel === 'number') ? this.licenseLevel : 1;
+
+        // 1. Sıralı Görev Kontrolü: Görev N tamamlanmadan Görev N+1 kesinlikle açılamaz
+        if (typeof route.taskIndex === 'number') {
+            if (route.taskIndex > completed) {
+                const activeTaskNumber = completed + 1;
+                const requestedTaskNumber = route.taskIndex + 1;
+                return {
+                    allowed: false,
+                    reason: `Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Görev ${requestedTaskNumber} henüz kilitlidir. Lütfen önce Görev ${activeTaskNumber}'i başarıyla tamamlayın.`
+                };
+            }
+        }
+
+        // 2. Ehliyet / Lisans Seviyesi Kontrolü
+        if (typeof route.licenseLevel === 'number' && route.licenseLevel > currentLic) {
+            return {
+                allowed: false,
+                reason: `Bu seviye için ${route.licenseLevel}. Seviye ehliyet gereklidir. Mevcut seviyeniz: ${currentLic}. Lütfen önceki seviyeleri tamamlayın.`
+            };
+        }
+
+        // 3. Şehirlerarası & İlçe Seferleri Koruması (10 Seviye Kuralı)
+        const isIntercity = !!route.isIntercity;
+        const isDistrict = !!(route.isDistrict || route.district === 'İlçeler Arası' || (route.district && route.district !== 'Süleymanpaşa'));
+        
+        if ((isIntercity || isDistrict) && !this.hasPassedLevel10()) {
+            return {
+                allowed: false,
+                reason: `Mikyas Kaptanlık Akademisi Kuralı: Şehirlerarası ve ilçe seviyelerine geçebilmek için önce 1. Seviye Şehir İçi Seferlerini (10 Görevi) tamamlamalısınız! Mevcut tamamlanan: ${completed} / 10 görev.`
+            };
+        }
+
+        return { allowed: true };
+    },
+
     startRoute: function(routeId) {
+        // PEDAGOJİK SEVİYE KORUMASI: Bir seviye tamamlanmadan diğer seviyelere başlanamaz!
+        const accessCheck = this.isRouteAccessible(routeId);
+        if (!accessCheck.allowed) {
+            if (typeof audio !== 'undefined' && audio.playWarning) {
+                try { audio.playWarning(); } catch(e) {}
+            }
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak(accessCheck.reason);
+            }
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(accessCheck.reason, 'warning');
+            }
+            if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+                audio.updateNvdaLiveRegion(accessCheck.reason);
+            }
+            return false;
+        }
+
         // VELİMEŞE İLÇE SINIR KORUMASI: Velimeşe modundaysa dışarı çıkış kapalıdır!
         if (this.isVelimeseLocked) {
             const nextRoute = (typeof routesData !== 'undefined' && routesData[routeId]) || null;
