@@ -3,6 +3,7 @@
    Mikyas Simülasyon Dünyası - İki Ana Kategoriye Ayrılmış Sistem:
    1. AÇILMIŞ BAŞARILAR (Kazanılanlar / Gurur Tablosu)
    2. AÇILMAYANLAR (Gizemli Mühürlü Başarılar / Sır Odası)
+   + RASTGELE GİZEMLİ HEDEF ÖNERİSİ ("Bunu açarken kazara diğerlerini de aç!")
    %100 Ekran Okuyucu (NVDA) Uyumlu, Sayfalamalı ve Tam Erişilebilir
    ========================================================================== */
 
@@ -14,6 +15,7 @@ const DriverBadges = {
     searchQuery: '',
     currentPage: 1,
     pageSize: 30,
+    currentSuggestedBadge: null,
 
     mysteryClues: {
     "sefer_azmi": "Trakya yollarında kontak kapatmadan seferden sefere koşan azimli kaptanların mührü...",
@@ -158,6 +160,35 @@ const DriverBadges = {
         return true;
     },
 
+    // --- RASTGELE GİZEMLİ HEDEF SEÇİCİ ---
+    pickRandomMysteryBadge: function(announce = false) {
+        const data = this.getBadgesData();
+        let locked = this.badges.filter(b => !(data[b.id] && data[b.id].unlocked));
+
+        if (this.currentTier !== 'all') {
+            const tierFiltered = locked.filter(b => b.tier === parseInt(this.currentTier));
+            if (tierFiltered.length > 0) locked = tierFiltered;
+        }
+
+        if (locked.length === 0) {
+            this.currentSuggestedBadge = null;
+            return null;
+        }
+
+        const rand = locked[Math.floor(Math.random() * locked.length)];
+        this.currentSuggestedBadge = rand;
+
+        if (announce && typeof audio !== 'undefined') {
+            if (typeof audio.playSwitchClick === 'function') audio.playSwitchClick();
+            const clue = this.mysteryClues[rand.stat] || 'Trakya yollarında direksiyon salladıkça mühür çözülecek.';
+            const msg = `Kaptan, yeni gizemli hedefin: Başarı No ${rand.difficulty} ${rand.title}. Şart: ${rand.requirement}. İpucu: ${clue}. Yola çıkarken bu hedefi gözet, belki kazara başka mühürleri de kırarsın!`;
+            if (audio.speak) audio.speak(msg);
+            if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
+        }
+
+        return rand;
+    },
+
     // --- SEFER SONU 1500 BAŞARI OTOMATİK KONTROLÜ ---
     checkAfterRoute: function(stats) {
         if (!stats || !stats.isSuccess) return [];
@@ -269,17 +300,25 @@ const DriverBadges = {
 
         modal.classList.remove('hidden');
 
-        // Eğer henüz kazanılan başarı yoksa doğrudan Açılmayanlar gizemli sekmesine geç
         const unlockedCount = this.getUnlockedCount();
         this.currentTab = (unlockedCount > 0) ? 'unlocked' : 'locked';
         this.currentPage = 1;
+
+        if (this.currentTab === 'locked') {
+            this.pickRandomMysteryBadge(false);
+        }
+
         this.renderModal();
 
         const totalCount = this.badges.length;
         const lockedCount = totalCount - unlockedCount;
         const currentTabName = (this.currentTab === 'unlocked') ? 'Açılmış Başarılar' : 'Açılmayan Gizemli Başarılar';
 
-        const welcomeSpeech = `Başarılar menüsü açıldı. Şu an ${currentTabName} sekmesindesiniz. Toplam ${totalCount} başarıdan ${unlockedCount} tanesi açıldı, ${lockedCount} tanesi mühürlü bekliyor. Sekmeler arasında Tab tuşu ile geçiş yapabilirsiniz. Kapatmak için Esc tuşuna basınız.`;
+        let welcomeSpeech = `Başarılar menüsü açıldı. Şu an ${currentTabName} sekmesindesiniz. Toplam ${totalCount} başarıdan ${unlockedCount} tanesi açıldı, ${lockedCount} tanesi mühürlü bekliyor.`;
+
+        if (this.currentTab === 'locked' && this.currentSuggestedBadge) {
+            welcomeSpeech += ` Bugün senin için seçilen rastgele gizemli hedef: No ${this.currentSuggestedBadge.difficulty}, ${this.currentSuggestedBadge.title}. Nasıl açılır: ${this.currentSuggestedBadge.requirement}. Bu hedefi kovalarken kazara diğer başarıları da açabilirsin!`;
+        }
 
         if (typeof audio !== 'undefined') {
             if (typeof audio.playSwitchClick === 'function') audio.playSwitchClick();
@@ -320,6 +359,7 @@ const DriverBadges = {
 
         const tabUnlockedBtn = document.getElementById('tab-badges-unlocked');
         const tabLockedBtn = document.getElementById('tab-badges-locked');
+        const randomTargetBox = document.getElementById('random-mystery-target-box');
 
         if (!listEl) return;
         listEl.innerHTML = '';
@@ -349,6 +389,9 @@ const DriverBadges = {
                 tabLockedBtn.style.color = '#94a3b8';
                 tabLockedBtn.style.boxShadow = 'none';
             }
+            if (randomTargetBox) {
+                randomTargetBox.style.display = 'none';
+            }
         } else {
             if (tabLockedBtn) {
                 tabLockedBtn.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.35), rgba(126, 34, 206, 0.2))';
@@ -361,6 +404,60 @@ const DriverBadges = {
                 tabUnlockedBtn.style.borderColor = 'rgba(255, 255, 255, 0.15)';
                 tabUnlockedBtn.style.color = '#94a3b8';
                 tabUnlockedBtn.style.boxShadow = 'none';
+            }
+
+            // RASTGELE GİZEMLİ HEDEF KUTUSUNU GÖSTER
+            if (randomTargetBox) {
+                if (!this.currentSuggestedBadge || this.isUnlocked(this.currentSuggestedBadge.id)) {
+                    this.pickRandomMysteryBadge(false);
+                }
+
+                if (this.currentSuggestedBadge) {
+                    const r = this.currentSuggestedBadge;
+                    const clue = this.mysteryClues[r.stat] || 'Trakya yollarında direksiyon salladıkça mühür çözülecek.';
+                    randomTargetBox.style.display = 'block';
+                    randomTargetBox.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.4rem;">🎯</span>
+                                <span style="font-size: 1.05rem; font-weight: bold; color: #facc15;">
+                                    Günün Gizemli Hedefi (Rastgele Öneri)
+                                </span>
+                            </div>
+                            <button id="btn-reroll-mystery-target" class="modern-btn nav-item" style="padding: 5px 12px; font-size: 0.85rem; background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #e9d5ff; cursor: pointer; border-radius: 6px;" aria-label="Başka bir rastgele gizemli hedef öner">
+                                🎲 Başka Bir Hedef Öner
+                            </button>
+                        </div>
+                        <div style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 6px;">
+                            <strong style="color: #c084fc;">No #${r.difficulty} • ${r.tierName}:</strong> 
+                            <span style="color: #fef08a; font-weight: bold;">${r.title}</span> 
+                            <span style="font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; margin-left: 6px;">${r.category}</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; margin-bottom: 6px;">
+                            🔮 "${clue}"
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div style="color: #38bdf8;">
+                                🎯 <strong>Nasıl Açılır:</strong> ${r.requirement}
+                            </div>
+                            <div style="color: #a78bfa; font-size: 0.8rem; font-weight: 500;">
+                                💡 Bu hedefi kovalarken kazara diğer başarıları da açabilirsin!
+                            </div>
+                        </div>
+                    `;
+
+                    setTimeout(() => {
+                        const btnReroll = document.getElementById('btn-reroll-mystery-target');
+                        if (btnReroll) {
+                            btnReroll.onclick = () => {
+                                this.pickRandomMysteryBadge(true);
+                                this.renderModal();
+                            };
+                        }
+                    }, 50);
+                } else {
+                    randomTargetBox.style.display = 'none';
+                }
             }
         }
 
@@ -404,7 +501,6 @@ const DriverBadges = {
         if (btnPrev) btnPrev.disabled = (this.currentPage <= 1);
         if (btnNext) btnNext.disabled = (this.currentPage >= totalPages);
 
-        // Sayfa dilimi
         const startIndex = (this.currentPage - 1) * this.pageSize;
         const pageItems = filtered.slice(startIndex, startIndex + this.pageSize);
 
@@ -473,7 +569,6 @@ const DriverBadges = {
             else if (badge.tier === 5) tierColor = '#a855f7';
 
             if (isUn) {
-                // AÇILMIŞ BAŞARI TASARIMI (Altın ve Zafer Parlaması)
                 btn.style.border = '2px solid #eab308';
                 btn.style.background = 'linear-gradient(135deg, rgba(234, 179, 8, 0.18), rgba(202, 138, 4, 0.08))';
                 btn.style.boxShadow = '0 0 12px rgba(234, 179, 8, 0.15)';
@@ -524,12 +619,10 @@ const DriverBadges = {
                     }
                 };
             } else {
-                // AÇILMAYAN GİZEMLİ BAŞARI TASARIMI (Mühürlü ve Kriptik)
                 btn.style.border = '1px dashed rgba(168, 85, 247, 0.35)';
                 btn.style.background = 'linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 27, 75, 0.4))';
                 btn.style.opacity = '0.92';
 
-                // Gizemli başlık ve ipucu mantığı
                 const mysteryClueText = this.mysteryClues[badge.stat] || 'Trakya yollarında direksiyon salladıkça bu mühür çözülecek...';
                 const mysteryTitle = (badge.tier >= 4)
                     ? `🔒 ??? (Gizemli Mühür #${badge.difficulty})`
@@ -622,7 +715,6 @@ const DriverBadges = {
             btnClose.addEventListener('click', () => this.closeModal());
         }
 
-        // İki ana sekme: Açılmış Başarılar ve Açılmayanlar
         const tabUnlocked = document.getElementById('tab-badges-unlocked');
         const tabLocked = document.getElementById('tab-badges-locked');
 
@@ -638,23 +730,25 @@ const DriverBadges = {
         if (tabLocked) tabLocked.addEventListener('click', () => {
             this.currentTab = 'locked';
             this.currentPage = 1;
+            if (!this.currentSuggestedBadge || this.isUnlocked(this.currentSuggestedBadge.id)) {
+                this.pickRandomMysteryBadge(false);
+            }
             this.renderModal();
             if (typeof audio !== 'undefined' && audio.speak) {
                 audio.speak("Açılmayan gizemli başarılar sekmesine geçildi.");
             }
         });
 
-        // Zorluk filtresi
         const tierSelect = document.getElementById('badge-tier-select');
         if (tierSelect) {
             tierSelect.addEventListener('change', (e) => {
                 this.currentTier = e.target.value;
                 this.currentPage = 1;
+                this.pickRandomMysteryBadge(false);
                 this.renderModal();
             });
         }
 
-        // Arama kutusu
         const searchInput = document.getElementById('badge-search-input');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
@@ -664,14 +758,12 @@ const DriverBadges = {
             });
         }
 
-        // Sayfalama butonları
         const btnPrev = document.getElementById('btn-badge-prev-page');
         const btnNext = document.getElementById('btn-badge-next-page');
 
         if (btnPrev) btnPrev.addEventListener('click', () => this.prevPage());
         if (btnNext) btnNext.addEventListener('click', () => this.nextPage());
 
-        // Klavye kısayolları
         document.addEventListener('keydown', (e) => {
             const modal = document.getElementById('driver-badges-modal');
             if (!modal || modal.classList.contains('hidden')) return;
