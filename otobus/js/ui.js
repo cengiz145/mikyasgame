@@ -491,6 +491,11 @@ const UI = {
             const isCompleted = (typeof route.taskIndex === 'number' && route.taskIndex < completedTasks);
             const isFuture = (typeof route.taskIndex === 'number' && route.taskIndex > completedTasks);
 
+            const access = (typeof Game !== 'undefined' && typeof Game.isRouteAccessible === 'function')
+                ? Game.isRouteAccessible(route.id)
+                : { allowed: !isFuture };
+            const isLocked = !access.allowed || isFuture;
+
             const li = document.createElement("li");
             li.style.marginBottom = "10px";
             const btn = document.createElement("button");
@@ -500,6 +505,8 @@ const UI = {
                 btnClass += " primary-btn pulse-anim";
             } else if (isCompleted) {
                 btnClass += " secondary-btn";
+            } else if (isLocked) {
+                btnClass += " locked-route";
             }
 
             btn.className = btnClass;
@@ -512,10 +519,15 @@ const UI = {
             if (isCurrentTask) {
                 btn.style.borderColor = "#38bdf8";
                 btn.style.boxShadow = "0 0 16px rgba(56, 189, 248, 0.4)";
+            } else if (isLocked) {
+                btn.style.opacity = "0.7";
+                btn.style.border = "1.5px dashed rgba(239, 68, 68, 0.5)";
+                btn.style.background = "rgba(15, 23, 42, 0.75)";
+                btn.setAttribute("aria-disabled", "true");
             }
 
             let icon = isCurrentTask ? "▶️" : (isCompleted ? "✅" : "🔒");
-            let statusText = isCurrentTask ? "(AKTİF SEFER GÖREVİ)" : (isCompleted ? "(Tamamlandı - Tekrar Sür)" : "(Kilitli)");
+            let statusText = isCurrentTask ? "(AKTİF SEFER GÖREVİ)" : (isCompleted ? "(Tamamlandı - Tekrar Sür)" : `(Kilitli - Önce Görev ${completedTasks + 1}'i Tamamlayın)`);
             
             const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
             const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Varış");
@@ -526,13 +538,21 @@ const UI = {
             const badgeHtml = '<span style="background: rgba(56,189,248,0.2); color: #38bdf8; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">' + stopCount + ' Durak | ' + totalKmRoute + ' km</span>';
             const cardSteps = (typeof MissionReader !== "undefined" && MissionReader.generateSteps) ? MissionReader.generateSteps(route) : [];
             const cardStepsHtml = cardSteps.map(s => '<div style="margin: 3px 0;">• ' + s + '</div>').join('');
-            let ariaDesc = "Görev: " + route.name + " " + statusText + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + stopCount + " durak, " + totalKmRoute + " kilometre.";
+            
+            let ariaDesc = isLocked 
+                ? ("Görev: " + route.name + " Kilitli. Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Bu seviyeye geçmek için önce Görev " + (completedTasks + 1) + " başarıyla tamamlanmalıdır. Kalkış: " + startStop + ", Varış: " + endStop + ".")
+                : ("Görev: " + route.name + " " + statusText + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + stopCount + " durak, " + totalKmRoute + " kilometre.");
             
             btn.setAttribute("aria-label", ariaDesc);
 
+            const lockedNoticeHtml = isLocked ? 
+                ('<div style="font-size: 0.88rem; color: #f87171; background: rgba(239, 68, 68, 0.12); border-left: 3px solid #ef4444; padding: 8px 12px; border-radius: 4px; margin-top: 8px;">' +
+                 '    ⛔ <strong>Pedagojik İlerleme Kuralı:</strong> Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Bu görevin kilidini açmak için önce <strong>Görev ' + (completedTasks + 1) + '</strong> seferini başarıyla tamamlamalısınız.' +
+                 '</div>') : '';
+
             btn.innerHTML = [
                 '<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 8px;">',
-                '    <strong style="color: ' + (route.color || '#38bdf8') + '; font-size: 1.15rem;">' + icon + ' ' + route.name + ' ' + statusText + '</strong>',
+                '    <strong style="color: ' + (isLocked ? '#f87171' : (route.color || '#38bdf8')) + '; font-size: 1.15rem;">' + icon + ' ' + route.name + ' ' + statusText + '</strong>',
                 '    ' + badgeHtml,
                 '</div>',
                 '<div style="font-size: 1rem; color: #f1f5f9; margin-bottom: 5px;">',
@@ -547,14 +567,21 @@ const UI = {
                 (isCurrentTask ? 
                 '<div style="font-size: 0.88rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 6px; width: 100%; border-left: 3px solid #38bdf8; margin-top: 6px;">' +
                 '    📋 <strong>Görev Adımları (A: Harita Özeti | Shift + A: Adım Adım Dinle):</strong><br>' + cardStepsHtml +
-                '</div>' : '')
+                '</div>' : ''),
+                lockedNoticeHtml
             ].join("");
 
             btn.onclick = () => {
-                if (isFuture) {
-                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
-                    if (typeof audio !== 'undefined' && audio.speak) audio.speak("Bu görev henüz kilitli. Lütfen önceki sefer görevini tamamlayın.");
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Bu görev kilitlidir. Önceki görevi tamamlayın.", "warning");
+                if (isLocked) {
+                    if (typeof audio !== 'undefined' && audio.playWarning) {
+                        try { audio.playWarning(); } catch(e) {}
+                    } else if (typeof audio !== 'undefined' && audio.playSelect) {
+                        audio.playSelect();
+                    }
+                    const msg = (access && access.reason) ? access.reason : ("Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Bu görevi açmak için lütfen önce Görev " + (completedTasks + 1) + "'i başarıyla tamamlayın.");
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Bu seviye kilitlidir. Önce Görev " + (completedTasks + 1) + "'i tamamlayın.", "warning");
+                    if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
                     return;
                 }
                 if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
@@ -616,7 +643,7 @@ const KeyboardNav = {
         
         const elements = activeContainer.querySelectorAll('.nav-item');
         elements.forEach(el => {
-            if (!el.disabled && !el.classList.contains('locked-route') && !el.classList.contains('hidden') && el.style.display !== 'none') {
+            if (!el.disabled && !el.classList.contains('hidden') && el.style.display !== 'none') {
                 this.items.push(el);
             }
         });

@@ -428,6 +428,23 @@ const AkilliRotaSistemi = {
             return false;
         }
 
+        // PEDAGOJİK SEVİYE KONTROLÜ: Akıllı rota kilitli bir seviyeyi açamaz
+        if (typeof Game !== 'undefined' && typeof Game.isRouteAccessible === 'function') {
+            const check = Game.isRouteAccessible(res.route.id);
+            if (!check.allowed) {
+                if (typeof audio !== 'undefined' && audio.playWarning) {
+                    try { audio.playWarning(); } catch(e) {}
+                }
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak(check.reason);
+                }
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast(check.reason, "warning");
+                }
+                return false;
+            }
+        }
+
         this.closeModal();
 
         const msg = `Akıllı rota hazır: ${res.fromStop} durağından ${res.toStop} durağına Hat ${res.route.hatNo} ile ${res.stopsCount} duraklık sefer başlıyor. Toplam ${res.dist} kilometre. İyi yolculuklar kaptan.`;

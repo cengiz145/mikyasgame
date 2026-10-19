@@ -338,7 +338,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     '</div>'
                 ].join('');
 
+                const access = (typeof Game !== 'undefined' && typeof Game.isRouteAccessible === 'function')
+                    ? Game.isRouteAccessible(route.id)
+                    : { allowed: true };
+
+                if (!access.allowed) {
+                    btn.classList.add('locked-route');
+                    btn.style.opacity = '0.65';
+                    btn.style.border = '1px dashed rgba(239, 68, 68, 0.5)';
+                    btn.setAttribute('aria-disabled', 'true');
+                }
+
                 btn.onclick = () => {
+                    if (!access.allowed) {
+                        if (typeof audio !== 'undefined' && audio.playWarning) {
+                            try { audio.playWarning(); } catch(e) {}
+                        }
+                        if (typeof audio !== 'undefined' && audio.speak) audio.speak(access.reason);
+                        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(access.reason, "warning");
+                        return;
+                    }
                     audio.playSelect();
                     document.getElementById('district-dest-modal').classList.add('hidden');
                     routesData[route.id] = route;
@@ -362,8 +381,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const openIntercitySelection = () => {
         if (!Game.hasPassedLevel10()) {
             audio.playSelect();
-            audio.speak("Şehirlerarası seyahat ve harita için önce şehir içi 10 seviyeyi geçmelisiniz. Mevcut seviyeniz: " + Game.licenseLevel);
-            UI.showToast("10 Seviyeyi Geçmeden Harita Açılamaz", "warning");
+            const msg = "Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Şehirlerarası seyahat için önce 1. Seviye Şehir İçi Seferlerini (10 Görevi) tamamlamalısınız. Mevcut tamamlanan: " + (Game.completedTasks || 0) + " / 10.";
+            audio.speak(msg);
+            UI.showToast("Mikyas Akademisi: 1. Seviye (10 Görev) Tamamlanmadan Şehirlerarası Sefer Açılamaz", "warning");
             return;
         }
         Game.gameMode = 'intercity';
