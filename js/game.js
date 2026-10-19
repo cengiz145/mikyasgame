@@ -103,6 +103,9 @@ const Game = {
     setActiveDistrict: function(dist) {
         this.activeDistrict = dist || "Süleymanpaşa";
         try { localStorage.setItem('activeDistrict', this.activeDistrict); } catch(e) {}
+        if (typeof generateRoutesFromAPI === 'function') {
+            generateRoutesFromAPI(null, "Tekirdağ", this.activeDistrict);
+        }
         if (typeof AkilliRotaSistemi !== 'undefined' && AkilliRotaSistemi.updateDistrictUI) {
             AkilliRotaSistemi.updateDistrictUI();
         }

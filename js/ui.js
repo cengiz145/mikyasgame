@@ -431,7 +431,8 @@ const UI = {
     renderRoutes: function(cityName, completedTasks) {
         completedTasks = (typeof completedTasks === 'number') ? completedTasks : 0;
         const titleEl = document.getElementById("route-sel-title");
-        if (titleEl) titleEl.innerText = cityName + " Sefer Görevleri (1 - 10. Seviye)";
+        const activeDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
+        if (titleEl) titleEl.innerText = `${activeDist} Sefer Görevleri (1 - 10. Seviye)`;
         
         const listEl = document.getElementById("dynamic-route-list");
         if (!listEl) return;
