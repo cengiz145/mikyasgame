@@ -1662,11 +1662,15 @@ const Game = {
             this.driftVelocity += (this.targetDriftVelocity * 1.5) * deltaTime; // Karda sürekli yalpalar
         }
 
+        let prevSpeed = this.speed;
         this.speed += currentAcceleration * deltaTime;
         if (this.speed > currentMaxSpeed && this.acceleration > 0) {
             this.speed -= 10 * deltaTime; // Yavaşça limite çek
         }
-        if (this.speed < 0) {
+        if (this.speed <= 0) {
+            if (prevSpeed > 2 && this.isBrakeKeyDown && typeof audio.playAirBrake === 'function') {
+                audio.playAirBrake();
+            }
             this.speed = 0;
         }
         
@@ -1729,6 +1733,7 @@ const Game = {
             this.lanePosition = Math.max(15, Math.min(85, this.lanePosition)); // Yolda tut
         }
 
+        if (this.speed > 5) { this.wasMovingBeforeStop = true; }
         if (this.speed > 0) {
             // GERÇEKÇİ OYUN ÖLÇEÄİ: 1 gerçek kilometre = Oyun içinde 250 metre sürüş süresi (4 kat hızlı)
             // PROFESYONEL AKUSTİK: DURACAK ZİLİ VE KOKPİT İKAZ LAMBASI (220m kala)
