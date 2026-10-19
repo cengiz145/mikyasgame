@@ -298,25 +298,26 @@ const UI = {
         if (lvlEl) lvlEl.innerText = licenseTitle;
         
         const budgetEl = document.getElementById('ui-budget');
-        if (budgetEl) budgetEl.innerText = `${budget} ₺`;
+        if (budgetEl) budgetEl.innerText = `${budget.toLocaleString('tr-TR')} ₺`;
         
         const xpText = document.getElementById('ui-xp-text');
         const xpFill = document.getElementById('ui-xp-fill');
 
-        const hasPassed10 = (completedTasks >= 10 || licenseLevel > 10);
+        const currentXP = (typeof Game !== 'undefined' && Game.playerXP) ? Game.playerXP : 0;
+        const currentLvl = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : (licenseLevel || 1);
+        const prevThreshold = (typeof Game !== 'undefined' && Game.LEVEL_XP_THRESHOLDS) ? (Game.LEVEL_XP_THRESHOLDS[currentLvl - 1] || 0) : 0;
+        const nextThreshold = (typeof Game !== 'undefined' && Game.getNextLevelXP) ? Game.getNextLevelXP(currentLvl) : 1000;
 
-        if (hasPassed10) {
-            if (xpText) xpText.innerText = `10 Seviye Geçildi! İlçe & Şehirlerarası Açık (Seviye: ${licenseLevel})`;
-            if (xpFill) xpFill.style.width = `100%`;
-        } else {
-            const currentLevelNum = Math.min(10, completedTasks + 1);
-            const remaining = 10 - completedTasks;
-            if (xpText) xpText.innerText = `Şehir İçi İlerleme: Seviye ${currentLevelNum} / 10 (${remaining} Seviye Kaldı)`;
-            if (xpFill) xpFill.style.width = `${Math.min(100, (completedTasks / 10) * 100)}%`;
+        const levelRange = Math.max(1, nextThreshold - prevThreshold);
+        const progressInLevel = Math.max(0, currentXP - prevThreshold);
+        const percent = Math.min(100, Math.round((progressInLevel / levelRange) * 100));
+
+        if (xpText) {
+            xpText.innerText = `${currentXP.toLocaleString('tr-TR')} / ${nextThreshold.toLocaleString('tr-TR')} XP (%${percent})`;
         }
-
-        this.updateTitleScreenButtons();
-        this.updateRouteScreenButtons();
+        if (xpFill) {
+            xpFill.style.width = `${percent}%`;
+        }
     },
 
     renderCityMap: function(licenseLevel, unlockedCitiesArr) {
