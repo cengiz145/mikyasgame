@@ -73,12 +73,14 @@ const Game = {
     },
 
     getUnlockTeaser: function(currentLevel) {
+        if (currentLevel < 2) return "Seviye 2'de Çevik Isuzu Novo Lux açılacak!";
         if (currentLevel < 3) return "Seviye 3'te BMC Neocity 10M açılacak!";
         if (currentLevel < 5) return "Seviye 5'te Mercedes Conecto Solo açılacak!";
         if (currentLevel < 8) return "Seviye 8'de 18 Metre Körüklü Conecto açılacak!";
+        if (currentLevel < 8) return "Seviye 8'de Efsane Mercedes O 403 açılacak!";
         if (currentLevel < 10) return "Seviye 10'da Mercedes Travego ve İlçe Karayolları açılacak!";
         if (currentLevel < 12) return "Seviye 12'de Mercedes Tourismo açılacak!";
-        if (currentLevel < 14) return "Seviye 14'te MAN Lion's Coach açılacak!";
+        if (currentLevel < 14) return "Seviye 14'te Temsa Safir Plus ve MAN Lion's Coach açılacak!";
         if (currentLevel < 16) return "Seviye 16'da Setra TopClass açılacak!";
         if (currentLevel < 20) return "Seviye 20'de Fütüristik Neoplan Cityliner açılacak!";
         return "Efsanevi Master Kaptan unvanına sahipsiniz!";
@@ -197,7 +199,7 @@ const Game = {
         } else {
             if (typeof audio !== 'undefined' && typeof audio.playLuggageBays === 'function') audio.playLuggageBays(false);
             if (lugEl) lugEl.style.display = 'none';
-            const msg = "Bagaj kapakları pnömatik olarak kilitlendi. Sefer için hazır.";
+            const msg = "Bagaj kapakları kilitlendi. Sefer için hazır.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
         }
@@ -207,13 +209,13 @@ const Game = {
         if (typeof audio !== 'undefined' && typeof audio.playIBISChime === 'function') audio.playIBISChime();
         const r = this.activeRouteData;
         if (!r) {
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak("IBIS: Aktif sefer bulunmuyor.");
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Hat Tabelası: Şu anda aktif bir sefer bulunmuyor.");
             return;
         }
         const start = r.startStop || (r.stops[0] ? r.stops[0].name : "Başlangıç");
         const end = r.endStop || (r.stops[r.stops.length - 1] ? r.stops[r.stops.length - 1].name : "Son Durak");
         const lineCode = (r.hatNo || "26").toUpperCase();
-        const msg = `IBIS Hat Bilgisayarı: Hat ${lineCode}. Güzergah: ${start} kalkışlı, ${end} varışlı. Dış LED tabela ve iç yolcu anons ekranı senkronize.`;
+        const msg = `Hat Tabelası: Hat ${lineCode}. Güzergah: ${start} kalkışlı, ${end} varışlı.`;
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
         if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
     },
@@ -705,10 +707,10 @@ const Game = {
                 '    <li style="margin-bottom: 6px;"><strong>Kalkış ve Hızlanma:</strong> <code>W</code> veya <code>Yukarı Ok</code> tuşuna basarak gaz verin ve kalkış yapın. Şeridinizi korumak için <code>A / D</code> veya <code>Sol / Sağ Ok</code> tuşlarını kullanın.</li>',
                 '    <li style="margin-bottom: 6px;"><strong>Durağa Yaklaşma ve Duracak Zili:</strong> Durağa 220 metre kala inecek yolcu varsa akustik <code>DURACAK</code> zili çalar ve kokpitte kırmızı ikaz lambası yanar. Kademeli fren ve retarder ile sarsıntısız durun.</li>',
                 '    <li style="margin-bottom: 6px;"><strong>Kneeling ve Kapılar:</strong> Araç durduğunda <code>E</code> (Ön Kapı) ve <code>Q</code> (Arka Kapı) ile kapıları açın. Araç durağa yana yatar (Kneeling). Yolcular Tekirdağ Kart basarken resmî validatör sinyallerini dinleyin.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Kaptan Telsizi ve Konfor Takibi:</strong> <code>T</code> tuşuna basarak TEKULAŞ Hareket Merkezi telsiz anonsunu dinleyin. <code>C</code> tuşuyla anlık Yolcu Konfor Endeksinizi kontrol edin.</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Kaptan Telsizi ve Konfor Takibi:</strong> <code>T</code> tuşuna basarak TEKULAŞ Hareket Merkezi telsiz anonsunu dinleyin. <code>C</code> tuşuyla yolcu memnuniyetini kontrol edin.</li>',
                 '    <li style="margin-bottom: 6px;"><strong>Görevi Başarıyla Bitirme:</strong> Sırasıyla tüm duraklara uğrayıp son durak olan <strong>' + endStop + '</strong> durağına vardığınızda görevi tamamlayıp prim kazanın!</li>',
                 '</ul>',
-                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>U</strong> Engelli Rampası | <strong>P</strong> Pnömatik Bagaj | <strong>I</strong> IBIS Hat Tabelası | <strong>Z</strong> Zamanlama | <strong>J</strong> Kayıp Eşya | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>R</strong> Hız | <strong>Shift+T</strong> Saat.</div>'
+                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>U</strong> Engelli Rampası | <strong>P</strong> Bagaj Kapağı | <strong>I</strong> Hat Tabelası | <strong>Z</strong> Zamanlama | <strong>J</strong> Kayıp Eşya | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>R</strong> Hız | <strong>Shift+T</strong> Saat.</div>'
             ].join("");
         }
 
@@ -1660,11 +1662,15 @@ const Game = {
             this.driftVelocity += (this.targetDriftVelocity * 1.5) * deltaTime; // Karda sürekli yalpalar
         }
 
+        let prevSpeed = this.speed;
         this.speed += currentAcceleration * deltaTime;
         if (this.speed > currentMaxSpeed && this.acceleration > 0) {
             this.speed -= 10 * deltaTime; // Yavaşça limite çek
         }
-        if (this.speed < 0) {
+        if (this.speed <= 0) {
+            if (prevSpeed > 2 && this.isBrakeKeyDown && typeof audio.playAirBrake === 'function') {
+                audio.playAirBrake();
+            }
             this.speed = 0;
         }
         
@@ -1727,6 +1733,7 @@ const Game = {
             this.lanePosition = Math.max(15, Math.min(85, this.lanePosition)); // Yolda tut
         }
 
+        if (this.speed > 5) { this.wasMovingBeforeStop = true; }
         if (this.speed > 0) {
             // GERÇEKÇİ OYUN ÖLÇEÄİ: 1 gerçek kilometre = Oyun içinde 250 metre sürüş süresi (4 kat hızlı)
             // PROFESYONEL AKUSTİK: DURACAK ZİLİ VE KOKPİT İKAZ LAMBASI (220m kala)

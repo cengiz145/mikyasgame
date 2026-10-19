@@ -1,0 +1,714 @@
+/* ==========================================================================
+   TÜRKİYE TURNESİ - SESLERİ GÖSTER & SES GALERİSİ (SOUND-GALLERY.JS)
+   7 Farklı Akustik Rölanti Grubu, Akbil Sesleri ve Mekanik Efektler
+   ========================================================================== */
+
+const SoundGallery = {
+    currentAudioNode: null,
+    currentGainNode: null,
+    currentHtmlAudio: null,
+    activeTimer: null,
+    countdownInterval: null,
+    remainingSeconds: 0,
+    currentlyPlayingId: null,
+    currentTab: 'all',
+
+    // Ses Listesi Veritabanı
+    sounds: [
+        // --- GRUP 1: SAF AĞIR VASITA V6 DİZEL RÖLANTİSİ (TOK TIR-TIR-TIR) ---
+        {
+            id: 'engine_pure_v6_travego',
+            category: 'engine',
+            soundGroup: 'Grup 1: Saf V6 Rölantisi',
+            title: 'Grup 1: Mercedes-Benz Travego 16 SHD (Saf Tır-Tır-Tır)',
+            busId: 'mercedes_travego_16shd',
+            icon: '⚙️',
+            specs: 'OM 470 LA Euro 6, 456 HP - Kesintisiz Saf Rölanti',
+            desc: 'Sadece motorun ritmik ve tok dizel çalışma homurtusu (tır-tır-tır-tır). Başka hiçbir yabancı ses içermez. [Setra S 516 ile ortak grup]',
+            type: 'pure_v6',
+            file: 'sounds/freesound_pure_bus_idle.mp3',
+            playbackRate: 1.0,
+            bassBoost: 4
+        },
+        // --- GRUP 2: OTOGAR PERON VE HAVA TAHLİYELİ KALKIŞ RÖLANTİSİ ---
+        {
+            id: 'engine_terminal_tourismo',
+            category: 'engine',
+            soundGroup: 'Grup 2: Otogar Peron Rölantisi',
+            title: 'Grup 2: Mercedes-Benz Tourismo (Otogar Peron & Hava Tahliyeli)',
+            busId: 'mercedes_tourismo_16rhd',
+            icon: '🛣️',
+            specs: 'OM 936 Euro 6, 354 HP - Orijinal Peron Kalkış ve Hava Tahliyeli Ses',
+            desc: 'Peronda kalkış öncesi hava tahliye tıslaması ve ardından devam eden tok uzun yol dizel rölantisi. [Scania Irizar ve Neoplan ile ortak]',
+            type: 'coach_terminal',
+            file: 'sounds/freesound_coach_idle.mp3',
+            playbackRate: 1.0,
+            bassBoost: 4
+        },
+        {
+            id: 'engine_terminal_scania',
+            category: 'engine',
+            soundGroup: 'Grup 2: Otogar Peron Rölantisi',
+            title: 'Grup 2: Scania Irizar i8 VIP (Otogar Peron Kralı)',
+            busId: 'scania_irizar_i8',
+            icon: '👑',
+            specs: 'Scania DC13 Euro 6, 490 HP - VIP Uzun Yol Rölantisi',
+            desc: '13 litrelik dev Scania motorunun hava tahliyeli güçlü otogar peron çalışması.',
+            type: 'coach_terminal',
+            file: 'sounds/freesound_coach_idle.mp3',
+            playbackRate: 0.98,
+            bassBoost: 5
+        },
+        // --- GRUP 3: EFSANE V8 ÇİFT EGZOZ DERİN BAS RÖLANTİSİ ---
+        {
+            id: 'engine_v8_o403',
+            category: 'engine',
+            soundGroup: 'Grup 3: Efsane V8 Derin Bas',
+            title: 'Grup 3: Mercedes-Benz O 403 RHD (Efsane V8 Bas)',
+            busId: 'mercedes_o403_rhd',
+            icon: '⭐',
+            specs: 'OM 442 LA V8, 381 HP - Efsanevi V8 Çift Egzoz Bas Sesi',
+            desc: '90\'ların ve 2000\'lerin kralı. Yeri göğü titreten o meşhur derin V8 çift egzoz bas homurtusu. [Temsa Safir ile ortak]',
+            type: 'v8_bass',
+            file: 'sounds/bassrolanti.mp3',
+            playbackRate: 0.91,
+            bassBoost: 7
+        },
+        // --- GRUP 4: MODERN ALÇAK TABANLI ŞEHİR İÇİ BELEDİYE & CUMMINS RÖLANTİSİ ---
+        {
+            id: 'engine_city_kent',
+            category: 'engine',
+            soundGroup: 'Grup 4: Şehir İçi Belediye Rölantisi',
+            title: 'Grup 4: Otokar Kent LF Solo (Cummins Belediye)',
+            busId: 'otokar_kent_lf',
+            icon: '🏙️',
+            specs: 'Cummins ISB6.7 Euro 6, 280 HP - Alçak Tabanlı Şehir İçi',
+            desc: 'Freesound New Bus Engine: Alçak tabanlı belediye otobüsünün durağa yanaşırken ve dururken çıkardığı Cummins turbo/dizel sesi. [BMC Neocity ile ortak]',
+            type: 'city_cummins',
+            file: 'sounds/freesound_new_bus_idle.mp3',
+            playbackRate: 1.0,
+            bassBoost: 1
+        },
+        // --- GRUP 5: 18 METRE AĞIR KÖRÜKLÜ & BÜYÜK METROPOL TRANSIT RÖLANTİSİ ---
+        {
+            id: 'engine_articulated_conecto',
+            category: 'engine',
+            soundGroup: 'Grup 5: 18m Körüklü Ağır Transit',
+            title: 'Grup 5: Mercedes-Benz Conecto G (18m Körüklü Transit Bası)',
+            busId: 'mercedes_conecto_g',
+            icon: '🚃',
+            specs: 'OM 470, 360 HP - 18 Metre Körüklü Ağır Metropol Bası',
+            desc: 'Freesound Articulated Idle: 18 metrelik ağır gövdeyi çeken 10.7 litrelik motorun devasa kütleli ve hırıltılı transit rölantisi. [Conecto Solo ile ortak]',
+            type: 'articulated',
+            file: 'sounds/freesound_articulated_idle.mp3',
+            playbackRate: 0.90,
+            bassBoost: 5
+        },
+        // --- GRUP 6: KASABA, İLÇE VE KÖY ÇEVİK MİDİBÜS DİZEL RÖLANTİSİ ---
+        {
+            id: 'engine_midibus_novo',
+            category: 'engine',
+            soundGroup: 'Grup 6: Çevik Midibüs Rölantisi',
+            title: 'Grup 6: Isuzu Novo Lux Midibüs (4 Silindir Kasaba Dizeli)',
+            busId: 'isuzu_novo_lux',
+            icon: '🚐',
+            specs: 'Isuzu 4HK1-TCS, 190 HP - 4 Silindir Japon Dizeli',
+            desc: 'Freesound Midibus Idle: Trakya köyleri ve kasaba hatlarının küçük hacimli, daha seri ve tiz vuran 4 silindirli dizel midibüs sesi.',
+            type: 'midibus',
+            file: 'sounds/freesound_midibus_idle.mp3',
+            playbackRate: 1.05,
+            bassBoost: 1
+        },
+        // --- GRUP 7: AĞIR BAVYERA D26 ENDÜSTRİYEL DİZEL RÖLANTİSİ ---
+        {
+            id: 'engine_man_d26',
+            category: 'engine',
+            soundGroup: 'Grup 7: Ağır Bavyera D26',
+            title: 'Grup 7: MAN Lion\'s Coach (470 HP Ağır Bavyera Dizeli)',
+            busId: 'man_lions_coach',
+            icon: '🦁',
+            specs: 'D2676 LOH Euro 6, 470 HP - Endüstriyel Bavyera Dizeli',
+            desc: 'Freesound Heavy Truck Idle: Sert, otoriter, doğrudan motor ızgarasından gelen kalın ve gür Bavyera dizel homurtusu.',
+            type: 'man_d26',
+            file: 'sounds/freesound_heavy_man_idle.mp3',
+            playbackRate: 0.96,
+            bassBoost: 4
+        },
+
+        // --- AKBİL VE KART OKUYUCU (VALIDATOR) SESLERİ ---
+        {
+            id: 'akbil_tam',
+            category: 'akbil',
+            title: 'Tam Akbil / Standart Biniş Onay Bipi',
+            icon: '💳',
+            specs: 'Freesound ilmari_freesound #625731 Zoom H5 Stüdyo Kaydı',
+            desc: 'Şehir içi otobüse binerken tam kart basıldığında çıkan o temiz ve net tek tonlu onay sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilTam) audio.playAkbilTam();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('tam');
+            }
+        },
+        {
+            id: 'akbil_ogrenci',
+            category: 'akbil',
+            title: 'Öğrenci & İndirimli Akbil (Çift Bip)',
+            icon: '🎓',
+            specs: 'Freesound SpliceSound #369875 Orijinal Transit Kart Kaydı',
+            desc: 'Öğrenci veya indirimli kart okutulduğunda çıkan o melodik ve neşeli çift dıt-dıt onay sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilOgrenci) audio.playAkbilOgrenci();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('ogrenci');
+            }
+        },
+        {
+            id: 'akbil_hata',
+            category: 'akbil',
+            title: 'Yetersiz Bakiye / Kart Reddedildi Alarmı',
+            icon: '❌',
+            specs: 'Freesound PerMagnusLindborg #324248 Card Reject Alarm',
+            desc: 'Kartta para kalmadığında veya kart okunamadığında validatörün çaldığı o keskin ret ve uyarı alarmı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilHata) audio.playAkbilHata();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('yetersiz');
+            }
+        },
+        {
+            id: 'bus_validator',
+            category: 'akbil',
+            title: 'Gerçek Otobüs Kart Okuyucu Validatör Mekanizması',
+            icon: '📟',
+            specs: 'Freesound Robinhood76 #62589 Orijinal Otobüs Validatörü',
+            desc: 'Gerçek bir belediye otobüsü kart okuyucu cihazının iç röle ve elektronik kart okuma tepkisi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playBusValidator) audio.playBusValidator();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('serbest');
+            }
+        },
+
+        // --- PNÖMATİK & MEKANİK EFEKTLER ---
+        {
+            id: 'fx_air_brake',
+            category: 'effect',
+            title: 'Gerçek Havalı Fren (Air Brake Release)',
+            icon: '💨',
+            specs: 'Freesound InspectorJ #415510 Orijinal Kayıt',
+            desc: 'Otobüs durduğunda veya frene basıldığında çıkan meşhur pnömatik hava tahliye ve tıslama sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAirBrake) audio.playAirBrake();
+                else if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.airBrake) audio.sounds.airBrake.play();
+            }
+        },
+        {
+            id: 'fx_door',
+            category: 'effect',
+            title: 'Gerçek Otobüs Pnömatik Kapı Sesi',
+            icon: '🚪',
+            specs: 'Freesound Robinhood76 #489370 Orijinal Kayıt',
+            desc: 'İki kanatlı pnömatik yolcu kapısının açılma, hava tahliyesi ve kapanma kilitlenme sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.doorOpen) {
+                    audio.sounds.doorOpen.play();
+                } else {
+                    const a = new Audio('sounds/freesound_bus_door.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_air_horn',
+            category: 'effect',
+            title: 'Ağır Vasıta Endüstriyel Havalı Korna',
+            icon: '📯',
+            specs: 'Freesound mcpable #397858 Orijinal Kayıt',
+            desc: 'Şehirlerarası otobüslerin ve tırların o heybetli, gür ve yankılanan havalı kornası.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.airHorn) {
+                    audio.sounds.airHorn.play();
+                } else {
+                    const a = new Audio('sounds/freesound_industrial_horn.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_retarder',
+            category: 'effect',
+            title: 'Voith / ZF Hidrolik Retarder Düdüğü',
+            icon: '🎶',
+            specs: '10 Saniyelik Dinamik Retarder Simülasyonu',
+            desc: 'Ağır vasıta yüksek hızdan yavaşlarken şanzımandan gelen o meşhur elektrikli ıslık ve düdük sesi.',
+            is10Seconds: true,
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playRetarder) {
+                    audio.playRetarder(10, 90);
+                }
+            }
+        },
+        {
+            id: 'fx_governor',
+            category: 'effect',
+            title: 'Kompresör Hava Tahliye Valfi (Air Governor)',
+            icon: '⚙️',
+            specs: '120 PSI Basınç Tahliye Boşalması',
+            desc: 'Hava tüpleri dolduğunda tahliye regülatörünün attığı o keskin "çuf-tısss" sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAirGovernorCutoff) {
+                    audio.playAirGovernorCutoff();
+                }
+            }
+        },
+        {
+            id: 'fx_emergency_lock',
+            category: 'effect',
+            title: 'İmdat Freni Kilitlenme ve Boşalma',
+            icon: '🛑',
+            specs: 'Mekanik Mandal ve Pnömatik İmdat Sistemi',
+            desc: 'El freni mandalı çekildiğinde arka tekerleklerin zınk diye kilitlenme ve hava boşalma sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playEmergencyBrakeLock) {
+                    audio.playEmergencyBrakeLock();
+                }
+            }
+        }
+    ],
+
+    init: function() {
+        const btnOpen = document.getElementById('btn-open-sound-gallery');
+        if (btnOpen) {
+            btnOpen.addEventListener('click', () => this.openModal());
+        }
+
+        const btnClose = document.getElementById('btn-sound-gallery-close');
+        if (btnClose) {
+            btnClose.addEventListener('click', () => this.closeModal());
+        }
+
+        const btnStopAll = document.getElementById('btn-sound-gallery-stop-all');
+        if (btnStopAll) {
+            btnStopAll.addEventListener('click', () => this.stopCurrentSound(true));
+        }
+
+        const tabAll = document.getElementById('tab-sound-all');
+        const tabEngine = document.getElementById('tab-sound-engine');
+        const tabAkbil = document.getElementById('tab-sound-akbil');
+        const tabFx = document.getElementById('tab-sound-fx');
+
+        if (tabAll) tabAll.addEventListener('click', () => this.switchTab('all'));
+        if (tabEngine) tabEngine.addEventListener('click', () => this.switchTab('engine'));
+        if (tabAkbil) tabAkbil.addEventListener('click', () => this.switchTab('akbil'));
+        if (tabFx) tabFx.addEventListener('click', () => this.switchTab('effect'));
+
+        // Klavye Kısayolu: [S] tuşu ile Ses Galerisi Açma
+        window.addEventListener('keydown', (e) => {
+            const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+            if (activeTag === 'input' || activeTag === 'textarea' || activeTag === 'select') return;
+
+            if (e.key === 's' || e.key === 'S') {
+                const titleScreen = document.getElementById('title-screen');
+                if (titleScreen && !titleScreen.classList.contains('hidden')) {
+                    const modal = document.getElementById('sound-gallery-modal');
+                    if (modal && modal.classList.contains('hidden')) {
+                        e.preventDefault();
+                        this.openModal();
+                    }
+                }
+            } else if (e.key === 'Escape') {
+                const modal = document.getElementById('sound-gallery-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    this.closeModal();
+                }
+            }
+        });
+    },
+
+    openModal: function() {
+        const modal = document.getElementById('sound-gallery-modal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+
+        // AudioContext uyandır
+        if (typeof audio !== 'undefined' && audio.ctx && audio.ctx.state === 'suspended') {
+            audio.ctx.resume();
+        }
+
+        this.renderModal(this.currentTab);
+
+        const welcomeText = "Sesleri Göster galerisi açıldı. 7 farklı otobüs grubunun rölanti motor seslerini 10 saniye boyunca dinleyebilir veya akbil ve mekanik efektleri test edebilirsiniz.";
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak(welcomeText);
+        }
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+            audio.updateNvdaLiveRegion(welcomeText);
+        }
+
+        if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+            KeyboardNav.initForScreen();
+        }
+    },
+
+    closeModal: function() {
+        this.stopCurrentSound(false);
+        const modal = document.getElementById('sound-gallery-modal');
+        if (modal) modal.classList.add('hidden');
+
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak("Ses galerisi kapatıldı, ana menüye dönüldü.");
+        }
+
+        if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+            KeyboardNav.initForScreen();
+        }
+    },
+
+    switchTab: function(tab) {
+        this.currentTab = tab;
+        ['tab-sound-all', 'tab-sound-engine', 'tab-sound-akbil', 'tab-sound-fx'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.background = 'rgba(255,255,255,0.08)';
+                el.style.borderColor = 'rgba(255,255,255,0.2)';
+                el.style.color = '#94a3b8';
+            }
+        });
+
+        const activeId = tab === 'engine' ? 'tab-sound-engine' : (tab === 'akbil' ? 'tab-sound-akbil' : (tab === 'effect' ? 'tab-sound-fx' : 'tab-sound-all'));
+        const activeEl = document.getElementById(activeId);
+        if (activeEl) {
+            activeEl.style.background = 'rgba(168,85,247,0.3)';
+            activeEl.style.borderColor = '#c084fc';
+            activeEl.style.color = '#fff';
+        }
+
+        this.renderModal(tab);
+        if (typeof KeyboardNav !== "undefined" && KeyboardNav.initForScreen) {
+            KeyboardNav.initForScreen();
+        }
+    },
+
+    renderModal: function(tab = 'all') {
+        const listEl = document.getElementById('sound-gallery-list');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+
+        const filtered = this.sounds.filter(s => {
+            if (tab === 'engine') return s.category === 'engine';
+            if (tab === 'akbil') return s.category === 'akbil';
+            if (tab === 'effect') return s.category === 'effect';
+            return true;
+        });
+
+        filtered.forEach(s => {
+            const li = document.createElement('li');
+            li.style.marginBottom = "12px";
+
+            const isPlaying = this.currentlyPlayingId === s.id;
+
+            const btn = document.createElement('button');
+            btn.className = 'menu-btn nav-item';
+            btn.id = "btn-sound-" + s.id;
+            btn.style.width = '100%';
+            btn.style.flexDirection = 'column';
+            btn.style.alignItems = 'stretch';
+            btn.style.textAlign = 'left';
+            btn.style.padding = '14px 18px';
+            btn.style.border = isPlaying ? '2.5px solid #a855f7' : '1px solid rgba(255,255,255,0.15)';
+            btn.style.background = isPlaying ? 'rgba(168, 85, 247, 0.22)' : 'rgba(15, 23, 42, 0.7)';
+            btn.style.borderRadius = '10px';
+            btn.style.transition = 'all 0.2s ease';
+
+            let categoryTag = '';
+            if (s.category === 'engine') {
+                categoryTag = '<span style="color: #c084fc; font-size: 0.85rem; font-weight: bold; background: rgba(168,85,247,0.2); padding: 3px 8px; border-radius: 4px;">⏱️ ' + (s.soundGroup || 'Motor Rölantisi') + '</span>';
+            } else if (s.category === 'akbil') {
+                categoryTag = '<span style="color: #38bdf8; font-size: 0.85rem; font-weight: bold; background: rgba(56,189,248,0.2); padding: 3px 8px; border-radius: 4px;">💳 Akbil & Kart Okuyucu</span>';
+            } else {
+                categoryTag = '<span style="color: #34d399; font-size: 0.85rem; font-weight: bold; background: rgba(16,185,129,0.2); padding: 3px 8px; border-radius: 4px;">💨 Havalı & Mekanik Efekt</span>';
+            }
+
+            let playBadge = '';
+            if (isPlaying) {
+                playBadge = '<span id="badge-countdown-' + s.id + '" style="background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; font-weight: bold; padding: 6px 12px; border-radius: 20px; font-size: 0.95rem; animation: pulse 1s infinite;">' +
+                    '🔊 ÇALIYOR (' + this.remainingSeconds + ' sn)</span>';
+            } else {
+                playBadge = s.category === 'engine'
+                    ? '<span style="background: rgba(168,85,247,0.25); color: #e9d5ff; font-weight: bold; padding: 5px 12px; border-radius: 20px; font-size: 0.88rem;">▶️ 10 Saniye Dinle</span>'
+                    : '<span style="background: rgba(56,189,248,0.2); color: #7dd3fc; font-weight: bold; padding: 5px 12px; border-radius: 20px; font-size: 0.88rem;">▶️ Efekti Çal</span>';
+            }
+
+            const ariaLabel = s.title + '. ' + s.specs + '. ' + s.desc + '. ' + (s.category === 'engine' ? '10 saniye boyunca dinlemek için Enter tuşuna basın.' : 'Efekti dinlemek için Enter tuşuna basın.') + (isPlaying ? ' Şu anda çalıyor.' : '');
+            btn.setAttribute('aria-label', ariaLabel);
+
+            btn.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <span style="font-size: 1.2rem; font-weight: bold; color: #fff;">
+                            ${s.icon} ${s.title}
+                        </span>
+                        <div style="margin-top: 4px;">${categoryTag}</div>
+                    </div>
+                    <div>${playBadge}</div>
+                </div>
+                <div style="font-size: 0.92rem; color: #cbd5e1; margin-bottom: 4px;">
+                    ⚙️ <strong>Özellikler:</strong> <span style="color: #facc15;">${s.specs}</span>
+                </div>
+                <div style="font-size: 0.88rem; color: #94a3b8; line-height: 1.4;">
+                    💡 ${s.desc}
+                </div>
+            `;
+
+            btn.onclick = () => {
+                if (isPlaying) {
+                    this.stopCurrentSound(true);
+                } else {
+                    this.playSoundItem(s);
+                }
+            };
+
+            li.appendChild(btn);
+            listEl.appendChild(li);
+        });
+
+        if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+            KeyboardNav.initForScreen();
+        }
+    },
+
+    playSoundItem: function(s) {
+        this.stopCurrentSound(false);
+
+        this.currentlyPlayingId = s.id;
+        const statusBanner = document.getElementById('sound-gallery-current-status');
+        const statusText = document.getElementById('sound-gallery-status-text');
+
+        if (s.category === 'engine') {
+            this.playEngineFor10Seconds(s);
+        } else if (s.is10Seconds) {
+            this.play10SecondEffect(s);
+        } else {
+            if (statusBanner && statusText) {
+                statusBanner.style.display = 'flex';
+                statusText.innerText = '▶️ Çalıyor: ' + s.title;
+            }
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak(s.title + ' çalınıyor.');
+            }
+            if (typeof s.playFn === 'function') {
+                s.playFn();
+            }
+            this.renderModal(this.currentTab);
+            setTimeout(() => {
+                this.currentlyPlayingId = null;
+                if (statusBanner) statusBanner.style.display = 'none';
+                this.renderModal(this.currentTab);
+            }, 3000);
+        }
+    },
+
+    playEngineFor10Seconds: function(s) {
+        this.remainingSeconds = 10;
+        const statusBanner = document.getElementById('sound-gallery-current-status');
+        const statusText = document.getElementById('sound-gallery-status-text');
+        const countdownEl = document.getElementById('sound-gallery-countdown-num');
+
+        if (statusBanner) statusBanner.style.display = 'flex';
+        if (statusText) statusText.innerText = '▶️ 10 Saniye Motor Dinleniyor: ' + s.title;
+        if (countdownEl) countdownEl.innerText = '10';
+
+        const speechNotice = s.title + ' motor sesi 10 saniye boyunca dinletiliyor.';
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak(speechNotice);
+        }
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+            audio.updateNvdaLiveRegion(speechNotice);
+        }
+
+        try {
+            const ctx = (typeof audio !== 'undefined' && audio.ctx) ? audio.ctx : (Howler.ctx || new (window.AudioContext || window.webkitAudioContext)());
+            if (ctx.state === 'suspended') ctx.resume();
+
+            let targetBuffer = null;
+            if (typeof audio !== 'undefined') {
+                if (audio.groupBuffers && audio.groupBuffers[s.type]) {
+                    targetBuffer = audio.groupBuffers[s.type];
+                } else if (s.type === 'pure_v6') {
+                    targetBuffer = audio.pureIdleBuffer || audio.idleBuffer;
+                } else if (s.type === 'coach_terminal') {
+                    targetBuffer = audio.coachTerminalIdleBuffer || audio.pureIdleBuffer || audio.idleBuffer;
+                } else if (s.type === 'v8_bass') {
+                    targetBuffer = audio.bassIdleBuffer || audio.pureIdleBuffer || audio.idleBuffer;
+                } else {
+                    targetBuffer = audio.cityIdleBuffer || audio.pureIdleBuffer || audio.idleBuffer;
+                }
+            }
+
+            if (targetBuffer) {
+                const source = ctx.createBufferSource();
+                source.buffer = targetBuffer;
+                source.loop = true;
+                source.loopStart = 0.05;
+                source.loopEnd = Math.max(0.1, targetBuffer.duration - 0.05);
+                source.playbackRate.value = s.playbackRate || 1.0;
+
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(0.001, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(1.0, ctx.currentTime + 0.15);
+
+                const bassFilter = ctx.createBiquadFilter();
+                bassFilter.type = 'lowshelf';
+                bassFilter.frequency.value = 130;
+                bassFilter.gain.value = s.bassBoost || 3;
+
+                const lowpass = ctx.createBiquadFilter();
+                lowpass.type = 'lowpass';
+                lowpass.frequency.value = 6500;
+
+                source.connect(bassFilter);
+                bassFilter.connect(lowpass);
+                lowpass.connect(gain);
+                gain.connect(ctx.destination);
+
+                source.start(0);
+                this.currentAudioNode = source;
+                this.currentGainNode = gain;
+            } else {
+                this.currentHtmlAudio = new Audio(s.file || 'sounds/freesound_pure_bus_idle.mp3');
+                this.currentHtmlAudio.loop = true;
+                this.currentHtmlAudio.play().catch(() => {});
+            }
+        } catch (e) {
+            console.error("Motor sesi başlatılırken hata:", e);
+        }
+
+        this.renderModal(this.currentTab);
+
+        this.countdownInterval = setInterval(() => {
+            this.remainingSeconds--;
+            if (countdownEl) countdownEl.innerText = this.remainingSeconds;
+            
+            const badge = document.getElementById('badge-countdown-' + s.id);
+            if (badge) {
+                badge.innerText = '🔊 ÇALIYOR (' + this.remainingSeconds + ' sn)';
+            }
+
+            if (this.remainingSeconds === 1) {
+                if (this.currentGainNode && typeof audio !== 'undefined' && audio.ctx) {
+                    try {
+                        this.currentGainNode.gain.linearRampToValueAtTime(0.001, audio.ctx.currentTime + 0.9);
+                    } catch(e) {}
+                }
+            }
+
+            if (this.remainingSeconds <= 0) {
+                this.finish10Seconds(s);
+            }
+        }, 1000);
+    },
+
+    play10SecondEffect: function(s) {
+        this.remainingSeconds = 10;
+        const statusBanner = document.getElementById('sound-gallery-current-status');
+        const statusText = document.getElementById('sound-gallery-status-text');
+        const countdownEl = document.getElementById('sound-gallery-countdown-num');
+
+        if (statusBanner) statusBanner.style.display = 'flex';
+        if (statusText) statusText.innerText = '▶️ 10 Saniye Dinleniyor: ' + s.title;
+        if (countdownEl) countdownEl.innerText = '10';
+
+        if (typeof s.playFn === 'function') {
+            s.playFn();
+        }
+
+        this.renderModal(this.currentTab);
+
+        this.countdownInterval = setInterval(() => {
+            this.remainingSeconds--;
+            if (countdownEl) countdownEl.innerText = this.remainingSeconds;
+            const badge = document.getElementById('badge-countdown-' + s.id);
+            if (badge) badge.innerText = '🔊 ÇALIYOR (' + this.remainingSeconds + ' sn)';
+
+            if (this.remainingSeconds <= 0) {
+                this.finish10Seconds(s);
+            }
+        }, 1000);
+    },
+
+    finish10Seconds: function(s) {
+        this.stopCurrentSound(false);
+
+        const doneMessage = s.title + ' 10 saniyelik dinleme tamamlandı.';
+        if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak(doneMessage);
+        }
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+            audio.updateNvdaLiveRegion(doneMessage);
+        }
+
+        const statusText = document.getElementById('sound-gallery-status-text');
+        if (statusText) {
+            statusText.innerText = '✅ ' + s.title + ' 10 saniyelik dinleme bitti.';
+        }
+
+        setTimeout(() => {
+            const statusBanner = document.getElementById('sound-gallery-current-status');
+            if (statusBanner && !this.currentlyPlayingId) {
+                statusBanner.style.display = 'none';
+            }
+        }, 3000);
+
+        this.renderModal(this.currentTab);
+    },
+
+    stopCurrentSound: function(notify = true) {
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+        }
+
+        if (this.currentAudioNode) {
+            try {
+                this.currentAudioNode.stop();
+                this.currentAudioNode.disconnect();
+            } catch(e) {}
+            this.currentAudioNode = null;
+        }
+
+        if (this.currentGainNode) {
+            try { this.currentGainNode.disconnect(); } catch(e){}
+            this.currentGainNode = null;
+        }
+
+        if (this.currentHtmlAudio) {
+            try {
+                this.currentHtmlAudio.pause();
+                this.currentHtmlAudio.currentTime = 0;
+            } catch(e) {}
+            this.currentHtmlAudio = null;
+        }
+
+        if (typeof audio !== 'undefined' && audio.stopRetarder) {
+            try { audio.stopRetarder(); } catch(e){}
+        }
+
+        const wasPlaying = this.currentlyPlayingId;
+        this.currentlyPlayingId = null;
+        this.remainingSeconds = 0;
+
+        const statusBanner = document.getElementById('sound-gallery-current-status');
+        if (statusBanner) statusBanner.style.display = 'none';
+
+        if (notify && wasPlaying) {
+            const msg = "Ses çalması durduruldu.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
+        }
+
+        this.renderModal(this.currentTab);
+    }
+};
+
+if (typeof window !== 'undefined') {
+    window.SoundGallery = SoundGallery;
+    document.addEventListener('DOMContentLoaded', () => {
+        SoundGallery.init();
+    });
+}
