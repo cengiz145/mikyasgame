@@ -181,8 +181,8 @@ const AkilliRotaSistemi = {
             smartStops.push({
                 name: orig.name,
                 anons: anons,
-                bekleyenYolcu: isFirst ? 20 : (isLast ? 0 : (((i * 3 + 2) % 5) + 1)),
-                inenYolcu: isFirst ? 0 : (isLast ? 20 : (((i * 2 + 1) % 4) + 1)),
+                bekleyenYolcu: isFirst ? 20 : (isLast ? 0 : (((j * 3 + 2) % 5) + 1)),
+                inenYolcu: isFirst ? 0 : (isLast ? 20 : (((j * 2 + 1) % 4) + 1)),
                 gercekMesafeSonraki: isLast ? 0 : (orig.gercekMesafeSonraki || 0.8),
                 lat: orig.lat,
                 lon: orig.lon

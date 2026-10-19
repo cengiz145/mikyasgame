@@ -57,6 +57,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // =================================================
 
+        // === ROTALARI VE TEKULAŞ GÖREVLERİNİ AÇILIŞTA ANINDA YEREL VERİDEN YÜKLE ===
+    const initAllRoutesInstantly = () => {
+        try {
+            if (typeof generateRoutesFromAPI === 'function') {
+                const defaultStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari["Tekirdağ"]) 
+                    ? varsayilanSehirDuraklari["Tekirdağ"] : [];
+                generateRoutesFromAPI(defaultStops, "Tekirdağ");
+                console.log("Tekirdağ rotaları ve TEKULAŞ veritabanı anında yüklendi:", Object.keys(routesData).length);
+
+                if (typeof varsayilanSehirDuraklari !== 'undefined') {
+                    ["Yalova", "Bayburt", "Edirne", "Kırklareli", "İstanbul"].forEach(city => {
+                        if (varsayilanSehirDuraklari[city]) {
+                            generateRoutesFromAPI(varsayilanSehirDuraklari[city], city);
+                        }
+                    });
+                }
+            }
+        } catch (preloadErr) {
+            console.warn("Açılışta rota ön yükleme uyarısı:", preloadErr);
+        }
+    };
+    initAllRoutesInstantly();
+    // =========================================================================
+
     // 0. Splash Screen
     const splashScreen = document.getElementById('splash-screen');
     const loginScreen = document.getElementById('login-screen');
@@ -627,102 +651,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Route Menu // Eğer bu şehir için önceden API'den rota çekilmemişse, çek.
     document.addEventListener('go-to-route-screen', async (e) => {
         const cityName = e.detail.city;
-        const cityData = sehirRotalari[cityName];
         
-        // Eğer bu şehir için önceden API'den rota çekilmemişse, çek.
-        const existingRoutes = Object.values(routesData).filter(r => r.sehir === cityName);
+        // Eğer bu şehir için önceden rota üretilmemişse, yerel duraklardan anında üret (0 bekleme)
+        let existingRoutes = Object.values(routesData).filter(r => r.sehir === cityName);
         
         if (existingRoutes.length === 0) {
-            UI.showLoading(`${cityName} için duraklar yükleniyor...`);
+            const realCityStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName])
+                ? varsayilanSehirDuraklari[cityName]
+                : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
             
-            try {
-                let p = 0;
-                const interval = setInterval(() => { p += 10; if(p>90) p=90; UI.updateLoading(p); }, 300);
-
-                // Eski hatalı/yapay 'Merkez Durak' önbelleklerini temizle
-                try {
-                    for (let i = localStorage.length - 1; i >= 0; i--) {
-                        const k = localStorage.key(i);
-                        if (k && (k.startsWith('cachedStops_v2_') || k.startsWith('cachedStops_v3_'))) {
-                            localStorage.removeItem(k);
-                        }
-                    }
-                } catch(e) {}
-
-                let rawStops = null;
-                const cacheKey = `cachedStops_v4_${cityName}`;
-                const cachedData = localStorage.getItem(cacheKey);
-
-                window.cityBumps = window.cityBumps || {};
-
-                if (cachedData) {
-                    try {
-                        const parsed = JSON.parse(cachedData);
-                        if (parsed.stops && parsed.stops.length >= 5 && !parsed.stops.some(s => s.name && s.name.includes("Merkez Durak"))) {
-                            rawStops = parsed.stops;
-                            window.cityBumps[cityName] = parsed.bumps || [];
-                            clearInterval(interval);
-                            UI.updateLoading(100);
-                        } else {
-                            localStorage.removeItem(cacheKey);
-                            rawStops = null;
-                        }
-                    } catch(e) {
-                        rawStops = null;
-                    }
-                }
-
-                if (!rawStops) {
-                    try {
-                        // API'den canlı çekmeyi dene
-                        rawStops = await fetchStopsFromOverpass(cityData.canliSorgu);
-                        window.cityBumps[cityName] = window.lastFetchedBumps || [];
-                    } catch (apiErr) {
-                        console.warn("Overpass API'ye ulaşılamadı, gerçek durak havuzu kullanılıyor:", apiErr);
-                        rawStops = null;
-                    }
-
-                    clearInterval(interval);
-                    UI.updateLoading(100);
-
-                    // Eğer API'den veri gelmediyse veya 5'ten az durak varsa, şehrin gerçek durak listesini al
-                    if (!rawStops || rawStops.length < 5) {
-                        const realCityStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName])
-                            ? varsayilanSehirDuraklari[cityName]
-                            : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
-                        
-                        rawStops = JSON.parse(JSON.stringify(realCityStops));
-                        if (typeof UI !== 'undefined' && UI.showToast) {
-                            UI.showToast(`${cityName} özgün durak güzergahları yüklendi!`, "success");
-                        }
-                    }
-
-                    // Önbelleğe kaydet (artık hiçbir zaman Merkez Durak 1,2,3 üretilmez)
-                    localStorage.setItem(cacheKey, JSON.stringify({
-                        stops: rawStops,
-                        bumps: window.cityBumps[cityName]
-                    }));
-                }
-                
-                generateRoutesFromAPI(rawStops, cityName);
-                
-            } catch (err) {
-                console.error(err);
-                const realCityStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName])
-                    ? varsayilanSehirDuraklari[cityName]
-                    : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
-                
-                let fallbackStops = JSON.parse(JSON.stringify(realCityStops));
-                localStorage.setItem(`cachedStops_v4_${cityName}`, JSON.stringify({ stops: fallbackStops, bumps: [] }));
-                generateRoutesFromAPI(fallbackStops, cityName);
-            } finally {
-                setTimeout(() => {
-                    UI.hideLoading();
-                }, 500);
+            if (typeof generateRoutesFromAPI === 'function') {
+                generateRoutesFromAPI(realCityStops, cityName);
             }
         }
         
-        // Rotaları çiz ve geç
+        // Rotaları çiz ve ekrana anında geç
         UI.renderRoutes(cityName, Game.completedTasks);
         UI.switchScreen('route-menu');
     });

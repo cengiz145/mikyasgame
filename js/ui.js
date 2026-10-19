@@ -415,29 +415,60 @@ const UI = {
     },
 
     renderRoutes: function(cityName, completedTasks) {
-        document.getElementById("route-sel-title").innerText = cityName + " Görevleri";
+        completedTasks = (typeof completedTasks === 'number') ? completedTasks : 0;
+        const titleEl = document.getElementById("route-sel-title");
+        if (titleEl) titleEl.innerText = cityName + " Sefer Görevleri ve Hatları";
+        
         const listEl = document.getElementById("dynamic-route-list");
+        if (!listEl) return;
         listEl.innerHTML = "";
         
-        const cityRoutes = Object.values(routesData).filter(r => r.sehir === cityName);
+        // Şehrin tüm görev rotalarını al
+        let cityRoutes = Object.values(routesData).filter(r => r.sehir === cityName && typeof r.taskIndex === 'number');
         
+        // Eğer görev rotası yoksa, normal hatları göster
         if (cityRoutes.length === 0) {
-            listEl.innerHTML = '<li style="text-align:center; color: white;">Bu şehir için rota bulunamadı. Lütfen API\'den veri çekin.</li>';
+            cityRoutes = Object.values(routesData).filter(r => r.sehir === cityName);
+        }
+
+        if (cityRoutes.length === 0) {
+            listEl.innerHTML = '<li style="text-align:center; color: white; padding: 20px;">Bu şehir için kayıtlı rota bulunamadı.</li>';
             return;
         }
 
-        cityRoutes.forEach(route => {
-            if (route.taskIndex !== completedTasks) {
-                return; 
-            }
+        // Aktif lisans seviyesi (Çırak = 1, Kalfa = 2, Usta = 3)
+        const currentLic = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
 
-            const isCurrentTask = route.taskIndex === completedTasks;
-            
+        // Görevleri sırala: Aktif görev EN BAŞTA
+        cityRoutes.sort((a, b) => {
+            if (a.taskIndex === completedTasks) return -1;
+            if (b.taskIndex === completedTasks) return 1;
+            return (a.taskIndex || 0) - (b.taskIndex || 0);
+        });
+
+        // Oyuncunun görebileceği görevler: Mevcut lisans seviyesindeki veya tamamlanan görevler
+        const visibleRoutes = cityRoutes.filter(r => {
+            if (typeof r.licenseLevel === 'number') {
+                return r.licenseLevel <= currentLic;
+            }
+            return true;
+        });
+
+        const routesToRender = visibleRoutes.length > 0 ? visibleRoutes : cityRoutes;
+
+        routesToRender.forEach(route => {
+            const isCurrentTask = (route.taskIndex === completedTasks);
+            const isCompleted = (typeof route.taskIndex === 'number' && route.taskIndex < completedTasks);
+            const isFuture = (typeof route.taskIndex === 'number' && route.taskIndex > completedTasks);
+
             const li = document.createElement("li");
+            li.style.marginBottom = "10px";
             const btn = document.createElement("button");
             
             let btnClass = "menu-btn nav-item";
-            if (!isCurrentTask) {
+            if (isCurrentTask) {
+                btnClass += " primary-btn pulse-anim";
+            } else if (isCompleted) {
                 btnClass += " secondary-btn";
             }
 
@@ -445,27 +476,33 @@ const UI = {
             btn.style.flexDirection = "column";
             btn.style.alignItems = "stretch";
             btn.style.textAlign = "left";
-            btn.style.padding = "18px 20px";
+            btn.style.padding = "16px 20px";
             btn.style.lineHeight = "1.5";
             btn.style.width = "100%";
+            if (isCurrentTask) {
+                btn.style.borderColor = "#38bdf8";
+                btn.style.boxShadow = "0 0 16px rgba(56, 189, 248, 0.4)";
+            }
 
-            let icon = isCurrentTask ? "▶️" : "✅";
+            let icon = isCurrentTask ? "▶️" : (isCompleted ? "✅" : "🔒");
+            let statusText = isCurrentTask ? "(AKTİF SEFER GÖREVİ)" : (isCompleted ? "(Tamamlandı - Tekrar Sür)" : "(Kilitli)");
             
-            const startStop = route.startStop || (route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
-            const endStop = route.endStop || (route.stops[route.stops.length - 1] ? route.stops[route.stops.length - 1].name : "Varış");
-            const intermediate = route.intermediateStops || (route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
+            const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
+            const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Varış");
+            const intermediate = route.intermediateStops || (route.stops && route.stops.length > 2 ? route.stops.slice(1, -1).map(s => s.name) : []);
             
-            const totalKmRoute = (route.stops && route.stops.length > 0) ? route.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0).toFixed(1) : 0;
-            const badgeHtml = '<span style="background: rgba(56,189,248,0.2); color: #38bdf8; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">' + route.stops.length + ' Durak | ' + totalKmRoute + ' km</span>';
+            const totalKmRoute = (route.totalKm) ? route.totalKm.toFixed(1) : ((route.stops && route.stops.length > 0) ? route.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0).toFixed(1) : 0);
+            const stopCount = (route.stops) ? route.stops.length : 0;
+            const badgeHtml = '<span style="background: rgba(56,189,248,0.2); color: #38bdf8; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">' + stopCount + ' Durak | ' + totalKmRoute + ' km</span>';
             const cardSteps = (typeof MissionReader !== "undefined" && MissionReader.generateSteps) ? MissionReader.generateSteps(route) : [];
             const cardStepsHtml = cardSteps.map(s => '<div style="margin: 3px 0;">• ' + s + '</div>').join('');
-            let ariaDesc = "Görev: " + route.name + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + route.stops.length + " durak. Görev Adımları: " + cardSteps.join("; ");
+            let ariaDesc = "Görev: " + route.name + " " + statusText + ". Kalkış: " + startStop + ", Varış: " + endStop + ". Toplam " + stopCount + " durak, " + totalKmRoute + " kilometre.";
             
             btn.setAttribute("aria-label", ariaDesc);
 
             btn.innerHTML = [
                 '<div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 8px;">',
-                '    <strong style="color: ' + route.color + '; font-size: 1.2rem;">' + icon + ' ' + route.name + ' ' + (isCurrentTask ? '(AKTİF GÖREV)' : '(Tamamlandı)') + '</strong>',
+                '    <strong style="color: ' + (route.color || '#38bdf8') + '; font-size: 1.15rem;">' + icon + ' ' + route.name + ' ' + statusText + '</strong>',
                 '    ' + badgeHtml,
                 '</div>',
                 '<div style="font-size: 1rem; color: #f1f5f9; margin-bottom: 5px;">',
@@ -477,14 +514,23 @@ const UI = {
                 (intermediate.length > 0 ? 
                     '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> ' + intermediate.join(' ➔ ') + '</div>' : 
                     '<div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 8px;">🛑 <strong>Durulacak Ara Duraklar:</strong> Ara durak yok (Doğrudan varış durağına kesintisiz sürüş)</div>'),
-                '<div style="font-size: 0.88rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 6px; width: 100%; border-left: 3px solid #38bdf8;">',
-                '    📋 <strong>Görev Adımları (A: Harita Özeti | Shift + A: Adım Adım Dinle):</strong><br>' + cardStepsHtml,
-                '</div>'
+                (isCurrentTask ? 
+                '<div style="font-size: 0.88rem; color: #cbd5e1; background: rgba(0,0,0,0.3); padding: 10px 12px; border-radius: 6px; width: 100%; border-left: 3px solid #38bdf8; margin-top: 6px;">' +
+                '    📋 <strong>Görev Adımları (A: Harita Özeti | Shift + A: Adım Adım Dinle):</strong><br>' + cardStepsHtml +
+                '</div>' : '')
             ].join("");
 
             btn.onclick = () => {
-                audio.playSelect();
-                Game.startRoute(route.id);
+                if (isFuture) {
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak("Bu görev henüz kilitli. Lütfen önceki sefer görevini tamamlayın.");
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Bu görev kilitlidir. Önceki görevi tamamlayın.", "warning");
+                    return;
+                }
+                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                if (typeof Game !== 'undefined' && Game.startRoute) {
+                    Game.startRoute(route.id);
+                }
             };
 
             li.appendChild(btn);
