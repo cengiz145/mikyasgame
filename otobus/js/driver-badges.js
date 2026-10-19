@@ -11,6 +11,22 @@ const DriverBadges = {
 
     badges: [
         {
+            id: 'mahalle_kasifi',
+            title: 'Mahalle Kaşifi Rozeti',
+            icon: '🧭',
+            category: 'Keşif',
+            desc: 'Şehirde en az 5 farklı ara durağı direksiyon başında bizzat keşfedip hafızasına kaydeden dikkatli kaptanlara verilir.',
+            requirement: 'Şehirde en az 5 farklı durağı keşfet (+50 ₺ Keşif Primi)'
+        },
+        {
+            id: 'hat_hakimi',
+            title: 'Hat Hakimi ve Bölge Ustası',
+            icon: '🗺️',
+            category: 'Hafıza',
+            desc: 'Çalıştığı ilçenin duraklarının en az %80\'ini keşfedip avucunun içi gibi öğrenen usta kaptanlara verilir.',
+            requirement: 'Seçili ilçedeki durakların en az %80\'ini keşfet'
+        },
+        {
             id: 'ilk_sefer',
             title: 'Çırak Kaptan Rozeti',
             icon: '🥉',
