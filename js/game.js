@@ -492,6 +492,92 @@ const Game = {
         }
 
         UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+
+        // WAAW! KADEMELİ SİSTEM AÇILIŞLARI VE KUTLAMA KARTI
+        this.triggerProgressiveWowAnnouncement(this.completedTasks);
+    },
+
+    triggerProgressiveWowAnnouncement: function(completed) {
+        const box = document.getElementById('res-wow-unlock-box');
+        const titleEl = document.getElementById('res-wow-title');
+        const descEl = document.getElementById('res-wow-desc');
+        const iconEl = document.getElementById('res-wow-icon');
+
+        if (!box || !titleEl || !descEl) return;
+
+        let wowData = null;
+
+        if (completed === 1) {
+            wowData = {
+                icon: "💳",
+                title: "WAAW! 2. GÖREV AÇILDI: TEKİRDAĞ KART & AKBİL SİSTEMİ!",
+                desc: "Harika bir ilk sürüştü kaptanım! Artık otobüsünüze binen yolcular Tekirdağ Kart (Akbil) basacak ve gerçek validatör sinyalleri çalacak!",
+                speech: "Tebrikler kaptanım! İlk görevi tamamladınız. 2. Görev açıldı! Artık yolcularınız akbil basacak!"
+            };
+        } else if (completed === 2) {
+            wowData = {
+                icon: "🔔",
+                title: "WAAW! 3. GÖREV AÇILDI: AKUSTİK DURACAK ZİLİ & ARKA KAPI!",
+                desc: "Simülasyon derinleşiyor! İnecek yolcular artık durağa 200 metre kala 'DURACAK' butonuna basacak. Zil çalınca durakta durup Q tuşu ile Arka Kapıyı açmalısınız!",
+                speech: "Vay canına! 3. Görev açıldı! Akustik Duracak Zili ve Arka Kapı devreye girdi!"
+            };
+        } else if (completed === 3) {
+            wowData = {
+                icon: "♿",
+                title: "WAAW! 4. GÖREV AÇILDI: ENGELLİ RAMPASI & KNEELING SİSTEMİ!",
+                desc: "Gerçekçi belediyecilik simülasyonu! Durakta tekerlekli sandalyeli vatandaş beklediğinde 'U' tuşuna basarak rampayı açabilir ve otobüsü yana yatırabilirsiniz!",
+                speech: "Vay canına! 4. Görev açıldı! Engelli rampası ve yana yatma sistemi açıldı!"
+            };
+        } else if (completed === 5) {
+            wowData = {
+                icon: "📻",
+                title: "WAAW! 6. GÖREV AÇILDI: TEKULAŞ CANLI TELSİZ & HAVA DURUMU!",
+                desc: "TEKULAŞ Hareket Merkezi amirliği hatta bağlandı! 'T' tuşuna basarak canlı telsiz anonslarını dinleyebilirsiniz. Yağmur başladığında 'X' ile silecekleri çalıştırın!",
+                speech: "Vay canına! 6. Görev açıldı! Canlı belediye telsizi ve dinamik hava durumu açıldı!"
+            };
+        } else if (completed === 7) {
+            wowData = {
+                icon: "⚙️",
+                title: "WAAW! 8. GÖREV AÇILDI: PNÖMATİK HAVA FRENİ & KOMPRESÖR SİSTEMİ!",
+                desc: "Endüstriyel otobüs simülasyonu devrede! Kademeli fren yapın; hava tüpleri 4 bar altına düşerse imdat kilitlenir! Rölantide gaz verip havayı doldurun!",
+                speech: "Vay canına! 8. Görev açıldı! Gerçek hava freni ve kompresör simülasyonu devrede!"
+            };
+        } else if (completed === 9) {
+            wowData = {
+                icon: "🏁",
+                title: "WAAW! 10. GÖREV: BÜYÜK FİNAL SEFERİ!",
+                desc: "Kaptanım, Çıraklık seviyesinin son ve en büyük görevi! Bu görevi tamamlarsanız KALFA KAPTAN olacak ve 18 metrelik dev körüklü otobüsü kazanacaksınız!",
+                speech: "Büyük final zamanı kaptanım! 10. Görev açıldı! Bu görevi bitirince Kalfa Kaptan olacaksınız!"
+            };
+        } else if (completed === 10) {
+            wowData = {
+                icon: "🎆",
+                title: "WAAW! İNANILMAZ BAŞARI: KALFA KAPTAN OLDUNUZ!",
+                desc: "1. Seviyenin 10 görevini de tamamladınız! Oyun devasa bir Türkiye Turnesi'ne dönüştü: 🚌 18 Metrelik Körüklü Conecto garajınıza eklendi, 🏭 Çorlu ve Çerkezköy Metropol Hatları ile 🧭 Akıllı Rota Bulucu açıldı!",
+                speech: "İNANILMAZ BİR BAŞARI KAPTANIM! WAAW! 1. Seviyenin 10 görevini tamamlayıp KALFA KAPTANLIĞA yükseldiniz! 18 metrelik körüklü otobüs ve tüm Tekirdağ ilçeleri emrinize açıldı!"
+            };
+        }
+
+        if (wowData) {
+            box.classList.remove('hidden');
+            if (iconEl) iconEl.innerText = wowData.icon;
+            titleEl.innerText = wowData.title;
+            descEl.innerText = wowData.desc;
+            
+            setTimeout(() => {
+                if (typeof audio !== 'undefined' && audio.playSuccess) {
+                    try { audio.playSuccess(); } catch(e) {}
+                }
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak(wowData.speech);
+                }
+                if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) {
+                    audio.updateNvdaLiveRegion(wowData.speech);
+                }
+            }, 600);
+        } else {
+            box.classList.add('hidden');
+        }
     },
 
         addXP: function(amount) {
@@ -695,23 +781,96 @@ const Game = {
                 return "<li style=\"margin-bottom: 5px; color: " + color + ";\"><strong>" + (idx + 1) + ". Durak:</strong> " + s.name + " <span style=\"font-size: 0.85rem; opacity: 0.85;\">" + badge + "</span></li>";
             }).join("");
 
+            // KADEMELİ PEDAGOJİK GÖREV BRİFİNGİ (Basitten Karmaşığa WAAW Tasarımı)
+            const tIdx = (typeof r.taskIndex === 'number') ? r.taskIndex : 0;
+            let howToDriveHtml = '';
+            let shortcutsNote = '';
+
+            if (tIdx === 0) {
+                // Görev 1: Tamamen sade, kolay, eğlenceli ve sıcak
+                howToDriveHtml = [
+                    '<div style="background: rgba(34, 197, 94, 0.15); border: 1.5px solid #22c55e; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #22c55e; font-size: 1.1rem;">🌱 Seviye 1: Hoş Geldiniz Çırak Kaptan!</strong><br>',
+                    '    <span style="color: #f1f5f9;">İlk seferinizde işiniz çok kolay ve eğlenceli: Sadece gaz verin, durakta durup ön kapıyı açın ve yolcunuzu alın! Başlangıçta hiçbir karmaşık mekanik yoktur. Rahatça sürüşün tadını çıkarın.</span>',
+                    '</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Nasıl Sürülür? (Temel Kontroller):</div>',
+                    '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
+                    '    <li><strong>W veya Yukarı Ok:</strong> Gaz verip ilerleyin.</li>',
+                    '    <li><strong>S veya Aşağı Ok:</strong> Durakta yavaşlayıp durun.</li>',
+                    '    <li><strong>A / D veya Sol / Sağ Ok:</strong> Şeridinizi koruyun.</li>',
+                    '    <li><strong>E Tuşu:</strong> Ön kapıyı açıp yolcuları alın.</li>',
+                    '    <li><strong>H Tuşu:</strong> Korna çalın.</li>',
+                    '</ul>'
+                ].join("");
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 İpucu: Görevleri tamamladıkça; Akbil Kartı, Duracak Zili, Engelli Rampası, Belediye Telsizi ve Hava Freni gibi gerçekçi sistemler adım adım açılacaktır!</div>';
+            } else if (tIdx === 1) {
+                // Görev 2: Akbil ve Kart Okuyucu devrede
+                howToDriveHtml = [
+                    '<div style="background: rgba(56, 189, 248, 0.15); border: 1.5px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">💳 Yeni Özellik: Tekirdağ Kart (Akbil) Devrede!</strong><br>',
+                    '    <span style="color: #f1f5f9;">Kapıyı açtığınızda yolcular Tekirdağ Kart basacak ve validatörden gerçek onay bipleri duyacaksınız. Bilet gelirleri bütçenize eklenecektir.</span>',
+                    '</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş Kontrolleri:</div>',
+                    '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
+                    '    <li><strong>W / Yukarı Ok:</strong> Gaz | <strong>S / Aşağı Ok:</strong> Fren | <strong>A / D:</strong> Direksiyon</li>',
+                    '    <li><strong>E:</strong> Ön Kapı (Yolcular kart basar) | <strong>H:</strong> Korna</li>',
+                    '</ul>'
+                ].join("");
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan İpucu: Duraklara yaklaşırken kademeli fren yaparak yolcuların rahat etmesini sağlayın.</div>';
+            } else if (tIdx < 4) {
+                // Görev 3-4: Duracak Zili & Arka Kapı devrede
+                howToDriveHtml = [
+                    '<div style="background: rgba(239, 68, 68, 0.15); border: 1.5px solid #ef4444; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #f87171; font-size: 1.1rem;">🔔 Yeni Mekanik: Akustik Duracak Butonu & Arka Kapı (Q) Açıldı!</strong><br>',
+                    '    <span style="color: #f1f5f9;">Durağa 200m kala inecek yolcu varsa Duracak zili çalar ve kırmızı ikaz lambası yanar. Durakta durup <strong>Q</strong> tuşu ile arka kapıyı açarak yolcuları indirin.</span>',
+                    '</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Kapı Kontrolleri:</div>',
+                    '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
+                    '    <li><strong>W:</strong> Gaz | <strong>S:</strong> Fren | <strong>A / D:</strong> Direksiyon | <strong>H:</strong> Korna</li>',
+                    '    <li><strong>E:</strong> Ön Kapı (Binen yolcular) | <strong>Q:</strong> Arka Kapı (İnen yolcular)</li>',
+                    '</ul>'
+                ].join("");
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>C</strong> Yolcu Konforu | <strong>R</strong> Hız Göstergesi.</div>';
+            } else if (tIdx < 6) {
+                // Görev 5-6: Engelli Rampası, Kneeling & Telsiz
+                howToDriveHtml = [
+                    '<div style="background: rgba(168, 85, 247, 0.15); border: 1.5px solid #c084fc; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #c084fc; font-size: 1.1rem;">♿ Yeni Sistem: Engelli Rampası & Kneeling (U) Açıldı!</strong><br>',
+                    '    <span style="color: #f1f5f9;">Durakta tekerlekli sandalyeli yolcu beklediğinde <strong>U</strong> tuşuna basarak rampayı açın ve otobüsü yana yatırın. Ayrıca <strong>T</strong> tuşuyla canlı TEKULAŞ telsiz anonslarını dinleyebilirsiniz!</span>',
+                    '</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Sistem Kontrolleri:</div>',
+                    '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E:</strong> Ön Kapı | <strong>Q:</strong> Arka Kapı</li>',
+                    '    <li><strong>U:</strong> Engelli Rampası & Kneeling | <strong>T:</strong> TEKULAŞ Telsizi</li>',
+                    '</ul>'
+                ].join("");
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>U</strong> Rampa | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>Z</strong> Sefer Dakikliği.</div>';
+            } else {
+                // Görev 7-10: Tam Profesyonel Simülasyon
+                howToDriveHtml = [
+                    '<div style="background: rgba(234, 179, 8, 0.15); border: 1.5px solid #eab308; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #facc15; font-size: 1.1rem;">⚙️ Tam Profesyonel Sefer: Pnömatik Hava Freni & Telsiz Devrede!</strong><br>',
+                    '    <span style="color: #f1f5f9;">Hava basıncını koruyun, kademeli frenleme yapın. Sefer saatine dakik riayet edin. 10. Görev bitiminde 18 metrelik körüklü otobüs ve tüm ilçeler açılacaktır!</span>',
+                    '</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Tam Kokpit Kontrolleri:</div>',
+                    '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E / Q:</strong> Kapılar | <strong>U:</strong> Rampa | <strong>T:</strong> Telsiz</li>',
+                    '    <li><strong>X:</strong> Yağmur Silecekleri | <strong>L:</strong> Farlar | <strong>Z:</strong> Sefer Saati</li>',
+                    '</ul>'
+                ].join("");
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev | <strong>U</strong> Rampa | <strong>P</strong> Bagaj | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>Z</strong> Zamanlama.</div>';
+            }
+
             detailsContainer.innerHTML = [
                 '<div style="font-size: 1.15rem; color: #38bdf8; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid rgba(56,189,248,0.3); padding-bottom: 6px;">📋 ' + r.name + '</div>',
-                (r.isIntercity ? '<div style="background: rgba(250,204,21,0.15); border: 1px solid #facc15; color: #facc15; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;">🛣️ <strong>Sefer Türü:</strong> Şehirler Arası Seyahat | <strong>Araç:</strong> Şehirlerarası Seyahat Otobüsü (Travego / Tourismo)</div>' : '<div style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;">🏙️ <strong>Sefer Türü:</strong> Şehir İçi ve İlçe Belediye Seferi | <strong>Araç:</strong> TEKULAŞ Belediye Otobüsü</div>'),
+                '<div style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;">🏙️ <strong>Sefer Türü:</strong> Süleymanpaşa Şehir İçi Belediye Seferi | <strong>Araç:</strong> TEKULAŞ Belediye Otobüsü</div>',
                 '<div style="margin-bottom: 8px;">📍 <strong>Kalkış (Başlangıç) Durağı:</strong> <span style="color: #38bdf8; font-weight: bold;">' + startStop + '</span></div>',
                 '<div style="margin-bottom: 8px;">🏁 <strong>Gidilecek Son Durak (Hedef):</strong> <span style="color: #22c55e; font-weight: bold;">' + endStop + '</span></div>',
                 '<div style="margin-bottom: 8px;">🛑 <strong>Durulacak Duraklar Listesi (Sırasıyla):</strong><ol style="margin-left: 20px; margin-top: 6px; margin-bottom: 6px;">' + stopsHtml + '</ol></div>',
                 '<div style="margin-bottom: 12px;">📊 <strong>Toplam Durak Sayısı:</strong> ' + r.stops.length + ' Durak</div>',
                 '<hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.15); margin: 12px 0;">',
-                '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Nasıl Yapılacak? (Ayrıntılı Görev ve Sürüş Yönergesi):</div>',
-                '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px;">',
-                '    <li style="margin-bottom: 6px;"><strong>Kalkış ve Hızlanma:</strong> <code>W</code> veya <code>Yukarı Ok</code> tuşuna basarak gaz verin ve kalkış yapın. Şeridinizi korumak için <code>A / D</code> veya <code>Sol / Sağ Ok</code> tuşlarını kullanın.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Durağa Yaklaşma ve Duracak Zili:</strong> Durağa 220 metre kala inecek yolcu varsa akustik <code>DURACAK</code> zili çalar ve kokpitte kırmızı ikaz lambası yanar. Kademeli fren ve retarder ile sarsıntısız durun.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Kneeling ve Kapılar:</strong> Araç durduğunda <code>E</code> (Ön Kapı) ve <code>Q</code> (Arka Kapı) ile kapıları açın. Araç durağa yana yatar (Kneeling). Yolcular Tekirdağ Kart basarken resmî validatör sinyallerini dinleyin.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Kaptan Telsizi ve Konfor Takibi:</strong> <code>T</code> tuşuna basarak TEKULAŞ Hareket Merkezi telsiz anonsunu dinleyin. <code>C</code> tuşuyla yolcu memnuniyetini kontrol edin.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Görevi Başarıyla Bitirme:</strong> Sırasıyla tüm duraklara uğrayıp son durak olan <strong>' + endStop + '</strong> durağına vardığınızda görevi tamamlayıp prim kazanın!</li>',
-                '</ul>',
-                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>U</strong> Engelli Rampası | <strong>P</strong> Bagaj Kapağı | <strong>I</strong> Hat Tabelası | <strong>Z</strong> Zamanlama | <strong>J</strong> Kayıp Eşya | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>R</strong> Hız | <strong>Shift+T</strong> Saat.</div>'
+                howToDriveHtml,
+                shortcutsNote
             ].join("");
         }
 
