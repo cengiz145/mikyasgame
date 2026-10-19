@@ -192,7 +192,8 @@ const BusFleet = {
                 hornSound: "air",
                 cabinDamping: 0.80,
                 retarderPitch: 0.95,
-                character: "Dengeli uzun yol seyahat sesi + kademeli retarder ve havalı korna"
+                engineSample: "coach_terminal_idle",
+                character: "Orijinal Otogar Peron Rölantisi + Hava Tahliyesi ve Dengeli Uzun Yol Dizeli"
             }
         },
         {
@@ -353,6 +354,38 @@ const BusFleet = {
             }
         },
 {
+            id: "scania_irizar_i8",
+            brand: "Scania",
+            model: "Irizar i8 VIP",
+            fullName: "Scania Irizar i8 VIP (Otogar Peron Kralı)",
+            category: "seyahat",
+            categoryName: "VIP Lüks Seyahat Devi",
+            icon: "👑",
+            requiredLevel: 18,
+            price: 135000,
+            seatCapacity: 44,
+            standingCapacity: 0,
+            totalCapacity: 44,
+            maxSpeed: 120,
+            acceleration: 1.45,
+            braking: 1.4,
+            engine: "Scania DC13 Euro 6 (490 HP)",
+            transmission: "Opticruise 12 İleri Otomatik",
+            doorType: "Pnömatik Çift Kilitli Yolcu Kapısı",
+            features: "490 HP İsveç Scania motoru, Irizar aerodinamik lüks gövde, 2+1 VIP konfor, otogar peron hava tahliyesi.",
+            desc: "Türkiye otogarlarının ve ekspres hatlarının lüks simgesi. Perondan kalkarken hava tahliyesi ve tok dizel rölantisiyle fark yaratır.",
+            soundProfile: {
+                basePitch: 0.98,
+                bassBoost: 5,
+                hasRetarder: true,
+                hornSound: "air",
+                cabinDamping: 0.70,
+                retarderPitch: 1.0,
+                engineSample: "coach_terminal_idle",
+                character: "490 HP Scania rölanti homurtusu + Otogar peron hava tahliyesi ve gür havalı korna"
+            }
+        },
+        {
             id: "neoplan_cityliner",
             brand: "Neoplan",
             model: "Cityliner",

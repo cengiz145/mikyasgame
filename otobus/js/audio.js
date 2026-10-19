@@ -19,12 +19,19 @@ class AudioSystem {
         this.idleBuffer = null;
         this.bassIdleBuffer = null;
         this.coachIdleBuffer = null;
+        this.pureIdleBuffer = null;
+        this.coachTerminalIdleBuffer = null;
         this.cityIdleBuffer = null;
         try {
             fetch('sounds/freesound_pure_bus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
                 if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
                 return this.ctx.decodeAudioData(b);
-            }).then(decoded => { this.coachIdleBuffer = decoded; }).catch(() => {});
+            }).then(decoded => { this.pureIdleBuffer = decoded; this.coachIdleBuffer = decoded; }).catch(() => {});
+
+            fetch('sounds/freesound_coach_idle.mp3').then(r => r.arrayBuffer()).then(b => {
+                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                return this.ctx.decodeAudioData(b);
+            }).then(decoded => { this.coachTerminalIdleBuffer = decoded; }).catch(() => {});
 
             fetch('sounds/freesound_engine_city.mp3').then(r => r.arrayBuffer()).then(b => {
                 if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
@@ -413,12 +420,20 @@ class AudioSystem {
 
         this.sounds.start.once('end', () => {
             const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
-            const useBass = currentBus && (currentBus.soundProfile && currentBus.soundProfile.engineSample === 'bassrolanti' || currentBus.id.includes('travego') || currentBus.id.includes('o403') || currentBus.id.includes('setra') || currentBus.id.includes('safir'));
-            let activeBuffer = this.idleBuffer;
-            if (useBass) {
-                activeBuffer = this.coachIdleBuffer || this.bassIdleBuffer || this.idleBuffer;
-            } else {
-                activeBuffer = this.cityIdleBuffer || this.idleBuffer;
+            let activeBuffer = this.pureIdleBuffer || this.idleBuffer;
+            if (currentBus) {
+                if (currentBus.id.includes('tourismo') || currentBus.id.includes('irizar') || currentBus.id.includes('neoplan')) {
+                    // Orijinal otogar peron ve hava tahliyeli rölanti sesi
+                    activeBuffer = this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
+                } else if (currentBus.id.includes('o403')) {
+                    // Efsane V8 çift egzoz bas rölantisi
+                    activeBuffer = this.bassIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
+                } else if (currentBus.id.includes('travego') || currentBus.id.includes('setra') || currentBus.id.includes('safir') || currentBus.id.includes('man')) {
+                    // Saf ağır vasıta tok rölantisi (kesintisiz tır-tır-tır)
+                    activeBuffer = this.pureIdleBuffer || this.idleBuffer;
+                } else {
+                    activeBuffer = this.cityIdleBuffer || this.idleBuffer;
+                }
             }
             if (this.isEngineRunning && activeBuffer) {
                 this.idleSource = this.ctx.createBufferSource();

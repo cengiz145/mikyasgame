@@ -1,6 +1,6 @@
 /* ==========================================================================
    TÜRKİYE TURNESİ - SESLERİ GÖSTER & SES GALERİSİ (SOUND-GALLERY.JS)
-   Motor seslerini 10 saniye boyunca dinleme, havalı fren, korna ve efektler
+   Motor seslerini 10 saniye boyunca dinleme, havalı fren, korna, akbil ve efektler
    ========================================================================== */
 
 const SoundGallery = {
@@ -19,38 +19,38 @@ const SoundGallery = {
         {
             id: 'engine_pure_idle',
             category: 'engine',
-            title: 'Saf Ağır Dizel Rölanti (Tır Tır Tır Sesi)',
-            busId: 'pure_diesel',
+            title: 'Mercedes-Benz Travego 16 SHD (Saf Tır-Tır-Tır Sesi)',
+            busId: 'mercedes_travego_16shd',
             icon: '⚙️',
-            specs: 'Kesintisiz Saf Rölanti - 0 Dış Ses, 0 Fren Havası',
+            specs: 'OM 470 LA Euro 6, 456 HP - Kesintisiz Saf Rölanti',
             desc: 'Sadece motorun ritmik ve tok dizel çalışma homurtusu (tır-tır-tır-tır). Başka hiçbir yabancı ses içermez.',
-            type: 'coach',
+            type: 'pure',
             playbackRate: 1.0,
             bassBoost: 4
         },
         {
-            id: 'engine_travego',
+            id: 'engine_tourismo_terminal',
             category: 'engine',
-            title: 'Mercedes-Benz Travego 16 SHD',
-            busId: 'mercedes_travego_16shd',
-            icon: '👑',
-            specs: 'OM 470 LA Euro 6, 456 HP - Ağır V6 Şehirlerarası',
-            desc: 'Freesound Coach Idle: Derin, tok ve güçlü şehirlerarası dizel rölanti homurtusu.',
-            type: 'coach',
+            title: 'Mercedes-Benz Tourismo (Otogar Peron & Hava Tahliyeli)',
+            busId: 'mercedes_tourismo_16rhd',
+            icon: '🛣️',
+            specs: 'OM 936 Euro 6, 354 HP - Orijinal Peron Kalkış ve Hava Tahliyeli Ses',
+            desc: 'Orijinal Freesound kaydı: Peronda kalkış öncesi hava tahliye tıslaması ve ardından devam eden tok uzun yol dizel rölantisi.',
+            type: 'terminal',
             playbackRate: 1.0,
-            bassBoost: 3
+            bassBoost: 4
         },
         {
-            id: 'engine_tourismo',
+            id: 'engine_scania_irizar',
             category: 'engine',
-            title: 'Mercedes-Benz Tourismo 16 RHD',
-            busId: 'mercedes_tourismo_16rhd',
-            icon: '🚌',
-            specs: 'OM 470 LA, 428 HP - Akıcı Uzun Yol Dizel Rölantisi',
-            desc: 'Dengeli ve konforlu seyahat rölantisi, sakin kabin akustiği.',
-            type: 'coach',
-            playbackRate: 1.03,
-            bassBoost: 2
+            title: 'Scania Irizar i8 VIP (Otogar Peron Kralı)',
+            busId: 'scania_irizar_i8',
+            icon: '👑',
+            specs: 'Scania DC13 Euro 6, 490 HP - VIP Uzun Yol Rölantisi',
+            desc: '13 litrelik dev Scania motorunun hava tahliyeli güçlü otogar peron çalışması.',
+            type: 'terminal',
+            playbackRate: 0.98,
+            bassBoost: 5
         },
         {
             id: 'engine_o403',
@@ -60,7 +60,7 @@ const SoundGallery = {
             icon: '⭐',
             specs: 'OM 442 LA V8, 381 HP - Efsanevi V8 Çift Egzoz Bas Sesi',
             desc: '90\'ların ve 2000\'lerin kralı. Yeri göğü titreten o meşhur derin V8 dizel sesi.',
-            type: 'coach',
+            type: 'bass',
             playbackRate: 0.91,
             bassBoost: 7
         },
@@ -72,7 +72,7 @@ const SoundGallery = {
             icon: '💎',
             specs: 'OM 471 LA, 476 HP - Lüks Alman Şehirlerarası Motoru',
             desc: 'Kassbohrer-Setra kalitesi; sessiz, elit ve derinden gelen Alman güç homurtusu.',
-            type: 'coach',
+            type: 'pure',
             playbackRate: 0.97,
             bassBoost: 3
         },
@@ -84,8 +84,8 @@ const SoundGallery = {
             icon: '🇹🇷',
             specs: 'DAF PACCAR MX-11, 450 HP - Yerli Uzun Yol Devi',
             desc: 'DAF motor bloğunun kendine has yüksek torklu ve kararlı çalışma ritmi.',
-            type: 'coach',
-            playbackRate: 1.06,
+            type: 'pure',
+            playbackRate: 1.05,
             bassBoost: 4
         },
         {
@@ -96,7 +96,7 @@ const SoundGallery = {
             icon: '🦁',
             specs: 'D2676 LOH Euro 6, 460 HP - Tok Bavyera Dizeli',
             desc: 'Sert, otoriter ve güçlü Bavyera motor akustiği.',
-            type: 'coach',
+            type: 'pure',
             playbackRate: 0.95,
             bassBoost: 4
         },
@@ -108,7 +108,7 @@ const SoundGallery = {
             icon: '🚀',
             specs: 'MAN D2676, 470 HP - Çift Turbo Aerodinamik Seyahat',
             desc: 'Fütüristik çift turbo uzun yol rölantisi ve hafif ıslık tonu.',
-            type: 'coach',
+            type: 'terminal',
             playbackRate: 1.0,
             bassBoost: 3
         },
@@ -173,8 +173,7 @@ const SoundGallery = {
             bassBoost: 0
         },
 
-        
-        // --- 3. AKBİL VE KART OKUYUCU (VALIDATOR) SESLERİ ---
+        // --- 2. AKBİL VE KART OKUYUCU (VALIDATOR) SESLERİ ---
         {
             id: 'akbil_tam',
             category: 'akbil',
@@ -223,7 +222,8 @@ const SoundGallery = {
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('serbest');
             }
         },
-        // --- 2. PNÖMATİK & MEKANİK EFEKTLER ---
+
+        // --- 3. PNÖMATİK & MEKANİK EFEKTLER ---
         {
             id: 'fx_air_brake',
             category: 'effect',
@@ -328,12 +328,12 @@ const SoundGallery = {
 
         const tabAll = document.getElementById('tab-sound-all');
         const tabEngine = document.getElementById('tab-sound-engine');
-        const tabFx = document.getElementById('tab-sound-fx');
         const tabAkbil = document.getElementById('tab-sound-akbil');
-        if (tabAkbil) tabAkbil.addEventListener('click', () => this.switchTab('akbil'));
+        const tabFx = document.getElementById('tab-sound-fx');
 
         if (tabAll) tabAll.addEventListener('click', () => this.switchTab('all'));
         if (tabEngine) tabEngine.addEventListener('click', () => this.switchTab('engine'));
+        if (tabAkbil) tabAkbil.addEventListener('click', () => this.switchTab('akbil'));
         if (tabFx) tabFx.addEventListener('click', () => this.switchTab('effect'));
 
         // Klavye Kısayolu: [S] tuşu ile Ses Galerisi Açma
@@ -371,7 +371,7 @@ const SoundGallery = {
 
         this.renderModal(this.currentTab);
 
-        const welcomeText = "Sesleri Göster galerisi açıldı. 12 farklı otobüsün motor sesini 10 saniye boyunca dinleyebilir veya havalı fren, korna gibi efektleri deneyebilirsiniz.";
+        const welcomeText = "Sesleri Göster galerisi açıldı. Otobüs motor seslerini 10 saniye boyunca dinleyebilir veya akbil, havalı fren, korna gibi efektleri deneyebilirsiniz.";
         if (typeof audio !== 'undefined' && audio.speak) {
             audio.speak(welcomeText);
         }
@@ -418,7 +418,9 @@ const SoundGallery = {
         }
 
         this.renderModal(tab);
-        if (typeof KeyboardNav !== "undefined" && KeyboardNav.initForScreen) KeyboardNav.initForScreen();
+        if (typeof KeyboardNav !== "undefined" && KeyboardNav.initForScreen) {
+            KeyboardNav.initForScreen();
+        }
     },
 
     renderModal: function(tab = 'all') {
@@ -428,8 +430,8 @@ const SoundGallery = {
 
         const filtered = this.sounds.filter(s => {
             if (tab === 'engine') return s.category === 'engine';
-            if (tab === 'effect') return s.category === 'effect';
             if (tab === 'akbil') return s.category === 'akbil';
+            if (tab === 'effect') return s.category === 'effect';
             return true;
         });
 
@@ -452,9 +454,14 @@ const SoundGallery = {
             btn.style.borderRadius = '10px';
             btn.style.transition = 'all 0.2s ease';
 
-            const categoryTag = s.category === 'engine'
-                ? '<span style="color: #c084fc; font-size: 0.85rem; font-weight: bold; background: rgba(168,85,247,0.2); padding: 3px 8px; border-radius: 4px;">⏱️ 10 Saniye Motor Dinleme</span>'
-                : '<span style="color: #38bdf8; font-size: 0.85rem; font-weight: bold; background: rgba(56,189,248,0.2); padding: 3px 8px; border-radius: 4px;">💨 Havalı & Mekanik Efekt</span>';
+            let categoryTag = '';
+            if (s.category === 'engine') {
+                categoryTag = '<span style="color: #c084fc; font-size: 0.85rem; font-weight: bold; background: rgba(168,85,247,0.2); padding: 3px 8px; border-radius: 4px;">⏱️ 10 Saniye Motor Dinleme</span>';
+            } else if (s.category === 'akbil') {
+                categoryTag = '<span style="color: #38bdf8; font-size: 0.85rem; font-weight: bold; background: rgba(56,189,248,0.2); padding: 3px 8px; border-radius: 4px;">💳 Akbil & Kart Okuyucu</span>';
+            } else {
+                categoryTag = '<span style="color: #34d399; font-size: 0.85rem; font-weight: bold; background: rgba(16,185,129,0.2); padding: 3px 8px; border-radius: 4px;">💨 Havalı & Mekanik Efekt</span>';
+            }
 
             let playBadge = '';
             if (isPlaying) {
@@ -563,10 +570,14 @@ const SoundGallery = {
 
             let targetBuffer = null;
             if (typeof audio !== 'undefined') {
-                if (s.type === 'coach') {
-                    targetBuffer = audio.coachIdleBuffer || audio.bassIdleBuffer || audio.idleBuffer;
-                } else {
+                if (s.type === 'terminal') {
+                    targetBuffer = audio.coachTerminalIdleBuffer || audio.coachIdleBuffer || audio.pureIdleBuffer || audio.idleBuffer;
+                } else if (s.type === 'bass') {
+                    targetBuffer = audio.bassIdleBuffer || audio.pureIdleBuffer || audio.idleBuffer;
+                } else if (s.type === 'city') {
                     targetBuffer = audio.cityIdleBuffer || audio.idleBuffer;
+                } else {
+                    targetBuffer = audio.pureIdleBuffer || audio.coachIdleBuffer || audio.idleBuffer;
                 }
             }
 
@@ -602,7 +613,9 @@ const SoundGallery = {
                 this.currentGainNode = gain;
             } else {
                 // Buffer henüz çözülmemişse HTMLAudioElement ile garantili fallback
-                const audioSrc = s.type === 'coach' ? 'sounds/freesound_pure_bus_idle.mp3' : 'sounds/freesound_engine_city.mp3';
+                const audioSrc = s.type === 'terminal' 
+                    ? 'sounds/freesound_coach_idle.mp3' 
+                    : (s.type === 'city' ? 'sounds/freesound_engine_city.mp3' : 'sounds/freesound_pure_bus_idle.mp3');
                 this.currentHtmlAudio = new Audio(audioSrc);
                 this.currentHtmlAudio.loop = true;
                 this.currentHtmlAudio.play().catch(() => {});
