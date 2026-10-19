@@ -131,7 +131,82 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-        // 0.5. Login Screen
+            // 0.5. Login Screen & Bölge / İlçe Listesi Sistemi
+    const DISTRICT_OPTIONS = [
+        { id: "Süleymanpaşa", icon: "🏙️", name: "Süleymanpaşa (Tekirdağ Merkez)", desc: "Şehir içi sahil, çarşı ve üniversite hatları" },
+        { id: "Saray", icon: "🌳", name: "Saray (İlçe Merkezi & Mahalleleri)", desc: "Kuzey Trakya ormanları ve ilçe hatları" },
+        { id: "Velimeşe", icon: "🏭", name: "Velimeşe (Ergene Sanayi & TOKİ)", desc: "Sanayi bölgesi, TOKİ konutları ve fabrika hatları" },
+        { id: "Çorlu", icon: "🏭", name: "Çorlu (Sanayi & Şehir Merkezi)", desc: "Büyük metropol ve yoğun şehir hatları" },
+        { id: "Çerkezköy - Kapaklı", icon: "🏢", name: "Çerkezköy ve Kapaklı", desc: "Organize sanayi ve ilçe hatları" },
+        { id: "Malkara", icon: "🌾", name: "Malkara (Merkez & Köy Yolları)", desc: "Geniş ova, tepe mahalleler ve köy yolları" },
+        { id: "Hayrabolu", icon: "🌻", name: "Hayrabolu (Trakya Ovası)", desc: "Ayçiçeği tarlaları ve ova çarşı hatları" },
+        { id: "Şarköy", icon: "🍇", name: "Şarköy (Sahil & Bağ Yolları)", desc: "Marmara denizi kıyısı ve bağ hatları" },
+        { id: "Muratlı", icon: "🚆", name: "Muratlı (Tren Garı & Çarşı)", desc: "Tren istasyonu aksı ve ilçe merkez seferleri" }
+    ];
+
+    let chosenDistrict = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
+
+    const renderLoginDistrictList = () => {
+        const listEl = document.getElementById('login-district-list');
+        const statusEl = document.getElementById('lbl-current-chosen-district');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+
+        DISTRICT_OPTIONS.forEach((opt, idx) => {
+            const isSelected = (opt.id === chosenDistrict);
+            const li = document.createElement('li');
+            li.style.marginBottom = '6px';
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `menu-btn nav-item login-dist-btn ${isSelected ? 'primary-btn' : ''}`;
+            btn.style.width = '100%';
+            btn.style.textAlign = 'left';
+            btn.style.padding = '10px 14px';
+            btn.style.fontSize = '0.98rem';
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'space-between';
+            btn.style.border = isSelected ? '2px solid #22c55e' : '1px solid rgba(56,189,248,0.3)';
+            btn.style.background = isSelected ? 'rgba(34, 197, 94, 0.22)' : 'rgba(15,23,42,0.7)';
+            btn.style.cursor = 'pointer';
+            btn.setAttribute('role', 'option');
+            btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            btn.setAttribute('data-dist-id', opt.id);
+            btn.setAttribute('aria-label', `${idx + 1}. İlçe: ${opt.name}. ${isSelected ? 'Seçili bölge.' : 'Seçmek için Enter tuşuna basın.'}`);
+
+            btn.innerHTML = `
+                <span><strong>${opt.icon} ${opt.name}</strong></span>
+                <span style="font-weight:bold; font-size:0.9rem; color:${isSelected ? '#4ade80' : '#94a3b8'}">
+                    ${isSelected ? '✓ SEÇİLİ' : 'Seç'}
+                </span>
+            `;
+
+            btn.onclick = () => {
+                chosenDistrict = opt.id;
+                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                if (statusEl) statusEl.innerText = `${opt.icon} ${opt.name}`;
+                renderLoginDistrictList();
+                const selBtn = listEl.querySelector(`[data-dist-id="${opt.id}"]`);
+                if (selBtn) selBtn.focus();
+                const announceText = `${opt.name} seçildi.`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceText);
+                if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceText);
+            };
+
+            li.appendChild(btn);
+            listEl.appendChild(li);
+        });
+
+        if (statusEl) {
+            const cur = DISTRICT_OPTIONS.find(o => o.id === chosenDistrict) || DISTRICT_OPTIONS[0];
+            statusEl.innerText = `${cur.icon} ${cur.name}`;
+        }
+    };
+
+    // Açılışta login listesini hazırla
+    renderLoginDistrictList();
+
     const usernameInput = document.getElementById('username-input');
     const btnLogin = document.getElementById('btn-login');
 
@@ -156,8 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn("Firebase bağlantı hatası, yerel modla devam ediliyor:", error);
         }
 
-        const distSelect = document.getElementById('district-select-input');
-        const chosenDistrict = (distSelect && distSelect.value) ? distSelect.value : 'Süleymanpaşa';
         if (typeof Game !== 'undefined' && Game.setActiveDistrict) {
             Game.setActiveDistrict(chosenDistrict);
         } else {
@@ -182,6 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const licenseTitle = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
             UI.updatePlayerStats(Game.licenseLevel || 1, Game.completedTasks || 0, Game.playerBudget || 0, licenseTitle);
         }
+        if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
+            UI.updateTitleScreenButtons();
+        }
     };
 
     if (usernameInput) {
@@ -197,27 +273,103 @@ document.addEventListener('DOMContentLoaded', () => {
         btnLogin.addEventListener('click', handleLoginAction);
     }
 
-        // Title Screen - Aktif Bölge Değiştir Butonu
+    // Title Screen - Bölge & İlçe Seçim Modalı (Listeden Oklarla Gezinme)
+    const openDistrictPickerModal = () => {
+        const modal = document.getElementById('district-picker-modal');
+        const listEl = document.getElementById('district-picker-list');
+        if (!modal || !listEl) return;
+
+        const curDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || 'Süleymanpaşa');
+        listEl.innerHTML = '';
+
+        DISTRICT_OPTIONS.forEach((opt, idx) => {
+            const isSelected = (opt.id === curDist);
+            const li = document.createElement('li');
+            li.style.marginBottom = '8px';
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `menu-btn nav-item ${isSelected ? 'primary-btn' : ''}`;
+            btn.style.width = '100%';
+            btn.style.textAlign = 'left';
+            btn.style.padding = '12px 16px';
+            btn.style.fontSize = '1.02rem';
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'space-between';
+            btn.style.border = isSelected ? '2px solid #22c55e' : '1.5px solid rgba(56,189,248,0.3)';
+            btn.style.background = isSelected ? 'rgba(34, 197, 94, 0.22)' : 'rgba(15,23,42,0.85)';
+            btn.style.cursor = 'pointer';
+            btn.setAttribute('role', 'option');
+            btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            btn.setAttribute('data-dist-id', opt.id);
+            btn.setAttribute('aria-label', `${idx + 1}. İlçe: ${opt.name}. ${opt.desc}. ${isSelected ? 'Şu anki aktif bölgeniz.' : 'Seçmek için Enter tuşuna basın.'}`);
+
+            btn.innerHTML = `
+                <span class="btn-text">
+                    <strong>${opt.icon} ${opt.name}</strong>
+                    <small style="display:block; color:#94a3b8; font-size:0.85rem; margin-top:2px;">${opt.desc}</small>
+                </span>
+                <span style="font-weight:bold; font-size:0.95rem; color:${isSelected ? '#4ade80' : '#38bdf8'};">
+                    ${isSelected ? '✓ SEÇİLİ' : 'Seç (Enter)'}
+                </span>
+            `;
+
+            btn.onclick = () => {
+                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                if (typeof Game !== 'undefined' && Game.setActiveDistrict) {
+                    Game.setActiveDistrict(opt.id);
+                } else {
+                    localStorage.setItem('activeDistrict', opt.id);
+                }
+                closeDistrictPickerModal();
+                if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
+                    UI.updateTitleScreenButtons();
+                }
+                const announceMsg = `${opt.name} ana bölgeniz olarak seçildi. 1. Seviye seferleriniz 4 duraktan başlayarak hazırlandı.`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceMsg);
+                if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`📍 Aktif Bölge: ${opt.name}`, 'success');
+            };
+
+            li.appendChild(btn);
+            listEl.appendChild(li);
+        });
+
+        modal.classList.remove('hidden');
+        if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+            KeyboardNav.initForScreen();
+        }
+
+        // Seçili ilçeye veya ilk öğeye odaklan
+        setTimeout(() => {
+            const activeBtn = listEl.querySelector(`[data-dist-id="${curDist}"]`) || listEl.querySelector('button');
+            if (activeBtn) activeBtn.focus();
+        }, 100);
+
+        const welcomeVoice = "Bölge ve ilçe seçim listesi açıldı. Yukarı ve aşağı oklarla 9 ilçe arasında gezinebilir, Enter ile seçebilirsiniz.";
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(welcomeVoice);
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(welcomeVoice);
+    };
+
+    const closeDistrictPickerModal = () => {
+        const modal = document.getElementById('district-picker-modal');
+        if (modal) modal.classList.add('hidden');
+        if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+            KeyboardNav.initForScreen();
+        }
+        const btnChange = document.getElementById('btn-change-active-district');
+        if (btnChange) btnChange.focus();
+    };
+
+    const btnClosePicker = document.getElementById('btn-close-district-picker');
+    if (btnClosePicker) {
+        btnClosePicker.addEventListener('click', closeDistrictPickerModal);
+    }
+
     const btnChangeDist = document.getElementById('btn-change-active-district');
     if (btnChangeDist) {
-        btnChangeDist.addEventListener('click', () => {
-            const allDistricts = ["Süleymanpaşa", "Saray", "Velimeşe", "Çorlu", "Çerkezköy - Kapaklı", "Malkara", "Hayrabolu", "Şarköy", "Muratlı"];
-            const cur = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
-            let idx = allDistricts.indexOf(cur);
-            let next = allDistricts[(idx + 1) % allDistricts.length];
-
-            if (typeof Game !== 'undefined' && Game.setActiveDistrict) {
-                Game.setActiveDistrict(next);
-            } else {
-                localStorage.setItem('activeDistrict', next);
-            }
-            if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
-                UI.updateTitleScreenButtons();
-            }
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak(`Ana çalışma bölgeniz ${next} olarak ayarlandı. 1. Seviye Çıraklık seferleriniz ${next} için 4 duraktan başlayarak hazırlandı.`);
-            }
-        });
+        btnChangeDist.addEventListener('click', openDistrictPickerModal);
     }
 
     // 1. Title Screen - Şehir İçi ve Şehirlerarası Ayrımı

@@ -776,6 +776,14 @@ window.addEventListener('keydown', (e) => {
 
     // ESCAPE: Açıklamayı susturur ve çıkar
     if (e.key === 'Escape') {
+        const pickerModal = document.getElementById('district-picker-modal');
+        if (pickerModal && !pickerModal.classList.contains('hidden')) {
+            pickerModal.classList.add('hidden');
+            KeyboardNav.initForScreen();
+            const btnChange = document.getElementById('btn-change-active-district');
+            if (btnChange) btnChange.focus();
+            return;
+        }
         if (typeof MissionReader !== 'undefined') MissionReader.exit();
         return;
     }
@@ -795,6 +803,13 @@ window.addEventListener('keydown', (e) => {
     }
 
     if (isDriving) return;
+
+    // Metin kutusunda (input/textarea) Sol ve Sağ ok tuşlarının imleci hareket ettirmesine izin ver
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            return;
+        }
+    }
 
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
         e.preventDefault();

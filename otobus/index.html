@@ -27,7 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/styles.css?v=1792436450977">
+    <link rel="stylesheet" href="css/styles.css?v=1792445659699">
 </head>
 <body>
     <div id="nvda-live-region" aria-live="assertive" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
@@ -63,20 +63,17 @@
                 <input type="text" id="username-input" class="modern-btn nav-item" style="width: 100%; text-align: center; font-size: 1.2rem; cursor: text; background: rgba(255,255,255,0.1); border: 2px solid var(--primary);" value="Kaptan" placeholder="Kullanıcı Adı Giriniz" aria-label="Kullanıcı adınız. Varsayılan olarak Kaptan belirlenmiştir.">
             </div>
             
-                        <div style="margin-bottom: 20px; text-align: left;">
-                <label for="district-select-input" style="display: block; margin-bottom: 8px; font-weight: bold; color: #38bdf8;">📍 Ana Çalışma Bölgesi (Merkez Üssü):</label>
-                <select id="district-select-input" class="modern-btn nav-item" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 10px; background: rgba(0,0,0,0.6); border: 2px solid #38bdf8; color: #fff;" aria-label="Başlangıç ve ana çalışma bölgenizi seçin">
-                    <option value="Süleymanpaşa" selected>🏙️ Süleymanpaşa (Tekirdağ Merkez)</option>
-                    <option value="Saray">🌳 Saray (İlçe Merkezi & Mahalleleri)</option>
-                    <option value="Velimeşe">🏭 Velimeşe (Ergene Sanayi & TOKİ)</option>
-                    <option value="Çorlu">🏭 Çorlu (Sanayi & Şehir Merkezi)</option>
-                    <option value="Çerkezköy - Kapaklı">🏢 Çerkezköy ve Kapaklı</option>
-                    <option value="Malkara">🌾 Malkara (Merkez & Köy Yolları)</option>
-                    <option value="Hayrabolu">🌻 Hayrabolu (Trakya Ovası)</option>
-                    <option value="Şarköy">🍇 Şarköy (Sahil & Bağ Yolları)</option>
-                    <option value="Muratlı">🚆 Muratlı (Tren Garı & Çarşı)</option>
-                </select>
-                <small style="color: #94a3b8; display: block; margin-top: 6px; font-size: 0.85rem;">Seçtiğiniz bölgenin mahalleleri ana rotanız olur, diğer ilçeler ilerde açılır.</small>
+                                    <div style="margin-bottom: 20px; text-align: left;">
+                <label id="lbl-login-district-title" style="display: block; margin-bottom: 6px; font-weight: bold; color: #38bdf8;">
+                    📍 Başlangıç Bölgesi (İlçe Listesi):
+                </label>
+                <div id="login-district-status" style="margin-bottom: 8px; color: #4ade80; font-weight: bold; font-size: 0.95rem;">
+                    Seçili Bölge: <span id="lbl-current-chosen-district">🏙️ Süleymanpaşa</span>
+                </div>
+                <ul id="login-district-list" class="menu-list" style="max-height: 220px; overflow-y: auto; list-style: none; padding: 4px; margin: 0 0 8px 0; border: 1.5px solid rgba(56,189,248,0.4); border-radius: 8px; background: rgba(0,0,0,0.5);" role="listbox" aria-label="Başlangıç bölgesi listesi. Yukarı ve aşağı oklarla gezin, Enter ile seçin.">
+                    <!-- Dinamik doldurulacak -->
+                </ul>
+                <small style="color: #94a3b8; display: block; font-size: 0.85rem;">Yukarı/Aşağı oklarla listede gezinin. İstediğiniz ilçede Enter'a basıp seçin.</small>
             </div>
             <button id="btn-login" class="modern-btn btn-primary nav-item" style="width: 100%; padding: 15px; font-size: 1.2rem;" aria-label="Oyuna Gir">
                 <span class="btn-icon">👤</span> Oyuna Gir
@@ -95,9 +92,9 @@
             <h1 class="main-title" style="font-size: 3.5rem;">Otobüs Simülasyonu</h1>
         </div>
 
-                <div id="active-district-badge-container" style="margin-bottom: 14px; text-align: center; z-index: 1;">
-            <button id="btn-change-active-district" class="modern-btn nav-item" style="padding: 8px 18px; font-size: 1rem; background: rgba(56,189,248,0.15); border: 1.5px solid #38bdf8; color: #38bdf8; border-radius: 20px; cursor: pointer;" aria-label="Ana çalışma bölgesini değiştir">
-                📍 Ana Bölge: <strong id="lbl-active-district">Süleymanpaşa</strong> 🔄 (Değiştirmek İçin Tıkla)
+                        <div id="active-district-badge-container" style="margin-bottom: 14px; text-align: center; z-index: 1;">
+            <button id="btn-change-active-district" class="menu-btn nav-item" style="padding: 10px 20px; font-size: 1.05rem; background: rgba(56,189,248,0.18); border: 2px solid #38bdf8; color: #38bdf8; border-radius: 25px; cursor: pointer; justify-content: center;" aria-label="Bölge veya Şehir Değiştir. Şu anki bölge: Süleymanpaşa. Listeden seçmek için tıklayın">
+                📍 Bölge / İlçe Değiştir: <strong id="lbl-active-district" style="color: #fde047; margin-left: 6px;">Süleymanpaşa</strong> 📋 (Listeyi Aç)
             </button>
         </div>
         <div class="menu-container" style="z-index: 1;">
@@ -441,6 +438,24 @@
     </div>
 
     
+        <!-- Dedicated District / City Picker Modal (Listeden Oklarla Seçim) -->
+    <div id="district-picker-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 6500; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;" role="dialog" aria-modal="true" aria-labelledby="district-picker-title">
+        <div class="glass-panel" style="max-width: 540px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; padding: 24px;">
+            <h2 id="district-picker-title" style="color: #38bdf8; margin-bottom: 8px; font-size: 1.5rem; text-align: center;">
+                📍 Çalışmak İstediğiniz Bölgeyi / Şehri Seçin
+            </h2>
+            <p style="color: #94a3b8; font-size: 0.95rem; text-align: center; margin-bottom: 16px;">
+                Aşağı ve yukarı oklarla listede gezinin, seçmek istediğiniz ilçede <strong>ENTER</strong> tuşuna basın.
+            </p>
+            <ul id="district-picker-list" class="menu-list" style="overflow-y: auto; max-height: 50vh; list-style: none; padding: 0; margin: 0 0 16px 0;" role="listbox" aria-label="İlçe ve Bölge Listesi">
+                <!-- Javascript ile 9 ilçe butonları eklenecek -->
+            </ul>
+            <button id="btn-close-district-picker" class="menu-btn secondary-btn nav-item" style="justify-content: center; width: 100%; border-color: #ef4444; color: #ef4444;">
+                ❌ Vazgeç / Kapat
+            </button>
+        </div>
+    </div>
+
     <!-- District Selection Modal -->
     <div id="district-dest-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 6000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
         <h2 style="color: var(--text-light); margin-bottom: 10px; font-size: 2rem;">🏙️ Şehir İçi ve İlçe Belediye Seferleri (TEKULAŞ)</h2>
@@ -466,31 +481,31 @@
             <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="js/firebase.js?v=1792436450977"></script>
+    <script src="js/firebase.js?v=1792445659699"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-    <script src="js/map-engine.js?v=1792436450977"></script>
-    <script src="js/tekulas-data.js?v=1792436450977"></script>
-    <script src="js/data.js?v=1792436450977"></script>
-    <script src="js/audio-base64.js?v=1792436450977"></script>
-    <script src="sounds/npc_list.js?v=1792436450977"></script>
-    <script src="js/audio.js?v=1792436450977"></script>
-    <script src="js/api.js?v=1792436450977"></script>
-    <script src="js/ui.js?v=1792436450977"></script>
-    <script src="js/bus-fleet.js?v=1792436450977"></script>
-    <script src="js/stop-discovery.js?v=1792436450977"></script>
-    <script src="js/achievements-data.js?v=1792436450977"></script>
-        <script src="js/sound-gallery.js?v=1792436450977"></script>
-<script src="js/driver-badges.js?v=1792436450977"></script>
-    <script src="js/smart-system.js?v=1792436450977"></script>
-    <script src="js/smart-route.js?v=1792436450977"></script>
-    <script src="js/velimese-navigation.js?v=1792436450977"></script>
-    <script src="js/suleymanpasa-navigation.js?v=1792436450977"></script>
-    <script src="js/saray-navigation.js?v=1792436450977"></script>
-    <script src="js/compass-system.js?v=1792436450977"></script>
-    <script src="js/voice-assistant.js?v=1792436450977"></script>
-    <script src="js/game.js?v=1792436450977"></script>
-    <script src="js/app.js?v=1792436450977"></script>
+    <script src="js/map-engine.js?v=1792445659699"></script>
+    <script src="js/tekulas-data.js?v=1792445659699"></script>
+    <script src="js/data.js?v=1792445659699"></script>
+    <script src="js/audio-base64.js?v=1792445659699"></script>
+    <script src="sounds/npc_list.js?v=1792445659699"></script>
+    <script src="js/audio.js?v=1792445659699"></script>
+    <script src="js/api.js?v=1792445659699"></script>
+    <script src="js/ui.js?v=1792445659699"></script>
+    <script src="js/bus-fleet.js?v=1792445659699"></script>
+    <script src="js/stop-discovery.js?v=1792445659699"></script>
+    <script src="js/achievements-data.js?v=1792445659699"></script>
+        <script src="js/sound-gallery.js?v=1792445659699"></script>
+<script src="js/driver-badges.js?v=1792445659699"></script>
+    <script src="js/smart-system.js?v=1792445659699"></script>
+    <script src="js/smart-route.js?v=1792445659699"></script>
+    <script src="js/velimese-navigation.js?v=1792445659699"></script>
+    <script src="js/suleymanpasa-navigation.js?v=1792445659699"></script>
+    <script src="js/saray-navigation.js?v=1792445659699"></script>
+    <script src="js/compass-system.js?v=1792445659699"></script>
+    <script src="js/voice-assistant.js?v=1792445659699"></script>
+    <script src="js/game.js?v=1792445659699"></script>
+    <script src="js/app.js?v=1792445659699"></script>
 
     <!-- AKILLI ROTA SİSTEMİ (NEREDEN ➔ NEREYE) MODALI -->
     <div id="smart-route-modal" class="modal-overlay modal hidden" role="dialog" aria-modal="true" aria-labelledby="smart-route-title">
