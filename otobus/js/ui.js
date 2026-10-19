@@ -423,12 +423,31 @@ const UI = {
         if (!listEl) return;
         listEl.innerHTML = "";
         
-        // Şehrin tüm görev rotalarını al
-        let cityRoutes = Object.values(routesData).filter(r => r.sehir === cityName && typeof r.taskIndex === 'number');
+        // Şehrin tüm görev rotalarını al (Kimlik ve isme göre tekilleştirilmiş)
+        const seenRouteKeys = new Set();
+        let cityRoutes = [];
+        Object.values(routesData).forEach(r => {
+            if (!r || !r.id) return;
+            const key = r.id;
+            if (seenRouteKeys.has(key)) return;
+            seenRouteKeys.add(key);
+            if (r.sehir === cityName && typeof r.taskIndex === 'number') {
+                cityRoutes.push(r);
+            }
+        });
         
-        // Eğer görev rotası yoksa, normal hatları göster
+        // Eğer görev rotası yoksa, normal hatları göster (Tekilleştirilmiş)
         if (cityRoutes.length === 0) {
-            cityRoutes = Object.values(routesData).filter(r => r.sehir === cityName);
+            seenRouteKeys.clear();
+            Object.values(routesData).forEach(r => {
+                if (!r || !r.id) return;
+                const key = r.name || r.id;
+                if (seenRouteKeys.has(key)) return;
+                seenRouteKeys.add(key);
+                if (r.sehir === cityName || (cityName === "Tekirdağ" && (r.isDistrict || r.originDistrict === "Süleymanpaşa" || r.destDistrict))) {
+                    cityRoutes.push(r);
+                }
+            });
         }
 
         if (cityRoutes.length === 0) {
