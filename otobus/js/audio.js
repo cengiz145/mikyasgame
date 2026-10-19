@@ -21,7 +21,7 @@ class AudioSystem {
         this.coachIdleBuffer = null;
         this.cityIdleBuffer = null;
         try {
-            fetch('sounds/freesound_coach_idle.mp3').then(r => r.arrayBuffer()).then(b => {
+            fetch('sounds/freesound_pure_bus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
                 if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
                 return this.ctx.decodeAudioData(b);
             }).then(decoded => { this.coachIdleBuffer = decoded; }).catch(() => {});

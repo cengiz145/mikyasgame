@@ -17,6 +17,18 @@ const SoundGallery = {
     sounds: [
         // --- 1. OTOBÜS MOTORLARI (10 Saniye Dinleme) ---
         {
+            id: 'engine_pure_idle',
+            category: 'engine',
+            title: 'Saf Ağır Dizel Rölanti (Tır Tır Tır Sesi)',
+            busId: 'pure_diesel',
+            icon: '⚙️',
+            specs: 'Kesintisiz Saf Rölanti - 0 Dış Ses, 0 Fren Havası',
+            desc: 'Sadece motorun ritmik ve tok dizel çalışma homurtusu (tır-tır-tır-tır). Başka hiçbir yabancı ses içermez.',
+            type: 'coach',
+            playbackRate: 1.0,
+            bassBoost: 4
+        },
+        {
             id: 'engine_travego',
             category: 'engine',
             title: 'Mercedes-Benz Travego 16 SHD',
@@ -590,7 +602,7 @@ const SoundGallery = {
                 this.currentGainNode = gain;
             } else {
                 // Buffer henüz çözülmemişse HTMLAudioElement ile garantili fallback
-                const audioSrc = s.type === 'coach' ? 'sounds/freesound_coach_idle.mp3' : 'sounds/freesound_engine_city.mp3';
+                const audioSrc = s.type === 'coach' ? 'sounds/freesound_pure_bus_idle.mp3' : 'sounds/freesound_engine_city.mp3';
                 this.currentHtmlAudio = new Audio(audioSrc);
                 this.currentHtmlAudio.loop = true;
                 this.currentHtmlAudio.play().catch(() => {});
