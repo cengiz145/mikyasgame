@@ -82,42 +82,138 @@ async function fetchStopsFromOverpass(queryStr) {
     }
 }
 
+// Her Seçilen İlçe İçin Kesintisiz, Kaldığı Yerden Devam Eden ve 4 Durakla Başlayan 10 Görevli Şehir Turu Motoru
+function buildDistrictContinuousCircuit(districtName, tekulasDb) {
+    let master = [];
+    let defaultLineRef = null;
+
+    if (districtName === "Süleymanpaşa") {
+        const h1 = tekulasDb.find(r => r.name && r.name.includes("RÜSTEMPAŞA") && r.stops && r.stops.length >= 20) || tekulasDb[0];
+        const h18 = tekulasDb.find(r => r.id === "tekulas_175_18") || tekulasDb[1];
+        const h17 = tekulasDb.find(r => r.id === "tekulas_172_17_donus") || tekulasDb[2];
+        if (h1 && h1.stops) h1.stops.forEach(s => master.push(Object.assign({}, s)));
+        if (h18 && h18.stops) for (let i = 1; i < h18.stops.length; i++) master.push(Object.assign({}, h18.stops[i]));
+        if (h17 && h17.stops) for (let i = 1; i < h17.stops.length; i++) master.push(Object.assign({}, h17.stops[i]));
+        defaultLineRef = h1;
+    } else if (districtName === "Saray") {
+        const saraySokaklar = (typeof SarayNavigasyon !== 'undefined' && SarayNavigasyon.sokaklar)
+            ? SarayNavigasyon.sokaklar
+            : ((typeof window !== 'undefined' && window.SarayNavigasyon) ? window.SarayNavigasyon.sokaklar : []);
+        if (saraySokaklar && saraySokaklar.length >= 20) {
+            master = saraySokaklar.map(s => ({
+                name: s.name,
+                lat: s.lat,
+                lon: s.lon,
+                yolTipi: (s.cat === "Sokak" ? "Mahalle Sokağı" : (s.cat === "Köy Yolu" ? "Toprak Yol" : "Asfalt Cadde"))
+            }));
+        } else {
+            const sLines = tekulasDb.filter(r => r.district === "Saray" && r.stops && r.stops.length >= 5);
+            sLines.forEach(l => l.stops.forEach(s => master.push(Object.assign({}, s))));
+        }
+        defaultLineRef = { id: "saray_master", name: "Saray İlçe İçi Seferleri", district: "Saray", totalKm: 18 };
+    } else if (districtName === "Velimeşe") {
+        const velimeseSokaklar = (typeof VelimeseNavigasyon !== 'undefined' && VelimeseNavigasyon.sokaklar)
+            ? VelimeseNavigasyon.sokaklar
+            : ((typeof window !== 'undefined' && window.VelimeseNavigasyon) ? window.VelimeseNavigasyon.sokaklar : []);
+        if (velimeseSokaklar && velimeseSokaklar.length >= 20) {
+            master = velimeseSokaklar.slice(0, 60).map(s => ({
+                name: s.name,
+                lat: s.lat,
+                lon: s.lon,
+                yolTipi: (s.cat === "Sanayi" ? "Asfalt Cadde" : "Mahalle Sokağı")
+            }));
+        } else {
+            const vLines = tekulasDb.filter(r => (r.name && r.name.includes("VELİMEŞE") || r.district === "Velimeşe") && r.stops && r.stops.length >= 5);
+            vLines.forEach(l => l.stops.forEach(s => master.push(Object.assign({}, s))));
+        }
+        defaultLineRef = { id: "velimese_master", name: "Velimeşe Ergene Seferleri", district: "Velimeşe", totalKm: 22 };
+    } else if (districtName === "Çorlu") {
+        const h1 = tekulasDb.find(r => r.id === 'tekulas_1_1_yesiltepe') || tekulasDb[0];
+        const h2 = tekulasDb.find(r => r.id === 'tekulas_3_2') || tekulasDb[1];
+        if (h1 && h1.stops) h1.stops.forEach(s => master.push(Object.assign({}, s)));
+        if (h2 && h2.stops) for (let i = 1; i < h2.stops.length; i++) master.push(Object.assign({}, h2.stops[i]));
+        defaultLineRef = h1;
+    } else if (districtName === "Çerkezköy - Kapaklı" || districtName === "Çerkezköy" || districtName === "Kapaklı") {
+        const h1 = tekulasDb.find(r => r.id === 'tekulas_75_1') || tekulasDb[0];
+        const h2 = tekulasDb.find(r => r.id === 'tekulas_77_2') || tekulasDb[1];
+        const h3 = tekulasDb.find(r => r.id === 'tekulas_78_3_tepe_cezaevi') || tekulasDb[2];
+        if (h1 && h1.stops) h1.stops.forEach(s => master.push(Object.assign({}, s)));
+        if (h2 && h2.stops) for (let i = 1; i < h2.stops.length; i++) master.push(Object.assign({}, h2.stops[i]));
+        if (h3 && h3.stops) for (let i = 1; i < h3.stops.length; i++) master.push(Object.assign({}, h3.stops[i]));
+        defaultLineRef = h1;
+    } else {
+        const distLines = tekulasDb.filter(r => (r.district === districtName || (r.district && r.district.includes(districtName))) && r.stops && r.stops.length >= 3);
+        if (distLines.length > 0) {
+            distLines.forEach((l, lIdx) => {
+                const startIdx = lIdx === 0 ? 0 : 1;
+                for (let i = startIdx; i < l.stops.length; i++) {
+                    master.push(Object.assign({}, l.stops[i]));
+                }
+            });
+            defaultLineRef = distLines[0];
+        } else {
+            master = tekulasDb[0].stops.map(s => Object.assign({}, s));
+            defaultLineRef = tekulasDb[0];
+        }
+    }
+
+    const N = master.length;
+    for (let i = 0; i < N - 1; i++) {
+        if (!master[i].gercekMesafeSonraki || master[i].gercekMesafeSonraki === 0) {
+            const d = calculateDistance(master[i].lat, master[i].lon, master[i+1].lat, master[i+1].lon);
+            master[i].gercekMesafeSonraki = Math.max(0.4, Math.round(d * 10) / 10);
+        }
+    }
+    master[N - 1].gercekMesafeSonraki = 0;
+
+    // 10 Görevlik Aşamalı ve Kesintisiz Kesitler (1. Görev kesinlikle 4 duraklı nazik başlangıç!)
+    const cuts = [0, Math.min(3, N - 1)];
+    const remaining = (N - 1) - cuts[1];
+    const weights = [1.2, 1.3, 1.5, 1.6, 1.8, 2.0, 2.3, 2.6, 3.0];
+    const totalW = weights.reduce((a, b) => a + b, 0);
+
+    let cur = cuts[1];
+    for (let i = 0; i < 9; i++) {
+        if (i === 8) {
+            cuts.push(N - 1);
+        } else {
+            const step = Math.max(1, Math.round((remaining * weights[i]) / totalW));
+            cur = Math.min(N - 1 - (8 - i), cur + step);
+            cuts.push(cur);
+        }
+    }
+
+    const slices = [];
+    for (let i = 0; i < 10; i++) {
+        const cStart = cuts[i];
+        const cEnd = cuts[i + 1];
+        const startStop = master[cStart].name;
+        const endStop = master[cEnd].name;
+        slices.push({
+            name: `${districtName} Etabı ${i + 1}: ${startStop} ➔ ${endStop}`,
+            start: cStart,
+            end: cEnd,
+            lineRef: defaultLineRef
+        });
+    }
+
+    return { master, slices, defaultLineRef };
+}
+
 // Generate 30 Progressive Routes (3 Licenses x 10 Tasks) from raw API stops
-function generateRoutesFromAPI(rawStops, cityName) {
+function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
     /* TEKULAŞ_PROGRESSIVE_TASKS_SYSTEM */
     // TEKİRDAĞ İÇİN RESMİ TEKULAŞ BELEDİYE HATLARI HARİTALAMASI (183 HAT VERİTABANI)
     if (cityName === "Tekirdağ" && typeof window !== 'undefined' && window.tekulasHatVeritabani && window.tekulasHatVeritabani.length > 0) {
         const tekulasDb = window.tekulasHatVeritabani;
         
-        // 1. Seviye Çıraklık: KESİNTİSİZ ŞEHİR TURU (Kaldığı Duraktan Devam Eden Zincirleme Hatlar)
-        // Hat 1 (Rüstempaşa -> NKÜ Araştırma) + Hat 18 (NKÜ -> Şehir Hastanesi) + Hat 17 (Şehir Hastanesi -> Köprübaşı)
-        const h1 = tekulasDb.find(r => r.name.includes("RÜSTEMPAŞA") && r.stops && r.stops.length >= 20) || tekulasDb[0];
-        const h18 = tekulasDb.find(r => r.id === "tekulas_175_18") || tekulasDb[1];
-        const h17 = tekulasDb.find(r => r.id === "tekulas_172_17_donus") || tekulasDb[2];
+        // Aktif çalışma bölgesini belirle (Varsayılan: Süleymanpaşa)
+        const targetDistrict = activeDistrict || (typeof Game !== 'undefined' && Game.activeDistrict) || (typeof localStorage !== 'undefined' ? localStorage.getItem('activeDistrict') : null) || "Süleymanpaşa";
 
-        const masterLevel1Stops = [];
-        if (h1 && h1.stops) h1.stops.forEach(s => masterLevel1Stops.push(Object.assign({}, s)));
-        if (h18 && h18.stops) {
-            for (let i = 1; i < h18.stops.length; i++) masterLevel1Stops.push(Object.assign({}, h18.stops[i]));
-        }
-        if (h17 && h17.stops) {
-            for (let i = 1; i < h17.stops.length; i++) masterLevel1Stops.push(Object.assign({}, h17.stops[i]));
-        }
-
-        const continuousSlices = [
-            { name: "Hat 1: Sahil & Baykallar Etabı", start: 0, end: 3, lineRef: h1 },
-            { name: "Hat 1: Emniyet & Alkaya Sahil Etabı", start: 3, end: 7, lineRef: h1 },
-            { name: "Hat 1: Değirmenaltı Giriş Etabı", start: 7, end: 12, lineRef: h1 },
-            { name: "Hat 1: Değirmenaltı Sahil Turu", start: 12, end: 17, lineRef: h1 },
-            { name: "Hat 1: Üniversite Kampüs Tırmanışı", start: 17, end: 23, lineRef: h1 },
-            { name: "Hat 18: Kampüsten Şehre Dönüş Etabı", start: 23, end: 29, lineRef: h18 },
-            { name: "Hat 18: Bölge Trafik & FSM Bağlantısı", start: 29, end: 36, lineRef: h18 },
-            { name: "Hat 18: Belediye & Otogar Hattı", start: 36, end: 45, lineRef: h18 },
-            { name: "Hat 18: Şehir Hastanesi Ekspresi", start: 45, end: 57, lineRef: h18 },
-            { name: "Hat 17: Tarihi Çarşı & Köprübaşı Ringi", start: 57, end: masterLevel1Stops.length - 1, lineRef: h17 }
-        ];
-
-        const spasaLocalKeywords = continuousSlices;
+        // 1. Seviye Çıraklık: SEÇİLEN İLÇENİN KESİNTİSİZ ŞEHİR TURU (Kaldığı Duraktan Devam Eden Zincirleme Hatlar)
+        // Her ilçe için 1. görev kesinlikle 4 duraklı nazik başlangıçla başlar, kaldığı yerden adım adım şehri dolaştırır
+        const { master: masterLevel1Stops, slices: continuousSlices } = buildDistrictContinuousCircuit(targetDistrict, tekulasDb);
+        const districtLocalKeywords = continuousSlices;
 
         // 2. Seviye Kalfa (Süleymanpaşa İleri Seviye Şehir İçi Hatları)
         const kalfaKeywords = [
@@ -162,7 +258,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
         ];
 
         const allLevels = [
-            { lic: 1, name: "Çırak", list: spasaLocalKeywords, color: "#3b82f6" },
+            { lic: 1, name: "Çırak", list: districtLocalKeywords, color: "#3b82f6" },
             { lic: 2, name: "Kalfa", list: kalfaKeywords, color: "#eab308" },
             { lic: 3, name: "Usta", list: corluKeywords, color: "#ef4444" },
             { lic: 4, name: "İlçeler Arası", list: ilceKeywords, color: "#a855f7" }
@@ -234,7 +330,7 @@ function generateRoutesFromAPI(rawStops, cityName) {
                 const taskRoute = Object.assign({}, found, {
                     id: routeId,
                     sehir: "Tekirdağ",
-                    district: lvl.lic === 1 ? "Süleymanpaşa" : (found.district || "Süleymanpaşa"),
+                    district: lvl.lic === 1 ? targetDistrict : (found.district || targetDistrict),
                     isDistrict: false,
                     isCity: true,
                     name: "Görev " + taskNum + " (" + lvl.name + "): " + (item.name || found.name),

@@ -201,11 +201,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnChangeDist = document.getElementById('btn-change-active-district');
     if (btnChangeDist) {
         btnChangeDist.addEventListener('click', () => {
+            const allDistricts = ["Süleymanpaşa", "Saray", "Velimeşe", "Çorlu", "Çerkezköy - Kapaklı", "Malkara", "Hayrabolu", "Şarköy", "Muratlı"];
             const cur = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
-            let next = "Süleymanpaşa";
-            if (cur === "Süleymanpaşa") next = "Saray";
-            else if (cur === "Saray") next = "Velimeşe";
-            else next = "Süleymanpaşa";
+            let idx = allDistricts.indexOf(cur);
+            let next = allDistricts[(idx + 1) % allDistricts.length];
 
             if (typeof Game !== 'undefined' && Game.setActiveDistrict) {
                 Game.setActiveDistrict(next);
@@ -216,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 UI.updateTitleScreenButtons();
             }
             if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak(`Ana çalışma bölgeniz ${next} olarak ayarlandı. Artık ana rotanız burası.`);
+                audio.speak(`Ana çalışma bölgeniz ${next} olarak ayarlandı. 1. Seviye Çıraklık seferleriniz ${next} için 4 duraktan başlayarak hazırlandı.`);
             }
         });
     }
@@ -227,11 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
         Game.gameMode = 'city';
         Game.busType = 'belediye';
 
-        // 10 seviye geçilmeden ilçeler, şehirler, ülkeler ve harita kesinlikle gözükmesin! Doğrudan Süleymanpaşa görev ekranına yönlendir
+        // 10 seviye geçilmeden ilçeler, şehirler, ülkeler ve harita kesinlikle gözükmesin! Doğrudan aktif ilçe görev ekranına yönlendir
         if (!Game.hasPassedLevel10()) {
-            audio.speak("Süleymanpaşa şehir içi belediye seferleri seçildi. Sefer görevleri listeleniyor.");
-            UI.showToast("Süleymanpaşa Şehir İçi Seferleri (10 Seviye Kuralı)", "info");
-            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
+            const activeDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
+            audio.speak(`${activeDist} şehir içi belediye seferleri seçildi. Sefer görevleri listeleniyor.`);
+            UI.showToast(`${activeDist} Şehir İçi Seferleri (10 Seviye Kuralı)`, "info");
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: activeDist } }));
             return;
         }
 
@@ -701,18 +701,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Route Menu // Eğer bu şehir için önceden API'den rota çekilmemişse, çek.
     document.addEventListener('go-to-route-screen', async (e) => {
-        const cityName = e.detail.city;
+        const cityName = e.detail.city || "Tekirdağ";
+        const districtName = e.detail.district || (typeof Game !== 'undefined' && Game.activeDistrict) || localStorage.getItem('activeDistrict') || "Süleymanpaşa";
         
-        // Bu şehir için taskIndex'e sahip sıralı sefer görevleri var mı kontrol et
-        let existingTaskRoutes = Object.values(routesData).filter(r => r.sehir === cityName && typeof r.taskIndex === 'number');
+        // Bu şehir ve ilçe için taskIndex'e sahip sıralı sefer görevleri var mı kontrol et
+        let existingTaskRoutes = Object.values(routesData).filter(r => r.sehir === cityName && r.district === districtName && typeof r.taskIndex === 'number');
         
-        if (existingTaskRoutes.length === 0) {
+        if (existingTaskRoutes.length === 0 || (existingTaskRoutes.length > 0 && existingTaskRoutes[0].district !== districtName)) {
             const realCityStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName])
                 ? varsayilanSehirDuraklari[cityName]
                 : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
             
             if (typeof generateRoutesFromAPI === 'function') {
-                generateRoutesFromAPI(realCityStops, cityName);
+                generateRoutesFromAPI(realCityStops, cityName, districtName);
             }
         }
         
