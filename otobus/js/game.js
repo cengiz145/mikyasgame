@@ -156,6 +156,14 @@ const Game = {
     isLuggageOpen: false,
     hasWheelchairPassengerAtStop: false,
     hasLostItemFound: false,
+    lastFoundLostItem: null,
+    activePassengerEvent: null,
+    insufficientBalanceTriggeredAtStop: false,
+    kindnessBonusCount: 0,
+    activeRunningPassenger: false,
+    runningPassengerTriggeredAtStop: false,
+    runningPassengerTimer: null,
+    runningPassengerBonusCount: 0,
     timingDeviations: [],
 
     toggleWheelchairRamp: function() {
@@ -253,19 +261,36 @@ const Game = {
             return;
         }
         if (this.hasLostItemFound) {
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Koltuklar zaten kontrol edildi. Tüm eşyalar emanet bürosuna teslim edildi.");
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Koltuklar zaten kontrol edildi. Tüm eşyalar TEKULAŞ Emanet Bürosuna teslim edildi.");
             return;
         }
         this.hasLostItemFound = true;
+
+        const items = [
+            { name: "deri bir cüzdan ve kimlik kartı", reward: 120, xp: 60, toast: "👛 Deri Cüzdan ve Kimlik Bulundu (+120 ₺)" },
+            { name: "üniversite öğrencisinin unuttuğu sırt çantası", reward: 100, xp: 50, toast: "🎒 Öğrenci Sırt Çantası Bulundu (+100 ₺)" },
+            { name: "unutulmuş otomatik bir protokol şemsiyesi", reward: 80, xp: 40, toast: "☂️ Protokol Şemsiyesi Bulundu (+80 ₺)" },
+            { name: "unutulmuş bir çocuk montu ve atkı", reward: 90, xp: 45, toast: "🧸 Çocuk Montu ve Atkı Bulundu (+90 ₺)" }
+        ];
+        const selected = items[Math.floor(Math.random() * items.length)];
+        this.lastFoundLostItem = selected;
+
         if (typeof audio !== 'undefined' && typeof audio.playLostAndFoundWalk === 'function') {
             audio.playLostAndFoundWalk(() => {
-                this.addMoney(100);
-                this.addXP(50);
-                const msg = "Arka koltukta unutulan bir çanta bulundu ve TEKULAŞ Emanet Bürosuna teslim edildi! 100 Lira dürüstlük primi kazandınız.";
+                this.addMoney(selected.reward);
+                this.addXP(selected.xp);
+                const msg = `Arka koltukta ${selected.name} bulundu ve TEKULAŞ Emanet Bürosuna teslim edildi! ${selected.reward} Lira dürüst şoför primi ve ${selected.xp} tecrübe kazandınız.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                 if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🎒 Kayıp Eşya Bulundu (+100 ₺ / +50 XP)", "success");
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(selected.toast, "success");
             });
+        } else {
+            this.addMoney(selected.reward);
+            this.addXP(selected.xp);
+            const msg = `Arka koltukta ${selected.name} bulundu ve TEKULAŞ Emanet Bürosuna teslim edildi! ${selected.reward} Lira dürüst şoför primi kazandınız.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(selected.toast, "success");
         }
     },
 
@@ -714,6 +739,14 @@ const Game = {
         this.isRampDeployed = false;
         this.isLuggageOpen = false;
         this.hasLostItemFound = false;
+        this.lastFoundLostItem = null;
+        this.activePassengerEvent = null;
+        this.insufficientBalanceTriggeredAtStop = false;
+        this.kindnessBonusCount = 0;
+        this.activeRunningPassenger = false;
+        this.runningPassengerTriggeredAtStop = false;
+        this.runningPassengerTimer = null;
+        this.runningPassengerBonusCount = 0;
         this.hasWheelchairPassengerAtStop = false;
         const rampHudInit = document.getElementById('hud-ramp');
         if (rampHudInit) rampHudInit.style.display = 'none';
@@ -2500,7 +2533,7 @@ const Game = {
             document.getElementById('obstacles-container').innerHTML = '';
         }
         this.obstacles = [];
-        this.activeNPCs.forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
+        (this.activeNPCs || []).forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
         this.activeNPCs = [];
         
         document.getElementById('nav-feedback').innerText = "ARAÇ PERT OLDU! ÇEKİCİ BEKLENİYOR...";
@@ -2556,6 +2589,8 @@ const Game = {
     },
 
     arriveAtStop: function() {
+        const stopData = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops[this.currentStopIndex] : null;
+        const isFinalStop = (this.activeRouteData && this.activeRouteData.stops) ? (this.currentStopIndex >= this.activeRouteData.stops.length - 1) : false;
 
         // Yaşayan Yolcu Diyalogları (Sabah günaydın, yağmurda şemsiye, son durak vedası)
         if (this.weather === 'rainy' && typeof audio !== 'undefined' && typeof audio.playUmbrellaShake === 'function') {
@@ -2588,8 +2623,7 @@ const Game = {
             }, 800);
         }
 
-        const stopData = this.activeRouteData.stops[this.currentStopIndex];
-        const isFinalStop = this.currentStopIndex === this.activeRouteData.stops.length - 1;
+        // stopData ve isFinalStop fonksiyon başında güvenle tanımlandı
 
         // DURAK KEŞİF VE KOLEKSİYON SİSTEMİ TETİKLEYİCİSİ
         if (typeof StopDiscovery !== 'undefined' && stopData && stopData.name) {
@@ -2612,7 +2646,7 @@ const Game = {
                 document.getElementById('obstacles-container').innerHTML = '';
             }
             this.obstacles = [];
-            this.activeNPCs.forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
+            (this.activeNPCs || []).forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
             this.activeNPCs = [];
 
             // Direkt bir sonraki durağın rotasını hesapla (hızı sıfırlamadan)
@@ -2670,7 +2704,7 @@ const Game = {
         this.obstacles = [];
         
         // BUG FIX: Kalan NPC'leri ve seslerini temizle (Sonsuz motor sesi hatasını engeller)
-        this.activeNPCs.forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
+        (this.activeNPCs || []).forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
         this.activeNPCs = [];
         
         document.getElementById('stop-title').innerText = stopData.name;
@@ -2686,6 +2720,18 @@ const Game = {
         
         // Önceki durak butonlarını ve yolcu olayını gizle
         document.getElementById('passenger-interaction').classList.add('hidden');
+        this.insufficientBalanceTriggeredAtStop = false;
+        this.runningPassengerTriggeredAtStop = false;
+        this.activePassengerEvent = null;
+        this.activeRunningPassenger = false;
+        if (this.runningPassengerTimer) {
+            clearTimeout(this.runningPassengerTimer);
+            this.runningPassengerTimer = null;
+        }
+        const pChoiceBox = document.getElementById('passenger-choice-box');
+        if (pChoiceBox) pChoiceBox.classList.add('hidden');
+        const pRunningAlert = document.getElementById('running-passenger-alert');
+        if (pRunningAlert) pRunningAlert.classList.add('hidden');
         
         audio.speakSequence(["Åimdiki durak:", stopData.name]);
         
@@ -2703,6 +2749,11 @@ const Game = {
             document.getElementById('global-progress-text').parentElement.classList.add('hidden');
         }
         
+        // Koşan yolcu veya onay bekleyen yolcu olayı varsa hemen kalkış yapma
+        if (this.activeRunningPassenger || this.activePassengerEvent) {
+            return;
+        }
+
         if (!this.frontDoorOpen && !this.rearDoorOpen && audio.isEngineRunning) {
             this.departStop();
         }
@@ -2741,6 +2792,53 @@ const Game = {
             UI.showToast("Güvenlik Kilidi: Kapılar kilitli!", "error");
             return;
         }
+
+        // KOŞAN YOLCU ETKİLEŞİMİ: Kapı kapalıyken koşan yolcu varsa ve oyuncu kapıyı açarsa yolcu biner!
+        if (!this.frontDoorOpen && this.activeRunningPassenger) {
+            if (this.runningPassengerTimer) {
+                clearTimeout(this.runningPassengerTimer);
+                this.runningPassengerTimer = null;
+            }
+            this.activeRunningPassenger = false;
+            const rAlert = document.getElementById('running-passenger-alert');
+            if (rAlert) rAlert.classList.add('hidden');
+
+            this.frontDoorOpen = true;
+            const btn = document.getElementById('btn-front-door');
+            if (btn) btn.innerText = "Ön Kapıyı Kapat";
+
+            if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorOpen === 'function') audio.playPneumaticDoorOpen();
+            else if (typeof audio !== 'undefined' && audio.playDoorOpen) audio.playDoorOpen();
+
+            if (typeof audio !== 'undefined' && typeof audio.playSuccess === 'function') audio.playSuccess();
+
+            this.passengersOnBoard++;
+            this.addMoney(60);
+            this.addXP(30);
+            this.runningPassengerBonusCount = (this.runningPassengerBonusCount || 0) + 1;
+            this.passengerComfort = Math.min(100, (this.passengerComfort || 90) + 5);
+
+            const praise = "Helal olsun kaptanım, işe yetiştim sayende! Senin gibi şoför zor bulunur!";
+            const dialogEl = document.getElementById('passenger-dialog');
+            if (dialogEl) dialogEl.innerText = `"${praise}"`;
+            const feedbackEl = document.getElementById('passenger-feedback');
+            if (feedbackEl) {
+                feedbackEl.innerText = "🏃 Koşan yolcu kapıyı açtığınız için bindi! +60 ₺ Yetişme Primi / +30 XP";
+                feedbackEl.style.color = "#22c55e";
+            }
+
+            const activeBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
+            const seatCapacity = activeBus ? activeBus.seatCapacity : (this.activeRouteData ? (this.activeRouteData.otobusKapasitesi || 40) : 40);
+            const hudPass = document.getElementById('hud-passengers');
+            if (hudPass) hudPass.innerText = `${this.passengersOnBoard} / ${seatCapacity}`;
+
+            const fullMsg = `Kapıyı açtınız ve koşan yolcu bindi! Yolcu: ${praise} 60 Lira yetiştirme primi ve 30 tecrübe kazandınız.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(fullMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🏃 Yetişen Yolcu Bonusu (+60 ₺ / +30 XP)", "success");
+            return;
+        }
+
         // Havalı kapı açma (Eğitim Modu: Basınç güvenli seviyede tutulur)
         this.airPressure = Math.max(85, this.airPressure - 2);
         
@@ -2759,71 +2857,12 @@ const Game = {
             btn.innerText = "Ön Kapıyı Kapat";
             
             // YOLCU TEPKİSİ: Kapı açıldığında nezaket
-            // Deterministik Nezaket Formülü: Her 3 durakta bir düzenli yolcu selamı
             if (this.passengersOnBoard > 0 && (this.currentStopIndex % 3 === 0)) {
                 audio.speak("Kolay gelsin kaptan.");
             }
             
             if (!this.isDriving) {
-                const stopData = this.activeRouteData.stops[this.currentStopIndex];
-                let currentWaiting = stopData.bekleyenYolcu;
-                
-                if (this.boardingTimer) clearInterval(this.boardingTimer);
-                
-                if (currentWaiting > 0) {
-                    document.getElementById('passenger-interaction').classList.remove('hidden');
-                    document.getElementById('passenger-dialog').innerText = '"Binişler başladı..."';
-                    document.getElementById('passenger-feedback').innerText = "";
-                    document.getElementById('stop-waiting-count').innerText = currentWaiting;
-                    
-                    this.boardingTimer = setInterval(() => {
-                        // BUG FIX 3: Ghost Boarding engeli
-                        if (!this.frontDoorOpen) {
-                            clearInterval(this.boardingTimer);
-                            return;
-                        }
-                        
-                        if (currentWaiting <= 0) {
-                            clearInterval(this.boardingTimer);
-                            document.getElementById('passenger-dialog').innerText = '"Tüm yolcular bindi."';
-                            audio.speak("Binişler tamamlandı. Tüm yolcular bindi.");
-                            return;
-                        }
-                        
-                        const activeBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
-                        const seatCapacity = activeBus ? activeBus.seatCapacity : (this.activeRouteData.otobusKapasitesi || 40);
-                        const maxStanding = activeBus ? activeBus.standingCapacity : 15;
-                        
-                        if (this.passengersOnBoard < seatCapacity) {
-                            // Normal biniş
-                            this.automatedTicketProcess();
-                            currentWaiting--;
-                            stopData.bekleyenYolcu = currentWaiting; // BUG FIX: Orijinal veriyi de güncelle (Sonsuz para/yolcu hilesini engeller)
-                            document.getElementById('stop-waiting-count').innerText = currentWaiting;
-                        } else {
-                            // Otobüs dolu, aşırı yığılma reaksiyonları
-                            // KAPASİTE EŞİTSİZLİĞİ FORMÜLÜ (Sıfır İhtimal, Kesin Kapasite Matematiği)
-                            if (this.passengersOnBoard < (seatCapacity + maxStanding)) {
-                                // Ayakta yolcu kapasitesi varsa binişe izin verilir
-                                document.getElementById('passenger-dialog').innerText = '"Ayakta giderim sorun değil."';
-                                this.automatedTicketProcess(true);
-                                currentWaiting--;
-                                stopData.bekleyenYolcu = currentWaiting;
-                                document.getElementById('stop-waiting-count').innerText = currentWaiting;
-                            } else {
-                                // Otobüs tamamen ve yasal olarak dolu: Bir sonrakini bekler
-                                document.getElementById('passenger-dialog').innerText = '"Otobüs tamamen dolu, bir sonrakine bineceğim."';
-                                document.getElementById('passenger-feedback').innerText = "Kapasite dolu, yolcu binemedi.";
-                                document.getElementById('passenger-feedback').style.color = '#ef4444';
-                                currentWaiting--;
-                                stopData.bekleyenYolcu = currentWaiting;
-                                document.getElementById('stop-waiting-count').innerText = currentWaiting;
-                            }
-                        }
-                        
-                        document.getElementById('hud-passengers').innerText = `${this.passengersOnBoard} / ${seatCapacity}`;
-                    }, 1500);
-                }
+                this.startBoardingLoop();
             }
         } else {
             // Kapıyı Kapat
@@ -2836,8 +2875,186 @@ const Game = {
                 clearInterval(this.boardingTimer);
                 this.boardingTimer = null;
             }
+
+            // KOŞAN YOLCU OLAYI (Akıllı Durak Etkileşimi)
+            // Seferdeyken ve kapı kapandığı anda %35 ihtimalle son anda yetişmeye çalışan yolcu belirir
+            if (!this.isDriving && !this.runningPassengerTriggeredAtStop && this.activeRouteData && (this.currentStopIndex < this.activeRouteData.stops.length - 1)) {
+                const shouldTrigger = (this.currentStopIndex === 1) || (Math.random() < 0.35);
+                if (shouldTrigger) {
+                    this.triggerRunningPassenger();
+                    return; // Otomatik kalkış, koşan yolcu süresi bitince veya binince yapılacak
+                }
+            }
+
             if (!this.isDriving) this.checkAutoDepart();
         }
+    },
+
+    startBoardingLoop: function() {
+        if (this.boardingTimer) clearInterval(this.boardingTimer);
+        this.boardingTimer = null;
+        if (!this.activeRouteData || !this.activeRouteData.stops) return;
+        const stopData = this.activeRouteData.stops[this.currentStopIndex];
+        if (!stopData) return;
+
+        let currentWaiting = stopData.bekleyenYolcu;
+        if (currentWaiting <= 0) {
+            document.getElementById('passenger-dialog').innerText = '"Tüm yolcular bindi."';
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Binişler tamamlandı. Tüm yolcular bindi.");
+            return;
+        }
+
+        document.getElementById('passenger-interaction').classList.remove('hidden');
+        document.getElementById('passenger-dialog').innerText = '"Binişler başladı..."';
+        document.getElementById('passenger-feedback').innerText = "";
+        document.getElementById('stop-waiting-count').innerText = currentWaiting;
+
+        this.boardingTimer = setInterval(() => {
+            if (!this.frontDoorOpen) {
+                clearInterval(this.boardingTimer);
+                this.boardingTimer = null;
+                return;
+            }
+
+            // Kaptan kararı bekleyen aktif olay varsa duraklat
+            if (this.activePassengerEvent) {
+                clearInterval(this.boardingTimer);
+                this.boardingTimer = null;
+                return;
+            }
+
+            if (stopData.bekleyenYolcu <= 0) {
+                clearInterval(this.boardingTimer);
+                this.boardingTimer = null;
+                document.getElementById('passenger-dialog').innerText = '"Tüm yolcular bindi."';
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak("Binişler tamamlandı. Tüm yolcular bindi.");
+                return;
+            }
+
+            const activeBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
+            const seatCapacity = activeBus ? activeBus.seatCapacity : (this.activeRouteData.otobusKapasitesi || 40);
+            const maxStanding = activeBus ? activeBus.standingCapacity : 15;
+
+            if (this.passengersOnBoard < seatCapacity) {
+                const res = this.automatedTicketProcess(false);
+                if (res !== false) {
+                    stopData.bekleyenYolcu--;
+                    document.getElementById('stop-waiting-count').innerText = stopData.bekleyenYolcu;
+                }
+            } else if (this.passengersOnBoard < (seatCapacity + maxStanding)) {
+                document.getElementById('passenger-dialog').innerText = '"Ayakta giderim sorun değil."';
+                const res = this.automatedTicketProcess(true);
+                if (res !== false) {
+                    stopData.bekleyenYolcu--;
+                    document.getElementById('stop-waiting-count').innerText = stopData.bekleyenYolcu;
+                }
+            } else {
+                document.getElementById('passenger-dialog').innerText = '"Otobüs tamamen dolu, bir sonrakine bineceğim."';
+                document.getElementById('passenger-feedback').innerText = "Kapasite dolu, yolcu binemedi.";
+                document.getElementById('passenger-feedback').style.color = '#ef4444';
+                stopData.bekleyenYolcu--;
+                document.getElementById('stop-waiting-count').innerText = stopData.bekleyenYolcu;
+            }
+
+            document.getElementById('hud-passengers').innerText = `${this.passengersOnBoard} / ${seatCapacity}`;
+        }, 1500);
+    },
+
+    triggerRunningPassenger: function() {
+        this.runningPassengerTriggeredAtStop = true;
+        this.activeRunningPassenger = true;
+
+        const alertEl = document.getElementById('running-passenger-alert');
+        if (alertEl) alertEl.classList.remove('hidden');
+
+        const alertText = document.getElementById('running-passenger-text');
+        if (alertText) alertText.innerText = '🏃 Koşan Yolcu: "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı!" (Açmak için E tuşu veya buton)';
+
+        const msg = "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı! Durağa doğru koşan bir yolcu var. Kapıyı açmak için E tuşuna veya Ön Kapıyı Aç butonuna basınız.";
+        if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
+        if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+
+        if (this.runningPassengerTimer) clearTimeout(this.runningPassengerTimer);
+        this.runningPassengerTimer = setTimeout(() => {
+            if (this.activeRunningPassenger) {
+                this.activeRunningPassenger = false;
+                const el = document.getElementById('running-passenger-alert');
+                if (el) el.classList.add('hidden');
+
+                const missMsg = "Yolcu durağa yetişemedi: Ah be kaptanım, kıl payı kaçırdım... Bir sonraki aracı bekleyeceğim.";
+                if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(missMsg);
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(missMsg);
+
+                this.checkAutoDepart();
+            }
+        }, 4500);
+    },
+
+    resolveInsufficientBalance: function(allowed) {
+        if (!this.activePassengerEvent || this.activePassengerEvent.type !== 'insufficient_balance') return;
+        this.activePassengerEvent = null;
+
+        const choiceBox = document.getElementById('passenger-choice-box');
+        if (choiceBox) choiceBox.classList.add('hidden');
+
+        const stopData = this.activeRouteData ? this.activeRouteData.stops[this.currentStopIndex] : null;
+
+        if (allowed) {
+            // İzin verildi (Gönlü Zengin Kaptan)
+            this.passengersOnBoard++;
+            this.addMoney(50);
+            this.addXP(25);
+            this.kindnessBonusCount = (this.kindnessBonusCount || 0) + 1;
+            this.passengerComfort = Math.min(100, (this.passengerComfort || 90) + 5);
+
+            if (typeof audio !== 'undefined' && typeof audio.playSuccess === 'function') audio.playSuccess();
+
+            const thankMsg = '"Çok sağ olun kaptanım, Allah razı olsun! Bir sonraki durakta hemen yükleyeceğim."';
+            const dialogEl = document.getElementById('passenger-dialog');
+            if (dialogEl) dialogEl.innerText = thankMsg;
+            const feedbackEl = document.getElementById('passenger-feedback');
+            if (feedbackEl) {
+                feedbackEl.innerText = "❤️ Yolcuya izin verildi. +50 ₺ Gönlü Zengin Kaptan Primi ve +25 XP!";
+                feedbackEl.style.color = "#22c55e";
+            }
+
+            const announce = "Yolcuya izin verdiniz. Yolcu: Çok sağ olun kaptanım, Allah razı olsun! 50 Lira gönlü zengin kaptan primi kazandınız.";
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announce);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(announce);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("❤️ Kaptan İnsiyatifi (+50 ₺ / +25 XP)", "success");
+        } else {
+            // İndirildi (Kuralcı Kaptan)
+            const rejectMsg = '"Peki kaptanım, canınız sağ olsun. Bir dahakine doldurup binerim, iyi nöbetler."';
+            const dialogEl = document.getElementById('passenger-dialog');
+            if (dialogEl) dialogEl.innerText = rejectMsg;
+            const feedbackEl = document.getElementById('passenger-feedback');
+            if (feedbackEl) {
+                feedbackEl.innerText = "Yolcu araçtan indirildi.";
+                feedbackEl.style.color = "#ef4444";
+            }
+
+            const announce = "Yolcuyu indirdiniz. Yolcu: Peki kaptanım, canınız sağ olsun, iyi nöbetler.";
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(announce);
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(announce);
+        }
+
+        if (stopData && stopData.bekleyenYolcu > 0) {
+            stopData.bekleyenYolcu--;
+            const waitEl = document.getElementById('stop-waiting-count');
+            if (waitEl) waitEl.innerText = stopData.bekleyenYolcu;
+        }
+
+        const activeBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
+        const seatCapacity = activeBus ? activeBus.seatCapacity : (this.activeRouteData ? (this.activeRouteData.otobusKapasitesi || 40) : 40);
+        const hudPass = document.getElementById('hud-passengers');
+        if (hudPass) hudPass.innerText = `${this.passengersOnBoard} / ${seatCapacity}`;
+
+        // 1.8 saniye sonra biniş döngüsüne devam et
+        setTimeout(() => {
+            if (this.frontDoorOpen && !this.isDriving) {
+                this.startBoardingLoop();
+            }
+        }, 1800);
     },
     
     toggleRearDoor: function() {
@@ -2925,7 +3142,7 @@ const Game = {
             document.getElementById('obstacles-container').innerHTML = '';
         }
         this.obstacles = [];
-        this.activeNPCs.forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
+        (this.activeNPCs || []).forEach(n => { if (n.audioObj) n.audioObj.stop(); if (n.el) n.el.remove(); });
         this.activeNPCs = [];
         
         if (isSuccess) {
@@ -2989,6 +3206,23 @@ const Game = {
         
         if (document.getElementById('res-money')) document.getElementById('res-money').innerText = `${this.sessionMoney} ₺`;
         if (document.getElementById('res-penalties')) document.getElementById('res-penalties').innerText = '0 ₺ (Eğitimde Ceza Yok / Muaf)';
+
+        // Özel Yolcu Primleri Özeti
+        let smartSummaries = [];
+        if (this.kindnessBonusCount > 0) smartSummaries.push(`❤️ ${this.kindnessBonusCount} Yetersiz Bakiye İzni (+${this.kindnessBonusCount * 50} ₺)`);
+        if (this.runningPassengerBonusCount > 0) smartSummaries.push(`🏃 ${this.runningPassengerBonusCount} Koşan Yolcu Yetiştirildi (+${this.runningPassengerBonusCount * 60} ₺)`);
+        if (this.hasLostItemFound && this.lastFoundLostItem) smartSummaries.push(`🎒 Emanet: ${this.lastFoundLostItem.name} (+${this.lastFoundLostItem.reward} ₺)`);
+
+        const smartBox = document.getElementById('res-smart-events-box');
+        const smartText = document.getElementById('res-smart-events-text');
+        if (smartBox && smartText) {
+            if (smartSummaries.length > 0) {
+                smartBox.classList.remove('hidden');
+                smartText.innerText = smartSummaries.join(" | ");
+            } else {
+                smartBox.classList.add('hidden');
+            }
+        }
         
         const totalDriveSec = Math.round(this.totalDrivingSeconds || 0);
         const driveMins = Math.floor(totalDriveSec / 60);
@@ -3015,6 +3249,20 @@ const Game = {
         // Sadece oyun içindeysek ekran okuyucu veya sayfa kaydırmasını engellemek için preventDefault kullan
         if (k.startsWith('arrow') || k === ' ') {
             e.preventDefault();
+        }
+
+        // Y ve N tuşları: Eğer yetersiz bakiye olayı aktifse kaptan kararı
+        if (this.activePassengerEvent && this.activePassengerEvent.type === 'insufficient_balance') {
+            if (k === 'y') {
+                e.preventDefault();
+                this.resolveInsufficientBalance(true);
+                return;
+            }
+            if (k === 'n') {
+                e.preventDefault();
+                this.resolveInsufficientBalance(false);
+                return;
+            }
         }
 
         // Shift+Oklar Pusula değişimi ui.js/CompassSystem tarafından tek merkezden yönetilir
@@ -3240,7 +3488,7 @@ const Game = {
             }
             // Öndeki aracı uyar (korna çalınca öndeki yavaş araç sağa kaçar veya hızlanır)
             if (this.activeNPCs && this.activeNPCs.length > 0) {
-                this.activeNPCs.forEach(npc => {
+                (this.activeNPCs || []).forEach(npc => {
                     if (!npc.hasCollided && npc.type === 'ahead' && npc.y > 0 && npc.y < 180) {
                         npc.baseSpeed += 20; // Hızlanır
                         npc.x = 82; // Sağa emniyet şeridine yanaşır
@@ -3252,11 +3500,11 @@ const Game = {
                 });
             }
         }
-        if (k === 'pageup') {
+        if (k === 'pageup' || k === 'e') {
             e.preventDefault();
             this.toggleFrontDoor();
         }
-        if (k === 'pagedown') {
+        if (k === 'pagedown' || k === 'q') {
             e.preventDefault();
             this.toggleRearDoor();
         }

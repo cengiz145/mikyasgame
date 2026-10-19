@@ -777,6 +777,24 @@ document.addEventListener('DOMContentLoaded', () => {
         Game.toggleRearDoor();
     });
 
+    const btnAllow = document.getElementById('btn-passenger-allow');
+    if (btnAllow) {
+        btnAllow.addEventListener('click', () => {
+            if (typeof Game !== 'undefined' && typeof Game.resolveInsufficientBalance === 'function') {
+                Game.resolveInsufficientBalance(true);
+            }
+        });
+    }
+
+    const btnReject = document.getElementById('btn-passenger-reject');
+    if (btnReject) {
+        btnReject.addEventListener('click', () => {
+            if (typeof Game !== 'undefined' && typeof Game.resolveInsufficientBalance === 'function') {
+                Game.resolveInsufficientBalance(false);
+            }
+        });
+    }
+
     // 6. Results Logic
     document.getElementById('btn-next-mission').addEventListener('click', () => {
         audio.playSelect();
