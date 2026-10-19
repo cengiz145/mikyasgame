@@ -29,12 +29,6 @@ const AkilliRotaSistemi = {
         const sNorm = this.normalizeText(stopName);
         const qNorm = this.normalizeText(query);
         const qWords = qNorm.split(' ').filter(w => w.length > 1);
-        // Hat 26 Saray Alias Desteği
-        if (qNorm.includes("26") || qNorm.includes("saray") || qNorm.includes("226")) {
-            if (sNorm.includes("saray") || sNorm.includes("cerkezkoy") || sNorm.includes("kapakli") || sNorm.includes("suleymanpasa")) {
-                return true;
-            }
-        }
         // Velimeşe Çetin Sokak Alias Desteği
         if ((qNorm.includes("cetin") || qNorm.includes("cetin sokak")) && sNorm.includes("cetin")) {
             return true;
@@ -131,7 +125,6 @@ const AkilliRotaSistemi = {
                 }
                 if (fromIdx !== -1 && i > fromIdx && this.matchStop(s.name, nereyeQuery)) {
                     toIdx = i;
-                    break;
                 }
             }
 
@@ -438,6 +431,26 @@ if (typeof document !== 'undefined') {
                     toInput.value = "Yeni Otogar Caddesi";
                     if (typeof audio !== 'undefined' && audio.speak) {
                         audio.speak("Süleymanpaşa 7 Mahalle Sefer Modu devrede. Kalkış: Üniversite Caddesi Kampüs, Varış: Yeni Otobüs Terminali. Toplam mesafe ve süre formülle hesaplanıyor.");
+                    }
+                }
+            });
+        }
+    });
+}
+
+// Saray 62 KM Direkt Ekspres Hızlı Mod Butonu
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnS = document.getElementById('btn-saray-quick-mode');
+        if (btnS) {
+            btnS.addEventListener('click', () => {
+                const fromInput = document.getElementById('smart-from-input');
+                const toInput = document.getElementById('smart-to-input');
+                if (fromInput && toInput) {
+                    fromInput.value = "Süleymanpaşa Yeni Otobüs Terminali";
+                    toInput.value = "Saray Belediyesi Otogarı";
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Süleymanpaşa Saray 62 kilometre direkt ekspres hattı devrede. Kalkış: Süleymanpaşa Yeni Otogar, Varış: Saray Belediyesi Otogarı.");
                     }
                 }
             });

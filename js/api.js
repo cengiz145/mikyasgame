@@ -223,6 +223,12 @@ function generateRoutesFromAPI(rawStops, cityName) {
             if (!routesData[r.id]) routesData[r.id] = r;
         });
 
+        // Saray Ekspres (62 KM)
+        const rSaray = tekulasDb.find(r => r.id === "hat_saray_ekspres");
+        if (rSaray) {
+            routesData["hat_saray_ekspres"] = rSaray;
+        }
+
         // Geriye dönük rota kimliği uyumluluğu (Alias desteği)
         const r26 = tekulasDb.find(r => r.hatNo === "26" || r.name.indexOf("26/SÜLEYMANPASA") !== -1 || r.hatNo === "226");
         if (r26) {

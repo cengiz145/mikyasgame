@@ -1924,8 +1924,64 @@ const ilceRotalari = {
                 { name: "Süleymanpaşa Yeni Otobüs Terminali", anons: "Süleymanpaşa Yeni Otogar kalkış peronundayız. Muratlı seferi başlıyor.", bekleyenYolcu: 25, inenYolcu: 0, gercekMesafeSonraki: 24.0, lat: 40.9950, lon: 27.5620 },
                 { name: "Muratlı Meydan", anons: "Son durak: Muratlı Meydan. Seferimiz sona ermiştir.", bekleyenYolcu: 0, inenYolcu: 25, gercekMesafeSonraki: 0, lat: 41.1710, lon: 27.5020 }
             ]
-        }
-    ]
+        },
+{
+            id: "hat_saray_ekspres",
+            hatNo: "Saray Ekspres",
+            name: "SÜLEYMANPAŞA - SARAY DİREKT EKSPRES (62 KM)",
+            destDistrict: "Saray",
+            originDistrict: "Süleymanpaşa",
+            startStop: "Süleymanpaşa Yeni Otobüs Terminali",
+            endStop: "Saray Belediyesi Otogarı",
+            intermediateStops: ["Muratlı Sapağı (D-567)", "Vakıflar Kavşağı (D-567)"],
+            desc: "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Saray Belediyesi Otogarı. D-567 Karayolu (Muratlı-Vakıflar) üzerinden kesintisiz direkt ekspres hat. Toplam 4 durak, tam 62 kilometre.",
+            detailedInstructions: "Süleymanpaşa - Saray Direkt Ekspres (62 KM) Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otobüs Terminali durağından bekleyen 36 yolcuyu alarak hareket edin.\n2. Adım: 23 kilometre sonra Muratlı Sapağı (D-567) durağına gidin; yolcuları indirin ve bekleyen yolcuları alıp devam edin.\n3. Adım: 21 kilometre sonra Vakıflar Kavşağı (D-567) durağına gidin; yolcuları indirin ve bekleyen yolcuları alıp devam edin.\n4. Adım (Hedef Son Durak): 18 kilometre sonra Saray Belediyesi Otogarı durağına varın; tüm yolcuları indirin ve 62 kilometrelik ekspres seferi tamamlayın.",
+            speechBriefing: "Süleymanpaşa Saray Direkt Ekspres seferi. D-567 karayolu üzerinden toplam 62 kilometrelik ekspres sefer başlıyor. 1. Adım: Süleymanpaşa Terminalinden 36 yolcuyu alarak hareket edin. Güzergâh: Muratlı Sapağı, Vakıflar Kavşağı ve hedef Saray Belediyesi Otogarı.",
+            color: "#0284c7",
+            otobusKapasitesi: 46,
+            biletFiyat: 110,
+            biletFiyatMultiplier: 2.2,
+            isDistrict: true,
+            terrain: "otoyol",
+            stops: [
+                {
+                    name: "Süleymanpaşa Yeni Otobüs Terminali",
+                    anons: "Süleymanpaşa Yeni Otobüs Terminali kalkış peronundayız. Saray Direkt Ekspres 62 kilometre seferimiz başlıyor.",
+                    bekleyenYolcu: 36,
+                    inenYolcu: 0,
+                    gercekMesafeSonraki: 23.0,
+                    lat: 40.9950,
+                    lon: 27.5620
+                },
+                {
+                    name: "Muratlı Sapağı (D-567)",
+                    anons: "Sonraki durak: Muratlı Sapağı D-567 bağlantısı.",
+                    bekleyenYolcu: 6,
+                    inenYolcu: 4,
+                    gercekMesafeSonraki: 21.0,
+                    lat: 41.1710,
+                    lon: 27.5020
+                },
+                {
+                    name: "Vakıflar Kavşağı (D-567)",
+                    anons: "Sonraki durak: Vakıflar Kavşağı.",
+                    bekleyenYolcu: 5,
+                    inenYolcu: 3,
+                    gercekMesafeSonraki: 18.0,
+                    lat: 41.2700,
+                    lon: 27.7000
+                },
+                {
+                    name: "Saray Belediyesi Otogarı",
+                    anons: "Son durak: Saray Belediyesi Otogarı. 62 kilometrelik ekspres seferimiz tamamlanmıştır. Lütfen eşyalarınızı unutmayınız.",
+                    bekleyenYolcu: 0,
+                    inenYolcu: 40,
+                    gercekMesafeSonraki: 0,
+                    lat: 41.4450,
+                    lon: 27.9250
+                }
+            ]
+        },]
 };
 
 let routesData = {};
@@ -1938,6 +1994,8 @@ if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
         ilceRotalari["Tekirdağ"].push(Object.assign({}, r26, { id: "hat_26_suleymanpasa_velimese" }));
         ilceRotalari["Tekirdağ"].push(Object.assign({}, r26, { id: "hat_26_suleymanpasa_saray" }));
         if (typeof routesData !== 'undefined') {
+            const rSaray = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_saray_ekspres");
+            if (rSaray) routesData["hat_saray_ekspres"] = rSaray;
             routesData["hat_226_suleymanpasa_saray"] = r26;
             routesData["hat_26_suleymanpasa_saray"] = r26;
             routesData["hat_226_suleymanpasa_velimese"] = r26;
