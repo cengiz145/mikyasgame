@@ -156,6 +156,13 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn("Firebase bağlantı hatası, yerel modla devam ediliyor:", error);
         }
 
+        const distSelect = document.getElementById('district-select-input');
+        const chosenDistrict = (distSelect && distSelect.value) ? distSelect.value : 'Süleymanpaşa';
+        if (typeof Game !== 'undefined' && Game.setActiveDistrict) {
+            Game.setActiveDistrict(chosenDistrict);
+        } else {
+            localStorage.setItem('activeDistrict', chosenDistrict);
+        }
         localStorage.setItem('otobusUsername', username);
         
         if (typeof UI !== 'undefined' && UI.switchScreen) {
@@ -188,6 +195,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (btnLogin) {
         btnLogin.addEventListener('click', handleLoginAction);
+    }
+
+        // Title Screen - Aktif Bölge Değiştir Butonu
+    const btnChangeDist = document.getElementById('btn-change-active-district');
+    if (btnChangeDist) {
+        btnChangeDist.addEventListener('click', () => {
+            const cur = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
+            let next = "Süleymanpaşa";
+            if (cur === "Süleymanpaşa") next = "Saray";
+            else if (cur === "Saray") next = "Velimeşe";
+            else next = "Süleymanpaşa";
+
+            if (typeof Game !== 'undefined' && Game.setActiveDistrict) {
+                Game.setActiveDistrict(next);
+            } else {
+                localStorage.setItem('activeDistrict', next);
+            }
+            if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
+                UI.updateTitleScreenButtons();
+            }
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak(`Ana çalışma bölgeniz ${next} olarak ayarlandı. Artık ana rotanız burası.`);
+            }
+        });
     }
 
     // 1. Title Screen - Şehir İçi ve Şehirlerarası Ayrımı

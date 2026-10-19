@@ -8,13 +8,26 @@ const AkilliRotaSistemi = {
     allStopsCache: null,
 
     // MAHALLELER VE ANA DURAKLAR KATALOĞU (Ara duraklar giderken keşfedilir)
-        getActiveCatalog: function() {
-        const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
-        if (!hasPassed10) {
-            // Seviye 1-10: Diğer ilçeler tamamen gizlidir (sistemde hiç yer almaz)
-            return this.mahallelerVeAnaDuraklar.filter(item => item.district === "Süleymanpaşa");
+        getActiveDistrict: function() {
+        if (typeof Game !== 'undefined' && Game.activeDistrict) return Game.activeDistrict;
+        try {
+            return localStorage.getItem('activeDistrict') || "Süleymanpaşa";
+        } catch(e) {
+            return "Süleymanpaşa";
         }
-        return this.mahallelerVeAnaDuraklar;
+    },
+
+    getActiveCatalog: function() {
+        const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
+        const activeDist = this.getActiveDistrict();
+
+        if (activeDist === "all" && hasPassed10) {
+            return this.mahallelerVeAnaDuraklar;
+        }
+
+        // Sadece seçilen ana bölgenin mahalleleri listelenir, diğer tüm ilçeler tamamen ve sessizce gizlenir
+        const filtered = this.mahallelerVeAnaDuraklar.filter(item => item.district === activeDist);
+        return filtered.length > 0 ? filtered : this.mahallelerVeAnaDuraklar.filter(item => item.district === "Süleymanpaşa");
     },
 
     mahallelerVeAnaDuraklar: [
@@ -116,8 +129,9 @@ const AkilliRotaSistemi = {
         const effectiveFrom = fromHub ? fromHub.stopName : neredenQuery;
         const effectiveTo = toHub ? toHub.stopName : nereyeQuery;
 
+        const activeDist = this.getActiveDistrict();
         // 1. SÜLEYMANPAŞA İÇİ MAHALLE / ANA DURAK NAVİGASYONU
-        if ((!fromHub || fromHub.district === "Süleymanpaşa") && (!toHub || toHub.district === "Süleymanpaşa")) {
+        if ((activeDist === "Süleymanpaşa" || activeDist === "all") && (!fromHub || fromHub.district === "Süleymanpaşa") && (!toHub || toHub.district === "Süleymanpaşa")) {
             if (typeof SuleymanpasaNavigasyon !== 'undefined' && SuleymanpasaNavigasyon.findSokak) {
                 const sFrom = SuleymanpasaNavigasyon.findSokak(effectiveFrom);
                 const sTo = SuleymanpasaNavigasyon.findSokak(effectiveTo);
@@ -139,7 +153,7 @@ const AkilliRotaSistemi = {
         }
 
         // 2. SARAY İÇİ MAHALLE / ANA DURAK NAVİGASYONU
-        if (hasPassed10 && (!fromHub || fromHub.district === "Saray") && (!toHub || toHub.district === "Saray")) {
+        if ((activeDist === "Saray" || (hasPassed10 && activeDist === "all")) && (!fromHub || fromHub.district === "Saray") && (!toHub || toHub.district === "Saray")) {
             if (typeof SarayNavigasyon !== 'undefined' && SarayNavigasyon.findSokak) {
                 const sFrom = SarayNavigasyon.findSokak(effectiveFrom);
                 const sTo = SarayNavigasyon.findSokak(effectiveTo);
@@ -161,7 +175,7 @@ const AkilliRotaSistemi = {
         }
 
         // 3. VELİMEŞE İÇİ MAHALLE NAVİGASYONU
-        if (hasPassed10 && (!fromHub || fromHub.district === "Velimeşe") && (!toHub || toHub.district === "Velimeşe")) {
+        if ((activeDist === "Velimeşe" || (hasPassed10 && activeDist === "all")) && (!fromHub || fromHub.district === "Velimeşe") && (!toHub || toHub.district === "Velimeşe")) {
             if (typeof VelimeseNavigasyon !== 'undefined' && VelimeseNavigasyon.findSokak) {
                 const vFrom = VelimeseNavigasyon.findSokak(effectiveFrom);
                 const vTo = VelimeseNavigasyon.findSokak(effectiveTo);
@@ -433,13 +447,36 @@ const AkilliRotaSistemi = {
         return true;
     },
 
-    openModal: function() {
-        const modal = document.getElementById('smart-route-modal');
-        if (!modal) return;
-        modal.classList.remove('hidden');
-
-        // Datalist doldur (Seviyeye göre dinamik)
+        updateDistrictUI: function() {
+        const activeDist = this.getActiveDistrict();
         const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
+
+        // Sekme butonlarını güncelle
+        ['spasa', 'saray', 'velimese', 'intercity'].forEach(tabKey => {
+            const btn = document.getElementById('tab-dist-' + tabKey);
+            if (!btn) return;
+            if (tabKey === 'intercity') {
+                btn.style.display = hasPassed10 ? 'inline-block' : 'none';
+            }
+            const isMatch = (tabKey === 'spasa' && activeDist === 'Süleymanpaşa') ||
+                            (tabKey === 'saray' && activeDist === 'Saray') ||
+                            (tabKey === 'velimese' && activeDist === 'Velimeşe') ||
+                            (tabKey === 'intercity' && activeDist === 'all');
+
+            if (isMatch) {
+                btn.style.background = 'rgba(56,189,248,0.3)';
+                btn.style.borderColor = '#38bdf8';
+                btn.style.color = '#fff';
+                btn.style.fontWeight = 'bold';
+            } else {
+                btn.style.background = 'rgba(255,255,255,0.06)';
+                btn.style.borderColor = 'rgba(255,255,255,0.2)';
+                btn.style.color = '#94a3b8';
+                btn.style.fontWeight = 'normal';
+            }
+        });
+
+        // Datalist doldur (Sadece seçili bölgenin mahalle ve ana durakları)
         const datalist = document.getElementById('smart-stops-datalist');
         if (datalist) {
             datalist.innerHTML = '';
@@ -451,31 +488,49 @@ const AkilliRotaSistemi = {
             });
         }
 
-        // Popüler merkezler (Seviyeye göre dinamik)
+        // Popüler merkez butonları (Seçili bölgeye özel)
         const pillsContainer = document.getElementById('smart-pills-container');
         if (pillsContainer) {
             pillsContainer.innerHTML = '';
-            const popularStops = hasPassed10 ? [
-                "Değirmenaltı Kampüs",
-                "Valilik & Hükümet Cd.",
-                "Şehir Hastanesi",
-                "Süleymanpaşa Otogar",
-                "Saray Otogarı",
-                "Saray Devlet Hastanesi",
-                "Saray Çarşı",
-                "Velimeşe Merkez",
-                "Çorlu Otogarı",
-                "Çerkezköy Otogarı"
-            ] : [
-                "Değirmenaltı Kampüs",
-                "Valilik & Hükümet Cd.",
-                "Şehir Hastanesi",
-                "Süleymanpaşa Otogar",
-                "Köprübaşı & Çarşı",
-                "Atatürk Spor Salonu",
-                "Altınova Sahil",
-                "Baykallar & Emniyet"
-            ];
+            let popularStops = [];
+            if (activeDist === 'Saray') {
+                popularStops = [
+                    "Ayaspaşa Çarşı",
+                    "Saray Otogarı",
+                    "Saray Devlet Hastanesi",
+                    "Saray Fakülte Kampüsü",
+                    "100. Yıl Parklar",
+                    "Büyükyoncalı Merkez",
+                    "Çukuryurt Meydan"
+                ];
+            } else if (activeDist === 'Velimeşe') {
+                popularStops = [
+                    "Velimeşe Merkez",
+                    "Velimeşe Sanayi Bölgesi",
+                    "Velimeşe TOKİ Konutları"
+                ];
+            } else if (activeDist === 'all' && hasPassed10) {
+                popularStops = [
+                    "Değirmenaltı Kampüs",
+                    "Valilik & Hükümet Cd.",
+                    "Süleymanpaşa Otogar",
+                    "Saray Otogarı",
+                    "Saray Devlet Hastanesi",
+                    "Çorlu Otogarı",
+                    "Çerkezköy Otogarı"
+                ];
+            } else {
+                popularStops = [
+                    "Değirmenaltı Kampüs",
+                    "Valilik & Hükümet Cd.",
+                    "Şehir Hastanesi",
+                    "Süleymanpaşa Otogar",
+                    "Köprübaşı & Çarşı",
+                    "Atatürk Spor Salonu",
+                    "Altınova Sahil",
+                    "Baykallar & Emniyet"
+                ];
+            }
 
             popularStops.forEach(st => {
                 const pill = document.createElement('button');
@@ -503,20 +558,37 @@ const AkilliRotaSistemi = {
             });
         }
 
-        // İlçe hızlı mod butonları görünürlük ayarı
-        const btnSarayQuick = document.getElementById('btn-saray-quick-mode');
-        const btnSarayRing = document.getElementById('btn-saray-mahalle-mode');
-        const btnVelimeseQuick = document.getElementById('btn-velimese-quick-mode');
-        if (btnSarayQuick) btnSarayQuick.style.display = hasPassed10 ? 'inline-block' : 'none';
-        if (btnSarayRing) btnSarayRing.style.display = hasPassed10 ? 'inline-block' : 'none';
-        if (btnVelimeseQuick) btnVelimeseQuick.style.display = hasPassed10 ? 'inline-block' : 'none';
+        // Placeholder güncelle
+        const fromInput = document.getElementById('smart-from-input');
+        const toInput = document.getElementById('smart-to-input');
+        if (fromInput && toInput) {
+            if (activeDist === 'Saray') {
+                fromInput.placeholder = "Örn: Ayaspaşa Çarşı, Saray Otogar, Büyükyoncalı...";
+                toInput.placeholder = "Örn: Saray Devlet Hastanesi, Fakülte Kampüs...";
+            } else if (activeDist === 'Velimeşe') {
+                fromInput.placeholder = "Örn: Velimeşe Merkez Meydan, Çetin Sokak...";
+                toInput.placeholder = "Örn: Velimeşe TOKİ Konutları, Sanayi Bölgesi...";
+            } else {
+                fromInput.placeholder = "Örn: Değirmenaltı Kampüs, Valilik & Hükümet Cd....";
+                toInput.placeholder = "Örn: Şehir Hastanesi, Atatürk Spor Salonu...";
+            }
+        }
+    },
+
+    openModal: function() {
+        const modal = document.getElementById('smart-route-modal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+
+        this.updateDistrictUI();
 
         const fromInput = document.getElementById('smart-from-input');
         if (fromInput) {
             fromInput.focus();
         }
 
-        const speechNotice = "Akıllı Rota Sistemi açıldı. Sadece kalkış ve varış mahallesini veya ana durağını seçin; ara durakları sürüş esnasında rota üzerinde keşfedeceksiniz.";
+        const activeDist = this.getActiveDistrict();
+        const speechNotice = `Akıllı Rota Sistemi açıldı. Aktif bölgeniz: ${activeDist}. Sadece bu bölgenin mahalle ve durakları listeleniyor. Ara durakları sürüş esnasında keşfedeceksiniz.`;
         if (typeof audio !== 'undefined' && audio.speak) {
             audio.speak(speechNotice);
         }
@@ -534,6 +606,31 @@ const AkilliRotaSistemi = {
     },
 
     init: function() {
+                // Bölge Seçim Sekmeleri Dinleyicileri
+        const tabConfigs = [
+            { id: 'tab-dist-spasa', dist: 'Süleymanpaşa', name: 'Süleymanpaşa' },
+            { id: 'tab-dist-saray', dist: 'Saray', name: 'Saray' },
+            { id: 'tab-dist-velimese', dist: 'Velimeşe', name: 'Velimeşe' },
+            { id: 'tab-dist-intercity', dist: 'all', name: 'Tüm İlçeler' }
+        ];
+
+        tabConfigs.forEach(tc => {
+            const btn = document.getElementById(tc.id);
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    if (typeof Game !== 'undefined' && Game.setActiveDistrict) {
+                        Game.setActiveDistrict(tc.dist);
+                    } else {
+                        localStorage.setItem('activeDistrict', tc.dist);
+                        this.updateDistrictUI();
+                    }
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak(`Bölge değiştirildi: ${tc.name}. Sadece ${tc.name} mahalle ve durakları listeleniyor.`);
+                    }
+                });
+            }
+        });
+
         const btnOpen = document.getElementById('btn-open-smart-route');
         if (btnOpen) {
             btnOpen.addEventListener('click', () => this.openModal());

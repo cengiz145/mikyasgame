@@ -63,6 +63,15 @@
                 <input type="text" id="username-input" class="modern-btn nav-item" style="width: 100%; text-align: center; font-size: 1.2rem; cursor: text; background: rgba(255,255,255,0.1); border: 2px solid var(--primary);" value="Kaptan" placeholder="Kullanıcı Adı Giriniz" aria-label="Kullanıcı adınız. Varsayılan olarak Kaptan belirlenmiştir.">
             </div>
             
+                        <div style="margin-bottom: 20px; text-align: left;">
+                <label for="district-select-input" style="display: block; margin-bottom: 8px; font-weight: bold; color: #38bdf8;">📍 Ana Çalışma Bölgesi (Merkez Üssü):</label>
+                <select id="district-select-input" class="modern-btn nav-item" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 10px; background: rgba(0,0,0,0.6); border: 2px solid #38bdf8; color: #fff;" aria-label="Başlangıç ve ana çalışma bölgenizi seçin">
+                    <option value="Süleymanpaşa" selected>🏙️ Süleymanpaşa (Tekirdağ Merkez)</option>
+                    <option value="Saray">🌳 Saray (İlçe Merkezi & Mahalleleri)</option>
+                    <option value="Velimeşe">🏭 Velimeşe (Ergene Sanayi & TOKİ)</option>
+                </select>
+                <small style="color: #94a3b8; display: block; margin-top: 6px; font-size: 0.85rem;">Seçtiğiniz bölgenin mahalleleri ana rotanız olur, diğer ilçeler ilerde açılır.</small>
+            </div>
             <button id="btn-login" class="modern-btn btn-primary nav-item" style="width: 100%; padding: 15px; font-size: 1.2rem;" aria-label="Oyuna Gir">
                 <span class="btn-icon">👤</span> Oyuna Gir
             </button>
@@ -80,6 +89,11 @@
             <h1 class="main-title" style="font-size: 3.5rem;">Otobüs Simülasyonu</h1>
         </div>
 
+                <div id="active-district-badge-container" style="margin-bottom: 14px; text-align: center; z-index: 1;">
+            <button id="btn-change-active-district" class="modern-btn nav-item" style="padding: 8px 18px; font-size: 1rem; background: rgba(56,189,248,0.15); border: 1.5px solid #38bdf8; color: #38bdf8; border-radius: 20px; cursor: pointer;" aria-label="Ana çalışma bölgesini değiştir">
+                📍 Ana Bölge: <strong id="lbl-active-district">Süleymanpaşa</strong> 🔄 (Değiştirmek İçin Tıkla)
+            </button>
+        </div>
         <div class="menu-container" style="z-index: 1;">
             <button id="btn-open-smart-route" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: center; margin-bottom: 12px; font-size: 1.2rem; background: linear-gradient(135deg, #0284c7, #0369a1); border-color: #38bdf8;">
                 🧭 Akıllı Rota Bulucu (Nereden ➔ Nereye)
@@ -422,6 +436,21 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h2 id="smart-route-title" class="gradient-text" style="font-size: 1.7rem; margin: 0;">🧭 Akıllı Rota Sistemi</h2>
                 <button id="btn-smart-modal-close" class="modern-btn" style="padding: 6px 12px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444;" aria-label="Akıllı rota penceresini kapat">✕</button>
+            </div>
+                        <!-- AKTİF BÖLGE SEÇİMİ (SEKME BUTONLARI) -->
+            <div id="smart-district-tabs" style="display: flex; gap: 8px; margin-bottom: 16px;">
+                <button type="button" id="tab-dist-spasa" class="modern-btn nav-item" style="flex: 1; padding: 9px; font-size: 0.95rem; cursor: pointer; border-radius: 8px;" aria-label="Süleymanpaşa mahallelerini seç">
+                    🏙️ Süleymanpaşa
+                </button>
+                <button type="button" id="tab-dist-saray" class="modern-btn nav-item" style="flex: 1; padding: 9px; font-size: 0.95rem; cursor: pointer; border-radius: 8px;" aria-label="Saray mahallelerini seç">
+                    🌳 Saray
+                </button>
+                <button type="button" id="tab-dist-velimese" class="modern-btn nav-item" style="flex: 1; padding: 9px; font-size: 0.95rem; cursor: pointer; border-radius: 8px;" aria-label="Velimeşe mahallelerini seç">
+                    🏭 Velimeşe
+                </button>
+                <button type="button" id="tab-dist-intercity" class="modern-btn nav-item" style="flex: 1.2; padding: 9px; font-size: 0.95rem; display: none; cursor: pointer; border-radius: 8px;" aria-label="Tüm ilçeler ve şehirlerarası koridorlar">
+                    🛣️ Tüm İlçeler
+                </button>
             </div>
             <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 18px; line-height: 1.4;">Yüzlerce ara durakla uğraşmanıza gerek yok. Sadece gitmek istediğiniz <strong>mahalle veya ana durağı</strong> seçin; sistem en uygun rotayı hazırlar, tüm ara durakları sürüş esnasında keşfedersiniz.</p>
 
