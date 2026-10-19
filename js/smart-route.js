@@ -90,18 +90,38 @@ const AkilliRotaSistemi = {
     },
 
     getAllStops: function() {
-        if (this.allStopsCache && this.allStopsCache.length > 0) {
-            return this.allStopsCache;
+        const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
+        
+        // Seviye 1-10: Oyuncu henüz diğer ilçeleri açmadı, sadece Süleymanpaşa mahalle ve ana durakları
+        if (!hasPassed10) {
+            return this.mahallelerVeAnaDuraklar
+                .filter(item => item.district === "Süleymanpaşa")
+                .map(item => item.label);
         }
-        // Sadece Mahalleler ve Ana Duraklar listelenir (Ara duraklar giderken keşfedilir)
-        this.allStopsCache = this.mahallelerVeAnaDuraklar.map(item => item.label);
-        return this.allStopsCache;
+
+        // Seviye 10+: Tüm ilçe otogarları ve mahalleler açık
+        return this.mahallelerVeAnaDuraklar.map(item => item.label);
     },
 
     hesapla: function(neredenQuery, nereyeQuery) {
         // Mahalle ve Ana Durak çözümlemesi
         const fromHub = this.resolveMahalleOrHub(neredenQuery);
         const toHub = this.resolveMahalleOrHub(nereyeQuery);
+
+        const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
+
+        // SEVİYE 10 KİLİT KONTROLÜ (İlçe otogarları ve şehirlerarası seferler)
+        if (!hasPassed10) {
+            const isOutsideSpasa = (fromHub && fromHub.district !== "Süleymanpaşa") || 
+                                   (toHub && toHub.district !== "Süleymanpaşa");
+            if (isOutsideSpasa) {
+                const targetDistrict = (toHub && toHub.district !== "Süleymanpaşa") ? toHub.district : fromHub.district;
+                return {
+                    success: false,
+                    message: `${targetDistrict} ve diğer ilçe otogarları kilitli! İlçe seferlerini açabilmek için Süleymanpaşa'da en az 10 görevi tamamlayıp 10. Seviyeye ulaşmalısınız.`
+                };
+            }
+        }
 
         const effectiveFrom = fromHub ? fromHub.stopName : neredenQuery;
         const effectiveTo = toHub ? toHub.stopName : nereyeQuery;
@@ -426,9 +446,11 @@ const AkilliRotaSistemi = {
         if (!modal) return;
         modal.classList.remove('hidden');
 
-        // Datalist doldur
+        // Datalist doldur (Seviyeye göre dinamik)
+        const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
         const datalist = document.getElementById('smart-stops-datalist');
-        if (datalist && datalist.children.length === 0) {
+        if (datalist) {
+            datalist.innerHTML = '';
             const stops = this.getAllStops();
             stops.forEach(name => {
                 const opt = document.createElement('option');
@@ -437,10 +459,11 @@ const AkilliRotaSistemi = {
             });
         }
 
-        // Popüler merkezler
+        // Popüler merkezler (Seviyeye göre dinamik)
         const pillsContainer = document.getElementById('smart-pills-container');
-        if (pillsContainer && pillsContainer.children.length === 0) {
-            const popularStops = [
+        if (pillsContainer) {
+            pillsContainer.innerHTML = '';
+            const popularStops = hasPassed10 ? [
                 "Değirmenaltı Kampüs",
                 "Valilik & Hükümet Cd.",
                 "Şehir Hastanesi",
@@ -451,6 +474,15 @@ const AkilliRotaSistemi = {
                 "Velimeşe Merkez",
                 "Çorlu Otogarı",
                 "Çerkezköy Otogarı"
+            ] : [
+                "Değirmenaltı Kampüs",
+                "Valilik & Hükümet Cd.",
+                "Şehir Hastanesi",
+                "Süleymanpaşa Otogar",
+                "Köprübaşı & Çarşı",
+                "Atatürk Spor Salonu",
+                "Altınova Sahil",
+                "Baykallar & Emniyet"
             ];
 
             popularStops.forEach(st => {
@@ -479,12 +511,22 @@ const AkilliRotaSistemi = {
             });
         }
 
+        // İlçe hızlı mod butonları görünürlük ayarı
+        const btnSarayQuick = document.getElementById('btn-saray-quick-mode');
+        const btnSarayRing = document.getElementById('btn-saray-mahalle-mode');
+        const btnVelimeseQuick = document.getElementById('btn-velimese-quick-mode');
+        if (btnSarayQuick) btnSarayQuick.style.display = hasPassed10 ? 'inline-block' : 'none';
+        if (btnSarayRing) btnSarayRing.style.display = hasPassed10 ? 'inline-block' : 'none';
+        if (btnVelimeseQuick) btnVelimeseQuick.style.display = hasPassed10 ? 'inline-block' : 'none';
+
         const fromInput = document.getElementById('smart-from-input');
         if (fromInput) {
             fromInput.focus();
         }
 
-        const speechNotice = "Akıllı Rota Sistemi açıldı. Sadece kalkış ve varış mahallesi veya ana durağını seçin; ara durakları sürüş esnasında rota üzerinde keşfedeceksiniz.";
+        const speechNotice = hasPassed10 
+            ? "Akıllı Rota Sistemi açıldı. Sadece kalkış ve varış mahallesi veya ana terminalini seçin; ara durakları sürüş esnasında rota üzerinde keşfedeceksiniz."
+            : "Akıllı Rota Sistemi açıldı. Süleymanpaşa mahalleleri ve ana durakları arasında seferinizi seçebilirsiniz. İlçe otogarları ve ekspres hatlar 10. Seviyede açılacaktır.";
         if (typeof audio !== 'undefined' && audio.speak) {
             audio.speak(speechNotice);
         }
@@ -570,6 +612,12 @@ if (typeof document !== 'undefined') {
         const btnV = document.getElementById('btn-velimese-quick-mode');
         if (btnV) {
             btnV.addEventListener('click', () => {
+                if (typeof Game !== 'undefined' && !Game.hasPassedLevel10()) {
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Velimeşe hattı kilitli! Bu hatta sefer yapabilmek için Süleymanpaşa'da 10 görevi tamamlayıp 10. Seviyeye ulaşmalısınız.");
+                    }
+                    return;
+                }
                 const fromInput = document.getElementById('smart-from-input');
                 const toInput = document.getElementById('smart-to-input');
                 if (fromInput && toInput) {
@@ -611,6 +659,12 @@ if (typeof document !== 'undefined') {
         const btnS = document.getElementById('btn-saray-quick-mode');
         if (btnS) {
             btnS.addEventListener('click', () => {
+                if (typeof Game !== 'undefined' && !Game.hasPassedLevel10()) {
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Saray ekspres hattı kilitli! Bu hatta sefer yapabilmek için Süleymanpaşa'da 10 görevi tamamlayıp 10. Seviyeye ulaşmalısınız.");
+                    }
+                    return;
+                }
                 const fromInput = document.getElementById('smart-from-input');
                 const toInput = document.getElementById('smart-to-input');
                 if (fromInput && toInput) {
