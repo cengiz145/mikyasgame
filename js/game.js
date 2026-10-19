@@ -35,6 +35,17 @@ const Game = {
         }
     })(),
     currentCity: localStorage.getItem('merkezUs') || "Tekirdağ",
+    activeDistrict: localStorage.getItem('activeDistrict') || "Süleymanpaşa",
+    setActiveDistrict: function(dist) {
+        this.activeDistrict = dist || "Süleymanpaşa";
+        try { localStorage.setItem('activeDistrict', this.activeDistrict); } catch(e) {}
+        if (typeof AkilliRotaSistemi !== 'undefined' && AkilliRotaSistemi.updateDistrictUI) {
+            AkilliRotaSistemi.updateDistrictUI();
+        }
+        if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
+            UI.updateTitleScreenButtons();
+        }
+    },
     
     // --- Active Route State ---
     activeRouteId: null,

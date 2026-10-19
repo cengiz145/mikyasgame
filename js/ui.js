@@ -216,12 +216,22 @@ if (typeof window !== "undefined") window.MissionReader = MissionReader;
 const UI = {
     updateTitleScreenButtons: function() {
         const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
+        const activeDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
+        
         const btnCity = document.getElementById('btn-start-city');
         const btnIntercity = document.getElementById('btn-start-intercity');
+        const lblDistrict = document.getElementById('lbl-active-district');
+        
+        if (lblDistrict) {
+            lblDistrict.innerText = (activeDist === 'all') ? 'Tüm İlçeler' : activeDist;
+        }
+        
         if (btnCity) {
-            btnCity.innerHTML = hasPassed10 
-                ? "🏙️ Şehir İçi ve İlçe Seferleri (TEKULAŞ)" 
-                : "🏙️ Şehir İçi Belediye Seferleri (Süleymanpaşa)";
+            if (hasPassed10) {
+                btnCity.innerHTML = "🏙️ Şehir İçi ve İlçe Seferleri (TEKULAŞ)";
+            } else {
+                btnCity.innerHTML = `🏙️ Tüm ${activeDist} Hatları ve Mahalle Seferleri`;
+            }
         }
         if (btnIntercity) {
             btnIntercity.style.display = hasPassed10 ? "flex" : "none";
