@@ -1981,6 +1981,77 @@ const ilceRotalari = {
                     lon: 27.9250
                 }
             ]
+        },
+        {
+            id: "hat_35_saray_ici",
+            hatNo: "35",
+            name: "HAT 35: SARAY İÇİ BELEDİYE RİNGİ (25 DURAK)",
+            destDistrict: "Saray",
+            originDistrict: "Saray",
+            startStop: "Saray Otogar 1 (Giriş Peronu)",
+            endStop: "Saray Devlet Hastanesi Ana Giriş",
+            intermediateStops: [
+                "100. Yıl Atatürk Caddesi 1",
+                "Ladin Sokak Parkı",
+                "100. Yıl Atatürk Caddesi 2",
+                "Mezarlık Caddesi 1",
+                "Mezarlık Caddesi 2",
+                "Saray Hastane Caddesi 1",
+                "Hastane Caddesi 2",
+                "Remzi Saker Parkı",
+                "Mezarlık Caddesi 3",
+                "Cumhuriyet Caddesi Çarşı",
+                "Cumhuriyet Caddesi Park Mevkii",
+                "Cumhuriyet Caddesi Trafo",
+                "Uğur Mumcu Caddesi",
+                "Saray Belediyesi (Cumhuriyet Meydanı)",
+                "Saray Emniyet Müdürlüğü",
+                "İstanbul Caddesi 1",
+                "İstanbul Caddesi 2",
+                "Midye Caddesi 1",
+                "Pazarcık Sağlık Ocağı",
+                "Ayvacık Caddesi 1",
+                "Türkan Bebek Parkı",
+                "Millet Caddesi 1",
+                "Depo Caddesi 1"
+            ],
+            desc: "Kalkış: Saray Otogarı ➔ Varış: Saray Devlet Hastanesi. Saray ilçe merkezini, çarşıyı, Pazarcık ve Kemalpaşa mahallelerini birbirine bağlayan 25 duraklı resmî TEKULAŞ şehir içi ring hattı.",
+            detailedInstructions: "Hat 35 Saray İçi Sefer Görev Adımları:\n1. Adım: Saray Otogar 1 peronundan yolcuları alarak hareket edin.\n2. Adım: Çarşı ve mahalle güzergâhı boyunca sırasıyla 25 durakta durup yolcu indirin ve bindirin.\n3. Adım (Hedef Son Durak): Saray Devlet Hastanesi durağında seferi tamamlayın.",
+            speechBriefing: "Hat 35 Saray Şehir İçi Seferi başlıyor. Saray Otogarından hareketle 25 durak boyunca Saray Çarşı, Pazarcık, Kemalpaşa ve son durak Saray Devlet Hastanesine ulaşılacaktır.",
+            color: "#06b6d4",
+            otobusKapasitesi: 32,
+            biletFiyat: 18,
+            biletFiyatMultiplier: 1.0,
+            isDistrict: false,
+            isCity: true,
+            terrain: "mahalle_asfalt",
+            stops: [
+                { name: "Saray Otogar 1 (Giriş Peronu)", anons: "Saray Otogar 1 kalkış peronundayız. Hat 35 Saray Şehir İçi seferimiz başlıyor.", bekleyenYolcu: 22, inenYolcu: 0, gercekMesafeSonraki: 0.5, lat: 41.4408, lon: 27.9211 },
+                { name: "100. Yıl Atatürk Caddesi 1", anons: "Sonraki durak: 100. Yıl Atatürk Caddesi 1.", bekleyenYolcu: 4, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4367, lon: 27.9157 },
+                { name: "Ladin Sokak Parkı", anons: "Sonraki durak: Ladin Sokak Parkı.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4325, lon: 27.9109 },
+                { name: "100. Yıl Atatürk Caddesi 2", anons: "Sonraki durak: 100. Yıl Atatürk Caddesi 2.", bekleyenYolcu: 3, inenYolcu: 1, gercekMesafeSonraki: 0.4, lat: 41.4353, lon: 27.9138 },
+                { name: "Mezarlık Caddesi 1", anons: "Sonraki durak: Mezarlık Caddesi 1.", bekleyenYolcu: 2, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4388, lon: 27.9167 },
+                { name: "Mezarlık Caddesi 2", anons: "Sonraki durak: Mezarlık Caddesi 2.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4417, lon: 27.9124 },
+                { name: "Saray Hastane Caddesi 1", anons: "Sonraki durak: Saray Hastane Caddesi 1.", bekleyenYolcu: 4, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4423, lon: 27.9103 },
+                { name: "Hastane Caddesi 2", anons: "Sonraki durak: Hastane Caddesi 2.", bekleyenYolcu: 3, inenYolcu: 1, gercekMesafeSonraki: 0.4, lat: 41.4427, lon: 27.9069 },
+                { name: "Remzi Saker Parkı", anons: "Sonraki durak: Remzi Saker Parkı.", bekleyenYolcu: 5, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4451, lon: 27.9056 },
+                { name: "Mezarlık Caddesi 3", anons: "Sonraki durak: Mezarlık Caddesi 3.", bekleyenYolcu: 2, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4457, lon: 27.9088 },
+                { name: "Cumhuriyet Caddesi Çarşı", anons: "Sonraki durak: Cumhuriyet Caddesi Çarşı.", bekleyenYolcu: 6, inenYolcu: 3, gercekMesafeSonraki: 0.4, lat: 41.4463, lon: 27.9109 },
+                { name: "Cumhuriyet Caddesi Park Mevkii", anons: "Sonraki durak: Cumhuriyet Caddesi Park Mevkii.", bekleyenYolcu: 4, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4452, lon: 27.9131 },
+                { name: "Cumhuriyet Caddesi Trafo", anons: "Sonraki durak: Cumhuriyet Caddesi Trafo.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4432, lon: 27.9164 },
+                { name: "Uğur Mumcu Caddesi", anons: "Sonraki durak: Uğur Mumcu Caddesi.", bekleyenYolcu: 5, inenYolcu: 3, gercekMesafeSonraki: 0.4, lat: 41.4443, lon: 27.9178 },
+                { name: "Saray Belediyesi (Cumhuriyet Meydanı)", anons: "Sonraki durak: Saray Belediyesi Cumhuriyet Meydanı.", bekleyenYolcu: 8, inenYolcu: 5, gercekMesafeSonraki: 0.4, lat: 41.4422, lon: 27.9204 },
+                { name: "Saray Emniyet Müdürlüğü", anons: "Sonraki durak: Saray Emniyet Müdürlüğü.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4438, lon: 27.9252 },
+                { name: "İstanbul Caddesi 1", anons: "Sonraki durak: İstanbul Caddesi 1.", bekleyenYolcu: 4, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4447, lon: 27.9259 },
+                { name: "İstanbul Caddesi 2", anons: "Sonraki durak: İstanbul Caddesi 2.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4464, lon: 27.9279 },
+                { name: "Midye Caddesi 1", anons: "Sonraki durak: Midye Caddesi 1.", bekleyenYolcu: 4, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4474, lon: 27.9293 },
+                { name: "Pazarcık Sağlık Ocağı", anons: "Sonraki durak: Pazarcık Sağlık Ocağı.", bekleyenYolcu: 6, inenYolcu: 3, gercekMesafeSonraki: 0.4, lat: 41.4499, lon: 27.9320 },
+                { name: "Ayvacık Caddesi 1", anons: "Sonraki durak: Ayvacık Caddesi 1.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4512, lon: 27.9287 },
+                { name: "Türkan Bebek Parkı", anons: "Sonraki durak: Türkan Bebek Parkı.", bekleyenYolcu: 4, inenYolcu: 2, gercekMesafeSonraki: 0.5, lat: 41.4531, lon: 27.9274 },
+                { name: "Millet Caddesi 1", anons: "Sonraki durak: Millet Caddesi 1.", bekleyenYolcu: 4, inenYolcu: 3, gercekMesafeSonraki: 0.4, lat: 41.4455, lon: 27.9229 },
+                { name: "Depo Caddesi 1", anons: "Sonraki durak: Depo Caddesi 1.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4424, lon: 27.9239 },
+                { name: "Saray Devlet Hastanesi Ana Giriş", anons: "Son durak: Saray Devlet Hastanesi Ana Giriş. Hat 35 Saray Şehir İçi seferimiz tamamlanmıştır.", bekleyenYolcu: 0, inenYolcu: 35, gercekMesafeSonraki: 0, lat: 41.4380, lon: 27.9307 }
+            ]
         },]
 };
 
@@ -1993,6 +2064,11 @@ if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
     if (r26) {
         // Sadece routesData alias haritalamasi yapilir, ilceRotalari listesine cift kopya eklenmez
         if (typeof routesData !== 'undefined') {
+            const r35 = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_35_saray_ici");
+            if (r35) {
+                routesData["hat_35_saray_ici"] = r35;
+                routesData["hat_35"] = r35;
+            }
             const rSaray = ilceRotalari["Tekirdağ"].find(r => r.id === "hat_saray_ekspres");
             if (rSaray) routesData["hat_saray_ekspres"] = rSaray;
             routesData["hat_226_suleymanpasa_saray"] = r26;
