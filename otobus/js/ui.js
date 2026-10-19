@@ -227,10 +227,13 @@ const UI = {
         }
         
         if (btnCity) {
+            const completed = (typeof Game !== 'undefined' && typeof Game.completedTasks === 'number') ? Game.completedTasks : 0;
             if (hasPassed10) {
-                btnCity.innerHTML = "🏙️ Şehir İçi ve İlçe Seferleri (TEKULAŞ)";
+                btnCity.innerHTML = "🏙️ Şehir İçi ve İlçe Seferleri (TEKULAŞ - Kalfa Seviyesi)";
+            } else if (completed === 0) {
+                btnCity.innerHTML = "🚍 Seferlere Başla (1. Seviye Çırak Seferi - Görev 1)";
             } else {
-                btnCity.innerHTML = `🏙️ Tüm ${activeDist} Hatları ve Mahalle Seferleri`;
+                btnCity.innerHTML = `🚍 Seferlere Devam Et (${completed + 1}. Görev: 10'da ${completed} Tamamlandı)`;
             }
         }
         if (btnIntercity) {
