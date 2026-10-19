@@ -197,7 +197,7 @@ const Game = {
         } else {
             if (typeof audio !== 'undefined' && typeof audio.playLuggageBays === 'function') audio.playLuggageBays(false);
             if (lugEl) lugEl.style.display = 'none';
-            const msg = "Bagaj kapakları pnömatik olarak kilitlendi. Sefer için hazır.";
+            const msg = "Bagaj kapakları kilitlendi. Sefer için hazır.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
         }
@@ -207,13 +207,13 @@ const Game = {
         if (typeof audio !== 'undefined' && typeof audio.playIBISChime === 'function') audio.playIBISChime();
         const r = this.activeRouteData;
         if (!r) {
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak("IBIS: Aktif sefer bulunmuyor.");
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Hat Tabelası: Şu anda aktif bir sefer bulunmuyor.");
             return;
         }
         const start = r.startStop || (r.stops[0] ? r.stops[0].name : "Başlangıç");
         const end = r.endStop || (r.stops[r.stops.length - 1] ? r.stops[r.stops.length - 1].name : "Son Durak");
         const lineCode = (r.hatNo || "26").toUpperCase();
-        const msg = `IBIS Hat Bilgisayarı: Hat ${lineCode}. Güzergah: ${start} kalkışlı, ${end} varışlı. Dış LED tabela ve iç yolcu anons ekranı senkronize.`;
+        const msg = `Hat Tabelası: Hat ${lineCode}. Güzergah: ${start} kalkışlı, ${end} varışlı.`;
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
         if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
     },
@@ -705,10 +705,10 @@ const Game = {
                 '    <li style="margin-bottom: 6px;"><strong>Kalkış ve Hızlanma:</strong> <code>W</code> veya <code>Yukarı Ok</code> tuşuna basarak gaz verin ve kalkış yapın. Şeridinizi korumak için <code>A / D</code> veya <code>Sol / Sağ Ok</code> tuşlarını kullanın.</li>',
                 '    <li style="margin-bottom: 6px;"><strong>Durağa Yaklaşma ve Duracak Zili:</strong> Durağa 220 metre kala inecek yolcu varsa akustik <code>DURACAK</code> zili çalar ve kokpitte kırmızı ikaz lambası yanar. Kademeli fren ve retarder ile sarsıntısız durun.</li>',
                 '    <li style="margin-bottom: 6px;"><strong>Kneeling ve Kapılar:</strong> Araç durduğunda <code>E</code> (Ön Kapı) ve <code>Q</code> (Arka Kapı) ile kapıları açın. Araç durağa yana yatar (Kneeling). Yolcular Tekirdağ Kart basarken resmî validatör sinyallerini dinleyin.</li>',
-                '    <li style="margin-bottom: 6px;"><strong>Kaptan Telsizi ve Konfor Takibi:</strong> <code>T</code> tuşuna basarak TEKULAŞ Hareket Merkezi telsiz anonsunu dinleyin. <code>C</code> tuşuyla anlık Yolcu Konfor Endeksinizi kontrol edin.</li>',
+                '    <li style="margin-bottom: 6px;"><strong>Kaptan Telsizi ve Konfor Takibi:</strong> <code>T</code> tuşuna basarak TEKULAŞ Hareket Merkezi telsiz anonsunu dinleyin. <code>C</code> tuşuyla yolcu memnuniyetini kontrol edin.</li>',
                 '    <li style="margin-bottom: 6px;"><strong>Görevi Başarıyla Bitirme:</strong> Sırasıyla tüm duraklara uğrayıp son durak olan <strong>' + endStop + '</strong> durağına vardığınızda görevi tamamlayıp prim kazanın!</li>',
                 '</ul>',
-                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>U</strong> Engelli Rampası | <strong>P</strong> Pnömatik Bagaj | <strong>I</strong> IBIS Hat Tabelası | <strong>Z</strong> Zamanlama | <strong>J</strong> Kayıp Eşya | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>R</strong> Hız | <strong>Shift+T</strong> Saat.</div>'
+                '<div style="font-size: 0.85rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>U</strong> Engelli Rampası | <strong>P</strong> Bagaj Kapağı | <strong>I</strong> Hat Tabelası | <strong>Z</strong> Zamanlama | <strong>J</strong> Kayıp Eşya | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>R</strong> Hız | <strong>Shift+T</strong> Saat.</div>'
             ].join("");
         }
 

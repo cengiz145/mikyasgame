@@ -11,110 +11,122 @@ class VoiceAssistant {
         this.isCopilotEnabled = (localStorage.getItem('copilot_enabled') !== 'false');
         this.currentStageFilter = 'lab'; // 'all', 1, 2, 3, 4, 'karne'
 
-        // 4 Pedagojik Gelişim Aşamasına Ayrılmış 12 Eğitim Modülü
+        // 4 Aşamada Toplam 12 Sade ve Pratik Sürüş Dersi (Tamamen Oyuncuya Oyunu Anlatan Dil)
         this.tutorialLessons = [
-            // 1. AŞAMA: TEMEL SÜRÜŞ VE ARAÇ HAKİMİYETİ (BAŞLANGIÇ)
+            // 1. BÖLÜM: DİREKSİYON BAŞINA GEÇİŞ
             {
                 id: 'driving',
                 stage: 1,
-                stageName: '1. Aşama: Temel Sürüş ve Araç Hakimiyeti',
-                title: '1. Temel Sürüş ve Araç Kontrolleri',
-                keys: 'W (Gaz), S (Fren), A (Sol), D (Sağ), Boşluk (Motor), R (Hız)',
-                speech: 'Temel Sürüş ve Araç Kontrolleri: Boşluk tuşuna basarak motoru çalıştırınız veya durdurunuz. W tuşuna basılı tutarak araca gaz verip hızlanınız. S tuşu servis frenidir; durağa veya kasise yaklaşırken aracı yavaşlatır ve durdurur. A ve D tuşları direksiyonu sola ve sağa çevirir. R tuşuna basarak anlık hızınızı kilometre cinsinden öğrenebilirsiniz.'
+                stageName: '1. Bölüm: Direksiyon Başına Geçiş',
+                title: '1. Motoru Çalıştırma, Gaz ve Fren',
+                keys: 'M veya Boşluk (Motor), W (Gaz), S (Fren), A ve D (Direksiyon), R (Hız)',
+                tip: 'Kontağı açmak için M tuşuna bas, sonra W ile gaza basıp ilerle.',
+                speech: 'Otobüsü sürmek çok kolay! Önce M veya Boşluk tuşuna basarak motoru çalıştırırsın. W tuşuna basılı tuttuğunda gaza basarsın ve otobüs hızlanır. Durmak veya yavaşlamak için S tuşuna basarsın. A tuşu sola, D tuşu sağa döner. Ne kadar hızlı gittiğini öğrenmek için de R tuşuna basabilirsin.'
             },
             {
                 id: 'stops',
                 stage: 1,
-                stageName: '1. Aşama: Temel Sürüş ve Araç Hakimiyeti',
-                title: '2. Duraklar ve Kapı İşlemleri',
+                stageName: '1. Bölüm: Direksiyon Başına Geçiş',
+                title: '2. Duraklarda Yolcu Alma ve İndirme',
                 keys: '1 (Ön Kapı), 2 (Arka Kapı)',
-                speech: 'Duraklar ve Yolcu İndirme-Bindirme: Durağa ulaşıp tam olarak durduktan sonra 1 tuşuna basarak ön kapıyı, 2 tuşuna basarak arka kapıyı açınız. Ön kapıdan yeni yolcular biner, arka kapıdan inen yolcular tahliye edilir. Tüm yolcular indikten ve bindikten sonra aynı tuşlarla kapıları kapatınız. Güvenlik kilidi devrede olduğu için kapılar açıkken araç hareket etmez.'
+                tip: 'Durakta tam durduktan sonra 1 ile ön kapıyı, 2 ile arka kapıyı aç.',
+                speech: 'Durağa geldiğinde S tuşuna basıp tam dur. 1 tuşuna basarak ön kapıyı aç, yeni binen yolcular kartlarını okutsun. 2 tuşuna basarak arka kapıyı aç, inecek yolcular insin. Herkes binip indikten sonra yine 1 ve 2 tuşlarıyla kapıları kapat. Kapılar açıkken otobüs gitmez, kapıları kapatıp gaza basabilirsin.'
             },
             {
                 id: 'compass',
                 stage: 1,
-                stageName: '1. Aşama: Temel Sürüş ve Araç Hakimiyeti',
-                title: '3. Pusula ve İstikamet Yönlendirme',
-                keys: 'Y (Pusula), Shift + Ok Tuşları (Yön Değiştir)',
-                speech: 'Pusula ve Yön Bulma Sistemi: Y tuşuna basarak otobüsünüzün mevcut istikametini Kuzey, Güney, Doğu veya Batı olarak dinleyebilirsiniz. Güzergah dönüşlerinde Shift tuşu ile birlikte Yukarı, Aşağı, Sol veya Sağ yön oklarına basarak aracınızın pusula yönünü değiştirebilirsiniz.'
+                stageName: '1. Bölüm: Direksiyon Başına Geçiş',
+                title: '3. Yönünü Bulma ve Pusula',
+                keys: 'Y (Hangi Yöne Gidiyorum?), Shift + Ok Tuşları (Yön Değiştir)',
+                tip: 'Nereye gittiğini merak ettiğinde Y tuşuna basarak yönünü öğrenebilirsin.',
+                speech: 'Nereye doğru gittiğini öğrenmek için Y tuşuna bas. Oyun sana Kuzey, Güney, Doğu veya Batı diye sesli söyler. Dönüş yapacağın zaman Shift tuşuyla birlikte Yön Oklarına basarak otobüsün yönünü çevirebilirsin.'
             },
 
-            // 2. AŞAMA: SOSYAL DUYARLILIK VE YOLCU GÜVENLİĞİ (GELİŞME)
+            // 2. BÖLÜM: YOLCULARIMIZ VE DURAKLAR
             {
                 id: 'ramp',
                 stage: 2,
-                stageName: '2. Aşama: Sosyal Duyarlılık ve Yolcu Güvenliği',
-                title: '4. Engelli Yolcular ve Rampa Sistemi',
-                keys: 'U (Engelli Rampası)',
-                speech: 'Engelli Yolcular ve Rampa Sistemi: Durakta tekerlekli sandalyeli bir yolcu beklediğinde asistan sesli uyarı verir. Durup kapıları açtıktan sonra U tuşuna basarak pnömatik engelli rampasını indiriniz. Yolcu araca güvenle bindikten sonra tekrar U tuşuna basarak rampayı kapatınız. Rampa toplanmadan araç güvenlik kilidini çözmez.'
+                stageName: '2. Bölüm: Yolcularımız ve Duraklar',
+                title: '4. Tekerlekli Sandalyeli Yolcular ve Rampa',
+                keys: 'K (Otobüsü Sağa Yatır), U veya R (Engelli Rampası)',
+                tip: 'Tekerlekli sandalyeli yolcu görünce rampayı aç, yolcu binince kapat.',
+                speech: 'Durakta tekerlekli sandalyeli veya yaşlı bir yolcumuz bekliyorsa oyun sana haber verir. Durup kapıyı açtıktan sonra K tuşuna basarak otobüsü kaldırıma doğru eğebilirsin. U veya R tuşuna basınca rampa açılır ve yolcumuz biner. Yolcumuz binince tekrar U veya R tuşuna basıp rampayı kapatırsın ve yola devam edersin.'
             },
             {
                 id: 'bumps',
                 stage: 2,
-                stageName: '2. Aşama: Sosyal Duyarlılık ve Yolcu Güvenliği',
-                title: '5. Hız Kasisleri ve Konfor Endeksi',
-                keys: 'S (Fren ile 30 km/s altı), C (Konfor Endeksi)',
-                speech: 'Hız Kasisleri ve Konfor Endeksi: Seyir halindeyken yolda hız kasisi tespit edildiğinde asistan kasis uyarısı yapar. S tuşuna basarak hızınızı saatte 30 kilometrenin altına düşürünüz. Kasis üzerinden 30\'un üzerinde bir hızla geçmek yolcu konfor puanını ve araç mekanik sağlığını düşürür. C tuşuna basarak yolcu konfor yüzdesini öğrenebilirsiniz.'
+                stageName: '2. Bölüm: Yolcularımız ve Duraklar',
+                title: '5. Tümsekler ve Yolcu Memnuniyeti',
+                keys: 'S (Tümsekte Yavaşla), C (Yolcu Memnuniyeti)',
+                tip: 'Kasis görünce hızını 30 km/s altına düşür ki yolcular sarsılmasın.',
+                speech: 'Yolda kasis veya tümsek uyarısı duyduğunda S tuşuna basarak hızını 30 un altına düşür. Çok hızlı geçersen yolcular sarsılır ve puan kaybedersin! Yolcuların senden ne kadar memnun olduğunu görmek için C tuşuna basabilirsin.'
             },
             {
                 id: 'comfort_ac',
                 stage: 2,
-                stageName: '2. Aşama: Sosyal Duyarlılık ve Yolcu Güvenliği',
-                title: '6. Klima, Havalandırma ve Cam Kontrolleri',
-                keys: 'K (Klima Aç/Kapat), O (Kaptan Camı)',
-                speech: 'Klima ve Cam Kontrolleri: Sıcak yaz veya soğuk kış günlerinde K tuşuna basarak kabin klimasını açıp kapatabilirsiniz. O tuşuna basarak kaptan sol camını açıp kapatabilir, içeriye temiz hava alabilirsiniz.'
+                stageName: '2. Bölüm: Yolcularımız ve Duraklar',
+                title: '6. Klima ve Şoför Camı',
+                keys: 'K (Klima Aç/Kapat), O (Şoför Camı)',
+                tip: 'Hava çok sıcak veya soğuksa klimayı aç, ferahlamak için camı aç.',
+                speech: 'Sıcak yaz günlerinde veya kış soğuğunda yolcuların üşümemesi ya da bunalmaması için K tuşuna basarak klimayı açıp kapatabilirsin. Temiz hava almak istediğinde de O tuşuna basarak şoför camını açıp kapatabilirsin.'
             },
 
-            // 3. AŞAMA: ZAMAN YÖNETİMİ VE ZOR KOŞULLAR (İLERİ DÜZEY)
+            // 3. BÖLÜM: GECE, YAĞMUR VE SEFER KURALLARI
             {
                 id: 'lights_weather',
                 stage: 3,
-                stageName: '3. Aşama: Zaman Yönetimi ve Zor Koşullar',
-                title: '7. Farlar, Silecekler ve Hava Koşulları',
-                keys: 'F (Farlar), Shift + W (Silecek), Shift + T (Saat/Hava)',
-                speech: 'Farlar ve Hava Şartları: Akşam saatlerinde, tünellerde veya gece seferlerinde F tuşuna basarak farlarınızı yakınız. Yağmurlu veya karlı havalarda görüşü korumak için Shift ve W tuşlarına basarak silecekleri devreye alınız. Shift ve T tuşlarına basarak güncel oyun saatini, dış sıcaklığı ve hava durumunu dinleyebilirsiniz.'
+                stageName: '3. Bölüm: Gece, Yağmur ve Sefer Kuralları',
+                title: '7. Farlar, Yağmur ve Silecekler',
+                keys: 'F (Farlar), Shift + W (Silecek), Shift + T (Saat ve Hava)',
+                tip: 'Karanlıkta F ile farları yak, yağmurda Shift+W ile silecekleri çalıştır.',
+                speech: 'Akşam olduğunda, tünellere girdiğinde veya hava karardığında F tuşuna basarak farlarını yak. Yağmurlu ve karlı havalarda önünü rahat görebilmek için Shift ve W tuşlarına basarak silecekleri çalıştır. Saati ve dışarıdaki hava durumunu öğrenmek için de Shift ve T tuşlarına bas.'
             },
             {
                 id: 'timetable',
                 stage: 3,
-                stageName: '3. Aşama: Zaman Yönetimi ve Zor Koşullar',
-                title: '8. Dakiklik, Sefer Çizelgesi ve IBIS Bilgisayarı',
-                keys: 'Z (Dakiklik Raporu), I (IBIS Bilgisayarı)',
-                speech: 'Dakiklik ve IBIS Bilgisayarı: Z tuşuna basarak resmi sefer saatine göre erken mi yoksa rötarlı mı gittiğinizi kontrol edebilirsiniz. I tuşuna basarak IBIS hat bilgisayarını ve otobüsün dış LED tabelasındaki güzergah senkronizasyonunu dinleyebilirsiniz.'
+                stageName: '3. Bölüm: Gece, Yağmur ve Sefer Kuralları',
+                title: '8. Saate Bakma ve Ön Tabela',
+                keys: 'Z (Geç mi Kaldım?), I (Ön Tabela)',
+                tip: 'Zamana bakmak için Z tuşuna, ön tabelayı dinlemek için I tuşuna bas.',
+                speech: 'Seferde geç mi kaldın yoksa erken mi gidiyorsun öğrenmek için Z tuşuna bas. Otobüsün önündeki ışıklı tabelada hangi hatta gittiğin yazar; tabelada ne yazdığını dinlemek için de I tuşuna basabilirsin.'
             },
             {
                 id: 'lost_found',
                 stage: 3,
-                stageName: '3. Aşama: Zaman Yönetimi ve Zor Koşullar',
-                title: '9. Sefer Sonu ve Kayıp Eşya Kontrolü',
-                keys: 'J (Kabin Teftişi)',
-                speech: 'Sefer Sonu ve Kayıp Eşya Kontrolü: Hattın son durağına ulaşıp tüm yolcular tahliye edildikten sonra seyahat tamamlanır. Sefere son vermeden önce J tuşuna basarak kabin teftişi yapınız. Koltuklarda unutulan telefon, cüzdan veya çantaları tespit edip emanet bürosuna teslim ederek tecrübe puanı ve bahşiş kazanabilirsiniz.'
+                stageName: '3. Bölüm: Gece, Yağmur ve Sefer Kuralları',
+                title: '9. Son Durak ve Unutulan Eşyalar',
+                keys: 'J (Otobüse Göz At)',
+                tip: 'Son durakta herkes indikten sonra koltukları kontrol edip eşyaları topla.',
+                speech: 'Hattın son durağına gelip tüm yolcular indikten sonra seferin tamamlanır. Seferi bitirmeden önce J tuşuna basarak koltukların arasına bak. Yolcuların unuttuğu telefon veya çantaları bulursan ekstra puan ve bahşiş kazanırsın!'
             },
 
-            // 4. AŞAMA: USTA KAPTANLIK VE ŞEHİRLERARASI SEFERLER (USTALIK)
+            // 4. BÖLÜM: UZUN YOL VE USTA ŞOFÖRLÜK
             {
                 id: 'luggage',
                 stage: 4,
-                stageName: '4. Aşama: Usta Kaptanlık ve Şehirlerarası Seferler',
-                title: '10. Bagaj Kapakları ve Şehirlerarası Seferler',
-                keys: 'P (Alt Bagaj Kapakları)',
-                speech: 'Bagaj Kapakları ve Uzun Yol: Şehirlerarası ve ilçe hatlarında yolcuların bavul ve valizlerini alabilmek için durakta P tuşuna basarak alt bagaj kapaklarını açınız. Yükleme tamamlandıktan sonra tekrar P tuşuna basarak kapakları kilitleyiniz.'
+                stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
+                title: '10. Şehirlerarası Sefer ve Valizler',
+                keys: 'P (Bagaj Kapağı)',
+                tip: 'Yolcuların valizleri için durakta P tuşuna basıp bagajı aç.',
+                speech: 'Şehirlerarası sefere çıktığında yolcuların büyük valizleri olur. Durakta durunca P tuşuna basarak bagaj kapağını açarsın. Valizler yerleşince tekrar P tuşuna basarak kapağı kapatırsın.'
             },
             {
                 id: 'badges_collection',
                 stage: 4,
-                stageName: '4. Aşama: Usta Kaptanlık ve Şehirlerarası Seferler',
-                title: '11. 1500 Başarı ve Durak Hafızası',
-                keys: 'K (Durak Albümü), Menü Rozetler Sekmesi',
-                speech: '1500 Başarı ve Durak Hafızası: Menüdeki Kaptan Liyakat Rozetleri bölümünden 1\'den 1500\'e kadar sıralı resmi görevleri inceleyebilir, rastgele hedef önerisi alabilirsiniz. Sürüş sırasında K tuşuna basarak o ana kadar keşfettiğiniz şehir duraklarının koleksiyonunu ve kazandığınız keşif primlerini dinleyebilirsiniz.'
+                stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
+                title: '11. 1500 Başarı ve Keşfedilen Duraklar',
+                keys: 'Menüde Başarılar Sekmesi, K (Keşfedilen Duraklar)',
+                tip: '1500 farklı göreve bakarak sıradaki hedefini seçebilirsin.',
+                speech: 'Oyunda tam 1500 farklı görev ve madalya seni bekliyor! Menüden Başarılar sekmesine girip sıradaki görevini görebilir veya rastgele bir hedef seçtirebilirsin. Yolda giderken K tuşuna basarak şu ana kadar kaç farklı durak keşfettiğini de öğrenebilirsin.'
             },
             {
                 id: 'voice_guide',
                 stage: 4,
-                stageName: '4. Aşama: Usta Kaptanlık ve Şehirlerarası Seferler',
-                title: '12. Sesli Asistan ve Sesle Yönetim',
-                keys: 'V (Mikrofon / Sesli Asistan)',
-                speech: 'Sesli Seyir Asistanı: Sürüş halindeyken V tuşuna basarak asistana sesli komut verebilirsiniz. Hızım kaç, neredeyiz, sonraki durak, pusula, farları yak, klimayı aç, 48 numaralı hat, Saray seferi veya nasıl sürülür gibi sorularınızı doğrudan konuşarak iletebilirsiniz.'
+                stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
+                title: '12. Sesli Asistanla Konuşma',
+                keys: 'V (Mikrofon)',
+                tip: 'Direksiyonu bırakmadan sesli olarak soru sorabilir ve komut verebilirsin.',
+                speech: 'Sürüş sırasında elini klavyeden kaldırmadan V tuşuna basarak benimle doğrudan konuşabilirsin. Hızım kaç, neredeyiz, farları yak, klimayı aç veya nasıl oynanır demen yeterlidir.'
             }
         ];
 
@@ -221,7 +233,7 @@ class VoiceAssistant {
         modal.classList.remove('hidden');
         this.updateCopilotButtonText();
 
-        const welcomeMsg = "Mikyas Kaptanlık Akademisi ve İnteraktif Sürüş Atölyesi açıldı. Not stresi ve sınav korkusu olmadan formülleri canlı deneyebileceğiniz atölye istasyonlarımız hazır. Yön tuşlarıyla pratik butonlarına geçebilir veya F1 tuşuyla atölyeyi kapatabilirsiniz.";
+        const welcomeMsg = "Otobüs Sürüş Rehberi açıldı. Hiç zor değil; adım adım tuşlara basarak otobüsü çalıştırmayı ve sürmeyi birlikte öğreneceğiz. Şimdi birinci adımla başlayalım.";
         if (typeof audio !== 'undefined' && audio.speak) {
             audio.speak(welcomeMsg);
         }
@@ -235,7 +247,7 @@ class VoiceAssistant {
         if (modal) modal.classList.add('hidden');
         this.stopTutorialSpeech();
         if (typeof audio !== 'undefined' && audio.speak) {
-            audio.speak("Akademi rehberi kapatıldı.");
+            audio.speak("Sürüş rehberi kapatıldı.");
         }
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
             KeyboardNav.initForScreen();
@@ -322,7 +334,7 @@ class VoiceAssistant {
             btn.style.background = 'rgba(6, 78, 59, 0.25)';
             btn.style.cursor = 'pointer';
 
-            btn.setAttribute('aria-label', `${lesson.stageName}. ${lesson.title}. Formül: ${lesson.formula}. Tuşlar: ${lesson.keys}. Dinlemek için Enter'a basınız.`);
+            btn.setAttribute('aria-label', `${lesson.stageName}. ${lesson.title}. Tuşlar: ${lesson.keys}. İpucu: ${lesson.tip}. Dinlemek için Enter'a basınız.`);
 
             btn.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -333,9 +345,9 @@ class VoiceAssistant {
                     <span style="font-size: 0.85rem; color: #a7f3d0; background: rgba(16, 185, 129, 0.2); padding: 4px 10px; border-radius: 4px;">▶ Dinle</span>
                 </div>
                 <div style="background: rgba(15, 23, 42, 0.6); border-left: 3px solid #38bdf8; padding: 6px 10px; border-radius: 4px; font-size: 0.86rem; color: #38bdf8;">
-                    📐 <strong>Formül:</strong> ${lesson.formula}
+                    💡 <strong>Oyun İpucu:</strong> ${lesson.tip}
                 </div>
-                <div style="font-size: 0.88rem; color: #fde047;"><strong>Tuşlar / Aksiyon:</strong> ${lesson.keys}</div>
+                <div style="font-size: 0.88rem; color: #fde047;"><strong>Tuşlar:</strong> ${lesson.keys}</div>
                 <div style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.4;">${lesson.speech}</div>
             `;
 
@@ -353,13 +365,11 @@ class VoiceAssistant {
     }
 
     // =========================================================================
-    // ADIM ADIM KILAVUZLU İNTERAKTİF SÜRÜŞ ATÖLYESİ (ÖĞRETMEN DİSİPLİNİ & SIFIR STRES)
+    // ADIM ADIM REHBERLİ SÜRÜŞ EĞİTİMİ (TERİMSİZ, EN ANLAŞILIR OYUN DİLİ)
     // =========================================================================
     initGuidedLab() {
         if (typeof this.guidedStep === 'undefined') this.guidedStep = 1;
         if (typeof this.labSpeed === 'undefined') this.labSpeed = 0;
-        if (typeof this.labPressure === 'undefined') this.labPressure = 0;
-        if (typeof this.labComfort === 'undefined') this.labComfort = 100;
         if (typeof this.labEngineRunning === 'undefined') this.labEngineRunning = false;
         if (typeof this.labKneeling === 'undefined') this.labKneeling = false;
         if (typeof this.labRampOpen === 'undefined') this.labRampOpen = false;
@@ -367,38 +377,37 @@ class VoiceAssistant {
         if (typeof this.labRearDoor === 'undefined') this.labRearDoor = false;
         if (typeof this.labRetarderActive === 'undefined') this.labRetarderActive = false;
         this.guidedFeedbackText = "";
-        this.guidedFeedbackType = "info"; // "success" | "warning" | "info"
+        this.guidedFeedbackType = "info";
 
         this.guidedSteps = [
             {
                 step: 1,
-                title: "1. Adım: Motor Marşı ve Pnömatik Basınç",
-                formula: "Hava Basıncı ≥ 85 PSI ➔ İmdat Frenleri Çözülür",
-                instruction: "Sevgili Kaptan Adayım, otobüsümüzü sefere hazırlamak için önce motoru çalıştırmalıyız. Lütfen klavyenizden M tuşuna basınız veya aşağıdaki 'Marşa Bas' butonuna tıklayınız.",
+                title: "1. Adım: Motoru Çalıştırma (Kontağı Açalım)",
+                tip: "Otobüsün hareket etmesi için önce motoru çalıştırmalıyız.",
+                instruction: "Otobüsümüzü çalıştırmak için klavyeden M tuşuna basınız veya aşağıdaki 'Marşa Bas' butonuna tıklayınız.",
                 targetKey: "m",
-                actionBtnText: "🔑 Kontağı Aç & Marşa Bas (M)",
+                actionBtnText: "🔑 Motoru Çalıştır (M)",
                 actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
-                successFeedback: "Aferin, çok güzel yaptınız! 12 litrelik dizel motor çalıştı ve hava tüpleri 120 PSI basınca ulaştı. İmdat frenleri çözüldü. Şimdi ikinci adıma geçelim.",
-                failFeedback: "Henüz doğru tuşa basmadınız kaptanım. Motoru çalıştırmak için lütfen sadece M tuşuna basınız. Başarabilirsin, tekrar dene!",
+                successFeedback: "Aferin, çok güzel! Motor çalıştı, sesini duyduk. Şimdi gaza basıp yola çıkalım.",
+                failFeedback: "Motoru çalıştırmak için lütfen sadece M tuşuna basınız. Başarabilirsin, tekrar dene!",
                 execute: () => {
                     if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.start) {
                         try { audio.sounds.start.play(); } catch(e) {}
                     }
                     this.labEngineRunning = true;
-                    this.labPressure = 120;
                 }
             },
             {
                 step: 2,
-                title: "2. Adım: Gaza Basıp Hızlanma",
-                formula: "v = a · t ➔ Ağır Tonaj Hızlanma Dinamiği",
-                instruction: "Motorumuz çalışıyor. Şimdi aracı hareket ettirmek ve hızlanmak için klavyeden W tuşuna (veya Yukarı Ok) basınız.",
+                title: "2. Adım: Gaza Basma (Yola Çıkalım)",
+                tip: "Otobüsü hızlandırmak için gaza basıyoruz.",
+                instruction: "Otobüsü sürmek ve hızlanmak için klavyeden W tuşuna (veya Yukarı Ok tuşuna) basınız.",
                 targetKey: "w",
                 altTargetKey: "arrowup",
-                actionBtnText: "🟢 Gaza Bas: 50 km/s (W / Yukarı Ok)",
+                actionBtnText: "🟢 Gaza Bas ve Hızlan (W / Yukarı Ok)",
                 actionBtnStyle: "background: linear-gradient(135deg, #16a34a, #15803d); border: 1.5px solid #4ade80;",
-                successFeedback: "Harika gidiyorsun, tebrikler! Otobüsümüz hareket etti ve saatte 50 kilometre hıza ulaştı. İleride ilk durağımız görünüyor.",
-                failFeedback: "Hızlanmak için lütfen W tuşuna veya Yukarı Ok tuşuna basınız. Tekrar deneyiniz kaptanım!",
+                successFeedback: "Harika gidiyorsun, tebrikler! Otobüsümüz hızlandı, ilk durağımıza doğru gidiyoruz.",
+                failFeedback: "Hızlanmak için lütfen W tuşuna veya Yukarı Ok tuşuna basınız. Tekrar deneyiniz!",
                 execute: () => {
                     if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
                     this.labSpeed = 50;
@@ -406,31 +415,30 @@ class VoiceAssistant {
             },
             {
                 step: 3,
-                title: "3. Adım: İpek Fren ile Yumuşak Duruş",
-                formula: "Duruş Mesafesi: d = v² / 200 | Konfor = %100",
-                instruction: "Durağa yaklaşıyoruz! Yolcuları sarsmamak için yumuşak bir ipek fren yapmalıyız. Lütfen klavyeden S tuşuna (veya Aşağı Ok) basınız.",
+                title: "3. Adım: Yumuşakça Durma (Fren Yapalım)",
+                tip: "Durağa yaklaşınca yolcular sarsılmasın diye frene yumuşakça basıyoruz.",
+                instruction: "Durağa geldik! Yolcuları sarsmadan durmak için lütfen klavyeden S tuşuna (veya Aşağı Ok tuşuna) basınız.",
                 targetKey: "s",
                 altTargetKey: "arrowdown",
-                actionBtnText: "✨ İpek Fren Yap ve Dur (S / Aşağı Ok)",
+                actionBtnText: "✨ Frene Bas ve Dur (S / Aşağı Ok)",
                 actionBtnStyle: "background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981;",
-                successFeedback: "Mükemmel bir duruş, tebrikler! Gazı erkenden kesip ipek gibi durdun. Yolcular ayakta bile sarsılmadı, konfor puanımız yüzde yüz!",
-                failFeedback: "Durağa yumuşak yanaşmak ve durmak için lütfen S tuşuna veya Aşağı Ok tuşuna basınız. Başaracaksın, bir kez daha dene!",
+                successFeedback: "Mükemmel bir duruş, tebrikler! Çok yumuşak durdun, yolcular hiç sarsılmadı.",
+                failFeedback: "Durmak için lütfen S tuşuna veya Aşağı Ok tuşuna basınız. Tekrar dene!",
                 execute: () => {
                     if (typeof audio !== 'undefined' && audio.playAirBrake) audio.playAirBrake();
                     this.labSpeed = 0;
-                    this.labComfort = 100;
                 }
             },
             {
                 step: 4,
-                title: "4. Adım: Otobüsü Sağa Yatırma (Kneeling)",
-                formula: "Kneeling (%15 Eğim) ➔ Kaldırım Hizalama",
-                instruction: "Durakta yaşlı ve engelli yolcularımız bekliyor. Otobüsün basamak yüksekliğini kaldırım seviyesine indirmek için klavyeden K tuşuna basınız.",
+                title: "4. Adım: Otobüsü Sağa Eğme (Kaldırıma Yaklaştırma)",
+                tip: "Yaşlı ve engelli yolcular basamağa rahat çıksın diye otobüsü sağa eğiyoruz.",
+                instruction: "Durakta yaşlı bir yolcumuz bekliyor. Otobüsü kaldırıma doğru eğmek için klavyeden K tuşuna basınız.",
                 targetKey: "k",
-                actionBtnText: "⬇️ Otobüsü Sağa Yatır (K)",
+                actionBtnText: "⬇️ Otobüsü Sağa Eğ (K)",
                 actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
-                successFeedback: "Aferin, çok doğru yaptınız! Otobüs sağ körüklerini indirerek kaldırım hizasına eğildi. İşte sosyal duyarlılık ve usta kaptanlık budur!",
-                failFeedback: "Otobüsü kaldırım seviyesine eğmek için lütfen K tuşuna basınız. Tekrar dene kaptanım!",
+                successFeedback: "Aferin çok doğru! Otobüs yana yattı, basamak kaldırım seviyesine indi.",
+                failFeedback: "Otobüsü eğmek için lütfen K tuşuna basınız. Tekrar dene!",
                 execute: () => {
                     if (typeof audio !== 'undefined' && audio.playKneeling) audio.playKneeling();
                     this.labKneeling = true;
@@ -439,14 +447,14 @@ class VoiceAssistant {
             {
                 step: 5,
                 title: "5. Adım: Engelli Rampasını Açma",
-                formula: "1:12 Eğim Standardı ➔ Engelsiz Erişim",
-                instruction: "Tekerlekli sandalyeli yolcumuzun rahatça binebilmesi için klavyeden R tuşuna (veya U) basarak engelli rampasını açınız.",
+                tip: "Tekerlekli sandalyeli yolcumuzun binmesi için rampayı açıyoruz.",
+                instruction: "Tekerlekli sandalyeli yolcumuzun rahatça binmesi için klavyeden R tuşuna (veya U) basarak rampayı açınız.",
                 targetKey: "r",
                 altTargetKey: "u",
                 actionBtnText: "🛹 Engelli Rampasını Aç (R veya U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #d97706, #b45309); border: 1.5px solid #facc15;",
-                successFeedback: "Harikasınız, tebrikler! Rampa açıldı ve yolcumuz araca güvenle bindi. Yolcumuz sesleniyor: Çok teşekkür ederim kaptanım, iyi ki varsınız!",
-                failFeedback: "Engelli rampasını açmak için lütfen R veya U tuşuna basınız. Hadi bir kez daha deneyelim!",
+                successFeedback: "Harikasın! Rampa açıldı, yolcumuz bindi ve teşekkür etti: İyi ki varsın kaptan!",
+                failFeedback: "Rampayı açmak için lütfen R veya U tuşuna basınız.",
                 execute: () => {
                     if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
                     this.labRampOpen = true;
@@ -454,14 +462,14 @@ class VoiceAssistant {
             },
             {
                 step: 6,
-                title: "6. Adım: Rampayı Kapatma ve Doğrultma",
-                formula: "Rampa Kilitli ➔ Sürüş İzni Çözülür",
-                instruction: "Yolcumuz bindi. Güvenlik gereği rampa açıkken araç hareket etmez. Rampayı kapatmak için tekrar R tuşuna (veya U) basınız.",
+                title: "6. Adım: Rampayı Geri Kapatma",
+                tip: "Yolcumuz bindi, sefere devam etmek için rampayı geri topluyoruz.",
+                instruction: "Yolcumuz bindi. Tekrar yola çıkabilmek için lütfen tekrar R tuşuna (veya U) basarak rampayı kapatınız.",
                 targetKey: "r",
                 altTargetKey: "u",
-                actionBtnText: "⬆️ Rampayı Kapat ve Doğrult (R veya U)",
+                actionBtnText: "⬆️ Rampayı Kapat ve Otobüsü Doğrult (R veya U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
-                successFeedback: "Çok güzel, tebrikler! Rampa emniyetle toplandı ve otobüsümüz normal sürüş yüksekliğine döndü.",
+                successFeedback: "Çok güzel! Rampa kapandı ve otobüsümüz doğruldu.",
                 failFeedback: "Rampayı kapatmak için lütfen tekrar R veya U tuşuna basınız.",
                 execute: () => {
                     if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
@@ -471,14 +479,14 @@ class VoiceAssistant {
             },
             {
                 step: 7,
-                title: "7. Adım: Ön Kapıyı Açma (Yolcu Binişi)",
-                formula: "Yolcu Akışı ➔ Ön Kapı Biniş (1)",
-                instruction: "Durakta bekleyen diğer yolcuları almak için klavyeden 1 tuşuna basarak ön kapıyı açınız.",
+                title: "7. Adım: Ön Kapıyı Açma (Yolcuları Alma)",
+                tip: "Durakta bekleyen diğer yolcuların binmesi için ön kapıyı açıyoruz.",
+                instruction: "Duraktaki diğer yolcuların binmesi için klavyeden 1 tuşuna basarak ön kapıyı açınız.",
                 targetKey: "1",
                 actionBtnText: "🚪 Ön Kapıyı Aç (1)",
                 actionBtnStyle: "background: linear-gradient(135deg, #7c3aed, #6d28d9); border: 1.5px solid #a78bfa;",
-                successFeedback: "Aferin doğru yaptınız! Ön kapı açıldı ve yolcularımız kartlarını basarak bindi: Bip bip, kolay gelsin kaptan!",
-                failFeedback: "Yolcuları almak için ön kapıyı açmalıyız; lütfen klavyeden 1 tuşuna basınız.",
+                successFeedback: "Aferin doğru yaptın! Kapı açıldı, yolcular kartlarını basıp bindi.",
+                failFeedback: "Ön kapıyı açmak için lütfen 1 tuşuna basınız.",
                 execute: () => {
                     if (typeof audio !== 'undefined' && audio.playDoorOpen) audio.playDoorOpen();
                     this.labFrontDoor = true;
@@ -486,14 +494,14 @@ class VoiceAssistant {
             },
             {
                 step: 8,
-                title: "8. Adım: Kapıları Kapatma ve Güvenlik Kilidi",
-                formula: "Kapılar Kapalı ➔ Gaz Emniyet Kilidi Çözülür",
-                instruction: "Tüm yolcular bindi. Sürüş güvenlik kilidini çözmek için lütfen tekrar 1 tuşuna basarak ön kapıyı kapatınız.",
+                title: "8. Adım: Ön Kapıyı Kapatma",
+                tip: "Yolcular bindi, güvenle sürmek için kapıyı kapatıyoruz.",
+                instruction: "Yolcular bindi. Yola çıkmak için lütfen tekrar 1 tuşuna basarak kapıyı kapatınız.",
                 targetKey: "1",
                 actionBtnText: "🔒 Ön Kapıyı Kapat (1)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
-                successFeedback: "Tebrikler, kapılar emniyetle kapandı ve gaz güvenlik kilidi çözüldü! Artık güvenle yola çıkabiliriz.",
-                failFeedback: "Kapıyı kapatmak için lütfen tekrar 1 tuşuna basınız.",
+                successFeedback: "Tebrikler! Kapılar kapandı, artık güvenle sürebilirsin.",
+                failFeedback: "Kapıyı kapatmak için lütfen 1 tuşuna basınız.",
                 execute: () => {
                     if (typeof audio !== 'undefined' && audio.playDoorClose) audio.playDoorClose();
                     this.labFrontDoor = false;
@@ -501,14 +509,14 @@ class VoiceAssistant {
             },
             {
                 step: 9,
-                title: "9. Adım: Manyetik Retarder (Yokuş Freni)",
-                formula: "Ağır Tonaj + Dik İniş ➔ Manyetik Retarder (Space)",
-                instruction: "Son olarak, dik yokuşlarda balataları yakmadan motor gücüyle yavaşlamak için Boşluk (Space) tuşuna basarak manyetik retarderi çekiniz.",
+                title: "9. Adım: Yokuş Aşağı İniş Freni (Retarder)",
+                tip: "Yokuş inerken normal fren balataları ısınmasın diye motor frenini çekiyoruz.",
+                instruction: "Son olarak, dik yokuş inerken otobüsü yavaşlatmak için Boşluk (Space) tuşuna basarak yokuş frenini çekiniz.",
                 targetKey: " ",
-                actionBtnText: "⚡ Manyetik Retarderi Çek (Space / Boşluk)",
+                actionBtnText: "⚡ Yokuş Frenini Çek (Boşluk / Space)",
                 actionBtnStyle: "background: linear-gradient(135deg, #ea580c, #c2410c); border: 1.5px solid #f97316;",
-                successFeedback: "Muhteşem! Manyetik retarder devrede, balatalar aşınmadan güvenle yavaşladık! Bütün temel aşamaları tamamladınız!",
-                failFeedback: "Manyetik retarderi devreye sokmak için lütfen Boşluk (Space) tuşuna basınız.",
+                successFeedback: "Muhteşem! Yokuş frenini çektin, otobüs yavaşladı. Bütün kontrolleri başarıyla öğrendin!",
+                failFeedback: "Yokuş freni için lütfen Boşluk (Space) tuşuna basınız.",
                 execute: () => {
                     if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
                     this.labRetarderActive = true;
@@ -516,7 +524,7 @@ class VoiceAssistant {
             },
             {
                 step: 10,
-                title: "🎓 Akademi Mezuniyeti & Resmi Kaptanlık Brövesi",
+                title: "🎉 Tebrikler! Eğitimi Başarıyla Bitirdin",
                 isGraduation: true
             }
         ];
@@ -529,36 +537,35 @@ class VoiceAssistant {
 
         const currentStep = this.guidedSteps[this.guidedStep - 1] || this.guidedSteps[0];
         const isGraduation = !!currentStep.isGraduation;
-        const progressPct = Math.round(((this.guidedStep - 1) / 9) * 100);
 
         if (isGraduation) {
-            // MEZUNİYET EKRANI
+            // MEZUNİYET EKRANI (TAMAMEN SAMİMİ VE EĞLENCELİ)
             if (typeof Game !== 'undefined' && typeof Game.completeAcademy === 'function') {
                 Game.completeAcademy();
             }
             if (typeof audio !== 'undefined' && audio.playSuccess) audio.playSuccess();
 
             labContainer.innerHTML = `
-                <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 78, 59, 0.5)); border: 2px solid #eab308; border-radius: 14px; padding: 26px; text-align: center; box-shadow: 0 0 30px rgba(234, 179, 8, 0.3);">
-                    <div style="font-size: 3.8rem; margin-bottom: 10px;">🏆</div>
-                    <span style="font-size: 0.88rem; color: #fde047; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">MİKYAS KAPTANLIK AKADEMİSİ MEZUNİYETİ</span>
-                    <h3 style="color: #facc15; font-size: 1.8rem; margin: 6px 0 12px 0;">🎉 TEBRİKLER KAPTANIM!</h3>
+                <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(2, 132, 199, 0.35)); border: 2px solid #38bdf8; border-radius: 14px; padding: 26px; text-align: center; box-shadow: 0 0 30px rgba(56, 189, 248, 0.25);">
+                    <div style="font-size: 3.8rem; margin-bottom: 8px;">🏆</div>
+                    <span style="font-size: 0.9rem; color: #38bdf8; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">TEBRİKLER ŞOFÖR KARDEŞİM!</span>
+                    <h3 style="color: #ffffff; font-size: 1.8rem; margin: 6px 0 12px 0;">🎉 Bütün Kontrolleri Öğrendin!</h3>
                     
-                    <div style="background: rgba(234, 179, 8, 0.15); border: 1.5px solid #eab308; border-radius: 10px; padding: 16px; margin: 16px auto; max-width: 600px; text-align: left;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-                            <span style="font-size: 2rem;">🎖️</span>
+                    <div style="background: rgba(56, 189, 248, 0.12); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 16px; margin: 16px auto; max-width: 580px; text-align: left;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+                            <span style="font-size: 2rem;">🚍</span>
                             <div>
-                                <strong style="color: #fef08a; font-size: 1.15rem; display: block;">Resmî Şehir İçi Sefer Kaptanı Brövesi Verildi</strong>
-                                <span style="color: #cbd5e1; font-size: 0.9rem;">Öğrencilik aşaması tamamlandı, Süleymanpaşa hatları emrinizde!</span>
+                                <strong style="color: #38bdf8; font-size: 1.15rem; display: block;">Artık Gerçek Bir Otobüs Şoförüsün!</strong>
+                                <span style="color: #cbd5e1; font-size: 0.9rem;">Motoru çalıştırmayı, yumuşak durmayı, kapıları ve engelli rampasını öğrendin.</span>
                             </div>
                         </div>
-                        <p style="color: #f1f5f9; font-size: 0.94rem; line-height: 1.5; margin: 8px 0 0 0;">
-                            Motor marşını, ipek freni, engelli rampası sevgi protokolünü ve kapı emniyetini üstün başarıyla kavradınız. Artık yolcularımızı güvenle ve konforla taşıyabilirsiniz.
+                        <p style="color: #f1f5f9; font-size: 0.95rem; line-height: 1.5; margin: 8px 0 0 0;">
+                            Yolcularımız durakta seni bekliyor. Hemen ilk seferine çık ve şehrin caddelerinde keyifle sür!
                         </p>
                     </div>
 
-                    <button id="btn-lab-start-first-mission" class="modern-btn nav-item" style="padding: 14px 28px; font-size: 1.15rem; background: linear-gradient(135deg, #059669, #047857); border: 2px solid #34d399; color: #ffffff; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 10px; box-shadow: 0 0 16px rgba(52, 211, 153, 0.4);" aria-label="İlk Seferime Başla. 1. Seviye Görevini Aç">
-                        🚍 İlk Seferime Başla (Görev 1: Süleymanpaşa)
+                    <button id="btn-lab-start-first-mission" class="modern-btn nav-item" style="padding: 14px 30px; font-size: 1.2rem; background: linear-gradient(135deg, #0284c7, #0369a1); border: 2px solid #38bdf8; color: #ffffff; font-weight: bold; border-radius: 10px; cursor: pointer; margin-top: 10px; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);" aria-label="İlk Seferime Başla. 1. Göreve Git">
+                        🚍 İlk Seferime Başla (1. Göreve Git)
                     </button>
                 </div>
             `;
@@ -568,7 +575,6 @@ class VoiceAssistant {
                 btnStart.onclick = () => {
                     if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
                     this.closeTutorialModal();
-                    // Görev seçim ekranına git
                     document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
                 };
             }
@@ -579,82 +585,74 @@ class VoiceAssistant {
             return;
         }
 
-        // AKTİF REHBERLİ ADIM EKRANI
+        // AKTİF ADIM EKRANI (TERİMSİZ, EN ANLAŞILIR VE NET)
         labContainer.innerHTML = `
-            <div style="background: rgba(15, 23, 42, 0.85); border: 1.5px solid #10b981; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
-                <!-- Başlık ve İlerleme -->
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(16, 185, 129, 0.3); padding-bottom: 10px; margin-bottom: 14px;">
+            <div style="background: rgba(15, 23, 42, 0.85); border: 1.5px solid #38bdf8; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+                <!-- Adım Başlığı -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(56, 189, 248, 0.3); padding-bottom: 10px; margin-bottom: 14px;">
                     <div>
-                        <span style="font-size: 0.8rem; color: #a7f3d0; text-transform: uppercase; letter-spacing: 1px;">Adım Adım İnteraktif Sürüş Eğitimi</span>
-                        <h3 style="color: #34d399; font-size: 1.35rem; margin: 2px 0 0 0;">${currentStep.title}</h3>
+                        <span style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Sürüşü Öğreniyoruz</span>
+                        <h3 style="color: #38bdf8; font-size: 1.35rem; margin: 2px 0 0 0;">${currentStep.title}</h3>
                     </div>
-                    <span style="background: rgba(16, 185, 129, 0.25); color: #34d399; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.9rem;">
-                        Adım ${this.guidedStep} / 9 (%${progressPct})
+                    <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 0.95rem;">
+                        Adım ${this.guidedStep} / 9
                     </span>
                 </div>
 
-                <!-- Gösterge Paneli (CANLI SİMÜLASYON VERİLERİ) -->
+                <!-- Otobüsün Durumu (Çok Basit ve Net) -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-bottom: 16px;">
                     <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
-                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">MOTOR DURUMU</span>
-                        <strong style="color: ${this.labEngineRunning ? '#4ade80' : '#f87171'}; font-size: 0.95rem;">${this.labEngineRunning ? '🟢 Çalışıyor' : '🔴 Kapalı'}</strong>
+                        <span style="color: #94a3b8; font-size: 0.78rem; display: block;">MOTOR</span>
+                        <strong style="color: ${this.labEngineRunning ? '#4ade80' : '#f87171'}; font-size: 1rem;">${this.labEngineRunning ? '🟢 Çalışıyor' : '🔴 Kapalı'}</strong>
                     </div>
                     <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
-                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">HAVA BASINCI</span>
-                        <strong style="color: #38bdf8; font-size: 0.95rem;">${this.labPressure} PSI</strong>
+                        <span style="color: #94a3b8; font-size: 0.78rem; display: block;">HIZ</span>
+                        <strong style="color: #facc15; font-size: 1rem;">${this.labSpeed} km/s</strong>
                     </div>
                     <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
-                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">HIZ GÖSTERGESİ</span>
-                        <strong style="color: #facc15; font-size: 0.95rem;">${this.labSpeed} km/s</strong>
+                        <span style="color: #94a3b8; font-size: 0.78rem; display: block;">ENGELLİ RAMPASI</span>
+                        <strong style="color: #38bdf8; font-size: 1rem;">${this.labRampOpen ? '🛹 Açık' : (this.labKneeling ? '🦼 Yana Yatık' : '⚪ Kapalı')}</strong>
                     </div>
                     <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
-                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">YOLCU KONFORU</span>
-                        <strong style="color: #4ade80; font-size: 0.95rem;">%${this.labComfort}</strong>
-                    </div>
-                    <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
-                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">RAMPA & KÖYÜK</span>
-                        <strong style="color: #38bdf8; font-size: 0.95rem;">${this.labRampOpen ? '🛹 Rampa Açık' : (this.labKneeling ? '🦼 Yana Yatık' : '⚪ Normal')}</strong>
-                    </div>
-                    <div style="background: rgba(0,0,0,0.4); padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
-                        <span style="color: #94a3b8; font-size: 0.75rem; display: block;">KAPILAR</span>
-                        <strong style="color: ${this.labFrontDoor || this.labRearDoor ? '#f87171' : '#4ade80'}; font-size: 0.95rem;">${this.labFrontDoor || this.labRearDoor ? '🚪 Açık (Gaz Kilitli)' : '🔒 Kapalı'}</strong>
+                        <span style="color: #94a3b8; font-size: 0.78rem; display: block;">KAPILAR</span>
+                        <strong style="color: ${this.labFrontDoor || this.labRearDoor ? '#f87171' : '#4ade80'}; font-size: 1rem;">${this.labFrontDoor || this.labRearDoor ? '🚪 Açık' : '🔒 Kapalı'}</strong>
                     </div>
                 </div>
 
-                <!-- Formül Kutusu -->
-                <div style="background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; padding: 10px 14px; border-radius: 0 6px 6px 0; margin-bottom: 14px; font-size: 0.9rem; color: #38bdf8;">
-                    📐 <strong>Pedagojik Formül:</strong> ${currentStep.formula}
+                <!-- Basit İpucu Kutusu -->
+                <div style="background: rgba(56, 189, 248, 0.1); border-left: 4px solid #38bdf8; padding: 10px 14px; border-radius: 0 6px 6px 0; margin-bottom: 14px; font-size: 0.92rem; color: #e0f2fe;">
+                    💡 <strong>İpucu:</strong> ${currentStep.tip}
                 </div>
 
-                <!-- Talimat Kutusu -->
-                <div style="background: rgba(6, 78, 59, 0.35); border: 1.5px solid rgba(16, 185, 129, 0.4); border-radius: 10px; padding: 16px; margin-bottom: 16px;">
-                    <div style="font-weight: bold; color: #a7f3d0; margin-bottom: 6px; font-size: 1rem;">📢 Öğretmen Talimatı (Şimdi Ne Yapmalısınız?):</div>
-                    <p style="color: #f1f5f9; font-size: 1.05rem; line-height: 1.5; margin: 0;">${currentStep.instruction}</p>
+                <!-- Ne Yapılacağını Anlatan Talimat Kutusu -->
+                <div style="background: rgba(30, 41, 59, 0.7); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: 10px; padding: 16px; margin-bottom: 18px;">
+                    <div style="font-weight: bold; color: #38bdf8; margin-bottom: 6px; font-size: 1.05rem;">📢 Şimdi Ne Yapıyoruz?</div>
+                    <p style="color: #f8fafc; font-size: 1.1rem; line-height: 1.5; margin: 0; font-weight: 500;">${currentStep.instruction}</p>
                 </div>
 
-                <!-- TEK VE NET HEDEF AKSİYON BUTONU (KULLANICININ KAFASI KARIŞMAZ) -->
-                <div style="text-align: center; margin-bottom: 16px;">
-                    <button id="btn-guided-action" class="modern-btn nav-item" style="padding: 16px 32px; font-size: 1.25rem; font-weight: bold; border-radius: 10px; cursor: pointer; color: #ffffff; ${currentStep.actionBtnStyle} box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);" aria-label="${currentStep.actionBtnText}">
+                <!-- TEK VE NET BASILACAK BUTON -->
+                <div style="text-align: center; margin-bottom: 18px;">
+                    <button id="btn-guided-action" class="modern-btn nav-item" style="padding: 16px 36px; font-size: 1.3rem; font-weight: bold; border-radius: 10px; cursor: pointer; color: #ffffff; ${currentStep.actionBtnStyle} box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);" aria-label="${currentStep.actionBtnText}">
                         ${currentStep.actionBtnText}
                     </button>
                 </div>
 
-                <!-- GERİ BİLDİRİM / MOTİVASYON VE TELKİN ALANI -->
-                <div id="guided-feedback-box" style="display: ${this.guidedFeedbackText ? 'block' : 'none'}; padding: 12px 16px; border-radius: 8px; margin-bottom: 14px; font-size: 0.95rem; font-weight: bold; ${this.guidedFeedbackType === 'success' ? 'background: rgba(34, 197, 94, 0.2); border: 1.5px solid #22c55e; color: #4ade80;' : 'background: rgba(234, 179, 8, 0.2); border: 1.5px solid #eab308; color: #fde047;'}">
+                <!-- GERİ BİLDİRİM / TEBRİK YA DA YOL GÖSTERME KUTUSU -->
+                <div id="guided-feedback-box" style="display: ${this.guidedFeedbackText ? 'block' : 'none'}; padding: 14px 18px; border-radius: 8px; margin-bottom: 14px; font-size: 1rem; font-weight: bold; ${this.guidedFeedbackType === 'success' ? 'background: rgba(34, 197, 94, 0.2); border: 1.5px solid #22c55e; color: #4ade80;' : 'background: rgba(234, 179, 8, 0.2); border: 1.5px solid #eab308; color: #fde047;'}">
                     ${this.guidedFeedbackText}
                 </div>
 
-                <!-- Yardımcı Butonlar: Sesli Dinle ve Önceki Adım -->
+                <!-- Alt Yardımcı Butonlar -->
                 <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px;">
-                    <button id="btn-guided-replay-audio" class="modern-btn nav-item" style="padding: 8px 14px; font-size: 0.88rem; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; border-radius: 6px; cursor: pointer;" aria-label="Talimatı Sesli Tekrar Dinle">
-                        🔊 Talimatı Tekrar Dinle
+                    <button id="btn-guided-replay-audio" class="modern-btn nav-item" style="padding: 8px 14px; font-size: 0.9rem; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; border-radius: 6px; cursor: pointer;" aria-label="Talimatı Sesli Tekrar Dinle">
+                        🔊 Ne Yapacağımı Tekrar Söyle
                     </button>
-                    ${this.guidedStep > 1 ? '<button id="btn-guided-prev-step" class="modern-btn nav-item" style="padding: 8px 14px; font-size: 0.88rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">⬅️ Önceki Adım</button>' : ''}
+                    ${this.guidedStep > 1 ? '<button id="btn-guided-prev-step" class="modern-btn nav-item" style="padding: 8px 14px; font-size: 0.9rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; border-radius: 6px; cursor: pointer;">⬅️ Önceki Adıma Dön</button>' : ''}
                 </div>
             </div>
         `;
 
-        // Aksiyon Butonu Dinleyicisi
+        // Buton Olayları
         const btnAction = document.getElementById('btn-guided-action');
         if (btnAction) {
             btnAction.onclick = () => {
@@ -662,7 +660,6 @@ class VoiceAssistant {
             };
         }
 
-        // Sesli Tekrar Dinle
         const btnReplay = document.getElementById('btn-guided-replay-audio');
         if (btnReplay) {
             btnReplay.onclick = () => {
@@ -672,7 +669,6 @@ class VoiceAssistant {
             };
         }
 
-        // Önceki Adım
         const btnPrev = document.getElementById('btn-guided-prev-step');
         if (btnPrev) {
             btnPrev.onclick = () => {
@@ -754,7 +750,7 @@ class VoiceAssistant {
 
 
     // =========================================================================
-    // KAPTANLIK SERÜVENİ & YOL ARKADAŞI (NOT KORKUSU VE SINAV STRESİ YOK!)
+    // ŞOFÖRLÜK DURUMUM (TAMAMEN SAMİMİ VE EĞLENCELİ, SIFIR STRES)
     // =========================================================================
     renderKaptanlikSeruveni() {
         const seruvenContainer = document.getElementById('tutorial-seruven-container') || document.getElementById('tutorial-karne-container');
@@ -763,62 +759,61 @@ class VoiceAssistant {
         const level = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
         const xp = (typeof Game !== 'undefined' && Game.playerXP) ? Game.playerXP : 0;
         const tasks = (typeof Game !== 'undefined' && Game.completedTasks) ? Game.completedTasks : 0;
-        const title = (typeof Game !== 'undefined' && typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer Sürücü';
+        const title = (typeof Game !== 'undefined' && typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer Şoför';
         const nextXP = (typeof Game !== 'undefined' && typeof Game.getNextLevelXP === 'function') ? Game.getNextLevelXP(level) : 250;
-        const unlockTeaser = (typeof Game !== 'undefined' && typeof Game.getUnlockTeaser === 'function') ? Game.getUnlockTeaser(level) : "Seviye 3'te BMC Neocity 10M açılacak!";
+        const unlockTeaser = (typeof Game !== 'undefined' && typeof Game.getUnlockTeaser === 'function') ? Game.getUnlockTeaser(level) : "Seviye 3'te yeni otobüs açılacak!";
 
-        // Sıcak, samimi, cesaretlendirici yol arkadaşı mentor tavsiyeleri (Sınav veya not dili YOK)
-        let companionAdvice = "";
+        let advice = "";
         if (level < 3) {
-            companionAdvice = "Kaptanım harika gidiyorsun! Şu an yolculuğunun en keyifli keşif dönemindesin. Duraklara tatlı bir süzülüşle yanaşman ve yolcuları güler yüzle karşılaman tam bir centilmenlik örneği. Sebatla sürdükçe yeni araçlar filona katılacak!";
+            advice = "Harika gidiyorsun! Şu an başlangıç aşamasındasın. Duraklara yumuşak yanaşıp yolcuları güler yüzle aldıkça tecrübe kazanacaksın. Yeni otobüsler yakında açılacak!";
         } else if (level < 6) {
-            companionAdvice = "Direksiyon hakimiyetin göz dolduruyor kaptan! Engelli rampasını özenle açman ve kasislerde ipek fren yapman yolcuların gönlünde taht kurdu. Şehir içi hatların aranan kaptanı oldun!";
+            advice = "Direksiyonun çok iyi! Engelli rampasını açman ve kasislerde yavaşlaman yolcuları çok mutlu etti. Şehir içi hatların sevilen şoförü oldun!";
         } else if (level < 10) {
-            companionAdvice = "Vay be, artık tecrübeli bir şehir içi başkaptanı oldun! Körüklü otobüste gösterdiğin ustalık takdire şayan. Çok yakında otoyollara çıkacak ve Mercedes Travego'nun direksiyonuna geçeceksin!";
+            advice = "Artık usta bir şehir içi şoförüsün! Körüklü otobüste çok başarılısın. Çok yakında şehirlerarası yollara çıkacaksın!";
         } else {
-            companionAdvice = "Efsane bir Usta Kaptansın! Şehirlerarası uzun yol koridorlarında ve Türkiye Turnesi rotalarında tecrübenle parlıyorsun. Tüm yollar, duraklar ve filodaki dev otobüsler seninle gurur duyuyor!";
+            advice = "Efsane bir Kaptansın! Şehirlerarası uzun yollarda tecrübenle parlıyorsun. Tüm otobüsler emrinde!";
         }
 
         const xpPercent = Math.min(100, Math.round((xp / nextXP) * 100));
 
         seruvenContainer.innerHTML = `
-            <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(6, 78, 59, 0.45)); border: 2px solid #eab308; border-radius: 12px; padding: 22px; box-shadow: 0 0 24px rgba(234, 179, 8, 0.2);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(234, 179, 8, 0.3); padding-bottom: 12px; margin-bottom: 16px;">
+            <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(2, 132, 199, 0.35)); border: 2px solid #38bdf8; border-radius: 12px; padding: 22px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(56, 189, 248, 0.3); padding-bottom: 12px; margin-bottom: 16px;">
                     <div>
-                        <span style="font-size: 0.82rem; color: #fde047; text-transform: uppercase; letter-spacing: 1px;">Mikyas Akademi Yol Arkadaşı & Macera Günlüğü</span>
-                        <h3 style="color: #facc15; font-size: 1.55rem; margin: 4px 0 0 0;">🌟 Seviye ${level} - ${title}</h3>
+                        <span style="font-size: 0.85rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Şoförlük Bilgilerin</span>
+                        <h3 style="color: #38bdf8; font-size: 1.55rem; margin: 4px 0 0 0;">🌟 Seviye ${level} - ${title}</h3>
                     </div>
-                    <button id="btn-seruven-read-speech" class="modern-btn nav-item" style="padding: 10px 18px; background: linear-gradient(135deg, #d97706, #b45309); border: 1.5px solid #facc15; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Kaptanlık serüvenimi ve yol arkadaşı tavsiyelerini sesli dinle">
-                        🔊 Serüvenimi Dinle
+                    <button id="btn-seruven-read-speech" class="modern-btn nav-item" style="padding: 10px 18px; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #ffffff; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Şoförlük durumumu dinle">
+                        🔊 Durumumu Dinle
                     </button>
                 </div>
 
-                <!-- Tecrübe ve İlerleme Çubuğu -->
+                <!-- Tecrübe Çubuğu -->
                 <div style="margin-bottom: 18px;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 6px; color: #e2e8f0;">
-                        <span>Kazanılan Tecrübe & Keşif: <strong>${xp} / ${nextXP} XP</strong></span>
-                        <span style="color: #facc15; font-weight: bold;">%${xpPercent}</span>
+                        <span>Kazanılan Tecrübe Puanı: <strong>${xp} / ${nextXP} Puan</strong></span>
+                        <span style="color: #38bdf8; font-weight: bold;">%${xpPercent}</span>
                     </div>
                     <div style="height: 12px; background: rgba(0,0,0,0.5); border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-                        <div style="height: 100%; width: ${xpPercent}%; background: linear-gradient(90deg, #eab308, #38bdf8); transition: width 0.3s ease;"></div>
+                        <div style="height: 100%; width: ${xpPercent}%; background: linear-gradient(90deg, #38bdf8, #4ade80); transition: width 0.3s ease;"></div>
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px;">
                     <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
-                        <span style="color: #94a3b8; font-size: 0.85rem; display: block;">Başarıyla Tamamlanan Seferler</span>
+                        <span style="color: #94a3b8; font-size: 0.85rem; display: block;">Tamamlanan Seferler</span>
                         <strong style="color: #4ade80; font-size: 1.3rem;">${tasks} Sefer</strong>
                     </div>
                     <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
-                        <span style="color: #94a3b8; font-size: 0.85rem; display: block;">Sıradaki Otobüs / Hat Keşfi</span>
+                        <span style="color: #94a3b8; font-size: 0.85rem; display: block;">Sıradaki Otobüs Açılışı</span>
                         <strong style="color: #38bdf8; font-size: 1rem;">${unlockTeaser}</strong>
                     </div>
                 </div>
 
-                <!-- Samimi Yol Arkadaşı Kutusu (Sınav veya not dili YOK) -->
-                <div style="background: rgba(234, 179, 8, 0.12); border-left: 4px solid #eab308; padding: 14px 16px; border-radius: 0 8px 8px 0;">
-                    <div style="font-weight: bold; color: #fde047; margin-bottom: 4px; font-size: 1rem;">👨‍✈️ Ümit Kaptan'dan Yol Arkadaşı Tavsiyeleri:</div>
-                    <p style="color: #f1f5f9; font-size: 0.94rem; line-height: 1.5; margin: 0;">${companionAdvice}</p>
+                <!-- Samimi Tavsiye Kutusu -->
+                <div style="background: rgba(56, 189, 248, 0.12); border-left: 4px solid #38bdf8; padding: 14px 16px; border-radius: 0 8px 8px 0;">
+                    <div style="font-weight: bold; color: #38bdf8; margin-bottom: 4px; font-size: 1rem;">💬 Ümit Kaptan'dan Tavsiyeler:</div>
+                    <p style="color: #f1f5f9; font-size: 0.95rem; line-height: 1.5; margin: 0;">${advice}</p>
                 </div>
             </div>
         `;
@@ -826,7 +821,7 @@ class VoiceAssistant {
         const btnRead = document.getElementById('btn-seruven-read-speech');
         if (btnRead) {
             btnRead.addEventListener('click', () => {
-                const speechText = `Kaptanlık Serüveniniz ve Macera Günlüğünüz. Mevcut dereceniz Seviye ${level}, ${title}. Toplam tecrübeniz ${xp} puan. Gelecek seviye için ${nextXP} puan gerekiyor. Tamamlanan sefer sayısı ${tasks}. ${unlockTeaser}. ${companionAdvice}`;
+                const speechText = `Şoförlük durumunuz. Seviyeniz ${level}, ${title}. Toplam tecrübeniz ${xp} puan. Gelecek seviye için ${nextXP} puan gerekiyor. Tamamlanan sefer sayısı ${tasks}. ${unlockTeaser}. ${advice}`;
                 if (typeof audio !== 'undefined' && audio.speak) {
                     audio.stopSpeech();
                     audio.speak(speechText);
@@ -859,16 +854,16 @@ class VoiceAssistant {
         audio.stopSpeech();
 
         const sequence = [
-            "Mikyas Kaptanlık Akademisi Pedagojik Sürüş Eğitimi başlatılıyor. 4 gelişim aşamasındaki tüm dersler sırasıyla aktarılacaktır."
+            "Sürüş eğitimi başlatılıyor. Otobüsü nasıl süreceğinizi ve tüm tuşları adım adım anlatıyorum."
         ];
         this.tutorialLessons.forEach(l => {
             sequence.push(l.stageName + ". " + l.title + ". " + l.speech);
         });
-        sequence.push("Tüm akademi dersleri tamamlandı. Öğrendiklerinizi sahada uygulayarak usta kaptanlığa terfi edebilirsiniz. Başarılar dilerim!");
+        sequence.push("Tüm sürüş adımlarını öğrendiniz! Artık direksiyon başına geçip yolcularınızı taşımaya başlayabilirsiniz. İyi sürüşler dilerim!");
 
         audio.speakSequence(sequence);
         if (typeof UI !== 'undefined' && UI.showToast) {
-            UI.showToast("▶️ Pedagojik Sesli Eğitim Başlatıldı", "success");
+            UI.showToast("▶️ Sesli Sürüş Eğitimi Başlatıldı", "success");
         }
     }
 
@@ -1005,7 +1000,7 @@ class VoiceAssistant {
             const level = Game.licenseLevel || 1;
             const xp = Game.playerXP || 0;
             const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
-            audio.speak(`Kaptanlık gelişim karneniz açıldı. Mevcut dereceniz Seviye ${level}, ${title}. Toplam ${xp} tecrübe puanınız var.`);
+            audio.speak(`Şoförlük durumunuz açıldı. Şu an Seviye ${level}, ${title} durumundasınız. Toplam tecrübeniz ${xp} puandır.`);
             return;
         }
 
@@ -1396,7 +1391,7 @@ class VoiceAssistant {
         }
 
         // Anlaşılamadı
-        audio.speak("Anlayamadım. Kaptanlık Akademisi ve kurallar için 'akademi' diyebilir veya F1 tuşuna basabilirsiniz.");
+        audio.speak("Anlayamadım. Oyunu ve tuşları öğrenmek için 'yardım' diyebilir veya klavyeden F1 tuşuna basabilirsiniz.");
     }
 }
 

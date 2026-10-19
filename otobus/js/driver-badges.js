@@ -127,7 +127,7 @@ const DriverBadges = {
             if (typeof audio !== 'undefined' && typeof audio.playBadgeFanfare === 'function') {
                 audio.playBadgeFanfare();
             }
-            const msg = `Tebrikler Kaptan! Yeni bir liyakat rozeti kazandınız: ${badge.title}! ${badge.desc}`;
+            const msg = `Tebrikler Kaptan! Yeni bir başarı rozeti kazandınız: ${badge.title}! ${badge.desc}`;
             if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
                 audio.speak(msg);
             }
@@ -255,8 +255,8 @@ const DriverBadges = {
             const count = newlyUnlocked.length;
             const topTitle = newlyUnlocked[0].title;
             const announceText = count === 1
-                ? `Tebrikler Kaptan! Yeni bir liyakat rozeti kazandınız: ${topTitle}!`
-                : `Tebrikler Kaptan! Sefer başarınızla ${count} yeni liyakat rozeti açıldı! İlk rozetiniz: ${topTitle}.`;
+                ? `Tebrikler Kaptan! Yeni bir başarı rozeti kazandınız: ${topTitle}!`
+                : `Tebrikler Kaptan! Sefer başarınızla ${count} yeni başarı rozeti açıldı! İlk rozetiniz: ${topTitle}.`;
 
             setTimeout(() => {
                 if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {

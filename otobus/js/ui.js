@@ -547,7 +547,7 @@ const UI = {
 
             const lockedNoticeHtml = isLocked ? 
                 ('<div style="font-size: 0.88rem; color: #f87171; background: rgba(239, 68, 68, 0.12); border-left: 3px solid #ef4444; padding: 8px 12px; border-radius: 4px; margin-top: 8px;">' +
-                 '    ⛔ <strong>Pedagojik İlerleme Kuralı:</strong> Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Bu görevin kilidini açmak için önce <strong>Görev ' + (completedTasks + 1) + '</strong> seferini başarıyla tamamlamalısınız.' +
+                 '    ⛔ <strong>Seviye Sırası Kuralı:</strong> Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Bu görevin kilidini açmak için önce <strong>Görev ' + (completedTasks + 1) + '</strong> seferini başarıyla tamamlamalısınız.' +
                  '</div>') : '';
 
             btn.innerHTML = [
