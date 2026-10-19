@@ -428,7 +428,7 @@ const Game = {
         return titles[lvl] || `${lvl}. Seviye Şehir İçi Sürücü`;
     },
 
-    completeTask: function() {
+    completeTask: function(comfortMsg, timingRewardMsg) {
         if (!this.activeRouteId) return;
 
         const stopsCount = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops.length : 6;
@@ -465,17 +465,18 @@ const Game = {
 
         const nextThreshold = this.getNextLevelXP(this.licenseLevel);
         const remainingXP = Math.max(0, nextThreshold - this.playerXP);
-        const teaser = this.getUnlockTeaser(this.licenseLevel);
+
+        const extraNotes = (comfortMsg || "") + (timingRewardMsg || "");
 
         if (newLevel > oldLevel) {
             if (typeof audio !== 'undefined' && audio.playSuccess) {
                 try { audio.playSuccess(); } catch(e) {}
             }
-            const lvlMsg = `Tebrikler kaptan! Seferden +${earnedXP} XP kazandınız ve Seviye ${newLevel}'e terfi ettiniz! Yeni unvanınız: ${this.getLicenseTitle()}. Garajda yeni araçlar sizi bekliyor!`;
+            const lvlMsg = `Tebrikler kaptan! Sefer başarıyla tamamlandı.${extraNotes} Seferden +${earnedXP} XP kazandınız ve Seviye ${newLevel}'e terfi ettiniz! Yeni unvanınız: ${this.getLicenseTitle()}.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(lvlMsg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! (${this.getLicenseTitle()})`, "success");
         } else {
-            const reportMsg = `Sefer tamamlandı! Kazanılan: +${earnedXP} XP. Seviye ${this.licenseLevel + 1}'e kalan: ${remainingXP} XP. ${teaser}`;
+            const reportMsg = `Tebrikler kaptan, sefer tamamlandı.${extraNotes} Kazanılan: +${earnedXP} XP. Seviye ${this.licenseLevel + 1}'e kalan: ${remainingXP} XP.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(reportMsg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏁 Sefer Bitti: +${earnedXP} XP (Kalan: ${remainingXP} XP)`, "info");
         }
@@ -483,6 +484,18 @@ const Game = {
         UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
     },
 
+        addXP: function(amount) {
+        if (!amount || amount <= 0) return;
+        this.playerXP = (this.playerXP || 0) + amount;
+        const newLevel = this.calculateLevelFromXP(this.playerXP);
+        if (newLevel > this.licenseLevel) {
+            this.licenseLevel = newLevel;
+        }
+        this.saveData();
+        if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+            UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+        }
+    },
     addMoney: function(amount) {
         this.playerBudget += amount;
         this.sessionMoney += amount;
@@ -2668,14 +2681,14 @@ const Game = {
                 timingRewardMsg = " Sefer saatine yüksek sadakat ve dakiklik primi: 150 Lira ve 40 tecrübe puanı kazandınız.";
             }
 
-            audio.speak("Tebrikler. Görev başarıyla tamamlandı." + comfortMsg + (typeof timingRewardMsg !== "undefined" ? timingRewardMsg : "") + " Bir sonraki göreve geçmek için sonraki üzerine tıklayın veya geri dönüp oyundan çıkmak için ana menü düğmesine basın.");
+            // Sesli anons ve sonuç raporu completeTask tarafından tek seferde okunur
             
             if (this.activeRouteData && this.activeRouteData.isIntercity) {
                 this.unlockCity(this.activeRouteData.destCity);
                 if (typeof UI !== 'undefined') UI.showToast(`${this.activeRouteData.destCity} Åehrinin Kilidi Açıldı!`, 'success');
             }
 
-            this.completeTask(); // İlerlemeyi kaydet
+            this.completeTask(comfortMsg, timingRewardMsg); // İlerlemeyi kaydet ve sonuç anonsunu yap
 
             // ŞOFÖR LİYAKAT VE ROZET SİSTEMİ KONTROLÜ
             if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkAfterRoute === 'function') {
