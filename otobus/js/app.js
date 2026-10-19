@@ -227,6 +227,21 @@ document.addEventListener('DOMContentLoaded', () => {
         Game.gameMode = 'city';
         Game.busType = 'belediye';
 
+        // AKADEMİ TAMAMLANMADAN SÜRÜŞ BAŞLAYAMAZ!
+        if (typeof Game !== 'undefined' && typeof Game.isAcademyCompleted === 'function' && !Game.isAcademyCompleted()) {
+            if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+            const msg = "Kaptanım, direksiyona geçmeden önce lütfen temel akademiyi tamamlayınız! Önce öğrenci olarak pratiklerimizi bitirmeliyiz.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "warning");
+            if (typeof VoiceAssistant !== 'undefined' && VoiceAssistant.instance && VoiceAssistant.instance.openTutorialModal) {
+                VoiceAssistant.instance.openTutorialModal();
+            } else {
+                const btnTut = document.getElementById('btn-open-tutorial');
+                if (btnTut) btnTut.click();
+            }
+            return;
+        }
+
         // 10 seviye geçilmeden ilçeler, şehirler, ülkeler ve harita kesinlikle gözükmesin!
         if (!Game.hasPassedLevel10()) {
             audio.speak("Süleymanpaşa şehir içi belediye seferleri seçildi. Sefer görevleri listeleniyor.");

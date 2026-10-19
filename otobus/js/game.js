@@ -19,6 +19,14 @@ try {
 
 const Game = {
     // --- State Variables ---
+    academyCompleted: localStorage.getItem('academyCompleted') === 'true',
+    isAcademyCompleted: function() {
+        return this.academyCompleted === true || (this.completedTasks && this.completedTasks > 0) || (this.licenseLevel && this.licenseLevel > 1);
+    },
+    completeAcademy: function() {
+        this.academyCompleted = true;
+        try { localStorage.setItem('academyCompleted', 'true'); } catch(e) {}
+    },
     username: null,
     licenseLevel: parseInt(localStorage.getItem('licenseLevel')) || 1,
     playerXP: parseInt(localStorage.getItem('playerXP')) || 0,
@@ -568,6 +576,16 @@ const Game = {
     },
 
     startRoute: function(routeId) {
+        // AKADEMİ EĞİTİM KORUMASI: Akademi bitmeden hiçbir rota başlayamaz!
+        if (typeof this.isAcademyCompleted === 'function' && !this.isAcademyCompleted()) {
+            const msg = "Kaptanım, direksiyona geçmeden önce lütfen temel akademiyi tamamlayınız! Önce öğrenci olarak pratiklerimizi bitirmeliyiz.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, 'warning');
+            if (typeof VoiceAssistant !== 'undefined' && VoiceAssistant.instance && VoiceAssistant.instance.openTutorialModal) {
+                VoiceAssistant.instance.openTutorialModal();
+            }
+            return false;
+        }
         // PEDAGOJİK SEVİYE KORUMASI: Bir seviye tamamlanmadan diğer seviyelere başlanamaz!
         const accessCheck = this.isRouteAccessible(routeId);
         if (!accessCheck.allowed) {
