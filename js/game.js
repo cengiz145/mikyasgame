@@ -376,6 +376,26 @@ const Game = {
     completeTask: function() {
         if (!this.activeRouteId) return;
 
+        /* ANY_ROUTE_LICENSE_ADVANCEMENT */
+        // Sadece eski görevler değil, Akıllı Rota veya herhangi bir resmi seferi bitirmek de ehliyet seviyesini artırır!
+        this.completedTasks++;
+        this.licenseLevel = Math.max(this.licenseLevel, this.completedTasks + 1);
+
+        if (this.completedTasks === 10) {
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak("Tebrikler kaptan! 10 seviyeyi başarıyla tamamladınız! İlçe belediye hatları ve şehirlerarası harita açıldı!");
+            }
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast("🎉 10 Seviye Geçildi! İlçe ve Şehirlerarası Hatlar Açıldı!", "success");
+            }
+        } else if (this.completedTasks < 10) {
+            const remaining = 10 - this.completedTasks;
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak(`Sefer tamamlandı. Seviye ${this.licenseLevel}'e yükseldiniz. İlçe ve şehirlerarası haritaya ${remaining} seviye kaldı.`);
+            }
+        }
+        this.saveData();
+
         const taskMatch = this.activeRouteId.match(/_task_(\d+)/);
         if (taskMatch) {
             const taskIndex = parseInt(taskMatch[1]);
@@ -2223,6 +2243,11 @@ const Game = {
 
         const stopData = this.activeRouteData.stops[this.currentStopIndex];
         const isFinalStop = this.currentStopIndex === this.activeRouteData.stops.length - 1;
+
+        // DURAK KEŞİF VE KOLEKSİYON SİSTEMİ TETİKLEYİCİSİ
+        if (typeof StopDiscovery !== 'undefined' && stopData && stopData.name) {
+            StopDiscovery.onReachStop(stopData.name, this.activeDistrict || "Süleymanpaşa");
+        }
 
         // Yolcu matematiğini başta hesapla
         // FORMÜLE BAĞLI İNİŞ: Kalan durak sayısına göre orantılı deterministik iniş formülü
