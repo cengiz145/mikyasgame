@@ -7,6 +7,58 @@
 const AkilliRotaSistemi = {
     allStopsCache: null,
 
+    // MAHALLELER VE ANA DURAKLAR KATALOĞU (Ara duraklar giderken keşfedilir)
+    mahallelerVeAnaDuraklar: [
+        // SÜLEYMANPAŞA MAHALLELERİ VE ANA MERKEZLER
+        { label: "Değirmenaltı Mahallesi (Kampüs & KYK)", district: "Süleymanpaşa", stopName: "Üniversite Caddesi", keys: ["degirmenalti", "kampus", "kyk", "universite"] },
+        { label: "Çınarlı Mahallesi (Köprübaşı & Çarşı)", district: "Süleymanpaşa", stopName: "Köprübaşı Meydanı Caddesi", keys: ["cinarli", "koprubasi", "carsi"] },
+        { label: "Ertuğrul Mahallesi (Valilik & Hükümet Cd.)", district: "Süleymanpaşa", stopName: "Hükümet Caddesi (Süleymanpaşa Tarihi Valilik & Çarşı)", keys: ["ertugrul", "valilik", "hukumet", "meydan"] },
+        { label: "Gündoğdu Mahallesi (Şehir Hastanesi)", district: "Süleymanpaşa", stopName: "Şehir Hastanesi Ana Giriş Caddesi", keys: ["gundogdu", "sehir hastanesi", "hastane"] },
+        { label: "100. Yıl Mahallesi (Atatürk Spor Salonu)", district: "Süleymanpaşa", stopName: "Atatürk Spor Salonu Caddesi", keys: ["100 yil", "spor salonu", "yuzuncu yil"] },
+        { label: "Altınova Mahallesi (Sahil & Liman)", district: "Süleymanpaşa", stopName: "Altınova Sahil Caddesi", keys: ["altinova", "sahil", "liman"] },
+        { label: "Hürriyet Mahallesi (Baykallar & Emniyet)", district: "Süleymanpaşa", stopName: "Baykallar Caddesi", keys: ["hurriyet", "baykallar", "emniyet"] },
+        { label: "Süleymanpaşa Yeni Otogar (Otobüs Terminali)", district: "Süleymanpaşa", stopName: "Yeni Otobüs Terminali Caddesi", keys: ["suleymanpasa otogar", "terminal", "yeni otogar", "otogar"] },
+
+        // SARAY MAHALLELERİ VE ANA MERKEZLER
+        { label: "Ayaspaşa Mahallesi (Saray Çarşı & Belediye)", district: "Saray", stopName: "Saray Belediyesi (Cumhuriyet Meydanı)", keys: ["ayaspasa", "saray belediye", "saray carsi", "saray merkez"] },
+        { label: "Pazarcık Mahallesi (Saray Otogarı)", district: "Saray", stopName: "Saray Otogar 1 (Giriş Peronu)", keys: ["pazarcik", "saray otogar"] },
+        { label: "Yeni Mahalle (Saray Devlet Hastanesi)", district: "Saray", stopName: "Saray Devlet Hastanesi Ana Giriş", keys: ["yeni mahalle", "saray hastane", "devlet hastanesi"] },
+        { label: "Yeni Mahalle (Saray Fakülte Kampüsü)", district: "Saray", stopName: "Saray Meslek Yüksekokulu (Fakülte Kampüs)", keys: ["fakulte", "kampus", "myo", "saray myo"] },
+        { label: "Kemalpaşa Mahallesi (100. Yıl & Parklar)", district: "Saray", stopName: "100. Yıl Atatürk Caddesi 1", keys: ["kemalpasa", "100 yil saray", "ladin"] },
+        { label: "Büyükyoncalı Mahallesi (Yoncalı Merkez)", district: "Saray", stopName: "Büyükyoncalı Merkez (Belediye Binası)", keys: ["buyukyoncali", "yoncali"] },
+        { label: "Çukuryurt Mahallesi (Meydan)", district: "Saray", stopName: "Çukuryurt Köy Meydanı", keys: ["cukuryurt"] },
+
+        // VELİMEŞE & ERGENE
+        { label: "Velimeşe Mahallesi (Merkez Meydan)", district: "Velimeşe", stopName: "Velimeşe Merkez Meydan", keys: ["velimese", "velimese merkez", "cetin"] },
+        { label: "Velimeşe Sanayi Bölgesi", district: "Velimeşe", stopName: "Sanayi Caddesi", keys: ["velimese sanayi", "osb"] },
+        { label: "Velimeşe TOKİ Konutları", district: "Velimeşe", stopName: "TOKİ 233. Sokak", keys: ["velimese toki", "toki"] },
+
+        // ÇEVRE İLÇELER
+        { label: "Çorlu Otogarı (İlçe Terminali)", district: "Çorlu", stopName: "Çorlu Otogar", keys: ["corlu", "corlu otogar"] },
+        { label: "Çerkezköy Otogarı (İlçe Terminali)", district: "Çerkezköy", stopName: "Çerkezköy Otogar", keys: ["cerkezkoy", "cerkezkoy otogar"] },
+        { label: "Kapaklı Otogarı (İlçe Terminali)", district: "Kapaklı", stopName: "Kapaklı Otogarı", keys: ["kapakli", "kapakli otogar"] },
+        { label: "Muratlı Meydanı (İstasyon)", district: "Muratlı", stopName: "Muratlı Meydan", keys: ["muratli", "muratli meydan"] }
+    ],
+
+    resolveMahalleOrHub: function(query) {
+        if (!query) return null;
+        const qNorm = this.normalizeText(query);
+        const qWords = qNorm.split(' ').filter(w => w.length > 2);
+
+        // 1. Doğrudan etiket eşleşmesi
+        let match = this.mahallelerVeAnaDuraklar.find(item => this.normalizeText(item.label) === qNorm);
+        if (match) return match;
+
+        // 2. Anahtar kelime eşleşmesi
+        match = this.mahallelerVeAnaDuraklar.find(item => item.keys.some(k => qNorm.includes(k) || k.includes(qNorm)));
+        if (match) return match;
+
+        // 3. Kelime alt dize eşleşmesi
+        match = this.mahallelerVeAnaDuraklar.find(item => qWords.some(w => this.normalizeText(item.label).includes(w)));
+        return match || null;
+    },
+    allStopsCache: null,
+
     normalizeText: function(text) {
         if (!text) return '';
         return text
@@ -41,31 +93,84 @@ const AkilliRotaSistemi = {
         if (this.allStopsCache && this.allStopsCache.length > 0) {
             return this.allStopsCache;
         }
-
-        const stopSet = new Set();
-        const db = (typeof window !== 'undefined' && window.tekulasHatVeritabani) ? window.tekulasHatVeritabani : [];
-
-        db.forEach(route => {
-            if (route.stops && Array.isArray(route.stops)) {
-                route.stops.forEach(s => {
-                    if (s.name && s.name.trim().length > 0) {
-                        stopSet.add(s.name.trim());
-                    }
-                });
-            }
-        });
-
-        if (typeof SarayNavigasyon !== 'undefined' && Array.isArray(SarayNavigasyon.sokaklar)) {
-            SarayNavigasyon.sokaklar.forEach(s => stopSet.add(s.name));
-        }
-        if (typeof VelimeseNavigasyon !== 'undefined' && Array.isArray(VelimeseNavigasyon.sokaklar)) {
-            VelimeseNavigasyon.sokaklar.forEach(s => stopSet.add(s.name));
-        }
-        this.allStopsCache = Array.from(stopSet).sort((a, b) => a.localeCompare(b, 'tr'));
+        // Sadece Mahalleler ve Ana Duraklar listelenir (Ara duraklar giderken keşfedilir)
+        this.allStopsCache = this.mahallelerVeAnaDuraklar.map(item => item.label);
         return this.allStopsCache;
     },
 
     hesapla: function(neredenQuery, nereyeQuery) {
+        // Mahalle ve Ana Durak çözümlemesi
+        const fromHub = this.resolveMahalleOrHub(neredenQuery);
+        const toHub = this.resolveMahalleOrHub(nereyeQuery);
+
+        const effectiveFrom = fromHub ? fromHub.stopName : neredenQuery;
+        const effectiveTo = toHub ? toHub.stopName : nereyeQuery;
+
+        // 1. SÜLEYMANPAŞA İÇİ MAHALLE / ANA DURAK NAVİGASYONU
+        if ((!fromHub || fromHub.district === "Süleymanpaşa") && (!toHub || toHub.district === "Süleymanpaşa")) {
+            if (typeof SuleymanpasaNavigasyon !== 'undefined' && SuleymanpasaNavigasyon.findSokak) {
+                const sFrom = SuleymanpasaNavigasyon.findSokak(effectiveFrom);
+                const sTo = SuleymanpasaNavigasyon.findSokak(effectiveTo);
+                if (sFrom && sTo && sFrom.id !== sTo.id) {
+                    const sRes = SuleymanpasaNavigasyon.rotaOlustur(effectiveFrom, effectiveTo);
+                    if (sRes.success) {
+                        return {
+                            success: true,
+                            route: sRes.route,
+                            originalRoute: sRes.route,
+                            fromStop: fromHub ? fromHub.label : sRes.kalkis.name,
+                            toStop: toHub ? toHub.label : sRes.varis.name,
+                            stopsCount: sRes.stopsCount,
+                            dist: sRes.totalKm
+                        };
+                    }
+                }
+            }
+        }
+
+        // 2. SARAY İÇİ MAHALLE / ANA DURAK NAVİGASYONU
+        if ((!fromHub || fromHub.district === "Saray") && (!toHub || toHub.district === "Saray")) {
+            if (typeof SarayNavigasyon !== 'undefined' && SarayNavigasyon.findSokak) {
+                const sFrom = SarayNavigasyon.findSokak(effectiveFrom);
+                const sTo = SarayNavigasyon.findSokak(effectiveTo);
+                if (sFrom && sTo && sFrom.id !== sTo.id) {
+                    const sRes = SarayNavigasyon.rotaOlustur(effectiveFrom, effectiveTo);
+                    if (sRes.success) {
+                        return {
+                            success: true,
+                            route: sRes.route,
+                            originalRoute: sRes.route,
+                            fromStop: fromHub ? fromHub.label : sRes.kalkis.name,
+                            toStop: toHub ? toHub.label : sRes.varis.name,
+                            stopsCount: sRes.stopsCount,
+                            dist: sRes.totalKm
+                        };
+                    }
+                }
+            }
+        }
+
+        // 3. VELİMEŞE İÇİ MAHALLE NAVİGASYONU
+        if ((!fromHub || fromHub.district === "Velimeşe") && (!toHub || toHub.district === "Velimeşe")) {
+            if (typeof VelimeseNavigasyon !== 'undefined' && VelimeseNavigasyon.findSokak) {
+                const vFrom = VelimeseNavigasyon.findSokak(effectiveFrom);
+                const vTo = VelimeseNavigasyon.findSokak(effectiveTo);
+                if (vFrom && vTo && vFrom.id !== vTo.id) {
+                    const vRes = VelimeseNavigasyon.rotaOlustur(effectiveFrom, effectiveTo);
+                    if (vRes.success) {
+                        return {
+                            success: true,
+                            route: vRes.route,
+                            originalRoute: vRes.route,
+                            fromStop: fromHub ? fromHub.label : vRes.kalkis.name,
+                            toStop: toHub ? toHub.label : vRes.varis.name,
+                            stopsCount: vRes.stopsCount,
+                            dist: vRes.totalKm
+                        };
+                    }
+                }
+            }
+        }
         // SARAY İLÇE VE MAHALLELERİ İÇİ FORMÜLSEL NAVİGASYON
         if (typeof SarayNavigasyon !== 'undefined' && SarayNavigasyon.findSokak) {
             const sFrom = SarayNavigasyon.findSokak(neredenQuery);
@@ -127,10 +232,24 @@ const AkilliRotaSistemi = {
             return { success: false, message: "Lütfen hem kalkış hem de varış durağını belirtin." };
         }
 
-        const db = (typeof window !== 'undefined' && window.tekulasHatVeritabani) ? window.tekulasHatVeritabani : [];
+        const db = (typeof window !== 'undefined' && window.tekulasHatVeritabani && window.tekulasHatVeritabani.length > 0)
+            ? window.tekulasHatVeritabani
+            : ((typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) ? ilceRotalari["Tekirdağ"] : (typeof routesData !== 'undefined' ? Object.values(routesData) : []));
+
         if (!db || db.length === 0) {
             return { success: false, message: "Hat veritabanı yüklenemedi." };
         }
+
+        const checkMatch = (stopName, query, hub) => {
+            if (!stopName) return false;
+            if (query && this.matchStop(stopName, query)) return true;
+            if (hub) {
+                if (hub.stopName && this.matchStop(stopName, hub.stopName)) return true;
+                const sNorm = this.normalizeText(stopName);
+                if (hub.keys && hub.keys.some(k => sNorm.includes(k) || k.includes(sNorm))) return true;
+            }
+            return false;
+        };
 
         const candidates = [];
 
@@ -142,10 +261,10 @@ const AkilliRotaSistemi = {
 
             for (let i = 0; i < route.stops.length; i++) {
                 const s = route.stops[i];
-                if (fromIdx === -1 && this.matchStop(s.name, neredenQuery)) {
+                if (fromIdx === -1 && checkMatch(s.name, neredenQuery, fromHub)) {
                     fromIdx = i;
                 }
-                if (fromIdx !== -1 && i > fromIdx && this.matchStop(s.name, nereyeQuery)) {
+                if (fromIdx !== -1 && i > fromIdx && checkMatch(s.name, nereyeQuery, toHub)) {
                     toIdx = i;
                 }
             }
@@ -165,6 +284,30 @@ const AkilliRotaSistemi = {
                 });
             }
         });
+
+        // İLÇELER ARASI KORİDOR VE EKSPRES BAĞLANTI DESTEĞİ
+        if (candidates.length === 0 && fromHub && toHub && fromHub.district !== toHub.district) {
+            const interDistrict = db.find(r => 
+                (r.id === "hat_saray_ekspres" && fromHub.district === "Süleymanpaşa" && toHub.district === "Saray") ||
+                ((r.hatNo === "26" || r.hatNo === "226") && fromHub.district === "Süleymanpaşa" && toHub.district === "Saray") ||
+                ((r.hatNo === "26" || r.hatNo === "226" || r.id === "hat_saray_ekspres") && fromHub.district === "Saray" && toHub.district === "Süleymanpaşa") ||
+                ((r.originDistrict === fromHub.district && r.destDistrict === toHub.district) || (r.destDistrict === fromHub.district && r.originDistrict === toHub.district))
+            );
+            if (interDistrict && interDistrict.stops && interDistrict.stops.length > 1) {
+                const isReverse = (interDistrict.destDistrict === fromHub.district && interDistrict.originDistrict === toHub.district);
+                const activeStops = isReverse ? [...interDistrict.stops].reverse() : interDistrict.stops;
+                candidates.push({
+                    route: interDistrict,
+                    fromStop: activeStops[0].name,
+                    toStop: activeStops[activeStops.length - 1].name,
+                    fromIdx: 0,
+                    toIdx: activeStops.length - 1,
+                    stopsCount: activeStops.length,
+                    dist: interDistrict.totalKm || 62,
+                    subStops: activeStops
+                });
+            }
+        }
 
         if (candidates.length === 0) {
             return { 
@@ -298,14 +441,16 @@ const AkilliRotaSistemi = {
         const pillsContainer = document.getElementById('smart-pills-container');
         if (pillsContainer && pillsContainer.children.length === 0) {
             const popularStops = [
-                "Atatürk Spor Salonu",
-                "Cumhuriyet Meydanı",
-                "Valilik",
-                "Köprübaşı",
-                "Rüstempaşa Cami",
-                "Değirmenaltı",
-                "Araştırma Hastanesi",
-                "Tepekent"
+                "Değirmenaltı Kampüs",
+                "Valilik & Hükümet Cd.",
+                "Şehir Hastanesi",
+                "Süleymanpaşa Otogar",
+                "Saray Otogarı",
+                "Saray Devlet Hastanesi",
+                "Saray Çarşı",
+                "Velimeşe Merkez",
+                "Çorlu Otogarı",
+                "Çerkezköy Otogarı"
             ];
 
             popularStops.forEach(st => {
@@ -339,7 +484,7 @@ const AkilliRotaSistemi = {
             fromInput.focus();
         }
 
-        const speechNotice = "Akıllı Rota Sistemi açıldı. Nereden nereye gitmek istediğinizi yazın veya seçin; yönü ve hattı sistem hesaplasın.";
+        const speechNotice = "Akıllı Rota Sistemi açıldı. Sadece kalkış ve varış mahallesi veya ana durağını seçin; ara durakları sürüş esnasında rota üzerinde keşfedeceksiniz.";
         if (typeof audio !== 'undefined' && audio.speak) {
             audio.speak(speechNotice);
         }

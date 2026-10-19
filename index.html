@@ -27,7 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/styles.css?v=1792371910893">
+    <link rel="stylesheet" href="css/styles.css?v=1792372427779">
 </head>
 <body>
     <div id="nvda-live-region" aria-live="assertive" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
@@ -393,28 +393,28 @@
             <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="js/firebase.js?v=1792371910893"></script>
+    <script src="js/firebase.js?v=1792372427779"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-    <script src="js/map-engine.js?v=1792371910893"></script>
-    <script src="js/tekulas-data.js?v=1792371910893"></script>
-    <script src="js/data.js?v=1792371910893"></script>
-    <script src="js/audio-base64.js?v=1792371910893"></script>
-    <script src="sounds/npc_list.js?v=1792371910893"></script>
-    <script src="js/audio.js?v=1792371910893"></script>
-    <script src="js/api.js?v=1792371910893"></script>
-    <script src="js/ui.js?v=1792371910893"></script>
-    <script src="js/bus-fleet.js?v=1792371910893"></script>
-    <script src="js/driver-badges.js?v=1792371910893"></script>
-    <script src="js/smart-system.js?v=1792371910893"></script>
-    <script src="js/smart-route.js?v=1792371910893"></script>
-    <script src="js/velimese-navigation.js?v=1792371910893"></script>
-    <script src="js/suleymanpasa-navigation.js?v=1792371910893"></script>
-    <script src="js/saray-navigation.js?v=1792371910893"></script>
-    <script src="js/compass-system.js?v=1792371910893"></script>
-    <script src="js/voice-assistant.js?v=1792371910893"></script>
-    <script src="js/game.js?v=1792371910893"></script>
-    <script src="js/app.js?v=1792371910893"></script>
+    <script src="js/map-engine.js?v=1792372427779"></script>
+    <script src="js/tekulas-data.js?v=1792372427779"></script>
+    <script src="js/data.js?v=1792372427779"></script>
+    <script src="js/audio-base64.js?v=1792372427779"></script>
+    <script src="sounds/npc_list.js?v=1792372427779"></script>
+    <script src="js/audio.js?v=1792372427779"></script>
+    <script src="js/api.js?v=1792372427779"></script>
+    <script src="js/ui.js?v=1792372427779"></script>
+    <script src="js/bus-fleet.js?v=1792372427779"></script>
+    <script src="js/driver-badges.js?v=1792372427779"></script>
+    <script src="js/smart-system.js?v=1792372427779"></script>
+    <script src="js/smart-route.js?v=1792372427779"></script>
+    <script src="js/velimese-navigation.js?v=1792372427779"></script>
+    <script src="js/suleymanpasa-navigation.js?v=1792372427779"></script>
+    <script src="js/saray-navigation.js?v=1792372427779"></script>
+    <script src="js/compass-system.js?v=1792372427779"></script>
+    <script src="js/voice-assistant.js?v=1792372427779"></script>
+    <script src="js/game.js?v=1792372427779"></script>
+    <script src="js/app.js?v=1792372427779"></script>
 
     <!-- AKILLI ROTA SİSTEMİ (NEREDEN ➔ NEREYE) MODALI -->
     <div id="smart-route-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="smart-route-title">
@@ -423,18 +423,16 @@
                 <h2 id="smart-route-title" class="gradient-text" style="font-size: 1.7rem; margin: 0;">🧭 Akıllı Rota Sistemi</h2>
                 <button id="btn-smart-modal-close" class="modern-btn" style="padding: 6px 12px; background: rgba(255,255,255,0.1); border: 1px solid #ef4444; color: #ef4444;" aria-label="Akıllı rota penceresini kapat">✕</button>
             </div>
-            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 18px; line-height: 1.4;">
-                Gidiş veya dönüş seçmenize gerek yok. Nereden nereye gitmek istediğinizi yazın veya seçin; akıllı sistem en uygun TEKULAŞ hattını ve yönünü otomatik hesaplar.
-            </p>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 18px; line-height: 1.4;">Yüzlerce ara durakla uğraşmanıza gerek yok. Sadece gitmek istediğiniz <strong>mahalle veya ana durağı</strong> seçin; sistem en uygun rotayı hazırlar, tüm ara durakları sürüş esnasında keşfedersiniz.</p>
 
             <div style="margin-bottom: 16px;">
-                <label for="smart-from-input" style="display: block; font-weight: bold; color: #38bdf8; margin-bottom: 6px;">📍 Nereden? (Kalkış Durağı / Bölgesi):</label>
-                <input type="text" id="smart-from-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 12px 14px; background: rgba(0,0,0,0.5); border: 2px solid #38bdf8; color: #fff;" placeholder="Örn: Atatürk Spor Salonu, Valilik, Köprübaşı..." aria-label="Kalkış durağı">
+                <label for="smart-from-input" style="display: block; font-weight: bold; color: #38bdf8; margin-bottom: 6px;">📍 Nereden? (Kalkış Mahallesi veya Ana Durak):</label>
+                <input type="text" id="smart-from-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 12px 14px; background: rgba(0,0,0,0.5); border: 2px solid #38bdf8; color: #fff;" placeholder="Örn: Değirmenaltı Kampüs, Valilik & Hükümet Cd., Saray Otogar..." aria-label="Kalkış durağı">
             </div>
 
             <div style="margin-bottom: 18px;">
-                <label for="smart-to-input" style="display: block; font-weight: bold; color: #22c55e; margin-bottom: 6px;">🏁 Nereye? (Varış / Hedef Durağı):</label>
-                <input type="text" id="smart-to-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 12px 14px; background: rgba(0,0,0,0.5); border: 2px solid #22c55e; color: #fff;" placeholder="Örn: Tepekent, Değirmenaltı, Araştırma Hastanesi..." aria-label="Varış hedef durağı">
+                <label for="smart-to-input" style="display: block; font-weight: bold; color: #22c55e; margin-bottom: 6px;">🏁 Nereye? (Varış Mahallesi veya Hedef Ana Durak):</label>
+                <input type="text" id="smart-to-input" list="smart-stops-datalist" class="modern-btn" style="width: 100%; text-align: left; font-size: 1.1rem; padding: 12px 14px; background: rgba(0,0,0,0.5); border: 2px solid #22c55e; color: #fff;" placeholder="Örn: Şehir Hastanesi, Saray Devlet Hastanesi, Çorlu Otogar..." aria-label="Varış hedef durağı">
             </div>
 
             <datalist id="smart-stops-datalist"></datalist>
