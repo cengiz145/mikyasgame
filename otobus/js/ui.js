@@ -622,32 +622,58 @@ const KeyboardNav = {
     items: [],
     currentIndex: 0,
     
+    getActiveContainer: function() {
+        // Açık olan tüm modalları topla (.modal, .modal-overlay, [role="dialog"], [aria-modal="true"])
+        const allModals = Array.from(document.querySelectorAll('.modal:not(.hidden), .modal-overlay:not(.hidden), [role="dialog"]:not(.hidden), [aria-modal="true"]:not(.hidden)'));
+        const visibleModals = allModals.filter(el => {
+            if (el.classList.contains('hidden')) return false;
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+        });
+
+        if (visibleModals.length > 0) {
+            // En son açılan (en üstteki) modalı aktif kapsayıcı yap
+            return visibleModals[visibleModals.length - 1];
+        }
+
+        // Açık modal yoksa açık ekranı (.screen, main) aktif kapsayıcı yap
+        const allScreens = Array.from(document.querySelectorAll('.screen:not(.hidden), main:not(.hidden)'));
+        const visibleScreens = allScreens.filter(el => {
+            if (el.classList.contains('hidden')) return false;
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+        });
+
+        if (visibleScreens.length > 0) {
+            return visibleScreens[0];
+        }
+
+        return document.body;
+    },
+
     initForScreen: function() {
         this.items = [];
         this.currentIndex = 0;
         
-        // EKRAN OKUYUCU DÜZELTMESİ (A11Y): Açık bir modal varsa klavye odağını önce ona hapset
-        const visibleModals = document.querySelectorAll('.modal:not(.hidden)');
-        let activeContainer = null;
-        
-        if (visibleModals.length > 0) {
-            activeContainer = visibleModals[0];
-        } else {
-            const visibleScreens = document.querySelectorAll('.screen:not(.hidden)');
-            if (visibleScreens.length > 0) {
-                activeContainer = visibleScreens[0];
-            }
-        }
-        
+        const activeContainer = this.getActiveContainer();
         if (!activeContainer) return;
         
         const elements = activeContainer.querySelectorAll('.nav-item');
         elements.forEach(el => {
-            if (!el.disabled && !el.classList.contains('hidden') && el.style.display !== 'none') {
+            if (el.disabled || el.classList.contains('hidden')) return;
+            const style = window.getComputedStyle(el);
+            if (style.display !== 'none' && style.visibility !== 'hidden') {
                 this.items.push(el);
             }
         });
         
+        // Eğer şu an aktif odaklı eleman bu listenin içindeyse currentIndex'i onunla eşitle
+        if (document.activeElement && this.items.includes(document.activeElement)) {
+            this.currentIndex = this.items.indexOf(document.activeElement);
+        } else {
+            this.currentIndex = 0;
+        }
+
         this.updateFocus();
     },
     
@@ -659,27 +685,62 @@ const KeyboardNav = {
             if (this.currentIndex >= this.items.length) this.currentIndex = 0;
             
             const focusedEl = this.items[this.currentIndex];
-            focusedEl.classList.add('nav-focused');
-            focusedEl.focus(); 
+            if (focusedEl) {
+                focusedEl.classList.add('nav-focused');
+                focusedEl.focus(); 
+                
+                try {
+                    focusedEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                } catch(e) {}
+            }
         }
     },
     
+    syncActiveContainerIfNeeded: function() {
+        const currentContainer = this.getActiveContainer();
+        // Eğer items listemiz boşsa veya mevcut item'lar aktif kapsayıcıya ait değilse tazele
+        if (this.items.length === 0 || !currentContainer || !this.items[0] || !currentContainer.contains(this.items[0])) {
+            this.initForScreen();
+            return true;
+        }
+        return false;
+    },
+
     moveNext: function() {
+        this.syncActiveContainerIfNeeded();
         if (this.items.length === 0) return;
-        audio.playNav();
+
+        // Kullanıcı Tab veya fareyle odağı değiştirdiyse currentIndex'i yakala
+        if (document.activeElement && this.items.includes(document.activeElement)) {
+            this.currentIndex = this.items.indexOf(document.activeElement);
+        }
+
+        if (typeof audio !== 'undefined' && audio.playNav) audio.playNav();
         this.currentIndex++;
         this.updateFocus();
     },
     
     movePrev: function() {
+        this.syncActiveContainerIfNeeded();
         if (this.items.length === 0) return;
-        audio.playNav();
+
+        if (document.activeElement && this.items.includes(document.activeElement)) {
+            this.currentIndex = this.items.indexOf(document.activeElement);
+        }
+
+        if (typeof audio !== 'undefined' && audio.playNav) audio.playNav();
         this.currentIndex--;
         this.updateFocus();
     },
     
     selectCurrent: function() {
+        this.syncActiveContainerIfNeeded();
         if (this.items.length === 0) return;
+        
+        if (document.activeElement && this.items.includes(document.activeElement)) {
+            this.currentIndex = this.items.indexOf(document.activeElement);
+        }
+
         const focusedEl = this.items[this.currentIndex];
         if (focusedEl) {
             focusedEl.click();

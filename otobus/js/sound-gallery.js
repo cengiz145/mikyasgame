@@ -406,6 +406,7 @@ const SoundGallery = {
         }
 
         this.renderModal(tab);
+        if (typeof KeyboardNav !== "undefined" && KeyboardNav.initForScreen) KeyboardNav.initForScreen();
     },
 
     renderModal: function(tab = 'all') {
