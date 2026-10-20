@@ -215,6 +215,13 @@ const CompassSystem = {
         const districtModal = document.getElementById('district-dest-modal');
         const routeMenu = document.getElementById('route-menu');
 
+        // 0. Bölge & İlçe Seçim Modalı (9 İlçe Pusula Desteği)
+        const districtPickerModal = document.getElementById('district-picker-modal');
+        if (districtPickerModal && !districtPickerModal.classList.contains('hidden')) {
+            this.handleDistrictPickerCompass(dir);
+            return;
+        }
+
         // 1. Harita Ekranı (Şehirler Arası)
         if (baseSelection && !baseSelection.classList.contains('hidden')) {
             this.handleMapMenu(dir);
@@ -276,6 +283,43 @@ const CompassSystem = {
             const noRoute = `${currentCity} için ${dir.name} yönünde doğrudan komşu şehir hattı bulunmuyor.`;
             if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(noRoute);
             if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast(noRoute, 'warning');
+        }
+    },
+
+    handleDistrictPickerCompass: function(dir) {
+        const listEl = document.getElementById('district-picker-list');
+        if (!listEl) return;
+
+        // Süleymanpaşa merkezli coğrafi yönler
+        const keywords = {
+            "Kuzey": ["saray", "muratlı"],
+            "Doğu": ["çorlu", "velimeşe", "çerkezköy"],
+            "Güney": ["şarköy"],
+            "Batı": ["malkara", "hayrabolu"]
+        };
+        const targets = keywords[dir.name] || [];
+
+        let foundBtn = null;
+        const buttons = listEl.querySelectorAll('button');
+        for (const btn of buttons) {
+            const text = (btn.getAttribute('data-dist-id') || btn.innerText).toLowerCase();
+            if (targets.some(k => text.includes(k))) {
+                foundBtn = btn;
+                break;
+            }
+        }
+
+        if (foundBtn) {
+            foundBtn.focus();
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-focused'));
+            foundBtn.classList.add('nav-focused');
+            const distName = foundBtn.getAttribute('data-dist-id') || foundBtn.innerText.trim();
+            const msg = `${dir.name} İstikameti: ${distName}. Seçmek için Enter'a basın.`;
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast(`🧭 ${dir.name} ➔ ${distName}`, 'info');
+        } else {
+            const msg = `${dir.name} yönünde ilçe bulunamadı.`;
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
         }
     },
 

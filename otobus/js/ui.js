@@ -323,26 +323,36 @@ const UI = {
         }
     },
 
-    renderCityMap: function(licenseLevel, unlockedCitiesArr) {
+            renderCityMap: function(licenseLevel, unlockedCitiesArr) {
+        licenseLevel = (typeof licenseLevel === 'number') ? licenseLevel : (typeof Game !== 'undefined' && Game.licenseLevel ? Game.licenseLevel : 1);
+        unlockedCitiesArr = Array.isArray(unlockedCitiesArr) ? unlockedCitiesArr : (typeof Game !== 'undefined' && Array.isArray(Game.unlockedCities) ? Game.unlockedCities : ["Tekirdağ"]);
+
         const listEl = document.getElementById('city-selection-list');
+        if (!listEl) return;
         listEl.innerHTML = '';
         
-        const isFirstTime = unlockedCitiesArr.length === 0;
-        const isUzunYolUnlocked = licenseLevel > 4; // Ehliyet seviye 5 olunca Åehirlerarası açılır
+        const isFirstTime = (unlockedCitiesArr.length === 0);
+        const isUzunYolUnlocked = licenseLevel > 4; // Ehliyet seviye 5 olunca Şehirlerarası açılır
         
-        document.getElementById('map-subtitle').innerText = isFirstTime 
-            ? "Maceraya Başlayacağınız Merkez Üssü Seçin" 
-            : "Çalışmak İstediğiniz Åehri Seçin veya Haritayı Genişletin";
+        const subTitleEl = document.getElementById('map-subtitle');
+        if (subTitleEl) {
+            subTitleEl.innerText = isFirstTime 
+                ? "Maceraya Başlayacağınız Merkez Üssü Seçin" 
+                : "Çalışmak İstediğiniz Şehri Seçin veya Haritayı Genişletin";
+        }
 
-        document.getElementById('unlock-points-display').innerHTML = isUzunYolUnlocked 
-            ? `Harita Keşfi: <span style="color:var(--success)">Uzun Yol Åoförü (Açık)</span>`
-            : `Harita Keşfi: <span style="color:var(--danger)">Uzun Yol Ehliyeti Bekleniyor (3. Sınıfı Bitir)</span>`;
+        const unlockPointsEl = document.getElementById('unlock-points-display');
+        if (unlockPointsEl) {
+            unlockPointsEl.innerHTML = isUzunYolUnlocked 
+                ? `Harita Keşfi: <span style="color:var(--success)">Uzun Yol Şoförü (Açık)</span>`
+                : `Harita Keşfi: <span style="color:var(--danger)">Uzun Yol Ehliyeti Bekleniyor (3. Sınıfı Bitir)</span>`;
+        }
 
-        // Unlockable komşuları bul (Açık olan şehirlerin komşuları)
+        // Unlockable komşuları bul (Açık olan şehirlerin coğrafi komşuları)
         const unlockableCandidates = new Set();
         if (!isFirstTime) {
             unlockedCitiesArr.forEach(city => {
-                const data = sehirRotalari[city];
+                const data = (typeof sehirRotalari !== 'undefined') ? sehirRotalari[city] : null;
                 if (data && data.komsular) {
                     Object.values(data.komsular).forEach(neighbor => {
                         if (!unlockedCitiesArr.includes(neighbor)) {
@@ -353,29 +363,48 @@ const UI = {
             });
         }
 
-        masterCitiesList.forEach(cityName => {
+        const currentActiveCity = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
+
+        masterCitiesList.forEach((cityName, idx) => {
             const isUnlocked = isFirstTime || unlockedCitiesArr.includes(cityName);
             const canUnlock = !isFirstTime && unlockableCandidates.has(cityName) && isUzunYolUnlocked;
             const isNeighborButLocked = !isFirstTime && unlockableCandidates.has(cityName) && !isUzunYolUnlocked;
             
             const li = document.createElement('li');
+            li.style.marginBottom = '10px';
             const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.setAttribute('data-city', cityName);
+            btn.setAttribute('role', 'button');
             
             if (isUnlocked) {
-                btn.className = 'menu-btn nav-item primary-btn';
+                const isSelectedCity = (cityName === currentActiveCity);
+                btn.className = `menu-btn nav-item primary-btn ${isSelectedCity ? 'city-active-item' : ''}`;
+                btn.style.width = '100%';
+                btn.style.justifyContent = 'space-between';
+                btn.style.border = isSelectedCity ? '2px solid #22c55e' : '1px solid rgba(56,189,248,0.4)';
+                
+                const labelText = isFirstTime 
+                    ? `${idx + 1}. Şehir: ${cityName}. Açık Şehir. Başlangıç merkez üssü yapmak için Enter tuşuna basın.`
+                    : `${idx + 1}. Şehir: ${cityName}. Açık Şehir. ${isSelectedCity ? 'Şu anki aktif merkeziniz.' : ''} Sefere başlamak veya şehre giriş yapmak için Enter tuşuna basın.`;
+                btn.setAttribute('aria-label', labelText);
+                
                 btn.innerHTML = `
-                    <span class="btn-icon">ğŸ™ï¸</span>
-                    <span class="btn-text">
-                        <strong>${cityName} ${isFirstTime ? "(Merkez Üs Yap)" : "(Açık Åehir)"}</strong>
-                        <small>Bu şehre giriş yap</small>
+                    <span class="btn-icon">🏙️</span>
+                    <span class="btn-text" style="text-align: left; flex: 1; margin-left: 10px;">
+                        <strong>${cityName} ${isFirstTime ? "(Merkez Üs Yap)" : "(Açık Şehir)"}</strong>
+                        <small style="display:block; color:#94a3b8; font-size:0.85rem;">Bu şehre giriş yap ve seferleri gör</small>
                     </span>
+                    <span style="font-weight: bold; font-size: 0.9rem; color: #4ade80;">${isSelectedCity ? '✓ AKTİF' : 'Giriş Yap'}</span>
                 `;
                 btn.onclick = () => {
-                    audio.playSelect();
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
                     if (isFirstTime) {
                         Game.unlockCity(cityName);
                         Game.setCity(cityName);
-                        UI.showToast(`${cityName} Merkez Üssü Olarak Belirlendi!`, 'success');
+                        const selMsg = `${cityName} Merkez Üssü Olarak Belirlendi!`;
+                        UI.showToast(selMsg, 'success');
+                        if (typeof audio !== 'undefined' && audio.speak) audio.speak(selMsg);
                         setTimeout(() => {
                             UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
                             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: cityName } }));
@@ -386,6 +415,9 @@ const UI = {
                         if (modeModal) {
                             modeModal.classList.remove('hidden');
                             KeyboardNav.initForScreen();
+                            const modeVoice = `${cityName} seçildi. Görev modunu belirleyin: Şehir içi seferler, ilçe hatları veya şehirlerarası uzun yol.`;
+                            if (typeof audio !== 'undefined' && audio.speak) audio.speak(modeVoice);
+                            if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(modeVoice);
                         } else {
                             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: cityName } }));
                         }
@@ -393,39 +425,75 @@ const UI = {
                 };
             } else if (canUnlock) {
                 btn.className = 'menu-btn nav-item unlockable-city';
+                btn.style.width = '100%';
+                btn.style.justifyContent = 'space-between';
+                btn.setAttribute('aria-label', `${idx + 1}. Şehir: ${cityName}. Kilidi açılabilir komşu şehir. Uzun yol izniniz mevcut. Kilidi açmak ve sefere başlamak için Enter tuşuna basın.`);
                 btn.innerHTML = `
-                    <span class="btn-icon">ğŸ”“</span>
-                    <span class="btn-text">
+                    <span class="btn-icon">🔓</span>
+                    <span class="btn-text" style="text-align: left; flex: 1; margin-left: 10px;">
                         <strong>${cityName} (Kilidi Aç)</strong>
-                        <small>Uzun yol izni var. Sefere başla!</small>
+                        <small style="display:block; color:#94a3b8; font-size:0.85rem;">Uzun yol izni var. Sefere başla!</small>
                     </span>
+                    <span style="font-weight: bold; font-size: 0.9rem; color: #38bdf8;">Kilidi Aç</span>
                 `;
                 btn.onclick = () => {
-                    audio.playSelect();
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
                     Game.unlockCity(cityName);
-                    UI.showToast(`${cityName} Kilidi Açıldı!`, 'success');
+                    const unlockMsg = `${cityName} Kilidi Açıldı! Seferlere başlanabilir.`;
+                    UI.showToast(unlockMsg, 'success');
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(unlockMsg);
                     UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
                 };
             } else {
                 btn.className = 'menu-btn nav-item locked-city';
-                btn.disabled = true;
+                btn.setAttribute('aria-disabled', 'true');
+                btn.style.width = '100%';
+                btn.style.justifyContent = 'space-between';
+                btn.style.opacity = '0.75';
+                btn.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                btn.style.cursor = 'pointer';
                 
-                let lockReason = isNeighborButLocked ? "Önce merkez üssünde 3. Sınıf Ehliyeti bitirmelisin!" : "Bu şehre henüz komşu değilsiniz.";
+                let lockReason = isNeighborButLocked 
+                    ? "Önce merkez üssünde 3. Sınıf Ehliyeti bitirmelisin!" 
+                    : "Bu şehre henüz komşu değilsiniz. Komşu şehirleri tamamlayarak rotayı genişletin.";
                 
+                btn.setAttribute('aria-label', `${idx + 1}. Şehir: ${cityName}. Kilitli Şehir. ${lockReason}. Durum bilgisi için Enter tuşuna basın.`);
                 btn.innerHTML = `
-                    <span class="btn-icon">ğŸ”’</span>
-                    <span class="btn-text">
-                        <strong>${cityName} (Kilitli)</strong>
-                        <small>${lockReason}</small>
+                    <span class="btn-icon">🔒</span>
+                    <span class="btn-text" style="text-align: left; flex: 1; margin-left: 10px;">
+                        <strong style="color: #ef4444;">${cityName} (Kilitli)</strong>
+                        <small style="display:block; color:#f87171; font-size:0.85rem;">${lockReason}</small>
                     </span>
+                    <span style="font-weight: bold; font-size: 0.85rem; color: #ef4444;">KİLİTLİ</span>
                 `;
+                btn.onclick = () => {
+                    if (typeof audio !== 'undefined' && audio.playWarning) audio.playWarning();
+                    const warnText = `${cityName} henüz kilitli. ${lockReason}`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(warnText);
+                    if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(warnText);
+                    UI.showToast(`🔒 ${cityName} Kilitli: ${lockReason}`, 'warning');
+                };
             }
 
             li.appendChild(btn);
             listEl.appendChild(li);
         });
-        
+
         KeyboardNav.initForScreen();
+
+        // Ekran açılışında sesli anons ve odaklama
+        const curCity = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
+        const mapAnnouncement = isFirstTime 
+            ? "Şehir seçme haritası açıldı. Yukarı ve aşağı ok tuşlarıyla 8 şehir arasında gezinebilir, açık bir şehri merkez üs yapmak için Enter tuşuna basabilirsiniz."
+            : `Şehir haritası açıldı. Aktif şehriniz ${curCity}. Yukarı ve aşağı oklarla şehirler arasında gezinebilir, açık ve kilitli şehirlerin durumunu inceleyebilirsiniz.`;
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(mapAnnouncement);
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(mapAnnouncement);
+
+        // İlk açık şehre veya mevcut şehre otomatik odaklan
+        setTimeout(() => {
+            const activeBtn = listEl.querySelector(`[data-city="${curCity}"]`) || listEl.querySelector('.primary-btn') || listEl.querySelector('button');
+            if (activeBtn) activeBtn.focus();
+        }, 150);
     },
 
     renderRoutes: function(cityName, completedTasks) {
@@ -759,7 +827,23 @@ const KeyboardNav = {
 };
 
 window.addEventListener('keydown', (e) => {
-    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+    // Metin kutusunda (input/textarea) klavye davranışları:
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+        // Sol ve Sağ oklar metin içinde imleci hareket ettirsin
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            return;
+        }
+        // Aşağı ok ile metin kutusundan sonraki menü elemanına (ilçe listesi vb.) yumuşak geçiş
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            KeyboardNav.moveNext();
+            return;
+        }
+        // Escape dışındaki tuşlar inputun doğal yazımına bırakılır
+        if (e.key !== 'Escape') {
+            return;
+        }
+    }
 
     // SHIFT + OK TUŞLARI: PUSULA VE 4 YÖN SİSTEMİ (Kuzey, Güney, Doğu, Batı)
     if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
@@ -774,7 +858,7 @@ window.addEventListener('keydown', (e) => {
 
     const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
 
-    // ESCAPE: Açıklamayı susturur ve çıkar
+    // ESCAPE: Açıklamayı susturur ve açık modalı kapatır
     if (e.key === 'Escape') {
         const pickerModal = document.getElementById('district-picker-modal');
         if (pickerModal && !pickerModal.classList.contains('hidden')) {
@@ -782,6 +866,18 @@ window.addEventListener('keydown', (e) => {
             KeyboardNav.initForScreen();
             const btnChange = document.getElementById('btn-change-active-district');
             if (btnChange) btnChange.focus();
+            return;
+        }
+        const modeModal = document.getElementById('mode-selection-modal');
+        if (modeModal && !modeModal.classList.contains('hidden')) {
+            modeModal.classList.add('hidden');
+            KeyboardNav.initForScreen();
+            return;
+        }
+        const intercityModal = document.getElementById('intercity-dest-modal');
+        if (intercityModal && !intercityModal.classList.contains('hidden')) {
+            intercityModal.classList.add('hidden');
+            KeyboardNav.initForScreen();
             return;
         }
         if (typeof MissionReader !== 'undefined') MissionReader.exit();
@@ -804,13 +900,6 @@ window.addEventListener('keydown', (e) => {
 
     if (isDriving) return;
 
-    // Metin kutusunda (input/textarea) Sol ve Sağ ok tuşlarının imleci hareket ettirmesine izin ver
-    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            return;
-        }
-    }
-
     if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
         e.preventDefault();
         KeyboardNav.moveNext();
@@ -822,8 +911,7 @@ window.addEventListener('keydown', (e) => {
             e.preventDefault();
             return;
         }
-        // NVDA veya Tab ile odaklanılan eleman bir buton değilse (div ise) Enter native çalışmaz.
-        // Bu yüzden eğer bir nav-item üzerinde isek tıklamasını sağlıyoruz.
+        // NVDA veya Tab ile odaklanılan eleman buton değilse tıkla
         if (document.activeElement && document.activeElement.classList.contains('nav-item')) {
             if (document.activeElement.tagName !== 'BUTTON') { 
                 e.preventDefault();
@@ -832,8 +920,6 @@ window.addEventListener('keydown', (e) => {
         }
     }
 });
-
-
 
 
 

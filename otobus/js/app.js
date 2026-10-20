@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-            // 0.5. Login Screen & Bölge / İlçe Listesi Sistemi
+                // 0.5. Login Screen & Bölge / İlçe Listesi Sistemi (Yüksek Erişilebilirlik)
     const DISTRICT_OPTIONS = [
         { id: "Süleymanpaşa", icon: "🏙️", name: "Süleymanpaşa (Tekirdağ Merkez)", desc: "Şehir içi sahil, çarşı ve üniversite hatları" },
         { id: "Saray", icon: "🌳", name: "Saray (İlçe Merkezi & Mahalleleri)", desc: "Kuzey Trakya ormanları ve ilçe hatları" },
@@ -151,6 +151,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const statusEl = document.getElementById('lbl-current-chosen-district');
         if (!listEl) return;
         listEl.innerHTML = '';
+        listEl.setAttribute('role', 'radiogroup');
+        listEl.setAttribute('aria-label', 'Başlangıç bölgesi ve ilçe listesi. 9 ilçe mevcuttur.');
 
         DISTRICT_OPTIONS.forEach((opt, idx) => {
             const isSelected = (opt.id === chosenDistrict);
@@ -170,14 +172,14 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.border = isSelected ? '2px solid #22c55e' : '1px solid rgba(56,189,248,0.3)';
             btn.style.background = isSelected ? 'rgba(34, 197, 94, 0.22)' : 'rgba(15,23,42,0.7)';
             btn.style.cursor = 'pointer';
-            btn.setAttribute('role', 'option');
-            btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            btn.setAttribute('role', 'radio');
+            btn.setAttribute('aria-checked', isSelected ? 'true' : 'false');
             btn.setAttribute('data-dist-id', opt.id);
             btn.setAttribute('aria-label', `${idx + 1}. İlçe: ${opt.name}. ${isSelected ? 'Seçili bölge.' : 'Seçmek için Enter tuşuna basın.'}`);
 
             btn.innerHTML = `
                 <span><strong>${opt.icon} ${opt.name}</strong></span>
-                <span style="font-weight:bold; font-size:0.9rem; color:${isSelected ? '#4ade80' : '#94a3b8'}">
+                <span class="sel-badge" style="font-weight:bold; font-size:0.9rem; color:${isSelected ? '#4ade80' : '#94a3b8'}">
                     ${isSelected ? '✓ SEÇİLİ' : 'Seç'}
                 </span>
             `;
@@ -186,10 +188,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 chosenDistrict = opt.id;
                 if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
                 if (statusEl) statusEl.innerText = `${opt.icon} ${opt.name}`;
-                renderLoginDistrictList();
-                const selBtn = listEl.querySelector(`[data-dist-id="${opt.id}"]`);
-                if (selBtn) selBtn.focus();
-                const announceText = `${opt.name} seçildi.`;
+                
+                // DOM'u yıkmadan sadece durum ve stilleri güncelle (NVDA odağını kaybetmez)
+                const allButtons = listEl.querySelectorAll('.login-dist-btn');
+                allButtons.forEach((b, bIdx) => {
+                    const bId = b.getAttribute('data-dist-id');
+                    const isSel = (bId === chosenDistrict);
+                    b.setAttribute('aria-checked', isSel ? 'true' : 'false');
+                    b.classList.toggle('primary-btn', isSel);
+                    b.style.border = isSel ? '2px solid #22c55e' : '1px solid rgba(56,189,248,0.3)';
+                    b.style.background = isSel ? 'rgba(34, 197, 94, 0.22)' : 'rgba(15,23,42,0.7)';
+                    const badge = b.querySelector('.sel-badge');
+                    if (badge) {
+                        badge.innerText = isSel ? '✓ SEÇİLİ' : 'Seç';
+                        badge.style.color = isSel ? '#4ade80' : '#94a3b8';
+                    }
+                    const o = DISTRICT_OPTIONS.find(x => x.id === bId);
+                    if (o) {
+                        b.setAttribute('aria-label', `${bIdx + 1}. İlçe: ${o.name}. ${isSel ? 'Seçili bölge.' : 'Seçmek için Enter tuşuna basın.'}`);
+                    }
+                });
+
+                const announceText = `${opt.name} başlangıç bölgesi seçildi. Oyuna girmek için Aşağı okla Oyuna Gir butonuna ilerleyebilirsiniz.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceText);
                 if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceText);
             };
@@ -250,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`Hoş geldin, ${username}!`, 'success');
-        if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Hoş geldin, ${username}! Ana menü açıldı.`);
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Hoş geldin, ${username}! Ana menü açıldı. Çalışma bölgeniz ${chosenDistrict}.`);
         if (typeof UI !== 'undefined' && UI.updatePlayerStats && typeof Game !== 'undefined') {
             const licenseTitle = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
             UI.updatePlayerStats(Game.licenseLevel || 1, Game.completedTasks || 0, Game.playerBudget || 0, licenseTitle);
@@ -281,6 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const curDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || 'Süleymanpaşa');
         listEl.innerHTML = '';
+        listEl.setAttribute('role', 'radiogroup');
+        listEl.setAttribute('aria-label', 'Bölge ve ilçe seçim listesi. 9 ilçe mevcuttur.');
 
         DISTRICT_OPTIONS.forEach((opt, idx) => {
             const isSelected = (opt.id === curDist);
@@ -300,10 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.border = isSelected ? '2px solid #22c55e' : '1.5px solid rgba(56,189,248,0.3)';
             btn.style.background = isSelected ? 'rgba(34, 197, 94, 0.22)' : 'rgba(15,23,42,0.85)';
             btn.style.cursor = 'pointer';
-            btn.setAttribute('role', 'option');
-            btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+            btn.setAttribute('role', 'radio');
+            btn.setAttribute('aria-checked', isSelected ? 'true' : 'false');
             btn.setAttribute('data-dist-id', opt.id);
-            btn.setAttribute('aria-label', `${idx + 1}. İlçe: ${opt.name}. ${opt.desc}. ${isSelected ? 'Şu anki aktif bölgeniz.' : 'Seçmek için Enter tuşuna basın.'}`);
+            btn.setAttribute('aria-label', `${idx + 1}. İlçe: ${opt.name}. ${opt.desc}. ${isSelected ? 'Şu anki aktif çalışma bölgeniz.' : 'Seçmek için Enter tuşuna basın.'}`);
 
             btn.innerHTML = `
                 <span class="btn-text">
@@ -326,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
                     UI.updateTitleScreenButtons();
                 }
-                const announceMsg = `${opt.name} ana bölgeniz olarak seçildi. 1. Seviye seferleriniz 4 duraktan başlayarak hazırlandı.`;
+                const announceMsg = `${opt.name} ana çalışma bölgeniz olarak seçildi. 1. Seviye seferleriniz 4 duraktan başlayarak hazırlandı.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceMsg);
                 if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`📍 Aktif Bölge: ${opt.name}`, 'success');
@@ -345,9 +367,9 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             const activeBtn = listEl.querySelector(`[data-dist-id="${curDist}"]`) || listEl.querySelector('button');
             if (activeBtn) activeBtn.focus();
-        }, 100);
+        }, 120);
 
-        const welcomeVoice = "Bölge ve ilçe seçim listesi açıldı. Yukarı ve aşağı oklarla 9 ilçe arasında gezinebilir, Enter ile seçebilirsiniz.";
+        const welcomeVoice = "Bölge ve ilçe seçim penceresi açıldı. 9 ilçe arasında yukarı ve aşağı oklarla gezinebilir, Enter ile seçebilirsiniz. Kapatmak için Escape tuşuna basabilirsiniz.";
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(welcomeVoice);
         if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(welcomeVoice);
     };
@@ -620,10 +642,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 2. City Selection (Map) Screen
-    document.getElementById('btn-base-back').addEventListener('click', () => {
-        audio.playSelect();
-        UI.switchScreen('title-screen');
-    });
+    const btnBaseBack = document.getElementById('btn-base-back');
+    if (btnBaseBack) {
+        btnBaseBack.addEventListener('click', () => {
+            if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("Ana ekrana dönüldü.");
+            if (typeof UI !== 'undefined' && UI.switchScreen) {
+                UI.switchScreen('title-screen');
+            }
+            const btnStart = document.getElementById('btn-start-city');
+            if (btnStart) btnStart.focus();
+        });
+    }
 
     // Harita ekranından rota ekranına geçiş eventi (ui.js fırlatıyor)
     // 2.5 Mode Selection Modals
