@@ -26,9 +26,12 @@ class AudioSystem {
             coach_terminal: null,
             v8_bass: null,
             city_cummins: null,
+            conecto_solo: null,
             articulated: null,
             midibus: null,
-            man_d26: null
+            man_d26: null,
+            daf_paccar: null,
+            scania_dc13: null
         };
         this.cityIdleBuffer = null;
         this.syntheticIdleBuffer = null;
@@ -66,6 +69,15 @@ class AudioSystem {
             });
             safeLoadBuffer('sounds/freesound_heavy_man_idle.mp3', d => {
                 if (this.groupBuffers) this.groupBuffers.man_d26 = d;
+            });
+            safeLoadBuffer('sounds/freesound_engine_city.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.conecto_solo = d;
+            });
+            safeLoadBuffer('sounds/freesound_daf_paccar_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.daf_paccar = d;
+            });
+            safeLoadBuffer('sounds/freesound_scania_dc13_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.scania_dc13 = d;
             });
         } catch(e) {}
         this.idleSource = null;
@@ -498,16 +510,22 @@ startEngine() {
             let activeBuffer = this.pureIdleBuffer || this.idleBuffer;
             if (currentBus) {
                 const grp = currentBus.soundGroup || (currentBus.soundProfile ? currentBus.soundProfile.soundGroup : '');
-                if (grp === 'coach_terminal' || currentBus.id.includes('tourismo') || currentBus.id.includes('irizar') || currentBus.id.includes('neoplan')) {
-                    activeBuffer = (this.groupBuffers && this.groupBuffers.coach_terminal) || this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
-                } else if (grp === 'v8_bass' || currentBus.id.includes('o403') || currentBus.id.includes('safir')) {
+                if (grp === 'scania_dc13' || currentBus.id.includes('irizar')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.scania_dc13) || this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
+                } else if (grp === 'daf_paccar' || currentBus.id.includes('safir')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.daf_paccar) || this.pureIdleBuffer || this.idleBuffer;
+                } else if (grp === 'man_d26' || currentBus.id.includes('man_lions') || currentBus.id.includes('neoplan')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.man_d26) || this.pureIdleBuffer || this.idleBuffer;
+                } else if (grp === 'v8_bass' || currentBus.id.includes('o403')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.v8_bass) || this.bassIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
-                } else if (grp === 'articulated' || currentBus.id.includes('conecto')) {
+                } else if (grp === 'articulated' || currentBus.id.includes('conecto_g')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.articulated) || this.cityIdleBuffer || this.idleBuffer;
+                } else if (grp === 'conecto_solo' || currentBus.id === 'mercedes_conecto_12m') {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.conecto_solo) || this.cityIdleBuffer || this.idleBuffer;
+                } else if (grp === 'coach_terminal' || currentBus.id.includes('tourismo')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.coach_terminal) || this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
                 } else if (grp === 'midibus' || currentBus.id.includes('novo')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.midibus) || this.cityIdleBuffer || this.idleBuffer;
-                } else if (grp === 'man_d26' || currentBus.id.includes('man_lions')) {
-                    activeBuffer = (this.groupBuffers && this.groupBuffers.man_d26) || this.pureIdleBuffer || this.idleBuffer;
                 } else if (grp === 'city_cummins' || currentBus.id.includes('kent') || currentBus.id.includes('neocity')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.city_cummins) || this.cityIdleBuffer || this.idleBuffer;
                 } else {
