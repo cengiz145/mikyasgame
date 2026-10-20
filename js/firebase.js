@@ -1,4 +1,4 @@
-// Firebase BaÄŸlantÄ± AyarlarÄ±
+﻿// Firebase Bağlantı Ayarları
 const firebaseConfig = { 
     apiKey: "AIzaSyBDGdQjm6NX8ANQm90HJR8wD2Nk2E1h-ro", 
     authDomain: "hgfz-5a1ca.firebaseapp.com", 
@@ -9,15 +9,16 @@ const firebaseConfig = {
     databaseURL: "https://hgfz-5a1ca-default-rtdb.firebaseio.com"
 };
 
-// UygulamayÄ± gÃ¼venli baÅŸlat (Offline Ã‡Ã¶kme KorumasÄ±)
+// Uygulamayı güvenli başlat (Offline Çökme Koruması)
 try {
     if (typeof firebase !== 'undefined') {
         firebase.initializeApp(firebaseConfig);
         window.db = firebase.database();
     } else {
-        throw new Error("Firebase kÃ¼tÃ¼phanesi yÃ¼klenemedi.");
+        throw new Error("Firebase kütüphanesi yüklenemedi.");
     }
 } catch (error) {
-    console.warn("[Ã‡EVRÄ°MDÄ°ÅÄ° MOD AKTÄ°F] VeritabanÄ± baÄŸlantÄ±sÄ± yok veya internet koptu:", error);
-    window.db = null; // Sistem Ã§evrimdÄ±ÅŸÄ± oynanÄ±ÅŸ iÃ§in db'yi nazikÃ§e atlar
+    console.warn("[ÇEVRİMDİÅİ MOD AKTİF] Veritabanı bağlantısı yok veya internet koptu:", error);
+    window.db = null; // Sistem çevrimdışı oynanış için db'yi nazikçe atlar
 }
+

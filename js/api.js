@@ -141,6 +141,30 @@ function buildDistrictContinuousCircuit(districtName, tekulasDb) {
         if (h2 && h2.stops) for (let i = 1; i < h2.stops.length; i++) master.push(Object.assign({}, h2.stops[i]));
         if (h3 && h3.stops) for (let i = 1; i < h3.stops.length; i++) master.push(Object.assign({}, h3.stops[i]));
         defaultLineRef = h1;
+    } else if (districtName === "Muratlı") {
+        const mLines = tekulasDb.filter(r => (r.district === "Muratlı" || (r.name && r.name.toLowerCase().includes("muratlı"))) && r.stops && r.stops.length >= 2);
+        if (mLines.length > 0) {
+            mLines.forEach(l => {
+                l.stops.forEach(s => master.push(Object.assign({}, s)));
+            });
+            defaultLineRef = mLines[0];
+        }
+        const muratliExtraStops = [
+            { name: "MURATLI TREN GARI", lat: 41.1712, lon: 27.5023, gercekMesafeSonraki: 1.1 },
+            { name: "MURATLI BELEDİYESİ", lat: 41.1725, lon: 27.5045, gercekMesafeSonraki: 0.9 },
+            { name: "ŞEHİT YÜZBAŞI MAYADAĞLI CAD", lat: 41.1741, lon: 27.5068, gercekMesafeSonraki: 1.3 },
+            { name: "MURATLI ÇARŞI MEYDANI", lat: 41.1755, lon: 27.5089, gercekMesafeSonraki: 1.0 },
+            { name: "MURATLI DEVLET HASTANESİ", lat: 41.1780, lon: 27.5120, gercekMesafeSonraki: 1.4 },
+            { name: "MURATLI SANAYİ SİTESİ", lat: 41.1820, lon: 27.5180, gercekMesafeSonraki: 1.8 },
+            { name: "İNANLI ÇEŞMESİ & KÖY YOLU", lat: 41.1860, lon: 27.5240, gercekMesafeSonraki: 2.1 },
+            { name: "AŞAĞISEVİNDİK KAVŞAĞI", lat: 41.1910, lon: 27.5310, gercekMesafeSonraki: 1.7 },
+            { name: "YUKARISEVİNDİK MERKEZ", lat: 41.1960, lon: 27.5380, gercekMesafeSonraki: 2.0 },
+            { name: "MURATLI OTOGARI", lat: 41.1700, lon: 27.5010, gercekMesafeSonraki: 0.0 }
+        ];
+        if (master.length < 10) {
+            master = muratliExtraStops.map(s => Object.assign({}, s));
+            defaultLineRef = { id: "muratli_master", name: "Muratlı Şehir İçi ve Tren Garı Seferleri", district: "Muratlı", totalKm: 14 };
+        }
     } else {
         const distLines = tekulasDb.filter(r => (r.district === districtName || (r.district && r.district.includes(districtName))) && r.stops && r.stops.length >= 3);
         if (distLines.length > 0) {

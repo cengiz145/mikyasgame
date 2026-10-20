@@ -160,6 +160,9 @@ const AkilliSistem = {
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(speech);
         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🧭 Akıllı Sefer: ${chosenRoute.name}`, "success");
 
+        if (typeof routesData !== 'undefined' && !routesData[chosenRoute.id]) {
+            routesData[chosenRoute.id] = chosenRoute;
+        }
         if (typeof Game !== 'undefined' && Game.startRoute) {
             Game.startRoute(chosenRoute.id);
         }

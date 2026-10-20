@@ -1,4 +1,4 @@
-try {
+﻿try {
     var fso = new ActiveXObject("Scripting.FileSystemObject");
     var f = fso.OpenTextFile("js/audio-base64.js", 1);
     var code = f.ReadAll();

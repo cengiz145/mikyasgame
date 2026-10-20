@@ -12,7 +12,9 @@ class AudioSystem {
         this.engineCabinFilter = null;
         this.activeSoundProfile = null;
         this.retarderOsc = null;
+        this.retarderOsc2 = null;
         this.retarderFilter = null;
+        this.retarderFilter2 = null;
         this.retarderGain = null;
         
         this.isEngineRunning = false;
@@ -26,46 +28,59 @@ class AudioSystem {
             coach_terminal: null,
             v8_bass: null,
             city_cummins: null,
+            conecto_solo: null,
             articulated: null,
             midibus: null,
-            man_d26: null
+            man_d26: null,
+            daf_paccar: null,
+            scania_dc13: null
         };
         this.cityIdleBuffer = null;
+        this.syntheticIdleBuffer = null;
         try {
-            fetch('sounds/freesound_pure_bus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { this.pureIdleBuffer = d; this.coachIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.pure_v6 = d; }).catch(() => {});
+            const safeLoadBuffer = (url, callback) => {
+                fetch(url).then(r => {
+                    if (!r.ok) return null;
+                    return r.arrayBuffer();
+                }).then(b => {
+                    if (!b) return;
+                    if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                    return this.ctx.decodeAudioData(b);
+                }).then(decoded => {
+                    if (decoded && callback) callback(decoded);
+                }).catch(() => {});
+            };
 
-            fetch('sounds/freesound_coach_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { this.coachTerminalIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.coach_terminal = d; }).catch(() => {});
-
-            fetch('sounds/bassrolanti.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { this.bassIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.v8_bass = d; }).catch(() => {});
-
-            fetch('sounds/freesound_new_bus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { this.cityIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.city_cummins = d; }).catch(() => {});
-
-            fetch('sounds/freesound_articulated_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { if (this.groupBuffers) this.groupBuffers.articulated = d; }).catch(() => {});
-
-            fetch('sounds/freesound_midibus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { if (this.groupBuffers) this.groupBuffers.midibus = d; }).catch(() => {});
-
-            fetch('sounds/freesound_heavy_man_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { if (this.groupBuffers) this.groupBuffers.man_d26 = d; }).catch(() => {});
+            safeLoadBuffer('sounds/freesound_pure_bus_idle.mp3', d => {
+                this.pureIdleBuffer = d; this.coachIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.pure_v6 = d;
+            });
+            safeLoadBuffer('sounds/freesound_coach_idle.mp3', d => {
+                this.coachTerminalIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.coach_terminal = d;
+            });
+            safeLoadBuffer('sounds/bassrolanti.mp3', d => {
+                this.bassIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.v8_bass = d;
+            });
+            safeLoadBuffer('sounds/freesound_new_bus_idle.mp3', d => {
+                this.cityIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.city_cummins = d;
+            });
+            safeLoadBuffer('sounds/freesound_articulated_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.articulated = d;
+            });
+            safeLoadBuffer('sounds/freesound_midibus_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.midibus = d;
+            });
+            safeLoadBuffer('sounds/freesound_heavy_man_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.man_d26 = d;
+            });
+            safeLoadBuffer('sounds/freesound_engine_city.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.conecto_solo = d;
+            });
+            safeLoadBuffer('sounds/freesound_daf_paccar_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.daf_paccar = d;
+            });
+            safeLoadBuffer('sounds/freesound_scania_dc13_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.scania_dc13 = d;
+            });
         } catch(e) {}
         this.idleSource = null;
         this.idleGain = null;
@@ -112,13 +127,16 @@ class AudioSystem {
             rain10: new Howl({ src: ['sounds/rain10.ogg'], loop: true, volume: 0 }),
             rain11: new Howl({ src: ['sounds/rain11.ogg'], loop: true, volume: 0 }),
             // Freesound Gerçek Çevre ve Yol Sesleri (Asfalt, Çakıl, Kum, Rüzgar, Derz)
+// Freesound Gerçek Çevre ve Yol Sesleri (Doğal Şehir Ambiyansı, Kuş Sesleri, Asfalt, Rüzgar)
+                        tireScreech: new Howl({ src: ['sounds/freesound_tire_screech.mp3'], loop: false, volume: 0.85 }),
+            snowTires: new Howl({ src: ['sounds/freesound_snow_tires.mp3'], loop: true, volume: 0 }),
+            beachShore: new Howl({ src: ['sounds/freesound_beach_shore.mp3'], loop: true, volume: 0 }),
+            cabinAmbience: new Howl({ src: ['sounds/freesound_bus_cabin_ambience.mp3'], loop: true, volume: 0 }),
+            cityAmbience: new Howl({ src: ['sounds/freesound_city_ambience.mp3', 'sounds/street1.ogg'], loop: true, volume: 0 }),
             roadAsphalt: new Howl({ src: ['sounds/freesound_road_asphalt.mp3'], loop: true, volume: 0 }),
             roadGravel: new Howl({ src: ['sounds/freesound_road_gravel.mp3'], loop: true, volume: 0 }),
             roadGravelAsphalt: new Howl({ src: ['sounds/freesound_road_gravel_asphalt.mp3'], loop: true, volume: 0 }),
-            roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 }),
-            roadJointHit1: new Howl({ src: ['sounds/freesound_road_joint_hit1.wav', 'sounds/freesound_road_joints_tikir.mp3'], loop: false, volume: 0.65 }),
-            roadJointHit2: new Howl({ src: ['sounds/freesound_road_joint_hit2.wav', 'sounds/freesound_road_joints_tikir.mp3'], loop: false, volume: 0.65 })
-        };
+            roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 })};
 
         // KORNA İÇİN ÖZEL WEB AUDIO API KURULUMU (Boğuk efekti ve trim için)
         this.hornBuffer = null;
@@ -250,7 +268,7 @@ class AudioSystem {
         }
         
         if (this.ctx.state === 'suspended') {
-            this.ctx.resume();
+            this.ctx.resume().catch(() => {});
         }
         this.playMenuMusic();
         this.initTireNoise();
@@ -391,34 +409,68 @@ class AudioSystem {
         }
 
         if (!this.retarderOsc) {
+            // Gerçek Voith / ZF Hidrolik Retarder Akustiği (Çift Harmonik Türbin Islığı)
             this.retarderOsc = this.ctx.createOscillator();
-            this.retarderOsc.type = 'sawtooth';
+            this.retarderOsc.type = 'sine'; // Ana hidrolik girdap frekansı
+            this.retarderOsc2 = this.ctx.createOscillator();
+            this.retarderOsc2.type = 'triangle'; // Şanzıman dişli ve türbin ıslığı harmonisi
+
             this.retarderFilter = this.ctx.createBiquadFilter();
             this.retarderFilter.type = 'bandpass';
-            this.retarderFilter.Q.value = 4.2;
+            this.retarderFilter.Q.value = 5.5;
+
+            this.retarderFilter2 = this.ctx.createBiquadFilter();
+            this.retarderFilter2.type = 'peaking';
+            this.retarderFilter2.gain.value = 6;
+            this.retarderFilter2.Q.value = 4.0;
+
             this.retarderGain = this.ctx.createGain();
             this.retarderGain.gain.value = 0.0;
 
             this.retarderOsc.connect(this.retarderFilter);
+            this.retarderOsc2.connect(this.retarderFilter2);
             this.retarderFilter.connect(this.retarderGain);
+            this.retarderFilter2.connect(this.retarderGain);
+
             if (this.environmentMixer) this.retarderGain.connect(this.environmentMixer);
             else this.retarderGain.connect(this.ctx.destination);
+
             this.retarderOsc.start();
+            this.retarderOsc2.start();
+            this.wasRetarderEngaged = false;
         }
 
         const isEngaged = (speed > 20 && isBraking) || (this.isRetarderManuallyEngaged && speed > 15);
         if (isEngaged) {
             const pitchFactor = profile && profile.retarderPitch ? profile.retarderPitch : 1.0;
-            const baseF = pitchFactor * (360 + (speed / 90) * 880);
-            const targetGain = Math.min(0.32, (speed / 65) * 0.32);
-            this.retarderOsc.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.08);
-            this.retarderFilter.frequency.setTargetAtTime(baseF * 1.25, this.ctx.currentTime, 0.08);
-            this.retarderGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.12);
+            const cabinDamping = profile && profile.cabinDamping ? profile.cabinDamping : 0.8;
+            // Hıza bağlı gerçekçi Voith türbin frekans kayması
+            const baseF = pitchFactor * (320 + Math.pow(speed / 90, 1.1) * 780);
+            const harmF = baseF * 1.5;
 
+            this.retarderOsc.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.06);
+            this.retarderOsc2.frequency.setTargetAtTime(harmF, this.ctx.currentTime, 0.06);
+
+            this.retarderFilter.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.06);
+            this.retarderFilter2.frequency.setTargetAtTime(harmF, this.ctx.currentTime, 0.06);
+
+            const targetGain = Math.min(0.28, (speed / 70) * 0.28) * cabinDamping;
+            this.retarderGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.10);
+
+            this.wasRetarderEngaged = true;
             const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
             if (el) el.style.display = 'inline-block';
         } else {
-            this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.22);
+            if (this.wasRetarderEngaged && speed > 30) {
+                // Retarder boşa çıktığında gerçekçi pnomatik hava tahliyesi
+                this.wasRetarderEngaged = false;
+                if (typeof this.playAirBrake === 'function') {
+                    try { this.playAirBrake(); } catch(e){}
+                }
+            } else {
+                this.wasRetarderEngaged = false;
+            }
+            this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.20);
             const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
             if (el) el.style.display = 'none';
         }
@@ -449,34 +501,77 @@ class AudioSystem {
         this.sounds.select.play();
     }
 
-    startEngine() {
+        createSyntheticIdleBuffer() {
+        if (!this.ctx) {
+            this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const sampleRate = this.ctx.sampleRate || 44100;
+        const duration = 2.0;
+        const length = Math.floor(sampleRate * duration);
+        const buffer = this.ctx.createBuffer(1, length, sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        const baseFreq = 16.0;
+        let lastNoise = 0;
+        for (let i = 0; i < length; i++) {
+            const t = i / sampleRate;
+            const pulse = Math.pow(Math.max(0, Math.sin(2 * Math.PI * baseFreq * t)), 3) * 0.6;
+            const subHarmonic = Math.sin(2 * Math.PI * (baseFreq * 0.5) * t) * 0.25;
+            const highHarmonic = Math.sin(2 * Math.PI * (baseFreq * 2.0) * t) * 0.15;
+            const metallic = Math.sin(2 * Math.PI * (baseFreq * 4.0) * t) * 0.08;
+            const white = Math.random() * 2 - 1;
+            lastNoise = (lastNoise + 0.05 * white) / 1.05;
+            
+            data[i] = (pulse + subHarmonic + highHarmonic + metallic + (lastNoise * 0.4)) * 0.7;
+        }
+        this.syntheticIdleBuffer = buffer;
+        if (!this.idleBuffer) this.idleBuffer = buffer;
+        if (!this.pureIdleBuffer) this.pureIdleBuffer = buffer;
+        return buffer;
+    }
+
+startEngine() {
         this.init();
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
         if (this.isEngineRunning) return;
         
         this.isEngineRunning = true;
 
-        this.sounds.start.once('end', () => {
+        const launchIdle = () => {
+            if (!this.isEngineRunning || this.idleSource) return;
+            
             const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
             let activeBuffer = this.pureIdleBuffer || this.idleBuffer;
             if (currentBus) {
                 const grp = currentBus.soundGroup || (currentBus.soundProfile ? currentBus.soundProfile.soundGroup : '');
-                if (grp === 'coach_terminal' || currentBus.id.includes('tourismo') || currentBus.id.includes('irizar') || currentBus.id.includes('neoplan')) {
-                    activeBuffer = (this.groupBuffers && this.groupBuffers.coach_terminal) || this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
-                } else if (grp === 'v8_bass' || currentBus.id.includes('o403') || currentBus.id.includes('safir')) {
+                if (grp === 'scania_dc13' || currentBus.id.includes('irizar')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.scania_dc13) || this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
+                } else if (grp === 'daf_paccar' || currentBus.id.includes('safir')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.daf_paccar) || this.pureIdleBuffer || this.idleBuffer;
+                } else if (grp === 'man_d26' || currentBus.id.includes('man_lions') || currentBus.id.includes('neoplan')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.man_d26) || this.pureIdleBuffer || this.idleBuffer;
+                } else if (grp === 'v8_bass' || currentBus.id.includes('o403')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.v8_bass) || this.bassIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
-                } else if (grp === 'articulated' || currentBus.id.includes('conecto')) {
+                } else if (grp === 'articulated' || currentBus.id.includes('conecto_g')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.articulated) || this.cityIdleBuffer || this.idleBuffer;
+                } else if (grp === 'conecto_solo' || currentBus.id === 'mercedes_conecto_12m') {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.conecto_solo) || this.cityIdleBuffer || this.idleBuffer;
+                } else if (grp === 'coach_terminal' || currentBus.id.includes('tourismo')) {
+                    activeBuffer = (this.groupBuffers && this.groupBuffers.coach_terminal) || this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
                 } else if (grp === 'midibus' || currentBus.id.includes('novo')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.midibus) || this.cityIdleBuffer || this.idleBuffer;
-                } else if (grp === 'man_d26' || currentBus.id.includes('man_lions')) {
-                    activeBuffer = (this.groupBuffers && this.groupBuffers.man_d26) || this.pureIdleBuffer || this.idleBuffer;
                 } else if (grp === 'city_cummins' || currentBus.id.includes('kent') || currentBus.id.includes('neocity')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.city_cummins) || this.cityIdleBuffer || this.idleBuffer;
                 } else {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.pure_v6) || this.pureIdleBuffer || this.idleBuffer;
                 }
             }
-            if (this.isEngineRunning && activeBuffer) {
+            if (!activeBuffer) {
+                activeBuffer = this.syntheticIdleBuffer || this.createSyntheticIdleBuffer();
+            }
+            if (activeBuffer && this.ctx) {
                 this.idleSource = this.ctx.createBufferSource();
                 this.idleSource.buffer = activeBuffer;
                 this.idleSource.loop = true;
@@ -509,29 +604,46 @@ class AudioSystem {
                 this.engineCabinFilter.connect(this.idleGain);
                 this.idleGain.connect(this.enginePanner);
 
-                // Aktif aracın ses profilini uygula
-                const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                 if (currentBus && currentBus.soundProfile) {
                     this.applyBusSoundProfile(currentBus.soundProfile);
                 }
                 
-                // MOTOR HASARI LFO (Vuruntu/Titreşim)
                 this.engineDamageLfo = this.ctx.createOscillator();
                 this.engineDamageLfo.type = 'sawtooth';
                 this.engineDamageLfo.frequency.value = 5;
                 
                 this.engineDamageGain = this.ctx.createGain();
-                this.engineDamageGain.gain.value = 0; // Başlangıçta hasar yok
+                this.engineDamageGain.gain.value = 0;
                 
                 this.engineDamageLfo.connect(this.engineDamageGain);
                 this.engineDamageGain.connect(this.idleGain.gain);
                 this.engineDamageLfo.start();
                 
-                this.idleSource.start(0);
+                try {
+                    this.idleSource.start(0);
+                } catch(e) {}
             }
-        });
-        
-        this.sounds.start.play();
+        };
+
+        let startedViaEnd = false;
+        if (this.sounds && this.sounds.start) {
+            try {
+                this.sounds.start.once('end', () => {
+                    startedViaEnd = true;
+                    launchIdle();
+                });
+                this.sounds.start.play();
+            } catch(e) {
+                launchIdle();
+            }
+            setTimeout(() => {
+                if (!startedViaEnd && this.isEngineRunning) {
+                    launchIdle();
+                }
+            }, 1400);
+        } else {
+            launchIdle();
+        }
     }
 
     stopEngine() {
@@ -592,7 +704,8 @@ class AudioSystem {
         this.tireFilter.connect(this.tireGain);
         this.tireGain.connect(this.environmentMixer); // Connect to environment mixer so windows affect it
 
-        this.tireNoiseSource.start();
+        // Yapay brown noise kaldirildi, gercek ses kayitlari kullaniliyor
+        this.tireGain.gain.value = 0;
     }
 
     updateTireNoise(speed, roadType) {
@@ -623,9 +736,33 @@ class AudioSystem {
 
         const windowVolBoost = this.isWindowOpen ? 0.15 : 0;
 
+                // 0. DOĞAL ÇEVRE & ŞEHİR AMBİYANSI (Kuş sesleri, sakin cadde)
+        if (this.sounds && this.sounds.cityAmbience) {
+            if (!this.sounds.cityAmbience.playing()) {
+                this.sounds.cityAmbience.volume(0);
+                this.sounds.cityAmbience.play();
+            }
+            let targetAmbienceVol = this.isWindowOpen ? 0.45 : 0.25;
+            if (speed > 35) {
+                targetAmbienceVol = Math.max(0.08, targetAmbienceVol - ((speed - 35) / 60) * 0.15);
+            }
+            this.sounds.cityAmbience.volume(targetAmbienceVol);
+        }
+
+        
+        // Otobüs İçi Yolcu & Kabin Ambiyansı (Yolda seyrederken canlı kabin hissi)
+        if (this.sounds && this.sounds.cabinAmbience) {
+            if (!this.sounds.cabinAmbience.playing()) {
+                this.sounds.cabinAmbience.volume(0);
+                this.sounds.cabinAmbience.play();
+            }
+            const targetCabinVol = Math.min(0.24, 0.08 + (speed / 100) * 0.12);
+            this.sounds.cabinAmbience.volume(targetCabinVol);
+        }
+
         // 1. ASFALT YOL SESİ (freesound_road_asphalt.mp3)
         if (isAsphalt && this.sounds.roadAsphalt) {
-            const targetAsphaltVol = Math.min(0.70, (speed / 85) * 0.50 + 0.12 + windowVolBoost);
+            const targetAsphaltVol = Math.min(0.50, (speed / 90) * 0.42 + windowVolBoost);
             const targetAsphaltRate = Math.min(1.30, Math.max(0.75, 0.75 + (speed / 100) * 0.45));
             if (!this.sounds.roadAsphalt.playing()) {
                 this.sounds.roadAsphalt.volume(0);
@@ -686,16 +823,7 @@ class AudioSystem {
             setTimeout(() => { if (speed < 25 && this.sounds.roadWind) this.sounds.roadWind.pause(); }, 250);
         }
 
-        // 5. ASVALT DERZ / KÖPRÜ BAĞLANTI "TIKIR TIKIR" SESİ
-        // Asfalt yollarda 15 km/h üzeri seyrederken her 30-50 metrede bir ritmik tıkır tıkır sesi
-        if (isAsphalt && speed >= 15) {
-            this.roadJointDistanceCounter = (this.roadJointDistanceCounter || 0) + metersMoved;
-            if (this.roadJointDistanceCounter >= this.nextJointDistance) {
-                this.playRoadJointHit(speed);
-                this.roadJointDistanceCounter = 0;
-                this.nextJointDistance = 30 + Math.random() * 20; // 30 ile 50 metre arası dinamik aralık
-            }
-        }
+        // 5. Yol derz vuruntusu (davul/çekiç hissini önlemek için kaldırıldı)
 
         // 6. SENTETİK DÜŞÜK FREKANS GÖVDE TİTREŞİMİ (Arka plan dolgusu)
         let subGain = (speed / 100) * 0.18;
@@ -703,27 +831,17 @@ class AudioSystem {
         this.tireFilter.type = 'lowpass';
         this.tireFilter.frequency.setTargetAtTime(cutoff, this.ctx.currentTime, 0.1);
         this.tireFilter.Q.setTargetAtTime(1.0, this.ctx.currentTime, 0.1);
-        this.tireGain.gain.setTargetAtTime(subGain, this.ctx.currentTime, 0.1);
+        this.tireGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1); // Yapay gurultu susturuldu
     }
 
     playRoadJointHit(speed = 45) {
-        if (!this.sounds) return;
-        this.lastJointSoundToggle = !this.lastJointSoundToggle;
-        const sound = this.lastJointSoundToggle ? this.sounds.roadJointHit1 : this.sounds.roadJointHit2;
-        if (!sound) return;
-        
-        let vol = Math.min(0.85, 0.30 + (speed / 90) * 0.45);
-        if (this.isWindowOpen) vol = Math.min(0.95, vol + 0.15);
-        
-        const rate = Math.min(1.20, Math.max(0.85, 0.90 + (speed / 100) * 0.25 + (Math.random() * 0.1 - 0.05)));
-        sound.volume(vol);
-        sound.rate(rate);
-        sound.play();
+        // Davul/çekiç hissi veren vuruntu sesleri iptal edildi
+        return;
     }
 
     stopAllRoadSounds() {
         if (!this.sounds) return;
-        ['roadAsphalt', 'roadGravel', 'roadGravelAsphalt', 'roadWind'].forEach(key => {
+        ['roadAsphalt', 'roadGravel', 'roadGravelAsphalt', 'roadWind', 'cityAmbience', 'cabinAmbience'].forEach(key => {
             const snd = this.sounds[key];
             if (snd && snd.playing()) {
                 snd.fade(snd.volume(), 0, 200);
@@ -876,60 +994,41 @@ class AudioSystem {
     }
 
     updateWeatherSound(speed, weatherType) {
-        if (weatherType === 'rainy') {
-            // OGG dosyaları arka planda çaldığı için sentetik bir white noise kontrolüne gerek yok.
-        } else if (weatherType === 'snowy') {
-            if (!this.weatherFilter || !this.weatherGain) return;
-            // Karda hız arttıkça tekerlek hışırtısı (ezilme) sesi artar
-            let targetFreq = 300 + (speed * 10);
-            let targetVolume = speed === 0 ? 0.0 : 0.15 + (speed / 130) * 0.6; // Dururken ses çıkmaz
-            this.weatherFilter.frequency.setValueAtTime(targetFreq, this.ctx.currentTime);
-            this.weatherGain.gain.setValueAtTime(targetVolume, this.ctx.currentTime);
+        if (weatherType === 'snowy' && this.sounds && this.sounds.snowTires) {
+            if (speed > 3) {
+                const targetVol = Math.min(0.65, 0.12 + (speed / 90) * 0.45);
+                if (!this.sounds.snowTires.playing()) {
+                    this.sounds.snowTires.volume(0);
+                    this.sounds.snowTires.play();
+                }
+                this.sounds.snowTires.volume(targetVol);
+            } else if (this.sounds.snowTires.playing()) {
+                this.sounds.snowTires.fade(this.sounds.snowTires.volume(), 0, 200);
+                setTimeout(() => { if (speed <= 3 && this.sounds.snowTires) this.sounds.snowTires.pause(); }, 200);
+            }
+        } else if (this.sounds && this.sounds.snowTires && this.sounds.snowTires.playing()) {
+            this.sounds.snowTires.fade(this.sounds.snowTires.volume(), 0, 200);
+            setTimeout(() => { if (this.sounds.snowTires) this.sounds.snowTires.pause(); }, 200);
         }
     }
     
     // --- SAVRULMA VE ZORLANMA EFEKTİ (SKIDDING) ---
     playTireScreech(intensity) {
-        this.init();
-        if (!this.skidBuffer) {
-            const bufferSize = this.ctx.sampleRate * 1;
-            this.skidBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-            const data = this.skidBuffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
+        if (!this.sounds || !this.sounds.tireScreech) return;
+        const targetVol = Math.min(0.90, Math.max(0.20, intensity * 0.75));
+        if (!this.sounds.tireScreech.playing()) {
+            this.sounds.tireScreech.volume(targetVol);
+            this.sounds.tireScreech.rate(0.95 + Math.random() * 0.15);
+            this.sounds.tireScreech.play();
+        } else {
+            this.sounds.tireScreech.volume(targetVol);
         }
-
-        if (!this.skidSource) {
-            this.skidSource = this.ctx.createBufferSource();
-            this.skidSource.buffer = this.skidBuffer;
-            this.skidSource.loop = true;
-            
-            this.skidFilter = this.ctx.createBiquadFilter();
-            this.skidFilter.type = 'bandpass';
-            this.skidFilter.Q.value = 4.0; // Islıksı/cıyaklama tonu
-            
-            this.skidGain = this.ctx.createGain();
-            this.skidGain.gain.value = 0;
-            
-            this.skidSource.connect(this.skidFilter);
-            this.skidFilter.connect(this.skidGain);
-            if (this.environmentMixer) {
-                this.skidGain.connect(this.environmentMixer);
-            } else {
-                this.skidGain.connect(this.ctx.destination);
-            }
-            this.skidSource.start();
-        }
-        
-        // Åiddete göre sesi ve tonu (pitch) ayarla
-        this.skidGain.gain.setTargetAtTime(intensity * 0.5, this.ctx.currentTime, 0.1);
-        this.skidFilter.frequency.setTargetAtTime(1000 + intensity * 800, this.ctx.currentTime, 0.1);
     }
 
     stopTireScreech() {
-        if (this.skidGain) {
-            this.skidGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
+        if (this.sounds && this.sounds.tireScreech && this.sounds.tireScreech.playing()) {
+            this.sounds.tireScreech.fade(this.sounds.tireScreech.volume(), 0, 150);
+            setTimeout(() => { if (this.sounds.tireScreech) this.sounds.tireScreech.pause(); }, 150);
         }
     }
 

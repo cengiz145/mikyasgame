@@ -41,6 +41,7 @@ const BusFleet = {
         },
         {
             id: "bmc_neocity_10m",
+            soundGroup: "city_cummins",
             brand: "BMC",
             model: "Neocity 10M",
             fullName: "BMC Neocity (10 Metre Mahalle)",
@@ -72,7 +73,7 @@ const BusFleet = {
         },
         {
             id: "mercedes_conecto_12m",
-            soundGroup: "articulated",
+            soundGroup: "conecto_solo",
             brand: "Mercedes-Benz",
             model: "Conecto 12M",
             fullName: "Mercedes-Benz Conecto (12 Metre)",
@@ -104,6 +105,7 @@ const BusFleet = {
         },
         {
             id: "mercedes_conecto_g",
+            soundGroup: "articulated",
             brand: "Mercedes-Benz",
             model: "Conecto G 18M",
             fullName: "Mercedes-Benz Conecto G (18 Metre Körüklü)",
@@ -234,6 +236,7 @@ const BusFleet = {
         },
         {
             id: "setra_topclass_s516",
+            soundGroup: "pure_v6",
             brand: "Setra",
             model: "S 516 HDH TopClass",
             fullName: "Setra S 516 HDH TopClass (Çift Dingil VIP)",
@@ -330,6 +333,7 @@ const BusFleet = {
         },
         {
             id: "temsa_safir_plus",
+            soundGroup: "daf_paccar",
             brand: "Temsa",
             model: "Safir Plus",
             fullName: "Temsa Safir Plus (2+1 VIP)",
@@ -356,12 +360,13 @@ const BusFleet = {
                 hornSound: "air",
                 cabinDamping: 0.70,
                 retarderPitch: 0.95,
-                engineSample: "bassrolanti",
-                character: "450 HP DAF motor homurtusu + ZF İntarder ıslığı ve havalı korna"
+                engineSample: "daf_paccar",
+                character: "450 HP DAF PACCAR MX-11 homurtusu + ZF İntarder ıslığı ve havalı korna"
             }
         },
-{
+        {
             id: "scania_irizar_i8",
+            soundGroup: "scania_dc13",
             brand: "Scania",
             model: "Irizar i8 VIP",
             fullName: "Scania Irizar i8 VIP (Otogar Peron Kralı)",
@@ -388,12 +393,13 @@ const BusFleet = {
                 hornSound: "air",
                 cabinDamping: 0.70,
                 retarderPitch: 1.0,
-                engineSample: "coach_terminal_idle",
-                character: "490 HP Scania rölanti homurtusu + Otogar peron hava tahliyesi ve gür havalı korna"
+                engineSample: "scania_dc13",
+                character: "490 HP Scania DC13 derin torklu İsveç rölantisi + Otogar peron hava tahliyesi ve gür havalı korna"
             }
         },
         {
             id: "neoplan_cityliner",
+            soundGroup: "man_d26",
             brand: "Neoplan",
             model: "Cityliner",
             fullName: "Neoplan Cityliner (Fütüristik Lüks)",

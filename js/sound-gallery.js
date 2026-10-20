@@ -15,126 +15,158 @@ const SoundGallery = {
 
     // Ses Listesi Veritabanı
     sounds: [
-        // --- GRUP 1: SAF AĞIR VASITA V6 DİZEL RÖLANTİSİ (TOK TIR-TIR-TIR) ---
+        // --- 10 GRUP MODEL VE MOTOR BİREBİR EŞLEŞTİRİLMİŞ GERÇEK RÖLANTİ SESLERİ ---
+        // GRUP 1: MERCEDES-BENZ TRAVEGO & SETRA TOPCLASS (SAF DAIMLER OM 470/471 V6)
         {
             id: 'engine_pure_v6_travego',
             category: 'engine',
-            soundGroup: 'Grup 1: Saf V6 Rölantisi',
-            title: 'Grup 1: Mercedes-Benz Travego 16 SHD (Saf Tır-Tır-Tır)',
+            soundGroup: 'Grup 1: Saf Daimler V6 Rölantisi',
+            title: 'Grup 1: Mercedes Travego 16 SHD & Setra S 516',
             busId: 'mercedes_travego_16shd',
             icon: '⚙️',
-            specs: 'OM 470 LA Euro 6, 456 HP - Kesintisiz Saf Rölanti',
-            desc: 'Sadece motorun ritmik ve tok dizel çalışma homurtusu (tır-tır-tır-tır). Başka hiçbir yabancı ses içermez. [Setra S 516 ile ortak grup]',
+            specs: 'OM 470 / OM 471 BlueTec Euro 6 - Kesintisiz Saf Rölanti',
+            desc: 'Daimler V6/sıralı 6 motorunun pürüzsüz, ritmik uzun yol dizel tınısı (tır-tır-tır). [Travego ve Setra TopClass VIP]',
             type: 'pure_v6',
             file: 'sounds/freesound_pure_bus_idle.mp3',
             playbackRate: 1.0,
             bassBoost: 4
         },
-        // --- GRUP 2: OTOGAR PERON VE HAVA TAHLİYELİ KALKIŞ RÖLANTİSİ ---
+        // GRUP 2: MERCEDES-BENZ TOURISMO (OTOGAR PERON RÖLANTİSİ VE HAVA TAHLİYESİ)
         {
             id: 'engine_terminal_tourismo',
             category: 'engine',
             soundGroup: 'Grup 2: Otogar Peron Rölantisi',
-            title: 'Grup 2: Mercedes-Benz Tourismo (Otogar Peron & Hava Tahliyeli)',
+            title: 'Grup 2: Mercedes-Benz Tourismo 16 RHD',
             busId: 'mercedes_tourismo_16rhd',
             icon: '🛣️',
             specs: 'OM 936 Euro 6, 354 HP - Orijinal Peron Kalkış ve Hava Tahliyeli Ses',
-            desc: 'Peronda kalkış öncesi hava tahliye tıslaması ve ardından devam eden tok uzun yol dizel rölantisi. [Scania Irizar ve Neoplan ile ortak]',
+            desc: 'Otogar peronunda kalkış öncesi hava tahliye tıslaması ve ardından devam eden tok uzun yol dizel rölantisi.',
             type: 'coach_terminal',
             file: 'sounds/freesound_coach_idle.mp3',
             playbackRate: 1.0,
             bassBoost: 4
         },
-        {
-            id: 'engine_terminal_scania',
-            category: 'engine',
-            soundGroup: 'Grup 2: Otogar Peron Rölantisi',
-            title: 'Grup 2: Scania Irizar i8 VIP (Otogar Peron Kralı)',
-            busId: 'scania_irizar_i8',
-            icon: '👑',
-            specs: 'Scania DC13 Euro 6, 490 HP - VIP Uzun Yol Rölantisi',
-            desc: '13 litrelik dev Scania motorunun hava tahliyeli güçlü otogar peron çalışması.',
-            type: 'coach_terminal',
-            file: 'sounds/freesound_coach_idle.mp3',
-            playbackRate: 0.98,
-            bassBoost: 5
-        },
-        // --- GRUP 3: EFSANE V8 ÇİFT EGZOZ DERİN BAS RÖLANTİSİ ---
+        // GRUP 3: MERCEDES-BENZ O 403 RHD (EFSANEVİ OM 442 V8 ÇİFT EGZOZ BASI)
         {
             id: 'engine_v8_o403',
             category: 'engine',
             soundGroup: 'Grup 3: Efsane V8 Derin Bas',
-            title: 'Grup 3: Mercedes-Benz O 403 RHD (Efsane V8 Bas)',
+            title: 'Grup 3: Mercedes-Benz O 403 RHD (Yolların Efsanesi V8)',
             busId: 'mercedes_o403_rhd',
             icon: '⭐',
-            specs: 'OM 442 LA V8, 381 HP - Efsanevi V8 Çift Egzoz Bas Sesi',
-            desc: '90\'ların ve 2000\'lerin kralı. Yeri göğü titreten o meşhur derin V8 çift egzoz bas homurtusu. [Temsa Safir ile ortak]',
+            specs: 'OM 442 LA V8 Turbo Intercooler, 381 HP - Efsanevi V8 Çift Egzoz Bas Sesi',
+            desc: '90 ve 2000\'lerin kralı. Yeri göğü titreten o meşhur derin V8 çift egzoz bas homurtusu. Sadece gerçek O 403\'e özeldir.',
             type: 'v8_bass',
             file: 'sounds/bassrolanti.mp3',
             playbackRate: 0.91,
             bassBoost: 7
         },
-        // --- GRUP 4: MODERN ALÇAK TABANLI ŞEHİR İÇİ BELEDİYE & CUMMINS RÖLANTİSİ ---
+        // GRUP 4: OTOKAR KENT LF & BMC NEOCITY (CUMMINS ISB BELEDİYE)
         {
             id: 'engine_city_kent',
             category: 'engine',
-            soundGroup: 'Grup 4: Şehir İçi Belediye Rölantisi',
-            title: 'Grup 4: Otokar Kent LF Solo (Cummins Belediye)',
+            soundGroup: 'Grup 4: Cummins Şehir İçi Belediye',
+            title: 'Grup 4: Otokar Kent LF & BMC Neocity (Cummins ISB)',
             busId: 'otokar_kent_lf',
             icon: '🏙️',
-            specs: 'Cummins ISB6.7 Euro 6, 280 HP - Alçak Tabanlı Şehir İçi',
-            desc: 'Freesound New Bus Engine: Alçak tabanlı belediye otobüsünün durağa yanaşırken ve dururken çıkardığı Cummins turbo/dizel sesi. [BMC Neocity ile ortak]',
+            specs: 'Cummins ISB6.7 & 4.5L Euro 6 - Alçak Tabanlı Şehir İçi',
+            desc: 'Alçak tabanlı şehir içi belediye otobüsünün durağa yanaşırken ve dururken çıkardığı Cummins turbo/dizel sesi.',
             type: 'city_cummins',
             file: 'sounds/freesound_new_bus_idle.mp3',
             playbackRate: 1.0,
             bassBoost: 1
         },
-        // --- GRUP 5: 18 METRE AĞIR KÖRÜKLÜ & BÜYÜK METROPOL TRANSIT RÖLANTİSİ ---
+        // GRUP 5: MERCEDES-BENZ CONECTO 12M SOLO (OM 936 SOLO ŞEHİR İÇİ)
+        {
+            id: 'engine_conecto_solo',
+            category: 'engine',
+            soundGroup: 'Grup 5: Mercedes Solo Belediye',
+            title: 'Grup 5: Mercedes-Benz Conecto 12M Solo (OM 936)',
+            busId: 'mercedes_conecto_12m',
+            icon: '🚌',
+            specs: 'OM 936 Euro 6, 299 HP - 12 Metre Solo Belediye',
+            desc: '12 metrelik solo Conecto\'nun tok ve pürüzsüz Alman OM 936 motor sesi ve sessiz şehir içi rölantisi.',
+            type: 'conecto_solo',
+            file: 'sounds/freesound_engine_city.mp3',
+            playbackRate: 1.0,
+            bassBoost: 3
+        },
+        // GRUP 6: MERCEDES-BENZ CONECTO G 18M KÖRÜKLÜ (AĞIR TRANSİT BASI)
         {
             id: 'engine_articulated_conecto',
             category: 'engine',
-            soundGroup: 'Grup 5: 18m Körüklü Ağır Transit',
-            title: 'Grup 5: Mercedes-Benz Conecto G (18m Körüklü Transit Bası)',
+            soundGroup: 'Grup 6: 18m Körüklü Ağır Transit',
+            title: 'Grup 6: Mercedes-Benz Conecto G (18m Körüklü Transit Bası)',
             busId: 'mercedes_conecto_g',
             icon: '🚃',
             specs: 'OM 470, 360 HP - 18 Metre Körüklü Ağır Metropol Bası',
-            desc: 'Freesound Articulated Idle: 18 metrelik ağır gövdeyi çeken 10.7 litrelik motorun devasa kütleli ve hırıltılı transit rölantisi. [Conecto Solo ile ortak]',
+            desc: '18 metrelik ağır körüklü gövdeyi çeken 10.7 litrelik motorun devasa kütleli ve hırıltılı transit rölantisi.',
             type: 'articulated',
             file: 'sounds/freesound_articulated_idle.mp3',
             playbackRate: 0.90,
             bassBoost: 5
         },
-        // --- GRUP 6: KASABA, İLÇE VE KÖY ÇEVİK MİDİBÜS DİZEL RÖLANTİSİ ---
+        // GRUP 7: MAN LION\'S COACH & NEOPLAN CITYLINER (MAN D2676 BAVYERA DİZELİ)
+        {
+            id: 'engine_man_d26',
+            category: 'engine',
+            soundGroup: 'Grup 7: MAN D26 Ağır Bavyera',
+            title: 'Grup 7: MAN Lion\'s Coach & Neoplan Cityliner',
+            busId: 'man_lions_coach',
+            icon: '🦁',
+            specs: 'MAN D2676 Euro 6, 470 HP - Endüstriyel Bavyera Dizeli',
+            desc: 'Sert, otoriter, doğrudan motor ızgarasından gelen kalın ve gür Bavyera dizel homurtusu. Neoplan MAN üretimi olduğu için D26 kullanır.',
+            type: 'man_d26',
+            file: 'sounds/freesound_heavy_man_idle.mp3',
+            playbackRate: 0.96,
+            bassBoost: 5
+        },
+        // GRUP 8: TEMSA SAFİR PLUS (DAF PACCAR MX-11 450 HP)
+        {
+            id: 'engine_daf_safir',
+            category: 'engine',
+            soundGroup: 'Grup 8: DAF PACCAR Uzun Yol',
+            title: 'Grup 8: Temsa Safir Plus (DAF PACCAR MX-11)',
+            busId: 'temsa_safir_plus',
+            icon: '💎',
+            specs: 'DAF PACCAR MX-11 Euro 6, 450 HP - 6 Silindir Ağır Dizel',
+            desc: 'Temsa Safir\'in hak ettiği orijinal DAF motoru. Tok ve gırtlaktan gelen 6 silindir DAF homurtusu. Asla V8 değildir.',
+            type: 'daf_paccar',
+            file: 'sounds/freesound_daf_paccar_idle.mp3',
+            playbackRate: 1.0,
+            bassBoost: 5
+        },
+        // GRUP 9: SCANIA IRIZAR i8 VIP (SCANIA DC13 13 LITRE DERİN İSVEÇ TORKU)
+        {
+            id: 'engine_scania_dc13',
+            category: 'engine',
+            soundGroup: 'Grup 9: Scania DC13 İsveç Torku',
+            title: 'Grup 9: Scania Irizar i8 VIP (Otogar Peron Kralı)',
+            busId: 'scania_irizar_i8',
+            icon: '👑',
+            specs: 'Scania DC13 Euro 6, 490 HP - 13 Litre Dev İsveç Dizeli',
+            desc: 'İsveç mühendisliği 13 litrelik dev Scania motorunun o meşhur düşük devirli, derin göğüslü tork homurtusu.',
+            type: 'scania_dc13',
+            file: 'sounds/freesound_scania_dc13_idle.mp3',
+            playbackRate: 0.98,
+            bassBoost: 6
+        },
+        // GRUP 10: ISUZU NOVO LUX (4 SILINDIR SERI KASABA MİDİBÜSÜ)
         {
             id: 'engine_midibus_novo',
             category: 'engine',
-            soundGroup: 'Grup 6: Çevik Midibüs Rölantisi',
-            title: 'Grup 6: Isuzu Novo Lux Midibüs (4 Silindir Kasaba Dizeli)',
+            soundGroup: 'Grup 10: Çevik Midibüs Rölantisi',
+            title: 'Grup 10: Isuzu Novo Lux Midibüs (4HK1)',
             busId: 'isuzu_novo_lux',
             icon: '🚐',
             specs: 'Isuzu 4HK1-TCS, 190 HP - 4 Silindir Japon Dizeli',
-            desc: 'Freesound Midibus Idle: Trakya köyleri ve kasaba hatlarının küçük hacimli, daha seri ve tiz vuran 4 silindirli dizel midibüs sesi.',
+            desc: 'Trakya kasaba ve köy hatlarının küçük hacimli, daha seri ve tiz vuran 4 silindirli dizel midibüs sesi.',
             type: 'midibus',
             file: 'sounds/freesound_midibus_idle.mp3',
             playbackRate: 1.05,
             bassBoost: 1
         },
-        // --- GRUP 7: AĞIR BAVYERA D26 ENDÜSTRİYEL DİZEL RÖLANTİSİ ---
-        {
-            id: 'engine_man_d26',
-            category: 'engine',
-            soundGroup: 'Grup 7: Ağır Bavyera D26',
-            title: 'Grup 7: MAN Lion\'s Coach (470 HP Ağır Bavyera Dizeli)',
-            busId: 'man_lions_coach',
-            icon: '🦁',
-            specs: 'D2676 LOH Euro 6, 470 HP - Endüstriyel Bavyera Dizeli',
-            desc: 'Freesound Heavy Truck Idle: Sert, otoriter, doğrudan motor ızgarasından gelen kalın ve gür Bavyera dizel homurtusu.',
-            type: 'man_d26',
-            file: 'sounds/freesound_heavy_man_idle.mp3',
-            playbackRate: 0.96,
-            bassBoost: 4
-        },
-
+        
         // --- AKBİL VE KART OKUYUCU (VALIDATOR) SESLERİ ---
         {
             id: 'akbil_tam',
@@ -276,8 +308,8 @@ const SoundGallery = {
             category: 'effect',
             title: 'Freesound Asfalt Yol & Kabin Lastik Yuvarlanması',
             icon: '🛣️',
-            specs: 'Freesound #352863 Orijinal Asfalt Sürüş Kaydı',
-            desc: 'Otobüs asfalt yolda seyrederken kabin içine gelen o tok, tatlı lastik ve asfalt sürtünme sesi.',
+            specs: 'Freesound #566284 Orijinal Pürüzsüz Asfalt Sürüş Kaydı',
+            desc: 'Otobüs asfalt yolda seyrederken kabin içine gelen pürüzsüz ve gerçekçi lastik yuvarlanma sesi.',
             is10Seconds: true,
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.roadAsphalt) {
@@ -287,16 +319,33 @@ const SoundGallery = {
                 }
             }
         },
-        {
-            id: 'road_tikir_joint',
+                {
+            id: 'bus_cabin_ambience',
             category: 'effect',
-            title: 'Freesound Asfalt & Köprü Derzi (Tıkır Tıkır Sesi)',
-            icon: '🌉',
-            specs: 'Freesound #866213 Orijinal Köprü ve Yol Bağlantı Kaydı',
-            desc: 'Otobüs giderken asfalt üzerindeki genleşme derzlerinden ve köprü bağlantılarından geçerken çıkan o ritmik tıkır tıkır sesi.',
+            title: 'Freesound Otobüs İçi Yolcu & Kabin Ambiyansı',
+            icon: '👥',
+            specs: 'Freesound #379370 Orijinal Otobüs Yolcu Kabin Kaydı',
+            desc: 'Otobüs seyir halindeyken içeride oluşan gerçekçi yolcu hareketleri, hafif uğultu ve doğal kabin atmosferi.',
+            is10Seconds: true,
             playFn: () => {
-                if (typeof audio !== 'undefined' && audio.playRoadJointHit) {
-                    audio.playRoadJointHit(55);
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.cabinAmbience) {
+                    audio.sounds.cabinAmbience.volume(0.65);
+                    audio.sounds.cabinAmbience.play();
+                }
+            }
+        },
+        {
+            id: 'city_ambience',
+            category: 'effect',
+            title: 'Freesound Sakin Şehir & Mahalle Çevre Ambiyansı',
+            icon: '🌳',
+            specs: 'Freesound #135074 Orijinal Şehir & Kuş Cıvıltısı Kaydı',
+            desc: 'Otobüs durakta beklerken veya şehir içinde sakince ilerlerken dışarıdan gelen huzurlu kuş sesleri, hafif esinti ve sakin cadde atmosferi.',
+            is10Seconds: true,
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.cityAmbience) {
+                    audio.sounds.cityAmbience.volume(0.65);
+                    audio.sounds.cityAmbience.play();
                 }
             }
         },
@@ -305,7 +354,7 @@ const SoundGallery = {
             category: 'effect',
             title: 'Freesound Çakıllı Yol Sürüşü',
             icon: '🪨',
-            specs: 'Freesound #281512 Orijinal Çakıl Zemin Kaydı',
+            specs: 'Freesound #251662 Orijinal Çakıl Zemin Lastik Kaydı',
             desc: 'Otobüsün çakıllı ve taşlı yollarda ilerlerken lastiklerin altından gelen çıtır çıtır çakıl ezilme sesi.',
             is10Seconds: true,
             playFn: () => {
@@ -321,7 +370,7 @@ const SoundGallery = {
             category: 'effect',
             title: 'Freesound Kumlu ve Toprak Yol Sürüşü',
             icon: '🏜️',
-            specs: 'Freesound #233076 Orijinal Kum ve Asfalt Serpinti Kaydı',
+            specs: 'Freesound #637192 Orijinal Toprak Yol Kabin Kaydı',
             desc: 'Kumlu, gevşek zeminlerde ve toprak yollarda tekerleklerin çıkardığı yumuşak ve hışırtılı sürüş sesi.',
             is10Seconds: true,
             playFn: () => {
@@ -333,11 +382,39 @@ const SoundGallery = {
             }
         },
         {
+            id: 'tire_screech',
+            category: 'effect',
+            title: 'Freesound Gerçek Lastik Kayma & Savrulma',
+            icon: '🛑',
+            specs: 'Freesound #271337 Orijinal Lastik Kayma Kaydı',
+            desc: 'Sert fren yapıldığında veya virajlarda tekerleklerin asfaltta çıkardığı gerçek sürtünme sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playTireScreech) {
+                    audio.playTireScreech(1.0);
+                }
+            }
+        },
+        {
+            id: 'snow_tires',
+            category: 'effect',
+            title: 'Freesound Karda Sürüş & Kar Ezilme Sesi',
+            icon: '❄️',
+            specs: 'Freesound #71099 Orijinal Kar Zemin Lastik Kaydı',
+            desc: 'Karlı havalarda lastiklerin altındaki taze karın ezilmesiyle oluşan çıtır çıtır kış sürüşü sesi.',
+            is10Seconds: true,
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.snowTires) {
+                    audio.sounds.snowTires.volume(0.70);
+                    audio.sounds.snowTires.play();
+                }
+            }
+        },
+        {
             id: 'road_wind',
             category: 'effect',
-            title: 'Freesound Hız Rüzgarı & Açık Cam Ambiyansı',
+            title: 'Freesound Doğal Çevre Rüzgar Esintisi',
             icon: '💨',
-            specs: 'Freesound #51247 Orijinal Yol Rüzgarı Kaydı',
+            specs: 'Freesound #697217 Orijinal Doğal Rüzgar Esintisi Kaydı',
             desc: 'Hızlandıkça kabin etrafında esen aerodinamik rüzgar sesi ve sürücü penceresi açıldığında içeri dolan canlı hava akımı.',
             is10Seconds: true,
             playFn: () => {
@@ -426,7 +503,7 @@ const SoundGallery = {
 
         // AudioContext uyandır
         if (typeof audio !== 'undefined' && audio.ctx && audio.ctx.state === 'suspended') {
-            audio.ctx.resume();
+            if (audio.ctx && audio.ctx.state === 'suspended') audio.ctx.resume().catch(() => {});
         }
 
         this.renderModal(this.currentTab);
@@ -653,7 +730,7 @@ const SoundGallery = {
 
         try {
             const ctx = (typeof audio !== 'undefined' && audio.ctx) ? audio.ctx : (Howler.ctx || new (window.AudioContext || window.webkitAudioContext)());
-            if (ctx.state === 'suspended') ctx.resume();
+            if (ctx.state === 'suspended') ctx.resume().catch(() => {});
 
             let targetBuffer = null;
             if (typeof audio !== 'undefined') {
