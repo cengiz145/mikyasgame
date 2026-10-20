@@ -12,7 +12,9 @@ class AudioSystem {
         this.engineCabinFilter = null;
         this.activeSoundProfile = null;
         this.retarderOsc = null;
+        this.retarderOsc2 = null;
         this.retarderFilter = null;
+        this.retarderFilter2 = null;
         this.retarderGain = null;
         
         this.isEngineRunning = false;
@@ -407,34 +409,68 @@ class AudioSystem {
         }
 
         if (!this.retarderOsc) {
+            // Gerçek Voith / ZF Hidrolik Retarder Akustiği (Çift Harmonik Türbin Islığı)
             this.retarderOsc = this.ctx.createOscillator();
-            this.retarderOsc.type = 'sawtooth';
+            this.retarderOsc.type = 'sine'; // Ana hidrolik girdap frekansı
+            this.retarderOsc2 = this.ctx.createOscillator();
+            this.retarderOsc2.type = 'triangle'; // Şanzıman dişli ve türbin ıslığı harmonisi
+
             this.retarderFilter = this.ctx.createBiquadFilter();
             this.retarderFilter.type = 'bandpass';
-            this.retarderFilter.Q.value = 4.2;
+            this.retarderFilter.Q.value = 5.5;
+
+            this.retarderFilter2 = this.ctx.createBiquadFilter();
+            this.retarderFilter2.type = 'peaking';
+            this.retarderFilter2.gain.value = 6;
+            this.retarderFilter2.Q.value = 4.0;
+
             this.retarderGain = this.ctx.createGain();
             this.retarderGain.gain.value = 0.0;
 
             this.retarderOsc.connect(this.retarderFilter);
+            this.retarderOsc2.connect(this.retarderFilter2);
             this.retarderFilter.connect(this.retarderGain);
+            this.retarderFilter2.connect(this.retarderGain);
+
             if (this.environmentMixer) this.retarderGain.connect(this.environmentMixer);
             else this.retarderGain.connect(this.ctx.destination);
+
             this.retarderOsc.start();
+            this.retarderOsc2.start();
+            this.wasRetarderEngaged = false;
         }
 
         const isEngaged = (speed > 20 && isBraking) || (this.isRetarderManuallyEngaged && speed > 15);
         if (isEngaged) {
             const pitchFactor = profile && profile.retarderPitch ? profile.retarderPitch : 1.0;
-            const baseF = pitchFactor * (360 + (speed / 90) * 880);
-            const targetGain = Math.min(0.32, (speed / 65) * 0.32);
-            this.retarderOsc.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.08);
-            this.retarderFilter.frequency.setTargetAtTime(baseF * 1.25, this.ctx.currentTime, 0.08);
-            this.retarderGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.12);
+            const cabinDamping = profile && profile.cabinDamping ? profile.cabinDamping : 0.8;
+            // Hıza bağlı gerçekçi Voith türbin frekans kayması
+            const baseF = pitchFactor * (320 + Math.pow(speed / 90, 1.1) * 780);
+            const harmF = baseF * 1.5;
 
+            this.retarderOsc.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.06);
+            this.retarderOsc2.frequency.setTargetAtTime(harmF, this.ctx.currentTime, 0.06);
+
+            this.retarderFilter.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.06);
+            this.retarderFilter2.frequency.setTargetAtTime(harmF, this.ctx.currentTime, 0.06);
+
+            const targetGain = Math.min(0.28, (speed / 70) * 0.28) * cabinDamping;
+            this.retarderGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.10);
+
+            this.wasRetarderEngaged = true;
             const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
             if (el) el.style.display = 'inline-block';
         } else {
-            this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.22);
+            if (this.wasRetarderEngaged && speed > 30) {
+                // Retarder boşa çıktığında gerçekçi pnomatik hava tahliyesi
+                this.wasRetarderEngaged = false;
+                if (typeof this.playAirBrake === 'function') {
+                    try { this.playAirBrake(); } catch(e){}
+                }
+            } else {
+                this.wasRetarderEngaged = false;
+            }
+            this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.20);
             const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
             if (el) el.style.display = 'none';
         }
