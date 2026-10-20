@@ -122,4 +122,8 @@ Write-Host "Artik GitHub Pages adresinde siteniz ve oyunlariniz canli yayinda." 
 Write-Host "===================================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Cikmak icin bir tusa basin..."
-$Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
+try {
+    $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown") | Out-Null
+} catch {
+    Start-Sleep -Seconds 1
+}
