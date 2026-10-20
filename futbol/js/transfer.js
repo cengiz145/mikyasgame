@@ -356,6 +356,7 @@ function renderTransferPlayers(targetTeamId, oldSearchParam) {
             if (powFilter === 'rotation') return pPow < 70;
             return true;
         });
+    }
     if (valFilter) {
         targetPlayers = targetPlayers.filter(p => {
             let price = calculatePrice(p);
