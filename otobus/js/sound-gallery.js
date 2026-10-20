@@ -350,11 +350,39 @@ const SoundGallery = {
             }
         },
         {
+            id: 'tire_screech',
+            category: 'effect',
+            title: 'Freesound Gerçek Lastik Kayma & Savrulma',
+            icon: '🛑',
+            specs: 'Freesound #271337 Orijinal Lastik Kayma Kaydı',
+            desc: 'Sert fren yapıldığında veya virajlarda tekerleklerin asfaltta çıkardığı gerçek sürtünme sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playTireScreech) {
+                    audio.playTireScreech(1.0);
+                }
+            }
+        },
+        {
+            id: 'snow_tires',
+            category: 'effect',
+            title: 'Freesound Karda Sürüş & Kar Ezilme Sesi',
+            icon: '❄️',
+            specs: 'Freesound #71099 Orijinal Kar Zemin Lastik Kaydı',
+            desc: 'Karlı havalarda lastiklerin altındaki taze karın ezilmesiyle oluşan çıtır çıtır kış sürüşü sesi.',
+            is10Seconds: true,
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.snowTires) {
+                    audio.sounds.snowTires.volume(0.70);
+                    audio.sounds.snowTires.play();
+                }
+            }
+        },
+        {
             id: 'road_wind',
             category: 'effect',
-            title: 'Freesound Hız Rüzgarı & Açık Cam Ambiyansı',
+            title: 'Freesound Doğal Çevre Rüzgar Esintisi',
             icon: '💨',
-            specs: 'Freesound #51247 Orijinal Yol Rüzgarı Kaydı',
+            specs: 'Freesound #697217 Orijinal Doğal Rüzgar Esintisi Kaydı',
             desc: 'Hızlandıkça kabin etrafında esen aerodinamik rüzgar sesi ve sürücü penceresi açıldığında içeri dolan canlı hava akımı.',
             is10Seconds: true,
             playFn: () => {

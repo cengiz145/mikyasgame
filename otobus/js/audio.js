@@ -114,6 +114,9 @@ class AudioSystem {
             rain11: new Howl({ src: ['sounds/rain11.ogg'], loop: true, volume: 0 }),
             // Freesound Gerçek Çevre ve Yol Sesleri (Asfalt, Çakıl, Kum, Rüzgar, Derz)
 // Freesound Gerçek Çevre ve Yol Sesleri (Doğal Şehir Ambiyansı, Kuş Sesleri, Asfalt, Rüzgar)
+                        tireScreech: new Howl({ src: ['sounds/freesound_tire_screech.mp3'], loop: false, volume: 0.85 }),
+            snowTires: new Howl({ src: ['sounds/freesound_snow_tires.mp3'], loop: true, volume: 0 }),
+            beachShore: new Howl({ src: ['sounds/freesound_beach_shore.mp3'], loop: true, volume: 0 }),
             cabinAmbience: new Howl({ src: ['sounds/freesound_bus_cabin_ambience.mp3'], loop: true, volume: 0 }),
             cityAmbience: new Howl({ src: ['sounds/freesound_city_ambience.mp3', 'sounds/street1.ogg'], loop: true, volume: 0 }),
             roadAsphalt: new Howl({ src: ['sounds/freesound_road_asphalt.mp3'], loop: true, volume: 0 }),
@@ -647,7 +650,8 @@ startEngine() {
         this.tireFilter.connect(this.tireGain);
         this.tireGain.connect(this.environmentMixer); // Connect to environment mixer so windows affect it
 
-        this.tireNoiseSource.start();
+        // Yapay brown noise kaldirildi, gercek ses kayitlari kullaniliyor
+        this.tireGain.gain.value = 0;
     }
 
     updateTireNoise(speed, roadType) {
@@ -773,7 +777,7 @@ startEngine() {
         this.tireFilter.type = 'lowpass';
         this.tireFilter.frequency.setTargetAtTime(cutoff, this.ctx.currentTime, 0.1);
         this.tireFilter.Q.setTargetAtTime(1.0, this.ctx.currentTime, 0.1);
-        this.tireGain.gain.setTargetAtTime(subGain, this.ctx.currentTime, 0.1);
+        this.tireGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.1); // Yapay gurultu susturuldu
     }
 
     playRoadJointHit(speed = 45) {
@@ -936,60 +940,41 @@ startEngine() {
     }
 
     updateWeatherSound(speed, weatherType) {
-        if (weatherType === 'rainy') {
-            // OGG dosyaları arka planda çaldığı için sentetik bir white noise kontrolüne gerek yok.
-        } else if (weatherType === 'snowy') {
-            if (!this.weatherFilter || !this.weatherGain) return;
-            // Karda hız arttıkça tekerlek hışırtısı (ezilme) sesi artar
-            let targetFreq = 300 + (speed * 10);
-            let targetVolume = speed === 0 ? 0.0 : 0.15 + (speed / 130) * 0.6; // Dururken ses çıkmaz
-            this.weatherFilter.frequency.setValueAtTime(targetFreq, this.ctx.currentTime);
-            this.weatherGain.gain.setValueAtTime(targetVolume, this.ctx.currentTime);
+        if (weatherType === 'snowy' && this.sounds && this.sounds.snowTires) {
+            if (speed > 3) {
+                const targetVol = Math.min(0.65, 0.12 + (speed / 90) * 0.45);
+                if (!this.sounds.snowTires.playing()) {
+                    this.sounds.snowTires.volume(0);
+                    this.sounds.snowTires.play();
+                }
+                this.sounds.snowTires.volume(targetVol);
+            } else if (this.sounds.snowTires.playing()) {
+                this.sounds.snowTires.fade(this.sounds.snowTires.volume(), 0, 200);
+                setTimeout(() => { if (speed <= 3 && this.sounds.snowTires) this.sounds.snowTires.pause(); }, 200);
+            }
+        } else if (this.sounds && this.sounds.snowTires && this.sounds.snowTires.playing()) {
+            this.sounds.snowTires.fade(this.sounds.snowTires.volume(), 0, 200);
+            setTimeout(() => { if (this.sounds.snowTires) this.sounds.snowTires.pause(); }, 200);
         }
     }
     
     // --- SAVRULMA VE ZORLANMA EFEKTİ (SKIDDING) ---
     playTireScreech(intensity) {
-        this.init();
-        if (!this.skidBuffer) {
-            const bufferSize = this.ctx.sampleRate * 1;
-            this.skidBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-            const data = this.skidBuffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
-            }
+        if (!this.sounds || !this.sounds.tireScreech) return;
+        const targetVol = Math.min(0.90, Math.max(0.20, intensity * 0.75));
+        if (!this.sounds.tireScreech.playing()) {
+            this.sounds.tireScreech.volume(targetVol);
+            this.sounds.tireScreech.rate(0.95 + Math.random() * 0.15);
+            this.sounds.tireScreech.play();
+        } else {
+            this.sounds.tireScreech.volume(targetVol);
         }
-
-        if (!this.skidSource) {
-            this.skidSource = this.ctx.createBufferSource();
-            this.skidSource.buffer = this.skidBuffer;
-            this.skidSource.loop = true;
-            
-            this.skidFilter = this.ctx.createBiquadFilter();
-            this.skidFilter.type = 'bandpass';
-            this.skidFilter.Q.value = 4.0; // Islıksı/cıyaklama tonu
-            
-            this.skidGain = this.ctx.createGain();
-            this.skidGain.gain.value = 0;
-            
-            this.skidSource.connect(this.skidFilter);
-            this.skidFilter.connect(this.skidGain);
-            if (this.environmentMixer) {
-                this.skidGain.connect(this.environmentMixer);
-            } else {
-                this.skidGain.connect(this.ctx.destination);
-            }
-            this.skidSource.start();
-        }
-        
-        // Åiddete göre sesi ve tonu (pitch) ayarla
-        this.skidGain.gain.setTargetAtTime(intensity * 0.5, this.ctx.currentTime, 0.1);
-        this.skidFilter.frequency.setTargetAtTime(1000 + intensity * 800, this.ctx.currentTime, 0.1);
     }
 
     stopTireScreech() {
-        if (this.skidGain) {
-            this.skidGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
+        if (this.sounds && this.sounds.tireScreech && this.sounds.tireScreech.playing()) {
+            this.sounds.tireScreech.fade(this.sounds.tireScreech.volume(), 0, 150);
+            setTimeout(() => { if (this.sounds.tireScreech) this.sounds.tireScreech.pause(); }, 150);
         }
     }
 
