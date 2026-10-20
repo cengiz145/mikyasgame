@@ -1,4 +1,4 @@
-
+﻿
 window.getRankInfo = function(xp) {
     if (xp < 100) return { name: 'Çaylak', next: 100 };
     if (xp < 300) return { name: 'Çırak', next: 300 };
@@ -226,31 +226,32 @@ window.currentActiveMenu = 'main';
 
 window.getActiveButtons = function () {
     let buttons = [];
-    if (window.currentActiveMenu === 'main') buttons = Array.from(window.mainMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'scoreboard') buttons = Array.from(window.scoreboardMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'difficulty') buttons = Array.from(window.difficultyMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'practice') buttons = Array.from(window.practiceMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'story') buttons = Array.from(window.storyMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'stats') buttons = Array.from(window.statsMenu.querySelectorAll('.stat-item, .stat-copy-btn, .menu-button'));
-    else if (window.currentActiveMenu === 'store') buttons = Array.from(window.storeMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'achievements') buttons = Array.from(window.achievementsMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'feedback') buttons = Array.from(window.feedbackMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'server-message') buttons = Array.from(window.serverMessageMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
-    else if (window.currentActiveMenu === 'daily-reward') buttons = Array.from(window.dailyRewardMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
-    else if (window.currentActiveMenu === 'first-time-tutorial') buttons = Array.from(window.firstTimeTutorialMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
-    else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('div[tabindex="0"], .menu-button'));
-    else if (window.currentActiveMenu === 'game') buttons = Array.from(window.gameMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'profile') buttons = Array.from(window.profileMenu.querySelectorAll('.stat-item, .stat-copy-btn, .menu-button'));
-    else if (window.currentActiveMenu === 'saved-games') buttons = Array.from(window.savedGamesMenu.querySelectorAll('li[tabindex="0"], .menu-button'));
-    else if (window.currentActiveMenu === 'social') buttons = Array.from(window.socialMenu.querySelectorAll('li[tabindex="0"], .menu-button'));
-    else if (window.currentActiveMenu === 'social-action') buttons = Array.from(document.getElementById('social-action-modal') ? document.getElementById('social-action-modal').querySelectorAll('.menu-button') : []);
-    else if (window.currentActiveMenu === 'play-mode') buttons = Array.from(document.getElementById('play-mode-menu-container').querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'multiplayer-select') buttons = Array.from(document.getElementById('multiplayer-select-menu-container').querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'pvp-rooms') buttons = Array.from(document.getElementById('pvp-rooms-menu-container').querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'pvp-lobby') buttons = Array.from(document.getElementById('pvp-lobby-menu-container').querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'pvp-create') buttons = Array.from(document.getElementById('pvp-create-menu-container').querySelectorAll('.menu-button, input, select'));
-    else if (window.currentActiveMenu === 'update') buttons = Array.from(window.updateMenu.querySelectorAll('.menu-button'));
-    else if (window.currentActiveMenu === 'settings') buttons = Array.from(document.getElementById('settings-menu-container').querySelectorAll('.menu-button, input[type="range"], select'));
+    const getBtns = (el, sel) => el ? Array.from(el.querySelectorAll(sel)) : [];
+
+    if (window.currentActiveMenu === 'main') buttons = getBtns(window.mainMenu, '.menu-button');
+    else if (window.currentActiveMenu === 'scoreboard') buttons = getBtns(window.scoreboardMenu, '.menu-button');
+    else if (window.currentActiveMenu === 'difficulty') buttons = getBtns(window.difficultyMenu, '.menu-button');
+    else if (window.currentActiveMenu === 'practice') buttons = getBtns(window.practiceMenu, '.menu-button');
+    else if (window.currentActiveMenu === 'story') buttons = getBtns(window.storyMenu, '.menu-button');
+    else if (window.currentActiveMenu === 'stats') buttons = getBtns(window.statsMenu, '.stat-item, .stat-copy-btn, .menu-button');
+    else if (window.currentActiveMenu === 'store') buttons = getBtns(window.storeMenu, '.menu-button');
+    else if (window.currentActiveMenu === 'achievements') buttons = getBtns(window.achievementsMenu, '.menu-button');
+    else if (window.currentActiveMenu === 'feedback') buttons = getBtns(window.feedbackMenu, '.menu-button');
+    else if (window.currentActiveMenu === 'server-message') buttons = getBtns(window.serverMessageMenu, 'div[tabindex="0"], .menu-button');
+    else if (window.currentActiveMenu === 'daily-reward') buttons = getBtns(window.dailyRewardMenu, 'div[tabindex="0"], .menu-button');
+    else if (window.currentActiveMenu === 'first-time-tutorial') buttons = getBtns(window.firstTimeTutorialMenu, 'div[tabindex="0"], .menu-button');
+    else if (window.currentActiveMenu === 'update') buttons = getBtns(window.updateMenu, 'div[tabindex="0"], .menu-button');
+    else if (window.currentActiveMenu === 'game') buttons = getBtns(window.gameMenu, '.menu-button');
+    else if (window.currentActiveMenu === 'profile') buttons = getBtns(window.profileMenu, '.stat-item, .stat-copy-btn, .menu-button');
+    else if (window.currentActiveMenu === 'saved-games') buttons = getBtns(window.savedGamesMenu, 'li[tabindex="0"], .menu-button');
+    else if (window.currentActiveMenu === 'social') buttons = getBtns(window.socialMenu, 'li[tabindex="0"], .menu-button');
+    else if (window.currentActiveMenu === 'social-action') buttons = getBtns(document.getElementById('social-action-modal'), '.menu-button');
+    else if (window.currentActiveMenu === 'play-mode') buttons = getBtns(document.getElementById('play-mode-menu-container'), '.menu-button');
+    else if (window.currentActiveMenu === 'multiplayer-select') buttons = getBtns(document.getElementById('multiplayer-select-menu-container'), '.menu-button');
+    else if (window.currentActiveMenu === 'pvp-rooms') buttons = getBtns(document.getElementById('pvp-rooms-menu-container'), '.menu-button');
+    else if (window.currentActiveMenu === 'pvp-lobby') buttons = getBtns(document.getElementById('pvp-lobby-menu-container'), '.menu-button');
+    else if (window.currentActiveMenu === 'pvp-create') buttons = getBtns(document.getElementById('pvp-create-menu-container'), '.menu-button, input, select');
+    else if (window.currentActiveMenu === 'settings') buttons = getBtns(document.getElementById('settings-menu-container'), '.menu-button, input[type="range"], select');
 
     return buttons.filter(btn => {
         const li = btn.closest('li');
@@ -4241,7 +4242,7 @@ if (!window.orijinalAnnounce) {
         const okumaSuresi = Math.max(1500, (siradaki.text.length * 70) + 1000);
         
         // Aşama 1'de kurduğumuz ajan zamanlayıcısını kullanarak sıradaki mesaja geç
-        window.hgfzZamanlayici.setTimeout(() => {
+        (window.hgfzZamanlayici && window.hgfzZamanlayici.setTimeout ? window.hgfzZamanlayici.setTimeout : setTimeout)(() => {
             window.srOkuyorMu = false;
             window.srKuyruguIslet(); // Kuyrukta bekleyen varsa devam et
         }, okumaSuresi);
