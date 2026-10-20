@@ -1048,12 +1048,7 @@ const Game = {
         // Zemin Ses Kaynaklarını Haritaya Yerleştir (3D)
         audio.placeAmbientSources(this.activeRouteData, this.licenseLevel);
         
-        // Motoru Çalıştır
-        if (typeof audio !== 'undefined' && typeof audio.startEngine === 'function') {
-            if (!audio.isEngineRunning) {
-                audio.startEngine();
-            }
-        }
+
         
         this.lastFrameTime = performance.now();
         this.nextNavSoundTime = this.lastFrameTime + 10000 + Math.random() * 20000; // 10-30s sonra ilk ses
@@ -1136,9 +1131,8 @@ const Game = {
             }
             this.isFetchingRoute = true;
 
-            // OSRM HESAPLAMASI BAŞLIYOR (Geçici olarak oyunu duraklat)
+            // OSRM HESAPLAMASI (Arka planda çalışır, aracı duraklatmaz)
             const wasDriving = this.isDriving;
-            this.isDriving = false; // Rota hesaplanana kadar otobüs hareket etmesin
             
             // Eğer sanayi menüsünde falan değilsek, sesli ve görsel bilgi ver
             if (!document.getElementById('garage-screen').classList.contains('hidden') === false) {
@@ -1157,7 +1151,12 @@ const Game = {
             }
 
             this.routeBumps = [];
-            let fallbackDistance = (this.currentStopIndex === 0) ? nextStop.gercekMesafeSonraki * 1000 : this.activeRouteData.stops[this.currentStopIndex - 1].gercekMesafeSonraki * 1000;
+            let fallbackDistance = (this.currentStopIndex === 0) 
+                ? (nextStop.gercekMesafeSonraki ? nextStop.gercekMesafeSonraki * 1000 : 500) 
+                : (this.activeRouteData.stops[this.currentStopIndex - 1].gercekMesafeSonraki ? this.activeRouteData.stops[this.currentStopIndex - 1].gercekMesafeSonraki * 1000 : 500);
+            if (!this.currentDistanceToNext || this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
+                this.currentDistanceToNext = fallbackDistance || 500;
+            }
 
             fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`)
                 .then(res => res.json())
@@ -1719,7 +1718,7 @@ const Game = {
             this.keys.arrowup = false;
         }
         
-        // BUG FIX: Gerçek otobüslerde kapılar açıkken gaza basamazsın (Kapı Fren İnterlok Sistemi)
+                // BUG FIX: Gerçek otobüslerde kapılar açıkken gaza basamazsın (Kapı Fren İnterlok Sistemi)
         // AYRICA: Çekici üzerindeyken gaz verilmesini engelle
         let canAccelerate = true;
         if (this.frontDoorOpen || this.rearDoorOpen) {
@@ -1728,34 +1727,39 @@ const Game = {
         if (this.isBeingTowed) {
             canAccelerate = false;
         }
-        
-        if (!canAccelerate) {
-            this.keys.w = false;
-            this.keys.arrowup = false;
-        }
 
-        // FİZİK MOTORU VE KULLANICI GİRİÅLERİ (ÇEKİCİ MODUNDA KİLİTLENİR)
+        // FİZİK MOTORU VE KULLANICI GİRİŞLERİ (ÇEKİCİ MODUNDA KİLİTLENİR)
         if (!this.isBeingTowed) {
             // Motor kapalıysa araç gidemez
             if (!audio.isEngineRunning) {
                 this.acceleration = -5; // Sadece sürtünme
+                if (this.keys.w || this.keys.arrowup) {
+                    const now = performance.now();
+                    if (!this.lastEngineOffWarnTime || now - this.lastEngineOffWarnTime > 4000) {
+                        this.lastEngineOffWarnTime = now;
+                        if (typeof audio.speak === 'function') audio.speak("Motor kapalı. Boşluk tuşuna basarak motoru çalıştırınız.");
+                    }
+                }
             } else {
-                // TONAJ (AÄIRLIK) HESAPLAMASI
+                // TONAJ HESAPLAMASI
                 const baseWeight = 12000; // Boş otobüs 12 Ton
-                const currentWeight = baseWeight + (this.passengersOnBoard * 75); // Her yolcu 75 kg
-                const weightMultiplier = baseWeight / currentWeight; // Boşken 1.0, 18 ton iken ~0.66
+                const currentWeight = baseWeight + (this.passengersOnBoard * 75);
+                const weightMultiplier = baseWeight / currentWeight;
                 
                 // Ehliyet seviyesine göre zorluk
                 const difficultyMultiplier = 1 + (this.licenseLevel * 0.2);
 
-                if (this.keys.w || this.keys.arrowup) {
-                    this.acceleration = (24 * difficultyMultiplier) * weightMultiplier; // Doluyken hantallaşır
-                } else if (this.keys.s || this.keys.arrowdown) {
-                    this.acceleration = -25 * weightMultiplier; // Doluyken durmak daha zor olur (fren mesafesi uzar)
-                    if (this.isEmergencyBrakeLocked) this.acceleration = -80 * weightMultiplier; // İmdatlar kilitliyken süper fren
+                const isThrottle = canAccelerate && !this.isEmergencyBrakeLocked && (this.keys.w || this.keys.arrowup);
+                const isBrake = (this.keys.s || this.keys.arrowdown);
+
+                if (isThrottle) {
+                    this.acceleration = (24 * difficultyMultiplier) * weightMultiplier;
+                } else if (isBrake) {
+                    this.acceleration = -25 * weightMultiplier;
+                    if (this.isEmergencyBrakeLocked) this.acceleration = -80 * weightMultiplier;
                 } else {
-                    this.acceleration = -5 * weightMultiplier; // Sürtünme (Ağır vasıta momentumu korur)
-                    if (this.isEmergencyBrakeLocked) this.acceleration = -80 * weightMultiplier; // Zınk diye kilitlenme ivmesi
+                    this.acceleration = -5 * weightMultiplier;
+                    if (this.isEmergencyBrakeLocked) this.acceleration = -80 * weightMultiplier;
                 }
             }
 
@@ -3250,11 +3254,22 @@ const Game = {
 
         // Eğer oyun sürüş halinde değilse, mola ekranında değilse ve sanayide değilse;
         // bu tuş vuruşları ana menü veya diğer arayüzler içindir. Oyunu ilgilendirmez.
-        if (!this.isDriving && document.getElementById('stop-screen').classList.contains('hidden') && !SanayiMechanic.isActive) {
+        const isDrivingScreen = document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden');
+        if (!this.isDriving && !isDrivingScreen && document.getElementById('stop-screen').classList.contains('hidden') && !SanayiMechanic.isActive) {
             return;
         }
 
         const k = e.key.toLowerCase();
+        
+        // Sürüş tuşlarını anında güncelle (Caps Lock, Türkçe klavye ve e.repeat fark etmeksizin)
+        if (k === 'w' || e.code === 'KeyW') this.keys.w = true;
+        if (k === 's' || e.code === 'KeyS') { this.keys.s = true; this.isBrakeKeyDown = true; }
+        if (k === 'a' || e.code === 'KeyA') this.keys.a = true;
+        if (k === 'd' || e.code === 'KeyD') this.keys.d = true;
+        if (k === 'arrowup' || e.code === 'ArrowUp') this.keys.arrowup = true;
+        if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = true; this.isBrakeKeyDown = true; }
+        if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = true;
+        if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = true;
         
         // Sadece oyun içindeysek ekran okuyucu veya sayfa kaydırmasını engellemek için preventDefault kullan
         if (k.startsWith('arrow') || k === ' ') {
@@ -3584,9 +3599,15 @@ const Game = {
     handleKeyUp: function(e) {
         const k = e.key.toLowerCase();
         if (e.shiftKey && (k.startsWith('arrow'))) return;
-        // BUG FIX: Oyun durumu değiştiğinde (örneğin durağa tam yanaştığımızda isDriving false olur)
-        // Eğer bu kontrolü yaparsak, oyuncunun elini tuştan çekmesi algılanmaz ve tuş sonsuza kadar takılı kalır!
-        // Bu yüzden keyup olayları her zaman dinlenmelidir.
+        
+        if (k === 'w' || e.code === 'KeyW') this.keys.w = false;
+        if (k === 's' || e.code === 'KeyS') { this.keys.s = false; this.isBrakeKeyDown = false; }
+        if (k === 'a' || e.code === 'KeyA') this.keys.a = false;
+        if (k === 'd' || e.code === 'KeyD') this.keys.d = false;
+        if (k === 'arrowup' || e.code === 'ArrowUp') this.keys.arrowup = false;
+        if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = false; this.isBrakeKeyDown = false; }
+        if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = false;
+        if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = false;
         if (this.keys.hasOwnProperty(k)) this.keys[k] = false;
         
         if (k === 'l') {
