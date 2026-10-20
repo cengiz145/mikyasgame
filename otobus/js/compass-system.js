@@ -59,7 +59,7 @@ const CompassSystem = {
         try {
             if (typeof audio === 'undefined' || !audio.ctx) return;
             const ctx = audio.ctx;
-            if (ctx.state === 'suspended') ctx.resume();
+            if (ctx.state === 'suspended') ctx.resume().catch(() => {});
 
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();

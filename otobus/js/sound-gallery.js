@@ -426,7 +426,7 @@ const SoundGallery = {
 
         // AudioContext uyandır
         if (typeof audio !== 'undefined' && audio.ctx && audio.ctx.state === 'suspended') {
-            audio.ctx.resume();
+            if (audio.ctx && audio.ctx.state === 'suspended') audio.ctx.resume().catch(() => {});
         }
 
         this.renderModal(this.currentTab);
@@ -653,7 +653,7 @@ const SoundGallery = {
 
         try {
             const ctx = (typeof audio !== 'undefined' && audio.ctx) ? audio.ctx : (Howler.ctx || new (window.AudioContext || window.webkitAudioContext)());
-            if (ctx.state === 'suspended') ctx.resume();
+            if (ctx.state === 'suspended') ctx.resume().catch(() => {});
 
             let targetBuffer = null;
             if (typeof audio !== 'undefined') {

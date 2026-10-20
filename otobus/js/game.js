@@ -1048,6 +1048,13 @@ const Game = {
         // Zemin Ses Kaynaklarını Haritaya Yerleştir (3D)
         audio.placeAmbientSources(this.activeRouteData, this.licenseLevel);
         
+        // Motoru Çalıştır
+        if (typeof audio !== 'undefined' && typeof audio.startEngine === 'function') {
+            if (!audio.isEngineRunning) {
+                audio.startEngine();
+            }
+        }
+        
         this.lastFrameTime = performance.now();
         this.nextNavSoundTime = this.lastFrameTime + 10000 + Math.random() * 20000; // 10-30s sonra ilk ses
         this.nextAmbienceTime = this.lastFrameTime + 5000 + Math.random() * 5000;
@@ -3466,12 +3473,17 @@ const Game = {
         }
         if (this.keys.hasOwnProperty(k)) this.keys[k] = true;
 
-        // Özel aksiyonlar
-        if (e.code === 'Space') {
+        // Özel aksiyonlar (Motor Çalıştırma: M veya Boşluk tuşu)
+        if (k === 'm' || e.code === 'KeyM' || e.code === 'Space') {
+            e.preventDefault();
             if (audio.isEngineRunning) {
                 audio.stopEngine();
+                if (typeof audio.speak === 'function') audio.speak("Motor durduruldu.");
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 Motor Durduruldu", "warning");
             } else {
                 audio.startEngine();
+                if (typeof audio.speak === 'function') audio.speak("Motor çalıştırıldı.");
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔑 Motor Çalıştırıldı", "success");
             }
             if (!this.isDriving) this.checkAutoDepart();
         }

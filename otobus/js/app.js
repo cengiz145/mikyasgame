@@ -15,14 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     window.addEventListener('unhandledrejection', (e) => {
-        console.error("Unhandled Promise Rejection:", e.reason);
-        let msg = e.reason ? (e.reason.message || e.reason) : "Bilinmeyen Promise Hatası";
-        if (String(msg).indexOf('Firebase') === -1 && String(msg).indexOf('offline') === -1) {
+        console.warn("Unhandled Promise Rejection:", e.reason);
+        let msg = e.reason ? (e.reason.message || String(e.reason)) : "";
+        const ignoredPatterns = ['Firebase', 'offline', 'AudioContext', 'user gesture', 'play()', 'abort', 'fetch', 'NetworkError', 'not allowed'];
+        const isIgnored = ignoredPatterns.some(p => msg.toLowerCase().includes(p.toLowerCase()));
+        if (!isIgnored && msg.length > 0) {
             if (window.UI && typeof window.UI.showToast === 'function') {
                 window.UI.showToast(`SİSTEM HATASI (Promise): ${msg}`, 'danger');
-            }
-            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                audio.speak(`Gizli arka plan hatası: ${msg}. Lütfen bu hatayı bana bildirin.`);
             }
         }
     });

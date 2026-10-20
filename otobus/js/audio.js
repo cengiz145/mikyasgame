@@ -31,41 +31,42 @@ class AudioSystem {
             man_d26: null
         };
         this.cityIdleBuffer = null;
+        this.syntheticIdleBuffer = null;
         try {
-            fetch('sounds/freesound_pure_bus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { this.pureIdleBuffer = d; this.coachIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.pure_v6 = d; }).catch(() => {});
+            const safeLoadBuffer = (url, callback) => {
+                fetch(url).then(r => {
+                    if (!r.ok) return null;
+                    return r.arrayBuffer();
+                }).then(b => {
+                    if (!b) return;
+                    if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+                    return this.ctx.decodeAudioData(b);
+                }).then(decoded => {
+                    if (decoded && callback) callback(decoded);
+                }).catch(() => {});
+            };
 
-            fetch('sounds/freesound_coach_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { this.coachTerminalIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.coach_terminal = d; }).catch(() => {});
-
-            fetch('sounds/bassrolanti.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { this.bassIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.v8_bass = d; }).catch(() => {});
-
-            fetch('sounds/freesound_new_bus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { this.cityIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.city_cummins = d; }).catch(() => {});
-
-            fetch('sounds/freesound_articulated_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { if (this.groupBuffers) this.groupBuffers.articulated = d; }).catch(() => {});
-
-            fetch('sounds/freesound_midibus_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { if (this.groupBuffers) this.groupBuffers.midibus = d; }).catch(() => {});
-
-            fetch('sounds/freesound_heavy_man_idle.mp3').then(r => r.arrayBuffer()).then(b => {
-                if (!this.ctx) this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
-                return this.ctx.decodeAudioData(b);
-            }).then(d => { if (this.groupBuffers) this.groupBuffers.man_d26 = d; }).catch(() => {});
+            safeLoadBuffer('sounds/freesound_pure_bus_idle.mp3', d => {
+                this.pureIdleBuffer = d; this.coachIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.pure_v6 = d;
+            });
+            safeLoadBuffer('sounds/freesound_coach_idle.mp3', d => {
+                this.coachTerminalIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.coach_terminal = d;
+            });
+            safeLoadBuffer('sounds/bassrolanti.mp3', d => {
+                this.bassIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.v8_bass = d;
+            });
+            safeLoadBuffer('sounds/freesound_new_bus_idle.mp3', d => {
+                this.cityIdleBuffer = d; if (this.groupBuffers) this.groupBuffers.city_cummins = d;
+            });
+            safeLoadBuffer('sounds/freesound_articulated_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.articulated = d;
+            });
+            safeLoadBuffer('sounds/freesound_midibus_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.midibus = d;
+            });
+            safeLoadBuffer('sounds/freesound_heavy_man_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.man_d26 = d;
+            });
         } catch(e) {}
         this.idleSource = null;
         this.idleGain = null;
@@ -250,7 +251,7 @@ class AudioSystem {
         }
         
         if (this.ctx.state === 'suspended') {
-            this.ctx.resume();
+            this.ctx.resume().catch(() => {});
         }
         this.playMenuMusic();
         this.initTireNoise();
@@ -449,13 +450,47 @@ class AudioSystem {
         this.sounds.select.play();
     }
 
-    startEngine() {
+        createSyntheticIdleBuffer() {
+        if (!this.ctx) {
+            this.ctx = Howler.ctx || new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const sampleRate = this.ctx.sampleRate || 44100;
+        const duration = 2.0;
+        const length = Math.floor(sampleRate * duration);
+        const buffer = this.ctx.createBuffer(1, length, sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        const baseFreq = 16.0;
+        let lastNoise = 0;
+        for (let i = 0; i < length; i++) {
+            const t = i / sampleRate;
+            const pulse = Math.pow(Math.max(0, Math.sin(2 * Math.PI * baseFreq * t)), 3) * 0.6;
+            const subHarmonic = Math.sin(2 * Math.PI * (baseFreq * 0.5) * t) * 0.25;
+            const highHarmonic = Math.sin(2 * Math.PI * (baseFreq * 2.0) * t) * 0.15;
+            const metallic = Math.sin(2 * Math.PI * (baseFreq * 4.0) * t) * 0.08;
+            const white = Math.random() * 2 - 1;
+            lastNoise = (lastNoise + 0.05 * white) / 1.05;
+            
+            data[i] = (pulse + subHarmonic + highHarmonic + metallic + (lastNoise * 0.4)) * 0.7;
+        }
+        this.syntheticIdleBuffer = buffer;
+        if (!this.idleBuffer) this.idleBuffer = buffer;
+        if (!this.pureIdleBuffer) this.pureIdleBuffer = buffer;
+        return buffer;
+    }
+
+startEngine() {
         this.init();
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+        }
         if (this.isEngineRunning) return;
         
         this.isEngineRunning = true;
 
-        this.sounds.start.once('end', () => {
+        const launchIdle = () => {
+            if (!this.isEngineRunning || this.idleSource) return;
+            
             const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
             let activeBuffer = this.pureIdleBuffer || this.idleBuffer;
             if (currentBus) {
@@ -476,7 +511,10 @@ class AudioSystem {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.pure_v6) || this.pureIdleBuffer || this.idleBuffer;
                 }
             }
-            if (this.isEngineRunning && activeBuffer) {
+            if (!activeBuffer) {
+                activeBuffer = this.syntheticIdleBuffer || this.createSyntheticIdleBuffer();
+            }
+            if (activeBuffer && this.ctx) {
                 this.idleSource = this.ctx.createBufferSource();
                 this.idleSource.buffer = activeBuffer;
                 this.idleSource.loop = true;
@@ -509,29 +547,46 @@ class AudioSystem {
                 this.engineCabinFilter.connect(this.idleGain);
                 this.idleGain.connect(this.enginePanner);
 
-                // Aktif aracın ses profilini uygula
-                const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                 if (currentBus && currentBus.soundProfile) {
                     this.applyBusSoundProfile(currentBus.soundProfile);
                 }
                 
-                // MOTOR HASARI LFO (Vuruntu/Titreşim)
                 this.engineDamageLfo = this.ctx.createOscillator();
                 this.engineDamageLfo.type = 'sawtooth';
                 this.engineDamageLfo.frequency.value = 5;
                 
                 this.engineDamageGain = this.ctx.createGain();
-                this.engineDamageGain.gain.value = 0; // Başlangıçta hasar yok
+                this.engineDamageGain.gain.value = 0;
                 
                 this.engineDamageLfo.connect(this.engineDamageGain);
                 this.engineDamageGain.connect(this.idleGain.gain);
                 this.engineDamageLfo.start();
                 
-                this.idleSource.start(0);
+                try {
+                    this.idleSource.start(0);
+                } catch(e) {}
             }
-        });
-        
-        this.sounds.start.play();
+        };
+
+        let startedViaEnd = false;
+        if (this.sounds && this.sounds.start) {
+            try {
+                this.sounds.start.once('end', () => {
+                    startedViaEnd = true;
+                    launchIdle();
+                });
+                this.sounds.start.play();
+            } catch(e) {
+                launchIdle();
+            }
+            setTimeout(() => {
+                if (!startedViaEnd && this.isEngineRunning) {
+                    launchIdle();
+                }
+            }, 1400);
+        } else {
+            launchIdle();
+        }
     }
 
     stopEngine() {
