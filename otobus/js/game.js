@@ -968,7 +968,10 @@ const Game = {
 
         UI.switchScreen('driving-screen');
         audio.stopMenuMusic();
-        audio.startEngine(); // BUG FIX: Motoru yeniden başlat
+        audio.stopEngine();
+        if (typeof audio.speak === 'function') {
+            audio.speak("Kaza sonrası aracınız durağa çekildi. Hareket etmek için Boşluk veya M tuşuna basarak motoru çalıştırın.");
+        }
         
         // BUG FIX: Eğer kaza yapmadan önce özel bir hava durumu varsa geri getir
         if (this.weather !== 'sunny' && typeof audio.startWeather === 'function') {
