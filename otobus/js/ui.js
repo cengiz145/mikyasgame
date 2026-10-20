@@ -221,9 +221,15 @@ const UI = {
         const btnCity = document.getElementById('btn-start-city');
         const btnIntercity = document.getElementById('btn-start-intercity');
         const lblDistrict = document.getElementById('lbl-active-district');
+        const btnChangeDist = document.getElementById('btn-change-active-district');
+        const distNameDisplay = (activeDist === 'all') ? 'Tüm İlçeler' : activeDist;
         
         if (lblDistrict) {
-            lblDistrict.innerText = (activeDist === 'all') ? 'Tüm İlçeler' : activeDist;
+            lblDistrict.innerText = distNameDisplay;
+        }
+        if (btnChangeDist) {
+            btnChangeDist.setAttribute('aria-label', `Bölge veya Şehir Değiştir. Şu anki seçili bölge: ${distNameDisplay}. Listeden değiştirmek için tıklayın`);
+            btnChangeDist.setAttribute('title', `Aktif Bölge: ${distNameDisplay}`);
         }
         
         if (btnCity) {
@@ -498,9 +504,24 @@ const UI = {
 
     renderRoutes: function(cityName, completedTasks) {
         completedTasks = (typeof completedTasks === 'number') ? completedTasks : 0;
-        const titleEl = document.getElementById("route-sel-title");
         const activeDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
+        
+        // Eğer Tekirdağ için görevler henüz üretilmemişse veya task 0 aktif ilçeyle eşleşmiyorsa MUTLAKA yeniden üret
+        if (cityName === "Tekirdağ" && typeof generateRoutesFromAPI === 'function') {
+            const task0 = (typeof routesData !== 'undefined') ? routesData["tekirdag_task_0"] : null;
+            if (!task0 || task0.district !== activeDist) {
+                const realStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari["Tekirdağ"])
+                    ? varsayilanSehirDuraklari["Tekirdağ"]
+                    : null;
+                generateRoutesFromAPI(realStops, "Tekirdağ", activeDist);
+            }
+        }
+
+        const titleEl = document.getElementById("route-sel-title");
         if (titleEl) titleEl.innerText = `${activeDist} Sefer Görevleri (1 - 10. Seviye)`;
+        
+        const subtitleEl = document.getElementById("route-sel-subtitle") || document.querySelector("#route-menu .subtitle");
+        if (subtitleEl) subtitleEl.innerText = `${cityName} - ${activeDist} bölgesi canlı hat ve durak görevleri`;
         
         const listEl = document.getElementById("dynamic-route-list");
         if (!listEl) return;
@@ -673,6 +694,8 @@ const UI = {
                 activeTaskBtn.focus();
             } catch(e) {}
         }
+        const routeWelcome = `${activeDist} sefer görevleri açıldı. Toplam ${routesToRender.length} görev listelendi.`;
+        if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(routeWelcome);
     },
 
     showLoading: function(text) {

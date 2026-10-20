@@ -103,14 +103,21 @@ const Game = {
     setActiveDistrict: function(dist) {
         this.activeDistrict = dist || "Süleymanpaşa";
         try { localStorage.setItem('activeDistrict', this.activeDistrict); } catch(e) {}
+        this.saveData();
         if (typeof generateRoutesFromAPI === 'function') {
-            generateRoutesFromAPI(null, "Tekirdağ", this.activeDistrict);
+            const realStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari["Tekirdağ"])
+                ? varsayilanSehirDuraklari["Tekirdağ"]
+                : null;
+            generateRoutesFromAPI(realStops, "Tekirdağ", this.activeDistrict);
         }
         if (typeof AkilliRotaSistemi !== 'undefined' && AkilliRotaSistemi.updateDistrictUI) {
             AkilliRotaSistemi.updateDistrictUI();
         }
         if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
             UI.updateTitleScreenButtons();
+        }
+        if (typeof UI !== 'undefined' && document.getElementById('route-menu') && !document.getElementById('route-menu').classList.contains('hidden')) {
+            UI.renderRoutes("Tekirdağ", this.completedTasks);
         }
     },
     
@@ -389,6 +396,10 @@ const Game = {
                             this.clockMinutes = data.clockMinutes || 480;
                             this.unlockedCities = data.unlockedCities || ["Tekirdağ"];
                             this.currentCity = data.currentCity || "Tekirdağ";
+                            if (data.activeDistrict) {
+                                this.activeDistrict = data.activeDistrict;
+                                try { localStorage.setItem('activeDistrict', this.activeDistrict); } catch(e) {}
+                            }
                         }
                     } else {
                         this.licenseLevel = 1;
@@ -421,6 +432,7 @@ const Game = {
             localStorage.setItem('clockMinutes', this.clockMinutes);
             localStorage.setItem('unlockedCities', JSON.stringify(this.unlockedCities));
             localStorage.setItem('merkezUs', this.currentCity);
+            localStorage.setItem('activeDistrict', this.activeDistrict || "Süleymanpaşa");
         } catch (storageErr) {
             console.warn("Yerel depolama kayıt uyarısı:", storageErr);
         }
@@ -435,7 +447,8 @@ const Game = {
                     playerBudget: this.playerBudget,
                     clockMinutes: this.clockMinutes,
                     unlockedCities: this.unlockedCities,
-                    currentCity: this.currentCity
+                    currentCity: this.currentCity,
+                    activeDistrict: this.activeDistrict || "Süleymanpaşa"
                 }).catch(e => {
                     console.error("Firebase save error", e);
                 });

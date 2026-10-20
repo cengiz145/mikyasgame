@@ -27,7 +27,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="css/styles.css?v=1792457065889">
+    <link rel="stylesheet" href="css/styles.css?v=1792457550865">
 </head>
 <body>
     <div id="nvda-live-region" aria-live="assertive" aria-atomic="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden;"></div>
@@ -93,7 +93,7 @@
         </div>
 
                         <div id="active-district-badge-container" style="margin-bottom: 14px; text-align: center; z-index: 1;">
-            <button id="btn-change-active-district" class="menu-btn nav-item" style="padding: 10px 20px; font-size: 1.05rem; background: rgba(56,189,248,0.18); border: 2px solid #38bdf8; color: #38bdf8; border-radius: 25px; cursor: pointer; justify-content: center;" aria-label="Bölge veya Şehir Değiştir. Şu anki bölge: Süleymanpaşa. Listeden seçmek için tıklayın">
+            <button id="btn-change-active-district" class="menu-btn nav-item" style="padding: 10px 20px; font-size: 1.05rem; background: rgba(56,189,248,0.18); border: 2px solid #38bdf8; color: #38bdf8; border-radius: 25px; cursor: pointer; justify-content: center;" aria-label="Bölge veya Şehir Değiştir. Listeden seçmek için tıklayın">
                 📍 Bölge / İlçe Değiştir: <strong id="lbl-active-district" style="color: #fde047; margin-left: 6px;">Süleymanpaşa</strong> 📋 (Listeyi Aç)
             </button>
         </div>
@@ -187,7 +187,7 @@
     <main id="route-menu" class="screen hidden" role="application">
         <div class="title-container">
             <h1 class="main-title" id="route-sel-title">Görev Seçimi</h1>
-            <p class="subtitle">API'den çekilen canlı rotalardan birini seçin</p>
+            <p class="subtitle" id="route-sel-subtitle">API'den çekilen canlı rotalardan birini seçin</p>
             <div id="mission-audio-guide" style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin: 10px 0; font-size: 0.95rem;">
                 ⌨️ <strong>(Shift + Oklar)</strong> Pusula (Sağ: Doğu, Sol: Batı, Yukarı: Kuzey, Aşağı: Güney) | <strong>(A)</strong> Açıklama | <strong>(Shift + A)</strong> Adım Adım | <strong>(Esc)</strong> Çık
             </div>
@@ -481,31 +481,31 @@
             <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="js/firebase.js?v=1792457065889"></script>
+    <script src="js/firebase.js?v=1792457550865"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-    <script src="js/map-engine.js?v=1792457065889"></script>
-    <script src="js/tekulas-data.js?v=1792457065889"></script>
-    <script src="js/data.js?v=1792457065889"></script>
-    <script src="js/audio-base64.js?v=1792457065889"></script>
-    <script src="sounds/npc_list.js?v=1792457065889"></script>
-    <script src="js/audio.js?v=1792457065889"></script>
-    <script src="js/api.js?v=1792457065889"></script>
-    <script src="js/ui.js?v=1792457065889"></script>
-    <script src="js/bus-fleet.js?v=1792457065889"></script>
-    <script src="js/stop-discovery.js?v=1792457065889"></script>
-    <script src="js/achievements-data.js?v=1792457065889"></script>
-        <script src="js/sound-gallery.js?v=1792457065889"></script>
-<script src="js/driver-badges.js?v=1792457065889"></script>
-    <script src="js/smart-system.js?v=1792457065889"></script>
-    <script src="js/smart-route.js?v=1792457065889"></script>
-    <script src="js/velimese-navigation.js?v=1792457065889"></script>
-    <script src="js/suleymanpasa-navigation.js?v=1792457065889"></script>
-    <script src="js/saray-navigation.js?v=1792457065889"></script>
-    <script src="js/compass-system.js?v=1792457065889"></script>
-    <script src="js/voice-assistant.js?v=1792457065889"></script>
-    <script src="js/game.js?v=1792457065889"></script>
-    <script src="js/app.js?v=1792457065889"></script>
+    <script src="js/map-engine.js?v=1792457550865"></script>
+    <script src="js/tekulas-data.js?v=1792457550865"></script>
+    <script src="js/data.js?v=1792457550865"></script>
+    <script src="js/audio-base64.js?v=1792457550865"></script>
+    <script src="sounds/npc_list.js?v=1792457550865"></script>
+    <script src="js/audio.js?v=1792457550865"></script>
+    <script src="js/api.js?v=1792457550865"></script>
+    <script src="js/ui.js?v=1792457550865"></script>
+    <script src="js/bus-fleet.js?v=1792457550865"></script>
+    <script src="js/stop-discovery.js?v=1792457550865"></script>
+    <script src="js/achievements-data.js?v=1792457550865"></script>
+        <script src="js/sound-gallery.js?v=1792457550865"></script>
+<script src="js/driver-badges.js?v=1792457550865"></script>
+    <script src="js/smart-system.js?v=1792457550865"></script>
+    <script src="js/smart-route.js?v=1792457550865"></script>
+    <script src="js/velimese-navigation.js?v=1792457550865"></script>
+    <script src="js/suleymanpasa-navigation.js?v=1792457550865"></script>
+    <script src="js/saray-navigation.js?v=1792457550865"></script>
+    <script src="js/compass-system.js?v=1792457550865"></script>
+    <script src="js/voice-assistant.js?v=1792457550865"></script>
+    <script src="js/game.js?v=1792457550865"></script>
+    <script src="js/app.js?v=1792457550865"></script>
 
     <!-- AKILLI ROTA SİSTEMİ (NEREDEN ➔ NEREYE) MODALI -->
     <div id="smart-route-modal" class="modal-overlay modal hidden" role="dialog" aria-modal="true" aria-labelledby="smart-route-title">

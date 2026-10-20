@@ -112,6 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const licenseTitle = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
                     UI.updatePlayerStats(Game.licenseLevel || 1, Game.completedTasks || 0, Game.playerBudget || 0, licenseTitle);
                 }
+                if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
+                    UI.updateTitleScreenButtons();
+                }
             } else {
                 loginScreen.classList.remove('hidden');
                 const userInput = document.getElementById('username-input');
@@ -592,13 +595,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Eğer daha önce merkez üs seçilmişse, direkt o şehrin görev ekranına (oyuna başla menüsüne) at!
         if (!Game.hasPassedLevel10()) {
-            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: Game.activeDistrict } }));
         } else if (!Game.hasPassedLevel10()) {
             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
         } else if (!Game.hasPassedLevel10()) {
             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
         } else if (Game.unlockedCities.length > 0 && Game.currentCity) {
-            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: Game.currentCity } }));
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: Game.currentCity || "Tekirdağ", district: Game.activeDistrict } }));
         } else {
             UI.switchScreen('base-selection-menu');
         }
@@ -882,13 +885,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Route Menu // Eğer bu şehir için önceden API'den rota çekilmemişse, çek.
     document.addEventListener('go-to-route-screen', async (e) => {
-        const cityName = e.detail.city || "Tekirdağ";
-        const districtName = e.detail.district || (typeof Game !== 'undefined' && Game.activeDistrict) || localStorage.getItem('activeDistrict') || "Süleymanpaşa";
+        const cityName = (e.detail && e.detail.city) || (typeof Game !== 'undefined' && Game.currentCity) || "Tekirdağ";
+        const districtName = (e.detail && e.detail.district) || (typeof Game !== 'undefined' && Game.activeDistrict) || localStorage.getItem('activeDistrict') || "Süleymanpaşa";
         
-        // Bu şehir ve ilçe için taskIndex'e sahip sıralı sefer görevleri var mı kontrol et
-        let existingTaskRoutes = Object.values(routesData).filter(r => r.sehir === cityName && r.district === districtName && typeof r.taskIndex === 'number');
-        
-        if (existingTaskRoutes.length === 0 || (existingTaskRoutes.length > 0 && existingTaskRoutes[0].district !== districtName)) {
+        // Tekirdağ için aktif ilçe rotaları kontrol et
+        const task0 = (typeof routesData !== 'undefined') ? routesData["tekirdag_task_0"] : null;
+        const needsRegen = (cityName === "Tekirdağ")
+            ? (!task0 || task0.district !== districtName)
+            : (!routesData || !routesData[`${cityName.toLowerCase()}_task_0`]);
+            
+        if (needsRegen) {
             const realCityStops = (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName])
                 ? varsayilanSehirDuraklari[cityName]
                 : (typeof varsayilanSehirDuraklari !== 'undefined' ? varsayilanSehirDuraklari["Tekirdağ"] : []);
