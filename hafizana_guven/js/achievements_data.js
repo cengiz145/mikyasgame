@@ -1,4 +1,4 @@
-window.achievementsList = [
+﻿window.achievementsList = [
     {
         id: "easy_1",
         title: "Kolay Mod Çırak",
@@ -872,7 +872,6 @@ if (window.achievementsList) {
         checkCondition: function() { return localStorage.getItem('ach_secret_clumsy') === 'true'; },
         progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_secret_clumsy') ? 1 : 0) + "/1"; }
     });
-}
 
     addAch({
         id: "ach_flawless_execution",
@@ -927,6 +926,8 @@ if (window.achievementsList) {
         checkCondition: function() { return localStorage.getItem('ach_acoustic_isolation') === 'true'; },
         progressText: function() { return "İlerleme: " + (localStorage.getItem('ach_acoustic_isolation') ? 1 : 0) + "/1"; }
     });
+
+}
 
 window.checkAllAchievements = function() {
     if (window.achievementsList && window.userAchievements) {
