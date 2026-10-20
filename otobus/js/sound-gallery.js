@@ -276,8 +276,8 @@ const SoundGallery = {
             category: 'effect',
             title: 'Freesound Asfalt Yol & Kabin Lastik Yuvarlanması',
             icon: '🛣️',
-            specs: 'Freesound #352863 Orijinal Asfalt Sürüş Kaydı',
-            desc: 'Otobüs asfalt yolda seyrederken kabin içine gelen o tok, tatlı lastik ve asfalt sürtünme sesi.',
+            specs: 'Freesound #566284 Orijinal Pürüzsüz Asfalt Sürüş Kaydı',
+            desc: 'Otobüs asfalt yolda seyrederken kabin içine gelen pürüzsüz ve gerçekçi lastik yuvarlanma sesi.',
             is10Seconds: true,
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.roadAsphalt) {
@@ -287,16 +287,18 @@ const SoundGallery = {
                 }
             }
         },
-        {
-            id: 'road_tikir_joint',
+                {
+            id: 'city_ambience',
             category: 'effect',
-            title: 'Freesound Asfalt & Köprü Derzi (Tıkır Tıkır Sesi)',
-            icon: '🌉',
-            specs: 'Freesound #866213 Orijinal Köprü ve Yol Bağlantı Kaydı',
-            desc: 'Otobüs giderken asfalt üzerindeki genleşme derzlerinden ve köprü bağlantılarından geçerken çıkan o ritmik tıkır tıkır sesi.',
+            title: 'Freesound Sakin Şehir & Mahalle Çevre Ambiyansı',
+            icon: '🌳',
+            specs: 'Freesound #135074 Orijinal Şehir & Kuş Cıvıltısı Kaydı',
+            desc: 'Otobüs durakta beklerken veya şehir içinde sakince ilerlerken dışarıdan gelen huzurlu kuş sesleri, hafif esinti ve sakin cadde atmosferi.',
+            is10Seconds: true,
             playFn: () => {
-                if (typeof audio !== 'undefined' && audio.playRoadJointHit) {
-                    audio.playRoadJointHit(55);
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.cityAmbience) {
+                    audio.sounds.cityAmbience.volume(0.65);
+                    audio.sounds.cityAmbience.play();
                 }
             }
         },
