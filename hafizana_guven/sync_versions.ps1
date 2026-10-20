@@ -1,12 +1,13 @@
-$ErrorActionPreference = "Stop"
-$dir = ".\";
-$newVersion = "0.97.4.63"
+﻿$ErrorActionPreference = "Stop"
+$dir = $PSScriptRoot
+if (-not $dir) { $dir = ".\" }
+$newVersion = "0.98.0.0"
 
 Write-Host "Updating version.json..."
 $vJsonPath = Join-Path $dir "version.json"
 $vJson = Get-Content $vJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $vJson.version = $newVersion
-$vJson.changelog = "Sohbet geçmişi yüklenirken çalınan ses spam sorunu düzeltildi."
+$vJson.changelog = "Büyük Bilişsel ve Ekonomik Güncelleme: Bilişsel başarılar ve Rütbe sistemi eklendi, oyun ekonomisi dengelendi."
 $vJson | ConvertTo-Json -Depth 5 | Set-Content $vJsonPath -Encoding UTF8
 
 Write-Host "Updating package.json..."
@@ -26,26 +27,30 @@ Write-Host "Updating .last_sent_version.txt..."
 $lvPath = Join-Path $dir ".last_sent_version.txt"
 Set-Content $lvPath -Value "v$newVersion" -Encoding UTF8
 
-Write-Host "Updating changelog.txt..."
+Write-Host "Checking changelog.txt..."
 $changelogPath = Join-Path $dir "changelog.txt"
 $changelogContent = Get-Content $changelogPath -Encoding UTF8
-$todayDate = (Get-Date).ToString('dd.MM.yyyy')
-$newEntry = @"
+$firstVersion = $changelogContent | Where-Object { $_ -match '^\[v[\d\.]+\]' } | Select-Object -First 1
+
+if ($firstVersion -notmatch "\[v$newVersion\]") {
+    $todayDate = (Get-Date).ToString('dd.MM.yyyy')
+    $newEntry = @"
 [v$newVersion] - $todayDate
 
 Genel:
-- Sohbet ekranında eski mesajlar yüklenirken oluşan bildirim sesi spamlama hatası çözüldü.
+- Bilişsel başarılar ve Rütbe sistemi eklendi, oyun ekonomisi dengelendi.
 
 "@
-
-$newChangelog = @()
-$newChangelog += $changelogContent[0] # Header
-$newChangelog += ""
-$newChangelog += $newEntry
-for ($i=1; $i -lt $changelogContent.Length; $i++) {
-    $newChangelog += $changelogContent[$i]
+    $newChangelog = @()
+    $newChangelog += $changelogContent[0] # Header
+    $newChangelog += ""
+    $newChangelog += $newEntry
+    for ($i=1; $i -lt $changelogContent.Length; $i++) {
+        $newChangelog += $changelogContent[$i]
+    }
+    $newChangelog | Set-Content $changelogPath -Encoding UTF8
+} else {
+    Write-Host "changelog.txt zaten v$newVersion ile guncel, tekrar eklenmedi."
 }
-$newChangelog | Set-Content $changelogPath -Encoding UTF8
 
 Write-Host "Tüm sürümler v$newVersion olarak eşitlendi!"
-
