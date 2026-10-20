@@ -35,7 +35,48 @@ window.sEscapeHTML = function(str) {
 };
 
 
-window.DEBUG_MODE = false;
+window.DEBUG_MODE = true;
+try { localStorage.setItem('hafizaGuvenDebugMode', 'true'); } catch(e) {}
+
+// Hata Ayıklama & Teşhis Yardımcısı
+window.hataAyiklama = {
+    aktif: true,
+    durum: function() {
+        const rapor = {
+            surum: window.UYGULAMA_SURUMU || "0.98.0.1",
+            jetonlar: localStorage.getItem('hafizaGuvenTotalTokens') || "0",
+            xp: localStorage.getItem('hafizaGuvenXP') || "0",
+            rutbe: localStorage.getItem('hafizaGuvenRank') || "Çaylak",
+            hataKorumasi: localStorage.getItem('hafizaGuvenHataKorumasi') || "0",
+            zamanKorumasi: localStorage.getItem('hafizaGuvenZamanKorumasi') || "0",
+            seciliEnstruman: localStorage.getItem('hafizaGuvenSelectedInstrument') || "Piyano (Varsayılan)",
+            acikBasarimSayisi: Object.keys(JSON.parse(localStorage.getItem('hafizaGuvenAchievements') || '{}')).length,
+            toplamBasarimSayisi: window.achievementsList ? window.achievementsList.length : 0,
+            sesDurumu: (typeof Howler !== 'undefined') ? "Howler.js Aktif" : "Howler.js Yüklenmedi"
+        };
+        console.table(rapor);
+        if (window.announceToScreenReader) {
+            window.announceToScreenReader("Hata ayıklama raporu: Sürüm " + rapor.surum + ", Jetonlar: " + rapor.jetonlar + ", Rütbe: " + rapor.rutbe + ", Başarımlar: " + rapor.acikBasarimSayisi + "/" + rapor.toplamBasarimSayisi);
+        }
+        return rapor;
+    },
+    depolamaKontrol: function() {
+        if (window.HafizanaGuvenAutoRepair && window.HafizanaGuvenAutoRepair.runLocalStorageDoctor) {
+            window.HafizanaGuvenAutoRepair.runLocalStorageDoctor();
+            console.log("[Hata Ayıklama] Depolama doktoru çalıştırıldı, tüm veriler tarandı ve doğrulandı.");
+        }
+    },
+    kartlariGoster: function() {
+        if (window.cards && window.cards.length > 0) {
+            console.log("[Hata Ayıklama] Aktif Kart Dizilimi:");
+            console.table(window.cards.map((c, i) => ({ indeks: i, deger: c.dataset.value, acik: c.classList.contains('flipped'), eslesti: c.classList.contains('matched') })));
+        } else {
+            console.log("[Hata Ayıklama] Şu anda aktif oyun tahtası yok.");
+        }
+    }
+};
+
+console.log("[Hata Ayıklama] Hafızana Güven Hata Ayıklama Modu (DEBUG_MODE) etkinleştirildi. Bilgi için konsola 'hataAyiklama.durum()' yazabilirsiniz.");
 
 // Boşluk tuşuna ve yön tuşlarına basıldığında sayfanın aşağı/yukarı kaymasını engelle
 window.addEventListener('keydown', function(event) {
@@ -43,12 +84,16 @@ window.addEventListener('keydown', function(event) {
     if (event.ctrlKey && event.shiftKey && (event.key === 'd' || event.key === 'D')) {
         event.preventDefault();
         window.DEBUG_MODE = !window.DEBUG_MODE;
+        try { localStorage.setItem('hafizaGuvenDebugMode', window.DEBUG_MODE ? 'true' : 'false'); } catch(e) {}
         console.log("DEBUG_MODE: " + window.DEBUG_MODE);
         if (window.showToastNotification) {
             window.showToastNotification("Hata Ayıklama Modu " + (window.DEBUG_MODE ? "Açık" : "Kapalı"), window.DEBUG_MODE ? "info" : "warning");
         }
         if (window.announceToScreenReader) {
             window.announceToScreenReader("Hata ayıklama modu " + (window.DEBUG_MODE ? "etkinleştirildi" : "kapatıldı"));
+        }
+        if (window.DEBUG_MODE && window.hataAyiklama) {
+            window.hataAyiklama.durum();
         }
         if (window.correctSound) window.correctSound.play();
         return;
