@@ -114,6 +114,7 @@ class AudioSystem {
             rain11: new Howl({ src: ['sounds/rain11.ogg'], loop: true, volume: 0 }),
             // Freesound Gerçek Çevre ve Yol Sesleri (Asfalt, Çakıl, Kum, Rüzgar, Derz)
 // Freesound Gerçek Çevre ve Yol Sesleri (Doğal Şehir Ambiyansı, Kuş Sesleri, Asfalt, Rüzgar)
+            cabinAmbience: new Howl({ src: ['sounds/freesound_bus_cabin_ambience.mp3'], loop: true, volume: 0 }),
             cityAmbience: new Howl({ src: ['sounds/freesound_city_ambience.mp3', 'sounds/street1.ogg'], loop: true, volume: 0 }),
             roadAsphalt: new Howl({ src: ['sounds/freesound_road_asphalt.mp3'], loop: true, volume: 0 }),
             roadGravel: new Howl({ src: ['sounds/freesound_road_gravel.mp3'], loop: true, volume: 0 }),
@@ -690,6 +691,17 @@ startEngine() {
             this.sounds.cityAmbience.volume(targetAmbienceVol);
         }
 
+        
+        // Otobüs İçi Yolcu & Kabin Ambiyansı (Yolda seyrederken canlı kabin hissi)
+        if (this.sounds && this.sounds.cabinAmbience) {
+            if (!this.sounds.cabinAmbience.playing()) {
+                this.sounds.cabinAmbience.volume(0);
+                this.sounds.cabinAmbience.play();
+            }
+            const targetCabinVol = Math.min(0.24, 0.08 + (speed / 100) * 0.12);
+            this.sounds.cabinAmbience.volume(targetCabinVol);
+        }
+
         // 1. ASFALT YOL SESİ (freesound_road_asphalt.mp3)
         if (isAsphalt && this.sounds.roadAsphalt) {
             const targetAsphaltVol = Math.min(0.50, (speed / 90) * 0.42 + windowVolBoost);
@@ -771,7 +783,7 @@ startEngine() {
 
     stopAllRoadSounds() {
         if (!this.sounds) return;
-        ['roadAsphalt', 'roadGravel', 'roadGravelAsphalt', 'roadWind', 'cityAmbience'].forEach(key => {
+        ['roadAsphalt', 'roadGravel', 'roadGravelAsphalt', 'roadWind', 'cityAmbience', 'cabinAmbience'].forEach(key => {
             const snd = this.sounds[key];
             if (snd && snd.playing()) {
                 snd.fade(snd.volume(), 0, 200);

@@ -288,6 +288,21 @@ const SoundGallery = {
             }
         },
                 {
+            id: 'bus_cabin_ambience',
+            category: 'effect',
+            title: 'Freesound Otobüs İçi Yolcu & Kabin Ambiyansı',
+            icon: '👥',
+            specs: 'Freesound #379370 Orijinal Otobüs Yolcu Kabin Kaydı',
+            desc: 'Otobüs seyir halindeyken içeride oluşan gerçekçi yolcu hareketleri, hafif uğultu ve doğal kabin atmosferi.',
+            is10Seconds: true,
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.cabinAmbience) {
+                    audio.sounds.cabinAmbience.volume(0.65);
+                    audio.sounds.cabinAmbience.play();
+                }
+            }
+        },
+        {
             id: 'city_ambience',
             category: 'effect',
             title: 'Freesound Sakin Şehir & Mahalle Çevre Ambiyansı',
@@ -307,7 +322,7 @@ const SoundGallery = {
             category: 'effect',
             title: 'Freesound Çakıllı Yol Sürüşü',
             icon: '🪨',
-            specs: 'Freesound #281512 Orijinal Çakıl Zemin Kaydı',
+            specs: 'Freesound #251662 Orijinal Çakıl Zemin Lastik Kaydı',
             desc: 'Otobüsün çakıllı ve taşlı yollarda ilerlerken lastiklerin altından gelen çıtır çıtır çakıl ezilme sesi.',
             is10Seconds: true,
             playFn: () => {
@@ -323,7 +338,7 @@ const SoundGallery = {
             category: 'effect',
             title: 'Freesound Kumlu ve Toprak Yol Sürüşü',
             icon: '🏜️',
-            specs: 'Freesound #233076 Orijinal Kum ve Asfalt Serpinti Kaydı',
+            specs: 'Freesound #637192 Orijinal Toprak Yol Kabin Kaydı',
             desc: 'Kumlu, gevşek zeminlerde ve toprak yollarda tekerleklerin çıkardığı yumuşak ve hışırtılı sürüş sesi.',
             is10Seconds: true,
             playFn: () => {
