@@ -1208,51 +1208,8 @@ const Game = {
                     if (this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
                         this.currentDistanceToNext = fallbackDistance || 1000;
                     }
-                    this.isDriving = wasDriving; // Sürüşü geri başlat
-                    
-                    // DURAN OYUN DÖNGÜSÜNÜ YENİDEN BAÅLAT
-                    if (this.isDriving) {
-
-            // Sürüş Süresi Takibi (Emektar Direksiyon Rozeti)
-            this.totalDrivingSeconds = (this.totalDrivingSeconds || 0) + (deltaTime || 0.016);
-            if (this.totalDrivingSeconds >= 1800 && typeof DriverBadges !== 'undefined' && !DriverBadges.isUnlocked('emektar_direksiyon')) {
-                DriverBadges.unlock('emektar_direksiyon', true);
-            }
-
-            // Karşıdan Gelen Meslektaş Otobüsü (Her 4-7 dakikada bir)
-            if (!this.nextColleagueTime) {
-                this.nextColleagueTime = performance.now() + 180000 + Math.random() * 240000;
-            }
-            if (this.isDriving && this.speed > 25 && performance.now() > this.nextColleagueTime) {
-                this.nextColleagueTime = performance.now() + 240000 + Math.random() * 240000;
-                if (typeof audio !== 'undefined' && typeof audio.playPassingBus === 'function') {
-                    audio.playPassingBus(() => {
-                        this.colleagueGreetingActive = true;
-                        setTimeout(() => { this.colleagueGreetingActive = false; }, 3800);
-                    });
-                }
-            }
-
-            // Kasis Yaklaşma Sesli Uyarısı (60m kala)
-            if (this.kasisDistance !== null && this.kasisDistance <= 60 && this.kasisDistance > 0 && !this.kasisWarned) {
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak("İleride kasis var, yavaşlayınız.");
-                this.kasisWarned = true;
-            }
-            if (this.kasisDistance !== null && this.kasisDistance <= 0) {
-                if (typeof audio !== 'undefined' && typeof audio.playSuspensionBounce === 'function') {
-                    audio.playSuspensionBounce();
-                }
-                this.kasisDistance = null;
-                this.kasisWarned = false;
-            }
-
-                        this.lastFrameTime = performance.now();
-                        this.animationFrameId = requestAnimationFrame((t) => this.gameLoop(t));
-                    }
-
-                    // Cift anons engellendi (anons planNextStop icinde tek noktadan yapilir)
                 });
-        } else {
+} else {
             this.routeBumps = this.savedState && this.savedState.routeBumps ? this.savedState.routeBumps : [];
         }
 
@@ -1400,6 +1357,39 @@ const Game = {
         // BUG FIX: Eğer sekme arka planda kalırsa deltaTime aşırı büyür ve fizik motorunu patlatır.
         // Bunu engellemek için deltaTime değerini maksimum 0.1 saniye (100ms) ile sınırlandırıyoruz.
         if (deltaTime > 0.1) deltaTime = 0.1;
+
+        // Sürüş Süresi Takibi (Emektar Direksiyon Rozeti)
+        if (this.totalDrivingSeconds >= 1800 && typeof DriverBadges !== 'undefined' && !DriverBadges.isUnlocked('emektar_direksiyon')) {
+            DriverBadges.unlock('emektar_direksiyon', true);
+        }
+
+        // Karşıdan Gelen Meslektaş Otobüsü
+        if (!this.nextColleagueTime) {
+            this.nextColleagueTime = currentTime + 180000 + Math.random() * 240000;
+        }
+        if (this.isDriving && this.speed > 25 && currentTime > this.nextColleagueTime) {
+            this.nextColleagueTime = currentTime + 240000 + Math.random() * 240000;
+            if (typeof audio !== 'undefined' && typeof audio.playPassingBus === 'function') {
+                audio.playPassingBus(() => {
+                    this.colleagueGreetingActive = true;
+                    setTimeout(() => { this.colleagueGreetingActive = false; }, 3800);
+                });
+            }
+        }
+
+        // Kasis Yaklaşma Sesli Uyarısı (60m kala)
+        if (this.kasisDistance !== null && this.kasisDistance <= 60 && this.kasisDistance > 0 && !this.kasisWarned) {
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak("İleride kasis var, yavaşlayınız.");
+            this.kasisWarned = true;
+        }
+        if (this.kasisDistance !== null && this.kasisDistance <= 0) {
+            if (typeof audio !== 'undefined' && typeof audio.playSuspensionBounce === 'function') {
+                audio.playSuspensionBounce();
+            }
+            this.kasisDistance = null;
+            this.kasisWarned = false;
+        }
+
 
         // Çekici (Tow Truck) Yapay Zeka (Otopilot) Modu
         if (this.isBeingTowed) {
