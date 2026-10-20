@@ -881,27 +881,32 @@ window.addEventListener('keydown', (e) => {
 
     const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
 
-    // ESCAPE: Açıklamayı susturur ve açık modalı kapatır
+    // ESCAPE: Açıklamayı susturur ve açık olan herhangi bir modalı kapatır
     if (e.key === 'Escape') {
-        const pickerModal = document.getElementById('district-picker-modal');
-        if (pickerModal && !pickerModal.classList.contains('hidden')) {
-            pickerModal.classList.add('hidden');
-            KeyboardNav.initForScreen();
-            const btnChange = document.getElementById('btn-change-active-district');
-            if (btnChange) btnChange.focus();
-            return;
-        }
-        const modeModal = document.getElementById('mode-selection-modal');
-        if (modeModal && !modeModal.classList.contains('hidden')) {
-            modeModal.classList.add('hidden');
-            KeyboardNav.initForScreen();
-            return;
-        }
-        const intercityModal = document.getElementById('intercity-dest-modal');
-        if (intercityModal && !intercityModal.classList.contains('hidden')) {
-            intercityModal.classList.add('hidden');
-            KeyboardNav.initForScreen();
-            return;
+        const modalIds = [
+            'district-picker-modal',
+            'mode-selection-modal',
+            'intercity-dest-modal',
+            'district-dest-modal',
+            'smart-route-modal',
+            'garage-fleet-modal',
+            'sound-gallery-modal',
+            'badges-modal',
+            'stop-collection-modal',
+            'tutorial-modal',
+            'exit-screen'
+        ];
+        for (const mId of modalIds) {
+            const m = document.getElementById(mId);
+            if (m && !m.classList.contains('hidden')) {
+                m.classList.add('hidden');
+                KeyboardNav.initForScreen();
+                if (mId === 'district-picker-modal') {
+                    const btnChange = document.getElementById('btn-change-active-district');
+                    if (btnChange) btnChange.focus();
+                }
+                return;
+            }
         }
         if (typeof MissionReader !== 'undefined') MissionReader.exit();
         return;

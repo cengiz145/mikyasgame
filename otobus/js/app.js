@@ -596,10 +596,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Eğer daha önce merkez üs seçilmişse, direkt o şehrin görev ekranına (oyuna başla menüsüne) at!
         if (!Game.hasPassedLevel10()) {
             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: Game.activeDistrict } }));
-        } else if (!Game.hasPassedLevel10()) {
-            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
-        } else if (!Game.hasPassedLevel10()) {
-            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ" } }));
         } else if (Game.unlockedCities.length > 0 && Game.currentCity) {
             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: Game.currentCity || "Tekirdağ", district: Game.activeDistrict } }));
         } else {
@@ -616,7 +612,23 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.playSelect();
         
         // Sadece tutulması gerekenleri ayır
-        const safeKeys = ['otobusUsername', 'licenseLevel', 'completedTasks', 'para', 'clockMinutes', 'unlockedCities', 'merkezUs'];
+        const safeKeys = [
+            'otobusUsername',
+            'licenseLevel',
+            'completedTasks',
+            'para',
+            'playerXP',
+            'clockMinutes',
+            'unlockedCities',
+            'merkezUs',
+            'activeDistrict',
+            'selectedBusId',
+            'tekulas_owned_buses_v1',
+            'driver_lifetime_stats_v1',
+            'driver_badges_v1',
+            'tekulas_discovered_stops_v1',
+            'copilot_enabled'
+        ];
         const savedData = {};
         
         safeKeys.forEach(key => {
@@ -988,19 +1000,29 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.playSelect();
         UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
         
-        // BUG FIX: activeRouteId yerine sıradaki (completedTasks) taskIndex'e sahip rotayı bul
-        let nextRouteId = Object.keys(routesData).find(k => 
-            routesData[k].sehir === Game.currentCity && 
-            routesData[k].taskIndex === Game.completedTasks
-        );
+        let nextRouteId = null;
+        if (Game.currentCity === "Tekirdağ") {
+            const candidateKey = "tekirdag_task_" + Game.completedTasks;
+            if (typeof routesData !== 'undefined' && routesData[candidateKey]) {
+                nextRouteId = candidateKey;
+            }
+        }
+        if (!nextRouteId && typeof routesData !== 'undefined') {
+            nextRouteId = Object.keys(routesData).find(k => 
+                routesData[k] &&
+                routesData[k].sehir === Game.currentCity && 
+                routesData[k].taskIndex === Game.completedTasks
+            );
+        }
         
         if (nextRouteId) {
             Game.startRoute(nextRouteId);
         } else {
-            UI.showToast("Bu şehirdeki görevleri tamamladınız! Haritaya dönülüyor.", "success");
+            UI.showToast("Bu seviyedeki görevleri tamamladınız! Görev listesine dönülüyor.", "success");
             Game.activeRouteId = null;
             const btnStart = document.getElementById('btn-start-game');
             if (btnStart) btnStart.innerText = "Yeni Bir Oyuna Başla";
+            UI.renderRoutes(Game.currentCity || "Tekirdağ", Game.completedTasks);
             UI.switchScreen('route-menu');
         }
     });
@@ -1020,6 +1042,9 @@ document.addEventListener('DOMContentLoaded', () => {
             UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
             UI.switchScreen('base-selection-menu');
         } else {
+            if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
+                UI.updateTitleScreenButtons();
+            }
             UI.switchScreen('title-screen');
         }
     });

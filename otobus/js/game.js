@@ -913,7 +913,7 @@ const Game = {
 
             detailsContainer.innerHTML = [
                 '<div style="font-size: 1.15rem; color: #38bdf8; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid rgba(56,189,248,0.3); padding-bottom: 6px;">📋 ' + r.name + '</div>',
-                '<div style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;">🏙️ <strong>Sefer Türü:</strong> Süleymanpaşa Şehir İçi Belediye Seferi | <strong>Araç:</strong> TEKULAŞ Belediye Otobüsü</div>',
+                '<div style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;">🏙️ <strong>Sefer Türü:</strong> ' + (r.district || Game.activeDistrict || "Tekirdağ") + ' Şehir İçi Belediye Seferi | <strong>Araç:</strong> TEKULAŞ Belediye Otobüsü</div>',
                 '<div style="margin-bottom: 8px;">📍 <strong>Kalkış (Başlangıç) Durağı:</strong> <span style="color: #38bdf8; font-weight: bold;">' + startStop + '</span></div>',
                 '<div style="margin-bottom: 8px;">🏁 <strong>Gidilecek Son Durak (Hedef):</strong> <span style="color: #22c55e; font-weight: bold;">' + endStop + '</span></div>',
                 '<div style="margin-bottom: 8px;">🛑 <strong>Durulacak Duraklar Listesi (Sırasıyla):</strong><ol style="margin-left: 20px; margin-top: 6px; margin-bottom: 6px;">' + stopsHtml + '</ol></div>',
@@ -1099,9 +1099,9 @@ const Game = {
         if (isOtoyolArea && this.licenseLevel >= 5) {
             audio.currentTerrain = "otoyol";
         } 
-        else if (typeof sehirRotalari !== 'undefined' && sehirRotalari[this.activeRouteId] && sehirRotalari[this.activeRouteId].terrain) {
+        else if (typeof sehirRotalari !== 'undefined' && sehirRotalari[this.currentCity] && sehirRotalari[this.currentCity].terrain) {
             // Åehrin genel terrain'ine dön
-            audio.currentTerrain = sehirRotalari[this.activeRouteId].terrain;
+            audio.currentTerrain = sehirRotalari[this.currentCity].terrain;
         } else {
             audio.currentTerrain = "asfalt";
         }
@@ -2651,7 +2651,7 @@ const Game = {
         // FORMÜLE BAĞLI İNİŞ: Kalan durak sayısına göre orantılı deterministik iniş formülü
         const remainingStops = Math.max(1, this.activeRouteData.stops.length - this.currentStopIndex - 1);
         const alighting = isFinalStop ? this.passengersOnBoard : Math.min(this.passengersOnBoard, Math.max(1, Math.round(this.passengersOnBoard / (remainingStops + 1))));
-        const waiting = stopData.bekleyenYolcu;
+        const waiting = (typeof stopData.bekleyenYolcu === 'number') ? stopData.bekleyenYolcu : 5;
 
         // PAS GEÇME MANTIÄI: İnecek veya binecek yoksa ve son durak değilse durmadan geç
         if (!isFinalStop && alighting === 0 && waiting === 0) {
