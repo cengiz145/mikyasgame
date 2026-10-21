@@ -1324,17 +1324,27 @@ const sehirRotalari = {
             toplamIlceSayisi: 11,
             aciklama: "Eski merkez ilçe Süleymanpaşa adını aldı. Çorlu'ya bağlı beldelerin birleşmesiyle Ergene yeni bir ilçe oldu. Çerkezköy'e bağlı bir belde olan Kapaklı müstakil bir ilçeye dönüştürüldü. Diğer 8 ilçe (Çorlu, Çerkezköy, Malkara, Şarköy, Hayrabolu, Saray, Muratlı ve Marmaraereğlisi) ile birlikte güncel ilçe sayısı 11 olarak sabitlendi.",
             komsuIlceler: {
-                "Süleymanpaşa": ["Muratlı", "Çorlu", "Marmaraereğlisi", "Hayrabolu", "Malkara", "Şarköy", "Kapaklı", "Ergene"],
-                "Çorlu": ["Ergene", "Süleymanpaşa", "Marmaraereğlisi", "Çerkezköy", "Muratlı", "Hayrabolu", "Saray"],
-                "Çerkezköy": ["Kapaklı", "Çorlu", "Ergene", "Saray"],
-                "Kapaklı": ["Çerkezköy", "Saray", "Çorlu", "Süleymanpaşa"],
-                "Ergene": ["Çorlu", "Muratlı", "Süleymanpaşa", "Çerkezköy"],
-                "Muratlı": ["Süleymanpaşa", "Ergene", "Çorlu", "Hayrabolu"],
-                "Marmaraereğlisi": ["Süleymanpaşa", "Çorlu", "Şarköy"],
-                "Saray": ["Kapaklı", "Çerkezköy", "Ergene", "Çorlu", "Süleymanpaşa"],
-                "Hayrabolu": ["Süleymanpaşa", "Muratlı", "Malkara", "Çorlu"],
+                "Süleymanpaşa": ["Muratlı", "Çorlu", "Marmaraereğlisi", "Hayrabolu", "Malkara", "Şarköy"],
+                "Çorlu": ["Süleymanpaşa", "Marmaraereğlisi", "Ergene", "Çerkezköy", "Muratlı"],
+                "Ergene": ["Çorlu", "Muratlı", "Çerkezköy", "Kapaklı", "Saray"],
+                "Çerkezköy": ["Kapaklı", "Çorlu", "Ergene"],
+                "Kapaklı": ["Çerkezköy", "Saray", "Ergene"],
+                "Saray": ["Kapaklı", "Ergene"],
+                "Muratlı": ["Süleymanpaşa", "Çorlu", "Ergene", "Hayrabolu"],
+                "Marmaraereğlisi": ["Süleymanpaşa", "Çorlu"],
+                "Hayrabolu": ["Süleymanpaşa", "Muratlı", "Malkara"],
                 "Malkara": ["Süleymanpaşa", "Hayrabolu", "Şarköy"],
-                "Şarköy": ["Süleymanpaşa", "Malkara", "Marmaraereğlisi"]
+                "Şarköy": ["Süleymanpaşa", "Malkara"]
+            },
+            ilSinirKapilari: {
+                "Marmaraereğlisi": [{ komsuIl: "İstanbul", ilceAks: "Silivri / Gümüşyaka", yol: "D-110 / E84", mesafeKm: 15 }],
+                "Çerkezköy": [{ komsuIl: "İstanbul", ilceAks: "Silivri / Çatalca", yol: "D-567 / O-3", mesafeKm: 25 }],
+                "Kapaklı": [{ komsuIl: "İstanbul", ilceAks: "Çatalca", yol: "D-020", mesafeKm: 30 }],
+                "Muratlı": [{ komsuIl: "Kırklareli", ilceAks: "Lüleburgaz / Büyükkarıştıran", yol: "D-565", mesafeKm: 22 }],
+                "Saray": [{ komsuIl: "Kırklareli", ilceAks: "Vize / Kıyıköy", yol: "D-020", mesafeKm: 20 }],
+                "Hayrabolu": [{ komsuIl: "Edirne", ilceAks: "Uzunköprü", yol: "D-555", mesafeKm: 42 }],
+                "Malkara": [{ komsuIl: "Edirne", ilceAks: "Keşan / İpsala", yol: "D-110 / E84", mesafeKm: 28 }],
+                "Şarköy": [{ komsuIl: "Çanakkale", ilceAks: "Gelibolu / Evreşe", yol: "D-120", mesafeKm: 35 }]
             },
             liste: [
                 { id: "Süleymanpaşa", ad: "Süleymanpaşa", rol: "İl Merkezi (Eski Merkez İlçe)", lat: 40.9833, lon: 27.5167, merkezeMesafeKm: 0, aciklama: "Eski merkez ilçe Süleymanpaşa adını aldı." },
@@ -5666,20 +5676,21 @@ const ilceRotalari = {
                 "Yeniçiftlik Sahil Kavşağı",
                 "Perinthos Antik Kenti Girişi"
         ],
-        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Marmaraereğlisi Otogarı. D-110 Karadeniz-Marmara Sahil Koridoru üzerinden kesintisiz sahil ekspres hattı. Toplam 5 durak, 38 km.",
-        "detailedInstructions": "Süleymanpaşa - Marmaraereğlisi Sahil Ekspres Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otobüs Terminali peronundan 32 yolcuyu alarak hareket edin.\n2. Adım: 6 km sonra Tekirdağ Liman Kavşağı durağına varın; yolcu indirip yeni yolcuları alın.\n3. Adım: 22 km sonra Yeniçiftlik Sahil Kavşağı durağında yolcu indirme/bindirme yapın.\n4. Adım: 8.5 km sonra Perinthos Antik Kenti Girişi durağına uğrayın.\n5. Adım (Hedef Son Durak): 1.5 km sonra Marmaraereğlisi Otogarı peronuna yanaşıp tüm yolcuları indirin ve görevi tamamlayın.",
-        "speechBriefing": "Süleymanpaşa Marmaraereğlisi Sahil Ekspres seferi. D-110 sahil yolu üzerinden toplam 38 kilometrelik sefer başlıyor. Duraklarımız: Liman Kavşağı, Yeniçiftlik ve Perinthos Antik Kenti. Son durak Marmaraereğlisi Otogarı. İyi yolculuklar.",
+        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Marmaraereğlisi Otogarı. D-110 Karadeniz-Marmara Sahil Koridoru üzerinden komşu ilçeye kesintisiz sahil ekspres hattı. Toplam 5 durak, 38 km.",
+        "detailedInstructions": "Süleymanpaşa - Marmaraereğlisi Sahil Ekspres Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otobüs Terminalinden 32 yolcuyu alarak hareket edin.\n2. Adım: 6 km sonra Liman Kavşağı durağına varın.\n3. Adım: 22 km sonra Yeniçiftlik Sahil Kavşağı durağında yolcu indirme/bindirme yapın.\n4. Adım: 8.5 km sonra Perinthos Antik Kenti durağına uğrayın.\n5. Adım (Hedef Son Durak): 1.5 km sonra Marmaraereğlisi Otogarında görevi tamamlayın.",
+        "speechBriefing": "Süleymanpaşa Marmaraereğlisi Sahil Ekspres seferi. D-110 sahil yolu üzerinden komşu ilçemiz Marmaraereğlisi'ne 38 kilometrelik sefer başlıyor. İyi yolculuklar kaptan.",
         "color": "#0ea5e9",
         "otobusKapasitesi": 42,
         "biletFiyat": 70,
         "biletFiyatMultiplier": 2.0,
         "isDistrict": true,
+        "isKomsuRoute": true,
         "terrain": "sahil",
         "totalKm": 38.0,
         "stops": [
                 {
                         "name": "Süleymanpaşa Yeni Otobüs Terminali",
-                        "anons": "Süleymanpaşa Yeni Otobüs Terminali peronundayız. Marmaraereğlisi Sahil Ekspres seferimiz başlıyor.",
+                        "anons": "Süleymanpaşa Yeni Otogar peronundayız. Marmaraereğlisi Sahil Ekspres seferimiz başlıyor.",
                         "bekleyenYolcu": 32,
                         "inenYolcu": 0,
                         "gercekMesafeSonraki": 6.0,
@@ -5689,8 +5700,8 @@ const ilceRotalari = {
                 {
                         "name": "Tekirdağ Liman Kavşağı (D-110)",
                         "anons": "Sonraki durak: Tekirdağ Liman Kavşağı.",
-                        "bekleyenYolcu": 8,
-                        "inenYolcu": 4,
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 2,
                         "gercekMesafeSonraki": 22.0,
                         "lat": 40.976,
                         "lon": 27.53
@@ -5698,26 +5709,26 @@ const ilceRotalari = {
                 {
                         "name": "Yeniçiftlik Sahil Kavşağı",
                         "anons": "Sonraki durak: Yeniçiftlik Sahil Kavşağı.",
-                        "bekleyenYolcu": 10,
+                        "bekleyenYolcu": 8,
                         "inenYolcu": 6,
                         "gercekMesafeSonraki": 8.5,
-                        "lat": 40.982,
-                        "lon": 27.89
+                        "lat": 40.981,
+                        "lon": 28.005
                 },
                 {
                         "name": "Perinthos Antik Kenti Girişi",
                         "anons": "Sonraki durak: Perinthos Antik Kenti Girişi.",
                         "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
+                        "inenYolcu": 5,
                         "gercekMesafeSonraki": 1.5,
-                        "lat": 40.972,
-                        "lon": 27.962
+                        "lat": 40.971,
+                        "lon": 27.958
                 },
                 {
                         "name": "Marmaraereğlisi Otogarı",
-                        "anons": "Son durak: Marmaraereğlisi Otogarı. Seferimiz tamamlanmıştır. Lütfen eşyalarınızı unutmayınız.",
+                        "anons": "Son durak: Marmaraereğlisi Otogarı. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 41,
+                        "inenYolcu": 36,
                         "gercekMesafeSonraki": 0,
                         "lat": 40.9686,
                         "lon": 27.9553
@@ -5727,78 +5738,69 @@ const ilceRotalari = {
         {
         "id": "hat_suleymanpasa_hayrabolu",
         "hatNo": "HB-25",
-        "name": "SÜLEYMANPAŞA - HAYRABOLU EKSPRES",
+        "name": "SÜLEYMANPAŞA - HAYRABOLU OVA EKSPRES",
         "destDistrict": "Hayrabolu",
         "originDistrict": "Süleymanpaşa",
         "startStop": "Süleymanpaşa Yeni Otobüs Terminali",
-        "endStop": "Hayrabolu İlçe Otogarı",
+        "endStop": "Hayrabolu Otogarı & Meydan",
         "intermediateStops": [
-                "Muratlı Caddesi Trafo",
-                "Karacakılavuz Sapağı (D-555)",
-                "Banarlı Belde Meydanı",
-                "Hayrabolu Sanayi Sitesi"
+                "Banarlı Kavşağı (D-555)",
+                "Bıyıkali Tarım Bölgesi",
+                "Karacakılavuz Sapağı"
         ],
-        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Hayrabolu İlçe Otogarı. D-555 Karayolu boyunca Trakya ayçiçeği tarlaları ve beldeler üzerinden ekspres sefer. Toplam 6 durak, 52 km.",
-        "detailedInstructions": "Süleymanpaşa - Hayrabolu Ekspres Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otobüs Terminalinden 35 yolcuyu alarak hareket edin.\n2. Adım: 4 km sonra Muratlı Caddesi Trafo durağında yolcu indirme/bindirme yapın.\n3. Adım: 18 km sonra Karacakılavuz Sapağı durağına varın.\n4. Adım: 12 km sonra Banarlı Belde Meydanı durağında durun.\n5. Adım: 16 km sonra Hayrabolu Sanayi Sitesi durağında durun.\n6. Adım (Hedef Son Durak): 2 km sonra Hayrabolu İlçe Otogarına varıp tüm yolcuları indirin ve görevi tamamlayın.",
-        "speechBriefing": "Süleymanpaşa Hayrabolu Ekspres seferi. D-555 karayolu üzerinden 52 kilometrelik seferimiz başlıyor. Güzergâhımız Karacakılavuz, Banarlı ve Hayrabolu Sanayi. Hedef Hayrabolu İlçe Otogarı. İyi yolculuklar.",
+        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Hayrabolu Otogarı. D-555 üzerinden Trakya ayçiçeği tarlaları ve komşu ilçe Hayrabolu ova aksı. Toplam 5 durak, 52 km.",
+        "detailedInstructions": "Süleymanpaşa - Hayrabolu Ova Ekspres Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otogardan 35 yolcuyu alarak hareket edin.\n2. Adım: 12 km sonra Banarlı Kavşağında durun.\n3. Adım: 15 km sonra Bıyıkali durağında durun.\n4. Adım: 14 km sonra Karacakılavuz Sapağı durağında yolcu indirin.\n5. Adım (Hedef Son Durak): 11 km sonra Hayrabolu Otogarına vararak seferi bitirin.",
+        "speechBriefing": "Süleymanpaşa Hayrabolu Ova Ekspres seferi. D-555 karayolu üzerinden Trakya ovalarını aşarak komşu ilçemiz Hayrabolu'ya uzanan 52 kilometrelik seferimiz başlıyor. İyi sürüşler kaptan.",
         "color": "#eab308",
-        "otobusKapasitesi": 40,
+        "otobusKapasitesi": 44,
         "biletFiyat": 80,
         "biletFiyatMultiplier": 2.0,
         "isDistrict": true,
-        "terrain": "asfalt",
+        "isKomsuRoute": true,
+        "terrain": "kirsal",
         "totalKm": 52.0,
         "stops": [
                 {
                         "name": "Süleymanpaşa Yeni Otobüs Terminali",
-                        "anons": "Süleymanpaşa Yeni Otobüs Terminalindeyiz. Hayrabolu Ekspres seferimiz başlıyor.",
+                        "anons": "Süleymanpaşa Yeni Otogar peronundayız. Hayrabolu Ova Ekspres seferimiz başlıyor.",
                         "bekleyenYolcu": 35,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 4.0,
+                        "gercekMesafeSonraki": 12.0,
                         "lat": 40.995,
                         "lon": 27.562
                 },
                 {
-                        "name": "Muratlı Caddesi Trafo",
-                        "anons": "Sonraki durak: Muratlı Caddesi Trafo.",
+                        "name": "Banarlı Kavşağı (D-555)",
+                        "anons": "Sonraki durak: Banarlı Kavşağı.",
+                        "bekleyenYolcu": 4,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 15.0,
+                        "lat": 41.055,
+                        "lon": 27.425
+                },
+                {
+                        "name": "Bıyıkali Tarım Bölgesi",
+                        "anons": "Sonraki durak: Bıyıkali Tarım Bölgesi.",
                         "bekleyenYolcu": 6,
                         "inenYolcu": 3,
-                        "gercekMesafeSonraki": 18.0,
-                        "lat": 41.002,
-                        "lon": 27.545
+                        "gercekMesafeSonraki": 14.0,
+                        "lat": 41.11,
+                        "lon": 27.31
                 },
                 {
-                        "name": "Karacakılavuz Sapağı (D-555)",
+                        "name": "Karacakılavuz Sapağı",
                         "anons": "Sonraki durak: Karacakılavuz Sapağı.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 12.0,
-                        "lat": 41.12,
-                        "lon": 27.35
-                },
-                {
-                        "name": "Banarlı Belde Meydanı",
-                        "anons": "Sonraki durak: Banarlı Belde Meydanı.",
                         "bekleyenYolcu": 5,
                         "inenYolcu": 4,
-                        "gercekMesafeSonraki": 16.0,
-                        "lat": 41.165,
-                        "lon": 27.28
+                        "gercekMesafeSonraki": 11.0,
+                        "lat": 41.17,
+                        "lon": 27.21
                 },
                 {
-                        "name": "Hayrabolu Sanayi Sitesi",
-                        "anons": "Sonraki durak: Hayrabolu Sanayi Sitesi.",
-                        "bekleyenYolcu": 3,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 2.0,
-                        "lat": 41.21,
-                        "lon": 27.125
-                },
-                {
-                        "name": "Hayrabolu İlçe Otogarı",
-                        "anons": "Son durak: Hayrabolu İlçe Otogarı. Seferimiz sona ermiştir.",
+                        "name": "Hayrabolu Otogarı & Meydan",
+                        "anons": "Son durak: Hayrabolu Otogarı ve Meydan. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 39,
+                        "inenYolcu": 41,
                         "gercekMesafeSonraki": 0,
                         "lat": 41.2153,
                         "lon": 27.1111
@@ -5808,31 +5810,31 @@ const ilceRotalari = {
         {
         "id": "hat_suleymanpasa_malkara",
         "hatNo": "ML-35",
-        "name": "SÜLEYMANPAŞA - MALKARA EKSPRES",
+        "name": "SÜLEYMANPAŞA - MALKARA BATI KORİDORU",
         "destDistrict": "Malkara",
         "originDistrict": "Süleymanpaşa",
         "startStop": "Süleymanpaşa Yeni Otobüs Terminali",
-        "endStop": "Malkara İlçe Otogarı",
+        "endStop": "Malkara Şehirlerarası Otobüs Terminali",
         "intermediateStops": [
-                "Tekirdağ Namık Kemal Üniversitesi Kavşağı",
-                "İnecik Tarihi Kervansaray Durağı",
-                "Yenice Kavşağı (D-110)",
-                "Ahievren Köy Girişi"
+                "Tekirdağ NKÜ Araştırma Hastanesi Kavşağı",
+                "İnecik Tarihi Köy Meydanı",
+                "Ahievren Tarım Kavşağı"
         ],
-        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Malkara İlçe Otogarı. D-110 / E84 Uluslararası Trakya Otoyolu üzerinden hızlı ekspres hat. Toplam 6 durak, 58 km.",
-        "detailedInstructions": "Süleymanpaşa - Malkara Ekspres Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otobüs Terminali peronundan 38 yolcuyu alarak hareket edin.\n2. Adım: 8 km sonra NKÜ Kavşağı durağında yolcu indirin ve bekleyenleri alın.\n3. Adım: 16 km sonra İnecik Tarihi Kervansaray durağında durun.\n4. Adım: 14 km sonra Yenice Kavşağı durağında durun.\n5. Adım: 18 km sonra Ahievren durağında durun.\n6. Adım (Hedef Son Durak): 2 km sonra Malkara İlçe Otogarına varıp tüm yolcuları indirin ve görevi başarıyla tamamlayın.",
-        "speechBriefing": "Süleymanpaşa Malkara Ekspres seferi. D-110 otoyolu üzerinden 58 kilometrelik ekspres sefer başlıyor. İnecik Kervansaray, Yenice ve Ahievren üzerinden Malkara Otogarına ulaşacağız. İyi yolculuklar kaptan.",
-        "color": "#84cc16",
-        "otobusKapasitesi": 44,
+        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Malkara Otogarı. D-110 / E84 uluslararası ana güzergâh üzerinden komşu ilçe Malkara ekspresi. Toplam 5 durak, 58 km.",
+        "detailedInstructions": "Süleymanpaşa - Malkara Batı Koridoru Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otogardan 38 yolcuyu alarak hareket edin.\n2. Adım: 8 km sonra NKÜ Kavşağı durağına varın.\n3. Adım: 20 km sonra İnecik Tarihi Köy durağında durun.\n4. Adım: 18 km sonra Ahievren durağında yolcu indirin.\n5. Adım (Hedef Son Durak): 12 km sonra Malkara Otogarında seferi tamamlayın.",
+        "speechBriefing": "Süleymanpaşa Malkara Batı Koridoru seferi. D-110 E84 otoyol aksı boyunca komşu ilçemiz Malkara'ya uzanan 58 kilometrelik ekspres sefer başlıyor. Emniyet kemerlerinizi bağlayınız.",
+        "color": "#f97316",
+        "otobusKapasitesi": 45,
         "biletFiyat": 85,
         "biletFiyatMultiplier": 2.0,
         "isDistrict": true,
+        "isKomsuRoute": true,
         "terrain": "otoyol",
         "totalKm": 58.0,
         "stops": [
                 {
                         "name": "Süleymanpaşa Yeni Otobüs Terminali",
-                        "anons": "Süleymanpaşa Yeni Otobüs Terminali kalkış peronundayız. Malkara Ekspres seferi başlıyor.",
+                        "anons": "Süleymanpaşa Yeni Otogar peronundayız. Malkara Batı Koridoru seferimiz başlıyor.",
                         "bekleyenYolcu": 38,
                         "inenYolcu": 0,
                         "gercekMesafeSonraki": 8.0,
@@ -5840,44 +5842,35 @@ const ilceRotalari = {
                         "lon": 27.562
                 },
                 {
-                        "name": "Tekirdağ Namık Kemal Üniversitesi Kavşağı",
-                        "anons": "Sonraki durak: Namık Kemal Üniversitesi Kavşağı.",
-                        "bekleyenYolcu": 6,
+                        "name": "Tekirdağ NKÜ Araştırma Hastanesi Kavşağı",
+                        "anons": "Sonraki durak: Tekirdağ NKÜ Araştırma Hastanesi Kavşağı.",
+                        "bekleyenYolcu": 7,
                         "inenYolcu": 4,
-                        "gercekMesafeSonraki": 16.0,
-                        "lat": 40.998,
-                        "lon": 27.585
+                        "gercekMesafeSonraki": 20.0,
+                        "lat": 40.993,
+                        "lon": 27.575
                 },
                 {
-                        "name": "İnecik Tarihi Kervansaray Durağı",
-                        "anons": "Sonraki durak: İnecik Tarihi Kervansaray Durağı.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 14.0,
-                        "lat": 40.925,
-                        "lon": 27.365
-                },
-                {
-                        "name": "Yenice Kavşağı (D-110)",
-                        "anons": "Sonraki durak: Yenice Kavşağı.",
+                        "name": "İnecik Tarihi Köy Meydanı",
+                        "anons": "Sonraki durak: İnecik Tarihi Köy Meydanı.",
                         "bekleyenYolcu": 5,
-                        "inenYolcu": 4,
+                        "inenYolcu": 3,
                         "gercekMesafeSonraki": 18.0,
+                        "lat": 40.935,
+                        "lon": 27.24
+                },
+                {
+                        "name": "Ahievren Tarım Kavşağı",
+                        "anons": "Sonraki durak: Ahievren Tarım Kavşağı.",
+                        "bekleyenYolcu": 4,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 12.0,
                         "lat": 40.908,
-                        "lon": 27.185
+                        "lon": 27.05
                 },
                 {
-                        "name": "Ahievren Köy Girişi",
-                        "anons": "Sonraki durak: Ahievren Köy Girişi.",
-                        "bekleyenYolcu": 3,
-                        "inenYolcu": 2,
-                        "gercekMesafeSonraki": 2.0,
-                        "lat": 40.898,
-                        "lon": 27.02
-                },
-                {
-                        "name": "Malkara İlçe Otogarı",
-                        "anons": "Son durak: Malkara İlçe Otogarı. Seferimiz tamamlanmıştır.",
+                        "name": "Malkara Şehirlerarası Otobüs Terminali",
+                        "anons": "Son durak: Malkara Şehirlerarası Otobüs Terminali. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
                         "inenYolcu": 43,
                         "gercekMesafeSonraki": 0,
@@ -5901,14 +5894,15 @@ const ilceRotalari = {
                 "Hoşköy Tarihi Fener",
                 "Mürefte Liman & İskele"
         ],
-        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Şarköy İskele. Kumbağ, Uçmakdere virajları, Ganos Dağları ve Marmara kıyısı boyunca Türkiye'nin en manzaralı sahil hattı. Toplam 7 durak, 84 km.",
-        "detailedInstructions": "Süleymanpaşa - Şarköy Sahil & Yayla Ekspres Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otogardan 40 yolcuyu alarak hareket edin.\n2. Adım: 14 km sonra Kumbağ Sahil Meydanı durağında durun.\n3. Adım: 12 km sonra Yeniköy Seyir Tepesi durağında durun.\n4. Adım: 11 km sonra Uçmakdere Paraşüt İniş Alanı durağında durun.\n5. Adım: 18 km sonra Hoşköy Tarihi Fener durağına varın.\n6. Adım: 14 km sonra Mürefte Liman durağına varın.\n7. Adım (Hedef Son Durak): 15 km sonra Şarköy İlçe Otogarı ve İskele durağında seferi tamamlayın.",
-        "speechBriefing": "Süleymanpaşa Şarköy Sahil ve Yayla Ekspres seferi. Kumbağ, Uçmakdere yamaçları, Hoşköy ve Mürefte üzerinden Şarköy İskelesine uzanan 84 kilometrelik sahil turumuz başlıyor. İyi seyirler dileriz.",
+        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Şarköy İskele. Kumbağ, Uçmakdere virajları, Ganos Dağları ve Marmara kıyısı boyunca komşu ilçe Şarköy'e uzanan sahil hattı. Toplam 7 durak, 84 km.",
+        "detailedInstructions": "Süleymanpaşa - Şarköy Sahil & Yayla Ekspres Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otogardan 40 yolcuyu alarak hareket edin.\n2. Adım: 14 km sonra Kumbağ Sahil Meydanında durun.\n3. Adım: 12 km sonra Yeniköy durağında durun.\n4. Adım: 11 km sonra Uçmakdere Paraşüt İniş Alanında durun.\n5. Adım: 18 km sonra Hoşköy durağında durun.\n6. Adım: 14 km sonra Mürefte Liman durağına varın.\n7. Adım (Hedef Son Durak): 15 km sonra Şarköy Otogarı ve İskelede seferi tamamlayın.",
+        "speechBriefing": "Süleymanpaşa Şarköy Sahil ve Yayla Ekspres seferi. Kumbağ, Uçmakdere yamaçları, Hoşköy ve Mürefte üzerinden komşu sahil ilçemiz Şarköy'e uzanan 84 kilometrelik nefes kesici yolculuk başlıyor.",
         "color": "#ec4899",
         "otobusKapasitesi": 44,
         "biletFiyat": 120,
         "biletFiyatMultiplier": 2.2,
         "isDistrict": true,
+        "isKomsuRoute": true,
         "terrain": "sahil",
         "totalKm": 84.0,
         "stops": [
@@ -5978,323 +5972,143 @@ const ilceRotalari = {
         ]
 },
         {
-        "id": "hat_suleymanpasa_kapakli",
-        "hatNo": "KP-55",
-        "name": "SÜLEYMANPAŞA - KAPAKLI DİREKT EKSPRES",
-        "destDistrict": "Kapaklı",
-        "originDistrict": "Süleymanpaşa",
-        "startStop": "Süleymanpaşa Yeni Otobüs Terminali",
-        "endStop": "Kapaklı Otogarı",
-        "intermediateStops": [
-                "Muratlı Sapağı (D-567)",
-                "Vakıflar Kavşağı (D-567)",
-                "Kızılpınar Işıklar",
-                "Kapaklı Giriş / Yıldızkent Kavşağı"
-        ],
-        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Kapaklı Otogarı. D-567 üzerinden Çerkezköy çevre yolu ve Yıldızkent bağlantılı direkt sanayi ekspresi. Toplam 6 durak, 67 km.",
-        "detailedInstructions": "Süleymanpaşa - Kapaklı Direkt Ekspres Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otogardan 36 yolcuyu alarak hareket edin.\n2. Adım: 23 km sonra Muratlı Sapağında durun.\n3. Adım: 21 km sonra Vakıflar Kavşağında durun.\n4. Adım: 14 km sonra Kızılpınar Işıklar durağında durun.\n5. Adım: 7 km sonra Kapaklı Yıldızkent Kavşağında durun.\n6. Adım (Hedef Son Durak): 2 km sonra Kapaklı Otogarına varıp tüm yolcuları indirin ve görevi tamamlayın.",
-        "speechBriefing": "Süleymanpaşa Kapaklı Direkt Ekspres seferi. D-567 üzerinden 67 kilometrelik sanayi seferi başlıyor. Güzergâhımız Muratlı, Vakıflar ve Yıldızkent. Hedef Kapaklı Otogarı. İyi yolculuklar.",
-        "color": "#14b8a6",
-        "otobusKapasitesi": 44,
-        "biletFiyat": 90,
-        "biletFiyatMultiplier": 2.0,
-        "isDistrict": true,
-        "terrain": "otoyol",
-        "totalKm": 67.0,
-        "stops": [
-                {
-                        "name": "Süleymanpaşa Yeni Otobüs Terminali",
-                        "anons": "Süleymanpaşa Yeni Otogar peronundayız. Kapaklı Direkt Ekspres seferi başlıyor.",
-                        "bekleyenYolcu": 36,
-                        "inenYolcu": 0,
-                        "gercekMesafeSonraki": 23.0,
-                        "lat": 40.995,
-                        "lon": 27.562
-                },
-                {
-                        "name": "Muratlı Sapağı (D-567)",
-                        "anons": "Sonraki durak: Muratlı Sapağı.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 21.0,
-                        "lat": 41.171,
-                        "lon": 27.502
-                },
-                {
-                        "name": "Vakıflar Kavşağı (D-567)",
-                        "anons": "Sonraki durak: Vakıflar Kavşağı.",
-                        "bekleyenYolcu": 7,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 14.0,
-                        "lat": 41.27,
-                        "lon": 27.7
-                },
-                {
-                        "name": "Kızılpınar Işıklar",
-                        "anons": "Sonraki durak: Kızılpınar Işıklar.",
-                        "bekleyenYolcu": 5,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 7.0,
-                        "lat": 41.265,
-                        "lon": 27.955
-                },
-                {
-                        "name": "Kapaklı Giriş / Yıldızkent Kavşağı",
-                        "anons": "Sonraki durak: Kapaklı Giriş, Yıldızkent Kavşağı.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 5,
-                        "gercekMesafeSonraki": 2.0,
-                        "lat": 41.309,
-                        "lon": 27.984
-                },
-                {
-                        "name": "Kapaklı Otogarı",
-                        "anons": "Son durak: Kapaklı Otogarı. Seferimiz tamamlanmıştır.",
-                        "bekleyenYolcu": 0,
-                        "inenYolcu": 44,
-                        "gercekMesafeSonraki": 0,
-                        "lat": 41.315,
-                        "lon": 27.98
-                }
-        ]
-},
-        {
-        "id": "hat_suleymanpasa_ergene",
-        "hatNo": "ERG-65",
-        "name": "SÜLEYMANPAŞA - ERGENE (MARMARACIK) EKSPRES",
-        "destDistrict": "Ergene",
-        "originDistrict": "Süleymanpaşa",
-        "startStop": "Süleymanpaşa Yeni Otobüs Terminali",
-        "endStop": "Ergene Belediyesi (Marmaracık Merkez)",
-        "intermediateStops": [
-                "Muratlı Demiryolu Kavşağı",
-                "Karamehmet OSB Ayrımı",
-                "Ulaş Belde Meydanı",
-                "Vakıflar Sanayi Sitesi"
-        ],
-        "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Ergene Belediyesi (Marmaracık). Ergene ilçesi idari merkezi, OSB tesisleri ve Ulaş beldesi bağlantılı hat. Toplam 6 durak, 45 km.",
-        "detailedInstructions": "Süleymanpaşa - Ergene Ekspres Görev Adımları:\n1. Adım: Süleymanpaşa Yeni Otogardan 34 yolcuyu alarak hareket edin.\n2. Adım: 20 km sonra Muratlı Demiryolu Kavşağında durun.\n3. Adım: 12 km sonra Karamehmet OSB Ayrımında durun.\n4. Adım: 7 km sonra Ulaş Belde Meydanında durun.\n5. Adım: 4.5 km sonra Vakıflar Sanayi Sitesinde durun.\n6. Adım (Hedef Son Durak): 1.5 km sonra Ergene Belediyesi (Marmaracık Merkez) durağında seferi tamamlayın.",
-        "speechBriefing": "Süleymanpaşa Ergene Ekspres seferi. Ulaş beldesi ve sanayi tesisleri üzerinden Ergene ilçesi Marmaracık merkezine 45 kilometrelik seferimiz başlıyor. İyi yolculuklar dileriz.",
-        "color": "#f97316",
-        "otobusKapasitesi": 40,
-        "biletFiyat": 65,
-        "biletFiyatMultiplier": 2.0,
-        "isDistrict": true,
-        "terrain": "asfalt",
-        "totalKm": 45.0,
-        "stops": [
-                {
-                        "name": "Süleymanpaşa Yeni Otobüs Terminali",
-                        "anons": "Süleymanpaşa Yeni Otogar peronundayız. Ergene Marmaracık Ekspres seferimiz başlıyor.",
-                        "bekleyenYolcu": 34,
-                        "inenYolcu": 0,
-                        "gercekMesafeSonraki": 20.0,
-                        "lat": 40.995,
-                        "lon": 27.562
-                },
-                {
-                        "name": "Muratlı Demiryolu Kavşağı",
-                        "anons": "Sonraki durak: Muratlı Demiryolu Kavşağı.",
-                        "bekleyenYolcu": 5,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 12.0,
-                        "lat": 41.17,
-                        "lon": 27.505
-                },
-                {
-                        "name": "Karamehmet OSB Ayrımı",
-                        "anons": "Sonraki durak: Karamehmet OSB Ayrımı.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 7.0,
-                        "lat": 41.215,
-                        "lon": 27.65
-                },
-                {
-                        "name": "Ulaş Belde Meydanı",
-                        "anons": "Sonraki durak: Ulaş Belde Meydanı.",
-                        "bekleyenYolcu": 7,
-                        "inenYolcu": 5,
-                        "gercekMesafeSonraki": 4.5,
-                        "lat": 41.251,
-                        "lon": 27.778
-                },
-                {
-                        "name": "Vakıflar Sanayi Sitesi",
-                        "anons": "Sonraki durak: Vakıflar Sanayi Sitesi.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 1.5,
-                        "lat": 41.238,
-                        "lon": 27.755
-                },
-                {
-                        "name": "Ergene Belediyesi (Marmaracık Merkez)",
-                        "anons": "Son durak: Ergene Belediyesi Marmaracık Merkez. Seferimiz tamamlanmıştır.",
-                        "bekleyenYolcu": 0,
-                        "inenYolcu": 41,
-                        "gercekMesafeSonraki": 0,
-                        "lat": 41.2281,
-                        "lon": 27.7028
-                }
-        ]
-},
-        {
         "id": "hat_corlu_cerkezkoy",
         "hatNo": "ÇOR-ÇER-70",
-        "name": "ÇORLU - ÇERKEZKÖY SANAYİ EKSPRES",
+        "name": "ÇORLU - ÇERKEZKÖY SANAYİ METROPOLÜ",
         "destDistrict": "Çerkezköy",
         "originDistrict": "Çorlu",
         "startStop": "Çorlu Otogar",
-        "endStop": "Çerkezköy Otogar",
+        "endStop": "Çerkezköy Otogarı",
         "intermediateStops": [
                 "Çorlu Orion AVM & Çevre Yolu",
-                "Tekirdağ Çorlu Atatürk Havalimanı Girişi",
-                "Veliköy Organize Sanayi Bölgesi",
-                "Kızılpınar Meydan"
+                "Velimeşe OSB Kavşağı",
+                "Kızılpınar Işıklar"
         ],
-        "desc": "Kalkış: Çorlu Otogar ➔ Varış: Çerkezköy Otogar. Trakya'nın iki dev sanayi ilçesini bağlayan yoğun sanayi ekspresi. Toplam 6 durak, 26 km.",
-        "detailedInstructions": "Çorlu - Çerkezköy Sanayi Ekspres Görev Adımları:\n1. Adım: Çorlu Otogarından 36 yolcuyu alarak hareket edin.\n2. Adım: 3.5 km sonra Orion AVM durağında durun.\n3. Adım: 5.5 km sonra Çorlu Havalimanı Kavşağında durun.\n4. Adım: 8 km sonra Veliköy OSB durağında durun.\n5. Adım: 5 km sonra Kızılpınar Meydan durağında durun.\n6. Adım (Hedef Son Durak): 4 km sonra Çerkezköy Otogarına varıp tüm yolcuları indirin ve görevi tamamlayın.",
-        "speechBriefing": "Çorlu Çerkezköy Sanayi Ekspres seferi. Havalimanı, Veliköy OSB ve Kızılpınar üzerinden Çerkezköy Otogarına uzanan 26 kilometrelik yoğun sanayi seferimiz başlıyor. İyi yolculuklar.",
+        "desc": "Kalkış: Çorlu Otogar ➔ Varış: Çerkezköy Otogarı. Trakya'nın iki dev sanayi komşu ilçesini D-567 üzerinden birbirine bağlayan yoğun ekspres hattı. Toplam 5 durak, 26 km.",
+        "detailedInstructions": "Çorlu - Çerkezköy Sanayi Metropolü Görev Adımları:\n1. Adım: Çorlu Otogarından 40 yolcuyu alarak hareket edin.\n2. Adım: 4 km sonra Orion AVM durağında durun.\n3. Adım: 12 km sonra Velimeşe OSB Kavşağında durun.\n4. Adım: 7 km sonra Kızılpınar Işıklar durağında durun.\n5. Adım (Hedef Son Durak): 3 km sonra Çerkezköy Otogarına varıp görevi tamamlayın.",
+        "speechBriefing": "Çorlu Çerkezköy Sanayi Metropolü seferi. İki komşu sanayi devimizi bağlayan 26 kilometrelik hatta hareket ediyoruz. Velimeşe OSB ve Kızılpınar üzerinden Çerkezköy Otogarına ulaşıyoruz. İyi sürüşler.",
         "color": "#6366f1",
         "otobusKapasitesi": 44,
-        "biletFiyat": 50,
+        "biletFiyat": 55,
         "biletFiyatMultiplier": 1.8,
         "isDistrict": true,
+        "isKomsuRoute": true,
         "terrain": "otoyol",
         "totalKm": 26.0,
         "stops": [
                 {
                         "name": "Çorlu Otogar",
-                        "anons": "Çorlu Otogar kalkış peronundayız. Çerkezköy Sanayi Ekspres seferi başlıyor.",
-                        "bekleyenYolcu": 36,
+                        "anons": "Çorlu Otogar peronundayız. Çerkezköy Sanayi Metropolü seferimiz başlıyor.",
+                        "bekleyenYolcu": 40,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 3.5,
+                        "gercekMesafeSonraki": 4.0,
                         "lat": 41.16,
                         "lon": 27.8
                 },
                 {
                         "name": "Çorlu Orion AVM & Çevre Yolu",
-                        "anons": "Sonraki durak: Orion AVM ve Çevre Yolu.",
+                        "anons": "Sonraki durak: Çorlu Orion AVM ve Çevre Yolu.",
                         "bekleyenYolcu": 8,
                         "inenYolcu": 4,
-                        "gercekMesafeSonraki": 5.5,
-                        "lat": 41.165,
-                        "lon": 27.825
+                        "gercekMesafeSonraki": 12.0,
+                        "lat": 41.17,
+                        "lon": 27.82
                 },
                 {
-                        "name": "Tekirdağ Çorlu Atatürk Havalimanı Girişi",
-                        "anons": "Sonraki durak: Tekirdağ Çorlu Atatürk Havalimanı Girişi.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 5,
-                        "gercekMesafeSonraki": 8.0,
-                        "lat": 41.138,
-                        "lon": 27.91
-                },
-                {
-                        "name": "Veliköy Organize Sanayi Bölgesi",
-                        "anons": "Sonraki durak: Veliköy Organize Sanayi Bölgesi.",
-                        "bekleyenYolcu": 9,
+                        "name": "Velimeşe OSB Kavşağı",
+                        "anons": "Sonraki durak: Velimeşe Organize Sanayi Kavşağı.",
+                        "bekleyenYolcu": 10,
                         "inenYolcu": 7,
-                        "gercekMesafeSonraki": 5.0,
-                        "lat": 41.235,
-                        "lon": 27.945
+                        "gercekMesafeSonraki": 7.0,
+                        "lat": 41.25,
+                        "lon": 27.89
                 },
                 {
-                        "name": "Kızılpınar Meydan",
-                        "anons": "Sonraki durak: Kızılpınar Meydan.",
+                        "name": "Kızılpınar Işıklar",
+                        "anons": "Sonraki durak: Kızılpınar Işıklar.",
                         "bekleyenYolcu": 6,
                         "inenYolcu": 5,
-                        "gercekMesafeSonraki": 4.0,
+                        "gercekMesafeSonraki": 3.0,
                         "lat": 41.265,
-                        "lon": 27.965
+                        "lon": 27.955
                 },
                 {
-                        "name": "Çerkezköy Otogar",
-                        "anons": "Son durak: Çerkezköy Otogar. Çorlu Çerkezköy seferimiz tamamlanmıştır.",
+                        "name": "Çerkezköy Otogarı",
+                        "anons": "Son durak: Çerkezköy Otogarı. Seferimiz başarıyla tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 44,
+                        "inenYolcu": 48,
                         "gercekMesafeSonraki": 0,
-                        "lat": 41.285,
-                        "lon": 27.995
+                        "lat": 41.2858,
+                        "lon": 28.0019
                 }
         ]
 },
         {
         "id": "hat_corlu_ergene",
         "hatNo": "ÇOR-ERG-72",
-        "name": "ÇORLU - ERGENE (MARMARACIK & SAĞLIK) METROPOL HATTI",
+        "name": "ÇORLU - ERGENE ŞEHİRSEL BAĞLANTI HATTI",
         "destDistrict": "Ergene",
         "originDistrict": "Çorlu",
         "startStop": "Çorlu Otogar",
-        "endStop": "Ergene Belediyesi (Marmaracık Merkez)",
+        "endStop": "Ergene Hükümet Konağı & Marmaracık Meydan",
         "intermediateStops": [
-                "Çorlu Çarşı Heykel Meydanı",
-                "Sağlık Mahallesi Edirne Caddesi",
-                "Yeşiltepe Mahallesi Meydanı",
-                "Ergene Devlet Hastanesi Bölgesi"
+                "Çorlu Yeni Sanayi Sitesi",
+                "Sağlık Mahallesi Meydan",
+                "Yeşiltepe Kavşağı"
         ],
-        "desc": "Kalkış: Çorlu Otogar ➔ Varış: Ergene Marmaracık. Çorlu ve Ergene'nin iç içe geçmiş Sağlık, Yeşiltepe mahalleleri ve hastane bölgesini bağlayan şehirleşmiş metropol hattı. Toplam 6 durak, 9 km.",
-        "detailedInstructions": "Çorlu - Ergene Metropol Hattı Görev Adımları:\n1. Adım: Çorlu Otogarından 30 yolcuyu alarak hareket edin.\n2. Adım: 1.5 km sonra Çorlu Heykel Meydanında durun.\n3. Adım: 2.2 km sonra Sağlık Mahallesi durağında durun.\n4. Adım: 1.8 km sonra Yeşiltepe Meydanında durun.\n5. Adım: 2.4 km sonra Ergene Devlet Hastanesinde durun.\n6. Adım (Hedef Son Durak): 1.1 km sonra Ergene Belediyesi (Marmaracık) merkezinde seferi tamamlayın.",
-        "speechBriefing": "Çorlu Ergene Metropol seferi. Sağlık ve Yeşiltepe mahalleleri üzerinden Ergene Marmaracık merkezine 9 kilometrelik metropol seferimiz başlıyor. İyi sürüşler.",
+        "desc": "Kalkış: Çorlu Otogar ➔ Varış: Ergene Marmaracık. Doğrudan sınır komşusu olan Çorlu ile Ergene'yi birleştiren kesintisiz belediye ekspresi. Toplam 5 durak, 9 km.",
+        "detailedInstructions": "Çorlu - Ergene Şehirsel Bağlantı Görev Adımları:\n1. Adım: Çorlu Otogarından 36 yolcuyu alarak hareket edin.\n2. Adım: 2.5 km sonra Çorlu Yeni Sanayi durağında durun.\n3. Adım: 2.5 km sonra Sağlık Mahallesi durağında yolcu indirin/bindirin.\n4. Adım: 2 km sonra Yeşiltepe Kavşağında durun.\n5. Adım (Hedef Son Durak): 2 km sonra Ergene Marmaracık Hükümet Konağında seferi tamamlayın.",
+        "speechBriefing": "Çorlu Ergene Şehirsel Bağlantı seferi. İki komşu ilçemiz arasındaki 9 kilometrelik yoğun hat başlıyor. Duraklarımız Yeni Sanayi, Sağlık Mahallesi ve Yeşiltepe. Hedef Ergene Marmaracık.",
         "color": "#10b981",
-        "otobusKapasitesi": 38,
-        "biletFiyat": 25,
-        "biletFiyatMultiplier": 1.2,
+        "otobusKapasitesi": 50,
+        "biletFiyat": 30,
+        "biletFiyatMultiplier": 1.5,
         "isDistrict": true,
+        "isKomsuRoute": true,
         "terrain": "asfalt",
         "totalKm": 9.0,
         "stops": [
                 {
                         "name": "Çorlu Otogar",
-                        "anons": "Çorlu Otogar durağındayız. Ergene Marmaracık metropol seferi başlıyor.",
-                        "bekleyenYolcu": 30,
+                        "anons": "Çorlu Otogar peronundayız. Ergene bağlantı hattı seferimiz başlıyor.",
+                        "bekleyenYolcu": 36,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 1.5,
+                        "gercekMesafeSonraki": 2.5,
                         "lat": 41.16,
                         "lon": 27.8
                 },
                 {
-                        "name": "Çorlu Çarşı Heykel Meydanı",
-                        "anons": "Sonraki durak: Çorlu Çarşı Heykel Meydanı.",
-                        "bekleyenYolcu": 7,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 2.2,
-                        "lat": 41.158,
-                        "lon": 27.795
-                },
-                {
-                        "name": "Sağlık Mahallesi Edirne Caddesi",
-                        "anons": "Sonraki durak: Sağlık Mahallesi Edirne Caddesi.",
+                        "name": "Çorlu Yeni Sanayi Sitesi",
+                        "anons": "Sonraki durak: Çorlu Yeni Sanayi Sitesi.",
                         "bekleyenYolcu": 8,
                         "inenYolcu": 5,
-                        "gercekMesafeSonraki": 1.8,
-                        "lat": 41.205,
-                        "lon": 27.735
+                        "gercekMesafeSonraki": 2.5,
+                        "lat": 41.172,
+                        "lon": 27.77
                 },
                 {
-                        "name": "Yeşiltepe Mahallesi Meydanı",
-                        "anons": "Sonraki durak: Yeşiltepe Mahallesi Meydanı.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 2.4,
-                        "lat": 41.198,
-                        "lon": 27.742
-                },
-                {
-                        "name": "Ergene Devlet Hastanesi Bölgesi",
-                        "anons": "Sonraki durak: Ergene Devlet Hastanesi Bölgesi.",
-                        "bekleyenYolcu": 5,
+                        "name": "Sağlık Mahallesi Meydan",
+                        "anons": "Sonraki durak: Sağlık Mahallesi Meydan.",
+                        "bekleyenYolcu": 9,
                         "inenYolcu": 6,
-                        "gercekMesafeSonraki": 1.1,
-                        "lat": 41.233,
-                        "lon": 27.712
+                        "gercekMesafeSonraki": 2.0,
+                        "lat": 41.195,
+                        "lon": 27.74
                 },
                 {
-                        "name": "Ergene Belediyesi (Marmaracık Merkez)",
-                        "anons": "Son durak: Ergene Belediyesi Marmaracık Merkez. Metropol seferimiz tamamlanmıştır.",
+                        "name": "Yeşiltepe Kavşağı",
+                        "anons": "Sonraki durak: Yeşiltepe Kavşağı.",
+                        "bekleyenYolcu": 7,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 2.0,
+                        "lat": 41.215,
+                        "lon": 27.718
+                },
+                {
+                        "name": "Ergene Hükümet Konağı & Marmaracık Meydan",
+                        "anons": "Son durak: Ergene Hükümet Konağı ve Marmaracık Meydan. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 38,
+                        "inenYolcu": 44,
                         "gercekMesafeSonraki": 0,
                         "lat": 41.2281,
                         "lon": 27.7028
@@ -6304,76 +6118,67 @@ const ilceRotalari = {
         {
         "id": "hat_corlu_marmaraereglisi",
         "hatNo": "ÇOR-ME-74",
-        "name": "ÇORLU - MARMARAEREĞLİSİ SAHİL HATTI",
+        "name": "ÇORLU - MARMARAEREĞLİSİ KAVŞAK HATTI",
         "destDistrict": "Marmaraereğlisi",
         "originDistrict": "Çorlu",
         "startStop": "Çorlu Otogar",
         "endStop": "Marmaraereğlisi Otogarı",
         "intermediateStops": [
-                "Emlak Konutları Köprülü Kavşağı",
-                "Seymen Köy Yolu Girişi",
-                "Türkmenli Sapağı",
-                "Yeniçiftlik Çarşı Kavşağı"
+                "Çorlu Havalimanı Kavşağı (TEQ)",
+                "Seymen Köyü Sapağı",
+                "Kamara Koyu Sahil Yolu"
         ],
-        "desc": "Kalkış: Çorlu Otogar ➔ Varış: Marmaraereğlisi Otogarı. Sanayi merkezini en yakın Marmara sahil kıyısına ve plajlara bağlayan hızlı ilçe koridoru. Toplam 6 durak, 22 km.",
-        "detailedInstructions": "Çorlu - Marmaraereğlisi Sahil Hattı Görev Adımları:\n1. Adım: Çorlu Otogarından 32 yolcuyu alarak hareket edin.\n2. Adım: 3 km sonra Emlak Konutları Kavşağında durun.\n3. Adım: 7 km sonra Seymen Köy Girişinde durun.\n4. Adım: 5.5 km sonra Türkmenli Sapağında durun.\n5. Adım: 4.5 km sonra Yeniçiftlik Kavşağında durun.\n6. Adım (Hedef Son Durak): 2 km sonra Marmaraereğlisi Otogarına varıp tüm yolcuları indirin ve görevi tamamlayın.",
-        "speechBriefing": "Çorlu Marmaraereğlisi sahil seferi. Seymen ve Yeniçiftlik üzerinden Marmara Denizi kıyısına 22 kilometrelik seferimiz başlıyor. İyi yolculuklar.",
+        "desc": "Kalkış: Çorlu Otogar ➔ Varış: Marmaraereğlisi Otogarı. Havalimanı koridoru üzerinden güney komşusu Marmaraereğlisi kıyılarına uzanan ekspres hat. Toplam 5 durak, 22 km.",
+        "detailedInstructions": "Çorlu - Marmaraereğlisi Kavşak Hattı Görev Adımları:\n1. Adım: Çorlu Otogarından 34 yolcuyu alarak hareket edin.\n2. Adım: 7 km sonra Havalimanı Kavşağında durun.\n3. Adım: 6 km sonra Seymen Köyü Sapağında durun.\n4. Adım: 6 km sonra Kamara Koyu durağında durun.\n5. Adım (Hedef Son Durak): 3 km sonra Marmaraereğlisi Otogarında görevi tamamlayın.",
+        "speechBriefing": "Çorlu Marmaraereğlisi Kavşak seferi. Çorlu Havalimanı ve Seymen üzerinden komşu sahil ilçemiz Marmaraereğlisi'ne 22 kilometrelik seferimiz başlıyor. İyi sürüşler dileriz.",
         "color": "#06b6d4",
-        "otobusKapasitesi": 40,
-        "biletFiyat": 45,
+        "otobusKapasitesi": 44,
+        "biletFiyat": 50,
         "biletFiyatMultiplier": 1.8,
         "isDistrict": true,
+        "isKomsuRoute": true,
         "terrain": "asfalt",
         "totalKm": 22.0,
         "stops": [
                 {
                         "name": "Çorlu Otogar",
-                        "anons": "Çorlu Otogar kalkış peronundayız. Marmaraereğlisi seferi başlıyor.",
-                        "bekleyenYolcu": 32,
+                        "anons": "Çorlu Otogar peronundayız. Marmaraereğlisi Kavşak seferimiz başlıyor.",
+                        "bekleyenYolcu": 34,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 3.0,
+                        "gercekMesafeSonraki": 7.0,
                         "lat": 41.16,
                         "lon": 27.8
                 },
                 {
-                        "name": "Emlak Konutları Köprülü Kavşağı",
-                        "anons": "Sonraki durak: Emlak Konutları Köprülü Kavşağı.",
+                        "name": "Çorlu Havalimanı Kavşağı (TEQ)",
+                        "anons": "Sonraki durak: Çorlu Atatürk Havalimanı Kavşağı.",
                         "bekleyenYolcu": 6,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 7.0,
-                        "lat": 41.155,
-                        "lon": 27.83
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 41.135,
+                        "lon": 27.89
                 },
                 {
-                        "name": "Seymen Köy Yolu Girişi",
-                        "anons": "Sonraki durak: Seymen Köy Yolu Girişi.",
-                        "bekleyenYolcu": 4,
+                        "name": "Seymen Köyü Sapağı",
+                        "anons": "Sonraki durak: Seymen Köyü Sapağı.",
+                        "bekleyenYolcu": 5,
                         "inenYolcu": 3,
-                        "gercekMesafeSonraki": 5.5,
-                        "lat": 41.085,
-                        "lon": 27.88
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 41.06,
+                        "lon": 27.92
                 },
                 {
-                        "name": "Türkmenli Sapağı",
-                        "anons": "Sonraki durak: Türkmenli Sapağı.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 4.5,
-                        "lat": 41.025,
-                        "lon": 27.915
-                },
-                {
-                        "name": "Yeniçiftlik Çarşı Kavşağı",
-                        "anons": "Sonraki durak: Yeniçiftlik Çarşı Kavşağı.",
-                        "bekleyenYolcu": 7,
+                        "name": "Kamara Koyu Sahil Yolu",
+                        "anons": "Sonraki durak: Kamara Koyu Sahil Yolu.",
+                        "bekleyenYolcu": 6,
                         "inenYolcu": 5,
-                        "gercekMesafeSonraki": 2.0,
+                        "gercekMesafeSonraki": 3.0,
                         "lat": 40.985,
-                        "lon": 27.995
+                        "lon": 27.94
                 },
                 {
                         "name": "Marmaraereğlisi Otogarı",
-                        "anons": "Son durak: Marmaraereğlisi Otogarı. Çorlu Marmaraereğlisi seferimiz tamamlanmıştır.",
+                        "anons": "Son durak: Marmaraereğlisi Otogarı. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
                         "inenYolcu": 39,
                         "gercekMesafeSonraki": 0,
@@ -6385,749 +6190,1174 @@ const ilceRotalari = {
         {
         "id": "hat_corlu_muratli",
         "hatNo": "ÇOR-MUR-76",
-        "name": "ÇORLU - MURATLI İLÇE HATTI",
+        "name": "ÇORLU - MURATLI SANAYİ & TREN HATTI",
         "destDistrict": "Muratlı",
         "originDistrict": "Çorlu",
         "startStop": "Çorlu Otogar",
-        "endStop": "Muratlı Tren Garı",
+        "endStop": "Muratlı İlçe Otogarı",
         "intermediateStops": [
-                "Çorlu Çevre Yolu Kırkgöz Mevkii",
-                "Hıdırağa Köyü Sapağı",
-                "Aşağısevindik Kavşağı",
-                "Muratlı Sanayi Sitesi"
+                "Çorlu Ağır Sanayi Bölgesi",
+                "Kırkgöz Köyü Girişi",
+                "Muratlı Tren Garı Meydanı"
         ],
-        "desc": "Kalkış: Çorlu Otogar ➔ Varış: Muratlı Tren Garı. D-565 karayolu ve Trakya demiryolu koridoru boyunca ilçe seferi. Toplam 6 durak, 24 km.",
-        "detailedInstructions": "Çorlu - Muratlı İlçe Hattı Görev Adımları:\n1. Adım: Çorlu Otogarından 30 yolcuyu alarak hareket edin.\n2. Adım: 4 km sonra Kırkgöz Mevkiinde durun.\n3. Adım: 8 km sonra Hıdırağa Köy Sapağında durun.\n4. Adım: 6.5 km sonra Aşağısevindik Kavşağında durun.\n5. Adım: 4 km sonra Muratlı Sanayi Sitesinde durun.\n6. Adım (Hedef Son Durak): 1.5 km sonra Muratlı Tren Garında tüm yolcuları indirin ve görevi tamamlayın.",
-        "speechBriefing": "Çorlu Muratlı seferi. D-565 üzerinden Muratlı Tren Garına 24 kilometrelik ilçe seferimiz başlıyor. İyi yolculuklar.",
+        "desc": "Kalkış: Çorlu Otogar ➔ Varış: Muratlı Otogarı. İki komşu sanayi ve tarım ilçesini D-565 üzerinden bağlayan demiryolu ve karayolu ekspresi. Toplam 5 durak, 24 km.",
+        "detailedInstructions": "Çorlu - Muratlı Sanayi & Tren Hattı Görev Adımları:\n1. Adım: Çorlu Otogarından 35 yolcuyu alarak hareket edin.\n2. Adım: 5 km sonra Çorlu Ağır Sanayi Bölgesinde durun.\n3. Adım: 9 km sonra Kırkgöz Köyü durağında durun.\n4. Adım: 8 km sonra Muratlı Tren Garı Meydanında durun.\n5. Adım (Hedef Son Durak): 2 km sonra Muratlı İlçe Otogarında seferi bitirin.",
+        "speechBriefing": "Çorlu Muratlı Sanayi ve Tren hattı seferi. Kırkgöz ve Ağır Sanayi üzerinden komşumuz Muratlı'ya 24 kilometrelik seferimiz başlıyor. İyi yolculuklar.",
         "color": "#8b5cf6",
-        "otobusKapasitesi": 38,
-        "biletFiyat": 45,
+        "otobusKapasitesi": 44,
+        "biletFiyat": 50,
         "biletFiyatMultiplier": 1.8,
         "isDistrict": true,
+        "isKomsuRoute": true,
         "terrain": "asfalt",
         "totalKm": 24.0,
         "stops": [
                 {
                         "name": "Çorlu Otogar",
-                        "anons": "Çorlu Otogar kalkış durağındayız. Muratlı seferimiz başlıyor.",
-                        "bekleyenYolcu": 30,
+                        "anons": "Çorlu Otogar peronundayız. Muratlı ekspres seferimiz başlıyor.",
+                        "bekleyenYolcu": 35,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 4.0,
+                        "gercekMesafeSonraki": 5.0,
                         "lat": 41.16,
                         "lon": 27.8
                 },
                 {
-                        "name": "Çorlu Çevre Yolu Kırkgöz Mevkii",
-                        "anons": "Sonraki durak: Çorlu Çevre Yolu Kırkgöz Mevkii.",
-                        "bekleyenYolcu": 5,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 8.0,
-                        "lat": 41.175,
-                        "lon": 27.76
+                        "name": "Çorlu Ağır Sanayi Bölgesi",
+                        "anons": "Sonraki durak: Çorlu Ağır Sanayi Bölgesi.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 9.0,
+                        "lat": 41.17,
+                        "lon": 27.72
                 },
                 {
-                        "name": "Hıdırağa Köyü Sapağı",
-                        "anons": "Sonraki durak: Hıdırağa Köyü Sapağı.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 2,
-                        "gercekMesafeSonraki": 6.5,
-                        "lat": 41.185,
-                        "lon": 27.68
-                },
-                {
-                        "name": "Aşağısevindik Kavşağı",
-                        "anons": "Sonraki durak: Aşağısevindik Kavşağı.",
+                        "name": "Kırkgöz Köyü Girişi",
+                        "anons": "Sonraki durak: Kırkgöz Köyü Girişi.",
                         "bekleyenYolcu": 5,
                         "inenYolcu": 4,
-                        "gercekMesafeSonraki": 4.0,
-                        "lat": 41.191,
-                        "lon": 27.531
+                        "gercekMesafeSonraki": 8.0,
+                        "lat": 41.18,
+                        "lon": 27.6
                 },
                 {
-                        "name": "Muratlı Sanayi Sitesi",
-                        "anons": "Sonraki durak: Muratlı Sanayi Sitesi.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 1.5,
-                        "lat": 41.182,
-                        "lon": 27.518
+                        "name": "Muratlı Tren Garı Meydanı",
+                        "anons": "Sonraki durak: Muratlı Tren Garı Meydanı.",
+                        "bekleyenYolcu": 7,
+                        "inenYolcu": 6,
+                        "gercekMesafeSonraki": 2.0,
+                        "lat": 41.173,
+                        "lon": 27.505
                 },
                 {
-                        "name": "Muratlı Tren Garı",
-                        "anons": "Son durak: Muratlı Tren Garı. Çorlu Muratlı seferimiz tamamlanmıştır.",
+                        "name": "Muratlı İlçe Otogarı",
+                        "anons": "Son durak: Muratlı İlçe Otogarı. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 36,
+                        "inenYolcu": 41,
                         "gercekMesafeSonraki": 0,
-                        "lat": 41.1712,
-                        "lon": 27.5023
+                        "lat": 41.1717,
+                        "lon": 27.5028
                 }
         ]
 },
         {
-        "id": "hat_corlu_hayrabolu",
-        "hatNo": "ÇOR-HB-78",
-        "name": "ÇORLU - HAYRABOLU İÇ TRAKYA EKSPRES",
-        "destDistrict": "Hayrabolu",
-        "originDistrict": "Çorlu",
-        "startStop": "Çorlu Otogar",
-        "endStop": "Hayrabolu İlçe Otogarı",
+        "id": "hat_ergene_muratli",
+        "hatNo": "ERG-MUR-77",
+        "name": "ERGENE - MURATLI KOMŞU İLÇE HATTI",
+        "destDistrict": "Muratlı",
+        "originDistrict": "Ergene",
+        "startStop": "Ergene Hükümet Konağı & Marmaracık Meydan",
+        "endStop": "Muratlı İlçe Otogarı",
         "intermediateStops": [
-                "Ulaş Belde Girişi",
-                "Ahimehmet Sapağı",
-                "Kütahya Köy Yolu",
-                "Çerkezmüsellim Belde Meydanı"
+                "Ulaş Beldesi Çarşı",
+                "Misinli Tarım Kavşağı",
+                "Muratlı Sanayi Kavşağı"
         ],
-        "desc": "Kalkış: Çorlu Otogar ➔ Varış: Hayrabolu İlçe Otogarı. Trakya iç ovaları, beldeler ve tarım koridoru üzerinden 64 km'lik uzun ekspres hat.",
-        "detailedInstructions": "Çorlu - Hayrabolu Ekspres Görev Adımları:\n1. Adım: Çorlu Otogarından 38 yolcuyu alarak hareket edin.\n2. Adım: 14 km sonra Ulaş Belde Girişinde durun.\n3. Adım: 16 km sonra Ahimehmet Sapağında durun.\n4. Adım: 16 km sonra Kütahya Köy Yolunda durun.\n5. Adım: 14 km sonra Çerkezmüsellim Belde Meydanında durun.\n6. Adım (Hedef Son Durak): 4 km sonra Hayrabolu İlçe Otogarına varıp tüm yolcuları indirin ve görevi tamamlayın.",
-        "speechBriefing": "Çorlu Hayrabolu İç Trakya Ekspres seferi. Ulaş ve Çerkezmüsellim üzerinden Hayrabolu Otogarına 64 kilometrelik seferimiz başlıyor. İyi yolculuklar kaptan.",
-        "color": "#f59e0b",
+        "desc": "Kalkış: Ergene Marmaracık ➔ Varış: Muratlı Otogarı. Ergene ve Muratlı fiziksel sınır komşuluğunu birleştiren yerel ve sanayi ekspresi. Toplam 5 durak, 18 km.",
+        "detailedInstructions": "Ergene - Muratlı Komşu İlçe Hattı Görev Adımları:\n1. Adım: Ergene Marmaracık Hükümet Konağından 30 yolcuyu alın.\n2. Adım: 4 km sonra Ulaş Beldesinde durun.\n3. Adım: 6 km sonra Misinli Kavşağında durun.\n4. Adım: 6 km sonra Muratlı Sanayi durağına varın.\n5. Adım (Hedef Son Durak): 2 km sonra Muratlı Otogarında seferi bitirin.",
+        "speechBriefing": "Ergene Muratlı Komşu İlçe seferi. Marmaracık'tan hareket ederek Ulaş ve Misinli üzerinden sınır komşumuz Muratlı Otogarına uzanan 18 kilometrelik seferimiz başlıyor. İyi sürüşler.",
+        "color": "#14b8a6",
         "otobusKapasitesi": 42,
-        "biletFiyat": 90,
-        "biletFiyatMultiplier": 2.0,
+        "biletFiyat": 45,
+        "biletFiyatMultiplier": 1.7,
         "isDistrict": true,
+        "isKomsuRoute": true,
         "terrain": "asfalt",
-        "totalKm": 64.0,
+        "totalKm": 18.0,
         "stops": [
                 {
-                        "name": "Çorlu Otogar",
-                        "anons": "Çorlu Otogar kalkış peronundayız. Hayrabolu İç Trakya Ekspres seferi başlıyor.",
-                        "bekleyenYolcu": 38,
+                        "name": "Ergene Hükümet Konağı & Marmaracık Meydan",
+                        "anons": "Ergene Marmaracık peronundayız. Muratlı komşu ilçe seferimiz başlıyor.",
+                        "bekleyenYolcu": 30,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 14.0,
-                        "lat": 41.16,
+                        "gercekMesafeSonraki": 4.0,
+                        "lat": 41.2281,
+                        "lon": 27.7028
+                },
+                {
+                        "name": "Ulaş Beldesi Çarşı",
+                        "anons": "Sonraki durak: Ulaş Beldesi Çarşı.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 41.215,
+                        "lon": 27.65
+                },
+                {
+                        "name": "Misinli Tarım Kavşağı",
+                        "anons": "Sonraki durak: Misinli Tarım Kavşağı.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 41.2,
+                        "lon": 27.58
+                },
+                {
+                        "name": "Muratlı Sanayi Kavşağı",
+                        "anons": "Sonraki durak: Muratlı Sanayi Kavşağı.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 2.0,
+                        "lat": 41.18,
+                        "lon": 27.52
+                },
+                {
+                        "name": "Muratlı İlçe Otogarı",
+                        "anons": "Son durak: Muratlı İlçe Otogarı. Seferimiz tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 36,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 41.1717,
+                        "lon": 27.5028
+                }
+        ]
+},
+        {
+        "id": "hat_ergene_cerkezkoy",
+        "hatNo": "ERG-ÇER-79",
+        "name": "ERGENE - ÇERKEZKÖY OSB SANAYİ KORİDORU",
+        "destDistrict": "Çerkezköy",
+        "originDistrict": "Ergene",
+        "startStop": "Ergene Hükümet Konağı & Marmaracık Meydan",
+        "endStop": "Çerkezköy Otogarı",
+        "intermediateStops": [
+                "Velimeşe Merkez Meydanı (Atatürk Parkı)",
+                "Velimeşe OSB Girişi",
+                "Kızılpınar Işıklar"
+        ],
+        "desc": "Kalkış: Ergene Marmaracık ➔ Varış: Çerkezköy Otogarı. Velimeşe Organize Sanayi Bölgesi üzerinden komşu ilçe Çerkezköy'e bağlanan ekspres hat. Toplam 5 durak, 23 km.",
+        "detailedInstructions": "Ergene - Çerkezköy OSB Koridoru Görev Adımları:\n1. Adım: Ergene Marmaracık'tan 35 yolcuyu alarak hareket edin.\n2. Adım: 11 km sonra Velimeşe Merkez Meydanında durun.\n3. Adım: 2.5 km sonra Velimeşe OSB Girişinde durun.\n4. Adım: 6.5 km sonra Kızılpınar Işıklarda durun.\n5. Adım (Hedef Son Durak): 3 km sonra Çerkezköy Otogarında seferi tamamlayın.",
+        "speechBriefing": "Ergene Çerkezköy OSB Sanayi Koridoru seferi. Velimeşe Organize Sanayi üzerinden sınır komşumuz Çerkezköy'e 23 kilometrelik sanayi seferi başlıyor. İyi sürüşler kaptan.",
+        "color": "#3b82f6",
+        "otobusKapasitesi": 46,
+        "biletFiyat": 50,
+        "biletFiyatMultiplier": 1.8,
+        "isDistrict": true,
+        "isKomsuRoute": true,
+        "terrain": "asfalt",
+        "totalKm": 23.0,
+        "stops": [
+                {
+                        "name": "Ergene Hükümet Konağı & Marmaracık Meydan",
+                        "anons": "Ergene Marmaracık peronundayız. Çerkezköy OSB koridoru seferimiz başlıyor.",
+                        "bekleyenYolcu": 35,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 11.0,
+                        "lat": 41.2281,
+                        "lon": 27.7028
+                },
+                {
+                        "name": "Velimeşe Merkez Meydanı (Atatürk Parkı)",
+                        "anons": "Sonraki durak: Velimeşe Merkez Meydanı Atatürk Parkı.",
+                        "bekleyenYolcu": 9,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 2.5,
+                        "lat": 41.254,
+                        "lon": 27.902
+                },
+                {
+                        "name": "Velimeşe OSB Girişi",
+                        "anons": "Sonraki durak: Velimeşe Organize Sanayi Bölgesi Girişi.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 6,
+                        "gercekMesafeSonraki": 6.5,
+                        "lat": 41.258,
+                        "lon": 27.92
+                },
+                {
+                        "name": "Kızılpınar Işıklar",
+                        "anons": "Sonraki durak: Kızılpınar Işıklar.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 3.0,
+                        "lat": 41.265,
+                        "lon": 27.955
+                },
+                {
+                        "name": "Çerkezköy Otogarı",
+                        "anons": "Son durak: Çerkezköy Otogarı. Seferimiz tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 43,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 41.2858,
+                        "lon": 28.0019
+                }
+        ]
+},
+        {
+        "id": "hat_ergene_kapakli",
+        "hatNo": "ERG-KAP-81",
+        "name": "ERGENE - KAPAKLI SANAYİ & YILDIZKENT HATTI",
+        "destDistrict": "Kapaklı",
+        "originDistrict": "Ergene",
+        "startStop": "Ergene Hükümet Konağı & Marmaracık Meydan",
+        "endStop": "Kapaklı Otogarı",
+        "intermediateStops": [
+                "Vakıflar Kavşağı (D-567)",
+                "Velimeşe Çevre Yolu",
+                "Kapaklı Giriş / Yıldızkent Kavşağı"
+        ],
+        "desc": "Kalkış: Ergene Marmaracık ➔ Varış: Kapaklı Otogarı. Vakıflar ve Velimeşe çevre yolu aksından komşu ilçe Kapaklı Yıldızkent'e bağlanan hat. Toplam 5 durak, 28 km.",
+        "detailedInstructions": "Ergene - Kapaklı Sanayi Hattı Görev Adımları:\n1. Adım: Ergene Marmaracık'tan 32 yolcuyu alarak hareket edin.\n2. Adım: 8 km sonra Vakıflar Kavşağında durun.\n3. Adım: 12 km sonra Velimeşe Çevre Yolunda durun.\n4. Adım: 6 km sonra Kapaklı Yıldızkent Kavşağında durun.\n5. Adım (Hedef Son Durak): 2 km sonra Kapaklı Otogarında seferi tamamlayın.",
+        "speechBriefing": "Ergene Kapaklı Sanayi hattı seferi. Vakıflar ve Yıldızkent üzerinden komşu ilçemiz Kapaklı'ya 28 kilometrelik ekspres seferimiz başlıyor. İyi sürüşler.",
+        "color": "#0284c7",
+        "otobusKapasitesi": 44,
+        "biletFiyat": 55,
+        "biletFiyatMultiplier": 1.8,
+        "isDistrict": true,
+        "isKomsuRoute": true,
+        "terrain": "otoyol",
+        "totalKm": 28.0,
+        "stops": [
+                {
+                        "name": "Ergene Hükümet Konağı & Marmaracık Meydan",
+                        "anons": "Ergene Marmaracık peronundayız. Kapaklı ekspres seferimiz başlıyor.",
+                        "bekleyenYolcu": 32,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 8.0,
+                        "lat": 41.2281,
+                        "lon": 27.7028
+                },
+                {
+                        "name": "Vakıflar Kavşağı (D-567)",
+                        "anons": "Sonraki durak: Vakıflar Kavşağı.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 12.0,
+                        "lat": 41.27,
+                        "lon": 27.7
+                },
+                {
+                        "name": "Velimeşe Çevre Yolu",
+                        "anons": "Sonraki durak: Velimeşe Çevre Yolu.",
+                        "bekleyenYolcu": 7,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 41.275,
+                        "lon": 27.88
+                },
+                {
+                        "name": "Kapaklı Giriş / Yıldızkent Kavşağı",
+                        "anons": "Sonraki durak: Kapaklı Giriş, Yıldızkent Kavşağı.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 2.0,
+                        "lat": 41.309,
+                        "lon": 27.984
+                },
+                {
+                        "name": "Kapaklı Otogarı",
+                        "anons": "Son durak: Kapaklı Otogarı. Seferimiz tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 41,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 41.3125,
+                        "lon": 27.9786
+                }
+        ]
+},
+        {
+        "id": "hat_ergene_saray",
+        "hatNo": "ERG-SAR-83",
+        "name": "ERGENE - SARAY KUZEY TRAKYA HATTI",
+        "destDistrict": "Saray",
+        "originDistrict": "Ergene",
+        "startStop": "Ergene Hükümet Konağı & Marmaracık Meydan",
+        "endStop": "Saray Belediyesi Otogarı",
+        "intermediateStops": [
+                "Vakıflar Kavşağı (D-567)",
+                "Misinköy Orman Koridoru",
+                "Büyükyoncalı Meydan"
+        ],
+        "desc": "Kalkış: Ergene Marmaracık ➔ Varış: Saray Otogarı. D-567 karayolu ile doğrudan sınır komşusu olan Saray ilçesine uzanan kuzey ekspresi. Toplam 5 durak, 43 km.",
+        "detailedInstructions": "Ergene - Saray Kuzey Trakya Hattı Görev Adımları:\n1. Adım: Ergene Marmaracık'tan 36 yolcuyu alarak hareket edin.\n2. Adım: 8 km sonra Vakıflar Kavşağında durun.\n3. Adım: 16 km sonra Misinköy Orman Koridorunda durun.\n4. Adım: 12 km sonra Büyükyoncalı Meydanında durun.\n5. Adım (Hedef Son Durak): 7 km sonra Saray Belediyesi Otogarında seferi bitirin.",
+        "speechBriefing": "Ergene Saray Kuzey Trakya seferi. Vakıflar ve Büyükyoncalı üzerinden komşumuz Saray Otogarına uzanan 43 kilometrelik sefer başlıyor. Istranca eteklerine tırmanıyoruz. İyi yolculuklar.",
+        "color": "#0d9488",
+        "otobusKapasitesi": 44,
+        "biletFiyat": 70,
+        "biletFiyatMultiplier": 1.9,
+        "isDistrict": true,
+        "isKomsuRoute": true,
+        "terrain": "kirsal",
+        "totalKm": 43.0,
+        "stops": [
+                {
+                        "name": "Ergene Hükümet Konağı & Marmaracık Meydan",
+                        "anons": "Ergene Marmaracık peronundayız. Saray Kuzey Trakya seferimiz başlıyor.",
+                        "bekleyenYolcu": 36,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 8.0,
+                        "lat": 41.2281,
+                        "lon": 27.7028
+                },
+                {
+                        "name": "Vakıflar Kavşağı (D-567)",
+                        "anons": "Sonraki durak: Vakıflar Kavşağı.",
+                        "bekleyenYolcu": 7,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 16.0,
+                        "lat": 41.27,
+                        "lon": 27.7
+                },
+                {
+                        "name": "Misinköy Orman Koridoru",
+                        "anons": "Sonraki durak: Misinköy Orman Koridoru.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 12.0,
+                        "lat": 41.35,
                         "lon": 27.8
                 },
                 {
-                        "name": "Ulaş Belde Girişi",
-                        "anons": "Sonraki durak: Ulaş Belde Girişi.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 16.0,
-                        "lat": 41.251,
-                        "lon": 27.778
+                        "name": "Büyükyoncalı Meydan",
+                        "anons": "Sonraki durak: Büyükyoncalı Meydan.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 6,
+                        "gercekMesafeSonraki": 7.0,
+                        "lat": 41.38,
+                        "lon": 27.91
                 },
                 {
-                        "name": "Ahimehmet Sapağı",
-                        "anons": "Sonraki durak: Ahimehmet Sapağı.",
-                        "bekleyenYolcu": 5,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 16.0,
-                        "lat": 41.245,
-                        "lon": 27.56
-                },
-                {
-                        "name": "Kütahya Köy Yolu",
-                        "anons": "Sonraki durak: Kütahya Köy Yolu.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 14.0,
-                        "lat": 41.235,
-                        "lon": 27.35
-                },
-                {
-                        "name": "Çerkezmüsellim Belde Meydanı",
-                        "anons": "Sonraki durak: Çerkezmüsellim Belde Meydanı.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 5,
-                        "gercekMesafeSonraki": 4.0,
-                        "lat": 41.225,
-                        "lon": 27.2
-                },
-                {
-                        "name": "Hayrabolu İlçe Otogarı",
-                        "anons": "Son durak: Hayrabolu İlçe Otogarı. Seferimiz tamamlanmıştır.",
+                        "name": "Saray Belediyesi Otogarı",
+                        "anons": "Son durak: Saray Belediyesi Otogarı. Seferimiz başarıyla tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 44,
+                        "inenYolcu": 43,
                         "gercekMesafeSonraki": 0,
-                        "lat": 41.2153,
-                        "lon": 27.1111
+                        "lat": 41.445,
+                        "lon": 27.925
                 }
         ]
 },
         {
         "id": "hat_cerkezkoy_kapakli",
         "hatNo": "ÇER-KAP-80",
-        "name": "ÇERKEZKÖY - KAPAKLI METROPOL RİNGİ",
+        "name": "ÇERKEZKÖY - KAPAKLI METROPOLİTEN HAT",
         "destDistrict": "Kapaklı",
         "originDistrict": "Çerkezköy",
-        "startStop": "Çerkezköy Otogar",
+        "startStop": "Çerkezköy Otogarı",
         "endStop": "Kapaklı Otogarı",
         "intermediateStops": [
-                "Çerkezköy Belediyesi / Atatürk Caddesi",
-                "Çerkezköy Devlet Hastanesi Sapağı",
-                "Kapaklı Giriş / Yıldızkent Kavşağı",
-                "Kapaklı Belediyesi"
+                "Cengiz Topel Caddesi Kavşağı",
+                "Kapaklı Yıldızkent Köprülü Kavşağı"
         ],
-        "desc": "Kalkış: Çerkezköy Otogar ➔ Varış: Kapaklı Otogarı. Trakya'nın en hızlı büyüyen iki ilçesini 5 km mesafede birleştiren yoğun metropol ringi. Toplam 6 durak.",
-        "detailedInstructions": "Çerkezköy - Kapaklı Metropol Hattı Görev Adımları:\n1. Adım: Çerkezköy Otogarından 32 yolcuyu alarak hareket edin.\n2. Adım: 1 km sonra Çerkezköy Belediyesi durağında durun.\n3. Adım: 1.2 km sonra Devlet Hastanesi Sapağında durun.\n4. Adım: 1 km sonra Yıldızkent Kavşağında durun.\n5. Adım: 0.9 km sonra Kapaklı Belediyesinde durun.\n6. Adım (Hedef Son Durak): 0.9 km sonra Kapaklı Otogarında seferi tamamlayın.",
-        "speechBriefing": "Çerkezköy Kapaklı Metropol seferi. Yıldızkent üzerinden Kapaklı Otogarına 5 kilometrelik yoğun ring hattımız başlıyor. İyi sürüşler kaptan.",
-        "color": "#10b981",
-        "otobusKapasitesi": 36,
-        "biletFiyat": 20,
-        "biletFiyatMultiplier": 1.2,
+        "desc": "Kalkış: Çerkezköy Otogarı ➔ Varış: Kapaklı Otogarı. Birbirine bitişik iki komşu sanayi merkezini bağlayan yüksek frekanslı ekspres hat. Toplam 4 durak, 5 km.",
+        "detailedInstructions": "Çerkezköy - Kapaklı Metropoliten Hat Görev Adımları:\n1. Adım: Çerkezköy Otogarından 40 yolcuyu alarak hareket edin.\n2. Adım: 1.5 km sonra Cengiz Topel Caddesinde durun.\n3. Adım: 2 km sonra Yıldızkent Köprülü Kavşağında durun.\n4. Adım (Hedef Son Durak): 1.5 km sonra Kapaklı Otogarında seferi bitirin.",
+        "speechBriefing": "Çerkezköy Kapaklı Metropoliten seferi. İki komşu ilçemiz arasındaki 5 kilometrelik yoğun ring hattı başlıyor. Yıldızkent üzerinden Kapaklı Otogarına varıyoruz. İyi sürüşler.",
+        "color": "#a855f7",
+        "otobusKapasitesi": 50,
+        "biletFiyat": 25,
+        "biletFiyatMultiplier": 1.5,
         "isDistrict": true,
-        "terrain": "asfalt",
+        "isKomsuRoute": true,
+        "terrain": "sehirici",
         "totalKm": 5.0,
         "stops": [
                 {
-                        "name": "Çerkezköy Otogar",
-                        "anons": "Çerkezköy Otogar kalkış peronundayız. Kapaklı Metropol ringi başlıyor.",
-                        "bekleyenYolcu": 32,
+                        "name": "Çerkezköy Otogarı",
+                        "anons": "Çerkezköy Otogar peronundayız. Kapaklı metropoliten seferi başlıyor.",
+                        "bekleyenYolcu": 40,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 1.0,
-                        "lat": 41.285,
-                        "lon": 27.995
+                        "gercekMesafeSonraki": 1.5,
+                        "lat": 41.2858,
+                        "lon": 28.0019
                 },
                 {
-                        "name": "Çerkezköy Belediyesi / Atatürk Caddesi",
-                        "anons": "Sonraki durak: Çerkezköy Belediyesi ve Atatürk Caddesi.",
-                        "bekleyenYolcu": 7,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 1.2,
-                        "lat": 41.293,
-                        "lon": 27.992
-                },
-                {
-                        "name": "Çerkezköy Devlet Hastanesi Sapağı",
-                        "anons": "Sonraki durak: Çerkezköy Devlet Hastanesi Sapağı.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 5,
-                        "gercekMesafeSonraki": 1.0,
-                        "lat": 41.302,
-                        "lon": 27.988
-                },
-                {
-                        "name": "Kapaklı Giriş / Yıldızkent Kavşağı",
-                        "anons": "Sonraki durak: Kapaklı Giriş, Yıldızkent Kavşağı.",
-                        "bekleyenYolcu": 8,
+                        "name": "Cengiz Topel Caddesi Kavşağı",
+                        "anons": "Sonraki durak: Cengiz Topel Caddesi Kavşağı.",
+                        "bekleyenYolcu": 9,
                         "inenYolcu": 6,
-                        "gercekMesafeSonraki": 0.9,
+                        "gercekMesafeSonraki": 2.0,
+                        "lat": 41.295,
+                        "lon": 27.99
+                },
+                {
+                        "name": "Kapaklı Yıldızkent Köprülü Kavşağı",
+                        "anons": "Sonraki durak: Kapaklı Yıldızkent Köprülü Kavşağı.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 7,
+                        "gercekMesafeSonraki": 1.5,
                         "lat": 41.309,
                         "lon": 27.984
-                },
-                {
-                        "name": "Kapaklı Belediyesi",
-                        "anons": "Sonraki durak: Kapaklı Belediyesi.",
-                        "bekleyenYolcu": 5,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 0.9,
-                        "lat": 41.313,
-                        "lon": 27.981
                 },
                 {
                         "name": "Kapaklı Otogarı",
                         "anons": "Son durak: Kapaklı Otogarı. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 39,
+                        "inenYolcu": 44,
                         "gercekMesafeSonraki": 0,
-                        "lat": 41.315,
-                        "lon": 27.98
+                        "lat": 41.3125,
+                        "lon": 27.9786
                 }
         ]
 },
         {
         "id": "hat_kapakli_saray",
         "hatNo": "KAP-SAR-85",
-        "name": "KAPAKLI - SARAY KUZEY ORMANLARI HATTI",
+        "name": "KAPAKLI - SARAY ORMAN HATTI",
         "destDistrict": "Saray",
         "originDistrict": "Kapaklı",
         "startStop": "Kapaklı Otogarı",
         "endStop": "Saray Belediyesi Otogarı",
         "intermediateStops": [
-                "Pınarça Sapağı",
-                "Büyükyoncalı Merkez (Belediye)",
-                "Yeniköy Kavşağı",
-                "Saray Çukuryurt Sapağı"
+                "Büyükyoncalı Sanayi Sapağı",
+                "Küçükyoncalı Girişi",
+                "Saray Çarşı Meydanı"
         ],
-        "desc": "Kalkış: Kapaklı Otogarı ➔ Varış: Saray Belediyesi Otogarı. Büyükyoncalı ve meşe ormanları içinden geçen kuzey Trakya ilçe hattı. Toplam 6 durak, 15 km.",
-        "detailedInstructions": "Kapaklı - Saray Kuzey Ormanları Hattı Görev Adımları:\n1. Adım: Kapaklı Otogarından 32 yolcuyu alarak hareket edin.\n2. Adım: 3.5 km sonra Pınarça Sapağında durun.\n3. Adım: 4 km sonra Büyükyoncalı Merkez durağında durun.\n4. Adım: 3 km sonra Yeniköy Kavşağında durun.\n5. Adım: 2.5 km sonra Çukuryurt Sapağında durun.\n6. Adım (Hedef Son Durak): 2 km sonra Saray Belediyesi Otogarında seferi tamamlayın.",
-        "speechBriefing": "Kapaklı Saray Kuzey Ormanları seferi. Büyükyoncalı üzerinden Saray Belediyesi Otogarına 15 kilometrelik doğa ve ilçe seferimiz başlıyor. İyi sürüşler.",
-        "color": "#22c55e",
-        "otobusKapasitesi": 38,
-        "biletFiyat": 35,
-        "biletFiyatMultiplier": 1.5,
+        "desc": "Kalkış: Kapaklı Otogarı ➔ Varış: Saray Belediyesi Otogarı. D-567 üzerinden orman kuşağına ve komşu ilçe Saray'a uzanan ekspres hat. Toplam 5 durak, 15 km.",
+        "detailedInstructions": "Kapaklı - Saray Orman Hattı Görev Adımları:\n1. Adım: Kapaklı Otogarından 36 yolcuyu alarak hareket edin.\n2. Adım: 5 km sonra Büyükyoncalı durağında durun.\n3. Adım: 4 km sonra Küçükyoncalı Girişinde durun.\n4. Adım: 4.5 km sonra Saray Çarşı Meydanında durun.\n5. Adım (Hedef Son Durak): 1.5 km sonra Saray Otogarında seferi bitirin.",
+        "speechBriefing": "Kapaklı Saray Orman hattı seferi. Büyükyoncalı ve Küçükyoncalı üzerinden komşumuz Saray'a 15 kilometrelik ekspres seferimiz başlıyor. İyi sürüşler dileriz.",
+        "color": "#84cc16",
+        "otobusKapasitesi": 44,
+        "biletFiyat": 45,
+        "biletFiyatMultiplier": 1.7,
         "isDistrict": true,
-        "terrain": "asfalt",
+        "isKomsuRoute": true,
+        "terrain": "kirsal",
         "totalKm": 15.0,
         "stops": [
                 {
                         "name": "Kapaklı Otogarı",
-                        "anons": "Kapaklı Otogarı kalkış peronundayız. Saray seferimiz başlıyor.",
-                        "bekleyenYolcu": 32,
+                        "anons": "Kapaklı Otogar peronundayız. Saray Orman Hattı seferimiz başlıyor.",
+                        "bekleyenYolcu": 36,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 3.5,
-                        "lat": 41.315,
-                        "lon": 27.98
+                        "gercekMesafeSonraki": 5.0,
+                        "lat": 41.3125,
+                        "lon": 27.9786
                 },
                 {
-                        "name": "Pınarça Sapağı",
-                        "anons": "Sonraki durak: Pınarça Sapağı.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 2,
-                        "gercekMesafeSonraki": 4.0,
-                        "lat": 41.355,
-                        "lon": 27.965
-                },
-                {
-                        "name": "Büyükyoncalı Merkez (Belediye)",
-                        "anons": "Sonraki durak: Büyükyoncalı Merkez, Belediye Meydanı.",
+                        "name": "Büyükyoncalı Sanayi Sapağı",
+                        "anons": "Sonraki durak: Büyükyoncalı Sanayi Sapağı.",
                         "bekleyenYolcu": 6,
-                        "inenYolcu": 5,
-                        "gercekMesafeSonraki": 3.0,
-                        "lat": 41.39,
-                        "lon": 27.955
-                },
-                {
-                        "name": "Yeniköy Kavşağı",
-                        "anons": "Sonraki durak: Yeniköy Kavşağı.",
-                        "bekleyenYolcu": 4,
                         "inenYolcu": 3,
-                        "gercekMesafeSonraki": 2.5,
-                        "lat": 41.405,
-                        "lon": 27.945
+                        "gercekMesafeSonraki": 4.0,
+                        "lat": 41.36,
+                        "lon": 27.94
                 },
                 {
-                        "name": "Saray Çukuryurt Sapağı",
-                        "anons": "Sonraki durak: Saray Çukuryurt Sapağı.",
+                        "name": "Küçükyoncalı Girişi",
+                        "anons": "Sonraki durak: Küçükyoncalı Girişi.",
                         "bekleyenYolcu": 5,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 2.0,
-                        "lat": 41.425,
-                        "lon": 27.938
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 4.5,
+                        "lat": 41.4,
+                        "lon": 27.93
+                },
+                {
+                        "name": "Saray Çarşı Meydanı",
+                        "anons": "Sonraki durak: Saray Çarşı Meydanı.",
+                        "bekleyenYolcu": 7,
+                        "inenYolcu": 6,
+                        "gercekMesafeSonraki": 1.5,
+                        "lat": 41.4422,
+                        "lon": 27.9204
                 },
                 {
                         "name": "Saray Belediyesi Otogarı",
                         "anons": "Son durak: Saray Belediyesi Otogarı. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 38,
+                        "inenYolcu": 41,
                         "gercekMesafeSonraki": 0,
                         "lat": 41.445,
                         "lon": 27.925
-                }
-        ]
-},
-        {
-        "id": "hat_malkara_sarkoy",
-        "hatNo": "ML-SK-90",
-        "name": "MALKARA - ŞARKÖY BAĞ & SAHİL KORİDORU",
-        "destDistrict": "Şarköy",
-        "originDistrict": "Malkara",
-        "startStop": "Malkara İlçe Otogarı",
-        "endStop": "Şarköy İlçe Otogarı & İskele",
-        "intermediateStops": [
-                "Malkara Hükümet Meydanı",
-                "Kozyörük Beldesi",
-                "Balabancık Sapağı",
-                "Sağlamtaş Beldesi",
-                "Çınarlı Köyü Bağ Yolu"
-        ],
-        "desc": "Kalkış: Malkara İlçe Otogarı ➔ Varış: Şarköy İskele. Malkara yaylaları, Kozyörük, Sağlamtaş beldesi ve üzüm bağları üzerinden Marmara sahiline iniş hattı. Toplam 7 durak, 48 km.",
-        "detailedInstructions": "Malkara - Şarköy Bağ & Sahil Koridoru Görev Adımları:\n1. Adım: Malkara Otogarından 35 yolcuyu alarak hareket edin.\n2. Adım: 2 km sonra Malkara Hükümet Meydanında durun.\n3. Adım: 14 km sonra Kozyörük Beldesinde durun.\n4. Adım: 10 km sonra Balabancık Sapağında durun.\n5. Adım: 9 km sonra Sağlamtaş Beldesinde durun.\n6. Adım: 8 km sonra Çınarlı Köyü Bağ Yolunda durun.\n7. Adım (Hedef Son Durak): 5 km sonra Şarköy İlçe Otogarı ve İskelesinde seferi tamamlayın.",
-        "speechBriefing": "Malkara Şarköy Bağ ve Sahil Koridoru seferi. Kozyörük, Sağlamtaş ve meşhur Şarköy bağları üzerinden Marmara sahiline uzanan 48 kilometrelik seferimiz başlıyor. İyi yolculuklar.",
-        "color": "#a855f7",
-        "otobusKapasitesi": 40,
-        "biletFiyat": 75,
-        "biletFiyatMultiplier": 2.0,
-        "isDistrict": true,
-        "terrain": "asfalt",
-        "totalKm": 48.0,
-        "stops": [
-                {
-                        "name": "Malkara İlçe Otogarı",
-                        "anons": "Malkara İlçe Otogarı peronundayız. Şarköy seferimiz başlıyor.",
-                        "bekleyenYolcu": 35,
-                        "inenYolcu": 0,
-                        "gercekMesafeSonraki": 2.0,
-                        "lat": 40.89,
-                        "lon": 26.9011
-                },
-                {
-                        "name": "Malkara Hükümet Meydanı",
-                        "anons": "Sonraki durak: Malkara Hükümet Meydanı.",
-                        "bekleyenYolcu": 7,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 14.0,
-                        "lat": 40.892,
-                        "lon": 26.905
-                },
-                {
-                        "name": "Kozyörük Beldesi",
-                        "anons": "Sonraki durak: Kozyörük Beldesi.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 10.0,
-                        "lat": 40.835,
-                        "lon": 26.985
-                },
-                {
-                        "name": "Balabancık Sapağı",
-                        "anons": "Sonraki durak: Balabancık Sapağı.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 9.0,
-                        "lat": 40.785,
-                        "lon": 27.02
-                },
-                {
-                        "name": "Sağlamtaş Beldesi",
-                        "anons": "Sonraki durak: Sağlamtaş Beldesi.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 5,
-                        "gercekMesafeSonraki": 8.0,
-                        "lat": 40.725,
-                        "lon": 27.05
-                },
-                {
-                        "name": "Çınarlı Köyü Bağ Yolu",
-                        "anons": "Sonraki durak: Çınarlı Köyü Bağ Yolu.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 5.0,
-                        "lat": 40.67,
-                        "lon": 27.085
-                },
-                {
-                        "name": "Şarköy İlçe Otogarı & İskele",
-                        "anons": "Son durak: Şarköy İlçe Otogarı ve İskele. Seferimiz tamamlanmıştır.",
-                        "bekleyenYolcu": 0,
-                        "inenYolcu": 43,
-                        "gercekMesafeSonraki": 0,
-                        "lat": 40.6139,
-                        "lon": 27.1128
-                }
-        ]
-},
-        {
-        "id": "hat_hayrabolu_malkara",
-        "hatNo": "HB-ML-95",
-        "name": "HAYRABOLU - MALKARA BATI TRAKYA BAĞLANTISI",
-        "destDistrict": "Malkara",
-        "originDistrict": "Hayrabolu",
-        "startStop": "Hayrabolu İlçe Otogarı",
-        "endStop": "Malkara İlçe Otogarı",
-        "intermediateStops": [
-                "Parmaksız Köyü",
-                "Kadıosman Sapağı",
-                "Yaylagöne Beldesi",
-                "Elmalı Köy Yolu Girişi"
-        ],
-        "desc": "Kalkış: Hayrabolu İlçe Otogarı ➔ Varış: Malkara İlçe Otogarı. İki komşu ilçeyi kırsal köyler ve yayla bozkırları üzerinden bağlayan stratejik batı Trakya hattı. Toplam 6 durak, 46 km.",
-        "detailedInstructions": "Hayrabolu - Malkara Batı Trakya Bağlantısı Görev Adımları:\n1. Adım: Hayrabolu Otogarından 30 yolcuyu alarak hareket edin.\n2. Adım: 11 km sonra Parmaksız Köyünde durun.\n3. Adım: 12 km sonra Kadıosman Sapağında durun.\n4. Adım: 11 km sonra Yaylagöne Beldesinde durun.\n5. Adım: 9 km sonra Elmalı Köy Yolunda durun.\n6. Adım (Hedef Son Durak): 3 km sonra Malkara İlçe Otogarında seferi tamamlayın.",
-        "speechBriefing": "Hayrabolu Malkara Batı Trakya bağlantı seferi. Parmaksız, Yaylagöne ve Elmalı köyleri üzerinden Malkara Otogarına 46 kilometrelik kırsal seferimiz başlıyor. İyi sürüşler.",
-        "color": "#d97706",
-        "otobusKapasitesi": 38,
-        "biletFiyat": 75,
-        "biletFiyatMultiplier": 2.0,
-        "isDistrict": true,
-        "terrain": "asfalt",
-        "totalKm": 46.0,
-        "stops": [
-                {
-                        "name": "Hayrabolu İlçe Otogarı",
-                        "anons": "Hayrabolu İlçe Otogarındayız. Malkara bağlantı seferimiz başlıyor.",
-                        "bekleyenYolcu": 30,
-                        "inenYolcu": 0,
-                        "gercekMesafeSonraki": 11.0,
-                        "lat": 41.2153,
-                        "lon": 27.1111
-                },
-                {
-                        "name": "Parmaksız Köyü",
-                        "anons": "Sonraki durak: Parmaksız Köyü.",
-                        "bekleyenYolcu": 5,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 12.0,
-                        "lat": 41.135,
-                        "lon": 27.08
-                },
-                {
-                        "name": "Kadıosman Sapağı",
-                        "anons": "Sonraki durak: Kadıosman Sapağı.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 11.0,
-                        "lat": 41.045,
-                        "lon": 27.02
-                },
-                {
-                        "name": "Yaylagöne Beldesi",
-                        "anons": "Sonraki durak: Yaylagöne Beldesi.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 4,
-                        "gercekMesafeSonraki": 9.0,
-                        "lat": 40.97,
-                        "lon": 26.97
-                },
-                {
-                        "name": "Elmalı Köy Yolu Girişi",
-                        "anons": "Sonraki durak: Elmalı Köy Yolu Girişi.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 3.0,
-                        "lat": 40.925,
-                        "lon": 26.935
-                },
-                {
-                        "name": "Malkara İlçe Otogarı",
-                        "anons": "Son durak: Malkara İlçe Otogarı. Seferimiz sona ermiştir.",
-                        "bekleyenYolcu": 0,
-                        "inenYolcu": 36,
-                        "gercekMesafeSonraki": 0,
-                        "lat": 40.89,
-                        "lon": 26.9011
                 }
         ]
 },
         {
         "id": "hat_hayrabolu_muratli",
         "hatNo": "HB-MUR-98",
-        "name": "HAYRABOLU - MURATLI DEMİRYOLU BAĞLANTI HATTI",
+        "name": "HAYRABOLU - MURATLI DEMİRYOLU BAĞLANTISI",
         "destDistrict": "Muratlı",
         "originDistrict": "Hayrabolu",
-        "startStop": "Hayrabolu İlçe Otogarı",
-        "endStop": "Muratlı Tren Garı",
+        "startStop": "Hayrabolu Otogarı & Meydan",
+        "endStop": "Muratlı İlçe Otogarı",
         "intermediateStops": [
-                "Çerkezmüsellim Kavşağı",
-                "Danışment Köyü",
-                "Aydınlar Sapağı",
-                "Muratlı Devlet Hastanesi"
+                "Şalgamlı Tarım Beldesi",
+                "Yurtbelen Sapağı",
+                "Muratlı Giriş Işıklar"
         ],
-        "desc": "Kalkış: Hayrabolu İlçe Otogarı ➔ Varış: Muratlı Tren Garı. Hayrabolu ayçiçeği havzası ile Muratlı TCDD ana demiryolu hattını birleştiren ilçe hattı. Toplam 6 durak, 44 km.",
-        "detailedInstructions": "Hayrabolu - Muratlı Demiryolu Bağlantı Hattı Görev Adımları:\n1. Adım: Hayrabolu Otogarından 32 yolcuyu alarak hareket edin.\n2. Adım: 12 km sonra Çerkezmüsellim Kavşağında durun.\n3. Adım: 13 km sonra Danışment Köyünde durun.\n4. Adım: 11 km sonra Aydınlar Sapağında durun.\n5. Adım: 6.5 km sonra Muratlı Devlet Hastanesinde durun.\n6. Adım (Hedef Son Durak): 1.5 km sonra Muratlı Tren Garında seferi tamamlayın.",
-        "speechBriefing": "Hayrabolu Muratlı Demiryolu bağlantı seferi. Danışment ve Aydınlar üzerinden Muratlı Tren Garına 44 kilometrelik seferimiz başlıyor. İyi sürüşler dileriz.",
-        "color": "#64748b",
-        "otobusKapasitesi": 38,
+        "desc": "Kalkış: Hayrabolu Otogarı ➔ Varış: Muratlı Otogarı. İki komşu tarım ve demiryolu ilçesini birleştiren Trakya iç ekspresi. Toplam 5 durak, 44 km.",
+        "detailedInstructions": "Hayrabolu - Muratlı Demiryolu Bağlantısı Görev Adımları:\n1. Adım: Hayrabolu Otogarından 32 yolcuyu alarak hareket edin.\n2. Adım: 15 km sonra Şalgamlı durağında durun.\n3. Adım: 16 km sonra Yurtbelen Sapağında durun.\n4. Adım: 10 km sonra Muratlı Giriş Işıklarda durun.\n5. Adım (Hedef Son Durak): 3 km sonra Muratlı Otogarında seferi bitirin.",
+        "speechBriefing": "Hayrabolu Muratlı Demiryolu Bağlantısı seferi. Şalgamlı üzerinden komşumuz Muratlı'ya 44 kilometrelik Trakya seferimiz başlıyor. İyi sürüşler kaptan.",
+        "color": "#a855f7",
+        "otobusKapasitesi": 42,
         "biletFiyat": 70,
-        "biletFiyatMultiplier": 2.0,
+        "biletFiyatMultiplier": 1.9,
         "isDistrict": true,
-        "terrain": "asfalt",
+        "isKomsuRoute": true,
+        "terrain": "kirsal",
         "totalKm": 44.0,
         "stops": [
                 {
-                        "name": "Hayrabolu İlçe Otogarı",
-                        "anons": "Hayrabolu İlçe Otogarı kalkış peronundayız. Muratlı Tren Garı seferi başlıyor.",
+                        "name": "Hayrabolu Otogarı & Meydan",
+                        "anons": "Hayrabolu Otogar peronundayız. Muratlı ekspres seferimiz başlıyor.",
                         "bekleyenYolcu": 32,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 12.0,
+                        "gercekMesafeSonraki": 15.0,
                         "lat": 41.2153,
                         "lon": 27.1111
                 },
                 {
-                        "name": "Çerkezmüsellim Kavşağı",
-                        "anons": "Sonraki durak: Çerkezmüsellim Kavşağı.",
-                        "bekleyenYolcu": 5,
+                        "name": "Şalgamlı Tarım Beldesi",
+                        "anons": "Sonraki durak: Şalgamlı Tarım Beldesi.",
+                        "bekleyenYolcu": 6,
                         "inenYolcu": 3,
-                        "gercekMesafeSonraki": 13.0,
-                        "lat": 41.225,
-                        "lon": 27.2
+                        "gercekMesafeSonraki": 16.0,
+                        "lat": 41.2,
+                        "lon": 27.27
                 },
                 {
-                        "name": "Danışment Köyü",
-                        "anons": "Sonraki durak: Danışment Köyü.",
-                        "bekleyenYolcu": 4,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 11.0,
-                        "lat": 41.21,
-                        "lon": 27.34
-                },
-                {
-                        "name": "Aydınlar Sapağı",
-                        "anons": "Sonraki durak: Aydınlar Sapağı.",
+                        "name": "Yurtbelen Sapağı",
+                        "anons": "Sonraki durak: Yurtbelen Sapağı.",
                         "bekleyenYolcu": 5,
                         "inenYolcu": 4,
-                        "gercekMesafeSonraki": 6.5,
-                        "lat": 41.195,
-                        "lon": 27.44
+                        "gercekMesafeSonraki": 10.0,
+                        "lat": 41.19,
+                        "lon": 27.42
                 },
                 {
-                        "name": "Muratlı Devlet Hastanesi",
-                        "anons": "Sonraki durak: Muratlı Devlet Hastanesi.",
+                        "name": "Muratlı Giriş Işıklar",
+                        "anons": "Sonraki durak: Muratlı Giriş Işıklar.",
                         "bekleyenYolcu": 6,
                         "inenYolcu": 5,
-                        "gercekMesafeSonraki": 1.5,
+                        "gercekMesafeSonraki": 3.0,
                         "lat": 41.178,
-                        "lon": 27.512
+                        "lon": 27.48
                 },
                 {
-                        "name": "Muratlı Tren Garı",
-                        "anons": "Son durak: Muratlı Tren Garı. Hayrabolu Muratlı seferimiz tamamlanmıştır.",
+                        "name": "Muratlı İlçe Otogarı",
+                        "anons": "Son durak: Muratlı İlçe Otogarı. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
                         "inenYolcu": 37,
                         "gercekMesafeSonraki": 0,
-                        "lat": 41.1712,
-                        "lon": 27.5023
+                        "lat": 41.1717,
+                        "lon": 27.5028
                 }
         ]
 },
         {
-        "id": "hat_saray_corlu",
-        "hatNo": "SAR-ÇOR-100",
-        "name": "SARAY - ÇORLU KUZEY-GÜNEY SANAYİ KORİDORU",
-        "destDistrict": "Çorlu",
-        "originDistrict": "Saray",
-        "startStop": "Saray Belediyesi Otogarı",
-        "endStop": "Çorlu Otogar",
+        "id": "hat_hayrabolu_malkara",
+        "hatNo": "HB-ML-95",
+        "name": "HAYRABOLU - MALKARA İÇ TRAKYA HATTI",
+        "destDistrict": "Malkara",
+        "originDistrict": "Hayrabolu",
+        "startStop": "Hayrabolu Otogarı & Meydan",
+        "endStop": "Malkara Şehirlerarası Otobüs Terminali",
         "intermediateStops": [
-                "Saray Çarşı Meydanı",
-                "Vakıflar Kavşağı (D-567)",
-                "Ergene Marmaracık Girişi",
-                "Çorlu Yeni Sanayi Sitesi"
+                "Karakavak Köyü Girişi",
+                "Balabancık Beldesi Meydanı",
+                "Malkara Sanayi Sitesi"
         ],
-        "desc": "Kalkış: Saray Belediyesi Otogarı ➔ Varış: Çorlu Otogar. Kuzey orman ilçesi Saray ile güney sanayi metropolü Çorlu'yu Ergene koridoru üzerinden bağlayan ekspres hat. Toplam 6 durak, 46 km.",
-        "detailedInstructions": "Saray - Çorlu Kuzey-Güney Koridoru Görev Adımları:\n1. Adım: Saray Otogarından 36 yolcuyu alarak hareket edin.\n2. Adım: 1.5 km sonra Saray Çarşı Meydanında durun.\n3. Adım: 22.5 km sonra Vakıflar Kavşağında durun.\n4. Adım: 11 km sonra Ergene Marmaracık Girişinde durun.\n5. Adım: 8 km sonra Çorlu Yeni Sanayi Sitesinde durun.\n6. Adım (Hedef Son Durak): 3 km sonra Çorlu Otogarına varıp tüm yolcuları indirin ve görevi tamamlayın.",
-        "speechBriefing": "Saray Çorlu Kuzey Güney Sanayi Koridoru seferi. Vakıflar ve Ergene üzerinden Çorlu Otogarına uzanan 46 kilometrelik ekspres seferimiz başlıyor. İyi sürüşler kaptan.",
-        "color": "#0284c7",
-        "otobusKapasitesi": 44,
+        "desc": "Kalkış: Hayrabolu Otogarı ➔ Varış: Malkara Otogarı. Komşu iki iç Trakya ilçesini birleştiren tarım ve maden ekspresi. Toplam 5 durak, 46 km.",
+        "detailedInstructions": "Hayrabolu - Malkara İç Trakya Hattı Görev Adımları:\n1. Adım: Hayrabolu Otogarından 30 yolcuyu alarak hareket edin.\n2. Adım: 14 km sonra Karakavak Köyünde durun.\n3. Adım: 16 km sonra Balabancık Beldesinde durun.\n4. Adım: 13 km sonra Malkara Sanayi Sitesinde durun.\n5. Adım (Hedef Son Durak): 3 km sonra Malkara Otogarında seferi tamamlayın.",
+        "speechBriefing": "Hayrabolu Malkara İç Trakya hattı seferi. Balabancık ovaları üzerinden komşu ilçemiz Malkara'ya uzanan 46 kilometrelik seferimiz başlıyor. İyi sürüşler dileriz.",
+        "color": "#d97706",
+        "otobusKapasitesi": 42,
         "biletFiyat": 75,
-        "biletFiyatMultiplier": 2.0,
+        "biletFiyatMultiplier": 1.9,
         "isDistrict": true,
-        "terrain": "otoyol",
+        "isKomsuRoute": true,
+        "terrain": "kirsal",
         "totalKm": 46.0,
         "stops": [
                 {
-                        "name": "Saray Belediyesi Otogarı",
-                        "anons": "Saray Belediyesi Otogarı peronundayız. Çorlu Kuzey Güney Koridoru seferimiz başlıyor.",
-                        "bekleyenYolcu": 36,
+                        "name": "Hayrabolu Otogarı & Meydan",
+                        "anons": "Hayrabolu Otogar peronundayız. Malkara ekspres seferimiz başlıyor.",
+                        "bekleyenYolcu": 30,
                         "inenYolcu": 0,
-                        "gercekMesafeSonraki": 1.5,
-                        "lat": 41.445,
-                        "lon": 27.925
+                        "gercekMesafeSonraki": 14.0,
+                        "lat": 41.2153,
+                        "lon": 27.1111
                 },
                 {
-                        "name": "Saray Çarşı Meydanı",
-                        "anons": "Sonraki durak: Saray Çarşı Meydanı.",
-                        "bekleyenYolcu": 6,
-                        "inenYolcu": 3,
-                        "gercekMesafeSonraki": 22.5,
-                        "lat": 41.4422,
-                        "lon": 27.9204
+                        "name": "Karakavak Köyü Girişi",
+                        "anons": "Sonraki durak: Karakavak Köyü Girişi.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 16.0,
+                        "lat": 41.1,
+                        "lon": 27.05
                 },
                 {
-                        "name": "Vakıflar Kavşağı (D-567)",
-                        "anons": "Sonraki durak: Vakıflar Kavşağı.",
+                        "name": "Balabancık Beldesi Meydanı",
+                        "anons": "Sonraki durak: Balabancık Beldesi Meydanı.",
                         "bekleyenYolcu": 7,
-                        "inenYolcu": 5,
-                        "gercekMesafeSonraki": 11.0,
-                        "lat": 41.27,
-                        "lon": 27.7
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 13.0,
+                        "lat": 41.01,
+                        "lon": 26.98
                 },
                 {
-                        "name": "Ergene Marmaracık Girişi",
-                        "anons": "Sonraki durak: Ergene Marmaracık Girişi.",
-                        "bekleyenYolcu": 8,
-                        "inenYolcu": 6,
-                        "gercekMesafeSonraki": 8.0,
-                        "lat": 41.2281,
-                        "lon": 27.7028
-                },
-                {
-                        "name": "Çorlu Yeni Sanayi Sitesi",
-                        "anons": "Sonraki durak: Çorlu Yeni Sanayi Sitesi.",
+                        "name": "Malkara Sanayi Sitesi",
+                        "anons": "Sonraki durak: Malkara Sanayi Sitesi.",
                         "bekleyenYolcu": 6,
-                        "inenYolcu": 7,
+                        "inenYolcu": 5,
                         "gercekMesafeSonraki": 3.0,
-                        "lat": 41.172,
-                        "lon": 27.77
+                        "lat": 40.91,
+                        "lon": 26.92
                 },
                 {
-                        "name": "Çorlu Otogar",
-                        "anons": "Son durak: Çorlu Otogar. Saray Çorlu seferimiz tamamlanmıştır.",
+                        "name": "Malkara Şehirlerarası Otobüs Terminali",
+                        "anons": "Son durak: Malkara Şehirlerarası Otobüs Terminali. Seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 42,
+                        "inenYolcu": 37,
                         "gercekMesafeSonraki": 0,
-                        "lat": 41.16,
-                        "lon": 27.8
+                        "lat": 40.89,
+                        "lon": 26.9011
                 }
         ]
 },
         {
-        "id": "hat_marmaraereglisi_sarkoy",
-        "hatNo": "ME-SK-110",
-        "name": "MARMARAEREĞLİSİ - ŞARKÖY KIYI KORDONU HATTI",
+        "id": "hat_malkara_sarkoy",
+        "hatNo": "ML-SK-90",
+        "name": "MALKARA - ŞARKÖY DAĞ & SAHİL HATTI",
         "destDistrict": "Şarköy",
-        "originDistrict": "Marmaraereğlisi",
-        "startStop": "Marmaraereğlisi Otogarı",
+        "originDistrict": "Malkara",
+        "startStop": "Malkara Şehirlerarası Otobüs Terminali",
         "endStop": "Şarköy İlçe Otogarı & İskele",
         "intermediateStops": [
-                "Yeniçiftlik Sahili",
-                "Tekirdağ Süleymanpaşa Limanı",
-                "Kumbağ Plajı",
-                "Uçmakdere Sahil",
-                "Mürefte İskele"
+                "Sağlamtaş Beldesi Girişi",
+                "Çınarlı Köy Meydanı",
+                "Şarköy Tepe Seyir Terası"
         ],
-        "desc": "Kalkış: Marmaraereğlisi Otogarı ➔ Varış: Şarköy İskele. Tekirdağ'ın doğu sahilinden batı sahiline kadar tüm Marmara Denizi kıyısını kucaklayan büyük kıyı maratonu. Toplam 7 durak, 122 km.",
-        "detailedInstructions": "Marmaraereğlisi - Şarköy Kıyı Kordonu Görev Adımları:\n1. Adım: Marmaraereğlisi Otogarından 40 yolcuyu alarak hareket edin.\n2. Adım: 8 km sonra Yeniçiftlik Sahili durağında durun.\n3. Adım: 30 km sonra Süleymanpaşa Limanında durun.\n4. Adım: 14 km sonra Kumbağ Plajında durun.\n5. Adım: 23 km sonra Uçmakdere Sahil durağında durun.\n6. Adım: 29 km sonra Mürefte İskelesinde durun.\n7. Adım (Hedef Son Durak): 18 km sonra Şarköy İlçe Otogarı ve İskelesinde seferi tamamlayın.",
-        "speechBriefing": "Marmaraereğlisi Şarköy Büyük Kıyı Kordonu seferi. Yeniçiftlik, Süleymanpaşa, Kumbağ, Uçmakdere ve Mürefte kıyıları boyunca 122 kilometrelik Marmara deniz hattımız başlıyor. İyi seyirler kaptan.",
-        "color": "#0369a1",
-        "otobusKapasitesi": 46,
-        "biletFiyat": 175,
-        "biletFiyatMultiplier": 2.5,
+        "desc": "Kalkış: Malkara Otogarı ➔ Varış: Şarköy İskele. Malkara platosundan Marmara sahiline komşu ilçe Şarköy'e inen orman ve bağ rotası. Toplam 5 durak, 48 km.",
+        "detailedInstructions": "Malkara - Şarköy Dağ & Sahil Hattı Görev Adımları:\n1. Adım: Malkara Otogarından 35 yolcuyu alarak hareket edin.\n2. Adım: 16 km sonra Sağlamtaş Beldesinde durun.\n3. Adım: 18 km sonra Çınarlı Köyünde durun.\n4. Adım: 10 km sonra Tepe Seyir Terasında durun.\n5. Adım (Hedef Son Durak): 4 km sonra Şarköy İskelesinde seferi bitirin.",
+        "speechBriefing": "Malkara Şarköy Dağ ve Sahil hattı seferi. Sağlamtaş ve Çınarlı üzerinden komşu sahil ilçemiz Şarköy'e inen 48 kilometrelik seferimiz başlıyor. Virajlara dikkat ediniz.",
+        "color": "#db2777",
+        "otobusKapasitesi": 42,
+        "biletFiyat": 75,
+        "biletFiyatMultiplier": 2.0,
         "isDistrict": true,
+        "isKomsuRoute": true,
+        "terrain": "daglik",
+        "totalKm": 48.0,
+        "stops": [
+                {
+                        "name": "Malkara Şehirlerarası Otobüs Terminali",
+                        "anons": "Malkara Otogar peronundayız. Şarköy seferimiz başlıyor.",
+                        "bekleyenYolcu": 35,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 16.0,
+                        "lat": 40.89,
+                        "lon": 26.9011
+                },
+                {
+                        "name": "Sağlamtaş Beldesi Girişi",
+                        "anons": "Sonraki durak: Sağlamtaş Beldesi Girişi.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 18.0,
+                        "lat": 40.8,
+                        "lon": 26.95
+                },
+                {
+                        "name": "Çınarlı Köy Meydanı",
+                        "anons": "Sonraki durak: Çınarlı Köy Meydanı.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 10.0,
+                        "lat": 40.7,
+                        "lon": 27.05
+                },
+                {
+                        "name": "Şarköy Tepe Seyir Terası",
+                        "anons": "Sonraki durak: Şarköy Tepe Seyir Terası.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 4.0,
+                        "lat": 40.64,
+                        "lon": 27.1
+                },
+                {
+                        "name": "Şarköy İlçe Otogarı & İskele",
+                        "anons": "Son durak: Şarköy İlçe Otogarı ve İskele. Seferimiz tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 40,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 40.6139,
+                        "lon": 27.1128
+                }
+        ]
+},
+        {
+        "id": "hat_sinir_marmaraereglisi_silivri",
+        "hatNo": "SNR-IST-01",
+        "name": "MARMARAEREĞLİSİ - İSTANBUL SİLİVRİ SINIR EKSPRES",
+        "destDistrict": "İstanbul (Silivri)",
+        "originDistrict": "Marmaraereğlisi",
+        "startStop": "Marmaraereğlisi Otogarı",
+        "endStop": "Silivri Otogar",
+        "intermediateStops": [
+                "Gümüşyaka Sahil & İl Sınırı",
+                "Silivri Maxi AVM Kavşağı"
+        ],
+        "desc": "Kalkış: Marmaraereğlisi Otogarı ➔ Varış: Silivri Otogar. D-110 / E84 üzerinden Tekirdağ il sınırını geçip komşu il İstanbul Silivri'ye ulaşan sahil sınır ekspresi. Toplam 4 durak, 25 km.",
+        "detailedInstructions": "Marmaraereğlisi - İstanbul Silivri Sınır Ekspres Görev Adımları:\n1. Adım: Marmaraereğlisi Otogarından 38 yolcuyu alarak hareket edin.\n2. Adım: 8 km sonra Gümüşyaka Sahil ve İstanbul İl Sınırında durun.\n3. Adım: 13 km sonra Silivri Maxi AVM Kavşağında durun.\n4. Adım (Hedef Son Durak): 4 km sonra Silivri Otogarında seferi tamamlayın.",
+        "speechBriefing": "Marmaraereğlisi İstanbul Silivri Sınır Ekspres seferi. D-110 otoyolundan Tekirdağ il sınırını aşarak komşu ilimiz İstanbul Silivri Otogarına uzanan 25 kilometrelik sınır seferi başlıyor. İyi sürüşler kaptan.",
+        "color": "#38bdf8",
+        "otobusKapasitesi": 46,
+        "biletFiyat": 65,
+        "biletFiyatMultiplier": 2.0,
+        "isDistrict": true,
+        "isBorderRoute": true,
         "terrain": "sahil",
-        "totalKm": 122.0,
+        "totalKm": 25.0,
         "stops": [
                 {
                         "name": "Marmaraereğlisi Otogarı",
-                        "anons": "Marmaraereğlisi Otogarı peronundayız. Şarköy Kıyı Kordonu seferimiz başlıyor.",
-                        "bekleyenYolcu": 40,
+                        "anons": "Marmaraereğlisi Otogarı peronundayız. İstanbul Silivri Sınır Ekspres seferimiz başlıyor.",
+                        "bekleyenYolcu": 38,
                         "inenYolcu": 0,
                         "gercekMesafeSonraki": 8.0,
                         "lat": 40.9686,
                         "lon": 27.9553
                 },
                 {
-                        "name": "Yeniçiftlik Sahili",
-                        "anons": "Sonraki durak: Yeniçiftlik Sahili.",
+                        "name": "Gümüşyaka Sahil & İl Sınırı",
+                        "anons": "Sonraki durak: Gümüşyaka Sahil ve İstanbul İl Sınırı Geçiş Noktası.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 13.0,
+                        "lat": 41.015,
+                        "lon": 28.06
+                },
+                {
+                        "name": "Silivri Maxi AVM Kavşağı",
+                        "anons": "Sonraki durak: Silivri Maxi AVM Kavşağı.",
+                        "bekleyenYolcu": 7,
+                        "inenYolcu": 6,
+                        "gercekMesafeSonraki": 4.0,
+                        "lat": 41.06,
+                        "lon": 28.2
+                },
+                {
+                        "name": "Silivri Otogar",
+                        "anons": "Son durak: Silivri Otogar. İstanbul sınır hattı seferimiz tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 43,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 41.074,
+                        "lon": 28.247
+                }
+        ]
+},
+        {
+        "id": "hat_sinir_cerkezkoy_silivri",
+        "hatNo": "SNR-IST-02",
+        "name": "ÇERKEZKÖY - İSTANBUL SİLİVRİ / ÇATALCA SINIR HATTI",
+        "destDistrict": "İstanbul (Silivri / Çatalca)",
+        "originDistrict": "Çerkezköy",
+        "startStop": "Çerkezköy Otogarı",
+        "endStop": "Silivri Otogar",
+        "intermediateStops": [
+                "Değirmenköy Sapağı & İstanbul Sınırı",
+                "Kınalı Otoyol Gişeleri (O-3 / O-7)"
+        ],
+        "desc": "Kalkış: Çerkezköy Otogarı ➔ Varış: Silivri Otogar. D-567 ve O-3 Kuzey Marmara sanayi koridoru üzerinden komşu il İstanbul'a açılan kapı. Toplam 4 durak, 35 km.",
+        "detailedInstructions": "Çerkezköy - Silivri Sınır Hattı Görev Adımları:\n1. Adım: Çerkezköy Otogarından 40 yolcuyu alın.\n2. Adım: 15 km sonra Değirmenköy İstanbul Sınırında durun.\n3. Adım: 14 km sonra Kınalı Otoyol Gişelerinde durun.\n4. Adım (Hedef Son Durak): 6 km sonra Silivri Otogarında seferi bitirin.",
+        "speechBriefing": "Çerkezköy İstanbul Silivri ve Çatalca sınır koridoru seferi. Değirmenköy ve Kınalı üzerinden komşu ilimiz İstanbul'a uzanan 35 kilometrelik ekspres sefer başlıyor. İyi yolculuklar.",
+        "color": "#60a5fa",
+        "otobusKapasitesi": 46,
+        "biletFiyat": 75,
+        "biletFiyatMultiplier": 2.0,
+        "isDistrict": true,
+        "isBorderRoute": true,
+        "terrain": "otoyol",
+        "totalKm": 35.0,
+        "stops": [
+                {
+                        "name": "Çerkezköy Otogarı",
+                        "anons": "Çerkezköy Otogarı peronundayız. İstanbul Silivri sınır seferimiz başlıyor.",
+                        "bekleyenYolcu": 40,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 15.0,
+                        "lat": 41.2858,
+                        "lon": 28.0019
+                },
+                {
+                        "name": "Değirmenköy Sapağı & İstanbul Sınırı",
+                        "anons": "Sonraki durak: Değirmenköy Sapağı ve İstanbul İl Sınırı.",
                         "bekleyenYolcu": 7,
                         "inenYolcu": 4,
-                        "gercekMesafeSonraki": 30.0,
-                        "lat": 40.981,
-                        "lon": 28.005
-                },
-                {
-                        "name": "Tekirdağ Süleymanpaşa Limanı",
-                        "anons": "Sonraki durak: Tekirdağ Süleymanpaşa Limanı.",
-                        "bekleyenYolcu": 9,
-                        "inenYolcu": 6,
                         "gercekMesafeSonraki": 14.0,
-                        "lat": 40.976,
-                        "lon": 27.53
+                        "lat": 41.175,
+                        "lon": 28.12
                 },
                 {
-                        "name": "Kumbağ Plajı",
-                        "anons": "Sonraki durak: Kumbağ Plajı.",
+                        "name": "Kınalı Otoyol Gişeleri (O-3 / O-7)",
+                        "anons": "Sonraki durak: Kınalı Otoyol Gişeleri.",
                         "bekleyenYolcu": 8,
                         "inenYolcu": 6,
-                        "gercekMesafeSonraki": 23.0,
-                        "lat": 40.865,
-                        "lon": 27.46
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 41.11,
+                        "lon": 28.18
                 },
                 {
-                        "name": "Uçmakdere Sahil",
-                        "anons": "Sonraki durak: Uçmakdere Sahil.",
+                        "name": "Silivri Otogar",
+                        "anons": "Son durak: Silivri Otogar. Seferimiz tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 45,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 41.074,
+                        "lon": 28.247
+                }
+        ]
+},
+        {
+        "id": "hat_sinir_muratli_luleburgaz",
+        "hatNo": "SNR-KIR-01",
+        "name": "MURATLI - KIRKLARELİ LÜLEBURGAZ SINIR EKSPRES",
+        "destDistrict": "Kırklareli (Lüleburgaz)",
+        "originDistrict": "Muratlı",
+        "startStop": "Muratlı İlçe Otogarı",
+        "endStop": "Lüleburgaz Otogar",
+        "intermediateStops": [
+                "Muratlı Tren Garı Çıkışı",
+                "Büyükkarıştıran Meydanı & İl Sınırı",
+                "Lüleburgaz Sanayi Kavşağı"
+        ],
+        "desc": "Kalkış: Muratlı Otogarı ➔ Varış: Lüleburgaz Otogar. D-565 Tekirdağ - Kırklareli il sınır kapısı demiryolu ve sanayi koridoru. Toplam 5 durak, 24 km.",
+        "detailedInstructions": "Muratlı - Lüleburgaz Sınır Ekspres Görev Adımları:\n1. Adım: Muratlı Otogarından 36 yolcuyu alarak hareket edin.\n2. Adım: 2 km sonra Tren Garı durağında durun.\n3. Adım: 12 km sonra Büyükkarıştıran Kırklareli Sınır durağında durun.\n4. Adım: 8 km sonra Lüleburgaz Sanayi Kavşağında durun.\n5. Adım (Hedef Son Durak): 2 km sonra Lüleburgaz Otogarında seferi bitirin.",
+        "speechBriefing": "Muratlı Kırklareli Lüleburgaz Sınır Ekspres seferi. Büyükkarıştıran üzerinden komşu ilimiz Kırklareli'nin en büyük ilçesi Lüleburgaz'a 24 kilometrelik il sınır seferi başlıyor. İyi sürüşler kaptan.",
+        "color": "#a78bfa",
+        "otobusKapasitesi": 44,
+        "biletFiyat": 60,
+        "biletFiyatMultiplier": 1.9,
+        "isDistrict": true,
+        "isBorderRoute": true,
+        "terrain": "asfalt",
+        "totalKm": 24.0,
+        "stops": [
+                {
+                        "name": "Muratlı İlçe Otogarı",
+                        "anons": "Muratlı Otogar peronundayız. Lüleburgaz sınır seferimiz başlıyor.",
+                        "bekleyenYolcu": 36,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 2.0,
+                        "lat": 41.1717,
+                        "lon": 27.5028
+                },
+                {
+                        "name": "Muratlı Tren Garı Çıkışı",
+                        "anons": "Sonraki durak: Muratlı Tren Garı Çıkışı.",
                         "bekleyenYolcu": 6,
-                        "inenYolcu": 5,
-                        "gercekMesafeSonraki": 29.0,
-                        "lat": 40.8,
-                        "lon": 27.365
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 12.0,
+                        "lat": 41.175,
+                        "lon": 27.505
                 },
                 {
-                        "name": "Mürefte İskele",
-                        "anons": "Sonraki durak: Mürefte İskele.",
+                        "name": "Büyükkarıştıran Meydanı & İl Sınırı",
+                        "anons": "Sonraki durak: Büyükkarıştıran Meydanı ve Kırklareli İl Sınırı.",
+                        "bekleyenYolcu": 9,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 8.0,
+                        "lat": 41.27,
+                        "lon": 27.48
+                },
+                {
+                        "name": "Lüleburgaz Sanayi Kavşağı",
+                        "anons": "Sonraki durak: Lüleburgaz Sanayi Kavşağı.",
                         "bekleyenYolcu": 7,
                         "inenYolcu": 6,
-                        "gercekMesafeSonraki": 18.0,
-                        "lat": 40.672,
-                        "lon": 27.245
+                        "gercekMesafeSonraki": 2.0,
+                        "lat": 41.385,
+                        "lon": 27.36
                 },
                 {
-                        "name": "Şarköy İlçe Otogarı & İskele",
-                        "anons": "Son durak: Şarköy İlçe Otogarı ve İskele. Büyük kıyı maratonumuz tamamlanmıştır.",
+                        "name": "Lüleburgaz Otogar",
+                        "anons": "Son durak: Lüleburgaz Otogar. Kırklareli sınır seferimiz tamamlanmıştır.",
                         "bekleyenYolcu": 0,
-                        "inenYolcu": 49,
+                        "inenYolcu": 45,
                         "gercekMesafeSonraki": 0,
+                        "lat": 41.405,
+                        "lon": 27.345
+                }
+        ]
+},
+        {
+        "id": "hat_sinir_saray_vize",
+        "hatNo": "SNR-KIR-02",
+        "name": "SARAY - KIRKLARELİ VİZE DOĞA KORİDORU",
+        "destDistrict": "Kırklareli (Vize)",
+        "originDistrict": "Saray",
+        "startStop": "Saray Belediyesi Otogarı",
+        "endStop": "Vize Meydan",
+        "intermediateStops": [
+                "Küçükyoncalı Sapağı",
+                "Çakıllı Beldesi & Kırklareli Sınırı"
+        ],
+        "desc": "Kalkış: Saray Belediyesi Otogarı ➔ Varış: Vize Meydan. D-020 Istranca Dağları eteklerinde Tekirdağ ile Kırklareli'yi bağlayan doğa ve sınır koridoru. Toplam 4 durak, 22 km.",
+        "detailedInstructions": "Saray - Vize Doğa Koridoru Görev Adımları:\n1. Adım: Saray Belediyesi Otogarından 35 yolcuyu alarak hareket edin.\n2. Adım: 6 km sonra Küçükyoncalı Sapağında durun.\n3. Adım: 10 km sonra Çakıllı Beldesi ve Kırklareli Sınır durağında durun.\n4. Adım (Hedef Son Durak): 6 km sonra Vize Hükümet Meydanında seferi tamamlayın.",
+        "speechBriefing": "Saray Kırklareli Vize Doğa Koridoru seferi. D-020 Istranca ormanları boyunca komşu ilimiz Kırklareli'nin Vize ilçesine uzanan 22 kilometrelik sınır seferimiz başlıyor. İyi sürüşler.",
+        "color": "#22c55e",
+        "otobusKapasitesi": 42,
+        "biletFiyat": 55,
+        "biletFiyatMultiplier": 1.9,
+        "isDistrict": true,
+        "isBorderRoute": true,
+        "terrain": "kirsal",
+        "totalKm": 22.0,
+        "stops": [
+                {
+                        "name": "Saray Belediyesi Otogarı",
+                        "anons": "Saray Otogar peronundayız. Kırklareli Vize Doğa Koridoru seferimiz başlıyor.",
+                        "bekleyenYolcu": 35,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 41.445,
+                        "lon": 27.925
+                },
+                {
+                        "name": "Küçükyoncalı Sapağı",
+                        "anons": "Sonraki durak: Küçükyoncalı Sapağı.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 10.0,
+                        "lat": 41.49,
+                        "lon": 27.88
+                },
+                {
+                        "name": "Çakıllı Beldesi & Kırklareli Sınırı",
+                        "anons": "Sonraki durak: Çakıllı Beldesi ve Kırklareli İl Sınırı.",
+                        "bekleyenYolcu": 7,
+                        "inenYolcu": 4,
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 41.52,
+                        "lon": 27.82
+                },
+                {
+                        "name": "Vize Meydan",
+                        "anons": "Son durak: Vize Hükümet Meydanı. Kırklareli doğa sınır seferimiz tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 41,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 41.572,
+                        "lon": 27.765
+                }
+        ]
+},
+        {
+        "id": "hat_sinir_hayrabolu_uzunkopru",
+        "hatNo": "SNR-EDR-01",
+        "name": "HAYRABOLU - EDİRNE UZUNKÖPRÜ SINIR EKSPRES",
+        "destDistrict": "Edirne (Uzunköprü)",
+        "originDistrict": "Hayrabolu",
+        "startStop": "Hayrabolu Otogarı & Meydan",
+        "endStop": "Uzunköprü Meydan",
+        "intermediateStops": [
+                "Çerkezmüsellim Beldesi",
+                "Kırcasalih & Edirne İl Sınırı (D-555)",
+                "Tarihi Uzunköprü Girişi"
+        ],
+        "desc": "Kalkış: Hayrabolu Otogarı ➔ Varış: Uzunköprü Meydan. D-555 Tekirdağ - Edirne ova koridoru ve tarihi köprü bağlantısı. Toplam 5 durak, 42 km.",
+        "detailedInstructions": "Hayrabolu - Uzunköprü Sınır Ekspres Görev Adımları:\n1. Adım: Hayrabolu Otogarından 34 yolcuyu alarak hareket edin.\n2. Adım: 12 km sonra Çerkezmüsellim Beldesinde durun.\n3. Adım: 16 km sonra Kırcasalih Edirne Sınır durağında durun.\n4. Adım: 12 km sonra Tarihi Uzunköprü Girişinde durun.\n5. Adım (Hedef Son Durak): 2 km sonra Uzunköprü Meydanında görevi tamamlayın.",
+        "speechBriefing": "Hayrabolu Edirne Uzunköprü Sınır Ekspres seferi. Ergene Ovası boyunca komşu ilimiz Edirne'nin Uzunköprü ilçesine uzanan 42 kilometrelik sınır hattı başlıyor. Dünyanın en uzun taş köprüsüne varıyoruz. İyi yolculuklar.",
+        "color": "#f59e0b",
+        "otobusKapasitesi": 44,
+        "biletFiyat": 75,
+        "biletFiyatMultiplier": 2.0,
+        "isDistrict": true,
+        "isBorderRoute": true,
+        "terrain": "kirsal",
+        "totalKm": 42.0,
+        "stops": [
+                {
+                        "name": "Hayrabolu Otogarı & Meydan",
+                        "anons": "Hayrabolu Otogar peronundayız. Edirne Uzunköprü sınır ekspres seferimiz başlıyor.",
+                        "bekleyenYolcu": 34,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 12.0,
+                        "lat": 41.2153,
+                        "lon": 27.1111
+                },
+                {
+                        "name": "Çerkezmüsellim Beldesi",
+                        "anons": "Sonraki durak: Çerkezmüsellim Beldesi.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 16.0,
+                        "lat": 41.25,
+                        "lon": 27.0
+                },
+                {
+                        "name": "Kırcasalih & Edirne İl Sınırı (D-555)",
+                        "anons": "Sonraki durak: Kırcasalih ve Edirne İl Sınırı Geçiş Noktası.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 12.0,
+                        "lat": 41.27,
+                        "lon": 26.85
+                },
+                {
+                        "name": "Tarihi Uzunköprü Girişi",
+                        "anons": "Sonraki durak: UNESCO Mirası Tarihi Taş Uzunköprü Girişi.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 2.0,
+                        "lat": 41.265,
+                        "lon": 26.69
+                },
+                {
+                        "name": "Uzunköprü Meydan",
+                        "anons": "Son durak: Uzunköprü Meydan. Edirne sınır ekspres seferimiz tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 41,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 41.268,
+                        "lon": 26.685
+                }
+        ]
+},
+        {
+        "id": "hat_sinir_malkara_kesan",
+        "hatNo": "SNR-EDR-02",
+        "name": "MALKARA - EDİRNE KEŞAN SINIR EKSPRES",
+        "destDistrict": "Edirne (Keşan)",
+        "originDistrict": "Malkara",
+        "startStop": "Malkara Şehirlerarası Otobüs Terminali",
+        "endStop": "Keşan Otogar",
+        "intermediateStops": [
+                "İbrice Maden Sapağı",
+                "Yenimuhacir Beldesi & Edirne İl Sınırı"
+        ],
+        "desc": "Kalkış: Malkara Otogarı ➔ Varış: Keşan Otogar. D-110 / E84 uluslararası anayolu üzerinden Tekirdağ'dan komşu il Edirne'nin Keşan kavşağına uzanan ekspres hat. Toplam 4 durak, 28 km.",
+        "detailedInstructions": "Malkara - Keşan Sınır Ekspres Görev Adımları:\n1. Adım: Malkara Otogarından 38 yolcuyu alarak hareket edin.\n2. Adım: 10 km sonra İbrice Maden Sapağında durun.\n3. Adım: 12 km sonra Yenimuhacir ve Edirne İl Sınırında durun.\n4. Adım (Hedef Son Durak): 6 km sonra Keşan Otogarında seferi bitirin.",
+        "speechBriefing": "Malkara Edirne Keşan Sınır Ekspres seferi. D-110 E84 koridoru üzerinden komşu ilimiz Edirne Keşan Otogarına 28 kilometrelik sınır seferimiz başlıyor. Ege ve İpsala bağlantı kavşağına doğru yoldayız. İyi sürüşler.",
+        "color": "#f97316",
+        "otobusKapasitesi": 46,
+        "biletFiyat": 65,
+        "biletFiyatMultiplier": 2.0,
+        "isDistrict": true,
+        "isBorderRoute": true,
+        "terrain": "otoyol",
+        "totalKm": 28.0,
+        "stops": [
+                {
+                        "name": "Malkara Şehirlerarası Otobüs Terminali",
+                        "anons": "Malkara Otogar peronundayız. Edirne Keşan sınır ekspres seferimiz başlıyor.",
+                        "bekleyenYolcu": 38,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 10.0,
+                        "lat": 40.89,
+                        "lon": 26.9011
+                },
+                {
+                        "name": "İbrice Maden Sapağı",
+                        "anons": "Sonraki durak: İbrice Maden Sapağı.",
+                        "bekleyenYolcu": 5,
+                        "inenYolcu": 2,
+                        "gercekMesafeSonraki": 12.0,
+                        "lat": 40.87,
+                        "lon": 26.78
+                },
+                {
+                        "name": "Yenimuhacir Beldesi & Edirne İl Sınırı",
+                        "anons": "Sonraki durak: Yenimuhacir Beldesi ve Edirne İl Sınırı.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 40.86,
+                        "lon": 26.69
+                },
+                {
+                        "name": "Keşan Otogar",
+                        "anons": "Son durak: Keşan Şehirlerarası Otobüs Terminali. Edirne sınır seferimiz başarıyla tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 44,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 40.854,
+                        "lon": 26.63
+                }
+        ]
+},
+        {
+        "id": "hat_sinir_sarkoy_gelibolu",
+        "hatNo": "SNR-CNK-01",
+        "name": "ŞARKÖY - ÇANAKKALE GELİBOLU BOĞAZ KORİDORU",
+        "destDistrict": "Çanakkale (Gelibolu)",
+        "originDistrict": "Şarköy",
+        "startStop": "Şarköy İlçe Otogarı & İskele",
+        "endStop": "Gelibolu Otogar",
+        "intermediateStops": [
+                "Kavakköy Girişi",
+                "Evreşe Ovası & Çanakkale İl Sınırı (D-120)",
+                "Bolayır Tarihi Tepe"
+        ],
+        "desc": "Kalkış: Şarköy İskele ➔ Varış: Gelibolu Otogar. D-120 üzerinden Saros Körfezi kıyısı boyunca komşu il Çanakkale Gelibolu Yarımadasına ve 1915 Köprüsü aksına uzanan hat. Toplam 5 durak, 45 km.",
+        "detailedInstructions": "Şarköy - Gelibolu Boğaz Koridoru Görev Adımları:\n1. Adım: Şarköy İskelesinden 40 yolcuyu alarak hareket edin.\n2. Adım: 12 km sonra Kavakköy durağında durun.\n3. Adım: 15 km sonra Evreşe ve Çanakkale İl Sınır durağında durun.\n4. Adım: 12 km sonra Bolayır durağında durun.\n5. Adım (Hedef Son Durak): 6 km sonra Gelibolu Otogarında seferi bitirin.",
+        "speechBriefing": "Şarköy Çanakkale Gelibolu Boğaz Koridoru seferi. Marmara'dan Saros Körfezi'ne uzanarak komşu ilimiz Çanakkale Gelibolu'ya 45 kilometrelik tarihi seferimiz başlıyor. Şehitler coğrafyasına hoş geldiniz. İyi yolculuklar.",
+        "color": "#ef4444",
+        "otobusKapasitesi": 46,
+        "biletFiyat": 80,
+        "biletFiyatMultiplier": 2.2,
+        "isDistrict": true,
+        "isBorderRoute": true,
+        "terrain": "sahil",
+        "totalKm": 45.0,
+        "stops": [
+                {
+                        "name": "Şarköy İlçe Otogarı & İskele",
+                        "anons": "Şarköy İskele peronundayız. Çanakkale Gelibolu Boğaz Koridoru seferimiz başlıyor.",
+                        "bekleyenYolcu": 40,
+                        "inenYolcu": 0,
+                        "gercekMesafeSonraki": 12.0,
                         "lat": 40.6139,
                         "lon": 27.1128
+                },
+                {
+                        "name": "Kavakköy Girişi",
+                        "anons": "Sonraki durak: Kavakköy Girişi.",
+                        "bekleyenYolcu": 6,
+                        "inenYolcu": 3,
+                        "gercekMesafeSonraki": 15.0,
+                        "lat": 40.6,
+                        "lon": 26.96
+                },
+                {
+                        "name": "Evreşe Ovası & Çanakkale İl Sınırı (D-120)",
+                        "anons": "Sonraki durak: Evreşe Ovası ve Çanakkale İl Sınırı.",
+                        "bekleyenYolcu": 8,
+                        "inenYolcu": 5,
+                        "gercekMesafeSonraki": 12.0,
+                        "lat": 40.6,
+                        "lon": 26.8
+                },
+                {
+                        "name": "Bolayır Tarihi Tepe",
+                        "anons": "Sonraki durak: Namık Kemal'in ve Gazi Süleyman Paşa'nın kabrinin bulunduğu Bolayır Tarihi Tepe.",
+                        "bekleyenYolcu": 7,
+                        "inenYolcu": 6,
+                        "gercekMesafeSonraki": 6.0,
+                        "lat": 40.54,
+                        "lon": 26.75
+                },
+                {
+                        "name": "Gelibolu Otogar",
+                        "anons": "Son durak: Gelibolu Otogarı ve Feribot İskelesi. Çanakkale Boğaz koridoru seferimiz tamamlanmıştır.",
+                        "bekleyenYolcu": 0,
+                        "inenYolcu": 47,
+                        "gercekMesafeSonraki": 0,
+                        "lat": 40.41,
+                        "lon": 26.67
                 }
         ]
 }

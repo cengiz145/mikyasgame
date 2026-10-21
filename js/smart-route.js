@@ -1046,16 +1046,18 @@ const AkilliRotaSistemi = {
             }
         });
 
-        // İLÇELER ARASI KORİDOR VE EKSPRES BAĞLANTI DESTEĞİ
+        // İLÇELER ARASI KORİDOR VE EKSPRES BAĞLANTI DESTEĞİ (KOMŞULUK İLİŞKİLERİNE GÖRE)
         if (hasPassed10 && candidates.length === 0 && fromHub && toHub && fromHub.district !== toHub.district) {
+            const d1 = fromHub.district;
+            const d2 = toHub.district;
             const interDistrict = db.find(r => 
-                (r.id === "hat_saray_ekspres" && fromHub.district === "Süleymanpaşa" && toHub.district === "Saray") ||
-                ((r.hatNo === "26" || r.hatNo === "226") && fromHub.district === "Süleymanpaşa" && toHub.district === "Saray") ||
-                ((r.hatNo === "26" || r.hatNo === "226" || r.id === "hat_saray_ekspres") && fromHub.district === "Saray" && toHub.district === "Süleymanpaşa") ||
-                ((r.originDistrict === fromHub.district && r.destDistrict === toHub.district) || (r.destDistrict === fromHub.district && r.originDistrict === toHub.district))
+                (r.originDistrict === d1 && r.destDistrict === d2) ||
+                (r.destDistrict === d1 && r.originDistrict === d2) ||
+                (r.id === "hat_saray_ekspres" && ((d1 === "Süleymanpaşa" && d2 === "Saray") || (d1 === "Saray" && d2 === "Süleymanpaşa"))) ||
+                ((r.hatNo === "26" || r.hatNo === "226") && ((d1 === "Süleymanpaşa" && d2 === "Saray") || (d1 === "Saray" && d2 === "Süleymanpaşa")))
             );
             if (interDistrict && interDistrict.stops && interDistrict.stops.length > 1) {
-                const isReverse = (interDistrict.destDistrict === fromHub.district && interDistrict.originDistrict === toHub.district);
+                const isReverse = (interDistrict.destDistrict === d1 && interDistrict.originDistrict === d2);
                 const activeStops = isReverse ? [...interDistrict.stops].reverse() : interDistrict.stops;
                 candidates.push({
                     route: interDistrict,
@@ -1064,9 +1066,140 @@ const AkilliRotaSistemi = {
                     fromIdx: 0,
                     toIdx: activeStops.length - 1,
                     stopsCount: activeStops.length,
-                    dist: interDistrict.totalKm || 62,
+                    dist: interDistrict.totalKm || 50,
                     subStops: activeStops
                 });
+            } else {
+                // BFS İLE KOMŞULUK İLİŞKİLERİNE GÖRE ÇOK BACAKLI KORİDOR AĞI OLUŞTURMA
+                const kGraph = (typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"] && sehirRotalari["Tekirdağ"].ilcelerBilgisi && sehirRotalari["Tekirdağ"].ilcelerBilgisi.komsuIlceler)
+                    ? sehirRotalari["Tekirdağ"].ilcelerBilgisi.komsuIlceler
+                    : {
+                        "Süleymanpaşa": ["Muratlı", "Çorlu", "Marmaraereğlisi", "Hayrabolu", "Malkara", "Şarköy"],
+                        "Çorlu": ["Süleymanpaşa", "Marmaraereğlisi", "Ergene", "Çerkezköy", "Muratlı"],
+                        "Ergene": ["Çorlu", "Muratlı", "Çerkezköy", "Kapaklı", "Saray"],
+                        "Çerkezköy": ["Kapaklı", "Çorlu", "Ergene"],
+                        "Kapaklı": ["Çerkezköy", "Saray", "Ergene"],
+                        "Saray": ["Kapaklı", "Ergene"],
+                        "Muratlı": ["Süleymanpaşa", "Çorlu", "Ergene", "Hayrabolu"],
+                        "Marmaraereğlisi": ["Süleymanpaşa", "Çorlu"],
+                        "Hayrabolu": ["Süleymanpaşa", "Muratlı", "Malkara"],
+                        "Malkara": ["Süleymanpaşa", "Hayrabolu", "Şarköy"],
+                        "Şarköy": ["Süleymanpaşa", "Malkara"]
+                    };
+
+                // Sınır illerinin ilçe kapıları (Örn: Silivri -> Marmaraereğlisi/Çerkezköy, Keşan -> Malkara, Gelibolu -> Şarköy vb.)
+                const gatewayMap = {
+                    "İstanbul": "Marmaraereğlisi",
+                    "Edirne": "Malkara",
+                    "Kırklareli": "Muratlı",
+                    "Çanakkale": "Şarköy"
+                };
+
+                const startDist = gatewayMap[d1] || d1;
+                const endDist = gatewayMap[d2] || d2;
+
+                if (kGraph[startDist] && kGraph[endDist]) {
+                    const queue = [[startDist]];
+                    const visited = new Set([startDist]);
+                    let foundPath = null;
+
+                    while (queue.length > 0) {
+                        const path = queue.shift();
+                        const curr = path[path.length - 1];
+                        if (curr === endDist) {
+                            foundPath = path;
+                            break;
+                        }
+                        const neighbors = kGraph[curr] || [];
+                        for (const nb of neighbors) {
+                            if (!visited.has(nb)) {
+                                visited.add(nb);
+                                queue.push([...path, nb]);
+                            }
+                        }
+                    }
+
+                    if (foundPath && foundPath.length > 1) {
+                        // Komşu ilçe adımları boyunca durakları ve hatları birleştir
+                        const combinedStops = [];
+                        let totalCalculatedKm = 0;
+                        const seenStopNames = new Set();
+
+                        for (let p = 0; p < foundPath.length - 1; p++) {
+                            const u = foundPath[p];
+                            const v = foundPath[p + 1];
+                            const legRoute = db.find(r => 
+                                (r.originDistrict === u && r.destDistrict === v) ||
+                                (r.originDistrict === v && r.destDistrict === u)
+                            );
+                            if (legRoute && legRoute.stops && legRoute.stops.length > 0) {
+                                const isRev = (legRoute.originDistrict === v && legRoute.destDistrict === u);
+                                const legStops = isRev ? [...legRoute.stops].reverse() : legRoute.stops;
+                                legStops.forEach((st, sIdx) => {
+                                    if (p > 0 && sIdx === 0) return;
+                                    if (!seenStopNames.has(st.name)) {
+                                        seenStopNames.add(st.name);
+                                        combinedStops.push(st);
+                                        totalCalculatedKm += (st.gercekMesafeSonraki || 0);
+                                    }
+                                });
+                            }
+                        }
+
+                        // Eğer dış sınır ili hedefiyse (örn: Silivri, Keşan, Lüleburgaz, Vize, Gelibolu), sınır rotasını ekle
+                        if (d2 in gatewayMap || d2 === "İstanbul" || d2 === "Edirne" || d2 === "Kırklareli" || d2 === "Çanakkale") {
+                            const borderRoute = db.find(r => 
+                                r.isBorderRoute && r.originDistrict === endDist && (r.destDistrict.includes(d2) || (toHub && r.destDistrict.includes(toHub.label)))
+                            );
+                            if (borderRoute && borderRoute.stops) {
+                                borderRoute.stops.forEach((st, sIdx) => {
+                                    if (sIdx > 0 && !seenStopNames.has(st.name)) {
+                                        seenStopNames.add(st.name);
+                                        combinedStops.push(st);
+                                        totalCalculatedKm += (st.gercekMesafeSonraki || 0);
+                                    }
+                                });
+                            }
+                        }
+
+                        if (combinedStops.length >= 2) {
+                            const pathTitle = foundPath.join(" ➔ ");
+                            const multiRoute = {
+                                id: `hat_komsu_koridor_${startDist}_${endDist}`.toLowerCase(),
+                                hatNo: "KOMŞU-AKTARMA",
+                                name: `${d1.toUpperCase()} - ${d2.toUpperCase()} KOMŞULUK KORİDORU`,
+                                originDistrict: d1,
+                                destDistrict: d2,
+                                startStop: combinedStops[0].name,
+                                endStop: combinedStops[combinedStops.length - 1].name,
+                                intermediateStops: combinedStops.slice(1, -1).map(s => s.name),
+                                desc: `Kalkış: ${combinedStops[0].name} ➔ Varış: ${combinedStops[combinedStops.length - 1].name}. İllerdeki ve ilçelerdeki komşuluk ilişkilerine göre kesintisiz aktarma güzergâhı: ${pathTitle}. Toplam ${combinedStops.length} durak, ${Math.round(totalCalculatedKm)} km.`,
+                                speechBriefing: `${d1} ilçesinden ${d2} istikametine komşuluk koridorları üzerinden düzenlenen seferimiz başlıyor. Güzergâhımız ${pathTitle}. İyi yolculuklar kaptan.`,
+                                color: "#0284c7",
+                                otobusKapasitesi: 46,
+                                biletFiyat: Math.max(50, Math.round(totalCalculatedKm * 1.5)),
+                                biletFiyatMultiplier: 2.0,
+                                isDistrict: true,
+                                isKomsuRoute: true,
+                                totalKm: Math.round(totalCalculatedKm),
+                                stops: combinedStops
+                            };
+
+                            if (typeof routesData !== 'undefined') routesData[multiRoute.id] = multiRoute;
+
+                            candidates.push({
+                                route: multiRoute,
+                                fromStop: combinedStops[0].name,
+                                toStop: combinedStops[combinedStops.length - 1].name,
+                                fromIdx: 0,
+                                toIdx: combinedStops.length - 1,
+                                stopsCount: combinedStops.length,
+                                dist: Math.round(totalCalculatedKm),
+                                subStops: combinedStops
+                            });
+                        }
+                    }
+                }
             }
         }
 

@@ -1148,9 +1148,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 let ariaTxt = "Hat " + route.hatNo + ": " + route.name + ". Toplam " + stopCount + " durak, " + totalKm.toFixed(1) + " kilometre. Kalkış: " + sName + ", Varış: " + eName;
                 btn.setAttribute('aria-label', ariaTxt);
 
+                let badgeSpan = '';
+                if (route.isBorderRoute) {
+                    badgeSpan = ' <span style="background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid #ef4444; padding: 2px 7px; border-radius: 4px; font-size: 0.78rem; margin-left: 6px; font-weight: bold;">[Komşu İl Sınırı]</span>';
+                } else if (route.isKomsuRoute || (route.originDistrict && route.destDistrict && route.originDistrict !== route.destDistrict)) {
+                    badgeSpan = ' <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; padding: 2px 7px; border-radius: 4px; font-size: 0.78rem; margin-left: 6px; font-weight: bold;">[Komşu İlçe]</span>';
+                } else {
+                    badgeSpan = ' <span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 7px; border-radius: 4px; font-size: 0.78rem; margin-left: 6px; font-weight: bold;">[İlçe İçi]</span>';
+                }
+
                 btn.innerHTML = [
                     '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">',
-                    '   <span style="font-weight: bold; color: ' + (route.color || '#38bdf8') + '; font-size: 1.05rem;">[Hat ' + route.hatNo + '] ' + route.name + '</span>',
+                    '   <span style="font-weight: bold; color: ' + (route.color || '#38bdf8') + '; font-size: 1.05rem;">[Hat ' + route.hatNo + '] ' + route.name + badgeSpan + '</span>',
                     '   <span style="color: var(--secondary); font-size: 0.85rem; font-weight: bold;">' + stopCount + ' Durak | ' + totalKm.toFixed(1) + ' KM</span>',
                     '</div>',
                     '<div style="font-size: 0.85rem; color: #94a3b8;">',
@@ -1595,6 +1604,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const districtList = (typeof ilceRotalari !== 'undefined' && ilceRotalari[currentCity]) 
             ? ilceRotalari[currentCity] 
             : (typeof ilceRotalari !== 'undefined' ? ilceRotalari["Tekirdağ"] : []);
+
+        const curDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
+        const tkData = (typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"] && sehirRotalari["Tekirdağ"].ilcelerBilgisi) ? sehirRotalari["Tekirdağ"].ilcelerBilgisi : null;
+        const komsuList = (tkData && tkData.komsuIlceler && tkData.komsuIlceler[curDist]) ? tkData.komsuIlceler[curDist] : [];
+
+        const descEl = document.getElementById('district-modal-desc');
+        if (descEl) {
+            descEl.innerHTML = `📍 <strong>Aktif Bölgeniz:</strong> <span style="color:#38bdf8;">${curDist}</span> | İllerdeki komşuluk ilişkilerine göre hatlar:`;
+        }
         
         if (!districtList || districtList.length === 0) {
             UI.showToast("Bu şehir için tanımlı ilçe hattı bulunamadı.", "error");
@@ -1603,7 +1621,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        districtList.forEach(distRoute => {
+        // Akıllı Sıralama: Aktif ilçenin Doğrudan Komşuları -> Komşu İl Sınır Kapıları -> İlçe İçi -> Diğerleri
+        const sortedDistrictList = [...districtList].sort((a, b) => {
+            const getPriority = (r) => {
+                const isBorderThis = r.isBorderRoute && r.originDistrict === curDist;
+                const isKomsuThis = (r.originDistrict === curDist && komsuList.includes(r.destDistrict)) || (r.destDistrict === curDist && komsuList.includes(r.originDistrict));
+                const isLocalThis = (r.originDistrict === curDist && r.destDistrict === curDist) || r.district === curDist;
+                const isRelThis = r.originDistrict === curDist || r.destDistrict === curDist;
+
+                if (isKomsuThis) return 1;
+                if (isBorderThis) return 2;
+                if (isLocalThis) return 3;
+                if (isRelThis) return 4;
+                if (r.isBorderRoute) return 5;
+                if (r.isKomsuRoute) return 6;
+                return 7;
+            };
+            return getPriority(a) - getPriority(b);
+        });
+
+        sortedDistrictList.forEach(distRoute => {
             const li = document.createElement('li');
             li.style.marginBottom = "10px";
             
@@ -1613,11 +1650,20 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.justifyContent = 'space-between';
             btn.style.padding = '15px';
             
-            const totalKm = distRoute.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
+            const totalKm = distRoute.totalKm || (distRoute.stops ? distRoute.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0) : 20);
             
+            let badgeHtml = '';
+            if (distRoute.isBorderRoute) {
+                badgeHtml = '<span style="background: rgba(239,68,68,0.25); color: #f87171; border: 1px solid #ef4444; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">[Komşu İl Sınırı]</span>';
+            } else if ((distRoute.originDistrict === curDist && komsuList.includes(distRoute.destDistrict)) || (distRoute.destDistrict === curDist && komsuList.includes(distRoute.originDistrict)) || distRoute.isKomsuRoute) {
+                badgeHtml = '<span style="background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid #0284c7; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">[Komşu İlçe]</span>';
+            } else if (distRoute.originDistrict === distRoute.destDistrict) {
+                badgeHtml = '<span style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">[İlçe İçi]</span>';
+            }
+
             btn.innerHTML = `
-                <span><strong style="color: ${distRoute.color};">[Hat ${distRoute.hatNo}] ${distRoute.destDistrict}</strong> (${distRoute.originDistrict} - ${distRoute.destDistrict})</span>
-                <span style="color: var(--secondary);">${totalKm.toFixed(0)} KM İlçe Seferi</span>
+                <span><strong style="color: ${distRoute.color || '#38bdf8'};">[Hat ${distRoute.hatNo}] ${distRoute.name}</strong> ${badgeHtml}</span>
+                <span style="color: var(--secondary); font-weight: bold;">${Math.round(totalKm)} KM</span>
             `;
             
             btn.onclick = () => {
