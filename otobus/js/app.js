@@ -2,6 +2,10 @@
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU BAÅLATICI (APP.JS)
    ========================================================================== */
 
+// 81 İl Resmi KGM Karayolları Mesafeleri js/data.js içerisinde tanımlıdır ve window.sehirlerarasiMesafeler üzerinden erişilir.
+
+        if (typeof window !== 'undefined') window.sehirlerarasiMesafeler = sehirlerarasiMesafeler;
+
 document.addEventListener('DOMContentLoaded', () => {
     // === HATA AYIKLAMA (DEBUG) MODU ===
     window.addEventListener('error', (e) => {
@@ -135,15 +139,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 0.5. Login Screen & Bölge / İlçe Listesi Sistemi (Yüksek Erişilebilirlik)
     const DISTRICT_OPTIONS = [
-        { id: "Süleymanpaşa", icon: "🏙️", name: "Süleymanpaşa (Tekirdağ Merkez)", desc: "Şehir içi sahil, çarşı ve üniversite hatları" },
-        { id: "Saray", icon: "🌳", name: "Saray (İlçe Merkezi & Mahalleleri)", desc: "Kuzey Trakya ormanları ve ilçe hatları" },
-        { id: "Velimeşe", icon: "🏭", name: "Velimeşe (Ergene Sanayi & TOKİ)", desc: "Sanayi bölgesi, TOKİ konutları ve fabrika hatları" },
-        { id: "Çorlu", icon: "🏭", name: "Çorlu (Sanayi & Şehir Merkezi)", desc: "Büyük metropol ve yoğun şehir hatları" },
-        { id: "Çerkezköy - Kapaklı", icon: "🏢", name: "Çerkezköy ve Kapaklı", desc: "Organize sanayi ve ilçe hatları" },
-        { id: "Malkara", icon: "🌾", name: "Malkara (Merkez & Köy Yolları)", desc: "Geniş ova, tepe mahalleler ve köy yolları" },
-        { id: "Hayrabolu", icon: "🌻", name: "Hayrabolu (Trakya Ovası)", desc: "Ayçiçeği tarlaları ve ova çarşı hatları" },
-        { id: "Şarköy", icon: "🍇", name: "Şarköy (Sahil & Bağ Yolları)", desc: "Marmara denizi kıyısı ve bağ hatları" },
-        { id: "Muratlı", icon: "🚆", name: "Muratlı (Tren Garı & Çarşı)", desc: "Tren istasyonu aksı ve ilçe merkez seferleri" }
+        { id: "Süleymanpaşa", icon: "🏙️", name: "Süleymanpaşa (Tekirdağ Merkez)", desc: "Eski merkez ilçe Süleymanpaşa adını aldı. Sahil, çarşı ve üniversite hatları (0 km)" },
+        { id: "Muratlı", icon: "🚆", name: "Muratlı (Tren Garı & Çarşı)", desc: "Tren istasyonu aksı ve ilçe merkez seferleri (Merkeze 24 km)" },
+        { id: "Çorlu", icon: "🏭", name: "Çorlu (Sanayi & Şehir Merkezi)", desc: "Büyük sanayi metropolü ve en kalabalık ilçe (Merkeze 36 km)" },
+        { id: "Marmaraereğlisi", icon: "🏖️", name: "Marmaraereğlisi (Sahil & Antik Kent)", desc: "Perinthos antik kenti, Yeniçiftlik, Sultanköy ve Marmara sahil hatları (Merkeze 38 km)" },
+        { id: "Ergene", icon: "⚙️", name: "Ergene / Velimeşe (Sanayi & TOKİ)", desc: "Çorlu'ya bağlı beldelerin birleşmesiyle Ergene yeni bir ilçe oldu. OSB ve TOKİ hatları (Merkeze 45 km)" },
+        { id: "Hayrabolu", icon: "🌻", name: "Hayrabolu (Trakya Ovası)", desc: "Ayçiçeği tarlaları ve ova çarşı hatları (Merkeze 52 km)" },
+        { id: "Malkara", icon: "🌾", name: "Malkara (Merkez & Köy Yolları)", desc: "Geniş ova, tepe mahalleler ve köy yolları (Merkeze 58 km)" },
+        { id: "Çerkezköy", icon: "🏭", name: "Çerkezköy (Sanayi & OSB Merkezi)", desc: "Çerkezköy OSB, Tepe, İstasyon ve Veliköy hatları (Merkeze 62 km)" },
+        { id: "Kapaklı", icon: "🏢", name: "Kapaklı (Müstakil İlçe & Yıldızkent)", desc: "Çerkezköy'e bağlı bir belde olan Kapaklı müstakil bir ilçeye dönüştürüldü. Yıldızkent ve Pınarça hatları (Merkeze 67 km)" },
+        { id: "Saray", icon: "🌳", name: "Saray (İlçe Merkezi & Mahalleleri)", desc: "Kuzey Trakya ormanları ve ilçe hatları (Merkeze 78 km)" },
+        { id: "Şarköy", icon: "🍇", name: "Şarköy (Sahil & Bağ Yolları)", desc: "Marmara denizi kıyısı ve bağ hatları (Merkeze 84 km)" }
     ];
 
     let chosenDistrict = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
@@ -154,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!listEl) return;
         listEl.innerHTML = '';
         listEl.setAttribute('role', 'radiogroup');
-        listEl.setAttribute('aria-label', 'Başlangıç bölgesi ve ilçe listesi. 9 ilçe mevcuttur.');
+        listEl.setAttribute('aria-label', 'Başlangıç bölgesi ve ilçe listesi. 11 ilçe mevcuttur.');
 
         DISTRICT_OPTIONS.forEach((opt, idx) => {
             const isSelected = (opt.id === chosenDistrict);
@@ -259,6 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('activeDistrict', chosenDistrict);
         }
         localStorage.setItem('otobusUsername', username);
+        if (typeof Multiplayer !== 'undefined' && Multiplayer.profile) { Multiplayer.profile.name = username; Multiplayer.syncMyState(); }
         
         if (typeof UI !== 'undefined' && UI.switchScreen) {
             UI.switchScreen('title-screen');
@@ -304,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const curDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || 'Süleymanpaşa');
         listEl.innerHTML = '';
         listEl.setAttribute('role', 'radiogroup');
-        listEl.setAttribute('aria-label', 'Bölge ve ilçe seçim listesi. 9 ilçe mevcuttur.');
+        listEl.setAttribute('aria-label', 'Bölge ve ilçe seçim listesi. 11 ilçe mevcuttur.');
 
         DISTRICT_OPTIONS.forEach((opt, idx) => {
             const isSelected = (opt.id === curDist);
@@ -371,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (activeBtn) activeBtn.focus();
         }, 120);
 
-        const welcomeVoice = "Bölge ve ilçe seçim penceresi açıldı. 9 ilçe arasında yukarı ve aşağı oklarla gezinebilir, Enter ile seçebilirsiniz. Kapatmak için Escape tuşuna basabilirsiniz.";
+        const welcomeVoice = "Bölge ve ilçe seçim penceresi açıldı. 11 ilçe arasında yukarı ve aşağı oklarla gezinebilir, Enter ile seçebilirsiniz. Kapatmak için Escape tuşuna basabilirsiniz.";
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(welcomeVoice);
         if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(welcomeVoice);
     };
@@ -425,16 +432,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (descEl) descEl.innerText = "Lütfen gitmek istediğiniz ilçe veya hat kategorisini seçin:";
 
             const cats = [
-                { id: "Süleymanpaşa", icon: "🏙️", title: "Süleymanpaşa Şehir İçi Hatları", filter: r => r.district === 'Süleymanpaşa' },
-                { id: "Çorlu", icon: "🏭", title: "Çorlu Şehir İçi Hatları", filter: r => r.district === 'Çorlu' },
-                { id: "Çerkezköy - Kapaklı", icon: "🏢", title: "Çerkezköy ve Kapaklı Hatları", filter: r => r.district === 'Çerkezköy - Kapaklı' },
-                { id: "İlçeler Arası", icon: "🚌", title: "İlçeler Arası Hatlar (Hat 26 Saray, Hat 48 Velimeşe vb.)", filter: r => r.isDistrict || r.district === 'İlçeler Arası' },
-                { id: "Malkara", icon: "🌾", title: "Malkara Hatları", filter: r => r.district === 'Malkara' },
-                { id: "Saray", icon: "🌳", title: "Saray Hatları", filter: r => r.district === 'Saray' },
-                { id: "Hayrabolu", icon: "🌻", title: "Hayrabolu Hatları", filter: r => r.district === 'Hayrabolu' },
-                { id: "Şarköy", icon: "🍇", title: "Şarköy Hatları", filter: r => r.district === 'Şarköy' },
-                { id: "Muratlı", icon: "🚆", title: "Muratlı Hatları", filter: r => r.district === 'Muratlı' },
-                { id: "TÜMÜ", icon: "📋", title: "Tüm TEKULAŞ Hatları (183 Hat, 3.913 Durak)", filter: () => true }
+                { id: "Süleymanpaşa", icon: "🏙️", title: "Süleymanpaşa Hatları (Merkez)", filter: r => r.district === 'Süleymanpaşa' || r.originDistrict === 'Süleymanpaşa' || r.destDistrict === 'Süleymanpaşa' },
+                { id: "Muratlı", icon: "🚆", title: "Muratlı Hatları (24 km)", filter: r => r.district === 'Muratlı' || r.originDistrict === 'Muratlı' || r.destDistrict === 'Muratlı' },
+                { id: "Çorlu", icon: "🏭", title: "Çorlu Hatları (36 km)", filter: r => r.district === 'Çorlu' || r.originDistrict === 'Çorlu' || r.destDistrict === 'Çorlu' },
+                { id: "Marmaraereğlisi", icon: "🏖️", title: "Marmaraereğlisi Sahil Hatları (38 km)", filter: r => r.district === 'Marmaraereğlisi' || r.originDistrict === 'Marmaraereğlisi' || r.destDistrict === 'Marmaraereğlisi' || (r.name && r.name.toLowerCase().includes('ereğli')) },
+                { id: "Ergene", icon: "⚙️", title: "Ergene & Velimeşe Hatları (45 km)", filter: r => r.district === 'Ergene' || r.district === 'Velimeşe' || r.originDistrict === 'Ergene' || r.destDistrict === 'Ergene' || (r.name && (r.name.toLowerCase().includes('ergene') || r.name.toLowerCase().includes('marmaracık') || r.name.toLowerCase().includes('velimeşe'))) },
+                { id: "Hayrabolu", icon: "🌻", title: "Hayrabolu Hatları (52 km)", filter: r => r.district === 'Hayrabolu' || r.originDistrict === 'Hayrabolu' || r.destDistrict === 'Hayrabolu' },
+                { id: "Malkara", icon: "🌾", title: "Malkara Hatları (58 km)", filter: r => r.district === 'Malkara' || r.originDistrict === 'Malkara' || r.destDistrict === 'Malkara' },
+                { id: "Çerkezköy", icon: "🏭", title: "Çerkezköy Hatları (62 km)", filter: r => r.district === 'Çerkezköy' || r.originDistrict === 'Çerkezköy' || r.destDistrict === 'Çerkezköy' },
+                { id: "Kapaklı", icon: "🏢", title: "Kapaklı Hatları (67 km)", filter: r => r.district === 'Kapaklı' || r.originDistrict === 'Kapaklı' || r.destDistrict === 'Kapaklı' },
+                { id: "Saray", icon: "🌳", title: "Saray Hatları (78 km)", filter: r => r.district === 'Saray' || r.originDistrict === 'Saray' || r.destDistrict === 'Saray' },
+                { id: "Şarköy", icon: "🍇", title: "Şarköy Sahil Hatları (84 km)", filter: r => r.district === 'Şarköy' || r.originDistrict === 'Şarköy' || r.destDistrict === 'Şarköy' },
+                { id: "İlçeler Arası", icon: "🚌", title: "İlçeler Arası Ekspres Hatlar (11 İlçe Ağı)", filter: r => r.isDistrict || r.district === 'İlçeler Arası' || (r.originDistrict && r.destDistrict && r.originDistrict !== r.destDistrict) },
+                { id: "TÜMÜ", icon: "📋", title: "Tüm TEKULAŞ Hatları (11 İlçe Ağı)", filter: () => true }
             ];
 
             cats.forEach(c => {
@@ -504,13 +514,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 let ariaTxt = "Hat " + route.hatNo + ": " + route.name + ". Toplam " + stopCount + " durak, " + totalKm.toFixed(1) + " kilometre. Kalkış: " + sName + ", Varış: " + eName;
                 btn.setAttribute('aria-label', ariaTxt);
 
+                let badgeSpan = '';
+                if (route.isBorderRoute) {
+                    badgeSpan = ' <span style="background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid #ef4444; padding: 2px 7px; border-radius: 4px; font-size: 0.78rem; margin-left: 6px; font-weight: bold;">[Komşu İl Sınırı]</span>';
+                } else if (route.isKomsuRoute || (route.originDistrict && route.destDistrict && route.originDistrict !== route.destDistrict)) {
+                    badgeSpan = ' <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #0284c7; padding: 2px 7px; border-radius: 4px; font-size: 0.78rem; margin-left: 6px; font-weight: bold;">[Komşu İlçe]</span>';
+                } else {
+                    badgeSpan = ' <span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 7px; border-radius: 4px; font-size: 0.78rem; margin-left: 6px; font-weight: bold;">[İlçe İçi]</span>';
+                }
+
                 btn.innerHTML = [
                     '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">',
-                    '   <span style="font-weight: bold; color: ' + (route.color || '#38bdf8') + '; font-size: 1.05rem;">[Hat ' + route.hatNo + '] ' + route.name + '</span>',
+                    '   <span style="font-weight: bold; color: ' + (route.color || '#38bdf8') + '; font-size: 1.05rem;">[Hat ' + route.hatNo + '] ' + route.name + badgeSpan + '</span>',
                     '   <span style="color: var(--secondary); font-size: 0.85rem; font-weight: bold;">' + stopCount + ' Durak | ' + totalKm.toFixed(1) + ' KM</span>',
                     '</div>',
                     '<div style="font-size: 0.85rem; color: #94a3b8;">',
-                    '   📍 ' + sName + ' ➔ 🏁 ' + eName,
+                    '   📍 ' + sName + ' ➔ 🏁 ' + eName + (route.karayolu ? ' | <span style="color:#f59e0b; font-weight:bold;">🛣️ ' + route.karayolu + '</span>' : ''),
                     '</div>'
                 ].join('');
 
@@ -573,6 +592,32 @@ document.addEventListener('DOMContentLoaded', () => {
         UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
         UI.switchScreen('base-selection-menu');
     };
+
+    const btnOpenComp = document.getElementById('btn-open-company');
+    if (btnOpenComp) {
+        btnOpenComp.addEventListener('click', () => {
+            if (typeof CompanySystem !== 'undefined' && CompanySystem.openCompanyModal) {
+                CompanySystem.openCompanyModal();
+            }
+        });
+    }
+
+    const btnOpenMp = document.getElementById('btn-open-multiplayer');
+    if (btnOpenMp) {
+        btnOpenMp.addEventListener('click', () => {
+            if (typeof Multiplayer !== 'undefined' && Multiplayer.openRadarModal) {
+                Multiplayer.openRadarModal();
+            }
+        });
+    }
+    const hudMpPanel = document.getElementById('hud-multiplayer-panel');
+    if (hudMpPanel) {
+        hudMpPanel.addEventListener('click', () => {
+            if (typeof Multiplayer !== 'undefined' && Multiplayer.openRadarModal) {
+                Multiplayer.openRadarModal();
+            }
+        });
+    }
 
     if (document.getElementById('btn-start-city')) {
         document.getElementById('btn-start-city').addEventListener('click', openCitySelection);
@@ -685,6 +730,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btn-mode-inter').addEventListener('click', () => {
+        // Mikyas Kaptanlık Akademisi: Stajyer ve acemi şoförler uzun yol şehirlerarası sefere çıkamaz!
+        if (typeof Game !== 'undefined' && typeof Game.hasPassedLevel10 === 'function' && !Game.hasPassedLevel10()) {
+            if (typeof audio !== 'undefined' && audio.playWarning) {
+                try { audio.playWarning(); } catch(e) {}
+            } else if (typeof audio !== 'undefined' && audio.playSelect) {
+                audio.playSelect();
+            }
+            const completed = (typeof Game.completedTasks === 'number') ? Game.completedTasks : 0;
+            const academyMsg = `Mikyas Kaptanlık Akademisi Kuralı: Şehirlerarası uzun yol seferlerine çıkabilmek için önce şehir içi 10 görevi tamamlayıp Usta Kaptan ehliyetini almalısınız! Stajyer ve acemi şoförler uzun yola çıkamaz. Mevcut tamamlanan görev: ${completed} / 10.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(academyMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Şehirlerarası Seferler İçin En Az 10 Görev Gerekir!", "warning");
+            return;
+        }
+
         audio.playSelect();
         document.getElementById('mode-selection-modal').classList.add('hidden');
         
@@ -698,15 +757,50 @@ document.addEventListener('DOMContentLoaded', () => {
         // Find all possible destinations (all unlocked + neighbors)
         const possibleDests = new Set([...unlockedCitiesArr]);
         const data = sehirRotalari[Game.currentCity];
-        if (data && data.komsular) {
-            Object.values(data.komsular).forEach(n => possibleDests.add(n));
+        if (data) {
+            if (data.komsular) {
+                Object.values(data.komsular).forEach(n => {
+                    if (typeof n === 'string') {
+                        n.split(/[\/,]+/).map(s => s.trim()).forEach(sub => {
+                            if (sub && (typeof sehirRotalari !== 'undefined' && sehirRotalari[sub])) possibleDests.add(sub);
+                        });
+                    }
+                });
+            }
+            if (Array.isArray(data.komsuIller)) {
+                data.komsuIller.forEach(sub => {
+                    if (sub && (typeof sehirRotalari !== 'undefined' && sehirRotalari[sub])) possibleDests.add(sub);
+                });
+            }
+            // Bütün illeri bütün illere komşu ve şehirlerarası sefer ağı olarak bağla:
+            if (typeof masterCitiesList !== 'undefined' && Array.isArray(masterCitiesList)) {
+                masterCitiesList.forEach(sub => {
+                    if (sub && (typeof sehirRotalari !== 'undefined' && sehirRotalari[sub])) possibleDests.add(sub);
+                });
+            }
         }
         
         possibleDests.delete(Game.currentCity); // Can't go to self
         
-        possibleDests.forEach(destCity => {
+        // Akıllı Sıralama: 1. Doğrudan Komşu İller, 2. Açılmış Şehirler, 3. Diğer İller (Alfabetik)
+        const sortedDests = Array.from(possibleDests).sort((a, b) => {
+            const isKomsuA = data && Array.isArray(data.komsuIller) && data.komsuIller.includes(a);
+            const isKomsuB = data && Array.isArray(data.komsuIller) && data.komsuIller.includes(b);
+            if (isKomsuA && !isKomsuB) return -1;
+            if (!isKomsuA && isKomsuB) return 1;
+
+            const isUnlA = unlockedCitiesArr.includes(a);
+            const isUnlB = unlockedCitiesArr.includes(b);
+            if (isUnlA && !isUnlB) return -1;
+            if (!isUnlA && isUnlB) return 1;
+
+            return a.localeCompare(b, 'tr');
+        });
+
+        sortedDests.forEach(destCity => {
             hasDestinations = true;
             const isUnlocked = unlockedCitiesArr.includes(destCity);
+            const isKomsu = (data && Array.isArray(data.komsuIller) && data.komsuIller.includes(destCity));
             const li = document.createElement('li');
             li.style.marginBottom = "10px";
             
@@ -716,9 +810,42 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.justifyContent = 'space-between';
             btn.style.padding = '15px';
             
+            let previewDistKm = 0;
+            const pairKey1 = Game.currentCity + "-" + destCity;
+            const pairKey2 = destCity + "-" + Game.currentCity;
+            if (typeof sehirlerarasiMesafeler !== 'undefined') {
+                if (sehirlerarasiMesafeler[pairKey1]) previewDistKm = sehirlerarasiMesafeler[pairKey1];
+                else if (sehirlerarasiMesafeler[pairKey2]) previewDistKm = sehirlerarasiMesafeler[pairKey2];
+            }
+
+            const cFromPrev = typeof sehirRotalari !== 'undefined' ? sehirRotalari[Game.currentCity] : null;
+            const cToPrev = typeof sehirRotalari !== 'undefined' ? sehirRotalari[destCity] : null;
+            if (!previewDistKm) {
+                if (Game.currentCity === "Tekirdağ" && cToPrev && cToPrev.merkezeMesafeKm) previewDistKm = cToPrev.merkezeMesafeKm;
+                else if (destCity === "Tekirdağ" && cFromPrev && cFromPrev.merkezeMesafeKm) previewDistKm = cFromPrev.merkezeMesafeKm;
+                else if (cFromPrev && cFromPrev.tekirdagMesafeKm && cFromPrev.tekirdagMesafeKm[destCity]) previewDistKm = cFromPrev.tekirdagMesafeKm[destCity];
+                else if (cToPrev && cToPrev.tekirdagMesafeKm && cToPrev.tekirdagMesafeKm[Game.currentCity]) previewDistKm = cToPrev.tekirdagMesafeKm[Game.currentCity];
+                else if (cFromPrev && cFromPrev.coordinates && cToPrev && cToPrev.coordinates) {
+                    const lat1 = cFromPrev.coordinates.lat, lon1 = cFromPrev.coordinates.lon;
+                    const lat2 = cToPrev.coordinates.lat, lon2 = cToPrev.coordinates.lon;
+                    if (lat1 && lon1 && lat2 && lon2) {
+                        const R = 6371;
+                        const dLat = (lat2 - lat1) * Math.PI / 180;
+                        const dLon = (lon2 - lon1) * Math.PI / 180;
+                        const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+                        previewDistKm = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.28);
+                    }
+                }
+            }
+            if (!previewDistKm) previewDistKm = 150;
+
+            const badgeHtml = isKomsu
+                ? '<span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; margin-left: 6px;">[Komşu İl]</span>'
+                : (isUnlocked ? '<span style="color: #4ade80; font-size: 0.8em; margin-left: 6px;">(Açık Şehir)</span>' : '<span style="color: #94a3b8; font-size: 0.8em; margin-left: 6px;">(Keşfedilecek)</span>');
+
             btn.innerHTML = `
-                <span><strong>${destCity}</strong> ${isUnlocked ? '(Açık Åehir)' : '(Keşfedilecek)'}</span>
-                <span style="color: var(--secondary);">15 KM Sefer</span>
+                <span><strong>${destCity}</strong> ${badgeHtml}</span>
+                <span style="color: var(--secondary); font-weight: bold;">${previewDistKm} KM Sefer</span>
             `;
             
             btn.onclick = () => {
@@ -746,27 +873,62 @@ document.addEventListener('DOMContentLoaded', () => {
                     destCity: destCity,
                     stops: []
                 };
-                const sehirlerarasiMesafeler = {
-                    "Tekirdağ-İstanbul": 135, "İstanbul-Tekirdağ": 135,
-                    "Tekirdağ-Edirne": 140, "Edirne-Tekirdağ": 140,
-                    "Tekirdağ-Kırklareli": 115, "Kırklareli-Tekirdağ": 115,
-                    "Tekirdağ-Çanakkale": 170, "Çanakkale-Tekirdağ": 170,
-                    "İstanbul-Ankara": 450, "Ankara-İstanbul": 450,
-                    "Edirne-Kırklareli": 65, "Kırklareli-Edirne": 65,
-                    "İstanbul-Edirne": 240, "Edirne-İstanbul": 240,
-                    "İstanbul-Kırklareli": 215, "Kırklareli-İstanbul": 215,
-                    "Çanakkale-Balıkesir": 195,
-                    "Tekirdağ-Ankara": 585, "Ankara-Tekirdağ": 585
-                };
                 const intercityKey = Game.currentCity + "-" + destCity;
-                const realDistKm = sehirlerarasiMesafeler[intercityKey] || 150;
+                let realDistKm = sehirlerarasiMesafeler[intercityKey];
+                if (!realDistKm) {
+                    const cFrom = typeof sehirRotalari !== 'undefined' ? sehirRotalari[Game.currentCity] : null;
+                    const cTo = typeof sehirRotalari !== 'undefined' ? sehirRotalari[destCity] : null;
+                    if (Game.currentCity === "Tekirdağ" && cTo && cTo.merkezeMesafeKm) realDistKm = cTo.merkezeMesafeKm;
+                    else if (destCity === "Tekirdağ" && cFrom && cFrom.merkezeMesafeKm) realDistKm = cFrom.merkezeMesafeKm;
+                    else if (cFrom && cFrom.tekirdagMesafeKm && cFrom.tekirdagMesafeKm[destCity]) realDistKm = cFrom.tekirdagMesafeKm[destCity];
+                    else if (cTo && cTo.tekirdagMesafeKm && cTo.tekirdagMesafeKm[Game.currentCity]) realDistKm = cTo.tekirdagMesafeKm[Game.currentCity];
+                    else if (cFrom && cFrom.coordinates && cTo && cTo.coordinates) {
+                        const lat1 = cFrom.coordinates.lat, lon1 = cFrom.coordinates.lon;
+                        const lat2 = cTo.coordinates.lat, lon2 = cTo.coordinates.lon;
+                        if (lat1 && lon1 && lat2 && lon2) {
+                            const R = 6371;
+                            const dLat = (lat2 - lat1) * Math.PI / 180;
+                            const dLon = (lon2 - lon1) * Math.PI / 180;
+                            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+                            realDistKm = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 1.28);
+                        }
+                    }
+                }
+                if (!realDistKm) realDistKm = 150;
                 
-                routesData[intercityRouteId].stops = [
-                    { name: startStop, anons: startStop + " kalkış peronundayız. " + destCity + " seferi başlıyor.", bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: realDistKm },
-                    { name: endStop, anons: "Son durak: " + endStop + ". Şehirlerarası seferimiz sona ermiştir.", bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 0 }
-                ];
+                const cFromData = (typeof sehirRotalari !== 'undefined') ? sehirRotalari[Game.currentCity] : null;
+                const cToData = (typeof sehirRotalari !== 'undefined') ? sehirRotalari[destCity] : null;
+                const lat1 = (cFromData && cFromData.coordinates) ? cFromData.coordinates.lat : 40.9833;
+                const lon1 = (cFromData && cFromData.coordinates) ? cFromData.coordinates.lon : 27.5167;
+                const lat2 = (cToData && cToData.coordinates) ? cToData.coordinates.lat : 41.0082;
+                const lon2 = (cToData && cToData.coordinates) ? cToData.coordinates.lon : 28.9784;
+
+                const midArr = (typeof window !== 'undefined' && window.midPoints && window.midPoints[destCity])
+                    ? window.midPoints[destCity]
+                    : ((typeof midPoints !== 'undefined' && midPoints[destCity]) ? midPoints[destCity] : null);
+
+                if (realDistKm >= 200 && midArr && midArr.length > 0) {
+                    const passName = midArr[0];
+                    const midLat = Number((lat1 + (lat2 - lat1) * 0.50).toFixed(4));
+                    const midLon = Number((lon1 + (lon2 - lon1) * 0.50).toFixed(4));
+                    const dist1 = Math.round(realDistKm * 0.55);
+                    const dist2 = realDistKm - dist1;
+
+                    routesData[intercityRouteId].intermediateStops = [passName];
+                    routesData[intercityRouteId].stops = [
+                        { name: startStop, lat: lat1, lon: lon1, anons: `${startStop} kalkış peronundayız. ${destCity} seferi başlıyor.`, bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: dist1 },
+                        { name: passName, lat: midLat, lon: midLon, anons: `Önemli geçiş noktası: ${passName}. Yolcularımızın emniyet kemerlerini takmaları rica olunur.`, bekleyenYolcu: 0, inenYolcu: 0, gercekMesafeSonraki: dist2 },
+                        { name: endStop, lat: lat2, lon: lon2, anons: `Son durak: ${endStop}. Şehirlerarası seferimiz sona ermiştir.`, bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 0 }
+                    ];
+                } else {
+                    routesData[intercityRouteId].stops = [
+                        { name: startStop, lat: lat1, lon: lon1, anons: startStop + " kalkış peronundayız. " + destCity + " seferi başlıyor.", bekleyenYolcu: 28, inenYolcu: 0, gercekMesafeSonraki: realDistKm },
+                        { name: endStop, lat: lat2, lon: lon2, anons: "Son durak: " + endStop + ". Şehirlerarası seferimiz sona ermiştir.", bekleyenYolcu: 0, inenYolcu: 28, gercekMesafeSonraki: 0 }
+                    ];
+                }
                 
                 // Add to sehirRotalari temporarily so startRoute works
+                if (!sehirRotalari[Game.currentCity].routes) sehirRotalari[Game.currentCity].routes = [];
                 if (!sehirRotalari[Game.currentCity].routes.includes(intercityRouteId)) {
                     sehirRotalari[Game.currentCity].routes.push(intercityRouteId);
                 }
@@ -808,6 +970,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const districtList = (typeof ilceRotalari !== 'undefined' && ilceRotalari[currentCity]) 
             ? ilceRotalari[currentCity] 
             : (typeof ilceRotalari !== 'undefined' ? ilceRotalari["Tekirdağ"] : []);
+
+        const curDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || "Süleymanpaşa");
+        const tkData = (typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"] && sehirRotalari["Tekirdağ"].ilcelerBilgisi) ? sehirRotalari["Tekirdağ"].ilcelerBilgisi : null;
+        const komsuList = (tkData && tkData.komsuIlceler && tkData.komsuIlceler[curDist]) ? tkData.komsuIlceler[curDist] : [];
+
+        const descEl = document.getElementById('district-modal-desc');
+        if (descEl) {
+            descEl.innerHTML = `📍 <strong>Aktif Bölgeniz:</strong> <span style="color:#38bdf8;">${curDist}</span> | İllerdeki komşuluk ilişkilerine göre hatlar:`;
+        }
         
         if (!districtList || districtList.length === 0) {
             UI.showToast("Bu şehir için tanımlı ilçe hattı bulunamadı.", "error");
@@ -816,7 +987,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        districtList.forEach(distRoute => {
+        // Akıllı Sıralama: Aktif ilçenin Doğrudan Komşuları -> Komşu İl Sınır Kapıları -> İlçe İçi -> Diğerleri
+        const sortedDistrictList = [...districtList].sort((a, b) => {
+            const getPriority = (r) => {
+                const isBorderThis = r.isBorderRoute && r.originDistrict === curDist;
+                const isKomsuThis = (r.originDistrict === curDist && komsuList.includes(r.destDistrict)) || (r.destDistrict === curDist && komsuList.includes(r.originDistrict));
+                const isLocalThis = (r.originDistrict === curDist && r.destDistrict === curDist) || r.district === curDist;
+                const isRelThis = r.originDistrict === curDist || r.destDistrict === curDist;
+
+                if (isKomsuThis) return 1;
+                if (isBorderThis) return 2;
+                if (isLocalThis) return 3;
+                if (isRelThis) return 4;
+                if (r.isBorderRoute) return 5;
+                if (r.isKomsuRoute) return 6;
+                return 7;
+            };
+            return getPriority(a) - getPriority(b);
+        });
+
+        sortedDistrictList.forEach(distRoute => {
             const li = document.createElement('li');
             li.style.marginBottom = "10px";
             
@@ -826,11 +1016,24 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.style.justifyContent = 'space-between';
             btn.style.padding = '15px';
             
-            const totalKm = distRoute.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
+            const totalKm = distRoute.totalKm || (distRoute.stops ? distRoute.stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0) : 20);
             
+            let badgeHtml = '';
+            if (distRoute.isBorderRoute) {
+                badgeHtml = '<span style="background: rgba(239,68,68,0.25); color: #f87171; border: 1px solid #ef4444; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">[Komşu İl Sınırı]</span>';
+            } else if ((distRoute.originDistrict === curDist && komsuList.includes(distRoute.destDistrict)) || (distRoute.destDistrict === curDist && komsuList.includes(distRoute.originDistrict)) || distRoute.isKomsuRoute) {
+                badgeHtml = '<span style="background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid #0284c7; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">[Komşu İlçe]</span>';
+            } else if (distRoute.originDistrict === distRoute.destDistrict) {
+                badgeHtml = '<span style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">[İlçe İçi]</span>';
+            }
+
+            const roadBadge = distRoute.karayolu ? `<div style="font-size: 0.82rem; color: #fbbf24; margin-top: 3px; font-weight: bold;">🛣️ Güzergâh: ${distRoute.karayolu}</div>` : '';
             btn.innerHTML = `
-                <span><strong style="color: ${distRoute.color};">[Hat ${distRoute.hatNo}] ${distRoute.destDistrict}</strong> (${distRoute.originDistrict} - ${distRoute.destDistrict})</span>
-                <span style="color: var(--secondary);">${totalKm.toFixed(0)} KM İlçe Seferi</span>
+                <div style="text-align: left;">
+                    <div><strong style="color: ${distRoute.color || '#38bdf8'};">[Hat ${distRoute.hatNo}] ${distRoute.name}</strong> ${badgeHtml}</div>
+                    ${roadBadge}
+                </div>
+                <span style="color: var(--secondary); font-weight: bold;">${Math.round(totalKm)} KM</span>
             `;
             
             btn.onclick = () => {
@@ -1094,3 +1297,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
+
+if (typeof turkiyeDenizleri !== "undefined" && typeof window !== "undefined") { window.turkiyeDenizleri = turkiyeDenizleri; }
