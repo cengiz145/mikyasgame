@@ -239,9 +239,9 @@ const UI = {
 
         if (btnCareer) {
             if (completed === 0) {
-                btnCareer.innerHTML = "🏆 Kariyer Modu (1. Görev: Sıfırdan Başla - Çırak Kaptan)";
+                btnCareer.innerHTML = "🎖️ İlerleme Modu (İlk Sefer Emri: Göreve Başla)";
             } else {
-                btnCareer.innerHTML = `🏆 Kariyer Moduna Devam Et (${completed + 1}. Görev: 100'de ${completed} Tamamlandı)`;
+                btnCareer.innerHTML = `🎖️ İlerleme Moduna Devam Et (Yeni Sefer Emri: Sefer ${completed + 1})`;
             }
         }
         if (btnFree) {
@@ -587,10 +587,20 @@ const UI = {
             return true;
         });
 
-        const routesToRender = visibleRoutes.length > 0 ? visibleRoutes : cityRoutes;
+        let routesToRender = visibleRoutes.length > 0 ? visibleRoutes : cityRoutes;
+        const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive');
+
+        // İLERLEME MODU GİZEM VE KADEMELİ AÇILMA PRENSİBİ:
+        // Oyuncuya toplam görev sayısı veya tüm gelecek görevler gösterilmez.
+        // Yalnızca tamamlananlar + şu anki aktif görev + hemen sıradaki 1 kilitli görev gösterilir.
+        if (!isFreeDrive) {
+            routesToRender = routesToRender.filter(r => {
+                const tIdx = (typeof r.taskIndex === 'number') ? r.taskIndex : 0;
+                return tIdx <= completedTasks + 1;
+            });
+        }
         let activeTaskBtn = null;
 
-        const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive');
         routesToRender.forEach(route => {
             const taskNum = (typeof route.taskIndex === 'number') ? (route.taskIndex + 1) : 1;
             let isCurrentTask = false;
@@ -719,7 +729,7 @@ const UI = {
                 activeTaskBtn.focus();
             } catch(e) {}
         }
-        const routeWelcome = `${activeDist} sefer görevleri açıldı. Toplam ${routesToRender.length} görev listelendi.`;
+        const routeWelcome = isFreeDrive ? `${activeDist} serbest sürüş güzergahları listelendi.` : `İlerleme Modu açıldı. Aktif sefer emriniz hazır.`;
         if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(routeWelcome);
     },
 
