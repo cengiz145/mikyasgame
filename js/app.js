@@ -624,9 +624,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCareer.addEventListener('click', () => {
             if (typeof Game !== 'undefined') Game.setPlayMode('career');
             audio.playSelect();
-            const msg = "Mikyas Kaptanlık Akademisi Kariyer Modu açıldı. 100 seviyeli sıralı görev brifingleriniz listeleniyor.";
+            const msg = "Mikyas Kaptanlık Akademisi İlerleme Modu açıldı. Hareket Amirliği'nin tebliğ ettiği aktif sefer emriniz hazır.";
             audio.speak(msg);
-            UI.showToast("🏆 Kariyer Modu Aktif (100 Görev)", "info");
+            UI.showToast("🎖️ İlerleme Modu Aktif", "info");
             document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: Game.activeDistrict } }));
         });
     }

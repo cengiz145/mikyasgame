@@ -1516,7 +1516,7 @@
                 taskNum: 100,
                 level: 10,
                 levelTitle: "10. Sınıf EFSANE MİKYAS MASTER KAPTANI (Altın Direksiyon Brövesi)",
-                title: "BÜYÜK FİNAL: 100. GÖREV TÜRKİYE ŞAMPİYONLUK SEFERİ",
+                title: "BÜYÜK FİNAL: TÜRKİYE ŞAMPİYONLUK ZİRVE SEFERİ",
                 district: "Tüm Türkiye Şampiyonluk Parkuru",
                 routeSnippet: "Türkiye Şampiyonluk Parkuru 10",
                 isTraining: false,
@@ -1524,7 +1524,7 @@
                 passengersAllowed: true,
                 featureUnlock: "👑 MİKYAS AKADEMİSİ ALTIN DİREKSİYON ONUR MADALYASI!",
                 rulesActive: "Eksiksiz Tam Profesyonel Karayolu ve Protokol Standartları",
-                dispatcherOrder: "Sayın Efsane Master Kaptanım, Mikyas Kaptanlık Akademisi tarihinin 100. ve en büyük şampiyonluk seferine atanmış bulunmaktasınız. 99 zorlu görevi kaza yapmaksızın, üstün yolcu konforuyla tamamlayarak tüm Türkiye yollarında bir efsaneye dönüştünüz. Bu son şeref turunu tamamladığınızda akademimizin en yüksek liyakat ödülü olan 'Altın Direksiyon Onur Madalyası' adınıza tescil edilecektir. Herhangi bir süre kısıtlaması yoktur; ustalığınızı tüm ülkeye sergileyiniz. Yolunuz daima açık olsun!"
+                dispatcherOrder: "Sayın Efsane Master Kaptanım, Mikyas Kaptanlık Akademisi tarihinin en büyük, en kapsamlı ve en prestijli şampiyonluk zirve seferine atanmış bulunmaktasınız. Tüm zorlu kademeleri kaza yapmaksızın, üstün yolcu konforuyla tamamlayarak tüm Türkiye yollarında bir efsaneye dönüştünüz. Bu son şeref turunu tamamladığınızda akademimizin en yüksek liyakat ödülü olan 'Altın Direksiyon Onur Madalyası' adınıza tescil edilecektir. Herhangi bir süre kısıtlaması yoktur; ustalığınızı tüm ülkeye sergileyiniz. Yolunuz daima açık olsun!"
             }
         ],
 
