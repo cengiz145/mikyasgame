@@ -619,15 +619,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const btnOpenGarageFleet = document.getElementById('btn-open-garage-fleet');
+    if (btnOpenGarageFleet) {
+        btnOpenGarageFleet.addEventListener('click', () => {
+            if (typeof BusFleet !== 'undefined' && BusFleet.openGarageModal) {
+                BusFleet.openGarageModal();
+            }
+        });
+    }
+
+    const btnOpenDealer = document.getElementById('btn-open-dealership');
+    if (btnOpenDealer) {
+        btnOpenDealer.addEventListener('click', () => {
+            if (typeof BusFleet !== 'undefined' && BusFleet.openDealershipModal) {
+                BusFleet.openDealershipModal();
+            }
+        });
+    }
+
     const btnCareer = document.getElementById('btn-mode-career');
     if (btnCareer) {
         btnCareer.addEventListener('click', () => {
             if (typeof Game !== 'undefined') Game.setPlayMode('career');
             audio.playSelect();
-            const msg = "Mikyas Kaptanlık Akademisi İlerleme Modu açıldı. Hareket Amirliği'nin tebliğ ettiği aktif sefer emriniz hazır.";
+            const msg = "Kariyer ve İlerleme Modu açıldı. Şehirler, operasyonel seferler ve başarılar hazır.";
             audio.speak(msg);
-            UI.showToast("🎖️ İlerleme Modu Aktif", "info");
-            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: Game.activeDistrict } }));
+            UI.showToast("🎖️ Kariyer Modu Aktif", "info");
+            openCitySelection();
         });
     }
 
