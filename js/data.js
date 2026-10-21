@@ -14,6 +14,146 @@ const sehirRotalari = {
         canliSorgu: `area["ISO3166-2"="TR-01"]->.adana; (node["highway"="bus_stop"](area.adana););`,
         ilcelerBilgisi: {
             toplamIlceSayisi: 15,
+            komsuIlceler: {
+                      "Seyhan": [
+                                "Yüreğir",
+                                "Çukurova",
+                                "Karaisalı",
+                                "Karataş"
+                      ],
+                      "Yüreğir": [
+                                "Seyhan",
+                                "Sarıçam",
+                                "Ceyhan",
+                                "Karataş",
+                                "Yumurtalık"
+                      ],
+                      "Çukurova": [
+                                "Seyhan",
+                                "Sarıçam",
+                                "Karaisalı"
+                      ],
+                      "Sarıçam": [
+                                "Yüreğir",
+                                "Çukurova",
+                                "Karaisalı",
+                                "İmamoğlu",
+                                "Ceyhan",
+                                "Aladağ"
+                      ],
+                      "Karaisalı": [
+                                "Seyhan",
+                                "Çukurova",
+                                "Sarıçam",
+                                "Pozantı",
+                                "Aladağ"
+                      ],
+                      "Ceyhan": [
+                                "Yüreğir",
+                                "Sarıçam",
+                                "İmamoğlu",
+                                "Kozan",
+                                "Yumurtalık"
+                      ],
+                      "Karataş": [
+                                "Seyhan",
+                                "Yüreğir",
+                                "Yumurtalık"
+                      ],
+                      "Yumurtalık": [
+                                "Karataş",
+                                "Yüreğir",
+                                "Ceyhan"
+                      ],
+                      "İmamoğlu": [
+                                "Sarıçam",
+                                "Ceyhan",
+                                "Kozan",
+                                "Aladağ"
+                      ],
+                      "Kozan": [
+                                "İmamoğlu",
+                                "Ceyhan",
+                                "Aladağ",
+                                "Feke"
+                      ],
+                      "Aladağ": [
+                                "Karaisalı",
+                                "Pozantı",
+                                "Sarıçam",
+                                "İmamoğlu",
+                                "Kozan",
+                                "Feke"
+                      ],
+                      "Pozantı": [
+                                "Karaisalı",
+                                "Aladağ"
+                      ],
+                      "Feke": [
+                                "Aladağ",
+                                "Kozan",
+                                "Saimbeyli"
+                      ],
+                      "Saimbeyli": [
+                                "Feke",
+                                "Tufanbeyli"
+                      ],
+                      "Tufanbeyli": [
+                                "Saimbeyli"
+                      ]
+            },
+            ilSinirKapilari: {
+                      "Pozantı": [
+                                {
+                                          "komsuIl": "Niğde",
+                                          "ilceAks": "Ulukışla / Toros Tünelleri",
+                                          "yol": "O-21 / D-750",
+                                          "mesafeKm": 55
+                                },
+                                {
+                                          "komsuIl": "Mersin",
+                                          "ilceAks": "Tarsus / Çamlıyayla",
+                                          "yol": "O-21 / D-750",
+                                          "mesafeKm": 65
+                                }
+                      ],
+                      "Ceyhan": [
+                                {
+                                          "komsuIl": "Osmaniye",
+                                          "ilceAks": "Toprakkale / Merkez",
+                                          "yol": "O-52 / D-400",
+                                          "mesafeKm": 45
+                                },
+                                {
+                                          "komsuIl": "Hatay",
+                                          "ilceAks": "Erzin / Dörtyol",
+                                          "yol": "D-817 / O-53",
+                                          "mesafeKm": 50
+                                }
+                      ],
+                      "Seyhan": [
+                                {
+                                          "komsuIl": "Mersin",
+                                          "ilceAks": "Tarsus / Akdeniz",
+                                          "yol": "D-400 / O-51",
+                                          "mesafeKm": 30
+                                }
+                      ],
+                      "Tufanbeyli": [
+                                {
+                                          "komsuIl": "Kayseri",
+                                          "ilceAks": "Develi / Tomarza",
+                                          "yol": "D-815",
+                                          "mesafeKm": 85
+                                },
+                                {
+                                          "komsuIl": "Kahramanmaraş",
+                                          "ilceAks": "Göksun",
+                                          "yol": "46-77 İl Yolu",
+                                          "mesafeKm": 60
+                                }
+                      ]
+            },
             aciklama: "Adana'nın 5'i merkez ilçe olmak üzere toplam 15 ilçesi bulunur: Merkez İlçeler (5): Seyhan, Yüreğir, Çukurova, Sarıçam, Karaisalı (Merkezle bütünleşik yapıda kabul edilir). Güney / Ova ve Kıyı İlçeleri (3): Ceyhan, Karataş, Yumurtalık. Kuzey / Dağlık ve Yayla İlçeleri (7): Kozan, İmamoğlu, Aladağ, Feke, Saimbeyli, Tufanbeyli, Pozantı.",
             kategoriler: {
                 merkezIlceler: ["Seyhan", "Yüreğir", "Çukurova", "Sarıçam", "Karaisalı"],
@@ -423,6 +563,296 @@ const sehirRotalari = {
         merkezeMesafeKm: 585,
         routes: [],
         canliSorgu: `area["ISO3166-2"="TR-06"]->.ankara; area["name"="Çankaya"]->.ilce; (node["highway"="bus_stop"](area.ankara)(area.ilce); node["traffic_calming"~"bump|hump"](area.ankara)(area.ilce););`,
+        ilcelerBilgisi: {
+                  "toplamIlceSayisi": 25,
+                  "aciklama": "Türkiye'nin başkenti Ankara, 9'u merkez ilçe olmak üzere toplam 25 ilçeden oluşur.",
+                  "kategoriler": {
+                            "merkezIlceler": [
+                                      "Çankaya",
+                                      "Keçiören",
+                                      "Yenimahalle",
+                                      "Mamak",
+                                      "Altındağ",
+                                      "Etimesgut",
+                                      "Sincan",
+                                      "Gölbaşı",
+                                      "Pursaklar"
+                            ],
+                            "cevreVeKirsalIlceler": [
+                                      "Polatlı",
+                                      "Beypazarı",
+                                      "Nallıhan",
+                                      "Ayaş",
+                                      "Güdül",
+                                      "Kızılcahamam",
+                                      "Çamlıdere",
+                                      "Kahramankazan",
+                                      "Çubuk",
+                                      "Akyurt",
+                                      "Kalecik",
+                                      "Elmadağ",
+                                      "Bala",
+                                      "Haymana",
+                                      "Şereflikoçhisar",
+                                      "Evren"
+                            ]
+                  },
+                  "komsuIlceler": {
+                            "Çankaya": [
+                                      "Altındağ",
+                                      "Mamak",
+                                      "Gölbaşı",
+                                      "Etimesgut",
+                                      "Yenimahalle"
+                            ],
+                            "Altındağ": [
+                                      "Çankaya",
+                                      "Mamak",
+                                      "Pursaklar",
+                                      "Keçiören",
+                                      "Yenimahalle"
+                            ],
+                            "Keçiören": [
+                                      "Altındağ",
+                                      "Pursaklar",
+                                      "Yenimahalle"
+                            ],
+                            "Yenimahalle": [
+                                      "Çankaya",
+                                      "Altındağ",
+                                      "Keçiören",
+                                      "Kahramankazan",
+                                      "Sincan",
+                                      "Etimesgut"
+                            ],
+                            "Mamak": [
+                                      "Çankaya",
+                                      "Altındağ",
+                                      "Elmadağ",
+                                      "Bala"
+                            ],
+                            "Etimesgut": [
+                                      "Çankaya",
+                                      "Yenimahalle",
+                                      "Sincan"
+                            ],
+                            "Sincan": [
+                                      "Etimesgut",
+                                      "Yenimahalle",
+                                      "Kahramankazan",
+                                      "Ayaş",
+                                      "Polatlı"
+                            ],
+                            "Gölbaşı": [
+                                      "Çankaya",
+                                      "Mamak",
+                                      "Bala",
+                                      "Haymana"
+                            ],
+                            "Pursaklar": [
+                                      "Altındağ",
+                                      "Keçiören",
+                                      "Çubuk",
+                                      "Akyurt"
+                            ],
+                            "Akyurt": [
+                                      "Pursaklar",
+                                      "Çubuk",
+                                      "Kalecik",
+                                      "Elmadağ",
+                                      "Altındağ"
+                            ],
+                            "Çubuk": [
+                                      "Pursaklar",
+                                      "Akyurt",
+                                      "Kalecik",
+                                      "Kahramankazan",
+                                      "Kızılcahamam"
+                            ],
+                            "Kahramankazan": [
+                                      "Yenimahalle",
+                                      "Sincan",
+                                      "Ayaş",
+                                      "Kızılcahamam",
+                                      "Çubuk"
+                            ],
+                            "Kızılcahamam": [
+                                      "Kahramankazan",
+                                      "Çamlıdere",
+                                      "Güdül",
+                                      "Çubuk"
+                            ],
+                            "Çamlıdere": [
+                                      "Kızılcahamam",
+                                      "Güdül",
+                                      "Beypazarı"
+                            ],
+                            "Güdül": [
+                                      "Çamlıdere",
+                                      "Kızılcahamam",
+                                      "Kahramankazan",
+                                      "Ayaş",
+                                      "Beypazarı"
+                            ],
+                            "Ayaş": [
+                                      "Sincan",
+                                      "Kahramankazan",
+                                      "Güdül",
+                                      "Beypazarı",
+                                      "Polatlı"
+                            ],
+                            "Beypazarı": [
+                                      "Güdül",
+                                      "Ayaş",
+                                      "Polatlı",
+                                      "Nallıhan",
+                                      "Çamlıdere"
+                            ],
+                            "Nallıhan": [
+                                      "Beypazarı"
+                            ],
+                            "Polatlı": [
+                                      "Sincan",
+                                      "Ayaş",
+                                      "Beypazarı",
+                                      "Haymana"
+                            ],
+                            "Haymana": [
+                                      "Polatlı",
+                                      "Gölbaşı",
+                                      "Bala"
+                            ],
+                            "Bala": [
+                                      "Gölbaşı",
+                                      "Mamak",
+                                      "Elmadağ",
+                                      "Haymana",
+                                      "Şereflikoçhisar",
+                                      "Evren"
+                            ],
+                            "Elmadağ": [
+                                      "Mamak",
+                                      "Altındağ",
+                                      "Akyurt",
+                                      "Kalecik",
+                                      "Bala"
+                            ],
+                            "Kalecik": [
+                                      "Akyurt",
+                                      "Çubuk",
+                                      "Elmadağ"
+                            ],
+                            "Şereflikoçhisar": [
+                                      "Bala",
+                                      "Evren"
+                            ],
+                            "Evren": [
+                                      "Bala",
+                                      "Şereflikoçhisar"
+                            ]
+                  },
+                  "ilSinirKapilari": {
+                            "Polatlı": [
+                                      {
+                                                "komsuIl": "Eskişehir",
+                                                "ilceAks": "Sivrihisar / D-200 Aksı",
+                                                "yol": "D-200 / E-90",
+                                                "mesafeKm": 75
+                                      },
+                                      {
+                                                "komsuIl": "Konya",
+                                                "ilceAks": "Yunak / Çeltik Aksı",
+                                                "yol": "D-695",
+                                                "mesafeKm": 85
+                                      }
+                            ],
+                            "Kızılcahamam": [
+                                      {
+                                                "komsuIl": "Bolu",
+                                                "ilceAks": "Gerede / Karadeniz Ayrımı",
+                                                "yol": "D-750 / O-4",
+                                                "mesafeKm": 80
+                                      },
+                                      {
+                                                "komsuIl": "Çankırı",
+                                                "ilceAks": "Çerkeş Aksı",
+                                                "yol": "D-750",
+                                                "mesafeKm": 70
+                                      }
+                            ],
+                            "Elmadağ": [
+                                      {
+                                                "komsuIl": "Kırıkkale",
+                                                "ilceAks": "Yahşihan / Merkez",
+                                                "yol": "D-200",
+                                                "mesafeKm": 40
+                                      }
+                            ],
+                            "Şereflikoçhisar": [
+                                      {
+                                                "komsuIl": "Aksaray",
+                                                "ilceAks": "Tuz Gölü / Merkez",
+                                                "yol": "D-750",
+                                                "mesafeKm": 65
+                                      }
+                            ],
+                            "Nallıhan": [
+                                      {
+                                                "komsuIl": "Bolu",
+                                                "ilceAks": "Mudurnu / Göynük",
+                                                "yol": "D-140",
+                                                "mesafeKm": 55
+                                      }
+                            ]
+                  },
+                  "liste": [
+                            {
+                                      "id": "Çankaya",
+                                      "ad": "Çankaya",
+                                      "rol": "Hükümet & Başkent Merkezi",
+                                      "lat": 39.9208,
+                                      "lon": 32.854,
+                                      "merkezeMesafeKm": 0,
+                                      "aciklama": "Kızılay, Anıtkabir, TBMM ve Elçilikler."
+                            },
+                            {
+                                      "id": "Yenimahalle",
+                                      "ad": "Yenimahalle",
+                                      "rol": "AŞTİ & Ulaşım Aksı",
+                                      "lat": 39.918,
+                                      "lon": 32.812,
+                                      "merkezeMesafeKm": 5,
+                                      "aciklama": "AŞTİ Otobüs Terminali ve Batıkent aksı."
+                            },
+                            {
+                                      "id": "Altındağ",
+                                      "ad": "Altındağ",
+                                      "rol": "Tarihi Çekirdek & Ulus",
+                                      "lat": 39.9415,
+                                      "lon": 32.8545,
+                                      "merkezeMesafeKm": 3,
+                                      "aciklama": "Ulus Meydanı, Ankara Kalesi ve Hacı Bayram Camii."
+                            },
+                            {
+                                      "id": "Polatlı",
+                                      "ad": "Polatlı",
+                                      "rol": "Batı Kapısı & Duatepe",
+                                      "lat": 39.585,
+                                      "lon": 32.145,
+                                      "merkezeMesafeKm": 75,
+                                      "aciklama": "Sakarya Meydan Muharebesi Tarihi Parkı ve Gordion."
+                            },
+                            {
+                                      "id": "Kızılcahamam",
+                                      "ad": "Kızılcahamam",
+                                      "rol": "Kuzey Kapısı & Termal / Doğa",
+                                      "lat": 40.472,
+                                      "lon": 32.655,
+                                      "merkezeMesafeKm": 80,
+                                      "aciklama": "Soğuksu Milli Parkı ve Termal Kaplıcalar."
+                            }
+                  ]
+        },
         coordinates: {
             dms: "39°56′N 32°52′E",
             enlemDms: "39°56′K",
@@ -847,6 +1277,224 @@ const sehirRotalari = {
         merkezeMesafeKm: 275,
         routes: [],
         canliSorgu: `area["ISO3166-2"="TR-16"]->.bursa; (node["highway"="bus_stop"](area.bursa););`,
+        ilcelerBilgisi: {
+                  "toplamIlceSayisi": 17,
+                  "aciklama": "Osmanlı'nın ilk başkenti ve sanayi devi Bursa, 3'ü merkez metropol olmak üzere toplam 17 ilçeden oluşur.",
+                  "kategoriler": {
+                            "merkezIlceler": [
+                                      "Osmangazi",
+                                      "Nilüfer",
+                                      "Yıldırım"
+                            ],
+                            "kiyiVeKuzeyIlceler": [
+                                      "Mudanya",
+                                      "Gemlik",
+                                      "Orhangazi",
+                                      "İznik"
+                            ],
+                            "doguVeGuneyIlceler": [
+                                      "İnegöl",
+                                      "Yenişehir",
+                                      "Kestel",
+                                      "Gürsu",
+                                      "Karacabey",
+                                      "Mustafakemalpaşa",
+                                      "Orhaneli",
+                                      "Keles",
+                                      "Büyükorhan",
+                                      "Harmancık"
+                            ]
+                  },
+                  "komsuIlceler": {
+                            "Osmangazi": [
+                                      "Nilüfer",
+                                      "Yıldırım",
+                                      "Mudanya",
+                                      "Gemlik",
+                                      "Keles",
+                                      "Orhaneli"
+                            ],
+                            "Nilüfer": [
+                                      "Osmangazi",
+                                      "Mudanya",
+                                      "Karacabey",
+                                      "Mustafakemalpaşa",
+                                      "Orhaneli"
+                            ],
+                            "Yıldırım": [
+                                      "Osmangazi",
+                                      "Gürsu",
+                                      "Kestel"
+                            ],
+                            "Gürsu": [
+                                      "Yıldırım",
+                                      "Kestel",
+                                      "Gemlik"
+                            ],
+                            "Kestel": [
+                                      "Yıldırım",
+                                      "Gürsu",
+                                      "Gemlik",
+                                      "Yenişehir",
+                                      "İnegöl"
+                            ],
+                            "Mudanya": [
+                                      "Osmangazi",
+                                      "Nilüfer",
+                                      "Gemlik"
+                            ],
+                            "Gemlik": [
+                                      "Mudanya",
+                                      "Osmangazi",
+                                      "Gürsu",
+                                      "Kestel",
+                                      "Yenişehir",
+                                      "Orhangazi"
+                            ],
+                            "Orhangazi": [
+                                      "Gemlik",
+                                      "İznik"
+                            ],
+                            "İznik": [
+                                      "Orhangazi",
+                                      "Yenişehir"
+                            ],
+                            "Yenişehir": [
+                                      "İznik",
+                                      "Orhangazi",
+                                      "Gemlik",
+                                      "Kestel",
+                                      "İnegöl"
+                            ],
+                            "İnegöl": [
+                                      "Kestel",
+                                      "Yenişehir",
+                                      "Keles"
+                            ],
+                            "Karacabey": [
+                                      "Nilüfer",
+                                      "Mustafakemalpaşa"
+                            ],
+                            "Mustafakemalpaşa": [
+                                      "Nilüfer",
+                                      "Karacabey",
+                                      "Orhaneli",
+                                      "Büyükorhan"
+                            ],
+                            "Orhaneli": [
+                                      "Osmangazi",
+                                      "Nilüfer",
+                                      "Mustafakemalpaşa",
+                                      "Büyükorhan",
+                                      "Harmancık",
+                                      "Keles"
+                            ],
+                            "Keles": [
+                                      "Osmangazi",
+                                      "Orhaneli",
+                                      "Harmancık",
+                                      "İnegöl"
+                            ],
+                            "Büyükorhan": [
+                                      "Mustafakemalpaşa",
+                                      "Orhaneli",
+                                      "Harmancık"
+                            ],
+                            "Harmancık": [
+                                      "Büyükorhan",
+                                      "Orhaneli",
+                                      "Keles"
+                            ]
+                  },
+                  "ilSinirKapilari": {
+                            "Orhangazi": [
+                                      {
+                                                "komsuIl": "Yalova",
+                                                "ilceAks": "Süpürgelik / Osmangazi Köprüsü",
+                                                "yol": "O-5 / D-575",
+                                                "mesafeKm": 22
+                                      }
+                            ],
+                            "Karacabey": [
+                                      {
+                                                "komsuIl": "Balıkesir",
+                                                "ilceAks": "Bandırma / Çanakkale Aksı",
+                                                "yol": "D-200 / E90",
+                                                "mesafeKm": 40
+                                      }
+                            ],
+                            "Mustafakemalpaşa": [
+                                      {
+                                                "komsuIl": "Balıkesir",
+                                                "ilceAks": "Susurluk / İzmir Aksı",
+                                                "yol": "O-5 / D-565",
+                                                "mesafeKm": 30
+                                      }
+                            ],
+                            "İnegöl": [
+                                      {
+                                                "komsuIl": "Bilecik",
+                                                "ilceAks": "Bozüyük / Mezit Boğazı",
+                                                "yol": "D-200 / E90",
+                                                "mesafeKm": 45
+                                      }
+                            ],
+                            "Yenişehir": [
+                                      {
+                                                "komsuIl": "Bilecik",
+                                                "ilceAks": "Bilecik Merkez",
+                                                "yol": "D-160",
+                                                "mesafeKm": 40
+                                      }
+                            ],
+                            "İznik": [
+                                      {
+                                                "komsuIl": "Kocaeli",
+                                                "ilceAks": "Karamürsel / Samanlı Dağları",
+                                                "yol": "D-595",
+                                                "mesafeKm": 35
+                                      }
+                            ]
+                  },
+                  "liste": [
+                            {
+                                      "id": "Osmangazi",
+                                      "ad": "Osmangazi",
+                                      "rol": "Tarihi ve Ticari Çekirdek",
+                                      "lat": 40.183,
+                                      "lon": 29.064,
+                                      "merkezeMesafeKm": 0,
+                                      "aciklama": "Ulu Cami, Heykel, Tophane ve Kapalıçarşı."
+                            },
+                            {
+                                      "id": "Nilüfer",
+                                      "ad": "Nilüfer",
+                                      "rol": "Modern Yaşam & Üniversite",
+                                      "lat": 40.215,
+                                      "lon": 28.985,
+                                      "merkezeMesafeKm": 8,
+                                      "aciklama": "Görükle Uludağ Üniversitesi ve FSM Bulvarı."
+                            },
+                            {
+                                      "id": "Mudanya",
+                                      "ad": "Mudanya",
+                                      "rol": "Deniz Kapısı & BUDO Feribot",
+                                      "lat": 40.378,
+                                      "lon": 28.882,
+                                      "merkezeMesafeKm": 28,
+                                      "aciklama": "Mütareke Evi ve İstanbul deniz otobüsü iskelesi."
+                            },
+                            {
+                                      "id": "İnegöl",
+                                      "ad": "İnegöl",
+                                      "rol": "Doğu Kapısı & Mobilya Sanayii",
+                                      "lat": 40.078,
+                                      "lon": 29.512,
+                                      "merkezeMesafeKm": 45,
+                                      "aciklama": "Mobilya Vadisi, Oylat Kaplıcaları ve köftesi."
+                            }
+                  ]
+        },
         coordinates: {
             dms: "40°11′N 29°04′E",
             enlemDms: "40°11′K",
@@ -1551,6 +2199,426 @@ const sehirRotalari = {
         merkezeMesafeKm: 135,
         routes: [],
         canliSorgu: `area["ISO3166-2"="TR-34"]->.istanbul; area["name"="Kadıköy"]->.ilce; (node["highway"="bus_stop"](area.istanbul)(area.ilce); node["traffic_calming"~"bump|hump"](area.istanbul)(area.ilce););`,
+        ilcelerBilgisi: {
+                  "toplamIlceSayisi": 39,
+                  "aciklama": "Türkiye'nin en kalabalık metropolü İstanbul, 25'i Avrupa, 14'ü Anadolu yakasında olmak üzere 39 ilçeden oluşur. Boğaziçi Köprüleri ve Marmaray ile kıtalar birbirine bağlanır.",
+                  "kategoriler": {
+                            "avrupaYakasi": [
+                                      "Silivri",
+                                      "Çatalca",
+                                      "Büyükçekmece",
+                                      "Beylikdüzü",
+                                      "Esenyurt",
+                                      "Avcılar",
+                                      "Küçükçekmece",
+                                      "Başakşehir",
+                                      "Arnavutköy",
+                                      "Bakırköy",
+                                      "Bahçelievler",
+                                      "Bağcılar",
+                                      "Güngören",
+                                      "Zeytinburnu",
+                                      "Esenler",
+                                      "Bayrampaşa",
+                                      "Gaziosmanpaşa",
+                                      "Sultangazi",
+                                      "Eyüpsultan",
+                                      "Fatih",
+                                      "Beyoğlu",
+                                      "Kâğıthane",
+                                      "Şişli",
+                                      "Beşiktaş",
+                                      "Sarıyer"
+                            ],
+                            "anadoluYakasi": [
+                                      "Kadıköy",
+                                      "Üsküdar",
+                                      "Beykoz",
+                                      "Ümraniye",
+                                      "Ataşehir",
+                                      "Maltepe",
+                                      "Sancaktepe",
+                                      "Çekmeköy",
+                                      "Sultanbeyli",
+                                      "Kartal",
+                                      "Pendik",
+                                      "Tuzla",
+                                      "Şile",
+                                      "Adalar"
+                            ]
+                  },
+                  "komsuIlceler": {
+                            "Silivri": [
+                                      "Çatalca",
+                                      "Büyükçekmece"
+                            ],
+                            "Çatalca": [
+                                      "Silivri",
+                                      "Büyükçekmece",
+                                      "Arnavutköy"
+                            ],
+                            "Büyükçekmece": [
+                                      "Silivri",
+                                      "Çatalca",
+                                      "Arnavutköy",
+                                      "Esenyurt",
+                                      "Beylikdüzü"
+                            ],
+                            "Beylikdüzü": [
+                                      "Büyükçekmece",
+                                      "Esenyurt",
+                                      "Avcılar"
+                            ],
+                            "Esenyurt": [
+                                      "Büyükçekmece",
+                                      "Beylikdüzü",
+                                      "Avcılar",
+                                      "Başakşehir",
+                                      "Arnavutköy"
+                            ],
+                            "Avcılar": [
+                                      "Beylikdüzü",
+                                      "Esenyurt",
+                                      "Başakşehir",
+                                      "Küçükçekmece"
+                            ],
+                            "Küçükçekmece": [
+                                      "Avcılar",
+                                      "Başakşehir",
+                                      "Bağcılar",
+                                      "Bahçelievler",
+                                      "Bakırköy"
+                            ],
+                            "Başakşehir": [
+                                      "Arnavutköy",
+                                      "Esenyurt",
+                                      "Avcılar",
+                                      "Küçükçekmece",
+                                      "Bağcılar",
+                                      "Esenler",
+                                      "Sultangazi",
+                                      "Eyüpsultan"
+                            ],
+                            "Arnavutköy": [
+                                      "Çatalca",
+                                      "Büyükçekmece",
+                                      "Esenyurt",
+                                      "Başakşehir",
+                                      "Sultangazi",
+                                      "Eyüpsultan"
+                            ],
+                            "Bakırköy": [
+                                      "Küçükçekmece",
+                                      "Bahçelievler",
+                                      "Güngören",
+                                      "Zeytinburnu"
+                            ],
+                            "Bahçelievler": [
+                                      "Küçükçekmece",
+                                      "Bağcılar",
+                                      "Güngören",
+                                      "Bakırköy"
+                            ],
+                            "Bağcılar": [
+                                      "Küçükçekmece",
+                                      "Başakşehir",
+                                      "Esenler",
+                                      "Güngören",
+                                      "Bahçelievler"
+                            ],
+                            "Güngören": [
+                                      "Bağcılar",
+                                      "Esenler",
+                                      "Zeytinburnu",
+                                      "Bakırköy",
+                                      "Bahçelievler"
+                            ],
+                            "Zeytinburnu": [
+                                      "Bakırköy",
+                                      "Güngören",
+                                      "Bayrampaşa",
+                                      "Eyüpsultan",
+                                      "Fatih"
+                            ],
+                            "Esenler": [
+                                      "Bağcılar",
+                                      "Başakşehir",
+                                      "Sultangazi",
+                                      "Gaziosmanpaşa",
+                                      "Bayrampaşa",
+                                      "Güngören"
+                            ],
+                            "Bayrampaşa": [
+                                      "Esenler",
+                                      "Gaziosmanpaşa",
+                                      "Eyüpsultan",
+                                      "Zeytinburnu"
+                            ],
+                            "Gaziosmanpaşa": [
+                                      "Esenler",
+                                      "Sultangazi",
+                                      "Eyüpsultan",
+                                      "Bayrampaşa"
+                            ],
+                            "Sultangazi": [
+                                      "Başakşehir",
+                                      "Arnavutköy",
+                                      "Eyüpsultan",
+                                      "Gaziosmanpaşa",
+                                      "Esenler"
+                            ],
+                            "Eyüpsultan": [
+                                      "Arnavutköy",
+                                      "Sultangazi",
+                                      "Gaziosmanpaşa",
+                                      "Bayrampaşa",
+                                      "Zeytinburnu",
+                                      "Fatih",
+                                      "Beyoğlu",
+                                      "Kâğıthane",
+                                      "Sarıyer"
+                            ],
+                            "Fatih": [
+                                      "Zeytinburnu",
+                                      "Eyüpsultan"
+                            ],
+                            "Beyoğlu": [
+                                      "Eyüpsultan",
+                                      "Kâğıthane",
+                                      "Şişli",
+                                      "Beşiktaş"
+                            ],
+                            "Kâğıthane": [
+                                      "Eyüpsultan",
+                                      "Beyoğlu",
+                                      "Şişli",
+                                      "Beşiktaş",
+                                      "Sarıyer"
+                            ],
+                            "Şişli": [
+                                      "Beyoğlu",
+                                      "Kâğıthane",
+                                      "Beşiktaş",
+                                      "Sarıyer"
+                            ],
+                            "Beşiktaş": [
+                                      "Beyoğlu",
+                                      "Şişli",
+                                      "Kâğıthane",
+                                      "Sarıyer"
+                            ],
+                            "Sarıyer": [
+                                      "Eyüpsultan",
+                                      "Kâğıthane",
+                                      "Şişli",
+                                      "Beşiktaş"
+                            ],
+                            "Üsküdar": [
+                                      "Beykoz",
+                                      "Ümraniye",
+                                      "Ataşehir",
+                                      "Kadıköy"
+                            ],
+                            "Kadıköy": [
+                                      "Üsküdar",
+                                      "Ataşehir",
+                                      "Maltepe"
+                            ],
+                            "Beykoz": [
+                                      "Üsküdar",
+                                      "Ümraniye",
+                                      "Çekmeköy",
+                                      "Şile"
+                            ],
+                            "Ümraniye": [
+                                      "Üsküdar",
+                                      "Beykoz",
+                                      "Çekmeköy",
+                                      "Sancaktepe",
+                                      "Ataşehir"
+                            ],
+                            "Ataşehir": [
+                                      "Kadıköy",
+                                      "Üsküdar",
+                                      "Ümraniye",
+                                      "Sancaktepe",
+                                      "Maltepe"
+                            ],
+                            "Maltepe": [
+                                      "Kadıköy",
+                                      "Ataşehir",
+                                      "Sancaktepe",
+                                      "Kartal"
+                            ],
+                            "Sancaktepe": [
+                                      "Ataşehir",
+                                      "Ümraniye",
+                                      "Çekmeköy",
+                                      "Şile",
+                                      "Pendik",
+                                      "Sultanbeyli",
+                                      "Kartal",
+                                      "Maltepe"
+                            ],
+                            "Çekmeköy": [
+                                      "Beykoz",
+                                      "Şile",
+                                      "Sancaktepe",
+                                      "Ümraniye"
+                            ],
+                            "Sultanbeyli": [
+                                      "Sancaktepe",
+                                      "Kartal",
+                                      "Pendik"
+                            ],
+                            "Kartal": [
+                                      "Maltepe",
+                                      "Sancaktepe",
+                                      "Sultanbeyli",
+                                      "Pendik"
+                            ],
+                            "Pendik": [
+                                      "Kartal",
+                                      "Sultanbeyli",
+                                      "Sancaktepe",
+                                      "Şile",
+                                      "Tuzla"
+                            ],
+                            "Tuzla": [
+                                      "Pendik"
+                            ],
+                            "Şile": [
+                                      "Beykoz",
+                                      "Çekmeköy",
+                                      "Sancaktepe",
+                                      "Pendik"
+                            ],
+                            "Adalar": [
+                                      "Kadıköy",
+                                      "Maltepe",
+                                      "Kartal"
+                            ]
+                  },
+                  "ilSinirKapilari": {
+                            "Silivri": [
+                                      {
+                                                "komsuIl": "Tekirdağ",
+                                                "ilceAks": "Marmaraereğlisi / Çorlu",
+                                                "yol": "D-110 / E84",
+                                                "mesafeKm": 35
+                                      },
+                                      {
+                                                "komsuIl": "Tekirdağ",
+                                                "ilceAks": "Çerkezköy (Değirmenköy)",
+                                                "yol": "D-567 / O-3",
+                                                "mesafeKm": 28
+                                      }
+                            ],
+                            "Çatalca": [
+                                      {
+                                                "komsuIl": "Kırklareli",
+                                                "ilceAks": "Vize / Kıyıköy",
+                                                "yol": "D-020",
+                                                "mesafeKm": 38
+                                      },
+                                      {
+                                                "komsuIl": "Tekirdağ",
+                                                "ilceAks": "Saray (Binkılıç)",
+                                                "yol": "D-020",
+                                                "mesafeKm": 32
+                                      }
+                            ],
+                            "Tuzla": [
+                                      {
+                                                "komsuIl": "Kocaeli",
+                                                "ilceAks": "Gebze / Çayırova / Darıca",
+                                                "yol": "D-100 / O-4 (TEM)",
+                                                "mesafeKm": 18
+                                      }
+                            ],
+                            "Pendik": [
+                                      {
+                                                "komsuIl": "Kocaeli",
+                                                "ilceAks": "Gebze Organize Sanayi",
+                                                "yol": "TEM O-4",
+                                                "mesafeKm": 24
+                                      }
+                            ],
+                            "Şile": [
+                                      {
+                                                "komsuIl": "Kocaeli",
+                                                "ilceAks": "Kandıra (Ağva Aksı)",
+                                                "yol": "D-020",
+                                                "mesafeKm": 45
+                                      }
+                            ]
+                  },
+                  "liste": [
+                            {
+                                      "id": "Fatih",
+                                      "ad": "Fatih",
+                                      "rol": "Tarihi Yarımada & Payitaht",
+                                      "lat": 41.0185,
+                                      "lon": 28.948,
+                                      "merkezeMesafeKm": 0,
+                                      "aciklama": "Tarihi Yarımada, Ayasofya, Sultanahmet ve Kapalıçarşı."
+                            },
+                            {
+                                      "id": "Kadıköy",
+                                      "ad": "Kadıköy",
+                                      "rol": "Anadolu Yakası Kültür & Kordon",
+                                      "lat": 40.9915,
+                                      "lon": 29.0225,
+                                      "merkezeMesafeKm": 8,
+                                      "aciklama": "Rıhtım, Moda, Bağdat Caddesi ve Boğa Heykeli."
+                            },
+                            {
+                                      "id": "Üsküdar",
+                                      "ad": "Üsküdar",
+                                      "rol": "Kız Kulesi & Tarihi İskele",
+                                      "lat": 41.026,
+                                      "lon": 29.015,
+                                      "merkezeMesafeKm": 6,
+                                      "aciklama": "Kız Kulesi, Mihrimah Sultan Camii ve Çamlıca Tepesi."
+                            },
+                            {
+                                      "id": "Beşiktaş",
+                                      "ad": "Beşiktaş",
+                                      "rol": "Boğaziçi & Saraylar Hattı",
+                                      "lat": 41.0425,
+                                      "lon": 29.006,
+                                      "merkezeMesafeKm": 5,
+                                      "aciklama": "Dolmabahçe Sarayı, Ortaköy ve Çarşı."
+                            },
+                            {
+                                      "id": "Beyoğlu",
+                                      "ad": "Beyoğlu",
+                                      "rol": "Taksim & İstiklal Caddesi",
+                                      "lat": 41.036,
+                                      "lon": 28.977,
+                                      "merkezeMesafeKm": 3,
+                                      "aciklama": "Taksim Meydanı, Galata Kulesi ve Tarihi Tramvay."
+                            },
+                            {
+                                      "id": "Silivri",
+                                      "ad": "Silivri",
+                                      "rol": "Batı Trakya Kapısı & Sahil",
+                                      "lat": 41.074,
+                                      "lon": 28.246,
+                                      "merkezeMesafeKm": 68,
+                                      "aciklama": "Tekirdağ sınır kapısı, sahil kordonu ve ayçiçeği tarlaları."
+                            },
+                            {
+                                      "id": "Tuzla",
+                                      "ad": "Tuzla",
+                                      "rol": "Doğu Kocaeli Kapısı & Marina",
+                                      "lat": 40.816,
+                                      "lon": 29.303,
+                                      "merkezeMesafeKm": 42,
+                                      "aciklama": "Kocaeli Gebze sınır kapısı, tersaneler ve Viaport Marina."
+                            }
+                  ]
+        },
         coordinates: {
             dms: "41°00′N 28°58′E",
             enlemDms: "41°00′K",
@@ -1797,6 +2865,311 @@ const sehirRotalari = {
         merkezeMesafeKm: 520,
         routes: [],
         canliSorgu: `area["ISO3166-2"="TR-35"]->.izmir; (node["highway"="bus_stop"](area.izmir););`,
+        ilcelerBilgisi: {
+                  "toplamIlceSayisi": 30,
+                  "aciklama": "Ege'nin incisi İzmir, 11'i merkez metropol olmak üzere toplam 30 ilçeden oluşur.",
+                  "kategoriler": {
+                            "merkezMetropol": [
+                                      "Konak",
+                                      "Bornova",
+                                      "Karşıyaka",
+                                      "Bayraklı",
+                                      "Buca",
+                                      "Karabağlar",
+                                      "Balçova",
+                                      "Narlıdere",
+                                      "Güzelbahçe",
+                                      "Çiğli",
+                                      "Gaziemir"
+                            ],
+                            "yarimadaVeKiyi": [
+                                      "Urla",
+                                      "Çeşme",
+                                      "Karaburun",
+                                      "Seferihisar",
+                                      "Menderes",
+                                      "Foça",
+                                      "Aliağa",
+                                      "Dikili"
+                            ],
+                            "kuzeyVeGuneyIcler": [
+                                      "Menemen",
+                                      "Bergama",
+                                      "Kınık",
+                                      "Kemalpaşa",
+                                      "Torbalı",
+                                      "Selçuk",
+                                      "Tire",
+                                      "Ödemiş",
+                                      "Bayındır",
+                                      "Kiraz",
+                                      "Beydağ"
+                            ]
+                  },
+                  "komsuIlceler": {
+                            "Konak": [
+                                      "Bornova",
+                                      "Buca",
+                                      "Karabağlar",
+                                      "Balçova",
+                                      "Bayraklı"
+                            ],
+                            "Bayraklı": [
+                                      "Konak",
+                                      "Bornova",
+                                      "Karşıyaka"
+                            ],
+                            "Karşıyaka": [
+                                      "Bayraklı",
+                                      "Bornova",
+                                      "Menemen",
+                                      "Çiğli"
+                            ],
+                            "Çiğli": [
+                                      "Karşıyaka",
+                                      "Menemen"
+                            ],
+                            "Bornova": [
+                                      "Konak",
+                                      "Bayraklı",
+                                      "Karşıyaka",
+                                      "Menemen",
+                                      "Kemalpaşa",
+                                      "Buca"
+                            ],
+                            "Buca": [
+                                      "Konak",
+                                      "Bornova",
+                                      "Kemalpaşa",
+                                      "Torbalı",
+                                      "Menderes",
+                                      "Gaziemir",
+                                      "Karabağlar"
+                            ],
+                            "Karabağlar": [
+                                      "Konak",
+                                      "Buca",
+                                      "Gaziemir",
+                                      "Menderes",
+                                      "Seferihisar",
+                                      "Balçova"
+                            ],
+                            "Balçova": [
+                                      "Konak",
+                                      "Karabağlar",
+                                      "Narlıdere"
+                            ],
+                            "Narlıdere": [
+                                      "Balçova",
+                                      "Güzelbahçe",
+                                      "Karabağlar"
+                            ],
+                            "Güzelbahçe": [
+                                      "Narlıdere",
+                                      "Urla",
+                                      "Seferihisar",
+                                      "Karabağlar"
+                            ],
+                            "Urla": [
+                                      "Güzelbahçe",
+                                      "Seferihisar",
+                                      "Çeşme",
+                                      "Karaburun"
+                            ],
+                            "Çeşme": [
+                                      "Urla"
+                            ],
+                            "Karaburun": [
+                                      "Urla"
+                            ],
+                            "Seferihisar": [
+                                      "Urla",
+                                      "Güzelbahçe",
+                                      "Karabağlar",
+                                      "Menderes"
+                            ],
+                            "Gaziemir": [
+                                      "Karabağlar",
+                                      "Buca",
+                                      "Menderes"
+                            ],
+                            "Menderes": [
+                                      "Gaziemir",
+                                      "Buca",
+                                      "Karabağlar",
+                                      "Seferihisar",
+                                      "Torbalı",
+                                      "Selçuk"
+                            ],
+                            "Torbalı": [
+                                      "Menderes",
+                                      "Buca",
+                                      "Kemalpaşa",
+                                      "Bayındır",
+                                      "Tire",
+                                      "Selçuk"
+                            ],
+                            "Selçuk": [
+                                      "Menderes",
+                                      "Torbalı",
+                                      "Tire"
+                            ],
+                            "Kemalpaşa": [
+                                      "Bornova",
+                                      "Buca",
+                                      "Torbalı",
+                                      "Bayındır"
+                            ],
+                            "Bayındır": [
+                                      "Kemalpaşa",
+                                      "Torbalı",
+                                      "Tire",
+                                      "Ödemiş"
+                            ],
+                            "Tire": [
+                                      "Torbalı",
+                                      "Selçuk",
+                                      "Bayındır",
+                                      "Ödemiş"
+                            ],
+                            "Ödemiş": [
+                                      "Bayındır",
+                                      "Tire",
+                                      "Kiraz",
+                                      "Beydağ"
+                            ],
+                            "Kiraz": [
+                                      "Ödemiş",
+                                      "Beydağ"
+                            ],
+                            "Beydağ": [
+                                      "Ödemiş",
+                                      "Kiraz"
+                            ],
+                            "Menemen": [
+                                      "Çiğli",
+                                      "Karşıyaka",
+                                      "Bornova",
+                                      "Aliağa",
+                                      "Foça"
+                            ],
+                            "Foça": [
+                                      "Menemen",
+                                      "Aliağa"
+                            ],
+                            "Aliağa": [
+                                      "Foça",
+                                      "Menemen",
+                                      "Bergama"
+                            ],
+                            "Bergama": [
+                                      "Aliağa",
+                                      "Kınık",
+                                      "Dikili"
+                            ],
+                            "Dikili": [
+                                      "Bergama"
+                            ],
+                            "Kınık": [
+                                      "Bergama"
+                            ]
+                  },
+                  "ilSinirKapilari": {
+                            "Bornova": [
+                                      {
+                                                "komsuIl": "Manisa",
+                                                "ilceAks": "Merkez / Sabuncubeli Tüneli",
+                                                "yol": "D-565",
+                                                "mesafeKm": 35
+                                      }
+                            ],
+                            "Kemalpaşa": [
+                                      {
+                                                "komsuIl": "Manisa",
+                                                "ilceAks": "Turgutlu / O-5 Girişi",
+                                                "yol": "D-300 / E96",
+                                                "mesafeKm": 30
+                                      }
+                            ],
+                            "Selçuk": [
+                                      {
+                                                "komsuIl": "Aydın",
+                                                "ilceAks": "Kuşadası / Efes Girişi",
+                                                "yol": "D-515",
+                                                "mesafeKm": 20
+                                      },
+                                      {
+                                                "komsuIl": "Aydın",
+                                                "ilceAks": "Germencik / O-31 Otoyolu",
+                                                "yol": "O-31 / D-550",
+                                                "mesafeKm": 35
+                                      }
+                            ],
+                            "Dikili": [
+                                      {
+                                                "komsuIl": "Balıkesir",
+                                                "ilceAks": "Ayvalık / Sarımsaklı Sahili",
+                                                "yol": "D-550 / E87",
+                                                "mesafeKm": 40
+                                      }
+                            ],
+                            "Bergama": [
+                                      {
+                                                "komsuIl": "Balıkesir",
+                                                "ilceAks": "Soma / İvrindi Aksı",
+                                                "yol": "D-240",
+                                                "mesafeKm": 45
+                                      }
+                            ]
+                  },
+                  "liste": [
+                            {
+                                      "id": "Konak",
+                                      "ad": "Konak",
+                                      "rol": "Tarihi ve Ticari Merkez",
+                                      "lat": 38.4187,
+                                      "lon": 27.1286,
+                                      "merkezeMesafeKm": 0,
+                                      "aciklama": "Saat Kulesi, Tarihi Kemeraltı Çarşısı ve Kordonboyu."
+                            },
+                            {
+                                      "id": "Bornova",
+                                      "ad": "Bornova",
+                                      "rol": "İZOTAŞ & Üniversite Kenti",
+                                      "lat": 38.465,
+                                      "lon": 27.218,
+                                      "merkezeMesafeKm": 8,
+                                      "aciklama": "Ege Üniversitesi ve Şehirlerarası Otobüs Terminali."
+                            },
+                            {
+                                      "id": "Karşıyaka",
+                                      "ad": "Karşıyaka",
+                                      "rol": "Körfez Sahili & Çarşı",
+                                      "lat": 38.4555,
+                                      "lon": 27.112,
+                                      "merkezeMesafeKm": 12,
+                                      "aciklama": "Karşıyaka İskele, Çarşı ve Alaybey Sahili."
+                            },
+                            {
+                                      "id": "Çeşme",
+                                      "ad": "Çeşme",
+                                      "rol": "Turizm & Rüzgar Sörfü",
+                                      "lat": 38.324,
+                                      "lon": 26.305,
+                                      "merkezeMesafeKm": 85,
+                                      "aciklama": "Çeşme Kalesi, Marina ve Ilıca Sahili."
+                            },
+                            {
+                                      "id": "Selçuk",
+                                      "ad": "Selçuk",
+                                      "rol": "Efes & UNESCO Dünya Mirası",
+                                      "lat": 37.948,
+                                      "lon": 27.368,
+                                      "merkezeMesafeKm": 75,
+                                      "aciklama": "Efes Antik Kenti ve Meryem Ana Evi."
+                            }
+                  ]
+        },
         coordinates: {
             dms: "38°25′N 27°08′E",
             enlemDms: "38°25′K",
@@ -3486,68 +4859,389 @@ baglantiYollari: {
 // Tekirdağ için Süleymanpaşa, Çorlu, Çerkezköy, Muratlı gerçek durakları bulunur.
 const varsayilanSehirDuraklari = {
     "Denizli": [
-        { "name": "Denizli Büyükşehir Otobüs Terminali (Merkez)", "lat": 37.7850, "lon": 29.0890 },
-        { "name": "Tarihi Delikliçınar Meydanı & Horoz Heykeli", "lat": 37.7760, "lon": 29.0860 },
-        { "name": "Pamukkale Travertenleri & Hierapolis Antik Kenti", "lat": 37.9250, "lon": 29.1210 },
-        { "name": "Pamukkale Üniversitesi (PAÜ) Kınıklı Kampüsü", "lat": 37.7410, "lon": 29.1020 },
-        { "name": "Sarayköy İlçe Meydanı & Termal Kaplıcalar", "lat": 37.9150, "lon": 28.9250 },
-        { "name": "Honaz İlçe Meydanı & Tarihi Kiraz Aksı", "lat": 37.7550, "lon": 29.2550 }
+        {
+            "name": "Denizli Büyükşehir Otobüs Terminali (Merkez)",
+            "lat": 37.785,
+            "lon": 29.089
+        },
+        {
+            "name": "Tarihi Delikliçınar Meydanı & Horoz Heykeli",
+            "lat": 37.776,
+            "lon": 29.086
+        },
+        {
+            "name": "Pamukkale Travertenleri & Hierapolis Antik Kenti",
+            "lat": 37.925,
+            "lon": 29.121
+        },
+        {
+            "name": "Pamukkale Üniversitesi (PAÜ) Kınıklı Kampüsü",
+            "lat": 37.741,
+            "lon": 29.102
+        },
+        {
+            "name": "Sarayköy İlçe Meydanı & Termal Kaplıcalar",
+            "lat": 37.915,
+            "lon": 28.925
+        },
+        {
+            "name": "Honaz İlçe Meydanı & Tarihi Kiraz Aksı",
+            "lat": 37.755,
+            "lon": 29.255
+        },
+        {
+            "name": "Servergazi Değirmenönü Parkı & Türbesi",
+            "lat": 37.756,
+            "lon": 29.042
+        },
+        {
+            "name": "Laodikeia Antik Kenti & Kazı Alanı",
+            "lat": 37.835,
+            "lon": 29.108
+        },
+        {
+            "name": "Denizli Çardak Havalimanı Giriş Nizamiyesi",
+            "lat": 37.789,
+            "lon": 29.701
+        },
+        {
+            "name": "Bağbaşı Yaylası & Denizli Teleferik Alt İstasyonu",
+            "lat": 37.728,
+            "lon": 29.125
+        }
     ],
-
     "Antalya": [
-        { "name": "Antalya Şehirlerarası Otobüs Terminali (Kepez)", "lat": 36.9230, "lon": 30.6680 },
-        { "name": "Tarihi Kaleiçi & Cumhuriyet Meydanı (Saat Kulesi)", "lat": 36.8860, "lon": 30.7050 },
-        { "name": "Konyaaltı Sahil Parkı & Akdeniz Bulvarı", "lat": 36.8820, "lon": 30.6550 },
-        { "name": "Akdeniz Üniversitesi Kampüsü Giriş Kapısı", "lat": 36.8920, "lon": 30.6520 },
-        { "name": "Lara Sahili & Düden Parkı Şelale Durağı", "lat": 36.8510, "lon": 30.7850 },
-        { "name": "Alanya İlçe Otogarı & Kleopatra Plajı Yolu", "lat": 36.5510, "lon": 31.9810 }
+        {
+            "name": "Antalya Şehirlerarası Otobüs Terminali (Kepez)",
+            "lat": 36.923,
+            "lon": 30.668
+        },
+        {
+            "name": "Tarihi Kaleiçi & Cumhuriyet Meydanı (Saat Kulesi)",
+            "lat": 36.886,
+            "lon": 30.705
+        },
+        {
+            "name": "Konyaaltı Sahil Parkı & Akdeniz Bulvarı",
+            "lat": 36.882,
+            "lon": 30.655
+        },
+        {
+            "name": "Akdeniz Üniversitesi Kampüsü Giriş Kapısı",
+            "lat": 36.892,
+            "lon": 30.652
+        },
+        {
+            "name": "Lara Sahili & Düden Parkı Şelale Durağı",
+            "lat": 36.851,
+            "lon": 30.785
+        },
+        {
+            "name": "Alanya İlçe Otogarı & Kleopatra Plajı Yolu",
+            "lat": 36.551,
+            "lon": 31.981
+        },
+        {
+            "name": "Manavgat Şelalesi & Side Antik Kenti Meydanı",
+            "lat": 36.788,
+            "lon": 31.391
+        },
+        {
+            "name": "Kemer Marina & Ayışığı Koyu Sahil Parkı",
+            "lat": 36.602,
+            "lon": 30.563
+        },
+        {
+            "name": "Kaş Yat Limanı & Meis Seyir Tepesi",
+            "lat": 36.199,
+            "lon": 29.638
+        },
+        {
+            "name": "Antalya Havalimanı İç-Dış Hatlar Terminali",
+            "lat": 36.899,
+            "lon": 30.801
+        },
+        {
+            "name": "Kurşunlu Şelalesi Tabiat Parkı Girişi",
+            "lat": 36.998,
+            "lon": 30.822
+        },
+        {
+            "name": "Döşemealtı Kent Ormanı & D-650 Burdur Yolu",
+            "lat": 37.018,
+            "lon": 30.612
+        }
     ],
-
     "Amasya": [
-        { "name": "AŞOT - Amasya Şehirlerarası Otobüs Terminali (Merkez)", "lat": 40.6420, "lon": 35.8180 },
-        { "name": "Yavuz Selim Meydanı & Amasya Valiliği", "lat": 40.6530, "lon": 35.8340 },
-        { "name": "Tarihi Hazeranlar Konağı & Kral Kaya Mezarları", "lat": 40.6550, "lon": 35.8310 },
-        { "name": "Amasya Üniversitesi Milli Hâkimiyet Merkez Kampüsü", "lat": 40.6650, "lon": 35.8480 },
-        { "name": "Merzifon İlçe Otogarı & Havalimanı Kavşağı", "lat": 40.8710, "lon": 35.4610 },
-        { "name": "Suluova İlçe Meydanı & Şeker Fabrikası Aksı", "lat": 40.8350, "lon": 35.6550 }
+        {
+            "name": "AŞOT - Amasya Şehirlerarası Otobüs Terminali (Merkez)",
+            "lat": 40.642,
+            "lon": 35.818
+        },
+        {
+            "name": "Yavuz Selim Meydanı & Amasya Valiliği",
+            "lat": 40.653,
+            "lon": 35.834
+        },
+        {
+            "name": "Tarihi Hazeranlar Konağı & Kral Kaya Mezarları",
+            "lat": 40.655,
+            "lon": 35.831
+        },
+        {
+            "name": "Amasya Üniversitesi Milli Hâkimiyet Merkez Kampüsü",
+            "lat": 40.665,
+            "lon": 35.848
+        },
+        {
+            "name": "Merzifon İlçe Otogarı & Havalimanı Kavşağı",
+            "lat": 40.871,
+            "lon": 35.461
+        },
+        {
+            "name": "Suluova İlçe Meydanı & Şeker Fabrikası Aksı",
+            "lat": 40.835,
+            "lon": 35.655
+        },
+        {
+            "name": "Borabay Gölü Tabiat Parkı Yolu (Taşova)",
+            "lat": 40.852,
+            "lon": 36.155
+        },
+        {
+            "name": "Şehzadeler Gezi Yolu & Yeşilırmak Boyu",
+            "lat": 40.651,
+            "lon": 35.832
+        },
+        {
+            "name": "Aynalı Mağara & Ziyaret Beldesi Kavşağı",
+            "lat": 40.668,
+            "lon": 35.865
+        },
+        {
+            "name": "Ferhat ile Şirin Aşıklar Müzesi & Su Kanalı",
+            "lat": 40.638,
+            "lon": 35.808
+        }
     ],
-
     "Ağrı": [
-        { "name": "Ağrı Şehirlerarası Otobüs Terminali (Merkez)", "lat": 39.7150, "lon": 43.0380 },
-        { "name": "Ağrı Valiliği & Cumhuriyet Meydanı", "lat": 39.7210, "lon": 43.0530 },
-        { "name": "Ağrı İbrahim Çeçen Üniversitesi (AİÇÜ) Kampüsü", "lat": 39.7020, "lon": 43.0180 },
-        { "name": "Doğubayazıt İlçe Otogarı & İshak Paşa Sarayı Yolu", "lat": 39.5450, "lon": 44.0850 },
-        { "name": "Ağrı Dağı Milli Parkı & Gürbulak Sınır Kapısı Girişi", "lat": 39.5600, "lon": 44.4000 },
-        { "name": "Patnos İlçe Otogarı & Süphan Dağı Geçişi", "lat": 39.2350, "lon": 42.8600 }
+        {
+            "name": "Ağrı Şehirlerarası Otobüs Terminali (Merkez)",
+            "lat": 39.715,
+            "lon": 43.038
+        },
+        {
+            "name": "Ağrı Valiliği & Cumhuriyet Meydanı",
+            "lat": 39.721,
+            "lon": 43.053
+        },
+        {
+            "name": "Ağrı İbrahim Çeçen Üniversitesi (AİÇÜ) Kampüsü",
+            "lat": 39.702,
+            "lon": 43.018
+        },
+        {
+            "name": "Doğubayazıt İlçe Otogarı & İshak Paşa Sarayı Yolu",
+            "lat": 39.545,
+            "lon": 44.085
+        },
+        {
+            "name": "Ağrı Dağı Milli Parkı & Gürbulak Sınır Kapısı Girişi",
+            "lat": 39.56,
+            "lon": 44.4
+        },
+        {
+            "name": "Patnos İlçe Otogarı & Süphan Dağı Geçişi",
+            "lat": 39.235,
+            "lon": 42.86
+        },
+        {
+            "name": "Diyadin Kaplıcaları & Kanyon Parkı",
+            "lat": 39.552,
+            "lon": 43.675
+        },
+        {
+            "name": "Eleşkirt İlçe Meydanı & D-100 Erzurum Yolu",
+            "lat": 39.795,
+            "lon": 42.685
+        },
+        {
+            "name": "Ağrı Eğitim ve Araştırma Hastanesi",
+            "lat": 39.728,
+            "lon": 43.068
+        },
+        {
+            "name": "Tarihi Hamur Kümbeti & İlçe Girişi",
+            "lat": 39.615,
+            "lon": 42.985
+        }
     ],
-
     "Afyonkarahisar": [
-        { "name": "AFTAŞ - Afyonkarahisar Şehirlerarası Otobüs Terminali", "lat": 38.7410, "lon": 30.5680 },
-        { "name": "Tarihi Zafer Meydanı & Afyon Valiliği", "lat": 38.7550, "lon": 30.5410 },
-        { "name": "Afyon Kocatepe Üniversitesi (AKÜ) Ahmet Necdet Sezer Kampüsü", "lat": 38.8150, "lon": 30.5320 },
-        { "name": "Tarihi İmaret (Gedik Ahmet Paşa) Camii Meydanı", "lat": 38.7580, "lon": 30.5360 },
-        { "name": "Özdilek / İkbal Kavşağı & Çevre Yolu Dinlenme Tesisi", "lat": 38.7820, "lon": 30.4980 },
-        { "name": "Gazlıgöl Termal Tesisler & İstasyon Durağı", "lat": 38.9650, "lon": 30.5050 }
+        {
+            "name": "AFTAŞ - Afyonkarahisar Şehirlerarası Otobüs Terminali",
+            "lat": 38.741,
+            "lon": 30.568
+        },
+        {
+            "name": "Tarihi Zafer Meydanı & Afyon Valiliği",
+            "lat": 38.755,
+            "lon": 30.541
+        },
+        {
+            "name": "Afyon Kocatepe Üniversitesi (AKÜ) Ahmet Necdet Sezer Kampüsü",
+            "lat": 38.815,
+            "lon": 30.532
+        },
+        {
+            "name": "Tarihi İmaret (Gedik Ahmet Paşa) Camii Meydanı",
+            "lat": 38.758,
+            "lon": 30.536
+        },
+        {
+            "name": "Özdilek / İkbal Kavşağı & Çevre Yolu Dinlenme Tesisi",
+            "lat": 38.782,
+            "lon": 30.498
+        },
+        {
+            "name": "Gazlıgöl Termal Tesisler & İstasyon Durağı",
+            "lat": 38.965,
+            "lon": 30.505
+        },
+        {
+            "name": "Tarihi Afyon Kalesi Çıkış Kapısı",
+            "lat": 38.752,
+            "lon": 30.534
+        },
+        {
+            "name": "Sandıklı İlçe Otogarı & Hüdai Kaplıcaları",
+            "lat": 38.468,
+            "lon": 30.272
+        },
+        {
+            "name": "Dinar Otogarı & Suçıkan Şelaleleri Parkı",
+            "lat": 38.065,
+            "lon": 30.165
+        },
+        {
+            "name": "Frig Vadisi Ayazini Metropolü Girişi",
+            "lat": 39.015,
+            "lon": 30.558
+        }
     ],
-
     "Adıyaman": [
-        { "name": "Adıyaman Şehirlerarası Otobüs Terminali (Merkez)", "lat": 37.7520, "lon": 38.2910 },
-        { "name": "Adıyaman Valiliği & Demokrasi Parkı", "lat": 37.7635, "lon": 38.2770 },
-        { "name": "Adıyaman Üniversitesi (Altınşehir Kampüsü)", "lat": 37.7470, "lon": 38.2320 },
-        { "name": "Kahta Otobüs Terminali & Cendere Köprüsü Bağlantısı", "lat": 37.7850, "lon": 38.6250 },
-        { "name": "Nemrut Dağı Milli Parkı & Karadut Giriş İstasyonu", "lat": 37.9420, "lon": 38.7180 },
-        { "name": "Gölbaşı Otogarı & Doğu Anadolu Kavşağı", "lat": 37.7860, "lon": 37.6430 }
+        {
+            "name": "Adıyaman Şehirlerarası Otobüs Terminali (Merkez)",
+            "lat": 37.752,
+            "lon": 38.291
+        },
+        {
+            "name": "Adıyaman Valiliği & Demokrasi Parkı",
+            "lat": 37.7635,
+            "lon": 38.277
+        },
+        {
+            "name": "Adıyaman Üniversitesi (Altınşehir Kampüsü)",
+            "lat": 37.747,
+            "lon": 38.232
+        },
+        {
+            "name": "Kahta Otobüs Terminali & Cendere Köprüsü Bağlantısı",
+            "lat": 37.785,
+            "lon": 38.625
+        },
+        {
+            "name": "Nemrut Dağı Milli Parkı & Karadut Giriş İstasyonu",
+            "lat": 37.942,
+            "lon": 38.718
+        },
+        {
+            "name": "Gölbaşı Otogarı & Doğu Anadolu Kavşağı",
+            "lat": 37.786,
+            "lon": 37.643
+        },
+        {
+            "name": "Perre Antik Kenti & Kaya Mezarları",
+            "lat": 37.795,
+            "lon": 38.295
+        },
+        {
+            "name": "Besni İlçe Meydanı & Eski Besni Ören Yeri",
+            "lat": 37.685,
+            "lon": 37.862
+        },
+        {
+            "name": "Gerger Kanyonu & Atatürk Barajı Seyir Tepesi",
+            "lat": 38.035,
+            "lon": 39.045
+        },
+        {
+            "name": "Arsemia Tarihi Ören Yeri & Eski Kahta Kalesi",
+            "lat": 37.945,
+            "lon": 38.655
+        }
     ],
-
     "Adana": [
-        { "name": "Adana Büyükşehir Otobüs Terminali (Seyhan)", "lat": 36.9914, "lon": 35.2842 },
-        { "name": "Tarihi Taşköprü & Seyhan Nehri Caddesi", "lat": 36.9865, "lon": 35.3340 },
-        { "name": "Sabancı Merkez Camii & Merkez Park", "lat": 36.9920, "lon": 35.3280 },
-        { "name": "İnönü Parkı & Adana Valilik Meydanı", "lat": 36.9950, "lon": 35.3230 },
-        { "name": "Adana Tren Garı (İstasyon Meydanı)", "lat": 37.0030, "lon": 35.3180 },
-        { "name": "Çukurova Üniversitesi Balcalı Yerleşkesi", "lat": 37.0580, "lon": 35.3550 }
+        {
+            "name": "Adana Büyükşehir Otobüs Terminali (Seyhan)",
+            "lat": 36.9914,
+            "lon": 35.2842
+        },
+        {
+            "name": "Tarihi Taşköprü & Seyhan Nehri Caddesi",
+            "lat": 36.9865,
+            "lon": 35.334
+        },
+        {
+            "name": "Sabancı Merkez Camii & Merkez Park",
+            "lat": 36.992,
+            "lon": 35.328
+        },
+        {
+            "name": "İnönü Parkı & Adana Valilik Meydanı",
+            "lat": 36.995,
+            "lon": 35.323
+        },
+        {
+            "name": "Adana Tren Garı (İstasyon Meydanı)",
+            "lat": 37.003,
+            "lon": 35.318
+        },
+        {
+            "name": "Çukurova Üniversitesi Balcalı Yerleşkesi",
+            "lat": 37.058,
+            "lon": 35.355
+        },
+        {
+            "name": "Yüreğir Otogarı & D-400 Karayolu Aksı",
+            "lat": 36.982,
+            "lon": 35.349
+        },
+        {
+            "name": "Çukurova Baraj Gölü & Adnan Menderes Bulvarı",
+            "lat": 37.051,
+            "lon": 35.295
+        },
+        {
+            "name": "Ceyhan İlçe Otogarı & İnönü Bulvarı",
+            "lat": 37.0294,
+            "lon": 35.8175
+        },
+        {
+            "name": "Tarihi Misis Köprüsü & Antik Kenti (Yakapınar)",
+            "lat": 36.958,
+            "lon": 35.625
+        },
+        {
+            "name": "Kozan Kalesi & Tarihi Hoşkadem Camii",
+            "lat": 37.455,
+            "lon": 35.815
+        },
+        {
+            "name": "Pozantı Belemedik Tabiat Parkı & Varda Vadisi Girişi",
+            "lat": 37.4267,
+            "lon": 34.8717
+        }
     ],
-
     "Tekirdağ": [
         {
             "name": "Süleymanpaşa Yeni Otobüs Terminali",
@@ -3698,79 +5392,67 @@ const varsayilanSehirDuraklari = {
             "name": "Velimeşe Meydan",
             "lat": 41.253,
             "lon": 27.899
-        }
-    ,
+        },
         {
             "name": "Velimeşe - 1 Durağı",
             "lat": 41.2505,
             "lon": 27.894
-        }
-    ,
+        },
         {
             "name": "Velimeşe Muhtarlık & Ek Hizmet Binası",
             "lat": 41.2525,
             "lon": 27.898
-        }
-    ,
+        },
         {
             "name": "Velimeşe Mustafa Kemal Atatürk Caddesi",
             "lat": 41.2515,
             "lon": 27.8965
-        }
-    ,
+        },
         {
             "name": "Velimeşe İstasyon & Tren Garı",
             "lat": 41.248,
             "lon": 27.893
-        }
-    ,
+        },
         {
             "name": "Velimeşe TOKİ Konutları",
             "lat": 41.256,
             "lon": 27.905
-        }
-    ,
+        },
         {
             "name": "Velimeşe Çetin Sokak (Dedebal Kavşağı)",
-            "lat": 41.2520,
+            "lat": 41.252,
             "lon": 27.8985
         },
         {
             "name": "Velimeşe Aile Sağlığı Merkezi",
             "lat": 41.2535,
             "lon": 27.9005
-        }
-    ,
+        },
         {
             "name": "Velimeşe İlkokulu & Ortaokulu",
             "lat": 41.254,
             "lon": 27.897
-        }
-    ,
+        },
         {
             "name": "Velimeşe M. Kemal Atatürk Stadyumu (Velimeşespor)",
             "lat": 41.257,
             "lon": 27.902
-        }
-    ,
+        },
         {
             "name": "Velimeşe Mezarlığı",
             "lat": 41.2465,
             "lon": 27.889
-        }
-    ,
+        },
         {
             "name": "Velimeşe Çerkezköy Yolu Durağı",
             "lat": 41.255,
             "lon": 27.908
-        }
-    ,
+        },
         {
             "name": "Velimeşe Bozdoğan Petrol & D-110 Kavşağı",
             "lat": 41.242,
             "lon": 27.88
-        }
-    ,
+        },
         {
             "name": "Velimeşe Gölet / Mesire Alanı",
             "lat": 41.258,
@@ -4586,11 +6268,3404 @@ const varsayilanSehirDuraklari = {
             "lat": 40.906,
             "lon": 32.859
         }
+    ],
+    "İzmir": [
+        {
+            "name": "İZOTAŞ İzmir Şehirlerarası Otobüs Terminali (Bornova)",
+            "lat": 38.432,
+            "lon": 27.215
+        },
+        {
+            "name": "Tarihi Konak Meydanı & Saat Kulesi",
+            "lat": 38.4187,
+            "lon": 27.1286
+        },
+        {
+            "name": "Alsancak Tren Garı & Kordonboyu",
+            "lat": 38.4385,
+            "lon": 27.143
+        },
+        {
+            "name": "Ege Üniversitesi Bornova Merkez Kampüsü",
+            "lat": 38.455,
+            "lon": 27.228
+        },
+        {
+            "name": "Karşıyaka Vapur İskelesi & Çarşı",
+            "lat": 38.4555,
+            "lon": 27.112
+        },
+        {
+            "name": "Buca Şirinyer Meydanı & DEÜ Eğitim Kampüsü",
+            "lat": 38.385,
+            "lon": 27.165
+        },
+        {
+            "name": "Fahrettin Altay Aktarma Merkezi & Üçkuyular İskelesi",
+            "lat": 38.397,
+            "lon": 27.065
+        },
+        {
+            "name": "Balçova Teleferik & Termal Tesisleri",
+            "lat": 38.388,
+            "lon": 27.051
+        },
+        {
+            "name": "Gaziemir Fuar İzmir & Adnan Menderes Havalimanı Yolu",
+            "lat": 38.318,
+            "lon": 27.129
+        },
+        {
+            "name": "Çeşme Otogarı & Tarihi Çeşme Kalesi / Marina",
+            "lat": 38.324,
+            "lon": 26.305
+        },
+        {
+            "name": "Selçuk Efes Antik Kenti & Meryem Ana Evi Yolu",
+            "lat": 37.948,
+            "lon": 27.368
+        },
+        {
+            "name": "Urla Sanat Sokağı & Tarihi İskele Kordonu",
+            "lat": 38.324,
+            "lon": 26.765
+        },
+        {
+            "name": "Torbalı İlçe Otogarı & İZBAN İstasyonu",
+            "lat": 38.152,
+            "lon": 27.362
+        },
+        {
+            "name": "Foça Eski Foça Limanı & Siren Kayalıkları İskelesi",
+            "lat": 38.671,
+            "lon": 26.758
+        },
+        {
+            "name": "Bergama Akropolü & Kızıl Avlu Ören Yeri",
+            "lat": 39.132,
+            "lon": 27.185
+        }
+    ],
+    "Bursa": [
+        {
+            "name": "Bursa Şehirlerarası Otobüs Terminali (BURULAŞ)",
+            "lat": 40.262,
+            "lon": 29.055
+        },
+        {
+            "name": "Heykel Cumhuriyet Meydanı & Tarihi Valilik",
+            "lat": 40.183,
+            "lon": 29.064
+        },
+        {
+            "name": "Tarihi Bursa Ulu Cami & Kapalıçarşı Bedesten",
+            "lat": 40.1845,
+            "lon": 29.0615
+        },
+        {
+            "name": "Bursa Uludağ Üniversitesi Görükle Kampüsü",
+            "lat": 40.225,
+            "lon": 28.871
+        },
+        {
+            "name": "Mudanya Mütareke Meydanı & BUDO Feribot İskelesi",
+            "lat": 40.378,
+            "lon": 28.882
+        },
+        {
+            "name": "Tophane Saat Kulesi & Osman Gazi - Orhan Gazi Türbeleri",
+            "lat": 40.1865,
+            "lon": 29.057
+        },
+        {
+            "name": "Cumalıkızık UNESCO Tarihi Osmanlı Köyü Meydanı",
+            "lat": 40.176,
+            "lon": 29.171
+        },
+        {
+            "name": "Nilüfer Fatih Sultan Mehmet Bulvarı (FSM)",
+            "lat": 40.215,
+            "lon": 28.985
+        },
+        {
+            "name": "Kent Meydanı AVM & T1 İpekböceği Tramvay İstasyonu",
+            "lat": 40.198,
+            "lon": 29.058
+        },
+        {
+            "name": "İnegöl Şehirlerarası Otogarı & Mobilya AVM Aksı",
+            "lat": 40.078,
+            "lon": 29.512
+        },
+        {
+            "name": "İznik Tarihi Surları & Ayasofya Camii Meydanı",
+            "lat": 40.428,
+            "lon": 29.721
+        },
+        {
+            "name": "Gemlik Sahil Kordonu & Serbest Bölge Girişi",
+            "lat": 40.432,
+            "lon": 29.155
+        },
+        {
+            "name": "Uludağ Milli Parkı 1. Gelişim Oteller Bölgesi",
+            "lat": 40.102,
+            "lon": 29.132
+        },
+        {
+            "name": "Karacabey Otogarı & Longoz Ormanları Kavşağı",
+            "lat": 40.215,
+            "lon": 28.358
+        }
+    ],
+    "Konya": [
+        {
+            "name": "Konya Şehirlerarası Otobüs Terminali",
+            "lat": 37.952,
+            "lon": 32.508
+        },
+        {
+            "name": "Mevlana Müzesi & Mevlana Kent Meydanı",
+            "lat": 37.871,
+            "lon": 32.505
+        },
+        {
+            "name": "Tarihi Alaaddin Tepesi Parkı & Sultan Camii",
+            "lat": 37.873,
+            "lon": 32.493
+        },
+        {
+            "name": "Selçuk Üniversitesi Alaeddin Keykubat Kampüsü",
+            "lat": 38.028,
+            "lon": 32.512
+        },
+        {
+            "name": "Meram Bağları Sahili & Tarihi Meram Köprüsü",
+            "lat": 37.855,
+            "lon": 32.428
+        },
+        {
+            "name": "Karatay Medresesi Çini Eserleri Müzesi",
+            "lat": 37.8755,
+            "lon": 32.4925
+        },
+        {
+            "name": "Zafer Meydanı & Kültürpark Yürüyüş Yolu",
+            "lat": 37.8725,
+            "lon": 32.488
+        },
+        {
+            "name": "Konya Bilim Merkezi & Havalimanı Yolu",
+            "lat": 37.985,
+            "lon": 32.585
+        },
+        {
+            "name": "Bosna Hersek Mahallesi Gençlik Çarşısı",
+            "lat": 38.005,
+            "lon": 32.525
+        },
+        {
+            "name": "Akşehir İlçe Otogarı & Nasreddin Hoca Türbesi",
+            "lat": 38.358,
+            "lon": 31.418
+        },
+        {
+            "name": "Beyşehir Gölü Sahil Parkı & Eşrefoğlu Camii",
+            "lat": 37.682,
+            "lon": 31.722
+        },
+        {
+            "name": "Ereğli Şehirlerarası Otogarı & İvriz Kaya Kabartması Yolu",
+            "lat": 37.512,
+            "lon": 34.051
+        },
+        {
+            "name": "Çumra Çatalhöyük UNESCO Neolitik Kenti Girişi",
+            "lat": 37.668,
+            "lon": 32.825
+        },
+        {
+            "name": "Seydişehir Kuğulu Tabiat Parkı & Termal Tesisler",
+            "lat": 37.408,
+            "lon": 31.845
+        }
+    ],
+    "Eskişehir": [
+        {
+            "name": "Eskişehir Şehirlerarası Otobüs Terminali",
+            "lat": 39.771,
+            "lon": 30.552
+        },
+        {
+            "name": "Tarihi Odunpazarı Evleri & Modern Müze (OMM)",
+            "lat": 39.762,
+            "lon": 30.526
+        },
+        {
+            "name": "Porsuk Çayı & Adalar Gondol İskelesi",
+            "lat": 39.7755,
+            "lon": 30.518
+        },
+        {
+            "name": "Anadolu Üniversitesi Yunus Emre Kampüsü Ana Kapı",
+            "lat": 39.791,
+            "lon": 30.499
+        },
+        {
+            "name": "Eskişehir Osmangazi Üniversitesi (ESOGÜ) Meşelik Kampüsü",
+            "lat": 39.751,
+            "lon": 30.485
+        },
+        {
+            "name": "Sazova Bilim, Sanat ve Kültür Parkı (Masal Şatosu)",
+            "lat": 39.768,
+            "lon": 30.472
+        },
+        {
+            "name": "Kentpark Yapay Plajı & Porsuk Göleti",
+            "lat": 39.778,
+            "lon": 30.558
+        },
+        {
+            "name": "Eskişehir Tren Garı & İstasyon Caddesi",
+            "lat": 39.7785,
+            "lon": 30.509
+        },
+        {
+            "name": "Haller Gençlik Merkezi & Üniversite Caddesi",
+            "lat": 39.782,
+            "lon": 30.512
+        },
+        {
+            "name": "Şelale Park Seyir Terası & Değirmen",
+            "lat": 39.758,
+            "lon": 30.531
+        },
+        {
+            "name": "Sivrihisar Ulu Cami & Tarihi Saat Kulesi",
+            "lat": 39.448,
+            "lon": 31.538
+        },
+        {
+            "name": "Çifteler Sakaryabaşı Tabiat Parkı Su Kaynağı",
+            "lat": 39.382,
+            "lon": 31.135
+        }
+    ],
+    "Kocaeli": [
+        {
+            "name": "Kocaeli Şehirlerarası Otobüs Terminali (İzmit)",
+            "lat": 40.768,
+            "lon": 29.972
+        },
+        {
+            "name": "Gebze Şehirlerarası Otobüs Terminali & Marmaray İstasyonu",
+            "lat": 40.795,
+            "lon": 29.432
+        },
+        {
+            "name": "Sekapark Sahil Parkı & Kocaeli Bilim Merkezi",
+            "lat": 40.761,
+            "lon": 29.911
+        },
+        {
+            "name": "Kocaeli Üniversitesi Umuttepe Merkez Kampüsü",
+            "lat": 40.822,
+            "lon": 29.921
+        },
+        {
+            "name": "İzmit Tarihi Saat Kulesi & Tren Garı Meydanı",
+            "lat": 40.764,
+            "lon": 29.928
+        },
+        {
+            "name": "Gölcük Donanma Meydanı & Değirmendere Sahil Çınarlığı",
+            "lat": 40.718,
+            "lon": 29.822
+        },
+        {
+            "name": "Darıca Balyanoz Koyu Sahil Parkı & Hayvanat Bahçesi",
+            "lat": 40.762,
+            "lon": 29.381
+        },
+        {
+            "name": "Kartepe Kayak Merkezi Dağ Yolu Girişi (Maşukiye)",
+            "lat": 40.702,
+            "lon": 30.045
+        },
+        {
+            "name": "Karamürsel Sahil Kordonu & Vapur İskelesi",
+            "lat": 40.692,
+            "lon": 29.615
+        },
+        {
+            "name": "Körfez Tütünçiftlik Sahili & Yarımca Limanı",
+            "lat": 40.748,
+            "lon": 29.775
+        },
+        {
+            "name": "Derince Harikalar Sahili & Gösteri Merkezi",
+            "lat": 40.752,
+            "lon": 29.832
+        },
+        {
+            "name": "Kandıra İlçe Otogarı & Kerpe Sahili Yolu",
+            "lat": 41.072,
+            "lon": 30.152
+        }
+    ],
+    "Sakarya": [
+        {
+            "name": "Sakarya Büyükşehir Otobüs Terminali (Adapazarı)",
+            "lat": 40.738,
+            "lon": 30.405
+        },
+        {
+            "name": "Çark Caddesi & Tarihi Kent Meydanı",
+            "lat": 40.776,
+            "lon": 30.398
+        },
+        {
+            "name": "Sakarya Üniversitesi Esentepe Merkez Kampüsü",
+            "lat": 40.741,
+            "lon": 30.332
+        },
+        {
+            "name": "Sapanca Gölü Sahil Yolu & Kırkpınar Sahili",
+            "lat": 40.692,
+            "lon": 30.265
+        },
+        {
+            "name": "Tarihi Justinianos (Beşköprü) Köprüsü Parkı",
+            "lat": 40.742,
+            "lon": 30.375
+        },
+        {
+            "name": "Arifiye YHT Hızlı Tren Garı Girişi",
+            "lat": 40.712,
+            "lon": 30.365
+        },
+        {
+            "name": "Karasu Sahil Parkı & Karadeniz Kordonu",
+            "lat": 41.098,
+            "lon": 30.692
+        },
+        {
+            "name": "Hendek Şehir Meydanı & Bayraktepe Tesisleri",
+            "lat": 40.798,
+            "lon": 30.745
+        },
+        {
+            "name": "Akyazı Kuzuluk Termal Kaplıcaları Tesisleri",
+            "lat": 40.612,
+            "lon": 30.655
+        },
+        {
+            "name": "Taraklı Tarihi Osmanlı Konakları & Çarşı Meydanı",
+            "lat": 40.395,
+            "lon": 30.455
+        }
+    ],
+    "Balıkesir": [
+        {
+            "name": "Balıkesir Şehirlerarası Otobüs Terminali",
+            "lat": 39.638,
+            "lon": 27.915
+        },
+        {
+            "name": "Tarihi Saat Kulesi & Zağnos Paşa Camii Meydanı",
+            "lat": 39.648,
+            "lon": 27.882
+        },
+        {
+            "name": "Balıkesir Üniversitesi Çağış Kampüsü",
+            "lat": 39.525,
+            "lon": 28.028
+        },
+        {
+            "name": "Bandırma Otogarı & İDO Hızlı Feribot İskelesi",
+            "lat": 40.352,
+            "lon": 27.975
+        },
+        {
+            "name": "Ayvalık Sahil Kordonu & Tarihi Cunda (Alibey) Adası",
+            "lat": 39.318,
+            "lon": 26.695
+        },
+        {
+            "name": "Edremit Şehirlerarası Otogarı & Akçay Sahil Kordonu",
+            "lat": 39.592,
+            "lon": 26.975
+        },
+        {
+            "name": "Altınoluk Sahili & Kazdağları Şahinderesi Kanyonu",
+            "lat": 39.571,
+            "lon": 26.745
+        },
+        {
+            "name": "Susurluk Dinlenme Tesisleri & Tarihi Ayran Meydanı",
+            "lat": 39.912,
+            "lon": 28.158
+        },
+        {
+            "name": "Gönen Termal Kaplıcaları & Park Meydanı",
+            "lat": 40.105,
+            "lon": 27.655
+        },
+        {
+            "name": "Erdek Sahil Parkı & Kyzikos Antik Kenti Girişi",
+            "lat": 40.398,
+            "lon": 27.792
+        },
+        {
+            "name": "Manyas Kuşcenneti Milli Parkı Ziyaretçi Merkezi",
+            "lat": 40.235,
+            "lon": 27.965
+        }
+    ],
+    "Aydın": [
+        {
+            "name": "Aydın Şehirlerarası Otobüs Terminali",
+            "lat": 37.828,
+            "lon": 27.852
+        },
+        {
+            "name": "Efeler Atatürk Kent Meydanı & Valilik Önü",
+            "lat": 37.848,
+            "lon": 27.845
+        },
+        {
+            "name": "Adnan Menderes Üniversitesi (ADÜ) Aytepe Kampüsü",
+            "lat": 37.855,
+            "lon": 27.858
+        },
+        {
+            "name": "Kuşadası Otogarı & Tarihi Güvercinada Kalesi",
+            "lat": 37.858,
+            "lon": 27.261
+        },
+        {
+            "name": "Didim Altınkum Sahili & Tarihi Apollon Tapınağı",
+            "lat": 37.371,
+            "lon": 27.258
+        },
+        {
+            "name": "Söke Otogarı & Priene Antik Kenti Kavşağı",
+            "lat": 37.752,
+            "lon": 27.408
+        },
+        {
+            "name": "Nazilli Uzun Çarşı Meydanı & Sümerpark",
+            "lat": 37.915,
+            "lon": 28.325
+        },
+        {
+            "name": "Karacasu Tarihi Afrodisias Antik Kenti Ören Yeri",
+            "lat": 37.708,
+            "lon": 28.725
+        },
+        {
+            "name": "Çine Vadisi & Tarihi İncekemer Köprüsü",
+            "lat": 37.615,
+            "lon": 28.065
+        },
+        {
+            "name": "Kuşadası Kadınlar Denizi Sahil Plajı",
+            "lat": 37.842,
+            "lon": 27.242
+        }
+    ],
+    "Muğla": [
+        {
+            "name": "Muğla Menteşe Şehirlerarası Otobüs Terminali",
+            "lat": 37.205,
+            "lon": 28.375
+        },
+        {
+            "name": "Muğla Sıtkı Koçman Üniversitesi Kötekli Kampüsü",
+            "lat": 37.165,
+            "lon": 28.371
+        },
+        {
+            "name": "Bodrum Şehirlerarası Otogarı & Tarihi Bodrum Kalesi",
+            "lat": 37.038,
+            "lon": 27.428
+        },
+        {
+            "name": "Fethiye Şehirlerarası Otogarı & Ölüdeniz Belcekız Sahili",
+            "lat": 36.658,
+            "lon": 29.125
+        },
+        {
+            "name": "Marmaris Netsel Marina & Kordon Boyu Sahil Parkı",
+            "lat": 36.852,
+            "lon": 28.272
+        },
+        {
+            "name": "Datça Tarihi İskele Kordonu & Knidos Antik Kenti Yolu",
+            "lat": 36.725,
+            "lon": 27.685
+        },
+        {
+            "name": "Akyaka Azmak Çayı & Gökova Körfezi Kordonu",
+            "lat": 37.055,
+            "lon": 28.328
+        },
+        {
+            "name": "Köyceğiz Gölü Kordonu & Kaunos Kral Mezarları (Dalyan)",
+            "lat": 36.968,
+            "lon": 28.692
+        },
+        {
+            "name": "Milas Tarihi Baltalı Kapı & Gümüşkesen Mezar Anıtı",
+            "lat": 37.315,
+            "lon": 27.782
+        },
+        {
+            "name": "Dalaman Havalimanı Dış Hatlar Terminali Yolu",
+            "lat": 36.715,
+            "lon": 28.795
+        },
+        {
+            "name": "Yatağan Tarihi Stratonikeia Antik Kenti Girişi",
+            "lat": 37.312,
+            "lon": 28.065
+        }
+    ],
+    "Manisa": [
+        {
+            "name": "Manisa Büyükşehir Şehirlerarası Otobüs Terminali",
+            "lat": 38.618,
+            "lon": 27.428
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Tarihi Hükümet Konağı",
+            "lat": 38.612,
+            "lon": 27.425
+        },
+        {
+            "name": "Tarihi Sultan Camii & Mesir Macunu Külliyesi",
+            "lat": 38.615,
+            "lon": 27.435
+        },
+        {
+            "name": "Manisa Celal Bayar Üniversitesi Şehit Prof. Dr. İlhan Varank Kampüsü",
+            "lat": 38.675,
+            "lon": 27.312
+        },
+        {
+            "name": "Spil Dağı Milli Parkı Girişi & Niobe Ağlayan Kaya",
+            "lat": 38.585,
+            "lon": 27.438
+        },
+        {
+            "name": "Tarihi Muradiye Camii & Mimar Sinan Meydanı",
+            "lat": 38.614,
+            "lon": 27.429
+        },
+        {
+            "name": "Salihli Otogarı & Tarihi Sardes Antik Kenti (Lidya)",
+            "lat": 38.482,
+            "lon": 28.135
+        },
+        {
+            "name": "Akhisar Şehirlerarası Otogarı & Tarihi Tepe Mezarlığı",
+            "lat": 38.922,
+            "lon": 27.842
+        },
+        {
+            "name": "Turgutlu Şehir Meydanı & Irlamaz Vadisi Parkı",
+            "lat": 38.498,
+            "lon": 27.702
+        },
+        {
+            "name": "Alaşehir Tarihi Philadelphia Kiliseleri Ören Yeri",
+            "lat": 38.352,
+            "lon": 28.518
+        }
+    ],
+    "Yalova": [
+        {
+            "name": "Yalova Şehirlerarası Otobüs Terminali & İDO İskelesi",
+            "lat": 40.655,
+            "lon": 29.278
+        },
+        {
+            "name": "15 Temmuz Demokrasi ve Cumhuriyet Meydanı",
+            "lat": 40.658,
+            "lon": 29.272
+        },
+        {
+            "name": "Yalova Üniversitesi Merkez Kampüsü",
+            "lat": 40.648,
+            "lon": 29.355
+        },
+        {
+            "name": "Yürüyen Köşk Sahil Parkı & Kordonboyu",
+            "lat": 40.661,
+            "lon": 29.295
+        },
+        {
+            "name": "Termal Tarihi Kaplıcalar & Atatürk Köşkü",
+            "lat": 40.612,
+            "lon": 29.172
+        },
+        {
+            "name": "Çınarcık Sahil Kordonu & Taşliman Plajı",
+            "lat": 40.642,
+            "lon": 29.125
+        },
+        {
+            "name": "Armutlu Kaplıcaları & Tatil Köyü İskelesi",
+            "lat": 40.525,
+            "lon": 28.828
+        },
+        {
+            "name": "Karaca Arboretumu Canlı Ağaç Müzesi (Samanlı)",
+            "lat": 40.638,
+            "lon": 29.235
+        }
+    ],
+    "Bilecik": [
+        {
+            "name": "Bilecik Şehirlerarası Otobüs Terminali",
+            "lat": 40.142,
+            "lon": 29.982
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Tarihi Saat Kulesi",
+            "lat": 40.145,
+            "lon": 29.979
+        },
+        {
+            "name": "Bilecik Şeyh Edebali Üniversitesi Kampüsü",
+            "lat": 40.198,
+            "lon": 29.965
+        },
+        {
+            "name": "Şeyh Edebali Türbesi & Tarihi Orhan Gazi Camii",
+            "lat": 40.138,
+            "lon": 29.988
+        },
+        {
+            "name": "Bozüyük Şehirlerarası Otogarı & Metristepe Zafer Anıtı Yolu",
+            "lat": 39.908,
+            "lon": 30.038
+        },
+        {
+            "name": "Söğüt Tarihi Ertuğrul Gazi Türbesi & Kuyulu Mescit",
+            "lat": 40.018,
+            "lon": 30.182
+        },
+        {
+            "name": "Osmaneli Tarihi Konakları & Sakarya Nehri Kıyısı",
+            "lat": 40.358,
+            "lon": 30.015
+        },
+        {
+            "name": "Pazaryeri Küçükelmalı Tabiat Parkı Göleti",
+            "lat": 39.992,
+            "lon": 29.905
+        }
+    ],
+    "Bolu": [
+        {
+            "name": "Bolu Şehirlerarası Otobüs Terminali",
+            "lat": 40.738,
+            "lon": 31.625
+        },
+        {
+            "name": "İzzet Baysal Caddesi & Valilik Kent Meydanı",
+            "lat": 40.735,
+            "lon": 31.608
+        },
+        {
+            "name": "Bolu Abant İzzet Baysal Üniversitesi Gölköy Kampüsü",
+            "lat": 40.712,
+            "lon": 31.528
+        },
+        {
+            "name": "Abant Gölü Milli Parkı Giriş Nizamiyesi",
+            "lat": 40.605,
+            "lon": 31.282
+        },
+        {
+            "name": "Gölcük Tabiat Parkı & Devlet Konukevi",
+            "lat": 40.655,
+            "lon": 31.628
+        },
+        {
+            "name": "Yedigöller Milli Parkı Giriş Aksı",
+            "lat": 40.942,
+            "lon": 31.745
+        },
+        {
+            "name": "Tarihi Mudurnu Konakları & Saat Kulesi",
+            "lat": 40.465,
+            "lon": 31.215
+        },
+        {
+            "name": "Göynük Tarihi Zafer Kulesi & Akşemseddin Türbesi",
+            "lat": 40.398,
+            "lon": 30.785
+        },
+        {
+            "name": "Kartalkaya Kayak Tesisleri Köroğlu Dağ Yolu",
+            "lat": 40.585,
+            "lon": 31.795
+        }
+    ],
+    "Düzce": [
+        {
+            "name": "Düzce Şehirlerarası Otobüs Terminali",
+            "lat": 40.835,
+            "lon": 31.175
+        },
+        {
+            "name": "Anıtpark Meydanı & Tarihi Valilik Binası",
+            "lat": 40.842,
+            "lon": 31.161
+        },
+        {
+            "name": "Düzce Üniversitesi Konuralp Yerleşkesi",
+            "lat": 40.902,
+            "lon": 31.178
+        },
+        {
+            "name": "Prusias ad Hypium Antik Kenti & Roma Tiyatrosu (Konuralp)",
+            "lat": 40.905,
+            "lon": 31.152
+        },
+        {
+            "name": "Akçakoca Sahil Parkı & Tarihi Ceneviz Kalesi",
+            "lat": 41.085,
+            "lon": 31.115
+        },
+        {
+            "name": "Samandere Şelalesi Tabiat Anıtı Yolu",
+            "lat": 40.718,
+            "lon": 31.265
+        },
+        {
+            "name": "Güzeldere Şelalesi Tabiat Parkı (Gölyaka)",
+            "lat": 40.738,
+            "lon": 31.025
+        },
+        {
+            "name": "Topuk Yaylası Göleti & Spor Tesisleri Yolu",
+            "lat": 40.675,
+            "lon": 31.332
+        }
+    ],
+    "Kütahya": [
+        {
+            "name": "Kütahya Şehirlerarası Otobüs Terminali",
+            "lat": 39.418,
+            "lon": 29.992
+        },
+        {
+            "name": "Zafer Meydanı & Tarihi Çinili Vazo",
+            "lat": 39.421,
+            "lon": 29.983
+        },
+        {
+            "name": "Kütahya Dumlupınar Üniversitesi Evliya Çelebi Kampüsü",
+            "lat": 39.482,
+            "lon": 29.895
+        },
+        {
+            "name": "Tarihi Kütahya Kalesi & Döner Gazino Seyir Tepesi",
+            "lat": 39.415,
+            "lon": 29.972
+        },
+        {
+            "name": "Çinili Cami & Tarihi Germiyan Sokağı Konakları",
+            "lat": 39.423,
+            "lon": 29.986
+        },
+        {
+            "name": "Aizanoi Antik Kenti & Zeus Tapınağı (Çavdarhisar)",
+            "lat": 39.202,
+            "lon": 29.615
+        },
+        {
+            "name": "Ilıca Harlek Termal Turizm Merkezi",
+            "lat": 39.552,
+            "lon": 30.085
+        },
+        {
+            "name": "Tavşanlı Şehirlerarası Otogarı & Göbel Termal",
+            "lat": 39.548,
+            "lon": 29.495
+        },
+        {
+            "name": "Simav Eynal Kaplıcaları & Doğa Parkı",
+            "lat": 39.115,
+            "lon": 28.988
+        }
+    ],
+    "Uşak": [
+        {
+            "name": "Uşak Şehirlerarası Otobüs Terminali",
+            "lat": 38.675,
+            "lon": 29.418
+        },
+        {
+            "name": "Tiritoğlu Parkı & Tarihi Hükümet Konağı Meydanı",
+            "lat": 38.678,
+            "lon": 29.405
+        },
+        {
+            "name": "Uşak Üniversitesi 1 Eylül Kampüsü",
+            "lat": 38.685,
+            "lon": 29.338
+        },
+        {
+            "name": "Uşak Arkeoloji Müzesi & Karun Hazineleri",
+            "lat": 38.672,
+            "lon": 29.402
+        },
+        {
+            "name": "Ulubey Kanyonları & Cam Seyir Terası",
+            "lat": 38.418,
+            "lon": 29.288
+        },
+        {
+            "name": "Tarihi Clandras Köprüsü & Su Kemeri (Karahallı)",
+            "lat": 38.358,
+            "lon": 29.505
+        },
+        {
+            "name": "Blaundus Antik Kenti Ören Yeri",
+            "lat": 38.348,
+            "lon": 29.235
+        },
+        {
+            "name": "Banaz Şehirlerarası Otogarı & Hamamboğazı Termal",
+            "lat": 38.742,
+            "lon": 29.755
+        },
+        {
+            "name": "Atapark Kültür ve Dinlenme Parkı",
+            "lat": 38.681,
+            "lon": 29.395
+        }
+    ],
+    "Kayseri": [
+        {
+            "name": "Kayseri Şehirlerarası Otobüs Terminali",
+            "lat": 38.745,
+            "lon": 35.438
+        },
+        {
+            "name": "Tarihi Cumhuriyet Meydanı & Kayseri Kalesi",
+            "lat": 38.722,
+            "lon": 35.487
+        },
+        {
+            "name": "Erciyes Dağı Kayak Merkezi & Tekir Kapı",
+            "lat": 38.542,
+            "lon": 35.518
+        },
+        {
+            "name": "Erciyes Üniversitesi Merkez Kampüsü",
+            "lat": 38.705,
+            "lon": 35.528
+        },
+        {
+            "name": "Tarihi Hunat Hatun Külliyesi & Kapalıçarşı Bedesten",
+            "lat": 38.721,
+            "lon": 35.491
+        },
+        {
+            "name": "Talas Tarihi Rum Evleri & Yaman Dede Konağı",
+            "lat": 38.688,
+            "lon": 35.552
+        },
+        {
+            "name": "Kayseri Kadir Has Şehir Stadyumu",
+            "lat": 38.742,
+            "lon": 35.425
+        },
+        {
+            "name": "Anadolu Harikalar Diyarı & Hayvanat Bahçesi",
+            "lat": 38.755,
+            "lon": 35.582
+        },
+        {
+            "name": "Mazakaland Eğlence Dünyası & Kumsmall AVM",
+            "lat": 38.768,
+            "lon": 35.378
+        },
+        {
+            "name": "Develi İlçe Otogarı & Aşık Seyrani Meydanı",
+            "lat": 38.388,
+            "lon": 35.492
+        },
+        {
+            "name": "İncesu Tarihi Merzifonlu Kara Mustafa Paşa Kervansarayı",
+            "lat": 38.635,
+            "lon": 35.185
+        },
+        {
+            "name": "Kayseri Havalimanı İç-Dış Hatlar Terminali",
+            "lat": 38.768,
+            "lon": 35.492
+        }
+    ],
+    "Sivas": [
+        {
+            "name": "Sivas Şehirlerarası Otobüs Terminali",
+            "lat": 39.738,
+            "lon": 37.038
+        },
+        {
+            "name": "Tarihi Hükümet Meydanı & Valilik Binası",
+            "lat": 39.7505,
+            "lon": 37.0165
+        },
+        {
+            "name": "Tarihi Çifte Minareli Medrese & Buruciye Medresesi",
+            "lat": 39.7485,
+            "lon": 37.015
+        },
+        {
+            "name": "Sivas Atatürk Kongre ve Etnografya Müzesi",
+            "lat": 39.7515,
+            "lon": 37.014
+        },
+        {
+            "name": "Sivas Cumhuriyet Üniversitesi Merkez Kampüsü",
+            "lat": 39.705,
+            "lon": 37.028
+        },
+        {
+            "name": "Tarihi Gök Medrese & Selçuklu Parkı",
+            "lat": 39.742,
+            "lon": 37.012
+        },
+        {
+            "name": "Paşabahçe Mesire Alanı & Hobbit Evleri",
+            "lat": 39.782,
+            "lon": 37.055
+        },
+        {
+            "name": "Divriği Ulu Cami ve Darüşşifası Yolu (UNESCO)",
+            "lat": 39.372,
+            "lon": 38.125
+        },
+        {
+            "name": "Kangal Balıklı Kaplıcaları Şifa Merkezi Yolu",
+            "lat": 39.128,
+            "lon": 37.455
+        },
+        {
+            "name": "Sıcak Çermik Termal Turizm Merkezi",
+            "lat": 39.865,
+            "lon": 36.785
+        }
+    ],
+    "Aksaray": [
+        {
+            "name": "Aksaray Şehirlerarası Otobüs Terminali",
+            "lat": 38.375,
+            "lon": 33.998
+        },
+        {
+            "name": "15 Temmuz Milli İrade Meydanı & Vilayet Önü",
+            "lat": 38.371,
+            "lon": 34.028
+        },
+        {
+            "name": "Aksaray Üniversitesi Merkez Kampüsü",
+            "lat": 38.388,
+            "lon": 33.935
+        },
+        {
+            "name": "Tarihi Eğri Minare (Kızıl Minare) Camii",
+            "lat": 38.368,
+            "lon": 34.035
+        },
+        {
+            "name": "Ihlara Vadisi Milli Parkı Giriş Nizamiyesi",
+            "lat": 38.238,
+            "lon": 34.302
+        },
+        {
+            "name": "Tarihi Sultanhanı Kervansarayı & İpekyolu Çarşısı",
+            "lat": 38.245,
+            "lon": 33.545
+        },
+        {
+            "name": "Somuncu Baba Türbesi & Külliyesi Kanyonu",
+            "lat": 38.345,
+            "lon": 34.055
+        },
+        {
+            "name": "Hasan Dağı Kış Sporları & Mesire Alanı Yolu",
+            "lat": 38.132,
+            "lon": 34.168
+        }
+    ],
+    "Karaman": [
+        {
+            "name": "Karaman Şehirlerarası Otobüs Terminali",
+            "lat": 37.195,
+            "lon": 33.242
+        },
+        {
+            "name": "Aktekke Kent Meydanı & Mader-i Mevlana Camii",
+            "lat": 37.181,
+            "lon": 33.218
+        },
+        {
+            "name": "Karamanoğlu Mehmetbey Üniversitesi Kampüsü",
+            "lat": 37.165,
+            "lon": 33.185
+        },
+        {
+            "name": "Tarihi Karaman Kalesi & Şehir Müzesi",
+            "lat": 37.185,
+            "lon": 33.212
+        },
+        {
+            "name": "Tarihi Hatuniye Medresesi & Taş Medrese Parkı",
+            "lat": 37.182,
+            "lon": 33.215
+        },
+        {
+            "name": "Taşkale Tarihi Tahıl Ambarları & Manazan Mağaraları",
+            "lat": 37.158,
+            "lon": 33.618
+        },
+        {
+            "name": "Ermenek Turkuaz Baraj Gölü & Tarihi Kalesi",
+            "lat": 36.635,
+            "lon": 32.895
+        },
+        {
+            "name": "Karadağ Binbirkilise Tarihi Ören Yeri",
+            "lat": 37.405,
+            "lon": 33.155
+        }
+    ],
+    "Kırıkkale": [
+        {
+            "name": "Kırıkkale Şehirlerarası Otobüs Terminali",
+            "lat": 39.852,
+            "lon": 33.518
+        },
+        {
+            "name": "Cumhuriyet Meydanı & MKE Fabrikaları Girişi",
+            "lat": 39.845,
+            "lon": 33.508
+        },
+        {
+            "name": "Kırıkkale Üniversitesi Yahşihan Merkez Kampüsü",
+            "lat": 39.878,
+            "lon": 33.452
+        },
+        {
+            "name": "MKE Silah Sanayi Müzesi & Kent Park",
+            "lat": 39.848,
+            "lon": 33.512
+        },
+        {
+            "name": "Tarihi Çeşnigir Köprüsü & Kanyonu (Keskin)",
+            "lat": 39.605,
+            "lon": 33.418
+        },
+        {
+            "name": "Tarihi Taş Mektep & Hacı Taşan Kültür Merkezi (Keskin)",
+            "lat": 39.672,
+            "lon": 33.585
+        },
+        {
+            "name": "Tarihi Hasandede Türbesi & Seyir Terası",
+            "lat": 39.735,
+            "lon": 33.512
+        },
+        {
+            "name": "Yahşihan Tren Garı & Kızılırmak Boyu Yürüyüş Yolu",
+            "lat": 39.855,
+            "lon": 33.435
+        }
+    ],
+    "Kırşehir": [
+        {
+            "name": "Kırşehir Şehirlerarası Otobüs Terminali",
+            "lat": 39.155,
+            "lon": 34.175
+        },
+        {
+            "name": "Cacabey Meydanı & Tarihi Cacabey Medresesi (Gözlemevi)",
+            "lat": 39.145,
+            "lon": 34.161
+        },
+        {
+            "name": "Kırşehir Ahi Evran Üniversitesi Bağbaşı Kampüsü",
+            "lat": 39.122,
+            "lon": 34.185
+        },
+        {
+            "name": "Tarihi Ahi Evran Külliyesi & Camii Meydanı",
+            "lat": 39.142,
+            "lon": 34.158
+        },
+        {
+            "name": "Neşet Ertaş Gönül Sultanları Kültür Evi",
+            "lat": 39.148,
+            "lon": 34.164
+        },
+        {
+            "name": "Kentpark Ahi Çarşısı & Yapay Gölet",
+            "lat": 39.138,
+            "lon": 34.152
+        },
+        {
+            "name": "Kaman Kalehöyük Arkeoloji Müzesi & Japon Bahçesi",
+            "lat": 39.352,
+            "lon": 33.785
+        },
+        {
+            "name": "Mucur Seyfe Gölü Kuş Cenneti Yolu",
+            "lat": 39.198,
+            "lon": 34.412
+        }
+    ],
+    "Nevşehir": [
+        {
+            "name": "Nevşehir Şehirlerarası Otobüs Terminali",
+            "lat": 38.648,
+            "lon": 34.728
+        },
+        {
+            "name": "Hükümet Konağı & Damat İbrahim Paşa Külliyesi",
+            "lat": 38.625,
+            "lon": 34.715
+        },
+        {
+            "name": "Nevşehir Hacı Bektaş Veli Üniversitesi Merkez Kampüsü",
+            "lat": 38.665,
+            "lon": 34.745
+        },
+        {
+            "name": "Tarihi Kayaşehir & Nevşehir Kalesi Meydanı",
+            "lat": 38.628,
+            "lon": 34.708
+        },
+        {
+            "name": "Göreme Açık Hava Müzesi & Peri Bacaları Parkı",
+            "lat": 38.642,
+            "lon": 34.829
+        },
+        {
+            "name": "Uçhisar Kalesi Zirvesi & Seyir Terası",
+            "lat": 38.631,
+            "lon": 34.805
+        },
+        {
+            "name": "Ürgüp Üç Güzeller Peri Bacaları & Asmalı Konak",
+            "lat": 38.632,
+            "lon": 34.912
+        },
+        {
+            "name": "Avanos Kızılırmak Sallanan Asma Köprüsü & Çömlekçiler",
+            "lat": 38.718,
+            "lon": 34.845
+        },
+        {
+            "name": "Hacıbektaş Veli Dergâhı Müzesi & Çilehane",
+            "lat": 38.945,
+            "lon": 34.562
+        }
+    ],
+    "Niğde": [
+        {
+            "name": "Niğde Şehirlerarası Otobüs Terminali",
+            "lat": 37.975,
+            "lon": 34.695
+        },
+        {
+            "name": "Hükümet Meydanı & Tarihi Niğde Kalesi Saat Kulesi",
+            "lat": 37.968,
+            "lon": 34.678
+        },
+        {
+            "name": "Niğde Ömer Halisdemir Üniversitesi Merkez Kampüsü",
+            "lat": 37.925,
+            "lon": 34.632
+        },
+        {
+            "name": "Tarihi Alaeddin Camii & Sungurbey Camii",
+            "lat": 37.965,
+            "lon": 34.675
+        },
+        {
+            "name": "Gümüşler Manastırı & Kaya Kiliseleri (Gümüşler)",
+            "lat": 38.005,
+            "lon": 34.765
+        },
+        {
+            "name": "Aladağlar Milli Parkı & Demirkazık Dağ Evi Yolu",
+            "lat": 37.852,
+            "lon": 35.085
+        },
+        {
+            "name": "Çamardı Vadisi & Emli Kanyonu Girişi",
+            "lat": 37.832,
+            "lon": 35.012
+        },
+        {
+            "name": "Bor Tarihi Paşa Camii & Eski Bedesten Çarşısı",
+            "lat": 37.892,
+            "lon": 34.558
+        }
+    ],
+    "Yozgat": [
+        {
+            "name": "Yozgat Şehirlerarası Otobüs Terminali",
+            "lat": 39.815,
+            "lon": 34.825
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Tarihi Saat Kulesi",
+            "lat": 39.821,
+            "lon": 34.808
+        },
+        {
+            "name": "Yozgat Bozok Üniversitesi Erdoğan Akdağ Kampüsü",
+            "lat": 39.792,
+            "lon": 34.785
+        },
+        {
+            "name": "Yozgat Çamlığı Milli Parkı Girişi & Seyir Terası",
+            "lat": 39.812,
+            "lon": 34.802
+        },
+        {
+            "name": "Tarihi Çapanoğlu (Büyük) Camii & Külliyesi",
+            "lat": 39.823,
+            "lon": 34.811
+        },
+        {
+            "name": "Sorgun Şehirlerarası Otogarı & Jeotermal Kaplıcalar",
+            "lat": 39.812,
+            "lon": 35.185
+        },
+        {
+            "name": "Sarıkaya Tarihi Basilica Therma Roma Hamamı",
+            "lat": 39.495,
+            "lon": 35.378
+        },
+        {
+            "name": "Akdağmadeni Tarihi Kilise & Yayla Ormanları",
+            "lat": 39.661,
+            "lon": 35.885
+        }
+    ],
+    "Çankırı": [
+        {
+            "name": "Çankırı Şehirlerarası Otobüs Terminali",
+            "lat": 40.598,
+            "lon": 33.625
+        },
+        {
+            "name": "Belediye Meydanı & Tarihi Çankırı Kalesi",
+            "lat": 40.605,
+            "lon": 33.618
+        },
+        {
+            "name": "Çankırı Karatekin Üniversitesi Uluyazı Kampüsü",
+            "lat": 40.642,
+            "lon": 33.655
+        },
+        {
+            "name": "Tarihi Yer Altı Tuz Şehri (Tuz Mağarası) Girişi",
+            "lat": 40.528,
+            "lon": 33.785
+        },
+        {
+            "name": "Tarihi Taş Mescit (Darüşşifa ve İmarathane)",
+            "lat": 40.608,
+            "lon": 33.612
+        },
+        {
+            "name": "Çankırı Tren Garı & İstasyon Caddesi",
+            "lat": 40.595,
+            "lon": 33.621
+        },
+        {
+            "name": "Ilgaz Dağı Kayak Tesisleri Çankırı Doruk Girişi",
+            "lat": 41.065,
+            "lon": 33.742
+        },
+        {
+            "name": "Çerkeş Tarihi Muradın Kervansarayı & Meydanı",
+            "lat": 40.812,
+            "lon": 32.892
+        }
+    ],
+    "Trabzon": [
+        {
+            "name": "Trabzon Şehirlerarası Otobüs Terminali (Yeni Değirmendere)",
+            "lat": 41.001,
+            "lon": 39.752
+        },
+        {
+            "name": "Tarihi Atatürk Alanı & Meydan Parkı",
+            "lat": 41.0055,
+            "lon": 39.7285
+        },
+        {
+            "name": "Karadeniz Teknik Üniversitesi (KTÜ) Kanuni Kampüsü",
+            "lat": 40.995,
+            "lon": 39.778
+        },
+        {
+            "name": "Tarihi Ayasofya Camii Müzesi & Sahil Parkı",
+            "lat": 41.002,
+            "lon": 39.695
+        },
+        {
+            "name": "Sümela Manastırı Giriş Kapısı & Altındere Vadisi (Maçka)",
+            "lat": 40.69,
+            "lon": 39.658
+        },
+        {
+            "name": "Trabzon Kalesi & Zağnos Vadisi Parkı",
+            "lat": 41.004,
+            "lon": 39.718
+        },
+        {
+            "name": "Akçaabat Sahil Parkı & Meşhur Köfteciler Aksı",
+            "lat": 41.022,
+            "lon": 39.572
+        },
+        {
+            "name": "Boztepe Seyir Terası & Tarihi Çay Bahçesi",
+            "lat": 40.998,
+            "lon": 39.731
+        },
+        {
+            "name": "Uzungöl Tabiat Parkı Kordonu & Seyir Terası (Çaykara)",
+            "lat": 40.618,
+            "lon": 40.292
+        },
+        {
+            "name": "Yomra Sahil Dolgu Parkı & Cevahir AVM",
+            "lat": 40.958,
+            "lon": 39.855
+        },
+        {
+            "name": "Of İlçe Meydanı & Tarihi Taşhan Pazarı",
+            "lat": 40.942,
+            "lon": 40.265
+        },
+        {
+            "name": "Trabzon Havalimanı Dış Hatlar Terminali",
+            "lat": 40.995,
+            "lon": 39.789
+        }
+    ],
+    "Samsun": [
+        {
+            "name": "Samsun Şehirlerarası Otobüs Terminali (Saftaş Yusuf Ziya Yılmaz)",
+            "lat": 41.272,
+            "lon": 36.325
+        },
+        {
+            "name": "Tarihi Bandırma Vapuru ve Milli Mücadele Açık Hava Müzesi",
+            "lat": 41.285,
+            "lon": 36.375
+        },
+        {
+            "name": "Atakum Sahil Şeridi & Çobanlı İskelesi",
+            "lat": 41.332,
+            "lon": 36.275
+        },
+        {
+            "name": "Ondokuz Mayıs Üniversitesi (OMÜ) Kurupelit Kampüsü",
+            "lat": 41.365,
+            "lon": 36.195
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Tarihi Onur Anıtı",
+            "lat": 41.289,
+            "lon": 36.3365
+        },
+        {
+            "name": "Sevgi Gölü & Amisos Tepesi Teleferik Alt İstasyonu",
+            "lat": 41.305,
+            "lon": 36.332
+        },
+        {
+            "name": "Doğu Park & Mert Irmağı Balıkçı Barınakları",
+            "lat": 41.285,
+            "lon": 36.358
+        },
+        {
+            "name": "Batı Park & Amazon Köyü Heykeli",
+            "lat": 41.312,
+            "lon": 36.321
+        },
+        {
+            "name": "Bafra Şehirlerarası Otogarı & Tarihi Çetinkaya Köprüsü",
+            "lat": 41.568,
+            "lon": 35.908
+        },
+        {
+            "name": "Çarşamba Tarihi Göğceli Ahşap Camii Aksı",
+            "lat": 41.198,
+            "lon": 36.725
+        },
+        {
+            "name": "Tekkeköy Arkeoloji Vadisi & Mağaraları",
+            "lat": 41.215,
+            "lon": 36.452
+        },
+        {
+            "name": "Havza Kaplıcaları & Atatürk Evi Müzesi",
+            "lat": 40.978,
+            "lon": 35.658
+        }
+    ],
+    "Ordu": [
+        {
+            "name": "Ordu Şehirlerarası Otobüs Terminali",
+            "lat": 40.985,
+            "lon": 37.892
+        },
+        {
+            "name": "Boztepe Teleferik Alt İstasyonu & Sahil Parkı",
+            "lat": 40.988,
+            "lon": 37.878
+        },
+        {
+            "name": "Tarihi Taşbaşı Mahallesi & Kültür Merkezi",
+            "lat": 40.991,
+            "lon": 37.872
+        },
+        {
+            "name": "Ordu Üniversitesi Cumhuriyet Kampüsü",
+            "lat": 40.965,
+            "lon": 37.955
+        },
+        {
+            "name": "Atatürk Parkı & Rıhtım Kordonu",
+            "lat": 40.986,
+            "lon": 37.882
+        },
+        {
+            "name": "Ünye Tarihi Çakırtepe & Yaşayan Kale",
+            "lat": 41.128,
+            "lon": 37.285
+        },
+        {
+            "name": "Fatsa Sahil Kordonu & Çerkezler Tepesi",
+            "lat": 41.028,
+            "lon": 37.498
+        },
+        {
+            "name": "Perşembe Yason Burnu Feneri & Yarımadası",
+            "lat": 41.135,
+            "lon": 37.682
+        },
+        {
+            "name": "Çambaşı Yaylası Kayak Merkezi Yolu (Kabadüz)",
+            "lat": 40.648,
+            "lon": 37.955
+        }
+    ],
+    "Rize": [
+        {
+            "name": "Rize Şehirlerarası Otobüs Terminali",
+            "lat": 41.025,
+            "lon": 40.538
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Çay Çarşısı Dev Çay Bardağı Kulesi",
+            "lat": 41.028,
+            "lon": 40.518
+        },
+        {
+            "name": "Recep Tayyip Erdoğan Üniversitesi Zihni Derin Kampüsü",
+            "lat": 41.041,
+            "lon": 40.495
+        },
+        {
+            "name": "Tarihi Rize Kalesi & Botanik Çay Bahçesi",
+            "lat": 41.022,
+            "lon": 40.512
+        },
+        {
+            "name": "Ayder Yaylası Kaplıcalar & Milli Park Girişi (Çamlıhemşin)",
+            "lat": 40.952,
+            "lon": 41.098
+        },
+        {
+            "name": "Fırtına Deresi Tarihi Kemer Köprüleri & Rafting Parkuru",
+            "lat": 41.085,
+            "lon": 41.012
+        },
+        {
+            "name": "Tarihi Zilkale & Palovit Şelalesi Tabiat Parkı Yolu",
+            "lat": 40.902,
+            "lon": 40.965
+        },
+        {
+            "name": "Ardeşen Sahil Parkı & Fırtına Vadisi Ağzı",
+            "lat": 41.192,
+            "lon": 40.988
+        },
+        {
+            "name": "Çayeli Haremtepe (Çeçeva) Çay Tarlaları Girişi",
+            "lat": 41.085,
+            "lon": 40.725
+        }
+    ],
+    "Giresun": [
+        {
+            "name": "Giresun Şehirlerarası Otobüs Terminali",
+            "lat": 40.915,
+            "lon": 38.375
+        },
+        {
+            "name": "Tarihi Giresun Kalesi & Seyir Terası",
+            "lat": 40.921,
+            "lon": 38.391
+        },
+        {
+            "name": "Giresun Liman Meydanı & Sahil Parkı",
+            "lat": 40.918,
+            "lon": 38.388
+        },
+        {
+            "name": "Giresun Üniversitesi Güre Yerleşkesi",
+            "lat": 40.912,
+            "lon": 38.455
+        },
+        {
+            "name": "Tarihi Zeytinlik Mahallesi & Konakları",
+            "lat": 40.917,
+            "lon": 38.394
+        },
+        {
+            "name": "Kümbet Yaylası & Koçkayası Tabiat Parkı Yolu",
+            "lat": 40.558,
+            "lon": 38.442
+        },
+        {
+            "name": "Giresun Adası Tekne İskelesi & Sahil Kordonu",
+            "lat": 40.925,
+            "lon": 38.405
+        },
+        {
+            "name": "Bulancak Sahil Kordonu & Tarihi İskele",
+            "lat": 40.938,
+            "lon": 38.228
+        },
+        {
+            "name": "Tirebolu Kalesi & Sahil Doğal Plajları",
+            "lat": 41.008,
+            "lon": 38.815
+        }
+    ],
+    "Artvin": [
+        {
+            "name": "Artvin Şehirlerarası Otobüs Terminali",
+            "lat": 41.178,
+            "lon": 41.821
+        },
+        {
+            "name": "Çok Katlı Otopark Üstü Meydan & Tarihi Artvin Kalesi",
+            "lat": 41.182,
+            "lon": 41.819
+        },
+        {
+            "name": "Artvin Çoruh Üniversitesi Seyitler Merkez Kampüsü",
+            "lat": 41.198,
+            "lon": 41.835
+        },
+        {
+            "name": "Dünyanın En Büyük Atatürk Heykeli & Atatepe Seyir Alanı",
+            "lat": 41.168,
+            "lon": 41.828
+        },
+        {
+            "name": "Kafkasör Yaylası & Boğa Güreşleri Festival Alanı",
+            "lat": 41.155,
+            "lon": 41.775
+        },
+        {
+            "name": "Borçka Karagöl Tabiat Parkı Girişi",
+            "lat": 41.365,
+            "lon": 41.855
+        },
+        {
+            "name": "Hopa Otogarı & Karadeniz Sahil Yolu Sarp Sınır Girişi",
+            "lat": 41.395,
+            "lon": 41.425
+        },
+        {
+            "name": "Şavşat Karagöl & Sahara Milli Parkı Yolu",
+            "lat": 41.242,
+            "lon": 42.365
+        }
+    ],
+    "Bartın": [
+        {
+            "name": "Bartın Şehirlerarası Otobüs Terminali",
+            "lat": 41.632,
+            "lon": 32.342
+        },
+        {
+            "name": "Hükümet Caddesi & Tarihi Şadırvan Meydanı",
+            "lat": 41.638,
+            "lon": 32.338
+        },
+        {
+            "name": "Bartın Üniversitesi Ağdacı ve Kutlubey Kampüsü",
+            "lat": 41.615,
+            "lon": 32.285
+        },
+        {
+            "name": "Tarihi Amasra Kalesi & Boztepe Kemere Köprüsü",
+            "lat": 41.748,
+            "lon": 32.385
+        },
+        {
+            "name": "Amasra Küçük Liman & Tarihi Çekiciler Çarşısı",
+            "lat": 41.745,
+            "lon": 32.388
+        },
+        {
+            "name": "İnkumu Sahil Kordonu & Karadeniz Plajı",
+            "lat": 41.675,
+            "lon": 32.225
+        },
+        {
+            "name": "Çakraz Sahili & Doğa Parkı Koyu",
+            "lat": 41.782,
+            "lon": 32.482
+        },
+        {
+            "name": "Küre Dağları Milli Parkı Giriş Kapısı (Ulus)",
+            "lat": 41.605,
+            "lon": 32.655
+        }
+    ],
+    "Karabük": [
+        {
+            "name": "Karabük Şehirlerarası Otobüs Terminali",
+            "lat": 41.205,
+            "lon": 32.632
+        },
+        {
+            "name": "Kent Meydanı & KARDEMİR Demir Çelik Fabrikaları Girişi",
+            "lat": 41.201,
+            "lon": 32.628
+        },
+        {
+            "name": "Karabük Üniversitesi Demir Çelik Kampüsü",
+            "lat": 41.218,
+            "lon": 32.655
+        },
+        {
+            "name": "Tarihi Safranbolu Çarşısı & Kazdağlıoğlu Meydanı",
+            "lat": 41.245,
+            "lon": 32.695
+        },
+        {
+            "name": "Safranbolu Hıdırlık Tepesi Seyir Alanı & Cinci Hanı",
+            "lat": 41.242,
+            "lon": 32.692
+        },
+        {
+            "name": "Tarihi İncekaya Su Kemeri & Kristal Cam Teras (Tokatlı)",
+            "lat": 41.275,
+            "lon": 32.685
+        },
+        {
+            "name": "Yenice Ormanları & Şeker Kanyonu Girişi",
+            "lat": 41.202,
+            "lon": 32.335
+        },
+        {
+            "name": "Eskipazar Tarihi Hadrianapolis Antik Kenti",
+            "lat": 40.952,
+            "lon": 32.535
+        }
+    ],
+    "Zonguldak": [
+        {
+            "name": "Zonguldak 100. Yıl Şehirlerarası Otobüs Terminali",
+            "lat": 41.455,
+            "lon": 31.785
+        },
+        {
+            "name": "Madenci Anıtı & Gazipaşa Caddesi Meydanı",
+            "lat": 41.458,
+            "lon": 31.792
+        },
+        {
+            "name": "Zonguldak Bülent Ecevit Üniversitesi Farabi Kampüsü",
+            "lat": 41.445,
+            "lon": 31.765
+        },
+        {
+            "name": "Maden Müzesi & Eğitim Ocağı Tesisleri",
+            "lat": 41.442,
+            "lon": 31.795
+        },
+        {
+            "name": "Kozlu Sahil Parkı & Liman Yolu",
+            "lat": 41.432,
+            "lon": 31.745
+        },
+        {
+            "name": "Karadeniz Ereğli Çınaraltı Meydanı & Sahil Kordonu",
+            "lat": 41.282,
+            "lon": 31.425
+        },
+        {
+            "name": "Cehennemağzı Mağaraları Tabiat Alanı (Kdz. Ereğli)",
+            "lat": 41.278,
+            "lon": 31.438
+        },
+        {
+            "name": "Filyos Tarihi Tios Antik Kenti & Sahil Parkı",
+            "lat": 41.565,
+            "lon": 32.025
+        }
+    ],
+    "Kastamonu": [
+        {
+            "name": "Kastamonu Şehirlerarası Otobüs Terminali",
+            "lat": 41.378,
+            "lon": 33.785
+        },
+        {
+            "name": "Nasrullah Meydanı & Tarihi Nasrullah Camii Şadırvanı",
+            "lat": 41.3755,
+            "lon": 33.774
+        },
+        {
+            "name": "Tarihi Kastamonu Kalesi & Saat Kulesi Tepesi",
+            "lat": 41.3785,
+            "lon": 33.7765
+        },
+        {
+            "name": "Kastamonu Üniversitesi Kuzeykent Kampüsü",
+            "lat": 41.418,
+            "lon": 33.765
+        },
+        {
+            "name": "Şerife Bacı Anıtı & Cumhuriyet Meydanı",
+            "lat": 41.3765,
+            "lon": 33.778
+        },
+        {
+            "name": "Vedat Tek Kültür Merkezi & Türkiye'nin İlk Şapka Müzesi",
+            "lat": 41.365,
+            "lon": 33.768
+        },
+        {
+            "name": "Ilgaz Dağı Milli Parkı & Yurduntepe Kayak Tesisleri",
+            "lat": 41.075,
+            "lon": 33.738
+        },
+        {
+            "name": "Tosya Otogarı & Tarihi Pirinç Çarşısı",
+            "lat": 41.018,
+            "lon": 34.038
+        },
+        {
+            "name": "İnebolu Tarihi Liman & Türk Ocağı Binası Kordonu",
+            "lat": 41.975,
+            "lon": 33.762
+        }
+    ],
+    "Sinop": [
+        {
+            "name": "Sinop Şehirlerarası Otobüs Terminali",
+            "lat": 42.018,
+            "lon": 35.138
+        },
+        {
+            "name": "Hükümet Meydanı & Tarihi Saat Kulesi",
+            "lat": 42.025,
+            "lon": 35.152
+        },
+        {
+            "name": "Sinop Üniversitesi Seyit Bilal Kampüsü",
+            "lat": 42.032,
+            "lon": 35.112
+        },
+        {
+            "name": "Tarihi Tarihi Sinop Kapalı Cezaevi & Kalesi",
+            "lat": 42.024,
+            "lon": 35.148
+        },
+        {
+            "name": "İnceburun Deniz Feneri (Türkiye'nin En Kuzey Ucu)",
+            "lat": 42.098,
+            "lon": 34.945
+        },
+        {
+            "name": "Hamsilos Koyu Fiyordu & Akliman Sahil Parkı",
+            "lat": 42.058,
+            "lon": 35.045
+        },
+        {
+            "name": "Erfelek Tatlıca Şelaleleri Tabiat Parkı Girişi",
+            "lat": 41.875,
+            "lon": 34.912
+        },
+        {
+            "name": "Boyabat Tarihi Kalesi & Tarihi Konaklar Çarşısı",
+            "lat": 41.468,
+            "lon": 34.768
+        }
+    ],
+    "Çorum": [
+        {
+            "name": "Çorum Şehirlerarası Otobüs Terminali",
+            "lat": 40.542,
+            "lon": 34.965
+        },
+        {
+            "name": "Hürriyet Meydanı & Tarihi Saat Kulesi",
+            "lat": 40.551,
+            "lon": 34.954
+        },
+        {
+            "name": "Hitit Üniversitesi Kuzey Kampüsü",
+            "lat": 40.582,
+            "lon": 34.938
+        },
+        {
+            "name": "Tarihi Ulu Cami & Çorum Arkeoloji Müzesi",
+            "lat": 40.548,
+            "lon": 34.952
+        },
+        {
+            "name": "Boğazkale Hattuşa Hitit Başkenti Ören Yeri (UNESCO)",
+            "lat": 40.018,
+            "lon": 34.615
+        },
+        {
+            "name": "Alacahöyük Arkeolojik Alanı & Sfenksli Kapı",
+            "lat": 40.235,
+            "lon": 34.698
+        },
+        {
+            "name": "İncesu Kanyonu & Kibele Kabartması Yolu",
+            "lat": 40.358,
+            "lon": 35.215
+        },
+        {
+            "name": "Osmancık Tarihi Koyunbaba Köprüsü & Kandiber Kalesi",
+            "lat": 40.975,
+            "lon": 34.802
+        },
+        {
+            "name": "İskilip Tarihi Kalesi & Arasta Çarşısı",
+            "lat": 40.738,
+            "lon": 34.475
+        }
+    ],
+    "Tokat": [
+        {
+            "name": "Tokat Şehirlerarası Otobüs Terminali",
+            "lat": 40.328,
+            "lon": 36.562
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Tarihi Saat Kulesi",
+            "lat": 40.318,
+            "lon": 36.554
+        },
+        {
+            "name": "Tokat Gaziosmanpaşa Üniversitesi Taşlıçiftlik Kampüsü",
+            "lat": 40.335,
+            "lon": 36.485
+        },
+        {
+            "name": "Tarihi Tokat Kalesi & Sulusokak Konakları",
+            "lat": 40.315,
+            "lon": 36.549
+        },
+        {
+            "name": "Tarihi Ali Paşa Camii & Taşhan Çarşısı",
+            "lat": 40.317,
+            "lon": 36.552
+        },
+        {
+            "name": "Ballıca Mağarası Tabiat Parkı Girişi (Pazar)",
+            "lat": 40.235,
+            "lon": 36.302
+        },
+        {
+            "name": "Zile Tarihi Kalesi & Sezar Amfi Tiyatrosu",
+            "lat": 40.302,
+            "lon": 35.885
+        },
+        {
+            "name": "Niksar Tarihi Çamiçi Yaylası & Niksar Kalesi",
+            "lat": 40.592,
+            "lon": 36.952
+        },
+        {
+            "name": "Erbaa Şehir Meydanı & Horoztepe Tarihi Parkı",
+            "lat": 40.678,
+            "lon": 36.568
+        }
+    ],
+    "Gümüşhane": [
+        {
+            "name": "Gümüşhane Şehirlerarası Otobüs Terminali",
+            "lat": 40.458,
+            "lon": 39.485
+        },
+        {
+            "name": "Zafer Meydanı & Tarihi Hükümet Caddesi",
+            "lat": 40.461,
+            "lon": 39.479
+        },
+        {
+            "name": "Gümüşhane Üniversitesi Bağlarbaşı Kampüsü",
+            "lat": 40.442,
+            "lon": 39.502
+        },
+        {
+            "name": "Tarihi Süleymaniye (Eski Gümüşhane) Mahallesi",
+            "lat": 40.448,
+            "lon": 39.445
+        },
+        {
+            "name": "Karaca Mağarası Tabiat Parkı Girişi (Torul)",
+            "lat": 40.552,
+            "lon": 39.395
+        },
+        {
+            "name": "Torul Kalesi & Cam Seyir Terası",
+            "lat": 40.562,
+            "lon": 39.292
+        },
+        {
+            "name": "Tomara Şelalesi Tabiat Parkı Girişi (Şiran)",
+            "lat": 40.165,
+            "lon": 39.025
+        },
+        {
+            "name": "Santa Harabeleri Tarihi Dumanlı Köyü Aksı",
+            "lat": 40.685,
+            "lon": 39.758
+        }
+    ],
+    "Bayburt": [
+        {
+            "name": "Bayburt Şehirlerarası Otobüs Terminali",
+            "lat": 40.252,
+            "lon": 40.235
+        },
+        {
+            "name": "Saat Kulesi Meydanı & Tarihi Bayburt Kalesi",
+            "lat": 40.258,
+            "lon": 40.224
+        },
+        {
+            "name": "Bayburt Üniversitesi Dede Korkut Kampüsü",
+            "lat": 40.245,
+            "lon": 40.212
+        },
+        {
+            "name": "Baksı Müzesi (Bayraktar Köyü)",
+            "lat": 40.395,
+            "lon": 40.095
+        },
+        {
+            "name": "Kenan Yavuz Etnografya Müzesi (Beşpınar)",
+            "lat": 40.185,
+            "lon": 40.065
+        },
+        {
+            "name": "Çoruh Nehri Kordon Boyu Parkı",
+            "lat": 40.256,
+            "lon": 40.228
+        },
+        {
+            "name": "Aydıntepe Tarihi Yeraltı Şehri Meydanı",
+            "lat": 40.388,
+            "lon": 40.155
+        }
+    ],
+    "Mersin": [
+        {
+            "name": "MEŞOT - Mersin Şehirlerarası Otobüs Terminali",
+            "lat": 36.828,
+            "lon": 34.642
+        },
+        {
+            "name": "Mersin Marina & Sahil Kordon Parkı",
+            "lat": 36.775,
+            "lon": 34.575
+        },
+        {
+            "name": "Atatürk Parkı & Tarihi Liman İskelesi",
+            "lat": 36.798,
+            "lon": 34.632
+        },
+        {
+            "name": "Mersin Üniversitesi Çiftlikköy Kampüsü",
+            "lat": 36.785,
+            "lon": 34.525
+        },
+        {
+            "name": "Forum Mersin & Pozcu Meydanı",
+            "lat": 36.792,
+            "lon": 34.598
+        },
+        {
+            "name": "Tarihi Kızkalesi Sahili & Deniz Kalesi (Erdemli)",
+            "lat": 36.462,
+            "lon": 34.148
+        },
+        {
+            "name": "Tarsus Tarihi Eshab-ı Kehf & Nusret Mayın Gemisi Parkı",
+            "lat": 36.918,
+            "lon": 34.895
+        },
+        {
+            "name": "Cennet-Cehennem Obrukları & Narlıkuyu Koyu (Silifke)",
+            "lat": 36.452,
+            "lon": 34.108
+        },
+        {
+            "name": "Silifke Şehirlerarası Otogarı & Tarihi Taşköprü",
+            "lat": 36.378,
+            "lon": 33.928
+        },
+        {
+            "name": "Anamur Tarihi Mamure Kalesi Sahili",
+            "lat": 36.078,
+            "lon": 32.885
+        },
+        {
+            "name": "Çukurova Uluslararası Havalimanı Girişi",
+            "lat": 36.905,
+            "lon": 35.065
+        }
+    ],
+    "Hatay": [
+        {
+            "name": "Hatay Şehirlerarası Otobüs Terminali (Antakya)",
+            "lat": 36.228,
+            "lon": 36.175
+        },
+        {
+            "name": "Tarihi Habib-i Neccar Camii & Kurtuluş Caddesi",
+            "lat": 36.204,
+            "lon": 36.162
+        },
+        {
+            "name": "Tarihi Antakya Sokakları & Eski Uzun Çarşı",
+            "lat": 36.202,
+            "lon": 36.159
+        },
+        {
+            "name": "Hatay Arkeoloji ve Mozaik Müzesi",
+            "lat": 36.221,
+            "lon": 36.165
+        },
+        {
+            "name": "Harbiye Şelaleleri Mesire ve Dinlenme Alanı",
+            "lat": 36.132,
+            "lon": 36.142
+        },
+        {
+            "name": "Hatay Mustafa Kemal Üniversitesi Tayfur Sökmen Kampüsü",
+            "lat": 36.328,
+            "lon": 36.195
+        },
+        {
+            "name": "İskenderun Sahil Kordonu & Anıt Meydanı",
+            "lat": 36.588,
+            "lon": 36.172
+        },
+        {
+            "name": "İskenderun Otogarı & Liman Girişi",
+            "lat": 36.575,
+            "lon": 36.165
+        },
+        {
+            "name": "Samandağ Titus Tüneli & Beşikli Mağara Ören Yeri",
+            "lat": 36.122,
+            "lon": 35.928
+        },
+        {
+            "name": "Belen Geçidi Tarihi Kervansaray & Seyir Noktası",
+            "lat": 36.488,
+            "lon": 36.225
+        }
+    ],
+    "Isparta": [
+        {
+            "name": "Isparta Şehirlerarası Otobüs Terminali",
+            "lat": 37.778,
+            "lon": 30.565
+        },
+        {
+            "name": "Tarihi Hükümet Konağı & Gül Heykeli Meydanı",
+            "lat": 37.765,
+            "lon": 30.556
+        },
+        {
+            "name": "Süleyman Demirel Üniversitesi Doğu Kampüsü",
+            "lat": 37.832,
+            "lon": 30.532
+        },
+        {
+            "name": "Tarihi Firdevs Bey Bedesteni & Mimar Sinan Camii",
+            "lat": 37.7635,
+            "lon": 30.5545
+        },
+        {
+            "name": "Gökçay Mesire Alanı & Halı Kilim Etnografya Müzesi",
+            "lat": 37.748,
+            "lon": 30.542
+        },
+        {
+            "name": "Eğirdir Gölü Sahil Kordonu & Dündar Bey Medresesi",
+            "lat": 37.875,
+            "lon": 30.852
+        },
+        {
+            "name": "Eğirdir Yeşilada & Akpınar Seyir Tepesi",
+            "lat": 37.885,
+            "lon": 30.865
+        },
+        {
+            "name": "Davraz Dağı Kayak Tesisleri Zirve Yolu",
+            "lat": 37.785,
+            "lon": 30.755
+        },
+        {
+            "name": "Kuyucak Lavanta Kokulu Köy Girişi (Keçiborlu)",
+            "lat": 37.955,
+            "lon": 30.345
+        }
+    ],
+    "Burdur": [
+        {
+            "name": "Burdur Şehirlerarası Otobüs Terminali",
+            "lat": 37.725,
+            "lon": 30.292
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Burdur Saat Kulesi",
+            "lat": 37.718,
+            "lon": 30.285
+        },
+        {
+            "name": "Burdur Mehmet Akif Ersoy Üniversitesi İstiklal Kampüsü",
+            "lat": 37.665,
+            "lon": 30.328
+        },
+        {
+            "name": "Tarihi Burdur Arkeoloji Müzesi & Taş Oda Konağı",
+            "lat": 37.721,
+            "lon": 30.288
+        },
+        {
+            "name": "Salda Gölü Beyaz Adalar Tabiat Parkı (Yeşilova)",
+            "lat": 37.552,
+            "lon": 29.682
+        },
+        {
+            "name": "Burdur Gölü Sahil Şeridi & Kuş Gözlem Evi",
+            "lat": 37.738,
+            "lon": 30.265
+        },
+        {
+            "name": "Sagalassos Antik Kenti & Antoninler Çeşmesi (Ağlasun)",
+            "lat": 37.678,
+            "lon": 30.525
+        },
+        {
+            "name": "İnsuyu Mağarası Tabiat Parkı Girişi",
+            "lat": 37.652,
+            "lon": 30.365
+        }
+    ],
+    "Osmaniye": [
+        {
+            "name": "Osmaniye Şehirlerarası Otobüs Terminali",
+            "lat": 37.078,
+            "lon": 36.235
+        },
+        {
+            "name": "Devlet Bahçeli Meydanı & Tarihi Saat Kulesi",
+            "lat": 37.072,
+            "lon": 36.248
+        },
+        {
+            "name": "Osmaniye Korkut Ata Üniversitesi Karacaoğlan Kampüsü",
+            "lat": 37.042,
+            "lon": 36.218
+        },
+        {
+            "name": "Kastabala (Hierapolis) Antik Kenti & Sütunlu Cadde",
+            "lat": 37.178,
+            "lon": 36.185
+        },
+        {
+            "name": "Tarihi Toprakkale Kalesi & Parkı",
+            "lat": 37.065,
+            "lon": 36.145
+        },
+        {
+            "name": "Karatepe-Aslantaş Milli Parkı & Açık Hava Müzesi (Kadirli)",
+            "lat": 37.288,
+            "lon": 36.245
+        },
+        {
+            "name": "Kadirli Şehir Meydanı & Tarihi Ala Cami (Flaviapolis)",
+            "lat": 37.375,
+            "lon": 36.095
+        },
+        {
+            "name": "Zorkun Yaylası Çam Ormanları Giriş Kapısı",
+            "lat": 36.955,
+            "lon": 36.358
+        }
+    ],
+    "Kahramanmaraş": [
+        {
+            "name": "Kahramanmaraş Şehirlerarası Otobüs Terminali",
+            "lat": 37.568,
+            "lon": 36.945
+        },
+        {
+            "name": "Tarihi Maraş Kalesi & Ulu Cami Meydanı",
+            "lat": 37.585,
+            "lon": 36.928
+        },
+        {
+            "name": "Tarihi Demirciler & Bakırcılar Çarşısı (Kapalı Çarşı)",
+            "lat": 37.584,
+            "lon": 36.9295
+        },
+        {
+            "name": "Kahramanmaraş Sütçü İmam Üniversitesi Avşar Kampüsü",
+            "lat": 37.592,
+            "lon": 36.825
+        },
+        {
+            "name": "Trabzon Caddesi & Valilik Kent Meydanı",
+            "lat": 37.575,
+            "lon": 36.932
+        },
+        {
+            "name": "Menzelet Barajı Mesire Alanı & Ali Kayası Seyir Terası",
+            "lat": 37.675,
+            "lon": 36.845
+        },
+        {
+            "name": "Yedikuyular Kayak Merkezi & Kış Sporları Tesisleri",
+            "lat": 37.642,
+            "lon": 37.045
+        },
+        {
+            "name": "Afşin Eshab-ı Kehf Külliyesi & Tarihi Mağara",
+            "lat": 38.245,
+            "lon": 36.915
+        },
+        {
+            "name": "Elbistan Şehirlerarası Otogarı & Ceyhan Nehri Kaynağı",
+            "lat": 38.205,
+            "lon": 37.195
+        },
+        {
+            "name": "Göksun Şehir Meydanı & Berit Dağı Yolu",
+            "lat": 38.021,
+            "lon": 36.495
+        }
+    ],
+    "Gaziantep": [
+        {
+            "name": "GATAŞ - Gaziantep Şehirlerarası Otobüs Terminali",
+            "lat": 37.085,
+            "lon": 37.382
+        },
+        {
+            "name": "Tarihi Gaziantep Kalesi & Bakırcılar Çarşısı",
+            "lat": 37.066,
+            "lon": 37.383
+        },
+        {
+            "name": "Zeugma Mozaik Müzesi & İpekyolu Bulvarı",
+            "lat": 37.075,
+            "lon": 37.385
+        },
+        {
+            "name": "Gaziantep Üniversitesi Şehitkamil Merkez Kampüsü",
+            "lat": 37.035,
+            "lon": 37.312
+        },
+        {
+            "name": "Masal Parkı & Tramvay İstasyonu",
+            "lat": 37.068,
+            "lon": 37.355
+        },
+        {
+            "name": "100. Yıl Atatürk Kültür Parkı & Kavaklık",
+            "lat": 37.058,
+            "lon": 37.362
+        },
+        {
+            "name": "Tarihi Şahinbey Milli Mücadele Müzesi & Savaş Mağaraları",
+            "lat": 37.0585,
+            "lon": 37.381
+        },
+        {
+            "name": "Dülükbaba Tabiat Parkı & Antik Kenti (Mitras Tapınağı)",
+            "lat": 37.122,
+            "lon": 37.365
+        },
+        {
+            "name": "Hasan Kalyoncu Üniversitesi Kampüsü",
+            "lat": 37.018,
+            "lon": 37.458
+        },
+        {
+            "name": "Nizip Otogarı & Fırat Nehri Zeugma Antik Kenti İskelesi",
+            "lat": 37.012,
+            "lon": 37.795
+        },
+        {
+            "name": "Şehitkamil Sanat Merkezi & Alleben Göleti Parkı",
+            "lat": 37.042,
+            "lon": 37.295
+        },
+        {
+            "name": "Gaziantep Havalimanı İç-Dış Hatlar Girişi",
+            "lat": 36.948,
+            "lon": 37.478
+        }
+    ],
+    "Şanlıurfa": [
+        {
+            "name": "Şanlıurfa Şehirlerarası Otobüs Terminali",
+            "lat": 37.185,
+            "lon": 38.795
+        },
+        {
+            "name": "Tarihi Balıklıgöl (Halil-ür Rahman) Platosu & Aynzeliha Gölü",
+            "lat": 37.148,
+            "lon": 38.785
+        },
+        {
+            "name": "Göbeklitepe UNESCO Ören Yeri & Ziyaretçi Karşılama Merkezi",
+            "lat": 37.223,
+            "lon": 38.922
+        },
+        {
+            "name": "Şanlıurfa Arkeoloji Müzesi & Haleplibahçe Mozaikleri",
+            "lat": 37.155,
+            "lon": 38.782
+        },
+        {
+            "name": "Harran Üniversitesi Osmanbey Kampüsü",
+            "lat": 37.172,
+            "lon": 39.015
+        },
+        {
+            "name": "Tarihi Harran Kümbet Evleri & Dünyanın İlk İslam Üniversitesi",
+            "lat": 36.862,
+            "lon": 39.028
+        },
+        {
+            "name": "Tarihi Urfa Kalesi & Çifte Hanlar Bedesteni",
+            "lat": 37.145,
+            "lon": 38.784
+        },
+        {
+            "name": "Abide Kavşağı & Atatürk Bulvarı Meydanı",
+            "lat": 37.165,
+            "lon": 38.798
+        },
+        {
+            "name": "Karaköprü GAP Vadisi Parkı & Su Oyunları",
+            "lat": 37.205,
+            "lon": 38.795
+        },
+        {
+            "name": "Birecik Kelaynak Üretim İstasyonu & Fırat Köprüsü",
+            "lat": 37.025,
+            "lon": 37.978
+        },
+        {
+            "name": "Siverek Tarihi Paşa Konağı & Şehir Parkı",
+            "lat": 37.755,
+            "lon": 39.318
+        }
+    ],
+    "Diyarbakır": [
+        {
+            "name": "DİŞTİ - Diyarbakır Şehirlerarası Otobüs Terminali",
+            "lat": 37.915,
+            "lon": 40.165
+        },
+        {
+            "name": "Tarihi Dağkapı Meydanı & Şeyh Said Bulvarı",
+            "lat": 37.9155,
+            "lon": 40.2355
+        },
+        {
+            "name": "Diyarbakır Tarihi Surları & Mardin Kapı",
+            "lat": 37.905,
+            "lon": 40.238
+        },
+        {
+            "name": "Tarihi On Gözlü Köprü & Hevsel Bahçeleri Seyir Alanı",
+            "lat": 37.892,
+            "lon": 40.242
+        },
+        {
+            "name": "Dicle Üniversitesi Kampüsü & Tıp Fakültesi Hastanesi",
+            "lat": 37.935,
+            "lon": 40.278
+        },
+        {
+            "name": "Tarihi Ulu Cami & Hasan Paşa Hanı (Suriçi)",
+            "lat": 37.9125,
+            "lon": 40.237
+        },
+        {
+            "name": "Ofis Semti & Ekinciler Caddesi Sanat Sokağı",
+            "lat": 37.918,
+            "lon": 40.218
+        },
+        {
+            "name": "Anıt Park & Diyarbakır Valilik Meydanı",
+            "lat": 37.916,
+            "lon": 40.225
+        },
+        {
+            "name": "Kayapınar 75 Metrelik Yol & Park Orman",
+            "lat": 37.945,
+            "lon": 40.155
+        },
+        {
+            "name": "Ergani Şehir Otogarı & Tarihi Hilar Mağaraları (Çayönü)",
+            "lat": 38.268,
+            "lon": 39.765
+        },
+        {
+            "name": "Silvan Malabadi Köprüsü Aksı & Tarihi Kalesi",
+            "lat": 38.142,
+            "lon": 41.012
+        },
+        {
+            "name": "Suriçi Dört Ayaklı Minare & Şeyh Mutahhar Camii",
+            "lat": 37.911,
+            "lon": 40.2395
+        }
+    ],
+    "Mardin": [
+        {
+            "name": "Mardin Şehirlerarası Otobüs Terminali (Yenişehir)",
+            "lat": 37.318,
+            "lon": 40.715
+        },
+        {
+            "name": "Eski Mardin Birinci Cadde & Cumhuriyet Meydanı",
+            "lat": 37.313,
+            "lon": 40.742
+        },
+        {
+            "name": "Tarihi Mardin Kalesi (Kartal Yuvası) Seyir Terası",
+            "lat": 37.319,
+            "lon": 40.738
+        },
+        {
+            "name": "Tarihi Kasımiye Medresesi & Mezopotamya Ovası Manzarası",
+            "lat": 37.308,
+            "lon": 40.722
+        },
+        {
+            "name": "Mardin Artuklu Üniversitesi Kampüsü",
+            "lat": 37.345,
+            "lon": 40.665
+        },
+        {
+            "name": "Tarihi Zinciriye (Sultan İsa) Medresesi & Ulu Cami",
+            "lat": 37.3155,
+            "lon": 40.7405
+        },
+        {
+            "name": "Tarihi Deyrulzafaran Süryani Manastırı Girişi",
+            "lat": 37.298,
+            "lon": 40.792
+        },
+        {
+            "name": "Dara Antik Kenti & Tarihi Su Sarnıçları (Zindan)",
+            "lat": 37.182,
+            "lon": 40.955
+        },
+        {
+            "name": "Midyat Tarihi Konukevi (Sıla Konağı) & Telkâriciler Çarşısı",
+            "lat": 37.418,
+            "lon": 41.342
+        }
+    ],
+    "Batman": [
+        {
+            "name": "BŞOT - Batman Şehirlerarası Otobüs Terminali",
+            "lat": 37.895,
+            "lon": 41.148
+        },
+        {
+            "name": "Turgut Özal Bulvarı & Batman Valiliği Kent Meydanı",
+            "lat": 37.885,
+            "lon": 41.131
+        },
+        {
+            "name": "Batman Üniversitesi Batı Raman Merkez Kampüsü",
+            "lat": 37.812,
+            "lon": 41.055
+        },
+        {
+            "name": "Tarihi Hasankeyf Kalesi & Yeni Arkeopark / Zeynel Bey Türbesi",
+            "lat": 37.712,
+            "lon": 41.415
+        },
+        {
+            "name": "Hasankeyf Ilısu Baraj Gölü Tekne İskelesi & Kordon",
+            "lat": 37.718,
+            "lon": 41.421
+        },
+        {
+            "name": "Tarihi Malabadi Köprüsü Batman Mesire Parkı",
+            "lat": 38.152,
+            "lon": 41.202
+        },
+        {
+            "name": "Kozluk Tarihi Hezo Kalesi & Çarşı Meydanı",
+            "lat": 38.188,
+            "lon": 41.488
+        },
+        {
+            "name": "Kozluk Ayngebire Şelalesi & Doğa Dinlenme Parkı",
+            "lat": 38.225,
+            "lon": 41.512
+        }
+    ],
+    "Siirt": [
+        {
+            "name": "Siirt Şehirlerarası Otobüs Terminali",
+            "lat": 37.935,
+            "lon": 41.928
+        },
+        {
+            "name": "Güres Caddesi & Tarihi Hükümet Meydanı",
+            "lat": 37.928,
+            "lon": 41.942
+        },
+        {
+            "name": "Siirt Üniversitesi Kezer Merkez Kampüsü",
+            "lat": 37.975,
+            "lon": 41.848
+        },
+        {
+            "name": "Tarihi Siirt Ulu Cami & Çinili Minare",
+            "lat": 37.9265,
+            "lon": 41.948
+        },
+        {
+            "name": "Tarihi Veysel Karani Türbesi & Külliyesi (Baykan)",
+            "lat": 38.155,
+            "lon": 41.775
+        },
+        {
+            "name": "Tillo (Aydınlar) İbrahim Hakkı Hazretleri Işık Hadisesi Türbesi",
+            "lat": 37.955,
+            "lon": 42.012
+        },
+        {
+            "name": "Rasıl Hacar (Deliklitaş) Botan Kanyonu Cam Seyir Terası",
+            "lat": 37.895,
+            "lon": 41.958
+        },
+        {
+            "name": "Şirvan Tarihi Küfre Kalesi & Bakır Madeni Aksı",
+            "lat": 38.062,
+            "lon": 42.025
+        }
+    ],
+    "Şırnak": [
+        {
+            "name": "Şırnak Şehirlerarası Otobüs Terminali",
+            "lat": 37.525,
+            "lon": 42.448
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Tarihi Şırnak Şehir Parkı",
+            "lat": 37.518,
+            "lon": 42.456
+        },
+        {
+            "name": "Şırnak Üniversitesi Merkez Kampüsü",
+            "lat": 37.545,
+            "lon": 42.418
+        },
+        {
+            "name": "Cizre Tarihi Kırmızı Medrese & Ulu Cami",
+            "lat": 37.328,
+            "lon": 42.185
+        },
+        {
+            "name": "Cizre Hz. Nuh (A.S.) Türbesi & Mem-û Zîn Türbesi",
+            "lat": 37.325,
+            "lon": 42.188
+        },
+        {
+            "name": "Tarihi Kasrik Boğazı Tabiat Parkı & Kral Kaya Rölyefi",
+            "lat": 37.458,
+            "lon": 42.275
+        },
+        {
+            "name": "Silopi Habur Sınır Kapısı İpekyolu Aksı",
+            "lat": 37.165,
+            "lon": 42.572
+        },
+        {
+            "name": "Cudi Dağı Sefine Zirvesi Yolu Girişi",
+            "lat": 37.395,
+            "lon": 42.485
+        }
+    ],
+    "Hakkâri": [
+        {
+            "name": "Hakkâri Şehirlerarası Otobüs Terminali",
+            "lat": 37.578,
+            "lon": 43.735
+        },
+        {
+            "name": "Bulvar Caddesi & Valilik Kent Meydanı",
+            "lat": 37.574,
+            "lon": 43.741
+        },
+        {
+            "name": "Hakkâri Üniversitesi Zeynel Bey Kampüsü",
+            "lat": 37.565,
+            "lon": 43.765
+        },
+        {
+            "name": "Tarihi Meydan Medresesi & Biçer Mahallesi",
+            "lat": 37.572,
+            "lon": 43.738
+        },
+        {
+            "name": "Merga Bütan Kayak Merkezi (2800m Rakım Tesisleri)",
+            "lat": 37.575,
+            "lon": 43.642
+        },
+        {
+            "name": "Zap Vadisi & Tarihi Taş Köprü",
+            "lat": 37.548,
+            "lon": 43.725
+        },
+        {
+            "name": "Yüksekova Şehirlerarası Otogarı & İpekyolu Caddesi",
+            "lat": 37.572,
+            "lon": 44.285
+        },
+        {
+            "name": "Çukurca Tarihi Taş Evler & Emir Şaban Camii",
+            "lat": 37.248,
+            "lon": 43.612
+        }
+    ],
+    "Kilis": [
+        {
+            "name": "Kilis Şehirlerarası Otobüs Terminali",
+            "lat": 36.722,
+            "lon": 37.118
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Tarihi Hükümet Konağı",
+            "lat": 36.716,
+            "lon": 37.115
+        },
+        {
+            "name": "Kilis 7 Aralık Üniversitesi Merkez Kampüsü",
+            "lat": 36.702,
+            "lon": 37.098
+        },
+        {
+            "name": "Tarihi Ravanda Kalesi & Afrin Çayı Vadisi",
+            "lat": 36.875,
+            "lon": 36.985
+        },
+        {
+            "name": "Tarihi Salih Efendi Sokağı & Kilis Eski Konakları",
+            "lat": 36.714,
+            "lon": 37.118
+        },
+        {
+            "name": "Söğütlüdere Mesire Alanı & Akpınar Parkı",
+            "lat": 36.735,
+            "lon": 37.085
+        },
+        {
+            "name": "Öncüpınar Sınır Kapısı Karayolu Girişi",
+            "lat": 36.648,
+            "lon": 37.095
+        }
+    ],
+    "Malatya": [
+        {
+            "name": "MAŞTİ - Malatya Şehirlerarası Otobüs Terminali",
+            "lat": 38.355,
+            "lon": 38.258
+        },
+        {
+            "name": "Kanalboyu Caddesi & Kernek Şelalesi Meydanı",
+            "lat": 38.345,
+            "lon": 38.322
+        },
+        {
+            "name": "Tarihi Malatya Valiliği & Kapalıçarşı Meydanı",
+            "lat": 38.352,
+            "lon": 38.315
+        },
+        {
+            "name": "İnönü Üniversitesi Merkez Kampüsü",
+            "lat": 38.325,
+            "lon": 38.438
+        },
+        {
+            "name": "Battalgazi Tarihi Ulu Cami & Silahtar Mustafa Paşa Kervansarayı",
+            "lat": 38.421,
+            "lon": 38.365
+        },
+        {
+            "name": "Turgut Özal Tabiat Parkı & Mişmiş Park Göleti",
+            "lat": 38.338,
+            "lon": 38.412
+        },
+        {
+            "name": "Yeşilyurt Tarihi Konaklar & Lezzet Caddesi",
+            "lat": 38.298,
+            "lon": 38.245
+        },
+        {
+            "name": "Darende Somuncu Baba Külliyesi & Tohma Kanyonu",
+            "lat": 38.548,
+            "lon": 37.495
+        },
+        {
+            "name": "Arslantepe Arkeolojik Höyüğü (UNESCO Dünya Mirası)",
+            "lat": 38.381,
+            "lon": 38.362
+        }
+    ],
+    "Erzurum": [
+        {
+            "name": "Erzurum Şehirlerarası Otobüs Terminali",
+            "lat": 39.932,
+            "lon": 41.258
+        },
+        {
+            "name": "Tarihi Çifte Minareli Medrese & Erzurum Kalesi Meydanı",
+            "lat": 39.9055,
+            "lon": 41.278
+        },
+        {
+            "name": "Tarihi Yakutiye Medresesi & Kent Meydanı",
+            "lat": 39.9075,
+            "lon": 41.2725
+        },
+        {
+            "name": "Atatürk Üniversitesi Merkez Kampüsü Giriş Nizamiyesi",
+            "lat": 39.898,
+            "lon": 41.242
+        },
+        {
+            "name": "Palandöken Dağı Kayak Merkezi & Ejder 3200 Zirve Yolu",
+            "lat": 39.845,
+            "lon": 41.282
+        },
+        {
+            "name": "Tarihi Rüstem Paşa Bedesteni (Taşhan Oltu Taşı Çarşısı)",
+            "lat": 39.9085,
+            "lon": 41.276
+        },
+        {
+            "name": "Erzurum Tren Garı & İstasyon Meydanı",
+            "lat": 39.918,
+            "lon": 41.268
+        },
+        {
+            "name": "Tortum Şelalesi & Tabiat Parkı Yolu (Uzundere)",
+            "lat": 40.655,
+            "lon": 41.652
+        },
+        {
+            "name": "Tarihi Üç Kümbetler & Milli Mücadele Parkı",
+            "lat": 39.903,
+            "lon": 41.279
+        },
+        {
+            "name": "Aziziye Tabyaları Tarihi Parkı & Nene Hatun Anıtı",
+            "lat": 39.912,
+            "lon": 41.328
+        }
+    ],
+    "Van": [
+        {
+            "name": "Van Şehirlerarası Otobüs Terminali",
+            "lat": 38.515,
+            "lon": 43.372
+        },
+        {
+            "name": "Tarihi Van Kalesi & Urartu Kral Kaya Mezarları",
+            "lat": 38.502,
+            "lon": 43.342
+        },
+        {
+            "name": "Cumhuriyet Caddesi & Beşyol Meydanı",
+            "lat": 38.498,
+            "lon": 43.385
+        },
+        {
+            "name": "Van Yüzüncü Yıl Üniversitesi Zeve Kampüsü",
+            "lat": 38.578,
+            "lon": 43.288
+        },
+        {
+            "name": "Tarihi Akdamar Kilisesi Feribot İskelesi (Gevaş)",
+            "lat": 38.305,
+            "lon": 43.042
+        },
+        {
+            "name": "Edremit Sahil Kordonu & Kız Kalesi Seyir Terası",
+            "lat": 38.428,
+            "lon": 43.255
+        },
+        {
+            "name": "Van Kedisi Villası & Araştırma Merkezi",
+            "lat": 38.582,
+            "lon": 43.292
+        },
+        {
+            "name": "İskele Sahil Parkı & Van Gölü Feribot Yolu",
+            "lat": 38.528,
+            "lon": 43.332
+        },
+        {
+            "name": "Muradiye Şelalesi & Asma Köprü Doğa Parkı",
+            "lat": 39.048,
+            "lon": 43.755
+        },
+        {
+            "name": "Tarihi Hoşap Kalesi & Güzelsu Meydanı",
+            "lat": 38.318,
+            "lon": 43.802
+        }
+    ],
+    "Kars": [
+        {
+            "name": "Kars Şehirlerarası Otobüs Terminali",
+            "lat": 40.598,
+            "lon": 43.082
+        },
+        {
+            "name": "Tarihi Kars Kalesi & Taş Köprü",
+            "lat": 40.615,
+            "lon": 43.092
+        },
+        {
+            "name": "Fethiye Camii & Tarihi Baltık Mimarisi Caddeleri",
+            "lat": 40.608,
+            "lon": 43.098
+        },
+        {
+            "name": "Kafkas Üniversitesi Ahmet Arslan Kongre Merkezi",
+            "lat": 40.582,
+            "lon": 43.055
+        },
+        {
+            "name": "Tarihi Ani Ören Yeri (UNESCO Dünya Mirası)",
+            "lat": 40.512,
+            "lon": 43.572
+        },
+        {
+            "name": "Çıldır Gölü Sahil Parkı & Atlı Kızak İskelesi (Arpaçay)",
+            "lat": 41.055,
+            "lon": 43.312
+        },
+        {
+            "name": "Sarıkamış Kayak Merkezi & Tarihi Katerina Av Köşkü",
+            "lat": 40.328,
+            "lon": 42.595
+        },
+        {
+            "name": "Namık Kemal Evi & Ebu'l Hasan Harakani Türbesi",
+            "lat": 40.612,
+            "lon": 43.091
+        }
+    ],
+    "Ardahan": [
+        {
+            "name": "Ardahan Şehirlerarası Otobüs Terminali",
+            "lat": 41.112,
+            "lon": 42.705
+        },
+        {
+            "name": "Milli Egemenlik Parkı & Tarihi Ardahan Kalesi",
+            "lat": 41.118,
+            "lon": 42.701
+        },
+        {
+            "name": "Ardahan Üniversitesi Çamlıçatak Kampüsü",
+            "lat": 41.155,
+            "lon": 42.765
+        },
+        {
+            "name": "Çıldır Gölü Sahil Parkı & Akçakale Yarımadası",
+            "lat": 41.085,
+            "lon": 43.255
+        },
+        {
+            "name": "Şeytan Kalesi & Kura Vadisi Kanyonu (Çıldır)",
+            "lat": 41.162,
+            "lon": 43.148
+        },
+        {
+            "name": "Yalnızçam Kayak Merkezi Tesisleri",
+            "lat": 41.065,
+            "lon": 42.512
+        },
+        {
+            "name": "Göle İlçe Meydanı & Ormanları Yolu",
+            "lat": 40.785,
+            "lon": 42.565
+        }
+    ],
+    "Iğdır": [
+        {
+            "name": "Iğdır Şehirlerarası Otobüs Terminali",
+            "lat": 39.925,
+            "lon": 44.055
+        },
+        {
+            "name": "Zübeyde Hanım Bulvarı & Valilik Kent Meydanı",
+            "lat": 39.919,
+            "lon": 44.045
+        },
+        {
+            "name": "Iğdır Üniversitesi Şehit Bülent Yurtseven Kampüsü",
+            "lat": 39.948,
+            "lon": 44.112
+        },
+        {
+            "name": "Tuzluca Tarihi Tuz Mağaraları Terapi Merkezi",
+            "lat": 40.042,
+            "lon": 43.665
+        },
+        {
+            "name": "Ağrı Dağı Koruköy Tırmanış Başlangıç Parkuru",
+            "lat": 39.755,
+            "lon": 44.295
+        },
+        {
+            "name": "Tarihi Kervansaray (Harmandöven Köyü İpekyolu)",
+            "lat": 39.815,
+            "lon": 43.855
+        },
+        {
+            "name": "Karakoyunlu Tarihi Koç Başlı Mezar Taşları Açık Hava Müzesi",
+            "lat": 39.972,
+            "lon": 44.175
+        }
+    ],
+    "Muş": [
+        {
+            "name": "Muş Şehirlerarası Otobüs Terminali",
+            "lat": 38.742,
+            "lon": 41.512
+        },
+        {
+            "name": "Belediye Meydanı & Tarihi Hükümet Konağı",
+            "lat": 38.735,
+            "lon": 41.492
+        },
+        {
+            "name": "Muş Alparslan Üniversitesi Merkez Külliyesi",
+            "lat": 38.765,
+            "lon": 41.425
+        },
+        {
+            "name": "Tarihi Muş Kalesi & Tarihi Konaklar Parkı",
+            "lat": 38.732,
+            "lon": 41.488
+        },
+        {
+            "name": "Tarihi Murat Köprüsü & Rekreasyon Alanı",
+            "lat": 38.768,
+            "lon": 41.562
+        },
+        {
+            "name": "Malazgirt 1071 Meydan Muharebesi Tarihi Milli Parkı",
+            "lat": 39.145,
+            "lon": 42.545
+        },
+        {
+            "name": "Varto İlçe Meydanı & Hamurpet (Akdoğan) Gölü Yolu",
+            "lat": 39.175,
+            "lon": 41.455
+        },
+        {
+            "name": "Bulanık Bilican Dağları Aksı",
+            "lat": 38.945,
+            "lon": 42.275
+        }
+    ],
+    "Bitlis": [
+        {
+            "name": "Bitlis Şehirlerarası Otobüs Terminali",
+            "lat": 38.412,
+            "lon": 42.125
+        },
+        {
+            "name": "Tarihi Bitlis Kalesi & Beş Minare Meydanı",
+            "lat": 38.398,
+            "lon": 42.108
+        },
+        {
+            "name": "Bitlis Eren Üniversitesi Rahva Merkez Kampüsü",
+            "lat": 38.485,
+            "lon": 42.185
+        },
+        {
+            "name": "Tarihi İhlasiye Medresesi & Şerefiye Camii",
+            "lat": 38.3995,
+            "lon": 42.1095
+        },
+        {
+            "name": "Tarihi Ahlat Selçuklu Meydan Mezarlığı & Kümbetleri (UNESCO)",
+            "lat": 38.748,
+            "lon": 42.485
+        },
+        {
+            "name": "Tatvan Sahil Parkı & Van Gölü Feribot İskelesi",
+            "lat": 38.508,
+            "lon": 42.285
+        },
+        {
+            "name": "Nemrut Krater Gölü & Kalderası Tabiat Parkı Girişi",
+            "lat": 38.625,
+            "lon": 42.245
+        },
+        {
+            "name": "Adilcevaz Tarihi Sahil Kalesi & Urartu Kef Kalesi",
+            "lat": 38.805,
+            "lon": 42.735
+        }
+    ],
+    "Bingöl": [
+        {
+            "name": "Bingöl Şehirlerarası Otobüs Terminali",
+            "lat": 38.895,
+            "lon": 40.512
+        },
+        {
+            "name": "Genç Caddesi & Dörtyol Saat Kulesi Meydanı",
+            "lat": 38.885,
+            "lon": 40.495
+        },
+        {
+            "name": "Bingöl Üniversitesi Merkez Kampüsü",
+            "lat": 38.898,
+            "lon": 40.472
+        },
+        {
+            "name": "Yüzen Adalar Tabiat Anıtı (Solhan Hazarşah)",
+            "lat": 38.935,
+            "lon": 40.978
+        },
+        {
+            "name": "Haserek Kayak Merkezi & Kış Sporları Tesisleri",
+            "lat": 38.955,
+            "lon": 40.412
+        },
+        {
+            "name": "Tarihi Zağ Mağaraları & Peri Suyu Vadisi",
+            "lat": 39.012,
+            "lon": 40.655
+        },
+        {
+            "name": "Ilıcalar Kaplıcaları & Termal Turizm Merkezi",
+            "lat": 38.985,
+            "lon": 40.612
+        },
+        {
+            "name": "Genç Tarihi Sebeterias Kalesi & Murat Nehri Boyu",
+            "lat": 38.752,
+            "lon": 40.558
+        }
+    ],
+    "Tunceli": [
+        {
+            "name": "Tunceli Şehirlerarası Otobüs Terminali",
+            "lat": 39.112,
+            "lon": 39.552
+        },
+        {
+            "name": "Seyit Rıza Meydanı & Munzur Çayı Kıyısı Parkı",
+            "lat": 39.105,
+            "lon": 39.548
+        },
+        {
+            "name": "Munzur Üniversitesi Aktuluk Kampüsü",
+            "lat": 39.075,
+            "lon": 39.515
+        },
+        {
+            "name": "Munzur Vadisi Milli Parkı Giriş Nizamiyesi",
+            "lat": 39.155,
+            "lon": 39.465
+        },
+        {
+            "name": "Munzur Gözeleri Kutsal Su Kaynakları (Ovacık)",
+            "lat": 39.365,
+            "lon": 39.118
+        },
+        {
+            "name": "Ovacık Kayak Merkezi & Kış Sporları Parkuru",
+            "lat": 39.352,
+            "lon": 39.215
+        },
+        {
+            "name": "Pertek Kalesi & Keban Barajı Feribot İskelesi",
+            "lat": 38.865,
+            "lon": 39.325
+        },
+        {
+            "name": "Nazımiye Düzgün Baba Dağı ve Ziyaretgâhı",
+            "lat": 39.145,
+            "lon": 39.912
+        }
+    ],
+    "Elazığ": [
+        {
+            "name": "Elazığ Şehirlerarası Otobüs Terminali",
+            "lat": 38.665,
+            "lon": 39.245
+        },
+        {
+            "name": "Gazi Caddesi & 15 Temmuz Demokrasi Meydanı",
+            "lat": 38.675,
+            "lon": 39.222
+        },
+        {
+            "name": "Fırat Üniversitesi Merkez Kampüsü",
+            "lat": 38.678,
+            "lon": 39.198
+        },
+        {
+            "name": "Tarihi Harput Kalesi & Harput Ulu Cami (Eğri Minare)",
+            "lat": 38.705,
+            "lon": 39.255
+        },
+        {
+            "name": "Harput Şefik Gül Kültür Evi & Balakgazi Parkı",
+            "lat": 38.702,
+            "lon": 39.251
+        },
+        {
+            "name": "Hazar Gölü Sahil Parkı & Plajları (Sivrice)",
+            "lat": 38.455,
+            "lon": 39.312
+        },
+        {
+            "name": "Keban Barajı & Su Ürünleri Dinlenme Tesisleri",
+            "lat": 38.795,
+            "lon": 38.755
+        },
+        {
+            "name": "Tarihi Palu Köprüsü & Palu Kalesi",
+            "lat": 38.692,
+            "lon": 39.925
+        },
+        {
+            "name": "Hazarbaba Kayak Merkezi Tesisleri",
+            "lat": 38.412,
+            "lon": 39.245
+        }
+    ],
+    "Erzincan": [
+        {
+            "name": "Erzincan Şehirlerarası Otobüs Terminali",
+            "lat": 39.738,
+            "lon": 39.512
+        },
+        {
+            "name": "Cumhuriyet Meydanı & Tarihi Saat Kulesi Dörtyol",
+            "lat": 39.75,
+            "lon": 39.492
+        },
+        {
+            "name": "Erzincan Binali Yıldırım Üniversitesi Yalnızbağ Kampüsü",
+            "lat": 39.792,
+            "lon": 39.425
+        },
+        {
+            "name": "Girlevik Şelalesi Doğa Parkı Mesire Alanı",
+            "lat": 39.578,
+            "lon": 39.715
+        },
+        {
+            "name": "Ergan Dağı Kayak Merkezi & Kış Sporları Tesisleri",
+            "lat": 39.652,
+            "lon": 39.465
+        },
+        {
+            "name": "Kemaliye (Eğin) Karanlık Kanyon & Tarihi Taş Yolu",
+            "lat": 39.262,
+            "lon": 38.495
+        },
+        {
+            "name": "Altıntepe Urartu Kalesi & Kazı Alanı Höyüğü",
+            "lat": 39.702,
+            "lon": 39.645
+        },
+        {
+            "name": "Tercan Mama Hatun Külliyesi & Kervansarayı",
+            "lat": 39.778,
+            "lon": 40.385
+        }
     ]
 };
 
+
 // İlçe ve Beldeler Arası Sabit Hatlar (TEKULAŞ & Ekspres)
 const ilceRotalari = {
+    "Bursa": [
+            {
+                    "id": "bur_hat_16_mudanya",
+                    "hatNo": "16-1",
+                    "name": "16-1 BURSA TERMİNAL - OSMANGAZİ - MUDANYA SAHİL EKSPRES",
+                    "destDistrict": "Mudanya",
+                    "originDistrict": "Osmangazi",
+                    "startStop": "Bursa Şehirlerarası Otobüs Terminali (BURULAŞ)",
+                    "endStop": "Mudanya Mütareke Meydanı & BUDO Feribot İskelesi",
+                    "intermediateStops": [
+                            "Kent Meydanı & Tramvay İstasyonu",
+                            "Acemler Bursaspor Stadyumu Aktarma",
+                            "Geçit Özdilek Kavşağı & Hızlı Tren Viyadüğü",
+                            "Güzelyalı İDO İskelesi Kavşağı"
+                    ],
+                    "desc": "Bursa Büyükşehir Terminalinden Marmara Denizi Mudanya İskelesine sahil ve deniz bağlantı ekspresi.",
+                    "sehir": "Bursa",
+                    "karayolu": "D-575 / Mudanya Yolu"
+            },
+            {
+                    "id": "bur_hat_16_inegol",
+                    "hatNo": "16-2",
+                    "name": "16-2 HEYKEL - KESTEL - İNEGÖL MOBİLYA VE TARİH EKSPRES",
+                    "destDistrict": "İnegöl",
+                    "originDistrict": "Osmangazi",
+                    "startStop": "Heykel Cumhuriyet Meydanı & Tarihi Valilik",
+                    "endStop": "İnegöl Şehirlerarası Otogarı & Mobilya AVM Aksı",
+                    "intermediateStops": [
+                            "Yıldırım Tarihi Yeşil Türbe & Külliyesi",
+                            "Kestel Doğu Aktarma İstasyonu",
+                            "Barakfakih Sanayi Kavşağı",
+                            "Babaoğlu Mezit Boğazı Girişi"
+                    ],
+                    "desc": "Heykel merkezden Bilecik / Kütahya sınır kapısı sanayi devi İnegöl'e D-200 / E90 doğu ekspres seferi.",
+                    "sehir": "Bursa",
+                    "karayolu": "D-200 / E90"
+            }
+    ],
+    "Ankara": [
+            {
+                    "id": "ank_hat_06_polatli",
+                    "hatNo": "06-1",
+                    "name": "06-1 AŞTİ - ETİMESGUT - SİNCAN - POLATLI BATI EKSPRES",
+                    "destDistrict": "Polatlı",
+                    "originDistrict": "Yenimahalle",
+                    "startStop": "AŞTİ Şehirlerarası Otobüs Terminali",
+                    "endStop": "Polatlı İlçe Otogarı & Duatepe Anıtı",
+                    "intermediateStops": [
+                            "Etimesgut Zırhlı Birlikler Kavşağı",
+                            "Sincan Lale Meydanı & Tren Garı",
+                            "Yenikent & Temelli Göleti Girişi"
+                    ],
+                    "desc": "Başkent AŞTİ terminali ile Eskişehir / Konya sınır kapısı tarihi Polatlı arası D-200 / E-90 batı ekspres hattı.",
+                    "sehir": "Ankara",
+                    "karayolu": "D-200 / E-90"
+            },
+            {
+                    "id": "ank_hat_06_kizilcahamam",
+                    "hatNo": "06-2",
+                    "name": "06-2 KIZILAY - KAHRAMANKAZAN - KIZILCAHAMAM TERMAL EKSPRES",
+                    "destDistrict": "Kızılcahamam",
+                    "originDistrict": "Çankaya",
+                    "startStop": "Kızılay Meydanı & Güvenpark",
+                    "endStop": "Kızılcahamam Soğuksu Milli Parkı & Termal Kaplıcalar",
+                    "intermediateStops": [
+                            "Ulus Atatürk Heykeli & Valilik",
+                            "Yenimahalle Batıkent Metro Kavşağı",
+                            "Kahramankazan İlçe Meydanı & TUSAŞ Kavşağı"
+                    ],
+                    "desc": "Kızılay merkezden Bolu / Çankırı sınırındaki Kızılcahamam kaplıcalarına D-750 / O-4 kuzey ekspres hattı.",
+                    "sehir": "Ankara",
+                    "karayolu": "D-750 / O-4"
+            }
+    ],
+    "İzmir": [
+            {
+                    "id": "izm_hat_35_cesme",
+                    "hatNo": "35-1",
+                    "name": "35-1 BORNOVA (İZOTAŞ) - URLA - ÇEŞME MARİNA EKSPRES",
+                    "destDistrict": "Çeşme",
+                    "originDistrict": "Bornova",
+                    "startStop": "İZOTAŞ İzmir Şehirlerarası Otobüs Terminali (Bornova)",
+                    "endStop": "Çeşme Otogarı & Tarihi Çeşme Kalesi / Marina",
+                    "intermediateStops": [
+                            "Fahrettin Altay Aktarma Merkezi",
+                            "Güzelbahçe Sahil Kordonu",
+                            "Urla Sanat Sokağı & İskele",
+                            "Alaçatı Port & Değirmenler Meydanı"
+                    ],
+                    "desc": "İzmir Merkez Otogarından Çeşme Yarımadasına O-32 Otoyolu turizm ve sahil ekspres hattı.",
+                    "sehir": "İzmir",
+                    "karayolu": "O-32 / D-300"
+            },
+            {
+                    "id": "izm_hat_35_selcuk",
+                    "hatNo": "35-2",
+                    "name": "35-2 KONAK - TORBALI - SELÇUK (EFES) ANTİK EKSPRES",
+                    "destDistrict": "Selçuk",
+                    "originDistrict": "Konak",
+                    "startStop": "Tarihi Konak Meydanı & Saat Kulesi",
+                    "endStop": "Selçuk Efes Antik Kenti & Meryem Ana Evi Yolu",
+                    "intermediateStops": [
+                            "Gaziemir Fuar İzmir & Havalimanı Girişi",
+                            "Menderes İlçe Meydanı",
+                            "Torbalı İlçe Otogarı & Tren İstasyonu"
+                    ],
+                    "desc": "Konak Meydanından Aydın sınırındaki UNESCO Dünya Mirası Efes Antik Kenti Selçuk ilçesine D-550 ekspres seferi.",
+                    "sehir": "İzmir",
+                    "karayolu": "D-550 / O-31"
+            }
+    ],
     "Adana": [
         {
             "id": "adana_hat_101_ceyhan",
@@ -7399,6 +12474,8 @@ const ilceRotalari = {
 };
 
 let routesData = {};
+if (typeof window !== "undefined") window.routesData = routesData;
+if (typeof globalThis !== "undefined") globalThis.routesData = routesData;
 
 // TEKİRDAĞ 11 İLÇE EKSİKSİZ BAĞLANTI AĞI (18 EKSPRES & BÖLGE HATTI)
 if (typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) {
@@ -8148,4 +13225,727 @@ if (typeof masterCitiesList !== 'undefined' && typeof sehirRotalari !== 'undefin
             sehirRotalari[cityA].ulasimAgi = masterCitiesList.filter(c => c !== cityA);
         }
     });
+}
+
+
+// RESMİ KGM DEVLET KARAYOLLARI MESAFE MATRİSİ (81 İL)
+const sehirlerarasiMesafeler = {
+                    "Tekirdağ-Kırıkkale": 525, "Kırıkkale-Tekirdağ": 525,
+                    "İstanbul-Kırıkkale": 400, "Kırıkkale-İstanbul": 400,
+                    "Ankara-Kırıkkale": 75, "Kırıkkale-Ankara": 75,
+                    "Çankırı-Kırıkkale": 110, "Kırıkkale-Çankırı": 110,
+                    "Çorum-Kırıkkale": 165, "Kırıkkale-Çorum": 165,
+                    "Yozgat-Kırıkkale": 140, "Kırıkkale-Yozgat": 140,
+                    "Kırşehir-Kırıkkale": 110, "Kırıkkale-Kırşehir": 110,
+                    "Aksaray-Kırıkkale": 155, "Kırıkkale-Aksaray": 155,
+                    "Kayseri-Kırıkkale": 240, "Kırıkkale-Kayseri": 240,
+
+                    "Tekirdağ-Batman": 1530, "Batman-Tekirdağ": 1530,
+                    "İstanbul-Batman": 1405, "Batman-İstanbul": 1405,
+                    "Ankara-Batman": 975, "Batman-Ankara": 975,
+                    "Diyarbakır-Batman": 100, "Batman-Diyarbakır": 100,
+                    "Siirt-Batman": 85, "Batman-Siirt": 85,
+                    "Muş-Batman": 135, "Batman-Muş": 135,
+                    "Bitlis-Batman": 135, "Batman-Bitlis": 135,
+                    "Mardin-Batman": 140, "Batman-Mardin": 140,
+                    "Şırnak-Batman": 170, "Batman-Şırnak": 170,
+                    "Şanlıurfa-Batman": 280, "Batman-Şanlıurfa": 280,
+
+                    "Tekirdağ-Şırnak": 1680, "Şırnak-Tekirdağ": 1680,
+                    "İstanbul-Şırnak": 1555, "Şırnak-İstanbul": 1555,
+                    "Ankara-Şırnak": 1125, "Şırnak-Ankara": 1125,
+                    "Mardin-Şırnak": 190, "Şırnak-Mardin": 190,
+                    "Siirt-Şırnak": 95, "Şırnak-Siirt": 95,
+                    "Hakkâri-Şırnak": 190, "Şırnak-Hakkâri": 190,
+                    "Van-Şırnak": 210, "Şırnak-Van": 210,
+                    "Diyarbakır-Şırnak": 285, "Şırnak-Diyarbakır": 285,
+
+                    "Tekirdağ-Bartın": 565, "Bartın-Tekirdağ": 565,
+                    "İstanbul-Bartın": 440, "Bartın-İstanbul": 440,
+                    "Ankara-Bartın": 280, "Bartın-Ankara": 280,
+                    "Zonguldak-Bartın": 85, "Bartın-Zonguldak": 85,
+                    "Karabük-Bartın": 85, "Bartın-Karabük": 85,
+                    "Kastamonu-Bartın": 185, "Bartın-Kastamonu": 185,
+                    "Bolu-Bartın": 225, "Bartın-Bolu": 225,
+                    "Düzce-Bartın": 175, "Bartın-Düzce": 175,
+
+                    "Tekirdağ-Ardahan": 1520, "Ardahan-Tekirdağ": 1520,
+                    "İstanbul-Ardahan": 1395, "Ardahan-İstanbul": 1395,
+                    "Ankara-Ardahan": 1060, "Ardahan-Ankara": 1060,
+                    "Kars-Ardahan": 90, "Ardahan-Kars": 90,
+                    "Artvin-Ardahan": 115, "Ardahan-Artvin": 115,
+                    "Erzurum-Ardahan": 200, "Ardahan-Erzurum": 200,
+                    "Iğdır-Ardahan": 230, "Ardahan-Iğdır": 230,
+                    "Trabzon-Ardahan": 280, "Ardahan-Trabzon": 280,
+                    "Rize-Ardahan": 210, "Ardahan-Rize": 210,
+
+                    "Tekirdağ-Iğdır": 1600, "Iğdır-Tekirdağ": 1600,
+                    "İstanbul-Iğdır": 1475, "Iğdır-İstanbul": 1475,
+                    "Ankara-Iğdır": 1140, "Iğdır-Ankara": 1140,
+                    "Kars-Iğdır": 140, "Iğdır-Kars": 140,
+                    "Ağrı-Iğdır": 140, "Iğdır-Ağrı": 140,
+                    "Erzurum-Iğdır": 320, "Iğdır-Erzurum": 320,
+                    "Van-Iğdır": 240, "Iğdır-Van": 240,
+
+                    "Tekirdağ-Karabük": 530, "Karabük-Tekirdağ": 530,
+                    "İstanbul-Karabük": 405, "Karabük-İstanbul": 405,
+                    "Ankara-Karabük": 215, "Karabük-Ankara": 215,
+                    "Zonguldak-Karabük": 95, "Karabük-Zonguldak": 95,
+                    "Bolu-Karabük": 140, "Karabük-Bolu": 140,
+                    "Çankırı-Karabük": 120, "Karabük-Çankırı": 120,
+                    "Kastamonu-Karabük": 110, "Karabük-Kastamonu": 110,
+
+                    "Tekirdağ-Kilis": 1240, "Kilis-Tekirdağ": 1240,
+                    "İstanbul-Kilis": 1115, "Kilis-İstanbul": 1115,
+                    "Ankara-Kilis": 700, "Kilis-Ankara": 700,
+                    "Gaziantep-Kilis": 65, "Kilis-Gaziantep": 65,
+                    "Hatay-Kilis": 120, "Kilis-Hatay": 120,
+                    "Osmaniye-Kilis": 160, "Kilis-Osmaniye": 160,
+                    "Kahramanmaraş-Kilis": 145, "Kilis-Kahramanmaraş": 145,
+                    "Şanlıurfa-Kilis": 205, "Kilis-Şanlıurfa": 205,
+
+                    "Tekirdağ-Osmaniye": 1100, "Osmaniye-Tekirdağ": 1100,
+                    "İstanbul-Osmaniye": 975, "Osmaniye-İstanbul": 975,
+                    "Ankara-Osmaniye": 560, "Osmaniye-Ankara": 560,
+                    "Adana-Osmaniye": 90, "Osmaniye-Adana": 90,
+                    "Hatay-Osmaniye": 130, "Osmaniye-Hatay": 130,
+                    "Gaziantep-Osmaniye": 130, "Osmaniye-Gaziantep": 130,
+                    "Kahramanmaraş-Osmaniye": 95, "Osmaniye-Kahramanmaraş": 95,
+                    "Mersin-Osmaniye": 160, "Osmaniye-Mersin": 160,
+
+                    "Tekirdağ-Düzce": 365, "Düzce-Tekirdağ": 365,
+                    "İstanbul-Düzce": 215, "Düzce-İstanbul": 215,
+                    "Ankara-Düzce": 235, "Düzce-Ankara": 235,
+                    "Bolu-Düzce": 45, "Düzce-Bolu": 45,
+                    "Sakarya-Düzce": 70, "Düzce-Sakarya": 70,
+                    "Zonguldak-Düzce": 120, "Düzce-Zonguldak": 120,
+                    "Kocaeli-Düzce": 115, "Düzce-Kocaeli": 115,
+                    "Bursa-Düzce": 195, "Düzce-Bursa": 195,
+
+                    "Tekirdağ-Trabzon": 1150, "Trabzon-Tekirdağ": 1150,
+                    "İstanbul-Trabzon": 1025, "Trabzon-İstanbul": 1025,
+                    "Ankara-Trabzon": 740, "Trabzon-Ankara": 740,
+                    "Rize-Trabzon": 75, "Trabzon-Rize": 75,
+                    "Giresun-Trabzon": 135, "Trabzon-Giresun": 135,
+                    "Gümüşhane-Trabzon": 100, "Trabzon-Gümüşhane": 100,
+                    "Bayburt-Trabzon": 140, "Trabzon-Bayburt": 140,
+                    "Erzurum-Trabzon": 265, "Trabzon-Erzurum": 265,
+
+                    "Tekirdağ-Tunceli": 1340, "Tunceli-Tekirdağ": 1340,
+                    "İstanbul-Tunceli": 1210, "Tunceli-İstanbul": 1210,
+                    "Ankara-Tunceli": 820, "Tunceli-Ankara": 820,
+                    "Elazığ-Tunceli": 135, "Tunceli-Elazığ": 135,
+                    "Erzincan-Tunceli": 135, "Tunceli-Erzincan": 135,
+                    "Bingöl-Tunceli": 145, "Tunceli-Bingöl": 145,
+
+                    "Tekirdağ-Şanlıurfa": 1380, "Şanlıurfa-Tekirdağ": 1380,
+                    "İstanbul-Şanlıurfa": 1250, "Şanlıurfa-İstanbul": 1250,
+                    "Ankara-Şanlıurfa": 820, "Şanlıurfa-Ankara": 820,
+                    "Gaziantep-Şanlıurfa": 140, "Şanlıurfa-Gaziantep": 140,
+                    "Diyarbakır-Şanlıurfa": 180, "Şanlıurfa-Diyarbakır": 180,
+                    "Mardin-Şanlıurfa": 190, "Şanlıurfa-Mardin": 190,
+                    "Adıyaman-Şanlıurfa": 110, "Şanlıurfa-Adıyaman": 110,
+
+                    "Tekirdağ-Uşak": 500, "Uşak-Tekirdağ": 500,
+                    "İstanbul-Uşak": 370, "Uşak-İstanbul": 370,
+                    "Ankara-Uşak": 370, "Uşak-Ankara": 370,
+                    "İzmir-Uşak": 210, "Uşak-İzmir": 210,
+                    "Afyonkarahisar-Uşak": 115, "Uşak-Afyonkarahisar": 115,
+                    "Kütahya-Uşak": 140, "Uşak-Kütahya": 140,
+                    "Denizli-Uşak": 150, "Uşak-Denizli": 150,
+                    "Manisa-Uşak": 195, "Uşak-Manisa": 195,
+
+                    "Tekirdağ-Van": 1690, "Van-Tekirdağ": 1690,
+                    "İstanbul-Van": 1560, "Van-İstanbul": 1560,
+                    "Ankara-Van": 1180, "Van-Ankara": 1180,
+                    "Bitlis-Van": 160, "Van-Bitlis": 160,
+                    "Ağrı-Van": 230, "Van-Ağrı": 230,
+                    "Hakkâri-Van": 200, "Van-Hakkâri": 200,
+                    "Siirt-Van": 250, "Van-Siirt": 250,
+
+                    "Tekirdağ-Yozgat": 770, "Yozgat-Tekirdağ": 770,
+                    "İstanbul-Yozgat": 640, "Yozgat-İstanbul": 640,
+                    "Ankara-Yozgat": 215, "Yozgat-Ankara": 215,
+                    "Sivas-Yozgat": 220, "Yozgat-Sivas": 220,
+                    "Kayseri-Yozgat": 175, "Yozgat-Kayseri": 175,
+                    "Çorum-Yozgat": 108, "Yozgat-Çorum": 108,
+                    "Kırşehir-Yozgat": 110, "Yozgat-Kırşehir": 110,
+                    "Kırıkkale-Yozgat": 140, "Yozgat-Kırıkkale": 140,
+
+                    "Tekirdağ-Zonguldak": 440, "Zonguldak-Tekirdağ": 440,
+                    "İstanbul-Zonguldak": 320, "Zonguldak-İstanbul": 320,
+                    "Ankara-Zonguldak": 270, "Zonguldak-Ankara": 270,
+                    "Bolu-Zonguldak": 150, "Zonguldak-Bolu": 150,
+                    "Düzce-Zonguldak": 120, "Zonguldak-Düzce": 120,
+                    "Bartın-Zonguldak": 85, "Zonguldak-Bartın": 85,
+                    "Karabük-Zonguldak": 95, "Zonguldak-Karabük": 95,
+
+                    "Tekirdağ-Aksaray": 790, "Aksaray-Tekirdağ": 790,
+                    "İstanbul-Aksaray": 660, "Aksaray-İstanbul": 660,
+                    "Ankara-Aksaray": 225, "Aksaray-Ankara": 225,
+                    "Konya-Aksaray": 145, "Aksaray-Konya": 145,
+                    "Nevşehir-Aksaray": 75, "Aksaray-Nevşehir": 75,
+                    "Niğde-Aksaray": 110, "Aksaray-Niğde": 110,
+                    "Kırşehir-Aksaray": 110, "Aksaray-Kırşehir": 110,
+                    "Kayseri-Aksaray": 150, "Aksaray-Kayseri": 150,
+
+                    "Tekirdağ-Karaman": 820, "Karaman-Tekirdağ": 820,
+                    "İstanbul-Karaman": 685, "Karaman-İstanbul": 685,
+                    "Ankara-Karaman": 370, "Karaman-Ankara": 370,
+                    "Konya-Karaman": 120, "Karaman-Konya": 120,
+                    "Mersin-Karaman": 230, "Karaman-Mersin": 230,
+                    "Antalya-Karaman": 330, "Karaman-Antalya": 330,
+                    "Ereğli-Karaman": 90, "Karaman-Ereğli": 90,
+
+                    "Tekirdağ-Niğde": 880, "Niğde-Tekirdağ": 880,
+                    "İstanbul-Niğde": 750, "Niğde-İstanbul": 750,
+                    "Ankara-Niğde": 350, "Niğde-Ankara": 350,
+                    "Adana-Niğde": 170, "Niğde-Adana": 170,
+                    "Kayseri-Niğde": 130, "Niğde-Kayseri": 130,
+                    "Nevşehir-Niğde": 85, "Niğde-Nevşehir": 85,
+                    "Mersin-Niğde": 180, "Niğde-Mersin": 180,
+                    "Aksaray-Niğde": 110, "Niğde-Aksaray": 110,
+
+                    "Tekirdağ-Ordu": 1010, "Ordu-Tekirdağ": 1010,
+                    "İstanbul-Ordu": 880, "Ordu-İstanbul": 880,
+                    "Ankara-Ordu": 560, "Ordu-Ankara": 560,
+                    "Samsun-Ordu": 150, "Ordu-Samsun": 150,
+                    "Giresun-Ordu": 45, "Ordu-Giresun": 45,
+                    "Trabzon-Ordu": 180, "Ordu-Trabzon": 180,
+
+                    "Tekirdağ-Rize": 1230, "Rize-Tekirdağ": 1230,
+                    "İstanbul-Rize": 1100, "Rize-İstanbul": 1100,
+                    "Ankara-Rize": 780, "Rize-Ankara": 780,
+                    "Trabzon-Rize": 75, "Rize-Trabzon": 75,
+                    "Artvin-Rize": 95, "Rize-Artvin": 95,
+                    "Erzurum-Rize": 210, "Rize-Erzurum": 210,
+
+                    "Tekirdağ-Sakarya": 285, "Sakarya-Tekirdağ": 285,
+                    "İstanbul-Sakarya": 135, "Sakarya-İstanbul": 135,
+                    "Ankara-Sakarya": 310, "Sakarya-Ankara": 310,
+                    "Kocaeli-Sakarya": 35, "Sakarya-Kocaeli": 35,
+                    "Bolu-Sakarya": 115, "Sakarya-Bolu": 115,
+                    "Düzce-Sakarya": 70, "Sakarya-Düzce": 70,
+                    "Bilecik-Sakarya": 100, "Sakarya-Bilecik": 100,
+
+                    "Tekirdağ-Samsun": 860, "Samsun-Tekirdağ": 860,
+                    "İstanbul-Samsun": 735, "Samsun-İstanbul": 735,
+                    "Ankara-Samsun": 410, "Samsun-Ankara": 410,
+                    "Sinop-Samsun": 155, "Samsun-Sinop": 155,
+                    "Çorum-Samsun": 172, "Samsun-Çorum": 172,
+                    "Amasya-Samsun": 130, "Samsun-Amasya": 130,
+                    "Ordu-Samsun": 150, "Samsun-Ordu": 150,
+
+                    "Tekirdağ-Siirt": 1680, "Siirt-Tekirdağ": 1680,
+                    "İstanbul-Siirt": 1550, "Siirt-İstanbul": 1550,
+                    "Ankara-Siirt": 1150, "Siirt-Ankara": 1150,
+                    "Batman-Siirt": 85, "Siirt-Batman": 85,
+                    "Bitlis-Siirt": 95, "Siirt-Bitlis": 95,
+                    "Şırnak-Siirt": 100, "Siirt-Şırnak": 100,
+                    "Diyarbakır-Siirt": 180, "Siirt-Diyarbakır": 180,
+
+                    "Tekirdağ-Sivas": 975, "Sivas-Tekirdağ": 975,
+                    "İstanbul-Sivas": 845, "Sivas-İstanbul": 845,
+                    "Ankara-Sivas": 440, "Sivas-Ankara": 440,
+                    "Kayseri-Sivas": 195, "Sivas-Kayseri": 195,
+                    "Malatya-Sivas": 245, "Sivas-Malatya": 245,
+                    "Erzincan-Sivas": 250, "Sivas-Erzincan": 250,
+                    "Tokat-Sivas": 105, "Sivas-Tokat": 105,
+                    "Yozgat-Sivas": 220, "Sivas-Yozgat": 220,
+
+                    "Tekirdağ-Tokat": 910, "Tokat-Tekirdağ": 910,
+                    "İstanbul-Tokat": 780, "Tokat-İstanbul": 780,
+                    "Ankara-Tokat": 380, "Tokat-Ankara": 380,
+                    "Amasya-Tokat": 115, "Tokat-Amasya": 115,
+                    "Sivas-Tokat": 105, "Tokat-Sivas": 105,
+                    "Samsun-Tokat": 220, "Tokat-Samsun": 220,
+                    "Ordu-Tokat": 210, "Tokat-Ordu": 210,
+
+                    "Tekirdağ-Kocaeli": 250, "Kocaeli-Tekirdağ": 250,
+                    "İstanbul-Kocaeli": 95, "Kocaeli-İstanbul": 95,
+                    "Ankara-Kocaeli": 350, "Kocaeli-Ankara": 350,
+                    "Sakarya-Kocaeli": 35, "Kocaeli-Sakarya": 35,
+                    "Yalova-Kocaeli": 45, "Kocaeli-Yalova": 45,
+                    "Bursa-Kocaeli": 135, "Kocaeli-Bursa": 135,
+
+                    "Tekirdağ-Kütahya": 380, "Kütahya-Tekirdağ": 380,
+                    "İstanbul-Kütahya": 250, "Kütahya-İstanbul": 250,
+                    "Ankara-Kütahya": 310, "Kütahya-Ankara": 310,
+                    "Eskişehir-Kütahya": 75, "Kütahya-Eskişehir": 75,
+                    "Afyonkarahisar-Kütahya": 100, "Kütahya-Afyonkarahisar": 100,
+                    "Bilecik-Kütahya": 110, "Kütahya-Bilecik": 110,
+                    "Bursa-Kütahya": 175, "Kütahya-Bursa": 175,
+
+                    "Tekirdağ-Malatya": 1250, "Malatya-Tekirdağ": 1250,
+                    "İstanbul-Malatya": 1120, "Malatya-İstanbul": 1120,
+                    "Ankara-Malatya": 670, "Malatya-Ankara": 670,
+                    "Elazığ-Malatya": 100, "Malatya-Elazığ": 100,
+                    "Sivas-Malatya": 245, "Malatya-Sivas": 245,
+                    "Adıyaman-Malatya": 120, "Malatya-Adıyaman": 120,
+                    "Kahramanmaraş-Malatya": 220, "Malatya-Kahramanmaraş": 220,
+
+                    "Tekirdağ-Manisa": 490, "Manisa-Tekirdağ": 490,
+                    "İstanbul-Manisa": 440, "Manisa-İstanbul": 440,
+                    "Ankara-Manisa": 560, "Manisa-Ankara": 560,
+                    "İzmir-Manisa": 35, "Manisa-İzmir": 35,
+                    "Balıkesir-Manisa": 140, "Manisa-Balıkesir": 140,
+                    "Aydın-Manisa": 145, "Manisa-Aydın": 145,
+
+                    "Tekirdağ-Kahramanmaraş": 1200, "Kahramanmaraş-Tekirdağ": 1200,
+                    "İstanbul-Kahramanmaraş": 1070, "Kahramanmaraş-İstanbul": 1070,
+                    "Ankara-Kahramanmaraş": 600, "Kahramanmaraş-Ankara": 600,
+                    "Gaziantep-Kahramanmaraş": 78, "Kahramanmaraş-Gaziantep": 78,
+                    "Adana-Kahramanmaraş": 190, "Kahramanmaraş-Adana": 190,
+                    "Osmaniye-Kahramanmaraş": 110, "Kahramanmaraş-Osmaniye": 110,
+                    "Kayseri-Kahramanmaraş": 260, "Kahramanmaraş-Kayseri": 260,
+
+                    "Tekirdağ-Mardin": 1610, "Mardin-Tekirdağ": 1610,
+                    "İstanbul-Mardin": 1480, "Mardin-İstanbul": 1480,
+                    "Ankara-Mardin": 1050, "Mardin-Ankara": 1050,
+                    "Diyarbakır-Mardin": 95, "Mardin-Diyarbakır": 95,
+                    "Şanlıurfa-Mardin": 190, "Mardin-Şanlıurfa": 190,
+                    "Batman-Mardin": 140, "Mardin-Batman": 140,
+
+                    "Tekirdağ-Muğla": 730, "Muğla-Tekirdağ": 730,
+                    "İstanbul-Muğla": 680, "Muğla-İstanbul": 680,
+                    "Ankara-Muğla": 620, "Muğla-Ankara": 620,
+                    "Aydın-Muğla": 100, "Muğla-Aydın": 100,
+                    "Denizli-Muğla": 145, "Muğla-Denizli": 145,
+                    "Antalya-Muğla": 310, "Muğla-Antalya": 310,
+                    "İzmir-Muğla": 210, "Muğla-İzmir": 210,
+
+                    "Tekirdağ-Muş": 1460, "Muş-Tekirdağ": 1460,
+                    "İstanbul-Muş": 1330, "Muş-İstanbul": 1330,
+                    "Ankara-Muş": 940, "Muş-Ankara": 940,
+                    "Bitlis-Muş": 85, "Muş-Bitlis": 85,
+                    "Bingöl-Muş": 115, "Muş-Bingöl": 115,
+                    "Erzurum-Muş": 220, "Muş-Erzurum": 220,
+                    "Ağrı-Muş": 165, "Muş-Ağrı": 165,
+
+                    "Tekirdağ-Nevşehir": 770, "Nevşehir-Tekirdağ": 770,
+                    "İstanbul-Nevşehir": 640, "Nevşehir-İstanbul": 640,
+                    "Ankara-Nevşehir": 280, "Nevşehir-Ankara": 280,
+                    "Kayseri-Nevşehir": 80, "Nevşehir-Kayseri": 80,
+                    "Kırşehir-Nevşehir": 90, "Nevşehir-Kırşehir": 90,
+                    "Aksaray-Nevşehir": 75, "Nevşehir-Aksaray": 75,
+                    "Niğde-Nevşehir": 85, "Nevşehir-Niğde": 85,
+
+                    "Tekirdağ-Hakkâri": 1850, "Hakkâri-Tekirdağ": 1850,
+                    "İstanbul-Hakkâri": 1720, "Hakkâri-İstanbul": 1720,
+                    "Ankara-Hakkâri": 1320, "Hakkâri-Ankara": 1320,
+                    "Van-Hakkâri": 200, "Hakkâri-Van": 200,
+                    "Şırnak-Hakkâri": 190, "Hakkâri-Şırnak": 190,
+
+                    "Tekirdağ-Hatay": 1180, "Hatay-Tekirdağ": 1180,
+                    "İstanbul-Hatay": 1050, "Hatay-İstanbul": 1050,
+                    "Ankara-Hatay": 640, "Hatay-Ankara": 640,
+                    "Adana-Hatay": 190, "Hatay-Adana": 190,
+                    "Osmaniye-Hatay": 130, "Hatay-Osmaniye": 130,
+                    "Gaziantep-Hatay": 190, "Hatay-Gaziantep": 190,
+
+                    "Tekirdağ-Isparta": 690, "Isparta-Tekirdağ": 690,
+                    "İstanbul-Isparta": 560, "Isparta-İstanbul": 560,
+                    "Ankara-Isparta": 390, "Isparta-Ankara": 390,
+                    "Burdur-Isparta": 30, "Isparta-Burdur": 30,
+                    "Antalya-Isparta": 130, "Isparta-Antalya": 130,
+                    "Konya-Isparta": 240, "Isparta-Konya": 240,
+                    "Afyonkarahisar-Isparta": 165, "Isparta-Afyonkarahisar": 165,
+
+                    "Tekirdağ-Mersin": 1010, "Mersin-Tekirdağ": 1010,
+                    "İstanbul-Mersin": 880, "Mersin-İstanbul": 880,
+                    "Ankara-Mersin": 480, "Mersin-Ankara": 480,
+                    "Adana-Mersin": 70, "Mersin-Adana": 70,
+                    "Konya-Mersin": 350, "Mersin-Konya": 350,
+                    "Niğde-Mersin": 180, "Mersin-Niğde": 180,
+                    "Antalya-Mersin": 470, "Mersin-Antalya": 470,
+
+                    "Tekirdağ-İzmir": 520, "İzmir-Tekirdağ": 520,
+                    "İstanbul-İzmir": 475, "İzmir-İstanbul": 475,
+                    "Ankara-İzmir": 580, "İzmir-Ankara": 580,
+                    "Balıkesir-İzmir": 175, "İzmir-Balıkesir": 175,
+                    "Manisa-İzmir": 35, "İzmir-Manisa": 35,
+                    "Aydın-İzmir": 110, "İzmir-Aydın": 110,
+                    "Çanakkale-İzmir": 320, "İzmir-Çanakkale": 320,
+                    "Trabzon-Samsun": 330,
+                    "Samsun-Trabzon": 330,
+                    "Trabzon-Rize": 75,
+                    "Rize-Trabzon": 75,
+                    "Trabzon-Ordu": 180,
+                    "Ordu-Trabzon": 180,
+                    "Trabzon-Giresun": 135,
+                    "Giresun-Trabzon": 135,
+                    "Samsun-Ordu": 150,
+                    "Ordu-Samsun": 150,
+                    "Samsun-Sinop": 160,
+                    "Sinop-Samsun": 160,
+                    "Samsun-Çorum": 170,
+                    "Çorum-Samsun": 170,
+                    "Samsun-Amasya": 130,
+                    "Amasya-Samsun": 130,
+                    "İzmir-Manisa": 35,
+                    "Manisa-İzmir": 35,
+                    "İzmir-Aydın": 110,
+                    "Aydın-İzmir": 110,
+                    "İzmir-Muğla": 210,
+                    "Muğla-İzmir": 210,
+                    "İzmir-Denizli": 225,
+                    "Denizli-İzmir": 225,
+                    "İzmir-Uşak": 210,
+                    "Uşak-İzmir": 210,
+                    "İzmir-Bursa": 330,
+                    "Bursa-İzmir": 330,
+                    "Ankara-Eskişehir": 235,
+                    "Eskişehir-Ankara": 235,
+                    "Ankara-Bursa": 385,
+                    "Bursa-Ankara": 385,
+                    "Ankara-Konya": 260,
+                    "Konya-Ankara": 260,
+                    "Ankara-Kayseri": 315,
+                    "Kayseri-Ankara": 315,
+                    "Ankara-Sivas": 440,
+                    "Sivas-Ankara": 440,
+                    "Gaziantep-Şanlıurfa": 140,
+                    "Şanlıurfa-Gaziantep": 140,
+                    "Diyarbakır-Şanlıurfa": 180,
+                    "Şanlıurfa-Diyarbakır": 180,
+                    "Diyarbakır-Mardin": 95,
+                    "Mardin-Diyarbakır": 95,
+                    "Diyarbakır-Batman": 100,
+                    "Batman-Diyarbakır": 100,
+                    "Diyarbakır-Elazığ": 150,
+                    "Elazığ-Diyarbakır": 150,
+                    "Erzurum-Erzincan": 190,
+                    "Erzincan-Erzurum": 190,
+                    "Erzurum-Kars": 200,
+                    "Kars-Erzurum": 200,
+                    "Erzurum-Ağrı": 185,
+                    "Ağrı-Erzurum": 185,
+                    "Van-Bitlis": 160,
+                    "Bitlis-Van": 160,
+                    "Van-Hakkâri": 200,
+                    "Hakkâri-Van": 200,
+                    "Van-Ağrı": 230,
+                    "Ağrı-Van": 230,
+                    "Antalya-Muğla": 315,
+                    "Muğla-Antalya": 315,
+                    "Antalya-Burdur": 125,
+                    "Burdur-Antalya": 125,
+                    "Antalya-Isparta": 130,
+                    "Isparta-Antalya": 130,
+                    "Antalya-Konya": 305,
+                    "Konya-Antalya": 305,
+                    "Antalya-Mersin": 475,
+                    "Mersin-Antalya": 475,
+                    "Bursa-İzmir": 330, "İzmir-Bursa": 330,
+
+                    "Tekirdağ-Kars": 1530, "Kars-Tekirdağ": 1530,
+                    "İstanbul-Kars": 1400, "Kars-İstanbul": 1400,
+                    "Ankara-Kars": 1070, "Kars-Ankara": 1070,
+                    "Erzurum-Kars": 200, "Kars-Erzurum": 200,
+                    "Ağrı-Kars": 140, "Kars-Ağrı": 140,
+                    "Ardahan-Kars": 90, "Kars-Ardahan": 90,
+                    "Iğdır-Kars": 140, "Kars-Iğdır": 140,
+
+                    "Tekirdağ-Kastamonu": 620, "Kastamonu-Tekirdağ": 620,
+                    "İstanbul-Kastamonu": 490, "Kastamonu-İstanbul": 490,
+                    "Ankara-Kastamonu": 240, "Kastamonu-Ankara": 240,
+                    "Sinop-Kastamonu": 180, "Kastamonu-Sinop": 180,
+                    "Çankırı-Kastamonu": 105, "Kastamonu-Çankırı": 105,
+                    "Çorum-Kastamonu": 195, "Kastamonu-Çorum": 195,
+                    "Karabük-Kastamonu": 110, "Kastamonu-Karabük": 110,
+
+                    "Tekirdağ-Kayseri": 890, "Kayseri-Tekirdağ": 890,
+                    "İstanbul-Kayseri": 760, "Kayseri-İstanbul": 760,
+                    "Ankara-Kayseri": 315, "Kayseri-Ankara": 315,
+                    "Sivas-Kayseri": 195, "Kayseri-Sivas": 195,
+                    "Nevşehir-Kayseri": 80, "Kayseri-Nevşehir": 80,
+                    "Niğde-Kayseri": 130, "Kayseri-Niğde": 130,
+                    "Yozgat-Kayseri": 175, "Kayseri-Yozgat": 175,
+                    "Adana-Kayseri": 330, "Kayseri-Adana": 330,
+                    "Kahramanmaraş-Kayseri": 260, "Kayseri-Kahramanmaraş": 260,
+
+                    "Tekirdağ-Kırşehir": 730, "Kırşehir-Tekirdağ": 730,
+                    "İstanbul-Kırşehir": 600, "Kırşehir-İstanbul": 600,
+                    "Ankara-Kırşehir": 185, "Kırşehir-Ankara": 185,
+                    "Nevşehir-Kırşehir": 90, "Kırşehir-Nevşehir": 90,
+                    "Yozgat-Kırşehir": 110, "Kırşehir-Yozgat": 110,
+                    "Kırıkkale-Kırşehir": 110, "Kırşehir-Kırıkkale": 110,
+                    "Aksaray-Kırşehir": 110, "Kırşehir-Aksaray": 110,
+                    "Kayseri-Kırşehir": 135, "Kırşehir-Kayseri": 135,
+
+                    "Tekirdağ-Denizli": 670, "Denizli-Tekirdağ": 670,
+                    "İstanbul-Denizli": 560, "Denizli-İstanbul": 560,
+                    "Ankara-Denizli": 480, "Denizli-Ankara": 480,
+                    "İzmir-Denizli": 225, "Denizli-İzmir": 225,
+                    "Aydın-Denizli": 125, "Denizli-Aydın": 125,
+                    "Muğla-Denizli": 145, "Denizli-Muğla": 145,
+                    "Burdur-Denizli": 150, "Denizli-Burdur": 150,
+                    "Uşak-Denizli": 150, "Denizli-Uşak": 150,
+                    "Afyonkarahisar-Denizli": 220, "Denizli-Afyonkarahisar": 220,
+                    "Antalya-Denizli": 220, "Denizli-Antalya": 220,
+
+                    "Tekirdağ-Antalya": 830, "Antalya-Tekirdağ": 830,
+                    "İstanbul-Antalya": 700, "Antalya-İstanbul": 700,
+                    "Ankara-Antalya": 480, "Antalya-Ankara": 480,
+                    "Burdur-Antalya": 122, "Antalya-Burdur": 122,
+                    "Isparta-Antalya": 130, "Antalya-Isparta": 130,
+                    "Muğla-Antalya": 310, "Antalya-Muğla": 310,
+                    "Konya-Antalya": 305, "Antalya-Konya": 305,
+
+                    "Bolu-Ankara": 190, "Ankara-Bolu": 190,
+                    "Eskişehir-Ankara": 235, "Ankara-Eskişehir": 235,
+                    "Konya-Ankara": 260, "Ankara-Konya": 260,
+                    "Kırıkkale-Ankara": 75, "Ankara-Kırıkkale": 75,
+                    "Aksaray-Ankara": 225, "Ankara-Aksaray": 225,
+
+                    "Tekirdağ-Amasya": 810, "Amasya-Tekirdağ": 810,
+                    "İstanbul-Amasya": 680, "Amasya-İstanbul": 680,
+                    "Ankara-Amasya": 335, "Amasya-Ankara": 335,
+                    "Samsun-Amasya": 130, "Amasya-Samsun": 130,
+                    "Tokat-Amasya": 115, "Amasya-Tokat": 115,
+                    "Çorum-Amasya": 92, "Amasya-Çorum": 92,
+
+                    "Tekirdağ-Ağrı": 1510, "Ağrı-Tekirdağ": 1510,
+                    "İstanbul-Ağrı": 1380, "Ağrı-İstanbul": 1380,
+                    "Ankara-Ağrı": 1060, "Ağrı-Ankara": 1060,
+                    "Erzurum-Ağrı": 180, "Ağrı-Erzurum": 180,
+                    "Van-Ağrı": 230, "Ağrı-Van": 230,
+                    "Kars-Ağrı": 140, "Ağrı-Kars": 140,
+                    "Iğdır-Ağrı": 140, "Ağrı-Iğdır": 140,
+
+                    "Tekirdağ-Afyonkarahisar": 540, "Afyonkarahisar-Tekirdağ": 540,
+                    "İstanbul-Afyonkarahisar": 410, "Afyonkarahisar-İstanbul": 410,
+                    "Ankara-Afyonkarahisar": 260, "Afyonkarahisar-Ankara": 260,
+                    "Adana-Afyonkarahisar": 510, "Afyonkarahisar-Adana": 510,
+                    "Eskişehir-Afyonkarahisar": 130, "Afyonkarahisar-Eskişehir": 130,
+                    "Kütahya-Afyonkarahisar": 100, "Afyonkarahisar-Kütahya": 100,
+                    "Konya-Afyonkarahisar": 225, "Afyonkarahisar-Konya": 225,
+                    "Isparta-Afyonkarahisar": 165, "Afyonkarahisar-Isparta": 165,
+
+                    "Tekirdağ-Adıyaman": 1250, "Adıyaman-Tekirdağ": 1250,
+                    "İstanbul-Adıyaman": 1130, "Adıyaman-İstanbul": 1130,
+                    "Ankara-Adıyaman": 690, "Adıyaman-Ankara": 690,
+                    "Adana-Adıyaman": 340, "Adıyaman-Adana": 340,
+
+                                                                                                                                                                                                        "Tekirdağ-Sinop": 810, "Sinop-Tekirdağ": 810,
+                    "İstanbul-Sinop": 680, "Sinop-İstanbul": 680,
+                    "Ankara-Sinop": 415, "Sinop-Ankara": 415,
+                    "Samsun-Sinop": 155, "Sinop-Samsun": 155,
+                    "Kastamonu-Sinop": 180, "Sinop-Kastamonu": 180,
+                    "Çorum-Sinop": 210, "Sinop-Çorum": 210,
+                                                                                                                                                                                                        "Tekirdağ-Yalova": 220, "Yalova-Tekirdağ": 220,
+                    "İstanbul-Yalova": 95, "Yalova-İstanbul": 95,
+                    "Kocaeli-Yalova": 45, "Yalova-Kocaeli": 45,
+                    "Bursa-Yalova": 70, "Yalova-Bursa": 70,
+                    "Sakarya-Yalova": 85, "Yalova-Sakarya": 85,
+                    "Bilecik-Yalova": 110, "Yalova-Bilecik": 110,
+                    "Ankara-Yalova": 410, "Yalova-Ankara": 410,
+                    "Balıkesir-Yalova": 200, "Yalova-Balıkesir": 200,
+                                        "Tekirdağ-Erzurum": 1360, "Erzurum-Tekirdağ": 1360,
+                    "İstanbul-Erzurum": 1225, "Erzurum-İstanbul": 1225,
+                    "Ankara-Erzurum": 875, "Erzurum-Ankara": 875,
+                    "Erzincan-Erzurum": 190, "Erzurum-Erzincan": 190,
+                    "Kars-Erzurum": 200, "Erzurum-Kars": 200,
+                    "Ağrı-Erzurum": 185, "Erzurum-Ağrı": 185,
+                    "Muş-Erzurum": 220, "Erzurum-Muş": 220,
+                    "Bingöl-Erzurum": 180, "Erzurum-Bingöl": 180,
+                    "Bayburt-Erzurum": 125, "Erzurum-Bayburt": 125,
+                    "Artvin-Erzurum": 200, "Erzurum-Artvin": 200,
+                    "Trabzon-Erzurum": 265, "Erzurum-Trabzon": 265,
+                    "Tekirdağ-Konya": 700, "Konya-Tekirdağ": 700,
+                    "İstanbul-Konya": 565, "Konya-İstanbul": 565,
+                    "Ankara-Konya": 260, "Konya-Ankara": 260,
+                    "Afyonkarahisar-Konya": 225, "Konya-Afyonkarahisar": 225,
+                    "Antalya-Konya": 305, "Konya-Antalya": 305,
+                    "Aksaray-Konya": 145, "Konya-Aksaray": 145,
+                    "Karaman-Konya": 120, "Konya-Karaman": 120,
+                    "Eskişehir-Konya": 330, "Konya-Eskişehir": 330,
+                    "Isparta-Konya": 240, "Konya-Isparta": 240,
+                    "Burdur-Konya": 270, "Konya-Burdur": 270,
+                    "Bursa-Konya": 485, "Konya-Bursa": 485,
+                    "Tekirdağ-Erzincan": 1170, "Erzincan-Tekirdağ": 1170,
+                    "İstanbul-Erzincan": 1035, "Erzincan-İstanbul": 1035,
+                    "Ankara-Erzincan": 685, "Erzincan-Ankara": 685,
+                    "Erzurum-Erzincan": 190, "Erzincan-Erzurum": 190,
+                    "Sivas-Erzincan": 250, "Erzincan-Sivas": 250,
+                    "Elazığ-Erzincan": 260, "Erzincan-Elazığ": 260,
+                    "Tunceli-Erzincan": 135, "Erzincan-Tunceli": 135,
+                    "Gümüşhane-Erzincan": 135, "Erzincan-Gümüşhane": 135,
+                    "Bayburt-Erzincan": 145, "Erzincan-Bayburt": 145,
+                    "Malatya-Erzincan": 250, "Erzincan-Malatya": 250,
+                    "Tekirdağ-Elazığ": 1350, "Elazığ-Tekirdağ": 1350,
+                    "İstanbul-Elazığ": 1215, "Elazığ-İstanbul": 1215,
+                    "Ankara-Elazığ": 765, "Elazığ-Ankara": 765,
+                    "Malatya-Elazığ": 100, "Elazığ-Malatya": 100,
+                    "Bingöl-Elazığ": 145, "Elazığ-Bingöl": 145,
+                    "Diyarbakır-Elazığ": 155, "Elazığ-Diyarbakır": 155,
+                    "Tunceli-Elazığ": 135, "Elazığ-Tunceli": 135,
+                    "Erzincan-Elazığ": 260, "Elazığ-Erzincan": 260,
+                    "Adıyaman-Elazığ": 240, "Elazığ-Adıyaman": 240,
+                    "Tekirdağ-Bayburt": 1265, "Bayburt-Tekirdağ": 1265,
+                    "İstanbul-Bayburt": 1130, "Bayburt-İstanbul": 1130,
+                    "Ankara-Bayburt": 775, "Bayburt-Ankara": 775,
+                    "Erzurum-Bayburt": 125, "Bayburt-Erzurum": 125,
+                    "Trabzon-Bayburt": 140, "Bayburt-Trabzon": 140,
+                    "Gümüşhane-Bayburt": 78, "Bayburt-Gümüşhane": 78,
+                    "Erzincan-Bayburt": 145, "Bayburt-Erzincan": 145,
+                    "Rize-Bayburt": 180, "Bayburt-Rize": 180,
+                    "Tekirdağ-Diyarbakır": 1560, "Diyarbakır-Tekirdağ": 1560,
+                    "İstanbul-Diyarbakır": 1425, "Diyarbakır-İstanbul": 1425,
+                    "Ankara-Diyarbakır": 1000, "Diyarbakır-Ankara": 1000,
+                    "Adana-Diyarbakır": 535, "Diyarbakır-Adana": 535,
+                    "Şanlıurfa-Diyarbakır": 180, "Diyarbakır-Şanlıurfa": 180,
+                    "Mardin-Diyarbakır": 95, "Diyarbakır-Mardin": 95,
+                    "Batman-Diyarbakır": 100, "Diyarbakır-Batman": 100,
+                    "Elazığ-Diyarbakır": 155, "Diyarbakır-Elazığ": 155,
+                    "Bingöl-Diyarbakır": 140, "Diyarbakır-Bingöl": 140,
+                    "Adıyaman-Diyarbakır": 205, "Diyarbakır-Adıyaman": 205,
+                    "Tekirdağ-Çorum": 745, "Çorum-Tekirdağ": 745,
+                    "İstanbul-Çorum": 610, "Çorum-İstanbul": 610,
+                    "Ankara-Çorum": 245, "Çorum-Ankara": 245,
+                    "Amasya-Çorum": 92, "Çorum-Amasya": 92,
+                    "Samsun-Çorum": 172, "Çorum-Samsun": 172,
+                    "Sinop-Çorum": 270, "Çorum-Sinop": 270,
+                    "Kastamonu-Çorum": 195, "Çorum-Kastamonu": 195,
+                    "Çankırı-Çorum": 155, "Çorum-Çankırı": 155,
+                    "Kırıkkale-Çorum": 165, "Çorum-Kırıkkale": 165,
+                    "Yozgat-Çorum": 108, "Çorum-Yozgat": 108,
+                    "Tekirdağ-Çankırı": 550, "Çankırı-Tekirdağ": 550,
+                    "İstanbul-Çankırı": 415, "Çankırı-İstanbul": 415,
+                    "Ankara-Çankırı": 130, "Çankırı-Ankara": 130,
+                    "Bolu-Çankırı": 190, "Çankırı-Bolu": 190,
+                    "Kastamonu-Çankırı": 105, "Çankırı-Kastamonu": 105,
+                    "Karabük-Çankırı": 120, "Çankırı-Karabük": 120,
+                    "Çorum-Çankırı": 155, "Çankırı-Çorum": 155,
+                    "Kırıkkale-Çankırı": 110, "Çankırı-Kırıkkale": 110,
+                    "Tekirdağ-Bursa": 275, "Bursa-Tekirdağ": 275,
+                    "İstanbul-Bursa": 155, "Bursa-İstanbul": 155,
+                    "Ankara-Bursa": 385, "Bursa-Ankara": 385,
+                    "Yalova-Bursa": 70, "Bursa-Yalova": 70,
+                    "Bilecik-Bursa": 95, "Bursa-Bilecik": 95,
+                    "Balıkesir-Bursa": 150, "Bursa-Balıkesir": 150,
+                    "Kütahya-Bursa": 175, "Bursa-Kütahya": 175,
+                    "Eskişehir-Bursa": 150, "Bursa-Eskişehir": 150,
+                    "Tekirdağ-Burdur": 710, "Burdur-Tekirdağ": 710,
+                    "İstanbul-Burdur": 580, "Burdur-İstanbul": 580,
+                    "Ankara-Burdur": 420, "Burdur-Ankara": 420,
+                    "Isparta-Burdur": 30, "Burdur-Isparta": 30,
+                    "Antalya-Burdur": 122, "Burdur-Antalya": 122,
+                    "Denizli-Burdur": 150, "Burdur-Denizli": 150,
+                    "Afyonkarahisar-Burdur": 170, "Burdur-Afyonkarahisar": 170,
+                    "Tekirdağ-Bolu": 395, "Bolu-Tekirdağ": 395,
+                    "İstanbul-Bolu": 260, "Bolu-İstanbul": 260,
+                    "Ankara-Bolu": 190, "Bolu-Ankara": 190,
+                    "Düzce-Bolu": 45, "Bolu-Düzce": 45,
+                    "Sakarya-Bolu": 115, "Bolu-Sakarya": 115,
+                    "Zonguldak-Bolu": 150, "Bolu-Zonguldak": 150,
+                    "Karabük-Bolu": 140, "Bolu-Karabük": 140,
+                    "Tekirdağ-Bitlis": 1520, "Bitlis-Tekirdağ": 1520,
+                    "İstanbul-Bitlis": 1390, "Bitlis-İstanbul": 1390,
+                    "Ankara-Bitlis": 995, "Bitlis-Ankara": 995,
+                    "Van-Bitlis": 160, "Bitlis-Van": 160,
+                    "Muş-Bitlis": 85, "Bitlis-Muş": 85,
+                    "Siirt-Bitlis": 95, "Bitlis-Siirt": 95,
+                    "Ağrı-Bitlis": 145, "Bitlis-Ağrı": 145,
+                    "Batman-Bitlis": 135, "Bitlis-Batman": 135,
+                    "Tekirdağ-Bingöl": 1425, "Bingöl-Tekirdağ": 1425,
+                    "İstanbul-Bingöl": 1295, "Bingöl-İstanbul": 1295,
+                    "Ankara-Bingöl": 900, "Bingöl-Ankara": 900,
+                    "Elazığ-Bingöl": 140, "Bingöl-Elazığ": 140,
+                    "Muş-Bingöl": 115, "Bingöl-Muş": 115,
+                    "Erzurum-Bingöl": 180, "Bingöl-Erzurum": 180,
+                    "Diyarbakır-Bingöl": 145, "Bingöl-Diyarbakır": 145,
+                    "Tekirdağ-Bilecik": 380, "Bilecik-Tekirdağ": 380,
+                    "İstanbul-Bilecik": 245, "Bilecik-İstanbul": 245,
+                    "Ankara-Bilecik": 315, "Bilecik-Ankara": 315,
+                    "Sakarya-Bilecik": 100, "Bilecik-Sakarya": 100,
+                    "Bursa-Bilecik": 95, "Bilecik-Bursa": 95,
+                    "Eskişehir-Bilecik": 80, "Bilecik-Eskişehir": 80,
+                    "Kütahya-Bilecik": 110, "Bilecik-Kütahya": 110,
+                    "Tekirdağ-Balıkesir": 295, "Balıkesir-Tekirdağ": 295,
+                    "İstanbul-Balıkesir": 280, "Balıkesir-İstanbul": 280,
+                    "Ankara-Balıkesir": 535, "Balıkesir-Ankara": 535,
+                    "Bursa-Balıkesir": 150, "Balıkesir-Bursa": 150,
+                    "İzmir-Balıkesir": 175, "Balıkesir-İzmir": 175,
+                    "Manisa-Balıkesir": 140, "Balıkesir-Manisa": 140,
+                    "Kütahya-Balıkesir": 230, "Balıkesir-Kütahya": 230,
+                    "Tekirdağ-Aydın": 630, "Aydın-Tekirdağ": 630,
+                    "İstanbul-Aydın": 520, "Aydın-İstanbul": 520,
+                    "Ankara-Aydın": 590, "Aydın-Ankara": 590,
+                    "İzmir-Aydın": 110, "Aydın-İzmir": 110,
+                    "Denizli-Aydın": 125, "Aydın-Denizli": 125,
+                    "Muğla-Aydın": 100, "Aydın-Muğla": 100,
+                    "Manisa-Aydın": 145, "Aydın-Manisa": 145,
+                    "Tekirdağ-Artvin": 1440, "Artvin-Tekirdağ": 1440,
+                    "İstanbul-Artvin": 1310, "Artvin-İstanbul": 1310,
+                    "Ankara-Artvin": 980, "Artvin-Ankara": 980,
+                    "Rize-Artvin": 95, "Artvin-Rize": 95,
+                    "Erzurum-Artvin": 200, "Artvin-Erzurum": 200,
+                    "Ardahan-Artvin": 115, "Artvin-Ardahan": 115,
+                    "Tekirdağ-Adana": 1050, "Adana-Tekirdağ": 1050,
+                    "İstanbul-Adana": 930, "Adana-İstanbul": 930,
+                    "Ankara-Adana": 490, "Adana-Ankara": 490,
+
+                    "Tekirdağ-İstanbul": 135, "İstanbul-Tekirdağ": 135,
+                    "Tekirdağ-Edirne": 140, "Edirne-Tekirdağ": 140,
+                    "Tekirdağ-Kırklareli": 115, "Kırklareli-Tekirdağ": 115,
+                    "Tekirdağ-Çanakkale": 170, "Çanakkale-Tekirdağ": 170,
+                    "Edirne-Kırklareli": 65, "Kırklareli-Edirne": 65,
+                    "Edirne-Çanakkale": 210, "Çanakkale-Edirne": 210,
+                    "Kırklareli-Çanakkale": 240, "Çanakkale-Kırklareli": 240,
+                    "İstanbul-Edirne": 240, "Edirne-İstanbul": 240,
+                    "İstanbul-Kırklareli": 215, "Kırklareli-İstanbul": 215,
+                    "İstanbul-Çanakkale": 310, "Çanakkale-İstanbul": 310,
+                    "İstanbul-Ankara": 450, "Ankara-İstanbul": 450,
+                    "Tekirdağ-Ankara": 585,
+                    "Tekirdağ-Eskişehir": 430,
+                    "Tekirdağ-Gaziantep": 1260,
+                    "Tekirdağ-Giresun": 1050,
+                    "Tekirdağ-Gümüşhane": 1140, "Gümüşhane-Tekirdağ": 1140,
+                    "İstanbul-Gümüşhane": 1020, "Gümüşhane-İstanbul": 1020,
+                    "Ankara-Gümüşhane": 760, "Gümüşhane-Ankara": 760,
+                    "Bayburt-Gümüşhane": 75, "Gümüşhane-Bayburt": 75,
+                    "Erzincan-Gümüşhane": 135, "Gümüşhane-Erzincan": 135,
+                    "Giresun-Gümüşhane": 145, "Gümüşhane-Giresun": 145,
+                    "Erzurum-Gümüşhane": 200, "Gümüşhane-Erzurum": 200,
+ "Giresun-Tekirdağ": 1050,
+                    "İstanbul-Giresun": 930, "Giresun-İstanbul": 930,
+                    "Ankara-Giresun": 610, "Giresun-Ankara": 610,
+                    "Erzincan-Giresun": 225, "Giresun-Erzincan": 225,
+                    "Erzurum-Giresun": 335, "Giresun-Erzurum": 335,
+                    "Amasya-Giresun": 280, "Giresun-Amasya": 280,
+                    "Çorum-Giresun": 370, "Giresun-Çorum": 370,
+ "Gaziantep-Tekirdağ": 1260,
+                    "İstanbul-Gaziantep": 1145, "Gaziantep-İstanbul": 1145,
+                    "Ankara-Gaziantep": 700, "Gaziantep-Ankara": 700,
+                    "Adana-Gaziantep": 220, "Gaziantep-Adana": 220,
+                    "Adıyaman-Gaziantep": 150, "Gaziantep-Adıyaman": 150,
+                    "Diyarbakır-Gaziantep": 315, "Gaziantep-Diyarbakır": 315,
+                    "Konya-Gaziantep": 550, "Gaziantep-Konya": 550,
+ "Eskişehir-Tekirdağ": 430,
+                    "İstanbul-Eskişehir": 300, "Eskişehir-İstanbul": 300,
+                    "Ankara-Eskişehir": 235, "Eskişehir-Ankara": 235,
+                    "Bursa-Eskişehir": 150, "Eskişehir-Bursa": 150,
+                    "Bilecik-Eskişehir": 80, "Eskişehir-Bilecik": 80,
+                    "Konya-Eskişehir": 330, "Eskişehir-Konya": 330,
+                    "Afyonkarahisar-Eskişehir": 130, "Eskişehir-Afyonkarahisar": 130,
+                    "Bolu-Eskişehir": 200, "Eskişehir-Bolu": 200,
+ "Ankara-Tekirdağ": 585,
+                    "Çanakkale-Balıkesir": 195, "Balıkesir-Çanakkale": 195,
+                    "Çanakkale-Bursa": 270, "Bursa-Çanakkale": 270,
+                    "Çanakkale-İzmir": 320, "İzmir-Çanakkale": 320
+                };
+if (typeof window !== 'undefined') {
+    window.masterCitiesList = masterCitiesList;
+    window.sehirRotalari = sehirRotalari;
+    window.varsayilanSehirDuraklari = varsayilanSehirDuraklari;
+    window.ilceRotalari = (typeof ilceRotalari !== 'undefined') ? ilceRotalari : {};
+    window.sehirlerarasiMesafeler = sehirlerarasiMesafeler;
+}
+if (typeof globalThis !== 'undefined') {
+    globalThis.masterCitiesList = masterCitiesList;
+    globalThis.sehirRotalari = sehirRotalari;
+    globalThis.varsayilanSehirDuraklari = varsayilanSehirDuraklari;
+    globalThis.ilceRotalari = (typeof ilceRotalari !== 'undefined') ? ilceRotalari : {};
+    globalThis.sehirlerarasiMesafeler = sehirlerarasiMesafeler;
 }

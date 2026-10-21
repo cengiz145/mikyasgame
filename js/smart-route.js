@@ -991,9 +991,9 @@ const AkilliRotaSistemi = {
             };
         }
 
-        const db = (typeof window !== 'undefined' && window.tekulasHatVeritabani && window.tekulasHatVeritabani.length > 0)
+        const db = (typeof window !== 'undefined' && window.tekulasHatVeritabani && window.tekulasHatVeritabani.length > 0 && currentCity === "Tekirdağ")
             ? window.tekulasHatVeritabani
-            : ((typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) ? ilceRotalari["Tekirdağ"] : (typeof routesData !== 'undefined' ? Object.values(routesData) : []));
+            : ((typeof ilceRotalari !== 'undefined' && ilceRotalari[currentCity]) ? ilceRotalari[currentCity] : ((typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) ? ilceRotalari["Tekirdağ"] : (typeof routesData !== 'undefined' ? Object.values(routesData) : [])));
 
         if (!db || db.length === 0) {
             return { success: false, message: "Hat veritabanı yüklenemedi." };
@@ -1071,9 +1071,11 @@ const AkilliRotaSistemi = {
                 });
             } else {
                 // BFS İLE KOMŞULUK İLİŞKİLERİNE GÖRE ÇOK BACAKLI KORİDOR AĞI OLUŞTURMA
-                const kGraph = (typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"] && sehirRotalari["Tekirdağ"].ilcelerBilgisi && sehirRotalari["Tekirdağ"].ilcelerBilgisi.komsuIlceler)
-                    ? sehirRotalari["Tekirdağ"].ilcelerBilgisi.komsuIlceler
-                    : {
+                const kGraph = (typeof sehirRotalari !== 'undefined' && sehirRotalari[currentCity] && sehirRotalari[currentCity].ilcelerBilgisi && sehirRotalari[currentCity].ilcelerBilgisi.komsuIlceler)
+                    ? sehirRotalari[currentCity].ilcelerBilgisi.komsuIlceler
+                    : ((typeof sehirRotalari !== 'undefined' && sehirRotalari["Tekirdağ"] && sehirRotalari["Tekirdağ"].ilcelerBilgisi && sehirRotalari["Tekirdağ"].ilcelerBilgisi.komsuIlceler)
+                        ? sehirRotalari["Tekirdağ"].ilcelerBilgisi.komsuIlceler
+                        : {
                         "Süleymanpaşa": ["Muratlı", "Çorlu", "Marmaraereğlisi", "Hayrabolu", "Malkara", "Şarköy"],
                         "Çorlu": ["Süleymanpaşa", "Marmaraereğlisi", "Ergene", "Çerkezköy", "Muratlı"],
                         "Ergene": ["Çorlu", "Muratlı", "Çerkezköy", "Kapaklı", "Saray"],
@@ -1085,7 +1087,7 @@ const AkilliRotaSistemi = {
                         "Hayrabolu": ["Süleymanpaşa", "Muratlı", "Malkara"],
                         "Malkara": ["Süleymanpaşa", "Hayrabolu", "Şarköy"],
                         "Şarköy": ["Süleymanpaşa", "Malkara"]
-                    };
+                    });
 
                 // Sınır illerinin ilçe kapıları (Örn: Silivri -> Marmaraereğlisi/Çerkezköy, Keşan -> Malkara, Gelibolu -> Şarköy vb.)
                 const gatewayMap = {
