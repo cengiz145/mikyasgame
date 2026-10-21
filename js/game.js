@@ -741,27 +741,18 @@ const Game = {
     },
 
     getLicenseTitle: function() {
-        if (typeof CareerMissions !== 'undefined' && CareerMissions.getLevelTitle) {
-            return CareerMissions.getLevelTitle(this.completedTasks);
+        let equipped = null;
+        if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.getEquippedTitle === 'function') {
+            equipped = DriverBadges.getEquippedTitle();
         }
-        if (this.completedTasks >= 10 || this.licenseLevel > 10) {
-            return `${this.licenseLevel}. Sınıf Master Kaptan (İlçe & Şehirlerarası)`;
+        const careerTitle = (typeof CareerMissions !== 'undefined' && CareerMissions.getLevelTitle)
+            ? CareerMissions.getLevelTitle(this.completedTasks)
+            : `${this.licenseLevel}. Seviye Şehir İçi Sürücü`;
+
+        if (equipped && equipped.name && equipped.id !== 'title_cirak') {
+            return `${equipped.icon} ${equipped.name} (${careerTitle})`;
         }
-        const lvl = Math.min(10, Math.max(1, this.licenseLevel));
-        const titles = [
-            "",
-            "1. Seviye Çırak Şehir İçi Sürücü",
-            "2. Seviye Stajyer Şehir İçi Sürücü",
-            "3. Seviye Acemi Şehir İçi Sürücü",
-            "4. Seviye Kalfalık Şehir İçi Sürücü",
-            "5. Seviye Deneyimli Şehir İçi Şoför",
-            "6. Seviye Kıdemli Şehir İçi Şoför",
-            "7. Seviye Uzman Şehir İçi Şoför",
-            "8. Seviye Şehir İçi Hat Kaptanı",
-            "9. Seviye Şehir İçi Başkaptan",
-            "10. Seviye Usta Şehir İçi Kaptan (Son Sınav)"
-        ];
-        return titles[lvl] || `${lvl}. Seviye Şehir İçi Sürücü`;
+        return careerTitle;
     },
 
     completeTask: function(comfortMsg, timingRewardMsg) {
@@ -1332,6 +1323,7 @@ const Game = {
         this.engineRPM = 800;
         this.currentGear = 1;
         this.rampUsedInRoute = false;
+        this.retarderUsedInRoute = false;
         this.hasLostItemFound = false;
         
         // ZAMAN VE HAVA DURUMU SİSTEMİ
@@ -2282,7 +2274,8 @@ const Game = {
                 
                 // Retarder (Motor Freni) Etkisi: 30 km/s'den hızlıysak ve imdat kilitli değilse
                 if (this.speed > 30 && !this.isEmergencyBrakeLocked && typeof audio.playRetarder === 'function') {
-                    audio.playRetarder(5, this.speed); // 5 saniyelik retarder simülasyonu
+                    audio.playRetarder(5, this.speed);
+                    this.retarderUsedInRoute = true; // 5 saniyelik retarder simülasyonu
                 }
             }
             // Gerçek otobüslerde frene basılı tutmak havayı tüketmez, sadece basıp bırakmak tüketir!
@@ -3976,7 +3969,11 @@ const Game = {
                     isNight: !!this.isNight,
                     isHeadlightsOn: !!this.isHeadlightsOn,
                     completedTasks: this.completedTasks,
-                    totalDrivingSeconds: this.totalDrivingSeconds || 0
+                    totalDrivingSeconds: this.totalDrivingSeconds || 0,
+                    retarderUsed: !!this.retarderUsedInRoute,
+                    selectedBus: this.selectedBus,
+                    isIntercity: !!(this.activeRouteData && this.activeRouteData.isIntercity),
+                    unlockedCitiesCount: (this.unlockedCities && Array.isArray(this.unlockedCities)) ? this.unlockedCities.length : 1
                 };
                 DriverBadges.checkAfterRoute(routeStats);
             }

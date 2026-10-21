@@ -318,7 +318,17 @@ const UI = {
 
     updatePlayerStats: function(licenseLevel, completedTasks, budget, licenseTitle) {
         const lvlEl = document.getElementById('ui-level');
-        if (lvlEl) lvlEl.innerText = licenseTitle;
+        if (lvlEl) {
+            let displayTitle = licenseTitle;
+            if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.getEquippedTitle === 'function') {
+                const eq = DriverBadges.getEquippedTitle();
+                if (eq && eq.name && eq.id !== 'title_cirak') {
+                    displayTitle = `${eq.icon} ${eq.name}`;
+                    lvlEl.title = `Kuşanılan Unvan: ${eq.name} | Kademe: ${licenseTitle}`;
+                }
+            }
+            lvlEl.innerText = displayTitle;
+        }
         
         const budgetEl = document.getElementById('ui-budget');
         if (budgetEl) budgetEl.innerText = `${budget.toLocaleString('tr-TR')} ₺`;
