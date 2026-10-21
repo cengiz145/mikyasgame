@@ -30,6 +30,70 @@
             radioLogs: []                  // Canlı telsiz kayıtları
         },
 
+        // Türkiye'nin Önde Gelen Otobüs Şirketleri (Maaşlı Kaptanlık Modu)
+        corporateCompanies: [
+            {
+                id: "kamil_koc",
+                name: "Kâmil Koç Otobüsleri",
+                slogan: "Cumhuriyetin İlk Karayolu Firması (1926)",
+                logo: "🔵",
+                badge: "⭐ Kurumsal Kaptan",
+                dailySalary: 3500,
+                bonusPercent: 10,
+                minLevel: 1,
+                desc: "Düzenli hat seferleri, her seferde +%10 garanti bilet primi ve şirket yemek/ikram desteği.",
+                color: "#38bdf8"
+            },
+            {
+                id: "pamukkale",
+                name: "Pamukkale Turizm",
+                slogan: "Keyifli Yolculuk, Pamuk Eller Direksiyona (Jumbo VIP)",
+                logo: "🔴",
+                badge: "👑 VIP Baş Kaptan",
+                dailySalary: 4500,
+                bonusPercent: 15,
+                minLevel: 2,
+                desc: "2+1 Jumbo araç filosu, üstün yolcu konforu ve sefer başına +%15 VIP memnuniyet primi.",
+                color: "#f87171"
+            },
+            {
+                id: "metro",
+                name: "Metro Turizm",
+                slogan: "Aklınızda Neresi Varsa, Orada Bir Metro Var",
+                logo: "🔴",
+                badge: "⚡ Seri Sefer Kaptanı",
+                dailySalary: 3800,
+                bonusPercent: 12,
+                minLevel: 1,
+                desc: "Türkiye'nin en geniş acente ağı, yüksek sefer sıklığı ve sefer başına +%12 ciro primi.",
+                color: "#fb923c"
+            },
+            {
+                id: "tekulas",
+                name: "TEKULAŞ (Tekirdağ Büyükşehir Belediyesi)",
+                slogan: "Halkımızın Hizmetinde Güvenli, Konforlu Şehir İçi Ulaşım",
+                logo: "🟡",
+                badge: "🏛️ Resmi Belediye Şoförü",
+                dailySalary: 3200,
+                bonusPercent: 8,
+                minLevel: 1,
+                desc: "Resmi büyükşehir belediyesi kadrosu, sabit mesai, kamu sosyal hakları ve sendika güvencesi.",
+                color: "#facc15"
+            },
+            {
+                id: "varan",
+                name: "Varan Turizm",
+                slogan: "Türkiye Karayollarının Bir Numaralı Ultra Lüks Efsanesi",
+                logo: "🌟",
+                badge: "💎 Elit Karayolu Kaptanı",
+                dailySalary: 6000,
+                bonusPercent: 20,
+                minLevel: 3,
+                desc: "Business Class ultra lüks seferler, +%20 VIP ciro primi ve yüksek yolcu bahşişleri.",
+                color: "#eab308"
+            }
+        ],
+
         // Şoför Rütbe ve Terfi Basamakları
         ranks: [
             { level: 1, title: "Stajyer Şoför", badge: "🌱", reqXP: 0, speedMod: 0.95, bonusRev: 1.0, desc: "Mesleğe yeni adım atmış, acemi ama hevesli çırak şoför." },
@@ -1346,7 +1410,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(250, 204, 21, 0.2); padding-bottom: 10px;">
                         <div>
                             <h2 id="company-modal-title" style="font-size: 1.75rem; margin: 0; color: #facc15; display: flex; align-items: center; gap: 8px;">
-                                🏢 Akıllı Filo & Şirket Yönetimi
+                                🏢 Şirket Kur veya Var Olan Bir Şirkette Çalış
                             </h2>
                             <p style="color: #cbd5e1; font-size: 0.9rem; margin: 4px 0 0 0;">
                                 Otomatik sefer optimizasyonu, dinamik piyasa borsası, şoför karakterleri ve araç tahsisi
@@ -1367,8 +1431,11 @@
 
                     <!-- 5 Sekme Butonları -->
                     <div style="display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;">
-                        <button id="tab-comp-drivers" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(234, 179, 8, 0.3); border: 1.5px solid #facc15; color: #fff; cursor: pointer; border-radius: 6px; font-size: 0.9rem;">
-                            🚍 Şoförlerim & Filom
+                        <button id="tab-comp-drivers" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 9px 8px; font-weight: bold; background: rgba(234, 179, 8, 0.3); border: 1.5px solid #facc15; color: #fff; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
+                            🏢 Kendi Filom & Şoförlerim
+                        </button>
+                        <button id="tab-comp-corporate-work" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
+                            👔 Var Olan Şirkette Çalış (Maaşlı)
                         </button>
                         <button id="tab-comp-market-trends" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.9rem;">
                             📈 Sefer Borsası & VIP İhale
@@ -1420,6 +1487,19 @@
                         </div>
                     </div>
 
+                    <!-- 6. SEKME: Var Olan Bir Şirkette Çalış (Maaşlı Kaptanlık) -->
+                    <div id="panel-comp-corporate-work" style="display: none;">
+                        <div style="background: rgba(15,23,42,0.6); padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                            <h3 style="color: #fde047; margin: 0 0 4px 0; font-size: 1.1rem;">👔 Kurumsal Taşımacılık: Şirketlerde Maaşlı Kaptan Ol</h3>
+                            <p style="color: #cbd5e1; font-size: 0.88rem; margin: 0;">
+                                Kendi şirketinizi yönetmek yerine Türkiye'nin köklü otobüs firmalarına katılarak günlük garanti maaş, sefer primleri ve kurumsal üniforma ayrıcalığı kazanabilirsiniz.
+                            </p>
+                        </div>
+                        <div id="corporate-work-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                            <!-- Dinamik doldurulacak -->
+                        </div>
+                    </div>
+
                     <!-- 5. SEKME: Canlı Telsiz Kayıtları -->
                     <div id="panel-comp-radio" style="display: none;">
                         <div id="company-radio-container" style="max-height: 48vh; overflow-y: auto; background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 8px; padding: 12px;" role="status" aria-live="polite">
@@ -1451,6 +1531,7 @@
             // Sekme geçişleri
             const tabs = [
                 { tabId: 'tab-comp-drivers', panelId: 'panel-comp-drivers' },
+                { tabId: 'tab-comp-corporate-work', panelId: 'panel-comp-corporate-work' },
                 { tabId: 'tab-comp-market-trends', panelId: 'panel-comp-market-trends' },
                 { tabId: 'tab-comp-hire', panelId: 'panel-comp-hire' },
                 { tabId: 'tab-comp-hq', panelId: 'panel-comp-hq' },
@@ -1492,6 +1573,7 @@
             this.renderDriverMarket();
             this.renderHqUpgrades();
             this.renderRadioLogs();
+            this.renderCorporateWork();
         },
 
         // Şirket Başlık Kartını Render Et
@@ -1504,11 +1586,25 @@
             const revFormatted = (this.data.totalRevenue || 0).toLocaleString('tr-TR');
             const lvlInfo = this.companyLevels.find(l => l.level === (this.data.companyLevel || 1)) || this.companyLevels[0];
 
+            const empId = this.data.corporateEmployer;
+            const empComp = this.corporateCompanies ? this.corporateCompanies.find(c => c.id === empId) : null;
+
+            const empBadge = empComp
+                ? `<div style="margin-top: 8px; padding: 8px 12px; background: rgba(34,197,94,0.18); border: 1.5px solid #22c55e; border-radius: 8px; font-size: 0.88rem; color: #86efac; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+                    <span>👔 <strong>Maaşlı Kaptan:</strong> ${empComp.name} (${empComp.badge}) | Günlük Maaş: <strong style="color: #fde047;">${empComp.dailySalary.toLocaleString('tr-TR')} ₺</strong> | Sefer Primi: <strong style="color: #4ade80;">+${empComp.bonusPercent}%</strong></span>
+                    <button id="btn-comp-leave-corp" class="modern-btn nav-item" style="padding: 4px 12px; font-size: 0.8rem; background: rgba(239,68,68,0.25); border: 1px solid #ef4444; color: #fca5a5; border-radius: 6px; cursor: pointer;">Kendi Şirketime Dön</button>
+                   </div>`
+                : `<div style="margin-top: 8px; padding: 8px 12px; background: rgba(234,179,8,0.15); border: 1.5px solid #facc15; border-radius: 8px; font-size: 0.88rem; color: #fef08a; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+                    <span>🏢 <strong>Bağımsız Şirket Sahibi:</strong> Kendi filonuzu ve şoförlerinizi yönetiyorsunuz. Tüm gelirler doğrudan şirket kasanıza aktarılır.</span>
+                    <button id="btn-comp-go-corp-tab" class="modern-btn nav-item" style="padding: 4px 12px; font-size: 0.8rem; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; border-radius: 6px; cursor: pointer;">👔 Şirketlerde Çalış</button>
+                   </div>`;
+
             card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div>
-                    <div style="color: #fde047; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                    <div style="color: #fde047; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
                         <span>🏢 ${this.data.companyName}</span>
+                        <button id="btn-rename-company" class="modern-btn nav-item" style="padding: 3px 10px; font-size: 0.8rem; background: rgba(255,255,255,0.12); border: 1px solid #fde047; color: #fde047; border-radius: 6px; cursor: pointer;" title="Şirket İsmini Değiştir">✏️ Şirket Kur / İsim Düzenle</button>
                         <span style="font-size: 0.85rem; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.4); border: 1px solid #facc15; color: #fef08a;">
                             ${lvlInfo.badge} Seviye ${lvlInfo.level}: ${lvlInfo.title}
                         </span>
@@ -1526,7 +1622,33 @@
                     </div>
                 </div>
             </div>
+            ${empBadge}
             `;
+
+            const btnRename = card.querySelector('#btn-rename-company');
+            if (btnRename) {
+                btnRename.addEventListener('click', () => {
+                    const promptName = prompt("Yeni Şirket İsminizi Girin (Örn: Mikyas Turizm, Trakya Lojistik):", this.data.companyName);
+                    if (promptName && promptName.trim().length > 0) {
+                        this.setCompanyName(promptName.trim());
+                    }
+                });
+            }
+
+            const btnLeave = card.querySelector('#btn-comp-leave-corp');
+            if (btnLeave) {
+                btnLeave.addEventListener('click', () => {
+                    this.leaveCorporateCompany();
+                });
+            }
+
+            const btnGoCorp = card.querySelector('#btn-comp-go-corp-tab');
+            if (btnGoCorp) {
+                btnGoCorp.addEventListener('click', () => {
+                    const tabCorp = document.getElementById('tab-comp-corporate-work');
+                    if (tabCorp) tabCorp.click();
+                });
+            }
         },
 
         // Kiralanmış Şoförleri, Araçları, Kondisyon ve Enerji Durumlarını Render Et
@@ -1999,6 +2121,132 @@
                 </div>
                 `;
             }).join('');
+        },
+
+        setCompanyName: function(newName) {
+            this.data.companyName = newName;
+            this.saveData();
+            this.renderCompanyOverview();
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏢 Şirket İsmi: ${this.data.companyName}`, 'success');
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Şirket ismi ${this.data.companyName} olarak kaydedildi.`);
+        },
+
+        joinCorporateCompany: function(companyId) {
+            const comp = this.corporateCompanies.find(c => c.id === companyId);
+            if (!comp) return;
+
+            const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
+            if (currentLevel < comp.minLevel) {
+                const lockMsg = `Bu şirkete katılmak için Seviye ${comp.minLevel} kaptanlık derecesine sahip olmalısınız (Mevcut Seviyeniz: ${currentLevel}).`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, 'warning');
+                return;
+            }
+
+            this.data.corporateEmployer = comp.id;
+            this.saveData();
+
+            // İlk işe başlama primini hediye et
+            if (typeof Game !== 'undefined') {
+                Game.playerBudget += comp.dailySalary;
+                Game.saveData();
+                if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                    const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                    UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                }
+            }
+
+            const successMsg = `Tebrikler! ${comp.name} bünyesinde maaşlı kaptan olarak göreve başladınız. İlk günlük maaşınız ${comp.dailySalary.toLocaleString('tr-TR')} TL hesabınıza yatırıldı.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(successMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`👔 ${comp.name} Kadrosuna Katıldınız! (+${comp.dailySalary.toLocaleString('tr-TR')} ₺)`, 'success');
+
+            this.renderAll();
+        },
+
+        leaveCorporateCompany: function() {
+            this.data.corporateEmployer = null;
+            this.saveData();
+
+            const msg = "Kurumsal şirketten ayrıldınız. Artık kendi bağımsız şirketiniz ve filonuz adına çalışıyorsunuz.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🏢 Bağımsız Şirket Moduna Dönüldü", "info");
+
+            this.renderAll();
+        },
+
+        renderCorporateWork: function() {
+            const container = document.getElementById('corporate-work-list');
+            if (!container) return;
+
+            const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
+            const activeCorpId = this.data.corporateEmployer;
+
+            container.innerHTML = this.corporateCompanies.map(comp => {
+                const isCurrent = (activeCorpId === comp.id);
+                const isUnlocked = (currentLevel >= comp.minLevel);
+
+                return `
+                <div style="background: rgba(15,23,42,0.85); border: 1.5px solid ${isCurrent ? '#22c55e' : (isUnlocked ? comp.color : '#334155')}; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div style="font-size: 1.15rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
+                                <span>${comp.logo}</span>
+                                <span>${comp.name}</span>
+                            </div>
+                            <span style="font-size: 0.8rem; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.5); border: 1px solid ${comp.color}; color: #fff;">
+                                ${comp.badge}
+                            </span>
+                        </div>
+                        <div style="color: #94a3b8; font-size: 0.83rem; font-style: italic; margin-bottom: 8px;">
+                            "${comp.slogan}"
+                        </div>
+                        <div style="background: rgba(255,255,255,0.04); border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.85rem; color: #cbd5e1;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                                <span>💰 Günlük Maaş:</span>
+                                <strong style="color: #fde047;">${comp.dailySalary.toLocaleString('tr-TR')} ₺</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>🎁 Sefer Başı Bilet Primi:</span>
+                                <strong style="color: #4ade80;">+%${comp.bonusPercent}</strong>
+                            </div>
+                        </div>
+                        <div style="color: #cbd5e1; font-size: 0.83rem; line-height: 1.3; margin-bottom: 12px;">
+                            💡 ${comp.desc}
+                        </div>
+                    </div>
+                    <div>
+                        ${isCurrent ? `
+                            <button id="btn-leave-corp-${comp.id}" class="modern-btn nav-item" style="width: 100%; padding: 10px; background: rgba(34,197,94,0.2); border: 1.5px solid #22c55e; color: #4ade80; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                                ✅ AKTİF ÇALIŞTIĞINIZ FİRMA (Ayrıl)
+                            </button>
+                        ` : (isUnlocked ? `
+                            <button id="btn-join-corp-${comp.id}" class="modern-btn nav-item" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                                ✍️ Sözleşme İmzala (Maaşlı Kaptan Ol)
+                            </button>
+                        ` : `
+                            <button class="modern-btn" disabled style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid #334155; color: #64748b; font-weight: bold; border-radius: 8px;">
+                                🔒 Seviye ${comp.minLevel} Gerekli
+                            </button>
+                        `)}
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            this.corporateCompanies.forEach(comp => {
+                const btnJoin = container.querySelector(`#btn-join-corp-${comp.id}`);
+                if (btnJoin) {
+                    btnJoin.addEventListener('click', () => {
+                        this.joinCorporateCompany(comp.id);
+                    });
+                }
+                const btnLeave = container.querySelector(`#btn-leave-corp-${comp.id}`);
+                if (btnLeave) {
+                    btnLeave.addEventListener('click', () => {
+                        this.leaveCorporateCompany();
+                    });
+                }
+            });
         }
     };
 

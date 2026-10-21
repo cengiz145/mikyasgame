@@ -1022,17 +1022,54 @@ const BusFleet = {
         return true;
     },
 
+    currentMode: 'garage',
+    currentTab: 'all',
+
     openModal: function() {
+        this.openGarageModal();
+    },
+
+    openGarageModal: function() {
+        this.currentMode = 'garage';
         const modal = document.getElementById('bus-garage-modal');
         if (!modal) return;
         modal.classList.remove('hidden');
 
-        this.currentTab = 'all';
+        const titleEl = document.getElementById('bus-garage-title');
+        if (titleEl) titleEl.textContent = '🚌 Garajım (Mevcut Araçlarım)';
+        const descEl = document.getElementById('bus-garage-desc');
+        if (descEl) descEl.textContent = 'Satın aldığınız ve garajınızda bulunan otobüsleriniz. Seferlerinizde kullanmak istediğiniz aracı seçebilirsiniz.';
+
+        this.setModeTabActive('garage');
+        this.setTabActive('tab-fleet-all');
+        this.renderModal('owned');
+
+        const sel = this.getSelectedBus();
+        const welcomeSpeech = `Otobüs Garajım açıldı. Aktif aracınız: ${sel.fullName}.`;
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(welcomeSpeech);
+
+        if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+            KeyboardNav.initForScreen();
+        }
+    },
+
+    openDealershipModal: function() {
+        this.currentMode = 'dealership';
+        const modal = document.getElementById('bus-garage-modal');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+
+        const titleEl = document.getElementById('bus-garage-title');
+        if (titleEl) titleEl.textContent = '🛒 Yeni Otobüsler Satın Al (Showroom & Galeri)';
+        const descEl = document.getElementById('bus-garage-desc');
+        if (descEl) descEl.textContent = "Türkiye'nin en seçkin 20 otobüs modeli. Seviyenizi yükselterek ve kazandığınız bütçeyle filonuzu genişletin.";
+
+        this.setModeTabActive('dealership');
+        this.setTabActive('tab-fleet-all');
         this.renderModal('all');
 
-        const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
-        const sel = this.getSelectedBus();
-        const welcomeSpeech = `Otobüs Garajı açıldı. Mevcut seviyeniz: ${currentLevel}. Aktif aracınız: ${sel.fullName}.`;
+        const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+        const welcomeSpeech = `Otobüs satış galerisi ve showroom açıldı. Bütçeniz: ${currentBudget.toLocaleString('tr-TR')} TL. 20 otobüs modeli listeleniyor.`;
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(welcomeSpeech);
 
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
@@ -1048,6 +1085,30 @@ const BusFleet = {
         }
     },
 
+    setModeTabActive: function(activeMode) {
+        const tabGarage = document.getElementById('tab-view-garage');
+        const tabDealer = document.getElementById('tab-view-dealership');
+        if (tabGarage && tabDealer) {
+            if (activeMode === 'garage') {
+                tabGarage.style.background = 'rgba(56,189,248,0.3)';
+                tabGarage.style.borderColor = '#38bdf8';
+                tabGarage.style.color = '#fff';
+
+                tabDealer.style.background = 'rgba(255,255,255,0.08)';
+                tabDealer.style.borderColor = 'rgba(255,255,255,0.2)';
+                tabDealer.style.color = '#94a3b8';
+            } else {
+                tabDealer.style.background = 'rgba(249,115,22,0.35)';
+                tabDealer.style.borderColor = '#f97316';
+                tabDealer.style.color = '#fff';
+
+                tabGarage.style.background = 'rgba(255,255,255,0.08)';
+                tabGarage.style.borderColor = 'rgba(255,255,255,0.2)';
+                tabGarage.style.color = '#94a3b8';
+            }
+        }
+    },
+
     renderModal: function(filterCategory) {
         this.currentTab = filterCategory;
         const listEl = document.getElementById('garage-bus-list');
@@ -1055,17 +1116,55 @@ const BusFleet = {
         listEl.innerHTML = '';
 
         const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
+        const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
         const selectedId = this.getSelectedBusId();
 
-        const filtered = this.buses.filter(b => {
-            if (filterCategory === 'belediye') return b.category === 'belediye';
-            if (filterCategory === 'seyahat') return b.category === 'seyahat';
-            return true;
-        });
+        let filtered = this.buses;
+
+        if (this.currentMode === 'garage') {
+            filtered = filtered.filter(b => this.isBusOwned(b.id));
+        }
+
+        if (filterCategory === 'belediye') {
+            filtered = filtered.filter(b => b.category === 'belediye');
+        } else if (filterCategory === 'seyahat') {
+            filtered = filtered.filter(b => b.category === 'seyahat');
+        }
+
+        if (filtered.length === 0) {
+            const emptyLi = document.createElement('li');
+            emptyLi.style.textAlign = 'center';
+            emptyLi.style.padding = '32px 20px';
+            emptyLi.style.background = 'rgba(15,23,42,0.6)';
+            emptyLi.style.borderRadius = '12px';
+            emptyLi.style.border = '1px dashed rgba(255,255,255,0.2)';
+            emptyLi.innerHTML = `
+                <div style="font-size: 2.2rem; margin-bottom: 8px;">🛒</div>
+                <div style="color: #cbd5e1; font-size: 1.05rem; font-weight: bold; margin-bottom: 6px;">
+                    Garajınızda bu filtreye uygun araç bulunmuyor.
+                </div>
+                <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 16px;">
+                    Yeni otobüs modellerini incelemek ve filonuzu büyütmek için Otobüs Galerisi'ni ziyaret edebilirsiniz.
+                </p>
+                <button id="btn-switch-to-dealership" class="menu-btn nav-item" style="display: inline-flex; width: auto; margin: 0 auto; padding: 10px 24px; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                    🛒 Showroom ve Galeriye Git
+                </button>
+            `;
+            listEl.appendChild(emptyLi);
+            const btnSw = emptyLi.querySelector('#btn-switch-to-dealership');
+            if (btnSw) {
+                btnSw.onclick = () => this.openDealershipModal();
+            }
+            if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+                KeyboardNav.initForScreen();
+            }
+            return;
+        }
 
         filtered.forEach(b => {
             const isUnlocked = currentLevel >= b.requiredLevel;
             const isSelected = b.id === selectedId;
+            const isOwned = this.isBusOwned(b.id);
 
             const li = document.createElement('li');
             li.style.marginBottom = "12px";
@@ -1080,19 +1179,26 @@ const BusFleet = {
             btn.style.border = isSelected ? '2px solid #22c55e' : (isUnlocked ? '1px solid rgba(255,255,255,0.15)' : '1px solid rgba(239,68,68,0.3)');
             btn.style.background = isSelected ? 'rgba(34,197,94,0.15)' : (isUnlocked ? 'rgba(15,23,42,0.6)' : 'rgba(0,0,0,0.4)');
 
-            const isOwned = this.isBusOwned(b.id);
             let statusBadge = '';
-            if (isSelected) {
-                statusBadge = '<span style="background: #22c55e; color: #000; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">✅ AKTİF KULLANIMDA</span>';
-            } else if (isOwned) {
-                statusBadge = '<span style="background: rgba(34,197,94,0.25); color: #22c55e; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">GARAJINIZDA (SEÇ)</span>';
-            } else if (isUnlocked) {
-                const canAfford = (typeof Game !== 'undefined' && Game.playerBudget >= (b.price || 0));
-                statusBadge = canAfford
-                    ? `<span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🛒 SATIN AL (${(b.price || 0).toLocaleString('tr-TR')} ₺)</span>`
-                    : `<span style="background: rgba(245,158,11,0.2); color: #fbbf24; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🔒 ${(b.price || 0).toLocaleString('tr-TR')} ₺ (Yetersiz Bakiye)</span>`;
+            if (this.currentMode === 'garage') {
+                if (isSelected) {
+                    statusBadge = '<span style="background: #22c55e; color: #000; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">✅ AKTİF KULLANIMDA</span>';
+                } else {
+                    statusBadge = '<span style="background: rgba(34,197,94,0.25); color: #22c55e; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">▶️ BU ARACI SEÇ (Enter)</span>';
+                }
             } else {
-                statusBadge = `<span style="background: rgba(239,68,68,0.2); color: #f87171; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🔒 SEVİYE ${b.requiredLevel} GEREKLİ (${(b.price || 0).toLocaleString('tr-TR')} ₺)</span>`;
+                if (isSelected) {
+                    statusBadge = '<span style="background: #22c55e; color: #000; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">✅ GARAJINIZDA (SEÇİLİ)</span>';
+                } else if (isOwned) {
+                    statusBadge = '<span style="background: rgba(34,197,94,0.25); color: #22c55e; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">✅ GARAJINIZDA MEVCUT (SEÇ)</span>';
+                } else if (isUnlocked) {
+                    const canAfford = currentBudget >= (b.price || 0);
+                    statusBadge = canAfford
+                        ? `<span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🛒 SATIN AL (${(b.price || 0).toLocaleString('tr-TR')} ₺)</span>`
+                        : `<span style="background: rgba(245,158,11,0.2); color: #fbbf24; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🔒 ${(b.price || 0).toLocaleString('tr-TR')} ₺ (Yetersiz Bakiye)</span>`;
+                } else {
+                    statusBadge = `<span style="background: rgba(239,68,68,0.2); color: #f87171; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🔒 SEVİYE ${b.requiredLevel} GEREKLİ (${(b.price || 0).toLocaleString('tr-TR')} ₺)</span>`;
+                }
             }
 
             const categoryBadge = b.category === 'belediye'
@@ -1103,13 +1209,13 @@ const BusFleet = {
                 ? `${b.seatCapacity} Oturan + ${b.standingCapacity} Ayakta (Toplam ${b.totalCapacity} Yolcu)`
                 : `${b.seatCapacity} Koltuklu (2+1 Rahat Seyahat)`;
 
-            let ariaLabel = `${b.fullName}. ${b.categoryName}. Kabin NVH Sessizliği yüzde ${b.nvhLevel || 70}, Şasi Mukavemeti yüzde ${b.chassisRigidity || 70}, Körük Konforu yüzde ${b.suspensionComfort || 70}. Bahşiş Bonusu artı yüzde ${b.tipBonusPercent || 0}. Fiyat: ${(b.price || 0).toLocaleString('tr-TR')} TL. ${capacityInfo}. Motor: ${b.engine}. ${!isUnlocked ? `Kilitli, Seviye ${b.requiredLevel} ve ${(b.price || 0).toLocaleString('tr-TR')} TL gereklidir.` : (isOwned ? (isSelected ? 'Şu anda aktif seçili araç.' : 'Garajınızda mevcut, sefere seçmek için Enter.') : `Satın almak için Enter. Fiyat: ${(b.price || 0).toLocaleString('tr-TR')} TL.`)}`;
+            let ariaLabel = `${b.fullName}. ${b.categoryName}. Fiyat: ${(b.price || 0).toLocaleString('tr-TR')} TL. ${capacityInfo}. ${isOwned ? (isSelected ? 'Aktif kullanımda.' : 'Garajınızda mevcut, seçmek için Enter.') : 'Satın almak için Enter.'}`;
             btn.setAttribute('aria-label', ariaLabel);
 
             btn.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <div>
-                        <span style="font-size: 1.15rem; font-weight: bold; color: ${isUnlocked ? '#fff' : '#94a3b8'};">
+                        <span style="font-size: 1.15rem; font-weight: bold; color: ${isUnlocked || isOwned ? '#fff' : '#94a3b8'};">
                             ${b.icon} ${b.fullName}
                         </span>
                         <div style="margin-top: 2px;">${categoryBadge}</div>
@@ -1129,26 +1235,32 @@ const BusFleet = {
                 <div style="font-size: 0.85rem; color: #a1a1aa; margin-bottom: 6px;">
                     💡 ${b.features}
                 </div>
-                <!-- 🏗️ Yapı & 🔇 NVH Akustik Kalite Paneli -->
+                <!-- Yapı & NVH Akustik Kalite Paneli -->
                 <div style="background: rgba(15,23,42,0.85); border: 1px solid rgba(56,189,248,0.3); border-radius: 8px; padding: 8px 12px; margin-top: 4px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: bold; margin-bottom: 3px;">
                         <span style="color: #38bdf8;">🔇 NVH Kabin Sessizliği: %${b.nvhLevel || 70} (${b.cabinAcousticType || 'Standart'})</span>
                         <span style="color: #22c55e;">💰 Bahşiş Bonusu: +%${b.tipBonusPercent || 0}</span>
                     </div>
                     <div style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 3px;">
-                        🛡️ <strong>Şasi Mukavemeti:</strong> %${b.chassisRigidity || 70} | 🎈 <strong>Havalı Körük Emişi:</strong> %${b.suspensionComfort || 70}
+                        🛡️ <strong>Şasi Mukavemeti:</strong> %${b.chassisRigidity || 70} | 🎈 <strong>Körük Konforu:</strong> %${b.suspensionComfort || 70}
                     </div>
-                    <div style="font-size: 0.78rem; color: #94a3b8; font-style: italic;">
-                        🏗️ <strong>Yapısal Kalite:</strong> ${b.structureDetails || 'Standart çelik gövde yapısı.'}
+                    <div style="font-size: 0.78rem; color: #4ade80; font-weight: bold;">
+                        ✅ Kondisyon: %100 Mükemmel | ⛽ Depo: Dolu | 🔧 Bakım: Yapıldı
                     </div>
                 </div>
             `;
 
             btn.onclick = () => {
-                if (isUnlocked) {
+                if (isOwned) {
                     this.selectBus(b.id);
+                    this.renderModal(this.currentTab);
+                } else if (isUnlocked) {
+                    const bought = this.buyBus(b.id);
+                    if (bought) {
+                        this.renderModal(this.currentTab);
+                    }
                 } else {
-                    const lockMsg = `Bu araç henüz kilitli. ${b.fullName} kullanabilmek için Seviye ${b.requiredLevel} ehliyet derecesine ulaşmalısınız.`;
+                    const lockMsg = `Bu araç henüz kilitli. ${b.fullName} satın alabilmek için Seviye ${b.requiredLevel} olmalısınız.`;
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, "warning");
                 }
@@ -1158,15 +1270,49 @@ const BusFleet = {
             listEl.appendChild(li);
         });
 
+        // Garajım modunda alt kısma galeri tanıtım kartı ekle
+        if (this.currentMode === 'garage') {
+            const promoLi = document.createElement('li');
+            promoLi.style.marginTop = '16px';
+            promoLi.style.padding = '14px 18px';
+            promoLi.style.background = 'linear-gradient(135deg, rgba(249, 115, 22, 0.12), rgba(234, 179, 8, 0.12))';
+            promoLi.style.border = '1.5px solid rgba(249, 115, 22, 0.4)';
+            promoLi.style.borderRadius = '10px';
+            promoLi.style.display = 'flex';
+            promoLi.style.alignItems = 'center';
+            promoLi.style.justifyContent = 'space-between';
+            promoLi.style.flexWrap = 'wrap';
+            promoLi.style.gap = '10px';
+            promoLi.innerHTML = `
+                <div>
+                    <div style="color: #fed7aa; font-weight: bold; font-size: 1rem;">🛒 Filonuzu Büyütmek İster Misiniz?</div>
+                    <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 2px;">20 farklı otobüs modelini showroom galerisinde inceleyin ve satın alın.</div>
+                </div>
+                <button id="btn-garage-go-showroom" class="modern-btn nav-item" style="padding: 8px 18px; background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                    🛒 Showroom'a Git
+                </button>
+            `;
+            listEl.appendChild(promoLi);
+            const btnPromo = promoLi.querySelector('#btn-garage-go-showroom');
+            if (btnPromo) {
+                btnPromo.onclick = () => this.openDealershipModal();
+            }
+        }
+
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
             KeyboardNav.initForScreen();
         }
     },
 
     init: function() {
-        const btnOpen = document.getElementById('btn-open-garage-fleet');
-        if (btnOpen) {
-            btnOpen.addEventListener('click', () => this.openModal());
+        const btnOpenGarage = document.getElementById('btn-open-garage-fleet');
+        if (btnOpenGarage) {
+            btnOpenGarage.addEventListener('click', () => this.openGarageModal());
+        }
+
+        const btnOpenDealer = document.getElementById('btn-open-dealership');
+        if (btnOpenDealer) {
+            btnOpenDealer.addEventListener('click', () => this.openDealershipModal());
         }
 
         const btnClose = document.getElementById('btn-garage-modal-close');
@@ -1174,13 +1320,25 @@ const BusFleet = {
             btnClose.addEventListener('click', () => this.closeModal());
         }
 
+        // Mod Değiştirici Sekmeler
+        const tabViewGarage = document.getElementById('tab-view-garage');
+        if (tabViewGarage) {
+            tabViewGarage.addEventListener('click', () => this.openGarageModal());
+        }
+
+        const tabViewDealer = document.getElementById('tab-view-dealership');
+        if (tabViewDealer) {
+            tabViewDealer.addEventListener('click', () => this.openDealershipModal());
+        }
+
+        // Kategori Sekmeleri
         const tabAll = document.getElementById('tab-fleet-all');
         const tabCity = document.getElementById('tab-fleet-city');
         const tabIntercity = document.getElementById('tab-fleet-intercity');
 
         if (tabAll) tabAll.addEventListener('click', () => {
             this.setTabActive('tab-fleet-all');
-            this.renderModal('all');
+            this.renderModal(this.currentMode === 'garage' ? 'owned' : 'all');
         });
         if (tabCity) tabCity.addEventListener('click', () => {
             this.setTabActive('tab-fleet-city');
@@ -1199,7 +1357,7 @@ const BusFleet = {
     },
 
     setTabActive: function(activeTabId) {
-        ['tab-fleet-all', 'tab-fleet-kucuk', 'tab-fleet-orta', 'tab-fleet-buyuk', 'tab-fleet-city', 'tab-fleet-intercity'].forEach(id => {
+        ['tab-fleet-all', 'tab-fleet-city', 'tab-fleet-intercity'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 if (id === activeTabId) {
