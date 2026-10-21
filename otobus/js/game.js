@@ -4035,6 +4035,16 @@ const Game = {
         }
 
         const k = e.key.toLowerCase();
+        // SHIFT + VİRGÜL (Shift + ,): Rastgele Telsiz Konuşmaları Yükle / Dinlet (Kanal 19)
+        const isCommaKey = (e.key === ',' || e.key === ';' || e.key === '<' || e.code === 'Comma');
+        if (e.shiftKey && isCommaKey) {
+            e.preventDefault();
+            if (typeof Multiplayer !== 'undefined' && typeof Multiplayer.playRandomRadioChatter === 'function') {
+                Multiplayer.playRandomRadioChatter();
+            }
+            return;
+        }
+
         
         // Sürüş tuşlarını anında güncelle (Caps Lock, Türkçe klavye ve e.repeat fark etmeksizin)
         if (k === 'w' || e.code === 'KeyW') this.keys.w = true;
@@ -4108,22 +4118,13 @@ const Game = {
             return;
         }
 
-        if (k === 'v') {
+        // V TUŞU: Telsiz Sesli Konuşma (Push-to-Talk)
+        if (k === 'v' || e.code === 'KeyV') {
             e.preventDefault();
-            if (this.isDriving && this.speed > 3) {
-                const warnMsg = "Güvenlik: Seyir halindeyken çay içilmez kaptanım. Durakta veya duraklamada keyifle yudumlayabilirsiniz.";
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(warnMsg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
-                return;
-            }
-            if (typeof audio !== 'undefined' && typeof audio.playTeaPourAndSip === 'function') {
-                audio.playTeaPourAndSip(() => {
-                    this.passengerComfort = Math.min(100, (this.passengerComfort || 90) + 5);
-                    this.addXP(15);
-                    const teaMsg = "Sıcak demli çay yudumlandı. Afiyet olsun kaptanım, keyfiniz yerine geldi (+15 tecrübe, +5 konfor).";
-                    if (typeof audio.speak === 'function') audio.speak(teaMsg);
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("☕ Çay Yudumlandı (+15 XP, +5 Konfor)", "success");
-                });
+            if (typeof Multiplayer !== 'undefined' && typeof Multiplayer.startVoiceRadio === 'function') {
+                Multiplayer.startVoiceRadio();
+            } else if (window.voiceAssistant && window.voiceAssistant.toggleListening) {
+                window.voiceAssistant.toggleListening();
             }
             return;
         }
@@ -4178,8 +4179,27 @@ const Game = {
             return;
         }
 
-        if (k === 'c') {
+        if (k === 'c' || e.code === 'KeyC') {
             e.preventDefault();
+            if (e.shiftKey) {
+                // Shift + C: Sıcak Demli Çay Yudumlama
+                if (this.isDriving && this.speed > 3) {
+                    const warnMsg = "Güvenlik: Seyir halindeyken çay içilmez kaptanım. Durakta veya duraklamada keyifle yudumlayabilirsiniz.";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(warnMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
+                    return;
+                }
+                if (typeof audio !== 'undefined' && typeof audio.playTeaPourAndSip === 'function') {
+                    audio.playTeaPourAndSip(() => {
+                        this.passengerComfort = Math.min(100, (this.passengerComfort || 90) + 5);
+                        this.addXP(15);
+                        const teaMsg = "Sıcak demli çay yudumlandı. Afiyet olsun kaptanım (+15 tecrübe, +5 konfor).";
+                        if (typeof audio.speak === 'function') audio.speak(teaMsg);
+                        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("☕ Çay Yudumlandı (+15 XP, +5 Konfor)", "success");
+                    });
+                }
+                return;
+            }
             const status = this.getComfortStatus();
             const msg = `Yolcu Konfor Endeksi: Yüzde ${Math.round(this.passengerComfort)}. Sürüş kalitesi ${status}.`;
             if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);

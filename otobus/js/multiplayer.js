@@ -327,15 +327,21 @@
             } catch (err) {}
         },
 
-        // Telsiz Mesajı Gönder (Kanal 19)
+                // Telsiz Mesajı Gönder (Kanal 19 - Hibrit Canlı & Çevrimdışı)
         sendRadioMessage: function (text) {
             if (!text || !text.trim()) return;
             const cleanText = text.trim().substring(0, 140);
 
+            this.playRadioChirp();
+
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(`📻 [Kanal 19] ${this.profile.name}: "${cleanText}"`, "success");
+            }
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak(`Telsizden siz: ${cleanText}`);
+            }
+
             if (!this.isOnline || !window.db) {
-                if (typeof UI !== 'undefined' && UI.showToast) {
-                    UI.showToast("Çevrimdışı mod: Telsiz yayını yapılamadı.", "warning");
-                }
                 return;
             }
 
@@ -353,21 +359,162 @@
                     timestamp: firebase.database.ServerValue.TIMESTAMP
                 });
 
-                this.playRadioChirp();
-
-                if (typeof UI !== 'undefined' && UI.showToast) {
-                    UI.showToast(`📻 Telsiz Gönderildi: "${cleanText}"`, "success");
-                }
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(`Telsiz yayını yapıldı: ${cleanText}`);
-                }
-
                 // 15 saniye sonra bu telsiz anonsunu temizle
                 setTimeout(() => {
                     newMsgRef.remove().catch(() => {});
                 }, 15000);
 
             } catch (e) {}
+        },
+
+        
+        // Rastgele Telsiz Konuşmaları Havuzu (Kanal 19 Otobüs & Kaptan Muhabbetleri)
+        randomChatterPool: [
+            { name: "Kaptan Selim", plate: "16 BRS 412", bus: "Travego", text: "Hayırlı seferler kaptanlar! Bolu Dağı tüneli açık, yol temiz, tekerinize taş değmesin!" },
+            { name: "Dadaş Mehmet", plate: "25 ERZ 088", bus: "Setra S 517", text: "Palandöken rampalarında hafif kar atıştırıyor kaptanım, retarderi kademeli kullanın, yol kaygan." },
+            { name: "Gültekin Kaptan", plate: "34 ESN 991", bus: "Neoplan Skyliner", text: "Esenler otogarına giriş yaptık arkadaşlar. Peronlar kalabalık, dikkatli yanaşın." },
+            { name: "Recep Usta", plate: "59 TKL 340", bus: "Kent LF", text: "Çorlu Sanayi sapağında radar kontrolü var usta, hız sınırlarına riayet edelim." },
+            { name: "Ayhan Kaptan", plate: "06 AST 215", bus: "MAN Lions Coach", text: "AŞTİ Ankara istikametinde hafif sis var, takip mesafesini açalım, hayırlı akşamlar." },
+            { name: "Kaptan Fatma", plate: "35 EGE 770", bus: "Tourismo", text: "İzmir otobanı akıcı, dinlenme tesislerinde çay molasındayız, gelen olursa bekleriz." },
+            { name: "Yusuf Kaptan", plate: "41 KCL 156", bus: "Travego 16 SH", text: "Arkadan gelen Travego, sol şerit boş usta, selektörünü aldım rahatça geçebilirsin!" },
+            { name: "Kemal Usta", plate: "59 MKR 554", bus: "Temsa Maraton", text: "Kınalı gişelerinde trafik akıcı, hava açık. Bütün meslektaşlarıma kazasız belasız varışlar dilerim." },
+            { name: "Kadir Kaptan", plate: "61 TRB 808", bus: "Tourliner", text: "Karadeniz sahil yolu serin ve yağışlı, silecekleri kontrol edin kaptanlarım." },
+            { name: "Halil İbrahim", plate: "07 ANT 332", bus: "Tourismo 16", text: "Antalya makasında kavşak lambalarına dikkat, turizm yoğunluğu başladı, selamlar!" },
+            { name: "Murat Çırak", plate: "59 SLY 101", bus: "Sultan Mega", text: "Ustam sahil ringini tamamladık, yolcular çok memnun. Kanal 19'a selam olsun!" },
+            { name: "Kaptan Ayşe", plate: "34 VIP 060", bus: "Setra TopClass", text: "Körfez geçişi açık, ikram servisimizi yaptık, tüm yolcularımıza afiyetler dilerim." },
+            { name: "Şahin Baba", plate: "14 BLU 777", bus: "Travego 15", text: "Bolu Dağı tesislerinde kuru fasulye pilav sıcak çıktı kaptanlarım, çaylar da müesseseden!" },
+            { name: "Serdar Kaptan", plate: "22 EDR 454", bus: "BMC Neocity", text: "Kapıkule ve Edirne hattında rüzgar sert esiyor, direksiyonu sıkı tutalım arkadaşlar." },
+            { name: "İsmail Kaptan", plate: "59 CRK 229", bus: "Karsan Atak", text: "Çerkezköy organize sanayide vardiya çıkışı var, yol kenarındaki yayalara dikkat usta." },
+            { name: "Bekir Çavuş", plate: "54 SKR 321", bus: "Mercedes Conecto", text: "Adapazarı sapağında yol çalışması tek şeride düşmüş, yavaşlayıp dikkatli geçin." },
+            { name: "Kaptan Burak", plate: "10 BKS 890", bus: "Tourismo 15", text: "Susurluk'ta ayran tost molası verdik, yolcular keyifli, arkadan gelen araçlara yol açık." },
+            { name: "Rıza Kaptan", plate: "58 SVS 414", bus: "Travego 16", text: "Sivas Kızıldağ geçidinde tipi var usta, zincir takan kamyonlar var, ağır gidin." }
+        ],
+
+        // Shift + Virgül: Rastgele Telsiz Konuşması Seç ve Yükle / Dinlet
+        playRandomRadioChatter: function () {
+            const chatter = this.randomChatterPool[Math.floor(Math.random() * this.randomChatterPool.length)];
+            
+            this.playRadioChirp();
+
+            const toastMsg = `📻 [Kanal 19] ${chatter.name} (${chatter.plate}): "${chatter.text}"`;
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(toastMsg, "info");
+            }
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak(`Telsizden ${chatter.name}: "${chatter.text}"`);
+            }
+
+            // Çevrimiçiyse diğer oyunculara da gönder
+            if (this.isOnline && window.db) {
+                try {
+                    const radioRef = window.db.ref('radio_chatter');
+                    const newMsgRef = radioRef.push();
+                    newMsgRef.set({
+                        driverId: 'chatter_' + Math.random().toString(36).substr(2, 6),
+                        name: chatter.name,
+                        plate: chatter.plate,
+                        company: "Kanal 19 Konvoy",
+                        city: typeof Game !== 'undefined' ? (Game.currentCity || "Karayolu") : "Karayolu",
+                        text: chatter.text,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    setTimeout(() => newMsgRef.remove().catch(() => {}), 15000);
+                } catch(e) {}
+            }
+        },
+
+        voiceRecognition: null,
+        isVoiceRecording: false,
+
+        // V Tuşu: Telsiz Sesli Konuşma (Push-to-Talk)
+        startVoiceRadio: function () {
+            if (this.isVoiceRecording) {
+                if (this.voiceRecognition) {
+                    try { this.voiceRecognition.stop(); } catch(e){}
+                }
+                this.isVoiceRecording = false;
+                if (typeof audio !== 'undefined' && audio.playRadioSquelch) {
+                    audio.playRadioSquelch(false);
+                }
+                return;
+            }
+
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) {
+                this.playRadioChirp();
+                const text = prompt("🎙️ Telsiz Anonsu Gönder (Kanal 19):", "Hayırlı seferler kaptanlar!");
+                if (text && text.trim()) {
+                    this.sendRadioMessage(text.trim());
+                }
+                return;
+            }
+
+            try {
+                if (!this.voiceRecognition) {
+                    this.voiceRecognition = new SpeechRec();
+                    this.voiceRecognition.lang = 'tr-TR';
+                    this.voiceRecognition.continuous = false;
+                    this.voiceRecognition.interimResults = false;
+                }
+
+                this.voiceRecognition.onstart = () => {
+                    this.isVoiceRecording = true;
+                    if (typeof audio !== 'undefined' && audio.playRadioSquelch) {
+                        audio.playRadioSquelch(true);
+                    } else {
+                        this.playRadioChirp();
+                    }
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast("🎙️ TELSİZ MANDALI AÇIK (Kanal 19) — Konuşun...", "success");
+                    }
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Telsiz mandalı açıldı, konuşun.");
+                    }
+                };
+
+                this.voiceRecognition.onresult = (event) => {
+                    this.isVoiceRecording = false;
+                    const transcript = event.results[0][0].transcript;
+                    if (transcript && transcript.trim()) {
+                        this.sendRadioMessage(transcript.trim());
+
+                        // Sürüş komutuysa sesli asistan da algılasın
+                        if (window.voiceAssistant && typeof window.voiceAssistant.processCommand === 'function') {
+                            window.voiceAssistant.processCommand(transcript.toLowerCase());
+                        }
+                    }
+                };
+
+                this.voiceRecognition.onerror = (event) => {
+                    this.isVoiceRecording = false;
+                    console.warn("[Multiplayer] Sesli telsiz hatası:", event.error);
+                    if (typeof audio !== 'undefined' && audio.playRadioSquelch) {
+                        audio.playRadioSquelch(false);
+                    }
+                    if (event.error === 'not-allowed') {
+                        if (typeof UI !== 'undefined') UI.showToast("Mikrofon izni verilmedi. Telsiz metin girişini kullanabilirsiniz.", "warning");
+                        const text = prompt("🎙️ Mikrofon kapalı. Telsiz anonsunu yazarak gönderin (Kanal 19):", "");
+                        if (text && text.trim()) this.sendRadioMessage(text.trim());
+                    } else if (event.error === 'no-speech') {
+                        if (typeof UI !== 'undefined') UI.showToast("Ses algılanamadı, telsiz mandalı kapandı.", "info");
+                    }
+                };
+
+                this.voiceRecognition.onend = () => {
+                    this.isVoiceRecording = false;
+                    if (typeof audio !== 'undefined' && audio.playRadioSquelch) {
+                        audio.playRadioSquelch(false);
+                    }
+                };
+
+                this.voiceRecognition.start();
+
+            } catch (err) {
+                console.error("[Multiplayer] Sesli telsiz başlatılamadı:", err);
+                this.isVoiceRecording = false;
+                const text = prompt("🎙️ Telsiz Anonsu Gönder (Kanal 19):", "");
+                if (text && text.trim()) this.sendRadioMessage(text.trim());
+            }
         },
 
         // Başka bir oyuncudan telsiz anonsu geldiğinde

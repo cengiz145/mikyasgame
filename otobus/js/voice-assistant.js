@@ -210,7 +210,11 @@ class VoiceAssistant {
 
             if (e.key.toLowerCase() === 'v' && !e.repeat && !e.altKey && !e.ctrlKey) {
                 if (typeof Game !== 'undefined' && Game.isDriving) {
-                    this.toggleListening();
+                    if (typeof Multiplayer !== 'undefined' && typeof Multiplayer.startVoiceRadio === 'function') {
+                        Multiplayer.startVoiceRadio();
+                    } else {
+                        this.toggleListening();
+                    }
                 }
             }
 
