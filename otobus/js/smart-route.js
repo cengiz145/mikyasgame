@@ -129,8 +129,8 @@ const AkilliRotaSistemi = {
         { label: "100. Yıl Mahallesi (Atatürk Spor Salonu)", district: "Süleymanpaşa", stopName: "Atatürk Spor Salonu Caddesi", keys: ["100 yil", "spor salonu", "yuzuncu yil"] },
         { label: "Altınova Mahallesi (Sahil & Liman)", district: "Süleymanpaşa", stopName: "Altınova Sahil Caddesi", keys: ["altinova", "sahil", "liman"] },
         { label: "Hürriyet Mahallesi (Baykallar & Emniyet)", district: "Süleymanpaşa", stopName: "Baykallar Caddesi", keys: ["hurriyet", "baykallar", "emniyet"] },
-        { label: "Süleymanpaşa İlçe Merkezi & Yeni Otogar", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa", "tekirdag merkez", "suleymanpasa merkez", "suleymanpasa otogar", "tekirdag otogar", "yeni otogar"] },
-        { label: "Süleymanpaşa Yeni Otogar (Otobüs Terminali)", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa otogar", "tekirdag otogar", "yeni otogar"] },
+        { label: "Süleymanpaşa İlçe Merkezi & Yeni Otogar", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa", "tekirdag merkez", "suleymanpasa merkez", "suleymanpasa otogar", "tekirdag otogar", "yeni otogar", "otogar", "terminal", "otobus terminali"] },
+        { label: "Süleymanpaşa Yeni Otogar (Otobüs Terminali)", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa otogar", "tekirdag otogar", "yeni otogar", "otogar", "terminal", "otobus terminali"] },
 
         // SARAY MAHALLELERİ VE ANA MERKEZLER
         { label: "Ayaspaşa Mahallesi (Saray Çarşı & Belediye)", district: "Saray", stopName: "Saray Belediyesi (Cumhuriyet Meydanı)", keys: ["ayaspasa", "saray belediye", "saray carsi", "saray merkez"] },
@@ -660,6 +660,7 @@ const AkilliRotaSistemi = {
     },
 
     hesapla: function(neredenQuery, nereyeQuery) {
+        const currentCity = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
         // Mahalle ve Ana Durak çözümlemesi
         const fromHub = this.resolveMahalleOrHub(neredenQuery);
         const toHub = this.resolveMahalleOrHub(nereyeQuery);
@@ -883,8 +884,7 @@ const AkilliRotaSistemi = {
         const toTargetProv = matchProv(toHub, nToNorm);
 
         if (fromTargetProv || toTargetProv) {
-            const currentCity = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
-            const curDist = this.getActiveDistrict();
+                        const curDist = this.getActiveDistrict();
 
             // Kalkış ve Varış İllerini Dinamik Belirle
             let originProvince = fromTargetProv;
