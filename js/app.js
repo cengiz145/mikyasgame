@@ -1163,7 +1163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     '   <span style="color: var(--secondary); font-size: 0.85rem; font-weight: bold;">' + stopCount + ' Durak | ' + totalKm.toFixed(1) + ' KM</span>',
                     '</div>',
                     '<div style="font-size: 0.85rem; color: #94a3b8;">',
-                    '   📍 ' + sName + ' ➔ 🏁 ' + eName,
+                    '   📍 ' + sName + ' ➔ 🏁 ' + eName + (route.karayolu ? ' | <span style="color:#f59e0b; font-weight:bold;">🛣️ ' + route.karayolu + '</span>' : ''),
                     '</div>'
                 ].join('');
 
@@ -1661,8 +1661,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 badgeHtml = '<span style="background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid #22c55e; padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">[İlçe İçi]</span>';
             }
 
+            const roadBadge = distRoute.karayolu ? `<div style="font-size: 0.82rem; color: #fbbf24; margin-top: 3px; font-weight: bold;">🛣️ Güzergâh: ${distRoute.karayolu}</div>` : '';
             btn.innerHTML = `
-                <span><strong style="color: ${distRoute.color || '#38bdf8'};">[Hat ${distRoute.hatNo}] ${distRoute.name}</strong> ${badgeHtml}</span>
+                <div style="text-align: left;">
+                    <div><strong style="color: ${distRoute.color || '#38bdf8'};">[Hat ${distRoute.hatNo}] ${distRoute.name}</strong> ${badgeHtml}</div>
+                    ${roadBadge}
+                </div>
                 <span style="color: var(--secondary); font-weight: bold;">${Math.round(totalKm)} KM</span>
             `;
             
