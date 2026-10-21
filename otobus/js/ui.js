@@ -232,8 +232,22 @@ const UI = {
             btnChangeDist.setAttribute('title', `Aktif Bölge: ${distNameDisplay}`);
         }
         
+        const btnCareer = document.getElementById('btn-mode-career');
+        const btnFree = document.getElementById('btn-mode-freedrive');
+        const completed = (typeof Game !== 'undefined' && typeof Game.completedTasks === 'number') ? Game.completedTasks : 0;
+        const currentTitle = (typeof Game !== 'undefined' && Game.getLicenseTitle) ? Game.getLicenseTitle() : "Kaptan";
+
+        if (btnCareer) {
+            if (completed === 0) {
+                btnCareer.innerHTML = "🏆 Kariyer Modu (1. Görev: Sıfırdan Başla - Çırak Kaptan)";
+            } else {
+                btnCareer.innerHTML = `🏆 Kariyer Moduna Devam Et (${completed + 1}. Görev: 100'de ${completed} Tamamlandı)`;
+            }
+        }
+        if (btnFree) {
+            btnFree.innerHTML = "🛣️ Serbest Sürüş Modu (Serbest Simülasyon & Pratik - Süre/Görev Sınırı Yok)";
+        }
         if (btnCity) {
-            const completed = (typeof Game !== 'undefined' && typeof Game.completedTasks === 'number') ? Game.completedTasks : 0;
             if (hasPassed10) {
                 btnCity.innerHTML = "🏙️ Şehir İçi ve İlçe Seferleri (TEKULAŞ - Kalfa Seviyesi)";
             } else if (completed === 0) {
@@ -576,11 +590,20 @@ const UI = {
         const routesToRender = visibleRoutes.length > 0 ? visibleRoutes : cityRoutes;
         let activeTaskBtn = null;
 
+        const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive');
         routesToRender.forEach(route => {
             const taskNum = (typeof route.taskIndex === 'number') ? (route.taskIndex + 1) : 1;
-            const isCurrentTask = (route.taskIndex === completedTasks);
-            const isCompleted = (typeof route.taskIndex === 'number' && route.taskIndex < completedTasks);
-            const isLocked = (typeof route.taskIndex === 'number' && route.taskIndex > completedTasks);
+            let isCurrentTask = false;
+            let isCompleted = false;
+            let isLocked = false;
+            
+            if (isFreeDrive) {
+                isLocked = false;
+            } else {
+                isCurrentTask = (route.taskIndex === completedTasks);
+                isCompleted = (typeof route.taskIndex === 'number' && route.taskIndex < completedTasks);
+                isLocked = (typeof route.taskIndex === 'number' && route.taskIndex > completedTasks);
+            }
 
             const li = document.createElement("li");
             li.style.marginBottom = "10px";
@@ -616,10 +639,12 @@ const UI = {
                 btn.setAttribute("aria-disabled", "true");
             }
 
-            let icon = isCurrentTask ? "🟢" : (isCompleted ? "✅" : "🔒");
-            let statusText = isCurrentTask 
-                ? "(AÇIK - ŞU ANKİ GÖREVİNİZ)" 
-                : (isCompleted ? "(Tamamlandı - İsterseniz Tekrar Sürün)" : `(KİLİTLİ - KAPALI: Önce Görev ${completedTasks + 1}'i Tamamlayın)`);
+            let icon = isFreeDrive ? "🛣️" : (isCurrentTask ? "🟢" : (isCompleted ? "✅" : "🔒"));
+            let statusText = isFreeDrive
+                ? "(SERBEST SÜRÜŞE AÇIK - PRATİK YAPABİLİRSİNİZ)"
+                : (isCurrentTask 
+                    ? "(AÇIK - ŞU ANKİ GÖREVİNİZ)" 
+                    : (isCompleted ? "(Tamamlandı - İsterseniz Tekrar Sürün)" : `(KİLİTLİ - KAPALI: Önce Görev ${completedTasks + 1}'i Tamamlayın)`));
             
             const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
             const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Varış");

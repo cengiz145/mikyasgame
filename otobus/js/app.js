@@ -619,6 +619,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const btnCareer = document.getElementById('btn-mode-career');
+    if (btnCareer) {
+        btnCareer.addEventListener('click', () => {
+            if (typeof Game !== 'undefined') Game.setPlayMode('career');
+            audio.playSelect();
+            const msg = "Mikyas Kaptanlık Akademisi Kariyer Modu açıldı. 100 seviyeli sıralı görev brifingleriniz listeleniyor.";
+            audio.speak(msg);
+            UI.showToast("🏆 Kariyer Modu Aktif (100 Görev)", "info");
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: Game.activeDistrict } }));
+        });
+    }
+
+    const btnFreeDrive = document.getElementById('btn-mode-freedrive');
+    if (btnFreeDrive) {
+        btnFreeDrive.addEventListener('click', () => {
+            if (typeof Game !== 'undefined') Game.setPlayMode('free_drive');
+            audio.playSelect();
+            const msg = "Serbest Sürüş Modu seçildi. Saat ve süre sınırlaması olmadan, dilediğiniz güzergahta serbestçe pratik yapabilirsiniz.";
+            audio.speak(msg);
+            UI.showToast("🛣️ Serbest Sürüş Modu Aktif (Serbest Pratik)", "info");
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: Game.activeDistrict } }));
+        });
+    }
+
     if (document.getElementById('btn-start-city')) {
         document.getElementById('btn-start-city').addEventListener('click', openCitySelection);
     }

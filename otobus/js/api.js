@@ -363,11 +363,101 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
             { no: "71", kw: "KIZILPINAR-ÇERKEZKÖY" }
         ];
 
+        // 5. Seviye Ergene & Velimeşe OSB Ağır Sanayi Hatları
+        const osbKeywords = [
+            { no: "48", kw: "VELİMEŞE-ÇORLU" },
+            { no: "48/1", kw: "VELİMEŞE MAHALLE" },
+            { no: "49", kw: "ERGENE-DERİ OSB" },
+            { no: "51", kw: "MARMARACIK-SANAYİ" },
+            { no: "52", kw: "ULAŞ-VARDİYA" },
+            { no: "53", kw: "VELİMEŞE TREN GAR" },
+            { no: "54", kw: "ERGENE GECE" },
+            { no: "55", kw: "AĞIR SANAYİ" },
+            { no: "56", kw: "ÇORLU ÇEVRE YOLU" },
+            { no: "57", kw: "OSB FİNAL" }
+        ];
+
+        // 6. Seviye 18 Metre Körüklü Otobüs Metropol Hatları
+        const korukluKeywords = [
+            { no: "26", kw: "KÖRÜKLÜ CONECTO HAT 1" },
+            { no: "26/1", kw: "KÖRÜKLÜ KAVŞAK GEÇİŞ" },
+            { no: "26/2", kw: "TEKİRDAĞSPOR TARAFTAR" },
+            { no: "2/7", kw: "ÜNİVERSİTE BAHAR ŞENLİĞİ" },
+            { no: "26", kw: "SARAY EKSPRES KÖRÜKLÜ" },
+            { no: "1", kw: "ÇORLU MEYDAN YOĞUN" },
+            { no: "3", kw: "ÇİFT KAPILI SANAYİ" },
+            { no: "20", kw: "YAĞMURDA KÖRÜKLÜ" },
+            { no: "28", kw: "GECE VARDİYA EKSPRES" },
+            { no: "26", kw: "KÖRÜKLÜ FİLO ŞAMPİYONU" }
+        ];
+
+        // 7. Seviye Trakya Dağ Geçitleri & Şarköy
+        const dagKeywords = [
+            { no: "138", kw: "ŞARKÖY ZEYTİN HASADI" },
+            { no: "97", kw: "MÜREFTE SAHİL VİRAJ" },
+            { no: "35", kw: "MALKARA KIŞ KARAYOLU" },
+            { no: "50", kw: "HAYRABOLU AYÇİÇEĞİ" },
+            { no: "47", kw: "SARAY ORMAN YOLU" },
+            { no: "71", kw: "ÇERKEZKÖY SANAYİ" },
+            { no: "26", kw: "KAPAKLI AKŞAM YOĞUN" },
+            { no: "35", kw: "SÜLEYMANPAŞA MALKARA GECE" },
+            { no: "138", kw: "UÇMAKDERE DAĞ GEÇİDİ" },
+            { no: "138", kw: "TRAKYA ZİRVE FATİHİ" }
+        ];
+
+        // 8. Seviye Şehirlerarası Otoyollar & VIP Heyetler
+        const otoyolKeywords = [
+            { no: "İST-1", kw: "İSTANBUL ESENLER EKSPRES" },
+            { no: "OTO-1", kw: "HGS GİŞE PROTOKOLÜ" },
+            { no: "EDR-1", kw: "EDİRNE SELİMİYE HEYETİ" },
+            { no: "TESİS-1", kw: "DİNLENME TESİSİ MOLA" },
+            { no: "ÇNK-1", kw: "ÇANAKKALE 1915 KÖPRÜSÜ" },
+            { no: "BRS-1", kw: "BURSA OSMANGAZİ TRANSİT" },
+            { no: "BLK-1", kw: "BALIKESİR GECE SEFERİ" },
+            { no: "İZM-1", kw: "İZMİR EGE MARATONU" },
+            { no: "OTO-2", kw: "ŞEHİRLERARASI GECE FIRTINA" },
+            { no: "OTO-3", kw: "OTOYOL BAŞ KAPTANLIĞI" }
+        ];
+
+        // 9. Seviye Anadolu Kar Geçitleri & Gece Kartalı
+        const anadoluKeywords = [
+            { no: "KOC-1", kw: "KOCAELİ SANAYİ KORİDORU" },
+            { no: "BOLU-1", kw: "BOLU DAĞI SİS VE KAR" },
+            { no: "BOLU-2", kw: "BOLU TÜNELİ EMNİYET" },
+            { no: "ANK-1", kw: "ANKARA AŞTİ BAŞKENT" },
+            { no: "KRD-1", kw: "KARADENİZ SAHİL YOLU" },
+            { no: "KPD-1", kw: "KAPADOKYA TURİST HEYETİ" },
+            { no: "TRS-1", kw: "TOROSLAR GECE TIRMANIŞ" },
+            { no: "EGE-1", kw: "EGE SAHİL VİRAJLARI" },
+            { no: "ERZ-1", kw: "PALANDÖKEN ZİRVE İNTİKAL" },
+            { no: "AND-F", kw: "ŞEREF KÜRSÜSÜ SEFERİ" }
+        ];
+
+        // 10. Seviye Büyük Türkiye Şampiyonluk Finalleri
+        const sampiyonlukKeywords = [
+            { no: "ŞMP-1", kw: "ÇANAKKALE ŞEHİTLİK ANMA" },
+            { no: "ŞMP-2", kw: "İZMİR KORDON KURTULUŞ" },
+            { no: "ŞMP-3", kw: "ANKARA ANITKABİR SAYGI" },
+            { no: "ŞMP-4", kw: "TRABZON SÜMELA DAĞ YOLU" },
+            { no: "ŞMP-5", kw: "GAZİANTEP ŞANLIURFA GAP" },
+            { no: "ŞMP-6", kw: "VAN GÖLÜ DOĞU EKSPRES" },
+            { no: "ŞMP-7", kw: "MİLLİ TAKIM KAFİLE TRANSFER" },
+            { no: "ŞMP-8", kw: "BOĞAZ KÖPRÜSÜ GECE GEÇİŞ" },
+            { no: "ŞMP-9", kw: "TRAKYA'YA ZAFER DÖNÜŞÜ" },
+            { no: "ŞMP-10", kw: "100. GÖREV BÜYÜK FİNAL ŞAMPİYONLUK" }
+        ];
+
         const allLevels = [
-            { lic: 1, name: "Çırak", list: districtLocalKeywords, color: "#3b82f6" },
-            { lic: 2, name: "Kalfa", list: kalfaKeywords, color: "#eab308" },
-            { lic: 3, name: "Usta", list: corluKeywords, color: "#ef4444" },
-            { lic: 4, name: "İlçeler Arası", list: ilceKeywords, color: "#a855f7" }
+            { lic: 1, name: "Çırak Kaptan", list: districtLocalKeywords, color: "#3b82f6" },
+            { lic: 2, name: "Kalfa Kaptan", list: kalfaKeywords, color: "#eab308" },
+            { lic: 3, name: "Usta Kaptan", list: corluKeywords, color: "#ef4444" },
+            { lic: 4, name: "İlçe Hatları", list: ilceKeywords, color: "#a855f7" },
+            { lic: 5, name: "OSB Vardiya Reisi", list: osbKeywords, color: "#f97316" },
+            { lic: 6, name: "Körüklü Filo Reisi", list: korukluKeywords, color: "#06b6d4" },
+            { lic: 7, name: "Dağ Geçitleri Müfettişi", list: dagKeywords, color: "#14b8a6" },
+            { lic: 8, name: "Otoyol Baş Kaptanı", list: otoyolKeywords, color: "#8b5cf6" },
+            { lic: 9, name: "Kar Geçitleri Üstadı", list: anadoluKeywords, color: "#ec4899" },
+            { lic: 10, name: "EFSANE MASTER KAPTAN", list: sampiyonlukKeywords, color: "#eab308" }
         ];
 
         let taskGlobalIndex = 0;
@@ -453,6 +543,20 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                     totalKm: routeTotalKm
                 });
 
+                
+                // MİKYAS KAPTANLIK AKADEMİSİ 100 GÖREV ENTEGRASYONU
+                if (typeof CareerMissions !== 'undefined' && CareerMissions.enrichRoute) {
+                    CareerMissions.enrichRoute(taskRoute, taskGlobalIndex);
+                    const cm = CareerMissions.getMission(taskGlobalIndex);
+                    if (cm) {
+                        taskRoute.name = "Görev " + taskNum + " (" + cm.levelTitle + "): " + cm.title;
+                        taskRoute.speechBriefing = cm.dispatcherOrder;
+                        taskRoute.isTraining = cm.isTraining;
+                        taskRoute.emptyBus = cm.emptyBus;
+                        taskRoute.passengersAllowed = cm.passengersAllowed;
+                        taskRoute.noTimeLimit = true;
+                    }
+                }
                 routesData[routeId] = taskRoute;
                 routesData[found.id] = found; // Hat id'si ile de erişilebilir
                 taskGlobalIndex++;
