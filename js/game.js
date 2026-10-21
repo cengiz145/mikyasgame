@@ -88,6 +88,8 @@ const Game = {
     hasPassedLevel10: function() {
         return (this.completedTasks >= 10) || (this.licenseLevel > 10);
     },
+    playMode: localStorage.getItem('gamePlayMode') || 'career',
+    setPlayMode: function(m) { this.playMode = m === 'free_drive' ? 'free_drive' : 'career'; try { localStorage.setItem('gamePlayMode', this.playMode); } catch(e) {} },
     completedTasks: parseInt(localStorage.getItem('completedTasks')) || 0, // 0 to 26
     playerBudget: parseFloat(localStorage.getItem('para')) || 0,
     clockMinutes: parseFloat(localStorage.getItem('clockMinutes')) || 480, // Varsayılan 08:00 (480 dakika)
@@ -739,6 +741,9 @@ const Game = {
     },
 
     getLicenseTitle: function() {
+        if (typeof CareerMissions !== 'undefined' && CareerMissions.getLevelTitle) {
+            return CareerMissions.getLevelTitle(this.completedTasks);
+        }
         if (this.completedTasks >= 10 || this.licenseLevel > 10) {
             return `${this.licenseLevel}. Sınıf Master Kaptan (İlçe & Şehirlerarası)`;
         }
@@ -944,6 +949,9 @@ const Game = {
     isRouteAccessible: function(routeId) {
         const route = (typeof routesData !== 'undefined' && routesData[routeId]) ? routesData[routeId] : null;
         if (!route) {
+            return { allowed: true };
+        }
+        if (this.playMode === 'free_drive') {
             return { allowed: true };
         }
 
@@ -1198,9 +1206,43 @@ const Game = {
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev | <strong>U</strong> Rampa | <strong>P</strong> Bagaj | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>Z</strong> Zamanlama.</div>';
             }
 
+            const mission = (typeof CareerMissions !== 'undefined') ? CareerMissions.getMission(r.taskIndex || 0) : null;
+            const isFreeDrive = (this.playMode === 'free_drive');
+            
+            let orderHtml = '';
+            if (isFreeDrive) {
+                orderHtml = [
+                    '<div style="background: rgba(34, 197, 94, 0.15); border: 1.5px solid #22c55e; padding: 14px 18px; border-radius: 8px; margin-bottom: 14px;">',
+                    '    <strong style="color: #4ade80; font-size: 1.15rem;">🛣️ SERBEST SÜRÜŞ VE PRATİK MODU</strong><br>',
+                    '    <span style="color: #f1f5f9; line-height: 1.6; display: block; margin-top: 6px;">Bu modda herhangi bir görev kısıtlaması, saat veya süre sınırı, ceza veya kural baskısı yoktur. Kariyerinizde kazandığınız tüm araçları ve güzergâhları serbestçe deneyimleyebilir, sürüş pratiği yapabilirsiniz.</span>',
+                    '</div>'
+                ].join("");
+            } else {
+                const dispatcherText = (mission && mission.dispatcherOrder) ? mission.dispatcherOrder : (r.speechBriefing || "");
+                const featureText = (mission && mission.featureUnlock) ? mission.featureUnlock : "Standart Hat Seferi";
+                const rulesText = (mission && mission.rulesActive) ? mission.rulesActive : "Temel Emniyet Kuralları";
+                
+                orderHtml = [
+                    '<div style="background: rgba(15, 23, 42, 0.9); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">',
+                    '    <div style="color: #38bdf8; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">',
+                    '        <span>🎙️</span> <span>TEKULAŞ HAREKET AMİRLİĞİ RESMİ SEFER TALİMATI</span>',
+                    '    </div>',
+                    '    <p style="color: #f8fafc; font-size: 0.98rem; line-height: 1.7; margin: 0 0 12px 0; border-left: 3px solid #38bdf8; padding-left: 12px;">',
+                    '        "' + dispatcherText + '"',
+                    '    </p>',
+                    '    <div style="display: grid; grid-template-columns: 1fr; gap: 8px; font-size: 0.92rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">',
+                    '        <div style="color: #fde047;"><strong>🚀 Açılan Donanım / Özellik:</strong> ' + featureText + '</div>',
+                    '        <div style="color: #a78bfa;"><strong>⚖️ Yürürlükteki Kurallar:</strong> ' + rulesText + '</div>',
+                    '        <div style="color: #4ade80;"><strong>⏱️ Zaman Kısıtlaması:</strong> KESİNLİKLE YOKTUR (Tamamen kendi temponuzda sürüş)</div>',
+                    '    </div>',
+                    '</div>'
+                ].join("");
+            }
+
             detailsContainer.innerHTML = [
                 '<div style="font-size: 1.15rem; color: #38bdf8; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid rgba(56,189,248,0.3); padding-bottom: 6px;">📋 ' + r.name + '</div>',
                 '<div style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin-bottom: 12px;">🏙️ <strong>Sefer Türü:</strong> ' + (r.district || Game.activeDistrict || "Tekirdağ") + ' Şehir İçi Belediye Seferi | <strong>Araç:</strong> TEKULAŞ Belediye Otobüsü</div>',
+                orderHtml,
                 '<div style="margin-bottom: 8px;">📍 <strong>Kalkış (Başlangıç) Durağı:</strong> <span style="color: #38bdf8; font-weight: bold;">' + startStop + '</span></div>',
                 '<div style="margin-bottom: 8px;">🏁 <strong>Gidilecek Son Durak (Hedef):</strong> <span style="color: #22c55e; font-weight: bold;">' + endStop + '</span></div>',
                 '<div style="margin-bottom: 8px;">🛑 <strong>Durulacak Duraklar Listesi (Sırasıyla):</strong><ol style="margin-left: 20px; margin-top: 6px; margin-bottom: 6px;">' + stopsHtml + '</ol></div>',
@@ -3351,13 +3393,21 @@ const Game = {
         }
 
         // Yolcu matematiğini başta hesapla
-        // FORMÜLE BAĞLI İNİŞ: Kalan durak sayısına göre orantılı deterministik iniş formülü
+        const isTrainingEmpty = !!(this.activeRouteData && (this.activeRouteData.emptyBus || this.activeRouteData.isTraining));
         const remainingStops = Math.max(1, this.activeRouteData.stops.length - this.currentStopIndex - 1);
-        const alighting = isFinalStop ? this.passengersOnBoard : Math.min(this.passengersOnBoard, Math.max(1, Math.round(this.passengersOnBoard / (remainingStops + 1))));
-        const waiting = (typeof stopData.bekleyenYolcu === 'number') ? stopData.bekleyenYolcu : 5;
+        const alighting = isTrainingEmpty ? 0 : (isFinalStop ? this.passengersOnBoard : Math.min(this.passengersOnBoard, Math.max(1, Math.round(this.passengersOnBoard / (remainingStops + 1)))));
+        const waiting = isTrainingEmpty ? 0 : ((typeof stopData.bekleyenYolcu === 'number') ? stopData.bekleyenYolcu : 5);
 
-        // PAS GEÇME MANTIĞI: İnecek veya binecek yoksa ve son durak değilse durmadan geç
-        if (!isFinalStop && alighting === 0 && waiting === 0) {
+        if (isTrainingEmpty) {
+            const emptyNotice = isFinalStop 
+                ? "Son test durağına vardınız. Aracı durdurup eğitimi tamamlayınız." 
+                : (stopData.name + " test durağına ulaştınız. Yolcusuz intikal devam ediyor. Kapıyı açarak durak yanaşma provası yapabilir veya seyre devam edebilirsiniz.");
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(emptyNotice);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 " + emptyNotice, "info");
+        }
+
+        // PAS GEÇME MANTIĞI: İnecek veya binecek yoksa, eğitim modu değilse ve son durak değilse durmadan geç
+        if (!isTrainingEmpty && !isFinalStop && alighting === 0 && waiting === 0) {
             this.currentStopIndex++;
             audio.speakSequence([stopData.name + " durağını geçiyorsunuz.", "Yolcu olmadığı için duraklanmadı.", "Yeni rota hesaplanıyor."]);
             
