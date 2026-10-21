@@ -99,14 +99,18 @@ const MapEngine = {
 
     // Ekran Okuyucu ve TTS Anonsu (Sıfır önceden yüklenmiş ses dosyası)
     announceStop: function(stopName) {
-        const msg = `Durağa varıldı: ${stopName}`;
-        if (typeof audio !== 'undefined') {
-            if (typeof audio.playStopChime === 'function') audio.playStopChime();
-            if (typeof audio.speak === 'function') audio.speak(msg);
-            if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
-        }
-        if (typeof UI !== 'undefined' && UI.showToast) {
-            UI.showToast(msg, 'info');
+        if (typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
+            audio.playBusAnnouncement('arrive', stopName);
+        } else {
+            const msg = `Durağımız: ${stopName}. Kapılar açılıyor.`;
+            if (typeof audio !== 'undefined') {
+                if (typeof audio.playStopChime === 'function') audio.playStopChime();
+                if (typeof audio.speak === 'function') audio.speak(msg);
+                if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+            }
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(msg, 'info');
+            }
         }
     }
 };
