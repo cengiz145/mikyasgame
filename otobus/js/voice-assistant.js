@@ -42,6 +42,16 @@ class VoiceAssistant {
                 speech: 'Nereye doğru gittiğini öğrenmek için Y tuşuna bas. Oyun sana Kuzey, Güney, Doğu veya Batı diye sesli söyler. Dönüş yapacağın zaman Shift tuşuyla birlikte Yön Oklarına basarak otobüsün yönünü çevirebilirsin.'
             },
 
+            {
+                id: 'cockpit_navigation',
+                stage: 1,
+                stageName: '1. Bölüm: Direksiyon Başına Geçiş',
+                title: '3.1. Akıllı Hat ve Durak Navigasyonu',
+                keys: 'N (Sıradaki Durak), Ctrl + N / Shift + N (Sefer Sonu & Toplam Kalan Hat)',
+                tip: 'N ile sıradaki durağı, Ctrl+N ile son durağı ve toplam kalan mesafeyi dinle.',
+                speech: 'Sürüş sırasında dilediğin an N tuşuna basarak sıradaki durağın adını, kalan mesafeyi, tahmini varış süresini ve yönünü öğrenebilirsin. Ctrl ve N veya Shift ve N tuşlarına basarak da seferin son durağını, kalan toplam hat kilometresini, kalan durak sayısını ve toplam tahmini varış süresini dinleyebilirsin.'
+            },
+
             // 2. BÖLÜM: YOLCULARIMIZ VE DURAKLAR
             {
                 id: 'ramp',
@@ -1231,6 +1241,17 @@ class VoiceAssistant {
                 }
             }
         }
+        if (command.includes("saray") && (command.includes("sefer") || command.includes("şehir içi") || command.includes("sehir ici") || command.includes("hastane") || command.includes("çarşı") || command.includes("otogar") || command.includes("kampüs"))) {
+            if (typeof SarayNavigasyon !== 'undefined') {
+                const toTarget = command.includes("hastane") ? "Saray Devlet Hastanesi" :
+                                 (command.includes("kampüs") ? "Saray Fakülte Kampüsü" :
+                                 (command.includes("çarşı") ? "Ayaspaşa Çarşı" : "Saray Devlet Hastanesi"));
+                audio.speak("Saray içi Otogardan " + toTarget + " durağına belediye ring seferi başlatılıyor.");
+                SarayNavigasyon.baslat("Saray Otogarı", toTarget);
+                return;
+            }
+        }
+
         if (command.includes("çetin sokak") || command.includes("cetin sokak")) {
             if (typeof VelimeseNavigasyon !== 'undefined') {
                 if (command.includes("toki") || command.includes("meydan") || command.includes("istasyon") || command.includes("çarşı")) {
@@ -1350,6 +1371,272 @@ class VoiceAssistant {
             return;
         }
 
+                                                                                                // --- TÜRKİYE DENİZLERİ SESLİ BİLGİLENDİRME VE REHBERLİK ---
+        if (command.includes("denizler") || command.includes("türkiyenin denizleri") || command.includes("kaç deniz") || command.includes("denizlerimiz")) {
+            audio.speak("Türkiye üç tarafı denizlerle çevrili bir yarımadadır: Kuzeyde 1695 kilometre kıyısıyla Karadeniz, batıda girintili çıkıntılı koylarıyla Ege Denizi, güneyde en sıcak ve en tuzlu denizimiz Akdeniz ve tamamı sınırlarımızda olan iç denizimiz Marmara Denizi yer alır. Ayrıca Doğu Anadolu'da yöre halkının deniz olarak andığı Van Gölü bulunur.");
+            return;
+        }
+
+        if (command.includes("karadeniz")) {
+            audio.speak("Karadeniz, Türkiye'nin kuzey sınırını oluşturan en uzun kıyı şeridine sahip denizimizdir. Kıyı uzunluğu 1695 kilometredir. Binde 18 ile Türkiye'nin en az tuzlu denizidir. D-010 Karadeniz Sahil Yolu ile Artvin'den Kırklareli'ye kadar uzanır. En kuzey noktası Sinop İnceburun'dur.");
+            return;
+        }
+
+        if (command.includes("marmara")) {
+            audio.speak("Marmara Denizi, tamamı Türkiye sınırları içinde yer alan iç denizimizdir. 927 kilometre kıyı şeridine sahiptir. İstanbul ve Çanakkale Boğazları ile Karadeniz ve Ege'yi birbirine bağlar. Kıyılarında Tekirdağ, İstanbul, Kocaeli, Yalova, Bursa, Balıkesir ve Çanakkale yer alır.");
+            return;
+        }
+
+        if (command.includes("ege denizi") || (command.includes("ege") && (command.includes("sahil") || command.includes("deniz") || command.includes("kıyı")))) {
+            audio.speak("Ege Denizi, Türkiye'nin batısında dağların denize dik uzanmasıyla oluşan binlerce koy, körfez ve yarımadaya sahiptir. Çanakkale, Balıkesir, İzmir, Aydın ve Muğla kıyılarını yıkar. Antik kentleri ve zeytinlikleriyle ünlüdür.");
+            return;
+        }
+
+        if (command.includes("akdeniz")) {
+            audio.speak("Akdeniz, Türkiye'nin güney sınırında yer alan, güneşlenme süresi en yüksek, suyu en sıcak ve tuzluluk oranı binde 38 ile en yüksek denizimizdir. Muğla, Antalya, Mersin, Adana ve Hatay kıyılarını kapsar. Efsanevi D-400 Sahil Yolu boyunca Toroslar eşliğinde uzanır.");
+            return;
+        }
+
+        if (command.includes("van denizi") || command.includes("van gölü")) {
+            audio.speak("Van Gölü, 3713 kilometrekarelik alanıyla Türkiye'nin en büyük gölü olup yöre halkı tarafından 'Van Denizi' olarak anılır. Suları sodalı ve tuzludur. Tatvan ile Van arasında tren feribotu seferleri yapılmaktadır.");
+            return;
+        }
+
+        if (command.includes("sinop")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Sinop arası resmi karayolu mesafesi 810 kilometredir. Gerede, Ilgaz, Boyabat veya Samsun sahil yolu üzerinden ulaşılmaktadır.");
+                return;
+            }
+            audio.speak("Sinop, Karadeniz Bölgesi'nde Boztepe Yarımadası üzerinde yer alır ve Türkiye'nin en kuzey noktası İnceburun'a ev sahipliği yapar. Koordinatları 42 derece 1 dakika Kuzey, 35 derece 9 dakika Doğudur. Kara komşuları Kastamonu, Çorum ve Samsun'dur.");
+            return;
+        }
+
+                                                                                if (command.includes("yalova")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Yalova arası resmi karayolu mesafesi Osmangazi Köprüsü üzerinden 220 kilometredir.");
+                return;
+            }
+            audio.speak("Yalova, Marmara Bölgesi'nin güneyinde Samanlı Dağları eteklerinde yer alır. Atatürk'ün Yürüyen Köşkü, şifalı Termal kaplıcaları ve Osmangazi Köprüsüyle ünlüdür. Koordinatları 40 derece 39 dakika Kuzey, 29 derece 16 dakika Doğudur. Kara komşuları Kocaeli ve Bursa'dır. Kuzey ve batısında Marmara Denizi yer alır.");
+            return;
+        }
+
+                                                                if (command.includes("gümüşhane") || command.includes("gumushane")) {
+                if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
+                    audio.speak("Tekirdağ ile Gümüşhane arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, Bolu, Amasya, Erzincan ve Kelkit aksı üzerinden 1140 kilometredir.");
+                    return;
+                }
+                audio.speak("Gümüşhane, Doğu Karadeniz'in iç kesiminde Harşit Vadisi boyunca uzanan dağlar arasındaki tarihi maden ve kültür kentimizdir. 14.5 kilometrelik Yeni Zigana Tüneli, Karaca Mağarası, Tomara Şelalesi, Torul Kalesi Cam Terası, meşhur pestili ve kömesiyle tanınır. Koordinatları 40 derece 27 dakika Kuzey, 39 derece 28 dakika Doğudur. Komşuları Trabzon, Bayburt, Erzincan ve Giresun'dur.");
+                return;
+            }
+                        if (command.includes("tesis") || command.includes("mola") || command.includes("dinlenme tesisi") || command.includes("çorba") || command.includes("tost")) {
+                            if (command.includes("rol yapma") || command.includes("kolonya") || command.includes("ikram") || command.includes("polis") || command.includes("takograf")) {
+                if (typeof RoleplaySystem !== 'undefined') {
+                    RoleplaySystem.openModal();
+                }
+                return;
+            }
+            if (typeof HighwayFacilities !== 'undefined') {
+                    HighwayFacilities.openFacilityModal();
+                }
+                return;
+            }
+            if (command.includes("hgs") || command.includes("gişe") || command.includes("otoyol ücreti") || command.includes("bakiye")) {
+                if (typeof HighwayFacilities !== 'undefined') {
+                    HighwayFacilities.openHgsModal();
+                }
+                return;
+            }
+            if (command.includes("giresun")) {
+                if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
+                    audio.speak("Tekirdağ ile Giresun arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, Bolu Dağı, Samsun ve Karadeniz Sahil Yolu üzerinden 1050 kilometredir.");
+                    return;
+                }
+                audio.speak("Giresun, Doğu Karadeniz Bölgesi'nde yemyeşil fındık bahçeleri ve masmavi Karadeniz kıyısında kurulu tarihi sahil kentimizdir. Tarihi Giresun Kalesi, Karadeniz'in tek yaşanabilir adası olan Giresun Adası, Kümbet Yaylası, dünyaca meşhur tombul fındığı, Görele pidesi ve kemençesiyle ünlüdür. Koordinatları 40 derece 55 dakika Kuzey, 38 derece 23 dakika Doğudur. Komşuları Trabzon, Gümüşhane, Erzincan, Sivas ve Ordu'dur.");
+                return;
+            }
+            if (command.includes("gaziantep") || command.includes("antep")) {
+                if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
+                    audio.speak("Tekirdağ ile Gaziantep arası resmi karayolu mesafesi Kuzey Marmara, O-4, Ankara Niğde Otoyolu ve TAG Otoyolu üzerinden 1260 kilometredir.");
+                    return;
+                }
+                audio.speak("Gaziantep, Güneydoğu Anadolu Bölgesi'nde yer alan kadim gastronomi ve sanayi metropolümüzdür. UNESCO tescilli mutfağı, Zeugma Mozaik Müzesi, Çingene Kızı mozaiği, Antep Kalesi, Bakırcılar Çarşısı, Rumkale, fıstık ve baklavasıyla dünyaca ünlüdür. Koordinatları 37 derece 4 dakika Kuzey, 37 derece 23 dakika Doğudur. Komşuları Adıyaman, Şanlıurfa, Kilis, Hatay, Osmaniye ve Kahramanmaraş'tır.");
+                return;
+            }
+            if (command.includes("eskişehir") || command.includes("eskisehir")) {
+                if (command.includes("mesafe") || command.includes("kaç km") || command.includes("uzaklık")) {
+                    audio.speak("Tekirdağ ile Eskişehir arası resmi karayolu mesafesi Osmangazi Köprüsü, Bursa ve Bozüyük aksı üzerinden 430 kilometredir.");
+                    return;
+                }
+                audio.speak("Eskişehir, İç Anadolu Bölgesi'nde Porsuk Çayı kıyısında yer alan modern bir üniversite ve kültür şehridir. Tarihi Odunpazarı Evleri, Sazova Parkı, Masal Şatosu, lületaşı, çibörek, met helvası ve Frig Vadisiyle ünlüdür. Koordinatları 39 derece 46 dakika Kuzey, 30 derece 31 dakika Doğudur. Komşuları Bilecik, Bolu, Ankara, Konya, Afyonkarahisar ve Kütahya'dır.");
+                return;
+            }
+            if (command.includes("erzurum")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Erzurum arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, D-100 ve Erzincan Aşkale aksı üzerinden 1360 kilometredir.");
+                return;
+            }
+            audio.speak("Erzurum, Doğu Anadolu Bölgesi'nde Palandöken Dağları eteklerinde yer alır. Çifte Minareli Medrese, Palandöken Kayak Merkezi, Tortum Şelalesi ve cağ kebabıyla ünlüdür. Koordinatları 39 derece 54 dakika Kuzey, 41 derece 16 dakika Doğudur. Komşuları Artvin, Rize, Bayburt, Erzincan, Bingöl, Muş, Ağrı, Kars ve Ardahan'dır.");
+            return;
+        }
+
+        if (command.includes("konya")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Konya arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, Sakarya ve Afyonkarahisar Akşehir D-300 aksı üzerinden 700 kilometredir.");
+                return;
+            }
+            audio.speak("Konya, İç Anadolu Bölgesi'nde yer alan Türkiye'nin yüzölçümü en büyük ilidir. Selçuklu başkenti, Hz. Mevlana'nın türbesi ve UNESCO Çatalhöyük antik kentiyle tanınır. Koordinatları 37 derece 52 dakika Kuzey, 32 derece 29 dakika Doğudur. Komşuları Ankara, Aksaray, Niğde, Karaman, Mersin, Antalya, Isparta, Afyonkarahisar ve Eskişehir'dir.");
+            return;
+        }
+
+        if (command.includes("erzincan")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Erzincan arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, D-100 ve Refahiye Kızıldağ Geçidi aksı üzerinden 1170 kilometredir.");
+                return;
+            }
+            audio.speak("Erzincan, Doğu Anadolu Bölgesi'nde Karasu Fırat Vadisi'nde yer alır. Girlevik Şelalesi, Ergan Dağı Kayak Merkezi, Kemaliye Karanlık Kanyonu ve tulum peyniriyle ünlüdür. Koordinatları 39 derece 45 dakika Kuzey, 39 derece 29 dakika Doğudur. Komşuları Sivas, Gümüşhane, Bayburt, Erzurum, Tunceli, Bingöl, Elazığ, Malatya ve Giresun'dur.");
+            return;
+        }
+
+        if (command.includes("elazığ") || command.includes("elazig")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Elazığ arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, Malatya Kömürhan Köprüsü ve D-300 aksı üzerinden 1350 kilometredir.");
+                return;
+            }
+            audio.speak("Elazığ, Doğu Anadolu Bölgesi'nin Yukarı Fırat Bölümü'nde Keban ve Hazar Gölleri arasında yer alır. Tarihi Harput Kalesi, Hazarbaba Kayak Merkezi ve Çayda Çıra kültürüyle ünlüdür. Koordinatları 38 derece 40 dakika Kuzey, 39 derece 13 dakika Doğudur. Komşuları Tunceli, Bingöl, Diyarbakır, Malatya ve Erzincan'dır.");
+            return;
+        }
+
+        if (command.includes("bayburt")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Bayburt arası resmi karayolu mesafesi Kuzey Marmara Otoyolu ve Kop Dağı Erzurum aksı üzerinden 1265 kilometredir.");
+                return;
+            }
+            audio.speak("Bayburt, Doğu Karadeniz Bölgesi'nin iç kesiminde Çoruh Nehri kıyısında yer alır. Tarihi Bayburt Kalesi, Dede Korkut Türbesi, Baksı Müzesi ve Saat Kulesiyle ünlüdür. Koordinatları 40 derece 15 dakika Kuzey, 40 derece 13 dakika Doğudur. Komşuları Trabzon, Rize, Erzurum, Erzincan ve Gümüşhane'dir.");
+            return;
+        }
+
+        if (command.includes("diyarbakır") || command.includes("diyarbakir")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Diyarbakır arası resmi karayolu mesafesi Anadolu Otoyolu, Adana Gaziantep Otoyolu ve Şanlıurfa üzerinden 1560 kilometredir.");
+                return;
+            }
+            audio.speak("Diyarbakır, Güneydoğu Anadolu Bölgesi'nde Dicle Nehri kıyısında yer alır. UNESCO Dünya Mirası Diyarbakır Surları, Hevsel Bahçeleri ve Ulu Camisiyle ünlüdür. Koordinatları 37 derece 55 dakika Kuzey, 40 derece 14 dakika Doğudur. Komşuları Elazığ, Bingöl, Muş, Batman, Mardin, Şanlıurfa, Adıyaman ve Malatya'dır.");
+            return;
+        }
+
+        if (command.includes("çorum") || command.includes("corum")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Çorum arası resmi karayolu mesafesi Kuzey Marmara Otoyolu, Gerede ve Sungurlu D-200 aksı üzerinden 745 kilometredir.");
+                return;
+            }
+            audio.speak("Çorum, Orta Karadeniz Bölgesi'nin iç kesiminde yer alır. Hitit İmparatorluğu'nun başkenti Hattuşa'ya ev sahipliği yapar ve dünyaca ünlü Çorum leblebisiyle tanınır. Koordinatları 40 derece 33 dakika Kuzey, 34 derece 57 dakika Doğudur. Komşuları Sinop, Samsun, Amasya, Yozgat, Kırıkkale, Çankırı ve Kastamonu'dur.");
+            return;
+        }
+
+        if (command.includes("çankırı") || command.includes("cankiri")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Çankırı arası resmi karayolu mesafesi Kuzey Marmara Otoyolu ve Gerede Çerkeş D-100 hattı üzerinden 550 kilometredir.");
+                return;
+            }
+            audio.speak("Çankırı, İç Anadolu Bölgesi'nin kuzeyinde Ilgaz Dağları eteklerinde yer alır. Kaya tuzu mağarası, Selçuklu eseri Taş Mescit ve Ilgaz Kayak Merkeziyle ünlüdür. Koordinatları 40 derece 36 dakika Kuzey, 33 derece 37 dakika Doğudur. Komşuları Bolu, Karabük, Kastamonu, Çorum, Kırıkkale ve Ankara'dır.");
+            return;
+        }
+
+        if (command.includes("bursa")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Bursa arası resmi karayolu mesafesi 1915 Çanakkale Köprüsü üzerinden 275 kilometre, Osmangazi Köprüsü üzerinden 350 kilometredir.");
+                return;
+            }
+            audio.speak("Bursa, Marmara Bölgesi'nin güneyinde, Uludağ eteklerinde yer alır. Osmanlı Devleti'nin ilk başkentlerindendir. Koordinatları 40 derece 11 dakika Kuzey, 29 derece 4 dakika Doğudur. Komşuları Yalova, Kocaeli, Sakarya, Bilecik, Kütahya ve Balıkesir'dir. Kuzeyinde Marmara Denizi yer alır.");
+            return;
+        }
+
+        if (command.includes("burdur")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Burdur arası resmi karayolu mesafesi 710 kilometredir. Afyonkarahisar ve Sandıklı üzerinden D-650 karayoluyla Göller Yöresi'ne ulaşılmaktadır.");
+                return;
+            }
+            audio.speak("Burdur, Akdeniz Bölgesi'nin Göller Yöresi'nde yer alır. Koordinatları 37 derece 43 dakika Kuzey, 30 derece 17 dakika Doğudur. Komşuları Afyonkarahisar, Isparta, Antalya, Muğla ve Denizli'dir.");
+            return;
+        }
+
+        if (command.includes("bolu")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Bolu arası resmi karayolu mesafesi 395 kilometredir. Kuzey Marmara Otoyolu, Sakarya, Düzce ve Bolu Dağı Tüneli üzerinden ulaşılmaktadır.");
+                return;
+            }
+            audio.speak("Bolu, Karadeniz Bölgesi'nin batısında, İstanbul ile Ankara arasındaki en önemli geçiş güzergahında yer alır. Koordinatları 40 derece 44 dakika Kuzey, 31 derece 36 dakika Doğudur. Komşuları Düzce, Sakarya, Bilecik, Eskişehir, Ankara, Çankırı, Karabük ve Zonguldak'tır.");
+            return;
+        }
+
+        if (command.includes("bitlis")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Bitlis arası resmi karayolu mesafesi 1520 kilometredir. Ankara, Malatya, Elazığ, Bingöl ve Muş üzerinden D-300 karayoluyla Van Gölü havzasına ulaşılmaktadır.");
+                return;
+            }
+            audio.speak("Bitlis, Doğu Anadolu Bölgesi'nde Van Gölü'nün batısında yer alır. Koordinatları 38 derece 24 dakika Kuzey, 42 derece 6 dakika Doğudur. Komşuları Van, Ağrı, Muş, Batman ve Siirt'tir.");
+            return;
+        }
+
+        if (command.includes("bingöl") || command.includes("bingol")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Bingöl arası resmi karayolu mesafesi 1425 kilometredir. Ankara, Sivas, Erzincan ya da Elazığ üzerinden D-300 karayoluyla ulaşılmaktadır.");
+                return;
+            }
+            audio.speak("Bingöl, Doğu Anadolu Bölgesi'nde Yukarı Fırat ve Murat havzasında yer alır. Koordinatları 38 derece 53 dakika Kuzey, 40 derece 30 dakika Doğudur. Komşuları Erzurum, Erzincan, Muş, Diyarbakır, Elazığ ve Tunceli'dir.");
+            return;
+        }
+
+        if (command.includes("bilecik")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Bilecik arası resmi karayolu mesafesi 380 kilometredir. Kuzey Marmara Otoyolu, Sakarya ve D-650 karayolu üzerinden ulaşılmaktadır.");
+                return;
+            }
+            audio.speak("Bilecik, Marmara Bölgesi'nin güneydoğusunda, Osmanlı Devleti'nin kurulduğu topraklarda yer alır. Koordinatları 40 derece 8 dakika Kuzey, 29 derece 58 dakika Doğudur. Komşuları Sakarya, Bursa, Bolu, Eskişehir ve Kütahya'dır.");
+            return;
+        }
+
+        if (command.includes("balıkesir") || command.includes("balikesir")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Balıkesir arası resmi karayolu mesafesi 295 kilometredir. 1915 Çanakkale Köprüsü veya Bandırma deniz/kara hattı üzerinden ulaşılmaktadır.");
+                return;
+            }
+            audio.speak("Balıkesir, Marmara Bölgesi'nin güneyinde, hem Marmara hem de Ege Denizi'ne kıyısı olan kavşak bir ildir. Koordinatları 39 derece 39 dakika Kuzey, 27 derece 53 dakika Doğudur. Komşuları Çanakkale, Bursa, Kütahya, Manisa ve İzmir'dir.");
+            return;
+        }
+
+        if (command.includes("aydın") || command.includes("aydin")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Aydın arası resmi karayolu mesafesi 630 kilometredir. Çanakkale Köprüsü, Balıkesir, Manisa, İzmir ve O-31 Otoyolu güzergahı kullanılır.");
+                return;
+            }
+            audio.speak("Aydın, Ege Bölgesi'nde Büyük Menderes Havzası'nda yer alır. Koordinatları 37 derece 51 dakika Kuzey, 27 derece 51 dakika Doğudur. Komşuları İzmir, Manisa, Denizli ve Muğla'dır. Batısında Ege Denizi uzanır.");
+            return;
+        }
+
+        if (command.includes("artvin")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Artvin arası resmi karayolu mesafesi 1440 kilometredir. Güzergah Karadeniz Sahil Yolu, Hopa ve Cankurtaran Tüneli üzerinden Çoruh Vadisi'ne uzanmaktadır.");
+                return;
+            }
+            audio.speak("Artvin, Doğu Karadeniz Bölgesi'nde Çoruh Vadisi yamaçlarında yer alır. Koordinatları 41 derece 11 dakika Kuzey, 41 derece 49 dakika Doğudur. Komşuları Rize, Erzurum ve Ardahan'dır. Kuzeyinde Gürcistan sınırı ve Karadeniz bulunur.");
+            return;
+        }
+
+        if (command.includes("çanakkale") || command.includes("canakkale")) {
+            if (command.includes("kaç km") || command.includes("mesafe") || command.includes("ne kadar")) {
+                audio.speak("Tekirdağ ile Çanakkale arası resmi karayolu mesafesi 170 kilometredir. Malkara ve Keşan üzerinden Gelibolu ve 1915 Çanakkale Köprüsü güzergahı kullanılır.");
+                return;
+            }
+            audio.speak("Çanakkale, Marmara Bölgesi'nin güneybatısında, Çanakkale Boğazı'nın iki yakasında yer alır. Koordinatları 40 derece 9 dakika Kuzey, 26 derece 24 dakika Doğudur. Komşuları Tekirdağ, Edirne ve Balıkesir'dir.");
+            return;
+        }
+
+        if (command.includes("koordinat") || command.includes("konum") || command.includes("tekirdağ nerede") || command.includes("nerede")) {
+            audio.speak("Tekirdağ, Türkiye'nin kuzeybatısında Trakya yakasında yer alır. Koordinatları: 40 derece 59 dakika Kuzey, 27 derece 31 dakika Doğudur. Doğuda İstanbul, batıda Edirne ve Çanakkale, kuzeyde Kırklareli, güneyde Marmara Denizi ile çevrilidir.");
+            return;
+        }
+
         if (command.includes("neredeyiz") || command.includes("mesafe") || command.includes("ne kadar kaldı")) {
             let distance = Math.floor(Game.currentDistanceToNext);
             let unit = "metre";
@@ -1380,9 +1667,11 @@ class VoiceAssistant {
 
         // --- KLİMA KONTROLÜ ---
         if (command.includes("klima") || command.includes("sıcak") || command.includes("soğuk") || command.includes("üşü") || command.includes("yan")) {
-            if (command.includes("kaç derece") || command.includes("sıcaklık ne") || command.includes("durumu")) {
-                const msg = `Dış sıcaklık ${Game.temperature} derece, otobüs içi ${Math.floor(Game.busTemperature)} derece. ${Game.isACOn ? "Klima açık." : "Klima kapalı."}`;
-                audio.speak(msg);
+            if (command.includes("kaç derece") || command.includes("sıcaklık") || command.includes("hava") || command.includes("yağmur") || command.includes("yağış")) {
+                let durum = (Game.weather === 'sunny') 
+                    ? (Game.isNight ? 'açık gece' : 'güneşli') 
+                    : (Game.weather === 'rainy' ? `yağmurlu, saatte ${Game.rainMmPerHour || 5} milimetre yağış var` : 'karlı');
+                audio.speak(`Dış sıcaklık ${Game.temperature} derece, araç içi ${Math.floor(Game.busTemperature)} derece. Hava ${durum}. ${Game.isACOn ? "Klima açık." : "Klima kapalı."}`);
                 return;
             }
 

@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU SES SİSTEMİ (AUDIO.JS)
    ========================================================================== */
 
@@ -33,7 +33,13 @@ class AudioSystem {
             midibus: null,
             man_d26: null,
             daf_paccar: null,
-            scania_dc13: null
+            scania_dc13: null,
+            iveco_daily: null,
+            karsan_atak: null,
+            bmc_procity: null,
+            temsa_avenue: null,
+            kent_articulated: null,
+            temsa_maraton: null
         };
         this.cityIdleBuffer = null;
         this.syntheticIdleBuffer = null;
@@ -80,6 +86,24 @@ class AudioSystem {
             });
             safeLoadBuffer('sounds/freesound_scania_dc13_idle.mp3', d => {
                 if (this.groupBuffers) this.groupBuffers.scania_dc13 = d;
+            });
+            safeLoadBuffer('sounds/freesound_iveco_daily_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.iveco_daily = d;
+            });
+            safeLoadBuffer('sounds/freesound_karsan_atak_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.karsan_atak = d;
+            });
+            safeLoadBuffer('sounds/freesound_bmc_procity_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.bmc_procity = d;
+            });
+            safeLoadBuffer('sounds/freesound_temsa_avenue_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.temsa_avenue = d;
+            });
+            safeLoadBuffer('sounds/freesound_kent_articulated_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.kent_articulated = d;
+            });
+            safeLoadBuffer('sounds/freesound_temsa_maraton_idle.mp3', d => {
+                if (this.groupBuffers) this.groupBuffers.temsa_maraton = d;
             });
         } catch(e) {}
         this.idleSource = null;
@@ -272,6 +296,7 @@ class AudioSystem {
         }
         this.playMenuMusic();
         this.initTireNoise();
+        this.initTunnelAcoustics();
     }
     
     updateAcoustics(leftDamage = 0, rightDamage = 0) {
@@ -297,14 +322,10 @@ class AudioSystem {
 
     updateBusPosition(lanePosition) {
         if (!this.enginePanner) return;
-        
-        const now = this.ctx.currentTime;
-        
-        // lanePosition 50 ise merkez (pan = 0). 15 sol şerit (pan = -1), 85 sağ şerit (pan = 1)
-        let panValue = (lanePosition - 50) / 35;
-        panValue = Math.max(-1, Math.min(1, panValue));
-        
-        this.enginePanner.pan.setTargetAtTime(panValue, now, 0.1);
+        // Motor sesi kabin içinde sabittir; sağa-sola yaslanma ve kulaklar arasında seviye dalgalanması engellenmiştir.
+        if (this.enginePanner.pan.value !== 0) {
+            this.enginePanner.pan.setValueAtTime(0, this.ctx.currentTime);
+        }
     }
 
     setWindowOpen(isOpen) {
@@ -377,22 +398,34 @@ class AudioSystem {
         }
     }
 
-    applyBusSoundProfile(profile) {
+    applyBusSoundProfile(profile, busObj = null) {
         if (!profile) return;
         this.activeSoundProfile = profile;
         if (!this.ctx) return;
         
+        const now = this.ctx.currentTime;
+        const currentBus = busObj || ((typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null);
+        const nvh = (currentBus && typeof currentBus.nvhLevel === 'number') ? currentBus.nvhLevel : 70;
+        const susp = (currentBus && typeof currentBus.suspensionComfort === 'number') ? currentBus.suspensionComfort : 70;
+        
+        this.activeBusNvh = nvh;
+        this.activeBusSuspension = susp;
+
         // 1. Bas Güçlendirme / Eq Ayarı (Büyük motorlarda derin sub-bass rölanti titreşimi)
         if (this.engineBassFilter) {
             const boost = typeof profile.bassBoost === 'number' ? profile.bassBoost : 0;
-            this.engineBassFilter.gain.setTargetAtTime(boost, this.ctx.currentTime, 0.1);
+            this.engineBassFilter.gain.setTargetAtTime(boost, now, 0.1);
         }
         
-        // 2. Kabin Akustik Ses Yalıtımı (Setra, Travego gibi lüks otobüslerde tizler sönümlenir)
+        // 2. Kabin Akustik NVH Ses Yalıtımı:
+        // Setra (%98) ve Travego (%95) gibi lüks araçlarda motor sesi kadife gibi boğuk ve tok bir nefes (2200-2600 Hz) haline gelir.
+        // Otokar/BMC gibi ekonomik şehir içi otobüslerde mekanik sesler daha açıktır (7000-8000 Hz).
         if (this.engineCabinFilter) {
-            const damping = typeof profile.cabinDamping === 'number' ? profile.cabinDamping : 1.0;
-            const targetFreq = Math.max(1200, Math.min(12000, 8000 * damping));
-            this.engineCabinFilter.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.1);
+            // nvhLevel 60 -> ~7500 Hz | nvhLevel 98 -> ~2200 Hz
+            const normalizedNvh = Math.max(0, Math.min(1, (nvh - 55) / 45));
+            const targetFreq = 7500 - (normalizedNvh * 5300); // 7500 Hz down to 2200 Hz
+            this.engineCabinFilter.frequency.setTargetAtTime(targetFreq, now, 0.15);
+            this.engineCabinFilter.Q.setTargetAtTime(1.0 + (normalizedNvh * 0.8), now, 0.15);
         }
     }
 
@@ -546,7 +579,9 @@ startEngine() {
             let activeBuffer = this.pureIdleBuffer || this.idleBuffer;
             if (currentBus) {
                 const grp = currentBus.soundGroup || (currentBus.soundProfile ? currentBus.soundProfile.soundGroup : '');
-                if (grp === 'scania_dc13' || currentBus.id.includes('irizar')) {
+                if (this.groupBuffers && this.groupBuffers[grp]) {
+                    activeBuffer = this.groupBuffers[grp];
+                } else if (grp === 'scania_dc13' || currentBus.id.includes('irizar')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.scania_dc13) || this.coachTerminalIdleBuffer || this.pureIdleBuffer || this.idleBuffer;
                 } else if (grp === 'daf_paccar' || currentBus.id.includes('safir')) {
                     activeBuffer = (this.groupBuffers && this.groupBuffers.daf_paccar) || this.pureIdleBuffer || this.idleBuffer;
@@ -575,8 +610,8 @@ startEngine() {
                 this.idleSource = this.ctx.createBufferSource();
                 this.idleSource.buffer = activeBuffer;
                 this.idleSource.loop = true;
-                this.idleSource.loopStart = 0.05; 
-                this.idleSource.loopEnd = Math.max(0.1, activeBuffer.duration - 0.05);
+                this.idleSource.loopStart = 0; 
+                this.idleSource.loopEnd = activeBuffer.duration;
 
                 this.idleGain = this.ctx.createGain();
                 this.idleGain.gain.value = 1.0;
@@ -608,16 +643,7 @@ startEngine() {
                     this.applyBusSoundProfile(currentBus.soundProfile);
                 }
                 
-                this.engineDamageLfo = this.ctx.createOscillator();
-                this.engineDamageLfo.type = 'sawtooth';
-                this.engineDamageLfo.frequency.value = 5;
-                
-                this.engineDamageGain = this.ctx.createGain();
-                this.engineDamageGain.gain.value = 0;
-                
-                this.engineDamageLfo.connect(this.engineDamageGain);
-                this.engineDamageGain.connect(this.idleGain.gain);
-                this.engineDamageLfo.start();
+                // Rölanti ses seviyesi tamamen sabittir; tremolo/dalgalanma yapan LFO bağlantısı kaldırıldı.
                 
                 try {
                     this.idleSource.start(0);
@@ -810,6 +836,11 @@ startEngine() {
             let targetWindVol = Math.min(0.35, ((speed - 25) / 75) * 0.30);
             if (this.isWindowOpen) {
                 targetWindVol = Math.min(0.80, targetWindVol + 0.35 + ((speed - 25) / 75) * 0.25);
+            } else {
+                // NVH Akustik Çift Cam İzolasyonu: Setra (%98) ve Travego (%95) kabinlerinde rüzgar sesi yarı yarıya sönümlenir
+                const nvh = this.activeBusNvh || 70;
+                const windDamping = Math.max(0.45, 1.0 - (((nvh - 55) / 45) * 0.50));
+                targetWindVol *= windDamping;
             }
             const targetWindRate = Math.min(1.30, 0.90 + (speed / 100) * 0.30);
             if (!this.sounds.roadWind.playing()) {
@@ -839,6 +870,184 @@ startEngine() {
         return;
     }
 
+    // =========================================================================
+    // KARAYOLU GERÇEKÇİ AKUSTİK MODÜLLERİ (TÜNEL YANKISI, KÖPRÜ DERZİ, ÇUKUR, TRAFİK IŞIKLARI)
+    // =========================================================================
+
+    initTunnelAcoustics() {
+        if (!this.ctx || this.tunnelConvolver) return;
+        try {
+            const duration = 2.2;
+            const decay = 2.0;
+            const rate = this.ctx.sampleRate;
+            const length = Math.floor(rate * duration);
+            const impulse = this.ctx.createBuffer(2, length, rate);
+            const left = impulse.getChannelData(0);
+            const right = impulse.getChannelData(1);
+
+            for (let i = 0; i < length; i++) {
+                const t = i / rate;
+                const env = Math.pow(1 - t / duration, decay);
+                left[i] = (Math.random() * 2 - 1) * env;
+                right[i] = (Math.random() * 2 - 1) * env;
+            }
+
+            this.tunnelConvolver = this.ctx.createConvolver();
+            this.tunnelConvolver.buffer = impulse;
+
+            this.tunnelFilter = this.ctx.createBiquadFilter();
+            this.tunnelFilter.type = 'lowpass';
+            this.tunnelFilter.frequency.value = 1800; // Beton tünel sönümlemesi
+
+            this.tunnelDelay = this.ctx.createDelay();
+            this.tunnelDelay.delayTime.value = 0.16; // 160ms eko aralığı
+
+            this.tunnelFeedback = this.ctx.createGain();
+            this.tunnelFeedback.gain.value = 0.30;
+
+            this.tunnelDelay.connect(this.tunnelFeedback);
+            this.tunnelFeedback.connect(this.tunnelDelay);
+
+            this.tunnelWetGain = this.ctx.createGain();
+            this.tunnelWetGain.gain.value = 0.0; // Varsayılan açık hava: 0
+
+            if (this.envMerger) {
+                this.envMerger.connect(this.tunnelFilter);
+                this.tunnelFilter.connect(this.tunnelConvolver);
+                this.tunnelFilter.connect(this.tunnelDelay);
+                this.tunnelConvolver.connect(this.tunnelWetGain);
+                this.tunnelDelay.connect(this.tunnelWetGain);
+                this.tunnelWetGain.connect(this.ctx.destination);
+            }
+        } catch(e) {
+            console.error("Tunnel acoustics init error:", e);
+        }
+    }
+
+    setTunnelMode(isActive) {
+        if (!this.ctx) return;
+        this.initTunnelAcoustics();
+        if (!this.tunnelWetGain) return;
+        const now = this.ctx.currentTime;
+        this.isInsideTunnel = isActive;
+        this.tunnelWetGain.gain.cancelScheduledValues(now);
+        this.tunnelWetGain.gain.setValueAtTime(this.tunnelWetGain.gain.value, now);
+        if (isActive) {
+            // Tünele girince yankı 1.2 sn içinde derinleşir
+            this.tunnelWetGain.gain.linearRampToValueAtTime(0.50, now + 1.2);
+        } else {
+            // Tünelden çıkınca açık havaya döner
+            this.tunnelWetGain.gain.linearRampToValueAtTime(0.0, now + 0.8);
+        }
+    }
+
+    // Köprü / Viyadük çelik genleşme derzi vuruntusu (tak-tak, tak-tak)
+    playBridgeJoint(speed = 50) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const gainVal = Math.min(0.28, 0.08 + (speed / 100) * 0.18);
+
+        const playThump = (timeOffset, freq, panVal) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            const panner = (typeof this.ctx.createStereoPanner === 'function') ? this.ctx.createStereoPanner() : null;
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + timeOffset);
+            osc.frequency.exponentialRampToValueAtTime(45, now + timeOffset + 0.045);
+
+            gain.gain.setValueAtTime(gainVal, now + timeOffset);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.05);
+
+            osc.connect(gain);
+            if (panner) {
+                panner.pan.value = panVal;
+                gain.connect(panner);
+                panner.connect(this.environmentMixer || this.ctx.destination);
+            } else {
+                gain.connect(this.environmentMixer || this.ctx.destination);
+            }
+            osc.start(now + timeOffset);
+            osc.stop(now + timeOffset + 0.055);
+        };
+
+        playThump(0.00, 110, -0.2);
+        playThump(0.03, 95, 0.2);
+        const wheelbaseDelay = Math.max(0.08, Math.min(0.28, 12 / Math.max(10, (speed / 3.6))));
+        playThump(wheelbaseDelay, 100, -0.3);
+        playThump(wheelbaseDelay + 0.03, 85, 0.3);
+    }
+
+    // Asfalt Çukuru (Pothole Thump) - Hangi tekerlek girdiyse o hoparlörden sert darbe
+    playPotholeThump(side = 'right', speed = 50) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const isSevere = speed > 35;
+        const susp = this.activeBusSuspension || 70;
+        // Havalı körük ve bağımsız aks süspansiyon sönümlemesi:
+        // Setra (%98) ve Travego (%93)'te sert darbe yerine tok ve yumuşak hava sönümü oluşur
+        const suspDamping = Math.max(0.38, 1.0 - (((susp - 55) / 45) * 0.58));
+        const gainVal = (isSevere ? 0.40 : 0.20) * suspDamping;
+        const panVal = (side === 'left') ? -0.8 : 0.8;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const panner = (typeof this.ctx.createStereoPanner === 'function') ? this.ctx.createStereoPanner() : null;
+
+        // Yüksek konforda sert testere dişi yerine pürüzsüz üçgen dalga
+        osc.type = (susp > 85) ? 'triangle' : (isSevere ? 'sawtooth' : 'triangle');
+        const startFreq = (susp > 85) ? (isSevere ? 120 : 90) : (isSevere ? 180 : 130);
+        osc.frequency.setValueAtTime(startFreq, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
+
+        gain.gain.setValueAtTime(gainVal, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (isSevere ? 0.20 : 0.12));
+
+        osc.connect(gain);
+        if (panner) {
+            panner.pan.value = panVal;
+            gain.connect(panner);
+            panner.connect(this.environmentMixer || this.ctx.destination);
+        } else {
+            gain.connect(this.environmentMixer || this.ctx.destination);
+        }
+        osc.start(now);
+        osc.stop(now + 0.2);
+    }
+
+    // Trafik Işıkları Akustik Sinyalizasyonu (Görme Engelliler İçin)
+    playTrafficLightTone(type = 'red') {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain);
+        gain.connect(this.environmentMixer || this.ctx.destination);
+
+        if (type === 'red') {
+            osc.frequency.setValueAtTime(750, now);
+            gain.gain.setValueAtTime(0.16, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            osc.start(now);
+            osc.stop(now + 0.09);
+        } else if (type === 'green') {
+            osc.frequency.setValueAtTime(1050, now);
+            osc.frequency.setValueAtTime(1400, now + 0.06);
+            gain.gain.setValueAtTime(0.22, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        }
+    }
+
+    // Uzaktaki Ender Kaza Sesi
+    playDistantCrash(pan = 0.5) {
+        if (!this.sounds || !this.sounds.crash) return;
+        const id = this.sounds.crash.play();
+        this.sounds.crash.stereo(pan, id);
+        this.sounds.crash.volume(0.35, id);
+    }
+
     stopAllRoadSounds() {
         if (!this.sounds) return;
         ['roadAsphalt', 'roadGravel', 'roadGravelAsphalt', 'roadWind', 'cityAmbience', 'cabinAmbience'].forEach(key => {
@@ -862,59 +1071,21 @@ startEngine() {
             this.currentGear = gear;
         }
 
-        // RPM bazlı frekans cambazlığı (800 rölanti -> 1.0, 2500 max -> 2.5 vb.)
-        let targetRate = rpm !== null ? (rpm / 800) : (1.0 + (speed / 90) * 1.8);
-        
-        // Aktif otobüsün ses profili (küçük motorlar tiz, büyük motorlar tok ve bas)
-        if (typeof BusFleet !== 'undefined') {
-            const busObj = BusFleet.getSelectedBus();
-            if (busObj && busObj.soundProfile) {
-                targetRate *= (busObj.soundProfile.basePitch || 1.0);
-            }
+        // RÖLANTİ SESİ ASLA KALINLAŞIP İNCELMEYECEK - 100% SABİT DOĞAL TON (1.000)
+        // Hiçbir devirde veya hızda rölanti sesi suni olarak inceltilmez ya da kalınlaştırılmaz.
+        if (this.idleSource.playbackRate && this.idleSource.playbackRate.value !== 1.0) {
+            this.idleSource.playbackRate.setValueAtTime(1.0, this.ctx.currentTime);
+        }
+        this.currentIdleRate = 1.0;
+
+        // RÖLANTİ SES SEVİYESİ ASLA YÜKSELİP ALÇALMAYACAK - 100% SABİT SEVİYE (1.000)
+        if (this.idleGain && this.idleGain.gain && this.idleGain.gain.value !== 1.0) {
+            this.idleGain.gain.setValueAtTime(1.0, this.ctx.currentTime);
         }
 
         // Retarder kontrolü (Frenleme esnasında)
         const isBrakingNow = (typeof Game !== 'undefined') && (Game.acceleration < 0);
         this.updateRetarder(speed, isBrakingNow);
-        
-        // MOTOR HASARI EFEKTİ (Sputter / Titreşim / Tekleme)
-        if (typeof Game !== 'undefined' && Game.busDamage) {
-            const damage = Game.busDamage.front;
-            if (damage > 20) {
-                const damageRatio = damage / 100; // 0.2 ile 1.0 arası
-                
-                // 1. Devir dalgalanması (Tekleme)
-                if (Math.random() < (damageRatio * 0.3)) {
-                    targetRate *= (0.6 + Math.random() * 0.3); // Anlık boğulma
-                }
-                
-                // 2. Vuruntu ve titreşim (LFO genliğini ayarla)
-                if (this.engineDamageGain && this.engineDamageLfo) {
-                    this.engineDamageGain.gain.setValueAtTime(damageRatio * 0.6, this.ctx.currentTime);
-                    this.engineDamageLfo.frequency.setValueAtTime(5 + speed * 0.15, this.ctx.currentTime);
-                }
-            } else {
-                if (this.engineDamageGain) {
-                    this.engineDamageGain.gain.setValueAtTime(0, this.ctx.currentTime);
-                }
-            }
-        }
-        
-        // EGZOZ KOPUKSA SESİ ÇILDIRT (DISTORTION/BOÄULMA)
-        if (this.isExhaustBroken) {
-            targetRate *= (0.8 + Math.random() * 0.4);
-            if (this.idleGain) this.idleGain.gain.setValueAtTime(2.5, this.ctx.currentTime);
-        } else {
-            if (this.idleGain) this.idleGain.gain.setValueAtTime(1.0, this.ctx.currentTime);
-        }
-        
-        targetRate = Math.min(3.0, Math.max(0.6, targetRate)); // Minimum 0.6 yapalım ki boğulma belli olsun
-        
-        if (!this.currentIdleRate || Math.abs(this.currentIdleRate - targetRate) > 0.03) {
-            // Boğulma efekti için anlık atlamalara izin veriyoruz
-            this.idleSource.playbackRate.setValueAtTime(targetRate, this.ctx.currentTime);
-            this.currentIdleRate = targetRate;
-        }
     }
 
     // --- HAVA DURUMU VE SİLECEK (YENİ) ---
@@ -1094,6 +1265,54 @@ startEngine() {
         gain.connect(this.environmentMixer);
         osc.start(this.ctx.currentTime);
         osc.stop(this.ctx.currentTime + 0.1);
+    }
+
+    // AKILLI KOKPİT AKUSTİK NAVİGASYON VE HEDEF BİP TONU
+    playNavChime(isDestination = false) {
+        try {
+            this.init();
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            if (!isDestination) {
+                // N tuşu: Temiz, tek yüksek navigasyon bip sesi (750Hz -> 880Hz)
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(750, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.09);
+            } else {
+                // Ctrl+N / Shift+N hedef tonu: Çift harmonik akustik bildirim (587Hz -> 880Hz)
+                const osc1 = this.ctx.createOscillator();
+                const gain1 = this.ctx.createGain();
+                osc1.type = 'triangle';
+                osc1.frequency.setValueAtTime(587.33, now); // D5
+                gain1.gain.setValueAtTime(0.25, now);
+                gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc1.connect(gain1);
+                gain1.connect(this.ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.08);
+
+                const osc2 = this.ctx.createOscillator();
+                const gain2 = this.ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(880, now + 0.09); // A5
+                gain2.gain.setValueAtTime(0.25, now + 0.09);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+                osc2.connect(gain2);
+                gain2.connect(this.ctx.destination);
+                osc2.start(now + 0.09);
+                osc2.stop(now + 0.22);
+            }
+        } catch (e) {
+            console.warn("playNavChime error:", e);
+        }
     }
 
     playHeadlightBust() {
@@ -1450,34 +1669,59 @@ startEngine() {
         }, 340);
     }
 
-    // --- RESMÎ TELSİZ AKUSTİĞİ: SQUELCH BURST (DİJİTAL MANDAL SESİ) ---
+    // --- RESMÎ TELSİZ AKUSTİĞİ: YUMUŞAK MANDAL VE ROGER BEEP ---
     playRadioSquelch(isOpening = true) {
         this.init();
+        
+        let playedAudio = false;
+        try {
+            const soundFile = isOpening ? 'sounds/freesound_radio_start.mp3' : 'sounds/freesound_radio_end.mp3';
+            const a = new Audio(soundFile);
+            a.volume = isOpening ? 0.20 : 0.15; // Kulağı asla rahatsız etmeyen, yumuşacık kısık ses
+            const p = a.play();
+            if (p && typeof p.catch === 'function') {
+                p.catch(() => {});
+            }
+            playedAudio = true;
+        } catch (e) {}
+
+        // Eğer ses dosyası çalınabiliyorsa Web Audio ile ikinci bir ses çalıp gürültü yapma!
+        if (playedAudio) return;
+
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
-        const dur = isOpening ? 0.08 : 0.06;
-        const bufferSize = Math.floor(this.ctx.sampleRate * dur);
-        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * 0.8;
+
+        if (isOpening) {
+            // Sentetik yedek: Yumuşak 350 Hz mekanik tık (sıfır gürültü, sıfır tiz)
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(350, now);
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.linearRampToValueAtTime(0.06, now + 0.004);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.05);
+        } else {
+            // Sentetik yedek kapanış: Yumuşak alçak frekanslı ikili bip (1100 Hz -> 880 Hz, kısık volüm)
+            const beepDur = 0.05;
+            [1100, 880].forEach((freq, idx) => {
+                const t = now + (idx * 0.06);
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, t);
+                gain.gain.setValueAtTime(0.0001, t);
+                gain.gain.linearRampToValueAtTime(0.05, t + 0.004);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t + beepDur);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(t);
+                osc.stop(t + beepDur + 0.01);
+            });
         }
-        const noise = this.ctx.createBufferSource();
-        noise.buffer = buffer;
-        
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(isOpening ? 2800 : 1800, now);
-        filter.Q.value = 4.0;
-        
-        const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.25, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-        
-        noise.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.ctx.destination);
-        noise.start(now);
     }
 
     // --- RESMÎ DİSPEÇER TELSİZİ: ANONS & ANLIK TRAFİK YAYINI ---
@@ -1491,7 +1735,7 @@ startEngine() {
             } else {
                 setTimeout(() => this.playRadioSquelch(false), 220);
             }
-        }, 100);
+        }, 120);
     }
 
     // --- TEKERLEKLİ SANDALYE RAMPASI AÇILMA AKUSTİĞİ ---
@@ -1604,26 +1848,127 @@ startEngine() {
         noise.start(now);
     }
 
-    // --- IBIS / YOLCU BİLGİLENDİRME ÇANI (DİJİTAL CHIME) ---
-    playIBISChime() {
+    // --- 3'LÜ ANONS ZİLİ SİSTEMİ (Dı - Dı - Dııın / 3 Zilin Birleşimi) ---
+    playIBISChime(isDeepGong = false) {
         this.init();
         if (!this.ctx) return;
+        
+        if (isDeepGong) {
+            this.playDeepGongChime();
+            return;
+        }
+
         const now = this.ctx.currentTime;
-        const notes = [880, 1318.5]; // A5 -> E6 modern iki tonlu bilgilendirme ding-dong
-        notes.forEach((freq, idx) => {
-            const t = now + (idx * 0.14);
+        // 3 Tane Zil: 1. Dı (E5), 2. Dı (G5), 3. Dıııın (C6 uzun sönen pirinç zil)
+        const chimeNotes = [
+            { freq: 659.25, timeOffset: 0.00, dur: 0.24, gain: 0.28 }, // 1. Zil: Dı
+            { freq: 783.99, timeOffset: 0.16, dur: 0.24, gain: 0.32 }, // 2. Zil: Dı
+            { freq: 1046.50, timeOffset: 0.32, dur: 0.95, gain: 0.38 }  // 3. Zil: Dıııın (uzun rezonanslı çan)
+        ];
+
+        chimeNotes.forEach(note => {
+            const t = now + note.timeOffset;
+            
+            // Temel sinüs dalgası
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, t);
-            gain.gain.setValueAtTime(0.001, t);
-            gain.gain.linearRampToValueAtTime(0.35, t + 0.005);
-            gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+            osc.frequency.setValueAtTime(note.freq, t);
+            
+            // Gerçek çan vuruş ve sönüm zarfı (akustik gong envelope)
+            gain.gain.setValueAtTime(0.0001, t);
+            gain.gain.linearRampToValueAtTime(note.gain, t + 0.006);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t + note.dur);
+            
             osc.connect(gain);
             gain.connect(this.environmentMixer || this.ctx.destination);
             osc.start(t);
-            osc.stop(t + 0.38);
+            osc.stop(t + note.dur + 0.02);
+
+            // Metalik/bronz zil harmonik parlaklığı (2.76x üst ton)
+            const harmOsc = this.ctx.createOscillator();
+            const harmGain = this.ctx.createGain();
+            harmOsc.type = 'sine';
+            harmOsc.frequency.setValueAtTime(note.freq * 2.76, t);
+            harmGain.gain.setValueAtTime(0.0001, t);
+            harmGain.gain.linearRampToValueAtTime(note.gain * 0.18, t + 0.004);
+            harmGain.gain.exponentialRampToValueAtTime(0.0001, t + (note.dur * 0.45));
+            harmOsc.connect(harmGain);
+            harmGain.connect(this.environmentMixer || this.ctx.destination);
+            harmOsc.start(t);
+            harmOsc.stop(t + (note.dur * 0.45) + 0.02);
         });
+    }
+
+    // --- TEKLİ DERİN ANONS GONGU (Dıııın) ---
+    playDeepGongChime() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const baseFreq = 523.25; // C5 tok pirinç otogar gongu
+        const dur = 1.6;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(baseFreq, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.42, now + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+        osc.connect(gain);
+        gain.connect(this.environmentMixer || this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + dur + 0.05);
+
+        // Zengin alt ve üst çan harmonikleri
+        [1.5, 2.0, 2.76].forEach((mult, i) => {
+            const hOsc = this.ctx.createOscillator();
+            const hGain = this.ctx.createGain();
+            hOsc.type = 'sine';
+            hOsc.frequency.setValueAtTime(baseFreq * mult, now);
+            hGain.gain.setValueAtTime(0.0001, now);
+            hGain.gain.linearRampToValueAtTime(0.15 / (i + 1), now + 0.006);
+            hGain.gain.exponentialRampToValueAtTime(0.0001, now + (dur * 0.7));
+            hOsc.connect(hGain);
+            hGain.connect(this.environmentMixer || this.ctx.destination);
+            hOsc.start(now);
+            hOsc.stop(now + (dur * 0.7) + 0.05);
+        });
+    }
+
+    // --- AKILLI VE GERÇEKÇİ BELEDİYE OTOBÜSÜ ANONS SİSTEMİ (IBIS / TEKULAŞ / İETT STANDARDI) ---
+    playBusAnnouncement(phase, stopName, options = {}) {
+        if (!stopName) return;
+        this.playIBISChime();
+        
+        let anonsText = '';
+        if (phase === 'depart') {
+            if (options.isInitial) {
+                const lineInfo = options.routeName ? (options.routeName + ' ') : '';
+                anonsText = 'Sayın yolcularımız, ' + lineInfo + 'seferimiz başlamıştır. İlk durağımız: ' + stopName + '.';
+            } else if (options.isFinal) {
+                anonsText = 'Sonraki durak: ' + stopName + '. Son duraktır.';
+            } else {
+                anonsText = 'Sonraki durak: ' + stopName + '.';
+            }
+        } else if (phase === 'approach') {
+            anonsText = stopName + ' durağına yaklaşıyorsunuz. İnecek yolcular lütfen hazırlansın.';
+        } else if (phase === 'arrive') {
+            if (options.isFinal) {
+                anonsText = 'Son durağımız: ' + stopName + '. Araçtan ayrılırken lütfen eşyalarınızı kontrol ediniz. TEKULAŞ iyi günler diler.';
+            } else {
+                anonsText = 'Durağımız: ' + stopName + '. Kapılar açılıyor.';
+            }
+        }
+
+        if (anonsText) {
+            // 3'lü zil melodisi (Dı - Dı - Dııın) biter bitmez net konuşma başlasın (750 ms)
+            setTimeout(() => {
+                this.speak(anonsText);
+            }, 750);
+        }
     }
 
     // --- KAYIP EŞYA KONTROL SESİ (ADIMLAR VE BULMA ÇANI) ---
@@ -2554,7 +2899,7 @@ startEngine() {
         }
     }
 
-    async speak(text) {
+    async speak(text, onEndCallback = null) {
         if (!text) return;
         
         // Ekran okuyucu (NVDA) erişilebilirliği için live region'ı güncelle
@@ -2586,7 +2931,12 @@ startEngine() {
                 if (this.sequenceId !== currentSeqId) return;
                 const ttsAudio = new Audio("data:audio/mp3;base64," + cachedAudio);
                 this.currentTTSAudio = ttsAudio;
-                ttsAudio.play().catch(e => {});
+                if (typeof onEndCallback === 'function') {
+                    ttsAudio.onended = () => onEndCallback();
+                }
+                ttsAudio.play().catch(e => {
+                    if (typeof onEndCallback === 'function') onEndCallback();
+                });
                 return;
             }
         } catch (e) {}
@@ -2616,7 +2966,12 @@ startEngine() {
                     try { localStorage.setItem(cacheKey, data.audioContent); } catch (e) {}
                     const ttsAudio = new Audio("data:audio/mp3;base64," + data.audioContent);
                     this.currentTTSAudio = ttsAudio;
-                    ttsAudio.play().catch(e => {});
+                    if (typeof onEndCallback === 'function') {
+                        ttsAudio.onended = () => onEndCallback();
+                    }
+                    ttsAudio.play().catch(e => {
+                        if (typeof onEndCallback === 'function') onEndCallback();
+                    });
                     return;
                 } else {
                     this.googleTtsDisabled = true;
@@ -2628,7 +2983,7 @@ startEngine() {
 
         // Yerel tarayıcı sesiyle anons yap (Sıfır gecikme, net ve kesintisiz)
         if (this.sequenceId !== currentSeqId) return;
-        this.speakBrowserVoice(text);
+        this.speakBrowserVoice(text, onEndCallback);
     }
 
     async speakSequence(textArray) {
