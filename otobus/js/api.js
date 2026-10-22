@@ -809,3 +809,82 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
 
     return true;
 }
+
+/* ==========================================================================
+   TÜRKİYE GENELİ SERBEST ROTA MOTORU (81 İL, TÜM İLÇELER VE MAHALLELER)
+   ========================================================================== */
+function createOrGetFreeRoamRoute(cityName, districtName, neighborhoodName) {
+    if (typeof routesData === 'undefined' || !routesData) routesData = {};
+
+    cityName = cityName || "Tekirdağ";
+    districtName = districtName || "Süleymanpaşa";
+    neighborhoodName = neighborhoodName || "Merkez";
+
+    const isFullDistrictTour = neighborhoodName.includes("Genel Şehir Turu") || neighborhoodName.includes("İlçe Turu");
+    const routeSlug = (cityName + "_" + districtName + "_" + neighborhoodName).toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const routeId = "free_roam_" + routeSlug;
+
+    // Tekirdağ için resmi TEKULAŞ veritabanından eşleşen hatları kontrol et
+    if (cityName === "Tekirdağ" && typeof window !== 'undefined' && window.tekulasHatVeritabani) {
+        const tekulas = window.tekulasHatVeritabani;
+        const matchingLine = tekulas.find(r => 
+            (r.district === districtName || r.originDistrict === districtName || r.destDistrict === districtName) &&
+            (!isFullDistrictTour ? (r.name && r.name.toLowerCase().includes(neighborhoodName.toLowerCase())) : true)
+        ) || tekulas.find(r => r.district === districtName) || tekulas[0];
+
+        if (matchingLine) {
+            const freeRoute = Object.assign({}, matchingLine, {
+                id: routeId,
+                sehir: "Tekirdağ",
+                district: districtName,
+                isFreeRoam: true,
+                taskIndex: 0,
+                name: "[Serbest Rota] Tekirdağ " + districtName + ": " + (isFullDistrictTour ? "Tüm Mahalleler Turu" : neighborhoodName),
+                speechBriefing: "Tekirdağ " + districtName + ", " + neighborhoodName + " serbest seferi. Kalkış durağınız: " + (matchingLine.startStop || "Kalkış Garajı") + ". İyi sürüşler kaptan."
+            });
+            routesData[routeId] = freeRoute;
+            return freeRoute;
+        }
+    }
+
+    // Diğer tüm iller için koordinat ve gerçekçi durak ağı oluştur
+    let baseLat = 39.92;
+    let baseLon = 32.85;
+
+    if (typeof varsayilanSehirDuraklari !== 'undefined' && varsayilanSehirDuraklari[cityName] && varsayilanSehirDuraklari[cityName].length > 0) {
+        baseLat = varsayilanSehirDuraklari[cityName][0].lat || baseLat;
+        baseLon = varsayilanSehirDuraklari[cityName][0].lon || baseLon;
+    }
+
+    const cleanMahalle = neighborhoodName.replace(" Mahallesi", "").replace(" Beldesi", "");
+    const stops = [
+        { name: cleanMahalle + " Merkez Meydan Durağı", lat: baseLat + 0.005, lon: baseLon + 0.004, gercekMesafeSonraki: 1.8 },
+        { name: cleanMahalle + " Çarşı & Park Durağı", lat: baseLat + 0.009, lon: baseLon + 0.008, gercekMesafeSonraki: 2.1 },
+        { name: cleanMahalle + " Bulvarı & Sağlık Ocağı", lat: baseLat + 0.014, lon: baseLon + 0.012, gercekMesafeSonraki: 2.4 },
+        { name: cleanMahalle + " Okullar & Spor Kompleksi", lat: baseLat + 0.019, lon: baseLon + 0.017, gercekMesafeSonraki: 2.6 },
+        { name: districtName + " Şehirlerarası Otogar & Transfer Merkezi", lat: baseLat + 0.025, lon: baseLon + 0.023, gercekMesafeSonraki: 0 }
+    ];
+
+    const totalKm = stops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
+
+    const freeRoute = {
+        id: routeId,
+        sehir: cityName,
+        district: districtName,
+        mahalle: neighborhoodName,
+        isFreeRoam: true,
+        taskIndex: 0,
+        licenseLevel: 1,
+        color: "#22c55e",
+        name: "[Serbest Rota] " + cityName + " - " + districtName + " (" + cleanMahalle + ")",
+        startStop: stops[0].name,
+        endStop: stops[stops.length - 1].name,
+        intermediateStops: stops.slice(1, -1).map(s => s.name),
+        stops: stops,
+        totalKm: Number(totalKm.toFixed(1)),
+        speechBriefing: cityName + " " + districtName + ", " + cleanMahalle + " serbest seferi. İlk durak: " + stops[0].name + ". Son durak: " + stops[stops.length - 1].name + ". Toplam " + stops.length + " durak, " + totalKm.toFixed(1) + " kilometre. İyi yolculuklar kaptan."
+    };
+
+    routesData[routeId] = freeRoute;
+    return freeRoute;
+}
