@@ -357,10 +357,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
                     UI.updateTitleScreenButtons();
                 }
-                const announceMsg = `${opt.name} ana çalışma bölgeniz olarak seçildi. 1. Seviye seferleriniz 4 duraktan başlayarak hazırlandı.`;
+                const lblActive = document.getElementById('lbl-active-district');
+                if (lblActive) lblActive.textContent = opt.name;
+                const lblRouteActive = document.getElementById('lbl-route-active-district');
+                if (lblRouteActive) lblRouteActive.textContent = opt.name;
+
+                const announceMsg = `${opt.name} ilçesi seçildi. Mahalle hatları ve serbest güzergahlar yüklendi.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceMsg);
                 if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`📍 Aktif Bölge: ${opt.name}`, 'success');
+
+                // Serbest Sürüş Modunda Rota Ekranına Yönlendir
+                document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: opt.id } }));
             };
 
             li.appendChild(btn);
@@ -391,6 +399,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const btnChange = document.getElementById('btn-change-active-district');
         if (btnChange) btnChange.focus();
+
+        // Eğer serbest sürüş modundaysa ve rota ekranında değilse mevcut bölgeyle devam et
+        const routeMenu = document.getElementById('route-menu');
+        const isRouteVisible = routeMenu && !routeMenu.classList.contains('hidden');
+        if (typeof Game !== 'undefined' && Game.playMode === 'free_drive' && !isRouteVisible) {
+            const curDist = Game.activeDistrict || localStorage.getItem('activeDistrict') || 'Süleymanpaşa';
+            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: curDist } }));
+        }
     };
 
     const btnClosePicker = document.getElementById('btn-close-district-picker');
@@ -654,10 +670,10 @@ document.addEventListener('DOMContentLoaded', () => {
         btnFreeDrive.addEventListener('click', () => {
             if (typeof Game !== 'undefined') Game.setPlayMode('free_drive');
             audio.playSelect();
-            const msg = "Serbest Sürüş Modu seçildi. Saat ve süre sınırlaması olmadan, dilediğiniz güzergahta serbestçe pratik yapabilirsiniz.";
+            const msg = "Serbest Sürüş Modu seçildi. Lütfen sürüş yapmak istediğiniz il ve ilçeyi seçin.";
             audio.speak(msg);
-            UI.showToast("🛣️ Serbest Sürüş Modu Aktif (Serbest Pratik)", "info");
-            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: Game.activeDistrict } }));
+            UI.showToast("🛣️ Serbest Sürüş: İlçe & Mahalle Seçimi", "info");
+            openDistrictPickerModal();
         });
     }
 

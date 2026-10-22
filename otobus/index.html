@@ -95,12 +95,7 @@
             </div>
         </div>
 
-        <!-- Aktif Bölge Butonu (Kompakt Rozet) -->
-        <div id="active-district-badge-container" style="margin-bottom: 16px; text-align: center; width: 100%;">
-            <button id="btn-change-active-district" class="menu-btn nav-item" style="padding: 7px 18px; font-size: 0.92rem; background: rgba(56,189,248,0.14); border: 1.5px solid #38bdf8; color: #38bdf8; border-radius: 20px; cursor: pointer; justify-content: center; width: auto; display: inline-flex; margin: 0 auto;" aria-label="Bölge veya Şehir Değiştir. Listeden seçmek için tıklayın">
-                📍 Bölge: <strong id="lbl-active-district" style="color: #fde047; margin: 0 4px;">Süleymanpaşa</strong> 📋 (Değiştir)
-            </button>
-        </div>
+        
 
         <div class="menu-container" style="width: 100%; z-index: 1;">
 
@@ -170,6 +165,8 @@
 
             <!-- GİZLİ YEDEK ELEMANLAR (ARKA PLAN VE KISAYOL UYUMLULUĞU İÇİN) -->
             <div class="hidden" style="display: none;" aria-hidden="true">
+                <span id="lbl-active-district" class="hidden" style="display: none;">Süleymanpaşa</span>
+                
                 <button id="btn-open-facilities"></button>
                 <button id="btn-open-roleplay"></button>
                 <button id="btn-open-sound-gallery"></button>
@@ -258,6 +255,20 @@
         <div class="title-container">
             <h1 class="main-title" id="route-sel-title">Görev Seçimi</h1>
             <p class="subtitle" id="route-sel-subtitle">API'den çekilen canlı rotalardan birini seçin</p>
+
+            <!-- SERBEST SÜRÜŞ KONUM & BÖLGE SEÇİM PANELİ -->
+            <div id="route-location-panel" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: rgba(56,189,248,0.12); border: 1.5px solid #38bdf8; border-radius: 12px; padding: 12px 18px; margin-bottom: 14px; width: 100%; box-shadow: 0 4px 15px rgba(56,189,248,0.15);">
+                <div>
+                    <span style="color: #94a3b8; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; display: block;">📍 Aktif Sürüş Bölgesi (İl & İlçe):</span>
+                    <strong style="color: #fde047; font-size: 1.15rem; display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                        <span id="lbl-route-city">Tekirdağ</span> / <span id="lbl-route-active-district">Süleymanpaşa</span>
+                    </strong>
+                    <span style="color: #cbd5e1; font-size: 0.82rem; display: block; margin-top: 2px;">Mahalle hatları, cadde güzergahları ve serbest pratik hatları hazır.</span>
+                </div>
+                <button id="btn-change-active-district" class="menu-btn nav-item" style="width: auto; padding: 10px 18px; font-size: 0.92rem; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #fff; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 2px 10px rgba(2,132,199,0.3);" aria-label="Farklı bir il, ilçe veya mahalle seçmek için tıklayın">
+                    🗺️ İl & İlçe Değiştir
+                </button>
+            </div>
             <div id="mission-audio-guide" style="background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #38bdf8; padding: 8px 12px; border-radius: 6px; margin: 10px 0; font-size: 0.95rem;">
                 ⌨️ <strong>(Shift + Oklar)</strong> Pusula (Sağ: Doğu, Sol: Batı, Yukarı: Kuzey, Aşağı: Güney) | <strong>(A)</strong> Açıklama | <strong>(Shift + A)</strong> Adım Adım | <strong>(Esc)</strong> Çık
             </div>
