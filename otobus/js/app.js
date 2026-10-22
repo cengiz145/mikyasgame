@@ -122,7 +122,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 loginScreen.classList.remove('hidden');
                 const userInput = document.getElementById('username-input');
-                if (userInput) userInput.focus();
+                if (userInput) {
+                    userInput.value = '';
+                    userInput.focus();
+                }
             }
             if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
                 KeyboardNav.initForScreen();
@@ -242,9 +245,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let username = (usernameInput && usernameInput.value) ? usernameInput.value.trim() : '';
         username = username.replace(/[.#$\[\]]/g, '');
         
-        // Asla kullanıcıyı engelleme, boşsa Kaptan yap
+        // Kullanıcı adı boş bırakılırsa oyuncuyu uyar ve kutucuğa odaklan
         if (!username) {
-            username = "Kaptan";
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast('Lütfen bir kullanıcı adı yazınız!', 'warning');
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak('Lütfen bir kullanıcı adı yazınız.');
+            if (usernameInput) usernameInput.focus();
+            return;
         }
 
         if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
