@@ -1318,6 +1318,97 @@
         },
 
         // Yeni Şirket Kurma Modalını Aç
+        
+        // Şirketi Gönüllü Olarak Kapatma / Feshetme
+        dissolveCompany: function () {
+            const compName = this.data.companyName || "Şirketiniz";
+            const treasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 0;
+            const driverCount = (this.data.hiredDrivers && this.data.hiredDrivers.length) || 0;
+
+            let promptText = `🏢 ŞİRKETİ FESHETME VE KAPATMA İŞLEMİ\n\n` +
+                `"${compName}" şirketinizi tamamen kapatmak ve feshetmek istiyor musunuz?\n\n` +
+                `Bu işlem sonucunda:\n`;
+
+            if (treasury > 0) {
+                promptText += `• Şirket kasasında biriken ${treasury.toLocaleString('tr-TR')} ₺ nakit bakiye KESİNTİSİZ şahsi cüzdanınıza aktarılır.\n`;
+            } else if (treasury < 0) {
+                promptText += `• Şirketin mevcut borcu (${treasury.toLocaleString('tr-TR')} ₺) tasfiye edilerek kapatılır.\n`;
+            } else {
+                promptText += `• Şirket kasası kapatılır.\n`;
+            }
+
+            if (driverCount > 0) {
+                promptText += `• Şirketteki ${driverCount} sözleşmeli kaptan serbest bırakılır (Şoför Pazarı'na döner).\n`;
+            }
+
+            promptText += `• Tüm şube ve bina yatırımları temel düzeye çekilir.\n` +
+                `• ŞAHSİ HAKLARINIZ (Kişisel cüzdanınız, garajınızdaki otobüsler, ehliyetiniz) AYNEN KORUNUR.\n` +
+                `• Tamamen bağımsız bir serbest kaptan olarak tek başınıza çalışmaya devam edersiniz.\n` +
+                `• İleride dilediğiniz zaman sıfırdan yeniden yeni bir şirket kurabilirsiniz.\n\n` +
+                `Şirketinizi şimdi kapatmayı onaylıyor musunuz?`;
+
+            const ok = confirm(promptText);
+            if (!ok) return;
+
+            // Kasadaki pozitif parayı şahsi cüzdana aktar
+            if (treasury > 0 && typeof Game !== 'undefined') {
+                Game.playerBudget = (Game.playerBudget || 0) + treasury;
+                Game.saveData();
+                if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                    const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                    UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                }
+            }
+
+            // Muhasebe kaydı
+            if (treasury > 0) {
+                this.recordTransaction('expense', 'dividends', 'Şirket Feshi - Kasadaki Tüm Bakiyenin Şahsi Cüzdana Aktarılması', treasury);
+            }
+
+            // Şirketi sıfırla ve kapat
+            this.data.companyTreasury = 0;
+            this.data.hiredDrivers = [];
+            this.data.institutions = {
+                headquarters: 1,
+                bus_garage: 1,
+                terminal_offices: 1,
+                maintenance_depot: 1,
+                driver_lodging: 1,
+                city_agencies: 1
+            };
+            this.data.terminalBranches = {
+                tekirdag: true,
+                corlu: false,
+                istanbul_esenler: false,
+                ankara_asti: false,
+                izmir_otogar: false
+            };
+            this.data.hqUpgrades = {
+                fuelContract: false,
+                luxuryLounge: false,
+                terminalPlatform: false,
+                corporateBrand: false
+            };
+            this.data.companyLevel = 1;
+            this.data.revenueSharePercent = 0; // %100 kaptan cüzdanına kalır
+
+            // Topluluk listesinden çıkar (varsa)
+            let captains = this.getCaptainCompanies();
+            const filteredCaptains = captains.filter(c => !c.name || c.name.toLowerCase() !== compName.toLowerCase());
+            try {
+                localStorage.setItem(this.COMMUNITY_STORAGE_KEY, JSON.stringify(filteredCaptains));
+            } catch(e) {}
+
+            this.saveData();
+            this.renderAll();
+
+            const succMsg = `${compName} şirketi başarıyla feshedildi ve kapatıldı. ${treasury > 0 ? (treasury.toLocaleString('tr-TR') + ' ₺ cüzdanınıza aktarıldı. ') : ''}Artık tamamen bağımsız serbest bir kaptan olarak çalışıyorsunuz.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(succMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast("🏢 Şirketiniz feshedildi ve kapatıldı. Bağımsız çalışmaya döndünüz!", "success");
+            }
+        },
+
         openCreateCompanyModal: function() {
             this.injectCreateCompanyModal();
             const modal = document.getElementById('create-company-modal');
@@ -3768,6 +3859,7 @@
                     <div style="color: #fde047; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
                         <span>🏢 ${this.data.companyName}</span>
                         <button id="btn-rename-company" class="modern-btn nav-item" style="padding: 3px 10px; font-size: 0.8rem; background: rgba(255,255,255,0.12); border: 1px solid #fde047; color: #fde047; border-radius: 6px; cursor: pointer;" title="Şirket İsmini Değiştir">✏️ Şirket Kur / İsim Düzenle</button>
+                        <button id="btn-dissolve-company" class="modern-btn nav-item" style="padding: 3px 10px; font-size: 0.8rem; background: rgba(239,68,68,0.18); border: 1px solid #ef4444; color: #fca5a5; border-radius: 6px; cursor: pointer;" title="Şirketi Kapat ve Feshet">🗑️ Şirketi Kapat / Feshet</button>
                         <span style="font-size: 0.85rem; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.4); border: 1px solid #facc15; color: #fef08a;">
                             ${lvlInfo.badge} Seviye ${lvlInfo.level}: ${lvlInfo.title}
                         </span>
@@ -3850,6 +3942,13 @@
             if (btnRename) {
                 btnRename.addEventListener('click', () => {
                     this.openCreateCompanyModal();
+                });
+            }
+
+            const btnDissolve = card.querySelector('#btn-dissolve-company');
+            if (btnDissolve) {
+                btnDissolve.addEventListener('click', () => {
+                    this.dissolveCompany();
                 });
             }
 
