@@ -1,6 +1,6 @@
 /**
  * company-system.js - Akıllı Şirket & Filo Yönetimi, Dinamik Borsa, Şoför AI & Otomatik Sefer Optimizasyonu
- * Şoför Karakterleri, Gerçek Araç Tahsisi, Sinerji Algoritmaları, Dinamik Piyasa Talepleri ve Yapay Zeka Filo Müdürü
+ * Şoför Karakterleri, Gerçek Araç Tahsisi, Sinerji Algoritmaları, Dinamik Piyasa Talepleri ve Başharekât Yönetimi
  * Geliştirici: Ümit Ekrem Mikyas
  */
 
@@ -27,7 +27,7 @@
                 ticketing_network: 1,   // 1: Gişe & Manuel, 2: Dijital Çağrı Merkezi, 3: Küresel Rezervasyon Ağı
                 catering_logistics: 1,  // 1: Bakkal/Toptancı, 2: Soğuk Hava Deposu, 3: Gurme Catering Üssü
                 highway_resort: 1,      // 1: Çay Ocağı Durağı, 2: Dinlenme Tesisi, 3: Mega Yaşam Parkı
-                fleet_operations: 1     // 1: Telefon/Telsiz, 2: GPS Uydu Masası, 3: Yapay Zeka Harekât
+                fleet_operations: 1     // 1: Telefon/Telsiz, 2: GPS Uydu Masası, 3: Başharekât Komuta Merkezi
             },
             satisfactionRating: 4.9,       // 1.0 - 5.0 (Yıldız Değerlendirmesi)
             terminalBranches: {            // Otogar Yazıhaneleri
@@ -655,10 +655,10 @@
                     },
                     {
                         level: 3,
-                        title: "Yapay Zeka Destekli Küresel Biletleme Konsorsiyumu",
-                        badge: "🥇 Seviye 3: Küresel Rezervasyon Ağı (MAX)",
+                        title: "Merkezi Global Biletleme & Seyahat Konsorsiyumu",
+                        badge: "🥇 Seviye 3: Global Rezervasyon Ağı (MAX)",
                         cost: 130000,
-                        perkDesc: "Bilet hasılatı +%60 artar, doluluk oranı daima %95+ olur, her bilet satışından ekstra pasif acente komisyonu şirkete akar.",
+                        perkDesc: "Bilet hasılatı +%60 artar, doluluk oranı daima %95+ olur, uluslararası acente dağıtım ağı sayesinde her bilet satışından ekstra acente komisyonu şirkete akar.",
                         perkShort: "+%60 Bilet Geliri, %95+ Doluluk, Pasif Acente Kârı",
                         effects: { demandMultiplier: 1.60, revenueBonus: 0.35 }
                     }
@@ -763,11 +763,11 @@
                     },
                     {
                         level: 3,
-                        title: "Yapay Zeka Harekât & Otonom Lojistik Komuta Merkezi",
-                        badge: "🥇 Seviye 3: Yapay Zeka Harekât (MAX)",
+                        title: "7/24 Kesintisiz Karayolu Harekât & Sevkiyat Komuta Merkezi",
+                        badge: "🥇 Seviye 3: Kesintisiz Sevkiyat & Harekât (MAX)",
                         cost: 120000,
-                        perkDesc: "Otomatik sefer süreleri %40 hızlanır, kaza riski %0, karlı/sisli havalarda sefer gecikmesi sıfırlanır, sefer borsasında en kârlı rotalar otomatik belirlenir.",
-                        perkShort: "%40 Hızlı Sefer, Sıfır Gecikme, Otonom Borsa Analizi",
+                        perkDesc: "Deneyimli başharekâtçılar sayesinde sefer süreleri %40 hızlanır, kaza ve gecikme riski %0'a iner, yol ve hava muhalefeti anında çözülür, en kârlı rotalar belirlenir.",
+                        perkShort: "%40 Hızlı Sefer, Sıfır Gecikme, Profesyonel Sevkiyat",
                         effects: { tripSpeedBonus: 0.40, ticketCancelAvoid: 1.0 }
                     }
                 ]
@@ -1958,7 +1958,7 @@
             return true;
         },
 
-        // YAPAY ZEKA FİLO MÜDÜRÜ: TEK TUŞLA AKILLI OPTİMİZE DAĞITIM
+        // BAŞHAREKÂT YÖNETİMİ: TEK TUŞLA AKILLI SEFER DAĞITIMI
         autoDispatchAllAI: function () {
             if (!this.data.hiredDrivers || this.data.hiredDrivers.length === 0) {
                 if (typeof UI !== 'undefined') UI.showToast("Filoda kayıtlı şoför bulunamadı!", "warning");
@@ -2051,13 +2051,13 @@
 
             this.playAiDispatchSound();
 
-            const summarySpeech = `Yapay Zeka Filo Müdürü ${dispatchedCount} şoförünüzü ve araçlarınızı canlı borsa taleplerine göre en yüksek kâr marjıyla akıllıca rotalara dağıttı!`;
+            const summarySpeech = `Başharekât Müdürü ${dispatchedCount} şoförünüzü ve araçlarınızı canlı borsa taleplerine göre en yüksek kâr potansiyeliyle akıllıca seferlere dağıttı!`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(summarySpeech);
             if (typeof UI !== 'undefined' && UI.showToast) {
-                UI.showToast(`🤖 AKILLI DAĞITIM TAMAMLANDI: ${dispatchedCount} sefer başlatıldı!`, "success");
+                UI.showToast(`📋 AKILLI SEFER DAĞITIMI TAMAMLANDI: ${dispatchedCount} sefer başlatıldı!`, "success");
             }
 
-            this.addRadioLog("🤖 Filo Yapay Zekası", "⚡", `Akıllı Sefer Optimizasyonu tamamlandı. Tüm filo zirve kâr marjıyla sahaya sürüldü.`, "success");
+            this.addRadioLog("👨‍💼 Başharekât Müdürü", "📋", `Akıllı Sefer Dağıtımı tamamlandı. Tüm filo en yüksek kâr potansiyeline göre sahaya sürüldü.`, "success");
             this.renderAll();
         },
 
@@ -2527,8 +2527,8 @@
                             
                         </div>
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <button id="btn-company-ai-dispatch-top" class="modern-btn nav-item" style="padding: 8px 16px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #000; font-weight: bold; border: 1px solid #7dd3fc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px;" aria-label="Yapay Zeka Filo Müdürü: Tek tuşla tüm şoförleri en karlı seferlere otomatik dağıt">
-                                🤖 Akıllı Filo Dağıtımı (AI)
+                            <button id="btn-company-ai-dispatch-top" class="modern-btn nav-item" style="padding: 8px 16px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #000; font-weight: bold; border: 1px solid #7dd3fc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px;" aria-label="Başharekât: Tek tuşla tüm şoförleri en karlı seferlere akıllıca dağıt">
+                                📋 Akıllı Sefer Dağıtımı
                             </button>
                             <button id="btn-close-company-modal" class="modern-btn nav-item" style="padding: 7px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; cursor: pointer; border-radius: 8px;" aria-label="Şirket Menüsünü Kapat (Esc)">✕ Kapat</button>
                         </div>
