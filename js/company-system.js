@@ -3582,9 +3582,9 @@
                     <!-- 6. SEKME: Var Olan Bir Şirkette Çalış (Maaşlı Kaptanlık) -->
                     <div id="panel-comp-corporate-work" style="display: none;">
                         <div style="background: rgba(15,23,42,0.6); padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                            <h3 style="color: #fde047; margin: 0 0 4px 0; font-size: 1.1rem;">👔 Kaptan Şirketleri & Bağımsız Çalışma Modeli</h3>
+                            <h3 style="color: #fde047; margin: 0 0 4px 0; font-size: 1.1rem;">👔 Kaptan Şirketleri & Çalışma Listesi</h3>
                             <p style="color: #cbd5e1; font-size: 0.88rem; margin: 0;">
-                                İster bağımsız serbest kaptan olarak sıfır kesinti ve sıfır şirket riskiyle çalışın, isterseniz diğer kaptanların kurduğu şirketlere katılarak günlük garanti maaş kazanın. (Telif hakkı olan gerçek ticari markalar yer almaz; tüm şirketler oyuncular tarafından tescillenir).
+                                Bir şirkette çalışmak isterseniz aşağıdaki şirketlerden dilediğiniz birine katılabilirsiniz. Şirkete bağlandığınızda günlük maaş ve sefer primi kazanırsınız. Şirketten ayrıldığınızda ise kendi başınıza serbest çalışırsınız.
                             </p>
                         </div>
                         <div id="corporate-work-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
@@ -4517,24 +4517,6 @@
             const captainCompanies = this.getCaptainCompanies();
 
             let html = '';
-
-            // 1. BAĞIMSIZ SERBEST KAPTAN ÇALIŞMA KARTI (Telif Riski Yok, %100 Şahsi Kazanç)
-            const isCurrentlyIndep = (!activeCorpId && (this.data.revenueSharePercent === 0 || this.data.isIndependentMode));
-            html += `
-            <div style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(15, 23, 42, 0.95)); border: 2px solid #10b981; border-radius: 12px; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);">
-                <div>
-                    <div style="color: #34d399; font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                        <span>⭐</span> <span>Bağımsız Serbest Kaptan Modu (%100 Şahsi Kazanç)</span>
-                    </div>
-                    <div style="color: #cbd5e1; font-size: 0.88rem; margin-top: 4px; line-height: 1.45; max-width: 650px;">
-                        Herhangi bir şirkete bağlı kalmadan, kendi şahsi otobüsünüzle serbest kaptan olarak çalışın. Sefer hasılatının %100'ü doğrudan kişisel cüzdanınıza akar. <strong>Sıfır şirket işletme riski ve sıfır telif riski.</strong>
-                    </div>
-                </div>
-                <button id="btn-activate-independent" class="modern-btn nav-item" style="padding: 11px 22px; background: ${isCurrentlyIndep ? 'rgba(16, 185, 129, 0.35)' : 'linear-gradient(135deg, #10b981, #059669)'}; border: 1.5px solid #34d399; color: #fff; font-weight: 800; border-radius: 8px; cursor: pointer; font-size: 0.95rem; box-shadow: 0 3px 12px rgba(16,185,129,0.3);" aria-label="Bağımsız serbest kaptan olarak çalış">
-                    ${isCurrentlyIndep ? '✅ Aktif Bağımsız Kaptansınız' : '⭐ Bağımsız Kaptan Olarak Çalış'}
-                </button>
-            </div>
-            `;
 
             // ŞİRKETLERİ SADECE İNSANLAR KURAR (YAPAY ŞİRKETLER YOKTUR)
             if (captainCompanies.length === 0) {
