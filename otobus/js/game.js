@@ -18,6 +18,77 @@ try {
    ========================================================================== */
 
 const Game = {
+
+    // DİNAMİK YAKIT VE TÜKETİM SİSTEMİ
+    fuelTankCapacity: 500,
+    currentFuelLiters: 500,
+    fuelWarned15: false,
+    fuelWarned5: false,
+
+    getFuelCapacity: function() {
+        const bus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
+            ? BusFleet.getSelectedBus() 
+            : (this.selectedBus || null);
+        if (bus && bus.fuelTankCapacity) return bus.fuelTankCapacity;
+        if (bus) {
+            if (bus.sizeTier === 1) return 150;
+            if (bus.sizeTier === 2) return 300;
+            if (bus.sizeTier === 3) return 430;
+            if (bus.sizeTier === 4) return 500;
+            if (bus.sizeTier === 5) return 620;
+            if (bus.category === 'seyahat') return 520;
+        }
+        return 500;
+    },
+
+    getFuelConsumptionPer100km: function() {
+        const bus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
+            ? BusFleet.getSelectedBus() 
+            : (this.selectedBus || null);
+        if (bus && bus.fuelConsumptionRate) return bus.fuelConsumptionRate;
+        if (bus) {
+            if (bus.sizeTier === 1) return 22;
+            if (bus.sizeTier === 2) return 32;
+            if (bus.sizeTier === 3) return 44;
+            if (bus.sizeTier === 4) return 28;
+            if (bus.sizeTier === 5) return 33;
+        }
+        return 30;
+    },
+
+    refuel: function(liters, costPerLiter = 42) {
+        const cap = this.getFuelCapacity();
+        if (this.currentFuelLiters === undefined) this.currentFuelLiters = cap;
+        const needed = Math.max(0, cap - this.currentFuelLiters);
+        const toAdd = (liters === undefined || liters === null) ? needed : Math.min(needed, liters);
+        if (toAdd <= 0) {
+            const fullMsg = "Deponuz zaten tamamen dolu!";
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(fullMsg, "info");
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+            return 0;
+        }
+        const cost = Math.round(toAdd * costPerLiter);
+        if (this.playerBudget < cost) {
+            const warnMsg = `Yetersiz bütçe! ${Math.floor(toAdd)} litre mazot için ${cost} ₺ gerekiyor, bakiyeniz ${this.playerBudget} ₺.`;
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(warnMsg);
+            return 0;
+        }
+        this.deductMoney(cost);
+        this.currentFuelLiters += toAdd;
+        this.fuelWarned15 = false;
+        this.fuelWarned5 = false;
+        this.saveData();
+
+        if (typeof audio !== 'undefined' && typeof audio.playNavChime === 'function') {
+            audio.playNavChime();
+        }
+        const succMsg = `⛽ Depoya ${Math.floor(toAdd)} litre mazot dolduruldu (-${cost} ₺). Depo şu an %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`;
+        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(succMsg, "success");
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Depoya ${Math.floor(toAdd)} litre mazot alındı. Yakıt seviyeniz yüzde ${Math.floor((this.currentFuelLiters / cap) * 100)}.`);
+        return toAdd;
+    },
+
     // --- State Variables ---
     academyCompleted: localStorage.getItem('academyCompleted') === 'true',
     isAcademyCompleted: function() {
@@ -1032,6 +1103,14 @@ const Game = {
         }
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
+        this.fuelTankCapacity = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
+        if (this.currentFuelLiters === undefined || this.currentFuelLiters <= 0) {
+            this.currentFuelLiters = this.fuelTankCapacity;
+        } else if (this.currentFuelLiters > this.fuelTankCapacity) {
+            this.currentFuelLiters = this.fuelTankCapacity;
+        }
+        this.fuelWarned15 = false;
+        this.fuelWarned5 = false;
         this.totalDrivingSeconds = 0;
         this.activeRouteData = routesData[routeId];
         this.passengerComfort = 100;
@@ -2564,6 +2643,18 @@ const Game = {
         if (typeof audio.updateWeatherSound === 'function') audio.updateWeatherSound(this.speed, this.weather);
 
         document.getElementById('hud-speed').innerText = Math.floor(this.speed);
+        // Canlı Yakıt HUD Göstergesi
+        const hudFuelVal = document.getElementById('hud-fuel-val');
+        if (hudFuelVal) {
+            const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
+            const curFuel = (this.currentFuelLiters !== undefined) ? this.currentFuelLiters : cap;
+            const liters = Math.max(0, Math.floor(curFuel));
+            const pct = Math.max(0, Math.min(100, Math.floor((curFuel / cap) * 100)));
+            hudFuelVal.innerText = `%${pct} (${liters} L)`;
+            if (pct > 30) hudFuelVal.style.color = '#4ade80';
+            else if (pct > 15) hudFuelVal.style.color = '#facc15';
+            else hudFuelVal.style.color = '#ef4444';
+        }
         if (typeof AkilliSistem !== 'undefined' && AkilliSistem.onCoPilotUpdate) {
             AkilliSistem.onCoPilotUpdate(this);
         }
@@ -2660,7 +2751,64 @@ const Game = {
             const distanceScale = 1.0; // 1:1 Gerçek Fizik (Metre / Saniye)
             const distanceCovered = (this.speed / 3.6) * deltaTime * distanceScale; 
             this.currentDistanceToNext -= distanceCovered;
-            this.totalDistanceCovered += distanceCovered; // 3D Ses uzayı için ilerleme kaydı
+            this.totalDistanceCovered += distanceCovered;
+
+            // Dinamik Yakıt Tüketim Fiziği
+            if (this.engineStarted) {
+                const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
+                if (this.currentFuelLiters === undefined) this.currentFuelLiters = cap;
+                
+                if (this.speed > 0) {
+                    const distKm = (this.speed / 3600) * deltaTime;
+                    const consRate = (typeof this.getFuelConsumptionPer100km === 'function') ? this.getFuelConsumptionPer100km() : 30;
+                    let throttleFactor = 1.0;
+                    if (this.isRetarderActive && !this.keys.w && !this.keys.arrowup) {
+                        throttleFactor = 0.05; // Retarder devredeyken enjeksiyon kesme
+                    } else if (!this.keys.w && !this.keys.arrowup) {
+                        throttleFactor = 0.2; // Gazsız akış
+                    }
+                    const passCount = this.passengers ? (this.passengers.length || 0) : 0;
+                    const loadFactor = 1.0 + (passCount * 0.003);
+                    const burned = distKm * (consRate / 100) * throttleFactor * loadFactor;
+                    this.currentFuelLiters = Math.max(0, this.currentFuelLiters - burned);
+                } else {
+                    // Rölanti yakıt tüketimi
+                    const idleBurn = 0.00065 * deltaTime;
+                    this.currentFuelLiters = Math.max(0, this.currentFuelLiters - idleBurn);
+                }
+
+                const currentPct = Math.floor((this.currentFuelLiters / cap) * 100);
+
+                // Düşük yakıt ikazları
+                if (currentPct <= 15 && currentPct > 5 && !this.fuelWarned15) {
+                    this.fuelWarned15 = true;
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Dikkat! Yakıt seviyesi kritik, yüzde 15 kaldı. En yakın tesisten mazot alınız.");
+                    }
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast("⛽ Düşük Yakıt Uyarısı (%15)", "warning");
+                    }
+                } else if (currentPct <= 5 && currentPct > 0 && !this.fuelWarned5) {
+                    this.fuelWarned5 = true;
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Acil ikaz! Yakıt tükenmek üzere, sadece yüzde 5 kaldı!");
+                    }
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast("🚨 Acil: Yakıt Tükeniyor (%5)", "error");
+                    }
+                } else if (this.currentFuelLiters <= 0 && this.engineStarted) {
+                    this.engineStarted = false;
+                    this.isDriving = false;
+                    this.speed = 0;
+                    this.acceleration = 0;
+                    if (typeof audio !== 'undefined' && typeof audio.stopEngine === 'function') {
+                        audio.stopEngine();
+                    }
+                    const stallMsg = "Yakıtınız tamamen tükendi! Motor durdu. İlerlemek için Tesis (J) menüsünden veya çekici yardımıyla yakıt alınız.";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(stallMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⚠️ Yakıt Bitti! Motor Durdu", "error");
+                }
+            } // 3D Ses uzayı için ilerleme kaydı
             
             if (this.currentDistanceToNext <= 0) {
                 // BUG FIX: Çekici sanayiye götürürken normal durak mantığı çalışmamalı!
@@ -4257,7 +4405,17 @@ const Game = {
 
         if (k === 'h') {
             e.preventDefault();
-            let msg = `Araç sağlığı yüzde ${Math.floor(this.busDamage.health)}. `;
+            const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
+            const currentFuel = (this.currentFuelLiters !== undefined) ? this.currentFuelLiters : cap;
+            const liters = Math.max(0, Math.floor(currentFuel));
+            const pct = Math.max(0, Math.min(100, Math.floor((currentFuel / cap) * 100)));
+
+            let fuelSpeech = `Mevcut yakıt seviyeniz yüzde ${pct}, ${liters} litre. `;
+            if (pct <= 15) {
+                fuelSpeech += "⚠️ Dikkat, düşük yakıt ikazı! ";
+            }
+
+            let msg = fuelSpeech + `Araç sağlığı yüzde ${Math.floor(this.busDamage.health)}. `;
             let hasarListesi = [];
             
             if (this.busDamage.leftWindow > 0) hasarListesi.push(`Sol cam yüzde ${Math.floor(this.busDamage.leftWindow)}`);
@@ -4274,6 +4432,13 @@ const Game = {
             }
             
             if (typeof audio.speak === 'function') audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                const toastType = pct <= 15 ? 'warning' : 'info';
+                UI.showToast(`⛽ Yakıt: %${pct} (${liters}/${cap} L) | 🛠️ Sağlık: %${Math.floor(this.busDamage.health)}`, toastType);
+            }
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                audio.updateNvdaLiveRegion(msg);
+            }
             return;
         }
 
@@ -4302,7 +4467,7 @@ const Game = {
             }
             if (!this.isDriving) this.checkAutoDepart();
         }
-        if (k === 'l' || k === 'h' || k === 'k') {
+        if (k === 'l' || k === 'k') {
             e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.playHorn === 'function') {
             // Karşıdan gelen meslektaş kornasına selam verme
@@ -4652,6 +4817,7 @@ const SanayiMechanic = {
         
         // Canı tekrar fulleyelim çünkü tamirden çıktık
         Game.busDamage.health = 100;
+        if (typeof Game.refuel === 'function') Game.refuel();
         
         document.getElementById('btn-start-game').innerText = "Kaldığın Yerden Devam Et";
         

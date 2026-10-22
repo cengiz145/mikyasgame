@@ -91,7 +91,6 @@
             </div>
             <div style="text-align: left;">
                 <h1 class="main-title" style="font-size: 2.3rem; margin: 0; line-height: 1.1;">Otobüs Simülasyonu</h1>
-                <p style="color: #94a3b8; font-size: 0.9rem; margin: 2px 0 0 0;">Türkiye Karayolları & Şehir İçi Yolcu Taşımacılığı</p>
             </div>
         </div>
 
@@ -102,62 +101,47 @@
             <!-- 5 TEMEL OYUN SÜTUNU -->
             <div style="display: flex; flex-direction: column; gap: 11px; margin-bottom: 16px; width: 100%;">
                 
-                <!-- 1. Kariyer & İlerleme Modu -->
-                <button id="btn-mode-career" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: space-between; padding: 15px 20px; font-size: 1.12rem; background: linear-gradient(135deg, #0284c7, #0369a1); border: 2px solid #38bdf8; border-radius: 12px; text-align: left; width: 100%; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);" aria-label="Kariyer ve İlerleme Modu. Operasyonel Seferler, Kıdem Rütbeleri, 1500 Başarı ve Şehirler">
+                <!-- 1. Kariyer Modu -->
+                <button id="btn-mode-career" class="menu-btn primary-btn pulse-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.15rem; background: linear-gradient(135deg, #0284c7, #0369a1); border: 2px solid #38bdf8; border-radius: 12px; text-align: left; width: 100%; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);" aria-label="Kariyer Modu">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <span style="font-size: 1.8rem; line-height: 1;">🎖️</span>
-                        <div>
-                            <strong style="font-size: 1.15rem; color: #fff; display: block;">Kariyer & İlerleme Modu</strong>
-                            <span style="font-size: 0.84rem; color: #bae6fd; font-weight: normal;">Operasyonel Seferler • Kıdem Rütbeleri • 1500 Başarı & Rozetler</span>
-                        </div>
+                        <strong style="font-size: 1.15rem; color: #fff;">Kariyer Modu</strong>
                     </div>
                     <span style="color: #38bdf8; font-size: 1.3rem;">➜</span>
                 </button>
 
                 <!-- 2. Serbest Sürüş Modu -->
-                <button id="btn-mode-freedrive" class="menu-btn secondary-btn nav-item" style="justify-content: space-between; padding: 15px 20px; font-size: 1.12rem; background: rgba(34, 197, 94, 0.16); border: 2px solid #22c55e; color: #4ade80; border-radius: 12px; text-align: left; width: 100%;" aria-label="Serbest Sürüş Modu. Süre veya görev baskısı olmadan özgür sürüş ve Akıllı Rota Bulucu">
+                <button id="btn-mode-freedrive" class="menu-btn secondary-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.15rem; background: rgba(34, 197, 94, 0.16); border: 2px solid #22c55e; color: #4ade80; border-radius: 12px; text-align: left; width: 100%;" aria-label="Serbest Sürüş Modu">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <span style="font-size: 1.8rem; line-height: 1;">🛣️</span>
-                        <div>
-                            <strong style="font-size: 1.15rem; color: #4ade80; display: block;">Serbest Sürüş Modu</strong>
-                            <span style="font-size: 0.84rem; color: #86efac; font-weight: normal;">Süre & Hedef Baskısız Özgür Simülasyon • Akıllı Rota Bulucu</span>
-                        </div>
+                        <strong style="font-size: 1.15rem; color: #4ade80;">Serbest Sürüş Modu</strong>
                     </div>
                     <span style="color: #22c55e; font-size: 1.3rem;">➜</span>
                 </button>
 
-                <!-- 3. Garajım (Mevcut Araçlarım) -->
-                <button id="btn-open-garage-fleet" class="menu-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.05rem; border: 1.5px solid #eab308; color: #fde047; background: rgba(234, 179, 8, 0.12); border-radius: 12px; text-align: left; width: 100%;" aria-label="Garajım. Satın aldığınız mevcut araçlar ve aktif otobüs seçimi">
+                <!-- 3. Garajım -->
+                <button id="btn-open-garage-fleet" class="menu-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.12rem; border: 1.5px solid #eab308; color: #fde047; background: rgba(234, 179, 8, 0.12); border-radius: 12px; text-align: left; width: 100%;" aria-label="Garajım">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <span style="font-size: 1.7rem; line-height: 1;">🚌</span>
-                        <div>
-                            <strong style="font-size: 1.05rem; color: #fde047; display: block;">Garajım (Mevcut Araçlarım)</strong>
-                            <span style="font-size: 0.83rem; color: #fef08a; font-weight: normal;">Sahip Olduğunuz Otobüsler • Aktif Sefer Aracı Seçimi • Kondisyon</span>
-                        </div>
+                        <strong style="font-size: 1.12rem; color: #fde047;">Garajım</strong>
                     </div>
                     <span style="color: #facc15; font-size: 1.2rem;">➜</span>
                 </button>
 
-                <!-- 4. Yeni Otobüsler Satın Al (Showroom) -->
-                <button id="btn-open-dealership" class="menu-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.05rem; border: 1.5px solid #f97316; color: #fed7aa; background: rgba(249, 115, 22, 0.12); border-radius: 12px; text-align: left; width: 100%;" aria-label="Yeni Otobüsler Satın Al. 20 otobüs modeli, showroom ve satış galerisi">
+                <!-- 4. Yeni Otobüsler Satın Al -->
+                <button id="btn-open-dealership" class="menu-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.12rem; border: 1.5px solid #f97316; color: #fed7aa; background: rgba(249, 115, 22, 0.12); border-radius: 12px; text-align: left; width: 100%;" aria-label="Yeni Otobüsler Satın Al">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <span style="font-size: 1.7rem; line-height: 1;">🛒</span>
-                        <div>
-                            <strong style="font-size: 1.05rem; color: #fb923c; display: block;">Yeni Otobüsler Satın Al (Galeri)</strong>
-                            <span style="font-size: 0.83rem; color: #fed7aa; font-weight: normal;">20 Farklı Otobüs Modeli • Teknik Özellikler • Satış Showroom'u</span>
-                        </div>
+                        <strong style="font-size: 1.12rem; color: #fb923c;">Yeni Otobüsler Satın Al</strong>
                     </div>
                     <span style="color: #fb923c; font-size: 1.2rem;">➜</span>
                 </button>
 
                 <!-- 5. Şirket Kur veya Var Olan Bir Şirkette Çalış -->
-                <button id="btn-open-company" class="menu-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.05rem; border: 1.5px solid #ca8a04; color: #fef08a; background: rgba(202, 138, 4, 0.18); border-radius: 12px; text-align: left; width: 100%;" aria-label="Şirket Kur veya Var Olan Bir Şirkette Çalış. Kendi filonu kur veya Kamil Koç, Pamukkale, TEKULAŞ'ta maaşlı şoför olarak çalış">
+                <button id="btn-open-company" class="menu-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.12rem; border: 1.5px solid #ca8a04; color: #fef08a; background: rgba(202, 138, 4, 0.18); border-radius: 12px; text-align: left; width: 100%;" aria-label="Şirket Kur veya Var Olan Bir Şirkette Çalış">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <span style="font-size: 1.7rem; line-height: 1;">🏢</span>
-                        <div>
-                            <strong style="font-size: 1.05rem; color: #facc15; display: block;">Şirket Kur veya Var Olan Bir Şirkette Çalış</strong>
-                            <span style="font-size: 0.83rem; color: #fef08a; font-weight: normal;">Kendi Filonu Yönet veya Kamil Koç, Pamukkale, TEKULAŞ'ta Maaşlı Kaptan Ol</span>
-                        </div>
+                        <strong style="font-size: 1.12rem; color: #facc15;">Şirket Kur veya Var Olan Bir Şirkette Çalış</strong>
                     </div>
                     <span style="color: #facc15; font-size: 1.2rem;">➜</span>
                 </button>
@@ -341,6 +325,7 @@
             <div id="hud-luggage" style="display: none; background: #d97706; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 0 12px rgba(217, 119, 6, 0.8); border: 1px solid #fbbf24;" aria-live="polite">🧳 BAGAJ AÇIK</div>
             <div id="hud-timing-panel" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #334155; color: #a78bfa; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem;" title="Sefer Zamanlaması (Kısayol Z)">⏱️ <span id="hud-timing-val">Vaktinde (0 Dk)</span></div>
             <div id="hud-comfort-panel" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #334155; color: #38bdf8; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem;">⭐ KONFOR: <span id="hud-comfort-val" style="color: #4ade80;">%100</span></div>
+            <div id="hud-fuel-panel" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #f59e0b; color: #fbbf24; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px;" title="Mevcut Yakıt Seviyesi ve Araç Durumu (Kısayol: H)" role="button" tabindex="0" aria-label="Mevcut Yakıt Seviyesi ve Araç Durumu. Bilgi almak için H tuşuna basın veya tıklayın.">⛽ YAKIT: <span id="hud-fuel-val" style="color: #4ade80;">%100 (500L)</span></div>
             <div id="hud-compass" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #38bdf8; color: #38bdf8; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem;" title="Pusula İstikameti (Kısayol: Y | Yön Değişimi: Shift+Oklar)" role="region" aria-label="Pusula İstikameti">🧭 <span id="hud-compass-text">KUZEY (0°)</span></div>
         </div>
         <div class="dashboard" style="background: rgba(15, 22, 36, 0.85);">
@@ -680,9 +665,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <div>
                     <h2 id="bus-garage-title" class="gradient-text" style="font-size: 1.7rem; margin: 0;">🚌 Garajım (Mevcut Araçlarım)</h2>
-                    <p id="bus-garage-desc" style="color: #cbd5e1; font-size: 0.92rem; margin: 4px 0 0 0;">
-                        Kariyeriniz boyunca sahip olduğunuz araçları buradan yönetebilir ve sefere çıkacağınız otobüsü seçebilirsiniz.
-                    </p>
+                    <p id="bus-garage-desc" style="display: none;"></p>
                 </div>
                 <button id="btn-garage-modal-close" class="modern-btn" style="padding: 6px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Otobüs garajını kapat">✕ Kapat</button>
             </div>

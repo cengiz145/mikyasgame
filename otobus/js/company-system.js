@@ -1412,9 +1412,7 @@
                             <h2 id="company-modal-title" style="font-size: 1.75rem; margin: 0; color: #facc15; display: flex; align-items: center; gap: 8px;">
                                 🏢 Şirket Kur veya Var Olan Bir Şirkette Çalış
                             </h2>
-                            <p style="color: #cbd5e1; font-size: 0.9rem; margin: 4px 0 0 0;">
-                                Otomatik sefer optimizasyonu, dinamik piyasa borsası, şoför karakterleri ve araç tahsisi
-                            </p>
+                            
                         </div>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <button id="btn-company-ai-dispatch-top" class="modern-btn nav-item" style="padding: 8px 16px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #000; font-weight: bold; border: 1px solid #7dd3fc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px;" aria-label="Yapay Zeka Filo Müdürü: Tek tuşla tüm şoförleri en karlı seferlere otomatik dağıt">
