@@ -3582,9 +3582,9 @@
                     <!-- 6. SEKME: Var Olan Bir Şirkette Çalış (Maaşlı Kaptanlık) -->
                     <div id="panel-comp-corporate-work" style="display: none;">
                         <div style="background: rgba(15,23,42,0.6); padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                            <h3 style="color: #fde047; margin: 0 0 4px 0; font-size: 1.1rem;">👔 Kurumsal Taşımacılık: Şirketlerde Maaşlı Kaptan Ol</h3>
+                            <h3 style="color: #fde047; margin: 0 0 4px 0; font-size: 1.1rem;">👔 Kaptan Şirketleri & Bağımsız Çalışma Modeli</h3>
                             <p style="color: #cbd5e1; font-size: 0.88rem; margin: 0;">
-                                Kendi şirketinizi yönetmek yerine Türkiye'nin köklü otobüs firmalarına katılarak günlük garanti maaş, sefer primleri ve kurumsal üniforma ayrıcalığı kazanabilirsiniz.
+                                İster bağımsız serbest kaptan olarak sıfır kesinti ve sıfır şirket riskiyle çalışın, isterseniz diğer kaptanların kurduğu şirketlere katılarak günlük garanti maaş kazanın. (Telif hakkı olan gerçek ticari markalar yer almaz; tüm şirketler oyuncular tarafından tescillenir).
                             </p>
                         </div>
                         <div id="corporate-work-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
