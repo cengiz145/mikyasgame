@@ -650,7 +650,7 @@
                 name: "Merkez Yönetim Ofisi / Genel Müdürlük",
                 icon: "🏛️",
                 category: "Şirket Yönetim Merkezi (Marka & İzinler)",
-                simpleSummary: "Şirketinin ana yönetim ofisidir kaptanım. Seferler buradan yönetilir. Ofisini büyüttükçe şirketinin marka değeri artar, yolcular sana güvenir ve bilet fiyatlarına ekstra marka zammı gelerek daha çok kazanırsın.",
+                simpleSummary: "Şirketinizin idari ve operasyonel yönetim merkezidir. Seferler buradan planlanır ve yürütülür. Seviye yükseldikçe kurumsal marka değeri artar ve bilet fiyatlarına %30 kalıcı marka primi kazandırır.",
                 playerBenefits: [
                     "📋 Şehirlerarası yeni hatlar açıp resmi seferler başlatmanı sağlar.",
                     "🛡️ Şirketini korsan taşımacılık, idari para cezaları ve sefer iptallerinden korur.",
@@ -695,7 +695,7 @@
                 name: "Araç Park Alanı & Filo Garaj Sahası",
                 icon: "🅿️",
                 category: "Otobüs Park Sahası (Filo Kapasitesi)",
-                simpleSummary: "Otobüslerinin gece güvenle park ettiği sahadır. Garajın ne kadar büyükse filona o kadar çok otobüs alabilirsin. Kapalı hangar yaptırdığında araçların geceleri hiç hasar almaz ve yıpranması yarı yarıya düşer.",
+                simpleSummary: "Filodaki otobüslerin güvenli park ve bekleme alanıdır. Garaj kapasitesi şirketinize kaç otobüs alabileceğinizi belirler. Gelişmiş garaj ve kapalı hangar sistemleri araç yıpranmasını %50 oranında azaltır.",
                 playerBenefits: [
                     "🚌 Şirketine kaç tane otobüs satın alabileceğini (filo kapasiteni) doğrudan belirler.",
                     "🔒 Otobüslerinizin gece hasar görmesini, parça hırsızlığını ve otopark cezası yemesini sıfırlar.",
@@ -740,7 +740,7 @@
                 name: "Otogar Yazıhaneleri & Peron Ağı",
                 icon: "🏢",
                 category: "Otogar Bilet Gişesi & Peron", 
-                simpleSummary: "Şehir otogarlarındaki bilet gişelerin ve yolcu bindirme peronlarındır. Yazıhanelerin açıldıkça otobüslerine yolcu dolar, sefer başı havadan pasif para kazanırsın ve Seviye 3'te bedava mazot alırsın!",
+                simpleSummary: "Şehirlerarası otobüs terminallerinde bilet satışı ve yolcu alımı yapmanızı sağlar. Sefer başına düzenli pasif gelir sağlar ve Seviye 3'te tüm araçlarınıza ücretsiz akaryakıt temin eder.",
                 playerBenefits: [
                     "🎫 Her şehirdeki resmi peronlardan yolcu toplamanı sağlar ve bilet hasılatını katlar.",
                     "💰 Şirketinize sefer başına düzenli pasif terminal kâr payı kazandırır.",
@@ -785,7 +785,7 @@
                 name: "Bakım, Onarım ve Yıkama Atölyesi (Kademe Binası)",
                 icon: "🛠️",
                 category: "Şirket İçi Tamirhane & Yıkama",
-                simpleSummary: "Kendi şirket tamirhanendir. Otobüsün bozulduğunda sanayide sıra beklemezsin ve yüksek tamir faturaları ödemezsin. Tamir faturanı %65 ucuzlatır ve otobüsünü iki kat daha hızlı tamir eder.",
+                simpleSummary: "Şirketinize ait teknik bakım ve onarım atölyesidir. Otobüslerin periyodik bakımlarını ve hasar onarımlarını şirket bünyesinde yaparak servis faturalarını %65 ucuzlatır ve tamir süresini yarı yarıya kısaltır.",
                 playerBenefits: [
                     "🔧 Sanayi ve tamir masraflarını devasa oranda ucuzlatır (%65'e varan tamir indirimi).",
                     "🧼 Pırıl pırıl yıkanmış otobüslerle yolcu memnuniyetini ve kaptan bahşişlerini zirveye çıkarır.",
@@ -830,7 +830,7 @@
                 name: "Personel Dinlenme Evi / Kaptan Lojmanı",
                 icon: "🛏️",
                 category: "Şoför Dinlenme Evi & Lojman",
-                simpleSummary: "Şoförlerinin seferden yorgun dönünce uyuyup dinlendiği evdir. Şoförlerin dinlenme süresini kısaltır, hemen zinde olarak sefere çıkmalarını sağlar ve uykusuzluktan kaza yapmalarını engeller.",
+                simpleSummary: "Sefer tamamlayan şoförlerin zorunlu dinlenme ihtiyaçlarını karşıladığı alandır. Dinlenme süresini kısaltarak şoförlerin sefere daha hızlı dönmesini sağlar ve yorgunluk kaynaklı kaza riskini önler.",
                 playerBenefits: [
                     "🛌 Şoförlerin dinlenme süresini hızlandırır, sefer aralarında uzun süre beklemeni önler.",
                     "🌟 Şoförlerin tecrübe puanı (XP) kazanımını x2 katına çıkarır ve sana bol bahşiş getirmelerini sağlar.",
@@ -875,7 +875,7 @@
                 name: "Şehir İçi Bilet Satış Acenteleri & Terminal Shuttle (Servis) Ağı",
                 icon: "🏬",
                 category: "Çarşı Gişeleri & Yolcu Servisi",
-                simpleSummary: "Otogarlar genelde şehrin dışındadır. Çarşıya bilet gişeleri açıp ücretsiz servis minibüsleri koyarsın. Minibüsler yolcuları otogara taşır, otobüsünün tüm koltukları dolar ve bilet gelirin %50 artırır.",
+                simpleSummary: "Şehir merkezlerinde bilet satışı yapar ve servis minibüsleriyle yolcuları otogara ulaştırır. Otobüslerinizin koltuk doluluk oranını yükseltir ve bilet hasılatına kalıcı %50 katkı sağlar.",
                 playerBenefits: [
                     "👥 Yolcu talebini patlatır, otobüslerinizin koltuklarını tıka basa doldurur.",
                     "🚌 Şehir merkezinden otogara ücretsiz yolcu taşıyarak firmanı en çok tercih edilen marka yapar.",
@@ -1054,10 +1054,10 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
                     <div>
                         <div style="color: #38bdf8; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                            <span>🏢</span> <span>ŞİRKET BİNALARI VE TESİSLERİ (KOLAY REHBER)</span>
+                            <span>🏢</span> <span>ŞİRKET BİNALARI VE TESİSLERİ REHBERİ</span>
                         </div>
                         <div style="color: #cbd5e1; font-size: 0.9rem; margin-top: 4px; line-height: 1.5;">
-                            Otobüs şirketini büyüttükçe geliştirebileceğin <strong>6 temel bina</strong> vardır kaptanım. Binalar geliştikçe filona daha çok otobüs alabilirsin, tamir ve mazot masrafların düşer, seferlerin daha çok kâr kazandırır!
+                            Şirketinizi büyüttükçe geliştirebileceğiniz <strong>6 temel tesis</strong> bulunur. Tesisler geliştikçe filo kapasiteniz artar, servis ve akaryakıt maliyetleriniz düşer, sefer kârlılığınız yükselir.
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -1073,22 +1073,22 @@
                 <!-- 6 BİNA HIZLI ÖZET KARTLARI -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #38bdf8; font-size: 0.84rem; color: #cbd5e1;">
-                        🏛️ <strong>Genel Müdürlük:</strong> Şirketinin beynidir. Sefer izinlerini yönetir, cezalardan korur ve bilet hasılatına +%30 marka primi kazandırır.
+                        🏛️ <strong>Genel Müdürlük:</strong> Şirketinizin idari yönetim merkezidir. Bilet hasılatına +%30 marka primi kazandırır ve hat izinlerini hızlandırır.
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #22c55e; font-size: 0.84rem; color: #cbd5e1;">
-                        🅿️ <strong>Filo Garajı:</strong> Otobüs park alanındır. Şirketine kaç otobüs alabileceğini (filo kapasiteni) belirler ve gece hasarlarını önler.
+                        🅿️ <strong>Garaj ve Filo Sahası:</strong> Araç park alanıdır. Filonuzun araç kapasitesini belirler ve kapalı hangar ile araç yıpranmasını %50 azaltır.
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #facc15; font-size: 0.84rem; color: #cbd5e1;">
-                        🏢 <strong>Otogar Yazıhaneleri:</strong> Terminallerdeki dükkânlarındır. Sefer başı +3.500 ₺ pasif kâr ve %100 BEDAVA MAZOT kazandırır!
+                        🏢 <strong>Otogar Yazıhaneleri:</strong> Terminallerdeki resmi peron gişelerinizdir. Sefer başı +3.500 ₺ pasif gelir ve 3. Seviyede ücretsiz akaryakıt sağlar.
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #f97316; font-size: 0.84rem; color: #cbd5e1;">
-                        🛠️ <strong>Kademe Binası (Tamirhane & Yıkama):</strong> Sanayi faturanı %65 düşürür, otomatik yıkama ile memnuniyeti ve bahşişleri artırır.
+                        🛠️ <strong>Bakım ve Onarım Atölyesi (Kademe):</strong> Şirket içi teknik servistir. Dış servis faturalarını %65 düşürür ve tamir süresini yarı yarıya kısaltır.
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #ec4899; font-size: 0.84rem; color: #cbd5e1;">
-                        🛏️ <strong>Kaptan Lojmanı:</strong> Şoförlerinin dinlenme evidir. Takograf dinlenme süresini %75 kısaltır, kazaları önler ve x2 kat sefer verimi sağlar.
+                        🛏️ <strong>Personel Dinlenme Tesisi (Lojman):</strong> Şoför dinlenme alanıdır. Dinlenme süresini %75 kısaltır ve yorgunluk kaynaklı kaza riskini sıfırlar.
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #a855f7; font-size: 0.84rem; color: #cbd5e1;">
-                        🏬 <strong>Şehir İçi Acente & Servis Ağı:</strong> Otogara uzak yolcuları çarşıdan toplayıp otobüsünü doldurur ve bilet hasılatını +%50 artırır.
+                        🏬 <strong>Şehir İçi Acente & Servis Ağı:</strong> Çarşı gişeleriniz ve servis araçlarınızdır. Yolcu doluluk oranını ve bilet gelirini kalıcı +%50 artırır.
                     </div>
                 </div>
             </div>
@@ -2078,7 +2078,7 @@
             if (!driver) return;
 
             if (driver.energy >= 95) {
-                if (typeof UI !== 'undefined') UI.showToast(`${driver.name} zaten zımba gibi enerjik! (% ${driver.energy})`, "info");
+                if (typeof UI !== 'undefined') UI.showToast(`${driver.name} zaten tamamen dinlenmiş ve enerjik! (% ${driver.energy})`, "info");
                 return;
             }
 
