@@ -967,6 +967,8 @@ window.addEventListener('keydown', (e) => {
     // 1. ESCAPE: Açıklamayı susturur ve açık olan herhangi bir modalı kapatır
     if (e.key === 'Escape') {
         const modalIds = [
+            'captain-profile-inspector-modal',
+            'leaderboard-modal',
             'create-company-modal',
             'company-modal',
             'district-picker-modal',
