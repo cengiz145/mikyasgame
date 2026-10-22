@@ -427,6 +427,10 @@ class VoiceAssistant {
             <!-- BÖLÜM 1: ŞİRKET KURMA VE ÇALIŞMA MODELLERİ -->
             <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <div style="background: rgba(202, 138, 4, 0.15); border: 1.5px solid #ca8a04; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; color: #fef08a; font-size: 0.88rem;">
+                    💡 <strong>Önemli Kural:</strong> Şirket Yönetimine <strong>sadece Ana Menü'deki "Şirket Yönetimi"</strong> butonundan erişebilirsiniz. Sürüş güvenliği ve odaklanmanız için sefer esnasında şirket menüsü açılamaz; tüm kararlarınızı ana menüde sakin bir şekilde alabilirsiniz.
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <h4 style="color: #38bdf8; margin: 0; font-size: 1.1rem;">1. Şirket Kurma ve Çalışma Modelleri</h4>
                     <button class="modern-btn btn-read-section nav-item" data-text="Şirket Kurma ve Çalışma Modelleri. Oyunda iki farklı çalışma şekli bulunur. İsterseniz kendi otobüs firmanızı kurup araç ve şoför yönetebilir, sefer gelirlerini toplayabilirsiniz. İsterseniz mevcut kurumsal firmalara katılarak sabit günlük maaş ve sefer primi karşılığında kaptan şoför olarak görev yapabilirsiniz." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>

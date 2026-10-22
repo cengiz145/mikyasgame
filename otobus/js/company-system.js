@@ -2994,6 +2994,23 @@
         },
 
         openCompanyModal: function () {
+            // Şirket Yönetimi SADECE Ana Menü'den açılabilir! Sürüş veya mola esnasında açılamaz.
+            const drivingScreen = document.getElementById('driving-screen');
+            const stopScreen = document.getElementById('stop-screen');
+            const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
+            const isDrivingVisible = drivingScreen && !drivingScreen.classList.contains('hidden');
+            const isStopVisible = stopScreen && !stopScreen.classList.contains('hidden');
+
+            if (isDriving || isDrivingVisible || isStopVisible) {
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast("Şirket Yönetimine sadece Ana Menüden erişebilirsiniz!", "warning");
+                }
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Şirket yönetimine sadece ana menüden erişebilirsiniz. Lütfen önce ana menüye dönünüz.");
+                }
+                return;
+            }
+
             this.injectModal();
             const modal = document.getElementById('company-system-modal');
             if (!modal) return;
