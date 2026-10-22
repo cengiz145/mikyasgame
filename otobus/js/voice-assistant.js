@@ -419,19 +419,47 @@ class VoiceAssistant {
                         Şirketin operasyonel maliyetlerini düşüren, kapasitesini artıran ve gelirini katlayan 7 temel bina ve tesisin işlevleri.
                     </p>
                 </div>
-                <button class="modern-btn btn-read-section nav-item" data-text="Şirket Yönetimi ve 7 Temel Tesis Rehberi. Bu kılavuzda şirket kurma modellerini, şirketinize doğrudan seviye atlatabileceğiniz 7 temel tesisi ve Kasa Defteri ile finansal takibi öğreneceksiniz." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                <button class="modern-btn btn-read-section nav-item" data-text="Şirket Yönetimi, 7 Temel Tesis ve Kâr Etme Rehberi. Bu kılavuzda şirket kurmanın neden hayati olduğunu, pasif gelirle kâr etmenin 5 kısayolunu, 7 temel tesis binasını ve başarılı filo yönetimi taktiklerini öğreneceksiniz." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
                     ▶️ Tüm Bölümü Sesli Dinle
                 </button>
             </div>
 
-            <!-- BÖLÜM 1: ŞİRKET KURMA VE ÇALIŞMA MODELLERİ -->
+            <!-- ÖNEMLİ KURAL NOTU -->
+            <div style="background: rgba(202, 138, 4, 0.15); border: 1.5px solid #ca8a04; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; color: #fef08a; font-size: 0.9rem;">
+                💡 <strong>Önemli Kural:</strong> Şirket Yönetimine <strong>sadece Ana Menü'deki 5. buton ("🏢 Şirket Yönetimi")</strong> üzerinden erişebilirsiniz. Sürüş güvenliği ve odaklanmanız için sefer esnasında şirket menüsü açılamaz; tüm kararlarınızı ana menüde sakin bir şekilde alabilirsiniz.
+            </div>
+
+            <!-- BÖLÜM 1: ŞİRKET NEDEN ÖNEMLİ VE NEDEN KURMALIYIM? -->
+            <div style="background: linear-gradient(135deg, rgba(202, 138, 4, 0.2), rgba(15, 23, 42, 0.85)); border: 1.5px solid #eab308; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                        <span>👑</span> <span>1. Şirket Neden Önemli ve Neden Şirket Kurmalıyım?</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket neden önemlidir ve neden şirket kurmalısınız? Tek başınıza kaptanlık yaparsanız yalnızca direksiyon başındayken para kazanırsınız, mazotu ve tamiri piyasa fiyatından ödersiniz. Şirket sahibi olduğunuzda ise dört büyük güce sahip olursunuz. Birincisi pasif gelir: İşe aldığınız şoförler siz dinlenirken bile arka planda durmaksızın sefer yapar ve şirket kasanıza para akıtır. İkincisi giderleri sıfırlama gücü: Kendi akaryakıt istasyonunuzla depoyu bedavaya doldurur, kendi tamirhanenizle masrafları yüzde altmış beş düşürürsünüz. Üçüncüsü tavan bilet ve kargo geliri: Yazıhaneleriniz sayesinde biletleri yüzde otuz daha pahalıya satar ve bagaj kargosundan binlerce lira ek temettü alırsınız. Dördüncüsü holdingleşme: Şirketiniz büyüdükçe seviyeniz artar ve kazancınız katlanır." style="padding: 6px 12px; background: rgba(234,179,8,0.25); border: 1px solid #eab308; color: #fef08a; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ Neden Şirket? Dinle
+                    </button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.55;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 8px;">
+                        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border-left: 3px solid #ef4444;">
+                            <strong style="color: #fca5a5;">❌ Tek Başına (Bireysel) Kaptan Olmak:</strong><br>
+                            Yalnızca kendi sürdüğünüz sefer kadar para kazanırsınız. Direksiyon başında değilseniz geliriniz <strong>0 ₺</strong>'dir. Mazotu, bakımı ve araç yıkamasını piyasadaki en yüksek fiyattan cepten ödersiniz.
+                        </div>
+                        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border-left: 3px solid #22c55e;">
+                            <strong style="color: #4ade80;">✅ Şirket Sahibi (Patron) Olmanın 4 Gücü:</strong><br>
+                            • <strong>1. Pasif Gelir (Otomatik Kazanç):</strong> Şoförleriniz siz dinlenirken veya başka hatta sürerken arka planda sürekli sefer yapıp kasanıza para yağdırır.<br>
+                            • <strong>2. Giderleri Sıfırlama:</strong> Kendi Akaryakıt İstasyonunuzla depoya <strong>0 ₺ (Bedava)</strong> mazot koyarsınız.<br>
+                            • <strong>3. Tavan Bilet & Kargo:</strong> Biletleri %30 daha pahalıya keser, emanet kargodan sefer başı binlerce lira alırsınız.<br>
+                            • <strong>4. Holding Olma:</strong> Şirket seviyeniz arttıkça piyasa itibarınız ve gelir çarpanlarınız katlanır.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BÖLÜM 2: ŞİRKET KURMA VE ÇALIŞMA MODELLERİ -->
             <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <div style="background: rgba(202, 138, 4, 0.15); border: 1.5px solid #ca8a04; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; color: #fef08a; font-size: 0.88rem;">
-                    💡 <strong>Önemli Kural:</strong> Şirket Yönetimine <strong>sadece Ana Menü'deki "Şirket Yönetimi"</strong> butonundan erişebilirsiniz. Sürüş güvenliği ve odaklanmanız için sefer esnasında şirket menüsü açılamaz; tüm kararlarınızı ana menüde sakin bir şekilde alabilirsiniz.
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.1rem;">1. Şirket Kurma ve Çalışma Modelleri</h4>
+                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.1rem;">2. Şirket Kurma ve Çalışma Modelleri</h4>
                     <button class="modern-btn btn-read-section nav-item" data-text="Şirket Kurma ve Çalışma Modelleri. Oyunda iki farklı çalışma şekli bulunur. İsterseniz kendi otobüs firmanızı kurup araç ve şoför yönetebilir, sefer gelirlerini toplayabilirsiniz. İsterseniz mevcut kurumsal firmalara katılarak sabit günlük maaş ve sefer primi karşılığında kaptan şoför olarak görev yapabilirsiniz." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
                 <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
@@ -443,7 +471,7 @@ class VoiceAssistant {
             <!-- BÖLÜM 2: 7 TEMEL TESİS VE KAZANDIRDIKLARI -->
             <div style="margin-bottom: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem;">2. Şirketin 7 Temel Tesis Binası ve Kazandırdıkları</h4>
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem;">3. Şirketin 7 Temel Tesis Binası ve Kazandırdıkları</h4>
                     <button class="modern-btn btn-read-section nav-item" data-text="Şirketin 7 temel tesisi şunlardır. Garaj ve Filo Sahası araç kapasitesini artırır ve yıpranmayı azaltır. Bakım ve Onarım Atölyesi dış servis masraflarını yüzde 65 ucuzlatır ve tamir süresini kısaltır. Otobüs Yıkama İstasyonu memnuniyeti hızla toparlar ve bekleme süresini sıfırlar. Şirket Akaryakıt İstasyonu toptan mazot tasarrufu ve ücretsiz akaryakıt sağlar. Otogar Yazıhaneleri ve Bekleme Salonları talep çarpanını artırır ve tavan bilet fiyatı hakkı verir. Personel Dinlenme Tesisi şoförlerin yorgunluk ve stresini hızla sıfırlar. Lojistik ve İkram Deposu ise ikram maliyetini düşürür ve ek kargo geliri kazandırır." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ 7 Binayı Sesli Dinle</button>
                 </div>
 
@@ -518,7 +546,7 @@ class VoiceAssistant {
             <!-- BÖLÜM 3: OTOGAR YAZIHANESİ İŞLETME MODELLERİ -->
             <div style="background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #34d399; margin: 0; font-size: 1.1rem;">3. Otogar Yazıhanesi İşletme Modelleri & Paket Kargo</h4>
+                    <h4 style="color: #34d399; margin: 0; font-size: 1.1rem;">4. Otogar Yazıhanesi İşletme Modelleri & Paket Kargo</h4>
                     <button class="modern-btn btn-read-section nav-item" data-text="Otogar yazıhaneleri iki farklı modelle işletilebilir. Şirket Öz Şubesi modelinde kirayı şirketiniz öder; bilet ve kargo gelirinin tamamı kasanıza kalır. Acentelik Bayiliği modelinde ise açılış maliyeti yoktur. İşletmeyi yerel esnaf yürütür; hasılatın yüzde 88 i şirketinize gelir, yüzde 12 si bayiye komisyon kalır. Ayrıca açık yazıhaneler otobüs bagajında koli kabul ederek sefer başına parça başı 140 lira ek gelir sağlar." style="padding: 4px 10px; background: rgba(52,211,153,0.2); border: 1px solid #34d399; color: #a7f3d0; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 8px;">
@@ -539,7 +567,7 @@ class VoiceAssistant {
             <!-- BÖLÜM 4: FİNANSAL AKIŞ VE KASA DEFTERİ TAKİBİ -->
             <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #facc15; margin: 0; font-size: 1.1rem;">4. Finansal Akış ve Kasa Defteri Takibi</h4>
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.1rem;">5. Finansal Akış ve Kasa Defteri Takibi</h4>
                     <button class="modern-btn btn-read-section nav-item" data-text="Finansal Akış ve Kasa Defteri Takibi. Gerçekleşen tüm bilet satışları, kargo gelirleri, akaryakıt harcamaları ve servis masrafları sisteme anlık olarak kaydedilir. Şirket Menüsü altındaki Kasa Defteri sekmesinden toplam gelirinizi, toplam giderinizi ve net şirket kârınızı detaylı olarak inceleyebilirsiniz. Manuel hesaplama yapmanıza gerek kalmadan tüm finansal durum açık bir şekilde listelenir." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
                 <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
@@ -547,12 +575,71 @@ class VoiceAssistant {
                 </p>
             </div>
 
+            <!-- BÖLÜM 6: ŞİRKETLE KÂR ETMENİN 5 KISAYOLU (ZENGİN OLMA REHBERİ) -->
+            <div style="background: linear-gradient(135deg, rgba(22, 101, 52, 0.25), rgba(15, 23, 42, 0.9)); border: 1.5px solid #22c55e; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(34, 197, 94, 0.2); padding-bottom: 8px;">
+                    <div>
+                        <h4 style="color: #4ade80; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                            <span>🚀</span> <span>6. Şirketle Kâr Etmenin 5 Kısayolu (Zengin Olma Taktikleri)</span>
+                        </h4>
+                        <span style="font-size: 0.82rem; color: #86efac;">Kasayı hızla doldurmak ve filoyu büyütmek için profesyonel taktikler.</span>
+                    </div>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketle kâr etmenin beş kısayolu şunlardır. Birincisi Çift Kasa Akışı: Şirketi kurar kurmaz hediye gelen Murat Kaptanı sefere gönderin, siz de kendi otobüsünüzle sefere çıkın; aynı anda iki koldan para kazanın. İkincisi Başharekât Akıllı Sefer Dağıtımı: Ana menüye her döndüğünüzde tek tıkla Akıllı Sefer Dağıtımı butonuna basın; boş şoförler en karlı dalgalanma rotalarına otomatik dağılsın. Üçüncüsü Hızlı Mazot Sıfırlama: Akaryakıt İstasyonunu Seviye üçe yükselterek mazotu tamamen bedava yapın, tüm bilet parası net kâr kalsın. Dördüncüsü İkram ve Emanet Kargo: Sürüşte ı tuşuyla ikram dağıtıp bahşiş toplayın, sefer sonunda açık yazıhanelerinizden binlerce lira kargo geliri alın. Beşincisi Kasadan Cüzdana Transfer: Şirket kasasında biriken kârı Cüzdana Para Çek butonuyla şahsi hesabınıza aktarıp galerideki en lüks otobüsleri satın alın." style="padding: 6px 12px; background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #86efac; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ 5 Kısayolu Dinle
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                    
+                    <!-- KISAYOL 1 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #22c55e; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #4ade80; font-size: 0.95rem;">⚡ Kısayol 1: Çift Kasa Akışı (Murat Kaptan Taktigi)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirketi kurduğunuz anda oyun size <strong>Murat Kaptan'ı hediye eder</strong>. Hemen Murat Kaptan'ı boş bir hatta sefere gönderin. Siz de kendi aracınızla başka bir sefere çıkın. Böylece aynı süre içinde <strong>2 otobüsten birden çifte hasılat</strong> toplarsınız.
+                        </p>
+                    </div>
+
+                    <!-- KISAYOL 2 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #38bdf8; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">🎯 Kısayol 2: Başharekât Butonunu Alışkanlık Yapın</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Her sefer dönüşü Ana Menü'de Şirket Yönetimi'ne girip sağ üstteki <strong>"📋 Akıllı Sefer Dağıtımı"</strong> butonuna mutlaka 1 kez tıklayın. Sistem boşta bekleyen tüm şoförlerinizi o an piyasada yolcu talebi patlamış en kazançlı hatlara anında dağıtır.
+                        </p>
+                    </div>
+
+                    <!-- KISAYOL 3 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #eab308; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #fde047; font-size: 0.95rem;">⛽ Kısayol 3: Hızlı Mazot Sıfırlama (Bina 4)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Bir otobüs şirketinin en büyük gideri mazottur. Kazandığınız ilk kârı <strong>Şirket Akaryakıt İstasyonu'na</strong> yatırın. Seviye 3'e çıkardığınız an tüm filo için <strong>mazot 0 ₺ (Tamamen Bedava)</strong> olur; bilet hasılatının tamamı net kâr olarak kasada kalır!
+                        </p>
+                    </div>
+
+                    <!-- KISAYOL 4 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #a855f7; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #c084fc; font-size: 0.95rem;">📦 Kısayol 4: Çifte Sefer Geliri (İkram Bahşişi + Bagaj Kargo)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Yoldayken klavyeden <strong>I tuşuna</strong> basıp yolculara kek-çay ikramı yaparak yüksek bahşiş toplayın. Sefer bitince de açık terminal yazıhaneleriniz sayesinde bagajdaki emanet kolilerden (koli başı 140-160 ₺) <strong>2.000 - 3.500 ₺ temiz kargo geliri</strong> kazanın.
+                        </p>
+                    </div>
+
+                    <!-- KISAYOL 5 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #ec4899; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #f472b6; font-size: 0.95rem;">💰 Kısayol 5: Şirket Kârını Cüzdana Çekip Lüks Filo Kurun</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirket kasasında yüz binlerce lira biriktiğinde <strong>"Cüzdana Para Çek"</strong> butonuyla kâr payını anında şahsi cüzdanınıza aktarın. Ardından Ana Menü'deki Galeri'den oyundaki en lüks Travego, Tourismo veya çift katlı otobüsleri peşin parayla satın alıp filonuzu taçlandırın.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
             <!-- BÖLÜM 5: BAŞARILI ŞİRKET YÖNETİMİ İÇİN TEMEL İPUÇLARI VE ALTIN TAKTİKLER -->
             <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 8px;">
                     <div>
                         <h4 style="color: #38bdf8; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
-                            <span>💡</span> <span>5. Başarılı Şirket Yönetimi İçin Temel İpuçları (Altın Kurallar)</span>
+                            <span>💡</span> <span>7. Başarılı Şirket Yönetimi İçin Temel İpuçları (Altın Kurallar)</span>
                         </h4>
                         <span style="font-size: 0.82rem; color: #94a3b8;">Şirketinizi karlı tutmak, filonuzu büyütmek ve iflas etmemek için uygulamanız gereken 6 temel taktik.</span>
                     </div>
@@ -620,7 +707,7 @@ class VoiceAssistant {
             <div style="background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <h4 style="color: #facc15; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>❓</span> <span>6. Sıkça Sorulan Sorular ve Hızlı Cevaplar</span>
+                        <span>❓</span> <span>8. Sıkça Sorulan Sorular ve Hızlı Cevaplar</span>
                     </h4>
                     <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetimi hakkında en çok merak edilen sorular. Bir: Şoförlerim neden sefere çıkmıyor? Seferden yorgun dönmüşlerdir. Personel Sosyal Tesisini geliştirerek dinlenme sürelerini dört kat hızlandırabilirsiniz. İki: Şirket kasasındaki parayla otobüs alabilir miyim? Evet, Cüzdana Para Çek butonuna basıp kasadaki parayı cüzdanınıza aktarın, ardından otobüs galerisinden dilediğiniz aracı satın alın. Üç: Neden yeni şoför alamıyorum? Garaj kapasiteniz dolmuştur, Garaj ve Filo Sahasını Seviye ikiye yükselterek sınırı on beşe çıkarın. Dört: Bilet fiyatlarını nasıl yükseltirim? Otogar Yazıhanelerini geliştirerek tavan bilet fiyatı çarpanını aktif edin." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ S.S.S Dinle</button>
                 </div>
