@@ -735,6 +735,66 @@ class VoiceAssistant {
                 </div>
             </div>
 
+            <!-- BÖLÜM 9: EKRAN OKUYUCU (NVDA) KULLANAN KAPTANLAR İÇİN ADIM ADIM KLAVYE VE MENÜ NAVİGASYON REHBERİ -->
+            <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.95)); border: 1.5px solid #60a5fa; border-radius: 10px; padding: 16px; margin-top: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(96, 165, 250, 0.25); padding-bottom: 8px;">
+                    <div>
+                        <h4 style="color: #93c5fd; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                            <span>⌨️</span> <span>9. Ekran Okuyucu ve Görme Engelli Kaptanlar İçin Adım Adım Klavye Rehberi</span>
+                        </h4>
+                        <span style="font-size: 0.82rem; color: #bfdbfe;">Menüleri ezberlemenize gerek kalmadan Tab, Ok tuşları ve Enter ile tam kontrol adımları.</span>
+                    </div>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Ekran okuyucu ve görme engelli kaptanlar için adım adım klavye navigasyonu. Bir: Ana menüdeyken Tab veya Aşağı Ok tuşuna dört kez basarak beşinci sıradaki Şirket Yönetimi seçeneğine gelip Enter tuşuna basınız. İki: Şirket menüsü açıldığında Tab tuşu ile üstteki Akıllı Sefer Dağıtımı ve Kapat butonlarını, ardından Cüzdana Para Çek ve Kasaya Para Yatır butonlarını gezebilirsiniz. Üç: Şoför kiralamak için Tab ile Şoför Pazarı sekmesine gelip Enter a basınız; ardından Tab ile şoför listesine inip Transfer Et butonunda Enter a basınız. Dört: Boşta bekleyen tüm şoförleri tek tıkla sefere yollamak için Shift Tab ile en üstteki Akıllı Sefer Dağıtımı butonuna gelip Enter a basınız. Beş: Binaları geliştirmek için Yasal Binalar sekmesine girip dilediğiniz binanın altındaki Geliştir butonunda Enter a basınız. Altı: İşleminiz bittiğinde klavyeden Escape tuşuna basarak şirket menüsünü kapatıp doğrudan ana menüye dönünüz." style="padding: 6px 12px; background: rgba(59,130,246,0.25); border: 1px solid #60a5fa; color: #bfdbfe; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ Adım Adım Klavye Rehberini Dinle
+                    </button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.86rem; color: #cbd5e1; line-height: 1.5;">
+                    
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #38bdf8;">
+                        <strong style="color: #7dd3fc; font-size: 0.92rem;">1. Adım: Ana Menüden Şirket Yönetimine Giriş</strong><br>
+                        • Ana Menü'deyken <strong>Aşağı Ok</strong> veya <strong>Tab</strong> tuşuna sırasıyla basınız.<br>
+                        • Sıralama şöyledir: 1. Şehir İçi Seferler ➜ 2. Şehirlerarası Seyahat ➜ 3. Garajım ➜ 4. Yeni Otobüsler Satın Al ➜ <strong>5. Şirket Yönetimi</strong>.<br>
+                        • Ekran okuyucunuz <em>'Şirket Yönetimi, düğme'</em> dediğinde <strong>Enter</strong> tuşuna basınız. Şirket yönetim paneli açılır ve sesli bilgilendirme yapılır.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #facc15;">
+                        <strong style="color: #fde047; font-size: 0.92rem;">2. Adım: Şirket Paneli İçinde Sekmelerde Gezinme</strong><br>
+                        • Panel açıldığında <strong>Tab</strong> tuşuna basarak sırayla ilerleyebilirsiniz.<br>
+                        • İlk odak: <strong>📋 Akıllı Sefer Dağıtımı</strong> ve <strong>✕ Kapat (Esc)</strong> butonlarıdır.<br>
+                        • Tab ile devam ettiğinizde şirket kasanız okunur; hemen ardından <strong>'Cüzdana Para Çek'</strong> ve <strong>'Kasaya Para Yatır'</strong> butonları gelir.<br>
+                        • Bir sonraki Tab basışlarında menü sekmeleri gelir: <em>1. Kendi Filom & Şoförlerim, 2. Yasal Binalar & Garaj, 3. Var Olan Şirkete Katıl, 4. Sefer Borsası, 5. Şoför Pazarı & Transfer, 9. Kasa Defteri</em>.<br>
+                        • Hangi sekmeyi açmak istiyorsanız o sekmenin üzerindeyken <strong>Enter</strong> tuşuna basınız.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #22c55e;">
+                        <strong style="color: #4ade80; font-size: 0.92rem;">3. Adım: Şoför Pazarından İlk Kaptanı İşe Alma</strong><br>
+                        • Tab tuşuyla <strong>'👨‍✈️ Şoför Pazarı & Transfer'</strong> sekmesine gelip <strong>Enter</strong>'a basınız.<br>
+                        • Tab tuşuna basarak listelenen kaptanların isimlerini, maaşlarını ve özelliklerini dinleyiniz.<br>
+                        • Örneğin Murat Çırak veya Mehmet Kaptan'ın altındaki <strong>'Transfer Et'</strong> düğmesine geldiğinizde <strong>Enter</strong>'a basınız. Kaptan başarıyla filonuza katılır.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #a855f7;">
+                        <strong style="color: #c084fc; font-size: 0.92rem;">4. Adım: Kaptanları Tek Tuşla Sefere Yollama (Başharekât)</strong><br>
+                        • Şirket panelinin herhangi bir yerindeyken <strong>Shift + Tab</strong> yaparak en üstteki <strong>'📋 Akıllı Sefer Dağıtımı'</strong> butonuna geri dönünüz.<br>
+                        • <strong>Enter</strong> tuşuna basınız. Sistem filoda bekleyen tüm kaptanlarınızı en karlı rotalara otomatik olarak sevk eder.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #ec4899;">
+                        <strong style="color: #f472b6; font-size: 0.92rem;">5. Adım: Binaları Yükseltme (Akaryakıtı Bedava Yapma)</strong><br>
+                        • Tab tuşuyla <strong>'🏛️ Yasal Binalar & Garaj'</strong> sekmesine gelip <strong>Enter</strong>'a basınız.<br>
+                        • Tab ile binalar arasında ilerleyip <strong>'Şirket Akaryakıt İstasyonu'</strong> başlığı altındaki <strong>'Geliştir'</strong> butonuna gelip <strong>Enter</strong>'a basınız. Seviye 3'e ulaştığınızda mazot tamamen ücretsiz olur.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #eab308;">
+                        <strong style="color: #fde047; font-size: 0.92rem;">6. Adım: Şirket Menüsünü Kapatma ve Seferinize Başlama</strong><br>
+                        • İşlemlerinizi tamamladığınızda klavyeden <strong>Esc (Escape)</strong> tuşuna basınız. Şirket paneli kapanır ve otomatik olarak Ana Menü'ye dönersiniz.<br>
+                        • Ana Menü'de <strong>Yukarı Ok</strong> tuşuna basarak 1. sıradaki <strong>'Şehir İçi Seferler'</strong> veya 2. sıradaki <strong>'Şehirlerarası Seyahat'</strong> butonuna gelip <strong>Enter</strong>'a basarak kendi seferinizi başlatınız.
+                    </div>
+
+                </div>
+            </div>
+
         </div>
         `;
 
