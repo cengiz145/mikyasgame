@@ -980,6 +980,105 @@ const Game = {
             UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
         }
     },
+    // --- OTOBÜS İÇİ İKRAM & MUAVİN SERVİSİ (I TUŞU) ---
+    serveCatering: function() {
+        if (!this.passengersOnBoard || this.passengersOnBoard <= 0) {
+            const noPassMsg = "Otobüste yolcu bulunmuyor. İkram servisi duraktan yolcu aldıktan sonra yapılır.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(noPassMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(noPassMsg, "info");
+            return;
+        }
+
+        const now = Date.now();
+        if (this.lastCateringTime && (now - this.lastCateringTime < 25000)) {
+            const waitSeconds = Math.ceil((25000 - (now - this.lastCateringTime)) / 1000);
+            const waitMsg = `Yolcular henüz ikramlarını bitirmedi. Yeni servis için ${waitSeconds} saniye bekleyiniz.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(waitMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(waitMsg, "info");
+            return;
+        }
+        this.lastCateringTime = now;
+
+        let compName = "Mikyas Seyahat";
+        let pkgType = "standart";
+        let pkgName = "Çay, Kahve & Taze Kek";
+        let tipBase = 35;
+        let ratingBonus = 0.1;
+
+        if (typeof CompanySystem !== 'undefined') {
+            const empId = CompanySystem.data && CompanySystem.data.corporateEmployer;
+            const empComp = empId ? CompanySystem.getCompanyById(empId) : null;
+            if (empComp) {
+                compName = empComp.name;
+                pkgType = empComp.cateringPackage || "standart";
+            } else if (CompanySystem.data) {
+                compName = CompanySystem.data.companyName || "Mikyas Seyahat";
+                pkgType = CompanySystem.data.cateringPackage || "standart";
+            }
+        }
+
+        if (pkgType === 'ekonomik') {
+            pkgName = "Sıcak Çay, Su & Kek";
+            tipBase = 20;
+        } else if (pkgType === 'vip') {
+            pkgName = "Jumbo VIP: Taze Meyve Suyu, Sıcak Sandviç & Dondurma";
+            tipBase = 70;
+            ratingBonus = 0.2;
+        }
+
+        const tipMoney = Math.round(tipBase + (this.passengersOnBoard * 4));
+        this.addMoney(tipMoney, true); // Bahşiş doğrudan kaptana kalır
+
+        if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.boostSatisfaction === 'function') {
+            CompanySystem.boostSatisfaction(ratingBonus);
+        }
+
+        if (typeof audio !== 'undefined' && typeof audio.playChime === 'function') {
+            audio.playChime();
+        }
+
+        const caterAnnouncement = `Ding-dong! Değerli yolcularımız, ${compName} ikram servisimiz başlamıştır. Muavinimiz kolonya ve ${pkgName} ikramı yapmaktadır. Afiyet olsun!`;
+        const thankMsg = `Yolcular: 'Eline sağlık muavin bey, çok makbule geçti!' Yolcular kaptana toplam +${tipMoney} ₺ bahşiş bıraktı.`;
+
+        if (typeof audio !== 'undefined' && audio.speakSequence) {
+            audio.speakSequence([caterAnnouncement, thankMsg]);
+        } else if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak(caterAnnouncement + " " + thankMsg);
+        }
+
+        if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast(`☕ ${compName} İkramı Dağıtıldı! (+${tipMoney} ₺ Bahşiş)`, "success");
+        }
+
+        const passFeedback = document.getElementById('passenger-feedback');
+        if (passFeedback) {
+            passFeedback.innerText = `☕ İkram Servisi: ${pkgName} dağıtıldı. (+${tipMoney} ₺ Kaptan Bahşişi)`;
+            passFeedback.style.color = '#38bdf8';
+        }
+    },
+
+    // --- OTOGAR PERON HAREKET ANONSU ---
+    playTerminalDepartureAnnouncement: function() {
+        let compName = "Mikyas Seyahat";
+        if (typeof CompanySystem !== 'undefined') {
+            const empId = CompanySystem.data && CompanySystem.data.corporateEmployer;
+            const empComp = empId ? CompanySystem.getCompanyById(empId) : null;
+            if (empComp && empComp.name) compName = empComp.name;
+            else if (CompanySystem.data && CompanySystem.data.companyName) compName = CompanySystem.data.companyName;
+        }
+        const rName = (this.activeRouteData && this.activeRouteData.name) ? this.activeRouteData.name : "Şehirlerarası Sefer";
+        const peronNo = (this.activeRouteData && this.activeRouteData.hatNo) ? parseInt(this.activeRouteData.hatNo) || 12 : 12;
+        const msg = `Dikkat lütfen! Sayın yolcularımız; ${compName} bünyesinde ${rName} seferini gerçekleştirecek olan otobüsümüz ${peronNo} numaralı perondan hareket etmek üzeredir. Biletli yolcularımızın araçtaki yerlerini almaları rica olunur. ${compName} iyi yolculuklar diler.`;
+
+        if (typeof audio !== 'undefined' && audio.playChime) audio.playChime();
+        if (typeof audio !== 'undefined' && audio.speak) {
+            setTimeout(() => audio.speak(msg), 400);
+        }
+        if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast(`📢 ${compName}: Peron ${peronNo} Seferi Başlıyor!`, "info");
+        }
+    },
+
     addMoney: function(amount, isDirect = false) {
         if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
             return { captainShare: 0, companyShare: 0, companySharePercent: 50, totalFare: 0 };
@@ -1163,11 +1262,16 @@ const Game = {
         this.activeRouteData = routesData[routeId];
         this.passengerComfort = 100;
         this.stopRequestBellTriggered = false;
+        if (this.currentStopIndex === 0 && !isResume && !this.terminalAnnouncedForRoute) {
+            this.terminalAnnouncedForRoute = true;
+            this.playTerminalDepartureAnnouncement();
+        }
         this.lastRecordedSpeed = 0;
         this.lastHarshBrakeWarningTime = 0;
         this.isRampDeployed = false;
         this.isLuggageOpen = false;
         this.hasLostItemFound = false;
+        this.terminalAnnouncedForRoute = false;
         this.lastFoundLostItem = null;
         this.activePassengerEvent = null;
         this.insufficientBalanceTriggeredAtStop = false;
@@ -1186,7 +1290,14 @@ const Game = {
             const hNo = (this.activeRouteData.hatNo || "26").toUpperCase();
             const sSt = this.activeRouteData.startStop || (this.activeRouteData.stops[0] ? this.activeRouteData.stops[0].name : "MERKEZ");
             const eSt = this.activeRouteData.endStop || (this.activeRouteData.stops[this.activeRouteData.stops.length - 1] ? this.activeRouteData.stops[this.activeRouteData.stops.length - 1].name : "VARIŞ");
-            ibisTextEl.innerText = `[${hNo}] ${sSt} ➔ ${eSt}`;
+            let activeCompName = "MİKYAS TURİZM";
+            if (typeof CompanySystem !== 'undefined') {
+                const empId = CompanySystem.data && CompanySystem.data.corporateEmployer;
+                const empComp = empId ? CompanySystem.getCompanyById(empId) : null;
+                if (empComp && empComp.name) activeCompName = empComp.name.toUpperCase();
+                else if (CompanySystem.data && CompanySystem.data.companyName) activeCompName = CompanySystem.data.companyName.toUpperCase();
+            }
+            ibisTextEl.innerText = `👑 ${activeCompName} | [${hNo}] ${sSt} ➔ ${eSt}`;
         }
         const bellHudInit = document.getElementById('hud-stop-request');
         if (bellHudInit) bellHudInit.style.display = 'none';
@@ -4064,9 +4175,13 @@ const Game = {
         }
         
         let fare = this.ticketPrices[pType];
+        let pricingMult = 1.0;
+        if (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.ticketPricingMultiplier) {
+            pricingMult = CompanySystem.data.ticketPricingMultiplier;
+        }
         const cityName = this.activeRouteData.sehir;
         if (sehirRotalari[cityName] && sehirRotalari[cityName].ucretler) {
-            fare = sehirRotalari[cityName].ucretler[pType];
+            fare = Math.round(sehirRotalari[cityName].ucretler[pType] * pricingMult);
         }
         
         let splitRes = null;
@@ -4237,6 +4352,13 @@ const Game = {
 
         const k = e.key.toLowerCase();
         // SHIFT + VİRGÜL (Shift + ,): Rastgele Telsiz Konuşmaları Yükle / Dinlet (Kanal 19)
+        // İKRAM VE MUAVİN SERVİSİ (I Tuşu)
+        if (k === 'i' || k === 'ı' || e.code === 'KeyI') {
+            e.preventDefault();
+            this.serveCatering();
+            return;
+        }
+
         const isCommaKey = (e.key === ',' || e.key === ';' || e.key === '<' || e.code === 'Comma');
         if (e.shiftKey && isCommaKey) {
             e.preventDefault();

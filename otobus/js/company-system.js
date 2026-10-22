@@ -20,6 +20,17 @@
             companyLevel: 1, // 1: Yazıhane, 2: Bölge Acentesi, 3: Marmara Lojistik, 4: Ulusal Karayolları, 5: Uluslararası Holding
             companyTreasury: 50000,        // Şirket Kasası Bakiyesi (₺)
             revenueSharePercent: 50,       // %50 Şirket Kasasına, %50 Kaptana (Serbestçe değiştirilebilir)
+            cateringPackage: 'standart',   // 'ekonomik' | 'standart' | 'vip'
+            satisfactionRating: 4.9,       // 1.0 - 5.0 (Yıldız Değerlendirmesi)
+            terminalBranches: {            // Otogar Yazıhaneleri
+                tekirdag: true,
+                corlu: false,
+                istanbul_esenler: false,
+                ankara_asti: false,
+                izmir_otogar: false
+            },
+            ticketPricingMultiplier: 1.0,  // 0.8: Halk (%100 Doluluk), 1.0: Standart, 1.3: Ekspres, 1.6: VIP
+            facilityContract: 'standart',  // Dinlenme Tesisi Anlaşması
             hqUpgrades: {
                 fuelContract: false,       // %20 yakıt tasarrufu
                 luxuryLounge: false,       // %50 hızlı şoför dinlenmesi & enerji
@@ -250,7 +261,291 @@
             }
         },
 
-        // Şirket Arama (Kaptan + Kurumsal)
+                // --- İKRAM & MUAVİN SİSTEMİ ---
+        setCateringPackage: function(pkg) {
+            this.data.cateringPackage = pkg;
+            this.saveData();
+            this.renderAll();
+
+            const pkgNames = {
+                'ekonomik': 'Sıcak Çay, Su & Taze Kek Paketi',
+                'standart': 'Standart Karayolu Paketi (Çay, Nescafe, Soğuk Meşrubat, Kraker & Kolonya)',
+                'vip': 'Jumbo VIP First Class (Sıcak Sandviç, Taze Meyve Suyu & Dondurma)'
+            };
+            const msg = `İkram paketi güncellendi: ${pkgNames[pkg] || pkg}. Sürüş esnasında I tuşuna basarak yolcularınıza ikram servisi yapabilirsiniz.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`☕ ${pkgNames[pkg] || pkg} Seçildi!`, 'success');
+        },
+
+        boostSatisfaction: function(delta) {
+            this.data.satisfactionRating = Math.min(5.0, Math.max(3.0, (this.data.satisfactionRating || 4.8) + delta));
+            this.saveData();
+        },
+
+        renderCatering: function() {
+            const container = document.getElementById('company-catering-container');
+            if (!container) return;
+
+            const curPkg = this.data.cateringPackage || 'standart';
+            const rating = (this.data.satisfactionRating || 4.9).toFixed(1);
+
+            container.innerHTML = `
+            <div style="background: rgba(15,23,42,0.85); border: 2px solid #ca8a04; border-radius: 12px; padding: 18px; margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                    <div>
+                        <div style="color: #facc15; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                            <span>☕</span> <span>Otobüs İçi İkram & Muavin Hizmet Standardı</span>
+                        </div>
+                        <div style="color: #cbd5e1; font-size: 0.88rem; margin-top: 3px;">
+                            Gerçek otobüs firmalarının sunduğu ikram kalitesini siz belirlersiniz. İkram kalitesi arttıkça yolcu memnuniyeti ve bahşişler artar.
+                        </div>
+                    </div>
+                    <div style="background: rgba(245, 158, 11, 0.18); border: 1.5px solid #f59e0b; border-radius: 8px; padding: 6px 14px; text-align: center;">
+                        <span style="font-size: 0.8rem; color: #fde047; display: block; font-weight: bold;">YOLCU MEMNUNİYETİ</span>
+                        <strong style="font-size: 1.35rem; color: #fff;">⭐ ${rating} / 5.0</strong>
+                    </div>
+                </div>
+
+                <!-- CANLI SÜRÜŞ İKRAM REHBERİ -->
+                <div style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(2, 132, 199, 0.15)); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;">
+                    <div style="color: #38bdf8; font-weight: bold; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🛎️</span> <span>Sürüş Esnasında İkram Nasıl Dağıtılır?</span>
+                    </div>
+                    <div style="color: #e2e8f0; font-size: 0.9rem; line-height: 1.5; margin-top: 4px;">
+                        Otobüsünüzde yolcu varken klavyeden <strong>I</strong> (veya <strong>ı</strong>) tuşuna bastığınızda, muavin ayağa kalkar, yolculara limon kolonyası döker ve seçtiğiniz ikramları dağıtır. Yolcular memnun kalır ve kaptana nakit <strong>bahşiş</strong> bırakır!
+                    </div>
+                </div>
+
+                <!-- 3 İKRAM PAKETİ SEÇİMİ -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                    
+                    <!-- 1. EKONOMİK -->
+                    <div style="background: rgba(30,41,59,0.7); border: 2px solid ${curPkg === 'ekonomik' ? '#22c55e' : '#475569'}; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <strong style="color: #fff; font-size: 1.05rem;">🍵 Ekonomik İkram</strong>
+                                <span style="font-size: 0.78rem; padding: 2px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid #64748b; color: #cbd5e1;">Halk Paketi</span>
+                            </div>
+                            <div style="color: #94a3b8; font-size: 0.83rem; margin-bottom: 10px;">
+                                Sıcak Demleme Çay, Pınar Bardak Su ve Taze Meyveli Kek.
+                            </div>
+                            <div style="font-size: 0.85rem; color: #cbd5e1; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 6px; margin-bottom: 12px; line-height: 1.4;">
+                                <div>💰 Maliyet: <strong style="color: #fde047;">8 ₺ / Yolcu</strong></div>
+                                <div>🎁 Bahşiş Ortalama: <strong style="color: #4ade80;">+25 ₺</strong></div>
+                                <div>⭐ Memnuniyet Etkisi: <strong style="color: #38bdf8;">%80</strong></div>
+                            </div>
+                        </div>
+                        <button class="modern-btn btn-select-catering nav-item" data-pkg="ekonomik" style="width: 100%; padding: 8px; background: ${curPkg === 'ekonomik' ? '#22c55e' : 'rgba(255,255,255,0.08)'}; color: ${curPkg === 'ekonomik' ? '#000' : '#fff'}; font-weight: bold; border-radius: 6px; border: 1px solid #22c55e; cursor: pointer;">
+                            ${curPkg === 'ekonomik' ? '✅ Aktif İkram Paketi' : 'Bu Paketi Seç'}
+                        </button>
+                    </div>
+
+                    <!-- 2. STANDART (ÖNERİLEN) -->
+                    <div style="background: rgba(30,41,59,0.7); border: 2px solid ${curPkg === 'standart' ? '#22c55e' : '#f59e0b'}; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 0 15px rgba(245,158,11,0.2);">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <strong style="color: #fff; font-size: 1.05rem;">☕ Standart Karayolu</strong>
+                                <span style="font-size: 0.78rem; padding: 2px 8px; border-radius: 6px; background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #fde047; font-weight: bold;">⭐ Önerilen</span>
+                            </div>
+                            <div style="color: #94a3b8; font-size: 0.83rem; margin-bottom: 10px;">
+                                Sıcak Çay, Nescafe, Kutu Meşrubat, Çikolatalı Kek, Tuzlu Kraker ve Limon Kolonyası.
+                            </div>
+                            <div style="font-size: 0.85rem; color: #cbd5e1; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 6px; margin-bottom: 12px; line-height: 1.4;">
+                                <div>💰 Maliyet: <strong style="color: #fde047;">18 ₺ / Yolcu</strong></div>
+                                <div>🎁 Bahşiş Ortalama: <strong style="color: #4ade80;">+50 ₺</strong></div>
+                                <div>⭐ Memnuniyet Etkisi: <strong style="color: #38bdf8;">%92</strong></div>
+                            </div>
+                        </div>
+                        <button class="modern-btn btn-select-catering nav-item" data-pkg="standart" style="width: 100%; padding: 8px; background: ${curPkg === 'standart' ? '#22c55e' : 'linear-gradient(135deg, #f59e0b, #d97706)'}; color: #000; font-weight: bold; border-radius: 6px; border: none; cursor: pointer;">
+                            ${curPkg === 'standart' ? '✅ Aktif İkram Paketi' : 'Bu Paketi Seç'}
+                        </button>
+                    </div>
+
+                    <!-- 3. JUMBO VIP -->
+                    <div style="background: rgba(30,41,59,0.7); border: 2px solid ${curPkg === 'vip' ? '#22c55e' : '#a855f7'}; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <strong style="color: #fff; font-size: 1.05rem;">🍨 Jumbo VIP First Class</strong>
+                                <span style="font-size: 0.78rem; padding: 2px 8px; border-radius: 6px; background: rgba(168,85,247,0.2); border: 1px solid #a855f7; color: #d8b4fe;">Ultra Lüks</span>
+                            </div>
+                            <div style="color: #94a3b8; font-size: 0.83rem; margin-bottom: 10px;">
+                                Sıcak Kaşarlı Sandviç, Karışık Meyve Suları, İsviçre Çikolatası ve Yazın Maraş Dondurması.
+                            </div>
+                            <div style="font-size: 0.85rem; color: #cbd5e1; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 6px; margin-bottom: 12px; line-height: 1.4;">
+                                <div>💰 Maliyet: <strong style="color: #fde047;">35 ₺ / Yolcu</strong></div>
+                                <div>🎁 Bahşiş Ortalama: <strong style="color: #4ade80;">+90 ₺</strong></div>
+                                <div>⭐ Memnuniyet Etkisi: <strong style="color: #38bdf8;">%99</strong></div>
+                            </div>
+                        </div>
+                        <button class="modern-btn btn-select-catering nav-item" data-pkg="vip" style="width: 100%; padding: 8px; background: ${curPkg === 'vip' ? '#22c55e' : 'rgba(168,85,247,0.2)'}; color: ${curPkg === 'vip' ? '#000' : '#d8b4fe'}; font-weight: bold; border-radius: 6px; border: 1px solid #a855f7; cursor: pointer;">
+                            ${curPkg === 'vip' ? '✅ Aktif İkram Paketi' : 'Bu Paketi Seç'}
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            `;
+
+            container.querySelectorAll('.btn-select-catering').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const pkg = e.currentTarget.getAttribute('data-pkg');
+                    this.setCateringPackage(pkg);
+                });
+            });
+        },
+
+        // --- OTOGAR YAZIHANELERİ & BİLET FİYAT TARİFESİ ---
+        rentTerminalBranch: function(branchId, cost, name) {
+            const curTreasury = this.data.companyTreasury || 0;
+            if (curTreasury < cost) {
+                const failMsg = `${name} Yazıhanesini kiralamak için şirket kasasında en az ${cost.toLocaleString('tr-TR')} ₺ bulunmalıdır. (Mevcut Kasa: ${curTreasury.toLocaleString('tr-TR')} ₺).`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(failMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(failMsg, 'warning');
+                return;
+            }
+
+            this.data.companyTreasury -= cost;
+            if (!this.data.terminalBranches) this.data.terminalBranches = {};
+            this.data.terminalBranches[branchId] = true;
+            this.saveData();
+            this.renderAll();
+
+            const succMsg = `Tebrikler! ${name} Şehirlerarası Otobüs Terminali Yazıhanesi kiralandı. Artık o şehirden şirketinizin otobüslerine ekstra yolcu ve bilet satışı akacaktır.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(succMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏢 ${name} Yazıhanesi Açıldı!`, 'success');
+        },
+
+        setPricingMultiplier: function(mult) {
+            this.data.ticketPricingMultiplier = parseFloat(mult) || 1.0;
+            this.saveData();
+            this.renderAll();
+
+            const multNames = {
+                0.8: '%80 İndirimli Halk Tarifesi (%100 Doluluk Garantisi)',
+                1.0: '%100 Standart Karayolu Tarifesi (Dengeli Fiyat & Yolcu)',
+                1.3: '%130 Ekspres Konforlu Tarife (Yüksek Kâr)',
+                1.6: '%160 VIP First Class Lüks Tarife (Maksimum Ciro)'
+            };
+            const msg = `Bilet fiyat politikası güncellendi: ${multNames[mult] || mult}.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏷️ ${multNames[mult] || mult}`, 'success');
+        },
+
+        renderBranches: function() {
+            const container = document.getElementById('company-branches-container');
+            if (!container) return;
+
+            const branches = [
+                { id: 'tekirdag', name: 'Tekirdağ Süleymanpaşa Otogarı', desc: 'Genel Merkez Yazıhanesi. Süleymanpaşa sahil ve ilçe peronları.', cost: 0, boost: '+%30 Yolcu' },
+                { id: 'corlu', name: 'Çorlu Şehirlerarası Otogarı', desc: 'Sanayi ve bölge kavşağı. Çorlu ringi ve fabrika bağlantıları.', cost: 15000, boost: '+%40 Yolcu' },
+                { id: 'istanbul_esenler', name: 'İstanbul 15 Temmuz Demokrasi Otogarı (Esenler)', desc: "Türkiye'nin en büyük otogarı. 168 peron bağlantısı.", cost: 35000, boost: '+%60 Yolcu & Bilet Satışı' },
+                { id: 'ankara_asti', name: 'Ankara AŞTİ Şehirlerarası Terminali', desc: 'Başkent merkezi. Resmi heyet ve Anadolu aktarma kapısı.', cost: 30000, boost: '+%50 Yolcu' },
+                { id: 'izmir_otogar', name: 'İzmir Şehirlerarası Otobüs Terminali (İZOTAŞ)', desc: 'Ege sahilleri ve Bornova ana peronları.', cost: 28000, boost: '+%50 Yolcu' }
+            ];
+
+            const activeBranches = this.data.terminalBranches || { tekirdag: true };
+            const curMult = this.data.ticketPricingMultiplier || 1.0;
+
+            let html = `
+            <!-- 1. BİLET FİYAT POLİTİKASI (DİNAMİK TARİFE) -->
+            <div style="background: rgba(15,23,42,0.85); border: 2px solid #38bdf8; border-radius: 12px; padding: 18px; margin-bottom: 14px;">
+                <div style="color: #38bdf8; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span>🏷️</span> <span>Bilet Fiyat Politikası & Dinamik Tarife</span>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; margin-bottom: 14px;">
+                    Bilet fiyatlarını ucuz yaparak otobüsü %100 doldurabilir veya VIP fiyat belirleyerek bilet başı yüksek kâr sağlayabilirsiniz.
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;">
+                    <button class="modern-btn btn-set-pricing nav-item" data-mult="0.8" style="padding: 10px; background: ${curMult === 0.8 ? '#38bdf8' : 'rgba(255,255,255,0.06)'}; color: ${curMult === 0.8 ? '#000' : '#fff'}; font-weight: bold; border-radius: 8px; border: 1px solid #38bdf8; cursor: pointer; text-align: left;">
+                        <div style="font-size: 0.95rem;">%80 Halk Tarifesi</div>
+                        <div style="font-size: 0.78rem; opacity: 0.85; margin-top: 2px;">Biletler %20 Ucuz (%100 Doluluk)</div>
+                    </button>
+                    <button class="modern-btn btn-set-pricing nav-item" data-mult="1.0" style="padding: 10px; background: ${curMult === 1.0 ? '#22c55e' : 'rgba(255,255,255,0.06)'}; color: ${curMult === 1.0 ? '#000' : '#fff'}; font-weight: bold; border-radius: 8px; border: 1px solid #22c55e; cursor: pointer; text-align: left;">
+                        <div style="font-size: 0.95rem;">%100 Standart Tarife</div>
+                        <div style="font-size: 0.78rem; opacity: 0.85; margin-top: 2px;">Dengeli Fiyat & Yüksek Talep</div>
+                    </button>
+                    <button class="modern-btn btn-set-pricing nav-item" data-mult="1.3" style="padding: 10px; background: ${curMult === 1.3 ? '#f59e0b' : 'rgba(255,255,255,0.06)'}; color: ${curMult === 1.3 ? '#000' : '#fff'}; font-weight: bold; border-radius: 8px; border: 1px solid #f59e0b; cursor: pointer; text-align: left;">
+                        <div style="font-size: 0.95rem;">%130 Ekspres Konfor</div>
+                        <div style="font-size: 0.78rem; opacity: 0.85; margin-top: 2px;">Hızlı Hat, +%30 Yüksek Bilet</div>
+                    </button>
+                    <button class="modern-btn btn-set-pricing nav-item" data-mult="1.6" style="padding: 10px; background: ${curMult === 1.6 ? '#a855f7' : 'rgba(255,255,255,0.06)'}; color: ${curMult === 1.6 ? '#000' : '#fff'}; font-weight: bold; border-radius: 8px; border: 1px solid #a855f7; cursor: pointer; text-align: left;">
+                        <div style="font-size: 0.95rem;">%160 VIP First Class</div>
+                        <div style="font-size: 0.78rem; opacity: 0.85; margin-top: 2px;">Lüks Sefer, En Yüksek Kâr</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. OTOGAR YAZIHANELERİ LİSTESİ -->
+            <div style="background: rgba(15,23,42,0.85); border: 2px solid #ca8a04; border-radius: 12px; padding: 18px;">
+                <div style="color: #facc15; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span>🏢</span> <span>Şehirlerarası Otogar Yazıhaneleri & Şube Ağı</span>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; margin-bottom: 14px;">
+                    Şirketinizin yazıhanesini açtığınız şehirlerde bilet satış ofisiniz kurulur ve seferlerinize binen yolcu akışı katlanır.
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+            `;
+
+            branches.forEach(b => {
+                const isOwned = (b.id === 'tekirdag' || activeBranches[b.id]);
+
+                html += `
+                <div style="background: rgba(30,41,59,0.7); border: 1.5px solid ${isOwned ? '#22c55e' : '#475569'}; border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div style="font-size: 1.05rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
+                            <span>${isOwned ? '🏢' : '🏬'}</span>
+                            <span>${b.name}</span>
+                            ${isOwned ? '<span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #4ade80; font-weight: bold;">✅ AÇIK YAZIHANE</span>' : ''}
+                        </div>
+                        <div style="color: #94a3b8; font-size: 0.83rem; margin-top: 3px;">
+                            ${b.desc}
+                        </div>
+                        <div style="color: #38bdf8; font-size: 0.83rem; margin-top: 2px;">
+                            ⚡ Ayrıcalık: <strong>${b.boost}</strong>
+                        </div>
+                    </div>
+                    <div>
+                        ${isOwned ? `
+                            <span style="color: #4ade80; font-weight: bold; font-size: 0.9rem;">
+                                ✔️ Hizmetinizde
+                            </span>
+                        ` : `
+                            <button class="modern-btn btn-rent-branch nav-item" data-id="${b.id}" data-cost="${b.cost}" data-name="${b.name}" style="padding: 8px 18px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 2px 10px rgba(245,158,11,0.3);">
+                                ✍️ Yazıhane Kirala (${b.cost.toLocaleString('tr-TR')} ₺)
+                            </button>
+                        `}
+                    </div>
+                </div>
+                `;
+            });
+
+            html += `
+                </div>
+            </div>
+            `;
+
+            container.innerHTML = html;
+
+            container.querySelectorAll('.btn-set-pricing').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const mult = e.currentTarget.getAttribute('data-mult');
+                    this.setPricingMultiplier(mult);
+                });
+            });
+
+            container.querySelectorAll('.btn-rent-branch').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const bId = e.currentTarget.getAttribute('data-id');
+                    const cost = parseInt(e.currentTarget.getAttribute('data-cost')) || 0;
+                    const name = e.currentTarget.getAttribute('data-name');
+                    this.rentTerminalBranch(bId, cost, name);
+                });
+            });
+        },
+
+// Şirket Arama (Kaptan + Kurumsal)
         getCompanyById: function(companyId) {
             if (!companyId) return null;
             const captains = this.getCaptainCompanies();
@@ -1777,8 +2072,14 @@
                         <button id="tab-comp-hq" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.9rem;">
                             🏢 Şirket Gelişimi & Merkez
                         </button>
-                        <button id="tab-comp-radio" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.9rem;">
+                        <button id="tab-comp-radio" class="modern-btn nav-item" style="flex: 1; min-width: 120px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
                             📻 Canlı Telsiz
+                        </button>
+                        <button id="tab-comp-catering" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
+                            ☕ İkram & Muavin
+                        </button>
+                        <button id="tab-comp-branches" class="modern-btn nav-item" style="flex: 1; min-width: 150px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
+                            🏢 Yazıhaneler & Bilet
                         </button>
                     </div>
 
@@ -1917,6 +2218,8 @@
             this.renderHqUpgrades();
             this.renderRadioLogs();
             this.renderCorporateWork();
+            this.renderCatering();
+            this.renderBranches();
         },
 
         // Şirket Başlık Kartını Render Et
