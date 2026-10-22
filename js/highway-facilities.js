@@ -491,6 +491,21 @@
         },
 
         // Ön Camı & Farları Yıkatma
+        // Tesis Akaryakıt İstasyonundan Mazot Doldur
+        refuelBus: function () {
+            if (typeof Game === 'undefined') return;
+            const cap = (typeof Game.getFuelCapacity === 'function') ? Game.getFuelCapacity() : (Game.fuelTankCapacity || 500);
+            const current = (Game.currentFuelLiters !== undefined) ? Game.currentFuelLiters : cap;
+            const needed = Math.max(0, cap - current);
+            if (needed <= 1) {
+                const fullMsg = `Deponuz zaten tamamen dolu (%${Math.floor((current / cap) * 100)} - ${Math.floor(current)} L).`;
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(fullMsg, "info");
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+                return;
+            }
+            Game.refuel();
+        },
+
         washWindshield: function () {
             const washFee = 40;
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;

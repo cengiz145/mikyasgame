@@ -238,14 +238,20 @@ const UI = {
         const currentTitle = (typeof Game !== 'undefined' && Game.getLicenseTitle) ? Game.getLicenseTitle() : "Kaptan";
 
         if (btnCareer) {
-            if (completed === 0) {
-                btnCareer.innerHTML = "🎖️ İlerleme Modu (İlk Sefer Emri: Göreve Başla)";
-            } else {
-                btnCareer.innerHTML = `🎖️ İlerleme Moduna Devam Et (Yeni Sefer Emri: Sefer ${completed + 1})`;
-            }
+            btnCareer.innerHTML = `<div style="display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 1.8rem; line-height: 1;">🎖️</span>
+                <strong style="font-size: 1.15rem; color: #fff;">Kariyer Modu</strong>
+            </div>
+            <span style="color: #38bdf8; font-size: 1.3rem;">➜</span>`;
+            btnCareer.setAttribute('aria-label', 'Kariyer Modu');
         }
         if (btnFree) {
-            btnFree.innerHTML = "🛣️ Serbest Sürüş Modu (Serbest Simülasyon & Pratik - Süre/Görev Sınırı Yok)";
+            btnFree.innerHTML = `<div style="display: flex; align-items: center; gap: 14px;">
+                <span style="font-size: 1.8rem; line-height: 1;">🛣️</span>
+                <strong style="font-size: 1.15rem; color: #4ade80;">Serbest Sürüş Modu</strong>
+            </div>
+            <span style="color: #22c55e; font-size: 1.3rem;">➜</span>`;
+            btnFree.setAttribute('aria-label', 'Serbest Sürüş Modu');
         }
         if (btnCity) {
             if (hasPassed10) {

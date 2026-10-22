@@ -626,6 +626,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    const hudFuelPanel = document.getElementById('hud-fuel-panel');
+    if (hudFuelPanel) {
+        hudFuelPanel.addEventListener('click', () => {
+            if (typeof Game !== 'undefined' && Game.handleKeyDown) {
+                Game.handleKeyDown({ key: 'h', preventDefault: () => {} });
+            }
+        });
+    }
+
     const hudMpPanel = document.getElementById('hud-multiplayer-panel');
     if (hudMpPanel) {
         hudMpPanel.addEventListener('click', () => {
@@ -658,9 +667,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCareer.addEventListener('click', () => {
             if (typeof Game !== 'undefined') Game.setPlayMode('career');
             audio.playSelect();
-            const msg = "Kariyer ve İlerleme Modu açıldı. Şehirler, operasyonel seferler ve başarılar hazır.";
+            const msg = "Kariyer Modu açıldı.";
             audio.speak(msg);
-            UI.showToast("🎖️ Kariyer Modu Aktif", "info");
+            UI.showToast("🎖️ Kariyer Modu", "info");
             openCitySelection();
         });
     }
@@ -670,9 +679,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btnFreeDrive.addEventListener('click', () => {
             if (typeof Game !== 'undefined') Game.setPlayMode('free_drive');
             audio.playSelect();
-            const msg = "Serbest Sürüş Modu seçildi. Lütfen sürüş yapmak istediğiniz il ve ilçeyi seçin.";
+            const msg = "Serbest Sürüş Modu açıldı.";
             audio.speak(msg);
-            UI.showToast("🛣️ Serbest Sürüş: İlçe & Mahalle Seçimi", "info");
+            UI.showToast("🛣️ Serbest Sürüş Modu", "info");
             openDistrictPickerModal();
         });
     }
