@@ -917,10 +917,12 @@ const BusFleet = {
         const bus = this.buses.find(b => b.id === busId);
         if (!bus) return false;
 
+        const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive') || (typeof localStorage !== 'undefined' && localStorage.getItem('gamePlayMode') === 'free_drive');
         const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
         const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
 
-        if (currentLevel < bus.requiredLevel) {
+        // Serbest modda tüm otobüslerin seviye kilidi açıktır; kariyer modunda seviye şartı devam eder.
+        if (!isFreeDrive && currentLevel < bus.requiredLevel) {
             const lockMsg = `Seviyeniz yetersiz! ${bus.fullName} satın almak için Seviye ${bus.requiredLevel} olmalısınız (Mevcut Seviyeniz: ${currentLevel}).`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, "warning");
@@ -989,8 +991,9 @@ const BusFleet = {
             return this.buyBus(busId);
         }
 
+        const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive') || (typeof localStorage !== 'undefined' && localStorage.getItem('gamePlayMode') === 'free_drive');
         const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
-        if (currentLevel < bus.requiredLevel) {
+        if (!isFreeDrive && currentLevel < bus.requiredLevel) {
             const msg = `Bu otobüs kilitli! ${bus.fullName} için Seviye ${bus.requiredLevel} olmalısınız. Mevcut seviyeniz: ${currentLevel}.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "warning");
@@ -1059,17 +1062,29 @@ const BusFleet = {
         if (!modal) return;
         modal.classList.remove('hidden');
 
+        const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive') || (typeof localStorage !== 'undefined' && localStorage.getItem('gamePlayMode') === 'free_drive');
+
         const titleEl = document.getElementById('bus-garage-title');
-        if (titleEl) titleEl.textContent = '🛒 Yeni Otobüsler Satın Al (Showroom & Galeri)';
+        if (titleEl) {
+            titleEl.textContent = isFreeDrive
+                ? '🛒 Otobüs Satın Al (Serbest Mod - Seviye Kilitsiz)'
+                : '🛒 Yeni Otobüsler Satın Al (Showroom & Galeri)';
+        }
         const descEl = document.getElementById('bus-garage-desc');
-        if (descEl) descEl.textContent = "Türkiye'nin en seçkin 20 otobüs modeli. Seviyenizi yükselterek ve kazandığınız bütçeyle filonuzu genişletin.";
+        if (descEl) {
+            descEl.textContent = isFreeDrive
+                ? "🛣️ Serbest Sürüş Modu: Tüm 20 otobüs modelinin seviye kilitleri açıktır! Yeterli bütçeniz olduğu sürece dilediğiniz lüks seyahat veya metropol otobüsünü satın alabilirsiniz."
+                : "Türkiye'nin en seçkin 20 otobüs modeli. Seviyenizi yükselterek ve kazandığınız bütçeyle filonuzu genişletin.";
+        }
 
         this.setModeTabActive('dealership');
         this.setTabActive('tab-fleet-all');
         this.renderModal('all');
 
         const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
-        const welcomeSpeech = `Otobüs satış galerisi ve showroom açıldı. Bütçeniz: ${currentBudget.toLocaleString('tr-TR')} TL. 20 otobüs modeli listeleniyor.`;
+        const welcomeSpeech = isFreeDrive
+            ? `Serbest sürüş otobüs galerisi açıldı. Tüm otobüslerin seviye kilidi açıktır. Bütçeniz: ${currentBudget.toLocaleString('tr-TR')} TL. İstediğiniz aracı satın alabilirsiniz.`
+            : `Otobüs satış galerisi ve showroom açıldı. Bütçeniz: ${currentBudget.toLocaleString('tr-TR')} TL. 20 otobüs modeli listeleniyor.`;
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(welcomeSpeech);
 
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
@@ -1115,6 +1130,7 @@ const BusFleet = {
         if (!listEl) return;
         listEl.innerHTML = '';
 
+        const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive') || (typeof localStorage !== 'undefined' && localStorage.getItem('gamePlayMode') === 'free_drive');
         const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
         const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
         const selectedId = this.getSelectedBusId();
@@ -1129,6 +1145,29 @@ const BusFleet = {
             filtered = filtered.filter(b => b.category === 'belediye');
         } else if (filterCategory === 'seyahat') {
             filtered = filtered.filter(b => b.category === 'seyahat');
+        }
+
+        // Serbest Sürüş Modu Galeri Bilgilendirme Rozeti
+        if (isFreeDrive && this.currentMode === 'dealership') {
+            const bannerLi = document.createElement('li');
+            bannerLi.style.marginBottom = '14px';
+            bannerLi.style.padding = '12px 16px';
+            bannerLi.style.background = 'linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(56, 189, 248, 0.15))';
+            bannerLi.style.border = '1.5px solid #22c55e';
+            bannerLi.style.borderRadius = '10px';
+            bannerLi.style.boxShadow = '0 2px 10px rgba(34,197,94,0.15)';
+            bannerLi.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.5rem;">🔓</span>
+                    <div>
+                        <div style="color: #4ade80; font-weight: bold; font-size: 0.98rem;">Serbest Sürüş Modu: Seviye Kilitleri Kaldırıldı!</div>
+                        <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 2px;">
+                            Tüm 20 otobüs modelini seviye şartı olmadan inceleyebilir, bütçeniz karşılığında satın alarak serbest sürüşte hemen kullanabilirsiniz.
+                        </div>
+                    </div>
+                </div>
+            `;
+            listEl.appendChild(bannerLi);
         }
 
         if (filtered.length === 0) {
@@ -1162,7 +1201,7 @@ const BusFleet = {
         }
 
         filtered.forEach(b => {
-            const isUnlocked = currentLevel >= b.requiredLevel;
+            const isUnlocked = isFreeDrive || (currentLevel >= b.requiredLevel);
             const isSelected = b.id === selectedId;
             const isOwned = this.isBusOwned(b.id);
 
@@ -1193,9 +1232,10 @@ const BusFleet = {
                     statusBadge = '<span style="background: rgba(34,197,94,0.25); color: #22c55e; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">✅ GARAJINIZDA MEVCUT (SEÇ)</span>';
                 } else if (isUnlocked) {
                     const canAfford = currentBudget >= (b.price || 0);
+                    const needed = (b.price || 0) - currentBudget;
                     statusBadge = canAfford
                         ? `<span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🛒 SATIN AL (${(b.price || 0).toLocaleString('tr-TR')} ₺)</span>`
-                        : `<span style="background: rgba(245,158,11,0.2); color: #fbbf24; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🔒 ${(b.price || 0).toLocaleString('tr-TR')} ₺ (Yetersiz Bakiye)</span>`;
+                        : `<span style="background: rgba(245,158,11,0.2); color: #fbbf24; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🔒 ${(b.price || 0).toLocaleString('tr-TR')} ₺ (Yetersiz Bakiye - Kalan: ${needed.toLocaleString('tr-TR')} ₺)</span>`;
                 } else {
                     statusBadge = `<span style="background: rgba(239,68,68,0.2); color: #f87171; font-weight: bold; padding: 4px 10px; border-radius: 4px; font-size: 0.85rem;">🔒 SEVİYE ${b.requiredLevel} GEREKLİ (${(b.price || 0).toLocaleString('tr-TR')} ₺)</span>`;
                 }
@@ -1313,6 +1353,18 @@ const BusFleet = {
         const btnOpenDealer = document.getElementById('btn-open-dealership');
         if (btnOpenDealer) {
             btnOpenDealer.addEventListener('click', () => this.openDealershipModal());
+        }
+
+        const btnRouteGarage = document.getElementById('btn-route-open-garage');
+        if (btnRouteGarage) {
+            btnRouteGarage.addEventListener('click', () => {
+                const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive') || (typeof localStorage !== 'undefined' && localStorage.getItem('gamePlayMode') === 'free_drive');
+                if (isFreeDrive) {
+                    this.openDealershipModal();
+                } else {
+                    this.openGarageModal();
+                }
+            });
         }
 
         const btnClose = document.getElementById('btn-garage-modal-close');
