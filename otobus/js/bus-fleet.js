@@ -962,6 +962,24 @@ const BusFleet = {
         const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
 
         // Serbest modda tüm otobüslerin seviye kilidi açıktır; kariyer modunda seviye şartı devam eder.
+                // GARA VE FİLO SAHASI KAPASİTE KONTROLÜ
+        const owned = this.getOwnedBusIds();
+        let maxBusesAllowed = 5; // Seviye 1: 5 araç
+        const compSys = (typeof CompanySystem !== 'undefined') ? CompanySystem : ((typeof window !== 'undefined' && window.CompanySystem) ? window.CompanySystem : null);
+        if (compSys && typeof compSys.getInstitutionLevel === 'function') {
+            const garageLevel = compSys.getInstitutionLevel('bus_garage');
+            if (garageLevel === 1) maxBusesAllowed = 5;
+            else if (garageLevel === 2) maxBusesAllowed = 15;
+            else if (garageLevel >= 3) maxBusesAllowed = 999;
+        }
+
+        if (owned.length >= maxBusesAllowed) {
+            const capMsg = `Garaj Kapasitesi Dolu! Mevcut Seviye Garaj Sahası en fazla ${maxBusesAllowed} otobüs barındırabilir (Şu an: ${owned.length} otobüs). Yeni araç satın almak için Şirket Menüsü -> Yasal Binalar sekmesinden Garaj ve Filo Sahası'nı büyütün!`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(capMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`⛔ ${capMsg}`, "warning");
+            return false;
+        }
+
         if (!isFreeDrive && currentLevel < bus.requiredLevel) {
             const lockMsg = `Seviyeniz yetersiz! ${bus.fullName} satın almak için Seviye ${bus.requiredLevel} olmalısınız (Mevcut Seviyeniz: ${currentLevel}).`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
@@ -987,7 +1005,7 @@ const BusFleet = {
             }
         }
 
-        const owned = this.getOwnedBusIds();
+        // Garaja ekle
         if (!owned.includes(busId)) {
             owned.push(busId);
             try { localStorage.setItem(this.OWNED_KEY, JSON.stringify(owned)); } catch(e) {}

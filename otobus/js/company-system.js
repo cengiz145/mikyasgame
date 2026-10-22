@@ -1874,12 +1874,15 @@
                 return false;
             }
 
-            // Kapasite kontrolü
-            const currentLvlInfo = this.companyLevels.find(l => l.level === (this.data.companyLevel || 1)) || this.companyLevels[0];
-            const maxDriversAllowed = (currentLvlInfo.level === 1) ? 2 : (currentLvlInfo.level === 2 ? 4 : (currentLvlInfo.level === 3 ? 6 : (currentLvlInfo.level === 4 ? 8 : 99)));
+            // Kapasite kontrolü: Garaj ve Filo Sahası Seviyesine Göre
+            const garageLvl = this.getInstitutionLevel('bus_garage');
+            let maxDriversAllowed = 5; // Seviye 1: 5 şoför
+            if (garageLvl === 1) maxDriversAllowed = 5;
+            else if (garageLvl === 2) maxDriversAllowed = 15;
+            else if (garageLvl >= 3) maxDriversAllowed = 99;
             
             if (!isFreeGift && this.data.hiredDrivers.length >= maxDriversAllowed) {
-                const limitMsg = `Filo Kapasitesi Dolu! Mevcut şirket seviyeniz (${currentLvlInfo.title}) en fazla ${maxDriversAllowed} şoföre izin veriyor. Daha fazla kaptan için şirketinizi büyütün!`;
+                const limitMsg = `Garaj ve İstihdam Kapasitesi Dolu! Seviye ${garageLvl} Garaj Sahası en fazla ${maxDriversAllowed} şoför barındırabilir. Daha fazla kaptan istihdam etmek için Yasal Binalar sekmesinden Garaj ve Filo Sahası'nı Seviye ${garageLvl + 1}'e büyütün!`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(limitMsg);
                 if (typeof UI !== 'undefined') UI.showToast(`⛔ ${limitMsg}`, "warning");
                 return false;

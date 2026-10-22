@@ -3524,6 +3524,16 @@ const Game = {
                     // KİNETİK ENERJİ HASAR FORMÜLÜ: Hasar = v^2 / 110 (Rastgelelik sıfırlandı)
                     let damageAmount = Math.max(5, Math.min(100, Math.round(Math.pow(this.speed, 2) / 110)));
                     
+                    // Garaj ve Filo Sahası Koruması (Kapalı Hangar, Güvenlik Kameraları ve Çevre Aydınlatması)
+                    if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                        const garageLvl = CompanySystem.getInstitutionLevel('bus_garage');
+                        if (garageLvl === 2) {
+                            damageAmount = Math.max(3, Math.round(damageAmount * 0.75)); // %25 Yıpranma Azalımı
+                        } else if (garageLvl >= 3) {
+                            damageAmount = Math.max(2, Math.round(damageAmount * 0.50)); // %50 Yıpranma Azalımı (Kapalı Lojistik Hangar Koruması)
+                        }
+                    }
+                    
                     let oldHealth = this.busDamage.health;
                     this.busDamage.health -= damageAmount;
                     this.busDamage.health = Math.max(0, this.busDamage.health);
