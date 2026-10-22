@@ -115,10 +115,21 @@
                     }
                 });
 
-                // 6. Düzenli Kalp Atışı (Heartbeat Sync)
+                // 6. Düzenli Kalp Atışı (Adaptif Kota Korumalı Heartbeat)
                 this.syncTimer = setInterval(() => {
-                    this.syncMyState();
-                }, 1200);
+                    const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
+                    const speed = (typeof Game !== 'undefined') ? (Game.currentSpeed || 0) : 0;
+                    // Araç dururken veya menüdeyken gereksiz Firebase yazmasını frenle
+                    if (!isDriving) {
+                        const now = Date.now();
+                        if (!this._lastIdleSync || now - this._lastIdleSync >= 8000) {
+                            this._lastIdleSync = now;
+                            this.syncMyState();
+                        }
+                    } else {
+                        this.syncMyState();
+                    }
+                }, 2500);
 
                 // İlk eşitlemeyi hemen yap
                 this.syncMyState();
@@ -327,10 +338,17 @@
             } catch (err) {}
         },
 
-                // Telsiz Mesajı Gönder (Kanal 19 - Hibrit Canlı & Çevrimdışı)
+                _lastRadioSendTime: 0,
+        // Telsiz Mesajı Gönder (Kanal 19 - Hibrit Canlı & Çevrimdışı)
         sendRadioMessage: function (text) {
             if (!text || !text.trim()) return;
-            const cleanText = text.trim().substring(0, 140);
+            const now = Date.now();
+            if (now - this._lastRadioSendTime < 2500) {
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⚠️ Telsiz mandalı meşgul, lütfen 2 saniye bekleyin.", "warning");
+                return;
+            }
+            this._lastRadioSendTime = now;
+            const cleanText = text.replace(/[<>{}`]/g, '').trim().substring(0, 100);
 
             this.playRadioChirp();
 

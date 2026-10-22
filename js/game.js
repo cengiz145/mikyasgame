@@ -723,24 +723,65 @@ const Game = {
     
     ticketPrices: { tam: 15, ogrenci: 8, yasli: 0 },
 
+    // =========================================================================
+    // MAXIMUM FIREBASE KORUMA & KOTA GÜVENLİK SİSTEMİ (BULLETPROOF SHIELD)
+    // 1. İstek Hız Sınırı (Rate Limiting & Cooldown: 2500ms)
+    // 2. Akıllı Fark Kontrolü (Diff / Dirty-Check: Değişmeyen veriyi gönderme)
+    // 3. Paket Boyutu Tavanı (Payload Size Guard: Max 25 KB)
+    // 4. Sigorta Sistemi (Circuit Breaker: Hata durumunda 60sn duraklat)
+    // 5. Derin Veri Temizleme & Tip Doğrulama (Recursive Sanitization)
+    // =========================================================================
     _firebaseSaveTimer: null,
+    _lastFirebaseWriteTime: 0,
+    _lastFirebasePayloadHash: "",
+    _firebaseCooldownMs: 2500, // En az 2.5 saniye aralıkla yaz
+    _maxPayloadBytes: 25000,   // Tek seferde en fazla 25 KB veri
+    _circuitBreaker: {
+        errorCount: 0,
+        blockedUntil: 0,
+        tripThreshold: 3,
+        cooldownDurationMs: 60000 // 3 ardışık hatada 60 saniye dinlen
+    },
 
-    // Firebase için Veri Temizleme & Güvenlik Zırhı (%100 Çökme Önleyici)
-    sanitizeForFirebase: function(obj) {
+    // Derin Güvenlik Zırhı: Tip, Karakter, Boyut ve Derinlik Temizleyici
+    sanitizeForFirebase: function(obj, depth = 0) {
+        if (depth > 5) return null; // Derinlik sınırı (Döngüsel referans ve şişme koruması)
         if (obj === null || obj === undefined) return null;
-        if (typeof obj !== 'object') return obj;
+        
+        // Sayı doğrulama ve mantıklı sınırlar
+        if (typeof obj === 'number') {
+            if (!Number.isFinite(obj) || Number.isNaN(obj)) return 0;
+            return Math.max(-1000000000, Math.min(1000000000, obj));
+        }
+
+        // Metin doğrulama ve uzunluk sınırı
+        if (typeof obj === 'string') {
+            // XSS / Script ve aşırı uzunluk koruması
+            return obj.replace(/[<>{}`]/g, '').trim().substring(0, 150);
+        }
+
+        if (typeof obj === 'boolean') return obj;
+
         if (Array.isArray(obj)) {
-            return obj.map(item => this.sanitizeForFirebase(item));
+            // Dizi boyutu sınırı: En fazla 80 öğe
+            return obj.slice(0, 80).map(item => this.sanitizeForFirebase(item, depth + 1));
         }
-        const clean = {};
-        for (const key of Object.keys(obj)) {
-            const sanitizedKey = key.replace(/[.$#\[\]\/]/g, '_');
-            const val = obj[key];
-            if (val !== undefined && typeof val !== 'function') {
-                clean[sanitizedKey] = this.sanitizeForFirebase(val);
+
+        if (typeof obj === 'object') {
+            const clean = {};
+            const keys = Object.keys(obj).slice(0, 50); // En fazla 50 anahtar
+            for (const key of keys) {
+                // Firebase için geçersiz karakterleri temizle (. $ # [ ] /) ve max 40 karakter yap
+                const sanitizedKey = key.replace(/[.$#\[\]\/\s]/g, '_').substring(0, 40);
+                const val = obj[key];
+                if (val !== undefined && typeof val !== 'function' && typeof val !== 'symbol') {
+                    clean[sanitizedKey] = this.sanitizeForFirebase(val, depth + 1);
+                }
             }
+            return clean;
         }
-        return clean;
+
+        return null;
     },
 
     loadFromFirebase: function(username) {
@@ -754,7 +795,7 @@ const Game = {
                 }
 
                 this.username = username;
-                const cleanUser = username.replace(/[.#$\[\]\/]/g, '');
+                const cleanUser = username.replace(/[.#$\[\]\/\s]/g, '');
                 const ref = window.db.ref('otobus_simulasyonu/kullanicilar/' + cleanUser);
                 
                 let isResolved = false;
@@ -783,23 +824,23 @@ const Game = {
                             this.currentCity = "Tekirdağ";
                             this.saveData(true);
                         } else {
-                            this.licenseLevel = data.licenseLevel || 1;
-                            this.playerXP = data.playerXP || 0;
-                            this.completedTasks = data.completedTasks || 0;
-                            this.playerBudget = data.playerBudget || 0;
-                            this.clockMinutes = data.clockMinutes || 480;
-                            this.unlockedCities = data.unlockedCities || ["Tekirdağ"];
-                            this.currentCity = data.currentCity || "Tekirdağ";
+                            this.licenseLevel = Math.max(1, Math.min(100, parseInt(data.licenseLevel) || 1));
+                            this.playerXP = Math.max(0, Math.min(999999999, parseInt(data.playerXP) || 0));
+                            this.completedTasks = Math.max(0, Math.min(50000, parseInt(data.completedTasks) || 0));
+                            this.playerBudget = Math.max(0, Math.min(999999999, parseFloat(data.playerBudget) || 0));
+                            this.clockMinutes = Math.max(0, Math.min(1440, parseFloat(data.clockMinutes) || 480));
+                            this.unlockedCities = Array.isArray(data.unlockedCities) ? data.unlockedCities.slice(0, 81) : ["Tekirdağ"];
+                            this.currentCity = (typeof data.currentCity === 'string') ? data.currentCity.substring(0, 30) : "Tekirdağ";
                             if (data.activeDistrict) {
-                                this.activeDistrict = data.activeDistrict;
+                                this.activeDistrict = data.activeDistrict.substring(0, 30);
                                 try { localStorage.setItem('activeDistrict', this.activeDistrict); } catch(e) {}
                             }
                             if (data.activeNeighborhood) {
-                                this.activeNeighborhood = data.activeNeighborhood;
+                                this.activeNeighborhood = data.activeNeighborhood.substring(0, 40);
                                 try { localStorage.setItem('activeNeighborhood', this.activeNeighborhood); } catch(e) {}
                             }
                             if (data.selectedBusId) {
-                                try { localStorage.setItem('selectedBusId', data.selectedBusId); } catch(e) {}
+                                try { localStorage.setItem('selectedBusId', data.selectedBusId.substring(0, 40)); } catch(e) {}
                             }
                             if (data.academyCompleted) {
                                 try { localStorage.setItem('academyCompleted', 'true'); } catch(e) {}
@@ -907,31 +948,42 @@ const Game = {
             console.warn("Yerel depolama kayıt uyarısı:", storageErr);
         }
 
-        // 2. Firebase Bulut Kaydı (Debounce ile Ağ Korumalı ve Çökme Önleyici)
+        // 2. Firebase Bulut Kaydı (Maximum Koruma Kalkanı)
         if (!window.db || !this.username) return;
+
+        // Sigorta kontrolü (Circuit Breaker): Dinlenme süresindeyse ağ isteğini durdur
+        const now = Date.now();
+        if (now < this._circuitBreaker.blockedUntil) {
+            return;
+        }
 
         const performFirebaseSave = () => {
             try {
                 if (!window.db || !this.username) return;
-                const cleanUser = this.username.replace(/[.#$\[\]\/]/g, '');
+                const cleanUser = this.username.replace(/[.#$\[\]\/\s]/g, '');
                 if (!cleanUser) return;
 
-                // Tüm istatistik ve modül verilerini topla
+                // Değerleri yasal sınırlar içine al (Clamping)
+                const safeLevel = Math.max(1, Math.min(100, parseInt(this.licenseLevel) || 1));
+                const safeXP = Math.max(0, Math.min(999999999, parseInt(this.playerXP) || 0));
+                const safeTasks = Math.max(0, Math.min(50000, parseInt(this.completedTasks) || 0));
+                const safeBudget = Math.max(0, Math.min(999999999, parseFloat(this.playerBudget) || 0));
+                const safeClock = Math.max(0, Math.min(1440, parseFloat(this.clockMinutes) || 480));
+
                 const payload = {
                     season: 'season_level1',
-                    licenseLevel: this.licenseLevel || 1,
-                    playerXP: this.playerXP || 0,
-                    completedTasks: this.completedTasks || 0,
-                    playerBudget: this.playerBudget || 0,
-                    clockMinutes: this.clockMinutes || 480,
-                    unlockedCities: this.unlockedCities || ["Tekirdağ"],
-                    currentCity: this.currentCity || "Tekirdağ",
-                    activeDistrict: this.activeDistrict || "Süleymanpaşa",
-                    activeNeighborhood: this.activeNeighborhood || "",
+                    licenseLevel: safeLevel,
+                    playerXP: safeXP,
+                    completedTasks: safeTasks,
+                    playerBudget: safeBudget,
+                    clockMinutes: safeClock,
+                    unlockedCities: Array.isArray(this.unlockedCities) ? this.unlockedCities.slice(0, 81) : ["Tekirdağ"],
+                    currentCity: (this.currentCity || "Tekirdağ").substring(0, 30),
+                    activeDistrict: (this.activeDistrict || "Süleymanpaşa").substring(0, 30),
+                    activeNeighborhood: (this.activeNeighborhood || "").substring(0, 40),
                     playMode: this.playMode || "career",
-                    selectedBusId: (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBusId) ? BusFleet.getSelectedBusId() : "otokar_sultan_mega",
-                    academyCompleted: (localStorage.getItem('academyCompleted') === 'true'),
-                    lastSavedTimestamp: Date.now()
+                    selectedBusId: (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBusId) ? BusFleet.getSelectedBusId().substring(0, 40) : "otokar_sultan_mega",
+                    academyCompleted: (localStorage.getItem('academyCompleted') === 'true')
                 };
 
                 // Sürücü Ömür Boyu İstatistikleri (DriverBadges)
@@ -950,29 +1002,29 @@ const Game = {
                 // Şirket Verileri (CompanySystem)
                 if (typeof CompanySystem !== 'undefined' && CompanySystem.data) {
                     payload.companyData = {
-                        companyName: CompanySystem.data.companyName || "Mikyas Seyahat",
+                        companyName: (CompanySystem.data.companyName || "Mikyas Seyahat").substring(0, 40),
                         foundedDate: CompanySystem.data.foundedDate || Date.now(),
-                        totalRevenue: CompanySystem.data.totalRevenue || 0,
-                        completedTripsCount: CompanySystem.data.completedTripsCount || 0,
-                        companyLevel: CompanySystem.data.companyLevel || 1,
-                        companyTreasury: CompanySystem.data.companyTreasury || 50000,
-                        revenueSharePercent: CompanySystem.data.revenueSharePercent || 50,
+                        totalRevenue: Math.max(0, Math.min(999999999, CompanySystem.data.totalRevenue || 0)),
+                        completedTripsCount: Math.max(0, Math.min(50000, CompanySystem.data.completedTripsCount || 0)),
+                        companyLevel: Math.max(1, Math.min(10, CompanySystem.data.companyLevel || 1)),
+                        companyTreasury: Math.max(-1000000, Math.min(999999999, CompanySystem.data.companyTreasury || 50000)),
+                        revenueSharePercent: Math.max(0, Math.min(100, CompanySystem.data.revenueSharePercent || 50)),
                         cateringPackage: CompanySystem.data.cateringPackage || "standart",
                         institutions: CompanySystem.data.institutions || {},
-                        satisfactionRating: CompanySystem.data.satisfactionRating || 4.9,
+                        satisfactionRating: Math.max(1.0, Math.min(5.0, CompanySystem.data.satisfactionRating || 4.9)),
                         terminalBranches: CompanySystem.data.terminalBranches || {},
                         ticketPricingMultiplier: CompanySystem.data.ticketPricingMultiplier || 1.0,
                         facilityContract: CompanySystem.data.facilityContract || "standart",
                         hqUpgrades: CompanySystem.data.hqUpgrades || {},
-                        hiredDrivers: CompanySystem.data.hiredDrivers || [],
-                        bankruptcyCount: CompanySystem.data.bankruptcyCount || 0
+                        hiredDrivers: Array.isArray(CompanySystem.data.hiredDrivers) ? CompanySystem.data.hiredDrivers.slice(0, 20) : [],
+                        bankruptcyCount: Math.max(0, CompanySystem.data.bankruptcyCount || 0)
                     };
                 }
 
                 // Otoyol Tesisleri ve HGS (HighwayFacilities)
                 if (typeof HighwayFacilities !== 'undefined' && HighwayFacilities.data) {
                     payload.highwayData = {
-                        hgsBalance: HighwayFacilities.data.hgsBalance || 0,
+                        hgsBalance: Math.max(0, Math.min(100000, HighwayFacilities.data.hgsBalance || 0)),
                         visitedFacilities: HighwayFacilities.data.visitedFacilities || {},
                         stats: HighwayFacilities.data.stats || {}
                     };
@@ -983,21 +1035,53 @@ const Game = {
                     payload.discoveredStops = StopDiscovery.getDiscoveredData();
                 }
 
+                // Derin Temizlik Uygula
                 const cleanPayload = this.sanitizeForFirebase(payload);
-                window.db.ref('otobus_simulasyonu/kullanicilar/' + cleanUser).update(cleanPayload).catch(e => {
-                    console.warn("Firebase bulut kayıt uyarısı:", e);
-                });
+
+                // 2. Akıllı Fark Kontrolü (Diff / Dirty-Check): Veri değişmediyse Firebase yazmasını atla
+                const payloadString = JSON.stringify(cleanPayload);
+                if (payloadString === this._lastFirebasePayloadHash) {
+                    return; // Hiçbir veri değişmedi, kota harcamadan sessizce çık
+                }
+
+                // 3. Paket Boyutu Tavanı (Payload Size Guard): 25 KB'yi aşarsa engelle
+                if (payloadString.length > this._maxPayloadBytes) {
+                    console.warn("[Firebase Shield] Paket boyutu sınırı aşıldı (" + payloadString.length + " bayt), ağ yazması durduruldu.");
+                    return;
+                }
+
+                // Zaman damgası ekle
+                cleanPayload.lastSavedTimestamp = Date.now();
+
+                // Firebase'e güvenli yaz
+                window.db.ref('otobus_simulasyonu/kullanicilar/' + cleanUser).update(cleanPayload)
+                    .then(() => {
+                        this._lastFirebaseWriteTime = Date.now();
+                        this._lastFirebasePayloadHash = payloadString;
+                        this._circuitBreaker.errorCount = 0; // Başarılı yazmada hata sayacını sıfırla
+                    })
+                    .catch(e => {
+                        this._circuitBreaker.errorCount++;
+                        if (this._circuitBreaker.errorCount >= this._circuitBreaker.tripThreshold) {
+                            this._circuitBreaker.blockedUntil = Date.now() + this._circuitBreaker.cooldownDurationMs;
+                            console.warn("[Firebase Sigortası Devrede] 3 ardışık hata nedeniyle Firebase istekleri 60 saniye duraklatıldı. Yerel kayıt aktif.");
+                        }
+                    });
             } catch (e) {
-                console.warn("Firebase bulut kayıt hatası:", e);
+                console.warn("[Firebase Shield] Koruma hatası yakalandı:", e);
             }
         };
 
-        if (immediate) {
+        const timeSinceLastWrite = now - this._lastFirebaseWriteTime;
+
+        if (immediate && timeSinceLastWrite >= 1000) {
             if (this._firebaseSaveTimer) clearTimeout(this._firebaseSaveTimer);
             performFirebaseSave();
         } else {
+            // Akıllı kuyruk: Cooldown süresi dolana kadar bekle, ardından tek seferde yaz
             if (this._firebaseSaveTimer) clearTimeout(this._firebaseSaveTimer);
-            this._firebaseSaveTimer = setTimeout(performFirebaseSave, 800);
+            const delay = Math.max(800, this._firebaseCooldownMs - timeSinceLastWrite);
+            this._firebaseSaveTimer = setTimeout(performFirebaseSave, delay);
         }
     },
 
