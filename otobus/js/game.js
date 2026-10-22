@@ -980,11 +980,59 @@ const Game = {
             UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
         }
     },
-    addMoney: function(amount) {
-        this.playerBudget += amount;
-        this.sessionMoney += amount;
+    addMoney: function(amount, isDirect = false) {
+        if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
+            return { captainShare: 0, companyShare: 0, companySharePercent: 50, totalFare: 0 };
+        }
+
+        if (isDirect) {
+            this.playerBudget += amount;
+            this.sessionMoney += amount;
+            this.saveData();
+            if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
+                UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+            }
+            return { captainShare: amount, companyShare: 0, companySharePercent: 0, totalFare: amount };
+        }
+
+        // Hasılat Paylaşım Oranını Belirle (Varsayılan %50 Şirkete Aktarılır, %50 Kaptana Kalır - Serbestçe Ayarlanabilir)
+        let sharePercent = 50;
+        if (typeof CompanySystem !== 'undefined') {
+            const empId = CompanySystem.data && CompanySystem.data.corporateEmployer;
+            if (empId) {
+                const comp = CompanySystem.getCompanyById(empId);
+                if (comp && typeof comp.companySharePercent === 'number') {
+                    sharePercent = comp.companySharePercent;
+                } else if (CompanySystem.data && typeof CompanySystem.data.revenueSharePercent === 'number') {
+                    sharePercent = CompanySystem.data.revenueSharePercent;
+                }
+            } else if (CompanySystem.data && typeof CompanySystem.data.revenueSharePercent === 'number') {
+                sharePercent = CompanySystem.data.revenueSharePercent;
+            }
+        }
+
+        // %50 Şirket Kasasına Aktar, %50 Kaptan Cüzdanında Kalsın
+        const companyShare = Math.round(amount * (sharePercent / 100));
+        const captainShare = amount - companyShare;
+
+        this.playerBudget += captainShare;
+        this.sessionMoney += captainShare;
         this.saveData();
-        UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+
+        if (companyShare > 0 && typeof CompanySystem !== 'undefined' && typeof CompanySystem.addCompanyRevenue === 'function') {
+            CompanySystem.addCompanyRevenue(companyShare);
+        }
+
+        if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
+            UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+        }
+
+        return {
+            captainShare: captainShare,
+            companyShare: companyShare,
+            companySharePercent: sharePercent,
+            totalFare: amount
+        };
     },
 
     deductMoney: function(amount) {
@@ -4021,8 +4069,9 @@ const Game = {
             fare = sehirRotalari[cityName].ucretler[pType];
         }
         
+        let splitRes = null;
         if (pType !== "yasli") {
-            this.addMoney(fare);
+            splitRes = this.addMoney(fare);
         }
         this.passengersOnBoard++;
         
@@ -4033,7 +4082,11 @@ const Game = {
         }
         
         let label = pType === "tam" ? "Tam" : (pType === "ogrenci" ? "Öğrenci" : "Serbest");
-        document.getElementById('passenger-feedback').innerText = `${label} basıldı. ${fare > 0 ? fare + ' â‚º alındı.' : 'Ücretsiz geçiş.'}`;
+        if (fare > 0 && splitRes && splitRes.companyShare > 0) {
+            document.getElementById('passenger-feedback').innerText = `${label} basıldı. ${fare} ₺ (%${splitRes.companySharePercent} Şirket: ${splitRes.companyShare} ₺, Kaptan: ${splitRes.captainShare} ₺).`;
+        } else {
+            document.getElementById('passenger-feedback').innerText = `${label} basıldı. ${fare > 0 ? fare + ' ₺ alındı.' : 'Ücretsiz geçiş.'}`;
+        }
         document.getElementById('passenger-feedback').style.color = 'var(--secondary)';
         
         if (!isStanding) {
