@@ -22,12 +22,12 @@
             revenueSharePercent: 50,       // %50 Şirket Kasasına, %50 Kaptana (Serbestçe değiştirilebilir)
             cateringPackage: 'standart',   // 'ekonomik' | 'standart' | 'vip'
             institutions: {
-                garage_maintenance: 1,  // 1: Sanayi Kanalı, 2: Yetkili Servis Hangarı, 3: Entegre Otobüs Fabrikası
-                driver_academy: 1,      // 1: Otogar Odası, 2: Simülatör Laboratuvarı, 3: Karayolu Enstitüsü
-                ticketing_network: 1,   // 1: Gişe & Manuel, 2: Dijital Çağrı Merkezi, 3: Küresel Rezervasyon Ağı
-                catering_logistics: 1,  // 1: Bakkal/Toptancı, 2: Soğuk Hava Deposu, 3: Gurme Catering Üssü
-                highway_resort: 1,      // 1: Çay Ocağı Durağı, 2: Dinlenme Tesisi, 3: Mega Yaşam Parkı
-                fleet_operations: 1     // 1: Telefon/Telsiz, 2: GPS Uydu Masası, 3: Başharekât Komuta Merkezi
+                headquarters: 1,       // 1. Merkez Yönetim Ofisi / Genel Müdürlük (B1 Yasal Zorunluluk)
+                bus_garage: 1,         // 2. Araç Park Sahası / Garaj (B1 Yasal Zorunluluk)
+                terminal_offices: 1,   // 3. Otogar Yazıhaneleri & Peron Ağı (B1 Yasal & Operasyonel)
+                maintenance_depot: 1,  // 4. Bakım, Onarım ve Yıkama Atölyesi (Kademe Binası)
+                driver_lodging: 1,     // 5. Personel Dinlenme Evi / Kaptan Lojmanı (Takograf İhtiyacı)
+                city_agencies: 1       // 6. Şehir İçi Bilet Satış Acenteleri & Terminal Shuttle
             },
             satisfactionRating: 4.9,       // 1.0 - 5.0 (Yıldız Değerlendirmesi)
             terminalBranches: {            // Otogar Yazıhaneleri
@@ -554,232 +554,241 @@
         },
 
 
-        // OTOBÜS KURUMLARI VE TESİSLERİ SEVİYE SİSTEMİ
+                // T.C. ULAŞTIRMA VE ALTYAPI BAKANLIĞI - KARAYOLU TAŞIMA YÖNETMELİĞİ (B1 YETKİ BELGESİ BİNALARI)
         institutionsData: [
             {
-                id: "garage_maintenance",
-                name: "Otobüs Bakım Onarım & Kademe Merkezi",
-                icon: "🛠️",
-                category: "Teknik Servis & Garaj",
-                desc: "Otobüslerin motor revizyonu, şasi kontrolü, fren testleri ve periyodik ağır bakımlarının yapıldığı teknik merkez.",
+                id: "headquarters",
+                name: "Merkez Yönetim Ofisi / Genel Müdürlük",
+                icon: "🏛️",
+                category: "B1 Belgesi Yasal Zorunluluk",
+                desc: "Ulaştırma Bakanlığı B1 Taşıma Yetki Belgesi için zorunlu tescilli merkez adresi. Şirketin tüzel kişiliği, hat izinleri, personel sözleşmeleri, hukuki süreçler ve filo sevk idaresinin yürütüldüğü idari merkez.",
                 levels: [
                     {
                         level: 1,
-                        title: "İlçe Sanayi Kanal Çukuru & Yağ Değişimi",
-                        badge: "🥉 Seviye 1: Temel Bakım",
+                        title: "Kiralanan Bağımsız Şirket Ofisi",
+                        badge: "🥉 Seviye 1: Bağımsız Ofis",
                         cost: 0,
-                        perkDesc: "Otobüs hasar onarım masrafında %10 indirim.",
-                        perkShort: "%10 Tamir İndirimi",
-                        effects: { repairDiscount: 0.10, wearRate: 1.0, fuelSave: 0.0 }
+                        perkDesc: "Yasal B1 Taşıma Yetki Belgesi ruhsatı tescillidir. Tüm resmi şehirlerarası hat başvuruları ve sefer izinleri aktiftir.",
+                        perkShort: "B1 Ruhsatı & Yasal Sefer İzni",
+                        effects: { tripSpeedBonus: 0, ticketCancelAvoid: 0 }
                     },
                     {
                         level: 2,
-                        title: "Modern Kademe & Yetkili Servis Hangarı",
-                        badge: "🥈 Seviye 2: Yetkili Servis",
+                        title: "Bağımsız İş Merkezi & Plaza İdari Katı",
+                        badge: "🥈 Seviye 2: Plaza İdari Katı",
                         cost: 40000,
-                        perkDesc: "Tamir masraflarında %30 indirim, araç yıpranma hızı %25 yavaşlar, H tuşunda arıza teşhisi.",
-                        perkShort: "%30 Tamir İndirimi, %25 Daha Az Aşınma",
-                        effects: { repairDiscount: 0.30, wearRate: 0.75, fuelSave: 0.05 }
+                        perkDesc: "Hukuki süreçler ve hat izinleri hızlanır, sefer izin harçlarında %25 indirim sağlanır, idari cezalardan muafiyet kazanılır.",
+                        perkShort: "Hızlı Hat İzinleri, -%25 İdari Harç",
+                        effects: { tripSpeedBonus: 0.20, ticketCancelAvoid: 0.50 }
                     },
                     {
                         level: 3,
-                        title: "Entegre Otobüs Fabrika & Revizyon Üssü",
-                        badge: "🥇 Seviye 3: Mega Kademe (MAX)",
-                        cost: 110000,
-                        perkDesc: "Tamir masraflarında %60 indirim, sıfır motor arıza riski, sefer başı araç kondisyonu %100'e yakın kalır, tüm filonun yakıt tasarrufu +%15.",
-                        perkShort: "%60 Tamir İndirimi, Sıfır Arıza Riski, +%15 Yakıt Tasarrufu",
-                        effects: { repairDiscount: 0.60, wearRate: 0.50, fuelSave: 0.15 }
+                        title: "Şirket Genel Müdürlük Plaza Binası (Mülk Holding Binası)",
+                        badge: "🥇 Seviye 3: Holding Genel Müdürlüğü (MAX)",
+                        cost: 120000,
+                        perkDesc: "Türkiye genelinde sınırsız hat açma yetkisi, kurumsal genel müdürlük prestijiyle bilet hasılatında +%30 kalıcı prim, filo yönetim hızı %40 artar.",
+                        perkShort: "+%30 Bilet Marka Primi, Sınırsız Hat Tescili",
+                        effects: { tripSpeedBonus: 0.40, ticketCancelAvoid: 1.0 }
                     }
                 ]
             },
             {
-                id: "driver_academy",
-                name: "Ulaştırma & Kaptanlık Akademisi",
-                icon: "🎓",
-                category: "Kaptan Eğitimi & İnsan Kaynakları",
-                desc: "Kaptanların ileri sürüş teknikleri (anti-skid, karlı zemin), yolcu psikolojisi, takograf mevzuatı ve güvenli seyir eğitimi aldığı kampüs.",
+                id: "bus_garage",
+                name: "Araç Park Alanı & Filo Garaj Sahası",
+                icon: "🅿️",
+                category: "B1 Belgesi Yasal Zorunluluk",
+                desc: "Yönetmelik gereği tescilli koltuk kapasitesine oranla araçların güvenle park edilmesi, geceleme yapması ve boş beklemelerinin yapıldığı tescilli açık/kapalı saha.",
                 levels: [
                     {
                         level: 1,
-                        title: "Otogar Kaptanlar Odası & Temel Brifing",
-                        badge: "🥉 Seviye 1: Temel Eğitim",
+                        title: "Kiralanan Tescilli Açık Park Sahası (5 Otobüs)",
+                        badge: "🥉 Seviye 1: 5 Araçlık Açık Saha",
                         cost: 0,
-                        perkDesc: "Kaptanlara temel güzergâh oryantasyonu (+%5 sefer primi).",
-                        perkShort: "+%5 Sefer Primi",
-                        effects: { xpMultiplier: 1.0, tipBonus: 0.05, fatigueReduction: 0 }
+                        perkDesc: "5 araca kadar yasal geceleme ve park sahası (Temel B1 garaj şartı karşılandı).",
+                        perkShort: "5 Otobüslük Yasal Park",
+                        effects: { capacity: 5 }
                     },
                     {
                         level: 2,
-                        title: "İleri Sürüş Simülatör Laboratuvarı & Kaptan Misafirhanesi",
-                        badge: "🥈 Seviye 2: Simülatör Kampüsü",
+                        title: "Özel Asfalt Kaplama Güvenlikli Filo Garaj Sahası (15 Otobüs)",
+                        badge: "🥈 Seviye 2: 15 Araçlık Güvenlikli Garaj",
                         cost: 45000,
-                        perkDesc: "Çalışan kaptanların tecrübe (XP) kazanım hızı x1.5 katına çıkar, kaza/ceza riski %40 azalır, sefer başı bahşiş +%20.",
-                        perkShort: "x1.5 XP Kazanımı, -%40 Ceza Riski, +%20 Bahşiş",
-                        effects: { xpMultiplier: 1.5, tipBonus: 0.20, fatigueReduction: 0.3 }
+                        perkDesc: "15 araca kadar tescilli geniş park kapasitesi, 7/24 özel güvenlik, geceleme hasar ve parça hırsızlığı riski sıfır.",
+                        perkShort: "15 Otobüs Kapasitesi, Sıfır Gece Hasarı",
+                        effects: { capacity: 15 }
                     },
                     {
                         level: 3,
-                        title: "Uluslararası Karayolu Taşımacılık Enstitüsü",
-                        badge: "🥇 Seviye 3: Uluslararası Akademi (MAX)",
-                        cost: 125000,
-                        perkDesc: "Tüm filonun sefer verimi x2 katına çıkar, otomatik seferlerden gelen hasılat +%35 artar, kaptan yorgunluğu sıfırlanır, efsane transferler açılır.",
-                        perkShort: "x2.0 XP Kazanımı, +%35 Otomatik Sefer Hasılatı, Sıfır Yorgunluk",
-                        effects: { xpMultiplier: 2.0, tipBonus: 0.35, fatigueReduction: 1.0 }
-                    }
-                ]
-            },
-            {
-                id: "ticketing_network",
-                name: "Merkezi Biletleme & Rezervasyon Kurumu",
-                icon: "🌐",
-                category: "Acente Dağıtım & Çağrı Merkezi",
-                desc: "Online seyahat platformları (Obilet/Biletall entegrasyonu), otogar peron gişeleri ve 7/24 rezervasyon santralinin yönetildiği kurum.",
-                levels: [
-                    {
-                        level: 1,
-                        title: "Otogar Bilet Gişesi & Manuel Bilet Koçanı",
-                        badge: "🥉 Seviye 1: Yerel Gişe",
-                        cost: 0,
-                        perkDesc: "Klasik peron bilet satışı ve standart yolcu talebi.",
-                        perkShort: "Standart Bilet Hacmi",
-                        effects: { demandMultiplier: 1.0, revenueBonus: 0 }
-                    },
-                    {
-                        level: 2,
-                        title: "7/24 Dijital Çağrı Merkezi & Online Bilet Portalı",
-                        badge: "🥈 Seviye 2: Dijital Acente Ağı",
-                        cost: 50000,
-                        perkDesc: "Tüm hatlarda yolcu talebi +%35 artar, otobüsler en az %85 dolulukla sefere başlar, bilet iptalleri düşer.",
-                        perkShort: "+%35 Yolcu Talebi, Minimum %85 Doluluk",
-                        effects: { demandMultiplier: 1.35, revenueBonus: 0.15 }
-                    },
-                    {
-                        level: 3,
-                        title: "Merkezi Global Biletleme & Seyahat Konsorsiyumu",
-                        badge: "🥇 Seviye 3: Global Rezervasyon Ağı (MAX)",
+                        title: "Tam Entegre Kapalı Lojistik Garaj & Peron Kompleksi (Sınırsız Filo)",
+                        badge: "🥇 Seviye 3: Entegre Lojistik Garaj (MAX)",
                         cost: 130000,
-                        perkDesc: "Bilet hasılatı +%60 artar, doluluk oranı daima %95+ olur, uluslararası acente dağıtım ağı sayesinde her bilet satışından ekstra acente komisyonu şirkete akar.",
-                        perkShort: "+%60 Bilet Geliri, %95+ Doluluk, Pasif Acente Kârı",
-                        effects: { demandMultiplier: 1.60, revenueBonus: 0.35 }
+                        perkDesc: "Sınırsız otobüs park kapasitesi, kapalı geceleme hangarı, otobüslerin sabah sefere hazırlanma süresi yarıya iner, filo işletme maliyeti düşer.",
+                        perkShort: "Sınırsız Park Kapasitesi, Hızlı Sefer Hazırlığı",
+                        effects: { capacity: 999 }
                     }
                 ]
             },
             {
-                id: "catering_logistics",
-                name: "Karayolu Lojistik & İkram Tedarik Kurumu",
-                icon: "🍽️",
-                category: "Catering & İkram Deposu",
-                desc: "Otobüs içi servis edilen sıcak/soğuk içecekler, kekler, sandviçler, limon kolonyaları ve hijyen kitlerinin tedarik edildiği dev lojistik üssü.",
+                id: "terminal_offices",
+                name: "Otogar Yazıhaneleri & Peron Ağı",
+                icon: "🏢",
+                category: "Operasyonel & Yasal Zorunluluk",
+                desc: "Otobüslerin yolcu indirip bindireceği her şehirdeki resmi şehirlerarası otobüs terminallerinde kiralanan gişe/yazıhane ofisleri (korsan duraklama yasaktır).",
                 levels: [
                     {
                         level: 1,
-                        title: "Yerel Bakkal & Hal Toptancısı Tedariği",
-                        badge: "🥉 Seviye 1: Temel Tedarik",
+                        title: "Merkez Otogar Yazıhanesi (Tekirdağ Süleymanpaşa)",
+                        badge: "🥉 Seviye 1: Merkez Yazıhane",
                         cost: 0,
-                        perkDesc: "Standart ikram maliyetleri ve peron ikram stoğu.",
-                        perkShort: "Standart İkram",
-                        effects: { costDiscount: 0, tipBonus: 0, satisfactionBoost: 1.0 }
-                    },
-                    {
-                        level: 2,
-                        title: "Soğuk Hava Depolu İkram Lojistik Merkezi",
-                        badge: "🥈 Seviye 2: Lojistik Merkez",
-                        cost: 35000,
-                        perkDesc: "'I' tuşu ile yapılan ikramların maliyeti %40 ucuzlar, yolcu memnuniyeti daima yüksek kalır, yolcu bahşişleri +%30 artar.",
-                        perkShort: "%40 Ucuz İkram Maliyeti, +%30 Yolcu Bahşişi",
-                        effects: { costDiscount: 0.40, tipBonus: 0.30, satisfactionBoost: 1.5 }
-                    },
-                    {
-                        level: 3,
-                        title: "Endüstriyel Karayolu Gurme Catering Fabrikası",
-                        badge: "🥇 Seviye 3: Gurme Catering Üssü (MAX)",
-                        cost: 95000,
-                        perkDesc: "İkram maliyetleri %100 sıfırlanır (şirketimizin kendi üretimi), Jumbo VIP ikramda yolcular astronomik bahşiş bırakır (+%75 bahşiş) ve şirket memnuniyeti 5.0 yıldıza kilitlenir.",
-                        perkShort: "Ücretsiz İkram Üretimi, +%75 Bahşiş, 5.0 Sabit Memnuniyet",
-                        effects: { costDiscount: 1.0, tipBonus: 0.75, satisfactionBoost: 2.5 }
-                    }
-                ]
-            },
-            {
-                id: "highway_resort",
-                name: "Şirkete Ait Otoyol Dinlenme Tesisi",
-                icon: "☕",
-                category: "Mola & Yaşam Merkezi",
-                desc: "Otoyol güzergahlarında yolcuların 30 dakika mola verdiği, şirketin mülkiyetindeki dinlenme, restoran ve yaşam kompleksi.",
-                levels: [
-                    {
-                        level: 1,
-                        title: "Otoyol Kenarı Mola İstasyonu & Çay Ocağı",
-                        badge: "🥉 Seviye 1: Mola Noktası",
-                        cost: 0,
-                        perkDesc: "Molalarda yolculara ücretsiz çay ikramı.",
-                        perkShort: "Mola Çay İkramı",
+                        perkDesc: "Resmi otogar peronundan yasal kalkış ve bilet satışı.",
+                        perkShort: "Merkez Peron İzni",
                         effects: { passiveDividend: 0, fuelDiscount: 0 }
                     },
                     {
                         level: 2,
-                        title: "Kapsamlı Karayolu Dinlenme Tesisi (Restoran & Market)",
-                        badge: "🥈 Seviye 2: Dinlenme Tesisi",
-                        cost: 65000,
-                        perkDesc: "Filodaki her sefer dinlenme tesisinden geçerken şirkete restoran ve market kâr payı bırakır (sefer başı +1.500 ₺ pasif gelir), akaryakıt dolumu şirket araçlarına %30 indirimli olur.",
-                        perkShort: "Sefer Başı +1.500 ₺ Pasif Gelir, %30 Akaryakıt İndirimi",
+                        title: "Bölgesel Otogar Yazıhane & Peron Ağı (Çorlu, Esenler, AŞTİ)",
+                        badge: "🥈 Seviye 2: Büyükşehir Peronları",
+                        cost: 50000,
+                        perkDesc: "Büyük metropol otogarlarında resmi peron hakimiyeti, korsan cezalarından tam muafiyet, sefer başı +1.500 ₺ otogar kâr payı, akaryakıt dolumu %30 indirimli.",
+                        perkShort: "+%40 Yolcu Hacmi, +1.500 ₺ Sefer Payı",
                         effects: { passiveDividend: 1500, fuelDiscount: 0.30 }
                     },
                     {
                         level: 3,
-                        title: "Mega Karayolu Yaşam Kompleksi (Otel, AVM & SPA)",
-                        badge: "🥇 Seviye 3: Mega Mola Parkı (MAX)",
-                        cost: 160000,
-                        perkDesc: "Her seferden +3.500 ₺ tesis kârı, diğer şirketlerin otobüsleri de tesisimize uğrayarak komisyon öder, şirket araçlarına akaryakıt ve dış yıkama %100 BEDAVA olur!",
-                        perkShort: "Sefer Başı +3.500 ₺ Pasif Gelir, %100 Ücretsiz Akaryakıt",
+                        title: "Türkiye Geneli Ulusal Otogar Yazıhane Konsorsiyumu",
+                        badge: "🥇 Seviye 3: Ulusal Otogar Ağı (MAX)",
+                        cost: 140000,
+                        perkDesc: "Tüm büyükşehir terminallerinde 1 numaralı VIP peron önceliği, otogar çıkış harçlarında %30 indirim, sefer başı +3.500 ₺ pasif terminal kâr payı, şirket araçlarına akaryakıt %100 BEDAVA!",
+                        perkShort: "+3.500 ₺ Sefer Kârı, %100 Ücretsiz Akaryakıt",
                         effects: { passiveDividend: 3500, fuelDiscount: 1.0 }
                     }
                 ]
             },
             {
-                id: "fleet_operations",
-                name: "Filo Takip & Operasyon Kontrol Merkezi",
-                icon: "📡",
-                category: "Harekât & Uydu Komuta Merkezi",
-                desc: "Otobüslerin anlık GPS konumunu, takograf hız ve dinlenme sürelerini, hava durumunu ve güzergâh trafiğini uydudan izleyen harekât merkezi.",
+                id: "maintenance_depot",
+                name: "Bakım, Onarım ve Yıkama Atölyesi (Kademe Binası)",
+                icon: "🛠️",
+                category: "Teknik Servis & Hijyen Altyapısı",
+                desc: "Yüksek tavanlı kapalı tamir hangarı (lift ve kanallı), su giderli yıkama peronu ve yedek parça ambarı. Yağ değişimi, fren bakımı, lastik değişimi ve her sefer öncesi dış fırçalama ile iç dezenfeksiyon işlemleri.",
                 levels: [
                     {
                         level: 1,
-                        title: "Masa Başı Telsiz & Telefon İletişim Masası",
-                        badge: "🥉 Seviye 1: Temel Takip Masası",
+                        title: "Anlaşmalı Sanayi Servisi & Kanal Çukuru",
+                        badge: "🥉 Seviye 1: Temel Kademe",
                         cost: 0,
-                        perkDesc: "Telefon ve telsizle şoförlerden manuel bilgi alma.",
-                        perkShort: "Temel Telsiz İletişimi",
-                        effects: { tripSpeedBonus: 0, ticketCancelAvoid: 0 }
+                        perkDesc: "Rutin yağ ve lastik değişimi (%10 tamir indirimi).",
+                        perkShort: "%10 Tamir İndirimi",
+                        effects: { repairDiscount: 0.10, wearRate: 1.0, fuelSave: 0.0 }
                     },
                     {
                         level: 2,
-                        title: "Dijital Takograf & GPS Uydu Filo İzleme Masası",
-                        badge: "🥈 Seviye 2: Uydu Takip Masası",
+                        title: "Şirkete Ait Kapalı Kademe Hangarı & Otomatik Yıkama Peronu",
+                        badge: "🥈 Seviye 2: Servis Hangarı & Yıkama",
                         cost: 45000,
-                        perkDesc: "Şoförlerin otomatik sefer tamamlama süresi %20 hızlanır, radar/hız cezaları %50 engellenir, telsizden rota sinerjisi uyarısı gelir.",
-                        perkShort: "%20 Daha Hızlı Otomatik Sefer, -%50 Ceza Riski",
-                        effects: { tripSpeedBonus: 0.20, ticketCancelAvoid: 0.50 }
+                        perkDesc: "Tamir masraflarında %35 indirim, sefer öncesi otomatik fırçalı yıkama ve dezenfeksiyon ile yolcu konforuna doğrudan katkı, araç yıpranma hızı %25 yavaşlar.",
+                        perkShort: "%35 Tamir İndirimi, Otomatik Dış Yıkama, %25 Az Aşınma",
+                        effects: { repairDiscount: 0.35, wearRate: 0.75, fuelSave: 0.05 }
                     },
                     {
                         level: 3,
-                        title: "7/24 Kesintisiz Karayolu Harekât & Sevkiyat Komuta Merkezi",
-                        badge: "🥇 Seviye 3: Kesintisiz Sevkiyat & Harekât (MAX)",
-                        cost: 120000,
-                        perkDesc: "Deneyimli başharekâtçılar sayesinde sefer süreleri %40 hızlanır, kaza ve gecikme riski %0'a iner, yol ve hava muhalefeti anında çözülür, en kârlı rotalar belirlenir.",
-                        perkShort: "%40 Hızlı Sefer, Sıfır Gecikme, Profesyonel Sevkiyat",
-                        effects: { tripSpeedBonus: 0.40, ticketCancelAvoid: 1.0 }
+                        title: "Entegre Otobüs Revizyon Hangarı, Test Pisti & Ağır Bakım Üssü",
+                        badge: "🥇 Seviye 3: Mega Kademe Üssü (MAX)",
+                        cost: 125000,
+                        perkDesc: "Tamir masraflarında %65 indirim, sıfır motor arıza riski, tüm filonun yakıt tüketiminde %15 tasarruf, sefer başı araç kondisyonu daima %100'e yakın kalır.",
+                        perkShort: "%65 Tamir İndirimi, Sıfır Arıza Riski, +%15 Yakıt Tasarrufu",
+                        effects: { repairDiscount: 0.65, wearRate: 0.50, fuelSave: 0.15 }
+                    }
+                ]
+            },
+            {
+                id: "driver_lodging",
+                name: "Personel Dinlenme Evi / Kaptan Lojmanı",
+                icon: "🛏️",
+                category: "Güvenlik & Yasal Takograf İhtiyacı",
+                desc: "Şoförlerin yasal takograf dinlenme sürelerini doldurabilmesi için garaj sahası veya otogar yakınında kiralanan/kurulan gürültüden uzak uyku, sıcak duş ve dinlenme lojmanı.",
+                levels: [
+                    {
+                        level: 1,
+                        title: "Otogar Şoförler Odası & Dinlenme Birimi",
+                        badge: "🥉 Seviye 1: Dinlenme Odası",
+                        cost: 0,
+                        perkDesc: "Temel takograf dinlenme süresi ve sefer brifingi (+%5 sefer primi).",
+                        perkShort: "+%5 Sefer Primi",
+                        effects: { xpMultiplier: 1.0, tipBonus: 0.05, fatigueReduction: 0 }
+                    },
+                    {
+                        level: 2,
+                        title: "Müstakil Kaptan Misafirhanesi & Lojman (Sıcak Duş, Yatak, Kafeterya)",
+                        badge: "🥈 Seviye 2: Kaptan Lojmanı",
+                        cost: 40000,
+                        perkDesc: "Şoförlerin dinlenme süresi %50 daha hızlı geçer (dinlenme süresi yarıya iner), yorgunluk kaynaklı kaza ve ceza riski %40 azalır, tecrübe kazanımı x1.5 katına çıkar.",
+                        perkShort: "x1.5 XP, -%50 Dinlenme Süresi, -%40 Ceza Riski",
+                        effects: { xpMultiplier: 1.5, tipBonus: 0.20, fatigueReduction: 0.5 }
+                    },
+                    {
+                        level: 3,
+                        title: "5 Yıldızlı Kaptan Oteli & Sosyal Yaşam Kampüsü",
+                        badge: "🥇 Seviye 3: Kaptan Oteli & Kampüs (MAX)",
+                        cost: 115000,
+                        perkDesc: "Şoför dinlenme süresi %75 kısalır, kaptanlar daima %100 moralle sefere çıkar, filonun sefer verimi x2.0 katına ulaşır, sefer başı bahşiş ve puan tavan yapar.",
+                        perkShort: "x2.0 Sefer Verimi, Anında Zindelik, Tavan Bahşiş",
+                        effects: { xpMultiplier: 2.0, tipBonus: 0.35, fatigueReduction: 1.0 }
+                    }
+                ]
+            },
+            {
+                id: "city_agencies",
+                name: "Şehir İçi Bilet Satış Acenteleri & Terminal Shuttle (Servis) Ağı",
+                icon: "🏬",
+                category: "Doğrudan Satış & Yolcu Shuttle Ağı",
+                desc: "Şehir merkezindeki yolcuların bilet temin ettiği ve terminallere ücretsiz servis araçlarıyla (shuttle) ulaştırıldığı cadde üzeri bilet acenteleri ve servis filosu.",
+                levels: [
+                    {
+                        level: 1,
+                        title: "Cadde Üzeri Bilet Satış Noktası",
+                        badge: "🥉 Seviye 1: Şehir İçi Gişe",
+                        cost: 0,
+                        perkDesc: "Şehir merkezinden doğrudan bilet satışı ve standart yolcu akışı.",
+                        perkShort: "Merkezi Bilet Satışı",
+                        effects: { demandMultiplier: 1.0, revenueBonus: 0 }
+                    },
+                    {
+                        level: 2,
+                        title: "Bölgesel Cadde Acente Ağı & Ücretsiz Terminal Servis (Shuttle) Filosu",
+                        badge: "🥈 Seviye 2: Acente & Shuttle Filosu",
+                        cost: 50000,
+                        perkDesc: "Şehir içi ücretsiz ring servisleri yolcuları doğrudan otogara taşır. Bilet talebi +%35 artar, otobüsler en az %85 dolulukla sefere çıkar, bilet hasılat primi +%15.",
+                        perkShort: "+%35 Yolcu Talebi, Ücretsiz Terminal Servisi",
+                        effects: { demandMultiplier: 1.35, revenueBonus: 0.15 }
+                    },
+                    {
+                        level: 3,
+                        title: "Ulusal Acente Dağıtım Ağı & VIP Adrese Servis Transferi",
+                        badge: "🥇 Seviye 3: Ulusal Acente & VIP Shuttle (MAX)",
+                        cost: 135000,
+                        perkDesc: "Bilet hasılatında +%50 kalıcı artış, her acenteden şirkete düzenli komisyon kârı (pasif gelir), kapıdan kapıya VIP transfer güvencesi.",
+                        perkShort: "+%50 Bilet Hasılatı, Pasif Acente Geliri, VIP Shuttle",
+                        effects: { demandMultiplier: 1.60, revenueBonus: 0.35 }
                     }
                 ]
             }
         ],
 
-        // Kurumun Mevcut Seviyesini Al (1 - 3)
+        // Kurumun Mevcut Seviyesini Al (1 - 3, Takma İsimler / Aliases Destekli)
         getInstitutionLevel: function(instId) {
             if (!this.data.institutions) {
                 this.data.institutions = {};
             }
-            return this.data.institutions[instId] || 1;
+            const aliases = {
+                garage_maintenance: 'maintenance_depot',
+                driver_academy: 'driver_lodging',
+                ticketing_network: 'city_agencies',
+                catering_logistics: 'maintenance_depot',
+                highway_resort: 'terminal_offices',
+                fleet_operations: 'headquarters'
+            };
+            const targetKey = aliases[instId] || instId;
+            return this.data.institutions[instId] || this.data.institutions[targetKey] || 1;
         },
 
         // Kurum Büyütme / Seviye Atlama Sesi (Majör Arpej)
@@ -809,6 +818,16 @@
 
         // Kurumu Büyüt / Seviye Yükselt
         upgradeInstitution: function(instId) {
+            const aliases = {
+                garage_maintenance: 'maintenance_depot',
+                driver_academy: 'driver_lodging',
+                ticketing_network: 'city_agencies',
+                catering_logistics: 'maintenance_depot',
+                highway_resort: 'terminal_offices',
+                fleet_operations: 'headquarters'
+            };
+            const targetKey = aliases[instId] || instId;
+            instId = targetKey;
             const inst = this.institutionsData.find(i => i.id === instId);
             if (!inst) return;
             const currentLevel = this.getInstitutionLevel(instId);
@@ -890,10 +909,10 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
                     <div>
                         <div style="color: #38bdf8; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                            <span>🏛️</span> <span>Otobüs Kurumları & Tesis Seviye Sistemi</span>
+                            <span>🇹🇷</span> <span>B1 YETKİ BELGESİ — YASAL VE OPERASYONEL ALTYAPI</span>
                         </div>
                         <div style="color: #cbd5e1; font-size: 0.88rem; margin-top: 3px;">
-                            Otobüs bakım kademenizi, kaptan akademisini, biletleme ağını ve dinlenme tesisinizi büyüterek şirketinize kalıcı devasa güç kazandırın.
+                            T.C. Ulaştırma ve Altyapı Bakanlığı Karayolu Taşıma Yönetmeliği uyarınca B1 belgeli şehirlerarası yolcu şirketlerinin sahip olması gereken 6 fiziki alan ve yasal bina altyapısı:
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -1534,12 +1553,12 @@
                     // Eksik alanları tamamla
                     if (!this.data.institutions) {
                         this.data.institutions = {
-                            garage_maintenance: 1,
-                            driver_academy: 1,
-                            ticketing_network: 1,
-                            catering_logistics: 1,
-                            highway_resort: 1,
-                            fleet_operations: 1
+                            headquarters: 1,
+                            bus_garage: 1,
+                            terminal_offices: 1,
+                            maintenance_depot: 1,
+                            driver_lodging: 1,
+                            city_agencies: 1
                         };
                     }
                     if (!this.data.hqUpgrades) {
@@ -2545,7 +2564,7 @@
                             🚌 Kendi Filom & Şoförlerim
                         </button>
                         <button id="tab-comp-institutions" class="modern-btn nav-item" style="flex: 1; min-width: 150px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            🏛️ Otobüs Kurumları & Tesisler
+                            🏛️ Yasal Binalar & Garaj (B1 Belgesi)
                         </button>
                         <button id="tab-comp-corporate-work" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
                             👔 Var Olan Bir Şirkete Katıl (Maaşlı)
@@ -2692,7 +2711,7 @@
                                 if (other.tabId === t.tabId) {
                                 if (t.tabId === 'tab-comp-institutions') {
                                         if (typeof audio !== 'undefined' && audio.speak) {
-                                            audio.speak("Otobüs kurumları ve tesis büyütme merkezi açıldı. 6 adet kurumunuzu büyüterek Seviye 3 zirvesine taşıyabilirsiniz.");
+                                            audio.speak("Ulaştırma Bakanlığı B1 Taşıma Yetki Belgesi yasal binalar ve tesisler menüsü açıldı. Merkez ofis, garaj, otogar yazıhaneleri, kademe, kaptan lojmanı ve şehir içi servis acentelerini büyütebilirsiniz.");
                                         }
                                     } else if (t.tabId === 'tab-comp-catering') {
                                         if (typeof audio !== 'undefined' && audio.speak) {
