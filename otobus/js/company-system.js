@@ -21,6 +21,14 @@
             companyTreasury: 50000,        // Şirket Kasası Bakiyesi (₺)
             revenueSharePercent: 50,       // %50 Şirket Kasasına, %50 Kaptana (Serbestçe değiştirilebilir)
             cateringPackage: 'standart',   // 'ekonomik' | 'standart' | 'vip'
+            institutions: {
+                garage_maintenance: 1,  // 1: Sanayi Kanalı, 2: Yetkili Servis Hangarı, 3: Entegre Otobüs Fabrikası
+                driver_academy: 1,      // 1: Otogar Odası, 2: Simülatör Laboratuvarı, 3: Karayolu Enstitüsü
+                ticketing_network: 1,   // 1: Gişe & Manuel, 2: Dijital Çağrı Merkezi, 3: Küresel Rezervasyon Ağı
+                catering_logistics: 1,  // 1: Bakkal/Toptancı, 2: Soğuk Hava Deposu, 3: Gurme Catering Üssü
+                highway_resort: 1,      // 1: Çay Ocağı Durağı, 2: Dinlenme Tesisi, 3: Mega Yaşam Parkı
+                fleet_operations: 1     // 1: Telefon/Telsiz, 2: GPS Uydu Masası, 3: Yapay Zeka Harekât
+            },
             satisfactionRating: 4.9,       // 1.0 - 5.0 (Yıldız Değerlendirmesi)
             terminalBranches: {            // Otogar Yazıhaneleri
                 tekirdag: true,
@@ -545,7 +553,454 @@
             });
         },
 
-// Şirket Arama (Kaptan + Kurumsal)
+
+        // OTOBÜS KURUMLARI VE TESİSLERİ SEVİYE SİSTEMİ
+        institutionsData: [
+            {
+                id: "garage_maintenance",
+                name: "Otobüs Bakım Onarım & Kademe Merkezi",
+                icon: "🛠️",
+                category: "Teknik Servis & Garaj",
+                desc: "Otobüslerin motor revizyonu, şasi kontrolü, fren testleri ve periyodik ağır bakımlarının yapıldığı teknik merkez.",
+                levels: [
+                    {
+                        level: 1,
+                        title: "İlçe Sanayi Kanal Çukuru & Yağ Değişimi",
+                        badge: "🥉 Seviye 1: Temel Bakım",
+                        cost: 0,
+                        perkDesc: "Otobüs hasar onarım masrafında %10 indirim.",
+                        perkShort: "%10 Tamir İndirimi",
+                        effects: { repairDiscount: 0.10, wearRate: 1.0, fuelSave: 0.0 }
+                    },
+                    {
+                        level: 2,
+                        title: "Modern Kademe & Yetkili Servis Hangarı",
+                        badge: "🥈 Seviye 2: Yetkili Servis",
+                        cost: 40000,
+                        perkDesc: "Tamir masraflarında %30 indirim, araç yıpranma hızı %25 yavaşlar, H tuşunda arıza teşhisi.",
+                        perkShort: "%30 Tamir İndirimi, %25 Daha Az Aşınma",
+                        effects: { repairDiscount: 0.30, wearRate: 0.75, fuelSave: 0.05 }
+                    },
+                    {
+                        level: 3,
+                        title: "Entegre Otobüs Fabrika & Revizyon Üssü",
+                        badge: "🥇 Seviye 3: Mega Kademe (MAX)",
+                        cost: 110000,
+                        perkDesc: "Tamir masraflarında %60 indirim, sıfır motor arıza riski, sefer başı araç kondisyonu %100'e yakın kalır, tüm filonun yakıt tasarrufu +%15.",
+                        perkShort: "%60 Tamir İndirimi, Sıfır Arıza Riski, +%15 Yakıt Tasarrufu",
+                        effects: { repairDiscount: 0.60, wearRate: 0.50, fuelSave: 0.15 }
+                    }
+                ]
+            },
+            {
+                id: "driver_academy",
+                name: "Ulaştırma & Kaptanlık Akademisi",
+                icon: "🎓",
+                category: "Kaptan Eğitimi & İnsan Kaynakları",
+                desc: "Kaptanların ileri sürüş teknikleri (anti-skid, karlı zemin), yolcu psikolojisi, takograf mevzuatı ve güvenli seyir eğitimi aldığı kampüs.",
+                levels: [
+                    {
+                        level: 1,
+                        title: "Otogar Kaptanlar Odası & Temel Brifing",
+                        badge: "🥉 Seviye 1: Temel Eğitim",
+                        cost: 0,
+                        perkDesc: "Kaptanlara temel güzergâh oryantasyonu (+%5 sefer primi).",
+                        perkShort: "+%5 Sefer Primi",
+                        effects: { xpMultiplier: 1.0, tipBonus: 0.05, fatigueReduction: 0 }
+                    },
+                    {
+                        level: 2,
+                        title: "İleri Sürüş Simülatör Laboratuvarı & Kaptan Misafirhanesi",
+                        badge: "🥈 Seviye 2: Simülatör Kampüsü",
+                        cost: 45000,
+                        perkDesc: "Çalışan kaptanların tecrübe (XP) kazanım hızı x1.5 katına çıkar, kaza/ceza riski %40 azalır, sefer başı bahşiş +%20.",
+                        perkShort: "x1.5 XP Kazanımı, -%40 Ceza Riski, +%20 Bahşiş",
+                        effects: { xpMultiplier: 1.5, tipBonus: 0.20, fatigueReduction: 0.3 }
+                    },
+                    {
+                        level: 3,
+                        title: "Uluslararası Karayolu Taşımacılık Enstitüsü",
+                        badge: "🥇 Seviye 3: Uluslararası Akademi (MAX)",
+                        cost: 125000,
+                        perkDesc: "Tüm filonun sefer verimi x2 katına çıkar, otomatik seferlerden gelen hasılat +%35 artar, kaptan yorgunluğu sıfırlanır, efsane transferler açılır.",
+                        perkShort: "x2.0 XP Kazanımı, +%35 Otomatik Sefer Hasılatı, Sıfır Yorgunluk",
+                        effects: { xpMultiplier: 2.0, tipBonus: 0.35, fatigueReduction: 1.0 }
+                    }
+                ]
+            },
+            {
+                id: "ticketing_network",
+                name: "Merkezi Biletleme & Rezervasyon Kurumu",
+                icon: "🌐",
+                category: "Acente Dağıtım & Çağrı Merkezi",
+                desc: "Online seyahat platformları (Obilet/Biletall entegrasyonu), otogar peron gişeleri ve 7/24 rezervasyon santralinin yönetildiği kurum.",
+                levels: [
+                    {
+                        level: 1,
+                        title: "Otogar Bilet Gişesi & Manuel Bilet Koçanı",
+                        badge: "🥉 Seviye 1: Yerel Gişe",
+                        cost: 0,
+                        perkDesc: "Klasik peron bilet satışı ve standart yolcu talebi.",
+                        perkShort: "Standart Bilet Hacmi",
+                        effects: { demandMultiplier: 1.0, revenueBonus: 0 }
+                    },
+                    {
+                        level: 2,
+                        title: "7/24 Dijital Çağrı Merkezi & Online Bilet Portalı",
+                        badge: "🥈 Seviye 2: Dijital Acente Ağı",
+                        cost: 50000,
+                        perkDesc: "Tüm hatlarda yolcu talebi +%35 artar, otobüsler en az %85 dolulukla sefere başlar, bilet iptalleri düşer.",
+                        perkShort: "+%35 Yolcu Talebi, Minimum %85 Doluluk",
+                        effects: { demandMultiplier: 1.35, revenueBonus: 0.15 }
+                    },
+                    {
+                        level: 3,
+                        title: "Yapay Zeka Destekli Küresel Biletleme Konsorsiyumu",
+                        badge: "🥇 Seviye 3: Küresel Rezervasyon Ağı (MAX)",
+                        cost: 130000,
+                        perkDesc: "Bilet hasılatı +%60 artar, doluluk oranı daima %95+ olur, her bilet satışından ekstra pasif acente komisyonu şirkete akar.",
+                        perkShort: "+%60 Bilet Geliri, %95+ Doluluk, Pasif Acente Kârı",
+                        effects: { demandMultiplier: 1.60, revenueBonus: 0.35 }
+                    }
+                ]
+            },
+            {
+                id: "catering_logistics",
+                name: "Karayolu Lojistik & İkram Tedarik Kurumu",
+                icon: "🍽️",
+                category: "Catering & İkram Deposu",
+                desc: "Otobüs içi servis edilen sıcak/soğuk içecekler, kekler, sandviçler, limon kolonyaları ve hijyen kitlerinin tedarik edildiği dev lojistik üssü.",
+                levels: [
+                    {
+                        level: 1,
+                        title: "Yerel Bakkal & Hal Toptancısı Tedariği",
+                        badge: "🥉 Seviye 1: Temel Tedarik",
+                        cost: 0,
+                        perkDesc: "Standart ikram maliyetleri ve peron ikram stoğu.",
+                        perkShort: "Standart İkram",
+                        effects: { costDiscount: 0, tipBonus: 0, satisfactionBoost: 1.0 }
+                    },
+                    {
+                        level: 2,
+                        title: "Soğuk Hava Depolu İkram Lojistik Merkezi",
+                        badge: "🥈 Seviye 2: Lojistik Merkez",
+                        cost: 35000,
+                        perkDesc: "'I' tuşu ile yapılan ikramların maliyeti %40 ucuzlar, yolcu memnuniyeti daima yüksek kalır, yolcu bahşişleri +%30 artar.",
+                        perkShort: "%40 Ucuz İkram Maliyeti, +%30 Yolcu Bahşişi",
+                        effects: { costDiscount: 0.40, tipBonus: 0.30, satisfactionBoost: 1.5 }
+                    },
+                    {
+                        level: 3,
+                        title: "Endüstriyel Karayolu Gurme Catering Fabrikası",
+                        badge: "🥇 Seviye 3: Gurme Catering Üssü (MAX)",
+                        cost: 95000,
+                        perkDesc: "İkram maliyetleri %100 sıfırlanır (şirketimizin kendi üretimi), Jumbo VIP ikramda yolcular astronomik bahşiş bırakır (+%75 bahşiş) ve şirket memnuniyeti 5.0 yıldıza kilitlenir.",
+                        perkShort: "Ücretsiz İkram Üretimi, +%75 Bahşiş, 5.0 Sabit Memnuniyet",
+                        effects: { costDiscount: 1.0, tipBonus: 0.75, satisfactionBoost: 2.5 }
+                    }
+                ]
+            },
+            {
+                id: "highway_resort",
+                name: "Şirkete Ait Otoyol Dinlenme Tesisi",
+                icon: "☕",
+                category: "Mola & Yaşam Merkezi",
+                desc: "Otoyol güzergahlarında yolcuların 30 dakika mola verdiği, şirketin mülkiyetindeki dinlenme, restoran ve yaşam kompleksi.",
+                levels: [
+                    {
+                        level: 1,
+                        title: "Otoyol Kenarı Mola İstasyonu & Çay Ocağı",
+                        badge: "🥉 Seviye 1: Mola Noktası",
+                        cost: 0,
+                        perkDesc: "Molalarda yolculara ücretsiz çay ikramı.",
+                        perkShort: "Mola Çay İkramı",
+                        effects: { passiveDividend: 0, fuelDiscount: 0 }
+                    },
+                    {
+                        level: 2,
+                        title: "Kapsamlı Karayolu Dinlenme Tesisi (Restoran & Market)",
+                        badge: "🥈 Seviye 2: Dinlenme Tesisi",
+                        cost: 65000,
+                        perkDesc: "Filodaki her sefer dinlenme tesisinden geçerken şirkete restoran ve market kâr payı bırakır (sefer başı +1.500 ₺ pasif gelir), akaryakıt dolumu şirket araçlarına %30 indirimli olur.",
+                        perkShort: "Sefer Başı +1.500 ₺ Pasif Gelir, %30 Akaryakıt İndirimi",
+                        effects: { passiveDividend: 1500, fuelDiscount: 0.30 }
+                    },
+                    {
+                        level: 3,
+                        title: "Mega Karayolu Yaşam Kompleksi (Otel, AVM & SPA)",
+                        badge: "🥇 Seviye 3: Mega Mola Parkı (MAX)",
+                        cost: 160000,
+                        perkDesc: "Her seferden +3.500 ₺ tesis kârı, diğer şirketlerin otobüsleri de tesisimize uğrayarak komisyon öder, şirket araçlarına akaryakıt ve dış yıkama %100 BEDAVA olur!",
+                        perkShort: "Sefer Başı +3.500 ₺ Pasif Gelir, %100 Ücretsiz Akaryakıt",
+                        effects: { passiveDividend: 3500, fuelDiscount: 1.0 }
+                    }
+                ]
+            },
+            {
+                id: "fleet_operations",
+                name: "Filo Takip & Operasyon Kontrol Merkezi",
+                icon: "📡",
+                category: "Harekât & Uydu Komuta Merkezi",
+                desc: "Otobüslerin anlık GPS konumunu, takograf hız ve dinlenme sürelerini, hava durumunu ve güzergâh trafiğini uydudan izleyen harekât merkezi.",
+                levels: [
+                    {
+                        level: 1,
+                        title: "Masa Başı Telsiz & Telefon İletişim Masası",
+                        badge: "🥉 Seviye 1: Temel Takip Masası",
+                        cost: 0,
+                        perkDesc: "Telefon ve telsizle şoförlerden manuel bilgi alma.",
+                        perkShort: "Temel Telsiz İletişimi",
+                        effects: { tripSpeedBonus: 0, ticketCancelAvoid: 0 }
+                    },
+                    {
+                        level: 2,
+                        title: "Dijital Takograf & GPS Uydu Filo İzleme Masası",
+                        badge: "🥈 Seviye 2: Uydu Takip Masası",
+                        cost: 45000,
+                        perkDesc: "Şoförlerin otomatik sefer tamamlama süresi %20 hızlanır, radar/hız cezaları %50 engellenir, telsizden rota sinerjisi uyarısı gelir.",
+                        perkShort: "%20 Daha Hızlı Otomatik Sefer, -%50 Ceza Riski",
+                        effects: { tripSpeedBonus: 0.20, ticketCancelAvoid: 0.50 }
+                    },
+                    {
+                        level: 3,
+                        title: "Yapay Zeka Harekât & Otonom Lojistik Komuta Merkezi",
+                        badge: "🥇 Seviye 3: Yapay Zeka Harekât (MAX)",
+                        cost: 120000,
+                        perkDesc: "Otomatik sefer süreleri %40 hızlanır, kaza riski %0, karlı/sisli havalarda sefer gecikmesi sıfırlanır, sefer borsasında en kârlı rotalar otomatik belirlenir.",
+                        perkShort: "%40 Hızlı Sefer, Sıfır Gecikme, Otonom Borsa Analizi",
+                        effects: { tripSpeedBonus: 0.40, ticketCancelAvoid: 1.0 }
+                    }
+                ]
+            }
+        ],
+
+        // Kurumun Mevcut Seviyesini Al (1 - 3)
+        getInstitutionLevel: function(instId) {
+            if (!this.data.institutions) {
+                this.data.institutions = {};
+            }
+            return this.data.institutions[instId] || 1;
+        },
+
+        // Kurum Büyütme / Seviye Atlama Sesi (Majör Arpej)
+        playLevelUpChime: function() {
+            const ctx = this.getAudioCtx();
+            if (!ctx) return;
+            try {
+                if (ctx.state === 'suspended') ctx.resume();
+                const now = ctx.currentTime;
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const t = now + (idx * 0.08);
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, t);
+                    gain.gain.setValueAtTime(0.001, t);
+                    gain.gain.linearRampToValueAtTime(0.28, t + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(t);
+                    osc.stop(t + 0.45);
+                });
+            } catch(e) {}
+        },
+
+        // Kurumu Büyüt / Seviye Yükselt
+        upgradeInstitution: function(instId) {
+            const inst = this.institutionsData.find(i => i.id === instId);
+            if (!inst) return;
+            const currentLevel = this.getInstitutionLevel(instId);
+            if (currentLevel >= 3) {
+                const maxMsg = `${inst.name} zaten maksimum zirve seviyededir (${inst.levels[2].title}).`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(maxMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(maxMsg, 'info');
+                return;
+            }
+
+            const nextLvlObj = inst.levels[currentLevel]; // index 1 is level 2, index 2 is level 3
+            const cost = nextLvlObj.cost;
+
+            const companyTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+            const playerBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+
+            let paidFrom = '';
+            if (companyTreasury >= cost) {
+                this.data.companyTreasury -= cost;
+                paidFrom = 'Şirket Kasasından';
+            } else if (playerBudget >= cost) {
+                if (typeof Game !== 'undefined') {
+                    Game.playerBudget -= cost;
+                    Game.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                    }
+                }
+                paidFrom = 'Kaptan Cüzdanınızdan (Şahsi Yatırım)';
+            } else if ((companyTreasury + playerBudget) >= cost) {
+                const fromTreasury = companyTreasury;
+                const remainder = cost - fromTreasury;
+                this.data.companyTreasury = 0;
+                if (typeof Game !== 'undefined') {
+                    Game.playerBudget -= remainder;
+                    Game.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                    }
+                }
+                paidFrom = `Kasadan (${fromTreasury.toLocaleString('tr-TR')} ₺) ve Cüzdandan (${remainder.toLocaleString('tr-TR')} ₺)`;
+            } else {
+                const needed = cost - (companyTreasury + playerBudget);
+                const failMsg = `Yetersiz bakiye! ${inst.name} Seviye ${nextLvlObj.level} yükseltmesi için ${cost.toLocaleString('tr-TR')} ₺ gerekiyor. Şirket Kasası: ${companyTreasury.toLocaleString('tr-TR')} ₺, Cüzdanınız: ${playerBudget.toLocaleString('tr-TR')} ₺. Eksik: ${needed.toLocaleString('tr-TR')} ₺.`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(failMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`⚠️ ${failMsg}`, 'warning');
+                return;
+            }
+
+            this.data.institutions[instId] = nextLvlObj.level;
+            this.saveData();
+
+            this.playLevelUpChime();
+
+            const toastMsg = `🎉 TEBRİKLER! ${inst.name} başarıyla Seviye ${nextLvlObj.level}'e büyütüldü: '${nextLvlObj.title}'. ${paidFrom} ${cost.toLocaleString('tr-TR')} ₺ ödendi.`;
+            const speechMsg = `Tebrikler! ${inst.name} Seviye ${nextLvlObj.level}'e büyütüldü: ${nextLvlObj.title}. Yeni avantaj: ${nextLvlObj.perkShort}.`;
+
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(speechMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(toastMsg, 'success');
+
+            this.addRadioLog("🏢 Merkez İdare", "🏛️", `${inst.name} tesisimiz Seviye ${nextLvlObj.level}'e terfi etti (${nextLvlObj.title}). Filonun yeni gücü: ${nextLvlObj.perkShort}`, "system");
+
+            this.renderAll();
+        },
+
+        // Otobüs Kurumları ve Tesislerini Render Et
+        renderInstitutions: function() {
+            const container = document.getElementById('company-institutions-container');
+            if (!container) return;
+
+            const companyTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+            const playerBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            const totalAvailable = companyTreasury + playerBudget;
+
+            let html = `
+            <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 1.5px solid #38bdf8; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(56, 189, 248, 0.15);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+                    <div>
+                        <div style="color: #38bdf8; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                            <span>🏛️</span> <span>Otobüs Kurumları & Tesis Seviye Sistemi</span>
+                        </div>
+                        <div style="color: #cbd5e1; font-size: 0.88rem; margin-top: 3px;">
+                            Otobüs bakım kademenizi, kaptan akademisini, biletleme ağını ve dinlenme tesisinizi büyüterek şirketinize kalıcı devasa güç kazandırın.
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div style="background: rgba(234, 179, 8, 0.18); border: 1px solid #eab308; border-radius: 8px; padding: 6px 14px; font-size: 0.88rem; color: #fef08a;">
+                            🏦 Şirket Kasası: <strong style="color: #facc15; font-size: 1rem;">${companyTreasury.toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                        <div style="background: rgba(34, 197, 94, 0.18); border: 1px solid #22c55e; border-radius: 8px; padding: 6px 14px; font-size: 0.88rem; color: #86efac;">
+                            👤 Kaptan Cüzdanı: <strong style="color: #4ade80; font-size: 1rem;">${playerBudget.toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 14px;">
+            `;
+
+            this.institutionsData.forEach(inst => {
+                const curLvl = this.getInstitutionLevel(inst.id);
+                const curLvlObj = inst.levels[curLvl - 1];
+                const isMax = (curLvl >= 3);
+                const nextLvlObj = isMax ? null : inst.levels[curLvl];
+                const canAfford = nextLvlObj ? (totalAvailable >= nextLvlObj.cost) : false;
+
+                html += `
+                <div style="background: rgba(15, 23, 42, 0.88); border: 1.8px solid ${isMax ? '#eab308' : (curLvl === 2 ? '#38bdf8' : '#475569')}; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <div>
+                                <div style="font-size: 1.15rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 1.3rem;">${inst.icon}</span>
+                                    <span>${inst.name}</span>
+                                </div>
+                                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 2px;">
+                                    📌 ${inst.category}
+                                </div>
+                            </div>
+                            <span style="font-size: 0.8rem; padding: 3px 9px; border-radius: 6px; font-weight: bold; ${isMax ? 'background: rgba(234, 179, 8, 0.25); color: #facc15; border: 1px solid #eab308;' : (curLvl === 2 ? 'background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8;' : 'background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid #64748b;')}">
+                                ${curLvlObj.badge}
+                            </span>
+                        </div>
+
+                        <!-- 3 Aşamalı Seviye Göstergesi (Stepper) -->
+                        <div style="display: flex; gap: 4px; margin: 10px 0 12px 0;">
+                            <div style="flex: 1; height: 6px; border-radius: 3px; background: #22c55e;"></div>
+                            <div style="flex: 1; height: 6px; border-radius: 3px; background: ${curLvl >= 2 ? (curLvl === 2 ? '#38bdf8' : '#22c55e') : 'rgba(255,255,255,0.1)'};"></div>
+                            <div style="flex: 1; height: 6px; border-radius: 3px; background: ${curLvl >= 3 ? '#eab308' : 'rgba(255,255,255,0.1)'};"></div>
+                        </div>
+
+                        <div style="color: #cbd5e1; font-size: 0.85rem; line-height: 1.45; margin-bottom: 12px;">
+                            ${inst.desc}
+                        </div>
+
+                        <!-- Mevcut Seviye Kartı -->
+                        <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;">
+                            <div style="color: #4ade80; font-size: 0.82rem; font-weight: bold; margin-bottom: 3px;">
+                                ✓ MEVCUT SEVİYE: ${curLvlObj.title}
+                            </div>
+                            <div style="color: #e2e8f0; font-size: 0.84rem;">
+                                ${curLvlObj.perkDesc}
+                            </div>
+                        </div>
+
+                        <!-- Sonraki Seviye Hedefi -->
+                        ${!isMax && nextLvlObj ? `
+                            <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;">
+                                <div style="color: #38bdf8; font-size: 0.82rem; font-weight: bold; margin-bottom: 3px;">
+                                    ★ SEVİYE ${nextLvlObj.level} HEDEFİ: ${nextLvlObj.title}
+                                </div>
+                                <div style="color: #cbd5e1; font-size: 0.84rem;">
+                                    ${nextLvlObj.perkDesc}
+                                </div>
+                            </div>
+                        ` : `
+                            <div style="background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; text-align: center; color: #fde047; font-weight: bold; font-size: 0.85rem;">
+                                👑 TEBRİKLER! Bu kurum maksimum zirve seviyeye ulaştırıldı.
+                            </div>
+                        `}
+                    </div>
+
+                    <div>
+                        ${isMax ? `
+                            <button class="modern-btn" disabled style="width: 100%; padding: 11px; background: rgba(234, 179, 8, 0.18); border: 1.5px solid #eab308; color: #facc15; font-weight: 800; border-radius: 8px; font-size: 0.92rem;">
+                                👑 MAKSİMUM SEVİYEYE ULAŞILDI
+                            </button>
+                        ` : `
+                            <button class="modern-btn btn-upgrade-institution nav-item" data-inst-id="${inst.id}" style="width: 100%; padding: 11px; background: ${canAfford ? 'linear-gradient(135deg, #0284c7, #0369a1)' : 'rgba(255,255,255,0.06)'}; border: 1.5px solid ${canAfford ? '#38bdf8' : '#475569'}; color: ${canAfford ? '#ffffff' : '#94a3b8'}; font-weight: 800; border-radius: 8px; cursor: ${canAfford ? 'pointer' : 'pointer'}; font-size: 0.95rem; box-shadow: ${canAfford ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'};" aria-label="${inst.name} kurumunu Seviye ${nextLvlObj.level}'e büyüt. Ücret: ${nextLvlObj.cost.toLocaleString('tr-TR')} TL. Avantaj: ${nextLvlObj.perkShort}">
+                                🚀 Kurumu Büyüt (Seviye ${nextLvlObj.level}'e Yükselt) — ${nextLvlObj.cost.toLocaleString('tr-TR')} ₺
+                            </button>
+                        `}
+                    </div>
+                </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+
+            container.querySelectorAll('.btn-upgrade-institution').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const instId = e.currentTarget.getAttribute('data-inst-id');
+                    this.upgradeInstitution(instId);
+                });
+            });
+        },
+
+
+        // Şirket Arama (Kaptan + Kurumsal)
         getCompanyById: function(companyId) {
             if (!companyId) return null;
             const captains = this.getCaptainCompanies();
@@ -1077,6 +1532,16 @@
                     this.data = Object.assign(this.data, parsed);
 
                     // Eksik alanları tamamla
+                    if (!this.data.institutions) {
+                        this.data.institutions = {
+                            garage_maintenance: 1,
+                            driver_academy: 1,
+                            ticketing_network: 1,
+                            catering_logistics: 1,
+                            highway_resort: 1,
+                            fleet_operations: 1
+                        };
+                    }
                     if (!this.data.hqUpgrades) {
                         this.data.hqUpgrades = { fuelContract: false, luxuryLounge: false, terminalPlatform: false, corporateBrand: false };
                     }
@@ -1309,7 +1774,11 @@
                 return false;
             }
 
-            const repairCost = Math.round((100 - curCond) * 8); // Puan başına 8 TL
+            const garageLevel = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('garage_maintenance') : 1;
+            let costMultiplier = 8;
+            if (garageLevel === 2) costMultiplier = 5.6; // %30 Garaj İndirimi
+            else if (garageLevel === 3) costMultiplier = 3.2; // %60 Garaj İndirimi
+            const repairCost = Math.round((100 - curCond) * costMultiplier);
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
             if (currentBudget < repairCost) {
                 const msg = `Yetersiz bakiye! ${bus.fullName} periyodik bakımı için ${repairCost} ₺ gerekiyor.`;
@@ -1347,7 +1816,11 @@
                 const busId = d.assignedBusId || "otokar_kent_lf";
                 const cond = this.getBusCondition(busId);
                 if (cond < 90 && !busesToFix.some(b => b.busId === busId)) {
-                    const cost = Math.round((100 - cond) * 8);
+                    const garageLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('garage_maintenance') : 1;
+                    let mult = 8;
+                    if (garageLvl === 2) mult = 5.6;
+                    else if (garageLvl === 3) mult = 3.2;
+                    const cost = Math.round((100 - cond) * mult);
                     totalCost += cost;
                     busesToFix.push({ busId, cost });
                 }
@@ -1596,7 +2069,11 @@
 
             this.data.hiredDrivers.forEach(driver => {
                 if (driver.status === 'on_trip') {
-                    driver.currentTripSeconds = (driver.currentTripSeconds || 0) + deltaSec;
+                    const opsLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('fleet_operations') : 1;
+                    let speedMult = 1.0;
+                    if (opsLvl === 2) speedMult = 1.25; // %25 daha hızlı sefer tamamlama
+                    else if (opsLvl === 3) speedMult = 1.65; // %65 daha hızlı sefer tamamlama
+                    driver.currentTripSeconds = (driver.currentTripSeconds || 0) + (deltaSec * speedMult);
 
                     // Sefer tamamlandı mı?
                     if (driver.currentTripSeconds >= driver.targetDurationSeconds) {
@@ -1644,6 +2121,10 @@
 
             // 2. YOLCU KAPASİTESİ VE BİLET HASILATI
             let basePass = route.avgPassengers + Math.floor(Math.random() * 6);
+            const ticketingLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('ticketing_network') : 1;
+            if (ticketingLvl === 2) basePass = Math.round(basePass * 1.35);
+            else if (ticketingLvl === 3) basePass = Math.round(basePass * 1.60);
+
             if (this.data.hqUpgrades && this.data.hqUpgrades.terminalPlatform) {
                 basePass = Math.round(basePass * 1.25); // +%25 peron yolcu çekme
             }
@@ -1735,6 +2216,9 @@
             if (driver.traitId === "trait_apprentice") {
                 gainedXP = Math.round(gainedXP * 1.6); // Çırak azmi
             }
+            const academyLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('driver_academy') : 1;
+            if (academyLvl === 2) gainedXP = Math.round(gainedXP * 1.5);
+            else if (academyLvl === 3) gainedXP = Math.round(gainedXP * 2.0);
             driver.currentXP = (driver.currentXP || 0) + gainedXP;
             driver.totalTripsMade = (driver.totalTripsMade || 0) + 1;
             driver.totalEarningsMade = (driver.totalEarningsMade || 0) + netProfit;
@@ -2058,7 +2542,10 @@
                     <!-- 5 Sekme Butonları -->
                     <div style="display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;">
                         <button id="tab-comp-drivers" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 9px 8px; font-weight: bold; background: rgba(234, 179, 8, 0.3); border: 1.5px solid #facc15; color: #fff; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            🏢 Kendi Filom & Şoförlerim
+                            🚌 Kendi Filom & Şoförlerim
+                        </button>
+                        <button id="tab-comp-institutions" class="modern-btn nav-item" style="flex: 1; min-width: 150px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
+                            🏛️ Otobüs Kurumları & Tesisler
                         </button>
                         <button id="tab-comp-corporate-work" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
                             👔 Var Olan Bir Şirkete Katıl (Maaşlı)
@@ -2139,6 +2626,27 @@
                         </div>
                     </div>
 
+                    <!-- 7. SEKME: Otobüs Kurumları ve Tesisler (Seviye Sistemi) -->
+                    <div id="panel-comp-institutions" style="display: none;">
+                        <div id="company-institutions-container" style="max-height: 52vh; overflow-y: auto;">
+                            <!-- Dinamik doldurulacak -->
+                        </div>
+                    </div>
+
+                    <!-- 8. SEKME: İkram & Muavin Servisi -->
+                    <div id="panel-comp-catering" style="display: none;">
+                        <div id="company-catering-container" style="max-height: 52vh; overflow-y: auto;">
+                            <!-- Dinamik doldurulacak -->
+                        </div>
+                    </div>
+
+                    <!-- 9. SEKME: Otogar Yazıhaneleri & Bilet Fiyat Tarifesi -->
+                    <div id="panel-comp-branches" style="display: none;">
+                        <div id="company-branches-container" style="max-height: 52vh; overflow-y: auto;">
+                            <!-- Dinamik doldurulacak -->
+                        </div>
+                    </div>
+
                 </div>
             </div>
             `;
@@ -2163,6 +2671,9 @@
             // Sekme geçişleri
             const tabs = [
                 { tabId: 'tab-comp-drivers', panelId: 'panel-comp-drivers' },
+                { tabId: 'tab-comp-institutions', panelId: 'panel-comp-institutions' },
+                { tabId: 'tab-comp-catering', panelId: 'panel-comp-catering' },
+                { tabId: 'tab-comp-branches', panelId: 'panel-comp-branches' },
                 { tabId: 'tab-comp-corporate-work', panelId: 'panel-comp-corporate-work' },
                 { tabId: 'tab-comp-market-trends', panelId: 'panel-comp-market-trends' },
                 { tabId: 'tab-comp-hire', panelId: 'panel-comp-hire' },
@@ -2179,7 +2690,19 @@
                             const otherPanel = document.getElementById(other.panelId);
                             if (otherBtn && otherPanel) {
                                 if (other.tabId === t.tabId) {
-                                if (t.tabId === 'tab-comp-corporate-work') {
+                                if (t.tabId === 'tab-comp-institutions') {
+                                        if (typeof audio !== 'undefined' && audio.speak) {
+                                            audio.speak("Otobüs kurumları ve tesis büyütme merkezi açıldı. 6 adet kurumunuzu büyüterek Seviye 3 zirvesine taşıyabilirsiniz.");
+                                        }
+                                    } else if (t.tabId === 'tab-comp-catering') {
+                                        if (typeof audio !== 'undefined' && audio.speak) {
+                                            audio.speak("Otobüs içi ikram ve muavin servisi menüsü açıldı. İkram paketini belirleyebilir, yolda I tuşuna basarak ikram dağıtabilirsiniz.");
+                                        }
+                                    } else if (t.tabId === 'tab-comp-branches') {
+                                        if (typeof audio !== 'undefined' && audio.speak) {
+                                            audio.speak("Otogar yazıhaneleri ve bilet fiyat tarifesi menüsü açıldı.");
+                                        }
+                                    } else if (t.tabId === 'tab-comp-corporate-work') {
                                     const caps = this.getCaptainCompanies();
                                     if (caps.length === 0) {
                                         if (typeof audio !== 'undefined' && audio.speak) {
@@ -2218,6 +2741,7 @@
             this.renderHqUpgrades();
             this.renderRadioLogs();
             this.renderCorporateWork();
+            this.renderInstitutions();
             this.renderCatering();
             this.renderBranches();
         },
