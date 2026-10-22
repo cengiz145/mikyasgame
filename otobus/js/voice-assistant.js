@@ -273,19 +273,15 @@ class VoiceAssistant {
         this.renderTutorialContent();
     }
 
-    setAcademyTab(tabId) {
-        this.currentStageFilter = tabId;
-        this.renderTutorialContent();
-    }
-
     renderTutorialContent() {
         const listEl = document.getElementById('tutorial-lessons-list');
         const seruvenContainer = document.getElementById('tutorial-seruven-container') || document.getElementById('tutorial-karne-container');
         const labContainer = document.getElementById('tutorial-lab-container');
+        const compContainer = document.getElementById('tutorial-company-container');
         if (!listEl) return;
 
         // Sekme butonlarının aktiflik stilini güncelle
-        const tabs = ['lab', 'all', 'stage1', 'stage2', 'stage3', 'stage4', 'seruven', 'karne', 'company'];
+        const tabs = ['company', 'lab', 'all', 'stage1', 'stage2', 'stage3', 'stage4', 'seruven', 'karne'];
         tabs.forEach(t => {
             const btn = document.getElementById(`tab-acad-${t}`);
             if (btn) {
@@ -298,7 +294,6 @@ class VoiceAssistant {
         });
 
         // 0. ŞİRKET YÖNETİMİ, 6 YASAL BİNA VE ÖN MUHASEBE REHBERİ
-        const compContainer = document.getElementById('tutorial-company-container');
         if (this.currentStageFilter === 'company') {
             if (labContainer) labContainer.style.display = 'none';
             if (seruvenContainer) seruvenContainer.style.display = 'none';
@@ -311,164 +306,22 @@ class VoiceAssistant {
         } else {
             if (compContainer) compContainer.style.display = 'none';
         }
+        tabs.forEach(t => {
+            const btn = document.getElementById(`tab-acad-${t}`);
+            if (btn) {
+                const isActive = (this.currentStageFilter === t) || (t === 'seruven' && this.currentStageFilter === 'karne');
+                btn.style.background = isActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(255, 255, 255, 0.08)';
+                btn.style.borderColor = isActive ? '#10b981' : 'rgba(255, 255, 255, 0.2)';
+                btn.style.color = isActive ? '#34d399' : '#cbd5e1';
+                btn.style.fontWeight = isActive ? 'bold' : 'normal';
+            }
+        });
 
         // 1. İNTERAKTİF SÜRÜŞ ATÖLYESİ (CANLI FORMÜL PRATİĞİ)
         if (this.currentStageFilter === 'lab') {
             if (labContainer) {
                 labContainer.style.display = 'block';
-                this.renderCompanyGuide() {
-        const container = document.getElementById('tutorial-company-container');
-        if (!container) return;
-
-        container.innerHTML = `
-        <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); border: 2px solid #ca8a04; border-radius: 12px; padding: 18px 22px; color: #fff;">
-            
-            <!-- BAŞLIK -->
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(250, 204, 21, 0.3); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-                <div>
-                    <h3 style="margin: 0; color: #facc15; font-size: 1.4rem; display: flex; align-items: center; gap: 8px;">
-                        <span>🏢</span> <span>Şirket Yönetimi & 6 Yasal Bina Rehberi (B1 Yetki Belgesi)</span>
-                    </h3>
-                    <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.9rem;">
-                        T.C. Ulaştırma ve Altyapı Bakanlığı Karayolu Taşıma Yönetmeliği uyarınca bir otobüs şirketi nasıl kurulur, binalar ne işe yarar ve para akışı nasıl takip edilir?
-                    </p>
-                </div>
-                <button class="modern-btn btn-read-section nav-item" data-text="Şirket Yönetimi ve 6 Yasal Bina Rehberi. Bu rehberde şirket kurmayı, genel müdürlük, garaj, otogar yazıhaneleri, kademe tamirhanesi, kaptan lojmanı ve şehir içi servis acentelerini öğreneceksiniz." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
-                    ▶️ Bu Bölümü Sesli Dinle
-                </button>
-            </div>
-
-            <!-- BÖLÜM 1: ŞİRKET KURMA VEYA MAAŞLI ÇALIŞMA -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.1rem;">1. Şirket Kurmak veya Bir Şirkette Çalışmak</h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket Kurmak veya Bir Şirkette Çalışmak. Oyunda iki yolunuz vardır. İster kendi otobüs firmanızı kurup şoför ve filo yönetebilir, bilet hasılatını toplayabilirsiniz. İsterseniz köklü firmalara katılıp günlük garanti maaş ve sefer primleriyle maaşlı kaptanlık yapabilirsiniz." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
-                    • <strong>Kendi Şirketinizi Yönetin:</strong> Şirketinizin adını tescilleyin, filo kurun, şoför istihdam edin ve bilet hasılatını cüzdanınız ile şirket kasası arasında dilediğiniz oranda bölüştürün (%50 / %50 önerilir).<br>
-                    • <strong>Kurumsal Firmada Maaşlı Kaptan Olun:</strong> Metro, Pamukkale, Kamil Koç veya Tekulaş gibi şirketlerde günlük garanti maaş ve sefer primleriyle çalışın.
-                </p>
-            </div>
-
-            <!-- BÖLÜM 2: 6 YASAL BİNA VE GÖREVLERİ -->
-            <div style="margin-bottom: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem;">2. Şirketinizin 6 Yasal Binası & Kazandırdıkları</h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketinizin 6 yasal binası vardır. Genel müdürlük hat izinlerini yönetir ve marka primi verir. Filo garajı araç kapasitesini belirler ve yıpranmayı yarıya indirir. Otogar yazıhaneleri pasif kâr ve bedava mazot sağlar. Kademe atölyesi tamir masrafını yüzde 65 ucuzlatır ve süreyi yarıya indirir. Kaptan lojmanı dinlenme süresini yüzde 75 kısaltır. Şehir içi acenteler ise yolcuları ücretsiz servisle toplayıp bilet gelirini yüzde 50 artırır." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ 6 Binayı Sesli Dinle</button>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
-                    
-                    <!-- BİNA 1 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #38bdf8; font-size: 0.95rem;">🏛️ 1. Genel Müdürlük (Şirket Beyni)</strong>
-                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Karayolu Taşıma Kanunu'na göre şirket açmak için zorunlu tescilli adres.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Bağımsız Ofis ➔ Plaza İdari Katı ➔ Holding Genel Müdürlüğü.<br>
-                            • <strong>Kazancı:</strong> Sefer izin harçlarını ucuzlatır, idari cezaları sıfırlar ve bilet hasılatına <strong>+%30 marka primi</strong> kazandırır.
-                        </p>
-                    </div>
-
-                    <!-- BİNA 2 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #22c55e; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #4ade80; font-size: 0.95rem;">🅿️ 2. Garaj ve Filo Sahası (Depot)</strong>
-                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Otobüslerin gece uyuduğu ve beklediği resmi park alanı.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Açık Saha (5 Araç) ➔ Güvenlikli Asfalt Garaj (15 Araç) ➔ Kapalı Hangar (Sınırsız).<br>
-                            • <strong>Kazancı:</strong> Filo kapasitenizi ve şoför kotanızı artırır. Kapalı hangar sayesinde araçların <strong>yıpranma ve hasar oranı %50 yarı yarıya düşer</strong>!
-                        </p>
-                    </div>
-
-                    <!-- BİNA 3 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #eab308; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #fde047; font-size: 0.95rem;">🏢 3. Otogar Yazıhaneleri & Peron Ağı</strong>
-                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Şehir terminallerinde yasal yolcu bindirme ve peron hakkı.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Merkez Gişe ➔ Büyükşehir Peronları ➔ Ulusal Otogar Konsorsiyumu.<br>
-                            • <strong>Kazancı:</strong> Korsan duraklama cezasını önler, sefer başı <strong>+3.500 ₺ pasif kâr</strong> ve Seviye 3'te tüm araçlarınıza <strong>%100 BEDAVA MAZOT</strong> sağlar!
-                        </p>
-                    </div>
-
-                    <!-- BİNA 4 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #f97316; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #fb923c; font-size: 0.95rem;">🛠️ 4. Kademe Binası (Tamirhane & Yıkama)</strong>
-                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Şirket içi hidrolik liftler, diagnostik bilgisayarları ve boyahane.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Kanal Çukuru ➔ Hidrolik Liftler & Diagnostik ➔ Mega Revizyon Üssü.<br>
-                            • <strong>Kazancı:</strong> Dış tamir faturalarını <strong>%65 ucuzlatır</strong>, tamir süresini yarı yarıya kısaltır ve fırçalı dış yıkama ile yolcu memnuniyet bahşişlerini artırır.
-                        </p>
-                    </div>
-
-                    <!-- BİNA 5 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #ec4899; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #f472b6; font-size: 0.95rem;">🛏️ 5. Kaptan Lojmanı (Personel Dinlenme)</strong>
-                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Şoförlerin yasal takograf molalarında uyuyup duş aldığı dinlenme evi.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Şoför Odası ➔ Müstakil Lojman ➔ 5 Yıldızlı Kaptan Oteli & Kampüs.<br>
-                            • <strong>Kazancı:</strong> Dinlenme süresini <strong>%75 kısaltır</strong>, kaza ve ceza riskini sıfırlar, kaptanların sefer verimini x2.0 katına çıkarır.
-                        </p>
-                    </div>
-
-                    <!-- BİNA 6 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #a855f7; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #c084fc; font-size: 0.95rem;">🏬 6. Şehir İçi Acenteler & Servis Ağı</strong>
-                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Çarşı merkezindeki bilet gişeleri ve yolcuları otogara taşıyan ücretsiz servis minibüsleri.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Cadde Gişesi ➔ Acente & Shuttle Filosu ➔ Ulusal Acente & VIP Transfer.<br>
-                            • <strong>Kazancı:</strong> Otobüslerin boş kalkmasını engeller, koltukları doldurur ve bilet hasılatına kalıcı <strong>+%50 prim</strong> sağlar.
-                        </p>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- BÖLÜM 3: OTOGAR YAZIHANESİ İŞLETME MODELLERİ -->
-            <div style="background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #34d399; margin: 0; font-size: 1.1rem;">3. Otogar Yazıhanesi Modelleri & 4 Günlük Görev</h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Otogar yazıhaneleri iki modelle açılır. Öz şubede kirayı ödersiniz, gelirin tamamı şirkete kalır. F1 acentelik bayiliğinde sıfır lira masrafla yerel esnaf dükkanı açar, hasılatın yüzde 88 i şirketinize gelir. Ayrıca her yazıhane peron anonsu yapar, yolcu manifestosu tanzim eder, bagaj fişler ve her seferde 4 ila 8 adet emanet paket kargo teslim ederek ek para kazandırır." style="padding: 4px 10px; background: rgba(52,211,153,0.2); border: 1px solid #34d399; color: #a7f3d0; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 8px;">
-                    <div style="background: rgba(22,163,74,0.15); border-left: 3px solid #22c55e; padding: 10px; border-radius: 6px;">
-                        <strong style="color: #4ade80;">🏢 Model A: Şirket Öz Şubesi</strong><br>
-                        <span style="font-size: 0.84rem; color: #cbd5e1;">Kirasını şirket öder, kendi bordrolu personeli çalışır. Bilet ve kargo gelirinin <strong>%100'ü doğrudan kasaya</strong> kalır.</span>
-                    </div>
-                    <div style="background: rgba(2,132,199,0.15); border-left: 3px solid #38bdf8; padding: 10px; border-radius: 6px;">
-                        <strong style="color: #38bdf8;">🤝 Model B: F1 Acente Bayiliği</strong><br>
-                        <span style="font-size: 0.84rem; color: #cbd5e1;"><strong>0 ₺ Masraf (Bedava Açılış)!</strong> Yerel esnaf işletir. Hasılatın <strong>%88'i şirkete</strong> gelir, %12'si bayiye komisyon kalır.</span>
-                    </div>
-                </div>
-                <div style="margin-top: 10px; font-size: 0.84rem; color: #fde047;">
-                    📦 <strong>Emanet & Paket Kargo Geliri:</strong> Açık yazıhaneler otobüs bagajına koli kabul eder. Her seferde 4-8 koli taşınır ve koli başı 140 ₺ ekstra net kazanç sağlar!
-                </div>
-            </div>
-
-            <!-- BÖLÜM 4: CANLI KASA DEFTERİ VE ÖN MUHASEBE -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; border: 1px solid rgba(255,255,255,0.08);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #facc15; margin: 0; font-size: 1.1rem;">4. Para Akışı & Canlı Kasa Defteri (Ön Muhasebe)</h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Para akışı nasıl hesaplanır? Oyuncunun oturup matematik yapmasına gerek yoktur. Oyun her bilet gelirini, kargo kazancını, mazot giderini ve tamir faturasını saniyesi saniyesine Kasa Defteri'ne işler. Tek tıkla toplam geliri, toplam gideri ve net şirket kârınızı anlık olarak görebilirsiniz." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
-                    Oyuncunun kağıt kalemle hesap tutmasına gerek yoktur. Şirket Menüsü'ndeki <strong>📊 Kasa Defteri & Muhasebe</strong> sekmesi tüm para giriş ve çıkışlarını canlı banka ekstresi gibi listeler. Toplam gelirinizi, masraflarınızı, net şirket kârınızı ve en çok nereye para harcadığınızı tek ekranda görebilirsiniz.
-                </p>
-            </div>
-
-        </div>
-        `;
-
-        // Sesli okuma butonları
-        container.querySelectorAll('.btn-read-section').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const text = e.currentTarget.getAttribute('data-text');
-                if (text && typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(text);
-                }
-            });
-        });
-    }
-
-    renderInteractiveLab();
+                this.renderInteractiveLab();
             }
             if (seruvenContainer) seruvenContainer.style.display = 'none';
             listEl.style.display = 'none';
@@ -548,6 +401,159 @@ class VoiceAssistant {
     // =========================================================================
     // ADIM ADIM REHBERLİ SÜRÜŞ EĞİTİMİ (TERİMSİZ, EN ANLAŞILIR OYUN DİLİ)
     // =========================================================================
+
+    renderCompanyGuide() {
+        const container = document.getElementById('tutorial-company-container');
+        if (!container) return;
+
+        container.innerHTML = `
+        <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); border: 2px solid #ca8a04; border-radius: 12px; padding: 18px 22px; color: #fff;">
+            
+            <!-- BAŞLIK -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(250, 204, 21, 0.3); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h3 style="margin: 0; color: #facc15; font-size: 1.4rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🏢</span> <span>Şirket Yönetimi & 6 Yasal Bina Rehberi (B1 Yetki Belgesi)</span>
+                    </h3>
+                    <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.9rem;">
+                        T.C. Ulaştırma ve Altyapı Bakanlığı Karayolu Taşıma Yönetmeliği uyarınca bir otobüs şirketi nasıl kurulur, binalar ne işe yarar ve para akışı nasıl takip edilir?
+                    </p>
+                </div>
+                <button class="modern-btn btn-read-section nav-item" data-text="Şirket Yönetimi ve 6 Yasal Bina Rehberi kaptanım! Bu rehberde kendi şirketini kurmayı, genel müdürlük, garaj, otogar yazıhaneleri, kademe tamirhanesi, kaptan lojmanı ve şehir içi servis acentelerinin sana kazandıracağı tüm avantajları öğreneceksin." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                    ▶️ Bu Bölümü Sesli Dinle
+                </button>
+            </div>
+
+            <!-- BÖLÜM 1: ŞİRKET KURMA VEYA MAAŞLI ÇALIŞMA -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.1rem;">1. Şirket Kurmak veya Bir Şirkette Çalışmak</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket Kurmak veya Bir Şirkette Çalışmak. Oyunda iki yolun var kaptanım! İster kendi otobüs firmanı kurup şoför ve filo yönetebilir, bilet hasılatını toplayabilirsin. İstersen köklü firmalara katılıp günlük garanti maaş ve sefer primleriyle maaşlı kaptanlık yapabilirsin." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
+                    • <strong>Kendi Şirketini Yönet:</strong> Şirketinin adını tescille, filo kur, şoför istihdam et ve bilet hasılatını cüzdanın ile şirket kasan arasında dilediğin oranda bölüştür (%50 / %50 önerilir).<br>
+                    • <strong>Kurumsal Firmada Maaşlı Kaptan Ol:</strong> Metro, Pamukkale, Kamil Koç veya Tekulaş gibi şirketlerde günlük garanti maaş ve sefer primleriyle çalış.
+                </p>
+            </div>
+
+            <!-- BÖLÜM 2: 6 YASAL BİNA VE GÖREVLERİ -->
+            <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem;">2. Şirketinin 6 Yasal Binası & Kazandırdıkları</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketinin 6 yasal binası vardır kaptanım. Genel müdürlük hat izinlerini yönetir ve sana marka primi verir. Filo garajı araç kapasiteni belirler ve yıpranmayı yarıya indirir. Otogar yazıhaneleri pasif kâr ve bedava mazot sağlar. Kademe atölyesi tamir masrafını yüzde 65 ucuzlatır ve süreyi yarıya indirir. Kaptan lojmanı dinlenme süreni yüzde 75 kısaltır. Şehir içi acenteler ise yolcuları ücretsiz servisle toplayıp bilet gelirini yüzde 50 artırır." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ 6 Binayı Sesli Dinle</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                    
+                    <!-- BİNA 1 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">🏛️ 1. Genel Müdürlük (Şirket Beyni)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Görevi:</strong> Karayolu Taşıma Kanunu'na göre şirket açmak için zorunlu tescilli merkez adresindir.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Bağımsız Ofis ➔ Plaza İdari Katı ➔ Holding Genel Müdürlüğü.<br>
+                            • <strong>Kazancı:</strong> Sefer izin harçlarını ucuzlatır, idari cezaları sıfırlar ve bilet hasılatına <strong>+%30 marka primi</strong> kazandırır.
+                        </p>
+                    </div>
+
+                    <!-- BİNA 2 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #22c55e; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #4ade80; font-size: 0.95rem;">🅿️ 2. Garaj ve Filo Sahası (Depot)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Görevi:</strong> Otobüslerinin gece uyuduğu ve beklediği resmi park sahandır.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Açık Saha (5 Araç) ➔ Güvenlikli Asfalt Garaj (15 Araç) ➔ Kapalı Hangar (Sınırsız).<br>
+                            • <strong>Kazancı:</strong> Filo kapasiteni ve şoför kotanı artırır. Kapalı hangar sayesinde araçlarının <strong>yıpranma ve hasar oranı %50 yarı yarıya düşer</strong>!
+                        </p>
+                    </div>
+
+                    <!-- BİNA 3 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #eab308; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #fde047; font-size: 0.95rem;">🏢 3. Otogar Yazıhaneleri & Peron Ağı</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Görevi:</strong> Şehir terminallerinde yasal yolcu bindirme ve peron hakkındır.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Merkez Gişe ➔ Büyükşehir Peronları ➔ Ulusal Otogar Konsorsiyumu.<br>
+                            • <strong>Kazancı:</strong> Korsan duraklama cezasını önler, sefer başı <strong>+3.500 ₺ pasif kâr</strong> ve Seviye 3'te tüm araçlarına <strong>%100 BEDAVA MAZOT</strong> sağlar!
+                        </p>
+                    </div>
+
+                    <!-- BİNA 4 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #f97316; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #fb923c; font-size: 0.95rem;">🛠️ 4. Kademe Binası (Tamirhane & Yıkama)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Görevi:</strong> Şirket içi hidrolik liftlerin, diagnostik bilgisayarların ve boyahanendir.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Kanal Çukuru ➔ Hidrolik Liftler & Diagnostik ➔ Mega Revizyon Üssü.<br>
+                            • <strong>Kazancı:</strong> Dış tamir faturalarını <strong>%65 ucuzlatır</strong>, tamir süresini yarı yarıya kısaltır ve fırçalı dış yıkama ile yolcu memnuniyet bahşişlerini artırır.
+                        </p>
+                    </div>
+
+                    <!-- BİNA 5 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #ec4899; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #f472b6; font-size: 0.95rem;">🛏️ 5. Kaptan Lojmanı (Personel Dinlenme)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Görevi:</strong> Şoförlerinin yasal takograf molalarında uyuyup dinlendiği evdir.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Şoför Odası ➔ Müstakil Lojman ➔ 5 Yıldızlı Kaptan Oteli & Kampüs.<br>
+                            • <strong>Kazancı:</strong> Dinlenme süresini <strong>%75 kısaltır</strong>, kaza ve ceza riskini sıfırlar, kaptanlarının sefer verimini x2.0 katına çıkarır.
+                        </p>
+                    </div>
+
+                    <!-- BİNA 6 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #a855f7; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #c084fc; font-size: 0.95rem;">🏬 6. Şehir İçi Acenteler & Servis Ağı</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Görevi:</strong> Çarşı merkezindeki bilet gişelerin ve yolcularını otogara taşıyan ücretsiz servis minibüslerindir.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Cadde Gişesi ➔ Acente & Shuttle Filosu ➔ Ulusal Acente & VIP Transfer.<br>
+                            • <strong>Kazancı:</strong> Otobüslerinin boş kalkmasını engeller, koltukları doldurur ve bilet hasılatına kalıcı <strong>+%50 prim</strong> sağlar.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- BÖLÜM 3: OTOGAR YAZIHANESİ İŞLETME MODELLERİ -->
+            <div style="background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #34d399; margin: 0; font-size: 1.1rem;">3. Otogar Yazıhanesi Modelleri & 4 Günlük Görev</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Otogar yazıhaneleri iki modelle açılır kaptanım. Öz şubende kirayı şirketin öder, gelirin tamamı kasana kalır. F1 acentelik bayiliğinde cebinden beş kuruş çıkmadan sıfır lira masrafla yerel esnaf dükkanı açar, hasılatın yüzde 88'i doğrudan şirketine gelir. Ayrıca her yazıhane peron anonsu yapar, yolcu manifestosu tanzim eder, bagaj fişler ve her seferde otobüs bagajına 4 ila 8 adet koli teslim ederek sana ek para kazandırır." style="padding: 4px 10px; background: rgba(52,211,153,0.2); border: 1px solid #34d399; color: #a7f3d0; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 8px;">
+                    <div style="background: rgba(22,163,74,0.15); border-left: 3px solid #22c55e; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #4ade80;">🏢 Model A: Şirket Öz Şubesi</strong><br>
+                        <span style="font-size: 0.84rem; color: #cbd5e1;">Kirasını şirketin öder, kendi bordrolu personelin çalışır. Bilet ve kargo gelirinin <strong>%100'ü doğrudan kasana</strong> kalır.</span>
+                    </div>
+                    <div style="background: rgba(2,132,199,0.15); border-left: 3px solid #38bdf8; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #38bdf8;">🤝 Model B: F1 Acente Bayiliği</strong><br>
+                        <span style="font-size: 0.84rem; color: #cbd5e1;"><strong>0 ₺ Masraf (Bedava Açılış)!</strong> Yerel esnaf işletir. Hasılatın <strong>%88'i şirketine</strong> gelir, %12'si bayiye komisyon kalır.</span>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.84rem; color: #fde047;">
+                    📦 <strong>Emanet & Paket Kargo Geliri:</strong> Açık yazıhanelerin otobüs bagajına koli kabul eder. Her seferde 4-8 koli taşınır ve koli başı 140 ₺ ekstra net kazanç sağlar!
+                </div>
+            </div>
+
+            <!-- BÖLÜM 4: CANLI KASA DEFTERİ VE ÖN MUHASEBE -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.1rem;">4. Para Akışı & Canlı Kasa Defteri (Ön Muhasebe)</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Para akışı nasıl hesaplanır? Senin oturup hesap kitap yapmana hiç gerek yok kaptanım! Oyun her bilet gelirini, kargo kazancını, mazot giderini ve tamir faturasını saniyesi saniyesine Kasa Defteri'ne işler. Tek tıkla toplam gelirini, toplam giderini ve net şirket kârını anlık olarak görebilirsin." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
+                    Senin kağıt kalemle hesap tutmana hiç gerek yok kaptanım. Şirket Menüsü'ndeki <strong>📊 Kasa Defteri & Muhasebe</strong> sekmesi tüm para giriş ve çıkışlarını canlı banka ekstresi gibi listeler. Toplam gelirini, masraflarını, net şirket kârını ve en çok nereye para harcadığını tek ekranda görebilirsin.
+                </p>
+            </div>
+
+        </div>
+        `;
+
+        // Sesli okuma butonları
+        container.querySelectorAll('.btn-read-section').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const text = e.currentTarget.getAttribute('data-text');
+                if (text && typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak(text);
+                }
+            });
+        });
+    }
+
     initGuidedLab() {
         if (typeof this.guidedStep === 'undefined') this.guidedStep = 1;
         if (typeof this.labSpeed === 'undefined') this.labSpeed = 0;

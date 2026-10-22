@@ -650,11 +650,11 @@
                 name: "Merkez Yönetim Ofisi / Genel Müdürlük",
                 icon: "🏛️",
                 category: "B1 Belgesi Yasal Zorunluluk (Şirket Beyni)",
-                simpleSummary: "Şirketinizin resmi beyni ve kalbidir. Karayolu Taşıma Kanunu'na göre şirket açmak ve şehirlerarası sefer düzenlemek için bağımsız bir merkez adres göstermek şarttır.",
+                simpleSummary: "Şirketinin resmi beyni ve kalbidir kaptanım. Karayolu Taşıma Kanunu'na göre şirket açmak ve şehirlerarası sefer düzenlemek için bağımsız bir merkez adres göstermek şarttır.",
                 playerBenefits: [
                     "📋 Tüm Türkiye genelinde yasal hat açma ve resmi sefer düzenleme izni verir.",
-                    "🛡️ Şirketinizi korsan taşımacılık, idari para cezaları ve sefer iptallerinden korur.",
-                    "💰 Büyüdükçe firmanızın kurumsal prestiji artar ve bilet gelirlerinize +%30 kalıcı marka primi ekler."
+                    "🛡️ Şirketini korsan taşımacılık, idari para cezaları ve sefer iptallerinden korur.",
+                    "💰 Büyüdükçe firmanın kurumsal prestiji artar ve bilet gelirlerine +%30 kalıcı marka primi ekler."
                 ],
                 desc: "Ulaştırma Bakanlığı B1 Taşıma Yetki Belgesi için zorunlu tescilli merkez adresi. Şirketin tüzel kişiliği, hat izinleri, personel sözleşmeleri, hukuki süreçler ve filo sevk idaresinin yürütüldüğü idari merkez.",
                 levels: [
@@ -663,7 +663,7 @@
                         title: "Kiralanan Bağımsız Şirket Ofisi",
                         badge: "🥉 Seviye 1: Bağımsız Ofis",
                         cost: 0,
-                        simplePerk: "Temel B1 Taşıma Belgesi onaylıdır. Tüm şehirlere yasal olarak sefer başlatabilirsiniz.",
+                        simplePerk: "Temel B1 Taşıma Belgesi onaylıdır. Tüm şehirlere yasal olarak sefer başlatabilirsin.",
                         perkDesc: "Yasal B1 Taşıma Yetki Belgesi ruhsatı tescillidir. Tüm resmi şehirlerarası hat başvuruları ve sefer izinleri aktiftir.",
                         perkShort: "B1 Ruhsatı & Yasal Sefer İzni",
                         effects: { tripSpeedBonus: 0, ticketCancelAvoid: 0 }
@@ -673,7 +673,7 @@
                         title: "Bağımsız İş Merkezi & Plaza İdari Katı",
                         badge: "🥈 Seviye 2: Plaza İdari Katı",
                         cost: 40000,
-                        simplePerk: "Hat açma izinleri hızlanır, resmi harçlar %25 ucuzlar ve idari cezalardan muafiyet kazanırsınız.",
+                        simplePerk: "Hat açma izinlerin hızlanır, resmi harçlar %25 ucuzlar ve idari cezalardan muafiyet kazanırsın.",
                         perkDesc: "Hukuki süreçler ve hat izinleri hızlanır, sefer izin harçlarında %25 indirim sağlanır, idari cezalardan muafiyet kazanılır.",
                         perkShort: "Hızlı Hat İzinleri, -%25 İdari Harç",
                         effects: { tripSpeedBonus: 0.20, ticketCancelAvoid: 0.50 }
@@ -683,7 +683,7 @@
                         title: "Şirket Genel Müdürlük Plaza Binası (Holding Genel Merkezi)",
                         badge: "🥇 Seviye 3: Holding Genel Müdürlüğü (MAX)",
                         cost: 120000,
-                        simplePerk: "Tüm Türkiye'de dev marka prestiji! Bilet hasılatınız kalıcı olarak +%30 artar ve sınırsız hat tesciliniz açılır.",
+                        simplePerk: "Tüm Türkiye'de dev marka prestiji! Bilet hasılatın kalıcı olarak +%30 artar ve sınırsız hat tescilin açılır.",
                         perkDesc: "Türkiye genelinde sınırsız hat açma yetkisi, kurumsal genel müdürlük prestijiyle bilet hasılatında +%30 kalıcı prim, filo yönetim hızı %40 artar.",
                         perkShort: "+%30 Bilet Marka Primi, Sınırsız Hat Tescili",
                         effects: { tripSpeedBonus: 0.40, ticketCancelAvoid: 1.0 }
@@ -695,9 +695,9 @@
                 name: "Araç Park Alanı & Filo Garaj Sahası",
                 icon: "🅿️",
                 category: "B1 Belgesi Yasal Zorunluluk (Filo Kapasitesi)",
-                simpleSummary: "Otobüslerinizin gece uyuduğu, yıkandığı ve sefer saatini beklediği resmi garaj sahasıdır. Sokak arasına otobüs park etmek yasaktır; şirketinizin otobüs sayısına uygun büyüklükte garajı olması şarttır.",
+                simpleSummary: "Otobüslerinin gece uyuduğu, yıkandığı ve sefer saatini beklediği resmi garaj sahandır. Sokak arasına otobüs park etmek yasaktır; şirketinin otobüs sayısına uygun büyüklükte garajı olması şarttır.",
                 playerBenefits: [
-                    "🚌 Şirketinize kaç tane otobüs satın alabileceğinizi (filo kapasitenizi) doğrudan belirler.",
+                    "🚌 Şirketine kaç tane otobüs satın alabileceğini (filo kapasiteni) doğrudan belirler.",
                     "🔒 Otobüslerinizin gece hasar görmesini, parça hırsızlığını ve otopark cezası yemesini sıfırlar.",
                     "⚡ Sabah otobüslerin sefere çıkış hazırlığını hızlandırır ve işletme giderlerini düşürür."
                 ],
@@ -708,7 +708,7 @@
                         title: "Kiralanan Tescilli Açık Park Sahası (5 Otobüs)",
                         badge: "🥉 Seviye 1: 5 Araçlık Açık Saha",
                         cost: 0,
-                        simplePerk: "Şirketiniz en fazla 5 adet otobüse sahip olabilir (Temel B1 garaj şartı karşılandı).",
+                        simplePerk: "Şirketin en fazla 5 adet otobüse sahip olabilir (Temel B1 garaj şartı karşılandı).",
                         perkDesc: "5 araca kadar yasal geceleme ve park sahası (Temel B1 garaj şartı karşılandı).",
                         perkShort: "5 Otobüslük Yasal Park",
                         effects: { capacity: 5 }
@@ -718,7 +718,7 @@
                         title: "Özel Asfalt Kaplama Güvenlikli Filo Garaj Sahası (15 Otobüs)",
                         badge: "🥈 Seviye 2: 15 Araçlık Güvenlikli Garaj",
                         cost: 45000,
-                        simplePerk: "Filo kapasiteniz 15 otobüse çıkar! 7/24 özel güvenlik ile gece hasarı ve parça hırsızlığı riski sıfırlanır.",
+                        simplePerk: "Filo kapasiten 15 otobüse çıkar! 7/24 özel güvenlik ile gece hasarı ve parça hırsızlığı riski sıfırlanır.",
                         perkDesc: "15 araca kadar tescilli geniş park kapasitesi, 7/24 özel güvenlik, geceleme hasar ve parça hırsızlığı riski sıfır.",
                         perkShort: "15 Otobüs Kapasitesi, Sıfır Gece Hasarı",
                         effects: { capacity: 15 }
@@ -740,9 +740,9 @@
                 name: "Otogar Yazıhaneleri & Peron Ağı",
                 icon: "🏢",
                 category: "Yolcu Kabul & Peron İzni (Korsan Önleme)",
-                simpleSummary: "Şehirlerdeki resmi otobüs terminallerinde kiraladığınız gişe ve peron ağınızdır. Yol kenarında durup kaçak yolcu almak yasaktır; otogar yazıhanesi yasal bilet kesip yolcu bindirmenin tek meşru yoludur.",
+                simpleSummary: "Şehirlerdeki resmi otobüs terminallerinde kiraladığın gişe ve peron ağındır. Yol kenarında durup kaçak yolcu almak yasaktır; otogar yazıhanesi yasal bilet kesip yolcu bindirmenin tek meşru yoludur.",
                 playerBenefits: [
-                    "🎫 Her şehirdeki resmi peronlardan yolcu toplamanızı sağlar ve bilet hasılatını katlar.",
+                    "🎫 Her şehirdeki resmi peronlardan yolcu toplamanı sağlar ve bilet hasılatını katlar.",
                     "💰 Şirketinize sefer başına düzenli pasif terminal kâr payı kazandırır.",
                     "⛽ Geliştikçe anlaşmalı tesislerden akaryakıt dolumunu indirimli ve Seviye 3'te %100 BEDAVA yapar!"
                 ],
@@ -785,9 +785,9 @@
                 name: "Bakım, Onarım ve Yıkama Atölyesi (Kademe Binası)",
                 icon: "🛠️",
                 category: "Teknik Servis, Tamir & Hijyen Üssü",
-                simpleSummary: "Otobüslerinizin sanayide sıra beklemeden kendi şirket ustalarınız tarafından tamir edildiği ve her sefer öncesi otomatik yıkandığı kademe binasıdır. Yağ, filtre, fren, lastik bakımları burada yapılır.",
+                simpleSummary: "Otobüslerinin sanayide sıra beklemeden kendi şirket ustaların tarafından tamir edildiği ve her sefer öncesi otomatik yıkandığı kademe binandır. Yağ, filtre, fren, lastik bakımları burada yapılır.",
                 playerBenefits: [
-                    "🔧 Sanayi ve tamir masraflarınızı devasa oranda ucuzlatır (%65'e varan tamir indirimi).",
+                    "🔧 Sanayi ve tamir masraflarını devasa oranda ucuzlatır (%65'e varan tamir indirimi).",
                     "🧼 Pırıl pırıl yıkanmış otobüslerle yolcu memnuniyetini ve kaptan bahşişlerini zirveye çıkarır.",
                     "🛡️ Yolda kalma, motor harareti ve ani arıza riskini sıfıra indirir; yakıt tüketimini %15 düşürür."
                 ],
@@ -830,10 +830,10 @@
                 name: "Personel Dinlenme Evi / Kaptan Lojmanı",
                 icon: "🛏️",
                 category: "Güvenlik & Yasal Takograf Dinlenme Şartı",
-                simpleSummary: "Kaptan şoförlerinizin ve muavinlerinizin yasal direksiyon süreleri (takograf) bittiğinde sıcak duş alıp sessizce uyuduğu dinlenme evidir. Yorgun şoförün kaza yapmasını ve ceza yemesini engeller.",
+                simpleSummary: "Kaptan şoförlerinin ve muavinlerinin yasal direksiyon süreleri (takograf) bittiğinde sıcak duş alıp sessizce uyuduğu dinlenme evidir. Yorgun şoförün kaza yapmasını ve ceza yemesini engeller.",
                 playerBenefits: [
-                    "🛌 Şoförlerin dinlenme süresini hızlandırır, sefer aralarında uzun süre beklemenizi önler.",
-                    "🌟 Şoförlerin tecrübe puanı (XP) kazanımını x2 katına çıkarır ve bol bahşiş getirmelerini sağlar.",
+                    "🛌 Şoförlerin dinlenme süresini hızlandırır, sefer aralarında uzun süre beklemeni önler.",
+                    "🌟 Şoförlerin tecrübe puanı (XP) kazanımını x2 katına çıkarır ve sana bol bahşiş getirmelerini sağlar.",
                     "🛡️ Yorgunluk ve uykusuzluk kaynaklı kaza ile trafik cezası riskini tamamen ortadan kaldırır."
                 ],
                 desc: "Şoförlerin yasal takograf dinlenme sürelerini doldurabilmesi için garaj sahası veya otogar yakınında kiralanan/kurulan gürültüden uzak uyku, sıcak duş ve dinlenme lojmanı.",
@@ -875,10 +875,10 @@
                 name: "Şehir İçi Bilet Satış Acenteleri & Terminal Shuttle (Servis) Ağı",
                 icon: "🏬",
                 category: "Doğrudan Bilet Satışı & Yolcu Servis Minibüsleri",
-                simpleSummary: "Otogar şehrin dışındadır; bu yüzden vatandaşlar biletlerini çarşıdaki cadde acentelerinizden alır. Ücretsiz servis minibüsleriniz (shuttle) de yolcuları mahallelerden toplayıp otogardaki peronunuza getirir. Otobüsünüzün boş kalkmasını engeller!",
+                simpleSummary: "Otogar şehrin dışındadır; bu yüzden vatandaşlar biletlerini çarşıdaki cadde acentelerinden alır. Ücretsiz servis minibüslerin (shuttle) de yolcuları mahallelerden toplayıp otogardaki peronuna getirir. Otobüsünün boş kalkmasını engeller!",
                 playerBenefits: [
                     "👥 Yolcu talebini patlatır, otobüslerinizin koltuklarını tıka basa doldurur.",
-                    "🚌 Şehir merkezinden otogara ücretsiz yolcu taşıyarak firmanızı en çok tercih edilen marka yapar.",
+                    "🚌 Şehir merkezinden otogara ücretsiz yolcu taşıyarak firmanı en çok tercih edilen marka yapar.",
                     "💵 Seviye atladıkça bilet hasılatınıza kalıcı prim (%50) ve acentelerden düzenli komisyon kârı sağlar."
                 ],
                 desc: "Şehir merkezindeki yolcuların bilet temin ettiği ve terminallere ücretsiz servis araçlarıyla (shuttle) ulaştırıldığı cadde üzeri bilet acenteleri ve servis filosu.",
@@ -1057,7 +1057,7 @@
                             <span>🇹🇷</span> <span>B1 YETKİ BELGESİ — ŞİRKET BİNALARI VE TESİS REHBERİ</span>
                         </div>
                         <div style="color: #cbd5e1; font-size: 0.9rem; margin-top: 4px; line-height: 1.5;">
-                            Gerçek bir otobüs şirketi yönetirken sahip olmanız gereken <strong>6 temel bina ve tesis</strong> vardır. Her binayı büyüttüğünüzde filonuz daha çok para kazanır, masraflarınız düşer ve seferleriniz hızlanır.
+                            Gerçek bir otobüs şirketi yönetirken sahip olman gereken <strong>6 temel bina ve tesis</strong> vardır kaptanım. Her binayı büyüttüğünde filon daha çok para kazanır, masrafların düşer ve seferlerin hızlanır.
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -1073,22 +1073,22 @@
                 <!-- 6 BİNA HIZLI ÖZET KARTLARI -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.1);">
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #38bdf8; font-size: 0.84rem; color: #cbd5e1;">
-                        🏛️ <strong>Genel Müdürlük:</strong> Şirketin beynidir. Sefer izinlerini yönetir, cezalardan korur ve bilet hasılatına +%30 marka primi kazandırır.
+                        🏛️ <strong>Genel Müdürlük:</strong> Şirketinin beynidir. Sefer izinlerini yönetir, cezalardan korur ve bilet hasılatına +%30 marka primi kazandırır.
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #22c55e; font-size: 0.84rem; color: #cbd5e1;">
-                        🅿️ <strong>Filo Garajı:</strong> Otobüs park alanıdır. Şirketinize kaç otobüs alabileceğinizi (filo kapasitesini) belirler ve gece hasarlarını önler.
+                        🅿️ <strong>Filo Garajı:</strong> Otobüs park alanındır. Şirketine kaç otobüs alabileceğini (filo kapasiteni) belirler ve gece hasarlarını önler.
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #facc15; font-size: 0.84rem; color: #cbd5e1;">
-                        🏢 <strong>Otogar Yazıhaneleri:</strong> Terminallerdeki dükkânlarınızdır. Sefer başı +3.500 ₺ pasif kâr ve %100 BEDAVA MAZOT kazandırır!
+                        🏢 <strong>Otogar Yazıhaneleri:</strong> Terminallerdeki dükkânlarındır. Sefer başı +3.500 ₺ pasif kâr ve %100 BEDAVA MAZOT kazandırır!
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #f97316; font-size: 0.84rem; color: #cbd5e1;">
-                        🛠️ <strong>Kademe Binası (Tamirhane & Yıkama):</strong> Sanayi faturasını %65 düşürür, otomatik yıkama ile memnuniyeti ve bahşişleri artırır.
+                        🛠️ <strong>Kademe Binası (Tamirhane & Yıkama):</strong> Sanayi faturanı %65 düşürür, otomatik yıkama ile memnuniyeti ve bahşişleri artırır.
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #ec4899; font-size: 0.84rem; color: #cbd5e1;">
-                        🛏️ <strong>Kaptan Lojmanı:</strong> Şoförlerin dinlenme evidir. Takograf dinlenme süresini %75 kısaltır, kazaları önler ve x2 kat sefer verimi sağlar.
+                        🛏️ <strong>Kaptan Lojmanı:</strong> Şoförlerinin dinlenme evidir. Takograf dinlenme süresini %75 kısaltır, kazaları önler ve x2 kat sefer verimi sağlar.
                     </div>
                     <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #a855f7; font-size: 0.84rem; color: #cbd5e1;">
-                        🏬 <strong>Şehir İçi Acente & Servis Ağı:</strong> Otogara uzak yolcuları çarşıdan toplayıp otobüsü doldurur ve bilet hasılatını +%50 artırır.
+                        🏬 <strong>Şehir İçi Acente & Servis Ağı:</strong> Otogara uzak yolcuları çarşıdan toplayıp otobüsünü doldurur ve bilet hasılatını +%50 artırır.
                     </div>
                 </div>
             </div>
@@ -1149,7 +1149,7 @@
                         <!-- 2. KUTU: OYUNA VE FİLONUZA SOMUT FAYDALARI -->
                         <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 9px; padding: 12px; margin-bottom: 12px;">
                             <div style="color: #facc15; font-weight: bold; font-size: 0.85rem; margin-bottom: 6px; display: flex; align-items: center; gap: 5px;">
-                                <span>🎮</span> <span>Oyuna ve Filonuza Kazandırdığı Faydalar:</span>
+                                <span>🎮</span> <span>Sana ve Filona Kazandırdığı Faydalar:</span>
                             </div>
                             ${benefitsListHtml}
                         </div>
@@ -1157,7 +1157,7 @@
                         <!-- 3. KUTU: MEVCUT SEVİYE GÜCÜ -->
                         <div style="background: rgba(34, 197, 94, 0.12); border: 1.5px solid rgba(34, 197, 94, 0.35); border-radius: 9px; padding: 12px; margin-bottom: 10px;">
                             <div style="color: #4ade80; font-size: 0.84rem; font-weight: bold; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;">
-                                <span>✓</span> <span>ŞU ANKİ SEVİYENİZ: ${curLvlObj.title}</span>
+                                <span>✓</span> <span>ŞU ANKİ SEVİYEN: ${curLvlObj.title}</span>
                             </div>
                             <div style="color: #f1f5f9; font-size: 0.85rem; line-height: 1.4;">
                                 ${curLvlObj.simplePerk || curLvlObj.perkDesc}
