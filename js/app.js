@@ -881,6 +881,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const btnOpenLeaderboard = document.getElementById('btn-open-leaderboard');
+    if (btnOpenLeaderboard) {
+        btnOpenLeaderboard.addEventListener('click', () => {
+            if (typeof LeaderboardSystem !== 'undefined' && LeaderboardSystem.open) {
+                LeaderboardSystem.open();
+            }
+        });
+    }
     const hudFuelPanel = document.getElementById('hud-fuel-panel');
     if (hudFuelPanel) {
         hudFuelPanel.addEventListener('click', () => {
