@@ -2362,8 +2362,12 @@
                         stateChanged = true;
                     }
                 } else if (driver.status === 'resting') {
-                    // Dinlenme süresi (Lüks dinlenme tesisi anlaşması varsa 2 kat hızlı)
-                    const restRate = (this.data.hqUpgrades && this.data.hqUpgrades.luxuryLounge) ? 2.0 : 1.0;
+                    // 6. Personel Sosyal Tesisleri ve Dinlenme Odaları (Staff Lounge)
+                    let restRate = 1.0;
+                    const loungeLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('driver_lodging') : 1;
+                    if (loungeLvl === 2) restRate = 2.0; // Seviye 2: %50 daha hızlı dinlenme (2 kat)
+                    else if (loungeLvl >= 3) restRate = 4.0; // Seviye 3: %75 daha hızlı dinlenme (4 kat)
+                    if (this.data.hqUpgrades && this.data.hqUpgrades.luxuryLounge) restRate = Math.max(restRate, 2.0);
                     driver.restRemainingSeconds = (driver.restRemainingSeconds || 12) - (deltaSec * restRate);
                     
                     // Enerji yavaş yavaş dolar

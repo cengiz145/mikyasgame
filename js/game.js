@@ -70,11 +70,11 @@ const Game = {
         let effCostPerLiter = costPerLiter;
         let isFreeFuel = false;
         if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
-            const resortLvl = CompanySystem.getInstitutionLevel('highway_resort');
-            if (resortLvl === 2) {
-                effCostPerLiter = Math.round(costPerLiter * 0.70); // %30 dinlenme tesisi indirimi
-            } else if (resortLvl === 3) {
-                effCostPerLiter = 0; // %100 ÜCRETSİZ
+            const fuelLvl = Math.max(CompanySystem.getInstitutionLevel('fuel_depot'), CompanySystem.getInstitutionLevel('highway_resort'));
+            if (fuelLvl === 2) {
+                effCostPerLiter = Math.round(costPerLiter * 0.70); // %30 toptan yakıt tasarrufu
+            } else if (fuelLvl >= 3) {
+                effCostPerLiter = 0; // %100 ÜCRETSİZ MAZOT (Şirket Akaryakıt İstasyonu Seviye 3)
                 isFreeFuel = true;
             }
         }
@@ -101,7 +101,7 @@ const Game = {
             audio.playNavChime();
         }
         const succMsg = isFreeFuel 
-            ? `⛽ Şirket Mega Yaşam Kompleksi ayrıcalığıyla depoya ${Math.floor(toAdd)} litre mazot ÜCRETSİZ dolduruldu! Depo: %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`
+            ? `⛽ Şirket Akaryakıt İstasyonu (Seviye 3) ayrıcalığıyla depoya ${Math.floor(toAdd)} litre mazot ÜCRETSİZ dolduruldu! Depo: %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`
             : `⛽ Depoya ${Math.floor(toAdd)} litre mazot dolduruldu (-${cost} ₺). Depo şu an %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`;
         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(succMsg, "success");
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Depoya ${Math.floor(toAdd)} litre mazot alındı. Yakıt seviyeniz yüzde ${Math.floor((this.currentFuelLiters / cap) * 100)}.`);
@@ -4276,9 +4276,19 @@ const Game = {
         this.activeNPCs = [];
         
         if (isSuccess) {
-            // Otogar Yazıhanesi Emanet & Paket Kargo Geliri
-            const cargoPackagesCount = 4 + Math.floor(Math.random() * 5); // 4-8 adet emanet koli
-            const cargoPerPkg = 140; // Koli başı 140 TL
+            // 7. Lojistik ve İkram Deposu (Catering & Cargo Hub) & Paket Kargo
+            let cargoBaseCount = 4 + Math.floor(Math.random() * 5); // Temel 4-8 koli
+            let cargoPerPkg = 140; // Koli başı 140 TL
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const cargoHubLvl = Math.max(CompanySystem.getInstitutionLevel('catering_cargo_hub'), CompanySystem.getInstitutionLevel('catering_logistics'));
+                if (cargoHubLvl === 2) {
+                    cargoBaseCount = 8 + Math.floor(Math.random() * 7); // 8-14 koli (Soğuk Hava Depolu & Yükleme Rampası)
+                } else if (cargoHubLvl >= 3) {
+                    cargoBaseCount = 15 + Math.floor(Math.random() * 9); // 15-23 koli (Mega Dağıtım Merkezi)
+                    cargoPerPkg = 160; // VIP Hızlı Kargo primi
+                }
+            }
+            const cargoPackagesCount = cargoBaseCount;
             let cargoEarnings = cargoPackagesCount * cargoPerPkg;
             let agencyNote = "";
 
@@ -4299,20 +4309,26 @@ const Game = {
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(cargoMsg, 'success');
             // Şirket Dinlenme Tesisi Seferi Temettüsü
             if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
-                const finishResortLvl = CompanySystem.getInstitutionLevel('highway_resort');
+                const termOfficeLvl = Math.max(CompanySystem.getInstitutionLevel('terminal_offices'), CompanySystem.getInstitutionLevel('highway_resort'));
                 let finishDiv = 0;
-                if (finishResortLvl === 2) finishDiv = 1500;
-                else if (finishResortLvl === 3) finishDiv = 3500;
+                if (termOfficeLvl === 2) finishDiv = 1500;
+                else if (termOfficeLvl >= 3) finishDiv = 3500;
                 if (finishDiv > 0) {
                     this.addMoney(finishDiv, true);
-                    if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'dividends', 'Otogar Peron Temettüsü', finishDiv);
-                    const divMsg = `☕ Şirket Dinlenme Tesisi kâr payı: +${finishDiv.toLocaleString('tr-TR')} ₺ cüzdanınıza aktarıldı!`;
+                    if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'dividends', 'Otogar Yazıhane & Bekleme Salonu Kâr Payı', finishDiv);
+                    const divMsg = `🏢 Otogar Yazıhanesi & VIP Salon kâr payı: +${finishDiv.toLocaleString('tr-TR')} ₺ aktarıldı!`;
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(divMsg, 'success');
                 }
             }
 
             let comfortBonus = 0;
             let comfortMsg = "";
+            // 3. Otobüs Yıkama İstasyonu (Bus Wash) Etkisi
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const washLvl = CompanySystem.getInstitutionLevel('bus_wash');
+                if (washLvl === 2) this.passengerComfort = Math.min(100, (this.passengerComfort || 70) + 10);
+                else if (washLvl >= 3) this.passengerComfort = Math.min(100, (this.passengerComfort || 70) + 20);
+            }
             if (this.passengerComfort >= 80) {
                 const curBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                 const tipBonusPct = (curBus && curBus.tipBonusPercent) ? curBus.tipBonusPercent : 0;
