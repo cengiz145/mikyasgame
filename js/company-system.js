@@ -424,71 +424,8 @@
             });
         },
 
-        // Türkiye'nin Önde Gelen Otobüs Şirketleri (Maaşlı Kaptanlık Modu)
-        corporateCompanies: [
-            {
-                id: "kamil_koc",
-                name: "Kâmil Koç Otobüsleri",
-                slogan: "Cumhuriyetin İlk Karayolu Firması (1926)",
-                logo: "🔵",
-                badge: "⭐ Kurumsal Kaptan",
-                dailySalary: 3500,
-                bonusPercent: 10,
-                companySharePercent: 50,
-                minLevel: 1,
-                desc: "Düzenli hat seferleri, her seferde +%10 garanti bilet primi ve şirket yemek/ikram desteği.",
-                color: "#38bdf8"
-            },
-            {
-                id: "pamukkale",
-                name: "Pamukkale Turizm",
-                slogan: "Keyifli Yolculuk, Pamuk Eller Direksiyona (Jumbo VIP)",
-                logo: "🔴",
-                badge: "👑 VIP Baş Kaptan",
-                dailySalary: 4500,
-                bonusPercent: 15,
-                companySharePercent: 50,
-                minLevel: 2,
-                desc: "2+1 Jumbo araç filosu, üstün yolcu konforu ve sefer başına +%15 VIP memnuniyet primi.",
-                color: "#f87171"
-            },
-            {
-                id: "metro",
-                name: "Metro Turizm",
-                slogan: "Aklınızda Neresi Varsa, Orada Bir Metro Var",
-                logo: "🔴",
-                badge: "⚡ Seri Sefer Kaptanı",
-                dailySalary: 3800,
-                bonusPercent: 12,
-                minLevel: 1,
-                desc: "Türkiye'nin en geniş acente ağı, yüksek sefer sıklığı ve sefer başına +%12 ciro primi.",
-                color: "#fb923c"
-            },
-            {
-                id: "tekulas",
-                name: "TEKULAŞ (Tekirdağ Büyükşehir Belediyesi)",
-                slogan: "Halkımızın Hizmetinde Güvenli, Konforlu Şehir İçi Ulaşım",
-                logo: "🟡",
-                badge: "🏛️ Resmi Belediye Şoförü",
-                dailySalary: 3200,
-                bonusPercent: 8,
-                minLevel: 1,
-                desc: "Resmi büyükşehir belediyesi kadrosu, sabit mesai, kamu sosyal hakları ve sendika güvencesi.",
-                color: "#facc15"
-            },
-            {
-                id: "varan",
-                name: "Varan Turizm",
-                slogan: "Türkiye Karayollarının Bir Numaralı Ultra Lüks Efsanesi",
-                logo: "🌟",
-                badge: "💎 Elit Karayolu Kaptanı",
-                dailySalary: 6000,
-                bonusPercent: 20,
-                minLevel: 3,
-                desc: "Business Class ultra lüks seferler, +%20 VIP ciro primi ve yüksek yolcu bahşişleri.",
-                color: "#eab308"
-            }
-        ],
+        // Şirketler Sadece Gerçek İnsanlar / Kaptanlar Tarafından Kurulur (Yapay Şirket Bulunmaz)
+        corporateCompanies: [],
 
         // Şoför Rütbe ve Terfi Basamakları
         ranks: [
@@ -1945,11 +1882,11 @@
                                     const caps = this.getCaptainCompanies();
                                     if (caps.length === 0) {
                                         if (typeof audio !== 'undefined' && audio.speak) {
-                                            audio.speak("Var olan bir şirkete katıl menüsü açıldı. Görünüşe göre kimse şirket kurmamış. İlk şirketinizi oluşturmak için yeni bir şirket kur butonuna basınız. Kurumsal firmalar listelendi.");
+                                            audio.speak("Var olan bir şirkete katıl menüsü açıldı. Görünüşe göre kimse şirket kurmamış. İlk şirketinizi oluşturmak için yeni bir şirket kur butonuna basınız.");
                                         }
                                     } else {
                                         if (typeof audio !== 'undefined' && audio.speak) {
-                                            audio.speak(`Var olan bir şirkete katıl menüsü açıldı. Kaptanlar tarafından kurulan ${caps.length} şirket ve kurumsal firmalar listelendi.`);
+                                            audio.speak(`Var olan bir şirkete katıl menüsü açıldı. Kaptanlar tarafından kurulan ${caps.length} şirket listelendi.`);
                                         }
                                     }
                                 }
@@ -2696,33 +2633,32 @@
 
             let html = '';
 
-            // --- 1. KAPTANLARIN KURDUĞU ŞİRKETLER BÖLÜMÜ ---
+            // ŞİRKETLERİ SADECE İNSANLAR KURAR (YAPAY ŞİRKETLER YOKTUR)
             if (captainCompanies.length === 0) {
                 // Görünüşe göre kimse şirket kurmamış ikazı
                 html += `
-                <div style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 2.5px dashed #f59e0b; border-radius: 14px; padding: 26px 28px; text-align: center; margin-bottom: 16px; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.2);">
-                    <div style="font-size: 2.8rem; margin-bottom: 10px; animation: pulse 2s infinite;">🏢</div>
-                    <div style="color: #fde047; font-size: 1.35rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">
+                <div style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 2.5px dashed #f59e0b; border-radius: 14px; padding: 32px 28px; text-align: center; margin-bottom: 16px; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.2);">
+                    <div style="font-size: 3rem; margin-bottom: 12px; animation: pulse 2s infinite;">🏢</div>
+                    <div style="color: #fde047; font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; letter-spacing: 0.5px;">
                         Görünüşe göre kimse şirket kurmamış.
                     </div>
-                    <div style="color: #e2e8f0; font-size: 1rem; max-width: 650px; margin: 0 auto 18px auto; line-height: 1.6;">
-                        İlk şirketinizi oluşturmak için aşağıdaki <strong>"Yeni Bir Şirket Kur"</strong> butonuna basınız. Şirketinizin adını, kaç kaptan çalıştırmak istediğinizi ve kaptanlara vereceğiniz günlük maaşı kendiniz belirlersiniz.
+                    <div style="color: #e2e8f0; font-size: 1.02rem; max-width: 650px; margin: 0 auto 20px auto; line-height: 1.6;">
+                        Oyunda yapay şirket bulunmamaktadır; tüm şirketler sadece gerçek kaptanlar tarafından kurulur. İlk şirketinizi oluşturmak için aşağıdaki <strong>"Yeni Bir Şirket Kur"</strong> butonuna basınız. Şirketinizin adını, kaç kaptan çalıştırmak istediğinizi, kaptanlara vereceğiniz günlük maaşı ve hasılat bölüşümünü kendiniz belirlersiniz.
                     </div>
-                    <button id="btn-empty-create-company" class="modern-btn nav-item" style="padding: 12px 30px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; border-radius: 10px; font-size: 1.05rem; cursor: pointer; border: none; box-shadow: 0 4px 20px rgba(245,158,11,0.45); transition: transform 0.2s;" aria-label="Yeni bir şirket kur">
+                    <button id="btn-empty-create-company" class="modern-btn nav-item" style="padding: 13px 32px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; border-radius: 10px; font-size: 1.05rem; cursor: pointer; border: none; box-shadow: 0 4px 20px rgba(245,158,11,0.45); transition: transform 0.2s;" aria-label="Yeni bir şirket kur">
                         🏢 Yeni Bir Şirket Kur
                     </button>
                 </div>
                 `;
             } else {
-                // Kaptan şirketleri mevcut
                 html += `
-                <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px 16px;">
+                <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px 16px;">
                     <div>
                         <div style="color: #facc15; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
                             <span>👨‍✈️</span> <span>Kaptanların Kurduğu Şirketler (${captainCompanies.length} Şirket Aktif)</span>
                         </div>
                         <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 2px;">
-                            Her şirketin kurucusu kaç kaptan çalıştıracağını ve kaptanlarına ne kadar maaş vereceğini kendisi belirler.
+                            Tüm şirketler sadece gerçek insanlar tarafından kurulur. Kurucu kaç kaptan çalıştıracağını, maaşını ve hasılat bölüşümünü kendisi belirler.
                         </div>
                     </div>
                     <button id="btn-sub-create-company" class="modern-btn nav-item" style="padding: 8px 18px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: bold; font-size: 0.92rem; border-radius: 8px; cursor: pointer; border: none; box-shadow: 0 2px 10px rgba(245,158,11,0.3);">
@@ -2738,6 +2674,8 @@
                     const isFull = (activeCount >= maxQuota && !isCurrent);
                     const foundedDateStr = this.formatTurkishDate(comp.createdDate);
                     const salaryFormatted = (parseInt(comp.dailySalary) || 2500).toLocaleString('tr-TR');
+                    const compShare = (comp.companySharePercent !== undefined) ? comp.companySharePercent : 50;
+                    const capShare = 100 - compShare;
 
                     html += `
                     <div style="background: rgba(15,23,42,0.92); border: 2px solid ${isCurrent ? '#22c55e' : '#f59e0b'}; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.18);">
@@ -2772,12 +2710,12 @@
                                     <strong style="color: ${isFull ? '#ef4444' : '#38bdf8'}; font-size: 0.95rem;">${activeCount} / ${maxQuota} Kaptan ${isFull ? '(Dolu)' : ''}</strong>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                                    <span>📊 Hasılat Bölüşümü:</span>
-                                    <strong style="color: #38bdf8; font-size: 0.95rem;">%${comp.companySharePercent || 50} Şirkete / %${100 - (comp.companySharePercent || 50)} Kaptana</strong>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
                                     <span>💰 Kaptanlara Verilen Günlük Maaş:</span>
                                     <strong style="color: #4ade80; font-size: 1.05rem;">${salaryFormatted} ₺ / Gün</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                    <span>📊 Hasılat Bölüşümü:</span>
+                                    <strong style="color: #38bdf8; font-size: 0.95rem;">%${compShare} Şirkete / %${capShare} Kaptana</strong>
                                 </div>
                                 <div style="display: flex; justify-content: space-between;">
                                     <span>🎁 Sefer Başı Bilet Primi:</span>
@@ -2786,7 +2724,7 @@
                             </div>
 
                             <div style="color: #94a3b8; font-size: 0.84rem; line-height: 1.4; margin-bottom: 14px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 6px;">
-                                💡 <em>Kurucu Şartı:</em> Kurucu ${comp.founder} tarafından ${maxQuota} kaptanlık kadro açılmış olup, kaptan başına günlük ${salaryFormatted} ₺ garanti maaş ve +%${comp.bonusPercent || 18} sefer primi ödenmektedir.
+                                💡 <em>Kurucu Şartı:</em> Kurucu ${comp.founder} tarafından ${maxQuota} kaptanlık kontenjan açılmış olup, kaptan başına günlük ${salaryFormatted} ₺ garanti maaş, %${compShare} şirket / %${capShare} kaptan gelir bölüşümü ve +%${comp.bonusPercent || 18} sefer primi ödenmektedir.
                             </div>
                         </div>
 
@@ -2809,71 +2747,6 @@
                     `;
                 });
             }
-
-            // --- 2. KURUMSAL ULUSAL ŞİRKETLER BÖLÜMÜ ---
-            html += `
-            <div style="grid-column: 1 / -1; margin-top: 18px; margin-bottom: 6px;">
-                <div style="color: #38bdf8; font-size: 1.18rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                    <span>🏛️</span> <span>Kurumsal Ulusal Şirketler (Kâmil Koç, Pamukkale, TEKULAŞ...)</span>
-                </div>
-            </div>
-            `;
-
-            this.corporateCompanies.forEach(comp => {
-                const isCurrent = (activeCorpId === comp.id);
-                const isUnlocked = (currentLevel >= comp.minLevel);
-
-                html += `
-                <div style="background: rgba(15,23,42,0.85); border: 1.5px solid ${isCurrent ? '#22c55e' : (isUnlocked ? comp.color : '#334155')}; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <div style="font-size: 1.15rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
-                                <span>${comp.logo}</span>
-                                <span>${comp.name}</span>
-                            </div>
-                            <span style="font-size: 0.8rem; padding: 2px 8px; border-radius: 6px; background: rgba(0,0,0,0.5); border: 1px solid ${comp.color}; color: #fff;">
-                                ${comp.badge}
-                            </span>
-                        </div>
-                        <div style="color: #94a3b8; font-size: 0.83rem; font-style: italic; margin-bottom: 8px;">
-                            "${comp.slogan}"
-                        </div>
-                        <div style="background: rgba(255,255,255,0.04); border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.85rem; color: #cbd5e1;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-                                <span>📊 Hasılat Bölüşümü:</span>
-                                <strong style="color: #38bdf8;">%${comp.companySharePercent || 50} Şirket / %${100 - (comp.companySharePercent || 50)} Kaptan</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-                                <span>💰 Günlük Maaş:</span>
-                                <strong style="color: #fde047;">${comp.dailySalary.toLocaleString('tr-TR')} ₺</strong>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>🎁 Sefer Başı Bilet Primi:</span>
-                                <strong style="color: #4ade80;">+%${comp.bonusPercent}</strong>
-                            </div>
-                        </div>
-                        <div style="color: #cbd5e1; font-size: 0.83rem; line-height: 1.3; margin-bottom: 12px;">
-                            💡 ${comp.desc}
-                        </div>
-                    </div>
-                    <div>
-                        ${isCurrent ? `
-                            <button class="modern-btn btn-leave-company nav-item" data-company-id="${comp.id}" style="width: 100%; padding: 10px; background: rgba(34,197,94,0.2); border: 1.5px solid #22c55e; color: #4ade80; font-weight: bold; border-radius: 8px; cursor: pointer;">
-                                ✅ AKTİF ÇALIŞTIĞINIZ FİRMA (Ayrıl)
-                            </button>
-                        ` : (isUnlocked ? `
-                            <button class="modern-btn btn-join-company nav-item" data-company-id="${comp.id}" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
-                                ✍️ Sözleşme İmzala (Maaşlı Kaptan Ol)
-                            </button>
-                        ` : `
-                            <button class="modern-btn" disabled style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid #334155; color: #64748b; font-weight: bold; border-radius: 8px;">
-                                🔒 Seviye ${comp.minLevel} Gerekli
-                            </button>
-                        `)}
-                    </div>
-                </div>
-                `;
-            });
 
             container.innerHTML = html;
 
