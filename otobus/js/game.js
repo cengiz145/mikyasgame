@@ -5051,7 +5051,14 @@ const SanayiMechanic = {
             document.getElementById('sanayi-dialog').innerText = msg;
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
             
-            // Onarım işlemi 30 saniye sürüyor (Her parça için)
+            // Kademe Binası Seviyesine Göre Onarım Süresi (Hatta Geri Dönme Hızı)
+            let repairDuration = 2000;
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const kademeLvl = CompanySystem.getInstitutionLevel('maintenance_depot');
+                if (kademeLvl === 2) repairDuration = 1000; // %50 Daha Hızlı Onarım (Liftler & Diagnostik)
+                else if (kademeLvl >= 3) repairDuration = 500;  // %75 Hızlı Ekspres Onarım (Mega Revizyon Üssü)
+            }
+
             setTimeout(() => {
                 // Hasarı sıfırla
                 Game.busDamage[part.id] = 0;
