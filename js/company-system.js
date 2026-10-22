@@ -3577,15 +3577,14 @@
 
             const modalHtml = `
             <div id="company-system-modal" class="modal-overlay modal hidden" role="dialog" aria-modal="true" aria-labelledby="company-modal-title" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 8600; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-                <div class="glass-panel" style="max-width: 940px; width: 96%; padding: 22px 26px; text-align: left; max-height: 92vh; overflow-y: auto; border: 2px solid #ca8a04; box-shadow: 0 0 45px rgba(202, 138, 4, 0.35); border-radius: 14px;">
+                <div class="glass-panel" style="max-width: 960px; width: 96%; padding: 22px 26px; text-align: left; max-height: 92vh; overflow-y: auto; border: 2px solid #ca8a04; box-shadow: 0 0 45px rgba(202, 138, 4, 0.35); border-radius: 14px;">
                     
                     <!-- Başlık ve Kapatma -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(250, 204, 21, 0.2); padding-bottom: 10px;">
                         <div>
-                            <h2 id="company-modal-title" style="font-size: 1.75rem; margin: 0; color: #facc15; display: flex; align-items: center; gap: 8px;">
-                                🏢 Şirket Kur veya Var Olan Bir Şirkette Çalış
+                            <h2 id="company-modal-title" style="font-size: 1.7rem; margin: 0; color: #facc15; display: flex; align-items: center; gap: 8px;">
+                                🏢 Şirket & Filo Yönetim Merkezi
                             </h2>
-                            
                         </div>
                         <div style="display: flex; gap: 8px; align-items: center;">
                             <button id="btn-company-ai-dispatch-top" class="modern-btn nav-item" style="padding: 8px 16px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #000; font-weight: bold; border: 1px solid #7dd3fc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px;" aria-label="Başharekât: Tek tuşla tüm şoförleri en karlı seferlere akıllıca dağıt">
@@ -3600,121 +3599,107 @@
                         <!-- Dinamik doldurulacak -->
                     </div>
 
-                    <!-- 5 Sekme Butonları -->
-                    <div style="display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;">
-                        <button id="tab-comp-drivers" class="modern-btn nav-item" style="flex: 1; min-width: 130px; padding: 9px 8px; font-weight: bold; background: rgba(234, 179, 8, 0.3); border: 1.5px solid #facc15; color: #fff; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            🚌 Kendi Filom & Şoförlerim
+                    <!-- 4 Temel Yönetim Sütunu Sekme Butonları -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;" role="tablist" aria-label="Şirket Yönetim Sekmeleri">
+                        <button id="tab-comp-drivers" class="modern-btn nav-item" role="tab" aria-selected="true" style="flex: 1; min-width: 160px; padding: 11px 10px; font-weight: bold; background: rgba(234, 179, 8, 0.35); border: 2px solid #facc15; color: #fff; cursor: pointer; border-radius: 8px; font-size: 0.95rem;">
+                            🚌 1. Filom & Şoförler
                         </button>
-                        <button id="tab-comp-institutions" class="modern-btn nav-item" style="flex: 1; min-width: 150px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            🏛️ Yasal Binalar & Garaj (B1 Belgesi)
+                        <button id="tab-comp-institutions" class="modern-btn nav-item" role="tab" aria-selected="false" style="flex: 1; min-width: 160px; padding: 11px 10px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 8px; font-size: 0.95rem;">
+                            🏢 2. Binalar & Garaj
                         </button>
-                        <button id="tab-comp-corporate-work" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            👔 Var Olan Bir Şirkete Katıl (Maaşlı)
+                        <button id="tab-comp-finances" class="modern-btn nav-item" role="tab" aria-selected="false" style="flex: 1; min-width: 160px; padding: 11px 10px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 8px; font-size: 0.95rem;">
+                            💰 3. Kasa & Finans
                         </button>
-                        <button id="tab-comp-market-trends" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.9rem;">
-                            📈 Sefer Borsası & VIP İhale
-                        </button>
-                        <button id="tab-comp-hire" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.9rem;">
-                            👨‍✈️ Şoför Pazarı & Transfer
-                        </button>
-                        <button id="tab-comp-hq" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.9rem;">
-                            🏢 Şirket Gelişimi & Merkez
-                        </button>
-                        <button id="tab-comp-radio" class="modern-btn nav-item" style="flex: 1; min-width: 120px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            📻 Canlı Telsiz
-                        </button>
-                        <button id="tab-comp-catering" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            ☕ İkram & Muavin
-                        </button>
-                                                <button id="tab-comp-finances" class="modern-btn nav-item" style="flex: 1; min-width: 150px; padding: 9px 8px; font-weight: bold; background: rgba(34, 197, 94, 0.2); border: 1.5px solid #22c55e; color: #4ade80; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            📊 Kasa Defteri & Muhasebe
-                        </button>
-<button id="tab-comp-branches" class="modern-btn nav-item" style="flex: 1; min-width: 150px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            🏢 Yazıhaneler & Bilet
+                        <button id="tab-comp-corporate-work" class="modern-btn nav-item" role="tab" aria-selected="false" style="flex: 1; min-width: 160px; padding: 11px 10px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 8px; font-size: 0.95rem;">
+                            👔 4. Şirketlerde Çalış
                         </button>
                     </div>
 
-                    <!-- 1. SEKME: Şoförlerim & Filo Yönetimi -->
-                    <div id="panel-comp-drivers" style="display: block;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
-                            <span style="font-size: 0.9rem; color: #cbd5e1;">Filodaki kaptanlarınızın araç, rota, enerji ve canlı ilerlemeleri:</span>
-                            <div style="display: flex; gap: 6px;">
-                                <button id="btn-comp-repair-all" class="modern-btn nav-item" style="padding: 5px 12px; background: rgba(34, 197, 94, 0.2); border: 1px solid #22c55e; color: #4ade80; font-size: 0.85rem; cursor: pointer; border-radius: 6px;">
+                    <!-- 1. PİLLAR: Filom & Şoförlerim (Aktif Filo, Şoför Pazarı, Borsa ve Telsiz) -->
+                    <div id="panel-comp-drivers" role="tabpanel" style="display: block;">
+                        <!-- Hızlı Operasyon Çubuğu -->
+                        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9)); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <div style="color: #38bdf8; font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                                    <span>⚡ Filo Hızlı Operasyonları</span>
+                                </div>
+                                <div style="color: #cbd5e1; font-size: 0.84rem; margin-top: 2px;">
+                                    Filodaki kaptanlarınızın araç, rota, enerji ve canlı ilerlemeleri:
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button id="btn-comp-repair-all" class="modern-btn nav-item" style="padding: 7px 14px; background: rgba(34, 197, 94, 0.2); border: 1.5px solid #22c55e; color: #4ade80; font-size: 0.86rem; font-weight: bold; cursor: pointer; border-radius: 6px;">
                                     🛠️ Tüm Filoya Bakım Yap
                                 </button>
                             </div>
                         </div>
-                        <div id="company-hired-list" style="max-height: 48vh; overflow-y: auto;">
-                            <!-- Dinamik doldurulacak -->
+
+                        <!-- Aktif Şoförler Listesi -->
+                        <div style="margin-bottom: 22px;">
+                            <h3 style="color: #facc15; font-size: 1.15rem; margin: 0 0 10px 0; display: flex; align-items: center; gap: 6px;">
+                                <span>🚌</span> <span>Aktif Kaptanlarım & Otobüslerim</span>
+                            </h3>
+                            <div id="company-hired-list" style="max-height: 48vh; overflow-y: auto;">
+                                <!-- Dinamik doldurulacak -->
+                            </div>
+                        </div>
+
+                        <!-- Şoför Pazarı & Yeni Kaptan Transferi -->
+                        <div style="margin-bottom: 22px; border-top: 1.5px solid rgba(255,255,255,0.12); padding-top: 16px;">
+                            <div style="margin-bottom: 10px;">
+                                <h3 style="color: #38bdf8; font-size: 1.15rem; margin: 0; display: flex; align-items: center; gap: 6px;">
+                                    <span>👨‍✈️</span> <span>Şoför Pazarı & Yeni Kaptan Transferi</span>
+                                </h3>
+                                <p style="color: #94a3b8; font-size: 0.84rem; margin: 3px 0 0 0;">
+                                    Filonuzu büyütmek için transfer edebileceğiniz uzman kaptanlar. Niteliklerine göre yakıt tasarrufu, dakiklik ve VIP prim sağlarlar.
+                                </p>
+                            </div>
+                            <div id="company-market-list" style="max-height: 48vh; overflow-y: auto;">
+                                <!-- Dinamik doldurulacak -->
+                            </div>
+                        </div>
+
+                        <!-- Canlı Sefer Borsası & Telsiz Akışı -->
+                        <div style="border-top: 1.5px solid rgba(255,255,255,0.12); padding-top: 16px;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px;">
+                                <div>
+                                    <h4 style="color: #fde047; font-size: 1rem; margin: 0 0 8px 0; display: flex; align-items: center; gap: 6px;">
+                                        <span>📈</span> <span>Karayolları Sefer Borsası & VIP İhaleler</span>
+                                    </h4>
+                                    <div id="company-trends-container" style="max-height: 42vh; overflow-y: auto;"></div>
+                                </div>
+                                <div>
+                                    <h4 style="color: #7dd3fc; font-size: 1rem; margin: 0 0 8px 0; display: flex; align-items: center; gap: 6px;">
+                                        <span>📻</span> <span>Canlı Filo Telsiz Kayıtları</span>
+                                    </h4>
+                                    <div id="company-radio-container" style="max-height: 42vh; overflow-y: auto; background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 8px; padding: 12px;" role="status" aria-live="polite"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 2. SEKME: Sefer Borsası & VIP İhaleler -->
-                    <div id="panel-comp-market-trends" style="display: none;">
-                        <div id="company-trends-container" style="max-height: 48vh; overflow-y: auto;">
-                            <!-- Dinamik doldurulacak -->
-                        </div>
+                    <!-- 2. PİLLAR: Binalar, Garaj & Yazıhaneler -->
+                    <div id="panel-comp-institutions" role="tabpanel" style="display: none;">
+                        <div id="company-institutions-container" style="margin-bottom: 22px;"></div>
+                        <div id="company-branches-container" style="margin-bottom: 22px;"></div>
+                        <div id="company-hq-container"></div>
                     </div>
 
-                    <!-- 3. SEKME: Şoför Pazarı & Transfer -->
-                    <div id="panel-comp-hire" style="display: none;">
-                        <div id="company-market-list" style="max-height: 48vh; overflow-y: auto;">
-                            <!-- Dinamik doldurulacak -->
-                        </div>
+                    <!-- 3. PİLLAR: Kasa, Gelir & Muhasebe -->
+                    <div id="panel-comp-finances" role="tabpanel" style="display: none;">
+                        <div id="company-catering-container" style="margin-bottom: 20px;"></div>
+                        <div id="company-finances-container"></div>
                     </div>
 
-                    <!-- 4. SEKME: Şirket Gelişimi & Kurumsal Avantajlar -->
-                    <div id="panel-comp-hq" style="display: none;">
-                        <div id="company-hq-container" style="max-height: 48vh; overflow-y: auto;">
-                            <!-- Dinamik doldurulacak -->
-                        </div>
-                    </div>
-
-                    <!-- 6. SEKME: Var Olan Bir Şirkette Çalış (Maaşlı Kaptanlık) -->
-                    <div id="panel-comp-corporate-work" style="display: none;">
-                        <div style="background: rgba(15,23,42,0.6); padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                            <h3 style="color: #fde047; margin: 0 0 4px 0; font-size: 1.1rem;">👔 Kaptan Şirketleri & Çalışma Listesi</h3>
-                            <p style="color: #cbd5e1; font-size: 0.88rem; margin: 0;">
+                    <!-- 4. PİLLAR: Var Olan Bir Şirkette Çalış (Maaşlı Kaptanlık) -->
+                    <div id="panel-comp-corporate-work" role="tabpanel" style="display: none;">
+                        <div style="background: rgba(15,23,42,0.6); padding: 14px 18px; border-radius: 10px; margin-bottom: 14px; border: 1px solid rgba(255,255,255,0.1);">
+                            <h3 style="color: #fde047; margin: 0 0 4px 0; font-size: 1.15rem;">👔 Kaptan Şirketleri & Çalışma Listesi</h3>
+                            <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0;">
                                 Bir şirkette çalışmak isterseniz aşağıdaki şirketlerden dilediğiniz birine katılabilirsiniz. Şirkete bağlandığınızda günlük maaş ve sefer primi kazanırsınız. Şirketten ayrıldığınızda ise kendi başınıza serbest çalışırsınız.
                             </p>
                         </div>
-                        <div id="corporate-work-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
-                            <!-- Dinamik doldurulacak -->
-                        </div>
-                    </div>
-
-                    <!-- 5. SEKME: Canlı Telsiz Kayıtları -->
-                    <div id="panel-comp-radio" style="display: none;">
-                        <div id="company-radio-container" style="max-height: 48vh; overflow-y: auto; background: rgba(15,23,42,0.7); border: 1px solid #334155; border-radius: 8px; padding: 12px;" role="status" aria-live="polite">
-                            <!-- Dinamik doldurulacak -->
-                        </div>
-                    </div>
-
-                    <!-- 7. SEKME: Otobüs Kurumları ve Tesisler (Seviye Sistemi) -->
-                    <div id="panel-comp-institutions" style="display: none;">
-                        <div id="company-institutions-container" style="max-height: 52vh; overflow-y: auto;">
-                            <!-- Dinamik doldurulacak -->
-                        </div>
-                    </div>
-
-                    <!-- 8. SEKME: İkram & Muavin Servisi -->
-                    <div id="panel-comp-catering" style="display: none;">
-                        <div id="company-catering-container" style="max-height: 52vh; overflow-y: auto;">
-                            <!-- Dinamik doldurulacak -->
-                        </div>
-                    </div>
-
-                                        <!-- 10. SEKME: Kasa Defteri & Ön Muhasebe -->
-                    <div id="panel-comp-finances" style="display: none;">
-                        <div id="company-finances-container" style="max-height: 52vh; overflow-y: auto;">
-                            <!-- Dinamik doldurulacak -->
-                        </div>
-                    </div>
-                    <!-- 9. SEKME: Otogar Yazıhaneleri & Bilet Fiyat Tarifesi -->
-                    <div id="panel-comp-branches" style="display: none;">
-                        <div id="company-branches-container" style="max-height: 52vh; overflow-y: auto;">
-                            <!-- Dinamik doldurulacak -->
-                        </div>
+                        <div id="corporate-work-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;"></div>
                     </div>
 
                 </div>
@@ -3738,18 +3723,12 @@
                 this.repairAllFleet();
             });
 
-            // Sekme geçişleri
+            // Sekme geçişleri (4 Temel Sütun)
             const tabs = [
                 { tabId: 'tab-comp-drivers', panelId: 'panel-comp-drivers' },
                 { tabId: 'tab-comp-institutions', panelId: 'panel-comp-institutions' },
-                { tabId: 'tab-comp-catering', panelId: 'panel-comp-catering' },
                 { tabId: 'tab-comp-finances', panelId: 'panel-comp-finances' },
-                { tabId: 'tab-comp-branches', panelId: 'panel-comp-branches' },
-                { tabId: 'tab-comp-corporate-work', panelId: 'panel-comp-corporate-work' },
-                { tabId: 'tab-comp-market-trends', panelId: 'panel-comp-market-trends' },
-                { tabId: 'tab-comp-hire', panelId: 'panel-comp-hire' },
-                { tabId: 'tab-comp-hq', panelId: 'panel-comp-hq' },
-                { tabId: 'tab-comp-radio', panelId: 'panel-comp-radio' }
+                { tabId: 'tab-comp-corporate-work', panelId: 'panel-comp-corporate-work' }
             ];
 
             tabs.forEach(t => {
@@ -3761,38 +3740,40 @@
                             const otherPanel = document.getElementById(other.panelId);
                             if (otherBtn && otherPanel) {
                                 if (other.tabId === t.tabId) {
-                                if (t.tabId === 'tab-comp-institutions') {
+                                    if (t.tabId === 'tab-comp-drivers') {
                                         if (typeof audio !== 'undefined' && audio.speak) {
-                                            audio.speak("Ulaştırma Bakanlığı B1 Taşıma Yetki Belgesi yasal binalar ve tesisler menüsü açıldı. Merkez ofis, garaj, otogar yazıhaneleri, kademe, kaptan lojmanı ve şehir içi servis acentelerini büyütebilirsiniz.");
+                                            audio.speak("1. Filom ve Şoförler menüsü açıldı. Kaptanlarınız, araç durumları, akıllı sefer dağıtımı ve şoför transfer pazarı karşınızda.");
                                         }
-                                    } else if (t.tabId === 'tab-comp-catering') {
+                                    } else if (t.tabId === 'tab-comp-institutions') {
                                         if (typeof audio !== 'undefined' && audio.speak) {
-                                            audio.speak("Otobüs içi ikram ve muavin servisi menüsü açıldı. İkram paketini belirleyebilir, yolda I tuşuna basarak ikram dağıtabilirsiniz.");
+                                            audio.speak("2. Binalar ve Garaj menüsü açıldı. Garaj sahası, kademe bakım atölyesi, akaryakıt istasyonu, lojistik depoları ve otogar yazıhaneleri burada.");
                                         }
-                                    } else if (t.tabId === 'tab-comp-branches') {
+                                    } else if (t.tabId === 'tab-comp-finances') {
                                         if (typeof audio !== 'undefined' && audio.speak) {
-                                            audio.speak("Otogar yazıhaneleri ve bilet fiyat tarifesi menüsü açıldı.");
+                                            audio.speak("3. Kasa ve Finans menüsü açıldı. Şirket kasası, cüzdanınız, para yatırma ve çekme, hasılat paylaşımı, ikram standartları ve kasa defteri ekstresi karşınızda.");
                                         }
                                     } else if (t.tabId === 'tab-comp-corporate-work') {
-                                    const caps = this.getCaptainCompanies();
-                                    if (caps.length === 0) {
-                                        if (typeof audio !== 'undefined' && audio.speak) {
-                                            audio.speak("Var olan bir şirkete katıl menüsü açıldı. Görünüşe göre kimse şirket kurmamış. İlk şirketinizi oluşturmak için yeni bir şirket kur butonuna basınız.");
-                                        }
-                                    } else {
-                                        if (typeof audio !== 'undefined' && audio.speak) {
-                                            audio.speak(`Var olan bir şirkete katıl menüsü açıldı. Kaptanlar tarafından kurulan ${caps.length} şirket listelendi.`);
+                                        const caps = this.getCaptainCompanies();
+                                        if (caps.length === 0) {
+                                            if (typeof audio !== 'undefined' && audio.speak) {
+                                                audio.speak("4. Şirketlerde Çalış menüsü açıldı. Görünüşe göre henüz kimse şirket kurmamış. İlk şirketinizi oluşturmak için yeni bir şirket kur butonuna basabilirsiniz.");
+                                            }
+                                        } else {
+                                            if (typeof audio !== 'undefined' && audio.speak) {
+                                                audio.speak(`4. Şirketlerde Çalış menüsü açıldı. Kaptanlar tarafından kurulan ${caps.length} şirket listelendi.`);
+                                            }
                                         }
                                     }
-                                }
-                                    otherBtn.style.background = 'rgba(234, 179, 8, 0.3)';
+                                    otherBtn.style.background = 'rgba(234, 179, 8, 0.35)';
                                     otherBtn.style.borderColor = '#facc15';
                                     otherBtn.style.color = '#fff';
+                                    otherBtn.setAttribute('aria-selected', 'true');
                                     otherPanel.style.display = 'block';
                                 } else {
                                     otherBtn.style.background = 'rgba(255,255,255,0.06)';
                                     otherBtn.style.borderColor = 'rgba(255,255,255,0.2)';
                                     otherBtn.style.color = '#94a3b8';
+                                    otherBtn.setAttribute('aria-selected', 'false');
                                     otherPanel.style.display = 'none';
                                 }
                             }
@@ -3807,17 +3788,17 @@
         renderAll: function () {
             this.renderCompanyOverview();
             this.renderHiredDrivers();
-            this.renderMarketTrends();
             this.renderDriverMarket();
-            this.renderHqUpgrades();
+            this.renderMarketTrends();
             this.renderRadioLogs();
-            this.renderCorporateWork();
             this.renderInstitutions();
-            this.renderCatering();
             this.renderBranches();
+            this.renderHqUpgrades();
+            this.renderFinances();
+            this.renderCatering();
+            this.renderCorporateWork();
         },
 
-        // Şirket Başlık Kartını Render Et
         renderCompanyOverview: function () {
             const card = document.getElementById('company-overview-card');
             if (!card) return;
@@ -4036,8 +4017,8 @@
                 const btnHire = container.querySelector('#btn-empty-goto-hire');
                 if (btnHire) {
                     btnHire.addEventListener('click', () => {
-                        const tabHire = document.getElementById('tab-comp-hire');
-                        if (tabHire) tabHire.click();
+                        const marketEl = document.getElementById('company-market-list');
+                        if (marketEl) marketEl.scrollIntoView({ behavior: 'smooth' });
                     });
                 }
                 return;
