@@ -824,10 +824,17 @@ const Game = {
                             this.currentCity = "Tekirdağ";
                             this.saveData(true);
                         } else {
-                            this.licenseLevel = Math.max(1, Math.min(100, parseInt(data.licenseLevel) || 1));
-                            this.playerXP = Math.max(0, Math.min(999999999, parseInt(data.playerXP) || 0));
-                            this.completedTasks = Math.max(0, Math.min(50000, parseInt(data.completedTasks) || 0));
-                            this.playerBudget = Math.max(0, Math.min(999999999, parseFloat(data.playerBudget) || 0));
+                            // Çevrimdışı İlerleme Koruma Kalkanı: Yerel ilerleme ile bulutu akıllıca birleştir
+                            const localLevel = parseInt(localStorage.getItem('licenseLevel')) || 1;
+                            const localXP = parseInt(localStorage.getItem('playerXP')) || 0;
+                            const localTasks = parseInt(localStorage.getItem('completedTasks')) || 0;
+                            const localBudget = parseFloat(localStorage.getItem('para')) || 0;
+
+                            // Oyuncu internet yokken yeni bir şey yaptıysa ASLA kaybolmaz (En yüksek değer korunur)
+                            this.licenseLevel = Math.max(localLevel, Math.max(1, Math.min(100, parseInt(data.licenseLevel) || 1)));
+                            this.playerXP = Math.max(localXP, Math.max(0, Math.min(999999999, parseInt(data.playerXP) || 0)));
+                            this.completedTasks = Math.max(localTasks, Math.max(0, Math.min(50000, parseInt(data.completedTasks) || 0)));
+                            this.playerBudget = Math.max(localBudget, Math.max(0, Math.min(999999999, parseFloat(data.playerBudget) || 0)));
                             this.clockMinutes = Math.max(0, Math.min(1440, parseFloat(data.clockMinutes) || 480));
                             this.unlockedCities = Array.isArray(data.unlockedCities) ? data.unlockedCities.slice(0, 81) : ["Tekirdağ"];
                             this.currentCity = (typeof data.currentCity === 'string') ? data.currentCity.substring(0, 30) : "Tekirdağ";
@@ -5370,4 +5377,35 @@ if (typeof window !== 'undefined') {
 }
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = Game;
+}
+
+// =========================================================================
+// OTOMATİK YENİDEN BAĞLANTI & ÇEVRİMDİŞİ KUYRUK EŞİTLEYİCİSİ
+// İnternet koptuğunda yapılan her şey yerelde birikir, internet geldiği an
+// saniyesinde Firebase'e aktarılır. Hiçbir emek asla kaybolmaz!
+// =========================================================================
+if (typeof window !== 'undefined') {
+    // 1. Tarayıcı Ağ Olayı: İnternet geri geldiğinde anında kaydet
+    window.addEventListener('online', () => {
+        console.log('[Ağ Kalkanı] İnternet bağlantısı sağlandı. Çevrimdışı kazanımlar buluta aktarılıyor...');
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData(true);
+        }
+    });
+
+    // 2. Firebase Canlı Soket Kontrolü (.info/connected)
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            if (window.db && typeof window.db.ref === 'function') {
+                window.db.ref('.info/connected').on('value', (snap) => {
+                    if (snap && snap.val() === true) {
+                        console.log('[Firebase Canlı Zırh] Sunucuya bağlanıldı, yerel veriler bulutla senkronize ediliyor...');
+                        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+                            Game.saveData(true);
+                        }
+                    }
+                });
+            }
+        } catch(e) {}
+    });
 }
