@@ -19,6 +19,18 @@
         // Efsane Karayolu Tesisleri
         facilities: [
             {
+                id: "facility_agri",
+                name: "Ağrı Dağı & İshak Paşa Dinlenme Tesisi",
+                route: "D-100 / E-80 Trans-Avrupa İpekyolu (Ağrı - Doğubayazıt)",
+                icon: "🏔️",
+                desc: "Türkiye'nin çatısı 5.137 metrelik efsanevi Ağrı Dağı'nın eteklerinde, İshak Paşa Sarayı manzaralı tarihi İpek Yolu mola tesisi. Sıcak Abdigör köftesi, bal-lavaş ve kaçak semaver çayı durağı.",
+                specialties: [
+                    { id: "agri_abdigor", name: "Hakiki Taşta Dövme Abdigör Köftesi", price: 165, effectDesc: "Yüzyıllık saray yemeği, uzun yolda gücü ve zindeliği zirveye taşır (+50 Enerji)" },
+                    { id: "agri_bal_lavas", name: "Ağrı Karakovan Balı & Sıcak Tandır Lavaşı", price: 85, effectDesc: "Doğal yayla balı ve manda kaymağıyla eşsiz enerji" },
+                    { id: "agri_semaver", name: "Odun Ateşinde Kaçak Semaver Çayı", price: 30, effectDesc: "1.500 km yol yorgunluğunu anında unutturan tavşan kanı çay" }
+                ]
+            },
+            {
                 id: "facility_bolu",
                 name: "Bolu Dağı Highway Dinlenme Tesisi",
                 route: "O-4 / D-100 Anadolu Otoyolu (Bolu Dağı Geçidi)",
