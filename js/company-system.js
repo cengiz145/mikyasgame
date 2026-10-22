@@ -805,7 +805,7 @@
                     },
                     {
                         level: 2,
-                        title: "Şirkete Ait Kapalı Kademe Hangarı & Otomatik Yıkama Peronu",
+                        title: "Kapalı Kademe Hangarı, Hidrolik Liftler, Diagnostik & Boyahane",
                         badge: "🥈 Seviye 2: Servis Hangarı & Yıkama",
                         cost: 45000,
                         simplePerk: "Tamir masraflarında %35 indirim, otomatik fırçalı dış yıkama ve otobüs aşınma hızında %25 yavaşlama.",
@@ -1990,8 +1990,8 @@
 
             const garageLevel = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('garage_maintenance') : 1;
             let costMultiplier = 8;
-            if (garageLevel === 2) costMultiplier = 5.6; // %30 Garaj İndirimi
-            else if (garageLevel === 3) costMultiplier = 3.2; // %60 Garaj İndirimi
+            if (garageLevel === 2) costMultiplier = 4.4; // %45 Kademe İndirimi (Gelişmiş Liftler & Diagnostik)
+            else if (garageLevel >= 3) costMultiplier = 2.8; // %65 Mega Kademe İndirimi (Kendi Revizyon Üssümüz)
             const repairCost = Math.round((100 - curCond) * costMultiplier);
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
             if (currentBudget < repairCost) {
@@ -2032,8 +2032,8 @@
                 if (cond < 90 && !busesToFix.some(b => b.busId === busId)) {
                     const garageLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('garage_maintenance') : 1;
                     let mult = 8;
-                    if (garageLvl === 2) mult = 5.6;
-                    else if (garageLvl === 3) mult = 3.2;
+                    if (garageLvl === 2) mult = 4.4; // %45 İndirim
+                    else if (garageLvl >= 3) mult = 2.8; // %65 İndirim
                     const cost = Math.round((100 - cond) * mult);
                     totalCost += cost;
                     busesToFix.push({ busId, cost });
