@@ -1668,7 +1668,7 @@
             },
             {
                 id: "route_antalya",
-                name: "Tekirdağ ➔ Pamukkale - Antalya (Akdeniz Ekspresi)",
+                name: "Tekirdağ ➔ Denizli Travertenleri - Antalya (Akdeniz Ekspresi)",
                 distKm: 780,
                 minRankLevel: 4,
                 routeType: "buyuk",
@@ -3114,7 +3114,7 @@
                                 <span>💡</span> <span>Kaptan Tavsiyesi & Çıkış Yolu</span>
                             </div>
                             <p style="margin: 0; color: #cbd5e1; font-size: 0.84rem; line-height: 1.55;">
-                                • <strong>Kurumsal Kaptanlık:</strong> Kamil Koç, Metro, Pamukkale gibi kurumsal firmalarda maaşlı şoförlük yaparak sıfır riskle temiz sermaye biriktirebilirsiniz.<br><br>
+                                • <strong>Bağımsız Serbest Kaptanlık:</strong> Herhangi bir şirkete bağlı olmadan serbest bireysel kaptan olarak çalışabilir, sıfır şirket masrafıyla tüm bilet gelirini (%100) doğrudan kendi cüzdanınıza alabilirsiniz.<br><br>
                                 • <strong>Temiz Başlangıç:</strong> Borçsuz 1. Seviye şirketinizle bütçenizi dikkatle yöneterek yeniden filonuzu büyütebilirsiniz.
                             </p>
                         </div>
@@ -4475,6 +4475,25 @@
             }
         },
 
+        
+        // Bağımsız Serbest Kaptan Çalışma Modu (Telif Riski Yok, %100 Kazanç Kaptana)
+        activateIndependentCaptainMode: function() {
+            if (this.data.corporateEmployer) {
+                this.adjustCaptainCompanyWorkers(this.data.corporateEmployer, -1);
+            }
+            this.data.corporateEmployer = null;
+            this.data.revenueSharePercent = 0;
+            this.data.isIndependentMode = true;
+            this.saveData();
+            this.renderAll();
+
+            const msg = "Tebrikler! Bağımsız Serbest Kaptan moduna geçtiniz. Hiçbir şirkete bağlı değilsiniz; sefer bilet gelirlerinin yüzde yüzü doğrudan şahsi cüzdanınıza aktarılır. Sıfır şirket gideri ve sıfır telif riski!";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast("⭐ Bağımsız Kaptan Modu: Sefer gelirlerinin %100'ü doğrudan cüzdanınıza kalır!", "success");
+            }
+        },
+
         leaveCorporateCompany: function() {
             if (this.data.corporateEmployer) {
                 this.adjustCaptainCompanyWorkers(this.data.corporateEmployer, -1);
@@ -4498,6 +4517,24 @@
             const captainCompanies = this.getCaptainCompanies();
 
             let html = '';
+
+            // 1. BAĞIMSIZ SERBEST KAPTAN ÇALIŞMA KARTI (Telif Riski Yok, %100 Şahsi Kazanç)
+            const isCurrentlyIndep = (!activeCorpId && (this.data.revenueSharePercent === 0 || this.data.isIndependentMode));
+            html += `
+            <div style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(15, 23, 42, 0.95)); border: 2px solid #10b981; border-radius: 12px; padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);">
+                <div>
+                    <div style="color: #34d399; font-size: 1.2rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                        <span>⭐</span> <span>Bağımsız Serbest Kaptan Modu (%100 Şahsi Kazanç)</span>
+                    </div>
+                    <div style="color: #cbd5e1; font-size: 0.88rem; margin-top: 4px; line-height: 1.45; max-width: 650px;">
+                        Herhangi bir şirkete bağlı kalmadan, kendi şahsi otobüsünüzle serbest kaptan olarak çalışın. Sefer hasılatının %100'ü doğrudan kişisel cüzdanınıza akar. <strong>Sıfır şirket işletme riski ve sıfır telif riski.</strong>
+                    </div>
+                </div>
+                <button id="btn-activate-independent" class="modern-btn nav-item" style="padding: 11px 22px; background: ${isCurrentlyIndep ? 'rgba(16, 185, 129, 0.35)' : 'linear-gradient(135deg, #10b981, #059669)'}; border: 1.5px solid #34d399; color: #fff; font-weight: 800; border-radius: 8px; cursor: pointer; font-size: 0.95rem; box-shadow: 0 3px 12px rgba(16,185,129,0.3);" aria-label="Bağımsız serbest kaptan olarak çalış">
+                    ${isCurrentlyIndep ? '✅ Aktif Bağımsız Kaptansınız' : '⭐ Bağımsız Kaptan Olarak Çalış'}
+                </button>
+            </div>
+            `;
 
             // ŞİRKETLERİ SADECE İNSANLAR KURAR (YAPAY ŞİRKETLER YOKTUR)
             if (captainCompanies.length === 0) {
