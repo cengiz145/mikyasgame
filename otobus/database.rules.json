@@ -1,0 +1,36 @@
+{
+  "rules": {
+    ".read": true,
+    "otobus_simulasyonu": {
+      "kullanicilar": {
+        "$username": {
+          ".read": true,
+          ".write": true,
+          ".validate": "newData.hasChildren(['season', 'licenseLevel']) && newData.child('licenseLevel').isNumber() && newData.child('licenseLevel').val() >= 1 && newData.child('licenseLevel').val() <= 100"
+        }
+      },
+      "topluluk_sirketleri": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "online_drivers": {
+      "$driverId": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['name', 'plate']) && newData.child('name').val().length <= 40"
+      }
+    },
+    "driver_events": {
+      ".read": true,
+      ".write": true
+    },
+    "radio_chatter": {
+      ".read": true,
+      ".write": true,
+      "$msgId": {
+        ".validate": "newData.hasChildren(['text', 'driverId']) && newData.child('text').val().length <= 120"
+      }
+    }
+  }
+}
