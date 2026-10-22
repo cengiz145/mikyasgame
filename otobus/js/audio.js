@@ -162,6 +162,15 @@ class AudioSystem {
             roadGravelAsphalt: new Howl({ src: ['sounds/freesound_road_gravel_asphalt.mp3'], loop: true, volume: 0 }),
             roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 })};
 
+        this.gameSoundVolume = 1.0;
+        this.musicVolume = 0.2;
+        this.soundBaseVolumes = {};
+        for (let k in this.sounds) {
+            if (k !== 'menuMusic' && this.sounds[k] && typeof this.sounds[k].volume === 'function') {
+                this.soundBaseVolumes[k] = this.sounds[k].volume() || 1.0;
+            }
+        }
+
         // KORNA İÇİN ÖZEL WEB AUDIO API KURULUMU (Boğuk efekti ve trim için)
         this.hornBuffer = null;
         this.hornSource = null;
@@ -378,23 +387,105 @@ class AudioSystem {
     }
 
     playMenuMusic() {
-        if (!this.sounds.menuMusic.playing()) {
-            this.sounds.menuMusic.play();
+        if (!this.sounds || !this.sounds.menuMusic) return;
+        if (typeof this.musicVolume === 'number') {
+            this.sounds.menuMusic.volume(this.musicVolume);
+        }
+        if (!this.sounds.menuMusic.playing() && (this.musicVolume === undefined || this.musicVolume > 0)) {
+            try {
+                this.sounds.menuMusic.play();
+            } catch(e) {}
         }
     }
 
     stopMenuMusic() {
-        this.sounds.menuMusic.stop();
+        if (this.sounds && this.sounds.menuMusic) {
+            this.sounds.menuMusic.stop();
+        }
     }
 
     adjustMusicVolume(amount) {
-        if (!this.sounds.menuMusic.playing()) return;
-        let newVol = this.sounds.menuMusic.volume() + amount;
+        if (typeof this.musicVolume !== 'number') {
+            this.musicVolume = (this.sounds && this.sounds.menuMusic) ? this.sounds.menuMusic.volume() : 0.2;
+        }
+        let newVol = Math.round((this.musicVolume + amount) * 100) / 100;
         newVol = Math.max(0, Math.min(1, newVol));
-        this.sounds.menuMusic.volume(newVol);
-        
+        this.musicVolume = newVol;
+
+        if (this.sounds && this.sounds.menuMusic) {
+            this.sounds.menuMusic.volume(newVol);
+            if (newVol > 0 && !this.sounds.menuMusic.playing()) {
+                try {
+                    this.sounds.menuMusic.play();
+                } catch(e) {}
+            } else if (newVol === 0 && this.sounds.menuMusic.playing()) {
+                this.sounds.menuMusic.pause();
+            }
+        }
+
+        const percent = Math.round(newVol * 100);
+        const toastMsg = percent === 0 ? "Müzik Sesi: Kapalı (%0)" : (percent === 100 ? "Müzik Sesi: %100 (Maksimum)" : `Müzik Sesi: %${percent}`);
+        const speechMsg = percent === 0 ? "Müzik sesi kapatıldı" : (percent === 100 ? "Müzik sesi yüzde yüz, maksimum" : `Müzik sesi yüzde ${percent}`);
+
         if (typeof UI !== 'undefined' && UI.showToast) {
-            UI.showToast(`Müzik Sesi: %${Math.round(newVol * 100)}`, 'success');
+            UI.showToast(toastMsg, 'success');
+        }
+        if (typeof this.updateNvdaLiveRegion === 'function') {
+            this.updateNvdaLiveRegion(speechMsg);
+        }
+        if (typeof this.speak === 'function') {
+            this.speak(speechMsg);
+        }
+    }
+
+    adjustGameSoundVolume(amount) {
+        if (typeof this.gameSoundVolume !== 'number') {
+            this.gameSoundVolume = 1.0;
+        }
+        let newVol = Math.round((this.gameSoundVolume + amount) * 100) / 100;
+        newVol = Math.max(0, Math.min(1, newVol));
+        this.gameSoundVolume = newVol;
+
+        // 1. Web Audio ortam/motor/efekt mikseri sesini ayarla
+        if (this.environmentMixer && this.ctx) {
+            try {
+                this.environmentMixer.gain.setTargetAtTime(newVol, this.ctx.currentTime, 0.05);
+            } catch(e) {}
+        }
+
+        // 2. Howler efekt seslerinin (menuMusic hariç) ses düzeyini güncelle
+        if (!this.soundBaseVolumes) {
+            this.soundBaseVolumes = {};
+            for (let k in this.sounds) {
+                if (k !== 'menuMusic' && this.sounds[k] && typeof this.sounds[k].volume === 'function') {
+                    this.soundBaseVolumes[k] = this.sounds[k].volume();
+                }
+            }
+        }
+        for (let k in this.sounds) {
+            if (k !== 'menuMusic' && this.sounds[k] && typeof this.sounds[k].volume === 'function') {
+                const base = (this.soundBaseVolumes[k] !== undefined) ? this.soundBaseVolumes[k] : 1.0;
+                this.sounds[k].volume(base * newVol);
+            }
+        }
+
+        const percent = Math.round(newVol * 100);
+        const toastMsg = percent === 0 ? "Oyun Ses Düzeyi: Kapalı (%0)" : (percent === 100 ? "Oyun Ses Düzeyi: %100 (Maksimum)" : `Oyun Ses Düzeyi: %${percent}`);
+        const speechMsg = percent === 0 ? "Oyun sesi kapatıldı" : (percent === 100 ? "Oyun ses düzeyi yüzde yüz, maksimum" : `Oyun ses düzeyi yüzde ${percent}`);
+
+        if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast(toastMsg, 'info');
+        }
+        if (typeof this.updateNvdaLiveRegion === 'function') {
+            this.updateNvdaLiveRegion(speechMsg);
+        }
+        if (typeof this.speak === 'function') {
+            this.speak(speechMsg);
+        }
+
+        // Kullanıcının yeni ses düzeyini hemen duyması için kısa navigasyon sesi çal
+        if (newVol > 0 && typeof this.playNav === 'function') {
+            this.playNav();
         }
     }
 
@@ -3240,15 +3331,8 @@ startEngine() {
 
 const audio = new AudioSystem();
 
-// Global Ses Kontrolü (Menülerde PageUp/PageDown)
+// NVDA susturma tuşuna (Ctrl) basıldığında oyunun anonslarını da sustur
 window.addEventListener('keydown', (e) => {
-    if (e.key === '+' || e.key === '=') {
-        audio.adjustMusicVolume(0.1);
-    } else if (e.key === '-' || e.key === '_') {
-        audio.adjustMusicVolume(-0.1);
-    }
-    
-    // NVDA susturma tuşuna (Ctrl) basıldığında oyunun anonslarını da sustur
     if (e.key === 'Control') {
         if (typeof audio !== 'undefined' && audio.stopSpeech) {
             audio.stopSpeech();

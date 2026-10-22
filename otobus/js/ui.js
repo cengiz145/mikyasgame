@@ -1022,6 +1022,55 @@ window.addEventListener('keydown', (e) => {
         return;
     }
 
+    // SES DÜZEYİ KONTROLLERİ (PageUp/PageDown: Müzik Sesi | Home/End: Oyun Ses Düzeyi)
+    // "ana menüde müziğin sesini açmak için sayfa yukarı sayfa aşşağı tuşları kullanılsın
+    // oyun ses düzzeyi ni kısıp açmak isiçinde home ve ent tuşları kullanılsın."
+    if (!isFormFieldElement(activeEl) || !isTextInputElement(activeEl)) {
+        if (e.key === 'PageUp') {
+            e.preventDefault();
+            if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
+                audio.adjustMusicVolume(0.1);
+            }
+            return;
+        }
+        if (e.key === 'PageDown') {
+            e.preventDefault();
+            if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
+                audio.adjustMusicVolume(-0.1);
+            }
+            return;
+        }
+        if (e.key === 'Home') {
+            e.preventDefault();
+            if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
+                audio.adjustGameSoundVolume(0.1);
+            }
+            return;
+        }
+        if (e.key === 'End') {
+            e.preventDefault();
+            if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
+                audio.adjustGameSoundVolume(-0.1);
+            }
+            return;
+        }
+        // İkincil kısayollar (+ ve -)
+        if (e.key === '+' || e.key === '=') {
+            e.preventDefault();
+            if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
+                audio.adjustMusicVolume(0.1);
+            }
+            return;
+        }
+        if (e.key === '-' || e.key === '_') {
+            e.preventDefault();
+            if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
+                audio.adjustMusicVolume(-0.1);
+            }
+            return;
+        }
+    }
+
     // 5. TAB TUŞU DAVRANIŞI:
     // "fform alanlarında veya yazı alanlarında tap tuşları etkili olsun."
     if (e.key === 'Tab') {

@@ -1750,9 +1750,9 @@ const DriverBadges = {
 
             if (e.key === 'Escape') {
                 this.closeModal();
-            } else if (e.key === 'PageDown' || e.key === ']') {
+            } else if (e.key === ']') {
                 if (this.currentMainTab === 'achievements') this.nextPage();
-            } else if (e.key === 'PageUp' || e.key === '[') {
+            } else if (e.key === '[') {
                 if (this.currentMainTab === 'achievements') this.prevPage();
             }
         });
