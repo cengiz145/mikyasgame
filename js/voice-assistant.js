@@ -447,9 +447,9 @@ class VoiceAssistant {
                         </div>
                         <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border-left: 3px solid #22c55e;">
                             <strong style="color: #4ade80;">✅ Şirket Sahibi (Patron) Olmanın 4 Gücü:</strong><br>
-                            • <strong>1. Pasif Gelir (Otomatik Kazanç):</strong> Şoförleriniz siz dinlenirken veya başka hatta sürerken arka planda sürekli sefer yapıp kasanıza para yağdırır.<br>
-                            • <strong>2. Giderleri Sıfırlama:</strong> Kendi Akaryakıt İstasyonunuzla depoya <strong>0 ₺ (Bedava)</strong> mazot koyarsınız.<br>
-                            • <strong>3. Tavan Bilet & Kargo:</strong> Biletleri %30 daha pahalıya keser, emanet kargodan sefer başı binlerce lira alırsınız.<br>
+                            • <strong>1. Pasif Gelir (Otomatik Hasılat):</strong> İstihdam ettiğiniz kaptanlar siz dinlenirken veya başka bir hatta sürüş yaparken arka planda kesintisiz sefer icra eder ve şirket kasanıza düzenli gelir aktarır.<br>
+                            • <strong>2. Giderleri Sıfırlama Gücü:</strong> Kendi tesisleriniz sayesinde akaryakıt ikmalini <strong>0 ₺ (Bedelsiz)</strong> yapar, bakım masraflarını %65 oranında düşürürsünüz.<br>
+                            • <strong>3. Tavan Bilet & Emanet Kargo Geliri:</strong> Terminal yazıhaneleriniz sayesinde biletleri tavan fiyattan (%30 daha yüksek) satar, bagaj kargo taşımacılığından sefer başı binlerce lira ek gelir sağlarsınız.<br>
                             • <strong>4. Holding Olma:</strong> Şirket seviyeniz arttıkça piyasa itibarınız ve gelir çarpanlarınız katlanır.
                         </div>
                     </div>
