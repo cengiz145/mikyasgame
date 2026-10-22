@@ -350,6 +350,15 @@ class AudioSystem {
         }
     }
 
+    isInBusCabin() {
+        if (typeof Game !== 'undefined' && Game.isDriving) return true;
+        const drivingEl = document.getElementById('driving-screen');
+        if (drivingEl && !drivingEl.classList.contains('hidden')) return true;
+        const stopEl = document.getElementById('stop-screen');
+        if (stopEl && !stopEl.classList.contains('hidden')) return true;
+        return false;
+    }
+
     updateNvdaLiveRegion(text) {
         let liveRegion = document.getElementById('nvda-live-region');
         if (!liveRegion) {
@@ -2944,6 +2953,12 @@ startEngine() {
     }
 
     speakBrowserVoice(text, onEndCallback = null) {
+        // KULLANICI KURALI: Ana menüde hiçbir sentezleyici konuşmasın
+        if (!this.isInBusCabin()) {
+            if (typeof onEndCallback === 'function') onEndCallback();
+            return;
+        }
+
         if (typeof window === 'undefined' || !window.speechSynthesis) {
             if (typeof onEndCallback === 'function') onEndCallback();
             return;
@@ -2991,10 +3006,23 @@ startEngine() {
     }
 
     async speak(text, onEndCallback = null) {
-        if (!text) return;
+        if (!text) {
+            if (typeof onEndCallback === 'function') onEndCallback();
+            return;
+        }
         
-        // Ekran okuyucu (NVDA) erişilebilirliği için live region'ı güncelle
+        // Ekran okuyucu (NVDA) erişilebilirliği için live region'ı her zaman güncelle
         this.updateNvdaLiveRegion(text);
+
+        // KULLANICI KURALI:
+        // Sadece otobüsün içindeyken (sürüş veya durak) Google Cloud TTS ve sesli sentezleyici konuşsun.
+        // Ana menüde ve menülerde Google altyapısı ya da herhangi bir sentezleyici KONUŞMASIN.
+        if (!this.isInBusCabin()) {
+            if (typeof onEndCallback === 'function') {
+                try { onEndCallback(); } catch(e){}
+            }
+            return;
+        }
 
         this.sequenceId = (this.sequenceId || 0) + 1;
         const currentSeqId = this.sequenceId;
@@ -3032,12 +3060,12 @@ startEngine() {
             }
         } catch (e) {}
 
-        // Google Cloud TTS denemesi (Eğer 403 veya hata almadıysak)
-        if (!this.googleTtsDisabled) {
+        // Google Cloud TTS denemesi (Otobüs içinde en yüksek kalitede anonslar)
+        if (!this.googleTtsDisabled || (this.googleTtsDisabledUntil && Date.now() > this.googleTtsDisabledUntil)) {
             try {
                 const apiKey = "AIzaSyAMgbeG7kuhowlmPKh2nsgm_vYzL6lpgHs";
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 1200);
+                const timeoutId = setTimeout(() => controller.abort(), 1800);
 
                 const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
                     method: 'POST',
@@ -3063,22 +3091,30 @@ startEngine() {
                     ttsAudio.play().catch(e => {
                         if (typeof onEndCallback === 'function') onEndCallback();
                     });
+                    this.googleTtsDisabled = false;
                     return;
                 } else {
-                    this.googleTtsDisabled = true;
+                    this.googleTtsDisabledUntil = Date.now() + 60000;
                 }
             } catch (error) {
-                this.googleTtsDisabled = true;
+                this.googleTtsDisabledUntil = Date.now() + 60000;
             }
         }
 
-        // Yerel tarayıcı sesiyle anons yap (Sıfır gecikme, net ve kesintisiz)
+        // Yerel tarayıcı sesiyle anons yap (Otobüs içinde sıfır gecikmeli yedek)
         if (this.sequenceId !== currentSeqId) return;
         this.speakBrowserVoice(text, onEndCallback);
     }
 
     async speakSequence(textArray) {
         if (!textArray || textArray.length === 0) return;
+
+        this.updateNvdaLiveRegion(textArray.join(" "));
+
+        // KULLANICI KURALI: Ana menüde ve menülerde sesli sentezleyici konuşmasın
+        if (!this.isInBusCabin()) {
+            return;
+        }
 
         this.sequenceId = (this.sequenceId || 0) + 1;
         const currentSeqId = this.sequenceId;
@@ -3095,8 +3131,6 @@ startEngine() {
             window.speechSynthesis.cancel();
             window.speechSynthesis.resume();
         }
-
-        this.updateNvdaLiveRegion(textArray.join(" "));
 
         let index = 0;
         const playNext = () => {
