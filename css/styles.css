@@ -882,3 +882,10 @@ body {
         transform: scale(0.8);
     }
 }
+
+/* Form alanları odaklanma stilleri (Metin kutularının zıplamasını engeller) */
+input.nav-focused, textarea.nav-focused, select.nav-focused {
+    transform: none !important;
+    border-color: var(--secondary) !important;
+    box-shadow: 0 0 15px var(--secondary-glow) !important;
+}

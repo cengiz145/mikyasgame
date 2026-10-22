@@ -747,7 +747,7 @@ class VoiceAssistant {
                         <h4 style="color: #93c5fd; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
                             <span>⌨️</span> <span>9. Ekran Okuyucu ve Görme Engelli Kaptanlar İçin Adım Adım Klavye Rehberi</span>
                         </h4>
-                        <span style="font-size: 0.82rem; color: #bfdbfe;">Menüleri ezberlemenize gerek kalmadan Tab, Ok tuşları ve Enter ile tam kontrol adımları.</span>
+                        <span style="font-size: 0.82rem; color: #bfdbfe;">Menüleri ezberlemenize gerek kalmadan Sağ ve Sol oklar, formlarda Tab ve Enter ile tam kontrol adımları.</span>
                     </div>
                     <button class="modern-btn btn-read-section nav-item" data-text="Ekran okuyucu ve görme engelli kaptanlar için adım adım klavye navigasyonu. Bir: Ana menüdeyken Tab veya Aşağı Ok tuşuna dört kez basarak beşinci sıradaki Şirket Yönetimi seçeneğine gelip Enter tuşuna basınız. İki: Şirket menüsü açıldığında Tab tuşu ile üstteki Akıllı Sefer Dağıtımı ve Kapat butonlarını, ardından Cüzdana Para Çek ve Kasaya Para Yatır butonlarını gezebilirsiniz. Üç: Şoför kiralamak için Tab ile Şoför Pazarı sekmesine gelip Enter a basınız; ardından Tab ile şoför listesine inip Transfer Et butonunda Enter a basınız. Dört: Boşta bekleyen tüm şoförleri tek tıkla sefere yollamak için Shift Tab ile en üstteki Akıllı Sefer Dağıtımı butonuna gelip Enter a basınız. Beş: Binaları geliştirmek için Yasal Binalar sekmesine girip dilediğiniz binanın altındaki Geliştir butonunda Enter a basınız. Altı: İşleminiz bittiğinde klavyeden Escape tuşuna basarak şirket menüsünü kapatıp doğrudan ana menüye dönünüz." style="padding: 6px 12px; background: rgba(59,130,246,0.25); border: 1px solid #60a5fa; color: #bfdbfe; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
                         ▶ Adım Adım Klavye Rehberini Dinle
@@ -758,7 +758,7 @@ class VoiceAssistant {
                     
                     <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #38bdf8;">
                         <strong style="color: #7dd3fc; font-size: 0.92rem;">1. Adım: Ana Menüden Şirket Yönetimine Giriş</strong><br>
-                        • Ana Menü'deyken <strong>Aşağı Ok</strong> veya <strong>Tab</strong> tuşuna sırasıyla basınız.<br>
+                        • Ana Menü'deyken <strong>Sağ Ok</strong> tuşuna basarak ögeler arasında ilerleyiniz.<br>
                         • Sıralama şöyledir: 1. Şehir İçi Seferler ➜ 2. Şehirlerarası Seyahat ➜ 3. Garajım ➜ 4. Yeni Otobüsler Satın Al ➜ <strong>5. Şirket Yönetimi</strong>.<br>
                         • Ekran okuyucunuz <em>'Şirket Yönetimi, düğme'</em> dediğinde <strong>Enter</strong> tuşuna basınız. Şirket yönetim paneli açılır ve sesli bilgilendirme yapılır.
                     </div>
@@ -794,7 +794,7 @@ class VoiceAssistant {
                     <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #eab308;">
                         <strong style="color: #fde047; font-size: 0.92rem;">6. Adım: Şirket Menüsünü Kapatma ve Seferinize Başlama</strong><br>
                         • İşlemlerinizi tamamladığınızda klavyeden <strong>Esc (Escape)</strong> tuşuna basınız. Şirket paneli kapanır ve otomatik olarak Ana Menü'ye dönersiniz.<br>
-                        • Ana Menü'de <strong>Yukarı Ok</strong> tuşuna basarak 1. sıradaki <strong>'Şehir İçi Seferler'</strong> veya 2. sıradaki <strong>'Şehirlerarası Seyahat'</strong> butonuna gelip <strong>Enter</strong>'a basarak kendi seferinizi başlatınız.
+                        • Ana Menü'de <strong>Sol Ok</strong> tuşuna basarak 1. sıradaki <strong>'Şehir İçi Seferler'</strong> veya 2. sıradaki <strong>'Şehirlerarası Seyahat'</strong> butonuna gelip <strong>Enter</strong>'a basarak kendi seferinizi başlatınız.
                     </div>
 
                 </div>

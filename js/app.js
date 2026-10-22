@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
-                const announceText = `${opt.name} başlangıç bölgesi seçildi. Oyuna girmek için Aşağı okla Oyuna Gir butonuna ilerleyebilirsiniz.`;
+                const announceText = `${opt.name} başlangıç bölgesi seçildi. Oyuna girmek için Sağ okla veya Tab tuşuyla Oyuna Gir butonuna ilerleyebilirsiniz.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceText);
                 if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceText);
             };
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (activeBtn) activeBtn.focus();
         }, 120);
 
-        const welcomeVoice = "Bölge ve ilçe seçim penceresi açıldı. 11 ilçe arasında yukarı ve aşağı oklarla gezinebilir, Enter ile seçebilirsiniz. Kapatmak için Escape tuşuna basabilirsiniz.";
+        const welcomeVoice = "Bölge ve ilçe seçim penceresi açıldı. 11 ilçe arasında sağ ve sol oklarla gezinebilir, Enter ile seçebilirsiniz. Kapatmak için Escape tuşuna basabilirsiniz.";
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(welcomeVoice);
         if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(welcomeVoice);
     };
