@@ -470,11 +470,11 @@
             if (!container) return;
 
             const branches = [
-                { id: 'tekirdag', name: 'Tekirdağ Süleymanpaşa Otogarı', desc: 'Genel Merkez Yazıhanesi. Süleymanpaşa sahil ve ilçe peronları.', cost: 0, boost: '+%30 Yolcu' },
-                { id: 'corlu', name: 'Çorlu Şehirlerarası Otogarı', desc: 'Sanayi ve bölge kavşağı. Çorlu ringi ve fabrika bağlantıları.', cost: 15000, boost: '+%40 Yolcu' },
-                { id: 'istanbul_esenler', name: 'İstanbul 15 Temmuz Demokrasi Otogarı (Esenler)', desc: "Türkiye'nin en büyük otogarı. 168 peron bağlantısı.", cost: 35000, boost: '+%60 Yolcu & Bilet Satışı' },
-                { id: 'ankara_asti', name: 'Ankara AŞTİ Şehirlerarası Terminali', desc: 'Başkent merkezi. Resmi heyet ve Anadolu aktarma kapısı.', cost: 30000, boost: '+%50 Yolcu' },
-                { id: 'izmir_otogar', name: 'İzmir Şehirlerarası Otobüs Terminali (İZOTAŞ)', desc: 'Ege sahilleri ve Bornova ana peronları.', cost: 28000, boost: '+%50 Yolcu' }
+                { id: 'tekirdag', name: 'Tekirdağ Süleymanpaşa Otogarı', desc: 'Genel Merkez Yazıhanesi. Süleymanpaşa sahil ve ilçe peronları ana kalkış noktası.', cost: 0, boost: '+%30 Yolcu Akışı' },
+                { id: 'corlu', name: 'Çorlu Şehirlerarası Otogarı', desc: 'Sanayi ve Trakya bölge kavşağı. Çorlu ringi ve fabrika işçi-yolcu transfer merkezi.', cost: 15000, boost: '+%40 Yolcu Akışı' },
+                { id: 'istanbul_esenler', name: 'İstanbul 15 Temmuz Demokrasi Otogarı (Esenler)', desc: "Türkiye'nin ve Avrupa'nın en büyük otobüs terminali. 168 aktif peron bağlantısı ve dev yolcu hacmi.", cost: 35000, boost: '+%60 Yolcu & Bilet Satışı' },
+                { id: 'ankara_asti', name: 'Ankara AŞTİ Şehirlerarası Terminali', desc: 'Başkentin kalbi. Bakanlıklar, üniversiteler ve tüm Anadolu aktarma peronları.', cost: 30000, boost: '+%50 Yolcu Akışı' },
+                { id: 'izmir_otogar', name: 'İzmir Şehirlerarası Otobüs Terminali (İZOTAŞ)', desc: 'Ege sahilleri, Bornova ana peronları ve turizm hatlarının merkezi.', cost: 28000, boost: '+%50 Yolcu Akışı' }
             ];
 
             const activeBranches = this.data.terminalBranches || { tekirdag: true };
@@ -482,12 +482,12 @@
 
             let html = `
             <!-- 1. BİLET FİYAT POLİTİKASI (DİNAMİK TARİFE) -->
-            <div style="background: rgba(15,23,42,0.85); border: 2px solid #38bdf8; border-radius: 12px; padding: 18px; margin-bottom: 14px;">
+            <div style="background: rgba(15,23,42,0.85); border: 2px solid #38bdf8; border-radius: 12px; padding: 18px; margin-bottom: 16px;">
                 <div style="color: #38bdf8; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                     <span>🏷️</span> <span>Bilet Fiyat Politikası & Dinamik Tarife</span>
                 </div>
                 <div style="color: #cbd5e1; font-size: 0.88rem; margin-bottom: 14px;">
-                    Bilet fiyatlarını ucuz yaparak otobüsü %100 doldurabilir veya VIP fiyat belirleyerek bilet başı yüksek kâr sağlayabilirsiniz.
+                    Bilet fiyatlarını ucuz yaparak otobüsü hemen doldurabilir veya VIP lüks tarife seçerek bilet başına rekor kâr elde edebilirsiniz.
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;">
@@ -510,16 +510,33 @@
                 </div>
             </div>
 
-            <!-- 2. OTOGAR YAZIHANELERİ LİSTESİ -->
-            <div style="background: rgba(15,23,42,0.85); border: 2px solid #ca8a04; border-radius: 12px; padding: 18px;">
+            <!-- 2. OTOGAR YAZIHANELERİ & İŞLETME MODELLERİ REHBERİ -->
+            <div style="background: rgba(15,23,42,0.85); border: 2px solid #ca8a04; border-radius: 12px; padding: 18px; margin-bottom: 16px;">
                 <div style="color: #facc15; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                     <span>🏢</span> <span>Şehirlerarası Otogar Yazıhaneleri & Şube Ağı</span>
                 </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; margin-bottom: 14px;">
-                    Şirketinizin yazıhanesini açtığınız şehirlerde bilet satış ofisiniz kurulur ve seferlerinize binen yolcu akışı katlanır.
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin-bottom: 12px;">
+                    Otobüslerin yolcu alıp indirebileceği tek yasal yer şehirlerarası otogarlardır. Yol kenarından veya korsan yolcu almak yasaktır. Bir otogarda yazıhane açtığınızda peron, gişe ve emanet kargo hakkı kazanırsınız.
                 </div>
 
-                <div style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- 2 İŞLETME MODELİ KARŞILAŞTIRMA KUTUSU -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 14px;">
+                    <div style="border-left: 3.5px solid #22c55e; padding-left: 10px;">
+                        <strong style="color: #4ade80; font-size: 0.9rem;">🏢 Model A: Şirket Öz Şubesi (Kendi Şubemiz)</strong>
+                        <div style="color: #cbd5e1; font-size: 0.83rem; margin-top: 3px;">
+                            Otogar kirasını şirketiniz öder, kendi bordrolu personelinizi yerleştirirsiniz. Bilet ve kargo emanet gelirlerinin <strong>%100'ü doğrudan şirket kasasına</strong> kalır.
+                        </div>
+                    </div>
+                    <div style="border-left: 3.5px solid #38bdf8; padding-left: 10px;">
+                        <strong style="color: #38bdf8; font-size: 0.9rem;">🤝 Model B: F1 Acente Bayiliği (Yerel Esnaf Bayisi)</strong>
+                        <div style="color: #cbd5e1; font-size: 0.83rem; margin-top: 3px;">
+                            <strong>Kira Masrafı: 0 ₺ (Ücretsiz Kurulum)!</strong> Dükkânı yerel acente işletir. Bilet ve kargo hasılatının <strong>%88'i şirketinize gelir, %12'si bayiye komisyon</strong> olarak kalır. Hızlı ve sıfır riskle büyütür.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YAZIHANELER LİSTESİ -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
             `;
 
             branches.forEach(b => {
@@ -529,11 +546,11 @@
                 const isDirectBranch = isOwned && !isAgency;
 
                 html += `
-                <div style="background: rgba(30,41,59,0.85); border: 1.8px solid ${isOwned ? (isDirectBranch ? '#22c55e' : '#38bdf8') : '#475569'}; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.25);">
+                <div style="background: rgba(30,41,59,0.85); border: 2px solid ${isOwned ? (isDirectBranch ? '#22c55e' : '#38bdf8') : '#475569'}; border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.25);">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
                         <div>
                             <div style="font-size: 1.15rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
-                                <span style="font-size: 1.3rem;">${isOwned ? (isDirectBranch ? '🏢' : '🤝') : '🏬'}</span>
+                                <span style="font-size: 1.35rem;">${isOwned ? (isDirectBranch ? '🏢' : '🤝') : '🏬'}</span>
                                 <span>${b.name}</span>
                             </div>
                             <div style="color: #94a3b8; font-size: 0.85rem; margin-top: 3px;">
@@ -543,11 +560,11 @@
                         <div>
                             ${isDirectBranch ? `
                                 <span style="font-size: 0.82rem; padding: 4px 12px; border-radius: 6px; background: rgba(34,197,94,0.2); border: 1.5px solid #22c55e; color: #4ade80; font-weight: 800;">
-                                    🏢 ŞİRKET ÖZ ŞUBESİ (%100 Hasılat)
+                                    🏢 ŞİRKET ÖZ ŞUBESİ (%100 Hasılat Şirket Kasasında)
                                 </span>
                             ` : (isAgency ? `
                                 <span style="font-size: 0.82rem; padding: 4px 12px; border-radius: 6px; background: rgba(56,189,248,0.2); border: 1.5px solid #38bdf8; color: #38bdf8; font-weight: 800;">
-                                    🤝 F1 ACENTE BAYİSİ (%88 Hasılat / %12 Bayi Payı)
+                                    🤝 F1 ACENTE BAYİSİ (%88 Şirket Payı / %12 Bayi Komisyonu)
                                 </span>
                             ` : `
                                 <span style="font-size: 0.82rem; padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid #64748b; color: #94a3b8; font-weight: bold;">
@@ -557,18 +574,30 @@
                         </div>
                     </div>
 
-                    <!-- 4 Günlük Yazıhane Görevi Kartı -->
-                    <div style="background: rgba(15,23,42,0.6); border-radius: 8px; padding: 10px 14px; margin: 10px 0; font-size: 0.83rem; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.06); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px;">
-                        <div>📢 <strong>Peron Koordinasyonu:</strong> ${isOwned ? '<span style="color:#4ade80;">Aktif Anons</span>' : 'Beklemede'}</div>
-                        <div>📋 <strong>Yolcu Manifestosu:</strong> ${isOwned ? '<span style="color:#4ade80;">Kaptana Teslim</span>' : 'Beklemede'}</div>
-                        <div>🏷️ <strong>Bagaj Fişleme:</strong> ${isOwned ? '<span style="color:#4ade80;">Barkodlu Fiş</span>' : 'Beklemede'}</div>
-                        <div>📦 <strong>Emanet & Koli Kargo:</strong> ${isOwned ? '<span style="color:#fde047;">Sefer Başı Gelir</span>' : 'Beklemede'}</div>
+                    <!-- 4 Günlük Yazıhane Görevi Kartı (Sade Açıklamalı) -->
+                    <div style="background: rgba(15,23,42,0.65); border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 0.83rem; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.06); display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px;">
+                        <div>
+                            📢 <strong>Peron Anonsu:</strong> 
+                            ${isOwned ? '<span style="color:#4ade80;">Yolcular perona anons edilir</span>' : '<span style="color:#94a3b8;">Beklemede</span>'}
+                        </div>
+                        <div>
+                            📋 <strong>Yolcu Manifestosu:</strong> 
+                            ${isOwned ? '<span style="color:#4ade80;">Resmi liste kaptana teslim</span>' : '<span style="color:#94a3b8;">Beklemede</span>'}
+                        </div>
+                        <div>
+                            🏷️ <strong>Bagaj Fişleme:</strong> 
+                            ${isOwned ? '<span style="color:#4ade80;">Bavullara barkod takılır</span>' : '<span style="color:#94a3b8;">Beklemede</span>'}
+                        </div>
+                        <div>
+                            📦 <strong>Emanet Koli Kargo:</strong> 
+                            ${isOwned ? '<span style="color:#fde047;">Her seferde 4-8 koli x 140 ₺ ek gelir</span>' : '<span style="color:#94a3b8;">Beklemede</span>'}
+                        </div>
                     </div>
 
                     <!-- Eylem Alanı: Öz Şube vs Acente Seçimi -->
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08);">
                         <div style="color: #38bdf8; font-size: 0.85rem;">
-                            ⚡ Sefer Etkisi: <strong>${b.boost}</strong>
+                            ⚡ Sefer Gücü: <strong>${b.boost}</strong>
                         </div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                             ${isOwned ? `
@@ -580,7 +609,7 @@
                                     🏢 Öz Şube Aç (${b.cost.toLocaleString('tr-TR')} ₺)
                                 </button>
                                 <button class="modern-btn btn-rent-branch nav-item" data-id="${b.id}" data-model="agency" data-cost="0" data-name="${b.name}" style="padding: 9px 16px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: bold; border-radius: 8px; border: 1.5px solid #38bdf8; cursor: pointer; font-size: 0.88rem; box-shadow: 0 2px 10px rgba(2,132,199,0.3);" aria-label="${b.name} F1 Acentesi ile Anlaş. 0 TL Peşin. Yerel bayi işletir, %12 komisyon alır.">
-                                    🤝 F1 Acente ile Anlaş (0 ₺ Ücretsiz Bayilik)
+                                    🤝 F1 Acente ile Anlaş (0 ₺ Bedava Bayilik)
                                 </button>
                             `}
                         </div>
@@ -614,14 +643,18 @@
             });
         },
 
-
-                // T.C. ULAŞTIRMA VE ALTYAPI BAKANLIĞI - KARAYOLU TAŞIMA YÖNETMELİĞİ (B1 YETKİ BELGESİ BİNALARI)
         institutionsData: [
             {
                 id: "headquarters",
                 name: "Merkez Yönetim Ofisi / Genel Müdürlük",
                 icon: "🏛️",
-                category: "B1 Belgesi Yasal Zorunluluk",
+                category: "B1 Belgesi Yasal Zorunluluk (Şirket Beyni)",
+                simpleSummary: "Şirketinizin resmi beyni ve kalbidir. Karayolu Taşıma Kanunu'na göre şirket açmak ve şehirlerarası sefer düzenlemek için bağımsız bir merkez adres göstermek şarttır.",
+                playerBenefits: [
+                    "📋 Tüm Türkiye genelinde yasal hat açma ve resmi sefer düzenleme izni verir.",
+                    "🛡️ Şirketinizi korsan taşımacılık, idari para cezaları ve sefer iptallerinden korur.",
+                    "💰 Büyüdükçe firmanızın kurumsal prestiji artar ve bilet gelirlerinize +%30 kalıcı marka primi ekler."
+                ],
                 desc: "Ulaştırma Bakanlığı B1 Taşıma Yetki Belgesi için zorunlu tescilli merkez adresi. Şirketin tüzel kişiliği, hat izinleri, personel sözleşmeleri, hukuki süreçler ve filo sevk idaresinin yürütüldüğü idari merkez.",
                 levels: [
                     {
@@ -629,6 +662,7 @@
                         title: "Kiralanan Bağımsız Şirket Ofisi",
                         badge: "🥉 Seviye 1: Bağımsız Ofis",
                         cost: 0,
+                        simplePerk: "Temel B1 Taşıma Belgesi onaylıdır. Tüm şehirlere yasal olarak sefer başlatabilirsiniz.",
                         perkDesc: "Yasal B1 Taşıma Yetki Belgesi ruhsatı tescillidir. Tüm resmi şehirlerarası hat başvuruları ve sefer izinleri aktiftir.",
                         perkShort: "B1 Ruhsatı & Yasal Sefer İzni",
                         effects: { tripSpeedBonus: 0, ticketCancelAvoid: 0 }
@@ -638,15 +672,17 @@
                         title: "Bağımsız İş Merkezi & Plaza İdari Katı",
                         badge: "🥈 Seviye 2: Plaza İdari Katı",
                         cost: 40000,
+                        simplePerk: "Hat açma izinleri hızlanır, resmi harçlar %25 ucuzlar ve idari cezalardan muafiyet kazanırsınız.",
                         perkDesc: "Hukuki süreçler ve hat izinleri hızlanır, sefer izin harçlarında %25 indirim sağlanır, idari cezalardan muafiyet kazanılır.",
                         perkShort: "Hızlı Hat İzinleri, -%25 İdari Harç",
                         effects: { tripSpeedBonus: 0.20, ticketCancelAvoid: 0.50 }
                     },
                     {
                         level: 3,
-                        title: "Şirket Genel Müdürlük Plaza Binası (Mülk Holding Binası)",
+                        title: "Şirket Genel Müdürlük Plaza Binası (Holding Genel Merkezi)",
                         badge: "🥇 Seviye 3: Holding Genel Müdürlüğü (MAX)",
                         cost: 120000,
+                        simplePerk: "Tüm Türkiye'de dev marka prestiji! Bilet hasılatınız kalıcı olarak +%30 artar ve sınırsız hat tesciliniz açılır.",
                         perkDesc: "Türkiye genelinde sınırsız hat açma yetkisi, kurumsal genel müdürlük prestijiyle bilet hasılatında +%30 kalıcı prim, filo yönetim hızı %40 artar.",
                         perkShort: "+%30 Bilet Marka Primi, Sınırsız Hat Tescili",
                         effects: { tripSpeedBonus: 0.40, ticketCancelAvoid: 1.0 }
@@ -657,7 +693,13 @@
                 id: "bus_garage",
                 name: "Araç Park Alanı & Filo Garaj Sahası",
                 icon: "🅿️",
-                category: "B1 Belgesi Yasal Zorunluluk",
+                category: "B1 Belgesi Yasal Zorunluluk (Filo Kapasitesi)",
+                simpleSummary: "Otobüslerinizin gece uyuduğu, yıkandığı ve sefer saatini beklediği resmi garaj sahasıdır. Sokak arasına otobüs park etmek yasaktır; şirketinizin otobüs sayısına uygun büyüklükte garajı olması şarttır.",
+                playerBenefits: [
+                    "🚌 Şirketinize kaç tane otobüs satın alabileceğinizi (filo kapasitenizi) doğrudan belirler.",
+                    "🔒 Otobüslerinizin gece hasar görmesini, parça hırsızlığını ve otopark cezası yemesini sıfırlar.",
+                    "⚡ Sabah otobüslerin sefere çıkış hazırlığını hızlandırır ve işletme giderlerini düşürür."
+                ],
                 desc: "Yönetmelik gereği tescilli koltuk kapasitesine oranla araçların güvenle park edilmesi, geceleme yapması ve boş beklemelerinin yapıldığı tescilli açık/kapalı saha.",
                 levels: [
                     {
@@ -665,6 +707,7 @@
                         title: "Kiralanan Tescilli Açık Park Sahası (5 Otobüs)",
                         badge: "🥉 Seviye 1: 5 Araçlık Açık Saha",
                         cost: 0,
+                        simplePerk: "Şirketiniz en fazla 5 adet otobüse sahip olabilir (Temel B1 garaj şartı karşılandı).",
                         perkDesc: "5 araca kadar yasal geceleme ve park sahası (Temel B1 garaj şartı karşılandı).",
                         perkShort: "5 Otobüslük Yasal Park",
                         effects: { capacity: 5 }
@@ -674,6 +717,7 @@
                         title: "Özel Asfalt Kaplama Güvenlikli Filo Garaj Sahası (15 Otobüs)",
                         badge: "🥈 Seviye 2: 15 Araçlık Güvenlikli Garaj",
                         cost: 45000,
+                        simplePerk: "Filo kapasiteniz 15 otobüse çıkar! 7/24 özel güvenlik ile gece hasarı ve parça hırsızlığı riski sıfırlanır.",
                         perkDesc: "15 araca kadar tescilli geniş park kapasitesi, 7/24 özel güvenlik, geceleme hasar ve parça hırsızlığı riski sıfır.",
                         perkShort: "15 Otobüs Kapasitesi, Sıfır Gece Hasarı",
                         effects: { capacity: 15 }
@@ -683,6 +727,7 @@
                         title: "Tam Entegre Kapalı Lojistik Garaj & Peron Kompleksi (Sınırsız Filo)",
                         badge: "🥇 Seviye 3: Entegre Lojistik Garaj (MAX)",
                         cost: 130000,
+                        simplePerk: "SINIRSIZ otobüs park kapasitesi! Kapalı hangar sayesinde araçlar anında sefere hazır hale gelir.",
                         perkDesc: "Sınırsız otobüs park kapasitesi, kapalı geceleme hangarı, otobüslerin sabah sefere hazırlanma süresi yarıya iner, filo işletme maliyeti düşer.",
                         perkShort: "Sınırsız Park Kapasitesi, Hızlı Sefer Hazırlığı",
                         effects: { capacity: 999 }
@@ -693,7 +738,13 @@
                 id: "terminal_offices",
                 name: "Otogar Yazıhaneleri & Peron Ağı",
                 icon: "🏢",
-                category: "Operasyonel & Yasal Zorunluluk",
+                category: "Yolcu Kabul & Peron İzni (Korsan Önleme)",
+                simpleSummary: "Şehirlerdeki resmi otobüs terminallerinde kiraladığınız gişe ve peron ağınızdır. Yol kenarında durup kaçak yolcu almak yasaktır; otogar yazıhanesi yasal bilet kesip yolcu bindirmenin tek meşru yoludur.",
+                playerBenefits: [
+                    "🎫 Her şehirdeki resmi peronlardan yolcu toplamanızı sağlar ve bilet hasılatını katlar.",
+                    "💰 Şirketinize sefer başına düzenli pasif terminal kâr payı kazandırır.",
+                    "⛽ Geliştikçe anlaşmalı tesislerden akaryakıt dolumunu indirimli ve Seviye 3'te %100 BEDAVA yapar!"
+                ],
                 desc: "Otobüslerin yolcu indirip bindireceği her şehirdeki resmi şehirlerarası otobüs terminallerinde kiralanan gişe/yazıhane ofisleri (korsan duraklama yasaktır).",
                 levels: [
                     {
@@ -701,6 +752,7 @@
                         title: "Merkez Otogar Yazıhanesi (Tekirdağ Süleymanpaşa)",
                         badge: "🥉 Seviye 1: Merkez Yazıhane",
                         cost: 0,
+                        simplePerk: "Merkez şehrinizdeki otogar peronundan yasal kalkış ve gişeden bilet satışı.",
                         perkDesc: "Resmi otogar peronundan yasal kalkış ve bilet satışı.",
                         perkShort: "Merkez Peron İzni",
                         effects: { passiveDividend: 0, fuelDiscount: 0 }
@@ -710,8 +762,9 @@
                         title: "Bölgesel Otogar Yazıhane & Peron Ağı (Çorlu, Esenler, AŞTİ)",
                         badge: "🥈 Seviye 2: Büyükşehir Peronları",
                         cost: 50000,
+                        simplePerk: "Büyükşehir terminallerinde hakimiyet, sefer başı +1.500 ₺ sabit otogar kârı ve akaryakıtta %30 indirim!",
                         perkDesc: "Büyük metropol otogarlarında resmi peron hakimiyeti, korsan cezalarından tam muafiyet, sefer başı +1.500 ₺ otogar kâr payı, akaryakıt dolumu %30 indirimli.",
-                        perkShort: "+%40 Yolcu Hacmi, +1.500 ₺ Sefer Payı",
+                        perkShort: "+%40 Yolcu Hacmi, +1.500 ₺ Sefer Payı, -%30 Mazot",
                         effects: { passiveDividend: 1500, fuelDiscount: 0.30 }
                     },
                     {
@@ -719,8 +772,9 @@
                         title: "Türkiye Geneli Ulusal Otogar Yazıhane Konsorsiyumu",
                         badge: "🥇 Seviye 3: Ulusal Otogar Ağı (MAX)",
                         cost: 140000,
+                        simplePerk: "Tüm terminallerde 1 numaralı VIP peron önceliği, sefer başı +3.500 ₺ pasif kâr ve %100 BEDAVA AKARYAKIT!",
                         perkDesc: "Tüm büyükşehir terminallerinde 1 numaralı VIP peron önceliği, otogar çıkış harçlarında %30 indirim, sefer başı +3.500 ₺ pasif terminal kâr payı, şirket araçlarına akaryakıt %100 BEDAVA!",
-                        perkShort: "+3.500 ₺ Sefer Kârı, %100 Ücretsiz Akaryakıt",
+                        perkShort: "+3.500 ₺ Sefer Kârı, %100 Ücretsiz Akaryakıt (BEDAVA)",
                         effects: { passiveDividend: 3500, fuelDiscount: 1.0 }
                     }
                 ]
@@ -729,7 +783,13 @@
                 id: "maintenance_depot",
                 name: "Bakım, Onarım ve Yıkama Atölyesi (Kademe Binası)",
                 icon: "🛠️",
-                category: "Teknik Servis & Hijyen Altyapısı",
+                category: "Teknik Servis, Tamir & Hijyen Üssü",
+                simpleSummary: "Otobüslerinizin sanayide sıra beklemeden kendi şirket ustalarınız tarafından tamir edildiği ve her sefer öncesi otomatik yıkandığı kademe binasıdır. Yağ, filtre, fren, lastik bakımları burada yapılır.",
+                playerBenefits: [
+                    "🔧 Sanayi ve tamir masraflarınızı devasa oranda ucuzlatır (%65'e varan tamir indirimi).",
+                    "🧼 Pırıl pırıl yıkanmış otobüslerle yolcu memnuniyetini ve kaptan bahşişlerini zirveye çıkarır.",
+                    "🛡️ Yolda kalma, motor harareti ve ani arıza riskini sıfıra indirir; yakıt tüketimini %15 düşürür."
+                ],
                 desc: "Yüksek tavanlı kapalı tamir hangarı (lift ve kanallı), su giderli yıkama peronu ve yedek parça ambarı. Yağ değişimi, fren bakımı, lastik değişimi ve her sefer öncesi dış fırçalama ile iç dezenfeksiyon işlemleri.",
                 levels: [
                     {
@@ -737,6 +797,7 @@
                         title: "Anlaşmalı Sanayi Servisi & Kanal Çukuru",
                         badge: "🥉 Seviye 1: Temel Kademe",
                         cost: 0,
+                        simplePerk: "Rutin yağ ve lastik değişimlerinde %10 tamir indirimi sağlar.",
                         perkDesc: "Rutin yağ ve lastik değişimi (%10 tamir indirimi).",
                         perkShort: "%10 Tamir İndirimi",
                         effects: { repairDiscount: 0.10, wearRate: 1.0, fuelSave: 0.0 }
@@ -746,6 +807,7 @@
                         title: "Şirkete Ait Kapalı Kademe Hangarı & Otomatik Yıkama Peronu",
                         badge: "🥈 Seviye 2: Servis Hangarı & Yıkama",
                         cost: 45000,
+                        simplePerk: "Tamir masraflarında %35 indirim, otomatik fırçalı dış yıkama ve otobüs aşınma hızında %25 yavaşlama.",
                         perkDesc: "Tamir masraflarında %35 indirim, sefer öncesi otomatik fırçalı yıkama ve dezenfeksiyon ile yolcu konforuna doğrudan katkı, araç yıpranma hızı %25 yavaşlar.",
                         perkShort: "%35 Tamir İndirimi, Otomatik Dış Yıkama, %25 Az Aşınma",
                         effects: { repairDiscount: 0.35, wearRate: 0.75, fuelSave: 0.05 }
@@ -755,6 +817,7 @@
                         title: "Entegre Otobüs Revizyon Hangarı, Test Pisti & Ağır Bakım Üssü",
                         badge: "🥇 Seviye 3: Mega Kademe Üssü (MAX)",
                         cost: 125000,
+                        simplePerk: "Tamir masraflarında %65 İNDİRİM! Sıfır motor arıza riski, tüm filoda %15 yakıt tasarrufu.",
                         perkDesc: "Tamir masraflarında %65 indirim, sıfır motor arıza riski, tüm filonun yakıt tüketiminde %15 tasarruf, sefer başı araç kondisyonu daima %100'e yakın kalır.",
                         perkShort: "%65 Tamir İndirimi, Sıfır Arıza Riski, +%15 Yakıt Tasarrufu",
                         effects: { repairDiscount: 0.65, wearRate: 0.50, fuelSave: 0.15 }
@@ -765,7 +828,13 @@
                 id: "driver_lodging",
                 name: "Personel Dinlenme Evi / Kaptan Lojmanı",
                 icon: "🛏️",
-                category: "Güvenlik & Yasal Takograf İhtiyacı",
+                category: "Güvenlik & Yasal Takograf Dinlenme Şartı",
+                simpleSummary: "Kaptan şoförlerinizin ve muavinlerinizin yasal direksiyon süreleri (takograf) bittiğinde sıcak duş alıp sessizce uyuduğu dinlenme evidir. Yorgun şoförün kaza yapmasını ve ceza yemesini engeller.",
+                playerBenefits: [
+                    "🛌 Şoförlerin dinlenme süresini hızlandırır, sefer aralarında uzun süre beklemenizi önler.",
+                    "🌟 Şoförlerin tecrübe puanı (XP) kazanımını x2 katına çıkarır ve bol bahşiş getirmelerini sağlar.",
+                    "🛡️ Yorgunluk ve uykusuzluk kaynaklı kaza ile trafik cezası riskini tamamen ortadan kaldırır."
+                ],
                 desc: "Şoförlerin yasal takograf dinlenme sürelerini doldurabilmesi için garaj sahası veya otogar yakınında kiralanan/kurulan gürültüden uzak uyku, sıcak duş ve dinlenme lojmanı.",
                 levels: [
                     {
@@ -773,6 +842,7 @@
                         title: "Otogar Şoförler Odası & Dinlenme Birimi",
                         badge: "🥉 Seviye 1: Dinlenme Odası",
                         cost: 0,
+                        simplePerk: "Temel takograf dinlenme süresi ve sefer brifingi (+%5 sefer primi).",
                         perkDesc: "Temel takograf dinlenme süresi ve sefer brifingi (+%5 sefer primi).",
                         perkShort: "+%5 Sefer Primi",
                         effects: { xpMultiplier: 1.0, tipBonus: 0.05, fatigueReduction: 0 }
@@ -782,6 +852,7 @@
                         title: "Müstakil Kaptan Misafirhanesi & Lojman (Sıcak Duş, Yatak, Kafeterya)",
                         badge: "🥈 Seviye 2: Kaptan Lojmanı",
                         cost: 40000,
+                        simplePerk: "Şoför dinlenme süresi yarı yarıya (%50) kısalır, ceza riski %40 azalır, tecrübe kazanımı x1.5 katına çıkar.",
                         perkDesc: "Şoförlerin dinlenme süresi %50 daha hızlı geçer (dinlenme süresi yarıya iner), yorgunluk kaynaklı kaza ve ceza riski %40 azalır, tecrübe kazanımı x1.5 katına çıkar.",
                         perkShort: "x1.5 XP, -%50 Dinlenme Süresi, -%40 Ceza Riski",
                         effects: { xpMultiplier: 1.5, tipBonus: 0.20, fatigueReduction: 0.5 }
@@ -791,6 +862,7 @@
                         title: "5 Yıldızlı Kaptan Oteli & Sosyal Yaşam Kampüsü",
                         badge: "🥇 Seviye 3: Kaptan Oteli & Kampüs (MAX)",
                         cost: 115000,
+                        simplePerk: "Dinlenme süresi %75 kısalır! Kaptanlar anında zinde ve %100 moralle sefere çıkar, sefer verimi x2.0 katına ulaşır.",
                         perkDesc: "Şoför dinlenme süresi %75 kısalır, kaptanlar daima %100 moralle sefere çıkar, filonun sefer verimi x2.0 katına ulaşır, sefer başı bahşiş ve puan tavan yapar.",
                         perkShort: "x2.0 Sefer Verimi, Anında Zindelik, Tavan Bahşiş",
                         effects: { xpMultiplier: 2.0, tipBonus: 0.35, fatigueReduction: 1.0 }
@@ -801,7 +873,13 @@
                 id: "city_agencies",
                 name: "Şehir İçi Bilet Satış Acenteleri & Terminal Shuttle (Servis) Ağı",
                 icon: "🏬",
-                category: "Doğrudan Satış & Yolcu Shuttle Ağı",
+                category: "Doğrudan Bilet Satışı & Yolcu Servis Minibüsleri",
+                simpleSummary: "Otogar şehrin dışındadır; bu yüzden vatandaşlar biletlerini çarşıdaki cadde acentelerinizden alır. Ücretsiz servis minibüsleriniz (shuttle) de yolcuları mahallelerden toplayıp otogardaki peronunuza getirir. Otobüsünüzün boş kalkmasını engeller!",
+                playerBenefits: [
+                    "👥 Yolcu talebini patlatır, otobüslerinizin koltuklarını tıka basa doldurur.",
+                    "🚌 Şehir merkezinden otogara ücretsiz yolcu taşıyarak firmanızı en çok tercih edilen marka yapar.",
+                    "💵 Seviye atladıkça bilet hasılatınıza kalıcı prim (%50) ve acentelerden düzenli komisyon kârı sağlar."
+                ],
                 desc: "Şehir merkezindeki yolcuların bilet temin ettiği ve terminallere ücretsiz servis araçlarıyla (shuttle) ulaştırıldığı cadde üzeri bilet acenteleri ve servis filosu.",
                 levels: [
                     {
@@ -809,6 +887,7 @@
                         title: "Cadde Üzeri Bilet Satış Noktası",
                         badge: "🥉 Seviye 1: Şehir İçi Gişe",
                         cost: 0,
+                        simplePerk: "Şehir merkezinden doğrudan bilet satışı ve standart yolcu akışı sağlar.",
                         perkDesc: "Şehir merkezinden doğrudan bilet satışı ve standart yolcu akışı.",
                         perkShort: "Merkezi Bilet Satışı",
                         effects: { demandMultiplier: 1.0, revenueBonus: 0 }
@@ -818,6 +897,7 @@
                         title: "Bölgesel Cadde Acente Ağı & Ücretsiz Terminal Servis (Shuttle) Filosu",
                         badge: "🥈 Seviye 2: Acente & Shuttle Filosu",
                         cost: 50000,
+                        simplePerk: "Ücretsiz servis minibüsleri yolcuları otogara taşır! Yolcu talebi +%35 artar, doluluk en az %85 olur, +%15 bilet hasılat primi.",
                         perkDesc: "Şehir içi ücretsiz ring servisleri yolcuları doğrudan otogara taşır. Bilet talebi +%35 artar, otobüsler en az %85 dolulukla sefere çıkar, bilet hasılat primi +%15.",
                         perkShort: "+%35 Yolcu Talebi, Ücretsiz Terminal Servisi",
                         effects: { demandMultiplier: 1.35, revenueBonus: 0.15 }
@@ -827,6 +907,7 @@
                         title: "Ulusal Acente Dağıtım Ağı & VIP Adrese Servis Transferi",
                         badge: "🥇 Seviye 3: Ulusal Acente & VIP Shuttle (MAX)",
                         cost: 135000,
+                        simplePerk: "Bilet gelirinizde kalıcı +%50 artış! Acentelerden şirketinize düzenli pasif komisyon kârı akar ve VIP kapıdan transfer hizmeti verilir.",
                         perkDesc: "Bilet hasılatında +%50 kalıcı artış, her acenteden şirkete düzenli komisyon kârı (pasif gelir), kapıdan kapıya VIP transfer güvencesi.",
                         perkShort: "+%50 Bilet Hasılatı, Pasif Acente Geliri, VIP Shuttle",
                         effects: { demandMultiplier: 1.60, revenueBonus: 0.35 }
@@ -966,28 +1047,52 @@
             const totalAvailable = companyTreasury + playerBudget;
 
             let html = `
-            <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 1.5px solid #38bdf8; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(56, 189, 248, 0.15);">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+            <!-- 1. B1 YETKİ BELGESİ BİNALARI GENEL REHBERİ (OYUNCUNUN ANLAYACAĞI SADE DİL) -->
+            <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 2px solid #38bdf8; border-radius: 14px; padding: 20px; margin-bottom: 18px; box-shadow: 0 4px 25px rgba(56, 189, 248, 0.18);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
                     <div>
-                        <div style="color: #38bdf8; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                            <span>🇹🇷</span> <span>B1 YETKİ BELGESİ — YASAL VE OPERASYONEL ALTYAPI</span>
+                        <div style="color: #38bdf8; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                            <span>🇹🇷</span> <span>B1 YETKİ BELGESİ — ŞİRKET BİNALARI VE TESİS REHBERİ</span>
                         </div>
-                        <div style="color: #cbd5e1; font-size: 0.88rem; margin-top: 3px;">
-                            T.C. Ulaştırma ve Altyapı Bakanlığı Karayolu Taşıma Yönetmeliği uyarınca B1 belgeli şehirlerarası yolcu şirketlerinin sahip olması gereken 6 fiziki alan ve yasal bina altyapısı:
+                        <div style="color: #cbd5e1; font-size: 0.9rem; margin-top: 4px; line-height: 1.5;">
+                            Gerçek bir otobüs şirketi yönetirken sahip olmanız gereken <strong>6 temel bina ve tesis</strong> vardır. Her binayı büyüttüğünüzde filonuz daha çok para kazanır, masraflarınız düşer ve seferleriniz hızlanır.
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <div style="background: rgba(234, 179, 8, 0.18); border: 1px solid #eab308; border-radius: 8px; padding: 6px 14px; font-size: 0.88rem; color: #fef08a;">
-                            🏦 Şirket Kasası: <strong style="color: #facc15; font-size: 1rem;">${companyTreasury.toLocaleString('tr-TR')} ₺</strong>
+                        <div style="background: rgba(234, 179, 8, 0.2); border: 1.5px solid #eab308; border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; color: #fef08a;">
+                            🏦 Şirket Kasası: <strong style="color: #facc15; font-size: 1.05rem;">${companyTreasury.toLocaleString('tr-TR')} ₺</strong>
                         </div>
-                        <div style="background: rgba(34, 197, 94, 0.18); border: 1px solid #22c55e; border-radius: 8px; padding: 6px 14px; font-size: 0.88rem; color: #86efac;">
-                            👤 Kaptan Cüzdanı: <strong style="color: #4ade80; font-size: 1rem;">${playerBudget.toLocaleString('tr-TR')} ₺</strong>
+                        <div style="background: rgba(34, 197, 94, 0.2); border: 1.5px solid #22c55e; border-radius: 8px; padding: 8px 16px; font-size: 0.9rem; color: #86efac;">
+                            👤 Kaptan Cüzdanı: <strong style="color: #4ade80; font-size: 1.05rem;">${playerBudget.toLocaleString('tr-TR')} ₺</strong>
                         </div>
+                    </div>
+                </div>
+
+                <!-- 6 BİNA HIZLI ÖZET KARTLARI -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #38bdf8; font-size: 0.84rem; color: #cbd5e1;">
+                        🏛️ <strong>Genel Müdürlük:</strong> Şirketin beynidir. Sefer izinlerini yönetir, cezalardan korur ve bilet hasılatına +%30 marka primi kazandırır.
+                    </div>
+                    <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #22c55e; font-size: 0.84rem; color: #cbd5e1;">
+                        🅿️ <strong>Filo Garajı:</strong> Otobüs park alanıdır. Şirketinize kaç otobüs alabileceğinizi (filo kapasitesini) belirler ve gece hasarlarını önler.
+                    </div>
+                    <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #facc15; font-size: 0.84rem; color: #cbd5e1;">
+                        🏢 <strong>Otogar Yazıhaneleri:</strong> Terminallerdeki dükkânlarınızdır. Sefer başı +3.500 ₺ pasif kâr ve %100 BEDAVA MAZOT kazandırır!
+                    </div>
+                    <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #f97316; font-size: 0.84rem; color: #cbd5e1;">
+                        🛠️ <strong>Kademe Binası (Tamirhane & Yıkama):</strong> Sanayi faturasını %65 düşürür, otomatik yıkama ile memnuniyeti ve bahşişleri artırır.
+                    </div>
+                    <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #ec4899; font-size: 0.84rem; color: #cbd5e1;">
+                        🛏️ <strong>Kaptan Lojmanı:</strong> Şoförlerin dinlenme evidir. Takograf dinlenme süresini %75 kısaltır, kazaları önler ve x2 kat sefer verimi sağlar.
+                    </div>
+                    <div style="background: rgba(15,23,42,0.6); padding: 10px 12px; border-radius: 8px; border-left: 3.5px solid #a855f7; font-size: 0.84rem; color: #cbd5e1;">
+                        🏬 <strong>Şehir İçi Acente & Servis Ağı:</strong> Otogara uzak yolcuları çarşıdan toplayıp otobüsü doldurur ve bilet hasılatını +%50 artırır.
                     </div>
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 14px;">
+            <!-- BİNA KARTLARI LİSTESİ -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px;">
             `;
 
             this.institutionsData.forEach(inst => {
@@ -997,70 +1102,95 @@
                 const nextLvlObj = isMax ? null : inst.levels[curLvl];
                 const canAfford = nextLvlObj ? (totalAvailable >= nextLvlObj.cost) : false;
 
+                const benefitsListHtml = (inst.playerBenefits || []).map(b => `
+                    <div style="margin-bottom: 4px; font-size: 0.84rem; color: #e2e8f0; line-height: 1.4;">
+                        ${b}
+                    </div>
+                `).join('');
+
                 html += `
-                <div style="background: rgba(15, 23, 42, 0.88); border: 1.8px solid ${isMax ? '#eab308' : (curLvl === 2 ? '#38bdf8' : '#475569')}; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                <div style="background: rgba(15, 23, 42, 0.9); border: 2px solid ${isMax ? '#eab308' : (curLvl === 2 ? '#38bdf8' : '#475569')}; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.35);">
                     <div>
+                        <!-- Başlık ve Rozet -->
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
                             <div>
-                                <div style="font-size: 1.15rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 1.3rem;">${inst.icon}</span>
+                                <div style="font-size: 1.2rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 1.4rem;">${inst.icon}</span>
                                     <span>${inst.name}</span>
                                 </div>
-                                <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 2px;">
+                                <div style="color: #94a3b8; font-size: 0.82rem; margin-top: 3px;">
                                     📌 ${inst.category}
                                 </div>
                             </div>
-                            <span style="font-size: 0.8rem; padding: 3px 9px; border-radius: 6px; font-weight: bold; ${isMax ? 'background: rgba(234, 179, 8, 0.25); color: #facc15; border: 1px solid #eab308;' : (curLvl === 2 ? 'background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8;' : 'background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid #64748b;')}">
+                            <span style="font-size: 0.82rem; padding: 4px 10px; border-radius: 6px; font-weight: bold; ${isMax ? 'background: rgba(234, 179, 8, 0.25); color: #facc15; border: 1.5px solid #eab308;' : (curLvl === 2 ? 'background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1.5px solid #38bdf8;' : 'background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid #64748b;')}">
                                 ${curLvlObj.badge}
                             </span>
                         </div>
 
-                        <!-- 3 Aşamalı Seviye Göstergesi (Stepper) -->
-                        <div style="display: flex; gap: 4px; margin: 10px 0 12px 0;">
-                            <div style="flex: 1; height: 6px; border-radius: 3px; background: #22c55e;"></div>
-                            <div style="flex: 1; height: 6px; border-radius: 3px; background: ${curLvl >= 2 ? (curLvl === 2 ? '#38bdf8' : '#22c55e') : 'rgba(255,255,255,0.1)'};"></div>
-                            <div style="flex: 1; height: 6px; border-radius: 3px; background: ${curLvl >= 3 ? '#eab308' : 'rgba(255,255,255,0.1)'};"></div>
+                        <!-- 3 Aşamalı Seviye Çubuğu (Stepper) -->
+                        <div style="display: flex; gap: 5px; margin: 12px 0 14px 0;">
+                            <div style="flex: 1; height: 7px; border-radius: 4px; background: #22c55e;"></div>
+                            <div style="flex: 1; height: 7px; border-radius: 4px; background: ${curLvl >= 2 ? (curLvl === 2 ? '#38bdf8' : '#22c55e') : 'rgba(255,255,255,0.12)'};"></div>
+                            <div style="flex: 1; height: 7px; border-radius: 4px; background: ${curLvl >= 3 ? '#eab308' : 'rgba(255,255,255,0.12)'};"></div>
                         </div>
 
-                        <div style="color: #cbd5e1; font-size: 0.85rem; line-height: 1.45; margin-bottom: 12px;">
-                            ${inst.desc}
-                        </div>
-
-                        <!-- Mevcut Seviye Kartı -->
-                        <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;">
-                            <div style="color: #4ade80; font-size: 0.82rem; font-weight: bold; margin-bottom: 3px;">
-                                ✓ MEVCUT SEVİYE: ${curLvlObj.title}
+                        <!-- 1. KUTU: BU BİNA NE İŞE YARAR? (SADE DİLLE OYUNCUYA ÖZET) -->
+                        <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.25), rgba(15, 23, 42, 0.6)); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 9px; padding: 12px; margin-bottom: 10px;">
+                            <div style="color: #38bdf8; font-weight: bold; font-size: 0.85rem; margin-bottom: 4px; display: flex; align-items: center; gap: 5px;">
+                                <span>❓</span> <span>Bu Bina Ne İşe Yarar?</span>
                             </div>
-                            <div style="color: #e2e8f0; font-size: 0.84rem;">
-                                ${curLvlObj.perkDesc}
+                            <div style="color: #e2e8f0; font-size: 0.85rem; line-height: 1.45;">
+                                ${inst.simpleSummary || inst.desc}
                             </div>
                         </div>
 
-                        <!-- Sonraki Seviye Hedefi -->
+                        <!-- 2. KUTU: OYUNA VE FİLONUZA SOMUT FAYDALARI -->
+                        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 9px; padding: 12px; margin-bottom: 12px;">
+                            <div style="color: #facc15; font-weight: bold; font-size: 0.85rem; margin-bottom: 6px; display: flex; align-items: center; gap: 5px;">
+                                <span>🎮</span> <span>Oyuna ve Filonuza Kazandırdığı Faydalar:</span>
+                            </div>
+                            ${benefitsListHtml}
+                        </div>
+
+                        <!-- 3. KUTU: MEVCUT SEVİYE GÜCÜ -->
+                        <div style="background: rgba(34, 197, 94, 0.12); border: 1.5px solid rgba(34, 197, 94, 0.35); border-radius: 9px; padding: 12px; margin-bottom: 10px;">
+                            <div style="color: #4ade80; font-size: 0.84rem; font-weight: bold; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;">
+                                <span>✓</span> <span>ŞU ANKİ SEVİYENİZ: ${curLvlObj.title}</span>
+                            </div>
+                            <div style="color: #f1f5f9; font-size: 0.85rem; line-height: 1.4;">
+                                ${curLvlObj.simplePerk || curLvlObj.perkDesc}
+                            </div>
+                        </div>
+
+                        <!-- 4. KUTU: SONRAKİ SEVİYEDE NE KAZANACAKSINIZ? -->
                         ${!isMax && nextLvlObj ? `
-                            <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;">
-                                <div style="color: #38bdf8; font-size: 0.82rem; font-weight: bold; margin-bottom: 3px;">
-                                    ★ SEVİYE ${nextLvlObj.level} HEDEFİ: ${nextLvlObj.title}
+                            <div style="background: rgba(56, 189, 248, 0.1); border: 1.5px solid rgba(56, 189, 248, 0.35); border-radius: 9px; padding: 12px; margin-bottom: 14px;">
+                                <div style="color: #38bdf8; font-size: 0.84rem; font-weight: bold; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;">
+                                    <span>★</span> <span>SEVİYE ${nextLvlObj.level} HEDEFİ: ${nextLvlObj.title}</span>
                                 </div>
-                                <div style="color: #cbd5e1; font-size: 0.84rem;">
-                                    ${nextLvlObj.perkDesc}
+                                <div style="color: #cbd5e1; font-size: 0.85rem; line-height: 1.4;">
+                                    ${nextLvlObj.simplePerk || nextLvlObj.perkDesc}
+                                </div>
+                                <div style="margin-top: 6px; font-size: 0.82rem; color: #fde047; font-weight: bold;">
+                                    💰 Geliştirme Ücreti: ${nextLvlObj.cost.toLocaleString('tr-TR')} ₺
                                 </div>
                             </div>
                         ` : `
-                            <div style="background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; text-align: center; color: #fde047; font-weight: bold; font-size: 0.85rem;">
-                                👑 TEBRİKLER! Bu kurum maksimum zirve seviyeye ulaştırıldı.
+                            <div style="background: rgba(234, 179, 8, 0.12); border: 1.5px solid rgba(234, 179, 8, 0.4); border-radius: 9px; padding: 12px; margin-bottom: 14px; text-align: center; color: #fde047; font-weight: bold; font-size: 0.88rem;">
+                                👑 TEBRİKLER! Bu tesis maksimum zirve seviyeye ulaştırıldı.
                             </div>
                         `}
                     </div>
 
+                    <!-- AKSİYON BUTONU -->
                     <div>
                         ${isMax ? `
-                            <button class="modern-btn" disabled style="width: 100%; padding: 11px; background: rgba(234, 179, 8, 0.18); border: 1.5px solid #eab308; color: #facc15; font-weight: 800; border-radius: 8px; font-size: 0.92rem;">
+                            <button class="modern-btn" disabled style="width: 100%; padding: 12px; background: rgba(234, 179, 8, 0.2); border: 1.5px solid #eab308; color: #facc15; font-weight: 800; border-radius: 8px; font-size: 0.94rem;">
                                 👑 MAKSİMUM SEVİYEYE ULAŞILDI
                             </button>
                         ` : `
-                            <button class="modern-btn btn-upgrade-institution nav-item" data-inst-id="${inst.id}" style="width: 100%; padding: 11px; background: ${canAfford ? 'linear-gradient(135deg, #0284c7, #0369a1)' : 'rgba(255,255,255,0.06)'}; border: 1.5px solid ${canAfford ? '#38bdf8' : '#475569'}; color: ${canAfford ? '#ffffff' : '#94a3b8'}; font-weight: 800; border-radius: 8px; cursor: ${canAfford ? 'pointer' : 'pointer'}; font-size: 0.95rem; box-shadow: ${canAfford ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'};" aria-label="${inst.name} kurumunu Seviye ${nextLvlObj.level}'e büyüt. Ücret: ${nextLvlObj.cost.toLocaleString('tr-TR')} TL. Avantaj: ${nextLvlObj.perkShort}">
-                                🚀 Kurumu Büyüt (Seviye ${nextLvlObj.level}'e Yükselt) — ${nextLvlObj.cost.toLocaleString('tr-TR')} ₺
+                            <button class="modern-btn btn-upgrade-institution nav-item" data-inst-id="${inst.id}" style="width: 100%; padding: 12px; background: ${canAfford ? 'linear-gradient(135deg, #0284c7, #0369a1)' : 'rgba(255,255,255,0.06)'}; border: 1.5px solid ${canAfford ? '#38bdf8' : '#475569'}; color: ${canAfford ? '#ffffff' : '#94a3b8'}; font-weight: 800; border-radius: 8px; cursor: pointer; font-size: 0.95rem; box-shadow: ${canAfford ? '0 4px 15px rgba(2, 132, 199, 0.4)' : 'none'};" aria-label="${inst.name} tesisini Seviye ${nextLvlObj.level}'e büyüt. Ücret: ${nextLvlObj.cost.toLocaleString('tr-TR')} TL. Sağlayacağı avantaj: ${nextLvlObj.simplePerk || nextLvlObj.perkShort}">
+                                🚀 Binayı Büyüt (Seviye ${nextLvlObj.level}'e Yükselt) — ${nextLvlObj.cost.toLocaleString('tr-TR')} ₺
                             </button>
                         `}
                     </div>
@@ -1078,7 +1208,6 @@
                 });
             });
         },
-
 
         // Şirket Arama (Kaptan + Kurumsal)
         getCompanyById: function(companyId) {
