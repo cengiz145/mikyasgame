@@ -723,6 +723,26 @@ const Game = {
     
     ticketPrices: { tam: 15, ogrenci: 8, yasli: 0 },
 
+    _firebaseSaveTimer: null,
+
+    // Firebase için Veri Temizleme & Güvenlik Zırhı (%100 Çökme Önleyici)
+    sanitizeForFirebase: function(obj) {
+        if (obj === null || obj === undefined) return null;
+        if (typeof obj !== 'object') return obj;
+        if (Array.isArray(obj)) {
+            return obj.map(item => this.sanitizeForFirebase(item));
+        }
+        const clean = {};
+        for (const key of Object.keys(obj)) {
+            const sanitizedKey = key.replace(/[.$#\[\]\/]/g, '_');
+            const val = obj[key];
+            if (val !== undefined && typeof val !== 'function') {
+                clean[sanitizedKey] = this.sanitizeForFirebase(val);
+            }
+        }
+        return clean;
+    },
+
     loadFromFirebase: function(username) {
         return new Promise((resolve) => {
             try {
@@ -734,7 +754,8 @@ const Game = {
                 }
 
                 this.username = username;
-                const ref = window.db.ref('otobus_simulasyonu/kullanicilar/' + username);
+                const cleanUser = username.replace(/[.#$\[\]\/]/g, '');
+                const ref = window.db.ref('otobus_simulasyonu/kullanicilar/' + cleanUser);
                 
                 let isResolved = false;
                 const timeoutId = setTimeout(() => {
@@ -743,7 +764,7 @@ const Game = {
                         console.warn("Firebase yanıt vermiyor (İnternet yavaş veya yok), yerel verilerle devam ediliyor.");
                         resolve();
                     }
-                }, 2000);
+                }, 2500);
 
                 ref.once('value').then((snapshot) => {
                     if (isResolved) return;
@@ -752,17 +773,18 @@ const Game = {
 
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        // Herkesi Seviye 1'den başlat kuralı (Global Sezon Reset)
                         if (data.season !== 'season_level1') {
                             this.licenseLevel = 1;
+                            this.playerXP = 0;
                             this.completedTasks = 0;
                             this.playerBudget = data.playerBudget || 0;
                             this.clockMinutes = data.clockMinutes || 480;
                             this.unlockedCities = ["Tekirdağ"];
                             this.currentCity = "Tekirdağ";
-                            this.saveData(); // Firebase bulut kaydını da Seviye 1 olarak güncelle
+                            this.saveData(true);
                         } else {
                             this.licenseLevel = data.licenseLevel || 1;
+                            this.playerXP = data.playerXP || 0;
                             this.completedTasks = data.completedTasks || 0;
                             this.playerBudget = data.playerBudget || 0;
                             this.clockMinutes = data.clockMinutes || 480;
@@ -772,11 +794,84 @@ const Game = {
                                 this.activeDistrict = data.activeDistrict;
                                 try { localStorage.setItem('activeDistrict', this.activeDistrict); } catch(e) {}
                             }
+                            if (data.activeNeighborhood) {
+                                this.activeNeighborhood = data.activeNeighborhood;
+                                try { localStorage.setItem('activeNeighborhood', this.activeNeighborhood); } catch(e) {}
+                            }
+                            if (data.selectedBusId) {
+                                try { localStorage.setItem('selectedBusId', data.selectedBusId); } catch(e) {}
+                            }
+                            if (data.academyCompleted) {
+                                try { localStorage.setItem('academyCompleted', 'true'); } catch(e) {}
+                            }
+
+                            // 1. Sürücü İstatistikleri & Başarılar (DriverBadges)
+                            if (data.driverStats && typeof DriverBadges !== 'undefined' && typeof DriverBadges.getLifetimeStats === 'function') {
+                                try {
+                                    const currentStats = DriverBadges.getLifetimeStats();
+                                    const merged = Object.assign({}, currentStats, data.driverStats);
+                                    DriverBadges.saveLifetimeStats(merged);
+                                } catch(e) {
+                                    console.warn("Driver stats merge error:", e);
+                                }
+                            }
+
+                            if (data.badgesData && typeof DriverBadges !== 'undefined' && typeof DriverBadges.getBadgesData === 'function') {
+                                try {
+                                    const currentBadges = DriverBadges.getBadgesData();
+                                    const mergedBadges = Object.assign({}, currentBadges, data.badgesData);
+                                    DriverBadges.saveBadgesData(mergedBadges);
+                                } catch(e) {
+                                    console.warn("Badges merge error:", e);
+                                }
+                            }
+
+                            if (data.equippedTitle && typeof DriverBadges !== 'undefined') {
+                                try {
+                                    localStorage.setItem(DriverBadges.TITLES_KEY, data.equippedTitle);
+                                } catch(e) {}
+                            }
+
+                            // 2. Şirket Verileri (CompanySystem)
+                            if (data.companyData && typeof CompanySystem !== 'undefined') {
+                                try {
+                                    CompanySystem.data = Object.assign(CompanySystem.data || {}, data.companyData);
+                                    CompanySystem.saveData();
+                                } catch(e) {
+                                    console.warn("Company data merge error:", e);
+                                }
+                            }
+
+                            // 3. Otoyol Tesisleri ve HGS (HighwayFacilities)
+                            if (data.highwayData && typeof HighwayFacilities !== 'undefined') {
+                                try {
+                                    HighwayFacilities.data = Object.assign(HighwayFacilities.data || {}, data.highwayData);
+                                    HighwayFacilities.saveData();
+                                } catch(e) {
+                                    console.warn("Highway data merge error:", e);
+                                }
+                            }
+
+                            // 4. Durak Keşifleri (StopDiscovery)
+                            if (data.discoveredStops && typeof StopDiscovery !== 'undefined' && typeof StopDiscovery.getDiscoveredData === 'function') {
+                                try {
+                                    const currentDiscovered = StopDiscovery.getDiscoveredData();
+                                    const mergedStops = Object.assign({}, currentDiscovered, data.discoveredStops);
+                                    StopDiscovery.saveDiscoveredData(mergedStops);
+                                } catch(e) {
+                                    console.warn("Stop discovery merge error:", e);
+                                }
+                            }
+
+                            // Yerel depolamaya da tam güncel hallerini senkronize et
+                            this.saveData(false);
                         }
                     } else {
+                        // Yeni kullanıcı: İlk bulut kaydını oluştur
                         this.licenseLevel = 1;
                         this.completedTasks = 0;
-                        this.saveData(); // Yeni profil
+                        this.playerXP = 0;
+                        this.saveData(true);
                     }
                     resolve();
                 }).catch(err => {
@@ -793,40 +888,116 @@ const Game = {
         });
     },
 
-    saveData: function() {
-        // Local fallback backup (crash-proof)
+    saveData: function(immediate = false) {
+        // 1. Yerel Kayıt (Anında ve Kesintisiz Çift Katman)
         try {
             localStorage.setItem('sim_season_level1', 'true');
             localStorage.setItem('licenseLevel', this.licenseLevel);
-            localStorage.setItem('playerXP', this.playerXP);
+            localStorage.setItem('playerXP', this.playerXP || 0);
             localStorage.setItem('completedTasks', this.completedTasks);
             localStorage.setItem('para', this.playerBudget);
             localStorage.setItem('clockMinutes', this.clockMinutes);
             localStorage.setItem('unlockedCities', JSON.stringify(this.unlockedCities));
             localStorage.setItem('merkezUs', this.currentCity);
             localStorage.setItem('activeDistrict', this.activeDistrict || "Süleymanpaşa");
+            if (this.activeNeighborhood) {
+                localStorage.setItem('activeNeighborhood', this.activeNeighborhood);
+            }
         } catch (storageErr) {
             console.warn("Yerel depolama kayıt uyarısı:", storageErr);
         }
 
-        // Firebase Cloud Save
-        try {
-            if (window.db && this.username) {
-                window.db.ref('otobus_simulasyonu/kullanicilar/' + this.username).set({
+        // 2. Firebase Bulut Kaydı (Debounce ile Ağ Korumalı ve Çökme Önleyici)
+        if (!window.db || !this.username) return;
+
+        const performFirebaseSave = () => {
+            try {
+                if (!window.db || !this.username) return;
+                const cleanUser = this.username.replace(/[.#$\[\]\/]/g, '');
+                if (!cleanUser) return;
+
+                // Tüm istatistik ve modül verilerini topla
+                const payload = {
                     season: 'season_level1',
-                    licenseLevel: this.licenseLevel,
-                    completedTasks: this.completedTasks,
-                    playerBudget: this.playerBudget,
-                    clockMinutes: this.clockMinutes,
-                    unlockedCities: this.unlockedCities,
-                    currentCity: this.currentCity,
-                    activeDistrict: this.activeDistrict || "Süleymanpaşa"
-                }).catch(e => {
-                    console.error("Firebase save error", e);
+                    licenseLevel: this.licenseLevel || 1,
+                    playerXP: this.playerXP || 0,
+                    completedTasks: this.completedTasks || 0,
+                    playerBudget: this.playerBudget || 0,
+                    clockMinutes: this.clockMinutes || 480,
+                    unlockedCities: this.unlockedCities || ["Tekirdağ"],
+                    currentCity: this.currentCity || "Tekirdağ",
+                    activeDistrict: this.activeDistrict || "Süleymanpaşa",
+                    activeNeighborhood: this.activeNeighborhood || "",
+                    playMode: this.playMode || "career",
+                    selectedBusId: (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBusId) ? BusFleet.getSelectedBusId() : "otokar_sultan_mega",
+                    academyCompleted: (localStorage.getItem('academyCompleted') === 'true'),
+                    lastSavedTimestamp: Date.now()
+                };
+
+                // Sürücü Ömür Boyu İstatistikleri (DriverBadges)
+                if (typeof DriverBadges !== 'undefined') {
+                    if (typeof DriverBadges.getLifetimeStats === 'function') {
+                        payload.driverStats = DriverBadges.getLifetimeStats();
+                    }
+                    if (typeof DriverBadges.getBadgesData === 'function') {
+                        payload.badgesData = DriverBadges.getBadgesData();
+                    }
+                    if (typeof DriverBadges.getEquippedTitleId === 'function') {
+                        payload.equippedTitle = DriverBadges.getEquippedTitleId();
+                    }
+                }
+
+                // Şirket Verileri (CompanySystem)
+                if (typeof CompanySystem !== 'undefined' && CompanySystem.data) {
+                    payload.companyData = {
+                        companyName: CompanySystem.data.companyName || "Mikyas Seyahat",
+                        foundedDate: CompanySystem.data.foundedDate || Date.now(),
+                        totalRevenue: CompanySystem.data.totalRevenue || 0,
+                        completedTripsCount: CompanySystem.data.completedTripsCount || 0,
+                        companyLevel: CompanySystem.data.companyLevel || 1,
+                        companyTreasury: CompanySystem.data.companyTreasury || 50000,
+                        revenueSharePercent: CompanySystem.data.revenueSharePercent || 50,
+                        cateringPackage: CompanySystem.data.cateringPackage || "standart",
+                        institutions: CompanySystem.data.institutions || {},
+                        satisfactionRating: CompanySystem.data.satisfactionRating || 4.9,
+                        terminalBranches: CompanySystem.data.terminalBranches || {},
+                        ticketPricingMultiplier: CompanySystem.data.ticketPricingMultiplier || 1.0,
+                        facilityContract: CompanySystem.data.facilityContract || "standart",
+                        hqUpgrades: CompanySystem.data.hqUpgrades || {},
+                        hiredDrivers: CompanySystem.data.hiredDrivers || [],
+                        bankruptcyCount: CompanySystem.data.bankruptcyCount || 0
+                    };
+                }
+
+                // Otoyol Tesisleri ve HGS (HighwayFacilities)
+                if (typeof HighwayFacilities !== 'undefined' && HighwayFacilities.data) {
+                    payload.highwayData = {
+                        hgsBalance: HighwayFacilities.data.hgsBalance || 0,
+                        visitedFacilities: HighwayFacilities.data.visitedFacilities || {},
+                        stats: HighwayFacilities.data.stats || {}
+                    };
+                }
+
+                // Durak Keşifleri (StopDiscovery)
+                if (typeof StopDiscovery !== 'undefined' && typeof StopDiscovery.getDiscoveredData === 'function') {
+                    payload.discoveredStops = StopDiscovery.getDiscoveredData();
+                }
+
+                const cleanPayload = this.sanitizeForFirebase(payload);
+                window.db.ref('otobus_simulasyonu/kullanicilar/' + cleanUser).update(cleanPayload).catch(e => {
+                    console.warn("Firebase bulut kayıt uyarısı:", e);
                 });
+            } catch (e) {
+                console.warn("Firebase bulut kayıt hatası:", e);
             }
-        } catch (e) {
-            console.error("Firebase senkronizasyon hatası (Senkron denendi ama başarısız oldu)", e);
+        };
+
+        if (immediate) {
+            if (this._firebaseSaveTimer) clearTimeout(this._firebaseSaveTimer);
+            performFirebaseSave();
+        } else {
+            if (this._firebaseSaveTimer) clearTimeout(this._firebaseSaveTimer);
+            this._firebaseSaveTimer = setTimeout(performFirebaseSave, 800);
         }
     },
 
