@@ -464,7 +464,7 @@ class VoiceAssistant {
                 </div>
                 <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
                     • <strong>Kendi Şirketinizi Kurmak:</strong> Kendi otobüs firmanızı açarak filo kurabilir, şoför istihdam edebilir ve sefer gelirlerini yönetebilirsiniz. Bilet hasılatını şirket kasası ile kişisel bütçeniz arasında belirlediğiniz oranda paylaştırabilirsiniz (Örnek: %50 / %50).<br>
-                    • <strong>Kurumsal Firmada Maaşlı Şoför Olmak:</strong> Şirket idaresi sorumluluğu almadan; Metro, Pamukkale, Kamil Koç veya Tekulaş bünyesinde sabit günlük maaş ve sefer primi alarak çalışabilirsiniz.
+                    • <strong>Bağımsız Serbest Kaptan Olarak Çalışmak:</strong> Şirket kurma veya şirket işletme riski almadan; bağımsız bir şoför olarak kendi aracınızla serbest seferler yapabilir, kazandığınız tüm bilet hasılatını (%100) kesintisiz olarak kendi şahsi cüzdanınıza alabilirsiniz. Oyunda telif hakkı olan gerçek ticari markalar yer almaz; dilerseniz topluluk bünyesindeki kaptan şirketlerinde de maaşlı çalışabilirsiniz.
                 </div>
             </div>
 
@@ -654,7 +654,7 @@ class VoiceAssistant {
                     <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #facc15; padding: 12px; border-radius: 8px;">
                         <strong style="color: #fde047; font-size: 0.95rem;">🎯 1. Başlangıç Taktigi: Şirket Kurmak mı, Maaşlı Başlamak mı?</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Kendi şirketinizi kurduğunuzda sistem size <strong>50.000 ₺ hazır şirket kasası</strong> verir. Şirketinizin <strong>tüm şoförlerini Şoför Pazarı'ndan tecrübesine ve maaşına göre siz kendiniz seçip işe alırsınız.</strong> Eğer şirket kurmadan önce sermaye biriktirmek isterseniz, kurumsal bir firmada (örneğin Tekulaş veya Pamukkale) maaşlı kaptan olarak çalışıp cepten sıfır masrafla nakit yapabilirsiniz.
+                            Kendi şirketinizi kurduğunuzda sistem size <strong>50.000 ₺ hazır şirket kasası</strong> verir. Şirketinizin <strong>tüm şoförlerini Şoför Pazarı'ndan tecrübesine ve maaşına göre siz kendiniz seçip işe alırsınız.</strong> Eğer şirket kurmadan önce sermaye biriktirmek isterseniz, bağımsız serbest kaptan olarak çalışıp tüm sefer gelirini (%100) doğrudan kendi cebinize koyarak cepten sıfır masrafla ve telif riski olmadan nakit biriktirebilirsiniz.
                         </p>
                     </div>
 
@@ -735,7 +735,7 @@ class VoiceAssistant {
 
                     <div style="background: rgba(239,68,68,0.08); padding: 10px 14px; border-radius: 6px; border: 1.5px solid rgba(239,68,68,0.35);">
                         <strong style="color: #f87171;">⚖️ Soru: Şirketim iflas edebilir mi? İflas edince ne olur?</strong><br>
-                        <span style="color: #fca5a5;">Cevap:</span> Evet! Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaştığında T.C. Asliye Ticaret Mahkemesi iflas ve tasfiye kararı verir. Tasfiye masası şirketin 1 milyon liralık borcunu tamamen siler, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>En önemli güvence:</strong> Şahsi ehliyetiniz, garajınızdaki otobüsleriniz ve kişisel cüzdanınız kanunen <strong>HACZEDİLEMEZ</strong> ve aynen korunur. Böylece sıfır borçla temiz bir sayfa açarak dilerseniz kurumsal firmalarda maaşlı çalışabilir, dilerseniz şirketinizi yeniden ayağa kaldırabilirsiniz.
+                        <span style="color: #fca5a5;">Cevap:</span> Evet! Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaştığında T.C. Asliye Ticaret Mahkemesi iflas ve tasfiye kararı verir. Tasfiye masası şirketin 1 milyon liralık borcunu tamamen siler, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>En önemli güvence:</strong> Şahsi ehliyetiniz, garajınızdaki otobüsleriniz ve kişisel cüzdanınız kanunen <strong>HACZEDİLEMEZ</strong> ve aynen korunur. Böylece sıfır borçla temiz bir sayfa açarak dilerseniz bağımsız serbest kaptan olarak çalışıp tüm geliri doğrudan cüzdanınıza aktarabilir, dilerseniz diğer kaptanların şirketlerinde maaşlı görev alabilirsiniz, dilerseniz şirketinizi yeniden ayağa kaldırabilirsiniz.
                     </div>
                 </div>
             </div>
