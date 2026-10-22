@@ -575,59 +575,59 @@ class VoiceAssistant {
                 </p>
             </div>
 
-            <!-- BÖLÜM 6: ŞİRKETLE KÂR ETMENİN 5 KISAYOLU (ZENGİN OLMA REHBERİ) -->
+            <!-- BÖLÜM 6: ŞİRKET KÂRLILIĞINI VE SERMAYE BÜYÜMESİNİ ARTIRMANIN 5 TEMEL STRATEJİSİ -->
             <div style="background: linear-gradient(135deg, rgba(22, 101, 52, 0.25), rgba(15, 23, 42, 0.9)); border: 1.5px solid #22c55e; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(34, 197, 94, 0.2); padding-bottom: 8px;">
                     <div>
                         <h4 style="color: #4ade80; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
-                            <span>🚀</span> <span>6. Şirketle Kâr Etmenin 5 Kısayolu (Zengin Olma Taktikleri)</span>
+                            <span>📈</span> <span>6. Şirket Kârlılığını ve Sermaye Büyümesini Artırmanın 5 Temel Stratejisi</span>
                         </h4>
-                        <span style="font-size: 0.82rem; color: #86efac;">Kasayı hızla doldurmak ve filoyu büyütmek için profesyonel taktikler.</span>
+                        <span style="font-size: 0.82rem; color: #86efac;">İşletme kârını azami düzeye taşımak ve filoyu büyütmek için uygulanacak resmi yönetim ilkeleri.</span>
                     </div>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketle kâr etmenin beş kısayolu şunlardır. Birincisi İlk Kaptanınızı Transfer Edin: Şirketteki tüm şoförleri siz bizzat seçersiniz; elli bin lira kasanızla hemen Şoför Pazarından ilk kaptanınızı transfer edip sefere gönderin ve siz de başka sefere çıkarak aynı anda iki koldan para kazanın. İkincisi Başharekât Akıllı Sefer Dağıtımı: Ana menüye her döndüğünüzde tek tıkla Akıllı Sefer Dağıtımı butonuna basın; boş şoförler en karlı dalgalanma rotalarına otomatik dağılsın. Üçüncüsü Hızlı Mazot Sıfırlama: Akaryakıt İstasyonunu Seviye üçe yükselterek mazotu tamamen bedava yapın, tüm bilet parası net kâr kalsın. Dördüncüsü İkram ve Emanet Kargo: Sürüşte ı tuşuyla ikram dağıtıp bahşiş toplayın, sefer sonunda açık yazıhanelerinizden binlerce lira kargo geliri alın. Beşincisi Kasadan Cüzdana Transfer: Şirket kasasında biriken kârı Cüzdana Para Çek butonuyla şahsi hesabınıza aktarıp galerideki en lüks otobüsleri satın alın." style="padding: 6px 12px; background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #86efac; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
-                        ▶ 5 Kısayolu Dinle
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket kârlılığını ve sermaye büyümesini artırmanın beş temel stratejisi şunlardır. Birincisi Kaptan İstihdamı ile Çift Yönlü Nakit Akışı: Şirketteki tüm şoförler bizzat tarafınızdan istihdam edilir. Şirket kasasındaki başlangıç sermayesiyle Şoför Pazarından uygun bir kaptan transfer edip sefere çıkarınız; siz de başka bir hatta sürüş yaparak aynı anda iki ayrı seferin gelirini şirkete kazandırınız. İkincisi Başharekât Akıllı Sefer Dağıtım Sistemi: Ana Menüye her dönüldüğünde bu butonu kullanarak boşta bekleyen kaptanları en karlı hatlara tek işlemle atayınız. Üçüncüsü Akaryakıt Maliyetinin Sıfırlanması: Şirket Akaryakıt İstasyonunu Seviye üçe yükselterek yakıtı tamamen bedelsiz hale getiriniz. Dördüncüsü İkram Hizmeti ve Paket Kargo Taşımacılığı: Seferde ı tuşuyla ikram dağıtıp bahşiş gelirini yükseltiniz, sefer varışında açık yazıhaneler üzerinden bagaj kargo gelirini tahsil ediniz. Beşincisi Sermaye Transferi: Şirket kasasında biriken kâr paylarını Cüzdana Para Çek butonuyla şahsi hesabınıza aktararak yeni otobüs yatırımları gerçekleştiriniz." style="padding: 6px 12px; background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #86efac; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ Stratejileri Dinle
                     </button>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
                     
-                    <!-- KISAYOL 1 -->
+                    <!-- STRATEJİ 1 -->
                     <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #22c55e; padding: 12px; border-radius: 8px;">
-                        <strong style="color: #4ade80; font-size: 0.95rem;">⚡ Kısayol 1: İlk Kaptanınızı Hemen Transfer Edin</strong>
+                        <strong style="color: #4ade80; font-size: 0.95rem;">📊 1. Kaptan İstihdamı ile Çift Yönlü Nakit Akışı</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Şirketinize katılacak <strong>tüm şoförleri siz bizzat seçersiniz</strong>. Şirketi kurunca hazır 50.000 ₺ kasanızla Şoför Pazarı'ndan ilk kaptanınızı (örneğin uygun maaşlı Murat Çırak veya ekonomik Mehmet Kaptan) hemen işe alın. Kaptanınızı sefere yollarken siz de başka sefere çıkın; aynı anda <strong>2 otobüsten birden çifte hasılat</strong> toplayın.
+                            Şirket bünyesindeki <strong>tüm şoförler bizzat sizin tarafınızdan istihdam edilir</strong>. Şirket kuruluşunda sağlanan 50.000 ₺ sermaye ile Şoför Pazarı'ndan ilk kaptanınızı transfer ederek derhal sefere görevlendiriniz. Siz kendi aracınızla hatta devam ederken diğer kaptanın da sefer tamamlaması sayesinde <strong>eş zamanlı olarak çift sefer hasılatı</strong> elde edilir.
                         </p>
                     </div>
 
-                    <!-- KISAYOL 2 -->
+                    <!-- STRATEJİ 2 -->
                     <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #38bdf8; padding: 12px; border-radius: 8px;">
-                        <strong style="color: #38bdf8; font-size: 0.95rem;">🎯 Kısayol 2: Başharekât Butonunu Alışkanlık Yapın</strong>
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">🎯 2. Başharekât (Akıllı Sefer Dağıtım Sistemi)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Her sefer dönüşü Ana Menü'de Şirket Yönetimi'ne girip sağ üstteki <strong>"📋 Akıllı Sefer Dağıtımı"</strong> butonuna mutlaka 1 kez tıklayın. Sistem boşta bekleyen tüm şoförlerinizi o an piyasada yolcu talebi patlamış en kazançlı hatlara anında dağıtır.
+                            Her sefer sonrasında Ana Menü'de Şirket Yönetimi ekranına girerek sağ üstte bulunan <strong>"📋 Akıllı Sefer Dağıtımı"</strong> fonksiyonunu çalıştırınız. Sistem, filoda atıl bekleyen tüm kaptan şoförleri bölgesel borsa talebi en yüksek ve kârlılığı azami olan güzergâhlara otomatik olarak sevk eder.
                         </p>
                     </div>
 
-                    <!-- KISAYOL 3 -->
+                    <!-- STRATEJİ 3 -->
                     <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #eab308; padding: 12px; border-radius: 8px;">
-                        <strong style="color: #fde047; font-size: 0.95rem;">⛽ Kısayol 3: Hızlı Mazot Sıfırlama (Bina 4)</strong>
+                        <strong style="color: #fde047; font-size: 0.95rem;">⛽ 3. Akaryakıt İşletme Giderlerinin Sıfırlanması (Bina 4)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Bir otobüs şirketinin en büyük gideri mazottur. Kazandığınız ilk kârı <strong>Şirket Akaryakıt İstasyonu'na</strong> yatırın. Seviye 3'e çıkardığınız an tüm filo için <strong>mazot 0 ₺ (Tamamen Bedava)</strong> olur; bilet hasılatının tamamı net kâr olarak kasada kalır!
+                            Karayolu yolcu taşımacılığındaki en yüksek işletme maliyeti akaryakıt tüketimidir. Elde edilen ilk ticari kârlar ile <strong>Şirket Akaryakıt İstasyonu</strong> Seviye 3 kademesine terfi ettirilmelidir. Bu aşamada filonun yakıt ikmali <strong>0 ₺ (tamamen bedelsiz)</strong> hale gelir ve bilet gelirinin tamamı net kâr hanesine yazılır.
                         </p>
                     </div>
 
-                    <!-- KISAYOL 4 -->
+                    <!-- STRATEJİ 4 -->
                     <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #a855f7; padding: 12px; border-radius: 8px;">
-                        <strong style="color: #c084fc; font-size: 0.95rem;">📦 Kısayol 4: Çifte Sefer Geliri (İkram Bahşişi + Bagaj Kargo)</strong>
+                        <strong style="color: #c084fc; font-size: 0.95rem;">📦 4. İkram Memnuniyeti ve Emanet Kargo Taşımacılığı</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Yoldayken klavyeden <strong>I tuşuna</strong> basıp yolculara kek-çay ikramı yaparak yüksek bahşiş toplayın. Sefer bitince de açık terminal yazıhaneleriniz sayesinde bagajdaki emanet kolilerden (koli başı 140-160 ₺) <strong>2.000 - 3.500 ₺ temiz kargo geliri</strong> kazanın.
+                            Sefer esnasında klavyeden <strong>I tuşu</strong> ile ikram dağıtımı yapılarak yolcu memnuniyeti ve sefer sonu bahşiş primi artırılır. Sefer varışında ise açık yazıhaneler üzerinden bagajda kabul edilen koli emanetlerinden (parça başı 140–160 ₺) <strong>2.000 – 3.500 ₺ ek operasyonel gelir</strong> tahsil edilir.
                         </p>
                     </div>
 
-                    <!-- KISAYOL 5 -->
+                    <!-- STRATEJİ 5 -->
                     <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #ec4899; padding: 12px; border-radius: 8px;">
-                        <strong style="color: #f472b6; font-size: 0.95rem;">💰 Kısayol 5: Şirket Kârını Cüzdana Çekip Lüks Filo Kurun</strong>
+                        <strong style="color: #f472b6; font-size: 0.95rem;">💰 5. Sermaye Transferi ve Üst Segment Filo Yatırımı</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Şirket kasasında yüz binlerce lira biriktiğinde <strong>"Cüzdana Para Çek"</strong> butonuyla kâr payını anında şahsi cüzdanınıza aktarın. Ardından Ana Menü'deki Galeri'den oyundaki en lüks Travego, Tourismo veya çift katlı otobüsleri peşin parayla satın alıp filonuzu taçlandırın.
+                            Şirket kasasında biriken kâr payları, panel üzerindeki <strong>"Cüzdana Para Çek"</strong> fonksiyonu ile şahsi hesaba aktarılır. Bu sermaye ile araç galerisinden yüksek yolcu kapasiteli, lüks seyahat otobüsleri peşin bedelle satın alınarak filonun pazar payı genişletilir.
                         </p>
                     </div>
 
