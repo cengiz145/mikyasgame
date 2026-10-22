@@ -724,6 +724,9 @@ const DriverBadges = {
         } catch (e) {
             console.warn("Rozet verisi kaydedilemedi:", e);
         }
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData();
+        }
     },
 
     getLifetimeStats: function() {
@@ -789,6 +792,9 @@ const DriverBadges = {
         try {
             localStorage.setItem(this.STATS_KEY, JSON.stringify(stats));
         } catch(e) {}
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData();
+        }
     },
 
     // --- KUŞANILAN AKTİF UNVAN YÖNETİMİ ---
@@ -819,6 +825,9 @@ const DriverBadges = {
         try {
             localStorage.setItem(this.TITLES_KEY, titleId);
         } catch(e) {}
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData();
+        }
 
         if (typeof audio !== 'undefined' && typeof audio.playBadgeFanfare === 'function') {
             audio.playBadgeFanfare();

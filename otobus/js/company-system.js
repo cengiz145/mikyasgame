@@ -1984,6 +1984,9 @@
             } catch (e) {
                 console.warn("[CompanySystem] Kaydetme hatası:", e);
             }
+            if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+                Game.saveData();
+            }
         },
 
         // Şoförün Rütbe Bilgisini Getir

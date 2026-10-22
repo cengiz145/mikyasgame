@@ -39,6 +39,9 @@ const StopDiscovery = {
         try {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
         } catch(e) {}
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData();
+        }
     },
 
     onReachStop: function(stopName, district) {
