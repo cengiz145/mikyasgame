@@ -413,13 +413,13 @@ class VoiceAssistant {
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(250, 204, 21, 0.3); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                 <div>
                     <h3 style="margin: 0; color: #facc15; font-size: 1.35rem; display: flex; align-items: center; gap: 8px;">
-                        <span>🏢</span> <span>Şirket Yönetimi ve Tesis Rehberi</span>
+                        <span>🏢</span> <span>Şirket Yönetimi ve 7 Temel Tesis Rehberi</span>
                     </h3>
                     <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.88rem;">
-                        Şirket kurma, tesis binalarını geliştirme ve gelir-gider takibine dair temel bilgiler.
+                        Şirketin operasyonel maliyetlerini düşüren, kapasitesini artıran ve gelirini katlayan 7 temel bina ve tesisin işlevleri.
                     </p>
                 </div>
-                <button class="modern-btn btn-read-section nav-item" data-text="Şirket Yönetimi ve Tesis Rehberi. Bu bölümde kendi şirketinizi kurmayı, tesislerinizi geliştirerek filo kapasitenizi ve kazancınızı artırmayı ve Kasa Defteri üzerinden finansal hareketlerinizi takip etmeyi öğreneceksiniz." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                <button class="modern-btn btn-read-section nav-item" data-text="Şirket Yönetimi ve 7 Temel Tesis Rehberi. Bu kılavuzda şirket kurma modellerini, şirketinize doğrudan seviye atlatabileceğiniz 7 temel tesisi ve Kasa Defteri ile finansal takibi öğreneceksiniz." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
                     ▶️ Tüm Bölümü Sesli Dinle
                 </button>
             </div>
@@ -436,72 +436,75 @@ class VoiceAssistant {
                 </div>
             </div>
 
-            <!-- BÖLÜM 2: ŞİRKET BİNALARI VE SAĞLADIĞI AVANTAJLAR -->
+            <!-- BÖLÜM 2: 7 TEMEL TESİS VE KAZANDIRDIKLARI -->
             <div style="margin-bottom: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem;">2. Şirket Binaları ve Sağladığı Avantajlar</h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketinizin sahip olabileceği 6 temel bina bulunur. Genel Müdürlük bilet gelirlerinize marka primi kazandırır. Garaj sahası filo kapasitenizi artırır ve araç yıpranmasını azaltır. Otogar yazıhanesi sefer başı pasif gelir ve ücretsiz akaryakıt sağlar. Bakım atölyesi servis masraflarını yüzde 65 ucuzlatır ve tamir süresini kısaltır. Personel lojmanı şoförlerin dinlenme süresini hızlandırır. Şehir içi acenteler ise yolcuları ücretsiz servisle toplayarak doluluk oranını artırır." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ 6 Binayı Sesli Dinle</button>
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem;">2. Şirketin 7 Temel Tesis Binası ve Kazandırdıkları</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketin 7 temel tesisi şunlardır. Garaj ve Filo Sahası araç kapasitesini artırır ve yıpranmayı azaltır. Bakım ve Onarım Atölyesi dış servis masraflarını yüzde 65 ucuzlatır ve tamir süresini kısaltır. Otobüs Yıkama İstasyonu memnuniyeti hızla toparlar ve bekleme süresini sıfırlar. Şirket Akaryakıt İstasyonu toptan mazot tasarrufu ve ücretsiz akaryakıt sağlar. Otogar Yazıhaneleri ve Bekleme Salonları talep çarpanını artırır ve tavan bilet fiyatı hakkı verir. Personel Dinlenme Tesisi şoförlerin yorgunluk ve stresini hızla sıfırlar. Lojistik ve İkram Deposu ise ikram maliyetini düşürür ve ek kargo geliri kazandırır." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ 7 Binayı Sesli Dinle</button>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px;">
                     
                     <!-- BİNA 1 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #38bdf8; font-size: 0.95rem;">🏛️ 1. Genel Müdürlük (Yönetim Ofisi)</strong>
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #22c55e; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #4ade80; font-size: 0.95rem;">🅿️ 1. Garaj ve Filo Sahası (Depot / Garage)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>İşlevi:</strong> Şirketinizin idari ve operasyonel yönetim merkezidir.<br>
-                            • <strong>Geliştirme:</strong> Bağımsız Ofis ➔ Plaza İdari Katı ➔ Genel Müdürlük Plaza Binası.<br>
-                            • <strong>Sağladığı Fayda:</strong> Şirketinizin itibarını artırarak bilet fiyatlarına <strong>+%30 marka primi</strong> kazandırır ve hat açma süreçlerini hızlandırır.
+                            • <strong>Nasıl Geliştirilir?</strong> Seviye 1 (küçük otopark) halinden kademe kademe büyütülür (Seviye 2, Seviye 3...).<br>
+                            • <strong>Ne Kazandırır?</strong> Barındırabileceğiniz maksimum otobüs ve istihdam edebileceğiniz şoför kapasitesini artırır. İleri seviyelerde garaja kapalı hangarlar, güvenlik kameraları ve çevre aydınlatması eklenerek araçların yıpranma oranı düşürülür (%50 azalma).
                         </p>
                     </div>
 
                     <!-- BİNA 2 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #22c55e; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #4ade80; font-size: 0.95rem;">🅿️ 2. Garaj ve Filo Sahası</strong>
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #f97316; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #fb923c; font-size: 0.95rem;">🛠️ 2. Bakım ve Onarım Atölyesi (Kademe / Service Workshop)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>İşlevi:</strong> Filodaki otobüslerin güvenli park ve bekleme alanıdır.<br>
-                            • <strong>Geliştirme:</strong> Açık Park Alanı (5 Araç) ➔ Güvenlikli Garaj (15 Araç) ➔ Kapalı Hangar (Sınırsız).<br>
-                            • <strong>Sağladığı Fayda:</strong> Filo kapasitenizi ve şoför kotanızı artırır. Kapalı hangar alanı sayesinde araçların <strong>yıpranma oranı %50 azalır</strong>.
+                            • <strong>Nasıl Geliştirilir?</strong> Garajın içine basit bir tamir kanalı olarak kurulur; sonrasında gelişmiş liftler, diagnostik bilgisayarları ve boyahane eklenir.<br>
+                            • <strong>Ne Kazandırır?</strong> Dışarıdaki tamircilere ödenen yüksek servis ve parça faturalarını %40–50 oranında (Seviye 3'te %65) ucuzlatır. Seferden hasarlı dönen araçların hatta geri dönme süresini (tamir süresini) ciddi oranda kısaltır (%50 daha hızlı).
                         </p>
                     </div>
 
                     <!-- BİNA 3 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #eab308; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #fde047; font-size: 0.95rem;">🏢 3. Otogar Yazıhaneleri & Peron Ağı</strong>
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">🧼 3. Otobüs Yıkama İstasyonu (Bus Wash)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>İşlevi:</strong> Şehirlerarası otobüs terminallerinde resmi bilet satışı ve yolcu alımı yapılmasını sağlar.<br>
-                            • <strong>Geliştirme:</strong> Merkez Gişe ➔ Bölgesel Peronlar ➔ Ulusal Otogar Konsorsiyumu.<br>
-                            • <strong>Sağladığı Fayda:</strong> Sefer başına <strong>+3.500 ₺ pasif gelir</strong> sağlar ve 3. Seviyede tüm araçlarınıza <strong>ücretsiz akaryakıt (%100 bedava)</strong> temin eder.
+                            • <strong>Nasıl Geliştirilir?</strong> Elle yıkama hortumundan başlayıp otomatik fırçalı yıkama tüneline ve kurutma sistemlerine terfi ettirilir.<br>
+                            • <strong>Ne Kazandırır?</strong> Araçlar seferden kirlendikçe düşen yolcu memnuniyetini ve bilet talebini hızla toparlar. Otomatik sistemler sayesinde araç başına yıkama maliyeti ve bekleme süresi sıfıra yaklaşır.
                         </p>
                     </div>
 
                     <!-- BİNA 4 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #f97316; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #fb923c; font-size: 0.95rem;">🛠️ 4. Bakım ve Onarım Atölyesi (Kademe)</strong>
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #eab308; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #fde047; font-size: 0.95rem;">⛽ 4. Şirket Akaryakıt İstasyonu (Fuel Depot)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>İşlevi:</strong> Otobüslerin periyodik bakımlarının, onarımlarının ve temizliğinin yapıldığı teknik servis merkezidir.<br>
-                            • <strong>Geliştirme:</strong> Bakım Kanalı ➔ Hidrolik Servis Hangarı ➔ Entegre Revizyon Üssü.<br>
-                            • <strong>Sağladığı Fayda:</strong> Dış servis faturalarını <strong>%65 ucuzlatır</strong>, tamir sürelerini yarı yarıya kısaltır ve otomatik yıkama ünitesi ile yolcu memnuniyetini artırır.
+                            • <strong>Nasıl Geliştirilir?</strong> Küçük bir yer altı yakıt deposu ve tek pompayla başlar; dev tanklara ve çoklu dolum adalarına dönüştürülür.<br>
+                            • <strong>Ne Kazandırır?</strong> Yol üstündeki normal istasyonlara kıyasla mazotu toptan fiyata getirerek firmanın en büyük gideri olan akaryakıt masrafını doğrudan aşağı çeker (Seviye 3'te tüm filoya %100 ÜCRETSİZ MAZOT).
                         </p>
                     </div>
 
                     <!-- BİNA 5 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #ec4899; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #f472b6; font-size: 0.95rem;">🛏️ 5. Personel Dinlenme Tesisi (Kaptan Lojmanı)</strong>
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #a855f7; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #c084fc; font-size: 0.95rem;">🏢 5. Otogar / Terminal Yazıhaneleri ve Bekleme Salonları</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>İşlevi:</strong> Seferden dönen şoförlerin dinlenme ihtiyaçlarını karşıladığı tesistir.<br>
-                            • <strong>Geliştirme:</strong> Şoför Odası ➔ Personel Misafirhanesi ➔ Dinlenme Kampüsü.<br>
-                            • <strong>Sağladığı Fayda:</strong> Şoförlerin dinlenme süresini <strong>%75 kısaltarak</strong> sefere daha hızlı dönmelerini sağlar; yorgunluk kaynaklı kaza ve ceza risklerini önler.
+                            • <strong>Nasıl Geliştirilir?</strong> Basit bir bilet gişesinden başlanıp klima, konforlu koltuklar, ücretsiz çay-kahve otomatları, Wi-Fi ve VIP yolcu bekleme salonuna dönüştürülür.<br>
+                            • <strong>Ne Kazandırır?</strong> O şehirdeki/duraktaki yolcu çekme kapasitesini (talep çarpanını) artırır. Yolcular daha lüks karşılandığı için bilet fiyatlarını tavan fiyata çekmenize (+%30 tavan bilet primi) ve sefer başı +3.500 ₺ pasif gelir elde etmenize imkân tanır.
                         </p>
                     </div>
 
                     <!-- BİNA 6 -->
-                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #a855f7; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #c084fc; font-size: 0.95rem;">🏬 6. Şehir İçi Acenteler & Servis Ağı</strong>
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #ec4899; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #f472b6; font-size: 0.95rem;">🛏️ 6. Personel Sosyal Tesisleri ve Dinlenme Odaları (Staff Lounge)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>İşlevi:</strong> Şehir merkezlerinde bilet satışı yapar ve servis minibüsleriyle yolcuları otogara ulaştırır.<br>
-                            • <strong>Geliştirme:</strong> Cadde Gişesi ➔ Acente & Servis Filosu ➔ VIP Transfer Ağı.<br>
-                            • <strong>Sağladığı Fayda:</strong> Otobüslerin yolcu doluluk oranını yükseltir ve bilet gelirlerine kalıcı <strong>+%50 prim</strong> sağlar.
+                            • <strong>Nasıl Geliştirilir?</strong> Basit bir sandalyeli dinlenme odasından; televizyon, mutfak, oyun masaları ve otel konforunda yatakhanelere yükseltilir.<br>
+                            • <strong>Ne Kazandırır?</strong> Şoförlerin yorgunluk ve stres seviyelerini çok daha hızlı sıfırlar (%75 dinlenme hızı). Şoförlerin kaza yapma, seferi aksatma veya istifa etme riskini en aza indirir.
+                        </p>
+                    </div>
+
+                    <!-- BİNA 7 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #06b6d4; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #22d3ee; font-size: 0.95rem;">📦 7. Lojistik ve İkram Deposu (Catering & Cargo Hub)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Nasıl Geliştirilir?</strong> Küçük bir koli deposundan profesyonel soğuk hava depolu ve yükleme rampalı lojistik merkezine çevrilir.<br>
+                            • <strong>Ne Kazandırır?</strong> Yolculara sunulan ikramların (kek, meşrubat vb.) birim maliyetini %40–70 düşürür. Otobüs bagajında taşınan ücretli kargo hacmini büyüterek sefer başına koli başı 140 ₺'den düzenli ek gelir sağlar.
                         </p>
                     </div>
 
@@ -511,7 +514,7 @@ class VoiceAssistant {
             <!-- BÖLÜM 3: OTOGAR YAZIHANESİ İŞLETME MODELLERİ -->
             <div style="background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #34d399; margin: 0; font-size: 1.1rem;">3. Otogar Yazıhanesi İşletme Modelleri</h4>
+                    <h4 style="color: #34d399; margin: 0; font-size: 1.1rem;">3. Otogar Yazıhanesi İşletme Modelleri & Paket Kargo</h4>
                     <button class="modern-btn btn-read-section nav-item" data-text="Otogar yazıhaneleri iki farklı modelle işletilebilir. Şirket Öz Şubesi modelinde kirayı şirketiniz öder; bilet ve kargo gelirinin tamamı kasanıza kalır. Acentelik Bayiliği modelinde ise açılış maliyeti yoktur. İşletmeyi yerel esnaf yürütür; hasılatın yüzde 88 i şirketinize gelir, yüzde 12 si bayiye komisyon kalır. Ayrıca açık yazıhaneler otobüs bagajında koli kabul ederek sefer başına parça başı 140 lira ek gelir sağlar." style="padding: 4px 10px; background: rgba(52,211,153,0.2); border: 1px solid #34d399; color: #a7f3d0; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 8px;">
