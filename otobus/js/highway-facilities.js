@@ -507,10 +507,21 @@
         },
 
         washWindshield: function () {
-            const washFee = 40;
+            let washFee = 40;
+            let washDiscountNote = "";
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const washLvl = CompanySystem.getInstitutionLevel('bus_wash');
+                if (washLvl === 2) {
+                    washFee = 15; // %62 indirim
+                    washDiscountNote = " (Yarı Otomatik Yıkama Ünitesi İndirimi)";
+                } else if (washLvl >= 3) {
+                    washFee = 0; // %100 ÜCRETSİZ
+                    washDiscountNote = " (Tam Otomatik Tünel Yıkama ile ÜCRETSİZ!)";
+                }
+            }
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
             if (currentBudget < washFee) {
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Cam yıkama için 40 ₺ gerekiyor.", "warning");
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`Yıkama için ${washFee} ₺ gerekiyor.`, "warning");
                 return;
             }
 
