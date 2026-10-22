@@ -686,9 +686,9 @@ class VoiceAssistant {
 
                     <!-- İPUCU 5 -->
                     <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #a855f7; padding: 12px; border-radius: 8px;">
-                        <strong style="color: #c084fc; font-size: 0.95rem;">💰 5. Kasa ve Cüzdan Arası Anlık Para Transferi</strong>
+                        <strong style="color: #c084fc; font-size: 0.95rem;">💰 5. Kasa, Cüzdan ve -1.000.000 ₺ İflas & Tasfiye Protokolü</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Şirket kasasında paranız biterse iflas etmezsiniz; <strong>"Kasaya Para Yatır"</strong> butonuyla kişisel cüzdanınızdan şirkete sermaye aktarabilirsiniz. Şirket kasası dolup taştığında ise <strong>"Cüzdana Para Çek"</strong> butonuyla şirket kârını kendi şahsi hesabınıza alıp istediğiniz lüks otobüsü satın alabilirsiniz.
+                            Şirket kasasında nakit azaldığında ticari borca girebilirsiniz. Kasa eksiye düştüğünde -250.000 ₺ ve -750.000 ₺ seviyelerinde banka ve mahkeme uyarı alarmları çalar. Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaşırsa <strong>T.C. Asliye Ticaret Mahkemesi</strong> kararıyla şirket <strong>RESMEN İFLAS EDER VE TASFİYE EDİLİR</strong>. Tasfiye protokolüyle 1 milyon liralık şirket borcu sıfırlanır, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>Şahsi ehliyetiniz, araçlarınız ve cüzdanınız kanunen HACZEDİLEMEZ ve aynen korunur.</strong> İflastan kaçınmak için tehlike anında <strong>"Kasaya Para Yatır"</strong> butonuyla şahsi cüzdanınızdan şirkete sermaye aktarabilirsiniz.
                         </p>
                     </div>
 
@@ -709,7 +709,7 @@ class VoiceAssistant {
                     <h4 style="color: #facc15; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
                         <span>❓</span> <span>8. Sıkça Sorulan Sorular ve Hızlı Cevaplar</span>
                     </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetimi hakkında en çok merak edilen sorular. Bir: Şoförlerim neden sefere çıkmıyor? Seferden yorgun dönmüşlerdir. Personel Sosyal Tesisini geliştirerek dinlenme sürelerini dört kat hızlandırabilirsiniz. İki: Şirket kasasındaki parayla otobüs alabilir miyim? Evet, Cüzdana Para Çek butonuna basıp kasadaki parayı cüzdanınıza aktarın, ardından otobüs galerisinden dilediğiniz aracı satın alın. Üç: Neden yeni şoför alamıyorum? Garaj kapasiteniz dolmuştur, Garaj ve Filo Sahasını Seviye ikiye yükselterek sınırı on beşe çıkarın. Dört: Bilet fiyatlarını nasıl yükseltirim? Otogar Yazıhanelerini geliştirerek tavan bilet fiyatı çarpanını aktif edin." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ S.S.S Dinle</button>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetimi hakkında en çok merak edilen sorular. Bir: Şoförlerim neden sefere çıkmıyor? Seferden yorgun dönmüşlerdir. Personel Sosyal Tesisini geliştirerek dinlenme sürelerini dört kat hızlandırabilirsiniz. İki: Şirket kasasındaki parayla otobüs alabilir miyim? Evet, Cüzdana Para Çek butonuna basıp kasadaki parayı cüzdanınıza aktarın, ardından otobüs galerisinden dilediğiniz aracı satın alın. Üç: Neden yeni şoför alamıyorum? Garaj kapasiteniz dolmuştur, Garaj ve Filo Sahasını Seviye ikiye yükselterek sınırı on beşe çıkarın. Dört: Bilet fiyatlarını nasıl yükseltirim? Otogar Yazıhanelerini geliştirerek tavan bilet fiyatı çarpanını aktif edin. Beş: Şirketim iflas edebilir mi? Evet, şirket borcu eksi bir milyon liraya ulaşırsa mahkeme tasfiye kararı verir ve borç sıfırlanır. Ehliyetiniz, araçlarınız ve kişisel cüzdanınız kanunen korunur." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ S.S.S Dinle</button>
                 </div>
 
                 <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.86rem; color: #cbd5e1;">
@@ -731,6 +731,11 @@ class VoiceAssistant {
                     <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
                         <strong style="color: #38bdf8;">Soru: Bilet fiyatlarını ve yolcu kazancımı nasıl artırabilirim?</strong><br>
                         <span style="color: #94a3b8;">Cevap:</span> <strong>Otogar Yazıhaneleri ve Bekleme Salonları'nı (Bina 5)</strong> yükseltin. Seviye 2'de bilet fiyatları %15, Seviye 3'te ise tavan fiyattan %30 daha pahalıya satılır ve her sefer sonu binlerce lira pasif temettü kazanırsınız.
+                    </div>
+
+                    <div style="background: rgba(239,68,68,0.08); padding: 10px 14px; border-radius: 6px; border: 1.5px solid rgba(239,68,68,0.35);">
+                        <strong style="color: #f87171;">⚖️ Soru: Şirketim iflas edebilir mi? İflas edince ne olur?</strong><br>
+                        <span style="color: #fca5a5;">Cevap:</span> Evet! Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaştığında T.C. Asliye Ticaret Mahkemesi iflas ve tasfiye kararı verir. Tasfiye masası şirketin 1 milyon liralık borcunu tamamen siler, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>En önemli güvence:</strong> Şahsi ehliyetiniz, garajınızdaki otobüsleriniz ve kişisel cüzdanınız kanunen <strong>HACZEDİLEMEZ</strong> ve aynen korunur. Böylece sıfır borçla temiz bir sayfa açarak dilerseniz kurumsal firmalarda maaşlı çalışabilir, dilerseniz şirketinizi yeniden ayağa kaldırabilirsiniz.
                     </div>
                 </div>
             </div>
