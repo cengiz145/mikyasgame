@@ -18,6 +18,8 @@
             totalRevenue: 0,
             completedTripsCount: 0,
             companyLevel: 1, // 1: Yazıhane, 2: Bölge Acentesi, 3: Marmara Lojistik, 4: Ulusal Karayolları, 5: Uluslararası Holding
+            companyTreasury: 50000,        // Şirket Kasası Bakiyesi (₺)
+            revenueSharePercent: 50,       // %50 Şirket Kasasına, %50 Kaptana (Serbestçe değiştirilebilir)
             hqUpgrades: {
                 fuelContract: false,       // %20 yakıt tasarrufu
                 luxuryLounge: false,       // %50 hızlı şoför dinlenmesi & enerji
@@ -75,6 +77,8 @@
                 activeCaptainsCount: parseInt(compData.activeCaptainsCount) || 1,
                 dailySalary: parseInt(compData.dailySalary) || 2500,
                 bonusPercent: parseInt(compData.bonusPercent) || 18,
+                companySharePercent: (compData.companySharePercent !== undefined) ? parseInt(compData.companySharePercent) : 50,
+                treasury: parseInt(compData.treasury) || 50000,
                 desc: compData.desc || `Kurucu Kaptan ${compData.founder || 'Kaptan'} tarafından kurulan bağımsız filo. Kontenjan: ${compData.maxCaptainsQuota || 10} kaptan, Günlük Maaş: ${(parseInt(compData.dailySalary) || 2500).toLocaleString('tr-TR')} ₺.`,
                 minLevel: 1,
                 isCaptainCompany: true,
@@ -98,6 +102,152 @@
             } catch(e) {}
 
             return companyObj;
+        },
+
+        // Şirket Kasasına Hasılat Ekleme
+        addCompanyRevenue: function(amount) {
+            if (!amount || amount <= 0) return;
+            this.data.companyTreasury = (this.data.companyTreasury || 0) + amount;
+            this.data.totalRevenue = (this.data.totalRevenue || 0) + amount;
+
+            // Eğer bir kaptan şirketinde çalışılıyorsa, o şirketin topluluk kasasına da yansıt
+            if (this.data.corporateEmployer) {
+                let captains = this.getCaptainCompanies();
+                const target = captains.find(c => c.id === this.data.corporateEmployer);
+                if (target) {
+                    target.treasury = (target.treasury || 0) + amount;
+                    try {
+                        localStorage.setItem(this.COMMUNITY_STORAGE_KEY, JSON.stringify(captains));
+                    } catch(e) {}
+                }
+            }
+
+            this.saveData();
+            if (typeof this.renderCompanyOverview === 'function') {
+                this.renderCompanyOverview();
+            }
+        },
+
+        // Hasılat Paylaşım Oranını Ayarla (Serbest Belirleme)
+        setRevenueSharePercent: function(percent) {
+            let val = parseInt(percent);
+            if (isNaN(val)) val = 50;
+            val = Math.max(0, Math.min(100, val));
+
+            this.data.revenueSharePercent = val;
+
+            // Kendi kurduğu kaptan şirketi varsa oraya da uygula
+            let captains = this.getCaptainCompanies();
+            const ownComp = captains.find(c => c.name && this.data.companyName && c.name.toLowerCase() === this.data.companyName.toLowerCase());
+            if (ownComp) {
+                ownComp.companySharePercent = val;
+                try {
+                    localStorage.setItem(this.COMMUNITY_STORAGE_KEY, JSON.stringify(captains));
+                } catch(e) {}
+            }
+
+            this.saveData();
+            this.renderAll();
+
+            const msg = `Hasılat paylaşım oranı güncellendi: Yüzde ${val} şirket kasasına aktarılacak, yüzde ${100 - val} kaptan cüzdanına kalacaktır.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(`📊 Hasılat Bölüşümü: %${val} Şirket / %${100 - val} Kaptan`, 'success');
+            }
+        },
+
+        // Serbest Hasılat Oranı Ayarlama Penceresi
+        openShareCustomModal: function() {
+            const current = this.data.revenueSharePercent !== undefined ? this.data.revenueSharePercent : 50;
+            const input = prompt(
+                "Şirket Kasasına Aktarılacak Yüzdeyi Belirleyin (0 ile 100 arasında bir sayı girin):\n\n" +
+                "Örnekler:\n" +
+                "• 50: %50 Şirket / %50 Kaptan (Standart & Önerilen)\n" +
+                "• 40: %40 Şirket / %60 Kaptan (Kaptan Teşvikli)\n" +
+                "• 30: %30 Şirket / %70 Kaptan (Yüksek Kaptan Payı)\n" +
+                "• 60: %60 Şirket / %40 Kaptan (Şirket Büyüme)\n" +
+                "• 70: %70 Şirket / %30 Kaptan (Filo Yatırımı)\n" +
+                "• 0: %0 Şirket / %100 Kaptan (Tamamı Kaptana Kalsın)\n" +
+                "• 100: %100 Şirket / %0 Kaptan (Tamamı Şirkete Aktarılsın)\n\n" +
+                "Kalan miktar otomatik olarak kaptan cüzdanına aktarılacaktır.",
+                current
+            );
+
+            if (input !== null) {
+                const parsed = parseInt(input.trim());
+                if (!isNaN(parsed) && parsed >= 0 && parsed <= 100) {
+                    this.setRevenueSharePercent(parsed);
+                } else {
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Lütfen 0 ile 100 arasında geçerli bir yüzde girin.", "warning");
+                }
+            }
+        },
+
+        // Cüzdandan Şirket Kasasına Para Yatır
+        transferToTreasury: function() {
+            if (typeof Game === 'undefined') return;
+            const curBudget = Game.playerBudget || 0;
+            if (curBudget <= 0) {
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Cüzdanınızda para bulunmuyor.", "warning");
+                return;
+            }
+
+            const input = prompt(`Şirket kasasına yatırmak istediğiniz tutarı girin (Mevcut Cüzdanınız: ${curBudget.toLocaleString('tr-TR')} ₺):`, "5000");
+            if (input !== null) {
+                const amt = parseInt(input.trim());
+                if (!isNaN(amt) && amt > 0) {
+                    if (amt > curBudget) {
+                        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Cüzdanınızda bu kadar para yok!", "warning");
+                        return;
+                    }
+                    Game.playerBudget -= amt;
+                    Game.saveData();
+                    this.data.companyTreasury = (this.data.companyTreasury || 0) + amt;
+                    this.saveData();
+                    this.renderAll();
+
+                    const msg = `${amt.toLocaleString('tr-TR')} ₺ cüzdanınızdan şirket kasasına aktarıldı.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
+                    }
+                }
+            }
+        },
+
+        // Şirket Kasasından Cüzdana Para Çek
+        transferToWallet: function() {
+            const curTreasury = this.data.companyTreasury || 0;
+            if (curTreasury <= 0) {
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Şirket kasasında çekilebilecek bakiye yok.", "warning");
+                return;
+            }
+
+            const input = prompt(`Cüzdanınıza çekmek istediğiniz tutarı girin (Şirket Kasası: ${curTreasury.toLocaleString('tr-TR')} ₺):`, "5000");
+            if (input !== null) {
+                const amt = parseInt(input.trim());
+                if (!isNaN(amt) && amt > 0) {
+                    if (amt > curTreasury) {
+                        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Şirket kasasında bu kadar para yok!", "warning");
+                        return;
+                    }
+                    this.data.companyTreasury -= amt;
+                    this.saveData();
+                    if (typeof Game !== 'undefined') {
+                        Game.playerBudget += amt;
+                        Game.saveData();
+                        if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                            UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
+                        }
+                    }
+                    this.renderAll();
+
+                    const msg = `Şirket kasasından cüzdanınıza ${amt.toLocaleString('tr-TR')} ₺ aktarıldı.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
+                }
+            }
         },
 
         // Şirket Arama (Kaptan + Kurumsal)
@@ -179,6 +329,24 @@
                         </div>
 
                         <div>
+                            <label for="new-comp-share" style="display: block; color: #fde047; font-weight: bold; font-size: 0.92rem; margin-bottom: 4px;">
+                                📊 Şirket / Kaptan Hasılat Bölüşümü:
+                            </label>
+                            <select id="new-comp-share" style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #ca8a04; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
+                                <option value="50" selected>%50 Şirket Kasasına / %50 Kaptana Kalsın (Standart & Önerilen)</option>
+                                <option value="40">%40 Şirket Kasasına / %60 Kaptana (Kaptan Teşvikli)</option>
+                                <option value="30">%30 Şirket Kasasına / %70 Kaptana (Yüksek Kaptan Payı)</option>
+                                <option value="60">%60 Şirket Kasasına / %40 Kaptana (Şirket Büyüme)</option>
+                                <option value="70">%70 Şirket Kasasına / %30 Kaptana (Holding Yatırımı)</option>
+                                <option value="0">%0 Şirket / %100 Kaptana (Tamamı Kaptana Kalsın - Serbest)</option>
+                                <option value="100">%100 Şirkete / %0 Kaptana (Tamamı Şirket Kasasına)</option>
+                            </select>
+                            <small style="color: #94a3b8; font-size: 0.78rem; display: block; margin-top: 3px;">
+                                Kurucu olarak bilet ve sefer hasılatının % kaçının şirkete aktarılacağını, % kaçının kaptana kalacağını serbestçe belirlersiniz.
+                            </small>
+                        </div>
+
+                        <div>
                             <label for="new-comp-bonus" style="display: block; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 4px;">🎁 Sefer Başı Bilet Primi:</label>
                             <select id="new-comp-bonus" style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
                                 <option value="10">%10 Bilet Satış Primi</option>
@@ -234,10 +402,12 @@
                     activeCaptainsCount: 1,
                     dailySalary: salary,
                     bonusPercent: bonus,
+                    companySharePercent: sharePercent,
                     slogan: slogan
                 });
 
                 this.data.companyName = name;
+                this.data.revenueSharePercent = sharePercent;
                 this.saveData();
 
                 document.getElementById('create-company-modal').classList.add('hidden');
@@ -264,6 +434,7 @@
                 badge: "⭐ Kurumsal Kaptan",
                 dailySalary: 3500,
                 bonusPercent: 10,
+                companySharePercent: 50,
                 minLevel: 1,
                 desc: "Düzenli hat seferleri, her seferde +%10 garanti bilet primi ve şirket yemek/ikram desteği.",
                 color: "#38bdf8"
@@ -276,6 +447,7 @@
                 badge: "👑 VIP Baş Kaptan",
                 dailySalary: 4500,
                 bonusPercent: 15,
+                companySharePercent: 50,
                 minLevel: 2,
                 desc: "2+1 Jumbo araç filosu, üstün yolcu konforu ve sefer başına +%15 VIP memnuniyet primi.",
                 color: "#f87171"
@@ -1816,6 +1988,9 @@
             if (!card) return;
 
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            const companyTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+            const sharePercent = (this.data.revenueSharePercent !== undefined) ? this.data.revenueSharePercent : 50;
+            const captainPercent = 100 - sharePercent;
             const hiredCount = this.data.hiredDrivers.length;
             const revFormatted = (this.data.totalRevenue || 0).toLocaleString('tr-TR');
             const lvlInfo = this.companyLevels.find(l => l.level === (this.data.companyLevel || 1)) || this.companyLevels[0];
@@ -1824,17 +1999,27 @@
             const empComp = this.getCompanyById(empId);
 
             const empBadge = empComp
-                ? `<div style="margin-top: 8px; padding: 8px 12px; background: rgba(34,197,94,0.18); border: 1.5px solid #22c55e; border-radius: 8px; font-size: 0.88rem; color: #86efac; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
-                    <span>👔 <strong>Maaşlı Kaptan:</strong> ${empComp.name} (${empComp.badge}) | Günlük Maaş: <strong style="color: #fde047;">${empComp.dailySalary.toLocaleString('tr-TR')} ₺</strong> | Sefer Primi: <strong style="color: #4ade80;">+${empComp.bonusPercent}%</strong></span>
-                    <button id="btn-comp-leave-corp" class="modern-btn nav-item" style="padding: 4px 12px; font-size: 0.8rem; background: rgba(239,68,68,0.25); border: 1px solid #ef4444; color: #fca5a5; border-radius: 6px; cursor: pointer;">Kendi Şirketime Dön</button>
+                ? `<div style="margin-top: 8px; padding: 10px 14px; background: rgba(34,197,94,0.18); border: 1.5px solid #22c55e; border-radius: 8px; font-size: 0.88rem; color: #86efac; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <span>👔 <strong>Maaşlı Kaptan:</strong> ${empComp.name} (${empComp.badge}) | Günlük Maaş: <strong style="color: #fde047;">${empComp.dailySalary.toLocaleString('tr-TR')} ₺</strong> | Sefer Primi: <strong style="color: #4ade80;">+${empComp.bonusPercent}%</strong></span>
+                        <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 3px;">
+                            📊 Hasılat Bölüşümü: <strong>%${empComp.companySharePercent || 50} Şirkete Aktarılır</strong>, <strong>%${100 - (empComp.companySharePercent || 50)} Kaptana Kalır</strong>
+                        </div>
+                    </div>
+                    <button id="btn-comp-leave-corp" class="modern-btn nav-item" style="padding: 6px 14px; font-size: 0.82rem; background: rgba(239,68,68,0.25); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 6px; cursor: pointer;">Kendi Şirketime Dön</button>
                    </div>`
-                : `<div style="margin-top: 8px; padding: 8px 12px; background: rgba(234,179,8,0.15); border: 1.5px solid #facc15; border-radius: 8px; font-size: 0.88rem; color: #fef08a; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
-                    <span>🏢 <strong>Bağımsız Şirket Sahibi:</strong> Kendi filonuzu ve şoförlerinizi yönetiyorsunuz. Tüm gelirler doğrudan şirket kasanıza aktarılır.</span>
-                    <button id="btn-comp-go-corp-tab" class="modern-btn nav-item" style="padding: 4px 12px; font-size: 0.8rem; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; border-radius: 6px; cursor: pointer;">👔 Şirketlerde Çalış</button>
+                : `<div style="margin-top: 8px; padding: 10px 14px; background: rgba(234,179,8,0.15); border: 1.5px solid #facc15; border-radius: 8px; font-size: 0.88rem; color: #fef08a; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <span>🏢 <strong>Bağımsız Şirket Sahibi:</strong> Kendi filonuzu ve şoförlerinizi yönetiyorsunuz. Sefer bilet hasılatı belirlediğiniz orana göre bölüştürülür.</span>
+                        <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 3px;">
+                            📊 Aktif Bölüşüm Politikası: <strong>%${sharePercent} Şirket Kasasına</strong>, <strong>%${captainPercent} Kaptan Cüzdanına</strong>
+                        </div>
+                    </div>
+                    <button id="btn-comp-go-corp-tab" class="modern-btn nav-item" style="padding: 6px 14px; font-size: 0.82rem; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-weight: bold; border-radius: 6px; cursor: pointer;">👔 Şirketlerde Çalış</button>
                    </div>`;
 
             card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                 <div>
                     <div style="color: #fde047; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
                         <span>🏢 ${this.data.companyName}</span>
@@ -1847,15 +2032,46 @@
                         Kayıtlı Filo: <strong style="color: #38bdf8;">${hiredCount} Kaptan</strong> | Tamamlanan Sefer: <strong style="color: #4ade80;">${this.data.completedTripsCount}</strong> | Holding Ayrıcalığı: <span style="color: #a7f3d0;">${lvlInfo.perkDesc}</span>
                     </div>
                 </div>
-                <div style="text-align: right;">
-                    <div style="color: #4ade80; font-size: 1.25rem; font-weight: bold;">
+                <div style="text-align: right; display: flex; flex-direction: column; gap: 3px;">
+                    <div style="color: #4ade80; font-size: 1.18rem; font-weight: bold;">
                         💰 Şirket Cirosu: ${revFormatted} ₺
                     </div>
                     <div style="color: #fde047; font-size: 0.95rem;">
-                        Şirket Kasası: <strong>${currentBudget.toLocaleString('tr-TR')} ₺</strong>
+                        🏢 Şirket Kasası (Aktarılan): <strong>${companyTreasury.toLocaleString('tr-TR')} ₺</strong>
+                    </div>
+                    <div style="color: #bae6fd; font-size: 0.9rem;">
+                        💼 Kaptan Cüzdanı (Bize Kalan): <strong>${currentBudget.toLocaleString('tr-TR')} ₺</strong>
                     </div>
                 </div>
             </div>
+
+            <!-- HASILAT PAYLAŞIM VE TRANSFER KONTROL BARİYERİ -->
+            <div style="margin-top: 12px; background: rgba(0,0,0,0.35); border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <div style="color: #facc15; font-weight: bold; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                        <span>📊</span> <span>Hasılat Paylaşım Oranı:</span>
+                        <span style="color: #38bdf8;">%${sharePercent} Şirkete Aktar</span> / <span style="color: #4ade80;">%${captainPercent} Bize Kalsın</span>
+                    </div>
+                    <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 2px;">
+                        Yolcu bilet ve sefer gelirleri bu orana göre şirket kasası ile kaptan cüzdanı arasında otomatik bölüştürülür.
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <button id="btn-share-preset-50" class="modern-btn nav-item" style="padding: 7px 13px; font-size: 0.82rem; background: ${sharePercent === 50 ? '#f59e0b' : 'rgba(255,255,255,0.08)'}; color: ${sharePercent === 50 ? '#000' : '#fff'}; font-weight: bold; border-radius: 6px; border: 1px solid #f59e0b; cursor: pointer;">
+                        %50 - %50 (Önerilen)
+                    </button>
+                    <button id="btn-share-custom-modal" class="modern-btn nav-item" style="padding: 7px 13px; font-size: 0.82rem; background: rgba(56,189,248,0.18); border: 1.5px solid #38bdf8; color: #7dd3fc; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                        ⚙️ Serbest Oran Ayarla
+                    </button>
+                    <button id="btn-deposit-treasury" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(34,197,94,0.18); border: 1px solid #22c55e; color: #86efac; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Cüzdandan Şirket Kasasına Para Yatır">
+                        📥 Kasaya Yatır
+                    </button>
+                    <button id="btn-withdraw-treasury" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(234,179,8,0.18); border: 1px solid #eab308; color: #fef08a; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Şirket Kasasından Cüzdana Para Çek">
+                        📤 Kasadan Çek
+                    </button>
+                </div>
+            </div>
+
             ${empBadge}
             `;
 
@@ -1878,6 +2094,34 @@
                 btnGoCorp.addEventListener('click', () => {
                     const tabCorp = document.getElementById('tab-comp-corporate-work');
                     if (tabCorp) tabCorp.click();
+                });
+            }
+
+            const btnShare50 = card.querySelector('#btn-share-preset-50');
+            if (btnShare50) {
+                btnShare50.addEventListener('click', () => {
+                    this.setRevenueSharePercent(50);
+                });
+            }
+
+            const btnShareCustom = card.querySelector('#btn-share-custom-modal');
+            if (btnShareCustom) {
+                btnShareCustom.addEventListener('click', () => {
+                    this.openShareCustomModal();
+                });
+            }
+
+            const btnDeposit = card.querySelector('#btn-deposit-treasury');
+            if (btnDeposit) {
+                btnDeposit.addEventListener('click', () => {
+                    this.transferToTreasury();
+                });
+            }
+
+            const btnWithdraw = card.querySelector('#btn-withdraw-treasury');
+            if (btnWithdraw) {
+                btnWithdraw.addEventListener('click', () => {
+                    this.transferToWallet();
                 });
             }
         },
@@ -2528,6 +2772,10 @@
                                     <strong style="color: ${isFull ? '#ef4444' : '#38bdf8'}; font-size: 0.95rem;">${activeCount} / ${maxQuota} Kaptan ${isFull ? '(Dolu)' : ''}</strong>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                    <span>📊 Hasılat Bölüşümü:</span>
+                                    <strong style="color: #38bdf8; font-size: 0.95rem;">%${comp.companySharePercent || 50} Şirkete / %${100 - (comp.companySharePercent || 50)} Kaptana</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
                                     <span>💰 Kaptanlara Verilen Günlük Maaş:</span>
                                     <strong style="color: #4ade80; font-size: 1.05rem;">${salaryFormatted} ₺ / Gün</strong>
                                 </div>
@@ -2591,6 +2839,10 @@
                             "${comp.slogan}"
                         </div>
                         <div style="background: rgba(255,255,255,0.04); border-radius: 6px; padding: 8px; margin-bottom: 8px; font-size: 0.85rem; color: #cbd5e1;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                                <span>📊 Hasılat Bölüşümü:</span>
+                                <strong style="color: #38bdf8;">%${comp.companySharePercent || 50} Şirket / %${100 - (comp.companySharePercent || 50)} Kaptan</strong>
+                            </div>
                             <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
                                 <span>💰 Günlük Maaş:</span>
                                 <strong style="color: #fde047;">${comp.dailySalary.toLocaleString('tr-TR')} ₺</strong>
