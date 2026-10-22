@@ -517,18 +517,38 @@
     
         <!-- Dedicated District / City Picker Modal (Listeden Oklarla Seçim) -->
     <div id="district-picker-modal" class="modal hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 6500; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;" role="dialog" aria-modal="true" aria-labelledby="district-picker-title">
-        <div class="glass-panel" style="max-width: 540px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; padding: 24px;">
-            <h2 id="district-picker-title" style="color: #38bdf8; margin-bottom: 8px; font-size: 1.5rem; text-align: center;">
-                📍 Çalışmak İstediğiniz Bölgeyi / Şehri Seçin
+        <div class="glass-panel" style="max-width: 620px; width: 100%; max-height: 88vh; display: flex; flex-direction: column; padding: 24px; border: 1.5px solid #38bdf8; box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);">
+            
+            <!-- Breadcrumb / Adım Rozeti ve Geri Butonu -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span id="free-picker-step-badge" style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #38bdf8; font-size: 0.82rem; padding: 3px 8px; border-radius: 4px; font-weight: bold;">
+                    1. ADIM: İL SEÇİMİ (81 İL)
+                </span>
+                <button id="btn-free-picker-back" type="button" class="nav-item modern-btn hidden" style="padding: 4px 12px; font-size: 0.85rem; background: rgba(255,255,255,0.1); border: 1px solid #64748b; color: #cbd5e1; border-radius: 6px; cursor: pointer;">
+                    ⬅️ Önceki Adım
+                </button>
+            </div>
+
+            <h2 id="district-picker-title" style="color: #38bdf8; margin: 0 0 6px 0; font-size: 1.45rem; text-align: left;">
+                🗺️ Serbest Rota: 1. Adım - İl (Şehir) Seçimi
             </h2>
-            <p style="color: #94a3b8; font-size: 0.95rem; text-align: center; margin-bottom: 16px;">
-                Aşağı ve yukarı oklarla listede gezinin, seçmek istediğiniz ilçede <strong>ENTER</strong> tuşuna basın.
+            <p id="district-picker-desc" style="color: #94a3b8; font-size: 0.9rem; margin: 0 0 12px 0;">
+                Türkiye'nin 81 ili listeleniyor. Sağ ve Sol oklarla listede gezinebilir, aramak için Tab ile arama kutusuna geçebilirsiniz.
             </p>
-            <ul id="district-picker-list" class="menu-list" style="overflow-y: auto; max-height: 50vh; list-style: none; padding: 0; margin: 0 0 16px 0;" role="radiogroup" aria-label="İlçe ve Bölge Seçim Listesi. 11 ilçe mevcuttur.">
-                <!-- Javascript ile 11 ilçe butonları eklenecek -->
+
+            <!-- Arama Kutusu (Tab Tuşuyla Ulaşılır) -->
+            <div style="margin-bottom: 12px;">
+                <input type="text" id="free-picker-search" class="nav-item" placeholder="🔍 İl, ilçe veya mahalle ara..." style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #0284c7; border-radius: 8px; color: #fff; font-size: 0.95rem; box-sizing: border-box;" aria-label="Arama kutusu">
+            </div>
+
+            <!-- Liste -->
+            <ul id="district-picker-list" class="menu-list" style="overflow-y: auto; max-height: 48vh; list-style: none; padding: 0; margin: 0 0 16px 0;" role="listbox">
+                <!-- Javascript ile 81 il / ilçeler / mahalleler doldurulacak -->
             </ul>
-            <button id="btn-close-district-picker" class="menu-btn secondary-btn nav-item" style="justify-content: center; width: 100%; border-color: #ef4444; color: #ef4444;">
-                ❌ Vazgeç / Kapat
+
+            <!-- Kapat Butonu -->
+            <button id="btn-close-district-picker" type="button" class="menu-btn secondary-btn nav-item" style="justify-content: center; width: 100%; border-color: #ef4444; color: #ef4444; padding: 10px;">
+                ❌ Vazgeç / Kapat (Esc)
             </button>
         </div>
     </div>
@@ -563,6 +583,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
     <script src="js/map-engine.js?v=1792467926943"></script>
+    <script src="js/turkey-data.js"></script>
     <script src="js/tekulas-data.js?v=1792467926943"></script>
     <script src="js/data.js?v=1792467926943"></script>
     <script src="js/audio-base64.js?v=1792467926943"></script>

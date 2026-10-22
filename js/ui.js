@@ -987,6 +987,19 @@ window.addEventListener('keydown', (e) => {
                 m.classList.add('hidden');
                 KeyboardNav.initForScreen();
                 if (mId === 'district-picker-modal') {
+                    if (typeof freePickerState !== 'undefined') {
+                        if (freePickerState.step === 'neighborhood') {
+                            freePickerState.step = 'district';
+                            m.classList.remove('hidden');
+                            if (typeof renderFreePickerCurrentStep === 'function') renderFreePickerCurrentStep();
+                            return;
+                        } else if (freePickerState.step === 'district') {
+                            freePickerState.step = 'city';
+                            m.classList.remove('hidden');
+                            if (typeof renderFreePickerCurrentStep === 'function') renderFreePickerCurrentStep();
+                            return;
+                        }
+                    }
                     const btnChange = document.getElementById('btn-change-active-district');
                     if (btnChange) btnChange.focus();
                 }
