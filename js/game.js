@@ -4284,6 +4284,7 @@ const Game = {
             }
 
             this.addMoney(cargoEarnings, true);
+            if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'cargo', 'Otogar Emanet Kargo (' + cargoPackagesCount + ' Koli)', cargoEarnings);
             const cargoMsg = `📦 Otogar Yazıhanesi Emanet & Paket Kargo: ${cargoPackagesCount} koli teslim edildi (+${cargoEarnings.toLocaleString('tr-TR')} ₺)${agencyNote}.`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(cargoMsg, 'success');
             // Şirket Dinlenme Tesisi Seferi Temettüsü
@@ -4294,6 +4295,7 @@ const Game = {
                 else if (finishResortLvl === 3) finishDiv = 3500;
                 if (finishDiv > 0) {
                     this.addMoney(finishDiv, true);
+                    if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'dividends', 'Otogar Peron Temettüsü', finishDiv);
                     const divMsg = `☕ Şirket Dinlenme Tesisi kâr payı: +${finishDiv.toLocaleString('tr-TR')} ₺ cüzdanınıza aktarıldı!`;
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(divMsg, 'success');
                 }
@@ -4308,6 +4310,7 @@ const Game = {
                 const tipBonusAmt = Math.round(baseBonus * (tipBonusPct / 100));
                 comfortBonus = baseBonus + tipBonusAmt;
                 this.addMoney(comfortBonus);
+                if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'tips', 'Yolcu Konfor & Bahşiş Primi', comfortBonus);
                 this.addXP(40);
                 const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${curBus.brand} Lüks Kabin Bonusu)` : "";
                 comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote} ve 40 tecrübe puanı kazandınız.`;
