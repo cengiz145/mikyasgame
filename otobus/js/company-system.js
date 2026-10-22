@@ -9,6 +9,7 @@
 
     const CompanySystem = {
         STORAGE_KEY: 'otobus_company_data_v2',
+        COMMUNITY_STORAGE_KEY: 'otobus_community_companies_v1',
         LEGACY_STORAGE_KEY: 'otobus_company_data',
 
         data: {
@@ -28,6 +29,229 @@
             marketTrends: {},              // routeId -> { multiplier, trendName, icon, desc, expiresAt }
             specialContracts: [],          // Aktif VIP ihaleler
             radioLogs: []                  // Canlı telsiz kayıtları
+        },
+
+        // Türkçe Tarih Formatlayıcı
+        formatTurkishDate: function(timestamp) {
+            try {
+                const d = new Date(timestamp || Date.now());
+                const months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+                return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+            } catch(e) {
+                return "22 Ekim 2026";
+            }
+        },
+
+        // Topluluk / Kaptan Şirketlerini Getir
+        getCaptainCompanies: function() {
+            try {
+                const raw = localStorage.getItem(this.COMMUNITY_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) return parsed;
+                }
+            } catch(e) {
+                console.warn("[CompanySystem] Kaptan şirketleri okunamadı:", e);
+            }
+            return [];
+        },
+
+        // Yeni Kaptan Şirketi Kaydet / Tescille
+        registerCaptainCompany: function(compData) {
+            let list = this.getCaptainCompanies();
+            const id = compData.id || ('captain_comp_' + Date.now());
+            const existingIdx = list.findIndex(c => c.id === id || (c.name && compData.name && c.name.toLowerCase() === compData.name.toLowerCase()));
+
+            const companyObj = {
+                id: id,
+                name: compData.name || "Kaptan Turizm",
+                founder: compData.founder || (typeof Game !== 'undefined' && Game.username) || "Ümit Ekrem Mikyas",
+                slogan: compData.slogan || "Özel Kaptan Taşımacılığı",
+                logo: compData.logo || "👑",
+                badge: "⭐ Kaptan Şirketi",
+                color: "#f59e0b",
+                city: compData.city || (typeof Game !== 'undefined' && Game.currentCity) || "Tekirdağ (Süleymanpaşa)",
+                maxCaptainsQuota: parseInt(compData.maxCaptainsQuota) || 10,
+                activeCaptainsCount: parseInt(compData.activeCaptainsCount) || 1,
+                dailySalary: parseInt(compData.dailySalary) || 2500,
+                bonusPercent: parseInt(compData.bonusPercent) || 18,
+                desc: compData.desc || `Kurucu Kaptan ${compData.founder || 'Kaptan'} tarafından kurulan bağımsız filo. Kontenjan: ${compData.maxCaptainsQuota || 10} kaptan, Günlük Maaş: ${(parseInt(compData.dailySalary) || 2500).toLocaleString('tr-TR')} ₺.`,
+                minLevel: 1,
+                isCaptainCompany: true,
+                createdDate: compData.createdDate || Date.now()
+            };
+
+            if (existingIdx >= 0) {
+                list[existingIdx] = Object.assign(list[existingIdx], companyObj);
+            } else {
+                list.unshift(companyObj);
+            }
+
+            try {
+                localStorage.setItem(this.COMMUNITY_STORAGE_KEY, JSON.stringify(list));
+            } catch(e) {}
+
+            try {
+                if (typeof window !== 'undefined' && window.db) {
+                    window.db.ref('otobus_simulasyonu/topluluk_sirketleri/' + id).set(companyObj).catch(() => {});
+                }
+            } catch(e) {}
+
+            return companyObj;
+        },
+
+        // Şirket Arama (Kaptan + Kurumsal)
+        getCompanyById: function(companyId) {
+            if (!companyId) return null;
+            const captains = this.getCaptainCompanies();
+            const capComp = captains.find(c => c.id === companyId);
+            if (capComp) return capComp;
+            return this.corporateCompanies.find(c => c.id === companyId) || null;
+        },
+
+        // Yeni Şirket Kurma Modalını Aç
+        openCreateCompanyModal: function() {
+            this.injectCreateCompanyModal();
+            const modal = document.getElementById('create-company-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                const inpName = document.getElementById('new-comp-name');
+                if (inpName) {
+                    inpName.value = this.data.companyName || "Mikyas Express Seyahat";
+                    inpName.focus();
+                }
+                const inpFounder = document.getElementById('new-comp-founder');
+                if (inpFounder) {
+                    inpFounder.value = (typeof Game !== 'undefined' && Game.username) ? Game.username : "Ümit Ekrem Mikyas";
+                }
+                const inpCity = document.getElementById('new-comp-city');
+                if (inpCity) {
+                    inpCity.value = (typeof Game !== 'undefined' && Game.currentCity) ? `${Game.currentCity} (${Game.activeDistrict || 'Süleymanpaşa'})` : "Tekirdağ (Süleymanpaşa)";
+                }
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Yeni bir şirket kurma penceresi açıldı. Şirketinizin adını, çalıştıracağınız kaptan sayısını ve vereceğiniz günlük maaşı belirleyebilirsiniz.");
+                }
+            }
+        },
+
+        // Yeni Şirket Kurma Modalını Enjekte Et
+        injectCreateCompanyModal: function() {
+            if (document.getElementById('create-company-modal')) return;
+
+            const modalHtml = `
+            <div id="create-company-modal" class="modal-overlay modal hidden" role="dialog" aria-modal="true" aria-labelledby="create-comp-title" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 8900; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                <div class="glass-panel" style="max-width: 620px; width: 95%; padding: 24px 28px; text-align: left; max-height: 92vh; overflow-y: auto; border: 2px solid #f59e0b; box-shadow: 0 0 45px rgba(245, 158, 11, 0.4); border-radius: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(250, 204, 21, 0.2); padding-bottom: 10px;">
+                        <h2 id="create-comp-title" style="margin: 0; font-size: 1.6rem; color: #facc15; display: flex; align-items: center; gap: 8px;">
+                            🏢 Yeni Bir Şirket Kur
+                        </h2>
+                        <button id="btn-close-create-comp-modal" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Pencereyi kapat">✕ Kapat</button>
+                    </div>
+
+                    <form id="form-create-company" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 14px;">
+                        <div>
+                            <label for="new-comp-name" style="display: block; color: #fde047; font-weight: bold; font-size: 0.95rem; margin-bottom: 4px;">🏢 Şirketinizin Adı:</label>
+                            <input id="new-comp-name" type="text" maxlength="40" required placeholder="Örn: Mikyas Seyahat, Trakya Lojistik" style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #ca8a04; color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box;" />
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label for="new-comp-founder" style="display: block; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 4px;">👑 Kurucu Kaptan:</label>
+                                <input id="new-comp-founder" type="text" maxlength="30" required style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" />
+                            </div>
+                            <div>
+                                <label for="new-comp-city" style="display: block; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 4px;">📍 Merkez Şehir:</label>
+                                <input id="new-comp-city" type="text" maxlength="40" style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" />
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label for="new-comp-quota" style="display: block; color: #38bdf8; font-weight: bold; font-size: 0.92rem; margin-bottom: 4px;">👥 Kaç Kaptan Çalıştırmak İstiyorsunuz?</label>
+                                <input id="new-comp-quota" type="number" min="1" max="100" value="10" required style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #0284c7; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" placeholder="Örn: 10 Kaptan" />
+                                <small style="color: #94a3b8; font-size: 0.78rem; display: block; margin-top: 3px;">Kurucu olarak çalıştıracağınız kaptan sayısını siz belirlersiniz.</small>
+                            </div>
+                            <div>
+                                <label for="new-comp-salary" style="display: block; color: #4ade80; font-weight: bold; font-size: 0.92rem; margin-bottom: 4px;">💰 Kaptanlara Verilecek Günlük Maaş (₺):</label>
+                                <input id="new-comp-salary" type="number" min="500" max="50000" step="100" value="2500" required style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #16a34a; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" placeholder="Örn: 2500 ₺" />
+                                <small style="color: #94a3b8; font-size: 0.78rem; display: block; margin-top: 3px;">Kaptanlarınıza ödenecek günlük maaşı siz belirlersiniz.</small>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="new-comp-bonus" style="display: block; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 4px;">🎁 Sefer Başı Bilet Primi:</label>
+                            <select id="new-comp-bonus" style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
+                                <option value="10">%10 Bilet Satış Primi</option>
+                                <option value="15">%15 Bilet Satış Primi</option>
+                                <option value="20" selected>%20 Bilet Satış Primi (Tavsiye Edilen)</option>
+                                <option value="25">%25 Bilet Satış Primi</option>
+                                <option value="30">%30 Yüksek Sefer Primi</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="new-comp-slogan" style="display: block; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 4px;">📢 Şirket Sloganı:</label>
+                            <input id="new-comp-slogan" type="text" maxlength="60" value="Türkiye Karayollarında Güven ve Konfor" style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" />
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                            <button id="btn-cancel-create-comp" type="button" class="modern-btn nav-item" style="padding: 10px 20px; background: rgba(255,255,255,0.08); border: 1px solid #64748b; color: #cbd5e1; border-radius: 8px; cursor: pointer;">
+                                Vazgeç
+                            </button>
+                            <button id="btn-submit-create-comp" type="submit" class="modern-btn nav-item" style="padding: 10px 24px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);">
+                                🏢 Şirketi Kur ve Tescille
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>`;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            document.getElementById('btn-close-create-comp-modal').addEventListener('click', () => {
+                document.getElementById('create-company-modal').classList.add('hidden');
+            });
+            document.getElementById('btn-cancel-create-comp').addEventListener('click', () => {
+                document.getElementById('create-company-modal').classList.add('hidden');
+            });
+
+            document.getElementById('form-create-company').addEventListener('submit', () => {
+                const name = document.getElementById('new-comp-name').value.trim();
+                const founder = document.getElementById('new-comp-founder').value.trim();
+                const city = document.getElementById('new-comp-city').value.trim();
+                const quota = document.getElementById('new-comp-quota').value;
+                const salary = document.getElementById('new-comp-salary').value;
+                const bonus = document.getElementById('new-comp-bonus').value;
+                const slogan = document.getElementById('new-comp-slogan').value.trim();
+
+                if (!name) return;
+
+                const compObj = this.registerCaptainCompany({
+                    name: name,
+                    founder: founder,
+                    city: city,
+                    maxCaptainsQuota: quota,
+                    activeCaptainsCount: 1,
+                    dailySalary: salary,
+                    bonusPercent: bonus,
+                    slogan: slogan
+                });
+
+                this.data.companyName = name;
+                this.saveData();
+
+                document.getElementById('create-company-modal').classList.add('hidden');
+
+                const succMsg = `Tebrikler! ${name} şirketi başarıyla kuruldu. Kurucu kaptan: ${founder}. Kontenjan: ${quota}, günlük maaş: ${parseInt(salary).toLocaleString('tr-TR')} ₺ olarak tescillendi.`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(succMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏢 ${name} Şirketi Başarıyla Kuruldu!`, "success");
+
+                this.renderAll();
+
+                // Var Olan Şirkete Katıl sekmesine geçip yeni şirketi göstersin
+                const tabCorp = document.getElementById('tab-comp-corporate-work');
+                if (tabCorp) tabCorp.click();
+            });
         },
 
         // Türkiye'nin Önde Gelen Otobüs Şirketleri (Maaşlı Kaptanlık Modu)
@@ -1433,7 +1657,7 @@
                             🏢 Kendi Filom & Şoförlerim
                         </button>
                         <button id="tab-comp-corporate-work" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
-                            👔 Var Olan Şirkette Çalış (Maaşlı)
+                            👔 Var Olan Bir Şirkete Katıl (Maaşlı)
                         </button>
                         <button id="tab-comp-market-trends" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.9rem;">
                             📈 Sefer Borsası & VIP İhale
@@ -1545,6 +1769,18 @@
                             const otherPanel = document.getElementById(other.panelId);
                             if (otherBtn && otherPanel) {
                                 if (other.tabId === t.tabId) {
+                                if (t.tabId === 'tab-comp-corporate-work') {
+                                    const caps = this.getCaptainCompanies();
+                                    if (caps.length === 0) {
+                                        if (typeof audio !== 'undefined' && audio.speak) {
+                                            audio.speak("Var olan bir şirkete katıl menüsü açıldı. Görünüşe göre kimse şirket kurmamış. İlk şirketinizi oluşturmak için yeni bir şirket kur butonuna basınız. Kurumsal firmalar listelendi.");
+                                        }
+                                    } else {
+                                        if (typeof audio !== 'undefined' && audio.speak) {
+                                            audio.speak(`Var olan bir şirkete katıl menüsü açıldı. Kaptanlar tarafından kurulan ${caps.length} şirket ve kurumsal firmalar listelendi.`);
+                                        }
+                                    }
+                                }
                                     otherBtn.style.background = 'rgba(234, 179, 8, 0.3)';
                                     otherBtn.style.borderColor = '#facc15';
                                     otherBtn.style.color = '#fff';
@@ -1585,7 +1821,7 @@
             const lvlInfo = this.companyLevels.find(l => l.level === (this.data.companyLevel || 1)) || this.companyLevels[0];
 
             const empId = this.data.corporateEmployer;
-            const empComp = this.corporateCompanies ? this.corporateCompanies.find(c => c.id === empId) : null;
+            const empComp = this.getCompanyById(empId);
 
             const empBadge = empComp
                 ? `<div style="margin-top: 8px; padding: 8px 12px; background: rgba(34,197,94,0.18); border: 1.5px solid #22c55e; border-radius: 8px; font-size: 0.88rem; color: #86efac; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
@@ -1626,10 +1862,7 @@
             const btnRename = card.querySelector('#btn-rename-company');
             if (btnRename) {
                 btnRename.addEventListener('click', () => {
-                    const promptName = prompt("Yeni Şirket İsminizi Girin (Örn: Mikyas Turizm, Trakya Lojistik):", this.data.companyName);
-                    if (promptName && promptName.trim().length > 0) {
-                        this.setCompanyName(promptName.trim());
-                    }
+                    this.openCreateCompanyModal();
                 });
             }
 
@@ -2130,15 +2363,35 @@
         },
 
         joinCorporateCompany: function(companyId) {
-            const comp = this.corporateCompanies.find(c => c.id === companyId);
+            const comp = this.getCompanyById(companyId);
             if (!comp) return;
 
             const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
-            if (currentLevel < comp.minLevel) {
+            if (currentLevel < (comp.minLevel || 1)) {
                 const lockMsg = `Bu şirkete katılmak için Seviye ${comp.minLevel} kaptanlık derecesine sahip olmalısınız (Mevcut Seviyeniz: ${currentLevel}).`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, 'warning');
                 return;
+            }
+
+            // Kaptan şirketi kontenjan kontrolü
+            if (comp.isCaptainCompany) {
+                let activeCount = parseInt(comp.activeCaptainsCount) || 1;
+                const maxQuota = parseInt(comp.maxCaptainsQuota) || 10;
+                if (activeCount >= maxQuota) {
+                    const fullMsg = `Bu şirketin kaptan kontenjanı doludur! (${activeCount}/${maxQuota} Kaptan).`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(fullMsg, 'warning');
+                    return;
+                }
+
+                // Eski şirketten ayrılma sayısını düşür
+                if (this.data.corporateEmployer) {
+                    this.adjustCaptainCompanyWorkers(this.data.corporateEmployer, -1);
+                }
+
+                // Yeni şirketin çalışan sayısını artır
+                this.adjustCaptainCompanyWorkers(comp.id, 1);
             }
 
             this.data.corporateEmployer = comp.id;
@@ -2154,20 +2407,37 @@
                 }
             }
 
-            const successMsg = `Tebrikler! ${comp.name} bünyesinde maaşlı kaptan olarak göreve başladınız. İlk günlük maaşınız ${comp.dailySalary.toLocaleString('tr-TR')} TL hesabınıza yatırıldı.`;
+            const successMsg = comp.isCaptainCompany 
+                ? `Tebrikler! Kurucu Kaptan ${comp.founder} tarafından kurulan ${comp.name} bünyesinde göreve başladınız. İlk günlük maaşınız ${comp.dailySalary.toLocaleString('tr-TR')} ₺ hesabınıza yatırıldı.`
+                : `Tebrikler! ${comp.name} bünyesinde maaşlı kaptan olarak göreve başladınız. İlk günlük maaşınız ${comp.dailySalary.toLocaleString('tr-TR')} ₺ hesabınıza yatırıldı.`;
+
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(successMsg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`👔 ${comp.name} Kadrosuna Katıldınız! (+${comp.dailySalary.toLocaleString('tr-TR')} ₺)`, 'success');
 
             this.renderAll();
         },
 
+        adjustCaptainCompanyWorkers: function(companyId, delta) {
+            let list = this.getCaptainCompanies();
+            const target = list.find(c => c.id === companyId);
+            if (target) {
+                target.activeCaptainsCount = Math.max(1, (parseInt(target.activeCaptainsCount) || 1) + delta);
+                try {
+                    localStorage.setItem(this.COMMUNITY_STORAGE_KEY, JSON.stringify(list));
+                } catch(e) {}
+            }
+        },
+
         leaveCorporateCompany: function() {
+            if (this.data.corporateEmployer) {
+                this.adjustCaptainCompanyWorkers(this.data.corporateEmployer, -1);
+            }
             this.data.corporateEmployer = null;
             this.saveData();
 
-            const msg = "Kurumsal şirketten ayrıldınız. Artık kendi bağımsız şirketiniz ve filonuz adına çalışıyorsunuz.";
+            const msg = "Şirketten ayrıldınız. Artık bağımsız çalışıyorsunuz.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🏢 Bağımsız Şirket Moduna Dönüldü", "info");
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🏢 Şirketten Ayrıldınız", "info");
 
             this.renderAll();
         },
@@ -2178,12 +2448,134 @@
 
             const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
             const activeCorpId = this.data.corporateEmployer;
+            const captainCompanies = this.getCaptainCompanies();
 
-            container.innerHTML = this.corporateCompanies.map(comp => {
+            let html = '';
+
+            // --- 1. KAPTANLARIN KURDUĞU ŞİRKETLER BÖLÜMÜ ---
+            if (captainCompanies.length === 0) {
+                // Görünüşe göre kimse şirket kurmamış ikazı
+                html += `
+                <div style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 2.5px dashed #f59e0b; border-radius: 14px; padding: 26px 28px; text-align: center; margin-bottom: 16px; box-shadow: 0 6px 25px rgba(245, 158, 11, 0.2);">
+                    <div style="font-size: 2.8rem; margin-bottom: 10px; animation: pulse 2s infinite;">🏢</div>
+                    <div style="color: #fde047; font-size: 1.35rem; font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px;">
+                        Görünüşe göre kimse şirket kurmamış.
+                    </div>
+                    <div style="color: #e2e8f0; font-size: 1rem; max-width: 650px; margin: 0 auto 18px auto; line-height: 1.6;">
+                        İlk şirketinizi oluşturmak için aşağıdaki <strong>"Yeni Bir Şirket Kur"</strong> butonuna basınız. Şirketinizin adını, kaç kaptan çalıştırmak istediğinizi ve kaptanlara vereceğiniz günlük maaşı kendiniz belirlersiniz.
+                    </div>
+                    <button id="btn-empty-create-company" class="modern-btn nav-item" style="padding: 12px 30px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; border-radius: 10px; font-size: 1.05rem; cursor: pointer; border: none; box-shadow: 0 4px 20px rgba(245,158,11,0.45); transition: transform 0.2s;" aria-label="Yeni bir şirket kur">
+                        🏢 Yeni Bir Şirket Kur
+                    </button>
+                </div>
+                `;
+            } else {
+                // Kaptan şirketleri mevcut
+                html += `
+                <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px 16px;">
+                    <div>
+                        <div style="color: #facc15; font-size: 1.25rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                            <span>👨‍✈️</span> <span>Kaptanların Kurduğu Şirketler (${captainCompanies.length} Şirket Aktif)</span>
+                        </div>
+                        <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 2px;">
+                            Her şirketin kurucusu kaç kaptan çalıştıracağını ve kaptanlarına ne kadar maaş vereceğini kendisi belirler.
+                        </div>
+                    </div>
+                    <button id="btn-sub-create-company" class="modern-btn nav-item" style="padding: 8px 18px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: bold; font-size: 0.92rem; border-radius: 8px; cursor: pointer; border: none; box-shadow: 0 2px 10px rgba(245,158,11,0.3);">
+                        + Yeni Bir Şirket Kur
+                    </button>
+                </div>
+                `;
+
+                captainCompanies.forEach(comp => {
+                    const isCurrent = (activeCorpId === comp.id);
+                    const activeCount = parseInt(comp.activeCaptainsCount) || 1;
+                    const maxQuota = parseInt(comp.maxCaptainsQuota) || 10;
+                    const isFull = (activeCount >= maxQuota && !isCurrent);
+                    const foundedDateStr = this.formatTurkishDate(comp.createdDate);
+                    const salaryFormatted = (parseInt(comp.dailySalary) || 2500).toLocaleString('tr-TR');
+
+                    html += `
+                    <div style="background: rgba(15,23,42,0.92); border: 2px solid ${isCurrent ? '#22c55e' : '#f59e0b'}; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.18);">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-size: 1.25rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
+                                        <span>${comp.logo || '👑'}</span>
+                                        <span>${comp.name}</span>
+                                    </div>
+                                    <div style="color: #94a3b8; font-size: 0.85rem; margin-top: 3px;">
+                                        📅 <strong>Kurulma Tarihi:</strong> <span style="color: #bae6fd;">${foundedDateStr}</span> | 📍 <strong>Merkez:</strong> ${comp.city || 'Tekirdağ'}
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.82rem; padding: 4px 10px; border-radius: 6px; background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #fde047; font-weight: bold; white-space: nowrap;">
+                                    👑 KAPTAN ŞİRKETİ
+                                </span>
+                            </div>
+
+                            <div style="color: #fde047; font-size: 0.88rem; font-style: italic; margin-bottom: 12px;">
+                                "${comp.slogan || 'Karayollarında Güven ve Kalite'}"
+                            </div>
+
+                            <!-- Kurucunun Belirlediği Şartlar & Kaptan Sayısı -->
+                            <div style="background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; font-size: 0.9rem; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.08);">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                                    <span>👑 Kurucu Kaptan:</span>
+                                    <strong style="color: #fde047; font-size: 0.95rem;">${comp.founder || 'Kaptan'}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                    <span>👥 Kaç Kaptan Çalışıyor (Kontenjan):</span>
+                                    <strong style="color: ${isFull ? '#ef4444' : '#38bdf8'}; font-size: 0.95rem;">${activeCount} / ${maxQuota} Kaptan ${isFull ? '(Dolu)' : ''}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                    <span>💰 Kaptanlara Verilen Günlük Maaş:</span>
+                                    <strong style="color: #4ade80; font-size: 1.05rem;">${salaryFormatted} ₺ / Gün</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>🎁 Sefer Başı Bilet Primi:</span>
+                                    <strong style="color: #facc15;">+%${comp.bonusPercent || 18}</strong>
+                                </div>
+                            </div>
+
+                            <div style="color: #94a3b8; font-size: 0.84rem; line-height: 1.4; margin-bottom: 14px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 6px;">
+                                💡 <em>Kurucu Şartı:</em> Kurucu ${comp.founder} tarafından ${maxQuota} kaptanlık kadro açılmış olup, kaptan başına günlük ${salaryFormatted} ₺ garanti maaş ve +%${comp.bonusPercent || 18} sefer primi ödenmektedir.
+                            </div>
+                        </div>
+
+                        <div>
+                            ${isCurrent ? `
+                                <button class="modern-btn btn-leave-company nav-item" data-company-id="${comp.id}" style="width: 100%; padding: 11px; background: rgba(34,197,94,0.2); border: 1.5px solid #22c55e; color: #4ade80; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 0.95rem;" aria-label="${comp.name} şirketinden ayrıl">
+                                    ✅ AKTİF ÇALIŞTIĞINIZ ŞİRKET (Ayrıl)
+                                </button>
+                            ` : (isFull ? `
+                                <button class="modern-btn" disabled style="width: 100%; padding: 11px; background: rgba(255,255,255,0.05); border: 1px solid #475569; color: #64748b; font-weight: bold; border-radius: 8px; font-size: 0.92rem;">
+                                    🔒 Kontenjan Dolu (${maxQuota}/${maxQuota} Kaptan)
+                                </button>
+                            ` : `
+                                <button class="modern-btn btn-join-company nav-item" data-company-id="${comp.id}" style="width: 100%; padding: 11px; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35); font-size: 0.95rem;" aria-label="${comp.name} şirketine maaşlı kaptan olarak katıl">
+                                    ✍️ Bu Şirkete Katıl (Günlük ${salaryFormatted} ₺ Maaş)
+                                </button>
+                            `)}
+                        </div>
+                    </div>
+                    `;
+                });
+            }
+
+            // --- 2. KURUMSAL ULUSAL ŞİRKETLER BÖLÜMÜ ---
+            html += `
+            <div style="grid-column: 1 / -1; margin-top: 18px; margin-bottom: 6px;">
+                <div style="color: #38bdf8; font-size: 1.18rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                    <span>🏛️</span> <span>Kurumsal Ulusal Şirketler (Kâmil Koç, Pamukkale, TEKULAŞ...)</span>
+                </div>
+            </div>
+            `;
+
+            this.corporateCompanies.forEach(comp => {
                 const isCurrent = (activeCorpId === comp.id);
                 const isUnlocked = (currentLevel >= comp.minLevel);
 
-                return `
+                html += `
                 <div style="background: rgba(15,23,42,0.85); border: 1.5px solid ${isCurrent ? '#22c55e' : (isUnlocked ? comp.color : '#334155')}; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -2214,11 +2606,11 @@
                     </div>
                     <div>
                         ${isCurrent ? `
-                            <button id="btn-leave-corp-${comp.id}" class="modern-btn nav-item" style="width: 100%; padding: 10px; background: rgba(34,197,94,0.2); border: 1.5px solid #22c55e; color: #4ade80; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                            <button class="modern-btn btn-leave-company nav-item" data-company-id="${comp.id}" style="width: 100%; padding: 10px; background: rgba(34,197,94,0.2); border: 1.5px solid #22c55e; color: #4ade80; font-weight: bold; border-radius: 8px; cursor: pointer;">
                                 ✅ AKTİF ÇALIŞTIĞINIZ FİRMA (Ayrıl)
                             </button>
                         ` : (isUnlocked ? `
-                            <button id="btn-join-corp-${comp.id}" class="modern-btn nav-item" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                            <button class="modern-btn btn-join-company nav-item" data-company-id="${comp.id}" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
                                 ✍️ Sözleşme İmzala (Maaşlı Kaptan Ol)
                             </button>
                         ` : `
@@ -2229,21 +2621,32 @@
                     </div>
                 </div>
                 `;
-            }).join('');
+            });
 
-            this.corporateCompanies.forEach(comp => {
-                const btnJoin = container.querySelector(`#btn-join-corp-${comp.id}`);
-                if (btnJoin) {
-                    btnJoin.addEventListener('click', () => {
-                        this.joinCorporateCompany(comp.id);
-                    });
-                }
-                const btnLeave = container.querySelector(`#btn-leave-corp-${comp.id}`);
-                if (btnLeave) {
-                    btnLeave.addEventListener('click', () => {
-                        this.leaveCorporateCompany();
-                    });
-                }
+            container.innerHTML = html;
+
+            // Olay Dinleyicileri
+            const btnEmptyCreate = container.querySelector('#btn-empty-create-company');
+            if (btnEmptyCreate) {
+                btnEmptyCreate.addEventListener('click', () => this.openCreateCompanyModal());
+            }
+
+            const btnSubCreate = container.querySelector('#btn-sub-create-company');
+            if (btnSubCreate) {
+                btnSubCreate.addEventListener('click', () => this.openCreateCompanyModal());
+            }
+
+            container.querySelectorAll('.btn-join-company').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const compId = e.currentTarget.getAttribute('data-company-id');
+                    this.joinCorporateCompany(compId);
+                });
+            });
+
+            container.querySelectorAll('.btn-leave-company').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    this.leaveCorporateCompany();
+                });
             });
         }
     };
