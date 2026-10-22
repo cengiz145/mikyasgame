@@ -412,131 +412,131 @@ class VoiceAssistant {
             <!-- BAŞLIK -->
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(250, 204, 21, 0.3); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
                 <div>
-                    <h3 style="margin: 0; color: #facc15; font-size: 1.4rem; display: flex; align-items: center; gap: 8px;">
-                        <span>🏢</span> <span>Şirket Yönetimi & 6 Yasal Bina Rehberi (B1 Yetki Belgesi)</span>
+                    <h3 style="margin: 0; color: #facc15; font-size: 1.35rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🏢</span> <span>Şirket Nasıl Yönetilir? (Yeni Başlayanlar İçin Kolay Rehber)</span>
                     </h3>
-                    <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.9rem;">
-                        T.C. Ulaştırma ve Altyapı Bakanlığı Karayolu Taşıma Yönetmeliği uyarınca bir otobüs şirketi nasıl kurulur, binalar ne işe yarar ve para akışı nasıl takip edilir?
+                    <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.88rem;">
+                        Kendi otobüs firmanı nasıl kurarsın, binaların sana ne kazandırır ve paranı nereden takip edersin? Hepsi çok kolay!
                     </p>
                 </div>
-                <button class="modern-btn btn-read-section nav-item" data-text="Şirket Yönetimi ve 6 Yasal Bina Rehberi kaptanım! Bu rehberde kendi şirketini kurmayı, genel müdürlük, garaj, otogar yazıhaneleri, kademe tamirhanesi, kaptan lojmanı ve şehir içi servis acentelerinin sana kazandıracağı tüm avantajları öğreneceksin." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
-                    ▶️ Bu Bölümü Sesli Dinle
+                <button class="modern-btn btn-read-section nav-item" data-text="Yeni Başlayanlar İçin Şirket Rehberi. Bu oyunda istersen kendi şirketini kurup patron olabilirsin, istersen büyük firmalarda maaşlı şoförlük yapabilirsin. Açtığın binalar sana daha çok para, bedava mazot ve ucuz tamir kazandırır. Para hesabını da oyun senin yerine otomatik tutar. Şimdi detayları dinleyelim." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                    ▶️ Tüm Bölümü Sesli Dinle
                 </button>
             </div>
 
-            <!-- BÖLÜM 1: ŞİRKET KURMA VEYA MAAŞLI ÇALIŞMA -->
+            <!-- BÖLÜM 1: PATRON OL YA DA MAAŞLI ÇALIŞ -->
             <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.1rem;">1. Şirket Kurmak veya Bir Şirkette Çalışmak</h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket Kurmak veya Bir Şirkette Çalışmak. Oyunda iki yolun var kaptanım! İster kendi otobüs firmanı kurup şoför ve filo yönetebilir, bilet hasılatını toplayabilirsin. İstersen köklü firmalara katılıp günlük garanti maaş ve sefer primleriyle maaşlı kaptanlık yapabilirsin." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.1rem;">1. Oyunda İki Yolun Var: Patron Ol ya da Maaşlı Çalış</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Oyunda önünde iki güzel yol var kaptanım. Birincisi kendi firmanı kurmak. Kendi şirketini kurunca patron olursun; otobüs satın alır, şoför çalıştırır ve bilet paralarını toplarsın. İkincisi ise büyük firmalarda maaşlı çalışmak. Şirket derdiyle hiç uğraşmak istemiyorsan Metro veya Kamil Koç gibi firmalara katılırsın; günlük garanti maaşını ve sefer primini alıp sadece otobüs sürersin." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
-                <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
-                    • <strong>Kendi Şirketini Yönet:</strong> Şirketinin adını tescille, filo kur, şoför istihdam et ve bilet hasılatını cüzdanın ile şirket kasan arasında dilediğin oranda bölüştür (%50 / %50 önerilir).<br>
-                    • <strong>Kurumsal Firmada Maaşlı Kaptan Ol:</strong> Metro, Pamukkale, Kamil Koç veya Tekulaş gibi şirketlerde günlük garanti maaş ve sefer primleriyle çalış.
-                </p>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
+                    • <strong>Kendi Şirketinin Patronu Ol:</strong> Firmanın adını koy, filo kur, şoförler işe al. Seferlerden gelen bilet parasını şirket kasan ile kendi cüzdanın arasında dilediğin gibi bölüş (%50 / %50 önerilir).<br>
+                    • <strong>Büyük Bir Firmada Maaşlı Şoför Ol:</strong> Metro, Pamukkale, Kamil Koç veya Tekulaş'a katıl. Her gün garanti maaşını ve sefer primini al, kafan rahat otobüs sür.
+                </div>
             </div>
 
-            <!-- BÖLÜM 2: 6 YASAL BİNA VE GÖREVLERİ -->
+            <!-- BÖLÜM 2: 6 TANE BİNAN VAR, SANA NE KAZANDIRIR? -->
             <div style="margin-bottom: 16px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem;">2. Şirketinin 6 Yasal Binası & Kazandırdıkları</h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketinin 6 yasal binası vardır kaptanım. Genel müdürlük hat izinlerini yönetir ve sana marka primi verir. Filo garajı araç kapasiteni belirler ve yıpranmayı yarıya indirir. Otogar yazıhaneleri pasif kâr ve bedava mazot sağlar. Kademe atölyesi tamir masrafını yüzde 65 ucuzlatır ve süreyi yarıya indirir. Kaptan lojmanı dinlenme süreni yüzde 75 kısaltır. Şehir içi acenteler ise yolcuları ücretsiz servisle toplayıp bilet gelirini yüzde 50 artırır." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ 6 Binayı Sesli Dinle</button>
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem;">2. Şirketinin 6 Binası & Kazandırdıkları (Ne İşe Yarar?)</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketinde açabileceğin 6 tane bina vardır kaptanım. Merkez ofis biletlerine marka primi katarak daha çok kazandırır. Garaj daha çok otobüs almanı sağlar ve araçların geceleri bozulmasını önler. Otogar yazıhanesi sefer başı pasif para ve bedava mazot verir. Tamirhane sanayi masraflarını yüzde 65 ucuzlatır ve otobüsünü hızlı tamir eder. Lojman şoförlerini çabucak dinlendirir ve kaza yapmalarını engeller. Çarşı servisi ise yolcuları toplayıp otobüsün tüm koltuklarını doldurur." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ 6 Binayı Sesli Dinle</button>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
                     
                     <!-- BİNA 1 -->
                     <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #38bdf8; font-size: 0.95rem;">🏛️ 1. Genel Müdürlük (Şirket Beyni)</strong>
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">🏛️ 1. Merkez Ofis (Yönetim Masası)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Karayolu Taşıma Kanunu'na göre şirket açmak için zorunlu tescilli merkez adresindir.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Bağımsız Ofis ➔ Plaza İdari Katı ➔ Holding Genel Müdürlüğü.<br>
-                            • <strong>Kazancı:</strong> Sefer izin harçlarını ucuzlatır, idari cezaları sıfırlar ve bilet hasılatına <strong>+%30 marka primi</strong> kazandırır.
+                            • <strong>Ne İşe Yarar?</strong> Şirketinin beynidir. Seferler buradan planlanır.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Mütevazı Ofis ➔ Plaza Katı ➔ Holding Binası.<br>
+                            • <strong>Cebine Faydası:</strong> Firmanın adı duyulur, yolcular güvenir ve bilet fiyatlarına <strong>+%30 marka zammı</strong> gelerek kazancını artırır!
                         </p>
                     </div>
 
                     <!-- BİNA 2 -->
                     <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #22c55e; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #4ade80; font-size: 0.95rem;">🅿️ 2. Garaj ve Filo Sahası (Depot)</strong>
+                        <strong style="color: #4ade80; font-size: 0.95rem;">🅿️ 2. Otobüs Garajı (Park Yeri)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Otobüslerinin gece uyuduğu ve beklediği resmi park sahandır.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Açık Saha (5 Araç) ➔ Güvenlikli Asfalt Garaj (15 Araç) ➔ Kapalı Hangar (Sınırsız).<br>
-                            • <strong>Kazancı:</strong> Filo kapasiteni ve şoför kotanı artırır. Kapalı hangar sayesinde araçlarının <strong>yıpranma ve hasar oranı %50 yarı yarıya düşer</strong>!
+                            • <strong>Ne İşe Yarar?</strong> Otobüslerinin gece uyuduğu ve beklediği güvenli park yeridir.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Açık Saha (5 Araç) ➔ Güvenlikli Garaj (15 Araç) ➔ Kapalı Hangar (Sınırsız).<br>
+                            • <strong>Cebine Faydası:</strong> İstediğin kadar otobüs alabilirsin. Kapalı hangar sayesinde araçların geceleri çizilmez, <strong>yıpranması %50 yarı yarıya düşer</strong>!
                         </p>
                     </div>
 
                     <!-- BİNA 3 -->
                     <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #eab308; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #fde047; font-size: 0.95rem;">🏢 3. Otogar Yazıhaneleri & Peron Ağı</strong>
+                        <strong style="color: #fde047; font-size: 0.95rem;">🏢 3. Otogar Yazıhanesi (Bilet Gişesi)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Şehir terminallerinde yasal yolcu bindirme ve peron hakkındır.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Merkez Gişe ➔ Büyükşehir Peronları ➔ Ulusal Otogar Konsorsiyumu.<br>
-                            • <strong>Kazancı:</strong> Korsan duraklama cezasını önler, sefer başı <strong>+3.500 ₺ pasif kâr</strong> ve Seviye 3'te tüm araçlarına <strong>%100 BEDAVA MAZOT</strong> sağlar!
+                            • <strong>Ne İşe Yarar?</strong> Şehir otogarlarında bilet satmanı ve perondan yolcu almanı sağlar.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Tekirdağ Gişesi ➔ Büyükşehir Peronları ➔ Tüm Türkiye Otogar Ağı.<br>
+                            • <strong>Cebine Faydası:</strong> Sefer başı <strong>+3.500 ₺ pasif kâr</strong> verir ve Seviye 3'te tüm araçlarına <strong>%100 BEDAVA MAZOT</strong> kazandırır!
                         </p>
                     </div>
 
                     <!-- BİNA 4 -->
                     <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #f97316; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #fb923c; font-size: 0.95rem;">🛠️ 4. Kademe Binası (Tamirhane & Yıkama)</strong>
+                        <strong style="color: #fb923c; font-size: 0.95rem;">🛠️ 4. Tamir Atölyesi (Şirket Tamircisi)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Şirket içi hidrolik liftlerin, diagnostik bilgisayarların ve boyahanendir.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Kanal Çukuru ➔ Hidrolik Liftler & Diagnostik ➔ Mega Revizyon Üssü.<br>
-                            • <strong>Kazancı:</strong> Dış tamir faturalarını <strong>%65 ucuzlatır</strong>, tamir süresini yarı yarıya kısaltır ve fırçalı dış yıkama ile yolcu memnuniyet bahşişlerini artırır.
+                            • <strong>Ne İşe Yarar?</strong> Otobüsün bozulduğunda sanayiye gitme diye kendi ustalarındır.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Tamir Kanalı ➔ Hidrolik Liftler ➔ Mega Tamir Üssü.<br>
+                            • <strong>Cebine Faydası:</strong> Tamir faturanı <strong>%65 ucuzlatır</strong>, tamir süresini yarı yarıya kısaltır. Otomatik yıkama ile yolculardan bol bahşiş toplarsın.
                         </p>
                     </div>
 
                     <!-- BİNA 5 -->
                     <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #ec4899; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #f472b6; font-size: 0.95rem;">🛏️ 5. Kaptan Lojmanı (Personel Dinlenme)</strong>
+                        <strong style="color: #f472b6; font-size: 0.95rem;">🛏️ 5. Kaptan Lojmanı (Şoför Dinlenme Evi)</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Şoförlerinin yasal takograf molalarında uyuyup dinlendiği evdir.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Şoför Odası ➔ Müstakil Lojman ➔ 5 Yıldızlı Kaptan Oteli & Kampüs.<br>
-                            • <strong>Kazancı:</strong> Dinlenme süresini <strong>%75 kısaltır</strong>, kaza ve ceza riskini sıfırlar, kaptanlarının sefer verimini x2.0 katına çıkarır.
+                            • <strong>Ne İşe Yarar?</strong> Şoförlerinin seferden sonra duş alıp uyuduğu dinlenme evidir.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Şoför Odası ➔ Müstakil Lojman ➔ 5 Yıldızlı Kaptan Oteli.<br>
+                            • <strong>Cebine Faydası:</strong> Dinlenme beklemesini <strong>%75 kısaltır</strong>, şoförlerin yola zımba gibi çıkar ve uykusuzluktan kaza yapmaz!
                         </p>
                     </div>
 
                     <!-- BİNA 6 -->
                     <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #a855f7; border-radius: 10px; padding: 12px;">
-                        <strong style="color: #c084fc; font-size: 0.95rem;">🏬 6. Şehir İçi Acenteler & Servis Ağı</strong>
+                        <strong style="color: #c084fc; font-size: 0.95rem;">🏬 6. Çarşı Acenteleri & Yolcu Servisi</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            • <strong>Görevi:</strong> Çarşı merkezindeki bilet gişelerin ve yolcularını otogara taşıyan ücretsiz servis minibüslerindir.<br>
-                            • <strong>Nasıl Büyütülür?</strong> Cadde Gişesi ➔ Acente & Shuttle Filosu ➔ Ulusal Acente & VIP Transfer.<br>
-                            • <strong>Kazancı:</strong> Otobüslerinin boş kalkmasını engeller, koltukları doldurur ve bilet hasılatına kalıcı <strong>+%50 prim</strong> sağlar.
+                            • <strong>Ne İşe Yarar?</strong> Çarşı merkezindeki gişelerin ve otogara yolcu taşıyan servislerindir.<br>
+                            • <strong>Nasıl Büyütülür?</strong> Cadde Gişesi ➔ Minibüs Servis Filosu ➔ VIP Adrese Teslim Servis.<br>
+                            • <strong>Cebine Faydası:</strong> Otobüslerinin boş kalkmasını engeller, koltukları doldurur ve bilet gelirini kalıcı <strong>+%50 artırır</strong>.
                         </p>
                     </div>
 
                 </div>
             </div>
 
-            <!-- BÖLÜM 3: OTOGAR YAZIHANESİ İŞLETME MODELLERİ -->
+            <!-- BÖLÜM 3: OTOGAR YAZIHANESİ AÇMAK ÇOK KOLAY! -->
             <div style="background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #34d399; margin: 0; font-size: 1.1rem;">3. Otogar Yazıhanesi Modelleri & 4 Günlük Görev</h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Otogar yazıhaneleri iki modelle açılır kaptanım. Öz şubende kirayı şirketin öder, gelirin tamamı kasana kalır. F1 acentelik bayiliğinde cebinden beş kuruş çıkmadan sıfır lira masrafla yerel esnaf dükkanı açar, hasılatın yüzde 88'i doğrudan şirketine gelir. Ayrıca her yazıhane peron anonsu yapar, yolcu manifestosu tanzim eder, bagaj fişler ve her seferde otobüs bagajına 4 ila 8 adet koli teslim ederek sana ek para kazandırır." style="padding: 4px 10px; background: rgba(52,211,153,0.2); border: 1px solid #34d399; color: #a7f3d0; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                    <h4 style="color: #34d399; margin: 0; font-size: 1.1rem;">3. Otogar Yazıhanesi Açmak Çok Kolay (2 Yol)</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Otogara yazıhane açarken iki yoldan birini seçersin kaptanım. Birincisi kendi şuben olarak açmak. Kirayı şirketin öder, kazancın tamamı senin kasana kalır. İkincisi acente bayisi olarak açmak. Bu yol bedavadır, cebinden beş kuruş çıkmaz. Dükkanı yerel bir esnaf işletir. Paranın yüzde 88 i senin şirketine gelir, yüzde 12 si bayiye komisyon kalır. Ayrıca her yazıhane otobüsün bagajına emanet koli koyar, her koli sana 140 lira net ek kazanç sağlar!" style="padding: 4px 10px; background: rgba(52,211,153,0.2); border: 1px solid #34d399; color: #a7f3d0; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 8px;">
                     <div style="background: rgba(22,163,74,0.15); border-left: 3px solid #22c55e; padding: 10px; border-radius: 6px;">
-                        <strong style="color: #4ade80;">🏢 Model A: Şirket Öz Şubesi</strong><br>
-                        <span style="font-size: 0.84rem; color: #cbd5e1;">Kirasını şirketin öder, kendi bordrolu personelin çalışır. Bilet ve kargo gelirinin <strong>%100'ü doğrudan kasana</strong> kalır.</span>
+                        <strong style="color: #4ade80;">🏢 Yol 1: Kendi Şuben Olarak Aç</strong><br>
+                        <span style="font-size: 0.84rem; color: #cbd5e1;">Kirasını şirketin öder. Bilet ve kargo kazancının <strong>%100'ü doğrudan senin kasana</strong> girer.</span>
                     </div>
                     <div style="background: rgba(2,132,199,0.15); border-left: 3px solid #38bdf8; padding: 10px; border-radius: 6px;">
-                        <strong style="color: #38bdf8;">🤝 Model B: F1 Acente Bayiliği</strong><br>
-                        <span style="font-size: 0.84rem; color: #cbd5e1;"><strong>0 ₺ Masraf (Bedava Açılış)!</strong> Yerel esnaf işletir. Hasılatın <strong>%88'i şirketine</strong> gelir, %12'si bayiye komisyon kalır.</span>
+                        <strong style="color: #38bdf8;">🤝 Yol 2: Acente Bayisi Olarak Aç (Bedava!)</strong><br>
+                        <span style="font-size: 0.84rem; color: #cbd5e1;"><strong>0 ₺ Masraf (Cebinden 1 lira çıkmaz)!</strong> Dükkânı yerel esnaf işletir. Hasılatın <strong>%88'i senin şirketine</strong> gelir, %12'si bayiye komisyon kalır.</span>
                     </div>
                 </div>
                 <div style="margin-top: 10px; font-size: 0.84rem; color: #fde047;">
-                    📦 <strong>Emanet & Paket Kargo Geliri:</strong> Açık yazıhanelerin otobüs bagajına koli kabul eder. Her seferde 4-8 koli taşınır ve koli başı 140 ₺ ekstra net kazanç sağlar!
+                    📦 <strong>Bagajda Emanet Koli Geliri:</strong> Açık yazıhanelerin otobüs bagajına koli kabul eder. Her seferde 4-8 koli taşınır ve koli başı 140 ₺ ek para kazanırsın!
                 </div>
             </div>
 
-            <!-- BÖLÜM 4: CANLI KASA DEFTERİ VE ÖN MUHASEBE -->
+            <!-- BÖLÜM 4: PARA HESABI NASIL TUTULUR? -->
             <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #facc15; margin: 0; font-size: 1.1rem;">4. Para Akışı & Canlı Kasa Defteri (Ön Muhasebe)</h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Para akışı nasıl hesaplanır? Senin oturup hesap kitap yapmana hiç gerek yok kaptanım! Oyun her bilet gelirini, kargo kazancını, mazot giderini ve tamir faturasını saniyesi saniyesine Kasa Defteri'ne işler. Tek tıkla toplam gelirini, toplam giderini ve net şirket kârını anlık olarak görebilirsin." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.1rem;">4. Para Hesabı Nasıl Tutulur? (Kafan Asla Karışmasın!)</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Para hesabını nasıl takip edeceksin? Senin kağıt kalem alıp hesap yapmana hiç gerek yok kaptanım! Sistem her bilet gelirini, bagajdaki koli kazancını, mazot giderini ve tamir faturasını saniyesi saniyesine Kasa Defteri'ne kaydeder. Şirket menüsündeki Kasa Defteri sekmesine tıkladığında ne kadar kazandın, ne kadar harcadın ve cebine net kâr ne kadar kaldı, tıpkı banka hesabı gibi tertemiz görürsün." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
                 <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
-                    Senin kağıt kalemle hesap tutmana hiç gerek yok kaptanım. Şirket Menüsü'ndeki <strong>📊 Kasa Defteri & Muhasebe</strong> sekmesi tüm para giriş ve çıkışlarını canlı banka ekstresi gibi listeler. Toplam gelirini, masraflarını, net şirket kârını ve en çok nereye para harcadığını tek ekranda görebilirsin.
+                    Senin kağıt kalem alıp matematik yapmana hiç gerek yok kaptanım. Şirket Menüsü'ndeki <strong>📊 Kasa Defteri & Muhasebe</strong> sekmesi tüm para giriş ve çıkışlarını canlı bir banka hesabı gibi listeler. Toplam kazancını, mazot ve tamir masraflarını ve cebine kalan net kârı tek bakışta görürsün.
                 </p>
             </div>
 

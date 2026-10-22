@@ -649,10 +649,10 @@
                 id: "headquarters",
                 name: "Merkez Yönetim Ofisi / Genel Müdürlük",
                 icon: "🏛️",
-                category: "B1 Belgesi Yasal Zorunluluk (Şirket Beyni)",
-                simpleSummary: "Şirketinin resmi beyni ve kalbidir kaptanım. Karayolu Taşıma Kanunu'na göre şirket açmak ve şehirlerarası sefer düzenlemek için bağımsız bir merkez adres göstermek şarttır.",
+                category: "Şirket Yönetim Merkezi (Marka & İzinler)",
+                simpleSummary: "Şirketinin ana yönetim ofisidir kaptanım. Seferler buradan yönetilir. Ofisini büyüttükçe şirketinin marka değeri artar, yolcular sana güvenir ve bilet fiyatlarına ekstra marka zammı gelerek daha çok kazanırsın.",
                 playerBenefits: [
-                    "📋 Tüm Türkiye genelinde yasal hat açma ve resmi sefer düzenleme izni verir.",
+                    "📋 Şehirlerarası yeni hatlar açıp resmi seferler başlatmanı sağlar.",
                     "🛡️ Şirketini korsan taşımacılık, idari para cezaları ve sefer iptallerinden korur.",
                     "💰 Büyüdükçe firmanın kurumsal prestiji artar ve bilet gelirlerine +%30 kalıcı marka primi ekler."
                 ],
@@ -694,8 +694,8 @@
                 id: "bus_garage",
                 name: "Araç Park Alanı & Filo Garaj Sahası",
                 icon: "🅿️",
-                category: "B1 Belgesi Yasal Zorunluluk (Filo Kapasitesi)",
-                simpleSummary: "Otobüslerinin gece uyuduğu, yıkandığı ve sefer saatini beklediği resmi garaj sahandır. Sokak arasına otobüs park etmek yasaktır; şirketinin otobüs sayısına uygun büyüklükte garajı olması şarttır.",
+                category: "Otobüs Park Sahası (Filo Kapasitesi)",
+                simpleSummary: "Otobüslerinin gece güvenle park ettiği sahadır. Garajın ne kadar büyükse filona o kadar çok otobüs alabilirsin. Kapalı hangar yaptırdığında araçların geceleri hiç hasar almaz ve yıpranması yarı yarıya düşer.",
                 playerBenefits: [
                     "🚌 Şirketine kaç tane otobüs satın alabileceğini (filo kapasiteni) doğrudan belirler.",
                     "🔒 Otobüslerinizin gece hasar görmesini, parça hırsızlığını ve otopark cezası yemesini sıfırlar.",
@@ -739,8 +739,8 @@
                 id: "terminal_offices",
                 name: "Otogar Yazıhaneleri & Peron Ağı",
                 icon: "🏢",
-                category: "Yolcu Kabul & Peron İzni (Korsan Önleme)",
-                simpleSummary: "Şehirlerdeki resmi otobüs terminallerinde kiraladığın gişe ve peron ağındır. Yol kenarında durup kaçak yolcu almak yasaktır; otogar yazıhanesi yasal bilet kesip yolcu bindirmenin tek meşru yoludur.",
+                category: "Otogar Bilet Gişesi & Peron", 
+                simpleSummary: "Şehir otogarlarındaki bilet gişelerin ve yolcu bindirme peronlarındır. Yazıhanelerin açıldıkça otobüslerine yolcu dolar, sefer başı havadan pasif para kazanırsın ve Seviye 3'te bedava mazot alırsın!",
                 playerBenefits: [
                     "🎫 Her şehirdeki resmi peronlardan yolcu toplamanı sağlar ve bilet hasılatını katlar.",
                     "💰 Şirketinize sefer başına düzenli pasif terminal kâr payı kazandırır.",
@@ -784,8 +784,8 @@
                 id: "maintenance_depot",
                 name: "Bakım, Onarım ve Yıkama Atölyesi (Kademe Binası)",
                 icon: "🛠️",
-                category: "Teknik Servis, Tamir & Hijyen Üssü",
-                simpleSummary: "Otobüslerinin sanayide sıra beklemeden kendi şirket ustaların tarafından tamir edildiği ve her sefer öncesi otomatik yıkandığı kademe binandır. Yağ, filtre, fren, lastik bakımları burada yapılır.",
+                category: "Şirket İçi Tamirhane & Yıkama",
+                simpleSummary: "Kendi şirket tamirhanendir. Otobüsün bozulduğunda sanayide sıra beklemezsin ve yüksek tamir faturaları ödemezsin. Tamir faturanı %65 ucuzlatır ve otobüsünü iki kat daha hızlı tamir eder.",
                 playerBenefits: [
                     "🔧 Sanayi ve tamir masraflarını devasa oranda ucuzlatır (%65'e varan tamir indirimi).",
                     "🧼 Pırıl pırıl yıkanmış otobüslerle yolcu memnuniyetini ve kaptan bahşişlerini zirveye çıkarır.",
@@ -829,8 +829,8 @@
                 id: "driver_lodging",
                 name: "Personel Dinlenme Evi / Kaptan Lojmanı",
                 icon: "🛏️",
-                category: "Güvenlik & Yasal Takograf Dinlenme Şartı",
-                simpleSummary: "Kaptan şoförlerinin ve muavinlerinin yasal direksiyon süreleri (takograf) bittiğinde sıcak duş alıp sessizce uyuduğu dinlenme evidir. Yorgun şoförün kaza yapmasını ve ceza yemesini engeller.",
+                category: "Şoför Dinlenme Evi & Lojman",
+                simpleSummary: "Şoförlerinin seferden yorgun dönünce uyuyup dinlendiği evdir. Şoförlerin dinlenme süresini kısaltır, hemen zinde olarak sefere çıkmalarını sağlar ve uykusuzluktan kaza yapmalarını engeller.",
                 playerBenefits: [
                     "🛌 Şoförlerin dinlenme süresini hızlandırır, sefer aralarında uzun süre beklemeni önler.",
                     "🌟 Şoförlerin tecrübe puanı (XP) kazanımını x2 katına çıkarır ve sana bol bahşiş getirmelerini sağlar.",
@@ -874,8 +874,8 @@
                 id: "city_agencies",
                 name: "Şehir İçi Bilet Satış Acenteleri & Terminal Shuttle (Servis) Ağı",
                 icon: "🏬",
-                category: "Doğrudan Bilet Satışı & Yolcu Servis Minibüsleri",
-                simpleSummary: "Otogar şehrin dışındadır; bu yüzden vatandaşlar biletlerini çarşıdaki cadde acentelerinden alır. Ücretsiz servis minibüslerin (shuttle) de yolcuları mahallelerden toplayıp otogardaki peronuna getirir. Otobüsünün boş kalkmasını engeller!",
+                category: "Çarşı Gişeleri & Yolcu Servisi",
+                simpleSummary: "Otogarlar genelde şehrin dışındadır. Çarşıya bilet gişeleri açıp ücretsiz servis minibüsleri koyarsın. Minibüsler yolcuları otogara taşır, otobüsünün tüm koltukları dolar ve bilet gelirin %50 artırır.",
                 playerBenefits: [
                     "👥 Yolcu talebini patlatır, otobüslerinizin koltuklarını tıka basa doldurur.",
                     "🚌 Şehir merkezinden otogara ücretsiz yolcu taşıyarak firmanı en çok tercih edilen marka yapar.",
@@ -1054,10 +1054,10 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
                     <div>
                         <div style="color: #38bdf8; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                            <span>🇹🇷</span> <span>B1 YETKİ BELGESİ — ŞİRKET BİNALARI VE TESİS REHBERİ</span>
+                            <span>🏢</span> <span>ŞİRKET BİNALARI VE TESİSLERİ (KOLAY REHBER)</span>
                         </div>
                         <div style="color: #cbd5e1; font-size: 0.9rem; margin-top: 4px; line-height: 1.5;">
-                            Gerçek bir otobüs şirketi yönetirken sahip olman gereken <strong>6 temel bina ve tesis</strong> vardır kaptanım. Her binayı büyüttüğünde filon daha çok para kazanır, masrafların düşer ve seferlerin hızlanır.
+                            Otobüs şirketini büyüttükçe geliştirebileceğin <strong>6 temel bina</strong> vardır kaptanım. Binalar geliştikçe filona daha çok otobüs alabilirsin, tamir ve mazot masrafların düşer, seferlerin daha çok kâr kazandırır!
                         </div>
                     </div>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
