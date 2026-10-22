@@ -287,6 +287,12 @@ const UI = {
             console.warn("Harita ekranı 10 seviye geçilmeden açılamaz.");
             screenId = 'title-screen';
         }
+        // Eğer menü ekranına geçiliyorsa açık kalan sesli konuşmaları anında sustur
+        if (screenId !== 'driving-screen' && screenId !== 'stop-screen') {
+            if (typeof audio !== 'undefined' && audio.stopSpeech) {
+                audio.stopSpeech();
+            }
+        }
         document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
         const activeScreen = document.getElementById(screenId);
         if (activeScreen) {
