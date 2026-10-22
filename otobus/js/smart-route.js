@@ -83,7 +83,7 @@ const midPoints = {
         "Antalya": ["Çubuk Boğazı Toroslar Tırmanışı", "Döşemealtı Gişeleri & Antalya Kuzey Girişi"],
         "Ankara": ["Bolu Dağı Tüneli & O-4 Anadolu Otoyolu", "Akıncı Gişeleri & Ankara Çevre Otoyolu"],
         "Amasya": ["Merzifon Karayolu Kavşağı & D-100", "Yeşilırmak Kordon Boyu & Boğazköy Girişi"],
-        "Ağrı": ["Eleşkirt Geçidi & Horasan Karayolu", "Ağrı Çevre Yolu & Sanayi Kavşağı"],
+        "Ağrı": ["Bolu Dağı Tüneli & Kızıldağ Geçidi (2190m)", "Eleşkirt Geçidi (2283m) & Ağrı Dağı Zirvesi Yolu"],
         "Afyonkarahisar": ["Özdilek / İkbal Karayolları Kavşağı", "Dumlupınar & Zafer Anıtı Sapağı"],
         "Adıyaman": ["Gölbaşı Gölleri Tabiat Parkı Geçişi", "Adıyaman Çevre Yolu & Altınşehir Kavşağı"],
         "Adana": ["Pozantı Toros Dağları Geçişi & O-21 Otoyolu", "Adana Kuzey Çevre Yolu & Gişeler"],
@@ -905,16 +905,26 @@ const AkilliRotaSistemi = {
             }
 
             // Gerçek KGM Karayolu Mesafesi ve GPS Hesabı
+            const resolveCityProv = (p) => {
+                if (!p) return "Tekirdağ";
+                const tekDistricts = ["Süleymanpaşa", "Çorlu", "Çerkezköy", "Kapaklı", "Ergene", "Muratlı", "Marmaraereğlisi", "Saray", "Hayrabolu", "Malkara", "Şarköy", "Velimeşe"];
+                if (tekDistricts.includes(p)) return "Tekirdağ";
+                return p;
+            };
+
+            const cityProv1 = resolveCityProv(originProvince);
+            const cityProv2 = resolveCityProv(targetProvince);
+
             let exactKm = 0;
-            const pairKey1 = originProvince + "-" + targetProvince;
-            const pairKey2 = targetProvince + "-" + originProvince;
+            const pairKey1 = cityProv1 + "-" + cityProv2;
+            const pairKey2 = cityProv2 + "-" + cityProv1;
             if (typeof sehirlerarasiMesafeler !== 'undefined') {
                 exactKm = sehirlerarasiMesafeler[pairKey1] || sehirlerarasiMesafeler[pairKey2] || 0;
             }
 
             // Koordinatlar (CompassSystem 81 İl GPS)
-            const c1 = (typeof CompassSystem !== 'undefined' && CompassSystem.getCityCoordinates) ? CompassSystem.getCityCoordinates(originProvince) : null;
-            const c2 = (typeof CompassSystem !== 'undefined' && CompassSystem.getCityCoordinates) ? CompassSystem.getCityCoordinates(targetProvince) : null;
+            const c1 = (typeof CompassSystem !== 'undefined' && CompassSystem.getCityCoordinates) ? CompassSystem.getCityCoordinates(cityProv1) : null;
+            const c2 = (typeof CompassSystem !== 'undefined' && CompassSystem.getCityCoordinates) ? CompassSystem.getCityCoordinates(cityProv2) : null;
 
             if (!exactKm && c1 && c2 && typeof CompassSystem !== 'undefined' && CompassSystem.calculateDistanceKm) {
                 exactKm = Math.round(CompassSystem.calculateDistanceKm(c1[0], c1[1], c2[0], c2[1]) * 1.28);
