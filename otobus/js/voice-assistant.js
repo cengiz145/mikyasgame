@@ -584,7 +584,7 @@ class VoiceAssistant {
                         </h4>
                         <span style="font-size: 0.82rem; color: #86efac;">Kasayı hızla doldurmak ve filoyu büyütmek için profesyonel taktikler.</span>
                     </div>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketle kâr etmenin beş kısayolu şunlardır. Birincisi Çift Kasa Akışı: Şirketi kurar kurmaz hediye gelen Murat Kaptanı sefere gönderin, siz de kendi otobüsünüzle sefere çıkın; aynı anda iki koldan para kazanın. İkincisi Başharekât Akıllı Sefer Dağıtımı: Ana menüye her döndüğünüzde tek tıkla Akıllı Sefer Dağıtımı butonuna basın; boş şoförler en karlı dalgalanma rotalarına otomatik dağılsın. Üçüncüsü Hızlı Mazot Sıfırlama: Akaryakıt İstasyonunu Seviye üçe yükselterek mazotu tamamen bedava yapın, tüm bilet parası net kâr kalsın. Dördüncüsü İkram ve Emanet Kargo: Sürüşte ı tuşuyla ikram dağıtıp bahşiş toplayın, sefer sonunda açık yazıhanelerinizden binlerce lira kargo geliri alın. Beşincisi Kasadan Cüzdana Transfer: Şirket kasasında biriken kârı Cüzdana Para Çek butonuyla şahsi hesabınıza aktarıp galerideki en lüks otobüsleri satın alın." style="padding: 6px 12px; background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #86efac; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketle kâr etmenin beş kısayolu şunlardır. Birincisi İlk Kaptanınızı Transfer Edin: Şirketteki tüm şoförleri siz bizzat seçersiniz; elli bin lira kasanızla hemen Şoför Pazarından ilk kaptanınızı transfer edip sefere gönderin ve siz de başka sefere çıkarak aynı anda iki koldan para kazanın. İkincisi Başharekât Akıllı Sefer Dağıtımı: Ana menüye her döndüğünüzde tek tıkla Akıllı Sefer Dağıtımı butonuna basın; boş şoförler en karlı dalgalanma rotalarına otomatik dağılsın. Üçüncüsü Hızlı Mazot Sıfırlama: Akaryakıt İstasyonunu Seviye üçe yükselterek mazotu tamamen bedava yapın, tüm bilet parası net kâr kalsın. Dördüncüsü İkram ve Emanet Kargo: Sürüşte ı tuşuyla ikram dağıtıp bahşiş toplayın, sefer sonunda açık yazıhanelerinizden binlerce lira kargo geliri alın. Beşincisi Kasadan Cüzdana Transfer: Şirket kasasında biriken kârı Cüzdana Para Çek butonuyla şahsi hesabınıza aktarıp galerideki en lüks otobüsleri satın alın." style="padding: 6px 12px; background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #86efac; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
                         ▶ 5 Kısayolu Dinle
                     </button>
                 </div>
@@ -593,9 +593,9 @@ class VoiceAssistant {
                     
                     <!-- KISAYOL 1 -->
                     <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #22c55e; padding: 12px; border-radius: 8px;">
-                        <strong style="color: #4ade80; font-size: 0.95rem;">⚡ Kısayol 1: Çift Kasa Akışı (Murat Kaptan Taktigi)</strong>
+                        <strong style="color: #4ade80; font-size: 0.95rem;">⚡ Kısayol 1: İlk Kaptanınızı Hemen Transfer Edin</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Şirketi kurduğunuz anda oyun size <strong>Murat Kaptan'ı hediye eder</strong>. Hemen Murat Kaptan'ı boş bir hatta sefere gönderin. Siz de kendi aracınızla başka bir sefere çıkın. Böylece aynı süre içinde <strong>2 otobüsten birden çifte hasılat</strong> toplarsınız.
+                            Şirketinize katılacak <strong>tüm şoförleri siz bizzat seçersiniz</strong>. Şirketi kurunca hazır 50.000 ₺ kasanızla Şoför Pazarı'ndan ilk kaptanınızı (örneğin uygun maaşlı Murat Çırak veya ekonomik Mehmet Kaptan) hemen işe alın. Kaptanınızı sefere yollarken siz de başka sefere çıkın; aynı anda <strong>2 otobüsten birden çifte hasılat</strong> toplayın.
                         </p>
                     </div>
 
@@ -643,7 +643,7 @@ class VoiceAssistant {
                         </h4>
                         <span style="font-size: 0.82rem; color: #94a3b8;">Şirketinizi karlı tutmak, filonuzu büyütmek ve iflas etmemek için uygulamanız gereken 6 temel taktik.</span>
                     </div>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetiminde başarılı olmanın 6 altın kuralı şunlardır. Bir: Başlangıçta şirket kurduğunuzda elli bin lira hazır kasa ve hediye bir çırak kaptan kazanırsınız. İki: Hasılat paylaşım oranını yüzde elli şirket yüzde elli kaptan olarak dengede tutun. Üç: Tesisleri doğru sırayla geliştirin; önce garaj kapasitesi, ardından bakım atölyesi ve akaryakıt istasyonuna öncelik verin. Dört: Şoförleri tek tek seçmekle uğraşmamak için Başharekât Akıllı Sefer Dağıtımı butonunu kullanın. Beş: Şirket kasasında para bittiğinde cüzdandan kasaya, şirket zenginleştiğinde ise kasadan cüzdana dilediğiniz tutarda para aktarın. Altı: Şirket yönetimi sadece Ana Menüden yapılır; sefer esnasında sürüşünüze odaklanın." style="padding: 6px 12px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetiminde başarılı olmanın 6 altın kuralı şunlardır. Bir: Başlangıçta şirket kurduğunuzda elli bin lira hazır kasa kazanırsınız ve şirketin tüm şoförlerini Şoför Pazarından siz kendiniz seçip işe alırsınız. İki: Hasılat paylaşım oranını yüzde elli şirket yüzde elli kaptan olarak dengede tutun. Üç: Tesisleri doğru sırayla geliştirin; önce garaj kapasitesi, ardından bakım atölyesi ve akaryakıt istasyonuna öncelik verin. Dört: Şoförleri tek tek seçmekle uğraşmamak için Başharekât Akıllı Sefer Dağıtımı butonunu kullanın. Beş: Şirket kasasında para bittiğinde cüzdandan kasaya, şirket zenginleştiğinde ise kasadan cüzdana dilediğiniz tutarda para aktarın. Altı: Şirket yönetimi sadece Ana Menüden yapılır; sefer esnasında sürüşünüze odaklanın." style="padding: 6px 12px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
                         ▶ İpuçlarını Sesli Dinle
                     </button>
                 </div>
@@ -654,7 +654,7 @@ class VoiceAssistant {
                     <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #facc15; padding: 12px; border-radius: 8px;">
                         <strong style="color: #fde047; font-size: 0.95rem;">🎯 1. Başlangıç Taktigi: Şirket Kurmak mı, Maaşlı Başlamak mı?</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Kendi şirketinizi kurduğunuzda sistem size <strong>50.000 ₺ hazır şirket kasası</strong> ve <strong>1 adet hediye çırak şoför</strong> (Murat Kaptan) verir. Eğer yönetim sorumluluğu almadan önce sermaye yapmak isterseniz, kurumsal bir firmada (örneğin Tekulaş veya Pamukkale) maaşlı kaptan olarak çalışıp cepten sıfır masrafla nakit biriktirebilirsiniz.
+                            Kendi şirketinizi kurduğunuzda sistem size <strong>50.000 ₺ hazır şirket kasası</strong> verir. Şirketinizin <strong>tüm şoförlerini Şoför Pazarı'ndan tecrübesine ve maaşına göre siz kendiniz seçip işe alırsınız.</strong> Eğer şirket kurmadan önce sermaye biriktirmek isterseniz, kurumsal bir firmada (örneğin Tekulaş veya Pamukkale) maaşlı kaptan olarak çalışıp cepten sıfır masrafla nakit yapabilirsiniz.
                         </p>
                     </div>
 

@@ -1770,9 +1770,9 @@
         init: function () {
             this.loadData();
 
-            // İlk açılışta başlangıç çırağını hediye et
-            if (!this.data.hiredDrivers || this.data.hiredDrivers.length === 0) {
-                this.hireDriver("drv_murat", true);
+            // Şirkete tüm şoförler oyuncu tarafından Şoför Pazarı'ndan bizzat transfer edilir
+            if (!Array.isArray(this.data.hiredDrivers)) {
+                this.data.hiredDrivers = [];
             }
 
             // Piyasa trendlerini ve ihaleleri kontrol et / tazele
@@ -3437,9 +3437,23 @@
 
             if (this.data.hiredDrivers.length === 0) {
                 container.innerHTML = `
-                <div style="padding: 20px; text-align: center; color: #94a3b8; background: rgba(255,255,255,0.03); border-radius: 8px;">
-                    Henüz hiç şoför kiralamadınız. 'Şoför Pazarı' sekmesinden hemen ilk çırağınızı veya kaptanınızı transfer edin!
+                <div style="padding: 24px; text-align: center; color: #cbd5e1; background: rgba(255,255,255,0.03); border: 1.5px dashed rgba(202, 138, 4, 0.4); border-radius: 10px;">
+                    <div style="font-size: 2.2rem; margin-bottom: 8px;">👨‍✈️</div>
+                    <strong style="color: #facc15; font-size: 1.15rem;">Filonuzda Henüz Kaptan Bulunmuyor</strong>
+                    <p style="margin: 8px 0 16px 0; color: #94a3b8; font-size: 0.9rem;">
+                        Şirketinizin tüm şoförlerini siz seçersiniz! <strong>'Şoför Pazarı'</strong> sekmesinden dilediğiniz kaptanı tecrübesine, sefer başı maaşına ve özel yeteneklerine göre hemen işe alabilirsiniz.
+                    </p>
+                    <button id="btn-empty-goto-hire" class="modern-btn nav-item" style="padding: 10px 20px; background: linear-gradient(135deg, #ca8a04, #eab308); color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1px solid #fde047;">
+                        🛒 Şoför Pazarına Git ve Kaptan Transfer Et
+                    </button>
                 </div>`;
+                const btnHire = container.querySelector('#btn-empty-goto-hire');
+                if (btnHire) {
+                    btnHire.addEventListener('click', () => {
+                        const tabHire = document.getElementById('tab-comp-hire');
+                        if (tabHire) tabHire.click();
+                    });
+                }
                 return;
             }
 
