@@ -67,14 +67,31 @@ const Game = {
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
             return 0;
         }
-        const cost = Math.round(toAdd * costPerLiter);
+        let effCostPerLiter = costPerLiter;
+        let isFreeFuel = false;
+        if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+            const resortLvl = CompanySystem.getInstitutionLevel('highway_resort');
+            if (resortLvl === 2) {
+                effCostPerLiter = Math.round(costPerLiter * 0.70); // %30 dinlenme tesisi indirimi
+            } else if (resortLvl === 3) {
+                effCostPerLiter = 0; // %100 ÜCRETSİZ
+                isFreeFuel = true;
+            }
+        }
+        const cost = Math.round(toAdd * effCostPerLiter);
         if (this.playerBudget < cost) {
             const warnMsg = `Yetersiz bütçe! ${Math.floor(toAdd)} litre mazot için ${cost} ₺ gerekiyor, bakiyeniz ${this.playerBudget} ₺.`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(warnMsg);
             return 0;
         }
-        this.deductMoney(cost);
+        if (cost > 0) {
+            this.playerBudget = Math.max(0, (this.playerBudget || 0) - cost);
+            if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                const title = (typeof this.getLicenseTitle === 'function') ? this.getLicenseTitle() : 'Kaptan';
+                UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, title);
+            }
+        }
         this.currentFuelLiters += toAdd;
         this.fuelWarned15 = false;
         this.fuelWarned5 = false;
@@ -83,7 +100,9 @@ const Game = {
         if (typeof audio !== 'undefined' && typeof audio.playNavChime === 'function') {
             audio.playNavChime();
         }
-        const succMsg = `⛽ Depoya ${Math.floor(toAdd)} litre mazot dolduruldu (-${cost} ₺). Depo şu an %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`;
+        const succMsg = isFreeFuel 
+            ? `⛽ Şirket Mega Yaşam Kompleksi ayrıcalığıyla depoya ${Math.floor(toAdd)} litre mazot ÜCRETSİZ dolduruldu! Depo: %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`
+            : `⛽ Depoya ${Math.floor(toAdd)} litre mazot dolduruldu (-${cost} ₺). Depo şu an %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`;
         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(succMsg, "success");
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Depoya ${Math.floor(toAdd)} litre mazot alındı. Yakıt seviyeniz yüzde ${Math.floor((this.currentFuelLiters / cap) * 100)}.`);
         return toAdd;
@@ -1026,7 +1045,18 @@ const Game = {
             ratingBonus = 0.2;
         }
 
-        const tipMoney = Math.round(tipBase + (this.passengersOnBoard * 4));
+        let tipMultiplier = 1.0;
+        if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+            const cateringLvl = CompanySystem.getInstitutionLevel('catering_logistics');
+            if (cateringLvl === 2) {
+                tipMultiplier = 1.30; // +%30 bahşiş
+                ratingBonus *= 1.5;
+            } else if (cateringLvl === 3) {
+                tipMultiplier = 1.75; // +%75 bahşiş
+                ratingBonus *= 2.5;
+            }
+        }
+        const tipMoney = Math.round((tipBase + (this.passengersOnBoard * 4)) * tipMultiplier);
         this.addMoney(tipMoney, true); // Bahşiş doğrudan kaptana kalır
 
         if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.boostSatisfaction === 'function') {
@@ -4181,7 +4211,13 @@ const Game = {
         }
         const cityName = this.activeRouteData.sehir;
         if (sehirRotalari[cityName] && sehirRotalari[cityName].ucretler) {
-            fare = Math.round(sehirRotalari[cityName].ucretler[pType] * pricingMult);
+            let fareTicketMult = 1.0;
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const fareTicketLvl = CompanySystem.getInstitutionLevel('ticketing_network');
+                if (fareTicketLvl === 2) fareTicketMult = 1.15;
+                else if (fareTicketLvl === 3) fareTicketMult = 1.35;
+            }
+            fare = Math.round(sehirRotalari[cityName].ucretler[pType] * pricingMult * fareTicketMult);
         }
         
         let splitRes = null;
@@ -4230,6 +4266,19 @@ const Game = {
         this.activeNPCs = [];
         
         if (isSuccess) {
+            // Şirket Dinlenme Tesisi Seferi Temettüsü
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const finishResortLvl = CompanySystem.getInstitutionLevel('highway_resort');
+                let finishDiv = 0;
+                if (finishResortLvl === 2) finishDiv = 1500;
+                else if (finishResortLvl === 3) finishDiv = 3500;
+                if (finishDiv > 0) {
+                    this.addMoney(finishDiv, true);
+                    const divMsg = `☕ Şirket Dinlenme Tesisi kâr payı: +${finishDiv.toLocaleString('tr-TR')} ₺ cüzdanınıza aktarıldı!`;
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(divMsg, 'success');
+                }
+            }
+
             let comfortBonus = 0;
             let comfortMsg = "";
             if (this.passengerComfort >= 80) {
