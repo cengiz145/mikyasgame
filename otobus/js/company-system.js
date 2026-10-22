@@ -49,8 +49,15 @@
             hiredDrivers: [],
             marketTrends: {},              // routeId -> { multiplier, trendName, icon, desc, expiresAt }
             specialContracts: [],          // Aktif VIP ihaleler
-            radioLogs: []                  // Canlı telsiz kayıtları
+            radioLogs: [],                 // Canlı telsiz kayıtları
+            bankruptcyWarned250k: false,   // -250.000 ₺ Sarı Alarm Uyarısı Yapıldı mı
+            bankruptcyWarned750k: false,   // -750.000 ₺ Kırmızı Alarm Uyarısı Yapıldı mı
+            bankruptcyCount: 0             // Toplam İflas ve Tasfiye Sayısı
         },
+
+        BANKRUPTCY_LIMIT: -1000000,     // Resmi İflas ve Tasfiye Eşiği (-1.000.000 ₺)
+        WARNING_YELLOW: -250000,       // Finansal Risk Sarı Alarmı (-250.000 ₺)
+        WARNING_RED: -750000,          // Kritik İflas Kırmızı Alarmı (-750.000 ₺),
 
         // Türkçe Tarih Formatlayıcı
         formatTurkishDate: function(timestamp) {
@@ -222,10 +229,12 @@
                     Game.playerBudget -= amt;
                     Game.saveData();
                     this.data.companyTreasury = (this.data.companyTreasury || 0) + amt;
+                    this.recordTransaction('income', 'dividends', 'Kaptan Şahsi Sermaye Enjeksiyonu', amt);
                     this.saveData();
                     this.renderAll();
+                    this.checkBankruptcyStatus();
 
-                    const msg = `${amt.toLocaleString('tr-TR')} ₺ cüzdanınızdan şirket kasasına aktarıldı.`;
+                    const msg = `${amt.toLocaleString('tr-TR')} ₺ cüzdanınızdan şirket kasasına aktarıldı. Yeni Kasa Bakiyesi: ${this.data.companyTreasury.toLocaleString('tr-TR')} ₺.`;
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
                     if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
@@ -237,32 +246,55 @@
 
         // Şirket Kasasından Cüzdana Para Çek
         transferToWallet: function() {
-            const curTreasury = this.data.companyTreasury || 0;
-            if (curTreasury <= 0) {
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Şirket kasasında çekilebilecek bakiye yok.", "warning");
+            const curTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+            const maxCreditAvailable = curTreasury - this.BANKRUPTCY_LIMIT; // Azami çekilebilecek tutar
+
+            if (maxCreditAvailable <= 0) {
+                const failMsg = "Şirket borçlanma tavanına (-1.000.000 ₺) ulaşılmıştır. Daha fazla fon çekilemez!";
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(failMsg, "error");
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(failMsg);
                 return;
             }
 
-            const input = prompt(`Cüzdanınıza çekmek istediğiniz tutarı girin (Şirket Kasası: ${curTreasury.toLocaleString('tr-TR')} ₺):`, "5000");
+            let promptMsg = `Cüzdanınıza çekmek istediğiniz tutarı girin (Mevcut Kasa: ${curTreasury.toLocaleString('tr-TR')} ₺):\n\n`;
+            if (curTreasury > 0) {
+                promptMsg += `• Kasada ${curTreasury.toLocaleString('tr-TR')} ₺ nakit mevcuttur.\n`;
+                promptMsg += `• Dilerseniz şirketi borçlandırarak (Ticari KMH Kredisi) daha yüksek tutar çekebilirsiniz.\n`;
+            } else {
+                promptMsg += `⚠️ Şirket kasası şu anda borçtadır (${curTreasury.toLocaleString('tr-TR')} ₺).\n`;
+                promptMsg += `• Ticari KMH Finansmanı ile şahsi cüzdanınıza para çekmeye devam edebilirsiniz.\n`;
+            }
+            promptMsg += `• DİKKAT: Şirket borcu -1.000.000 ₺'ye ulaşırsa Asliye Ticaret Mahkemesi şirketi RESMEN İFLAS ettirir ve tasfiye eder! (Kişisel cüzdanınız, araçlarınız ve ehliyetiniz korunur).\n\n` +
+                         `Maksimum çekilebilecek kredi limiti: ${maxCreditAvailable.toLocaleString('tr-TR')} ₺`;
+
+            const defVal = curTreasury > 0 ? String(Math.min(curTreasury, 10000)) : "50000";
+            const input = prompt(promptMsg, defVal);
             if (input !== null) {
                 const amt = parseInt(input.trim());
                 if (!isNaN(amt) && amt > 0) {
-                    if (amt > curTreasury) {
-                        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Şirket kasasında bu kadar para yok!", "warning");
+                    if (amt > maxCreditAvailable) {
+                        const limitMsg = `Bu tutarı çekemezsiniz! Çekebileceğiniz azami tutar ${maxCreditAvailable.toLocaleString('tr-TR')} ₺'dir. (Daha fazlası şirket borcunu -1.000.000 ₺ iflas eşiğinin de altına düşürür).`;
+                        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(limitMsg, "warning");
+                        if (typeof audio !== 'undefined' && audio.speak) audio.speak(limitMsg);
                         return;
                     }
+
                     this.data.companyTreasury -= amt;
+                    this.recordTransaction('expense', 'dividends', 'Kaptan Şahsi Kâr / Finansman Çekimi', amt);
                     this.saveData();
+
                     if (typeof Game !== 'undefined') {
-                        Game.playerBudget += amt;
+                        Game.playerBudget = (Game.playerBudget || 0) + amt;
                         Game.saveData();
                         if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
                             UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, Game.getLicenseTitle());
                         }
                     }
-                    this.renderAll();
 
-                    const msg = `Şirket kasasından cüzdanınıza ${amt.toLocaleString('tr-TR')} ₺ aktarıldı.`;
+                    this.renderAll();
+                    this.checkBankruptcyStatus();
+
+                    const msg = `Şirket hesabından cüzdanınıza ${amt.toLocaleString('tr-TR')} ₺ aktarıldı. Yeni Kasa Bakiyesi: ${this.data.companyTreasury.toLocaleString('tr-TR')} ₺.`;
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
                 }
@@ -2346,6 +2378,39 @@
 
             let stateChanged = false;
 
+            // Dönemsel Sabit İşletme Giderleri (Her 60 simülasyon saniyesinde bir)
+            this.overheadCounter = (this.overheadCounter || 0) + (deltaSec || 1);
+            if (this.overheadCounter >= 60) {
+                this.overheadCounter = 0;
+                let branchCount = 0;
+                if (this.data.terminalBranches) {
+                    Object.values(this.data.terminalBranches).forEach(b => {
+                        if (b && b.type === 'owned') branchCount++;
+                    });
+                }
+                const branchRents = branchCount * 1200; // Şube peron kiraları
+
+                let facilityLevels = 0;
+                if (this.data.institutions) {
+                    Object.values(this.data.institutions).forEach(lvl => {
+                        if (lvl > 1) facilityLevels += (lvl - 1);
+                    });
+                }
+                const facilityUpkeep = facilityLevels * 600; // Tesis bakım & elektrik
+
+                const driverCount = (this.data.hiredDrivers && this.data.hiredDrivers.length) || 0;
+                const driverInsurance = driverCount * 250; // Şoför sigorta ve taban lojman harcırahı
+
+                const totalOverhead = branchRents + facilityUpkeep + driverInsurance;
+                if (totalOverhead > 0) {
+                    this.data.companyTreasury = (this.data.companyTreasury || 0) - totalOverhead;
+                    this.recordTransaction('expense', 'branches', 'Dönemsel Şube, Garaj Bakım ve Personel Aidatları', totalOverhead);
+                    this.saveData();
+                    this.checkBankruptcyStatus();
+                    stateChanged = true;
+                }
+            }
+
             this.data.hiredDrivers.forEach(driver => {
                 if (driver.status === 'on_trip') {
                     const opsLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('fleet_operations') : 1;
@@ -2472,7 +2537,27 @@
             }
 
             const wage = driver.wagePerTrip || 250;
-            const netProfit = Math.max(150, grossRevenue - (fuel + wage));
+
+            // İkram Paketi Gideri
+            let cateringCost = 0;
+            if (this.data.cateringPackage === 'vip') {
+                cateringCost = Math.round(passengerCount * 65);
+            } else if (this.data.cateringPackage === 'standart') {
+                cateringCost = Math.round(passengerCount * 30);
+            } else if (this.data.cateringPackage === 'ekonomik') {
+                cateringCost = Math.round(passengerCount * 12);
+            }
+
+            const totalTripExpenses = fuel + wage + cateringCost;
+            const netProfit = grossRevenue - totalTripExpenses;
+
+            // Muhasebe Defterine Detaylı Gelir ve Gider Kaydı
+            this.recordTransaction('income', 'tickets', `${driver.name} - ${route.name} Sefer Hasılatı`, grossRevenue);
+            this.recordTransaction('expense', 'fuel', `${driver.name} - Akaryakıt Tüketimi`, fuel);
+            this.recordTransaction('expense', 'wages', `${driver.name} - Seferlik Harcırah & Maaş`, wage);
+            if (cateringCost > 0) {
+                this.recordTransaction('expense', 'catering', `${driver.name} - İkram Paketi Gideri`, cateringCost);
+            }
 
             // 5. KONDİSYON AŞINMASI
             const curCond = this.getBusCondition(driver.assignedBusId);
@@ -2483,16 +2568,31 @@
             // 6. ENERJİ TÜKETİMİ
             driver.energy = Math.max(10, (driver.energy || 100) - (wearAmount * 4));
 
-            // 7. KASAYA AKTARMA
-            if (typeof Game !== 'undefined') {
-                Game.playerBudget = (Game.playerBudget || 0) + netProfit;
-                Game.saveData();
+            // 7. KASAYA VE CÜZDANA AKTARMA (Hasılat Paylaşım Politikasına Göre)
+            const sharePercent = (this.data.revenueSharePercent !== undefined) ? this.data.revenueSharePercent : 50;
 
-                if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
-                    const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
-                    UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+            if (netProfit >= 0) {
+                const companyShare = Math.round(netProfit * (sharePercent / 100));
+                const captainShare = netProfit - companyShare;
+
+                this.data.companyTreasury = (this.data.companyTreasury || 0) + companyShare;
+
+                if (typeof Game !== 'undefined') {
+                    Game.playerBudget = (Game.playerBudget || 0) + captainShare;
+                    Game.saveData();
+
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                    }
                 }
+            } else {
+                // Zararına Sefer: Şirket kasası operasyonel zararı üstlenir
+                this.data.companyTreasury = (this.data.companyTreasury || 0) + netProfit;
             }
+
+            // İflas Durumu Denetimi
+            this.checkBankruptcyStatus();
 
             // 8. XP KAZANIMI & TERFİ
             let gainedXP = route.xpReward || 50;
@@ -2739,6 +2839,82 @@
             } catch(e) {}
         },
 
+        
+        playWarningAlarm: function () {
+            const ctx = this.getAudioCtx();
+            if (!ctx) return;
+            try {
+                if (ctx.state === 'suspended') ctx.resume();
+                const now = ctx.currentTime;
+                [650, 440, 650, 440].forEach((freq, idx) => {
+                    const t = now + (idx * 0.16);
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(freq, t);
+                    gain.gain.setValueAtTime(0.001, t);
+                    gain.gain.linearRampToValueAtTime(0.18, t + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(t);
+                    osc.stop(t + 0.15);
+                });
+            } catch(e) {}
+        },
+
+        playEmergencySiren: function () {
+            const ctx = this.getAudioCtx();
+            if (!ctx) return;
+            try {
+                if (ctx.state === 'suspended') ctx.resume();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(450, now);
+                osc.frequency.linearRampToValueAtTime(850, now + 0.4);
+                osc.frequency.linearRampToValueAtTime(450, now + 0.8);
+                osc.frequency.linearRampToValueAtTime(850, now + 1.2);
+                osc.frequency.linearRampToValueAtTime(450, now + 1.6);
+                
+                gain.gain.setValueAtTime(0.001, now);
+                gain.gain.linearRampToValueAtTime(0.25, now + 0.05);
+                gain.gain.setValueAtTime(0.25, now + 1.5);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 1.8);
+            } catch(e) {}
+        },
+
+        playCourtGavelSound: function () {
+            const ctx = this.getAudioCtx();
+            if (!ctx) return;
+            try {
+                if (ctx.state === 'suspended') ctx.resume();
+                const now = ctx.currentTime;
+                [0, 0.28].forEach(offset => {
+                    const t = now + offset;
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(160, t);
+                    osc.frequency.exponentialRampToValueAtTime(42, t + 0.15);
+
+                    gain.gain.setValueAtTime(0.45, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(t);
+                    osc.stop(t + 0.23);
+                });
+            } catch(e) {}
+        },
+
         playAiDispatchSound: function () {
             const ctx = this.getAudioCtx();
             if (!ctx) return;
@@ -2766,6 +2942,272 @@
 
         // Şirket Modalını Aç
         // --- CANLI KASA DEFTERİ & OTOMATİK ÖN MUHASEBE SİSTEMİ ---
+        
+        // --- İFLAS & TASFİYE SİSTEMİ (TİCARİON ESİNTİLİ -1.000.000 ₺ LİMİTİ) ---
+        checkBankruptcyStatus: function () {
+            const treasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+
+            // 1. RESMİ İFLAS VE TASFİYE EŞİĞİ (-1.000.000 ₺)
+            if (treasury <= this.BANKRUPTCY_LIMIT) {
+                this.triggerBankruptcyLiquidation();
+                return true;
+            }
+
+            // 2. KIRMIZI ALARM EŞİĞİ (-750.000 ₺)
+            if (treasury <= this.WARNING_RED) {
+                if (!this.data.bankruptcyWarned750k) {
+                    this.data.bankruptcyWarned750k = true;
+                    this.playEmergencySiren();
+                    const redMsg = `🚨 ACİL İFLAS UYARISI! Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ seviyesine ulaştı! Borç -1.000.000 ₺ sınırına dayanırsa mahkeme şirketimizi tasfiye edecektir! Lütfen cüzdandan şirkete para yatırın veya giderlerinizi kısın!`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(redMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(redMsg, 'error');
+                    this.addRadioLog("⚖️ Hukuk ve Mali Müşavir", "🚨", `Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ oldu! -1.000.000 ₺'de Asliye Ticaret Mahkemesi iflas kararı verecek!`, "danger");
+                }
+            } else {
+                this.data.bankruptcyWarned750k = false;
+            }
+
+            // 3. SARI ALARM EŞİĞİ (-250.000 ₺)
+            if (treasury <= this.WARNING_YELLOW) {
+                if (!this.data.bankruptcyWarned250k) {
+                    this.data.bankruptcyWarned250k = true;
+                    this.playWarningAlarm();
+                    const yellowMsg = `⚠️ FİNANSAL RİSK İHTARI! Şirket kasası ${treasury.toLocaleString('tr-TR')} ₺ eksiye düştü. Banka kredi ve faiz yükü artıyor. Lütfen kasanızı fonlayın veya harcamaları dengeleyin.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(yellowMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(yellowMsg, 'warning');
+                    this.addRadioLog("🏦 Bankalar & Mali Müşavir", "⚠️", `Şirket kasamız eksi ${Math.abs(treasury).toLocaleString('tr-TR')} ₺ oldu. Mali dengeyi sağlamalıyız.`, "warning");
+                }
+            } else {
+                this.data.bankruptcyWarned250k = false;
+            }
+
+            return false;
+        },
+
+        triggerBankruptcyLiquidation: function () {
+            const prevTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : -1000000;
+            const compName = this.data.companyName || "Şirket";
+
+            // Borç Tasfiyesi ve Temiz Sayfa
+            this.data.companyTreasury = 0;
+            this.data.companyLevel = 1;
+            this.data.institutions = {
+                headquarters: 1,
+                bus_garage: 1,
+                terminal_offices: 1,
+                maintenance_depot: 1,
+                driver_lodging: 1,
+                city_agencies: 1
+            };
+            this.data.terminalBranches = {
+                tekirdag: true,
+                corlu: false,
+                istanbul_esenler: false,
+                ankara_asti: false,
+                izmir_otogar: false
+            };
+            this.data.hqUpgrades = {
+                fuelContract: false,
+                luxuryLounge: false,
+                terminalPlatform: false,
+                corporateBrand: false
+            };
+            this.data.cateringPackage = 'standart';
+
+            // Şoförlerin sözleşmeleri feshedilir ve serbest kalırlar
+            const releasedDriversCount = (this.data.hiredDrivers && this.data.hiredDrivers.length) || 0;
+            this.data.hiredDrivers = [];
+
+            // İflas uyarı bayrakları sıfırlanır
+            this.data.bankruptcyWarned250k = false;
+            this.data.bankruptcyWarned750k = false;
+            this.data.bankruptcyCount = (this.data.bankruptcyCount || 0) + 1;
+
+            // Muhasebe Defterine Borç Tasfiyesi Kaydı
+            this.recordTransaction('income', 'debt_relief', '⚖️ Asliye Ticaret Mahkemesi Tasfiye Kararı ile Borç Sıfırlaması', Math.abs(prevTreasury));
+
+            this.saveData();
+
+            // Telsiz Kaydı
+            this.addRadioLog(
+                "⚖️ İcra & Tasfiye Masası",
+                "🏛️",
+                `Asliye Ticaret Mahkemesi Kararıyla ${compName} iflas etmiş ve tasfiye masasına devredilmiştir. ${Math.abs(prevTreasury).toLocaleString('tr-TR')} ₺ borç sıfırlanmış, şirket 1. Seviye Yazıhane olarak yeniden yapılandırılmıştır.`,
+                "danger"
+            );
+
+            // Şirket Yönetim Modalı Açıksa Kapat
+            this.closeCompanyModal();
+
+            // Mahkeme Tokmak Sesi
+            this.playCourtGavelSound();
+
+            // Sesli Anons ve Uyarı
+            if (typeof audio !== 'undefined' && audio.speak) {
+                const speechText = `T.C. Asliye Ticaret Mahkemesi Kararı: Şirketiniz bir milyon Türk Lirası borç sınırına ulaştığı için resmen iflas etmiş ve tasfiye edilmiştir. Şirketin bir milyon liralık borcu tasfiye masası tarafından tamamen silinmiştir. Binalar temel seviyeye çekilmiş ve şoförlerin sözleşmeleri feshedilmiştir. Şahsi ehliyetiniz, şahsi otobüsleriniz ve cüzdanınız korunmuştur. Dilerseniz kurumsal şirketlerde çalışıp nakit biriktirebilir ya da sıfırdan yeniden başlayabilirsiniz.`;
+                audio.speak(speechText);
+            }
+
+            // Görsel ve Erişilebilir Resmi Mahkeme İflas Tutanağı Modalı Aç
+            this.showBankruptcyModal(prevTreasury, releasedDriversCount);
+        },
+
+        injectBankruptcyModal: function () {
+            if (document.getElementById('company-bankruptcy-modal')) return;
+
+            const modalHtml = `
+            <div id="company-bankruptcy-modal" class="modal-overlay modal hidden" role="dialog" aria-modal="true" aria-labelledby="bankruptcy-modal-title" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5,5,10,0.96); z-index: 99999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(14px); padding: 16px;">
+                <div class="glass-panel" style="max-width: 820px; width: 100%; padding: 26px 30px; text-align: left; max-height: 92vh; overflow-y: auto; border: 2.5px solid #ef4444; box-shadow: 0 0 50px rgba(239, 68, 68, 0.45); border-radius: 16px; background: linear-gradient(150deg, #180808 0%, #1e1111 60%, #0f172a 100%); color: #f8fafc;">
+                    
+                    <!-- ÜST BAŞLIK & MÜHÜR -->
+                    <div style="text-align: center; border-bottom: 2px solid rgba(239, 68, 68, 0.4); padding-bottom: 14px; margin-bottom: 18px;">
+                        <div style="font-size: 2.2rem; margin-bottom: 4px;">⚖️</div>
+                        <h2 id="bankruptcy-modal-title" style="color: #ef4444; font-size: 1.4rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; text-transform: uppercase;">
+                            T.C. ASLİYE TİCARET MAHKEMESİ VE İCRA İFLAS MÜDÜRLÜĞÜ
+                        </h2>
+                        <div style="color: #fca5a5; font-size: 1.05rem; font-weight: bold; margin-top: 4px;">
+                            RESMİ ŞİRKET İFLAS VE TASFİYE TUTANAĞI
+                        </div>
+                        <div id="bankruptcy-modal-meta" style="font-size: 0.8rem; color: #94a3b8; margin-top: 6px;">
+                            Karar Dosya No: 2026/TAS-1M • Yetkili: Tasfiye Heyeti
+                        </div>
+                    </div>
+
+                    <!-- AÇIKLAMA BİLDİRİMİ -->
+                    <div style="background: rgba(239, 68, 68, 0.12); border-left: 4px solid #ef4444; padding: 12px 16px; border-radius: 8px; margin-bottom: 18px;">
+                        <p id="bankruptcy-modal-desc" style="margin: 0; color: #fecaca; font-size: 0.92rem; line-height: 1.55;">
+                            Şirket borcu yasal iflas limitine ulaşmış ve tasfiye protokolü tamamlanmıştır.
+                        </p>
+                    </div>
+
+                    <!-- 3 KOLONLU KARTLAR -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                        
+                        <!-- KART 1: TASFİYE EDİLENLER -->
+                        <div style="background: rgba(0, 0, 0, 0.4); border: 1.5px solid rgba(239, 68, 68, 0.4); border-radius: 10px; padding: 14px;">
+                            <div style="color: #f87171; font-weight: bold; font-size: 0.98rem; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                <span>📋</span> <span>Tasfiye Edilenler</span>
+                            </div>
+                            <ul id="bankruptcy-liquidated-list" style="margin: 0; padding-left: 18px; color: #cbd5e1; font-size: 0.84rem; line-height: 1.6;">
+                                <li>Şirket borcu sıfırlandı.</li>
+                                <li>Sözleşmeli şoförler serbest bırakıldı.</li>
+                                <li>Tesisler Seviye 1'e çekildi.</li>
+                            </ul>
+                        </div>
+
+                        <!-- KART 2: HACZEDİLEMEZ BİREYSEL HAKLAR (KORUNANLAR) -->
+                        <div style="background: rgba(0, 0, 0, 0.4); border: 1.5px solid rgba(34, 197, 94, 0.5); border-radius: 10px; padding: 14px;">
+                            <div style="color: #4ade80; font-weight: bold; font-size: 0.98rem; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                <span>🛡️</span> <span>Haczedilemez Şahsi Haklar (Korundu)</span>
+                            </div>
+                            <ul id="bankruptcy-protected-list" style="margin: 0; padding-left: 18px; color: #cbd5e1; font-size: 0.84rem; line-height: 1.6;">
+                                <li><strong>Sürücü Ehliyeti:</strong> Ehliyet seviyeniz aynen korunur.</li>
+                                <li><strong>Şahsi Garajınız:</strong> Sahip olduğunuz bireysel otobüsler haczedilemez.</li>
+                                <li><strong>Kişisel Cüzdan:</strong> Şahsi birikiminiz elinizde kalır.</li>
+                                <li><strong>Mesleki Tecrübe:</strong> Tamamladığınız görevler ve itibarınız silinmez.</li>
+                            </ul>
+                        </div>
+
+                        <!-- KART 3: ÇIKIŞ YOLU VE TAVSİYELER -->
+                        <div style="background: rgba(0, 0, 0, 0.4); border: 1.5px solid rgba(56, 189, 248, 0.5); border-radius: 10px; padding: 14px;">
+                            <div style="color: #38bdf8; font-weight: bold; font-size: 0.98rem; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                <span>💡</span> <span>Kaptan Tavsiyesi & Çıkış Yolu</span>
+                            </div>
+                            <p style="margin: 0; color: #cbd5e1; font-size: 0.84rem; line-height: 1.55;">
+                                • <strong>Kurumsal Kaptanlık:</strong> Kamil Koç, Metro, Pamukkale gibi kurumsal firmalarda maaşlı şoförlük yaparak sıfır riskle temiz sermaye biriktirebilirsiniz.<br><br>
+                                • <strong>Temiz Başlangıç:</strong> Borçsuz 1. Seviye şirketinizle bütçenizi dikkatle yöneterek yeniden filonuzu büyütebilirsiniz.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!-- EKRAN OKUYUCU BUTONU -->
+                    <div style="margin-top: 14px;">
+                        <button id="btn-confirm-bankruptcy" class="modern-btn nav-item" style="width: 100%; padding: 14px 20px; font-size: 1.05rem; font-weight: bold; background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #fff; border: 2px solid #ef4444; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.45); transition: all 0.2s;" aria-label="Mahkeme Tasfiye Kararını Okudum ve Onaylıyorum, Temiz Bir Sayfa Aç, düğme">
+                            📜 Mahkeme Tasfiye Kararını Onaylıyorum ve Temiz Sayfa Açıyorum (Enter / Space)
+                        </button>
+                    </div>
+
+                </div>
+            </div>`;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            const modal = document.getElementById('company-bankruptcy-modal');
+            const confirmBtn = document.getElementById('btn-confirm-bankruptcy');
+
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    if (modal) modal.classList.add('hidden');
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast("✅ Tasfiye süreci tamamlandı. Temiz bir sayfa ile yeni başlangıç yapabilirsiniz!", "success");
+                    }
+                    if (typeof audio !== 'undefined' && audio.playSelect) {
+                        audio.playSelect();
+                    }
+                    const btnCity = document.getElementById('btn-city-routes');
+                    if (btnCity) btnCity.focus();
+                });
+            }
+
+            window.addEventListener('keydown', (e) => {
+                if (modal && !modal.classList.contains('hidden')) {
+                    if (e.key === 'Escape' || e.key === 'Enter') {
+                        confirmBtn.click();
+                    }
+                }
+            });
+        },
+
+        showBankruptcyModal: function (debtAmount, driverCount) {
+            this.injectBankruptcyModal();
+            const modal = document.getElementById('company-bankruptcy-modal');
+            if (!modal) return;
+
+            const compName = this.data.companyName || "Mikyas Seyahat";
+            const dateStr = this.formatTurkishDate(Date.now());
+            const absDebt = Math.abs(debtAmount).toLocaleString('tr-TR');
+            const budgetStr = (typeof Game !== 'undefined' && Game.playerBudget ? Game.playerBudget : 0).toLocaleString('tr-TR');
+            const licenseLvl = (typeof Game !== 'undefined' && Game.licenseLevel ? Game.licenseLevel : 1);
+
+            const metaEl = document.getElementById('bankruptcy-modal-meta');
+            if (metaEl) {
+                metaEl.innerHTML = `Karar Dosya No: 2026/TAS-1M • Karar Tarihi: ${dateStr} • Şirket: <strong>${compName}</strong>`;
+            }
+
+            const descEl = document.getElementById('bankruptcy-modal-desc');
+            if (descEl) {
+                descEl.innerHTML = `<strong>Resmi İflas Kararı:</strong> Sayın Şirket Sahibi; <strong>${compName}</strong> ticari işletmesi, toplam <strong>-${absDebt} ₺</strong> borç bakiyesine ulaşarak yasal <strong>-1.000.000 ₺</strong> iflas sınırını aşmıştır. İcra ve İflas Kanunu gereğince şirketin mevcut operasyonel tüzel kişiliği feshedilmiş ve tasfiye protokolü icra edilmiştir.`;
+            }
+
+            const liqEl = document.getElementById('bankruptcy-liquidated-list');
+            if (liqEl) {
+                liqEl.innerHTML = `
+                    <li><strong>-${absDebt} ₺ Borç Silindi:</strong> Tasfiye masası kararıyla şirket borcu sıfırlandı.</li>
+                    <li><strong>${driverCount} Sözleşmeli Kaptan:</strong> Sözleşmeler feshedildi, şoför pazarına döndüler.</li>
+                    <li><strong>Tesisler & Şubeler:</strong> Seviye 1 Yazıhane düzeyine sıfırlandı.</li>
+                    <li><strong>Şirket Seviyesi:</strong> Seviye 1 Yazıhaneye çekildi.</li>
+                `;
+            }
+
+            const protEl = document.getElementById('bankruptcy-protected-list');
+            if (protEl) {
+                protEl.innerHTML = `
+                    <li><strong>Sürücü Ehliyeti:</strong> Ehliyet seviyeniz (${licenseLvl}. Seviye) aynen korunur.</li>
+                    <li><strong>Şahsi Garajınız:</strong> Sahip olduğunuz bireysel otobüsler haczedilemez.</li>
+                    <li><strong>Kişisel Cüzdan:</strong> Şahsi birikiminiz (${budgetStr} ₺) güvendedir.</li>
+                    <li><strong>Mesleki Tecrübe:</strong> Tamamladığınız görevler ve itibarınız silinmez.</li>
+                `;
+            }
+
+            modal.classList.remove('hidden');
+
+            const confirmBtn = document.getElementById('btn-confirm-bankruptcy');
+            if (confirmBtn) {
+                setTimeout(() => confirmBtn.focus(), 100);
+            }
+        },
+
         initFinances: function() {
             if (!this.data.finances) {
                 this.data.finances = {
@@ -3338,9 +3780,33 @@
                     <div style="color: #4ade80; font-size: 1.18rem; font-weight: bold;">
                         💰 Şirket Cirosu: ${revFormatted} ₺
                     </div>
-                    <div style="color: #fde047; font-size: 0.95rem;">
-                        🏢 Şirket Kasası (Aktarılan): <strong>${companyTreasury.toLocaleString('tr-TR')} ₺</strong>
-                    </div>
+                    ${(() => {
+                        if (companyTreasury <= -750000) {
+                            return `<div style="background: rgba(239, 68, 68, 0.25); border: 1.5px solid #ef4444; border-radius: 6px; padding: 4px 8px; color: #fca5a5; font-size: 0.92rem;">
+                                <span style="color: #ef4444; font-weight: bold;">🚨 Şirket Kasası: ${companyTreasury.toLocaleString('tr-TR')} ₺</span>
+                                <div style="font-size: 0.74rem; color: #fecaca; margin-top: 1px;">
+                                    <strong>KIRMIZI ALARM:</strong> İflasa Kalan: ${(-1000000 - companyTreasury).toLocaleString('tr-TR')} ₺
+                                </div>
+                            </div>`;
+                        } else if (companyTreasury <= -250000) {
+                            return `<div style="background: rgba(249, 115, 22, 0.2); border: 1.5px solid #f97316; border-radius: 6px; padding: 4px 8px; color: #fdba74; font-size: 0.92rem;">
+                                <span style="color: #f97316; font-weight: bold;">⚠️ Şirket Kasası: ${companyTreasury.toLocaleString('tr-TR')} ₺</span>
+                                <div style="font-size: 0.74rem; color: #fed7aa; margin-top: 1px;">
+                                    <strong>SARI ALARM:</strong> Ticari Borç Eşiği (İflas: -1.000.000 ₺)
+                                </div>
+                            </div>`;
+                        } else if (companyTreasury < 0) {
+                            return `<div style="background: rgba(234, 179, 8, 0.15); border: 1px solid #eab308; border-radius: 6px; padding: 4px 8px; color: #fef08a; font-size: 0.92rem;">
+                                <span style="color: #fde047; font-weight: bold;">🏢 Şirket Kasası: ${companyTreasury.toLocaleString('tr-TR')} ₺ (Borçlu)</span>
+                                <div style="font-size: 0.74rem; color: #cbd5e1; margin-top: 1px;">İflas Sınırı: -1.000.000 ₺</div>
+                            </div>`;
+                        } else {
+                            return `<div style="color: #fde047; font-size: 0.95rem;">
+                                🏢 Şirket Kasası: <strong>${companyTreasury.toLocaleString('tr-TR')} ₺</strong>
+                                <div style="font-size: 0.74rem; color: #94a3b8; margin-top: 1px;">İflas Sınırı: -1.000.000 ₺</div>
+                            </div>`;
+                        }
+                    })()}
                     <div style="color: #bae6fd; font-size: 0.9rem;">
                         💼 Kaptan Cüzdanı (Bize Kalan): <strong>${currentBudget.toLocaleString('tr-TR')} ₺</strong>
                     </div>
@@ -3370,6 +3836,9 @@
                     </button>
                     <button id="btn-withdraw-treasury" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(234,179,8,0.18); border: 1px solid #eab308; color: #fef08a; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Şirket Kasasından Cüzdana Para Çek">
                         📤 Kasadan Çek
+                    </button>
+                    <button id="btn-test-bankruptcy" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(239,68,68,0.18); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Resmi Asliye Ticaret Mahkemesi Tasfiye ve İflas Protokolünü Test Et (-1.000.000 ₺)">
+                        ⚖️ İflas Testi (-1M ₺)
                     </button>
                 </div>
             </div>
@@ -3424,6 +3893,24 @@
             if (btnWithdraw) {
                 btnWithdraw.addEventListener('click', () => {
                     this.transferToWallet();
+                });
+            }
+
+            const btnTestBankruptcy = card.querySelector('#btn-test-bankruptcy');
+            if (btnTestBankruptcy) {
+                btnTestBankruptcy.addEventListener('click', () => {
+                    const confirmTest = confirm(
+                        "⚖️ RESMİ İFLAS VE TASFİYE SİMÜLASYONU\n\n" +
+                        "Şirket kasasını -1.000.000 ₺ borca çekip T.C. Asliye Ticaret Mahkemesi Tasfiye Protokolünü çalıştırmak istiyor musunuz?\n\n" +
+                        "• Şirketin 1.000.000 ₺ borcu sıfırlanacaktır (Borç affı).\n" +
+                        "• Binalar Seviye 1'e dönecek, şoförler serbest kalacaktır.\n" +
+                        "• ŞAHSİ HAKLARINIZ (Kişisel cüzdanınız, garajınızdaki araçlar, ehliyetiniz) KORUNACAKTIR.\n\n" +
+                        "İflas sürecini şimdi başlatmak istiyor musunuz?"
+                    );
+                    if (confirmTest) {
+                        this.data.companyTreasury = -1000000;
+                        this.checkBankruptcyStatus();
+                    }
                 });
             }
         },
