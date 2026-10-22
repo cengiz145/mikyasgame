@@ -417,6 +417,7 @@
                 }
 
                 this.data.companyTreasury -= cost;
+                this.recordTransaction('expense', 'branches', name + ' Öz Şube Açılış Bedeli', cost);
                 this.data.terminalBranches[branchId] = {
                     type: 'owned',
                     name: name,
@@ -1021,6 +1022,7 @@
                 return;
             }
 
+            this.recordTransaction('expense', 'upgrades', inst.name + ' Seviye ' + nextLvlObj.level + ' Yatırımı', cost);
             this.data.institutions[instId] = nextLvlObj.level;
             this.saveData();
 
@@ -2691,6 +2693,234 @@
         },
 
         // Şirket Modalını Aç
+        // --- CANLI KASA DEFTERİ & OTOMATİK ÖN MUHASEBE SİSTEMİ ---
+        initFinances: function() {
+            if (!this.data.finances) {
+                this.data.finances = {
+                    totalIncome: 0,
+                    totalExpense: 0,
+                    categories: {
+                        tickets: 0,
+                        cargo: 0,
+                        dividends: 0,
+                        tips: 0,
+                        fuel: 0,
+                        maintenance: 0,
+                        catering: 0,
+                        branches: 0,
+                        upgrades: 0
+                    },
+                    ledger: []
+                };
+            }
+        },
+
+        recordTransaction: function(type, category, title, amount) {
+            this.initFinances();
+            const amt = Math.round(Number(amount) || 0);
+            if (amt <= 0) return;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+            if (type === 'income') {
+                this.data.finances.totalIncome += amt;
+                this.data.finances.categories[category] = (this.data.finances.categories[category] || 0) + amt;
+            } else {
+                this.data.finances.totalExpense += amt;
+                this.data.finances.categories[category] = (this.data.finances.categories[category] || 0) + amt;
+            }
+
+            const currentTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+            const currentWallet = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+
+            const entry = {
+                id: 'tx_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                time: timeStr,
+                type: type, // 'income' | 'expense'
+                category: category,
+                title: title,
+                amount: amt,
+                balance: currentTreasury + currentWallet
+            };
+
+            this.data.finances.ledger.unshift(entry);
+            if (this.data.finances.ledger.length > 40) {
+                this.data.finances.ledger.pop();
+            }
+
+            this.saveData();
+            if (document.getElementById('panel-comp-finances') && document.getElementById('panel-comp-finances').style.display !== 'none') {
+                this.renderFinances();
+            }
+        },
+
+        renderFinances: function() {
+            const container = document.getElementById('company-finances-container');
+            if (!container) return;
+
+            this.initFinances();
+            const fin = this.data.finances;
+            const totalInc = fin.totalIncome || 0;
+            const totalExp = fin.totalExpense || 0;
+            const netProfit = totalInc - totalExp;
+            const profitMargin = totalInc > 0 ? Math.round((netProfit / totalInc) * 100) : 0;
+
+            const cats = fin.categories || {};
+            const ticketRev = cats.tickets || 0;
+            const cargoRev = cats.cargo || 0;
+            const divRev = cats.dividends || 0;
+            const tipRev = cats.tips || 0;
+
+            const fuelExp = cats.fuel || 0;
+            const maintExp = cats.maintenance || 0;
+            const catExp = cats.catering || 0;
+            const branchExp = cats.branches || 0;
+            const upgExp = cats.upgrades || 0;
+
+            let advice = "Filonuz dengeli çalışıyor. Sefer sayısını artırarak cironuzu yükseltebilirsiniz.";
+            if (fuelExp > (totalExp * 0.35) && fuelExp > 5000) {
+                advice = "💡 <strong>Akaryakıt Masrafınız Yüksek:</strong> Otogar Yazıhanelerini Seviye 3 yaparak tüm araçlarınıza <strong>%100 BEDAVA MAZOT</strong> alabilir ve kârınızı devasa oranda artırabilirsiniz!";
+            } else if (maintExp > (totalExp * 0.30) && maintExp > 5000) {
+                advice = "💡 <strong>Tamir Masrafınız Yüksek:</strong> Kademe Binasını Seviye 2 veya 3'e büyüterek bakım faturalarınızı <strong>%65'e varan oranda</strong> ucuzlatabilirsiniz.";
+            } else if (cargoRev > 0) {
+                advice = "💡 <strong>Emanet Koli Kargo Harika Gidiyor:</strong> Açtığınız her otogar şubesi sefer başına 4-8 koli ekstra kargo kazandırır. Daha çok otogarda şube açın!";
+            }
+
+            let ledgerRows = '';
+            if (!fin.ledger || fin.ledger.length === 0) {
+                ledgerRows = '<tr><td colspan="5" style="text-align:center; padding: 18px; color: #94a3b8;">Henüz kayıtlı finansal hareket bulunmuyor. İlk seferinizi tamamladığınızda veya mazot aldığınızda kasa defterine otomatik işlenecektir.</td></tr>';
+            } else {
+                fin.ledger.forEach(tx => {
+                    const isInc = (tx.type === 'income');
+                    const badgeColor = isInc ? '#22c55e' : '#ef4444';
+                    const sign = isInc ? '+' : '-';
+                    const catIcons = {
+                        tickets: '🎫 Bilet Satışı',
+                        cargo: '📦 Emanet Kargo',
+                        dividends: '🏢 Terminal Temettüsü',
+                        tips: '🎁 Yolcu Bahşişi',
+                        fuel: '⛽ Akaryakıt',
+                        maintenance: '🛠️ Kademe & Bakım',
+                        catering: '☕ İkram Malzemesi',
+                        branches: '🏬 Yazıhane İhalesi',
+                        upgrades: '🚀 Tesis Yatırımı',
+                        other: '💼 Genel'
+                    };
+                    ledgerRows += `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.86rem;">
+                        <td style="padding: 10px 8px; color: #94a3b8;">${tx.time}</td>
+                        <td style="padding: 10px 8px; color: #cbd5e1;">${catIcons[tx.category] || tx.category}</td>
+                        <td style="padding: 10px 8px; color: #fff; font-weight: 500;">${tx.title}</td>
+                        <td style="padding: 10px 8px; font-weight: bold; color: ${badgeColor}; text-align: right;">${sign}${tx.amount.toLocaleString('tr-TR')} ₺</td>
+                        <td style="padding: 10px 8px; color: #facc15; text-align: right;">${tx.balance.toLocaleString('tr-TR')} ₺</td>
+                    </tr>
+                    `;
+                });
+            }
+
+            container.innerHTML = `
+            <!-- 1. CANLI BİLANÇO VE KÂR/ZARAR KARTLARI -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                <div style="background: rgba(34,197,94,0.12); border: 1.5px solid #22c55e; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 0.82rem; color: #86efac; font-weight: bold;">🟢 TOPLAM KASA GİRİŞİ (GELİR)</div>
+                    <div style="font-size: 1.45rem; font-weight: 800; color: #4ade80; margin-top: 4px;">+${totalInc.toLocaleString('tr-TR')} ₺</div>
+                    <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 2px;">Bilet, kargo, temettü ve bahşişler</div>
+                </div>
+
+                <div style="background: rgba(239,68,68,0.12); border: 1.5px solid #ef4444; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 0.82rem; color: #fca5a5; font-weight: bold;">🔴 TOPLAM KASA ÇIKIŞI (GİDER)</div>
+                    <div style="font-size: 1.45rem; font-weight: 800; color: #f87171; margin-top: 4px;">-${totalExp.toLocaleString('tr-TR')} ₺</div>
+                    <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 2px;">Mazot, tamir, ikram ve kiralar</div>
+                </div>
+
+                <div style="background: rgba(234,179,8,0.15); border: 1.5px solid #eab308; border-radius: 10px; padding: 14px;">
+                    <div style="font-size: 0.82rem; color: #fde047; font-weight: bold;">💵 NET ŞİRKET KÂRI</div>
+                    <div style="font-size: 1.45rem; font-weight: 800; color: ${netProfit >= 0 ? '#facc15' : '#ef4444'}; margin-top: 4px;">${netProfit >= 0 ? '+' : ''}${netProfit.toLocaleString('tr-TR')} ₺</div>
+                    <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 2px;">Kâr Marjı: <strong>%${profitMargin}</strong></div>
+                </div>
+            </div>
+
+            <!-- 2. AKILLI MALİ DANIŞMAN NOTU -->
+            <div style="background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(15,23,42,0.7)); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.88rem; color: #e2e8f0; line-height: 1.5;">
+                ${advice}
+            </div>
+
+            <!-- 3. KATEGORİ BAZLI GELİR-GİDER DAĞILIMI -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px;">
+                <div style="background: rgba(15,23,42,0.75); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 14px;">
+                    <h4 style="color: #4ade80; margin: 0 0 10px 0; font-size: 0.95rem;">📈 Nereden Para Kazandınız? (Gelirler)</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.84rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🎫 Bilet Satış Hasılatı:</span>
+                            <strong style="color: #4ade80;">+${ticketRev.toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>📦 Emanet Kargo Gelirleri:</span>
+                            <strong style="color: #fde047;">+${cargoRev.toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🏢 Otogar & Acente Temettüleri:</span>
+                            <strong style="color: #38bdf8;">+${divRev.toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🎁 Yolcu Memnuniyet Bahşişleri:</span>
+                            <strong style="color: #a7f3d0;">+${tipRev.toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(15,23,42,0.75); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 14px;">
+                    <h4 style="color: #f87171; margin: 0 0 10px 0; font-size: 0.95rem;">📉 Paranız Nereye Gitti? (Masraflar)</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.84rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>⛽ Akaryakıt (Mazot) Gideri:</span>
+                            <strong style="color: #f87171;">-${fuelExp.toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🛠️ Kademe & Bakım-Onarım:</span>
+                            <strong style="color: #fca5a5;">-${maintExp.toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>☕ İkram ve Muavin Malzemeleri:</span>
+                            <strong style="color: #fed7aa;">-${catExp.toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>🏬 Yazıhane Kiraları & Tesis Yatırımları:</span>
+                            <strong style="color: #e2e8f0;">-${(branchExp + upgExp).toLocaleString('tr-TR')} ₺</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. CANLI KASA DEFTERİ (EKSTRE) TABLOSU -->
+            <div style="background: rgba(15,23,42,0.85); border: 1.5px solid #475569; border-radius: 10px; padding: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1rem; display: flex; align-items: center; gap: 6px;">
+                        <span>📜</span> <span>Son Kasa Hareketleri (Canlı Ekstre)</span>
+                    </h4>
+                    <span style="font-size: 0.78rem; color: #94a3b8;">Otomatik güncellenir</span>
+                </div>
+                <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1.5px solid rgba(255,255,255,0.15); font-size: 0.8rem; color: #94a3b8;">
+                                <th style="padding: 8px;">Saat</th>
+                                <th style="padding: 8px;">İşlem Türü</th>
+                                <th style="padding: 8px;">Açıklama</th>
+                                <th style="padding: 8px; text-align: right;">Tutar</th>
+                                <th style="padding: 8px; text-align: right;">Kasa Sonu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${ledgerRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            `;
+        },
+
         openCompanyModal: function () {
             this.injectModal();
             const modal = document.getElementById('company-system-modal');
@@ -2774,7 +3004,10 @@
                         <button id="tab-comp-catering" class="modern-btn nav-item" style="flex: 1; min-width: 140px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
                             ☕ İkram & Muavin
                         </button>
-                        <button id="tab-comp-branches" class="modern-btn nav-item" style="flex: 1; min-width: 150px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
+                                                <button id="tab-comp-finances" class="modern-btn nav-item" style="flex: 1; min-width: 150px; padding: 9px 8px; font-weight: bold; background: rgba(34, 197, 94, 0.2); border: 1.5px solid #22c55e; color: #4ade80; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
+                            📊 Kasa Defteri & Muhasebe
+                        </button>
+<button id="tab-comp-branches" class="modern-btn nav-item" style="flex: 1; min-width: 150px; padding: 9px 8px; font-weight: bold; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; cursor: pointer; border-radius: 6px; font-size: 0.88rem;">
                             🏢 Yazıhaneler & Bilet
                         </button>
                     </div>
@@ -2849,6 +3082,12 @@
                         </div>
                     </div>
 
+                                        <!-- 10. SEKME: Kasa Defteri & Ön Muhasebe -->
+                    <div id="panel-comp-finances" style="display: none;">
+                        <div id="company-finances-container" style="max-height: 52vh; overflow-y: auto;">
+                            <!-- Dinamik doldurulacak -->
+                        </div>
+                    </div>
                     <!-- 9. SEKME: Otogar Yazıhaneleri & Bilet Fiyat Tarifesi -->
                     <div id="panel-comp-branches" style="display: none;">
                         <div id="company-branches-container" style="max-height: 52vh; overflow-y: auto;">
@@ -2882,6 +3121,7 @@
                 { tabId: 'tab-comp-drivers', panelId: 'panel-comp-drivers' },
                 { tabId: 'tab-comp-institutions', panelId: 'panel-comp-institutions' },
                 { tabId: 'tab-comp-catering', panelId: 'panel-comp-catering' },
+                { tabId: 'tab-comp-finances', panelId: 'panel-comp-finances' },
                 { tabId: 'tab-comp-branches', panelId: 'panel-comp-branches' },
                 { tabId: 'tab-comp-corporate-work', panelId: 'panel-comp-corporate-work' },
                 { tabId: 'tab-comp-market-trends', panelId: 'panel-comp-market-trends' },
