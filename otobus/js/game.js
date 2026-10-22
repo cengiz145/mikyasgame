@@ -4995,11 +4995,11 @@ const SanayiMechanic = {
             }
         } 
         else if (this.state === 'report') {
-            if (e.key === 'ArrowDown') {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
                 audio.playNav();
                 this.currentIndex = Math.min(this.currentIndex + 1, this.parts.length);
                 this.renderList();
-            } else if (e.key === 'ArrowUp') {
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
                 audio.playNav();
                 this.currentIndex = Math.max(this.currentIndex - 1, 0);
                 this.renderList();

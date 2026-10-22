@@ -520,8 +520,8 @@ const UI = {
         // Ekran açılışında sesli anons ve odaklama
         const curCity = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
         const mapAnnouncement = isFirstTime 
-            ? "Şehir seçme haritası açıldı. Yukarı ve aşağı ok tuşlarıyla 8 şehir arasında gezinebilir, açık bir şehri merkez üs yapmak için Enter tuşuna basabilirsiniz."
-            : `Şehir haritası açıldı. Aktif şehriniz ${curCity}. Yukarı ve aşağı oklarla şehirler arasında gezinebilir, açık ve kilitli şehirlerin durumunu inceleyebilirsiniz.`;
+            ? "Şehir seçme haritası açıldı. Sağ ve sol ok tuşlarıyla 8 şehir arasında gezinebilir, açık bir şehri merkez üs yapmak için Enter tuşuna basabilirsiniz."
+            : `Şehir haritası açıldı. Aktif şehriniz ${curCity}. Sağ ve sol oklarla şehirler arasında gezinebilir, açık ve kilitli şehirlerin durumunu inceleyebilirsiniz.`;
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(mapAnnouncement);
         if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(mapAnnouncement);
 
@@ -810,11 +810,15 @@ const KeyboardNav = {
         const activeContainer = this.getActiveContainer();
         if (!activeContainer) return;
         
-        const elements = activeContainer.querySelectorAll('.nav-item');
+        // Ögeler: .nav-item butonlar, kartlar, sekmeler ve görünür form elemanları
+        const elements = activeContainer.querySelectorAll('.nav-item, input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled])');
+        const seen = new Set();
         elements.forEach(el => {
+            if (seen.has(el)) return;
+            seen.add(el);
             if (el.disabled || el.classList.contains('hidden')) return;
             const style = window.getComputedStyle(el);
-            if (style.display !== 'none' && style.visibility !== 'hidden') {
+            if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
                 this.items.push(el);
             }
         });
@@ -830,7 +834,7 @@ const KeyboardNav = {
     },
     
     updateFocus: function() {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('nav-focused'));
+        document.querySelectorAll('.nav-focused').forEach(el => el.classList.remove('nav-focused'));
         
         if (this.items.length > 0) {
             if (this.currentIndex < 0) this.currentIndex = this.items.length - 1;
@@ -850,7 +854,6 @@ const KeyboardNav = {
     
     syncActiveContainerIfNeeded: function() {
         const currentContainer = this.getActiveContainer();
-        // Eğer items listemiz boşsa veya mevcut item'lar aktif kapsayıcıya ait değilse tazele
         if (this.items.length === 0 || !currentContainer || !this.items[0] || !currentContainer.contains(this.items[0])) {
             this.initForScreen();
             return true;
@@ -900,41 +903,72 @@ const KeyboardNav = {
     }
 };
 
+// Form alanı ve metin alanı tespit yardımcıları
+function isFormFieldElement(el) {
+    if (!el) return false;
+    const tag = (el.tagName || '').toUpperCase();
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    if (el.isContentEditable) return true;
+    return false;
+}
+
+function isTextInputElement(el) {
+    if (!el) return false;
+    const tag = (el.tagName || '').toUpperCase();
+    if (tag === 'TEXTAREA') return true;
+    if (el.isContentEditable) return true;
+    if (tag === 'INPUT') {
+        const type = (el.type || 'text').toLowerCase();
+        return !['button', 'submit', 'reset', 'checkbox', 'radio', 'color', 'file'].includes(type);
+    }
+    return false;
+}
+
+function getVisibleFormControls(container) {
+    const root = container || (typeof KeyboardNav !== 'undefined' && KeyboardNav.getActiveContainer ? KeyboardNav.getActiveContainer() : document.body);
+    if (!root) return [];
+    
+    const selector = 'input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), [contenteditable="true"], button:not([disabled]), .nav-item:not([disabled])';
+    const candidates = Array.from(root.querySelectorAll(selector));
+    const seen = new Set();
+    const result = [];
+    
+    candidates.forEach(el => {
+        if (seen.has(el)) return;
+        seen.add(el);
+        if (el.classList.contains('hidden') || el.disabled) return;
+        const style = window.getComputedStyle(el);
+        if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+            result.push(el);
+        }
+    });
+    
+    return result;
+}
+
+function containerHasFormFields(container) {
+    const root = container || (typeof KeyboardNav !== 'undefined' && KeyboardNav.getActiveContainer ? KeyboardNav.getActiveContainer() : document.body);
+    if (!root) return false;
+    const fields = root.querySelectorAll('input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), [contenteditable="true"]');
+    for (let el of fields) {
+        if (el.classList.contains('hidden') || el.disabled) continue;
+        const style = window.getComputedStyle(el);
+        if (style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0') {
+            return true;
+        }
+    }
+    return false;
+}
+
 window.addEventListener('keydown', (e) => {
-    // Metin kutusunda (input/textarea) klavye davranışları:
-    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
-        // Sol ve Sağ oklar metin içinde imleci hareket ettirsin
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            return;
-        }
-        // Aşağı ok ile metin kutusundan sonraki menü elemanına (ilçe listesi vb.) yumuşak geçiş
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            KeyboardNav.moveNext();
-            return;
-        }
-        // Escape dışındaki tuşlar inputun doğal yazımına bırakılır
-        if (e.key !== 'Escape') {
-            return;
-        }
-    }
-
-    // SHIFT + OK TUŞLARI: PUSULA VE 4 YÖN SİSTEMİ (Kuzey, Güney, Doğu, Batı)
-    if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
-        e.preventDefault();
-        if (typeof CompassSystem !== 'undefined' && typeof CompassSystem.handleDirection === 'function') {
-            CompassSystem.handleDirection(e.key);
-        } else if (typeof CompassNav !== 'undefined') {
-            CompassNav.handleDirection(e.key);
-        }
-        return;
-    }
-
+    const activeEl = document.activeElement;
     const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
 
-    // ESCAPE: Açıklamayı susturur ve açık olan herhangi bir modalı kapatır
+    // 1. ESCAPE: Açıklamayı susturur ve açık olan herhangi bir modalı kapatır
     if (e.key === 'Escape') {
         const modalIds = [
+            'create-company-modal',
+            'company-modal',
             'district-picker-modal',
             'mode-selection-modal',
             'intercity-dest-modal',
@@ -963,34 +997,139 @@ window.addEventListener('keydown', (e) => {
         return;
     }
 
-    // SHIFT + A: Adım adım görevin adımlarını okur (Hem menüde hem sürüşte çalışır)
+    // 2. SHIFT + OK TUŞLARI: PUSULA VE 4 YÖN SİSTEMİ (Kuzey, Güney, Doğu, Batı)
+    if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        e.preventDefault();
+        if (typeof CompassSystem !== 'undefined' && typeof CompassSystem.handleDirection === 'function') {
+            CompassSystem.handleDirection(e.key);
+        } else if (typeof CompassNav !== 'undefined') {
+            CompassNav.handleDirection(e.key);
+        }
+        return;
+    }
+
+    // 3. SHIFT + A: Adım adım görevin adımlarını okur (Hem menüde hem sürüşte çalışır)
     if (e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
         if (typeof MissionReader !== 'undefined') MissionReader.readNextStep();
         return;
     }
 
-    // A TUŞU: Görev haritasındaki açıklamaları okur (SADECE sürüşte değilken - sürüşte A sola döndürür)
-    if (!e.shiftKey && !e.ctrlKey && !e.altKey && (e.key === 'a' || e.key === 'A') && !isDriving) {
+    // 4. A TUŞU: Görev haritasındaki açıklamaları okur (SADECE sürüşte değilken ve metin kutusunda değilken)
+    if (!e.shiftKey && !e.ctrlKey && !e.altKey && (e.key === 'a' || e.key === 'A') && !isDriving && !isFormFieldElement(activeEl)) {
         e.preventDefault();
         if (typeof MissionReader !== 'undefined') MissionReader.readDescription();
         return;
     }
 
+    // 5. TAB TUŞU DAVRANIŞI:
+    // "fform alanlarında veya yazı alanlarında tap tuşları etkili olsun."
+    if (e.key === 'Tab') {
+        if (isDriving) {
+            e.preventDefault();
+            return;
+        }
+
+        const activeContainer = KeyboardNav.getActiveContainer();
+        const hasForm = containerHasFormFields(activeContainer);
+
+        // Eğer mevcut ekranda/modalda HİÇBİR form alanı yoksa Tab'ı engelle
+        // Böylece ögeler arası gezinme SADECE sağ/sol oklarla yapılır!
+        if (!hasForm) {
+            e.preventDefault();
+            return;
+        }
+
+        // Form alanı olan ekranlarda/modallarda Tab tuşu form kontrolleri arasında dolaşsın
+        const controls = getVisibleFormControls(activeContainer);
+        if (controls.length > 0) {
+            e.preventDefault();
+            let currentIndex = controls.indexOf(activeEl);
+            let nextIndex = 0;
+
+            if (currentIndex !== -1) {
+                if (e.shiftKey) {
+                    nextIndex = (currentIndex - 1 + controls.length) % controls.length;
+                } else {
+                    nextIndex = (currentIndex + 1) % controls.length;
+                }
+            } else {
+                nextIndex = e.shiftKey ? controls.length - 1 : 0;
+            }
+
+            const targetEl = controls[nextIndex];
+            if (targetEl) {
+                document.querySelectorAll('.nav-focused').forEach(el => el.classList.remove('nav-focused'));
+                targetEl.classList.add('nav-focused');
+                targetEl.focus();
+
+                if (typeof audio !== 'undefined' && audio.playNav) audio.playNav();
+
+                if (KeyboardNav.items.includes(targetEl)) {
+                    KeyboardNav.currentIndex = KeyboardNav.items.indexOf(targetEl);
+                }
+            }
+            return;
+        }
+    }
+
+    // 6. FORM ALANLARINDA VEYA YAZI ALANLARINDA DİĞER TUŞLAR:
+    if (isFormFieldElement(activeEl)) {
+        // Metin kutusunda sol ve sağ oklar metin imlecini doğal hareket ettirsin (menü öğesi atlamasın)
+        if (isTextInputElement(activeEl)) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                return; // Doğal imleç hareketine izin ver
+            }
+            if (activeEl.tagName === 'TEXTAREA') {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    return; // Çok satırlı metinde satırlar arası harekete izin ver
+                }
+            }
+            if (activeEl.type === 'number') {
+                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    return; // Sayı kutusunda artırma/azaltmaya izin ver
+                }
+            }
+            // Diğer metin kutularında Yukarı ve Aşağı oklar sayfayı kaydırmasın ve öge atlamasın
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                return;
+            }
+        }
+
+        // Seçim kutularında (SELECT): Yukarı/Aşağı oklar seçenekleri doğal değiştirsin
+        if (activeEl.tagName === 'SELECT') {
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                return; // Doğal seçenek değiştirmeye izin ver
+            }
+        }
+
+        // Enter tuşu: Doğal form davranışı
+        if (e.key === 'Enter') {
+            return;
+        }
+    }
+
+    // SÜRÜŞ ESNASINDA DİĞER OK TUŞLARI OTOBÜSÜ YÖNETİR
     if (isDriving) return;
 
-    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+    // 7. ÖGELER ARASI DOLAŞMA: SADECE SAĞ VE SOL OKLAR
+    // "ögeler arası dolaşmak için sadece sağ ve sol oklar kullanılsın"
+    if (e.key === 'ArrowRight') {
         e.preventDefault();
         KeyboardNav.moveNext();
-    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
         KeyboardNav.movePrev();
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        // Yukarı ve aşağı oklar menü/liste ögeleri arasında dolaşmasın!
+        e.preventDefault();
     } else if (e.key === 'Enter' || e.key === ' ') {
         if (e.repeat) {
             e.preventDefault();
             return;
         }
-        // NVDA veya Tab ile odaklanılan eleman buton değilse tıkla
+        // Odaklanılan eleman nav-item ise tıkla
         if (document.activeElement && document.activeElement.classList.contains('nav-item')) {
             if (document.activeElement.tagName !== 'BUTTON') { 
                 e.preventDefault();
@@ -999,8 +1138,6 @@ window.addEventListener('keydown', (e) => {
         }
     }
 });
-
-
 
 /* ==========================================================================
    PUSULA VE 4 YÖN SİSTEMİ ENTEGRASYONU (COMPASS-SYSTEM DELEGATION)
