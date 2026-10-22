@@ -403,24 +403,50 @@
         },
 
         // --- OTOGAR YAZIHANELERİ & BİLET FİYAT TARİFESİ ---
-        rentTerminalBranch: function(branchId, cost, name) {
-            const curTreasury = this.data.companyTreasury || 0;
-            if (curTreasury < cost) {
-                const failMsg = `${name} Yazıhanesini kiralamak için şirket kasasında en az ${cost.toLocaleString('tr-TR')} ₺ bulunmalıdır. (Mevcut Kasa: ${curTreasury.toLocaleString('tr-TR')} ₺).`;
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(failMsg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(failMsg, 'warning');
-                return;
-            }
-
-            this.data.companyTreasury -= cost;
+        rentTerminalBranch: function(branchId, cost, name, model = 'owned') {
             if (!this.data.terminalBranches) this.data.terminalBranches = {};
-            this.data.terminalBranches[branchId] = true;
-            this.saveData();
-            this.renderAll();
 
-            const succMsg = `Tebrikler! ${name} Şehirlerarası Otobüs Terminali Yazıhanesi kiralandı. Artık o şehirden şirketinizin otobüslerine ekstra yolcu ve bilet satışı akacaktır.`;
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(succMsg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏢 ${name} Yazıhanesi Açıldı!`, 'success');
+            if (model === 'owned') {
+                // ŞİRKETİN ÖZ ŞUBESİ (Kendi Bordrolu Müdürü & Personeli)
+                const curTreasury = this.data.companyTreasury || 0;
+                if (curTreasury < cost) {
+                    const failMsg = `${name} Öz Şubesini kiralamak için şirket kasasında en az ${cost.toLocaleString('tr-TR')} ₺ bulunmalıdır. (Mevcut Kasa: ${curTreasury.toLocaleString('tr-TR')} ₺).`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(failMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(failMsg, 'warning');
+                    return;
+                }
+
+                this.data.companyTreasury -= cost;
+                this.data.terminalBranches[branchId] = {
+                    type: 'owned',
+                    name: name,
+                    openedAt: Date.now(),
+                    managerTitle: 'Bordrolu Yazıhane Müdürü'
+                };
+                this.saveData();
+                this.renderAll();
+
+                const succMsg = `Tebrikler! ${name} Şirket Öz Şubesi açıldı. Bordrolu yazıhane müdürünüz, bilet ve peron görevlileriniz göreve başladı. Bilet ve emanet kargo gelirlerinin %100'ü doğrudan şirket kasasına akacaktır.`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(succMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏢 ${name} Öz Şubesi Açıldı!`, 'success');
+                this.addRadioLog("🏢 Yazıhane Müdürü", "👔", `${name} terminalinde öz şubemiz açıldı. Peron anonsları, bagaj fişleme ve emanet kargo kabulü başladı.`, "success");
+            } else {
+                // ACENTELİK / BAYİLİK (F1 Yetki Belgeli Yerel Esnaf) - SIFIR KİRA MALİYETİ
+                this.data.terminalBranches[branchId] = {
+                    type: 'agency',
+                    name: name,
+                    openedAt: Date.now(),
+                    commissionRate: 12, // %12 Acente Komisyonu
+                    managerTitle: 'F1 Yetkili Acente Bayi'
+                };
+                this.saveData();
+                this.renderAll();
+
+                const succMsg = `Tebrikler! ${name} terminalinde F1 yetki belgeli yerel acente ile bayilik sözleşmesi imzalandı. Sıfır kira masrafıyla tabelanız asıldı! Bilet hasılatının %88'i şirket kasasına kalır (%12 acente payı).`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(succMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🤝 ${name} F1 Acente Bayiliği Kuruldu!`, 'success');
+                this.addRadioLog("🤝 Acente Bayisi", "🏬", `${name} otogarında şirketinizin tabelasını astık. Yolculara bilet kesimi ve bagaj fişleme hizmeti vermeye başladık.`, "success");
+            }
         },
 
         setPricingMultiplier: function(mult) {
@@ -497,33 +523,67 @@
             `;
 
             branches.forEach(b => {
-                const isOwned = (b.id === 'tekirdag' || activeBranches[b.id]);
+                const branchData = activeBranches[b.id];
+                const isOwned = (b.id === 'tekirdag' || !!branchData);
+                const isAgency = branchData && (branchData.type === 'agency');
+                const isDirectBranch = isOwned && !isAgency;
 
                 html += `
-                <div style="background: rgba(30,41,59,0.7); border: 1.5px solid ${isOwned ? '#22c55e' : '#475569'}; border-radius: 10px; padding: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <div>
-                        <div style="font-size: 1.05rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
-                            <span>${isOwned ? '🏢' : '🏬'}</span>
-                            <span>${b.name}</span>
-                            ${isOwned ? '<span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 6px; background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #4ade80; font-weight: bold;">✅ AÇIK YAZIHANE</span>' : ''}
+                <div style="background: rgba(30,41,59,0.85); border: 1.8px solid ${isOwned ? (isDirectBranch ? '#22c55e' : '#38bdf8') : '#475569'}; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.25);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                        <div>
+                            <div style="font-size: 1.15rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.3rem;">${isOwned ? (isDirectBranch ? '🏢' : '🤝') : '🏬'}</span>
+                                <span>${b.name}</span>
+                            </div>
+                            <div style="color: #94a3b8; font-size: 0.85rem; margin-top: 3px;">
+                                ${b.desc}
+                            </div>
                         </div>
-                        <div style="color: #94a3b8; font-size: 0.83rem; margin-top: 3px;">
-                            ${b.desc}
-                        </div>
-                        <div style="color: #38bdf8; font-size: 0.83rem; margin-top: 2px;">
-                            ⚡ Ayrıcalık: <strong>${b.boost}</strong>
+                        <div>
+                            ${isDirectBranch ? `
+                                <span style="font-size: 0.82rem; padding: 4px 12px; border-radius: 6px; background: rgba(34,197,94,0.2); border: 1.5px solid #22c55e; color: #4ade80; font-weight: 800;">
+                                    🏢 ŞİRKET ÖZ ŞUBESİ (%100 Hasılat)
+                                </span>
+                            ` : (isAgency ? `
+                                <span style="font-size: 0.82rem; padding: 4px 12px; border-radius: 6px; background: rgba(56,189,248,0.2); border: 1.5px solid #38bdf8; color: #38bdf8; font-weight: 800;">
+                                    🤝 F1 ACENTE BAYİSİ (%88 Hasılat / %12 Bayi Payı)
+                                </span>
+                            ` : `
+                                <span style="font-size: 0.82rem; padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid #64748b; color: #94a3b8; font-weight: bold;">
+                                    Kapalı Yazıhane
+                                </span>
+                            `)}
                         </div>
                     </div>
-                    <div>
-                        ${isOwned ? `
-                            <span style="color: #4ade80; font-weight: bold; font-size: 0.9rem;">
-                                ✔️ Hizmetinizde
-                            </span>
-                        ` : `
-                            <button class="modern-btn btn-rent-branch nav-item" data-id="${b.id}" data-cost="${b.cost}" data-name="${b.name}" style="padding: 8px 18px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; box-shadow: 0 2px 10px rgba(245,158,11,0.3);">
-                                ✍️ Yazıhane Kirala (${b.cost.toLocaleString('tr-TR')} ₺)
-                            </button>
-                        `}
+
+                    <!-- 4 Günlük Yazıhane Görevi Kartı -->
+                    <div style="background: rgba(15,23,42,0.6); border-radius: 8px; padding: 10px 14px; margin: 10px 0; font-size: 0.83rem; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.06); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px;">
+                        <div>📢 <strong>Peron Koordinasyonu:</strong> ${isOwned ? '<span style="color:#4ade80;">Aktif Anons</span>' : 'Beklemede'}</div>
+                        <div>📋 <strong>Yolcu Manifestosu:</strong> ${isOwned ? '<span style="color:#4ade80;">Kaptana Teslim</span>' : 'Beklemede'}</div>
+                        <div>🏷️ <strong>Bagaj Fişleme:</strong> ${isOwned ? '<span style="color:#4ade80;">Barkodlu Fiş</span>' : 'Beklemede'}</div>
+                        <div>📦 <strong>Emanet & Koli Kargo:</strong> ${isOwned ? '<span style="color:#fde047;">Sefer Başı Gelir</span>' : 'Beklemede'}</div>
+                    </div>
+
+                    <!-- Eylem Alanı: Öz Şube vs Acente Seçimi -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.08);">
+                        <div style="color: #38bdf8; font-size: 0.85rem;">
+                            ⚡ Sefer Etkisi: <strong>${b.boost}</strong>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            ${isOwned ? `
+                                <span style="color: #4ade80; font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                                    <span>✔️</span> <span>Yazıhane ve Peron Hizmetinizde</span>
+                                </span>
+                            ` : `
+                                <button class="modern-btn btn-rent-branch nav-item" data-id="${b.id}" data-model="owned" data-cost="${b.cost}" data-name="${b.name}" style="padding: 9px 16px; background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-weight: bold; border-radius: 8px; border: 1.5px solid #22c55e; cursor: pointer; font-size: 0.88rem; box-shadow: 0 2px 10px rgba(22,163,74,0.3);" aria-label="${b.name} Öz Şubesi Aç. Kira: ${b.cost.toLocaleString('tr-TR')} ₺. Bilet ve kargo gelirinin %100'ü şirkete kalır.">
+                                    🏢 Öz Şube Aç (${b.cost.toLocaleString('tr-TR')} ₺)
+                                </button>
+                                <button class="modern-btn btn-rent-branch nav-item" data-id="${b.id}" data-model="agency" data-cost="0" data-name="${b.name}" style="padding: 9px 16px; background: linear-gradient(135deg, #0284c7, #0369a1); color: #fff; font-weight: bold; border-radius: 8px; border: 1.5px solid #38bdf8; cursor: pointer; font-size: 0.88rem; box-shadow: 0 2px 10px rgba(2,132,199,0.3);" aria-label="${b.name} F1 Acentesi ile Anlaş. 0 TL Peşin. Yerel bayi işletir, %12 komisyon alır.">
+                                    🤝 F1 Acente ile Anlaş (0 ₺ Ücretsiz Bayilik)
+                                </button>
+                            `}
+                        </div>
                     </div>
                 </div>
                 `;
@@ -548,7 +608,8 @@
                     const bId = e.currentTarget.getAttribute('data-id');
                     const cost = parseInt(e.currentTarget.getAttribute('data-cost')) || 0;
                     const name = e.currentTarget.getAttribute('data-name');
-                    this.rentTerminalBranch(bId, cost, name);
+                    const model = e.currentTarget.getAttribute('data-model') || 'owned';
+                    this.rentTerminalBranch(bId, cost, name, model);
                 });
             });
         },
