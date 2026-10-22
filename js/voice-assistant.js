@@ -537,7 +537,7 @@ class VoiceAssistant {
             </div>
 
             <!-- BÖLÜM 4: FİNANSAL AKIŞ VE KASA DEFTERİ TAKİBİ -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <h4 style="color: #facc15; margin: 0; font-size: 1.1rem;">4. Finansal Akış ve Kasa Defteri Takibi</h4>
                     <button class="modern-btn btn-read-section nav-item" data-text="Finansal Akış ve Kasa Defteri Takibi. Gerçekleşen tüm bilet satışları, kargo gelirleri, akaryakıt harcamaları ve servis masrafları sisteme anlık olarak kaydedilir. Şirket Menüsü altındaki Kasa Defteri sekmesinden toplam gelirinizi, toplam giderinizi ve net şirket kârınızı detaylı olarak inceleyebilirsiniz. Manuel hesaplama yapmanıza gerek kalmadan tüm finansal durum açık bir şekilde listelenir." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
@@ -545,6 +545,107 @@ class VoiceAssistant {
                 <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
                     Tüm bilet satışları, emanet kargo gelirleri, akaryakıt harcamaları ve bakım masrafları sisteme anlık olarak kaydedilir. Şirket Menüsü'ndeki <strong>📊 Kasa Defteri & Muhasebe</strong> sekmesinden toplam gelirinizi, masraf kalemlerinizi ve net şirket kârınızı canlı olarak takip edebilirsiniz; manuel hesaplama yapmanıza gerek yoktur.
                 </p>
+            </div>
+
+            <!-- BÖLÜM 5: BAŞARILI ŞİRKET YÖNETİMİ İÇİN TEMEL İPUÇLARI VE ALTIN TAKTİKLER -->
+            <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 8px;">
+                    <div>
+                        <h4 style="color: #38bdf8; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                            <span>💡</span> <span>5. Başarılı Şirket Yönetimi İçin Temel İpuçları (Altın Kurallar)</span>
+                        </h4>
+                        <span style="font-size: 0.82rem; color: #94a3b8;">Şirketinizi karlı tutmak, filonuzu büyütmek ve iflas etmemek için uygulamanız gereken 6 temel taktik.</span>
+                    </div>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetiminde başarılı olmanın 6 altın kuralı şunlardır. Bir: Başlangıçta şirket kurduğunuzda elli bin lira hazır kasa ve hediye bir çırak kaptan kazanırsınız. İki: Hasılat paylaşım oranını yüzde elli şirket yüzde elli kaptan olarak dengede tutun. Üç: Tesisleri doğru sırayla geliştirin; önce garaj kapasitesi, ardından bakım atölyesi ve akaryakıt istasyonuna öncelik verin. Dört: Şoförleri tek tek seçmekle uğraşmamak için Başharekât Akıllı Sefer Dağıtımı butonunu kullanın. Beş: Şirket kasasında para bittiğinde cüzdandan kasaya, şirket zenginleştiğinde ise kasadan cüzdana dilediğiniz tutarda para aktarın. Altı: Şirket yönetimi sadece Ana Menüden yapılır; sefer esnasında sürüşünüze odaklanın." style="padding: 6px 12px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ İpuçlarını Sesli Dinle
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                    
+                    <!-- İPUCU 1 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #facc15; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #fde047; font-size: 0.95rem;">🎯 1. Başlangıç Taktigi: Şirket Kurmak mı, Maaşlı Başlamak mı?</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Kendi şirketinizi kurduğunuzda sistem size <strong>50.000 ₺ hazır şirket kasası</strong> ve <strong>1 adet hediye çırak şoför</strong> (Murat Kaptan) verir. Eğer yönetim sorumluluğu almadan önce sermaye yapmak isterseniz, kurumsal bir firmada (örneğin Tekulaş veya Pamukkale) maaşlı kaptan olarak çalışıp cepten sıfır masrafla nakit biriktirebilirsiniz.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 2 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #22c55e; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #4ade80; font-size: 0.95rem;">⚖️ 2. Hasılat Paylaşım Oranı (%50 / %50 Dengesi)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Kendi kullandığınız otobüsle bitirdiğiniz seferlerin bilet gelirini Şirket Kasası ile Kişisel Cüzdanınız arasında dilediğiniz oranda paylaştırabilirsiniz. <strong>Tavsiye:</strong> Başlangıçta <strong>%50 Şirket / %50 Kaptan</strong> dengesi en idealidir. Böylece hem kişisel otobüs satın alma bütçeniz hem de bina geliştirme kasanız aynı anda büyür.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 3 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #f97316; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #fb923c; font-size: 0.95rem;">🏗️ 3. Binaları Hangi Sırayla Geliştirmelisiniz?</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>1. Garaj Sahası:</strong> Filodaki 5 araç/şoför sınırına yaklaştıkça ilk olarak garajı Seviye 2'ye yükseltin (Sınır 15'e çıkar ve araç yıpranması %25 azalır).<br>
+                            • <strong>2. Bakım Atölyesi:</strong> Tamir masraflarını erken dönemde %45-65 ucuzlatmak için erkenden terfi ettirin.<br>
+                            • <strong>3. Akaryakıt İstasyonu:</strong> Seviye 3'e ulaştığınızda tüm filoya <strong>ücretsiz mazot</strong> sağlayarak şirketin en büyük giderini sıfırlayın.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 4 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #38bdf8; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">📋 4. Başharekât (Akıllı Sefer Dağıtımı) ile Zahmetsiz Yönetim</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirket ekranının sağ üst köşesindeki <strong>"📋 Akıllı Sefer Dağıtımı"</strong> butonuna tıkladığınızda, sistem boşta ve dinlenmiş tüm şoförlerinizi o an piyasada en çok kazandıran rotalara ve uygun otobüslere tek tıkla otomatik olarak atar. Tek tek şoför seçmekle vakit kaybetmezsiniz.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 5 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #a855f7; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #c084fc; font-size: 0.95rem;">💰 5. Kasa ve Cüzdan Arası Anlık Para Transferi</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirket kasasında paranız biterse iflas etmezsiniz; <strong>"Kasaya Para Yatır"</strong> butonuyla kişisel cüzdanınızdan şirkete sermaye aktarabilirsiniz. Şirket kasası dolup taştığında ise <strong>"Cüzdana Para Çek"</strong> butonuyla şirket kârını kendi şahsi hesabınıza alıp istediğiniz lüks otobüsü satın alabilirsiniz.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 6 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #ec4899; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #f472b6; font-size: 0.95rem;">🏢 6. Yönetim Masası Sadece Ana Menüdedir</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirket Yönetimine <strong>sadece Ana Menü'deki 5. buton</strong> üzerinden erişebilirsiniz. Sefer sürüşü esnasında dikkat dağınıklığını ve kaza riskini önlemek için panel sürüş sırasında kapalıdır. Direksiyon başında sadece yolunuza odaklanın, sefer bitince ana menüye dönüp şirketinizi rahatça büyütün.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- BÖLÜM 6: SIKÇA SORULAN SORULAR VE CEVAPLARI (S.S.S) -->
+            <div style="background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>❓</span> <span>6. Sıkça Sorulan Sorular ve Hızlı Cevaplar</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetimi hakkında en çok merak edilen sorular. Bir: Şoförlerim neden sefere çıkmıyor? Seferden yorgun dönmüşlerdir. Personel Sosyal Tesisini geliştirerek dinlenme sürelerini dört kat hızlandırabilirsiniz. İki: Şirket kasasındaki parayla otobüs alabilir miyim? Evet, Cüzdana Para Çek butonuna basıp kasadaki parayı cüzdanınıza aktarın, ardından otobüs galerisinden dilediğiniz aracı satın alın. Üç: Neden yeni şoför alamıyorum? Garaj kapasiteniz dolmuştur, Garaj ve Filo Sahasını Seviye ikiye yükselterek sınırı on beşe çıkarın. Dört: Bilet fiyatlarını nasıl yükseltirim? Otogar Yazıhanelerini geliştirerek tavan bilet fiyatı çarpanını aktif edin." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ S.S.S Dinle</button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.86rem; color: #cbd5e1;">
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <strong style="color: #38bdf8;">Soru: Şoförlerim bazen sefere çıkmıyor, neden?</strong><br>
+                        <span style="color: #94a3b8;">Cevap:</span> Şoförler uzun seferlerden sonra yorulur ve dinlenme moduna geçerler. Dinlenmelerini hızlandırmak için <strong>Personel Sosyal Tesisleri (Bina 6)</strong> seviyesini yükseltin; şoförler 4 kat daha hızlı dinlenip hemen yeni sefere hazır olurlar.
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <strong style="color: #38bdf8;">Soru: Şirket kasasında biriken parayla şahsi otobüs satın alabilir miyim?</strong><br>
+                        <span style="color: #94a3b8;">Cevap:</span> Evet! Şirket panosundaki <strong>"Cüzdana Para Çek"</strong> butonuna basın ve istediğiniz tutarı şahsi cüzdanınıza aktarın. Ardından Ana Menü'deki Galeri'den dilediğiniz otobüsü satın alabilirsiniz.
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <strong style="color: #38bdf8;">Soru: Yeni bir şoför veya otobüs alamıyorum, buton pasif?</strong><br>
+                        <span style="color: #94a3b8;">Cevap:</span> Garajınızın kontenjanı dolmuştur (Başlangıçta 5 araç/şofördür). Tesisler sekmesinden <strong>Garaj ve Filo Sahası'nı Seviye 2'ye</strong> yükselterek kapasiteyi 15 araca çıkarabilirsiniz.
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <strong style="color: #38bdf8;">Soru: Bilet fiyatlarını ve yolcu kazancımı nasıl artırabilirim?</strong><br>
+                        <span style="color: #94a3b8;">Cevap:</span> <strong>Otogar Yazıhaneleri ve Bekleme Salonları'nı (Bina 5)</strong> yükseltin. Seviye 2'de bilet fiyatları %15, Seviye 3'te ise tavan fiyattan %30 daha pahalıya satılır ve her sefer sonu binlerce lira pasif temettü kazanırsınız.
+                    </div>
+                </div>
             </div>
 
         </div>
