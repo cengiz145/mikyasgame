@@ -4266,6 +4266,26 @@ const Game = {
         this.activeNPCs = [];
         
         if (isSuccess) {
+            // Otogar Yazıhanesi Emanet & Paket Kargo Geliri
+            const cargoPackagesCount = 4 + Math.floor(Math.random() * 5); // 4-8 adet emanet koli
+            const cargoPerPkg = 140; // Koli başı 140 TL
+            let cargoEarnings = cargoPackagesCount * cargoPerPkg;
+            let agencyNote = "";
+
+            if (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.terminalBranches) {
+                // Eğer acente modeli ise %12 acente payı kesilir
+                const currentCityKey = (this.currentCity || '').toLowerCase().replace(/[^a-z]/g, '');
+                const branchObj = Object.values(CompanySystem.data.terminalBranches).find(b => typeof b === 'object');
+                if (branchObj && branchObj.type === 'agency') {
+                    const agencyCommission = Math.round(cargoEarnings * 0.12);
+                    cargoEarnings -= agencyCommission;
+                    agencyNote = " (%12 F1 Bayi komisyonu düşüldü)";
+                }
+            }
+
+            this.addMoney(cargoEarnings, true);
+            const cargoMsg = `📦 Otogar Yazıhanesi Emanet & Paket Kargo: ${cargoPackagesCount} koli teslim edildi (+${cargoEarnings.toLocaleString('tr-TR')} ₺)${agencyNote}.`;
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(cargoMsg, 'success');
             // Şirket Dinlenme Tesisi Seferi Temettüsü
             if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
                 const finishResortLvl = CompanySystem.getInstitutionLevel('highway_resort');
