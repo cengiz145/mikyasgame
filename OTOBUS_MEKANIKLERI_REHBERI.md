@@ -170,7 +170,7 @@ Ağır vasıta dizel motorları düşük devirde yüksek tork üretir:
 | **D / →** | Direksiyon (Sağ) | Aracı sağa yönlendirir. |
 | **B** | Kademeli Retarder Kolu | 5 kademeli şanzıman freni (1-2-3-4-5). Balataları ısıtmadan hız keser. |
 | **Shift + B** | Retarder Sıfırla | Retarder kolunu anında boşa alır ve hava tahliye sesiyle devreden çıkar. |
-| **Space / M**| Motor / İmdat Freni | Kontağı açar/kapatır ve el frenini (Maxi körükleri) kilitler/çözer. |
+| **Space / M**| Motoru Aç / Kapat | Kontağı açar veya kapatır (Dizel motoru çalıştırır / durdurur). |
 | **G** | Sefer & Görev Durumu | Sıradaki durak, kalan mesafe, kalan durak ve varış hedefini sesli okur. |
 | **F** | Farlar | Gece ve tünel geçişlerinde aydınlatma sağlar. |
 | **L** | Havalı Korna | Ağır vasıta çift borulu havalı kornayı çalar. |
