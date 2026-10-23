@@ -160,7 +160,13 @@ class AudioSystem {
             roadAsphalt: new Howl({ src: ['sounds/freesound_road_asphalt.mp3'], loop: true, volume: 0 }),
             roadGravel: new Howl({ src: ['sounds/freesound_road_gravel.mp3'], loop: true, volume: 0 }),
             roadGravelAsphalt: new Howl({ src: ['sounds/freesound_road_gravel_asphalt.mp3'], loop: true, volume: 0 }),
-            roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 })};
+            roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 }),
+            // Freesound Gerçek Canlı Yolcu Tepki ve Homurtu Sesleri
+            passengerShock: new Howl({ src: ['sounds/freesound_passenger_shock.mp3'], volume: 0.85 }),
+            passengerBump: new Howl({ src: ['sounds/freesound_passenger_bump.mp3'], volume: 0.85 }),
+            passengerDiscontent: new Howl({ src: ['sounds/freesound_passenger_discontent.mp3'], volume: 0.80 }),
+            passengerGroan: new Howl({ src: ['sounds/freesound_passenger_groan.mp3'], volume: 0.80 }),
+            passengerMurmur: new Howl({ src: ['sounds/freesound_passenger_murmur_loop.mp3'], loop: true, volume: 0 })};
 
         this.gameSoundVolume = 1.0;
         this.musicVolume = 0.2;
@@ -1154,6 +1160,86 @@ startEngine() {
         this.sounds.crash.volume(0.35, id);
     }
 
+    // --- FREESOUND GERÇEK YOLCU AKUSTİK TEPKİLERİ ---
+    playPassengerShock() {
+        if (!this.sounds || !this.sounds.passengerShock) return;
+        const now = performance.now();
+        if (this.lastPassengerShockTime && (now - this.lastPassengerShockTime < 6000)) return;
+        this.lastPassengerShockTime = now;
+        try {
+            const id = this.sounds.passengerShock.play();
+            if (typeof this.sounds.passengerShock.stereo === 'function') {
+                this.sounds.passengerShock.stereo((Math.random() - 0.5) * 0.5, id);
+            }
+            this.sounds.passengerShock.volume(0.85, id);
+        } catch(e) {}
+    }
+
+    playPassengerBump() {
+        if (!this.sounds || !this.sounds.passengerBump) return;
+        const now = performance.now();
+        if (this.lastPassengerBumpTime && (now - this.lastPassengerBumpTime < 5000)) return;
+        this.lastPassengerBumpTime = now;
+        try {
+            const id = this.sounds.passengerBump.play();
+            if (typeof this.sounds.passengerBump.stereo === 'function') {
+                this.sounds.passengerBump.stereo((Math.random() - 0.5) * 0.5, id);
+            }
+            this.sounds.passengerBump.volume(0.85, id);
+        } catch(e) {}
+    }
+
+    playPassengerDiscontent() {
+        if (!this.sounds || !this.sounds.passengerDiscontent) return;
+        const now = performance.now();
+        if (this.lastPassengerDiscontentTime && (now - this.lastPassengerDiscontentTime < 14000)) return;
+        this.lastPassengerDiscontentTime = now;
+        try {
+            const id = this.sounds.passengerDiscontent.play();
+            if (typeof this.sounds.passengerDiscontent.stereo === 'function') {
+                this.sounds.passengerDiscontent.stereo((Math.random() - 0.5) * 0.5, id);
+            }
+            this.sounds.passengerDiscontent.volume(0.80, id);
+        } catch(e) {}
+    }
+
+    playPassengerGroan() {
+        if (!this.sounds || !this.sounds.passengerGroan) return;
+        const now = performance.now();
+        if (this.lastPassengerGroanTime && (now - this.lastPassengerGroanTime < 22000)) return;
+        this.lastPassengerGroanTime = now;
+        try {
+            const id = this.sounds.passengerGroan.play();
+            if (typeof this.sounds.passengerGroan.stereo === 'function') {
+                this.sounds.passengerGroan.stereo((Math.random() - 0.5) * 0.5, id);
+            }
+            this.sounds.passengerGroan.volume(0.80, id);
+        } catch(e) {}
+    }
+
+    updatePassengerCabinMurmur(passengerCount = 0, isDriving = false) {
+        if (!this.sounds || !this.sounds.passengerMurmur) return;
+        if (!isDriving || passengerCount <= 0) {
+            if (this.sounds.passengerMurmur.playing()) {
+                this.sounds.passengerMurmur.fade(this.sounds.passengerMurmur.volume(), 0, 600);
+                setTimeout(() => {
+                    try { if (this.sounds.passengerMurmur) this.sounds.passengerMurmur.pause(); } catch(e){}
+                }, 600);
+            }
+            return;
+        }
+
+        // Yolcu sayısına göre tatlı bir kabin içi yaşam mırıltısı
+        const targetVol = Math.min(0.12, 0.03 + (passengerCount / 60) * 0.09);
+        if (!this.sounds.passengerMurmur.playing()) {
+            this.sounds.passengerMurmur.volume(0);
+            this.sounds.passengerMurmur.play();
+            this.sounds.passengerMurmur.fade(0, targetVol, 1200);
+        } else {
+            this.sounds.passengerMurmur.fade(this.sounds.passengerMurmur.volume(), targetVol, 400);
+        }
+    }
+
     stopAllSoundEffects() {
         // 1. Zamanlayıcıları temizle (Gecikmeli başlayan motor/akbil seslerini engelle)
         if (this.enginePreviewTimer) {
@@ -1205,7 +1291,7 @@ startEngine() {
             const effectKeys = [
                 'start', 'engine', 'airBrake', 'kneeling', 'doorOpen', 'doorClose',
                 'akbilTam', 'akbilOgrenci', 'stopRequest', 'retarder', 'speedBump',
-                'horn', 'tireScreech'
+                'horn', 'tireScreech', 'passengerShock', 'passengerBump', 'passengerDiscontent', 'passengerGroan', 'passengerMurmur'
             ];
             effectKeys.forEach(k => {
                 if (this.sounds[k] && typeof this.sounds[k].stop === 'function') {

@@ -311,6 +311,91 @@ const SoundGallery = {
             }
         },
         {
+            id: 'fx_passenger_shock',
+            category: 'effect',
+            title: 'Freesound Yolcu Sert Fren İrkilme & Şok Çığlığı',
+            icon: '😱',
+            specs: 'Freesound #324895 Stüdyo Kaydı (CC0)',
+            desc: 'Sert frende veya ani savrulmada arka koltuktaki yolcuların ses tellerinden çıkan gerçek şok, irkilme ve panik çığlığı ("Hooop! N\'oluyor!").',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPassengerShock) {
+                    audio.playPassengerShock();
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_shock.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_passenger_bump',
+            category: 'effect',
+            title: 'Freesound Yolcu Kasis Zıplama & Sarsıntı İniltisi',
+            icon: '💥',
+            specs: 'Freesound #324897 Stüdyo Kaydı (CC0)',
+            desc: 'Kasise veya çukura hızlı girildiğinde koltukta zıplayan yolcuların gerçek bedensel "Ooff!", "Ah!" iniltisi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPassengerBump) {
+                    audio.playPassengerBump();
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_bump.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_passenger_discontent',
+            category: 'effect',
+            title: 'Freesound Yolcu Huzursuzluk & Homurdanma Uğultusu',
+            icon: '😠',
+            specs: 'Freesound #144903 Stüdyo Kaydı (CC0)',
+            desc: 'Sürüş konforu düştüğünde veya otobüs sıcak olduğunda arka sıralardan gelen şikayet mırıldanmaları ve homurtular.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPassengerDiscontent) {
+                    audio.playPassengerDiscontent();
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_discontent.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_passenger_groan',
+            category: 'effect',
+            title: 'Freesound Yolcu Bekleme Bıkkınlığı & "Of Ya" İç Çekişi',
+            icon: '⏱️',
+            specs: 'Freesound #150956 Stüdyo Kaydı (CC-BY)',
+            desc: 'Durakta, ışıkta veya trafikte uzun süre hareketsiz kalınca yolcuların toplu bıkkınlık homurtusu ve iç çekişi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPassengerGroan) {
+                    audio.playPassengerGroan();
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_groan.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_passenger_murmur',
+            category: 'effect',
+            title: 'Freesound Yolcu Doğal Kabin İçi Sohbet & Mırıltı Ambiyansı',
+            icon: '👥',
+            specs: 'Freesound #260122 Stüdyo Kaydı (CC0 - Kesintisiz Döngü)',
+            desc: 'Otobüste yolcu varken arkadan gelen o dertsiz, huzurlu kabin içi sohbet ve mırıltı atmosferi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.passengerMurmur) {
+                    audio.updatePassengerCabinMurmur(30, true);
+                    setTimeout(() => {
+                        audio.updatePassengerCabinMurmur(0, false);
+                    }, 8000);
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_murmur_loop.mp3');
+                    a.volume = 0.5;
+                    a.play().catch(() => {});
+                    setTimeout(() => a.pause(), 8000);
+                }
+            }
+        },
+        {
             id: 'fx_air_horn',
             category: 'effect',
             title: 'Ağır Vasıta Endüstriyel Havalı Korna',
