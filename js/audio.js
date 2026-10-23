@@ -129,16 +129,16 @@ class AudioSystem {
             select: new Howl({ src: ['sounds/menuenter21.wav'] }),
             start: new Howl({ src: [typeof AUDIO_B64 !== 'undefined' ? AUDIO_B64.start : 'sounds/Bus-contac.wav'] }),
             doorOpen: new Howl({ 
-                src: [typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorOpen ? AUDIO_B64.doorOpen : 'sounds/freesound_bus_door.mp3', 'sounds/otobüs kapı açılma sesi.mp3'],
+                src: ['sounds/bus_door_open.mp3', 'sounds/freesound_bus_door.mp3', typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorOpen ? AUDIO_B64.doorOpen : ''],
                 format: ['mp3']
             }),
             doorClose: new Howl({ 
-                src: [typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorClose ? AUDIO_B64.doorClose : 'sounds/freesound_bus_door.mp3', 'sounds/otobüs kapı kapanma sesi.mp3'],
+                src: ['sounds/bus_door_close.mp3', 'sounds/freesound_bus_door.mp3', typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorClose ? AUDIO_B64.doorClose : ''],
                 format: ['mp3']
             }),
             turnTick: new Howl({ src: ['sounds/vinebeep5.ogg'] }),
             crash: new Howl({ src: ['sounds/underwaterland.ogg'] }),
-            airHorn: new Howl({ src: ['sounds/freesound_industrial_horn.mp3', 'sounds/havalı korna.mp3'], volume: 0.90 }),
+            airHorn: new Howl({ src: ['sounds/air_horn.mp3', 'sounds/freesound_industrial_horn.mp3'], volume: 0.90 }),
             airBrake: new Howl({ src: ['sounds/freesound_air_brake.mp3'], volume: 0.90 }),
             akbilTam: new Howl({ src: ['sounds/kentkart_tam.wav', 'sounds/freesound_akbil_tam.mp3'], volume: 0.95 }),
             akbilOgrenci: new Howl({ src: ['sounds/kentkart_ogrenci.wav', 'sounds/freesound_akbil_ogrenci.mp3'], volume: 0.95 }),
@@ -163,6 +163,13 @@ class AudioSystem {
             roadGravel: new Howl({ src: ['sounds/freesound_road_gravel.mp3'], loop: true, volume: 0 }),
             roadGravelAsphalt: new Howl({ src: ['sounds/freesound_road_gravel_asphalt.mp3'], loop: true, volume: 0 }),
             roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 }),
+            roadJointHit: new Howl({ src: ['sounds/freesound_road_joint_hit.wav'], volume: 0.85 }),
+            roadJointHit1: new Howl({ src: ['sounds/freesound_road_joint_hit1.wav'], volume: 0.85 }),
+            roadJointHit2: new Howl({ src: ['sounds/freesound_road_joint_hit2.wav'], volume: 0.85 }),
+            gongTekli: new Howl({ src: ['sounds/anons_tekli_gong.wav', 'sounds/anons_tekli_gong.mp3'], volume: 0.95 }),
+            zil3lu: new Howl({ src: ['sounds/anons_3lu_zil.wav', 'sounds/anons_3lu_zil.mp3'], volume: 0.95 }),
+            rampDeploy: new Howl({ src: ['sounds/freesound_ramp_deploy.mp3'], volume: 0.85 }),
+            rampRetract: new Howl({ src: ['sounds/freesound_ramp_retract.mp3'], volume: 0.85 }),
             // Freesound Gerçek Canlı Yolcu Tepki ve Homurtu Sesleri
             passengerShock: new Howl({ src: ['sounds/freesound_passenger_shock.mp3'], volume: 0.85 }),
             passengerBump: new Howl({ src: ['sounds/freesound_passenger_bump.mp3'], volume: 0.85 }),
@@ -566,7 +573,7 @@ class AudioSystem {
         }
 
         if (!this.retarderOsc) {
-            // Gerçek Voith / ZF Hidrolik Retarder Akustiği (Çift Harmonik Türbin Islığı)
+            // Gerçek Voith / ZF Hidrolik Retarder Akustiği (Çift Harmonik Türbin Islığı + Hidrolik Türbülans)
             this.retarderOsc = this.ctx.createOscillator();
             this.retarderOsc.type = 'sine'; // Ana hidrolik girdap frekansı
             this.retarderOsc2 = this.ctx.createOscillator();
@@ -584,6 +591,34 @@ class AudioSystem {
             this.retarderGain = this.ctx.createGain();
             this.retarderGain.gain.value = 0.0;
 
+            // Retarder hidrodinamik yağ sirkülasyonu ve gövde türbülansı (Pink noise)
+            const sampleRate = this.ctx.sampleRate || 44100;
+            const bufferSize = sampleRate * 2;
+            const noiseBuf = this.ctx.createBuffer(1, bufferSize, sampleRate);
+            const output = noiseBuf.getChannelData(0);
+            let b0 = 0, b1 = 0, b2 = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                output[i] = (b0 + b1 + b2 + white * 0.5362) * 0.16;
+            }
+            this.retarderTurbulenceSource = this.ctx.createBufferSource();
+            this.retarderTurbulenceSource.buffer = noiseBuf;
+            this.retarderTurbulenceSource.loop = true;
+
+            this.retarderTurbulenceFilter = this.ctx.createBiquadFilter();
+            this.retarderTurbulenceFilter.type = 'bandpass';
+            this.retarderTurbulenceFilter.Q.value = 3.5;
+
+            this.retarderTurbulenceGain = this.ctx.createGain();
+            this.retarderTurbulenceGain.gain.value = 0.0;
+
+            this.retarderTurbulenceSource.connect(this.retarderTurbulenceFilter);
+            this.retarderTurbulenceFilter.connect(this.retarderTurbulenceGain);
+            this.retarderTurbulenceGain.connect(this.retarderGain);
+
             this.retarderOsc.connect(this.retarderFilter);
             this.retarderOsc2.connect(this.retarderFilter2);
             this.retarderFilter.connect(this.retarderGain);
@@ -594,6 +629,7 @@ class AudioSystem {
 
             this.retarderOsc.start();
             this.retarderOsc2.start();
+            this.retarderTurbulenceSource.start();
             this.wasRetarderEngaged = false;
         }
 
@@ -610,9 +646,15 @@ class AudioSystem {
 
             this.retarderFilter.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.06);
             this.retarderFilter2.frequency.setTargetAtTime(harmF, this.ctx.currentTime, 0.06);
+            if (this.retarderTurbulenceFilter) {
+                this.retarderTurbulenceFilter.frequency.setTargetAtTime(baseF * 0.75, this.ctx.currentTime, 0.06);
+            }
 
             const targetGain = Math.min(0.28, (speed / 70) * 0.28) * cabinDamping;
             this.retarderGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.10);
+            if (this.retarderTurbulenceGain) {
+                this.retarderTurbulenceGain.gain.setTargetAtTime(0.42, this.ctx.currentTime, 0.10);
+            }
 
             this.wasRetarderEngaged = true;
             const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
@@ -628,6 +670,9 @@ class AudioSystem {
                 this.wasRetarderEngaged = false;
             }
             this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.20);
+            if (this.retarderTurbulenceGain) {
+                this.retarderTurbulenceGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.20);
+            }
             const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
             if (el) el.style.display = 'none';
         }
@@ -1074,75 +1119,50 @@ startEngine() {
     // Köprü / Viyadük çelik genleşme derzi vuruntusu (tak-tak, tak-tak)
     playBridgeJoint(speed = 50) {
         if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        const gainVal = Math.min(0.28, 0.08 + (speed / 100) * 0.18);
+        const volumeFactor = Math.min(1.0, 0.4 + (speed / 100) * 0.6);
+        const rateFactor = Math.min(1.2, 0.9 + (speed / 120) * 0.3);
+        const wheelbaseDelay = Math.max(70, Math.min(260, (12 / Math.max(10, (speed / 3.6))) * 1000));
 
-        const playThump = (timeOffset, freq, panVal) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            const panner = (typeof this.ctx.createStereoPanner === 'function') ? this.ctx.createStereoPanner() : null;
-
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, now + timeOffset);
-            osc.frequency.exponentialRampToValueAtTime(45, now + timeOffset + 0.045);
-
-            gain.gain.setValueAtTime(gainVal, now + timeOffset);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.05);
-
-            osc.connect(gain);
-            if (panner) {
-                panner.pan.value = panVal;
-                gain.connect(panner);
-                panner.connect(this.environmentMixer || this.ctx.destination);
-            } else {
-                gain.connect(this.environmentMixer || this.ctx.destination);
+        // Ön aks derz darbesi (Stereo hafif sol)
+        if (this.sounds && this.sounds.roadJointHit1) {
+            try {
+                const id1 = this.sounds.roadJointHit1.play();
+                this.sounds.roadJointHit1.volume(0.80 * volumeFactor, id1);
+                this.sounds.roadJointHit1.rate(rateFactor, id1);
+                if (typeof this.sounds.roadJointHit1.stereo === 'function') this.sounds.roadJointHit1.stereo(-0.25, id1);
+            } catch(e) {}
+        }
+        // Arka aks derz darbesi (Stereo hafif sağ, dingil mesafesi gecikmesiyle)
+        setTimeout(() => {
+            if (this.sounds && this.sounds.roadJointHit2) {
+                try {
+                    const id2 = this.sounds.roadJointHit2.play();
+                    this.sounds.roadJointHit2.volume(0.90 * volumeFactor, id2);
+                    this.sounds.roadJointHit2.rate(rateFactor * 0.96, id2);
+                    if (typeof this.sounds.roadJointHit2.stereo === 'function') this.sounds.roadJointHit2.stereo(0.25, id2);
+                } catch(e) {}
             }
-            osc.start(now + timeOffset);
-            osc.stop(now + timeOffset + 0.055);
-        };
-
-        playThump(0.00, 110, -0.2);
-        playThump(0.03, 95, 0.2);
-        const wheelbaseDelay = Math.max(0.08, Math.min(0.28, 12 / Math.max(10, (speed / 3.6))));
-        playThump(wheelbaseDelay, 100, -0.3);
-        playThump(wheelbaseDelay + 0.03, 85, 0.3);
+        }, wheelbaseDelay);
     }
 
     // Asfalt Çukuru (Pothole Thump) - Hangi tekerlek girdiyse o hoparlörden sert darbe
     playPotholeThump(side = 'right', speed = 50) {
         if (!this.ctx) return;
-        const now = this.ctx.currentTime;
         const isSevere = speed > 35;
         const susp = this.activeBusSuspension || 70;
-        // Havalı körük ve bağımsız aks süspansiyon sönümlemesi:
-        // Setra (%98) ve Travego (%93)'te sert darbe yerine tok ve yumuşak hava sönümü oluşur
-        const suspDamping = Math.max(0.38, 1.0 - (((susp - 55) / 45) * 0.58));
-        const gainVal = (isSevere ? 0.40 : 0.20) * suspDamping;
-        const panVal = (side === 'left') ? -0.8 : 0.8;
+        const suspDamping = Math.max(0.40, 1.0 - (((susp - 55) / 45) * 0.55));
+        const gainVal = (isSevere ? 0.95 : 0.65) * suspDamping;
+        const panVal = (side === 'left') ? -0.75 : 0.75;
+        const rateVal = (isSevere ? 1.05 : 0.92);
 
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const panner = (typeof this.ctx.createStereoPanner === 'function') ? this.ctx.createStereoPanner() : null;
-
-        // Yüksek konforda sert testere dişi yerine pürüzsüz üçgen dalga
-        osc.type = (susp > 85) ? 'triangle' : (isSevere ? 'sawtooth' : 'triangle');
-        const startFreq = (susp > 85) ? (isSevere ? 120 : 90) : (isSevere ? 180 : 130);
-        osc.frequency.setValueAtTime(startFreq, now);
-        osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
-
-        gain.gain.setValueAtTime(gainVal, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + (isSevere ? 0.20 : 0.12));
-
-        osc.connect(gain);
-        if (panner) {
-            panner.pan.value = panVal;
-            gain.connect(panner);
-            panner.connect(this.environmentMixer || this.ctx.destination);
-        } else {
-            gain.connect(this.environmentMixer || this.ctx.destination);
+        if (this.sounds && this.sounds.roadJointHit) {
+            try {
+                const id = this.sounds.roadJointHit.play();
+                this.sounds.roadJointHit.volume(gainVal, id);
+                this.sounds.roadJointHit.rate(rateVal, id);
+                if (typeof this.sounds.roadJointHit.stereo === 'function') this.sounds.roadJointHit.stereo(panVal, id);
+            } catch(e) {}
         }
-        osc.start(now);
-        osc.stop(now + 0.2);
     }
 
     // Trafik Işıkları Akustik Sinyalizasyonu (Görme Engelliler İçin)
@@ -1958,6 +1978,12 @@ startEngine() {
     // --- PROFESYONEL AKUSTİK: DURACAK ZİLİ (STOP REQUEST BELL) ---
     playStopRequestBell() {
         this.init();
+        if (this.sounds && this.sounds.gongTekli) {
+            try {
+                this.sounds.gongTekli.play();
+                return;
+            } catch(e) {}
+        }
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
         
@@ -2189,6 +2215,13 @@ startEngine() {
     }
 
     playRampDeploy() {
+        this.init();
+        if (this.sounds && this.sounds.rampDeploy) {
+            try {
+                this.sounds.rampDeploy.play();
+                return;
+            } catch(e) {}
+        }
         try {
             if (this.currentRampAudio) {
                 this.currentRampAudio.pause();
@@ -2198,7 +2231,6 @@ startEngine() {
             aud.volume = 0.85;
             this.currentRampAudio = aud;
             aud.play().catch(e => {
-                console.warn("[Audio] Rampa iniş sesi çalınamadı, fallback synth:", e);
                 this.fallbackRampDeploy();
             });
         } catch(e) {
@@ -2207,6 +2239,13 @@ startEngine() {
     }
 
     playRampRetract() {
+        this.init();
+        if (this.sounds && this.sounds.rampRetract) {
+            try {
+                this.sounds.rampRetract.play();
+                return;
+            } catch(e) {}
+        }
         try {
             if (this.currentRampAudio) {
                 this.currentRampAudio.pause();
@@ -2216,7 +2255,6 @@ startEngine() {
             aud.volume = 0.85;
             this.currentRampAudio = aud;
             aud.play().catch(e => {
-                console.warn("[Audio] Rampa toplanma sesi çalınamadı, fallback synth:", e);
                 this.fallbackRampRetract();
             });
         } catch(e) {
@@ -2431,12 +2469,19 @@ startEngine() {
     // --- 3'LÜ ANONS ZİLİ SİSTEMİ (Dı - Dı - Dııın / 3 Zilin Birleşimi) ---
     playIBISChime(isDeepGong = false) {
         this.init();
-        if (!this.ctx) return;
-        
         if (isDeepGong) {
             this.playDeepGongChime();
             return;
         }
+
+        if (this.sounds && this.sounds.zil3lu) {
+            try {
+                this.sounds.zil3lu.play();
+                return;
+            } catch(e) {}
+        }
+
+        if (!this.ctx) return;
 
         const now = this.ctx.currentTime;
         // 3 Tane Zil: 1. Dı (E5), 2. Dı (G5), 3. Dıııın (C6 uzun sönen pirinç zil)
@@ -2483,6 +2528,12 @@ startEngine() {
     // --- TEKLİ DERİN ANONS GONGU (Dıııın) ---
     playDeepGongChime() {
         this.init();
+        if (this.sounds && this.sounds.gongTekli) {
+            try {
+                this.sounds.gongTekli.play();
+                return;
+            } catch(e) {}
+        }
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
         const baseFreq = 523.25; // C5 tok pirinç otogar gongu
