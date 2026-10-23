@@ -16,6 +16,8 @@ class VoiceAssistant {
             // 1. BÖLÜM: DİREKSİYON BAŞINA GEÇİŞ
             {
                 id: 'driving',
+                soundDesc: '🔑 Marş, Dizel Rölanti, Gaza Basma ve Havalı Fren',
+                soundIcon: '🔑',
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: '1. Motoru Çalıştırma, Gaz ve Fren',
@@ -25,6 +27,8 @@ class VoiceAssistant {
             },
             {
                 id: 'stops',
+                soundDesc: '🚪 Pnömatik Kapılar ve 💳 Akbil Kart Okuma',
+                soundIcon: '🚪',
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: '2. Duraklarda Yolcu Alma ve İndirme',
@@ -34,6 +38,8 @@ class VoiceAssistant {
             },
             {
                 id: 'compass',
+                soundDesc: '🧭 Pusula ve Yön Bildirim Çanı',
+                soundIcon: '🧭',
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: '3. Yönünü Bulma ve Pusula',
@@ -44,6 +50,8 @@ class VoiceAssistant {
 
             {
                 id: 'cockpit_navigation',
+                soundDesc: '🔔 Üç Tonlu Durak Anons Gongu',
+                soundIcon: '🔔',
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: '3.1. Akıllı Hat ve Durak Navigasyonu',
@@ -55,6 +63,8 @@ class VoiceAssistant {
             // 2. BÖLÜM: YOLCULARIMIZ VE DURAKLAR
             {
                 id: 'ramp',
+                soundDesc: '🦼 Yana Yatma (Kneeling) ve 🛹 Freesound Engelli Rampası',
+                soundIcon: '🛹',
                 stage: 2,
                 stageName: '2. Bölüm: Yolcularımız ve Duraklar',
                 title: '4. Tekerlekli Sandalyeli Yolcular ve Rampa',
@@ -64,6 +74,8 @@ class VoiceAssistant {
             },
             {
                 id: 'bumps',
+                soundDesc: '⚡ Kasis Darbe Sesi ve 🎶 Voith Retarder Düdüğü',
+                soundIcon: '⚡',
                 stage: 2,
                 stageName: '2. Bölüm: Yolcularımız ve Duraklar',
                 title: '5. Tümsekler ve Yolcu Memnuniyeti',
@@ -73,6 +85,8 @@ class VoiceAssistant {
             },
             {
                 id: 'comfort_ac',
+                soundDesc: '🪟 Freesound Elektrikli Cam Açma & Kapatma',
+                soundIcon: '🪟',
                 stage: 2,
                 stageName: '2. Bölüm: Yolcularımız ve Duraklar',
                 title: '6. Klima ve Şoför Camı',
@@ -84,6 +98,8 @@ class VoiceAssistant {
             // 3. BÖLÜM: GECE, YAĞMUR VE SEFER KURALLARI
             {
                 id: 'lights_weather',
+                soundDesc: '💡 Kokpit Far Anahtarı ve 🌧️ Silecek Süpürme',
+                soundIcon: '💡',
                 stage: 3,
                 stageName: '3. Bölüm: Gece, Yağmur ve Sefer Kuralları',
                 title: '7. Farlar, Yağmur ve Silecekler',
@@ -93,6 +109,8 @@ class VoiceAssistant {
             },
             {
                 id: 'timetable',
+                soundDesc: '⏱️ Takograf / Hat Ekranı Dijital Bildirim',
+                soundIcon: '⏱️',
                 stage: 3,
                 stageName: '3. Bölüm: Gece, Yağmur ve Sefer Kuralları',
                 title: '8. Saate Bakma ve Ön Tabela',
@@ -102,6 +120,8 @@ class VoiceAssistant {
             },
             {
                 id: 'lost_found',
+                soundDesc: '🪙 Bahşiş ve Ödül Şıngırtısı',
+                soundIcon: '🪙',
                 stage: 3,
                 stageName: '3. Bölüm: Gece, Yağmur ve Sefer Kuralları',
                 title: '9. Son Durak ve Unutulan Eşyalar',
@@ -113,6 +133,8 @@ class VoiceAssistant {
             // 4. BÖLÜM: UZUN YOL VE USTA ŞOFÖRLÜK
             {
                 id: 'luggage',
+                soundDesc: '🧳 Havalı Bagaj Kapağı Pnömatik Açılış & Kapanış',
+                soundIcon: '🧳',
                 stage: 4,
                 stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
                 title: '10. Şehirlerarası Sefer ve Valizler',
@@ -122,6 +144,8 @@ class VoiceAssistant {
             },
             {
                 id: 'badges_collection',
+                soundDesc: '🏆 Madalya & Kupa Zafer Fanfarı',
+                soundIcon: '🏆',
                 stage: 4,
                 stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
                 title: '11. 1500 Başarı ve Keşfedilen Duraklar',
@@ -131,6 +155,8 @@ class VoiceAssistant {
             },
             {
                 id: 'voice_guide',
+                soundDesc: '🎙️ Telsiz Bas-Konuş ve Mandal Sesi',
+                soundIcon: '🎙️',
                 stage: 4,
                 stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
                 title: '12. Sesli Asistanla Konuşma',
@@ -382,6 +408,11 @@ class VoiceAssistant {
                     💡 <strong>Oyun İpucu:</strong> ${lesson.tip}
                 </div>
                 <div style="font-size: 0.88rem; color: #fde047;"><strong>Tuşlar:</strong> ${lesson.keys}</div>
+                ${lesson.soundDesc ? `
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #38bdf8; background: rgba(56, 189, 248, 0.14); padding: 5px 10px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.35);">
+                    <span>🔊 <strong>Tarif Edilen Ses:</strong> ${lesson.soundDesc}</span>
+                </div>
+                ` : ''}
                 <div style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.4;">${lesson.speech}</div>
             `;
 
@@ -833,14 +864,20 @@ class VoiceAssistant {
                 tip: "Otobüsün hareket etmesi için önce motoru çalıştırmalıyız.",
                 instruction: "Otobüsümüzü çalıştırmak için klavyeden M tuşuna basınız veya aşağıdaki 'Marşa Bas' butonuna tıklayınız.",
                 targetKey: "m",
+                soundName: "🔑 Marş Motoru ve Dizel Rölanti",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playEngineStartPreview) audio.playEngineStartPreview(3.2);
+                        else if (audio.sounds && audio.sounds.start) audio.sounds.start.play();
+                    }
+                },
                 actionBtnText: "🔑 Motoru Çalıştır (M)",
                 actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
-                successFeedback: "Aferin, çok güzel! Motor çalıştı, sesini duyduk. Şimdi gaza basıp yola çıkalım.",
+                successFeedback: "Aferin, çok güzel! Motor çalıştı, dizel rölanti sesini duyduk. Şimdi gaza basıp yola çıkalım.",
                 failFeedback: "Motoru çalıştırmak için lütfen sadece M tuşuna basınız. Başarabilirsin, tekrar dene!",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.start) {
-                        try { audio.sounds.start.play(); } catch(e) {}
-                    }
+                    const s = this.guidedSteps[0];
+                    if (s && s.playSound) s.playSound();
                     this.labEngineRunning = true;
                 }
             },
@@ -851,12 +888,19 @@ class VoiceAssistant {
                 instruction: "Otobüsü sürmek ve hızlanmak için klavyeden W tuşuna (veya Yukarı Ok tuşuna) basınız.",
                 targetKey: "w",
                 altTargetKey: "arrowup",
+                soundName: "🟢 Dizel Devirlenme & Hızlanma",
+                playSound: () => {
+                    if (typeof audio !== 'undefined' && audio.playAcceleration) {
+                        audio.playAcceleration(2.8);
+                    }
+                },
                 actionBtnText: "🟢 Gaza Bas ve Hızlan (W / Yukarı Ok)",
                 actionBtnStyle: "background: linear-gradient(135deg, #16a34a, #15803d); border: 1.5px solid #4ade80;",
-                successFeedback: "Harika gidiyorsun, tebrikler! Otobüsümüz hızlandı, ilk durağımıza doğru gidiyoruz.",
+                successFeedback: "Harika gidiyorsun, tebrikler! Otobüsümüz motor devriyle hızlandı, ilk durağımıza doğru gidiyoruz.",
                 failFeedback: "Hızlanmak için lütfen W tuşuna veya Yukarı Ok tuşuna basınız. Tekrar deneyiniz!",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    const s = this.guidedSteps[1];
+                    if (s && s.playSound) s.playSound();
                     this.labSpeed = 50;
                 }
             },
@@ -867,12 +911,19 @@ class VoiceAssistant {
                 instruction: "Durağa geldik! Yolcuları sarsmadan durmak için lütfen klavyeden S tuşuna (veya Aşağı Ok tuşuna) basınız.",
                 targetKey: "s",
                 altTargetKey: "arrowdown",
+                soundName: "💨 Havalı Fren Pnömatik Tahliyesi",
+                playSound: () => {
+                    if (typeof audio !== 'undefined' && audio.playAirBrake) {
+                        audio.playAirBrake();
+                    }
+                },
                 actionBtnText: "✨ Frene Bas ve Dur (S / Aşağı Ok)",
                 actionBtnStyle: "background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981;",
-                successFeedback: "Mükemmel bir duruş, tebrikler! Çok yumuşak durdun, yolcular hiç sarsılmadı.",
+                successFeedback: "Mükemmel bir duruş, tebrikler! Havalı fren tıslamasıyla çok yumuşak durdun, yolcular hiç sarsılmadı.",
                 failFeedback: "Durmak için lütfen S tuşuna veya Aşağı Ok tuşuna basınız. Tekrar dene!",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playAirBrake) audio.playAirBrake();
+                    const s = this.guidedSteps[2];
+                    if (s && s.playSound) s.playSound();
                     this.labSpeed = 0;
                 }
             },
@@ -882,12 +933,20 @@ class VoiceAssistant {
                 tip: "Yaşlı ve engelli yolcular basamağa rahat çıksın diye otobüsü sağa eğiyoruz.",
                 instruction: "Durakta yaşlı bir yolcumuz bekliyor. Otobüsü kaldırıma doğru eğmek için klavyeden K tuşuna basınız.",
                 targetKey: "k",
+                soundName: "🦼 Kneeling Süspansiyon Yana Yatış Tıslaması",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playKneeling) audio.playKneeling(true);
+                        else if (audio.playKneelingSound) audio.playKneelingSound();
+                    }
+                },
                 actionBtnText: "⬇️ Otobüsü Sağa Eğ (K)",
                 actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
-                successFeedback: "Aferin çok doğru! Otobüs yana yattı, basamak kaldırım seviyesine indi.",
+                successFeedback: "Aferin çok doğru! Hava körükleri tıslayarak otobüs yana yattı, basamak kaldırım seviyesine indi.",
                 failFeedback: "Otobüsü eğmek için lütfen K tuşuna basınız. Tekrar dene!",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playKneeling) audio.playKneeling();
+                    const s = this.guidedSteps[3];
+                    if (s && s.playSound) s.playSound();
                     this.labKneeling = true;
                 }
             },
@@ -898,12 +957,20 @@ class VoiceAssistant {
                 instruction: "Tekerlekli sandalyeli yolcumuzun rahatça binmesi için klavyeden R tuşuna (veya U) basarak rampayı açınız.",
                 targetKey: "r",
                 altTargetKey: "u",
+                soundName: "🛹 Freesound Hidrolik Rampa İniş & Kaldırım Klankı",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playRampDeploy) audio.playRampDeploy();
+                        else if (audio.playRamp) audio.playRamp(true);
+                    }
+                },
                 actionBtnText: "🛹 Engelli Rampasını Aç (R veya U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #d97706, #b45309); border: 1.5px solid #facc15;",
-                successFeedback: "Harikasın! Rampa açıldı, yolcumuz bindi ve teşekkür etti: İyi ki varsın kaptan!",
+                successFeedback: "Harikasın! Rampa hidrolik sesle indi ve kaldırıma kilitlendi. Yolcumuz bindi: Çok teşekkür ederim kaptanım!",
                 failFeedback: "Rampayı açmak için lütfen R veya U tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
+                    const s = this.guidedSteps[4];
+                    if (s && s.playSound) s.playSound();
                     this.labRampOpen = true;
                 }
             },
@@ -914,12 +981,20 @@ class VoiceAssistant {
                 instruction: "Yolcumuz bindi. Tekrar yola çıkabilmek için lütfen tekrar R tuşuna (veya U) basarak rampayı kapatınız.",
                 targetKey: "r",
                 altTargetKey: "u",
+                soundName: "⬆️ Freesound Rampa Toplanma & Şasi Kilidi",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playRampRetract) audio.playRampRetract();
+                        else if (audio.playRamp) audio.playRamp(false);
+                    }
+                },
                 actionBtnText: "⬆️ Rampayı Kapat ve Otobüsü Doğrult (R veya U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
-                successFeedback: "Çok güzel! Rampa kapandı ve otobüsümüz doğruldu.",
+                successFeedback: "Çok güzel! Rampa motorla toplanıp şasiye kilitlendi ve körükler otobüsü doğrulttu.",
                 failFeedback: "Rampayı kapatmak için lütfen tekrar R veya U tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
+                    const s = this.guidedSteps[5];
+                    if (s && s.playSound) s.playSound();
                     this.labRampOpen = false;
                     this.labKneeling = false;
                 }
@@ -930,12 +1005,23 @@ class VoiceAssistant {
                 tip: "Durakta bekleyen diğer yolcuların binmesi için ön kapıyı açıyoruz.",
                 instruction: "Duraktaki diğer yolcuların binmesi için klavyeden 1 tuşuna basarak ön kapıyı açınız.",
                 targetKey: "1",
+                soundName: "🚪 Ön Kapı Pnömatik Açılışı & 💳 Akbil Bip Sesi",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playDoorOpenWithAkbil) audio.playDoorOpenWithAkbil();
+                        else {
+                            if (audio.playDoorOpen) audio.playDoorOpen();
+                            setTimeout(() => { if (audio.playAkbilTam) audio.playAkbilTam(); }, 750);
+                        }
+                    }
+                },
                 actionBtnText: "🚪 Ön Kapıyı Aç (1)",
                 actionBtnStyle: "background: linear-gradient(135deg, #7c3aed, #6d28d9); border: 1.5px solid #a78bfa;",
-                successFeedback: "Aferin doğru yaptın! Kapı açıldı, yolcular kartlarını basıp bindi.",
+                successFeedback: "Aferin doğru yaptın! Pnömatik kapı açıldı, yolcular kartlarını okutup bindi.",
                 failFeedback: "Ön kapıyı açmak için lütfen 1 tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playDoorOpen) audio.playDoorOpen();
+                    const s = this.guidedSteps[6];
+                    if (s && s.playSound) s.playSound();
                     this.labFrontDoor = true;
                 }
             },
@@ -945,12 +1031,19 @@ class VoiceAssistant {
                 tip: "Yolcular bindi, güvenle sürmek için kapıyı kapatıyoruz.",
                 instruction: "Yolcular bindi. Yola çıkmak için lütfen tekrar 1 tuşuna basarak kapıyı kapatınız.",
                 targetKey: "1",
+                soundName: "🔒 Ön Kapı Pnömatik Kapanış & Kauçuk Fitil",
+                playSound: () => {
+                    if (typeof audio !== 'undefined' && audio.playDoorClose) {
+                        audio.playDoorClose();
+                    }
+                },
                 actionBtnText: "🔒 Ön Kapıyı Kapat (1)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
-                successFeedback: "Tebrikler! Kapılar kapandı, artık güvenle sürebilirsin.",
+                successFeedback: "Tebrikler! Kapılar hava sesiyle kapandı ve kilitlendi, artık güvenle sürebilirsin.",
                 failFeedback: "Kapıyı kapatmak için lütfen 1 tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playDoorClose) audio.playDoorClose();
+                    const s = this.guidedSteps[7];
+                    if (s && s.playSound) s.playSound();
                     this.labFrontDoor = false;
                 }
             },
@@ -960,12 +1053,19 @@ class VoiceAssistant {
                 tip: "Yokuş inerken normal fren balataları ısınmasın diye motor frenini çekiyoruz.",
                 instruction: "Son olarak, dik yokuş inerken otobüsü yavaşlatmak için Boşluk (Space) tuşuna basarak yokuş frenini çekiniz.",
                 targetKey: " ",
+                soundName: "🎶 Voith / ZF Hidrolik Retarder Düdüğü & Yavaşlama",
+                playSound: () => {
+                    if (typeof audio !== 'undefined' && audio.playRetarder) {
+                        audio.playRetarder(3.5, 65);
+                    }
+                },
                 actionBtnText: "⚡ Yokuş Frenini Çek (Boşluk / Space)",
                 actionBtnStyle: "background: linear-gradient(135deg, #ea580c, #c2410c); border: 1.5px solid #f97316;",
-                successFeedback: "Muhteşem! Yokuş frenini çektin, otobüs yavaşladı. Bütün kontrolleri başarıyla öğrendin!",
+                successFeedback: "Muhteşem! Retarder ıslık çalarak otobüsü yavaşlattı. Bütün kontrolleri ve akustikleri başarıyla öğrendin!",
                 failFeedback: "Yokuş freni için lütfen Boşluk (Space) tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    const s = this.guidedSteps[8];
+                    if (s && s.playSound) s.playSound();
                     this.labRetarderActive = true;
                 }
             },
@@ -1078,11 +1178,16 @@ class VoiceAssistant {
                     <p style="color: #f8fafc; font-size: 1.1rem; line-height: 1.5; margin: 0; font-weight: 500;">${currentStep.instruction}</p>
                 </div>
 
-                <!-- TEK VE NET BASILACAK BUTON -->
-                <div style="text-align: center; margin-bottom: 18px;">
-                    <button id="btn-guided-action" class="modern-btn nav-item" style="padding: 16px 36px; font-size: 1.3rem; font-weight: bold; border-radius: 10px; cursor: pointer; color: #ffffff; ${currentStep.actionBtnStyle} box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);" aria-label="${currentStep.actionBtnText}">
+                <!-- TEK VE NET BASILACAK BUTON VE SES TESTİ -->
+                <div style="display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 18px;">
+                    <button id="btn-guided-action" class="modern-btn nav-item" style="padding: 16px 32px; font-size: 1.25rem; font-weight: bold; border-radius: 10px; cursor: pointer; color: #ffffff; ${currentStep.actionBtnStyle} box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);" aria-label="${currentStep.actionBtnText}">
                         ${currentStep.actionBtnText}
                     </button>
+                    ${currentStep.soundName ? `
+                    <button id="btn-guided-listen-sound" class="modern-btn nav-item" style="padding: 14px 22px; font-size: 1.02rem; font-weight: bold; border-radius: 10px; cursor: pointer; color: #38bdf8; background: rgba(56, 189, 248, 0.18); border: 2px solid #38bdf8; display: inline-flex; align-items: center; gap: 8px;" aria-label="Tarif edilen sesi dinle: ${currentStep.soundName}">
+                        🔊 Sesi Dinle: ${currentStep.soundName}
+                    </button>
+                    ` : ''}
                 </div>
 
                 <!-- GERİ BİLDİRİM / TEBRİK YA DA YOL GÖSTERME KUTUSU -->
@@ -1105,6 +1210,16 @@ class VoiceAssistant {
         if (btnAction) {
             btnAction.onclick = () => {
                 this.executeGuidedSuccess();
+            };
+        }
+
+        const btnListenSound = document.getElementById('btn-guided-listen-sound');
+        if (btnListenSound && currentStep.playSound) {
+            btnListenSound.onclick = () => {
+                currentStep.playSound();
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast(`🔊 Çalıyor: ${currentStep.soundName}`, 'info');
+                }
             };
         }
 
@@ -1140,30 +1255,39 @@ class VoiceAssistant {
         const currentStep = this.guidedSteps[this.guidedStep - 1];
         if (!currentStep) return;
 
+        // Adımın mekanik sesi hemen çalsın
         if (currentStep.execute) currentStep.execute();
 
         this.guidedFeedbackText = "🎉 " + currentStep.successFeedback;
         this.guidedFeedbackType = "success";
 
         if (typeof audio !== 'undefined') {
-            if (audio.playSuccess) audio.playSuccess();
-            if (audio.speak) audio.speak(currentStep.successFeedback);
-            if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(currentStep.successFeedback);
+            // Mekanik sesin rahatça duyulabilmesi için tebrik mesajını 500ms sonraya zamanla
+            setTimeout(() => {
+                if (audio.speak) audio.speak(currentStep.successFeedback);
+                if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(currentStep.successFeedback);
+            }, 550);
         }
         if (typeof UI !== 'undefined' && UI.showToast) {
             UI.showToast("Aferin! Doğru yaptınız. Sıradaki adıma geçiliyor...", "success");
         }
 
-        // 1.8 saniye sonra sıradaki adıma yumuşak geçiş
+        // Sıradaki adıma yumuşak geçiş
         setTimeout(() => {
             this.guidedStep++;
             this.guidedFeedbackText = "";
             this.renderInteractiveLab();
             const nextStep = this.guidedSteps[this.guidedStep - 1];
-            if (nextStep && !nextStep.isGraduation && typeof audio !== 'undefined' && audio.speak) {
-                setTimeout(() => audio.speak(nextStep.instruction), 600);
+            if (nextStep && !nextStep.isGraduation && typeof audio !== 'undefined') {
+                setTimeout(() => {
+                    if (audio.speak) audio.speak(nextStep.instruction);
+                    // Sıradaki adımın sesini de oyuncuya önizlet
+                    if (nextStep.playSound) {
+                        setTimeout(() => nextStep.playSound(), 900);
+                    }
+                }, 600);
             }
-        }, 1800);
+        }, 2200);
     }
 
     // Yanlış Tuşa Basıldığında Nazik ve Teşvik Edici Telkin
@@ -1282,14 +1406,113 @@ class VoiceAssistant {
         }
     }
 
+
+    // --- EĞİTİMDE TARİF EDİLEN SESLERİ BİREBİR ÇALMA SİSTEMİ ---
+    playLessonSoundEffect(lessonId) {
+        if (typeof audio === 'undefined') return;
+        switch(lessonId) {
+            case 'driving':
+                // 1. Motor marş + rölanti, ardından gaz ve fren
+                if (audio.playEngineStartPreview) audio.playEngineStartPreview(2.4);
+                setTimeout(() => {
+                    if (audio.playAcceleration) audio.playAcceleration(2.0);
+                }, 2500);
+                setTimeout(() => {
+                    if (audio.playAirBrake) audio.playAirBrake();
+                }, 4600);
+                break;
+            case 'stops':
+                // 2. Havalı kapı açılışı, Akbil kart okutma ve kapı kapanışı
+                if (audio.playDoorOpen) audio.playDoorOpen();
+                setTimeout(() => {
+                    if (audio.playAkbilTam) audio.playAkbilTam();
+                }, 1000);
+                setTimeout(() => {
+                    if (audio.playDoorClose) audio.playDoorClose();
+                }, 2200);
+                break;
+            case 'compass':
+                // 3. Yön & pusula akustik çanı
+                if (audio.playStopRequestBell) audio.playStopRequestBell();
+                break;
+            case 'cockpit_navigation':
+                // 3.1 Üç tonlu durak/istasyon gong anonsu
+                if (audio.playTerminalChime) audio.playTerminalChime();
+                break;
+            case 'ramp':
+                // 4. Kaldırıma yatma (kneeling), Freesound rampa iniş ve toplanma
+                if (audio.playKneeling) audio.playKneeling(true);
+                setTimeout(() => {
+                    if (audio.playRampDeploy) audio.playRampDeploy();
+                }, 1200);
+                setTimeout(() => {
+                    if (audio.playRampRetract) audio.playRampRetract();
+                }, 5200);
+                break;
+            case 'bumps':
+                // 5. Kasis darbe sesi ve retarder yavaşlama düdüğü
+                if (audio.playRoadBump) audio.playRoadBump();
+                setTimeout(() => {
+                    if (audio.playRetarder) audio.playRetarder(3.0, 45);
+                }, 600);
+                break;
+            case 'comfort_ac':
+                // 6. Freesound sol cam açılma ve fitil kapanma
+                if (audio.playWindowSound) audio.playWindowSound(true);
+                setTimeout(() => {
+                    if (audio.playWindowSound) audio.playWindowSound(false);
+                }, 2500);
+                break;
+            case 'lights_weather':
+                // 7. Kokpit far anahtarı, yağmur ve silecek süpürme
+                if (audio.playSwitchClick) audio.playSwitchClick();
+                setTimeout(() => {
+                    if (audio.playWiperCycle) audio.playWiperCycle();
+                }, 600);
+                break;
+            case 'timetable':
+                // 8. Takograf ve hat tabelası dijital bildirim sesi
+                if (audio.playTachographBeep) audio.playTachographBeep();
+                break;
+            case 'lost_found':
+                // 9. Bahşiş ve eşya bulma şıngırtısı
+                if (audio.playCoinSound) audio.playCoinSound();
+                break;
+            case 'luggage':
+                // 10. Havalı bagaj kapağı açılma ve kapanma
+                if (audio.playLuggageBays) audio.playLuggageBays(true);
+                setTimeout(() => {
+                    if (audio.playLuggageBays) audio.playLuggageBays(false);
+                }, 2200);
+                break;
+            case 'badges_collection':
+                // 11. Madalya / kupa zafer melodisi
+                if (audio.playSuccess) audio.playSuccess();
+                break;
+            case 'voice_guide':
+                // 12. Telsiz bas-konuş ve mandal bırakma sesi
+                if (audio.playRadioTalk) audio.playRadioTalk(true);
+                setTimeout(() => {
+                    if (audio.playRadioTalk) audio.playRadioTalk(false);
+                }, 1200);
+                break;
+            default:
+                if (audio.playSelect) audio.playSelect();
+                break;
+        }
+    }
+
     playLesson(lessonId) {
         const lesson = this.tutorialLessons.find(l => l.id === lessonId);
         if (!lesson) return;
         if (typeof audio !== 'undefined') {
-            if (audio.playSelect) audio.playSelect();
             audio.stopSpeech();
+            this.playLessonSoundEffect(lessonId);
             const fullText = `${lesson.stageName}. ${lesson.title}. ${lesson.speech}`;
-            audio.speak(fullText);
+            // Ses efektinin girişiyle birlikte anlatım başlasın
+            setTimeout(() => {
+                audio.speak(fullText);
+            }, 300);
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast(`🔊 ${lesson.title}`, 'info');
             }
