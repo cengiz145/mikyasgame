@@ -1615,7 +1615,13 @@ class VoiceAssistant {
             advice = "Efsane bir Kaptansın! Şehirlerarası uzun yollarda tecrübenle parlıyorsun. Tüm otobüsler emrinde!";
         }
 
-        const xpPercent = Math.min(100, Math.round((xp / nextXP) * 100));
+        const prevXP = (typeof Game !== 'undefined' && Game.LEVEL_XP_THRESHOLDS)
+            ? (level > 20 ? 71000 + ((level - 20) * 10000) : (Game.LEVEL_XP_THRESHOLDS[level - 1] || 0))
+            : 0;
+        const levelRange = Math.max(1, nextXP - prevXP);
+        const progressInLevel = Math.max(0, xp - prevXP);
+        const xpPercent = Math.min(100, Math.round((progressInLevel / levelRange) * 100));
+        const remainingXP = Math.max(0, nextXP - xp);
 
         seruvenContainer.innerHTML = `
             <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(2, 132, 199, 0.35)); border: 2px solid #38bdf8; border-radius: 12px; padding: 22px;">
@@ -1662,7 +1668,7 @@ class VoiceAssistant {
         const btnRead = document.getElementById('btn-seruven-read-speech');
         if (btnRead) {
             btnRead.addEventListener('click', () => {
-                const speechText = `Şoförlük durumunuz. Seviyeniz ${level}, ${title}. Toplam tecrübeniz ${xp} puan. Gelecek seviye için ${nextXP} puan gerekiyor. Tamamlanan sefer sayısı ${tasks}. ${unlockTeaser}. ${advice}`;
+                const speechText = `Şoförlük durumunuz. Seviyeniz ${level}, ${title}. Toplam tecrübeniz ${xp} puan. Seviye ${level + 1}'e kalan ${remainingXP} puan. Tamamlanan sefer sayısı ${tasks}. ${unlockTeaser}. ${advice}`;
                 if (typeof audio !== 'undefined' && audio.speak) {
                     audio.stopSpeech();
                     audio.speak(speechText);
@@ -1943,7 +1949,9 @@ class VoiceAssistant {
             const level = Game.licenseLevel || 1;
             const xp = Game.playerXP || 0;
             const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
-            audio.speak(`Şoförlük durumunuz açıldı. Şu an Seviye ${level}, ${title} durumundasınız. Toplam tecrübeniz ${xp} puandır.`);
+            const nextXP = (typeof Game.getNextLevelXP === 'function') ? Game.getNextLevelXP(level) : 250;
+            const remaining = Math.max(0, nextXP - xp);
+            audio.speak(`Şoförlük durumunuz açıldı. Şu an Seviye ${level}, ${title} durumundasınız. Toplam tecrübeniz ${xp} puandır. Seviye ${level + 1}'e kalan: ${remaining} puan.`);
             return;
         }
 

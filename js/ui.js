@@ -350,7 +350,9 @@ const UI = {
 
         const currentXP = (typeof Game !== 'undefined' && Game.playerXP) ? Game.playerXP : 0;
         const currentLvl = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : (licenseLevel || 1);
-        const prevThreshold = (typeof Game !== 'undefined' && Game.LEVEL_XP_THRESHOLDS) ? (Game.LEVEL_XP_THRESHOLDS[currentLvl - 1] || 0) : 0;
+        const prevThreshold = (typeof Game !== 'undefined' && Game.LEVEL_XP_THRESHOLDS)
+            ? (currentLvl > 20 ? 71000 + ((currentLvl - 20) * 10000) : (Game.LEVEL_XP_THRESHOLDS[currentLvl - 1] || 0))
+            : 0;
         const nextThreshold = (typeof Game !== 'undefined' && Game.getNextLevelXP) ? Game.getNextLevelXP(currentLvl) : 1000;
 
         const levelRange = Math.max(1, nextThreshold - prevThreshold);
@@ -359,6 +361,7 @@ const UI = {
 
         if (xpText) {
             xpText.innerText = `${currentXP.toLocaleString('tr-TR')} / ${nextThreshold.toLocaleString('tr-TR')} XP (%${percent})`;
+            xpText.title = `Mevcut Seviye İlerlemesi: ${progressInLevel.toLocaleString('tr-TR')} / ${levelRange.toLocaleString('tr-TR')} XP (%${percent}) | Seviye ${currentLvl + 1}'e kalan: ${Math.max(0, nextThreshold - currentXP).toLocaleString('tr-TR')} XP`;
         }
         if (xpFill) {
             xpFill.style.width = `${percent}%`;

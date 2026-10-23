@@ -82,8 +82,9 @@ const StopDiscovery = {
             }
 
             // Keşif Primi (+50 ₺ ve +25 XP tecrübe)
-            if (typeof Game !== 'undefined' && Game.addMoney) {
-                Game.addMoney(50);
+            if (typeof Game !== 'undefined') {
+                if (Game.addMoney) Game.addMoney(50, true);
+                if (Game.addXP) Game.addXP(25, "Yeni Durak Keşfi");
             }
 
             // Rozet kontrolleri

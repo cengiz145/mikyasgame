@@ -4,6 +4,7 @@ try {
         if (localStorage.getItem('sim_season_level1') !== 'true') {
             localStorage.setItem('sim_season_level1', 'true');
             localStorage.setItem('licenseLevel', '1');
+            localStorage.setItem('playerXP', '0');
             localStorage.setItem('completedTasks', '0');
             localStorage.setItem('unlockedCities', JSON.stringify(["Tekirdağ"]));
             localStorage.setItem('merkezUs', 'Tekirdağ');
@@ -163,12 +164,17 @@ const Game = {
                 break;
             }
         }
+        if (xp >= 71000) {
+            const extra = Math.floor((xp - 71000) / 10000);
+            lvl = Math.min(100, 20 + extra);
+        }
         return lvl;
     },
 
     getNextLevelXP: function(currentLevel) {
         if (currentLevel >= this.LEVEL_XP_THRESHOLDS.length) {
-            return this.LEVEL_XP_THRESHOLDS[this.LEVEL_XP_THRESHOLDS.length - 1] + 10000;
+            const extraLevels = currentLevel - this.LEVEL_XP_THRESHOLDS.length + 1;
+            return this.LEVEL_XP_THRESHOLDS[this.LEVEL_XP_THRESHOLDS.length - 1] + (extraLevels * 10000);
         }
         return this.LEVEL_XP_THRESHOLDS[currentLevel];
     },
@@ -177,8 +183,7 @@ const Game = {
         if (currentLevel < 2) return "Seviye 2'de Çevik Isuzu Novo Lux açılacak!";
         if (currentLevel < 3) return "Seviye 3'te BMC Neocity 10M açılacak!";
         if (currentLevel < 5) return "Seviye 5'te Mercedes Conecto Solo açılacak!";
-        if (currentLevel < 8) return "Seviye 8'de 18 Metre Körüklü Conecto açılacak!";
-        if (currentLevel < 8) return "Seviye 8'de Efsane Mercedes O 403 açılacak!";
+        if (currentLevel < 8) return "Seviye 8'de 18 Metre Körüklü Conecto ve Efsane O 403 açılacak!";
         if (currentLevel < 10) return "Seviye 10'da Mercedes Travego ve İlçe Karayolları açılacak!";
         if (currentLevel < 12) return "Seviye 12'de Mercedes Tourismo açılacak!";
         if (currentLevel < 14) return "Seviye 14'te Temsa Safir Plus ve MAN Lion's Coach açılacak!";
@@ -450,11 +455,18 @@ const Game = {
             this.rampUsedInRoute = true;
             if (typeof audio !== 'undefined' && typeof audio.playRampDeploy === 'function') audio.playRampDeploy();
             if (rampEl) rampEl.style.display = 'inline-block';
-            this.addXP(30);
-            const msg = "Tekerlekli sandalye rampası açıldı. Yolcu güvenle biniyor: Çok teşekkür ederim kaptanım, iyi görevler. Kapatmak için tekrar U tuşuna basınız.";
+            let xpGained = false;
+            if (this.hasWheelchairPassengerAtStop && !this.rampXPAwardedThisStop) {
+                this.rampXPAwardedThisStop = true;
+                this.addXP(30, "Tekerlekli Sandalye Rampası Hizmeti");
+                xpGained = true;
+            }
+            const msg = xpGained
+                ? "Tekerlekli sandalye rampası açıldı. Yolcu güvenle biniyor: Çok teşekkür ederim kaptanım, iyi görevler. Kapatmak için tekrar U tuşuna basınız."
+                : "Tekerlekli sandalye rampası açıldı. Kapatmak için tekrar U tuşuna basınız.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("♿ Rampa Açıldı (+30 XP)", "info");
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(xpGained ? "♿ Rampa Açıldı (+30 XP)" : "♿ Rampa Açıldı", "info");
         } else {
             if (typeof audio !== 'undefined' && typeof audio.playRampRetract === 'function') audio.playRampRetract();
             if (rampEl) rampEl.style.display = 'none';
@@ -1132,8 +1144,8 @@ const Game = {
         return careerTitle;
     },
 
-    completeTask: function(comfortMsg, timingRewardMsg) {
-        if (!this.activeRouteId) return;
+    completeTask: function(comfortMsg, timingRewardMsg, punctualityScore = 100) {
+        if (!this.activeRouteId) return 0;
 
         const stopsCount = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops.length : 6;
         
@@ -1145,19 +1157,32 @@ const Game = {
             earnedXP += 75;
             bonusDetails.push("İpek Fren & Üstün Konfor (+75 XP)");
         } else if (this.passengerComfort >= 75) {
-            earnedXP += 35;
+            earnedXP += 40;
+            bonusDetails.push("Yolcu Konfor Primi (+40 XP)");
         }
 
-        // 2. Erişilebilirlik & Engelli Rampası Primi
-        if (this.isRampDeployed || this.hasWheelchairPassengerAtStop) {
+        // 2. Dakiklik & Sefer Sadakati Primi
+        if (punctualityScore >= 90) {
+            earnedXP += 40;
+            bonusDetails.push("Dakiklik Primi (+40 XP)");
+        }
+
+        // 3. Erişilebilirlik & Engelli Rampası Primi
+        if (this.isRampDeployed || this.hasWheelchairPassengerAtStop || this.rampUsedInRoute) {
             earnedXP += 50;
             bonusDetails.push("Erişilebilirlik Primi (+50 XP)");
         }
 
-        // 3. Gece Seferi Primi
+        // 4. Gece Seferi Primi
         if (this.clockMinutes < 360 || this.clockMinutes >= 1140) {
             earnedXP += 60;
             bonusDetails.push("Gece Nöbet Primi (+60 XP)");
+        }
+
+        // 5. Şehirlerarası Sefer Primi
+        if (this.activeRouteData && this.activeRouteData.isIntercity) {
+            earnedXP += 100;
+            bonusDetails.push("Şehirlerarası Sefer Primi (+100 XP)");
         }
 
         const oldLevel = this.licenseLevel;
@@ -1189,6 +1214,7 @@ const Game = {
 
         // WAAW! KADEMELİ SİSTEM AÇILIŞLARI VE KUTLAMA KARTI
         this.triggerProgressiveWowAnnouncement(this.completedTasks);
+        return earnedXP;
     },
 
     triggerProgressiveWowAnnouncement: function(completed) {
@@ -1274,14 +1300,28 @@ const Game = {
         }
     },
 
-        addXP: function(amount) {
+    addXP: function(amount, reason = null) {
         if (!amount || amount <= 0) return;
+        const oldLevel = this.licenseLevel;
         this.playerXP = (this.playerXP || 0) + amount;
         const newLevel = this.calculateLevelFromXP(this.playerXP);
-        if (newLevel > this.licenseLevel) {
-            this.licenseLevel = newLevel;
-        }
+        this.licenseLevel = Math.max(oldLevel, newLevel);
         this.saveData();
+
+        if (newLevel > oldLevel) {
+            if (typeof audio !== 'undefined' && audio.playSuccess) {
+                try { audio.playSuccess(); } catch(e) {}
+            }
+            const lvlMsg = `Tebrikler kaptan! ${amount} tecrübe puanı kazandınız ve Seviye ${newLevel}'e terfi ettiniz! Yeni unvanınız: ${this.getLicenseTitle()}.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(lvlMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! (${this.getLicenseTitle()})`, "success");
+            }
+            if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
+                UI.updateTitleScreenButtons();
+            }
+        }
+
         if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
             UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
         }
@@ -4342,6 +4382,7 @@ const Game = {
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(rampNotice);
         }
 
+        this.rampXPAwardedThisStop = false;
         this.isDriving = false;
         if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
         this.speed = 0;
@@ -4885,9 +4926,8 @@ const Game = {
                 comfortBonus = baseBonus + tipBonusAmt;
                 this.addMoney(comfortBonus);
                 if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'tips', 'Yolcu Konfor & Bahşiş Primi', comfortBonus);
-                this.addXP(40);
                 const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${curBus.brand} Lüks Kabin Bonusu)` : "";
-                comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote} ve 40 tecrübe puanı kazandınız.`;
+                comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote}.`;
             }
             
             const resComfort = document.getElementById('res-comfort');
@@ -4906,8 +4946,7 @@ const Game = {
             let timingRewardMsg = "";
             if (punctualityScore >= 90) {
                 this.addMoney(150);
-                this.addXP(40);
-                timingRewardMsg = " Sefer saatine yüksek sadakat ve dakiklik primi: 150 Lira ve 40 tecrübe puanı kazandınız.";
+                timingRewardMsg = " Sefer saatine yüksek sadakat ve dakiklik primi: 150 Lira.";
             }
 
             // Sesli anons ve sonuç raporu completeTask tarafından tek seferde okunur
@@ -4921,7 +4960,7 @@ const Game = {
                 }
             }
 
-            this.completeTask(comfortMsg, timingRewardMsg); // İlerlemeyi kaydet ve sonuç anonsunu yap
+            const actualEarnedXP = this.completeTask(comfortMsg, timingRewardMsg, punctualityScore); // İlerlemeyi kaydet ve sonuç anonsunu yap
 
             // ŞOFÖR LİYAKAT VE ROZET SİSTEMİ KONTROLÜ
             if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkAfterRoute === 'function') {
@@ -4941,7 +4980,7 @@ const Game = {
                     totalDrivingSeconds: this.totalDrivingSeconds || 0,
                     retarderUsed: !!this.retarderUsedInRoute,
                     selectedBus: curBusActive,
-                    earnedXP: 100 + ((this.activeRouteData?.stops?.length || 6) * 15) + (this.passengerComfort >= 90 ? 75 : (this.passengerComfort >= 75 ? 35 : 0)) + (this.isRampDeployed ? 50 : 0),
+                    earnedXP: actualEarnedXP,
                     earnedMoney: cargoEarnings + (comfortBonus || 0) + (finishDiv || 0) + (this.sessionMoney || 0),
                     routeDistanceKm: (this.activeRouteData && this.activeRouteData.totalDistanceKm) ? this.activeRouteData.totalDistanceKm : Math.max(1, Math.round((this.totalDistanceCovered || 8000) / 1000)),
                     isIntercity: !!(this.activeRouteData && this.activeRouteData.isIntercity),
@@ -5157,10 +5196,19 @@ const Game = {
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
                     return;
                 }
+                const now = Date.now();
+                if (this.lastTeaTime && (now - this.lastTeaTime < 25000)) {
+                    const waitSec = Math.ceil((25000 - (now - this.lastTeaTime)) / 1000);
+                    const coolMsg = `Çayınızı henüz taze yudumladınız kaptanım. Yeni bir çay demlemek için ${waitSec} saniye bekleyiniz.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(coolMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(coolMsg, "info");
+                    return;
+                }
+                this.lastTeaTime = now;
                 if (typeof audio !== 'undefined' && typeof audio.playTeaPourAndSip === 'function') {
                     audio.playTeaPourAndSip(() => {
                         this.passengerComfort = Math.min(100, (this.passengerComfort || 90) + 5);
-                        this.addXP(15);
+                        this.addXP(15, "Sıcak Demli Çay Molası");
                         const teaMsg = "Sıcak demli çay yudumlandı. Afiyet olsun kaptanım (+15 tecrübe, +5 konfor).";
                         if (typeof audio.speak === 'function') audio.speak(teaMsg);
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("☕ Çay Yudumlandı (+15 XP, +5 Konfor)", "success");

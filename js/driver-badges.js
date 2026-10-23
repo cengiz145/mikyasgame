@@ -971,7 +971,7 @@ const DriverBadges = {
         lifetime.totalPassengers += carried;
         
         const xpEarned = (typeof stats.earnedXP === 'number') ? stats.earnedXP : 150;
-        lifetime.totalXP += xpEarned;
+        lifetime.totalXP = Math.max(lifetime.totalXP || 0, (typeof Game !== 'undefined' && Game.playerXP) ? Game.playerXP : ((lifetime.totalXP || 0) + xpEarned));
 
         const moneyEarned = (typeof stats.earnedMoney === 'number') ? stats.earnedMoney : 100;
         lifetime.budgetEarned += moneyEarned;
