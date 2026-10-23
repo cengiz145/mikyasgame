@@ -4812,17 +4812,6 @@ const Game = {
             return;
         }
 
-        if (k === 'o') {
-            e.preventDefault();
-            if (typeof audio !== 'undefined' && typeof audio.toggleDriverWindow === 'function') {
-                const isOpen = audio.toggleDriverWindow();
-                const winMsg = isOpen ? "Kaptan camı açıldı. Dış sesler ve serin hava kokpite doluyor." : "Kaptan camı kapatıldı. Kabin yalıtımı sağlandı.";
-                if (typeof audio.speak === 'function') audio.speak(winMsg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(isOpen ? "🪟 Sol Cam Açıldı" : "🪟 Sol Cam Kapatıldı", "info");
-            }
-            return;
-        }
-
         if (k === 'u') {
             e.preventDefault();
             this.toggleWheelchairRamp();

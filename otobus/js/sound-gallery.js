@@ -252,7 +252,7 @@ const SoundGallery = {
             title: 'Freesound Kaptan Camı Açılma (Elektrikli Motor)',
             icon: '🪟',
             specs: 'Freesound scriotxstudios #354003 Stüdyo Kaydı',
-            desc: 'Kaptan sol penceresinin elektrikli motor ve ray sesi eşliğinde aşağı inişi (Kısayol: O tuşu).',
+            desc: 'Kaptan sol penceresinin elektrikli motor ve ray sesi eşliğinde aşağı inişi (Kısayol: Home tuşu).',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playWindowSound) {
                     audio.playWindowSound(true);
@@ -268,7 +268,7 @@ const SoundGallery = {
             title: 'Freesound Kaptan Camı Kapanma & Akustik Yalıtım',
             icon: '🪟',
             specs: 'Freesound scriotxstudios #354002 Stüdyo Kaydı',
-            desc: 'Kaptan sol penceresinin yukarı kapanışı ve kauçuk fitille kabin yalıtımı kilitleme sesi (Kısayol: O tuşu).',
+            desc: 'Kaptan sol penceresinin yukarı kapanışı ve kauçuk fitille kabin yalıtımı kilitleme sesi (Kısayol: End tuşu).',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playWindowSound) {
                     audio.playWindowSound(false);

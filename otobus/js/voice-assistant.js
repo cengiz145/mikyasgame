@@ -76,9 +76,9 @@ class VoiceAssistant {
                 stage: 2,
                 stageName: '2. Bölüm: Yolcularımız ve Duraklar',
                 title: '6. Klima ve Şoför Camı',
-                keys: 'K (Klima), Home (Cam Aç), End (Cam Kapat), O (Cam Aç/Kapat)',
+                keys: 'K (Klima), Home (Cam Aç), End (Cam Kapat)',
                 tip: 'Home ile camı aç, End ile kapat. Temiz hava kokpite dolar.',
-                speech: 'Sıcak yaz günlerinde veya kış soğuğunda yolcuların üşümemesi ya da bunalmaması için K tuşuna basarak klimayı açıp kapatabilirsin. Temiz hava almak istediğinde Home tuşuna basarak şoför camını açabilir, End tuşuna basarak kapatabilirsin. Ayrıca O tuşuyla da tek tuşla açıp kapatabilirsin.'
+                speech: 'Sıcak yaz günlerinde veya kış soğuğunda yolcuların üşümemesi ya da bunalmaması için K tuşuna basarak klimayı açıp kapatabilirsin. Temiz hava almak istediğinde Home tuşuna basarak şoför camını açabilir, End tuşuna basarak kapatabilirsin.'
             },
 
             // 3. BÖLÜM: GECE, YAĞMUR VE SEFER KURALLARI
