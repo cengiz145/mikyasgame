@@ -171,10 +171,10 @@ const SoundGallery = {
         {
             id: 'akbil_tam',
             category: 'akbil',
-            title: 'Tam Akbil / Standart Biniş Onay Bipi',
+            title: 'Tam Akbil / Orijinal İETT Tek Dıt Onayı',
             icon: '💳',
-            specs: 'Freesound ilmari_freesound #625731 Zoom H5 Stüdyo Kaydı',
-            desc: 'Şehir içi otobüse binerken tam kart basıldığında çıkan o temiz ve net tek tonlu onay sesi.',
+            specs: 'Freesound yalnizsarki #109217 İETT İstanbul Orijinal Akbil Kaydı',
+            desc: 'Şehir içi otobüse binerken tam kart basıldığında çıkan o temiz, net ve saf tek "Dıt!" onay sesi. Arka plan gürültüsü ve turnike şakırtısı tamamen arındırılmıştır.',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilTam) audio.playAkbilTam();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('tam');
@@ -183,13 +183,49 @@ const SoundGallery = {
         {
             id: 'akbil_ogrenci',
             category: 'akbil',
-            title: 'Öğrenci & İndirimli Akbil (Çift Bip)',
+            title: 'Öğrenci & İndirimli Akbil (Orijinal Çift Dı-Dıt)',
             icon: '🎓',
-            specs: 'Freesound SpliceSound #369875 Orijinal Transit Kart Kaydı',
-            desc: 'Öğrenci veya indirimli kart okutulduğunda çıkan o melodik ve neşeli çift dıt-dıt onay sesi.',
+            specs: 'Freesound yalnizsarki #109216 İETT İstanbul Orijinal İndirimli Kaydı',
+            desc: 'Öğrenci veya indirimli kart okutulduğunda çıkan o meşhur, seri çift "Dı-Dıt!" onay sesi.',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilOgrenci) audio.playAkbilOgrenci();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('ogrenci');
+            }
+        },
+        {
+            id: 'akbil_ucretsiz',
+            category: 'akbil',
+            title: 'Ücretsiz Kart (Meşhur İki Tonlu "Düü-Düüüt" Si-Mi Bipi)',
+            icon: '👵',
+            specs: 'Akustik Sentetik 44.1kHz Si-Mi (988Hz - 1318Hz) Orijinal Ücretsiz Sinyali',
+            desc: '65 yaş üstü, engelli ve serbest kart basıldığında validatörün çaldığı o meşhur melodik iki tonlu "Düü-Düüüt" (Si-Mi) sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilUcretsiz) audio.playAkbilUcretsiz();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('ucretsiz');
+            }
+        },
+        {
+            id: 'akbil_aylik',
+            category: 'akbil',
+            title: 'Aylık Mavi Kart / Abonman Biniş Bipi',
+            icon: '🎫',
+            specs: 'Freesound yalnizsarki #109215 İETT İstanbul Orijinal Aylık Kaydı',
+            desc: 'Aylık paso ve mavi kart basıldığında validatörden duyulan özel abonman onay tonu.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilAylik) audio.playAkbilAylik();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('aylik');
+            }
+        },
+        {
+            id: 'akbil_aktarma',
+            category: 'akbil',
+            title: 'Aktarma Biniş Sinyali',
+            icon: '🔄',
+            specs: 'Freesound yalnizsarki #109214 İETT İstanbul Orijinal Aktarma Kaydı',
+            desc: 'Metrodan otobüse veya hattan hatta aktarma yaparken validatörün verdiği indirimli aktarma biniş sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilAktarma) audio.playAkbilAktarma();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('aktarma');
             }
         },
         {
@@ -202,18 +238,6 @@ const SoundGallery = {
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilHata) audio.playAkbilHata();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('yetersiz');
-            }
-        },
-        {
-            id: 'bus_validator',
-            category: 'akbil',
-            title: 'Gerçek Otobüs Kart Okuyucu Validatör Mekanizması',
-            icon: '📟',
-            specs: 'Freesound Robinhood76 #62589 Orijinal Otobüs Validatörü',
-            desc: 'Gerçek bir belediye otobüsü kart okuyucu cihazının iç röle ve elektronik kart okuma tepkisi.',
-            playFn: () => {
-                if (typeof audio !== 'undefined' && audio.playBusValidator) audio.playBusValidator();
-                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('serbest');
             }
         },
 
@@ -492,6 +516,78 @@ const SoundGallery = {
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playRadioSquelchSound) audio.playRadioSquelchSound();
                 else new Audio('sounds/freesound_radio_squelch.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_reverse_beep',
+            category: 'effect',
+            title: 'Ağır Vasıta Geri Vites İkaz Düdüğü (Reverse Beeper)',
+            icon: '⏮️',
+            specs: 'Freesound #523672 Orijinal Ağır Vasıta Geri Vites İkazı (CC0)',
+            desc: 'Otobüs geri vitese takıldığında dışarıya ve yayalara güvenlik amacıyla öten o meşhur ritmik güvenlik bip sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.toggleReverseBeepDemo) audio.toggleReverseBeepDemo();
+                else new Audio('sounds/freesound_reverse_beep.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_handbrake_air',
+            category: 'effect',
+            title: 'İmdat / El Freni Pnömatik Hava Tahliyesi',
+            icon: '🅿️',
+            specs: 'Freesound #725109 Pnömatik Basınç Boşalması (CC0)',
+            desc: 'Otobüs durup el freni (imdat) çekildiğinde veya motor kapatıldığında hava tüplerinden boşalan derin tıslama sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playHandbrakeAir) audio.playHandbrakeAir();
+                else new Audio('sounds/freesound_handbrake_air.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_crowd_walla',
+            category: 'effect',
+            title: 'Kalabalık Yolcu & Durak Ortam Uğultusu (Crowd Walla)',
+            icon: '🗣️',
+            specs: 'Freesound #733849 Doğal İnsan Uğultusu & Konuşma Ambiyansı (CC0)',
+            desc: 'Otobüs içi yolcuların ve duraktaki kalabalığın yaşayan, canlı fısıltı ve konuşma ambiyansı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.toggleCrowdDemo) audio.toggleCrowdDemo();
+                else new Audio('sounds/freesound_crowd_walla.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_diner_ambience',
+            category: 'effect',
+            title: 'Gece Dinlenme Tesisi / Lokanta Ortamı (Rest Stop Ambience)',
+            icon: '🍽️',
+            specs: 'Freesound #573770 Mola Tesisi & Lokanta Ortamı (CC0)',
+            desc: 'Şehirlerarası mola verildiğinde dinlenme tesisindeki çay bardakları, kaşık sesleri ve gece lokantası uğultusu.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.toggleDinerDemo) audio.toggleDinerDemo();
+                else new Audio('sounds/freesound_diner_ambience.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_trolley_cart',
+            category: 'effect',
+            title: 'Muavin İkram Servis Arabası (Trolley Cart)',
+            icon: '🛒',
+            specs: 'Freesound #570075 Halı & Koridor Tekerlek Yuvarlanışı (CC0)',
+            desc: 'Muavinin koridorda ikram arabasını iterken halı zemin üzerinde çıkan tekerlek sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playTrolleyCart) audio.playTrolleyCart();
+                else new Audio('sounds/freesound_trolley_cart.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_snack_wrapper',
+            category: 'effect',
+            title: 'Atıştırmalık & Kek Paketi Hışırtısı',
+            icon: '🧁',
+            specs: 'Freesound #37167 Ambalaj Açılma Hışırtısı (CC0)',
+            desc: 'İkram sırasında yolculara dağıtılan taze kek veya bisküvi paketinin açılma çıtırtısı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playSnackWrapper) audio.playSnackWrapper();
+                else new Audio('sounds/freesound_snack_wrapper.mp3').play().catch(()=>{});
             }
         },
         {

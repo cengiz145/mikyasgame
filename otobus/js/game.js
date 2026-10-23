@@ -1328,7 +1328,9 @@ const Game = {
             CompanySystem.boostSatisfaction(ratingBonus);
         }
 
-        if (typeof audio !== 'undefined' && typeof audio.playChime === 'function') {
+        if (typeof audio !== 'undefined' && typeof audio.playFullRefreshmentService === 'function') {
+            audio.playFullRefreshmentService();
+        } else if (typeof audio !== 'undefined' && typeof audio.playChime === 'function') {
             audio.playChime();
         }
 
@@ -3560,9 +3562,18 @@ const Game = {
             if (audio.updatePassengerCabinMurmur) {
                 audio.updatePassengerCabinMurmur(this.passengersOnBoard, this.isDriving);
             }
+            if (audio.updateCrowdAmbience) {
+                audio.updateCrowdAmbience(this.passengersOnBoard, this.frontDoorOpen || this.rearDoorOpen, !this.isDriving);
+            }
             // Konfor %65'in altına düşerse arka sıralardan memnuniyetsiz homurdanmalar yükselir
             if (this.passengersOnBoard > 0 && this.passengerComfort < 65 && audio.playPassengerDiscontent) {
                 audio.playPassengerDiscontent();
+            }
+            // Ağır vasıta geri vites ikaz düdüğü (Araç dururken veya geri vitesteyken S / Aşağı tuşuna basılıysa)
+            if (this.isDriving && this.speed === 0 && (this.keys.s || this.keys.arrowdown)) {
+                if (audio.startReverseBeep) audio.startReverseBeep();
+            } else if (this.speed > 0 || this.keys.w || this.keys.arrowup || !this.isDriving) {
+                if (audio.stopReverseBeep) audio.stopReverseBeep();
             }
         }
 
@@ -5028,6 +5039,7 @@ const Game = {
             e.preventDefault();
             if (audio.isEngineRunning) {
                 audio.stopEngine();
+                if (typeof audio.playHandbrakeAir === 'function') audio.playHandbrakeAir();
                 if (typeof audio.speak === 'function') audio.speak("Motor durduruldu.");
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 Motor Durduruldu", "warning");
             } else {
