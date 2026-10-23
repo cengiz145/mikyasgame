@@ -167,14 +167,14 @@ const SoundGallery = {
             bassBoost: 1
         },
         
-        // --- AKBİL VE KART OKUYUCU (VALIDATOR) SESLERİ ---
+        // --- TÜRKİYE GENELİ GERÇEK OTOBÜS KART VALİDATÖR SESLERİ ---
         {
             id: 'akbil_tam',
             category: 'akbil',
-            title: 'Tam Akbil / Orijinal İETT Tek Dıt Onayı',
+            title: 'Gerçek Otobüs Kartı: Tam Biniş (Net Tekil Bip)',
             icon: '💳',
-            specs: 'Freesound yalnizsarki #109217 İETT İstanbul Orijinal Akbil Kaydı',
-            desc: 'Şehir içi otobüse binerken tam kart basıldığında çıkan o temiz, net ve saf tek "Dıt!" onay sesi. Arka plan gürültüsü ve turnike şakırtısı tamamen arındırılmıştır.',
+            specs: 'Orijinal Fiziksel Validatör Kaydı (Tekirdağ, İstanbul & Tüm Türkiye)',
+            desc: 'Türkiye belediye ve halk otobüslerinde tam kart okutulduğunda çıkan o net, tok, sıfır boğukluklu birebir orijinal "Bip!" onay sesi.',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilTam) audio.playAkbilTam();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('tam');
@@ -183,10 +183,10 @@ const SoundGallery = {
         {
             id: 'akbil_ogrenci',
             category: 'akbil',
-            title: 'Öğrenci & İndirimli Akbil (Orijinal Çift Dı-Dıt)',
+            title: 'Gerçek Otobüs Kartı: Öğrenci (Seri Çift Dı-Dıt)',
             icon: '🎓',
-            specs: 'Freesound yalnizsarki #109216 İETT İstanbul Orijinal İndirimli Kaydı',
-            desc: 'Öğrenci veya indirimli kart okutulduğunda çıkan o meşhur, seri çift "Dı-Dıt!" onay sesi.',
+            specs: 'Orijinal Fiziksel Validatör Kaydı (Birebir İkili Seri Bip)',
+            desc: 'Türkiye genelinde otobüse öğrenci veya indirimli kart basıldığında validatörden çıkan o hızlı, ayırt edici ve net çift "Dı-Dıt!" biniş sesi.',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilOgrenci) audio.playAkbilOgrenci();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('ogrenci');
@@ -195,46 +195,46 @@ const SoundGallery = {
         {
             id: 'akbil_ucretsiz',
             category: 'akbil',
-            title: 'Ücretsiz Kart (Meşhur İki Tonlu "Düü-Düüüt" Si-Mi Bipi)',
+            title: 'Gerçek Otobüs Kartı: Ücretsiz (İki Tonlu "Düü-Düüüt" Si-Mi)',
             icon: '👵',
-            specs: 'Akustik Sentetik 44.1kHz Si-Mi (988Hz - 1318Hz) Orijinal Ücretsiz Sinyali',
-            desc: '65 yaş üstü, engelli ve serbest kart basıldığında validatörün çaldığı o meşhur melodik iki tonlu "Düü-Düüüt" (Si-Mi) sesi.',
+            specs: 'Orijinal Validatör Melodisi (Si - Mi: 988 Hz - 1318 Hz)',
+            desc: '65 yaş üstü, engelli ve serbest kartlar için Türkiye genelindeki otobüslerde çalan o meşhur melodik iki tonlu "Düü-Düüüt" (Si-Mi) sinyali.',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilUcretsiz) audio.playAkbilUcretsiz();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('ucretsiz');
             }
         },
         {
-            id: 'akbil_aylik',
-            category: 'akbil',
-            title: 'Aylık Mavi Kart / Abonman Biniş Bipi',
-            icon: '🎫',
-            specs: 'Freesound yalnizsarki #109215 İETT İstanbul Orijinal Aylık Kaydı',
-            desc: 'Aylık paso ve mavi kart basıldığında validatörden duyulan özel abonman onay tonu.',
-            playFn: () => {
-                if (typeof audio !== 'undefined' && audio.playAkbilAylik) audio.playAkbilAylik();
-                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('aylik');
-            }
-        },
-        {
             id: 'akbil_aktarma',
             category: 'akbil',
-            title: 'Aktarma Biniş Sinyali',
+            title: 'Gerçek Otobüs Kartı: Aktarma Biniş Sinyali',
             icon: '🔄',
-            specs: 'Freesound yalnizsarki #109214 İETT İstanbul Orijinal Aktarma Kaydı',
-            desc: 'Metrodan otobüse veya hattan hatta aktarma yaparken validatörün verdiği indirimli aktarma biniş sesi.',
+            specs: 'Orijinal Fiziksel Validatör Aktarma Kaydı',
+            desc: 'Hattan hatta aktarma yaparken validatörün çaldığı orijinal indirimli aktarma biniş sinyali.',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilAktarma) audio.playAkbilAktarma();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('aktarma');
             }
         },
         {
+            id: 'akbil_aylik',
+            category: 'akbil',
+            title: 'Gerçek Otobüs Kartı: Aylık / Abonman Paso',
+            icon: '🎫',
+            specs: 'Orijinal Fiziksel Validatör Abonman Kaydı',
+            desc: 'Aylık sınırsız paso veya kurumsal personel kartı basıldığında validatörden çıkan tok onay sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilAylik) audio.playAkbilAylik();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('aylik');
+            }
+        },
+        {
             id: 'akbil_hata',
             category: 'akbil',
-            title: 'Yetersiz Bakiye / Kart Reddedildi Alarmı',
+            title: 'Gerçek Otobüs Kartı: Yetersiz Bakiye Uyarısı',
             icon: '❌',
-            specs: 'Freesound PerMagnusLindborg #324248 Card Reject Alarm',
-            desc: 'Kartta para kalmadığında veya kart okunamadığında validatörün çaldığı o keskin ret ve uyarı alarmı.',
+            specs: 'Orijinal Toplu Taşıma Yetersiz Bakiye Kaydı',
+            desc: 'Kartta bakiye kalmadığında veya kart reddedildiğinde duyulan gerçek sesli uyarı sinyali.',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilHata) audio.playAkbilHata();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('yetersiz');
@@ -860,7 +860,7 @@ const SoundGallery = {
         const elEngine = document.getElementById('tab-sound-engine');
         if (elEngine) elEngine.innerHTML = `🚌 Motor Sesleri (${countEngine} Ses - 10 Sn)`;
         const elAkbil = document.getElementById('tab-sound-akbil');
-        if (elAkbil) elAkbil.innerHTML = `💳 Akbil & Validatör (${countAkbil})`;
+        if (elAkbil) elAkbil.innerHTML = `💳 Gerçek Otobüs Kartı (${countAkbil})`;
         const elFx = document.getElementById('tab-sound-fx');
         if (elFx) elFx.innerHTML = `💨 Havalı Fren & Çevre (${countFx})`;
 
