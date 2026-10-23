@@ -324,7 +324,7 @@ class VoiceAssistant {
         if (!listEl) return;
 
         // Sekme butonlarının aktiflik stilini güncelle
-        const tabs = ['company', 'lab', 'all', 'stage1', 'stage2', 'stage3', 'stage4', 'seruven', 'karne'];
+        const tabs = ['mechanics', 'company', 'lab', 'all', 'stage1', 'stage2', 'stage3', 'stage4', 'seruven', 'karne'];
         tabs.forEach(t => {
             const btn = document.getElementById(`tab-acad-${t}`);
             if (btn) {
@@ -335,6 +335,22 @@ class VoiceAssistant {
                 btn.style.fontWeight = isActive ? 'bold' : 'normal';
             }
         });
+
+        // 0. OTOBÜS MEKANİKLERİ VE AĞIR VASITA FİZİĞİ REHBERİ
+        const mechContainer = document.getElementById('tutorial-mechanics-container');
+        if (this.currentStageFilter === 'mechanics') {
+            if (labContainer) labContainer.style.display = 'none';
+            if (seruvenContainer) seruvenContainer.style.display = 'none';
+            if (compContainer) compContainer.style.display = 'none';
+            listEl.style.display = 'none';
+            if (mechContainer) {
+                mechContainer.style.display = 'block';
+                this.renderBusMechanicsGuide();
+            }
+            return;
+        } else {
+            if (mechContainer) mechContainer.style.display = 'none';
+        }
 
         // 0. ŞİRKET YÖNETİMİ, 6 YASAL BİNA VE ÖN MUHASEBE REHBERİ
         if (this.currentStageFilter === 'company') {
@@ -445,6 +461,231 @@ class VoiceAssistant {
     // =========================================================================
     // ADIM ADIM REHBERLİ SÜRÜŞ EĞİTİMİ (TERİMSİZ, EN ANLAŞILIR OYUN DİLİ)
     // =========================================================================
+
+    renderBusMechanicsGuide() {
+        const container = document.getElementById('tutorial-mechanics-container');
+        if (!container) return;
+
+        container.innerHTML = `
+        <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); border: 2px solid #10b981; border-radius: 12px; padding: 18px 22px; color: #fff;">
+            
+            <!-- BAŞLIK -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(16, 185, 129, 0.3); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h3 style="margin: 0; color: #34d399; font-size: 1.4rem; display: flex; align-items: center; gap: 8px;">
+                        <span>⚙️</span> <span>Otobüs Mekanikleri & Ağır Vasıta Fiziği Başucu Rehberi</span>
+                    </h3>
+                    <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.88rem;">
+                        Retarder, havalı fren, balata şişmesi, 15 tonluk dağ eğim fiziği, kneeling ve viraj dinamiklerinin bilimsel ve pratik açıklaması.
+                    </p>
+                </div>
+                <button class="modern-btn btn-read-section nav-item" data-text="Otobüs Mekanikleri ve Ağır Vasıta Fiziği Başucu Rehberi. Bu bölümde retarder şanzıman freni, balata şişmesi, havalı fren basıncı, eğim fiziği, kapı interlok sistemi ve viraj merkezkaç kuvvetleri gibi gerçek otobüs kaptanlarının bildiği tüm mekanik kavramları öğreneceksiniz." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                    ▶️ Tüm Bölümü Sesli Dinle
+                </button>
+            </div>
+
+            <!-- HIZLI KONTROL KUTUSU -->
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; color: #a7f3d0; font-size: 0.9rem; line-height: 1.5;">
+                ⚡ <strong>Hızlı Kaptan Kısayolları:</strong> 
+                <strong>B:</strong> Kademeli Retarder Kolu (1-2-3-4-5) • 
+                <strong>Shift + B:</strong> Retarder Sıfırla (Boşa Al) • 
+                <strong>W / S:</strong> Gaz / Ayak Freni • 
+                <strong>Space:</strong> Kontak / El Freni • 
+                <strong>G:</strong> Sefer & Görev Durumu • 
+                <strong>E:</strong> Ön Kapı & Kneeling • 
+                <strong>F:</strong> Farlar • 
+                <strong>L:</strong> Havalı Korna • 
+                <strong>🏔️ HUD:</strong> Canlı Rakım & Eğim Göstergesi
+            </div>
+
+            <!-- BÖLÜM 1: RETARDER (HİDROLİK ŞANZIMAN FRENi) -->
+            <div style="background: linear-gradient(135deg, rgba(5, 150, 105, 0.2), rgba(15, 23, 42, 0.85)); border: 1.5px solid #10b981; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="color: #34d399; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🎶</span> <span>1. Retarder (Hidrolik Şanzıman Freni - Voith & ZF)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Birinci Bölüm: Retarder yani Hidrolik Şanzıman Freni. Retarder, ağır vasıtalarda tekerlek balatalarına hiç dokunmadan şanzıman çıkış milini hidrolik yağ girdabıyla frenleyen aşınmasız yardımcı fren sistemidir. Normal fren balataları sürtünmeyle aşınır ve yokuş aşağı inerken aşırı ısınıp tutmaz hale gelir. Retarder ise yağı bir türbin haznesinde sıkıştırarak kinetik enerjiyi ısıya çevirir ve aracı sarsmadan yavaşlatır. Oyunda B tuşuna basarak retarder kolunu kademe bir ile beş arasında çekebilirsiniz. Shift B ile anında kapatabilirsiniz. Retarder devredeyken duyduğunuz o meşhur tiz türbin ıslığı Voith hidrolik retarderin gerçek çalışma sesidir." style="padding: 6px 12px; background: rgba(16,185,129,0.25); border: 1px solid #10b981; color: #a7f3d0; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ Retarderi Dinle
+                    </button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.55;">
+                    • <strong>Retarder Nedir ve Neden Hayatidir?</strong> 15-18 tonluk bir otobüsü dik bir dağdan (örneğin Bolu Dağı veya Güzeldere Geçidi) indirirken yalnızca ayak freni kullanılırsa, balatalar birkaç dakika içinde aşırı ısınır, sürtünme sıfırlanır ve fren tamamen boşalır. Retarder, şanzıman kardan miline bağlı <em>rotor</em> ve <em>stator</em> çarkları arasına hidrolik yağ basarak sürtünmesiz frenleme yapar.<br>
+                    • <strong>5 Kademeli Retarder Kolu:</strong> Klavyeden <strong>B</strong> tuşuna her bastığınızda retarder kolu bir kademe artar (Kademe 1: Hafif tutuş ➔ Kademe 3: %7 eğim iniş tutuşu ➔ Kademe 5: Tam hidrolik blokaj). <strong>Shift + B</strong> kolu anında boşa alır.<br>
+                    • <strong>Türbin Islığı ve Pnömatik Tahliye:</strong> Retarder çekildiğinde aracın hızına bağlı olarak yükselen o karakteristik Voith ıslık sesi duyulur; retarder devreden çıktığında ise gerçek ağır vasıtalardaki gibi havalı tahliye sesi (<em>'tısss'</em>) yankılanır.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 2: BALATA ISINMASI VE FREN ŞİŞMESİ (BRAKE FADE) -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(239, 68, 68, 0.4);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #f87171; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🔥</span> <span>2. Balata Isınması & Fren Şişmesi (Brake Fade)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="İkinci Bölüm: Balata Isınması ve Fren Şişmesi. Dağlık yollarda inerken sürekli S tuşuna yani ayak frenine basarsanız, sürtünme diskleri hızla ısınır. Sıcaklık iki yüz altmış dereceyi aştığında balata reçineleri gaz çıkarmaya başlar ve balata diske tutunamaz. Buna şoförler arasında fren şişmesi denir. Fren şiştiğinde fren mesafesi üç katına çıkar ve otobüs duramaz hale gelir. Çözüm: Dik inişlerde ayak frenini bırakıp B tuşuyla Retarderi devreye sokmaktır. Böylece hava akımı ve retarder soğutması sayesinde balatalar hızla güvenli sıcaklığa iner." style="padding: 4px 10px; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Fiziksel Neden:</strong> Balata diske sürtündükçe kinetik enerji ısıya dönüşür. Normal çalışma sıcaklığı 50°C - 150°C arasındadır.<br>
+                    • <strong>260°C Tehlike Eşiği:</strong> Disk sıcaklığı 260°C'yi aştığında balatanın sürtünme katsayısı %65 oranında çöker (Fren Şişmesi). Sesli asistan: <em>'⚠️ Dikkat! Balatalar aşırı ısındı ve şişti! Retarder kullanınız!'</em> uyarısı verir.<br>
+                    • <strong>Balata Nasıl Soğutulur?</strong> Ayak freninden ayak çekilip araç 30 km/s üzerinde seyrederken rüzgar akımıyla ve <strong>B</strong> tuşuyla Retarder kullanılarak balata sıcaklığı hızla 60°C seviyesine soğutulur.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 3: EĞİM YERÇEKİMİ VE DAĞ RAMPALARI (NEWTON FİZİĞİ) -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(56, 189, 248, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🏔️</span> <span>3. Eğim Yerçekimi ve Dağ Rampaları (a = g · sin θ)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Üçüncü Bölüm: Eğim Yerçekimi ve Dağ Rampaları. Türkiye'nin gerçek Harita Genel Müdürlüğü ve Karayolları Genel Müdürlüğü topoğrafyası oyuna entegre edilmiştir. Yokuş yukarı çıkarken yerçekimi ivmesi on beş tonluk otobüsü geri çeker; motor devri bayılır ve yakıt tüketimi her yüzde bir eğim için yüzde on iki artar. Yokuş aşağı inişte ise araç serbest ivmelenerek hızlanır. Kokpitteki dağ simgeli rakım göstergesi bulunduğunuz ilin gerçek deniz seviyesi rakımını, yolun anlık eğim yüzdesini ve Bolu Dağı, Sabuncubeli veya Güzeldere gibi tescilli geçit isimlerini canlı olarak gösterir." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Tırmanış Direnci:</strong> Bolu Dağı (%7.5), Sabuncubeli (%9.0) veya Güzeldere (%11.0) tırmanırken 15 tonluk otobüsün gaz tepkisi ağırlaşır. Vites düşürüp motor devrini 1.800 - 2.200 RPM aralığında tutmanız gerekir.<br>
+                    • <strong>İniş İvmesi:</strong> Yokuş aşağı inerken Newton yerçekimi (a = g · sin θ) otobüsü öne doğru iter. Hız limiti aşılmadan önce mutlaka retarder çekilmelidir.<br>
+                    • <strong>Kokpit Rakım Göstergesi:</strong> <code>🏔️ Rakım: 1577 m (+ %7.5 Tırmanış • Bolu Dağı Geçidi)</code> şeklinde anlık olarak güncellenir.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 4: PNÖMATİK HAVALI FREN SİSTEMİ (BAR & PSI) -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(250, 204, 21, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>💨</span> <span>4. Pnömatik Havalı Fren Sistemi (Bar & PSI Yönetimi)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Dördüncü Bölüm: Pnömatik Havalı Fren Sistemi. Ağır vasıtalar otomobiller gibi hidrolik frenle durdurulamaz; çünkü on beş tonu sıkıştırmak için muazzam bir hava basıncı gerekir. Otobüslerde sekiz ile on iki bar arasında çalışan hava kompresörü ve hava tankları bulunur. Frene her basıp bıraktığınızda hava tankından basınç harcanır. Basınç altmış PSI altına düşerse sesli hava alarmı öter. Eğer hava tamamen biterse güvenlik amacıyla imdat freni körükleri patlar ve araç tekerlekleri kilitlenir. Gerçek kaptanlar frene art arda pompalamaz, tek ve dengeli basış yapar." style="padding: 4px 10px; background: rgba(234,179,8,0.2); border: 1px solid #eab308; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Hava Tankı Dinamiği:</strong> Frene basılı tutmak havayı tüketmez; ancak frene ardı ardına basıp bırakmak (pompalama) tanktaki havayı tüketir.<br>
+                    • <strong>Düşük Hava İkazı (60 PSI Altı):</strong> Basınç kritik eşiğin altına indiğinde kabinde sesli buzzer çalar. Aracı rölantide tutarak kompresörün tankları doldurmasını bekleyiniz.<br>
+                    • <strong>İmdat / Park Freni (Maxi Körükler):</strong> Boşluk (Space) tuşuyla çekilen imdat freni, hava basıncıyla değil yay tansiyonuyla tekerlekleri mekanik olarak kilitler.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 5: KAPI FREN İNTERLOK SİSTEMİ (DOOR-BRAKE SAFETY LOCK) -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(168, 85, 247, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #c084fc; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🚪</span> <span>5. Kapı Fren İnterlok Sistemi (Door-Brake Safety Lock)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Beşinci Bölüm: Kapı Fren İnterlok Sistemi. Modern belediye ve şehirlerarası otobüslerde uluslararası yolcu güvenliği standardı gereği kapı interlok mekanizması bulunur. Ön kapı, arka kapı veya engelli rampası açıkken gaz pedalı tamamen kilitlenir ve araç hareket edemez. Yolcular binerken otobüsün aniden hareket etmesini önleyen bu sistem, kapılar tamamen kapandığında otomatik olarak devreden çıkar ve gaz vermenize izin verir." style="padding: 4px 10px; background: rgba(168,85,247,0.2); border: 1px solid #a855f7; color: #d8b4fe; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>E tuşu (Ön Kapı):</strong> Yolcu binişi ve kart basımı için açılır.<br>
+                    • <strong>Q tuşu (Arka Kapı):</strong> İnen yolcular için kullanılır.<br>
+                    • <strong>İnterlok Devredeyken:</strong> W tuşuna veya yukarı oka basılsa dahi araç hareket etmez; yolcular emniyetle bindikten sonra kapılar kapatıldığında ivmelenme açılır.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 6: KNEELING VE ENGELLİ RAMPASI -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(6, 182, 212, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #22d3ee; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>♿</span> <span>6. Kneeling (Yana Yatma) & Çift Kademeli Rampa</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Altıncı Bölüm: Kneeling yani Yana Yatma ve Engelli Rampası. Alçak tabanlı belediye otobüslerinde durakta bekleyen yaşlı, çocuklu ve tekerlekli sandalyeli yolcuların rahat binebilmesi için sağ süspansiyon körüklerinin havası boşaltılarak otobüs kaldırıma doğru yedi santimetre yatırılır. Buna kneeling denir. Ayrıca durakta tekerlekli sandalye ikonu gördüğünüzde orta kapıdaki rampayı açarak yolcunun emniyetle binmesini sağlamalısınız." style="padding: 4px 10px; background: rgba(6,182,212,0.2); border: 1px solid #06b6d4; color: #a5f3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Kneeling İşlevi:</strong> Durakta durup kapıyı açtığınızda havalı süspansiyon otomatik olarak sağa yatar (HUD'da <code>🚌 KNEELING</code> yanar). Kalkışta körükler tekrar dolar.<br>
+                    • <strong>Erişilebilirlik Bonusu:</strong> Tekerlekli sandalyeli yolcuları rampayla aldığınızda yolcu memnuniyeti tavan yapar ve ek şoförlük tecrübe puanı (XP) kazanırsınız.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 7: VİRAJ MERKEZKAÇ KUVVETİ ($v^2 / R$) VE GÖVDE SALINIMI -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(244, 63, 94, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #fb7185; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🔄</span> <span>7. Viraj Geometrisi, Merkezkaç Kuvveti ve Gövde Salınımı</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Yedinci Bölüm: Viraj Geometrisi ve Merkezkaç Kuvveti. Üç nokta sekiz metre yüksekliğe sahip bir otobüsün ağırlık merkezi otomobillerden çok daha yukarıdadır. Viraja girdiğinizde merkezkaç ivmesiyle otobüs gövdesi fiziksel olarak dönüşün tersine doğru yatar. Eğer viraja hız tabelasındaki limitin üzerinde girerseniz lastikler çığlık atarak kayar, direksiyon savrulur ve yolcular panikleyerek konfor endeksiniz düşer. Usta kaptanlar viraja girmeden önce retarder ile hızını düşürür, viraj içinde dengeli gaz verir." style="padding: 4px 10px; background: rgba(244,63,94,0.2); border: 1px solid #f43f5e; color: #fecdd3; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Gövde Salınımı (Body Roll):</strong> Sola virajda otobüs sağa yatar (<code>rotate</code>), 3D yol perspektifi eğrilir (<code>skewX</code>).<br>
+                    • <strong>Lastik Kayması (Tire Screech):</strong> Viraj hız limiti aşıldığında lastiklerden acı bir çığlık sesi yükselir ve araç şeridin dışına savrulur.<br>
+                    • <strong>Yolcu Konforu:</strong> Yumuşak viraj dönüşleri yolcu memnuniyetini %100 tutar; savrulma ve sert fren konfor puanını düşürür.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 8: VİYADÜK VE ASMA KÖPRÜ YAN RÜZGARLARI -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(245, 158, 11, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #fbbf24; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🌉</span> <span>8. Viyadük & Asma Köprü Yan Rüzgarları ve Çelik Derzler</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Sekizinci Bölüm: Viyadük ve Asma Köprüler. 1915 Çanakkale, Osmangazi, Yavuz Sultan Selim ve Botan Çayı Beğendik Köprüsü gibi devasa yapılardan geçerken kanyon ve deniz yan rüzgarları otobüsün geniş yan yüzeyine çarpar. Şeritte kalabilmek için direksiyona hafif kontra kuvveti uygulamanız gerekir. Ayrıca her otuz beş metrede bir köprü çelik genleşme derzlerinin üzerinden geçerken lastiklerden o meşhur tok tak tak vuruntu sesi duyulur." style="padding: 4px 10px; background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #fde68a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Yan Rüzgar Savrulması:</strong> Yüksek köprülerde otobüs rüzgar yönüne doğru hafifçe kayar; direksiyonla düzeltme yapılmalıdır.<br>
+                    • <strong>Çelik Derz Vuruntusu:</strong> Her 35 metrede bir çelik derzlerin üzerinden geçerken hıza bağlı gerçekçi genleşme vuruntusu çalınır.<br>
+                    • <strong>Botan Çayı Beğendik Viyadüğü:</strong> 165 metre ayak yüksekliği ile Türkiye'nin en yüksek viyadüğüdür; şiddetli vadi rüzgarına dikkat ediniz.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 9: TÜNEL AKUSTİĞİ VE FAR REJİMİ -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(99, 102, 241, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #818cf8; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🚇</span> <span>9. Tünel Akustiği ve Far Rejimi</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Dokuzuncu Bölüm: Tünel Akustiği ve Far Rejimi. Yeni Zigana Tüneli ondört bin dört yüz yetmiş altı metre, Ovit Tüneli ondört bin üç yüz kırk altı metre uzunluğundadır. Tünele girdiğinizde kabin akustiği yankı moduna geçer; motor ve egzoz sesi beton çeperlere çarparak homurdanır. Tünelde mutlaka F tuşuna basarak farlarınızı açmalısınız; aksi halde karanlıkta yolcular tedirgin olur ve sesli asistan ikaz eder." style="padding: 4px 10px; background: rgba(99,102,241,0.2); border: 1px solid #6366f1; color: #c7d2fe; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Ses Yankısı (Reverb):</strong> Tünel içinde korna, motor ve fren sesleri metalik yankı kazanır.<br>
+                    • <strong>Far Zorunluluğu:</strong> F tuşuyla farlar açılmadığında sesli asistan tünel karanlığı uyarısı verir.<br>
+                    • <strong>Resmî Uzunluklar:</strong> Tüneller kilometrelerce sürer ve sadece gerçek koridorunda yer alan tüneller karşınıza çıkar.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 10: DEVİR SAATİ (RPM), VİTES VE YAKIT VERİMLİLİĞİ -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #34d399; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>⛽</span> <span>10. Devir Saati (RPM), Şanzıman ve Yakıt Tasarrufu</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Onuncu Bölüm: Devir Saati, Vites ve Yakıt Tasarrufu. Ağır vasıta dizel motorları bin ile bin beş yüz devir arasındaki yeşil bantta maksimum tork üretir ve en az yakıtı tüketir. Gaza sürekli sonuna kadar basmak devri iki bin beş yüzün üzerine çıkararak yakıtı hızla tüketir ve motoru yorar. Yokuş çıkarken doğru viteste devri bin sekiz yüz civarında tutmak hem motoru korur hem de tırmanış çekişini maksimuma ulaştırır." style="padding: 4px 10px; background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #a7f3d0; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Yeşil Devir Aralığı:</strong> 1.000 - 1.600 RPM ekonomik seyir bölgesidir.<br>
+                    • <strong>Tırmanış Devri:</strong> Dik rampada devir 1.200 altına düşerse araç bayılır; vites küçültülmelidir.<br>
+                    • <strong>Retarder ve Yakıt:</strong> Retarder çekildiğinde enjeksiyon kesilir; sıfır yakıt tüketimiyle frenleme yapılır.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 11: EKSİKSİZ KONTROL VE KISAYOL REFERANS TABLOSU -->
+            <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1.5px solid #64748b; border-radius: 10px; padding: 16px; margin-top: 16px;">
+                <h4 style="color: #94a3b8; margin: 0 0 10px 0; font-size: 1.15rem;">📋 Tam Kaptan Kontrol Tablosu</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; font-size: 0.85rem; color: #cbd5e1;">
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>W / Yukarı Ok:</strong> Gaz (İvmelenme)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>S / Aşağı Ok:</strong> Servis Freni (Ayak Freni)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>A / D:</strong> Direksiyon (Sol / Sağ)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>B:</strong> Kademeli Retarder Kolu (1-5)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>Shift + B:</strong> Retarder Sıfırla (Boşa Al)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>Space (Boşluk):</strong> Motor Aç/Kapa & El Freni</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>G:</strong> Sefer & Görev Durumu Anonsu</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>F:</strong> Ön Farlar (Tünelde Zorunlu)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>L:</strong> Havalı Korna (Air Horn)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>E:</strong> Ön Kapı & Kneeling</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>Q:</strong> Arka Kapı Kontrolü</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>K:</strong> Klima (22°C Konfor)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>Y:</strong> Pusula İstikameti Sorgula</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>V:</strong> Telsiz Konuşması (Push-to-Talk)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>H:</strong> Yakıt & Hasar Raporu</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>C / Shift+C:</strong> Konfor / Demli Çay Yudumla</div>
+                </div>
+            </div>
+
+        </div>
+        `;
+
+        // Sesli okuma butonları dinleyicileri
+        container.querySelectorAll('.btn-read-section').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const text = e.currentTarget.getAttribute('data-text');
+                if (text && typeof audio !== 'undefined' && audio.speak) {
+                    if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+                    audio.speak(text);
+                }
+            });
+        });
+    }
 
     renderCompanyGuide() {
         const container = document.getElementById('tutorial-company-container');
@@ -1652,6 +1893,9 @@ class VoiceAssistant {
 
         const tabLab = document.getElementById('tab-acad-lab');
         if (tabLab) tabLab.addEventListener('click', () => this.setAcademyTab('lab'));
+
+        const tabMech = document.getElementById('tab-acad-mechanics');
+        if (tabMech) tabMech.addEventListener('click', () => this.setAcademyTab('mechanics'));
 
         const tabKarne = document.getElementById('tab-acad-karne') || document.getElementById('tab-acad-seruven');
         if (tabKarne) tabKarne.addEventListener('click', () => this.setAcademyTab('seruven'));
