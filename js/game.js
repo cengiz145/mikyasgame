@@ -1062,7 +1062,9 @@ const Game = {
                         facilityContract: CompanySystem.data.facilityContract || "standart",
                         hqUpgrades: CompanySystem.data.hqUpgrades || {},
                         hiredDrivers: Array.isArray(CompanySystem.data.hiredDrivers) ? CompanySystem.data.hiredDrivers.slice(0, 20) : [],
-                        bankruptcyCount: Math.max(0, CompanySystem.data.bankruptcyCount || 0)
+                        bankruptcyCount: Math.max(0, CompanySystem.data.bankruptcyCount || 0),
+                        corporateEmployer: CompanySystem.data.corporateEmployer || null,
+                        isIndependentMode: !!CompanySystem.data.isIndependentMode
                     };
                 }
 

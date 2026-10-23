@@ -22,12 +22,13 @@
             revenueSharePercent: 50,       // %50 Şirket Kasasına, %50 Kaptana (Serbestçe değiştirilebilir)
             cateringPackage: 'standart',   // 'ekonomik' | 'standart' | 'vip'
             institutions: {
-                headquarters: 1,       // 1. Merkez Yönetim Ofisi / Genel Müdürlük (B1 Yasal Zorunluluk)
-                bus_garage: 1,         // 2. Araç Park Sahası / Garaj (B1 Yasal Zorunluluk)
-                terminal_offices: 1,   // 3. Otogar Yazıhaneleri & Peron Ağı (B1 Yasal & Operasyonel)
-                maintenance_depot: 1,  // 4. Bakım, Onarım ve Yıkama Atölyesi (Kademe Binası)
-                driver_lodging: 1,     // 5. Personel Dinlenme Evi / Kaptan Lojmanı (Takograf İhtiyacı)
-                city_agencies: 1       // 6. Şehir İçi Bilet Satış Acenteleri & Terminal Shuttle
+                bus_garage: 1,         // 1. Garaj ve Filo Sahası (Depot / Garage)
+                maintenance_depot: 1,  // 2. Bakım ve Onarım Atölyesi (Kademe / Workshop)
+                bus_wash: 1,           // 3. Otobüs Yıkama İstasyonu (Bus Wash)
+                fuel_depot: 1,         // 4. Şirket Akaryakıt İstasyonu (Fuel Depot)
+                terminal_offices: 1,   // 5. Otogar Yazıhaneleri ve Bekleme Salonları
+                driver_lodging: 1,     // 6. Personel Sosyal Tesisleri ve Dinlenme Odaları
+                catering_cargo_hub: 1  // 7. Lojistik ve İkram Deposu (Catering & Cargo Hub)
             },
             satisfactionRating: 4.9,       // 1.0 - 5.0 (Yıldız Değerlendirmesi)
             terminalBranches: {            // Otogar Yazıhaneleri
@@ -133,10 +134,9 @@
         // Şirket Kasasına Hasılat Ekleme
         addCompanyRevenue: function(amount) {
             if (!amount || amount <= 0) return;
-            this.data.companyTreasury = (this.data.companyTreasury || 0) + amount;
             this.data.totalRevenue = (this.data.totalRevenue || 0) + amount;
 
-            // Eğer bir kaptan şirketinde çalışılıyorsa, o şirketin topluluk kasasına da yansıt
+            // Eğer bir kaptan şirketinde çalışılıyorsa, şirket payı işveren şirketin kasasına akar
             if (this.data.corporateEmployer) {
                 let captains = this.getCaptainCompanies();
                 const target = captains.find(c => c.id === this.data.corporateEmployer);
@@ -146,6 +146,11 @@
                         localStorage.setItem(this.COMMUNITY_STORAGE_KEY, JSON.stringify(captains));
                     } catch(e) {}
                 }
+                this.recordTransaction('income', 'tickets', `İşveren Şirket (${(target && target.name) || 'Şirket'}) Sefer Hasılat Payı`, amount);
+            } else {
+                // Kendi şirketimiz yönetiliyorsa doğrudan şirket kasasına aktarılır
+                this.data.companyTreasury = (this.data.companyTreasury || 0) + amount;
+                this.recordTransaction('income', 'tickets', 'Kaptan Sefer Hasılatı', amount);
             }
 
             this.saveData();
@@ -1015,14 +1020,21 @@
             }
             const aliases = {
                 garage_maintenance: 'maintenance_depot',
+                maintenance: 'maintenance_depot',
+                garage: 'bus_garage',
+                fleet_operations: 'bus_garage',
                 driver_academy: 'driver_lodging',
+                staff_lounge: 'driver_lodging',
+                lodging: 'driver_lodging',
                 ticketing_network: 'terminal_offices',
                 city_agencies: 'terminal_offices',
-                catering_logistics: 'catering_cargo_hub',
-                highway_resort: 'fuel_depot',
-                fleet_operations: 'bus_garage',
                 headquarters: 'terminal_offices',
-                fuel_station: 'fuel_depot'
+                catering_logistics: 'catering_cargo_hub',
+                cargo_hub: 'catering_cargo_hub',
+                highway_resort: 'fuel_depot',
+                fuel_station: 'fuel_depot',
+                wash_station: 'bus_wash',
+                wash: 'bus_wash'
             };
             const targetKey = aliases[instId] || instId;
             return this.data.institutions[instId] || this.data.institutions[targetKey] || 1;
@@ -1057,11 +1069,21 @@
         upgradeInstitution: function(instId) {
             const aliases = {
                 garage_maintenance: 'maintenance_depot',
+                maintenance: 'maintenance_depot',
+                garage: 'bus_garage',
+                fleet_operations: 'bus_garage',
                 driver_academy: 'driver_lodging',
-                ticketing_network: 'city_agencies',
-                catering_logistics: 'maintenance_depot',
-                highway_resort: 'terminal_offices',
-                fleet_operations: 'headquarters'
+                staff_lounge: 'driver_lodging',
+                lodging: 'driver_lodging',
+                ticketing_network: 'terminal_offices',
+                city_agencies: 'terminal_offices',
+                headquarters: 'terminal_offices',
+                catering_logistics: 'catering_cargo_hub',
+                cargo_hub: 'catering_cargo_hub',
+                highway_resort: 'fuel_depot',
+                fuel_station: 'fuel_depot',
+                wash_station: 'bus_wash',
+                wash: 'bus_wash'
             };
             const targetKey = aliases[instId] || instId;
             instId = targetKey;
@@ -1368,13 +1390,16 @@
             // Şirketi sıfırla ve kapat
             this.data.companyTreasury = 0;
             this.data.hiredDrivers = [];
+            this.data.corporateEmployer = null;
+            this.data.isIndependentMode = true;
             this.data.institutions = {
-                headquarters: 1,
                 bus_garage: 1,
-                terminal_offices: 1,
                 maintenance_depot: 1,
+                bus_wash: 1,
+                fuel_depot: 1,
+                terminal_offices: 1,
                 driver_lodging: 1,
-                city_agencies: 1
+                catering_cargo_hub: 1
             };
             this.data.terminalBranches = {
                 tekirdag: true,
@@ -1538,6 +1563,8 @@
                 const city = document.getElementById('new-comp-city').value.trim();
                 const quota = document.getElementById('new-comp-quota').value;
                 const salary = document.getElementById('new-comp-salary').value;
+                const shareEl = document.getElementById('new-comp-share');
+                const sharePercent = shareEl ? (parseInt(shareEl.value) || 50) : 50;
                 const bonus = document.getElementById('new-comp-bonus').value;
                 const slogan = document.getElementById('new-comp-slogan').value.trim();
 
@@ -1557,6 +1584,14 @@
 
                 this.data.companyName = name;
                 this.data.revenueSharePercent = sharePercent;
+                this.data.isIndependentMode = false;
+                this.data.corporateEmployer = null;
+                try {
+                    localStorage.setItem('otobusCompany', name);
+                    if (typeof Multiplayer !== 'undefined' && Multiplayer.profile) {
+                        Multiplayer.profile.company = name;
+                    }
+                } catch(e) {}
                 this.saveData();
 
                 document.getElementById('create-company-modal').classList.add('hidden');
@@ -1933,13 +1968,22 @@
                     // Eksik alanları tamamla
                     if (!this.data.institutions) {
                         this.data.institutions = {
-                            headquarters: 1,
                             bus_garage: 1,
-                            terminal_offices: 1,
                             maintenance_depot: 1,
+                            bus_wash: 1,
+                            fuel_depot: 1,
+                            terminal_offices: 1,
                             driver_lodging: 1,
-                            city_agencies: 1
+                            catering_cargo_hub: 1
                         };
+                    } else {
+                        // Mevcut verilerdeki eksik kurumları tamamla
+                        const standardInsts = ['bus_garage', 'maintenance_depot', 'bus_wash', 'fuel_depot', 'terminal_offices', 'driver_lodging', 'catering_cargo_hub'];
+                        standardInsts.forEach(key => {
+                            if (!this.data.institutions[key]) {
+                                this.data.institutions[key] = 1;
+                            }
+                        });
                     }
                     if (!this.data.hqUpgrades) {
                         this.data.hqUpgrades = { fuelContract: false, luxuryLounge: false, terminalPlatform: false, corporateBrand: false };
@@ -2053,6 +2097,12 @@
         setCompanyName: function (newName) {
             if (!newName || !newName.trim()) return;
             this.data.companyName = newName.trim().substring(0, 40);
+            try {
+                localStorage.setItem('otobusCompany', this.data.companyName);
+                if (typeof Multiplayer !== 'undefined' && Multiplayer.profile) {
+                    Multiplayer.profile.company = this.data.companyName;
+                }
+            } catch(e) {}
             this.saveData();
             const msg = `Şirketinizin adı '${this.data.companyName}' olarak tescillendi.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
@@ -2184,33 +2234,55 @@
                 return false;
             }
 
-            const garageLevel = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('garage_maintenance') : 1;
+            const garageLevel = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('maintenance_depot') : 1;
             let costMultiplier = 8;
             if (garageLevel === 2) costMultiplier = 4.4; // %45 Kademe İndirimi (Gelişmiş Liftler & Diagnostik)
             else if (garageLevel >= 3) costMultiplier = 2.8; // %65 Mega Kademe İndirimi (Kendi Revizyon Üssümüz)
             const repairCost = Math.round((100 - curCond) * costMultiplier);
-            const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
-            if (currentBudget < repairCost) {
-                const msg = `Yetersiz bakiye! ${bus.fullName} periyodik bakımı için ${repairCost} ₺ gerekiyor.`;
+            const companyTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+            const playerBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            if ((companyTreasury + playerBudget) < repairCost) {
+                const msg = `Yetersiz bakiye! ${bus.fullName} periyodik bakımı için ${repairCost.toLocaleString('tr-TR')} ₺ gerekiyor.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                 if (typeof UI !== 'undefined') UI.showToast(`⚠️ ${msg}`, "warning");
                 return false;
             }
 
-            if (typeof Game !== 'undefined') {
-                Game.playerBudget -= repairCost;
-                Game.saveData();
-                if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
-                    const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
-                    UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+            let paidFrom = '';
+            if (companyTreasury >= repairCost) {
+                this.data.companyTreasury -= repairCost;
+                paidFrom = 'Şirket Kasasından';
+            } else if (playerBudget >= repairCost) {
+                if (typeof Game !== 'undefined') {
+                    Game.playerBudget -= repairCost;
+                    Game.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                    }
                 }
+                paidFrom = 'Cüzdanınızdan';
+            } else {
+                const fromTreasury = companyTreasury;
+                const remainder = repairCost - fromTreasury;
+                this.data.companyTreasury = 0;
+                if (typeof Game !== 'undefined') {
+                    Game.playerBudget -= remainder;
+                    Game.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                    }
+                }
+                paidFrom = `Kasa (${fromTreasury.toLocaleString('tr-TR')} ₺) ve Cüzdandan (${remainder.toLocaleString('tr-TR')} ₺)`;
             }
 
             this.data.busConditions[busId] = 100;
+            this.recordTransaction('expense', 'maintenance', `${bus.fullName} Periyodik Bakım & Kademe Onarımı`, repairCost);
             this.saveData();
 
             this.playCashChime();
-            const doneMsg = `🛠️ ${bus.fullName} periyodik bakımı yapıldı! Yağ, frenler ve filtreler yenilendi. Kondisyon: %100 (-${repairCost} ₺).`;
+            const doneMsg = `🛠️ ${bus.fullName} periyodik bakımı yapıldı! Yağ, frenler ve filtreler yenilendi. Kondisyon: %100 (${paidFrom} -${repairCost.toLocaleString('tr-TR')} ₺).`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(doneMsg);
             if (typeof UI !== 'undefined') UI.showToast(doneMsg, "success");
             this.renderAll();
@@ -2226,7 +2298,7 @@
                 const busId = d.assignedBusId || "otokar_kent_lf";
                 const cond = this.getBusCondition(busId);
                 if (cond < 90 && !busesToFix.some(b => b.busId === busId)) {
-                    const garageLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('garage_maintenance') : 1;
+                    const garageLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('maintenance_depot') : 1;
                     let mult = 8;
                     if (garageLvl === 2) mult = 4.4; // %45 İndirim
                     else if (garageLvl >= 3) mult = 2.8; // %65 İndirim
@@ -2241,28 +2313,50 @@
                 return;
             }
 
-            const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
-            if (currentBudget < totalCost) {
-                if (typeof UI !== 'undefined') UI.showToast(`Toplu bakım için ${totalCost} ₺ gerekiyor. Bakiyeniz yetersiz!`, "warning");
+            const companyTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+            const playerBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            if ((companyTreasury + playerBudget) < totalCost) {
+                if (typeof UI !== 'undefined') UI.showToast(`Toplu bakım için ${totalCost.toLocaleString('tr-TR')} ₺ gerekiyor. Bakiyeniz yetersiz!`, "warning");
                 return;
             }
 
-            if (typeof Game !== 'undefined') {
-                Game.playerBudget -= totalCost;
-                Game.saveData();
-                if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
-                    const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
-                    UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+            let paidFrom = '';
+            if (companyTreasury >= totalCost) {
+                this.data.companyTreasury -= totalCost;
+                paidFrom = 'Şirket Kasasından';
+            } else if (playerBudget >= totalCost) {
+                if (typeof Game !== 'undefined') {
+                    Game.playerBudget -= totalCost;
+                    Game.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                    }
                 }
+                paidFrom = 'Cüzdanınızdan';
+            } else {
+                const fromTreasury = companyTreasury;
+                const remainder = totalCost - fromTreasury;
+                this.data.companyTreasury = 0;
+                if (typeof Game !== 'undefined') {
+                    Game.playerBudget -= remainder;
+                    Game.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                    }
+                }
+                paidFrom = `Kasa (${fromTreasury.toLocaleString('tr-TR')} ₺) ve Cüzdandan (${remainder.toLocaleString('tr-TR')} ₺)`;
             }
 
             busesToFix.forEach(b => {
                 this.data.busConditions[b.busId] = 100;
             });
+            this.recordTransaction('expense', 'maintenance', `Tüm Filo Kademe Bakımı (${busesToFix.length} Otobüs)`, totalCost);
             this.saveData();
 
             this.playCashChime();
-            const msg = `🛠️ FİLO SERVİSTE! ${busesToFix.length} otobüsün tüm bakımları tamamlandı! Kasadan -${totalCost} ₺ ödendi.`;
+            const msg = `🛠️ FİLO SERVİSTE! ${busesToFix.length} otobüsün tüm bakımları tamamlandı! ${paidFrom} -${totalCost.toLocaleString('tr-TR')} ₺ ödendi.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof UI !== 'undefined') UI.showToast(msg, "success");
             this.renderAll();
@@ -2279,13 +2373,16 @@
             }
 
             const cost = 120; // 120 TL dinlenme tesisi ikramı
-            const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
-            if (currentBudget < cost) {
+            const companyTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+            const playerBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            if ((companyTreasury + playerBudget) < cost) {
                 if (typeof UI !== 'undefined') UI.showToast(`İkram için ${cost} ₺ gerekiyor. Yetersiz bakiye!`, "warning");
                 return;
             }
 
-            if (typeof Game !== 'undefined') {
+            if (companyTreasury >= cost) {
+                this.data.companyTreasury -= cost;
+            } else if (typeof Game !== 'undefined') {
                 Game.playerBudget -= cost;
                 Game.saveData();
                 if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
@@ -2294,6 +2391,7 @@
                 }
             }
 
+            this.recordTransaction('expense', 'catering', `${driver.name} - Dinlenme Tesisi İkramı`, cost);
             driver.energy = 100;
             this.saveData();
 
@@ -2807,14 +2905,9 @@
             }
 
             // İhaleyi kabul et: Peşin prim kasaya aktarılır
-            if (typeof Game !== 'undefined') {
-                Game.playerBudget = (Game.playerBudget || 0) + contract.rewardBonus;
-                Game.saveData();
-                if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
-                    const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
-                    UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
-                }
-            }
+            this.data.companyTreasury = (this.data.companyTreasury || 0) + contract.rewardBonus;
+            this.data.totalRevenue = (this.data.totalRevenue || 0) + contract.rewardBonus;
+            this.recordTransaction('income', 'dividends', `VIP Protokol İhale Primi: ${contract.title}`, contract.rewardBonus);
 
             this.playCashChime();
             const msg = `🏆 VIP İHALE KABUL EDİLDİ! '${contract.title}' ihalesi ${driver.name} kaptanımıza teslim edildi. Kasaya peşin prim aktarıldı: +${contract.rewardBonus.toLocaleString('tr-TR')} ₺!`;
@@ -2855,23 +2948,45 @@
                 return;
             }
 
-            const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
-            if (currentBudget < cost) {
+            const companyTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
+            const playerBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            if ((companyTreasury + playerBudget) < cost) {
                 const msg = `Yetersiz bakiye! ${upgradeNames[upgradeKey]} için ${cost.toLocaleString('tr-TR')} ₺ gerekiyor.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                 if (typeof UI !== 'undefined') UI.showToast(`⚠️ ${msg}`, "warning");
                 return;
             }
 
-            if (typeof Game !== 'undefined') {
-                Game.playerBudget -= cost;
-                Game.saveData();
-                if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
-                    const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
-                    UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+            let paidFrom = '';
+            if (companyTreasury >= cost) {
+                this.data.companyTreasury -= cost;
+                paidFrom = 'Şirket Kasasından';
+            } else if (playerBudget >= cost) {
+                if (typeof Game !== 'undefined') {
+                    Game.playerBudget -= cost;
+                    Game.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                    }
                 }
+                paidFrom = 'Cüzdanınızdan';
+            } else {
+                const fromTreasury = companyTreasury;
+                const remainder = cost - fromTreasury;
+                this.data.companyTreasury = 0;
+                if (typeof Game !== 'undefined') {
+                    Game.playerBudget -= remainder;
+                    Game.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Kaptan';
+                        UI.updatePlayerStats(Game.licenseLevel, Game.completedTasks, Game.playerBudget, title);
+                    }
+                }
+                paidFrom = 'Kasa ve Cüzdandan';
             }
 
+            this.recordTransaction('expense', 'upgrades', upgradeNames[upgradeKey], cost);
             this.data.hqUpgrades[upgradeKey] = true;
             this.saveData();
 
@@ -3091,12 +3206,13 @@
             this.data.companyTreasury = 0;
             this.data.companyLevel = 1;
             this.data.institutions = {
-                headquarters: 1,
                 bus_garage: 1,
-                terminal_offices: 1,
                 maintenance_depot: 1,
+                bus_wash: 1,
+                fuel_depot: 1,
+                terminal_offices: 1,
                 driver_lodging: 1,
-                city_agencies: 1
+                catering_cargo_hub: 1
             };
             this.data.terminalBranches = {
                 tekirdag: true,
@@ -3393,7 +3509,7 @@
 
             let advice = "Filonuz dengeli çalışıyor. Sefer sayısını artırarak cironuzu yükseltebilirsiniz.";
             if (fuelExp > (totalExp * 0.35) && fuelExp > 5000) {
-                advice = "💡 <strong>Akaryakıt Masrafınız Yüksek:</strong> Otogar Yazıhanelerini Seviye 3 yaparak tüm araçlarınıza <strong>%100 BEDAVA MAZOT</strong> alabilir ve kârınızı devasa oranda artırabilirsiniz!";
+                advice = "💡 <strong>Akaryakıt Masrafınız Yüksek:</strong> Şirket Akaryakıt İstasyonunu (Fuel Depot) Seviye 3 yaparak tüm filonuza <strong>%100 BEDAVA MAZOT</strong> alabilir ve yakıt giderini sıfırlayabilirsiniz!";
             } else if (maintExp > (totalExp * 0.30) && maintExp > 5000) {
                 advice = "💡 <strong>Tamir Masrafınız Yüksek:</strong> Kademe Binasını Seviye 2 veya 3'e büyüterek bakım faturalarınızı <strong>%65'e varan oranda</strong> ucuzlatabilirsiniz.";
             } else if (cargoRev > 0) {
@@ -3559,8 +3675,28 @@
             modal.classList.remove('hidden');
             this.renderAll();
 
+            if (!this._escapeBound) {
+                this._escapeBound = true;
+                window.addEventListener('keydown', (e) => {
+                    const m = document.getElementById('company-system-modal');
+                    if (m && !m.classList.contains('hidden') && e.key === 'Escape') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.closeCompanyModal();
+                    }
+                });
+            }
+
             if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
                 KeyboardNav.initForScreen();
+            }
+
+            // Erişilebilirlik odağını ilk sekmeye ver
+            const firstTab = document.getElementById('tab-comp-drivers');
+            if (firstTab) {
+                setTimeout(() => {
+                    try { firstTab.focus(); } catch(e) {}
+                }, 100);
             }
 
             const currentLvl = this.companyLevels.find(l => l.level === (this.data.companyLevel || 1)) || this.companyLevels[0];
@@ -3576,6 +3712,13 @@
             if (modal) modal.classList.add('hidden');
             if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
                 KeyboardNav.initForScreen();
+            }
+            const btnOpen = document.getElementById('btn-open-company');
+            if (btnOpen) {
+                try { btnOpen.focus(); } catch(e) {}
+            }
+            if (typeof audio !== 'undefined' && audio.speak) {
+                audio.speak("Şirket yönetim merkezi kapatıldı, ana menüye dönüldü.");
             }
         },
 
@@ -3716,10 +3859,18 @@
 
             document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-            // Kapat butonları
+            // Kapat butonu ve Dış Tıklama (Backdrop Overlay)
             document.getElementById('btn-close-company-modal').addEventListener('click', () => {
                 this.closeCompanyModal();
             });
+            const compSysModal = document.getElementById('company-system-modal');
+            if (compSysModal) {
+                compSysModal.addEventListener('click', (e) => {
+                    if (e.target === compSysModal) {
+                        this.closeCompanyModal();
+                    }
+                });
+            }
 
             // AI Dağıtım butonu
             document.getElementById('btn-company-ai-dispatch-top').addEventListener('click', () => {
@@ -3866,7 +4017,7 @@
                             return `<div style="background: rgba(239, 68, 68, 0.25); border: 1.5px solid #ef4444; border-radius: 6px; padding: 4px 8px; color: #fca5a5; font-size: 0.92rem;">
                                 <span style="color: #ef4444; font-weight: bold;">🚨 Şirket Kasası: ${companyTreasury.toLocaleString('tr-TR')} ₺</span>
                                 <div style="font-size: 0.74rem; color: #fecaca; margin-top: 1px;">
-                                    <strong>KIRMIZI ALARM:</strong> İflasa Kalan: ${(-1000000 - companyTreasury).toLocaleString('tr-TR')} ₺
+                                    <strong>KIRMIZI ALARM:</strong> İflasa Kalan Borç Payı: ${Math.max(0, companyTreasury - this.BANKRUPTCY_LIMIT).toLocaleString('tr-TR')} ₺
                                 </div>
                             </div>`;
                         } else if (companyTreasury <= -250000) {
@@ -4253,7 +4404,7 @@
                                     ${contract.icon} ${contract.title}
                                 </div>
                                 <div style="color: #38bdf8; font-size: 0.85rem; margin-top: 2px;">
-                                    Kurum: <strong>${contract.client}</strong> | Peşin Prim: <strong style="color: #4ade80; font-size: 1.05rem;">+${contract.rewardBonus.toLocaleString('tr-TR')} ₺</strong>
+                                    Kurum: <strong>${contract.client || 'Resmi Kurum'}</strong> | Peşin Prim: <strong style="color: #4ade80; font-size: 1.05rem;">+${(contract.rewardBonus || 0).toLocaleString('tr-TR')} ₺</strong>
                                 </div>
                                 <div style="color: #cbd5e1; font-size: 0.82rem; margin-top: 4px; max-width: 520px;">
                                     ${contract.desc} (Gereken Kaptan: En az Seviye ${contract.reqMinRank} Kaptan)
@@ -4489,14 +4640,6 @@
             }).join('');
         },
 
-        setCompanyName: function(newName) {
-            this.data.companyName = newName;
-            this.saveData();
-            this.renderCompanyOverview();
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏢 Şirket İsmi: ${this.data.companyName}`, 'success');
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Şirket ismi ${this.data.companyName} olarak kaydedildi.`);
-        },
-
         joinCorporateCompany: function(companyId) {
             const comp = this.getCompanyById(companyId);
             if (!comp) return;
@@ -4530,6 +4673,7 @@
             }
 
             this.data.corporateEmployer = comp.id;
+            this.data.isIndependentMode = false;
             this.saveData();
 
             // İlk işe başlama primini hediye et
