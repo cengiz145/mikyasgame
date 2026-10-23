@@ -129,21 +129,24 @@ class AudioSystem {
             select: new Howl({ src: ['sounds/menuenter21.wav'] }),
             start: new Howl({ src: [typeof AUDIO_B64 !== 'undefined' ? AUDIO_B64.start : 'sounds/Bus-contac.wav'] }),
             doorOpen: new Howl({ 
-                src: [typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorOpen ? AUDIO_B64.doorOpen : 'sounds/freesound_bus_door.mp3', 'sounds/otobüs kapı açılma sesi.mp3'],
+                src: ['sounds/bus_door_open.mp3', 'sounds/freesound_bus_door.mp3', typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorOpen ? AUDIO_B64.doorOpen : ''],
                 format: ['mp3']
             }),
             doorClose: new Howl({ 
-                src: [typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorClose ? AUDIO_B64.doorClose : 'sounds/freesound_bus_door.mp3', 'sounds/otobüs kapı kapanma sesi.mp3'],
+                src: ['sounds/bus_door_close.mp3', 'sounds/freesound_bus_door.mp3', typeof AUDIO_B64 !== 'undefined' && AUDIO_B64.doorClose ? AUDIO_B64.doorClose : ''],
                 format: ['mp3']
             }),
             turnTick: new Howl({ src: ['sounds/vinebeep5.ogg'] }),
             crash: new Howl({ src: ['sounds/underwaterland.ogg'] }),
-            airHorn: new Howl({ src: ['sounds/freesound_industrial_horn.mp3', 'sounds/havalı korna.mp3'], volume: 0.90 }),
+            airHorn: new Howl({ src: ['sounds/air_horn.mp3', 'sounds/freesound_industrial_horn.mp3'], volume: 0.90 }),
             airBrake: new Howl({ src: ['sounds/freesound_air_brake.mp3'], volume: 0.90 }),
-            akbilTam: new Howl({ src: ['sounds/freesound_akbil_tam.mp3'], volume: 0.90 }),
-            akbilOgrenci: new Howl({ src: ['sounds/freesound_akbil_ogrenci.mp3'], volume: 0.90 }),
-            akbilHata: new Howl({ src: ['sounds/freesound_akbil_hata.mp3'], volume: 0.90 }),
-            busValidator: new Howl({ src: ['sounds/freesound_bus_validator.mp3'], volume: 0.90 }),
+            akbilTam: new Howl({ src: ['sounds/kentkart_tam.wav', 'sounds/freesound_akbil_tam.mp3'], volume: 0.95 }),
+            akbilOgrenci: new Howl({ src: ['sounds/kentkart_ogrenci.wav', 'sounds/freesound_akbil_ogrenci.mp3'], volume: 0.95 }),
+            akbilAylik: new Howl({ src: ['sounds/kentkart_abonman.wav', 'sounds/real_akbil_aylik.mp3'], volume: 0.95 }),
+            akbilAktarma: new Howl({ src: ['sounds/kentkart_aktarma.wav', 'sounds/real_akbil_aktarma.mp3'], volume: 0.95 }),
+            akbilUcretsiz: new Howl({ src: ['sounds/kentkart_ucretsiz.wav', 'sounds/freesound_akbil_ucretsiz.wav'], volume: 0.95 }),
+            akbilHata: new Howl({ src: ['sounds/kentkart_yetersiz.wav', 'sounds/freesound_akbil_hata.mp3'], volume: 0.95 }),
+            busValidator: new Howl({ src: ['sounds/kentkart_tam.wav', 'sounds/kentkart_ucretsiz.wav'], volume: 0.95 }),
             npcHorn: new Howl({ src: ['sounds/vehicle_h1.ogg'], volume: 0.80 }),
             menuMusic: new Howl({ src: ['sounds/music53.wav'], loop: true, volume: 0.2 }),
             rain8: new Howl({ src: ['sounds/rain8.ogg'], loop: true, volume: 0 }),
@@ -151,8 +154,7 @@ class AudioSystem {
             rain10: new Howl({ src: ['sounds/rain10.ogg'], loop: true, volume: 0 }),
             rain11: new Howl({ src: ['sounds/rain11.ogg'], loop: true, volume: 0 }),
             // Freesound Gerçek Çevre ve Yol Sesleri (Asfalt, Çakıl, Kum, Rüzgar, Derz)
-// Freesound Gerçek Çevre ve Yol Sesleri (Doğal Şehir Ambiyansı, Kuş Sesleri, Asfalt, Rüzgar)
-                        tireScreech: new Howl({ src: ['sounds/freesound_tire_screech.mp3'], loop: false, volume: 0.85 }),
+            tireScreech: new Howl({ src: ['sounds/freesound_tire_screech.mp3'], loop: false, volume: 0.85 }),
             snowTires: new Howl({ src: ['sounds/freesound_snow_tires.mp3'], loop: true, volume: 0 }),
             beachShore: new Howl({ src: ['sounds/freesound_beach_shore.mp3'], loop: true, volume: 0 }),
             cabinAmbience: new Howl({ src: ['sounds/freesound_bus_cabin_ambience.mp3'], loop: true, volume: 0 }),
@@ -160,7 +162,45 @@ class AudioSystem {
             roadAsphalt: new Howl({ src: ['sounds/freesound_road_asphalt.mp3'], loop: true, volume: 0 }),
             roadGravel: new Howl({ src: ['sounds/freesound_road_gravel.mp3'], loop: true, volume: 0 }),
             roadGravelAsphalt: new Howl({ src: ['sounds/freesound_road_gravel_asphalt.mp3'], loop: true, volume: 0 }),
-            roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 })};
+            roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 }),
+            roadJointHit: new Howl({ src: ['sounds/freesound_road_joint_hit.wav'], volume: 0.85 }),
+            roadJointHit1: new Howl({ src: ['sounds/freesound_road_joint_hit1.wav'], volume: 0.85 }),
+            roadJointHit2: new Howl({ src: ['sounds/freesound_road_joint_hit2.wav'], volume: 0.85 }),
+            gongTekli: new Howl({ src: ['sounds/anons_tekli_gong.wav', 'sounds/anons_tekli_gong.mp3'], volume: 0.95 }),
+            zil3lu: new Howl({ src: ['sounds/anons_3lu_zil.wav', 'sounds/anons_3lu_zil.mp3'], volume: 0.95 }),
+            rampDeploy: new Howl({ src: ['sounds/freesound_ramp_deploy.mp3'], volume: 0.85 }),
+            rampRetract: new Howl({ src: ['sounds/freesound_ramp_retract.mp3'], volume: 0.85 }),
+            // Freesound Gerçek Canlı Yolcu Tepki ve Homurtu Sesleri
+            passengerShock: new Howl({ src: ['sounds/freesound_passenger_shock.mp3'], volume: 0.85 }),
+            passengerBump: new Howl({ src: ['sounds/freesound_passenger_bump.mp3'], volume: 0.85 }),
+            passengerDiscontent: new Howl({ src: ['sounds/freesound_passenger_discontent.mp3'], volume: 0.80 }),
+            passengerGroan: new Howl({ src: ['sounds/freesound_passenger_groan.mp3'], volume: 0.80 }),
+            passengerMurmur: new Howl({ src: ['sounds/freesound_passenger_murmur_loop.mp3'], loop: true, volume: 0 }),
+            // Freesound Sinematik Atmosfer ve Yol Sesleri
+            teaPour: new Howl({ src: ['sounds/freesound_tea_pour.mp3'], volume: 0.85 }),
+            teaStir: new Howl({ src: ['sounds/freesound_tea_stir.mp3'], volume: 0.85 }),
+            trolleyCart: new Howl({ src: ['sounds/freesound_trolley_cart.mp3'], volume: 0.80 }),
+            snackWrapper: new Howl({ src: ['sounds/freesound_snack_wrapper.mp3'], volume: 0.80 }),
+            stationChime: new Howl({ src: ['sounds/freesound_station_chime.mp3'], volume: 0.90 }),
+            luggageSuitcase: new Howl({ src: ['sounds/freesound_luggage_suitcase.mp3'], volume: 0.85 }),
+            policeSiren: new Howl({ src: ['sounds/freesound_police_siren.mp3'], volume: 0.80 }),
+            tachographPrint: new Howl({ src: ['sounds/freesound_tachograph_print.mp3'], volume: 0.85 }),
+            thunderclap: new Howl({ src: ['sounds/freesound_thunderclap.mp3'], volume: 0.90 }),
+            distantFoghorn: new Howl({ src: ['sounds/freesound_distant_foghorn.mp3'], volume: 0.80 }),
+            radioSquelch: new Howl({ src: ['sounds/freesound_radio_squelch.mp3'], volume: 0.75 }),
+            crowdWalla: new Howl({ src: ['sounds/freesound_crowd_walla.mp3'], loop: true, volume: 0 }),
+            dinerAmbience: new Howl({ src: ['sounds/freesound_diner_ambience.mp3'], loop: true, volume: 0 }),
+            reverseBeep: new Howl({ src: ['sounds/freesound_reverse_beep.mp3'], loop: true, volume: 0.85 }),
+            handbrakeAir: new Howl({ src: ['sounds/freesound_handbrake_air.mp3'], volume: 0.85 })};
+
+        this.gameSoundVolume = 1.0;
+        this.musicVolume = 0.2;
+        this.soundBaseVolumes = {};
+        for (let k in this.sounds) {
+            if (k !== 'menuMusic' && this.sounds[k] && typeof this.sounds[k].volume === 'function') {
+                this.soundBaseVolumes[k] = this.sounds[k].volume() || 1.0;
+            }
+        }
 
         // KORNA İÇİN ÖZEL WEB AUDIO API KURULUMU (Boğuk efekti ve trim için)
         this.hornBuffer = null;
@@ -341,6 +381,15 @@ class AudioSystem {
         }
     }
 
+    isInBusCabin() {
+        if (typeof Game !== 'undefined' && Game.isDriving) return true;
+        const drivingEl = document.getElementById('driving-screen');
+        if (drivingEl && !drivingEl.classList.contains('hidden')) return true;
+        const stopEl = document.getElementById('stop-screen');
+        if (stopEl && !stopEl.classList.contains('hidden')) return true;
+        return false;
+    }
+
     updateNvdaLiveRegion(text) {
         let liveRegion = document.getElementById('nvda-live-region');
         if (!liveRegion) {
@@ -378,23 +427,105 @@ class AudioSystem {
     }
 
     playMenuMusic() {
-        if (!this.sounds.menuMusic.playing()) {
-            this.sounds.menuMusic.play();
+        if (!this.sounds || !this.sounds.menuMusic) return;
+        if (typeof this.musicVolume === 'number') {
+            this.sounds.menuMusic.volume(this.musicVolume);
+        }
+        if (!this.sounds.menuMusic.playing() && (this.musicVolume === undefined || this.musicVolume > 0)) {
+            try {
+                this.sounds.menuMusic.play();
+            } catch(e) {}
         }
     }
 
     stopMenuMusic() {
-        this.sounds.menuMusic.stop();
+        if (this.sounds && this.sounds.menuMusic) {
+            this.sounds.menuMusic.stop();
+        }
     }
 
     adjustMusicVolume(amount) {
-        if (!this.sounds.menuMusic.playing()) return;
-        let newVol = this.sounds.menuMusic.volume() + amount;
+        if (typeof this.musicVolume !== 'number') {
+            this.musicVolume = (this.sounds && this.sounds.menuMusic) ? this.sounds.menuMusic.volume() : 0.2;
+        }
+        let newVol = Math.round((this.musicVolume + amount) * 100) / 100;
         newVol = Math.max(0, Math.min(1, newVol));
-        this.sounds.menuMusic.volume(newVol);
-        
+        this.musicVolume = newVol;
+
+        if (this.sounds && this.sounds.menuMusic) {
+            this.sounds.menuMusic.volume(newVol);
+            if (newVol > 0 && !this.sounds.menuMusic.playing()) {
+                try {
+                    this.sounds.menuMusic.play();
+                } catch(e) {}
+            } else if (newVol === 0 && this.sounds.menuMusic.playing()) {
+                this.sounds.menuMusic.pause();
+            }
+        }
+
+        const percent = Math.round(newVol * 100);
+        const toastMsg = percent === 0 ? "Müzik Sesi: Kapalı (%0)" : (percent === 100 ? "Müzik Sesi: %100 (Maksimum)" : `Müzik Sesi: %${percent}`);
+        const speechMsg = percent === 0 ? "Müzik sesi kapatıldı" : (percent === 100 ? "Müzik sesi yüzde yüz, maksimum" : `Müzik sesi yüzde ${percent}`);
+
         if (typeof UI !== 'undefined' && UI.showToast) {
-            UI.showToast(`Müzik Sesi: %${Math.round(newVol * 100)}`, 'success');
+            UI.showToast(toastMsg, 'success');
+        }
+        if (typeof this.updateNvdaLiveRegion === 'function') {
+            this.updateNvdaLiveRegion(speechMsg);
+        }
+        if (typeof this.speak === 'function') {
+            this.speak(speechMsg);
+        }
+    }
+
+    adjustGameSoundVolume(amount) {
+        if (typeof this.gameSoundVolume !== 'number') {
+            this.gameSoundVolume = 1.0;
+        }
+        let newVol = Math.round((this.gameSoundVolume + amount) * 100) / 100;
+        newVol = Math.max(0, Math.min(1, newVol));
+        this.gameSoundVolume = newVol;
+
+        // 1. Web Audio ortam/motor/efekt mikseri sesini ayarla
+        if (this.environmentMixer && this.ctx) {
+            try {
+                this.environmentMixer.gain.setTargetAtTime(newVol, this.ctx.currentTime, 0.05);
+            } catch(e) {}
+        }
+
+        // 2. Howler efekt seslerinin (menuMusic hariç) ses düzeyini güncelle
+        if (!this.soundBaseVolumes) {
+            this.soundBaseVolumes = {};
+            for (let k in this.sounds) {
+                if (k !== 'menuMusic' && this.sounds[k] && typeof this.sounds[k].volume === 'function') {
+                    this.soundBaseVolumes[k] = this.sounds[k].volume();
+                }
+            }
+        }
+        for (let k in this.sounds) {
+            if (k !== 'menuMusic' && this.sounds[k] && typeof this.sounds[k].volume === 'function') {
+                const base = (this.soundBaseVolumes[k] !== undefined) ? this.soundBaseVolumes[k] : 1.0;
+                this.sounds[k].volume(base * newVol);
+            }
+        }
+
+        const percent = Math.round(newVol * 100);
+        const toastMsg = percent === 0 ? "Oyun Ses Düzeyi: Kapalı (%0)" : (percent === 100 ? "Oyun Ses Düzeyi: %100 (Maksimum)" : `Oyun Ses Düzeyi: %${percent}`);
+        const speechMsg = percent === 0 ? "Oyun sesi kapatıldı" : (percent === 100 ? "Oyun ses düzeyi yüzde yüz, maksimum" : `Oyun ses düzeyi yüzde ${percent}`);
+
+        if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast(toastMsg, 'info');
+        }
+        if (typeof this.updateNvdaLiveRegion === 'function') {
+            this.updateNvdaLiveRegion(speechMsg);
+        }
+        if (typeof this.speak === 'function') {
+            this.speak(speechMsg);
+        }
+
+        // Kullanıcının yeni ses düzeyini hemen duyması için kısa navigasyon sesi çal
+        if (newVol > 0 && typeof this.playNav === 'function') {
+            this.playNav();
         }
     }
 
@@ -442,7 +573,7 @@ class AudioSystem {
         }
 
         if (!this.retarderOsc) {
-            // Gerçek Voith / ZF Hidrolik Retarder Akustiği (Çift Harmonik Türbin Islığı)
+            // Gerçek Voith / ZF Hidrolik Retarder Akustiği (Çift Harmonik Türbin Islığı + Hidrolik Türbülans)
             this.retarderOsc = this.ctx.createOscillator();
             this.retarderOsc.type = 'sine'; // Ana hidrolik girdap frekansı
             this.retarderOsc2 = this.ctx.createOscillator();
@@ -460,6 +591,34 @@ class AudioSystem {
             this.retarderGain = this.ctx.createGain();
             this.retarderGain.gain.value = 0.0;
 
+            // Retarder hidrodinamik yağ sirkülasyonu ve gövde türbülansı (Pink noise)
+            const sampleRate = this.ctx.sampleRate || 44100;
+            const bufferSize = sampleRate * 2;
+            const noiseBuf = this.ctx.createBuffer(1, bufferSize, sampleRate);
+            const output = noiseBuf.getChannelData(0);
+            let b0 = 0, b1 = 0, b2 = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                output[i] = (b0 + b1 + b2 + white * 0.5362) * 0.16;
+            }
+            this.retarderTurbulenceSource = this.ctx.createBufferSource();
+            this.retarderTurbulenceSource.buffer = noiseBuf;
+            this.retarderTurbulenceSource.loop = true;
+
+            this.retarderTurbulenceFilter = this.ctx.createBiquadFilter();
+            this.retarderTurbulenceFilter.type = 'bandpass';
+            this.retarderTurbulenceFilter.Q.value = 3.5;
+
+            this.retarderTurbulenceGain = this.ctx.createGain();
+            this.retarderTurbulenceGain.gain.value = 0.0;
+
+            this.retarderTurbulenceSource.connect(this.retarderTurbulenceFilter);
+            this.retarderTurbulenceFilter.connect(this.retarderTurbulenceGain);
+            this.retarderTurbulenceGain.connect(this.retarderGain);
+
             this.retarderOsc.connect(this.retarderFilter);
             this.retarderOsc2.connect(this.retarderFilter2);
             this.retarderFilter.connect(this.retarderGain);
@@ -470,10 +629,12 @@ class AudioSystem {
 
             this.retarderOsc.start();
             this.retarderOsc2.start();
+            this.retarderTurbulenceSource.start();
             this.wasRetarderEngaged = false;
         }
 
-        const isEngaged = (speed > 20 && isBraking) || (this.isRetarderManuallyEngaged && speed > 15);
+        const hasManualRetarder = (typeof Game !== 'undefined' && Game.retarderLevel && Game.retarderLevel > 0) || this.isRetarderManuallyEngaged;
+        const isEngaged = (speed > 20 && isBraking) || (hasManualRetarder && speed > 8);
         if (isEngaged) {
             const pitchFactor = profile && profile.retarderPitch ? profile.retarderPitch : 1.0;
             const cabinDamping = profile && profile.cabinDamping ? profile.cabinDamping : 0.8;
@@ -486,9 +647,15 @@ class AudioSystem {
 
             this.retarderFilter.frequency.setTargetAtTime(baseF, this.ctx.currentTime, 0.06);
             this.retarderFilter2.frequency.setTargetAtTime(harmF, this.ctx.currentTime, 0.06);
+            if (this.retarderTurbulenceFilter) {
+                this.retarderTurbulenceFilter.frequency.setTargetAtTime(baseF * 0.75, this.ctx.currentTime, 0.06);
+            }
 
             const targetGain = Math.min(0.28, (speed / 70) * 0.28) * cabinDamping;
             this.retarderGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.10);
+            if (this.retarderTurbulenceGain) {
+                this.retarderTurbulenceGain.gain.setTargetAtTime(0.42, this.ctx.currentTime, 0.10);
+            }
 
             this.wasRetarderEngaged = true;
             const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
@@ -504,6 +671,9 @@ class AudioSystem {
                 this.wasRetarderEngaged = false;
             }
             this.retarderGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.20);
+            if (this.retarderTurbulenceGain) {
+                this.retarderTurbulenceGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.20);
+            }
             const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
             if (el) el.style.display = 'none';
         }
@@ -513,6 +683,18 @@ class AudioSystem {
         this.init();
         this.isRetarderManuallyEngaged = true;
         this.updateRetarder(speed, true);
+        if (this.retarderAutoStopTimer) {
+            clearTimeout(this.retarderAutoStopTimer);
+            this.retarderAutoStopTimer = null;
+        }
+        if (duration && duration > 0) {
+            this.retarderAutoStopTimer = setTimeout(() => {
+                // Sadece ayak freni simülasyonuysa otomatik kapat, kol çekiliyse kapatma
+                if (typeof Game === 'undefined' || !Game.retarderLevel || Game.retarderLevel === 0) {
+                    this.stopRetarder();
+                }
+            }, duration * 1000);
+        }
     }
 
     stopRetarder() {
@@ -522,6 +704,87 @@ class AudioSystem {
         }
         const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
         if (el) el.style.display = 'none';
+    }
+
+    playDoorButtonTick() {
+        this.init();
+        if (typeof this.playSwitchClick === 'function') {
+            this.playSwitchClick();
+        } else if (typeof this.playTurnTick === 'function') {
+            this.playTurnTick(0);
+        }
+    }
+
+    playStopChime() {
+        this.init();
+        if (typeof this.playIBISChime === 'function') {
+            this.playIBISChime();
+        } else if (typeof this.playStationChime === 'function') {
+            this.playStationChime();
+        }
+    }
+
+    playRadioTalk() {
+        this.init();
+        if (typeof this.playRadioSquelchSound === 'function') {
+            this.playRadioSquelchSound();
+        } else if (typeof this.playRadioSquelch === 'function') {
+            this.playRadioSquelch();
+        }
+    }
+
+    playChime() {
+        this.init();
+        if (typeof this.playStationChime === 'function') {
+            this.playStationChime();
+        } else if (typeof this.playIBISChime === 'function') {
+            this.playIBISChime();
+        } else if (typeof this.playNavChime === 'function') {
+            this.playNavChime();
+        }
+    }
+
+    playWarning() {
+        this.init();
+        if (!this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(580, now);
+            osc.frequency.setValueAtTime(440, now + 0.12);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+            osc.connect(gain);
+            gain.connect(this.masterGain || this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.29);
+        } catch(e) {}
+    }
+
+    playSuccess() {
+        this.init();
+        if (typeof this.playBadgeFanfare === 'function') {
+            try { this.playBadgeFanfare(); return; } catch(e) {}
+        }
+        if (!this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            freqs.forEach((f, idx) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(f, now + (idx * 0.08));
+                gain.gain.setValueAtTime(0.2, now + (idx * 0.08));
+                gain.gain.exponentialRampToValueAtTime(0.005, now + (idx * 0.08) + 0.35);
+                osc.connect(gain);
+                gain.connect(this.masterGain || this.ctx.destination);
+                osc.start(now + (idx * 0.08));
+                osc.stop(now + (idx * 0.08) + 0.36);
+            });
+        } catch(e) {}
     }
 
     playNav() {
@@ -944,75 +1207,50 @@ startEngine() {
     // Köprü / Viyadük çelik genleşme derzi vuruntusu (tak-tak, tak-tak)
     playBridgeJoint(speed = 50) {
         if (!this.ctx) return;
-        const now = this.ctx.currentTime;
-        const gainVal = Math.min(0.28, 0.08 + (speed / 100) * 0.18);
+        const volumeFactor = Math.min(1.0, 0.4 + (speed / 100) * 0.6);
+        const rateFactor = Math.min(1.2, 0.9 + (speed / 120) * 0.3);
+        const wheelbaseDelay = Math.max(70, Math.min(260, (12 / Math.max(10, (speed / 3.6))) * 1000));
 
-        const playThump = (timeOffset, freq, panVal) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            const panner = (typeof this.ctx.createStereoPanner === 'function') ? this.ctx.createStereoPanner() : null;
-
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, now + timeOffset);
-            osc.frequency.exponentialRampToValueAtTime(45, now + timeOffset + 0.045);
-
-            gain.gain.setValueAtTime(gainVal, now + timeOffset);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.05);
-
-            osc.connect(gain);
-            if (panner) {
-                panner.pan.value = panVal;
-                gain.connect(panner);
-                panner.connect(this.environmentMixer || this.ctx.destination);
-            } else {
-                gain.connect(this.environmentMixer || this.ctx.destination);
+        // Ön aks derz darbesi (Stereo hafif sol)
+        if (this.sounds && this.sounds.roadJointHit1) {
+            try {
+                const id1 = this.sounds.roadJointHit1.play();
+                this.sounds.roadJointHit1.volume(0.80 * volumeFactor, id1);
+                this.sounds.roadJointHit1.rate(rateFactor, id1);
+                if (typeof this.sounds.roadJointHit1.stereo === 'function') this.sounds.roadJointHit1.stereo(-0.25, id1);
+            } catch(e) {}
+        }
+        // Arka aks derz darbesi (Stereo hafif sağ, dingil mesafesi gecikmesiyle)
+        setTimeout(() => {
+            if (this.sounds && this.sounds.roadJointHit2) {
+                try {
+                    const id2 = this.sounds.roadJointHit2.play();
+                    this.sounds.roadJointHit2.volume(0.90 * volumeFactor, id2);
+                    this.sounds.roadJointHit2.rate(rateFactor * 0.96, id2);
+                    if (typeof this.sounds.roadJointHit2.stereo === 'function') this.sounds.roadJointHit2.stereo(0.25, id2);
+                } catch(e) {}
             }
-            osc.start(now + timeOffset);
-            osc.stop(now + timeOffset + 0.055);
-        };
-
-        playThump(0.00, 110, -0.2);
-        playThump(0.03, 95, 0.2);
-        const wheelbaseDelay = Math.max(0.08, Math.min(0.28, 12 / Math.max(10, (speed / 3.6))));
-        playThump(wheelbaseDelay, 100, -0.3);
-        playThump(wheelbaseDelay + 0.03, 85, 0.3);
+        }, wheelbaseDelay);
     }
 
     // Asfalt Çukuru (Pothole Thump) - Hangi tekerlek girdiyse o hoparlörden sert darbe
     playPotholeThump(side = 'right', speed = 50) {
         if (!this.ctx) return;
-        const now = this.ctx.currentTime;
         const isSevere = speed > 35;
         const susp = this.activeBusSuspension || 70;
-        // Havalı körük ve bağımsız aks süspansiyon sönümlemesi:
-        // Setra (%98) ve Travego (%93)'te sert darbe yerine tok ve yumuşak hava sönümü oluşur
-        const suspDamping = Math.max(0.38, 1.0 - (((susp - 55) / 45) * 0.58));
-        const gainVal = (isSevere ? 0.40 : 0.20) * suspDamping;
-        const panVal = (side === 'left') ? -0.8 : 0.8;
+        const suspDamping = Math.max(0.40, 1.0 - (((susp - 55) / 45) * 0.55));
+        const gainVal = (isSevere ? 0.95 : 0.65) * suspDamping;
+        const panVal = (side === 'left') ? -0.75 : 0.75;
+        const rateVal = (isSevere ? 1.05 : 0.92);
 
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        const panner = (typeof this.ctx.createStereoPanner === 'function') ? this.ctx.createStereoPanner() : null;
-
-        // Yüksek konforda sert testere dişi yerine pürüzsüz üçgen dalga
-        osc.type = (susp > 85) ? 'triangle' : (isSevere ? 'sawtooth' : 'triangle');
-        const startFreq = (susp > 85) ? (isSevere ? 120 : 90) : (isSevere ? 180 : 130);
-        osc.frequency.setValueAtTime(startFreq, now);
-        osc.frequency.exponentialRampToValueAtTime(30, now + 0.12);
-
-        gain.gain.setValueAtTime(gainVal, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + (isSevere ? 0.20 : 0.12));
-
-        osc.connect(gain);
-        if (panner) {
-            panner.pan.value = panVal;
-            gain.connect(panner);
-            panner.connect(this.environmentMixer || this.ctx.destination);
-        } else {
-            gain.connect(this.environmentMixer || this.ctx.destination);
+        if (this.sounds && this.sounds.roadJointHit) {
+            try {
+                const id = this.sounds.roadJointHit.play();
+                this.sounds.roadJointHit.volume(gainVal, id);
+                this.sounds.roadJointHit.rate(rateVal, id);
+                if (typeof this.sounds.roadJointHit.stereo === 'function') this.sounds.roadJointHit.stereo(panVal, id);
+            } catch(e) {}
         }
-        osc.start(now);
-        osc.stop(now + 0.2);
     }
 
     // Trafik Işıkları Akustik Sinyalizasyonu (Görme Engelliler İçin)
@@ -1046,6 +1284,317 @@ startEngine() {
         const id = this.sounds.crash.play();
         this.sounds.crash.stereo(pan, id);
         this.sounds.crash.volume(0.35, id);
+    }
+
+    // --- FREESOUND GERÇEK YOLCU AKUSTİK TEPKİLERİ ---
+    playPassengerShock() {
+        if (!this.sounds || !this.sounds.passengerShock) return;
+        const now = performance.now();
+        if (this.lastPassengerShockTime && (now - this.lastPassengerShockTime < 6000)) return;
+        this.lastPassengerShockTime = now;
+        try {
+            const id = this.sounds.passengerShock.play();
+            if (typeof this.sounds.passengerShock.stereo === 'function') {
+                this.sounds.passengerShock.stereo((Math.random() - 0.5) * 0.5, id);
+            }
+            this.sounds.passengerShock.volume(0.85, id);
+        } catch(e) {}
+    }
+
+    playPassengerBump() {
+        if (!this.sounds || !this.sounds.passengerBump) return;
+        const now = performance.now();
+        if (this.lastPassengerBumpTime && (now - this.lastPassengerBumpTime < 5000)) return;
+        this.lastPassengerBumpTime = now;
+        try {
+            const id = this.sounds.passengerBump.play();
+            if (typeof this.sounds.passengerBump.stereo === 'function') {
+                this.sounds.passengerBump.stereo((Math.random() - 0.5) * 0.5, id);
+            }
+            this.sounds.passengerBump.volume(0.85, id);
+        } catch(e) {}
+    }
+
+    playPassengerDiscontent() {
+        if (!this.sounds || !this.sounds.passengerDiscontent) return;
+        const now = performance.now();
+        if (this.lastPassengerDiscontentTime && (now - this.lastPassengerDiscontentTime < 14000)) return;
+        this.lastPassengerDiscontentTime = now;
+        try {
+            const id = this.sounds.passengerDiscontent.play();
+            if (typeof this.sounds.passengerDiscontent.stereo === 'function') {
+                this.sounds.passengerDiscontent.stereo((Math.random() - 0.5) * 0.5, id);
+            }
+            this.sounds.passengerDiscontent.volume(0.80, id);
+        } catch(e) {}
+    }
+
+    playPassengerGroan() {
+        if (!this.sounds || !this.sounds.passengerGroan) return;
+        const now = performance.now();
+        if (this.lastPassengerGroanTime && (now - this.lastPassengerGroanTime < 22000)) return;
+        this.lastPassengerGroanTime = now;
+        try {
+            const id = this.sounds.passengerGroan.play();
+            if (typeof this.sounds.passengerGroan.stereo === 'function') {
+                this.sounds.passengerGroan.stereo((Math.random() - 0.5) * 0.5, id);
+            }
+            this.sounds.passengerGroan.volume(0.80, id);
+        } catch(e) {}
+    }
+
+    updatePassengerCabinMurmur(passengerCount = 0, isDriving = false) {
+        if (!this.sounds || !this.sounds.passengerMurmur) return;
+        if (!isDriving || passengerCount <= 0) {
+            if (this.sounds.passengerMurmur.playing()) {
+                this.sounds.passengerMurmur.fade(this.sounds.passengerMurmur.volume(), 0, 600);
+                setTimeout(() => {
+                    try { if (this.sounds.passengerMurmur) this.sounds.passengerMurmur.pause(); } catch(e){}
+                }, 600);
+            }
+            return;
+        }
+
+        // Yolcu sayısına göre tatlı bir kabin içi yaşam mırıltısı
+        const targetVol = Math.min(0.12, 0.03 + (passengerCount / 60) * 0.09);
+        if (!this.sounds.passengerMurmur.playing()) {
+            this.sounds.passengerMurmur.volume(0);
+            this.sounds.passengerMurmur.play();
+            this.sounds.passengerMurmur.fade(0, targetVol, 1200);
+        } else {
+            this.sounds.passengerMurmur.fade(this.sounds.passengerMurmur.volume(), targetVol, 400);
+        }
+    }
+
+    // --- FREESOUND SİNEMATİK SAHNE VE ATMOSFER METOTLARI ---
+    playTeaPour() {
+        if (this.sounds && this.sounds.teaPour) this.sounds.teaPour.play();
+    }
+
+    playTeaStir() {
+        if (this.sounds && this.sounds.teaStir) this.sounds.teaStir.play();
+    }
+
+    playTrolleyCart() {
+        if (this.sounds && this.sounds.trolleyCart) this.sounds.trolleyCart.play();
+    }
+
+    playSnackWrapper() {
+        if (this.sounds && this.sounds.snackWrapper) this.sounds.snackWrapper.play();
+    }
+
+    playFullRefreshmentService() {
+        // İkram servisi sinematiği:
+        // 1. Koridorda servis arabası tekerlek tıkırtısı (0s)
+        this.playTrolleyCart();
+        // 2. Kek / bisküvi paketi açılma hışırtısı (1.0s)
+        setTimeout(() => { this.playSnackWrapper(); }, 1000);
+        // 3. Termostan sıcak çay dökülüşü (2.2s)
+        setTimeout(() => { this.playTeaPour(); }, 2200);
+        // 4. Çay kaşığı çınlaması (3.8s)
+        setTimeout(() => { this.playTeaStir(); }, 3800);
+    }
+
+    playStationChime() {
+        if (this.sounds && this.sounds.stationChime) this.sounds.stationChime.play();
+    }
+
+    playLuggageSuitcase() {
+        if (this.sounds && this.sounds.luggageSuitcase) this.sounds.luggageSuitcase.play();
+    }
+
+    playPoliceSiren() {
+        if (this.sounds && this.sounds.policeSiren) this.sounds.policeSiren.play();
+    }
+
+    playTachographPrint() {
+        if (this.sounds && this.sounds.tachographPrint) this.sounds.tachographPrint.play();
+    }
+
+    playThunderclap() {
+        if (this.sounds && this.sounds.thunderclap) {
+            const id = this.sounds.thunderclap.play();
+            if (typeof this.sounds.thunderclap.stereo === 'function') {
+                this.sounds.thunderclap.stereo((Math.random() - 0.5) * 0.8, id);
+            }
+        }
+    }
+
+    playDistantFoghorn() {
+        if (this.sounds && this.sounds.distantFoghorn) this.sounds.distantFoghorn.play();
+    }
+
+    playRadioSquelchSound() {
+        if (this.sounds && this.sounds.radioSquelch) this.sounds.radioSquelch.play();
+    }
+
+    playHandbrakeAir() {
+        if (this.sounds && this.sounds.handbrakeAir) {
+            try { this.sounds.handbrakeAir.play(); } catch(e){}
+        } else if (typeof this.playAirBrake === 'function') {
+            this.playAirBrake();
+        }
+    }
+
+    startReverseBeep() {
+        if (this.isReverseBeeping) return;
+        this.isReverseBeeping = true;
+        if (this.sounds && this.sounds.reverseBeep) {
+            try {
+                this.sounds.reverseBeep.volume(0.85);
+                this.sounds.reverseBeep.play();
+            } catch(e){}
+        }
+    }
+
+    stopReverseBeep() {
+        if (!this.isReverseBeeping) return;
+        this.isReverseBeeping = false;
+        if (this.sounds && this.sounds.reverseBeep) {
+            try {
+                this.sounds.reverseBeep.fade(this.sounds.reverseBeep.volume(), 0, 200);
+                setTimeout(() => {
+                    if (!this.isReverseBeeping && this.sounds && this.sounds.reverseBeep) {
+                        this.sounds.reverseBeep.stop();
+                    }
+                }, 220);
+            } catch(e){
+                try { this.sounds.reverseBeep.stop(); } catch(e2){}
+            }
+        }
+    }
+
+    toggleReverseBeepDemo() {
+        if (this.isReverseBeeping) {
+            this.stopReverseBeep();
+        } else {
+            this.startReverseBeep();
+            setTimeout(() => { this.stopReverseBeep(); }, 4000);
+        }
+    }
+
+    updateCrowdAmbience(passengerCount = 0, isDoorOpen = false, isStation = false) {
+        if (!this.sounds || !this.sounds.crowdWalla) return;
+        let targetVol = 0;
+        if (passengerCount > 0) {
+            // 1 yolcudan 50 yolcuya kadar yumuşak artış
+            targetVol = Math.min(0.70, 0.15 + (passengerCount / 40) * 0.45);
+        }
+        if (isStation && isDoorOpen) {
+            // Durakta kapı açılınca durak kalabalığı içeri dolar
+            targetVol = Math.max(targetVol, 0.45);
+        }
+        
+        if (targetVol > 0.02 && !this.sounds.crowdWalla.playing()) {
+            this.sounds.crowdWalla.volume(0.01);
+            this.sounds.crowdWalla.play();
+        }
+        this.sounds.crowdWalla.fade(this.sounds.crowdWalla.volume(), targetVol, 500);
+    }
+
+    toggleCrowdDemo() {
+        if (!this.sounds || !this.sounds.crowdWalla) return;
+        if (this.sounds.crowdWalla.playing()) {
+            this.sounds.crowdWalla.stop();
+        } else {
+            this.sounds.crowdWalla.volume(0.65);
+            this.sounds.crowdWalla.play();
+            setTimeout(() => {
+                if (this.sounds && this.sounds.crowdWalla) this.sounds.crowdWalla.fade(0.65, 0, 1000);
+            }, 5000);
+        }
+    }
+
+    toggleDinerDemo() {
+        if (!this.sounds || !this.sounds.dinerAmbience) return;
+        if (this.sounds.dinerAmbience.playing()) {
+            this.sounds.dinerAmbience.stop();
+        } else {
+            this.sounds.dinerAmbience.volume(0.65);
+            this.sounds.dinerAmbience.play();
+            setTimeout(() => {
+                if (this.sounds && this.sounds.dinerAmbience) this.sounds.dinerAmbience.fade(0.65, 0, 1000);
+            }, 6000);
+        }
+    }
+
+    stopAllSoundEffects() {
+        // 1. Zamanlayıcıları temizle (Gecikmeli başlayan motor/akbil seslerini engelle)
+        if (this.enginePreviewTimer) {
+            clearTimeout(this.enginePreviewTimer);
+            this.enginePreviewTimer = null;
+        }
+        if (this.enginePreviewFadeTimer) {
+            clearTimeout(this.enginePreviewFadeTimer);
+            this.enginePreviewFadeTimer = null;
+        }
+        if (this.accelTimer) {
+            clearTimeout(this.accelTimer);
+            this.accelTimer = null;
+        }
+        if (this.doorAkbilTimer) {
+            clearTimeout(this.doorAkbilTimer);
+            this.doorAkbilTimer = null;
+        }
+        if (this.retarderAutoStopTimer) {
+            clearTimeout(this.retarderAutoStopTimer);
+            this.retarderAutoStopTimer = null;
+        }
+
+        // 2. HTML5 Audio nesnelerini anında durdur ve sıfırla
+        if (this.currentAccelAudio) {
+            try { this.currentAccelAudio.pause(); this.currentAccelAudio.currentTime = 0; } catch(e){}
+            this.currentAccelAudio = null;
+        }
+        if (this.enginePreviewAudio) {
+            try { this.enginePreviewAudio.pause(); this.enginePreviewAudio.currentTime = 0; } catch(e){}
+            this.enginePreviewAudio = null;
+        }
+        if (this.currentRampAudio) {
+            try { this.currentRampAudio.pause(); this.currentRampAudio.currentTime = 0; } catch(e){}
+            this.currentRampAudio = null;
+        }
+        if (this.currentWindowAudio) {
+            try { this.currentWindowAudio.pause(); this.currentWindowAudio.currentTime = 0; } catch(e){}
+            this.currentWindowAudio = null;
+        }
+
+        // 3. Retarder sesini tamamen kes
+        if (typeof this.stopRetarder === 'function') {
+            this.stopRetarder();
+        }
+
+        // 4. Howler üzerindeki tüm efektleri sustur
+        if (this.sounds) {
+            const effectKeys = [
+                'start', 'engine', 'airBrake', 'kneeling', 'doorOpen', 'doorClose',
+                'akbilTam', 'akbilOgrenci', 'akbilAylik', 'akbilAktarma', 'akbilUcretsiz', 'akbilHata', 'busValidator', 'stopRequest', 'retarder', 'speedBump',
+                'horn', 'tireScreech', 'passengerShock', 'passengerBump', 'passengerDiscontent', 'passengerGroan', 'passengerMurmur',
+                'teaPour', 'teaStir', 'trolleyCart', 'snackWrapper', 'stationChime', 'luggageSuitcase', 'policeSiren', 'tachographPrint', 'thunderclap', 'distantFoghorn', 'radioSquelch',
+                'crowdWalla', 'dinerAmbience', 'reverseBeep', 'handbrakeAir'
+            ];
+            effectKeys.forEach(k => {
+                if (this.sounds[k] && typeof this.sounds[k].stop === 'function') {
+                    try { this.sounds[k].stop(); } catch(e){}
+                }
+            });
+        }
+
+        // 5. Web Audio API rölanti / motor gain'lerini sessize al
+        if (this.idleGain && this.ctx) {
+            try { this.idleGain.gain.setValueAtTime(0, this.ctx.currentTime); } catch(e){}
+        }
+        if (this.engineMasterGain && this.ctx) {
+            try { this.engineMasterGain.gain.setValueAtTime(0, this.ctx.currentTime); } catch(e){}
+        }
+        if (this.retarderGain && this.ctx) {
+            try { this.retarderGain.gain.setValueAtTime(0, this.ctx.currentTime); } catch(e){}
+        }
+
+        // 6. Çevre ve yol seslerini durdur
+        if (typeof this.stopAllRoadSounds === 'function') {
+            this.stopAllRoadSounds();
+        }
     }
 
     stopAllRoadSounds() {
@@ -1084,7 +1633,7 @@ startEngine() {
         }
 
         // Retarder kontrolü (Frenleme esnasında)
-        const isBrakingNow = (typeof Game !== 'undefined') && (Game.acceleration < 0);
+        const isBrakingNow = (typeof Game !== 'undefined') && (Game.isBrakeKeyDown || (Game.keys && (Game.keys.s || Game.keys.arrowdown)) || (Game.retarderLevel && Game.retarderLevel > 0));
         this.updateRetarder(speed, isBrakingNow);
     }
 
@@ -1476,6 +2025,17 @@ startEngine() {
             this.exhaustWarningGain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.2);
         }
     }
+
+    updateExhaustDrag(speed) {
+        if (!this.exhaustDragGain || !this.ctx) return;
+        if (speed < 5) {
+            this.exhaustDragGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
+        } else {
+            // Kopuk egzoz sürtünme gürültüsü
+            let targetVol = Math.min(0.45, 0.10 + (speed / 160));
+            this.exhaustDragGain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.2);
+        }
+    }
     
     // --- VİTES SESİ (Hava Tahliyesi) ---
     playGearShiftSound() {
@@ -1517,6 +2077,12 @@ startEngine() {
     // --- PROFESYONEL AKUSTİK: DURACAK ZİLİ (STOP REQUEST BELL) ---
     playStopRequestBell() {
         this.init();
+        if (this.sounds && this.sounds.gongTekli) {
+            try {
+                this.sounds.gongTekli.play();
+                return;
+            } catch(e) {}
+        }
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
         
@@ -1738,30 +2304,80 @@ startEngine() {
         }, 120);
     }
 
-    // --- TEKERLEKLİ SANDALYE RAMPASI AÇILMA AKUSTİĞİ ---
+    // --- TEKERLEKLİ SANDALYE RAMPASI SESLERİ (FREESOUND HD) ---
+    playRamp(isOpen = true) {
+        if (isOpen) {
+            this.playRampDeploy();
+        } else {
+            this.playRampRetract();
+        }
+    }
+
     playRampDeploy() {
+        this.init();
+        if (this.sounds && this.sounds.rampDeploy) {
+            try {
+                this.sounds.rampDeploy.play();
+                return;
+            } catch(e) {}
+        }
+        try {
+            if (this.currentRampAudio) {
+                this.currentRampAudio.pause();
+                this.currentRampAudio.currentTime = 0;
+            }
+            const aud = new Audio('sounds/freesound_ramp_deploy.mp3');
+            aud.volume = 0.85;
+            this.currentRampAudio = aud;
+            aud.play().catch(e => {
+                this.fallbackRampDeploy();
+            });
+        } catch(e) {
+            this.fallbackRampDeploy();
+        }
+    }
+
+    playRampRetract() {
+        this.init();
+        if (this.sounds && this.sounds.rampRetract) {
+            try {
+                this.sounds.rampRetract.play();
+                return;
+            } catch(e) {}
+        }
+        try {
+            if (this.currentRampAudio) {
+                this.currentRampAudio.pause();
+                this.currentRampAudio.currentTime = 0;
+            }
+            const aud = new Audio('sounds/freesound_ramp_retract.mp3');
+            aud.volume = 0.85;
+            this.currentRampAudio = aud;
+            aud.play().catch(e => {
+                this.fallbackRampRetract();
+            });
+        } catch(e) {
+            this.fallbackRampRetract();
+        }
+    }
+
+    fallbackRampDeploy() {
         this.init();
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
-        
-        // Hidrolik motor sesi (220 Hz -> 360 Hz)
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(220, now);
         osc.frequency.exponentialRampToValueAtTime(360, now + 0.8);
-        
         gain.gain.setValueAtTime(0.001, now);
         gain.gain.linearRampToValueAtTime(0.3, now + 0.08);
         gain.gain.setValueAtTime(0.3, now + 0.7);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
-        
         osc.connect(gain);
         gain.connect(this.environmentMixer || this.ctx.destination);
         osc.start(now);
         osc.stop(now + 0.85);
-        
-        // 0.85 sn sonra metal rampanın kaldırıma oturma sesi (klank-tık)
         setTimeout(() => {
             if (!this.ctx) return;
             const t = this.ctx.currentTime;
@@ -1779,30 +2395,23 @@ startEngine() {
         }, 850);
     }
 
-    // --- TEKERLEKLİ SANDALYE RAMPASI KAPANMA AKUSTİĞİ ---
-    playRampRetract() {
+    fallbackRampRetract() {
         this.init();
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
-        
-        // Hidrolik motor geri sarma sesi (360 Hz -> 240 Hz)
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(360, now);
         osc.frequency.exponentialRampToValueAtTime(240, now + 0.75);
-        
         gain.gain.setValueAtTime(0.001, now);
         gain.gain.linearRampToValueAtTime(0.28, now + 0.08);
         gain.gain.setValueAtTime(0.28, now + 0.65);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-        
         osc.connect(gain);
         gain.connect(this.environmentMixer || this.ctx.destination);
         osc.start(now);
         osc.stop(now + 0.8);
-        
-        // Yuvasına oturup kilitlenme kliği
         setTimeout(() => {
             if (!this.ctx) return;
             const t = this.ctx.currentTime;
@@ -1817,6 +2426,114 @@ startEngine() {
             clickOsc.start(t);
             clickOsc.stop(t + 0.1);
         }, 760);
+    }
+
+    // --- EĞİTİM VE SÜRÜŞ SİMÜLASYONU YARDIMCI AKUSTİKLERİ ---
+    playKneeling(isLowering = true) {
+        this.playKneelingSound();
+    }
+
+    playAcceleration(duration = 2.8) {
+        try {
+            if (this.currentAccelAudio) {
+                this.currentAccelAudio.pause();
+                this.currentAccelAudio.currentTime = 0;
+            }
+            const aud = new Audio('sounds/freesound_engine_city.mp3');
+            aud.currentTime = 2.0;
+            aud.volume = 0.85;
+            this.currentAccelAudio = aud;
+            aud.play().catch(() => {});
+            setTimeout(() => {
+                if (this.currentAccelAudio === aud) {
+                    let vol = aud.volume;
+                    const fade = setInterval(() => {
+                        vol -= 0.12;
+                        if (vol <= 0.05) {
+                            clearInterval(fade);
+                            try { aud.pause(); } catch(e) {}
+                        } else {
+                            try { aud.volume = vol; } catch(e) {}
+                        }
+                    }, 50);
+                }
+            }, duration * 1000);
+        } catch(e) {}
+    }
+
+    playEngineStartPreview(duration = 2.4) {
+        try {
+            if (this.enginePreviewTimer) clearTimeout(this.enginePreviewTimer);
+            if (this.sounds && this.sounds.start) {
+                try { this.sounds.start.play(); } catch(e) {}
+            }
+            this.enginePreviewTimer = setTimeout(() => {
+                if (this.enginePreviewAudio) {
+                    this.enginePreviewAudio.pause();
+                    this.enginePreviewAudio.currentTime = 0;
+                }
+                const aud = new Audio('sounds/freesound_pure_bus_idle.mp3');
+                aud.volume = 0.85;
+                this.enginePreviewAudio = aud;
+                aud.play().catch(() => {});
+                setTimeout(() => {
+                    if (this.enginePreviewAudio === aud) {
+                        let vol = aud.volume;
+                        const fade = setInterval(() => {
+                            vol -= 0.1;
+                            if (vol <= 0.05) {
+                                clearInterval(fade);
+                                try { aud.pause(); } catch(e) {}
+                            } else {
+                                try { aud.volume = vol; } catch(e) {}
+                            }
+                        }, 60);
+                    }
+                }, duration * 1000);
+            }, 750);
+        } catch(e) {}
+    }
+
+    playDoorOpenWithAkbil() {
+        this.playDoorOpen();
+        if (this.doorAkbilTimer) clearTimeout(this.doorAkbilTimer);
+        this.doorAkbilTimer = setTimeout(() => {
+            if (typeof this.playAkbilTam === 'function') {
+                this.playAkbilTam();
+            } else if (this.sounds && this.sounds.akbilTam) {
+                this.sounds.akbilTam.play();
+            }
+        }, 850);
+    }
+
+    playRoadBump() {
+        try {
+            const aud = new Audio('sounds/freesound_road_joint_hit.wav');
+            aud.volume = 0.85;
+            aud.play().catch(() => {});
+        } catch(e) {}
+    }
+
+    playTerminalChime() {
+        try {
+            const aud = new Audio('sounds/freesound_terminal_chime_3tone.mp3');
+            aud.volume = 0.85;
+            aud.play().catch(() => {});
+        } catch(e) {}
+    }
+
+    playTachographBeep() {
+        try {
+            const aud = new Audio('sounds/freesound_tachograph_print.mp3');
+            aud.volume = 0.75;
+            aud.play().catch(() => {});
+        } catch(e) {}
+    }
+
+    playCoinSound() {
+        try {
+            if (this.sounds && this.sounds.select) this.sounds.select.play();
+        } catch(e) {}
     }
 
     // --- ŞEHİRLERARASI OTOBÜS PNÖMATİK BAGAJ KAPAKLARI ---
@@ -1851,12 +2568,19 @@ startEngine() {
     // --- 3'LÜ ANONS ZİLİ SİSTEMİ (Dı - Dı - Dııın / 3 Zilin Birleşimi) ---
     playIBISChime(isDeepGong = false) {
         this.init();
-        if (!this.ctx) return;
-        
         if (isDeepGong) {
             this.playDeepGongChime();
             return;
         }
+
+        if (this.sounds && this.sounds.zil3lu) {
+            try {
+                this.sounds.zil3lu.play();
+                return;
+            } catch(e) {}
+        }
+
+        if (!this.ctx) return;
 
         const now = this.ctx.currentTime;
         // 3 Tane Zil: 1. Dı (E5), 2. Dı (G5), 3. Dıııın (C6 uzun sönen pirinç zil)
@@ -1903,6 +2627,12 @@ startEngine() {
     // --- TEKLİ DERİN ANONS GONGU (Dıııın) ---
     playDeepGongChime() {
         this.init();
+        if (this.sounds && this.sounds.gongTekli) {
+            try {
+                this.sounds.gongTekli.play();
+                return;
+            } catch(e) {}
+        }
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
         const baseFreq = 523.25; // C5 tok pirinç otogar gongu
@@ -2099,24 +2829,30 @@ startEngine() {
     }
 
     // 2. KAPTAN SOL CAMI MOTORU VE AKUSTİK YALITIM
+    playWindowSound(isOpen) {
+        try {
+            if (this.currentWindowAudio) {
+                this.currentWindowAudio.pause();
+                this.currentWindowAudio.currentTime = 0;
+            }
+            const soundFile = isOpen ? 'sounds/freesound_window_open.mp3' : 'sounds/freesound_window_close.mp3';
+            const aud = new Audio(soundFile);
+            aud.volume = 0.85;
+            this.currentWindowAudio = aud;
+            aud.play().catch(e => {
+                console.warn("[Audio] Cam sesi çalınamadı:", e);
+            });
+        } catch(e) {
+            console.warn("[Audio] Cam sesi hatası:", e);
+        }
+    }
+
     toggleDriverWindow() {
         this.init();
-        const now = this.ctx.currentTime;
         this.isWindowOpen = !this.isWindowOpen;
 
-        // Elektrikli cam motor sesi (0.5s vızıltı)
-        const motorOsc = this.ctx.createOscillator();
-        const motorGain = this.ctx.createGain();
-        motorOsc.type = 'sawtooth';
-        motorOsc.frequency.setValueAtTime(this.isWindowOpen ? 160 : 190, now);
-        motorOsc.frequency.linearRampToValueAtTime(this.isWindowOpen ? 140 : 175, now + 0.5);
-        motorGain.gain.setValueAtTime(0.1, now);
-        motorGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-        motorOsc.connect(motorGain);
-        motorGain.connect(this.ctx.destination);
-        motorOsc.start(now);
-        motorOsc.stop(now + 0.5);
-        motorOsc.onended = () => { try { motorOsc.disconnect(); motorGain.disconnect(); } catch(e){} };
+        // Freesound stüdyo kalitesinde gerçek elektrikli cam motoru & ray sesi (#354003 / #354002)
+        this.playWindowSound(this.isWindowOpen);
 
         this.setWindowOpen(this.isWindowOpen);
         return this.isWindowOpen;
@@ -2703,8 +3439,14 @@ startEngine() {
         }
     }
 
-    playTurnTick() {
-        this.sounds.turnTick.play();
+    playTurnTick(pan = 0) {
+        if (!this.sounds || !this.sounds.turnTick) return;
+        try {
+            const id = this.sounds.turnTick.play();
+            if (typeof this.sounds.turnTick.stereo === 'function' && typeof pan === 'number' && pan !== 0) {
+                this.sounds.turnTick.stereo(Math.max(-1, Math.min(1, pan)), id);
+            }
+        } catch(e) {}
     }
 
     // --- RESMÎ TEKİRDAĞ KART / KENTKART VALİDATÖR SESLERİ ---
@@ -2714,10 +3456,14 @@ startEngine() {
             try { this.sounds.akbilTam.play(); return; } catch(e){}
         } else if (type === 'ogrenci' && this.sounds && this.sounds.akbilOgrenci) {
             try { this.sounds.akbilOgrenci.play(); return; } catch(e){}
+        } else if (type === 'aylik' && this.sounds && this.sounds.akbilAylik) {
+            try { this.sounds.akbilAylik.play(); return; } catch(e){}
+        } else if (type === 'aktarma' && this.sounds && this.sounds.akbilAktarma) {
+            try { this.sounds.akbilAktarma.play(); return; } catch(e){}
+        } else if ((type === 'yasli' || type === 'serbest' || type === 'ucretsiz') && this.sounds && (this.sounds.akbilUcretsiz || this.sounds.busValidator)) {
+            try { (this.sounds.akbilUcretsiz || this.sounds.busValidator).play(); return; } catch(e){}
         } else if ((type === 'yetersiz' || type === 'ret' || type === 'hata') && this.sounds && this.sounds.akbilHata) {
             try { this.sounds.akbilHata.play(); return; } catch(e){}
-        } else if ((type === 'yasli' || type === 'serbest') && this.sounds && this.sounds.busValidator) {
-            try { this.sounds.busValidator.play(); return; } catch(e){}
         }
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
@@ -2741,24 +3487,26 @@ startEngine() {
                 osc.start(startTime);
                 osc.stop(startTime + 0.07);
             }
-        } else if (type === 'yasli' || type === 'serbest') {
-            // Üç tonlu melodik arpej (880 Hz -> 1175 Hz -> 1760 Hz)
-            const freqs = [880, 1174.66, 1760];
-            freqs.forEach((freq, idx) => {
-                const startTime = now + (idx * 0.065);
+        } else if (type === 'yasli' || type === 'serbest' || type === 'ucretsiz') {
+            // Meşhur Türk İki Tonlu "Düü-Düüüt" (Si - Mi: 987.77 Hz -> 1318.51 Hz)
+            const tones = [
+                { freq: 987.77, start: now, dur: 0.12 },
+                { freq: 1318.51, start: now + 0.16, dur: 0.22 }
+            ];
+            tones.forEach(t => {
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, startTime);
+                osc.frequency.setValueAtTime(t.freq, t.start);
                 
-                gain.gain.setValueAtTime(0.001, startTime);
-                gain.gain.linearRampToValueAtTime(0.4, startTime + 0.005);
-                gain.gain.exponentialRampToValueAtTime(0.001, startTime + (idx === 2 ? 0.12 : 0.055));
+                gain.gain.setValueAtTime(0.001, t.start);
+                gain.gain.linearRampToValueAtTime(0.45, t.start + 0.008);
+                gain.gain.exponentialRampToValueAtTime(0.001, t.start + t.dur);
                 
                 osc.connect(gain);
                 gain.connect(outDest);
-                osc.start(startTime);
-                osc.stop(startTime + (idx === 2 ? 0.13 : 0.06));
+                osc.start(t.start);
+                osc.stop(t.start + t.dur + 0.02);
             });
         } else if (type === 'yetersiz' || type === 'ret') {
             // İki kalın ve sert ret tonu (280 Hz testere dalgası)
@@ -2817,6 +3565,30 @@ startEngine() {
         }
     }
 
+    playAkbilAylik() {
+        if (this.sounds && this.sounds.akbilAylik) {
+            try { this.sounds.akbilAylik.play(); } catch(e){}
+        } else {
+            this.playValidatorSound('aylik');
+        }
+    }
+
+    playAkbilAktarma() {
+        if (this.sounds && this.sounds.akbilAktarma) {
+            try { this.sounds.akbilAktarma.play(); } catch(e){}
+        } else {
+            this.playValidatorSound('aktarma');
+        }
+    }
+
+    playAkbilUcretsiz() {
+        if (this.sounds && this.sounds.akbilUcretsiz) {
+            try { this.sounds.akbilUcretsiz.play(); } catch(e){}
+        } else {
+            this.playValidatorSound('ucretsiz');
+        }
+    }
+
     playAkbilHata() {
         if (this.sounds && this.sounds.akbilHata) {
             try { this.sounds.akbilHata.play(); } catch(e){}
@@ -2826,10 +3598,12 @@ startEngine() {
     }
 
     playBusValidator() {
-        if (this.sounds && this.sounds.busValidator) {
+        if (this.sounds && this.sounds.akbilUcretsiz) {
+            try { this.sounds.akbilUcretsiz.play(); } catch(e){}
+        } else if (this.sounds && this.sounds.busValidator) {
             try { this.sounds.busValidator.play(); } catch(e){}
         } else {
-            this.playValidatorSound('serbest');
+            this.playValidatorSound('ucretsiz');
         }
     }
 
@@ -2853,6 +3627,12 @@ startEngine() {
     }
 
     speakBrowserVoice(text, onEndCallback = null) {
+        // KULLANICI KURALI: Ana menüde hiçbir sentezleyici konuşmasın
+        if (!this.isInBusCabin()) {
+            if (typeof onEndCallback === 'function') onEndCallback();
+            return;
+        }
+
         if (typeof window === 'undefined' || !window.speechSynthesis) {
             if (typeof onEndCallback === 'function') onEndCallback();
             return;
@@ -2900,10 +3680,23 @@ startEngine() {
     }
 
     async speak(text, onEndCallback = null) {
-        if (!text) return;
+        if (!text) {
+            if (typeof onEndCallback === 'function') onEndCallback();
+            return;
+        }
         
-        // Ekran okuyucu (NVDA) erişilebilirliği için live region'ı güncelle
+        // Ekran okuyucu (NVDA) erişilebilirliği için live region'ı her zaman güncelle
         this.updateNvdaLiveRegion(text);
+
+        // KULLANICI KURALI:
+        // Sadece otobüsün içindeyken (sürüş veya durak) Google Cloud TTS ve sesli sentezleyici konuşsun.
+        // Ana menüde ve menülerde Google altyapısı ya da herhangi bir sentezleyici KONUŞMASIN.
+        if (!this.isInBusCabin()) {
+            if (typeof onEndCallback === 'function') {
+                try { onEndCallback(); } catch(e){}
+            }
+            return;
+        }
 
         this.sequenceId = (this.sequenceId || 0) + 1;
         const currentSeqId = this.sequenceId;
@@ -2941,12 +3734,12 @@ startEngine() {
             }
         } catch (e) {}
 
-        // Google Cloud TTS denemesi (Eğer 403 veya hata almadıysak)
-        if (!this.googleTtsDisabled) {
+        // Google Cloud TTS denemesi (Otobüs içinde en yüksek kalitede anonslar)
+        if (!this.googleTtsDisabled || (this.googleTtsDisabledUntil && Date.now() > this.googleTtsDisabledUntil)) {
             try {
                 const apiKey = "AIzaSyAMgbeG7kuhowlmPKh2nsgm_vYzL6lpgHs";
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 1200);
+                const timeoutId = setTimeout(() => controller.abort(), 1800);
 
                 const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
                     method: 'POST',
@@ -2972,22 +3765,30 @@ startEngine() {
                     ttsAudio.play().catch(e => {
                         if (typeof onEndCallback === 'function') onEndCallback();
                     });
+                    this.googleTtsDisabled = false;
                     return;
                 } else {
-                    this.googleTtsDisabled = true;
+                    this.googleTtsDisabledUntil = Date.now() + 60000;
                 }
             } catch (error) {
-                this.googleTtsDisabled = true;
+                this.googleTtsDisabledUntil = Date.now() + 60000;
             }
         }
 
-        // Yerel tarayıcı sesiyle anons yap (Sıfır gecikme, net ve kesintisiz)
+        // Yerel tarayıcı sesiyle anons yap (Otobüs içinde sıfır gecikmeli yedek)
         if (this.sequenceId !== currentSeqId) return;
         this.speakBrowserVoice(text, onEndCallback);
     }
 
     async speakSequence(textArray) {
         if (!textArray || textArray.length === 0) return;
+
+        this.updateNvdaLiveRegion(textArray.join(" "));
+
+        // KULLANICI KURALI: Ana menüde ve menülerde sesli sentezleyici konuşmasın
+        if (!this.isInBusCabin()) {
+            return;
+        }
 
         this.sequenceId = (this.sequenceId || 0) + 1;
         const currentSeqId = this.sequenceId;
@@ -3004,8 +3805,6 @@ startEngine() {
             window.speechSynthesis.cancel();
             window.speechSynthesis.resume();
         }
-
-        this.updateNvdaLiveRegion(textArray.join(" "));
 
         let index = 0;
         const playNext = () => {
@@ -3240,15 +4039,8 @@ startEngine() {
 
 const audio = new AudioSystem();
 
-// Global Ses Kontrolü (Menülerde PageUp/PageDown)
+// NVDA susturma tuşuna (Ctrl) basıldığında oyunun anonslarını da sustur
 window.addEventListener('keydown', (e) => {
-    if (e.key === '+' || e.key === '=') {
-        audio.adjustMusicVolume(0.1);
-    } else if (e.key === '-' || e.key === '_') {
-        audio.adjustMusicVolume(-0.1);
-    }
-    
-    // NVDA susturma tuşuna (Ctrl) basıldığında oyunun anonslarını da sustur
     if (e.key === 'Control') {
         if (typeof audio !== 'undefined' && audio.stopSpeech) {
             audio.stopSpeech();

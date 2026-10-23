@@ -1440,7 +1440,7 @@ const SuleymanpasaNavigasyon = {
             const segDist = nextStop ? this.hesaplaGercekYolKm(current, nextStop) : 0;
 
             routeStops.push({
-                name: current.name + " (" + current.mahalle + ")",
+                name: current.name + (current.mahalle ? " (" + current.mahalle + ")" : ""),
                 anons: isFirst 
                     ? current.mahalle + ", " + current.name + " durağındayız. Süleymanpaşa şehir içi seferi başlıyor."
                     : (isLast ? "Son durak: " + current.mahalle + ", " + current.name + ". Seferimiz tamamlanmıştır." : "Sonraki durak: " + current.name + "."),
@@ -1464,7 +1464,7 @@ const SuleymanpasaNavigasyon = {
             id: routeId,
             hatNo: "SP-ŞEHİR",
             name: "Süleymanpaşa: " + kalkis.name + " ➔ " + varis.name,
-            rawName: "Süleymanpaşa İçi (" + kalkis.mahalle + " - " + varis.mahalle + ")",
+            rawName: "Süleymanpaşa İçi (" + (kalkis.mahalle || 'Merkez') + " - " + (varis.mahalle || 'Merkez') + ")",
             district: "Süleymanpaşa",
             originDistrict: "Süleymanpaşa",
             destDistrict: "Süleymanpaşa",
@@ -1482,7 +1482,7 @@ const SuleymanpasaNavigasyon = {
             biletFiyatMultiplier: 1.0,
             otobusKapasitesi: 32,
             terrain: "sehirici_asfalt",
-            desc: "Süleymanpaşa Şehir İçi Seferi: " + kalkis.name + " (" + kalkis.mahalle + ") ➔ " + varis.name + " (" + varis.mahalle + "). Toplam " + routeStops.length + " durak, " + finalKm + " km. Tahmini sefer süresi: " + seferDk + " dakika. Bilet: " + biletTL + " TL.",
+            desc: "Süleymanpaşa Şehir İçi Seferi: " + kalkis.name + (kalkis.mahalle ? " (" + kalkis.mahalle + ")" : "") + " ➔ " + varis.name + (varis.mahalle ? " (" + varis.mahalle + ")" : "") + ". Toplam " + routeStops.length + " durak, " + finalKm + " km. Tahmini sefer süresi: " + seferDk + " dakika. Bilet: " + biletTL + " TL.",
             speechBriefing: "Süleymanpaşa şehir içi seferi oluşturuldu. " + kalkis.mahalle + ", " + kalkis.name + " durağından " + varis.mahalle + ", " + varis.name + " durağına hareket ediliyor. Güzergâh boyunca " + routeStops.length + " durakta durulacaktır. Toplam " + finalKm + " kilometre, tahmini süre " + seferDk + " dakika.",
             detailedInstructions: "Süleymanpaşa Şehir İçi Seferi (SP-ŞEHİR)\n" +
                 routeStops.map((s, idx) => (idx + 1) + ". Adım: " + s.name + (idx === routeStops.length - 1 ? " (Son Durak)" : "")).join('\n'),
@@ -1517,7 +1517,7 @@ const SuleymanpasaNavigasyon = {
             Game.isSuleymanpasaLocked = true;
             Game.startRoute(res.route.id);
             if (typeof UI !== 'undefined' && UI.showToast) {
-                UI.showToast("🏙️ Süleymanpaşa Seferi: " + res.kalkis.name + " ➔ " + res.varis.name + " (" + res.totalKm + " KM)", "info");
+                UI.showToast("🏙️ Süleymanpaşa Seferi: " + (res.kalkis ? res.kalkis.name : 'Kalkış') + " ➔ " + (res.varis ? res.varis.name : 'Varış') + " (" + (res.totalKm || 0) + " KM)", "info");
             }
             return true;
         }

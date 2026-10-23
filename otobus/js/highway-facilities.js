@@ -459,7 +459,7 @@
             }
 
             this.playTeaChime();
-            const msg = `🍲 Afiyet olsun! ${fac.name}'nde ${spec.name} yediniz (${spec.price} ₺). ${spec.effectDesc}.`;
+            const msg = `🍲 Afiyet olsun! ${(fac && fac.name) || 'Tesis'}'nde ${(spec && spec.name) || 'Yemek'} yediniz (${(spec && spec.price) || 0} ₺). ${(spec && spec.effectDesc) || ''}.`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
             if (typeof audio !== 'undefined' && audio.speak) {
                 audio.speak(`Afiyet olsun kaptan! ${spec.name} yediniz. Zindelik ve enerjiniz arttı.`);
@@ -491,11 +491,37 @@
         },
 
         // Ön Camı & Farları Yıkatma
+        // Tesis Akaryakıt İstasyonundan Mazot Doldur
+        refuelBus: function () {
+            if (typeof Game === 'undefined') return;
+            const cap = (typeof Game.getFuelCapacity === 'function') ? Game.getFuelCapacity() : (Game.fuelTankCapacity || 500);
+            const current = (Game.currentFuelLiters !== undefined) ? Game.currentFuelLiters : cap;
+            const needed = Math.max(0, cap - current);
+            if (needed <= 1) {
+                const fullMsg = `Deponuz zaten tamamen dolu (%${Math.floor((current / cap) * 100)} - ${Math.floor(current)} L).`;
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(fullMsg, "info");
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+                return;
+            }
+            Game.refuel();
+        },
+
         washWindshield: function () {
-            const washFee = 40;
+            let washFee = 40;
+            let washDiscountNote = "";
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const washLvl = CompanySystem.getInstitutionLevel('bus_wash');
+                if (washLvl === 2) {
+                    washFee = 15; // %62 indirim
+                    washDiscountNote = " (Yarı Otomatik Yıkama Ünitesi İndirimi)";
+                } else if (washLvl >= 3) {
+                    washFee = 0; // %100 ÜCRETSİZ
+                    washDiscountNote = " (Tam Otomatik Tünel Yıkama ile ÜCRETSİZ!)";
+                }
+            }
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
             if (currentBudget < washFee) {
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("Cam yıkama için 40 ₺ gerekiyor.", "warning");
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`Yıkama için ${washFee} ₺ gerekiyor.`, "warning");
                 return;
             }
 
@@ -548,7 +574,7 @@
             const muavinText = `Sayın yolcularımız, ${fac.name}'ne varmış bulunmaktayız. Kaptanımız 30 dakika ihtiyaç molası vermiştir. Lütfen peron numaranızı ve araç plakanızı unutmayınız. Hayırlı dinlenmeler dileriz.`;
             
             if (typeof UI !== 'undefined' && UI.showToast) {
-                UI.showToast(`📢 [Muavin Anonsu] 30 Dk İhtiyaç Molası Başladı! (+${tipsEarned} ₺ Yolcu Bahşişi)`, "success");
+                UI.showToast(`📢 [Muavin Anonsu] 30 Dk İhtiyaç Molası Başladı! (+${tipsEarned || 0} ₺ Yolcu Bahşişi)`, "success");
             }
             if (typeof audio !== 'undefined' && audio.speak) {
                 audio.speak(muavinText);
@@ -609,10 +635,13 @@
                 const k = e.key.toLowerCase();
                 if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
-                if (k === 'j') {
+                // Shift + J: Dinlenme Tesisi Menüsü (J tek başına son durakta Kayıp Eşya teftişidir)
+                if (e.shiftKey && (k === 'j' || e.code === 'KeyJ')) {
                     e.preventDefault();
                     this.toggleFacilityModal();
-                } else if (k === 'y') {
+                } 
+                // Shift + H: HGS Bakiye & Gişe Menüsü (Y tek başına Pusula / İstikamet sorgusudur)
+                else if (e.shiftKey && (k === 'h' || e.code === 'KeyH')) {
                     e.preventDefault();
                     this.toggleHgsModal();
                 }

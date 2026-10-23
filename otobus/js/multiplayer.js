@@ -115,10 +115,21 @@
                     }
                 });
 
-                // 6. Düzenli Kalp Atışı (Heartbeat Sync)
+                // 6. Düzenli Kalp Atışı (Adaptif Kota Korumalı Heartbeat)
                 this.syncTimer = setInterval(() => {
-                    this.syncMyState();
-                }, 1200);
+                    const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
+                    const speed = (typeof Game !== 'undefined') ? (Game.currentSpeed || 0) : 0;
+                    // Araç dururken veya menüdeyken gereksiz Firebase yazmasını frenle
+                    if (!isDriving) {
+                        const now = Date.now();
+                        if (!this._lastIdleSync || now - this._lastIdleSync >= 8000) {
+                            this._lastIdleSync = now;
+                            this.syncMyState();
+                        }
+                    } else {
+                        this.syncMyState();
+                    }
+                }, 2500);
 
                 // İlk eşitlemeyi hemen yap
                 this.syncMyState();
@@ -200,7 +211,7 @@
                             this.proximityAnnounceCooldown[driver.id] = now;
 
                             const dirText = (driver.totalDist > myDist) ? "ilerinizde karşı şeritten geliyor" : "arkanızda konvoy takip mesafesinde";
-                            const msg = `Dikkat Kaptan: ${driver.name} (${driver.plate}), yaklaşık ${Math.round(distDiff)} metre ${dirText}!`;
+                            const msg = `Dikkat Kaptan: ${driver.name || 'Kaptan'} (${driver.plate || 'Plakasız'}), yaklaşık ${Math.round(distDiff)} metre ${dirText}!`;
 
                             if (typeof audio !== 'undefined' && audio.speak) {
                                 audio.speak(msg);
@@ -267,7 +278,7 @@
                         this.play3DRemoteHorn(pan, vol);
 
                         // Ekrana ve sesli asistana selam bildirimi
-                        const toastMsg = `📢 Kaptan ${ev.name} (${ev.plate}) size korna ile selam verdi!`;
+                        const toastMsg = `📢 Kaptan ${ev.name || 'Kaptan'} (${ev.plate || 'Plakasız'}) size korna ile selam verdi!`;
                         if (typeof UI !== 'undefined' && UI.showToast) {
                             UI.showToast(toastMsg, "success");
                         }
@@ -327,10 +338,17 @@
             } catch (err) {}
         },
 
-                // Telsiz Mesajı Gönder (Kanal 19 - Hibrit Canlı & Çevrimdışı)
+                _lastRadioSendTime: 0,
+        // Telsiz Mesajı Gönder (Kanal 19 - Hibrit Canlı & Çevrimdışı)
         sendRadioMessage: function (text) {
             if (!text || !text.trim()) return;
-            const cleanText = text.trim().substring(0, 140);
+            const now = Date.now();
+            if (now - this._lastRadioSendTime < 2500) {
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⚠️ Telsiz mandalı meşgul, lütfen 2 saniye bekleyin.", "warning");
+                return;
+            }
+            this._lastRadioSendTime = now;
+            const cleanText = text.replace(/[<>{}`]/g, '').trim().substring(0, 100);
 
             this.playRadioChirp();
 
@@ -396,7 +414,7 @@
             
             this.playRadioChirp();
 
-            const toastMsg = `📻 [Kanal 19] ${chatter.name} (${chatter.plate}): "${chatter.text}"`;
+            const toastMsg = `📻 [Kanal 19] ${chatter.name || 'Kaptan'} (${chatter.plate || 'Kanal 19'}): "${chatter.text || ''}"`;
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast(toastMsg, "info");
             }
@@ -622,7 +640,7 @@
                     <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
                         <div style="color: #6ee7b7; font-weight: bold; font-size: 0.95rem; margin-bottom: 4px;">👤 SİZİN KAPTAN BİLGİNİZ:</div>
                         <div id="mp-my-profile-desc" style="color: #fff; font-size: 1.05rem;">
-                            <strong>${this.profile.name}</strong> (${this.profile.plate}) - ${this.profile.company}
+                            <strong>${this.profile.name || 'Kaptan'}</strong> (${this.profile.plate || '59 TK 001'}) - ${this.profile.company || 'Tekirdağ Birlik'}
                         </div>
                     </div>
 
@@ -704,8 +722,8 @@
             const profEl = document.getElementById('mp-my-profile-desc');
             if (profEl) {
                 const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
-                const busName = currentBus ? currentBus.name : this.profile.bus;
-                profEl.innerHTML = `<strong>${this.profile.name}</strong> (${this.profile.plate}) - ${this.profile.company} <br><small style="color: #94a3b8;">Araç: ${busName}</small>`;
+                const busName = currentBus ? currentBus.name : (this.profile.bus || 'Standart Otobüs');
+                profEl.innerHTML = `<strong>${this.profile.name || 'Kaptan'}</strong> (${this.profile.plate || '59 TK 001'}) - ${this.profile.company || 'Tekirdağ Birlik'} <br><small style="color: #94a3b8;">Araç: ${busName}</small>`;
             }
 
             const listEl = document.getElementById('mp-drivers-list');

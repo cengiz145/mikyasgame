@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('error', (e) => {
         console.error("Global JS Error:", e.message, "at", e.filename, ":", e.lineno);
         if (window.UI && typeof window.UI.showToast === 'function') {
-            window.UI.showToast(`SİSTEM HATASI: ${e.message} (Satır: ${e.lineno})`, 'danger');
+            const errMsg = e.message || "Bilinmeyen Hata";
+            const lineInfo = (e.lineno !== undefined && e.lineno !== null) ? ` (Satır: ${e.lineno})` : "";
+            window.UI.showToast(`SİSTEM HATASI: ${errMsg}${lineInfo}`, 'danger');
         }
         if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
             audio.speak(`Kritik sistem hatası: ${e.message}. Lütfen bu hatayı bana bildirin.`);
@@ -43,20 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // ==========================================================
 
-    // === HERKESİ SEVİYE 1'DEN BAŞLAT GÜNCELLEMESİ ===
-    if (localStorage.getItem('sim_season_level1') !== 'true') {
-        localStorage.setItem('sim_season_level1', 'true');
-        localStorage.setItem('licenseLevel', '1');
-        localStorage.setItem('completedTasks', '0');
-        localStorage.setItem('unlockedCities', JSON.stringify(["Tekirdağ"]));
-        localStorage.setItem('merkezUs', 'Tekirdağ');
-        if (typeof Game !== 'undefined') {
-            Game.licenseLevel = 1;
-            Game.completedTasks = 0;
-            Game.unlockedCities = ["Tekirdağ"];
-            Game.currentCity = "Tekirdağ";
+    // === TÜM VERİLERİ SIFIRLAMA & SEVİYE 1 TEMİZ BAŞLANGIÇ GÜNCELLEMESİ ===
+    if (localStorage.getItem('wipe_all_data_20261024_v1') !== 'true') {
+        localStorage.setItem('wipe_all_data_20261024_v1', 'true');
+        localStorage.setItem('sim_season_fresh_v2', 'true');
+        if (typeof Game !== 'undefined' && typeof Game.resetAllGameData === 'function') {
+            Game.resetAllGameData(false);
         }
-        console.log("Herkes Seviye 1'den başlatıldı.");
+        console.log("Tüm oyun ve şirket verileri sıfırlandı. Temiz kariyer aktif.");
     }
     // =================================================
 
@@ -122,7 +118,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 loginScreen.classList.remove('hidden');
                 const userInput = document.getElementById('username-input');
-                if (userInput) userInput.focus();
+                if (userInput) {
+                    userInput.value = '';
+                    userInput.focus();
+                }
             }
             if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
                 KeyboardNav.initForScreen();
@@ -217,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
-                const announceText = `${opt.name} başlangıç bölgesi seçildi. Oyuna girmek için Aşağı okla Oyuna Gir butonuna ilerleyebilirsiniz.`;
+                const announceText = `${opt.name} başlangıç bölgesi seçildi. Oyuna girmek için Sağ okla veya Tab tuşuyla Oyuna Gir butonuna ilerleyebilirsiniz.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceText);
                 if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceText);
             };
@@ -242,9 +241,12 @@ document.addEventListener('DOMContentLoaded', () => {
         let username = (usernameInput && usernameInput.value) ? usernameInput.value.trim() : '';
         username = username.replace(/[.#$\[\]]/g, '');
         
-        // Asla kullanıcıyı engelleme, boşsa Kaptan yap
+        // Kullanıcı adı boş bırakılırsa oyuncuyu uyar ve kutucuğa odaklan
         if (!username) {
-            username = "Kaptan";
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast('Lütfen bir kullanıcı adı yazınız!', 'warning');
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak('Lütfen bir kullanıcı adı yazınız.');
+            if (usernameInput) usernameInput.focus();
+            return;
         }
 
         if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
@@ -303,90 +305,347 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Title Screen - Bölge & İlçe Seçim Modalı (Listeden Oklarla Gezinme)
-    const openDistrictPickerModal = () => {
+    // 3 Kademeli Hiyerarşik Serbest Rota Seçim Durumu (İl ➔ İlçe ➔ Mahalle)
+    window.freePickerState = {
+        step: 'city', // 'city' | 'district' | 'neighborhood'
+        city: 'Tekirdağ',
+        district: 'Süleymanpaşa',
+        neighborhood: null,
+        searchQuery: ''
+    };
+
+    const renderFreePickerCurrentStep = (filterQuery = '') => {
         const modal = document.getElementById('district-picker-modal');
         const listEl = document.getElementById('district-picker-list');
+        const titleEl = document.getElementById('district-picker-title');
+        const descEl = document.getElementById('district-picker-desc');
+        const badgeEl = document.getElementById('free-picker-step-badge');
+        const backBtn = document.getElementById('btn-free-picker-back');
+        const searchInp = document.getElementById('free-picker-search');
+
         if (!modal || !listEl) return;
-
-        const curDist = (typeof Game !== 'undefined' && Game.activeDistrict) ? Game.activeDistrict : (localStorage.getItem('activeDistrict') || 'Süleymanpaşa');
         listEl.innerHTML = '';
-        listEl.setAttribute('role', 'radiogroup');
-        listEl.setAttribute('aria-label', 'Bölge ve ilçe seçim listesi. 11 ilçe mevcuttur.');
 
-        DISTRICT_OPTIONS.forEach((opt, idx) => {
-            const isSelected = (opt.id === curDist);
-            const li = document.createElement('li');
-            li.style.marginBottom = '8px';
+        const adminData = (typeof window !== 'undefined' && window.TurkeyAdminData) ? window.TurkeyAdminData : null;
+        const q = (filterQuery || freePickerState.searchQuery || '').trim().toLowerCase();
 
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = `menu-btn nav-item ${isSelected ? 'primary-btn' : ''}`;
-            btn.style.width = '100%';
-            btn.style.textAlign = 'left';
-            btn.style.padding = '12px 16px';
-            btn.style.fontSize = '1.02rem';
-            btn.style.display = 'flex';
-            btn.style.alignItems = 'center';
-            btn.style.justifyContent = 'space-between';
-            btn.style.border = isSelected ? '2px solid #22c55e' : '1.5px solid rgba(56,189,248,0.3)';
-            btn.style.background = isSelected ? 'rgba(34, 197, 94, 0.22)' : 'rgba(15,23,42,0.85)';
-            btn.style.cursor = 'pointer';
-            btn.setAttribute('role', 'radio');
-            btn.setAttribute('aria-checked', isSelected ? 'true' : 'false');
-            btn.setAttribute('data-dist-id', opt.id);
-            btn.setAttribute('aria-label', `${idx + 1}. İlçe: ${opt.name}. ${opt.desc}. ${isSelected ? 'Şu anki aktif çalışma bölgeniz.' : 'Seçmek için Enter tuşuna basın.'}`);
+        // -------------------------------------------------------------
+        // 1. ADIM: İL SEÇİMİ (81 İL)
+        // -------------------------------------------------------------
+        if (freePickerState.step === 'city') {
+            if (badgeEl) badgeEl.innerText = "1. ADIM: İL SEÇİMİ (81 İL)";
+            if (backBtn) backBtn.classList.add('hidden');
+            if (titleEl) titleEl.innerText = "🗺️ Serbest Rota: 1. Adım - İl (Şehir) Seçimi";
+            if (descEl) descEl.innerText = "Türkiye'nin 81 ili listeleniyor. Sağ ve Sol oklarla listede gezinebilir, Tab ile arama kutusuna geçebilirsiniz.";
+            if (searchInp) searchInp.placeholder = "🔍 İl ara (örn: İstanbul, Ankara, İzmir, Antalya, Bursa, Tekirdağ)...";
 
-            btn.innerHTML = `
-                <span class="btn-text">
-                    <strong>${opt.icon} ${opt.name}</strong>
-                    <small style="display:block; color:#94a3b8; font-size:0.85rem; margin-top:2px;">${opt.desc}</small>
-                </span>
-                <span style="font-weight:bold; font-size:0.95rem; color:${isSelected ? '#4ade80' : '#38bdf8'};">
-                    ${isSelected ? '✓ SEÇİLİ' : 'Seç (Enter)'}
-                </span>
-            `;
+            const allCities = adminData ? Object.keys(adminData) : ((typeof masterCitiesList !== 'undefined') ? masterCitiesList : ["Tekirdağ", "İstanbul", "Ankara", "İzmir", "Bursa"]);
+            allCities.sort((a, b) => a.localeCompare(b, 'tr'));
 
-            btn.onclick = () => {
-                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
-                if (typeof Game !== 'undefined' && Game.setActiveDistrict) {
-                    Game.setActiveDistrict(opt.id);
-                } else {
-                    localStorage.setItem('activeDistrict', opt.id);
-                }
-                closeDistrictPickerModal();
-                if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
-                    UI.updateTitleScreenButtons();
-                }
-                const lblActive = document.getElementById('lbl-active-district');
-                if (lblActive) lblActive.textContent = opt.name;
-                const lblRouteActive = document.getElementById('lbl-route-active-district');
-                if (lblRouteActive) lblRouteActive.textContent = opt.name;
+            const filteredCities = allCities.filter(c => {
+                if (!q) return true;
+                const plate = adminData && adminData[c] ? adminData[c].plate : '';
+                return c.toLowerCase().includes(q) || plate.includes(q);
+            });
 
-                const announceMsg = `${opt.name} ilçesi seçildi. Mahalle hatları ve serbest güzergahlar yüklendi.`;
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceMsg);
-                if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceMsg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`📍 Aktif Bölge: ${opt.name}`, 'success');
+            if (filteredCities.length === 0) {
+                listEl.innerHTML = '<li style="color:#94a3b8; text-align:center; padding:20px;">Aramanıza uygun il bulunamadı.</li>';
+                return;
+            }
 
-                // Serbest Sürüş Modunda Rota Ekranına Yönlendir
-                document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: opt.id } }));
-            };
+            filteredCities.forEach(cityName => {
+                const cInfo = adminData && adminData[cityName] ? adminData[cityName] : { plate: "TR", region: "Türkiye", districts: {} };
+                const distCount = Object.keys(cInfo.districts || {}).length;
+                const isSelected = (cityName === freePickerState.city);
 
-            li.appendChild(btn);
-            listEl.appendChild(li);
-        });
+                const li = document.createElement('li');
+                li.style.marginBottom = '8px';
 
-        modal.classList.remove('hidden');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `menu-btn nav-item ${isSelected ? 'primary-btn' : ''}`;
+                btn.style.width = '100%';
+                btn.style.textAlign = 'left';
+                btn.style.padding = '12px 16px';
+                btn.style.fontSize = '1.02rem';
+                btn.style.display = 'flex';
+                btn.style.alignItems = 'center';
+                btn.style.justifyContent = 'space-between';
+                btn.style.border = isSelected ? '2px solid #22c55e' : '1.5px solid rgba(56,189,248,0.3)';
+                btn.style.background = isSelected ? 'rgba(34, 197, 94, 0.22)' : 'rgba(15,23,42,0.85)';
+                btn.style.cursor = 'pointer';
+
+                btn.setAttribute('aria-label', `${cInfo.plate} ${cityName} ili, ${cInfo.region} bölgesi, ${distCount} ilçe mevcut. Seçmek için Enter'a basın.`);
+
+                btn.innerHTML = `
+                    <span class="btn-text">
+                        <strong>🏙️ ${cInfo.plate ? cInfo.plate + ' - ' : ''}${cityName}</strong>
+                        <small style="display:block; color:#94a3b8; font-size:0.85rem; margin-top:2px;">${cInfo.region || 'Türkiye'}</small>
+                    </span>
+                    <span style="color:#38bdf8; font-size:0.9rem; font-weight:bold;">
+                        ${distCount > 0 ? distCount + ' İlçe ➔' : 'Seç (Enter)'}
+                    </span>
+                `;
+
+                btn.onclick = () => {
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    freePickerState.city = cityName;
+                    freePickerState.step = 'district';
+                    freePickerState.searchQuery = '';
+                    if (searchInp) searchInp.value = '';
+
+                    const msg = `${cityName} ili seçildi. İlçeleri listeleniyor.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`📍 İl: ${cityName}`, 'info');
+
+                    renderFreePickerCurrentStep();
+                };
+
+                li.appendChild(btn);
+                listEl.appendChild(li);
+            });
+        }
+
+        // -------------------------------------------------------------
+        // 2. ADIM: İLÇE SEÇİMİ (SEÇİLEN İLİN TÜM İLÇELERİ)
+        // -------------------------------------------------------------
+        else if (freePickerState.step === 'district') {
+            const cityName = freePickerState.city || 'Tekirdağ';
+            const cInfo = adminData && adminData[cityName] ? adminData[cityName] : null;
+            const distMap = cInfo ? cInfo.districts : {};
+            const allDistricts = Object.keys(distMap);
+            allDistricts.sort((a, b) => a.localeCompare(b, 'tr'));
+
+            if (badgeEl) badgeEl.innerText = "2. ADIM: İLÇE SEÇİMİ";
+            if (backBtn) {
+                backBtn.classList.remove('hidden');
+                backBtn.innerHTML = "⬅️ İllere Geri Dön";
+                backBtn.onclick = () => {
+                    freePickerState.step = 'city';
+                    freePickerState.searchQuery = '';
+                    if (searchInp) searchInp.value = '';
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    renderFreePickerCurrentStep();
+                };
+            }
+            if (titleEl) titleEl.innerText = `📍 ${cityName} İli: 2. Adım - İlçe Seçimi`;
+            if (descEl) descEl.innerText = `${cityName} iline ait ${allDistricts.length} ilçe listeleniyor. Sürüş yapmak istediğiniz ilçeyi seçin.`;
+            if (searchInp) searchInp.placeholder = `🔍 ${cityName} ilçelerinde ara...`;
+
+            const filteredDistricts = allDistricts.filter(d => !q || d.toLowerCase().includes(q));
+
+            if (filteredDistricts.length === 0) {
+                listEl.innerHTML = '<li style="color:#94a3b8; text-align:center; padding:20px;">Aramanıza uygun ilçe bulunamadı.</li>';
+                return;
+            }
+
+            filteredDistricts.forEach(distName => {
+                const nList = distMap[distName] || [];
+                const isSelected = (distName === freePickerState.district);
+
+                const li = document.createElement('li');
+                li.style.marginBottom = '8px';
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `menu-btn nav-item ${isSelected ? 'primary-btn' : ''}`;
+                btn.style.width = '100%';
+                btn.style.textAlign = 'left';
+                btn.style.padding = '12px 16px';
+                btn.style.fontSize = '1.02rem';
+                btn.style.display = 'flex';
+                btn.style.alignItems = 'center';
+                btn.style.justifyContent = 'space-between';
+                btn.style.border = isSelected ? '2px solid #22c55e' : '1.5px solid rgba(56,189,248,0.3)';
+                btn.style.background = isSelected ? 'rgba(34, 197, 94, 0.22)' : 'rgba(15,23,42,0.85)';
+                btn.style.cursor = 'pointer';
+
+                btn.setAttribute('aria-label', `${distName} ilçesi, ${nList.length} mahalle mevcut. Seçmek için Enter'a basın.`);
+
+                btn.innerHTML = `
+                    <span class="btn-text">
+                        <strong>📍 ${distName} İlçesi</strong>
+                        <small style="display:block; color:#94a3b8; font-size:0.85rem; margin-top:2px;">${nList.length} Mahalle & Hat Mevcut</small>
+                    </span>
+                    <span style="color:#22c55e; font-size:0.9rem; font-weight:bold;">
+                        Mahalleleri Gör ➔
+                    </span>
+                `;
+
+                btn.onclick = () => {
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    freePickerState.district = distName;
+                    freePickerState.step = 'neighborhood';
+                    freePickerState.searchQuery = '';
+                    if (searchInp) searchInp.value = '';
+
+                    const msg = `${distName} ilçesi seçildi. Mahalleler listeleniyor.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`📍 İlçe: ${distName}`, 'info');
+
+                    renderFreePickerCurrentStep();
+                };
+
+                li.appendChild(btn);
+                listEl.appendChild(li);
+            });
+        }
+
+        // -------------------------------------------------------------
+        // 3. ADIM: MAHALLE & HAT SEÇİMİ (SEÇİLEN İLÇENİN TÜM MAHALLELERİ)
+        // -------------------------------------------------------------
+        else if (freePickerState.step === 'neighborhood') {
+            const cityName = freePickerState.city || 'Tekirdağ';
+            const distName = freePickerState.district || 'Süleymanpaşa';
+            const cInfo = adminData && adminData[cityName] ? adminData[cityName] : null;
+            const distMap = cInfo ? cInfo.districts : {};
+            const rawNeighborhoods = distMap[distName] || [
+                `${distName} Merkez & Hükümet Konağı`,
+                "Cumhuriyet Mahallesi",
+                "Atatürk Bulvarı & Çarşı",
+                "İstiklal Caddesi",
+                "Yeni Mahalle & Konutlar",
+                `${distName} Otogar & Sanayi`
+            ];
+
+            if (badgeEl) badgeEl.innerText = "3. ADIM: MAHALLE & HAT SEÇİMİ";
+            if (backBtn) {
+                backBtn.classList.remove('hidden');
+                backBtn.innerHTML = "⬅️ İlçelere Geri Dön";
+                backBtn.onclick = () => {
+                    freePickerState.step = 'district';
+                    freePickerState.searchQuery = '';
+                    if (searchInp) searchInp.value = '';
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    renderFreePickerCurrentStep();
+                };
+            }
+            if (titleEl) titleEl.innerText = `🏘️ ${distName || 'Merkez'} (${cityName || 'Tekirdağ'}): 3. Adım - Mahalle & Hat`;
+            if (descEl) descEl.innerText = `${distName} ilçesine ait mahalleler listeleniyor. Serbest seferinizi başlatmak istediğiniz mahalleyi seçin.`;
+            if (searchInp) searchInp.placeholder = `🔍 Mahalle ara (örn: Merkez, Cumhuriyet, Atatürk)... `;
+
+            // Genel Tur seçeneği
+            const fullTourTitle = `🌟 ${distName} Genel İlçe Turu (Tüm Mahalleler Arası Kesintisiz Hat)`;
+            let itemsToRender = [fullTourTitle, ...rawNeighborhoods];
+
+            if (q) {
+                itemsToRender = itemsToRender.filter(m => m.toLowerCase().includes(q));
+            }
+
+            if (itemsToRender.length === 0) {
+                listEl.innerHTML = '<li style="color:#94a3b8; text-align:center; padding:20px;">Aramanıza uygun mahalle bulunamadı.</li>';
+                return;
+            }
+
+            itemsToRender.forEach((mName, idx) => {
+                const isFullTour = (idx === 0 && mName === fullTourTitle);
+                const li = document.createElement('li');
+                li.style.marginBottom = '8px';
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `menu-btn nav-item ${isFullTour ? 'primary-btn pulse-anim' : ''}`;
+                btn.style.width = '100%';
+                btn.style.textAlign = 'left';
+                btn.style.padding = '14px 16px';
+                btn.style.fontSize = '1.02rem';
+                btn.style.display = 'flex';
+                btn.style.alignItems = 'center';
+                btn.style.justifyContent = 'space-between';
+                btn.style.border = isFullTour ? '2px solid #f59e0b' : '1.5px solid rgba(56,189,248,0.3)';
+                btn.style.background = isFullTour ? 'rgba(245, 158, 11, 0.2)' : 'rgba(15,23,42,0.85)';
+                btn.style.cursor = 'pointer';
+
+                btn.setAttribute('aria-label', `${mName}. Serbest seferi başlatmak için Enter'a basın.`);
+
+                btn.innerHTML = `
+                    <span class="btn-text">
+                        <strong>${isFullTour ? '🌟' : '🏘️'} ${mName}</strong>
+                        <small style="display:block; color:#94a3b8; font-size:0.85rem; margin-top:2px;">
+                            ${isFullTour ? 'Tüm mahalle duraklarını kapsayan ekspres hat' : cityName + ' - ' + distName + ' Yerel Seferi'}
+                        </small>
+                    </span>
+                    <span style="color:${isFullTour ? '#f59e0b' : '#38bdf8'}; font-size:0.95rem; font-weight:bold;">
+                        Seferi Başlat ➔
+                    </span>
+                `;
+
+                btn.onclick = () => {
+                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    freePickerState.neighborhood = mName;
+
+                    // Game ve localStorage güncelle
+                    if (typeof Game !== 'undefined') {
+                        Game.currentCity = freePickerState.city;
+                        Game.activeDistrict = freePickerState.district;
+                        Game.activeNeighborhood = mName;
+                        if (typeof Game.setPlayMode === 'function') Game.setPlayMode('free_drive');
+                    }
+                    localStorage.setItem('currentCity', freePickerState.city);
+                    localStorage.setItem('activeDistrict', freePickerState.district);
+                    localStorage.setItem('activeNeighborhood', mName);
+
+                    const lblActive = document.getElementById('lbl-active-district');
+                    if (lblActive) lblActive.textContent = freePickerState.city + " / " + freePickerState.district;
+                    const lblRouteActive = document.getElementById('lbl-route-active-district');
+                    if (lblRouteActive) lblRouteActive.textContent = (freePickerState.district || 'Merkez') + (mName ? " (" + mName + ")" : "");
+
+                    const announceMsg = `${freePickerState.city || 'Tekirdağ'}, ${freePickerState.district || 'Merkez'}, ${mName || 'Şehir İçi'} serbest seferiniz hazırlandı. İyi yolculuklar kaptan.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceMsg);
+                    if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🛣️ ${freePickerState.city || 'Tekirdağ'} - ${freePickerState.district || 'Merkez'}${mName ? ' (' + mName + ')' : ''}`, 'success');
+
+                    // Serbest rotayı oluştur
+                    if (typeof createOrGetFreeRoamRoute === 'function') {
+                        createOrGetFreeRoamRoute(freePickerState.city, freePickerState.district, mName);
+                    }
+
+                    closeDistrictPickerModal();
+
+                    // Rota Ekranına veya Sefer Ekranına yönlendir
+                    document.dispatchEvent(new CustomEvent('go-to-route-screen', { 
+                        detail: { 
+                            city: freePickerState.city, 
+                            district: freePickerState.district,
+                            mahalle: mName
+                        } 
+                    }));
+                };
+
+                li.appendChild(btn);
+                listEl.appendChild(li);
+            });
+        }
+
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
             KeyboardNav.initForScreen();
         }
+    };
 
-        // Seçili ilçeye veya ilk öğeye odaklan
-        setTimeout(() => {
-            const activeBtn = listEl.querySelector(`[data-dist-id="${curDist}"]`) || listEl.querySelector('button');
-            if (activeBtn) activeBtn.focus();
-        }, 120);
+    const openDistrictPickerModal = () => {
+        const modal = document.getElementById('district-picker-modal');
+        if (!modal) return;
 
-        const welcomeVoice = "Bölge ve ilçe seçim penceresi açıldı. 11 ilçe arasında yukarı ve aşağı oklarla gezinebilir, Enter ile seçebilirsiniz. Kapatmak için Escape tuşuna basabilirsiniz.";
+        // İlçe seçimini 1. Adım (İl Seçimi) ile başlat
+        freePickerState.step = 'city';
+        freePickerState.city = (typeof Game !== 'undefined' && Game.currentCity) || localStorage.getItem('currentCity') || 'Tekirdağ';
+        freePickerState.district = (typeof Game !== 'undefined' && Game.activeDistrict) || localStorage.getItem('activeDistrict') || 'Süleymanpaşa';
+        freePickerState.neighborhood = null;
+        freePickerState.searchQuery = '';
+
+        const searchInp = document.getElementById('free-picker-search');
+        if (searchInp) {
+            searchInp.value = '';
+            searchInp.oninput = (e) => {
+                freePickerState.searchQuery = e.target.value.trim();
+                renderFreePickerCurrentStep(freePickerState.searchQuery);
+            };
+        }
+
+        modal.classList.remove('hidden');
+        renderFreePickerCurrentStep();
+
+        const welcomeVoice = "Serbest Sefer Seçim Penceresi açıldı. 1. Adım: İl Seçimi. 81 il arasında Sağ ve Sol oklarla gezinebilir, aramak için Tab ile arama kutusuna geçebilirsiniz.";
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(welcomeVoice);
         if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(welcomeVoice);
     };
@@ -399,14 +658,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const btnChange = document.getElementById('btn-change-active-district');
         if (btnChange) btnChange.focus();
-
-        // Eğer serbest sürüş modundaysa ve rota ekranında değilse mevcut bölgeyle devam et
-        const routeMenu = document.getElementById('route-menu');
-        const isRouteVisible = routeMenu && !routeMenu.classList.contains('hidden');
-        if (typeof Game !== 'undefined' && Game.playMode === 'free_drive' && !isRouteVisible) {
-            const curDist = Game.activeDistrict || localStorage.getItem('activeDistrict') || 'Süleymanpaşa';
-            document.dispatchEvent(new CustomEvent('go-to-route-screen', { detail: { city: "Tekirdağ", district: curDist } }));
-        }
     };
 
     const btnClosePicker = document.getElementById('btn-close-district-picker');
@@ -573,7 +824,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('district-dest-modal').classList.add('hidden');
                     routesData[route.id] = route;
                     audio.speak("TEKULAŞ " + route.name + " devreye alındı. İyi yolculuklar kaptan.");
-                    UI.showToast(route.name + " Devreye Alındı (" + totalKm.toFixed(1) + " KM)", "success");
+                    const safeKm = (typeof totalKm === 'number' && !isNaN(totalKm)) ? totalKm.toFixed(1) : '0';
+                    UI.showToast(route.name + " Devreye Alındı (" + safeKm + " KM)", "success");
                     Game.startRoute(route.id);
                 };
 
@@ -626,6 +878,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const btnOpenLeaderboard = document.getElementById('btn-open-leaderboard');
+    if (btnOpenLeaderboard) {
+        btnOpenLeaderboard.addEventListener('click', () => {
+            if (typeof LeaderboardSystem !== 'undefined' && LeaderboardSystem.open) {
+                LeaderboardSystem.open();
+            }
+        });
+    }
+    const hudFuelPanel = document.getElementById('hud-fuel-panel');
+    if (hudFuelPanel) {
+        hudFuelPanel.addEventListener('click', () => {
+            if (typeof Game !== 'undefined' && Game.handleKeyDown) {
+                Game.handleKeyDown({ key: 'h', preventDefault: () => {} });
+            }
+        });
+    }
+
     const hudMpPanel = document.getElementById('hud-multiplayer-panel');
     if (hudMpPanel) {
         hudMpPanel.addEventListener('click', () => {
@@ -658,9 +928,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btnCareer.addEventListener('click', () => {
             if (typeof Game !== 'undefined') Game.setPlayMode('career');
             audio.playSelect();
-            const msg = "Kariyer ve İlerleme Modu açıldı. Şehirler, operasyonel seferler ve başarılar hazır.";
+            const msg = "Kariyer Modu açıldı.";
             audio.speak(msg);
-            UI.showToast("🎖️ Kariyer Modu Aktif", "info");
+            UI.showToast("🎖️ Kariyer Modu", "info");
             openCitySelection();
         });
     }
@@ -670,9 +940,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btnFreeDrive.addEventListener('click', () => {
             if (typeof Game !== 'undefined') Game.setPlayMode('free_drive');
             audio.playSelect();
-            const msg = "Serbest Sürüş Modu seçildi. Lütfen sürüş yapmak istediğiniz il ve ilçeyi seçin.";
+            const msg = "Serbest Sürüş Modu açıldı.";
             audio.speak(msg);
-            UI.showToast("🛣️ Serbest Sürüş: İlçe & Mahalle Seçimi", "info");
+            UI.showToast("🛣️ Serbest Sürüş Modu", "info");
             openDistrictPickerModal();
         });
     }

@@ -1535,15 +1535,20 @@
 
         getLevelTitle: function(levelOrTaskIndex) {
             let lvl = 1;
-            if (typeof levelOrTaskIndex === 'number') {
+            if (typeof levelOrTaskIndex === 'number' && !isNaN(levelOrTaskIndex)) {
                 if (levelOrTaskIndex > 10) {
                     lvl = Math.floor(levelOrTaskIndex / 10) + 1;
                 } else {
                     lvl = levelOrTaskIndex;
                 }
+            } else if (typeof levelOrTaskIndex === 'string') {
+                const parsed = parseInt(levelOrTaskIndex, 10);
+                if (!isNaN(parsed)) {
+                    lvl = (parsed > 10) ? (Math.floor(parsed / 10) + 1) : parsed;
+                }
             }
-            lvl = Math.max(1, Math.min(10, lvl));
-            return this.LEVEL_TITLES[lvl - 1];
+            lvl = Math.max(1, Math.min(10, Math.floor(lvl) || 1));
+            return (this.LEVEL_TITLES && this.LEVEL_TITLES[lvl - 1]) || "1. Sınıf Stajyer Şehir İçi Sürücüsü";
         },
 
         enrichRoute: function(route, taskIndex) {

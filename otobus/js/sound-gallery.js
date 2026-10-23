@@ -167,14 +167,14 @@ const SoundGallery = {
             bassBoost: 1
         },
         
-        // --- AKBİL VE KART OKUYUCU (VALIDATOR) SESLERİ ---
+        // --- TÜRKİYE GENELİ GERÇEK OTOBÜS KART VALİDATÖR SESLERİ ---
         {
             id: 'akbil_tam',
             category: 'akbil',
-            title: 'Tam Akbil / Standart Biniş Onay Bipi',
+            title: 'Gerçek Otobüs Kartı: Tam Biniş (Net Tekil Bip)',
             icon: '💳',
-            specs: 'Freesound ilmari_freesound #625731 Zoom H5 Stüdyo Kaydı',
-            desc: 'Şehir içi otobüse binerken tam kart basıldığında çıkan o temiz ve net tek tonlu onay sesi.',
+            specs: 'Orijinal Fiziksel Validatör Kaydı (Tekirdağ, İstanbul & Tüm Türkiye)',
+            desc: 'Türkiye belediye ve halk otobüslerinde tam kart okutulduğunda çıkan o net, tok, sıfır boğukluklu birebir orijinal "Bip!" onay sesi.',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilTam) audio.playAkbilTam();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('tam');
@@ -183,37 +183,61 @@ const SoundGallery = {
         {
             id: 'akbil_ogrenci',
             category: 'akbil',
-            title: 'Öğrenci & İndirimli Akbil (Çift Bip)',
+            title: 'Gerçek Otobüs Kartı: Öğrenci (Seri Çift Dı-Dıt)',
             icon: '🎓',
-            specs: 'Freesound SpliceSound #369875 Orijinal Transit Kart Kaydı',
-            desc: 'Öğrenci veya indirimli kart okutulduğunda çıkan o melodik ve neşeli çift dıt-dıt onay sesi.',
+            specs: 'Orijinal Fiziksel Validatör Kaydı (Birebir İkili Seri Bip)',
+            desc: 'Türkiye genelinde otobüse öğrenci veya indirimli kart basıldığında validatörden çıkan o hızlı, ayırt edici ve net çift "Dı-Dıt!" biniş sesi.',
             playFn: () => {
                 if (typeof audio !== 'undefined' && audio.playAkbilOgrenci) audio.playAkbilOgrenci();
                 else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('ogrenci');
             }
         },
         {
-            id: 'akbil_hata',
+            id: 'akbil_ucretsiz',
             category: 'akbil',
-            title: 'Yetersiz Bakiye / Kart Reddedildi Alarmı',
-            icon: '❌',
-            specs: 'Freesound PerMagnusLindborg #324248 Card Reject Alarm',
-            desc: 'Kartta para kalmadığında veya kart okunamadığında validatörün çaldığı o keskin ret ve uyarı alarmı.',
+            title: 'Gerçek Otobüs Kartı: Ücretsiz (İki Tonlu "Düü-Düüüt" Si-Mi)',
+            icon: '👵',
+            specs: 'Orijinal Validatör Melodisi (Si - Mi: 988 Hz - 1318 Hz)',
+            desc: '65 yaş üstü, engelli ve serbest kartlar için Türkiye genelindeki otobüslerde çalan o meşhur melodik iki tonlu "Düü-Düüüt" (Si-Mi) sinyali.',
             playFn: () => {
-                if (typeof audio !== 'undefined' && audio.playAkbilHata) audio.playAkbilHata();
-                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('yetersiz');
+                if (typeof audio !== 'undefined' && audio.playAkbilUcretsiz) audio.playAkbilUcretsiz();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('ucretsiz');
             }
         },
         {
-            id: 'bus_validator',
+            id: 'akbil_aktarma',
             category: 'akbil',
-            title: 'Gerçek Otobüs Kart Okuyucu Validatör Mekanizması',
-            icon: '📟',
-            specs: 'Freesound Robinhood76 #62589 Orijinal Otobüs Validatörü',
-            desc: 'Gerçek bir belediye otobüsü kart okuyucu cihazının iç röle ve elektronik kart okuma tepkisi.',
+            title: 'Gerçek Otobüs Kartı: Aktarma Biniş Sinyali',
+            icon: '🔄',
+            specs: 'Orijinal Fiziksel Validatör Aktarma Kaydı',
+            desc: 'Hattan hatta aktarma yaparken validatörün çaldığı orijinal indirimli aktarma biniş sinyali.',
             playFn: () => {
-                if (typeof audio !== 'undefined' && audio.playBusValidator) audio.playBusValidator();
-                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('serbest');
+                if (typeof audio !== 'undefined' && audio.playAkbilAktarma) audio.playAkbilAktarma();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('aktarma');
+            }
+        },
+        {
+            id: 'akbil_aylik',
+            category: 'akbil',
+            title: 'Gerçek Otobüs Kartı: Aylık / Abonman Paso',
+            icon: '🎫',
+            specs: 'Orijinal Fiziksel Validatör Abonman Kaydı',
+            desc: 'Aylık sınırsız paso veya kurumsal personel kartı basıldığında validatörden çıkan tok onay sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilAylik) audio.playAkbilAylik();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('aylik');
+            }
+        },
+        {
+            id: 'akbil_hata',
+            category: 'akbil',
+            title: 'Gerçek Otobüs Kartı: Yetersiz Bakiye Uyarısı',
+            icon: '❌',
+            specs: 'Orijinal Toplu Taşıma Yetersiz Bakiye Kaydı',
+            desc: 'Kartta bakiye kalmadığında veya kart reddedildiğinde duyulan gerçek sesli uyarı sinyali.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playAkbilHata) audio.playAkbilHata();
+                else if (typeof audio !== 'undefined' && audio.playValidatorSound) audio.playValidatorSound('yetersiz');
             }
         },
 
@@ -244,6 +268,326 @@ const SoundGallery = {
                     const a = new Audio('sounds/freesound_bus_door.mp3');
                     a.play().catch(() => {});
                 }
+            }
+        },
+        {
+            id: 'fx_window_open',
+            category: 'effect',
+            title: 'Freesound Kaptan Camı Açılma (Elektrikli Motor)',
+            icon: '🪟',
+            specs: 'Freesound scriotxstudios #354003 Stüdyo Kaydı',
+            desc: 'Kaptan sol penceresinin elektrikli motor ve ray sesi eşliğinde aşağı inişi (Kısayol: Home tuşu).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playWindowSound) {
+                    audio.playWindowSound(true);
+                } else {
+                    const a = new Audio('sounds/freesound_window_open.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_window_close',
+            category: 'effect',
+            title: 'Freesound Kaptan Camı Kapanma & Akustik Yalıtım',
+            icon: '🪟',
+            specs: 'Freesound scriotxstudios #354002 Stüdyo Kaydı',
+            desc: 'Kaptan sol penceresinin yukarı kapanışı ve kauçuk fitille kabin yalıtımı kilitleme sesi (Kısayol: End tuşu).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playWindowSound) {
+                    audio.playWindowSound(false);
+                } else {
+                    const a = new Audio('sounds/freesound_window_close.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_ramp_deploy',
+            category: 'effect',
+            title: 'Freesound Engelli Rampası İniş & Kaldırım Teması',
+            icon: '🛹',
+            specs: 'Freesound SoundsofTheMachine #784981 Stüdyo Kaydı',
+            desc: 'Tekerlekli sandalyeli yolcular için otobüs tabanından uzanan hidrolik rampanın inişi ve kaldırıma kilitlenme sesi (Kısayol: U veya R tuşu).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playRampDeploy) {
+                    audio.playRampDeploy();
+                } else {
+                    const a = new Audio('sounds/freesound_ramp_deploy.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_ramp_retract',
+            category: 'effect',
+            title: 'Freesound Engelli Rampası Toplanma & Şasi Kilidi',
+            icon: '🛹',
+            specs: 'Freesound #637009 HD Mekanizma Kaydı',
+            desc: 'Yolcu binişi sonrası rampanın elektrikli motorla yukarı toplanıp otobüs şasisine kilitlenme sesi (Kısayol: U veya R tuşu).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playRampRetract) {
+                    audio.playRampRetract();
+                } else {
+                    const a = new Audio('sounds/freesound_ramp_retract.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_passenger_shock',
+            category: 'effect',
+            title: 'Freesound Yolcu Sert Fren İrkilme & Şok Çığlığı',
+            icon: '😱',
+            specs: 'Freesound #324895 Stüdyo Kaydı (CC0)',
+            desc: 'Sert frende veya ani savrulmada arka koltuktaki yolcuların ses tellerinden çıkan gerçek şok, irkilme ve panik çığlığı ("Hooop! N\'oluyor!").',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPassengerShock) {
+                    audio.playPassengerShock();
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_shock.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_passenger_bump',
+            category: 'effect',
+            title: 'Freesound Yolcu Kasis Zıplama & Sarsıntı İniltisi',
+            icon: '💥',
+            specs: 'Freesound #324897 Stüdyo Kaydı (CC0)',
+            desc: 'Kasise veya çukura hızlı girildiğinde koltukta zıplayan yolcuların gerçek bedensel "Ooff!", "Ah!" iniltisi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPassengerBump) {
+                    audio.playPassengerBump();
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_bump.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_passenger_discontent',
+            category: 'effect',
+            title: 'Freesound Yolcu Huzursuzluk & Homurdanma Uğultusu',
+            icon: '😠',
+            specs: 'Freesound #144903 Stüdyo Kaydı (CC0)',
+            desc: 'Sürüş konforu düştüğünde veya otobüs sıcak olduğunda arka sıralardan gelen şikayet mırıldanmaları ve homurtular.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPassengerDiscontent) {
+                    audio.playPassengerDiscontent();
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_discontent.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_passenger_groan',
+            category: 'effect',
+            title: 'Freesound Yolcu Bekleme Bıkkınlığı & "Of Ya" İç Çekişi',
+            icon: '⏱️',
+            specs: 'Freesound #150956 Stüdyo Kaydı (CC-BY)',
+            desc: 'Durakta, ışıkta veya trafikte uzun süre hareketsiz kalınca yolcuların toplu bıkkınlık homurtusu ve iç çekişi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPassengerGroan) {
+                    audio.playPassengerGroan();
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_groan.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_passenger_murmur',
+            category: 'effect',
+            title: 'Freesound Yolcu Doğal Kabin İçi Sohbet & Mırıltı Ambiyansı',
+            icon: '👥',
+            specs: 'Freesound #260122 Stüdyo Kaydı (CC0 - Kesintisiz Döngü)',
+            desc: 'Otobüste yolcu varken arkadan gelen o dertsiz, huzurlu kabin içi sohbet ve mırıltı atmosferi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.passengerMurmur) {
+                    audio.updatePassengerCabinMurmur(30, true);
+                    setTimeout(() => {
+                        audio.updatePassengerCabinMurmur(0, false);
+                    }, 8000);
+                } else {
+                    const a = new Audio('sounds/freesound_passenger_murmur_loop.mp3');
+                    a.volume = 0.5;
+                    a.play().catch(() => {});
+                    setTimeout(() => a.pause(), 8000);
+                }
+            }
+        },
+        {
+            id: 'fx_station_chime',
+            category: 'effect',
+            title: 'Freesound Otogar Peron Anons Çanı & Melodik Gong',
+            icon: '🔔',
+            specs: 'Freesound #419491 Stüdyo Kaydı (CC0)',
+            desc: 'Otogarda perona yanaşırken ve kalkış öncesi peron hoparlörlerinden çalan 3 tonlu melodik otogar anons çanı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playStationChime) audio.playStationChime();
+                else new Audio('sounds/freesound_station_chime.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_tea_service',
+            category: 'effect',
+            title: 'Freesound Yol Boyu Çay İkramı & Kaşık Şıngırtısı',
+            icon: '☕',
+            specs: 'Freesound #657675 & #665189 Stüdyo Kaydı (CC0)',
+            desc: 'Muavinin termostan karton bardağa taze çay döküşü ve ardından ince belli bardakta çay kaşığı şıngırtısı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playFullRefreshmentService) audio.playFullRefreshmentService();
+                else {
+                    new Audio('sounds/freesound_tea_pour.mp3').play().catch(()=>{});
+                    setTimeout(() => new Audio('sounds/freesound_tea_stir.mp3').play().catch(()=>{}), 1800);
+                }
+            }
+        },
+        {
+            id: 'fx_luggage_suitcase',
+            category: 'effect',
+            title: 'Freesound Tekerlekli Valiz & Peron Bagaj Yükleme',
+            icon: '🧳',
+            specs: 'Freesound #423703 HD Kayıt (CC0)',
+            desc: 'Yolcuların peronda valiz sürüklemesi ve otobüsün alt bagaj haznesine bavulların yerleştirilme sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playLuggageSuitcase) audio.playLuggageSuitcase();
+                else new Audio('sounds/freesound_luggage_suitcase.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_police_siren',
+            category: 'effect',
+            title: 'Freesound Jandarma / Polis Yol Denetim Sireni',
+            icon: '🚨',
+            specs: 'Freesound #853022 Stüdyo Kaydı (CC0)',
+            desc: 'Şehir girişindeki denetim noktasında veya otoyolda kenara çekme esnasında çalan kısa polis sireni.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPoliceSiren) audio.playPoliceSiren();
+                else new Audio('sounds/freesound_police_siren.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_tachograph_print',
+            category: 'effect',
+            title: 'Freesound Takograf Termal Kağıt Yazdırma & Çıktı',
+            icon: '📄',
+            specs: 'Freesound #413838 HD Mekanizma (CC0)',
+            desc: 'Polis kontrolünde takograf cihazından sürüş süresi ve hız fişi basıp yırtma sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playTachographPrint) audio.playTachographPrint();
+                else new Audio('sounds/freesound_tachograph_print.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_thunderclap',
+            category: 'effect',
+            title: 'Freesound Gece Fırtınası & Derin Gök Gürültüsü',
+            icon: '⛈️',
+            specs: 'Freesound #534023 Doğa Kaydı (CC0)',
+            desc: 'Yağmurlu gece sürüşlerinde gökyüzünde yankılanan heybetli şimşek ve gök gürültüsü sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playThunderclap) audio.playThunderclap();
+                else new Audio('sounds/freesound_thunderclap.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_distant_foghorn',
+            category: 'effect',
+            title: 'Freesound Boğaz / Köprü Geçişi Vapur Sis Düdüğü',
+            icon: '🚢',
+            specs: 'Freesound #507471 Deniz Kaydı (CC0)',
+            desc: 'Köprülerden geçerken veya Marmara sahili boyunca sisli havada uzaktan gelen nostaljik gemi sis düdüğü.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playDistantFoghorn) audio.playDistantFoghorn();
+                else new Audio('sounds/freesound_distant_foghorn.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_radio_squelch',
+            category: 'effect',
+            title: 'Freesound CB Şoför Telsizi Mandal Bırakma Cızırtısı',
+            icon: '📻',
+            specs: 'Freesound #524205 Telsiz Kaydı (CC0)',
+            desc: 'Şoförler arası telsiz anonsu bittiğinde mandalı bırakırken çıkan o gerçekçi radyo paraziti (squelch).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playRadioSquelchSound) audio.playRadioSquelchSound();
+                else new Audio('sounds/freesound_radio_squelch.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_reverse_beep',
+            category: 'effect',
+            title: 'Ağır Vasıta Geri Vites İkaz Düdüğü (Reverse Beeper)',
+            icon: '⏮️',
+            specs: 'Freesound #523672 Orijinal Ağır Vasıta Geri Vites İkazı (CC0)',
+            desc: 'Otobüs geri vitese takıldığında dışarıya ve yayalara güvenlik amacıyla öten o meşhur ritmik güvenlik bip sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.toggleReverseBeepDemo) audio.toggleReverseBeepDemo();
+                else new Audio('sounds/freesound_reverse_beep.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_handbrake_air',
+            category: 'effect',
+            title: 'İmdat / El Freni Pnömatik Hava Tahliyesi',
+            icon: '🅿️',
+            specs: 'Freesound #725109 Pnömatik Basınç Boşalması (CC0)',
+            desc: 'Otobüs durup el freni (imdat) çekildiğinde veya motor kapatıldığında hava tüplerinden boşalan derin tıslama sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playHandbrakeAir) audio.playHandbrakeAir();
+                else new Audio('sounds/freesound_handbrake_air.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_crowd_walla',
+            category: 'effect',
+            title: 'Kalabalık Yolcu & Durak Ortam Uğultusu (Crowd Walla)',
+            icon: '🗣️',
+            specs: 'Freesound #733849 Doğal İnsan Uğultusu & Konuşma Ambiyansı (CC0)',
+            desc: 'Otobüs içi yolcuların ve duraktaki kalabalığın yaşayan, canlı fısıltı ve konuşma ambiyansı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.toggleCrowdDemo) audio.toggleCrowdDemo();
+                else new Audio('sounds/freesound_crowd_walla.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_diner_ambience',
+            category: 'effect',
+            title: 'Gece Dinlenme Tesisi / Lokanta Ortamı (Rest Stop Ambience)',
+            icon: '🍽️',
+            specs: 'Freesound #573770 Mola Tesisi & Lokanta Ortamı (CC0)',
+            desc: 'Şehirlerarası mola verildiğinde dinlenme tesisindeki çay bardakları, kaşık sesleri ve gece lokantası uğultusu.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.toggleDinerDemo) audio.toggleDinerDemo();
+                else new Audio('sounds/freesound_diner_ambience.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_trolley_cart',
+            category: 'effect',
+            title: 'Muavin İkram Servis Arabası (Trolley Cart)',
+            icon: '🛒',
+            specs: 'Freesound #570075 Halı & Koridor Tekerlek Yuvarlanışı (CC0)',
+            desc: 'Muavinin koridorda ikram arabasını iterken halı zemin üzerinde çıkan tekerlek sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playTrolleyCart) audio.playTrolleyCart();
+                else new Audio('sounds/freesound_trolley_cart.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_snack_wrapper',
+            category: 'effect',
+            title: 'Atıştırmalık & Kek Paketi Hışırtısı',
+            icon: '🧁',
+            specs: 'Freesound #37167 Ambalaj Açılma Hışırtısı (CC0)',
+            desc: 'İkram sırasında yolculara dağıtılan taze kek veya bisküvi paketinin açılma çıtırtısı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playSnackWrapper) audio.playSnackWrapper();
+                else new Audio('sounds/freesound_snack_wrapper.mp3').play().catch(()=>{});
             }
         },
         {
@@ -505,6 +849,20 @@ const SoundGallery = {
         if (typeof audio !== 'undefined' && audio.ctx && audio.ctx.state === 'suspended') {
             if (audio.ctx && audio.ctx.state === 'suspended') audio.ctx.resume().catch(() => {});
         }
+
+        // Dinamik sekme sayılarını güncelle
+        const countAll = this.sounds.length;
+        const countEngine = this.sounds.filter(s => s.category === 'engine').length;
+        const countAkbil = this.sounds.filter(s => s.category === 'akbil').length;
+        const countFx = this.sounds.filter(s => s.category === 'effect').length;
+        const elAll = document.getElementById('tab-sound-all');
+        if (elAll) elAll.innerHTML = `📋 Tüm Sesler (${countAll})`;
+        const elEngine = document.getElementById('tab-sound-engine');
+        if (elEngine) elEngine.innerHTML = `🚌 Motor Sesleri (${countEngine} Ses - 10 Sn)`;
+        const elAkbil = document.getElementById('tab-sound-akbil');
+        if (elAkbil) elAkbil.innerHTML = `💳 Gerçek Otobüs Kartı (${countAkbil})`;
+        const elFx = document.getElementById('tab-sound-fx');
+        if (elFx) elFx.innerHTML = `💨 Havalı Fren & Çevre (${countFx})`;
 
         this.renderModal(this.currentTab);
 

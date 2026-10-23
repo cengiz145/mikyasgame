@@ -39,6 +39,9 @@ const StopDiscovery = {
         try {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
         } catch(e) {}
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData();
+        }
     },
 
     onReachStop: function(stopName, district) {
@@ -79,17 +82,18 @@ const StopDiscovery = {
             }
 
             // Keşif Primi (+50 ₺ ve +25 XP tecrübe)
-            if (typeof Game !== 'undefined' && Game.addMoney) {
-                Game.addMoney(50);
+            if (typeof Game !== 'undefined') {
+                if (Game.addMoney) Game.addMoney(50, true);
+                if (Game.addXP) Game.addXP(25, "Yeni Durak Keşfi");
             }
 
             // Rozet kontrolleri
             const totalDiscovered = Object.keys(data).length;
-            if (totalDiscovered >= 5 && typeof DriverBadges !== 'undefined' && DriverBadges.unlockBadge) {
-                DriverBadges.unlockBadge('mahalle_kasifi');
+            if (totalDiscovered >= 5 && typeof DriverBadges !== 'undefined' && (DriverBadges.unlockBadge || DriverBadges.unlock)) {
+                (DriverBadges.unlockBadge || DriverBadges.unlock).call(DriverBadges, 'mahalle_kasifi', true, 'Mahalle Kâşifi (5 Durak Keşfi)');
             }
-            if (districtDiscoveredCount >= Math.round(totalCount * 0.8) && typeof DriverBadges !== 'undefined' && DriverBadges.unlockBadge) {
-                DriverBadges.unlockBadge('hat_hakimi');
+            if (districtDiscoveredCount >= Math.round(totalCount * 0.8) && typeof DriverBadges !== 'undefined' && (DriverBadges.unlockBadge || DriverBadges.unlock)) {
+                (DriverBadges.unlockBadge || DriverBadges.unlock).call(DriverBadges, 'hat_hakimi', true, 'Hat Hâkimi (%80 Durak Keşfi)');
             }
         } else {
             data[cleanName].visitCount = (data[cleanName].visitCount || 1) + 1;

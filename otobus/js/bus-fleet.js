@@ -27,6 +27,8 @@ const BusFleet = {
             standingCapacity: 15,
             totalCapacity: 44,
             maxSpeed: 95,
+            fuelTankCapacity: 160,
+            fuelConsumptionRate: 23,
             acceleration: 1.15,
             braking: 1.1,
             engine: "Cummins ISB 4.5L Euro 6 (210 HP - 850 Nm)",
@@ -72,6 +74,8 @@ const BusFleet = {
             standingCapacity: 75,
             totalCapacity: 107,
             maxSpeed: 85,
+            fuelTankCapacity: 300,
+            fuelConsumptionRate: 32,
             acceleration: 1.0,
             braking: 1.0,
             engine: "Cummins ISB 6.7L Euro 6 (280 HP)",
@@ -111,11 +115,13 @@ const BusFleet = {
             categoryName: "Mahalle ve Dar Sokak Otobüsü",
             icon: "🚐",
             requiredLevel: 3,
-            price: 1500,
+            price: 140000,
             seatCapacity: 26,
             standingCapacity: 50,
             totalCapacity: 76,
             maxSpeed: 80,
+            fuelTankCapacity: 240,
+            fuelConsumptionRate: 27,
             acceleration: 1.15,
             braking: 1.05,
             engine: "Cummins 4.5L Euro 6 (210 HP)",
@@ -155,11 +161,13 @@ const BusFleet = {
             categoryName: "Şehir İçi Konfor Solo",
             icon: "🚌",
             requiredLevel: 6,
-            price: 5000,
+            price: 380000,
             seatCapacity: 30,
             standingCapacity: 80,
             totalCapacity: 110,
             maxSpeed: 90,
+            fuelTankCapacity: 300,
+            fuelConsumptionRate: 31,
             acceleration: 1.1,
             braking: 1.15,
             engine: "OM 936 Euro 6 (299 HP)",
@@ -199,11 +207,13 @@ const BusFleet = {
             categoryName: "Körüklü Üniversite & Metrobüs",
             icon: "🚎",
             requiredLevel: 8,
-            price: 15000,
+            price: 1150000,
             seatCapacity: 45,
             standingCapacity: 115,
             totalCapacity: 160,
             maxSpeed: 85,
+            fuelTankCapacity: 420,
+            fuelConsumptionRate: 43,
             acceleration: 0.95,
             braking: 1.25,
             engine: "OM 470 Euro 6 (360 HP)",
@@ -245,11 +255,13 @@ const BusFleet = {
             categoryName: "Şehirlerarası Lüks Seyahat",
             icon: "🛣️",
             requiredLevel: 11,
-            price: 35000,
+            price: 2250000,
             seatCapacity: 46,
             standingCapacity: 0,
             totalCapacity: 46,
             maxSpeed: 110,
+            fuelTankCapacity: 540,
+            fuelConsumptionRate: 28,
             acceleration: 1.25,
             braking: 1.3,
             engine: "OM 470 BlueTec Euro 6 (428 HP)",
@@ -289,11 +301,13 @@ const BusFleet = {
             categoryName: "Klasik Şehirlerarası Yolcu",
             icon: "🛣️",
             requiredLevel: 13,
-            price: 50000,
+            price: 2800000,
             seatCapacity: 54,
             standingCapacity: 0,
             totalCapacity: 54,
             maxSpeed: 105,
+            fuelTankCapacity: 500,
+            fuelConsumptionRate: 27,
             acceleration: 1.2,
             braking: 1.2,
             engine: "OM 936 Euro 6 (354 HP)",
@@ -334,11 +348,13 @@ const BusFleet = {
             categoryName: "Yüksek Güçlü Uzun Yol",
             icon: "🦁",
             requiredLevel: 15,
-            price: 75000,
+            price: 3850000,
             seatCapacity: 50,
             standingCapacity: 0,
             totalCapacity: 50,
             maxSpeed: 110,
+            fuelTankCapacity: 520,
+            fuelConsumptionRate: 28,
             acceleration: 1.35,
             braking: 1.35,
             engine: "MAN D2676 Euro 6 (470 HP - 2400 Nm)",
@@ -378,11 +394,13 @@ const BusFleet = {
             categoryName: "Ultra VIP Premium Seyahat",
             icon: "👑",
             requiredLevel: 18,
-            price: 100000,
+            price: 5800000,
             seatCapacity: 42,
             standingCapacity: 0,
             totalCapacity: 42,
             maxSpeed: 115,
+            fuelTankCapacity: 600,
+            fuelConsumptionRate: 33,
             acceleration: 1.4,
             braking: 1.45,
             engine: "OM 471 Euro 6 (510 HP - Çift Arka Dingil)",
@@ -422,11 +440,13 @@ const BusFleet = {
             categoryName: "İlçe ve Kasaba Hattı",
             icon: "🚐",
             requiredLevel: 2,
-            price: 7500,
+            price: 95000,
             seatCapacity: 29,
             standingCapacity: 12,
             totalCapacity: 41,
             maxSpeed: 95,
+            fuelTankCapacity: 140,
+            fuelConsumptionRate: 21,
             acceleration: 1.3,
             braking: 1.2,
             engine: "Isuzu 4HK1E6C-E (190 HP)",
@@ -466,11 +486,13 @@ const BusFleet = {
             categoryName: "Efsane Klasik Şehirlerarası",
             icon: "👑",
             requiredLevel: 8,
-            price: 28000,
+            price: 850000,
             seatCapacity: 46,
             standingCapacity: 0,
             totalCapacity: 46,
             maxSpeed: 120,
+            fuelTankCapacity: 480,
+            fuelConsumptionRate: 30,
             acceleration: 1.3,
             braking: 1.25,
             engine: "OM 442 LA V8 Turbo Intercooler (381 HP)",
@@ -511,11 +533,13 @@ const BusFleet = {
             categoryName: "Şehirlerarası Uzun Yol",
             icon: "💎",
             requiredLevel: 14,
-            price: 60000,
+            price: 3200000,
             seatCapacity: 41,
             standingCapacity: 0,
             totalCapacity: 41,
             maxSpeed: 110,
+            fuelTankCapacity: 500,
+            fuelConsumptionRate: 27,
             acceleration: 1.35,
             braking: 1.3,
             engine: "DAF PACCAR MX-11 Euro 6 (450 HP)",
@@ -556,11 +580,13 @@ const BusFleet = {
             categoryName: "VIP Lüks Seyahat Devi",
             icon: "👑",
             requiredLevel: 18,
-            price: 135000,
+            price: 5200000,
             seatCapacity: 44,
             standingCapacity: 0,
             totalCapacity: 44,
             maxSpeed: 120,
+            fuelTankCapacity: 650,
+            fuelConsumptionRate: 34,
             acceleration: 1.45,
             braking: 1.4,
             engine: "Scania DC13 Euro 6 (490 HP)",
@@ -601,11 +627,13 @@ const BusFleet = {
             categoryName: "Efsane Fütüristik Filo Lideri",
             icon: "🚀",
             requiredLevel: 20,
-            price: 150000,
+            price: 6500000,
             seatCapacity: 48,
             standingCapacity: 0,
             totalCapacity: 48,
             maxSpeed: 115,
+            fuelTankCapacity: 620,
+            fuelConsumptionRate: 32,
             acceleration: 1.4,
             braking: 1.4,
             engine: "MAN Euro 6 (460 HP)",
@@ -647,11 +675,13 @@ const BusFleet = {
             roadFit: "En dar mahalle çıkmazları, köy yolları ve dik tepe rampaları",
             icon: "🚐",
             requiredLevel: 2,
-            price: 4500,
+            price: 65000,
             seatCapacity: 19,
             standingCapacity: 8,
             totalCapacity: 27,
             maxSpeed: 100,
+            fuelTankCapacity: 100,
+            fuelConsumptionRate: 16,
             acceleration: 1.25,
             braking: 1.15,
             engine: "Iveco 3.0L HPI Twin Turbo Euro 6 (205 HP - 470 Nm)",
@@ -690,11 +720,13 @@ const BusFleet = {
             roadFit: "Dar mahalle hatları, tarihi merkezler ve sahil ringleri",
             icon: "🚌",
             requiredLevel: 3,
-            price: 12000,
+            price: 185000,
             seatCapacity: 25,
             standingCapacity: 33,
             totalCapacity: 58,
             maxSpeed: 90,
+            fuelTankCapacity: 150,
+            fuelConsumptionRate: 22,
             acceleration: 1.2,
             braking: 1.15,
             engine: "FPT NEF4 Euro 6 (186 HP - 680 Nm)",
@@ -735,11 +767,13 @@ const BusFleet = {
             roadFit: "Metropol ana arterleri, bulvarlar ve yoğun otobüs durakları",
             icon: "🚍",
             requiredLevel: 5,
-            price: 22000,
+            price: 490000,
             seatCapacity: 31,
             standingCapacity: 76,
             totalCapacity: 107,
             maxSpeed: 85,
+            fuelTankCapacity: 300,
+            fuelConsumptionRate: 32,
             acceleration: 1.1,
             braking: 1.2,
             engine: "Cummins ISB 6.7L Euro 6 (280 HP - 1100 Nm)",
@@ -778,11 +812,13 @@ const BusFleet = {
             roadFit: "Geniş caddeler ve ilçe hatları",
             icon: "🚍",
             requiredLevel: 7,
-            price: 30000,
+            price: 620000,
             seatCapacity: 33,
             standingCapacity: 72,
             totalCapacity: 105,
             maxSpeed: 90,
+            fuelTankCapacity: 300,
+            fuelConsumptionRate: 31,
             acceleration: 1.15,
             braking: 1.2,
             engine: "Cummins ISB 6.7L Euro 6 (300 HP - 1200 Nm)",
@@ -823,11 +859,13 @@ const BusFleet = {
             roadFit: "Üniversite ekspres koridorları ve metropol ana arterleri",
             icon: "🚎",
             requiredLevel: 10,
-            price: 42000,
+            price: 1450000,
             seatCapacity: 48,
             standingCapacity: 117,
             totalCapacity: 165,
             maxSpeed: 85,
+            fuelTankCapacity: 440,
+            fuelConsumptionRate: 44,
             acceleration: 1.05,
             braking: 1.3,
             engine: "DAF PACCAR MX-11 Euro 6 (370 HP - 1600 Nm)",
@@ -866,11 +904,13 @@ const BusFleet = {
             roadFit: "Şehirlerarası otoyollar, peronlar ve VIP turizm seferleri",
             icon: "🛣️",
             requiredLevel: 16,
-            price: 88000,
+            price: 4400000,
             seatCapacity: 41,
             standingCapacity: 0,
             totalCapacity: 41,
             maxSpeed: 115,
+            fuelTankCapacity: 550,
+            fuelConsumptionRate: 29,
             acceleration: 1.38,
             braking: 1.35,
             engine: "DAF PACCAR MX-11 Euro 6 (450 HP - 2300 Nm)",
@@ -922,8 +962,26 @@ const BusFleet = {
         const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
 
         // Serbest modda tüm otobüslerin seviye kilidi açıktır; kariyer modunda seviye şartı devam eder.
+                // GARA VE FİLO SAHASI KAPASİTE KONTROLÜ
+        const owned = this.getOwnedBusIds();
+        let maxBusesAllowed = 5; // Seviye 1: 5 araç
+        const compSys = (typeof CompanySystem !== 'undefined') ? CompanySystem : ((typeof window !== 'undefined' && window.CompanySystem) ? window.CompanySystem : null);
+        if (compSys && typeof compSys.getInstitutionLevel === 'function') {
+            const garageLevel = compSys.getInstitutionLevel('bus_garage');
+            if (garageLevel === 1) maxBusesAllowed = 5;
+            else if (garageLevel === 2) maxBusesAllowed = 15;
+            else if (garageLevel >= 3) maxBusesAllowed = 999;
+        }
+
+        if (owned.length >= maxBusesAllowed) {
+            const capMsg = `Garaj Kapasitesi Dolu! Mevcut Seviye Garaj Sahası en fazla ${maxBusesAllowed} otobüs barındırabilir (Şu an: ${owned.length} otobüs). Yeni araç satın almak için Şirket Menüsü -> Yasal Binalar sekmesinden Garaj ve Filo Sahası'nı büyütün!`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(capMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`⛔ ${capMsg}`, "warning");
+            return false;
+        }
+
         if (!isFreeDrive && currentLevel < bus.requiredLevel) {
-            const lockMsg = `Seviyeniz yetersiz! ${bus.fullName} satın almak için Seviye ${bus.requiredLevel} olmalısınız (Mevcut Seviyeniz: ${currentLevel}).`;
+            const lockMsg = `Seviyeniz yetersiz! ${bus.fullName} satın almak için Seviye ${bus.requiredLevel} olmalısınız (Mevcut Seviyeniz: ${currentLevel || 1}).`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, "warning");
             return false;
@@ -947,7 +1005,7 @@ const BusFleet = {
             }
         }
 
-        const owned = this.getOwnedBusIds();
+        // Garaja ekle
         if (!owned.includes(busId)) {
             owned.push(busId);
             try { localStorage.setItem(this.OWNED_KEY, JSON.stringify(owned)); } catch(e) {}
@@ -1048,7 +1106,7 @@ const BusFleet = {
         this.renderModal('owned');
 
         const sel = this.getSelectedBus();
-        const welcomeSpeech = `Otobüs Garajım açıldı. Aktif aracınız: ${sel.fullName}.`;
+        const welcomeSpeech = "Garajım açıldı.";
         if (typeof audio !== 'undefined' && audio.speak) audio.speak(welcomeSpeech);
 
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
@@ -1264,7 +1322,7 @@ const BusFleet = {
                 </div>
                 <div style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 4px;">
                     👥 <strong>Kapasite:</strong> <span style="color: #38bdf8;">${capacityInfo}</span> | 
-                    ⚡ <strong>Maks Hız:</strong> ${b.maxSpeed} km/s
+                    ⚡ <strong>Maks Hız:</strong> ${b.maxSpeed} km/s | ⛽ <strong>Yakıt Deposu:</strong> <span style="color: #facc15;">${b.fuelTankCapacity || 500} L</span> (~ ${b.fuelConsumptionRate || 30} L/100km)
                 </div>
                 <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 4px;">
                     ⚙️ <strong>Motor & Vites:</strong> ${b.engine} | ${b.transmission}

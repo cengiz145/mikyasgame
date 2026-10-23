@@ -925,7 +925,7 @@ const CompassSystem = {
             audio.updateNvdaLiveRegion(report);
         }
         if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
-            UI.showToast(`🧭 Pusula: ${dir.icon} ${dir.name} (${dir.angle}°)`, 'info');
+            UI.showToast(`🧭 Pusula: ${dir.icon || '🧭'} ${dir.name || 'Kuzey'} (${typeof dir.angle === 'number' ? dir.angle : 0}°)`, 'info');
         }
         this.updateHUD(dir);
         return report;
@@ -937,7 +937,7 @@ const CompassSystem = {
         const isDriving = (typeof Game !== 'undefined' && Game.isDriving);
         const city = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
 
-        let report = `Pusula İstikameti: ${dir.name} (${dir.angle} derece). `;
+        let report = `Pusula İstikameti: ${dir.name || 'Kuzey'} (${typeof dir.angle === 'number' ? dir.angle : 0} derece). `;
 
         // Aktif rota ve durak analizi
         if (typeof Game !== 'undefined' && Game.activeRouteData) {
@@ -1063,7 +1063,7 @@ const CompassSystem = {
             audio.updateNvdaLiveRegion(report);
         }
         if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
-            UI.showToast(`🧭 İstikamet ${dir.icon} ${dir.name} (${dir.angle}°)`, 'info');
+            UI.showToast(`🧭 İstikamet ${dir.icon || '🧭'} ${dir.name || 'Kuzey'} (${typeof dir.angle === 'number' ? dir.angle : 0}°)`, 'info');
         }
     },
 
@@ -1106,7 +1106,7 @@ const CompassSystem = {
         // 5. Ana Menüde genel yön anonsu
         const currentCity = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
         const landmark = this.getLandmarkDesc(currentCity, dir.name);
-        const msg = `${dir.name} (${dir.angle}°): ${landmark}`;
+        const msg = `${dir.name || 'Kuzey'} (${typeof dir.angle === 'number' ? dir.angle : 0}°): ${landmark}`;
         if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
         if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast(`🧭 ${dir.icon} ${msg}`, 'info');
     },
@@ -1314,18 +1314,22 @@ const CompassSystem = {
 
         const currentCity = (typeof Game !== 'undefined' && Game.currentCity) ? Game.currentCity : "Tekirdağ";
         const landmark = this.getLandmarkDesc(currentCity, dir.name);
-        const msg = `${dir.name} İstikameti (${dir.angle}°): ${landmark}`;
+        const msg = `${dir.name || 'Kuzey'} İstikameti (${typeof dir.angle === 'number' ? dir.angle : 0}°): ${landmark}`;
         if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
         if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') UI.showToast(`🧭 ${dir.icon} ${msg}`, 'info');
     },
 
     updateHUD: function(dir) {
+        dir = dir || (this.cardinals && this.cardinals.ArrowUp) || { icon: '⬆️', name: 'KUZEY', angle: 0 };
         const compassHud = document.getElementById('hud-compass');
         const compassText = document.getElementById('hud-compass-text');
+        const icon = dir.icon || '🧭';
+        const dName = (dir.name || 'KUZEY').toUpperCase();
+        const angle = (typeof dir.angle === 'number' && !isNaN(dir.angle)) ? dir.angle : 0;
         if (compassText) {
-            compassText.innerText = `${dir.icon} ${dir.name.toUpperCase()} (${dir.angle}°)`;
+            compassText.innerText = `${icon} ${dName} (${angle}°)`;
         } else if (compassHud) {
-            compassHud.innerText = `🧭 ${dir.icon} ${dir.name.toUpperCase()} (${dir.angle}°)`;
+            compassHud.innerText = `🧭 ${icon} ${dName} (${angle}°)`;
         }
     },
 

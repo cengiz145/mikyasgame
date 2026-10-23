@@ -195,7 +195,7 @@ const SarayNavigasyon = {
             id: routeId,
             hatNo: "Saray İçi",
             name: "Saray İçi: " + kalkis.name + " ➔ " + varis.name,
-            rawName: "Saray Şehir İçi Ulaşım (" + kalkis.name + " - " + varis.name + ")",
+            rawName: "Saray Şehir İçi Ulaşım (" + (kalkis ? kalkis.name : 'Kalkış') + " - " + (varis ? varis.name : 'Varış') + ")",
             district: "Saray",
             originDistrict: "Saray",
             destDistrict: "Saray",

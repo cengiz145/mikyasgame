@@ -1263,7 +1263,7 @@ const AkilliRotaSistemi = {
             id: smartId,
             hatNo: best.route.hatNo,
             name: `Akıllı Rota: ${best.fromStop} ➔ ${best.toStop}`,
-            rawName: `${best.route.name} (${best.fromStop} - ${best.toStop})`,
+            rawName: `${(best.route && best.route.name) || 'Hat'} (${best.fromStop || 'Kalkış'} - ${best.toStop || 'Varış'})`,
             district: best.route.district,
             originDistrict: best.route.district,
             destDistrict: best.route.district,
@@ -1281,7 +1281,7 @@ const AkilliRotaSistemi = {
             terrain: "asfalt",
             desc: `Akıllı Rota Sistemi: ${best.fromStop} ➔ ${best.toStop}. Hat ${best.route.hatNo} ile ${smartStops.length} durak, ${best.dist} km.`,
             speechBriefing: `Akıllı rota oluşturuldu. ${best.fromStop} durağından ${best.toStop} durağına Hat ${best.route.hatNo} ile seferiniz başlıyor. Toplam ${smartStops.length} durak, ${best.dist} kilometre.`,
-            detailedInstructions: `Akıllı Rota (Hat ${best.route.hatNo})\n` +
+            detailedInstructions: `Akıllı Rota (Hat ${(best.route && best.route.hatNo) || "Özel"})\n` +
                 smartStops.map((s, idx) => `${idx + 1}. Adım: ${s.name}`).join('\n'),
             stops: smartStops
         };
@@ -1337,7 +1337,7 @@ const AkilliRotaSistemi = {
             audio.speak(msg);
         }
         if (typeof UI !== 'undefined' && UI.showToast) {
-            UI.showToast(`Akıllı Rota: ${res.fromStop} ➔ ${res.toStop} (Hat ${res.route.hatNo})`, "success");
+            UI.showToast(`Akıllı Rota: ${res.fromStop || ''} ➔ ${res.toStop || ''}${res.route && res.route.hatNo ? ' (Hat ' + res.route.hatNo + ')' : ''}`, "success");
         }
 
         if (typeof AkilliSistem !== 'undefined' && AkilliSistem.autoAssignBusForRoute) {

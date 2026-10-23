@@ -16,6 +16,8 @@ class VoiceAssistant {
             // 1. BÖLÜM: DİREKSİYON BAŞINA GEÇİŞ
             {
                 id: 'driving',
+                soundDesc: '🔑 Marş, Dizel Rölanti, Gaza Basma ve Havalı Fren',
+                soundIcon: '🔑',
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: '1. Motoru Çalıştırma, Gaz ve Fren',
@@ -25,6 +27,8 @@ class VoiceAssistant {
             },
             {
                 id: 'stops',
+                soundDesc: '🚪 Pnömatik Kapılar ve 💳 Akbil Kart Okuma',
+                soundIcon: '🚪',
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: '2. Duraklarda Yolcu Alma ve İndirme',
@@ -34,6 +38,8 @@ class VoiceAssistant {
             },
             {
                 id: 'compass',
+                soundDesc: '🧭 Pusula ve Yön Bildirim Çanı',
+                soundIcon: '🧭',
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: '3. Yönünü Bulma ve Pusula',
@@ -44,6 +50,8 @@ class VoiceAssistant {
 
             {
                 id: 'cockpit_navigation',
+                soundDesc: '🔔 Üç Tonlu Durak Anons Gongu',
+                soundIcon: '🔔',
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: '3.1. Akıllı Hat ve Durak Navigasyonu',
@@ -55,6 +63,8 @@ class VoiceAssistant {
             // 2. BÖLÜM: YOLCULARIMIZ VE DURAKLAR
             {
                 id: 'ramp',
+                soundDesc: '🦼 Yana Yatma (Kneeling) ve 🛹 Freesound Engelli Rampası',
+                soundIcon: '🛹',
                 stage: 2,
                 stageName: '2. Bölüm: Yolcularımız ve Duraklar',
                 title: '4. Tekerlekli Sandalyeli Yolcular ve Rampa',
@@ -64,6 +74,8 @@ class VoiceAssistant {
             },
             {
                 id: 'bumps',
+                soundDesc: '⚡ Kasis Darbe Sesi ve 🎶 Voith Retarder Düdüğü',
+                soundIcon: '⚡',
                 stage: 2,
                 stageName: '2. Bölüm: Yolcularımız ve Duraklar',
                 title: '5. Tümsekler ve Yolcu Memnuniyeti',
@@ -73,17 +85,21 @@ class VoiceAssistant {
             },
             {
                 id: 'comfort_ac',
+                soundDesc: '🪟 Freesound Elektrikli Cam Açma & Kapatma',
+                soundIcon: '🪟',
                 stage: 2,
                 stageName: '2. Bölüm: Yolcularımız ve Duraklar',
                 title: '6. Klima ve Şoför Camı',
-                keys: 'K (Klima Aç/Kapat), O (Şoför Camı)',
-                tip: 'Hava çok sıcak veya soğuksa klimayı aç, ferahlamak için camı aç.',
-                speech: 'Sıcak yaz günlerinde veya kış soğuğunda yolcuların üşümemesi ya da bunalmaması için K tuşuna basarak klimayı açıp kapatabilirsin. Temiz hava almak istediğinde de O tuşuna basarak şoför camını açıp kapatabilirsin.'
+                keys: 'K (Klima), Home (Cam Aç), End (Cam Kapat)',
+                tip: 'Home ile camı aç, End ile kapat. Temiz hava kokpite dolar.',
+                speech: 'Sıcak yaz günlerinde veya kış soğuğunda yolcuların üşümemesi ya da bunalmaması için K tuşuna basarak klimayı açıp kapatabilirsin. Temiz hava almak istediğinde Home tuşuna basarak şoför camını açabilir, End tuşuna basarak kapatabilirsin.'
             },
 
             // 3. BÖLÜM: GECE, YAĞMUR VE SEFER KURALLARI
             {
                 id: 'lights_weather',
+                soundDesc: '💡 Kokpit Far Anahtarı ve 🌧️ Silecek Süpürme',
+                soundIcon: '💡',
                 stage: 3,
                 stageName: '3. Bölüm: Gece, Yağmur ve Sefer Kuralları',
                 title: '7. Farlar, Yağmur ve Silecekler',
@@ -93,6 +109,8 @@ class VoiceAssistant {
             },
             {
                 id: 'timetable',
+                soundDesc: '⏱️ Takograf / Hat Ekranı Dijital Bildirim',
+                soundIcon: '⏱️',
                 stage: 3,
                 stageName: '3. Bölüm: Gece, Yağmur ve Sefer Kuralları',
                 title: '8. Saate Bakma ve Ön Tabela',
@@ -102,6 +120,8 @@ class VoiceAssistant {
             },
             {
                 id: 'lost_found',
+                soundDesc: '🪙 Bahşiş ve Ödül Şıngırtısı',
+                soundIcon: '🪙',
                 stage: 3,
                 stageName: '3. Bölüm: Gece, Yağmur ve Sefer Kuralları',
                 title: '9. Son Durak ve Unutulan Eşyalar',
@@ -113,6 +133,8 @@ class VoiceAssistant {
             // 4. BÖLÜM: UZUN YOL VE USTA ŞOFÖRLÜK
             {
                 id: 'luggage',
+                soundDesc: '🧳 Havalı Bagaj Kapağı Pnömatik Açılış & Kapanış',
+                soundIcon: '🧳',
                 stage: 4,
                 stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
                 title: '10. Şehirlerarası Sefer ve Valizler',
@@ -122,6 +144,8 @@ class VoiceAssistant {
             },
             {
                 id: 'badges_collection',
+                soundDesc: '🏆 Madalya & Kupa Zafer Fanfarı',
+                soundIcon: '🏆',
                 stage: 4,
                 stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
                 title: '11. 1500 Başarı ve Keşfedilen Duraklar',
@@ -131,6 +155,8 @@ class VoiceAssistant {
             },
             {
                 id: 'voice_guide',
+                soundDesc: '🎙️ Telsiz Bas-Konuş ve Mandal Sesi',
+                soundIcon: '🎙️',
                 stage: 4,
                 stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
                 title: '12. Sesli Asistanla Konuşma',
@@ -243,6 +269,10 @@ class VoiceAssistant {
     openTutorialModal() {
         const modal = document.getElementById('tutorial-assistant-modal');
         if (!modal) return;
+        // Eğitim moduna girerken tüm oyun ve efekt seslerini sustur
+        if (typeof audio !== 'undefined' && audio.stopAllSoundEffects) {
+            audio.stopAllSoundEffects();
+        }
         this.renderTutorialContent();
         modal.classList.remove('hidden');
         this.updateCopilotButtonText();
@@ -260,8 +290,13 @@ class VoiceAssistant {
         const modal = document.getElementById('tutorial-assistant-modal');
         if (modal) modal.classList.add('hidden');
         this.stopTutorialSpeech();
-        if (typeof audio !== 'undefined' && audio.speak) {
-            audio.speak("Sürüş rehberi kapatıldı.");
+        if (this.stepTransitionTimeout) {
+            clearTimeout(this.stepTransitionTimeout);
+            this.stepTransitionTimeout = null;
+        }
+        if (typeof audio !== 'undefined') {
+            if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+            if (audio.speak) audio.speak("Sürüş rehberi kapatıldı.");
         }
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
             KeyboardNav.initForScreen();
@@ -269,11 +304,14 @@ class VoiceAssistant {
     }
 
     setAcademyTab(tabId) {
-        this.currentStageFilter = tabId;
-        this.renderTutorialContent();
-    }
-
-    setAcademyTab(tabId) {
+        if (this.stepTransitionTimeout) {
+            clearTimeout(this.stepTransitionTimeout);
+            this.stepTransitionTimeout = null;
+        }
+        if (typeof audio !== 'undefined') {
+            if (audio.stopSpeech) audio.stopSpeech();
+            if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+        }
         this.currentStageFilter = tabId;
         this.renderTutorialContent();
     }
@@ -282,10 +320,51 @@ class VoiceAssistant {
         const listEl = document.getElementById('tutorial-lessons-list');
         const seruvenContainer = document.getElementById('tutorial-seruven-container') || document.getElementById('tutorial-karne-container');
         const labContainer = document.getElementById('tutorial-lab-container');
+        const compContainer = document.getElementById('tutorial-company-container');
         if (!listEl) return;
 
         // Sekme butonlarının aktiflik stilini güncelle
-        const tabs = ['lab', 'all', 'stage1', 'stage2', 'stage3', 'stage4', 'seruven', 'karne'];
+        const tabs = ['mechanics', 'company', 'lab', 'all', 'stage1', 'stage2', 'stage3', 'stage4', 'seruven', 'karne'];
+        tabs.forEach(t => {
+            const btn = document.getElementById(`tab-acad-${t}`);
+            if (btn) {
+                const isActive = (this.currentStageFilter === t) || (t === 'seruven' && this.currentStageFilter === 'karne');
+                btn.style.background = isActive ? 'rgba(16, 185, 129, 0.4)' : 'rgba(255, 255, 255, 0.08)';
+                btn.style.borderColor = isActive ? '#10b981' : 'rgba(255, 255, 255, 0.2)';
+                btn.style.color = isActive ? '#34d399' : '#cbd5e1';
+                btn.style.fontWeight = isActive ? 'bold' : 'normal';
+            }
+        });
+
+        // 0. OTOBÜS MEKANİKLERİ VE AĞIR VASITA FİZİĞİ REHBERİ
+        const mechContainer = document.getElementById('tutorial-mechanics-container');
+        if (this.currentStageFilter === 'mechanics') {
+            if (labContainer) labContainer.style.display = 'none';
+            if (seruvenContainer) seruvenContainer.style.display = 'none';
+            if (compContainer) compContainer.style.display = 'none';
+            listEl.style.display = 'none';
+            if (mechContainer) {
+                mechContainer.style.display = 'block';
+                this.renderBusMechanicsGuide();
+            }
+            return;
+        } else {
+            if (mechContainer) mechContainer.style.display = 'none';
+        }
+
+        // 0. ŞİRKET YÖNETİMİ, 6 YASAL BİNA VE ÖN MUHASEBE REHBERİ
+        if (this.currentStageFilter === 'company') {
+            if (labContainer) labContainer.style.display = 'none';
+            if (seruvenContainer) seruvenContainer.style.display = 'none';
+            listEl.style.display = 'none';
+            if (compContainer) {
+                compContainer.style.display = 'block';
+                this.renderCompanyGuide();
+            }
+            return;
+        } else {
+            if (compContainer) compContainer.style.display = 'none';
+        }
         tabs.forEach(t => {
             const btn = document.getElementById(`tab-acad-${t}`);
             if (btn) {
@@ -362,6 +441,7 @@ class VoiceAssistant {
                     💡 <strong>Oyun İpucu:</strong> ${lesson.tip}
                 </div>
                 <div style="font-size: 0.88rem; color: #fde047;"><strong>Tuşlar:</strong> ${lesson.keys}</div>
+
                 <div style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.4;">${lesson.speech}</div>
             `;
 
@@ -381,6 +461,645 @@ class VoiceAssistant {
     // =========================================================================
     // ADIM ADIM REHBERLİ SÜRÜŞ EĞİTİMİ (TERİMSİZ, EN ANLAŞILIR OYUN DİLİ)
     // =========================================================================
+
+    renderBusMechanicsGuide() {
+        const container = document.getElementById('tutorial-mechanics-container');
+        if (!container) return;
+
+        container.innerHTML = `
+        <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); border: 2px solid #10b981; border-radius: 12px; padding: 18px 22px; color: #fff;">
+            
+            <!-- BAŞLIK -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(16, 185, 129, 0.3); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h3 style="margin: 0; color: #34d399; font-size: 1.4rem; display: flex; align-items: center; gap: 8px;">
+                        <span>⚙️</span> <span>Otobüs Mekanikleri & Ağır Vasıta Fiziği Başucu Rehberi</span>
+                    </h3>
+                    <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.88rem;">
+                        Retarder, havalı fren, balata şişmesi, 15 tonluk dağ eğim fiziği, kneeling ve viraj dinamiklerinin bilimsel ve pratik açıklaması.
+                    </p>
+                </div>
+                <button class="modern-btn btn-read-section nav-item" data-text="Otobüs Mekanikleri ve Ağır Vasıta Fiziği Başucu Rehberi. Bu bölümde retarder şanzıman freni, balata şişmesi, havalı fren basıncı, eğim fiziği, kapı interlok sistemi ve viraj merkezkaç kuvvetleri gibi gerçek otobüs kaptanlarının bildiği tüm mekanik kavramları öğreneceksiniz." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                    ▶️ Tüm Bölümü Sesli Dinle
+                </button>
+            </div>
+
+            <!-- HIZLI KONTROL KUTUSU -->
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; color: #a7f3d0; font-size: 0.9rem; line-height: 1.5;">
+                ⚡ <strong>Hızlı Kaptan Kısayolları:</strong> 
+                <strong>B:</strong> Kademeli Retarder Kolu (1-2-3-4-5) • 
+                <strong>Shift + B:</strong> Retarder Sıfırla (Boşa Al) • 
+                <strong>W / S:</strong> Gaz / Ayak Freni • 
+                <strong>Space:</strong> Kontak / El Freni • 
+                <strong>G:</strong> Sefer & Görev Durumu • 
+                <strong>E:</strong> Ön Kapı & Kneeling • 
+                <strong>F:</strong> Farlar • 
+                <strong>L:</strong> Havalı Korna • 
+                <strong>🏔️ HUD:</strong> Canlı Rakım & Eğim Göstergesi
+            </div>
+
+            <!-- BÖLÜM 1: RETARDER (HİDROLİK ŞANZIMAN FRENi) -->
+            <div style="background: linear-gradient(135deg, rgba(5, 150, 105, 0.2), rgba(15, 23, 42, 0.85)); border: 1.5px solid #10b981; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="color: #34d399; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🎶</span> <span>1. Retarder (Hidrolik Şanzıman Freni - Voith & ZF)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Birinci Bölüm: Retarder yani Hidrolik Şanzıman Freni. Retarder, ağır vasıtalarda tekerlek balatalarına hiç dokunmadan şanzıman çıkış milini hidrolik yağ girdabıyla frenleyen aşınmasız yardımcı fren sistemidir. Normal fren balataları sürtünmeyle aşınır ve yokuş aşağı inerken aşırı ısınıp tutmaz hale gelir. Retarder ise yağı bir türbin haznesinde sıkıştırarak kinetik enerjiyi ısıya çevirir ve aracı sarsmadan yavaşlatır. Oyunda B tuşuna basarak retarder kolunu kademe bir ile beş arasında çekebilirsiniz. Shift B ile anında kapatabilirsiniz. Retarder devredeyken duyduğunuz o meşhur tiz türbin ıslığı Voith hidrolik retarderin gerçek çalışma sesidir." style="padding: 6px 12px; background: rgba(16,185,129,0.25); border: 1px solid #10b981; color: #a7f3d0; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ Retarderi Dinle
+                    </button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.55;">
+                    • <strong>Retarder Nedir ve Neden Hayatidir?</strong> 15-18 tonluk bir otobüsü dik bir dağdan (örneğin Bolu Dağı veya Güzeldere Geçidi) indirirken yalnızca ayak freni kullanılırsa, balatalar birkaç dakika içinde aşırı ısınır, sürtünme sıfırlanır ve fren tamamen boşalır. Retarder, şanzıman kardan miline bağlı <em>rotor</em> ve <em>stator</em> çarkları arasına hidrolik yağ basarak sürtünmesiz frenleme yapar.<br>
+                    • <strong>5 Kademeli Retarder Kolu:</strong> Klavyeden <strong>B</strong> tuşuna her bastığınızda retarder kolu bir kademe artar (Kademe 1: Hafif tutuş ➔ Kademe 3: %7 eğim iniş tutuşu ➔ Kademe 5: Tam hidrolik blokaj). <strong>Shift + B</strong> kolu anında boşa alır.<br>
+                    • <strong>Türbin Islığı ve Pnömatik Tahliye:</strong> Retarder çekildiğinde aracın hızına bağlı olarak yükselen o karakteristik Voith ıslık sesi duyulur; retarder devreden çıktığında ise gerçek ağır vasıtalardaki gibi havalı tahliye sesi (<em>'tısss'</em>) yankılanır.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 2: BALATA ISINMASI VE FREN ŞİŞMESİ (BRAKE FADE) -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(239, 68, 68, 0.4);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #f87171; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🔥</span> <span>2. Balata Isınması & Fren Şişmesi (Brake Fade)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="İkinci Bölüm: Balata Isınması ve Fren Şişmesi. Dağlık yollarda inerken sürekli S tuşuna yani ayak frenine basarsanız, sürtünme diskleri hızla ısınır. Sıcaklık iki yüz altmış dereceyi aştığında balata reçineleri gaz çıkarmaya başlar ve balata diske tutunamaz. Buna şoförler arasında fren şişmesi denir. Fren şiştiğinde fren mesafesi üç katına çıkar ve otobüs duramaz hale gelir. Çözüm: Dik inişlerde ayak frenini bırakıp B tuşuyla Retarderi devreye sokmaktır. Böylece hava akımı ve retarder soğutması sayesinde balatalar hızla güvenli sıcaklığa iner." style="padding: 4px 10px; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Fiziksel Neden:</strong> Balata diske sürtündükçe kinetik enerji ısıya dönüşür. Normal çalışma sıcaklığı 50°C - 150°C arasındadır.<br>
+                    • <strong>260°C Tehlike Eşiği:</strong> Disk sıcaklığı 260°C'yi aştığında balatanın sürtünme katsayısı %65 oranında çöker (Fren Şişmesi). Sesli asistan: <em>'⚠️ Dikkat! Balatalar aşırı ısındı ve şişti! Retarder kullanınız!'</em> uyarısı verir.<br>
+                    • <strong>Balata Nasıl Soğutulur?</strong> Ayak freninden ayak çekilip araç 30 km/s üzerinde seyrederken rüzgar akımıyla ve <strong>B</strong> tuşuyla Retarder kullanılarak balata sıcaklığı hızla 60°C seviyesine soğutulur.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 3: EĞİM YERÇEKİMİ VE DAĞ RAMPALARI (NEWTON FİZİĞİ) -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(56, 189, 248, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🏔️</span> <span>3. Eğim Yerçekimi ve Dağ Rampaları (a = g · sin θ)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Üçüncü Bölüm: Eğim Yerçekimi ve Dağ Rampaları. Türkiye'nin gerçek Harita Genel Müdürlüğü ve Karayolları Genel Müdürlüğü topoğrafyası oyuna entegre edilmiştir. Yokuş yukarı çıkarken yerçekimi ivmesi on beş tonluk otobüsü geri çeker; motor devri bayılır ve yakıt tüketimi her yüzde bir eğim için yüzde on iki artar. Yokuş aşağı inişte ise araç serbest ivmelenerek hızlanır. Kokpitteki dağ simgeli rakım göstergesi bulunduğunuz ilin gerçek deniz seviyesi rakımını, yolun anlık eğim yüzdesini ve Bolu Dağı, Sabuncubeli veya Güzeldere gibi tescilli geçit isimlerini canlı olarak gösterir." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Tırmanış Direnci:</strong> Bolu Dağı (%7.5), Sabuncubeli (%9.0) veya Güzeldere (%11.0) tırmanırken 15 tonluk otobüsün gaz tepkisi ağırlaşır. Vites düşürüp motor devrini 1.800 - 2.200 RPM aralığında tutmanız gerekir.<br>
+                    • <strong>İniş İvmesi:</strong> Yokuş aşağı inerken Newton yerçekimi (a = g · sin θ) otobüsü öne doğru iter. Hız limiti aşılmadan önce mutlaka retarder çekilmelidir.<br>
+                    • <strong>Kokpit Rakım Göstergesi:</strong> <code>🏔️ Rakım: 1577 m (+ %7.5 Tırmanış • Bolu Dağı Geçidi)</code> şeklinde anlık olarak güncellenir.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 4: PNÖMATİK HAVALI FREN SİSTEMİ (BAR & PSI) -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(250, 204, 21, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>💨</span> <span>4. Pnömatik Havalı Fren Sistemi (Bar & PSI Yönetimi)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Dördüncü Bölüm: Pnömatik Havalı Fren Sistemi. Ağır vasıtalar otomobiller gibi hidrolik frenle durdurulamaz; çünkü on beş tonu sıkıştırmak için muazzam bir hava basıncı gerekir. Otobüslerde sekiz ile on iki bar arasında çalışan hava kompresörü ve hava tankları bulunur. Frene her basıp bıraktığınızda hava tankından basınç harcanır. Basınç altmış PSI altına düşerse sesli hava alarmı öter. Eğer hava tamamen biterse güvenlik amacıyla imdat freni körükleri patlar ve araç tekerlekleri kilitlenir. Gerçek kaptanlar frene art arda pompalamaz, tek ve dengeli basış yapar." style="padding: 4px 10px; background: rgba(234,179,8,0.2); border: 1px solid #eab308; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Hava Tankı Dinamiği:</strong> Frene basılı tutmak havayı tüketmez; ancak frene ardı ardına basıp bırakmak (pompalama) tanktaki havayı tüketir.<br>
+                    • <strong>Düşük Hava İkazı (60 PSI Altı):</strong> Basınç kritik eşiğin altına indiğinde kabinde sesli buzzer çalar. Aracı rölantide tutarak kompresörün tankları doldurmasını bekleyiniz.<br>
+                    • <strong>İmdat / Park Freni (Maxi Körükler):</strong> Boşluk (Space) tuşuyla çekilen imdat freni, hava basıncıyla değil yay tansiyonuyla tekerlekleri mekanik olarak kilitler.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 5: KAPI FREN İNTERLOK SİSTEMİ (DOOR-BRAKE SAFETY LOCK) -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(168, 85, 247, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #c084fc; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🚪</span> <span>5. Kapı Fren İnterlok Sistemi (Door-Brake Safety Lock)</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Beşinci Bölüm: Kapı Fren İnterlok Sistemi. Modern belediye ve şehirlerarası otobüslerde uluslararası yolcu güvenliği standardı gereği kapı interlok mekanizması bulunur. Ön kapı, arka kapı veya engelli rampası açıkken gaz pedalı tamamen kilitlenir ve araç hareket edemez. Yolcular binerken otobüsün aniden hareket etmesini önleyen bu sistem, kapılar tamamen kapandığında otomatik olarak devreden çıkar ve gaz vermenize izin verir." style="padding: 4px 10px; background: rgba(168,85,247,0.2); border: 1px solid #a855f7; color: #d8b4fe; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>E tuşu (Ön Kapı):</strong> Yolcu binişi ve kart basımı için açılır.<br>
+                    • <strong>Q tuşu (Arka Kapı):</strong> İnen yolcular için kullanılır.<br>
+                    • <strong>İnterlok Devredeyken:</strong> W tuşuna veya yukarı oka basılsa dahi araç hareket etmez; yolcular emniyetle bindikten sonra kapılar kapatıldığında ivmelenme açılır.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 6: KNEELING VE ENGELLİ RAMPASI -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(6, 182, 212, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #22d3ee; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>♿</span> <span>6. Kneeling (Yana Yatma) & Çift Kademeli Rampa</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Altıncı Bölüm: Kneeling yani Yana Yatma ve Engelli Rampası. Alçak tabanlı belediye otobüslerinde durakta bekleyen yaşlı, çocuklu ve tekerlekli sandalyeli yolcuların rahat binebilmesi için sağ süspansiyon körüklerinin havası boşaltılarak otobüs kaldırıma doğru yedi santimetre yatırılır. Buna kneeling denir. Ayrıca durakta tekerlekli sandalye ikonu gördüğünüzde orta kapıdaki rampayı açarak yolcunun emniyetle binmesini sağlamalısınız." style="padding: 4px 10px; background: rgba(6,182,212,0.2); border: 1px solid #06b6d4; color: #a5f3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Kneeling İşlevi:</strong> Durakta durup kapıyı açtığınızda havalı süspansiyon otomatik olarak sağa yatar (HUD'da <code>🚌 KNEELING</code> yanar). Kalkışta körükler tekrar dolar.<br>
+                    • <strong>Erişilebilirlik Bonusu:</strong> Tekerlekli sandalyeli yolcuları rampayla aldığınızda yolcu memnuniyeti tavan yapar ve ek şoförlük tecrübe puanı (XP) kazanırsınız.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 7: VİRAJ MERKEZKAÇ KUVVETİ ($v^2 / R$) VE GÖVDE SALINIMI -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(244, 63, 94, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #fb7185; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🔄</span> <span>7. Viraj Geometrisi, Merkezkaç Kuvveti ve Gövde Salınımı</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Yedinci Bölüm: Viraj Geometrisi ve Merkezkaç Kuvveti. Üç nokta sekiz metre yüksekliğe sahip bir otobüsün ağırlık merkezi otomobillerden çok daha yukarıdadır. Viraja girdiğinizde merkezkaç ivmesiyle otobüs gövdesi fiziksel olarak dönüşün tersine doğru yatar. Eğer viraja hız tabelasındaki limitin üzerinde girerseniz lastikler çığlık atarak kayar, direksiyon savrulur ve yolcular panikleyerek konfor endeksiniz düşer. Usta kaptanlar viraja girmeden önce retarder ile hızını düşürür, viraj içinde dengeli gaz verir." style="padding: 4px 10px; background: rgba(244,63,94,0.2); border: 1px solid #f43f5e; color: #fecdd3; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Gövde Salınımı (Body Roll):</strong> Sola virajda otobüs sağa yatar (<code>rotate</code>), 3D yol perspektifi eğrilir (<code>skewX</code>).<br>
+                    • <strong>Lastik Kayması (Tire Screech):</strong> Viraj hız limiti aşıldığında lastiklerden acı bir çığlık sesi yükselir ve araç şeridin dışına savrulur.<br>
+                    • <strong>Yolcu Konforu:</strong> Yumuşak viraj dönüşleri yolcu memnuniyetini %100 tutar; savrulma ve sert fren konfor puanını düşürür.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 8: VİYADÜK VE ASMA KÖPRÜ YAN RÜZGARLARI -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(245, 158, 11, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #fbbf24; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🌉</span> <span>8. Viyadük & Asma Köprü Yan Rüzgarları ve Çelik Derzler</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Sekizinci Bölüm: Viyadük ve Asma Köprüler. 1915 Çanakkale, Osmangazi, Yavuz Sultan Selim ve Botan Çayı Beğendik Köprüsü gibi devasa yapılardan geçerken kanyon ve deniz yan rüzgarları otobüsün geniş yan yüzeyine çarpar. Şeritte kalabilmek için direksiyona hafif kontra kuvveti uygulamanız gerekir. Ayrıca her otuz beş metrede bir köprü çelik genleşme derzlerinin üzerinden geçerken lastiklerden o meşhur tok tak tak vuruntu sesi duyulur." style="padding: 4px 10px; background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #fde68a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Yan Rüzgar Savrulması:</strong> Yüksek köprülerde otobüs rüzgar yönüne doğru hafifçe kayar; direksiyonla düzeltme yapılmalıdır.<br>
+                    • <strong>Çelik Derz Vuruntusu:</strong> Her 35 metrede bir çelik derzlerin üzerinden geçerken hıza bağlı gerçekçi genleşme vuruntusu çalınır.<br>
+                    • <strong>Botan Çayı Beğendik Viyadüğü:</strong> 165 metre ayak yüksekliği ile Türkiye'nin en yüksek viyadüğüdür; şiddetli vadi rüzgarına dikkat ediniz.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 9: TÜNEL AKUSTİĞİ VE FAR REJİMİ -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(99, 102, 241, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #818cf8; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🚇</span> <span>9. Tünel Akustiği ve Far Rejimi</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Dokuzuncu Bölüm: Tünel Akustiği ve Far Rejimi. Yeni Zigana Tüneli ondört bin dört yüz yetmiş altı metre, Ovit Tüneli ondört bin üç yüz kırk altı metre uzunluğundadır. Tünele girdiğinizde kabin akustiği yankı moduna geçer; motor ve egzoz sesi beton çeperlere çarparak homurdanır. Tünelde mutlaka F tuşuna basarak farlarınızı açmalısınız; aksi halde karanlıkta yolcular tedirgin olur ve sesli asistan ikaz eder." style="padding: 4px 10px; background: rgba(99,102,241,0.2); border: 1px solid #6366f1; color: #c7d2fe; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Ses Yankısı (Reverb):</strong> Tünel içinde korna, motor ve fren sesleri metalik yankı kazanır.<br>
+                    • <strong>Far Zorunluluğu:</strong> F tuşuyla farlar açılmadığında sesli asistan tünel karanlığı uyarısı verir.<br>
+                    • <strong>Resmî Uzunluklar:</strong> Tüneller kilometrelerce sürer ve sadece gerçek koridorunda yer alan tüneller karşınıza çıkar.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 10: DEVİR SAATİ (RPM), VİTES VE YAKIT VERİMLİLİĞİ -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #34d399; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>⛽</span> <span>10. Devir Saati (RPM), Şanzıman ve Yakıt Tasarrufu</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Onuncu Bölüm: Devir Saati, Vites ve Yakıt Tasarrufu. Ağır vasıta dizel motorları bin ile bin beş yüz devir arasındaki yeşil bantta maksimum tork üretir ve en az yakıtı tüketir. Gaza sürekli sonuna kadar basmak devri iki bin beş yüzün üzerine çıkararak yakıtı hızla tüketir ve motoru yorar. Yokuş çıkarken doğru viteste devri bin sekiz yüz civarında tutmak hem motoru korur hem de tırmanış çekişini maksimuma ulaştırır." style="padding: 4px 10px; background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #a7f3d0; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
+                    • <strong>Yeşil Devir Aralığı:</strong> 1.000 - 1.600 RPM ekonomik seyir bölgesidir.<br>
+                    • <strong>Tırmanış Devri:</strong> Dik rampada devir 1.200 altına düşerse araç bayılır; vites küçültülmelidir.<br>
+                    • <strong>Retarder ve Yakıt:</strong> Retarder çekildiğinde enjeksiyon kesilir; sıfır yakıt tüketimiyle frenleme yapılır.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 11: EKSİKSİZ KONTROL VE KISAYOL REFERANS TABLOSU -->
+            <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1.5px solid #64748b; border-radius: 10px; padding: 16px; margin-top: 16px;">
+                <h4 style="color: #94a3b8; margin: 0 0 10px 0; font-size: 1.15rem;">📋 Tam Kaptan Kontrol Tablosu</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; font-size: 0.85rem; color: #cbd5e1;">
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>W / Yukarı Ok:</strong> Gaz (İvmelenme)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>S / Aşağı Ok:</strong> Servis Freni (Ayak Freni)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>A / D:</strong> Direksiyon (Sol / Sağ)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>B:</strong> Kademeli Retarder Kolu (1-5)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>Shift + B:</strong> Retarder Sıfırla (Boşa Al)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>Space (Boşluk):</strong> Motor Aç/Kapa & El Freni</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>G:</strong> Sefer & Görev Durumu Anonsu</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>F:</strong> Ön Farlar (Tünelde Zorunlu)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>L:</strong> Havalı Korna (Air Horn)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>E:</strong> Ön Kapı & Kneeling</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>Q:</strong> Arka Kapı Kontrolü</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>K:</strong> Klima (22°C Konfor)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>Y:</strong> Pusula İstikameti Sorgula</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>V:</strong> Telsiz Konuşması (Push-to-Talk)</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>H:</strong> Yakıt & Hasar Raporu</div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 6px;"><strong>C / Shift+C:</strong> Konfor / Demli Çay Yudumla</div>
+                </div>
+            </div>
+
+        </div>
+        `;
+
+        // Sesli okuma butonları dinleyicileri
+        container.querySelectorAll('.btn-read-section').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const text = e.currentTarget.getAttribute('data-text');
+                if (text && typeof audio !== 'undefined' && audio.speak) {
+                    if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+                    audio.speak(text);
+                }
+            });
+        });
+    }
+
+    renderCompanyGuide() {
+        const container = document.getElementById('tutorial-company-container');
+        if (!container) return;
+
+        container.innerHTML = `
+        <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); border: 2px solid #ca8a04; border-radius: 12px; padding: 18px 22px; color: #fff;">
+            
+            <!-- BAŞLIK -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(250, 204, 21, 0.3); padding-bottom: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <h3 style="margin: 0; color: #facc15; font-size: 1.35rem; display: flex; align-items: center; gap: 8px;">
+                        <span>🏢</span> <span>Şirket Yönetimi ve 7 Temel Tesis Rehberi</span>
+                    </h3>
+                    <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 0.88rem;">
+                        Şirketin operasyonel maliyetlerini düşüren, kapasitesini artıran ve gelirini katlayan 7 temel bina ve tesisin işlevleri.
+                    </p>
+                </div>
+                <button class="modern-btn btn-read-section nav-item" data-text="Şirket Yönetimi, 7 Temel Tesis ve Kâr Etme Rehberi. Bu kılavuzda şirket kurmanın neden hayati olduğunu, pasif gelirle kâr etmenin 5 kısayolunu, 7 temel tesis binasını ve başarılı filo yönetimi taktiklerini öğreneceksiniz." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
+                    ▶️ Tüm Bölümü Sesli Dinle
+                </button>
+            </div>
+
+            <!-- ÖNEMLİ KURAL NOTU -->
+            <div style="background: rgba(202, 138, 4, 0.15); border: 1.5px solid #ca8a04; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; color: #fef08a; font-size: 0.9rem;">
+                💡 <strong>Önemli Kural:</strong> Şirket Yönetimine <strong>sadece Ana Menü'deki 5. buton ("🏢 Şirket Yönetimi")</strong> üzerinden erişebilirsiniz. Sürüş güvenliği ve odaklanmanız için sefer esnasında şirket menüsü açılamaz; tüm kararlarınızı ana menüde sakin bir şekilde alabilirsiniz.
+            </div>
+
+            <!-- BÖLÜM 1: ŞİRKET NEDEN ÖNEMLİ VE NEDEN KURMALIYIM? -->
+            <div style="background: linear-gradient(135deg, rgba(202, 138, 4, 0.2), rgba(15, 23, 42, 0.85)); border: 1.5px solid #eab308; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                        <span>👑</span> <span>1. Şirket Neden Önemli ve Neden Şirket Kurmalıyım?</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket neden önemlidir ve neden şirket kurmalısınız? Tek başınıza kaptanlık yaparsanız yalnızca direksiyon başındayken para kazanırsınız, mazotu ve tamiri piyasa fiyatından ödersiniz. Şirket sahibi olduğunuzda ise dört büyük güce sahip olursunuz. Birincisi pasif gelir: İşe aldığınız şoförler siz dinlenirken bile arka planda durmaksızın sefer yapar ve şirket kasanıza para akıtır. İkincisi giderleri sıfırlama gücü: Kendi akaryakıt istasyonunuzla depoyu bedavaya doldurur, kendi tamirhanenizle masrafları yüzde altmış beş düşürürsünüz. Üçüncüsü tavan bilet ve kargo geliri: Yazıhaneleriniz sayesinde biletleri yüzde otuz daha pahalıya satar ve bagaj kargosundan binlerce lira ek temettü alırsınız. Dördüncüsü holdingleşme: Şirketiniz büyüdükçe seviyeniz artar ve kazancınız katlanır." style="padding: 6px 12px; background: rgba(234,179,8,0.25); border: 1px solid #eab308; color: #fef08a; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ Neden Şirket? Dinle
+                    </button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.55;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 8px;">
+                        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border-left: 3px solid #ef4444;">
+                            <strong style="color: #fca5a5;">❌ Tek Başına (Bireysel) Kaptan Olmak:</strong><br>
+                            Yalnızca kendi sürdüğünüz sefer kadar para kazanırsınız. Direksiyon başında değilseniz geliriniz <strong>0 ₺</strong>'dir. Mazotu, bakımı ve araç yıkamasını piyasadaki en yüksek fiyattan cepten ödersiniz.
+                        </div>
+                        <div style="background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; border-left: 3px solid #22c55e;">
+                            <strong style="color: #4ade80;">✅ Şirket Sahibi (Patron) Olmanın 4 Gücü:</strong><br>
+                            • <strong>1. Pasif Gelir (Otomatik Hasılat):</strong> İstihdam ettiğiniz kaptanlar siz dinlenirken veya başka bir hatta sürüş yaparken arka planda kesintisiz sefer icra eder ve şirket kasanıza düzenli gelir aktarır.<br>
+                            • <strong>2. Giderleri Sıfırlama Gücü:</strong> Kendi tesisleriniz sayesinde akaryakıt ikmalini <strong>0 ₺ (Bedelsiz)</strong> yapar, bakım masraflarını %65 oranında düşürürsünüz.<br>
+                            • <strong>3. Tavan Bilet & Emanet Kargo Geliri:</strong> Terminal yazıhaneleriniz sayesinde biletleri tavan fiyattan (%30 daha yüksek) satar, bagaj kargo taşımacılığından sefer başı binlerce lira ek gelir sağlarsınız.<br>
+                            • <strong>4. Holding Olma:</strong> Şirket seviyeniz arttıkça piyasa itibarınız ve gelir çarpanlarınız katlanır.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BÖLÜM 2: ŞİRKET KURMA VE ÇALIŞMA MODELLERİ -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.1rem;">2. Şirket Kurma ve Çalışma Modelleri</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket Kurma ve Çalışma Modelleri. Oyunda iki farklı çalışma şekli bulunur. İsterseniz kendi otobüs firmanızı kurup araç ve şoför yönetebilir, sefer gelirlerini toplayabilirsiniz. İsterseniz mevcut kurumsal firmalara katılarak sabit günlük maaş ve sefer primi karşılığında kaptan şoför olarak görev yapabilirsiniz." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
+                    • <strong>Kendi Şirketinizi Kurmak:</strong> Kendi otobüs firmanızı açarak filo kurabilir, şoför istihdam edebilir ve sefer gelirlerini yönetebilirsiniz. Bilet hasılatını şirket kasası ile kişisel bütçeniz arasında belirlediğiniz oranda paylaştırabilirsiniz (Örnek: %50 / %50).<br>
+                    • <strong>Bağımsız Serbest Kaptan Olarak Çalışmak:</strong> Şirket kurma veya şirket işletme riski almadan; bağımsız bir şoför olarak kendi aracınızla serbest seferler yapabilir, kazandığınız tüm bilet hasılatını (%100) kesintisiz olarak kendi şahsi cüzdanınıza alabilirsiniz. Oyunda telif hakkı olan gerçek ticari markalar yer almaz; dilerseniz topluluk bünyesindeki kaptan şirketlerinde de maaşlı çalışabilirsiniz.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 2: 7 TEMEL TESİS VE KAZANDIRDIKLARI -->
+            <div style="margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem;">3. Şirketin 7 Temel Tesis Binası ve Kazandırdıkları</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirketin 7 temel tesisi şunlardır. Garaj ve Filo Sahası araç kapasitesini artırır ve yıpranmayı azaltır. Bakım ve Onarım Atölyesi dış servis masraflarını yüzde 65 ucuzlatır ve tamir süresini kısaltır. Otobüs Yıkama İstasyonu memnuniyeti hızla toparlar ve bekleme süresini sıfırlar. Şirket Akaryakıt İstasyonu toptan mazot tasarrufu ve ücretsiz akaryakıt sağlar. Otogar Yazıhaneleri ve Bekleme Salonları talep çarpanını artırır ve tavan bilet fiyatı hakkı verir. Personel Dinlenme Tesisi şoförlerin yorgunluk ve stresini hızla sıfırlar. Lojistik ve İkram Deposu ise ikram maliyetini düşürür ve ek kargo geliri kazandırır." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ 7 Binayı Sesli Dinle</button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px;">
+                    
+                    <!-- BİNA 1 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #22c55e; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #4ade80; font-size: 0.95rem;">🅿️ 1. Garaj ve Filo Sahası (Depot / Garage)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Nasıl Geliştirilir?</strong> Seviye 1 (küçük otopark) halinden kademe kademe büyütülür (Seviye 2, Seviye 3...).<br>
+                            • <strong>Ne Kazandırır?</strong> Barındırabileceğiniz maksimum otobüs ve istihdam edebileceğiniz şoför kapasitesini artırır. İleri seviyelerde garaja kapalı hangarlar, güvenlik kameraları ve çevre aydınlatması eklenerek araçların yıpranma oranı düşürülür (%50 azalma).
+                        </p>
+                    </div>
+
+                    <!-- BİNA 2 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #f97316; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #fb923c; font-size: 0.95rem;">🛠️ 2. Bakım ve Onarım Atölyesi (Kademe / Service Workshop)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Nasıl Geliştirilir?</strong> Garajın içine basit bir tamir kanalı olarak kurulur; sonrasında gelişmiş liftler, diagnostik bilgisayarları ve boyahane eklenir.<br>
+                            • <strong>Ne Kazandırır?</strong> Dışarıdaki tamircilere ödenen yüksek servis ve parça faturalarını %40–50 oranında (Seviye 3'te %65) ucuzlatır. Seferden hasarlı dönen araçların hatta geri dönme süresini (tamir süresini) ciddi oranda kısaltır (%50 daha hızlı).
+                        </p>
+                    </div>
+
+                    <!-- BİNA 3 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">🧼 3. Otobüs Yıkama İstasyonu (Bus Wash)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Nasıl Geliştirilir?</strong> Elle yıkama hortumundan başlayıp otomatik fırçalı yıkama tüneline ve kurutma sistemlerine terfi ettirilir.<br>
+                            • <strong>Ne Kazandırır?</strong> Araçlar seferden kirlendikçe düşen yolcu memnuniyetini ve bilet talebini hızla toparlar. Otomatik sistemler sayesinde araç başına yıkama maliyeti ve bekleme süresi sıfıra yaklaşır.
+                        </p>
+                    </div>
+
+                    <!-- BİNA 4 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #eab308; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #fde047; font-size: 0.95rem;">⛽ 4. Şirket Akaryakıt İstasyonu (Fuel Depot)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Nasıl Geliştirilir?</strong> Küçük bir yer altı yakıt deposu ve tek pompayla başlar; dev tanklara ve çoklu dolum adalarına dönüştürülür.<br>
+                            • <strong>Ne Kazandırır?</strong> Yol üstündeki normal istasyonlara kıyasla mazotu toptan fiyata getirerek firmanın en büyük gideri olan akaryakıt masrafını doğrudan aşağı çeker (Seviye 3'te tüm filoya %100 ÜCRETSİZ MAZOT).
+                        </p>
+                    </div>
+
+                    <!-- BİNA 5 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #a855f7; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #c084fc; font-size: 0.95rem;">🏢 5. Otogar / Terminal Yazıhaneleri ve Bekleme Salonları</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Nasıl Geliştirilir?</strong> Basit bir bilet gişesinden başlanıp klima, konforlu koltuklar, ücretsiz çay-kahve otomatları, Wi-Fi ve VIP yolcu bekleme salonuna dönüştürülür.<br>
+                            • <strong>Ne Kazandırır?</strong> O şehirdeki/duraktaki yolcu çekme kapasitesini (talep çarpanını) artırır. Yolcular daha lüks karşılandığı için bilet fiyatlarını tavan fiyata çekmenize (+%30 tavan bilet primi) ve sefer başı +3.500 ₺ pasif gelir elde etmenize imkân tanır.
+                        </p>
+                    </div>
+
+                    <!-- BİNA 6 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #ec4899; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #f472b6; font-size: 0.95rem;">🛏️ 6. Personel Sosyal Tesisleri ve Dinlenme Odaları (Staff Lounge)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Nasıl Geliştirilir?</strong> Basit bir sandalyeli dinlenme odasından; televizyon, mutfak, oyun masaları ve otel konforunda yatakhanelere yükseltilir.<br>
+                            • <strong>Ne Kazandırır?</strong> Şoförlerin yorgunluk ve stres seviyelerini çok daha hızlı sıfırlar (%75 dinlenme hızı). Şoförlerin kaza yapma, seferi aksatma veya istifa etme riskini en aza indirir.
+                        </p>
+                    </div>
+
+                    <!-- BİNA 7 -->
+                    <div style="background: rgba(15,23,42,0.7); border: 1.5px solid #06b6d4; border-radius: 10px; padding: 12px;">
+                        <strong style="color: #22d3ee; font-size: 0.95rem;">📦 7. Lojistik ve İkram Deposu (Catering & Cargo Hub)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>Nasıl Geliştirilir?</strong> Küçük bir koli deposundan profesyonel soğuk hava depolu ve yükleme rampalı lojistik merkezine çevrilir.<br>
+                            • <strong>Ne Kazandırır?</strong> Yolculara sunulan ikramların (kek, meşrubat vb.) birim maliyetini %40–70 düşürür. Otobüs bagajında taşınan ücretli kargo hacmini büyüterek sefer başına koli başı 140 ₺'den düzenli ek gelir sağlar.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- BÖLÜM 3: OTOGAR YAZIHANESİ İŞLETME MODELLERİ -->
+            <div style="background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #34d399; margin: 0; font-size: 1.1rem;">4. Otogar Yazıhanesi İşletme Modelleri & Paket Kargo</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Otogar yazıhaneleri iki farklı modelle işletilebilir. Şirket Öz Şubesi modelinde kirayı şirketiniz öder; bilet ve kargo gelirinin tamamı kasanıza kalır. Acentelik Bayiliği modelinde ise açılış maliyeti yoktur. İşletmeyi yerel esnaf yürütür; hasılatın yüzde 88 i şirketinize gelir, yüzde 12 si bayiye komisyon kalır. Ayrıca açık yazıhaneler otobüs bagajında koli kabul ederek sefer başına parça başı 140 lira ek gelir sağlar." style="padding: 4px 10px; background: rgba(52,211,153,0.2); border: 1px solid #34d399; color: #a7f3d0; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-top: 8px;">
+                    <div style="background: rgba(22,163,74,0.15); border-left: 3px solid #22c55e; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #4ade80;">🏢 Model A: Şirket Öz Şubesi</strong><br>
+                        <span style="font-size: 0.84rem; color: #cbd5e1;">Kirasını ve masraflarını şirketiniz öder. Bilet ve kargo gelirlerinin <strong>%100'ü doğrudan şirket kasanıza</strong> aktarılır.</span>
+                    </div>
+                    <div style="background: rgba(2,132,199,0.15); border-left: 3px solid #38bdf8; padding: 10px; border-radius: 6px;">
+                        <strong style="color: #38bdf8;">🤝 Model B: Acentelik Bayiliği (Ücretsiz Açılış)</strong><br>
+                        <span style="font-size: 0.84rem; color: #cbd5e1;"><strong>0 ₺ Masraf (Açılış bedelsizdir).</strong> İşletmeyi yerel bayi yürütür. Bilet hasılatının <strong>%88'i şirketinize</strong> gelir, %12'si bayiye komisyon olarak verilir.</span>
+                    </div>
+                </div>
+                <div style="margin-top: 10px; font-size: 0.84rem; color: #fde047;">
+                    📦 <strong>Paket Kargo Taşımacılığı:</strong> Açık yazıhaneler otobüs bagajına emanet koli kabul eder. Her seferde 4-8 koli taşınır ve koli başına <strong>140 ₺ ek net gelir</strong> elde edilir.
+                </div>
+            </div>
+
+            <!-- BÖLÜM 4: FİNANSAL AKIŞ VE KASA DEFTERİ TAKİBİ -->
+            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.1rem;">5. Finansal Akış ve Kasa Defteri Takibi</h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Finansal Akış ve Kasa Defteri Takibi. Gerçekleşen tüm bilet satışları, kargo gelirleri, akaryakıt harcamaları ve servis masrafları sisteme anlık olarak kaydedilir. Şirket Menüsü altındaki Kasa Defteri sekmesinden toplam gelirinizi, toplam giderinizi ve net şirket kârınızı detaylı olarak inceleyebilirsiniz. Manuel hesaplama yapmanıza gerek kalmadan tüm finansal durum açık bir şekilde listelenir." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                </div>
+                <p style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5; margin: 0;">
+                    Tüm bilet satışları, emanet kargo gelirleri, akaryakıt harcamaları ve bakım masrafları sisteme anlık olarak kaydedilir. Şirket Menüsü'ndeki <strong>📊 Kasa Defteri & Muhasebe</strong> sekmesinden toplam gelirinizi, masraf kalemlerinizi ve net şirket kârınızı canlı olarak takip edebilirsiniz; manuel hesaplama yapmanıza gerek yoktur.
+                </p>
+            </div>
+
+            <!-- BÖLÜM 6: ŞİRKET KÂRLILIĞINI VE SERMAYE BÜYÜMESİNİ ARTIRMANIN 5 TEMEL STRATEJİSİ -->
+            <div style="background: linear-gradient(135deg, rgba(22, 101, 52, 0.25), rgba(15, 23, 42, 0.9)); border: 1.5px solid #22c55e; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(34, 197, 94, 0.2); padding-bottom: 8px;">
+                    <div>
+                        <h4 style="color: #4ade80; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                            <span>📈</span> <span>6. Şirket Kârlılığını ve Sermaye Büyümesini Artırmanın 5 Temel Stratejisi</span>
+                        </h4>
+                        <span style="font-size: 0.82rem; color: #86efac;">İşletme kârını azami düzeye taşımak ve filoyu büyütmek için uygulanacak resmi yönetim ilkeleri.</span>
+                    </div>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket kârlılığını ve sermaye büyümesini artırmanın beş temel stratejisi şunlardır. Birincisi Kaptan İstihdamı ile Çift Yönlü Nakit Akışı: Şirketteki tüm şoförler bizzat tarafınızdan istihdam edilir. Şirket kasasındaki başlangıç sermayesiyle Şoför Pazarından uygun bir kaptan transfer edip sefere çıkarınız; siz de başka bir hatta sürüş yaparak aynı anda iki ayrı seferin gelirini şirkete kazandırınız. İkincisi Başharekât Akıllı Sefer Dağıtım Sistemi: Ana Menüye her dönüldüğünde bu butonu kullanarak boşta bekleyen kaptanları en karlı hatlara tek işlemle atayınız. Üçüncüsü Akaryakıt Maliyetinin Sıfırlanması: Şirket Akaryakıt İstasyonunu Seviye üçe yükselterek yakıtı tamamen bedelsiz hale getiriniz. Dördüncüsü İkram Hizmeti ve Paket Kargo Taşımacılığı: Seferde ı tuşuyla ikram dağıtıp bahşiş gelirini yükseltiniz, sefer varışında açık yazıhaneler üzerinden bagaj kargo gelirini tahsil ediniz. Beşincisi Sermaye Transferi: Şirket kasasında biriken kâr paylarını Cüzdana Para Çek butonuyla şahsi hesabınıza aktararak yeni otobüs yatırımları gerçekleştiriniz." style="padding: 6px 12px; background: rgba(34,197,94,0.2); border: 1px solid #22c55e; color: #86efac; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ Stratejileri Dinle
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                    
+                    <!-- STRATEJİ 1 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #22c55e; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #4ade80; font-size: 0.95rem;">📊 1. Kaptan İstihdamı ile Çift Yönlü Nakit Akışı</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirket bünyesindeki <strong>tüm şoförler bizzat sizin tarafınızdan istihdam edilir</strong>. Şirket kuruluşunda sağlanan 50.000 ₺ sermaye ile Şoför Pazarı'ndan ilk kaptanınızı transfer ederek derhal sefere görevlendiriniz. Siz kendi aracınızla hatta devam ederken diğer kaptanın da sefer tamamlaması sayesinde <strong>eş zamanlı olarak çift sefer hasılatı</strong> elde edilir.
+                        </p>
+                    </div>
+
+                    <!-- STRATEJİ 2 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #38bdf8; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">🎯 2. Başharekât (Akıllı Sefer Dağıtım Sistemi)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Her sefer sonrasında Ana Menü'de Şirket Yönetimi ekranına girerek sağ üstte bulunan <strong>"📋 Akıllı Sefer Dağıtımı"</strong> fonksiyonunu çalıştırınız. Sistem, filoda atıl bekleyen tüm kaptan şoförleri bölgesel borsa talebi en yüksek ve kârlılığı azami olan güzergâhlara otomatik olarak sevk eder.
+                        </p>
+                    </div>
+
+                    <!-- STRATEJİ 3 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #eab308; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #fde047; font-size: 0.95rem;">⛽ 3. Akaryakıt İşletme Giderlerinin Sıfırlanması (Bina 4)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Karayolu yolcu taşımacılığındaki en yüksek işletme maliyeti akaryakıt tüketimidir. Elde edilen ilk ticari kârlar ile <strong>Şirket Akaryakıt İstasyonu</strong> Seviye 3 kademesine terfi ettirilmelidir. Bu aşamada filonun yakıt ikmali <strong>0 ₺ (tamamen bedelsiz)</strong> hale gelir ve bilet gelirinin tamamı net kâr hanesine yazılır.
+                        </p>
+                    </div>
+
+                    <!-- STRATEJİ 4 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #a855f7; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #c084fc; font-size: 0.95rem;">📦 4. İkram Memnuniyeti ve Emanet Kargo Taşımacılığı</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Sefer esnasında klavyeden <strong>I tuşu</strong> ile ikram dağıtımı yapılarak yolcu memnuniyeti ve sefer sonu bahşiş primi artırılır. Sefer varışında ise açık yazıhaneler üzerinden bagajda kabul edilen koli emanetlerinden (parça başı 140–160 ₺) <strong>2.000 – 3.500 ₺ ek operasyonel gelir</strong> tahsil edilir.
+                        </p>
+                    </div>
+
+                    <!-- STRATEJİ 5 -->
+                    <div style="background: rgba(15, 23, 42, 0.75); border-left: 3px solid #ec4899; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #f472b6; font-size: 0.95rem;">💰 5. Sermaye Transferi ve Üst Segment Filo Yatırımı</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirket kasasında biriken kâr payları, panel üzerindeki <strong>"Cüzdana Para Çek"</strong> fonksiyonu ile şahsi hesaba aktarılır. Bu sermaye ile araç galerisinden yüksek yolcu kapasiteli, lüks seyahat otobüsleri peşin bedelle satın alınarak filonun pazar payı genişletilir.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- BÖLÜM 5: BAŞARILI ŞİRKET YÖNETİMİ İÇİN TEMEL İPUÇLARI VE ALTIN TAKTİKLER -->
+            <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid #38bdf8; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(56, 189, 248, 0.2); padding-bottom: 8px;">
+                    <div>
+                        <h4 style="color: #38bdf8; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                            <span>💡</span> <span>7. Başarılı Şirket Yönetimi İçin Temel İpuçları (Altın Kurallar)</span>
+                        </h4>
+                        <span style="font-size: 0.82rem; color: #94a3b8;">Şirketinizi karlı tutmak, filonuzu büyütmek ve iflas etmemek için uygulamanız gereken 6 temel taktik.</span>
+                    </div>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetiminde başarılı olmanın 6 altın kuralı şunlardır. Bir: Başlangıçta şirket kurduğunuzda elli bin lira hazır kasa kazanırsınız ve şirketin tüm şoförlerini Şoför Pazarından siz kendiniz seçip işe alırsınız. İki: Hasılat paylaşım oranını yüzde elli şirket yüzde elli kaptan olarak dengede tutun. Üç: Tesisleri doğru sırayla geliştirin; önce garaj kapasitesi, ardından bakım atölyesi ve akaryakıt istasyonuna öncelik verin. Dört: Şoförleri tek tek seçmekle uğraşmamak için Başharekât Akıllı Sefer Dağıtımı butonunu kullanın. Beş: Şirket kasasında para bittiğinde cüzdandan kasaya, şirket zenginleştiğinde ise kasadan cüzdana dilediğiniz tutarda para aktarın. Altı: Şirket yönetimi sadece Ana Menüden yapılır; sefer esnasında sürüşünüze odaklanın." style="padding: 6px 12px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ İpuçlarını Sesli Dinle
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                    
+                    <!-- İPUCU 1 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #facc15; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #fde047; font-size: 0.95rem;">🎯 1. Başlangıç Taktigi: Şirket Kurmak mı, Maaşlı Başlamak mı?</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Kendi şirketinizi kurduğunuzda sistem size <strong>50.000 ₺ hazır şirket kasası</strong> verir. Şirketinizin <strong>tüm şoförlerini Şoför Pazarı'ndan tecrübesine ve maaşına göre siz kendiniz seçip işe alırsınız.</strong> Eğer şirket kurmadan önce sermaye biriktirmek isterseniz, bağımsız serbest kaptan olarak çalışıp tüm sefer gelirini (%100) doğrudan kendi cebinize koyarak cepten sıfır masrafla ve telif riski olmadan nakit biriktirebilirsiniz.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 2 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #22c55e; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #4ade80; font-size: 0.95rem;">⚖️ 2. Hasılat Paylaşım Oranı (%50 / %50 Dengesi)</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Kendi kullandığınız otobüsle bitirdiğiniz seferlerin bilet gelirini Şirket Kasası ile Kişisel Cüzdanınız arasında dilediğiniz oranda paylaştırabilirsiniz. <strong>Tavsiye:</strong> Başlangıçta <strong>%50 Şirket / %50 Kaptan</strong> dengesi en idealidir. Böylece hem kişisel otobüs satın alma bütçeniz hem de bina geliştirme kasanız aynı anda büyür.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 3 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #f97316; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #fb923c; font-size: 0.95rem;">🏗️ 3. Binaları Hangi Sırayla Geliştirmelisiniz?</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            • <strong>1. Garaj Sahası:</strong> Filodaki 5 araç/şoför sınırına yaklaştıkça ilk olarak garajı Seviye 2'ye yükseltin (Sınır 15'e çıkar ve araç yıpranması %25 azalır).<br>
+                            • <strong>2. Bakım Atölyesi:</strong> Tamir masraflarını erken dönemde %45-65 ucuzlatmak için erkenden terfi ettirin.<br>
+                            • <strong>3. Akaryakıt İstasyonu:</strong> Seviye 3'e ulaştığınızda tüm filoya <strong>ücretsiz mazot</strong> sağlayarak şirketin en büyük giderini sıfırlayın.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 4 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #38bdf8; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #38bdf8; font-size: 0.95rem;">📋 4. Başharekât (Akıllı Sefer Dağıtımı) ile Zahmetsiz Yönetim</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirket ekranının sağ üst köşesindeki <strong>"📋 Akıllı Sefer Dağıtımı"</strong> butonuna tıkladığınızda, sistem boşta ve dinlenmiş tüm şoförlerinizi o an piyasada en çok kazandıran rotalara ve uygun otobüslere tek tıkla otomatik olarak atar. Tek tek şoför seçmekle vakit kaybetmezsiniz.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 5 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #a855f7; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #c084fc; font-size: 0.95rem;">💰 5. Kasa, Cüzdan ve -1.000.000 ₺ İflas & Tasfiye Protokolü</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirket kasasında nakit azaldığında ticari borca girebilirsiniz. Kasa eksiye düştüğünde -250.000 ₺ ve -750.000 ₺ seviyelerinde banka ve mahkeme uyarı alarmları çalar. Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaşırsa <strong>T.C. Asliye Ticaret Mahkemesi</strong> kararıyla şirket <strong>RESMEN İFLAS EDER VE TASFİYE EDİLİR</strong>. Tasfiye protokolüyle 1 milyon liralık şirket borcu sıfırlanır, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>Şahsi ehliyetiniz, araçlarınız ve cüzdanınız kanunen HACZEDİLEMEZ ve aynen korunur.</strong> İflastan kaçınmak için tehlike anında <strong>"Kasaya Para Yatır"</strong> butonuyla şahsi cüzdanınızdan şirkete sermaye aktarabilirsiniz.
+                        </p>
+                    </div>
+
+                    <!-- İPUCU 6 -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #ec4899; padding: 12px; border-radius: 8px;">
+                        <strong style="color: #f472b6; font-size: 0.95rem;">🏢 6. Yönetim Masası Sadece Ana Menüdedir</strong>
+                        <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
+                            Şirket Yönetimine <strong>sadece Ana Menü'deki 5. buton</strong> üzerinden erişebilirsiniz. Sefer sürüşü esnasında dikkat dağınıklığını ve kaza riskini önlemek için panel sürüş sırasında kapalıdır. Direksiyon başında sadece yolunuza odaklanın, sefer bitince ana menüye dönüp şirketinizi rahatça büyütün.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- BÖLÜM 6: SIKÇA SORULAN SORULAR VE CEVAPLARI (S.S.S) -->
+            <div style="background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+                        <span>❓</span> <span>8. Sıkça Sorulan Sorular ve Hızlı Cevaplar</span>
+                    </h4>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetimi hakkında en çok merak edilen sorular. Bir: Şoförlerim neden sefere çıkmıyor? Seferden yorgun dönmüşlerdir. Personel Sosyal Tesisini geliştirerek dinlenme sürelerini dört kat hızlandırabilirsiniz. İki: Şirket kasasındaki parayla otobüs alabilir miyim? Evet, Cüzdana Para Çek butonuna basıp kasadaki parayı cüzdanınıza aktarın, ardından otobüs galerisinden dilediğiniz aracı satın alın. Üç: Neden yeni şoför alamıyorum? Garaj kapasiteniz dolmuştur, Garaj ve Filo Sahasını Seviye ikiye yükselterek sınırı on beşe çıkarın. Dört: Bilet fiyatlarını nasıl yükseltirim? Otogar Yazıhanelerini geliştirerek tavan bilet fiyatı çarpanını aktif edin. Beş: Şirketim iflas edebilir mi? Evet, şirket borcu eksi bir milyon liraya ulaşırsa mahkeme tasfiye kararı verir ve borç sıfırlanır. Ehliyetiniz, araçlarınız ve kişisel cüzdanınız kanunen korunur." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ S.S.S Dinle</button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.86rem; color: #cbd5e1;">
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <strong style="color: #38bdf8;">Soru: Şoförlerim bazen sefere çıkmıyor, neden?</strong><br>
+                        <span style="color: #94a3b8;">Cevap:</span> Şoförler uzun seferlerden sonra yorulur ve dinlenme moduna geçerler. Dinlenmelerini hızlandırmak için <strong>Personel Sosyal Tesisleri (Bina 6)</strong> seviyesini yükseltin; şoförler 4 kat daha hızlı dinlenip hemen yeni sefere hazır olurlar.
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <strong style="color: #38bdf8;">Soru: Şirket kasasında biriken parayla şahsi otobüs satın alabilir miyim?</strong><br>
+                        <span style="color: #94a3b8;">Cevap:</span> Evet! Şirket panosundaki <strong>"Cüzdana Para Çek"</strong> butonuna basın ve istediğiniz tutarı şahsi cüzdanınıza aktarın. Ardından Ana Menü'deki Galeri'den dilediğiniz otobüsü satın alabilirsiniz.
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <strong style="color: #38bdf8;">Soru: Yeni bir şoför veya otobüs alamıyorum, buton pasif?</strong><br>
+                        <span style="color: #94a3b8;">Cevap:</span> Garajınızın kontenjanı dolmuştur (Başlangıçta 5 araç/şofördür). Tesisler sekmesinden <strong>Garaj ve Filo Sahası'nı Seviye 2'ye</strong> yükselterek kapasiteyi 15 araca çıkarabilirsiniz.
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <strong style="color: #38bdf8;">Soru: Bilet fiyatlarını ve yolcu kazancımı nasıl artırabilirim?</strong><br>
+                        <span style="color: #94a3b8;">Cevap:</span> <strong>Otogar Yazıhaneleri ve Bekleme Salonları'nı (Bina 5)</strong> yükseltin. Seviye 2'de bilet fiyatları %15, Seviye 3'te ise tavan fiyattan %30 daha pahalıya satılır ve her sefer sonu binlerce lira pasif temettü kazanırsınız.
+                    </div>
+
+                    <div style="background: rgba(239,68,68,0.08); padding: 10px 14px; border-radius: 6px; border: 1.5px solid rgba(239,68,68,0.35);">
+                        <strong style="color: #f87171;">⚖️ Soru: Şirketim iflas edebilir mi? İflas edince ne olur?</strong><br>
+                        <span style="color: #fca5a5;">Cevap:</span> Evet! Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaştığında T.C. Asliye Ticaret Mahkemesi iflas ve tasfiye kararı verir. Tasfiye masası şirketin 1 milyon liralık borcunu tamamen siler, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>En önemli güvence:</strong> Şahsi ehliyetiniz, garajınızdaki otobüsleriniz ve kişisel cüzdanınız kanunen <strong>HACZEDİLEMEZ</strong> ve aynen korunur. Böylece sıfır borçla temiz bir sayfa açarak dilerseniz bağımsız serbest kaptan olarak çalışıp tüm geliri doğrudan cüzdanınıza aktarabilir, dilerseniz diğer kaptanların şirketlerinde maaşlı görev alabilirsiniz, dilerseniz şirketinizi yeniden ayağa kaldırabilirsiniz.
+                    </div>
+                </div>
+            </div>
+
+            <!-- BÖLÜM 9: EKRAN OKUYUCU (NVDA) KULLANAN KAPTANLAR İÇİN ADIM ADIM KLAVYE VE MENÜ NAVİGASYON REHBERİ -->
+            <div style="background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(15, 23, 42, 0.95)); border: 1.5px solid #60a5fa; border-radius: 10px; padding: 16px; margin-top: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(96, 165, 250, 0.25); padding-bottom: 8px;">
+                    <div>
+                        <h4 style="color: #93c5fd; margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+                            <span>⌨️</span> <span>9. Ekran Okuyucu ve Görme Engelli Kaptanlar İçin Adım Adım Klavye Rehberi</span>
+                        </h4>
+                        <span style="font-size: 0.82rem; color: #bfdbfe;">Menüleri ezberlemenize gerek kalmadan Sağ/Sol oklar, formlarda Tab, müzik sesi için Sayfa Yukarı/Aşağı (PageUp/PageDown), oyun sesi için Home/End tuşları ile tam kontrol adımları.</span>
+                    </div>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Ekran okuyucu ve görme engelli kaptanlar için adım adım klavye navigasyonu. Bir: Ana menüdeyken Tab veya Aşağı Ok tuşuna dört kez basarak beşinci sıradaki Şirket Yönetimi seçeneğine gelip Enter tuşuna basınız. İki: Şirket menüsü açıldığında Tab tuşu ile üstteki Akıllı Sefer Dağıtımı ve Kapat butonlarını, ardından Cüzdana Para Çek ve Kasaya Para Yatır butonlarını gezebilirsiniz. Üç: Şoför kiralamak için Tab ile Şoför Pazarı sekmesine gelip Enter a basınız; ardından Tab ile şoför listesine inip Transfer Et butonunda Enter a basınız. Dört: Boşta bekleyen tüm şoförleri tek tıkla sefere yollamak için Shift Tab ile en üstteki Akıllı Sefer Dağıtımı butonuna gelip Enter a basınız. Beş: Binaları geliştirmek için Yasal Binalar sekmesine girip dilediğiniz binanın altındaki Geliştir butonunda Enter a basınız. Altı: İşleminiz bittiğinde klavyeden Escape tuşuna basarak şirket menüsünü kapatıp doğrudan ana menüye dönünüz." style="padding: 6px 12px; background: rgba(59,130,246,0.25); border: 1px solid #60a5fa; color: #bfdbfe; font-size: 0.85rem; border-radius: 6px; cursor: pointer;">
+                        ▶ Adım Adım Klavye Rehberini Dinle
+                    </button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.86rem; color: #cbd5e1; line-height: 1.5;">
+                    
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #38bdf8;">
+                        <strong style="color: #7dd3fc; font-size: 0.92rem;">1. Adım: Ana Menüden Şirket Yönetimine Giriş</strong><br>
+                        • Ana Menü'deyken <strong>Sağ Ok</strong> tuşuna basarak ögeler arasında ilerleyiniz.<br>
+                        • Sıralama şöyledir: 1. Şehir İçi Seferler ➜ 2. Şehirlerarası Seyahat ➜ 3. Garajım ➜ 4. Yeni Otobüsler Satın Al ➜ <strong>5. Şirket Yönetimi</strong>.<br>
+                        • Ekran okuyucunuz <em>'Şirket Yönetimi, düğme'</em> dediğinde <strong>Enter</strong> tuşuna basınız. Şirket yönetim paneli açılır ve sesli bilgilendirme yapılır.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #facc15;">
+                        <strong style="color: #fde047; font-size: 0.92rem;">2. Adım: Şirket Paneli İçinde Sekmelerde Gezinme</strong><br>
+                        • Panel açıldığında <strong>Tab</strong> tuşuna basarak sırayla ilerleyebilirsiniz.<br>
+                        • İlk odak: <strong>📋 Akıllı Sefer Dağıtımı</strong> ve <strong>✕ Kapat (Esc)</strong> butonlarıdır.<br>
+                        • Tab ile devam ettiğinizde şirket kasanız okunur; hemen ardından <strong>'Cüzdana Para Çek'</strong> ve <strong>'Kasaya Para Yatır'</strong> butonları gelir.<br>
+                        • Bir sonraki Tab basışlarında menü sekmeleri gelir: <em>1. Kendi Filom & Şoförlerim, 2. Yasal Binalar & Garaj, 3. Var Olan Şirkete Katıl, 4. Sefer Borsası, 5. Şoför Pazarı & Transfer, 9. Kasa Defteri</em>.<br>
+                        • Hangi sekmeyi açmak istiyorsanız o sekmenin üzerindeyken <strong>Enter</strong> tuşuna basınız.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #22c55e;">
+                        <strong style="color: #4ade80; font-size: 0.92rem;">3. Adım: Şoför Pazarından İlk Kaptanı İşe Alma</strong><br>
+                        • Tab tuşuyla <strong>'👨‍✈️ Şoför Pazarı & Transfer'</strong> sekmesine gelip <strong>Enter</strong>'a basınız.<br>
+                        • Tab tuşuna basarak listelenen kaptanların isimlerini, maaşlarını ve özelliklerini dinleyiniz.<br>
+                        • Örneğin Murat Çırak veya Mehmet Kaptan'ın altındaki <strong>'Transfer Et'</strong> düğmesine geldiğinizde <strong>Enter</strong>'a basınız. Kaptan başarıyla filonuza katılır.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #a855f7;">
+                        <strong style="color: #c084fc; font-size: 0.92rem;">4. Adım: Kaptanları Tek Tuşla Sefere Yollama (Başharekât)</strong><br>
+                        • Şirket panelinin herhangi bir yerindeyken <strong>Shift + Tab</strong> yaparak en üstteki <strong>'📋 Akıllı Sefer Dağıtımı'</strong> butonuna geri dönünüz.<br>
+                        • <strong>Enter</strong> tuşuna basınız. Sistem filoda bekleyen tüm kaptanlarınızı en karlı rotalara otomatik olarak sevk eder.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #ec4899;">
+                        <strong style="color: #f472b6; font-size: 0.92rem;">5. Adım: Binaları Yükseltme (Akaryakıtı Bedava Yapma)</strong><br>
+                        • Tab tuşuyla <strong>'🏛️ Yasal Binalar & Garaj'</strong> sekmesine gelip <strong>Enter</strong>'a basınız.<br>
+                        • Tab ile binalar arasında ilerleyip <strong>'Şirket Akaryakıt İstasyonu'</strong> başlığı altındaki <strong>'Geliştir'</strong> butonuna gelip <strong>Enter</strong>'a basınız. Seviye 3'e ulaştığınızda mazot tamamen ücretsiz olur.
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.35); padding: 12px; border-radius: 8px; border-left: 3px solid #eab308;">
+                        <strong style="color: #fde047; font-size: 0.92rem;">6. Adım: Şirket Menüsünü Kapatma ve Seferinize Başlama</strong><br>
+                        • İşlemlerinizi tamamladığınızda klavyeden <strong>Esc (Escape)</strong> tuşuna basınız. Şirket paneli kapanır ve otomatik olarak Ana Menü'ye dönersiniz.<br>
+                        • Ana Menü'de <strong>Sol Ok</strong> tuşuna basarak 1. sıradaki <strong>'Şehir İçi Seferler'</strong> veya 2. sıradaki <strong>'Şehirlerarası Seyahat'</strong> butonuna gelip <strong>Enter</strong>'a basarak kendi seferinizi başlatınız.
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        `;
+
+        // Sesli okuma butonları
+        container.querySelectorAll('.btn-read-section').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const text = e.currentTarget.getAttribute('data-text');
+                if (text && typeof audio !== 'undefined' && audio.speak) {
+                    if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+                    audio.speak(text);
+                }
+            });
+        });
+    }
+
     initGuidedLab() {
         if (typeof this.guidedStep === 'undefined') this.guidedStep = 1;
         if (typeof this.labSpeed === 'undefined') this.labSpeed = 0;
@@ -396,143 +1115,221 @@ class VoiceAssistant {
         this.guidedSteps = [
             {
                 step: 1,
+                soundDuration: 2200,
                 title: "1. Adım: Motoru Çalıştırma (Kontağı Açalım)",
                 tip: "Otobüsün hareket etmesi için önce motoru çalıştırmalıyız.",
                 instruction: "Otobüsümüzü çalıştırmak için klavyeden M tuşuna basınız veya aşağıdaki 'Marşa Bas' butonuna tıklayınız.",
                 targetKey: "m",
+                soundName: "🔑 Marş Motoru ve Dizel Rölanti",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playEngineStartPreview) audio.playEngineStartPreview(3.2);
+                        else if (audio.sounds && audio.sounds.start) audio.sounds.start.play();
+                    }
+                },
                 actionBtnText: "🔑 Motoru Çalıştır (M)",
                 actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
-                successFeedback: "Aferin, çok güzel! Motor çalıştı, sesini duyduk. Şimdi gaza basıp yola çıkalım.",
+                successFeedback: "Aferin, çok güzel! Motor çalıştı, dizel rölanti sesini duyduk. Şimdi gaza basıp yola çıkalım.",
                 failFeedback: "Motoru çalıştırmak için lütfen sadece M tuşuna basınız. Başarabilirsin, tekrar dene!",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.sounds && audio.sounds.start) {
-                        try { audio.sounds.start.play(); } catch(e) {}
-                    }
+                    const s = this.guidedSteps[0];
+                    if (s && s.playSound) s.playSound();
                     this.labEngineRunning = true;
                 }
             },
             {
                 step: 2,
+                soundDuration: 2200,
                 title: "2. Adım: Gaza Basma (Yola Çıkalım)",
                 tip: "Otobüsü hızlandırmak için gaza basıyoruz.",
                 instruction: "Otobüsü sürmek ve hızlanmak için klavyeden W tuşuna (veya Yukarı Ok tuşuna) basınız.",
                 targetKey: "w",
                 altTargetKey: "arrowup",
+                soundName: "🟢 Dizel Devirlenme & Hızlanma",
+                playSound: () => {
+                    if (typeof audio !== 'undefined' && audio.playAcceleration) {
+                        audio.playAcceleration(2.8);
+                    }
+                },
                 actionBtnText: "🟢 Gaza Bas ve Hızlan (W / Yukarı Ok)",
                 actionBtnStyle: "background: linear-gradient(135deg, #16a34a, #15803d); border: 1.5px solid #4ade80;",
-                successFeedback: "Harika gidiyorsun, tebrikler! Otobüsümüz hızlandı, ilk durağımıza doğru gidiyoruz.",
+                successFeedback: "Harika gidiyorsun, tebrikler! Otobüsümüz motor devriyle hızlandı, ilk durağımıza doğru gidiyoruz.",
                 failFeedback: "Hızlanmak için lütfen W tuşuna veya Yukarı Ok tuşuna basınız. Tekrar deneyiniz!",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    const s = this.guidedSteps[1];
+                    if (s && s.playSound) s.playSound();
                     this.labSpeed = 50;
                 }
             },
             {
                 step: 3,
+                soundDuration: 2000,
                 title: "3. Adım: Yumuşakça Durma (Fren Yapalım)",
                 tip: "Durağa yaklaşınca yolcular sarsılmasın diye frene yumuşakça basıyoruz.",
                 instruction: "Durağa geldik! Yolcuları sarsmadan durmak için lütfen klavyeden S tuşuna (veya Aşağı Ok tuşuna) basınız.",
                 targetKey: "s",
                 altTargetKey: "arrowdown",
+                soundName: "💨 Havalı Fren Pnömatik Tahliyesi",
+                playSound: () => {
+                    if (typeof audio !== 'undefined' && audio.playAirBrake) {
+                        audio.playAirBrake();
+                    }
+                },
                 actionBtnText: "✨ Frene Bas ve Dur (S / Aşağı Ok)",
                 actionBtnStyle: "background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981;",
-                successFeedback: "Mükemmel bir duruş, tebrikler! Çok yumuşak durdun, yolcular hiç sarsılmadı.",
+                successFeedback: "Mükemmel bir duruş, tebrikler! Havalı fren tıslamasıyla çok yumuşak durdun, yolcular hiç sarsılmadı.",
                 failFeedback: "Durmak için lütfen S tuşuna veya Aşağı Ok tuşuna basınız. Tekrar dene!",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playAirBrake) audio.playAirBrake();
+                    const s = this.guidedSteps[2];
+                    if (s && s.playSound) s.playSound();
                     this.labSpeed = 0;
                 }
             },
             {
                 step: 4,
+                soundDuration: 2000,
                 title: "4. Adım: Otobüsü Sağa Eğme (Kaldırıma Yaklaştırma)",
                 tip: "Yaşlı ve engelli yolcular basamağa rahat çıksın diye otobüsü sağa eğiyoruz.",
                 instruction: "Durakta yaşlı bir yolcumuz bekliyor. Otobüsü kaldırıma doğru eğmek için klavyeden K tuşuna basınız.",
                 targetKey: "k",
+                soundName: "🦼 Kneeling Süspansiyon Yana Yatış Tıslaması",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playKneeling) audio.playKneeling(true);
+                        else if (audio.playKneelingSound) audio.playKneelingSound();
+                    }
+                },
                 actionBtnText: "⬇️ Otobüsü Sağa Eğ (K)",
                 actionBtnStyle: "background: linear-gradient(135deg, #0284c7, #0369a1); border: 1.5px solid #38bdf8;",
-                successFeedback: "Aferin çok doğru! Otobüs yana yattı, basamak kaldırım seviyesine indi.",
+                successFeedback: "Aferin çok doğru! Hava körükleri tıslayarak otobüs yana yattı, basamak kaldırım seviyesine indi.",
                 failFeedback: "Otobüsü eğmek için lütfen K tuşuna basınız. Tekrar dene!",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playKneeling) audio.playKneeling();
+                    const s = this.guidedSteps[3];
+                    if (s && s.playSound) s.playSound();
                     this.labKneeling = true;
                 }
             },
             {
                 step: 5,
+                soundDuration: 2200,
                 title: "5. Adım: Engelli Rampasını Açma",
                 tip: "Tekerlekli sandalyeli yolcumuzun binmesi için rampayı açıyoruz.",
                 instruction: "Tekerlekli sandalyeli yolcumuzun rahatça binmesi için klavyeden R tuşuna (veya U) basarak rampayı açınız.",
                 targetKey: "r",
                 altTargetKey: "u",
+                soundName: "🛹 Freesound Hidrolik Rampa İniş & Kaldırım Klankı",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playRampDeploy) audio.playRampDeploy();
+                        else if (audio.playRamp) audio.playRamp(true);
+                    }
+                },
                 actionBtnText: "🛹 Engelli Rampasını Aç (R veya U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #d97706, #b45309); border: 1.5px solid #facc15;",
-                successFeedback: "Harikasın! Rampa açıldı, yolcumuz bindi ve teşekkür etti: İyi ki varsın kaptan!",
+                successFeedback: "Harikasın! Rampa hidrolik sesle indi ve kaldırıma kilitlendi. Yolcumuz bindi: Çok teşekkür ederim kaptanım!",
                 failFeedback: "Rampayı açmak için lütfen R veya U tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
+                    const s = this.guidedSteps[4];
+                    if (s && s.playSound) s.playSound();
                     this.labRampOpen = true;
                 }
             },
             {
                 step: 6,
+                soundDuration: 2200,
                 title: "6. Adım: Rampayı Geri Kapatma",
                 tip: "Yolcumuz bindi, sefere devam etmek için rampayı geri topluyoruz.",
                 instruction: "Yolcumuz bindi. Tekrar yola çıkabilmek için lütfen tekrar R tuşuna (veya U) basarak rampayı kapatınız.",
                 targetKey: "r",
                 altTargetKey: "u",
+                soundName: "⬆️ Freesound Rampa Toplanma & Şasi Kilidi",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playRampRetract) audio.playRampRetract();
+                        else if (audio.playRamp) audio.playRamp(false);
+                    }
+                },
                 actionBtnText: "⬆️ Rampayı Kapat ve Otobüsü Doğrult (R veya U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
-                successFeedback: "Çok güzel! Rampa kapandı ve otobüsümüz doğruldu.",
+                successFeedback: "Çok güzel! Rampa motorla toplanıp şasiye kilitlendi ve körükler otobüsü doğrulttu.",
                 failFeedback: "Rampayı kapatmak için lütfen tekrar R veya U tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playRamp) audio.playRamp();
+                    const s = this.guidedSteps[5];
+                    if (s && s.playSound) s.playSound();
                     this.labRampOpen = false;
                     this.labKneeling = false;
                 }
             },
             {
                 step: 7,
+                soundDuration: 2200,
                 title: "7. Adım: Ön Kapıyı Açma (Yolcuları Alma)",
                 tip: "Durakta bekleyen diğer yolcuların binmesi için ön kapıyı açıyoruz.",
                 instruction: "Duraktaki diğer yolcuların binmesi için klavyeden 1 tuşuna basarak ön kapıyı açınız.",
                 targetKey: "1",
+                soundName: "🚪 Ön Kapı Pnömatik Açılışı & 💳 Akbil Bip Sesi",
+                playSound: () => {
+                    if (typeof audio !== 'undefined') {
+                        if (audio.playDoorOpenWithAkbil) audio.playDoorOpenWithAkbil();
+                        else {
+                            if (audio.playDoorOpen) audio.playDoorOpen();
+                            setTimeout(() => { if (audio.playAkbilTam) audio.playAkbilTam(); }, 750);
+                        }
+                    }
+                },
                 actionBtnText: "🚪 Ön Kapıyı Aç (1)",
                 actionBtnStyle: "background: linear-gradient(135deg, #7c3aed, #6d28d9); border: 1.5px solid #a78bfa;",
-                successFeedback: "Aferin doğru yaptın! Kapı açıldı, yolcular kartlarını basıp bindi.",
+                successFeedback: "Aferin doğru yaptın! Pnömatik kapı açıldı, yolcular kartlarını okutup bindi.",
                 failFeedback: "Ön kapıyı açmak için lütfen 1 tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playDoorOpen) audio.playDoorOpen();
+                    const s = this.guidedSteps[6];
+                    if (s && s.playSound) s.playSound();
                     this.labFrontDoor = true;
                 }
             },
             {
                 step: 8,
+                soundDuration: 1800,
                 title: "8. Adım: Ön Kapıyı Kapatma",
                 tip: "Yolcular bindi, güvenle sürmek için kapıyı kapatıyoruz.",
                 instruction: "Yolcular bindi. Yola çıkmak için lütfen tekrar 1 tuşuna basarak kapıyı kapatınız.",
                 targetKey: "1",
+                soundName: "🔒 Ön Kapı Pnömatik Kapanış & Kauçuk Fitil",
+                playSound: () => {
+                    if (typeof audio !== 'undefined' && audio.playDoorClose) {
+                        audio.playDoorClose();
+                    }
+                },
                 actionBtnText: "🔒 Ön Kapıyı Kapat (1)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
-                successFeedback: "Tebrikler! Kapılar kapandı, artık güvenle sürebilirsin.",
+                successFeedback: "Tebrikler! Kapılar hava sesiyle kapandı ve kilitlendi, artık güvenle sürebilirsin.",
                 failFeedback: "Kapıyı kapatmak için lütfen 1 tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playDoorClose) audio.playDoorClose();
+                    const s = this.guidedSteps[7];
+                    if (s && s.playSound) s.playSound();
                     this.labFrontDoor = false;
                 }
             },
             {
                 step: 9,
+                soundDuration: 2200,
                 title: "9. Adım: Yokuş Aşağı İniş Freni (Retarder)",
                 tip: "Yokuş inerken normal fren balataları ısınmasın diye motor frenini çekiyoruz.",
                 instruction: "Son olarak, dik yokuş inerken otobüsü yavaşlatmak için Boşluk (Space) tuşuna basarak yokuş frenini çekiniz.",
                 targetKey: " ",
+                soundName: "🎶 Voith / ZF Hidrolik Retarder Düdüğü & Yavaşlama",
+                playSound: () => {
+                    if (typeof audio !== 'undefined' && audio.playRetarder) {
+                        audio.playRetarder(3.5, 65);
+                    }
+                },
                 actionBtnText: "⚡ Yokuş Frenini Çek (Boşluk / Space)",
                 actionBtnStyle: "background: linear-gradient(135deg, #ea580c, #c2410c); border: 1.5px solid #f97316;",
-                successFeedback: "Muhteşem! Yokuş frenini çektin, otobüs yavaşladı. Bütün kontrolleri başarıyla öğrendin!",
+                successFeedback: "Muhteşem! Retarder ıslık çalarak otobüsü yavaşlattı. Bütün kontrolleri ve akustikleri başarıyla öğrendin!",
                 failFeedback: "Yokuş freni için lütfen Boşluk (Space) tuşuna basınız.",
                 execute: () => {
-                    if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                    const s = this.guidedSteps[8];
+                    if (s && s.playSound) s.playSound();
                     this.labRetarderActive = true;
                 }
             },
@@ -675,11 +1472,15 @@ class VoiceAssistant {
             };
         }
 
+
+
         const btnReplay = document.getElementById('btn-guided-replay-audio');
         if (btnReplay) {
             btnReplay.onclick = () => {
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(currentStep.instruction);
+                if (typeof audio !== 'undefined') {
+                    if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+                    if (audio.speak) audio.speak(currentStep.instruction);
+                    if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(currentStep.instruction);
                 }
             };
         }
@@ -688,11 +1489,21 @@ class VoiceAssistant {
         if (btnPrev) {
             btnPrev.onclick = () => {
                 if (this.guidedStep > 1) {
+                    if (this.stepTransitionTimeout) {
+                        clearTimeout(this.stepTransitionTimeout);
+                        this.stepTransitionTimeout = null;
+                    }
+                    if (typeof audio !== 'undefined' && audio.stopAllSoundEffects) {
+                        audio.stopAllSoundEffects();
+                    }
                     this.guidedStep--;
                     this.guidedFeedbackText = "";
                     this.renderInteractiveLab();
                     const prevStep = this.guidedSteps[this.guidedStep - 1];
-                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(prevStep.instruction);
+                    if (typeof audio !== 'undefined') {
+                        if (audio.speak) audio.speak(prevStep.instruction);
+                        if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(prevStep.instruction);
+                    }
                 }
             };
         }
@@ -707,30 +1518,45 @@ class VoiceAssistant {
         const currentStep = this.guidedSteps[this.guidedStep - 1];
         if (!currentStep) return;
 
+        // Önceki geçiş zamanlayıcısı varsa temizle
+        if (this.stepTransitionTimeout) {
+            clearTimeout(this.stepTransitionTimeout);
+            this.stepTransitionTimeout = null;
+        }
+
+        // Adımın mekanik sesi çalsın
         if (currentStep.execute) currentStep.execute();
 
         this.guidedFeedbackText = "🎉 " + currentStep.successFeedback;
         this.guidedFeedbackType = "success";
 
-        if (typeof audio !== 'undefined') {
-            if (audio.playSuccess) audio.playSuccess();
-            if (audio.speak) audio.speak(currentStep.successFeedback);
-            if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(currentStep.successFeedback);
-        }
         if (typeof UI !== 'undefined' && UI.showToast) {
             UI.showToast("Aferin! Doğru yaptınız. Sıradaki adıma geçiliyor...", "success");
         }
 
-        // 1.8 saniye sonra sıradaki adıma yumuşak geçiş
-        setTimeout(() => {
+        const duration = currentStep.soundDuration || 2200;
+
+        // KULLANICI KURALI:
+        // "ses bittiğinde bir sonraki adıma geçerken sesi kapat. eğitim okunurken sesler sussun ki ekran okuyucuyla eğitimi tamamlamak kolay olsun."
+        this.stepTransitionTimeout = setTimeout(() => {
+            // Ses bittiğinde, bir sonraki adıma geçmeden hemen önce TÜM SESLERİ KAPAT!
+            if (typeof audio !== 'undefined' && audio.stopAllSoundEffects) {
+                audio.stopAllSoundEffects();
+            }
+
             this.guidedStep++;
             this.guidedFeedbackText = "";
             this.renderInteractiveLab();
+
             const nextStep = this.guidedSteps[this.guidedStep - 1];
-            if (nextStep && !nextStep.isGraduation && typeof audio !== 'undefined' && audio.speak) {
-                setTimeout(() => audio.speak(nextStep.instruction), 600);
+            if (nextStep && !nextStep.isGraduation && typeof audio !== 'undefined') {
+                // Ekran okuyucu (NVDA vb.) sessizlik içinde talimatı net bir şekilde okusun
+                setTimeout(() => {
+                    if (audio.speak) audio.speak(nextStep.instruction);
+                    if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(nextStep.instruction);
+                }, 200);
             }
-        }, 1800);
+        }, duration);
     }
 
     // Yanlış Tuşa Basıldığında Nazik ve Teşvik Edici Telkin
@@ -789,7 +1615,13 @@ class VoiceAssistant {
             advice = "Efsane bir Kaptansın! Şehirlerarası uzun yollarda tecrübenle parlıyorsun. Tüm otobüsler emrinde!";
         }
 
-        const xpPercent = Math.min(100, Math.round((xp / nextXP) * 100));
+        const prevXP = (typeof Game !== 'undefined' && Game.LEVEL_XP_THRESHOLDS)
+            ? (level > 20 ? 71000 + ((level - 20) * 10000) : (Game.LEVEL_XP_THRESHOLDS[level - 1] || 0))
+            : 0;
+        const levelRange = Math.max(1, nextXP - prevXP);
+        const progressInLevel = Math.max(0, xp - prevXP);
+        const xpPercent = Math.min(100, Math.round((progressInLevel / levelRange) * 100));
+        const remainingXP = Math.max(0, nextXP - xp);
 
         seruvenContainer.innerHTML = `
             <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(2, 132, 199, 0.35)); border: 2px solid #38bdf8; border-radius: 12px; padding: 22px;">
@@ -836,7 +1668,7 @@ class VoiceAssistant {
         const btnRead = document.getElementById('btn-seruven-read-speech');
         if (btnRead) {
             btnRead.addEventListener('click', () => {
-                const speechText = `Şoförlük durumunuz. Seviyeniz ${level}, ${title}. Toplam tecrübeniz ${xp} puan. Gelecek seviye için ${nextXP} puan gerekiyor. Tamamlanan sefer sayısı ${tasks}. ${unlockTeaser}. ${advice}`;
+                const speechText = `Şoförlük durumunuz. Seviyeniz ${level}, ${title}. Toplam tecrübeniz ${xp} puan. Seviye ${level + 1}'e kalan ${remainingXP} puan. Tamamlanan sefer sayısı ${tasks}. ${unlockTeaser}. ${advice}`;
                 if (typeof audio !== 'undefined' && audio.speak) {
                     audio.stopSpeech();
                     audio.speak(speechText);
@@ -849,16 +1681,113 @@ class VoiceAssistant {
         }
     }
 
+
+    // --- EĞİTİMDE TARİF EDİLEN SESLERİ BİREBİR ÇALMA SİSTEMİ ---
+    playLessonSoundEffect(lessonId) {
+        if (typeof audio === 'undefined') return;
+        switch(lessonId) {
+            case 'driving':
+                // 1. Motor marş + rölanti, ardından gaz ve fren
+                if (audio.playEngineStartPreview) audio.playEngineStartPreview(2.4);
+                setTimeout(() => {
+                    if (audio.playAcceleration) audio.playAcceleration(2.0);
+                }, 2500);
+                setTimeout(() => {
+                    if (audio.playAirBrake) audio.playAirBrake();
+                }, 4600);
+                break;
+            case 'stops':
+                // 2. Havalı kapı açılışı, Akbil kart okutma ve kapı kapanışı
+                if (audio.playDoorOpen) audio.playDoorOpen();
+                setTimeout(() => {
+                    if (audio.playAkbilTam) audio.playAkbilTam();
+                }, 1000);
+                setTimeout(() => {
+                    if (audio.playDoorClose) audio.playDoorClose();
+                }, 2200);
+                break;
+            case 'compass':
+                // 3. Yön & pusula akustik çanı
+                if (audio.playStopRequestBell) audio.playStopRequestBell();
+                break;
+            case 'cockpit_navigation':
+                // 3.1 Üç tonlu durak/istasyon gong anonsu
+                if (audio.playTerminalChime) audio.playTerminalChime();
+                break;
+            case 'ramp':
+                // 4. Kaldırıma yatma (kneeling), Freesound rampa iniş ve toplanma
+                if (audio.playKneeling) audio.playKneeling(true);
+                setTimeout(() => {
+                    if (audio.playRampDeploy) audio.playRampDeploy();
+                }, 1200);
+                setTimeout(() => {
+                    if (audio.playRampRetract) audio.playRampRetract();
+                }, 5200);
+                break;
+            case 'bumps':
+                // 5. Kasis darbe sesi ve retarder yavaşlama düdüğü
+                if (audio.playRoadBump) audio.playRoadBump();
+                setTimeout(() => {
+                    if (audio.playRetarder) audio.playRetarder(3.0, 45);
+                }, 600);
+                break;
+            case 'comfort_ac':
+                // 6. Freesound sol cam açılma ve fitil kapanma
+                if (audio.playWindowSound) audio.playWindowSound(true);
+                setTimeout(() => {
+                    if (audio.playWindowSound) audio.playWindowSound(false);
+                }, 2500);
+                break;
+            case 'lights_weather':
+                // 7. Kokpit far anahtarı, yağmur ve silecek süpürme
+                if (audio.playSwitchClick) audio.playSwitchClick();
+                setTimeout(() => {
+                    if (audio.playWiperCycle) audio.playWiperCycle();
+                }, 600);
+                break;
+            case 'timetable':
+                // 8. Takograf ve hat tabelası dijital bildirim sesi
+                if (audio.playTachographBeep) audio.playTachographBeep();
+                break;
+            case 'lost_found':
+                // 9. Bahşiş ve eşya bulma şıngırtısı
+                if (audio.playCoinSound) audio.playCoinSound();
+                break;
+            case 'luggage':
+                // 10. Havalı bagaj kapağı açılma ve kapanma
+                if (audio.playLuggageBays) audio.playLuggageBays(true);
+                setTimeout(() => {
+                    if (audio.playLuggageBays) audio.playLuggageBays(false);
+                }, 2200);
+                break;
+            case 'badges_collection':
+                // 11. Madalya / kupa zafer melodisi
+                if (audio.playSuccess) audio.playSuccess();
+                break;
+            case 'voice_guide':
+                // 12. Telsiz bas-konuş ve mandal bırakma sesi
+                if (audio.playRadioTalk) audio.playRadioTalk(true);
+                setTimeout(() => {
+                    if (audio.playRadioTalk) audio.playRadioTalk(false);
+                }, 1200);
+                break;
+            default:
+                if (audio.playSelect) audio.playSelect();
+                break;
+        }
+    }
+
     playLesson(lessonId) {
         const lesson = this.tutorialLessons.find(l => l.id === lessonId);
         if (!lesson) return;
         if (typeof audio !== 'undefined') {
-            if (audio.playSelect) audio.playSelect();
             audio.stopSpeech();
+            // KULLANICI KURALI: Eğitim okunurken sesler sussun ki ekran okuyucuyla eğitimi tamamlamak kolay olsun
+            if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
             const fullText = `${lesson.stageName}. ${lesson.title}. ${lesson.speech}`;
             audio.speak(fullText);
             if (typeof UI !== 'undefined' && UI.showToast) {
-                UI.showToast(`🔊 ${lesson.title}`, 'info');
+                UI.showToast(`📖 ${lesson.title}`, 'info');
             }
         }
     }
@@ -867,6 +1796,7 @@ class VoiceAssistant {
         if (typeof audio === 'undefined') return;
         if (audio.playSelect) audio.playSelect();
         audio.stopSpeech();
+        if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
 
         const sequence = [
             "Sürüş eğitimi başlatılıyor. Otobüsü nasıl süreceğinizi ve tüm tuşları adım adım anlatıyorum."
@@ -883,8 +1813,9 @@ class VoiceAssistant {
     }
 
     stopTutorialSpeech() {
-        if (typeof audio !== 'undefined' && audio.stopSpeech) {
-            audio.stopSpeech();
+        if (typeof audio !== 'undefined') {
+            if (audio.stopSpeech) audio.stopSpeech();
+            if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast("⏹️ Ses Susturuldu", "info");
             }
@@ -969,6 +1900,9 @@ class VoiceAssistant {
         const tabLab = document.getElementById('tab-acad-lab');
         if (tabLab) tabLab.addEventListener('click', () => this.setAcademyTab('lab'));
 
+        const tabMech = document.getElementById('tab-acad-mechanics');
+        if (tabMech) tabMech.addEventListener('click', () => this.setAcademyTab('mechanics'));
+
         const tabKarne = document.getElementById('tab-acad-karne') || document.getElementById('tab-acad-seruven');
         if (tabKarne) tabKarne.addEventListener('click', () => this.setAcademyTab('seruven'));
 
@@ -1014,8 +1948,10 @@ class VoiceAssistant {
             this.setAcademyTab('karne');
             const level = Game.licenseLevel || 1;
             const xp = Game.playerXP || 0;
-            const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
-            audio.speak(`Şoförlük durumunuz açıldı. Şu an Seviye ${level}, ${title} durumundasınız. Toplam tecrübeniz ${xp} puandır.`);
+            const title = (typeof Game.getLicenseTitle === 'function' && Game.getLicenseTitle()) ? Game.getLicenseTitle() : '1. Sınıf Sürücü';
+            const nextXP = (typeof Game.getNextLevelXP === 'function') ? Game.getNextLevelXP(level) : 250;
+            const remaining = Math.max(0, nextXP - xp);
+            audio.speak(`Şoförlük durumunuz açıldı. Şu an Seviye ${level}, ${title} durumundasınız. Toplam tecrübeniz ${xp} puandır. Seviye ${level + 1}'e kalan: ${remaining} puan.`);
             return;
         }
 
@@ -1675,7 +2611,9 @@ class VoiceAssistant {
                 let durum = (Game.weather === 'sunny') 
                     ? (Game.isNight ? 'açık gece' : 'güneşli') 
                     : (Game.weather === 'rainy' ? `yağmurlu, saatte ${Game.rainMmPerHour || 5} milimetre yağış var` : 'karlı');
-                audio.speak(`Dış sıcaklık ${Game.temperature} derece, araç içi ${Math.floor(Game.busTemperature)} derece. Hava ${durum}. ${Game.isACOn ? "Klima açık." : "Klima kapalı."}`);
+                const extTemp = (typeof Game.temperature === 'number' && !isNaN(Game.temperature)) ? Game.temperature : 18;
+            const inTemp = (typeof Game.busTemperature === 'number' && !isNaN(Game.busTemperature)) ? Math.floor(Game.busTemperature) : 22;
+            audio.speak(`Dış sıcaklık ${extTemp} derece, araç içi ${inTemp} derece. Hava ${durum}. ${Game.isACOn ? "Klima açık." : "Klima kapalı."}`);
                 return;
             }
 

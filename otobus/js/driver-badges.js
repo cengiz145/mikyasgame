@@ -141,7 +141,7 @@ const DriverBadges = {
             desc: 'Marmara, Ege ve Akdeniz sahil yollarında deniz meltemi eşliğinde yolcularına VIP konfor sunan kıyı reisi.',
             requirement: 'Sahil ve kıyı hatlarında toplam en az 15 sefer tamamlayın.',
             badgeId: 'brove_kiyi_sahil',
-            unlockCondition: (stats) => (stats.totalTrips || 0) >= 15
+            unlockCondition: (stats) => ((stats.coastalTrips || stats.totalTrips || 0) >= 15)
         },
         {
             id: 'title_sehir_ici_cambazi',
@@ -303,7 +303,10 @@ const DriverBadges = {
             badgeId: null,
             unlockCondition: (stats, badgesData) => {
                 if (!badgesData) return false;
-                const count = Object.keys(badgesData).filter(k => k.startsWith('brove_') && badgesData[k].unlocked).length;
+                const badgesList = (typeof DriverBadges !== 'undefined' && Array.isArray(DriverBadges.CAPTAIN_BADGES)) ? DriverBadges.CAPTAIN_BADGES : [];
+                const count = badgesList.length > 0 
+                    ? badgesList.filter(b => badgesData[b.id] && badgesData[b.id].unlocked).length
+                    : Object.keys(badgesData).filter(k => k.startsWith('brove_') && badgesData[k].unlocked).length;
                 return count >= 10;
             }
         }
@@ -724,6 +727,9 @@ const DriverBadges = {
         } catch (e) {
             console.warn("Rozet verisi kaydedilemedi:", e);
         }
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData();
+        }
     },
 
     getLifetimeStats: function() {
@@ -744,6 +750,7 @@ const DriverBadges = {
             retarderUsesCount: 0,
             rainSnowTrips: 0,
             mountainTrips: 0,
+            coastalTrips: 0,
             citiesVisitedCount: 1,
             midibusTrips: 0,
             soloTrips: 0,
@@ -762,15 +769,17 @@ const DriverBadges = {
             licenseLevel: 1
         };
 
+        let hasSaved = false;
         try {
             const saved = localStorage.getItem(this.STATS_KEY);
             if (saved) {
                 stats = Object.assign(stats, JSON.parse(saved));
+                hasSaved = true;
             }
         } catch(e) {}
 
         if (typeof Game !== 'undefined') {
-            if (Game.completedTasks) stats.totalTrips = Math.max(stats.totalTrips, Game.completedTasks);
+            if (!hasSaved && Game.completedTasks) stats.totalTrips = Math.max(stats.totalTrips, Game.completedTasks);
             if (Game.playerXP) stats.totalXP = Math.max(stats.totalXP, Game.playerXP);
             if (Game.licenseLevel) stats.licenseLevel = Math.max(stats.licenseLevel, Game.licenseLevel);
             if (Game.playerBudget) stats.budgetEarned = Math.max(stats.budgetEarned, Game.playerBudget);
@@ -789,6 +798,9 @@ const DriverBadges = {
         try {
             localStorage.setItem(this.STATS_KEY, JSON.stringify(stats));
         } catch(e) {}
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData();
+        }
     },
 
     // --- KUŞANILAN AKTİF UNVAN YÖNETİMİ ---
@@ -819,6 +831,9 @@ const DriverBadges = {
         try {
             localStorage.setItem(this.TITLES_KEY, titleId);
         } catch(e) {}
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData();
+        }
 
         if (typeof audio !== 'undefined' && typeof audio.playBadgeFanfare === 'function') {
             audio.playBadgeFanfare();
@@ -859,6 +874,10 @@ const DriverBadges = {
         if (!title) return false;
         if (title.id === 'title_cirak') return true;
 
+        if (this.isBadgeUnlocked(titleId)) {
+            return true;
+        }
+
         if (title.badgeId && this.isBadgeUnlocked(title.badgeId)) {
             return true;
         }
@@ -895,6 +914,11 @@ const DriverBadges = {
         return this.CAPTAIN_TITLES.filter(t => this.isTitleUnlocked(t.id)).length;
     },
 
+    getTotalUnlockedAllCount: function() {
+        const data = this.getBadgesData();
+        return Object.values(data).filter(v => v && v.unlocked).length;
+    },
+
     unlock: function(id, announceNow = true, customName = null) {
         const data = this.getBadgesData();
         if (data[id] && data[id].unlocked) return false;
@@ -909,11 +933,34 @@ const DriverBadges = {
         };
         this.saveBadgesData(data);
 
+        let displayName = customName;
+        if (!displayName) {
+            const KNOWN_NAMES = {
+                'mahalle_kasifi': 'Mahalle Kâşifi (5 Durak Keşfi)',
+                'hat_hakimi': 'Hat Hâkimi (%80 Durak Keşfi)',
+                'emektar_direksiyon': 'Emektar Direksiyon (30 Dakika Kesintisiz Sürüş)'
+            };
+            if (KNOWN_NAMES[id]) {
+                displayName = KNOWN_NAMES[id];
+            } else {
+                const b = this.CAPTAIN_BADGES ? this.CAPTAIN_BADGES.find(x => x.id === id) : null;
+                if (b) displayName = b.title;
+                else {
+                    const ach = this.badges ? this.badges.find(x => x.id === id) : null;
+                    if (ach) displayName = ach.title;
+                    else {
+                        const t = this.CAPTAIN_TITLES ? this.CAPTAIN_TITLES.find(x => x.id === id) : null;
+                        if (t) displayName = t.name;
+                        else displayName = id;
+                    }
+                }
+            }
+        }
+
         if (announceNow) {
             if (typeof audio !== 'undefined' && typeof audio.playBadgeFanfare === 'function') {
                 audio.playBadgeFanfare();
             }
-            const displayName = customName || id;
             const msg = "Tebrikler Kaptan! Yeni bir başarı ve liyakat ödülü kazandınız: " + displayName + "!";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(msg);
@@ -923,14 +970,18 @@ const DriverBadges = {
         return true;
     },
 
+    unlockBadge: function(id, announceNow = true, customName = null) {
+        return this.unlock(id, announceNow, customName);
+    },
+
     // --- RASTGELE HEDEF SEÇİCİ ---
     pickRandomMysteryBadge: function(announce = false) {
         const data = this.getBadgesData();
         let locked = this.badges.filter(b => !(data[b.id] && data[b.id].unlocked));
 
         if (this.currentTier !== 'all') {
-            const tierFiltered = locked.filter(b => b.tier === parseInt(this.currentTier));
-            if (tierFiltered.length > 0) locked = tierFiltered;
+            const reqTier = parseInt(this.currentTier);
+            locked = locked.filter(b => b.tier === reqTier);
         }
 
         if (locked.length === 0) {
@@ -955,14 +1006,30 @@ const DriverBadges = {
     checkAfterRoute: function(stats) {
         if (!stats || !stats.isSuccess) return [];
 
+        let hasSaved = false;
+        try {
+            hasSaved = !!localStorage.getItem(this.STATS_KEY);
+        } catch(e) {}
         const lifetime = this.getLifetimeStats();
 
-        lifetime.totalTrips += 1;
-        const carried = (typeof Game !== 'undefined' && Game.passengersOnBoard) ? Game.passengersOnBoard : 15;
+        // 1. Toplam Seferler: Double-count engellendi
+        const gameTasks = (typeof Game !== 'undefined' && typeof Game.completedTasks === 'number') ? Game.completedTasks : 0;
+        if (!hasSaved && gameTasks > 0) {
+            lifetime.totalTrips = gameTasks;
+        } else {
+            lifetime.totalTrips = (lifetime.totalTrips || 0) + 1;
+        }
+
+        // 2. Taşınan Yolcular: Gerçek sefer verisi ve alighting sonrası sıfırlanma bugı onarıldı
+        const carried = (typeof stats.passengersCarried === 'number')
+            ? stats.passengersCarried
+            : ((typeof Game !== 'undefined' && typeof Game.totalPassengersBoardedInRoute === 'number' && Game.totalPassengersBoardedInRoute > 0)
+                ? Game.totalPassengersBoardedInRoute
+                : ((typeof Game !== 'undefined' && typeof Game.passengersOnBoard === 'number' && Game.passengersOnBoard > 0) ? Game.passengersOnBoard : 15));
         lifetime.totalPassengers += carried;
         
         const xpEarned = (typeof stats.earnedXP === 'number') ? stats.earnedXP : 150;
-        lifetime.totalXP += xpEarned;
+        lifetime.totalXP = Math.max(lifetime.totalXP || 0, (typeof Game !== 'undefined' && Game.playerXP) ? Game.playerXP : ((lifetime.totalXP || 0) + xpEarned));
 
         const moneyEarned = (typeof stats.earnedMoney === 'number') ? stats.earnedMoney : 100;
         lifetime.budgetEarned += moneyEarned;
@@ -973,7 +1040,7 @@ const DriverBadges = {
         const drivingSec = (typeof stats.totalDrivingSeconds === 'number') ? stats.totalDrivingSeconds : 180;
         lifetime.totalDrivingMinutes += Math.max(1, Math.round(drivingSec / 60));
 
-        // Konfor ve Seri Kontrolü
+        // Konfor ve Seri Kontrolü (Peş peşe %95 ve üzeri - 85-94 arası dondurma hatası onarıldı)
         if (typeof stats.passengerComfort === 'number' && stats.passengerComfort >= 90) {
             lifetime.totalComfortTrips += 1;
         }
@@ -982,11 +1049,11 @@ const DriverBadges = {
             if (lifetime.currentComfortStreak > (lifetime.maxComfortStreak || 0)) {
                 lifetime.maxComfortStreak = lifetime.currentComfortStreak;
             }
-        } else if (typeof stats.passengerComfort === 'number' && stats.passengerComfort < 85) {
+        } else {
             lifetime.currentComfortStreak = 0;
         }
 
-        // Dakiklik ve Seri Kontrolü
+        // Dakiklik ve Seri Kontrolü (Peş peşe %95 ve üzeri - 85-94 arası dondurma hatası onarıldı)
         if (typeof stats.punctualityScore === 'number' && stats.punctualityScore >= 90) {
             lifetime.totalPunctualTrips += 1;
         }
@@ -995,15 +1062,15 @@ const DriverBadges = {
             if (lifetime.currentPunctualStreak > (lifetime.maxPunctualStreak || 0)) {
                 lifetime.maxPunctualStreak = lifetime.currentPunctualStreak;
             }
-        } else if (typeof stats.punctualityScore === 'number' && stats.punctualityScore < 85) {
+        } else {
             lifetime.currentPunctualStreak = 0;
         }
 
-        // Hasarsızlık ve Temiz Sürüş Serisi Kontrolü
+        // Hasarsızlık ve Temiz Sürüş Serisi Kontrolü (%100 Kondisyon)
         if (typeof stats.busHealth === 'number' && stats.busHealth >= 100) {
             lifetime.totalCleanTrips += 1;
-            lifetime.currentCleanStreak += 1;
-            if (lifetime.currentCleanStreak > lifetime.maxCleanStreak) {
+            lifetime.currentCleanStreak = (lifetime.currentCleanStreak || 0) + 1;
+            if (lifetime.currentCleanStreak > (lifetime.maxCleanStreak || 0)) {
                 lifetime.maxCleanStreak = lifetime.currentCleanStreak;
             }
         } else {
@@ -1015,9 +1082,12 @@ const DriverBadges = {
             lifetime.perfectTripsCount = (lifetime.perfectTripsCount || 0) + 1;
         }
 
-        // Retarder Kontrolü
-        if (stats.retarderUsed) {
-            lifetime.retarderUsesCount = (lifetime.retarderUsesCount || 0) + 1;
+        // Retarder Kontrolü (Sefer içi kullanım adedi doğru aktarılır)
+        const retarderCount = (typeof stats.retarderUsesCount === 'number' && stats.retarderUsesCount > 0)
+            ? stats.retarderUsesCount
+            : (stats.retarderUsed ? 1 : 0);
+        if (retarderCount > 0) {
+            lifetime.retarderUsesCount = (lifetime.retarderUsesCount || 0) + retarderCount;
         }
 
         // Gece Seferi
@@ -1025,9 +1095,12 @@ const DriverBadges = {
             lifetime.totalNightTrips += 1;
         }
 
-        // Engelli Rampası
-        if (stats.rampUsed === true) {
-            lifetime.totalRampsUsed += 1;
+        // Engelli Rampası (Sefer içi kullanım adedi doğru aktarılır)
+        const rampCount = (typeof stats.rampsUsedCount === 'number' && stats.rampsUsedCount > 0)
+            ? stats.rampsUsedCount
+            : (stats.rampUsed ? 1 : 0);
+        if (rampCount > 0) {
+            lifetime.totalRampsUsed = (lifetime.totalRampsUsed || 0) + rampCount;
         }
 
         // Kayıp Eşya
@@ -1036,11 +1109,13 @@ const DriverBadges = {
         }
 
         // Hava Durumu (Yağmur / Kar)
-        if (typeof Game !== 'undefined' && (Game.activeClimateRegime === 'yagmurlu' || Game.activeClimateRegime === 'karli')) {
+        const isRainSnow = (stats.isRainOrSnow === true) || 
+            (typeof Game !== 'undefined' && (Game.activeClimateRegime === 'yagmurlu' || Game.activeClimateRegime === 'karli' || Game.weather === 'rainy' || Game.weather === 'snowy'));
+        if (isRainSnow) {
             lifetime.rainSnowTrips = (lifetime.rainSnowTrips || 0) + 1;
         }
 
-        // Dağ / Viraj / Güzergah
+        // Dağ / Viraj / Güzergah / Sahil
         if (typeof Game !== 'undefined' && Game.activeRouteData) {
             const rName = (Game.activeRouteData.name || '') + ' ' + (Game.activeRouteData.desc || '');
             if (rName.includes('Bolu') || rName.includes('Dağ') || rName.includes('Geçit') || rName.includes('Zigana') || rName.includes('Toros')) {
@@ -1049,17 +1124,22 @@ const DriverBadges = {
             if (Game.activeRouteData.isIntercity) {
                 lifetime.intercityTrips = (lifetime.intercityTrips || 0) + 1;
             }
+            const rLower = rName.toLowerCase();
+            if (rLower.includes('sahil') || rLower.includes('kıyı') || rLower.includes('kiyi') || rLower.includes('deniz') || rLower.includes('kordon') || Game.activeRouteData.isCoastal) {
+                lifetime.coastalTrips = (lifetime.coastalTrips || 0) + 1;
+            }
         }
 
-        // Araç Sınıfı İstatistiği
+        // Araç Sınıfı İstatistiği (Körüklü ve VIP modelleri hassas eşleşme)
         const bus = (stats.selectedBus) || (typeof Game !== 'undefined' ? Game.selectedBus : null);
         if (bus) {
             if (bus.sizeTier === 1 || bus.sizeClass === 'kucuk') lifetime.midibusTrips = (lifetime.midibusTrips || 0) + 1;
             if (bus.sizeTier === 2 || bus.sizeClass === 'orta') lifetime.soloTrips = (lifetime.soloTrips || 0) + 1;
-            if (bus.id && (bus.id.includes('koruklu') || bus.id.includes('conecto_g') || (bus.model && bus.model.includes('Körüklü')))) {
+            const isArticulated = bus.id && (bus.id.includes('articulated') || bus.id.includes('koruklu') || bus.id.includes('conecto_g') || (bus.model && bus.model.includes('Körüklü')));
+            if (isArticulated) {
                 lifetime.articulatedTrips = (lifetime.articulatedTrips || 0) + 1;
             }
-            if (bus.sizeTier === 3 && !(bus.id && bus.id.includes('koruklu'))) {
+            if (bus.sizeTier === 3 && !isArticulated) {
                 lifetime.vipIntercityTrips = (lifetime.vipIntercityTrips || 0) + 1;
             }
             if (bus.brand && bus.brand.toLowerCase().includes('mercedes')) lifetime.mercedesTrips = (lifetime.mercedesTrips || 0) + 1;
@@ -1067,15 +1147,14 @@ const DriverBadges = {
         }
 
         // Keşfedilen Duraklar ve Şehirler
-        if (typeof StopDiscovery !== 'undefined' && StopDiscovery.getDiscoveredStops) {
-            lifetime.stopsDiscovered = StopDiscovery.getDiscoveredStops().length;
-        }
-        if (typeof Game !== 'undefined' && Game.unlockedCities && Array.isArray(Game.unlockedCities)) {
-            lifetime.citiesVisitedCount = Math.max(lifetime.citiesVisitedCount || 1, Game.unlockedCities.length);
-        }
-        if (typeof Game !== 'undefined' && Game.licenseLevel) {
-            lifetime.licenseLevel = Game.licenseLevel;
-        }
+        const stopsCount = (typeof stats.stopsDiscovered === 'number') ? stats.stopsDiscovered : (typeof StopDiscovery !== 'undefined' && StopDiscovery.getDiscoveredStops ? StopDiscovery.getDiscoveredStops().length : (lifetime.stopsDiscovered || 0));
+        lifetime.stopsDiscovered = Math.max(lifetime.stopsDiscovered || 0, stopsCount);
+
+        const citiesCount = (typeof stats.unlockedCitiesCount === 'number') ? stats.unlockedCitiesCount : (typeof Game !== 'undefined' && Game.unlockedCities ? Game.unlockedCities.length : (lifetime.citiesVisitedCount || 1));
+        lifetime.citiesVisitedCount = Math.max(lifetime.citiesVisitedCount || 1, citiesCount);
+
+        const licLevel = (typeof stats.licenseLevel === 'number') ? stats.licenseLevel : (typeof Game !== 'undefined' && Game.licenseLevel ? Game.licenseLevel : (lifetime.licenseLevel || 1));
+        lifetime.licenseLevel = Math.max(lifetime.licenseLevel || 1, licLevel);
 
         this.saveLifetimeStats(lifetime);
 
@@ -1092,7 +1171,17 @@ const DriverBadges = {
             }
         });
 
-        // 2. 1500 BAŞARIYI KONTROL ET
+        // 2. KAPTAN UNVANLARINI KONTROL ET
+        this.CAPTAIN_TITLES.forEach(title => {
+            if (title.id === 'title_cirak') return;
+            if (data[title.id] && data[title.id].unlocked) return;
+            if (this.isTitleUnlocked(title.id)) {
+                this.unlock(title.id, false, title.name);
+                newlyUnlocked.push({ type: 'title', item: title });
+            }
+        });
+
+        // 3. 1500 BAŞARIYI KONTROL ET
         this.badges.forEach(b => {
             if (data[b.id] && data[b.id].unlocked) return;
 
@@ -1103,7 +1192,7 @@ const DriverBadges = {
             }
         });
 
-        // 3. ANONS VE KUTLAMA
+        // 4. ANONS VE KUTLAMA
         if (newlyUnlocked.length > 0) {
             setTimeout(() => {
                 if (typeof audio !== 'undefined' && typeof audio.playBadgeFanfare === 'function') {
@@ -1115,11 +1204,14 @@ const DriverBadges = {
             const first = newlyUnlocked[0].item;
             const titleMsg = (newlyUnlocked[0].type === 'brove') 
                 ? "🎖️ Yeni Resmi Kaptan Brövesi Açıldı: " + first.title
-                : "🏆 Yeni Başarı Açıldı: " + first.title;
+                : ((newlyUnlocked[0].type === 'title')
+                    ? "👑 Yeni Kaptan Unvanı Açıldı: " + first.name
+                    : "🏆 Yeni Başarı Açıldı: " + first.title);
 
+            const firstDisplayName = first.title || first.name || "Yeni Ödül";
             const announceText = count === 1
-                ? "Tebrikler Kaptan! Sefer başarınızla yeni bir ödül kazandınız: " + first.title + "!"
-                : "Tebrikler Kaptan! Sefer başarınızla " + count + " adet yeni rozet ve unvan kazanıldı! İlk ödülünüz: " + first.title + ".";
+                ? "Tebrikler Kaptan! Sefer başarınızla yeni bir ödül kazandınız: " + firstDisplayName + "!"
+                : "Tebrikler Kaptan! Sefer başarınızla " + count + " adet yeni rozet ve unvan kazanıldı! İlk ödülünüz: " + firstDisplayName + ".";
 
             setTimeout(() => {
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceText);
@@ -1249,7 +1341,7 @@ const DriverBadges = {
                         '<div>' +
                             '<span style="font-size: 0.85rem; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">👑 DİREKSİYONDAKİ AKTİF UNVANINIZ:</span><br>' +
                             '<span style="font-size: 1.35rem; font-weight: bold; color: #fef08a;">' + equipped.icon + ' ' + equipped.name + '</span>' +
-                            '<span style="font-size: 0.85rem; color: #94a3b8; margin-left: 8px;">(' + equipped.category + ')</span>' +
+                            '<span style="font-size: 0.85rem; color: #94a3b8; margin-left: 8px;">(' + (equipped.category || 'Genel Kademe') + ')</span>' +
                             '<div style="font-size: 0.85rem; color: #e2e8f0; margin-top: 4px;">' + equipped.desc + '</div>' +
                         '</div>' +
                         '<div>' +
@@ -1502,11 +1594,11 @@ const DriverBadges = {
                 }
 
                 if (this.searchQuery && this.searchQuery.trim() !== '') {
-                    const q = this.searchQuery.toLowerCase();
-                    const matchTitle = b.title.toLowerCase().includes(q);
-                    const matchDesc = b.desc.toLowerCase().includes(q);
-                    const matchCat = b.category.toLowerCase().includes(q);
-                    const matchReq = b.requirement.toLowerCase().includes(q);
+                    const q = this.searchQuery.toLocaleLowerCase('tr-TR').trim();
+                    const matchTitle = (b.title || '').toLocaleLowerCase('tr-TR').includes(q);
+                    const matchDesc = (b.desc || '').toLocaleLowerCase('tr-TR').includes(q);
+                    const matchCat = (b.category || '').toLocaleLowerCase('tr-TR').includes(q);
+                    const matchReq = (b.requirement || '').toLocaleLowerCase('tr-TR').includes(q);
                     if (!matchTitle && !matchDesc && !matchCat && !matchReq) return false;
                 }
 
@@ -1542,6 +1634,9 @@ const DriverBadges = {
                 emptyLi.style.color = '#94a3b8';
                 emptyLi.innerHTML = "Henüz bu filtreye uygun bir başarı bulunamadı.";
                 listEl.appendChild(emptyLi);
+                if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
+                    KeyboardNav.initForScreen();
+                }
                 return;
             }
 
@@ -1633,16 +1728,18 @@ const DriverBadges = {
     nextPage: function() {
         this.currentPage++;
         this.renderModal();
-        const notice = "Sayfa " + this.currentPage + "'e geçildi.";
+        const notice = "Sayfa " + this.currentPage + " açıldı.";
         if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(notice);
         const listEl = document.getElementById('driver-badges-list');
         if (listEl) listEl.scrollTop = 0;
     },
 
     prevPage: function() {
-        this.currentPage--;
+        if (this.currentPage > 1) {
+            this.currentPage--;
+        }
         this.renderModal();
-        const notice = "Sayfa " + this.currentPage + "'e geçildi.";
+        const notice = "Sayfa " + this.currentPage + " açıldı.";
         if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(notice);
         const listEl = document.getElementById('driver-badges-list');
         if (listEl) listEl.scrollTop = 0;
@@ -1750,9 +1847,9 @@ const DriverBadges = {
 
             if (e.key === 'Escape') {
                 this.closeModal();
-            } else if (e.key === 'PageDown' || e.key === ']') {
+            } else if (e.key === ']') {
                 if (this.currentMainTab === 'achievements') this.nextPage();
-            } else if (e.key === 'PageUp' || e.key === '[') {
+            } else if (e.key === '[') {
                 if (this.currentMainTab === 'achievements') this.prevPage();
             }
         });

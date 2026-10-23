@@ -1,12 +1,39 @@
-// HERKESİ SEVİYE 1'DEN BAŞLATMA PROTOKOLÜ (GLOBAL SEZON 1)
+// TÜM OYUN VE ŞİRKET VERİLERİNİ TEMİZLEME PROTOKOLÜ (GLOBAL SEZON 2)
 try {
     if (typeof localStorage !== 'undefined') {
-        if (localStorage.getItem('sim_season_level1') !== 'true') {
-            localStorage.setItem('sim_season_level1', 'true');
+        if (localStorage.getItem('wipe_all_data_20261024_v1') !== 'true') {
+            const wipeKeys = [
+                'sim_season_level1', 'licenseLevel', 'driverLicenseLevel', 'playerXP',
+                'completedTasks', 'para', 'clockMinutes', 'unlockedCities', 'merkezUs',
+                'activeDistrict', 'activeNeighborhood', 'selectedBusId', 'academyCompleted',
+                'gamePlayMode', 'otobusSave', 'otobusCompany', 'otobusDriverId', 'otobusPlate',
+                'activeRoute', 'routesData', 'routeFixApplied_v1', 'tekulas_owned_buses_v1',
+                'otobus_company_data_v2', 'otobus_company_data', 'otobus_community_companies_v1',
+                'tekulas_driver_badges_v2', 'tekulas_driver_stats_v2', 'tekulas_driver_equipped_title_v1',
+                'tekulas_driver_unlocked_titles_v1', 'otobus_highway_data', 'tekulas_discovered_stops_v1',
+                'copilot_enabled'
+            ];
+            wipeKeys.forEach(k => {
+                try { localStorage.removeItem(k); } catch(e) {}
+            });
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const k = localStorage.key(i);
+                if (k && (/^(otobus|tekulas|sim_|route)/i.test(k))) {
+                    localStorage.removeItem(k);
+                }
+            }
+            localStorage.setItem('wipe_all_data_20261024_v1', 'true');
+            localStorage.setItem('sim_season_fresh_v2', 'true');
             localStorage.setItem('licenseLevel', '1');
+            localStorage.setItem('playerXP', '0');
             localStorage.setItem('completedTasks', '0');
+            localStorage.setItem('para', '2500');
+            localStorage.setItem('clockMinutes', '480');
             localStorage.setItem('unlockedCities', JSON.stringify(["Tekirdağ"]));
             localStorage.setItem('merkezUs', 'Tekirdağ');
+            localStorage.setItem('activeDistrict', 'Süleymanpaşa');
+            localStorage.setItem('tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
+            localStorage.setItem('selectedBusId', 'otokar_kent_lf');
         }
     }
 } catch(e) {}
@@ -18,6 +45,107 @@ try {
    ========================================================================== */
 
 const Game = {
+
+    // DİNAMİK YAKIT VE TÜKETİM SİSTEMİ
+    fuelTankCapacity: 500,
+    currentFuelLiters: 500,
+    fuelWarned15: false,
+    fuelWarned5: false,
+    temperature: 20,
+    busTemperature: 22,
+    isACOn: false,
+    airPressure: 120,
+    isLowAirAlarmActive: false,
+    isEmergencyBrakeLocked: false,
+    selectedBus: null,
+    engineStarted: false,
+    isRetarderActive: false,
+    brakeEfficiency: 1.0,
+    lastInterlockWarnTime: 0,
+
+    getFuelCapacity: function() {
+        const bus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
+            ? BusFleet.getSelectedBus() 
+            : (this.selectedBus || null);
+        if (bus && bus.fuelTankCapacity) return bus.fuelTankCapacity;
+        if (bus) {
+            if (bus.sizeTier === 1) return 150;
+            if (bus.sizeTier === 2) return 300;
+            if (bus.sizeTier === 3) return 430;
+            if (bus.sizeTier === 4) return 500;
+            if (bus.sizeTier === 5) return 620;
+            if (bus.category === 'seyahat') return 520;
+        }
+        return 500;
+    },
+
+    getFuelConsumptionPer100km: function() {
+        const bus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
+            ? BusFleet.getSelectedBus() 
+            : (this.selectedBus || null);
+        if (bus && bus.fuelConsumptionRate) return bus.fuelConsumptionRate;
+        if (bus) {
+            if (bus.sizeTier === 1) return 22;
+            if (bus.sizeTier === 2) return 32;
+            if (bus.sizeTier === 3) return 44;
+            if (bus.sizeTier === 4) return 28;
+            if (bus.sizeTier === 5) return 33;
+        }
+        return 30;
+    },
+
+    refuel: function(liters, costPerLiter = 42) {
+        const cap = this.getFuelCapacity();
+        if (this.currentFuelLiters === undefined) this.currentFuelLiters = cap;
+        const needed = Math.max(0, cap - this.currentFuelLiters);
+        const toAdd = (liters === undefined || liters === null) ? needed : Math.min(needed, liters);
+        if (toAdd <= 0) {
+            const fullMsg = "Deponuz zaten tamamen dolu!";
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(fullMsg, "info");
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(fullMsg);
+            return 0;
+        }
+        let effCostPerLiter = costPerLiter;
+        let isFreeFuel = false;
+        if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+            const fuelLvl = Math.max(CompanySystem.getInstitutionLevel('fuel_depot'), CompanySystem.getInstitutionLevel('highway_resort'));
+            if (fuelLvl === 2) {
+                effCostPerLiter = Math.round(costPerLiter * 0.70); // %30 toptan yakıt tasarrufu
+            } else if (fuelLvl >= 3) {
+                effCostPerLiter = 0; // %100 ÜCRETSİZ MAZOT (Şirket Akaryakıt İstasyonu Seviye 3)
+                isFreeFuel = true;
+            }
+        }
+        const cost = Math.round(toAdd * effCostPerLiter);
+        if (this.playerBudget < cost) {
+            const warnMsg = `Yetersiz bütçe! ${Math.floor(toAdd)} litre mazot için ${cost} ₺ gerekiyor, bakiyeniz ${this.playerBudget} ₺.`;
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(warnMsg);
+            return 0;
+        }
+        if (cost > 0) {
+            this.playerBudget = Math.max(0, (this.playerBudget || 0) - cost);
+            if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                const title = (typeof this.getLicenseTitle === 'function') ? this.getLicenseTitle() : 'Kaptan';
+                UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, title);
+            }
+        }
+        this.currentFuelLiters += toAdd;
+        this.fuelWarned15 = false;
+        this.fuelWarned5 = false;
+        this.saveData();
+
+        if (typeof audio !== 'undefined' && typeof audio.playNavChime === 'function') {
+            audio.playNavChime();
+        }
+        const succMsg = isFreeFuel 
+            ? `⛽ Şirket Akaryakıt İstasyonu (Seviye 3) ayrıcalığıyla depoya ${Math.floor(toAdd)} litre mazot ÜCRETSİZ dolduruldu! Depo: %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`
+            : `⛽ Depoya ${Math.floor(toAdd)} litre mazot dolduruldu (-${cost} ₺). Depo şu an %${Math.floor((this.currentFuelLiters / cap) * 100)} dolu.`;
+        if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(succMsg, "success");
+        if (typeof audio !== 'undefined' && audio.speak) audio.speak(`Depoya ${Math.floor(toAdd)} litre mazot alındı. Yakıt seviyeniz yüzde ${Math.floor((this.currentFuelLiters / cap) * 100)}.`);
+        return toAdd;
+    },
+
     // --- State Variables ---
     academyCompleted: localStorage.getItem('academyCompleted') === 'true',
     isAcademyCompleted: function() {
@@ -62,12 +190,17 @@ const Game = {
                 break;
             }
         }
+        if (xp >= 71000) {
+            const extra = Math.floor((xp - 71000) / 10000);
+            lvl = Math.min(100, 20 + extra);
+        }
         return lvl;
     },
 
     getNextLevelXP: function(currentLevel) {
         if (currentLevel >= this.LEVEL_XP_THRESHOLDS.length) {
-            return this.LEVEL_XP_THRESHOLDS[this.LEVEL_XP_THRESHOLDS.length - 1] + 10000;
+            const extraLevels = currentLevel - this.LEVEL_XP_THRESHOLDS.length + 1;
+            return this.LEVEL_XP_THRESHOLDS[this.LEVEL_XP_THRESHOLDS.length - 1] + (extraLevels * 10000);
         }
         return this.LEVEL_XP_THRESHOLDS[currentLevel];
     },
@@ -76,8 +209,7 @@ const Game = {
         if (currentLevel < 2) return "Seviye 2'de Çevik Isuzu Novo Lux açılacak!";
         if (currentLevel < 3) return "Seviye 3'te BMC Neocity 10M açılacak!";
         if (currentLevel < 5) return "Seviye 5'te Mercedes Conecto Solo açılacak!";
-        if (currentLevel < 8) return "Seviye 8'de 18 Metre Körüklü Conecto açılacak!";
-        if (currentLevel < 8) return "Seviye 8'de Efsane Mercedes O 403 açılacak!";
+        if (currentLevel < 8) return "Seviye 8'de 18 Metre Körüklü Conecto ve Efsane O 403 açılacak!";
         if (currentLevel < 10) return "Seviye 10'da Mercedes Travego ve İlçe Karayolları açılacak!";
         if (currentLevel < 12) return "Seviye 12'de Mercedes Tourismo açılacak!";
         if (currentLevel < 14) return "Seviye 14'te Temsa Safir Plus ve MAN Lion's Coach açılacak!";
@@ -289,6 +421,17 @@ const Game = {
     steeringAngle: 0, // Direksiyon açısı (-30 ile +30 arası)
     driftVelocity: 0,
         roadCurvature: 0, // Rüzgar / Eğim kayma hızı
+    // --- Türkiye Coğrafi Topoğrafya & Tünel/Köprü Durumu ---
+    currentAltitude: 10,
+    currentSlopePct: 0.0,
+    currentLegTotalDistance: 1000,
+    currentLegDistanceCovered: 0,
+    activeRealTunnel: null,
+    activeRealBridge: null,
+    completedTunnels: [],
+    completedBridges: [],
+    lastBrakeWarnTime: 0,
+    retarderLevel: 0,
     targetDriftVelocity: 0,
     lastDriftChangeTime: 0,
     isDriving: false,
@@ -336,13 +479,21 @@ const Game = {
         const rampEl = document.getElementById('hud-ramp');
         if (this.isRampDeployed) {
             this.rampUsedInRoute = true;
+            this.rampsUsedCountInRoute = (this.rampsUsedCountInRoute || 0) + 1;
             if (typeof audio !== 'undefined' && typeof audio.playRampDeploy === 'function') audio.playRampDeploy();
             if (rampEl) rampEl.style.display = 'inline-block';
-            this.addXP(30);
-            const msg = "Tekerlekli sandalye rampası açıldı. Yolcu güvenle biniyor: Çok teşekkür ederim kaptanım, iyi görevler. Kapatmak için tekrar U tuşuna basınız.";
+            let xpGained = false;
+            if (this.hasWheelchairPassengerAtStop && !this.rampXPAwardedThisStop) {
+                this.rampXPAwardedThisStop = true;
+                this.addXP(30, "Tekerlekli Sandalye Rampası Hizmeti");
+                xpGained = true;
+            }
+            const msg = xpGained
+                ? "Tekerlekli sandalye rampası açıldı. Yolcu güvenle biniyor: Çok teşekkür ederim kaptanım, iyi görevler. Kapatmak için tekrar U tuşuna basınız."
+                : "Tekerlekli sandalye rampası açıldı. Kapatmak için tekrar U tuşuna basınız.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("♿ Rampa Açıldı (+30 XP)", "info");
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(xpGained ? "♿ Rampa Açıldı (+30 XP)" : "♿ Rampa Açıldı", "info");
         } else {
             if (typeof audio !== 'undefined' && typeof audio.playRampRetract === 'function') audio.playRampRetract();
             if (rampEl) rampEl.style.display = 'none';
@@ -358,6 +509,9 @@ const Game = {
             return;
         }
         this.isLuggageOpen = !this.isLuggageOpen;
+        if (this.isLuggageOpen && typeof audio !== 'undefined' && audio.playLuggageSuitcase) {
+            audio.playLuggageSuitcase();
+        }
         const lugEl = document.getElementById('hud-luggage');
         if (this.isLuggageOpen) {
             if (typeof audio !== 'undefined' && typeof audio.playLuggageBays === 'function') audio.playLuggageBays(true);
@@ -633,6 +787,67 @@ const Game = {
     
     ticketPrices: { tam: 15, ogrenci: 8, yasli: 0 },
 
+    // =========================================================================
+    // MAXIMUM FIREBASE KORUMA & KOTA GÜVENLİK SİSTEMİ (BULLETPROOF SHIELD)
+    // 1. İstek Hız Sınırı (Rate Limiting & Cooldown: 2500ms)
+    // 2. Akıllı Fark Kontrolü (Diff / Dirty-Check: Değişmeyen veriyi gönderme)
+    // 3. Paket Boyutu Tavanı (Payload Size Guard: Max 25 KB)
+    // 4. Sigorta Sistemi (Circuit Breaker: Hata durumunda 60sn duraklat)
+    // 5. Derin Veri Temizleme & Tip Doğrulama (Recursive Sanitization)
+    // =========================================================================
+    _firebaseSaveTimer: null,
+    _lastFirebaseWriteTime: 0,
+    _lastFirebasePayloadHash: "",
+    _firebaseCooldownMs: 2500, // En az 2.5 saniye aralıkla yaz
+    _maxPayloadBytes: 25000,   // Tek seferde en fazla 25 KB veri
+    _circuitBreaker: {
+        errorCount: 0,
+        blockedUntil: 0,
+        tripThreshold: 3,
+        cooldownDurationMs: 60000 // 3 ardışık hatada 60 saniye dinlen
+    },
+
+    // Derin Güvenlik Zırhı: Tip, Karakter, Boyut ve Derinlik Temizleyici
+    sanitizeForFirebase: function(obj, depth = 0) {
+        if (depth > 5) return null; // Derinlik sınırı (Döngüsel referans ve şişme koruması)
+        if (obj === null || obj === undefined) return null;
+        
+        // Sayı doğrulama ve mantıklı sınırlar
+        if (typeof obj === 'number') {
+            if (!Number.isFinite(obj) || Number.isNaN(obj)) return 0;
+            return Math.max(-1000000000, Math.min(1000000000, obj));
+        }
+
+        // Metin doğrulama ve uzunluk sınırı
+        if (typeof obj === 'string') {
+            // XSS / Script ve aşırı uzunluk koruması
+            return obj.replace(/[<>{}`]/g, '').trim().substring(0, 150);
+        }
+
+        if (typeof obj === 'boolean') return obj;
+
+        if (Array.isArray(obj)) {
+            // Dizi boyutu sınırı: En fazla 80 öğe
+            return obj.slice(0, 80).map(item => this.sanitizeForFirebase(item, depth + 1));
+        }
+
+        if (typeof obj === 'object') {
+            const clean = {};
+            const keys = Object.keys(obj).slice(0, 50); // En fazla 50 anahtar
+            for (const key of keys) {
+                // Firebase için geçersiz karakterleri temizle (. $ # [ ] /) ve max 40 karakter yap
+                const sanitizedKey = key.replace(/[.$#\[\]\/\s]/g, '_').substring(0, 40);
+                const val = obj[key];
+                if (val !== undefined && typeof val !== 'function' && typeof val !== 'symbol') {
+                    clean[sanitizedKey] = this.sanitizeForFirebase(val, depth + 1);
+                }
+            }
+            return clean;
+        }
+
+        return null;
+    },
+
     loadFromFirebase: function(username) {
         return new Promise((resolve) => {
             try {
@@ -644,7 +859,8 @@ const Game = {
                 }
 
                 this.username = username;
-                const ref = window.db.ref('otobus_simulasyonu/kullanicilar/' + username);
+                const cleanUser = username.replace(/[.#$\[\]\/\s]/g, '');
+                const ref = window.db.ref('otobus_simulasyonu/kullanicilar/' + cleanUser);
                 
                 let isResolved = false;
                 const timeoutId = setTimeout(() => {
@@ -653,7 +869,7 @@ const Game = {
                         console.warn("Firebase yanıt vermiyor (İnternet yavaş veya yok), yerel verilerle devam ediliyor.");
                         resolve();
                     }
-                }, 2000);
+                }, 2500);
 
                 ref.once('value').then((snapshot) => {
                     if (isResolved) return;
@@ -662,31 +878,124 @@ const Game = {
 
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        // Herkesi Seviye 1'den başlat kuralı (Global Sezon Reset)
-                        if (data.season !== 'season_level1') {
+                        if (data.season !== 'season_fresh_v2') {
                             this.licenseLevel = 1;
+                            this.playerXP = 0;
                             this.completedTasks = 0;
-                            this.playerBudget = data.playerBudget || 0;
-                            this.clockMinutes = data.clockMinutes || 480;
+                            this.playerBudget = 2500;
+                            this.clockMinutes = 480;
                             this.unlockedCities = ["Tekirdağ"];
                             this.currentCity = "Tekirdağ";
-                            this.saveData(); // Firebase bulut kaydını da Seviye 1 olarak güncelle
+                            this.activeDistrict = "Süleymanpaşa";
+                            this.activeNeighborhood = "";
+                            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.resetToDefault === 'function') {
+                                CompanySystem.resetToDefault();
+                            }
+                            if (typeof BusFleet !== 'undefined') {
+                                try {
+                                    localStorage.setItem(BusFleet.OWNED_KEY || 'tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
+                                    localStorage.setItem('selectedBusId', 'otokar_kent_lf');
+                                    if (typeof BusFleet.selectBus === 'function') BusFleet.selectBus('otokar_kent_lf');
+                                } catch(e) {}
+                            }
+                            this.saveData(true);
                         } else {
-                            this.licenseLevel = data.licenseLevel || 1;
-                            this.completedTasks = data.completedTasks || 0;
-                            this.playerBudget = data.playerBudget || 0;
-                            this.clockMinutes = data.clockMinutes || 480;
-                            this.unlockedCities = data.unlockedCities || ["Tekirdağ"];
-                            this.currentCity = data.currentCity || "Tekirdağ";
+                            // Çevrimdışı İlerleme Koruma Kalkanı: Yerel ilerleme ile bulutu akıllıca birleştir
+                            const localLevel = parseInt(localStorage.getItem('licenseLevel')) || 1;
+                            const localXP = parseInt(localStorage.getItem('playerXP')) || 0;
+                            const localTasks = parseInt(localStorage.getItem('completedTasks')) || 0;
+                            const localBudget = parseFloat(localStorage.getItem('para')) || 0;
+
+                            // Oyuncu internet yokken yeni bir şey yaptıysa ASLA kaybolmaz (En yüksek değer korunur)
+                            this.licenseLevel = Math.max(localLevel, Math.max(1, Math.min(100, parseInt(data.licenseLevel) || 1)));
+                            this.playerXP = Math.max(localXP, Math.max(0, Math.min(999999999, parseInt(data.playerXP) || 0)));
+                            this.completedTasks = Math.max(localTasks, Math.max(0, Math.min(50000, parseInt(data.completedTasks) || 0)));
+                            this.playerBudget = Math.max(localBudget, Math.max(0, Math.min(999999999, parseFloat(data.playerBudget) || 0)));
+                            this.clockMinutes = Math.max(0, Math.min(1440, parseFloat(data.clockMinutes) || 480));
+                            this.unlockedCities = Array.isArray(data.unlockedCities) ? data.unlockedCities.slice(0, 81) : ["Tekirdağ"];
+                            this.currentCity = (typeof data.currentCity === 'string') ? data.currentCity.substring(0, 30) : "Tekirdağ";
                             if (data.activeDistrict) {
-                                this.activeDistrict = data.activeDistrict;
+                                this.activeDistrict = data.activeDistrict.substring(0, 30);
                                 try { localStorage.setItem('activeDistrict', this.activeDistrict); } catch(e) {}
                             }
+                            if (data.activeNeighborhood) {
+                                this.activeNeighborhood = data.activeNeighborhood.substring(0, 40);
+                                try { localStorage.setItem('activeNeighborhood', this.activeNeighborhood); } catch(e) {}
+                            }
+                            if (data.selectedBusId) {
+                                try { localStorage.setItem('selectedBusId', data.selectedBusId.substring(0, 40)); } catch(e) {}
+                            }
+                            if (data.academyCompleted) {
+                                try { localStorage.setItem('academyCompleted', 'true'); } catch(e) {}
+                            }
+
+                            // 1. Sürücü İstatistikleri & Başarılar (DriverBadges)
+                            if (data.driverStats && typeof DriverBadges !== 'undefined' && typeof DriverBadges.getLifetimeStats === 'function') {
+                                try {
+                                    const currentStats = DriverBadges.getLifetimeStats();
+                                    const merged = Object.assign({}, currentStats, data.driverStats);
+                                    DriverBadges.saveLifetimeStats(merged);
+                                } catch(e) {
+                                    console.warn("Driver stats merge error:", e);
+                                }
+                            }
+
+                            if (data.badgesData && typeof DriverBadges !== 'undefined' && typeof DriverBadges.getBadgesData === 'function') {
+                                try {
+                                    const currentBadges = DriverBadges.getBadgesData();
+                                    const mergedBadges = Object.assign({}, currentBadges, data.badgesData);
+                                    DriverBadges.saveBadgesData(mergedBadges);
+                                } catch(e) {
+                                    console.warn("Badges merge error:", e);
+                                }
+                            }
+
+                            if (data.equippedTitle && typeof DriverBadges !== 'undefined') {
+                                try {
+                                    localStorage.setItem(DriverBadges.TITLES_KEY, data.equippedTitle);
+                                } catch(e) {}
+                            }
+
+                            // 2. Şirket Verileri (CompanySystem)
+                            if (data.companyData && typeof CompanySystem !== 'undefined') {
+                                try {
+                                    CompanySystem.data = Object.assign(CompanySystem.data || {}, data.companyData);
+                                    CompanySystem.saveData();
+                                } catch(e) {
+                                    console.warn("Company data merge error:", e);
+                                }
+                            }
+
+                            // 3. Otoyol Tesisleri ve HGS (HighwayFacilities)
+                            if (data.highwayData && typeof HighwayFacilities !== 'undefined') {
+                                try {
+                                    HighwayFacilities.data = Object.assign(HighwayFacilities.data || {}, data.highwayData);
+                                    HighwayFacilities.saveData();
+                                } catch(e) {
+                                    console.warn("Highway data merge error:", e);
+                                }
+                            }
+
+                            // 4. Durak Keşifleri (StopDiscovery)
+                            if (data.discoveredStops && typeof StopDiscovery !== 'undefined' && typeof StopDiscovery.getDiscoveredData === 'function') {
+                                try {
+                                    const currentDiscovered = StopDiscovery.getDiscoveredData();
+                                    const mergedStops = Object.assign({}, currentDiscovered, data.discoveredStops);
+                                    StopDiscovery.saveDiscoveredData(mergedStops);
+                                } catch(e) {
+                                    console.warn("Stop discovery merge error:", e);
+                                }
+                            }
+
+                            // Yerel depolamaya da tam güncel hallerini senkronize et
+                            this.saveData(false);
                         }
                     } else {
+                        // Yeni kullanıcı: İlk bulut kaydını oluştur
                         this.licenseLevel = 1;
                         this.completedTasks = 0;
-                        this.saveData(); // Yeni profil
+                        this.playerXP = 0;
+                        this.saveData(true);
                     }
                     resolve();
                 }).catch(err => {
@@ -703,60 +1012,404 @@ const Game = {
         });
     },
 
-    saveData: function() {
-        // Local fallback backup (crash-proof)
+    resetAllGameData: function(interactive = false) {
+        if (interactive) {
+            const confirmed = (typeof window !== 'undefined' && typeof window.confirm === 'function')
+                ? window.confirm(
+                    "⚠️ DİKKAT: TÜM OYUN VE ŞİRKET VERİLERİNİ SIFIRLAMA\n\n" +
+                    "Bu işlem:\n" +
+                    "• Şahsi cüzdanınızı ve tüm bakiyenizi (2.500 ₺ başlangıç harçlığına),\n" +
+                    "• Ehliyet seviyenizi Seviye 1'e ve XP'nizi 0'a,\n" +
+                    "• Tamamlanan görevleri 0'a ve açık şehirleri Tekirdağ'a,\n" +
+                    "• Satın aldığınız tüm otobüsleri silip yalnızca başlangıç aracı Otokar Kent LF'ye,\n" +
+                    "• Şirket kasasını 50.000 ₺'ye, kurum binalarını Seviye 1'e, şoförleri ve seferleri sıfıra,\n" +
+                    "• Kaptan liyakat unvanlarını, brövelerini ve otoyol tesis kayıtlarını,\n" +
+                    "TAMAMEN SİLECEK VE OYUNU SIFIRDAN BAŞLATACAKTIR.\n\n" +
+                    "Tüm verileri silip temiz başlangıç yapmak istediğinize emin misiniz?"
+                )
+                : true;
+            if (!confirmed) return false;
+        }
+
+        console.log("[Game] Tüm oyun ve şirket verileri temizleniyor...");
+
+        // 1. LocalStorage temizliği
         try {
-            localStorage.setItem('sim_season_level1', 'true');
+            if (typeof localStorage !== 'undefined') {
+                const wipeKeys = [
+                    'sim_season_level1', 'sim_season_fresh_v2', 'licenseLevel', 'driverLicenseLevel', 'playerXP',
+                    'completedTasks', 'para', 'clockMinutes', 'unlockedCities', 'merkezUs',
+                    'activeDistrict', 'activeNeighborhood', 'selectedBusId', 'academyCompleted',
+                    'gamePlayMode', 'otobusSave', 'otobusCompany', 'otobusDriverId', 'otobusPlate',
+                    'activeRoute', 'routesData', 'routeFixApplied_v1', 'tekulas_owned_buses_v1',
+                    'otobus_company_data_v2', 'otobus_company_data', 'otobus_community_companies_v1',
+                    'tekulas_driver_badges_v2', 'tekulas_driver_stats_v2', 'tekulas_driver_equipped_title_v1',
+                    'tekulas_driver_unlocked_titles_v1', 'otobus_highway_data', 'tekulas_discovered_stops_v1',
+                    'copilot_enabled'
+                ];
+                wipeKeys.forEach(k => {
+                    try { localStorage.removeItem(k); } catch(e) {}
+                });
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const k = localStorage.key(i);
+                    if (k && (/^(otobus|tekulas|sim_|route)/i.test(k))) {
+                        localStorage.removeItem(k);
+                    }
+                }
+                localStorage.setItem('wipe_all_data_20261024_v1', 'true');
+                localStorage.setItem('sim_season_fresh_v2', 'true');
+                localStorage.setItem('licenseLevel', '1');
+                localStorage.setItem('playerXP', '0');
+                localStorage.setItem('completedTasks', '0');
+                localStorage.setItem('para', '2500');
+                localStorage.setItem('clockMinutes', '480');
+                localStorage.setItem('unlockedCities', JSON.stringify(["Tekirdağ"]));
+                localStorage.setItem('merkezUs', 'Tekirdağ');
+                localStorage.setItem('activeDistrict', 'Süleymanpaşa');
+                localStorage.setItem('tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
+                localStorage.setItem('selectedBusId', 'otokar_kent_lf');
+            }
+        } catch(e) {
+            console.warn("[Game] Reset storage uyarısı:", e);
+        }
+
+        // 2. Bellekteki Game Durumunu Sıfırla
+        this.licenseLevel = 1;
+        this.playerXP = 0;
+        this.completedTasks = 0;
+        this.playerBudget = 2500;
+        this.clockMinutes = 480;
+        this.unlockedCities = ["Tekirdağ"];
+        this.currentCity = "Tekirdağ";
+        this.activeDistrict = "Süleymanpaşa";
+        this.activeNeighborhood = "";
+        this.academyCompleted = false;
+        this.playMode = 'career';
+        if (this._circuitBreaker) {
+            this._circuitBreaker = { failureCount: 0, blockedUntil: 0 };
+        }
+        this._lastFirebasePayloadHash = null;
+
+        // 3. Otobüs Filosu Sıfırlama
+        const busFleetObj = (typeof BusFleet !== 'undefined') ? BusFleet : ((typeof window !== 'undefined' && window.BusFleet) ? window.BusFleet : null);
+        if (busFleetObj) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem(busFleetObj.OWNED_KEY || 'tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
+                    localStorage.setItem('selectedBusId', 'otokar_kent_lf');
+                }
+                if (typeof busFleetObj.selectBus === 'function') {
+                    busFleetObj.selectBus('otokar_kent_lf');
+                }
+            } catch(e) {
+                console.warn("[Game] BusFleet sıfırlama uyarısı:", e);
+            }
+        }
+
+        // 4. Şirket Verisi Sıfırlama
+        const compSysObj = (typeof CompanySystem !== 'undefined') ? CompanySystem : ((typeof window !== 'undefined' && window.CompanySystem) ? window.CompanySystem : null);
+        if (compSysObj) {
+            try {
+                if (typeof compSysObj.resetToDefault === 'function') {
+                    compSysObj.resetToDefault();
+                } else if (compSysObj.data) {
+                    compSysObj.data.companyName = "Mikyas Seyahat & Turizm";
+                    compSysObj.data.foundedDate = Date.now();
+                    compSysObj.data.totalRevenue = 0;
+                    compSysObj.data.completedTripsCount = 0;
+                    compSysObj.data.companyLevel = 1;
+                    compSysObj.data.companyTreasury = 50000;
+                    compSysObj.data.revenueSharePercent = 50;
+                    compSysObj.data.cateringPackage = 'standart';
+                    compSysObj.data.institutions = {
+                        bus_garage: 1, maintenance_depot: 1, bus_wash: 1, fuel_depot: 1,
+                        terminal_offices: 1, driver_lodging: 1, catering_cargo_hub: 1
+                    };
+                    compSysObj.data.satisfactionRating = 4.9;
+                    compSysObj.data.terminalBranches = { tekirdag: true, corlu: false, istanbul_esenler: false, ankara_asti: false, izmir_otogar: false };
+                    compSysObj.data.ticketPricingMultiplier = 1.0;
+                    compSysObj.data.facilityContract = 'standart';
+                    compSysObj.data.hqUpgrades = { fuelContract: false, luxuryLounge: false, terminalPlatform: false, corporateBrand: false };
+                    compSysObj.data.busConditions = {};
+                    compSysObj.data.hiredDrivers = [];
+                    compSysObj.data.marketTrends = {};
+                    compSysObj.data.specialContracts = [];
+                    compSysObj.data.radioLogs = [];
+                    compSysObj.data.bankruptcyWarned250k = false;
+                    compSysObj.data.bankruptcyWarned750k = false;
+                    compSysObj.data.bankruptcyCount = 0;
+                    compSysObj.data.corporateEmployer = null;
+                    compSysObj.data.isIndependentMode = false;
+                    if (typeof compSysObj.saveData === 'function') compSysObj.saveData();
+                }
+            } catch(e) {
+                console.warn("[Game] CompanySystem sıfırlama uyarısı:", e);
+            }
+        }
+
+        // 5. Şoför Bröve ve İstatistik Sıfırlama
+        const driverBadgesObj = (typeof DriverBadges !== 'undefined') ? DriverBadges : ((typeof window !== 'undefined' && window.DriverBadges) ? window.DriverBadges : null);
+        if (driverBadgesObj) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem(driverBadgesObj.STORAGE_KEY || 'tekulas_driver_badges_v2', JSON.stringify({}));
+                    localStorage.setItem(driverBadgesObj.STATS_KEY || 'tekulas_driver_stats_v2', JSON.stringify({
+                        totalTrips: 0, totalKm: 0, totalPassengers: 0, maxComfortStreak: 0,
+                        nightTrips: 0, rainTrips: 0, perfectStops: 0, punctualTrips: 0,
+                        onTimeRate: 100, accidentFreeKm: 0, totalFuelSaved: 0, intercityTrips: 0, vipTrips: 0
+                    }));
+                    localStorage.setItem(driverBadgesObj.TITLES_KEY || 'tekulas_driver_equipped_title_v1', 'title_cirak');
+                    localStorage.setItem(driverBadgesObj.UNLOCKED_TITLES_KEY || 'tekulas_driver_unlocked_titles_v1', JSON.stringify(['title_cirak']));
+                }
+            } catch(e) {
+                console.warn("[Game] DriverBadges sıfırlama uyarısı:", e);
+            }
+        }
+
+        // 6. Otoyol Tesisleri ve Durak Keşifleri
+        const hwyObj = (typeof HighwayFacilities !== 'undefined') ? HighwayFacilities : ((typeof window !== 'undefined' && window.HighwayFacilities) ? window.HighwayFacilities : null);
+        if (hwyObj && hwyObj.data) {
+            try {
+                hwyObj.data = {
+                    hgsBalance: 250,
+                    visitedFacilities: {},
+                    stats: { totalSpent: 0, totalFuelLiters: 0, totalMeals: 0, totalRestMinutes: 0 }
+                };
+                if (typeof hwyObj.saveData === 'function') hwyObj.saveData();
+            } catch(e) {}
+        }
+        const stopDiscObj = (typeof StopDiscovery !== 'undefined') ? StopDiscovery : ((typeof window !== 'undefined' && window.StopDiscovery) ? window.StopDiscovery : null);
+        if (stopDiscObj) {
+            try {
+                stopDiscObj.discovered = {};
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.removeItem(stopDiscObj.STORAGE_KEY || 'tekulas_discovered_stops_v1');
+                }
+            } catch(e) {}
+        }
+
+        // 7. Buluta ve Yerel Depolamaya Sıfır Verileri Gönder
+        this.saveData(true);
+
+        // 8. Kullanıcı Arayüzü ve Sesli Bildirimler
+        if (typeof UI !== 'undefined') {
+            if (typeof UI.updatePlayerStats === 'function') {
+                const title = (typeof this.getLicenseTitle === 'function') ? this.getLicenseTitle() : 'Kaptan';
+                UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, title);
+            }
+            if (typeof UI.showToast === 'function') {
+                UI.showToast("✨ TÜM VERİLER SIFIRLANDI: Temiz kariyer ve Seviye 1 şirket hazır!", "success");
+            }
+        }
+
+        if (typeof audio !== 'undefined') {
+            if (typeof audio.playSuccess === 'function') {
+                try { audio.playSuccess(); } catch(e) {}
+            }
+            if (typeof audio.speak === 'function') {
+                audio.speak("Tüm oyun ve şirket verileri sıfırlandı. Temiz kariyer hazır.");
+            }
+        }
+
+        // Açık şirket modalı varsa yeniden çiz
+        if (compSysObj && typeof compSysObj.renderModal === 'function') {
+            const modal = (typeof document !== 'undefined') ? document.getElementById('company-system-modal') : null;
+            if (modal && !modal.classList.contains('hidden')) {
+                compSysObj.renderModal(compSysObj.currentTab || 'overview');
+            }
+        }
+
+        return true;
+    },
+
+    saveData: function(immediate = false) {
+        // 1. Yerel Kayıt (Anında ve Kesintisiz Çift Katman)
+        try {
+            localStorage.setItem('sim_season_fresh_v2', 'true');
             localStorage.setItem('licenseLevel', this.licenseLevel);
-            localStorage.setItem('playerXP', this.playerXP);
+            localStorage.setItem('playerXP', this.playerXP || 0);
             localStorage.setItem('completedTasks', this.completedTasks);
             localStorage.setItem('para', this.playerBudget);
             localStorage.setItem('clockMinutes', this.clockMinutes);
             localStorage.setItem('unlockedCities', JSON.stringify(this.unlockedCities));
             localStorage.setItem('merkezUs', this.currentCity);
             localStorage.setItem('activeDistrict', this.activeDistrict || "Süleymanpaşa");
+            if (this.activeNeighborhood) {
+                localStorage.setItem('activeNeighborhood', this.activeNeighborhood);
+            }
         } catch (storageErr) {
             console.warn("Yerel depolama kayıt uyarısı:", storageErr);
         }
 
-        // Firebase Cloud Save
-        try {
-            if (window.db && this.username) {
-                window.db.ref('otobus_simulasyonu/kullanicilar/' + this.username).set({
-                    season: 'season_level1',
-                    licenseLevel: this.licenseLevel,
-                    completedTasks: this.completedTasks,
-                    playerBudget: this.playerBudget,
-                    clockMinutes: this.clockMinutes,
-                    unlockedCities: this.unlockedCities,
-                    currentCity: this.currentCity,
-                    activeDistrict: this.activeDistrict || "Süleymanpaşa"
-                }).catch(e => {
-                    console.error("Firebase save error", e);
-                });
+        // 2. Firebase Bulut Kaydı (Maximum Koruma Kalkanı)
+        if (!window.db || !this.username) return;
+
+        // Sigorta kontrolü (Circuit Breaker): Dinlenme süresindeyse ağ isteğini durdur
+        const now = Date.now();
+        if (now < this._circuitBreaker.blockedUntil) {
+            return;
+        }
+
+        const performFirebaseSave = () => {
+            try {
+                if (!window.db || !this.username) return;
+                const cleanUser = this.username.replace(/[.#$\[\]\/\s]/g, '');
+                if (!cleanUser) return;
+
+                // Değerleri yasal sınırlar içine al (Clamping)
+                const safeLevel = Math.max(1, Math.min(100, parseInt(this.licenseLevel) || 1));
+                const safeXP = Math.max(0, Math.min(999999999, parseInt(this.playerXP) || 0));
+                const safeTasks = Math.max(0, Math.min(50000, parseInt(this.completedTasks) || 0));
+                const safeBudget = Math.max(0, Math.min(999999999, parseFloat(this.playerBudget) || 0));
+                const safeClock = Math.max(0, Math.min(1440, parseFloat(this.clockMinutes) || 480));
+
+                const payload = {
+                    season: 'season_fresh_v2',
+                    licenseLevel: safeLevel,
+                    playerXP: safeXP,
+                    completedTasks: safeTasks,
+                    playerBudget: safeBudget,
+                    clockMinutes: safeClock,
+                    unlockedCities: Array.isArray(this.unlockedCities) ? this.unlockedCities.slice(0, 81) : ["Tekirdağ"],
+                    currentCity: (this.currentCity || "Tekirdağ").substring(0, 30),
+                    activeDistrict: (this.activeDistrict || "Süleymanpaşa").substring(0, 30),
+                    activeNeighborhood: (this.activeNeighborhood || "").substring(0, 40),
+                    playMode: this.playMode || "career",
+                    selectedBusId: (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBusId) ? BusFleet.getSelectedBusId().substring(0, 40) : "otokar_sultan_mega",
+                    academyCompleted: (localStorage.getItem('academyCompleted') === 'true')
+                };
+
+                // Sürücü Ömür Boyu İstatistikleri (DriverBadges)
+                if (typeof DriverBadges !== 'undefined') {
+                    if (typeof DriverBadges.getLifetimeStats === 'function') {
+                        payload.driverStats = DriverBadges.getLifetimeStats();
+                    }
+                    if (typeof DriverBadges.getBadgesData === 'function') {
+                        payload.badgesData = DriverBadges.getBadgesData();
+                    }
+                    if (typeof DriverBadges.getEquippedTitleId === 'function') {
+                        payload.equippedTitle = DriverBadges.getEquippedTitleId();
+                    }
+                }
+
+                // Şirket Verileri (CompanySystem)
+                if (typeof CompanySystem !== 'undefined' && CompanySystem.data) {
+                    payload.companyData = {
+                        companyName: (CompanySystem.data.companyName || "Mikyas Seyahat").substring(0, 40),
+                        foundedDate: CompanySystem.data.foundedDate || Date.now(),
+                        totalRevenue: Math.max(0, Math.min(999999999, CompanySystem.data.totalRevenue || 0)),
+                        completedTripsCount: Math.max(0, Math.min(50000, CompanySystem.data.completedTripsCount || 0)),
+                        companyLevel: Math.max(1, Math.min(10, CompanySystem.data.companyLevel || 1)),
+                        companyTreasury: Math.max(-1000000, Math.min(999999999, CompanySystem.data.companyTreasury || 50000)),
+                        revenueSharePercent: Math.max(0, Math.min(100, CompanySystem.data.revenueSharePercent || 50)),
+                        cateringPackage: CompanySystem.data.cateringPackage || "standart",
+                        institutions: CompanySystem.data.institutions || {},
+                        satisfactionRating: Math.max(1.0, Math.min(5.0, CompanySystem.data.satisfactionRating || 4.9)),
+                        terminalBranches: CompanySystem.data.terminalBranches || {},
+                        ticketPricingMultiplier: CompanySystem.data.ticketPricingMultiplier || 1.0,
+                        facilityContract: CompanySystem.data.facilityContract || "standart",
+                        hqUpgrades: CompanySystem.data.hqUpgrades || {},
+                        hiredDrivers: Array.isArray(CompanySystem.data.hiredDrivers) ? CompanySystem.data.hiredDrivers.slice(0, 20) : [],
+                        bankruptcyCount: Math.max(0, CompanySystem.data.bankruptcyCount || 0),
+                        corporateEmployer: CompanySystem.data.corporateEmployer || null,
+                        isIndependentMode: !!CompanySystem.data.isIndependentMode
+                    };
+                }
+
+                // Otoyol Tesisleri ve HGS (HighwayFacilities)
+                if (typeof HighwayFacilities !== 'undefined' && HighwayFacilities.data) {
+                    payload.highwayData = {
+                        hgsBalance: Math.max(0, Math.min(100000, HighwayFacilities.data.hgsBalance || 0)),
+                        visitedFacilities: HighwayFacilities.data.visitedFacilities || {},
+                        stats: HighwayFacilities.data.stats || {}
+                    };
+                }
+
+                // Durak Keşifleri (StopDiscovery)
+                if (typeof StopDiscovery !== 'undefined' && typeof StopDiscovery.getDiscoveredData === 'function') {
+                    payload.discoveredStops = StopDiscovery.getDiscoveredData();
+                }
+
+                // Derin Temizlik Uygula
+                const cleanPayload = this.sanitizeForFirebase(payload);
+
+                // 2. Akıllı Fark Kontrolü (Diff / Dirty-Check): Veri değişmediyse Firebase yazmasını atla
+                const payloadString = JSON.stringify(cleanPayload);
+                if (payloadString === this._lastFirebasePayloadHash) {
+                    return; // Hiçbir veri değişmedi, kota harcamadan sessizce çık
+                }
+
+                // 3. Paket Boyutu Tavanı (Payload Size Guard): 25 KB'yi aşarsa engelle
+                if (payloadString.length > this._maxPayloadBytes) {
+                    console.warn("[Firebase Shield] Paket boyutu sınırı aşıldı (" + payloadString.length + " bayt), ağ yazması durduruldu.");
+                    return;
+                }
+
+                // Zaman damgası ekle
+                cleanPayload.lastSavedTimestamp = Date.now();
+
+                // Firebase'e güvenli yaz
+                window.db.ref('otobus_simulasyonu/kullanicilar/' + cleanUser).update(cleanPayload)
+                    .then(() => {
+                        this._lastFirebaseWriteTime = Date.now();
+                        this._lastFirebasePayloadHash = payloadString;
+                        this._circuitBreaker.errorCount = 0; // Başarılı yazmada hata sayacını sıfırla
+                    })
+                    .catch(e => {
+                        this._circuitBreaker.errorCount++;
+                        if (this._circuitBreaker.errorCount >= this._circuitBreaker.tripThreshold) {
+                            this._circuitBreaker.blockedUntil = Date.now() + this._circuitBreaker.cooldownDurationMs;
+                            console.warn("[Firebase Sigortası Devrede] 3 ardışık hata nedeniyle Firebase istekleri 60 saniye duraklatıldı. Yerel kayıt aktif.");
+                        }
+                    });
+            } catch (e) {
+                console.warn("[Firebase Shield] Koruma hatası yakalandı:", e);
             }
-        } catch (e) {
-            console.error("Firebase senkronizasyon hatası (Senkron denendi ama başarısız oldu)", e);
+        };
+
+        const timeSinceLastWrite = now - this._lastFirebaseWriteTime;
+
+        if (immediate && timeSinceLastWrite >= 1000) {
+            if (this._firebaseSaveTimer) clearTimeout(this._firebaseSaveTimer);
+            performFirebaseSave();
+        } else {
+            // Akıllı kuyruk: Cooldown süresi dolana kadar bekle, ardından tek seferde yaz
+            if (this._firebaseSaveTimer) clearTimeout(this._firebaseSaveTimer);
+            const delay = Math.max(800, this._firebaseCooldownMs - timeSinceLastWrite);
+            this._firebaseSaveTimer = setTimeout(performFirebaseSave, delay);
         }
     },
 
     getLicenseTitle: function() {
         let equipped = null;
         if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.getEquippedTitle === 'function') {
-            equipped = DriverBadges.getEquippedTitle();
+            try {
+                equipped = DriverBadges.getEquippedTitle();
+            } catch (e) {
+                equipped = null;
+            }
         }
-        const careerTitle = (typeof CareerMissions !== 'undefined' && CareerMissions.getLevelTitle)
-            ? CareerMissions.getLevelTitle(this.completedTasks)
-            : `${this.licenseLevel}. Seviye Şehir İçi Sürücü`;
+        const safeTasks = (typeof this.completedTasks === 'number' && !isNaN(this.completedTasks))
+            ? this.completedTasks
+            : (parseInt(localStorage.getItem('completedTasks'), 10) || 0);
+
+        const safeLevel = (typeof this.licenseLevel === 'number' && !isNaN(this.licenseLevel))
+            ? this.licenseLevel
+            : (parseInt(localStorage.getItem('driverLicenseLevel'), 10) || 1);
+
+        const careerTitle = (typeof CareerMissions !== 'undefined' && typeof CareerMissions.getLevelTitle === 'function')
+            ? (CareerMissions.getLevelTitle(safeTasks) || `${safeLevel}. Seviye Şehir İçi Sürücü`)
+            : `${safeLevel}. Seviye Şehir İçi Sürücü`;
 
         if (equipped && equipped.name && equipped.id !== 'title_cirak') {
-            return `${equipped.icon} ${equipped.name} (${careerTitle})`;
+            const icon = equipped.icon || '👑';
+            return `${icon} ${equipped.name} (${careerTitle})`;
         }
-        return careerTitle;
+        return careerTitle || `${safeLevel}. Seviye Şehir İçi Sürücü`;
     },
 
-    completeTask: function(comfortMsg, timingRewardMsg) {
-        if (!this.activeRouteId) return;
+    completeTask: function(comfortMsg, timingRewardMsg, punctualityScore = 100) {
+        if (!this.activeRouteId) return 0;
 
         const stopsCount = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops.length : 6;
         
@@ -768,19 +1421,32 @@ const Game = {
             earnedXP += 75;
             bonusDetails.push("İpek Fren & Üstün Konfor (+75 XP)");
         } else if (this.passengerComfort >= 75) {
-            earnedXP += 35;
+            earnedXP += 40;
+            bonusDetails.push("Yolcu Konfor Primi (+40 XP)");
         }
 
-        // 2. Erişilebilirlik & Engelli Rampası Primi
-        if (this.isRampDeployed || this.hasWheelchairPassengerAtStop) {
+        // 2. Dakiklik & Sefer Sadakati Primi
+        if (punctualityScore >= 90) {
+            earnedXP += 40;
+            bonusDetails.push("Dakiklik Primi (+40 XP)");
+        }
+
+        // 3. Erişilebilirlik & Engelli Rampası Primi
+        if (this.isRampDeployed || this.hasWheelchairPassengerAtStop || this.rampUsedInRoute) {
             earnedXP += 50;
             bonusDetails.push("Erişilebilirlik Primi (+50 XP)");
         }
 
-        // 3. Gece Seferi Primi
+        // 4. Gece Seferi Primi
         if (this.clockMinutes < 360 || this.clockMinutes >= 1140) {
             earnedXP += 60;
             bonusDetails.push("Gece Nöbet Primi (+60 XP)");
+        }
+
+        // 5. Şehirlerarası Sefer Primi
+        if (this.activeRouteData && this.activeRouteData.isIntercity) {
+            earnedXP += 100;
+            bonusDetails.push("Şehirlerarası Sefer Primi (+100 XP)");
         }
 
         const oldLevel = this.licenseLevel;
@@ -801,17 +1467,18 @@ const Game = {
             }
             const lvlMsg = `Tebrikler kaptan! Sefer başarıyla tamamlandı.${extraNotes} Seferden +${earnedXP} XP kazandınız ve Seviye ${newLevel}'e terfi ettiniz! Yeni unvanınız: ${this.getLicenseTitle()}.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(lvlMsg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! (${this.getLicenseTitle()})`, "success");
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! — ${this.getLicenseTitle()}`, "success");
         } else {
             const reportMsg = `Tebrikler kaptan, sefer tamamlandı.${extraNotes} Kazanılan: +${earnedXP} XP. Seviye ${this.licenseLevel + 1}'e kalan: ${remainingXP} XP.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(reportMsg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏁 Sefer Bitti: +${earnedXP} XP (Kalan: ${remainingXP} XP)`, "info");
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏁 Sefer Bitti: +${earnedXP} XP (Kalan: ${remainingXP || 0} XP)`, "info");
         }
 
         UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
 
         // WAAW! KADEMELİ SİSTEM AÇILIŞLARI VE KUTLAMA KARTI
         this.triggerProgressiveWowAnnouncement(this.completedTasks);
+        return earnedXP;
     },
 
     triggerProgressiveWowAnnouncement: function(completed) {
@@ -897,23 +1564,200 @@ const Game = {
         }
     },
 
-        addXP: function(amount) {
+    addXP: function(amount, reason = null) {
         if (!amount || amount <= 0) return;
+        const oldLevel = this.licenseLevel;
         this.playerXP = (this.playerXP || 0) + amount;
         const newLevel = this.calculateLevelFromXP(this.playerXP);
-        if (newLevel > this.licenseLevel) {
-            this.licenseLevel = newLevel;
-        }
+        this.licenseLevel = Math.max(oldLevel, newLevel);
         this.saveData();
+
+        if (newLevel > oldLevel) {
+            if (typeof audio !== 'undefined' && audio.playSuccess) {
+                try { audio.playSuccess(); } catch(e) {}
+            }
+            const lvlMsg = `Tebrikler kaptan! ${amount} tecrübe puanı kazandınız ve Seviye ${newLevel}'e terfi ettiniz! Yeni unvanınız: ${this.getLicenseTitle()}.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(lvlMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! — ${this.getLicenseTitle()}`, "success");
+            }
+            if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
+                UI.updateTitleScreenButtons();
+            }
+        }
+
         if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
             UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
         }
     },
-    addMoney: function(amount) {
-        this.playerBudget += amount;
-        this.sessionMoney += amount;
+    // --- OTOBÜS İÇİ İKRAM & MUAVİN SERVİSİ (I TUŞU) ---
+    serveCatering: function() {
+        if (!this.passengersOnBoard || this.passengersOnBoard <= 0) {
+            const noPassMsg = "Otobüste yolcu bulunmuyor. İkram servisi duraktan yolcu aldıktan sonra yapılır.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(noPassMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(noPassMsg, "info");
+            return;
+        }
+
+        const now = Date.now();
+        if (this.lastCateringTime && (now - this.lastCateringTime < 25000)) {
+            const waitSeconds = Math.ceil((25000 - (now - this.lastCateringTime)) / 1000);
+            const waitMsg = `Yolcular henüz ikramlarını bitirmedi. Yeni servis için ${waitSeconds} saniye bekleyiniz.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(waitMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(waitMsg, "info");
+            return;
+        }
+        this.lastCateringTime = now;
+
+        let compName = "Mikyas Seyahat";
+        let pkgType = "standart";
+        let pkgName = "Çay, Kahve & Taze Kek";
+        let tipBase = 35;
+        let ratingBonus = 0.1;
+
+        if (typeof CompanySystem !== 'undefined') {
+            const empId = CompanySystem.data && CompanySystem.data.corporateEmployer;
+            const empComp = empId ? CompanySystem.getCompanyById(empId) : null;
+            if (empComp) {
+                compName = empComp.name;
+                pkgType = empComp.cateringPackage || "standart";
+            } else if (CompanySystem.data) {
+                compName = CompanySystem.data.companyName || "Mikyas Seyahat";
+                pkgType = CompanySystem.data.cateringPackage || "standart";
+            }
+        }
+
+        if (pkgType === 'ekonomik') {
+            pkgName = "Sıcak Çay, Su & Kek";
+            tipBase = 20;
+        } else if (pkgType === 'vip') {
+            pkgName = "Jumbo VIP: Taze Meyve Suyu, Sıcak Sandviç & Dondurma";
+            tipBase = 70;
+            ratingBonus = 0.2;
+        }
+
+        let tipMultiplier = 1.0;
+        if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+            const cateringLvl = CompanySystem.getInstitutionLevel('catering_logistics');
+            if (cateringLvl === 2) {
+                tipMultiplier = 1.30; // +%30 bahşiş
+                ratingBonus *= 1.5;
+            } else if (cateringLvl === 3) {
+                tipMultiplier = 1.75; // +%75 bahşiş
+                ratingBonus *= 2.5;
+            }
+        }
+        const tipMoney = Math.round((tipBase + (this.passengersOnBoard * 4)) * tipMultiplier);
+        this.addMoney(tipMoney, true); // Bahşiş doğrudan kaptana kalır
+
+        if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.boostSatisfaction === 'function') {
+            CompanySystem.boostSatisfaction(ratingBonus);
+        }
+
+        if (typeof audio !== 'undefined' && typeof audio.playFullRefreshmentService === 'function') {
+            audio.playFullRefreshmentService();
+        } else if (typeof audio !== 'undefined' && typeof audio.playChime === 'function') {
+            audio.playChime();
+        }
+
+        const caterAnnouncement = `Ding-dong! Değerli yolcularımız, ${compName} ikram servisimiz başlamıştır. Muavinimiz kolonya ve ${pkgName} ikramı yapmaktadır. Afiyet olsun!`;
+        const thankMsg = `Yolcular: 'Eline sağlık muavin bey, çok makbule geçti!' Yolcular kaptana toplam +${tipMoney} ₺ bahşiş bıraktı.`;
+
+        if (typeof audio !== 'undefined' && audio.speakSequence) {
+            audio.speakSequence([caterAnnouncement, thankMsg]);
+        } else if (typeof audio !== 'undefined' && audio.speak) {
+            audio.speak(caterAnnouncement + " " + thankMsg);
+        }
+
+        if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast(`☕ ${compName || 'Şirket'} İkramı Dağıtıldı! (+${tipMoney || 0} ₺ Bahşiş)`, "success");
+        }
+
+        const passFeedback = document.getElementById('passenger-feedback');
+        if (passFeedback) {
+            passFeedback.innerText = `☕ İkram Servisi: ${pkgName || 'İkram'} dağıtıldı. (+${tipMoney || 0} ₺ Kaptan Bahşişi)`;
+            passFeedback.style.color = '#38bdf8';
+        }
+    },
+
+    // --- OTOGAR PERON HAREKET ANONSU ---
+    playTerminalDepartureAnnouncement: function() {
+        if (typeof audio !== 'undefined' && audio.playStationChime) {
+            audio.playStationChime();
+        }
+        let compName = "Mikyas Seyahat";
+        if (typeof CompanySystem !== 'undefined') {
+            const empId = CompanySystem.data && CompanySystem.data.corporateEmployer;
+            const empComp = empId ? CompanySystem.getCompanyById(empId) : null;
+            if (empComp && empComp.name) compName = empComp.name;
+            else if (CompanySystem.data && CompanySystem.data.companyName) compName = CompanySystem.data.companyName;
+        }
+        const rName = (this.activeRouteData && this.activeRouteData.name) ? this.activeRouteData.name : "Şehirlerarası Sefer";
+        const peronNo = (this.activeRouteData && this.activeRouteData.hatNo) ? parseInt(this.activeRouteData.hatNo) || 12 : 12;
+        const msg = `Dikkat lütfen! Sayın yolcularımız; ${compName} bünyesinde ${rName} seferini gerçekleştirecek olan otobüsümüz ${peronNo} numaralı perondan hareket etmek üzeredir. Biletli yolcularımızın araçtaki yerlerini almaları rica olunur. ${compName} iyi yolculuklar diler.`;
+
+        if (typeof audio !== 'undefined' && audio.playChime) audio.playChime();
+        if (typeof audio !== 'undefined' && audio.speak) {
+            setTimeout(() => audio.speak(msg), 400);
+        }
+        if (typeof UI !== 'undefined' && UI.showToast) {
+            UI.showToast(`📢 ${compName}: Peron ${peronNo} Seferi Başlıyor!`, "info");
+        }
+    },
+
+    addMoney: function(amount, isDirect = false) {
+        if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
+            return { captainShare: 0, companyShare: 0, companySharePercent: 50, totalFare: 0 };
+        }
+
+        if (isDirect) {
+            this.playerBudget += amount;
+            this.sessionMoney += amount;
+            this.saveData();
+            if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
+                UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+            }
+            return { captainShare: amount, companyShare: 0, companySharePercent: 0, totalFare: amount };
+        }
+
+        // Hasılat Paylaşım Oranını Belirle (Varsayılan %50 Şirkete Aktarılır, %50 Kaptana Kalır - Serbestçe Ayarlanabilir)
+        let sharePercent = 50;
+        if (typeof CompanySystem !== 'undefined') {
+            const empId = CompanySystem.data && CompanySystem.data.corporateEmployer;
+            if (empId) {
+                const comp = CompanySystem.getCompanyById(empId);
+                if (comp && typeof comp.companySharePercent === 'number') {
+                    sharePercent = comp.companySharePercent;
+                } else if (CompanySystem.data && typeof CompanySystem.data.revenueSharePercent === 'number') {
+                    sharePercent = CompanySystem.data.revenueSharePercent;
+                }
+            } else if (CompanySystem.data && typeof CompanySystem.data.revenueSharePercent === 'number') {
+                sharePercent = CompanySystem.data.revenueSharePercent;
+            }
+        }
+
+        // %50 Şirket Kasasına Aktar, %50 Kaptan Cüzdanında Kalsın
+        const companyShare = Math.round(amount * (sharePercent / 100));
+        const captainShare = amount - companyShare;
+
+        this.playerBudget += captainShare;
+        this.sessionMoney += captainShare;
         this.saveData();
-        UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+
+        if (companyShare > 0 && typeof CompanySystem !== 'undefined' && typeof CompanySystem.addCompanyRevenue === 'function') {
+            CompanySystem.addCompanyRevenue(companyShare);
+        }
+
+        if (typeof UI !== 'undefined' && typeof UI.updatePlayerStats === 'function') {
+            UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+        }
+
+        return {
+            captainShare: captainShare,
+            companyShare: companyShare,
+            companySharePercent: sharePercent,
+            totalFare: amount
+        };
     },
 
     deductMoney: function(amount) {
@@ -997,7 +1841,7 @@ const Game = {
         return { allowed: true };
     },
 
-    startRoute: function(routeId) {
+    startRoute: function(routeId, isResume = false) {
         // Akademi otomatik onayı
         this.academyCompleted = true;
         try { localStorage.setItem('academyCompleted', 'true'); } catch(e) {}
@@ -1032,13 +1876,41 @@ const Game = {
         }
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
+        this.completedTunnels = [];
+        this.completedBridges = [];
+        this.activeRealTunnel = null;
+        this.activeRealBridge = null;
+        this.currentAltitude = 10;
+        this.currentSlopePct = 0.0;
+        const arriveBusSprite = document.getElementById('bus-sprite');
+        if (arriveBusSprite) arriveBusSprite.style.transform = 'translateX(-50%) rotate(0deg)';
+        const arriveLaneCont = document.querySelector('.lane-container');
+        if (arriveLaneCont) arriveLaneCont.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
+        if (typeof audio !== 'undefined' && typeof audio.stopTireScreech === 'function') audio.stopTireScreech();
+        this.fuelTankCapacity = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
+        if (this.currentFuelLiters === undefined || this.currentFuelLiters <= 0) {
+            this.currentFuelLiters = this.fuelTankCapacity;
+        } else if (this.currentFuelLiters > this.fuelTankCapacity) {
+            this.currentFuelLiters = this.fuelTankCapacity;
+        }
+        this.fuelWarned15 = false;
+        this.fuelWarned5 = false;
         this.totalDrivingSeconds = 0;
         this.activeRouteData = routesData[routeId];
         this.passengerComfort = 100;
         this.stopRequestBellTriggered = false;
+        if (this.currentStopIndex === 0 && !isResume && !this.terminalAnnouncedForRoute) {
+            this.terminalAnnouncedForRoute = true;
+            this.playTerminalDepartureAnnouncement();
+        }
         this.lastRecordedSpeed = 0;
         this.lastHarshBrakeWarningTime = 0;
         this.isRampDeployed = false;
+        this.rampUsedInRoute = false;
+        this.rampsUsedCountInRoute = 0;
+        this.retarderUsedInRoute = false;
+        this.retarderUsesCountInRoute = 0;
+        this.totalPassengersBoardedInRoute = 0;
         this.isLuggageOpen = false;
         this.hasLostItemFound = false;
         this.lastFoundLostItem = null;
@@ -1059,7 +1931,14 @@ const Game = {
             const hNo = (this.activeRouteData.hatNo || "26").toUpperCase();
             const sSt = this.activeRouteData.startStop || (this.activeRouteData.stops[0] ? this.activeRouteData.stops[0].name : "MERKEZ");
             const eSt = this.activeRouteData.endStop || (this.activeRouteData.stops[this.activeRouteData.stops.length - 1] ? this.activeRouteData.stops[this.activeRouteData.stops.length - 1].name : "VARIŞ");
-            ibisTextEl.innerText = `[${hNo}] ${sSt} ➔ ${eSt}`;
+            let activeCompName = "MİKYAS TURİZM";
+            if (typeof CompanySystem !== 'undefined') {
+                const empId = CompanySystem.data && CompanySystem.data.corporateEmployer;
+                const empComp = empId ? CompanySystem.getCompanyById(empId) : null;
+                if (empComp && empComp.name) activeCompName = empComp.name.toUpperCase();
+                else if (CompanySystem.data && CompanySystem.data.companyName) activeCompName = CompanySystem.data.companyName.toUpperCase();
+            }
+            ibisTextEl.innerText = `👑 ${activeCompName} | [${hNo}] ${sSt} ➔ ${eSt}`;
         }
         const bellHudInit = document.getElementById('hud-stop-request');
         if (bellHudInit) bellHudInit.style.display = 'none';
@@ -1477,7 +2356,13 @@ const Game = {
             this.hierarchicalBeepPlayed = false;
             
             const nextStopEl = document.getElementById('hud-next-stop');
-            if (nextStopEl) nextStopEl.innerText = `${nextStop.name} (${this.currentStopIndex + 1}/${this.activeRouteData.stops.length})`;
+            if (nextStopEl) {
+                const nextStopName = nextStop ? nextStop.name : 'Sıradaki Durak';
+                const totalStopsCount = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops.length : 1;
+                nextStopEl.innerText = `${nextStopName} (${(this.currentStopIndex || 0) + 1}/${totalStopsCount})`;
+            }
+            this.currentLegTotalDistance = this.currentDistanceToNext || 850;
+            this.currentLegDistanceCovered = 0;
             return;
         }
 
@@ -1574,8 +2459,21 @@ const Game = {
                             }
                         }
                         
+                        // TÜRKİYE GERÇEK YOL GEOMETRİSİ VİRAJ ÇIKARIMI (OSRM Polyline Açı Analizi)
+                        if (typeof TurkeyCurvesEngine !== 'undefined') {
+                            const realCurves = TurkeyCurvesEngine.extractCurvesFromCoordinates(coords, routeDist, {
+                                city: this.currentCity,
+                                routeData: this.activeRouteData,
+                                currentStop: nextStop,
+                                prevStop: prevStop
+                            });
+                            if (realCurves && realCurves.length > 0) {
+                                this.upcomingTurns = realCurves;
+                            }
+                        }
+
                         if (typeof UI !== 'undefined' && document.getElementById('garage-screen').classList.contains('hidden')) {
-                            UI.showToast("Gerçek yol oluşturuldu!", "success");
+                            UI.showToast("Gerçek yol ve virajlar oluşturuldu!", "success");
                         }
                     } else {
                         this.currentDistanceToNext = fallbackDistance;
@@ -1597,8 +2495,44 @@ const Game = {
             this.routeBumps = this.savedState && this.savedState.routeBumps ? this.savedState.routeBumps : [];
         }
 
-        // --- YENİ: Etkileşimli Navigasyon Dönüş Noktaları ---
-        this.upcomingTurns = [];
+        this.currentLegTotalDistance = this.currentDistanceToNext || 1000;
+        this.currentLegDistanceCovered = 0;
+
+        // Gerçek KGM Tünel ve Köprü Kontrolü (Sadece rota koridorunda varsa)
+        if (typeof TurkeyGeographyEngine !== 'undefined') {
+            const rName = this.activeRouteData ? (this.activeRouteData.name || "") : "";
+            const fromStopName = prevStop ? prevStop.name : "";
+            const toStopName = nextStop ? nextStop.name : "";
+
+            const realTun = TurkeyGeographyEngine.getTunnelForRoute(this.currentCity, rName, fromStopName, toStopName);
+            if (realTun && (!this.completedTunnels || !this.completedTunnels.includes(realTun.id))) {
+                this.activeRealTunnel = realTun;
+                this.tunnelDistance = Math.max(300, Math.round(this.currentDistanceToNext * 0.4));
+            } else {
+                this.activeRealTunnel = null;
+                this.tunnelDistance = null;
+            }
+
+            const realBrd = TurkeyGeographyEngine.getBridgeForRoute(this.currentCity, rName, fromStopName, toStopName);
+            if (realBrd && (!this.completedBridges || !this.completedBridges.includes(realBrd.id))) {
+                this.activeRealBridge = realBrd;
+                this.bridgeDistance = Math.max(250, Math.round(this.currentDistanceToNext * 0.3));
+            } else {
+                this.activeRealBridge = null;
+                this.bridgeDistance = null;
+            }
+        }
+
+        // --- TÜRKİYE KARAYOLLARI GERÇEK VİRAJ VE DAĞ GEÇİTLERİ SİSTEMİ ---
+        if (typeof TurkeyCurvesEngine !== 'undefined' && (!this.upcomingTurns || this.upcomingTurns.length === 0)) {
+            this.upcomingTurns = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext, {
+                currentStop: nextStop,
+                prevStop: prevStop
+            });
+        }
+        if (!this.upcomingTurns || this.upcomingTurns.length === 0) {
+            this.upcomingTurns = [];
+        }
         let numTurns = Math.floor(this.currentDistanceToNext / 1500);
         if (numTurns > 3) numTurns = 3;
         
@@ -1652,7 +2586,12 @@ const Game = {
         // Uzaklığa göre büyükten küçüğe sırala
         this.upcomingTurns.sort((a,b) => b.distance - a.distance);
 
-        document.getElementById('hud-next-stop').innerText = `${nextStop.name} (${this.currentStopIndex + 1}/${this.activeRouteData.stops.length})`;
+        const hudNextStopEl = document.getElementById('hud-next-stop');
+        if (hudNextStopEl) {
+            const nextStopName = nextStop ? nextStop.name : 'Sıradaki Durak';
+            const totalStopsCount = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops.length : 1;
+            hudNextStopEl.innerText = `${nextStopName} (${(this.currentStopIndex || 0) + 1}/${totalStopsCount})`;
+        }
         const activeBusObj = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
         const totalBusCap = activeBusObj ? activeBusObj.totalCapacity : (this.activeRouteData ? this.activeRouteData.otobusKapasitesi : 40);
         document.getElementById('hud-passengers').innerText = `${this.passengersOnBoard} / ${totalBusCap}`;
@@ -1698,27 +2637,27 @@ const Game = {
         const traveled = (this.speed / 3.6) * deltaTime; // Metre cinsinden kat edilen yol
         const totalDist = this.totalDistanceCovered || 0;
 
-        // 1. TÜNELLER VE YANKI SİSTEMİ (Her 7.5 - 9 km'de bir)
-        if (this.tunnelDistance === null && !this.isInsideTunnel && (totalDist - this.lastTunnelSpawnDist >= 7500)) {
-            this.lastTunnelSpawnDist = totalDist;
-            this.tunnelDistance = 250; // 250 metre ileride tünel
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak("250 metre ileride tünel var, farlarınızı açınız (F tuşu).");
-            }
-        }
+        // 1. TÜRKİYE KARAYOLLARI RESMÎ TÜNEL GEÇİŞLERİ (SADECE GERÇEK KORİDORDA VARSA)
         if (this.tunnelDistance !== null && !this.isInsideTunnel) {
             this.tunnelDistance -= traveled;
             if (this.tunnelDistance <= 0) {
                 this.isInsideTunnel = true;
                 this.tunnelDistance = null;
-                this.tunnelLengthRemaining = 450; // 450 metrelik tünel
+                const tunnelData = this.activeRealTunnel;
+                const tunnelLen = tunnelData ? tunnelData.length : 1200;
+                const tunnelName = tunnelData ? tunnelData.name : "Karayolu Tüneli";
+                this.tunnelLengthRemaining = tunnelLen;
+
                 if (typeof audio !== 'undefined') {
                     if (audio.setTunnelMode) audio.setTunnelMode(true);
-                    if (audio.speak) audio.speak("Tünele girildi.");
+                    if (audio.speak) audio.speak(`${tunnelName} girişine ulaşıldı. Tünel uzunluğu ${tunnelLen} metre. Farlarınızı açık tutunuz.`);
+                }
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast(`🚇 ${tunnelName || 'Tünel'} (${tunnelLen || 0} m)`, "info");
                 }
                 if (!this.isHeadlightsOn) {
                     setTimeout(() => {
-                        if (this.isInsideTunnel && !this.isHeadlightsOn && typeof audio.speak === 'function') {
+                        if (this.isInsideTunnel && !this.isHeadlightsOn && typeof audio !== 'undefined' && typeof audio.speak === 'function') {
                             audio.speak("Tünel karanlık, lütfen F tuşuna basarak farları açınız.");
                         }
                     }, 2500);
@@ -1728,6 +2667,11 @@ const Game = {
             this.tunnelLengthRemaining -= traveled;
             if (this.tunnelLengthRemaining <= 0) {
                 this.isInsideTunnel = false;
+                if (this.activeRealTunnel) {
+                    if (!this.completedTunnels) this.completedTunnels = [];
+                    this.completedTunnels.push(this.activeRealTunnel.id);
+                    this.activeRealTunnel = null;
+                }
                 if (typeof audio !== 'undefined') {
                     if (audio.setTunnelMode) audio.setTunnelMode(false);
                     if (audio.speak) audio.speak("Tünelden çıkıldı, açık hava.");
@@ -1735,37 +2679,46 @@ const Game = {
             }
         }
 
-        // 2. KÖPRÜLER / VİYADÜKLER VE ÇELİK DERZ VURUNTULARI (Her 5 - 6 km'de bir)
-        if (this.bridgeDistance === null && !this.isInsideBridge && (totalDist - this.lastBridgeSpawnDist >= 5200)) {
-            this.lastBridgeSpawnDist = totalDist;
-            this.bridgeDistance = 200;
-        }
+        // 2. TÜRKİYE KARAYOLLARI RESMÎ ASMA KÖPRÜ VE VİYADÜK GEÇİŞLERİ (SADECE GERÇEK KORİDORDA VARSA)
         if (this.bridgeDistance !== null && !this.isInsideBridge) {
             this.bridgeDistance -= traveled;
             if (this.bridgeDistance <= 0) {
                 this.isInsideBridge = true;
                 this.bridgeDistance = null;
-                this.bridgeLengthRemaining = 380; // 380 metrelik viyadük köprüsü
+                const bridgeData = this.activeRealBridge;
+                const bridgeLen = bridgeData ? bridgeData.length : 1000;
+                const bridgeName = bridgeData ? bridgeData.name : "Karayolu Viyadüğü";
+                this.bridgeLengthRemaining = bridgeLen;
                 this.bridgeJointTraveled = 0;
+
                 if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Viyadük köprüsüne girildi. Yan rüzgara dikkat ediniz.");
+                    audio.speak(`${bridgeName} geçişi başladı. Uzunluk ${bridgeLen} metre. Şiddetli yan rüzgara dikkat ediniz.`);
+                }
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast(`🌉 ${bridgeName || 'Köprü'} (${bridgeLen || 0} m)`, "info");
                 }
             }
         } else if (this.isInsideBridge) {
             this.bridgeLengthRemaining -= traveled;
             this.bridgeJointTraveled += traveled;
-            // Her 35 metrede bir gerçekçi çelik derz vuruntusu (tak-tak, tak-tak)
+            // Her 35 metrede bir gerçekçi çelik derz genleşme vuruntusu (tak-tak)
             if (this.bridgeJointTraveled >= 35) {
                 this.bridgeJointTraveled = 0;
                 if (typeof audio !== 'undefined' && audio.playBridgeJoint) {
                     audio.playBridgeJoint(this.speed);
                 }
             }
-            // Köprüde hafif yan rüzgar savrulması (direksiyon hissi)
-            this.driftVelocity += (Math.sin(totalDist / 50) * 1.5) * deltaTime;
+            // Köprüde şiddetli yan rüzgar savrulması (direksiyon hissi)
+            const windStrength = (this.activeRealBridge && this.activeRealBridge.crosswindIntensity) ? this.activeRealBridge.crosswindIntensity : 2.5;
+            this.driftVelocity += (Math.sin(totalDist / 45) * windStrength) * deltaTime;
 
             if (this.bridgeLengthRemaining <= 0) {
                 this.isInsideBridge = false;
+                if (this.activeRealBridge) {
+                    if (!this.completedBridges) this.completedBridges = [];
+                    this.completedBridges.push(this.activeRealBridge.id);
+                    this.activeRealBridge = null;
+                }
                 if (typeof audio !== 'undefined' && audio.speak) {
                     audio.speak("Köprü geçildi.");
                 }
@@ -1864,8 +2817,13 @@ const Game = {
             if (this.trafficLightDistance <= 0) {
                 if (this.trafficLightState === 'red' && this.speed > 15) {
                     // Kırmızıda geçildi
-                    this.money = Math.max(0, (this.money || 100) - 150);
+                    this.playerBudget = Math.max(0, (this.playerBudget || 0) - 150);
+                    this.sessionPenalties = (this.sessionPenalties || 0) + 150;
                     this.passengerComfort = Math.max(20, (this.passengerComfort || 90) - 15);
+                    this.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+                    }
                     if (typeof audio !== 'undefined' && audio.speak) {
                         audio.speak("DİKKAT: Kırmızı ışıkta geçtiniz! Yüz elli lira trafik cezası kesildi.");
                     }
@@ -2088,30 +3046,25 @@ const Game = {
                 // Zaman aşıldığında dönüşü diziden çıkar ki sonsuza kadar kalmasın
                 this.upcomingTurns.shift();
                 
-                // Yeni bir dönüş hesapla ve başa ekle (rota yeniden hesaplandığı için)
+                // Rota yeniden hesaplandı: Türkiye karayolları otantik virajı ekle
                 if (this.currentDistanceToNext > 500) {
-                    const directions = [
-                        { dir: "tam sağa", req: 100 },
-                        { dir: "hafif sağa", req: 50 },
-                        { dir: "tam sola", req: 100 },
-                        { dir: "hafif sola", req: 50 },
-                        { dir: "kavşaktan tam sağa dönün", req: 150, special: true }
-                    ];
-                    const randType = directions[Math.floor(Math.random() * directions.length)];
-                    const newTurnDist = this.currentDistanceToNext - (300 + Math.random() * 200); // 300-500 metre sonra
-                    
-                    const newMilestones = [300, 100].filter(m => m < (this.currentDistanceToNext - newTurnDist) - 50);
-                    
-                    this.upcomingTurns.unshift({
-                        distance: newTurnDist,
-                        direction: randType.dir,
-                        requiredProgress: randType.req,
-                        isSpecial: randType.special || false,
-                        state: "approaching",
-                        currentProgress: 0,
-                        milestones: newMilestones,
-                        lastWarningTime: 0
-                    });
+                    if (typeof TurkeyCurvesEngine !== 'undefined') {
+                        const fallbackCurves = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext);
+                        if (fallbackCurves && fallbackCurves.length > 0) {
+                            this.upcomingTurns.unshift(fallbackCurves[0]);
+                        }
+                    } else {
+                        const newTurnDist = this.currentDistanceToNext - (300 + Math.random() * 200);
+                        this.upcomingTurns.unshift({
+                            distance: newTurnDist,
+                            direction: "hafif sağa",
+                            requiredProgress: 80,
+                            state: "approaching",
+                            currentProgress: 0,
+                            milestones: [250, 0],
+                            lastWarningTime: 0
+                        });
+                    }
                 }
             } 
             else if (currentTurn.state === "approaching") {
@@ -2133,31 +3086,19 @@ const Game = {
                     if (typeof audio.playNavChime === 'function') audio.playNavChime();
                     
                     if (triggeredMilestone === 0) {
-                        const nowVariants = [
-                            `Şimdi ${currentTurn.direction} dönün.`,
-                            `Lütfen şimdi ${currentTurn.direction} dönün.`,
-                            `Buradan ${currentTurn.direction} dönün.`
-                        ];
-                        let speechText = currentTurn.isSpecial ? 
-                            `Şimdi ${currentTurn.direction}` : 
-                            nowVariants[Math.floor(Math.random() * nowVariants.length)];
+                        let speechText = currentTurn.isRealTurkeyCurve
+                            ? (currentTurn.speechWarning || `Şimdi ${currentTurn.name || currentTurn.direction} dönün. Gazı dengeli tutun.`)
+                            : (currentTurn.isSpecial ? `Şimdi ${currentTurn.direction}` : `Şimdi ${currentTurn.direction} dönün.`);
                         
-                        setTimeout(() => audio.speak(speechText), 400); // Chime'dan hemen sonra
+                        setTimeout(() => audio.speak(speechText), 400);
                         
                         currentTurn.state = "waiting";
                         currentTurn.lastWarningTime = currentTime;
                     } else {
                         let distText = triggeredMilestone === 1000 ? "1 kilometre" : `${triggeredMilestone} metre`;
-                        
-                        const distVariants = [
-                            `${distText} sonra ${currentTurn.direction} dönün.`,
-                            `Lütfen ${distText} sonra ${currentTurn.direction} yönelin.`,
-                            `İlerideki kavşaktan, ${distText} sonra ${currentTurn.direction} dönün.`,
-                            `${distText} ileriden ${currentTurn.direction} sapın.`
-                        ];
-                        let speechText = currentTurn.isSpecial ? 
-                            `${distText} sonra ${currentTurn.direction}` : 
-                            distVariants[Math.floor(Math.random() * distVariants.length)];
+                        let speechText = currentTurn.isRealTurkeyCurve
+                            ? `${distText} sonra ${currentTurn.name || currentTurn.direction}. Tavsiye edilen azami hız ${currentTurn.advisorySpeed || 50} kilometre.`
+                            : (currentTurn.isSpecial ? `${distText} sonra ${currentTurn.direction}` : `${distText} sonra ${currentTurn.direction} dönün.`);
                             
                         setTimeout(() => audio.speak(speechText), 400);
                     }
@@ -2171,39 +3112,106 @@ const Game = {
                         this.upcomingTurns.shift();
                     }
                 } else {
-                    // YENİ: Viraj (Yol Kıvrımı) Fiziği
-                    let curveSpeed = 25; // Viraj savurma kuvveti
-                    
-                    if (currentTurn.direction.includes("sağa")) {
-                        this.roadCurvature = -curveSpeed; // Sağa viraj, sola savurur
-                    } else if (currentTurn.direction.includes("sola")) {
-                        this.roadCurvature = curveSpeed; // Sola viraj, sağa savurur
-                    } else if (currentTurn.direction === "U dönüşü yapın") {
-                        this.roadCurvature = -curveSpeed * 1.5; 
+                    // TÜRKİYE KARAYOLLARI GERÇEK VİRAJ FİZİĞİ & MERKEZKAÇ DİNAMİĞİ
+                    let baseIntensity = currentTurn.curveIntensity || 25;
+                    let isTurnRight = currentTurn.isRight !== undefined ? currentTurn.isRight : currentTurn.direction.includes("sağa");
+                    let dirMultiplier = isTurnRight ? -1 : 1; // Sağa virajda merkezkaç sola savurur (-), sola virajda sağa (+)
+                    if (currentTurn.direction && currentTurn.direction.includes("u dönüşü")) {
+                        dirMultiplier = -1.5;
                     }
+                    this.roadCurvature = baseIntensity * dirMultiplier;
                     
                     // Araç hareket ettiği sürece virajı dönmüş (ilerlemiş) sayılır
                     if (this.speed > 5) {
-                        currentTurn.currentProgress += (this.speed / 3.6) * deltaTime * 5; // Hıza bağlı ilerleme (Hızlandırıldı)
+                        currentTurn.currentProgress += (this.speed / 3.6) * deltaTime * 5;
                     }
                     
-                    document.getElementById('nav-feedback').innerText = `Viraj Dönülüyor... %${Math.min(100, Math.floor((currentTurn.currentProgress/currentTurn.requiredProgress)*100))}`;
-                    document.getElementById('nav-feedback').style.color = '#eab308';
+                    // Fiziksel değerlendirme (G-Kuvveti, Kasa Yatma, Savrulma, Lastik Sesi, Yolcu Tepkisi)
+                    let evalRes = { gForce: 0, bodyRollDeg: 0, isOverSpeed: false, screechIntensity: 0, comfortImpact: 0, passengerState: 'normal' };
+                    if (typeof TurkeyCurvesEngine !== 'undefined') {
+                        evalRes = TurkeyCurvesEngine.evaluateDrivingCurve(this.speed, currentTurn, this.steeringAngle);
+                    }
                     
-                    // SESLİ GERİBİLDİRİM: Araç virajı dönerken hızına bağlı olarak 300ms'de bir "tık" sesi çal (kör oyuncuya virajda olduğunu hatırlatır)
+                    // Görsel efektler: Otobüs kasasının yatması (Body Roll) ve Yolun kıvrılması (Perspective Skew)
+                    const busSprite = document.getElementById('bus-sprite');
+                    if (busSprite) {
+                        busSprite.style.transform = `translateX(-50%) rotate(${evalRes.bodyRollDeg || 0}deg)`;
+                    }
+                    const laneContainer = document.querySelector('.lane-container');
+                    if (laneContainer) {
+                        let skewAngle = Math.max(-10, Math.min(10, -dirMultiplier * (baseIntensity * 0.2)));
+                        laneContainer.style.transform = `translateX(-50%) rotateX(60deg) skewX(${skewAngle}deg)`;
+                    }
+
+                    // HUD Göstergesi: Gerçek viraj adı, hız tavsiyesi, G-kuvveti ve ilerleme
+                    const navFeedbackEl = document.getElementById('nav-feedback');
+                    if (navFeedbackEl) {
+                        const pct = Math.min(100, Math.floor((currentTurn.currentProgress / currentTurn.requiredProgress) * 100));
+                        const speedColor = evalRes.isOverSpeed ? '#ef4444' : '#eab308';
+                        const curveSign = currentTurn.passSign || `⚠️ ${currentTurn.name || currentTurn.direction}`;
+                        navFeedbackEl.innerHTML = `<span style="color: ${speedColor};">${curveSign} [${currentTurn.advisorySpeed || 50} km/s] | ${evalRes.gForce.toFixed(2)}G (%${pct})</span>`;
+                    }
+                    
+                    // SESLİ GERİBİLDİRİM: Kör oyuncular için stereofonik tık sesi (virajın yönüne göre sağ/sol kulaklıkta çalar)
                     if (!currentTurn.lastTickTime || currentTime > currentTurn.lastTickTime + 300) {
-                        if (this.speed > 5) audio.playTurnTick();
+                        if (this.speed > 5 && typeof audio.playTurnTick === 'function') {
+                            const panVal = currentTurn.pan !== undefined ? currentTurn.pan : (isTurnRight ? 0.70 : -0.70);
+                            audio.playTurnTick(panVal);
+                        }
                         currentTurn.lastTickTime = currentTime;
+                    }
+
+                    // AŞIRI HIZ VE MERKEZKAÇ ETKİLERİ: Lastik çığlığı, konfor kaybı ve yolcu tepkisi
+                    if (evalRes.isOverSpeed && this.speed > 25) {
+                        currentTurn.hadExcessiveOverspeed = true;
+                        currentTurn.isScreeching = true;
+                        if (typeof audio.playTireScreech === 'function') {
+                            audio.playTireScreech(evalRes.screechIntensity);
+                        }
+                        if (typeof this.passengerComfort === 'number') {
+                            this.passengerComfort = Math.max(10, this.passengerComfort + (evalRes.comfortImpact * deltaTime * 8));
+                        }
+                        if (evalRes.passengerState === 'panic' && (!currentTurn.lastPanicTime || currentTime > currentTurn.lastPanicTime + 6000)) {
+                            if (typeof audio.playPassengerShock === 'function') audio.playPassengerShock();
+                            if (typeof audio.speak === 'function') audio.speak("Kaptan yavaş, viraj çok sert savuruyor!");
+                            currentTurn.lastPanicTime = currentTime;
+                        } else if (evalRes.passengerState === 'murmur' && (!currentTurn.lastMurmurTime || currentTime > currentTurn.lastMurmurTime + 8000)) {
+                            if (typeof audio.playPassengerDiscontent === 'function') audio.playPassengerDiscontent();
+                            currentTurn.lastMurmurTime = currentTime;
+                        }
+                    } else if (currentTurn.isScreeching) {
+                        currentTurn.isScreeching = false;
+                        if (typeof audio.stopTireScreech === 'function') {
+                            audio.stopTireScreech();
+                        }
                     }
                     
                     if (currentTurn.currentProgress >= currentTurn.requiredProgress) {
-                        let turnDelta = 0;
-                        const turnDir = (currentTurn.direction || "").toLowerCase();
-                        if (turnDir.includes("tam sağa") || turnDir.includes("sağa dönün")) turnDelta = 90;
-                        else if (turnDir.includes("hafif sağa")) turnDelta = 45;
-                        else if (turnDir.includes("tam sola") || turnDir.includes("sola dönün")) turnDelta = -90;
-                        else if (turnDir.includes("hafif sola")) turnDelta = -45;
-                        else if (turnDir.includes("u dönüşü")) turnDelta = 180;
+                        // Viraj başarıyla tamamlandı
+                        if (busSprite) busSprite.style.transform = 'translateX(-50%) rotate(0deg)';
+                        if (laneContainer) laneContainer.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
+                        if (currentTurn.isScreeching) {
+                            currentTurn.isScreeching = false;
+                            if (typeof audio.stopTireScreech === 'function') {
+                                audio.stopTireScreech();
+                            }
+                        }
+
+                        if (!currentTurn.hadExcessiveOverspeed && typeof this.passengerComfort === 'number') {
+                            this.passengerComfort = Math.min(100, this.passengerComfort + 1.2); // Temiz viraj bonusu
+                        }
+
+                        let turnDelta = currentTurn.angleDelta || 0;
+                        if (!turnDelta) {
+                            const turnDir = (currentTurn.direction || "").toLowerCase();
+                            if (turnDir.includes("tam sağa") || turnDir.includes("sağa dönün")) turnDelta = 90;
+                            else if (turnDir.includes("hafif sağa") || turnDir.includes("tatlı sağ")) turnDelta = 45;
+                            else if (turnDir.includes("tam sola") || turnDir.includes("sola dönün")) turnDelta = -90;
+                            else if (turnDir.includes("hafif sola") || turnDir.includes("tatlı sol")) turnDelta = -45;
+                            else if (turnDir.includes("saç tokası sağa")) turnDelta = 120;
+                            else if (turnDir.includes("saç tokası sola")) turnDelta = -120;
+                            else if (turnDir.includes("u dönüşü")) turnDelta = 180;
+                        }
 
                         let newHeadingName = "";
                         if (typeof CompassSystem !== 'undefined' && turnDelta !== 0) {
@@ -2220,18 +3228,18 @@ const Game = {
                             newHeadingName = card.name;
                         }
 
+                        const cName = currentTurn.name || "Viraj";
                         const turnMsg = newHeadingName 
-                            ? `Dönüş tamamlandı. Yeni istikamet ${newHeadingName}. Şimdi devam edin.`
-                            : "Dönüş tamamlandı, şimdi devam edin.";
+                            ? `${cName} tamamlandı. Yeni istikamet ${newHeadingName}. Şimdi devam edin.`
+                            : `${cName} başarıyla geçildi, şimdi devam edin.`;
                         audio.speak(turnMsg);
-                        const navFeedbackEl = document.getElementById('nav-feedback');
                         if (navFeedbackEl) {
-                            navFeedbackEl.innerText = newHeadingName ? `Dönüş Başarılı! (${newHeadingName})` : "Dönüş Başarılı!";
+                            navFeedbackEl.innerText = `${cName} Başarılı! ${newHeadingName ? '(' + newHeadingName + ')' : ''}`;
                             navFeedbackEl.style.color = '#22c55e'; // Green
                         }
                         setTimeout(() => {
                             const el = document.getElementById('nav-feedback');
-                            if (el && el.innerText.includes("Dönüş Başarılı")) {
+                            if (el && el.innerText.includes("Başarılı")) {
                                 el.innerText = "";
                             }
                         }, 3000);
@@ -2255,8 +3263,10 @@ const Game = {
                 }
             }
         }
-        // EĞİTİM MODU KORUMASI: Basınç asla kritik seviyeye (85 PSI altına) düşmez, imdat freni kilitlenmez
-        this.airPressure = Math.max(85, this.airPressure);
+        // Eğitim Modu Koruması: Eğitim seferinde basınç 85 altına inmez
+        if (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) {
+            this.airPressure = Math.max(85, this.airPressure);
+        }
         
         let isBraking = (this.keys.s || this.keys.arrowdown);
         
@@ -2267,22 +3277,24 @@ const Game = {
         
         if (isBraking) {
             if (!this.isBrakeKeyDown) {
-                // Eğitim Modu: Havalı fren sesi çalar, ceza/tahliye kilitlenmesi yaşanmaz
-                this.airPressure = Math.max(85, this.airPressure - 1);
+                const minPressure = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
+                this.airPressure = Math.max(minPressure, this.airPressure - 3);
                 this.isBrakeKeyDown = true;
                 audio.playBrakeRelease(); // Tıss
                 
-                // Retarder (Motor Freni) Etkisi: 30 km/s'den hızlıysak ve imdat kilitli değilse
-                if (this.speed > 30 && !this.isEmergencyBrakeLocked && typeof audio.playRetarder === 'function') {
+                // Ayak freni retarder takviyesi (Eğer manuel retarder zaten çekili değilse)
+                if (this.speed > 30 && !this.isEmergencyBrakeLocked && (!this.retarderLevel || this.retarderLevel === 0) && typeof audio.playRetarder === 'function') {
                     audio.playRetarder(5, this.speed);
-                    this.retarderUsedInRoute = true; // 5 saniyelik retarder simülasyonu
+                    this.retarderUsedInRoute = true;
+                    this.retarderUsesCountInRoute = (this.retarderUsesCountInRoute || 0) + 1;
                 }
             }
             // Gerçek otobüslerde frene basılı tutmak havayı tüketmez, sadece basıp bırakmak tüketir!
         } else {
             if (this.isBrakeKeyDown) {
                 this.isBrakeKeyDown = false;
-                if (typeof audio.stopRetarder === 'function') {
+                // Ayak freni bırakıldığında, eğer MANUEL retarder kolu çekili değilse retarder sesini kapat
+                if ((!this.retarderLevel || this.retarderLevel === 0) && typeof audio.stopRetarder === 'function') {
                     audio.stopRetarder();
                 }
             }
@@ -2326,14 +3338,27 @@ const Game = {
             this.keys.arrowup = false;
         }
         
-                // BUG FIX: Gerçek otobüslerde kapılar açıkken gaza basamazsın (Kapı Fren İnterlok Sistemi)
+                // BUG FIX: Gerçek otobüslerde kapılar veya rampa/bagaj açıkken gaza basamazsın (Kapı Fren İnterlok Sistemi)
         // AYRICA: Çekici üzerindeyken gaz verilmesini engelle
         let canAccelerate = true;
-        if (this.frontDoorOpen || this.rearDoorOpen) {
+        if (this.frontDoorOpen || this.rearDoorOpen || this.isRampDeployed || this.isLuggageOpen) {
             canAccelerate = false;
         }
         if (this.isBeingTowed) {
             canAccelerate = false;
+        }
+
+        // Kapılar veya rampa açıkken gaza basılırsa sürücüye sesli ikaz ver
+        if (!canAccelerate && (this.keys.w || this.keys.arrowup)) {
+            const now = performance.now();
+            if (!this.lastInterlockWarnTime || now - this.lastInterlockWarnTime > 3500) {
+                this.lastInterlockWarnTime = now;
+                const reason = (this.frontDoorOpen || this.rearDoorOpen) 
+                    ? "Kapılar açıkken emniyet kilidi devrededir, gaz verilemez."
+                    : (this.isRampDeployed ? "Engelli rampası açıkken araç hareket edemez." : "Bagaj kapakları açıkken gaz verilemez.");
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(reason);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 Emniyet Kilidi: " + reason, "warning");
+            }
         }
 
         // KARAYOLU GERÇEKÇİ ÇEVRE VE YOL UNSURLARI DÖNGÜSÜ
@@ -2376,6 +3401,11 @@ const Game = {
                     if (this.isBrakeKeyDown) baseBrake = -14.5;
                     if (this.isEmergencyBrakeLocked) baseBrake = -28.0;
                     
+                    // Balata şişmesi (Brake Fade) verimlilik kaybı (260°C üzerinde %35'e kadar düşer)
+                    if (typeof this.brakeEfficiency === 'number') {
+                        baseBrake *= this.brakeEfficiency;
+                    }
+
                     // Islak yol ve yağmur milimetresine göre fren mesafesi ve tutunma kaybı:
                     if (this.weather === 'rainy' && this.rainMmPerHour > 0) {
                         const rainGripFactor = Math.max(0.72, 1.0 - (this.rainMmPerHour * 0.016));
@@ -2510,6 +3540,59 @@ const Game = {
 
         let prevSpeed = this.speed;
         this.speed += currentAcceleration * deltaTime;
+
+        // --- TÜRKİYE TOPOĞRAFYASI: EĞİM YERÇEKİMİ FİZİĞİ & RAKIM HESABI ---
+        if (typeof TurkeyGeographyEngine !== 'undefined') {
+            const fromStop = (this.currentStopIndex > 0 && this.activeRouteData?.stops) ? this.activeRouteData.stops[this.currentStopIndex - 1] : null;
+            const toStop = (this.activeRouteData?.stops) ? this.activeRouteData.stops[this.currentStopIndex] : null;
+            const rName = this.activeRouteData ? (this.activeRouteData.name || "") : "";
+            
+            const totalLegDist = Math.max(100, this.currentLegTotalDistance || 1000);
+            const remainingLegDist = Math.max(0, this.currentDistanceToNext || 0);
+            const legProgress = Math.min(1.0, Math.max(0.0, 1.0 - (remainingLegDist / totalLegDist)));
+
+            const incData = TurkeyGeographyEngine.getInclineForSegment(this.currentCity, fromStop, toStop, legProgress, rName);
+            this.currentAltitude = incData.altitude;
+            this.currentSlopePct = incData.slopePct;
+
+            const isFootBraking = (this.keys.s || this.keys.arrowdown || this.isBrakeKeyDown);
+            const retarderLevel = (this.retarderLevel && this.retarderLevel > 0) ? this.retarderLevel : ((this.isBrakeKeyDown && this.speed > 30) ? 3 : 0);
+            const incPhys = TurkeyGeographyEngine.calculateInclinePhysics(this.speed, this.currentSlopePct, deltaTime, isFootBraking, retarderLevel);
+            this.brakeEfficiency = incPhys.brakeEfficiency || 1.0;
+
+            // Manuel Retarder Frenleme Kuvveti (Kademeli Hidrolik Şanzıman Freni)
+            if (this.retarderLevel > 0 && this.speed > 8) {
+                const retarderDecel = (this.retarderLevel * 1.6) * deltaTime;
+                const maxRetarderDecel = Math.max(0, this.speed - 8);
+                this.speed -= Math.min(retarderDecel, maxRetarderDecel);
+            }
+
+            // Eğim yerçekimi ivmesi (Newton: F = m*g*sin(theta))
+            // İnişte araç hızlanır, tırmanışta hız keser
+            if (this.speed > 0 || incPhys.speedDelta > 0) {
+                this.speed += incPhys.speedDelta;
+            }
+
+            // Balata aşırı ısınma ve fren şişmesi uyarısı
+            if (incPhys.isBrakeOverheated && (currentTime - (this.lastBrakeWarnTime || 0) > 8000)) {
+                this.lastBrakeWarnTime = currentTime;
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Dikkat! Sürekli ayak freni yapmaktan balatalar aşırı ısındı. Retarder kullanarak motor freni yapınız!");
+                }
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast(`⚠️ Balata Sıcaklığı ${incPhys.brakeTemperature}°C! Fren Şişti, Retarder Kullanın!`, "warning");
+                }
+            }
+
+            // Canlı HUD Rakım ve Eğim Gösterimi
+            const altEl = document.getElementById('hud-altitude-text');
+            if (altEl) {
+                const slopeSign = (this.currentSlopePct > 0) ? `+ % ${this.currentSlopePct} Tırmanış` : (this.currentSlopePct < 0) ? `- % ${Math.abs(this.currentSlopePct)} İniş` : `%0 Düz`;
+                const passTag = incData.passName ? ` • ${incData.passName}` : "";
+                const safeAlt = (typeof this.currentAltitude === 'number' && !isNaN(this.currentAltitude)) ? this.currentAltitude : 0;
+                altEl.innerText = `Rakım: ${safeAlt} m (${slopeSign}${passTag})`;
+            }
+        }
         if (this.speed > currentMaxSpeed && this.acceleration > 0) {
             this.speed -= 10 * deltaTime; // Yavaşça limite çek
         }
@@ -2520,8 +3603,8 @@ const Game = {
             this.speed = 0;
         }
         
-        // BUG FIX: Otomatik Retarder Kapatma (Hız 10'un altına düşerse motor freni devreden çıkar)
-        if (this.speed < 10 && this.isBrakeKeyDown && typeof audio.stopRetarder === 'function') {
+        // Otomatik Retarder Kapatma (Hız 8'in altına düşerse türbin uğultusu devreden çıkar)
+        if (this.speed < 8 && typeof audio.stopRetarder === 'function') {
             audio.stopRetarder();
         }
 
@@ -2564,6 +3647,18 @@ const Game = {
         if (typeof audio.updateWeatherSound === 'function') audio.updateWeatherSound(this.speed, this.weather);
 
         document.getElementById('hud-speed').innerText = Math.floor(this.speed);
+        // Canlı Yakıt HUD Göstergesi
+        const hudFuelVal = document.getElementById('hud-fuel-val');
+        if (hudFuelVal) {
+            const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
+            const curFuel = (this.currentFuelLiters !== undefined) ? this.currentFuelLiters : cap;
+            const liters = Math.max(0, Math.floor(curFuel));
+            const pct = Math.max(0, Math.min(100, Math.floor((curFuel / cap) * 100)));
+            hudFuelVal.innerText = `%${pct} (${liters} L)`;
+            if (pct > 30) hudFuelVal.style.color = '#4ade80';
+            else if (pct > 15) hudFuelVal.style.color = '#facc15';
+            else hudFuelVal.style.color = '#ef4444';
+        }
         if (typeof AkilliSistem !== 'undefined' && AkilliSistem.onCoPilotUpdate) {
             AkilliSistem.onCoPilotUpdate(this);
         }
@@ -2650,17 +3745,79 @@ const Game = {
             if (this.currentDistanceToNext <= 95 && !this.stopApproachAnnounced && this.speed > 4) {
                 this.stopApproachAnnounced = true;
                 const isFinalStop = this.activeRouteData && this.activeRouteData.stops && (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
-                const nextStop = this.activeRouteData.stops[this.currentStopIndex];
+                const nextStop = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops[this.currentStopIndex] : null;
+                const stopName = nextStop ? nextStop.name : 'Sıradaki Durak';
                 if (typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
-                    audio.playBusAnnouncement('approach', nextStop.name, { isFinal: isFinalStop });
+                    audio.playBusAnnouncement('approach', stopName, { isFinal: isFinalStop });
                 } else if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                    audio.speak(`${nextStop.name} durağına yaklaşıyorsunuz. İnecek yolcular lütfen hazırlansın.`);
+                    audio.speak(`${stopName} durağına yaklaşıyorsunuz. İnecek yolcular lütfen hazırlansın.`);
                 }
             }
             const distanceScale = 1.0; // 1:1 Gerçek Fizik (Metre / Saniye)
             const distanceCovered = (this.speed / 3.6) * deltaTime * distanceScale; 
             this.currentDistanceToNext -= distanceCovered;
-            this.totalDistanceCovered += distanceCovered; // 3D Ses uzayı için ilerleme kaydı
+            this.totalDistanceCovered += distanceCovered;
+
+            // Dinamik Yakıt Tüketim Fiziği
+            if (this.engineStarted || (typeof audio !== 'undefined' && audio.isEngineRunning)) {
+                const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
+                if (this.currentFuelLiters === undefined) this.currentFuelLiters = cap;
+                
+                if (this.speed > 0) {
+                    const distKm = (this.speed / 3600) * deltaTime;
+                    const consRate = (typeof this.getFuelConsumptionPer100km === 'function') ? this.getFuelConsumptionPer100km() : 30;
+                    let throttleFactor = 1.0;
+                    const hasRetarder = (this.isRetarderActive || (this.retarderLevel && this.retarderLevel > 0));
+                    if (hasRetarder && !this.keys.w && !this.keys.arrowup) {
+                        throttleFactor = 0.05; // Retarder devredeyken enjeksiyon kesme (Sıfıra yakın tüketim)
+                    } else if (!this.keys.w && !this.keys.arrowup) {
+                        throttleFactor = 0.2; // Gazsız süzülme
+                    }
+                    const passCount = this.passengersOnBoard || 0;
+                    let loadFactor = 1.0 + (passCount * 0.003);
+                    if (this.currentSlopePct > 0) {
+                        loadFactor *= (1.0 + (this.currentSlopePct * 0.12)); // Her %1 eğim motor yakıt tüketimini %12 artırır
+                    }
+                    const burned = distKm * (consRate / 100) * throttleFactor * loadFactor;
+                    this.currentFuelLiters = Math.max(0, this.currentFuelLiters - burned);
+                } else {
+                    // Rölanti yakıt tüketimi
+                    const idleBurn = 0.00065 * deltaTime;
+                    this.currentFuelLiters = Math.max(0, this.currentFuelLiters - idleBurn);
+                }
+
+                const currentPct = Math.floor((this.currentFuelLiters / cap) * 100);
+
+                // Düşük yakıt ikazları
+                if (currentPct <= 15 && currentPct > 5 && !this.fuelWarned15) {
+                    this.fuelWarned15 = true;
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Dikkat! Yakıt seviyesi kritik, yüzde 15 kaldı. En yakın tesisten mazot alınız.");
+                    }
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast("⛽ Düşük Yakıt Uyarısı (%15)", "warning");
+                    }
+                } else if (currentPct <= 5 && currentPct > 0 && !this.fuelWarned5) {
+                    this.fuelWarned5 = true;
+                    if (typeof audio !== 'undefined' && audio.speak) {
+                        audio.speak("Acil ikaz! Yakıt tükenmek üzere, sadece yüzde 5 kaldı!");
+                    }
+                    if (typeof UI !== 'undefined' && UI.showToast) {
+                        UI.showToast("🚨 Acil: Yakıt Tükeniyor (%5)", "error");
+                    }
+                } else if (this.currentFuelLiters <= 0 && this.engineStarted) {
+                    this.engineStarted = false;
+                    this.isDriving = false;
+                    this.speed = 0;
+                    this.acceleration = 0;
+                    if (typeof audio !== 'undefined' && typeof audio.stopEngine === 'function') {
+                        audio.stopEngine();
+                    }
+                    const stallMsg = "Yakıtınız tamamen tükendi! Motor durdu. İlerlemek için Tesis (J) menüsünden veya çekici yardımıyla yakıt alınız.";
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(stallMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⚠️ Yakıt Bitti! Motor Durdu", "error");
+                }
+            } // 3D Ses uzayı için ilerleme kaydı
             
             if (this.currentDistanceToNext <= 0) {
                 // BUG FIX: Çekici sanayiye götürürken normal durak mantığı çalışmamalı!
@@ -2745,7 +3902,11 @@ const Game = {
         if (this.isDriving && deltaTime > 0) {
             const decel = (this.lastRecordedSpeed - this.speed) / deltaTime;
             // Eğitim aşamasında sert fren yapılsa dahi ceza verilmez; taban %90 altına inmez
-            if (decel > 30 && this.speed > 30) {
+            if (decel > 28 && this.speed > 25) {
+                // Yolcuların sert frende savrulma ve ani şok/çığlık tepkisi
+                if (this.passengersOnBoard > 0 && typeof audio !== 'undefined' && audio.playPassengerShock) {
+                    audio.playPassengerShock();
+                }
                 const curBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                 const rigidity = (curBus && curBus.chassisRigidity) ? curBus.chassisRigidity : 70;
                 const brakeDeduct = 0.5 * Math.max(0.4, 1.0 - (((rigidity - 60) / 40) * 0.55));
@@ -2814,6 +3975,11 @@ const Game = {
             
             if (this.kasisDistance <= 0) {
                 // Kasisten geçiş anı
+                if (this.speed > 35) { // Kasise hızlı girildiğinde yolcuların sarsılma iniltisi
+                    if (this.passengersOnBoard > 0 && typeof audio !== 'undefined' && audio.playPassengerBump) {
+                        audio.playPassengerBump();
+                    }
+                }
                 if (this.speed > 45) { // 45 km/h kasis hız limiti
                     // Hız aşımına bağlı deterministik hasar formülü
                     const excess = this.speed - 45;
@@ -2836,6 +4002,19 @@ const Game = {
             }
         }
         
+        // Durakta veya Işıkta Uzun Bekleme Homurtusu (Sabırsızlık & Bıkkınlık)
+        if (this.isDriving && this.speed === 0 && this.passengersOnBoard > 0) {
+            this.stationaryWaitTimer = (this.stationaryWaitTimer || 0) + deltaTime;
+            if (this.stationaryWaitTimer > 28) { // 28 saniyeden fazla durulursa
+                this.stationaryWaitTimer = 0;
+                if (typeof audio !== 'undefined' && audio.playPassengerGroan) {
+                    audio.playPassengerGroan();
+                }
+            }
+        } else {
+            this.stationaryWaitTimer = 0;
+        }
+
         // Egzoz Koptuysa Sürtünme ve Motor Sesi Kontrolü
         if (this.busDamage.exhaust >= 100) {
             if (typeof audio.stopExhaustWarning === 'function') audio.stopExhaustWarning();
@@ -2886,7 +4065,9 @@ const Game = {
         
         if (document.getElementById('hud-temp')) {
             const rainInfo = (this.weather === 'rainy' && this.rainMmPerHour > 0) ? ` | 🌧️ ${this.rainMmPerHour} mm/s` : '';
-            document.getElementById('hud-temp').innerText = `${Math.floor(this.busTemperature)}°C (Dış: ${this.temperature}°C)${this.isACOn && !isAnyWindowOpen ? ' [AC]' : ''}${rainInfo}`;
+            const safeBusTemp = (typeof this.busTemperature === 'number' && !isNaN(this.busTemperature)) ? Math.floor(this.busTemperature) : 22;
+            const safeOutTemp = (typeof this.temperature === 'number' && !isNaN(this.temperature)) ? this.temperature : 18;
+            document.getElementById('hud-temp').innerText = `${safeBusTemp}°C (Dış: ${safeOutTemp}°C)${this.isACOn && !isAnyWindowOpen ? ' [AC]' : ''}${rainInfo}`;
         }
 
         // Yolcu Sıcaklık Tepkileri (Tolerans Sistemi)
@@ -2928,11 +4109,38 @@ const Game = {
             }
         }
         
+        // Yolcu Doğal Kabin Mırıltısı ve Homurdanma Kontrolü
+        if (typeof audio !== 'undefined') {
+            if (audio.updatePassengerCabinMurmur) {
+                audio.updatePassengerCabinMurmur(this.passengersOnBoard, this.isDriving);
+            }
+            if (audio.updateCrowdAmbience) {
+                audio.updateCrowdAmbience(this.passengersOnBoard, this.frontDoorOpen || this.rearDoorOpen, !this.isDriving);
+            }
+            // Konfor %65'in altına düşerse arka sıralardan memnuniyetsiz homurdanmalar yükselir
+            if (this.passengersOnBoard > 0 && this.passengerComfort < 65 && audio.playPassengerDiscontent) {
+                audio.playPassengerDiscontent();
+            }
+            // Ağır vasıta geri vites ikaz düdüğü (Araç dururken veya geri vitesteyken S / Aşağı tuşuna basılıysa)
+            if (this.isDriving && this.speed === 0 && (this.keys.s || this.keys.arrowdown)) {
+                if (audio.startReverseBeep) audio.startReverseBeep();
+            } else if (this.speed > 0 || this.keys.w || this.keys.arrowup || !this.isDriving) {
+                if (audio.stopReverseBeep) audio.stopReverseBeep();
+            }
+        }
+
         // Yayalar (NPC) - Sürekli devrede (Çekicideyken DE çalışır, trafik akar)
         this.spawnAndMoveNPCs(deltaTime);
 
         // Yağmurlu/Karlı havada camda su damlaları veya kar efekti (Silecek mantığı)
         if (this.weather === 'rainy' || this.weather === 'snowy') {
+            this.thunderTimer = (this.thunderTimer || 0) + deltaTime;
+            if (this.weather === 'rainy' && this.thunderTimer > 35) { // Her 35-40 saniyede bir uzaktan gök gürültüsü
+                this.thunderTimer = 0;
+                if (typeof audio !== 'undefined' && audio.playThunderclap) {
+                    audio.playThunderclap();
+                }
+            }
             if (audio.isWiperOn) {
                 document.getElementById('weather-overlay').style.opacity = '0';
             } else {
@@ -3187,6 +4395,16 @@ const Game = {
                     // KİNETİK ENERJİ HASAR FORMÜLÜ: Hasar = v^2 / 110 (Rastgelelik sıfırlandı)
                     let damageAmount = Math.max(5, Math.min(100, Math.round(Math.pow(this.speed, 2) / 110)));
                     
+                    // Garaj ve Filo Sahası Koruması (Kapalı Hangar, Güvenlik Kameraları ve Çevre Aydınlatması)
+                    if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                        const garageLvl = CompanySystem.getInstitutionLevel('bus_garage');
+                        if (garageLvl === 2) {
+                            damageAmount = Math.max(3, Math.round(damageAmount * 0.75)); // %25 Yıpranma Azalımı
+                        } else if (garageLvl >= 3) {
+                            damageAmount = Math.max(2, Math.round(damageAmount * 0.50)); // %50 Yıpranma Azalımı (Kapalı Lojistik Hangar Koruması)
+                        }
+                    }
+                    
                     let oldHealth = this.busDamage.health;
                     this.busDamage.health -= damageAmount;
                     this.busDamage.health = Math.max(0, this.busDamage.health);
@@ -3402,7 +4620,8 @@ const Game = {
         // PAS GEÇME MANTIĞI: İnecek veya binecek yoksa, eğitim modu değilse ve son durak değilse durmadan geç
         if (!isTrainingEmpty && !isFinalStop && alighting === 0 && waiting === 0) {
             this.currentStopIndex++;
-            audio.speakSequence([stopData.name + " durağını geçiyorsunuz.", "Yolcu olmadığı için duraklanmadı.", "Yeni rota hesaplanıyor."]);
+            const passedStopName = (stopData && stopData.name) ? stopData.name : 'Mevcut Durak';
+            audio.speakSequence([passedStopName + " durağını geçiyorsunuz.", "Yolcu olmadığı için duraklanmadı.", "Yeni rota hesaplanıyor."]);
             
             // Eğer varsa geçmiş UI uyarılarını temizle
             if (document.getElementById('obstacles-container')) {
@@ -3447,6 +4666,7 @@ const Game = {
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(rampNotice);
         }
 
+        this.rampXPAwardedThisStop = false;
         this.isDriving = false;
         if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
         this.speed = 0;
@@ -3504,9 +4724,7 @@ const Game = {
         }
         
         UI.switchScreen('stop-screen');
-        
-        // Oto-kalkış bekleme durumunda
-        this.checkAutoDepart();
+        // Durağa varış tamamlandı; kapılar henüz açılmadı. Kalkış işlemi yolcular binip kapılar kapandıktan sonra tetiklenir.
     },
 
     checkAutoDepart: function() {
@@ -3581,6 +4799,7 @@ const Game = {
             if (typeof audio !== 'undefined' && typeof audio.playSuccess === 'function') audio.playSuccess();
 
             this.passengersOnBoard++;
+            this.totalPassengersBoardedInRoute = (this.totalPassengersBoardedInRoute || 0) + 1;
             this.addMoney(60);
             this.addXP(30);
             this.runningPassengerBonusCount = (this.runningPassengerBonusCount || 0) + 1;
@@ -3607,8 +4826,9 @@ const Game = {
             return;
         }
 
-        // Havalı kapı açma (Eğitim Modu: Basınç güvenli seviyede tutulur)
-        this.airPressure = Math.max(85, this.airPressure - 2);
+        // Havalı kapı açma
+        const minAirF = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
+        this.airPressure = Math.max(minAirF, this.airPressure - 2);
         
         this.frontDoorOpen = !this.frontDoorOpen;
         const btn = document.getElementById('btn-front-door');
@@ -3770,6 +4990,7 @@ const Game = {
         if (allowed) {
             // İzin verildi (Gönlü Zengin Kaptan)
             this.passengersOnBoard++;
+            this.totalPassengersBoardedInRoute = (this.totalPassengersBoardedInRoute || 0) + 1;
             this.addMoney(50);
             this.addXP(25);
             this.kindnessBonusCount = (this.kindnessBonusCount || 0) + 1;
@@ -3832,8 +5053,9 @@ const Game = {
             UI.showToast("Güvenlik Kilidi: Kapılar kilitli!", "error");
             return;
         }
-        // Arka kapı pnömatik (Eğitim Modu: Basınç güvenli seviyede tutulur)
-        this.airPressure = Math.max(85, this.airPressure - 2);
+        // Arka kapı pnömatik
+        const minAirR = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
+        this.airPressure = Math.max(minAirR, this.airPressure - 2);
         
         this.rearDoorOpen = !this.rearDoorOpen;
         const btn = document.getElementById('btn-rear-door');
@@ -3868,15 +5090,27 @@ const Game = {
         }
         
         let fare = this.ticketPrices[pType];
+        let pricingMult = 1.0;
+        if (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.ticketPricingMultiplier) {
+            pricingMult = CompanySystem.data.ticketPricingMultiplier;
+        }
         const cityName = this.activeRouteData.sehir;
         if (sehirRotalari[cityName] && sehirRotalari[cityName].ucretler) {
-            fare = sehirRotalari[cityName].ucretler[pType];
+            let fareTicketMult = 1.0;
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const fareTicketLvl = CompanySystem.getInstitutionLevel('ticketing_network');
+                if (fareTicketLvl === 2) fareTicketMult = 1.15;
+                else if (fareTicketLvl === 3) fareTicketMult = 1.35;
+            }
+            fare = Math.round(sehirRotalari[cityName].ucretler[pType] * pricingMult * fareTicketMult);
         }
         
+        let splitRes = null;
         if (pType !== "yasli") {
-            this.addMoney(fare);
+            splitRes = this.addMoney(fare);
         }
         this.passengersOnBoard++;
+        this.totalPassengersBoardedInRoute = (this.totalPassengersBoardedInRoute || 0) + 1;
         
         if (typeof audio !== 'undefined' && typeof audio.playValidatorSound === 'function') {
             audio.playValidatorSound(pType);
@@ -3885,7 +5119,11 @@ const Game = {
         }
         
         let label = pType === "tam" ? "Tam" : (pType === "ogrenci" ? "Öğrenci" : "Serbest");
-        document.getElementById('passenger-feedback').innerText = `${label} basıldı. ${fare > 0 ? fare + ' â‚º alındı.' : 'Ücretsiz geçiş.'}`;
+        if (fare > 0 && splitRes && splitRes.companyShare > 0) {
+            document.getElementById('passenger-feedback').innerText = `${label} basıldı. ${fare} ₺ (%${splitRes.companySharePercent} Şirket: ${splitRes.companyShare} ₺, Kaptan: ${splitRes.captainShare} ₺).`;
+        } else {
+            document.getElementById('passenger-feedback').innerText = `${label} basıldı. ${fare > 0 ? fare + ' ₺ alındı.' : 'Ücretsiz geçiş.'}`;
+        }
         document.getElementById('passenger-feedback').style.color = 'var(--secondary)';
         
         if (!isStanding) {
@@ -3914,8 +5152,59 @@ const Game = {
         this.activeNPCs = [];
         
         if (isSuccess) {
+            // 7. Lojistik ve İkram Deposu (Catering & Cargo Hub) & Paket Kargo
+            let cargoBaseCount = 4 + Math.floor(Math.random() * 5); // Temel 4-8 koli
+            let cargoPerPkg = 140; // Koli başı 140 TL
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const cargoHubLvl = Math.max(CompanySystem.getInstitutionLevel('catering_cargo_hub'), CompanySystem.getInstitutionLevel('catering_logistics'));
+                if (cargoHubLvl === 2) {
+                    cargoBaseCount = 8 + Math.floor(Math.random() * 7); // 8-14 koli (Soğuk Hava Depolu & Yükleme Rampası)
+                } else if (cargoHubLvl >= 3) {
+                    cargoBaseCount = 15 + Math.floor(Math.random() * 9); // 15-23 koli (Mega Dağıtım Merkezi)
+                    cargoPerPkg = 160; // VIP Hızlı Kargo primi
+                }
+            }
+            const cargoPackagesCount = cargoBaseCount;
+            let cargoEarnings = cargoPackagesCount * cargoPerPkg;
+            let agencyNote = "";
+
+            if (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.terminalBranches) {
+                // Eğer acente modeli ise %12 acente payı kesilir
+                const currentCityKey = (this.currentCity || '').toLowerCase().replace(/[^a-z]/g, '');
+                const branchObj = Object.values(CompanySystem.data.terminalBranches).find(b => typeof b === 'object');
+                if (branchObj && branchObj.type === 'agency') {
+                    const agencyCommission = Math.round(cargoEarnings * 0.12);
+                    cargoEarnings -= agencyCommission;
+                    agencyNote = " (%12 F1 Bayi komisyonu düşüldü)";
+                }
+            }
+
+            this.addMoney(cargoEarnings, true);
+            if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'cargo', 'Otogar Emanet Kargo (' + cargoPackagesCount + ' Koli)', cargoEarnings);
+            const cargoMsg = `📦 Otogar Yazıhanesi Emanet & Paket Kargo: ${cargoPackagesCount} koli teslim edildi (+${cargoEarnings.toLocaleString('tr-TR')} ₺)${agencyNote}.`;
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(cargoMsg, 'success');
+            // Şirket Dinlenme Tesisi Seferi Temettüsü
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const termOfficeLvl = Math.max(CompanySystem.getInstitutionLevel('terminal_offices'), CompanySystem.getInstitutionLevel('highway_resort'));
+                let finishDiv = 0;
+                if (termOfficeLvl === 2) finishDiv = 1500;
+                else if (termOfficeLvl >= 3) finishDiv = 3500;
+                if (finishDiv > 0) {
+                    this.addMoney(finishDiv, true);
+                    if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'dividends', 'Otogar Yazıhane & Bekleme Salonu Kâr Payı', finishDiv);
+                    const divMsg = `🏢 Otogar Yazıhanesi & VIP Salon kâr payı: +${finishDiv.toLocaleString('tr-TR')} ₺ aktarıldı!`;
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(divMsg, 'success');
+                }
+            }
+
             let comfortBonus = 0;
             let comfortMsg = "";
+            // 3. Otobüs Yıkama İstasyonu (Bus Wash) Etkisi
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const washLvl = CompanySystem.getInstitutionLevel('bus_wash');
+                if (washLvl === 2) this.passengerComfort = Math.min(100, (this.passengerComfort || 70) + 10);
+                else if (washLvl >= 3) this.passengerComfort = Math.min(100, (this.passengerComfort || 70) + 20);
+            }
             if (this.passengerComfort >= 80) {
                 const curBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                 const tipBonusPct = (curBus && curBus.tipBonusPercent) ? curBus.tipBonusPercent : 0;
@@ -3923,9 +5212,9 @@ const Game = {
                 const tipBonusAmt = Math.round(baseBonus * (tipBonusPct / 100));
                 comfortBonus = baseBonus + tipBonusAmt;
                 this.addMoney(comfortBonus);
-                this.addXP(40);
-                const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${curBus.brand} Lüks Kabin Bonusu)` : "";
-                comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote} ve 40 tecrübe puanı kazandınız.`;
+                if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'tips', 'Yolcu Konfor & Bahşiş Primi', comfortBonus);
+                const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${(curBus && curBus.brand) || 'Otobüs'} Lüks Kabin Bonusu)` : "";
+                comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote}.`;
             }
             
             const resComfort = document.getElementById('res-comfort');
@@ -3944,36 +5233,50 @@ const Game = {
             let timingRewardMsg = "";
             if (punctualityScore >= 90) {
                 this.addMoney(150);
-                this.addXP(40);
-                timingRewardMsg = " Sefer saatine yüksek sadakat ve dakiklik primi: 150 Lira ve 40 tecrübe puanı kazandınız.";
+                timingRewardMsg = " Sefer saatine yüksek sadakat ve dakiklik primi: 150 Lira.";
             }
 
             // Sesli anons ve sonuç raporu completeTask tarafından tek seferde okunur
             
             if (this.activeRouteData && this.activeRouteData.isIntercity) {
-                this.unlockCity(this.activeRouteData.destCity);
-                if (typeof UI !== 'undefined') UI.showToast(`${this.activeRouteData.destCity} Şehrinin Kilidi Açıldı!`, 'success');
+                if (this.activeRouteData.destCity) {
+                    this.unlockCity(this.activeRouteData.destCity);
+                    this.currentCity = this.activeRouteData.destCity;
+                    this.saveData();
+                    if (typeof UI !== 'undefined') UI.showToast(`${this.activeRouteData.destCity} Şehrine Ulaştınız ve Kilidi Açıldı!`, 'success');
+                }
             }
 
-            this.completeTask(comfortMsg, timingRewardMsg); // İlerlemeyi kaydet ve sonuç anonsunu yap
+            const actualEarnedXP = this.completeTask(comfortMsg, timingRewardMsg, punctualityScore); // İlerlemeyi kaydet ve sonuç anonsunu yap
 
             // ŞOFÖR LİYAKAT VE ROZET SİSTEMİ KONTROLÜ
             if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkAfterRoute === 'function') {
+                const curBusActive = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
+                    ? BusFleet.getSelectedBus() 
+                    : (this.selectedBus || null);
+                const punctualityBonus = (punctualityScore >= 90) ? 150 : 0;
                 const routeStats = {
                     isSuccess: true,
                     punctualityScore: punctualityScore,
                     passengerComfort: this.passengerComfort,
                     busHealth: (this.busDamage && typeof this.busDamage.health === 'number') ? this.busDamage.health : 100,
                     rampUsed: !!this.rampUsedInRoute,
+                    rampsUsedCount: this.rampsUsedCountInRoute || (this.rampUsedInRoute ? 1 : 0),
                     lostItemFound: !!this.hasLostItemFound,
                     isNight: !!this.isNight,
                     isHeadlightsOn: !!this.isHeadlightsOn,
                     completedTasks: this.completedTasks,
                     totalDrivingSeconds: this.totalDrivingSeconds || 0,
                     retarderUsed: !!this.retarderUsedInRoute,
-                    selectedBus: this.selectedBus,
+                    retarderUsesCount: this.retarderUsesCountInRoute || (this.retarderUsedInRoute ? 1 : 0),
+                    selectedBus: curBusActive,
+                    earnedXP: actualEarnedXP,
+                    earnedMoney: cargoEarnings + (comfortBonus || 0) + (finishDiv || 0) + punctualityBonus + (this.sessionMoney || 0),
+                    routeDistanceKm: (this.activeRouteData && this.activeRouteData.totalDistanceKm) ? this.activeRouteData.totalDistanceKm : Math.max(1, Math.round((this.totalDistanceCovered || 8000) / 1000)),
                     isIntercity: !!(this.activeRouteData && this.activeRouteData.isIntercity),
-                    unlockedCitiesCount: (this.unlockedCities && Array.isArray(this.unlockedCities)) ? this.unlockedCities.length : 1
+                    unlockedCitiesCount: (this.unlockedCities && Array.isArray(this.unlockedCities)) ? this.unlockedCities.length : 1,
+                    passengersCarried: this.totalPassengersBoardedInRoute || (this.isTrainingRoute ? 0 : 15),
+                    isRainOrSnow: (this.activeClimateRegime === 'yagmurlu' || this.activeClimateRegime === 'karli' || this.weather === 'rainy' || this.weather === 'snowy')
                 };
                 DriverBadges.checkAfterRoute(routeStats);
             }
@@ -4036,6 +5339,17 @@ const Game = {
 
         const k = e.key.toLowerCase();
         // SHIFT + VİRGÜL (Shift + ,): Rastgele Telsiz Konuşmaları Yükle / Dinlet (Kanal 19)
+        // İKRAM VE MUAVİN SERVİSİ (I Tuşu) & HAT TABELASI (Shift + I)
+        if (k === 'i' || k === 'ı' || e.code === 'KeyI') {
+            e.preventDefault();
+            if (e.shiftKey) {
+                this.reportIBISStatus();
+            } else {
+                this.serveCatering();
+            }
+            return;
+        }
+
         const isCommaKey = (e.key === ',' || e.key === ';' || e.key === '<' || e.code === 'Comma');
         if (e.shiftKey && isCommaKey) {
             e.preventDefault();
@@ -4129,17 +5443,6 @@ const Game = {
             return;
         }
 
-        if (k === 'o') {
-            e.preventDefault();
-            if (typeof audio !== 'undefined' && typeof audio.toggleDriverWindow === 'function') {
-                const isOpen = audio.toggleDriverWindow();
-                const winMsg = isOpen ? "Kaptan camı açıldı. Dış sesler ve serin hava kokpite doluyor." : "Kaptan camı kapatıldı. Kabin yalıtımı sağlandı.";
-                if (typeof audio.speak === 'function') audio.speak(winMsg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(isOpen ? "🪟 Sol Cam Açıldı" : "🪟 Sol Cam Kapatıldı", "info");
-            }
-            return;
-        }
-
         if (k === 'u') {
             e.preventDefault();
             this.toggleWheelchairRamp();
@@ -4152,11 +5455,7 @@ const Game = {
             return;
         }
 
-        if (k === 'i') {
-            e.preventDefault();
-            this.reportIBISStatus();
-            return;
-        }
+        // (IBIS Shift+I ve I tuşuyla yukarıda tek merkezden yönetilmektedir)
 
         if (k === 'z') {
             e.preventDefault();
@@ -4189,10 +5488,19 @@ const Game = {
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(warnMsg, "warning");
                     return;
                 }
+                const now = Date.now();
+                if (this.lastTeaTime && (now - this.lastTeaTime < 25000)) {
+                    const waitSec = Math.ceil((25000 - (now - this.lastTeaTime)) / 1000);
+                    const coolMsg = `Çayınızı henüz taze yudumladınız kaptanım. Yeni bir çay demlemek için ${waitSec} saniye bekleyiniz.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(coolMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(coolMsg, "info");
+                    return;
+                }
+                this.lastTeaTime = now;
                 if (typeof audio !== 'undefined' && typeof audio.playTeaPourAndSip === 'function') {
                     audio.playTeaPourAndSip(() => {
                         this.passengerComfort = Math.min(100, (this.passengerComfort || 90) + 5);
-                        this.addXP(15);
+                        this.addXP(15, "Sıcak Demli Çay Molası");
                         const teaMsg = "Sıcak demli çay yudumlandı. Afiyet olsun kaptanım (+15 tecrübe, +5 konfor).";
                         if (typeof audio.speak === 'function') audio.speak(teaMsg);
                         if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("☕ Çay Yudumlandı (+15 XP, +5 Konfor)", "success");
@@ -4213,11 +5521,28 @@ const Game = {
                 let hh = Math.floor(this.clockMinutes / 60);
                 let mm = Math.floor(this.clockMinutes % 60);
                 let timeStr = `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
+                let timeOfDay = "Gece";
+                if (this.clockMinutes >= 360 && this.clockMinutes < 720) timeOfDay = "Öğleden Önce";
+                else if (this.clockMinutes >= 720 && this.clockMinutes < 1080) timeOfDay = "Gün Ortası";
+                else if (this.clockMinutes >= 1080) timeOfDay = "Akşam";
+
                 let durum = this.weather === 'sunny' 
                     ? (this.isNight ? 'açık gece' : 'güneşli') 
                     : (this.weather === 'rainy' ? `yağmurlu, saatte ${this.rainMmPerHour || 5} milimetre yağış` : 'karlı');
-                const msg = `Saat ${timeStr}. Dış sıcaklık ${this.temperature} derece, araç içi ${Math.floor(this.busTemperature)} derece. Hava ${durum}. ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
+                let uyari = this.weather === 'snowy' ? ' Yollar buzlu.' : (this.weather === 'rainy' ? ' Yollar kaygan.' : '');
+                let farDurum = this.isNight ? (this.isHeadlightsOn ? ' Farlarınız açık.' : ' Farlarınız KAPALI, görüş tehlikesi!') : '';
+                
+                let weightCategory = "hafif";
+                if (this.passengersOnBoard > 15 && this.passengersOnBoard <= 40) weightCategory = "orta ağırlıkta";
+                else if (this.passengersOnBoard > 40) weightCategory = "çok ağır";
+
+                const safeBusTemp = (typeof this.busTemperature === 'number' && !isNaN(this.busTemperature)) ? Math.floor(this.busTemperature) : 22;
+                const safeOutTemp = (typeof this.temperature === 'number' && !isNaN(this.temperature)) ? this.temperature : 18;
+                const safePassengers = (typeof this.passengersOnBoard === 'number' && !isNaN(this.passengersOnBoard)) ? this.passengersOnBoard : 0;
+                const msg = `Saat ${timeStr} (${timeOfDay || 'Gündüz'}). Dış sıcaklık ${safeOutTemp} derece, araç içi ${safeBusTemp} derece. Hava ${durum}.${uyari}${farDurum} Otobüs şu an ${weightCategory} (${safePassengers} yolcu). ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
                 if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, 'info');
                 return;
             }
             this.handleRadioDispatch();
@@ -4225,7 +5550,7 @@ const Game = {
         }
 
 
-        if (k === 'g' || (k === 'b' && this.isDriving)) {
+        if (k === 'g') {
             e.preventDefault();
             const r = this.activeRouteData;
             if (r) {
@@ -4238,6 +5563,46 @@ const Game = {
                 const msg = "Mevcut Görev Durumu: " + r.name + ". Kalkış noktanız: " + startStop + ". Sıradaki durulacak durak: " + (nextStop ? nextStop.name : endStop) + ", yaklaşık " + distStr + " kaldı. Kalan durak sayısı: " + kalanDurak + ". Gitmeniz gereken son durak: " + endStop + ".";
                 if (typeof audio.speak === "function") audio.speak(msg);
                 if (typeof audio.updateNvdaLiveRegion === "function") audio.updateNvdaLiveRegion(msg);
+            }
+            return;
+        }
+
+        // B TUŞU: KADEMELİ RETARDER KOLU (0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 0 | Shift+B: Sıfırla)
+        if (k === 'b' || e.code === 'KeyB') {
+            e.preventDefault();
+            if (e.shiftKey) {
+                this.retarderLevel = 0;
+            } else {
+                this.retarderLevel = ((this.retarderLevel || 0) + 1) % 6;
+            }
+
+            const isEngaged = (this.retarderLevel > 0);
+            this.retarderUsedInRoute = true;
+            if (isEngaged) this.retarderUsesCountInRoute = (this.retarderUsesCountInRoute || 0) + 1;
+            if (typeof audio !== 'undefined') {
+                audio.isRetarderManuallyEngaged = isEngaged;
+                if (typeof audio.playDoorButtonTick === 'function') audio.playDoorButtonTick();
+                if (isEngaged && typeof audio.playRetarder === 'function' && this.speed > 15) {
+                    audio.playRetarder(this.retarderLevel * 2, this.speed);
+                } else if (!isEngaged && typeof audio.stopRetarder === 'function') {
+                    audio.stopRetarder();
+                }
+            }
+
+            const retEl = document.getElementById('hud-retarder');
+            if (retEl) {
+                if (isEngaged) {
+                    retEl.innerText = `⚡ RETARDER: KADEME ${this.retarderLevel}`;
+                    retEl.style.display = 'inline-block';
+                } else {
+                    retEl.style.display = 'none';
+                }
+            }
+
+            const msg = isEngaged ? `Retarder Kademe ${this.retarderLevel}.` : "Retarder kapatıldı.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(isEngaged ? `⚡ Retarder Kademe ${this.retarderLevel} Devrede` : `⚡ Retarder Devre Dışı`, isEngaged ? "success" : "info");
             }
             return;
         }
@@ -4257,7 +5622,17 @@ const Game = {
 
         if (k === 'h') {
             e.preventDefault();
-            let msg = `Araç sağlığı yüzde ${Math.floor(this.busDamage.health)}. `;
+            const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
+            const currentFuel = (this.currentFuelLiters !== undefined) ? this.currentFuelLiters : cap;
+            const liters = Math.max(0, Math.floor(currentFuel));
+            const pct = Math.max(0, Math.min(100, Math.floor((currentFuel / cap) * 100)));
+
+            let fuelSpeech = `Mevcut yakıt seviyeniz yüzde ${pct}, ${liters} litre. `;
+            if (pct <= 15) {
+                fuelSpeech += "⚠️ Dikkat, düşük yakıt ikazı! ";
+            }
+
+            let msg = fuelSpeech + `Araç sağlığı yüzde ${Math.floor(this.busDamage.health)}. `;
             let hasarListesi = [];
             
             if (this.busDamage.leftWindow > 0) hasarListesi.push(`Sol cam yüzde ${Math.floor(this.busDamage.leftWindow)}`);
@@ -4274,6 +5649,13 @@ const Game = {
             }
             
             if (typeof audio.speak === 'function') audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                const toastType = pct <= 15 ? 'warning' : 'info';
+                UI.showToast(`⛽ Yakıt: %${pct} (${liters}/${cap} L) | 🛠️ Sağlık: %${Math.floor(this.busDamage.health)}`, toastType);
+            }
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                audio.updateNvdaLiveRegion(msg);
+            }
             return;
         }
 
@@ -4292,17 +5674,20 @@ const Game = {
         if (k === 'm' || e.code === 'KeyM' || e.code === 'Space') {
             e.preventDefault();
             if (audio.isEngineRunning) {
+                this.engineStarted = false;
                 audio.stopEngine();
+                if (typeof audio.playHandbrakeAir === 'function') audio.playHandbrakeAir();
                 if (typeof audio.speak === 'function') audio.speak("Motor durduruldu.");
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 Motor Durduruldu", "warning");
             } else {
+                this.engineStarted = true;
                 audio.startEngine();
                 if (typeof audio.speak === 'function') audio.speak("Motor çalıştırıldı.");
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔑 Motor Çalıştırıldı", "success");
             }
             if (!this.isDriving) this.checkAutoDepart();
         }
-        if (k === 'l' || k === 'h' || k === 'k') {
+        if (k === 'l' || e.code === 'KeyL') {
             e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.playHorn === 'function') {
             // Karşıdan gelen meslektaş kornasına selam verme
@@ -4343,10 +5728,15 @@ const Game = {
         }
         if (k === 'home') {
             e.preventDefault();
-            audio.setWindowOpen(true);
-            audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
-            const dst = Math.max(0, Math.round(this.currentDistanceToNext));
-            audio.speak(`Sonraki durağa ${dst} metre kaldı`);
+            if (typeof audio !== 'undefined') {
+                if (audio.playWindowSound) audio.playWindowSound(true);
+                audio.setWindowOpen(true);
+                audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
+                const winMsg = "Kaptan camı açıldı. Dış sesler ve serin hava kokpite doluyor.";
+                if (typeof audio.speak === 'function') audio.speak(winMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Açıldı (Home)", "info");
+            }
+            return;
         }
         if (k === 'f') { // Farlar
             e.preventDefault();
@@ -4364,38 +5754,21 @@ const Game = {
                 }
             }
         }
-        if (k === 't') {
-            let hh = Math.floor(this.clockMinutes / 60);
-            let mm = Math.floor(this.clockMinutes % 60);
-            let timeStr = `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
-            
-            let timeOfDay = "Gece";
-            if (this.clockMinutes >= 360 && this.clockMinutes < 720) timeOfDay = "Öğleden Önce";
-            else if (this.clockMinutes >= 720 && this.clockMinutes < 1080) timeOfDay = "Gün Ortası";
-            else if (this.clockMinutes >= 1080) timeOfDay = "Akşam";
-
-            let durum = this.weather === 'sunny' ? (this.isNight ? 'Açık' : 'Güneşli') : (this.weather === 'rainy' ? 'Yağmurlu' : 'Karlı');
-            let uyari = this.weather === 'snowy' ? ' Yollar buzlu.' : (this.weather === 'rainy' ? ' Yollar kaygan.' : '');
-            let farDurum = this.isNight ? (this.isHeadlightsOn ? ' Farlarınız açık.' : ' Farlarınız KAPALI, görüş tehlikesi!') : '';
-            
-            // Tonaj Bilgisini Kategorize Et
-            let weightCategory = "Hafif"; // 0-15 yolcu
-            if (this.passengersOnBoard > 15 && this.passengersOnBoard <= 40) {
-                weightCategory = "Orta ağırlıkta";
-            } else if (this.passengersOnBoard > 40) {
-                weightCategory = "Çok ağır";
-            }
-            
-            audio.speak(`Saat ${timeStr}. ${timeOfDay}. Hava durumu: ${durum}. Sıcaklık: ${this.temperature} derece. Otobüs şu an ${weightCategory}.${uyari}${farDurum}`);
-        }
+        // (Hava & Saat Shift+T, Telsiz T tuşu ile yukarıda yönetilmektedir)
         if (k === 'k' || k === 'h' || k === 'v' || k === 't' || k === 'l') {
             e.preventDefault();
         }
         if (k === 'end') {
             e.preventDefault();
-            audio.setWindowOpen(false);
-            audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
-            audio.speak("Cam kapatıldı");
+            if (typeof audio !== 'undefined') {
+                if (audio.playWindowSound) audio.playWindowSound(false);
+                audio.setWindowOpen(false);
+                audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
+                const winMsg = "Kaptan camı kapatıldı. Kabin yalıtımı sağlandı.";
+                if (typeof audio.speak === 'function') audio.speak(winMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Kapatıldı (End)", "info");
+            }
+            return;
         }
     },
 
@@ -4557,11 +5930,11 @@ const SanayiMechanic = {
             }
         } 
         else if (this.state === 'report') {
-            if (e.key === 'ArrowDown') {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
                 audio.playNav();
                 this.currentIndex = Math.min(this.currentIndex + 1, this.parts.length);
                 this.renderList();
-            } else if (e.key === 'ArrowUp') {
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
                 audio.playNav();
                 this.currentIndex = Math.max(this.currentIndex - 1, 0);
                 this.renderList();
@@ -4629,7 +6002,14 @@ const SanayiMechanic = {
             document.getElementById('sanayi-dialog').innerText = msg;
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
             
-            // Onarım işlemi 30 saniye sürüyor (Her parça için)
+            // Kademe Binası Seviyesine Göre Onarım Süresi (Hatta Geri Dönme Hızı)
+            let repairDuration = 2000;
+            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
+                const kademeLvl = CompanySystem.getInstitutionLevel('maintenance_depot');
+                if (kademeLvl === 2) repairDuration = 1000; // %50 Daha Hızlı Onarım (Liftler & Diagnostik)
+                else if (kademeLvl >= 3) repairDuration = 500;  // %75 Hızlı Ekspres Onarım (Mega Revizyon Üssü)
+            }
+
             setTimeout(() => {
                 // Hasarı sıfırla
                 Game.busDamage[part.id] = 0;
@@ -4652,6 +6032,7 @@ const SanayiMechanic = {
         
         // Canı tekrar fulleyelim çünkü tamirden çıktık
         Game.busDamage.health = 100;
+        if (typeof Game.refuel === 'function') Game.refuel();
         
         document.getElementById('btn-start-game').innerText = "Kaldığın Yerden Devam Et";
         
@@ -4669,4 +6050,35 @@ if (typeof window !== 'undefined') {
 }
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = Game;
+}
+
+// =========================================================================
+// OTOMATİK YENİDEN BAĞLANTI & ÇEVRİMDİŞİ KUYRUK EŞİTLEYİCİSİ
+// İnternet koptuğunda yapılan her şey yerelde birikir, internet geldiği an
+// saniyesinde Firebase'e aktarılır. Hiçbir emek asla kaybolmaz!
+// =========================================================================
+if (typeof window !== 'undefined') {
+    // 1. Tarayıcı Ağ Olayı: İnternet geri geldiğinde anında kaydet
+    window.addEventListener('online', () => {
+        console.log('[Ağ Kalkanı] İnternet bağlantısı sağlandı. Çevrimdışı kazanımlar buluta aktarılıyor...');
+        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+            Game.saveData(true);
+        }
+    });
+
+    // 2. Firebase Canlı Soket Kontrolü (.info/connected)
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            if (window.db && typeof window.db.ref === 'function') {
+                window.db.ref('.info/connected').on('value', (snap) => {
+                    if (snap && snap.val() === true) {
+                        console.log('[Firebase Canlı Zırh] Sunucuya bağlanıldı, yerel veriler bulutla senkronize ediliyor...');
+                        if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
+                            Game.saveData(true);
+                        }
+                    }
+                });
+            }
+        } catch(e) {}
+    });
 }

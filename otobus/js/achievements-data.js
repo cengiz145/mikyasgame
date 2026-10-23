@@ -19507,6 +19507,9 @@ const ACHIEVEMENTS_1500 = [
   }
 ];
 
+if (typeof window !== 'undefined') {
+    window.ACHIEVEMENTS_1500 = ACHIEVEMENTS_1500;
+}
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ACHIEVEMENTS_1500;
 }
