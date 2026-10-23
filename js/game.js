@@ -379,6 +379,16 @@ const Game = {
     steeringAngle: 0, // Direksiyon açısı (-30 ile +30 arası)
     driftVelocity: 0,
         roadCurvature: 0, // Rüzgar / Eğim kayma hızı
+    // --- Türkiye Coğrafi Topoğrafya & Tünel/Köprü Durumu ---
+    currentAltitude: 10,
+    currentSlopePct: 0.0,
+    currentLegTotalDistance: 1000,
+    currentLegDistanceCovered: 0,
+    activeRealTunnel: null,
+    activeRealBridge: null,
+    completedTunnels: [],
+    completedBridges: [],
+    lastBrakeWarnTime: 0,
     targetDriftVelocity: 0,
     lastDriftChangeTime: 0,
     isDriving: false,
@@ -1550,6 +1560,12 @@ const Game = {
         }
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
+        this.completedTunnels = [];
+        this.completedBridges = [];
+        this.activeRealTunnel = null;
+        this.activeRealBridge = null;
+        this.currentAltitude = 10;
+        this.currentSlopePct = 0.0;
         const arriveBusSprite = document.getElementById('bus-sprite');
         if (arriveBusSprite) arriveBusSprite.style.transform = 'translateX(-50%) rotate(0deg)';
         const arriveLaneCont = document.querySelector('.lane-container');
@@ -2021,6 +2037,8 @@ const Game = {
             
             const nextStopEl = document.getElementById('hud-next-stop');
             if (nextStopEl) nextStopEl.innerText = `${nextStop.name} (${this.currentStopIndex + 1}/${this.activeRouteData.stops.length})`;
+            this.currentLegTotalDistance = this.currentDistanceToNext || 850;
+            this.currentLegDistanceCovered = 0;
             return;
         }
 
@@ -2153,6 +2171,34 @@ const Game = {
             this.routeBumps = this.savedState && this.savedState.routeBumps ? this.savedState.routeBumps : [];
         }
 
+        this.currentLegTotalDistance = this.currentDistanceToNext || 1000;
+        this.currentLegDistanceCovered = 0;
+
+        // Gerçek KGM Tünel ve Köprü Kontrolü (Sadece rota koridorunda varsa)
+        if (typeof TurkeyGeographyEngine !== 'undefined') {
+            const rName = this.activeRouteData ? (this.activeRouteData.name || "") : "";
+            const fromStopName = prevStop ? prevStop.name : "";
+            const toStopName = nextStop ? nextStop.name : "";
+
+            const realTun = TurkeyGeographyEngine.getTunnelForRoute(this.currentCity, rName, fromStopName, toStopName);
+            if (realTun && (!this.completedTunnels || !this.completedTunnels.includes(realTun.id))) {
+                this.activeRealTunnel = realTun;
+                this.tunnelDistance = Math.max(300, Math.round(this.currentDistanceToNext * 0.4));
+            } else {
+                this.activeRealTunnel = null;
+                this.tunnelDistance = null;
+            }
+
+            const realBrd = TurkeyGeographyEngine.getBridgeForRoute(this.currentCity, rName, fromStopName, toStopName);
+            if (realBrd && (!this.completedBridges || !this.completedBridges.includes(realBrd.id))) {
+                this.activeRealBridge = realBrd;
+                this.bridgeDistance = Math.max(250, Math.round(this.currentDistanceToNext * 0.3));
+            } else {
+                this.activeRealBridge = null;
+                this.bridgeDistance = null;
+            }
+        }
+
         // --- TÜRKİYE KARAYOLLARI GERÇEK VİRAJ VE DAĞ GEÇİTLERİ SİSTEMİ ---
         if (typeof TurkeyCurvesEngine !== 'undefined' && (!this.upcomingTurns || this.upcomingTurns.length === 0)) {
             this.upcomingTurns = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext, {
@@ -2262,27 +2308,27 @@ const Game = {
         const traveled = (this.speed / 3.6) * deltaTime; // Metre cinsinden kat edilen yol
         const totalDist = this.totalDistanceCovered || 0;
 
-        // 1. TÜNELLER VE YANKI SİSTEMİ (Her 7.5 - 9 km'de bir)
-        if (this.tunnelDistance === null && !this.isInsideTunnel && (totalDist - this.lastTunnelSpawnDist >= 7500)) {
-            this.lastTunnelSpawnDist = totalDist;
-            this.tunnelDistance = 250; // 250 metre ileride tünel
-            if (typeof audio !== 'undefined' && audio.speak) {
-                audio.speak("250 metre ileride tünel var, farlarınızı açınız (F tuşu).");
-            }
-        }
+        // 1. TÜRKİYE KARAYOLLARI RESMÎ TÜNEL GEÇİŞLERİ (SADECE GERÇEK KORİDORDA VARSA)
         if (this.tunnelDistance !== null && !this.isInsideTunnel) {
             this.tunnelDistance -= traveled;
             if (this.tunnelDistance <= 0) {
                 this.isInsideTunnel = true;
                 this.tunnelDistance = null;
-                this.tunnelLengthRemaining = 450; // 450 metrelik tünel
+                const tunnelData = this.activeRealTunnel;
+                const tunnelLen = tunnelData ? tunnelData.length : 1200;
+                const tunnelName = tunnelData ? tunnelData.name : "Karayolu Tüneli";
+                this.tunnelLengthRemaining = tunnelLen;
+
                 if (typeof audio !== 'undefined') {
                     if (audio.setTunnelMode) audio.setTunnelMode(true);
-                    if (audio.speak) audio.speak("Tünele girildi.");
+                    if (audio.speak) audio.speak(`${tunnelName} girişine ulaşıldı. Tünel uzunluğu ${tunnelLen} metre. Farlarınızı açık tutunuz.`);
+                }
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast(`🚇 ${tunnelName} (${tunnelLen} m)`, "info");
                 }
                 if (!this.isHeadlightsOn) {
                     setTimeout(() => {
-                        if (this.isInsideTunnel && !this.isHeadlightsOn && typeof audio.speak === 'function') {
+                        if (this.isInsideTunnel && !this.isHeadlightsOn && typeof audio !== 'undefined' && typeof audio.speak === 'function') {
                             audio.speak("Tünel karanlık, lütfen F tuşuna basarak farları açınız.");
                         }
                     }, 2500);
@@ -2292,6 +2338,11 @@ const Game = {
             this.tunnelLengthRemaining -= traveled;
             if (this.tunnelLengthRemaining <= 0) {
                 this.isInsideTunnel = false;
+                if (this.activeRealTunnel) {
+                    if (!this.completedTunnels) this.completedTunnels = [];
+                    this.completedTunnels.push(this.activeRealTunnel.id);
+                    this.activeRealTunnel = null;
+                }
                 if (typeof audio !== 'undefined') {
                     if (audio.setTunnelMode) audio.setTunnelMode(false);
                     if (audio.speak) audio.speak("Tünelden çıkıldı, açık hava.");
@@ -2299,37 +2350,46 @@ const Game = {
             }
         }
 
-        // 2. KÖPRÜLER / VİYADÜKLER VE ÇELİK DERZ VURUNTULARI (Her 5 - 6 km'de bir)
-        if (this.bridgeDistance === null && !this.isInsideBridge && (totalDist - this.lastBridgeSpawnDist >= 5200)) {
-            this.lastBridgeSpawnDist = totalDist;
-            this.bridgeDistance = 200;
-        }
+        // 2. TÜRKİYE KARAYOLLARI RESMÎ ASMA KÖPRÜ VE VİYADÜK GEÇİŞLERİ (SADECE GERÇEK KORİDORDA VARSA)
         if (this.bridgeDistance !== null && !this.isInsideBridge) {
             this.bridgeDistance -= traveled;
             if (this.bridgeDistance <= 0) {
                 this.isInsideBridge = true;
                 this.bridgeDistance = null;
-                this.bridgeLengthRemaining = 380; // 380 metrelik viyadük köprüsü
+                const bridgeData = this.activeRealBridge;
+                const bridgeLen = bridgeData ? bridgeData.length : 1000;
+                const bridgeName = bridgeData ? bridgeData.name : "Karayolu Viyadüğü";
+                this.bridgeLengthRemaining = bridgeLen;
                 this.bridgeJointTraveled = 0;
+
                 if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Viyadük köprüsüne girildi. Yan rüzgara dikkat ediniz.");
+                    audio.speak(`${bridgeName} geçişi başladı. Uzunluk ${bridgeLen} metre. Şiddetli yan rüzgara dikkat ediniz.`);
+                }
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast(`🌉 ${bridgeName} (${bridgeLen} m)`, "info");
                 }
             }
         } else if (this.isInsideBridge) {
             this.bridgeLengthRemaining -= traveled;
             this.bridgeJointTraveled += traveled;
-            // Her 35 metrede bir gerçekçi çelik derz vuruntusu (tak-tak, tak-tak)
+            // Her 35 metrede bir gerçekçi çelik derz genleşme vuruntusu (tak-tak)
             if (this.bridgeJointTraveled >= 35) {
                 this.bridgeJointTraveled = 0;
                 if (typeof audio !== 'undefined' && audio.playBridgeJoint) {
                     audio.playBridgeJoint(this.speed);
                 }
             }
-            // Köprüde hafif yan rüzgar savrulması (direksiyon hissi)
-            this.driftVelocity += (Math.sin(totalDist / 50) * 1.5) * deltaTime;
+            // Köprüde şiddetli yan rüzgar savrulması (direksiyon hissi)
+            const windStrength = (this.activeRealBridge && this.activeRealBridge.crosswindIntensity) ? this.activeRealBridge.crosswindIntensity : 2.5;
+            this.driftVelocity += (Math.sin(totalDist / 45) * windStrength) * deltaTime;
 
             if (this.bridgeLengthRemaining <= 0) {
                 this.isInsideBridge = false;
+                if (this.activeRealBridge) {
+                    if (!this.completedBridges) this.completedBridges = [];
+                    this.completedBridges.push(this.activeRealBridge.id);
+                    this.activeRealBridge = null;
+                }
                 if (typeof audio !== 'undefined' && audio.speak) {
                     audio.speak("Köprü geçildi.");
                 }
@@ -3124,6 +3184,50 @@ const Game = {
 
         let prevSpeed = this.speed;
         this.speed += currentAcceleration * deltaTime;
+
+        // --- TÜRKİYE TOPOĞRAFYASI: EĞİM YERÇEKİMİ FİZİĞİ & RAKIM HESABI ---
+        if (typeof TurkeyGeographyEngine !== 'undefined') {
+            const fromStop = (this.currentStopIndex > 0 && this.activeRouteData?.stops) ? this.activeRouteData.stops[this.currentStopIndex - 1] : null;
+            const toStop = (this.activeRouteData?.stops) ? this.activeRouteData.stops[this.currentStopIndex] : null;
+            const rName = this.activeRouteData ? (this.activeRouteData.name || "") : "";
+            
+            const totalLegDist = Math.max(100, this.currentLegTotalDistance || 1000);
+            const remainingLegDist = Math.max(0, this.currentDistanceToNext || 0);
+            const legProgress = Math.min(1.0, Math.max(0.0, 1.0 - (remainingLegDist / totalLegDist)));
+
+            const incData = TurkeyGeographyEngine.getInclineForSegment(this.currentCity, fromStop, toStop, legProgress, rName);
+            this.currentAltitude = incData.altitude;
+            this.currentSlopePct = incData.slopePct;
+
+            const isFootBraking = (this.keys.s || this.keys.arrowdown || this.isBrakeKeyDown);
+            const retarderLevel = (this.isBrakeKeyDown && this.speed > 30) ? 3 : 0;
+            const incPhys = TurkeyGeographyEngine.calculateInclinePhysics(this.speed, this.currentSlopePct, deltaTime, isFootBraking, retarderLevel);
+
+            // Eğim yerçekimi ivmesi (Newton: F = m*g*sin(theta))
+            // İnişte araç hızlanır, tırmanışta hız keser
+            if (this.speed > 0 || incPhys.speedDelta > 0) {
+                this.speed += incPhys.speedDelta;
+            }
+
+            // Balata aşırı ısınma ve fren şişmesi uyarısı
+            if (incPhys.isBrakeOverheated && (currentTime - (this.lastBrakeWarnTime || 0) > 8000)) {
+                this.lastBrakeWarnTime = currentTime;
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Dikkat! Sürekli ayak freni yapmaktan balatalar aşırı ısındı. Retarder kullanarak motor freni yapınız!");
+                }
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast(`⚠️ Balata Sıcaklığı ${incPhys.brakeTemperature}°C! Fren Şişti, Retarder Kullanın!`, "warning");
+                }
+            }
+
+            // Canlı HUD Rakım ve Eğim Gösterimi
+            const altEl = document.getElementById('hud-altitude-text');
+            if (altEl) {
+                const slopeSign = (this.currentSlopePct > 0) ? `+ % ${this.currentSlopePct} Tırmanış` : (this.currentSlopePct < 0) ? `- % ${Math.abs(this.currentSlopePct)} İniş` : `%0 Düz`;
+                const passTag = incData.passName ? ` • ${incData.passName}` : "";
+                altEl.innerText = `Rakım: ${this.currentAltitude} m (${slopeSign}${passTag})`;
+            }
+        }
         if (this.speed > currentMaxSpeed && this.acceleration > 0) {
             this.speed -= 10 * deltaTime; // Yavaşça limite çek
         }
