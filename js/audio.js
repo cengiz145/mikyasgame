@@ -613,6 +613,12 @@ class AudioSystem {
         this.init();
         this.isRetarderManuallyEngaged = true;
         this.updateRetarder(speed, true);
+        if (this.retarderAutoStopTimer) clearTimeout(this.retarderAutoStopTimer);
+        if (duration > 0) {
+            this.retarderAutoStopTimer = setTimeout(() => {
+                this.stopRetarder();
+            }, duration * 1000);
+        }
     }
 
     stopRetarder() {
@@ -1948,6 +1954,112 @@ startEngine() {
             clickOsc.start(t);
             clickOsc.stop(t + 0.1);
         }, 760);
+    }
+
+    // --- EĞİTİM VE SÜRÜŞ SİMÜLASYONU YARDIMCI AKUSTİKLERİ ---
+    playKneeling(isLowering = true) {
+        this.playKneelingSound();
+    }
+
+    playAcceleration(duration = 2.8) {
+        try {
+            if (this.currentAccelAudio) {
+                this.currentAccelAudio.pause();
+                this.currentAccelAudio.currentTime = 0;
+            }
+            const aud = new Audio('sounds/freesound_engine_city.mp3');
+            aud.currentTime = 2.0;
+            aud.volume = 0.85;
+            this.currentAccelAudio = aud;
+            aud.play().catch(() => {});
+            setTimeout(() => {
+                if (this.currentAccelAudio === aud) {
+                    let vol = aud.volume;
+                    const fade = setInterval(() => {
+                        vol -= 0.12;
+                        if (vol <= 0.05) {
+                            clearInterval(fade);
+                            try { aud.pause(); } catch(e) {}
+                        } else {
+                            try { aud.volume = vol; } catch(e) {}
+                        }
+                    }, 50);
+                }
+            }, duration * 1000);
+        } catch(e) {}
+    }
+
+    playEngineStartPreview(duration = 3.5) {
+        try {
+            if (this.sounds && this.sounds.start) {
+                try { this.sounds.start.play(); } catch(e) {}
+            }
+            setTimeout(() => {
+                if (this.enginePreviewAudio) {
+                    this.enginePreviewAudio.pause();
+                    this.enginePreviewAudio.currentTime = 0;
+                }
+                const aud = new Audio('sounds/freesound_pure_bus_idle.mp3');
+                aud.volume = 0.85;
+                this.enginePreviewAudio = aud;
+                aud.play().catch(() => {});
+                setTimeout(() => {
+                    if (this.enginePreviewAudio === aud) {
+                        let vol = aud.volume;
+                        const fade = setInterval(() => {
+                            vol -= 0.1;
+                            if (vol <= 0.05) {
+                                clearInterval(fade);
+                                try { aud.pause(); } catch(e) {}
+                            } else {
+                                try { aud.volume = vol; } catch(e) {}
+                            }
+                        }, 60);
+                    }
+                }, duration * 1000);
+            }, 750);
+        } catch(e) {}
+    }
+
+    playDoorOpenWithAkbil() {
+        this.playDoorOpen();
+        setTimeout(() => {
+            if (typeof this.playAkbilTam === 'function') {
+                this.playAkbilTam();
+            } else if (this.sounds && this.sounds.akbilTam) {
+                this.sounds.akbilTam.play();
+            }
+        }, 850);
+    }
+
+    playRoadBump() {
+        try {
+            const aud = new Audio('sounds/freesound_road_joint_hit.wav');
+            aud.volume = 0.85;
+            aud.play().catch(() => {});
+        } catch(e) {}
+    }
+
+    playTerminalChime() {
+        try {
+            const aud = new Audio('sounds/freesound_terminal_chime_3tone.mp3');
+            aud.volume = 0.85;
+            aud.play().catch(() => {});
+        } catch(e) {}
+    }
+
+    playTachographBeep() {
+        try {
+            const aud = new Audio('sounds/freesound_tachograph_print.mp3');
+            aud.volume = 0.75;
+            aud.play().catch(() => {});
+        } catch(e) {}
+    }
+
+    playCoinSound() {
+        try {
+            if (this.sounds && this.sounds.select) this.sounds.select.play();
+        } catch(e) {}
     }
 
     // --- ŞEHİRLERARASI OTOBÜS PNÖMATİK BAGAJ KAPAKLARI ---
