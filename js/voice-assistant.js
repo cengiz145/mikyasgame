@@ -408,11 +408,7 @@ class VoiceAssistant {
                     💡 <strong>Oyun İpucu:</strong> ${lesson.tip}
                 </div>
                 <div style="font-size: 0.88rem; color: #fde047;"><strong>Tuşlar:</strong> ${lesson.keys}</div>
-                ${lesson.soundDesc ? `
-                <div style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #38bdf8; background: rgba(56, 189, 248, 0.14); padding: 5px 10px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.35);">
-                    <span>🔊 <strong>Tarif Edilen Ses:</strong> ${lesson.soundDesc}</span>
-                </div>
-                ` : ''}
+
                 <div style="font-size: 0.84rem; color: #cbd5e1; line-height: 1.4;">${lesson.speech}</div>
             `;
 
@@ -1178,16 +1174,11 @@ class VoiceAssistant {
                     <p style="color: #f8fafc; font-size: 1.1rem; line-height: 1.5; margin: 0; font-weight: 500;">${currentStep.instruction}</p>
                 </div>
 
-                <!-- TEK VE NET BASILACAK BUTON VE SES TESTİ -->
-                <div style="display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 18px;">
-                    <button id="btn-guided-action" class="modern-btn nav-item" style="padding: 16px 32px; font-size: 1.25rem; font-weight: bold; border-radius: 10px; cursor: pointer; color: #ffffff; ${currentStep.actionBtnStyle} box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);" aria-label="${currentStep.actionBtnText}">
+                <!-- TEK VE NET BASILACAK BUTON -->
+                <div style="text-align: center; margin-bottom: 18px;">
+                    <button id="btn-guided-action" class="modern-btn nav-item" style="padding: 16px 36px; font-size: 1.3rem; font-weight: bold; border-radius: 10px; cursor: pointer; color: #ffffff; ${currentStep.actionBtnStyle} box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);" aria-label="${currentStep.actionBtnText}">
                         ${currentStep.actionBtnText}
                     </button>
-                    ${currentStep.soundName ? `
-                    <button id="btn-guided-listen-sound" class="modern-btn nav-item" style="padding: 14px 22px; font-size: 1.02rem; font-weight: bold; border-radius: 10px; cursor: pointer; color: #38bdf8; background: rgba(56, 189, 248, 0.18); border: 2px solid #38bdf8; display: inline-flex; align-items: center; gap: 8px;" aria-label="Tarif edilen sesi dinle: ${currentStep.soundName}">
-                        🔊 Sesi Dinle: ${currentStep.soundName}
-                    </button>
-                    ` : ''}
                 </div>
 
                 <!-- GERİ BİLDİRİM / TEBRİK YA DA YOL GÖSTERME KUTUSU -->
@@ -1213,15 +1204,7 @@ class VoiceAssistant {
             };
         }
 
-        const btnListenSound = document.getElementById('btn-guided-listen-sound');
-        if (btnListenSound && currentStep.playSound) {
-            btnListenSound.onclick = () => {
-                currentStep.playSound();
-                if (typeof UI !== 'undefined' && UI.showToast) {
-                    UI.showToast(`🔊 Çalıyor: ${currentStep.soundName}`, 'info');
-                }
-            };
-        }
+
 
         const btnReplay = document.getElementById('btn-guided-replay-audio');
         if (btnReplay) {
@@ -1278,13 +1261,9 @@ class VoiceAssistant {
             this.guidedFeedbackText = "";
             this.renderInteractiveLab();
             const nextStep = this.guidedSteps[this.guidedStep - 1];
-            if (nextStep && !nextStep.isGraduation && typeof audio !== 'undefined') {
+            if (nextStep && !nextStep.isGraduation && typeof audio !== 'undefined' && audio.speak) {
                 setTimeout(() => {
-                    if (audio.speak) audio.speak(nextStep.instruction);
-                    // Sıradaki adımın sesini de oyuncuya önizlet
-                    if (nextStep.playSound) {
-                        setTimeout(() => nextStep.playSound(), 900);
-                    }
+                    audio.speak(nextStep.instruction);
                 }, 600);
             }
         }, 2200);
