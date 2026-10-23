@@ -2199,24 +2199,30 @@ startEngine() {
     }
 
     // 2. KAPTAN SOL CAMI MOTORU VE AKUSTİK YALITIM
+    playWindowSound(isOpen) {
+        try {
+            if (this.currentWindowAudio) {
+                this.currentWindowAudio.pause();
+                this.currentWindowAudio.currentTime = 0;
+            }
+            const soundFile = isOpen ? 'sounds/freesound_window_open.mp3' : 'sounds/freesound_window_close.mp3';
+            const aud = new Audio(soundFile);
+            aud.volume = 0.85;
+            this.currentWindowAudio = aud;
+            aud.play().catch(e => {
+                console.warn("[Audio] Cam sesi çalınamadı:", e);
+            });
+        } catch(e) {
+            console.warn("[Audio] Cam sesi hatası:", e);
+        }
+    }
+
     toggleDriverWindow() {
         this.init();
-        const now = this.ctx.currentTime;
         this.isWindowOpen = !this.isWindowOpen;
 
-        // Elektrikli cam motor sesi (0.5s vızıltı)
-        const motorOsc = this.ctx.createOscillator();
-        const motorGain = this.ctx.createGain();
-        motorOsc.type = 'sawtooth';
-        motorOsc.frequency.setValueAtTime(this.isWindowOpen ? 160 : 190, now);
-        motorOsc.frequency.linearRampToValueAtTime(this.isWindowOpen ? 140 : 175, now + 0.5);
-        motorGain.gain.setValueAtTime(0.1, now);
-        motorGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-        motorOsc.connect(motorGain);
-        motorGain.connect(this.ctx.destination);
-        motorOsc.start(now);
-        motorOsc.stop(now + 0.5);
-        motorOsc.onended = () => { try { motorOsc.disconnect(); motorGain.disconnect(); } catch(e){} };
+        // Freesound stüdyo kalitesinde gerçek elektrikli cam motoru & ray sesi (#354003 / #354002)
+        this.playWindowSound(this.isWindowOpen);
 
         this.setWindowOpen(this.isWindowOpen);
         return this.isWindowOpen;

@@ -247,6 +247,38 @@ const SoundGallery = {
             }
         },
         {
+            id: 'fx_window_open',
+            category: 'effect',
+            title: 'Freesound Kaptan Camı Açılma (Elektrikli Motor)',
+            icon: '🪟',
+            specs: 'Freesound scriotxstudios #354003 Stüdyo Kaydı',
+            desc: 'Kaptan sol penceresinin elektrikli motor ve ray sesi eşliğinde aşağı inişi (Kısayol: O tuşu).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playWindowSound) {
+                    audio.playWindowSound(true);
+                } else {
+                    const a = new Audio('sounds/freesound_window_open.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_window_close',
+            category: 'effect',
+            title: 'Freesound Kaptan Camı Kapanma & Akustik Yalıtım',
+            icon: '🪟',
+            specs: 'Freesound scriotxstudios #354002 Stüdyo Kaydı',
+            desc: 'Kaptan sol penceresinin yukarı kapanışı ve kauçuk fitille kabin yalıtımı kilitleme sesi (Kısayol: O tuşu).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playWindowSound) {
+                    audio.playWindowSound(false);
+                } else {
+                    const a = new Audio('sounds/freesound_window_close.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
             id: 'fx_air_horn',
             category: 'effect',
             title: 'Ağır Vasıta Endüstriyel Havalı Korna',
