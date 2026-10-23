@@ -1970,6 +1970,11 @@
                         if (d.energy === undefined) d.energy = 100;
                         if (!d.assignedBusId) d.assignedBusId = "otokar_kent_lf";
                         if (d.autoDispatch === undefined) d.autoDispatch = true;
+                        if (!d.rankTitle) {
+                            const rankObj = this.ranks.find(r => r.level === (d.rankLevel || 1)) || this.ranks[0];
+                            d.rankTitle = rankObj ? rankObj.title : 'Kaptan';
+                            d.rankBadge = rankObj ? rankObj.badge : '🌱';
+                        }
                     });
                 }
             } catch (e) {
@@ -2312,7 +2317,7 @@
             if (route.minRankLevel && (driver.rankLevel || 1) < route.minRankLevel) {
                 const reqRank = this.ranks.find(r => r.level === route.minRankLevel);
                 const reqTitle = reqRank ? reqRank.title : `${route.minRankLevel}. Seviye Kaptan`;
-                const warnMsg = `Uzun Yol Tecrübesi Yetersiz: ${driver.name} (${driver.rankTitle}), ${route.name} seferine çıkamaz! En az ${reqTitle} tecrübesi şarttır.`;
+                const warnMsg = `Uzun Yol Tecrübesi Yetersiz: ${driver.name} (${driver.rankTitle || 'Kaptan'}), ${route.name} seferine çıkamaz! En az ${reqTitle} tecrübesi şarttır.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(warnMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`⛔ ${warnMsg}`, "warning");
                 return false;
@@ -4256,7 +4261,7 @@
                             </div>
                             <div style="display: flex; gap: 6px; align-items: center;">
                                 <select id="contract-driver-select-${contract.id}" class="modern-btn" style="padding: 6px; font-size: 0.85rem; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 6px;">
-                                    ${this.data.hiredDrivers.map(d => `<option value="${d.id}">${d.avatar} ${d.name} (${d.rankTitle})</option>`).join('')}
+                                    ${this.data.hiredDrivers.map(d => `<option value="${d.id}">${d.avatar || '👨‍✈️'} ${d.name} (${d.rankTitle || 'Kaptan'})` + `</option>`).join('')}
                                 </select>
                                 <button id="btn-accept-contract-${contract.id}" class="modern-btn nav-item" style="padding: 8px 14px; background: linear-gradient(135deg, #ca8a04, #eab308); color: #000; font-weight: bold; border-radius: 6px; cursor: pointer; border: none;">
                                     İhaleyi Al

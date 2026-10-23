@@ -1133,16 +1133,29 @@ const Game = {
     getLicenseTitle: function() {
         let equipped = null;
         if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.getEquippedTitle === 'function') {
-            equipped = DriverBadges.getEquippedTitle();
+            try {
+                equipped = DriverBadges.getEquippedTitle();
+            } catch (e) {
+                equipped = null;
+            }
         }
-        const careerTitle = (typeof CareerMissions !== 'undefined' && CareerMissions.getLevelTitle)
-            ? CareerMissions.getLevelTitle(this.completedTasks)
-            : `${this.licenseLevel}. Seviye Şehir İçi Sürücü`;
+        const safeTasks = (typeof this.completedTasks === 'number' && !isNaN(this.completedTasks))
+            ? this.completedTasks
+            : (parseInt(localStorage.getItem('completedTasks'), 10) || 0);
+
+        const safeLevel = (typeof this.licenseLevel === 'number' && !isNaN(this.licenseLevel))
+            ? this.licenseLevel
+            : (parseInt(localStorage.getItem('driverLicenseLevel'), 10) || 1);
+
+        const careerTitle = (typeof CareerMissions !== 'undefined' && typeof CareerMissions.getLevelTitle === 'function')
+            ? (CareerMissions.getLevelTitle(safeTasks) || `${safeLevel}. Seviye Şehir İçi Sürücü`)
+            : `${safeLevel}. Seviye Şehir İçi Sürücü`;
 
         if (equipped && equipped.name && equipped.id !== 'title_cirak') {
-            return `${equipped.icon} ${equipped.name} (${careerTitle})`;
+            const icon = equipped.icon || '👑';
+            return `${icon} ${equipped.name} (${careerTitle})`;
         }
-        return careerTitle;
+        return careerTitle || `${safeLevel}. Seviye Şehir İçi Sürücü`;
     },
 
     completeTask: function(comfortMsg, timingRewardMsg, punctualityScore = 100) {
@@ -2093,7 +2106,11 @@ const Game = {
             this.hierarchicalBeepPlayed = false;
             
             const nextStopEl = document.getElementById('hud-next-stop');
-            if (nextStopEl) nextStopEl.innerText = `${nextStop.name} (${this.currentStopIndex + 1}/${this.activeRouteData.stops.length})`;
+            if (nextStopEl) {
+                const nextStopName = nextStop ? nextStop.name : 'Sıradaki Durak';
+                const totalStopsCount = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops.length : 1;
+                nextStopEl.innerText = `${nextStopName} (${(this.currentStopIndex || 0) + 1}/${totalStopsCount})`;
+            }
             this.currentLegTotalDistance = this.currentDistanceToNext || 850;
             this.currentLegDistanceCovered = 0;
             return;
@@ -2319,7 +2336,12 @@ const Game = {
         // Uzaklığa göre büyükten küçüğe sırala
         this.upcomingTurns.sort((a,b) => b.distance - a.distance);
 
-        document.getElementById('hud-next-stop').innerText = `${nextStop.name} (${this.currentStopIndex + 1}/${this.activeRouteData.stops.length})`;
+        const hudNextStopEl = document.getElementById('hud-next-stop');
+        if (hudNextStopEl) {
+            const nextStopName = nextStop ? nextStop.name : 'Sıradaki Durak';
+            const totalStopsCount = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops.length : 1;
+            hudNextStopEl.innerText = `${nextStopName} (${(this.currentStopIndex || 0) + 1}/${totalStopsCount})`;
+        }
         const activeBusObj = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
         const totalBusCap = activeBusObj ? activeBusObj.totalCapacity : (this.activeRouteData ? this.activeRouteData.otobusKapasitesi : 40);
         document.getElementById('hud-passengers').innerText = `${this.passengersOnBoard} / ${totalBusCap}`;
@@ -3317,7 +3339,8 @@ const Game = {
             if (altEl) {
                 const slopeSign = (this.currentSlopePct > 0) ? `+ % ${this.currentSlopePct} Tırmanış` : (this.currentSlopePct < 0) ? `- % ${Math.abs(this.currentSlopePct)} İniş` : `%0 Düz`;
                 const passTag = incData.passName ? ` • ${incData.passName}` : "";
-                altEl.innerText = `Rakım: ${this.currentAltitude} m (${slopeSign}${passTag})`;
+                const safeAlt = (typeof this.currentAltitude === 'number' && !isNaN(this.currentAltitude)) ? this.currentAltitude : 0;
+                altEl.innerText = `Rakım: ${safeAlt} m (${slopeSign}${passTag})`;
             }
         }
         if (this.speed > currentMaxSpeed && this.acceleration > 0) {
@@ -3472,11 +3495,12 @@ const Game = {
             if (this.currentDistanceToNext <= 95 && !this.stopApproachAnnounced && this.speed > 4) {
                 this.stopApproachAnnounced = true;
                 const isFinalStop = this.activeRouteData && this.activeRouteData.stops && (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
-                const nextStop = this.activeRouteData.stops[this.currentStopIndex];
+                const nextStop = (this.activeRouteData && this.activeRouteData.stops) ? this.activeRouteData.stops[this.currentStopIndex] : null;
+                const stopName = nextStop ? nextStop.name : 'Sıradaki Durak';
                 if (typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
-                    audio.playBusAnnouncement('approach', nextStop.name, { isFinal: isFinalStop });
+                    audio.playBusAnnouncement('approach', stopName, { isFinal: isFinalStop });
                 } else if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
-                    audio.speak(`${nextStop.name} durağına yaklaşıyorsunuz. İnecek yolcular lütfen hazırlansın.`);
+                    audio.speak(`${stopName} durağına yaklaşıyorsunuz. İnecek yolcular lütfen hazırlansın.`);
                 }
             }
             const distanceScale = 1.0; // 1:1 Gerçek Fizik (Metre / Saniye)
@@ -4344,7 +4368,8 @@ const Game = {
         // PAS GEÇME MANTIĞI: İnecek veya binecek yoksa, eğitim modu değilse ve son durak değilse durmadan geç
         if (!isTrainingEmpty && !isFinalStop && alighting === 0 && waiting === 0) {
             this.currentStopIndex++;
-            audio.speakSequence([stopData.name + " durağını geçiyorsunuz.", "Yolcu olmadığı için duraklanmadı.", "Yeni rota hesaplanıyor."]);
+            const passedStopName = (stopData && stopData.name) ? stopData.name : 'Mevcut Durak';
+            audio.speakSequence([passedStopName + " durağını geçiyorsunuz.", "Yolcu olmadığı için duraklanmadı.", "Yeni rota hesaplanıyor."]);
             
             // Eğer varsa geçmiş UI uyarılarını temizle
             if (document.getElementById('obstacles-container')) {

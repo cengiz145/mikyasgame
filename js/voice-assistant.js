@@ -1948,7 +1948,7 @@ class VoiceAssistant {
             this.setAcademyTab('karne');
             const level = Game.licenseLevel || 1;
             const xp = Game.playerXP || 0;
-            const title = (typeof Game.getLicenseTitle === 'function') ? Game.getLicenseTitle() : 'Stajyer';
+            const title = (typeof Game.getLicenseTitle === 'function' && Game.getLicenseTitle()) ? Game.getLicenseTitle() : '1. Sınıf Sürücü';
             const nextXP = (typeof Game.getNextLevelXP === 'function') ? Game.getNextLevelXP(level) : 250;
             const remaining = Math.max(0, nextXP - xp);
             audio.speak(`Şoförlük durumunuz açıldı. Şu an Seviye ${level}, ${title} durumundasınız. Toplam tecrübeniz ${xp} puandır. Seviye ${level + 1}'e kalan: ${remaining} puan.`);

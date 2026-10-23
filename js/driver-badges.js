@@ -1341,7 +1341,7 @@ const DriverBadges = {
                         '<div>' +
                             '<span style="font-size: 0.85rem; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">👑 DİREKSİYONDAKİ AKTİF UNVANINIZ:</span><br>' +
                             '<span style="font-size: 1.35rem; font-weight: bold; color: #fef08a;">' + equipped.icon + ' ' + equipped.name + '</span>' +
-                            '<span style="font-size: 0.85rem; color: #94a3b8; margin-left: 8px;">(' + equipped.category + ')</span>' +
+                            '<span style="font-size: 0.85rem; color: #94a3b8; margin-left: 8px;">(' + (equipped.category || 'Genel Kademe') + ')</span>' +
                             '<div style="font-size: 0.85rem; color: #e2e8f0; margin-top: 4px;">' + equipped.desc + '</div>' +
                         '</div>' +
                         '<div>' +

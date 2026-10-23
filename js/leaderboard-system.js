@@ -385,7 +385,7 @@
                     let myScoreText = "";
                     if (this.currentCategory === 'km') myScoreText = `${me.totalKm.toLocaleString('tr-TR')} KM`;
                     else if (this.currentCategory === 'passengers') myScoreText = `${me.totalPassengers.toLocaleString('tr-TR')} Yolcu`;
-                    else if (this.currentCategory === 'xp') myScoreText = `Seviye ${me.licenseLevel} (${me.playerXP} XP)`;
+                    else if (this.currentCategory === 'xp') myScoreText = `Seviye ${me.licenseLevel || 1} (${(me.playerXP || 0).toLocaleString('tr-TR')} XP)`;
                     else if (this.currentCategory === 'company') myScoreText = `${Math.round(me.companyTreasury).toLocaleString('tr-TR')} ₺ Kasa`;
 
                     myBanner.innerHTML = `

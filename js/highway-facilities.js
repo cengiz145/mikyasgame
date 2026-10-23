@@ -459,7 +459,7 @@
             }
 
             this.playTeaChime();
-            const msg = `🍲 Afiyet olsun! ${fac.name}'nde ${spec.name} yediniz (${spec.price} ₺). ${spec.effectDesc}.`;
+            const msg = `🍲 Afiyet olsun! ${(fac && fac.name) || 'Tesis'}'nde ${(spec && spec.name) || 'Yemek'} yediniz (${(spec && spec.price) || 0} ₺). ${(spec && spec.effectDesc) || ''}.`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
             if (typeof audio !== 'undefined' && audio.speak) {
                 audio.speak(`Afiyet olsun kaptan! ${spec.name} yediniz. Zindelik ve enerjiniz arttı.`);

@@ -331,12 +331,12 @@ const UI = {
     updatePlayerStats: function(licenseLevel, completedTasks, budget, licenseTitle) {
         const lvlEl = document.getElementById('ui-level');
         if (lvlEl) {
-            let displayTitle = licenseTitle;
+            let displayTitle = licenseTitle || "1. Sınıf Şehir İçi Sürücüsü";
             if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.getEquippedTitle === 'function') {
                 const eq = DriverBadges.getEquippedTitle();
                 if (eq && eq.name && eq.id !== 'title_cirak') {
-                    displayTitle = `${eq.icon} ${eq.name}`;
-                    lvlEl.title = `Kuşanılan Unvan: ${eq.name} | Kademe: ${licenseTitle}`;
+                    displayTitle = `${eq.icon || '👑'} ${eq.name}`;
+                    lvlEl.title = `Kuşanılan Unvan: ${eq.name} | Kademe: ${licenseTitle || '1. Sınıf Sürücü'}`;
                 }
             }
             lvlEl.innerText = displayTitle;

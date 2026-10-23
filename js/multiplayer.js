@@ -640,7 +640,7 @@
                     <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
                         <div style="color: #6ee7b7; font-weight: bold; font-size: 0.95rem; margin-bottom: 4px;">👤 SİZİN KAPTAN BİLGİNİZ:</div>
                         <div id="mp-my-profile-desc" style="color: #fff; font-size: 1.05rem;">
-                            <strong>${this.profile.name}</strong> (${this.profile.plate}) - ${this.profile.company}
+                            <strong>${this.profile.name || 'Kaptan'}</strong> (${this.profile.plate || '59 TK 001'}) - ${this.profile.company || 'Tekirdağ Birlik'}
                         </div>
                     </div>
 
@@ -722,8 +722,8 @@
             const profEl = document.getElementById('mp-my-profile-desc');
             if (profEl) {
                 const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
-                const busName = currentBus ? currentBus.name : this.profile.bus;
-                profEl.innerHTML = `<strong>${this.profile.name}</strong> (${this.profile.plate}) - ${this.profile.company} <br><small style="color: #94a3b8;">Araç: ${busName}</small>`;
+                const busName = currentBus ? currentBus.name : (this.profile.bus || 'Standart Otobüs');
+                profEl.innerHTML = `<strong>${this.profile.name || 'Kaptan'}</strong> (${this.profile.plate || '59 TK 001'}) - ${this.profile.company || 'Tekirdağ Birlik'} <br><small style="color: #94a3b8;">Araç: ${busName}</small>`;
             }
 
             const listEl = document.getElementById('mp-drivers-list');

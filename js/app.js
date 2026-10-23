@@ -524,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderFreePickerCurrentStep();
                 };
             }
-            if (titleEl) titleEl.innerText = `🏘️ ${distName} (${cityName}): 3. Adım - Mahalle & Hat`;
+            if (titleEl) titleEl.innerText = `🏘️ ${distName || 'Merkez'} (${cityName || 'Tekirdağ'}): 3. Adım - Mahalle & Hat`;
             if (descEl) descEl.innerText = `${distName} ilçesine ait mahalleler listeleniyor. Serbest seferinizi başlatmak istediğiniz mahalleyi seçin.`;
             if (searchInp) searchInp.placeholder = `🔍 Mahalle ara (örn: Merkez, Cumhuriyet, Atatürk)... `;
 
@@ -592,12 +592,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     const lblActive = document.getElementById('lbl-active-district');
                     if (lblActive) lblActive.textContent = freePickerState.city + " / " + freePickerState.district;
                     const lblRouteActive = document.getElementById('lbl-route-active-district');
-                    if (lblRouteActive) lblRouteActive.textContent = freePickerState.district + " (" + mName + ")";
+                    if (lblRouteActive) lblRouteActive.textContent = (freePickerState.district || 'Merkez') + (mName ? " (" + mName + ")" : "");
 
-                    const announceMsg = `${freePickerState.city}, ${freePickerState.district}, ${mName} serbest seferiniz hazırlandı. İyi yolculuklar kaptan.`;
+                    const announceMsg = `${freePickerState.city || 'Tekirdağ'}, ${freePickerState.district || 'Merkez'}, ${mName || 'Şehir İçi'} serbest seferiniz hazırlandı. İyi yolculuklar kaptan.`;
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceMsg);
                     if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceMsg);
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🛣️ ${freePickerState.city} - ${freePickerState.district} (${mName})`, 'success');
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🛣️ ${freePickerState.city || 'Tekirdağ'} - ${freePickerState.district || 'Merkez'}${mName ? ' (' + mName + ')' : ''}`, 'success');
 
                     // Serbest rotayı oluştur
                     if (typeof createOrGetFreeRoamRoute === 'function') {

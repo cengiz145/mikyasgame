@@ -626,7 +626,7 @@
             // Türkiye Karayolu veritabanından en yakın meşhur geçit veya ilçe virajı eşleştirmesi
             const matchedPass = this._findMatchingPass(centerLat, centerLon, context);
             const curveName = matchedPass 
-                ? (matchedPass.name + " (" + dirText + ")")
+                ? (matchedPass.name + (dirText ? " (" + dirText + ")" : ""))
                 : this._generateRealisticTurkishCurveName(context, dirText, advisorySpeed);
 
             const speechText = matchedPass 
@@ -710,7 +710,7 @@
                     const radius = matchedPass ? matchedPass.radius : 75;
                     const advisorySpeed = matchedPass ? matchedPass.advisorySpeed : 50;
                     const curveIntensity = matchedPass ? matchedPass.intensity : 28;
-                    const curveName = matchedPass.name + " - " + (i + 1) + ". Kısım (" + dirText + ")";
+                    const curveName = matchedPass.name + " - " + (i + 1) + ". Kısım" + (dirText ? " (" + dirText + ")" : "");
 
                     turns.push({
                         distance: currentDist,
