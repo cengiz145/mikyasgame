@@ -1154,6 +1154,83 @@ startEngine() {
         this.sounds.crash.volume(0.35, id);
     }
 
+    stopAllSoundEffects() {
+        // 1. Zamanlayıcıları temizle (Gecikmeli başlayan motor/akbil seslerini engelle)
+        if (this.enginePreviewTimer) {
+            clearTimeout(this.enginePreviewTimer);
+            this.enginePreviewTimer = null;
+        }
+        if (this.enginePreviewFadeTimer) {
+            clearTimeout(this.enginePreviewFadeTimer);
+            this.enginePreviewFadeTimer = null;
+        }
+        if (this.accelTimer) {
+            clearTimeout(this.accelTimer);
+            this.accelTimer = null;
+        }
+        if (this.doorAkbilTimer) {
+            clearTimeout(this.doorAkbilTimer);
+            this.doorAkbilTimer = null;
+        }
+        if (this.retarderAutoStopTimer) {
+            clearTimeout(this.retarderAutoStopTimer);
+            this.retarderAutoStopTimer = null;
+        }
+
+        // 2. HTML5 Audio nesnelerini anında durdur ve sıfırla
+        if (this.currentAccelAudio) {
+            try { this.currentAccelAudio.pause(); this.currentAccelAudio.currentTime = 0; } catch(e){}
+            this.currentAccelAudio = null;
+        }
+        if (this.enginePreviewAudio) {
+            try { this.enginePreviewAudio.pause(); this.enginePreviewAudio.currentTime = 0; } catch(e){}
+            this.enginePreviewAudio = null;
+        }
+        if (this.currentRampAudio) {
+            try { this.currentRampAudio.pause(); this.currentRampAudio.currentTime = 0; } catch(e){}
+            this.currentRampAudio = null;
+        }
+        if (this.currentWindowAudio) {
+            try { this.currentWindowAudio.pause(); this.currentWindowAudio.currentTime = 0; } catch(e){}
+            this.currentWindowAudio = null;
+        }
+
+        // 3. Retarder sesini tamamen kes
+        if (typeof this.stopRetarder === 'function') {
+            this.stopRetarder();
+        }
+
+        // 4. Howler üzerindeki tüm efektleri sustur
+        if (this.sounds) {
+            const effectKeys = [
+                'start', 'engine', 'airBrake', 'kneeling', 'doorOpen', 'doorClose',
+                'akbilTam', 'akbilOgrenci', 'stopRequest', 'retarder', 'speedBump',
+                'horn', 'tireScreech'
+            ];
+            effectKeys.forEach(k => {
+                if (this.sounds[k] && typeof this.sounds[k].stop === 'function') {
+                    try { this.sounds[k].stop(); } catch(e){}
+                }
+            });
+        }
+
+        // 5. Web Audio API rölanti / motor gain'lerini sessize al
+        if (this.idleGain && this.ctx) {
+            try { this.idleGain.gain.setValueAtTime(0, this.ctx.currentTime); } catch(e){}
+        }
+        if (this.engineMasterGain && this.ctx) {
+            try { this.engineMasterGain.gain.setValueAtTime(0, this.ctx.currentTime); } catch(e){}
+        }
+        if (this.retarderGain && this.ctx) {
+            try { this.retarderGain.gain.setValueAtTime(0, this.ctx.currentTime); } catch(e){}
+        }
+
+        // 6. Çevre ve yol seslerini durdur
+        if (typeof this.stopAllRoadSounds === 'function') {
+            this.stopAllRoadSounds();
+        }
+    }
+
     stopAllRoadSounds() {
         if (!this.sounds) return;
         ['roadAsphalt', 'roadGravel', 'roadGravelAsphalt', 'roadWind', 'cityAmbience', 'cabinAmbience'].forEach(key => {
@@ -1989,12 +2066,13 @@ startEngine() {
         } catch(e) {}
     }
 
-    playEngineStartPreview(duration = 3.5) {
+    playEngineStartPreview(duration = 2.4) {
         try {
+            if (this.enginePreviewTimer) clearTimeout(this.enginePreviewTimer);
             if (this.sounds && this.sounds.start) {
                 try { this.sounds.start.play(); } catch(e) {}
             }
-            setTimeout(() => {
+            this.enginePreviewTimer = setTimeout(() => {
                 if (this.enginePreviewAudio) {
                     this.enginePreviewAudio.pause();
                     this.enginePreviewAudio.currentTime = 0;
@@ -2023,7 +2101,8 @@ startEngine() {
 
     playDoorOpenWithAkbil() {
         this.playDoorOpen();
-        setTimeout(() => {
+        if (this.doorAkbilTimer) clearTimeout(this.doorAkbilTimer);
+        this.doorAkbilTimer = setTimeout(() => {
             if (typeof this.playAkbilTam === 'function') {
                 this.playAkbilTam();
             } else if (this.sounds && this.sounds.akbilTam) {
