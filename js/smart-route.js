@@ -1281,7 +1281,7 @@ const AkilliRotaSistemi = {
             terrain: "asfalt",
             desc: `Akıllı Rota Sistemi: ${best.fromStop} ➔ ${best.toStop}. Hat ${best.route.hatNo} ile ${smartStops.length} durak, ${best.dist} km.`,
             speechBriefing: `Akıllı rota oluşturuldu. ${best.fromStop} durağından ${best.toStop} durağına Hat ${best.route.hatNo} ile seferiniz başlıyor. Toplam ${smartStops.length} durak, ${best.dist} kilometre.`,
-            detailedInstructions: `Akıllı Rota (Hat ${best.route.hatNo})\n` +
+            detailedInstructions: `Akıllı Rota (Hat ${(best.route && best.route.hatNo) || "Özel"})\n` +
                 smartStops.map((s, idx) => `${idx + 1}. Adım: ${s.name}`).join('\n'),
             stops: smartStops
         };

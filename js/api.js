@@ -509,7 +509,7 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                 }
 
                 const detailedInstructions = [
-                    "<strong>Görev Tanımı:</strong> Görev " + taskNum + " (" + lvl.name + "): " + (item.name || found.name) + "<br>",
+                    "<strong>Görev Tanımı:</strong> Görev " + taskNum + " (" + (lvl.name || 'Şehir İçi') + "): " + (item.name || found.name || 'Sefer') + "<br>",
                     "<strong>Kalkış (Başlangıç) Durağı:</strong> " + startStop + "<br>",
                     "<strong>Uğranacak Ara Duraklar:</strong> " + (intermediate.length > 0 ? intermediate.join(" ➔ ") : "Ara durak bulunmamaktadır (Doğrudan varış durağına sürüş)") + "<br>",
                     "<strong>Gitmeniz Gereken Son Durak (Hedef):</strong> " + endStop + "<br>",
@@ -529,7 +529,7 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                     district: lvl.lic === 1 ? targetDistrict : (found.district || targetDistrict),
                     isDistrict: false,
                     isCity: true,
-                    name: "Görev " + taskNum + " (" + lvl.name + "): " + (item.name || found.name),
+                    name: "Görev " + taskNum + " (" + (lvl.name || 'Şehir İçi Sürücü') + "): " + (item.name || found.name || 'Sefer'),
                     taskIndex: taskGlobalIndex,
                     licenseLevel: lvl.lic,
                     color: lvl.color,
@@ -549,7 +549,7 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                     CareerMissions.enrichRoute(taskRoute, taskGlobalIndex);
                     const cm = CareerMissions.getMission(taskGlobalIndex);
                     if (cm) {
-                        taskRoute.name = "Görev " + taskNum + " (" + cm.levelTitle + "): " + cm.title;
+                        taskRoute.name = "Görev " + taskNum + " (" + (cm.levelTitle || 'Kaptan') + "): " + (cm.title || 'Sefer');
                         taskRoute.speechBriefing = cm.dispatcherOrder;
                         taskRoute.isTraining = cm.isTraining;
                         taskRoute.emptyBus = cm.emptyBus;
@@ -876,7 +876,7 @@ function createOrGetFreeRoamRoute(cityName, districtName, neighborhoodName) {
         taskIndex: 0,
         licenseLevel: 1,
         color: "#22c55e",
-        name: "[Serbest Rota] " + cityName + " - " + districtName + " (" + cleanMahalle + ")",
+        name: "[Serbest Rota] " + (cityName || 'Tekirdağ') + " - " + (districtName || 'Merkez') + (cleanMahalle ? " (" + cleanMahalle + ")" : ""),
         startStop: stops[0].name,
         endStop: stops[stops.length - 1].name,
         intermediateStops: stops.slice(1, -1).map(s => s.name),

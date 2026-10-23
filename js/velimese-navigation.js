@@ -949,7 +949,7 @@ const VelimeseNavigasyon = {
             id: routeId,
             hatNo: "VM-R",
             name: "Velimeşe Mahalle İçi: " + kalkis.name + " ➔ " + varis.name,
-            rawName: "Velimeşe 100 Sokak Seferi (" + kalkis.name + " - " + varis.name + ")",
+            rawName: "Velimeşe 100 Sokak Seferi (" + (kalkis ? kalkis.name : 'Kalkış') + " - " + (varis ? varis.name : 'Varış') + ")",
             district: "Velimeşe",
             originDistrict: "Velimeşe",
             destDistrict: "Velimeşe",

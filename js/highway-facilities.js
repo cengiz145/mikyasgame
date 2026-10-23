@@ -574,7 +574,7 @@
             const muavinText = `Sayın yolcularımız, ${fac.name}'ne varmış bulunmaktayız. Kaptanımız 30 dakika ihtiyaç molası vermiştir. Lütfen peron numaranızı ve araç plakanızı unutmayınız. Hayırlı dinlenmeler dileriz.`;
             
             if (typeof UI !== 'undefined' && UI.showToast) {
-                UI.showToast(`📢 [Muavin Anonsu] 30 Dk İhtiyaç Molası Başladı! (+${tipsEarned} ₺ Yolcu Bahşişi)`, "success");
+                UI.showToast(`📢 [Muavin Anonsu] 30 Dk İhtiyaç Molası Başladı! (+${tipsEarned || 0} ₺ Yolcu Bahşişi)`, "success");
             }
             if (typeof audio !== 'undefined' && audio.speak) {
                 audio.speak(muavinText);

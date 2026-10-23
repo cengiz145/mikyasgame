@@ -1217,11 +1217,11 @@ const Game = {
             }
             const lvlMsg = `Tebrikler kaptan! Sefer başarıyla tamamlandı.${extraNotes} Seferden +${earnedXP} XP kazandınız ve Seviye ${newLevel}'e terfi ettiniz! Yeni unvanınız: ${this.getLicenseTitle()}.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(lvlMsg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! (${this.getLicenseTitle()})`, "success");
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! — ${this.getLicenseTitle()}`, "success");
         } else {
             const reportMsg = `Tebrikler kaptan, sefer tamamlandı.${extraNotes} Kazanılan: +${earnedXP} XP. Seviye ${this.licenseLevel + 1}'e kalan: ${remainingXP} XP.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(reportMsg);
-            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏁 Sefer Bitti: +${earnedXP} XP (Kalan: ${remainingXP} XP)`, "info");
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏁 Sefer Bitti: +${earnedXP} XP (Kalan: ${remainingXP || 0} XP)`, "info");
         }
 
         UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
@@ -1329,7 +1329,7 @@ const Game = {
             const lvlMsg = `Tebrikler kaptan! ${amount} tecrübe puanı kazandınız ve Seviye ${newLevel}'e terfi ettiniz! Yeni unvanınız: ${this.getLicenseTitle()}.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(lvlMsg);
             if (typeof UI !== 'undefined' && UI.showToast) {
-                UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! (${this.getLicenseTitle()})`, "success");
+                UI.showToast(`🎉 TERFİ: Seviye ${newLevel}! — ${this.getLicenseTitle()}`, "success");
             }
             if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
                 UI.updateTitleScreenButtons();
@@ -1420,12 +1420,12 @@ const Game = {
         }
 
         if (typeof UI !== 'undefined' && UI.showToast) {
-            UI.showToast(`☕ ${compName} İkramı Dağıtıldı! (+${tipMoney} ₺ Bahşiş)`, "success");
+            UI.showToast(`☕ ${compName || 'Şirket'} İkramı Dağıtıldı! (+${tipMoney || 0} ₺ Bahşiş)`, "success");
         }
 
         const passFeedback = document.getElementById('passenger-feedback');
         if (passFeedback) {
-            passFeedback.innerText = `☕ İkram Servisi: ${pkgName} dağıtıldı. (+${tipMoney} ₺ Kaptan Bahşişi)`;
+            passFeedback.innerText = `☕ İkram Servisi: ${pkgName || 'İkram'} dağıtıldı. (+${tipMoney || 0} ₺ Kaptan Bahşişi)`;
             passFeedback.style.color = '#38bdf8';
         }
     },
@@ -2403,7 +2403,7 @@ const Game = {
                     if (audio.speak) audio.speak(`${tunnelName} girişine ulaşıldı. Tünel uzunluğu ${tunnelLen} metre. Farlarınızı açık tutunuz.`);
                 }
                 if (typeof UI !== 'undefined' && UI.showToast) {
-                    UI.showToast(`🚇 ${tunnelName} (${tunnelLen} m)`, "info");
+                    UI.showToast(`🚇 ${tunnelName || 'Tünel'} (${tunnelLen || 0} m)`, "info");
                 }
                 if (!this.isHeadlightsOn) {
                     setTimeout(() => {
@@ -2445,7 +2445,7 @@ const Game = {
                     audio.speak(`${bridgeName} geçişi başladı. Uzunluk ${bridgeLen} metre. Şiddetli yan rüzgara dikkat ediniz.`);
                 }
                 if (typeof UI !== 'undefined' && UI.showToast) {
-                    UI.showToast(`🌉 ${bridgeName} (${bridgeLen} m)`, "info");
+                    UI.showToast(`🌉 ${bridgeName || 'Köprü'} (${bridgeLen || 0} m)`, "info");
                 }
             }
         } else if (this.isInsideBridge) {
@@ -3815,7 +3815,9 @@ const Game = {
         
         if (document.getElementById('hud-temp')) {
             const rainInfo = (this.weather === 'rainy' && this.rainMmPerHour > 0) ? ` | 🌧️ ${this.rainMmPerHour} mm/s` : '';
-            document.getElementById('hud-temp').innerText = `${Math.floor(this.busTemperature)}°C (Dış: ${this.temperature}°C)${this.isACOn && !isAnyWindowOpen ? ' [AC]' : ''}${rainInfo}`;
+            const safeBusTemp = (typeof this.busTemperature === 'number' && !isNaN(this.busTemperature)) ? Math.floor(this.busTemperature) : 22;
+            const safeOutTemp = (typeof this.temperature === 'number' && !isNaN(this.temperature)) ? this.temperature : 18;
+            document.getElementById('hud-temp').innerText = `${safeBusTemp}°C (Dış: ${safeOutTemp}°C)${this.isACOn && !isAnyWindowOpen ? ' [AC]' : ''}${rainInfo}`;
         }
 
         // Yolcu Sıcaklık Tepkileri (Tolerans Sistemi)
@@ -4961,7 +4963,7 @@ const Game = {
                 comfortBonus = baseBonus + tipBonusAmt;
                 this.addMoney(comfortBonus);
                 if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'tips', 'Yolcu Konfor & Bahşiş Primi', comfortBonus);
-                const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${curBus.brand} Lüks Kabin Bonusu)` : "";
+                const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${(curBus && curBus.brand) || 'Otobüs'} Lüks Kabin Bonusu)` : "";
                 comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote}.`;
             }
             
@@ -5284,7 +5286,10 @@ const Game = {
                 if (this.passengersOnBoard > 15 && this.passengersOnBoard <= 40) weightCategory = "orta ağırlıkta";
                 else if (this.passengersOnBoard > 40) weightCategory = "çok ağır";
 
-                const msg = `Saat ${timeStr} (${timeOfDay}). Dış sıcaklık ${this.temperature} derece, araç içi ${Math.floor(this.busTemperature)} derece. Hava ${durum}.${uyari}${farDurum} Otobüs şu an ${weightCategory} (${this.passengersOnBoard} yolcu). ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
+                const safeBusTemp = (typeof this.busTemperature === 'number' && !isNaN(this.busTemperature)) ? Math.floor(this.busTemperature) : 22;
+                const safeOutTemp = (typeof this.temperature === 'number' && !isNaN(this.temperature)) ? this.temperature : 18;
+                const safePassengers = (typeof this.passengersOnBoard === 'number' && !isNaN(this.passengersOnBoard)) ? this.passengersOnBoard : 0;
+                const msg = `Saat ${timeStr} (${timeOfDay || 'Gündüz'}). Dış sıcaklık ${safeOutTemp} derece, araç içi ${safeBusTemp} derece. Hava ${durum}.${uyari}${farDurum} Otobüs şu an ${weightCategory} (${safePassengers} yolcu). ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
                 if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
                 if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, 'info');

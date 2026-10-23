@@ -443,7 +443,7 @@
                     metricSubText = `${(u.playerXP || 0).toLocaleString('tr-TR')} XP | ${u.completedTasks || 0} Görev`;
                 } else if (this.currentCategory === 'company') {
                     metricText = `${Math.round(u.companyTreasury || 0).toLocaleString('tr-TR')} ₺`;
-                    metricSubText = `${u.companyName} (Seviye ${u.companyLevel})`;
+                    metricSubText = `${u.companyName || 'Şirket'} (Seviye ${u.companyLevel || 1})`;
                 }
 
                 const titleObj = this.getTitleInfo(u.equippedTitle);

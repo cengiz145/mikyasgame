@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('error', (e) => {
         console.error("Global JS Error:", e.message, "at", e.filename, ":", e.lineno);
         if (window.UI && typeof window.UI.showToast === 'function') {
-            window.UI.showToast(`SİSTEM HATASI: ${e.message} (Satır: ${e.lineno})`, 'danger');
+            const errMsg = e.message || "Bilinmeyen Hata";
+            const lineInfo = (e.lineno !== undefined && e.lineno !== null) ? ` (Satır: ${e.lineno})` : "";
+            window.UI.showToast(`SİSTEM HATASI: ${errMsg}${lineInfo}`, 'danger');
         }
         if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
             audio.speak(`Kritik sistem hatası: ${e.message}. Lütfen bu hatayı bana bildirin.`);
@@ -828,7 +830,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('district-dest-modal').classList.add('hidden');
                     routesData[route.id] = route;
                     audio.speak("TEKULAŞ " + route.name + " devreye alındı. İyi yolculuklar kaptan.");
-                    UI.showToast(route.name + " Devreye Alındı (" + totalKm.toFixed(1) + " KM)", "success");
+                    const safeKm = (typeof totalKm === 'number' && !isNaN(totalKm)) ? totalKm.toFixed(1) : '0';
+                    UI.showToast(route.name + " Devreye Alındı (" + safeKm + " KM)", "success");
                     Game.startRoute(route.id);
                 };
 

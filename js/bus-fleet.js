@@ -981,7 +981,7 @@ const BusFleet = {
         }
 
         if (!isFreeDrive && currentLevel < bus.requiredLevel) {
-            const lockMsg = `Seviyeniz yetersiz! ${bus.fullName} satın almak için Seviye ${bus.requiredLevel} olmalısınız (Mevcut Seviyeniz: ${currentLevel}).`;
+            const lockMsg = `Seviyeniz yetersiz! ${bus.fullName} satın almak için Seviye ${bus.requiredLevel} olmalısınız (Mevcut Seviyeniz: ${currentLevel || 1}).`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, "warning");
             return false;

@@ -1069,7 +1069,7 @@
             if (!inst) return;
             const currentLevel = this.getInstitutionLevel(instId);
             if (currentLevel >= 3) {
-                const maxMsg = `${inst.name} zaten maksimum zirve seviyededir (${inst.levels[2].title}).`;
+                const maxMsg = `${inst.name} zaten maksimum zirve seviyededir (${(inst.levels && inst.levels[2] && inst.levels[2].title) || 'Son Seviye'}).`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(maxMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(maxMsg, 'info');
                 return;
@@ -1128,7 +1128,7 @@
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(speechMsg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(toastMsg, 'success');
 
-            this.addRadioLog("🏢 Merkez İdare", "🏛️", `${inst.name} tesisimiz Seviye ${nextLvlObj.level}'e terfi etti (${nextLvlObj.title}). Filonun yeni gücü: ${nextLvlObj.perkShort}`, "system");
+            this.addRadioLog("🏢 Merkez İdare", "🏛️", `${inst.name} tesisimiz Seviye ${nextLvlObj.level}'e terfi etti (${(nextLvlObj && nextLvlObj.title) || 'Yeni Seviye'}). Filonun yeni gücü: ${(nextLvlObj && nextLvlObj.perkShort) || ''}`, "system");
 
             this.renderAll();
         },
@@ -2025,7 +2025,7 @@
                 this.data.companyLevel = newLvl;
                 this.saveData();
                 const lvlInfo = this.companyLevels.find(l => l.level === newLvl);
-                const toastMsg = `🏢 ŞİRKET BÜYÜDÜ! Şirketiniz '${lvlInfo.badge} ${lvlInfo.title}' seviyesine terfi etti! (${lvlInfo.perkDesc})`;
+                const toastMsg = `🏢 ŞİRKET BÜYÜDÜ! Şirketiniz '${lvlInfo.badge || '🏢'} ${lvlInfo.title || 'Şirket'}' seviyesine terfi etti! (${lvlInfo.perkDesc || 'Yeni Avantajlar Açıldı'})`;
                 if (typeof audio !== 'undefined' && audio.playSuccess) audio.playSuccess();
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(toastMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(toastMsg, "success");
@@ -2139,8 +2139,8 @@
             this.dispatchDriver(driverInfo.id, "route_corlu", defaultBusId);
 
             const successMsg = isFreeGift 
-                ? `Hayırlı olsun! Başlangıç çırağınız ${driverInfo.name} (${rankObj.badge} ${rankObj.title}) şirketinize katıldı! Sefere çıktıkça tecrübe kazanıp yükselecek.`
-                : `Transfer başarılı! ${driverInfo.name} (${rankObj.badge} ${rankObj.title}) ${driverInfo.hireFee} ₺ bedelle şirketinize katıldı.`;
+                ? `Hayırlı olsun! Başlangıç çırağınız ${driverInfo.name} (${rankObj ? rankObj.badge : '🌱'} ${rankObj ? rankObj.title : 'Kaptan'}) şirketinize katıldı! Sefere çıktıkça tecrübe kazanıp yükselecek.`
+                : `Transfer başarılı! ${driverInfo.name} (${rankObj ? rankObj.badge : '🌱'} ${rankObj ? rankObj.title : 'Kaptan'}) ${driverInfo.hireFee} ₺ bedelle şirketinize katıldı.`;
 
             this.playCashChime();
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(successMsg);
@@ -3825,7 +3825,7 @@
             const empBadge = empComp
                 ? `<div style="margin-top: 8px; padding: 10px 14px; background: rgba(34,197,94,0.18); border: 1.5px solid #22c55e; border-radius: 8px; font-size: 0.88rem; color: #86efac; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
                     <div>
-                        <span>👔 <strong>Maaşlı Kaptan:</strong> ${empComp.name} (${empComp.badge}) | Günlük Maaş: <strong style="color: #fde047;">${empComp.dailySalary.toLocaleString('tr-TR')} ₺</strong> | Sefer Primi: <strong style="color: #4ade80;">+${empComp.bonusPercent}%</strong></span>
+                        <span>👔 <strong>Maaşlı Kaptan:</strong> ${empComp.name} (${empComp.badge || '🏢'}) | Günlük Maaş: <strong style="color: #fde047;">${empComp.dailySalary.toLocaleString('tr-TR')} ₺</strong> | Sefer Primi: <strong style="color: #4ade80;">+${empComp.bonusPercent}%</strong></span>
                         <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 3px;">
                             📊 Hasılat Bölüşümü: <strong>%${empComp.companySharePercent || 50} Şirkete Aktarılır</strong>, <strong>%${100 - (empComp.companySharePercent || 50)} Kaptana Kalır</strong>
                         </div>
@@ -4503,7 +4503,7 @@
 
             const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
             if (currentLevel < (comp.minLevel || 1)) {
-                const lockMsg = `Bu şirkete katılmak için Seviye ${comp.minLevel} kaptanlık derecesine sahip olmalısınız (Mevcut Seviyeniz: ${currentLevel}).`;
+                const lockMsg = `Bu şirkete katılmak için Seviye ${comp.minLevel} kaptanlık derecesine sahip olmalısınız (Mevcut Seviyeniz: ${currentLevel || 1}).`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, 'warning');
                 return;

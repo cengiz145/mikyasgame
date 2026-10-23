@@ -2611,7 +2611,9 @@ class VoiceAssistant {
                 let durum = (Game.weather === 'sunny') 
                     ? (Game.isNight ? 'açık gece' : 'güneşli') 
                     : (Game.weather === 'rainy' ? `yağmurlu, saatte ${Game.rainMmPerHour || 5} milimetre yağış var` : 'karlı');
-                audio.speak(`Dış sıcaklık ${Game.temperature} derece, araç içi ${Math.floor(Game.busTemperature)} derece. Hava ${durum}. ${Game.isACOn ? "Klima açık." : "Klima kapalı."}`);
+                const extTemp = (typeof Game.temperature === 'number' && !isNaN(Game.temperature)) ? Game.temperature : 18;
+            const inTemp = (typeof Game.busTemperature === 'number' && !isNaN(Game.busTemperature)) ? Math.floor(Game.busTemperature) : 22;
+            audio.speak(`Dış sıcaklık ${extTemp} derece, araç içi ${inTemp} derece. Hava ${durum}. ${Game.isACOn ? "Klima açık." : "Klima kapalı."}`);
                 return;
             }
 

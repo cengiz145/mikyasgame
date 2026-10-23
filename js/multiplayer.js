@@ -211,7 +211,7 @@
                             this.proximityAnnounceCooldown[driver.id] = now;
 
                             const dirText = (driver.totalDist > myDist) ? "ilerinizde karşı şeritten geliyor" : "arkanızda konvoy takip mesafesinde";
-                            const msg = `Dikkat Kaptan: ${driver.name} (${driver.plate}), yaklaşık ${Math.round(distDiff)} metre ${dirText}!`;
+                            const msg = `Dikkat Kaptan: ${driver.name || 'Kaptan'} (${driver.plate || 'Plakasız'}), yaklaşık ${Math.round(distDiff)} metre ${dirText}!`;
 
                             if (typeof audio !== 'undefined' && audio.speak) {
                                 audio.speak(msg);
@@ -278,7 +278,7 @@
                         this.play3DRemoteHorn(pan, vol);
 
                         // Ekrana ve sesli asistana selam bildirimi
-                        const toastMsg = `📢 Kaptan ${ev.name} (${ev.plate}) size korna ile selam verdi!`;
+                        const toastMsg = `📢 Kaptan ${ev.name || 'Kaptan'} (${ev.plate || 'Plakasız'}) size korna ile selam verdi!`;
                         if (typeof UI !== 'undefined' && UI.showToast) {
                             UI.showToast(toastMsg, "success");
                         }
@@ -414,7 +414,7 @@
             
             this.playRadioChirp();
 
-            const toastMsg = `📻 [Kanal 19] ${chatter.name} (${chatter.plate}): "${chatter.text}"`;
+            const toastMsg = `📻 [Kanal 19] ${chatter.name || 'Kaptan'} (${chatter.plate || 'Kanal 19'}): "${chatter.text || ''}"`;
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast(toastMsg, "info");
             }
