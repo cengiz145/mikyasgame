@@ -570,6 +570,20 @@ const SoundGallery = {
             if (audio.ctx && audio.ctx.state === 'suspended') audio.ctx.resume().catch(() => {});
         }
 
+        // Dinamik sekme sayılarını güncelle
+        const countAll = this.sounds.length;
+        const countEngine = this.sounds.filter(s => s.category === 'engine').length;
+        const countAkbil = this.sounds.filter(s => s.category === 'akbil').length;
+        const countFx = this.sounds.filter(s => s.category === 'effect').length;
+        const elAll = document.getElementById('tab-sound-all');
+        if (elAll) elAll.innerHTML = `📋 Tüm Sesler (${countAll})`;
+        const elEngine = document.getElementById('tab-sound-engine');
+        if (elEngine) elEngine.innerHTML = `🚌 Motor Sesleri (${countEngine} Ses - 10 Sn)`;
+        const elAkbil = document.getElementById('tab-sound-akbil');
+        if (elAkbil) elAkbil.innerHTML = `💳 Akbil & Validatör (${countAkbil})`;
+        const elFx = document.getElementById('tab-sound-fx');
+        if (elFx) elFx.innerHTML = `💨 Havalı Fren & Çevre (${countFx})`;
+
         this.renderModal(this.currentTab);
 
         const welcomeText = "Sesleri Göster galerisi açıldı. 7 farklı otobüs grubunun rölanti motor seslerini 10 saniye boyunca dinleyebilir veya akbil ve mekanik efektleri test edebilirsiniz.";
