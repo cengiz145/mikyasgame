@@ -2038,6 +2038,66 @@
             }
         },
 
+        // Şirketi Sıfırdan Temiz Başlangıç Seviyesine Döndür
+        resetToDefault: function () {
+            this.data = {
+                companyName: "Mikyas Seyahat & Turizm",
+                foundedDate: Date.now(),
+                totalRevenue: 0,
+                completedTripsCount: 0,
+                companyLevel: 1,
+                companyTreasury: 50000,
+                revenueSharePercent: 50,
+                cateringPackage: 'standart',
+                institutions: {
+                    bus_garage: 1,
+                    maintenance_depot: 1,
+                    bus_wash: 1,
+                    fuel_depot: 1,
+                    terminal_offices: 1,
+                    driver_lodging: 1,
+                    catering_cargo_hub: 1
+                },
+                satisfactionRating: 4.9,
+                terminalBranches: {
+                    tekirdag: true,
+                    corlu: false,
+                    istanbul_esenler: false,
+                    ankara_asti: false,
+                    izmir_otogar: false
+                },
+                ticketPricingMultiplier: 1.0,
+                facilityContract: 'standart',
+                hqUpgrades: {
+                    fuelContract: false,
+                    luxuryLounge: false,
+                    terminalPlatform: false,
+                    corporateBrand: false
+                },
+                busConditions: {},
+                hiredDrivers: [],
+                marketTrends: {},
+                specialContracts: [],
+                radioLogs: [],
+                bankruptcyWarned250k: false,
+                bankruptcyWarned750k: false,
+                bankruptcyCount: 0,
+                corporateEmployer: null,
+                isIndependentMode: false
+            };
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.removeItem(this.LEGACY_STORAGE_KEY);
+                    localStorage.removeItem(this.COMMUNITY_STORAGE_KEY);
+                    localStorage.removeItem('otobusCompany');
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
+                }
+            } catch (e) {
+                console.warn("[CompanySystem] resetToDefault storage hatası:", e);
+            }
+            return true;
+        },
+
         // Şoförün Rütbe Bilgisini Getir
         getDriverRankInfo: function (driver) {
             const lvl = driver.rankLevel || 1;
@@ -4146,6 +4206,9 @@
                     <button id="btn-test-bankruptcy" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(239,68,68,0.18); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Resmi Asliye Ticaret Mahkemesi Tasfiye ve İflas Protokolünü Test Et (-1.000.000 ₺)">
                         ⚖️ İflas Testi (-1M ₺)
                     </button>
+                    <button id="btn-owner-reset-all-data-ov" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(220,38,38,0.25); border: 1.5px solid #dc2626; color: #fecaca; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Tüm oyun verilerini (şahsi cüzdan, araçlar, ehliyet, kariyer ve şirket dahil her şeyi) sıfırdan siler">
+                        ⚠️ Tüm Verileri Sıfırla
+                    </button>
                 </div>
             </div>
 
@@ -4213,6 +4276,18 @@
             if (btnWithdraw) {
                 btnWithdraw.addEventListener('click', () => {
                     this.transferToWallet();
+                });
+            }
+
+            const btnResetAllOv = card.querySelector('#btn-owner-reset-all-data-ov');
+            if (btnResetAllOv) {
+                btnResetAllOv.addEventListener('click', () => {
+                    if (typeof Game !== 'undefined' && typeof Game.resetAllGameData === 'function') {
+                        Game.resetAllGameData(true);
+                    } else {
+                        this.resetToDefault();
+                        this.renderModal('overview');
+                    }
                 });
             }
 
@@ -4651,9 +4726,12 @@
                             </div>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                         <button id="btn-owner-reset-level-1" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-size: 0.82rem; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Şirket seviyesini başlangıç seviyesine (Seviye 1) alır">
                             ↩️ Seviye 1'e Döndür
+                        </button>
+                        <button id="btn-owner-reset-all-data" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(220, 38, 38, 0.35); border: 1.5px solid #dc2626; color: #fecaca; font-size: 0.82rem; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Tüm oyun verilerini (şahsi cüzdan, araçlar, ehliyet, kariyer ve şirket dahil her şeyi) sıfırdan siler">
+                            ⚠️ Tüm Verileri Sıfırla
                         </button>
                     </div>
                 </div>
@@ -4759,6 +4837,18 @@
                     const confirmReset = confirm("Şirket seviyesini Seviye 1'e (Sahil Yazıhanesi) döndürmek istiyor musunuz?");
                     if (confirmReset) {
                         this.setCompanyLevelManually(1);
+                    }
+                });
+            }
+
+            const btnOwnerResetAll = container.querySelector('#btn-owner-reset-all-data');
+            if (btnOwnerResetAll) {
+                btnOwnerResetAll.addEventListener('click', () => {
+                    if (typeof Game !== 'undefined' && typeof Game.resetAllGameData === 'function') {
+                        Game.resetAllGameData(true);
+                    } else {
+                        this.resetToDefault();
+                        this.renderModal('upgrades');
                     }
                 });
             }

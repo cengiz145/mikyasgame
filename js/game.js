@@ -1,13 +1,39 @@
-// HERKESİ SEVİYE 1'DEN BAŞLATMA PROTOKOLÜ (GLOBAL SEZON 1)
+// TÜM OYUN VE ŞİRKET VERİLERİNİ TEMİZLEME PROTOKOLÜ (GLOBAL SEZON 2)
 try {
     if (typeof localStorage !== 'undefined') {
-        if (localStorage.getItem('sim_season_level1') !== 'true') {
-            localStorage.setItem('sim_season_level1', 'true');
+        if (localStorage.getItem('wipe_all_data_20261024_v1') !== 'true') {
+            const wipeKeys = [
+                'sim_season_level1', 'licenseLevel', 'driverLicenseLevel', 'playerXP',
+                'completedTasks', 'para', 'clockMinutes', 'unlockedCities', 'merkezUs',
+                'activeDistrict', 'activeNeighborhood', 'selectedBusId', 'academyCompleted',
+                'gamePlayMode', 'otobusSave', 'otobusCompany', 'otobusDriverId', 'otobusPlate',
+                'activeRoute', 'routesData', 'routeFixApplied_v1', 'tekulas_owned_buses_v1',
+                'otobus_company_data_v2', 'otobus_company_data', 'otobus_community_companies_v1',
+                'tekulas_driver_badges_v2', 'tekulas_driver_stats_v2', 'tekulas_driver_equipped_title_v1',
+                'tekulas_driver_unlocked_titles_v1', 'otobus_highway_data', 'tekulas_discovered_stops_v1',
+                'copilot_enabled'
+            ];
+            wipeKeys.forEach(k => {
+                try { localStorage.removeItem(k); } catch(e) {}
+            });
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const k = localStorage.key(i);
+                if (k && (/^(otobus|tekulas|sim_|route)/i.test(k))) {
+                    localStorage.removeItem(k);
+                }
+            }
+            localStorage.setItem('wipe_all_data_20261024_v1', 'true');
+            localStorage.setItem('sim_season_fresh_v2', 'true');
             localStorage.setItem('licenseLevel', '1');
             localStorage.setItem('playerXP', '0');
             localStorage.setItem('completedTasks', '0');
+            localStorage.setItem('para', '2500');
+            localStorage.setItem('clockMinutes', '480');
             localStorage.setItem('unlockedCities', JSON.stringify(["Tekirdağ"]));
             localStorage.setItem('merkezUs', 'Tekirdağ');
+            localStorage.setItem('activeDistrict', 'Süleymanpaşa');
+            localStorage.setItem('tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
+            localStorage.setItem('selectedBusId', 'otokar_kent_lf');
         }
     }
 } catch(e) {}
@@ -852,14 +878,26 @@ const Game = {
 
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        if (data.season !== 'season_level1') {
+                        if (data.season !== 'season_fresh_v2') {
                             this.licenseLevel = 1;
                             this.playerXP = 0;
                             this.completedTasks = 0;
-                            this.playerBudget = data.playerBudget || 0;
-                            this.clockMinutes = data.clockMinutes || 480;
+                            this.playerBudget = 2500;
+                            this.clockMinutes = 480;
                             this.unlockedCities = ["Tekirdağ"];
                             this.currentCity = "Tekirdağ";
+                            this.activeDistrict = "Süleymanpaşa";
+                            this.activeNeighborhood = "";
+                            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.resetToDefault === 'function') {
+                                CompanySystem.resetToDefault();
+                            }
+                            if (typeof BusFleet !== 'undefined') {
+                                try {
+                                    localStorage.setItem(BusFleet.OWNED_KEY || 'tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
+                                    localStorage.setItem('selectedBusId', 'otokar_kent_lf');
+                                    if (typeof BusFleet.selectBus === 'function') BusFleet.selectBus('otokar_kent_lf');
+                                } catch(e) {}
+                            }
                             this.saveData(true);
                         } else {
                             // Çevrimdışı İlerleme Koruma Kalkanı: Yerel ilerleme ile bulutu akıllıca birleştir
@@ -974,10 +1012,220 @@ const Game = {
         });
     },
 
+    resetAllGameData: function(interactive = false) {
+        if (interactive) {
+            const confirmed = (typeof window !== 'undefined' && typeof window.confirm === 'function')
+                ? window.confirm(
+                    "⚠️ DİKKAT: TÜM OYUN VE ŞİRKET VERİLERİNİ SIFIRLAMA\n\n" +
+                    "Bu işlem:\n" +
+                    "• Şahsi cüzdanınızı ve tüm bakiyenizi (2.500 ₺ başlangıç harçlığına),\n" +
+                    "• Ehliyet seviyenizi Seviye 1'e ve XP'nizi 0'a,\n" +
+                    "• Tamamlanan görevleri 0'a ve açık şehirleri Tekirdağ'a,\n" +
+                    "• Satın aldığınız tüm otobüsleri silip yalnızca başlangıç aracı Otokar Kent LF'ye,\n" +
+                    "• Şirket kasasını 50.000 ₺'ye, kurum binalarını Seviye 1'e, şoförleri ve seferleri sıfıra,\n" +
+                    "• Kaptan liyakat unvanlarını, brövelerini ve otoyol tesis kayıtlarını,\n" +
+                    "TAMAMEN SİLECEK VE OYUNU SIFIRDAN BAŞLATACAKTIR.\n\n" +
+                    "Tüm verileri silip temiz başlangıç yapmak istediğinize emin misiniz?"
+                )
+                : true;
+            if (!confirmed) return false;
+        }
+
+        console.log("[Game] Tüm oyun ve şirket verileri temizleniyor...");
+
+        // 1. LocalStorage temizliği
+        try {
+            if (typeof localStorage !== 'undefined') {
+                const wipeKeys = [
+                    'sim_season_level1', 'sim_season_fresh_v2', 'licenseLevel', 'driverLicenseLevel', 'playerXP',
+                    'completedTasks', 'para', 'clockMinutes', 'unlockedCities', 'merkezUs',
+                    'activeDistrict', 'activeNeighborhood', 'selectedBusId', 'academyCompleted',
+                    'gamePlayMode', 'otobusSave', 'otobusCompany', 'otobusDriverId', 'otobusPlate',
+                    'activeRoute', 'routesData', 'routeFixApplied_v1', 'tekulas_owned_buses_v1',
+                    'otobus_company_data_v2', 'otobus_company_data', 'otobus_community_companies_v1',
+                    'tekulas_driver_badges_v2', 'tekulas_driver_stats_v2', 'tekulas_driver_equipped_title_v1',
+                    'tekulas_driver_unlocked_titles_v1', 'otobus_highway_data', 'tekulas_discovered_stops_v1',
+                    'copilot_enabled'
+                ];
+                wipeKeys.forEach(k => {
+                    try { localStorage.removeItem(k); } catch(e) {}
+                });
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const k = localStorage.key(i);
+                    if (k && (/^(otobus|tekulas|sim_|route)/i.test(k))) {
+                        localStorage.removeItem(k);
+                    }
+                }
+                localStorage.setItem('wipe_all_data_20261024_v1', 'true');
+                localStorage.setItem('sim_season_fresh_v2', 'true');
+                localStorage.setItem('licenseLevel', '1');
+                localStorage.setItem('playerXP', '0');
+                localStorage.setItem('completedTasks', '0');
+                localStorage.setItem('para', '2500');
+                localStorage.setItem('clockMinutes', '480');
+                localStorage.setItem('unlockedCities', JSON.stringify(["Tekirdağ"]));
+                localStorage.setItem('merkezUs', 'Tekirdağ');
+                localStorage.setItem('activeDistrict', 'Süleymanpaşa');
+                localStorage.setItem('tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
+                localStorage.setItem('selectedBusId', 'otokar_kent_lf');
+            }
+        } catch(e) {
+            console.warn("[Game] Reset storage uyarısı:", e);
+        }
+
+        // 2. Bellekteki Game Durumunu Sıfırla
+        this.licenseLevel = 1;
+        this.playerXP = 0;
+        this.completedTasks = 0;
+        this.playerBudget = 2500;
+        this.clockMinutes = 480;
+        this.unlockedCities = ["Tekirdağ"];
+        this.currentCity = "Tekirdağ";
+        this.activeDistrict = "Süleymanpaşa";
+        this.activeNeighborhood = "";
+        this.academyCompleted = false;
+        this.playMode = 'career';
+        if (this._circuitBreaker) {
+            this._circuitBreaker = { failureCount: 0, blockedUntil: 0 };
+        }
+        this._lastFirebasePayloadHash = null;
+
+        // 3. Otobüs Filosu Sıfırlama
+        const busFleetObj = (typeof BusFleet !== 'undefined') ? BusFleet : ((typeof window !== 'undefined' && window.BusFleet) ? window.BusFleet : null);
+        if (busFleetObj) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem(busFleetObj.OWNED_KEY || 'tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
+                    localStorage.setItem('selectedBusId', 'otokar_kent_lf');
+                }
+                if (typeof busFleetObj.selectBus === 'function') {
+                    busFleetObj.selectBus('otokar_kent_lf');
+                }
+            } catch(e) {
+                console.warn("[Game] BusFleet sıfırlama uyarısı:", e);
+            }
+        }
+
+        // 4. Şirket Verisi Sıfırlama
+        const compSysObj = (typeof CompanySystem !== 'undefined') ? CompanySystem : ((typeof window !== 'undefined' && window.CompanySystem) ? window.CompanySystem : null);
+        if (compSysObj) {
+            try {
+                if (typeof compSysObj.resetToDefault === 'function') {
+                    compSysObj.resetToDefault();
+                } else if (compSysObj.data) {
+                    compSysObj.data.companyName = "Mikyas Seyahat & Turizm";
+                    compSysObj.data.foundedDate = Date.now();
+                    compSysObj.data.totalRevenue = 0;
+                    compSysObj.data.completedTripsCount = 0;
+                    compSysObj.data.companyLevel = 1;
+                    compSysObj.data.companyTreasury = 50000;
+                    compSysObj.data.revenueSharePercent = 50;
+                    compSysObj.data.cateringPackage = 'standart';
+                    compSysObj.data.institutions = {
+                        bus_garage: 1, maintenance_depot: 1, bus_wash: 1, fuel_depot: 1,
+                        terminal_offices: 1, driver_lodging: 1, catering_cargo_hub: 1
+                    };
+                    compSysObj.data.satisfactionRating = 4.9;
+                    compSysObj.data.terminalBranches = { tekirdag: true, corlu: false, istanbul_esenler: false, ankara_asti: false, izmir_otogar: false };
+                    compSysObj.data.ticketPricingMultiplier = 1.0;
+                    compSysObj.data.facilityContract = 'standart';
+                    compSysObj.data.hqUpgrades = { fuelContract: false, luxuryLounge: false, terminalPlatform: false, corporateBrand: false };
+                    compSysObj.data.busConditions = {};
+                    compSysObj.data.hiredDrivers = [];
+                    compSysObj.data.marketTrends = {};
+                    compSysObj.data.specialContracts = [];
+                    compSysObj.data.radioLogs = [];
+                    compSysObj.data.bankruptcyWarned250k = false;
+                    compSysObj.data.bankruptcyWarned750k = false;
+                    compSysObj.data.bankruptcyCount = 0;
+                    compSysObj.data.corporateEmployer = null;
+                    compSysObj.data.isIndependentMode = false;
+                    if (typeof compSysObj.saveData === 'function') compSysObj.saveData();
+                }
+            } catch(e) {
+                console.warn("[Game] CompanySystem sıfırlama uyarısı:", e);
+            }
+        }
+
+        // 5. Şoför Bröve ve İstatistik Sıfırlama
+        const driverBadgesObj = (typeof DriverBadges !== 'undefined') ? DriverBadges : ((typeof window !== 'undefined' && window.DriverBadges) ? window.DriverBadges : null);
+        if (driverBadgesObj) {
+            try {
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.setItem(driverBadgesObj.STORAGE_KEY || 'tekulas_driver_badges_v2', JSON.stringify({}));
+                    localStorage.setItem(driverBadgesObj.STATS_KEY || 'tekulas_driver_stats_v2', JSON.stringify({
+                        totalTrips: 0, totalKm: 0, totalPassengers: 0, maxComfortStreak: 0,
+                        nightTrips: 0, rainTrips: 0, perfectStops: 0, punctualTrips: 0,
+                        onTimeRate: 100, accidentFreeKm: 0, totalFuelSaved: 0, intercityTrips: 0, vipTrips: 0
+                    }));
+                    localStorage.setItem(driverBadgesObj.TITLES_KEY || 'tekulas_driver_equipped_title_v1', 'title_cirak');
+                    localStorage.setItem(driverBadgesObj.UNLOCKED_TITLES_KEY || 'tekulas_driver_unlocked_titles_v1', JSON.stringify(['title_cirak']));
+                }
+            } catch(e) {
+                console.warn("[Game] DriverBadges sıfırlama uyarısı:", e);
+            }
+        }
+
+        // 6. Otoyol Tesisleri ve Durak Keşifleri
+        const hwyObj = (typeof HighwayFacilities !== 'undefined') ? HighwayFacilities : ((typeof window !== 'undefined' && window.HighwayFacilities) ? window.HighwayFacilities : null);
+        if (hwyObj && hwyObj.data) {
+            try {
+                hwyObj.data = {
+                    hgsBalance: 250,
+                    visitedFacilities: {},
+                    stats: { totalSpent: 0, totalFuelLiters: 0, totalMeals: 0, totalRestMinutes: 0 }
+                };
+                if (typeof hwyObj.saveData === 'function') hwyObj.saveData();
+            } catch(e) {}
+        }
+        const stopDiscObj = (typeof StopDiscovery !== 'undefined') ? StopDiscovery : ((typeof window !== 'undefined' && window.StopDiscovery) ? window.StopDiscovery : null);
+        if (stopDiscObj) {
+            try {
+                stopDiscObj.discovered = {};
+                if (typeof localStorage !== 'undefined') {
+                    localStorage.removeItem(stopDiscObj.STORAGE_KEY || 'tekulas_discovered_stops_v1');
+                }
+            } catch(e) {}
+        }
+
+        // 7. Buluta ve Yerel Depolamaya Sıfır Verileri Gönder
+        this.saveData(true);
+
+        // 8. Kullanıcı Arayüzü ve Sesli Bildirimler
+        if (typeof UI !== 'undefined') {
+            if (typeof UI.updatePlayerStats === 'function') {
+                const title = (typeof this.getLicenseTitle === 'function') ? this.getLicenseTitle() : 'Kaptan';
+                UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, title);
+            }
+            if (typeof UI.showToast === 'function') {
+                UI.showToast("✨ TÜM VERİLER SIFIRLANDI: Temiz kariyer ve Seviye 1 şirket hazır!", "success");
+            }
+        }
+
+        if (typeof audio !== 'undefined') {
+            if (typeof audio.playSuccess === 'function') {
+                try { audio.playSuccess(); } catch(e) {}
+            }
+            if (typeof audio.speak === 'function') {
+                audio.speak("Tüm oyun ve şirket verileri sıfırlandı. Temiz kariyer hazır.");
+            }
+        }
+
+        // Açık şirket modalı varsa yeniden çiz
+        if (compSysObj && typeof compSysObj.renderModal === 'function') {
+            const modal = (typeof document !== 'undefined') ? document.getElementById('company-system-modal') : null;
+            if (modal && !modal.classList.contains('hidden')) {
+                compSysObj.renderModal(compSysObj.currentTab || 'overview');
+            }
+        }
+
+        return true;
+    },
+
     saveData: function(immediate = false) {
         // 1. Yerel Kayıt (Anında ve Kesintisiz Çift Katman)
         try {
-            localStorage.setItem('sim_season_level1', 'true');
+            localStorage.setItem('sim_season_fresh_v2', 'true');
             localStorage.setItem('licenseLevel', this.licenseLevel);
             localStorage.setItem('playerXP', this.playerXP || 0);
             localStorage.setItem('completedTasks', this.completedTasks);
@@ -1016,7 +1264,7 @@ const Game = {
                 const safeClock = Math.max(0, Math.min(1440, parseFloat(this.clockMinutes) || 480));
 
                 const payload = {
-                    season: 'season_level1',
+                    season: 'season_fresh_v2',
                     licenseLevel: safeLevel,
                     playerXP: safeXP,
                     completedTasks: safeTasks,

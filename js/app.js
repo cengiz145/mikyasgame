@@ -45,20 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // ==========================================================
 
-    // === HERKESİ SEVİYE 1'DEN BAŞLAT GÜNCELLEMESİ ===
-    if (localStorage.getItem('sim_season_level1') !== 'true') {
-        localStorage.setItem('sim_season_level1', 'true');
-        localStorage.setItem('licenseLevel', '1');
-        localStorage.setItem('completedTasks', '0');
-        localStorage.setItem('unlockedCities', JSON.stringify(["Tekirdağ"]));
-        localStorage.setItem('merkezUs', 'Tekirdağ');
-        if (typeof Game !== 'undefined') {
-            Game.licenseLevel = 1;
-            Game.completedTasks = 0;
-            Game.unlockedCities = ["Tekirdağ"];
-            Game.currentCity = "Tekirdağ";
+    // === TÜM VERİLERİ SIFIRLAMA & SEVİYE 1 TEMİZ BAŞLANGIÇ GÜNCELLEMESİ ===
+    if (localStorage.getItem('wipe_all_data_20261024_v1') !== 'true') {
+        localStorage.setItem('wipe_all_data_20261024_v1', 'true');
+        localStorage.setItem('sim_season_fresh_v2', 'true');
+        if (typeof Game !== 'undefined' && typeof Game.resetAllGameData === 'function') {
+            Game.resetAllGameData(false);
         }
-        console.log("Herkes Seviye 1'den başlatıldı.");
+        console.log("Tüm oyun ve şirket verileri sıfırlandı. Temiz kariyer aktif.");
     }
     // =================================================
 
