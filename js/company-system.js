@@ -2050,31 +2050,82 @@
             return nextRank ? nextRank.reqXP : 99999;
         },
 
-        // Şirket Büyüme Seviyesini Kontrol Et ve Güncelle
+        // Şirket Büyüme Seviyesini Kontrol Et (Yetki SADECE Şirket Sahibindedir - Otomatik Büyüme KAPALIDIR)
         checkCompanyLevelUp: function () {
             const trips = this.data.completedTripsCount || 0;
             const rev = this.data.totalRevenue || 0;
-            let currentLvl = this.data.companyLevel || 1;
-            let newLvl = 1;
+            const currentLvl = this.data.companyLevel || 1;
+            if (currentLvl >= 5) return;
 
-            for (let i = this.companyLevels.length - 1; i >= 0; i--) {
-                const req = this.companyLevels[i];
-                if (trips >= req.reqTrips && rev >= req.reqRev) {
-                    newLvl = req.level;
-                    break;
+            const nextLvl = this.companyLevels.find(l => l.level === currentLvl + 1);
+            if (!nextLvl) return;
+
+            // Hedefler tamamlandıysa şirketi KENDİ KENDİNE BÜYÜTMEZ; yalnızca patronu bilgilendirir
+            if (trips >= nextLvl.reqTrips && rev >= nextLvl.reqRev) {
+                if (!this.data.promotionNotified || this.data.promotionNotified < nextLvl.level) {
+                    this.data.promotionNotified = nextLvl.level;
+                    this.saveData();
+                    const notifyMsg = `👑 PATRON DİKKATİNE: Şirketiniz '${nextLvl.title}' seviyesine terfi etmeye hak kazandı! Yönetim yetkisi sadece sizde olduğu için HQ sekmesinden büyümeyi bizzat onaylayabilirsiniz.`;
+                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(notifyMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(notifyMsg, "info");
+                    this.addRadioLog("🏢 Mali Müşavir", "📑", `Sayın Patronum, şirketimiz '${nextLvl.title}' seviyesi hedeflerini tamamladı. Terfi onayınızı bekliyoruz!`, "system");
+                    if (typeof this.renderCompanyOverview === 'function') {
+                        this.renderCompanyOverview();
+                    }
                 }
             }
+        },
 
-            if (newLvl > currentLvl) {
-                this.data.companyLevel = newLvl;
-                this.saveData();
-                const lvlInfo = this.companyLevels.find(l => l.level === newLvl);
-                const toastMsg = `🏢 ŞİRKET BÜYÜDÜ! Şirketiniz '${lvlInfo.badge || '🏢'} ${lvlInfo.title || 'Şirket'}' seviyesine terfi etti! (${lvlInfo.perkDesc || 'Yeni Avantajlar Açıldı'})`;
-                if (typeof audio !== 'undefined' && audio.playSuccess) audio.playSuccess();
-                if (typeof audio !== 'undefined' && audio.speak) audio.speak(toastMsg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(toastMsg, "success");
-                this.addRadioLog("🏢 Merkez Ofis", "👨‍💼", `Şirketimiz resmi olarak '${lvlInfo.title}' unvanını aldı. Tüm filoya tebrikler!`, "system");
+        // Şirket Seviyesini Şirket Sahibi Olarak Bizzat Terfi Ettir (Yalnızca Oyuncu Onayıyla)
+        promoteCompanyLevelManually: function () {
+            const trips = this.data.completedTripsCount || 0;
+            const rev = this.data.totalRevenue || 0;
+            const currentLvl = this.data.companyLevel || 1;
+            if (currentLvl >= 5) {
+                if (typeof UI !== 'undefined') UI.showToast("Şirketiniz zaten zirvede: Altın Yıldızlı Holding!", "info");
+                return false;
             }
+
+            const nextLvl = this.companyLevels.find(l => l.level === currentLvl + 1);
+            if (!nextLvl) return false;
+
+            if (trips < nextLvl.reqTrips || rev < nextLvl.reqRev) {
+                const missingTrips = Math.max(0, nextLvl.reqTrips - trips);
+                const missingRev = Math.max(0, nextLvl.reqRev - rev);
+                const warnMsg = `Terfi için henüz hedefler tamamlanmadı. Kalan: ${missingTrips} Sefer ve ${missingRev.toLocaleString('tr-TR')} ₺ Ciro.`;
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(warnMsg);
+                if (typeof UI !== 'undefined') UI.showToast(warnMsg, "warning");
+                return false;
+            }
+
+            this.data.companyLevel = nextLvl.level;
+            this.data.promotionNotified = nextLvl.level;
+            this.saveData();
+
+            const toastMsg = `👑 TEBRİKLER PATRON! Şirketiniz sizin onayınızla resmi olarak '${nextLvl.badge} ${nextLvl.title}' seviyesine terfi ettirildi! (${nextLvl.perkDesc})`;
+            if (typeof audio !== 'undefined' && audio.playSuccess) audio.playSuccess();
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(toastMsg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(toastMsg, "success");
+            this.addRadioLog("🏢 Şirket Sahibi", "👑", `Şirket seviyesi bizzat patron tarafından '${nextLvl.title}' basamağına yükseltildi! Tüm filoya duyurulur!`, "success");
+
+            this.renderAll();
+            return true;
+        },
+
+        // Şirket Seviyesini Patron Olarak Manuel Belirle / Sıfırla (Tam Yetki)
+        setCompanyLevelManually: function (targetLvl) {
+            const lvl = Math.max(1, Math.min(5, parseInt(targetLvl) || 1));
+            this.data.companyLevel = lvl;
+            this.data.promotionNotified = (lvl > 1) ? lvl : 0;
+            this.saveData();
+
+            const lvlInfo = this.companyLevels.find(l => l.level === lvl) || this.companyLevels[0];
+            const msg = `Şirket seviyesi sizin patronluk yetkinizle Seviye ${lvl} (${lvlInfo.badge} ${lvlInfo.title}) olarak ayarlandı.`;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`👑 ${msg}`, "info");
+
+            this.renderAll();
+            return true;
         },
 
         // Telsiz Günlüğüne Mesaj Ekle
@@ -4045,6 +4096,29 @@
                 </div>
             </div>
 
+            ${(() => {
+                const currentLvl = this.data.companyLevel || 1;
+                if (currentLvl >= 5) return '';
+                const nextLvl = this.companyLevels.find(l => l.level === currentLvl + 1);
+                const trips = this.data.completedTripsCount || 0;
+                const rev = this.data.totalRevenue || 0;
+                const canPromote = nextLvl && trips >= nextLvl.reqTrips && rev >= nextLvl.reqRev;
+                if (!canPromote) return '';
+                return `
+                <div style="margin-top: 10px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.15)); border: 1.5px solid #10b981; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <span style="color: #4ade80; font-weight: bold; font-size: 0.95rem;">👑 ŞİRKET SAHİBİ DİKKATİNE: Şirketiniz Seviye ${nextLvl.level} (${nextLvl.title}) Terfisine Hak Kazandı!</span>
+                        <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 2px;">
+                            Şoförler şirketi kendi kendine büyütemez; şirketi terfi ettirme yetkisi yalnızca sizdedir.
+                        </div>
+                    </div>
+                    <button id="btn-comp-promote-overview" class="modern-btn nav-item" style="padding: 6px 16px; background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; font-weight: bold; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 10px rgba(16,185,129,0.3); font-size: 0.85rem;">
+                        👑 Terfiyi Onayla
+                    </button>
+                </div>
+                `;
+            })()}
+
             <!-- HASILAT PAYLAŞIM VE TRANSFER KONTROL BARİYERİ -->
             <div style="margin-top: 12px; background: rgba(0,0,0,0.35); border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div>
@@ -4125,6 +4199,13 @@
             if (btnDeposit) {
                 btnDeposit.addEventListener('click', () => {
                     this.transferToTreasury();
+                });
+            }
+
+            const btnPromoteOverview = card.querySelector('#btn-comp-promote-overview');
+            if (btnPromoteOverview) {
+                btnPromoteOverview.addEventListener('click', () => {
+                    this.promoteCompanyLevelManually();
                 });
             }
 
@@ -4549,7 +4630,66 @@
                 }
             ];
 
+            const currentLvl = this.data.companyLevel || 1;
+            const nextLvl = this.companyLevels.find(l => l.level === currentLvl + 1);
+            const trips = this.data.completedTripsCount || 0;
+            const rev = this.data.totalRevenue || 0;
+            const canPromote = nextLvl && trips >= nextLvl.reqTrips && rev >= nextLvl.reqRev;
+
             container.innerHTML = `
+            <!-- YALNIZCA ŞİRKET SAHİBİ YÖNETİM & TERFİ YETKİSİ PANELİ -->
+            <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 2px solid #eab308; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 20px rgba(234, 179, 8, 0.15);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.8rem;">👑</span>
+                        <div>
+                            <div style="color: #fde047; font-size: 1.15rem; font-weight: 800;">
+                                Yalnızca Şirket Sahibi Yetkisi (Patron Paneli)
+                            </div>
+                            <div style="color: #94a3b8; font-size: 0.84rem; margin-top: 1px;">
+                                Şirketin büyümesi, terfisi ve unvan kararları <strong>YALNIZCA sizin elinizdedir</strong>. Şoförler sadece sefere çıkar ve hasılat getirir; şirketi kendi kendilerine büyütemezler.
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button id="btn-owner-reset-level-1" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-size: 0.82rem; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Şirket seviyesini başlangıç seviyesine (Seviye 1) alır">
+                            ↩️ Seviye 1'e Döndür
+                        </button>
+                    </div>
+                </div>
+
+                ${canPromote ? `
+                    <div style="background: rgba(34, 197, 94, 0.15); border: 1.5px solid #22c55e; border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <div style="color: #4ade80; font-weight: bold; font-size: 1.02rem;">
+                                ✨ Şirketiniz Seviye ${nextLvl.level} (${nextLvl.title}) Terfisine Hak Kazandı!
+                            </div>
+                            <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 2px;">
+                                Sefer: <strong>${trips} / ${nextLvl.reqTrips}</strong> | Ciro: <strong>${rev.toLocaleString('tr-TR')} / ${nextLvl.reqRev.toLocaleString('tr-TR')} ₺</strong> (Hedefler Tamamlandı)
+                            </div>
+                        </div>
+                        <button id="btn-owner-promote-company" class="modern-btn nav-item" style="padding: 10px 22px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 800; font-size: 0.95rem; border-radius: 8px; cursor: pointer; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);">
+                            👑 Şirketi Terfi Ettir (${nextLvl.badge} ${nextLvl.title})
+                        </button>
+                    </div>
+                ` : (currentLvl >= 5 ? `
+                    <div style="background: rgba(234, 179, 8, 0.15); border: 1px solid #eab308; border-radius: 8px; padding: 10px 14px; color: #fde047; font-size: 0.9rem; font-weight: bold;">
+                        👑 Tebrikler! Şirketiniz en üst basamak olan 'Altın Yıldızlı Holding' unvanına sahiptir.
+                    </div>
+                ` : `
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <div style="color: #cbd5e1; font-size: 0.85rem;">
+                            🎯 Sonraki Seviye Hedefi (<strong>${nextLvl ? nextLvl.title : ''}</strong>): 
+                            <span style="color: ${(nextLvl && trips >= nextLvl.reqTrips) ? '#4ade80' : '#f87171'}; font-weight: bold;">${trips}/${nextLvl ? nextLvl.reqTrips : 0} Sefer</span> & 
+                            <span style="color: ${(nextLvl && rev >= nextLvl.reqRev) ? '#4ade80' : '#f87171'}; font-weight: bold;">${rev.toLocaleString('tr-TR')}/${nextLvl ? nextLvl.reqRev.toLocaleString('tr-TR') : 0} ₺ Ciro</span>
+                        </div>
+                        <button class="modern-btn" disabled style="padding: 8px 16px; background: rgba(255,255,255,0.05); color: #64748b; border: 1px solid #334155; font-size: 0.85rem; border-radius: 6px;">
+                            🔒 Terfi İçin Hedefler Bekleniyor
+                        </button>
+                    </div>
+                `)}
+            </div>
+
             <div style="background: rgba(15,23,42,0.8); border: 1.5px solid #a855f7; border-radius: 10px; padding: 14px; margin-bottom: 14px;">
                 <div style="color: #c084fc; font-size: 1.15rem; font-weight: bold; margin-bottom: 4px;">
                     🏢 Şirket Büyüme Basamakları (HQ Seviyesi)
@@ -4605,6 +4745,23 @@
                 </div>
             </div>
             `;
+
+            const btnOwnerPromote = container.querySelector('#btn-owner-promote-company');
+            if (btnOwnerPromote) {
+                btnOwnerPromote.addEventListener('click', () => {
+                    this.promoteCompanyLevelManually();
+                });
+            }
+
+            const btnOwnerReset1 = container.querySelector('#btn-owner-reset-level-1');
+            if (btnOwnerReset1) {
+                btnOwnerReset1.addEventListener('click', () => {
+                    const confirmReset = confirm("Şirket seviyesini Seviye 1'e (Sahil Yazıhanesi) döndürmek istiyor musunuz?");
+                    if (confirmReset) {
+                        this.setCompanyLevelManually(1);
+                    }
+                });
+            }
 
             upgrades.forEach(up => {
                 const btn = container.querySelector(`#btn-buy-upgrade-${up.key}`);
