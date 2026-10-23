@@ -3340,8 +3340,14 @@ startEngine() {
         }
     }
 
-    playTurnTick() {
-        this.sounds.turnTick.play();
+    playTurnTick(pan = 0) {
+        if (!this.sounds || !this.sounds.turnTick) return;
+        try {
+            const id = this.sounds.turnTick.play();
+            if (typeof this.sounds.turnTick.stereo === 'function' && typeof pan === 'number' && pan !== 0) {
+                this.sounds.turnTick.stereo(Math.max(-1, Math.min(1, pan)), id);
+            }
+        } catch(e) {}
     }
 
     // --- RESMÎ TEKİRDAĞ KART / KENTKART VALİDATÖR SESLERİ ---

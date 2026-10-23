@@ -2112,8 +2112,21 @@ const Game = {
                             }
                         }
                         
+                        // TÜRKİYE GERÇEK YOL GEOMETRİSİ VİRAJ ÇIKARIMI (OSRM Polyline Açı Analizi)
+                        if (typeof TurkeyCurvesEngine !== 'undefined') {
+                            const realCurves = TurkeyCurvesEngine.extractCurvesFromCoordinates(coords, routeDist, {
+                                city: this.currentCity,
+                                routeData: this.activeRouteData,
+                                currentStop: nextStop,
+                                prevStop: prevStop
+                            });
+                            if (realCurves && realCurves.length > 0) {
+                                this.upcomingTurns = realCurves;
+                            }
+                        }
+
                         if (typeof UI !== 'undefined' && document.getElementById('garage-screen').classList.contains('hidden')) {
-                            UI.showToast("Gerçek yol oluşturuldu!", "success");
+                            UI.showToast("Gerçek yol ve virajlar oluşturuldu!", "success");
                         }
                     } else {
                         this.currentDistanceToNext = fallbackDistance;
@@ -2135,8 +2148,16 @@ const Game = {
             this.routeBumps = this.savedState && this.savedState.routeBumps ? this.savedState.routeBumps : [];
         }
 
-        // --- YENİ: Etkileşimli Navigasyon Dönüş Noktaları ---
-        this.upcomingTurns = [];
+        // --- TÜRKİYE KARAYOLLARI GERÇEK VİRAJ VE DAĞ GEÇİTLERİ SİSTEMİ ---
+        if (typeof TurkeyCurvesEngine !== 'undefined' && (!this.upcomingTurns || this.upcomingTurns.length === 0)) {
+            this.upcomingTurns = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext, {
+                currentStop: nextStop,
+                prevStop: prevStop
+            });
+        }
+        if (!this.upcomingTurns || this.upcomingTurns.length === 0) {
+            this.upcomingTurns = [];
+        }
         let numTurns = Math.floor(this.currentDistanceToNext / 1500);
         if (numTurns > 3) numTurns = 3;
         
@@ -2626,30 +2647,25 @@ const Game = {
                 // Zaman aşıldığında dönüşü diziden çıkar ki sonsuza kadar kalmasın
                 this.upcomingTurns.shift();
                 
-                // Yeni bir dönüş hesapla ve başa ekle (rota yeniden hesaplandığı için)
+                // Rota yeniden hesaplandı: Türkiye karayolları otantik virajı ekle
                 if (this.currentDistanceToNext > 500) {
-                    const directions = [
-                        { dir: "tam sağa", req: 100 },
-                        { dir: "hafif sağa", req: 50 },
-                        { dir: "tam sola", req: 100 },
-                        { dir: "hafif sola", req: 50 },
-                        { dir: "kavşaktan tam sağa dönün", req: 150, special: true }
-                    ];
-                    const randType = directions[Math.floor(Math.random() * directions.length)];
-                    const newTurnDist = this.currentDistanceToNext - (300 + Math.random() * 200); // 300-500 metre sonra
-                    
-                    const newMilestones = [300, 100].filter(m => m < (this.currentDistanceToNext - newTurnDist) - 50);
-                    
-                    this.upcomingTurns.unshift({
-                        distance: newTurnDist,
-                        direction: randType.dir,
-                        requiredProgress: randType.req,
-                        isSpecial: randType.special || false,
-                        state: "approaching",
-                        currentProgress: 0,
-                        milestones: newMilestones,
-                        lastWarningTime: 0
-                    });
+                    if (typeof TurkeyCurvesEngine !== 'undefined') {
+                        const fallbackCurves = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext);
+                        if (fallbackCurves && fallbackCurves.length > 0) {
+                            this.upcomingTurns.unshift(fallbackCurves[0]);
+                        }
+                    } else {
+                        const newTurnDist = this.currentDistanceToNext - (300 + Math.random() * 200);
+                        this.upcomingTurns.unshift({
+                            distance: newTurnDist,
+                            direction: "hafif sağa",
+                            requiredProgress: 80,
+                            state: "approaching",
+                            currentProgress: 0,
+                            milestones: [250, 0],
+                            lastWarningTime: 0
+                        });
+                    }
                 }
             } 
             else if (currentTurn.state === "approaching") {
@@ -2671,31 +2687,19 @@ const Game = {
                     if (typeof audio.playNavChime === 'function') audio.playNavChime();
                     
                     if (triggeredMilestone === 0) {
-                        const nowVariants = [
-                            `Şimdi ${currentTurn.direction} dönün.`,
-                            `Lütfen şimdi ${currentTurn.direction} dönün.`,
-                            `Buradan ${currentTurn.direction} dönün.`
-                        ];
-                        let speechText = currentTurn.isSpecial ? 
-                            `Şimdi ${currentTurn.direction}` : 
-                            nowVariants[Math.floor(Math.random() * nowVariants.length)];
+                        let speechText = currentTurn.isRealTurkeyCurve
+                            ? (currentTurn.speechWarning || `Şimdi ${currentTurn.name || currentTurn.direction} dönün. Gazı dengeli tutun.`)
+                            : (currentTurn.isSpecial ? `Şimdi ${currentTurn.direction}` : `Şimdi ${currentTurn.direction} dönün.`);
                         
-                        setTimeout(() => audio.speak(speechText), 400); // Chime'dan hemen sonra
+                        setTimeout(() => audio.speak(speechText), 400);
                         
                         currentTurn.state = "waiting";
                         currentTurn.lastWarningTime = currentTime;
                     } else {
                         let distText = triggeredMilestone === 1000 ? "1 kilometre" : `${triggeredMilestone} metre`;
-                        
-                        const distVariants = [
-                            `${distText} sonra ${currentTurn.direction} dönün.`,
-                            `Lütfen ${distText} sonra ${currentTurn.direction} yönelin.`,
-                            `İlerideki kavşaktan, ${distText} sonra ${currentTurn.direction} dönün.`,
-                            `${distText} ileriden ${currentTurn.direction} sapın.`
-                        ];
-                        let speechText = currentTurn.isSpecial ? 
-                            `${distText} sonra ${currentTurn.direction}` : 
-                            distVariants[Math.floor(Math.random() * distVariants.length)];
+                        let speechText = currentTurn.isRealTurkeyCurve
+                            ? `${distText} sonra ${currentTurn.name || currentTurn.direction}. Tavsiye edilen azami hız ${currentTurn.advisorySpeed || 50} kilometre.`
+                            : (currentTurn.isSpecial ? `${distText} sonra ${currentTurn.direction}` : `${distText} sonra ${currentTurn.direction} dönün.`);
                             
                         setTimeout(() => audio.speak(speechText), 400);
                     }
@@ -2709,39 +2713,101 @@ const Game = {
                         this.upcomingTurns.shift();
                     }
                 } else {
-                    // YENİ: Viraj (Yol Kıvrımı) Fiziği
-                    let curveSpeed = 25; // Viraj savurma kuvveti
-                    
-                    if (currentTurn.direction.includes("sağa")) {
-                        this.roadCurvature = -curveSpeed; // Sağa viraj, sola savurur
-                    } else if (currentTurn.direction.includes("sola")) {
-                        this.roadCurvature = curveSpeed; // Sola viraj, sağa savurur
-                    } else if (currentTurn.direction === "U dönüşü yapın") {
-                        this.roadCurvature = -curveSpeed * 1.5; 
+                    // TÜRKİYE KARAYOLLARI GERÇEK VİRAJ FİZİĞİ & MERKEZKAÇ DİNAMİĞİ
+                    let baseIntensity = currentTurn.curveIntensity || 25;
+                    let isTurnRight = currentTurn.isRight !== undefined ? currentTurn.isRight : currentTurn.direction.includes("sağa");
+                    let dirMultiplier = isTurnRight ? -1 : 1; // Sağa virajda merkezkaç sola savurur (-), sola virajda sağa (+)
+                    if (currentTurn.direction && currentTurn.direction.includes("u dönüşü")) {
+                        dirMultiplier = -1.5;
                     }
+                    this.roadCurvature = baseIntensity * dirMultiplier;
                     
                     // Araç hareket ettiği sürece virajı dönmüş (ilerlemiş) sayılır
                     if (this.speed > 5) {
-                        currentTurn.currentProgress += (this.speed / 3.6) * deltaTime * 5; // Hıza bağlı ilerleme (Hızlandırıldı)
+                        currentTurn.currentProgress += (this.speed / 3.6) * deltaTime * 5;
                     }
                     
-                    document.getElementById('nav-feedback').innerText = `Viraj Dönülüyor... %${Math.min(100, Math.floor((currentTurn.currentProgress/currentTurn.requiredProgress)*100))}`;
-                    document.getElementById('nav-feedback').style.color = '#eab308';
+                    // Fiziksel değerlendirme (G-Kuvveti, Kasa Yatma, Savrulma, Lastik Sesi, Yolcu Tepkisi)
+                    let evalRes = { gForce: 0, bodyRollDeg: 0, isOverSpeed: false, screechIntensity: 0, comfortImpact: 0, passengerState: 'normal' };
+                    if (typeof TurkeyCurvesEngine !== 'undefined') {
+                        evalRes = TurkeyCurvesEngine.evaluateDrivingCurve(this.speed, currentTurn, this.steeringAngle);
+                    }
                     
-                    // SESLİ GERİBİLDİRİM: Araç virajı dönerken hızına bağlı olarak 300ms'de bir "tık" sesi çal (kör oyuncuya virajda olduğunu hatırlatır)
+                    // Görsel efektler: Otobüs kasasının yatması (Body Roll) ve Yolun kıvrılması (Perspective Skew)
+                    const busSprite = document.getElementById('bus-sprite');
+                    if (busSprite) {
+                        busSprite.style.transform = `translateX(-50%) rotate(${evalRes.bodyRollDeg || 0}deg)`;
+                    }
+                    const laneContainer = document.querySelector('.lane-container');
+                    if (laneContainer) {
+                        let skewAngle = Math.max(-10, Math.min(10, -dirMultiplier * (baseIntensity * 0.2)));
+                        laneContainer.style.transform = `translateX(-50%) rotateX(60deg) skewX(${skewAngle}deg)`;
+                    }
+
+                    // HUD Göstergesi: Gerçek viraj adı, hız tavsiyesi, G-kuvveti ve ilerleme
+                    const navFeedbackEl = document.getElementById('nav-feedback');
+                    if (navFeedbackEl) {
+                        const pct = Math.min(100, Math.floor((currentTurn.currentProgress / currentTurn.requiredProgress) * 100));
+                        const speedColor = evalRes.isOverSpeed ? '#ef4444' : '#eab308';
+                        const curveSign = currentTurn.passSign || `⚠️ ${currentTurn.name || currentTurn.direction}`;
+                        navFeedbackEl.innerHTML = `<span style="color: ${speedColor};">${curveSign} [${currentTurn.advisorySpeed || 50} km/s] | ${evalRes.gForce.toFixed(2)}G (%${pct})</span>`;
+                    }
+                    
+                    // SESLİ GERİBİLDİRİM: Kör oyuncular için stereofonik tık sesi (virajın yönüne göre sağ/sol kulaklıkta çalar)
                     if (!currentTurn.lastTickTime || currentTime > currentTurn.lastTickTime + 300) {
-                        if (this.speed > 5) audio.playTurnTick();
+                        if (this.speed > 5 && typeof audio.playTurnTick === 'function') {
+                            const panVal = currentTurn.pan !== undefined ? currentTurn.pan : (isTurnRight ? 0.70 : -0.70);
+                            audio.playTurnTick(panVal);
+                        }
                         currentTurn.lastTickTime = currentTime;
+                    }
+
+                    // AŞIRI HIZ VE MERKEZKAÇ ETKİLERİ: Lastik çığlığı, konfor kaybı ve yolcu tepkisi
+                    if (evalRes.isOverSpeed && this.speed > 25) {
+                        currentTurn.hadExcessiveOverspeed = true;
+                        if (typeof audio.playTireScreech === 'function') {
+                            audio.playTireScreech(evalRes.screechIntensity);
+                        }
+                        if (typeof this.passengerComfort === 'number') {
+                            this.passengerComfort = Math.max(10, this.passengerComfort + (evalRes.comfortImpact * deltaTime * 8));
+                        }
+                        if (evalRes.passengerState === 'panic' && (!currentTurn.lastPanicTime || currentTime > currentTurn.lastPanicTime + 6000)) {
+                            if (typeof audio.playPassengerShock === 'function') audio.playPassengerShock();
+                            if (typeof audio.speak === 'function') audio.speak("Kaptan yavaş, viraj çok sert savuruyor!");
+                            currentTurn.lastPanicTime = currentTime;
+                        } else if (evalRes.passengerState === 'murmur' && (!currentTurn.lastMurmurTime || currentTime > currentTurn.lastMurmurTime + 8000)) {
+                            if (typeof audio.playPassengerDiscontent === 'function') audio.playPassengerDiscontent();
+                            currentTurn.lastMurmurTime = currentTime;
+                        }
+                    } else {
+                        if (typeof audio.stopTireScreech === 'function' && !isSkidding) {
+                            audio.stopTireScreech();
+                        }
                     }
                     
                     if (currentTurn.currentProgress >= currentTurn.requiredProgress) {
-                        let turnDelta = 0;
-                        const turnDir = (currentTurn.direction || "").toLowerCase();
-                        if (turnDir.includes("tam sağa") || turnDir.includes("sağa dönün")) turnDelta = 90;
-                        else if (turnDir.includes("hafif sağa")) turnDelta = 45;
-                        else if (turnDir.includes("tam sola") || turnDir.includes("sola dönün")) turnDelta = -90;
-                        else if (turnDir.includes("hafif sola")) turnDelta = -45;
-                        else if (turnDir.includes("u dönüşü")) turnDelta = 180;
+                        // Viraj başarıyla tamamlandı
+                        if (busSprite) busSprite.style.transform = 'translateX(-50%) rotate(0deg)';
+                        if (laneContainer) laneContainer.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
+                        if (typeof audio.stopTireScreech === 'function' && !isSkidding) {
+                            audio.stopTireScreech();
+                        }
+
+                        if (!currentTurn.hadExcessiveOverspeed && typeof this.passengerComfort === 'number') {
+                            this.passengerComfort = Math.min(100, this.passengerComfort + 1.2); // Temiz viraj bonusu
+                        }
+
+                        let turnDelta = currentTurn.angleDelta || 0;
+                        if (!turnDelta) {
+                            const turnDir = (currentTurn.direction || "").toLowerCase();
+                            if (turnDir.includes("tam sağa") || turnDir.includes("sağa dönün")) turnDelta = 90;
+                            else if (turnDir.includes("hafif sağa") || turnDir.includes("tatlı sağ")) turnDelta = 45;
+                            else if (turnDir.includes("tam sola") || turnDir.includes("sola dönün")) turnDelta = -90;
+                            else if (turnDir.includes("hafif sola") || turnDir.includes("tatlı sol")) turnDelta = -45;
+                            else if (turnDir.includes("saç tokası sağa")) turnDelta = 120;
+                            else if (turnDir.includes("saç tokası sola")) turnDelta = -120;
+                            else if (turnDir.includes("u dönüşü")) turnDelta = 180;
+                        }
 
                         let newHeadingName = "";
                         if (typeof CompassSystem !== 'undefined' && turnDelta !== 0) {
@@ -2758,18 +2824,18 @@ const Game = {
                             newHeadingName = card.name;
                         }
 
+                        const cName = currentTurn.name || "Viraj";
                         const turnMsg = newHeadingName 
-                            ? `Dönüş tamamlandı. Yeni istikamet ${newHeadingName}. Şimdi devam edin.`
-                            : "Dönüş tamamlandı, şimdi devam edin.";
+                            ? `${cName} tamamlandı. Yeni istikamet ${newHeadingName}. Şimdi devam edin.`
+                            : `${cName} başarıyla geçildi, şimdi devam edin.`;
                         audio.speak(turnMsg);
-                        const navFeedbackEl = document.getElementById('nav-feedback');
                         if (navFeedbackEl) {
-                            navFeedbackEl.innerText = newHeadingName ? `Dönüş Başarılı! (${newHeadingName})` : "Dönüş Başarılı!";
+                            navFeedbackEl.innerText = `${cName} Başarılı! ${newHeadingName ? '(' + newHeadingName + ')' : ''}`;
                             navFeedbackEl.style.color = '#22c55e'; // Green
                         }
                         setTimeout(() => {
                             const el = document.getElementById('nav-feedback');
-                            if (el && el.innerText.includes("Dönüş Başarılı")) {
+                            if (el && el.innerText.includes("Başarılı")) {
                                 el.innerText = "";
                             }
                         }, 3000);
