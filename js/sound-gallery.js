@@ -279,6 +279,38 @@ const SoundGallery = {
             }
         },
         {
+            id: 'fx_ramp_deploy',
+            category: 'effect',
+            title: 'Freesound Engelli Rampası İniş & Kaldırım Teması',
+            icon: '🛹',
+            specs: 'Freesound SoundsofTheMachine #784981 Stüdyo Kaydı',
+            desc: 'Tekerlekli sandalyeli yolcular için otobüs tabanından uzanan hidrolik rampanın inişi ve kaldırıma kilitlenme sesi (Kısayol: U veya R tuşu).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playRampDeploy) {
+                    audio.playRampDeploy();
+                } else {
+                    const a = new Audio('sounds/freesound_ramp_deploy.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
+            id: 'fx_ramp_retract',
+            category: 'effect',
+            title: 'Freesound Engelli Rampası Toplanma & Şasi Kilidi',
+            icon: '🛹',
+            specs: 'Freesound #637009 HD Mekanizma Kaydı',
+            desc: 'Yolcu binişi sonrası rampanın elektrikli motorla yukarı toplanıp otobüs şasisine kilitlenme sesi (Kısayol: U veya R tuşu).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playRampRetract) {
+                    audio.playRampRetract();
+                } else {
+                    const a = new Audio('sounds/freesound_ramp_retract.mp3');
+                    a.play().catch(() => {});
+                }
+            }
+        },
+        {
             id: 'fx_air_horn',
             category: 'effect',
             title: 'Ağır Vasıta Endüstriyel Havalı Korna',

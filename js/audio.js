@@ -1838,30 +1838,68 @@ startEngine() {
         }, 120);
     }
 
-    // --- TEKERLEKLİ SANDALYE RAMPASI AÇILMA AKUSTİĞİ ---
+    // --- TEKERLEKLİ SANDALYE RAMPASI SESLERİ (FREESOUND HD) ---
+    playRamp(isOpen = true) {
+        if (isOpen) {
+            this.playRampDeploy();
+        } else {
+            this.playRampRetract();
+        }
+    }
+
     playRampDeploy() {
+        try {
+            if (this.currentRampAudio) {
+                this.currentRampAudio.pause();
+                this.currentRampAudio.currentTime = 0;
+            }
+            const aud = new Audio('sounds/freesound_ramp_deploy.mp3');
+            aud.volume = 0.85;
+            this.currentRampAudio = aud;
+            aud.play().catch(e => {
+                console.warn("[Audio] Rampa iniş sesi çalınamadı, fallback synth:", e);
+                this.fallbackRampDeploy();
+            });
+        } catch(e) {
+            this.fallbackRampDeploy();
+        }
+    }
+
+    playRampRetract() {
+        try {
+            if (this.currentRampAudio) {
+                this.currentRampAudio.pause();
+                this.currentRampAudio.currentTime = 0;
+            }
+            const aud = new Audio('sounds/freesound_ramp_retract.mp3');
+            aud.volume = 0.85;
+            this.currentRampAudio = aud;
+            aud.play().catch(e => {
+                console.warn("[Audio] Rampa toplanma sesi çalınamadı, fallback synth:", e);
+                this.fallbackRampRetract();
+            });
+        } catch(e) {
+            this.fallbackRampRetract();
+        }
+    }
+
+    fallbackRampDeploy() {
         this.init();
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
-        
-        // Hidrolik motor sesi (220 Hz -> 360 Hz)
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(220, now);
         osc.frequency.exponentialRampToValueAtTime(360, now + 0.8);
-        
         gain.gain.setValueAtTime(0.001, now);
         gain.gain.linearRampToValueAtTime(0.3, now + 0.08);
         gain.gain.setValueAtTime(0.3, now + 0.7);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
-        
         osc.connect(gain);
         gain.connect(this.environmentMixer || this.ctx.destination);
         osc.start(now);
         osc.stop(now + 0.85);
-        
-        // 0.85 sn sonra metal rampanın kaldırıma oturma sesi (klank-tık)
         setTimeout(() => {
             if (!this.ctx) return;
             const t = this.ctx.currentTime;
@@ -1879,30 +1917,23 @@ startEngine() {
         }, 850);
     }
 
-    // --- TEKERLEKLİ SANDALYE RAMPASI KAPANMA AKUSTİĞİ ---
-    playRampRetract() {
+    fallbackRampRetract() {
         this.init();
         if (!this.ctx) return;
         const now = this.ctx.currentTime;
-        
-        // Hidrolik motor geri sarma sesi (360 Hz -> 240 Hz)
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(360, now);
         osc.frequency.exponentialRampToValueAtTime(240, now + 0.75);
-        
         gain.gain.setValueAtTime(0.001, now);
         gain.gain.linearRampToValueAtTime(0.28, now + 0.08);
         gain.gain.setValueAtTime(0.28, now + 0.65);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-        
         osc.connect(gain);
         gain.connect(this.environmentMixer || this.ctx.destination);
         osc.start(now);
         osc.stop(now + 0.8);
-        
-        // Yuvasına oturup kilitlenme kliği
         setTimeout(() => {
             if (!this.ctx) return;
             const t = this.ctx.currentTime;
