@@ -3344,7 +3344,11 @@ const Game = {
         if (this.isDriving && deltaTime > 0) {
             const decel = (this.lastRecordedSpeed - this.speed) / deltaTime;
             // Eğitim aşamasında sert fren yapılsa dahi ceza verilmez; taban %90 altına inmez
-            if (decel > 30 && this.speed > 30) {
+            if (decel > 28 && this.speed > 25) {
+                // Yolcuların sert frende savrulma ve ani şok/çığlık tepkisi
+                if (this.passengersOnBoard > 0 && typeof audio !== 'undefined' && audio.playPassengerShock) {
+                    audio.playPassengerShock();
+                }
                 const curBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                 const rigidity = (curBus && curBus.chassisRigidity) ? curBus.chassisRigidity : 70;
                 const brakeDeduct = 0.5 * Math.max(0.4, 1.0 - (((rigidity - 60) / 40) * 0.55));
@@ -3413,6 +3417,11 @@ const Game = {
             
             if (this.kasisDistance <= 0) {
                 // Kasisten geçiş anı
+                if (this.speed > 35) { // Kasise hızlı girildiğinde yolcuların sarsılma iniltisi
+                    if (this.passengersOnBoard > 0 && typeof audio !== 'undefined' && audio.playPassengerBump) {
+                        audio.playPassengerBump();
+                    }
+                }
                 if (this.speed > 45) { // 45 km/h kasis hız limiti
                     // Hız aşımına bağlı deterministik hasar formülü
                     const excess = this.speed - 45;
@@ -3435,6 +3444,19 @@ const Game = {
             }
         }
         
+        // Durakta veya Işıkta Uzun Bekleme Homurtusu (Sabırsızlık & Bıkkınlık)
+        if (this.isDriving && this.speed === 0 && this.passengersOnBoard > 0) {
+            this.stationaryWaitTimer = (this.stationaryWaitTimer || 0) + deltaTime;
+            if (this.stationaryWaitTimer > 28) { // 28 saniyeden fazla durulursa
+                this.stationaryWaitTimer = 0;
+                if (typeof audio !== 'undefined' && audio.playPassengerGroan) {
+                    audio.playPassengerGroan();
+                }
+            }
+        } else {
+            this.stationaryWaitTimer = 0;
+        }
+
         // Egzoz Koptuysa Sürtünme ve Motor Sesi Kontrolü
         if (this.busDamage.exhaust >= 100) {
             if (typeof audio.stopExhaustWarning === 'function') audio.stopExhaustWarning();
@@ -3527,6 +3549,17 @@ const Game = {
             }
         }
         
+        // Yolcu Doğal Kabin Mırıltısı ve Homurdanma Kontrolü
+        if (typeof audio !== 'undefined') {
+            if (audio.updatePassengerCabinMurmur) {
+                audio.updatePassengerCabinMurmur(this.passengersOnBoard, this.isDriving);
+            }
+            // Konfor %65'in altına düşerse arka sıralardan memnuniyetsiz homurdanmalar yükselir
+            if (this.passengersOnBoard > 0 && this.passengerComfort < 65 && audio.playPassengerDiscontent) {
+                audio.playPassengerDiscontent();
+            }
+        }
+
         // Yayalar (NPC) - Sürekli devrede (Çekicideyken DE çalışır, trafik akar)
         this.spawnAndMoveNPCs(deltaTime);
 
