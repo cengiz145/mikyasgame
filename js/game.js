@@ -24,6 +24,17 @@ const Game = {
     currentFuelLiters: 500,
     fuelWarned15: false,
     fuelWarned5: false,
+    temperature: 20,
+    busTemperature: 22,
+    isACOn: false,
+    airPressure: 120,
+    isLowAirAlarmActive: false,
+    isEmergencyBrakeLocked: false,
+    selectedBus: null,
+    engineStarted: false,
+    isRetarderActive: false,
+    brakeEfficiency: 1.0,
+    lastInterlockWarnTime: 0,
 
     getFuelCapacity: function() {
         const bus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
@@ -1526,7 +1537,7 @@ const Game = {
         return { allowed: true };
     },
 
-    startRoute: function(routeId) {
+    startRoute: function(routeId, isResume = false) {
         // Akademi otomatik onayı
         this.academyCompleted = true;
         try { localStorage.setItem('academyCompleted', 'true'); } catch(e) {}
@@ -1593,7 +1604,6 @@ const Game = {
         this.isRampDeployed = false;
         this.isLuggageOpen = false;
         this.hasLostItemFound = false;
-        this.terminalAnnouncedForRoute = false;
         this.lastFoundLostItem = null;
         this.activePassengerEvent = null;
         this.insufficientBalanceTriggeredAtStop = false;
@@ -2489,8 +2499,13 @@ const Game = {
             if (this.trafficLightDistance <= 0) {
                 if (this.trafficLightState === 'red' && this.speed > 15) {
                     // Kırmızıda geçildi
-                    this.money = Math.max(0, (this.money || 100) - 150);
+                    this.playerBudget = Math.max(0, (this.playerBudget || 0) - 150);
+                    this.sessionPenalties = (this.sessionPenalties || 0) + 150;
                     this.passengerComfort = Math.max(20, (this.passengerComfort || 90) - 15);
+                    this.saveData();
+                    if (typeof UI !== 'undefined' && UI.updatePlayerStats) {
+                        UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
+                    }
                     if (typeof audio !== 'undefined' && audio.speak) {
                         audio.speak("DİKKAT: Kırmızı ışıkta geçtiniz! Yüz elli lira trafik cezası kesildi.");
                     }
@@ -2930,8 +2945,10 @@ const Game = {
                 }
             }
         }
-        // EĞİTİM MODU KORUMASI: Basınç asla kritik seviyeye (85 PSI altına) düşmez, imdat freni kilitlenmez
-        this.airPressure = Math.max(85, this.airPressure);
+        // Eğitim Modu Koruması: Eğitim seferinde basınç 85 altına inmez
+        if (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) {
+            this.airPressure = Math.max(85, this.airPressure);
+        }
         
         let isBraking = (this.keys.s || this.keys.arrowdown);
         
@@ -2942,22 +2959,23 @@ const Game = {
         
         if (isBraking) {
             if (!this.isBrakeKeyDown) {
-                // Eğitim Modu: Havalı fren sesi çalar, ceza/tahliye kilitlenmesi yaşanmaz
-                this.airPressure = Math.max(85, this.airPressure - 1);
+                const minPressure = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
+                this.airPressure = Math.max(minPressure, this.airPressure - 3);
                 this.isBrakeKeyDown = true;
                 audio.playBrakeRelease(); // Tıss
                 
-                // Retarder (Motor Freni) Etkisi: 30 km/s'den hızlıysak ve imdat kilitli değilse
-                if (this.speed > 30 && !this.isEmergencyBrakeLocked && typeof audio.playRetarder === 'function') {
+                // Ayak freni retarder takviyesi (Eğer manuel retarder zaten çekili değilse)
+                if (this.speed > 30 && !this.isEmergencyBrakeLocked && (!this.retarderLevel || this.retarderLevel === 0) && typeof audio.playRetarder === 'function') {
                     audio.playRetarder(5, this.speed);
-                    this.retarderUsedInRoute = true; // 5 saniyelik retarder simülasyonu
+                    this.retarderUsedInRoute = true;
                 }
             }
             // Gerçek otobüslerde frene basılı tutmak havayı tüketmez, sadece basıp bırakmak tüketir!
         } else {
             if (this.isBrakeKeyDown) {
                 this.isBrakeKeyDown = false;
-                if (typeof audio.stopRetarder === 'function') {
+                // Ayak freni bırakıldığında, eğer MANUEL retarder kolu çekili değilse retarder sesini kapat
+                if ((!this.retarderLevel || this.retarderLevel === 0) && typeof audio.stopRetarder === 'function') {
                     audio.stopRetarder();
                 }
             }
@@ -3001,14 +3019,27 @@ const Game = {
             this.keys.arrowup = false;
         }
         
-                // BUG FIX: Gerçek otobüslerde kapılar açıkken gaza basamazsın (Kapı Fren İnterlok Sistemi)
+                // BUG FIX: Gerçek otobüslerde kapılar veya rampa/bagaj açıkken gaza basamazsın (Kapı Fren İnterlok Sistemi)
         // AYRICA: Çekici üzerindeyken gaz verilmesini engelle
         let canAccelerate = true;
-        if (this.frontDoorOpen || this.rearDoorOpen) {
+        if (this.frontDoorOpen || this.rearDoorOpen || this.isRampDeployed || this.isLuggageOpen) {
             canAccelerate = false;
         }
         if (this.isBeingTowed) {
             canAccelerate = false;
+        }
+
+        // Kapılar veya rampa açıkken gaza basılırsa sürücüye sesli ikaz ver
+        if (!canAccelerate && (this.keys.w || this.keys.arrowup)) {
+            const now = performance.now();
+            if (!this.lastInterlockWarnTime || now - this.lastInterlockWarnTime > 3500) {
+                this.lastInterlockWarnTime = now;
+                const reason = (this.frontDoorOpen || this.rearDoorOpen) 
+                    ? "Kapılar açıkken emniyet kilidi devrededir, gaz verilemez."
+                    : (this.isRampDeployed ? "Engelli rampası açıkken araç hareket edemez." : "Bagaj kapakları açıkken gaz verilemez.");
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(reason);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 Emniyet Kilidi: " + reason, "warning");
+            }
         }
 
         // KARAYOLU GERÇEKÇİ ÇEVRE VE YOL UNSURLARI DÖNGÜSÜ
@@ -3051,6 +3082,11 @@ const Game = {
                     if (this.isBrakeKeyDown) baseBrake = -14.5;
                     if (this.isEmergencyBrakeLocked) baseBrake = -28.0;
                     
+                    // Balata şişmesi (Brake Fade) verimlilik kaybı (260°C üzerinde %35'e kadar düşer)
+                    if (typeof this.brakeEfficiency === 'number') {
+                        baseBrake *= this.brakeEfficiency;
+                    }
+
                     // Islak yol ve yağmur milimetresine göre fren mesafesi ve tutunma kaybı:
                     if (this.weather === 'rainy' && this.rainMmPerHour > 0) {
                         const rainGripFactor = Math.max(0.72, 1.0 - (this.rainMmPerHour * 0.016));
@@ -3203,11 +3239,13 @@ const Game = {
             const isFootBraking = (this.keys.s || this.keys.arrowdown || this.isBrakeKeyDown);
             const retarderLevel = (this.retarderLevel && this.retarderLevel > 0) ? this.retarderLevel : ((this.isBrakeKeyDown && this.speed > 30) ? 3 : 0);
             const incPhys = TurkeyGeographyEngine.calculateInclinePhysics(this.speed, this.currentSlopePct, deltaTime, isFootBraking, retarderLevel);
+            this.brakeEfficiency = incPhys.brakeEfficiency || 1.0;
 
             // Manuel Retarder Frenleme Kuvveti (Kademeli Hidrolik Şanzıman Freni)
-            if (this.retarderLevel > 0 && this.speed > 10) {
+            if (this.retarderLevel > 0 && this.speed > 8) {
                 const retarderDecel = (this.retarderLevel * 1.6) * deltaTime;
-                this.speed = Math.max(8, this.speed - retarderDecel);
+                const maxRetarderDecel = Math.max(0, this.speed - 8);
+                this.speed -= Math.min(retarderDecel, maxRetarderDecel);
             }
 
             // Eğim yerçekimi ivmesi (Newton: F = m*g*sin(theta))
@@ -3245,8 +3283,8 @@ const Game = {
             this.speed = 0;
         }
         
-        // BUG FIX: Otomatik Retarder Kapatma (Hız 10'un altına düşerse motor freni devreden çıkar)
-        if (this.speed < 10 && this.isBrakeKeyDown && typeof audio.stopRetarder === 'function') {
+        // Otomatik Retarder Kapatma (Hız 8'in altına düşerse türbin uğultusu devreden çıkar)
+        if (this.speed < 8 && typeof audio.stopRetarder === 'function') {
             audio.stopRetarder();
         }
 
@@ -3400,7 +3438,7 @@ const Game = {
             this.totalDistanceCovered += distanceCovered;
 
             // Dinamik Yakıt Tüketim Fiziği
-            if (this.engineStarted) {
+            if (this.engineStarted || (typeof audio !== 'undefined' && audio.isEngineRunning)) {
                 const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
                 if (this.currentFuelLiters === undefined) this.currentFuelLiters = cap;
                 
@@ -3408,13 +3446,17 @@ const Game = {
                     const distKm = (this.speed / 3600) * deltaTime;
                     const consRate = (typeof this.getFuelConsumptionPer100km === 'function') ? this.getFuelConsumptionPer100km() : 30;
                     let throttleFactor = 1.0;
-                    if (this.isRetarderActive && !this.keys.w && !this.keys.arrowup) {
-                        throttleFactor = 0.05; // Retarder devredeyken enjeksiyon kesme
+                    const hasRetarder = (this.isRetarderActive || (this.retarderLevel && this.retarderLevel > 0));
+                    if (hasRetarder && !this.keys.w && !this.keys.arrowup) {
+                        throttleFactor = 0.05; // Retarder devredeyken enjeksiyon kesme (Sıfıra yakın tüketim)
                     } else if (!this.keys.w && !this.keys.arrowup) {
-                        throttleFactor = 0.2; // Gazsız akış
+                        throttleFactor = 0.2; // Gazsız süzülme
                     }
-                    const passCount = this.passengers ? (this.passengers.length || 0) : 0;
-                    const loadFactor = 1.0 + (passCount * 0.003);
+                    const passCount = this.passengersOnBoard || 0;
+                    let loadFactor = 1.0 + (passCount * 0.003);
+                    if (this.currentSlopePct > 0) {
+                        loadFactor *= (1.0 + (this.currentSlopePct * 0.12)); // Her %1 eğim motor yakıt tüketimini %12 artırır
+                    }
                     const burned = distKm * (consRate / 100) * throttleFactor * loadFactor;
                     this.currentFuelLiters = Math.max(0, this.currentFuelLiters - burned);
                 } else {
@@ -4357,9 +4399,7 @@ const Game = {
         }
         
         UI.switchScreen('stop-screen');
-        
-        // Oto-kalkış bekleme durumunda
-        this.checkAutoDepart();
+        // Durağa varış tamamlandı; kapılar henüz açılmadı. Kalkış işlemi yolcular binip kapılar kapandıktan sonra tetiklenir.
     },
 
     checkAutoDepart: function() {
@@ -4460,8 +4500,9 @@ const Game = {
             return;
         }
 
-        // Havalı kapı açma (Eğitim Modu: Basınç güvenli seviyede tutulur)
-        this.airPressure = Math.max(85, this.airPressure - 2);
+        // Havalı kapı açma
+        const minAirF = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
+        this.airPressure = Math.max(minAirF, this.airPressure - 2);
         
         this.frontDoorOpen = !this.frontDoorOpen;
         const btn = document.getElementById('btn-front-door');
@@ -4685,8 +4726,9 @@ const Game = {
             UI.showToast("Güvenlik Kilidi: Kapılar kilitli!", "error");
             return;
         }
-        // Arka kapı pnömatik (Eğitim Modu: Basınç güvenli seviyede tutulur)
-        this.airPressure = Math.max(85, this.airPressure - 2);
+        // Arka kapı pnömatik
+        const minAirR = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
+        this.airPressure = Math.max(minAirR, this.airPressure - 2);
         
         this.rearDoorOpen = !this.rearDoorOpen;
         const btn = document.getElementById('btn-rear-door');
@@ -4871,14 +4913,21 @@ const Game = {
             // Sesli anons ve sonuç raporu completeTask tarafından tek seferde okunur
             
             if (this.activeRouteData && this.activeRouteData.isIntercity) {
-                this.unlockCity(this.activeRouteData.destCity);
-                if (typeof UI !== 'undefined') UI.showToast(`${this.activeRouteData.destCity} Şehrinin Kilidi Açıldı!`, 'success');
+                if (this.activeRouteData.destCity) {
+                    this.unlockCity(this.activeRouteData.destCity);
+                    this.currentCity = this.activeRouteData.destCity;
+                    this.saveData();
+                    if (typeof UI !== 'undefined') UI.showToast(`${this.activeRouteData.destCity} Şehrine Ulaştınız ve Kilidi Açıldı!`, 'success');
+                }
             }
 
             this.completeTask(comfortMsg, timingRewardMsg); // İlerlemeyi kaydet ve sonuç anonsunu yap
 
             // ŞOFÖR LİYAKAT VE ROZET SİSTEMİ KONTROLÜ
             if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkAfterRoute === 'function') {
+                const curBusActive = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
+                    ? BusFleet.getSelectedBus() 
+                    : (this.selectedBus || null);
                 const routeStats = {
                     isSuccess: true,
                     punctualityScore: punctualityScore,
@@ -4891,7 +4940,10 @@ const Game = {
                     completedTasks: this.completedTasks,
                     totalDrivingSeconds: this.totalDrivingSeconds || 0,
                     retarderUsed: !!this.retarderUsedInRoute,
-                    selectedBus: this.selectedBus,
+                    selectedBus: curBusActive,
+                    earnedXP: 100 + ((this.activeRouteData?.stops?.length || 6) * 15) + (this.passengerComfort >= 90 ? 75 : (this.passengerComfort >= 75 ? 35 : 0)) + (this.isRampDeployed ? 50 : 0),
+                    earnedMoney: cargoEarnings + (comfortBonus || 0) + (finishDiv || 0) + (this.sessionMoney || 0),
+                    routeDistanceKm: (this.activeRouteData && this.activeRouteData.totalDistanceKm) ? this.activeRouteData.totalDistanceKm : Math.max(1, Math.round((this.totalDistanceCovered || 8000) / 1000)),
                     isIntercity: !!(this.activeRouteData && this.activeRouteData.isIntercity),
                     unlockedCitiesCount: (this.unlockedCities && Array.isArray(this.unlockedCities)) ? this.unlockedCities.length : 1
                 };
@@ -4956,10 +5008,14 @@ const Game = {
 
         const k = e.key.toLowerCase();
         // SHIFT + VİRGÜL (Shift + ,): Rastgele Telsiz Konuşmaları Yükle / Dinlet (Kanal 19)
-        // İKRAM VE MUAVİN SERVİSİ (I Tuşu)
+        // İKRAM VE MUAVİN SERVİSİ (I Tuşu) & HAT TABELASI (Shift + I)
         if (k === 'i' || k === 'ı' || e.code === 'KeyI') {
             e.preventDefault();
-            this.serveCatering();
+            if (e.shiftKey) {
+                this.reportIBISStatus();
+            } else {
+                this.serveCatering();
+            }
             return;
         }
 
@@ -5068,11 +5124,7 @@ const Game = {
             return;
         }
 
-        if (k === 'i') {
-            e.preventDefault();
-            this.reportIBISStatus();
-            return;
-        }
+        // (IBIS Shift+I ve I tuşuyla yukarıda tek merkezden yönetilmektedir)
 
         if (k === 'z') {
             e.preventDefault();
@@ -5129,11 +5181,25 @@ const Game = {
                 let hh = Math.floor(this.clockMinutes / 60);
                 let mm = Math.floor(this.clockMinutes % 60);
                 let timeStr = `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
+                let timeOfDay = "Gece";
+                if (this.clockMinutes >= 360 && this.clockMinutes < 720) timeOfDay = "Öğleden Önce";
+                else if (this.clockMinutes >= 720 && this.clockMinutes < 1080) timeOfDay = "Gün Ortası";
+                else if (this.clockMinutes >= 1080) timeOfDay = "Akşam";
+
                 let durum = this.weather === 'sunny' 
                     ? (this.isNight ? 'açık gece' : 'güneşli') 
                     : (this.weather === 'rainy' ? `yağmurlu, saatte ${this.rainMmPerHour || 5} milimetre yağış` : 'karlı');
-                const msg = `Saat ${timeStr}. Dış sıcaklık ${this.temperature} derece, araç içi ${Math.floor(this.busTemperature)} derece. Hava ${durum}. ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
+                let uyari = this.weather === 'snowy' ? ' Yollar buzlu.' : (this.weather === 'rainy' ? ' Yollar kaygan.' : '');
+                let farDurum = this.isNight ? (this.isHeadlightsOn ? ' Farlarınız açık.' : ' Farlarınız KAPALI, görüş tehlikesi!') : '';
+                
+                let weightCategory = "hafif";
+                if (this.passengersOnBoard > 15 && this.passengersOnBoard <= 40) weightCategory = "orta ağırlıkta";
+                else if (this.passengersOnBoard > 40) weightCategory = "çok ağır";
+
+                const msg = `Saat ${timeStr} (${timeOfDay}). Dış sıcaklık ${this.temperature} derece, araç içi ${Math.floor(this.busTemperature)} derece. Hava ${durum}.${uyari}${farDurum} Otobüs şu an ${weightCategory} (${this.passengersOnBoard} yolcu). ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
                 if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
+                if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, 'info');
                 return;
             }
             this.handleRadioDispatch();
@@ -5264,18 +5330,20 @@ const Game = {
         if (k === 'm' || e.code === 'KeyM' || e.code === 'Space') {
             e.preventDefault();
             if (audio.isEngineRunning) {
+                this.engineStarted = false;
                 audio.stopEngine();
                 if (typeof audio.playHandbrakeAir === 'function') audio.playHandbrakeAir();
                 if (typeof audio.speak === 'function') audio.speak("Motor durduruldu.");
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🛑 Motor Durduruldu", "warning");
             } else {
+                this.engineStarted = true;
                 audio.startEngine();
                 if (typeof audio.speak === 'function') audio.speak("Motor çalıştırıldı.");
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🔑 Motor Çalıştırıldı", "success");
             }
             if (!this.isDriving) this.checkAutoDepart();
         }
-        if (k === 'l' || k === 'k') {
+        if (k === 'l' || e.code === 'KeyL') {
             e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.playHorn === 'function') {
             // Karşıdan gelen meslektaş kornasına selam verme
@@ -5342,30 +5410,7 @@ const Game = {
                 }
             }
         }
-        if (k === 't') {
-            let hh = Math.floor(this.clockMinutes / 60);
-            let mm = Math.floor(this.clockMinutes % 60);
-            let timeStr = `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
-            
-            let timeOfDay = "Gece";
-            if (this.clockMinutes >= 360 && this.clockMinutes < 720) timeOfDay = "Öğleden Önce";
-            else if (this.clockMinutes >= 720 && this.clockMinutes < 1080) timeOfDay = "Gün Ortası";
-            else if (this.clockMinutes >= 1080) timeOfDay = "Akşam";
-
-            let durum = this.weather === 'sunny' ? (this.isNight ? 'Açık' : 'Güneşli') : (this.weather === 'rainy' ? 'Yağmurlu' : 'Karlı');
-            let uyari = this.weather === 'snowy' ? ' Yollar buzlu.' : (this.weather === 'rainy' ? ' Yollar kaygan.' : '');
-            let farDurum = this.isNight ? (this.isHeadlightsOn ? ' Farlarınız açık.' : ' Farlarınız KAPALI, görüş tehlikesi!') : '';
-            
-            // Tonaj Bilgisini Kategorize Et
-            let weightCategory = "Hafif"; // 0-15 yolcu
-            if (this.passengersOnBoard > 15 && this.passengersOnBoard <= 40) {
-                weightCategory = "Orta ağırlıkta";
-            } else if (this.passengersOnBoard > 40) {
-                weightCategory = "Çok ağır";
-            }
-            
-            audio.speak(`Saat ${timeStr}. ${timeOfDay}. Hava durumu: ${durum}. Sıcaklık: ${this.temperature} derece. Otobüs şu an ${weightCategory}.${uyari}${farDurum}`);
-        }
+        // (Hava & Saat Shift+T, Telsiz T tuşu ile yukarıda yönetilmektedir)
         if (k === 'k' || k === 'h' || k === 'v' || k === 't' || k === 'l') {
             e.preventDefault();
         }

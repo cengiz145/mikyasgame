@@ -633,7 +633,8 @@ class AudioSystem {
             this.wasRetarderEngaged = false;
         }
 
-        const isEngaged = (speed > 20 && isBraking) || (this.isRetarderManuallyEngaged && speed > 15);
+        const hasManualRetarder = (typeof Game !== 'undefined' && Game.retarderLevel && Game.retarderLevel > 0) || this.isRetarderManuallyEngaged;
+        const isEngaged = (speed > 20 && isBraking) || (hasManualRetarder && speed > 8);
         if (isEngaged) {
             const pitchFactor = profile && profile.retarderPitch ? profile.retarderPitch : 1.0;
             const cabinDamping = profile && profile.cabinDamping ? profile.cabinDamping : 0.8;
@@ -682,10 +683,16 @@ class AudioSystem {
         this.init();
         this.isRetarderManuallyEngaged = true;
         this.updateRetarder(speed, true);
-        if (this.retarderAutoStopTimer) clearTimeout(this.retarderAutoStopTimer);
-        if (duration > 0) {
+        if (this.retarderAutoStopTimer) {
+            clearTimeout(this.retarderAutoStopTimer);
+            this.retarderAutoStopTimer = null;
+        }
+        if (duration && duration > 0) {
             this.retarderAutoStopTimer = setTimeout(() => {
-                this.stopRetarder();
+                // Sadece ayak freni simülasyonuysa otomatik kapat, kol çekiliyse kapatma
+                if (typeof Game === 'undefined' || !Game.retarderLevel || Game.retarderLevel === 0) {
+                    this.stopRetarder();
+                }
             }, duration * 1000);
         }
     }
@@ -697,6 +704,87 @@ class AudioSystem {
         }
         const el = typeof document !== 'undefined' ? document.getElementById('hud-retarder') : null;
         if (el) el.style.display = 'none';
+    }
+
+    playDoorButtonTick() {
+        this.init();
+        if (typeof this.playSwitchClick === 'function') {
+            this.playSwitchClick();
+        } else if (typeof this.playTurnTick === 'function') {
+            this.playTurnTick(0);
+        }
+    }
+
+    playStopChime() {
+        this.init();
+        if (typeof this.playIBISChime === 'function') {
+            this.playIBISChime();
+        } else if (typeof this.playStationChime === 'function') {
+            this.playStationChime();
+        }
+    }
+
+    playRadioTalk() {
+        this.init();
+        if (typeof this.playRadioSquelchSound === 'function') {
+            this.playRadioSquelchSound();
+        } else if (typeof this.playRadioSquelch === 'function') {
+            this.playRadioSquelch();
+        }
+    }
+
+    playChime() {
+        this.init();
+        if (typeof this.playStationChime === 'function') {
+            this.playStationChime();
+        } else if (typeof this.playIBISChime === 'function') {
+            this.playIBISChime();
+        } else if (typeof this.playNavChime === 'function') {
+            this.playNavChime();
+        }
+    }
+
+    playWarning() {
+        this.init();
+        if (!this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(580, now);
+            osc.frequency.setValueAtTime(440, now + 0.12);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+            osc.connect(gain);
+            gain.connect(this.masterGain || this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.29);
+        } catch(e) {}
+    }
+
+    playSuccess() {
+        this.init();
+        if (typeof this.playBadgeFanfare === 'function') {
+            try { this.playBadgeFanfare(); return; } catch(e) {}
+        }
+        if (!this.ctx) return;
+        try {
+            const now = this.ctx.currentTime;
+            const freqs = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            freqs.forEach((f, idx) => {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(f, now + (idx * 0.08));
+                gain.gain.setValueAtTime(0.2, now + (idx * 0.08));
+                gain.gain.exponentialRampToValueAtTime(0.005, now + (idx * 0.08) + 0.35);
+                osc.connect(gain);
+                gain.connect(this.masterGain || this.ctx.destination);
+                osc.start(now + (idx * 0.08));
+                osc.stop(now + (idx * 0.08) + 0.36);
+            });
+        } catch(e) {}
     }
 
     playNav() {
@@ -1545,7 +1633,7 @@ startEngine() {
         }
 
         // Retarder kontrolü (Frenleme esnasında)
-        const isBrakingNow = (typeof Game !== 'undefined') && (Game.acceleration < 0);
+        const isBrakingNow = (typeof Game !== 'undefined') && (Game.isBrakeKeyDown || (Game.keys && (Game.keys.s || Game.keys.arrowdown)) || (Game.retarderLevel && Game.retarderLevel > 0));
         this.updateRetarder(speed, isBrakingNow);
     }
 
@@ -1935,6 +2023,17 @@ startEngine() {
             // Hız arttıkça tıslama daha çok duyulur
             let targetVol = Math.min(0.3, 0.05 + (speed / 200));
             this.exhaustWarningGain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.2);
+        }
+    }
+
+    updateExhaustDrag(speed) {
+        if (!this.exhaustDragGain || !this.ctx) return;
+        if (speed < 5) {
+            this.exhaustDragGain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.2);
+        } else {
+            // Kopuk egzoz sürtünme gürültüsü
+            let targetVol = Math.min(0.45, 0.10 + (speed / 160));
+            this.exhaustDragGain.gain.setTargetAtTime(targetVol, this.ctx.currentTime, 0.2);
         }
     }
     

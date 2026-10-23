@@ -635,10 +635,13 @@
                 const k = e.key.toLowerCase();
                 if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
-                if (k === 'j') {
+                // Shift + J: Dinlenme Tesisi Menüsü (J tek başına son durakta Kayıp Eşya teftişidir)
+                if (e.shiftKey && (k === 'j' || e.code === 'KeyJ')) {
                     e.preventDefault();
                     this.toggleFacilityModal();
-                } else if (k === 'y') {
+                } 
+                // Shift + H: HGS Bakiye & Gişe Menüsü (Y tek başına Pusula / İstikamet sorgusudur)
+                else if (e.shiftKey && (k === 'h' || e.code === 'KeyH')) {
                     e.preventDefault();
                     this.toggleHgsModal();
                 }

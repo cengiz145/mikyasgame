@@ -1047,17 +1047,30 @@ window.addEventListener('keydown', (e) => {
     // "ana menüde müziğin sesini açmak için sayfa yukarı sayfa aşşağı tuşları kullanılsın
     // oyun ses düzzeyi ni kısıp açmak isiçinde home ve ent tuşları kullanılsın."
     if (!isFormFieldElement(activeEl) || !isTextInputElement(activeEl)) {
+        const inBus = isDriving || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'));
         if (e.key === 'PageUp') {
             e.preventDefault();
-            if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
-                audio.adjustMusicVolume(0.1);
+            if (inBus) {
+                if (typeof Game !== 'undefined' && typeof Game.toggleFrontDoor === 'function') {
+                    Game.toggleFrontDoor();
+                }
+            } else {
+                if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
+                    audio.adjustMusicVolume(0.1);
+                }
             }
             return;
         }
         if (e.key === 'PageDown') {
             e.preventDefault();
-            if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
-                audio.adjustMusicVolume(-0.1);
+            if (inBus) {
+                if (typeof Game !== 'undefined' && typeof Game.toggleRearDoor === 'function') {
+                    Game.toggleRearDoor();
+                }
+            } else {
+                if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
+                    audio.adjustMusicVolume(-0.1);
+                }
             }
             return;
         }
