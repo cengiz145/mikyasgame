@@ -448,6 +448,9 @@ const Game = {
             return;
         }
         this.isLuggageOpen = !this.isLuggageOpen;
+        if (this.isLuggageOpen && typeof audio !== 'undefined' && audio.playLuggageSuitcase) {
+            audio.playLuggageSuitcase();
+        }
         const lugEl = document.getElementById('hud-luggage');
         if (this.isLuggageOpen) {
             if (typeof audio !== 'undefined' && typeof audio.playLuggageBays === 'function') audio.playLuggageBays(true);
@@ -1351,6 +1354,9 @@ const Game = {
 
     // --- OTOGAR PERON HAREKET ANONSU ---
     playTerminalDepartureAnnouncement: function() {
+        if (typeof audio !== 'undefined' && audio.playStationChime) {
+            audio.playStationChime();
+        }
         let compName = "Mikyas Seyahat";
         if (typeof CompanySystem !== 'undefined') {
             const empId = CompanySystem.data && CompanySystem.data.corporateEmployer;
@@ -3565,6 +3571,13 @@ const Game = {
 
         // Yağmurlu/Karlı havada camda su damlaları veya kar efekti (Silecek mantığı)
         if (this.weather === 'rainy' || this.weather === 'snowy') {
+            this.thunderTimer = (this.thunderTimer || 0) + deltaTime;
+            if (this.weather === 'rainy' && this.thunderTimer > 35) { // Her 35-40 saniyede bir uzaktan gök gürültüsü
+                this.thunderTimer = 0;
+                if (typeof audio !== 'undefined' && audio.playThunderclap) {
+                    audio.playThunderclap();
+                }
+            }
             if (audio.isWiperOn) {
                 document.getElementById('weather-overlay').style.opacity = '0';
             } else {
