@@ -1063,15 +1063,43 @@ window.addEventListener('keydown', (e) => {
         }
         if (e.key === 'Home') {
             e.preventDefault();
-            if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
-                audio.adjustGameSoundVolume(0.1);
+            const inBus = isDriving || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'));
+            if (inBus) {
+                if (typeof audio !== 'undefined') {
+                    if (audio.playWindowSound) audio.playWindowSound(true);
+                    audio.setWindowOpen(true);
+                    if (typeof Game !== 'undefined' && Game.busDamage) {
+                        audio.updateAcoustics(Game.busDamage.leftWindow, Game.busDamage.rightWindow);
+                    }
+                    const winMsg = "Kaptan camı açıldı. Dış sesler ve serin hava kokpite doluyor.";
+                    if (typeof audio.speak === 'function') audio.speak(winMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Açıldı (Home)", "info");
+                }
+            } else {
+                if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
+                    audio.adjustGameSoundVolume(0.1);
+                }
             }
             return;
         }
         if (e.key === 'End') {
             e.preventDefault();
-            if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
-                audio.adjustGameSoundVolume(-0.1);
+            const inBus = isDriving || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'));
+            if (inBus) {
+                if (typeof audio !== 'undefined') {
+                    if (audio.playWindowSound) audio.playWindowSound(false);
+                    audio.setWindowOpen(false);
+                    if (typeof Game !== 'undefined' && Game.busDamage) {
+                        audio.updateAcoustics(Game.busDamage.leftWindow, Game.busDamage.rightWindow);
+                    }
+                    const winMsg = "Kaptan camı kapatıldı. Kabin yalıtımı sağlandı.";
+                    if (typeof audio.speak === 'function') audio.speak(winMsg);
+                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Kapatıldı (End)", "info");
+                }
+            } else {
+                if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
+                    audio.adjustGameSoundVolume(-0.1);
+                }
             }
             return;
         }
