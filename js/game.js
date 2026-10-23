@@ -1550,6 +1550,11 @@ const Game = {
         }
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
+        const arriveBusSprite = document.getElementById('bus-sprite');
+        if (arriveBusSprite) arriveBusSprite.style.transform = 'translateX(-50%) rotate(0deg)';
+        const arriveLaneCont = document.querySelector('.lane-container');
+        if (arriveLaneCont) arriveLaneCont.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
+        if (typeof audio !== 'undefined' && typeof audio.stopTireScreech === 'function') audio.stopTireScreech();
         this.fuelTankCapacity = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
         if (this.currentFuelLiters === undefined || this.currentFuelLiters <= 0) {
             this.currentFuelLiters = this.fuelTankCapacity;
@@ -2765,6 +2770,7 @@ const Game = {
                     // AŞIRI HIZ VE MERKEZKAÇ ETKİLERİ: Lastik çığlığı, konfor kaybı ve yolcu tepkisi
                     if (evalRes.isOverSpeed && this.speed > 25) {
                         currentTurn.hadExcessiveOverspeed = true;
+                        currentTurn.isScreeching = true;
                         if (typeof audio.playTireScreech === 'function') {
                             audio.playTireScreech(evalRes.screechIntensity);
                         }
@@ -2779,8 +2785,9 @@ const Game = {
                             if (typeof audio.playPassengerDiscontent === 'function') audio.playPassengerDiscontent();
                             currentTurn.lastMurmurTime = currentTime;
                         }
-                    } else {
-                        if (typeof audio.stopTireScreech === 'function' && !isSkidding) {
+                    } else if (currentTurn.isScreeching) {
+                        currentTurn.isScreeching = false;
+                        if (typeof audio.stopTireScreech === 'function') {
                             audio.stopTireScreech();
                         }
                     }
@@ -2789,8 +2796,11 @@ const Game = {
                         // Viraj başarıyla tamamlandı
                         if (busSprite) busSprite.style.transform = 'translateX(-50%) rotate(0deg)';
                         if (laneContainer) laneContainer.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
-                        if (typeof audio.stopTireScreech === 'function' && !isSkidding) {
-                            audio.stopTireScreech();
+                        if (currentTurn.isScreeching) {
+                            currentTurn.isScreeching = false;
+                            if (typeof audio.stopTireScreech === 'function') {
+                                audio.stopTireScreech();
+                            }
                         }
 
                         if (!currentTurn.hadExcessiveOverspeed && typeof this.passengerComfort === 'number') {
