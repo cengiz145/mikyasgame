@@ -293,7 +293,7 @@
                 companyTreasury: (typeof CompanySystem !== 'undefined' && CompanySystem.data) ? CompanySystem.data.companyTreasury : 50000,
                 totalRevenue: (typeof CompanySystem !== 'undefined' && CompanySystem.data) ? CompanySystem.data.totalRevenue : 0,
                 satisfactionRating: 4.9,
-                badgesCount: (typeof DriverBadges !== 'undefined') ? Object.keys(DriverBadges.getBadgesData()).length : 0,
+                badgesCount: (typeof DriverBadges !== 'undefined' && typeof DriverBadges.getTotalUnlockedAllCount === 'function') ? DriverBadges.getTotalUnlockedAllCount() : ((typeof DriverBadges !== 'undefined') ? Object.values(DriverBadges.getBadgesData()).filter(v => v && v.unlocked).length : 0),
                 lastSavedTimestamp: Date.now(),
                 isMe: true
             };

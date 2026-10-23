@@ -453,6 +453,7 @@ const Game = {
         const rampEl = document.getElementById('hud-ramp');
         if (this.isRampDeployed) {
             this.rampUsedInRoute = true;
+            this.rampsUsedCountInRoute = (this.rampsUsedCountInRoute || 0) + 1;
             if (typeof audio !== 'undefined' && typeof audio.playRampDeploy === 'function') audio.playRampDeploy();
             if (rampEl) rampEl.style.display = 'inline-block';
             let xpGained = false;
@@ -1642,6 +1643,11 @@ const Game = {
         this.lastRecordedSpeed = 0;
         this.lastHarshBrakeWarningTime = 0;
         this.isRampDeployed = false;
+        this.rampUsedInRoute = false;
+        this.rampsUsedCountInRoute = 0;
+        this.retarderUsedInRoute = false;
+        this.retarderUsesCountInRoute = 0;
+        this.totalPassengersBoardedInRoute = 0;
         this.isLuggageOpen = false;
         this.hasLostItemFound = false;
         this.lastFoundLostItem = null;
@@ -3008,6 +3014,7 @@ const Game = {
                 if (this.speed > 30 && !this.isEmergencyBrakeLocked && (!this.retarderLevel || this.retarderLevel === 0) && typeof audio.playRetarder === 'function') {
                     audio.playRetarder(5, this.speed);
                     this.retarderUsedInRoute = true;
+                    this.retarderUsesCountInRoute = (this.retarderUsesCountInRoute || 0) + 1;
                 }
             }
             // Gerçek otobüslerde frene basılı tutmak havayı tüketmez, sadece basıp bırakmak tüketir!
@@ -4515,6 +4522,7 @@ const Game = {
             if (typeof audio !== 'undefined' && typeof audio.playSuccess === 'function') audio.playSuccess();
 
             this.passengersOnBoard++;
+            this.totalPassengersBoardedInRoute = (this.totalPassengersBoardedInRoute || 0) + 1;
             this.addMoney(60);
             this.addXP(30);
             this.runningPassengerBonusCount = (this.runningPassengerBonusCount || 0) + 1;
@@ -4705,6 +4713,7 @@ const Game = {
         if (allowed) {
             // İzin verildi (Gönlü Zengin Kaptan)
             this.passengersOnBoard++;
+            this.totalPassengersBoardedInRoute = (this.totalPassengersBoardedInRoute || 0) + 1;
             this.addMoney(50);
             this.addXP(25);
             this.kindnessBonusCount = (this.kindnessBonusCount || 0) + 1;
@@ -4824,6 +4833,7 @@ const Game = {
             splitRes = this.addMoney(fare);
         }
         this.passengersOnBoard++;
+        this.totalPassengersBoardedInRoute = (this.totalPassengersBoardedInRoute || 0) + 1;
         
         if (typeof audio !== 'undefined' && typeof audio.playValidatorSound === 'function') {
             audio.playValidatorSound(pType);
@@ -4967,24 +4977,29 @@ const Game = {
                 const curBusActive = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
                     ? BusFleet.getSelectedBus() 
                     : (this.selectedBus || null);
+                const punctualityBonus = (punctualityScore >= 90) ? 150 : 0;
                 const routeStats = {
                     isSuccess: true,
                     punctualityScore: punctualityScore,
                     passengerComfort: this.passengerComfort,
                     busHealth: (this.busDamage && typeof this.busDamage.health === 'number') ? this.busDamage.health : 100,
                     rampUsed: !!this.rampUsedInRoute,
+                    rampsUsedCount: this.rampsUsedCountInRoute || (this.rampUsedInRoute ? 1 : 0),
                     lostItemFound: !!this.hasLostItemFound,
                     isNight: !!this.isNight,
                     isHeadlightsOn: !!this.isHeadlightsOn,
                     completedTasks: this.completedTasks,
                     totalDrivingSeconds: this.totalDrivingSeconds || 0,
                     retarderUsed: !!this.retarderUsedInRoute,
+                    retarderUsesCount: this.retarderUsesCountInRoute || (this.retarderUsedInRoute ? 1 : 0),
                     selectedBus: curBusActive,
                     earnedXP: actualEarnedXP,
-                    earnedMoney: cargoEarnings + (comfortBonus || 0) + (finishDiv || 0) + (this.sessionMoney || 0),
+                    earnedMoney: cargoEarnings + (comfortBonus || 0) + (finishDiv || 0) + punctualityBonus + (this.sessionMoney || 0),
                     routeDistanceKm: (this.activeRouteData && this.activeRouteData.totalDistanceKm) ? this.activeRouteData.totalDistanceKm : Math.max(1, Math.round((this.totalDistanceCovered || 8000) / 1000)),
                     isIntercity: !!(this.activeRouteData && this.activeRouteData.isIntercity),
-                    unlockedCitiesCount: (this.unlockedCities && Array.isArray(this.unlockedCities)) ? this.unlockedCities.length : 1
+                    unlockedCitiesCount: (this.unlockedCities && Array.isArray(this.unlockedCities)) ? this.unlockedCities.length : 1,
+                    passengersCarried: this.totalPassengersBoardedInRoute || (this.isTrainingRoute ? 0 : 15),
+                    isRainOrSnow: (this.activeClimateRegime === 'yagmurlu' || this.activeClimateRegime === 'karli' || this.weather === 'rainy' || this.weather === 'snowy')
                 };
                 DriverBadges.checkAfterRoute(routeStats);
             }
@@ -5283,6 +5298,7 @@ const Game = {
 
             const isEngaged = (this.retarderLevel > 0);
             this.retarderUsedInRoute = true;
+            if (isEngaged) this.retarderUsesCountInRoute = (this.retarderUsesCountInRoute || 0) + 1;
             if (typeof audio !== 'undefined') {
                 audio.isRetarderManuallyEngaged = isEngaged;
                 if (typeof audio.playDoorButtonTick === 'function') audio.playDoorButtonTick();
