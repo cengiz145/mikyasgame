@@ -269,6 +269,10 @@ class VoiceAssistant {
     openTutorialModal() {
         const modal = document.getElementById('tutorial-assistant-modal');
         if (!modal) return;
+        // Eğitim moduna girerken tüm oyun ve efekt seslerini sustur
+        if (typeof audio !== 'undefined' && audio.stopAllSoundEffects) {
+            audio.stopAllSoundEffects();
+        }
         this.renderTutorialContent();
         modal.classList.remove('hidden');
         this.updateCopilotButtonText();
@@ -286,8 +290,13 @@ class VoiceAssistant {
         const modal = document.getElementById('tutorial-assistant-modal');
         if (modal) modal.classList.add('hidden');
         this.stopTutorialSpeech();
-        if (typeof audio !== 'undefined' && audio.speak) {
-            audio.speak("Sürüş rehberi kapatıldı.");
+        if (this.stepTransitionTimeout) {
+            clearTimeout(this.stepTransitionTimeout);
+            this.stepTransitionTimeout = null;
+        }
+        if (typeof audio !== 'undefined') {
+            if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+            if (audio.speak) audio.speak("Sürüş rehberi kapatıldı.");
         }
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
             KeyboardNav.initForScreen();
@@ -295,6 +304,14 @@ class VoiceAssistant {
     }
 
     setAcademyTab(tabId) {
+        if (this.stepTransitionTimeout) {
+            clearTimeout(this.stepTransitionTimeout);
+            this.stepTransitionTimeout = null;
+        }
+        if (typeof audio !== 'undefined') {
+            if (audio.stopSpeech) audio.stopSpeech();
+            if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+        }
         this.currentStageFilter = tabId;
         this.renderTutorialContent();
     }
@@ -835,6 +852,7 @@ class VoiceAssistant {
             btn.addEventListener('click', (e) => {
                 const text = e.currentTarget.getAttribute('data-text');
                 if (text && typeof audio !== 'undefined' && audio.speak) {
+                    if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
                     audio.speak(text);
                 }
             });
@@ -856,6 +874,7 @@ class VoiceAssistant {
         this.guidedSteps = [
             {
                 step: 1,
+                soundDuration: 2200,
                 title: "1. Adım: Motoru Çalıştırma (Kontağı Açalım)",
                 tip: "Otobüsün hareket etmesi için önce motoru çalıştırmalıyız.",
                 instruction: "Otobüsümüzü çalıştırmak için klavyeden M tuşuna basınız veya aşağıdaki 'Marşa Bas' butonuna tıklayınız.",
@@ -879,6 +898,7 @@ class VoiceAssistant {
             },
             {
                 step: 2,
+                soundDuration: 2200,
                 title: "2. Adım: Gaza Basma (Yola Çıkalım)",
                 tip: "Otobüsü hızlandırmak için gaza basıyoruz.",
                 instruction: "Otobüsü sürmek ve hızlanmak için klavyeden W tuşuna (veya Yukarı Ok tuşuna) basınız.",
@@ -902,6 +922,7 @@ class VoiceAssistant {
             },
             {
                 step: 3,
+                soundDuration: 2000,
                 title: "3. Adım: Yumuşakça Durma (Fren Yapalım)",
                 tip: "Durağa yaklaşınca yolcular sarsılmasın diye frene yumuşakça basıyoruz.",
                 instruction: "Durağa geldik! Yolcuları sarsmadan durmak için lütfen klavyeden S tuşuna (veya Aşağı Ok tuşuna) basınız.",
@@ -925,6 +946,7 @@ class VoiceAssistant {
             },
             {
                 step: 4,
+                soundDuration: 2000,
                 title: "4. Adım: Otobüsü Sağa Eğme (Kaldırıma Yaklaştırma)",
                 tip: "Yaşlı ve engelli yolcular basamağa rahat çıksın diye otobüsü sağa eğiyoruz.",
                 instruction: "Durakta yaşlı bir yolcumuz bekliyor. Otobüsü kaldırıma doğru eğmek için klavyeden K tuşuna basınız.",
@@ -948,6 +970,7 @@ class VoiceAssistant {
             },
             {
                 step: 5,
+                soundDuration: 2200,
                 title: "5. Adım: Engelli Rampasını Açma",
                 tip: "Tekerlekli sandalyeli yolcumuzun binmesi için rampayı açıyoruz.",
                 instruction: "Tekerlekli sandalyeli yolcumuzun rahatça binmesi için klavyeden R tuşuna (veya U) basarak rampayı açınız.",
@@ -972,6 +995,7 @@ class VoiceAssistant {
             },
             {
                 step: 6,
+                soundDuration: 2200,
                 title: "6. Adım: Rampayı Geri Kapatma",
                 tip: "Yolcumuz bindi, sefere devam etmek için rampayı geri topluyoruz.",
                 instruction: "Yolcumuz bindi. Tekrar yola çıkabilmek için lütfen tekrar R tuşuna (veya U) basarak rampayı kapatınız.",
@@ -997,6 +1021,7 @@ class VoiceAssistant {
             },
             {
                 step: 7,
+                soundDuration: 2200,
                 title: "7. Adım: Ön Kapıyı Açma (Yolcuları Alma)",
                 tip: "Durakta bekleyen diğer yolcuların binmesi için ön kapıyı açıyoruz.",
                 instruction: "Duraktaki diğer yolcuların binmesi için klavyeden 1 tuşuna basarak ön kapıyı açınız.",
@@ -1023,6 +1048,7 @@ class VoiceAssistant {
             },
             {
                 step: 8,
+                soundDuration: 1800,
                 title: "8. Adım: Ön Kapıyı Kapatma",
                 tip: "Yolcular bindi, güvenle sürmek için kapıyı kapatıyoruz.",
                 instruction: "Yolcular bindi. Yola çıkmak için lütfen tekrar 1 tuşuna basarak kapıyı kapatınız.",
@@ -1045,6 +1071,7 @@ class VoiceAssistant {
             },
             {
                 step: 9,
+                soundDuration: 2200,
                 title: "9. Adım: Yokuş Aşağı İniş Freni (Retarder)",
                 tip: "Yokuş inerken normal fren balataları ısınmasın diye motor frenini çekiyoruz.",
                 instruction: "Son olarak, dik yokuş inerken otobüsü yavaşlatmak için Boşluk (Space) tuşuna basarak yokuş frenini çekiniz.",
@@ -1209,8 +1236,10 @@ class VoiceAssistant {
         const btnReplay = document.getElementById('btn-guided-replay-audio');
         if (btnReplay) {
             btnReplay.onclick = () => {
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(currentStep.instruction);
+                if (typeof audio !== 'undefined') {
+                    if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
+                    if (audio.speak) audio.speak(currentStep.instruction);
+                    if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(currentStep.instruction);
                 }
             };
         }
@@ -1219,11 +1248,21 @@ class VoiceAssistant {
         if (btnPrev) {
             btnPrev.onclick = () => {
                 if (this.guidedStep > 1) {
+                    if (this.stepTransitionTimeout) {
+                        clearTimeout(this.stepTransitionTimeout);
+                        this.stepTransitionTimeout = null;
+                    }
+                    if (typeof audio !== 'undefined' && audio.stopAllSoundEffects) {
+                        audio.stopAllSoundEffects();
+                    }
                     this.guidedStep--;
                     this.guidedFeedbackText = "";
                     this.renderInteractiveLab();
                     const prevStep = this.guidedSteps[this.guidedStep - 1];
-                    if (typeof audio !== 'undefined' && audio.speak) audio.speak(prevStep.instruction);
+                    if (typeof audio !== 'undefined') {
+                        if (audio.speak) audio.speak(prevStep.instruction);
+                        if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(prevStep.instruction);
+                    }
                 }
             };
         }
@@ -1238,35 +1277,45 @@ class VoiceAssistant {
         const currentStep = this.guidedSteps[this.guidedStep - 1];
         if (!currentStep) return;
 
-        // Adımın mekanik sesi hemen çalsın
+        // Önceki geçiş zamanlayıcısı varsa temizle
+        if (this.stepTransitionTimeout) {
+            clearTimeout(this.stepTransitionTimeout);
+            this.stepTransitionTimeout = null;
+        }
+
+        // Adımın mekanik sesi çalsın
         if (currentStep.execute) currentStep.execute();
 
         this.guidedFeedbackText = "🎉 " + currentStep.successFeedback;
         this.guidedFeedbackType = "success";
 
-        if (typeof audio !== 'undefined') {
-            // Mekanik sesin rahatça duyulabilmesi için tebrik mesajını 500ms sonraya zamanla
-            setTimeout(() => {
-                if (audio.speak) audio.speak(currentStep.successFeedback);
-                if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(currentStep.successFeedback);
-            }, 550);
-        }
         if (typeof UI !== 'undefined' && UI.showToast) {
             UI.showToast("Aferin! Doğru yaptınız. Sıradaki adıma geçiliyor...", "success");
         }
 
-        // Sıradaki adıma yumuşak geçiş
-        setTimeout(() => {
+        const duration = currentStep.soundDuration || 2200;
+
+        // KULLANICI KURALI:
+        // "ses bittiğinde bir sonraki adıma geçerken sesi kapat. eğitim okunurken sesler sussun ki ekran okuyucuyla eğitimi tamamlamak kolay olsun."
+        this.stepTransitionTimeout = setTimeout(() => {
+            // Ses bittiğinde, bir sonraki adıma geçmeden hemen önce TÜM SESLERİ KAPAT!
+            if (typeof audio !== 'undefined' && audio.stopAllSoundEffects) {
+                audio.stopAllSoundEffects();
+            }
+
             this.guidedStep++;
             this.guidedFeedbackText = "";
             this.renderInteractiveLab();
+
             const nextStep = this.guidedSteps[this.guidedStep - 1];
-            if (nextStep && !nextStep.isGraduation && typeof audio !== 'undefined' && audio.speak) {
+            if (nextStep && !nextStep.isGraduation && typeof audio !== 'undefined') {
+                // Ekran okuyucu (NVDA vb.) sessizlik içinde talimatı net bir şekilde okusun
                 setTimeout(() => {
-                    audio.speak(nextStep.instruction);
-                }, 600);
+                    if (audio.speak) audio.speak(nextStep.instruction);
+                    if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(nextStep.instruction);
+                }, 200);
             }
-        }, 2200);
+        }, duration);
     }
 
     // Yanlış Tuşa Basıldığında Nazik ve Teşvik Edici Telkin
@@ -1486,14 +1535,12 @@ class VoiceAssistant {
         if (!lesson) return;
         if (typeof audio !== 'undefined') {
             audio.stopSpeech();
-            this.playLessonSoundEffect(lessonId);
+            // KULLANICI KURALI: Eğitim okunurken sesler sussun ki ekran okuyucuyla eğitimi tamamlamak kolay olsun
+            if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
             const fullText = `${lesson.stageName}. ${lesson.title}. ${lesson.speech}`;
-            // Ses efektinin girişiyle birlikte anlatım başlasın
-            setTimeout(() => {
-                audio.speak(fullText);
-            }, 300);
+            audio.speak(fullText);
             if (typeof UI !== 'undefined' && UI.showToast) {
-                UI.showToast(`🔊 ${lesson.title}`, 'info');
+                UI.showToast(`📖 ${lesson.title}`, 'info');
             }
         }
     }
@@ -1502,6 +1549,7 @@ class VoiceAssistant {
         if (typeof audio === 'undefined') return;
         if (audio.playSelect) audio.playSelect();
         audio.stopSpeech();
+        if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
 
         const sequence = [
             "Sürüş eğitimi başlatılıyor. Otobüsü nasıl süreceğinizi ve tüm tuşları adım adım anlatıyorum."
@@ -1518,8 +1566,9 @@ class VoiceAssistant {
     }
 
     stopTutorialSpeech() {
-        if (typeof audio !== 'undefined' && audio.stopSpeech) {
-            audio.stopSpeech();
+        if (typeof audio !== 'undefined') {
+            if (audio.stopSpeech) audio.stopSpeech();
+            if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast("⏹️ Ses Susturuldu", "info");
             }
