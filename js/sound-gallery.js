@@ -396,6 +396,105 @@ const SoundGallery = {
             }
         },
         {
+            id: 'fx_station_chime',
+            category: 'effect',
+            title: 'Freesound Otogar Peron Anons Çanı & Melodik Gong',
+            icon: '🔔',
+            specs: 'Freesound #419491 Stüdyo Kaydı (CC0)',
+            desc: 'Otogarda perona yanaşırken ve kalkış öncesi peron hoparlörlerinden çalan 3 tonlu melodik otogar anons çanı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playStationChime) audio.playStationChime();
+                else new Audio('sounds/freesound_station_chime.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_tea_service',
+            category: 'effect',
+            title: 'Freesound Yol Boyu Çay İkramı & Kaşık Şıngırtısı',
+            icon: '☕',
+            specs: 'Freesound #657675 & #665189 Stüdyo Kaydı (CC0)',
+            desc: 'Muavinin termostan karton bardağa taze çay döküşü ve ardından ince belli bardakta çay kaşığı şıngırtısı.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playFullRefreshmentService) audio.playFullRefreshmentService();
+                else {
+                    new Audio('sounds/freesound_tea_pour.mp3').play().catch(()=>{});
+                    setTimeout(() => new Audio('sounds/freesound_tea_stir.mp3').play().catch(()=>{}), 1800);
+                }
+            }
+        },
+        {
+            id: 'fx_luggage_suitcase',
+            category: 'effect',
+            title: 'Freesound Tekerlekli Valiz & Peron Bagaj Yükleme',
+            icon: '🧳',
+            specs: 'Freesound #423703 HD Kayıt (CC0)',
+            desc: 'Yolcuların peronda valiz sürüklemesi ve otobüsün alt bagaj haznesine bavulların yerleştirilme sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playLuggageSuitcase) audio.playLuggageSuitcase();
+                else new Audio('sounds/freesound_luggage_suitcase.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_police_siren',
+            category: 'effect',
+            title: 'Freesound Jandarma / Polis Yol Denetim Sireni',
+            icon: '🚨',
+            specs: 'Freesound #853022 Stüdyo Kaydı (CC0)',
+            desc: 'Şehir girişindeki denetim noktasında veya otoyolda kenara çekme esnasında çalan kısa polis sireni.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playPoliceSiren) audio.playPoliceSiren();
+                else new Audio('sounds/freesound_police_siren.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_tachograph_print',
+            category: 'effect',
+            title: 'Freesound Takograf Termal Kağıt Yazdırma & Çıktı',
+            icon: '📄',
+            specs: 'Freesound #413838 HD Mekanizma (CC0)',
+            desc: 'Polis kontrolünde takograf cihazından sürüş süresi ve hız fişi basıp yırtma sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playTachographPrint) audio.playTachographPrint();
+                else new Audio('sounds/freesound_tachograph_print.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_thunderclap',
+            category: 'effect',
+            title: 'Freesound Gece Fırtınası & Derin Gök Gürültüsü',
+            icon: '⛈️',
+            specs: 'Freesound #534023 Doğa Kaydı (CC0)',
+            desc: 'Yağmurlu gece sürüşlerinde gökyüzünde yankılanan heybetli şimşek ve gök gürültüsü sesi.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playThunderclap) audio.playThunderclap();
+                else new Audio('sounds/freesound_thunderclap.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_distant_foghorn',
+            category: 'effect',
+            title: 'Freesound Boğaz / Köprü Geçişi Vapur Sis Düdüğü',
+            icon: '🚢',
+            specs: 'Freesound #507471 Deniz Kaydı (CC0)',
+            desc: 'Köprülerden geçerken veya Marmara sahili boyunca sisli havada uzaktan gelen nostaljik gemi sis düdüğü.',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playDistantFoghorn) audio.playDistantFoghorn();
+                else new Audio('sounds/freesound_distant_foghorn.mp3').play().catch(()=>{});
+            }
+        },
+        {
+            id: 'fx_radio_squelch',
+            category: 'effect',
+            title: 'Freesound CB Şoför Telsizi Mandal Bırakma Cızırtısı',
+            icon: '📻',
+            specs: 'Freesound #524205 Telsiz Kaydı (CC0)',
+            desc: 'Şoförler arası telsiz anonsu bittiğinde mandalı bırakırken çıkan o gerçekçi radyo paraziti (squelch).',
+            playFn: () => {
+                if (typeof audio !== 'undefined' && audio.playRadioSquelchSound) audio.playRadioSquelchSound();
+                else new Audio('sounds/freesound_radio_squelch.mp3').play().catch(()=>{});
+            }
+        },
+        {
             id: 'fx_air_horn',
             category: 'effect',
             title: 'Ağır Vasıta Endüstriyel Havalı Korna',

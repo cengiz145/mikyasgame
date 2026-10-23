@@ -166,7 +166,17 @@ class AudioSystem {
             passengerBump: new Howl({ src: ['sounds/freesound_passenger_bump.mp3'], volume: 0.85 }),
             passengerDiscontent: new Howl({ src: ['sounds/freesound_passenger_discontent.mp3'], volume: 0.80 }),
             passengerGroan: new Howl({ src: ['sounds/freesound_passenger_groan.mp3'], volume: 0.80 }),
-            passengerMurmur: new Howl({ src: ['sounds/freesound_passenger_murmur_loop.mp3'], loop: true, volume: 0 })};
+            passengerMurmur: new Howl({ src: ['sounds/freesound_passenger_murmur_loop.mp3'], loop: true, volume: 0 }),
+            // Freesound Sinematik Atmosfer ve Yol Sesleri
+            teaPour: new Howl({ src: ['sounds/freesound_tea_pour.mp3'], volume: 0.85 }),
+            teaStir: new Howl({ src: ['sounds/freesound_tea_stir.mp3'], volume: 0.85 }),
+            stationChime: new Howl({ src: ['sounds/freesound_station_chime.mp3'], volume: 0.90 }),
+            luggageSuitcase: new Howl({ src: ['sounds/freesound_luggage_suitcase.mp3'], volume: 0.85 }),
+            policeSiren: new Howl({ src: ['sounds/freesound_police_siren.mp3'], volume: 0.80 }),
+            tachographPrint: new Howl({ src: ['sounds/freesound_tachograph_print.mp3'], volume: 0.85 }),
+            thunderclap: new Howl({ src: ['sounds/freesound_thunderclap.mp3'], volume: 0.90 }),
+            distantFoghorn: new Howl({ src: ['sounds/freesound_distant_foghorn.mp3'], volume: 0.80 }),
+            radioSquelch: new Howl({ src: ['sounds/freesound_radio_squelch.mp3'], volume: 0.75 })};
 
         this.gameSoundVolume = 1.0;
         this.musicVolume = 0.2;
@@ -1240,6 +1250,56 @@ startEngine() {
         }
     }
 
+    // --- FREESOUND SİNEMATİK SAHNE VE ATMOSFER METOTLARI ---
+    playTeaPour() {
+        if (this.sounds && this.sounds.teaPour) this.sounds.teaPour.play();
+    }
+
+    playTeaStir() {
+        if (this.sounds && this.sounds.teaStir) this.sounds.teaStir.play();
+    }
+
+    playFullRefreshmentService() {
+        // İkram servisi: Önce sıcak çay dökülüşü, 1.8 sn sonra çay kaşığı şıngırtısı
+        this.playTeaPour();
+        setTimeout(() => {
+            this.playTeaStir();
+        }, 1800);
+    }
+
+    playStationChime() {
+        if (this.sounds && this.sounds.stationChime) this.sounds.stationChime.play();
+    }
+
+    playLuggageSuitcase() {
+        if (this.sounds && this.sounds.luggageSuitcase) this.sounds.luggageSuitcase.play();
+    }
+
+    playPoliceSiren() {
+        if (this.sounds && this.sounds.policeSiren) this.sounds.policeSiren.play();
+    }
+
+    playTachographPrint() {
+        if (this.sounds && this.sounds.tachographPrint) this.sounds.tachographPrint.play();
+    }
+
+    playThunderclap() {
+        if (this.sounds && this.sounds.thunderclap) {
+            const id = this.sounds.thunderclap.play();
+            if (typeof this.sounds.thunderclap.stereo === 'function') {
+                this.sounds.thunderclap.stereo((Math.random() - 0.5) * 0.8, id);
+            }
+        }
+    }
+
+    playDistantFoghorn() {
+        if (this.sounds && this.sounds.distantFoghorn) this.sounds.distantFoghorn.play();
+    }
+
+    playRadioSquelchSound() {
+        if (this.sounds && this.sounds.radioSquelch) this.sounds.radioSquelch.play();
+    }
+
     stopAllSoundEffects() {
         // 1. Zamanlayıcıları temizle (Gecikmeli başlayan motor/akbil seslerini engelle)
         if (this.enginePreviewTimer) {
@@ -1291,7 +1351,7 @@ startEngine() {
             const effectKeys = [
                 'start', 'engine', 'airBrake', 'kneeling', 'doorOpen', 'doorClose',
                 'akbilTam', 'akbilOgrenci', 'stopRequest', 'retarder', 'speedBump',
-                'horn', 'tireScreech', 'passengerShock', 'passengerBump', 'passengerDiscontent', 'passengerGroan', 'passengerMurmur'
+                'horn', 'tireScreech', 'passengerShock', 'passengerBump', 'passengerDiscontent', 'passengerGroan', 'passengerMurmur', 'teaPour', 'teaStir', 'stationChime', 'luggageSuitcase', 'policeSiren', 'tachographPrint', 'thunderclap', 'distantFoghorn', 'radioSquelch'
             ];
             effectKeys.forEach(k => {
                 if (this.sounds[k] && typeof this.sounds[k].stop === 'function') {
