@@ -5043,10 +5043,15 @@ const Game = {
         }
         if (k === 'home') {
             e.preventDefault();
-            audio.setWindowOpen(true);
-            audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
-            const dst = Math.max(0, Math.round(this.currentDistanceToNext));
-            audio.speak(`Sonraki durağa ${dst} metre kaldı`);
+            if (typeof audio !== 'undefined') {
+                if (audio.playWindowSound) audio.playWindowSound(true);
+                audio.setWindowOpen(true);
+                audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
+                const winMsg = "Kaptan camı açıldı. Dış sesler ve serin hava kokpite doluyor.";
+                if (typeof audio.speak === 'function') audio.speak(winMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Açıldı (Home)", "info");
+            }
+            return;
         }
         if (k === 'f') { // Farlar
             e.preventDefault();
@@ -5093,9 +5098,15 @@ const Game = {
         }
         if (k === 'end') {
             e.preventDefault();
-            audio.setWindowOpen(false);
-            audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
-            audio.speak("Cam kapatıldı");
+            if (typeof audio !== 'undefined') {
+                if (audio.playWindowSound) audio.playWindowSound(false);
+                audio.setWindowOpen(false);
+                audio.updateAcoustics(this.busDamage.leftWindow, this.busDamage.rightWindow);
+                const winMsg = "Kaptan camı kapatıldı. Kabin yalıtımı sağlandı.";
+                if (typeof audio.speak === 'function') audio.speak(winMsg);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Kapatıldı (End)", "info");
+            }
+            return;
         }
     },
 
