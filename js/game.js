@@ -389,6 +389,7 @@ const Game = {
     completedTunnels: [],
     completedBridges: [],
     lastBrakeWarnTime: 0,
+    retarderLevel: 0,
     targetDriftVelocity: 0,
     lastDriftChangeTime: 0,
     isDriving: false,
@@ -3200,8 +3201,14 @@ const Game = {
             this.currentSlopePct = incData.slopePct;
 
             const isFootBraking = (this.keys.s || this.keys.arrowdown || this.isBrakeKeyDown);
-            const retarderLevel = (this.isBrakeKeyDown && this.speed > 30) ? 3 : 0;
+            const retarderLevel = (this.retarderLevel && this.retarderLevel > 0) ? this.retarderLevel : ((this.isBrakeKeyDown && this.speed > 30) ? 3 : 0);
             const incPhys = TurkeyGeographyEngine.calculateInclinePhysics(this.speed, this.currentSlopePct, deltaTime, isFootBraking, retarderLevel);
+
+            // Manuel Retarder Frenleme Kuvveti (Kademeli Hidrolik Şanzıman Freni)
+            if (this.retarderLevel > 0 && this.speed > 10) {
+                const retarderDecel = (this.retarderLevel * 1.6) * deltaTime;
+                this.speed = Math.max(8, this.speed - retarderDecel);
+            }
 
             // Eğim yerçekimi ivmesi (Newton: F = m*g*sin(theta))
             // İnişte araç hızlanır, tırmanışta hız keser
@@ -5134,7 +5141,7 @@ const Game = {
         }
 
 
-        if (k === 'g' || (k === 'b' && this.isDriving)) {
+        if (k === 'g') {
             e.preventDefault();
             const r = this.activeRouteData;
             if (r) {
@@ -5147,6 +5154,45 @@ const Game = {
                 const msg = "Mevcut Görev Durumu: " + r.name + ". Kalkış noktanız: " + startStop + ". Sıradaki durulacak durak: " + (nextStop ? nextStop.name : endStop) + ", yaklaşık " + distStr + " kaldı. Kalan durak sayısı: " + kalanDurak + ". Gitmeniz gereken son durak: " + endStop + ".";
                 if (typeof audio.speak === "function") audio.speak(msg);
                 if (typeof audio.updateNvdaLiveRegion === "function") audio.updateNvdaLiveRegion(msg);
+            }
+            return;
+        }
+
+        // B TUŞU: KADEMELİ RETARDER KOLU (0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 0 | Shift+B: Sıfırla)
+        if (k === 'b' || e.code === 'KeyB') {
+            e.preventDefault();
+            if (e.shiftKey) {
+                this.retarderLevel = 0;
+            } else {
+                this.retarderLevel = ((this.retarderLevel || 0) + 1) % 6;
+            }
+
+            const isEngaged = (this.retarderLevel > 0);
+            this.retarderUsedInRoute = true;
+            if (typeof audio !== 'undefined') {
+                audio.isRetarderManuallyEngaged = isEngaged;
+                if (typeof audio.playDoorButtonTick === 'function') audio.playDoorButtonTick();
+                if (isEngaged && typeof audio.playRetarder === 'function' && this.speed > 15) {
+                    audio.playRetarder(this.retarderLevel * 2, this.speed);
+                } else if (!isEngaged && typeof audio.stopRetarder === 'function') {
+                    audio.stopRetarder();
+                }
+            }
+
+            const retEl = document.getElementById('hud-retarder');
+            if (retEl) {
+                if (isEngaged) {
+                    retEl.innerText = `⚡ RETARDER: KADEME ${this.retarderLevel}`;
+                    retEl.style.display = 'inline-block';
+                } else {
+                    retEl.style.display = 'none';
+                }
+            }
+
+            const msg = isEngaged ? `Retarder Kademe ${this.retarderLevel}.` : "Retarder kapatıldı.";
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast(isEngaged ? `⚡ Retarder Kademe ${this.retarderLevel} Devrede` : `⚡ Retarder Devre Dışı`, isEngaged ? "success" : "info");
             }
             return;
         }
