@@ -778,7 +778,8 @@ const DriverBadges = {
             totalDrivingMinutes: 0,
             totalKm: 0,
             totalLostItemsFound: 0,
-            licenseLevel: 1
+            licenseLevel: 1,
+            completedTasks: 0
         };
 
         let hasSaved = false;
@@ -791,6 +792,7 @@ const DriverBadges = {
         } catch(e) {}
 
         if (typeof Game !== 'undefined') {
+            if (typeof Game.completedTasks === 'number') stats.completedTasks = Math.max(stats.completedTasks || 0, Game.completedTasks);
             if (!hasSaved && Game.completedTasks) stats.totalTrips = Math.max(stats.totalTrips, Game.completedTasks);
             if (Game.playerXP) stats.totalXP = Math.max(stats.totalXP, Game.playerXP);
             if (Game.licenseLevel) stats.licenseLevel = Math.max(stats.licenseLevel, Game.licenseLevel);
@@ -1056,6 +1058,7 @@ const DriverBadges = {
             hasSaved = !!localStorage.getItem(this.STATS_KEY);
         } catch(e) {}
         const lifetime = this.getLifetimeStats();
+        if (stats && typeof stats.completedTasks === 'number') lifetime.completedTasks = Math.max(lifetime.completedTasks || 0, stats.completedTasks);
         this.saveLifetimeStats(lifetime);
 
         const data = this.getBadgesData();
@@ -1221,8 +1224,9 @@ const DriverBadges = {
         } catch(e) {}
         const lifetime = this.getLifetimeStats();
 
-        // 1. Toplam Seferler: Double-count engellendi
-        const gameTasks = (typeof Game !== 'undefined' && typeof Game.completedTasks === 'number') ? Game.completedTasks : 0;
+        // 1. Toplam Seferler & Kariyer Görevleri
+        const gameTasks = (typeof Game !== 'undefined' && typeof Game.completedTasks === 'number') ? Game.completedTasks : ((stats && typeof stats.completedTasks === 'number') ? stats.completedTasks : 0);
+        lifetime.completedTasks = Math.max(lifetime.completedTasks || 0, gameTasks);
         if (!hasSaved && gameTasks > 0) {
             lifetime.totalTrips = gameTasks;
         } else {
