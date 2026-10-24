@@ -5563,9 +5563,15 @@ const Game = {
         }
 
         
-                // Y TUŞU: Tek tuşla anlık pusula ve istikamet sorgusu
+                // Y TUŞU: Tek tuşla anlık pusula (Y) ve Topoğrafya/Eğim Raporu (Shift+Y)
         if (k === 'y') {
             e.preventDefault();
+            if (e.shiftKey) {
+                if (typeof TurkeyGeographyEngine !== 'undefined' && typeof TurkeyGeographyEngine.speakTopographyReport === 'function') {
+                    TurkeyGeographyEngine.speakTopographyReport(this);
+                }
+                return;
+            }
             if (typeof CompassSystem !== 'undefined' && typeof CompassSystem.queryCompass === 'function') {
                 CompassSystem.queryCompass();
             } else if (typeof CompassNav !== 'undefined' && typeof CompassNav.queryCompass === 'function') {
