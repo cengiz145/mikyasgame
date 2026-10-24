@@ -1478,14 +1478,7 @@ const Game = {
             bonusDetails.push("Şehirlerarası Sefer Primi (+100 XP)");
         }
 
-        // 6. Memleket Seferi Primi (+50 XP)
-        if (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.foundedCity) {
-            const fCity = CompanySystem.data.foundedCity;
-            if (this.currentCity === fCity || (this.activeRouteData && (this.activeRouteData.sehir === fCity || this.activeRouteData.originCity === fCity || this.activeRouteData.destCity === fCity))) {
-                earnedXP += 50;
-                bonusDetails.push(`${fCity} Memleket Seferi Primi (+50 XP, +%20 Bilet Bonusu)`);
-            }
-        }
+
 
         const oldLevel = this.licenseLevel;
         this.playerXP += earnedXP;
@@ -5149,15 +5142,7 @@ const Game = {
                 if (fareTicketLvl === 2) fareTicketMult = 1.15;
                 else if (fareTicketLvl === 3) fareTicketMult = 1.35;
             }
-            // Memleket Sevgisi & Sadakati Bonusu (+%20 Ciro):
-            let homelandBonus = 1.0;
-            if (typeof CompanySystem !== 'undefined' && CompanySystem.data && CompanySystem.data.foundedCity) {
-                const fCity = CompanySystem.data.foundedCity;
-                if (cityName === fCity || (this.activeRouteData && (this.activeRouteData.originCity === fCity || this.activeRouteData.destCity === fCity))) {
-                    homelandBonus = 1.20; // +%20 Memleket Sadakati Bonusu
-                }
-            }
-            fare = Math.round(sehirRotalari[cityName].ucretler[pType] * pricingMult * fareTicketMult * homelandBonus);
+            fare = Math.round(sehirRotalari[cityName].ucretler[pType] * pricingMult * fareTicketMult);
         }
         
         let splitRes = null;
