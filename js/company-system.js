@@ -2036,6 +2036,13 @@
             if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
                 Game.saveData();
             }
+            if (!this._isCheckingBadges && typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkBadges === 'function') {
+                this._isCheckingBadges = true;
+                try {
+                    DriverBadges.checkBadges({});
+                } catch(e) {}
+                this._isCheckingBadges = false;
+            }
         },
 
         // Şirketi Sıfırdan Temiz Başlangıç Seviyesine Döndür
