@@ -791,6 +791,41 @@ const DriverBadges = {
             stats.stopsDiscovered = Math.max(stats.stopsDiscovered, StopDiscovery.getDiscoveredStops().length);
         }
 
+        // Şirket Yönetimi İstatistikleri Entegrasyonu
+        const compSys = (typeof CompanySystem !== 'undefined') ? CompanySystem : ((typeof window !== 'undefined' && window.CompanySystem) ? window.CompanySystem : null);
+        if (compSys && compSys.data) {
+            const cData = compSys.data;
+            stats.companyLevel = Math.max(stats.companyLevel || 1, cData.companyLevel || 1);
+            stats.companyTreasury = Math.max(stats.companyTreasury || 0, Math.max(0, cData.companyTreasury || 0));
+            stats.companyTotalRevenue = Math.max(stats.companyTotalRevenue || 0, cData.totalRevenue || 0);
+            stats.companyTripsCount = Math.max(stats.companyTripsCount || 0, cData.completedTripsCount || 0);
+            stats.hiredDriversCount = Math.max(stats.hiredDriversCount || 0, Array.isArray(cData.hiredDrivers) ? cData.hiredDrivers.length : 0);
+
+            let totalInst = 0;
+            if (cData.institutions) {
+                Object.values(cData.institutions).forEach(lvl => { totalInst += (lvl || 1); });
+            }
+            stats.companyTotalInstitutionLevels = Math.max(stats.companyTotalInstitutionLevels || 7, totalInst);
+
+            let branchCount = 0;
+            if (cData.terminalBranches) {
+                Object.values(cData.terminalBranches).forEach(isOpen => { if (isOpen) branchCount++; });
+            }
+            stats.companyTerminalBranchesCount = Math.max(stats.companyTerminalBranchesCount || 1, branchCount);
+
+            let hqCount = 0;
+            if (cData.hqUpgrades) {
+                Object.values(cData.hqUpgrades).forEach(hasUp => { if (hasUp) hqCount++; });
+            }
+            stats.companyHqUpgradesCount = Math.max(stats.companyHqUpgradesCount || 0, hqCount);
+
+            stats.companyCateringVip = (cData.cateringPackage === 'vip' || cData.cateringPackage === 'standart') ? 1 : 0;
+            stats.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'standart') ? 1 : 0;
+            stats.companyContractsDone = (cData.specialContractsCompletedCount || (cData.specialContracts && cData.specialContracts.length) || 0);
+            stats.companySatisfactionHighScore = (cData.satisfactionRating >= 4.8) ? 1 : 0;
+            stats.companyMastery = (cData.companyLevel >= 5 && (cData.companyTreasury || 0) >= 50000000) ? 1 : 0;
+        }
+
         return stats;
     },
 
@@ -1002,6 +1037,81 @@ const DriverBadges = {
         return rand;
     },
 
+    // --- BAŞARI VE ROZETLERİ ANLIK KONTROL ET (GENEL TETİKLEYİCİ) ---
+    checkBadges: function(stats = {}) {
+        let hasSaved = false;
+        try {
+            hasSaved = !!localStorage.getItem(this.STATS_KEY);
+        } catch(e) {}
+        const lifetime = this.getLifetimeStats();
+        this.saveLifetimeStats(lifetime);
+
+        const data = this.getBadgesData();
+        const newlyUnlocked = [];
+
+        // 1. KAPTAN BRÖVELERİNİ KONTROL ET
+        this.CAPTAIN_BADGES.forEach(brove => {
+            if (data[brove.id] && data[brove.id].unlocked) return;
+            const prog = brove.getProgress(lifetime);
+            if (prog && prog.isCompleted) {
+                this.unlock(brove.id, false, brove.title);
+                newlyUnlocked.push({ type: 'brove', item: brove });
+            }
+        });
+
+        // 2. KAPTAN UNVANLARINI KONTROL ET
+        this.CAPTAIN_TITLES.forEach(title => {
+            if (title.id === 'title_cirak') return;
+            if (data[title.id] && data[title.id].unlocked) return;
+            if (this.isTitleUnlocked(title.id)) {
+                this.unlock(title.id, false, title.name);
+                newlyUnlocked.push({ type: 'title', item: title });
+            }
+        });
+
+        // 3. 1600 BAŞARIYI KONTROL ET
+        this.badges.forEach(b => {
+            if (data[b.id] && data[b.id].unlocked) return;
+
+            const currentStatVal = lifetime[b.stat] || 0;
+            if (currentStatVal >= b.targetValue) {
+                this.unlock(b.id, false, b.title);
+                newlyUnlocked.push({ type: 'achievement', item: b });
+            }
+        });
+
+        // 4. ANONS VE KUTLAMA
+        if (newlyUnlocked.length > 0) {
+            setTimeout(() => {
+                if (typeof audio !== 'undefined' && typeof audio.playBadgeFanfare === 'function') {
+                    audio.playBadgeFanfare();
+                }
+            }, 500);
+
+            const count = newlyUnlocked.length;
+            const first = newlyUnlocked[0].item;
+            const titleMsg = (newlyUnlocked[0].type === 'brove') 
+                ? "🎖️ Yeni Resmi Kaptan Brövesi Açıldı: " + first.title
+                : ((newlyUnlocked[0].type === 'title')
+                    ? "👑 Yeni Kaptan Unvanı Açıldı: " + first.name
+                    : "🏆 Yeni Başarı Açıldı: " + first.title);
+
+            const firstDisplayName = first.title || first.name || "Yeni Ödül";
+            const announceText = count === 1
+                ? "Tebrikler Kaptan! Yeni bir ödül kazandınız: " + firstDisplayName + "!"
+                : "Tebrikler Kaptan! " + count + " adet yeni rozet ve unvan kazanıldı! İlk ödülünüz: " + firstDisplayName + ".";
+
+            setTimeout(() => {
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceText);
+                if (typeof audio !== 'undefined' && audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(announceText);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(titleMsg, 'success');
+            }, 1600);
+        }
+
+        this.syncHudTitle();
+        return newlyUnlocked;
+    },
+
     // --- SEFER SONU OTOMATİK DEĞERLENDİRME ---
     checkAfterRoute: function(stats) {
         if (!stats || !stats.isSuccess) return [];
@@ -1156,6 +1266,41 @@ const DriverBadges = {
         const licLevel = (typeof stats.licenseLevel === 'number') ? stats.licenseLevel : (typeof Game !== 'undefined' && Game.licenseLevel ? Game.licenseLevel : (lifetime.licenseLevel || 1));
         lifetime.licenseLevel = Math.max(lifetime.licenseLevel || 1, licLevel);
 
+        // Şirket Yönetimi İstatistikleri Entegrasyonu
+        const compSysForCheck = (typeof CompanySystem !== 'undefined') ? CompanySystem : ((typeof window !== 'undefined' && window.CompanySystem) ? window.CompanySystem : null);
+        if (compSysForCheck && compSysForCheck.data) {
+            const cData = compSysForCheck.data;
+            lifetime.companyLevel = Math.max(lifetime.companyLevel || 1, cData.companyLevel || 1);
+            lifetime.companyTreasury = Math.max(lifetime.companyTreasury || 0, Math.max(0, cData.companyTreasury || 0));
+            lifetime.companyTotalRevenue = Math.max(lifetime.companyTotalRevenue || 0, cData.totalRevenue || 0);
+            lifetime.companyTripsCount = Math.max(lifetime.companyTripsCount || 0, cData.completedTripsCount || 0);
+            lifetime.hiredDriversCount = Math.max(lifetime.hiredDriversCount || 0, Array.isArray(cData.hiredDrivers) ? cData.hiredDrivers.length : 0);
+
+            let totalInst = 0;
+            if (cData.institutions) {
+                Object.values(cData.institutions).forEach(lvl => { totalInst += (lvl || 1); });
+            }
+            lifetime.companyTotalInstitutionLevels = Math.max(lifetime.companyTotalInstitutionLevels || 7, totalInst);
+
+            let branchCount = 0;
+            if (cData.terminalBranches) {
+                Object.values(cData.terminalBranches).forEach(isOpen => { if (isOpen) branchCount++; });
+            }
+            lifetime.companyTerminalBranchesCount = Math.max(lifetime.companyTerminalBranchesCount || 1, branchCount);
+
+            let hqCount = 0;
+            if (cData.hqUpgrades) {
+                Object.values(cData.hqUpgrades).forEach(hasUp => { if (hasUp) hqCount++; });
+            }
+            lifetime.companyHqUpgradesCount = Math.max(lifetime.companyHqUpgradesCount || 0, hqCount);
+
+            lifetime.companyCateringVip = (cData.cateringPackage === 'vip' || cData.cateringPackage === 'standart') ? 1 : 0;
+            lifetime.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'standart') ? 1 : 0;
+            lifetime.companyContractsDone = (cData.specialContractsCompletedCount || (cData.specialContracts && cData.specialContracts.length) || 0);
+            lifetime.companySatisfactionHighScore = (cData.satisfactionRating >= 4.8) ? 1 : 0;
+            lifetime.companyMastery = (cData.companyLevel >= 5 && (cData.companyTreasury || 0) >= 50000000) ? 1 : 0;
+        }
+
         this.saveLifetimeStats(lifetime);
 
         const data = this.getBadgesData();
@@ -1301,7 +1446,7 @@ const DriverBadges = {
         // Sekme Butonlarının Metinleri ve İstatistikleri
         if (tabMainTitles) tabMainTitles.innerText = "👑 Kaptan Unvanları (" + unlTitles + "/" + totalTitles + ")";
         if (tabMainBroveler) tabMainBroveler.innerText = "🎖️ Resmi Bröveler (" + unlBroves + "/" + totalBroves + ")";
-        if (tabMain1500) tabMain1500.innerText = "🏆 1500 Başarı (" + unlAchs + "/" + totalAchs + ")";
+        if (tabMain1500) tabMain1500.innerText = "🏆 " + totalAchs + " Başarı (" + unlAchs + "/" + totalAchs + ")";
 
         // Sekme Vurgulama
         const tabs = [
