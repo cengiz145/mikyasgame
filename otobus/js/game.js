@@ -221,6 +221,58 @@ const Game = {
         return (this.completedTasks >= 10) || (this.licenseLevel > 10);
     },
     playMode: localStorage.getItem('gamePlayMode') || 'career',
+    launchCareerDirectToGarage: function() {
+        this.setPlayMode('career');
+        this.gameMode = 'city';
+        this.busType = 'belediye';
+
+        const currentTask = (typeof this.completedTasks === 'number' && !isNaN(this.completedTasks))
+            ? this.completedTasks
+            : (parseInt(localStorage.getItem('completedTasks'), 10) || 0);
+
+        let targetRouteId = null;
+        if (typeof routesData !== 'undefined') {
+            const candidateKey = "tekirdag_task_" + currentTask;
+            if (routesData[candidateKey]) {
+                targetRouteId = candidateKey;
+            } else {
+                targetRouteId = Object.keys(routesData).find(k =>
+                    routesData[k] && routesData[k].taskIndex === currentTask
+                );
+            }
+            if (!targetRouteId) {
+                targetRouteId = Object.keys(routesData)[0];
+            }
+        }
+
+        if (targetRouteId) {
+            this.startRoute(targetRouteId);
+
+            const mission = (typeof CareerMissions !== 'undefined') ? CareerMissions.getMission(currentTask) : null;
+            const taskTitle = (mission && mission.title) ? mission.title : "Vardiya Sefer İntikali";
+
+            const dispatchAnnouncement = "Merkez Garajdasınız. Görev talimatınız amirlikçe tebliğ edildi: " + taskTitle + ". Brifingi dinlemek için B tuşuna, motoru çalıştırıp sefere başlamak için Enter tuşuna basınız.";
+
+            setTimeout(() => {
+                if (typeof audio !== 'undefined') {
+                    if (audio.speak) audio.speak(dispatchAnnouncement);
+                    if (audio.updateNvdaLiveRegion) audio.updateNvdaLiveRegion(dispatchAnnouncement);
+                }
+                const startBtn = document.getElementById('start-engine-btn');
+                if (startBtn && typeof startBtn.focus === 'function') {
+                    startBtn.focus();
+                }
+            }, 250);
+
+            if (typeof UI !== 'undefined' && UI.showToast) {
+                UI.showToast("📋 Sefer Emri: " + taskTitle, "info");
+            }
+            return true;
+        } else {
+            return false;
+        }
+    },
+
     setPlayMode: function(m) { this.playMode = m === 'free_drive' ? 'free_drive' : 'career'; try { localStorage.setItem('gamePlayMode', this.playMode); } catch(e) {} },
     completedTasks: parseInt(localStorage.getItem('completedTasks')) || 0, // 0 to 26
     playerBudget: parseFloat(localStorage.getItem('para')) || 0,
@@ -2020,9 +2072,18 @@ const Game = {
             }
         }
 
+        const garageTitleEl = document.getElementById("garage-screen-title");
         const routeDescEl = document.getElementById("garage-route-desc");
-        if (routeDescEl) {
-            routeDescEl.innerHTML = "<strong>" + r.name + "</strong><br><span style=\"color: var(--secondary); font-size: 0.95rem;\">" + startStop + " ➔ " + endStop + " (" + r.stops.length + " Durak)</span>";
+        const btnGarageBack = document.getElementById("btn-garage-back");
+
+        if (this.playMode === 'career') {
+            if (garageTitleEl) garageTitleEl.innerHTML = "🏛️ Merkez Hareket Amirliği & Vardiya Garajı";
+            if (routeDescEl) routeDescEl.innerHTML = "<strong>📋 Resmî Sefer Görev Emri ve Araç Tahsis Formu</strong><br><span style=\"color: var(--secondary); font-size: 0.95rem;\">" + startStop + " ➔ " + endStop + " (" + r.stops.length + " Durak)</span>";
+            if (btnGarageBack) btnGarageBack.innerText = "⬅️ Ana Menüye Dön (Kayıtlı Kalır)";
+        } else {
+            if (garageTitleEl) garageTitleEl.innerHTML = "Görev Brifingi ve Sefer Özeti";
+            if (routeDescEl) routeDescEl.innerHTML = "<strong>" + r.name + "</strong><br><span style=\"color: var(--secondary); font-size: 0.95rem;\">" + startStop + " ➔ " + endStop + " (" + r.stops.length + " Durak)</span>";
+            if (btnGarageBack) btnGarageBack.innerText = "⬅️ Hat ve Sefer Menüsüne Dön";
         }
 
         const detailsContainer = document.getElementById("garage-mission-details");
@@ -2129,18 +2190,32 @@ const Game = {
                 const featureText = (mission && mission.featureUnlock) ? mission.featureUnlock : "Standart Hat Seferi";
                 const rulesText = (mission && mission.rulesActive) ? mission.rulesActive : "Temel Emniyet Kuralları";
                 
+                const activeBusName = (this.activeBus && (this.activeBus.name || this.activeBus.fullName))
+                    ? (this.activeBus.name || this.activeBus.fullName)
+                    : "Standart Şehir İçi Otobüsü";
+                const taskDisplayTitle = (mission && mission.title) ? mission.title : r.name;
+
                 orderHtml = [
-                    '<div style="background: rgba(15, 23, 42, 0.9); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">',
-                    '    <div style="color: #38bdf8; font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">',
-                    '        <span>🎙️</span> <span>TEKULAŞ HAREKET AMİRLİĞİ RESMİ SEFER TALİMATI</span>',
+                    '<div style="background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">',
+                    '    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(56,189,248,0.3); padding-bottom: 8px; margin-bottom: 10px;">',
+                    '        <span style="color: #38bdf8; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">',
+                    '            <span>🎙️</span> <span>MERKEZ HAREKET AMİRLİĞİ RESMÎ SEFER TALİMATI</span>',
+                    '        </span>',
+                    '        <span style="background: rgba(56,189,248,0.2); color: #7dd3fc; padding: 3px 8px; border-radius: 5px; font-size: 0.85rem; font-weight: bold;">',
+                    '            Sicil: ' + ((this.completedTasks || 0) + 1) + '. Görev İntikali',
+                    '        </span>',
                     '    </div>',
-                    '    <p style="color: #f8fafc; font-size: 0.98rem; line-height: 1.7; margin: 0 0 12px 0; border-left: 3px solid #38bdf8; padding-left: 12px;">',
+                    '    <div style="color: #94a3b8; font-size: 0.93rem; margin-bottom: 10px;">',
+                    '        👤 <strong>Görevli Kaptan:</strong> <span style="color: #f1f5f9; font-weight: bold;">' + this.getLicenseTitle() + '</span> | ',
+                    '        🚌 <strong>Tahsis Edilen Otobüs:</strong> <span style="color: #facc15; font-weight: bold;">' + activeBusName + '</span>',
+                    '    </div>',
+                    '    <p style="color: #f8fafc; font-size: 0.98rem; line-height: 1.7; margin: 0 0 12px 0; border-left: 3px solid #38bdf8; padding-left: 12px; background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 0 6px 6px 0;">',
                     '        "' + dispatcherText + '"',
                     '    </p>',
                     '    <div style="display: grid; grid-template-columns: 1fr; gap: 8px; font-size: 0.92rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">',
-                    '        <div style="color: #fde047;"><strong>🚀 Açılan Donanım / Özellik:</strong> ' + featureText + '</div>',
-                    '        <div style="color: #a78bfa;"><strong>⚖️ Yürürlükteki Kurallar:</strong> ' + rulesText + '</div>',
-                    '        <div style="color: #4ade80;"><strong>⏱️ Zaman Kısıtlaması:</strong> KESİNLİKLE YOKTUR (Tamamen kendi temponuzda sürüş)</div>',
+                    '        <div style="color: #fde047;"><strong>🚀 Sefer Donanımı / Özellik:</strong> ' + featureText + '</div>',
+                    '        <div style="color: #a78bfa;"><strong>⚖️ Sürüş Disiplini:</strong> ' + rulesText + '</div>',
+                    '        <div style="color: #4ade80;"><strong>⏱️ Zaman Kısıtlaması:</strong> KESİNLİKLE YOKTUR (Serbest Ritim ve Yolcu Güvenliği Esastır)</div>',
                     '    </div>',
                     '</div>'
                 ].join("");

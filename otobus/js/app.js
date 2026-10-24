@@ -926,12 +926,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnCareer = document.getElementById('btn-mode-career');
     if (btnCareer) {
         btnCareer.addEventListener('click', () => {
-            if (typeof Game !== 'undefined') Game.setPlayMode('career');
             audio.playSelect();
-            const msg = "Kariyer Modu açıldı.";
-            audio.speak(msg);
-            UI.showToast("🎖️ Kariyer Modu", "info");
-            openCitySelection();
+            if (typeof Game !== 'undefined' && typeof Game.launchCareerDirectToGarage === 'function') {
+                Game.launchCareerDirectToGarage();
+            } else {
+                if (typeof Game !== 'undefined') Game.setPlayMode('career');
+                openCitySelection();
+            }
         });
     }
 
@@ -1491,7 +1492,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-garage-back').addEventListener('click', () => {
         audio.playSelect();
         if (typeof SanayiMechanic !== 'undefined') SanayiMechanic.isActive = false;
-        UI.switchScreen('route-menu');
+        if (typeof Game !== 'undefined' && Game.playMode === 'career') {
+            UI.switchScreen('main-menu');
+        } else {
+            UI.switchScreen('route-menu');
+        }
     });
 
     document.getElementById('start-engine-btn').addEventListener('click', () => {
