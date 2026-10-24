@@ -1233,6 +1233,44 @@ startEngine() {
         }, wheelbaseDelay);
     }
 
+    // Hız Kesici Kasis (Speed Bump) - Çift dingil vuruntusu ve süspansiyon esnemesi
+    playSpeedBump(speed = 30) {
+        if (!this.ctx) return;
+        const isFast = speed > 30;
+        const susp = this.activeBusSuspension || 70;
+        const suspDamping = Math.max(0.40, 1.0 - (((susp - 55) / 45) * 0.55));
+        const volumeFactor = Math.min(1.0, 0.50 + (speed / 80) * 0.50);
+        const wheelbaseDelay = Math.max(90, Math.min(250, (12 / Math.max(10, (speed / 3.6))) * 1000));
+
+        // 1. Ön Aks Kasis Darbesi (Stereo hafif sol)
+        if (this.sounds && this.sounds.roadJointHit) {
+            try {
+                const id1 = this.sounds.roadJointHit.play();
+                this.sounds.roadJointHit.volume(0.85 * volumeFactor * suspDamping, id1);
+                this.sounds.roadJointHit.rate(isFast ? 0.95 : 1.15, id1);
+                if (typeof this.sounds.roadJointHit.stereo === 'function') this.sounds.roadJointHit.stereo(-0.25, id1);
+            } catch(e) {}
+        }
+
+        // 2. Arka Aks Kasis Darbesi (Dingil gecikmesiyle)
+        setTimeout(() => {
+            const snd2 = (this.sounds && this.sounds.roadJointHit2) ? this.sounds.roadJointHit2 : (this.sounds ? this.sounds.roadJointHit : null);
+            if (snd2) {
+                try {
+                    const id2 = snd2.play();
+                    snd2.volume(0.95 * volumeFactor * suspDamping, id2);
+                    snd2.rate(isFast ? 0.90 : 1.05, id2);
+                    if (typeof snd2.stereo === 'function') snd2.stereo(0.25, id2);
+                } catch(e) {}
+            }
+        }, wheelbaseDelay);
+
+        // 3. Sert geçişte yolcu sarsılma iniltisi
+        if (isFast && typeof this.playPassengerShock === 'function') {
+            setTimeout(() => { this.playPassengerShock(); }, wheelbaseDelay + 80);
+        }
+    }
+
     // Asfalt Çukuru (Pothole Thump) - Hangi tekerlek girdiyse o hoparlörden sert darbe
     playPotholeThump(side = 'right', speed = 50) {
         if (!this.ctx) return;

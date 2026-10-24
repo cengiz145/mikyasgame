@@ -1987,6 +1987,18 @@ const Game = {
         this.totalDrivingSeconds = 0;
         this.activeRouteData = routesData[routeId];
         
+        // AKILLI ÇEVRE VE YOL ZEMİNİ MOTORU: Bölge ve yol yüzeyi tespiti
+        if (typeof SmartEnvironmentEngine !== 'undefined') {
+            const curCity = (this.activeRouteData && this.activeRouteData.sehir) || this.currentCity || "Tekirdağ";
+            const curDist = (this.activeRouteData && this.activeRouteData.ilce) || this.activeDistrict || "";
+            const startStopName = (this.activeRouteData && this.activeRouteData.startStop) || "";
+            const envType = SmartEnvironmentEngine.detectEnvironment(curCity, curDist, startStopName);
+            const surfType = SmartEnvironmentEngine.detectRoadSurface(curDist, startStopName, this.activeRouteData ? this.activeRouteData.name : "");
+            SmartEnvironmentEngine.updateAmbience(envType, false);
+            SmartEnvironmentEngine.updateSurfaceSound(surfType, 0);
+            SmartEnvironmentEngine.kasisDistance = 350; // Başlangıç kasis mesafesi
+        }
+        
         // CANLI METEOROLOJİ ENTEGRASYONU: İl ve ilçeye göre anlık uydu verisi çek
         if (typeof LiveWeather !== 'undefined') {
             const routeCity = (this.activeRouteData && this.activeRouteData.sehir) || this.currentCity || "Tekirdağ";
@@ -5607,6 +5619,12 @@ const Game = {
 
         if (k === 'z') {
             e.preventDefault();
+            if (e.shiftKey) {
+                if (typeof SmartEnvironmentEngine !== 'undefined' && typeof SmartEnvironmentEngine.speakSurfaceReport === 'function') {
+                    SmartEnvironmentEngine.speakSurfaceReport(this);
+                }
+                return;
+            }
             this.reportScheduleAdherence();
             return;
         }
