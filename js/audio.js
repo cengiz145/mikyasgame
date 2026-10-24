@@ -1039,14 +1039,22 @@ startEngine() {
         }
 
         
-        // Otobüs İçi Yolcu & Kabin Ambiyansı (Yolda seyrederken canlı kabin hissi)
+        // Otobüs İçi Yolcu & Kabin Ambiyansı (Canlı yolcu doluluğuna duyarlı akustik)
         if (this.sounds && this.sounds.cabinAmbience) {
-            if (!this.sounds.cabinAmbience.playing()) {
-                this.sounds.cabinAmbience.volume(0);
-                this.sounds.cabinAmbience.play();
+            const passCount = (typeof passengersCount === 'number') ? passengersCount : 20;
+            if (passCount <= 0) {
+                if (this.sounds.cabinAmbience.playing()) {
+                    this.sounds.cabinAmbience.fade(this.sounds.cabinAmbience.volume(), 0, 400);
+                }
+            } else {
+                if (!this.sounds.cabinAmbience.playing()) {
+                    this.sounds.cabinAmbience.volume(0);
+                    this.sounds.cabinAmbience.play();
+                }
+                const occupancyFactor = Math.min(1.0, passCount / 40);
+                const targetCabinVol = Math.min(0.25, (0.04 + (speed / 120) * 0.08) * (0.3 + occupancyFactor * 0.7));
+                this.sounds.cabinAmbience.volume(targetCabinVol);
             }
-            const targetCabinVol = Math.min(0.24, 0.08 + (speed / 100) * 0.12);
-            this.sounds.cabinAmbience.volume(targetCabinVol);
         }
 
         // 1. ASFALT YOL SESİ (freesound_road_asphalt.mp3)
@@ -4072,6 +4080,58 @@ startEngine() {
         
         osc.start(now);
         osc.stop(now + 1.5);
+    }
+
+    
+    playRadiatorFan() {
+        try {
+            this.init();
+            if (!this.ctx || this.radiatorFanGain) return;
+            const now = this.ctx.currentTime;
+            
+            // Hidrostatik radyatör soğutma fanı türbin uğultusu (Web Audio API)
+            const osc = this.ctx.createOscillator();
+            const filter = this.ctx.createBiquadFilter();
+            const gain = this.ctx.createGain();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(115, now);
+            
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(260, now);
+            filter.Q.setValueAtTime(4.0, now);
+            
+            gain.gain.setValueAtTime(0, now);
+            gain.gain.linearRampToValueAtTime(0.18, now + 1.2);
+            
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(this.environmentMixer || this.ctx.destination);
+            
+            osc.start(now);
+            this.radiatorFanOsc = osc;
+            this.radiatorFanGain = gain;
+        } catch(e) {
+            console.warn("playRadiatorFan error:", e);
+        }
+    }
+
+    stopRadiatorFan() {
+        try {
+            if (this.ctx && this.radiatorFanGain && this.radiatorFanOsc) {
+                const now = this.ctx.currentTime;
+                this.radiatorFanGain.gain.linearRampToValueAtTime(0, now + 1.0);
+                setTimeout(() => {
+                    if (this.radiatorFanOsc) {
+                        try { this.radiatorFanOsc.stop(); } catch(e){}
+                        this.radiatorFanOsc = null;
+                        this.radiatorFanGain = null;
+                    }
+                }, 1100);
+            }
+        } catch(e) {
+            console.warn("stopRadiatorFan error:", e);
+        }
     }
 
     playDistantPrayerAmbience() {
