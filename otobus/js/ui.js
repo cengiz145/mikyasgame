@@ -283,6 +283,7 @@ const UI = {
     ],
     
     switchScreen: function(screenId) {
+        if (screenId === 'main-menu') screenId = 'title-screen';
         if (screenId === 'base-selection-menu' && typeof Game !== 'undefined' && !Game.hasPassedLevel10()) {
             console.warn("Harita ekranı 10 seviye geçilmeden açılamaz.");
             screenId = 'title-screen';

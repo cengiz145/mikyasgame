@@ -887,6 +887,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Türkiye Coğrafya Atlası & Izgara Haritası Buton Bağlantısı
+    const btnTurkeyMap = document.getElementById('btn-turkey-map');
+    if (btnTurkeyMap) {
+        btnTurkeyMap.addEventListener('click', () => {
+            if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+            if (typeof TurkeyAtlas !== 'undefined' && TurkeyAtlas.open) {
+                TurkeyAtlas.open();
+            }
+        });
+    }
     const hudFuelPanel = document.getElementById('hud-fuel-panel');
     if (hudFuelPanel) {
         hudFuelPanel.addEventListener('click', () => {
@@ -1489,11 +1500,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // M tuşu ile Ana Menüden Türkiye Atlasını Doğrudan Açma Kısayolu
+    window.addEventListener("keydown", (e) => {
+        if (e.key && e.key.toLowerCase() === "m") {
+            const titleScr = document.getElementById("title-screen");
+            const atlasScr = document.getElementById("atlas-screen");
+            if (titleScr && !titleScr.classList.contains("hidden") && (!atlasScr || atlasScr.classList.contains("hidden"))) {
+                if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) return;
+                e.preventDefault();
+                if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
+                if (typeof TurkeyAtlas !== 'undefined' && TurkeyAtlas.open) {
+                    TurkeyAtlas.open();
+                }
+            }
+        }
+    });
+
     document.getElementById('btn-garage-back').addEventListener('click', () => {
         audio.playSelect();
         if (typeof SanayiMechanic !== 'undefined') SanayiMechanic.isActive = false;
         if (typeof Game !== 'undefined' && Game.playMode === 'career') {
-            UI.switchScreen('main-menu');
+            UI.switchScreen('title-screen');
         } else {
             UI.switchScreen('route-menu');
         }
