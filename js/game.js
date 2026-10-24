@@ -10,7 +10,7 @@ try {
                 'activeRoute', 'routesData', 'routeFixApplied_v1', 'tekulas_owned_buses_v1',
                 'otobus_company_data_v2', 'otobus_company_data', 'otobus_community_companies_v1',
                 'tekulas_driver_badges_v2', 'tekulas_driver_stats_v2', 'tekulas_driver_equipped_title_v1',
-                'tekulas_driver_unlocked_titles_v1', 'otobus_highway_data', 'tekulas_discovered_stops_v1',
+                'tekulas_driver_unlocked_titles_v1', 'otobus_highway_data', 'tekulas_discovered_stops_v1', 'otobus_welcome_calendar_v1',
                 'copilot_enabled'
             ];
             wipeKeys.forEach(k => {
@@ -956,6 +956,14 @@ const Game = {
                                 } catch(e) {}
                             }
 
+                            // Hoş Geldin Takvimi (WelcomeCalendar)
+                            if (data.welcomeCalendar && typeof WelcomeCalendar !== 'undefined') {
+                                try {
+                                    WelcomeCalendar.data = Object.assign(WelcomeCalendar.data || {}, data.welcomeCalendar);
+                                    WelcomeCalendar.saveData();
+                                } catch(e) {}
+                            }
+
                             // 2. Şirket Verileri (CompanySystem)
                             if (data.companyData && typeof CompanySystem !== 'undefined') {
                                 try {
@@ -1044,7 +1052,7 @@ const Game = {
                     'activeRoute', 'routesData', 'routeFixApplied_v1', 'tekulas_owned_buses_v1',
                     'otobus_company_data_v2', 'otobus_company_data', 'otobus_community_companies_v1',
                     'tekulas_driver_badges_v2', 'tekulas_driver_stats_v2', 'tekulas_driver_equipped_title_v1',
-                    'tekulas_driver_unlocked_titles_v1', 'otobus_highway_data', 'tekulas_discovered_stops_v1',
+                    'tekulas_driver_unlocked_titles_v1', 'otobus_highway_data', 'tekulas_discovered_stops_v1', 'otobus_welcome_calendar_v1',
                     'copilot_enabled'
                 ];
                 wipeKeys.forEach(k => {
@@ -1164,6 +1172,12 @@ const Game = {
             } catch(e) {
                 console.warn("[Game] DriverBadges sıfırlama uyarısı:", e);
             }
+        }
+
+        // 6.1. 100 Günlük Hoş Geldin Takvimi Sıfırlama
+        const welCal = (typeof WelcomeCalendar !== 'undefined') ? WelcomeCalendar : ((typeof window !== 'undefined' && window.WelcomeCalendar) ? window.WelcomeCalendar : null);
+        if (welCal && typeof welCal.resetData === 'function') {
+            try { welCal.resetData(); } catch(e) {}
         }
 
         // 6. Otoyol Tesisleri ve Durak Keşifleri
@@ -1292,36 +1306,51 @@ const Game = {
                     }
                 }
 
+                // Hoş Geldin Takvimi (WelcomeCalendar)
+                const welcomeCalObj = (typeof WelcomeCalendar !== 'undefined') ? WelcomeCalendar : (typeof window !== 'undefined' ? window.WelcomeCalendar : null);
+                if (welcomeCalObj && welcomeCalObj.data) {
+                    payload.welcomeCalendar = {
+                        claimedDays: welcomeCalObj.data.claimedDays || {},
+                        lastClaimDate: welcomeCalObj.data.lastClaimDate || null,
+                        claimedCount: welcomeCalObj.data.claimedCount || 0,
+                        totalClaimedCash: welcomeCalObj.data.totalClaimedCash || 0,
+                        totalClaimedXP: welcomeCalObj.data.totalClaimedXP || 0,
+                        totalClaimedTreasury: welcomeCalObj.data.totalClaimedTreasury || 0
+                    };
+                }
+
                 // Şirket Verileri (CompanySystem)
-                if (typeof CompanySystem !== 'undefined' && CompanySystem.data) {
+                const compSysObj = (typeof CompanySystem !== 'undefined') ? CompanySystem : (typeof window !== 'undefined' ? window.CompanySystem : null);
+                if (compSysObj && compSysObj.data) {
                     payload.companyData = {
-                        companyName: (CompanySystem.data.companyName || "Mikyas Seyahat").substring(0, 40),
-                        foundedDate: CompanySystem.data.foundedDate || Date.now(),
-                        totalRevenue: Math.max(0, Math.min(999999999, CompanySystem.data.totalRevenue || 0)),
-                        completedTripsCount: Math.max(0, Math.min(50000, CompanySystem.data.completedTripsCount || 0)),
-                        companyLevel: Math.max(1, Math.min(10, CompanySystem.data.companyLevel || 1)),
-                        companyTreasury: Math.max(-1000000, Math.min(999999999, CompanySystem.data.companyTreasury || 50000)),
-                        revenueSharePercent: Math.max(0, Math.min(100, CompanySystem.data.revenueSharePercent || 50)),
-                        cateringPackage: CompanySystem.data.cateringPackage || "standart",
-                        institutions: CompanySystem.data.institutions || {},
-                        satisfactionRating: Math.max(1.0, Math.min(5.0, CompanySystem.data.satisfactionRating || 4.9)),
-                        terminalBranches: CompanySystem.data.terminalBranches || {},
-                        ticketPricingMultiplier: CompanySystem.data.ticketPricingMultiplier || 1.0,
-                        facilityContract: CompanySystem.data.facilityContract || "standart",
-                        hqUpgrades: CompanySystem.data.hqUpgrades || {},
-                        hiredDrivers: Array.isArray(CompanySystem.data.hiredDrivers) ? CompanySystem.data.hiredDrivers.slice(0, 20) : [],
-                        bankruptcyCount: Math.max(0, CompanySystem.data.bankruptcyCount || 0),
-                        corporateEmployer: CompanySystem.data.corporateEmployer || null,
-                        isIndependentMode: !!CompanySystem.data.isIndependentMode
+                        companyName: (compSysObj.data.companyName || "Mikyas Seyahat").substring(0, 40),
+                        foundedDate: compSysObj.data.foundedDate || Date.now(),
+                        totalRevenue: Math.max(0, Math.min(999999999, compSysObj.data.totalRevenue || 0)),
+                        completedTripsCount: Math.max(0, Math.min(50000, compSysObj.data.completedTripsCount || 0)),
+                        companyLevel: Math.max(1, Math.min(10, compSysObj.data.companyLevel || 1)),
+                        companyTreasury: Math.max(-1000000, Math.min(999999999, compSysObj.data.companyTreasury || 50000)),
+                        revenueSharePercent: Math.max(0, Math.min(100, compSysObj.data.revenueSharePercent || 50)),
+                        cateringPackage: compSysObj.data.cateringPackage || "standart",
+                        institutions: compSysObj.data.institutions || {},
+                        satisfactionRating: Math.max(1.0, Math.min(5.0, compSysObj.data.satisfactionRating || 4.9)),
+                        terminalBranches: compSysObj.data.terminalBranches || {},
+                        ticketPricingMultiplier: compSysObj.data.ticketPricingMultiplier || 1.0,
+                        facilityContract: compSysObj.data.facilityContract || "standart",
+                        hqUpgrades: compSysObj.data.hqUpgrades || {},
+                        hiredDrivers: Array.isArray(compSysObj.data.hiredDrivers) ? compSysObj.data.hiredDrivers.slice(0, 20) : [],
+                        bankruptcyCount: Math.max(0, compSysObj.data.bankruptcyCount || 0),
+                        corporateEmployer: compSysObj.data.corporateEmployer || null,
+                        isIndependentMode: !!compSysObj.data.isIndependentMode
                     };
                 }
 
                 // Otoyol Tesisleri ve HGS (HighwayFacilities)
-                if (typeof HighwayFacilities !== 'undefined' && HighwayFacilities.data) {
+                const hwyObj = (typeof HighwayFacilities !== 'undefined') ? HighwayFacilities : (typeof window !== 'undefined' ? window.HighwayFacilities : null);
+                if (hwyObj && hwyObj.data) {
                     payload.highwayData = {
-                        hgsBalance: Math.max(0, Math.min(100000, HighwayFacilities.data.hgsBalance || 0)),
-                        visitedFacilities: HighwayFacilities.data.visitedFacilities || {},
-                        stats: HighwayFacilities.data.stats || {}
+                        hgsBalance: Math.max(0, Math.min(100000, hwyObj.data.hgsBalance || 0)),
+                        visitedFacilities: hwyObj.data.visitedFacilities || {},
+                        stats: hwyObj.data.stats || {}
                     };
                 }
 
