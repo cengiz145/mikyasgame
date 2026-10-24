@@ -734,6 +734,18 @@ const DriverBadges = {
 
     getLifetimeStats: function() {
         let stats = {
+            routesStartedCount: 0,
+            intercityStartsCount: 0,
+            nightStartsCount: 0,
+            rainSnowStartsCount: 0,
+            cleanStartsCount: 0,
+            fullFuelStartsCount: 0,
+            airPressureFullStarts: 0,
+            morningStartsCount: 0,
+            midibusStartsCount: 0,
+            soloStartsCount: 0,
+            articulatedStartsCount: 0,
+            coachStartsCount: 0,
             totalTrips: 0,
             totalPassengers: 0,
             totalXP: 0,
@@ -1109,6 +1121,93 @@ const DriverBadges = {
         }
 
         this.syncHudTitle();
+        return newlyUnlocked;
+    },
+
+    // --- SEFER BAŞLAMA İSTATİSTİKLERİNİ VE BAŞARIMLARINI KAYDET ---
+    recordRouteStart: function(gameInstance) {
+        if (!gameInstance) return [];
+        const lifetime = this.getLifetimeStats();
+
+        lifetime.routesStartedCount = (lifetime.routesStartedCount || 0) + 1;
+
+        const routeData = gameInstance.activeRouteData || null;
+        if (routeData && routeData.isIntercity) {
+            lifetime.intercityStartsCount = (lifetime.intercityStartsCount || 0) + 1;
+        }
+
+        if (gameInstance.isNight || (gameInstance.clockMinutes < 360 || gameInstance.clockMinutes >= 1140)) {
+            lifetime.nightStartsCount = (lifetime.nightStartsCount || 0) + 1;
+        }
+
+        if (gameInstance.weather === 'rain' || gameInstance.weather === 'snow' || (typeof weatherSystem !== 'undefined' && (weatherSystem.current === 'rain' || weatherSystem.current === 'snow'))) {
+            lifetime.rainSnowStartsCount = (lifetime.rainSnowStartsCount || 0) + 1;
+        }
+
+        if (gameInstance.busDamage && typeof gameInstance.busDamage.health === 'number' && gameInstance.busDamage.health >= 100) {
+            lifetime.cleanStartsCount = (lifetime.cleanStartsCount || 0) + 1;
+        }
+
+        const fuelCap = (typeof gameInstance.getFuelCapacity === 'function') ? gameInstance.getFuelCapacity() : (gameInstance.fuelTankCapacity || 500);
+        if (gameInstance.currentFuelLiters >= (fuelCap * 0.88)) {
+            lifetime.fullFuelStartsCount = (lifetime.fullFuelStartsCount || 0) + 1;
+        }
+
+        if (gameInstance.airPressurePSI >= 115) {
+            lifetime.airPressureFullStarts = (lifetime.airPressureFullStarts || 0) + 1;
+        }
+
+        if (gameInstance.clockMinutes >= 360 && gameInstance.clockMinutes <= 600) {
+            lifetime.morningStartsCount = (lifetime.morningStartsCount || 0) + 1;
+        }
+
+        const curBus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
+            ? BusFleet.getSelectedBus() 
+            : (gameInstance.selectedBus || null);
+
+        if (curBus) {
+            const isArticulated = (curBus.category === 'koruklu' || (curBus.name && curBus.name.toLowerCase().includes('körüklü')));
+            if (curBus.sizeTier === 1) {
+                lifetime.midibusStartsCount = (lifetime.midibusStartsCount || 0) + 1;
+            } else if (curBus.sizeTier === 2) {
+                lifetime.soloStartsCount = (lifetime.soloStartsCount || 0) + 1;
+            } else if (isArticulated) {
+                lifetime.articulatedStartsCount = (lifetime.articulatedStartsCount || 0) + 1;
+            } else if (curBus.sizeTier === 3) {
+                lifetime.coachStartsCount = (lifetime.coachStartsCount || 0) + 1;
+            }
+        }
+
+        this.saveLifetimeStats(lifetime);
+
+        // Sefer başladığı an şartı sağlanan başarımları hemen aç ve oyuncuyu kutla
+        const newlyUnlocked = [];
+        const data = this.getBadgesData();
+
+        this.badges.forEach(b => {
+            if (data[b.id] && data[b.id].unlocked) return;
+            const currentStatVal = lifetime[b.stat] || 0;
+            if (currentStatVal >= b.targetValue) {
+                this.unlock(b.id, false, b.title);
+                newlyUnlocked.push({ type: 'achievement', item: b });
+            }
+        });
+
+        if (newlyUnlocked.length > 0) {
+            setTimeout(() => {
+                if (typeof audio !== 'undefined' && typeof audio.playBadgeFanfare === 'function') {
+                    audio.playBadgeFanfare();
+                }
+            }, 300);
+
+            const first = newlyUnlocked[0].item;
+            const announceText = `Tebrikler Kaptan! Sefer başlangıcında yeni bir başarı kazandınız: ${first.title}!`;
+            setTimeout(() => {
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceText);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏆 Başarı Açıldı: ${first.title}`, 'success');
+            }, 800);
+        }
+
         return newlyUnlocked;
     },
 
