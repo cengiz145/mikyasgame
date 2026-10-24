@@ -3806,7 +3806,7 @@ const Game = {
         }
 
         audio.updateEngineSound(this.speed, this.engineRPM, this.currentGear);
-        if (typeof audio.updateTireNoise === 'function') audio.updateTireNoise(this.speed, this.currentRoadType);
+        if (typeof audio.updateTireNoise === 'function') audio.updateTireNoise(this.speed, this.currentRoadType, this.passengersOnBoard);
         if (typeof audio.updateWeatherSound === 'function') audio.updateWeatherSound(this.speed, this.weather);
 
         document.getElementById('hud-speed').innerText = Math.floor(this.speed);
@@ -3824,6 +3824,9 @@ const Game = {
         }
         if (typeof SolarPrayerEngine !== 'undefined') {
             SolarPrayerEngine.update(this.clockMinutes, this.currentCity, this.speed, this.doorsOpen);
+        }
+        if (typeof PowertrainDynamicsEngine !== 'undefined') {
+            PowertrainDynamicsEngine.updateThermodynamics(this, deltaTime);
         }
 
         if (typeof AkilliSistem !== 'undefined' && AkilliSistem.onCoPilotUpdate) {
@@ -4779,7 +4782,13 @@ const Game = {
         const isTrainingEmpty = !!(this.activeRouteData && (this.activeRouteData.emptyBus || this.activeRouteData.isTraining));
         const remainingStops = Math.max(1, this.activeRouteData.stops.length - this.currentStopIndex - 1);
         const alighting = isTrainingEmpty ? 0 : (isFinalStop ? this.passengersOnBoard : Math.min(this.passengersOnBoard, Math.max(1, Math.round(this.passengersOnBoard / (remainingStops + 1)))));
-        const waiting = isTrainingEmpty ? 0 : ((typeof stopData.bekleyenYolcu === 'number') ? stopData.bekleyenYolcu : 5);
+        let rawWaiting = (typeof stopData.bekleyenYolcu === 'number') ? stopData.bekleyenYolcu : 5;
+        if (typeof PowertrainDynamicsEngine !== 'undefined' && !isTrainingEmpty) {
+            const rushMult = PowertrainDynamicsEngine.getDemandMultiplier(this.clockMinutes);
+            rawWaiting = Math.max(0, Math.round(rawWaiting * rushMult));
+            stopData.bekleyenYolcu = rawWaiting;
+        }
+        const waiting = isTrainingEmpty ? 0 : rawWaiting;
 
         if (isTrainingEmpty) {
             const emptyNotice = isFinalStop 
@@ -5821,6 +5830,12 @@ const Game = {
 
         if (k === 'r') {
             e.preventDefault();
+            if (e.shiftKey) {
+                if (typeof PowertrainDynamicsEngine !== 'undefined' && typeof PowertrainDynamicsEngine.speakTelemetryReport === 'function') {
+                    PowertrainDynamicsEngine.speakTelemetryReport(this);
+                }
+                return;
+            }
             let msg = `Hızınız saatte ${Math.floor(this.speed)} kilometre.`;
             if (typeof audio.speak === 'function') audio.speak(msg);
             return;
