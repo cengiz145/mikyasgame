@@ -1540,7 +1540,7 @@ const Game = {
             wowData = {
                 icon: "♿",
                 title: "📋 KAMUSAL ERİŞİLEBİLİRLİK: ENGELLİ RAMPASI & KNEELING SİSTEMİ",
-                desc: "Büyükşehir Belediyesi erişilebilirlik mevzuatı gereği araca mekanik engelli rampası ve yana yatma sistemi (kneeling) zimmetlenmiştir. Durakta tekerlekli sandalyeli yolcu gördügünüzde 'U' tuşuna basarak rampayı açınız.",
+                desc: "Toplu taşıma erişilebilirlik ve yolcu konfor standartları gereği araca mekanik engelli rampası ve yana yatma sistemi (kneeling) zimmetlenmiştir. Durakta tekerlekli sandalyeli yolcu gördügünüzde 'U' tuşuna basarak rampayı açınız.",
                 speech: "Sayın Kaptanım; engelli rampası ve yana yatma donanımı hizmete sunulmuştur. Erişilebilirlik standartlarına riayet ediniz."
             };
         } else if (completed === 5) {

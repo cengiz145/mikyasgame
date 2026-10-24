@@ -192,4 +192,4 @@ Ağır vasıta dizel motorları düşük devirde yüksek tork üretir:
 | **F1** | Akademi & Yardım Menüsü| Bu kılavuzu, interaktif laboratuvarı ve şirket rehberini açar. |
 
 ---
-*T.C. Ulaştırma ve Altyapı Bakanlığı, Karayolları Genel Müdürlüğü (KGM) ve Harita Genel Müdürlüğü (HGM) teknik standartları esas alınarak hazırlanmıştır.*
+*Gerçek dünya karayolu ulaşımı, otobüs işletmeciliği ve araç dinamiği teknik standartları esas alınarak bağımsız bir simülasyon olarak geliştirilmiştir.*
