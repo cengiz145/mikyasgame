@@ -15,7 +15,7 @@ Bu kılavuz; simülasyonda yer alan tüm ağır vasıta fizik kurallarını, hid
 7. [Çift Kademeli Engelli Rampası & Erişilebilirlik](#7-çift-kademeli-engelli-rampası--erişilebilirlik)
 8. [Viraj Geometrisi, Merkezkaç Kuvveti ve Gövde Salınımı (Body Roll)](#8-viraj-geometrisi-merkezkaç-kuvveti-ve-gövde-salınımı-body-roll)
 9. [Viyadük & Asma Köprü Yan Rüzgarları ve Çelik Genleşme Derzleri](#9-viyadük--asma-köprü-yan-rüzgarları-ve-çelik-genleşme-derzleri)
-10. [KGM Resmî Tünel Envanteri ve Yankı Akustiği](#10-kgm-resmî-tünel-envanteri-ve-yankı-akustiği)
+10. [Karayolu Tünel Envanteri ve Yankı Akustiği](#10-karayolu-tünel-envanteri-ve-yankı-akustiği)
 11. [Devir Saati (RPM), Şanzıman ve Yakıt Tasarrufu](#11-devir-saati-rpm-şanzıman-ve-yakıt-tasarrufu)
 12. [Eksiksiz Kaptan Klavye ve Tuş Referans Tablosu](#12-eksiksiz-kaptan-klavye-ve-tuş-referans-tablosu)
 
@@ -61,7 +61,7 @@ Eğer sürücü dik bir dağ inişinde retarder kullanmayıp sürekli ayak freni
 ## 3. Eğim Yerçekimi ve Dağ Rampaları (a = g · sin θ)
 
 ### Türkiye Topoğrafyası Entegrasyonu
-Oyundaki tüm 81 il merkezi, Harita Genel Müdürlüğü (HGM) resmî deniz seviyesi rakım verileriyle donatılmıştır (Örn: Tekirdağ 10 m, İstanbul 30 m, Ankara 938 m, Sivas 1275 m, Erzurum 1890 m).
+Oyundaki tüm 81 il merkezi, Coğrafi rakım ve topoğrafya veritabanıyla donatılmıştır (Örn: Tekirdağ 10 m, İstanbul 30 m, Ankara 938 m, Sivas 1275 m, Erzurum 1890 m).
 
 ### Dağ Rampalarında Tırmanış ve İniş Fiziği
 * **Tırmanış (+ Eğim):** Newton yerçekimi ivmesi ($a = -g \cdot \sin\theta$) 15 tonluk aracı geri doğru çeker.
@@ -135,7 +135,7 @@ Asma köprülerde ve uzun viyadüklerde yaz-kış genleşmesini tolere eden çel
 
 ---
 
-## 10. KGM Resmî Tünel Envanteri ve Yankı Akustiği
+## 10. Karayolu Tünel Envanteri ve Yankı Akustiği
 
 Oyunda uydurma tünel bulunmaz; sadece aracın güzergahında tescilli bir tünel varsa devreye girer:
 * **Yeni Zigana Tüneli (D-885 Trabzon-Gümüşhane):** 14.476 m (Avrupa'nın ve Türkiye'nin en uzun çift tüplü karayolu tüneli).

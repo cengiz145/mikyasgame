@@ -212,7 +212,7 @@
             }
         ],
 
-        // HGS Otoyol Gişeleri (KGM Resmî Ücret Tarifeleri)
+        // OGS / HGS Otoyol Gişeleri (Standart Karayolu Tarifeleri)
         tolls: [
             { id: "toll_osmangazi", name: "O-5 Osmangazi Köprüsü Gişeleri", fee: 290, road: "O-5 Otoyolu (Yalova - Bursa Aksı)" },
             { id: "toll_canakkale", name: "1915 Çanakkale Köprüsü Gişeleri", fee: 340, road: "Malkara - Çanakkale Otoyolu" },
@@ -888,7 +888,7 @@
             </div>
 
             <!-- Otoyol Gişeleri Listesi ve Test Geçişi -->
-            <h4 style="color: #93c5fd; font-size: 1.1rem; margin: 0 0 10px 0;">🛣️ Otoyol Gişeleri (KGM Resmî Tarifeleri):</h4>
+            <h4 style="color: #93c5fd; font-size: 1.1rem; margin: 0 0 10px 0;">🛣️ Otoyol Gişeleri (Standart Otobüs Tarifeleri):</h4>
             <div style="display: flex; flex-direction: column; gap: 8px;">
             `;
 

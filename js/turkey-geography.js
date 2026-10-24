@@ -1,7 +1,7 @@
 /* ==========================================================================
    TÜRKİYE GERÇEK COĞRAFYA VE TOPOĞRAFYA MOTORU (TURKEY GEOGRAPHY ENGINE)
-   Harita Genel Müdürlüğü (HGM), Karayolları Genel Müdürlüğü (KGM) ve
-   Meteoroloji Genel Müdürlüğü (MGM) resmî verileriyle hazırlanmıştır.
+   Ulusal karayolu topoğrafyası, coğrafi rakım ve
+   bölgesel iklim simülasyon veri modeli.
    - 81 İl Resmî Deniz Seviyesi Rakımları (0m - 1890m)
    - Tescilli Karayolu Rampa ve Eğim Profili (% Eğim Yerçekimi Fiziği)
    - Resmî Tünel ve Viyadük Envanteri (Metre Bazında Gerçek Uzunluklar)
@@ -11,7 +11,7 @@
 (function(window) {
     'use strict';
 
-    // 1. TÜRKİYE 81 İL RESMÎ RAKIM VE COĞRAFİ BÖLGE VERİTABANI (HGM)
+    // 1. TÜRKİYE 81 İL COĞRAFİ RAKIM VE BÖLGE VERİTABANI
     const TURKEY_PROVINCES_ALTITUDE = {
         "Adana": { altitude: 23, region: "Akdeniz", terrain: "asfalt" },
         "Adıyaman": { altitude: 669, region: "Güneydoğu Anadolu", terrain: "asfalt" },
@@ -96,7 +96,7 @@
         "Düzce": { altitude: 160, region: "Karadeniz", terrain: "asfalt" }
     };
 
-    // 2. TÜRKİYE TESCİLLİ KARAYOLU DAĞ GEÇİTLERİ VE EĞİM ORANLARI (KGM)
+    // 2. TÜRKİYE TESCİLLİ KARAYOLU DAĞ GEÇİTLERİ VE EĞİM ORANLARI
     const TURKEY_HIGHWAY_PASSES_GRADIENTS = {
         "Güzeldere": { name: "Güzeldere Geçidi (32 Virajlar)", altitude: 2730, slopePct: 11.0, province: "Van", highway: "D-975" },
         "Ovit": { name: "Ovit Dağı Zirvesi", altitude: 2640, slopePct: 8.5, province: "Rize", highway: "D-925" },
@@ -120,7 +120,7 @@
         "Uçmakdere": { name: "Ganos Uçmakdere Rampası", altitude: 320, slopePct: 8.5, province: "Tekirdağ", highway: "59-52" }
     };
 
-    // 3. TÜRKİYE RESMÎ KARAYOLU TÜNEL ENVANTERİ (KGM)
+    // 3. TÜRKİYE KARAYOLU TÜNEL ENVANTERİ
     const TURKEY_HIGHWAY_TUNNELS = [
         { id: "yeni_zigana", name: "Yeni Zigana Tüneli", length: 14476, highway: "D-885", provinces: ["Trabzon", "Gümüşhane"] },
         { id: "ovit", name: "Ovit Dağı Tüneli", length: 14346, highway: "D-925", provinces: ["Rize", "Erzurum"] },
@@ -139,7 +139,7 @@
         { id: "kas_kalkan_tunel", name: "Kaş - Kalkan Sahil Tünelleri", length: 1200, highway: "D-400", provinces: ["Antalya"] }
     ];
 
-    // 4. TÜRKİYE RESMÎ ASMA KÖPRÜ VE VİYADÜK ENVANTERİ (KGM)
+    // 4. TÜRKİYE ASMA KÖPRÜ VE VİYADÜK ENVANTERİ
     const TURKEY_HIGHWAY_BRIDGES = [
         { id: "canakkale_1915", name: "1915 Çanakkale Köprüsü", length: 4608, highway: "O-6", provinces: ["Çanakkale"], crosswindIntensity: 3.5 },
         { id: "osmangazi", name: "Osmangazi Asma Köprüsü", length: 2682, highway: "O-5", provinces: ["Kocaeli", "Yalova"], crosswindIntensity: 3.0 },
@@ -233,7 +233,7 @@
         },
 
         /**
-         * Rota üzerinde tescilli gerçek KGM tüneli var mı kontrol eder
+         * Rota üzerinde tescilli karayolu tüneli var mı kontrol eder
          */
         getTunnelForRoute: function(cityName, routeName = "", fromStop = "", toStop = "") {
             const combined = ((cityName || "") + " " + (routeName || "") + " " + (fromStop || "") + " " + (toStop || "")).toLowerCase();
@@ -249,7 +249,7 @@
         },
 
         /**
-         * Rota üzerinde tescilli gerçek KGM asma köprüsü veya viyadüğü var mı kontrol eder
+         * Rota üzerinde tescilli asma köprü veya viyadük var mı kontrol eder
          */
         getBridgeForRoute: function(cityName, routeName = "", fromStop = "", toStop = "") {
             const combined = ((cityName || "") + " " + (routeName || "") + " " + (fromStop || "") + " " + (toStop || "")).toLowerCase();

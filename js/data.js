@@ -177,7 +177,7 @@ const sehirRotalari = {
                 { id: "Saimbeyli", ad: "Saimbeyli", grup: "Kuzey / Dağlık ve Yayla", rol: "Kiraz Vadisi & Yüksek Yaylalar", lat: 37.9883, lon: 36.0883, merkezeMesafeKm: 154, aciklama: "Kuzey dağlık ilçe. Saimbeyli kalesi ve kiraz bahçeleri." },
                 { id: "Tufanbeyli", ad: "Tufanbeyli", grup: "Kuzey / Dağlık ve Yayla", rol: "En Kuzey Zirve & Şar Harabeleri", lat: 38.2617, lon: 36.2200, merkezeMesafeKm: 191, aciklama: "En kuzey dağlık ilçe. Hitit Komana (Şar) antik kenti." }
             ],
-            // 15x15 Birebir KGM Karayolu Kilometre Matrisi
+            // 15x15 Karayolu Kilometre Matrisi
             mesafeMatrisiKm: {
                 "Seyhan":     { "Seyhan": 0, "Yüreğir": 5, "Çukurova": 8, "Sarıçam": 12, "Karaisalı": 50, "Ceyhan": 47, "Karataş": 49, "Yumurtalık": 81, "İmamoğlu": 45, "Kozan": 68, "Aladağ": 102, "Pozantı": 114, "Feke": 118, "Saimbeyli": 154, "Tufanbeyli": 191 },
                 "Yüreğir":    { "Seyhan": 5, "Yüreğir": 0, "Çukurova": 11, "Sarıçam": 8, "Karaisalı": 54, "Ceyhan": 42, "Karataş": 46, "Yumurtalık": 76, "İmamoğlu": 42, "Kozan": 65, "Aladağ": 105, "Pozantı": 118, "Feke": 115, "Saimbeyli": 151, "Tufanbeyli": 188 },
@@ -2017,7 +2017,7 @@ const sehirRotalari = {
                 { id: "Saray", ad: "Saray", rol: "Kuzey Trakya Orman Hattı", lat: 41.4439, lon: 27.9219, merkezeMesafeKm: 78, aciklama: "Istranca etekleri ve orman hatları." },
                 { id: "Şarköy", ad: "Şarköy", rol: "Marmara Sahil & Bağcılık", lat: 40.6139, lon: 27.1128, merkezeMesafeKm: 84, aciklama: "Marmara denizi kıyısı ve bağ hatları." }
             ],
-            // 11x11 Birebir Gerçek Karayolu Kilometre Matrisi (KGM Resmi Karayolu Mesafeleri)
+            // 11x11 Gerçek Karayolu Kilometre Matrisi (Karayolu Mesafeleri)
             mesafeMatrisiKm: {
                 "Süleymanpaşa":   { "Süleymanpaşa": 0,  "Muratlı": 24, "Çorlu": 36, "Marmaraereğlisi": 38, "Ergene": 45, "Hayrabolu": 52, "Malkara": 58, "Çerkezköy": 62, "Kapaklı": 67, "Saray": 78, "Şarköy": 84 },
                 "Muratlı":        { "Süleymanpaşa": 24, "Muratlı": 0,  "Çorlu": 24, "Marmaraereğlisi": 46, "Ergene": 18, "Hayrabolu": 44, "Malkara": 70, "Çerkezköy": 48, "Kapaklı": 53, "Saray": 68, "Şarköy": 98 },
@@ -13228,7 +13228,7 @@ if (typeof masterCitiesList !== 'undefined' && typeof sehirRotalari !== 'undefin
 }
 
 
-// RESMİ KGM DEVLET KARAYOLLARI MESAFE MATRİSİ (81 İL)
+// ŞEHİRLERARASI KARAYOLLARI MESAFE MATRİSİ (81 İL)
 const sehirlerarasiMesafeler = {
                     "Tekirdağ-Kırıkkale": 525, "Kırıkkale-Tekirdağ": 525,
                     "İstanbul-Kırıkkale": 400, "Kırıkkale-İstanbul": 400,
