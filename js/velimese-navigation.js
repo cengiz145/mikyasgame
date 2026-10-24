@@ -744,12 +744,12 @@ const VelimeseNavigasyon = {
     "anons": "Sonraki durak: Velimeşe Aile Sağlığı Merkezi."
   },
   {
-    "name": "Velimeşe TCDD Tren İstasyonu",
+    "name": "Velimeşe Tren Garı & İstasyon",
     "lat": 41.255,
     "lon": 27.906,
     "cat": "Ulaşım Merkezi",
     "id": "velimese_sokak_93",
-    "anons": "Sonraki durak: Velimeşe TCDD Tren İstasyonu."
+    "anons": "Sonraki durak: Velimeşe Tren Garı & İstasyon."
   },
   {
     "name": "Velimeşe Gölet Parkı & Mesire Alanı",

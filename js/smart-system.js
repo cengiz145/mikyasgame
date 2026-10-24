@@ -25,7 +25,7 @@ const AkilliSistem = {
         "sahil": "BAYKALLAR",
         "baykallar": "FATİH SULTAN MEHMET BULVARI 3 (BAYKALLAR )",
         "kultur merkezi": "YAHYA KEMAL BEYATLI KÜLTÜR MERKEZİ",
-        "emniyet": "YENİ EMNİYET MÜDÜRLÜĞÜ",
+        "emniyet": "HÜRRİYET ASAYİŞ MERKEZİ",
         "spor salonu": "ATATÜRK SPOR SALONU",
         "yuzuncu yil": "ATATÜRK SPOR SALONU",
         "sanayi": "SANAYİ CADDESİ 1",

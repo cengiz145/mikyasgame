@@ -2186,7 +2186,7 @@ class VoiceAssistant {
                 const toTarget = command.includes("hastane") ? "Saray Devlet Hastanesi" :
                                  (command.includes("kampüs") ? "Saray Fakülte Kampüsü" :
                                  (command.includes("çarşı") ? "Ayaspaşa Çarşı" : "Saray Devlet Hastanesi"));
-                audio.speak("Saray içi Otogardan " + toTarget + " durağına belediye ring seferi başlatılıyor.");
+                audio.speak("Saray içi Otogardan " + toTarget + " durağına şehir içi ring seferi başlatılıyor.");
                 SarayNavigasyon.baslat("Saray Otogarı", toTarget);
                 return;
             }
@@ -2196,7 +2196,7 @@ class VoiceAssistant {
             if (typeof VelimeseNavigasyon !== 'undefined') {
                 if (command.includes("toki") || command.includes("meydan") || command.includes("istasyon") || command.includes("çarşı")) {
                     const toTarget = command.includes("toki") ? "Velimeşe TOKİ 233. Sokak" : 
-                                     (command.includes("istasyon") ? "Velimeşe TCDD Tren İstasyonu" : 
+                                     (command.includes("istasyon") ? "Velimeşe Tren Garı & İstasyon" : 
                                      (command.includes("çarşı") ? "Çarşı Caddesi" : "Velimeşe Merkez Meydanı"));
                     audio.speak("Velimeşe içi Çetin Sokak'tan " + toTarget + " noktasına 100 sokak seferi başlatılıyor.");
                     VelimeseNavigasyon.baslat("Çetin Sokak", toTarget);
@@ -2239,7 +2239,7 @@ class VoiceAssistant {
             }
         }
         if (command.includes("saray içi") || command.includes("saray ring") || command.includes("hat 35") || command.includes("otuz beş") || command.includes("saray mahalle")) {
-            audio.speak("Hat 35 Saray Şehir İçi 25 duraklık belediye ring seferi başlatılıyor.");
+            audio.speak("Hat 35 Saray Şehir İçi 25 duraklık şehir içi ring seferi başlatılıyor.");
             if (typeof Game !== 'undefined' && Game.startRoute) {
                 Game.startRoute("hat_35_saray_ici");
                 return;

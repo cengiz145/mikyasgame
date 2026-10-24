@@ -13,7 +13,7 @@ const SarayNavigasyon = {
         { name: "Cumhuriyet Caddesi Park Mevkii", lat: 41.4452, lon: 27.9131, cat: "Cadde", id: "saray_sk_4", anons: "Sonraki durak: Cumhuriyet Caddesi Park Mevkii." },
         { name: "Cumhuriyet Caddesi Trafo", lat: 41.4432, lon: 27.9164, cat: "Cadde", id: "saray_sk_5", anons: "Sonraki durak: Cumhuriyet Caddesi Trafo." },
         { name: "Uğur Mumcu Caddesi", lat: 41.4443, lon: 27.9178, cat: "Ana Cadde", id: "saray_sk_6", anons: "Sonraki durak: Uğur Mumcu Caddesi." },
-        { name: "Saray Hükümet Caddesi (Kaymakamlık)", lat: 41.4435, lon: 27.9190, cat: "Resmi Kurum", id: "saray_sk_7", anons: "Sonraki durak: Saray Hükümet Caddesi Kaymakamlık." },
+        { name: "Saray Hükümet Caddesi (İlçe Meydanı)", lat: 41.4435, lon: 27.9190, cat: "Merkez", id: "saray_sk_7", anons: "Sonraki durak: Saray Hükümet Caddesi İlçe Meydanı." },
         { name: "Vatan Caddesi", lat: 41.4450, lon: 27.9185, cat: "Cadde", id: "saray_sk_8", anons: "Sonraki durak: Vatan Caddesi." },
         { name: "Gazi Caddesi", lat: 41.4440, lon: 27.9215, cat: "Cadde", id: "saray_sk_9", anons: "Sonraki durak: Gazi Caddesi." },
         { name: "Namık Kemal Caddesi", lat: 41.4418, lon: 27.9220, cat: "Cadde", id: "saray_sk_10", anons: "Sonraki durak: Namık Kemal Caddesi." },
@@ -33,7 +33,7 @@ const SarayNavigasyon = {
         { name: "Midye Sokak 2", lat: 41.4516, lon: 27.9345, cat: "Sokak", id: "saray_sk_22", anons: "Sonraki durak: Midye Sokak 2." },
         { name: "İstanbul Caddesi 1", lat: 41.4447, lon: 27.9259, cat: "Ana Arter", id: "saray_sk_23", anons: "Sonraki durak: İstanbul Caddesi 1." },
         { name: "İstanbul Caddesi 2", lat: 41.4464, lon: 27.9279, cat: "Ana Arter", id: "saray_sk_24", anons: "Sonraki durak: İstanbul Caddesi 2." },
-        { name: "Saray Emniyet Müdürlüğü", lat: 41.4438, lon: 27.9252, cat: "Resmi Kurum", id: "saray_sk_25", anons: "Sonraki durak: Saray Emniyet Müdürlüğü." },
+        { name: "Saray Asayiş Parkı", lat: 41.4438, lon: 27.9252, cat: "Merkez", id: "saray_sk_25", anons: "Sonraki durak: Saray Asayiş Parkı." },
 
         // --- YENİ MAHALLE (DEVLET HASTANESİ & FAKÜLTE AKS) ---
         { name: "Saray Devlet Hastanesi Ana Giriş", lat: 41.4380, lon: 27.9307, cat: "Sağlık", id: "saray_sk_26", anons: "Son durak: Saray Devlet Hastanesi Ana Giriş." },

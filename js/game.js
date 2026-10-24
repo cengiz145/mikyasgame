@@ -2385,7 +2385,7 @@ const Game = {
             const prevStop = this.currentStopIndex > 0 ? this.activeRouteData.stops[this.currentStopIndex - 1] : null;
             let stopDistance = prevStop ? (nextStop.pos - prevStop.pos) : (nextStop.pos || 850);
             
-            // Gerçekçi Tekirdağ belediye standardı: Şehir içi durak araları minimum 750m - 1100m
+            // Standart şehir içi hat standardı: Şehir içi durak araları minimum 750m - 1100m
             if (stopDistance < 750) {
                 stopDistance = 750 + ((this.currentStopIndex * 47) % 250);
             }
@@ -6033,7 +6033,7 @@ const SanayiMechanic = {
         const repairNext = () => {
             if (currentRepairIndex >= partsToRepair.length) {
                 // EĞİTİM VE GARANTİ DESTEĞİ: Sıfır masraf, belediye eğitim desteği
-                const finalMsg = "Tüm onarımlar belediye eğitim ve garanti desteği kapsamında ücretsiz olarak tamamlandı. Aracınız hazır kaptan, iyi görevler!";
+                const finalMsg = "Tüm onarımlar kaptanlık akademisi kasko ve garanti desteği kapsamında ücretsiz olarak karşılandı. Aracınız hazır kaptan, iyi görevler!";
                 document.getElementById('sanayi-dialog').innerText = finalMsg;
                 if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(finalMsg);
                 setTimeout(() => this.finishRepair(), 2500);
