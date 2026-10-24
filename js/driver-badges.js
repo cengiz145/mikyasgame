@@ -25,10 +25,10 @@ const DriverBadges = {
     CAPTAIN_TITLES: [
         {
             id: 'title_cirak',
-            name: 'Çırak Kaptan',
+            name: '1. Sınıf Stajyer Kaptan',
             icon: '🌱',
             category: 'Temel Kademe',
-            desc: 'Mikyas Kaptanlık Akademisi’ne ilk adımını atan, intizamlı ve öğrenmeye açık çaylak şoför.',
+            desc: 'Mikyas Kaptanlık Akademisi bünyesinde intikal devresine başlayan, intizamlı ve kurallara riayet eden stajyer sürücü.',
             requirement: 'Akademiye kaydolarak ilk kontağı çevirin.',
             badgeId: null,
             unlockCondition: () => true

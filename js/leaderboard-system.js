@@ -614,7 +614,7 @@
                         UI.showToast(`👏 Kaptan ${user.username} tebrik edildi! Saygı ve itibar puanı iletildi.`, "success");
                     }
                     if (typeof audio !== 'undefined' && audio.speak) {
-                        audio.speak(`Kaptan ${user.username} alkışlandı. Harika bir meslektaş dayanışması!`);
+                        audio.speak(`Kaptan ${user.username} selamlandı. Meslektaş dayanışması takdir edildi.`);
                     }
                 };
             }

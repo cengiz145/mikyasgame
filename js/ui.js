@@ -255,9 +255,9 @@ const UI = {
         }
         if (btnCity) {
             if (hasPassed10) {
-                btnCity.innerHTML = "🏙️ Şehir İçi ve İlçe Seferleri (TEKULAŞ - Kalfa Seviyesi)";
+                btnCity.innerHTML = "🏙️ Şehir İçi ve İlçe Seferleri (TEKULAŞ Hatları)";
             } else if (completed === 0) {
-                btnCity.innerHTML = "🚍 Seferlere Başla (1. Seviye Çırak Seferi - Görev 1)";
+                btnCity.innerHTML = "🚍 Seferlere Başla (1. Sınıf Stajyer İntikali - Görev 1)";
             } else {
                 btnCity.innerHTML = `🚍 Seferlere Devam Et (${completed + 1}. Görev: 10'da ${completed} Tamamlandı)`;
             }
