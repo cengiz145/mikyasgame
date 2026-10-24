@@ -2464,6 +2464,11 @@ const Game = {
 
         const nextStop = this.activeRouteData.stops[this.currentStopIndex];
         
+        // ŞEHİR ÖNEMLİ SİMGE NOKTA HAZIRLIĞI (Henüz seslendirmez, durağa varınca okunur)
+        if (typeof CityLandmarksEngine !== 'undefined' && nextStop) {
+            CityLandmarksEngine.prepareStop(this.currentCity, this.activeDistrict, nextStop.name);
+        }
+        
         // Zemin Akustiğini Ayarla (Dinamik İlçe/Durak Bazlı)
         let stopNameLower = (nextStop.name || "").toLowerCase();
         
@@ -4761,6 +4766,11 @@ const Game = {
             StopDiscovery.onReachStop(stopData.name, this.activeDistrict || "Süleymanpaşa");
         }
 
+        // ŞEHİR ÖNEMLİ SİMGE NOKTASI (Sadece durağa tam varılınca ekran okuyucu sesli okur, bilgi vermez)
+        if (typeof CityLandmarksEngine !== 'undefined' && stopData && stopData.name) {
+            CityLandmarksEngine.onArriveAtStop(this.currentCity, this.activeDistrict, stopData.name);
+        }
+
         // Yolcu matematiğini başta hesapla
         const isTrainingEmpty = !!(this.activeRouteData && (this.activeRouteData.emptyBus || this.activeRouteData.isTraining));
         const remainingStops = Math.max(1, this.activeRouteData.stops.length - this.currentStopIndex - 1);
@@ -5626,6 +5636,12 @@ const Game = {
 
         if (k === 'p') {
             e.preventDefault();
+            if (e.shiftKey) {
+                if (typeof CityLandmarksEngine !== 'undefined' && typeof CityLandmarksEngine.speakNearbyLandmark === 'function') {
+                    CityLandmarksEngine.speakNearbyLandmark(this);
+                }
+                return;
+            }
             this.toggleLuggageBays();
             return;
         }
