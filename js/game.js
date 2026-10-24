@@ -2665,10 +2665,19 @@ const Game = {
 
         // --- TÜRKİYE KARAYOLLARI GERÇEK VİRAJ VE DAĞ GEÇİTLERİ SİSTEMİ ---
         if (typeof TurkeyCurvesEngine !== 'undefined' && (!this.upcomingTurns || this.upcomingTurns.length === 0)) {
-            this.upcomingTurns = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext, {
-                currentStop: nextStop,
-                prevStop: prevStop
-            });
+            if (this.activeRouteData && this.activeRouteData.stops && this.activeRouteData.stops.length >= 3) {
+                this.upcomingTurns = TurkeyCurvesEngine.extractCurvesFromStopCoordinates(this.activeRouteData.stops, this.currentDistanceToNext, {
+                    city: this.currentCity,
+                    routeData: this.activeRouteData,
+                    currentStop: nextStop,
+                    prevStop: prevStop
+                });
+            } else {
+                this.upcomingTurns = TurkeyCurvesEngine.getCurvatureForCorridor(this.currentCity, this.activeRouteData, this.currentDistanceToNext, {
+                    currentStop: nextStop,
+                    prevStop: prevStop
+                });
+            }
         }
         if (!this.upcomingTurns || this.upcomingTurns.length === 0) {
             this.upcomingTurns = [];
@@ -5592,9 +5601,15 @@ const Game = {
             return;
         }
 
-        // V TUŞU: Telsiz Sesli Konuşma (Push-to-Talk)
+        // V TUŞU: Telsiz (V) ve Viraj/Geometri Raporu (Shift+V)
         if (k === 'v' || e.code === 'KeyV') {
             e.preventDefault();
+            if (e.shiftKey) {
+                if (typeof TurkeyCurvesEngine !== 'undefined' && typeof TurkeyCurvesEngine.speakCurveReport === 'function') {
+                    TurkeyCurvesEngine.speakCurveReport(this);
+                }
+                return;
+            }
             if (typeof Multiplayer !== 'undefined' && typeof Multiplayer.startVoiceRadio === 'function') {
                 Multiplayer.startVoiceRadio();
             } else if (window.voiceAssistant && window.voiceAssistant.toggleListening) {

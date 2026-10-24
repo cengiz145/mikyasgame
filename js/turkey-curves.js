@@ -806,6 +806,121 @@
                 comfortImpact: comfortImpact,
                 passengerState: passengerState
             };
+        },
+
+        /**
+         * GTFS veya Durak GPS koordinat dizisinden gerçek virajları ve dönüş açılarını çıkarır
+         */
+        extractCurvesFromStopCoordinates: function(stops, totalDistMeters = 2500, context = {}) {
+            if (!stops || stops.length < 3) {
+                return this.getCurvatureForCorridor(context.city || "Tekirdağ", context.routeData, totalDistMeters, context);
+            }
+
+            const validStops = stops.filter(s => (s.lat || s.stop_lat) && (s.lon || s.stop_lon));
+            if (validStops.length < 3) {
+                return this.getCurvatureForCorridor(context.city || "Tekirdağ", context.routeData, totalDistMeters, context);
+            }
+
+            const extracted = [];
+            for (let i = 1; i < validStops.length - 1; i++) {
+                const sPrev = validStops[i - 1];
+                const sCur = validStops[i];
+                const sNext = validStops[i + 1];
+
+                const lat0 = sPrev.lat || sPrev.stop_lat;
+                const lon0 = sPrev.lon || sPrev.stop_lon;
+                const lat1 = sCur.lat || sCur.stop_lat;
+                const lon1 = sCur.lon || sCur.stop_lon;
+                const lat2 = sNext.lat || sNext.stop_lat;
+                const lon2 = sNext.lon || sNext.stop_lon;
+
+                // Bearing 1 ve Bearing 2
+                const y1 = Math.sin((lon1 - lon0) * Math.PI / 180) * Math.cos(lat1 * Math.PI / 180);
+                const x1 = Math.cos(lat0 * Math.PI / 180) * Math.sin(lat1 * Math.PI / 180) -
+                           Math.sin(lat0 * Math.PI / 180) * Math.cos(lat1 * Math.PI / 180) * Math.cos((lon1 - lon0) * Math.PI / 180);
+                const b1 = (Math.atan2(y1, x1) * 180 / Math.PI + 360) % 360;
+
+                const y2 = Math.sin((lon2 - lon1) * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180);
+                const x2 = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) -
+                           Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos((lon2 - lon1) * Math.PI / 180);
+                const b2 = (Math.atan2(y2, x2) * 180 / Math.PI + 360) % 360;
+
+                let diff = b2 - b1;
+                while (diff < -180) diff += 360;
+                while (diff > 180) diff -= 360;
+
+                const absAngle = Math.abs(diff);
+                if (absAngle >= 25) {
+                    const isRight = diff > 0;
+                    let advSpeed = 45;
+                    let intensity = 25;
+                    let typeName = isRight ? "Sağa Dönüş" : "Sola Dönüş";
+
+                    if (absAngle >= 80) {
+                        advSpeed = 30;
+                        intensity = 40;
+                        typeName = isRight ? "90 Derece Sert Sağa Dönüş" : "90 Derece Sert Sola Dönüş";
+                    } else if (absAngle >= 50) {
+                        advSpeed = 38;
+                        intensity = 32;
+                        typeName = isRight ? "Kavisli Sağa Viraj" : "Kavisli Sola Viraj";
+                    }
+
+                    const triggerDist = Math.round(totalDistMeters * (i / validStops.length));
+                    extracted.push({
+                        id: `gtfs_turn_${i}_${sCur.name || 'durak'}`,
+                        name: `${sCur.name || 'Kavşak'} ${typeName}`,
+                        direction: isRight ? "sağa" : "sola",
+                        isRight: isRight,
+                        advisorySpeed: advSpeed,
+                        curveIntensity: intensity,
+                        requiredProgress: 100,
+                        currentProgress: 0,
+                        state: "approaching",
+                        milestones: [300, 100, 0],
+                        lastWarningTime: 0,
+                        isRealTurkeyCurve: true,
+                        pan: isRight ? 0.70 : -0.70,
+                        speechWarning: `${typeName}. Tavsiye edilen hız ${advSpeed} kilometre.`,
+                        passSign: `📐 ${typeName} [${advSpeed} km/s]`
+                    });
+                }
+            }
+
+            if (extracted.length === 0) {
+                return this.getCurvatureForCorridor(context.city || "Tekirdağ", context.routeData, totalDistMeters, context);
+            }
+            return extracted;
+        },
+
+        /**
+         * Sesli Viraj ve Yol Geometrisi Raporu (Shift + V Kısayolu)
+         */
+        speakCurveReport: function(game) {
+            if (!game) return;
+            const upcoming = (game.upcomingTurns && game.upcomingTurns.length > 0) ? game.upcomingTurns[0] : null;
+
+            let speech = "";
+            if (upcoming && upcoming.state !== "completed") {
+                const curveName = upcoming.name || upcoming.direction || "kavis";
+                const advSpeed = upcoming.advisorySpeed || 45;
+                const dir = upcoming.isRight ? "sağa" : (upcoming.isRight === false ? "sola" : upcoming.direction);
+                const gForceExpected = (upcoming.curveIntensity || 25) > 30 ? "Yüksek merkezkaç savrulması bekleniyor, hızı düşürün." : "Dengeli kavis.";
+
+                speech = `Viraj ve Geometri Raporu: Yaklaşan viraj: ${curveName}. İstikamet: ${dir}. Tavsiye edilen azami hız: ${advSpeed} kilometre. ${gForceExpected}`;
+            } else {
+                speech = "Viraj ve Geometri Raporu: Güzergah düz seyrediyor. Önünüzde sert bir viraj bulunmuyor.";
+            }
+
+            if (typeof audio !== 'undefined' && typeof audio.speak === 'function') {
+                audio.speak(speech);
+            }
+            if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') {
+                audio.updateNvdaLiveRegion(speech);
+            }
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
+                UI.showToast(`📐 ${speech.split(':')[1] ? speech.split(':')[1].trim() : speech}`, 'info');
+            }
         }
     };
 
