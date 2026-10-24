@@ -1907,6 +1907,12 @@ const Game = {
         }
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
+
+        // Sefer Başlatma Başarımları ve İstatistik Kaydı
+        if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.recordRouteStart === 'function') {
+            try { DriverBadges.recordRouteStart(this); } catch(e) { console.warn('[Game] recordRouteStart hatası:', e); }
+        }
+
         this.completedTunnels = [];
         this.completedBridges = [];
         this.activeRealTunnel = null;
