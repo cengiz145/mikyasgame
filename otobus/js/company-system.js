@@ -527,16 +527,16 @@
 
             if (curFoundedCity === 'Ankara') {
                 const b = branches.find(x => x.id === 'ankara_asti');
-                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [06] Başkent peronları ana kalkış üssü.'; b.boost = '+%50 Memleket Bonusu & Peron Hakimiyeti'; }
+                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [06] Başkent peronları ana kalkış üssü.'; b.boost = '+%50 Başkent Ana Üs Hâkimiyeti'; }
             } else if (curFoundedCity === 'İstanbul') {
                 const b = branches.find(x => x.id === 'istanbul_esenler');
-                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [34] 15 Temmuz Demokrasi Otogarı ana üssü.'; b.boost = '+%60 Memleket Bonusu & Peron Hakimiyeti'; }
+                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [34] 15 Temmuz Demokrasi Otogarı ana üssü.'; b.boost = '+%60 Metropol Ana Üs Hâkimiyeti'; }
             } else if (curFoundedCity === 'İzmir') {
                 const b = branches.find(x => x.id === 'izmir_otogar');
-                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [35] İZOTAŞ peronları ana üssü.'; b.boost = '+%50 Memleket Bonusu & Ege Hattı'; }
+                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [35] İZOTAŞ peronları ana üssü.'; b.boost = '+%50 Ege Ana Üs Hâkimiyeti'; }
             } else if (curFoundedCity === 'Tekirdağ') {
                 const b = branches.find(x => x.id === 'tekirdag');
-                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [59] Süleymanpaşa sahil ve peron ana kalkış noktası.'; b.boost = '+%40 Memleket Bonusu & Yolcu Akışı'; }
+                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [59] Süleymanpaşa sahil ve peron ana kalkış noktası.'; b.boost = '+%40 Trakya Ana Üs Hâkimiyeti'; }
             } else {
                 const dynBranchKey = 'branch_' + curFoundedCity.toLowerCase().replace(/[^a-z0-9]/g, '');
                 branches.unshift({
@@ -544,7 +544,7 @@
                     name: `${curFoundedPlate ? '[' + curFoundedPlate + '] ' : ''}${curFoundedCity} ${curFoundedDist} Otogarı`,
                     desc: `Resmi Şirket Genel Merkezi & Başyazıhane. ${curFoundedCity} ana kalkış peronları.`,
                     cost: 0,
-                    boost: '+%45 Memleket Bonusu & Peron Hakimiyeti'
+                    boost: '+%45 Genel Merkez Peron Hâkimiyeti'
                 });
             }
 
@@ -1603,7 +1603,7 @@
                             <div style="display: flex; flex-direction: column; justify-content: center;">
                                 <div style="background: rgba(30, 41, 59, 0.85); border: 1.5px solid #ca8a04; border-radius: 8px; padding: 10px 14px; color: #fde047; font-size: 0.84rem; line-height: 1.45;">
                                     🏢 Genel Merkez: <strong id="preview-comp-hq" style="color: #fff;">Tekirdağ (Süleymanpaşa) Otogarı</strong><br>
-                                    ✨ <span style="color:#4ade80; font-weight: bold;">+%20 Memleket Seferi Hasılat Bonusu</span>
+                                    🏛️ <span style="color:#38bdf8; font-weight: bold;">Resmi Şirket Genel Merkezi & Ana Garaj</span>
                                 </div>
                             </div>
                         </div>
