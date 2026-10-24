@@ -3575,7 +3575,7 @@
 
             // Sesli Anons ve Uyarı
             if (typeof audio !== 'undefined' && audio.speak) {
-                const speechText = `T.C. Asliye Ticaret Mahkemesi Kararı: Şirketiniz bir milyon Türk Lirası borç sınırına ulaştığı için resmen iflas etmiş ve tasfiye edilmiştir. Şirketin bir milyon liralık borcu tasfiye masası tarafından tamamen silinmiştir. Binalar temel seviyeye çekilmiş ve şoförlerin sözleşmeleri feshedilmiştir. Şahsi ehliyetiniz, şahsi otobüsleriniz ve cüzdanınız korunmuştur. Dilerseniz kurumsal şirketlerde çalışıp nakit biriktirebilir ya da sıfırdan yeniden başlayabilirsiniz.`;
+                const speechText = `Ticari Tasfiye ve İflas Heyeti Kararı: Şirketiniz bir milyon Türk Lirası borç sınırına ulaştığı için resmen iflas etmiş ve tasfiye edilmiştir. Şirketin bir milyon liralık borcu tasfiye masası tarafından tamamen silinmiştir. Binalar temel seviyeye çekilmiş ve şoförlerin sözleşmeleri feshedilmiştir. Şahsi ehliyetiniz, şahsi otobüsleriniz ve cüzdanınız korunmuştur. Dilerseniz kurumsal şirketlerde çalışıp nakit biriktirebilir ya da sıfırdan yeniden başlayabilirsiniz.`;
                 audio.speak(speechText);
             }
 
@@ -3594,7 +3594,7 @@
                     <div style="text-align: center; border-bottom: 2px solid rgba(239, 68, 68, 0.4); padding-bottom: 14px; margin-bottom: 18px;">
                         <div style="font-size: 2.2rem; margin-bottom: 4px;">⚖️</div>
                         <h2 id="bankruptcy-modal-title" style="color: #ef4444; font-size: 1.4rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; text-transform: uppercase;">
-                            T.C. ASLİYE TİCARET MAHKEMESİ VE İCRA İFLAS MÜDÜRLÜĞÜ
+                            TİCARİ İFLAS VE FİNANSAL TASFİYE HEYETİ
                         </h2>
                         <div style="color: #fca5a5; font-size: 1.05rem; font-weight: bold; margin-top: 4px;">
                             RESMİ ŞİRKET İFLAS VE TASFİYE TUTANAĞI
@@ -4501,7 +4501,7 @@
                 btnTestBankruptcy.addEventListener('click', () => {
                     const confirmTest = confirm(
                         "⚖️ RESMİ İFLAS VE TASFİYE SİMÜLASYONU\n\n" +
-                        "Şirket kasasını -1.000.000 ₺ borca çekip T.C. Asliye Ticaret Mahkemesi Tasfiye Protokolünü çalıştırmak istiyor musunuz?\n\n" +
+                        "Şirket kasasını -1.000.000 ₺ borca çekip Ticari İflas ve Tasfiye Protokolünü çalıştırmak istiyor musunuz?\n\n" +
                         "• Şirketin 1.000.000 ₺ borcu sıfırlanacaktır (Borç affı).\n" +
                         "• Binalar Seviye 1'e dönecek, şoförler serbest kalacaktır.\n" +
                         "• ŞAHSİ HAKLARINIZ (Kişisel cüzdanınız, garajınızdaki araçlar, ehliyetiniz) KORUNACAKTIR.\n\n" +
