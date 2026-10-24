@@ -1339,6 +1339,111 @@
             }
         },
 
+        // 00:00 Gece Yarısına Kalan Süre Hesabı
+        getTimeUntilMidnight: function () {
+            try {
+                const now = new Date();
+                const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+                const diffMs = Math.max(0, nextMidnight.getTime() - now.getTime());
+                const totalSeconds = Math.floor(diffMs / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                const hh = String(hours).padStart(2, '0');
+                const mm = String(minutes).padStart(2, '0');
+                const ss = String(seconds).padStart(2, '0');
+                return {
+                    diffMs: diffMs,
+                    totalSeconds: totalSeconds,
+                    hours: hours,
+                    minutes: minutes,
+                    seconds: seconds,
+                    formatted: `${hh}:${mm}:${ss}`,
+                    text: `${hours} saat ${minutes} dakika ${seconds} saniye`
+                };
+            } catch (e) {
+                return {
+                    diffMs: 0,
+                    totalSeconds: 0,
+                    hours: 0,
+                    minutes: 0,
+                    seconds: 0,
+                    formatted: "00:00:00",
+                    text: "0 saat 0 dakika"
+                };
+            }
+        },
+
+        // Saat 00:00'da Günün Sıfırlanması ve Yeni Günün Açılması
+        onMidnightReset: function () {
+            this.currentActiveDate = this.getTodayDateString();
+            this.updateBadge();
+            
+            const nextDay = this.getNextClaimableDay();
+            const resetMsg = `⏰ SAAT 00:00: Yeni gün başladı ve hoş geldin takvimi sıfırlandı! ${nextDay}. Gün ödülünüz hazır!`;
+            
+            if (typeof audio !== 'undefined') {
+                if (typeof audio.playSuccess === 'function') {
+                    try { audio.playSuccess(); } catch (e) {}
+                }
+                if (typeof audio.speak === 'function') {
+                    audio.speak(`Saat 00:00 oldu! Yeni gün başladı. ${nextDay}. gün hoş geldin ödülünüz açıldı.`);
+                }
+                if (typeof audio.updateNvdaLiveRegion === 'function') {
+                    audio.updateNvdaLiveRegion(resetMsg);
+                }
+            }
+
+            if (typeof UI !== 'undefined' && typeof UI.showToast === 'function') {
+                UI.showToast(resetMsg, "info");
+            }
+
+            // Açık modal varsa anında canlı olarak yeniden çiz
+            const modal = (typeof document !== 'undefined') ? document.getElementById('welcome-calendar-modal') : null;
+            if (modal && !modal.classList.contains('hidden')) {
+                this.renderModal();
+            }
+        },
+
+        // Gece Yarısı Geçiş Kontrolü (00:00 Tetikleyicisi)
+        checkMidnightReset: function (force = false) {
+            const todayStr = this.getTodayDateString();
+            if (force || (this.currentActiveDate && this.currentActiveDate !== todayStr)) {
+                this.currentActiveDate = todayStr;
+                this.onMidnightReset();
+                return true;
+            }
+            return false;
+        },
+
+        // 1 Saniyelik Canlı Saat ve 00:00 Nöbetçisi
+        startMidnightWatcher: function () {
+            if (this._midnightInterval) {
+                clearInterval(this._midnightInterval);
+            }
+            this.currentActiveDate = this.getTodayDateString();
+
+            if (typeof setInterval !== 'undefined') {
+                this._midnightInterval = setInterval(() => {
+                    const todayStr = this.getTodayDateString();
+                    if (this.currentActiveDate && this.currentActiveDate !== todayStr) {
+                        this.onMidnightReset();
+                    }
+
+                    // Modal açıksa canlı geri sayım sayacını saniyelik güncelle
+                    if (typeof document !== 'undefined') {
+                        const timerEl = document.getElementById('welcome-countdown-timer');
+                        const timerSubEl = document.getElementById('welcome-claim-cooldown-text');
+                        if (timerEl || timerSubEl) {
+                            const remaining = this.getTimeUntilMidnight();
+                            if (timerEl) timerEl.innerText = remaining.formatted;
+                            if (timerSubEl) timerSubEl.innerText = `${remaining.hours}s ${remaining.minutes}d ${remaining.seconds}sn`;
+                        }
+                    }
+                }, 1000);
+            }
+        },
+
         // Verileri Yükle
         loadData: function () {
             try {
@@ -1410,7 +1515,8 @@
         // Bugünün Ödülünü Al
         claimToday: function () {
             if (!this.isTodayClaimable()) {
-                const alreadyMsg = "Bugünkü hoş geldin hediyenizi zaten aldınız! Yeni ödülünüz yarın 00:00'da hazır olacak.";
+                const rem = this.getTimeUntilMidnight();
+                const alreadyMsg = `Bugünkü hoş geldin hediyenizi zaten aldınız! Yeni ödülünüz gece saat 00:00'da (${rem.hours} saat ${rem.minutes} dakika sonra) sıfırlanıp hazır olacak.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(alreadyMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("⏳ " + alreadyMsg, "warning");
                 return false;
@@ -1649,6 +1755,7 @@
             // 1. Özet & Bugün Al Butonu
             const summaryBox = modal.querySelector('#welcome-header-summary');
             if (summaryBox) {
+                const remTime = this.getTimeUntilMidnight();
                 summaryBox.innerHTML = `
                     <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
                         <div>
@@ -1663,6 +1770,15 @@
                                 ${(this.data.totalClaimedCash || 0).toLocaleString('tr-TR')} ₺ Cüzdan | ${(this.data.totalClaimedTreasury || 0).toLocaleString('tr-TR')} ₺ Kasa
                             </div>
                         </div>
+                        <div style="background: rgba(236, 72, 153, 0.15); border: 1.5px solid rgba(236, 72, 153, 0.4); padding: 6px 14px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.2rem; line-height: 1;">⏰</span>
+                            <div>
+                                <div style="font-size: 0.72rem; color: #fbcfe8; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Sıfırlanma (00:00)</div>
+                                <div id="welcome-countdown-timer" style="font-family: monospace; font-size: 1.05rem; font-weight: 800; color: #f472b6;">
+                                    ${remTime.formatted}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         ${isReady ? `
@@ -1674,8 +1790,9 @@
                                 👑 100 Günün Tamamı Tamamlandı!
                             </div>
                         ` : `
-                            <div style="padding: 8px 18px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #94a3b8; font-weight: bold; border-radius: 8px; font-size: 0.9rem;">
-                                ⏳ Bugünkü Ödül Alındı (Yarın ${nextDay}. Gün)
+                            <div style="padding: 8px 18px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; font-weight: bold; border-radius: 8px; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+                                <span>⏳ Bugünkü Ödül Alındı • </span>
+                                <span style="color: #fb7185;">00:00'da Sıfırlanacak (<span id="welcome-claim-cooldown-text">${remTime.hours}s ${remTime.minutes}d ${remTime.seconds}sn</span>)</span>
                             </div>
                         `)}
                     </div>
@@ -1714,6 +1831,7 @@
 
                 pageDays.forEach(item => {
                     const status = this.getDayStatus(item.day);
+                    const isNextWaiting = (status === 'locked' && item.day === nextDay && !isReady);
                     const card = document.createElement('div');
                     card.className = 'welcome-day-card nav-item';
                     card.setAttribute('tabindex', '0');
@@ -1730,12 +1848,16 @@
                         borderStyle = '2px solid #ec4899';
                         bgStyle = 'linear-gradient(145deg, rgba(236, 72, 153, 0.25), rgba(190, 24, 93, 0.2))';
                         statusBadge = '<span style="color: #fbcfe8; font-size: 0.8rem; font-weight: 800; background: #ec4899; padding: 3px 8px; border-radius: 6px; box-shadow: 0 0 10px rgba(236, 72, 153, 0.6);">🎁 HAZIR</span>';
+                    } else if (isNextWaiting) {
+                        borderStyle = '1.5px solid rgba(251, 113, 133, 0.5)';
+                        bgStyle = 'linear-gradient(145deg, rgba(244, 63, 94, 0.12), rgba(15, 23, 42, 0.7))';
+                        statusBadge = '<span style="color: #fb7185; font-size: 0.8rem; font-weight: bold; background: rgba(244, 63, 94, 0.2); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(244, 63, 94, 0.3);">⏳ 00:00\'da Açılacak</span>';
                     } else {
                         statusBadge = '<span style="color: #64748b; font-size: 0.8rem; font-weight: bold; background: rgba(255, 255, 255, 0.05); padding: 3px 8px; border-radius: 6px;">🔒 Kilitli</span>';
                     }
 
                     if (item.isMilestone) {
-                        borderStyle = (status === 'claimed') ? '2px solid #eab308' : ((status === 'ready') ? '2px solid #f59e0b' : '1.5px solid rgba(234, 179, 8, 0.4)');
+                        borderStyle = (status === 'claimed') ? '2px solid #eab308' : ((status === 'ready') ? '2px solid #f59e0b' : (isNextWaiting ? '2px solid #fb7185' : '1.5px solid rgba(234, 179, 8, 0.4)'));
                     }
 
                     card.style.cssText = `background: ${bgStyle}; border: ${borderStyle}; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.3); position: relative;`;
@@ -1760,8 +1882,8 @@
                         </div>
 
                         <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.78rem; color: #94a3b8;">
-                                ${item.isMilestone ? '⭐ Özel Dönüm Noktası' : 'Günlük Ödül'}
+                            <span style="font-size: 0.78rem; color: ${isNextWaiting ? '#fb7185' : '#94a3b8'};">
+                                ${isNextWaiting ? '⏰ Gece 00:00\'da Sıfırlanır' : (item.isMilestone ? '⭐ Özel Dönüm Noktası' : 'Günlük Ödül')}
                             </span>
                             ${status === 'ready' ? `
                                 <button class="modern-btn btn-card-claim" style="padding: 5px 12px; font-size: 0.82rem; font-weight: bold; background: #ec4899; color: #fff; border: none; border-radius: 6px; cursor: pointer;">
@@ -1803,6 +1925,7 @@
             this.loadData();
             this.createModal();
             this.updateBadge();
+            this.startMidnightWatcher();
 
             // Menü Butonunu Bağla
             const btnOpen = document.getElementById('btn-open-welcome-calendar');

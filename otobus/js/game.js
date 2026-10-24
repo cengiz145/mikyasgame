@@ -2896,7 +2896,16 @@ const Game = {
         const timeScale = 1.0; // 1:1 Gerçek Zamanlı Dakika ve Saniye
         this.clockMinutes += (deltaTime / 60) * timeScale;
         this.totalDrivingSeconds = (this.totalDrivingSeconds || 0) + deltaTime;
-        this.clockMinutes = this.clockMinutes % 1440;
+        if (this.clockMinutes >= 1440) {
+            this.clockMinutes = this.clockMinutes % 1440;
+            // Gece 00:00 saat sıfırlanması: Hoş geldin takvimi kontrolü
+            const welcomeCalObj = (typeof WelcomeCalendar !== 'undefined') ? WelcomeCalendar : ((typeof window !== 'undefined' && window.WelcomeCalendar) ? window.WelcomeCalendar : null);
+            if (welcomeCalObj && typeof welcomeCalObj.checkMidnightReset === 'function') {
+                welcomeCalObj.checkMidnightReset();
+            }
+        } else {
+            this.clockMinutes = this.clockMinutes % 1440;
+        }
         
         let wasNight = this.isNight;
         this.isNight = (this.clockMinutes < 360 || this.clockMinutes >= 1080); 
