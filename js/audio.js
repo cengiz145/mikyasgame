@@ -4073,6 +4073,54 @@ startEngine() {
         osc.start(now);
         osc.stop(now + 1.5);
     }
+
+    playDistantPrayerAmbience() {
+        try {
+            this.init();
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            
+            // Sıcak ve yankılı minare akustiği (Reverb & Harmonics)
+            const masterGain = this.ctx.createGain();
+            masterGain.gain.setValueAtTime(0, now);
+            masterGain.gain.linearRampToValueAtTime(0.22, now + 1.5);
+            masterGain.gain.linearRampToValueAtTime(0.18, now + 4.0);
+            masterGain.gain.exponentialRampToValueAtTime(0.001, now + 7.5);
+            
+            const filter = this.ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.setValueAtTime(440, now);
+            filter.Q.setValueAtTime(3.0, now);
+            
+            const panner = this.ctx.createStereoPanner();
+            panner.pan.setValueAtTime(0.2, now); // Hafif sağ kulaklıktan yankılanan uzak ses
+            
+            masterGain.connect(filter);
+            filter.connect(panner);
+            panner.connect(this.environmentMixer || this.ctx.destination);
+            
+            // Makamsal sıcak harmonikler (Rast / Hicaz tınısı)
+            const freqs = [220, 277.18, 329.63, 440];
+            freqs.forEach((f, idx) => {
+                const osc = this.ctx.createOscillator();
+                const oscGain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(f, now);
+                
+                const level = (idx === 0) ? 0.4 : (idx === 1) ? 0.3 : 0.2;
+                oscGain.gain.setValueAtTime(level, now);
+                
+                osc.connect(oscGain);
+                oscGain.connect(masterGain);
+                
+                osc.start(now);
+                osc.stop(now + 7.5);
+            });
+        } catch(e) {
+            console.warn("playDistantPrayerAmbience error:", e);
+        }
+    }
+
 }
 
 const audio = new AudioSystem();

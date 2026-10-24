@@ -3822,6 +3822,10 @@ const Game = {
             else if (pct > 15) hudFuelVal.style.color = '#facc15';
             else hudFuelVal.style.color = '#ef4444';
         }
+        if (typeof SolarPrayerEngine !== 'undefined') {
+            SolarPrayerEngine.update(this.clockMinutes, this.currentCity, this.speed, this.doorsOpen);
+        }
+
         if (typeof AkilliSistem !== 'undefined' && AkilliSistem.onCoPilotUpdate) {
             AkilliSistem.onCoPilotUpdate(this);
         }
@@ -5928,6 +5932,12 @@ const Game = {
         }
         if (k === 'pageup' || k === 'e') {
             e.preventDefault();
+            if (e.shiftKey) {
+                if (typeof SolarPrayerEngine !== 'undefined' && typeof SolarPrayerEngine.speakVakitReport === 'function') {
+                    SolarPrayerEngine.speakVakitReport(this);
+                }
+                return;
+            }
             this.toggleFrontDoor();
         }
         if (k === 'pagedown' || k === 'q') {
