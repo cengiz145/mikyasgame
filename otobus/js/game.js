@@ -255,7 +255,7 @@ const Game = {
         }
     },
     
-    // TEKİRDAĞ RESMİ MGM İKLİM NORMALLERİ VE ATMOSFERİK REJİMLER (AY İSİMLERİNDEN BAĞIMSIZ)
+    // TEKİRDAĞ BÖLGESEL İKLİM NORMALLERİ VE ATMOSFERİK REJİMLER (AY İSİMLERİNDEN BAĞIMSIZ)
     tekirdagClimate: {
         recordMax: 40.2,       // Tarihi rekor en yüksek (°C)
         meanMax: 17.9,         // Gündüz ortalama en yüksek (°C)
@@ -2535,7 +2535,7 @@ const Game = {
         this.currentLegTotalDistance = this.currentDistanceToNext || 1000;
         this.currentLegDistanceCovered = 0;
 
-        // Gerçek KGM Tünel ve Köprü Kontrolü (Sadece rota koridorunda varsa)
+        // Gerçek Karayolu Tünel ve Köprü Kontrolü (Sadece rota koridorunda varsa)
         if (typeof TurkeyGeographyEngine !== 'undefined') {
             const rName = this.activeRouteData ? (this.activeRouteData.name || "") : "";
             const fromStopName = prevStop ? prevStop.name : "";
@@ -2927,7 +2927,7 @@ const Game = {
         if (!this.lastWeatherCheckTime) this.lastWeatherCheckTime = currentTime;
         if (currentTime - this.lastWeatherCheckTime > 30000) {
             this.lastWeatherCheckTime = currentTime;
-            // Tekirdağ MGM iklim normalleri ve gün döngüsü sıcaklık hesaplaması (Ay bağımsız)
+            // Tekirdağ bölgesel iklim normalleri ve gün döngüsü sıcaklık hesaplaması (Ay bağımsız)
             const regime = (this.tekirdagClimate && this.tekirdagClimate.regimes && this.tekirdagClimate.regimes[this.activeClimateRegime])
                 ? this.tekirdagClimate.regimes[this.activeClimateRegime]
                 : { mean: 14.0, max: 17.9, min: 10.3 };

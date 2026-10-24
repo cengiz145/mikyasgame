@@ -2,7 +2,7 @@
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU BAÅLATICI (APP.JS)
    ========================================================================== */
 
-// 81 İl Resmi KGM Karayolları Mesafeleri js/data.js içerisinde tanımlıdır ve window.sehirlerarasiMesafeler üzerinden erişilir.
+// 81 İl Karayolları Mesafeleri js/data.js içerisinde tanımlıdır ve window.sehirlerarasiMesafeler üzerinden erişilir.
 
         if (typeof window !== 'undefined') window.sehirlerarasiMesafeler = sehirlerarasiMesafeler;
 

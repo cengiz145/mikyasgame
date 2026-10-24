@@ -275,7 +275,7 @@
                 promptMsg += `⚠️ Şirket kasası şu anda borçtadır (${curTreasury.toLocaleString('tr-TR')} ₺).\n`;
                 promptMsg += `• Ticari KMH Finansmanı ile şahsi cüzdanınıza para çekmeye devam edebilirsiniz.\n`;
             }
-            promptMsg += `• DİKKAT: Şirket borcu -1.000.000 ₺'ye ulaşırsa Asliye Ticaret Mahkemesi şirketi RESMEN İFLAS ettirir ve tasfiye eder! (Kişisel cüzdanınız, araçlarınız ve ehliyetiniz korunur).\n\n` +
+            promptMsg += `• DİKKAT: Şirket borcu -1.000.000 ₺'ye ulaşırsa Bağımsız Ticari Tasfiye Heyeti şirketi RESMEN İFLAS ettirir ve tasfiye eder! (Kişisel cüzdanınız, araçlarınız ve ehliyetiniz korunur).\n\n` +
                          `Maksimum çekilebilecek kredi limiti: ${maxCreditAvailable.toLocaleString('tr-TR')} ₺`;
 
             const defVal = curTreasury > 0 ? String(Math.min(curTreasury, 10000)) : "50000";
@@ -517,7 +517,7 @@
                 { id: 'tekirdag', name: 'Tekirdağ Süleymanpaşa Otogarı', desc: 'Süleymanpaşa sahil ve ilçe peronları ana kalkış noktası.', cost: 0, boost: '+%30 Yolcu Akışı' },
                 { id: 'corlu', name: 'Çorlu Şehirlerarası Otogarı', desc: 'Sanayi ve Trakya bölge kavşağı. Çorlu ringi ve fabrika işçi-yolcu transfer merkezi.', cost: 15000, boost: '+%40 Yolcu Akışı' },
                 { id: 'istanbul_esenler', name: 'İstanbul 15 Temmuz Demokrasi Otogarı (Esenler)', desc: "Türkiye'nin ve Avrupa'nın en büyük otobüs terminali. 168 aktif peron bağlantısı ve dev yolcu hacmi.", cost: 35000, boost: '+%60 Yolcu & Bilet Satışı' },
-                { id: 'ankara_asti', name: 'Ankara AŞTİ Şehirlerarası Terminali', desc: 'Başkentin kalbi. Bakanlıklar, üniversiteler ve tüm Anadolu aktarma peronları.', cost: 30000, boost: '+%50 Yolcu Akışı' },
+                { id: 'ankara_asti', name: 'Ankara AŞTİ Şehirlerarası Terminali', desc: 'Başkentin kalbi. İdari merkezler, üniversiteler ve tüm Anadolu aktarma peronları.', cost: 30000, boost: '+%50 Yolcu Akışı' },
                 { id: 'izmir_otogar', name: 'İzmir Şehirlerarası Otobüs Terminali (İZOTAŞ)', desc: 'Ege sahilleri, Bornova ana peronları ve turizm hatlarının merkezi.', cost: 28000, boost: '+%50 Yolcu Akışı' }
             ];
 
@@ -2073,7 +2073,7 @@
             {
                 id: "contract_derbi",
                 title: "⚽ Süper Lig Derbi Kafilesi Özel Seferi",
-                client: "TFF Süper Lig Kulübü",
+                client: "Profesyonel Futbol Kulübü",
                 icon: "🏆",
                 routeId: "route_ist",
                 rewardBonus: 3500,
@@ -2084,7 +2084,7 @@
             {
                 id: "contract_festival",
                 title: " Kiraz Festivali Protokol Transferi",
-                client: "Tekirdağ Büyükşehir Belediyesi",
+                client: "Bölgesel Kültür ve Festival Tertip Komitesi",
                 icon: "🍒",
                 routeId: "route_corlu",
                 rewardBonus: 2200,
@@ -2101,7 +2101,7 @@
                 rewardBonus: 5400,
                 reqMinRank: 4,
                 reqBusClass: "buyuk",
-                desc: "Ankara Bakanlıklar kongresine yabancı diplomatları ulaştırın. Devasa prim!"
+                desc: "Ankara Uluslararası Ticaret ve Finans Zirvesine yabancı heyetleri ulaştırın. Prestijli prim!"
             },
             {
                 id: "contract_kayak",
@@ -3488,10 +3488,10 @@
                 if (!this.data.bankruptcyWarned750k) {
                     this.data.bankruptcyWarned750k = true;
                     this.playEmergencySiren();
-                    const redMsg = `🚨 ACİL İFLAS UYARISI! Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ seviyesine ulaştı! Borç -1.000.000 ₺ sınırına dayanırsa mahkeme şirketimizi tasfiye edecektir! Lütfen cüzdandan şirkete para yatırın veya giderlerinizi kısın!`;
+                    const redMsg = `🚨 ACİL İFLAS UYARISI! Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ seviyesine ulaştı! Borç -1.000.000 ₺ sınırına dayanırsa Ticari Tasfiye Heyeti şirketimizi tasfiye edecektir! Lütfen cüzdandan şirkete para yatırın veya giderlerinizi kısın!`;
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(redMsg);
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(redMsg, 'error');
-                    this.addRadioLog("⚖️ Hukuk ve Mali Müşavir", "🚨", `Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ oldu! -1.000.000 ₺'de Asliye Ticaret Mahkemesi iflas kararı verecek!`, "danger");
+                    this.addRadioLog("⚖️ Hukuk ve Mali Müşavir", "🚨", `Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ oldu! -1.000.000 ₺'de Ticari Tasfiye Heyeti iflas kararı verecek!`, "danger");
                 }
             } else {
                 this.data.bankruptcyWarned750k = false;
@@ -3555,7 +3555,7 @@
             this.data.bankruptcyCount = (this.data.bankruptcyCount || 0) + 1;
 
             // Muhasebe Defterine Borç Tasfiyesi Kaydı
-            this.recordTransaction('income', 'debt_relief', '⚖️ Asliye Ticaret Mahkemesi Tasfiye Kararı ile Borç Sıfırlaması', Math.abs(prevTreasury));
+            this.recordTransaction('income', 'debt_relief', '⚖️ Ticari Tasfiye Heyeti Kararı ile Borç Sıfırlaması', Math.abs(prevTreasury));
 
             this.saveData();
 
@@ -3563,14 +3563,14 @@
             this.addRadioLog(
                 "⚖️ İcra & Tasfiye Masası",
                 "🏛️",
-                `Asliye Ticaret Mahkemesi Kararıyla ${compName} iflas etmiş ve tasfiye masasına devredilmiştir. ${Math.abs(prevTreasury).toLocaleString('tr-TR')} ₺ borç sıfırlanmış, şirket 1. Seviye Yazıhane olarak yeniden yapılandırılmıştır.`,
+                `Ticari Tasfiye Heyeti Kararıyla ${compName} iflas etmiş ve tasfiye masasına devredilmiştir. ${Math.abs(prevTreasury).toLocaleString('tr-TR')} ₺ borç sıfırlanmış, şirket 1. Seviye Yazıhane olarak yeniden yapılandırılmıştır.`,
                 "danger"
             );
 
             // Şirket Yönetim Modalı Açıksa Kapat
             this.closeCompanyModal();
 
-            // Mahkeme Tokmak Sesi
+            // Tasfiye Tokmak Sesi
             this.playCourtGavelSound();
 
             // Sesli Anons ve Uyarı
@@ -3579,7 +3579,7 @@
                 audio.speak(speechText);
             }
 
-            // Görsel ve Erişilebilir Resmi Mahkeme İflas Tutanağı Modalı Aç
+            // Görsel ve Erişilebilir Resmi Ticari İflas Tutanağı Modalı Aç
             this.showBankruptcyModal(prevTreasury, releasedDriversCount);
         },
 
@@ -3654,8 +3654,8 @@
 
                     <!-- EKRAN OKUYUCU BUTONU -->
                     <div style="margin-top: 14px;">
-                        <button id="btn-confirm-bankruptcy" class="modern-btn nav-item" style="width: 100%; padding: 14px 20px; font-size: 1.05rem; font-weight: bold; background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #fff; border: 2px solid #ef4444; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.45); transition: all 0.2s;" aria-label="Mahkeme Tasfiye Kararını Okudum ve Onaylıyorum, Temiz Bir Sayfa Aç, düğme">
-                            📜 Mahkeme Tasfiye Kararını Onaylıyorum ve Temiz Sayfa Açıyorum (Enter / Space)
+                        <button id="btn-confirm-bankruptcy" class="modern-btn nav-item" style="width: 100%; padding: 14px 20px; font-size: 1.05rem; font-weight: bold; background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #fff; border: 2px solid #ef4444; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.45); transition: all 0.2s;" aria-label="Ticari Tasfiye Kararını Okudum ve Onaylıyorum, Temiz Bir Sayfa Aç, düğme">
+                            📜 Ticari Tasfiye Kararını Onaylıyorum ve Temiz Sayfa Açıyorum (Enter / Space)
                         </button>
                     </div>
 
@@ -3708,7 +3708,7 @@
 
             const descEl = document.getElementById('bankruptcy-modal-desc');
             if (descEl) {
-                descEl.innerHTML = `<strong>Resmi İflas Kararı:</strong> Sayın Şirket Sahibi; <strong>${compName}</strong> ticari işletmesi, toplam <strong>-${absDebt} ₺</strong> borç bakiyesine ulaşarak yasal <strong>-1.000.000 ₺</strong> iflas sınırını aşmıştır. İcra ve İflas Kanunu gereğince şirketin mevcut operasyonel tüzel kişiliği feshedilmiş ve tasfiye protokolü icra edilmiştir.`;
+                descEl.innerHTML = `<strong>Resmi İflas Kararı:</strong> Sayın Şirket Sahibi; <strong>${compName}</strong> ticari işletmesi, toplam <strong>-${absDebt} ₺</strong> borç bakiyesine ulaşarak yasal <strong>-1.000.000 ₺</strong> iflas sınırını aşmıştır. Ticari İşletme Standartları gereğince şirketin mevcut operasyonel tüzel kişiliği feshedilmiş ve tasfiye protokolü icra edilmiştir.`;
             }
 
             const liqEl = document.getElementById('bankruptcy-liquidated-list');
@@ -4408,7 +4408,7 @@
                     <button id="btn-withdraw-treasury" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(234,179,8,0.18); border: 1px solid #eab308; color: #fef08a; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Şirket Kasasından Cüzdana Para Çek">
                         📤 Kasadan Çek
                     </button>
-                    <button id="btn-test-bankruptcy" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(239,68,68,0.18); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Resmi Asliye Ticaret Mahkemesi Tasfiye ve İflas Protokolünü Test Et (-1.000.000 ₺)">
+                    <button id="btn-test-bankruptcy" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(239,68,68,0.18); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Resmi Ticari Tasfiye ve İflas Protokolünü Test Et (-1.000.000 ₺)">
                         ⚖️ İflas Testi (-1M ₺)
                     </button>
                     <button id="btn-owner-reset-all-data-ov" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(220,38,38,0.25); border: 1.5px solid #dc2626; color: #fecaca; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Tüm oyun verilerini (şahsi cüzdan, araçlar, ehliyet, kariyer ve şirket dahil her şeyi) sıfırdan siler">

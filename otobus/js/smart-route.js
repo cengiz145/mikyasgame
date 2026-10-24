@@ -904,7 +904,7 @@ const AkilliRotaSistemi = {
                 targetProvince = (originProvince === "İstanbul") ? "Ankara" : "İstanbul";
             }
 
-            // Gerçek KGM Karayolu Mesafesi ve GPS Hesabı
+            // Gerçek Karayolu Mesafesi ve GPS Hesabı
             const resolveCityProv = (p) => {
                 if (!p) return "Tekirdağ";
                 const tekDistricts = ["Süleymanpaşa", "Çorlu", "Çerkezköy", "Kapaklı", "Ergene", "Muratlı", "Marmaraereğlisi", "Saray", "Hayrabolu", "Malkara", "Şarköy", "Velimeşe"];
