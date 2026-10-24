@@ -979,7 +979,7 @@ window.addEventListener('keydown', (e) => {
             'captain-profile-inspector-modal',
             'leaderboard-modal',
             'create-company-modal',
-            'company-system-modal',
+            'company-system-modal', 'welcome-calendar-modal',
             'company-modal',
             'district-picker-modal',
             'mode-selection-modal',
