@@ -3737,6 +3737,17 @@ const Game = {
             }
 
             // Balata aşırı ısınma ve fren şişmesi uyarısı
+            // Dik inişte ayak frenine yüklenilirse erken eğitici uyarı
+            if (this.currentSlopePct <= -3.5 && isFootBraking && (!this.retarderLevel || this.retarderLevel === 0) && (currentTime - (this.lastDownhillRetarderTipTime || 0) > 14000)) {
+                this.lastDownhillRetarderTipTime = currentTime;
+                if (typeof audio !== 'undefined' && audio.speak) {
+                    audio.speak("Kaptan, dik inişte ayak frenine yüklenmeyin, balatalar şişer. B tuşuna basarak Retarder yokuş frenini devreye sokunuz.");
+                }
+                if (typeof UI !== 'undefined' && UI.showToast) {
+                    UI.showToast("💡 İpucu: Dik inişte B tuşuyla Retarder (Yokuş Freni) kullanınız.", "info");
+                }
+            }
+
             if (incPhys.isBrakeOverheated && (currentTime - (this.lastBrakeWarnTime || 0) > 8000)) {
                 this.lastBrakeWarnTime = currentTime;
                 if (typeof audio !== 'undefined' && audio.speak) {
@@ -5814,7 +5825,7 @@ const Game = {
                 }
             }
 
-            const msg = isEngaged ? `Retarder Kademe ${this.retarderLevel}.` : "Retarder kapatıldı.";
+            const msg = isEngaged ? `Retarder Kademe ${this.retarderLevel}. Yokuş iniş freni devrede, balataları yakmadan şanzımandan yavaşlatır.` : "Retarder kapatıldı, serbest sürüş.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof UI !== 'undefined' && UI.showToast) {
                 UI.showToast(isEngaged ? `⚡ Retarder Kademe ${this.retarderLevel} Devrede` : `⚡ Retarder Devre Dışı`, isEngaged ? "success" : "info");
