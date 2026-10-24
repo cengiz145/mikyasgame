@@ -322,6 +322,7 @@
             <p class="subtitle" id="garage-route-desc">Hat bilgisi yükleniyor...</p>
         </div>
 
+        <div id="garage-live-weather-card"></div>
         <div id="garage-mission-details" class="instruction-box" style="margin-bottom: 20px; text-align: left; line-height: 1.6; max-height: 380px; overflow-y: auto;">
             <!-- Dinamik doldurulacak: Başlangıç durağı, durulacak duraklar, varış durağı, nasıl yapılacağı -->
         </div>
@@ -348,6 +349,7 @@
 
         <!-- KOKPİT DURUM VE İKAZ PANELİ -->
         <div id="cockpit-status-bar" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;" role="region" aria-label="Kokpit Durum Göstergeleri">
+            <div id="hud-live-weather" style="display: none; background: rgba(15, 23, 42, 0.85); border: 1px solid #38bdf8; color: #7dd3fc; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer;" title="Canlı Meteoroloji Raporu (Shift+H)" onclick="if(typeof LiveWeather!=='undefined')LiveWeather.announceWeatherReport('assertive');" role="button" tabindex="0" aria-label="Canlı Meteoroloji Raporu. Dinlemek için Shift H tuşuna basın veya tıklayın.">🌦️ Canlı Hava: Tekirdağ 10°C</div>
             <button id="btn-hud-tutorial" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer;" title="Sürüş Rehberi ve Tuşlar (F1)" aria-label="Sürüş Rehberi">🎓 SÜRÜŞ REHBERİ (F1)</button>
             <div id="hud-multiplayer-panel" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px;" title="Canlı Telsiz & Radar (Menü: X / F4 | Sesli Konuşma: V | Rastgele Sohbet: Shift+Virgül)" role="button" tabindex="0" aria-label="Çevrimiçi Kaptanlar ve Telsiz Kanal 19. Menü için X veya F4, sesli konuşmak için V, telsiz sohbeti için Shift Virgül tuşuna basın.">🟢 <span id="hud-multiplayer-count">1 Kaptan Çevrimiçi</span> <span style="font-size: 0.85rem; color: #fde047; background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(250,204,21,0.3);">📻 Telsiz (X / V)</span></div>
             <div id="hud-stop-request" style="display: none; background: #dc2626; color: #ffffff; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; box-shadow: 0 0 14px rgba(220, 38, 38, 0.9); border: 1px solid #f87171;" aria-live="assertive">🔴 DURACAK</div>
@@ -656,6 +658,7 @@
     <script src="js/turkey-curves.js?v=1792467926943"></script>
     <script src="js/welcome-calendar.js?v=1792617000000"></script>
     <script src="js/turkey-atlas.js?v=1792617500000"></script>
+    <script src="js/live-weather.js?v=1792618000000"></script>
     <script src="js/game.js?v=1792467926943"></script>
     <script src="js/app.js?v=1792467926943"></script>
 

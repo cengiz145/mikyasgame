@@ -1986,6 +1986,17 @@ const Game = {
         this.fuelWarned5 = false;
         this.totalDrivingSeconds = 0;
         this.activeRouteData = routesData[routeId];
+        
+        // CANLI METEOROLOJİ ENTEGRASYONU: İl ve ilçeye göre anlık uydu verisi çek
+        if (typeof LiveWeather !== 'undefined') {
+            const routeCity = (this.activeRouteData && this.activeRouteData.sehir) || this.currentCity || "Tekirdağ";
+            const routeDistrict = (this.activeRouteData && this.activeRouteData.ilce) || this.activeDistrict || "Süleymanpaşa";
+            LiveWeather.fetchWeather(routeCity, routeDistrict).then(data => {
+                if (data && typeof LiveWeather.applyToGame === 'function') {
+                    LiveWeather.applyToGame(data);
+                }
+            }).catch(e => console.warn('[Game] LiveWeather fetch hatası:', e));
+        }
         this.passengerComfort = 100;
         this.stopRequestBellTriggered = false;
         if (this.currentStopIndex === 0 && !isResume && !this.terminalAnnouncedForRoute) {
@@ -2320,6 +2331,11 @@ const Game = {
         // ZAMAN VE HAVA DURUMU SİSTEMİ
         audio.stopWeather(); // Mevcut hava olayını temizle
         this.isNight = (this.clockMinutes < 360 || this.clockMinutes >= 1080); // Gece başlangıcı kontrolü
+        
+        // CANLI METEOROLOJİ KONTROLÜ: Gerçek zamanlı uydu verisi varsa simülasyonu uydur
+        if (typeof LiveWeather !== 'undefined' && LiveWeather.current) {
+            LiveWeather.applyToGame(LiveWeather.current);
+        }
         
         // TEKİRDAĞ İKLİM NORMALLERİ VE ATMOSFERİK SİSTEM (AY İSİMLERİNDEN BAĞIMSIZ)
         if (!this.activeClimateRegime || !this.tekirdagClimate.regimes[this.activeClimateRegime]) {
@@ -5239,6 +5255,11 @@ const Game = {
             audio.playAkbil(pType);
         }
         
+        // Yağmurlu/karlı havada biniş yapan yolcunun şemsiye silkeleme çıtırtısı
+        if ((this.weather === 'rainy' || this.weather === 'snowy') && typeof audio !== 'undefined' && typeof audio.playUmbrellaShake === 'function' && Math.random() < 0.45) {
+            setTimeout(() => { try { audio.playUmbrellaShake(); } catch(e){} }, 320);
+        }
+        
         let label = pType === "tam" ? "Tam" : (pType === "ogrenci" ? "Öğrenci" : "Serbest");
         if (fare > 0 && splitRes && splitRes.companyShare > 0) {
             document.getElementById('passenger-feedback').innerText = `${label} basıldı. ${fare} ₺ (%${splitRes.companySharePercent} Şirket: ${splitRes.companyShare} ₺, Kaptan: ${splitRes.captainShare} ₺).`;
@@ -5660,7 +5681,12 @@ const Game = {
                 const safeBusTemp = (typeof this.busTemperature === 'number' && !isNaN(this.busTemperature)) ? Math.floor(this.busTemperature) : 22;
                 const safeOutTemp = (typeof this.temperature === 'number' && !isNaN(this.temperature)) ? this.temperature : 18;
                 const safePassengers = (typeof this.passengersOnBoard === 'number' && !isNaN(this.passengersOnBoard)) ? this.passengersOnBoard : 0;
-                const msg = `Saat ${timeStr} (${timeOfDay || 'Gündüz'}). Dış sıcaklık ${safeOutTemp} derece, araç içi ${safeBusTemp} derece. Hava ${durum}.${uyari}${farDurum} Otobüs şu an ${weightCategory} (${safePassengers} yolcu). ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
+                let liveSpeechExtra = "";
+                if (typeof LiveWeather !== 'undefined' && LiveWeather.current) {
+                    const lw = LiveWeather.current;
+                    liveSpeechExtra = ` Canlı meteoroloji: ${lw.city} ${lw.temperature} derece, rüzgar saatte ${lw.windSpeed} kilometre, gökyüzü ${lw.desc}.`;
+                }
+                const msg = `Saat ${timeStr} (${timeOfDay || 'Gündüz'}). Dış sıcaklık ${safeOutTemp} derece, araç içi ${safeBusTemp} derece. Hava ${durum}.${uyari}${farDurum}${liveSpeechExtra} Otobüs şu an ${weightCategory} (${safePassengers} yolcu). ${this.isACOn ? "Klima açık." : "Klima kapalı."}`;
                 if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
                 if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, 'info');
@@ -5743,6 +5769,12 @@ const Game = {
 
         if (k === 'h') {
             e.preventDefault();
+            if (e.shiftKey) {
+                if (typeof LiveWeather !== 'undefined') {
+                    LiveWeather.announceWeatherReport("assertive");
+                }
+                return;
+            }
             const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
             const currentFuel = (this.currentFuelLiters !== undefined) ? this.currentFuelLiters : cap;
             const liters = Math.max(0, Math.floor(currentFuel));
