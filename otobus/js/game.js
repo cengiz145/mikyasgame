@@ -529,6 +529,9 @@ const Game = {
         }
         this.isRampDeployed = !this.isRampDeployed;
         const rampEl = document.getElementById('hud-ramp');
+        if (typeof BusConceptGuide !== 'undefined') {
+            BusConceptGuide.announceAction('ramp', this.isRampDeployed);
+        }
         if (this.isRampDeployed) {
             this.rampUsedInRoute = true;
             this.rampsUsedCountInRoute = (this.rampsUsedCountInRoute || 0) + 1;
@@ -5023,6 +5026,9 @@ const Game = {
         this.airPressure = Math.max(minAirF, this.airPressure - 2);
         
         this.frontDoorOpen = !this.frontDoorOpen;
+        if (typeof BusConceptGuide !== 'undefined') {
+            BusConceptGuide.announceAction('front_door', this.frontDoorOpen);
+        }
         const btn = document.getElementById('btn-front-door');
         
         if (this.frontDoorOpen) {
@@ -5250,6 +5256,9 @@ const Game = {
         this.airPressure = Math.max(minAirR, this.airPressure - 2);
         
         this.rearDoorOpen = !this.rearDoorOpen;
+        if (typeof BusConceptGuide !== 'undefined') {
+            BusConceptGuide.announceAction('rear_door', this.rearDoorOpen);
+        }
         const btn = document.getElementById('btn-rear-door');
         
         if (this.rearDoorOpen) {
@@ -5610,10 +5619,28 @@ const Game = {
         }
 
         if (k === 'k') {
+            e.preventDefault();
+            if (e.shiftKey) {
+                if (typeof BusConceptGuide !== 'undefined' && typeof BusConceptGuide.openModal === 'function') {
+                    BusConceptGuide.openModal();
+                }
+                return;
+            }
             this.isACOn = !this.isACOn;
+            if (typeof BusConceptGuide !== 'undefined' && BusConceptGuide.announceAction('ac', this.isACOn)) {
+                return;
+            }
             const msg = this.isACOn ? "Klima açıldı. Hedef sıcaklık 22 derece." : "Klima kapatıldı.";
             if (typeof audio.speak === 'function') audio.speak(msg);
             if (typeof UI !== 'undefined') UI.showToast(msg, 'info');
+            return;
+        }
+
+        if (k === 'o' && e.shiftKey) {
+            e.preventDefault();
+            if (typeof BusConceptGuide !== 'undefined' && typeof BusConceptGuide.toggleEducationalMode === 'function') {
+                BusConceptGuide.toggleEducationalMode();
+            }
             return;
         }
 
@@ -5825,6 +5852,9 @@ const Game = {
                 }
             }
 
+            if (typeof BusConceptGuide !== 'undefined' && BusConceptGuide.announceAction('retarder', isEngaged, { level: this.retarderLevel })) {
+                return;
+            }
             const msg = isEngaged ? `Retarder Kademe ${this.retarderLevel}. Yokuş iniş freni devrede, balataları yakmadan şanzımandan yavaşlatır.` : "Retarder kapatıldı, serbest sürüş.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof UI !== 'undefined' && UI.showToast) {
@@ -6063,6 +6093,13 @@ window.addEventListener('keydown', (e) => {
         e.preventDefault();
         if (window.voiceAssistant && window.voiceAssistant.toggleTutorialModal) {
             window.voiceAssistant.toggleTutorialModal();
+        }
+        return;
+    }
+    if (e.key === 'F2') {
+        e.preventDefault();
+        if (typeof BusConceptGuide !== 'undefined' && typeof BusConceptGuide.openModal === 'function') {
+            BusConceptGuide.openModal();
         }
         return;
     }
