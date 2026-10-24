@@ -6,6 +6,7 @@ Bu kılavuz; simülasyonda yer alan tüm ağır vasıta fizik kurallarını, hid
 ---
 
 ## 📑 İÇİNDEKİLER
+0. [🎓 DERS: Aracı Kullanırken Dikkat Edilmesi Gereken Kavramlar (9 Temel Kavram)](#-ders-aracı-kullanırken-dikkat-edilmesi-gereken-kavramlar-9-temel-sürüş-kavramı)
 1. [Retarder (Hidrolik Şanzıman Freni - Voith & ZF)](#1-retarder-hidrolik-şanzıman-freni---voith--zf)
 2. [Balata Isınması & Fren Şişmesi (Brake Fade)](#2-balata-ısınması--fren-şişmesi-brake-fade)
 3. [Eğim Yerçekimi ve Dağ Rampaları (a = g · sin θ)](#3-eğim-yerçekimi-ve-dağ-rampaları-a--g--sin-θ)
@@ -18,6 +19,77 @@ Bu kılavuz; simülasyonda yer alan tüm ağır vasıta fizik kurallarını, hid
 10. [Karayolu Tünel Envanteri ve Yankı Akustiği](#10-karayolu-tünel-envanteri-ve-yankı-akustiği)
 11. [Devir Saati (RPM), Şanzıman ve Yakıt Tasarrufu](#11-devir-saati-rpm-şanzıman-ve-yakıt-tasarrufu)
 12. [Eksiksiz Kaptan Klavye ve Tuş Referans Tablosu](#12-eksiksiz-kaptan-klavye-ve-tuş-referans-tablosu)
+
+---
+
+---
+
+## 🎓 DERS: ARACI KULLANIRKEN DİKKAT EDİLMESİ GEREKEN KAVRAMLAR (9 TEMEL SÜRÜŞ KAVRAMI)
+
+Hiç otobüs şoförlüğü tecrübesi olmayan bir oyuncunun veya "Bu sistemler neden var, ne işe yarıyor ve nasıl kullanmalıyım?" diye merak eden herkesin bilmesi gereken 9 hayati kavram şunlardır:
+
+---
+
+### 1. 🛑 Retarder (Şanzıman / Yokuş Freni) - Kısayol: `B`
+* **Ne İşe Yarar?:** Yokuş aşağı inerken tekerleklerdeki fren balatalarına hiç dokunmadan, şanzıman milindeki hidrolik yağ girdabıyla otobüsü içeriden yavaşlatan sürtünmesiz yardımcı bir frendir.
+* **Neden Var / Neden Hayatidir?:** 16-18 tonluk bir otobüs dik bir dağdan (örneğin Bolu Dağı veya Sabuncubeli) inerken sürekli ayak frenine basılırsa, balatalar 350°C'yi aşar, reçineleri erir ve "Fren Şişmesi (Brake Fade)" oluşur. Fren şişince pedal sertleşir fakat fren tutmaz, araç yokuş aşağı kontrolsüzce kayar. Retarder sıfır sürtünmeyle çalıştığı için balataları soğuk tutar ve facia yaşanmasını önler. O meşhur "Vuvvvv" türbin sesi bu sistemden gelir.
+* **Nasıl Kullanılır?:** Yokuş aşağı inerken veya hızınızı güvenle düşürmek istediğinizde klavyeden **`B`** tuşuna basarak 1 ila 5 kademe arasında devreye alabilirsiniz. Kapatmak için **`Shift + B`** tuşuna basınız.
+
+---
+
+### 2. 📐 Kneeling (Kaldırıma Sağa Yatma / Körük Çökertme) - Otomatik / `K`
+* **Ne İşe Yarar?:** Otobüs durakta durduğunda sağ taraftaki pnömatik hava körüklerinin havasını boşaltarak aracın sağ tarafını kaldırıma doğru 7-8 santimetre eğmesidir.
+* **Neden Var / Neden Hayatidir?:** Yaşlılar, hamileler, bebek arabalı aileler ve çocuklar yüksek otobüs basamağına tırmanırken zorlanabilir veya düşebilir. Kneeling sistemi basamak yüksekliğini kaldırım seviyesine indirerek binişleri kolaylaştırır ve yolcu memnuniyetini artırır.
+* **Nasıl Kullanılır?:** Durakta durup kapıyı açtığınızda otobüs otomatik olarak yana yatar (`🚌 KNEELING` ışığı yanar). Manuel çökertme için de kullanılabilir. Kapılar kapanıp gaza basıldığında hava kompresörü körükleri şişirir ve araç normal sürüş seviyesine yükselir.
+
+---
+
+### 3. ♿ Engelli Rampası & Emniyet Kilidi - Kısayol: `U`
+* **Ne İşe Yarar?:** Tekerlekli sandalyeli yolcuların ve bebek arabalarının kaldırımdan otobüse engelsiz ve düzayak binebilmesini sağlayan açılır-kapanır rampadır.
+* **Neden Var / Neden Hayatidir?:** Otobüsler herkes için erişilebilir olmalıdır. Ancak rampa açıkken otobüs hareket ederse rampa kaldırıma çarparak kırılır veya tekerlekli sandalyeli yolcu düşebilir. Bu yüzden rampa açıldığında otobüste "Güvenlik Kilidi" devreye girer; rampa kapanana kadar araç kilitlenir ve asla hareket edemez.
+* **Nasıl Kullanılır?:** Durakta tekerlekli sandalye ikonu gördüğünüzde aracı tam durdurun. Kapıyı açtıktan sonra klavyeden **`U`** tuşuna basarak rampayı açın. Yolcu bindikten sonra tekrar **`U`** tuşuna basarak rampayı kapatın ve kilidi çözün.
+
+---
+
+### 4. 💨 Pnömatik Havalı Fren Sistemi & Kompresör - Kısayol: `S` (Ayak Freni)
+* **Ne İşe Yarar?:** Ağır vasıtayı durdurmak için hidrolik yağ yerine 8 ila 12 bar basınçlı sıkıştırılmış hava kullanan ana servis freni sistemidir.
+* **Neden Var / Neden Hayatidir?:** 18 tonluk bir kütleyi durdurmak için insan ayak gücü ve hidrolik sıvı basıncı yetersiz kalır; muazzam bir pnömatik hava gücü gerekir. Ancak frene art arda hızlıca basıp bırakırsanız (pompalama yaparsanız) hava tüpleri boşalır. Hava basıncı 60 PSI altına düşerse frenler tutmaz hale gelir ve alarm çalar!
+* **Nasıl Kullanılır?:** Klavyeden **`S`** tuşuyla fren yapılır. Usta bir kaptan gibi frene peş peşe bas-çek yapmayın; tek, dengeli ve kademeli basarak hava tankı basıncını koruyun.
+
+---
+
+### 5. 🅿️ İmdat Freni / Park Freni - Kısayol: `Boşluk (Space)`
+* **Ne İşe Yarar?:** Otobüs dururken veya park halindeyken aracın kaymasını önleyen, tekerlekleri kilit altında tutan yaylı mekanik park frenidir.
+* **Neden Var / Neden Hayatidir?:** Havalı fren sistemlerinde hava kaçağı olursa fren basıncı sıfırlanabilir. İmdat freni ise hava basıncıyla değil, içine sıkıştırılmış dev çelik yayların gerilimiyle çalışır. Yani otobüste hiç hava kalmasa dahi yaylar tekerlekleri kilitler ve aracın yokuş aşağı kaçmasını önler.
+* **Nasıl Kullanılır?:** Durakta yolcu alırken veya park ettiğinizde **`Boşluk (Space)`** tuşuna basarak imdat frenini çekin. Hareket etmeden önce tekrar basarak serbest bırakın.
+
+---
+
+### 6. 🚪 Kapı Fren Emniyet Kilidi (Interlock) - Kısayol: `E` (Ön) / `Q` (Arka)
+* **Ne İşe Yarar?:** Kapılar veya engelli rampası açıkken gaz kelebeğini elektronik ve pnömatik olarak kilitleyen, aracın hareket etmesini engelleyen güvenlik otomasyonudur.
+* **Neden Var / Neden Hayatidir?:** Kapı açıkken otobüs hareket ederse binen veya inen yolcular kapıdan düşebilir veya kapıya sıkışabilir. Bu sebeple uluslararası yolcu taşımacılığı regülasyonlarında kapı interlok mekanizması zorunludur.
+* **Nasıl Kullanılır?:** Durakta yolcu alırken **`E`** (ön kapı) ve **`Q`** (arka kapı) tuşlarına basın. Yolcu biniş/inişi bitip kapıları kapatmadan gaz (`W`) verseniz dahi otobüs hareket etmez. Kapıları kapattığınız an kilit çözülür ve araç gaz yemeye başlar.
+
+---
+
+### 7. 🌪️ Hidrostatik Radyatör Fanı (Hararet Soğutma) - Kısayol: `Shift + R` (Telemetri)
+* **Ne İşe Yarar?:** Motor aşırı ısındığında (95°C üzerine çıktığında) devreye giren dev hidrostatik soğutma pervanesidir.
+* **Neden Var / Neden Hayatidir?:** 18 tonluk otobüs dik yokuşlarda tam gaz tırmanırken devasa bir termal ısı üretir. Eğer bu ısı dağıtılamazsa motor contası yanar, yağ viskozitesi bozulur ve motor kilitlenir. Hidrostatik fan devreye girdiğinde güçlü bir uğultuyla radyatör peteklerine hava basarak motoru hızla 90°C ideal çalışma sıcaklığına soğutur.
+* **Nasıl Kullanılır?:** Sistem otomatiktir; motor 95°C'yi geçtiğinde fan kendiliğinden devreye girer. Durumu izlemek için **`Shift + R`** tuşuna basarak canlı motor sıcaklığını, fan durumunu ve yağ basıncını sesli dinleyebilirsiniz.
+
+---
+
+### 8. 👥 Yoğun Zirve Saat Dinamiği (Rush Hour) - Kısayol: `Shift + R`
+* **Ne İşe Yarar?:** Günün saatine göre (sabah 07:00-09:00 ve akşam 17:00-19:30 iş/okul mesai saatlerinde) duraklardaki yolcu talebini 2.5 - 3 kat artıran ve otobüs doluluğunu tavan yaptıran dinamik sistemdir.
+* **Neden Var / Neden Hayatidir?:** Gerçek hayatta günün her saati aynı yolcu yoğunluğu olmaz. Otobüs 70-80 yolcuyla dolduğunda araç ağırlığı 14 tondan 19 tona çıkar; fren mesafesi uzar, virajda merkezkaç savrulması artar ve yokuşta çekiş zorlaşır.
+* **Nasıl Kullanılır?:** Zirve saatlerde sürüş yaparken daha erken frenlemeli, duraklarda kapıları daha uzun süre açık tutmalı ve **`Shift + R`** tuşuna basarak doluluk durumunu ve araç ağırlığını kontrol etmelisiniz.
+
+---
+
+### 9. 📻 Telsiz Dispeçer Anonsları - Kısayol: `T`
+* **Ne İşe Yarar?:** Garaj amirliği, filo hareket merkezi ve yol boyundaki diğer kaptanlarla sesli ve telsiz mandalı üzerinden haberleşme sistemidir.
+* **Neden Var / Neden Hayatidir?:** Yoldaki kaza, kapalı güzergah, aşırı yolcu yoğunluğu veya teknik arıza durumlarında kaptan yalnız değildir; filo merkezi telsizle yönlendirme ve talimat verir.
+* **Nasıl Kullanılır?:** Klavyeden **`T`** tuşuna basarak canlı telsiz dispeçer anonslarını ve amirlik talimatlarını anlık olarak dinleyebilirsiniz.
 
 ---
 
