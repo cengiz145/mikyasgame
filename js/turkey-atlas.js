@@ -330,6 +330,16 @@
                     r && (r.sehir === cityName || r.originCity === cityName || r.destCity === cityName || (r.district && r.district.includes(cityName)))
                 );
             }
+
+            if (cityName === "Tekirdağ" && typeof window !== 'undefined' && window.tekulasHatVeritabani) {
+                const lineCount = window.tekulasHatVeritabani.length;
+                const stopCount = window.tekulasHatVeritabani.reduce((sum, r) => sum + (r.stops ? r.stops.length : 0), 0);
+                const sampleTitles = window.tekulasHatVeritabani.slice(0, 3).map(r => r.name).join(". ");
+                const speech = `Tekirdağ ilinde 11 ilçeyi birbirine bağlayan ${lineCount} aktif belediye hattı ve ${stopCount} gerçek durak mevcuttur. Örnek hatlar: ${sampleTitles}. Sefere çıkmak için Serbest Sürüş veya Kariyer modunu başlatabilirsiniz.`;
+                this.announceText(speech, "assertive");
+                return;
+            }
+
             if (matchedRoutes.length > 0) {
                 const titles = matchedRoutes.slice(0, 3).map(r => r.name).join(". ");
                 const speech = `${cityName} ilinden kalkan ${matchedRoutes.length} aktif otobüs seferi mevcuttur. Örnek hatlar: ${titles}. Sefere çıkmak için Serbest Sürüş veya Kariyer modunu başlatabilirsiniz.`;

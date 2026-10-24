@@ -558,40 +558,59 @@ const UI = {
         }
 
         const titleEl = document.getElementById("route-sel-title");
-        if (titleEl) titleEl.innerText = `${activeDist} Sefer Görevleri (1 - 10. Seviye)`;
-        
         const subtitleEl = document.getElementById("route-sel-subtitle") || document.querySelector("#route-menu .subtitle");
-        if (subtitleEl) subtitleEl.innerText = `${cityName} - ${activeDist} bölgesi canlı hat ve durak görevleri`;
         
         const listEl = document.getElementById("dynamic-route-list");
         if (!listEl) return;
         listEl.innerHTML = "";
-        
-        // Şehrin tüm görev rotalarını al (Kimlik ve isme göre tekilleştirilmiş)
-        const seenRouteKeys = new Set();
+
+        const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive');
         let cityRoutes = [];
-        Object.values(routesData).forEach(r => {
-            if (!r || !r.id) return;
-            const key = r.id;
-            if (seenRouteKeys.has(key)) return;
-            seenRouteKeys.add(key);
-            if (r.sehir === cityName && typeof r.taskIndex === 'number') {
-                cityRoutes.push(r);
+        const seenRouteKeys = new Set();
+
+        // TEKİRDAĞ GTFS & AÇIK VERİ ENTEGRASYONU (SERBEST SÜRÜŞTE 278 GERÇEK HAT)
+        if (isFreeDrive && cityName === "Tekirdağ" && typeof window !== 'undefined' && window.tekulasHatVeritabani) {
+            const tekulasDb = window.tekulasHatVeritabani;
+            // Aktif ilçeye ait hatları eşle
+            let distLines = tekulasDb.filter(r => 
+                r && (r.district === activeDist || r.originDistrict === activeDist || r.destDistrict === activeDist || (r.name && r.name.toLowerCase().includes(activeDist.toLowerCase())))
+            );
+            if (distLines.length === 0) {
+                distLines = tekulasDb;
             }
-        });
-        
-        // Eğer görev rotası yoksa, normal hatları göster (Tekilleştirilmiş)
-        if (cityRoutes.length === 0) {
-            seenRouteKeys.clear();
+            cityRoutes = distLines;
+            
+            const totalStopsCount = cityRoutes.reduce((sum, r) => sum + (r.stops ? r.stops.length : 0), 0);
+            if (titleEl) titleEl.innerText = `${activeDist} Belediye Hatları (GTFS - ${cityRoutes.length} Hat)`;
+            if (subtitleEl) subtitleEl.innerText = `Tekirdağ Büyükşehir Açık Veri & GTFS Sistemi • ${activeDist} bölgesine ait ${cityRoutes.length} hat ve ${totalStopsCount} durak listelendi.`;
+        } else {
+            if (titleEl) titleEl.innerText = `${activeDist} Sefer Görevleri (1 - 10. Seviye)`;
+            if (subtitleEl) subtitleEl.innerText = `${cityName} - ${activeDist} bölgesi canlı hat ve durak görevleri`;
+
+            // Şehrin tüm görev rotalarını al (Kimlik ve isme göre tekilleştirilmiş)
             Object.values(routesData).forEach(r => {
                 if (!r || !r.id) return;
-                const key = r.name || r.id;
+                const key = r.id;
                 if (seenRouteKeys.has(key)) return;
                 seenRouteKeys.add(key);
-                if (r.sehir === cityName || (cityName === "Tekirdağ" && (r.isDistrict || r.originDistrict === "Süleymanpaşa" || r.destDistrict))) {
+                if (r.sehir === cityName && typeof r.taskIndex === 'number') {
                     cityRoutes.push(r);
                 }
             });
+            
+            // Eğer görev rotası yoksa, normal hatları göster (Tekilleştirilmiş)
+            if (cityRoutes.length === 0) {
+                seenRouteKeys.clear();
+                Object.values(routesData).forEach(r => {
+                    if (!r || !r.id) return;
+                    const key = r.name || r.id;
+                    if (seenRouteKeys.has(key)) return;
+                    seenRouteKeys.add(key);
+                    if (r.sehir === cityName || (cityName === "Tekirdağ" && (r.isDistrict || r.originDistrict === "Süleymanpaşa" || r.destDistrict))) {
+                        cityRoutes.push(r);
+                    }
+                });
+            }
         }
 
         if (cityRoutes.length === 0) {
@@ -602,24 +621,21 @@ const UI = {
         // Aktif lisans seviyesi (Çırak = 1, Kalfa = 2, Usta = 3)
         const currentLic = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
 
-        // Görevleri doğal sayısal sırasına göre diz (Görev 1, Görev 2, ... Görev 10)
-        cityRoutes.sort((a, b) => (a.taskIndex || 0) - (b.taskIndex || 0));
-
-        // Oyuncunun görebileceği görevler: Mevcut lisans seviyesindeki görevler (1. Seviye için ilk 10 görev)
-        const visibleRoutes = cityRoutes.filter(r => {
-            if (typeof r.licenseLevel === 'number') {
-                return r.licenseLevel <= currentLic;
-            }
-            return true;
-        });
-
-        let routesToRender = visibleRoutes.length > 0 ? visibleRoutes : cityRoutes;
-        const isFreeDrive = (typeof Game !== 'undefined' && Game.playMode === 'free_drive');
-
-        // İLERLEME MODU GİZEM VE KADEMELİ AÇILMA PRENSİBİ:
-        // Oyuncuya toplam görev sayısı veya tüm gelecek görevler gösterilmez.
-        // Yalnızca tamamlananlar + şu anki aktif görev + hemen sıradaki 1 kilitli görev gösterilir.
+        let routesToRender = cityRoutes;
         if (!isFreeDrive) {
+            // Görevleri doğal sayısal sırasına göre diz (Görev 1, Görev 2, ... Görev 10)
+            cityRoutes.sort((a, b) => (a.taskIndex || 0) - (b.taskIndex || 0));
+
+            // Oyuncunun görebileceği görevler: Mevcut lisans seviyesindeki görevler (1. Seviye için ilk 10 görev)
+            const visibleRoutes = cityRoutes.filter(r => {
+                if (typeof r.licenseLevel === 'number') {
+                    return r.licenseLevel <= currentLic;
+                }
+                return true;
+            });
+            routesToRender = visibleRoutes.length > 0 ? visibleRoutes : cityRoutes;
+
+            // İLERLEME MODU GİZEM VE KADEMELİ AÇILMA PRENSİBİ:
             routesToRender = routesToRender.filter(r => {
                 const tIdx = (typeof r.taskIndex === 'number') ? r.taskIndex : 0;
                 return tIdx <= completedTasks + 1;
