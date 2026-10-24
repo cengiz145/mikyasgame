@@ -128,12 +128,12 @@ const AkilliRotaSistemi = {
         { label: "Gündoğdu Mahallesi (Şehir Hastanesi)", district: "Süleymanpaşa", stopName: "Şehir Hastanesi Ana Giriş Caddesi", keys: ["gundogdu", "sehir hastanesi", "hastane"] },
         { label: "100. Yıl Mahallesi (Atatürk Spor Salonu)", district: "Süleymanpaşa", stopName: "Atatürk Spor Salonu Caddesi", keys: ["100 yil", "spor salonu", "yuzuncu yil"] },
         { label: "Altınova Mahallesi (Sahil & Liman)", district: "Süleymanpaşa", stopName: "Altınova Sahil Caddesi", keys: ["altinova", "sahil", "liman"] },
-        { label: "Hürriyet Mahallesi (Baykallar & Emniyet)", district: "Süleymanpaşa", stopName: "Baykallar Caddesi", keys: ["hurriyet", "baykallar", "emniyet"] },
+        { label: "Hürriyet Mahallesi (Baykallar & Çarşı)", district: "Süleymanpaşa", stopName: "Baykallar Caddesi", keys: ["hurriyet", "baykallar", "emniyet"] },
         { label: "Süleymanpaşa İlçe Merkezi & Yeni Otogar", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa", "tekirdag merkez", "suleymanpasa merkez", "suleymanpasa otogar", "tekirdag otogar", "yeni otogar", "otogar", "terminal", "otobus terminali"] },
         { label: "Süleymanpaşa Yeni Otogar (Otobüs Terminali)", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa otogar", "tekirdag otogar", "yeni otogar", "otogar", "terminal", "otobus terminali"] },
 
         // SARAY MAHALLELERİ VE ANA MERKEZLER
-        { label: "Ayaspaşa Mahallesi (Saray Çarşı & Belediye)", district: "Saray", stopName: "Saray Belediyesi (Cumhuriyet Meydanı)", keys: ["ayaspasa", "saray belediye", "saray carsi", "saray merkez"] },
+        { label: "Ayaspaşa Mahallesi (Saray Çarşı & Park)", district: "Saray", stopName: "Cumhuriyet Meydanı & Park", keys: ["ayaspasa", "saray park", "saray carsi", "saray merkez"] },
         { label: "Pazarcık Mahallesi (Saray Otogarı)", district: "Saray", stopName: "Saray Otogar 1 (Giriş Peronu)", keys: ["pazarcik", "saray otogar"] },
         { label: "Yeni Mahalle (Saray Devlet Hastanesi)", district: "Saray", stopName: "Saray Devlet Hastanesi Ana Giriş", keys: ["yeni mahalle", "saray hastane", "devlet hastanesi"] },
         { label: "Yeni Mahalle (Saray Fakülte Kampüsü)", district: "Saray", stopName: "Saray Meslek Yüksekokulu (Fakülte Kampüs)", keys: ["fakulte", "kampus", "myo", "saray myo"] },
@@ -153,7 +153,7 @@ const AkilliRotaSistemi = {
         { label: "Perinthos Antik Kenti & Liman", district: "Marmaraereğlisi", stopName: "Perinthos Antik Kenti", keys: ["perinthos", "antik kent"] },
 
         // ERGENE MAHALLELERİ VE ANA MERKEZLER
-        { label: "Marmaracık Mahallesi (Ergene Belediye & Merkez)", district: "Ergene", stopName: "Ergene Belediyesi (Marmaracık)", keys: ["marmaracik", "ergene belediye", "ergene merkez"] },
+        { label: "Marmaracık Mahallesi (Ergene Merkez & Park)", district: "Ergene", stopName: "Marmaracık Meydan Durağı", keys: ["marmaracik", "ergene meydan", "ergene merkez"] },
         { label: "Sağlık Mahallesi (Edirne Caddesi & Pazar)", district: "Ergene", stopName: "Sağlık Mahallesi", keys: ["saglik", "saglik mahallesi"] },
         { label: "Yeşiltepe Mahallesi (Meydan & Çarşı)", district: "Ergene", stopName: "Yeşiltepe Meydan", keys: ["yesiltepe", "yesiltepe meydan"] },
         { label: "Ulaş Mahallesi (Belde Meydanı)", district: "Ergene", stopName: "Ulaş Meydan", keys: ["ulas", "ulas meydan"] },
@@ -583,7 +583,7 @@ const AkilliRotaSistemi = {
         { label: "Hayrabolu Otogarı (Çarşı & Meydan)", district: "Hayrabolu", stopName: "Hayrabolu Otogar", keys: ["hayrabolu", "hayrabolu otogar", "hayrabolu meydan"] },
         { label: "Şarköy Otogarı (Sahil & İskele)", district: "Şarköy", stopName: "Şarköy Otogar", keys: ["sarkoy", "sarkoy otogar", "sarkoy sahil", "sarkoy iskele"] },
         { label: "Marmaraereğlisi Otogarı (Sahil & Perinthos)", district: "Marmaraereğlisi", stopName: "Marmaraereğlisi Otogarı", keys: ["marmaraereglisi", "marmaraereğlisi", "eregli", "ereğli", "yeniciftlik", "perinthos"] },
-        { label: "Ergene Belediyesi & Marmaracık Meydan (Sanayi Aksı)", district: "Ergene", stopName: "Ergene Belediyesi (Marmaracık Merkez)", keys: ["ergene", "marmaracik", "marmaracık", "ulas", "ulaş", "saglik", "sağlık", "yesiltepe", "yeşiltepe"] },
+        { label: "Ergene Marmaracık Meydan (Sanayi Aksı)", district: "Ergene", stopName: "Marmaracık Merkez Durağı", keys: ["ergene", "marmaracik", "marmaracık", "ulas", "ulaş", "saglik", "sağlık", "yesiltepe", "yeşiltepe"] },
 
         // ÇEVRE İLÇELER
         { label: "Çorlu Otogarı (İlçe Terminali)", district: "Çorlu", stopName: "Çorlu Otogar", keys: ["corlu", "corlu otogar"] },
@@ -1430,7 +1430,7 @@ const AkilliRotaSistemi = {
                     "Köprübaşı & Çarşı",
                     "Atatürk Spor Salonu",
                     "Altınova Sahil",
-                    "Baykallar & Emniyet"
+                    "Baykallar & Çarşı"
                 ];
             }
 
@@ -1648,9 +1648,9 @@ if (typeof document !== 'undefined') {
                 const toInput = document.getElementById('smart-to-input');
                 if (fromInput && toInput) {
                     fromInput.value = "Süleymanpaşa Yeni Otobüs Terminali";
-                    toInput.value = "Saray Belediyesi Otogarı";
+                    toInput.value = "Saray Şehir Otogarı";
                     if (typeof audio !== 'undefined' && audio.speak) {
-                        audio.speak("Süleymanpaşa Saray 62 kilometre direkt ekspres hattı devrede. Kalkış: Süleymanpaşa Yeni Otogar, Varış: Saray Belediyesi Otogarı.");
+                        audio.speak("Süleymanpaşa Saray 62 kilometre direkt ekspres hattı devrede. Kalkış: Süleymanpaşa Yeni Otogar, Varış: Saray Şehir Otogarı.");
                     }
                 }
             });

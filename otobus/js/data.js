@@ -6224,7 +6224,7 @@ const varsayilanSehirDuraklari = {
             "lon": 32.805
         },
         {
-            "name": "Bakanlıklar Durağı",
+            "name": "Kızılay Meydan Durağı",
             "lat": 39.914,
             "lon": 32.852
         },
@@ -9839,7 +9839,7 @@ const ilceRotalari = {
                             "Şehit Yüzbaşı Mayadağlı Caddesi",
                             "Yahya Kemal Beyatlı Kültür Merkezi",
                             "Fatih Sultan Mehmet Bulvarı (Baykallar)",
-                            "Yeni Emniyet Müdürlüğü",
+                            "Hürriyet Asayiş Merkezi",
                             "Alkaya – Değirmenaltı Mevkii",
                             "Namık Kemal Üniversitesi (NKÜ) Kampüs Giriş / KYK Yurtları",
                             "NKÜ Araştırma Hastanesi & Rektörlük",
@@ -9872,7 +9872,7 @@ const ilceRotalari = {
                             "Saray Meslek Yüksekokulu (Fakülte)"
                   ],
                   "desc": "Kalkış: Süleymanpaşa Yeni Otogar ➔ Varış: Saray Belediyesi Otogarı. Güzergâh: Şehir Hastanesi, NKÜ Araştırma, Çorlu Çevre Yolu, Velimeşe, Veliköy, Kızılpınar, Çerkezköy, Kapaklı, Büyükyoncalı. Toplam 43 durak, ~86 km.",
-                  "detailedInstructions": "TEKULAŞ 26 Numaralı Hat (Süleymanpaşa Yeni Otogar – Saray Otogar) Tam Güzergâh Adımları:\\n1. Adım: Süleymanpaşa Yeni Otobüs Terminali durağından bekleyen 40 yolcuyu alarak hareket edin.\\n2. Adım: 1.2 kilometre sonra Muratlı Caddesi Trafo durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n3. Adım: 0.9 kilometre sonra Göçmen Konutları Giriş durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n4. Adım: 0.8 kilometre sonra Tekirdağ Büyükşehir Belediyesi Fen İşleri durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n5. Adım: 0.7 kilometre sonra Tekirdağ Şehir Hastanesi Acil durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n6. Adım: 0.5 kilometre sonra Ağız ve Diş Sağlığı Hastanesi durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n7. Adım: 0.4 kilometre sonra Tekirdağ Şehir Hastanesi Ana Giriş durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\\n8. Adım: 1.1 kilometre sonra Muratlı Caddesi / Soğancılar durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n9. Adım: 0.8 kilometre sonra Şehit Yüzbaşı Mayadağlı Caddesi durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n10. Adım: 1 kilometre sonra Yahya Kemal Beyatlı Kültür Merkezi durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n11. Adım: 1.2 kilometre sonra Fatih Sultan Mehmet Bulvarı (Baykallar) durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n12. Adım: 1 kilometre sonra Yeni Emniyet Müdürlüğü durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n13. Adım: 1.2 kilometre sonra Alkaya – Değirmenaltı Mevkii durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n14. Adım: 1.1 kilometre sonra Namık Kemal Üniversitesi (NKÜ) Kampüs Giriş / KYK Yurtları durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n15. Adım: 0.9 kilometre sonra NKÜ Araştırma Hastanesi & Rektörlük durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\\n16. Adım: 8.5 kilometre sonra D-110 Çevre Yolu Bağlar Mevkii durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n17. Adım: 9.5 kilometre sonra D-110 / D-567 Bağlantısı (Şerefli Kavşağı) durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n18. Adım: 7 kilometre sonra Çorlu Çevre Yolu Sapağı (Transit Geçiş) durağına gidin; yolcuları indirin ve bekleyen 1 yolcuyu alıp devam edin.\\n19. Adım: 4 kilometre sonra Velimeşe Girişi (Sanayi Bağlantısı) durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n20. Adım: 1.5 kilometre sonra Velimeşe Sanayi Caddesi durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n21. Adım: 1.2 kilometre sonra Velimeşe Merkez Meydan durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n22. Adım: 2.5 kilometre sonra Veliköy Giriş durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n23. Adım: 1.2 kilometre sonra Veliköy Merkez durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n24. Adım: 1.1 kilometre sonra Veliköy Işıklar / OSB Bağlantısı durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n25. Adım: 2.2 kilometre sonra Kızılpınar Giriş durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n26. Adım: 1.1 kilometre sonra Kızılpınar Kahveler Durağı durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n27. Adım: 1 kilometre sonra Kızılpınar Merkez durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n28. Adım: 3.5 kilometre sonra Çerkezköy Narin Kavşağı durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n29. Adım: 1.5 kilometre sonra Çerkezköy Otogarı durağına gidin; yolcuları indirin ve bekleyen 10 yolcuyu alıp devam edin.\\n30. Adım: 1.2 kilometre sonra Çerkezköy Şehir İçi Geçişi durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n31. Adım: 1 kilometre sonra Çerkezköy Belediyesi / Atatürk Caddesi durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n32. Adım: 1.3 kilometre sonra Çerkezköy Devlet Hastanesi Sapağı durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n33. Adım: 2 kilometre sonra Kapaklı Giriş / Yıldızkent Kavşağı durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n34. Adım: 1.2 kilometre sonra Kapaklı Belediyesi durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n35. Adım: 0.9 kilometre sonra Kapaklı Otogarı durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\\n36. Adım: 1.4 kilometre sonra Kapaklı Sanayi Kavşağı durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n37. Adım: 2.5 kilometre sonra Pınarça Sapağı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n38. Adım: 4.5 kilometre sonra Büyükyoncalı Giriş durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n39. Adım: 1.5 kilometre sonra Büyükyoncalı Merkez (Belediye) durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n40. Adım: 2 kilometre sonra Yeniköy Kavşağı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n41. Adım: 3.5 kilometre sonra Saray Çukuryurt Sapağı durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n42. Adım: 2.5 kilometre sonra Saray Meslek Yüksekokulu (Fakülte) durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n43. Adım (Hedef Son Durak): 1.5 kilometre sonra hedef Saray Belediyesi Otogarı durağına gidin; tüm yolcuları indirin ve görevi başarıyla tamamlayın.",
+                  "detailedInstructions": "TEKULAŞ 26 Numaralı Hat (Süleymanpaşa Yeni Otogar – Saray Otogar) Tam Güzergâh Adımları:\\n1. Adım: Süleymanpaşa Yeni Otobüs Terminali durağından bekleyen 40 yolcuyu alarak hareket edin.\\n2. Adım: 1.2 kilometre sonra Muratlı Caddesi Trafo durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n3. Adım: 0.9 kilometre sonra Göçmen Konutları Giriş durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n4. Adım: 0.8 kilometre sonra Fen İşleri durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n5. Adım: 0.7 kilometre sonra Tekirdağ Şehir Hastanesi Acil durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n6. Adım: 0.5 kilometre sonra Ağız ve Diş Sağlığı Hastanesi durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n7. Adım: 0.4 kilometre sonra Tekirdağ Şehir Hastanesi Ana Giriş durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\\n8. Adım: 1.1 kilometre sonra Muratlı Caddesi / Soğancılar durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n9. Adım: 0.8 kilometre sonra Şehit Yüzbaşı Mayadağlı Caddesi durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n10. Adım: 1 kilometre sonra Yahya Kemal Beyatlı Kültür Merkezi durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n11. Adım: 1.2 kilometre sonra Fatih Sultan Mehmet Bulvarı (Baykallar) durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n12. Adım: 1 kilometre sonra Hürriyet Asayiş Merkezi durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n13. Adım: 1.2 kilometre sonra Alkaya – Değirmenaltı Mevkii durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n14. Adım: 1.1 kilometre sonra Namık Kemal Üniversitesi (NKÜ) Kampüs Giriş / KYK Yurtları durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n15. Adım: 0.9 kilometre sonra NKÜ Araştırma Hastanesi & Rektörlük durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\\n16. Adım: 8.5 kilometre sonra D-110 Çevre Yolu Bağlar Mevkii durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n17. Adım: 9.5 kilometre sonra D-110 / D-567 Bağlantısı (Şerefli Kavşağı) durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n18. Adım: 7 kilometre sonra Çorlu Çevre Yolu Sapağı (Transit Geçiş) durağına gidin; yolcuları indirin ve bekleyen 1 yolcuyu alıp devam edin.\\n19. Adım: 4 kilometre sonra Velimeşe Girişi (Sanayi Bağlantısı) durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n20. Adım: 1.5 kilometre sonra Velimeşe Sanayi Caddesi durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n21. Adım: 1.2 kilometre sonra Velimeşe Merkez Meydan durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n22. Adım: 2.5 kilometre sonra Veliköy Giriş durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n23. Adım: 1.2 kilometre sonra Veliköy Merkez durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n24. Adım: 1.1 kilometre sonra Veliköy Işıklar / OSB Bağlantısı durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n25. Adım: 2.2 kilometre sonra Kızılpınar Giriş durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n26. Adım: 1.1 kilometre sonra Kızılpınar Kahveler Durağı durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n27. Adım: 1 kilometre sonra Kızılpınar Merkez durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n28. Adım: 3.5 kilometre sonra Çerkezköy Narin Kavşağı durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n29. Adım: 1.5 kilometre sonra Çerkezköy Otogarı durağına gidin; yolcuları indirin ve bekleyen 10 yolcuyu alıp devam edin.\\n30. Adım: 1.2 kilometre sonra Çerkezköy Şehir İçi Geçişi durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n31. Adım: 1 kilometre sonra Çerkezköy Belediyesi / Atatürk Caddesi durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n32. Adım: 1.3 kilometre sonra Çerkezköy Devlet Hastanesi Sapağı durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n33. Adım: 2 kilometre sonra Kapaklı Giriş / Yıldızkent Kavşağı durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n34. Adım: 1.2 kilometre sonra Kapaklı Belediyesi durağına gidin; yolcuları indirin ve bekleyen 6 yolcuyu alıp devam edin.\\n35. Adım: 0.9 kilometre sonra Kapaklı Otogarı durağına gidin; yolcuları indirin ve bekleyen 8 yolcuyu alıp devam edin.\\n36. Adım: 1.4 kilometre sonra Kapaklı Sanayi Kavşağı durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n37. Adım: 2.5 kilometre sonra Pınarça Sapağı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n38. Adım: 4.5 kilometre sonra Büyükyoncalı Giriş durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n39. Adım: 1.5 kilometre sonra Büyükyoncalı Merkez (Belediye) durağına gidin; yolcuları indirin ve bekleyen 5 yolcuyu alıp devam edin.\\n40. Adım: 2 kilometre sonra Yeniköy Kavşağı durağına gidin; yolcuları indirin ve bekleyen 2 yolcuyu alıp devam edin.\\n41. Adım: 3.5 kilometre sonra Saray Çukuryurt Sapağı durağına gidin; yolcuları indirin ve bekleyen 3 yolcuyu alıp devam edin.\\n42. Adım: 2.5 kilometre sonra Saray Meslek Yüksekokulu (Fakülte) durağına gidin; yolcuları indirin ve bekleyen 4 yolcuyu alıp devam edin.\\n43. Adım (Hedef Son Durak): 1.5 kilometre sonra hedef Saray Şehir Otogarı durağına gidin; tüm yolcuları indirin ve görevi başarıyla tamamlayın.",
                   "speechBriefing": "TEKULAŞ 26 No'lu Süleymanpaşa Çerkezköy Kapaklı Saray ekspres otobüs seferi. Kalkış: Süleymanpaşa Yeni Otobüs Terminali. Hedef son durak: Saray Belediyesi Otogarı. Toplam 43 durak ve 86 kilometre.",
                   "color": "#0284c7",
                   "otobusKapasitesi": 50,
@@ -9981,8 +9981,8 @@ const ilceRotalari = {
                                       "lon": 27.545
                             },
                             {
-                                      "name": "Yeni Emniyet Müdürlüğü",
-                                      "anons": "Sonraki durak: Yeni Emniyet Müdürlüğü.",
+                                      "name": "Hürriyet Asayiş Merkezi",
+                                      "anons": "Sonraki durak: Hürriyet Asayiş Merkezi.",
                                       "bekleyenYolcu": 3,
                                       "inenYolcu": 1,
                                       "gercekMesafeSonraki": 1.2,
@@ -10325,7 +10325,7 @@ const ilceRotalari = {
                 },
                 {
                         "name": "Velimeşe İstasyon & Tren Garı",
-                        "anons": "Sonraki durak: Velimeşe İstasyon ve TCDD Tren Garı.",
+                        "anons": "Sonraki durak: Velimeşe İstasyon ve Tren Garı.",
                         "bekleyenYolcu": 6,
                         "inenYolcu": 3,
                         "gercekMesafeSonraki": 1.1,
@@ -10478,7 +10478,7 @@ const ilceRotalari = {
                 },
                 {
                         "name": "Velimeşe İstasyon & Tren Garı",
-                        "anons": "Sonraki durak: Velimeşe İstasyon ve TCDD Tren Garı.",
+                        "anons": "Sonraki durak: Velimeşe İstasyon ve Tren Garı.",
                         "bekleyenYolcu": 6,
                         "inenYolcu": 3,
                         "gercekMesafeSonraki": 0.5,
@@ -10700,7 +10700,7 @@ const ilceRotalari = {
                 "Cumhuriyet Caddesi Trafo",
                 "Uğur Mumcu Caddesi",
                 "Saray Belediyesi (Cumhuriyet Meydanı)",
-                "Saray Emniyet Müdürlüğü",
+                "Saray Asayiş Parkı",
                 "İstanbul Caddesi 1",
                 "İstanbul Caddesi 2",
                 "Midye Caddesi 1",
@@ -10736,7 +10736,7 @@ const ilceRotalari = {
                 { name: "Cumhuriyet Caddesi Trafo", anons: "Sonraki durak: Cumhuriyet Caddesi Trafo.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4432, lon: 27.9164 },
                 { name: "Uğur Mumcu Caddesi", anons: "Sonraki durak: Uğur Mumcu Caddesi.", bekleyenYolcu: 5, inenYolcu: 3, gercekMesafeSonraki: 0.4, lat: 41.4443, lon: 27.9178 },
                 { name: "Saray Belediyesi (Cumhuriyet Meydanı)", anons: "Sonraki durak: Saray Belediyesi Cumhuriyet Meydanı.", bekleyenYolcu: 8, inenYolcu: 5, gercekMesafeSonraki: 0.4, lat: 41.4422, lon: 27.9204 },
-                { name: "Saray Emniyet Müdürlüğü", anons: "Sonraki durak: Saray Emniyet Müdürlüğü.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4438, lon: 27.9252 },
+                { name: "Saray Asayiş Parkı", anons: "Sonraki durak: Saray Asayiş Parkı.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4438, lon: 27.9252 },
                 { name: "İstanbul Caddesi 1", anons: "Sonraki durak: İstanbul Caddesi 1.", bekleyenYolcu: 4, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4447, lon: 27.9259 },
                 { name: "İstanbul Caddesi 2", anons: "Sonraki durak: İstanbul Caddesi 2.", bekleyenYolcu: 3, inenYolcu: 2, gercekMesafeSonraki: 0.3, lat: 41.4464, lon: 27.9279 },
                 { name: "Midye Caddesi 1", anons: "Sonraki durak: Midye Caddesi 1.", bekleyenYolcu: 4, inenYolcu: 2, gercekMesafeSonraki: 0.4, lat: 41.4474, lon: 27.9293 },
@@ -12669,12 +12669,12 @@ const velimeseTumDuraklarListesi = [
   {
     "id": "velimese_durak_7",
     "durakKodu": "1056",
-    "name": "Velimeşe İstasyon Caddesi & TCDD Tren Garı",
+    "name": "Velimeşe İstasyon Caddesi & Tren Garı",
     "cadde": "İstasyon Caddesi",
     "lat": 41.2545,
     "lon": 27.905,
     "pos": 2250,
-    "anons": "Sonraki durak: Velimeşe İstasyon Caddesi ve TCDD Tren Garı.",
+    "anons": "Sonraki durak: Velimeşe İstasyon Caddesi ve Tren Garı.",
     "bekleyenYolcu": 9,
     "inenYolcu": 4,
     "gercekMesafeSonraki": 0.4

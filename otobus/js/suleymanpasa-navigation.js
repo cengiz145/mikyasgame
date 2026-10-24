@@ -122,7 +122,7 @@ const SuleymanpasaNavigasyon = {
           "cat": "Kültür Aksı"
         },
         {
-          "name": "Yeni Emniyet Müdürlüğü Caddesi",
+          "name": "Yeni Asayiş Caddesi",
           "lat": 40.9895,
           "lon": 27.5465,
           "cat": "Kamu Aksı"
@@ -432,7 +432,7 @@ const SuleymanpasaNavigasyon = {
           "cat": "Konut Aksı"
         },
         {
-          "name": "Tekirdağ Büyükşehir Belediyesi Fen İşleri Caddesi",
+          "name": "Fen İşleri Caddesi",
           "lat": 40.9915,
           "lon": 27.524,
           "cat": "Kamu Aksı"
@@ -674,12 +674,12 @@ const SuleymanpasaNavigasyon = {
     {
       "id": "spasa_sokak_17",
       "mahalle": "Hürriyet Mahallesi",
-      "name": "Yeni Emniyet Müdürlüğü Caddesi",
+      "name": "Yeni Asayiş Caddesi",
       "cat": "Kamu Aksı",
       "lat": 40.9895,
       "lon": 27.5465,
       "kwFactor": 1.35,
-      "anons": "Sonraki durak: Hürriyet Mahallesi, Yeni Emniyet Müdürlüğü Caddesi."
+      "anons": "Sonraki durak: Hürriyet Mahallesi, Yeni Asayiş Caddesi."
     },
     {
       "id": "spasa_sokak_18",
@@ -1124,12 +1124,12 @@ const SuleymanpasaNavigasyon = {
     {
       "id": "spasa_sokak_62",
       "mahalle": "Aydoğdu & Zafer Mahallesi",
-      "name": "Tekirdağ Büyükşehir Belediyesi Fen İşleri Caddesi",
+      "name": "Fen İşleri Caddesi",
       "cat": "Kamu Aksı",
       "lat": 40.9915,
       "lon": 27.524,
       "kwFactor": 1.36,
-      "anons": "Sonraki durak: Aydoğdu & Zafer Mahallesi, Tekirdağ Büyükşehir Belediyesi Fen İşleri Caddesi."
+      "anons": "Sonraki durak: Aydoğdu & Zafer Mahallesi, Fen İşleri Caddesi."
     },
     {
       "id": "spasa_sokak_63",

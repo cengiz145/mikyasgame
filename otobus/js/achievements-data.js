@@ -19725,7 +19725,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Şirket Kasası",
     "icon": "🪐",
     "title": "Kırk Milyonluk Dev Rezerv",
-    "desc": "Şirket kasasında 40.000.000 ₺ biriktirerek ulaştırma sektörünün finans devi olun.",
+    "desc": "Şirket kasasında 40.000.000 ₺ biriktirerek yolcu taşımacılığı sektörünün finans devi olun.",
     "requirement": "Şirket kasası bakiyesini en az 40.000.000 ₺ düzeyine yükseltin."
   },
   {
@@ -20024,7 +20024,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Şirket Cirosu",
     "icon": "👑",
     "title": "Yüz Elli Milyonluk Ciro Devi",
-    "desc": "Karayolu ulaştırma tarihinin en büyük hasılatına imza atın: 150.000.000 ₺ ciro!",
+    "desc": "Karayolu yolcu taşımacılığı tarihinin en büyük hasılatına imza atın: 150.000.000 ₺ ciro!",
     "requirement": "Şirket toplam cirosunu en az 150.000.000 ₺ düzeyine ulaştırın."
   },
   {
