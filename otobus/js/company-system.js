@@ -1808,7 +1808,7 @@
 
         // Şoför Rütbe ve Terfi Basamakları
         ranks: [
-            { level: 1, title: "Stajyer Şoför", badge: "🌱", reqXP: 0, speedMod: 0.95, bonusRev: 1.0, desc: "Mesleğe yeni adım atmış, acemi ama hevesli çırak şoför." },
+            { level: 1, title: "Stajyer Şoför", badge: "🌱", reqXP: 0, speedMod: 0.95, bonusRev: 1.0, desc: "Mesleğe yeni adım atmış, intizamlı ve kurallara riayet eden stajyer şoför." },
             { level: 2, title: "Yardımcı Kaptan", badge: "🔰", reqXP: 120, speedMod: 1.05, bonusRev: 1.15, desc: "Yolları öğrenmiş, şehir içi ve ilçeler arası hatta güvenilir yardımcı şoför." },
             { level: 3, title: "Kaptan Şoför", badge: "🚌", reqXP: 350, speedMod: 1.15, bonusRev: 1.30, desc: "Tam yetkili usta kaptan. Şehirlerarası uzun yollarda yolcu güvenini kazanır." },
             { level: 4, title: "Kıdemli Uzun Yol Kaptanı", badge: "⭐", reqXP: 800, speedMod: 1.25, bonusRev: 1.50, desc: "Bolu Dağı ve kar kış demeden her yolda tecrübesini konuşturan kıdemli kurt şoför." },

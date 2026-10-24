@@ -448,9 +448,9 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
         ];
 
         const allLevels = [
-            { lic: 1, name: "Çırak Kaptan", list: districtLocalKeywords, color: "#3b82f6" },
-            { lic: 2, name: "Kalfa Kaptan", list: kalfaKeywords, color: "#eab308" },
-            { lic: 3, name: "Usta Kaptan", list: corluKeywords, color: "#ef4444" },
+            { lic: 1, name: "1. Sınıf Stajyer Sürücü", list: districtLocalKeywords, color: "#3b82f6" },
+            { lic: 2, name: "2. Sınıf Kıyı Kaptanı", list: kalfaKeywords, color: "#eab308" },
+            { lic: 3, name: "3. Sınıf Metropol Kaptanı", list: corluKeywords, color: "#ef4444" },
             { lic: 4, name: "İlçe Hatları", list: ilceKeywords, color: "#a855f7" },
             { lic: 5, name: "OSB Vardiya Reisi", list: osbKeywords, color: "#f97316" },
             { lic: 6, name: "Körüklü Filo Reisi", list: korukluKeywords, color: "#06b6d4" },
@@ -648,7 +648,7 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
         const intermediateStops = selected.slice(1, -1).map(s => s.name);
         const totalStops = selected.length;
         const directionLabel = isReturn ? "(Dönüş)" : "(Gidiş)";
-        const licName = licenseLvl === 1 ? "Çırak" : (licenseLvl === 2 ? "Kalfa" : (licenseLvl === 3 ? "Usta" : "İlçeler Arası"));
+        const licName = licenseLvl === 1 ? "1. Sınıf Stajyer" : (licenseLvl === 2 ? "2. Sınıf Kıyı Kaptanı" : (licenseLvl === 3 ? "3. Sınıf Metropol Kaptanı" : "Kıdemli Kaptan"));
         
         let title = "";
         if (isTraining) {

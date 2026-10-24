@@ -104,7 +104,7 @@
     },
     {
         "day": 7,
-        "title": "7. Gün (1. Hafta): Çıraklık Brövesi Sandığı",
+        "title": "7. Gün (1. Hafta): 1. Sınıf Stajyer Brövesi İkramiyesi",
         "icon": "⭐",
         "tier": 1,
         "cash": 3500,

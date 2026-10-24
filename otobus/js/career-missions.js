@@ -166,15 +166,15 @@
                 taskNum: 10,
                 level: 1,
                 levelTitle: "1. Sınıf Stajyer Şehir İçi Sürücüsü",
-                title: "1. Seviye Çıraklık Büyük Final Seferi",
+                title: "1. Sınıf Stajyer Mezuniyet ve Yeterlilik Seferi",
                 district: "Süleymanpaşa",
                 routeSnippet: "Yeni Otogar ➔ Kumbağ Sahil Meydanı",
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "KALFA KAPTANLIK RÜTBESİ & Isuzu Novo Lux Kilidi Açılışı!",
+                featureUnlock: "2. Sınıf Kıyı & Sahil Kaptanlığı Terfisi ve Isuzu Novo Lux Teslimatı",
                 rulesActive: "Sıfır kural & sıfır ceza (Alışma devresi)",
-                dispatcherOrder: "Sayın Kaptanım, 1. Seviye Çıraklık intikal devrenizin son ve en büyük sınav seferine atanmış bulunmaktasınız. Süleymanpaşa Otogarından hareketle Kumbağ sahil hattını bağlayacak, tüm durak ve kapı sistemlerini eksiksiz icra edeceksiniz. Bu seferi başarıyla tamamladığınız takdirde Kalfa Kaptan unvanını alacak ve filomuzun yeni çevik aracı Isuzu Novo Lux'ün anahtarını teslim alacaksınız. Zaman kısıtlaması yoktur; ustalığınızı sergileyiniz. Yolunuz açık olsun."
+                dispatcherOrder: "Sayın Kaptanım, 1. Sınıf Stajyerlik devrenizin son yeterlilik sınav seferine atanmış bulunmaktasınız. Süleymanpaşa Otogarından hareketle Kumbağ sahil hattını bağlayacak, tüm durak ve kapı sistemlerini eksiksiz icra edeceksiniz. Bu seferi başarıyla tamamladığınız takdirde 2. Sınıf Süleymanpaşa Kıyı & Sahil Kaptanı brövesini alacak ve filomuzun yeni çevik aracı Isuzu Novo Lux'ün anahtarını teslim alacaksınız. Emniyetli sürüşler dileriz."
             },
             {
                 index: 10,
@@ -189,7 +189,7 @@
                 passengersAllowed: true,
                 featureUnlock: "Canlı TEKULAŞ Telsizi (T) & Dispeçer Kanalı",
                 rulesActive: "Sıfır kural & sıfır ceza (Telsiz ve yağmur sistemleri devrede)",
-                dispatcherOrder: "Sayın Kalfa Kaptanım, Altınova - Değirmenaltı ana arteri üzerinde araç içi canlı telsiz iletişim modülümüz faaliyete geçirilmiştir. Sefer esnasında T tuşu ile hareket amirliği ve diğer hat kaptanlarının telsiz koordinasyon anonslarını takip ediniz. Seferinizde süre baskısı bulunmamaktadır; trafik akışına uyum sağlayınız. Başarılar dileriz."
+                dispatcherOrder: "Sayın Kıyı Kaptanım, Altınova - Değirmenaltı ana arteri üzerinde araç içi canlı telsiz iletişim modülümüz faaliyete geçirilmiştir. Sefer esnasında T tuşu ile hareket amirliği ve diğer hat kaptanlarının telsiz koordinasyon anonslarını takip ediniz. Seferinizde süre baskısı bulunmamaktadır; trafik akışına uyum sağlayınız. Başarılar dileriz."
             },
             {
                 index: 11,
@@ -322,9 +322,9 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "USTA KAPTANLIK RÜTBESİ & BMC Neocity 10M Kilidi Açılışı!",
+                featureUnlock: "3. Sınıf Metropol Hat Kaptanlığı Terfisi & BMC Neocity 10M Teslimatı",
                 rulesActive: "Sıfır kural & sıfır ceza (Telsiz ve yağmur sistemleri devrede)",
-                dispatcherOrder: "Sayın Kalfa Kaptanım, Süleymanpaşa etabını tamamlayıp Çorlu metropolüne geçiş sınav seferiniz onaylanmıştır. Bu seferi başarıyla ikmal ettiğinizde Usta Adayı rütbesine yükselecek ve filomuzun modern aracı BMC Neocity 10M modelini teslim alacaksınız. Zaman sınırı yoktur; ustalığınızı gösteriniz. Yolunuz açık olsun."
+                dispatcherOrder: "Sayın Kıyı Kaptanım, Süleymanpaşa etabını tamamlayıp Çorlu metropolüne geçiş sınav seferiniz onaylanmıştır. Bu seferi başarıyla ikmal ettiğinizde 3. Sınıf Çorlu Sanayi & Metropol Hat Kaptanı brövesine yükselecek ve filomuzun modern aracı BMC Neocity 10M modelini teslim alacaksınız. Emniyetli sürüşler dileriz."
             },
             {
                 index: 20,
