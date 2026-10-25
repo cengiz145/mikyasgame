@@ -293,7 +293,7 @@
                 companyTreasury: (typeof CompanySystem !== 'undefined' && CompanySystem.data) ? CompanySystem.data.companyTreasury : 50000,
                 totalRevenue: (typeof CompanySystem !== 'undefined' && CompanySystem.data) ? CompanySystem.data.totalRevenue : 0,
                 satisfactionRating: 4.9,
-                badgesCount: (typeof DriverBadges !== 'undefined' && typeof DriverBadges.getTotalUnlockedAllCount === 'function') ? DriverBadges.getTotalUnlockedAllCount() : ((typeof DriverBadges !== 'undefined') ? Object.values(DriverBadges.getBadgesData()).filter(v => v && v.unlocked).length : 0),
+                badgesCount: (typeof DriverBadges !== 'undefined') ? Object.keys(DriverBadges.getBadgesData()).length : 0,
                 lastSavedTimestamp: Date.now(),
                 isMe: true
             };
@@ -308,11 +308,11 @@
         // İnternet yoksa veya veritabanı boşsa gösterilecek zengin yedek kadro
         generateFallbackData: function () {
             const list = [
-                { username: "Usta Kaptan Selim", licenseLevel: 8, playerXP: 6850, totalKm: 14250, totalPassengers: 3840, totalTrips: 180, perfectTrips: 165, currentCity: "Tekirdağ", companyName: "Tekirdağ Ekspres", companyTreasury: 420000, equippedTitle: "title_yol_efendisi" },
-                { username: "Dadaş Mehmet", licenseLevel: 7, playerXP: 5200, totalKm: 11800, totalPassengers: 3120, totalTrips: 145, perfectTrips: 130, currentCity: "Erzurum", companyName: "Dadaş Seyahat", companyTreasury: 310000, equippedTitle: "title_gece_kartali" },
-                { username: "Kaptan Fatma", licenseLevel: 6, playerXP: 3800, totalKm: 9600, totalPassengers: 2850, totalTrips: 120, perfectTrips: 112, currentCity: "İzmir", companyName: "Ege Güneşi Turizm", companyTreasury: 250000, equippedTitle: "title_ipek_ayak" },
-                { username: "Gültekin Kaptan", licenseLevel: 5, playerXP: 2550, totalKm: 7400, totalPassengers: 2100, totalTrips: 95, perfectTrips: 84, currentCity: "İstanbul", companyName: "Marmara Hatları", companyTreasury: 180000, equippedTitle: "title_usta" },
-                { username: "Murat Çırak", licenseLevel: 3, playerXP: 850, totalKm: 3800, totalPassengers: 1150, totalTrips: 52, perfectTrips: 46, currentCity: "Tekirdağ (Süleymanpaşa)", companyName: "Sahil Birlik", companyTreasury: 95000, equippedTitle: "title_halk_kahramani" }
+                { username: "Usta Kaptan Selim", licenseLevel: 8, playerXP: 4800, totalKm: 14250, totalPassengers: 3840, totalTrips: 180, perfectTrips: 165, currentCity: "Tekirdağ", companyName: "Tekirdağ Ekspres", companyTreasury: 420000, equippedTitle: "title_yol_efendisi" },
+                { username: "Dadaş Mehmet", licenseLevel: 7, playerXP: 3950, totalKm: 11800, totalPassengers: 3120, totalTrips: 145, perfectTrips: 130, currentCity: "Erzurum", companyName: "Dadaş Seyahat", companyTreasury: 310000, equippedTitle: "title_gece_kartali" },
+                { username: "Kaptan Fatma", licenseLevel: 6, playerXP: 3200, totalKm: 9600, totalPassengers: 2850, totalTrips: 120, perfectTrips: 112, currentCity: "İzmir", companyName: "Ege Güneşi Turizm", companyTreasury: 250000, equippedTitle: "title_ipek_ayak" },
+                { username: "Gültekin Kaptan", licenseLevel: 5, playerXP: 2600, totalKm: 7400, totalPassengers: 2100, totalTrips: 95, perfectTrips: 84, currentCity: "İstanbul", companyName: "Marmara Hatları", companyTreasury: 180000, equippedTitle: "title_usta" },
+                { username: "Murat Çırak", licenseLevel: 3, playerXP: 1400, totalKm: 3800, totalPassengers: 1150, totalTrips: 52, perfectTrips: 46, currentCity: "Tekirdağ (Süleymanpaşa)", companyName: "Sahil Birlik", companyTreasury: 95000, equippedTitle: "title_halk_kahramani" }
             ];
             this.mergeCurrentPlayer(list);
             this._cachedData = list;
@@ -357,11 +357,7 @@
             } else if (this.currentCategory === 'passengers') {
                 items.sort((a, b) => (b.totalPassengers || 0) - (a.totalPassengers || 0));
             } else if (this.currentCategory === 'xp') {
-                items.sort((a, b) => {
-                    const diff = (b.playerXP || 0) - (a.playerXP || 0);
-                    if (diff !== 0) return diff;
-                    return (b.licenseLevel || 1) - (a.licenseLevel || 1);
-                });
+                items.sort((a, b) => ((b.playerXP || 0) + (b.licenseLevel * 1000)) - ((a.playerXP || 0) + (a.licenseLevel * 1000)));
             } else if (this.currentCategory === 'company') {
                 items.sort((a, b) => (b.companyTreasury || 0) - (a.companyTreasury || 0));
             }
@@ -385,7 +381,7 @@
                     let myScoreText = "";
                     if (this.currentCategory === 'km') myScoreText = `${me.totalKm.toLocaleString('tr-TR')} KM`;
                     else if (this.currentCategory === 'passengers') myScoreText = `${me.totalPassengers.toLocaleString('tr-TR')} Yolcu`;
-                    else if (this.currentCategory === 'xp') myScoreText = `Seviye ${me.licenseLevel || 1} (${(me.playerXP || 0).toLocaleString('tr-TR')} XP)`;
+                    else if (this.currentCategory === 'xp') myScoreText = `Seviye ${me.licenseLevel} (${me.playerXP} XP)`;
                     else if (this.currentCategory === 'company') myScoreText = `${Math.round(me.companyTreasury).toLocaleString('tr-TR')} ₺ Kasa`;
 
                     myBanner.innerHTML = `
@@ -443,7 +439,7 @@
                     metricSubText = `${(u.playerXP || 0).toLocaleString('tr-TR')} XP | ${u.completedTasks || 0} Görev`;
                 } else if (this.currentCategory === 'company') {
                     metricText = `${Math.round(u.companyTreasury || 0).toLocaleString('tr-TR')} ₺`;
-                    metricSubText = `${u.companyName || 'Şirket'} (Seviye ${u.companyLevel || 1})`;
+                    metricSubText = `${u.companyName} (Seviye ${u.companyLevel})`;
                 }
 
                 const titleObj = this.getTitleInfo(u.equippedTitle);
@@ -614,7 +610,7 @@
                         UI.showToast(`👏 Kaptan ${user.username} tebrik edildi! Saygı ve itibar puanı iletildi.`, "success");
                     }
                     if (typeof audio !== 'undefined' && audio.speak) {
-                        audio.speak(`Kaptan ${user.username} selamlandı. Meslektaş dayanışması takdir edildi.`);
+                        audio.speak(`Kaptan ${user.username} alkışlandı. Harika bir meslektaş dayanışması!`);
                     }
                 };
             }

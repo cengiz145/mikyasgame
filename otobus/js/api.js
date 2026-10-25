@@ -876,7 +876,7 @@ function createOrGetFreeRoamRoute(cityName, districtName, neighborhoodName) {
         taskIndex: 0,
         licenseLevel: 1,
         color: "#22c55e",
-        name: "[Serbest Rota] " + (cityName || 'Tekirdağ') + " - " + (districtName || 'Merkez') + (cleanMahalle ? " (" + cleanMahalle + ")" : ""),
+        name: "[Serbest Rota] " + cityName + " - " + districtName + " (" + cleanMahalle + ")",
         startStop: stops[0].name,
         endStop: stops[stops.length - 1].name,
         intermediateStops: stops.slice(1, -1).map(s => s.name),

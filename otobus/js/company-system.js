@@ -25,13 +25,12 @@
             revenueSharePercent: 50,       // %50 Şirket Kasasına, %50 Kaptana (Serbestçe değiştirilebilir)
             cateringPackage: 'standart',   // 'ekonomik' | 'standart' | 'vip'
             institutions: {
-                bus_garage: 1,         // 1. Garaj ve Filo Sahası (Depot / Garage)
-                maintenance_depot: 1,  // 2. Bakım ve Onarım Atölyesi (Kademe / Workshop)
-                bus_wash: 1,           // 3. Otobüs Yıkama İstasyonu (Bus Wash)
-                fuel_depot: 1,         // 4. Şirket Akaryakıt İstasyonu (Fuel Depot)
-                terminal_offices: 1,   // 5. Otogar Yazıhaneleri ve Bekleme Salonları
-                driver_lodging: 1,     // 6. Personel Sosyal Tesisleri ve Dinlenme Odaları
-                catering_cargo_hub: 1  // 7. Lojistik ve İkram Deposu (Catering & Cargo Hub)
+                headquarters: 1,       // 1. Merkez Yönetim Ofisi / Genel Müdürlük (B1 Yasal Zorunluluk)
+                bus_garage: 1,         // 2. Araç Park Sahası / Garaj (B1 Yasal Zorunluluk)
+                terminal_offices: 1,   // 3. Otogar Yazıhaneleri & Peron Ağı (B1 Yasal & Operasyonel)
+                maintenance_depot: 1,  // 4. Bakım, Onarım ve Yıkama Atölyesi (Kademe Binası)
+                driver_lodging: 1,     // 5. Personel Dinlenme Evi / Kaptan Lojmanı (Takograf İhtiyacı)
+                city_agencies: 1       // 6. Şehir İçi Bilet Satış Acenteleri & Terminal Shuttle
             },
             satisfactionRating: 4.9,       // 1.0 - 5.0 (Yıldız Değerlendirmesi)
             terminalBranches: {            // Otogar Yazıhaneleri
@@ -103,9 +102,6 @@
                 badge: "⭐ Kaptan Şirketi",
                 color: "#f59e0b",
                 city: compData.city || (typeof Game !== 'undefined' && Game.currentCity) || "Tekirdağ (Süleymanpaşa)",
-                foundedCity: compData.foundedCity || (compData.city ? compData.city.split(' ')[0] : "Tekirdağ"),
-                foundedDistrict: compData.foundedDistrict || "Süleymanpaşa",
-                plate: compData.plate || "59",
                 maxCaptainsQuota: parseInt(compData.maxCaptainsQuota) || 10,
                 activeCaptainsCount: parseInt(compData.activeCaptainsCount) || 1,
                 dailySalary: parseInt(compData.dailySalary) || 2500,
@@ -140,9 +136,10 @@
         // Şirket Kasasına Hasılat Ekleme
         addCompanyRevenue: function(amount) {
             if (!amount || amount <= 0) return;
+            this.data.companyTreasury = (this.data.companyTreasury || 0) + amount;
             this.data.totalRevenue = (this.data.totalRevenue || 0) + amount;
 
-            // Eğer bir kaptan şirketinde çalışılıyorsa, şirket payı işveren şirketin kasasına akar
+            // Eğer bir kaptan şirketinde çalışılıyorsa, o şirketin topluluk kasasına da yansıt
             if (this.data.corporateEmployer) {
                 let captains = this.getCaptainCompanies();
                 const target = captains.find(c => c.id === this.data.corporateEmployer);
@@ -152,11 +149,6 @@
                         localStorage.setItem(this.COMMUNITY_STORAGE_KEY, JSON.stringify(captains));
                     } catch(e) {}
                 }
-                this.recordTransaction('income', 'tickets', `İşveren Şirket (${(target && target.name) || 'Şirket'}) Sefer Hasılat Payı`, amount);
-            } else {
-                // Kendi şirketimiz yönetiliyorsa doğrudan şirket kasasına aktarılır
-                this.data.companyTreasury = (this.data.companyTreasury || 0) + amount;
-                this.recordTransaction('income', 'tickets', 'Kaptan Sefer Hasılatı', amount);
             }
 
             this.saveData();
@@ -275,7 +267,7 @@
                 promptMsg += `⚠️ Şirket kasası şu anda borçtadır (${curTreasury.toLocaleString('tr-TR')} ₺).\n`;
                 promptMsg += `• Ticari KMH Finansmanı ile şahsi cüzdanınıza para çekmeye devam edebilirsiniz.\n`;
             }
-            promptMsg += `• DİKKAT: Şirket borcu -1.000.000 ₺'ye ulaşırsa Bağımsız Ticari Tasfiye Heyeti şirketi RESMEN İFLAS ettirir ve tasfiye eder! (Kişisel cüzdanınız, araçlarınız ve ehliyetiniz korunur).\n\n` +
+            promptMsg += `• DİKKAT: Şirket borcu -1.000.000 ₺'ye ulaşırsa Asliye Ticaret Mahkemesi şirketi RESMEN İFLAS ettirir ve tasfiye eder! (Kişisel cüzdanınız, araçlarınız ve ehliyetiniz korunur).\n\n` +
                          `Maksimum çekilebilecek kredi limiti: ${maxCreditAvailable.toLocaleString('tr-TR')} ₺`;
 
             const defVal = curTreasury > 0 ? String(Math.min(curTreasury, 10000)) : "50000";
@@ -514,39 +506,12 @@
             if (!container) return;
 
             const branches = [
-                { id: 'tekirdag', name: 'Tekirdağ Süleymanpaşa Otogarı', desc: 'Süleymanpaşa sahil ve ilçe peronları ana kalkış noktası.', cost: 0, boost: '+%30 Yolcu Akışı' },
+                { id: 'tekirdag', name: 'Tekirdağ Süleymanpaşa Otogarı', desc: 'Genel Merkez Yazıhanesi. Süleymanpaşa sahil ve ilçe peronları ana kalkış noktası.', cost: 0, boost: '+%30 Yolcu Akışı' },
                 { id: 'corlu', name: 'Çorlu Şehirlerarası Otogarı', desc: 'Sanayi ve Trakya bölge kavşağı. Çorlu ringi ve fabrika işçi-yolcu transfer merkezi.', cost: 15000, boost: '+%40 Yolcu Akışı' },
                 { id: 'istanbul_esenler', name: 'İstanbul 15 Temmuz Demokrasi Otogarı (Esenler)', desc: "Türkiye'nin ve Avrupa'nın en büyük otobüs terminali. 168 aktif peron bağlantısı ve dev yolcu hacmi.", cost: 35000, boost: '+%60 Yolcu & Bilet Satışı' },
-                { id: 'ankara_asti', name: 'Ankara AŞTİ Şehirlerarası Terminali', desc: 'Başkentin kalbi. İdari merkezler, üniversiteler ve tüm Anadolu aktarma peronları.', cost: 30000, boost: '+%50 Yolcu Akışı' },
+                { id: 'ankara_asti', name: 'Ankara AŞTİ Şehirlerarası Terminali', desc: 'Başkentin kalbi. Bakanlıklar, üniversiteler ve tüm Anadolu aktarma peronları.', cost: 30000, boost: '+%50 Yolcu Akışı' },
                 { id: 'izmir_otogar', name: 'İzmir Şehirlerarası Otobüs Terminali (İZOTAŞ)', desc: 'Ege sahilleri, Bornova ana peronları ve turizm hatlarının merkezi.', cost: 28000, boost: '+%50 Yolcu Akışı' }
             ];
-
-            const curFoundedCity = this.data.foundedCity || 'Tekirdağ';
-            const curFoundedDist = this.data.foundedDistrict || 'Süleymanpaşa';
-            const curFoundedPlate = this.data.foundedPlate || '59';
-
-            if (curFoundedCity === 'Ankara') {
-                const b = branches.find(x => x.id === 'ankara_asti');
-                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [06] Başkent peronları ana kalkış üssü.'; b.boost = '+%50 Başkent Ana Üs Hâkimiyeti'; }
-            } else if (curFoundedCity === 'İstanbul') {
-                const b = branches.find(x => x.id === 'istanbul_esenler');
-                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [34] 15 Temmuz Demokrasi Otogarı ana üssü.'; b.boost = '+%60 Metropol Ana Üs Hâkimiyeti'; }
-            } else if (curFoundedCity === 'İzmir') {
-                const b = branches.find(x => x.id === 'izmir_otogar');
-                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [35] İZOTAŞ peronları ana üssü.'; b.boost = '+%50 Ege Ana Üs Hâkimiyeti'; }
-            } else if (curFoundedCity === 'Tekirdağ') {
-                const b = branches.find(x => x.id === 'tekirdag');
-                if (b) { b.cost = 0; b.desc = 'Resmi Şirket Genel Merkezi. [59] Süleymanpaşa sahil ve peron ana kalkış noktası.'; b.boost = '+%40 Trakya Ana Üs Hâkimiyeti'; }
-            } else {
-                const dynBranchKey = 'branch_' + curFoundedCity.toLowerCase().replace(/[^a-z0-9]/g, '');
-                branches.unshift({
-                    id: dynBranchKey,
-                    name: `${curFoundedPlate ? '[' + curFoundedPlate + '] ' : ''}${curFoundedCity} ${curFoundedDist} Otogarı`,
-                    desc: `Resmi Şirket Genel Merkezi & Başyazıhane. ${curFoundedCity} ana kalkış peronları.`,
-                    cost: 0,
-                    boost: '+%45 Genel Merkez Peron Hâkimiyeti'
-                });
-            }
 
             const activeBranches = this.data.terminalBranches || { tekirdag: true };
             const curMult = this.data.ticketPricingMultiplier || 1.0;
@@ -1053,21 +1018,14 @@
             }
             const aliases = {
                 garage_maintenance: 'maintenance_depot',
-                maintenance: 'maintenance_depot',
-                garage: 'bus_garage',
-                fleet_operations: 'bus_garage',
                 driver_academy: 'driver_lodging',
-                staff_lounge: 'driver_lodging',
-                lodging: 'driver_lodging',
                 ticketing_network: 'terminal_offices',
                 city_agencies: 'terminal_offices',
-                headquarters: 'terminal_offices',
                 catering_logistics: 'catering_cargo_hub',
-                cargo_hub: 'catering_cargo_hub',
                 highway_resort: 'fuel_depot',
-                fuel_station: 'fuel_depot',
-                wash_station: 'bus_wash',
-                wash: 'bus_wash'
+                fleet_operations: 'bus_garage',
+                headquarters: 'terminal_offices',
+                fuel_station: 'fuel_depot'
             };
             const targetKey = aliases[instId] || instId;
             return this.data.institutions[instId] || this.data.institutions[targetKey] || 1;
@@ -1102,21 +1060,11 @@
         upgradeInstitution: function(instId) {
             const aliases = {
                 garage_maintenance: 'maintenance_depot',
-                maintenance: 'maintenance_depot',
-                garage: 'bus_garage',
-                fleet_operations: 'bus_garage',
                 driver_academy: 'driver_lodging',
-                staff_lounge: 'driver_lodging',
-                lodging: 'driver_lodging',
-                ticketing_network: 'terminal_offices',
-                city_agencies: 'terminal_offices',
-                headquarters: 'terminal_offices',
-                catering_logistics: 'catering_cargo_hub',
-                cargo_hub: 'catering_cargo_hub',
-                highway_resort: 'fuel_depot',
-                fuel_station: 'fuel_depot',
-                wash_station: 'bus_wash',
-                wash: 'bus_wash'
+                ticketing_network: 'city_agencies',
+                catering_logistics: 'maintenance_depot',
+                highway_resort: 'terminal_offices',
+                fleet_operations: 'headquarters'
             };
             const targetKey = aliases[instId] || instId;
             instId = targetKey;
@@ -1124,7 +1072,7 @@
             if (!inst) return;
             const currentLevel = this.getInstitutionLevel(instId);
             if (currentLevel >= 3) {
-                const maxMsg = `${inst.name} zaten maksimum zirve seviyededir (${(inst.levels && inst.levels[2] && inst.levels[2].title) || 'Son Seviye'}).`;
+                const maxMsg = `${inst.name} zaten maksimum zirve seviyededir (${inst.levels[2].title}).`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(maxMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(maxMsg, 'info');
                 return;
@@ -1183,7 +1131,7 @@
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(speechMsg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(toastMsg, 'success');
 
-            this.addRadioLog("🏢 Merkez İdare", "🏛️", `${inst.name} tesisimiz Seviye ${nextLvlObj.level}'e terfi etti (${(nextLvlObj && nextLvlObj.title) || 'Yeni Seviye'}). Filonun yeni gücü: ${(nextLvlObj && nextLvlObj.perkShort) || ''}`, "system");
+            this.addRadioLog("🏢 Merkez İdare", "🏛️", `${inst.name} tesisimiz Seviye ${nextLvlObj.level}'e terfi etti (${nextLvlObj.title}). Filonun yeni gücü: ${nextLvlObj.perkShort}`, "system");
 
             this.renderAll();
         },
@@ -1423,16 +1371,13 @@
             // Şirketi sıfırla ve kapat
             this.data.companyTreasury = 0;
             this.data.hiredDrivers = [];
-            this.data.corporateEmployer = null;
-            this.data.isIndependentMode = true;
             this.data.institutions = {
+                headquarters: 1,
                 bus_garage: 1,
-                maintenance_depot: 1,
-                bus_wash: 1,
-                fuel_depot: 1,
                 terminal_offices: 1,
+                maintenance_depot: 1,
                 driver_lodging: 1,
-                catering_cargo_hub: 1
+                city_agencies: 1
             };
             this.data.terminalBranches = {
                 tekirdag: true,
@@ -1448,9 +1393,6 @@
                 corporateBrand: false
             };
             this.data.companyLevel = 1;
-            this.data.foundedCity = "Tekirdağ";
-            this.data.foundedDistrict = "Süleymanpaşa";
-            this.data.foundedPlate = "59";
             this.data.revenueSharePercent = 0; // %100 kaptan cüzdanına kalır
 
             // Topluluk listesinden çıkar (varsa)
@@ -1484,92 +1426,26 @@
                 if (inpFounder) {
                     inpFounder.value = (typeof Game !== 'undefined' && Game.username) ? Game.username : "Ümit Ekrem Mikyas";
                 }
-
-                const provSelect = document.getElementById('new-comp-province-select');
-                const curProv = this.data.foundedCity || (typeof Game !== 'undefined' && Game.currentCity) || "Tekirdağ";
-                const curDist = this.data.foundedDistrict || (typeof Game !== 'undefined' && Game.activeDistrict) || "Süleymanpaşa";
-
-                if (provSelect) {
-                    for (let i = 0; i < provSelect.options.length; i++) {
-                        if (provSelect.options[i].value === curProv) {
-                            provSelect.selectedIndex = i;
-                            break;
-                        }
-                    }
+                const inpCity = document.getElementById('new-comp-city');
+                if (inpCity) {
+                    inpCity.value = (typeof Game !== 'undefined' && Game.currentCity) ? `${Game.currentCity} (${Game.activeDistrict || 'Süleymanpaşa'})` : "Tekirdağ (Süleymanpaşa)";
                 }
-
-                this._updateDistricts(curProv, curDist);
-
                 if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("Yeni bir şirket kurma penceresi açıldı. Şirketinizin adını, merkez ilini, merkez ilçesini ve kaptan şartlarını belirleyebilirsiniz.");
+                    audio.speak("Yeni bir şirket kurma penceresi açıldı. Şirketinizin adını, çalıştıracağınız kaptan sayısını ve vereceğiniz günlük maaşı belirleyebilirsiniz.");
                 }
             }
         },
 
-        // İlçe Seçimini Dinamik Güncelleme Yardımcısı
-        _updateDistricts: function(provinceName, selectDistrictName) {
-            const distSelect = document.getElementById('new-comp-district-select');
-            const previewEl = document.getElementById('preview-comp-hq');
-            if (!distSelect) return;
-            distSelect.innerHTML = '';
-
-            let distList = [];
-            const admin = (typeof window !== 'undefined' && window.TurkeyAdminData) ? window.TurkeyAdminData : (typeof TurkeyAdminData !== 'undefined' ? TurkeyAdminData : null);
-            if (admin && admin[provinceName] && admin[provinceName].districts) {
-                distList = Object.keys(admin[provinceName].districts);
-            } else if (typeof sehirRotalari !== 'undefined' && sehirRotalari[provinceName] && sehirRotalari[provinceName].ilceler) {
-                distList = sehirRotalari[provinceName].ilceler;
-            } else {
-                distList = ["Merkez"];
-            }
-
-            distList.forEach(d => {
-                const opt = document.createElement('option');
-                opt.value = d;
-                opt.textContent = d;
-                if (selectDistrictName && d.toLowerCase() === selectDistrictName.toLowerCase()) {
-                    opt.selected = true;
-                }
-                distSelect.appendChild(opt);
-            });
-
-            if (!distSelect.value && distSelect.options.length > 0) {
-                distSelect.options[0].selected = true;
-            }
-
-            const chosenDist = distSelect.value || 'Merkez';
-            const plate = (admin && admin[provinceName]) ? admin[provinceName].plate : '';
-            if (previewEl) {
-                previewEl.textContent = `${plate ? '[' + plate + '] ' : ''}${provinceName} (${chosenDist}) Otogarı`;
-            }
-        },
-
-        // Yeni Şirket Kurma Modalını Enjekte Et (81 İl ve İlçe Seçimi Destekli)
+        // Yeni Şirket Kurma Modalını Enjekte Et
         injectCreateCompanyModal: function() {
             if (document.getElementById('create-company-modal')) return;
 
-            // 81 İli Plaka Sırasına Göre Hazırla
-            let provinceOptions = '';
-            const admin = (typeof window !== 'undefined' && window.TurkeyAdminData) ? window.TurkeyAdminData : (typeof TurkeyAdminData !== 'undefined' ? TurkeyAdminData : null);
-            if (admin) {
-                const pKeys = Object.keys(admin);
-                pKeys.sort((a, b) => parseInt(admin[a].plate || '99') - parseInt(admin[b].plate || '99'));
-                pKeys.forEach(p => {
-                    const pl = admin[p].plate ? admin[p].plate + ' - ' : '';
-                    const reg = admin[p].region ? ' (' + admin[p].region + ')' : '';
-                    const isSel = (p === (this.data.foundedCity || 'Tekirdağ')) ? 'selected' : '';
-                    provinceOptions += `<option value="${p}" ${isSel}>${pl}${p}${reg}</option>`;
-                });
-            } else {
-                provinceOptions = '<option value="Tekirdağ" selected>59 - Tekirdağ (Marmara)</option>';
-            }
-
             const modalHtml = `
             <div id="create-company-modal" class="modal-overlay modal hidden" role="dialog" aria-modal="true" aria-labelledby="create-comp-title" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 8900; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-                <div class="glass-panel" style="max-width: 650px; width: 95%; padding: 24px 28px; text-align: left; max-height: 92vh; overflow-y: auto; border: 2px solid #f59e0b; box-shadow: 0 0 45px rgba(245, 158, 11, 0.4); border-radius: 14px;">
+                <div class="glass-panel" style="max-width: 620px; width: 95%; padding: 24px 28px; text-align: left; max-height: 92vh; overflow-y: auto; border: 2px solid #f59e0b; box-shadow: 0 0 45px rgba(245, 158, 11, 0.4); border-radius: 14px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(250, 204, 21, 0.2); padding-bottom: 10px;">
                         <h2 id="create-comp-title" style="margin: 0; font-size: 1.6rem; color: #facc15; display: flex; align-items: center; gap: 8px;">
-                            🏢 Yeni Bir Şirket Kur & Tescille
+                            🏢 Yeni Bir Şirket Kur
                         </h2>
                         <button id="btn-close-create-comp-modal" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="Pencereyi kapat">✕ Kapat</button>
                     </div>
@@ -1577,7 +1453,7 @@
                     <form id="form-create-company" onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 14px;">
                         <div>
                             <label for="new-comp-name" style="display: block; color: #fde047; font-weight: bold; font-size: 0.95rem; margin-bottom: 4px;">🏢 Şirketinizin Adı:</label>
-                            <input id="new-comp-name" type="text" maxlength="40" required placeholder="Örn: Mikyas Seyahat, Başkent Turizm, Ege Hatları" style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #ca8a04; color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box;" />
+                            <input id="new-comp-name" type="text" maxlength="40" required placeholder="Örn: Mikyas Seyahat, Trakya Lojistik" style="width: 100%; padding: 10px 14px; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #ca8a04; color: #fff; border-radius: 8px; font-size: 1rem; box-sizing: border-box;" />
                         </div>
 
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -1586,25 +1462,8 @@
                                 <input id="new-comp-founder" type="text" maxlength="30" required style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" />
                             </div>
                             <div>
-                                <label for="new-comp-province-select" style="display: block; color: #fde047; font-weight: bold; font-size: 0.92rem; margin-bottom: 4px;">📍 Şirketin Kurulacağı İl (81 İl):</label>
-                                <select id="new-comp-province-select" style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #ca8a04; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
-                                    ${provinceOptions}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                            <div>
-                                <label for="new-comp-district-select" style="display: block; color: #38bdf8; font-weight: bold; font-size: 0.92rem; margin-bottom: 4px;">🏙️ Şirket Merkez İlçesi / Ana Peron:</label>
-                                <select id="new-comp-district-select" style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #0284c7; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;">
-                                </select>
-                                <small style="color: #94a3b8; font-size: 0.78rem; display: block; margin-top: 3px;">Seçtiğiniz ile göre tüm ilçeler listelenir.</small>
-                            </div>
-                            <div style="display: flex; flex-direction: column; justify-content: center;">
-                                <div style="background: rgba(30, 41, 59, 0.85); border: 1.5px solid #ca8a04; border-radius: 8px; padding: 10px 14px; color: #fde047; font-size: 0.84rem; line-height: 1.45;">
-                                    🏢 Genel Merkez: <strong id="preview-comp-hq" style="color: #fff;">Tekirdağ (Süleymanpaşa) Otogarı</strong><br>
-                                    🏛️ <span style="color:#38bdf8; font-weight: bold;">Resmi Şirket Genel Merkezi & Ana Garaj</span>
-                                </div>
+                                <label for="new-comp-city" style="display: block; color: #cbd5e1; font-size: 0.9rem; margin-bottom: 4px;">📍 Merkez Şehir:</label>
+                                <input id="new-comp-city" type="text" maxlength="40" style="width: 100%; padding: 9px 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid #475569; color: #fff; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" />
                             </div>
                         </div>
 
@@ -1676,47 +1535,12 @@
                 document.getElementById('create-company-modal').classList.add('hidden');
             });
 
-            const provSelect = document.getElementById('new-comp-province-select');
-            const distSelect = document.getElementById('new-comp-district-select');
-
-            provSelect.addEventListener('change', () => {
-                const selectedProv = provSelect.value;
-                this._updateDistricts(selectedProv);
-                const count = distSelect.options.length;
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(`${selectedProv} ili seçildi. ${count} ilçe listelendi.`);
-                }
-            });
-
-            distSelect.addEventListener('change', () => {
-                const chosenDist = distSelect.value;
-                const selectedProv = provSelect.value;
-                const adminData = (typeof window !== 'undefined' && window.TurkeyAdminData) ? window.TurkeyAdminData : (typeof TurkeyAdminData !== 'undefined' ? TurkeyAdminData : null);
-                const plate = (adminData && adminData[selectedProv]) ? adminData[selectedProv].plate : '';
-                const previewEl = document.getElementById('preview-comp-hq');
-                if (previewEl) {
-                    previewEl.textContent = `${plate ? '[' + plate + '] ' : ''}${selectedProv} (${chosenDist}) Otogarı`;
-                }
-                if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak(`${chosenDist} ilçesi merkez garaj olarak belirlendi.`);
-                }
-            });
-
             document.getElementById('form-create-company').addEventListener('submit', () => {
                 const name = document.getElementById('new-comp-name').value.trim();
                 const founder = document.getElementById('new-comp-founder').value.trim();
-                const pSelect = document.getElementById('new-comp-province-select');
-                const dSelect = document.getElementById('new-comp-district-select');
-                const province = pSelect ? pSelect.value : (this.data.foundedCity || (typeof Game !== 'undefined' && Game.currentCity) || "Tekirdağ");
-                const district = dSelect ? dSelect.value : (this.data.foundedDistrict || (typeof Game !== 'undefined' && Game.activeDistrict) || "Süleymanpaşa");
-                const adminData = (typeof window !== 'undefined' && window.TurkeyAdminData) ? window.TurkeyAdminData : (typeof TurkeyAdminData !== 'undefined' ? TurkeyAdminData : null);
-                const plate = (adminData && adminData[province]) ? adminData[province].plate : (province === 'Tekirdağ' ? '59' : '');
-                const cityFull = `${province} (${district})`;
-
+                const city = document.getElementById('new-comp-city').value.trim();
                 const quota = document.getElementById('new-comp-quota').value;
                 const salary = document.getElementById('new-comp-salary').value;
-                const shareEl = document.getElementById('new-comp-share');
-                const sharePercent = shareEl ? (parseInt(shareEl.value) || 50) : 50;
                 const bonus = document.getElementById('new-comp-bonus').value;
                 const slogan = document.getElementById('new-comp-slogan').value.trim();
 
@@ -1725,10 +1549,7 @@
                 const compObj = this.registerCaptainCompany({
                     name: name,
                     founder: founder,
-                    city: cityFull,
-                    foundedCity: province,
-                    foundedDistrict: district,
-                    plate: plate,
+                    city: city,
                     maxCaptainsQuota: quota,
                     activeCaptainsCount: 1,
                     dailySalary: salary,
@@ -1738,63 +1559,14 @@
                 });
 
                 this.data.companyName = name;
-                this.data.foundedCity = province;
-                this.data.foundedDistrict = district;
-                this.data.foundedPlate = plate;
                 this.data.revenueSharePercent = sharePercent;
-                this.data.isIndependentMode = false;
-                this.data.corporateEmployer = null;
-
-                // Seçilen ilin Genel Merkez Yazıhanesini otomatik aç
-                if (!this.data.terminalBranches) this.data.terminalBranches = {};
-                if (province === 'Tekirdağ') {
-                    this.data.terminalBranches.tekirdag = true;
-                } else if (province === 'İstanbul') {
-                    this.data.terminalBranches.istanbul_esenler = { type: 'owned', name: `İstanbul Esenler Terminali (${name} Genel Merkez)`, openedAt: Date.now(), managerTitle: 'Genel Merkez Müdürü' };
-                } else if (province === 'Ankara') {
-                    this.data.terminalBranches.ankara_asti = { type: 'owned', name: `Ankara AŞTİ Terminali (${name} Genel Merkez)`, openedAt: Date.now(), managerTitle: 'Genel Merkez Müdürü' };
-                } else if (province === 'İzmir') {
-                    this.data.terminalBranches.izmir_otogar = { type: 'owned', name: `İzmir İZOTAŞ Terminali (${name} Genel Merkez)`, openedAt: Date.now(), managerTitle: 'Genel Merkez Müdürü' };
-                } else {
-                    const dynBranchKey = 'branch_' + province.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    this.data.terminalBranches[dynBranchKey] = {
-                        type: 'owned',
-                        name: `${plate ? '[' + plate + '] ' : ''}${province} ${district} Otogarı (${name} Genel Merkez)`,
-                        openedAt: Date.now(),
-                        managerTitle: 'Genel Merkez Müdürü & Başyazıhane'
-                    };
-                }
-
-                // Oyuncunun mevcut şehir ve ilçe konumunu kurulan ile taşı
-                if (typeof Game !== 'undefined') {
-                    Game.currentCity = province;
-                    Game.activeDistrict = district;
-                    localStorage.setItem('merkezUs', province);
-                    if (!Array.isArray(Game.unlockedCities)) Game.unlockedCities = ["Tekirdağ"];
-                    if (!Game.unlockedCities.includes(province)) {
-                        Game.unlockedCities.push(province);
-                    }
-                    localStorage.setItem('unlockedCities', JSON.stringify(Game.unlockedCities));
-                    Game.saveData();
-                    if (typeof UI !== 'undefined') {
-                        if (typeof UI.updateCityDisplay === 'function') UI.updateCityDisplay();
-                        if (typeof UI.renderCityMap === 'function') UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
-                    }
-                }
-
-                try {
-                    localStorage.setItem('otobusCompany', name);
-                    if (typeof Multiplayer !== 'undefined' && Multiplayer.profile) {
-                        Multiplayer.profile.company = name;
-                    }
-                } catch(e) {}
                 this.saveData();
 
                 document.getElementById('create-company-modal').classList.add('hidden');
 
-                const succMsg = `Tebrikler Kaptan! ${name} şirketi, ${plate ? '[' + plate + '] ' : ''}${province} ili ${district} ilçesi merkezli olarak resmen kuruldu. Genel merkeziniz ve peron yazıhaneniz ${district} otogarında hizmete girdi!`;
+                const succMsg = `Tebrikler! ${name} şirketi başarıyla kuruldu. Kurucu kaptan: ${founder}. Kontenjan: ${quota}, günlük maaş: ${parseInt(salary).toLocaleString('tr-TR')} ₺ olarak tescillendi.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(succMsg);
-                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏢 ${name} Şirketi ${province} (${district}) Merkezli Kuruldu!`, "success");
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏢 ${name} Şirketi Başarıyla Kuruldu!`, "success");
 
                 this.renderAll();
 
@@ -1803,7 +1575,8 @@
                 if (tabCorp) tabCorp.click();
             });
         },
-// Şirketler Sadece Gerçek İnsanlar / Kaptanlar Tarafından Kurulur (Yapay Şirket Bulunmaz)
+
+        // Şirketler Sadece Gerçek İnsanlar / Kaptanlar Tarafından Kurulur (Yapay Şirket Bulunmaz)
         corporateCompanies: [],
 
         // Şoför Rütbe ve Terfi Basamakları
@@ -2163,22 +1936,13 @@
                     // Eksik alanları tamamla
                     if (!this.data.institutions) {
                         this.data.institutions = {
+                            headquarters: 1,
                             bus_garage: 1,
-                            maintenance_depot: 1,
-                            bus_wash: 1,
-                            fuel_depot: 1,
                             terminal_offices: 1,
+                            maintenance_depot: 1,
                             driver_lodging: 1,
-                            catering_cargo_hub: 1
+                            city_agencies: 1
                         };
-                    } else {
-                        // Mevcut verilerdeki eksik kurumları tamamla
-                        const standardInsts = ['bus_garage', 'maintenance_depot', 'bus_wash', 'fuel_depot', 'terminal_offices', 'driver_lodging', 'catering_cargo_hub'];
-                        standardInsts.forEach(key => {
-                            if (!this.data.institutions[key]) {
-                                this.data.institutions[key] = 1;
-                            }
-                        });
                     }
                     if (!this.data.hqUpgrades) {
                         this.data.hqUpgrades = { fuelContract: false, luxuryLounge: false, terminalPlatform: false, corporateBrand: false };
@@ -2231,76 +1995,6 @@
             if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
                 Game.saveData();
             }
-            if (!this._isCheckingBadges && typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkBadges === 'function') {
-                this._isCheckingBadges = true;
-                try {
-                    DriverBadges.checkBadges({});
-                } catch(e) {}
-                this._isCheckingBadges = false;
-            }
-        },
-
-        // Şirketi Sıfırdan Temiz Başlangıç Seviyesine Döndür
-        resetToDefault: function () {
-            this.data = {
-                companyName: "Mikyas Seyahat & Turizm",
-                foundedCity: "Tekirdağ",
-                foundedDistrict: "Süleymanpaşa",
-                foundedPlate: "59",
-                foundedDate: Date.now(),
-                totalRevenue: 0,
-                completedTripsCount: 0,
-                companyLevel: 1,
-                companyTreasury: 50000,
-                revenueSharePercent: 50,
-                cateringPackage: 'standart',
-                institutions: {
-                    bus_garage: 1,
-                    maintenance_depot: 1,
-                    bus_wash: 1,
-                    fuel_depot: 1,
-                    terminal_offices: 1,
-                    driver_lodging: 1,
-                    catering_cargo_hub: 1
-                },
-                satisfactionRating: 4.9,
-                terminalBranches: {
-                    tekirdag: true,
-                    corlu: false,
-                    istanbul_esenler: false,
-                    ankara_asti: false,
-                    izmir_otogar: false
-                },
-                ticketPricingMultiplier: 1.0,
-                facilityContract: 'standart',
-                hqUpgrades: {
-                    fuelContract: false,
-                    luxuryLounge: false,
-                    terminalPlatform: false,
-                    corporateBrand: false
-                },
-                busConditions: {},
-                hiredDrivers: [],
-                marketTrends: {},
-                specialContracts: [],
-                radioLogs: [],
-                bankruptcyWarned250k: false,
-                bankruptcyWarned750k: false,
-                bankruptcyCount: 0,
-                corporateEmployer: null,
-                isIndependentMode: false
-            };
-            try {
-                if (typeof localStorage !== 'undefined') {
-                    localStorage.removeItem(this.LEGACY_STORAGE_KEY);
-                    localStorage.removeItem(this.COMMUNITY_STORAGE_KEY);
-                    localStorage.removeItem('otobusCompany');
-                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.data));
-                }
-            } catch (e) {
-                console.warn("[CompanySystem] resetToDefault storage hatası:", e);
-            }
-            return true;
         },
 
         // Şoförün Rütbe Bilgisini Getir
@@ -2550,15 +2244,14 @@
                 return false;
             }
 
-            const garageLevel = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('maintenance_depot') : 1;
+            const garageLevel = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('garage_maintenance') : 1;
             let costMultiplier = 8;
             if (garageLevel === 2) costMultiplier = 4.4; // %45 Kademe İndirimi (Gelişmiş Liftler & Diagnostik)
             else if (garageLevel >= 3) costMultiplier = 2.8; // %65 Mega Kademe İndirimi (Kendi Revizyon Üssümüz)
             const repairCost = Math.round((100 - curCond) * costMultiplier);
-            const companyTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
-            const playerBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
-            if ((companyTreasury + playerBudget) < repairCost) {
-                const msg = `Yetersiz bakiye! ${bus.fullName} periyodik bakımı için ${repairCost.toLocaleString('tr-TR')} ₺ gerekiyor.`;
+            const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            if (currentBudget < repairCost) {
+                const msg = `Yetersiz bakiye! ${bus.fullName} periyodik bakımı için ${repairCost} ₺ gerekiyor.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                 if (typeof UI !== 'undefined') UI.showToast(`⚠️ ${msg}`, "warning");
                 return false;
@@ -2614,7 +2307,7 @@
                 const busId = d.assignedBusId || "otokar_kent_lf";
                 const cond = this.getBusCondition(busId);
                 if (cond < 90 && !busesToFix.some(b => b.busId === busId)) {
-                    const garageLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('maintenance_depot') : 1;
+                    const garageLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('garage_maintenance') : 1;
                     let mult = 8;
                     if (garageLvl === 2) mult = 4.4; // %45 İndirim
                     else if (garageLvl >= 3) mult = 2.8; // %65 İndirim
@@ -3488,10 +3181,10 @@
                 if (!this.data.bankruptcyWarned750k) {
                     this.data.bankruptcyWarned750k = true;
                     this.playEmergencySiren();
-                    const redMsg = `🚨 ACİL İFLAS UYARISI! Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ seviyesine ulaştı! Borç -1.000.000 ₺ sınırına dayanırsa Ticari Tasfiye Heyeti şirketimizi tasfiye edecektir! Lütfen cüzdandan şirkete para yatırın veya giderlerinizi kısın!`;
+                    const redMsg = `🚨 ACİL İFLAS UYARISI! Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ seviyesine ulaştı! Borç -1.000.000 ₺ sınırına dayanırsa mahkeme şirketimizi tasfiye edecektir! Lütfen cüzdandan şirkete para yatırın veya giderlerinizi kısın!`;
                     if (typeof audio !== 'undefined' && audio.speak) audio.speak(redMsg);
                     if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(redMsg, 'error');
-                    this.addRadioLog("⚖️ Hukuk ve Mali Müşavir", "🚨", `Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ oldu! -1.000.000 ₺'de Ticari Tasfiye Heyeti iflas kararı verecek!`, "danger");
+                    this.addRadioLog("⚖️ Hukuk ve Mali Müşavir", "🚨", `Şirket borcumuz ${treasury.toLocaleString('tr-TR')} ₺ oldu! -1.000.000 ₺'de Asliye Ticaret Mahkemesi iflas kararı verecek!`, "danger");
                 }
             } else {
                 this.data.bankruptcyWarned750k = false;
@@ -3522,13 +3215,12 @@
             this.data.companyTreasury = 0;
             this.data.companyLevel = 1;
             this.data.institutions = {
+                headquarters: 1,
                 bus_garage: 1,
-                maintenance_depot: 1,
-                bus_wash: 1,
-                fuel_depot: 1,
                 terminal_offices: 1,
+                maintenance_depot: 1,
                 driver_lodging: 1,
-                catering_cargo_hub: 1
+                city_agencies: 1
             };
             this.data.terminalBranches = {
                 tekirdag: true,
@@ -3555,7 +3247,7 @@
             this.data.bankruptcyCount = (this.data.bankruptcyCount || 0) + 1;
 
             // Muhasebe Defterine Borç Tasfiyesi Kaydı
-            this.recordTransaction('income', 'debt_relief', '⚖️ Ticari Tasfiye Heyeti Kararı ile Borç Sıfırlaması', Math.abs(prevTreasury));
+            this.recordTransaction('income', 'debt_relief', '⚖️ Asliye Ticaret Mahkemesi Tasfiye Kararı ile Borç Sıfırlaması', Math.abs(prevTreasury));
 
             this.saveData();
 
@@ -3563,23 +3255,23 @@
             this.addRadioLog(
                 "⚖️ İcra & Tasfiye Masası",
                 "🏛️",
-                `Ticari Tasfiye Heyeti Kararıyla ${compName} iflas etmiş ve tasfiye masasına devredilmiştir. ${Math.abs(prevTreasury).toLocaleString('tr-TR')} ₺ borç sıfırlanmış, şirket 1. Seviye Yazıhane olarak yeniden yapılandırılmıştır.`,
+                `Asliye Ticaret Mahkemesi Kararıyla ${compName} iflas etmiş ve tasfiye masasına devredilmiştir. ${Math.abs(prevTreasury).toLocaleString('tr-TR')} ₺ borç sıfırlanmış, şirket 1. Seviye Yazıhane olarak yeniden yapılandırılmıştır.`,
                 "danger"
             );
 
             // Şirket Yönetim Modalı Açıksa Kapat
             this.closeCompanyModal();
 
-            // Tasfiye Tokmak Sesi
+            // Mahkeme Tokmak Sesi
             this.playCourtGavelSound();
 
             // Sesli Anons ve Uyarı
             if (typeof audio !== 'undefined' && audio.speak) {
-                const speechText = `Ticari Tasfiye ve İflas Heyeti Kararı: Şirketiniz bir milyon Türk Lirası borç sınırına ulaştığı için resmen iflas etmiş ve tasfiye edilmiştir. Şirketin bir milyon liralık borcu tasfiye masası tarafından tamamen silinmiştir. Binalar temel seviyeye çekilmiş ve şoförlerin sözleşmeleri feshedilmiştir. Şahsi ehliyetiniz, şahsi otobüsleriniz ve cüzdanınız korunmuştur. Dilerseniz kurumsal şirketlerde çalışıp nakit biriktirebilir ya da sıfırdan yeniden başlayabilirsiniz.`;
+                const speechText = `T.C. Asliye Ticaret Mahkemesi Kararı: Şirketiniz bir milyon Türk Lirası borç sınırına ulaştığı için resmen iflas etmiş ve tasfiye edilmiştir. Şirketin bir milyon liralık borcu tasfiye masası tarafından tamamen silinmiştir. Binalar temel seviyeye çekilmiş ve şoförlerin sözleşmeleri feshedilmiştir. Şahsi ehliyetiniz, şahsi otobüsleriniz ve cüzdanınız korunmuştur. Dilerseniz kurumsal şirketlerde çalışıp nakit biriktirebilir ya da sıfırdan yeniden başlayabilirsiniz.`;
                 audio.speak(speechText);
             }
 
-            // Görsel ve Erişilebilir Resmi Ticari İflas Tutanağı Modalı Aç
+            // Görsel ve Erişilebilir Resmi Mahkeme İflas Tutanağı Modalı Aç
             this.showBankruptcyModal(prevTreasury, releasedDriversCount);
         },
 
@@ -3594,7 +3286,7 @@
                     <div style="text-align: center; border-bottom: 2px solid rgba(239, 68, 68, 0.4); padding-bottom: 14px; margin-bottom: 18px;">
                         <div style="font-size: 2.2rem; margin-bottom: 4px;">⚖️</div>
                         <h2 id="bankruptcy-modal-title" style="color: #ef4444; font-size: 1.4rem; font-weight: 800; margin: 0; letter-spacing: 0.5px; text-transform: uppercase;">
-                            TİCARİ İFLAS VE FİNANSAL TASFİYE HEYETİ
+                            T.C. ASLİYE TİCARET MAHKEMESİ VE İCRA İFLAS MÜDÜRLÜĞÜ
                         </h2>
                         <div style="color: #fca5a5; font-size: 1.05rem; font-weight: bold; margin-top: 4px;">
                             RESMİ ŞİRKET İFLAS VE TASFİYE TUTANAĞI
@@ -3654,8 +3346,8 @@
 
                     <!-- EKRAN OKUYUCU BUTONU -->
                     <div style="margin-top: 14px;">
-                        <button id="btn-confirm-bankruptcy" class="modern-btn nav-item" style="width: 100%; padding: 14px 20px; font-size: 1.05rem; font-weight: bold; background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #fff; border: 2px solid #ef4444; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.45); transition: all 0.2s;" aria-label="Ticari Tasfiye Kararını Okudum ve Onaylıyorum, Temiz Bir Sayfa Aç, düğme">
-                            📜 Ticari Tasfiye Kararını Onaylıyorum ve Temiz Sayfa Açıyorum (Enter / Space)
+                        <button id="btn-confirm-bankruptcy" class="modern-btn nav-item" style="width: 100%; padding: 14px 20px; font-size: 1.05rem; font-weight: bold; background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: #fff; border: 2px solid #ef4444; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.45); transition: all 0.2s;" aria-label="Mahkeme Tasfiye Kararını Okudum ve Onaylıyorum, Temiz Bir Sayfa Aç, düğme">
+                            📜 Mahkeme Tasfiye Kararını Onaylıyorum ve Temiz Sayfa Açıyorum (Enter / Space)
                         </button>
                     </div>
 
@@ -3708,7 +3400,7 @@
 
             const descEl = document.getElementById('bankruptcy-modal-desc');
             if (descEl) {
-                descEl.innerHTML = `<strong>Resmi İflas Kararı:</strong> Sayın Şirket Sahibi; <strong>${compName}</strong> ticari işletmesi, toplam <strong>-${absDebt} ₺</strong> borç bakiyesine ulaşarak yasal <strong>-1.000.000 ₺</strong> iflas sınırını aşmıştır. Ticari İşletme Standartları gereğince şirketin mevcut operasyonel tüzel kişiliği feshedilmiş ve tasfiye protokolü icra edilmiştir.`;
+                descEl.innerHTML = `<strong>Resmi İflas Kararı:</strong> Sayın Şirket Sahibi; <strong>${compName}</strong> ticari işletmesi, toplam <strong>-${absDebt} ₺</strong> borç bakiyesine ulaşarak yasal <strong>-1.000.000 ₺</strong> iflas sınırını aşmıştır. İcra ve İflas Kanunu gereğince şirketin mevcut operasyonel tüzel kişiliği feshedilmiş ve tasfiye protokolü icra edilmiştir.`;
             }
 
             const liqEl = document.getElementById('bankruptcy-liquidated-list');
@@ -3825,7 +3517,7 @@
 
             let advice = "Filonuz dengeli çalışıyor. Sefer sayısını artırarak cironuzu yükseltebilirsiniz.";
             if (fuelExp > (totalExp * 0.35) && fuelExp > 5000) {
-                advice = "💡 <strong>Akaryakıt Masrafınız Yüksek:</strong> Şirket Akaryakıt İstasyonunu (Fuel Depot) Seviye 3 yaparak tüm filonuza <strong>%100 BEDAVA MAZOT</strong> alabilir ve yakıt giderini sıfırlayabilirsiniz!";
+                advice = "💡 <strong>Akaryakıt Masrafınız Yüksek:</strong> Otogar Yazıhanelerini Seviye 3 yaparak tüm araçlarınıza <strong>%100 BEDAVA MAZOT</strong> alabilir ve kârınızı devasa oranda artırabilirsiniz!";
             } else if (maintExp > (totalExp * 0.30) && maintExp > 5000) {
                 advice = "💡 <strong>Tamir Masrafınız Yüksek:</strong> Kademe Binasını Seviye 2 veya 3'e büyüterek bakım faturalarınızı <strong>%65'e varan oranda</strong> ucuzlatabilirsiniz.";
             } else if (cargoRev > 0) {
@@ -4292,7 +3984,7 @@
             const empBadge = empComp
                 ? `<div style="margin-top: 8px; padding: 10px 14px; background: rgba(34,197,94,0.18); border: 1.5px solid #22c55e; border-radius: 8px; font-size: 0.88rem; color: #86efac; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
                     <div>
-                        <span>👔 <strong>Maaşlı Kaptan:</strong> ${empComp.name} (${empComp.badge || '🏢'}) | Günlük Maaş: <strong style="color: #fde047;">${empComp.dailySalary.toLocaleString('tr-TR')} ₺</strong> | Sefer Primi: <strong style="color: #4ade80;">+${empComp.bonusPercent}%</strong></span>
+                        <span>👔 <strong>Maaşlı Kaptan:</strong> ${empComp.name} (${empComp.badge}) | Günlük Maaş: <strong style="color: #fde047;">${empComp.dailySalary.toLocaleString('tr-TR')} ₺</strong> | Sefer Primi: <strong style="color: #4ade80;">+${empComp.bonusPercent}%</strong></span>
                         <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 3px;">
                             📊 Hasılat Bölüşümü: <strong>%${empComp.companySharePercent || 50} Şirkete Aktarılır</strong>, <strong>%${100 - (empComp.companySharePercent || 50)} Kaptana Kalır</strong>
                         </div>
@@ -4333,7 +4025,7 @@
                             return `<div style="background: rgba(239, 68, 68, 0.25); border: 1.5px solid #ef4444; border-radius: 6px; padding: 4px 8px; color: #fca5a5; font-size: 0.92rem;">
                                 <span style="color: #ef4444; font-weight: bold;">🚨 Şirket Kasası: ${companyTreasury.toLocaleString('tr-TR')} ₺</span>
                                 <div style="font-size: 0.74rem; color: #fecaca; margin-top: 1px;">
-                                    <strong>KIRMIZI ALARM:</strong> İflasa Kalan Borç Payı: ${Math.max(0, companyTreasury - this.BANKRUPTCY_LIMIT).toLocaleString('tr-TR')} ₺
+                                    <strong>KIRMIZI ALARM:</strong> İflasa Kalan: ${(-1000000 - companyTreasury).toLocaleString('tr-TR')} ₺
                                 </div>
                             </div>`;
                         } else if (companyTreasury <= -250000) {
@@ -4361,29 +4053,6 @@
                 </div>
             </div>
 
-            ${(() => {
-                const currentLvl = this.data.companyLevel || 1;
-                if (currentLvl >= 5) return '';
-                const nextLvl = this.companyLevels.find(l => l.level === currentLvl + 1);
-                const trips = this.data.completedTripsCount || 0;
-                const rev = this.data.totalRevenue || 0;
-                const canPromote = nextLvl && trips >= nextLvl.reqTrips && rev >= nextLvl.reqRev;
-                if (!canPromote) return '';
-                return `
-                <div style="margin-top: 10px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.15)); border: 1.5px solid #10b981; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                    <div>
-                        <span style="color: #4ade80; font-weight: bold; font-size: 0.95rem;">👑 ŞİRKET SAHİBİ DİKKATİNE: Şirketiniz Seviye ${nextLvl.level} (${nextLvl.title}) Terfisine Hak Kazandı!</span>
-                        <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 2px;">
-                            Şoförler şirketi kendi kendine büyütemez; şirketi terfi ettirme yetkisi yalnızca sizdedir.
-                        </div>
-                    </div>
-                    <button id="btn-comp-promote-overview" class="modern-btn nav-item" style="padding: 6px 16px; background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; font-weight: bold; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 10px rgba(16,185,129,0.3); font-size: 0.85rem;">
-                        👑 Terfiyi Onayla
-                    </button>
-                </div>
-                `;
-            })()}
-
             <!-- HASILAT PAYLAŞIM VE TRANSFER KONTROL BARİYERİ -->
             <div style="margin-top: 12px; background: rgba(0,0,0,0.35); border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div>
@@ -4408,11 +4077,8 @@
                     <button id="btn-withdraw-treasury" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(234,179,8,0.18); border: 1px solid #eab308; color: #fef08a; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Şirket Kasasından Cüzdana Para Çek">
                         📤 Kasadan Çek
                     </button>
-                    <button id="btn-test-bankruptcy" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(239,68,68,0.18); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Resmi Ticari Tasfiye ve İflas Protokolünü Test Et (-1.000.000 ₺)">
+                    <button id="btn-test-bankruptcy" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(239,68,68,0.18); border: 1.5px solid #ef4444; color: #fca5a5; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Resmi Asliye Ticaret Mahkemesi Tasfiye ve İflas Protokolünü Test Et (-1.000.000 ₺)">
                         ⚖️ İflas Testi (-1M ₺)
-                    </button>
-                    <button id="btn-owner-reset-all-data-ov" class="modern-btn nav-item" style="padding: 7px 11px; font-size: 0.82rem; background: rgba(220,38,38,0.25); border: 1.5px solid #dc2626; color: #fecaca; font-weight: bold; border-radius: 6px; cursor: pointer;" title="Tüm oyun verilerini (şahsi cüzdan, araçlar, ehliyet, kariyer ve şirket dahil her şeyi) sıfırdan siler">
-                        ⚠️ Tüm Verileri Sıfırla
                     </button>
                 </div>
             </div>
@@ -4470,29 +4136,10 @@
                 });
             }
 
-            const btnPromoteOverview = card.querySelector('#btn-comp-promote-overview');
-            if (btnPromoteOverview) {
-                btnPromoteOverview.addEventListener('click', () => {
-                    this.promoteCompanyLevelManually();
-                });
-            }
-
             const btnWithdraw = card.querySelector('#btn-withdraw-treasury');
             if (btnWithdraw) {
                 btnWithdraw.addEventListener('click', () => {
                     this.transferToWallet();
-                });
-            }
-
-            const btnResetAllOv = card.querySelector('#btn-owner-reset-all-data-ov');
-            if (btnResetAllOv) {
-                btnResetAllOv.addEventListener('click', () => {
-                    if (typeof Game !== 'undefined' && typeof Game.resetAllGameData === 'function') {
-                        Game.resetAllGameData(true);
-                    } else {
-                        this.resetToDefault();
-                        this.renderModal('overview');
-                    }
                 });
             }
 
@@ -4501,7 +4148,7 @@
                 btnTestBankruptcy.addEventListener('click', () => {
                     const confirmTest = confirm(
                         "⚖️ RESMİ İFLAS VE TASFİYE SİMÜLASYONU\n\n" +
-                        "Şirket kasasını -1.000.000 ₺ borca çekip Ticari İflas ve Tasfiye Protokolünü çalıştırmak istiyor musunuz?\n\n" +
+                        "Şirket kasasını -1.000.000 ₺ borca çekip T.C. Asliye Ticaret Mahkemesi Tasfiye Protokolünü çalıştırmak istiyor musunuz?\n\n" +
                         "• Şirketin 1.000.000 ₺ borcu sıfırlanacaktır (Borç affı).\n" +
                         "• Binalar Seviye 1'e dönecek, şoförler serbest kalacaktır.\n" +
                         "• ŞAHSİ HAKLARINIZ (Kişisel cüzdanınız, garajınızdaki araçlar, ehliyetiniz) KORUNACAKTIR.\n\n" +
@@ -5098,7 +4745,7 @@
 
             const currentLevel = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
             if (currentLevel < (comp.minLevel || 1)) {
-                const lockMsg = `Bu şirkete katılmak için Seviye ${comp.minLevel} kaptanlık derecesine sahip olmalısınız (Mevcut Seviyeniz: ${currentLevel || 1}).`;
+                const lockMsg = `Bu şirkete katılmak için Seviye ${comp.minLevel} kaptanlık derecesine sahip olmalısınız (Mevcut Seviyeniz: ${currentLevel}).`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(lockMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(lockMsg, 'warning');
                 return;

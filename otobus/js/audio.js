@@ -163,13 +163,6 @@ class AudioSystem {
             roadGravel: new Howl({ src: ['sounds/freesound_road_gravel.mp3'], loop: true, volume: 0 }),
             roadGravelAsphalt: new Howl({ src: ['sounds/freesound_road_gravel_asphalt.mp3'], loop: true, volume: 0 }),
             roadWind: new Howl({ src: ['sounds/freesound_road_wind_ambience.mp3'], loop: true, volume: 0 }),
-            roadJointHit: new Howl({ src: ['sounds/freesound_road_joint_hit.wav'], volume: 0.85 }),
-            roadJointHit1: new Howl({ src: ['sounds/freesound_road_joint_hit1.wav'], volume: 0.85 }),
-            roadJointHit2: new Howl({ src: ['sounds/freesound_road_joint_hit2.wav'], volume: 0.85 }),
-            gongTekli: new Howl({ src: ['sounds/anons_tekli_gong.wav', 'sounds/anons_tekli_gong.mp3'], volume: 0.95 }),
-            zil3lu: new Howl({ src: ['sounds/anons_3lu_zil.wav', 'sounds/anons_3lu_zil.mp3'], volume: 0.95 }),
-            rampDeploy: new Howl({ src: ['sounds/freesound_ramp_deploy.mp3'], volume: 0.85 }),
-            rampRetract: new Howl({ src: ['sounds/freesound_ramp_retract.mp3'], volume: 0.85 }),
             // Freesound Gerçek Canlı Yolcu Tepki ve Homurtu Sesleri
             passengerShock: new Howl({ src: ['sounds/freesound_passenger_shock.mp3'], volume: 0.85 }),
             passengerBump: new Howl({ src: ['sounds/freesound_passenger_bump.mp3'], volume: 0.85 }),
@@ -683,16 +676,10 @@ class AudioSystem {
         this.init();
         this.isRetarderManuallyEngaged = true;
         this.updateRetarder(speed, true);
-        if (this.retarderAutoStopTimer) {
-            clearTimeout(this.retarderAutoStopTimer);
-            this.retarderAutoStopTimer = null;
-        }
-        if (duration && duration > 0) {
+        if (this.retarderAutoStopTimer) clearTimeout(this.retarderAutoStopTimer);
+        if (duration > 0) {
             this.retarderAutoStopTimer = setTimeout(() => {
-                // Sadece ayak freni simülasyonuysa otomatik kapat, kol çekiliyse kapatma
-                if (typeof Game === 'undefined' || !Game.retarderLevel || Game.retarderLevel === 0) {
-                    this.stopRetarder();
-                }
+                this.stopRetarder();
             }, duration * 1000);
         }
     }
@@ -2360,6 +2347,42 @@ startEngine() {
     }
 
     playRampDeploy() {
+        try {
+            if (this.currentRampAudio) {
+                this.currentRampAudio.pause();
+                this.currentRampAudio.currentTime = 0;
+            }
+            const aud = new Audio('sounds/freesound_ramp_deploy.mp3');
+            aud.volume = 0.85;
+            this.currentRampAudio = aud;
+            aud.play().catch(e => {
+                console.warn("[Audio] Rampa iniş sesi çalınamadı, fallback synth:", e);
+                this.fallbackRampDeploy();
+            });
+        } catch(e) {
+            this.fallbackRampDeploy();
+        }
+    }
+
+    playRampRetract() {
+        try {
+            if (this.currentRampAudio) {
+                this.currentRampAudio.pause();
+                this.currentRampAudio.currentTime = 0;
+            }
+            const aud = new Audio('sounds/freesound_ramp_retract.mp3');
+            aud.volume = 0.85;
+            this.currentRampAudio = aud;
+            aud.play().catch(e => {
+                console.warn("[Audio] Rampa toplanma sesi çalınamadı, fallback synth:", e);
+                this.fallbackRampRetract();
+            });
+        } catch(e) {
+            this.fallbackRampRetract();
+        }
+    }
+
+    fallbackRampDeploy() {
         this.init();
         if (this.sounds && this.sounds.rampDeploy) {
             try {

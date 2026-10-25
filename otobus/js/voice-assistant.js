@@ -336,7 +336,7 @@ class VoiceAssistant {
         if (!listEl) return;
 
         // Sekme butonlarının aktiflik stilini güncelle
-        const tabs = ['mechanics', 'company', 'lab', 'all', 'stage1', 'stage2', 'stage3', 'stage4', 'seruven', 'karne'];
+        const tabs = ['company', 'lab', 'all', 'stage1', 'stage2', 'stage3', 'stage4', 'seruven', 'karne'];
         tabs.forEach(t => {
             const btn = document.getElementById(`tab-acad-${t}`);
             if (btn) {
@@ -347,22 +347,6 @@ class VoiceAssistant {
                 btn.style.fontWeight = isActive ? 'bold' : 'normal';
             }
         });
-
-        // 0. OTOBÜS MEKANİKLERİ VE AĞIR VASITA FİZİĞİ REHBERİ
-        const mechContainer = document.getElementById('tutorial-mechanics-container');
-        if (this.currentStageFilter === 'mechanics') {
-            if (labContainer) labContainer.style.display = 'none';
-            if (seruvenContainer) seruvenContainer.style.display = 'none';
-            if (compContainer) compContainer.style.display = 'none';
-            listEl.style.display = 'none';
-            if (mechContainer) {
-                mechContainer.style.display = 'block';
-                this.renderBusMechanicsGuide();
-            }
-            return;
-        } else {
-            if (mechContainer) mechContainer.style.display = 'none';
-        }
 
         // 0. ŞİRKET YÖNETİMİ, 6 YASAL BİNA VE ÖN MUHASEBE REHBERİ
         if (this.currentStageFilter === 'company') {
@@ -473,220 +457,6 @@ class VoiceAssistant {
     // =========================================================================
     // ADIM ADIM REHBERLİ SÜRÜŞ EĞİTİMİ (TERİMSİZ, EN ANLAŞILIR OYUN DİLİ)
     // =========================================================================
-
-    renderBusMechanicsGuide() {
-        const container = document.getElementById('tutorial-mechanics-container');
-        if (!container) return;
-
-        container.innerHTML = `
-        <div style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95)); border: 2px solid #10b981; border-radius: 12px; padding: 20px 24px; color: #fff;">
-            
-            <!-- BAŞLIK -->
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid rgba(16, 185, 129, 0.35); padding-bottom: 14px; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                <div>
-                    <h3 style="margin: 0; color: #34d399; font-size: 1.45rem; display: flex; align-items: center; gap: 10px;">
-                        <span>🎓</span> <span>Aracı Kullanırken Dikkat Edilmesi Gereken Kavramlar Dersi</span>
-                    </h3>
-                    <p style="margin: 6px 0 0 0; color: #94a3b8; font-size: 0.92rem; line-height: 1.45;">
-                        Hiç otobüs şoförlüğü tecrübesi olmayanlar ve "bu düğme neden var?" diye soranlar için: Otobüsteki 9 hayati kavramın ne işe yaradığı, neden var olduğu ve nasıl kullanılacağı.
-                    </p>
-                </div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="modern-btn btn-read-section nav-item" data-text="Aracı Kullanırken Dikkat Edilmesi Gereken Kavramlar Dersi. Hiç otobüs şoförlüğü tecrübesi olmayanlar için: Otobüsteki dokuz hayati kavram şunlardır. Birinci kavram Retarder şanzıman iniş freni. İkinci kavram Kneeling kaldırıma sağa yatma sistemi. Üçüncü kavram Engelli Rampası ve emniyet kilidi. Dördüncü kavram Pnömatik Havalı Fren sistemi ve kompresör basıncı. Beşinci kavram İmdat ve mekanik park freni. Altıncı kavram Kapı fren emniyet kilidi yani interlok. Yedinci kavram Hidrostatik radyatör hararet fanı. Sekizinci kavram Yoğun zirve saat yolcu dinamiği. Dokuzuncu kavram Telsiz dispeçer anonsları. Her kavramı altındaki butonlardan tek tek sesli dinleyebilirsiniz." style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #047857); border: 1.5px solid #10b981; color: #fff; font-weight: bold; border-radius: 8px; cursor: pointer;">
-                        ▶️ Tüm Dersi Sesli Dinle
-                    </button>
-                    <button id="btn-open-concept-dict" class="modern-btn nav-item" style="padding: 8px 14px; background: rgba(56, 189, 248, 0.2); border: 1.5px solid #38bdf8; color: #7dd3fc; font-weight: bold; border-radius: 8px; cursor: pointer;">
-                        📖 F2 Sözlüğü Aç
-                    </button>
-                </div>
-            </div>
-
-            <!-- HIZLI KONTROL KUTUSU -->
-            <div style="background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; color: #a7f3d0; font-size: 0.9rem; line-height: 1.5;">
-                ⚡ <strong>Hızlı Kaptan Kısayolları:</strong> 
-                <strong>B:</strong> Retarder Kolu (1-5 Kademe) • 
-                <strong>Shift + B:</strong> Retarder Kapat • 
-                <strong>Space:</strong> İmdat Freni / Kontak • 
-                <strong>E / Q:</strong> Ön / Arka Kapı & İnterlok • 
-                <strong>U:</strong> Engelli Rampası • 
-                <strong>Shift + R:</strong> Telemetri & Zirve Saat • 
-                <strong>T:</strong> Telsiz Dispeçer • 
-                <strong>F2 veya Shift+K:</strong> Detaylı Başucu Sözlüğü
-            </div>
-
-            <!-- 1. RETARDER -->
-            <div style="background: linear-gradient(135deg, rgba(5, 150, 105, 0.2), rgba(15, 23, 42, 0.85)); border: 1.5px solid #10b981; border-radius: 10px; padding: 16px; margin-bottom: 14px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <h4 style="color: #34d399; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>🛑</span> <span>1. Retarder (Şanzıman / Yokuş Freni) - Kısayol: [ B ]</span>
-                    </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Birinci Kavram: Retarder yani Hidrolik Şanzıman Freni. Ne işe yarar? Yokuş aşağı inerken tekerlek balatalarına hiç dokunmadan şanzıman milindeki hidrolik yağ girdabıyla otobüsü yavaşlatan sürtünmesiz yardımcı frendir. Neden vardır? On sekiz tonluk otobüs dik inişte sürekli ayak freniyle tutulursa balatalar üç yüz elli dereceye ulaşıp erir ve fren şişmesi yaşanır; fren tamamen boşalır. Retarder balataları soğuk tutarak kazayı önler. Nasıl kullanılır? Yokuş inerken klavyeden B tuşuna basarak bir ile beş kademe arasında çekilir. Kapatmak için Shift B ye basılır." style="padding: 5px 12px; background: rgba(16,185,129,0.25); border: 1px solid #10b981; color: #a7f3d0; font-size: 0.82rem; border-radius: 6px; cursor: pointer;">
-                        ▶ Retarderi Dinle
-                    </button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.55;">
-                    • <strong>📌 Ne İşe Yarar?:</strong> Yokuş aşağı inerken balatalara hiç dokunmadan şanzıman çıkış milini hidrolik yağ direnciyle yavaşlatır.<br>
-                    • <strong>🛡️ Neden Hayatidir?:</strong> 18 tonluk otobüsle dik yokuşta ayak frenine basılırsa balatalar 350°C'de camlaşır ve <strong>Fren Şişmesi (Brake Fade)</strong> oluşur, fren tamamen boşalır. Retarder balataları soğuk tutarak facia yaşanmasını engeller. O meşhur derin türbin ıslığı buradan gelir.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> <strong>B</strong> tuşuna basarak 1-5 kademe arasında devreye alabilirsiniz. <strong>Shift + B</strong> anında sıfırlar.
-                </div>
-            </div>
-
-            <!-- 2. KNEELING -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(6, 182, 212, 0.35);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #22d3ee; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>📐</span> <span>2. Kneeling (Kaldırıma Sağa Yatma / Körük Çökertme) - [ Otomatik / K ]</span>
-                    </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="İkinci Kavram: Kneeling yani Kaldırıma Sağa Yatma. Ne işe yarar? Durakta bekleyen yaşlı, çocuk ve engelli yolcular için otobüsün sağ havalı körüklerinin havası boşaltılır ve araç kaldırıma doğru sekiz santimetre yatar. Neden vardır? Yüksek basamak yolcuların düşmesine veya zorlanmasına yol açar; basamak yüksekliği sıfırlanır. Nasıl kullanılır? Durakta durup kapıyı açtığınızda otomatik yatar; kapılar kapanıp gaza basıldığında kompresör körükleri şişirip aracı normal sürüş yüksekliğine kaldırır." style="padding: 4px 10px; background: rgba(6,182,212,0.2); border: 1px solid #06b6d4; color: #a5f3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
-                    • <strong>📌 Ne İşe Yarar?:</strong> Durakta sağ süspansiyon körük havasını tahliye ederek basamağı kaldırım hizasına indirir.<br>
-                    • <strong>🛡️ Neden Hayatidir?:</strong> Yaşlıların, bastonlu yolcuların ve çocukların yüksek basamağa tırmanırken düşmesini önler.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> Durakta durup kapı açılınca otomatik devreye girer (HUD'da <code>🚌 KNEELING</code> yanar). Kalkışta otomatik kapanır.
-                </div>
-            </div>
-
-            <!-- 3. ENGELLİ RAMPASI -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(56, 189, 248, 0.35);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #38bdf8; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>♿</span> <span>3. Engelli Rampası & Güvenlik Kilidi - Kısayol: [ U ]</span>
-                    </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Üçüncü Kavram: Engelli Rampası ve Emniyet Kilidi. Ne işe yarar? Tekerlekli sandalyeli vatandaşların kaldırımdan otobüse düzayak ve emniyetle geçmesini sağlar. Neden vardır? Erişilebilirlik ve yolcu güvenliği içindir. Rampa açıkken otobüs hareket ederse rampa kırılır veya yolcu düşebilir. Bu yüzden rampa açıkken araç elektronik olarak kilitlenir ve gaz yemez. Nasıl kullanılır? Durakta tekerlekli sandalye görünce U tuşuna basıp rampayı açınız; yolcu binince tekrar U ile kapatınız." style="padding: 4px 10px; background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #7dd3fc; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
-                    • <strong>📌 Ne İşe Yarar?:</strong> Tekerlekli sandalyeli yolcuların otobüse engelsiz binmesini sağlayan açılır platformdur.<br>
-                    • <strong>🛡️ Neden Hayatidir?:</strong> Rampa açıkken otobüs yürürse rampa kaldırıma vurur ve yolcu devrilir; bu nedenle rampa açıkken motor gaza basılsa dahi araç yürümez (Güvenlik Kilidi).<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> Durakta durup kapıyı açtıktan sonra <strong>U</strong> tuşuyla rampayı açın. Yolcu binince tekrar <strong>U</strong> ile kapatın.
-                </div>
-            </div>
-
-            <!-- 4. HAVALI FREN SİSTEMİ -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(250, 204, 21, 0.35);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #facc15; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>💨</span> <span>4. Pnömatik Havalı Fren Sistemi & Kompresör - Kısayol: [ S ]</span>
-                    </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Dördüncü Kavram: Pnömatik Havalı Fren Sistemi. Ne işe yarar? Otobüsü durdurmak için hidrolik sıvı yerine sekiz ile on iki bar basınçlı sıkıştırılmış hava kullanır. Neden vardır? On sekiz tonu durdurmak için muazzam bir hava kuvveti şarttır. Ancak frene art arda basıp pompalarsanız tanktaki hava biter. Basınç altmış PSI altına inerse fren alarmı çalar. Nasıl kullanılır? S tuşuna basarken ayağınızı frende sürekli bas-çek yapmayınız; dengeli ve kademeli basarak hava basıncını koruyunuz." style="padding: 4px 10px; background: rgba(234,179,8,0.2); border: 1px solid #eab308; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
-                    • <strong>📌 Ne İşe Yarar?:</strong> Ağır vasıtayı durdurmak için çelik hava tanklarındaki 8-12 bar basınçlı havayı kullanır.<br>
-                    • <strong>🛡️ Neden Hayatidir?:</strong> Frene peş peşe basıp bırakmak (pompalama) tank havasını bitirir. Basınç 60 PSI altına düşerse fren tutmaz hale gelir ve acil ikaz çalar.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> <strong>S</strong> tuşuna basarken tek ve yumuşak frenleme yapınız; kompresörün tüpleri doldurmasına izin veriniz.
-                </div>
-            </div>
-
-            <!-- 5. İMDAT FRENİ -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(239, 68, 68, 0.35);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #f87171; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>🅿️</span> <span>5. İmdat Freni / Park Freni - Kısayol: [ Space / Boşluk ]</span>
-                    </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Beşinci Kavram: İmdat Freni ve Park Freni. Ne işe yarar? Otobüs dururken veya park halindeyken tekerlekleri mekanik çelik yaylarla kilitleyerek kaymayı önler. Neden vardır? Havalı frenlerde hava kaçağı olsa bile imdat freni hava basıncıyla değil içine sıkıştırılmış dev çelik yayların gerilimiyle tutar; araçta hiç hava kalmasa dahi otobüs yokuş aşağı kayamaz. Nasıl kullanılır? Durakta durduğunuzda veya son durakta Boşluk tuşuna basarak imdat frenini çekiniz; kalkış yapmadan önce tekrar basarak serbest bırakınız." style="padding: 4px 10px; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
-                    • <strong>📌 Ne İşe Yarar?:</strong> Otobüs park halindeyken veya yolcu alırken tekerlekleri mekanik yay kuvvetiyle sabitler.<br>
-                    • <strong>🛡️ Neden Hayatidir?:</strong> Sistemde hava kaçağı olsa bile dev çelik yaylar tekerlekleri mekanik kilitler, araç asla geriye kaymaz.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> <strong>Boşluk (Space)</strong> tuşuna basarak çekilir veya indirilir.
-                </div>
-            </div>
-
-            <!-- 6. KAPI FREN İNTERLOK -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(168, 85, 247, 0.35);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #c084fc; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>🚪</span> <span>6. Kapı Fren Emniyet Kilidi (Interlock) - Kısayol: [ E / Q ]</span>
-                    </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Altıncı Kavram: Kapı Fren Emniyet Kilidi yani İnterlok. Ne işe yarar? Kapılardan biri veya engelli rampası açıkken gaz kelebeğini kilitler ve otobüsün hareket etmesini engeller. Neden vardır? Yolcular binerken veya inerken otobüs hareket ederse yolcular kapıdan düşebilir veya ezilebilir. Kapılar tam kapanmadan hareket etmek yasaktır. Nasıl kullanılır? Durakta E ile ön, Q ile arka kapıyı açınız. Yolcu binişi bitince kapıları kapatınız; kapılar kapanmadan gaza bassanız bile otobüs gitmez." style="padding: 4px 10px; background: rgba(168,85,247,0.2); border: 1px solid #a855f7; color: #d8b4fe; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
-                    • <strong>📌 Ne İşe Yarar?:</strong> Kapılar açıkken araca gaz verilmesini elektronik olarak engelleyen güvenlik mekanizmasıdır.<br>
-                    • <strong>🛡️ Neden Hayatidir?:</strong> Yolcu binerken kaptanın dalgınlıkla gaza basıp yolcunun düşmesini ve ezilmesini önler.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> <strong>E</strong> (Ön Kapı) ve <strong>Q</strong> (Arka Kapı) tuşları ile kontrol edilir. Kapılar kapandığı an ivmelenme serbest kalır.
-                </div>
-            </div>
-
-            <!-- 7. RADYATÖR FANI -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(245, 158, 11, 0.35);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #fbbf24; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>🌪️</span> <span>7. Hidrostatik Radyatör Fanı (Hararet Soğutma) - Kısayol: [ Shift + R ]</span>
-                    </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Yedinci Kavram: Hidrostatik Radyatör Fanı ve Motor Harareti. Ne işe yarar? Ağır vasıta motoru doksan beş derece üzerine çıktığında devreye giren dev soğutma pervanesidir. Neden vardır? On sekiz tonluk otobüs dik rampaları tırmanırken motor aşırı ısınır; eğer fan devreye girmezse motor contası yanar ve motor kilitlenir. Fan güçlü bir uğultuyla radyatör peteklerini soğutarak sıcaklığı hızla doksan dereceye indirir. Nasıl kullanılır? Sistem otomatiktir; Shift R tuşuna basarak anlık motor hararetini dinleyebilirsiniz." style="padding: 4px 10px; background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #fde68a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
-                    • <strong>📌 Ne İşe Yarar?:</strong> Motor harareti 95°C'yi aştığında devreye giren yüksek debili hidrolik tahrikli soğutma fanıdır.<br>
-                    • <strong>🛡️ Neden Hayatidir?:</strong> Dik dağ tırmanışlarında motorun hararet yapıp contayı yakmasını ve motorun kilitlenmesini önler.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> Sistem otomatiktir. Canlı hararet derecesi ve fan durumunu dinlemek için <strong>Shift + R</strong> tuşuna basınız.
-                </div>
-            </div>
-
-            <!-- 8. ZİRVE SAATLER -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(244, 63, 94, 0.35);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #fb7185; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>👥</span> <span>8. Yoğun Zirve Saat Dinamiği (Rush Hour) - Kısayol: [ Shift + R ]</span>
-                    </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Sekizinci Kavram: Yoğun Zirve Saat Dinamiği yani Rush Hour. Ne işe yarar? Sabah ve akşam mesai saatlerinde duraklardaki yolcu talebini neredeyse üç kat artıran ve otobüs doluluğunu tavan yaptıran canlı zaman sistemidir. Neden vardır? Gerçek hayatta günün her saati yolcu aynı olmaz. Otobüs dolduğunda araç ağırlığı on dört tondan on dokuz tona fırlar; fren mesafesi uzar ve virajda savrulma artar. Nasıl kullanılır? Zirve saatlerde daha erken frenleme yapmalı ve Shift R ile araç ağırlığını kontrol etmelisiniz." style="padding: 4px 10px; background: rgba(244,63,94,0.2); border: 1px solid #f43f5e; color: #fecdd3; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
-                    • <strong>📌 Ne İşe Yarar?:</strong> Sabah (07:00-09:00) ve akşam (17:00-19:30) mesai saatlerinde yolcu akınını ve araç doluluğunu simüle eder.<br>
-                    • <strong>🛡️ Neden Hayatidir?:</strong> Araç doldukça toplam kütle 14 tondan 19 tona çıkar; fren mesafesi uzar, yokuş çekişi ağırlaşır.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> Zirve saatlerde durakta daha uzun bekleyip yolcuları alınız. <strong>Shift + R</strong> ile doluluk raporunu dinleyiniz.
-                </div>
-            </div>
-
-            <!-- 9. TELSİZ DİSPEÇER -->
-            <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; border: 1px solid rgba(129, 140, 248, 0.35);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <h4 style="color: #a5b4fc; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>📻</span> <span>9. Telsiz Dispeçer Anonsları - Kısayol: [ T ]</span>
-                    </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Dokuzuncu Kavram: Telsiz Dispeçer Anonsları. Ne işe yarar? Garaj amirliği, filo hareket merkezi ve yol boyundaki diğer otobüs kaptanlarıyla telsiz üzerinden haberleşmeyi sağlar. Neden vardır? Yolda kaza, kapalı cadde, arıza veya aşırı yolcu birikmesi gibi acil durumlarda kaptan amirlikten canlı talimat alır. Nasıl kullanılır? Klavyeden T tuşuna basarak anlık telsiz anonslarını ve dispeçer talimatlarını dinleyebilirsiniz." style="padding: 4px 10px; background: rgba(99,102,241,0.2); border: 1px solid #6366f1; color: #c7d2fe; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
-                </div>
-                <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
-                    • <strong>📌 Ne İşe Yarar?:</strong> Garaj amirliği ve diğer hat şoförleri arasındaki telsiz mandal anonslarını kabine aktarır.<br>
-                    • <strong>🛡️ Neden Hayatidir?:</strong> Güzergâhtaki kaza, yoğunluk veya teknik arıza durumlarında kaptanın yalnız kalmamasını sağlar.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> <strong>T</strong> tuşuna basarak canlı dispeçer anonslarını ve amirlik telsizini dinleyebilirsiniz.
-                </div>
-            </div>
-
-            <!-- DİĞER MEKANİK VE FİZİK DETAYLARI BAĞLANTISI -->
-            <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1.5px solid #64748b; border-radius: 10px; padding: 14px 16px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <div style="font-size: 0.88rem; color: #cbd5e1;">
-                    📚 <em>Tüm bu kavramlar oyun içinde F2 veya Shift+K tuşuyla Başucu Sözlüğü'nde de her an elinizin altındadır.</em>
-                </div>
-                <button id="btn-read-all-mechanics-doc" class="modern-btn nav-item" style="padding: 6px 14px; background: rgba(56, 189, 248, 0.25); border: 1px solid #38bdf8; color: #7dd3fc; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
-                    📖 OTOBUS_MEKANIKLERI_REHBERI.md Dosyasını Oku
-                </button>
-            </div>
-
-        </div>
-        `;
-
-        // Sesli okuma butonları dinleyicileri
-        container.querySelectorAll('.btn-read-section').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const text = e.currentTarget.getAttribute('data-text');
-                if (text && typeof audio !== 'undefined' && audio.speak) {
-                    if (audio.stopAllSoundEffects) audio.stopAllSoundEffects();
-                    audio.speak(text);
-                }
-            });
-        });
-
-        // F2 Sözlük Açma Butonu
-        const btnDict = container.querySelector('#btn-open-concept-dict');
-        if (btnDict) {
-            btnDict.addEventListener('click', () => {
-                if (typeof BusConceptGuide !== 'undefined' && typeof BusConceptGuide.openModal === 'function') {
-                    BusConceptGuide.openModal();
-                } else if (typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("F2 veya Shift K tuşuna basarak Başucu Sözlüğünü açabilirsiniz.");
-                }
-            });
-        }
-    }
 
     renderCompanyGuide() {
         const container = document.getElementById('tutorial-company-container');
@@ -974,7 +744,7 @@ class VoiceAssistant {
                     <div style="background: rgba(15, 23, 42, 0.7); border-left: 3px solid #a855f7; padding: 12px; border-radius: 8px;">
                         <strong style="color: #c084fc; font-size: 0.95rem;">💰 5. Kasa, Cüzdan ve -1.000.000 ₺ İflas & Tasfiye Protokolü</strong>
                         <p style="color: #cbd5e1; font-size: 0.84rem; margin: 6px 0 0 0; line-height: 1.45;">
-                            Şirket kasasında nakit azaldığında ticari borca girebilirsiniz. Kasa eksiye düştüğünde -250.000 ₺ ve -750.000 ₺ seviyelerinde banka ve yasal tasfiye uyarı alarmları çalar. Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaşırsa <strong>Ticari İflas ve Tasfiye Heyeti</strong> kararıyla şirket <strong>RESMEN İFLAS EDER VE TASFİYE EDİLİR</strong>. Tasfiye protokolüyle 1 milyon liralık şirket borcu sıfırlanır, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>Şahsi ehliyetiniz, araçlarınız ve cüzdanınız kanunen HACZEDİLEMEZ ve aynen korunur.</strong> İflastan kaçınmak için tehlike anında <strong>"Kasaya Para Yatır"</strong> butonuyla şahsi cüzdanınızdan şirkete sermaye aktarabilirsiniz.
+                            Şirket kasasında nakit azaldığında ticari borca girebilirsiniz. Kasa eksiye düştüğünde -250.000 ₺ ve -750.000 ₺ seviyelerinde banka ve mahkeme uyarı alarmları çalar. Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaşırsa <strong>T.C. Asliye Ticaret Mahkemesi</strong> kararıyla şirket <strong>RESMEN İFLAS EDER VE TASFİYE EDİLİR</strong>. Tasfiye protokolüyle 1 milyon liralık şirket borcu sıfırlanır, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>Şahsi ehliyetiniz, araçlarınız ve cüzdanınız kanunen HACZEDİLEMEZ ve aynen korunur.</strong> İflastan kaçınmak için tehlike anında <strong>"Kasaya Para Yatır"</strong> butonuyla şahsi cüzdanınızdan şirkete sermaye aktarabilirsiniz.
                         </p>
                     </div>
 
@@ -995,7 +765,7 @@ class VoiceAssistant {
                     <h4 style="color: #facc15; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
                         <span>❓</span> <span>8. Sıkça Sorulan Sorular ve Hızlı Cevaplar</span>
                     </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetimi hakkında en çok merak edilen sorular. Bir: Şoförlerim neden sefere çıkmıyor? Seferden yorgun dönmüşlerdir. Personel Sosyal Tesisini geliştirerek dinlenme sürelerini dört kat hızlandırabilirsiniz. İki: Şirket kasasındaki parayla otobüs alabilir miyim? Evet, Cüzdana Para Çek butonuna basıp kasadaki parayı cüzdanınıza aktarın, ardından otobüs galerisinden dilediğiniz aracı satın alın. Üç: Neden yeni şoför alamıyorum? Garaj kapasiteniz dolmuştur, Garaj ve Filo Sahasını Seviye ikiye yükselterek sınırı on beşe çıkarın. Dört: Bilet fiyatlarını nasıl yükseltirim? Otogar Yazıhanelerini geliştirerek tavan bilet fiyatı çarpanını aktif edin. Beş: Şirketim iflas edebilir mi? Evet, şirket borcu eksi bir milyon liraya ulaşırsa Bağımsız Ticari Tasfiye Heyeti tasfiye kararı verir ve borç sıfırlanır. Ehliyetiniz, araçlarınız ve kişisel cüzdanınız kanunen korunur." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ S.S.S Dinle</button>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Şirket yönetimi hakkında en çok merak edilen sorular. Bir: Şoförlerim neden sefere çıkmıyor? Seferden yorgun dönmüşlerdir. Personel Sosyal Tesisini geliştirerek dinlenme sürelerini dört kat hızlandırabilirsiniz. İki: Şirket kasasındaki parayla otobüs alabilir miyim? Evet, Cüzdana Para Çek butonuna basıp kasadaki parayı cüzdanınıza aktarın, ardından otobüs galerisinden dilediğiniz aracı satın alın. Üç: Neden yeni şoför alamıyorum? Garaj kapasiteniz dolmuştur, Garaj ve Filo Sahasını Seviye ikiye yükselterek sınırı on beşe çıkarın. Dört: Bilet fiyatlarını nasıl yükseltirim? Otogar Yazıhanelerini geliştirerek tavan bilet fiyatı çarpanını aktif edin. Beş: Şirketim iflas edebilir mi? Evet, şirket borcu eksi bir milyon liraya ulaşırsa mahkeme tasfiye kararı verir ve borç sıfırlanır. Ehliyetiniz, araçlarınız ve kişisel cüzdanınız kanunen korunur." style="padding: 4px 10px; background: rgba(250,204,21,0.2); border: 1px solid #facc15; color: #fef08a; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ S.S.S Dinle</button>
                 </div>
 
                 <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.86rem; color: #cbd5e1;">
@@ -1021,7 +791,7 @@ class VoiceAssistant {
 
                     <div style="background: rgba(239,68,68,0.08); padding: 10px 14px; border-radius: 6px; border: 1.5px solid rgba(239,68,68,0.35);">
                         <strong style="color: #f87171;">⚖️ Soru: Şirketim iflas edebilir mi? İflas edince ne olur?</strong><br>
-                        <span style="color: #fca5a5;">Cevap:</span> Evet! Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaştığında Ticari İflas ve Tasfiye Heyeti iflas ve tasfiye kararı verir. Tasfiye masası şirketin 1 milyon liralık borcunu tamamen siler, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>En önemli güvence:</strong> Şahsi ehliyetiniz, garajınızdaki otobüsleriniz ve kişisel cüzdanınız kanunen <strong>HACZEDİLEMEZ</strong> ve aynen korunur. Böylece sıfır borçla temiz bir sayfa açarak dilerseniz bağımsız serbest kaptan olarak çalışıp tüm geliri doğrudan cüzdanınıza aktarabilir, dilerseniz diğer kaptanların şirketlerinde maaşlı görev alabilirsiniz, dilerseniz şirketinizi yeniden ayağa kaldırabilirsiniz.
+                        <span style="color: #fca5a5;">Cevap:</span> Evet! Şirket borcu <strong>-1.000.000 ₺</strong> sınırına ulaştığında T.C. Asliye Ticaret Mahkemesi iflas ve tasfiye kararı verir. Tasfiye masası şirketin 1 milyon liralık borcunu tamamen siler, şoförler serbest kalır ve binalar Seviye 1'e döner. <strong>En önemli güvence:</strong> Şahsi ehliyetiniz, garajınızdaki otobüsleriniz ve kişisel cüzdanınız kanunen <strong>HACZEDİLEMEZ</strong> ve aynen korunur. Böylece sıfır borçla temiz bir sayfa açarak dilerseniz bağımsız serbest kaptan olarak çalışıp tüm geliri doğrudan cüzdanınıza aktarabilir, dilerseniz diğer kaptanların şirketlerinde maaşlı görev alabilirsiniz, dilerseniz şirketinizi yeniden ayağa kaldırabilirsiniz.
                     </div>
                 </div>
             </div>

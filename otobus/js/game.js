@@ -51,17 +51,6 @@ const Game = {
     currentFuelLiters: 500,
     fuelWarned15: false,
     fuelWarned5: false,
-    temperature: 20,
-    busTemperature: 22,
-    isACOn: false,
-    airPressure: 120,
-    isLowAirAlarmActive: false,
-    isEmergencyBrakeLocked: false,
-    selectedBus: null,
-    engineStarted: false,
-    isRetarderActive: false,
-    brakeEfficiency: 1.0,
-    lastInterlockWarnTime: 0,
 
     getFuelCapacity: function() {
         const bus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
@@ -933,7 +922,7 @@ const Game = {
 
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        if (data.season !== 'season_fresh_v2') {
+                        if (data.season !== 'season_level1') {
                             this.licenseLevel = 1;
                             this.playerXP = 0;
                             this.completedTasks = 0;
@@ -941,18 +930,6 @@ const Game = {
                             this.clockMinutes = 480;
                             this.unlockedCities = ["Tekirdağ"];
                             this.currentCity = "Tekirdağ";
-                            this.activeDistrict = "Süleymanpaşa";
-                            this.activeNeighborhood = "";
-                            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.resetToDefault === 'function') {
-                                CompanySystem.resetToDefault();
-                            }
-                            if (typeof BusFleet !== 'undefined') {
-                                try {
-                                    localStorage.setItem(BusFleet.OWNED_KEY || 'tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
-                                    localStorage.setItem('selectedBusId', 'otokar_kent_lf');
-                                    if (typeof BusFleet.selectBus === 'function') BusFleet.selectBus('otokar_kent_lf');
-                                } catch(e) {}
-                            }
                             this.saveData(true);
                         } else {
                             // Çevrimdışı İlerleme Koruma Kalkanı: Yerel ilerleme ile bulutu akıllıca birleştir
@@ -1008,14 +985,6 @@ const Game = {
                             if (data.equippedTitle && typeof DriverBadges !== 'undefined') {
                                 try {
                                     localStorage.setItem(DriverBadges.TITLES_KEY, data.equippedTitle);
-                                } catch(e) {}
-                            }
-
-                            // Hoş Geldin Takvimi (WelcomeCalendar)
-                            if (data.welcomeCalendar && typeof WelcomeCalendar !== 'undefined') {
-                                try {
-                                    WelcomeCalendar.data = Object.assign(WelcomeCalendar.data || {}, data.welcomeCalendar);
-                                    WelcomeCalendar.saveData();
                                 } catch(e) {}
                             }
 
@@ -1075,28 +1044,8 @@ const Game = {
         });
     },
 
-    resetAllGameData: function(interactive = false) {
-        if (interactive) {
-            const confirmed = (typeof window !== 'undefined' && typeof window.confirm === 'function')
-                ? window.confirm(
-                    "⚠️ DİKKAT: TÜM OYUN VE ŞİRKET VERİLERİNİ SIFIRLAMA\n\n" +
-                    "Bu işlem:\n" +
-                    "• Şahsi cüzdanınızı ve tüm bakiyenizi (2.500 ₺ başlangıç harçlığına),\n" +
-                    "• Ehliyet seviyenizi Seviye 1'e ve XP'nizi 0'a,\n" +
-                    "• Tamamlanan görevleri 0'a ve açık şehirleri Tekirdağ'a,\n" +
-                    "• Satın aldığınız tüm otobüsleri silip yalnızca başlangıç aracı Otokar Kent LF'ye,\n" +
-                    "• Şirket kasasını 50.000 ₺'ye, kurum binalarını Seviye 1'e, şoförleri ve seferleri sıfıra,\n" +
-                    "• Kaptan liyakat unvanlarını, brövelerini ve otoyol tesis kayıtlarını,\n" +
-                    "TAMAMEN SİLECEK VE OYUNU SIFIRDAN BAŞLATACAKTIR.\n\n" +
-                    "Tüm verileri silip temiz başlangıç yapmak istediğinize emin misiniz?"
-                )
-                : true;
-            if (!confirmed) return false;
-        }
-
-        console.log("[Game] Tüm oyun ve şirket verileri temizleniyor...");
-
-        // 1. LocalStorage temizliği
+    saveData: function(immediate = false) {
+        // 1. Yerel Kayıt (Anında ve Kesintisiz Çift Katman)
         try {
             if (typeof localStorage !== 'undefined') {
                 const wipeKeys = [
@@ -1333,7 +1282,7 @@ const Game = {
                 const safeClock = Math.max(0, Math.min(1440, parseFloat(this.clockMinutes) || 480));
 
                 const payload = {
-                    season: 'season_fresh_v2',
+                    season: 'season_level1',
                     licenseLevel: safeLevel,
                     playerXP: safeXP,
                     completedTasks: safeTasks,
@@ -1361,51 +1310,34 @@ const Game = {
                     }
                 }
 
-                // Hoş Geldin Takvimi (WelcomeCalendar)
-                const welcomeCalObj = (typeof WelcomeCalendar !== 'undefined') ? WelcomeCalendar : (typeof window !== 'undefined' ? window.WelcomeCalendar : null);
-                if (welcomeCalObj && welcomeCalObj.data) {
-                    payload.welcomeCalendar = {
-                        claimedDays: welcomeCalObj.data.claimedDays || {},
-                        lastClaimDate: welcomeCalObj.data.lastClaimDate || null,
-                        claimedCount: welcomeCalObj.data.claimedCount || 0,
-                        totalClaimedCash: welcomeCalObj.data.totalClaimedCash || 0,
-                        totalClaimedXP: welcomeCalObj.data.totalClaimedXP || 0,
-                        totalClaimedTreasury: welcomeCalObj.data.totalClaimedTreasury || 0
-                    };
-                }
-
                 // Şirket Verileri (CompanySystem)
-                const compSysObj = (typeof CompanySystem !== 'undefined') ? CompanySystem : (typeof window !== 'undefined' ? window.CompanySystem : null);
-                if (compSysObj && compSysObj.data) {
+                if (typeof CompanySystem !== 'undefined' && CompanySystem.data) {
                     payload.companyData = {
-                        companyName: (compSysObj.data.companyName || "Mikyas Seyahat").substring(0, 40),
-                        foundedDate: compSysObj.data.foundedDate || Date.now(),
-                        totalRevenue: Math.max(0, Math.min(999999999, compSysObj.data.totalRevenue || 0)),
-                        completedTripsCount: Math.max(0, Math.min(50000, compSysObj.data.completedTripsCount || 0)),
-                        companyLevel: Math.max(1, Math.min(10, compSysObj.data.companyLevel || 1)),
-                        companyTreasury: Math.max(-1000000, Math.min(999999999, compSysObj.data.companyTreasury || 50000)),
-                        revenueSharePercent: Math.max(0, Math.min(100, compSysObj.data.revenueSharePercent || 50)),
-                        cateringPackage: compSysObj.data.cateringPackage || "standart",
-                        institutions: compSysObj.data.institutions || {},
-                        satisfactionRating: Math.max(1.0, Math.min(5.0, compSysObj.data.satisfactionRating || 4.9)),
-                        terminalBranches: compSysObj.data.terminalBranches || {},
-                        ticketPricingMultiplier: compSysObj.data.ticketPricingMultiplier || 1.0,
-                        facilityContract: compSysObj.data.facilityContract || "standart",
-                        hqUpgrades: compSysObj.data.hqUpgrades || {},
-                        hiredDrivers: Array.isArray(compSysObj.data.hiredDrivers) ? compSysObj.data.hiredDrivers.slice(0, 20) : [],
-                        bankruptcyCount: Math.max(0, compSysObj.data.bankruptcyCount || 0),
-                        corporateEmployer: compSysObj.data.corporateEmployer || null,
-                        isIndependentMode: !!compSysObj.data.isIndependentMode
+                        companyName: (CompanySystem.data.companyName || "Mikyas Seyahat").substring(0, 40),
+                        foundedDate: CompanySystem.data.foundedDate || Date.now(),
+                        totalRevenue: Math.max(0, Math.min(999999999, CompanySystem.data.totalRevenue || 0)),
+                        completedTripsCount: Math.max(0, Math.min(50000, CompanySystem.data.completedTripsCount || 0)),
+                        companyLevel: Math.max(1, Math.min(10, CompanySystem.data.companyLevel || 1)),
+                        companyTreasury: Math.max(-1000000, Math.min(999999999, CompanySystem.data.companyTreasury || 50000)),
+                        revenueSharePercent: Math.max(0, Math.min(100, CompanySystem.data.revenueSharePercent || 50)),
+                        cateringPackage: CompanySystem.data.cateringPackage || "standart",
+                        institutions: CompanySystem.data.institutions || {},
+                        satisfactionRating: Math.max(1.0, Math.min(5.0, CompanySystem.data.satisfactionRating || 4.9)),
+                        terminalBranches: CompanySystem.data.terminalBranches || {},
+                        ticketPricingMultiplier: CompanySystem.data.ticketPricingMultiplier || 1.0,
+                        facilityContract: CompanySystem.data.facilityContract || "standart",
+                        hqUpgrades: CompanySystem.data.hqUpgrades || {},
+                        hiredDrivers: Array.isArray(CompanySystem.data.hiredDrivers) ? CompanySystem.data.hiredDrivers.slice(0, 20) : [],
+                        bankruptcyCount: Math.max(0, CompanySystem.data.bankruptcyCount || 0)
                     };
                 }
 
                 // Otoyol Tesisleri ve HGS (HighwayFacilities)
-                const hwyObj = (typeof HighwayFacilities !== 'undefined') ? HighwayFacilities : (typeof window !== 'undefined' ? window.HighwayFacilities : null);
-                if (hwyObj && hwyObj.data) {
+                if (typeof HighwayFacilities !== 'undefined' && HighwayFacilities.data) {
                     payload.highwayData = {
-                        hgsBalance: Math.max(0, Math.min(100000, hwyObj.data.hgsBalance || 0)),
-                        visitedFacilities: hwyObj.data.visitedFacilities || {},
-                        stats: hwyObj.data.stats || {}
+                        hgsBalance: Math.max(0, Math.min(100000, HighwayFacilities.data.hgsBalance || 0)),
+                        visitedFacilities: HighwayFacilities.data.visitedFacilities || {},
+                        stats: HighwayFacilities.data.stats || {}
                     };
                 }
 
@@ -1756,12 +1688,12 @@ const Game = {
         }
 
         if (typeof UI !== 'undefined' && UI.showToast) {
-            UI.showToast(`☕ ${compName || 'Şirket'} İkramı Dağıtıldı! (+${tipMoney || 0} ₺ Bahşiş)`, "success");
+            UI.showToast(`☕ ${compName} İkramı Dağıtıldı! (+${tipMoney} ₺ Bahşiş)`, "success");
         }
 
         const passFeedback = document.getElementById('passenger-feedback');
         if (passFeedback) {
-            passFeedback.innerText = `☕ İkram Servisi: ${pkgName || 'İkram'} dağıtıldı. (+${tipMoney || 0} ₺ Kaptan Bahşişi)`;
+            passFeedback.innerText = `☕ İkram Servisi: ${pkgName} dağıtıldı. (+${tipMoney} ₺ Kaptan Bahşişi)`;
             passFeedback.style.color = '#38bdf8';
         }
     },
@@ -1962,23 +1894,6 @@ const Game = {
         }
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
-
-        // Sefer Başlatma Başarımları ve İstatistik Kaydı
-        if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.recordRouteStart === 'function') {
-            try { DriverBadges.recordRouteStart(this); } catch(e) { console.warn('[Game] recordRouteStart hatası:', e); }
-        }
-
-        this.completedTunnels = [];
-        this.completedBridges = [];
-        this.activeRealTunnel = null;
-        this.activeRealBridge = null;
-        this.currentAltitude = 10;
-        this.currentSlopePct = 0.0;
-        const arriveBusSprite = document.getElementById('bus-sprite');
-        if (arriveBusSprite) arriveBusSprite.style.transform = 'translateX(-50%) rotate(0deg)';
-        const arriveLaneCont = document.querySelector('.lane-container');
-        if (arriveLaneCont) arriveLaneCont.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
-        if (typeof audio !== 'undefined' && typeof audio.stopTireScreech === 'function') audio.stopTireScreech();
         this.fuelTankCapacity = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
         if (this.currentFuelLiters === undefined || this.currentFuelLiters <= 0) {
             this.currentFuelLiters = this.fuelTankCapacity;
@@ -2028,6 +1943,7 @@ const Game = {
         this.totalPassengersBoardedInRoute = 0;
         this.isLuggageOpen = false;
         this.hasLostItemFound = false;
+        this.terminalAnnouncedForRoute = false;
         this.lastFoundLostItem = null;
         this.activePassengerEvent = null;
         this.insufficientBalanceTriggeredAtStop = false;
@@ -3836,13 +3752,6 @@ const Game = {
             else if (pct > 15) hudFuelVal.style.color = '#facc15';
             else hudFuelVal.style.color = '#ef4444';
         }
-        if (typeof SolarPrayerEngine !== 'undefined') {
-            SolarPrayerEngine.update(this.clockMinutes, this.currentCity, this.speed, this.doorsOpen);
-        }
-        if (typeof PowertrainDynamicsEngine !== 'undefined') {
-            PowertrainDynamicsEngine.updateThermodynamics(this, deltaTime);
-        }
-
         if (typeof AkilliSistem !== 'undefined' && AkilliSistem.onCoPilotUpdate) {
             AkilliSistem.onCoPilotUpdate(this);
         }
@@ -3943,7 +3852,7 @@ const Game = {
             this.totalDistanceCovered += distanceCovered;
 
             // Dinamik Yakıt Tüketim Fiziği
-            if (this.engineStarted || (typeof audio !== 'undefined' && audio.isEngineRunning)) {
+            if (this.engineStarted) {
                 const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
                 if (this.currentFuelLiters === undefined) this.currentFuelLiters = cap;
                 
@@ -3951,17 +3860,13 @@ const Game = {
                     const distKm = (this.speed / 3600) * deltaTime;
                     const consRate = (typeof this.getFuelConsumptionPer100km === 'function') ? this.getFuelConsumptionPer100km() : 30;
                     let throttleFactor = 1.0;
-                    const hasRetarder = (this.isRetarderActive || (this.retarderLevel && this.retarderLevel > 0));
-                    if (hasRetarder && !this.keys.w && !this.keys.arrowup) {
-                        throttleFactor = 0.05; // Retarder devredeyken enjeksiyon kesme (Sıfıra yakın tüketim)
+                    if (this.isRetarderActive && !this.keys.w && !this.keys.arrowup) {
+                        throttleFactor = 0.05; // Retarder devredeyken enjeksiyon kesme
                     } else if (!this.keys.w && !this.keys.arrowup) {
-                        throttleFactor = 0.2; // Gazsız süzülme
+                        throttleFactor = 0.2; // Gazsız akış
                     }
-                    const passCount = this.passengersOnBoard || 0;
-                    let loadFactor = 1.0 + (passCount * 0.003);
-                    if (this.currentSlopePct > 0) {
-                        loadFactor *= (1.0 + (this.currentSlopePct * 0.12)); // Her %1 eğim motor yakıt tüketimini %12 artırır
-                    }
+                    const passCount = this.passengers ? (this.passengers.length || 0) : 0;
+                    const loadFactor = 1.0 + (passCount * 0.003);
                     const burned = distKm * (consRate / 100) * throttleFactor * loadFactor;
                     this.currentFuelLiters = Math.max(0, this.currentFuelLiters - burned);
                 } else {
@@ -5419,8 +5324,9 @@ const Game = {
                 comfortBonus = baseBonus + tipBonusAmt;
                 this.addMoney(comfortBonus);
                 if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'tips', 'Yolcu Konfor & Bahşiş Primi', comfortBonus);
-                const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${(curBus && curBus.brand) || 'Otobüs'} Lüks Kabin Bonusu)` : "";
-                comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote}.`;
+                this.addXP(40);
+                const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${curBus.brand} Lüks Kabin Bonusu)` : "";
+                comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote} ve 40 tecrübe puanı kazandınız.`;
             }
             
             const resComfort = document.getElementById('res-comfort');
@@ -5545,14 +5451,10 @@ const Game = {
 
         const k = e.key.toLowerCase();
         // SHIFT + VİRGÜL (Shift + ,): Rastgele Telsiz Konuşmaları Yükle / Dinlet (Kanal 19)
-        // İKRAM VE MUAVİN SERVİSİ (I Tuşu) & HAT TABELASI (Shift + I)
+        // İKRAM VE MUAVİN SERVİSİ (I Tuşu)
         if (k === 'i' || k === 'ı' || e.code === 'KeyI') {
             e.preventDefault();
-            if (e.shiftKey) {
-                this.reportIBISStatus();
-            } else {
-                this.serveCatering();
-            }
+            this.serveCatering();
             return;
         }
 
@@ -5884,12 +5786,6 @@ const Game = {
 
         if (k === 'h') {
             e.preventDefault();
-            if (e.shiftKey) {
-                if (typeof LiveWeather !== 'undefined') {
-                    LiveWeather.announceWeatherReport("assertive");
-                }
-                return;
-            }
             const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
             const currentFuel = (this.currentFuelLiters !== undefined) ? this.currentFuelLiters : cap;
             const liters = Math.max(0, Math.floor(currentFuel));
@@ -5955,7 +5851,7 @@ const Game = {
             }
             if (!this.isDriving) this.checkAutoDepart();
         }
-        if (k === 'l' || e.code === 'KeyL') {
+        if (k === 'l' || k === 'k') {
             e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.playHorn === 'function') {
             // Karşıdan gelen meslektaş kornasına selam verme

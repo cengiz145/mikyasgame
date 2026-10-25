@@ -154,29 +154,6 @@
                     </div>
                     <span style="color: #34d399; font-size: 1.2rem;">➜</span>
                 </button>
-
-                <!-- 7. 100 Günlük Hoş Geldin Takvimi & Günlük Ödüller -->
-                <button id="btn-open-welcome-calendar" class="menu-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.12rem; border: 1.5px solid #ec4899; color: #fbcfe8; background: rgba(236, 72, 153, 0.18); border-radius: 12px; text-align: left; width: 100%; box-shadow: 0 4px 14px rgba(236, 72, 153, 0.25);" aria-label="100 Günlük Hoş Geldin Takvimi: Her gün artan hediyeleri topla">
-                    <div style="display: flex; align-items: center; gap: 14px;">
-                        <span style="font-size: 1.7rem; line-height: 1;">🎁</span>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <strong style="font-size: 1.12rem; color: #f472b6;">100 Günlük Hoş Geldin Takvimi</strong>
-                            <span id="welcome-calendar-badge" style="display: none; background: #ec4899; color: #fff; font-size: 0.75rem; font-weight: bold; padding: 2px 8px; border-radius: 10px;">1 Ödül Hazır!</span>
-                        </div>
-                    </div>
-                    <span style="color: #f472b6; font-size: 1.2rem;">➜</span>
-                </button>
-                <!-- 8. Türkiye Coğrafya Atlası & Izgara Haritası -->
-                <button id="btn-turkey-map" class="menu-btn nav-item" style="justify-content: space-between; padding: 14px 20px; font-size: 1.12rem; border: 1.5px solid #06b6d4; color: #a5f3fc; background: rgba(6, 182, 212, 0.16); border-radius: 12px; text-align: left; width: 100%; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.25);" aria-label="Türkiye Coğrafya Atlası ve Izgara Haritası. 81 il ve 973 ilçe sesli keşif. Kısayol M tuşu">
-                    <div style="display: flex; align-items: center; gap: 14px;">
-                        <span style="font-size: 1.7rem; line-height: 1;">🗺️</span>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <strong style="font-size: 1.12rem; color: #22d3ee;">Türkiye Coğrafya Atlası & Izgara Haritası</strong>
-                            <span style="background: rgba(6, 182, 212, 0.25); color: #67e8f9; font-size: 0.75rem; font-weight: bold; padding: 2px 8px; border-radius: 10px; border: 1px solid #0891b2;">Kısayol: M</span>
-                        </div>
-                    </div>
-                    <span style="color: #22d3ee; font-size: 1.2rem;">➜</span>
-                </button>
             </div>
 
             <!-- GİZLİ YEDEK ELEMANLAR (ARKA PLAN VE KISAYOL UYUMLULUĞU İÇİN) -->
@@ -360,7 +337,6 @@
             <div id="hud-timing-panel" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #334155; color: #a78bfa; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem;" title="Sefer Zamanlaması (Kısayol Z)">⏱️ <span id="hud-timing-val">Vaktinde (0 Dk)</span></div>
             <div id="hud-comfort-panel" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #334155; color: #38bdf8; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem;">⭐ KONFOR: <span id="hud-comfort-val" style="color: #4ade80;">%100</span></div>
             <div id="hud-fuel-panel" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #f59e0b; color: #fbbf24; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px;" title="Mevcut Yakıt Seviyesi ve Araç Durumu (Kısayol: H)" role="button" tabindex="0" aria-label="Mevcut Yakıt Seviyesi ve Araç Durumu. Bilgi almak için H tuşuna basın veya tıklayın.">⛽ YAKIT: <span id="hud-fuel-val" style="color: #4ade80;">%100 (500L)</span></div>
-            <div id="hud-altitude" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #10b981; color: #34d399; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer;" title="Coğrafi Rakım ve Yol Eğimi (Shift+Y)" onclick="if(typeof TurkeyGeographyEngine!=='undefined')TurkeyGeographyEngine.speakTopographyReport(Game);" role="button" tabindex="0" aria-label="Rakım ve Eğim Bilgisi. Rapor için Shift Y tuşuna basın veya tıklayın.">🏔️ <span id="hud-altitude-text">Rakım: 10 m (%0 Düz)</span></div>
             <div id="hud-compass" style="background: rgba(15, 23, 42, 0.85); border: 1px solid #38bdf8; color: #38bdf8; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem;" title="Pusula İstikameti (Kısayol: Y | Yön Değişimi: Shift+Oklar)" role="region" aria-label="Pusula İstikameti">🧭 <span id="hud-compass-text">KUZEY (0°)</span></div>
         </div>
         <div class="dashboard" style="background: rgba(15, 22, 36, 0.85);">
@@ -654,16 +630,6 @@
     <script src="js/compass-system.js?v=1792467926943"></script>
     <script src="js/voice-assistant.js?v=1792467926943"></script>
     <script src="js/leaderboard-system.js"></script>
-        <script src="js/turkey-geography.js?v=1792467926943"></script>
-    <script src="js/turkey-curves.js?v=1792467926943"></script>
-    <script src="js/welcome-calendar.js?v=1792617000000"></script>
-    <script src="js/turkey-atlas.js?v=1792617500000"></script>
-    <script src="js/live-weather.js?v=1792618000000"></script>
-    <script src="js/smart-environment.js?v=1792619000000"></script>
-    <script src="js/city-landmarks.js?v=1792620000000"></script>
-    <script src="js/solar-prayer-engine.js?v=1792621000000"></script>
-    <script src="js/powertrain-dynamics.js?v=1792622000000"></script>
-    <script src="js/bus-concept-guide.js?v=1792623000000"></script>
     <script src="js/game.js?v=1792467926943"></script>
     <script src="js/app.js?v=1792467926943"></script>
 
@@ -917,6 +883,9 @@
                 <button id="tab-acad-company" class="modern-btn nav-item" style="flex: 1.4; min-width: 180px; padding: 10px 14px; font-size: 0.95rem; background: rgba(234, 179, 8, 0.2); border: 1.5px solid #facc15; color: #fde047; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="5. Şirket Yönetimi, Binalar ve Ön Muhasebe Rehberi">
                     🏢 5. Şirket Yönetimi & Binalar
                 </button>
+                <button id="tab-acad-company" class="modern-btn nav-item" style="flex: 1.4; min-width: 180px; padding: 10px 14px; font-size: 0.95rem; background: rgba(234, 179, 8, 0.2); border: 1.5px solid #facc15; color: #fde047; font-weight: bold; border-radius: 8px; cursor: pointer;" aria-label="4. Şirket Yönetimi, Binalar ve Ön Muhasebe Rehberi">
+                    🏢 4. Şirket Yönetimi & Binalar
+                </button>
             </div>
 
             <!-- Hızlı Eylem Butonları -->
@@ -939,8 +908,6 @@
             <div id="tutorial-seruven-container" style="display: none; margin-bottom: 12px;"></div>
             <!-- Şirket Yönetimi, 6 Yasal Bina ve Kasa Defteri Rehberi -->
             <div id="tutorial-company-container" style="display: none; margin-bottom: 12px; max-height: 52vh; overflow-y: auto;"></div>
-            <!-- Otobüs Mekanikleri ve Ağır Vasıta Fiziği Rehberi -->
-            <div id="tutorial-mechanics-container" style="display: none; margin-bottom: 12px; max-height: 52vh; overflow-y: auto;"></div>
 
             <!-- Tuşlar ve Oyun İpuçları Listesi -->
             <ul id="tutorial-lessons-list" style="display: none; list-style: none; padding: 0; margin: 0; max-height: 50vh; overflow-y: auto;">
