@@ -1,0 +1,40 @@
+﻿============================================================
+       BALIK TUTMA OYUNU - ÇEVRİMİÇİ ÇOK OYUNCULU SÜRÜM
+============================================================
+
+1. NASIL BAŞLATILIR?
+   - Klasörün içindeki "balik_oyunu.exe" veya "oyunu_baslat.bat" 
+     dosyasına çift tıklayarak oyunu başlatabilirsiniz.
+   - Başlatıcı arka planda güncellemeleri otomatik kontrol eder, 
+     ağ motorunu açar ve oyunu başlatır.
+
+2. OTOMATİK GÜNCELLEME:
+   - Klasördeki "GUNCELLE.bat" dosyasına tıklayarak dilediğiniz zaman 
+     en yeni sürümü sesli olarak indirebilir ve kurabilirsiniz.
+
+3. ÇEVRİMİÇİ EŞLEŞME (ÇOK OYUNCULU MOD):
+   - Ana menüden "Oyuna Başla" deyip "Park Haritası"na girin.
+   - Parkta bulunan diğer arkadaşlarınızla internet üzerinden 
+     otomatik olarak eşleşirsiniz.
+   - Modemde port açmaya, Hamachi veya VPN kurmaya KESİNLİKLE gerek yoktur!
+   - Arkadaşınızın adımlarını 3D stereo olarak gerçek zamanlı duyarsınız.
+
+4. ÇEVRİMİÇİ RUMUZ BELİRLEME:
+   - Ana menüden "Çevrimiçi Rumuzunu Belirle" seçeneğine girerek 
+     istediğiniz balıkçı adını yazabilirsiniz.
+
+5. EŞYA AKTARIMI (HEDİYELEŞME):
+   - Park haritasındayken "E" tuşuyla Envanter Menüsü'ne girin.
+   - Arkadaşınıza vermek istediğiniz eşyayı seçip "G" tuşuna basın. 
+     Seçtiğiniz eşya anında arkadaşınıza hediye edilir!
+
+6. KONTROLLER VE KISAYOLLAR:
+   - Ok Tuşları: Yürüme ve menülerde dolaşma.
+   - Enter / Boşluk: Seçim yapma ve oltayı atma/çekme.
+   - HOME Tuşu: Ana ses seviyesini %10 artırır.
+   - END Tuşu: Ana ses seviyesini %10 azaltır.
+   - C Tuşu: Koordinatlarınızı ve arkadaşınızın mesafesini seslendirir.
+   - Esc: Menüye dönme veya çıkış.
+
+İyi oyunlar ve rastgele!
+============================================================
