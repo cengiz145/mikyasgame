@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
 $downloads = [System.Environment]::GetFolderPath("UserProfile") + "\Downloads"
 $benimDunyam = "$downloads\benim_dunyam"
@@ -36,7 +36,7 @@ if (Test-Path $otobusSource) {
 }
 
 # Diger oyunlar ve ana site dosyalari
-$digerKlasorler = @("futbol", "kelime_hazinesi", "video_asistan")
+$digerKlasorler = @("futbol", "kelime_hazinesi", "video_asistan", "kalpkalbe")
 foreach ($klasor in $digerKlasorler) {
     $srcK = "$benimDunyam\$klasor"
     if (Test-Path $srcK) {
