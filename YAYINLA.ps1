@@ -36,7 +36,7 @@ if (Test-Path $otobusSource) {
 }
 
 # Diger oyunlar ve ana site dosyalari
-$digerKlasorler = @("futbol", "kelime_hazinesi", "video_asistan", "kalpkalbe")
+$digerKlasorler = @("futbol", "kelime_hazinesi", "video_asistan")
 foreach ($klasor in $digerKlasorler) {
     $srcK = "$benimDunyam\$klasor"
     if (Test-Path $srcK) {
