@@ -1,7 +1,7 @@
 #include "bgt_compat.nvgt"
 #include "bc_compat.nvgt"
-double gversion=6.6;
-const string ver="6.6";
+double gversion=6.7;
+const string ver="6.7";
 //#include"sounds.dat"
 
 #include "includes.nvgt"
