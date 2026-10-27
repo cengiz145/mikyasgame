@@ -189,13 +189,37 @@ int wsindex=0;
 int ws_voice_index=0;
 string get_server_ip() {
     if (file_exists("host.txt")) {
-        return "127.0.0.1";
+        file f;
+        if (f.open("host.txt", "r")) {
+            string custom_ip = f.read();
+            f.close();
+            custom_ip = custom_ip.replace("\r", "");
+            custom_ip = custom_ip.replace("\n", "");
+            custom_ip = custom_ip.replace(" ", "");
+            if (custom_ip.length() >= 7 && custom_ip != "1") {
+                return custom_ip;
+            }
+        }
+    }
+    if (file_exists("server_ip.txt")) {
+        file f;
+        if (f.open("server_ip.txt", "r")) {
+            string custom_ip = f.read();
+            f.close();
+            custom_ip = custom_ip.replace("\r", "");
+            custom_ip = custom_ip.replace("\n", "");
+            custom_ip = custom_ip.replace(" ", "");
+            if (custom_ip.length() >= 7 && custom_ip != "1") {
+                return custom_ip;
+            }
+        }
     }
     string ip = url_get("https://raw.githubusercontent.com/cengiz145/mikyasgame/main/server_ip.txt");
     ip = ip.replace("\r", "");
     ip = ip.replace("\n", "");
-    if (ip == "") {
-        ip = "195.174.126.26";
+    ip = ip.replace(" ", "");
+    if (ip == "" || ip.length() < 7) {
+        ip = "176.96.131.55";
     }
     return ip;
 }
