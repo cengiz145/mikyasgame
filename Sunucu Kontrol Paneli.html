@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yetkilendirme ve Sunucu Kontrol Paneli - Rabia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(22, 30, 49, 0.85);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #ec4899;
+      --success: #10b981;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif; }
+    body {
+      background: radial-gradient(circle at 50% 0%, #2e1065 0%, #0f172a 50%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 30px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      max-width: 860px;
+      width: 100%;
+    }
+    .header-box {
+      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      backdrop-filter: blur(12px);
+    }
+    .header-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.35);
+    }
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, #c7d2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .header-sub {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    /* Alert / Bildirim */
+    .status-alert {
+      padding: 12px 18px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: none;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Yetkilendirme Kartları */
+    .auth-panel {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.22) 0%, rgba(236, 72, 153, 0.18) 50%, rgba(15, 23, 42, 0.85) 100%);
+      border: 2px solid rgba(165, 180, 252, 0.35);
+      border-radius: 20px;
+      padding: 26px;
+      margin-bottom: 26px;
+      box-shadow: 0 16px 36px -10px rgba(99, 102, 241, 0.3);
+    }
+    .auth-panel-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .item-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(8px);
+    }
+    .item-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .val-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #020617;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    .val-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #38bdf8;
+      flex: 1;
+      word-break: break-all;
+    }
+    .btn-copy {
+      background: rgba(99, 102, 241, 0.25);
+      color: #e0e7ff;
+      border: 1px solid rgba(99, 102, 241, 0.45);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover {
+      background: #4f46e5;
+      color: #fff;
+      transform: scale(1.03);
+    }
+    .desc-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+    /* Rehber Bölümü */
+    .guide-box {
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    .guide-box h2 {
+      font-size: 1.15rem;
+      color: #f472b6;
+      margin-bottom: 12px;
+    }
+    .guide-box ol {
+      margin-left: 22px;
+    }
+    .guide-box li {
+      margin-bottom: 12px;
+    }
+    .code-badge {
+      background: rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #93c5fd;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    /* Buton Grubu */
+    .action-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s ease;
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.55);
+    }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header-box">
+      <span class="header-tag">Rabia & Ümit Ekrem • Özel Sunucu</span>
+      <h1>Yetkilendirme ve Sunucu Bağlantı Paneli</h1>
+      <p class="header-sub">Rabia'nın bilgisayarını bağlayıp kendi oyununu güvenle hostlayabilmesi için resmi erişim bilgileri.</p>
+    </header>
+
+    <div id="alertBox" class="status-alert" role="status" aria-live="polite"></div>
+
+    <!-- Yetkilendirme Paneli -->
+    <main class="auth-panel" aria-labelledby="authTitle">
+      <div class="auth-panel-title">
+        <span aria-hidden="true">🔐</span>
+        <h2 id="authTitle" style="font-size: 1.35rem; color: #fff; display: inline;">Yetkilendirme Paneli</h2>
+      </div>
+
+      <div class="grid">
+        <!-- 1. Sunucu Adı -->
+        <div class="item-card">
+          <div class="item-label">
+            <span>🌐 Sunucu Adı / IP</span>
+          </div>
+          <div class="val-box">
+            <span class="val-text" id="hostVal">176.96.131.55</span>
+            <button class="btn-copy" onclick="copyValue('176.96.131.55', 'Sunucu Adı kopyalandı!')" aria-label="Sunucu adını kopyala">📋 Kopyala</button>
+          </div>
+          <p class="desc-text">İstemcideki veya TeamTalk'taki <em>Sunucu Adresi</em> alanına yazılır.</p>
+        </div>
+
+        <!-- 2. Ana Port -->
+        <div class="item-card">
+          <div class="item-label">
+            <span>🚪 Ana Port</span>
+          </div>
+          <div class="val-box">
+            <span class="val-text" id="portVal">10333</span>
+            <button class="btn-copy" onclick="copyValue('10333', 'Ana Port kopyalandı!')" aria-label="Ana portu kopyala">📋 Kopyala</button>
+          </div>
+          <p class="desc-text"><strong>10333</strong>: TeamTalk & Sesli Oyun Ana Portu (TCP & UDP)<br><em>Diğer: 65000 (Oyun Portu), 22 (SSH Host Portu)</em></p>
+        </div>
+
+        <!-- 3. Sunucunun Şifresi -->
+        <div class="item-card">
+          <div class="item-label">
+            <span>🔑 Sunucunun Şifresi</span>
+            <button class="btn-copy" style="padding: 2px 8px; font-size: 0.75rem;" onclick="togglePass()" id="toggleBtn" aria-label="Şifreyi gizle veya göster">👁️ Göster/Gizle</button>
+          </div>
+          <div class="val-box">
+            <span class="val-text" id="passVal">rabia2026</span>
+            <button class="btn-copy" onclick="copyValue('rabia2026', 'Sunucu Şifresi kopyalandı!')" aria-label="Sunucu şifresini kopyala">📋 Kopyala</button>
+          </div>
+          <p class="desc-text">Sunucuya bağlanırken ve oda yetkisi alırken girilecek şifre.</p>
+        </div>
+
+        <!-- 4. Yetkili Kullanıcı -->
+        <div class="item-card">
+          <div class="item-label">
+            <span>👤 Yetkili Kullanıcı</span>
+          </div>
+          <div class="val-box">
+            <span class="val-text" style="color: #f472b6;" id="userVal">rabia</span>
+            <button class="btn-copy" onclick="copyValue('rabia', 'Kullanıcı adı kopyalandı!')" aria-label="Kullanıcı adını kopyala">📋 Kopyala</button>
+          </div>
+          <p class="desc-text">Yetki Düzeyi: <strong>Tam Yetkili Yönetici & Oyun Hostu</strong></p>
+        </div>
+      </div>
+
+      <!-- Oyun Hostlama Rehberi -->
+      <section class="guide-box" aria-labelledby="guideTitle">
+        <h2 id="guideTitle">🎮 Rabia Bilgisayarını Nasıl Bağlayacak ve Oyununu Nasıl Hostlayacak?</h2>
+        <ol>
+          <li>
+            <strong>TeamTalk 5 ile Oyun Odası Açma & Sesli Oyun Hostlama:</strong><br>
+            TeamTalk programını açın. <span class="code-badge">F2</span> tuşuna basarak <em>Sunucuları Yönet</em> penceresini açın ve <em>"Ekle"</em> butonuna basın.<br>
+            • <strong>Sunucu Adı:</strong> <span class="code-badge">176.96.131.55</span><br>
+            • <strong>Ana Port:</strong> <span class="code-badge">10333</span><br>
+            • <strong>Sunucu Şifresi:</strong> <span class="code-badge">rabia2026</span><br>
+            • <strong>Yetkilendirme Sekmesi:</strong> Kullanıcı Adı: <span class="code-badge">rabia</span>, Şifre: <span class="code-badge">rabia2026</span><br>
+            Bağlandıktan sonra ekranda sağ tıklayıp (veya Uygulama Tuşu) <strong>"Kanal Oluştur"</strong> diyerek kendi oyun odanızı kurabilir, masaüstü veya stereo karışımı sesini paylaşarak oyununuzu arkadaşlarınızla canlı hostlayabilirsiniz!
+          </li>
+          <li>
+            <strong>Kendi Bilgisayarındaki Oyun Sunucusunu İnternete Açma (Tünel Bağlantısı):</strong><br>
+            Rabia kendi bilgisayarında çalışan bir sunucuyu (NVGT, Python, BGT vb.) VDS üzerinden herkese açmak isterse komut satırından:<br>
+            <span class="code-badge">ssh -N -R 6789:localhost:6789 rabia@176.96.131.55</span><br>
+            komutunu yazar (Şifre: <span class="code-badge">rabia2026</span>). Böylece oyuncular doğrudan VDS IP'sine (<span class="code-badge">176.96.131.55</span>) bağlanarak Rabia'nın bilgisayarındaki oyuna katılır.
+          </li>
+          <li>
+            <strong>Oyun Dosyalarını Sunucuya Yükleyip 7/24 Kesintisiz Hostlama:</strong><br>
+            WinSCP veya FileZilla ile Sunucu: <span class="code-badge">176.96.131.55</span>, Port: <span class="code-badge">22</span>, Kullanıcı: <span class="code-badge">rabia</span>, Şifre: <span class="code-badge">rabia2026</span> girerek dosyalarını sunucuya aktarabilir.
+          </li>
+        </ol>
+      </section>
+
+      <!-- Canlı Panele Giriş Butonu -->
+      <div class="action-row">
+        <a href="http://176.96.131.55:8080/" class="btn-primary" target="_blank" rel="noopener noreferrer" aria-label="Canlı VDS Sunucu Yönetim Paneline Git">
+          🚀 Canlı VDS Sunucu Yönetim Paneline Git (Port 8080)
+        </a>
+      </div>
+    </main>
+
+    <footer>
+      Mikyas Studio &bull; Rabia & Ümit Ekrem &bull; 2026
+    </footer>
+  </div>
+
+  <script>
+    function showAlert(msg, isSuccess=true) {
+      const box = document.getElementById('alertBox');
+      box.textContent = msg;
+      box.style.display = 'block';
+      box.style.background = isSuccess ? 'rgba(16, 185, 129, 0.25)' : 'rgba(239, 68, 68, 0.25)';
+      box.style.color = isSuccess ? '#34d399' : '#f87171';
+      box.style.border = isSuccess ? '1px solid #059669' : '1px solid #dc2626';
+      setTimeout(() => { box.style.display = 'none'; }, 4000);
+    }
+
+    function copyValue(text, successMsg) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+          showAlert(successMsg, true);
+        }).catch(() => {
+          fallbackCopy(text, successMsg);
+        });
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    }
+
+    function fallbackCopy(text, successMsg) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.left = "-999999px";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showAlert(successMsg, true);
+      } catch (err) {
+        showAlert('Panoya kopyalanamadı, lütfen elle kopyalayın: ' + text, false);
+      }
+      document.body.removeChild(ta);
+    }
+
+    let isVisible = true;
+    function togglePass() {
+      const pass = document.getElementById('passVal');
+      const btn = document.getElementById('toggleBtn');
+      isVisible = !isVisible;
+      if (isVisible) {
+        pass.textContent = 'rabia2026';
+        btn.textContent = '👁️ Gizle';
+      } else {
+        pass.textContent = '••••••••';
+        btn.textContent = '👁️ Göster';
+      }
+    }
+  </script>
+</body>
+</html>
