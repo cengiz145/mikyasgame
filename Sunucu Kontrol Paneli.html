@@ -3,122 +3,229 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yetkilendirme ve Sunucu Kontrol Paneli - Rabia</title>
+  <title>Benim Dünyam & TeamTalk - VDS Yönetim & Destek Paneli</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0b0f19;
       --card-bg: rgba(22, 30, 49, 0.85);
-      --card-border: rgba(255, 255, 255, 0.1);
+      --card-border: rgba(255, 255, 255, 0.08);
       --primary: #6366f1;
       --primary-hover: #4f46e5;
-      --accent: #ec4899;
       --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.15);
+      --warning: #f59e0b;
       --text: #f8fafc;
       --text-muted: #94a3b8;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', -apple-system, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, sans-serif; }
     body {
-      background: radial-gradient(circle at 50% 0%, #2e1065 0%, #0f172a 50%, var(--bg) 100%);
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg) 70%);
       color: var(--text);
       min-height: 100vh;
-      padding: 30px 16px;
+      padding: 24px 16px;
+    }
+    .container { max-width: 1050px; margin: 0 auto; }
+    header {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-    }
-    .container {
-      max-width: 860px;
-      width: 100%;
-    }
-    .header-box {
-      text-align: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--card-border);
       margin-bottom: 24px;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--card-border);
-      border-radius: 18px;
-      backdrop-filter: blur(12px);
     }
-    .header-tag {
-      display: inline-block;
-      background: linear-gradient(135deg, #ec4899, #8b5cf6);
-      color: white;
-      padding: 6px 16px;
+    h1 { font-size: 1.6rem; font-weight: 700; color: #fff; }
+    .badge-ip {
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #c7d2fe;
+      padding: 6px 12px;
       border-radius: 9999px;
       font-size: 0.85rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 15px rgba(236, 72, 153, 0.35);
+      font-weight: 600;
     }
-    h1 {
-      font-size: 1.85rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #fff, #c7d2fe);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .status-alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      display: none;
+    }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+    .card h2 { font-size: 1.1rem; color: #e2e8f0; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .metric-value { font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .metric-desc { font-size: 0.85rem; color: var(--text-muted); }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
+    .service-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 24px;
+    }
+    .service-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .pill-active { background: var(--success-bg); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .pill-inactive { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .pill-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    button {
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    button:focus { outline: 3px solid #818cf8; outline-offset: 2px; }
+    .btn-restart { background: #4f46e5; color: white; }
+    .btn-restart:hover { background: #4338ca; }
+    .btn-stop { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-stop:hover { background: rgba(239, 68, 68, 0.3); }
+    .btn-start { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .btn-start:hover { background: rgba(16, 185, 129, 0.3); }
+    .btn-backup { background: #059669; color: white; }
+    .btn-backup:hover { background: #047857; }
+    .btn-reboot { background: #dc2626; color: white; }
+    .btn-reboot:hover { background: #b91c1c; }
+    .btn-tool {
+      background: rgba(99, 102, 241, 0.15);
+      color: #c7d2fe;
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .btn-tool:hover { background: rgba(99, 102, 241, 0.28); }
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .diag-result {
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      font-size: 0.92rem;
+      line-height: 1.7;
+      display: none;
+    }
+    .terminal-box {
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 14px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #93c5fd;
+      max-height: 260px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      margin-top: 12px;
+      line-height: 1.4;
+    }
+    .backup-list { list-style: none; margin-top: 12px; }
+    .backup-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
       margin-bottom: 8px;
     }
-    .header-sub {
-      color: var(--text-muted);
-      font-size: 1rem;
-      line-height: 1.5;
-    }
-    /* Alert / Bildirim */
-    .status-alert {
-      padding: 12px 18px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      display: none;
-      text-align: center;
-      animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    /* Yetkilendirme Kartları */
-    .auth-panel {
+    /* Yetkilendirme & Bağlantı Paneli Stilleri */
+    .auth-banner {
       background: linear-gradient(135deg, rgba(99, 102, 241, 0.22) 0%, rgba(236, 72, 153, 0.18) 50%, rgba(15, 23, 42, 0.85) 100%);
       border: 2px solid rgba(165, 180, 252, 0.35);
-      border-radius: 20px;
-      padding: 26px;
+      border-radius: 16px;
+      padding: 24px;
       margin-bottom: 26px;
-      box-shadow: 0 16px 36px -10px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 12px 30px -5px rgba(99, 102, 241, 0.25);
     }
-    .auth-panel-title {
-      font-size: 1.35rem;
+    .auth-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 14px;
+    }
+    .auth-title {
+      font-size: 1.4rem;
       font-weight: 700;
       color: #fff;
-      margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .grid {
+    
+    .auth-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 16px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
-    .item-card {
-      background: rgba(15, 23, 42, 0.7);
+    .auth-card {
+      background: rgba(15, 23, 42, 0.65);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 14px;
+      border-radius: 12px;
       padding: 18px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       backdrop-filter: blur(8px);
     }
-    .item-label {
-      font-size: 0.82rem;
-      font-weight: 700;
+    .auth-card-label {
+      font-size: 0.85rem;
+      font-weight: 600;
       color: #cbd5e1;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -127,17 +234,17 @@
       align-items: center;
       justify-content: space-between;
     }
-    .val-box {
+    .auth-val-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       background: #020617;
       padding: 10px 14px;
-      border-radius: 10px;
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 8px;
+      border: 1px solid rgba(99, 102, 241, 0.25);
     }
-    .val-text {
-      font-family: 'JetBrains Mono', monospace;
+    .auth-val-text {
+      font-family: monospace;
       font-size: 1.15rem;
       font-weight: 700;
       color: #38bdf8;
@@ -147,9 +254,9 @@
     .btn-copy {
       background: rgba(99, 102, 241, 0.25);
       color: #e0e7ff;
-      border: 1px solid rgba(99, 102, 241, 0.45);
+      border: 1px solid rgba(99, 102, 241, 0.4);
       padding: 6px 12px;
-      border-radius: 8px;
+      border-radius: 6px;
       font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
@@ -161,243 +268,441 @@
     .btn-copy:hover {
       background: #4f46e5;
       color: #fff;
-      transform: scale(1.03);
     }
-    .desc-text {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 8px;
-      line-height: 1.4;
-    }
-    /* Rehber Bölümü */
-    .guide-box {
+    .auth-instructions {
       background: rgba(2, 6, 23, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 24px;
-      font-size: 0.95rem;
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 0.92rem;
       line-height: 1.7;
+      color: #e2e8f0;
     }
-    .guide-box h2 {
-      font-size: 1.15rem;
+    .auth-instructions h3 {
+      font-size: 1.05rem;
       color: #f472b6;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
-    .guide-box ol {
-      margin-left: 22px;
+    .auth-instructions ol {
+      margin-left: 20px;
+      margin-top: 6px;
     }
-    .guide-box li {
-      margin-bottom: 12px;
+    .auth-instructions li {
+      margin-bottom: 8px;
     }
-    .code-badge {
-      background: rgba(99, 102, 241, 0.25);
+    .code-tag {
+      background: rgba(99, 102, 241, 0.2);
       border: 1px solid rgba(99, 102, 241, 0.4);
       color: #93c5fd;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.9rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: monospace;
       font-weight: 600;
     }
-    /* Buton Grubu */
-    .action-row {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, #4f46e5, #7c3aed);
-      color: white;
-      text-decoration: none;
-      padding: 14px 28px;
-      border-radius: 12px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.25s ease;
-      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
-      border: none;
-      cursor: pointer;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.55);
-    }
-    footer {
-      text-align: center;
-      margin-top: 30px;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-    }
+    footer { text-align: center; margin-top: 40px; color: var(--text-muted); font-size: 0.85rem; }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Header -->
-    <header class="header-box">
-      <span class="header-tag">Rabia & Ümit Ekrem • Özel Sunucu</span>
-      <h1>Yetkilendirme ve Sunucu Bağlantı Paneli</h1>
-      <p class="header-sub">Rabia'nın bilgisayarını bağlayıp kendi oyununu güvenle hostlayabilmesi için resmi erişim bilgileri.</p>
+    <header>
+      <div>
+        <h1>Benim Dünyam & TeamTalk 5 Yönetim Paneli</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Tam Donanımlı Sunucu Yönetim & Destek Sistemi</p>
+      </div>
+      <div>
+        <span class="badge-ip">Sunucu IP: 176.96.131.55</span>
+      </div>
     </header>
 
     <div id="alertBox" class="status-alert" role="status" aria-live="polite"></div>
 
-    <!-- Yetkilendirme Paneli -->
-    <main class="auth-panel" aria-labelledby="authTitle">
-      <div class="auth-panel-title">
-        <span aria-hidden="true">🔐</span>
-        <h2 id="authTitle" style="font-size: 1.35rem; color: #fff; display: inline;">Yetkilendirme Paneli</h2>
-      </div>
-
+    <section aria-labelledby="statusHeading">
+      <h2 id="statusHeading" style="font-size: 1.2rem; margin-bottom: 14px; color: #cbd5e1;">Sistem Kaynakları</h2>
       <div class="grid">
-        <!-- 1. Sunucu Adı -->
-        <div class="item-card">
-          <div class="item-label">
-            <span>🌐 Sunucu Adı / IP</span>
-          </div>
-          <div class="val-box">
-            <span class="val-text" id="hostVal">176.96.131.55</span>
-            <button class="btn-copy" onclick="copyValue('176.96.131.55', 'Sunucu Adı kopyalandı!')" aria-label="Sunucu adını kopyala">📋 Kopyala</button>
-          </div>
-          <p class="desc-text">İstemcideki veya TeamTalk'taki <em>Sunucu Adresi</em> alanına yazılır.</p>
+        <div class="card">
+          <h2>İşlemci (CPU)</h2>
+          <div class="metric-value" id="cpuVal">-- %</div>
+          <div class="metric-desc" id="cpuDesc">Intel Xeon E5-2699 v4 (4 Çekirdek)</div>
+          <div class="progress-bar"><div class="progress-fill" id="cpuFill"></div></div>
         </div>
-
-        <!-- 2. Ana Port -->
-        <div class="item-card">
-          <div class="item-label">
-            <span>🚪 Ana Port</span>
-          </div>
-          <div class="val-box">
-            <span class="val-text" id="portVal">10333</span>
-            <button class="btn-copy" onclick="copyValue('10333', 'Ana Port kopyalandı!')" aria-label="Ana portu kopyala">📋 Kopyala</button>
-          </div>
-          <p class="desc-text"><strong>10333</strong>: TeamTalk & Sesli Oyun Ana Portu (TCP & UDP)<br><em>Diğer: 65000 (Oyun Portu), 22 (SSH Host Portu)</em></p>
+        <div class="card">
+          <h2>Bellek (RAM)</h2>
+          <div class="metric-value" id="memVal">-- / -- MB</div>
+          <div class="metric-desc" id="memDesc">Kullanılan / Toplam RAM</div>
+          <div class="progress-bar"><div class="progress-fill" id="memFill"></div></div>
         </div>
-
-        <!-- 3. Sunucunun Şifresi -->
-        <div class="item-card">
-          <div class="item-label">
-            <span>🔑 Sunucunun Şifresi</span>
-            <button class="btn-copy" style="padding: 2px 8px; font-size: 0.75rem;" onclick="togglePass()" id="toggleBtn" aria-label="Şifreyi gizle veya göster">👁️ Göster/Gizle</button>
-          </div>
-          <div class="val-box">
-            <span class="val-text" id="passVal">rabia2026</span>
-            <button class="btn-copy" onclick="copyValue('rabia2026', 'Sunucu Şifresi kopyalandı!')" aria-label="Sunucu şifresini kopyala">📋 Kopyala</button>
-          </div>
-          <p class="desc-text">Sunucuya bağlanırken ve oda yetkisi alırken girilecek şifre.</p>
+        <div class="card">
+          <h2>Disk Alanı</h2>
+          <div class="metric-value" id="diskVal">-- GB</div>
+          <div class="metric-desc">Kullanılabilir Boş NVMe Alanı</div>
         </div>
+        <div class="card">
+          <h2>Sistem Uptime</h2>
+          <div class="metric-value" id="uptimeVal" style="font-size: 1.3rem;">--</div>
+          <div class="metric-desc">Sunucunun Kesintisiz Açık Kalma Süresi</div>
+        </div>
+      </div>
+    </section>
 
-        <!-- 4. Yetkili Kullanıcı -->
-        <div class="item-card">
-          <div class="item-label">
-            <span>👤 Yetkili Kullanıcı</span>
-          </div>
-          <div class="val-box">
-            <span class="val-text" style="color: #f472b6;" id="userVal">rabia</span>
-            <button class="btn-copy" onclick="copyValue('rabia', 'Kullanıcı adı kopyalandı!')" aria-label="Kullanıcı adını kopyala">📋 Kopyala</button>
-          </div>
-          <p class="desc-text">Yetki Düzeyi: <strong>Tam Yetkili Yönetici & Oyun Hostu</strong></p>
+    
+
+    <!-- Benim Dünyam Game Server -->
+    <section class="service-card" aria-labelledby="gameHeading">
+      <div class="service-header">
+        <div>
+          <h2 id="gameHeading" style="font-size: 1.3rem; color: #fff;">🎮 Benim Dünyam (Oyun Sunucusu)</h2>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+            Portlar: UDP 6789 (Yerel) | UDP 65000 (Evrensel Güvenli Port)
+          </p>
+        </div>
+        <div id="gameStatusPill" class="status-pill pill-inactive">
+          <span class="pill-dot"></span>
+          <span id="gameStatusText" aria-live="polite">Kontrol Ediliyor...</span>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn-restart" aria-label="Benim Dünyam oyun sunucusunu yeniden başlat" onclick="actionService('game', 'restart')">🔄 Oyunu Yeniden Başlat</button>
+        <button class="btn-stop" aria-label="Benim Dünyam oyun sunucusunu durdur" onclick="actionService('game', 'stop')">⏹️ Oyunu Durdur</button>
+        <button class="btn-start" aria-label="Benim Dünyam oyun sunucusunu başlat" onclick="actionService('game', 'start')">▶️ Oyunu Başlat</button>
+      </div>
+    </section>
+
+    <!-- TeamTalk 5 Server -->
+    <section class="service-card" aria-labelledby="ttHeading">
+      <div class="service-header">
+        <div>
+          <h2 id="ttHeading" style="font-size: 1.3rem; color: #fff;">🎙️ TeamTalk 5 Sunucusu</h2>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+            Port: TCP & UDP 10333
+          </p>
+        </div>
+        <div id="ttStatusPill" class="status-pill pill-inactive">
+          <span class="pill-dot"></span>
+          <span id="ttStatusText" aria-live="polite">Kontrol Ediliyor...</span>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn-restart" aria-label="TeamTalk 5 ses sunucusunu yeniden başlat" onclick="actionService('tt', 'restart')">🔄 TeamTalk'ı Yeniden Başlat</button>
+        <button class="btn-stop" aria-label="TeamTalk 5 ses sunucusunu durdur" onclick="actionService('tt', 'stop')">⏹️ TeamTalk'ı Durdur</button>
+        <button class="btn-start" aria-label="TeamTalk 5 ses sunucusunu başlat" onclick="actionService('tt', 'start')">▶️ TeamTalk'ı Başlat</button>
+      </div>
+    </section>
+
+    <!-- Destek & Bakım Araçları (Müşteri Hizmetleri Seviyesi) -->
+    <section class="service-card" aria-labelledby="toolsHeading">
+      <div class="service-header">
+        <div>
+          <h2 id="toolsHeading" style="font-size: 1.3rem; color: #fff;">🛠️ Destek & Bakım Araçları (Uzman Kontrolleri)</h2>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+            Hosting firması destek ekibinin yaptığı tüm teknik kontroller tek tıkla elinizin altında.
+          </p>
         </div>
       </div>
 
-      <!-- Oyun Hostlama Rehberi -->
-      <section class="guide-box" aria-labelledby="guideTitle">
-        <h2 id="guideTitle">🎮 Rabia Bilgisayarını Nasıl Bağlayacak ve Oyununu Nasıl Hostlayacak?</h2>
-        <ol>
-          <li>
-            <strong>TeamTalk 5 ile Oyun Odası Açma & Sesli Oyun Hostlama:</strong><br>
-            TeamTalk programını açın. <span class="code-badge">F2</span> tuşuna basarak <em>Sunucuları Yönet</em> penceresini açın ve <em>"Ekle"</em> butonuna basın.<br>
-            • <strong>Sunucu Adı:</strong> <span class="code-badge">176.96.131.55</span><br>
-            • <strong>Ana Port:</strong> <span class="code-badge">10333</span><br>
-            • <strong>Sunucu Şifresi:</strong> <span class="code-badge">rabia2026</span><br>
-            • <strong>Yetkilendirme Sekmesi:</strong> Kullanıcı Adı: <span class="code-badge">rabia</span>, Şifre: <span class="code-badge">rabia2026</span><br>
-            Bağlandıktan sonra ekranda sağ tıklayıp (veya Uygulama Tuşu) <strong>"Kanal Oluştur"</strong> diyerek kendi oyun odanızı kurabilir, masaüstü veya stereo karışımı sesini paylaşarak oyununuzu arkadaşlarınızla canlı hostlayabilirsiniz!
-          </li>
-          <li>
-            <strong>Kendi Bilgisayarındaki Oyun Sunucusunu İnternete Açma (Tünel Bağlantısı):</strong><br>
-            Rabia kendi bilgisayarında çalışan bir sunucuyu (NVGT, Python, BGT vb.) VDS üzerinden herkese açmak isterse komut satırından:<br>
-            <span class="code-badge">ssh -N -R 6789:localhost:6789 rabia@176.96.131.55</span><br>
-            komutunu yazar (Şifre: <span class="code-badge">rabia2026</span>). Böylece oyuncular doğrudan VDS IP'sine (<span class="code-badge">176.96.131.55</span>) bağlanarak Rabia'nın bilgisayarındaki oyuna katılır.
-          </li>
-          <li>
-            <strong>Oyun Dosyalarını Sunucuya Yükleyip 7/24 Kesintisiz Hostlama:</strong><br>
-            WinSCP veya FileZilla ile Sunucu: <span class="code-badge">176.96.131.55</span>, Port: <span class="code-badge">22</span>, Kullanıcı: <span class="code-badge">rabia</span>, Şifre: <span class="code-badge">rabia2026</span> girerek dosyalarını sunucuya aktarabilir.
-          </li>
-        </ol>
-      </section>
-
-      <!-- Canlı Panele Giriş Butonu -->
-      <div class="action-row">
-        <a href="http://176.96.131.55:8080/" class="btn-primary" target="_blank" rel="noopener noreferrer" aria-label="Canlı VDS Sunucu Yönetim Paneline Git">
-          🚀 Canlı VDS Sunucu Yönetim Paneline Git (Port 8080)
-        </a>
+      <div class="tool-grid">
+        <button class="btn-tool" aria-label="Ağ, internet ve tüm portların durumunu otomatik test et" onclick="runDiagnostic()">
+          🌐 Port & Bağlantı Teşhisi Yap
+        </button>
+        <button class="btn-tool" aria-label="Sunucuda biriken önbellek ve boşta kalan RAM'i temizle" onclick="cleanRam()">
+          🧹 Boşta Kalan RAM'i Temizle
+        </button>
+        <button class="btn-tool" aria-label="Eski logları ve geçici dosyaları temizleyip diskte yer aç" onclick="cleanDisk()">
+          🗑️ Eski Logları & Çöpü Temizle
+        </button>
+        <button class="btn-tool" aria-label="Donan veya kilitli kalan Wine ve oyun işlemlerini temizle" onclick="cleanZombies()">
+          ☠️ Donan / Zombi İşlemleri Temizle
+        </button>
+        <button class="btn-tool" aria-label="65000 port yönlendirmesini ve güvenlik duvarını onar" onclick="fixFirewall()">
+          🛡️ Port Yönlendirmeyi Onar
+        </button>
       </div>
-    </main>
+
+      <div id="diagBox" class="diag-result" role="region" aria-live="polite" aria-label="Teşhis Sonuçları"></div>
+    </section>
+
+    <!-- Yedekleme Yöneticisi -->
+    <section class="service-card" aria-labelledby="backupHeading">
+      <div class="service-header">
+        <div>
+          <h2 id="backupHeading" style="font-size: 1.3rem; color: #fff;">💾 Güvenli Yedekleme</h2>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">
+            Tüm oyuncu hesapları, envanterler ve haritalar tek tıkla arşivlenir.
+          </p>
+        </div>
+        <button class="btn-backup" aria-label="Tüm oyun ve oyuncu verilerini hemen yeni bir dosyaya yedekle" onclick="createBackup()">📦 Hemen Yeni Yedek Al</button>
+      </div>
+      <ul class="backup-list" id="backupList">
+        <li style="color: var(--text-muted); font-size: 0.9rem;">Yedekler yükleniyor...</li>
+      </ul>
+    </section>
+
+    <!-- Canlı Loglar -->
+    <section class="service-card" aria-labelledby="logHeading">
+      <div class="service-header">
+        <h2 id="logHeading" style="font-size: 1.2rem; color: #fff;">📜 Canlı Oyun Sunucusu Günlüğü (Loglar)</h2>
+        <button style="background: rgba(255,255,255,0.08); color: #e2e8f0;" aria-label="Canlı sunucu loglarını yenile" onclick="refreshLogs()">🔄 Logları Yenile</button>
+      </div>
+      <div class="terminal-box" id="logBox" tabindex="0" role="region" aria-label="Sunucu konsol çıktıları">Loglar yükleniyor...</div>
+    </section>
+
+    <!-- Sunucuyu Yeniden Başlatma Butonu -->
+    <section style="text-align: right; margin-top: 20px;">
+      <button class="btn-reboot" aria-label="VDS sanal sunucusunu tamamen yeniden başlat" onclick="rebootVDS()">⚡ VDS Sunucusunu Tamamen Yeniden Başlat (Reboot)</button>
+    </section>
 
     <footer>
-      Mikyas Studio &bull; Rabia & Ümit Ekrem &bull; 2026
+      Benim Dünyam VDS Paneli &copy; 2026 &bull; Otomatik Sistem Yönetimi
     </footer>
   </div>
 
   <script>
-    function showAlert(msg, isSuccess=true) {
-      const box = document.getElementById('alertBox');
-      box.textContent = msg;
-      box.style.display = 'block';
-      box.style.background = isSuccess ? 'rgba(16, 185, 129, 0.25)' : 'rgba(239, 68, 68, 0.25)';
-      box.style.color = isSuccess ? '#34d399' : '#f87171';
-      box.style.border = isSuccess ? '1px solid #059669' : '1px solid #dc2626';
-      setTimeout(() => { box.style.display = 'none'; }, 4000);
-    }
+    // Token automatically set from URL or localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    let token = urlParams.get('token') || localStorage.getItem('bd_token') || '';
+    localStorage.setItem('bd_token', token);
 
-    function copyValue(text, successMsg) {
+    function copyToClipboard(text, successMsg) {
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).then(() => {
           showAlert(successMsg, true);
         }).catch(() => {
-          fallbackCopy(text, successMsg);
+          fallbackCopyText(text, successMsg);
         });
       } else {
-        fallbackCopy(text, successMsg);
+        fallbackCopyText(text, successMsg);
       }
     }
 
-    function fallbackCopy(text, successMsg) {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.position = "fixed";
-      ta.style.left = "-999999px";
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
+    function fallbackCopyText(text, successMsg) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
       try {
         document.execCommand('copy');
         showAlert(successMsg, true);
       } catch (err) {
-        showAlert('Panoya kopyalanamadı, lütfen elle kopyalayın: ' + text, false);
+        showAlert('Metin panoya kopyalanamadı, lütfen elle kopyalayınız: ' + text, false);
       }
-      document.body.removeChild(ta);
+      document.body.removeChild(textArea);
     }
 
-    let isVisible = true;
-    function togglePass() {
-      const pass = document.getElementById('passVal');
-      const btn = document.getElementById('toggleBtn');
-      isVisible = !isVisible;
-      if (isVisible) {
-        pass.textContent = 'rabia2026';
-        btn.textContent = '👁️ Gizle';
-      } else {
-        pass.textContent = '••••••••';
+    let passVisible = true;
+     else {
+        passEl.textContent = '••••••••';
         btn.textContent = '👁️ Göster';
       }
     }
+
+    function showAlert(msg, isSuccess=true) {
+      const box = document.getElementById('alertBox');
+      box.textContent = msg;
+      box.style.display = 'block';
+      box.style.background = isSuccess ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+      box.style.color = isSuccess ? '#34d399' : '#f87171';
+      box.style.border = isSuccess ? '1px solid #059669' : '1px solid #dc2626';
+      setTimeout(() => { box.style.display = 'none'; }, 6000);
+    }
+
+    async function fetchStatus() {
+      try {
+        const res = await fetch('/api/status?token=' + encodeURIComponent(token));
+        if (!res.ok) throw new Error('Durum alinamadi');
+        const data = await res.json();
+
+        // CPU
+        document.getElementById('cpuVal').textContent = data.cpu_percent + ' %';
+        document.getElementById('cpuFill').style.width = Math.min(data.cpu_percent, 100) + '%';
+
+        // RAM
+        document.getElementById('memVal').textContent = data.mem_used_mb + ' / ' + data.mem_total_mb + ' MB';
+        const memPercent = (data.mem_used_mb / data.mem_total_mb) * 100;
+        document.getElementById('memFill').style.width = Math.min(memPercent, 100) + '%';
+
+        // Disk & Uptime
+        document.getElementById('diskVal').textContent = data.disk_free_gb + ' GB';
+        document.getElementById('uptimeVal').textContent = data.uptime;
+
+        // Game Server
+        const gPill = document.getElementById('gameStatusPill');
+        const gText = document.getElementById('gameStatusText');
+        if (data.game_service === 'active') {
+          gPill.className = 'status-pill pill-active';
+          gText.textContent = 'Aktif (Çalışıyor)';
+        } else {
+          gPill.className = 'status-pill pill-inactive';
+          gText.textContent = 'Durduruldu';
+        }
+
+        // TeamTalk Server
+        const tPill = document.getElementById('ttStatusPill');
+        const tText = document.getElementById('ttStatusText');
+        if (data.tt_service === 'active') {
+          tPill.className = 'status-pill pill-active';
+          tText.textContent = 'Aktif (Çalışıyor)';
+        } else {
+          tPill.className = 'status-pill pill-inactive';
+          tText.textContent = 'Durduruldu';
+        }
+
+        // Backups
+        const bList = document.getElementById('backupList');
+        if (data.backups && data.backups.length > 0) {
+          bList.innerHTML = data.backups.map(b => `
+            <li class="backup-item">
+              <div>
+                <strong>${b.name}</strong>
+                <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: 8px;">(${b.size}) &bull; ${b.date}</span>
+              </div>
+              <button style="padding: 6px 12px; font-size: 0.85rem; background: rgba(99,102,241,0.2); color: #c7d2fe;" aria-label="${b.date} tarihli ${b.name} yedeğini geri yükle" onclick="restoreBackup('${b.name}')">Geri Yükle</button>
+            </li>
+          `).join('');
+        } else {
+          bList.innerHTML = '<li style="color: var(--text-muted); font-size: 0.9rem;">Henüz bir yedek alınmamış.</li>';
+        }
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function actionService(service, action) {
+      const sName = service === 'game' ? 'Benim Dünyam' : 'TeamTalk';
+      const aName = action === 'restart' ? 'yeniden başlatılıyor' : (action === 'stop' ? 'durduruluyor' : 'başlatılıyor');
+      showAlert(`${sName} ${aName}, lütfen bekleyin...`, true);
+
+      try {
+        const res = await fetch(`/api/${service}/${action}?token=` + encodeURIComponent(token), { method: 'POST' });
+        const data = await res.json();
+        showAlert(data.message, data.success);
+        setTimeout(fetchStatus, 1500);
+      } catch (e) {
+        showAlert('İşlem sırasında hata oluştu!', false);
+      }
+    }
+
+    async function runDiagnostic() {
+      showAlert('Sistem ve port teşhisi yapılıyor, lütfen bekleyin...', true);
+      const diagBox = document.getElementById('diagBox');
+      diagBox.style.display = 'block';
+      diagBox.innerHTML = '<em>Teşhis yapılıyor (Ping, Portlar, Servisler, Güvenlik Duvarı kontrol ediliyor)...</em>';
+      try {
+        const res = await fetch('/api/tools/diag?token=' + encodeURIComponent(token));
+        const d = await res.json();
+        diagBox.innerHTML = `
+          <strong style="color: #cbd5e1; font-size: 1rem;">📋 Sistem Teşhis Raporu:</strong><br><br>
+          ${d.ping_ok ? '✅' : '❌'} <strong>Dış İnternet Bağlantısı:</strong> ${d.ping_ok ? 'Aktif' : 'Kesik'} (Gecikme: ${d.ping})<br>
+          ${d.game_active ? '✅' : '❌'} <strong>Benim Dünyam Oyun Servisi:</strong> ${d.game_active ? 'Çalışıyor (UDP 6789)' : 'Durdurulmuş'}<br>
+          ${d.iptables_ok ? '✅' : '⚠️'} <strong>Port Yönlendirme (UDP 65000 -> 6789):</strong> ${d.iptables_ok ? 'Aktif & Yönlendirilmiş' : 'Yönlendirme Eksik'}<br>
+          ${d.tt_active ? '✅' : '❌'} <strong>TeamTalk 5 Ses Sunucusu:</strong> ${d.tt_active ? 'Çalışıyor (Port 10333)' : 'Durdurulmuş'}<br>
+          ℹ️ <strong>Aktif UDP Bağlantıları:</strong> ${d.udp_conns} aktif soket<br><br>
+          ${d.issues.length === 0 ? '<p style="color: #34d399; font-weight: 600;">✨ Harika! Sunucuda hiçbir sorun tespit edilmedi, tüm sistemler sağlıklı çalışıyor.</p>' : '<p style="color: #f87171; font-weight: 600;">Tespit edilen sorunlar: ' + d.issues.join(', ') + '</p>'}
+        `;
+        showAlert('Teşhis tamamlandı!', true);
+      } catch (e) {
+        diagBox.innerHTML = '<span style="color: #f87171;">Teşhis yapılırken hata oluştu.</span>';
+      }
+    }
+
+    async function cleanRam() {
+      showAlert('RAM önbelleği temizleniyor...', true);
+      try {
+        const res = await fetch('/api/tools/clean_ram?token=' + encodeURIComponent(token), { method: 'POST' });
+        const d = await res.json();
+        showAlert(d.message, d.success);
+        fetchStatus();
+      } catch (e) {
+        showAlert('RAM temizliği başarısız oldu.', false);
+      }
+    }
+
+    async function cleanDisk() {
+      showAlert('Gereksiz loglar ve geçici dosyalar temizleniyor...', true);
+      try {
+        const res = await fetch('/api/tools/clean_disk?token=' + encodeURIComponent(token), { method: 'POST' });
+        const d = await res.json();
+        showAlert(d.message, d.success);
+        fetchStatus();
+      } catch (e) {
+        showAlert('Disk temizliği başarısız oldu.', false);
+      }
+    }
+
+    async function cleanZombies() {
+      showAlert('Kilitli / askıda kalan işlemler sonlandırılıyor...', true);
+      try {
+        const res = await fetch('/api/tools/clean_zombies?token=' + encodeURIComponent(token), { method: 'POST' });
+        const d = await res.json();
+        showAlert(d.message, d.success);
+        setTimeout(fetchStatus, 2000);
+      } catch (e) {
+        showAlert('İşlem sırasında hata oluştu.', false);
+      }
+    }
+
+    async function fixFirewall() {
+      showAlert('Güvenlik duvarı ve port yönlendirmeleri yenileniyor...', true);
+      try {
+        const res = await fetch('/api/tools/fix_firewall?token=' + encodeURIComponent(token), { method: 'POST' });
+        const d = await res.json();
+        showAlert(d.message, d.success);
+      } catch (e) {
+        showAlert('Güvenlik duvarı onarımı başarısız oldu.', false);
+      }
+    }
+
+    async function createBackup() {
+      showAlert('Tam sunucu yedeği alınıyor, lütfen bekleyin...', true);
+      try {
+        const res = await fetch('/api/backup/create?token=' + encodeURIComponent(token), { method: 'POST' });
+        const data = await res.json();
+        showAlert(data.message, data.success);
+        fetchStatus();
+      } catch (e) {
+        showAlert('Yedek alma sırasında hata!', false);
+      }
+    }
+
+    async function restoreBackup(backupName) {
+      if (!confirm(`${backupName} yedeğini geri yüklemek istediğinize emin misiniz? Oyun sunucusu yeniden başlatılacak.`)) return;
+      showAlert('Yedek geri yükleniyor...', true);
+      try {
+        const res = await fetch('/api/backup/restore?name=' + encodeURIComponent(backupName) + '&token=' + encodeURIComponent(token), { method: 'POST' });
+        const data = await res.json();
+        showAlert(data.message, data.success);
+        setTimeout(fetchStatus, 3000);
+      } catch (e) {
+        showAlert('Geri yükleme başarısız!', false);
+      }
+    }
+
+    async function refreshLogs() {
+      try {
+        const res = await fetch('/api/logs?token=' + encodeURIComponent(token));
+        const data = await res.json();
+        const box = document.getElementById('logBox');
+        box.textContent = data.logs || 'Kayıt bulunamadı.';
+        box.scrollTop = box.scrollHeight;
+      } catch (e) {
+        document.getElementById('logBox').textContent = 'Loglar yüklenemedi.';
+      }
+    }
+
+    async function rebootVDS() {
+      if (!confirm('DİKKAT: VDS sunucusu tamamen yeniden başlatılacaktır (Reboot). Yaklaşık 40-50 saniye sürecek. Onaylıyor musunuz?')) return;
+      showAlert('Sunucu yeniden başlatılıyor... Yaklaşık 1 dakika sonra sayfa tekrar açılacaktır.', true);
+      try {
+        await fetch('/api/vds/reboot?token=' + encodeURIComponent(token), { method: 'POST' });
+      } catch (e) {}
+    }
+
+    // Initial load and periodic refresh
+    fetchStatus();
+    refreshLogs();
+    setInterval(fetchStatus, 4000);
   </script>
 </body>
 </html>
