@@ -333,6 +333,9 @@ sound gamemus;
 void main(){
 string fstring;
 run("gamemodule.exe", fstring, false, true);
+// Valve Steam Audio HRTF Motoru (Survive the Wild / Light and Night Standardi)
+sound_set_spatialization(audio_panner_phonon_hrtf, audio_attenuator_basic);
+set_sound_global_hrtf(true);
 stream.init_bass();
 set_sound_storage("sounds.dat");
 set_sound_decryption_key("novasenhadeincriptacaoparaossonsdodesafiomortalprosfilhosdaputanaoatrapalharembandodeviadofjslwkjflsdfwlfsjkdl123slfjklweof", false);

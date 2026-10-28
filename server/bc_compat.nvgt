@@ -15,12 +15,13 @@ void reset_all_forced_keys() {
 }
 
 void open_sound_device(int device) {
-	if (device >= 0) set_sound_output_device(device);
-}
-
-// BGT redirected uncaught-error/exception text to a file. NVGT has no direct
-// equivalent; the server only used it for a debug log, so this is a no-op.
-void set_error_output(const string& in filename) {
+	// device == -1 means "follow the system default output". Pinning to index 0
+	// instead is what made the game go silent when headphones were plugged in:
+	// the default device changes, but index 0 keeps pointing at the old one.
+	if (device < 0) return;
+	string[] devs = get_sound_output_devices();
+	if (device >= int(devs.length())) return; // stale index from prefs; keep default
+	set_sound_output_device(device);
 }
 
 void position_sound_custom_1d(sound@ s, double listener_x, double source_x, double pan_step, double volume_step, double start_pan, double start_volume) {
@@ -32,6 +33,9 @@ void position_sound_custom_1d(sound@ s, double listener_x, double source_x, doub
 	double vol = start_volume - abs(diff) * volume_step;
 	s.pan = pan;
 	s.volume = vol;
+	s.spatialization_enabled = true;
+	s.set_hrtf(true);
+	s.set_position_3d(float(diff), 0.0, 0.0);
 }
 
 void position_sound_custom_2d(sound@ s, double listener_x, double listener_y, double source_x, double source_y, double pan_step, double volume_step, double behind_pitch_decrease, double start_pan, double start_volume, double start_pitch) {
@@ -48,4 +52,7 @@ void position_sound_custom_2d(sound@ s, double listener_x, double listener_y, do
 	s.pan = pan;
 	s.volume = vol;
 	s.pitch = pitch;
+	s.spatialization_enabled = true;
+	s.set_hrtf(true);
+	s.set_position_3d(float(dx), float(dy), 0.0);
 }

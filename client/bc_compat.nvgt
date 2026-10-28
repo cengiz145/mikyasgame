@@ -33,6 +33,9 @@ void position_sound_custom_1d(sound@ s, double listener_x, double source_x, doub
 	double vol = start_volume - abs(diff) * volume_step;
 	s.pan = pan;
 	s.volume = vol;
+	s.spatialization_enabled = true;
+	s.set_hrtf(true);
+	s.set_position_3d(float(diff), 0.0, 0.0);
 }
 
 void position_sound_custom_2d(sound@ s, double listener_x, double listener_y, double source_x, double source_y, double pan_step, double volume_step, double behind_pitch_decrease, double start_pan, double start_volume, double start_pitch) {
@@ -49,4 +52,7 @@ void position_sound_custom_2d(sound@ s, double listener_x, double listener_y, do
 	s.pan = pan;
 	s.volume = vol;
 	s.pitch = pitch;
+	s.spatialization_enabled = true;
+	s.set_hrtf(true);
+	s.set_position_3d(float(dx), float(dy), 0.0);
 }
