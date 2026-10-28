@@ -550,7 +550,15 @@
     }
 
     let passVisible = true;
-     else {
+    function togglePassVisibility() {
+      const passEl = document.getElementById('authPassVal');
+      const btn = document.getElementById('btnTogglePass');
+      if (!passEl || !btn) return;
+      passVisible = !passVisible;
+      if (passVisible) {
+        passEl.textContent = '4Vz9o8Im7ijRsYPa';
+        btn.textContent = '👁️ Gizle';
+      } else {
         passEl.textContent = '••••••••';
         btn.textContent = '👁️ Göster';
       }
