@@ -632,7 +632,7 @@ pr.close();
 }
 string net_thread;
 net_thread=net.setup_server(port, 4, 500);
-net.set_bandwidth_limits(65536, 65536);
+net.set_bandwidth_limits(0, 0); // UNLIMITED BANDWIDTH (Eliminates packet throttling lag)
 if(!directory_exists("maps"))
 {
 directory_create("maps");

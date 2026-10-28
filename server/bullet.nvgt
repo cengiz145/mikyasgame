@@ -25,29 +25,33 @@ if(!pvp)return;
 if(canhaos.length()>0)cannon_loop();
 for(uint ie5=0;ie5<bullets.length();ie5++){
 if (bullets[ie5].facing==Left){
-bullets[ie5].x-=1;
-bullets[ie5].distance+=1;
+int step_amt = (bullets[ie5].speed_value > 1) ? bullets[ie5].speed_value : 2;
+bullets[ie5].x -= step_amt;
+bullets[ie5].distance += step_amt;
 if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
 if (bullets[ie5].damage_value>2) bullets[ie5].damage_value-=3;
 bullet_check(ie5);
 }
 else if (bullets[ie5].facing==Right){
-bullets[ie5].x+=1;
-bullets[ie5].distance+=1;
+int step_amt = (bullets[ie5].speed_value > 1) ? bullets[ie5].speed_value : 2;
+bullets[ie5].x += step_amt;
+bullets[ie5].distance += step_amt;
 if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
 if (bullets[ie5].damage_value>2)bullets[ie5].damage_value-=3;
 bullet_check(ie5);
 }
 else if (bullets[ie5].facing==Forward){
-bullets[ie5].y+=1;
-bullets[ie5].distance+=1;
+int step_amt = (bullets[ie5].speed_value > 1) ? bullets[ie5].speed_value : 2;
+bullets[ie5].y += step_amt;
+bullets[ie5].distance += step_amt;
 if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
 if (bullets[ie5].damage_value>2)bullets[ie5].damage_value-=3;
 bullet_check(ie5);
 }
 else if (bullets[ie5].facing==Back){
-bullets[ie5].y-=1;
-bullets[ie5].distance+=1;
+int step_amt = (bullets[ie5].speed_value > 1) ? bullets[ie5].speed_value : 2;
+bullets[ie5].y -= step_amt;
+bullets[ie5].distance += step_amt;
 if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
 if (bullets[ie5].damage_value>2)bullets[ie5].damage_value-=3;
 bullet_check(ie5);
