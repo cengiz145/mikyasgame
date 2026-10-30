@@ -1210,6 +1210,7 @@ if(buy_apartment==true){
 f.open("maps/prédio_residencial.map", "w");
 f.write(linear(m));
 f.close();
+invalidate_map_cache("prédio_residencial");
 f.open("maps/"+mapname+".map", "wb");
 string wtext="map:"+mapname+"\r\nmaxx:"+maxx+"\r\nmaxy:"+maxy+"\r\n"+
 "wall:0:0:50:wallnone\n"+
@@ -2589,6 +2590,7 @@ send_reliable(event.peer_id,"The ip of "+parsed[1]+" é "+player_ip+". Dados loc
 }
 else if((parsed[0]=="/delmap"||parsed[0]=="/deletemap") and parsed.length()>1){
 file_delete("maps/"+parsed[1]+".map");
+invalidate_map_cache(parsed[1]);
 send_reliable(event.peer_id,"msgnormal Pronto.", 0);
 }
 // The body reads parsed[4] for the floor material, so the guard has to be >4.
@@ -2606,6 +2608,7 @@ f.open("maps/"+mapname+".map", "wb");
 string wtext="map:"+mapname+"\r\nmaxx:"+maxx+"\r\nmaxy:"+maxy+"\r\nplatform:0:"+maxx+":0:"+parsed[4]+"\r\nwall:0:0:20:wallnone\r\nwall:"+maxx+":0:20:wallnone\r\n";
 f.write(wtext);
 f.close();
+invalidate_map_cache(mapname);
 players[index].map=mapname;
 send_reliable(players[index].peer_id, "changemap "+wtext+"\r\nx:0\r\ny:0\r\n", 0);
 players[index].x=0;

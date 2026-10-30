@@ -1,7 +1,7 @@
 ﻿#include "bgt_compat.nvgt"
 #include "bc_compat.nvgt"
 					double min_version=5.7;
-const string version="6.6";
+const string version="6.7";
 #include "rotation.nvgt"
 #include "monster_logic.nvgt"
 #include "pet_logic.nvgt"
@@ -195,11 +195,12 @@ weapons[4]="desert.ogg:20:100:"+random(1, 7);
 weapons[5]="arco.ogg:19:95:"+random(36, 38);
 weapons[6]="m14.ogg:40:200:"+random(1, 7);
 weapons[7]="m240.ogg:100:340:"+random(1, 7);
+weapons[8]="grenade.ogg:49:2000:39";
 weapons[9]="rifle.ogg:190:500:"+random(1, 7);
 weapons[10]="benelli.ogg:25:110:"+random(1, 7);
 weapons[11]="laser.ogg:200:550:40";
 weapons[12]="bazuca.ogg:500:1000000:41";
-weapons[13]="rocketlauncher.ogg:150::3000:42";
+weapons[13]="rocketlauncher.ogg:150:3000:42";
 weapons[14]="sniper.ogg:230:1000:"+random(1, 7);
 weapons[15]="uzi.ogg:45:193:"+random(1, 7);
 weapons[16]="mp5.ogg:60:207:"+random(1, 7);
@@ -213,7 +214,7 @@ weapons[23]="m4a1.ogg:63:220:"+random(1, 7);
 weapons[24]="m249.ogg:75:290:"+random(1, 7);
 weapons[25]="ak47.ogg:87:300:"+random(1, 7);
 weapons[26]="taser.ogg:5:100:"+random(1, 7);
-weapons[27]="chute.ogg:4:15::"+random(45, 48);
+weapons[27]="chute.ogg:4:15:"+random(45, 48);
 weapons[28]="lanÃ§a.ogg:4:90:49";
 weapons[29]="espada_curta.ogg:4:30:50";
 weapons[30]="mp7.ogg:110:380:"+random(1, 7);
@@ -839,7 +840,7 @@ if(nban.length()>0){
 string[] x;
 for(uint i=0;i<nban.length();i++){
 x=string_split(nban[i], " ", false);
-if(string_contains(x[i], "hi", 1)<0){
+if(x.length()>=3&&string_contains(nban[i], "hi", 1)<0){
 if(string_to_number(x[1])>=TIME_HOUR&&string_to_number(x[2])<=TIME_MINUTE){
 nban.remove_at(i);
 }
@@ -4247,6 +4248,7 @@ players[index].paralisado2=true;
 }
 void update(string map)
 {
+invalidate_map_cache(map);
 for (uint i=0; i<players.length(); i++)
 {
 if(players[i].map==map)
@@ -4261,6 +4263,7 @@ send_items(i);
 }
 void update2(string map)
 {
+invalidate_map_cache(map);
 for (uint i=0; i<players.length(); i++)
 {
 if(players[i].map==map)
@@ -8688,11 +8691,7 @@ return false;
 }
 bool suffocated(int index){
 	string map=players[index].map;
-	file f;
-	f.open("maps/"+map+".map", "r");
-	string mdata=f.read();
-	f.close();
-	string[] p1=delinear(mdata);
+	string[] p1=get_cached_map(map);
 	for(uint i=0; i<p1.length(); i++){
 		string[] parsed=string_split(p1[i], ":", true);
 		if(parsed[0]=="suffocate"&&parsed.length()>4){
@@ -8707,11 +8706,7 @@ bool suffocated(int index){
 }
 bool froze(int index){
 string map=players[index].map;
-file f;
-f.open("maps/"+map+".map", "r");
-string mdata=f.read();
-f.close();
-string[] p1=delinear(mdata);
+string[] p1=get_cached_map(map);
 for(uint i=0; i<p1.length(); i++){
 string[] parsed=string_split(p1[i], ":", true);
 if(parsed[0]=="freeze"&&parsed.length()>4){

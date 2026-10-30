@@ -28,7 +28,7 @@ menu_silent();
 m.add_item_tts(pu.get_value("Mulher"), "0");
 m.add_item_tts(pu.get_value("Homem"), "1");
 int menu_result=m.run(pu.get_value("Are you Male or Female"), true);
-if(m.get_item_name(menu_result)>=0){
+if(menu_result>0){
 speak(pu.get_value("Conectando..."));
 p.play_stationary("conectando.ogg", false);
 network net2;
@@ -38,6 +38,7 @@ net2.connect(serveraddress, serverport);
 connect_timer.restart();
 while(true)
 {
+wait(5);
 event2=net2.request();
 if (key_pressed(KEY_ESCAPE))
 {
@@ -92,8 +93,7 @@ main_menu();
 }
 event=net.request();
 if(event.type==event_disconnect||connected==false&&connect_timer.elapsed>=connect_time){
-string reason=url_get("https://github.com/cengiz145/mikyasgame/releases/latest/servidorultrasecretoasdfg/idk.txt");
-if(get_last_error()==-29) reason="Your connection (or the server) has timed out.";
+string reason="Your connection (or the server) has timed out.";
 dlg(pu.get_value("Error: Server timed out! Reasons for this:")+" "+pu.get_value(reason));
 reset();
 main_menu();

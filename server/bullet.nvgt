@@ -23,38 +23,33 @@ somarma=weapon_sound_sarm;
 void bullet_loop(){
 if(!pvp)return;
 if(canhaos.length()>0)cannon_loop();
-for(uint ie5=0;ie5<bullets.length();ie5++){
+for(int ie5=0;ie5<int(bullets.length());ie5++){
+for(int step_idx=0;step_idx<2;step_idx++){
+if(ie5<0||ie5>=int(bullets.length()))break;
 if (bullets[ie5].facing==Left){
-int step_amt = (bullets[ie5].speed_value > 1) ? bullets[ie5].speed_value : 2;
-bullets[ie5].x -= step_amt;
-bullets[ie5].distance += step_amt;
-if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
-if (bullets[ie5].damage_value>2) bullets[ie5].damage_value-=3;
-bullet_check(ie5);
+bullets[ie5].x -= 1;
+bullets[ie5].distance += 1;
 }
 else if (bullets[ie5].facing==Right){
-int step_amt = (bullets[ie5].speed_value > 1) ? bullets[ie5].speed_value : 2;
-bullets[ie5].x += step_amt;
-bullets[ie5].distance += step_amt;
-if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
-if (bullets[ie5].damage_value>2)bullets[ie5].damage_value-=3;
-bullet_check(ie5);
+bullets[ie5].x += 1;
+bullets[ie5].distance += 1;
 }
 else if (bullets[ie5].facing==Forward){
-int step_amt = (bullets[ie5].speed_value > 1) ? bullets[ie5].speed_value : 2;
-bullets[ie5].y += step_amt;
-bullets[ie5].distance += step_amt;
-if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
-if (bullets[ie5].damage_value>2)bullets[ie5].damage_value-=3;
-bullet_check(ie5);
+bullets[ie5].y += 1;
+bullets[ie5].distance += 1;
 }
 else if (bullets[ie5].facing==Back){
-int step_amt = (bullets[ie5].speed_value > 1) ? bullets[ie5].speed_value : 2;
-bullets[ie5].y -= step_amt;
-bullets[ie5].distance += step_amt;
+bullets[ie5].y -= 1;
+bullets[ie5].distance += 1;
+}
 if(bullets[ie5].loopid!="") update_moving_sound(bullets[ie5].loopid,bullets[ie5].x, bullets[ie5].y);
-if (bullets[ie5].damage_value>2)bullets[ie5].damage_value-=3;
+if (bullets[ie5].damage_value>2) bullets[ie5].damage_value-=3;
+uint old_len=bullets.length();
 bullet_check(ie5);
+if(bullets.length()<old_len){
+ie5--;
+break;
+}
 }
 }
 }
@@ -63,7 +58,7 @@ string surface=get_tile_at(bullets[b].x,bullets[b].y,bullets[b].mapname);
 string loc=get_zone_at(bullets[b].x,bullets[b].y,bullets[b].mapname);
 int ba2=get_player_index_from(bullets[b].owner);
 string ricochet_sound;
-if (string_contains(loc,"safe",1)>-1||bullets[b].distance>=bullets[b].range||ba2<0||players[ba2].map=="t nel"||players[ba2].peaceful==1){
+if (string_contains(loc,"safe",1)>-1||bullets[b].distance>=bullets[b].range||ba2<0||players[ba2].map=="t nel"||players[ba2].map=="tunnel"||players[ba2].peaceful==1){
 if(bullets[b].loopid!="") destroy_moving_sound(bullets[b].loopid);
 bullets.remove_at(b);
 return;

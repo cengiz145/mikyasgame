@@ -1808,7 +1808,7 @@ if(torre_de_babels[i].map==map&&torre_de_babels[i].x==x){
 while(true){
 bool t=false;
 for(uint i2=0;i2<m.length();i2++){
-if(string_contains(m[i2], "ptorre_de_babel", 1)>-1){
+if(string_contains(m[i2], "ptorre_de_babel", 1)>-1||string_contains(m[i2], "pwall", 1)>-1){
 string[] bla=string_split(m[i2], ":", false);
 if(string_to_number(bla[1])==x){
 t=true;

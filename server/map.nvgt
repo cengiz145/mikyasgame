@@ -30,7 +30,7 @@ string[] map=get_cached_map(m);
 if(map.length()==0)return false;
 for(uint i=0;i<map.length();i++){
 string[] parsed=string_split(map[i], ":", false);
-if(parsed[0]=="disable"){
+if(parsed.length()>1&&parsed[0]=="disable"){
 if(parsed[1]=="wand")return true;
 }
 }
@@ -43,7 +43,7 @@ string[] map=get_cached_map(mapname);
 if(map.length()==0)return"";
 for(uint i=0;i<map.length();i++){
 string[] parsed=string_split(map[i], ":", false);
-if(parsed[0]=="platform"){
+if(parsed[0]=="platform"&&parsed.length()>4){
 int minx=string_to_number(parsed[1]);
 int maxx=string_to_number(parsed[2]);
 int miny=string_to_number(parsed[3]);
@@ -51,7 +51,7 @@ int maxy=string_to_number(parsed[3]);
 if(minx>x)continue;
 if(minx<=x&&maxx>=x&&miny<=y&&maxy>=y)outval=parsed[4];
 }
-if(parsed[0]=="staircase"){
+if(parsed[0]=="staircase"&&parsed.length()>5){
 int minx=string_to_number(parsed[1]);
 int maxx=string_to_number(parsed[2]);
 int miny=string_to_number(parsed[3]);
@@ -59,7 +59,7 @@ int maxy=string_to_number(parsed[4]);
 if(minx>x)continue;
 if(minx<=x&&maxx>=x&&miny<=y&&maxy>=y)outval=parsed[5];
 }
-if(parsed[0]=="wall"){
+if((parsed[0]=="wall"||parsed[0]=="pwall")&&parsed.length()>4){
 int minx=string_to_number(parsed[1]);
 int maxx=string_to_number(parsed[1]);
 int miny=string_to_number(parsed[2]);
@@ -81,7 +81,7 @@ if(map.length()==0)return "";
 for(uint i=0; i<map.length(); i++)
 {
 string[] parsed=string_split(map[i], ":", false);
-if(parsed[0]=="zone"&&parsed.length()>4)
+if(parsed[0]=="zone"&&parsed.length()>5)
 {
 int minx=string_to_number(parsed[1]);
 int maxx=string_to_number(parsed[2]);
@@ -131,7 +131,7 @@ return final;
 }
 string[] delinear(string a)
 {
-return string_split(a, "\r\n", false);
+string norm=string_replace(a, "\r\n", "\n", true);
+norm=string_replace(norm, "\r", "\n", true);
+return string_split(norm, "\n", false);
 }
-
-
