@@ -218,7 +218,7 @@ const Game = {
         return "Efsanevi Master Kaptan unvanına sahipsiniz!";
     },
     hasPassedLevel10: function() {
-        return (this.completedTasks >= 10) || (this.licenseLevel > 10);
+        return true; // Geliştirici modu: Tüm ilçe ve şehirlerarası hatlar açık
     },
     playMode: localStorage.getItem('gamePlayMode') || 'career',
     launchCareerDirectToGarage: function() {
@@ -491,7 +491,7 @@ const Game = {
     currentCompassAngle: 0,
     isBeingTowed: false, // Çekici durumu
     savedState: null, // Kaza anı kayıt noktası
-    busDamage: { leftWindow: 0, rightWindow: 0, front: 0, wipers: 0, headlights: 0, exhaust: 0, health: 100 }, // Hasar durumu
+    busDamage: { leftWindow: 0, rightWindow: 0, headlights: 0, wipers: 0, exhaust: 0, suspension: 0, brakes: 0, front: 0, transmission: 0, engine: 0, chassis: 0, health: 100 }, // Sağlamlık gruplarına göre parça hasar durumu
     lastFrameTime: 0,
     animationFrameId: null,
     kasisDistance: null, // Kasis (Speed bump) için mesafe
@@ -2332,7 +2332,7 @@ const Game = {
 
     beginDriving: function(restoreMode = false) {
         this.isDriving = true;
-        this.busDamage = { leftWindow: 0, rightWindow: 0, front: 0, wipers: 0, headlights: 0, exhaust: 0, health: 100 };
+        this.busDamage = { leftWindow: 0, rightWindow: 0, headlights: 0, wipers: 0, exhaust: 0, suspension: 0, brakes: 0, front: 0, transmission: 0, engine: 0, chassis: 0, health: 100 };
         this.isHeadlightsOn = false; // Farlar başlangıçta kapalı
         this.kasisDistance = null;
         this.lastRearHitTime = 0;
@@ -2774,15 +2774,34 @@ const Game = {
         // araç hareket edip 6 km/s hıza ulaştığında akıllı anons sistemi (FAZ 1) tarafından gerçekçi okunur.
     },
 
-    calculateCrashOutcome: function(damageAmount) {
-        // YÜZDELİK ŞANSLAR KALDIRILDI - KİNETİK ENERJİ VE HASAR EŞİK FORMÜLÜ
-        // Darbenin kinetik şiddetine göre deterministik fiziksel sonuç
-        if (damageAmount >= 35) {
-            return 2; // Ağır darbe eşiği: Parça veya cam tamamen kırılır (100% hasar)
-        } else if (damageAmount >= 15) {
-            return 1; // Orta darbe eşiği: Parça çatlar / gevşer (50% hasar)
+    calculateCrashOutcome: function(damageAmount, groupTier = 1) {
+        // PARÇA SAĞLAMLIK GRUPLARINA GÖRE KİNETİK ENERJİ VE HASAR EŞİK FORMÜLÜ
+        // 1. Grup (Hassas Cam/Far/Silecek): Çatlama >= 12, Kırılma >= 25 (1.0x Dayanım)
+        // 2. Grup (Orta Alt Takım/Körük/Egzoz/Fren): Orta >= 22, Ağır >= 42 (1.75x Dayanım)
+        // 3. Grup (Yüksek Gövde/Tampon/Şanzıman): Orta >= 32, Ağır >= 58 (2.6x Dayanım)
+        // 4. Grup (Ultra Sağlam Zırhlı Motor/Şasi): Orta >= 48, Ağır >= 80 (4.0x Dayanım)
+        const curBus = (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBus) ? BusFleet.getSelectedBus() : null;
+        const chassisShield = (curBus && curBus.chassisRigidity) ? (0.85 + ((curBus.chassisRigidity - 70) / 100)) : 1.0;
+
+        let crackLimit = 12 * chassisShield;
+        let breakLimit = 25 * chassisShield;
+        if (groupTier === 2) {
+            crackLimit = 22 * chassisShield;
+            breakLimit = 42 * chassisShield;
+        } else if (groupTier === 3) {
+            crackLimit = 32 * chassisShield;
+            breakLimit = 58 * chassisShield;
+        } else if (groupTier >= 4) {
+            crackLimit = 48 * chassisShield;
+            breakLimit = 80 * chassisShield;
         }
-        return 0; // Düşük darbe: Sadece hafif kaporta çizilmesi, parça sağlam kurtulur
+
+        if (damageAmount >= breakLimit) {
+            return 2; // Ağır darbe eşiği: Parça tamamen kırılır / ağır hasar alır
+        } else if (damageAmount >= crackLimit) {
+            return 1; // Orta darbe eşiği: Parça çatlar / orta hasar alır
+        }
+        return 0; // Parçanın sağlamlık grubu darbeyi başarıyla karşıladı
     },
 
 
@@ -2912,14 +2931,24 @@ const Game = {
                     if (this.speed > 35) {
                         const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                         const susp = (currentBus && currentBus.suspensionComfort) ? currentBus.suspensionComfort : 70;
+                        const rigidity = (currentBus && currentBus.chassisRigidity) ? currentBus.chassisRigidity : 75;
+                        // 2. Grup (Havalı Süspansiyon Körükleri) çukura sert girildiğinde yıpranır
+                        if (this.speed > 45 && this.busDamage) {
+                            const rawSuspWear = (this.speed - 40) * 0.35;
+                            const group2Shield = 1.75 * (rigidity / 75);
+                            const netSuspWear = Math.max(2, Math.round(rawSuspWear / group2Shield));
+                            this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + netSuspWear);
+                        }
+                        // Süspansiyon körüğü hasarlıysa darbe sönümleme azalır
+                        const suspHealthFactor = this.busDamage ? Math.max(0.5, 1.0 - ((this.busDamage.suspension || 0) * 0.005)) : 1.0;
                         // Bağımsız havalı körük sönümleme: Setra/Travego'da konfor kaybı 6 puandan 2.2 puana iner
-                        const comfortDeduction = Math.max(1.8, 6.0 * (1.0 - (((susp - 55) / 45) * 0.65)));
+                        const comfortDeduction = Math.max(1.8, (6.0 / suspHealthFactor) * (1.0 - (((susp - 55) / 45) * 0.65)));
                         this.passengerComfort = Math.max(20, (this.passengerComfort || 90) - comfortDeduction);
                         if (typeof audio !== 'undefined' && audio.speak) {
-                            if (susp >= 90) {
-                                audio.speak("Çukurdan geçtik, lüks havalı körükler darbeyi başarıyla sönümledi.");
+                            if (susp >= 90 && (!this.busDamage || (this.busDamage.suspension || 0) < 30)) {
+                                audio.speak("Çukurdan geçtik, havalı süspansiyon körükleri darbeyi yumuşakça sönümledi.");
                             } else {
-                                audio.speak("Çukura sert girdik! Yolcular sarsıldı.");
+                                audio.speak("Çukura sert girdik! Süspansiyon körükleri zorlandı ve yolcular sarsıldı.");
                             }
                         }
                     }
@@ -3417,16 +3446,22 @@ const Game = {
             }
         }
 
-        // --- Pnömatik Fren Sistemi ---
+        // --- Pnömatik Fren ve Canlı Kompresör / Hava Kurutucu (APU) Sistemi ---
         if (audio.isEngineRunning) {
-            // Kompresör havayı doldurur (Eğitim Modu: Hızlı dolum, bekleme yok)
+            // Kompresör havayı motor devrine (RPM) orantılı hızda doldurur
+            const rpmCompressorFactor = Math.max(0.85, (this.engineRPM || 800) / 900);
             if (this.airPressure < 120) {
                 let prevPressure = this.airPressure;
-                this.airPressure += 12 * deltaTime;
+                this.airPressure += (10.5 * rpmCompressorFactor) * deltaTime;
                 if (this.airPressure >= 120 && prevPressure < 120) {
                     this.airPressure = 120;
-                    audio.playAirGovernorCutoff(); // Tahliye valfi çuf-tıss
+                    this.lastApuPurgeTime = currentTime;
+                    audio.playAirGovernorCutoff(); // Hava kurutucu regülatör tahliyesi (Çuf-tıss)
                 }
+            } else if (this.speed > 5 && (!this.lastApuPurgeTime || (currentTime - this.lastApuPurgeTime > 85000))) {
+                // Gerçek otobüslerde belirli aralıklarla hava kurutucu (APU) nem tahliyesi yapar ve kompresör tekrar doldurur
+                this.lastApuPurgeTime = currentTime;
+                this.airPressure = 114;
             }
         }
         // Eğitim Modu Koruması: Eğitim seferinde basınç 85 altına inmez
@@ -3444,7 +3479,8 @@ const Game = {
         if (isBraking) {
             if (!this.isBrakeKeyDown) {
                 const minPressure = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
-                this.airPressure = Math.max(minPressure, this.airPressure - 3);
+                const brakeAirLoss = 3 + (this.busDamage ? Math.floor((this.busDamage.brakes || 0) / 30) : 0);
+                this.airPressure = Math.max(minPressure, this.airPressure - brakeAirLoss);
                 this.isBrakeKeyDown = true;
                 audio.playBrakeRelease(); // Tıss
                 
@@ -3543,10 +3579,29 @@ const Game = {
                     }
                 }
             } else {
-                // TONAJ HESAPLAMASI
-                const baseWeight = 12000; // Boş otobüs 12 Ton
-                const currentWeight = baseWeight + (this.passengersOnBoard * 75);
+                // GERÇEK FABRİKA TONAJI VE PARÇA GRUBU DİNAMİKLERİ HESAPLAMASI
+                const activeBus = (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBus) ? BusFleet.getSelectedBus() : null;
+                const physSpecs = (typeof BusFleet !== 'undefined' && BusFleet.getBusPhysicsSpecs) ? BusFleet.getBusPhysicsSpecs(activeBus) : { emptyWeightKg: 12000 };
+                const baseWeight = physSpecs.emptyWeightKg || 12000;
+                const perPassKg = (activeBus && activeBus.category === 'seyahat') ? 95 : 75; // Seyahat otobüsünde yolcu + bavul 95 kg
+                const currentWeight = baseWeight + (this.passengersOnBoard * perPassKg);
                 const weightMultiplier = baseWeight / currentWeight;
+
+                // Aktif otobüsün fabrika ivmelenme, fren ve yerleşik akıllı kontrol katsayıları
+                const busChip = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(activeBus, this) : null;
+                const chipTorqueMult = (busChip && busChip.activeMode) ? busChip.activeMode.torqueMultiplier : 1.0;
+                const busAccelFactor = ((activeBus && typeof activeBus.acceleration === 'number') ? activeBus.acceleration : 1.1) * chipTorqueMult;
+                const busBrakeFactor = (activeBus && typeof activeBus.braking === 'number') ? activeBus.braking : 1.15;
+
+                // Parça sağlamlık gruplarının sürüş dinamiğine canlı etkisi:
+                // 4. Grup (Motor Bloğu) ve 2. Grup (Egzoz/DPF) hasarı -> Motor çekişini düşürür
+                const engineDmg = (this.busDamage && this.busDamage.engine) ? this.busDamage.engine : 0;
+                const exhaustDmg = (this.busDamage && this.busDamage.exhaust) ? this.busDamage.exhaust : 0;
+                const enginePowerHealth = Math.max(0.55, 1.0 - (engineDmg * 0.0035) - (exhaustDmg * 0.001));
+
+                // 2. Grup (Fren Balataları ve Körükleri) hasarı -> Fren tutuş gücünü azaltır
+                const brakePartDmg = (this.busDamage && this.busDamage.brakes) ? this.busDamage.brakes : 0;
+                const brakePartHealth = Math.max(0.55, 1.0 - (brakePartDmg * 0.0035));
                 
                 // Ehliyet seviyesine göre zorluk
                 const difficultyMultiplier = 1 + (this.licenseLevel * 0.2);
@@ -3555,16 +3610,15 @@ const Game = {
                 const isBrake = (this.keys.s || this.keys.arrowdown);
 
                 if (isThrottle) {
-                    // GERÇEKÇİ BELEDİYE OTOBÜSÜ İVMELENME FİZİĞİ (14-18 Tonluk Dizel Ağır Vasıta)
-                    // Gerçek hayatta bir belediye otobüsü 0'dan 50 km/s hıza yaklaşık 12-14 saniyede ulaşır
-                    let baseAccel = 5.8;
-                    if (this.speed > 45) baseAccel = 4.2;
-                    if (this.speed > 70) baseAccel = 2.6;
+                    // GERÇEKÇİ AĞIR VASITA DİZEL TORK EĞRİSİ VE PARÇA DİNAMİĞİ
+                    let baseAccel = 5.4 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 45) baseAccel = 3.9 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 70) baseAccel = 2.5 * busAccelFactor * enginePowerHealth;
                     this.acceleration = baseAccel * weightMultiplier;
                 } else if (isBrake) {
-                    // SERVİS VE HAVALI FREN KALİBRASYONU (Yolcuları savurmayan kademeli duruş)
-                    let baseBrake = -11.5;
-                    if (this.isBrakeKeyDown) baseBrake = -14.5;
+                    // SERVİS VE HAVALI FREN KALİBRASYONU (Araç fren gücü + 2. Grup balata kondisyonu)
+                    let baseBrake = -10.5 * busBrakeFactor * brakePartHealth;
+                    if (this.isBrakeKeyDown) baseBrake = -13.2 * busBrakeFactor * brakePartHealth;
                     if (this.isEmergencyBrakeLocked) baseBrake = -28.0;
                     
                     // Balata şişmesi (Brake Fade) verimlilik kaybı (260°C üzerinde %35'e kadar düşer)
@@ -3629,8 +3683,14 @@ const Game = {
         if (this.hasPoorVisibility && this.speed > this.maxSpeed + 10) {
             visDriftMultiplier = 3.5; // Kötü görüşte aşırı hız inanılmaz bir savrulma yaratır
         }
+        // Süspansiyon körükleri ve ana şasi hasarı varsa yanal salınım artar; yerleşik denge algoritması salınımı sönümler
+        const suspDmg = (this.busDamage && this.busDamage.suspension) ? this.busDamage.suspension : 0;
+        const chassisDmg = (this.busDamage && this.busDamage.chassis) ? this.busDamage.chassis : 0;
+        const swayChip = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(null, this) : null;
+        const stabilityDamping = (swayChip && typeof swayChip.stabilityFactor === 'number') ? swayChip.stabilityFactor : 1.0;
+        const suspensionSwayMult = (1.0 + (suspDmg * 0.01) + (chassisDmg * 0.015)) * stabilityDamping;
         
-        let lateralVelocity = (this.steeringAngle + this.driftVelocity * visDriftMultiplier + roadCurvature) * speedFactor;
+        let lateralVelocity = (this.steeringAngle + (this.driftVelocity * visDriftMultiplier * suspensionSwayMult) + roadCurvature) * speedFactor;
         
         this.lanePosition += lateralVelocity * deltaTime;
 
@@ -3726,9 +3786,11 @@ const Game = {
             const incPhys = TurkeyGeographyEngine.calculateInclinePhysics(this.speed, this.currentSlopePct, deltaTime, isFootBraking, retarderLevel);
             this.brakeEfficiency = incPhys.brakeEfficiency || 1.0;
 
-            // Manuel Retarder Frenleme Kuvveti (Kademeli Hidrolik Şanzıman Freni)
+            // Manuel Retarder Frenleme Kuvveti (3. Grup Hidrolik Şanzıman/Retarder kondisyonuna bağlı)
             if (this.retarderLevel > 0 && this.speed > 8) {
-                const retarderDecel = (this.retarderLevel * 1.6) * deltaTime;
+                const transDmg = (this.busDamage && this.busDamage.transmission) ? this.busDamage.transmission : 0;
+                const transHealthFactor = Math.max(0.55, 1.0 - (transDmg * 0.004));
+                const retarderDecel = (this.retarderLevel * 1.6 * transHealthFactor) * deltaTime;
                 const maxRetarderDecel = Math.max(0, this.speed - 8);
                 this.speed -= Math.min(retarderDecel, maxRetarderDecel);
             }
@@ -3786,8 +3848,8 @@ const Game = {
         }
 
         // RPM VE VİTES MANTIĞI
-        let isThrottleOn = this.keys.w;
-        let targetRPM = 800;
+        let isThrottleOn = (this.keys.w || this.keys.arrowup);
+        let targetRPM = this.dynamicIdleRPM || 800;
         const gearSpeedRatios = [0, 25, 45, 65, 90, 130]; 
 
         if (this.speed > 0 || isThrottleOn) {
@@ -3808,10 +3870,12 @@ const Game = {
         // RPM yumuşak geçiş
         this.engineRPM += (targetRPM - this.engineRPM) * 3 * deltaTime;
         
-        // Vites Atma (Yukarı)
-        if (this.engineRPM > 2400 && this.currentGear < 5 && this.speed > gearSpeedRatios[this.currentGear] * 0.9) {
+        // Akıllı Vites Atma (Yokuşta devri tutar, düz yolda ekonomik devirde vites büyütür)
+        const shiftChip = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(null, this) : null;
+        const smartShiftRPM = (shiftChip && shiftChip.shiftUpRPM) ? shiftChip.shiftUpRPM : 2200;
+        if (this.engineRPM > smartShiftRPM && this.currentGear < 5 && this.speed > gearSpeedRatios[this.currentGear] * 0.88) {
             this.currentGear++;
-            this.engineRPM = 1500; // Vites atınca devir düşer
+            this.engineRPM = 1450; // Vites atınca devir tatlı tork bandına düşer
         }
         // Vites Düşürme (Aşağı)
         else if (this.currentGear > 1 && this.speed < gearSpeedRatios[this.currentGear - 1] + 5) {
@@ -3962,7 +4026,10 @@ const Game = {
                     if (this.currentSlopePct > 0) {
                         loadFactor *= (1.0 + (this.currentSlopePct * 0.12)); // Her %1 eğim motor yakıt tüketimini %12 artırır
                     }
-                    const burned = distKm * (consRate / 100) * throttleFactor * loadFactor;
+                    // Arka plandaki akıllı enjeksiyon ve eğim adaptasyonu
+                    const activeChipFuel = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(null, this) : null;
+                    const chipFuelMult = (activeChipFuel && activeChipFuel.activeMode) ? activeChipFuel.activeMode.fuelMultiplier : 1.0;
+                    const burned = distKm * (consRate / 100) * throttleFactor * loadFactor * chipFuelMult;
                     this.currentFuelLiters = Math.max(0, this.currentFuelLiters - burned);
                 } else {
                     // Rölanti yakıt tüketimi
@@ -4165,19 +4232,32 @@ const Game = {
                     }
                 }
                 if (this.speed > 45) { // 45 km/h kasis hız limiti
-                    // Hız aşımına bağlı deterministik hasar formülü
+                    // Hız aşımına bağlı parça sağlamlık grubu hasar formülü
                     const excess = this.speed - 45;
-                    this.busDamage.health = Math.max(0, this.busDamage.health - Math.round(excess * 0.35));
+                    const curBus = (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBus) ? BusFleet.getSelectedBus() : null;
+                    const rigidityFactor = (curBus && curBus.chassisRigidity) ? (curBus.chassisRigidity / 75) : 1.0;
+                    const group2Shield = 1.75 * rigidityFactor; // 2. Grup (Alt Takım: Egzoz ve Süspansiyon Körükleri) 1.75x dayanımlıdır
+
+                    this.busDamage.health = Math.max(0, this.busDamage.health - Math.max(2, Math.round((excess * 0.35) / rigidityFactor)));
                     if (typeof audio.playUnderbodyHit === 'function') audio.playUnderbodyHit();
                     
-                    if (excess >= 25) { // 70 km/h ve üzeri: Ağır darbe
-                        this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 50);
-                        if (typeof audio.speak === 'function') audio.speak("Kasise aşırı hızlı girdik, altını çok sert vurduk ve egzoz ağır hasar aldı!");
-                    } else if (excess >= 10) { // 55 - 70 km/h arası: Orta darbe
-                        this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 25);
-                        if (typeof audio.speak === 'function') audio.speak("Kasise hızlı girdik, altını vurduk. Egzoz hasar aldı.");
+                    if (excess >= 25) { // 70 km/h ve üzeri: Ağır darbe (2. Grup Alt Takım + 4. Grup Şasi hafif darbe)
+                        const exhDmg = Math.round(45 / (group2Shield * 0.65));
+                        const suspDmg = Math.round(35 / (group2Shield * 0.65));
+                        this.busDamage.exhaust = Math.min(100, (this.busDamage.exhaust || 0) + exhDmg);
+                        this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + suspDmg);
+                        // Ana çelik şasi (4.0x dayanım) yalnızca bu kadar ağır darbede hafif zorlanır
+                        this.busDamage.chassis = Math.min(100, (this.busDamage.chassis || 0) + Math.max(3, Math.round(excess / (4.0 * rigidityFactor))));
+                        if (typeof audio.speak === 'function') audio.speak("Kasise aşırı hızlı girdik! Egzoz ve havalı süspansiyon körükleri ağır hasar aldı, çelik şasi darbeyi göğüsledi!");
+                    } else if (excess >= 10) { // 55 - 70 km/h arası: Orta darbe (Sadece Alt Takım etkilenir, Şasi sağlam kalır)
+                        const exhDmg = Math.round(25 / (group2Shield * 0.65));
+                        const suspDmg = Math.round(18 / (group2Shield * 0.65));
+                        this.busDamage.exhaust = Math.min(100, (this.busDamage.exhaust || 0) + exhDmg);
+                        this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + suspDmg);
+                        if (typeof audio.speak === 'function') audio.speak("Kasise hızlı girdik, altını vurduk. Egzoz ve süspansiyon körükleri hasar aldı; ana şasi sağlam.");
                     } else { // 45 - 55 km/h arası: Hafif sıyrık
-                        if (typeof audio.speak === 'function') audio.speak("Kasisten biraz hızlı geçtik, altı hafif sürttü ama egzoz sağlam kurtuldu.");
+                        this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + 5);
+                        if (typeof audio.speak === 'function') audio.speak("Kasisten biraz hızlı geçtik, süspansiyon körükleri darbeyi emdi ve egzoz sağlam kurtuldu.");
                     }
                 } else {
                     // Güvenli geçiş sesi (Hafif zıplama)
@@ -4593,56 +4673,90 @@ const Game = {
                     this.busDamage.health -= damageAmount;
                     this.busDamage.health = Math.max(0, this.busDamage.health);
                     
-                    // Şeride göre bölgesel hasar ve uyarılar
+                    // Şeride ve parça sağlamlık kademesine göre bölgesel hasar ve uyarılar
                     if (npc.x === 20) {
-                        let outcome = this.calculateCrashOutcome(damageAmount);
+                        // Hassas dış donanım (Sol Cam - 1.0x)
+                        let outcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (outcome === 2) {
                             this.busDamage.leftWindow = 100;
-                            audio.speak("Sol cama çarptık! Sol cam tamamen kırıldı, yüzde yüz hasarlı.");
+                            audio.speak("Sol taraftan çarptık! Sol cam tamamen kırıldı.");
                         } else if (outcome === 1) {
                             this.busDamage.leftWindow = Math.max(this.busDamage.leftWindow, 50);
-                            audio.speak("Sol cama çarptık! Sol cam çatladı, yüzde elli hasarlı.");
+                            audio.speak("Sol taraftan çarptık! Sol cam çatladı, yüzde elli hasarlı.");
                         } else {
-                            audio.speak("Sol taraftan çarptık! Şanslıyız, cam kırılmadı.");
+                            audio.speak("Sol taraftan hafif sürttük! Cam kırılmadı.");
+                        }
+                        // Orta-ağır yan darbede sol süspansiyon körüğü etkilenir (1.75x)
+                        if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
+                            this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(damageAmount / 1.75));
                         }
                     } else if (npc.x === 80) {
-                        let outcome = this.calculateCrashOutcome(damageAmount);
+                        // Hassas dış donanım (Sağ Cam - 1.0x)
+                        let outcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (outcome === 2) {
                             this.busDamage.rightWindow = 100;
-                            audio.speak("Sağ cama çarptık! Sağ cam tamamen kırıldı, yüzde yüz hasarlı.");
+                            audio.speak("Sağ taraftan çarptık! Sağ cam tamamen kırıldı.");
                         } else if (outcome === 1) {
                             this.busDamage.rightWindow = Math.max(this.busDamage.rightWindow, 50);
-                            audio.speak("Sağ cama çarptık! Sağ cam çatladı, yüzde elli hasarlı.");
+                            audio.speak("Sağ taraftan çarptık! Sağ cam çatladı, yüzde elli hasarlı.");
                         } else {
-                            audio.speak("Sağ taraftan çarptık! Şanslıyız, cam kırılmadı.");
+                            audio.speak("Sağ taraftan hafif sürttük! Cam kırılmadı.");
+                        }
+                        if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
+                            this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(damageAmount / 1.75));
                         }
                     } else {
-                        audio.speak(`Önden çarpıştık! Kaporta ${damageAmount} puan hasar aldı!`);
-                        this.busDamage.front = Math.min(100, this.busDamage.front + damageAmount);
+                        // ÖNDEN ÇARPIŞMA: Darbe sırasıyla Far/Silecek -> Ön Çelik Tampon & Şanzıman -> Motor & Şasi üzerinden sönümlenir
+                        const frontBumpDmg = Math.max(4, Math.round(damageAmount / 1.8));
+                        this.busDamage.front = Math.min(100, (this.busDamage.front || 0) + frontBumpDmg);
+                        audio.speak(`Önden çarpıştık! Ön çelik tampon ve kaporta ${frontBumpDmg} puan hasar aldı!`);
                         
-                        let hlOutcome = this.calculateCrashOutcome(damageAmount);
+                        // Ön Farlar (1.0x)
+                        let hlOutcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (hlOutcome === 2) {
                             this.busDamage.headlights = 100;
                             if (this.isHeadlightsOn) {
                                 this.isHeadlightsOn = false;
                                 if (typeof audio.playHeadlightBust === 'function') audio.playHeadlightBust();
                             }
-                            setTimeout(() => audio.speak("Ön farlar tamamen kırıldı, yüzde yüz hasarlı! Görüş tehlikede!"), 1500);
+                            setTimeout(() => audio.speak("Ön farlar tamamen kırıldı! Gece görüşü tehlikede!"), 1500);
                         } else if (hlOutcome === 1) {
                             this.busDamage.headlights = Math.max(this.busDamage.headlights, 50);
                             setTimeout(() => audio.speak("Ön farlar yüzde elli hasar aldı, bağlantıları gevşedi."), 1500);
                         }
                         
-                        let wpOutcome = this.calculateCrashOutcome(damageAmount);
+                        // Silecek Motoru (1.0x)
+                        let wpOutcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (wpOutcome === 2) {
                             this.busDamage.wipers = 100;
                             if (typeof audio.isWiperOn !== 'undefined' && audio.isWiperOn) {
                                 if (typeof audio.toggleWipers === 'function') audio.toggleWipers();
                             }
-                            setTimeout(() => audio.speak("Silecek motoru tamamen kırıldı, yüzde yüz hasarlı! Cam temizlenemeyecek!"), 3000);
+                            setTimeout(() => audio.speak("Silecek motoru tamamen kırıldı! Yağmurda cam temizlenemeyecek!"), 3000);
                         } else if (wpOutcome === 1) {
                             this.busDamage.wipers = Math.max(this.busDamage.wipers, 50);
-                            setTimeout(() => audio.speak("Silecekler yüzde elli hasar aldı, zorlanarak çalışıyor."), 3000);
+                            setTimeout(() => audio.speak("Silecek mekanizması yüzde elli hasar aldı."), 3000);
+                        }
+
+                        // Fren Körükleri ve Süspansiyon (1.75x)
+                        if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
+                            const g2Dmg = Math.round(damageAmount / 1.75);
+                            this.busDamage.brakes = Math.min(100, (this.busDamage.brakes || 0) + Math.round(g2Dmg * 0.7));
+                            this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(g2Dmg * 0.8));
+                        }
+
+                        // Şanzıman ve Retarder (2.6x)
+                        if (this.calculateCrashOutcome(damageAmount, 3) >= 1) {
+                            const g3Dmg = Math.round(damageAmount / 2.6);
+                            this.busDamage.transmission = Math.min(100, (this.busDamage.transmission || 0) + g3Dmg);
+                        }
+
+                        // Dizel Motor Bloğu ve Ana Çelik Şasi (4.0x)
+                        if (this.calculateCrashOutcome(damageAmount, 4) >= 1) {
+                            const g4Dmg = Math.round(damageAmount / 4.0);
+                            this.busDamage.engine = Math.min(100, (this.busDamage.engine || 0) + g4Dmg);
+                            this.busDamage.chassis = Math.min(100, (this.busDamage.chassis || 0) + Math.round(g4Dmg * 0.8));
+                            setTimeout(() => audio.speak(`Ağır darbe! Motor bloğu ve ana çelik şasi yüzde ${g4Dmg} sarsıntı hasarı aldı.`), 4200);
                         }
                     }
                     
@@ -5900,20 +6014,39 @@ const Game = {
                 fuelSpeech += "⚠️ Dikkat, düşük yakıt ikazı! ";
             }
 
-            let msg = fuelSpeech + `Araç sağlığı yüzde ${Math.floor(this.busDamage.health)}. `;
-            let hasarListesi = [];
-            
-            if (this.busDamage.leftWindow > 0) hasarListesi.push(`Sol cam yüzde ${Math.floor(this.busDamage.leftWindow)}`);
-            if (this.busDamage.rightWindow > 0) hasarListesi.push(`Sağ cam yüzde ${Math.floor(this.busDamage.rightWindow)}`);
-            if (this.busDamage.front > 0) hasarListesi.push(`Ön kaporta yüzde ${Math.floor(this.busDamage.front)}`);
-            if (this.busDamage.wipers > 0) hasarListesi.push(`Silecekler yüzde ${Math.floor(this.busDamage.wipers)}`);
-            if (this.busDamage.headlights > 0) hasarListesi.push(`Farlar yüzde ${Math.floor(this.busDamage.headlights)}`);
-            if (this.busDamage.exhaust > 0) hasarListesi.push(`Egzoz yüzde ${Math.floor(this.busDamage.exhaust)}`);
-            
-            if (hasarListesi.length > 0) {
-                msg += hasarListesi.join(", ") + " hasarlı.";
+            let msg = fuelSpeech + `Genel araç sağlığı yüzde ${Math.floor(this.busDamage.health)}. `;
+            const d = this.busDamage;
+
+            // Parçaları sağlamlık gruplarına göre doğal dille raporla
+            const g1Damages = [];
+            if (d.leftWindow > 0) g1Damages.push(`Sol cam yüzde ${Math.floor(d.leftWindow)}`);
+            if (d.rightWindow > 0) g1Damages.push(`Sağ cam yüzde ${Math.floor(d.rightWindow)}`);
+            if (d.headlights > 0) g1Damages.push(`Farlar yüzde ${Math.floor(d.headlights)}`);
+            if (d.wipers > 0) g1Damages.push(`Silecekler yüzde ${Math.floor(d.wipers)}`);
+
+            const g2Damages = [];
+            if (d.exhaust > 0) g2Damages.push(`Egzoz ve DPF yüzde ${Math.floor(d.exhaust)}`);
+            if (d.suspension > 0) g2Damages.push(`Havalı süspansiyon körükleri yüzde ${Math.floor(d.suspension)}`);
+            if (d.brakes > 0) g2Damages.push(`Fren balataları ve körükleri yüzde ${Math.floor(d.brakes)}`);
+
+            const g3Damages = [];
+            if (d.front > 0) g3Damages.push(`Ön çelik tampon ve kaporta yüzde ${Math.floor(d.front)}`);
+            if (d.transmission > 0) g3Damages.push(`Şanzıman ve retarder yüzde ${Math.floor(d.transmission)}`);
+
+            const g4Damages = [];
+            if (d.engine > 0) g4Damages.push(`Dizel motor bloğu yüzde ${Math.floor(d.engine)}`);
+            if (d.chassis > 0) g4Damages.push(`Ana çelik şasi yüzde ${Math.floor(d.chassis)}`);
+
+            const groupReports = [];
+            if (g1Damages.length > 0) groupReports.push(`Dış cam ve aydınlatma: ${g1Damages.join(", ")} hasarlı`);
+            if (g2Damages.length > 0) groupReports.push(`Alt takım ve yürüyen aksam: ${g2Damages.join(", ")} yıpranmış`);
+            if (g3Damages.length > 0) groupReports.push(`Ön gövde ve şanzıman: ${g3Damages.join(", ")} hasarlı`);
+            if (g4Damages.length > 0) groupReports.push(`Motor ve ana şasi: ${g4Damages.join(", ")} hasarlı`);
+
+            if (groupReports.length > 0) {
+                msg += "Parça durumu: " + groupReports.join(". ") + ".";
             } else {
-                msg += "Mekanik aksamda hiçbir hasar yok, her şey sağlam.";
+                msg += "Camlar, alt takım, süspansiyon körükleri, frenler, şanzıman, motor ve ana şasi dahil tüm parçalar yüzde 100 sağlam.";
             }
             
             if (typeof audio.speak === 'function') audio.speak(msg);
@@ -5938,7 +6071,7 @@ const Game = {
         }
         if (this.keys.hasOwnProperty(k)) this.keys[k] = true;
 
-        // Özel aksiyonlar (Motor Çalıştırma: M veya Boşluk tuşu)
+        // Özel aksiyonlar (M veya Boşluk tuşu: Motor Çalıştırma)
         if (k === 'm' || e.code === 'KeyM' || e.code === 'Space') {
             e.preventDefault();
             if (audio.isEngineRunning) {
@@ -6147,23 +6280,36 @@ const SanayiMechanic = {
         this.state = 'report';
         this.currentIndex = 0;
         
-        // Hasarlı parçaları tespit et
+        // Hasarlı parçaları sağlamlık sırasına (Dış donanım -> Alt takım -> Gövde/Aktarma -> Motor/Şasi) göre tespit et
         this.parts = [];
-        if (Game.busDamage.leftWindow > 0) this.parts.push({ id: 'leftWindow', name: 'Sol Cam', damage: Game.busDamage.leftWindow, toRepair: false });
-        if (Game.busDamage.rightWindow > 0) this.parts.push({ id: 'rightWindow', name: 'Sağ Cam', damage: Game.busDamage.rightWindow, toRepair: false });
-        if (Game.busDamage.front > 0) this.parts.push({ id: 'front', name: 'Ön Kaporta ve Motor', damage: Game.busDamage.front, toRepair: false });
-        if (Game.busDamage.wipers > 0) this.parts.push({ id: 'wipers', name: 'Silecek Motoru', damage: Game.busDamage.wipers, toRepair: false });
-        if (Game.busDamage.headlights > 0) this.parts.push({ id: 'headlights', name: 'Ön Farlar ve Tesisat', damage: Game.busDamage.headlights, toRepair: false });
-        if (Game.busDamage.exhaust > 0) this.parts.push({ id: 'exhaust', name: 'Egzoz ve DPF Sistemi', damage: Game.busDamage.exhaust, toRepair: false });
+        const d = Game.busDamage || {};
+        // Hassas ve Kırılgan Dış Donanım (Dayanım: 1.0x)
+        if (d.leftWindow > 0) this.parts.push({ id: 'leftWindow', groupTier: 1, groupName: 'Dış Cam ve Aydınlatma', name: 'Sol Yan Akustik Camlar', damage: d.leftWindow, effect: 'Kabin ses yalıtımını ve klima ısıtma/soğutma etkisini bozar.', toRepair: false });
+        if (d.rightWindow > 0) this.parts.push({ id: 'rightWindow', groupTier: 1, groupName: 'Dış Cam ve Aydınlatma', name: 'Sağ Yan & Kapı Camları', damage: d.rightWindow, effect: 'Kabin akustik yalıtımını ve iklimlendirmeyi bozar.', toRepair: false });
+        if (d.headlights > 0) this.parts.push({ id: 'headlights', groupTier: 1, groupName: 'Dış Cam ve Aydınlatma', name: 'Ön Farlar ve LED Aydınlatma', damage: d.headlights, effect: 'Gece ve tünellerde görüşü düşürür.', toRepair: false });
+        if (d.wipers > 0) this.parts.push({ id: 'wipers', groupTier: 1, groupName: 'Dış Cam ve Aydınlatma', name: 'Cam Silecek Motoru', damage: d.wipers, effect: 'Yağmur ve karda ön camın temizlenmesini engeller.', toRepair: false });
+
+        // Orta Dayanımlı Alt Takım & Aşınma Parçaları (Dayanım: 1.75x)
+        if (d.exhaust > 0) this.parts.push({ id: 'exhaust', groupTier: 2, groupName: 'Alt Takım ve Yürüyen Aksam', name: 'Egzoz ve Euro 6 DPF/SCR Sistemi', damage: d.exhaust, effect: 'Tıslama/sürtünme sesi yapar ve motor çekişini düşürür.', toRepair: false });
+        if (d.suspension > 0) this.parts.push({ id: 'suspension', groupTier: 2, groupName: 'Alt Takım ve Yürüyen Aksam', name: 'Pnömatik Havalı Süspansiyon Körükleri', damage: d.suspension, effect: 'Viraj savrulmasını artırır, çukurlarda yolcu konforunu düşürür.', toRepair: false });
+        if (d.brakes > 0) this.parts.push({ id: 'brakes', groupTier: 2, groupName: 'Alt Takım ve Yürüyen Aksam', name: 'Pnömatik Disk Fren Balataları & Körükleri', damage: d.brakes, effect: 'Fren mesafesini uzatır ve hava basıncını daha hızlı tüketir.', toRepair: false });
+
+        // Yüksek Dayanımlı Gövde & Aktarma Organları (Dayanım: 2.6x)
+        if (d.front > 0) this.parts.push({ id: 'front', groupTier: 3, groupName: 'Gövde ve Aktarma Organları', name: 'Ön Çelik Tampon ve Darbe Traversi', damage: d.front, effect: 'Önden darbeleri emerek motor ve radyatörü korur.', toRepair: false });
+        if (d.transmission > 0) this.parts.push({ id: 'transmission', groupTier: 3, groupName: 'Gövde ve Aktarma Organları', name: 'Şanzıman Dişli Kutusu & Retarder', damage: d.transmission, effect: 'Vites geçişlerini zorlaştırır ve Retarder yokuş frenini zayıflatır.', toRepair: false });
+
+        // Ana Omurga ve Motor Bloğu (Dayanım: 4.0x)
+        if (d.engine > 0) this.parts.push({ id: 'engine', groupTier: 4, groupName: 'Motor ve Ana Şasi', name: 'Dizel Motor Bloğu, Turbo ve Radyatör', damage: d.engine, effect: 'Motor çekiş gücünü düşürür ve harareti hızlandırır.', toRepair: false });
+        if (d.chassis > 0) this.parts.push({ id: 'chassis', groupTier: 4, groupName: 'Motor ve Ana Şasi', name: 'Ana Çelik Şasi Kafesi ve Dingiller', damage: d.chassis, effect: 'Aracın ana omurgasıdır; hasarlandığında şerit tutuşu zorlaşır.', toRepair: false });
         
         const dialogEl = document.getElementById('sanayi-dialog');
         const reportContainer = document.getElementById('sanayi-report-container');
         const listEl = document.getElementById('sanayi-parts-list');
         const statusEl = document.getElementById('sanayi-status');
         
-        statusEl.innerText = "Hasar Raporu";
-        dialogEl.innerText = "Aşağı-Yukarı yön tuşlarıyla hasarlı parçaları inceleyin. Onarmak için parçanın üzerindeyken Enter'a basın.";
-        if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Röntgen tamamlandı. Hasar raporunuz ekranda. Aşağı yukarı yön tuşlarıyla parçaları inceleyip, onarmak istediğiniz parçanın üzerinde enter tuşuna basın. İşiniz bittiğinde işlemi tamamla butonuna basabilirsiniz.");
+        statusEl.innerText = "Araç Ekspertiz ve Hasar Raporu";
+        dialogEl.innerText = "Hasarlı parçalar dış donanımdan ana şasiye doğru sıralandı. Aşağı-Yukarı oklarla inceleyip Enter ile onarım listesine ekleyin.";
+        if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Röntgen tamamlandı. Hasarlı parçalar listelendi. Aşağı yukarı yön tuşlarıyla parçaları ve sürüşe etkilerini inceleyip, onarmak istediğiniz parçanın üzerinde enter tuşuna basın.");
         
         reportContainer.classList.remove('hidden');
         
@@ -6177,7 +6323,7 @@ const SanayiMechanic = {
         this.parts.forEach((part, index) => {
             const li = document.createElement('li');
             li.className = 'route-item' + (index === this.currentIndex ? ' selected' : '');
-            li.innerHTML = `${part.name} - Hasar: %${Math.floor(part.damage)} ${part.toRepair ? '<span style="color:var(--primary)">[ONARILACAK]</span>' : ''}`;
+            li.innerHTML = `<span style="color:#38bdf8; font-weight:bold;">[${part.groupName}]</span> ${part.name} - Hasar: %${Math.floor(part.damage)} ${part.toRepair ? '<span style="color:var(--primary)">[ONARILACAK]</span>' : ''}<div style="font-size:0.82rem; color:#94a3b8; margin-top:2px;">⚙️ Dinamik Etki: ${part.effect || ''}</div>`;
             listEl.appendChild(li);
         });
         
@@ -6193,7 +6339,7 @@ const SanayiMechanic = {
     announceCurrentSelection: function() {
         if (this.currentIndex < this.parts.length) {
             const part = this.parts[this.currentIndex];
-            let text = `${part.name}. Yüzde ${Math.floor(part.damage)} hasarlı.`;
+            let text = `${part.groupName}: ${part.name}. Yüzde ${Math.floor(part.damage)} hasarlı. Sürüş dinamiğine etkisi: ${part.effect || ''}`;
             if (part.toRepair) text += " Onarım listesine eklendi.";
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(text);
         } else {
