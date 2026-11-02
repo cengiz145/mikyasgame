@@ -829,8 +829,9 @@ const DriverBadges = {
             totalDrivingMinutes: 0,
             totalKm: 0,
             totalLostItemsFound: 0,
-            licenseLevel: 1,
-            completedTasks: 0
+            licenseLevel: 0,
+            completedTasks: 0,
+            companyFullInfrastructure: 0
         };
 
         let hasSaved = false;
@@ -846,7 +847,9 @@ const DriverBadges = {
             if (typeof Game.completedTasks === 'number') stats.completedTasks = Math.max(stats.completedTasks || 0, Game.completedTasks);
             if (!hasSaved && Game.completedTasks) stats.totalTrips = Math.max(stats.totalTrips, Game.completedTasks);
             if (Game.playerXP) stats.totalXP = Math.max(stats.totalXP, Game.playerXP);
-            if (Game.licenseLevel) stats.licenseLevel = Math.max(stats.licenseLevel, Game.licenseLevel);
+            if (Game.licenseLevel && (Game.playerXP > 0 || stats.totalTrips > 0 || Game.completedTasks > 0 || Game.licenseLevel > 1)) {
+                stats.licenseLevel = Math.max(stats.licenseLevel || 0, Game.licenseLevel);
+            }
             if (Game.playerBudget) stats.budgetEarned = Math.max(stats.budgetEarned, Game.playerBudget);
             if (Game.unlockedCities && Array.isArray(Game.unlockedCities)) {
                 stats.citiesVisitedCount = Math.max(stats.citiesVisitedCount, Game.unlockedCities.length);
@@ -863,33 +866,34 @@ const DriverBadges = {
         const compSys = (typeof CompanySystem !== 'undefined') ? CompanySystem : ((typeof window !== 'undefined' && window.CompanySystem) ? window.CompanySystem : null);
         if (compSys && compSys.data) {
             const cData = compSys.data;
-            stats.companyLevel = Math.max(stats.companyLevel || 1, cData.companyLevel || 1);
-            stats.companyTreasury = Math.max(stats.companyTreasury || 0, Math.max(0, cData.companyTreasury || 0));
-            stats.companyTotalRevenue = Math.max(stats.companyTotalRevenue || 0, cData.totalRevenue || 0);
-            stats.companyTripsCount = Math.max(stats.companyTripsCount || 0, cData.completedTripsCount || 0);
-            stats.hiredDriversCount = Math.max(stats.hiredDriversCount || 0, Array.isArray(cData.hiredDrivers) ? cData.hiredDrivers.length : 0);
-
             let totalInst = 0;
             if (cData.institutions) {
                 Object.values(cData.institutions).forEach(lvl => { totalInst += (lvl || 1); });
             }
-            stats.companyTotalInstitutionLevels = Math.max(stats.companyTotalInstitutionLevels || 7, totalInst);
-
             let branchCount = 0;
             if (cData.terminalBranches) {
                 Object.values(cData.terminalBranches).forEach(isOpen => { if (isOpen) branchCount++; });
             }
-            stats.companyTerminalBranchesCount = Math.max(stats.companyTerminalBranchesCount || 1, branchCount);
-
             let hqCount = 0;
             if (cData.hqUpgrades) {
                 Object.values(cData.hqUpgrades).forEach(hasUp => { if (hasUp) hqCount++; });
             }
-            stats.companyHqUpgradesCount = Math.max(stats.companyHqUpgradesCount || 0, hqCount);
 
             const hasActiveCompanyTrips = (cData.completedTripsCount || 0) >= 1;
+            const hasCompanyActivity = hasActiveCompanyTrips || (Array.isArray(cData.hiredDrivers) && cData.hiredDrivers.length >= 1) || totalInst > 7 || branchCount > 1 || hqCount > 0 || (cData.companyLevel || 1) > 1;
+
+            stats.companyLevel = hasCompanyActivity ? Math.max(stats.companyLevel || 0, cData.companyLevel || 1) : (stats.companyLevel || 0);
+            stats.companyTreasury = Math.max(stats.companyTreasury || 0, Math.max(0, cData.companyTreasury || 0));
+            stats.companyTotalRevenue = Math.max(stats.companyTotalRevenue || 0, cData.totalRevenue || 0);
+            stats.companyTripsCount = Math.max(stats.companyTripsCount || 0, cData.completedTripsCount || 0);
+            stats.hiredDriversCount = Math.max(stats.hiredDriversCount || 0, Array.isArray(cData.hiredDrivers) ? cData.hiredDrivers.length : 0);
+            stats.companyTotalInstitutionLevels = Math.max(stats.companyTotalInstitutionLevels || 7, totalInst);
+            stats.companyTerminalBranchesCount = hasCompanyActivity ? Math.max(stats.companyTerminalBranchesCount || 0, branchCount) : (stats.companyTerminalBranchesCount || 0);
+            stats.companyHqUpgradesCount = Math.max(stats.companyHqUpgradesCount || 0, hqCount);
+            stats.companyFullInfrastructure = (totalInst >= 21 && branchCount >= 5 && hqCount >= 4) ? 1 : 0;
+
             stats.companyCateringVip = (cData.cateringPackage === 'vip' || (cData.cateringPackage === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
-            stats.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'kurumsal' || (cData.facilityContract === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
+            stats.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'kurumsal' || (cData.hqUpgrades && cData.hqUpgrades.luxuryLounge) || (cData.institutions && (cData.institutions.fuel_depot || 1) >= 2) || (cData.facilityContract === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
             stats.companyContractsDone = Math.max(stats.companyContractsDone || 0, cData.specialContractsCompletedCount || 0);
             stats.companySatisfactionHighScore = (hasActiveCompanyTrips && cData.satisfactionRating >= 4.8) ? 1 : 0;
             stats.companyMastery = (cData.companyLevel >= 5 && (cData.companyTreasury || 0) >= 50000000) ? 1 : 0;
@@ -1107,7 +1111,7 @@ const DriverBadges = {
     },
 
     // --- BAŞARI VE ROZETLERİ ANLIK KONTROL ET (GENEL TETİKLEYİCİ) ---
-    checkBadges: function(stats = {}) {
+    checkBadges: function(stats = {}, silent = false) {
         let hasSaved = false;
         try {
             hasSaved = !!localStorage.getItem(this.STATS_KEY);
@@ -1139,7 +1143,7 @@ const DriverBadges = {
             }
         });
 
-        // 3. 1600 BAŞARIYI KONTROL ET
+        // 3. 1900 BAŞARIYI KONTROL ET
         this.badges.forEach(b => {
             if (data[b.id] && data[b.id].unlocked) return;
 
@@ -1151,7 +1155,7 @@ const DriverBadges = {
         });
 
         // 4. ANONS VE KUTLAMA
-        if (newlyUnlocked.length > 0) {
+        if (!silent && newlyUnlocked.length > 0) {
             setTimeout(() => {
                 if (typeof audio !== 'undefined' && typeof audio.playBadgeFanfare === 'function') {
                     audio.playBadgeFanfare();
@@ -1252,11 +1256,18 @@ const DriverBadges = {
 
         this.saveLifetimeStats(lifetime);
 
-        // Sefer başladığı an şartı sağlanan başarımları hemen aç ve oyuncuyu kutla
+        // Sefer başladığı an şartı sağlanan sefer-başlangıç başarımlarını hemen aç ve oyuncuyu kutla
         const newlyUnlocked = [];
         const data = this.getBadgesData();
+        const startStatsSet = new Set([
+            'routesStartedCount', 'intercityStartsCount', 'nightStartsCount',
+            'rainSnowStartsCount', 'cleanStartsCount', 'fullFuelStartsCount',
+            'airPressureFullStarts', 'morningStartsCount', 'midibusStartsCount',
+            'soloStartsCount', 'articulatedStartsCount', 'coachStartsCount'
+        ]);
 
         this.badges.forEach(b => {
+            if (!startStatsSet.has(b.stat)) return;
             if (data[b.id] && data[b.id].unlocked) return;
             const currentStatVal = lifetime[b.stat] || 0;
             if (currentStatVal >= b.targetValue) {
@@ -1273,7 +1284,10 @@ const DriverBadges = {
             }, 300);
 
             const first = newlyUnlocked[0].item;
-            const announceText = `Tebrikler Kaptan! Sefer başlangıcında yeni bir başarı kazandınız: ${first.title}!`;
+            const count = newlyUnlocked.length;
+            const announceText = count === 1
+                ? `Tebrikler Kaptan! Sefer başlangıcında yeni bir başarı kazandınız: ${first.title}!`
+                : `Tebrikler Kaptan! Sefer başlangıcında ${count} adet başarı kazandınız! İlk ödülünüz: ${first.title}.`;
             setTimeout(() => {
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(announceText);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🏆 Başarı Açıldı: ${first.title}`, 'success');
@@ -1372,8 +1386,8 @@ const DriverBadges = {
             lifetime.retarderUsesCount = (lifetime.retarderUsesCount || 0) + retarderCount;
         }
 
-        // Gece Seferi
-        if (stats.isNight === true) {
+        // Gece Seferi (F tuşuyla farları açarak tamamlanan gece seferleri)
+        if (stats.isNight === true && (stats.headlightsUsed === true || stats.isHeadlightsOn === true)) {
             lifetime.totalNightTrips += 1;
         }
 
@@ -1450,31 +1464,32 @@ const DriverBadges = {
         const compSysForCheck = (typeof CompanySystem !== 'undefined') ? CompanySystem : ((typeof window !== 'undefined' && window.CompanySystem) ? window.CompanySystem : null);
         if (compSysForCheck && compSysForCheck.data) {
             const cData = compSysForCheck.data;
-            lifetime.companyLevel = Math.max(lifetime.companyLevel || 1, cData.companyLevel || 1);
-            lifetime.companyTreasury = Math.max(lifetime.companyTreasury || 0, Math.max(0, cData.companyTreasury || 0));
-            lifetime.companyTotalRevenue = Math.max(lifetime.companyTotalRevenue || 0, cData.totalRevenue || 0);
-            lifetime.companyTripsCount = Math.max(lifetime.companyTripsCount || 0, cData.completedTripsCount || 0);
-            lifetime.hiredDriversCount = Math.max(lifetime.hiredDriversCount || 0, Array.isArray(cData.hiredDrivers) ? cData.hiredDrivers.length : 0);
-
             let totalInst = 0;
             if (cData.institutions) {
                 Object.values(cData.institutions).forEach(lvl => { totalInst += (lvl || 1); });
             }
-            lifetime.companyTotalInstitutionLevels = Math.max(lifetime.companyTotalInstitutionLevels || 7, totalInst);
-
             let branchCount = 0;
             if (cData.terminalBranches) {
                 Object.values(cData.terminalBranches).forEach(isOpen => { if (isOpen) branchCount++; });
             }
-            lifetime.companyTerminalBranchesCount = Math.max(lifetime.companyTerminalBranchesCount || 1, branchCount);
-
             let hqCount = 0;
             if (cData.hqUpgrades) {
                 Object.values(cData.hqUpgrades).forEach(hasUp => { if (hasUp) hqCount++; });
             }
-            lifetime.companyHqUpgradesCount = Math.max(lifetime.companyHqUpgradesCount || 0, hqCount);
 
             const hasActiveCompanyTrips = (cData.completedTripsCount || 0) >= 1;
+            const hasCompanyActivity = hasActiveCompanyTrips || (Array.isArray(cData.hiredDrivers) && cData.hiredDrivers.length >= 1) || totalInst > 7 || branchCount > 1 || hqCount > 0 || (cData.companyLevel || 1) > 1;
+
+            lifetime.companyLevel = hasCompanyActivity ? Math.max(lifetime.companyLevel || 0, cData.companyLevel || 1) : (lifetime.companyLevel || 0);
+            lifetime.companyTreasury = Math.max(lifetime.companyTreasury || 0, Math.max(0, cData.companyTreasury || 0));
+            lifetime.companyTotalRevenue = Math.max(lifetime.companyTotalRevenue || 0, cData.totalRevenue || 0);
+            lifetime.companyTripsCount = Math.max(lifetime.companyTripsCount || 0, cData.completedTripsCount || 0);
+            lifetime.hiredDriversCount = Math.max(lifetime.hiredDriversCount || 0, Array.isArray(cData.hiredDrivers) ? cData.hiredDrivers.length : 0);
+            lifetime.companyTotalInstitutionLevels = Math.max(lifetime.companyTotalInstitutionLevels || 7, totalInst);
+            lifetime.companyTerminalBranchesCount = hasCompanyActivity ? Math.max(lifetime.companyTerminalBranchesCount || 0, branchCount) : (lifetime.companyTerminalBranchesCount || 0);
+            lifetime.companyHqUpgradesCount = Math.max(lifetime.companyHqUpgradesCount || 0, hqCount);
+            lifetime.companyFullInfrastructure = (totalInst >= 21 && branchCount >= 5 && hqCount >= 4) ? 1 : 0;
+
             lifetime.companyCateringVip = (cData.cateringPackage === 'vip' || (cData.cateringPackage === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
             lifetime.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'kurumsal' || (cData.facilityContract === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
             lifetime.companyContractsDone = Math.max(lifetime.companyContractsDone || 0, cData.specialContractsCompletedCount || 0);
@@ -1561,6 +1576,7 @@ const DriverBadges = {
             this.currentMainTab = targetTab;
         }
 
+        this.checkBadges({}, true);
         this.currentPage = 1;
         this.renderModal();
 

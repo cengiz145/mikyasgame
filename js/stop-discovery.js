@@ -14,41 +14,62 @@ const StopDiscovery = {
         "Velimeşe": []
     },
 
-    initKnownStops: function() {
-        if (typeof SuleymanpasaNavigasyon !== 'undefined' && Array.isArray(SuleymanpasaNavigasyon.sokaklar)) {
-            this.knownStops["Süleymanpaşa"] = SuleymanpasaNavigasyon.sokaklar.map(s => s.name);
+    initKnownStops: function () {
+        if (typeof SuleymanpasaNavigasyon !== 'undefined') {
+            if (Array.isArray(SuleymanpasaNavigasyon.sokaklar)) {
+                this.knownStops["Süleymanpaşa"] = SuleymanpasaNavigasyon.sokaklar.map(s => s.name);
+            } else if (SuleymanpasaNavigasyon.veritabani && SuleymanpasaNavigasyon.veritabani.mahalleler) {
+                const spSet = new Set();
+                Object.values(SuleymanpasaNavigasyon.veritabani.mahalleler).forEach(m => {
+                    if (m && Array.isArray(m.sokaklar)) {
+                        m.sokaklar.forEach(s => { if (s && s.name) spSet.add(s.name.trim()); });
+                    }
+                });
+                this.knownStops["Süleymanpaşa"] = Array.from(spSet);
+            }
         }
         if (typeof SarayNavigasyon !== 'undefined' && Array.isArray(SarayNavigasyon.sokaklar)) {
-            this.knownStops["Saray"] = SarayNavigasyon.sokaklar.map(s => s.name);
+            this.knownStops["Saray"] = SarayNavigasyon.sokaklar.map(s => s.name.trim());
         }
         if (typeof VelimeseNavigasyon !== 'undefined' && Array.isArray(VelimeseNavigasyon.sokaklar)) {
-            this.knownStops["Velimeşe"] = VelimeseNavigasyon.sokaklar.map(s => s.name);
+            this.knownStops["Velimeşe"] = VelimeseNavigasyon.sokaklar.map(s => s.name.trim());
         }
+
+        // Keşfedilen duraklardan (TEKULAŞ / Kariyer hatları dahil) ilgili ilçede olanları listeye dahil et
+        const discovered = this.getDiscoveredData();
+        Object.values(discovered).forEach(d => {
+            if (d && d.district && d.name) {
+                if (!this.knownStops[d.district]) this.knownStops[d.district] = [];
+                if (!this.knownStops[d.district].includes(d.name)) {
+                    this.knownStops[d.district].push(d.name);
+                }
+            }
+        });
     },
 
-    getDiscoveredData: function() {
+    getDiscoveredData: function () {
         try {
             const data = localStorage.getItem(this.STORAGE_KEY);
             return data ? JSON.parse(data) : {};
-        } catch(e) {
+        } catch (e) {
             return {};
         }
     },
 
-    getDiscoveredStops: function() {
+    getDiscoveredStops: function () {
         return Object.keys(this.getDiscoveredData());
     },
 
-    saveDiscoveredData: function(data) {
+    saveDiscoveredData: function (data) {
         try {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-        } catch(e) {}
+        } catch (e) { }
         if (typeof Game !== 'undefined' && typeof Game.saveData === 'function') {
             Game.saveData();
         }
     },
 
-    onReachStop: function(stopName, district) {
+    onReachStop: function (stopName, district) {
         if (!stopName) return;
         this.initKnownStops();
 
@@ -66,6 +87,7 @@ const StopDiscovery = {
                 visitCount: 1
             };
             this.saveDiscoveredData(data);
+            this.initKnownStops();
 
             const districtKnown = this.knownStops[activeDist] || [];
             const districtDiscoveredCount = Object.values(data).filter(d => d.district === activeDist).length;
@@ -73,7 +95,7 @@ const StopDiscovery = {
 
             // Sesli kutlama ve anons
             if (typeof audio !== 'undefined' && audio.playSuccess) {
-                try { audio.playSuccess(); } catch(e) {}
+                try { audio.playSuccess(); } catch (e) { }
             }
 
             const speechText = `Yeni durak keşfedildi: ${cleanName}! ${activeDist} keşfi: ${districtDiscoveredCount} de ${totalCount}.`;
@@ -99,6 +121,9 @@ const StopDiscovery = {
             if (districtDiscoveredCount >= Math.round(totalCount * 0.8) && typeof DriverBadges !== 'undefined' && (DriverBadges.unlockBadge || DriverBadges.unlock)) {
                 (DriverBadges.unlockBadge || DriverBadges.unlock).call(DriverBadges, 'hat_hakimi', true, 'Hat Hâkimi (%80 Durak Keşfi)');
             }
+            if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkBadges === 'function') {
+                DriverBadges.checkBadges({});
+            }
         } else {
             data[cleanName].visitCount = (data[cleanName].visitCount || 1) + 1;
             this.saveDiscoveredData(data);
@@ -109,7 +134,7 @@ const StopDiscovery = {
         }
     },
 
-    getStats: function(district) {
+    getStats: function (district) {
         this.initKnownStops();
         const data = this.getDiscoveredData();
         const activeDist = district || this.currentTab;
@@ -130,7 +155,7 @@ const StopDiscovery = {
         };
     },
 
-    renderModal: function(tabDistrict) {
+    renderModal: function (tabDistrict) {
         const modal = document.getElementById('stop-collection-modal');
         if (!modal) return;
 
@@ -184,7 +209,7 @@ const StopDiscovery = {
                 li.style.justifyContent = 'space-between';
                 li.style.alignItems = 'center';
 
-                const ariaTxt = isDisc 
+                const ariaTxt = isDisc
                     ? `Keşfedildi: ${stopName}. ${info.visitCount || 1} kez sefer yapıldı.`
                     : `Henüz keşfedilmedi: ${idx + 1}. durak. Sürüş esnasında keşfedin.`;
                 li.setAttribute('tabindex', '0');
@@ -218,7 +243,7 @@ const StopDiscovery = {
         }
     },
 
-    closeModal: function() {
+    closeModal: function () {
         const modal = document.getElementById('stop-collection-modal');
         if (modal) modal.classList.add('hidden');
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
@@ -226,7 +251,7 @@ const StopDiscovery = {
         }
     },
 
-    init: function() {
+    init: function () {
         const btnOpen = document.getElementById('btn-open-stop-collection');
         if (btnOpen) {
             btnOpen.addEventListener('click', () => {

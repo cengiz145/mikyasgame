@@ -533,13 +533,14 @@ const Game = {
             BusConceptGuide.announceAction('ramp', this.isRampDeployed);
         }
         if (this.isRampDeployed) {
-            this.rampUsedInRoute = true;
-            this.rampsUsedCountInRoute = (this.rampsUsedCountInRoute || 0) + 1;
             if (typeof audio !== 'undefined' && typeof audio.playRampDeploy === 'function') audio.playRampDeploy();
             if (rampEl) rampEl.style.display = 'inline-block';
             let xpGained = false;
-            if (this.hasWheelchairPassengerAtStop && !this.rampXPAwardedThisStop) {
+            const isWheelchairOrTask9 = this.hasWheelchairPassengerAtStop || (this.activeRouteData && this.activeRouteData.taskIndex === 8);
+            if (isWheelchairOrTask9 && !this.rampXPAwardedThisStop) {
                 this.rampXPAwardedThisStop = true;
+                this.rampUsedInRoute = true;
+                this.rampsUsedCountInRoute = (this.rampsUsedCountInRoute || 0) + 1;
                 this.addXP(30, "Tekerlekli Sandalye Rampası Hizmeti");
                 xpGained = true;
             }
@@ -766,6 +767,10 @@ const Game = {
             return;
         }
         this.hasLostItemFound = true;
+        if (this.finalStopDepartTimer) {
+            clearTimeout(this.finalStopDepartTimer);
+            this.finalStopDepartTimer = null;
+        }
 
         const items = [
             { name: "deri bir cüzdan ve kimlik kartı", reward: 120, xp: 60, toast: "👛 Deri Cüzdan ve Kimlik Bulundu (+120 ₺)" },
@@ -777,13 +782,19 @@ const Game = {
         this.lastFoundLostItem = selected;
 
         if (typeof audio !== 'undefined' && typeof audio.playLostAndFoundWalk === 'function') {
+            this.lostAndFoundCheckingInProgress = true;
             audio.playLostAndFoundWalk(() => {
+                this.lostAndFoundCheckingInProgress = false;
                 this.addMoney(selected.reward);
                 this.addXP(selected.xp);
                 const msg = `Arka koltukta ${selected.name} bulundu ve TEKULAŞ Emanet Bürosuna teslim edildi! ${selected.reward} Lira dürüst şoför primi ve ${selected.xp} tecrübe kazandınız.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                 if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(selected.toast, "success");
+                if (this.pendingFinishAfterLostCheck) {
+                    this.pendingFinishAfterLostCheck = false;
+                    setTimeout(() => this.finishRoute(), 1200);
+                }
             });
         } else {
             this.addMoney(selected.reward);
@@ -792,6 +803,10 @@ const Game = {
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(selected.toast, "success");
+            if (this.pendingFinishAfterLostCheck) {
+                this.pendingFinishAfterLostCheck = false;
+                setTimeout(() => this.finishRoute(), 1200);
+            }
         }
     },
 
@@ -2437,6 +2452,13 @@ const Game = {
         this.isDriving = true;
         this.busDamage = { leftWindow: 0, rightWindow: 0, headlights: 0, wipers: 0, exhaust: 0, suspension: 0, brakes: 0, front: 0, transmission: 0, engine: 0, chassis: 0, health: 100 };
         this.isHeadlightsOn = false; // Farlar başlangıçta kapalı
+        this.headlightsUsedInRoute = false;
+        this.lostAndFoundCheckingInProgress = false;
+        this.pendingFinishAfterLostCheck = false;
+        if (this.finalStopDepartTimer) {
+            clearTimeout(this.finalStopDepartTimer);
+            this.finalStopDepartTimer = null;
+        }
         this.kasisDistance = null;
         this.lastRearHitTime = 0;
         this.passengerAngerTimer = 0;
@@ -5032,7 +5054,7 @@ const Game = {
             rawWaiting = Math.max(0, Math.round(rawWaiting * rushMult));
             stopData.bekleyenYolcu = rawWaiting;
         }
-        const waiting = isTrainingEmpty ? 0 : rawWaiting;
+        const waiting = (isTrainingEmpty || isFinalStop) ? 0 : rawWaiting;
 
         if (isTrainingEmpty) {
             const emptyNotice = isFinalStop 
@@ -5177,6 +5199,24 @@ const Game = {
         }
 
         if (!this.activeRouteData || !Array.isArray(this.activeRouteData.stops) || this.currentStopIndex >= this.activeRouteData.stops.length - 1) {
+            if (this.lostAndFoundCheckingInProgress) {
+                this.pendingFinishAfterLostCheck = true;
+                return;
+            }
+            if (!this.hasLostItemFound && !this.isTrainingRoute && !this.finalStopDepartTimer) {
+                const waitNotice = "Son durak yolcu inişi tamamlandı. Koltuklarda unutulan eşya kontrolü için 4 saniye içinde J tuşuna basabilirsiniz.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(waitNotice);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🎒 Son Durak: Kayıp eşya kontrolü için 'J' tuşuna basabilirsiniz (4 sn)", "info");
+                this.finalStopDepartTimer = setTimeout(() => {
+                    this.finalStopDepartTimer = null;
+                    if (this.lostAndFoundCheckingInProgress) {
+                        this.pendingFinishAfterLostCheck = true;
+                    } else {
+                        this.finishRoute();
+                    }
+                }, 4000);
+                return;
+            }
             this.finishRoute();
             return;
         }
@@ -5701,7 +5741,8 @@ const Game = {
                     rampsUsedCount: this.rampsUsedCountInRoute || (this.rampUsedInRoute ? 1 : 0),
                     lostItemFound: !!this.hasLostItemFound,
                     isNight: !!this.isNight,
-                    isHeadlightsOn: !!this.isHeadlightsOn,
+                    isHeadlightsOn: !!(this.isHeadlightsOn || this.headlightsUsedInRoute),
+                    headlightsUsed: !!(this.isHeadlightsOn || this.headlightsUsedInRoute),
                     completedTasks: this.completedTasks,
                     totalDrivingSeconds: this.totalDrivingSeconds || 0,
                     retarderUsed: !!this.retarderUsedInRoute,
@@ -6277,6 +6318,7 @@ const Game = {
                 this.isHeadlightsOn = !this.isHeadlightsOn;
                 audio.playSwitchClick(); // Şalter sesi
                 if (this.isHeadlightsOn) {
+                    this.headlightsUsedInRoute = true;
                     audio.speak("Farlar açıldı.");
                 } else {
                     audio.speak("Farlar kapatıldı.");

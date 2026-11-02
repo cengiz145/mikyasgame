@@ -327,6 +327,9 @@
             const msg = `İkram paketi güncellendi: ${pkgNames[pkg] || pkg}. Sürüş esnasında I tuşuna basarak yolcularınıza ikram servisi yapabilirsiniz.`;
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`☕ ${pkgNames[pkg] || pkg} Seçildi!`, 'success');
+            if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkBadges === 'function') {
+                DriverBadges.checkBadges({});
+            }
         },
 
         boostSatisfaction: function(delta) {
@@ -491,6 +494,9 @@
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(succMsg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(`🤝 ${name} F1 Acente Bayiliği Kuruldu!`, 'success');
                 this.addRadioLog("🤝 Acente Bayisi", "🏬", `${name} otogarında şirketinizin tabelasını astık. Yolculara bilet kesimi ve bagaj fişleme hizmeti vermeye başladık.`, "success");
+            }
+            if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkBadges === 'function') {
+                DriverBadges.checkBadges({});
             }
         },
 
@@ -1187,6 +1193,9 @@
             this.addRadioLog("🏢 Merkez İdare", "🏛️", `${inst.name} tesisimiz Seviye ${nextLvlObj.level}'e terfi etti (${(nextLvlObj && nextLvlObj.title) || 'Yeni Seviye'}). Filonun yeni gücü: ${(nextLvlObj && nextLvlObj.perkShort) || ''}`, "system");
 
             this.renderAll();
+            if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkBadges === 'function') {
+                DriverBadges.checkBadges({});
+            }
         },
 
         // Otobüs Kurumları ve Tesislerini Render Et
@@ -2711,6 +2720,9 @@
             this.addRadioLog(driverInfo.name, driverInfo.avatar, `Selamünaleyküm kaptanlar! Şirket bünyesine katıldım, tekerime taş değmesin!`, "success");
 
             this.renderAll();
+            if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkBadges === 'function') {
+                DriverBadges.checkBadges({});
+            }
             return true;
         },
 
@@ -3436,6 +3448,9 @@
             this.data.specialContracts.splice(contractIdx, 1);
             this.saveData();
             this.renderAll();
+            if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkBadges === 'function') {
+                DriverBadges.checkBadges({});
+            }
         },
 
         // Şirket Genel Merkezi Avantajını Satın Al
@@ -3502,6 +3517,9 @@
 
             this.recordTransaction('expense', 'upgrades', upgradeNames[upgradeKey], cost);
             this.data.hqUpgrades[upgradeKey] = true;
+            if (upgradeKey === 'luxuryLounge') {
+                this.data.facilityContract = 'vip';
+            }
             this.saveData();
 
             this.playCashChime();
@@ -3509,6 +3527,9 @@
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof UI !== 'undefined') UI.showToast(msg, "success");
             this.renderAll();
+            if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.checkBadges === 'function') {
+                DriverBadges.checkBadges({});
+            }
         },
 
         // Web Audio Synthesizer Ses Efektleri
