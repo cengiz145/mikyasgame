@@ -1528,30 +1528,29 @@
             }
         ],
 
-        getMission: function(taskIndex) {
+        getMission: function (taskIndex) {
             const idx = Math.max(0, Math.min(99, parseInt(taskIndex) || 0));
             return this.missions[idx] || this.missions[0];
         },
 
-        getLevelTitle: function(levelOrTaskIndex) {
+        getLevelTitle: function (completedTasksOrIndex, isDirectLevel = false) {
             let lvl = 1;
-            if (typeof levelOrTaskIndex === 'number' && !isNaN(levelOrTaskIndex)) {
-                if (levelOrTaskIndex > 10) {
-                    lvl = Math.floor(levelOrTaskIndex / 10) + 1;
+            const parsed = (typeof completedTasksOrIndex === 'number' && !isNaN(completedTasksOrIndex))
+                ? completedTasksOrIndex
+                : parseInt(completedTasksOrIndex, 10);
+
+            if (!isNaN(parsed)) {
+                if (isDirectLevel) {
+                    lvl = parsed;
                 } else {
-                    lvl = levelOrTaskIndex;
-                }
-            } else if (typeof levelOrTaskIndex === 'string') {
-                const parsed = parseInt(levelOrTaskIndex, 10);
-                if (!isNaN(parsed)) {
-                    lvl = (parsed > 10) ? (Math.floor(parsed / 10) + 1) : parsed;
+                    lvl = Math.floor(Math.max(0, parsed) / 10) + 1;
                 }
             }
             lvl = Math.max(1, Math.min(10, Math.floor(lvl) || 1));
             return (this.LEVEL_TITLES && this.LEVEL_TITLES[lvl - 1]) || "1. Sınıf Stajyer Şehir İçi Sürücüsü";
         },
 
-        enrichRoute: function(route, taskIndex) {
+        enrichRoute: function (route, taskIndex) {
             if (!route) return route;
             const m = this.getMission(taskIndex);
             route.careerMission = m;

@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU BAÅLATICI (APP.JS)
    ========================================================================== */
 
@@ -1744,7 +1744,12 @@ document.addEventListener('DOMContentLoaded', () => {
             btnStart.innerText = "Yeni Bir Oyuna Başla";
         }
         
-        if (Game.hasPassedLevel10()) {
+        if (typeof Game !== 'undefined' && Game.playMode === 'career') {
+            if (typeof UI !== 'undefined' && UI.updateTitleScreenButtons) {
+                UI.updateTitleScreenButtons();
+            }
+            UI.switchScreen('title-screen');
+        } else if (Game.hasPassedLevel10()) {
             UI.renderCityMap(Game.licenseLevel, Game.unlockedCities);
             UI.switchScreen('base-selection-menu');
         } else {

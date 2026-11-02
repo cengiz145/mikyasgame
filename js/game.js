@@ -1539,7 +1539,14 @@ const Game = {
         this.playerXP += earnedXP;
         const newLevel = this.calculateLevelFromXP(this.playerXP);
         this.licenseLevel = Math.max(oldLevel, newLevel);
-        this.completedTasks++;
+
+        const routeTaskIdx = (this.activeRouteData && typeof this.activeRouteData.taskIndex === 'number')
+            ? this.activeRouteData.taskIndex
+            : null;
+        const wasNewCareerTask = (routeTaskIdx === null || routeTaskIdx === this.completedTasks);
+        if (wasNewCareerTask) {
+            this.completedTasks++;
+        }
         this.saveData();
 
         const nextThreshold = this.getNextLevelXP(this.licenseLevel);
@@ -1563,7 +1570,7 @@ const Game = {
         UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
 
         // RESMİ İŞLETME TEBLİĞLERİ VE HİZMETE ALMA TUTANAKLARI
-        this.triggerProgressiveWowAnnouncement(this.completedTasks);
+        this.triggerProgressiveWowAnnouncement(wasNewCareerTask ? this.completedTasks : -1);
         return earnedXP;
     },
 
@@ -1577,54 +1584,124 @@ const Game = {
 
         let wowData = null;
 
-        if (completed === 1) {
+        if (completed === 2) {
+            wowData = {
+                icon: "👥",
+                title: "📋 RESMİ TEBLİĞ: İLK YOLCU BİNİŞİ & ÖN KAPI (E) YETKİSİ",
+                desc: "Boş araç intikal ve durak hizalama provalarını başarıyla tamamladınız! 3. Görevden itibaren duraklarda bekleyen yolcuları E tuşu ile ön kapıyı açarak otobüse alabilirsiniz.",
+                speech: "Sayın Kaptanım, boş intikal provalarınız tamamlandı. Üçüncü görevden itibaren duraklarda E tuşu ile ön kapıyı açarak ilk yolcularınızı alabilirsiniz."
+            };
+        } else if (completed === 4) {
             wowData = {
                 icon: "💳",
-                title: "📋 RESMİ TEBLİĞ: ELEKTRONİK BİLET & VALİDATÖR DONANIMI",
-                desc: "Süleymanpaşa Hareket Amirliği tebliğidir: 2. Etap kapsamında aracınıza elektronik biletleme validatörü tahsis edilmiştir. Binen yolcular Tekirdağ Kart okutacak ve bilet hasılatı işletme bütçenize aktarılacaktır.",
-                speech: "Sayın Kaptanım, Hareket Amirliği tebliğidir: Aracınıza elektronik bilet validatörü monte edilmiştir. 2. Sefer intikaline başlayabilirsiniz."
+                title: "📋 RESMİ TEBLİĞ: TEKİRDAĞ KART (AKBİL) & VALİDATÖR DONANIMI",
+                desc: "Süleymanpaşa Hareket Amirliği tebliğidir: 5. Görev kapsamında aracınıza elektronik biletleme validatörü tahsis edilmiştir. Binen yolcular Tekirdağ Kart okutacak ve bilet hasılatı işletme bütçenize aktarılacaktır.",
+                speech: "Sayın Kaptanım, Hareket Amirliği tebliğidir: Aracınıza elektronik bilet validatörü monte edilmiştir. Beşinci sefer intikaline başlayabilirsiniz."
             };
-        } else if (completed === 2) {
+        } else if (completed === 6) {
             wowData = {
                 icon: "🔔",
-                title: "📋 TEKNİK TALİMAT: AKUSTİK İNİŞ ZİLİ & ÇİFT KAPI KONTROLÜ",
-                desc: "Yolcu iniş protokolü devreye alınmıştır. İnecek yolcular durağa 200 metre kala 'DURACAK' butonuna basacaktır. Sinyal aldığınızda aracı nizami durdurup Q tuşu ile arka kapıyı açınız.",
-                speech: "Sayın Kaptanım; akustik iniş zili ve arka kapı donanımı aktif edilmiştir. Durak yanaşmalarında arka kapıyı açarak inişleri sağlayınız."
+                title: "📋 TEKNİK TALİMAT: AKUSTİK İNİŞ ZİLİ & ARKA KAPI (Q) KONTROLÜ",
+                desc: "7. Görevden itibaren yolcu iniş protokolü devreye alınmıştır. İnecek yolcular durağa 200 metre kala 'DURACAK' butonuna basacaktır. Sinyal aldığınızda aracı nizami durdurup Q tuşu ile arka kapıyı açınız.",
+                speech: "Sayın Kaptanım; akustik iniş zili ve arka kapı donanımı aktif edilmiştir. Durak yanaşmalarında Q tuşu ile arka kapıyı açarak inişleri sağlayınız."
             };
-        } else if (completed === 3) {
+        } else if (completed === 8) {
             wowData = {
                 icon: "♿",
-                title: "📋 KAMUSAL ERİŞİLEBİLİRLİK: ENGELLİ RAMPASI & KNEELING SİSTEMİ",
-                desc: "Toplu taşıma erişilebilirlik ve yolcu konfor standartları gereği araca mekanik engelli rampası ve yana yatma sistemi (kneeling) zimmetlenmiştir. Durakta tekerlekli sandalyeli yolcu gördügünüzde 'U' tuşuna basarak rampayı açınız.",
-                speech: "Sayın Kaptanım; engelli rampası ve yana yatma donanımı hizmete sunulmuştur. Erişilebilirlik standartlarına riayet ediniz."
-            };
-        } else if (completed === 5) {
-            wowData = {
-                icon: "📻",
-                title: "📋 OPERASYONEL HABERLEŞME: TEKULAŞ MERKEZ TELSİZİ & METEOROLOJİ",
-                desc: "Hareket Kontrol Merkezi canlı telsiz frekansı hattınıza tanımlanmıştır. 'T' tuşuna basarak anlık telsiz anonslarını dinleyebilirsiniz. Yağış başladığında 'X' tuşu ile silecekleri devreye alınız.",
-                speech: "Sayın Kaptanım; TEKULAŞ Hareket Merkezi telsiz kanalı açılmıştır. Anlık operasyon talimatlarını takip ediniz."
-            };
-        } else if (completed === 7) {
-            wowData = {
-                icon: "⚙️",
-                title: "📋 MEKANİK GÜVENLİK: PNÖMATİK HAVA FRENİ & KOMPRESÖR SİSTEMİ",
-                desc: "Ağır vasıta pnömatik fren basınç izleme sistemi devrededir. Hava basıncını koruyunuz; kademeli frenaj uygulayınız. Basınç 4 bar altına düşerse imdat sistemi kilitlenir.",
-                speech: "Sayın Kaptanım; pnömatik hava freni ve kompresör basınç izleme sistemi devreye alınmıştır. Kademeli frenleme uygulayınız."
+                title: "📋 KAMUSAL ERİŞİLEBİLİRLİK: ENGELLİ RAMPASI & KNEELING (U)",
+                desc: "9. Görev itibarıyla toplu taşıma erişilebilirlik standartları gereği araca pnömatik engelli rampası ve yana yatma sistemi (kneeling) zimmetlenmiştir. Durakta tekerlekli sandalyeli yolcu gördüğünüzde 'U' tuşuna basarak rampayı açınız.",
+                speech: "Sayın Kaptanım; engelli rampası ve yana yatma donanımı hizmete sunulmuştur. U tuşu ile rampayı açabilirsiniz."
             };
         } else if (completed === 9) {
             wowData = {
                 icon: "🏁",
-                title: "📋 DİPLOMA ETABI: 1. SINIF MEZUNİYET SINAV SEFERİ",
-                desc: "1. Sınıf Stajyer sürücü devrenizin 10. ve son yeterlilik sınav seferi atanmıştır. Bu seferi tamamladığınızda 2. Sınıf Kıyı & Sahil Kaptanlığına terfi edecek ve 18 metrelik körüklü otobüs yetkisi alacaksınız.",
-                speech: "Sayın Kaptanım; 1. Sınıf Stajyer devrenizin son intikal sınavı tanımlanmıştır. Emniyetli sürüşler dileriz."
+                title: "📋 DİPLOMA ETABI: 1. SINIF STAJYER MEZUNİYET SINAV SEFERİ",
+                desc: "1. Sınıf Stajyer sürücü devrenizin 10. ve son yeterlilik sınav seferi atanmıştır. Bu seferi tamamladığınızda 2. Sınıf Süleymanpaşa Kıyı & Sahil Kaptanlığına terfi edeceksiniz.",
+                speech: "Sayın Kaptanım; 1. Sınıf Stajyer devrenizin son mezuniyet sınav seferi tanımlanmıştır. Emniyetli sürüşler dileriz."
             };
         } else if (completed === 10) {
             wowData = {
                 icon: "🎖️",
-                title: "🎓 TERFİ VE BRÖVE BELGESİ: 2. SINIF KIYI & SAHİL KAPTANI",
-                desc: "1. Sınıf Stajyerlik devresini başarıyla bitirdiniz. Şahsınıza 2. Sınıf Kıyı ve Sahil Kaptanlığı beratı tevdi edilmiştir. 18 Metrelik Körüklü Conecto filonuza katılmış ve tüm Trakya ilçe hatları yetkinize açılmıştır.",
-                speech: "Tebrik ederiz Sayın Kaptanım. 1. Sınıf Stajyerlik devresini başarıyla tamamlayarak 2. Sınıf Kıyı ve Sahil Kaptanlığına terfi ettiniz. Resmi beratınız tescil edilmiştir."
+                title: "🎓 TERFİ VE BRÖVE BELGESİ: 2. SINIF SÜLEYMANPAŞA KIYI & SAHİL KAPTANI",
+                desc: "1. Sınıf Stajyerlik devresini başarıyla bitirdiniz! Şahsınıza 2. Sınıf Kıyı ve Sahil Kaptanlığı beratı tevdi edilmiş, canlı TEKULAŞ Merkez Telsizi (T tuşu) ve çevik Isuzu Novo Lux yetkinize açılmıştır.",
+                speech: "Tebrik ederiz Sayın Kaptanım. 1. Sınıf Stajyerlik devresini başarıyla tamamlayarak 2. Sınıf Kıyı ve Sahil Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 13) {
+            wowData = {
+                icon: "🌧️",
+                title: "📋 METEOROLOJİ TALİMATI: DİNAMİK YAĞMUR & SİLECEK SİSTEMİ (X)",
+                desc: "14. Görev güzergâhında sağanak yağış beklenmektedir. Görüş netliğini korumak için 'X' tuşu ile cam sileceklerini devreye alınız.",
+                speech: "Sayın Kaptanım; yağışlı hava şartlarında X tuşu ile silecek kademelerini devreye alabilirsiniz."
+            };
+        } else if (completed === 17) {
+            wowData = {
+                icon: "🔦",
+                title: "📋 GECE SEYRİ TALİMATI: FAR VE AYDINLATMA PROTOKOLÜ (L)",
+                desc: "18. Görev alacakaranlık ve gece vardiyasında icra edilecektir. Sefer güvenliği için 'L' tuşu ile farlarınızı aktif ediniz.",
+                speech: "Sayın Kaptanım; gece seferlerinde L tuşu ile far ve aydınlatma sistemini aktif ediniz."
+            };
+        } else if (completed === 20) {
+            wowData = {
+                icon: "🏙️",
+                title: "🎓 TERFİ BELGESİ: 3. SINIF ÇORLU SANAYİ & METROPOL HAT KAPTANI",
+                desc: "Süleymanpaşa kıyı etabını başarıyla tamamladınız! 3. Sınıf Çorlu Metropol Kaptanlığına terfi ettiniz. BMC Neocity 10M tahsis edilmiş olup Kapı Emniyet Kilidi ve 50 km/s hız disiplini yürürlüğe girmiştir.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 3. Sınıf Çorlu Sanayi ve Metropol Hat Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 30) {
+            wowData = {
+                icon: "🛣️",
+                title: "🎓 TERFİ BELGESİ: 4. SINIF TRAKYA KIYI & İLÇE HATLARI KIDEMLİ KAPTANI",
+                desc: "Çorlu metropol etabını başarıyla bitirdiniz! 4. Sınıf Kıdemli İlçe Kaptanlığına yükseldiniz. Mercedes Conecto Solo ve Pnömatik Hava Basıncı Yönetimi devrededir.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 4. Sınıf Trakya Kıyı ve İlçe Hatları Kıdemli Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 40) {
+            wowData = {
+                icon: "🏭",
+                title: "🎓 TERFİ BELGESİ: 5. SINIF ERGENE & VELİMEŞE OSB FİLO REİSİ",
+                desc: "Bölgesel ilçe hatlarını başarıyla tamamladınız! 5. Sınıf Ergene ve Velimeşe Organize Sanayi Filo Reisliğine terfi ettiniz.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 5. Sınıf Ergene ve Velimeşe OSB Filo Reisliğine terfi ettiniz."
+            };
+        } else if (completed === 50) {
+            wowData = {
+                icon: "🚍",
+                title: "🎓 TERFİ BELGESİ: 6. SINIF 18 METRE KÖRÜKLÜ OTOBÜS BAŞ KAPTANI",
+                desc: "OSB ağır sanayi vardiyalarını başarıyla tamamladınız! 6. Sınıf 18 Metre Körüklü Otobüs Baş Kaptanlığına terfi ettiniz.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 6. Sınıf 18 Metre Körüklü Otobüs Baş Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 60) {
+            wowData = {
+                icon: "⛰️",
+                title: "🎓 TERFİ BELGESİ: 7. SINIF TRAKYA DAĞ GEÇİTLERİ & FİLO MÜFETTİŞİ",
+                desc: "Körüklü metropol etabını başarıyla tamamladınız! 7. Sınıf Trakya Dağ Geçitleri ve Kıdemli Filo Müfettişliğine terfi ettiniz. Efsane Mercedes O 403 uzun yol serisi açılmıştır.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 7. Sınıf Trakya Dağ Geçitleri ve Filo Müfettişliğine terfi ettiniz."
+            };
+        } else if (completed === 70) {
+            wowData = {
+                icon: "👑",
+                title: "🎓 TERFİ BELGESİ: 8. SINIF MARMARA - EGE OTOYOL BAŞ KAPTANI",
+                desc: "Trakya dağ geçitlerini başarıyla tamamladınız! 8. Sınıf Şehirlerarası Otoyol Baş Kaptanlığına ve Mercedes Travego 15 SHD kaptanlığına terfi ettiniz.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 8. Sınıf Marmara Ege Otoyol Baş Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 80) {
+            wowData = {
+                icon: "❄️",
+                title: "🎓 TERFİ BELGESİ: 9. SINIF ANADOLU KAR & DAĞ GEÇİTLERİ ÜSTADI",
+                desc: "Marmara ve Ege otoyol maratonunu tamamladınız! 9. Sınıf Anadolu Kar Geçitleri Üstadı ve Gece Kartalı unvanına yükseldiniz.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 9. Sınıf Anadolu Kar ve Dağ Geçitleri Üstadı unvanına terfi ettiniz."
+            };
+        } else if (completed === 90) {
+            wowData = {
+                icon: "🏆",
+                title: "🎓 TERFİ BELGESİ: 10. SINIF EFSANE MİKYAS MASTER KAPTANI",
+                desc: "Anadolu'nun en zorlu kar ve dağ geçitlerini fethettiniz! 10. Sınıf Efsane Mikyas Master Kaptanı unvanına ulaştınız. Türkiye Şampiyonluk Parkuru son 10 final etabı açılmıştır!",
+                speech: "Tebrik ederiz Sayın Kaptanım! 10. Sınıf Efsane Mikyas Master Kaptanı unvanına yükseldiniz."
+            };
+        } else if (completed === 100) {
+            wowData = {
+                icon: "👑",
+                title: "🏆 BÜYÜK FİNAL: MİKYAS AKADEMİSİ ALTIN DİREKSİYON ONUR MADALYASI!",
+                desc: "Mikyas Kaptanlık Akademisi'nin 100 görevlik tüm Türkiye serüvenini eksiksiz tamamladınız! Altın Direksiyon Onur Madalyası adınıza tescil edilmiştir. Yolunuz daima açık olsun Efsane Kaptan!",
+                speech: "Muhteşem başarı! Mikyas Kaptanlık Akademisinin yüz görevinin tamamını bitirerek Altın Direksiyon Onur Madalyasını kazandınız!"
             };
         }
 
@@ -1879,11 +1956,15 @@ const Game = {
         const completed = (typeof this.completedTasks === 'number') ? this.completedTasks : 0;
         const currentLic = (typeof this.licenseLevel === 'number') ? this.licenseLevel : 1;
 
-        // 1. Sıralı Görev Kontrolü: Seviye 1 Görevleri (Görev 1'den 10'a kadar)
+        // 1. Sıralı Görev Kontrolü: Kariyer modunda yalnızca sıradaki aktif görev oynanabilir
         if (typeof route.taskIndex === 'number') {
-            // Başlangıçta 1. Görev (taskIndex: 0) her zaman serbestçe açıktır
-            if (route.taskIndex === 0) {
-                return { allowed: true };
+            if (route.taskIndex < completed) {
+                const activeTaskNumber = completed + 1;
+                const requestedTaskNumber = route.taskIndex + 1;
+                return {
+                    allowed: false,
+                    reason: `Görev ${requestedTaskNumber} zaten başarıyla tamamlandı. Kariyer modunda önceki görevlere geri dönülemez; sıradaki göreviniz: Görev ${activeTaskNumber}.`
+                };
             }
             // Sıradaki görevden ilerideki tüm görevler kilitli ve kapalıdır
             if (route.taskIndex > completed) {
@@ -1894,7 +1975,7 @@ const Game = {
                     reason: `Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Görev ${requestedTaskNumber} henüz kilitli ve kapalıdır. Lütfen önce Görev ${activeTaskNumber}'i başarıyla tamamlayın.`
                 };
             }
-            // Tamamlanmış veya mevcut aktif görev serbestçe erişilebilir
+            // Mevcut aktif görev serbestçe erişilebilir
             return { allowed: true };
         }
 
@@ -2120,44 +2201,57 @@ const Game = {
                 return "<li style=\"margin-bottom: 5px; color: " + color + ";\"><strong>" + (idx + 1) + ". Durak:</strong> " + s.name + " <span style=\"font-size: 0.85rem; opacity: 0.85;\">" + badge + "</span></li>";
             }).join("");
 
-            // KADEMELİ VE RESMİ SEFER BRİFİNGİ (Kurumsal İşletme Standartları)
+            // KADEMELİ VE RESMİ SEFER BRİFİNGİ (Kurumsal İşletme Standartları - 100 Görev Uyumlu)
             const tIdx = (typeof r.taskIndex === 'number') ? r.taskIndex : 0;
             let howToDriveHtml = '';
             let shortcutsNote = '';
 
-            if (tIdx === 0) {
-                // Görev 1: Temel Sürüş ve İlk İntikal
+            if (tIdx < 2) {
+                // Görev 1-2: Boş Araç İntikali ve Durak Hizalama Provası
                 howToDriveHtml = [
                     '<div style="background: rgba(34, 197, 94, 0.15); border: 1.5px solid #22c55e; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #22c55e; font-size: 1.1rem;">📋 TEKULAŞ İntikal Talimatı: 1. Sınıf Stajyer Seferi</strong><br>',
-                    '    <span style="color: #f1f5f9;">Garaj amirliğince sefere tahsis edilen aracınızla kalkış durağına intikal ediniz. Ön kapı kontrolü (E tuşu), gaz ve fren dinamiklerini emniyet sınırları dahilinde test ediniz. Hız ve takip mesafesi kurallarına riayet esastır.</span>',
+                    '    <strong style="color: #22c55e; font-size: 1.1rem;">📋 TEKULAŞ İntikal Talimatı: Boş Araç & Durak Yanaşma Provası</strong><br>',
+                    '    <span style="color: #f1f5f9;">İlk iki seferimiz yolcusuz alıştırma intikalidir. Gaz, fren ve direksiyon dinamiklerini test ediniz; durak ceplerine kademeli frenle yanaşarak kaldırıma nizami paralellikte duruş provası yapınız.</span>',
                     '</div>',
-                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Temel Sürüş ve Kabin Kontrolleri:</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Temel Sürüş Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
                     '    <li><strong>W veya Yukarı Ok:</strong> Gaz pedalı (İvmelenme).</li>',
                     '    <li><strong>S veya Aşağı Ok:</strong> Servis freni (Kademeli duruş).</li>',
                     '    <li><strong>A / D veya Sol / Sağ Ok:</strong> Direksiyon ve şerit takibi.</li>',
-                    '    <li><strong>E Tuşu:</strong> Ön kapı kontrolü (Yolcu binişleri).</li>',
+                    '    <li><strong>E Tuşu:</strong> Ön kapı kontrolü (Durak yanaşma provası).</li>',
                     '    <li><strong>H Tuşu:</strong> Korna (İkaz sinyali).</li>',
                     '</ul>'
                 ].join("");
-                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 İşletme Notu: Görevler ilerledikçe; Elektronik Biletleme, Akustik İniş Zili, Engelli Rampası, Merkez Telsizi ve Pnömatik Hava Freni gibi profesyonel sistemler kademeli devreye alınacaktır.</div>';
-            } else if (tIdx === 1) {
-                // Görev 2: Akbil ve Kart Okuyucu devrede
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 İşletme Notu: 3. Görevde ilk yolcu binişleri, 5. Görevde Tekirdağ Kart, 7. Görevde Duracak Zili, 9. Görevde Engelli Rampası devreye alınacaktır.</div>';
+            } else if (tIdx < 4) {
+                // Görev 3-4: İlk Yolcular & Ön Kapı
                 howToDriveHtml = [
                     '<div style="background: rgba(56, 189, 248, 0.15); border: 1.5px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">💳 Yeni Özellik: Tekirdağ Kart (Akbil) Devrede!</strong><br>',
-                    '    <span style="color: #f1f5f9;">Kapıyı açtığınızda yolcular Tekirdağ Kart basacak ve validatörden gerçek onay bipleri duyacaksınız. Bilet gelirleri bütçenize eklenecektir.</span>',
+                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">👥 İlk Yolcu Binişi: Ön Kapı (E) ve Yolcu Konforu Devrede!</strong><br>',
+                    '    <span style="color: #f1f5f9;">Duraklarda bekleyen yolcuları <strong>E</strong> tuşu ile ön kapıyı açarak otobüse buyur ediniz. Sarsıntısız frenleme ile yolcu memnuniyetini yüksek tutunuz.</span>',
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
                     '    <li><strong>W / Yukarı Ok:</strong> Gaz | <strong>S / Aşağı Ok:</strong> Fren | <strong>A / D:</strong> Direksiyon</li>',
-                    '    <li><strong>E:</strong> Ön Kapı (Yolcular kart basar) | <strong>H:</strong> Korna</li>',
+                    '    <li><strong>E:</strong> Ön Kapı (Yolcu binişleri) | <strong>H:</strong> Korna</li>',
                     '</ul>'
                 ].join("");
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan İpucu: Duraklara yaklaşırken kademeli fren yaparak yolcuların rahat etmesini sağlayın.</div>';
-            } else if (tIdx < 4) {
-                // Görev 3-4: Duracak Zili & Arka Kapı devrede
+            } else if (tIdx < 6) {
+                // Görev 5-6: Tekirdağ Kart (Akbil) Validatörü
+                howToDriveHtml = [
+                    '<div style="background: rgba(56, 189, 248, 0.15); border: 1.5px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">💳 Elektronik Ücret Toplama: Tekirdağ Kart (Akbil) Devrede!</strong><br>',
+                    '    <span style="color: #f1f5f9;">Kapıyı açtığınızda yolcular Tekirdağ Kart okutacak ve validatörden gerçek onay sesleri duyacaksınız. Bilet gelirleri bütçenize eklenecektir.</span>',
+                    '</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş Kontrolleri:</div>',
+                    '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E:</strong> Ön Kapı (Kart Okutma) | <strong>H:</strong> Korna</li>',
+                    '</ul>'
+                ].join("");
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>C</strong> Yolcu Konforu | <strong>R</strong> Hız Göstergesi.</div>';
+            } else if (tIdx < 8) {
+                // Görev 7-8: Akustik Duracak Zili & Arka Kapı (Q)
                 howToDriveHtml = [
                     '<div style="background: rgba(239, 68, 68, 0.15); border: 1.5px solid #ef4444; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
                     '    <strong style="color: #f87171; font-size: 1.1rem;">🔔 Yolcu İniş Protokolü: Akustik Duracak Zili & Arka Kapı (Q) Aktif</strong><br>',
@@ -2170,26 +2264,39 @@ const Game = {
                     '</ul>'
                 ].join("");
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>C</strong> Yolcu Konforu | <strong>R</strong> Hız Göstergesi.</div>';
-            } else if (tIdx < 6) {
-                // Görev 5-6: Engelli Rampası, Kneeling & Telsiz
+            } else if (tIdx < 10) {
+                // Görev 9-10: Engelli Rampası & Kneeling (U)
                 howToDriveHtml = [
                     '<div style="background: rgba(168, 85, 247, 0.15); border: 1.5px solid #c084fc; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
                     '    <strong style="color: #c084fc; font-size: 1.1rem;">♿ Erişilebilirlik Protokolü: Engelli Rampası & Kneeling (U) Aktif</strong><br>',
-                    '    <span style="color: #f1f5f9;">Durakta tekerlekli sandalyeli yolcu beklediğinde <strong>U</strong> tuşuna basarak rampayı açın ve otobüsü yana yatırın. Ayrıca <strong>T</strong> tuşuyla canlı TEKULAŞ telsiz anonslarını dinleyebilirsiniz!</span>',
+                    '    <span style="color: #f1f5f9;">Durakta tekerlekli sandalyeli yolcu beklediğinde <strong>U</strong> tuşuna basarak rampayı açın ve otobüsü yana yatırın.</span>',
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Sistem Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
-                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E:</strong> Ön Kapı | <strong>Q:</strong> Arka Kapı</li>',
-                    '    <li><strong>U:</strong> Engelli Rampası & Kneeling | <strong>T:</strong> TEKULAŞ Telsizi</li>',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E:</strong> Ön Kapı | <strong>Q:</strong> Arka Kapı | <strong>U:</strong> Engelli Rampası</li>',
                     '</ul>'
                 ].join("");
-                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>U</strong> Rampa | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>Z</strong> Sefer Dakikliği.</div>';
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>U</strong> Rampa | <strong>C</strong> Konfor | <strong>Z</strong> Sefer Dakikliği.</div>';
+            } else if (tIdx < 20) {
+                // Görev 11-20 (2. Sınıf Kıyı Kaptanı): Telsiz (T), Silecek (X), Farlar (L)
+                howToDriveHtml = [
+                    '<div style="background: rgba(14, 165, 233, 0.15); border: 1.5px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">📻 2. Sınıf Kıyı Kaptanlığı: Canlı Telsiz (T), Silecek (X) & Far (L)</strong><br>',
+                    '    <span style="color: #f1f5f9;">Sefer esnasında <strong>T</strong> tuşu ile TEKULAŞ Merkez Telsizini dinleyebilir, yağışta <strong>X</strong> ile silecekleri ve gece sürüşünde <strong>L</strong> ile farları açabilirsiniz.</span>',
+                    '</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Kabin Kontrolleri:</div>',
+                    '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E / Q:</strong> Kapılar | <strong>U:</strong> Engelli Rampası</li>',
+                    '    <li><strong>T:</strong> TEKULAŞ Telsizi | <strong>X:</strong> Yağmur Silecekleri | <strong>L:</strong> Farlar</li>',
+                    '</ul>'
+                ].join("");
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>T</strong> Telsiz | <strong>X</strong> Silecek | <strong>L</strong> Farlar | <strong>C</strong> Konfor.</div>';
             } else {
-                // Görev 7-10: Tam Profesyonel Simülasyon
+                // Görev 21-100: Tam Profesyonel Simülasyon
                 howToDriveHtml = [
                     '<div style="background: rgba(234, 179, 8, 0.15); border: 1.5px solid #eab308; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #facc15; font-size: 1.1rem;">⚙️ Ağır Vasıta Rejimi: Pnömatik Hava Basıncı & Kompresör İzleme</strong><br>',
-                    '    <span style="color: #f1f5f9;">Hava basıncını koruyun, kademeli frenleme yapın. Sefer saatine dakik riayet edin. 10. Görev bitiminde 18 metrelik körüklü otobüs ve tüm ilçeler açılacaktır!</span>',
+                    '    <strong style="color: #facc15; font-size: 1.1rem;">⚙️ Profesyonel İşletme Rejimi: Emniyet Kilidi & Pnömatik Hava Basıncı</strong><br>',
+                    '    <span style="color: #f1f5f9;">Araç durmadan kapıları açmayın, pnömatik hava basıncını koruyun ve kademeli frenleme ile yolcu konforunu üst düzeyde tutun.</span>',
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Tam Kokpit Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
@@ -2220,6 +2327,7 @@ const Game = {
                     ? (this.activeBus.name || this.activeBus.fullName)
                     : "Standart Şehir İçi Otobüsü";
                 const taskDisplayTitle = (mission && mission.title) ? mission.title : r.name;
+                const displayTaskNum = (mission && mission.taskNum) ? mission.taskNum : (tIdx + 1);
 
                 orderHtml = [
                     '<div style="background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">',
@@ -2228,7 +2336,7 @@ const Game = {
                     '            <span>🎙️</span> <span>MERKEZ HAREKET AMİRLİĞİ RESMÎ SEFER TALİMATI</span>',
                     '        </span>',
                     '        <span style="background: rgba(56,189,248,0.2); color: #7dd3fc; padding: 3px 8px; border-radius: 5px; font-size: 0.85rem; font-weight: bold;">',
-                    '            Sicil: ' + ((this.completedTasks || 0) + 1) + '. Görev İntikali',
+                    '            Sicil: ' + displayTaskNum + '. Görev İntikali',
                     '        </span>',
                     '    </div>',
                     '    <div style="color: #94a3b8; font-size: 0.93rem; margin-bottom: 10px;">',

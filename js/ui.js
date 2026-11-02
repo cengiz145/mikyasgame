@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU ARAYÜZ (UI.JS)
    ========================================================================== */
 
@@ -618,18 +618,19 @@ const UI = {
             return;
         }
 
-        // Aktif lisans seviyesi (Çırak = 1, Kalfa = 2, Usta = 3)
+        // Aktif lisans seviyesi ve tamamlanan göreve göre kariyer sınıfı
         const currentLic = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
+        const effectiveCareerLic = Math.max(currentLic, Math.floor((completedTasks || 0) / 10) + 1);
 
         let routesToRender = cityRoutes;
         if (!isFreeDrive) {
-            // Görevleri doğal sayısal sırasına göre diz (Görev 1, Görev 2, ... Görev 10)
+            // Görevleri doğal sayısal sırasına göre diz (Görev 1, Görev 2, ... Görev 100)
             cityRoutes.sort((a, b) => (a.taskIndex || 0) - (b.taskIndex || 0));
 
-            // Oyuncunun görebileceği görevler: Mevcut lisans seviyesindeki görevler (1. Seviye için ilk 10 görev)
+            // Oyuncunun görebileceği görevler: Mevcut kariyer sınıfı ve altındaki görevler
             const visibleRoutes = cityRoutes.filter(r => {
                 if (typeof r.licenseLevel === 'number') {
-                    return r.licenseLevel <= currentLic;
+                    return r.licenseLevel <= effectiveCareerLic;
                 }
                 return true;
             });
@@ -696,7 +697,7 @@ const UI = {
                 ? "(SERBEST SÜRÜŞE AÇIK - PRATİK YAPABİLİRSİNİZ)"
                 : (isCurrentTask 
                     ? "(AÇIK - ŞU ANKİ GÖREVİNİZ)" 
-                    : (isCompleted ? "(Tamamlandı - İsterseniz Tekrar Sürün)" : `(KİLİTLİ - KAPALI: Önce Görev ${completedTasks + 1}'i Tamamlayın)`));
+                    : (isCompleted ? "(TAMAMLANDI - GEÇİLDİ)" : `(KİLİTLİ - KAPALI: Önce Görev ${completedTasks + 1}'i Tamamlayın)`));
             
             const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
             const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Varış");
@@ -712,7 +713,7 @@ const UI = {
                 ? (`Görev ${taskNum}: ${route.name}. KİLİTLİ VE KAPALI. Bu görevin açılması için önce Görev ${completedTasks + 1}'i başarıyla tamamlamalısınız. Kalkış: ${startStop}, Varış: ${endStop}.`)
                 : (isCurrentTask
                     ? (`Görev ${taskNum}: ${route.name}. AÇIK - ŞU ANKİ GÖREVİNİZ. Başlamak için Enter veya Boşluk tuşuna basın. Kalkış: ${startStop}, Varış: ${endStop}. Toplam ${stopCount} durak, ${totalKmRoute} kilometre.`)
-                    : (`Görev ${taskNum}: ${route.name}. Tamamlandı. Tekrar sürmek için Enter veya Boşluk tuşuna basın. Kalkış: ${startStop}, Varış: ${endStop}.`));
+                    : (`Görev ${taskNum}: ${route.name}. Tamamlandı ve geçildi. Sıradaki göreviniz: Görev ${completedTasks + 1}.`));
             
             btn.setAttribute("aria-label", ariaDesc);
 

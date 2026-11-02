@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU API DOSYASI (API.JS)
    ========================================================================== */
 
@@ -366,85 +366,106 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
         // 5. Seviye Ergene & Velimeşe OSB Ağır Sanayi Hatları
         const osbKeywords = [
             { no: "48", kw: "VELİMEŞE-ÇORLU" },
-            { no: "48/1", kw: "VELİMEŞE MAHALLE" },
-            { no: "49", kw: "ERGENE-DERİ OSB" },
-            { no: "51", kw: "MARMARACIK-SANAYİ" },
-            { no: "52", kw: "ULAŞ-VARDİYA" },
-            { no: "53", kw: "VELİMEŞE TREN GAR" },
-            { no: "54", kw: "ERGENE GECE" },
-            { no: "55", kw: "AĞIR SANAYİ" },
-            { no: "56", kw: "ÇORLU ÇEVRE YOLU" },
-            { no: "57", kw: "OSB FİNAL" }
+            { no: "48", kw: "VELİMEŞE" },
+            { no: "49", kw: "ERGENE" },
+            { no: "51", kw: "MARMARACIK" },
+            { no: "52", kw: "ULAŞ" },
+            { no: "48", kw: "VELİMEŞE" },
+            { no: "49", kw: "ERGENE" },
+            { no: "71", kw: "ÇERKEZKÖY" },
+            { no: "1", kw: "ÇORLU" },
+            { no: "48", kw: "VELİMEŞE-ÇORLU" }
         ];
 
         // 6. Seviye 18 Metre Körüklü Otobüs Metropol Hatları
         const korukluKeywords = [
-            { no: "26", kw: "KÖRÜKLÜ CONECTO HAT 1" },
-            { no: "26/1", kw: "KÖRÜKLÜ KAVŞAK GEÇİŞ" },
-            { no: "26/2", kw: "TEKİRDAĞSPOR TARAFTAR" },
-            { no: "2/7", kw: "ÜNİVERSİTE BAHAR ŞENLİĞİ" },
-            { no: "26", kw: "SARAY EKSPRES KÖRÜKLÜ" },
-            { no: "1", kw: "ÇORLU MEYDAN YOĞUN" },
-            { no: "3", kw: "ÇİFT KAPILI SANAYİ" },
-            { no: "20", kw: "YAĞMURDA KÖRÜKLÜ" },
-            { no: "28", kw: "GECE VARDİYA EKSPRES" },
-            { no: "26", kw: "KÖRÜKLÜ FİLO ŞAMPİYONU" }
+            { no: "26", kw: "SÜLEYMANPASA-ÇERKEZKÖY-KAPAKLI-SARAY" },
+            { no: "28", kw: "CORLU-M.EREGLISI-SULEYMANPASA" },
+            { no: "20", kw: "SÜLEYMANPAŞA-KUMBAĞ" },
+            { no: "2/7", kw: "100.YIL-NKU" },
+            { no: "26", kw: "SARAY" },
+            { no: "1", kw: "YESILTEPE-EMLAK" },
+            { no: "3", kw: "HAVUZLAR-HATİP" },
+            { no: "20", kw: "SÜLEYMANPAŞA-KUMBAĞ" },
+            { no: "28", kw: "CORLU-M.EREGLISI" },
+            { no: "26", kw: "SÜLEYMANPASA-ÇERKEZKÖY" }
         ];
 
         // 7. Seviye Trakya Dağ Geçitleri & Şarköy
         const dagKeywords = [
-            { no: "138", kw: "ŞARKÖY ZEYTİN HASADI" },
-            { no: "97", kw: "MÜREFTE SAHİL VİRAJ" },
-            { no: "35", kw: "MALKARA KIŞ KARAYOLU" },
-            { no: "50", kw: "HAYRABOLU AYÇİÇEĞİ" },
-            { no: "47", kw: "SARAY ORMAN YOLU" },
-            { no: "71", kw: "ÇERKEZKÖY SANAYİ" },
-            { no: "26", kw: "KAPAKLI AKŞAM YOĞUN" },
-            { no: "35", kw: "SÜLEYMANPAŞA MALKARA GECE" },
-            { no: "138", kw: "UÇMAKDERE DAĞ GEÇİDİ" },
-            { no: "138", kw: "TRAKYA ZİRVE FATİHİ" }
+            { no: "138", kw: "ŞARKÖY" },
+            { no: "97", kw: "BARBOROS" },
+            { no: "35", kw: "MALKARA" },
+            { no: "50", kw: "HAYRABOLU" },
+            { no: "47", kw: "SARAY" },
+            { no: "71", kw: "ÇERKEZKÖY" },
+            { no: "26", kw: "KAPAKLI" },
+            { no: "35", kw: "SÜLEYMANPAŞA-MALKARA" },
+            { no: "138", kw: "UÇMAKDERE" },
+            { no: "35", kw: "MALKARA" }
         ];
+
+        const makeHighwayStops = (stopNames, stepKm = 3.5) => {
+            return stopNames.map((sName, idx) => {
+                const isLast = (idx === stopNames.length - 1);
+                const dist = isLast ? 0 : stepKm;
+                return {
+                    name: sName,
+                    anons: idx === 0
+                        ? `${sName} kalkış noktasındayız. Sonraki hedef: ${stopNames[1] || sName}.`
+                        : (isLast ? `Son durak: ${sName}. Seferimiz başarıyla tamamlanmıştır.` : `Sonraki durak: ${sName}.`),
+                    lat: 40.98 + (idx * 0.04),
+                    lon: 27.51 + (idx * 0.06),
+                    routeKm: Math.round(idx * stepKm * 10) / 10,
+                    bekleyenYolcu: isLast ? 0 : 18,
+                    gercekMesafeSonraki: dist,
+                    yolcuTipi: "Sivil",
+                    yolTipi: "Otoyol & Karayolu",
+                    kavsakVar: false
+                };
+            });
+        };
 
         // 8. Seviye Şehirlerarası Otoyollar & VIP Heyetler
         const otoyolKeywords = [
-            { no: "İST-1", kw: "İSTANBUL ESENLER EKSPRES" },
-            { no: "OTO-1", kw: "HGS GİŞE PROTOKOLÜ" },
-            { no: "EDR-1", kw: "EDİRNE SELİMİYE HEYETİ" },
-            { no: "TESİS-1", kw: "DİNLENME TESİSİ MOLA" },
-            { no: "ÇNK-1", kw: "ÇANAKKALE 1915 KÖPRÜSÜ" },
-            { no: "BRS-1", kw: "BURSA OSMANGAZİ TRANSİT" },
-            { no: "BLK-1", kw: "BALIKESİR GECE SEFERİ" },
-            { no: "İZM-1", kw: "İZMİR EGE MARATONU" },
-            { no: "OTO-2", kw: "ŞEHİRLERARASI GECE FIRTINA" },
-            { no: "OTO-3", kw: "OTOYOL BAŞ KAPTANLIĞI" }
+            { no: "İST-1", kw: "İSTANBUL ESENLER EKSPRES", customStops: makeHighwayStops(["Tekirdağ Yeni Otogar", "Marmaraereğlisi Kavşağı", "Silivri Otoyol Tesisleri", "Mahmutbey Gişeler", "İstanbul Esenler Otogarı"], 4.0) },
+            { no: "OTO-1", kw: "HGS GİŞE PROTOKOLÜ", customStops: makeHighwayStops(["Çorlu Gişeler", "Kınalı Otoyol Kavşağı", "Çatalca Viyadüğü", "Avcılar HGS Gişeleri", "Beylikdüzü Transfer Merkezi"], 3.5) },
+            { no: "EDR-1", kw: "EDİRNE SELİMİYE HEYETİ", customStops: makeHighwayStops(["Süleymanpaşa Otogar", "Muratlı Kavşağı", "Lüleburgaz Terminal", "Babaeski Gişeler", "Edirne Selimiye Meydanı"], 3.8) },
+            { no: "TESİS-1", kw: "DİNLENME TESİSİ MOLA", customStops: makeHighwayStops(["Tekirdağ Merkez", "Çorlu Otoyol Bağlantısı", "Otoyol VIP Dinlenme Tesisi", "Silivri Kavşağı", "Büyükçekmece Terminali"], 3.5) },
+            { no: "ÇNK-1", kw: "ÇANAKKALE 1915 KÖPRÜSÜ", customStops: makeHighwayStops(["Tekirdağ Otogar", "Malkara Kavşağı", "Keşan Dörtyol", "Gelibolu Yaklaşımı", "1915 Çanakkale Köprüsü & Lapseki"], 4.2) },
+            { no: "BRS-1", kw: "BURSA OSMANGAZİ TRANSİT", customStops: makeHighwayStops(["İstanbul Anadolu Gişeler", "Gebze Dilovası", "Osmangazi Köprüsü", "Orhangazi Tüneli", "Bursa Şehirlerarası Otogar"], 4.0) },
+            { no: "BLK-1", kw: "BALIKESİR GECE SEFERİ", customStops: makeHighwayStops(["Bursa Batı Gişeler", "Karacabey Kavşağı", "Susurluk Dinlenme Tesisi", "Balıkesir Kuzey", "Balıkesir Merkez Otogar"], 3.8) },
+            { no: "İZM-1", kw: "İZMİR EGE MARATONU", customStops: makeHighwayStops(["Balıkesir Otogar", "Akhisar Otoyol Kavşağı", "Saruhanlı Geçişi", "Manisa Sabuncubeli Tüneli", "İzmir Bornova Otogarı"], 4.5) },
+            { no: "OTO-2", kw: "ŞEHİRLERARASI GECE FIRTINA", customStops: makeHighwayStops(["İzmir Otogar", "Menemen Otoyol", "Aliağa Sahil Koridoru", "Ayvalık Kavşağı", "Edremit Körfez Terminali"], 3.8) },
+            { no: "OTO-3", kw: "OTOYOL BAŞ KAPTANLIĞI", customStops: makeHighwayStops(["Çanakkale İskele", "1915 Çanakkale Köprüsü", "Malkara Otoyolu", "Süleymanpaşa Sahil", "Tekirdağ Merkez Otogar"], 4.2) }
         ];
 
         // 9. Seviye Anadolu Kar Geçitleri & Gece Kartalı
         const anadoluKeywords = [
-            { no: "KOC-1", kw: "KOCAELİ SANAYİ KORİDORU" },
-            { no: "BOLU-1", kw: "BOLU DAĞI SİS VE KAR" },
-            { no: "BOLU-2", kw: "BOLU TÜNELİ EMNİYET" },
-            { no: "ANK-1", kw: "ANKARA AŞTİ BAŞKENT" },
-            { no: "KRD-1", kw: "KARADENİZ SAHİL YOLU" },
-            { no: "KPD-1", kw: "KAPADOKYA TURİST HEYETİ" },
-            { no: "TRS-1", kw: "TOROSLAR GECE TIRMANIŞ" },
-            { no: "EGE-1", kw: "EGE SAHİL VİRAJLARI" },
-            { no: "ERZ-1", kw: "PALANDÖKEN ZİRVE İNTİKAL" },
-            { no: "AND-F", kw: "ŞEREF KÜRSÜSÜ SEFERİ" }
+            { no: "KOC-1", kw: "KOCAELİ SANAYİ KORİDORU", customStops: makeHighwayStops(["İstanbul Samandıra", "Şekerpınar OSB Gişeler", "Hereke Sahil Viyadüğü", "Körfez Geçişi", "Kocaeli İzmit Otogarı"], 3.8) },
+            { no: "BOLU-1", kw: "BOLU DAĞI SİS VE KAR", customStops: makeHighwayStops(["Sakarya Hendek", "Düzce Kaynaşlı Gişeler", "Bolu Dağı Polisevi Rampası", "Bolu Dağı Sisli Zirve", "Abant Kavşağı"], 4.0) },
+            { no: "BOLU-2", kw: "BOLU TÜNELİ EMNİYET", customStops: makeHighwayStops(["Kaynaşlı Yaklaşım", "Bolu Dağı Tüneli Girişi", "Bolu Tüneli Çıkış Viyadüğü", "Bolu Batı Gişeler", "Bolu Şehirlerarası Otogar"], 3.6) },
+            { no: "ANK-1", kw: "ANKARA AŞTİ BAŞKENT", customStops: makeHighwayStops(["Bolu Doğu Gişeler", "Yeniçağa Dinlenme Tesisi", "Kızılcahamam Soğuksu Geçidi", "Akıncı Gişeler", "Ankara AŞTİ Otogarı"], 4.5) },
+            { no: "KRD-1", kw: "KARADENİZ SAHİL YOLU", customStops: makeHighwayStops(["Samsun Otogar", "Fatsa Sahil Yolu", "Ordu Boztepe Tüneli", "Giresun Kalesi Sahili", "Trabzon Şehirlerarası Otogar"], 4.2) },
+            { no: "KPD-1", kw: "KAPADOKYA TURİST HEYETİ", customStops: makeHighwayStops(["Aksaray Sultanhanı", "Nevşehir Girişi", "Uçhisar Kalesi Yolu", "Göreme Peri Bacaları", "Ürgüp Turizm Terminali"], 3.5) },
+            { no: "TRS-1", kw: "TOROSLAR GECE TIRMANIŞ", customStops: makeHighwayStops(["Konya Ereğli", "Ulukışla Vadisi", "Pozantı Akçatekir Rampası", "Gülek Boğazı Zirvesi", "Adana Merkez Otogar"], 4.4) },
+            { no: "EGE-1", kw: "EGE SAHİL VİRAJLARI", customStops: makeHighwayStops(["Aydın Otoban Çıkışı", "Çine Madrandağı Geçidi", "Muğla Sakar Geçidi Virajları", "Gökova Körfezi", "Marmaris Otogarı"], 3.8) },
+            { no: "ERZ-1", kw: "PALANDÖKEN ZİRVE İNTİKAL", customStops: makeHighwayStops(["Erzincan Üzümlü", "Tercan Geçidi", "Aşkale Kop Dağı Yaklaşımı", "Erzurum Aziziye", "Palandöken Dağ Terminali"], 4.5) },
+            { no: "AND-F", kw: "ŞEREF KÜRSÜSÜ SEFERİ", customStops: makeHighwayStops(["Erzurum Otogar", "Sivas Kızıldağ Geçidi", "Yozgat Akdağmadeni", "Kırıkkale Kavşağı", "Ankara AŞTİ Şeref Peronu"], 4.6) }
         ];
 
         // 10. Seviye Büyük Türkiye Şampiyonluk Finalleri
         const sampiyonlukKeywords = [
-            { no: "ŞMP-1", kw: "ÇANAKKALE ŞEHİTLİK ANMA" },
-            { no: "ŞMP-2", kw: "İZMİR KORDON KURTULUŞ" },
-            { no: "ŞMP-3", kw: "ANKARA ANITKABİR SAYGI" },
-            { no: "ŞMP-4", kw: "TRABZON SÜMELA DAĞ YOLU" },
-            { no: "ŞMP-5", kw: "GAZİANTEP ŞANLIURFA GAP" },
-            { no: "ŞMP-6", kw: "VAN GÖLÜ DOĞU EKSPRES" },
-            { no: "ŞMP-7", kw: "MİLLİ TAKIM KAFİLE TRANSFER" },
-            { no: "ŞMP-8", kw: "BOĞAZ KÖPRÜSÜ GECE GEÇİŞ" },
-            { no: "ŞMP-9", kw: "TRAKYA'YA ZAFER DÖNÜŞÜ" },
-            { no: "ŞMP-10", kw: "100. GÖREV BÜYÜK FİNAL ŞAMPİYONLUK" }
+            { no: "ŞMP-1", kw: "ÇANAKKALE ŞEHİTLİK ANMA", customStops: makeHighwayStops(["Tekirdağ Otogar", "Keşan Koridoru", "Gelibolu Yarımadası", "Conkbayırı Yaklaşımı", "Çanakkale Şehitler Abidesi"], 4.2) },
+            { no: "ŞMP-2", kw: "İZMİR KORDON KURTULUŞ", customStops: makeHighwayStops(["Çanakkale Truva", "Edremit Kazdağları", "Bergama Kavşağı", "Karşıyaka Sahil", "İzmir Alsancak Kordon Meydanı"], 4.5) },
+            { no: "ŞMP-3", kw: "ANKARA ANITKABİR SAYGI", customStops: makeHighwayStops(["İzmir Bornova", "Afyonkarahisar Kavşağı", "Polatlı Sakarya Meydanı", "Tandoğan Meydanı", "Ankara Anıtkabir Tören Alanı"], 4.6) },
+            { no: "ŞMP-4", kw: "TRABZON SÜMELA DAĞ YOLU", customStops: makeHighwayStops(["Trabzon Meydan", "Değirmendere Vadisi", "Maçka Merkez", "Altındere Milli Parkı", "Sümela Manastırı Zirve Durağı"], 3.8) },
+            { no: "ŞMP-5", kw: "GAZİANTEP ŞANLIURFA GAP", customStops: makeHighwayStops(["Gaziantep Otogar", "Nizip Zeugma Kavşağı", "Birecik Fırat Köprüsü", "Suruç Otoyolu", "Şanlıurfa Balıklıgöl Meydanı"], 4.2) },
+            { no: "ŞMP-6", kw: "VAN GÖLÜ DOĞU EKSPRES", customStops: makeHighwayStops(["Bitlis Rahva Geçidi", "Tatvan Sahil Kordonu", "Ahlat Selçuklu Meydanı", "Gevaş Akdamar İskelesi", "Van Merkez Otogar"], 4.4) },
+            { no: "ŞMP-7", kw: "MİLLİ TAKIM KAFİLE TRANSFER", customStops: makeHighwayStops(["İstanbul Havalimanı VIP", "Kemerburgaz Otoyolu", "FSM Köprüsü Geçişi", "Ataşehir Finans Koridoru", "Olimpiyat Stadyumu Protokol Kapısı"], 3.8) },
+            { no: "ŞMP-8", kw: "BOĞAZ KÖPRÜSÜ GECE GEÇİŞ", customStops: makeHighwayStops(["Kadıköy Rıhtım", "Altunizade Yaklaşımı", "15 Temmuz Şehitler Köprüsü", "Beşiktaş Barbaros Bulvarı", "Taksim Cumhuriyet Meydanı"], 3.5) },
+            { no: "ŞMP-9", kw: "TRAKYA'YA ZAFER DÖNÜŞÜ", customStops: makeHighwayStops(["İstanbul Esenler", "Silivri Kıyı Koridoru", "Çorlu Zafer Takı", "Değirmenaltı Kordonu", "Süleymanpaşa Valilik Meydanı"], 4.2) },
+            { no: "ŞMP-10", kw: "100. GÖREV BÜYÜK FİNAL ŞAMPİYONLUK", customStops: makeHighwayStops(["Süleymanpaşa Merkez Garaj", "Sahil Kordonu Şeref Turu", "Çorlu Metropol Bulvarı", "Velimeşe & Saray Koridoru", "Mikyas Kaptanlık Akademisi Şeref Kürsüsü"], 4.5) }
         ];
 
         const allLevels = [
@@ -481,6 +502,14 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                     routeTotalKm = Math.round(calcKm * 10) / 10;
                     if (routeTotalKm < 1.0) routeTotalKm = 1.5;
                     routeStops[routeStops.length - 1].gercekMesafeSonraki = 0;
+                } else if (item.customStops && Array.isArray(item.customStops) && item.customStops.length >= 2) {
+                    found = { id: "career_highway_" + taskGlobalIndex, hatNo: item.no || "OTOYOL", name: item.kw };
+                    routeStops = item.customStops.map(s => Object.assign({}, s));
+                    let calcKm = 0;
+                    for (let s = 0; s < routeStops.length - 1; s++) {
+                        calcKm += (routeStops[s].gercekMesafeSonraki || 3.5);
+                    }
+                    routeTotalKm = Math.round(calcKm * 10) / 10;
                 } else {
                     found = item.id ? tekulasDb.find(r => r.id === item.id) : null;
                     if (!found) found = tekulasDb.find(r => r.name.includes(item.kw) || (r.hatNo === item.no && r.name.includes(item.kw)));
@@ -490,8 +519,8 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                     routeTotalKm = found.totalKm;
                 }
 
-                const taskNum = tIdx + 1;
-                const isTraining = (lvl.lic === 1 && taskNum <= 3);
+                const taskNum = taskGlobalIndex + 1;
+                const isTraining = (lvl.lic === 1 && tIdx < 2);
                 const routeId = "tekirdag_task_" + taskGlobalIndex;
 
                 const startStop = routeStops[0] ? routeStops[0].name : "Kalkış Garajı";
@@ -527,8 +556,9 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                     id: routeId,
                     sehir: "Tekirdağ",
                     district: lvl.lic === 1 ? targetDistrict : (found.district || targetDistrict),
-                    isDistrict: false,
-                    isCity: true,
+                    isDistrict: lvl.lic >= 4 && lvl.lic <= 7,
+                    isIntercity: lvl.lic >= 8,
+                    isCity: lvl.lic <= 3,
                     name: "Görev " + taskNum + " (" + (lvl.name || 'Şehir İçi Sürücü') + "): " + (item.name || found.name || 'Sefer'),
                     taskIndex: taskGlobalIndex,
                     licenseLevel: lvl.lic,
@@ -549,16 +579,22 @@ function generateRoutesFromAPI(rawStops, cityName, activeDistrict = null) {
                     CareerMissions.enrichRoute(taskRoute, taskGlobalIndex);
                     const cm = CareerMissions.getMission(taskGlobalIndex);
                     if (cm) {
-                        taskRoute.name = "Görev " + taskNum + " (" + (cm.levelTitle || 'Kaptan') + "): " + (cm.title || 'Sefer');
+                        const displayTaskNum = cm.taskNum || taskNum;
+                        taskRoute.name = "Görev " + displayTaskNum + " (" + (cm.levelTitle || 'Kaptan') + "): " + (cm.title || 'Sefer');
                         taskRoute.speechBriefing = cm.dispatcherOrder;
                         taskRoute.isTraining = cm.isTraining;
                         taskRoute.emptyBus = cm.emptyBus;
                         taskRoute.passengersAllowed = cm.passengersAllowed;
                         taskRoute.noTimeLimit = true;
+                        if (cm.district && lvl.lic > 1) {
+                            taskRoute.district = cm.district;
+                        }
                     }
                 }
                 routesData[routeId] = taskRoute;
-                routesData[found.id] = found; // Hat id'si ile de erişilebilir
+                if (found && found.id && !found.id.startsWith("career_highway_")) {
+                    routesData[found.id] = found; // Hat id'si ile de erişilebilir
+                }
                 taskGlobalIndex++;
             });
         });
