@@ -756,7 +756,7 @@ const Game = {
     },
 
     checkLostAndFound: function() {
-        const isFinalStop = this.activeRouteData && (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
+        const isFinalStop = !!(this.activeRouteData && Array.isArray(this.activeRouteData.stops) && (this.currentStopIndex >= this.activeRouteData.stops.length - 1));
         if (this.isDriving || !isFinalStop) {
             if (typeof audio !== 'undefined' && audio.speak) audio.speak("Kayıp eşya kontrolü son durakta tüm yolcular indikten sonra yapılır.");
             return;
@@ -1543,7 +1543,7 @@ const Game = {
         const routeTaskIdx = (this.activeRouteData && typeof this.activeRouteData.taskIndex === 'number')
             ? this.activeRouteData.taskIndex
             : null;
-        const wasNewCareerTask = (routeTaskIdx === null || routeTaskIdx === this.completedTasks);
+        const wasNewCareerTask = (this.playMode !== 'free_drive' && typeof routeTaskIdx === 'number' && routeTaskIdx === this.completedTasks);
         if (wasNewCareerTask) {
             this.completedTasks++;
         }
@@ -1587,9 +1587,9 @@ const Game = {
         if (completed === 2) {
             wowData = {
                 icon: "👥",
-                title: "📋 RESMİ TEBLİĞ: İLK YOLCU BİNİŞİ & ÖN KAPI (E) YETKİSİ",
-                desc: "Boş araç intikal ve durak hizalama provalarını başarıyla tamamladınız! 3. Görevden itibaren duraklarda bekleyen yolcuları E tuşu ile ön kapıyı açarak otobüse alabilirsiniz.",
-                speech: "Sayın Kaptanım, boş intikal provalarınız tamamlandı. Üçüncü görevden itibaren duraklarda E tuşu ile ön kapıyı açarak ilk yolcularınızı alabilirsiniz."
+                title: "📋 RESMİ TEBLİĞ: İLK YOLCU BİNİŞİ & ÖN KAPI (PAGEUP) YETKİSİ",
+                desc: "Boş araç intikal ve durak hizalama provalarını başarıyla tamamladınız! 3. Görevden itibaren duraklarda bekleyen yolcuları PageUp (Sayfa Yukarı) tuşu ile ön kapıyı açarak otobüse alabilirsiniz.",
+                speech: "Sayın Kaptanım, boş intikal provalarınız tamamlandı. Üçüncü görevden itibaren duraklarda Sayfa Yukarı yani PageUp tuşu ile ön kapıyı açarak ilk yolcularınızı alabilirsiniz."
             };
         } else if (completed === 4) {
             wowData = {
@@ -1601,9 +1601,9 @@ const Game = {
         } else if (completed === 6) {
             wowData = {
                 icon: "🔔",
-                title: "📋 TEKNİK TALİMAT: AKUSTİK İNİŞ ZİLİ & ARKA KAPI (Q) KONTROLÜ",
-                desc: "7. Görevden itibaren yolcu iniş protokolü devreye alınmıştır. İnecek yolcular durağa 200 metre kala 'DURACAK' butonuna basacaktır. Sinyal aldığınızda aracı nizami durdurup Q tuşu ile arka kapıyı açınız.",
-                speech: "Sayın Kaptanım; akustik iniş zili ve arka kapı donanımı aktif edilmiştir. Durak yanaşmalarında Q tuşu ile arka kapıyı açarak inişleri sağlayınız."
+                title: "📋 TEKNİK TALİMAT: AKUSTİK İNİŞ ZİLİ & ARKA KAPI (PAGEDOWN) KONTROLÜ",
+                desc: "7. Görevden itibaren yolcu iniş protokolü devreye alınmıştır. İnecek yolcular durağa 200 metre kala 'DURACAK' butonuna basacaktır. Sinyal aldığınızda aracı nizami durdurup PageDown (Sayfa Aşağı) tuşu ile arka kapıyı açınız.",
+                speech: "Sayın Kaptanım; akustik iniş zili ve arka kapı donanımı aktif edilmiştir. Durak yanaşmalarında Sayfa Aşağı yani PageDown tuşu ile arka kapıyı açarak inişleri sağlayınız."
             };
         } else if (completed === 8) {
             wowData = {
@@ -1629,16 +1629,16 @@ const Game = {
         } else if (completed === 13) {
             wowData = {
                 icon: "🌧️",
-                title: "📋 METEOROLOJİ TALİMATI: DİNAMİK YAĞMUR & SİLECEK SİSTEMİ (X)",
-                desc: "14. Görev güzergâhında sağanak yağış beklenmektedir. Görüş netliğini korumak için 'X' tuşu ile cam sileceklerini devreye alınız.",
-                speech: "Sayın Kaptanım; yağışlı hava şartlarında X tuşu ile silecek kademelerini devreye alabilirsiniz."
+                title: "📋 METEOROLOJİ TALİMATI: DİNAMİK YAĞMUR & SİLECEK SİSTEMİ (SHIFT + W)",
+                desc: "14. Görev güzergâhında sağanak yağış beklenmektedir. Görüş netliğini korumak için 'Shift + W' tuşu ile cam sileceklerini devreye alınız.",
+                speech: "Sayın Kaptanım; yağışlı hava şartlarında Shift ve W tuşu ile silecek kademelerini devreye alabilirsiniz."
             };
         } else if (completed === 17) {
             wowData = {
                 icon: "🔦",
-                title: "📋 GECE SEYRİ TALİMATI: FAR VE AYDINLATMA PROTOKOLÜ (L)",
-                desc: "18. Görev alacakaranlık ve gece vardiyasında icra edilecektir. Sefer güvenliği için 'L' tuşu ile farlarınızı aktif ediniz.",
-                speech: "Sayın Kaptanım; gece seferlerinde L tuşu ile far ve aydınlatma sistemini aktif ediniz."
+                title: "📋 GECE SEYRİ TALİMATI: FAR VE AYDINLATMA PROTOKOLÜ (F)",
+                desc: "18. Görev alacakaranlık ve gece vardiyasında icra edilecektir. Sefer güvenliği için 'F' tuşu ile farlarınızı aktif ediniz.",
+                speech: "Sayın Kaptanım; gece seferlerinde F tuşu ile far ve aydınlatma sistemini aktif ediniz."
             };
         } else if (completed === 20) {
             wowData = {
@@ -1801,7 +1801,7 @@ const Game = {
 
         let tipMultiplier = 1.0;
         if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
-            const cateringLvl = CompanySystem.getInstitutionLevel('catering_logistics');
+            const cateringLvl = CompanySystem.getInstitutionLevel('catering_cargo_hub');
             if (cateringLvl === 2) {
                 tipMultiplier = 1.30; // +%30 bahşiş
                 ratingBonus *= 1.5;
@@ -2044,11 +2044,6 @@ const Game = {
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
 
-        // Sefer Başlatma Başarımları ve İstatistik Kaydı
-        if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.recordRouteStart === 'function') {
-            try { DriverBadges.recordRouteStart(this); } catch(e) { console.warn('[Game] recordRouteStart hatası:', e); }
-        }
-
         this.completedTunnels = [];
         this.completedBridges = [];
         this.activeRealTunnel = null;
@@ -2218,8 +2213,8 @@ const Game = {
                     '    <li><strong>W veya Yukarı Ok:</strong> Gaz pedalı (İvmelenme).</li>',
                     '    <li><strong>S veya Aşağı Ok:</strong> Servis freni (Kademeli duruş).</li>',
                     '    <li><strong>A / D veya Sol / Sağ Ok:</strong> Direksiyon ve şerit takibi.</li>',
-                    '    <li><strong>E Tuşu:</strong> Ön kapı kontrolü (Durak yanaşma provası).</li>',
-                    '    <li><strong>H Tuşu:</strong> Korna (İkaz sinyali).</li>',
+                    '    <li><strong>PageUp (Sayfa Yukarı):</strong> Ön kapı kontrolü (Durak yanaşma provası).</li>',
+                    '    <li><strong>L Tuşu:</strong> Korna (İkaz sinyali).</li>',
                     '</ul>'
                 ].join("");
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 İşletme Notu: 3. Görevde ilk yolcu binişleri, 5. Görevde Tekirdağ Kart, 7. Görevde Duracak Zili, 9. Görevde Engelli Rampası devreye alınacaktır.</div>';
@@ -2227,13 +2222,13 @@ const Game = {
                 // Görev 3-4: İlk Yolcular & Ön Kapı
                 howToDriveHtml = [
                     '<div style="background: rgba(56, 189, 248, 0.15); border: 1.5px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">👥 İlk Yolcu Binişi: Ön Kapı (E) ve Yolcu Konforu Devrede!</strong><br>',
-                    '    <span style="color: #f1f5f9;">Duraklarda bekleyen yolcuları <strong>E</strong> tuşu ile ön kapıyı açarak otobüse buyur ediniz. Sarsıntısız frenleme ile yolcu memnuniyetini yüksek tutunuz.</span>',
+                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">👥 İlk Yolcu Binişi: Ön Kapı (PageUp / Sayfa Yukarı) ve Yolcu Konforu Devrede!</strong><br>',
+                    '    <span style="color: #f1f5f9;">Duraklarda bekleyen yolcuları <strong>PageUp (Sayfa Yukarı)</strong> tuşu ile ön kapıyı açarak otobüse buyur ediniz. Sarsıntısız frenleme ile yolcu memnuniyetini yüksek tutunuz.</span>',
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
                     '    <li><strong>W / Yukarı Ok:</strong> Gaz | <strong>S / Aşağı Ok:</strong> Fren | <strong>A / D:</strong> Direksiyon</li>',
-                    '    <li><strong>E:</strong> Ön Kapı (Yolcu binişleri) | <strong>H:</strong> Korna</li>',
+                    '    <li><strong>PageUp (Sayfa Yukarı):</strong> Ön Kapı (Yolcu binişleri) | <strong>L:</strong> Korna</li>',
                     '</ul>'
                 ].join("");
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan İpucu: Duraklara yaklaşırken kademeli fren yaparak yolcuların rahat etmesini sağlayın.</div>';
@@ -2246,21 +2241,21 @@ const Game = {
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
-                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E:</strong> Ön Kapı (Kart Okutma) | <strong>H:</strong> Korna</li>',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>PageUp (Sayfa Yukarı):</strong> Ön Kapı (Kart Okutma) | <strong>L:</strong> Korna</li>',
                     '</ul>'
                 ].join("");
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>C</strong> Yolcu Konforu | <strong>R</strong> Hız Göstergesi.</div>';
             } else if (tIdx < 8) {
-                // Görev 7-8: Akustik Duracak Zili & Arka Kapı (Q)
+                // Görev 7-8: Akustik Duracak Zili & Arka Kapı (PageDown)
                 howToDriveHtml = [
                     '<div style="background: rgba(239, 68, 68, 0.15); border: 1.5px solid #ef4444; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #f87171; font-size: 1.1rem;">🔔 Yolcu İniş Protokolü: Akustik Duracak Zili & Arka Kapı (Q) Aktif</strong><br>',
-                    '    <span style="color: #f1f5f9;">Durağa 200m kala inecek yolcu varsa Duracak zili çalar ve kırmızı ikaz lambası yanar. Durakta durup <strong>Q</strong> tuşu ile arka kapıyı açarak yolcuları indirin.</span>',
+                    '    <strong style="color: #f87171; font-size: 1.1rem;">🔔 Yolcu İniş Protokolü: Akustik Duracak Zili & Arka Kapı (PageDown / Sayfa Aşağı) Aktif</strong><br>',
+                    '    <span style="color: #f1f5f9;">Durağa 200m kala inecek yolcu varsa Duracak zili çalar ve kırmızı ikaz lambası yanar. Durakta durup <strong>PageDown (Sayfa Aşağı)</strong> tuşu ile arka kapıyı açarak yolcuları indirin.</span>',
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Kapı Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
-                    '    <li><strong>W:</strong> Gaz | <strong>S:</strong> Fren | <strong>A / D:</strong> Direksiyon | <strong>H:</strong> Korna</li>',
-                    '    <li><strong>E:</strong> Ön Kapı (Binen yolcular) | <strong>Q:</strong> Arka Kapı (İnen yolcular)</li>',
+                    '    <li><strong>W:</strong> Gaz | <strong>S:</strong> Fren | <strong>A / D:</strong> Direksiyon | <strong>L:</strong> Korna</li>',
+                    '    <li><strong>PageUp (Sayfa Yukarı):</strong> Ön Kapı (Binen yolcular) | <strong>PageDown (Sayfa Aşağı):</strong> Arka Kapı (İnen yolcular)</li>',
                     '</ul>'
                 ].join("");
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>C</strong> Yolcu Konforu | <strong>R</strong> Hız Göstergesi.</div>';
@@ -2273,24 +2268,24 @@ const Game = {
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Sistem Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
-                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E:</strong> Ön Kapı | <strong>Q:</strong> Arka Kapı | <strong>U:</strong> Engelli Rampası</li>',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>PageUp:</strong> Ön Kapı | <strong>PageDown:</strong> Arka Kapı | <strong>U:</strong> Engelli Rampası</li>',
                     '</ul>'
                 ].join("");
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>U</strong> Rampa | <strong>C</strong> Konfor | <strong>Z</strong> Sefer Dakikliği.</div>';
             } else if (tIdx < 20) {
-                // Görev 11-20 (2. Sınıf Kıyı Kaptanı): Telsiz (T), Silecek (X), Farlar (L)
+                // Görev 11-20 (2. Sınıf Kıyı Kaptanı): Telsiz (T), Silecek (Shift + W), Farlar (F)
                 howToDriveHtml = [
                     '<div style="background: rgba(14, 165, 233, 0.15); border: 1.5px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">📻 2. Sınıf Kıyı Kaptanlığı: Canlı Telsiz (T), Silecek (X) & Far (L)</strong><br>',
-                    '    <span style="color: #f1f5f9;">Sefer esnasında <strong>T</strong> tuşu ile TEKULAŞ Merkez Telsizini dinleyebilir, yağışta <strong>X</strong> ile silecekleri ve gece sürüşünde <strong>L</strong> ile farları açabilirsiniz.</span>',
+                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">📻 2. Sınıf Kıyı Kaptanlığı: Canlı Telsiz (T), Silecek (Shift + W) & Far (F)</strong><br>',
+                    '    <span style="color: #f1f5f9;">Sefer esnasında <strong>T</strong> tuşu ile TEKULAŞ Merkez Telsizini dinleyebilir, yağışta <strong>Shift + W</strong> ile silecekleri ve gece sürüşünde <strong>F</strong> ile farları açabilirsiniz.</span>',
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Kabin Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
-                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E / Q:</strong> Kapılar | <strong>U:</strong> Engelli Rampası</li>',
-                    '    <li><strong>T:</strong> TEKULAŞ Telsizi | <strong>X:</strong> Yağmur Silecekleri | <strong>L:</strong> Farlar</li>',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>PageUp / PageDown:</strong> Kapılar | <strong>U:</strong> Engelli Rampası</li>',
+                    '    <li><strong>T:</strong> TEKULAŞ Telsizi | <strong>Shift + W:</strong> Yağmur Silecekleri | <strong>F:</strong> Farlar | <strong>L:</strong> Korna</li>',
                     '</ul>'
                 ].join("");
-                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>T</strong> Telsiz | <strong>X</strong> Silecek | <strong>L</strong> Farlar | <strong>C</strong> Konfor.</div>';
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>T</strong> Telsiz | <strong>Shift + W</strong> Silecek | <strong>F</strong> Farlar | <strong>L</strong> Korna | <strong>H</strong> Araç Sağlık/Yakıt.</div>';
             } else {
                 // Görev 21-100: Tam Profesyonel Simülasyon
                 howToDriveHtml = [
@@ -2300,11 +2295,11 @@ const Game = {
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Tam Kokpit Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
-                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E / Q:</strong> Kapılar | <strong>U:</strong> Rampa | <strong>T:</strong> Telsiz</li>',
-                    '    <li><strong>X:</strong> Yağmur Silecekleri | <strong>L:</strong> Farlar | <strong>Z:</strong> Sefer Saati</li>',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>PageUp / PageDown:</strong> Kapılar | <strong>U:</strong> Rampa | <strong>T:</strong> Telsiz</li>',
+                    '    <li><strong>Shift + W:</strong> Yağmur Silecekleri | <strong>F:</strong> Farlar | <strong>L:</strong> Korna | <strong>Z:</strong> Sefer Saati</li>',
                     '</ul>'
                 ].join("");
-                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev | <strong>U</strong> Rampa | <strong>P</strong> Bagaj | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>Z</strong> Zamanlama.</div>';
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev | <strong>H</strong> Araç Sağlık/Yakıt | <strong>U</strong> Rampa | <strong>P</strong> Bagaj | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>Z</strong> Zamanlama.</div>';
             }
 
             const mission = (typeof CareerMissions !== 'undefined') ? CareerMissions.getMission(r.taskIndex || 0) : null;
@@ -2512,6 +2507,11 @@ const Game = {
         this.isLowAirAlarmActive = false;
         this.isEmergencyBrakeLocked = false;
         this.isBrakeKeyDown = false;
+
+        // Sefer Başlatma Başarımları ve İstatistik Kaydı (Tüm iklim, yakıt, otobüs ve rota verileri hazırlandıktan sonra)
+        if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.recordRouteStart === 'function') {
+            try { DriverBadges.recordRouteStart(this); } catch(e) { console.warn('[Game] recordRouteStart hatası:', e); }
+        }
         
         this.obstacles = [];
         this.activeNPCs = [];
@@ -2550,6 +2550,7 @@ const Game = {
         if (rampHudPlan) rampHudPlan.style.display = 'none';
         // Her 3 durakta bir tekerlekli sandalye kullanan erişilebilir yolcu durakta bekler
         this.hasWheelchairPassengerAtStop = (this.currentStopIndex > 0 && this.currentStopIndex % 3 === 1);
+        if (!this.activeRouteData || !Array.isArray(this.activeRouteData.stops)) return;
         if (this.currentStopIndex >= this.activeRouteData.stops.length) {
             this.finishRoute(true);
             return;
@@ -3955,17 +3956,19 @@ const Game = {
             audio.stopRetarder();
         }
 
-        // RPM VE VİTES MANTIĞI
+        // RPM VE VİTES MANTIĞI (6 İleri Otomatik Şanzıman)
         let isThrottleOn = (this.keys.w || this.keys.arrowup);
         let targetRPM = this.dynamicIdleRPM || 800;
-        const gearSpeedRatios = [0, 25, 45, 65, 90, 130]; 
+        const gearSpeedRatios = [0, 22, 42, 62, 85, 110, 135];
+        const maxGear = 6;
+        if (this.currentGear > maxGear) this.currentGear = maxGear;
 
         if (this.speed > 0 || isThrottleOn) {
-            let currentMinSpeed = gearSpeedRatios[this.currentGear - 1];
-            let currentMaxSpeed = gearSpeedRatios[this.currentGear];
+            let currentMinSpeed = gearSpeedRatios[this.currentGear - 1] || 0;
+            let currentMaxSpeed = gearSpeedRatios[this.currentGear] || 135;
             
             let speedInGear = this.speed - currentMinSpeed;
-            let gearRange = currentMaxSpeed - currentMinSpeed;
+            let gearRange = Math.max(10, currentMaxSpeed - currentMinSpeed);
             
             let speedRatio = Math.max(0, Math.min(1, speedInGear / gearRange));
             targetRPM = 1000 + (speedRatio * 1500); // 1000 ile 2500 arası
@@ -3981,7 +3984,7 @@ const Game = {
         // Akıllı Vites Atma (Yokuşta devri tutar, düz yolda ekonomik devirde vites büyütür)
         const shiftChip = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(null, this) : null;
         const smartShiftRPM = (shiftChip && shiftChip.shiftUpRPM) ? shiftChip.shiftUpRPM : 2200;
-        if (this.engineRPM > smartShiftRPM && this.currentGear < 5 && this.speed > gearSpeedRatios[this.currentGear] * 0.88) {
+        if (this.engineRPM > smartShiftRPM && this.currentGear < maxGear && this.speed > gearSpeedRatios[this.currentGear] * 0.88) {
             this.currentGear++;
             this.engineRPM = 1450; // Vites atınca devir tatlı tork bandına düşer
         }
@@ -4079,21 +4082,23 @@ const Game = {
             if (this.currentDistanceToNext <= 220 && !this.copilotFirstStopWarned && this.currentStopIndex === 0 && this.speed > 5) {
                 this.copilotFirstStopWarned = true;
                 if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled && typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("İlk durağınıza yaklaşıyorsunuz. S tuşuna basarak yavaşlayınız. Tam durduğunuzda 1 ve 2 tuşlarıyla kapıları açınız.");
+                    audio.speak("İlk durağınıza yaklaşıyorsunuz. S tuşuna basarak yavaşlayınız. Tam durduğunuzda Sayfa Yukarı ve Sayfa Aşağı tuşlarıyla kapıları açınız.");
                 }
             }
             // FAZ 1: DURAKTAN KALKIŞ ANONSU (Araç hareket edip hızlanınca)
             if (this.speed > 6 && !this.departAnnounced) {
                 this.departAnnounced = true;
-                const isInitial = (this.currentStopIndex === 0);
-                const isFinal = (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
-                const nextStop = this.activeRouteData.stops[this.currentStopIndex];
-                if (typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
-                    audio.playBusAnnouncement('depart', nextStop.name, {
-                        isInitial: isInitial,
-                        isFinal: isFinal,
-                        routeName: this.activeRouteData.name || this.activeRouteData.hatNo
-                    });
+                if (this.activeRouteData && Array.isArray(this.activeRouteData.stops)) {
+                    const isInitial = (this.currentStopIndex === 0);
+                    const isFinal = (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
+                    const nextStop = this.activeRouteData.stops[this.currentStopIndex];
+                    if (nextStop && typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
+                        audio.playBusAnnouncement('depart', nextStop.name, {
+                            isInitial: isInitial,
+                            isFinal: isFinal,
+                            routeName: this.activeRouteData.name || this.activeRouteData.hatNo
+                        });
+                    }
                 }
             }
 
@@ -4292,8 +4297,8 @@ const Game = {
         }
         this.lastRecordedSpeed = this.speed;
             
-        // Arkadan Çarpma (Rear-end collision) Mantığı
-        if (this.speed > 50 && this.acceleration < -100) {
+        // Arkadan Çarpma (Rear-end collision) Mantığı (Yüksek hızda ani imdat freninde arkadaki aracın çarpma riski)
+        if (this.speed > 50 && this.acceleration <= -22) {
             if (currentTime - this.lastRearHitTime > 5000 && Math.random() < 0.02) {
                 this.lastRearHitTime = currentTime;
                 this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 20); // Tek seferde kopmaz, %20 hasar alır
@@ -4434,6 +4439,7 @@ const Game = {
             this.busTemperature -= deltaTime * 0.1; // Saniyede 0.1 derece soğur
             if (this.busTemperature < targetTemp) this.busTemperature = targetTemp;
         }
+        this.cabinTemperature = this.busTemperature;
         
         if (document.getElementById('hud-temp')) {
             const rainInfo = (this.weather === 'rainy' && this.rainMmPerHour > 0) ? ` | 🌧️ ${this.rainMmPerHour} mm/s` : '';
@@ -4782,7 +4788,8 @@ const Game = {
                     this.busDamage.health = Math.max(0, this.busDamage.health);
                     
                     // Şeride ve parça sağlamlık kademesine göre bölgesel hasar ve uyarılar
-                    if (npc.x === 20) {
+                    const relCrashX = npc.x - this.lanePosition;
+                    if (relCrashX < -8) {
                         // Hassas dış donanım (Sol Cam - 1.0x)
                         let outcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (outcome === 2) {
@@ -4798,7 +4805,7 @@ const Game = {
                         if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
                             this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(damageAmount / 1.75));
                         }
-                    } else if (npc.x === 80) {
+                    } else if (relCrashX > 8) {
                         // Hassas dış donanım (Sağ Cam - 1.0x)
                         let outcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (outcome === 2) {
@@ -5016,7 +5023,8 @@ const Game = {
 
         // Yolcu matematiğini başta hesapla
         const isTrainingEmpty = !!(this.activeRouteData && (this.activeRouteData.emptyBus || this.activeRouteData.isTraining));
-        const remainingStops = Math.max(1, this.activeRouteData.stops.length - this.currentStopIndex - 1);
+        const totalStopsLen = (this.activeRouteData && Array.isArray(this.activeRouteData.stops)) ? this.activeRouteData.stops.length : 1;
+        const remainingStops = Math.max(1, totalStopsLen - this.currentStopIndex - 1);
         const alighting = isTrainingEmpty ? 0 : (isFinalStop ? this.passengersOnBoard : Math.min(this.passengersOnBoard, Math.max(1, Math.round(this.passengersOnBoard / (remainingStops + 1)))));
         let rawWaiting = (typeof stopData.bekleyenYolcu === 'number') ? stopData.bekleyenYolcu : 5;
         if (typeof PowertrainDynamicsEngine !== 'undefined' && !isTrainingEmpty) {
@@ -5168,7 +5176,7 @@ const Game = {
             return;
         }
 
-        if (this.currentStopIndex >= this.activeRouteData.stops.length - 1) {
+        if (!this.activeRouteData || !Array.isArray(this.activeRouteData.stops) || this.currentStopIndex >= this.activeRouteData.stops.length - 1) {
             this.finishRoute();
             return;
         }
@@ -5286,7 +5294,7 @@ const Game = {
 
             // KOŞAN YOLCU OLAYI (Akıllı Durak Etkileşimi)
             // Seferdeyken ve kapı kapandığı anda %35 ihtimalle son anda yetişmeye çalışan yolcu belirir
-            if (!this.isDriving && !this.runningPassengerTriggeredAtStop && this.activeRouteData && (this.currentStopIndex < this.activeRouteData.stops.length - 1)) {
+            if (!this.isDriving && !this.runningPassengerTriggeredAtStop && this.activeRouteData && Array.isArray(this.activeRouteData.stops) && (this.currentStopIndex < this.activeRouteData.stops.length - 1)) {
                 const shouldTrigger = (this.currentStopIndex === 1) || (Math.random() < 0.35);
                 if (shouldTrigger) {
                     this.triggerRunningPassenger();
@@ -5376,9 +5384,9 @@ const Game = {
         if (alertEl) alertEl.classList.remove('hidden');
 
         const alertText = document.getElementById('running-passenger-text');
-        if (alertText) alertText.innerText = '🏃 Koşan Yolcu: "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı!" (Açmak için E tuşu veya buton)';
+        if (alertText) alertText.innerText = '🏃 Koşan Yolcu: "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı!" (Açmak için PageUp tuşu veya buton)';
 
-        const msg = "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı! Durağa doğru koşan bir yolcu var. Kapıyı açmak için E tuşuna veya Ön Kapıyı Aç butonuna basınız.";
+        const msg = "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı! Durağa doğru koşan bir yolcu var. Kapıyı açmak için Sayfa Yukarı yani PageUp tuşuna veya Ön Kapıyı Aç butonuna basınız.";
         if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
         if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
 
@@ -5405,7 +5413,7 @@ const Game = {
         const choiceBox = document.getElementById('passenger-choice-box');
         if (choiceBox) choiceBox.classList.add('hidden');
 
-        const stopData = this.activeRouteData ? this.activeRouteData.stops[this.currentStopIndex] : null;
+        const stopData = (this.activeRouteData && Array.isArray(this.activeRouteData.stops)) ? this.activeRouteData.stops[this.currentStopIndex] : null;
 
         if (allowed) {
             // İzin verildi (Gönlü Zengin Kaptan)
@@ -5486,21 +5494,22 @@ const Game = {
         if (this.rearDoorOpen) {
             if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorOpen === 'function') audio.playPneumaticDoorOpen();
             else audio.playDoorOpen();
-            btn.innerText = "Arka Kapıyı Kapat";
+            if (btn) btn.innerText = "Arka Kapıyı Kapat";
             if (!this.isDriving) {
-                document.getElementById('stop-alighting-count').innerText = "0";
+                const alightEl = document.getElementById('stop-alighting-count');
+                if (alightEl) alightEl.innerText = "0";
             }
         } else {
             if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorClose === 'function') audio.playPneumaticDoorClose();
             else audio.playDoorClose();
-            btn.innerText = "Arka Kapıyı Aç";
+            if (btn) btn.innerText = "Arka Kapıyı Aç";
             if (!this.isDriving) this.checkAutoDepart();
         }
     },
 
     automatedTicketProcess: function(isStanding = false) {
         // FORMÜLE BAĞLI BİLET TÜRÜ: Durak adına ve biniş sırasına göre deterministik bilet
-        const currentStopName = (this.activeRouteData.stops[this.currentStopIndex]?.name || "").toLowerCase();
+        const currentStopName = ((this.activeRouteData && Array.isArray(this.activeRouteData.stops) && this.activeRouteData.stops[this.currentStopIndex]?.name) || "").toLowerCase();
         let pType = "tam";
         if (currentStopName.includes("üniversite") || currentStopName.includes("okul") || currentStopName.includes("fakülte") || currentStopName.includes("lise")) {
             pType = "ogrenci"; // Okul/Kampüs duraklarında öğrenci
@@ -5703,6 +5712,7 @@ const Game = {
                     routeDistanceKm: (this.activeRouteData && this.activeRouteData.totalDistanceKm) ? this.activeRouteData.totalDistanceKm : Math.max(1, Math.round((this.totalDistanceCovered || 8000) / 1000)),
                     isIntercity: !!(this.activeRouteData && this.activeRouteData.isIntercity),
                     unlockedCitiesCount: (this.unlockedCities && Array.isArray(this.unlockedCities)) ? this.unlockedCities.length : 1,
+                    stopsDiscovered: (typeof StopDiscovery !== 'undefined' && typeof StopDiscovery.getDiscoveredData === 'function') ? Object.keys(StopDiscovery.getDiscoveredData()).length : 0,
                     passengersCarried: this.totalPassengersBoardedInRoute || (this.isTrainingRoute ? 0 : 15),
                     isRainOrSnow: (this.activeClimateRegime === 'yagmurlu' || this.activeClimateRegime === 'karli' || this.weather === 'rainy' || this.weather === 'snowy')
                 };
@@ -5713,7 +5723,10 @@ const Game = {
         }
         
         if (document.getElementById('res-money')) document.getElementById('res-money').innerText = `${this.sessionMoney} ₺`;
-        if (document.getElementById('res-penalties')) document.getElementById('res-penalties').innerText = '0 ₺ (Eğitimde Ceza Yok / Muaf)';
+        if (document.getElementById('res-penalties')) {
+            const penAmt = Math.round(this.sessionPenalties || 0);
+            document.getElementById('res-penalties').innerText = penAmt > 0 ? `-${penAmt} ₺ (Kırmızı Işık / Trafik Cezası)` : '0 ₺ (Kural İhlali Yok)';
+        }
 
         // Özel Yolcu Primleri Özeti
         let smartSummaries = [];
@@ -6227,17 +6240,18 @@ const Game = {
                 });
             }
         }
-        if (k === 'pageup' || k === 'e') {
+        if (k === 'e' && e.shiftKey) {
             e.preventDefault();
-            if (e.shiftKey) {
-                if (typeof SolarPrayerEngine !== 'undefined' && typeof SolarPrayerEngine.speakVakitReport === 'function') {
-                    SolarPrayerEngine.speakVakitReport(this);
-                }
-                return;
+            if (typeof SolarPrayerEngine !== 'undefined' && typeof SolarPrayerEngine.speakVakitReport === 'function') {
+                SolarPrayerEngine.speakVakitReport(this);
             }
+            return;
+        }
+        if (k === 'pageup') {
+            e.preventDefault();
             this.toggleFrontDoor();
         }
-        if (k === 'pagedown' || k === 'q') {
+        if (k === 'pagedown') {
             e.preventDefault();
             this.toggleRearDoor();
         }

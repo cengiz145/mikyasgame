@@ -21,7 +21,7 @@ class VoiceAssistant {
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: 'Aracı Kullanırken Dikkat Edilmesi Gereken Kavramlar (9 Hayati Kavram)',
-                keys: 'F2 veya Shift+K (Sözlük), B (Retarder), U (Rampa), Space (İmdat Freni), E/Q (Kapılar), T (Telsiz)',
+                keys: 'F2 veya Shift+K (Sözlük), B (Retarder), U (Rampa), Space (İmdat Freni), PageUp/PageDown (Kapılar), T (Telsiz)',
                 tip: 'Otobüs kullanırken bilmen gereken 9 kavram: Retarder, Kneeling, Rampa, Havalı Fren, İmdat, Kapı Emniyet Kilidi, Radyatör Fanı, Zirve Saatler ve Telsiz.',
                 speech: 'Aracı kullanırken dikkat edilmesi gereken dokuz temel kavram şunlardır: Birincisi Retarder: Yokuş aşağı inerken B tuşuyla devreye aldığın şanzıman frenidir, balatalara dokunmadan otobüsü yavaşlatır ve fren balatalarının aşırı ısınıp frenin şişmesini yani tutmaz hale gelmesini önler. İkincisi Kneeling: Durakta yaşlı ve çocuklu yolcuların rahat binmesi için otobüsün sağ körük havasını tahliye ederek kaldırıma doğru sekiz santim yatmasıdır. Üçüncüsü Engelli Rampası: U tuşuyla açılan tekerlekli sandalye rampasıdır, rampa açıkken güvenlik kilidi devreye girer ve araç kilitlenir. Dördüncüsü Pnömatik Havalı Fren: Ağır vasıtayı durduran yüksek basınçlı hava tanklarıdır; frene sürekli peş peşe basıp pompalarsanız hava biter. Beşincisi İmdat Freni: Boşluk tuşuyla çekilen mekanik yaylı el frenidir, hava kaçağı olsa dahi aracı kilitler. Altıncısı Kapı Fren Emniyet Kilidi: Kapılar veya rampa açıkken otobüsün gaz yememesi ve hareket etmemesidir. Yedincisi Hidrostatik Radyatör Fanı: Dik tırmanışta motor hararet yapıp doksan beş dereceyi geçince devreye giren dev soğutma pervanesidir. Sekizincisi Yoğun Zirve Saat Dinamiği: Sabah ve akşam mesai çıkışlarında yolcu sayısının ve otobüs ağırlığının iki katına çıkmasıdır. Dokuzuncusu Telsiz Dispeçer Anonsları: T tuşuna basarak filo amirliğiyle haberleşmenizdir. Bu kavramların tüm detayları ve açıklamaları için dilediğiniz an F2 veya Shift K tuşuna basabilirsiniz.'
             },
@@ -44,9 +44,9 @@ class VoiceAssistant {
                 stage: 1,
                 stageName: '1. Bölüm: Direksiyon Başına Geçiş',
                 title: '2. Duraklarda Yolcu Alma ve İndirme',
-                keys: '1 (Ön Kapı), 2 (Arka Kapı)',
-                tip: 'Durakta tam durduktan sonra 1 ile ön kapıyı, 2 ile arka kapıyı aç.',
-                speech: 'Durağa geldiğinde S tuşuna basıp tam dur. 1 tuşuna basarak ön kapıyı aç, yeni binen yolcular kartlarını okutsun. 2 tuşuna basarak arka kapıyı aç, inecek yolcular insin. Herkes binip indikten sonra yine 1 ve 2 tuşlarıyla kapıları kapat. Kapılar açıkken otobüs gitmez, kapıları kapatıp gaza basabilirsin.'
+                keys: 'PageUp / Sayfa Yukarı (Ön Kapı), PageDown / Sayfa Aşağı (Arka Kapı)',
+                tip: 'Durakta tam durduktan sonra PageUp (Sayfa Yukarı) ile ön kapıyı, PageDown (Sayfa Aşağı) ile arka kapıyı aç.',
+                speech: 'Durağa geldiğinde S tuşuna basıp tam dur. Sayfa Yukarı yani PageUp tuşuna basarak ön kapıyı aç, yeni binen yolcular kartlarını okutsun. Sayfa Aşağı yani PageDown tuşuna basarak arka kapıyı aç, inecek yolcular insin. Herkes binip indikten sonra yine Sayfa Yukarı ve Sayfa Aşağı tuşlarıyla kapıları kapat. Kapılar açıkken otobüs gitmez, kapıları kapatıp gaza basabilirsin.'
             },
             {
                 id: 'compass',
@@ -80,9 +80,9 @@ class VoiceAssistant {
                 stage: 2,
                 stageName: '2. Bölüm: Yolcularımız ve Duraklar',
                 title: '4. Tekerlekli Sandalyeli Yolcular ve Rampa',
-                keys: 'K (Otobüsü Sağa Yatır), U veya R (Engelli Rampası)',
+                keys: 'K (Otobüsü Sağa Yatır), U (Engelli Rampası)',
                 tip: 'Tekerlekli sandalyeli yolcu görünce rampayı aç, yolcu binince kapat.',
-                speech: 'Durakta tekerlekli sandalyeli veya yaşlı bir yolcumuz bekliyorsa oyun sana haber verir. Durup kapıyı açtıktan sonra K tuşuna basarak otobüsü kaldırıma doğru eğebilirsin. U veya R tuşuna basınca rampa açılır ve yolcumuz biner. Yolcumuz binince tekrar U veya R tuşuna basıp rampayı kapatırsın ve yola devam edersin.'
+                speech: 'Durakta tekerlekli sandalyeli veya yaşlı bir yolcumuz bekliyorsa oyun sana haber verir. Durup kapıyı açtıktan sonra K tuşuna basarak otobüsü kaldırıma doğru eğebilirsin. U tuşuna basınca rampa açılır ve yolcumuz biner. Yolcumuz binince tekrar U tuşuna basıp rampayı kapatırsın ve yola devam edersin.'
             },
             {
                 id: 'bumps',
@@ -160,10 +160,10 @@ class VoiceAssistant {
                 soundIcon: '🏆',
                 stage: 4,
                 stageName: '4. Bölüm: Uzun Yol ve Usta Şoförlük',
-                title: '11. 1500 Başarı ve Keşfedilen Duraklar',
+                title: '11. 1900 Başarı ve Keşfedilen Duraklar',
                 keys: 'Menüde Başarılar Sekmesi, K (Keşfedilen Duraklar)',
-                tip: '1500 farklı göreve bakarak sıradaki hedefini seçebilirsin.',
-                speech: 'Oyunda tam 1500 farklı görev ve madalya seni bekliyor! Menüden Başarılar sekmesine girip sıradaki görevini görebilir veya rastgele bir hedef seçtirebilirsin. Yolda giderken K tuşuna basarak şu ana kadar kaç farklı durak keşfettiğini de öğrenebilirsin.'
+                tip: '1900 farklı göreve bakarak sıradaki hedefini seçebilirsin.',
+                speech: 'Oyunda tam 1900 farklı görev ve madalya seni bekliyor! Menüden Başarılar sekmesine girip sıradaki görevini görebilir veya rastgele bir hedef seçtirebilirsin. Yolda giderken K tuşuna basarak şu ana kadar kaç farklı durak keşfettiğini de öğrenebilirsin.'
             },
             {
                 id: 'voice_guide',
@@ -507,7 +507,7 @@ class VoiceAssistant {
                 <strong>B:</strong> Retarder Kolu (1-5 Kademe) • 
                 <strong>Shift + B:</strong> Retarder Kapat • 
                 <strong>Space:</strong> İmdat Freni / Kontak • 
-                <strong>E / Q:</strong> Ön / Arka Kapı & İnterlok • 
+                <strong>PageUp / PageDown:</strong> Ön / Arka Kapı & İnterlok • 
                 <strong>U:</strong> Engelli Rampası • 
                 <strong>Shift + R:</strong> Telemetri & Zirve Saat • 
                 <strong>T:</strong> Telsiz Dispeçer • 
@@ -595,14 +595,14 @@ class VoiceAssistant {
             <div style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid rgba(168, 85, 247, 0.35);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <h4 style="color: #c084fc; margin: 0; font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                        <span>🚪</span> <span>6. Kapı Fren Emniyet Kilidi (Interlock) - Kısayol: [ E / Q ]</span>
+                        <span>🚪</span> <span>6. Kapı Fren Emniyet Kilidi (Interlock) - Kısayol: [ PageUp / PageDown ]</span>
                     </h4>
-                    <button class="modern-btn btn-read-section nav-item" data-text="Altıncı Kavram: Kapı Fren Emniyet Kilidi yani İnterlok. Ne işe yarar? Kapılardan biri veya engelli rampası açıkken gaz kelebeğini kilitler ve otobüsün hareket etmesini engeller. Neden vardır? Yolcular binerken veya inerken otobüs hareket ederse yolcular kapıdan düşebilir veya ezilebilir. Kapılar tam kapanmadan hareket etmek yasaktır. Nasıl kullanılır? Durakta E ile ön, Q ile arka kapıyı açınız. Yolcu binişi bitince kapıları kapatınız; kapılar kapanmadan gaza bassanız bile otobüs gitmez." style="padding: 4px 10px; background: rgba(168,85,247,0.2); border: 1px solid #a855f7; color: #d8b4fe; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
+                    <button class="modern-btn btn-read-section nav-item" data-text="Altıncı Kavram: Kapı Fren Emniyet Kilidi yani İnterlok. Ne işe yarar? Kapılardan biri veya engelli rampası açıkken gaz kelebeğini kilitler ve otobüsün hareket etmesini engeller. Neden vardır? Yolcular binerken veya inerken otobüs hareket ederse yolcular kapıdan düşebilir veya ezilebilir. Kapılar tam kapanmadan hareket etmek yasaktır. Nasıl kullanılır? Durakta Sayfa Yukarı yani PageUp ile ön, Sayfa Aşağı yani PageDown ile arka kapıyı açınız. Yolcu binişi bitince kapıları kapatınız; kapılar kapanmadan gaza bassanız bile otobüs gitmez." style="padding: 4px 10px; background: rgba(168,85,247,0.2); border: 1px solid #a855f7; color: #d8b4fe; font-size: 0.8rem; border-radius: 6px; cursor: pointer;">▶ Dinle</button>
                 </div>
                 <div style="color: #cbd5e1; font-size: 0.88rem; line-height: 1.5;">
                     • <strong>📌 Ne İşe Yarar?:</strong> Kapılar açıkken araca gaz verilmesini elektronik olarak engelleyen güvenlik mekanizmasıdır.<br>
                     • <strong>🛡️ Neden Hayatidir?:</strong> Yolcu binerken kaptanın dalgınlıkla gaza basıp yolcunun düşmesini ve ezilmesini önler.<br>
-                    • <strong>🎮 Nasıl Kullanılır?:</strong> <strong>E</strong> (Ön Kapı) ve <strong>Q</strong> (Arka Kapı) tuşları ile kontrol edilir. Kapılar kapandığı an ivmelenme serbest kalır.
+                    • <strong>🎮 Nasıl Kullanılır?:</strong> <strong>PageUp (Sayfa Yukarı)</strong> (Ön Kapı) ve <strong>PageDown (Sayfa Aşağı)</strong> (Arka Kapı) tuşları ile kontrol edilir. Kapılar kapandığı an ivmelenme serbest kalır.
                 </div>
             </div>
 
@@ -1215,9 +1215,8 @@ class VoiceAssistant {
                 soundDuration: 2200,
                 title: "5. Adım: Engelli Rampasını Açma",
                 tip: "Tekerlekli sandalyeli yolcumuzun binmesi için rampayı açıyoruz.",
-                instruction: "Tekerlekli sandalyeli yolcumuzun rahatça binmesi için klavyeden R tuşuna (veya U) basarak rampayı açınız.",
-                targetKey: "r",
-                altTargetKey: "u",
+                instruction: "Tekerlekli sandalyeli yolcumuzun rahatça binmesi için klavyeden U tuşuna basarak rampayı açınız.",
+                targetKey: "u",
                 soundName: "🛹 Freesound Hidrolik Rampa İniş & Kaldırım Klankı",
                 playSound: () => {
                     if (typeof audio !== 'undefined') {
@@ -1225,10 +1224,10 @@ class VoiceAssistant {
                         else if (audio.playRamp) audio.playRamp(true);
                     }
                 },
-                actionBtnText: "🛹 Engelli Rampasını Aç (R veya U)",
+                actionBtnText: "🛹 Engelli Rampasını Aç (U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #d97706, #b45309); border: 1.5px solid #facc15;",
                 successFeedback: "Harikasın! Rampa hidrolik sesle indi ve kaldırıma kilitlendi. Yolcumuz bindi: Çok teşekkür ederim kaptanım!",
-                failFeedback: "Rampayı açmak için lütfen R veya U tuşuna basınız.",
+                failFeedback: "Rampayı açmak için lütfen U tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[4];
                     if (s && s.playSound) s.playSound();
@@ -1240,9 +1239,8 @@ class VoiceAssistant {
                 soundDuration: 2200,
                 title: "6. Adım: Rampayı Geri Kapatma",
                 tip: "Yolcumuz bindi, sefere devam etmek için rampayı geri topluyoruz.",
-                instruction: "Yolcumuz bindi. Tekrar yola çıkabilmek için lütfen tekrar R tuşuna (veya U) basarak rampayı kapatınız.",
-                targetKey: "r",
-                altTargetKey: "u",
+                instruction: "Yolcumuz bindi. Tekrar yola çıkabilmek için lütfen tekrar U tuşuna basarak rampayı kapatınız.",
+                targetKey: "u",
                 soundName: "⬆️ Freesound Rampa Toplanma & Şasi Kilidi",
                 playSound: () => {
                     if (typeof audio !== 'undefined') {
@@ -1250,10 +1248,10 @@ class VoiceAssistant {
                         else if (audio.playRamp) audio.playRamp(false);
                     }
                 },
-                actionBtnText: "⬆️ Rampayı Kapat ve Otobüsü Doğrult (R veya U)",
+                actionBtnText: "⬆️ Rampayı Kapat ve Otobüsü Doğrult (U)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
                 successFeedback: "Çok güzel! Rampa motorla toplanıp şasiye kilitlendi ve körükler otobüsü doğrulttu.",
-                failFeedback: "Rampayı kapatmak için lütfen tekrar R veya U tuşuna basınız.",
+                failFeedback: "Rampayı kapatmak için lütfen tekrar U tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[5];
                     if (s && s.playSound) s.playSound();
@@ -1266,8 +1264,8 @@ class VoiceAssistant {
                 soundDuration: 2200,
                 title: "7. Adım: Ön Kapıyı Açma (Yolcuları Alma)",
                 tip: "Durakta bekleyen diğer yolcuların binmesi için ön kapıyı açıyoruz.",
-                instruction: "Duraktaki diğer yolcuların binmesi için klavyeden 1 tuşuna basarak ön kapıyı açınız.",
-                targetKey: "1",
+                instruction: "Duraktaki diğer yolcuların binmesi için klavyeden PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açınız.",
+                targetKey: "pageup",
                 soundName: "🚪 Ön Kapı Pnömatik Açılışı & 💳 Akbil Bip Sesi",
                 playSound: () => {
                     if (typeof audio !== 'undefined') {
@@ -1278,10 +1276,10 @@ class VoiceAssistant {
                         }
                     }
                 },
-                actionBtnText: "🚪 Ön Kapıyı Aç (1)",
+                actionBtnText: "🚪 Ön Kapıyı Aç (PageUp / Sayfa Yukarı)",
                 actionBtnStyle: "background: linear-gradient(135deg, #7c3aed, #6d28d9); border: 1.5px solid #a78bfa;",
                 successFeedback: "Aferin doğru yaptın! Pnömatik kapı açıldı, yolcular kartlarını okutup bindi.",
-                failFeedback: "Ön kapıyı açmak için lütfen 1 tuşuna basınız.",
+                failFeedback: "Ön kapıyı açmak için lütfen PageUp (Sayfa Yukarı) tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[6];
                     if (s && s.playSound) s.playSound();
@@ -1293,18 +1291,18 @@ class VoiceAssistant {
                 soundDuration: 1800,
                 title: "8. Adım: Ön Kapıyı Kapatma",
                 tip: "Yolcular bindi, güvenle sürmek için kapıyı kapatıyoruz.",
-                instruction: "Yolcular bindi. Yola çıkmak için lütfen tekrar 1 tuşuna basarak kapıyı kapatınız.",
-                targetKey: "1",
+                instruction: "Yolcular bindi. Yola çıkmak için lütfen tekrar PageUp (Sayfa Yukarı) tuşuna basarak kapıyı kapatınız.",
+                targetKey: "pageup",
                 soundName: "🔒 Ön Kapı Pnömatik Kapanış & Kauçuk Fitil",
                 playSound: () => {
                     if (typeof audio !== 'undefined' && audio.playDoorClose) {
                         audio.playDoorClose();
                     }
                 },
-                actionBtnText: "🔒 Ön Kapıyı Kapat (1)",
+                actionBtnText: "🔒 Ön Kapıyı Kapat (PageUp / Sayfa Yukarı)",
                 actionBtnStyle: "background: linear-gradient(135deg, #475569, #334155); border: 1.5px solid #94a3b8;",
                 successFeedback: "Tebrikler! Kapılar hava sesiyle kapandı ve kilitlendi, artık güvenle sürebilirsin.",
-                failFeedback: "Kapıyı kapatmak için lütfen 1 tuşuna basınız.",
+                failFeedback: "Kapıyı kapatmak için lütfen PageUp (Sayfa Yukarı) tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[7];
                     if (s && s.playSound) s.playSound();
@@ -1316,18 +1314,18 @@ class VoiceAssistant {
                 soundDuration: 2200,
                 title: "9. Adım: Yokuş Aşağı İniş Freni (Retarder)",
                 tip: "Yokuş inerken normal fren balataları ısınmasın diye motor frenini çekiyoruz.",
-                instruction: "Son olarak, dik yokuş inerken otobüsü yavaşlatmak için Boşluk (Space) tuşuna basarak yokuş frenini çekiniz.",
-                targetKey: " ",
+                instruction: "Son olarak, dik yokuş inerken otobüsü yavaşlatmak için B tuşuna basarak yokuş frenini (Retarder) çekiniz.",
+                targetKey: "b",
                 soundName: "🎶 Voith / ZF Hidrolik Retarder Düdüğü & Yavaşlama",
                 playSound: () => {
                     if (typeof audio !== 'undefined' && audio.playRetarder) {
                         audio.playRetarder(3.5, 65);
                     }
                 },
-                actionBtnText: "⚡ Yokuş Frenini Çek (Boşluk / Space)",
+                actionBtnText: "⚡ Yokuş Frenini Çek (B)",
                 actionBtnStyle: "background: linear-gradient(135deg, #ea580c, #c2410c); border: 1.5px solid #f97316;",
                 successFeedback: "Muhteşem! Retarder ıslık çalarak otobüsü yavaşlattı. Bütün kontrolleri ve akustikleri başarıyla öğrendin!",
-                failFeedback: "Yokuş freni için lütfen Boşluk (Space) tuşuna basınız.",
+                failFeedback: "Yokuş freni (Retarder) için lütfen B tuşuna basınız.",
                 execute: () => {
                     const s = this.guidedSteps[8];
                     if (s && s.playSound) s.playSound();

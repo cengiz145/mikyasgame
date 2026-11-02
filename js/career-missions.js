@@ -67,9 +67,9 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "İlk Yolcu Binişi: Ön Kapı (E) & Bilet Gelirleri",
+                featureUnlock: "İlk Yolcu Binişi: Ön Kapı (PageUp / Sayfa Yukarı) & Bilet Gelirleri",
                 rulesActive: "Sıfır kural & sıfır ceza (Alışma devresi)",
-                dispatcherOrder: "Sayın Kaptanım, test sürüşü ve durak yanaşma intikallerinizi başarıyla tamamladınız. Artık Değirmenaltı durağında bekleyen ilk yolcularımızı perona davet etme vaktidir. Kalkış durağında E tuşu ile ön kapıyı açarak yolcularınızı buyur ediniz. Yolcuları sarsmadan, tebessümle karşılayarak çarşı merkezine güvenle ulaştırınız. Seferinizde herhangi bir gecikme cezası veya zaman sınırı yoktur; yolcu memnuniyeti kurumumuzun temel ilkesidir. Hayırlı seferler dileriz."
+                dispatcherOrder: "Sayın Kaptanım, test sürüşü ve durak yanaşma intikallerinizi başarıyla tamamladınız. Artık Değirmenaltı durağında bekleyen ilk yolcularımızı perona davet etme vaktidir. Kalkış durağında PageUp (Sayfa Yukarı) tuşu ile ön kapıyı açarak yolcularınızı buyur ediniz. Yolcuları sarsmadan, tebessümle karşılayarak çarşı merkezine güvenle ulaştırınız. Seferinizde herhangi bir gecikme cezası veya zaman sınırı yoktur; yolcu memnuniyeti kurumumuzun temel ilkesidir. Hayırlı seferler dileriz."
             },
             {
                 index: 3,
@@ -112,7 +112,7 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "Öğrenci Yoğunluğu & Korna (H) Kullanım Disiplini",
+                featureUnlock: "Öğrenci Yoğunluğu & Korna (L) Kullanım Disiplini",
                 rulesActive: "Sıfır kural & sıfır ceza (Alışma devresi)",
                 dispatcherOrder: "Sayın Kaptanım, 100. Yıl Okullar Bölgesi ring seferi tarafınıza tahsis edilmiştir. Ders çıkış saatinde duraklarda oluşacak öğrenci yoğunluğuna karşı durak yanaşmalarında azami dikkat göstermeniz ve gereksiz korna çalmaktan imtina etmeniz gerekmektedir. Süre sınırlaması yoktur; genç yolcularımızın can güvenliği her şeyin üzerindedir. İyi görevler dileriz."
             },
@@ -127,9 +127,9 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "Akustik Duracak Zili & Arka Kapı (Q)",
+                featureUnlock: "Akustik Duracak Zili & Arka Kapı (PageDown / Sayfa Aşağı)",
                 rulesActive: "Sıfır kural & sıfır ceza (Alışma devresi)",
-                dispatcherOrder: "Sayın Kaptanım, Köprübaşı - Yenişehir seferinde araç içi akustik yolcu talep sistemimiz aktif edilmiştir. Durağa 200 metre kala iniş yapacak yolcular duracak butonuna basacak ve kabinde ikaz zili çalacaktır. Bu ikazı aldığınızda durakta durarak Q tuşu ile arka kapıyı açınız. Seferinizde süre baskısı bulunmamaktadır; nizami yolcu tahliyesi esastır. Emniyetli sürüşler dileriz."
+                dispatcherOrder: "Sayın Kaptanım, Köprübaşı - Yenişehir seferinde araç içi akustik yolcu talep sistemimiz aktif edilmiştir. Durağa 200 metre kala iniş yapacak yolcular duracak butonuna basacak ve kabinde ikaz zili çalacaktır. Bu ikazı aldığınızda durakta durarak PageDown (Sayfa Aşağı) tuşu ile arka kapıyı açınız. Seferinizde süre baskısı bulunmamaktadır; nizami yolcu tahliyesi esastır. Emniyetli sürüşler dileriz."
             },
             {
                 index: 7,
@@ -232,9 +232,9 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "Dinamik Yağmur & Silecek Kademeleri (X)",
+                featureUnlock: "Dinamik Yağmur & Silecek Kademeleri (Shift + W)",
                 rulesActive: "Sıfır kural & sıfır ceza (Telsiz ve yağmur sistemleri devrede)",
-                dispatcherOrder: "Sayın Kaptanım, güzergâh üzerinde sağanak yağış başlamıştır. Yağış şartlarında görüş netliğini sağlamak amacıyla X tuşu ile silecekleri devreye alınız. Islak zeminde takip mesafesini koruyunuz. Süre baskısı kesinlikle yoktur; selametle varış esastır. İyi görevler dileriz."
+                dispatcherOrder: "Sayın Kaptanım, güzergâh üzerinde sağanak yağış başlamıştır. Yağış şartlarında görüş netliğini sağlamak amacıyla Shift + W tuşları ile silecekleri devreye alınız. Islak zeminde takip mesafesini koruyunuz. Süre baskısı kesinlikle yoktur; selametle varış esastır. İyi görevler dileriz."
             },
             {
                 index: 14,
@@ -292,9 +292,9 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "Gece Sürüşü & Kısa/Uzun Farlar (L)",
+                featureUnlock: "Gece Sürüşü & Kısa/Uzun Farlar (F)",
                 rulesActive: "Sıfır kural & sıfır ceza (Telsiz ve yağmur sistemleri devrede)",
-                dispatcherOrder: "Sayın Kaptanım, akşam alacakaranlığında sefer güvenliğini temin etmek amacıyla L tuşu ile kısa farlarınızı aktif ediniz. Karşı şeritten gelen sürücüleri rahatsız etmeden nizami aydınlatma sağlayınız. Zaman baskısı yoktur. Emniyetli seferler dileriz."
+                dispatcherOrder: "Sayın Kaptanım, akşam alacakaranlığında sefer güvenliğini temin etmek amacıyla F tuşu ile kısa farlarınızı aktif ediniz. Karşı şeritten gelen sürücüleri rahatsız etmeden nizami aydınlatma sağlayınız. Zaman baskısı yoktur. Emniyetli seferler dileriz."
             },
             {
                 index: 18,

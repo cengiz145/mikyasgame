@@ -35,6 +35,10 @@ const StopDiscovery = {
         }
     },
 
+    getDiscoveredStops: function() {
+        return Object.keys(this.getDiscoveredData());
+    },
+
     saveDiscoveredData: function(data) {
         try {
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));

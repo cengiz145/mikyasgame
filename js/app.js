@@ -1349,7 +1349,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     detailedInstructions: "Şehirlerarası Sefer Adımları:\n1. Adım: " + startStop + " durağından bekleyen 28 yolcuyu alarak hareket edin.\n2. Adım (Hedef Son Durak): Sonra " + endStop + " durağına gidin; tüm yolcuları indirin ve görevi başarıyla tamamlayın.",
                     speechBriefing: "Şehirlerarası " + Game.currentCity + " " + destCity + " seferi. 1. Adım: " + startStop + " durağından bekleyen yolcuları alarak hareket edin. 2. Adım: Son durak olan " + endStop + " durağına varıp tüm yolcuları indirin ve görevi tamamlayın.",
                     color: "#facc15",
-                    taskIndex: Game.completedTasks,
+                    taskIndex: null,
                     otobusKapasitesi: 28,
                     biletFiyatMultiplier: 10,
                     isIntercity: true,

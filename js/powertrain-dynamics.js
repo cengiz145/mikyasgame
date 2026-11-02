@@ -82,26 +82,29 @@
                 game.batteryVoltage = 24.4;
             }
             const ambient = (typeof game.temperature === 'number') ? game.temperature : 18.0;
-            if (typeof game.cabinTemperature !== 'number' || isNaN(game.cabinTemperature)) {
-                game.cabinTemperature = 21.5;
+            if (typeof game.busTemperature !== 'number' || isNaN(game.busTemperature)) {
+                game.busTemperature = 22.0;
             }
+            game.cabinTemperature = game.busTemperature;
 
             const isRunning = (typeof audio !== 'undefined' && audio.isEngineRunning) || game.engineStarted;
             const doorsOpen = !!(game.frontDoorOpen || game.rearDoorOpen);
             const winOpen = !!(typeof audio !== 'undefined' && audio.isWindowOpen);
             const passCount = game.passengersOnBoard || 0;
 
-            // 1. CANLI KABİN İKLİMLENDİRME (Webasto Kalorifer / Konvekta Tavan Kliması & Açık Kapı/Cam Isı Kaybı)
+            // 1. CANLI KABİN İKLİMLENDİRME (Klima / Kalorifer isACOn (K Tuşu) ile tek merkezden yönetilir)
+            const isBrokenWin = !!(game.busDamage && (game.busDamage.leftWindow >= 100 || game.busDamage.rightWindow >= 100));
             const windowDmgLeak = (game.busDamage) ? (((game.busDamage.leftWindow || 0) + (game.busDamage.rightWindow || 0)) * 0.002) : 0;
             const outsideExposure = (doorsOpen ? 0.18 : 0.015) + (winOpen ? 0.06 : 0) + windowDmgLeak;
-            // Dış ortam sıcaklığına doğru doğal ısı transferi + yolcu vücut ısısı
-            game.cabinTemperature += ((ambient - game.cabinTemperature) * outsideExposure + (passCount * 0.0012)) * deltaTime;
-            if (isRunning) {
-                // Otomatik çift bölgeli klima/kalorifer kabini 21.5°C konfor sıcaklığına dengeler
-                const targetCabinTemp = 21.5;
-                game.cabinTemperature += (targetCabinTemp - game.cabinTemperature) * 0.14 * deltaTime;
+            if (isRunning && game.isACOn && !winOpen && !isBrokenWin) {
+                const targetCabinTemp = 22.0;
+                game.busTemperature += (targetCabinTemp - game.busTemperature) * 0.14 * deltaTime;
+            } else {
+                // Klima kapalıyken veya cam açık/kırıkken dış ortam sıcaklığına ve yolcu ısısına yaklaşır
+                game.busTemperature += ((ambient - game.busTemperature) * outsideExposure + (passCount * 0.0012)) * deltaTime;
             }
-            game.cabinTemperature = Math.max(-5.0, Math.min(42.0, game.cabinTemperature));
+            game.busTemperature = Math.max(-5.0, Math.min(42.0, game.busTemperature));
+            game.cabinTemperature = game.busTemperature;
 
             // 2. CANLI YOLCU KABİN MIRILTISI VE UZUN YOL MUAVİN İKRAMI
             if (typeof audio !== 'undefined' && typeof audio.updatePassengerCabinMurmur === 'function') {
@@ -305,7 +308,10 @@
             const oil = (typeof game.engineOilPressure === 'number') ? game.engineOilPressure.toFixed(1) : "4.8";
             const turbo = (typeof game.turboBoostBar === 'number') ? game.turboBoostBar.toFixed(1) : "0.0";
             const volt = (typeof game.batteryVoltage === 'number') ? game.batteryVoltage.toFixed(1) : "28.3";
-            const cabinT = (typeof game.cabinTemperature === 'number') ? game.cabinTemperature.toFixed(1) : "21.5";
+            const rawCabinT = (typeof game.busTemperature === 'number' && !isNaN(game.busTemperature))
+                ? game.busTemperature
+                : ((typeof game.cabinTemperature === 'number' && !isNaN(game.cabinTemperature)) ? game.cabinTemperature : 22);
+            const cabinT = Math.floor(rawCabinT);
             const airPsi = Math.round((typeof game.airPressure === 'number') ? game.airPressure : 120);
             const passCount = game.passengersOnBoard || 0;
             

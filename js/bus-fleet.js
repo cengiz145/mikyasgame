@@ -265,7 +265,7 @@ const BusFleet = {
             acceleration: 1.28,
             braking: 1.35,
             engine: "Mercedes-Benz OM 470 Euro 6 (10.7L - 456 HP / 335 kW - 2200 Nm)",
-            transmission: "Mercedes GO 250-8 PowerShift 3 (8 İleri Otomatik + Voith SWR Su Retarderli)",
+            transmission: "Mercedes PowerShift 6 İleri Otomatik + Voith SWR Su Retarderli",
             doorType: "Pnömatik Tekli Piston Ön & Orta Kapı",
             features: "13.11m gerçek fabrika boyutu, 490L yakıt deposu, 456 HP / 2200 Nm OM 470 motor, 41 koltuklu 2+1 düzen, Voith Aquatarder SWR.",
             desc: "Mercedes-Benz Türk Hoşdere üretimi Türkiye otoyollarının amiral gemisi. 456 beygirlik gerçek fabrika verili lüks seyahat ikonu.",
@@ -311,7 +311,7 @@ const BusFleet = {
             acceleration: 1.24,
             braking: 1.28,
             engine: "Mercedes-Benz OM 470 Euro 6 (10.7L - 428 HP / 315 kW - 2100 Nm)",
-            transmission: "Mercedes GO 250-8 PowerShift 3 (8 İleri Otomatik + Voith SWR Retarder)",
+            transmission: "Mercedes PowerShift 6 İleri Otomatik + Voith SWR Retarder",
             doorType: "Pnömatik Dışa Açılır Yolcu Kapısı",
             features: "13.11m gerçek fabrika boyutu, 480L yakıt deposu, 428 HP / 2100 Nm OM 470 motor, 41 koltuklu 2+1 Rahat düzen.",
             desc: "Hoşdere fabrikası üretimi, Türkiye otogarlarının en çok tercih edilen 428 beygirlik uzun yol otobüsü.",
@@ -358,7 +358,7 @@ const BusFleet = {
             acceleration: 1.36,
             braking: 1.36,
             engine: "MAN D2676 LOH Euro 6e (12.4L - 480 HP / 353 kW - 2400 Nm)",
-            transmission: "MAN TipMatic Coach 12.25 OD (12 İleri Otomatik + ZF Intarder 3)",
+            transmission: "MAN TipMatic Coach (6 İleri Otomatik + ZF Intarder 3)",
             doorType: "Pnömatik Dışa Açılır Çift Kilitli Kapı",
             features: "13.09m gerçek Ankara fabrikası verisi, 525L yakıt deposu, 12.4L 480 HP / 2400 Nm tork, 4000 Nm ZF Intarder 3.",
             desc: "MAN Ankara Akyurt fabrikası üretimi gerçek katalog verili Lion's Coach C. 2400 Nm torkuyla rampaları düz yol gibi tırmanır.",
@@ -404,7 +404,7 @@ const BusFleet = {
             acceleration: 1.42,
             braking: 1.45,
             engine: "Mercedes-Benz OM 471 LA Euro 6 (12.8L - 510 HP / 375 kW - 2500 Nm)",
-            transmission: "Mercedes GO 250-8 PowerShift 3 (8 İleri Otomatik + Voith Aquatarder SWR)",
+            transmission: "Mercedes PowerShift (6 İleri Otomatik + Voith Aquatarder SWR)",
             doorType: "Elektro-Pnömatik Akıllı Kapı",
             features: "13.32m gerçek Neu-Ulm fabrika boyutu, 510L yakıt deposu, 12.8L 510 HP / 2500 Nm OM 471 motor, aktif arka aks yönlendirme.",
             desc: "Daimler Buses zirvesi. 510 beygir ve 2500 Nm torklu çift arka dingilli ultra lüks VIP seyahat otobüsü.",
@@ -590,7 +590,7 @@ const BusFleet = {
             acceleration: 1.44,
             braking: 1.42,
             engine: "Scania DC13 147 Euro 6 (12.7L - 500 HP / 368 kW - 2550 Nm)",
-            transmission: "Scania Opticruise GRSO895R 12 İleri Otomatik + R4100D Retarder",
+            transmission: "Scania Opticruise 6 İleri Otomatik + R4100D Retarder",
             doorType: "Pnömatik Çift Kilitli Elektro-Hidrolik Kapı",
             features: "14.07m gerçek fabrika boyutu, 600L yakıt deposu, 12.7L 500 HP / 2550 Nm Scania DC13 motor, 4100 Nm Scania R4100D retarder.",
             desc: "500 beygirlik İsveç Scania şasisi ve İspanyol Irizar i8 VIP karoserinin gerçek katalog verili birleşimi.",
@@ -637,7 +637,7 @@ const BusFleet = {
             acceleration: 1.38,
             braking: 1.4,
             engine: "MAN D2676 LOH Euro 6 (12.4L - 470 HP / 346 kW - 2400 Nm)",
-            transmission: "MAN TipMatic Coach 12 İleri Otomatik + ZF Intarder 3",
+            transmission: "MAN TipMatic Coach 6 İleri Otomatik + ZF Intarder 3",
             doorType: "Pnömatik Çift Emniyetli Kapı",
             features: "12.99m gerçek fabrika boyutu (N1216 HD), 490L yakıt deposu, 470 HP / 2400 Nm MAN D2676 motor, bölünmüş Sharp Cut ön cam.",
             desc: "Neoplan'ın ödüllü Sharp Cut tasarımına sahip gerçek katalog verili 12.99 metre Cityliner C modeli.",
@@ -685,9 +685,9 @@ const BusFleet = {
             acceleration: 1.25,
             braking: 1.18,
             engine: "Iveco F1C 3.0L HPI Twin-Turbo Euro 6 (210 HP / 154 kW - 470 Nm)",
-            transmission: "ZF Hi-Matic 8HP 8 İleri Tam Otomatik + Telma Retarder",
+            transmission: "ZF Hi-Matic 6 İleri Tam Otomatik + Telma Retarder",
             doorType: "Elektrikli Otomatik Sürgülü / Dışa Açılır Yolcu Kapısı",
-            features: "7.22m gerçek fabrika boyutu, 100L yakıt deposu, 3.0L 210 HP / 470 Nm F1C motor, 8 ileri ZF Hi-Matic şanzıman, Telma retarder.",
+            features: "7.22m gerçek fabrika boyutu, 100L yakıt deposu, 3.0L 210 HP / 470 Nm F1C motor, 6 ileri ZF Hi-Matic şanzıman, Telma retarder.",
             desc: "Dar mahalle sokaklarında ve tepe hatlarında yüksek torkuyla çalışan gerçek katalog verili Iveco Daily 70C21.",
             nvhLevel: 68,
             chassisRigidity: 72,
@@ -914,7 +914,7 @@ const BusFleet = {
             acceleration: 1.38,
             braking: 1.36,
             engine: "DAF PACCAR MX-11 330 Euro 6 (10.8L - 449 HP / 330 kW - 2300 Nm)",
-            transmission: "ZF TraXon 12 TX 2411 BO (12 İleri Otomatik + ZF Intarder 3)",
+            transmission: "ZF TraXon 6 İleri Otomatik + ZF Intarder 3",
             doorType: "Pnömatik Çift Kilitli Lüks Yolcu Kapısı",
             features: "13.08m uzunluk ve 3.90m yükseklik gerçek fabrika verisi, 562L yakıt deposu, 449 HP / 2300 Nm DAF MX-11 motor, 41 koltuklu 2+1 düzen.",
             desc: "Temsa Adana fabrikası üretimi gerçek katalog verili Maraton 13 VIP. 562 litre yakıt deposu, 11 m³ bagaj ve 2300 Nm tork.",
@@ -1044,13 +1044,8 @@ const BusFleet = {
             if (nmMatch) torqueNm = parseInt(nmMatch[1], 10);
         }
 
-        // Şanzıman metninden gerçek vites sayısını çıkar (6, 8 veya 12 ileri)
-        let gearCount = 6;
-        if (b.transmission) {
-            if (/12\s*İleri|TipMatic Coach 12|TraXon 12|Opticruise/i.test(b.transmission)) gearCount = 12;
-            else if (/8\s*İleri|GO 250-8|8HP/i.test(b.transmission)) gearCount = 8;
-            else gearCount = 6;
-        }
+        // Standart 6 ileri şanzıman kademesi
+        const gearCount = 6;
 
         return {
             emptyWeightTon,

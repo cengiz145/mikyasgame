@@ -874,7 +874,7 @@ function createOrGetFreeRoamRoute(cityName, districtName, neighborhoodName) {
                 sehir: "Tekirdağ",
                 district: districtName,
                 isFreeRoam: true,
-                taskIndex: 0,
+                taskIndex: null,
                 name: "[Serbest Rota] Tekirdağ " + districtName + ": " + (isFullDistrictTour ? "Tüm Mahalleler Turu" : neighborhoodName),
                 speechBriefing: "Tekirdağ " + districtName + ", " + neighborhoodName + " serbest seferi. Kalkış durağınız: " + (matchingLine.startStop || "Kalkış Garajı") + ". İyi sürüşler kaptan."
             });
@@ -909,7 +909,7 @@ function createOrGetFreeRoamRoute(cityName, districtName, neighborhoodName) {
         district: districtName,
         mahalle: neighborhoodName,
         isFreeRoam: true,
-        taskIndex: 0,
+        taskIndex: null,
         licenseLevel: 1,
         color: "#22c55e",
         name: "[Serbest Rota] " + (cityName || 'Tekirdağ') + " - " + (districtName || 'Merkez') + (cleanMahalle ? " (" + cleanMahalle + ")" : ""),

@@ -141,7 +141,7 @@ const DriverBadges = {
             desc: 'Marmara, Ege ve Akdeniz sahil yollarında deniz meltemi eşliğinde yolcularına VIP konfor sunan kıyı reisi.',
             requirement: 'Sahil ve kıyı hatlarında toplam en az 15 sefer tamamlayın.',
             badgeId: 'brove_kiyi_sahil',
-            unlockCondition: (stats) => ((stats.coastalTrips || stats.totalTrips || 0) >= 15)
+            unlockCondition: (stats) => (stats.coastalTrips || 0) >= 15
         },
         {
             id: 'title_sehir_ici_cambazi',
@@ -291,7 +291,7 @@ const DriverBadges = {
             desc: 'Mikyas Kaptanlık Akademisi’nin tüm operasyonel sınavlarını geçmiş, liyakat ve disiplinde zirveye ulaşmış şeref kaptanı.',
             requirement: 'İlerleme modunda en az 15 operasyonel görevi tamamlayın veya ehliyet seviyenizi 10’a çıkarın.',
             badgeId: 'brove_altin_direksiyon',
-            unlockCondition: (stats) => (stats.totalTrips || 0) >= 15 || (stats.licenseLevel || 1) >= 10
+            unlockCondition: (stats) => (stats.completedTasks || 0) >= 15 || (stats.licenseLevel || 1) >= 10
         },
         {
             id: 'title_efsanevi_maresal',
@@ -502,7 +502,7 @@ const DriverBadges = {
             requirement: 'Sahil ve kıyı hatlarında toplam en az 15 sefer tamamlayın.',
             grantedTitleId: 'title_kiyi_seridi',
             getProgress: (stats) => {
-                const cur = stats.totalTrips || 0;
+                const cur = stats.coastalTrips || 0;
                 return { current: cur, target: 15, isCompleted: cur >= 15, percent: Math.min(100, Math.round((cur / 15) * 100)) };
             }
         },
@@ -694,8 +694,59 @@ const DriverBadges = {
             requirement: 'İlerleme modunda en az 15 operasyonel görevi tamamlayın veya ehliyet seviyenizi 10’a yükseltin.',
             grantedTitleId: 'title_altin_direksiyon_sovalyesi',
             getProgress: (stats) => {
-                const cur = Math.max(stats.totalTrips || 0, stats.licenseLevel || 1);
-                return { current: cur, target: 15, isCompleted: cur >= 15, percent: Math.min(100, Math.round((cur / 15) * 100)) };
+                const tasks = stats.completedTasks || 0;
+                const lvl = stats.licenseLevel || 1;
+                const isDone = (tasks >= 15 || lvl >= 10);
+                const cur = isDone ? 15 : tasks;
+                return { current: cur, target: 15, isCompleted: isDone, percent: Math.min(100, Math.round((cur / 15) * 100)) };
+            }
+        },
+        {
+            id: 'mahalle_kasifi',
+            title: 'Mahalle Kâşifi Brövesi',
+            icon: '🗺️',
+            category: 'cografya',
+            categoryName: 'Coğrafya & Keşif',
+            tier: 2,
+            tierName: 'Gümüş Bröve',
+            desc: 'Farklı mahalle ve cadde duraklarına yanaşarak şehir hafızasını geliştiren araştırmacı kaptanlara verilir.',
+            requirement: 'Durak Keşif Albümünde en az 5 farklı durağı keşfedin.',
+            grantedTitleId: null,
+            getProgress: (stats) => {
+                const cur = stats.stopsDiscovered || 0;
+                return { current: cur, target: 5, isCompleted: cur >= 5, percent: Math.min(100, Math.round((cur / 5) * 100)) };
+            }
+        },
+        {
+            id: 'hat_hakimi',
+            title: 'Hat Hâkimi ve Rehber Kaptan Brövesi',
+            icon: '🧭',
+            category: 'cografya',
+            categoryName: 'Coğrafya & Keşif',
+            tier: 4,
+            tierName: 'Platin Bröve',
+            desc: 'Görev yaptığı ilçedeki durakların büyük çoğunluğunu avucunun içi gibi öğrenen usta hat kaptanlarına verilir.',
+            requirement: 'Bir ilçedeki durakların %80’ini veya toplamda 20 farklı durağı keşfedin.',
+            grantedTitleId: null,
+            getProgress: (stats) => {
+                const cur = stats.stopsDiscovered || 0;
+                return { current: cur, target: 20, isCompleted: cur >= 20, percent: Math.min(100, Math.round((cur / 20) * 100)) };
+            }
+        },
+        {
+            id: 'emektar_direksiyon',
+            title: 'Emektar Direksiyon (30 Dakika Mesai) Brövesi',
+            icon: '⏱️',
+            category: 'emniyet',
+            categoryName: 'Kariyer & Mesai',
+            tier: 3,
+            tierName: 'Altın Bröve',
+            desc: 'Direksiyon başında kesintisiz 30 dakika boyunca sabır ve dikkatle halkımıza hizmet veren emektar kaptanlara verilir.',
+            requirement: 'Direksiyon başında toplam 30 dakika (1800 saniye) aktif sürüş mesaisini tamamlayın.',
+            grantedTitleId: null,
+            getProgress: (stats) => {
+                const cur = Math.floor((stats.totalDrivingSeconds || 0) / 60);
+                return { current: cur, target: 30, isCompleted: cur >= 30, percent: Math.min(100, Math.round((cur / 30) * 100)) };
             }
         }
     ],
@@ -801,8 +852,11 @@ const DriverBadges = {
                 stats.citiesVisitedCount = Math.max(stats.citiesVisitedCount, Game.unlockedCities.length);
             }
         }
-        if (typeof StopDiscovery !== 'undefined' && StopDiscovery.getDiscoveredStops) {
-            stats.stopsDiscovered = Math.max(stats.stopsDiscovered, StopDiscovery.getDiscoveredStops().length);
+        if (typeof StopDiscovery !== 'undefined') {
+            const discCount = (typeof StopDiscovery.getDiscoveredStops === 'function')
+                ? StopDiscovery.getDiscoveredStops().length
+                : (typeof StopDiscovery.getDiscoveredData === 'function' ? Object.keys(StopDiscovery.getDiscoveredData()).length : 0);
+            stats.stopsDiscovered = Math.max(stats.stopsDiscovered || 0, discCount);
         }
 
         // Şirket Yönetimi İstatistikleri Entegrasyonu
@@ -833,10 +887,11 @@ const DriverBadges = {
             }
             stats.companyHqUpgradesCount = Math.max(stats.companyHqUpgradesCount || 0, hqCount);
 
-            stats.companyCateringVip = (cData.cateringPackage === 'vip' || cData.cateringPackage === 'standart') ? 1 : 0;
-            stats.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'standart') ? 1 : 0;
-            stats.companyContractsDone = (cData.specialContractsCompletedCount || (cData.specialContracts && cData.specialContracts.length) || 0);
-            stats.companySatisfactionHighScore = (cData.satisfactionRating >= 4.8) ? 1 : 0;
+            const hasActiveCompanyTrips = (cData.completedTripsCount || 0) >= 1;
+            stats.companyCateringVip = (cData.cateringPackage === 'vip' || (cData.cateringPackage === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
+            stats.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'kurumsal' || (cData.facilityContract === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
+            stats.companyContractsDone = Math.max(stats.companyContractsDone || 0, cData.specialContractsCompletedCount || 0);
+            stats.companySatisfactionHighScore = (hasActiveCompanyTrips && cData.satisfactionRating >= 4.8) ? 1 : 0;
             stats.companyMastery = (cData.companyLevel >= 5 && (cData.companyTreasury || 0) >= 50000000) ? 1 : 0;
         }
 
@@ -1143,7 +1198,12 @@ const DriverBadges = {
             lifetime.nightStartsCount = (lifetime.nightStartsCount || 0) + 1;
         }
 
-        if (gameInstance.weather === 'rain' || gameInstance.weather === 'snow' || (typeof weatherSystem !== 'undefined' && (weatherSystem.current === 'rain' || weatherSystem.current === 'snow'))) {
+        if (
+            gameInstance.weather === 'rain' || gameInstance.weather === 'snow' ||
+            gameInstance.weather === 'rainy' || gameInstance.weather === 'snowy' ||
+            gameInstance.activeClimateRegime === 'yagmurlu' || gameInstance.activeClimateRegime === 'karli' ||
+            (typeof weatherSystem !== 'undefined' && (weatherSystem.current === 'rain' || weatherSystem.current === 'snow' || weatherSystem.current === 'rainy' || weatherSystem.current === 'snowy'))
+        ) {
             lifetime.rainSnowStartsCount = (lifetime.rainSnowStartsCount || 0) + 1;
         }
 
@@ -1156,7 +1216,8 @@ const DriverBadges = {
             lifetime.fullFuelStartsCount = (lifetime.fullFuelStartsCount || 0) + 1;
         }
 
-        if (gameInstance.airPressurePSI >= 115) {
+        const currentAirPressure = (typeof gameInstance.airPressure === 'number') ? gameInstance.airPressure : (gameInstance.airPressurePSI || 0);
+        if (currentAirPressure >= 115) {
             lifetime.airPressureFullStarts = (lifetime.airPressureFullStarts || 0) + 1;
         }
 
@@ -1169,7 +1230,15 @@ const DriverBadges = {
             : (gameInstance.selectedBus || null);
 
         if (curBus) {
-            const isArticulated = (curBus.category === 'koruklu' || (curBus.name && curBus.name.toLowerCase().includes('körüklü')));
+            const busLabel = ((curBus.fullName || '') + ' ' + (curBus.model || '') + ' ' + (curBus.name || '') + ' ' + (curBus.id || '')).toLowerCase();
+            const isArticulated = (
+                curBus.category === 'koruklu' ||
+                curBus.soundGroup === 'articulated' ||
+                busLabel.includes('körüklü') ||
+                busLabel.includes('koruklu') ||
+                busLabel.includes('articulated') ||
+                busLabel.includes('conecto_g')
+            );
             if (curBus.sizeTier === 1) {
                 lifetime.midibusStartsCount = (lifetime.midibusStartsCount || 0) + 1;
             } else if (curBus.sizeTier === 2) {
@@ -1360,7 +1429,15 @@ const DriverBadges = {
         }
 
         // Keşfedilen Duraklar ve Şehirler
-        const stopsCount = (typeof stats.stopsDiscovered === 'number') ? stats.stopsDiscovered : (typeof StopDiscovery !== 'undefined' && StopDiscovery.getDiscoveredStops ? StopDiscovery.getDiscoveredStops().length : (lifetime.stopsDiscovered || 0));
+        const liveDiscoveredStops = (typeof StopDiscovery !== 'undefined')
+            ? ((typeof StopDiscovery.getDiscoveredStops === 'function')
+                ? StopDiscovery.getDiscoveredStops().length
+                : (typeof StopDiscovery.getDiscoveredData === 'function' ? Object.keys(StopDiscovery.getDiscoveredData()).length : 0))
+            : 0;
+        const stopsCount = Math.max(
+            typeof stats.stopsDiscovered === 'number' ? stats.stopsDiscovered : 0,
+            liveDiscoveredStops
+        );
         lifetime.stopsDiscovered = Math.max(lifetime.stopsDiscovered || 0, stopsCount);
 
         const citiesCount = (typeof stats.unlockedCitiesCount === 'number') ? stats.unlockedCitiesCount : (typeof Game !== 'undefined' && Game.unlockedCities ? Game.unlockedCities.length : (lifetime.citiesVisitedCount || 1));
@@ -1397,10 +1474,11 @@ const DriverBadges = {
             }
             lifetime.companyHqUpgradesCount = Math.max(lifetime.companyHqUpgradesCount || 0, hqCount);
 
-            lifetime.companyCateringVip = (cData.cateringPackage === 'vip' || cData.cateringPackage === 'standart') ? 1 : 0;
-            lifetime.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'standart') ? 1 : 0;
-            lifetime.companyContractsDone = (cData.specialContractsCompletedCount || (cData.specialContracts && cData.specialContracts.length) || 0);
-            lifetime.companySatisfactionHighScore = (cData.satisfactionRating >= 4.8) ? 1 : 0;
+            const hasActiveCompanyTrips = (cData.completedTripsCount || 0) >= 1;
+            lifetime.companyCateringVip = (cData.cateringPackage === 'vip' || (cData.cateringPackage === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
+            lifetime.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'kurumsal' || (cData.facilityContract === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
+            lifetime.companyContractsDone = Math.max(lifetime.companyContractsDone || 0, cData.specialContractsCompletedCount || 0);
+            lifetime.companySatisfactionHighScore = (hasActiveCompanyTrips && cData.satisfactionRating >= 4.8) ? 1 : 0;
             lifetime.companyMastery = (cData.companyLevel >= 5 && (cData.companyTreasury || 0) >= 50000000) ? 1 : 0;
         }
 
@@ -1491,7 +1569,7 @@ const DriverBadges = {
         const unlBroves = this.getUnlockedBrovelerCount();
         const unlAchs = this.getUnlockedCount();
 
-        let welcomeSpeech = "Liyakat ve Başarılar Paneli açıldı. Aktif unvanınız: " + currentTitle.name + ". Kazanılan Bröveler: 24 üzerinden " + unlBroves + ". Açılan Unvanlar: 28 üzerinden " + unlTitles + ". Tamamlanan Başarılar: " + unlAchs + ".";
+        let welcomeSpeech = "Liyakat ve Başarılar Paneli açıldı. Aktif unvanınız: " + currentTitle.name + ". Kazanılan Bröveler: " + this.CAPTAIN_BADGES.length + " üzerinden " + unlBroves + ". Açılan Unvanlar: " + this.CAPTAIN_TITLES.length + " üzerinden " + unlTitles + ". Tamamlanan Başarılar: " + unlAchs + ".";
 
         if (typeof audio !== 'undefined') {
             if (typeof audio.playSwitchClick === 'function') audio.playSwitchClick();
@@ -2040,7 +2118,8 @@ const DriverBadges = {
         if (tab1500) tab1500.addEventListener('click', () => {
             this.currentMainTab = 'achievements';
             this.renderModal();
-            if (typeof audio !== 'undefined' && audio.speak) audio.speak("1500 Şoför başarısı veritabanı sekmesine geçildi.");
+            const count = (this.badges && this.badges.length) ? this.badges.length : 1900;
+            if (typeof audio !== 'undefined' && audio.speak) audio.speak(count + " Şoför başarısı veritabanı sekmesine geçildi.");
         });
 
         // 1500 Başarı Alt Sekmeleri

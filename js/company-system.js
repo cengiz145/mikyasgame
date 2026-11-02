@@ -53,6 +53,7 @@
             hiredDrivers: [],
             marketTrends: {},              // routeId -> { multiplier, trendName, icon, desc, expiresAt }
             specialContracts: [],          // Aktif VIP ihaleler
+            specialContractsCompletedCount: 0, // Tamamlanan / Kabul Edilen VIP İhale Sayısı
             radioLogs: [],                 // Canlı telsiz kayıtları
             bankruptcyWarned250k: false,   // -250.000 ₺ Sarı Alarm Uyarısı Yapıldı mı
             bankruptcyWarned750k: false,   // -750.000 ₺ Kırmızı Alarm Uyarısı Yapıldı mı
@@ -1930,6 +1931,201 @@
                 traitDesc: "Tam zamanında perona yanaşır. Her sefer bitiminde +%25 dakiklik ikramiyesi kazandırır.",
                 desc: "Kusursuz zamanlama ustası. Sefer gecikmelerine asla izin vermez.",
                 preferredBusClass: "buyuk"
+            },
+            {
+                id: "drv_orhan",
+                name: "Orhan Baba",
+                avatar: "👨‍✈️",
+                startRankLevel: 3,
+                startXP: 420,
+                wagePerTrip: 380,
+                hireFee: 1050,
+                traitId: "trait_fuel",
+                traitName: "Körük & Retarder Ustası",
+                traitBadge: "⛽",
+                traitDesc: "İnişlerde retarderi nakış gibi işler. Sefer yakıt ve fren balatası giderini %45 düşürür.",
+                desc: "30 yıllık Trakya ve Anadolu kaptanı. Tek damla mazotu boşa harcamaz.",
+                preferredBusClass: "buyuk"
+            },
+            {
+                id: "drv_zeynep",
+                name: "Zeynep Kaptan",
+                avatar: "👩‍✈️",
+                startRankLevel: 2,
+                startXP: 220,
+                wagePerTrip: 310,
+                hireFee: 820,
+                traitId: "trait_vip",
+                traitName: "5 Yıldızlı Konfor & İkram",
+                traitBadge: "💎",
+                traitDesc: "Sarsıntısız sürüşüyle yolcuları mest eder. Sefer başına +%22 VIP memnuniyet primi kazandırır.",
+                desc: "Sahil ve turizm hatlarının en sevilen güler yüzlü kaptanı.",
+                preferredBusClass: "orta"
+            },
+            {
+                id: "drv_kadir",
+                name: "Kadir Usta",
+                avatar: "🛠️",
+                startRankLevel: 3,
+                startXP: 390,
+                wagePerTrip: 360,
+                hireFee: 980,
+                traitId: "trait_mechanic",
+                traitName: "Kademe Başustası",
+                traitBadge: "🔧",
+                traitDesc: "Motor sesinden arızayı anlar. Kullandığı otobüsün kondisyon yıpranmasını %75 azaltır.",
+                desc: "Sanayi çıraklığından yetişme, otobüsün ciğerini bilen emektar kaptan.",
+                preferredBusClass: "orta"
+            },
+            {
+                id: "drv_burak",
+                name: "Burak Kaptan",
+                avatar: "🕶️",
+                startRankLevel: 2,
+                startXP: 190,
+                wagePerTrip: 295,
+                hireFee: 780,
+                traitId: "trait_speed",
+                traitName: "TEM Otoyol Ekspresi",
+                traitBadge: "🌙",
+                traitDesc: "Gece ekspres seferlerinde yüksek tempo tutturur. Sefer sürelerini %25 kısaltır.",
+                desc: "Tekirdağ - İstanbul - Ankara otoyol hattının genç ve dinamik kaptanı.",
+                preferredBusClass: "buyuk"
+            },
+            {
+                id: "drv_halil",
+                name: "Halil İbrahim Kaptan",
+                avatar: "🏔️",
+                startRankLevel: 4,
+                startXP: 820,
+                wagePerTrip: 490,
+                hireFee: 1500,
+                traitId: "trait_winter",
+                traitName: "Zigana & Kop Geçidi Fatihi",
+                traitBadge: "❄️",
+                traitDesc: "Tipi, buzlanma ve sisli dağ geçitlerinde sıfır hata ile ilerler; kaza riski %0'dır.",
+                desc: "Doğu ve Karadeniz hatlarının en çetin kış şartlarında bile rötar yapmayan ustası.",
+                preferredBusClass: "buyuk"
+            },
+            {
+                id: "drv_elif",
+                name: "Elif Kaptan",
+                avatar: "🌟",
+                startRankLevel: 3,
+                startXP: 460,
+                wagePerTrip: 400,
+                hireFee: 1150,
+                traitId: "trait_punctual",
+                traitName: "Kronometre Hassasiyeti",
+                traitBadge: "🎯",
+                traitDesc: "Durak ve otogar peronlarına saniyesi saniyesine yanaşır. +%25 dakiklik primi sağlar.",
+                desc: "Belediye ve kurumsal hatlarda dakikliğiyle ödül almış örnek sürücü.",
+                preferredBusClass: "orta"
+            },
+            {
+                id: "drv_cemal",
+                name: "Cemal Ağa",
+                avatar: "👑",
+                startRankLevel: 4,
+                startXP: 980,
+                wagePerTrip: 560,
+                hireFee: 1850,
+                traitId: "trait_mentor",
+                traitName: "Başkaptan & Hat Müfettişi",
+                traitBadge: "👑",
+                traitDesc: "Genç şoförleri eğitir ve filoyu denetler. Tüm filonun sefer gelirine +%12 liderlik primi ekler.",
+                desc: "Trakya otogarlarında herkesin saygıyla selamladığı 35 yıllık başkaptan.",
+                preferredBusClass: "buyuk"
+            },
+            {
+                id: "drv_serkan",
+                name: "Serkan Kaptan",
+                avatar: "🚐",
+                startRankLevel: 1,
+                startXP: 110,
+                wagePerTrip: 250,
+                hireFee: 580,
+                traitId: "trait_fuel",
+                traitName: "Şehir İçi Eko-Sürüş",
+                traitBadge: "⛽",
+                traitDesc: "Dur-kalk trafikte yakıtı koklatır. Sefer yakıt maliyetini %45 oranında düşürür.",
+                desc: "Çorlu ve Çerkezköy fabrika servislerinde yetişmiş ekonomik sürüş uzmanı.",
+                preferredBusClass: "kucuk"
+            },
+            {
+                id: "drv_yasemin",
+                name: "Yasemin Kaptan",
+                avatar: "🌸",
+                startRankLevel: 2,
+                startXP: 260,
+                wagePerTrip: 330,
+                hireFee: 890,
+                traitId: "trait_vip",
+                traitName: "Protokol & Turizm Uzmanı",
+                traitBadge: "💎",
+                traitDesc: "Özel tur ve protokol seferlerinde yüksek bahşiş ve +%22 VIP bilet geliri kazandırır.",
+                desc: "Kongre, üniversite ve kültür turlarının aranan protokol kaptanı.",
+                preferredBusClass: "buyuk"
+            },
+            {
+                id: "drv_tayfun",
+                name: "Tayfun Kaptan",
+                avatar: "⚡",
+                startRankLevel: 3,
+                startXP: 510,
+                wagePerTrip: 410,
+                hireFee: 1220,
+                traitId: "trait_speed",
+                traitName: "Ege & Akdeniz Maratoncusu",
+                traitBadge: "🌙",
+                traitDesc: "Uzun menzilli sahil ve otoyol rotalarında sefer süresini %25 kısaltarak araç devir hızını artırır.",
+                desc: "İzmir ve Antalya hatlarında mekik dokuyan uzun yol maratoncusu.",
+                preferredBusClass: "buyuk"
+            },
+            {
+                id: "drv_davut",
+                name: "Davut Usta",
+                avatar: "🔩",
+                startRankLevel: 2,
+                startXP: 310,
+                wagePerTrip: 340,
+                hireFee: 920,
+                traitId: "trait_mechanic",
+                traitName: "Şanzıman & Pnömatik Koruyucu",
+                traitBadge: "🔧",
+                traitDesc: "Vites geçişleri pamuk gibidir. Sefer başına otobüs yıpranmasını %75 oranında azaltır.",
+                desc: "Aracına gözü gibi bakan, garaja her zaman tertemiz otobüs teslim eden usta.",
+                preferredBusClass: "kucuk"
+            },
+            {
+                id: "drv_gokhan",
+                name: "Gökhan Kaptan",
+                avatar: "🧭",
+                startRankLevel: 3,
+                startXP: 580,
+                wagePerTrip: 430,
+                hireFee: 1280,
+                traitId: "trait_punctual",
+                traitName: "Anadolu Ekspres Nöbetçisi",
+                traitBadge: "🎯",
+                traitDesc: "Yoğun otogar giriş-çıkışlarında vakit kaybetmez. Her seferde +%25 dakiklik primi kazandırır.",
+                desc: "Esenler ve AŞTİ peronlarına gözü kapalı yanaşan disiplinli uzun yol kaptanı.",
+                preferredBusClass: "buyuk"
+            },
+            {
+                id: "drv_hikmet",
+                name: "Hikmet Kaptan",
+                avatar: "🎖️",
+                startRankLevel: 4,
+                startXP: 890,
+                wagePerTrip: 520,
+                hireFee: 1650,
+                traitId: "trait_winter",
+                traitName: "Kıdemli Kış & Gece Kaptanı",
+                traitBadge: "❄️",
+                traitDesc: "Zifiri karanlık ve kar fırtınasında bile sarsıntısız sürüş yapar; kaza ve arıza riski %0'dır.",
+                desc: "Mikyas Akademisi onur kurulu üyesi, milyon kilometreyi devirmiş duayen kaptan.",
+                preferredBusClass: "buyuk"
             }
         ],
 
@@ -2283,6 +2479,7 @@
                 hiredDrivers: [],
                 marketTrends: {},
                 specialContracts: [],
+                specialContractsCompletedCount: 0,
                 radioLogs: [],
                 bankruptcyWarned250k: false,
                 bankruptcyWarned750k: false,
@@ -3223,6 +3420,7 @@
             // İhaleyi kabul et: Peşin prim kasaya aktarılır
             this.data.companyTreasury = (this.data.companyTreasury || 0) + contract.rewardBonus;
             this.data.totalRevenue = (this.data.totalRevenue || 0) + contract.rewardBonus;
+            this.data.specialContractsCompletedCount = (this.data.specialContractsCompletedCount || 0) + 1;
             this.recordTransaction('income', 'dividends', `VIP Protokol İhale Primi: ${contract.title}`, contract.rewardBonus);
 
             this.playCashChime();

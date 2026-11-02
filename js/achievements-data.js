@@ -30,7 +30,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (5 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 5 yolcu taşıyın."
   },
   {
@@ -121,8 +121,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1 Kez)."
   },
   {
     "id": "ach_0010_durak_kesfi",
@@ -225,7 +225,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (10 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 10 yolcu taşıyın."
   },
   {
@@ -316,8 +316,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (2 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 2 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (2 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 2 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (2 Kez)."
   },
   {
     "id": "ach_0025_durak_kesfi",
@@ -420,7 +420,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (15 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 15 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 15 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 15 yolcu taşıyın."
   },
   {
@@ -511,8 +511,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (3 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 3 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (3 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 3 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (3 Kez)."
   },
   {
     "id": "ach_0040_durak_kesfi",
@@ -615,7 +615,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (20 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 20 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 20 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 20 yolcu taşıyın."
   },
   {
@@ -706,8 +706,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (4 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 4 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (4 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 4 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (4 Kez)."
   },
   {
     "id": "ach_0055_durak_kesfi",
@@ -810,7 +810,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (25 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 25 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 25 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 25 yolcu taşıyın."
   },
   {
@@ -901,8 +901,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (5 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 5 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (5 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 5 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (5 Kez)."
   },
   {
     "id": "ach_0070_durak_kesfi",
@@ -1005,7 +1005,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (30 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 30 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 30 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 30 yolcu taşıyın."
   },
   {
@@ -1096,8 +1096,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (6 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 6 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (6 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 6 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (6 Kez)."
   },
   {
     "id": "ach_0085_durak_kesfi",
@@ -1200,7 +1200,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (35 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 35 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 35 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 35 yolcu taşıyın."
   },
   {
@@ -1291,8 +1291,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (7 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 7 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (7 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 7 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (7 Kez)."
   },
   {
     "id": "ach_0100_durak_kesfi",
@@ -1395,7 +1395,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (40 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 40 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 40 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 40 yolcu taşıyın."
   },
   {
@@ -1486,8 +1486,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (8 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 8 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (8 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 8 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (8 Kez)."
   },
   {
     "id": "ach_0115_durak_kesfi",
@@ -1590,7 +1590,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (45 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 45 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 45 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 45 yolcu taşıyın."
   },
   {
@@ -1681,8 +1681,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (9 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 9 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (9 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 9 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (9 Kez)."
   },
   {
     "id": "ach_0130_durak_kesfi",
@@ -1785,7 +1785,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (50 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 50 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 50 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 50 yolcu taşıyın."
   },
   {
@@ -1876,8 +1876,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (10 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 10 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (10 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 10 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (10 Kez)."
   },
   {
     "id": "ach_0145_durak_kesfi",
@@ -1980,7 +1980,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (65 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 65 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 65 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 65 yolcu taşıyın."
   },
   {
@@ -2071,8 +2071,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (12 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 12 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (12 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 12 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (12 Kez)."
   },
   {
     "id": "ach_0160_durak_kesfi",
@@ -2175,7 +2175,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (80 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 80 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 80 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 80 yolcu taşıyın."
   },
   {
@@ -2266,8 +2266,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (14 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 14 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (14 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 14 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (14 Kez)."
   },
   {
     "id": "ach_0175_durak_kesfi",
@@ -2370,7 +2370,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (95 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 95 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 95 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 95 yolcu taşıyın."
   },
   {
@@ -2461,8 +2461,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (16 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 16 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (16 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 16 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (16 Kez)."
   },
   {
     "id": "ach_0190_durak_kesfi",
@@ -2565,7 +2565,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (110 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 110 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 110 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 110 yolcu taşıyın."
   },
   {
@@ -2656,8 +2656,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (18 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 18 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (18 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 18 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (18 Kez)."
   },
   {
     "id": "ach_0205_durak_kesfi",
@@ -2760,7 +2760,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (125 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 125 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 125 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 125 yolcu taşıyın."
   },
   {
@@ -2851,8 +2851,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (20 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 20 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (20 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 20 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (20 Kez)."
   },
   {
     "id": "ach_0220_durak_kesfi",
@@ -2955,7 +2955,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (140 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 140 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 140 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 140 yolcu taşıyın."
   },
   {
@@ -3046,8 +3046,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (22 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 22 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (22 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 22 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (22 Kez)."
   },
   {
     "id": "ach_0235_durak_kesfi",
@@ -3150,7 +3150,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (155 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 155 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 155 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 155 yolcu taşıyın."
   },
   {
@@ -3241,8 +3241,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (24 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 24 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (24 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 24 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (24 Kez)."
   },
   {
     "id": "ach_0250_durak_kesfi",
@@ -3345,7 +3345,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (170 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 170 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 170 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 170 yolcu taşıyın."
   },
   {
@@ -3436,8 +3436,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (26 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 26 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (26 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 26 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (26 Kez)."
   },
   {
     "id": "ach_0265_durak_kesfi",
@@ -3540,7 +3540,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (185 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 185 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 185 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 185 yolcu taşıyın."
   },
   {
@@ -3631,8 +3631,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (28 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 28 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (28 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 28 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (28 Kez)."
   },
   {
     "id": "ach_0280_durak_kesfi",
@@ -3735,7 +3735,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 200 yolcu taşıyın."
   },
   {
@@ -3826,8 +3826,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (30 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 30 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (30 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 30 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (30 Kez)."
   },
   {
     "id": "ach_0295_durak_kesfi",
@@ -3930,7 +3930,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (250 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 250 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 250 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 250 yolcu taşıyın."
   },
   {
@@ -4021,8 +4021,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (35 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 35 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (35 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 35 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (35 Kez)."
   },
   {
     "id": "ach_0310_durak_kesfi",
@@ -4125,7 +4125,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (300 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 300 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 300 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 300 yolcu taşıyın."
   },
   {
@@ -4216,8 +4216,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (40 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 40 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (40 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 40 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (40 Kez)."
   },
   {
     "id": "ach_0325_durak_kesfi",
@@ -4320,7 +4320,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (350 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 350 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 350 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 350 yolcu taşıyın."
   },
   {
@@ -4411,8 +4411,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (45 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 45 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (45 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 45 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (45 Kez)."
   },
   {
     "id": "ach_0340_durak_kesfi",
@@ -4515,7 +4515,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 400 yolcu taşıyın."
   },
   {
@@ -4606,8 +4606,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (50 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 50 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (50 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 50 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (50 Kez)."
   },
   {
     "id": "ach_0355_durak_kesfi",
@@ -4710,7 +4710,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (450 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 450 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 450 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 450 yolcu taşıyın."
   },
   {
@@ -4801,8 +4801,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (55 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 55 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (55 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 55 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (55 Kez)."
   },
   {
     "id": "ach_0370_durak_kesfi",
@@ -4905,7 +4905,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (500 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 500 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 500 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 500 yolcu taşıyın."
   },
   {
@@ -4996,8 +4996,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (60 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 60 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (60 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 60 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (60 Kez)."
   },
   {
     "id": "ach_0385_durak_kesfi",
@@ -5100,7 +5100,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (550 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 550 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 550 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 550 yolcu taşıyın."
   },
   {
@@ -5191,8 +5191,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (65 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 65 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (65 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 65 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (65 Kez)."
   },
   {
     "id": "ach_0400_durak_kesfi",
@@ -5295,7 +5295,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 600 yolcu taşıyın."
   },
   {
@@ -5386,8 +5386,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (70 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 70 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (70 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 70 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (70 Kez)."
   },
   {
     "id": "ach_0415_durak_kesfi",
@@ -5490,7 +5490,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (650 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 650 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 650 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 650 yolcu taşıyın."
   },
   {
@@ -5581,8 +5581,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (75 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 75 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (75 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 75 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (75 Kez)."
   },
   {
     "id": "ach_0430_durak_kesfi",
@@ -5685,7 +5685,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (700 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 700 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 700 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 700 yolcu taşıyın."
   },
   {
@@ -5776,8 +5776,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (80 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 80 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (80 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 80 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (80 Kez)."
   },
   {
     "id": "ach_0445_durak_kesfi",
@@ -5880,7 +5880,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 800 yolcu taşıyın."
   },
   {
@@ -5971,8 +5971,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (90 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 90 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (90 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 90 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (90 Kez)."
   },
   {
     "id": "ach_0460_durak_kesfi",
@@ -6075,7 +6075,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (920 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 920 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 920 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 920 yolcu taşıyın."
   },
   {
@@ -6166,8 +6166,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (100 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 100 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (100 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 100 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (100 Kez)."
   },
   {
     "id": "ach_0475_durak_kesfi",
@@ -6270,7 +6270,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.040 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.040 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.040 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.040 yolcu taşıyın."
   },
   {
@@ -6361,8 +6361,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (110 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 110 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (110 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 110 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (110 Kez)."
   },
   {
     "id": "ach_0490_durak_kesfi",
@@ -6465,7 +6465,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.160 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.160 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.160 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.160 yolcu taşıyın."
   },
   {
@@ -6556,8 +6556,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (120 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 120 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (120 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 120 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (120 Kez)."
   },
   {
     "id": "ach_0505_durak_kesfi",
@@ -6660,7 +6660,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.280 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.280 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.280 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.280 yolcu taşıyın."
   },
   {
@@ -6751,8 +6751,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (130 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 130 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (130 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 130 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (130 Kez)."
   },
   {
     "id": "ach_0520_durak_kesfi",
@@ -6855,7 +6855,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.400 yolcu taşıyın."
   },
   {
@@ -6946,8 +6946,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (140 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 140 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (140 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 140 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (140 Kez)."
   },
   {
     "id": "ach_0535_durak_kesfi",
@@ -7050,7 +7050,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.520 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.520 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.520 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.520 yolcu taşıyın."
   },
   {
@@ -7141,8 +7141,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (150 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 150 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (150 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 150 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (150 Kez)."
   },
   {
     "id": "ach_0550_durak_kesfi",
@@ -7245,7 +7245,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.640 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.640 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.640 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.640 yolcu taşıyın."
   },
   {
@@ -7336,8 +7336,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (160 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 160 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (160 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 160 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (160 Kez)."
   },
   {
     "id": "ach_0565_durak_kesfi",
@@ -7440,7 +7440,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.760 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.760 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.760 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.760 yolcu taşıyın."
   },
   {
@@ -7531,8 +7531,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (170 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 170 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (170 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 170 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (170 Kez)."
   },
   {
     "id": "ach_0580_durak_kesfi",
@@ -7635,7 +7635,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.880 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.880 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.880 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.880 yolcu taşıyın."
   },
   {
@@ -7726,8 +7726,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (180 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 180 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (180 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 180 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (180 Kez)."
   },
   {
     "id": "ach_0595_durak_kesfi",
@@ -7830,7 +7830,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (2.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 2.000 yolcu taşıyın."
   },
   {
@@ -7921,8 +7921,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (190 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 190 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (190 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 190 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (190 Kez)."
   },
   {
     "id": "ach_0610_durak_kesfi",
@@ -8025,7 +8025,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (2.200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 2.200 yolcu taşıyın."
   },
   {
@@ -8116,8 +8116,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (200 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 200 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (200 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 200 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (200 Kez)."
   },
   {
     "id": "ach_0625_durak_kesfi",
@@ -8220,7 +8220,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (2.480 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.480 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.480 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 2.480 yolcu taşıyın."
   },
   {
@@ -8311,8 +8311,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (220 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 220 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (220 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 220 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (220 Kez)."
   },
   {
     "id": "ach_0640_durak_kesfi",
@@ -8415,7 +8415,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (2.760 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.760 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.760 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 2.760 yolcu taşıyın."
   },
   {
@@ -8506,8 +8506,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (235 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 235 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (235 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 235 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (235 Kez)."
   },
   {
     "id": "ach_0655_durak_kesfi",
@@ -8610,7 +8610,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (3.040 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.040 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.040 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 3.040 yolcu taşıyın."
   },
   {
@@ -8701,8 +8701,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (250 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 250 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (250 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 250 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (250 Kez)."
   },
   {
     "id": "ach_0670_durak_kesfi",
@@ -8805,7 +8805,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (3.320 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.320 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.320 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 3.320 yolcu taşıyın."
   },
   {
@@ -8896,8 +8896,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (265 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 265 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (265 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 265 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (265 Kez)."
   },
   {
     "id": "ach_0685_durak_kesfi",
@@ -9000,7 +9000,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (3.600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 3.600 yolcu taşıyın."
   },
   {
@@ -9091,8 +9091,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (280 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 280 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (280 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 280 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (280 Kez)."
   },
   {
     "id": "ach_0700_durak_kesfi",
@@ -9195,7 +9195,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (3.880 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.880 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.880 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 3.880 yolcu taşıyın."
   },
   {
@@ -9286,8 +9286,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (295 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 295 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (295 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 295 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (295 Kez)."
   },
   {
     "id": "ach_0715_durak_kesfi",
@@ -9390,7 +9390,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (4.160 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.160 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.160 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 4.160 yolcu taşıyın."
   },
   {
@@ -9481,8 +9481,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (310 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 310 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (310 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 310 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (310 Kez)."
   },
   {
     "id": "ach_0730_durak_kesfi",
@@ -9585,7 +9585,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (4.440 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.440 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.440 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 4.440 yolcu taşıyın."
   },
   {
@@ -9676,8 +9676,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (325 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 325 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (325 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 325 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (325 Kez)."
   },
   {
     "id": "ach_0745_durak_kesfi",
@@ -9780,7 +9780,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (4.720 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.720 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.720 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 4.720 yolcu taşıyın."
   },
   {
@@ -9871,8 +9871,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (340 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 340 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (340 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 340 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (340 Kez)."
   },
   {
     "id": "ach_0760_durak_kesfi",
@@ -9975,7 +9975,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (5.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 5.000 yolcu taşıyın."
   },
   {
@@ -10066,8 +10066,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (370 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 370 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (370 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 370 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (370 Kez)."
   },
   {
     "id": "ach_0775_durak_kesfi",
@@ -10170,7 +10170,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (5.500 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5.500 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5.500 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 5.500 yolcu taşıyın."
   },
   {
@@ -10261,8 +10261,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (390 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 390 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (390 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 390 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (390 Kez)."
   },
   {
     "id": "ach_0790_durak_kesfi",
@@ -10365,7 +10365,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (6.150 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 6.150 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 6.150 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 6.150 yolcu taşıyın."
   },
   {
@@ -10456,8 +10456,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (410 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 410 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (410 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 410 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (410 Kez)."
   },
   {
     "id": "ach_0805_durak_kesfi",
@@ -10560,7 +10560,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (6.800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 6.800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 6.800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 6.800 yolcu taşıyın."
   },
   {
@@ -10651,8 +10651,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (430 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 430 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (430 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 430 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (430 Kez)."
   },
   {
     "id": "ach_0820_durak_kesfi",
@@ -10755,7 +10755,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (7.450 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 7.450 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 7.450 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 7.450 yolcu taşıyın."
   },
   {
@@ -10846,8 +10846,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (450 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 450 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (450 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 450 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (450 Kez)."
   },
   {
     "id": "ach_0835_durak_kesfi",
@@ -10950,7 +10950,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (8.100 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 8.100 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 8.100 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 8.100 yolcu taşıyın."
   },
   {
@@ -11041,8 +11041,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (470 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 470 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (470 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 470 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (470 Kez)."
   },
   {
     "id": "ach_0850_durak_kesfi",
@@ -11145,7 +11145,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (8.750 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 8.750 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 8.750 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 8.750 yolcu taşıyın."
   },
   {
@@ -11236,8 +11236,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (490 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 490 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (490 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 490 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (490 Kez)."
   },
   {
     "id": "ach_0865_durak_kesfi",
@@ -11340,7 +11340,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (9.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 9.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 9.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 9.400 yolcu taşıyın."
   },
   {
@@ -11431,8 +11431,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (510 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 510 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (510 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 510 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (510 Kez)."
   },
   {
     "id": "ach_0880_durak_kesfi",
@@ -11535,7 +11535,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (10.050 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10.050 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10.050 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 10.050 yolcu taşıyın."
   },
   {
@@ -11626,8 +11626,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (530 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 530 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (530 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 530 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (530 Kez)."
   },
   {
     "id": "ach_0895_durak_kesfi",
@@ -11730,7 +11730,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (10.700 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10.700 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10.700 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 10.700 yolcu taşıyın."
   },
   {
@@ -11821,8 +11821,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (550 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 550 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (550 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 550 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (550 Kez)."
   },
   {
     "id": "ach_0910_durak_kesfi",
@@ -11925,7 +11925,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (11.350 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 11.350 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 11.350 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 11.350 yolcu taşıyın."
   },
   {
@@ -12016,8 +12016,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (570 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 570 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (570 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 570 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (570 Kez)."
   },
   {
     "id": "ach_0925_durak_kesfi",
@@ -12120,7 +12120,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (12.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 12.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 12.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 12.000 yolcu taşıyın."
   },
   {
@@ -12211,8 +12211,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (590 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 590 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (590 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 590 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (590 Kez)."
   },
   {
     "id": "ach_0940_durak_kesfi",
@@ -12315,7 +12315,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (13.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 13.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 13.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 13.000 yolcu taşıyın."
   },
   {
@@ -12406,8 +12406,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (610 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 610 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (610 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 610 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (610 Kez)."
   },
   {
     "id": "ach_0955_durak_kesfi",
@@ -12510,7 +12510,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (14.200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 14.200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 14.200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 14.200 yolcu taşıyın."
   },
   {
@@ -12601,8 +12601,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (630 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 630 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (630 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 630 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (630 Kez)."
   },
   {
     "id": "ach_0970_durak_kesfi",
@@ -12705,7 +12705,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (15.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 15.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 15.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 15.400 yolcu taşıyın."
   },
   {
@@ -12796,8 +12796,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (650 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 650 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (650 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 650 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (650 Kez)."
   },
   {
     "id": "ach_0985_durak_kesfi",
@@ -12900,7 +12900,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (16.600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 16.600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 16.600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 16.600 yolcu taşıyın."
   },
   {
@@ -12991,8 +12991,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (670 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 670 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (670 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 670 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (670 Kez)."
   },
   {
     "id": "ach_1000_durak_kesfi",
@@ -13095,7 +13095,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (17.800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 17.800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 17.800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 17.800 yolcu taşıyın."
   },
   {
@@ -13186,8 +13186,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (690 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 690 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (690 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 690 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (690 Kez)."
   },
   {
     "id": "ach_1015_durak_kesfi",
@@ -13290,7 +13290,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (19.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 19.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 19.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 19.000 yolcu taşıyın."
   },
   {
@@ -13381,8 +13381,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (710 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 710 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (710 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 710 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (710 Kez)."
   },
   {
     "id": "ach_1030_durak_kesfi",
@@ -13485,7 +13485,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (20.200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 20.200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 20.200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 20.200 yolcu taşıyın."
   },
   {
@@ -13576,8 +13576,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (730 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 730 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (730 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 730 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (730 Kez)."
   },
   {
     "id": "ach_1045_durak_kesfi",
@@ -13680,7 +13680,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (21.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 21.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 21.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 21.400 yolcu taşıyın."
   },
   {
@@ -13771,8 +13771,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (750 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 750 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (750 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 750 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (750 Kez)."
   },
   {
     "id": "ach_1060_durak_kesfi",
@@ -13875,7 +13875,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (22.600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 22.600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 22.600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 22.600 yolcu taşıyın."
   },
   {
@@ -13966,8 +13966,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (770 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 770 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (770 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 770 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (770 Kez)."
   },
   {
     "id": "ach_1075_durak_kesfi",
@@ -14070,7 +14070,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (23.800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 23.800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 23.800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 23.800 yolcu taşıyın."
   },
   {
@@ -14161,8 +14161,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (790 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 790 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (790 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 790 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (790 Kez)."
   },
   {
     "id": "ach_1090_durak_kesfi",
@@ -14265,7 +14265,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (25.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 25.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 25.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 25.000 yolcu taşıyın."
   },
   {
@@ -14356,8 +14356,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (810 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 810 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (810 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 810 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (810 Kez)."
   },
   {
     "id": "ach_1105_durak_kesfi",
@@ -14460,7 +14460,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (27.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 27.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 27.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 27.000 yolcu taşıyın."
   },
   {
@@ -14551,8 +14551,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (830 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 830 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (830 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 830 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (830 Kez)."
   },
   {
     "id": "ach_1120_durak_kesfi",
@@ -14655,7 +14655,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (29.300 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 29.300 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 29.300 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 29.300 yolcu taşıyın."
   },
   {
@@ -14746,8 +14746,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (850 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 850 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (850 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 850 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (850 Kez)."
   },
   {
     "id": "ach_1135_durak_kesfi",
@@ -14850,7 +14850,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (31.600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 31.600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 31.600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 31.600 yolcu taşıyın."
   },
   {
@@ -14941,8 +14941,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (870 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 870 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (870 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 870 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (870 Kez)."
   },
   {
     "id": "ach_1150_durak_kesfi",
@@ -15045,7 +15045,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (33.900 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 33.900 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 33.900 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 33.900 yolcu taşıyın."
   },
   {
@@ -15136,8 +15136,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (890 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 890 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (890 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 890 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (890 Kez)."
   },
   {
     "id": "ach_1165_durak_kesfi",
@@ -15240,7 +15240,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (36.200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 36.200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 36.200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 36.200 yolcu taşıyın."
   },
   {
@@ -15331,8 +15331,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (910 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 910 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (910 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 910 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (910 Kez)."
   },
   {
     "id": "ach_1180_durak_kesfi",
@@ -15435,7 +15435,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (38.500 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 38.500 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 38.500 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 38.500 yolcu taşıyın."
   },
   {
@@ -15526,8 +15526,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (930 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 930 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (930 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 930 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (930 Kez)."
   },
   {
     "id": "ach_1195_durak_kesfi",
@@ -15630,7 +15630,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (40.800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 40.800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 40.800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 40.800 yolcu taşıyın."
   },
   {
@@ -15721,8 +15721,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (950 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 950 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (950 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 950 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (950 Kez)."
   },
   {
     "id": "ach_1210_durak_kesfi",
@@ -15825,7 +15825,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (43.100 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 43.100 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 43.100 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 43.100 yolcu taşıyın."
   },
   {
@@ -15916,8 +15916,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (970 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 970 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (970 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 970 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (970 Kez)."
   },
   {
     "id": "ach_1225_durak_kesfi",
@@ -16020,7 +16020,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (45.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 45.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 45.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 45.400 yolcu taşıyın."
   },
   {
@@ -16111,8 +16111,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (990 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 990 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (990 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 990 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (990 Kez)."
   },
   {
     "id": "ach_1240_durak_kesfi",
@@ -16215,7 +16215,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (47.700 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 47.700 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 47.700 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 47.700 yolcu taşıyın."
   },
   {
@@ -16306,8 +16306,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.010 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.010 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.010 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.010 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.010 Kez)."
   },
   {
     "id": "ach_1255_durak_kesfi",
@@ -16410,7 +16410,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (50.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 50.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 50.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 50.000 yolcu taşıyın."
   },
   {
@@ -16501,8 +16501,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.030 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.030 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.030 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.030 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.030 Kez)."
   },
   {
     "id": "ach_1270_durak_kesfi",
@@ -16605,7 +16605,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (53.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 53.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 53.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 53.000 yolcu taşıyın."
   },
   {
@@ -16696,8 +16696,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.050 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.050 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.050 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.050 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.050 Kez)."
   },
   {
     "id": "ach_1285_durak_kesfi",
@@ -16800,7 +16800,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (56.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 56.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 56.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 56.000 yolcu taşıyın."
   },
   {
@@ -16891,8 +16891,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.070 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.070 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.070 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.070 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.070 Kez)."
   },
   {
     "id": "ach_1300_durak_kesfi",
@@ -16995,7 +16995,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (59.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 59.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 59.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 59.000 yolcu taşıyın."
   },
   {
@@ -17086,8 +17086,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.090 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.090 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.090 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.090 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.090 Kez)."
   },
   {
     "id": "ach_1315_durak_kesfi",
@@ -17190,7 +17190,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (62.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 62.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 62.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 62.000 yolcu taşıyın."
   },
   {
@@ -17281,8 +17281,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.110 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.110 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.110 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.110 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.110 Kez)."
   },
   {
     "id": "ach_1330_durak_kesfi",
@@ -17385,7 +17385,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (65.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 65.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 65.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 65.000 yolcu taşıyın."
   },
   {
@@ -17476,8 +17476,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.130 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.130 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.130 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.130 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.130 Kez)."
   },
   {
     "id": "ach_1345_durak_kesfi",
@@ -17580,7 +17580,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (68.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 68.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 68.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 68.000 yolcu taşıyın."
   },
   {
@@ -17671,8 +17671,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.150 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.150 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.150 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.150 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.150 Kez)."
   },
   {
     "id": "ach_1360_durak_kesfi",
@@ -17775,7 +17775,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (71.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 71.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 71.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 71.000 yolcu taşıyın."
   },
   {
@@ -17866,8 +17866,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.170 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.170 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.170 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.170 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.170 Kez)."
   },
   {
     "id": "ach_1375_durak_kesfi",
@@ -17970,7 +17970,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (74.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 74.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 74.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 74.000 yolcu taşıyın."
   },
   {
@@ -18061,8 +18061,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.190 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.190 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.190 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.190 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.190 Kez)."
   },
   {
     "id": "ach_1390_durak_kesfi",
@@ -18165,7 +18165,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (77.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 77.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 77.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 77.000 yolcu taşıyın."
   },
   {
@@ -18256,8 +18256,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.210 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.210 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.210 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.210 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.210 Kez)."
   },
   {
     "id": "ach_1405_durak_kesfi",
@@ -18360,7 +18360,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (80.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 80.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 80.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 80.000 yolcu taşıyın."
   },
   {
@@ -18451,8 +18451,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.230 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.230 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.230 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.230 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.230 Kez)."
   },
   {
     "id": "ach_1420_durak_kesfi",
@@ -18555,7 +18555,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (83.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 83.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 83.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 83.000 yolcu taşıyın."
   },
   {
@@ -18646,8 +18646,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.250 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.250 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.250 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.250 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.250 Kez)."
   },
   {
     "id": "ach_1435_durak_kesfi",
@@ -18750,7 +18750,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (86.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 86.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 86.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 86.000 yolcu taşıyın."
   },
   {
@@ -18841,8 +18841,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.270 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.270 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.270 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.270 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.270 Kez)."
   },
   {
     "id": "ach_1450_durak_kesfi",
@@ -18945,7 +18945,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (89.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 89.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 89.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 89.000 yolcu taşıyın."
   },
   {
@@ -19036,8 +19036,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.290 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.290 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.290 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.290 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.290 Kez)."
   },
   {
     "id": "ach_1465_durak_kesfi",
@@ -19140,7 +19140,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (92.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 92.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 92.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 92.000 yolcu taşıyın."
   },
   {
@@ -19231,8 +19231,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.310 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.310 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.310 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.310 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.310 Kez)."
   },
   {
     "id": "ach_1480_durak_kesfi",
@@ -19335,7 +19335,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (95.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 95.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 95.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 95.000 yolcu taşıyın."
   },
   {
@@ -19426,8 +19426,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.330 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.330 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.330 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.330 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.330 Kez)."
   },
   {
     "id": "ach_1495_durak_kesfi",
@@ -24517,130 +24517,130 @@ const ACHIEVEMENTS_1500 = [
     "difficulty": 1886,
     "tier": 1,
     "tierName": "Çok Kolay",
-    "stat": "licenseLevel",
+    "stat": "completedTasks",
     "targetValue": 1,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🔰",
     "title": "Kariyer Rütbesi: 1. Sınıf Stajyer Şehir İçi Sürücüsü",
-    "desc": "Mikyas Kaptanlık Akademisine resmi kaydınızı yaptırıp 1. Sınıf Stajyer sürücü unvanına erişin.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 1'e yükseltin."
+    "desc": "Mikyas Kaptanlık Akademisine resmi kaydınızı yaptırıp ilk görevinizi tamamlayarak 1. Sınıf Stajyer sürücü unvanına erişin.",
+    "requirement": "Kariyer modunda ilk görevinizi (1 Görev) tamamlayın."
   },
   {
     "id": "ach_1887_kariyer_sinif_2",
     "difficulty": 1887,
     "tier": 2,
     "tierName": "Kolay",
-    "stat": "licenseLevel",
-    "targetValue": 2,
+    "stat": "completedTasks",
+    "targetValue": 10,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🌊",
     "title": "Kariyer Rütbesi: 2. Sınıf Süleymanpaşa Kıyı & Sahil Kaptanı",
-    "desc": "Akademide 2. Sınıf seviyesine yükselerek sahil ve kordon hatlarının kaptanı olun.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 2'e yükseltin."
+    "desc": "Akademide ilk 10 görevi tamamlayıp 2. Sınıf seviyesine yükselerek sahil ve kordon hatlarının kaptanı olun.",
+    "requirement": "Kariyer modunda 10 görev tamamlayarak 2. Sınıf Kaptanlığa terfi edin."
   },
   {
     "id": "ach_1888_kariyer_sinif_3",
     "difficulty": 1888,
     "tier": 2,
     "tierName": "Kolay",
-    "stat": "licenseLevel",
-    "targetValue": 3,
+    "stat": "completedTasks",
+    "targetValue": 20,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🏭",
     "title": "Kariyer Rütbesi: 3. Sınıf Çorlu Sanayi & Metropol Hat Kaptanı",
-    "desc": "3. Sınıf seviyesine terfi ederek sanayi ve metropol hatlarında yetkili kaptanlık rütbesini kazanın.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 3'e yükseltin."
+    "desc": "20 görevi tamamlayıp 3. Sınıf seviyesine terfi ederek sanayi ve metropol hatlarında yetkili kaptanlık rütbesini kazanın.",
+    "requirement": "Kariyer modunda 20 görev tamamlayarak 3. Sınıf Kaptanlığa terfi edin."
   },
   {
     "id": "ach_1889_kariyer_sinif_4",
     "difficulty": 1889,
     "tier": 3,
     "tierName": "Orta",
-    "stat": "licenseLevel",
-    "targetValue": 4,
+    "stat": "completedTasks",
+    "targetValue": 30,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🧭",
     "title": "Kariyer Rütbesi: 4. Sınıf Trakya Kıyı & İlçe Hatları Kıdemli Kaptanı",
-    "desc": "4. Sınıf seviyesine erişerek ilçeler arası kıdemli hat kaptanlığı unvanını kuşanın.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 4'e yükseltin."
+    "desc": "30 görevi tamamlayıp 4. Sınıf seviyesine erişerek ilçeler arası kıdemli hat kaptanlığı unvanını kuşanın.",
+    "requirement": "Kariyer modunda 30 görev tamamlayarak 4. Sınıf Kaptanlığa terfi edin."
   },
   {
     "id": "ach_1890_kariyer_sinif_5",
     "difficulty": 1890,
     "tier": 3,
     "tierName": "Orta",
-    "stat": "licenseLevel",
-    "targetValue": 5,
+    "stat": "completedTasks",
+    "targetValue": 40,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🚛",
     "title": "Kariyer Rütbesi: 5. Sınıf Ergene & Velimeşe OSB Filo Reisi",
-    "desc": "5. Sınıf seviyesine ulaşarak organize sanayi bölgelerinin Filo Reisi rütbesine terfi edin.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 5'e yükseltin."
+    "desc": "40 görevi tamamlayıp 5. Sınıf seviyesine ulaşarak organize sanayi bölgelerinin Filo Reisi rütbesine terfi edin.",
+    "requirement": "Kariyer modunda 40 görev tamamlayarak 5. Sınıf Filo Reisliğine terfi edin."
   },
   {
     "id": "ach_1891_kariyer_sinif_6",
     "difficulty": 1891,
     "tier": 4,
     "tierName": "Zor",
-    "stat": "licenseLevel",
-    "targetValue": 6,
+    "stat": "completedTasks",
+    "targetValue": 50,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🚍",
     "title": "Kariyer Rütbesi: 6. Sınıf 18 Metre Körüklü Otobüs Baş Kaptanı",
-    "desc": "6. Sınıf seviyesine çıkarak körüklü dev otobüslerin baş kaptanlığı makamına layık görülün.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 6'e yükseltin."
+    "desc": "50 görevi tamamlayıp 6. Sınıf seviyesine çıkarak körüklü dev otobüslerin baş kaptanlığı makamına layık görülün.",
+    "requirement": "Kariyer modunda 50 görev tamamlayarak 6. Sınıf Baş Kaptanlığa terfi edin."
   },
   {
     "id": "ach_1892_kariyer_sinif_7",
     "difficulty": 1892,
     "tier": 4,
     "tierName": "Zor",
-    "stat": "licenseLevel",
-    "targetValue": 7,
+    "stat": "completedTasks",
+    "targetValue": 60,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🏔️",
     "title": "Kariyer Rütbesi: 7. Sınıf Trakya Dağ Geçitleri & Kıdemli Filo Müfettişi",
-    "desc": "7. Sınıf seviyesine terfi ederek zorlu dağ hatlarının filo müfettişi yetkisini alın.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 7'e yükseltin."
+    "desc": "60 görevi tamamlayıp 7. Sınıf seviyesine terfi ederek zorlu dağ hatlarının filo müfettişi yetkisini alın.",
+    "requirement": "Kariyer modunda 60 görev tamamlayarak 7. Sınıf Filo Müfettişliğine terfi edin."
   },
   {
     "id": "ach_1893_kariyer_sinif_8",
     "difficulty": 1893,
     "tier": 5,
     "tierName": "Efsane",
-    "stat": "licenseLevel",
-    "targetValue": 8,
+    "stat": "completedTasks",
+    "targetValue": 70,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "⭐",
     "title": "Kariyer Rütbesi: 8. Sınıf Marmara - Ege Otoyol Baş Kaptanı & VIP Transfer Şefi",
-    "desc": "8. Sınıf seviyesine erişerek şehirlerarası VIP transfer şefliği payesini göğsünüze takın.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 8'e yükseltin."
+    "desc": "70 görevi tamamlayıp 8. Sınıf seviyesine erişerek şehirlerarası VIP transfer şefliği payesini göğsünüze takın.",
+    "requirement": "Kariyer modunda 70 görev tamamlayarak 8. Sınıf VIP Transfer Şefliğine terfi edin."
   },
   {
     "id": "ach_1894_kariyer_sinif_9",
     "difficulty": 1894,
     "tier": 5,
     "tierName": "Efsane",
-    "stat": "licenseLevel",
-    "targetValue": 9,
+    "stat": "completedTasks",
+    "targetValue": 80,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🦅",
     "title": "Kariyer Rütbesi: 9. Sınıf Anadolu Kar & Dağ Geçitleri Üstadı & Gece Kartalı",
-    "desc": "9. Sınıf seviyesine çıkarak Anadolu yollarının efsanevi Gece Kartalı üstadı olun.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 9'e yükseltin."
+    "desc": "80 görevi tamamlayıp 9. Sınıf seviyesine çıkarak Anadolu yollarının efsanevi Gece Kartalı üstadı olun.",
+    "requirement": "Kariyer modunda 80 görev tamamlayarak 9. Sınıf Gece Kartalı rütbesine terfi edin."
   },
   {
     "id": "ach_1895_kariyer_sinif_10",
     "difficulty": 1895,
     "tier": 5,
     "tierName": "Efsane",
-    "stat": "licenseLevel",
-    "targetValue": 10,
+    "stat": "completedTasks",
+    "targetValue": 90,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "👑",
     "title": "Kariyer Rütbesi: 10. Sınıf EFSANE MİKYAS MASTER KAPTANI (Altın Direksiyon Brövesi)",
-    "desc": "10. Sınıf seviyesine yükselerek akademinin en yüksek liyakat ödülü olan Altın Direksiyon Brövesini kazanın!",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 10'e yükseltin."
+    "desc": "90 görevi tamamlayıp 10. Sınıf seviyesine yükselerek akademinin en yüksek liyakat ödülü olan Altın Direksiyon Brövesini kazanın!",
+    "requirement": "Kariyer modunda 90 görev tamamlayarak 10. Sınıf Master Kaptanlığa terfi edin."
   },
   {
     "id": "ach_1896_kariyer_zirve_10",
