@@ -1004,8 +1004,18 @@ const Game = {
                             // 1. Sürücü İstatistikleri & Başarılar (DriverBadges)
                             if (data.driverStats && typeof DriverBadges !== 'undefined' && typeof DriverBadges.getLifetimeStats === 'function') {
                                 try {
-                                    const currentStats = DriverBadges.getLifetimeStats();
-                                    const merged = Object.assign({}, currentStats, data.driverStats);
+                                    const currentStats = DriverBadges.getLifetimeStats() || {};
+                                    const cloudStats = data.driverStats || {};
+                                    const merged = Object.assign({}, currentStats, cloudStats);
+                                    Object.keys(merged).forEach(k => {
+                                        const localVal = currentStats[k];
+                                        const cloudVal = cloudStats[k];
+                                        if (typeof localVal === 'number' || typeof cloudVal === 'number') {
+                                            const nLocal = Number(localVal) || 0;
+                                            const nCloud = Number(cloudVal) || 0;
+                                            merged[k] = Math.max(nLocal, nCloud);
+                                        }
+                                    });
                                     DriverBadges.saveLifetimeStats(merged);
                                 } catch(e) {
                                     console.warn("Driver stats merge error:", e);
@@ -1014,8 +1024,19 @@ const Game = {
 
                             if (data.badgesData && typeof DriverBadges !== 'undefined' && typeof DriverBadges.getBadgesData === 'function') {
                                 try {
-                                    const currentBadges = DriverBadges.getBadgesData();
-                                    const mergedBadges = Object.assign({}, currentBadges, data.badgesData);
+                                    const currentBadges = DriverBadges.getBadgesData() || {};
+                                    const cloudBadges = data.badgesData || {};
+                                    const mergedBadges = Object.assign({}, cloudBadges, currentBadges);
+                                    Object.keys(cloudBadges).forEach(id => {
+                                        if (cloudBadges[id] && cloudBadges[id].unlocked) {
+                                            mergedBadges[id] = cloudBadges[id];
+                                        }
+                                    });
+                                    Object.keys(currentBadges).forEach(id => {
+                                        if (currentBadges[id] && currentBadges[id].unlocked) {
+                                            mergedBadges[id] = currentBadges[id];
+                                        }
+                                    });
                                     DriverBadges.saveBadgesData(mergedBadges);
                                 } catch(e) {
                                     console.warn("Badges merge error:", e);
@@ -2651,11 +2672,40 @@ const Game = {
             return;
         }
 
+        // TEKULAŞ İLÇE VE CADDE KİLOMETRE KALİBRASYONU (OSRM öncesi garantili yedek mesafe)
+        const prevStop = this.currentStopIndex > 0 ? this.activeRouteData.stops[this.currentStopIndex - 1] : null;
+        let rawDistKm = (this.currentStopIndex === 0)
+            ? (nextStop.gercekMesafeSonraki || 0.9)
+            : ((prevStop && prevStop.gercekMesafeSonraki) ? prevStop.gercekMesafeSonraki : (nextStop.gercekMesafeSonraki || 0.9));
+        
+        let combinedMeta = ((nextStop ? nextStop.name : '') + ' ' + (prevStop ? prevStop.name : '') + ' ' + (this.activeRouteData.name || '')).toLowerCase();
+        let isIntercityCorridor = combinedMeta.includes("otoyol") || combinedMeta.includes("çevre yolu") || combinedMeta.includes("malkara") || combinedMeta.includes("saray") || combinedMeta.includes("kınalı") || combinedMeta.includes("çorlu") || combinedMeta.includes("otogar");
+        let isBoulevardCampus = combinedMeta.includes("üniversite") || combinedMeta.includes("kampüs") || combinedMeta.includes("sanayi") || combinedMeta.includes("hastane") || combinedMeta.includes("sahil") || combinedMeta.includes("bulvar");
+
+        let calibratedMeters = rawDistKm * 1000;
+        if (isIntercityCorridor) {
+            // İlçeler arası gerçek durak mesafesi: 2.4 km - 4.2 km
+            if (calibratedMeters < 2400) calibratedMeters = 2400 + ((this.currentStopIndex * 157) % 1800);
+        } else if (isBoulevardCampus) {
+            // Ana bulvar, üniversite ve sahil mesafesi: 1.3 km - 2.1 km
+            if (calibratedMeters < 1300) calibratedMeters = 1300 + ((this.currentStopIndex * 93) % 800);
+        } else {
+            // Şehir içi TEKULAŞ cadde ve mahalle durağı: 850m - 1350m
+            if (calibratedMeters < 850) calibratedMeters = 850 + ((this.currentStopIndex * 67) % 500);
+        }
+
+        let fallbackDistance = Math.round(calibratedMeters);
+
         if (!isResume) {
-            if (this.isFetchingRoute) {
-                console.warn("Spam koruması: OSRM Rota şu an çekiliyor, mükerrer istek iptal edildi.");
-                return;
+            // Önceki duraktan kalan bekleyen OSRM isteği varsa iptal et ve yeni durağın mesafesini anında ata
+            if (this._osrmAbortController) {
+                try { this._osrmAbortController.abort(); } catch (e) {}
+                this._osrmAbortController = null;
             }
+            this.currentDistanceToNext = fallbackDistance;
+            this.currentLegTotalDistance = this.currentDistanceToNext || 1000;
+            this.currentLegDistanceCovered = 0;
+            this.routeBumps = [];
             this.isFetchingRoute = true;
 
             // OSRM HESAPLAMASI (Arka planda çalışır, aracı duraklatmaz)
@@ -2672,51 +2722,33 @@ const Game = {
                 lat2 = nextStop.lat; lon2 = nextStop.lon;
                 lat1 = lat2 - 0.01; lon1 = lon2 - 0.01; // Garajı durağa çok yakın varsayıyoruz
             } else {
-                const prevStop = this.activeRouteData.stops[this.currentStopIndex - 1];
                 lat1 = prevStop.lat; lon1 = prevStop.lon;
                 lat2 = nextStop.lat; lon2 = nextStop.lon;
-            }
-
-            this.routeBumps = [];
-            // TEKULAŞ İLÇE VE CADDE KİLOMETRE KALİBRASYONU
-            let prevStop = this.currentStopIndex > 0 ? this.activeRouteData.stops[this.currentStopIndex - 1] : null;
-            let rawDistKm = (this.currentStopIndex === 0)
-                ? (nextStop.gercekMesafeSonraki || 0.9)
-                : ((prevStop && prevStop.gercekMesafeSonraki) ? prevStop.gercekMesafeSonraki : (nextStop.gercekMesafeSonraki || 0.9));
-            
-            let combinedMeta = ((nextStop ? nextStop.name : '') + ' ' + (prevStop ? prevStop.name : '') + ' ' + (this.activeRouteData.name || '')).toLowerCase();
-            let isIntercityCorridor = combinedMeta.includes("otoyol") || combinedMeta.includes("çevre yolu") || combinedMeta.includes("malkara") || combinedMeta.includes("saray") || combinedMeta.includes("kınalı") || combinedMeta.includes("çorlu") || combinedMeta.includes("otogar");
-            let isBoulevardCampus = combinedMeta.includes("üniversite") || combinedMeta.includes("kampüs") || combinedMeta.includes("sanayi") || combinedMeta.includes("hastane") || combinedMeta.includes("sahil") || combinedMeta.includes("bulvar");
-
-            let calibratedMeters = rawDistKm * 1000;
-            if (isIntercityCorridor) {
-                // İlçeler arası gerçek durak mesafesi: 2.4 km - 4.2 km
-                if (calibratedMeters < 2400) calibratedMeters = 2400 + ((this.currentStopIndex * 157) % 1800);
-            } else if (isBoulevardCampus) {
-                // Ana bulvar, üniversite ve sahil mesafesi: 1.3 km - 2.1 km
-                if (calibratedMeters < 1300) calibratedMeters = 1300 + ((this.currentStopIndex * 93) % 800);
-            } else {
-                // Şehir içi TEKULAŞ cadde ve mahalle durağı: 850m - 1350m
-                if (calibratedMeters < 850) calibratedMeters = 850 + ((this.currentStopIndex * 67) % 500);
-            }
-
-            let fallbackDistance = Math.round(calibratedMeters);
-            if (!this.currentDistanceToNext || this.currentDistanceToNext < 850 || isNaN(this.currentDistanceToNext)) {
-                this.currentDistanceToNext = fallbackDistance;
             }
 
             if (!lat1 || !lon1 || !lat2 || !lon2 || isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
                 this.currentDistanceToNext = fallbackDistance;
                 this.isFetchingRoute = false;
             } else {
-                fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`)
+                const requestRouteId = this.activeRouteId;
+                const requestStopIndex = this.currentStopIndex;
+                const osrmController = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                this._osrmAbortController = osrmController;
+                const osrmTimeoutId = osrmController ? setTimeout(() => {
+                    try { osrmController.abort(); } catch (e) {}
+                }, 3500) : null;
+
+                fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`, osrmController ? { signal: osrmController.signal } : undefined)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.routes && data.routes.length > 0) {
+                    if (this.activeRouteId !== requestRouteId || this.currentStopIndex !== requestStopIndex) return;
+                    if (data && data.routes && data.routes.length > 0) {
                         const route = data.routes[0];
                         let routeDist = route.distance;
                         if (routeDist < 850) routeDist = fallbackDistance;
-                        this.currentDistanceToNext = routeDist; // OSRM gerçek mesafe (metre)
+                        const alreadyCovered = Math.max(0, this.currentLegDistanceCovered || 0);
+                        this.currentLegTotalDistance = routeDist;
+                        this.currentDistanceToNext = Math.max(50, routeDist - alreadyCovered); // OSRM gerçek mesafe (sürülen kısım düşülerek)
                         
                         // Kasis Eşleştirme (Polyline ve OSM verisi ile)
                         const coords = route.geometry.coordinates; // [[lon, lat], [lon, lat]]
@@ -2760,24 +2792,34 @@ const Game = {
                         if (typeof UI !== 'undefined' && document.getElementById('garage-screen').classList.contains('hidden')) {
                             UI.showToast("Gerçek yol ve virajlar oluşturuldu!", "success");
                         }
-                    } else {
+                    } else if (!this.currentDistanceToNext || this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
                         this.currentDistanceToNext = fallbackDistance;
                     }
                 })
                 .catch(err => {
-                    console.error("OSRM Hatası:", err);
-                    this.currentDistanceToNext = fallbackDistance;
+                    if (this.activeRouteId !== requestRouteId || this.currentStopIndex !== requestStopIndex) return;
+                    console.warn("OSRM yedek rotaya geçildi:", err && err.name ? err.name : err);
+                    if (!this.currentDistanceToNext || this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
+                        this.currentDistanceToNext = fallbackDistance;
+                    }
                     if (typeof UI !== 'undefined') UI.showToast("OSRM bağlantısı koptu, yapay rotaya dönüldü.", "warning");
                 })
                 .finally(() => {
-                    this.isFetchingRoute = false;
+                    if (osrmTimeoutId) clearTimeout(osrmTimeoutId);
+                    if (!osrmController || this._osrmAbortController === osrmController) {
+                        this.isFetchingRoute = false;
+                        this._osrmAbortController = null;
+                    }
                     if (this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
                         this.currentDistanceToNext = fallbackDistance || 1000;
                     }
                 });
             }
-} else {
+        } else {
             this.routeBumps = this.savedState && this.savedState.routeBumps ? this.savedState.routeBumps : [];
+            if (!this.currentDistanceToNext || this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
+                this.currentDistanceToNext = fallbackDistance;
+            }
         }
 
         this.currentLegTotalDistance = this.currentDistanceToNext || 1000;
