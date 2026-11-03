@@ -1198,7 +1198,7 @@ const DriverBadges = {
             lifetime.intercityStartsCount = (lifetime.intercityStartsCount || 0) + 1;
         }
 
-        if (gameInstance.isNight || (gameInstance.clockMinutes < 360 || gameInstance.clockMinutes >= 1140)) {
+        if (gameInstance.clockMinutes < 360 || gameInstance.clockMinutes >= 1140) {
             lifetime.nightStartsCount = (lifetime.nightStartsCount || 0) + 1;
         }
 
@@ -1491,7 +1491,7 @@ const DriverBadges = {
             lifetime.companyFullInfrastructure = (totalInst >= 21 && branchCount >= 5 && hqCount >= 4) ? 1 : 0;
 
             lifetime.companyCateringVip = (cData.cateringPackage === 'vip' || (cData.cateringPackage === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
-            lifetime.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'kurumsal' || (cData.facilityContract === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
+            lifetime.companyFacilityVip = (cData.facilityContract === 'vip' || cData.facilityContract === 'kurumsal' || (cData.hqUpgrades && cData.hqUpgrades.luxuryLounge) || (cData.institutions && (cData.institutions.fuel_depot || 1) >= 2) || (cData.facilityContract === 'standart' && hasActiveCompanyTrips)) ? 1 : 0;
             lifetime.companyContractsDone = Math.max(lifetime.companyContractsDone || 0, cData.specialContractsCompletedCount || 0);
             lifetime.companySatisfactionHighScore = (hasActiveCompanyTrips && cData.satisfactionRating >= 4.8) ? 1 : 0;
             lifetime.companyMastery = (cData.companyLevel >= 5 && (cData.companyTreasury || 0) >= 50000000) ? 1 : 0;
@@ -1593,7 +1593,7 @@ const DriverBadges = {
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(welcomeSpeech);
         }
 
-        const activeMainBtn = document.getElementById("tab-main-" + this.currentMainTab);
+        const activeMainBtn = document.getElementById(this.currentMainTab === 'achievements' ? 'tab-main-1500' : ('tab-main-' + this.currentMainTab));
         if (activeMainBtn) activeMainBtn.focus();
 
         if (typeof KeyboardNav !== 'undefined' && KeyboardNav.initForScreen) {
@@ -1982,9 +1982,12 @@ const DriverBadges = {
                 return;
             }
 
+            const lifetimeForCards = this.getLifetimeStats();
             pageItems.forEach(badge => {
                 const isUn = this.isUnlocked(badge.id);
                 const dateStr = this.getUnlockedDate(badge.id);
+                const curVal = Math.min(badge.targetValue, Math.max(0, Math.round(lifetimeForCards[badge.stat] || 0)));
+                const pctVal = Math.min(100, Math.round((curVal / Math.max(1, badge.targetValue)) * 100));
 
                 const li = document.createElement('li');
                 li.style.marginBottom = '10px';
@@ -2039,7 +2042,7 @@ const DriverBadges = {
                                     '<span style="font-size: 0.75rem; padding: 1px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; margin-left: 6px;">' + badge.category + '</span>' +
                                 '</div>' +
                             '</div>' +
-                            '<span style="background: rgba(148, 163, 184, 0.2); color: #94a3b8; font-weight: bold; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">🔒 KİLİTLİ</span>' +
+                            '<span style="background: rgba(148, 163, 184, 0.2); color: #94a3b8; font-weight: bold; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">🔒 ' + curVal.toLocaleString('tr-TR') + ' / ' + badge.targetValue.toLocaleString('tr-TR') + ' (%' + pctVal + ')</span>' +
                         '</div>' +
                         '<div style="font-size: 0.88rem; color: #cbd5e1; margin-bottom: 6px;">📖 ' + badge.desc + '</div>' +
                         '<div style="font-size: 0.82rem; color: #facc15; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.08);">' +
@@ -2048,7 +2051,8 @@ const DriverBadges = {
                 }
 
                 btn.onclick = () => {
-                    const ariaTxt = badge.title + ". " + badge.desc + ". Şart: " + badge.requirement;
+                    const progTxt = isUn ? "Durum: Kazanıldı." : ("İlerleme: " + curVal.toLocaleString('tr-TR') + " bölü " + badge.targetValue.toLocaleString('tr-TR') + ", yüzde " + pctVal + ".");
+                    const ariaTxt = badge.title + ". " + badge.desc + ". Şart: " + badge.requirement + " " + progTxt;
                     if (typeof audio !== 'undefined') {
                         if (isUn && audio.playBadgeFanfare) audio.playBadgeFanfare();
                         else if (audio.playSwitchClick) audio.playSwitchClick();

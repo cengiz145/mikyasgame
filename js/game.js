@@ -733,12 +733,14 @@ const Game = {
     reportScheduleAdherence: function() {
         if (typeof audio !== 'undefined' && typeof audio.playIBISChime === 'function') audio.playIBISChime();
         const stopData = this.activeRouteData && this.activeRouteData.stops ? this.activeRouteData.stops[this.currentStopIndex] : null;
-        if (!stopData || !stopData.scheduledMinutes) {
+        if (!stopData || stopData.scheduledMinutes === undefined) {
             const defMsg = "Sefer Zamanlaması: Duraklara tam vaktinde ulaşıyorsunuz. Sıfır dakika sapma.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(defMsg);
             return;
         }
-        const delta = this.clockMinutes - stopData.scheduledMinutes;
+        let delta = this.clockMinutes - (stopData.scheduledMinutes % 1440);
+        if (delta < -720) delta += 1440;
+        else if (delta > 720) delta -= 1440;
         if (Math.abs(delta) <= 1.0) {
             const msg = "Sefer Zamanlaması: Harika gidiyorsunuz, duraklara tam vaktinde ulaşıyorsunuz. Sıfır dakika sapma.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
@@ -2450,7 +2452,9 @@ const Game = {
 
     beginDriving: function(restoreMode = false) {
         this.isDriving = true;
-        this.busDamage = { leftWindow: 0, rightWindow: 0, headlights: 0, wipers: 0, exhaust: 0, suspension: 0, brakes: 0, front: 0, transmission: 0, engine: 0, chassis: 0, health: 100 };
+        if (!this.busDamage || typeof this.busDamage.health !== 'number' || this.busDamage.health <= 0) {
+            this.busDamage = { leftWindow: 0, rightWindow: 0, headlights: 0, wipers: 0, exhaust: 0, suspension: 0, brakes: 0, front: 0, transmission: 0, engine: 0, chassis: 0, health: 100 };
+        }
         this.isHeadlightsOn = false; // Farlar başlangıçta kapalı
         this.headlightsUsedInRoute = false;
         this.lostAndFoundCheckingInProgress = false;
@@ -2525,13 +2529,15 @@ const Game = {
         this.totalDistanceCovered = 0; // 3D Ses koordinat sistemi için
         
         // Pnömatik (Hava) Sistemi Değişkenleri
-        this.airPressure = 120; // Tam dolu (PSI)
+        if (typeof this.airPressure !== 'number' || this.airPressure <= 0) {
+            this.airPressure = 120; // Tam dolu (PSI)
+        }
         this.isLowAirAlarmActive = false;
         this.isEmergencyBrakeLocked = false;
         this.isBrakeKeyDown = false;
 
         // Sefer Başlatma Başarımları ve İstatistik Kaydı (Tüm iklim, yakıt, otobüs ve rota verileri hazırlandıktan sonra)
-        if (typeof DriverBadges !== 'undefined' && typeof DriverBadges.recordRouteStart === 'function') {
+        if (!restoreMode && typeof DriverBadges !== 'undefined' && typeof DriverBadges.recordRouteStart === 'function') {
             try { DriverBadges.recordRouteStart(this); } catch(e) { console.warn('[Game] recordRouteStart hatası:', e); }
         }
         
@@ -4251,8 +4257,10 @@ const Game = {
         // DAKİKLİK VE ZAMANLAMA SAPMASI HESABI (DELTA ZAMANI)
         if (this.isDriving && this.activeRouteData && this.activeRouteData.stops && this.activeRouteData.stops[this.currentStopIndex]) {
             const schedTime = this.activeRouteData.stops[this.currentStopIndex].scheduledMinutes;
-            if (schedTime) {
-                const delta = this.clockMinutes - schedTime;
+            if (schedTime !== undefined) {
+                let delta = this.clockMinutes - (schedTime % 1440);
+                if (delta < -720) delta += 1440;
+                else if (delta > 720) delta -= 1440;
                 const timingEl = document.getElementById('hud-timing-val');
                 if (timingEl) {
                     if (Math.abs(delta) <= 1.0) {
@@ -5091,8 +5099,10 @@ const Game = {
 
         // Dakiklik değerlendirmesi
         let timingArrivalNotice = "";
-        if (stopData && stopData.scheduledMinutes) {
-            const delta = this.clockMinutes - stopData.scheduledMinutes;
+        if (stopData && stopData.scheduledMinutes !== undefined) {
+            let delta = this.clockMinutes - (stopData.scheduledMinutes % 1440);
+            if (delta < -720) delta += 1440;
+            else if (delta > 720) delta -= 1440;
             this.timingDeviations.push(delta);
             if (delta < -1.2) {
                 const early = Math.abs(Math.round(delta));
