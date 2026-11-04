@@ -164,27 +164,47 @@
             </div>
         </section>
 
-        <!-- GOOGLE / SHAZAM TARZI SESLİ ŞARKI, MELODİ VE ŞARKI SÖZÜ BULUCU PANELİ -->
+        <!-- AKILLI SESLİ ŞARKI, MIRILDANMA (MELODİ KONTURU), MAKAM/AKORT VE ŞARKI SÖZÜ ASİSTANI -->
         <section id="song-finder-panel" aria-labelledby="song-finder-heading" class="exam-remote-section" style="border-color: #a855f7;">
             <div class="exam-remote-header">
-                <h2 id="song-finder-heading" style="color: #c084fc;">🎵 Bu Çalan Hangi Şarkı? (Sesli Şarkı, Melodi ve Söz Bulucu)</h2>
+                <h2 id="song-finder-heading" style="color: #c084fc;">🎵 Akıllı Şarkı, Mırıldanma, Makam ve Enstrüman Akort Asistanı</h2>
                 <span id="song-status-badge" class="status-badge ready">Dinlemeye Hazır</span>
             </div>
             <p class="exam-remote-hint">
-                Etrafta çalan bir şarkıyı bulmak, hatırladığınız birkaç kelimesini sesli söylemek veya mırıldanmak için <strong>"Şarkıyı Dinle ve Bul (H)"</strong> düğmesine basın. Bulunan şarkının orijinal kaydını hemen dinleyebilir veya tüm sözlerini sesli okutabilirsiniz:
+                Çalan şarkıyı dinletin, birkaç kelimesini söyleyin veya <strong>hiç söz söylemeden sadece melodisini mırıldanın / ıslık çalın</strong>. Şarkıyı bulduğunda orijinal kaydını dinleyebilir, sözlerini <strong>mısra mısra (satır satır)</strong> gezebilir, saz/gitar akordu yapabilir veya <strong>Kafe/Radyo Sürekli Takip</strong> modunu açabilirsiniz:
             </p>
             <div class="exam-nav-row" role="group" aria-label="Şarkı Dinleme ve Bulma Kontrolleri">
-                <button type="button" id="btn-song-listen" class="primary-btn" style="background: linear-gradient(135deg, #9333ea, #6366f1);" aria-label="Mikrofonla Çalan Şarkıyı veya Söylediğiniz Sözleri Dinleyip Bul (Kısayol: H)">
-                    🎤 Şarkıyı Dinle ve Bul (H)
+                <button type="button" id="btn-song-listen" class="primary-btn" style="background: linear-gradient(135deg, #9333ea, #6366f1);" aria-label="Mikrofonla Çalan Şarkıyı, Mırıldanmayı veya Söylediğiniz Sözleri Dinleyip Bul (Kısayol: H)">
+                    🎤 Şarkıyı / Mırıldanmayı Dinle (H)
                 </button>
                 <button type="button" id="btn-google-hum-search" class="secondary-btn" aria-label="Google Mırıldanarak veya Islık Çalarak Şarkı Bulma Motorunu Aç">
-                    🎶 Google Mırıldanarak Şarkı Bul
+                    🎶 Google Mırıldanma Motoru
                 </button>
+                <button type="button" id="btn-song-auto-radar" class="secondary-btn" aria-pressed="false" aria-label="Radyo veya Kafede Çalan Her Yeni Şarkıyı Otomatik Bulup Haber Veren Sürekli Takip Modunu Aç veya Kapat">
+                    📡 Sürekli Şarkı Takibi (Kafe/Radyo): Kapalı
+                </button>
+                <button type="button" id="btn-song-tuner" class="secondary-btn" aria-pressed="false" aria-label="Saz, Gitar, Keman İçin Sesli Enstrüman Akort ve Makam Bulucuyu Aç veya Kapat">
+                    🎸 Sesli Enstrüman Akort &amp; Makam: Kapalı
+                </button>
+            </div>
+            <div class="exam-nav-row" role="group" aria-label="Bulunan Şarkıyı Dinleme, Sözleri Mısra Mısra Okuma ve Şarkı Defteri" style="margin-top: 0.55rem;">
                 <button type="button" id="btn-song-preview" class="secondary-btn" disabled aria-label="Bulunan Şarkının Orijinal Kaydını Dinle veya Durdur">
                     ▶️ Bulunan Şarkıyı Dinle (Doğrula)
                 </button>
-                <button type="button" id="btn-song-read-lyrics" class="secondary-btn" disabled aria-label="Bulunan Şarkının Tüm Sözlerini Sesli Oku">
-                    📜 Şarkı Sözlerini Sesli Oku
+                <button type="button" id="btn-song-read-lyrics" class="secondary-btn" disabled aria-label="Bulunan Şarkının Tüm Sözlerini Baştan Sona Sesli Oku">
+                    📜 Tüm Sözleri Oku
+                </button>
+                <button type="button" id="btn-lyric-prev" class="secondary-btn" disabled aria-label="Şarkı Sözlerinde Önceki Mısraya (Satıra) Geç">
+                    ⬅️ Önceki Mısra
+                </button>
+                <button type="button" id="btn-lyric-current" class="secondary-btn" disabled aria-label="Şu Anki Mısrayı Tekrar Oku">
+                    🎤 Mısrayı Oku
+                </button>
+                <button type="button" id="btn-lyric-next" class="secondary-btn" disabled aria-label="Şarkı Sözlerinde Sonraki Mısraya (Satıra) Geç">
+                    Sonraki Mısra ➡️
+                </button>
+                <button type="button" id="btn-song-history" class="secondary-btn" aria-label="Daha Önce Bulduğunuz Şarkılar Defterini Sesli Oku">
+                    📒 Bulduğum Şarkılar Defteri
                 </button>
             </div>
             <div class="exam-nav-row" style="align-items:center; gap: 0.6rem; margin-top: 0.6rem;">
@@ -194,7 +214,7 @@
                     🔍 Sözden Şarkıyı Bul
                 </button>
             </div>
-            <div class="telemetry-grid" role="list" aria-label="Şarkı ve Melodi Bilgileri" style="margin-top: 0.7rem;">
+            <div class="telemetry-grid" role="list" aria-label="Şarkı, Makam ve Melodi Bilgileri" style="margin-top: 0.7rem;">
                 <div class="telemetry-item" role="listitem">
                     <span class="t-label">Bulunan Şarkı ve Sanatçı:</span>
                     <strong id="song-found-title">Henüz şarkı aranmadı</strong>
@@ -204,13 +224,17 @@
                     <strong id="song-found-album">-</strong>
                 </div>
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Mikrofondan Duyulan Sözler:</span>
+                    <span class="t-label">Duyulan Sözler / Aktif Mısra:</span>
                     <strong id="song-heard-words">Dinleme bekleniyor...</strong>
                 </div>
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Canlı Melodi Notası ve Ritim (BPM):</span>
+                    <span class="t-label">Nota, Makam/Ton, Akort ve Tempo (BPM):</span>
                     <strong id="song-melody-bpm">Ölçüm bekleniyor...</strong>
                 </div>
+            </div>
+            <div id="song-alternatives-box" hidden style="margin-top: 0.65rem;">
+                <p class="exam-remote-hint" style="margin-bottom: 0.35rem;">🎶 <strong>Diğer Eşleşen Şarkılar ve Sanatçının Sevilen Eserleri (Tek Dokunuşla Seçin):</strong></p>
+                <div id="song-alternatives-list" class="exam-nav-row" role="group" aria-label="Alternatif Şarkı Sonuçları"></div>
             </div>
             <div class="exam-nav-row" id="song-external-links" hidden style="margin-top: 0.65rem;">
                 <a id="btn-song-youtube" href="#" target="_blank" rel="noopener" class="action-btn" style="text-decoration:none; display:inline-block;" aria-label="Bulunan Şarkıyı YouTube Üzerinde Aç ve Dinle">

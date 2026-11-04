@@ -152,13 +152,22 @@
         lastStoryText: '',
         // Sesli Şarkı, Melodi ve Söz Bulucu Durumu
         songListening: false,
+        songAutoRadarEnabled: false,
+        songAutoRadarInterval: null,
+        songTunerActive: false,
+        lastTunerSpokenAt: 0,
         songRecognition: null,
         songAudioStream: null,
         songAnalyserTimer: null,
         songAutoSearchTimer: null,
         lastFoundSong: null,
+        songLyricLines: [],
+        currentLyricIndex: 0,
+        songAlternatives: [],
         songPreviewAudio: null,
         detectedNotes: [],
+        detectedMidiNotes: [],
+        chromaHistogram: new Float32Array(12),
         onsetTimestamps: [],
         lastRmsEnergy: 0,
         // Sınav Soruları ve Şık Durumu
@@ -242,14 +251,22 @@
         songStatusBadge: document.getElementById('song-status-badge'),
         btnSongListen: document.getElementById('btn-song-listen'),
         btnGoogleHumSearch: document.getElementById('btn-google-hum-search'),
+        btnSongAutoRadar: document.getElementById('btn-song-auto-radar'),
+        btnSongTuner: document.getElementById('btn-song-tuner'),
         btnSongPreview: document.getElementById('btn-song-preview'),
         btnSongReadLyrics: document.getElementById('btn-song-read-lyrics'),
+        btnLyricPrev: document.getElementById('btn-lyric-prev'),
+        btnLyricCurrent: document.getElementById('btn-lyric-current'),
+        btnLyricNext: document.getElementById('btn-lyric-next'),
+        btnSongHistory: document.getElementById('btn-song-history'),
         songSearchInput: document.getElementById('song-search-input'),
         btnSongTextSearch: document.getElementById('btn-song-text-search'),
         songFoundTitle: document.getElementById('song-found-title'),
         songFoundAlbum: document.getElementById('song-found-album'),
         songHeardWords: document.getElementById('song-heard-words'),
         songMelodyBpm: document.getElementById('song-melody-bpm'),
+        songAlternativesBox: document.getElementById('song-alternatives-box'),
+        songAlternativesList: document.getElementById('song-alternatives-list'),
         songExternalLinks: document.getElementById('song-external-links'),
         btnSongYoutube: document.getElementById('btn-song-youtube'),
         btnSongSpotify: document.getElementById('btn-song-spotify')
@@ -4274,32 +4291,41 @@
     }
 
     // =========================================================================
-    // MOD 15: GOOGLE / SHAZAM TARZI SESLİ ŞARKI, MELODİ (NOTA/BPM) VE SÖZ BULUCU
+    // MOD 15: AKILLI SESLİ ŞARKI, MIRILDANMA (PARSONS & YARI-TON ARALIK DİZİSİ),
+    // FONETİK TÜRKÇE SÖZ TAMAMLAMA, MISRA MISRA KARAOKE, MAKAM VE AKORT ASİSTANI
     // =========================================================================
     const TURKISH_NOTE_NAMES = ['Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si'];
+    const SAVED_SONGS_STORAGE_KEY = 'mikyas_saved_songs_v1';
 
+    /**
+     * Her eserin hem sözleri/anahtar kelimeleri hem de mırıldanma/ıslıkla (sözsüz) bulmayı sağlayan
+     * Yarı-Ton Melodi Aralık Vektörü (Semitone Intervals Δm = MIDI[i] - MIDI[i-1]) tanımlıdır.
+     */
     const TURKISH_OFFLINE_SONG_DB = [
         {
             title: 'Gülpembe',
             artist: 'Barış Manço',
             album: 'Sözüm Meclisten Dışarı (1981)',
             genre: 'Anadolu Rock',
+            semitoneIntervals: [-2, -2, -1, 1, 2, -2, -1, -2, 2, 1, -1, -2],
             keywords: ['gülpembe', 'sen gülünce güller açar', 'bülbüller seni söyler', 'güz yağmurlarıyla bir gün göçtün'],
-            lyrics: 'Sen gülünce güller açar Gülpembe,\nBülbüller seni söyler, biz dinlerdik Gülpembe.\nBahar gelir, parlak güneş doğardı,\nSen üzülünce boynumuz bükülürdü Gülpembe.\nGüz yağmurlarıyla bir gün göçtün gittin, inanamadık Gülpembe.'
+            lyrics: 'Sen gülünce güller açar Gülpembe,\nBülbüller seni söyler, biz dinlerdik Gülpembe.\nBahar gelir, parlak güneş doğardı,\nSen üzülünce boynumuz bükülürdü Gülpembe.\nGüz yağmurlarıyla bir gün göçtün gittin, inanamadık Gülpembe.\nBizim iller sessiz, bizim iller sensiz olamadı Gülpembe.'
         },
         {
             title: 'Dönence',
             artist: 'Barış Manço',
             album: 'Sözüm Meclisten Dışarı (1981)',
             genre: 'Anadolu Rock',
+            semitoneIntervals: [0, 3, 2, -2, -3, 0, 3, 2, 3, -3],
             keywords: ['dönence', 'simsiyah gecenin koynundayım', 'uzaklarda bir yerlerde güneşler doğuyor', 'biliyorum dönence'],
-            lyrics: 'Simsiyah gecenin koynundayım, yapayalnız.\nUzaklarda bir yerlerde güneşler doğuyor.\nBiliyorum, dönence!\nKupkuru bir ağacın dalıyım, yapayalnız.'
+            lyrics: 'Simsiyah gecenin koynundayım, yapayalnız.\nUzaklarda bir yerlerde güneşler doğuyor.\nBiliyorum, dönence!\nKupkuru bir ağacın dalıyım, yapayalnız.\nUzaklarda bir yerlerde bir şeyler kök salıyor.\nBiliyorum, dönence!'
         },
         {
             title: 'Dağlar Dağlar',
             artist: 'Barış Manço',
             album: 'Dağlar Dağlar (1970)',
             genre: 'Anadolu Rock',
+            semitoneIntervals: [2, 1, 2, -2, -1, -2, -2, 2, 1, -1, -2],
             keywords: ['dağlar dağlar', 'ellerimle büyüttüğüm', 'kurban olam yol ver geçem', 'sevdiğimi son bir olsun yakından görem'],
             lyrics: 'Ellerimle büyüttüğüm solar iken dirilttiğim,\nÇiçeğimi kopardınız, ellere verdiniz.\nDağlar dağlar, kurban olam, yol ver geçem,\nSevdiğimi son bir olsun yakından görem!'
         },
@@ -4308,14 +4334,16 @@
             artist: 'Barış Manço',
             album: 'Sözüm Meclisten Dışarı (1981)',
             genre: 'Çocuk / Pop',
+            semitoneIntervals: [2, 2, 1, 2, -2, -1, -2, -2, 2, 2, -4],
             keywords: ['arkadaşım eşek', 'kaç yıl oldu saymadım köyden göçeli', 'arkadaşım eş', 'uzun kulaklı'],
-            lyrics: 'Kaç yıl oldu saymadım köyden göçeli,\nMevsimler geldi geçti görüşmeyeli.\nArkadaşım eş, arkadaşım şek, arkadaşım eşek!'
+            lyrics: 'Kaç yıl oldu saymadım köyden göçeli,\nMevsimler geldi geçti görüşmeyeli.\nHiç haber göndermedin o günden beri,\nYoksa bana küstün mü, unuttun mu beni?\nArkadaşım eş, arkadaşım şek, arkadaşım eşek!'
         },
         {
             title: 'Uzun İnce Bir Yoldayım',
             artist: 'Aşık Veysel',
             album: 'Dostlar Beni Hatırlasın',
-            genre: 'Türk Halk Müziği',
+            genre: 'Türk Halk Müziği (Hüseyni)',
+            semitoneIntervals: [0, 2, 1, -1, -2, -2, 2, -2, -1, 1, -1, -2],
             keywords: ['uzun ince bir yoldayım', 'gidiyorum gündüz gece', 'bilmiyorum ne haldeyim', 'iki kapılı bir handa'],
             lyrics: 'Uzun ince bir yoldayım,\nGidiyorum gündüz gece.\nBilmiyorum ne haldeyim,\nGidiyorum gündüz gece.\nDünyaya geldiğim anda,\nYürüdüm aynı zamanda,\nİki kapılı bir handa,\nGidiyorum gündüz gece.'
         },
@@ -4324,7 +4352,8 @@
             artist: 'Neşet Ertaş',
             album: 'Bozkırın Tezenesi',
             genre: 'Türk Halk Müziği / Bozlak',
-            keywords: ['gönül dağı yağmur yağmur', 'boran olunca', 'akar can özümden sel gizli gizli', 'bir تنhada can cananı bulunca'],
+            semitoneIntervals: [3, 2, -2, -1, -2, 2, -2, -2, 2, -2],
+            keywords: ['gönül dağı yağmur yağmur', 'boran olunca', 'akar can özümden sel gizli gizli', 'bir tenhada can cananı bulunca'],
             lyrics: 'Gönül dağı yağmur yağmur boran olunca,\nAkar can özümden sel gizli gizli.\nBir tenhada can cananı bulunca,\nSinemi yaralar dil gizli gizli.'
         },
         {
@@ -4332,6 +4361,7 @@
             artist: 'Neşet Ertaş',
             album: 'Bozkırın Tezenesi',
             genre: 'Türk Halk Müziği',
+            semitoneIntervals: [2, 2, -2, -2, 2, 1, -1, -2, -2],
             keywords: ['neredesin sen', 'tatlı dile güler yüze', 'doyulur mu doyulur mu', 'aşkın beni deli eyledi'],
             lyrics: 'Tatlı dile güler yüze,\nDoyulur mu doyulur mu?\nAşkın beni deli eyledi,\nNeredesin sen, neredesin sen?'
         },
@@ -4340,30 +4370,34 @@
             artist: 'Sezen Aksu',
             album: 'Gülümse (1991)',
             genre: 'Türkçe Pop',
+            semitoneIntervals: [2, 1, 2, -2, -1, -2, 3, -1, -2],
             keywords: ['gülümse hadi gülümse', 'bulutlar gitsin', 'belki şehre bir film gelir', 'tut ki karnım acıktı anneme küstüm'],
-            lyrics: 'Tut ki karnım acıktı, anneme küstüm,\nTüm şehir bana küstü.\nBir kedim bile yok, anlıyor musun?\nHadi gülümse, bulutlar gitsin!\nBelki şehre bir film gelir, bir güzel orman olur yazılarda.'
+            lyrics: 'Tut ki karnım acıktı, anneme küstüm,\nTüm şehir bana küstü.\nBir kedim bile yok, anlıyor musun?\nHadi gülümse, bulutlar gitsin!\nBelki şehre bir film gelir, bir güzel orman olur yazılarda.\nİklim değişir, Akdeniz olur, gülümse!'
         },
         {
             title: 'Firuze',
             artist: 'Sezen Aksu',
             album: 'Firuze (1982)',
             genre: 'Türkçe Pop',
+            semitoneIntervals: [-1, -2, -2, 2, 2, 1, -1, -2],
             keywords: ['firuze', 'kıskanır rengini baharda yeşiller', 'sevda büyüsü gibisin sen firuze'],
-            lyrics: 'Kıskanır rengini baharda yeşiller,\nSevda büyüsü gibisin sen Firuze.\nSen نازlı bir çiçek, bir orman kuytu,\nÜzüm buğusu gibisin sen Firuze.'
+            lyrics: 'Kıskanır rengini baharda yeşiller,\nSevda büyüsü gibisin sen Firuze.\nSen nazlı bir çiçek, bir orman kuytu,\nÜzüm buğusu gibisin sen Firuze.'
         },
         {
             title: 'Resimdeki Gözyaşları',
             artist: 'Cem Karaca',
             album: 'Apaşlar (1968)',
             genre: 'Anadolu Rock',
+            semitoneIntervals: [3, 2, 2, -2, -2, -1, 1, 2, -2, -3],
             keywords: ['resimdeki gözyaşları', 'bir gün belki hayattan', 'geçmişteki günlerden bir teselli ararsın', 'bak o zaman resmime'],
-            lyrics: 'Bir gün belki hayattan,\nGeçmişteki günlerden bir teselli ararsın.\nBak o zaman resmime,\nGör akan o yaşları!'
+            lyrics: 'Bir gün belki hayattan,\nGeçmişteki günlerden bir teselli ararsın.\nBak o zaman resmime,\nGör akan o yaşları!\nBenden sana son kalan,\nBir küçük resim şimdi.\nCevap veremez ama,\nAğlar yalnızlığına!'
         },
         {
             title: 'Tamirci Çırağı',
             artist: 'Cem Karaca',
             album: 'Klasikler (1975)',
             genre: 'Anadolu Rock',
+            semitoneIntervals: [2, 1, 2, -2, -1, -2, 2, -2],
             keywords: ['tamirci çırağı', 'gönlümde bir fırtına kopar', 'işçisin sen işçi kal', 'giy dedi tulumları'],
             lyrics: 'Gönlümde bir fırtına kopar,\nUstam seslenir uzaktan: Oğlum al takımları!\nİşçisin sen işçi kal, giy dedi tulumları.'
         },
@@ -4372,6 +4406,7 @@
             artist: 'Cem Karaca',
             album: 'Merhaba Gençler (1987)',
             genre: 'Anadolu Rock',
+            semitoneIntervals: [0, 2, 1, 2, -2, -1, -2, 0, 3, -1, -2],
             keywords: ['ceviz ağacı', 'başım köpük köpük bulut', 'ben bir ceviz ağacıyım gülhane parkında', 'ne sen bunun farkındasın ne de polis farkında'],
             lyrics: 'Başım köpük köpük bulut, içim dışım deniz,\nBen bir ceviz ağacıyım Gülhane Parkında.\nBudak budak, şerham şerham ihtiyar bir ceviz,\nNe sen bunun farkındasın ne de polis farkında.'
         },
@@ -4379,7 +4414,8 @@
             title: 'Fikrimin İnce Gülü',
             artist: 'Müzeyyen Senar (Muallim İsmail Hakkı Bey)',
             album: 'Türk Sanat Müziği Klasikleri',
-            genre: 'Türk Sanat Müziği',
+            genre: 'Türk Sanat Müziği (Acemkürdî)',
+            semitoneIntervals: [-2, -1, -2, 2, 1, 2, -2, -1, -2, -2],
             keywords: ['fikrimin ince gülü', 'kalbimin şen bülbülü', 'o gün ki gördüm seni', 'yaktın ah yaktın beni'],
             lyrics: 'Fikrimin ince gülü,\nKalbimin şen bülbülü.\nO gün ki gördüm seni,\nYaktın ah yaktın beni.'
         },
@@ -4388,15 +4424,62 @@
             artist: 'Zeki Müren',
             album: 'Türk Sanat Müziği Klasikleri',
             genre: 'Türk Sanat Müziği (Sûzinâk)',
+            semitoneIntervals: [2, 1, 2, -2, -1, -2, 1, -1, -2],
             keywords: ['şimdi uzaklardasın', 'gönül hicranla doldu', 'hiç ayrılamam derken', 'kavuşmak hayal oldu'],
             lyrics: 'Şimdi uzaklardasın,\nGönül hicranla doldu.\nHiç ayrılamam derken,\nKavuşmak hayal oldu.'
+        },
+        {
+            title: 'Samanyolu',
+            artist: 'Berkant',
+            album: 'Türk Pop Klasikleri (1967)',
+            genre: 'Türkçe Nostalji / Pop',
+            semitoneIntervals: [5, -1, -2, -2, 3, -1, -2, -1, 5, -2, -1, -2],
+            keywords: ['samanyolu', 'sen kalbimin mehtabısın güneşisin', 'bir şarkısın sen ömür boyu sürecek', 'dudaklarımdan yıllarca düşmeyecek'],
+            lyrics: 'Sen kalbimin mehtabısın, güneşisin,\nSen ruhumun vazgeçilmez bir eşisin.\nBir şarkısın sen, ömür boyu sürecek,\nDudaklarımdan yıllarca düşmeyecek!'
+        },
+        {
+            title: 'Üsküdar\'a Gider İken (Kâtibim)',
+            artist: 'İstanbul Türküsü / Klasik',
+            album: 'Geleneksel İstanbul Türküleri',
+            genre: 'Türk Halk / Sanat Müziği (Nihavend)',
+            semitoneIntervals: [2, 1, 2, 2, -2, -2, -1, -2, 2, 1, 2, -3],
+            keywords: ['üsküdara gider iken', 'aldı da bir yağmur', 'katibimin setresi uzun', 'katip uykudan uyanmış'],
+            lyrics: 'Üsküdar\'a gider iken aldı da bir yağmur,\nKâtibimin setresi uzun, eteği çamur.\nKâtip uykudan uyanmış, gözleri mahmur,\nKâtip benim, ben kâtibin, el ne karışır?'
+        },
+        {
+            title: 'Çanakkale İçinde',
+            artist: 'Çanakkale Türküsü',
+            album: 'Kahramanlık Türküleri',
+            genre: 'Türk Halk Müziği',
+            semitoneIntervals: [2, 1, 2, 0, -2, -1, -2, 2, -2, -2],
+            keywords: ['çanakkale içinde vurdular beni', 'ölmeden mezara koydular beni', 'of gençliğim eyvah', 'aynalı çarşı'],
+            lyrics: 'Çanakkale içinde aynalı çarşı,\nAna ben gidiyom düşmana karşı,\nOf, gençliğim eyvah!\nÇanakkale içinde vurdular beni,\nÖlmeden mezara koydular beni,\nOf, gençliğim eyvah!'
+        },
+        {
+            title: 'Sarı Gelin',
+            artist: 'Erzurum Türküsü',
+            album: 'Anadolu Türküleri',
+            genre: 'Türk Halk Müziği',
+            semitoneIntervals: [0, -1, -2, 2, 1, -1, -2, -2, 2, -2],
+            keywords: ['sarı gelin', 'erzurum çarşı pazar', 'leylim aman', 'içinde bir kız gezer'],
+            lyrics: 'Erzurum çarşı pazar, leylim aman aman,\nSarı gelin...\nİçinde bir kız gezer, oy nenen ölsün sarı gelin aman!'
+        },
+        {
+            title: 'İstiklal Marşı',
+            artist: 'Mehmet Akif Ersoy & Osman Zeki Üngör',
+            album: 'Türkiye Cumhuriyeti Milli Marşı',
+            genre: 'Milli Marş',
+            semitoneIntervals: [5, 2, 1, -1, -2, -5, 5, 4, 3, -2, -1],
+            keywords: ['korkma sönmez bu şafaklarda', 'yüzen al sancak', 'sönmeden yurdumun üstünde', 'o benim milletimin yıldızıdır'],
+            lyrics: 'Korkma, sönmez bu şafaklarda yüzen al sancak;\nSönmeden yurdumun üstünde tüten en son ocak.\nO benim milletimin yıldızıdır, parlayacak;\nO benimdir, o benim milletimindir ancak!'
         },
         {
             title: 'Kuzu Kuzu',
             artist: 'Tarkan',
             album: 'Karma (2001)',
             genre: 'Türkçe Pop',
-            keywords: ['kuzu kuzu', 'bak kırıldı kolum kanadım', 'olmadı tutunamadım', 'işte geldim diz 보러 kuzu kuzu'],
+            semitoneIntervals: [0, 1, -1, -2, 2, 1, -1, -2],
+            keywords: ['kuzu kuzu', 'bak kırıldı kolum kanadım', 'olmadı tutunamadım', 'işte geldim kapına kuzu kuzu'],
             lyrics: 'Bak kırıldı kolum kanadım,\nOlmadı, tutunamadım.\nZor! Yokluğun çok zor, alışamadım.\nİşte geldim kapına kuzu kuzu!'
         },
         {
@@ -4404,6 +4487,7 @@
             artist: 'Tarkan',
             album: 'Ölürüm Sana (1997)',
             genre: 'Türkçe Pop',
+            semitoneIntervals: [1, 2, -2, -1, 1, 2, -2, -1],
             keywords: ['şımarık', 'yakalarsam muck muck', 'takmış koluna elin adamını', 'beni orta yerimden çatlatıyor'],
             lyrics: 'Takmış koluna elin adamını,\nBeni orta yerimden çatlatıyor.\nAğzında sakız şişirip şişirip,\nArsız arsız patlatıyor!'
         },
@@ -4412,6 +4496,7 @@
             artist: 'Müslüm Gürses',
             album: 'Aşk Tesadüfleri Sever (2006)',
             genre: 'Arabesk / Alternatif',
+            semitoneIntervals: [2, 1, 2, -2, -1, -2, -2, 2],
             keywords: ['nilüfer', 'zaman sadece birazcık zaman', 'geçici bu öfke bu hırs bu intikam', 'acılarımız tarih oluyor'],
             lyrics: 'Zaman, sadece birazcık zaman...\nGeçici bu öfke, bu hırs, bu intikam.\nAcılarımız tarih oluyor,\nÖmrümüzden Nilüfer.'
         },
@@ -4420,6 +4505,7 @@
             artist: 'Duman',
             album: 'Seni Kendime Sakladım (2005)',
             genre: 'Türkçe Rock',
+            semitoneIntervals: [2, 2, -2, -2, 4, -2, -2],
             keywords: ['senden daha güzel', 'kimseyi görmedim ben senden daha güzel', 'kimseyi tanımadım ben'],
             lyrics: 'Kimseyi görmedim ben,\nSenden daha güzel!\nKimseyi tanımadım ben,\nSenden daha özel!'
         },
@@ -4428,6 +4514,7 @@
             artist: 'Mor ve Ötesi',
             album: 'Dünya Yalan Söylüyor (2004)',
             genre: 'Türkçe Rock',
+            semitoneIntervals: [3, -1, -2, 2, -2, -2, 2, 1],
             keywords: ['bir derdim var artık tutamam içimde', 'gitsem nereye kadar', 'kalsam neye yarar'],
             lyrics: 'Bir derdim var, artık tutamam içimde.\nGitsem nereye kadar, kalsam neye yarar?\nHiç anlatamadım, hiç anlamadılar.'
         },
@@ -4436,6 +4523,7 @@
             artist: 'Şebnem Ferah',
             album: 'Perdeler (2001)',
             genre: 'Türkçe Rock',
+            semitoneIntervals: [-2, -1, 1, 2, 2, -2, -2, -1],
             keywords: ['sil baştan başlamak gerek bazen', 'hayatı sıfırlamak', 'her şeyi unutmak'],
             lyrics: 'Sil baştan başlamak gerek bazen,\nHayatı sıfırlamak.\nSil baştan sevmek gerek bazen,\nHer şeyi unutmak.'
         },
@@ -4444,14 +4532,132 @@
             artist: 'Yunus Emre İlahisi',
             album: 'Tasavvuf Klasikleri',
             genre: 'İlahi / Tasavvuf',
+            semitoneIntervals: [2, 1, 2, -2, -1, -2, 0, 2, -2],
             keywords: ['şol cennetin ırmakları', 'akar allah deyu deyu', 'çıkmış islam bülbülleri', 'öter allah deyu deyu'],
             lyrics: 'Şol cennetin ırmakları,\nAkar Allah deyu deyu.\nÇıkmış İslam bülbülleri,\nÖter Allah deyu deyu.'
+        },
+        {
+            title: 'İyi ki Doğdun (Mutlu Yıllar Sana)',
+            artist: 'Geleneksel Kutlama Şarkısı',
+            album: 'Kutlama Klasikleri',
+            genre: 'Kutlama Melodisi',
+            semitoneIntervals: [0, 2, -2, 5, -1, -4, 0, 2, -2, 7, -2],
+            keywords: ['iyi ki doğdun', 'mutlu yıllar sana', 'happy birthday to you'],
+            lyrics: 'İyi ki doğdun, iyi ki doğdun,\nMutlu yıllar sana!\nİyi ki doğdun, iyi ki varsın,\nNice mutlu yıllara!'
+        },
+        {
+            title: '9. Senfoni (Neşeye Övgü / Ode to Joy)',
+            artist: 'Ludwig van Beethoven',
+            album: 'Klasik Müzik Başyapıtları',
+            genre: 'Klasik Müzik',
+            semitoneIntervals: [0, 1, 2, 0, -2, -1, -2, -2, 2, 2, 0, -2, 0],
+            keywords: ['neşeye övgü', 'beethoven 9', 'ode to joy'],
+            lyrics: 'Kardeş olun ey insanlar,\nBunu ister tanrımız.\nBu dünyada her şey geçer,\nEn son sana dost kalır!'
         }
     ];
 
     /**
+     * Türkçe Fonetik Normalleştirici ve 3-Gram Bulanık (Fuzzy) Benzerlik Skoru:
+     * Gürültülü ortamda "gül pembe" -> "gulpembe" veya "uzun ince yolda" gibi eksik/bozuk
+     * duyulan kelimeleri yüksek doğrulukla eşleştirir.
+     */
+    function normalizeTurkishPhonetic(str) {
+        return String(str || '')
+            .toLocaleLowerCase('tr-TR')
+            .replace(/ğ/g, 'g')
+            .replace(/ş/g, 's')
+            .replace(/ç/g, 'c')
+            .replace(/ı/g, 'i')
+            .replace(/ö/g, 'o')
+            .replace(/ü/g, 'u')
+            .replace(/â/g, 'a')
+            .replace(/î/g, 'i')
+            .replace(/û/g, 'u')
+            .replace(/[^a-z0-9\s]/g, ' ')
+            .replace(/(.)\1+/g, '$1')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function computeTrigramSimilarity(a, b) {
+        const na = normalizeTurkishPhonetic(a);
+        const nb = normalizeTurkishPhonetic(b);
+        if (!na || !nb) return 0;
+        if (na.includes(nb) || nb.includes(na)) return 0.95;
+
+        const trigramsA = new Set();
+        const trigramsB = new Set();
+        for (let i = 0; i <= na.length - 3; i++) trigramsA.add(na.slice(i, i + 3));
+        for (let i = 0; i <= nb.length - 3; i++) trigramsB.add(nb.slice(i, i + 3));
+        if (trigramsA.size === 0 || trigramsB.size === 0) return 0;
+
+        let inter = 0;
+        trigramsA.forEach(t => {
+            if (trigramsB.has(t)) inter++;
+        });
+        return (2 * inter) / (trigramsA.size + trigramsB.size);
+    }
+
+    /**
+     * Sözsüz Mırıldanma / Islık / Enstrüman Melodisi Eşleştirici:
+     * Kullanıcının mırıldandığı MIDI notalarının yarı-ton farklarını (Δm = MIDI[i] - MIDI[i-1])
+     * ve Parsons yön kodunu (Çıkış/İniş/Aynı) veritabanındaki melodilerle karşılaştırır.
+     */
+    function matchMelodyBySemitoneContour(midiNotes) {
+        if (!Array.isArray(midiNotes) || midiNotes.length < 5) return null;
+        const userIntervals = [];
+        for (let i = 1; i < midiNotes.length; i++) {
+            const diff = Math.max(-9, Math.min(9, midiNotes[i] - midiNotes[i - 1]));
+            userIntervals.push(diff);
+        }
+
+        let bestSong = null;
+        let bestScore = 0;
+
+        for (let s = 0; s < TURKISH_OFFLINE_SONG_DB.length; s++) {
+            const song = TURKISH_OFFLINE_SONG_DB[s];
+            const ref = song.semitoneIntervals;
+            if (!ref || ref.length < 5) continue;
+
+            const winLen = Math.min(userIntervals.length, ref.length);
+            let maxSlideSim = 0;
+
+            for (let offset = 0; offset <= Math.max(0, ref.length - winLen); offset++) {
+                let errSum = 0;
+                let dirMatches = 0;
+                for (let k = 0; k < winLen; k++) {
+                    const u = userIntervals[k];
+                    const r = ref[offset + k];
+                    errSum += Math.abs(u - r);
+                    if (Math.sign(u) === Math.sign(r) || Math.abs(u - r) <= 1) {
+                        dirMatches++;
+                    }
+                }
+                const meanErr = errSum / winLen;
+                const dirRatio = dirMatches / winLen;
+                const sim = Math.max(0, 1 - meanErr / 4.8) * 0.65 + dirRatio * 0.35;
+                if (sim > maxSlideSim) maxSlideSim = sim;
+            }
+
+            if (maxSlideSim > bestScore) {
+                bestScore = maxSlideSim;
+                bestSong = song;
+            }
+        }
+
+        if (bestSong && bestScore >= 0.58) {
+            return {
+                song: bestSong,
+                confidencePct: Math.min(98, Math.round(bestScore * 100))
+            };
+        }
+        return null;
+    }
+
+    /**
      * Zaman düzlemi otokorelasyon (Autocorrelation) algoritması ile mikrofondan gelen
-     * mırıldanma, ıslık veya enstrüman sesinin temel frekansını (Hz) ve notasını bulur.
+     * mırıldanma, ıslık veya enstrüman sesinin temel frekansını (Hz), MIDI notasını
+     * ve akort sapmasını (Cent: 1200 * log2(f / f_std)) milimetrik olarak bulur.
      */
     function detectPitchHzAutocorrelation(buf, sampleRate) {
         const size = buf.length;
@@ -4460,7 +4666,7 @@
             rms += buf[i] * buf[i];
         }
         rms = Math.sqrt(rms / size);
-        if (rms < 0.015) return { hz: null, rms };
+        if (rms < 0.014) return { hz: null, rms };
 
         let r1 = 0, r2 = size - 1;
         const thres = 0.2;
@@ -4495,17 +4701,69 @@
         }
         if (maxpos <= 0) return { hz: null, rms };
 
-        const hz = sampleRate / maxpos;
-        if (hz < 75 || hz > 1100) return { hz: null, rms };
-        return { hz: Math.round(hz), rms };
+        // Parabolik enterpolasyon ile alt-örneklem (sub-sample) hassasiyeti
+        let truePos = maxpos;
+        if (maxpos > 0 && maxpos < newSize - 1) {
+            const y1 = c[maxpos - 1], y2 = c[maxpos], y3 = c[maxpos + 1];
+            const denom = y1 - 2 * y2 + y3;
+            if (Math.abs(denom) > 0.0001) {
+                truePos = maxpos + 0.5 * (y1 - y3) / denom;
+            }
+        }
+
+        const hz = sampleRate / truePos;
+        if (hz < 70 || hz > 1150) return { hz: null, rms };
+        return { hz: Number(hz.toFixed(1)), rms };
     }
 
-    function hzToTurkishNote(hz) {
+    function analyzePitchNoteAndCent(hz) {
         if (!hz) return null;
-        const midi = Math.round(12 * Math.log2(hz / 440) + 69);
-        const noteName = TURKISH_NOTE_NAMES[((midi % 12) + 12) % 12];
+        const exactMidi = 12 * Math.log2(hz / 440) + 69;
+        const midi = Math.round(exactMidi);
+        const cents = Math.round((exactMidi - midi) * 100);
+        const pitchClass = ((midi % 12) + 12) % 12;
+        const noteName = TURKISH_NOTE_NAMES[pitchClass];
         const octave = Math.floor(midi / 12) - 1;
-        return `${noteName}${octave}`;
+        return {
+            midi,
+            pitchClass,
+            noteName,
+            octave,
+            fullLabel: `${noteName}${octave}`,
+            cents,
+            hz: Math.round(hz)
+        };
+    }
+
+    /**
+     * 12-Ton Kroma Histogramından Çalan Müziğin Tonunu ve Türk Müziği Makam Ailesini Tahmin Eder.
+     */
+    function estimateMusicalKeyAndMakam(chromaHist) {
+        let maxVal = 0;
+        let rootIdx = 0;
+        for (let i = 0; i < 12; i++) {
+            if (chromaHist[i] > maxVal) {
+                maxVal = chromaHist[i];
+                rootIdx = i;
+            }
+        }
+        if (maxVal < 2) return 'Analiz ediliyor';
+
+        const rootName = TURKISH_NOTE_NAMES[rootIdx];
+        const minorThird = chromaHist[(rootIdx + 3) % 12];
+        const majorThird = chromaHist[(rootIdx + 4) % 12];
+        const flatSecond = chromaHist[(rootIdx + 1) % 12];
+
+        if (flatSecond > maxVal * 0.32 && majorThird >= minorThird) {
+            return `${rootName} Hicaz Makamı Ailesi`;
+        }
+        if (flatSecond > maxVal * 0.32 && minorThird > majorThird) {
+            return `${rootName} Kürdî / Hüseynî Ailesi`;
+        }
+        if (minorThird >= majorThird) {
+            return `${rootName} Minör (Nihavend / Buselik)`;
+        }
+        return `${rootName} Majör (Rast / Çargâh)`;
     }
 
     async function toggleSongListening() {
@@ -4515,7 +4773,6 @@
             return;
         }
 
-        // Eğer önizleme müziği veya konuşma çalıyorsa önce sustur ki mikrofona karışmasın
         stopSongPreviewPlayback();
         if ('speechSynthesis' in window) {
             try { window.speechSynthesis.cancel(); } catch (_) {}
@@ -4523,6 +4780,8 @@
 
         state.songListening = true;
         state.detectedNotes = [];
+        state.detectedMidiNotes = [];
+        state.chromaHistogram = new Float32Array(12);
         state.onsetTimestamps = [];
         state.lastRmsEnergy = 0;
         let capturedTranscript = '';
@@ -4531,13 +4790,13 @@
             el.btnSongListen.textContent = '⏹️ Dinlemeyi Durdur ve Bul (H)';
         }
         if (el.songStatusBadge) {
-            el.songStatusBadge.textContent = '🎤 Dinleniyor...';
+            el.songStatusBadge.textContent = state.songTunerActive ? '🎸 Akort & Makam Dinleniyor' : '🎤 Şarkı & Mırıldanma Dinleniyor...';
         }
         if (el.songHeardWords) {
-            el.songHeardWords.textContent = 'Çalan şarkıyı veya sesinizi dinliyorum...';
+            el.songHeardWords.textContent = 'Çalan şarkıyı, sözlerinizi veya mırıldanmanızı dinliyorum...';
         }
 
-        // 1. Canlı Mikrofon Nota (Melodi) ve Ritim (BPM) Analizörünü Başlat
+        // 1. Canlı Mikrofon Nota (Melodi), Akort (Cent), Makam ve Ritim (BPM) Analizörü
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
@@ -4556,7 +4815,6 @@
                         analyser.getFloatTimeDomainData(floatBuf);
                         const { hz, rms } = detectPitchHzAutocorrelation(floatBuf, audioCtx.sampleRate);
 
-                        // Ritim vuruşu (Beat Onset) tespiti ve BPM hesabı
                         const now = performance.now();
                         if (rms > state.lastRmsEnergy * 1.45 && rms > 0.03) {
                             const lastOnset = state.onsetTimestamps[state.onsetTimestamps.length - 1] || 0;
@@ -4567,11 +4825,35 @@
                         }
                         state.lastRmsEnergy = rms * 0.7 + state.lastRmsEnergy * 0.3;
 
+                        let noteInfo = null;
                         if (hz) {
-                            const note = hzToTurkishNote(hz);
-                            if (note && state.detectedNotes[state.detectedNotes.length - 1] !== note) {
-                                state.detectedNotes.push(note);
-                                if (state.detectedNotes.length > 8) state.detectedNotes.shift();
+                            noteInfo = analyzePitchNoteAndCent(hz);
+                            if (noteInfo) {
+                                state.chromaHistogram[noteInfo.pitchClass] += 1;
+                                if (state.detectedNotes[state.detectedNotes.length - 1] !== noteInfo.fullLabel) {
+                                    state.detectedNotes.push(noteInfo.fullLabel);
+                                    state.detectedMidiNotes.push(noteInfo.midi);
+                                    if (state.detectedNotes.length > 14) state.detectedNotes.shift();
+                                    if (state.detectedMidiNotes.length > 16) state.detectedMidiNotes.shift();
+                                }
+
+                                // Eğer Sesli Enstrüman Akort Modu açıksa müzisyeni sesle yönlendir
+                                if (state.songTunerActive && now - state.lastTunerSpokenAt > 2400) {
+                                    state.lastTunerSpokenAt = now;
+                                    let tuneAdvice = 'Tam akortlu!';
+                                    if (noteInfo.cents < -7) {
+                                        tuneAdvice = `Biraz kalın (pes, eksi ${Math.abs(noteInfo.cents)} sent); teli biraz sıkın.`;
+                                    } else if (noteInfo.cents > 7) {
+                                        tuneAdvice = `Biraz ince (tiz, artı ${noteInfo.cents} sent); teli biraz gevşetin.`;
+                                    } else {
+                                        radar.playLockChord();
+                                    }
+                                    const makamStr = estimateMusicalKeyAndMakam(state.chromaHistogram);
+                                    announceGuidance(`${noteInfo.noteName} notası (${noteInfo.hz} Hertz): ${tuneAdvice} Dizi: ${makamStr}.`, {
+                                        force: true,
+                                        bannerState: Math.abs(noteInfo.cents) <= 7 ? 'centered' : 'normal'
+                                    });
+                                }
                             }
                         }
 
@@ -4588,15 +4870,22 @@
                         }
 
                         if (el.songMelodyBpm) {
+                            const makamLabel = estimateMusicalKeyAndMakam(state.chromaHistogram);
+                            const centBadge = noteInfo
+                                ? ` (${noteInfo.cents >= 0 ? '+' : ''}${noteInfo.cents} sent)`
+                                : '';
                             const melodyTrail = state.detectedNotes.length > 0
                                 ? state.detectedNotes.slice(-5).join(' → ')
                                 : 'Melodi bekleniyor';
-                            el.songMelodyBpm.textContent = `${melodyTrail} • Tempo: ${bpmStr}`;
+                            el.songMelodyBpm.textContent = `${melodyTrail}${centBadge} • ${makamLabel} • ${bpmStr}`;
                         }
                     }, 125);
                 }
             } catch (_) {}
         }
+
+        // Eğer sadece Enstrüman Akort modu açıksa otomatik durdurma sayacı kurma, müzisyen rahatça akort yapsın
+        if (state.songTunerActive) return;
 
         // 2. Web Speech API veya Android Native Sesli Şarkı Sözü Yakalayıcıyı Başlat
         const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -4626,7 +4915,7 @@
                         state.songAutoSearchTimer = setTimeout(() => {
                             stopSongListening();
                             searchSongByLyricsOrQuery(fullWords);
-                        }, 1400);
+                        }, 1350);
                     }
                 };
 
@@ -4646,24 +4935,41 @@
             return;
         }
 
-        // 8.5 saniye sonunda duyulan sözlerle otomatik arama yap
+        // 8 saniye sonunda: Söz duyulduysa sözden bul; hiç söz yoksa mırıldanan melodinin Yarı-Ton Konturundan bul!
         if (state.songAutoSearchTimer) clearTimeout(state.songAutoSearchTimer);
         state.songAutoSearchTimer = setTimeout(() => {
             if (!state.songListening) return;
             const currentWords = el.songHeardWords ? el.songHeardWords.textContent.replace(/^"|"$/g, '').trim() : '';
+            const midiSnapshot = [...state.detectedMidiNotes];
+            const notesSnapshot = [...state.detectedNotes];
+            const makamSnapshot = estimateMusicalKeyAndMakam(state.chromaHistogram);
             stopSongListening();
+
             if (currentWords && !currentWords.includes('dinliyorum') && currentWords.length >= 2) {
                 searchSongByLyricsOrQuery(currentWords);
-            } else {
-                const notesInfo = state.detectedNotes.length > 0
-                    ? `Algılanan melodi notaları: ${state.detectedNotes.slice(-6).join(', ')}. `
-                    : '';
-                announceGuidance(`${notesInfo}Şarkının sözleri ortam gürültüsünden dolayı net duyulamadı. Şimdi telefonu müziğe biraz daha yaklaştırıp tekrar deneyebilir, şarkıdan hatırladığınız iki-üç kelimeyi söyleyebilir veya 'Google Mırıldanarak Şarkı Bul' düğmesine basabilirsiniz.`, {
+                return;
+            }
+
+            // Söz duyulmadıysa Mırıldanma / Islık Yarı-Ton Melodi Konturu Eşleştirmesi yap!
+            const humMatch = matchMelodyBySemitoneContour(midiSnapshot);
+            if (humMatch) {
+                if (el.songHeardWords) {
+                    el.songHeardWords.textContent = `Mırıldanan Melodi (%${humMatch.confidencePct} uyum): ${notesSnapshot.slice(-6).join(' → ')}`;
+                }
+                searchSongByLyricsOrQuery(`${humMatch.song.artist} ${humMatch.song.title}`, humMatch.confidencePct);
+                return;
+            }
+
+            const notesInfo = notesSnapshot.length > 0
+                ? `Mırıldandığınız notalar: ${notesSnapshot.slice(-6).join(', ')} (${makamSnapshot}). `
+                : '';
+            if (!state.songAutoRadarEnabled) {
+                announceGuidance(`${notesInfo}Şarkının sözleri gürültüden dolayı net seçilemedi. Şarkıdan hatırladığınız iki kelimeyi söyleyebilir veya tam mırıldanma taraması için Google Mırıldanma Motoru düğmesine basabilirsiniz.`, {
                     force: true,
                     bannerState: 'warning'
                 });
             }
-        }, 8500);
+        }, 8000);
     }
 
     function stopSongListening() {
@@ -4685,14 +4991,13 @@
             state.songAudioStream = null;
         }
         if (el.btnSongListen) {
-            el.btnSongListen.textContent = '🎤 Şarkıyı Dinle ve Bul (H)';
+            el.btnSongListen.textContent = '🎤 Şarkıyı / Mırıldanmayı Dinle (H)';
         }
-        if (el.songStatusBadge) {
-            el.songStatusBadge.textContent = 'Dinlemeye Hazır';
+        if (el.songStatusBadge && !state.songTunerActive) {
+            el.songStatusBadge.textContent = state.songAutoRadarEnabled ? '📡 Sürekli Takip Açık' : 'Dinlemeye Hazır';
         }
     }
 
-    // Android Native Ses Tanıma Köprüsü geri dönüşü
     window.receiveRecognizedSongWordsFromAndroid = function (spokenText) {
         stopSongListening();
         const clean = String(spokenText || '').trim();
@@ -4704,130 +5009,140 @@
     };
 
     /**
-     * Duyulan veya yazılan şarkı sözünden / isminden:
-     * 1) Dahili Klasik Türk Müziği / Pop / Türkü / İlahi sözlüğünü,
-     * 2) LRCLIB Küresel Tam Şarkı Sözü Arama Motorunu (https://lrclib.net/api/search),
-     * 3) Apple iTunes Türkiye Müzik Kataloğunu (30 sn orijinal stüdyo kaydı önizlemesi ile)
-     * sorgular ve şarkıyı, sanatçıyı, albümü ve tüm sözlerini sesli açıklar.
+     * Bulunan şarkıyı telefon hafızasındaki "Bulduğum Şarkılar Defteri"ne kaydeder.
      */
-    async function searchSongByLyricsOrQuery(rawQuery) {
-        const query = String(rawQuery || '').trim();
-        if (!query) {
-            announceGuidance('Lütfen şarkıdan hatırladığınız birkaç kelimeyi söyleyin veya arama kutusuna yazın.', {
-                force: true,
-                bannerState: 'warning'
+    function saveSongToHistory(track) {
+        if (!track || !track.title) return;
+        try {
+            const raw = localStorage.getItem(SAVED_SONGS_STORAGE_KEY);
+            const list = raw ? JSON.parse(raw) : [];
+            const filtered = list.filter(item =>
+                !(item.title === track.title && item.artist === track.artist)
+            );
+            const nowStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+            filtered.unshift({
+                title: track.title,
+                artist: track.artist,
+                album: track.album || '',
+                genre: track.genre || '',
+                previewUrl: track.previewUrl || '',
+                lyrics: track.lyrics || '',
+                savedAt: nowStr
             });
+            localStorage.setItem(SAVED_SONGS_STORAGE_KEY, JSON.stringify(filtered.slice(0, 20)));
+        } catch (_) {}
+    }
+
+    function speakSavedSongHistory() {
+        try {
+            const raw = localStorage.getItem(SAVED_SONGS_STORAGE_KEY);
+            const list = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(list) || list.length === 0) {
+                announceGuidance('Bulduğunuz şarkılar defterinde henüz kayıtlı bir şarkı yok. Bir şarkı bulduğunuzda otomatik olarak buraya kaydedilir.', {
+                    force: true,
+                    bannerState: 'normal'
+                });
+                return;
+            }
+            const summaryItems = list.slice(0, 6).map((item, idx) =>
+                `${idx + 1}: ${item.artist} — ${item.title} (Saat ${item.savedAt})`
+            );
+            const textReport = `📒 Bulduğunuz Şarkılar Defteri (${list.length} Şarkı):\n\n` +
+                list.map((item, idx) => `${idx + 1}. ${item.title} — ${item.artist} (${item.album}) [Saat ${item.savedAt}]`).join('\n');
+            showDetectedResult('📒 Bulduğum Şarkılar Defteri', textReport);
+            renderSongAlternatives(list.slice(0, 5), 'Kayıtlı Şarkılarınızdan Tek Dokunuşla Dinleyin:');
+            announceGuidance(`Şarkı defterinizde toplam ${list.length} şarkı kayıtlı: ${summaryItems.join(', ')}.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        } catch (_) {}
+    }
+
+    /**
+     * Şarkı sözlerini mısra mısra (satır satır) ayırır; LRC zaman etiketlerini temizler.
+     */
+    function prepareLyricLinesForNavigation(rawLyrics) {
+        const clean = String(rawLyrics || '')
+            .replace(/\[\d{1,2}:\d{2}(?:\.\d{1,3})?\]/g, '')
+            .split(/\r?\n/)
+            .map(l => l.trim())
+            .filter(l => l.length >= 2);
+        state.songLyricLines = clean;
+        state.currentLyricIndex = 0;
+
+        const hasLines = clean.length > 0;
+        if (el.btnLyricPrev) el.btnLyricPrev.disabled = !hasLines;
+        if (el.btnLyricCurrent) el.btnLyricCurrent.disabled = !hasLines;
+        if (el.btnLyricNext) el.btnLyricNext.disabled = !hasLines;
+    }
+
+    function speakCurrentLyricLine() {
+        if (!state.songLyricLines || state.songLyricLines.length === 0) {
+            announceGuidance('Bu şarkı için mısra mısra okunacak söz bulunamadı.', { force: true, bannerState: 'warning' });
             return;
         }
+        stopSongPreviewPlayback();
+        const line = state.songLyricLines[state.currentLyricIndex] || '';
+        const posLabel = `${state.currentLyricIndex + 1}. mısra (Toplam ${state.songLyricLines.length}): ${line}`;
+        if (el.songHeardWords) {
+            el.songHeardWords.textContent = posLabel;
+        }
+        announceGuidance(posLabel, { force: true, bannerState: 'centered' });
+    }
 
-        if (el.songStatusBadge) el.songStatusBadge.textContent = '🔍 Şarkı Aranıyor...';
-        if (el.songHeardWords) el.songHeardWords.textContent = `"${query}"`;
-        announceGuidance(`"${query}" sözleriyle eşleşen şarkı aranıyor, lütfen bekleyin...`, {
-            force: true,
-            bannerState: 'normal'
+    function stepLyricLine(delta) {
+        if (!state.songLyricLines || state.songLyricLines.length === 0) return;
+        const nextIdx = state.currentLyricIndex + delta;
+        if (nextIdx < 0) {
+            announceGuidance(`İlk mısradasınız: ${state.songLyricLines[0]}`, { force: true });
+            return;
+        }
+        if (nextIdx >= state.songLyricLines.length) {
+            announceGuidance('Şarkının son mısrasına ulaştınız.', { force: true });
+            return;
+        }
+        state.currentLyricIndex = nextIdx;
+        speakCurrentLyricLine();
+    }
+
+    function renderSongAlternatives(candidates, headingText = '') {
+        if (!el.songAlternativesBox || !el.songAlternativesList) return;
+        el.songAlternativesList.innerHTML = '';
+        if (!Array.isArray(candidates) || candidates.length === 0) {
+            el.songAlternativesBox.hidden = true;
+            return;
+        }
+        el.songAlternativesBox.hidden = false;
+        const hintEl = el.songAlternativesBox.querySelector('.exam-remote-hint');
+        if (hintEl && headingText) {
+            hintEl.innerHTML = `🎶 <strong>${headingText}</strong>`;
+        }
+        candidates.slice(0, 5).forEach((cand) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'secondary-btn';
+            btn.textContent = `🎵 ${cand.title} — ${cand.artist}`;
+            btn.setAttribute('aria-label', `${cand.artist}, ${cand.title} şarkısını seç ve dinle`);
+            btn.addEventListener('click', () => {
+                applyFoundSongToUI(cand, state.songAlternatives);
+            });
+            el.songAlternativesList.appendChild(btn);
         });
+    }
 
-        const lowerQ = query.toLocaleLowerCase('tr-TR');
-        let foundTrack = null;
-
-        // 1. AŞAMA: Çevrimdışı Klasik Türk Müziği / Pop / Türkü / İlahi Hızlı Eşleşme
-        for (let i = 0; i < TURKISH_OFFLINE_SONG_DB.length; i++) {
-            const item = TURKISH_OFFLINE_SONG_DB[i];
-            const hit = item.keywords.some(kw => lowerQ.includes(kw) || kw.includes(lowerQ));
-            if (hit || lowerQ.includes(item.title.toLocaleLowerCase('tr-TR'))) {
-                foundTrack = {
-                    title: item.title,
-                    artist: item.artist,
-                    album: item.album,
-                    genre: item.genre,
-                    lyrics: item.lyrics,
-                    previewUrl: ''
-                };
-                break;
-            }
-        }
-
-        // 2. AŞAMA: LRCLIB Tam Şarkı Sözü Veritabanı Sorgusu (Sözlerin içinden şarkıyı ve tüm sözlerini bulur)
-        try {
-            const lrcResp = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(query)}`);
-            if (lrcResp.ok) {
-                const lrcList = await lrcResp.json();
-                if (Array.isArray(lrcList) && lrcList.length > 0) {
-                    const bestLrc = lrcList[0];
-                    if (!foundTrack) {
-                        foundTrack = {
-                            title: bestLrc.trackName || bestLrc.name || 'Bilinmeyen Şarkı',
-                            artist: bestLrc.artistName || 'Bilinmeyen Sanatçı',
-                            album: bestLrc.albumName || 'Albüm Bilgisi Yok',
-                            genre: 'Müzik',
-                            lyrics: bestLrc.plainLyrics || '',
-                            previewUrl: ''
-                        };
-                    } else if (bestLrc.plainLyrics && bestLrc.plainLyrics.length > (foundTrack.lyrics || '').length) {
-                        foundTrack.lyrics = bestLrc.plainLyrics;
-                    }
-                }
-            }
-        } catch (_) {}
-
-        // 3. AŞAMA: Apple iTunes Türkiye Müzik Kataloğu Sorgusu (Orijinal 30 sn Şarkı Kaydı + Albüm/Yıl)
-        try {
-            const itunesSearchTerm = foundTrack
-                ? `${foundTrack.artist} ${foundTrack.title}`
-                : query;
-            const itResp = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(itunesSearchTerm)}&country=TR&media=music&limit=3`);
-            if (itResp.ok) {
-                const itData = await itResp.json();
-                if (itData && Array.isArray(itData.results) && itData.results.length > 0) {
-                    const topHit = itData.results[0];
-                    const releaseYear = topHit.releaseDate ? topHit.releaseDate.slice(0, 4) : '';
-                    if (!foundTrack) {
-                        foundTrack = {
-                            title: topHit.trackName || 'Bilinmeyen Şarkı',
-                            artist: topHit.artistName || 'Bilinmeyen Sanatçı',
-                            album: `${topHit.collectionName || 'Tekli'}${releaseYear ? ' (' + releaseYear + ')' : ''}`,
-                            genre: topHit.primaryGenreName || 'Müzik',
-                            lyrics: '',
-                            previewUrl: topHit.previewUrl || ''
-                        };
-                    } else {
-                        if (topHit.previewUrl) foundTrack.previewUrl = topHit.previewUrl;
-                        if (topHit.primaryGenreName) foundTrack.genre = topHit.primaryGenreName;
-                        if ((!foundTrack.album || foundTrack.album === 'Albüm Bilgisi Yok') && topHit.collectionName) {
-                            foundTrack.album = `${topHit.collectionName}${releaseYear ? ' (' + releaseYear + ')' : ''}`;
-                        }
-                    }
-
-                    // Eğer şarkı iTunes'dan bulunduysa ama sözleri henüz çekilmediyse LRCLIB'den tam sözlerini çek
-                    if (foundTrack && !foundTrack.lyrics) {
-                        try {
-                            const lrcFollow = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(foundTrack.artist + ' ' + foundTrack.title)}`);
-                            if (lrcFollow.ok) {
-                                const followArr = await lrcFollow.json();
-                                if (Array.isArray(followArr) && followArr.length > 0 && followArr[0].plainLyrics) {
-                                    foundTrack.lyrics = followArr[0].plainLyrics;
-                                }
-                            }
-                        } catch (_) {}
-                    }
-                }
-            }
-        } catch (_) {}
-
-        if (!foundTrack) {
-            if (el.songStatusBadge) el.songStatusBadge.textContent = 'Eşleşme Bulunamadı';
-            announceGuidance(`"${query}" sözleriyle eşleşen bir şarkı bulunamadı. Şarkının birkaç kelimesini daha net söyleyebilir veya sadece mırıldanmak için 'Google Mırıldanarak Şarkı Bul' düğmesine basabilirsiniz.`, {
-                force: true,
-                bannerState: 'warning'
-            });
-            return;
-        }
-
+    function applyFoundSongToUI(foundTrack, alternatives = [], melodyConfidencePct = null) {
         state.lastFoundSong = foundTrack;
+        saveSongToHistory(foundTrack);
+        prepareLyricLinesForNavigation(foundTrack.lyrics);
+
         radar.playQrSuccessSound();
         if (navigator.vibrate) navigator.vibrate([100, 50, 160]);
 
-        if (el.songStatusBadge) el.songStatusBadge.textContent = '✅ Şarkı Bulundu!';
+        if (el.songStatusBadge) {
+            el.songStatusBadge.textContent = melodyConfidencePct
+                ? `✅ Melodiden Bulundu (%${melodyConfidencePct})`
+                : '✅ Şarkı Bulundu!';
+        }
         if (el.songFoundTitle) el.songFoundTitle.textContent = `${foundTrack.title} — ${foundTrack.artist}`;
         if (el.songFoundAlbum) el.songFoundAlbum.textContent = `${foundTrack.album} • ${foundTrack.genre}`;
 
@@ -4850,23 +5165,245 @@
             el.btnSongSpotify.href = `https://open.spotify.com/search/${searchUrlQuery}`;
         }
 
+        renderSongAlternatives(
+            alternatives.filter(a => !(a.title === foundTrack.title && a.artist === foundTrack.artist)),
+            'Diğer Eşleşen Şarkılar ve Sanatçının Sevilen Eserleri (Tek Dokunuşla Seçin):'
+        );
+
         const lyricsSnippet = foundTrack.lyrics
-            ? `\n\n--- Şarkı Sözleri ---\n${foundTrack.lyrics}`
+            ? `\n\n--- Şarkı Sözleri (${state.songLyricLines.length} Mısra) ---\n${foundTrack.lyrics}`
             : '\n\n(Bu şarkının tam metin sözleri veritabanında yer almıyor, ancak orijinal kaydını dinleyebilirsiniz.)';
         const fullSongCard = `Şarkı Adı: ${foundTrack.title}\nSanatçı: ${foundTrack.artist}\nAlbüm: ${foundTrack.album}\nTür: ${foundTrack.genre}${lyricsSnippet}`;
         showDetectedResult(`🎵 Bulunan Şarkı: ${foundTrack.title} — ${foundTrack.artist}`, fullSongCard);
 
+        const melodyPrefix = melodyConfidencePct
+            ? `Mırıldandığınız melodiden yüzde ${melodyConfidencePct} uyumla bulundu! `
+            : 'Şarkı bulundu! ';
         const previewHint = foundTrack.previewUrl
-            ? 'Orijinal şarkıyı dinleyip doğrulamak için "Bulunan Şarkıyı Dinle" düğmesine basabilirsiniz.'
-            : 'Şarkıyı YouTube üzerinde açmak için aşağıdaki bağlantıya dokunabilirsiniz.';
-        const lyricsHint = foundTrack.lyrics
-            ? ' Tüm şarkı sözlerini dinlemek için "Şarkı Sözlerini Sesli Oku" düğmesine basabilirsiniz.'
+            ? 'Orijinal kaydını dinlemek için "Bulunan Şarkıyı Dinle" düğmesine basabilirsiniz.'
+            : 'Tamamını YouTube düğmesiyle dinleyebilirsiniz.';
+        const lyricsHint = state.songLyricLines.length > 0
+            ? ` Şarkının ${state.songLyricLines.length} mısralık sözlerini tek tek gezmek için Önceki ve Sonraki Mısra düğmelerini kullanabilirsiniz.`
             : '';
 
-        announceGuidance(`Şarkı bulundu! Sanatçı: ${foundTrack.artist}, Şarkı Adı: ${foundTrack.title}, Albüm: ${foundTrack.album}. ${previewHint}${lyricsHint}`, {
+        announceGuidance(`${melodyPrefix}Sanatçı: ${foundTrack.artist}, Şarkı Adı: ${foundTrack.title}, Albüm: ${foundTrack.album}. ${previewHint}${lyricsHint}`, {
             force: true,
             bannerState: 'centered'
         });
+    }
+
+    /**
+     * Akıllı Çok Katmanlı Şarkı Arama Motoru:
+     * 1) Türkçe Fonetik 3-Gram Bulanık Eşleşme (Gürültülü ortamda eksik/bozuk duyulan kelimeleri tamamlar),
+     * 2) LRCLIB Küresel Tam Şarkı Sözü & Senkronize Karaoke Veritabanı,
+     * 3) Apple iTunes Türkiye Kataloğu + Sanatçının Diğer Popüler Eserleri Önericisi.
+     */
+    async function searchSongByLyricsOrQuery(rawQuery, melodyConfidencePct = null) {
+        const query = String(rawQuery || '').trim();
+        if (!query) {
+            announceGuidance('Lütfen şarkıdan hatırladığınız birkaç kelimeyi söyleyin, mırıldanın veya arama kutusuna yazın.', {
+                force: true,
+                bannerState: 'warning'
+            });
+            return;
+        }
+
+        if (el.songStatusBadge) el.songStatusBadge.textContent = '🔍 Akıllı Arama Yapılıyor...';
+        if (!melodyConfidencePct && el.songHeardWords) {
+            el.songHeardWords.textContent = `"${query}"`;
+        }
+        if (!state.songAutoRadarEnabled) {
+            announceGuidance(`"${query}" için şarkı ve söz veritabanları taranıyor...`, {
+                force: true,
+                bannerState: 'normal'
+            });
+        }
+
+        let foundTrack = null;
+        const alternativeCandidates = [];
+
+        // 1. AŞAMA: Bulanık (Fuzzy) Fonetik 3-Gram Türkçe Şarkı Sözlüğü Taraması
+        let bestOfflineSim = 0;
+        let bestOfflineItem = null;
+        for (let i = 0; i < TURKISH_OFFLINE_SONG_DB.length; i++) {
+            const item = TURKISH_OFFLINE_SONG_DB[i];
+            let maxSim = computeTrigramSimilarity(query, `${item.artist} ${item.title}`);
+            for (let k = 0; k < item.keywords.length; k++) {
+                const kwSim = computeTrigramSimilarity(query, item.keywords[k]);
+                if (kwSim > maxSim) maxSim = kwSim;
+            }
+            if (maxSim > bestOfflineSim) {
+                bestOfflineSim = maxSim;
+                bestOfflineItem = item;
+            }
+        }
+
+        if (bestOfflineItem && bestOfflineSim >= 0.48) {
+            foundTrack = {
+                title: bestOfflineItem.title,
+                artist: bestOfflineItem.artist,
+                album: bestOfflineItem.album,
+                genre: bestOfflineItem.genre,
+                lyrics: bestOfflineItem.lyrics,
+                previewUrl: ''
+            };
+        }
+
+        // 2. AŞAMA: LRCLIB Tam Şarkı Sözü Veritabanı Sorgusu
+        try {
+            const lrcResp = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(query)}`);
+            if (lrcResp.ok) {
+                const lrcList = await lrcResp.json();
+                if (Array.isArray(lrcList) && lrcList.length > 0) {
+                    lrcList.slice(0, 4).forEach((item, idx) => {
+                        const cand = {
+                            title: item.trackName || item.name || 'Bilinmeyen Şarkı',
+                            artist: item.artistName || 'Bilinmeyen Sanatçı',
+                            album: item.albumName || 'Albüm Bilgisi Yok',
+                            genre: 'Müzik',
+                            lyrics: item.plainLyrics || item.syncedLyrics || '',
+                            previewUrl: ''
+                        };
+                        if (idx === 0 && !foundTrack) {
+                            foundTrack = cand;
+                        } else if (idx === 0 && foundTrack && cand.lyrics.length > (foundTrack.lyrics || '').length) {
+                            foundTrack.lyrics = cand.lyrics;
+                        } else {
+                            alternativeCandidates.push(cand);
+                        }
+                    });
+                }
+            }
+        } catch (_) {}
+
+        // 3. AŞAMA: Apple iTunes Türkiye Müzik Kataloğu + Sanatçının Diğer Eserleri
+        try {
+            const itunesSearchTerm = foundTrack
+                ? `${foundTrack.artist} ${foundTrack.title}`
+                : query;
+            const itResp = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(itunesSearchTerm)}&country=TR&media=music&limit=5`);
+            if (itResp.ok) {
+                const itData = await itResp.json();
+                if (itData && Array.isArray(itData.results) && itData.results.length > 0) {
+                    itData.results.forEach((hit, idx) => {
+                        const releaseYear = hit.releaseDate ? hit.releaseDate.slice(0, 4) : '';
+                        const albumStr = `${hit.collectionName || 'Tekli'}${releaseYear ? ' (' + releaseYear + ')' : ''}`;
+                        if (idx === 0) {
+                            if (!foundTrack) {
+                                foundTrack = {
+                                    title: hit.trackName || 'Bilinmeyen Şarkı',
+                                    artist: hit.artistName || 'Bilinmeyen Sanatçı',
+                                    album: albumStr,
+                                    genre: hit.primaryGenreName || 'Müzik',
+                                    lyrics: '',
+                                    previewUrl: hit.previewUrl || ''
+                                };
+                            } else {
+                                if (hit.previewUrl) foundTrack.previewUrl = hit.previewUrl;
+                                if (hit.primaryGenreName) foundTrack.genre = hit.primaryGenreName;
+                                if ((!foundTrack.album || foundTrack.album === 'Albüm Bilgisi Yok') && hit.collectionName) {
+                                    foundTrack.album = albumStr;
+                                }
+                            }
+                        } else {
+                            alternativeCandidates.push({
+                                title: hit.trackName || 'Şarkı',
+                                artist: hit.artistName || 'Sanatçı',
+                                album: albumStr,
+                                genre: hit.primaryGenreName || 'Müzik',
+                                lyrics: '',
+                                previewUrl: hit.previewUrl || ''
+                            });
+                        }
+                    });
+
+                    if (foundTrack && !foundTrack.lyrics) {
+                        try {
+                            const lrcFollow = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(foundTrack.artist + ' ' + foundTrack.title)}`);
+                            if (lrcFollow.ok) {
+                                const followArr = await lrcFollow.json();
+                                if (Array.isArray(followArr) && followArr.length > 0 && followArr[0].plainLyrics) {
+                                    foundTrack.lyrics = followArr[0].plainLyrics;
+                                }
+                            }
+                        } catch (_) {}
+                    }
+                }
+            }
+        } catch (_) {}
+
+        if (!foundTrack) {
+            if (el.songStatusBadge) el.songStatusBadge.textContent = 'Eşleşme Bulunamadı';
+            if (!state.songAutoRadarEnabled) {
+                announceGuidance(`"${query}" ile eşleşen bir şarkı bulunamadı. Şarkıdan hatırladığınız iki-üç kelimeyi daha söyleyebilir veya mırıldanabilirsiniz.`, {
+                    force: true,
+                    bannerState: 'warning'
+                });
+            }
+            return;
+        }
+
+        // Eğer Kafe/Radyo Sürekli Takip modundaysak ve aynı şarkı çalmaya devam ediyorsa tekrar tekrar konuşup rahatsız etme
+        if (state.songAutoRadarEnabled && state.lastFoundSong &&
+            state.lastFoundSong.title === foundTrack.title &&
+            state.lastFoundSong.artist === foundTrack.artist) {
+            return;
+        }
+
+        state.songAlternatives = alternativeCandidates;
+        applyFoundSongToUI(foundTrack, alternativeCandidates, melodyConfidencePct);
+    }
+
+    function toggleContinuousAutoSongRadar() {
+        radar.init();
+        state.songAutoRadarEnabled = !state.songAutoRadarEnabled;
+        if (el.btnSongAutoRadar) {
+            el.btnSongAutoRadar.classList.toggle('active-toggle', state.songAutoRadarEnabled);
+            el.btnSongAutoRadar.setAttribute('aria-pressed', String(state.songAutoRadarEnabled));
+            el.btnSongAutoRadar.textContent = `📡 Sürekli Şarkı Takibi (Kafe/Radyo): ${state.songAutoRadarEnabled ? 'Açık' : 'Kapalı'}`;
+        }
+
+        if (state.songAutoRadarInterval) {
+            clearInterval(state.songAutoRadarInterval);
+            state.songAutoRadarInterval = null;
+        }
+
+        if (state.songAutoRadarEnabled) {
+            announceGuidance('Sürekli Şarkı Takibi (Kafe ve Radyo Modu) açıldı! Ortamda çalan her yeni şarkıyı otomatik dinleyip size adını ve sanatçısını haber vereceğim.', {
+                force: true,
+                bannerState: 'centered'
+            });
+            if (!state.songListening) toggleSongListening();
+            state.songAutoRadarInterval = setInterval(() => {
+                if (state.songAutoRadarEnabled && !state.songListening && (!state.songPreviewAudio || state.songPreviewAudio.paused)) {
+                    toggleSongListening();
+                }
+            }, 22000);
+        } else {
+            stopSongListening();
+            announceGuidance('Sürekli şarkı takibi kapatıldı.', { force: true });
+        }
+    }
+
+    function toggleInstrumentTunerAndMakam() {
+        radar.init();
+        state.songTunerActive = !state.songTunerActive;
+        if (el.btnSongTuner) {
+            el.btnSongTuner.classList.toggle('active-toggle', state.songTunerActive);
+            el.btnSongTuner.setAttribute('aria-pressed', String(state.songTunerActive));
+            el.btnSongTuner.textContent = `🎸 Sesli Enstrüman Akort & Makam: ${state.songTunerActive ? 'Açık' : 'Kapalı'}`;
+        }
+
+        if (state.songTunerActive) {
+            announceGuidance('Sesli Enstrüman Akort ve Makam Bulucu açıldı! Bağlama, gitar, keman veya ney çaldığınızda hangi notada olduğunuzu, teli sıkmanız mı yoksa gevşetmeniz mi gerektiğini ve makam dizisini sesli söyleyeceğim.', {
+                force: true,
+                bannerState: 'centered'
+            });
+            if (!state.songListening) toggleSongListening();
+        } else {
+            stopSongListening();
+            announceGuidance('Enstrüman akort modu kapatıldı.', { force: true });
+        }
     }
 
     function stopSongPreviewPlayback() {
@@ -4920,7 +5457,7 @@
         }
         stopSongPreviewPlayback();
         const cleanLyrics = state.lastFoundSong.lyrics.replace(/\r?\n/g, ', ').replace(/\s+/g, ' ').trim();
-        announceGuidance(`${state.lastFoundSong.artist}, ${state.lastFoundSong.title} şarkısının sözleri: ${cleanLyrics}`, {
+        announceGuidance(`${state.lastFoundSong.artist}, ${state.lastFoundSong.title} şarkısının tüm sözleri: ${cleanLyrics}`, {
             force: true,
             bannerState: 'centered'
         });
@@ -4939,7 +5476,7 @@
                 return;
             }
         }
-        announceGuidance('Mikrofonla melodi ve şarkı sözü dinleme başlatılıyor; lütfen çalan şarkıyı dinletin veya sözlerini söyleyin.', {
+        announceGuidance('Akıllı melodi konturu ve şarkı sözü dinleme başlatılıyor; şimdi şarkının sözlerini söyleyebilir veya hiç söz söylemeden melodisini mırıldanabilirsiniz.', {
             force: true,
             bannerState: 'centered'
         });
@@ -5122,11 +5659,29 @@
     if (el.btnGoogleHumSearch) {
         el.btnGoogleHumSearch.addEventListener('click', launchGoogleHumSearch);
     }
+    if (el.btnSongAutoRadar) {
+        el.btnSongAutoRadar.addEventListener('click', toggleContinuousAutoSongRadar);
+    }
+    if (el.btnSongTuner) {
+        el.btnSongTuner.addEventListener('click', toggleInstrumentTunerAndMakam);
+    }
     if (el.btnSongPreview) {
         el.btnSongPreview.addEventListener('click', toggleSongPreviewPlayback);
     }
     if (el.btnSongReadLyrics) {
         el.btnSongReadLyrics.addEventListener('click', speakFoundSongLyrics);
+    }
+    if (el.btnLyricPrev) {
+        el.btnLyricPrev.addEventListener('click', () => stepLyricLine(-1));
+    }
+    if (el.btnLyricCurrent) {
+        el.btnLyricCurrent.addEventListener('click', speakCurrentLyricLine);
+    }
+    if (el.btnLyricNext) {
+        el.btnLyricNext.addEventListener('click', () => stepLyricLine(1));
+    }
+    if (el.btnSongHistory) {
+        el.btnSongHistory.addEventListener('click', speakSavedSongHistory);
     }
     if (el.btnSongTextSearch && el.songSearchInput) {
         el.btnSongTextSearch.addEventListener('click', () => {
