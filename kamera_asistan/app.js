@@ -575,7 +575,7 @@
             const now = performance.now();
             const dist = Math.min(1.4, Math.hypot(offsetX, offsetY));
 
-            const intervalMs = isCentered ? 440 : Math.max(145, Math.round(155 + dist * 460));
+            const intervalMs = isCentered ? 460 : Math.max(185, Math.round(190 + dist * 440));
             if (now < this.nextPulseTime) return;
             this.nextPulseTime = now + intervalMs;
 
@@ -584,9 +584,20 @@
                 return;
             }
 
-            const freq = Math.max(200, Math.min(920, 480 - offsetY * 240));
+            // KULAKLIKSIZ TEK TELEFON HOPARLÖRÜ İÇİN SAĞ-SOL AYIRICI SES KODLAMASI:
+            // Sol taraf (offsetX < -0.15): Çift tok ses ("Tık-Tık" 310 Hz ikili vuruş)
+            // Sağ taraf (offsetX >  0.15): Tek ince parlak ses ("Biip" 680 Hz tek vuruş)
+            // Yukarı/Aşağı: Orta ton (460 Hz - offsetY * 140)
             const pan = Math.max(-1, Math.min(1, offsetX * 1.25));
-            this.playPannedTone(freq, pan, 0.065, 'sine', 0.16);
+            if (offsetX < -0.15) {
+                this.playPannedTone(310, pan, 0.045, 'triangle', 0.20);
+                setTimeout(() => this.playPannedTone(310, pan, 0.055, 'triangle', 0.20), 65);
+            } else if (offsetX > 0.15) {
+                this.playPannedTone(680, pan, 0.085, 'sine', 0.20);
+            } else {
+                const verticalFreq = Math.max(240, Math.min(820, 480 - offsetY * 220));
+                this.playPannedTone(verticalFreq, 0, 0.065, 'sine', 0.18);
+            }
         }
 
         playLightMeterTone(brightness, hotSpotPanX = 0) {
@@ -2358,12 +2369,24 @@
         const mainAlign = computeAlignmentInstruction(people[0].bbox, anW, anH, 'Kişi');
         el.tPosition.textContent = `Toplam ${people.length} Kişi`;
         el.tDistance.textContent = `${mainGaze.approxMeters}m • ${mainGaze.isLookingAtUser ? 'Size Bakıyor' : 'Başka Yöne Bakıyor'}`;
-        radar.updateRadar(mainAlign.offsetX, mainAlign.offsetY, mainGaze.isLookingAtUser);
 
-        announceGuidance(`Karşınızda ${people.length} kişi var: ${personReports.join('; ')}.`, {
-            bannerState: mainGaze.isLookingAtUser ? 'centered' : 'normal',
-            minIntervalMs: 3400
-        });
+        // KULAKLIKSIZ ORTAMDA MAHCUP ETMEMEK İÇİN AVUÇ İÇİ TİTREŞİM + KISIK TIK MODU:
+        // Karşıdaki kişi size bakıyorsa avuç içinde çift tatlı titreşim verir; hoparlörden bağırmaz!
+        const now = performance.now();
+        if (mainGaze.isLookingAtUser) {
+            if (navigator.vibrate && now - state.lastQiblaLockVibrate > 2200) {
+                navigator.vibrate([70, 60, 110]);
+                state.lastQiblaLockVibrate = now;
+            }
+            radar.playLockChord();
+        }
+
+        const summaryBanner = `Karşınızda ${people.length} kişi var: ${personReports.join('; ')}. (Odadakiler duymasın diye sessiz titreşim aktif; sesli dinlemek için ekrana çift dokunun).`;
+        state.lastSpeechText = `Karşınızda ${people.length} kişi var: ${personReports.join('; ')}.`;
+        if (el.liveDirectionBox) {
+            el.liveDirectionBox.textContent = summaryBanner;
+            el.liveDirectionBox.classList.toggle('centered', mainGaze.isLookingAtUser);
+        }
     }
 
     // =========================================================================
@@ -3342,7 +3365,7 @@
             'liquid_level': '11. Bölüm: Bardağa Çay ve Su Doldurma Yardımcısı açıldı. Bardağı kameranın karşısına koyup doldurmaya başlayın; taşmadan önce durmanızı söyleyeceğim.',
             'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya çamaşır makinesi ekranını okutmak için Boşluk tuşuna basın.',
             'food_freshness': '13. Bölüm: Yiyecek Küflü mü ve Paket İçeriği Okuyucu açıldı. Ekmeği, meyveyi veya market paketini kameraya gösterin.',
-            'social_presence': '14. Bölüm: Odada Kim Var ve Bana Bakıyor mu Yardımcısı açıldı. Karşınızdaki kişilerin ne tarafta durduğunu ve size bakıp bakmadığını söyleyeceğim.'
+            'social_presence': '14. Bölüm: Odada Kim Var ve Bana Bakıyor mu Yardımcısı açıldı. Kulaklık gerekmez; odadakiler duymasın diye karşınızdaki kişi size baktığında telefon avucunuzda çift titrer. Sesli söylemesini isterseniz ekrana çift dokunun veya T tuşuna basın.'
         }[newMode];
 
         if (modeAnnouncement) {
