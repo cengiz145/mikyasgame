@@ -3613,16 +3613,15 @@
                 vh = Math.round(vh * ratio);
             }
 
-            const ratios = duration <= 2.5 ? [0.1, 0.5, 0.9] : [0.05, 0.35, 0.65, 0.92];
-            const stageNames = ratios.length === 3
-                ? ['Başlangıç', 'Orta Bölüm', 'Bitiş']
-                : ['Başlangıç', 'İlk Bölüm', 'İlerleyen Saniyeler', 'Bitiş'];
-
+            // Videoyu baştan sona gerçekten adım adım izlemek için süreye göre sık zaman adımları (en fazla 10 kare)
+            const stepCount = Math.min(10, Math.max(4, Math.ceil(duration / 1.5)));
             const frames = [];
-            for (let i = 0; i < ratios.length; i++) {
-                const targetTime = Math.min(Math.max(0.05, duration * ratios[i]), Math.max(0.05, duration - 0.08));
+
+            for (let i = 0; i < stepCount; i++) {
+                const ratio = stepCount === 1 ? 0.5 : (0.04 + (i / (stepCount - 1)) * 0.90);
+                const targetTime = Math.min(Math.max(0.05, duration * ratio), Math.max(0.05, duration - 0.06));
                 await new Promise((resolve) => {
-                    const seekTimer = setTimeout(resolve, 1800);
+                    const seekTimer = setTimeout(resolve, 1600);
                     videoEl.onseeked = () => {
                         clearTimeout(seekTimer);
                         resolve();
@@ -3640,8 +3639,8 @@
                 frameCanvas.height = vh;
                 frameCanvas.getContext('2d').drawImage(videoEl, 0, 0, vw, vh);
                 frames.push({
-                    stageName: stageNames[i],
-                    timeSec: Math.round(targetTime),
+                    stepIndex: i,
+                    timeSec: Number(targetTime.toFixed(1)),
                     canvas: frameCanvas
                 });
             }
@@ -3652,36 +3651,122 @@
         }
     }
 
+    /**
+     * İki ardışık video karesi arasındaki GERÇEK piksel farkını (Optik Hareket Haritası) ölçer.
+     * Varsayım yapmaz; hangi bölgedeki piksellerin ne oranda değiştiğini ve hareketin ağırlık
+     * merkezinin (cx, cy) nereye kaydığını matematiksel olarak hesaplar.
+     */
+    function measureTruePixelMotionBetweenFrames(prevMetrics, currMetrics, w, h) {
+        const dA = prevMetrics.imageData.data;
+        const dB = currMetrics.imageData.data;
+        const step = Math.max(2, Math.floor(Math.min(w, h) / 70));
+
+        let totalSampled = 0;
+        let changedPixels = 0;
+        let sumX = 0;
+        let sumY = 0;
+
+        for (let y = 0; y < h; y += step) {
+            for (let x = 0; x < w; x += step) {
+                const idx = (y * w + x) * 4;
+                const lumA = 0.299 * dA[idx] + 0.587 * dA[idx + 1] + 0.114 * dA[idx + 2];
+                const lumB = 0.299 * dB[idx] + 0.587 * dB[idx + 1] + 0.114 * dB[idx + 2];
+                const diff = Math.abs(lumB - lumA);
+                totalSampled++;
+                if (diff >= 24) {
+                    changedPixels++;
+                    sumX += (x / w);
+                    sumY += (y / h);
+                }
+            }
+        }
+
+        const changedRatio = changedPixels / Math.max(1, totalSampled);
+        const motionCx = changedPixels > 0 ? (sumX / changedPixels) : 0.5;
+        const motionCy = changedPixels > 0 ? (sumY / changedPixels) : 0.5;
+
+        let zoneHoriz = 'ortada';
+        if (motionCx < 0.36) zoneHoriz = 'sol tarafta';
+        else if (motionCx > 0.64) zoneHoriz = 'sağ tarafta';
+
+        let zoneVert = '';
+        if (motionCy < 0.32) zoneVert = 'üst kısımda ';
+        else if (motionCy > 0.68) zoneVert = 'alt kısımda ';
+
+        const isSceneCut = changedRatio > 0.46 || Math.abs(currMetrics.avgBrightness - prevMetrics.avgBrightness) > 40;
+
+        return {
+            changedRatio,
+            changedPct: Math.round(changedRatio * 100),
+            motionCx,
+            motionCy,
+            zoneLabel: `${zoneVert}${zoneHoriz}`.trim(),
+            isSceneCut
+        };
+    }
+
+    /**
+     * Tesseract OCR çıktısından gelen gürültü/doku uydurmalarını (halüsinasyonları) eler;
+     * SADECE gerçek harf/kelime içeren ve güven skoru yüksek olan gerçek ekran yazılarını döndürür.
+     */
+    function extractVerifiedRealTextFromOcrResult(ocrRes) {
+        if (!ocrRes || !ocrRes.data) return '';
+        const lines = Array.isArray(ocrRes.data.lines) ? ocrRes.data.lines : [];
+        const verifiedLines = [];
+
+        for (let i = 0; i < lines.length; i++) {
+            const ln = lines[i];
+            const conf = typeof ln.confidence === 'number' ? ln.confidence : (ocrRes.data.confidence || 0);
+            if (conf < 56) continue;
+
+            const raw = String(ln.text || '').replace(/\s+/g, ' ').trim();
+            if (raw.length < 3) continue;
+
+            // Gerçek harf veya rakam oranı kontrolü (yaprak/duvar dokusundan çıkan "| \ / _ ~" çöplerini reddet)
+            const alphaNumMatches = raw.match(/[\p{L}\p{N}]/gu) || [];
+            const alphaRatio = alphaNumMatches.length / raw.length;
+            if (alphaNumMatches.length < 3 || alphaRatio < 0.62) continue;
+
+            // En az bir anlamlı (2+ harfli) kelime veya 2+ haneli sayı içermeli
+            if (!/[\p{L}]{2,}|\d{2,}/u.test(raw)) continue;
+
+            verifiedLines.push(raw);
+        }
+
+        return verifiedLines.join(' — ');
+    }
+
     function buildSingleKeyframeCompactSummary(frameAnalysis) {
-        const { stageName, timeSec, canvas, metrics, preds } = frameAnalysis;
+        const { canvas, metrics, preds } = frameAnalysis;
         const w = canvas.width;
         const h = canvas.height;
         const imgData = metrics.imageData;
         const parts = [];
 
-        const people = preds.filter(p => p.class === 'person').sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
-        const objects = preds.filter(p => p.class !== 'person').sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
+        // SADECE yüksek güvenilirlikli (>= 0.52) nesne ve kişileri raporla; asla tahmin/uydurma yapma!
+        const verifiedPreds = preds.filter(p => (p.score || 0) >= 0.52);
+        const people = verifiedPreds.filter(p => p.class === 'person').sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
+        const objects = verifiedPreds.filter(p => p.class !== 'person').sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
 
         if (people.length > 0) {
             const p0 = people[0];
             const [bx, by, bw, bh] = p0.bbox;
             const cxNorm = (bx + bw / 2) / w;
             const posWord = cxNorm < 0.34 ? 'solda' : (cxNorm > 0.66 ? 'sağda' : 'ortada');
-            const gaze = estimatePersonGazeAndOrientation(p0.bbox, metrics, w, h);
             const torsoCloth = measureRegionColorAndPattern(
                 imgData, w, h,
                 bx + bw * 0.22, by + bh * 0.38,
                 Math.max(12, bw * 0.56), Math.max(12, bh * 0.40)
             );
             if (people.length === 1) {
-                parts.push(`${posWord} 1 kişi (${torsoCloth.colorName} kıyafetli, ${gaze.gazeDesc})`);
+                parts.push(`${posWord} 1 kişi (${torsoCloth.colorName} kıyafetli)`);
             } else {
-                parts.push(`toplam ${people.length} kişi (öndeki kişi ${posWord}, ${torsoCloth.colorName} kıyafetli)`);
+                parts.push(`${people.length} kişi (öndeki ${posWord}, ${torsoCloth.colorName} kıyafetli)`);
             }
         }
 
         if (objects.length > 0) {
-            const objList = objects.slice(0, 3).map(o => {
+            const objList = objects.slice(0, 4).map(o => {
                 const [bx, , bw] = o.bbox;
                 const cx = (bx + bw / 2) / w;
                 const pos = cx < 0.34 ? 'solda' : (cx > 0.66 ? 'sağda' : 'ortada');
@@ -3690,73 +3775,77 @@
             parts.push(objList.join(', '));
         }
 
-        const coinRes = detectAndClassifyTurkishCoins(imgData, w, h);
-        if (coinRes && coinRes.coins.length > 0) {
-            parts.push(`toplam ${coinRes.totalFormatted} değerinde ${coinRes.coins.length} adet demir para`);
-        }
-
         if (parts.length === 0) {
-            const bgTone = metrics.avgBrightness < 60 ? 'loş/karanlık' : (metrics.avgBrightness > 180 ? 'parlak aydınlık' : 'normal aydınlık');
-            parts.push(`${bgTone} ortamda ${metrics.centerColor.name} tonlarında yüzey/arka plan`);
+            const bgTone = metrics.avgBrightness < 60 ? 'loş/karanlık' : (metrics.avgBrightness > 180 ? 'parlak aydınlık' : 'aydınlık');
+            parts.push(`${bgTone} görünümde ${metrics.centerColor.name} ağırlıklı görüntü`);
         }
 
-        return `${stageName} (${timeSec}. saniye): Görüntüde ${parts.join('; ')} yer alıyor.`;
+        return parts.join('; ');
     }
 
     function computeTemporalVideoMotionAndTransition(frameAnalyses) {
         if (!Array.isArray(frameAnalyses) || frameAnalyses.length < 2) return '';
-        const notes = [];
+        const motionEvents = [];
+        let totalChangedPct = 0;
+        let sceneCutTimes = [];
+        let firstActiveMotion = null;
+        let lastActiveMotion = null;
 
-        // 1. Sahne / Kamera Açısı Değişimi Tespiti
-        let maxLumJump = 0;
-        let colorChanged = false;
         for (let i = 1; i < frameAnalyses.length; i++) {
-            const prevM = frameAnalyses[i - 1].metrics;
-            const currM = frameAnalyses[i].metrics;
-            const jump = Math.abs(currM.avgBrightness - prevM.avgBrightness);
-            if (jump > maxLumJump) maxLumJump = jump;
-            if (prevM.centerColor.name !== currM.centerColor.name) {
-                colorChanged = true;
+            const prev = frameAnalyses[i - 1];
+            const curr = frameAnalyses[i];
+            const m = curr.pixelMotion;
+            if (!m) continue;
+
+            totalChangedPct += m.changedPct;
+            if (m.isSceneCut) {
+                sceneCutTimes.push(`${curr.timeSec}. saniye`);
+            } else if (m.changedPct >= 5) {
+                if (!firstActiveMotion) firstActiveMotion = { timeSec: curr.timeSec, ...m };
+                lastActiveMotion = { timeSec: curr.timeSec, ...m };
+            }
+
+            // Doğrulanmış kişinin veya nesnenin ardışık kareler arasındaki gerçek yer değiştirmesi
+            const prevP = prev.preds.find(p => p.class === 'person' && (p.score || 0) >= 0.52);
+            const currP = curr.preds.find(p => p.class === 'person' && (p.score || 0) >= 0.52);
+            if (!prevP && currP) {
+                motionEvents.push(`${curr.timeSec}. saniyede görüntüye kişi giriyor.`);
+            } else if (prevP && !currP) {
+                motionEvents.push(`${curr.timeSec}. saniyede kişi görüntüden çıkıyor.`);
             }
         }
-        if (maxLumJump > 42) {
-            notes.push('Videonun ilerleyen saniyelerinde kamera başka bir ortama dönüyor veya sahne ışığı belirgin şekilde değişiyor.');
-        } else if (colorChanged) {
-            notes.push('Video boyunca kameranın baktığı açı veya ortamdaki renkler hafifçe değişiyor.');
+
+        const avgMotionPct = Math.round(totalChangedPct / Math.max(1, frameAnalyses.length - 1));
+        const summaryNotes = [];
+
+        if (sceneCutTimes.length > 0) {
+            summaryNotes.push(`Sahne Değişimi: Videoda ${sceneCutTimes.join(' ve ')} civarında kamera açısı veya sahne tamamen değişiyor.`);
+        }
+
+        if (avgMotionPct < 3 && !firstActiveMotion) {
+            summaryNotes.push('Hareket Durumu: Video boyunca piksellerde neredeyse hiç hareket yok (sabit/hareketsiz görüntü).');
         } else {
-            notes.push('Video sabit bir kamera açısıyla aynı ortamda ilerliyor.');
-        }
-
-        // 2. Kişi veya Ana Nesne Hareket Vektörü (Başlangıç -> Son)
-        const first = frameAnalyses[0];
-        const last = frameAnalyses[frameAnalyses.length - 1];
-        const firstPerson = first.preds.find(p => p.class === 'person');
-        const lastPerson = last.preds.find(p => p.class === 'person');
-
-        if (firstPerson && lastPerson) {
-            const cx0 = (firstPerson.bbox[0] + firstPerson.bbox[2] / 2) / first.canvas.width;
-            const cx1 = (lastPerson.bbox[0] + lastPerson.bbox[2] / 2) / last.canvas.width;
-            const area0 = (firstPerson.bbox[2] * firstPerson.bbox[3]) / (first.canvas.width * first.canvas.height);
-            const area1 = (lastPerson.bbox[2] * lastPerson.bbox[3]) / (last.canvas.width * last.canvas.height);
-
-            const dx = cx1 - cx0;
-            const moveParts = [];
-            if (dx > 0.14) moveParts.push('soldan sağa doğru hareket ediyor');
-            else if (dx < -0.14) moveParts.push('sağdan sola doğru hareket ediyor');
-
-            if (area1 > area0 * 1.32) moveParts.push('kameraya doğru yaklaşıyor');
-            else if (area1 < area0 * 0.72) moveParts.push('kameradan uzaklaşıyor');
-
-            if (moveParts.length > 0) {
-                notes.push(`Hareket: Videodaki kişi ${moveParts.join(' ve ')}.`);
+            if (firstActiveMotion && lastActiveMotion) {
+                const dx = lastActiveMotion.motionCx - firstActiveMotion.motionCx;
+                const dy = lastActiveMotion.motionCy - firstActiveMotion.motionCy;
+                let dirText = `en yoğun hareket ${lastActiveMotion.zoneLabel} bölgesinde (%${avgMotionPct} hareket yoğunluğu)`;
+                if (Math.abs(dx) >= 0.12) {
+                    dirText += dx > 0 ? ', hareket soldan sağa doğru ilerliyor' : ', hareket sağdan sola doğru ilerliyor';
+                }
+                if (Math.abs(dy) >= 0.12) {
+                    dirText += dy > 0 ? ' ve yukarıdan aşağıya doğru kayıyor' : ' ve aşağıdan yukarıya doğru çıkıyor';
+                }
+                summaryNotes.push(`Ölçülen Gerçek Hareket: Videoda ${dirText}.`);
+            } else {
+                summaryNotes.push(`Ölçülen Gerçek Hareket: Videoda ortalama %${avgMotionPct} oranında hareketlilik var.`);
             }
-        } else if (!firstPerson && lastPerson) {
-            notes.push('Hareket: Videonun başında kimse yokken ilerleyen saniyelerde görüntüye bir kişi giriyor.');
-        } else if (firstPerson && !lastPerson) {
-            notes.push('Hareket: Videonun başında görünen kişi videonun sonunda kadrajdan çıkıyor.');
         }
 
-        return notes.join(' ');
+        if (motionEvents.length > 0) {
+            summaryNotes.push(motionEvents.slice(0, 3).join(' '));
+        }
+
+        return summaryNotes.join(' ');
     }
 
     async function analyzeVideoKeyframesAndDescribe(frames, durationSec, sourceLabel = 'Seçilen Video') {
@@ -3779,22 +3868,30 @@
             let preds = [];
             if (state.cocoModel) {
                 try {
-                    preds = await state.cocoModel.detect(f.canvas, 10, 0.32);
+                    preds = await state.cocoModel.detect(f.canvas, 10, 0.50);
                 } catch (_) {
                     preds = [];
                 }
             }
+
+            const pixelMotion = i > 0
+                ? measureTruePixelMotionBetweenFrames(frameAnalyses[i - 1].metrics, metrics, f.canvas.width, f.canvas.height)
+                : null;
+
+            const descText = buildSingleKeyframeCompactSummary({ canvas: f.canvas, metrics, preds });
             const score = preds.length * 25 + metrics.sharpnessScore;
             if (score > bestFrameScore) {
                 bestFrameScore = score;
                 bestFrameIdx = i;
             }
             frameAnalyses.push({
-                stageName: f.stageName,
+                stepIndex: i,
                 timeSec: f.timeSec,
                 canvas: f.canvas,
                 metrics,
-                preds
+                preds,
+                pixelMotion,
+                descText
             });
         }
 
@@ -3802,41 +3899,73 @@
         state.lastCapturedDataUrl = bestFrame.canvas.toDataURL('image/jpeg', 0.90);
         el.btnDownloadPhoto.hidden = false;
 
-        const stageSummaries = frameAnalyses.map(buildSingleKeyframeCompactSummary);
+        // Aynı sahne açıklaması üst üste tekrar ediyorsa grupla ("0 ile 4. saniyeler arası: ...")
+        const timelineSegments = [];
+        for (let i = 0; i < frameAnalyses.length; i++) {
+            const curr = frameAnalyses[i];
+            const prevSeg = timelineSegments[timelineSegments.length - 1];
+            const isCut = curr.pixelMotion && curr.pixelMotion.isSceneCut;
+            if (prevSeg && prevSeg.descText === curr.descText && !isCut) {
+                prevSeg.endSec = curr.timeSec;
+            } else {
+                timelineSegments.push({
+                    startSec: curr.timeSec,
+                    endSec: curr.timeSec,
+                    descText: curr.descText
+                });
+            }
+        }
+
+        const timelineSentences = timelineSegments.map(seg => {
+            const timeLabel = seg.startSec === seg.endSec
+                ? `${seg.startSec}. saniyede`
+                : `${seg.startSec} ile ${seg.endSec}. saniyeler arasında`;
+            return `${timeLabel}: ${seg.descText}.`;
+        });
+
         const motionSummary = computeTemporalVideoMotionAndTransition(frameAnalyses);
         const avgLum = Math.round(frameAnalyses.reduce((acc, fa) => acc + fa.metrics.avgBrightness, 0) / frameAnalyses.length);
-        const lightDesc = avgLum < 60 ? 'loş/karanlık' : (avgLum > 180 ? 'oldukça aydınlık' : 'normal aydınlıkta');
+        const lightDesc = avgLum < 60 ? 'loş/karanlık' : (avgLum > 180 ? 'parlak aydınlık' : 'normal aydınlıkta');
 
         const initialVideoStory =
-            `${durationSec} saniyelik video (${frameAnalyses.length} ayrı sahne karesiyle) incelendi. Genel ortam ${lightDesc}. ` +
-            `${stageSummaries.join(' ')} ${motionSummary}`.trim();
+            `${durationSec} saniyelik video baştan sona ${frameAnalyses.length} ayrı zaman adımında izlendi (Ortam ${lightDesc}). ` +
+            `Zaman Akışı: ${timelineSentences.join(' ')} ${motionSummary}`.trim();
 
         populatePhotoExplorerMap(bestFrame.canvas, bestFrame.metrics, bestFrame.preds, [], initialVideoStory);
-        showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Sahne Sahne Video Betimlemesi`, initialVideoStory + '\n\n(Videodaki altyazılar ve ekran yazıları taranıyor...)');
-        announceGuidance(`${initialVideoStory} Şimdi videonun içinde geçen altyazı veya ekran yazısı var mı kontrol ediyorum...`, {
+        showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Gerçek Zaman Sıralı Video Analizi`, initialVideoStory + '\n\n(Videodaki tüm karelerde gerçek ekran yazısı ve altyazı kontrolü yapılıyor...)');
+        announceGuidance(`${initialVideoStory} Şimdi videodaki karelerde geçen gerçek yazıları okuyorum...`, {
             force: true,
             bannerState: 'centered'
         });
 
-        // Videonun başı, ortası ve sonundaki karelerde geçen altyazıları/yazıları OCR ile oku ve tekrarları ayıkla
+        // Videodaki farklılaşan karelerde gerçekten var olan yazıları/altyazıları yüksek güven filtreli OCR ile oku
         if (typeof window.Tesseract !== 'undefined' && !state.isProcessingOcr) {
             state.isProcessingOcr = true;
             try {
-                const sampleIndices = frameAnalyses.length >= 3
-                    ? [0, Math.floor(frameAnalyses.length / 2), frameAnalyses.length - 1]
-                    : [0];
+                // İlk kareyi, son kareyi ve sahnenin/hareketin değiştiği ara kareleri OCR'a sok (en fazla 5 farklı kare)
+                const candidateIndices = [0];
+                for (let i = 1; i < frameAnalyses.length - 1; i++) {
+                    const pm = frameAnalyses[i].pixelMotion;
+                    if (pm && (pm.isSceneCut || pm.changedPct >= 8) && candidateIndices.length < 4) {
+                        candidateIndices.push(i);
+                    }
+                }
+                if (frameAnalyses.length > 1 && !candidateIndices.includes(frameAnalyses.length - 1)) {
+                    candidateIndices.push(frameAnalyses.length - 1);
+                }
+
                 const uniqueCaptions = [];
 
-                for (let s = 0; s < sampleIndices.length; s++) {
-                    const fa = frameAnalyses[sampleIndices[s]];
+                for (let s = 0; s < candidateIndices.length; s++) {
+                    const fa = frameAnalyses[candidateIndices[s]];
                     const ocrRes = await window.Tesseract.recognize(fa.canvas, 'tur+eng');
-                    const rawTxt = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.replace(/\s+/g, ' ').trim() : '';
-                    if (rawTxt.length >= 4) {
-                        const isDuplicate = uniqueCaptions.some(existing => computeTrigramSimilarity(existing.text, rawTxt) >= 0.65);
+                    const verifiedText = extractVerifiedRealTextFromOcrResult(ocrRes);
+                    if (verifiedText.length >= 3) {
+                        const isDuplicate = uniqueCaptions.some(existing => computeTrigramSimilarity(existing.text, verifiedText) >= 0.65);
                         if (!isDuplicate) {
                             uniqueCaptions.push({
                                 timeSec: fa.timeSec,
-                                text: rawTxt
+                                text: verifiedText
                             });
                         }
                     }
@@ -3845,18 +3974,23 @@
                 let finalVideoStory = initialVideoStory;
                 if (uniqueCaptions.length > 0) {
                     const captionSpeech = uniqueCaptions.map(c => `${c.timeSec}. saniyede ekranda: "${c.text}"`).join('; ');
-                    finalVideoStory += `\n\nVideoda Okunan Altyazı ve Ekran Yazıları: ${captionSpeech}.`;
-                    showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Video Betimlemesi ve Altyazılar`, finalVideoStory);
+                    finalVideoStory += `\n\nVideoda Okunan Gerçek Yazılar / Altyazılar:\n${captionSpeech}.`;
+                    showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Video Analizi ve Okunan Yazılar`, finalVideoStory);
                     populatePhotoExplorerMap(bestFrame.canvas, bestFrame.metrics, bestFrame.preds, [], finalVideoStory);
-                    announceGuidance(`Videoda ayrıca şu yazılar geçiyor: ${captionSpeech}.`, {
+                    announceGuidance(`Videoda ekranda şu yazılar yer alıyor: ${captionSpeech}.`, {
                         force: true,
                         bannerState: 'centered'
                     });
                 } else {
-                    showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Sahne Sahne Video Betimlemesi`, finalVideoStory);
+                    finalVideoStory += '\n\nVideoda ekranda herhangi bir yazı veya altyazı yer almıyor.';
+                    showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Gerçek Zaman Sıralı Video Analizi`, finalVideoStory);
+                    announceGuidance('Videoda ekranda herhangi bir yazı veya altyazı yer almıyor.', {
+                        force: true,
+                        bannerState: 'centered'
+                    });
                 }
             } catch (_) {
-                showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Sahne Sahne Video Betimlemesi`, initialVideoStory);
+                showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Gerçek Zaman Sıralı Video Analizi`, initialVideoStory);
             } finally {
                 state.isProcessingOcr = false;
             }
@@ -3864,7 +3998,7 @@
     }
 
     async function handleGalleryVideoSelect(file) {
-        announceGuidance('Seçtiğiniz video açılıyor; başı, ortası ve sonundaki sahneler ile hareketler inceleniyor, lütfen birkaç saniye bekleyin...', {
+        announceGuidance('Seçtiğiniz video açılıyor; baştan sona saniye saniye izlenerek gerçek hareketler ve yazılar çıkarılıyor, lütfen bekleyin...', {
             force: true,
             bannerState: 'centered'
         });
@@ -3889,18 +4023,16 @@
     window.receiveSharedVideoFramesFromAndroid = async function (durationSec, frameDataUrls) {
         if (!Array.isArray(frameDataUrls) || frameDataUrls.length === 0) return;
         radar.init();
-        announceGuidance('Paylaştığınız video alındı; sahne sahne betimleniyor, lütfen bekleyin...', {
+        announceGuidance('Paylaştığınız video alındı; baştan sona kare kare izlenerek gerçek hareketler ve yazılar analiz ediliyor...', {
             force: true,
             bannerState: 'centered'
         });
-        const stageNames = frameDataUrls.length === 3
-            ? ['Başlangıç', 'Orta Bölüm', 'Bitiş']
-            : ['Başlangıç', 'İlk Bölüm', 'İlerleyen Saniyeler', 'Bitiş'];
-        const ratios = frameDataUrls.length === 3 ? [0.1, 0.5, 0.9] : [0.05, 0.35, 0.65, 0.92];
+        const total = frameDataUrls.length;
         const frames = [];
 
-        for (let i = 0; i < frameDataUrls.length; i++) {
+        for (let i = 0; i < total; i++) {
             const url = frameDataUrls[i];
+            const ratio = total === 1 ? 0.5 : (0.04 + (i / (total - 1)) * 0.90);
             const canvas = await new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
@@ -3915,8 +4047,8 @@
             });
             if (canvas) {
                 frames.push({
-                    stageName: stageNames[i] || `Sahne ${i + 1}`,
-                    timeSec: Math.round((durationSec || 8) * (ratios[i] || 0.5)),
+                    stepIndex: i,
+                    timeSec: Number(((durationSec || 8) * ratio).toFixed(1)),
                     canvas
                 });
             }

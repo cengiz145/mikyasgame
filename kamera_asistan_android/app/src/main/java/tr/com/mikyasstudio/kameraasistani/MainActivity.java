@@ -187,13 +187,17 @@ public class MainActivity extends AppCompatActivity {
                 if (durationMs < 1000L) durationMs = 4000L;
                 int durationSec = Math.max(1, Math.round(durationMs / 1000f));
 
-                double[] ratios = new double[]{0.05, 0.35, 0.65, 0.92};
+                int stepCount = Math.min(8, Math.max(4, (int) Math.ceil(durationSec / 1.5)));
                 StringBuilder jsArray = new StringBuilder("[");
                 boolean first = true;
 
-                for (double r : ratios) {
+                for (int i = 0; i < stepCount; i++) {
+                    double r = stepCount == 1 ? 0.5 : (0.04 + ((double) i / (stepCount - 1)) * 0.90);
                     long timeUs = (long) (durationMs * r * 1000.0);
-                    Bitmap frame = retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                    Bitmap frame = retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST);
+                    if (frame == null) {
+                        frame = retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                    }
                     if (frame != null) {
                         int w = frame.getWidth();
                         int h = frame.getHeight();
