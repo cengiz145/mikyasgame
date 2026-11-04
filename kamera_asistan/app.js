@@ -3108,30 +3108,63 @@
         const topBg = measureRegionColorAndPattern(imgData, w, h, w * 0.15, h * 0.04, w * 0.70, h * 0.18);
         sentences.push(`Fotoğraf betimlemesi: ${lightDesc}, ${sharpDesc} bir görüntü; arka plan genel olarak ${topBg.colorName} tonlarında.`);
 
-        // 2. İnsanlar, Bakış Yönü, Mesafe ve Üzerlerindeki Kıyafet Rengi/Deseni
-        const people = preds.filter(p => p.class === 'person');
-        if (people.length > 0) {
-            people.sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
-            people.slice(0, 3).forEach((p, idx) => {
+        // 2. İnsan Sayısı (Net Vurgu), Soldan Sağa Sıralama, Birbirine & Eşyalara Göre Konum ve Kıyafetleri
+        const people = preds.filter(p => p.class === 'person' && (p.score || 0) >= 0.45);
+        const otherObjs = preds.filter(p => p.class !== 'person');
+        if (people.length === 0) {
+            sentences.push('Kişi sayısı: Etrafta hiç kimse görünmüyor (0 kişi).');
+        } else {
+            // Soldan sağa doğru sırala (en soldaki 1. kişi, onun sağındaki 2. kişi...)
+            people.sort((a, b) => (a.bbox[0] + a.bbox[2] / 2) - (b.bbox[0] + b.bbox[2] / 2));
+            if (people.length === 1) {
+                sentences.push('Kişi sayısı: Etrafta 1 kişi var.');
+            } else {
+                sentences.push(`Kişi sayısı: Etrafta soldan sağa doğru toplam ${people.length} kişi var.`);
+            }
+
+            const analyzedPhotoPeople = [];
+            people.slice(0, 4).forEach((p, idx) => {
                 const [bx, by, bw, bh] = p.bbox;
                 const cx = (bx + bw / 2) / w;
-                let posWord = 'tam ortada';
-                if (cx < 0.36) posWord = 'sol tarafta';
-                else if (cx > 0.64) posWord = 'sağ tarafta';
+                let posWord = 'ortadaki';
+                if (cx < 0.36) posWord = 'soldaki';
+                else if (cx > 0.64) posWord = 'sağdaki';
 
                 const gaze = estimatePersonGazeAndOrientation(p.bbox, metrics, w, h);
-                // Gövde/Kıyafet Bölgesi (Kutunun ortasından aşağı %40..%82 arası)
                 const torso = measureRegionColorAndPattern(
                     imgData, w, h,
                     bx + bw * 0.22,
-                    by + bh * 0.40,
-                    bw * 0.56,
-                    bh * 0.42
+                    by + bh * 0.32,
+                    Math.max(12, bw * 0.56),
+                    Math.max(12, bh * 0.38)
                 );
+                const anchorRel = findNearestObjectRelativePhrase(p.bbox, otherObjs, w, h);
+                analyzedPhotoPeople.push({ p, cx, posWord, gaze, torso, anchorRel });
+            });
 
-                const personTitle = people.length === 1 ? 'Fotoğrafın' : `${idx + 1}. kişi fotoğrafın`;
+            analyzedPhotoPeople.forEach((item, idx) => {
+                const { p, posWord, gaze, torso, anchorRel } = item;
+                let personTitle = '';
+                if (analyzedPhotoPeople.length === 1) {
+                    const anchorText = anchorRel ? ` (${anchorRel} kişi)` : '';
+                    personTitle = `Görüntüdeki tek kişi (${posWord} kişi${anchorText})`;
+                } else if (idx === 0) {
+                    const nextPerson = analyzedPhotoPeople[1];
+                    const relToNext = nextPerson ? `, ${nextPerson.torso.colorName.toLowerCase()} kıyafetli kişinin solundaki kişi` : '';
+                    const anchorText = anchorRel ? `, ${anchorRel} kişi` : '';
+                    personTitle = `En soldaki 1. kişi (${posWord}${relToNext}${anchorText})`;
+                } else {
+                    const prevPerson = analyzedPhotoPeople[idx - 1];
+                    const orderLabel = (idx === analyzedPhotoPeople.length - 1 && analyzedPhotoPeople.length >= 2)
+                        ? (analyzedPhotoPeople.length === 2 ? 'Sağdaki 2. kişi' : `En sağdaki ${idx + 1}. kişi`)
+                        : `Ortadaki ${idx + 1}. kişi`;
+                    const relToPrev = `${prevPerson.torso.colorName.toLowerCase()} kıyafetli kişinin sağındaki kişi`;
+                    const anchorText = anchorRel ? `, ${anchorRel} kişi` : '';
+                    personTitle = `${orderLabel} (${relToPrev}${anchorText})`;
+                }
+
                 sentences.push(
-                    `${personTitle} ${posWord} kısmında, yaklaşık ${gaze.approxMeters} metre mesafede duruyor ve ${gaze.gazeDesc}. ` +
+                    `${personTitle}: Yaklaşık ${gaze.approxMeters} metre mesafede duruyor ve ${gaze.gazeDesc}. ` +
                     `Üzerinde ${torso.colorName} renginde, ${torso.pattern} bir kıyafet var.`
                 );
 
@@ -3149,7 +3182,6 @@
         }
 
         // 3. Çevredeki Diğer Eşyalar ve Fotoğraftaki Konumları
-        const otherObjs = preds.filter(p => p.class !== 'person');
         if (otherObjs.length > 0) {
             const itemPhrases = otherObjs.slice(0, 6).map(obj => {
                 const [bx, by, bw, bh] = obj.bbox;
@@ -3827,6 +3859,66 @@
         return verifiedLines.join(' — ');
     }
 
+    const GENITIVE_TR_OBJECT_LABELS = {
+        'dining table': 'masanın',
+        'chair': 'sandalyenin',
+        'couch': 'koltuğun',
+        'bench': 'bankın',
+        'tv': 'televizyonun',
+        'laptop': 'bilgisayarın',
+        'car': 'arabanın',
+        'bed': 'yatağın',
+        'potted plant': 'saksı bitkisinin',
+        'refrigerator': 'buzdolabının',
+        'book': 'kitabın',
+        'backpack': 'sırt çantasının',
+        'handbag': 'el çantasının',
+        'suitcase': 'bavulun',
+        'bottle': 'şişenin',
+        'cup': 'bardağın',
+        'door': 'kapının'
+    };
+
+    /**
+     * Bir kişinin (personBbox) çevredeki en belirgin referans eşyaya göre bağıl konumunu
+     * ("masanın solundaki", "koltuğun sağındaki", "televizyonun solundaki") hesaplar.
+     */
+    function findNearestObjectRelativePhrase(personBbox, allObjects, w, h) {
+        if (!Array.isArray(allObjects) || allObjects.length === 0) return '';
+        const [bx, by, bw, bh] = personBbox;
+        const pcx = bx + bw / 2;
+        const pcy = by + bh / 2;
+
+        // Referans alınabilecek orta/büyük eşyaları önceliklendir
+        let bestObj = null;
+        let bestDist = Infinity;
+        for (let i = 0; i < allObjects.length; i++) {
+            const obj = allObjects[i];
+            if (obj.class === 'person') continue;
+            const [ox, oy, ow, oh] = obj.bbox;
+            const ocx = ox + ow / 2;
+            const ocy = oy + oh / 2;
+            const dist = Math.hypot((pcx - ocx) / Math.max(1, w), (pcy - ocy) / Math.max(1, h));
+            if (dist < bestDist && dist <= 0.62) {
+                bestDist = dist;
+                bestObj = obj;
+            }
+        }
+        if (!bestObj) return '';
+
+        const [ox, , ow] = bestObj.bbox;
+        const ocx = ox + ow / 2;
+        const genName = GENITIVE_TR_OBJECT_LABELS[bestObj.class] || `${(TR_LABELS[bestObj.class] || bestObj.class).toLowerCase()} nesnesinin`;
+        const dxNorm = (pcx - ocx) / Math.max(1, w);
+
+        if (dxNorm < -0.07) {
+            return `${genName} solundaki`;
+        } else if (dxNorm > 0.07) {
+            return `${genName} sağındaki`;
+        }
+        return `${genName} yanındaki`;
+    }
+
     /**
      * Profesyonel Sesli Film Betimleme (Audio Description / SEBEDER) standardında
      * tek bir karedeki kişinin dış görünüşünü (üst/alt kıyafet rengi, deseni), duruşunu,
@@ -3836,7 +3928,8 @@
         const [bx, by, bw, bh] = p.bbox;
         const imgData = metrics.imageData;
         const cxNorm = (bx + bw / 2) / w;
-        const posWord = cxNorm < 0.34 ? 'sol tarafta' : (cxNorm > 0.66 ? 'sağ tarafta' : 'ortada');
+        const posWord = cxNorm < 0.35 ? 'soldaki' : (cxNorm > 0.65 ? 'sağdaki' : 'ortadaki');
+        const anchorRel = findNearestObjectRelativePhrase(p.bbox, allObjects, w, h);
 
         // Çekim planı ve duruş (Yakın plan portre mi, bel üstü mü, boydan mı?)
         const heightRatio = bh / Math.max(1, h);
@@ -3942,6 +4035,7 @@
         const uniqueActions = [...new Set(actions)];
         return {
             posWord,
+            anchorRel,
             shotAndPosture,
             gazeDesc: gaze.gazeDesc,
             clothText,
@@ -3962,22 +4056,49 @@
 
         // SADECE yüksek güvenilirlikli (>= 0.52) nesne ve kişileri raporla; asla tahmin/uydurma yapma!
         const verifiedPreds = preds.filter(p => (p.score || 0) >= 0.52);
-        const people = verifiedPreds.filter(p => p.class === 'person').sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
-        const objects = verifiedPreds.filter(p => p.class !== 'person').sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
+        // Kişileri soldan sağa doğru sırala (cx koordinatına göre) ki "soldaki kişi", "onun sağındaki kişi" çok net olsun!
+        const people = verifiedPreds
+            .filter(p => p.class === 'person')
+            .sort((a, b) => (a.bbox[0] + a.bbox[2] / 2) - (b.bbox[0] + b.bbox[2] / 2));
+        const objects = verifiedPreds
+            .filter(p => p.class !== 'person')
+            .sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
 
-        if (people.length > 0) {
-            const pInfo = analyzePersonAppearanceAndActionInFrame(people[0], objects, metrics, w, h, pixelMotion);
-            frameAnalysis.primaryPersonInfo = pInfo;
+        frameAnalysis.personCount = people.length;
 
-            if (people.length === 1) {
+        if (people.length === 0) {
+            parts.push('Etrafta hiç kimse yok (0 kişi)');
+        } else {
+            const pInfos = people.map(p => analyzePersonAppearanceAndActionInFrame(p, objects, metrics, w, h, pixelMotion));
+            frameAnalysis.primaryPersonInfo = pInfos[0];
+            frameAnalysis.allPersonInfos = pInfos;
+
+            if (pInfos.length === 1) {
+                const p0 = pInfos[0];
+                const relNote = p0.anchorRel ? ` (${p0.anchorRel} kişi)` : '';
                 parts.push(
-                    `Kadrajın ${pInfo.posWord} kısmında ${pInfo.shotAndPosture} bir kişi var; ${pInfo.clothText}, ${pInfo.gazeDesc} ve ${pInfo.actionText}`
+                    `Etrafta 1 kişi var: ${p0.posWord} kişi${relNote} ${p0.shotAndPosture} görünüyor; ${p0.clothText}, ${p0.gazeDesc} ve ${p0.actionText}`
                 );
             } else {
-                const p2Info = analyzePersonAppearanceAndActionInFrame(people[1], objects, metrics, w, h, pixelMotion);
-                parts.push(
-                    `Sahnedeki ${people.length} kişiden öndeki ${pInfo.posWord} (${pInfo.clothText}, ${pInfo.actionText}), ikinci kişi ise ${p2Info.posWord} (${p2Info.upperColor} kıyafetli, ${p2Info.actionText})`
-                );
+                const personDescriptions = pInfos.slice(0, 4).map((pInfo, idx) => {
+                    const anchorText = pInfo.anchorRel ? `, ${pInfo.anchorRel} kişi` : '';
+                    let roleTitle = '';
+                    if (idx === 0) {
+                        const nextP = pInfos[1];
+                        const relToNext = nextP ? `${nextP.upperColor.toLowerCase()} kıyafetli kişinin solundaki kişi` : pInfo.posWord;
+                        roleTitle = `Soldaki 1. kişi (${relToNext}${anchorText})`;
+                    } else if (idx === pInfos.length - 1) {
+                        const prevP = pInfos[idx - 1];
+                        const labelPrefix = pInfos.length === 2 ? 'Sağdaki 2. kişi' : `En sağdaki ${idx + 1}. kişi`;
+                        roleTitle = `${labelPrefix} (${prevP.upperColor.toLowerCase()} kıyafetli kişinin sağındaki kişi${anchorText})`;
+                    } else {
+                        const prevP = pInfos[idx - 1];
+                        const nextP = pInfos[idx + 1];
+                        roleTitle = `Ortadaki ${idx + 1}. kişi (soldaki ${prevP.upperColor.toLowerCase()} kıyafetli kişinin sağındaki ve sağdaki ${nextP.upperColor.toLowerCase()} kıyafetli kişinin solundaki kişi${anchorText})`;
+                    }
+                    return `${roleTitle}: ${pInfo.shotAndPosture}, ${pInfo.clothText}, ${pInfo.gazeDesc} ve ${pInfo.actionText}`;
+                });
+                parts.push(`Etrafta soldan sağa toplam ${pInfos.length} kişi var — ${personDescriptions.join('; ')}`);
             }
         }
 
@@ -3989,10 +4110,8 @@
                 const objColor = measureRegionColorAndPattern(imgData, w, h, bx + bw * 0.2, by + bh * 0.2, Math.max(8, bw * 0.6), Math.max(8, bh * 0.6));
                 return `${pos} ${objColor.colorName.toLowerCase()} ${TR_LABELS[o.class] || o.class}`;
             });
-            parts.push(`Çevrede ${objList.join(', ')} yer alıyor`);
-        }
-
-        if (parts.length === 0) {
+            parts.push(`Çevredeki eşyalar: ${objList.join(', ')}`);
+        } else if (people.length === 0) {
             const topBg = measureRegionColorAndPattern(imgData, w, h, w * 0.15, h * 0.08, w * 0.70, h * 0.25);
             const botBg = measureRegionColorAndPattern(imgData, w, h, w * 0.15, h * 0.65, w * 0.70, h * 0.25);
             const bgTone = metrics.avgBrightness < 60 ? 'Loş ortamda' : (metrics.avgBrightness > 180 ? 'Aydınlık ortamda' : 'Ortamda');
@@ -4004,8 +4123,8 @@
 
     /**
      * Teknik kamera/piksel istatistiği yerine, profesyonel bir Sesli Film Betimlemecisi gibi
-     * videonun başından sonuna kadar kişinin ne yaptığını, nereye yürüdüğünü, hangi eşyayı
-     * eline aldığını veya bıraktığını doğal bir öykü akışıyla özetler.
+     * videonun başından sonuna kadar kişi sayısının nasıl değiştiğini, kişilerin ne yaptığını,
+     * nereye yürüdüğünü ve hangi eşyayı eline aldığını doğal bir öykü akışıyla özetler.
      */
     function computeTemporalVideoMotionAndTransition(frameAnalyses) {
         if (!Array.isArray(frameAnalyses) || frameAnalyses.length < 2) return '';
@@ -4020,7 +4139,9 @@
             if (curr.primaryPersonInfo) {
                 personTimeline.push({
                     timeSec: curr.timeSec,
+                    count: curr.personCount || 1,
                     info: curr.primaryPersonInfo,
+                    allInfos: curr.allPersonInfos || [curr.primaryPersonInfo],
                     objects: curr.preds.filter(p => p.class !== 'person' && (p.score || 0) >= 0.52).map(p => TR_LABELS[p.class] || p.class)
                 });
             }
@@ -4033,12 +4154,16 @@
                         sceneCutTimes.push(`${curr.timeSec}. saniye`);
                     }
                 }
-                const prevHasPerson = Boolean(prev.primaryPersonInfo);
-                const currHasPerson = Boolean(curr.primaryPersonInfo);
-                if (!prevHasPerson && currHasPerson) {
-                    narrativeEvents.push(`${curr.timeSec}. saniyede kişi sahneye giriyor.`);
-                } else if (prevHasPerson && !currHasPerson) {
-                    narrativeEvents.push(`${curr.timeSec}. saniyede kişi sahneden ayrılıyor.`);
+                const prevCount = prev.personCount || 0;
+                const currCount = curr.personCount || 0;
+                if (prevCount === 0 && currCount > 0) {
+                    narrativeEvents.push(`${curr.timeSec}. saniyede görüntüye ${currCount} kişi giriyor.`);
+                } else if (prevCount > 0 && currCount === 0) {
+                    narrativeEvents.push(`${curr.timeSec}. saniyede görüntüyü terk ediyorlar ve etrafta kimse kalmıyor (0 kişi).`);
+                } else if (currCount > prevCount) {
+                    narrativeEvents.push(`${curr.timeSec}. saniyede sahneye yeni bir kişi daha katılıyor ve etraftaki kişi sayısı ${prevCount}'den ${currCount} kişiye çıkıyor.`);
+                } else if (currCount < prevCount) {
+                    narrativeEvents.push(`${curr.timeSec}. saniyede kişilerden biri kadrajdan çıkıyor ve etraftaki kişi sayısı ${prevCount}'den ${currCount} kişiye düşüyor.`);
                 }
             }
         }
