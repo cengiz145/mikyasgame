@@ -1299,7 +1299,7 @@
         } else if (state.mode === 'portrait') {
             handlePortraitAndPrivacyMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
         } else if (state.mode === 'color_cloth') {
-            handleColorAndPatternMode(anW, anH, metrics);
+            handleColorAndPatternMode(anW, anH, scaleX, scaleY, ovCtx, metrics);
         } else if (state.mode === 'anomaly_led') {
             handleAnomalyAndLedMode(anW, anH, scaleX, scaleY, ovCtx, metrics);
         } else if (state.mode === 'explorer') {
@@ -1526,14 +1526,559 @@
         }
     }
 
-    function handleColorAndPatternMode(anW, anH, metrics) {
+    // =========================================================================
+    // KUSURSUZ T.C. DARPHANE MADENİ (DEMİR) PARA TANIMA VE TOPLAM TUTAR MOTORU
+    // (1 TL, 50 Kuruş, 25 Kuruş, 10 Kuruş, 5 Kuruş, 5 TL Çift Halka CIELAB + Çap Oranı)
+    // =========================================================================
+    function formatTurkishKurusTotal(totalKurus) {
+        const lira = Math.floor(totalKurus / 100);
+        const kurus = totalKurus % 100;
+        if (lira > 0 && kurus > 0) return `${lira} Lira ${kurus} Kuruş`;
+        if (lira > 0) return `${lira} Türk Lirası`;
+        return `${kurus} Kuruş`;
+    }
+
+    function drawCoinCircleOverlay(ctx, coin, scaleX, scaleY) {
+        if (!ctx) return;
+        const cx = coin.cx * scaleX;
+        const cy = coin.cy * scaleY;
+        const r = coin.radius * ((scaleX + scaleY) * 0.5);
+
+        ctx.save();
+        ctx.strokeStyle = coin.colorHex || '#facc15';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Çift metalik (1 TL / 50 Kr / 5 TL) ise iç göbek halkasını da çiz
+        if (coin.isBiMetallic) {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r * 0.58, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        const label = coin.shortLabel || coin.name;
+        const boxW = Math.max(92, label.length * 9 + 16);
+        const lx = Math.max(4, cx - boxW / 2);
+        const ly = Math.max(26, cy - r - 10);
+        ctx.fillStyle = 'rgba(9, 13, 22, 0.88)';
+        ctx.fillRect(lx, ly - 22, boxW, 26);
+        ctx.fillStyle = coin.colorHex || '#facc15';
+        ctx.font = 'bold 15px sans-serif';
+        ctx.fillText(label, lx + 8, ly - 4);
+        ctx.restore();
+    }
+
+    /**
+     * Masa, avuç içi veya zemindeki T.C. Darphane madeni paralarını (5 TL, 1 TL, 50 Kr, 25 Kr, 10 Kr, 5 Kr)
+     * 1) Arka plan ΔE farkı + Dairesellik (4 köşe boşluk ve iç doluluk kilidi) + Kenar çember gradyanı ile segmente eder,
+     * 2) Her paranın İç Göbek (0.10R..0.54R) ve Dış Halka (0.62R..0.89R) CIELAB (L*, a*, b*) metalik imzasını ölçer,
+     * 3) Birden fazla para varsa Darphane milimetrik çap oranlarıyla (26.15mm, 23.85mm, 20.5mm, 18.5mm, 17.5mm) çapraz doğrular,
+     * 4) Konumlarını (solda, ortada, sağda) ve kuruşu kuruşuna toplam tutarını hesaplar.
+     */
+    function detectAndClassifyTurkishCoins(metrics, width, height, ocrText = '') {
+        if (!metrics || !metrics.imageData) {
+            return { coins: [], totalKurus: 0, totalFormatted: '0 Kuruş', summarySpeech: '' };
+        }
+        const { imageData, gray, gw, gh, step } = metrics;
+        const data = imageData.data;
+
+        // 1. Arka Plan Referans Rengi (Kenar Çerçeve Örneklemesi) ve Von Kries Beyaz Dengesi
+        let bgL = 0, bgA = 0, bgB = 0, bgCnt = 0;
+        let sumR = 0, sumG = 0, sumB = 0, allCnt = 0;
+
+        for (let gy = 0; gy < gh; gy++) {
+            const py = gy * step;
+            for (let gx = 0; gx < gw; gx++) {
+                const px = gx * step;
+                const idx = (py * width + px) * 4;
+                const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+                sumR += r;
+                sumG += g;
+                sumB += b;
+                allCnt++;
+
+                if (gx < 3 || gx >= gw - 3 || gy < 3 || gy >= gh - 3) {
+                    const lab = rgbToLab(r, g, b);
+                    bgL += lab.L;
+                    bgA += lab.a;
+                    bgB += lab.b;
+                    bgCnt++;
+                }
+            }
+        }
+
+        bgL /= Math.max(1, bgCnt);
+        bgA /= Math.max(1, bgCnt);
+        bgB /= Math.max(1, bgCnt);
+
+        const meanR = sumR / Math.max(1, allCnt);
+        const meanG = sumG / Math.max(1, allCnt);
+        const meanB = sumB / Math.max(1, allCnt);
+        const meanGray = (meanR + meanG + meanB) / 3;
+        // Kısmi Von Kries dengesi: Oda lambasının sarı/mavi sapmasını düzeltirken metalin gerçek sarı/gümüş farkını korur
+        const gainR = meanR > 15 ? (0.55 + 0.45 * Math.min(1.45, Math.max(0.70, meanGray / meanR))) : 1;
+        const gainG = meanG > 15 ? (0.55 + 0.45 * Math.min(1.45, Math.max(0.70, meanGray / meanG))) : 1;
+        const gainB = meanB > 15 ? (0.55 + 0.45 * Math.min(1.45, Math.max(0.70, meanGray / meanB))) : 1;
+
+        // 2. Ön Plan Madeni Para Aday Maskesi (Arka plandan CIELAB ΔE farkı veya yüksek metalik kenar kontrastı)
+        const rawMask = new Uint8Array(gw * gh);
+        for (let gy = 1; gy < gh - 1; gy++) {
+            const py = gy * step;
+            for (let gx = 1; gx < gw - 1; gx++) {
+                const px = gx * step;
+                const idx = (py * width + px) * 4;
+                const lab = rgbToLab(data[idx], data[idx + 1], data[idx + 2]);
+                const dL = lab.L - bgL;
+                const dA = lab.a - bgA;
+                const dB = lab.b - bgB;
+                const deltaEBg = Math.sqrt(dL * dL + 1.45 * dA * dA + 1.45 * dB * dB);
+
+                const gxGrad = Math.abs(gray[gy * gw + (gx + 1)] - gray[gy * gw + (gx - 1)]);
+                const gyGrad = Math.abs(gray[(gy + 1) * gw + gx] - gray[(gy - 1) * gw + gx]);
+                const edgeMag = gxGrad + gyGrad;
+
+                if (deltaEBg >= 13.2 || (deltaEBg >= 8.5 && edgeMag >= 28)) {
+                    rawMask[gy * gw + gx] = 1;
+                }
+            }
+        }
+
+        // Metal üzerindeki parlama deliklerini kapatmak için 3x3 morfolojik kapama (dilate -> erode)
+        const dilated = new Uint8Array(gw * gh);
+        for (let gy = 1; gy < gh - 1; gy++) {
+            for (let gx = 1; gx < gw - 1; gx++) {
+                let any = 0;
+                for (let dy = -1; dy <= 1 && !any; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (rawMask[(gy + dy) * gw + (gx + dx)]) {
+                            any = 1;
+                            break;
+                        }
+                    }
+                }
+                dilated[gy * gw + gx] = any;
+            }
+        }
+        const fgMask = new Uint8Array(gw * gh);
+        for (let gy = 1; gy < gh - 1; gy++) {
+            for (let gx = 1; gx < gw - 1; gx++) {
+                let all = 1;
+                for (let dy = -1; dy <= 1 && all; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (!dilated[(gy + dy) * gw + (gx + dx)]) {
+                            all = 0;
+                            break;
+                        }
+                    }
+                }
+                fgMask[gy * gw + gx] = all;
+            }
+        }
+
+        // 3. Bağlantılı Bileşen Analizi (8-Connected BFS) ve Dairesellik Kilidi
+        const visited = new Uint8Array(gw * gh);
+        const candidateCircles = [];
+        const minCoinDiamPx = Math.max(22, Math.min(width, height) * 0.065);
+        const maxCoinDiamPx = Math.min(width, height) * 0.68;
+
+        for (let sy = 2; sy < gh - 2; sy++) {
+            for (let sx = 2; sx < gw - 2; sx++) {
+                const startIdx = sy * gw + sx;
+                if (!fgMask[startIdx] || visited[startIdx]) continue;
+
+                const queue = [startIdx];
+                visited[startIdx] = 1;
+                let head = 0;
+                let minX = sx, maxX = sx, minY = sy, maxY = sy;
+                let sumX = 0, sumY = 0;
+                let touchesBorder = false;
+
+                while (head < queue.length) {
+                    const curr = queue[head++];
+                    const cy = Math.floor(curr / gw);
+                    const cx = curr % gw;
+                    sumX += cx;
+                    sumY += cy;
+
+                    if (cx < minX) minX = cx;
+                    if (cx > maxX) maxX = cx;
+                    if (cy < minY) minY = cy;
+                    if (cy > maxY) maxY = cy;
+                    if (cx <= 1 || cx >= gw - 2 || cy <= 1 || cy >= gh - 2) {
+                        touchesBorder = true;
+                    }
+
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            if (dx === 0 && dy === 0) continue;
+                            const nx = cx + dx, ny = cy + dy;
+                            if (nx >= 1 && nx < gw - 1 && ny >= 1 && ny < gh - 1) {
+                                const nIdx = ny * gw + nx;
+                                if (fgMask[nIdx] && !visited[nIdx]) {
+                                    visited[nIdx] = 1;
+                                    queue.push(nIdx);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (touchesBorder) continue;
+                const areaCells = queue.length;
+                const bwCells = maxX - minX + 1;
+                const bhCells = maxY - minY + 1;
+                const bwPx = bwCells * step;
+                const bhPx = bhCells * step;
+                const diamPx = (bwPx + bhPx) * 0.5;
+
+                if (diamPx < minCoinDiamPx || diamPx > maxCoinDiamPx) continue;
+
+                const aspect = bwCells / Math.max(1, bhCells);
+                if (aspect < 0.70 || aspect > 1.42) continue;
+
+                // İdeal dairenin kutu doluluk oranı π/4 ≈ 0.785'tir. Dikdörtgen kutu/kağıtları elemek için:
+                const boxFillRatio = areaCells / Math.max(1, bwCells * bhCells);
+                if (boxFillRatio < 0.52 || boxFillRatio > 0.90) continue;
+
+                const centerGX = (minX + maxX) * 0.5;
+                const centerGY = (minY + maxY) * 0.5;
+                const radCells = (bwCells + bhCells) * 0.25;
+
+                // Dairesellik Kilidi: Dairenin iç kısmı dolu, sınırlayıcı kutunun 4 köşesi (r > 1.03R) boş olmalı!
+                let innerHits = 0, innerTotal = 0;
+                let cornerHits = 0, cornerTotal = 0;
+                for (let gy = minY; gy <= maxY; gy++) {
+                    for (let gx = minX; gx <= maxX; gx++) {
+                        const normR = Math.hypot(gx - centerGX, gy - centerGY) / Math.max(1, radCells);
+                        const isFg = fgMask[gy * gw + gx];
+                        if (normR <= 0.72) {
+                            innerTotal++;
+                            if (isFg) innerHits++;
+                        } else if (normR >= 1.04) {
+                            cornerTotal++;
+                            if (isFg) cornerHits++;
+                        }
+                    }
+                }
+
+                const innerDensity = innerHits / Math.max(1, innerTotal);
+                const cornerDensity = cornerHits / Math.max(1, cornerTotal);
+                if (innerDensity < 0.68 || cornerDensity > 0.38) continue;
+
+                candidateCircles.push({
+                    cx: ((sumX / areaCells) + 0.5) * step,
+                    cy: ((sumY / areaCells) + 0.5) * step,
+                    radius: diamPx * 0.5,
+                    bbox: [minX * step, minY * step, bwPx, bhPx]
+                });
+            }
+        }
+
+        // 4. Tek Yakın Plan (Close-Up) Madeni Para Yedek Tespiti:
+        // Kullanıcı tek bir demir parayı kameranın tam ortasına yaklaştırdıysa çember kenar gradyanını kontrol et
+        if (candidateCircles.length === 0) {
+            const centerX = width * 0.5;
+            const centerY = height * 0.5;
+            const testRadii = [
+                Math.min(width, height) * 0.18,
+                Math.min(width, height) * 0.24,
+                Math.min(width, height) * 0.31
+            ];
+            let bestRimScore = 0;
+            let bestRadius = 0;
+
+            for (let rIdx = 0; rIdx < testRadii.length; rIdx++) {
+                const R = testRadii[rIdx];
+                let rimEdgeSum = 0;
+                let rimSamples = 0;
+                for (let deg = 0; deg < 360; deg += 10) {
+                    const rad = deg * (Math.PI / 180);
+                    const rxIn = Math.round((centerX + Math.cos(rad) * (R * 0.86)) / step);
+                    const ryIn = Math.round((centerY + Math.sin(rad) * (R * 0.86)) / step);
+                    const rxOut = Math.round((centerX + Math.cos(rad) * (R * 1.12)) / step);
+                    const ryOut = Math.round((centerY + Math.sin(rad) * (R * 1.12)) / step);
+                    if (rxOut >= 1 && rxOut < gw - 1 && ryOut >= 1 && ryOut < gh - 1 &&
+                        rxIn >= 1 && rxIn < gw - 1 && ryIn >= 1 && ryIn < gh - 1) {
+                        const idxIn = (ryIn * step * width + rxIn * step) * 4;
+                        const idxOut = (ryOut * step * width + rxOut * step) * 4;
+                        const labIn = rgbToLab(data[idxIn], data[idxIn + 1], data[idxIn + 2]);
+                        const labOut = rgbToLab(data[idxOut], data[idxOut + 1], data[idxOut + 2]);
+                        const dE = Math.hypot(labIn.L - labOut.L, labIn.a - labOut.a, labIn.b - labOut.b);
+                        rimEdgeSum += dE;
+                        rimSamples++;
+                    }
+                }
+                const avgRimDeltaE = rimEdgeSum / Math.max(1, rimSamples);
+                if (avgRimDeltaE > bestRimScore && avgRimDeltaE >= 15.5) {
+                    bestRimScore = avgRimDeltaE;
+                    bestRadius = R;
+                }
+            }
+
+            if (bestRadius > 0) {
+                candidateCircles.push({
+                    cx: centerX,
+                    cy: centerY,
+                    radius: bestRadius,
+                    bbox: [centerX - bestRadius, centerY - bestRadius, bestRadius * 2, bestRadius * 2]
+                });
+            }
+        }
+
+        if (candidateCircles.length === 0) {
+            return { coins: [], totalKurus: 0, totalFormatted: '0 Kuruş', summarySpeech: '' };
+        }
+
+        // 5. Her Dairesel Aday İçin Eş-Merkezli Halka (İç Göbek vs. Dış Halka) CIELAB + Metalik Kabartma Analizi
+        const analyzedCoins = [];
+
+        for (let i = 0; i < candidateCircles.length; i++) {
+            const cand = candidateCircles[i];
+            const { cx, cy, radius } = cand;
+            const x0 = Math.max(1, Math.floor(cx - radius));
+            const x1 = Math.min(width - 2, Math.ceil(cx + radius));
+            const y0 = Math.max(1, Math.floor(cy - radius));
+            const y1 = Math.min(height - 2, Math.ceil(cy + radius));
+            const sampleStep = Math.max(1, Math.floor(radius / 22));
+
+            let coreL = 0, coreA = 0, coreB = 0, coreCnt = 0;
+            let ringL = 0, ringA = 0, ringB = 0, ringCnt = 0;
+            let reliefEdgeSum = 0, reliefCnt = 0;
+
+            for (let y = y0; y <= y1; y += sampleStep) {
+                for (let x = x0; x <= x1; x += sampleStep) {
+                    const distNorm = Math.hypot(x - cx, y - cy) / Math.max(1, radius);
+                    if (distNorm > 0.90) continue;
+
+                    const idx = (y * width + x) * 4;
+                    const r = Math.min(255, data[idx] * gainR);
+                    const g = Math.min(255, data[idx + 1] * gainG);
+                    const b = Math.min(255, data[idx + 2] * gainB);
+                    const lab = rgbToLab(r, g, b);
+
+                    // Kabartma (rölyef) kenar enerjisi (Madeni paranın ortasındaki rakam ve motif kabartması)
+                    if (distNorm <= 0.72) {
+                        const idxR = (y * width + (x + 1)) * 4;
+                        const idxD = ((y + 1) * width + x) * 4;
+                        const grad = Math.abs(data[idxR] - data[idx]) + Math.abs(data[idxD] - data[idx]);
+                        reliefEdgeSum += grad;
+                        reliefCnt++;
+                    }
+
+                    // Aşırı parlama (L* > 94) ve derin gölge (L* < 14) piksellerini renk ortalamasından hariç tut
+                    if (lab.L > 94 || lab.L < 14) continue;
+
+                    if (distNorm >= 0.08 && distNorm <= 0.54) {
+                        coreL += lab.L;
+                        coreA += lab.a;
+                        coreB += lab.b;
+                        coreCnt++;
+                    } else if (distNorm >= 0.62 && distNorm <= 0.89) {
+                        ringL += lab.L;
+                        ringA += lab.a;
+                        ringB += lab.b;
+                        ringCnt++;
+                    }
+                }
+            }
+
+            if (coreCnt < 8 || ringCnt < 8) continue;
+
+            coreL /= coreCnt; coreA /= coreCnt; coreB /= coreCnt;
+            ringL /= ringCnt; ringA /= ringCnt; ringB /= ringCnt;
+            const reliefScore = reliefEdgeSum / Math.max(1, reliefCnt);
+
+            // Çok düz ve kabartmasız lekeleri (örneğin masa üzerindeki düz su damlası/bant) ele
+            if (reliefScore < 6.2) continue;
+
+            const coreChroma = Math.hypot(coreA, coreB);
+            const ringChroma = Math.hypot(ringA, ringB);
+            const deltaBRingCore = ringB - coreB;       // + ise dış halka sarı, - ise iç göbek sarı
+            const deltaChroma = ringChroma - coreChroma;
+            const meanA = 0.5 * (coreA + ringA);
+            const meanB = 0.5 * (coreB + ringB);
+            const meanChroma = Math.hypot(meanA, meanB);
+
+            analyzedCoins.push({
+                ...cand,
+                coreL, coreA, coreB, coreChroma,
+                ringL, ringA, ringB, ringChroma,
+                deltaBRingCore,
+                deltaChroma,
+                meanA, meanB, meanChroma,
+                reliefScore
+            });
+        }
+
+        if (analyzedCoins.length === 0) {
+            return { coins: [], totalKurus: 0, totalFormatted: '0 Kuruş', summarySpeech: '' };
+        }
+
+        // 6. Çoklu Para Varsa Milimetrik Çap Kalibrasyonu (Darphane Standartları: 1 TL = 26.15mm, 50 Kr = 23.85mm)
+        let refMmPerPx = null;
+        const oneTlRef = analyzedCoins.find(c => c.deltaBRingCore >= 3.2 && c.ringB >= 7.5);
+        const fiftyKrRef = analyzedCoins.find(c => c.deltaBRingCore <= -3.2 && c.coreB >= 7.5);
+        if (oneTlRef) {
+            refMmPerPx = 26.15 / (oneTlRef.radius * 2);
+        } else if (fiftyKrRef) {
+            refMmPerPx = 23.85 / (fiftyKrRef.radius * 2);
+        } else if (analyzedCoins.length >= 2) {
+            const maxRad = Math.max(...analyzedCoins.map(c => c.radius));
+            refMmPerPx = 26.15 / (maxRad * 2);
+        }
+
+        const upperOcr = String(ocrText || '').toUpperCase();
+        const classifiedCoins = analyzedCoins.map(c => {
+            const estMm = refMmPerPx ? (c.radius * 2 * refMmPerPx) : null;
+            let valueKurus = 100;
+            let name = '1 Türk Lirası';
+            let shortLabel = '1 TL';
+            let metalDesc = 'Dışı sarı pirinç halka, içi gümüş göbek';
+            let colorHex = '#facc15';
+            let isBiMetallic = false;
+
+            // DURUM A: ÇİFT METALLİ (Bİ-METALİK) PARALAR
+            if (c.deltaBRingCore >= 3.1 && (c.ringB >= 7.2 || c.deltaChroma >= 3.2)) {
+                // Dış halka sarı pirinç, iç göbek gümüş nikel -> Kesin 1 Türk Lirası!
+                valueKurus = 100;
+                name = '1 Türk Lirası';
+                shortLabel = '1 TL';
+                metalDesc = 'Dışı sarı pirinç halka, içi gümüş göbek';
+                colorHex = '#facc15';
+                isBiMetallic = true;
+            } else if (c.deltaBRingCore <= -3.1 && (c.coreB >= 7.2 || c.deltaChroma <= -3.2)) {
+                // Dış halka gümüş nikel, iç göbek sarı pirinç -> 50 Kuruş (23.85mm) veya 5 TL (28.15mm)
+                isBiMetallic = true;
+                const isFiveTlBySize = estMm !== null && estMm >= 27.1;
+                const isFiveTlByOcr = /\b5\s*(?:TL|TÜRK|LİRA)\b/.test(upperOcr) && !/\b50\b/.test(upperOcr);
+                if (isFiveTlBySize || isFiveTlByOcr) {
+                    valueKurus = 500;
+                    name = '5 Türk Lirası (Madeni)';
+                    shortLabel = '5 TL';
+                    metalDesc = 'Büyük boy çift halkalı, içi sarı göbek';
+                    colorHex = '#34d399';
+                } else {
+                    valueKurus = 50;
+                    name = '50 Kuruş';
+                    shortLabel = '50 Kr';
+                    metalDesc = 'Dışı gümüş halka, içi sarı göbek';
+                    colorHex = '#38bdf8';
+                }
+            } else {
+                // DURUM B: TEK METALLİ (MONO-METALİK) PARALAR (25 Kuruş, 10 Kuruş, 5 Kuruş, veya yansımalı 1 TL)
+                if (estMm !== null && estMm >= 25.0 && c.meanB >= 6.5) {
+                    valueKurus = 100;
+                    name = '1 Türk Lirası';
+                    shortLabel = '1 TL';
+                    metalDesc = 'Büyük boy (26 mm) madeni para';
+                    colorHex = '#facc15';
+                    isBiMetallic = true;
+                } else if (c.meanChroma < 10.6 && c.meanB < 9.2) {
+                    // Gümüş/Gri Nikel Görünümlü -> 25 Kuruş (20.50 mm)
+                    valueKurus = 25;
+                    name = '25 Kuruş';
+                    shortLabel = '25 Kr';
+                    metalDesc = 'Tamamı gümüş-gri metal';
+                    colorHex = '#e2e8f0';
+                } else if (c.meanA >= 4.6 || (estMm !== null && estMm <= 17.9)) {
+                    // Kızıl-Bakır Bronz -> 5 Kuruş (17.50 mm)
+                    valueKurus = 5;
+                    name = '5 Kuruş';
+                    shortLabel = '5 Kr';
+                    metalDesc = 'Kızıl-bakır renkli küçük para';
+                    colorHex = '#fb7185';
+                } else {
+                    // Sarı-Altın Bronz -> 10 Kuruş (18.50 mm)
+                    valueKurus = 10;
+                    name = '10 Kuruş';
+                    shortLabel = '10 Kr';
+                    metalDesc = 'Tamamı sarı metal';
+                    colorHex = '#fbbf24';
+                }
+            }
+
+            // Tek para varsa ve OCR rakamı net okuduysa çapraz doğrulama
+            if (analyzedCoins.length === 1 && upperOcr.length > 0) {
+                if (/\b50\b/.test(upperOcr)) {
+                    valueKurus = 50; name = '50 Kuruş'; shortLabel = '50 Kr'; isBiMetallic = true;
+                } else if (/\b25\b/.test(upperOcr)) {
+                    valueKurus = 25; name = '25 Kuruş'; shortLabel = '25 Kr';
+                } else if (/\b10\b/.test(upperOcr)) {
+                    valueKurus = 10; name = '10 Kuruş'; shortLabel = '10 Kr';
+                }
+            }
+
+            const cxNorm = c.cx / Math.max(1, width);
+            let posWord = 'ortada';
+            if (cxNorm < 0.36) posWord = 'solda';
+            else if (cxNorm > 0.64) posWord = 'sağda';
+
+            return {
+                ...c,
+                valueKurus,
+                name,
+                shortLabel,
+                metalDesc,
+                colorHex,
+                isBiMetallic,
+                posWord
+            };
+        });
+
+        // Soldan sağa sırala
+        classifiedCoins.sort((a, b) => a.cx - b.cx);
+        const totalKurus = classifiedCoins.reduce((acc, item) => acc + item.valueKurus, 0);
+        const totalFormatted = formatTurkishKurusTotal(totalKurus);
+
+        let summarySpeech = '';
+        if (classifiedCoins.length === 1) {
+            const single = classifiedCoins[0];
+            summarySpeech = `Demir para algılandı: ${single.posWord} 1 adet ${single.name} (${single.metalDesc}).`;
+        } else if (classifiedCoins.length > 1) {
+            const listStr = classifiedCoins.map(c => `${c.posWord} ${c.name}`).join(', ');
+            summarySpeech = `Toplam ${classifiedCoins.length} adet demir para algılandı: ${listStr}. Paraların toplam tutarı: ${totalFormatted}.`;
+        }
+
+        return {
+            coins: classifiedCoins,
+            totalKurus,
+            totalFormatted,
+            summarySpeech
+        };
+    }
+
+    function handleColorAndPatternMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
+        const coinReport = detectAndClassifyTurkishCoins(metrics, anW, anH);
+
+        if (coinReport.coins.length > 0) {
+            coinReport.coins.forEach(coin => drawCoinCircleOverlay(ovCtx, coin, scaleX, scaleY));
+            const mainCoin = coinReport.coins[0];
+            const align = computeAlignmentInstruction(mainCoin.bbox, anW, anH, mainCoin.name, 0.01, 0.70);
+
+            el.tPosition.textContent = coinReport.coins.length === 1
+                ? `${mainCoin.name} (${mainCoin.posWord})`
+                : `${coinReport.coins.length} Demir Para`;
+            el.tDistance.textContent = `Toplam: ${coinReport.totalFormatted}`;
+            radar.updateRadar(align.offsetX, align.offsetY, true);
+
+            announceGuidance(coinReport.summarySpeech, {
+                bannerState: 'centered',
+                minIntervalMs: 2800
+            });
+            return;
+        }
+
         const colorName = metrics.centerColor.name;
         const pattern = metrics.patternType;
 
         el.tPosition.textContent = colorName;
         el.tDistance.textContent = pattern;
 
-        const msg = `Merkezdeki yüzey rengi: ${colorName}. Kumaş veya yüzey dokusu: ${pattern}. Üzerindeki para tutarını veya etiketi okutmak için ekrana çift dokunun.`;
+        const msg = `Merkezdeki yüzey rengi: ${colorName}. Kumaş veya yüzey dokusu: ${pattern}. Demir paraları (1 TL, 50, 25, 10, 5 Kuruş) masaya veya avucunuza koyup gösterirseniz anında tanıyıp toplamını hesaplarım; kağıt para veya etiket okutmak için ekrana çift dokunun.`;
         announceGuidance(msg, {
             bannerState: 'centered',
             minIntervalMs: 3600
@@ -1556,6 +2101,23 @@
             announceGuidance(`Cihaz üzerinde ${led.colorName} LED ışık tespit edildi ve şu an ${blinkState}.`, {
                 bannerState: 'centered',
                 minIntervalMs: 2800
+            });
+            return;
+        }
+
+        // Yere düşen şey bir madeni (demir) para ise doğrudan kaç lira/kuruş olduğunu söyle!
+        const coinCheck = detectAndClassifyTurkishCoins(metrics, anW, anH);
+        if (coinCheck.coins.length > 0) {
+            coinCheck.coins.forEach(coin => drawCoinCircleOverlay(ovCtx, coin, scaleX, scaleY));
+            const firstCoin = coinCheck.coins[0];
+            const align = computeAlignmentInstruction(firstCoin.bbox, anW, anH, `Yerdeki ${firstCoin.name}`, 0.005, 0.55);
+            el.tPosition.textContent = `Yerde ${firstCoin.shortLabel} Bulundu`;
+            el.tDistance.textContent = `Toplam: ${coinCheck.totalFormatted}`;
+            radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
+
+            announceGuidance(`Yerde düşmüş demir para bulundu! ${coinCheck.summarySpeech} ${align.sentence}`, {
+                bannerState: 'centered',
+                minIntervalMs: 2500
             });
             return;
         }
@@ -2565,7 +3127,12 @@
             sentences.push(`Fotoğrafın merkezinde ${mid.colorName} renginde (${mid.pattern}) bir yüzey veya alan yer alıyor; alt kısım ise ${bot.colorName} tonlarında.`);
         }
 
-        // 4. Kağıt Para veya Yazı Özeti
+        // 4. Madeni (Demir) Paralar, Kağıt Para veya Yazı Özeti
+        const coinScan = detectAndClassifyTurkishCoins(metrics, w, h, cleanText);
+        if (coinScan.coins.length > 0) {
+            sentences.push(coinScan.summarySpeech);
+        }
+
         if (cleanText && cleanText.trim().length >= 3) {
             const banknote = detectTurkishBanknoteFromTextAndColor(cleanText);
             if (banknote) {
@@ -2582,7 +3149,7 @@
     /**
      * Parmağınla Dokunarak Fotoğraf Keşfi (Touch-to-Explore Image Map).
      * Kullanıcı parmağını fotoğraf üzerinde gezdirdikçe altında ne olduğunu (yüz, kıyafet rengi,
-     * eşya, yazı veya arka plan rengi) seslendirir ve titreşim verir.
+     * madeni para, eşya, yazı veya arka plan rengi) seslendirir ve titreşim verir.
      */
     function populatePhotoExplorerMap(capCanvas, metrics, preds, ocrLines = [], storyText = '') {
         state.lastStoryText = storyText;
@@ -2606,11 +3173,18 @@
             drawTargetBox(ctx, p.bbox, scaleX, scaleY, p.class === 'person' ? '#22c55e' : '#38bdf8', trName);
         });
 
+        // Madeni (demir) paraları keşif haritası üzerinde işaretle ve parmakla dokunma için kaydet
+        const coinScan = detectAndClassifyTurkishCoins(metrics, capCanvas.width, capCanvas.height);
+        coinScan.coins.forEach(coin => {
+            drawCoinCircleOverlay(ctx, coin, scaleX, scaleY);
+        });
+
         state.exploredPhoto = {
             width: capCanvas.width,
             height: capCanvas.height,
             imageData: metrics.imageData,
             preds,
+            coins: coinScan.coins,
             ocrLines,
             storyText
         };
@@ -2632,7 +3206,7 @@
         const nx = Math.max(0, Math.min(1, (clientX - rect.left) / Math.max(1, rect.width)));
         const ny = Math.max(0, Math.min(1, (clientY - rect.top) / Math.max(1, rect.height)));
 
-        const { width, height, imageData, preds, ocrLines } = state.exploredPhoto;
+        const { width, height, imageData, preds, coins, ocrLines } = state.exploredPhoto;
         const px = nx * width;
         const py = ny * height;
 
@@ -2644,25 +3218,38 @@
         const patch = measureRegionColorAndPattern(imageData, width, height, px - 18, py - 18, 36, 36);
         let hitDescription = '';
 
-        // 1. Öncelik: Parmağın altında insan veya eşya var mı?
-        for (let i = 0; i < preds.length; i++) {
-            const p = preds[i];
-            const [bx, by, bw, bh] = p.bbox;
-            if (px >= bx && px <= bx + bw && py >= by && py <= by + bh) {
-                if (p.class === 'person') {
-                    const relY = (py - by) / Math.max(1, bh);
-                    if (relY < 0.32) {
-                        hitDescription = `${zoneName}: Kişinin baş ve yüz kısmı`;
-                    } else if (relY < 0.80) {
-                        hitDescription = `${zoneName}: Kişinin kıyafeti, ${patch.colorName} (${patch.pattern})`;
-                    } else {
-                        hitDescription = `${zoneName}: Kişinin alt kısmı (${patch.colorName})`;
-                    }
-                } else {
-                    const trName = TR_LABELS[p.class] || p.class;
-                    hitDescription = `${zoneName}: ${trName} (${patch.colorName})`;
+        // 0. Öncelik: Parmağın altında bir madeni (demir) para var mı?
+        if (Array.isArray(coins) && coins.length > 0) {
+            for (let i = 0; i < coins.length; i++) {
+                const c = coins[i];
+                if (Math.hypot(px - c.cx, py - c.cy) <= c.radius * 1.15) {
+                    hitDescription = `${zoneName}: Demir Para — ${c.name} (${c.metalDesc})`;
+                    break;
                 }
-                break;
+            }
+        }
+
+        // 1. Öncelik: Parmağın altında insan veya eşya var mı?
+        if (!hitDescription) {
+            for (let i = 0; i < preds.length; i++) {
+                const p = preds[i];
+                const [bx, by, bw, bh] = p.bbox;
+                if (px >= bx && px <= bx + bw && py >= by && py <= by + bh) {
+                    if (p.class === 'person') {
+                        const relY = (py - by) / Math.max(1, bh);
+                        if (relY < 0.32) {
+                            hitDescription = `${zoneName}: Kişinin baş ve yüz kısmı`;
+                        } else if (relY < 0.80) {
+                            hitDescription = `${zoneName}: Kişinin kıyafeti, ${patch.colorName} (${patch.pattern})`;
+                        } else {
+                            hitDescription = `${zoneName}: Kişinin alt kısmı (${patch.colorName})`;
+                        }
+                    } else {
+                        const trName = TR_LABELS[p.class] || p.class;
+                        hitDescription = `${zoneName}: ${trName} (${patch.colorName})`;
+                    }
+                    break;
+                }
             }
         }
 
@@ -3686,7 +4273,7 @@
                 : '2. Bölüm: Sesli Kıble Pusulası açıldı. Şu an bulunduğunuz şehir bulunuyor; isterseniz listeden kendi ilinizi de seçebilirsiniz.',
             'qr_screen': '3. Bölüm: WhatsApp Web ve Bilgisayar Ekranı Hizalama açıldı. Telefonu bilgisayar ekranına tutun, karekodu ortalamanız için sağa sola yönlendireceğim.',
             'portrait': '4. Bölüm: Özçekim ve Fotoğraf Çekim Yardımcısı açıldı. Yüzünüz tam ortalandığında ve ışık güzel olduğunda 3, 2, 1 diye sayıp fotoğrafınızı çekeceğim.',
-            'color_cloth': '5. Bölüm: Kıyafet Rengi, Deseni ve Kağıt Para Tanıma açıldı. Kıyafetinizi veya kağıt parayı kameraya gösterin.',
+            'color_cloth': '5. Bölüm: Kağıt Para, Demir Para (1 TL, 50, 25, 10, 5 Kuruş) ve Kıyafet Rengi Tanıma açıldı. Demir paraları masaya veya avucunuza koyup gösterirseniz tek tek tanır ve toplam kaç lira kaç kuruş olduğunu hesaplarım.',
             'anomaly_led': '6. Bölüm: Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü açıldı. Kamerayı yere veya modemin, şarj aletinin ışığına tutun.',
             'light_meter': '7. Bölüm: Lamba Açık mı Kapalı mı ve Pencere Bulucu açıldı. Işığın olduğu tarafa döndükçe ses incelir.',
             'explorer': '8. Bölüm: Etrafımda Ne Var ve Evrak Okuyucu açıldı. Odanızdaki eşyaları söyler, çift dokunursanız elinizdeki kağıdı okur.',
