@@ -461,7 +461,7 @@ const SoundGallery = {
         {
             id: 'fx_police_siren',
             category: 'effect',
-            title: 'Freesound Jandarma / Polis Yol Denetim Sireni',
+            title: 'Yol Emniyet & Denetim Kontrol Sireni',
             icon: '🚨',
             specs: 'Freesound #853022 Stüdyo Kaydı (CC0)',
             desc: 'Şehir girişindeki denetim noktasında veya otoyolda kenara çekme esnasında çalan kısa polis sireni.',

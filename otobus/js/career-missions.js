@@ -67,9 +67,9 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "İlk Yolcu Binişi: Ön Kapı (E) & Bilet Gelirleri",
+                featureUnlock: "İlk Yolcu Binişi: Ön Kapı (PageUp / Sayfa Yukarı) & Bilet Gelirleri",
                 rulesActive: "Sıfır kural & sıfır ceza (Alışma devresi)",
-                dispatcherOrder: "Sayın Kaptanım, test sürüşü ve durak yanaşma intikallerinizi başarıyla tamamladınız. Artık Değirmenaltı durağında bekleyen ilk yolcularımızı perona davet etme vaktidir. Kalkış durağında E tuşu ile ön kapıyı açarak yolcularınızı buyur ediniz. Yolcuları sarsmadan, tebessümle karşılayarak çarşı merkezine güvenle ulaştırınız. Seferinizde herhangi bir gecikme cezası veya zaman sınırı yoktur; yolcu memnuniyeti kurumumuzun temel ilkesidir. Hayırlı seferler dileriz."
+                dispatcherOrder: "Sayın Kaptanım, test sürüşü ve durak yanaşma intikallerinizi başarıyla tamamladınız. Artık Değirmenaltı durağında bekleyen ilk yolcularımızı perona davet etme vaktidir. Kalkış durağında PageUp (Sayfa Yukarı) tuşu ile ön kapıyı açarak yolcularınızı buyur ediniz. Yolcuları sarsmadan, tebessümle karşılayarak çarşı merkezine güvenle ulaştırınız. Seferinizde herhangi bir gecikme cezası veya zaman sınırı yoktur; yolcu memnuniyeti kurumumuzun temel ilkesidir. Hayırlı seferler dileriz."
             },
             {
                 index: 3,
@@ -112,7 +112,7 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "Öğrenci Yoğunluğu & Korna (H) Kullanım Disiplini",
+                featureUnlock: "Öğrenci Yoğunluğu & Korna (L) Kullanım Disiplini",
                 rulesActive: "Sıfır kural & sıfır ceza (Alışma devresi)",
                 dispatcherOrder: "Sayın Kaptanım, 100. Yıl Okullar Bölgesi ring seferi tarafınıza tahsis edilmiştir. Ders çıkış saatinde duraklarda oluşacak öğrenci yoğunluğuna karşı durak yanaşmalarında azami dikkat göstermeniz ve gereksiz korna çalmaktan imtina etmeniz gerekmektedir. Süre sınırlaması yoktur; genç yolcularımızın can güvenliği her şeyin üzerindedir. İyi görevler dileriz."
             },
@@ -127,9 +127,9 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "Akustik Duracak Zili & Arka Kapı (Q)",
+                featureUnlock: "Akustik Duracak Zili & Arka Kapı (PageDown / Sayfa Aşağı)",
                 rulesActive: "Sıfır kural & sıfır ceza (Alışma devresi)",
-                dispatcherOrder: "Sayın Kaptanım, Köprübaşı - Yenişehir seferinde araç içi akustik yolcu talep sistemimiz aktif edilmiştir. Durağa 200 metre kala iniş yapacak yolcular duracak butonuna basacak ve kabinde ikaz zili çalacaktır. Bu ikazı aldığınızda durakta durarak Q tuşu ile arka kapıyı açınız. Seferinizde süre baskısı bulunmamaktadır; nizami yolcu tahliyesi esastır. Emniyetli sürüşler dileriz."
+                dispatcherOrder: "Sayın Kaptanım, Köprübaşı - Yenişehir seferinde araç içi akustik yolcu talep sistemimiz aktif edilmiştir. Durağa 200 metre kala iniş yapacak yolcular duracak butonuna basacak ve kabinde ikaz zili çalacaktır. Bu ikazı aldığınızda durakta durarak PageDown (Sayfa Aşağı) tuşu ile arka kapıyı açınız. Seferinizde süre baskısı bulunmamaktadır; nizami yolcu tahliyesi esastır. Emniyetli sürüşler dileriz."
             },
             {
                 index: 7,
@@ -232,9 +232,9 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "Dinamik Yağmur & Silecek Kademeleri (X)",
+                featureUnlock: "Dinamik Yağmur & Silecek Kademeleri (Shift + W)",
                 rulesActive: "Sıfır kural & sıfır ceza (Telsiz ve yağmur sistemleri devrede)",
-                dispatcherOrder: "Sayın Kaptanım, güzergâh üzerinde sağanak yağış başlamıştır. Yağış şartlarında görüş netliğini sağlamak amacıyla X tuşu ile silecekleri devreye alınız. Islak zeminde takip mesafesini koruyunuz. Süre baskısı kesinlikle yoktur; selametle varış esastır. İyi görevler dileriz."
+                dispatcherOrder: "Sayın Kaptanım, güzergâh üzerinde sağanak yağış başlamıştır. Yağış şartlarında görüş netliğini sağlamak amacıyla Shift + W tuşları ile silecekleri devreye alınız. Islak zeminde takip mesafesini koruyunuz. Süre baskısı kesinlikle yoktur; selametle varış esastır. İyi görevler dileriz."
             },
             {
                 index: 14,
@@ -292,9 +292,9 @@
                 isTraining: false,
                 emptyBus: false,
                 passengersAllowed: true,
-                featureUnlock: "Gece Sürüşü & Kısa/Uzun Farlar (L)",
+                featureUnlock: "Gece Sürüşü & Kısa/Uzun Farlar (F)",
                 rulesActive: "Sıfır kural & sıfır ceza (Telsiz ve yağmur sistemleri devrede)",
-                dispatcherOrder: "Sayın Kaptanım, akşam alacakaranlığında sefer güvenliğini temin etmek amacıyla L tuşu ile kısa farlarınızı aktif ediniz. Karşı şeritten gelen sürücüleri rahatsız etmeden nizami aydınlatma sağlayınız. Zaman baskısı yoktur. Emniyetli seferler dileriz."
+                dispatcherOrder: "Sayın Kaptanım, akşam alacakaranlığında sefer güvenliğini temin etmek amacıyla F tuşu ile kısa farlarınızı aktif ediniz. Karşı şeritten gelen sürücüleri rahatsız etmeden nizami aydınlatma sağlayınız. Zaman baskısı yoktur. Emniyetli seferler dileriz."
             },
             {
                 index: 18,
@@ -1528,30 +1528,29 @@
             }
         ],
 
-        getMission: function(taskIndex) {
+        getMission: function (taskIndex) {
             const idx = Math.max(0, Math.min(99, parseInt(taskIndex) || 0));
             return this.missions[idx] || this.missions[0];
         },
 
-        getLevelTitle: function(levelOrTaskIndex) {
+        getLevelTitle: function (completedTasksOrIndex, isDirectLevel = false) {
             let lvl = 1;
-            if (typeof levelOrTaskIndex === 'number' && !isNaN(levelOrTaskIndex)) {
-                if (levelOrTaskIndex > 10) {
-                    lvl = Math.floor(levelOrTaskIndex / 10) + 1;
+            const parsed = (typeof completedTasksOrIndex === 'number' && !isNaN(completedTasksOrIndex))
+                ? completedTasksOrIndex
+                : parseInt(completedTasksOrIndex, 10);
+
+            if (!isNaN(parsed)) {
+                if (isDirectLevel) {
+                    lvl = parsed;
                 } else {
-                    lvl = levelOrTaskIndex;
-                }
-            } else if (typeof levelOrTaskIndex === 'string') {
-                const parsed = parseInt(levelOrTaskIndex, 10);
-                if (!isNaN(parsed)) {
-                    lvl = (parsed > 10) ? (Math.floor(parsed / 10) + 1) : parsed;
+                    lvl = Math.floor(Math.max(0, parsed) / 10) + 1;
                 }
             }
             lvl = Math.max(1, Math.min(10, Math.floor(lvl) || 1));
             return (this.LEVEL_TITLES && this.LEVEL_TITLES[lvl - 1]) || "1. Sınıf Stajyer Şehir İçi Sürücüsü";
         },
 
-        enrichRoute: function(route, taskIndex) {
+        enrichRoute: function (route, taskIndex) {
             if (!route) return route;
             const m = this.getMission(taskIndex);
             route.careerMission = m;

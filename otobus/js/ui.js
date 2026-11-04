@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    TÜRKİYE TURNESİ - OTOBÜS SİMÜLASYONU ARAYÜZ (UI.JS)
    ========================================================================== */
 
@@ -314,7 +314,7 @@ const UI = {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         
-        const icon = type === 'success' ? 'âœ…' : (type === 'error' ? 'âŒ' : 'âš ï¸');
+        const icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : '⚠️');
         toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
         
         container.appendChild(toast);
@@ -618,18 +618,19 @@ const UI = {
             return;
         }
 
-        // Aktif lisans seviyesi (Çırak = 1, Kalfa = 2, Usta = 3)
+        // Aktif lisans seviyesi ve tamamlanan göreve göre kariyer sınıfı
         const currentLic = (typeof Game !== 'undefined' && Game.licenseLevel) ? Game.licenseLevel : 1;
+        const effectiveCareerLic = Math.max(currentLic, Math.floor((completedTasks || 0) / 10) + 1);
 
         let routesToRender = cityRoutes;
         if (!isFreeDrive) {
-            // Görevleri doğal sayısal sırasına göre diz (Görev 1, Görev 2, ... Görev 10)
+            // Görevleri doğal sayısal sırasına göre diz (Görev 1, Görev 2, ... Görev 100)
             cityRoutes.sort((a, b) => (a.taskIndex || 0) - (b.taskIndex || 0));
 
-            // Oyuncunun görebileceği görevler: Mevcut lisans seviyesindeki görevler (1. Seviye için ilk 10 görev)
+            // Oyuncunun görebileceği görevler: Mevcut kariyer sınıfı ve altındaki görevler
             const visibleRoutes = cityRoutes.filter(r => {
                 if (typeof r.licenseLevel === 'number') {
-                    return r.licenseLevel <= currentLic;
+                    return r.licenseLevel <= effectiveCareerLic;
                 }
                 return true;
             });
@@ -696,7 +697,7 @@ const UI = {
                 ? "(SERBEST SÜRÜŞE AÇIK - PRATİK YAPABİLİRSİNİZ)"
                 : (isCurrentTask 
                     ? "(AÇIK - ŞU ANKİ GÖREVİNİZ)" 
-                    : (isCompleted ? "(Tamamlandı - İsterseniz Tekrar Sürün)" : `(KİLİTLİ - KAPALI: Önce Görev ${completedTasks + 1}'i Tamamlayın)`));
+                    : (isCompleted ? "(TAMAMLANDI - GEÇİLDİ)" : `(KİLİTLİ - KAPALI: Önce Görev ${completedTasks + 1}'i Tamamlayın)`));
             
             const startStop = route.startStop || (route.stops && route.stops[0] ? route.stops[0].name : "Kalkış Garajı");
             const endStop = route.endStop || (route.stops && route.stops.length > 0 ? route.stops[route.stops.length - 1].name : "Varış");
@@ -712,7 +713,7 @@ const UI = {
                 ? (`Görev ${taskNum}: ${route.name}. KİLİTLİ VE KAPALI. Bu görevin açılması için önce Görev ${completedTasks + 1}'i başarıyla tamamlamalısınız. Kalkış: ${startStop}, Varış: ${endStop}.`)
                 : (isCurrentTask
                     ? (`Görev ${taskNum}: ${route.name}. AÇIK - ŞU ANKİ GÖREVİNİZ. Başlamak için Enter veya Boşluk tuşuna basın. Kalkış: ${startStop}, Varış: ${endStop}. Toplam ${stopCount} durak, ${totalKmRoute} kilometre.`)
-                    : (`Görev ${taskNum}: ${route.name}. Tamamlandı. Tekrar sürmek için Enter veya Boşluk tuşuna basın. Kalkış: ${startStop}, Varış: ${endStop}.`));
+                    : (`Görev ${taskNum}: ${route.name}. Tamamlandı ve geçildi. Sıradaki göreviniz: Görev ${completedTasks + 1}.`));
             
             btn.setAttribute("aria-label", ariaDesc);
 
@@ -996,17 +997,26 @@ window.addEventListener('keydown', (e) => {
             'captain-profile-inspector-modal',
             'leaderboard-modal',
             'create-company-modal',
+            'company-system-modal', 'welcome-calendar-modal',
             'company-modal',
             'district-picker-modal',
             'mode-selection-modal',
             'intercity-dest-modal',
             'district-dest-modal',
             'smart-route-modal',
+            'bus-garage-modal',
             'garage-fleet-modal',
             'sound-gallery-modal',
+            'driver-badges-modal',
             'badges-modal',
             'stop-collection-modal',
+            'tutorial-assistant-modal',
             'tutorial-modal',
+            'multiplayer-radar-modal',
+            'facility-modal',
+            'hgs-modal',
+            'roleplay-modal',
+            'bus-concept-modal',
             'exit-screen'
         ];
         for (const mId of modalIds) {
@@ -1067,35 +1077,30 @@ window.addEventListener('keydown', (e) => {
     // "ana menüde müziğin sesini açmak için sayfa yukarı sayfa aşşağı tuşları kullanılsın
     // oyun ses düzzeyi ni kısıp açmak isiçinde home ve ent tuşları kullanılsın."
     if (!isFormFieldElement(activeEl) || !isTextInputElement(activeEl)) {
+        const inBus = isDriving
+            || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'))
+            || (document.getElementById('stop-screen') && !document.getElementById('stop-screen').classList.contains('hidden'));
         if (e.key === 'PageUp') {
-            e.preventDefault();
-            if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
-                audio.adjustMusicVolume(0.1);
+            if (!inBus) {
+                e.preventDefault();
+                if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
+                    audio.adjustMusicVolume(0.1);
+                }
             }
             return;
         }
         if (e.key === 'PageDown') {
-            e.preventDefault();
-            if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
-                audio.adjustMusicVolume(-0.1);
+            if (!inBus) {
+                e.preventDefault();
+                if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
+                    audio.adjustMusicVolume(-0.1);
+                }
             }
             return;
         }
         if (e.key === 'Home') {
-            e.preventDefault();
-            const inBus = isDriving || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'));
-            if (inBus) {
-                if (typeof audio !== 'undefined') {
-                    if (audio.playWindowSound) audio.playWindowSound(true);
-                    audio.setWindowOpen(true);
-                    if (typeof Game !== 'undefined' && Game.busDamage) {
-                        audio.updateAcoustics(Game.busDamage.leftWindow, Game.busDamage.rightWindow);
-                    }
-                    const winMsg = "Kaptan camı açıldı. Dış sesler ve serin hava kokpite doluyor.";
-                    if (typeof audio.speak === 'function') audio.speak(winMsg);
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Açıldı (Home)", "info");
-                }
-            } else {
+            if (!inBus) {
+                e.preventDefault();
                 if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
                     audio.adjustGameSoundVolume(0.1);
                 }
@@ -1103,20 +1108,8 @@ window.addEventListener('keydown', (e) => {
             return;
         }
         if (e.key === 'End') {
-            e.preventDefault();
-            const inBus = isDriving || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'));
-            if (inBus) {
-                if (typeof audio !== 'undefined') {
-                    if (audio.playWindowSound) audio.playWindowSound(false);
-                    audio.setWindowOpen(false);
-                    if (typeof Game !== 'undefined' && Game.busDamage) {
-                        audio.updateAcoustics(Game.busDamage.leftWindow, Game.busDamage.rightWindow);
-                    }
-                    const winMsg = "Kaptan camı kapatıldı. Kabin yalıtımı sağlandı.";
-                    if (typeof audio.speak === 'function') audio.speak(winMsg);
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Kapatıldı (End)", "info");
-                }
-            } else {
+            if (!inBus) {
+                e.preventDefault();
                 if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
                     audio.adjustGameSoundVolume(-0.1);
                 }

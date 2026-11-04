@@ -539,7 +539,8 @@
             }
 
             this.playWindowWashSound();
-            const msg = "🧼 Tesis personeli otobüsün ön camını ve farlarını tazyikli su ve fırçayla pırıl pırıl yıkadı (-40 ₺). Görüş açınız mükemmel!";
+            const feeText = washFee > 0 ? `(-${washFee} ₺${washDiscountNote})` : `(ÜCRETSİZ!${washDiscountNote})`;
+            const msg = `🧼 Tesis personeli otobüsün ön camını ve farlarını tazyikli su ve fırçayla pırıl pırıl yıkadı ${feeText}. Görüş açınız mükemmel!`;
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(msg, "success");
             if (typeof audio !== 'undefined' && audio.speak) {
                 audio.speak("Otobüsün ön camı ve farları yıkandı. Gece görüşünüz maksimuma çıktı.");
@@ -603,9 +604,9 @@
                 const btnFacility = document.createElement('button');
                 btnFacility.id = 'hud-facility-btn';
                 btnFacility.style.cssText = 'background: rgba(245, 158, 11, 0.25); border: 1px solid #f59e0b; color: #fbbf24; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px;';
-                btnFacility.innerHTML = '🛋️ TESİS & MOLA (J)';
-                btnFacility.title = 'Karayolu Dinlenme Tesisleri & 30 Dk Mola Menüsü (Kısayol: J)';
-                btnFacility.setAttribute('aria-label', 'Karayolu Dinlenme Tesisi ve Mola Menüsü (J)');
+                btnFacility.innerHTML = '🛋️ TESİS & MOLA (Shift+J)';
+                btnFacility.title = 'Karayolu Dinlenme Tesisleri & 30 Dk Mola Menüsü (Kısayol: Shift+J)';
+                btnFacility.setAttribute('aria-label', 'Karayolu Dinlenme Tesisi ve Mola Menüsü (Shift artı J)');
                 btnFacility.addEventListener('click', () => this.openFacilityModal());
                 container.appendChild(btnFacility);
             }
@@ -614,9 +615,9 @@
                 const btnHgs = document.createElement('button');
                 btnHgs.id = 'hud-hgs-btn';
                 btnHgs.style.cssText = 'background: rgba(59, 130, 246, 0.25); border: 1px solid #3b82f6; color: #60a5fa; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px;';
-                btnHgs.innerHTML = `🏷️ HGS: <span id="hud-hgs-balance">${this.data.hgsBalance} ₺</span> (Y)`;
-                btnHgs.title = 'HGS Otoyol Gişesi ve Bakiye Menüsü (Kısayol: Y)';
-                btnHgs.setAttribute('aria-label', `HGS Otoyol Gişesi ve Bakiye ${this.data.hgsBalance} lira (Y)`);
+                btnHgs.innerHTML = `🏷️ HGS: <span id="hud-hgs-balance">${this.data.hgsBalance} ₺</span> (Alt+H)`;
+                btnHgs.title = 'HGS Otoyol Gişesi ve Bakiye Menüsü (Kısayol: Alt+H)';
+                btnHgs.setAttribute('aria-label', `HGS Otoyol Gişesi ve Bakiye ${this.data.hgsBalance} lira (Alt artı H)`);
                 btnHgs.addEventListener('click', () => this.openHgsModal());
                 container.appendChild(btnHgs);
             }
@@ -626,22 +627,22 @@
             const el = document.getElementById('hud-hgs-balance');
             if (el) el.innerText = `${this.data.hgsBalance} ₺`;
             const btn = document.getElementById('hud-hgs-btn');
-            if (btn) btn.setAttribute('aria-label', `HGS Otoyol Gişesi ve Bakiye ${this.data.hgsBalance} lira (Y)`);
+            if (btn) btn.setAttribute('aria-label', `HGS Otoyol Gişesi ve Bakiye ${this.data.hgsBalance} lira (Alt artı H)`);
         },
 
-        // Tuş Bağlantıları (J = Mola/Tesis, Y = HGS Gişe & Bakiye)
+        // Tuş Bağlantıları (Shift+J = Mola/Tesis, Alt+H = HGS Gişe & Bakiye)
         setupKeyBindings: function () {
             window.addEventListener('keydown', (e) => {
                 const k = e.key.toLowerCase();
                 if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
                 // Shift + J: Dinlenme Tesisi Menüsü (J tek başına son durakta Kayıp Eşya teftişidir)
-                if (e.shiftKey && (k === 'j' || e.code === 'KeyJ')) {
+                if (e.shiftKey && !e.altKey && !e.ctrlKey && (k === 'j' || e.code === 'KeyJ')) {
                     e.preventDefault();
                     this.toggleFacilityModal();
                 } 
-                // Shift + H: HGS Bakiye & Gişe Menüsü (Y tek başına Pusula / İstikamet sorgusudur)
-                else if (e.shiftKey && (k === 'h' || e.code === 'KeyH')) {
+                // Alt + H: HGS Bakiye & Gişe Menüsü (Shift+H Canlı Meteoroloji raporudur)
+                else if (e.altKey && !e.shiftKey && !e.ctrlKey && (k === 'h' || e.code === 'KeyH')) {
                     e.preventDefault();
                     this.toggleHgsModal();
                 }
@@ -775,8 +776,8 @@
                     <button id="btn-drink-tea" class="modern-btn" style="background: rgba(234, 179, 8, 0.2); border: 1px solid #facc15; color: #fef08a; font-weight: bold; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 0.95rem;" aria-label="Tavşan Kanı Çay İç (15 Lira)">
                         ☕ Tavşan Kanı Demli Çay (15 ₺)
                     </button>
-                    <button id="btn-wash-windshield" class="modern-btn" style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #bae6fd; font-weight: bold; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 0.95rem;" aria-label="Ön Camı ve Farları Yıkat (40 Lira)">
-                        🧼 Ön Camı & Farları Yıkat (40 ₺)
+                    <button id="btn-wash-windshield" class="modern-btn" style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #bae6fd; font-weight: bold; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 0.95rem;" aria-label="Ön Camı ve Farları Yıkat">
+                        🧼 Ön Camı & Farları Yıkat (${(typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function' && CompanySystem.getInstitutionLevel('bus_wash') >= 3) ? 'ÜCRETSİZ' : ((typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function' && CompanySystem.getInstitutionLevel('bus_wash') === 2) ? '15 ₺' : '40 ₺')})
                     </button>
                 </div>
             </div>

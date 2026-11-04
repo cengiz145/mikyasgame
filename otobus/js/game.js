@@ -51,6 +51,17 @@ const Game = {
     currentFuelLiters: 500,
     fuelWarned15: false,
     fuelWarned5: false,
+    temperature: 20,
+    busTemperature: 22,
+    isACOn: false,
+    airPressure: 120,
+    isLowAirAlarmActive: false,
+    isEmergencyBrakeLocked: false,
+    selectedBus: null,
+    engineStarted: false,
+    isRetarderActive: false,
+    brakeEfficiency: 1.0,
+    lastInterlockWarnTime: 0,
 
     getFuelCapacity: function() {
         const bus = (typeof BusFleet !== 'undefined' && typeof BusFleet.getSelectedBus === 'function') 
@@ -207,7 +218,7 @@ const Game = {
         return "Efsanevi Master Kaptan unvanına sahipsiniz!";
     },
     hasPassedLevel10: function() {
-        return (this.completedTasks >= 10) || (this.licenseLevel > 10);
+        return true; // Geliştirici modu: Tüm ilçe ve şehirlerarası hatlar açık
     },
     playMode: localStorage.getItem('gamePlayMode') || 'career',
     launchCareerDirectToGarage: function() {
@@ -480,7 +491,7 @@ const Game = {
     currentCompassAngle: 0,
     isBeingTowed: false, // Çekici durumu
     savedState: null, // Kaza anı kayıt noktası
-    busDamage: { leftWindow: 0, rightWindow: 0, front: 0, wipers: 0, headlights: 0, exhaust: 0, health: 100 }, // Hasar durumu
+    busDamage: { leftWindow: 0, rightWindow: 0, headlights: 0, wipers: 0, exhaust: 0, suspension: 0, brakes: 0, front: 0, transmission: 0, engine: 0, chassis: 0, health: 100 }, // Sağlamlık gruplarına göre parça hasar durumu
     lastFrameTime: 0,
     animationFrameId: null,
     kasisDistance: null, // Kasis (Speed bump) için mesafe
@@ -522,13 +533,14 @@ const Game = {
             BusConceptGuide.announceAction('ramp', this.isRampDeployed);
         }
         if (this.isRampDeployed) {
-            this.rampUsedInRoute = true;
-            this.rampsUsedCountInRoute = (this.rampsUsedCountInRoute || 0) + 1;
             if (typeof audio !== 'undefined' && typeof audio.playRampDeploy === 'function') audio.playRampDeploy();
             if (rampEl) rampEl.style.display = 'inline-block';
             let xpGained = false;
-            if (this.hasWheelchairPassengerAtStop && !this.rampXPAwardedThisStop) {
+            const isWheelchairOrTask9 = this.hasWheelchairPassengerAtStop || (this.activeRouteData && this.activeRouteData.taskIndex === 8);
+            if (isWheelchairOrTask9 && !this.rampXPAwardedThisStop) {
                 this.rampXPAwardedThisStop = true;
+                this.rampUsedInRoute = true;
+                this.rampsUsedCountInRoute = (this.rampsUsedCountInRoute || 0) + 1;
                 this.addXP(30, "Tekerlekli Sandalye Rampası Hizmeti");
                 xpGained = true;
             }
@@ -721,12 +733,14 @@ const Game = {
     reportScheduleAdherence: function() {
         if (typeof audio !== 'undefined' && typeof audio.playIBISChime === 'function') audio.playIBISChime();
         const stopData = this.activeRouteData && this.activeRouteData.stops ? this.activeRouteData.stops[this.currentStopIndex] : null;
-        if (!stopData || !stopData.scheduledMinutes) {
+        if (!stopData || stopData.scheduledMinutes === undefined) {
             const defMsg = "Sefer Zamanlaması: Duraklara tam vaktinde ulaşıyorsunuz. Sıfır dakika sapma.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(defMsg);
             return;
         }
-        const delta = this.clockMinutes - stopData.scheduledMinutes;
+        let delta = this.clockMinutes - (stopData.scheduledMinutes % 1440);
+        if (delta < -720) delta += 1440;
+        else if (delta > 720) delta -= 1440;
         if (Math.abs(delta) <= 1.0) {
             const msg = "Sefer Zamanlaması: Harika gidiyorsunuz, duraklara tam vaktinde ulaşıyorsunuz. Sıfır dakika sapma.";
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
@@ -745,7 +759,7 @@ const Game = {
     },
 
     checkLostAndFound: function() {
-        const isFinalStop = this.activeRouteData && (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
+        const isFinalStop = !!(this.activeRouteData && Array.isArray(this.activeRouteData.stops) && (this.currentStopIndex >= this.activeRouteData.stops.length - 1));
         if (this.isDriving || !isFinalStop) {
             if (typeof audio !== 'undefined' && audio.speak) audio.speak("Kayıp eşya kontrolü son durakta tüm yolcular indikten sonra yapılır.");
             return;
@@ -755,6 +769,10 @@ const Game = {
             return;
         }
         this.hasLostItemFound = true;
+        if (this.finalStopDepartTimer) {
+            clearTimeout(this.finalStopDepartTimer);
+            this.finalStopDepartTimer = null;
+        }
 
         const items = [
             { name: "deri bir cüzdan ve kimlik kartı", reward: 120, xp: 60, toast: "👛 Deri Cüzdan ve Kimlik Bulundu (+120 ₺)" },
@@ -766,13 +784,19 @@ const Game = {
         this.lastFoundLostItem = selected;
 
         if (typeof audio !== 'undefined' && typeof audio.playLostAndFoundWalk === 'function') {
+            this.lostAndFoundCheckingInProgress = true;
             audio.playLostAndFoundWalk(() => {
+                this.lostAndFoundCheckingInProgress = false;
                 this.addMoney(selected.reward);
                 this.addXP(selected.xp);
                 const msg = `Arka koltukta ${selected.name} bulundu ve TEKULAŞ Emanet Bürosuna teslim edildi! ${selected.reward} Lira dürüst şoför primi ve ${selected.xp} tecrübe kazandınız.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
                 if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
                 if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(selected.toast, "success");
+                if (this.pendingFinishAfterLostCheck) {
+                    this.pendingFinishAfterLostCheck = false;
+                    setTimeout(() => this.finishRoute(), 1200);
+                }
             });
         } else {
             this.addMoney(selected.reward);
@@ -781,6 +805,10 @@ const Game = {
             if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
             if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
             if (typeof UI !== 'undefined' && UI.showToast) UI.showToast(selected.toast, "success");
+            if (this.pendingFinishAfterLostCheck) {
+                this.pendingFinishAfterLostCheck = false;
+                setTimeout(() => this.finishRoute(), 1200);
+            }
         }
     },
 
@@ -922,7 +950,7 @@ const Game = {
 
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        if (data.season !== 'season_level1') {
+                        if (data.season !== 'season_fresh_v2') {
                             this.licenseLevel = 1;
                             this.playerXP = 0;
                             this.completedTasks = 0;
@@ -930,6 +958,18 @@ const Game = {
                             this.clockMinutes = 480;
                             this.unlockedCities = ["Tekirdağ"];
                             this.currentCity = "Tekirdağ";
+                            this.activeDistrict = "Süleymanpaşa";
+                            this.activeNeighborhood = "";
+                            if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.resetToDefault === 'function') {
+                                CompanySystem.resetToDefault();
+                            }
+                            if (typeof BusFleet !== 'undefined') {
+                                try {
+                                    localStorage.setItem(BusFleet.OWNED_KEY || 'tekulas_owned_buses_v1', JSON.stringify(["otokar_kent_lf"]));
+                                    localStorage.setItem('selectedBusId', 'otokar_kent_lf');
+                                    if (typeof BusFleet.selectBus === 'function') BusFleet.selectBus('otokar_kent_lf');
+                                } catch(e) {}
+                            }
                             this.saveData(true);
                         } else {
                             // Çevrimdışı İlerleme Koruma Kalkanı: Yerel ilerleme ile bulutu akıllıca birleştir
@@ -964,8 +1004,18 @@ const Game = {
                             // 1. Sürücü İstatistikleri & Başarılar (DriverBadges)
                             if (data.driverStats && typeof DriverBadges !== 'undefined' && typeof DriverBadges.getLifetimeStats === 'function') {
                                 try {
-                                    const currentStats = DriverBadges.getLifetimeStats();
-                                    const merged = Object.assign({}, currentStats, data.driverStats);
+                                    const currentStats = DriverBadges.getLifetimeStats() || {};
+                                    const cloudStats = data.driverStats || {};
+                                    const merged = Object.assign({}, currentStats, cloudStats);
+                                    Object.keys(merged).forEach(k => {
+                                        const localVal = currentStats[k];
+                                        const cloudVal = cloudStats[k];
+                                        if (typeof localVal === 'number' || typeof cloudVal === 'number') {
+                                            const nLocal = Number(localVal) || 0;
+                                            const nCloud = Number(cloudVal) || 0;
+                                            merged[k] = Math.max(nLocal, nCloud);
+                                        }
+                                    });
                                     DriverBadges.saveLifetimeStats(merged);
                                 } catch(e) {
                                     console.warn("Driver stats merge error:", e);
@@ -974,8 +1024,19 @@ const Game = {
 
                             if (data.badgesData && typeof DriverBadges !== 'undefined' && typeof DriverBadges.getBadgesData === 'function') {
                                 try {
-                                    const currentBadges = DriverBadges.getBadgesData();
-                                    const mergedBadges = Object.assign({}, currentBadges, data.badgesData);
+                                    const currentBadges = DriverBadges.getBadgesData() || {};
+                                    const cloudBadges = data.badgesData || {};
+                                    const mergedBadges = Object.assign({}, cloudBadges, currentBadges);
+                                    Object.keys(cloudBadges).forEach(id => {
+                                        if (cloudBadges[id] && cloudBadges[id].unlocked) {
+                                            mergedBadges[id] = cloudBadges[id];
+                                        }
+                                    });
+                                    Object.keys(currentBadges).forEach(id => {
+                                        if (currentBadges[id] && currentBadges[id].unlocked) {
+                                            mergedBadges[id] = currentBadges[id];
+                                        }
+                                    });
                                     DriverBadges.saveBadgesData(mergedBadges);
                                 } catch(e) {
                                     console.warn("Badges merge error:", e);
@@ -985,6 +1046,14 @@ const Game = {
                             if (data.equippedTitle && typeof DriverBadges !== 'undefined') {
                                 try {
                                     localStorage.setItem(DriverBadges.TITLES_KEY, data.equippedTitle);
+                                } catch(e) {}
+                            }
+
+                            // Hoş Geldin Takvimi (WelcomeCalendar)
+                            if (data.welcomeCalendar && typeof WelcomeCalendar !== 'undefined') {
+                                try {
+                                    WelcomeCalendar.data = Object.assign(WelcomeCalendar.data || {}, data.welcomeCalendar);
+                                    WelcomeCalendar.saveData();
                                 } catch(e) {}
                             }
 
@@ -1044,8 +1113,28 @@ const Game = {
         });
     },
 
-    saveData: function(immediate = false) {
-        // 1. Yerel Kayıt (Anında ve Kesintisiz Çift Katman)
+    resetAllGameData: function(interactive = false) {
+        if (interactive) {
+            const confirmed = (typeof window !== 'undefined' && typeof window.confirm === 'function')
+                ? window.confirm(
+                    "⚠️ DİKKAT: TÜM OYUN VE ŞİRKET VERİLERİNİ SIFIRLAMA\n\n" +
+                    "Bu işlem:\n" +
+                    "• Şahsi cüzdanınızı ve tüm bakiyenizi (2.500 ₺ başlangıç harçlığına),\n" +
+                    "• Ehliyet seviyenizi Seviye 1'e ve XP'nizi 0'a,\n" +
+                    "• Tamamlanan görevleri 0'a ve açık şehirleri Tekirdağ'a,\n" +
+                    "• Satın aldığınız tüm otobüsleri silip yalnızca başlangıç aracı Otokar Kent LF'ye,\n" +
+                    "• Şirket kasasını 50.000 ₺'ye, kurum binalarını Seviye 1'e, şoförleri ve seferleri sıfıra,\n" +
+                    "• Kaptan liyakat unvanlarını, brövelerini ve otoyol tesis kayıtlarını,\n" +
+                    "TAMAMEN SİLECEK VE OYUNU SIFIRDAN BAŞLATACAKTIR.\n\n" +
+                    "Tüm verileri silip temiz başlangıç yapmak istediğinize emin misiniz?"
+                )
+                : true;
+            if (!confirmed) return false;
+        }
+
+        console.log("[Game] Tüm oyun ve şirket verileri temizleniyor...");
+
+        // 1. LocalStorage temizliği
         try {
             if (typeof localStorage !== 'undefined') {
                 const wipeKeys = [
@@ -1282,7 +1371,7 @@ const Game = {
                 const safeClock = Math.max(0, Math.min(1440, parseFloat(this.clockMinutes) || 480));
 
                 const payload = {
-                    season: 'season_level1',
+                    season: 'season_fresh_v2',
                     licenseLevel: safeLevel,
                     playerXP: safeXP,
                     completedTasks: safeTasks,
@@ -1310,34 +1399,51 @@ const Game = {
                     }
                 }
 
+                // Hoş Geldin Takvimi (WelcomeCalendar)
+                const welcomeCalObj = (typeof WelcomeCalendar !== 'undefined') ? WelcomeCalendar : (typeof window !== 'undefined' ? window.WelcomeCalendar : null);
+                if (welcomeCalObj && welcomeCalObj.data) {
+                    payload.welcomeCalendar = {
+                        claimedDays: welcomeCalObj.data.claimedDays || {},
+                        lastClaimDate: welcomeCalObj.data.lastClaimDate || null,
+                        claimedCount: welcomeCalObj.data.claimedCount || 0,
+                        totalClaimedCash: welcomeCalObj.data.totalClaimedCash || 0,
+                        totalClaimedXP: welcomeCalObj.data.totalClaimedXP || 0,
+                        totalClaimedTreasury: welcomeCalObj.data.totalClaimedTreasury || 0
+                    };
+                }
+
                 // Şirket Verileri (CompanySystem)
-                if (typeof CompanySystem !== 'undefined' && CompanySystem.data) {
+                const compSysObj = (typeof CompanySystem !== 'undefined') ? CompanySystem : (typeof window !== 'undefined' ? window.CompanySystem : null);
+                if (compSysObj && compSysObj.data) {
                     payload.companyData = {
-                        companyName: (CompanySystem.data.companyName || "Mikyas Seyahat").substring(0, 40),
-                        foundedDate: CompanySystem.data.foundedDate || Date.now(),
-                        totalRevenue: Math.max(0, Math.min(999999999, CompanySystem.data.totalRevenue || 0)),
-                        completedTripsCount: Math.max(0, Math.min(50000, CompanySystem.data.completedTripsCount || 0)),
-                        companyLevel: Math.max(1, Math.min(10, CompanySystem.data.companyLevel || 1)),
-                        companyTreasury: Math.max(-1000000, Math.min(999999999, CompanySystem.data.companyTreasury || 50000)),
-                        revenueSharePercent: Math.max(0, Math.min(100, CompanySystem.data.revenueSharePercent || 50)),
-                        cateringPackage: CompanySystem.data.cateringPackage || "standart",
-                        institutions: CompanySystem.data.institutions || {},
-                        satisfactionRating: Math.max(1.0, Math.min(5.0, CompanySystem.data.satisfactionRating || 4.9)),
-                        terminalBranches: CompanySystem.data.terminalBranches || {},
-                        ticketPricingMultiplier: CompanySystem.data.ticketPricingMultiplier || 1.0,
-                        facilityContract: CompanySystem.data.facilityContract || "standart",
-                        hqUpgrades: CompanySystem.data.hqUpgrades || {},
-                        hiredDrivers: Array.isArray(CompanySystem.data.hiredDrivers) ? CompanySystem.data.hiredDrivers.slice(0, 20) : [],
-                        bankruptcyCount: Math.max(0, CompanySystem.data.bankruptcyCount || 0)
+                        companyName: (compSysObj.data.companyName || "Mikyas Seyahat").substring(0, 40),
+                        foundedDate: compSysObj.data.foundedDate || Date.now(),
+                        totalRevenue: Math.max(0, Math.min(999999999, compSysObj.data.totalRevenue || 0)),
+                        completedTripsCount: Math.max(0, Math.min(50000, compSysObj.data.completedTripsCount || 0)),
+                        companyLevel: Math.max(1, Math.min(10, compSysObj.data.companyLevel || 1)),
+                        companyTreasury: Math.max(-1000000, Math.min(999999999, compSysObj.data.companyTreasury || 50000)),
+                        revenueSharePercent: Math.max(0, Math.min(100, compSysObj.data.revenueSharePercent || 50)),
+                        cateringPackage: compSysObj.data.cateringPackage || "standart",
+                        institutions: compSysObj.data.institutions || {},
+                        satisfactionRating: Math.max(1.0, Math.min(5.0, compSysObj.data.satisfactionRating || 4.9)),
+                        terminalBranches: compSysObj.data.terminalBranches || {},
+                        ticketPricingMultiplier: compSysObj.data.ticketPricingMultiplier || 1.0,
+                        facilityContract: compSysObj.data.facilityContract || "standart",
+                        hqUpgrades: compSysObj.data.hqUpgrades || {},
+                        hiredDrivers: Array.isArray(compSysObj.data.hiredDrivers) ? compSysObj.data.hiredDrivers.slice(0, 20) : [],
+                        bankruptcyCount: Math.max(0, compSysObj.data.bankruptcyCount || 0),
+                        corporateEmployer: compSysObj.data.corporateEmployer || null,
+                        isIndependentMode: !!compSysObj.data.isIndependentMode
                     };
                 }
 
                 // Otoyol Tesisleri ve HGS (HighwayFacilities)
-                if (typeof HighwayFacilities !== 'undefined' && HighwayFacilities.data) {
+                const hwyObj = (typeof HighwayFacilities !== 'undefined') ? HighwayFacilities : (typeof window !== 'undefined' ? window.HighwayFacilities : null);
+                if (hwyObj && hwyObj.data) {
                     payload.highwayData = {
-                        hgsBalance: Math.max(0, Math.min(100000, HighwayFacilities.data.hgsBalance || 0)),
-                        visitedFacilities: HighwayFacilities.data.visitedFacilities || {},
-                        stats: HighwayFacilities.data.stats || {}
+                        hgsBalance: Math.max(0, Math.min(100000, hwyObj.data.hgsBalance || 0)),
+                        visitedFacilities: hwyObj.data.visitedFacilities || {},
+                        stats: hwyObj.data.stats || {}
                     };
                 }
 
@@ -1471,7 +1577,14 @@ const Game = {
         this.playerXP += earnedXP;
         const newLevel = this.calculateLevelFromXP(this.playerXP);
         this.licenseLevel = Math.max(oldLevel, newLevel);
-        this.completedTasks++;
+
+        const routeTaskIdx = (this.activeRouteData && typeof this.activeRouteData.taskIndex === 'number')
+            ? this.activeRouteData.taskIndex
+            : null;
+        const wasNewCareerTask = (this.playMode !== 'free_drive' && typeof routeTaskIdx === 'number' && routeTaskIdx === this.completedTasks);
+        if (wasNewCareerTask) {
+            this.completedTasks++;
+        }
         this.saveData();
 
         const nextThreshold = this.getNextLevelXP(this.licenseLevel);
@@ -1495,7 +1608,7 @@ const Game = {
         UI.updatePlayerStats(this.licenseLevel, this.completedTasks, this.playerBudget, this.getLicenseTitle());
 
         // RESMİ İŞLETME TEBLİĞLERİ VE HİZMETE ALMA TUTANAKLARI
-        this.triggerProgressiveWowAnnouncement(this.completedTasks);
+        this.triggerProgressiveWowAnnouncement(wasNewCareerTask ? this.completedTasks : -1);
         return earnedXP;
     },
 
@@ -1509,54 +1622,124 @@ const Game = {
 
         let wowData = null;
 
-        if (completed === 1) {
+        if (completed === 2) {
+            wowData = {
+                icon: "👥",
+                title: "📋 RESMİ TEBLİĞ: İLK YOLCU BİNİŞİ & ÖN KAPI (PAGEUP) YETKİSİ",
+                desc: "Boş araç intikal ve durak hizalama provalarını başarıyla tamamladınız! 3. Görevden itibaren duraklarda bekleyen yolcuları PageUp (Sayfa Yukarı) tuşu ile ön kapıyı açarak otobüse alabilirsiniz.",
+                speech: "Sayın Kaptanım, boş intikal provalarınız tamamlandı. Üçüncü görevden itibaren duraklarda Sayfa Yukarı yani PageUp tuşu ile ön kapıyı açarak ilk yolcularınızı alabilirsiniz."
+            };
+        } else if (completed === 4) {
             wowData = {
                 icon: "💳",
-                title: "📋 RESMİ TEBLİĞ: ELEKTRONİK BİLET & VALİDATÖR DONANIMI",
-                desc: "Süleymanpaşa Hareket Amirliği tebliğidir: 2. Etap kapsamında aracınıza elektronik biletleme validatörü tahsis edilmiştir. Binen yolcular Tekirdağ Kart okutacak ve bilet hasılatı işletme bütçenize aktarılacaktır.",
-                speech: "Sayın Kaptanım, Hareket Amirliği tebliğidir: Aracınıza elektronik bilet validatörü monte edilmiştir. 2. Sefer intikaline başlayabilirsiniz."
+                title: "📋 RESMİ TEBLİĞ: TEKİRDAĞ KART (AKBİL) & VALİDATÖR DONANIMI",
+                desc: "Süleymanpaşa Hareket Amirliği tebliğidir: 5. Görev kapsamında aracınıza elektronik biletleme validatörü tahsis edilmiştir. Binen yolcular Tekirdağ Kart okutacak ve bilet hasılatı işletme bütçenize aktarılacaktır.",
+                speech: "Sayın Kaptanım, Hareket Amirliği tebliğidir: Aracınıza elektronik bilet validatörü monte edilmiştir. Beşinci sefer intikaline başlayabilirsiniz."
             };
-        } else if (completed === 2) {
+        } else if (completed === 6) {
             wowData = {
                 icon: "🔔",
-                title: "📋 TEKNİK TALİMAT: AKUSTİK İNİŞ ZİLİ & ÇİFT KAPI KONTROLÜ",
-                desc: "Yolcu iniş protokolü devreye alınmıştır. İnecek yolcular durağa 200 metre kala 'DURACAK' butonuna basacaktır. Sinyal aldığınızda aracı nizami durdurup Q tuşu ile arka kapıyı açınız.",
-                speech: "Sayın Kaptanım; akustik iniş zili ve arka kapı donanımı aktif edilmiştir. Durak yanaşmalarında arka kapıyı açarak inişleri sağlayınız."
+                title: "📋 TEKNİK TALİMAT: AKUSTİK İNİŞ ZİLİ & ARKA KAPI (PAGEDOWN) KONTROLÜ",
+                desc: "7. Görevden itibaren yolcu iniş protokolü devreye alınmıştır. İnecek yolcular durağa 200 metre kala 'DURACAK' butonuna basacaktır. Sinyal aldığınızda aracı nizami durdurup PageDown (Sayfa Aşağı) tuşu ile arka kapıyı açınız.",
+                speech: "Sayın Kaptanım; akustik iniş zili ve arka kapı donanımı aktif edilmiştir. Durak yanaşmalarında Sayfa Aşağı yani PageDown tuşu ile arka kapıyı açarak inişleri sağlayınız."
             };
-        } else if (completed === 3) {
+        } else if (completed === 8) {
             wowData = {
                 icon: "♿",
-                title: "📋 KAMUSAL ERİŞİLEBİLİRLİK: ENGELLİ RAMPASI & KNEELING SİSTEMİ",
-                desc: "Toplu taşıma erişilebilirlik ve yolcu konfor standartları gereği araca mekanik engelli rampası ve yana yatma sistemi (kneeling) zimmetlenmiştir. Durakta tekerlekli sandalyeli yolcu gördügünüzde 'U' tuşuna basarak rampayı açınız.",
-                speech: "Sayın Kaptanım; engelli rampası ve yana yatma donanımı hizmete sunulmuştur. Erişilebilirlik standartlarına riayet ediniz."
-            };
-        } else if (completed === 5) {
-            wowData = {
-                icon: "📻",
-                title: "📋 OPERASYONEL HABERLEŞME: TEKULAŞ MERKEZ TELSİZİ & METEOROLOJİ",
-                desc: "Hareket Kontrol Merkezi canlı telsiz frekansı hattınıza tanımlanmıştır. 'T' tuşuna basarak anlık telsiz anonslarını dinleyebilirsiniz. Yağış başladığında 'X' tuşu ile silecekleri devreye alınız.",
-                speech: "Sayın Kaptanım; TEKULAŞ Hareket Merkezi telsiz kanalı açılmıştır. Anlık operasyon talimatlarını takip ediniz."
-            };
-        } else if (completed === 7) {
-            wowData = {
-                icon: "⚙️",
-                title: "📋 MEKANİK GÜVENLİK: PNÖMATİK HAVA FRENİ & KOMPRESÖR SİSTEMİ",
-                desc: "Ağır vasıta pnömatik fren basınç izleme sistemi devrededir. Hava basıncını koruyunuz; kademeli frenaj uygulayınız. Basınç 4 bar altına düşerse imdat sistemi kilitlenir.",
-                speech: "Sayın Kaptanım; pnömatik hava freni ve kompresör basınç izleme sistemi devreye alınmıştır. Kademeli frenleme uygulayınız."
+                title: "📋 KAMUSAL ERİŞİLEBİLİRLİK: ENGELLİ RAMPASI & KNEELING (U)",
+                desc: "9. Görev itibarıyla toplu taşıma erişilebilirlik standartları gereği araca pnömatik engelli rampası ve yana yatma sistemi (kneeling) zimmetlenmiştir. Durakta tekerlekli sandalyeli yolcu gördüğünüzde 'U' tuşuna basarak rampayı açınız.",
+                speech: "Sayın Kaptanım; engelli rampası ve yana yatma donanımı hizmete sunulmuştur. U tuşu ile rampayı açabilirsiniz."
             };
         } else if (completed === 9) {
             wowData = {
                 icon: "🏁",
-                title: "📋 DİPLOMA ETABI: 1. SINIF MEZUNİYET SINAV SEFERİ",
-                desc: "1. Sınıf Stajyer sürücü devrenizin 10. ve son yeterlilik sınav seferi atanmıştır. Bu seferi tamamladığınızda 2. Sınıf Kıyı & Sahil Kaptanlığına terfi edecek ve 18 metrelik körüklü otobüs yetkisi alacaksınız.",
-                speech: "Sayın Kaptanım; 1. Sınıf Stajyer devrenizin son intikal sınavı tanımlanmıştır. Emniyetli sürüşler dileriz."
+                title: "📋 DİPLOMA ETABI: 1. SINIF STAJYER MEZUNİYET SINAV SEFERİ",
+                desc: "1. Sınıf Stajyer sürücü devrenizin 10. ve son yeterlilik sınav seferi atanmıştır. Bu seferi tamamladığınızda 2. Sınıf Süleymanpaşa Kıyı & Sahil Kaptanlığına terfi edeceksiniz.",
+                speech: "Sayın Kaptanım; 1. Sınıf Stajyer devrenizin son mezuniyet sınav seferi tanımlanmıştır. Emniyetli sürüşler dileriz."
             };
         } else if (completed === 10) {
             wowData = {
                 icon: "🎖️",
-                title: "🎓 TERFİ VE BRÖVE BELGESİ: 2. SINIF KIYI & SAHİL KAPTANI",
-                desc: "1. Sınıf Stajyerlik devresini başarıyla bitirdiniz. Şahsınıza 2. Sınıf Kıyı ve Sahil Kaptanlığı beratı tevdi edilmiştir. 18 Metrelik Körüklü Conecto filonuza katılmış ve tüm Trakya ilçe hatları yetkinize açılmıştır.",
-                speech: "Tebrik ederiz Sayın Kaptanım. 1. Sınıf Stajyerlik devresini başarıyla tamamlayarak 2. Sınıf Kıyı ve Sahil Kaptanlığına terfi ettiniz. Resmi beratınız tescil edilmiştir."
+                title: "🎓 TERFİ VE BRÖVE BELGESİ: 2. SINIF SÜLEYMANPAŞA KIYI & SAHİL KAPTANI",
+                desc: "1. Sınıf Stajyerlik devresini başarıyla bitirdiniz! Şahsınıza 2. Sınıf Kıyı ve Sahil Kaptanlığı beratı tevdi edilmiş, canlı TEKULAŞ Merkez Telsizi (T tuşu) ve çevik Isuzu Novo Lux yetkinize açılmıştır.",
+                speech: "Tebrik ederiz Sayın Kaptanım. 1. Sınıf Stajyerlik devresini başarıyla tamamlayarak 2. Sınıf Kıyı ve Sahil Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 13) {
+            wowData = {
+                icon: "🌧️",
+                title: "📋 METEOROLOJİ TALİMATI: DİNAMİK YAĞMUR & SİLECEK SİSTEMİ (SHIFT + W)",
+                desc: "14. Görev güzergâhında sağanak yağış beklenmektedir. Görüş netliğini korumak için 'Shift + W' tuşu ile cam sileceklerini devreye alınız.",
+                speech: "Sayın Kaptanım; yağışlı hava şartlarında Shift ve W tuşu ile silecek kademelerini devreye alabilirsiniz."
+            };
+        } else if (completed === 17) {
+            wowData = {
+                icon: "🔦",
+                title: "📋 GECE SEYRİ TALİMATI: FAR VE AYDINLATMA PROTOKOLÜ (F)",
+                desc: "18. Görev alacakaranlık ve gece vardiyasında icra edilecektir. Sefer güvenliği için 'F' tuşu ile farlarınızı aktif ediniz.",
+                speech: "Sayın Kaptanım; gece seferlerinde F tuşu ile far ve aydınlatma sistemini aktif ediniz."
+            };
+        } else if (completed === 20) {
+            wowData = {
+                icon: "🏙️",
+                title: "🎓 TERFİ BELGESİ: 3. SINIF ÇORLU SANAYİ & METROPOL HAT KAPTANI",
+                desc: "Süleymanpaşa kıyı etabını başarıyla tamamladınız! 3. Sınıf Çorlu Metropol Kaptanlığına terfi ettiniz. BMC Neocity 10M tahsis edilmiş olup Kapı Emniyet Kilidi ve 50 km/s hız disiplini yürürlüğe girmiştir.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 3. Sınıf Çorlu Sanayi ve Metropol Hat Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 30) {
+            wowData = {
+                icon: "🛣️",
+                title: "🎓 TERFİ BELGESİ: 4. SINIF TRAKYA KIYI & İLÇE HATLARI KIDEMLİ KAPTANI",
+                desc: "Çorlu metropol etabını başarıyla bitirdiniz! 4. Sınıf Kıdemli İlçe Kaptanlığına yükseldiniz. Mercedes Conecto Solo ve Pnömatik Hava Basıncı Yönetimi devrededir.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 4. Sınıf Trakya Kıyı ve İlçe Hatları Kıdemli Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 40) {
+            wowData = {
+                icon: "🏭",
+                title: "🎓 TERFİ BELGESİ: 5. SINIF ERGENE & VELİMEŞE OSB FİLO REİSİ",
+                desc: "Bölgesel ilçe hatlarını başarıyla tamamladınız! 5. Sınıf Ergene ve Velimeşe Organize Sanayi Filo Reisliğine terfi ettiniz.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 5. Sınıf Ergene ve Velimeşe OSB Filo Reisliğine terfi ettiniz."
+            };
+        } else if (completed === 50) {
+            wowData = {
+                icon: "🚍",
+                title: "🎓 TERFİ BELGESİ: 6. SINIF 18 METRE KÖRÜKLÜ OTOBÜS BAŞ KAPTANI",
+                desc: "OSB ağır sanayi vardiyalarını başarıyla tamamladınız! 6. Sınıf 18 Metre Körüklü Otobüs Baş Kaptanlığına terfi ettiniz.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 6. Sınıf 18 Metre Körüklü Otobüs Baş Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 60) {
+            wowData = {
+                icon: "⛰️",
+                title: "🎓 TERFİ BELGESİ: 7. SINIF TRAKYA DAĞ GEÇİTLERİ & FİLO MÜFETTİŞİ",
+                desc: "Körüklü metropol etabını başarıyla tamamladınız! 7. Sınıf Trakya Dağ Geçitleri ve Kıdemli Filo Müfettişliğine terfi ettiniz. Efsane Mercedes O 403 uzun yol serisi açılmıştır.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 7. Sınıf Trakya Dağ Geçitleri ve Filo Müfettişliğine terfi ettiniz."
+            };
+        } else if (completed === 70) {
+            wowData = {
+                icon: "👑",
+                title: "🎓 TERFİ BELGESİ: 8. SINIF MARMARA - EGE OTOYOL BAŞ KAPTANI",
+                desc: "Trakya dağ geçitlerini başarıyla tamamladınız! 8. Sınıf Şehirlerarası Otoyol Baş Kaptanlığına ve Mercedes Travego 15 SHD kaptanlığına terfi ettiniz.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 8. Sınıf Marmara Ege Otoyol Baş Kaptanlığına terfi ettiniz."
+            };
+        } else if (completed === 80) {
+            wowData = {
+                icon: "❄️",
+                title: "🎓 TERFİ BELGESİ: 9. SINIF ANADOLU KAR & DAĞ GEÇİTLERİ ÜSTADI",
+                desc: "Marmara ve Ege otoyol maratonunu tamamladınız! 9. Sınıf Anadolu Kar Geçitleri Üstadı ve Gece Kartalı unvanına yükseldiniz.",
+                speech: "Tebrik ederiz Sayın Kaptanım! 9. Sınıf Anadolu Kar ve Dağ Geçitleri Üstadı unvanına terfi ettiniz."
+            };
+        } else if (completed === 90) {
+            wowData = {
+                icon: "🏆",
+                title: "🎓 TERFİ BELGESİ: 10. SINIF EFSANE MİKYAS MASTER KAPTANI",
+                desc: "Anadolu'nun en zorlu kar ve dağ geçitlerini fethettiniz! 10. Sınıf Efsane Mikyas Master Kaptanı unvanına ulaştınız. Türkiye Şampiyonluk Parkuru son 10 final etabı açılmıştır!",
+                speech: "Tebrik ederiz Sayın Kaptanım! 10. Sınıf Efsane Mikyas Master Kaptanı unvanına yükseldiniz."
+            };
+        } else if (completed === 100) {
+            wowData = {
+                icon: "👑",
+                title: "🏆 BÜYÜK FİNAL: MİKYAS AKADEMİSİ ALTIN DİREKSİYON ONUR MADALYASI!",
+                desc: "Mikyas Kaptanlık Akademisi'nin 100 görevlik tüm Türkiye serüvenini eksiksiz tamamladınız! Altın Direksiyon Onur Madalyası adınıza tescil edilmiştir. Yolunuz daima açık olsun Efsane Kaptan!",
+                speech: "Muhteşem başarı! Mikyas Kaptanlık Akademisinin yüz görevinin tamamını bitirerek Altın Direksiyon Onur Madalyasını kazandınız!"
             };
         }
 
@@ -1656,7 +1839,7 @@ const Game = {
 
         let tipMultiplier = 1.0;
         if (typeof CompanySystem !== 'undefined' && typeof CompanySystem.getInstitutionLevel === 'function') {
-            const cateringLvl = CompanySystem.getInstitutionLevel('catering_logistics');
+            const cateringLvl = CompanySystem.getInstitutionLevel('catering_cargo_hub');
             if (cateringLvl === 2) {
                 tipMultiplier = 1.30; // +%30 bahşiş
                 ratingBonus *= 1.5;
@@ -1688,12 +1871,12 @@ const Game = {
         }
 
         if (typeof UI !== 'undefined' && UI.showToast) {
-            UI.showToast(`☕ ${compName} İkramı Dağıtıldı! (+${tipMoney} ₺ Bahşiş)`, "success");
+            UI.showToast(`☕ ${compName || 'Şirket'} İkramı Dağıtıldı! (+${tipMoney || 0} ₺ Bahşiş)`, "success");
         }
 
         const passFeedback = document.getElementById('passenger-feedback');
         if (passFeedback) {
-            passFeedback.innerText = `☕ İkram Servisi: ${pkgName} dağıtıldı. (+${tipMoney} ₺ Kaptan Bahşişi)`;
+            passFeedback.innerText = `☕ İkram Servisi: ${pkgName || 'İkram'} dağıtıldı. (+${tipMoney || 0} ₺ Kaptan Bahşişi)`;
             passFeedback.style.color = '#38bdf8';
         }
     },
@@ -1811,11 +1994,15 @@ const Game = {
         const completed = (typeof this.completedTasks === 'number') ? this.completedTasks : 0;
         const currentLic = (typeof this.licenseLevel === 'number') ? this.licenseLevel : 1;
 
-        // 1. Sıralı Görev Kontrolü: Seviye 1 Görevleri (Görev 1'den 10'a kadar)
+        // 1. Sıralı Görev Kontrolü: Kariyer modunda yalnızca sıradaki aktif görev oynanabilir
         if (typeof route.taskIndex === 'number') {
-            // Başlangıçta 1. Görev (taskIndex: 0) her zaman serbestçe açıktır
-            if (route.taskIndex === 0) {
-                return { allowed: true };
+            if (route.taskIndex < completed) {
+                const activeTaskNumber = completed + 1;
+                const requestedTaskNumber = route.taskIndex + 1;
+                return {
+                    allowed: false,
+                    reason: `Görev ${requestedTaskNumber} zaten başarıyla tamamlandı. Kariyer modunda önceki görevlere geri dönülemez; sıradaki göreviniz: Görev ${activeTaskNumber}.`
+                };
             }
             // Sıradaki görevden ilerideki tüm görevler kilitli ve kapalıdır
             if (route.taskIndex > completed) {
@@ -1826,7 +2013,7 @@ const Game = {
                     reason: `Mikyas Kaptanlık Akademisi Kuralı: Bir seviye tamamlanmadan diğer seviyelere başlanamaz! Görev ${requestedTaskNumber} henüz kilitli ve kapalıdır. Lütfen önce Görev ${activeTaskNumber}'i başarıyla tamamlayın.`
                 };
             }
-            // Tamamlanmış veya mevcut aktif görev serbestçe erişilebilir
+            // Mevcut aktif görev serbestçe erişilebilir
             return { allowed: true };
         }
 
@@ -1894,6 +2081,24 @@ const Game = {
         }
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
+
+        if (!isResume) {
+            this.currentStopIndex = 0;
+            this.passengersOnBoard = 0;
+            this.terminalAnnouncedForRoute = false;
+        }
+
+        this.completedTunnels = [];
+        this.completedBridges = [];
+        this.activeRealTunnel = null;
+        this.activeRealBridge = null;
+        this.currentAltitude = 10;
+        this.currentSlopePct = 0.0;
+        const arriveBusSprite = document.getElementById('bus-sprite');
+        if (arriveBusSprite) arriveBusSprite.style.transform = 'translateX(-50%) rotate(0deg)';
+        const arriveLaneCont = document.querySelector('.lane-container');
+        if (arriveLaneCont) arriveLaneCont.style.transform = 'translateX(-50%) rotateX(60deg) skewX(0deg)';
+        if (typeof audio !== 'undefined' && typeof audio.stopTireScreech === 'function') audio.stopTireScreech();
         this.fuelTankCapacity = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
         if (this.currentFuelLiters === undefined || this.currentFuelLiters <= 0) {
             this.currentFuelLiters = this.fuelTankCapacity;
@@ -1943,7 +2148,6 @@ const Game = {
         this.totalPassengersBoardedInRoute = 0;
         this.isLuggageOpen = false;
         this.hasLostItemFound = false;
-        this.terminalAnnouncedForRoute = false;
         this.lastFoundLostItem = null;
         this.activePassengerEvent = null;
         this.insufficientBalanceTriggeredAtStop = false;
@@ -2036,84 +2240,110 @@ const Game = {
                 return "<li style=\"margin-bottom: 5px; color: " + color + ";\"><strong>" + (idx + 1) + ". Durak:</strong> " + s.name + " <span style=\"font-size: 0.85rem; opacity: 0.85;\">" + badge + "</span></li>";
             }).join("");
 
-            // KADEMELİ VE RESMİ SEFER BRİFİNGİ (Kurumsal İşletme Standartları)
+            // KADEMELİ VE RESMİ SEFER BRİFİNGİ (Kurumsal İşletme Standartları - 100 Görev Uyumlu)
             const tIdx = (typeof r.taskIndex === 'number') ? r.taskIndex : 0;
             let howToDriveHtml = '';
             let shortcutsNote = '';
 
-            if (tIdx === 0) {
-                // Görev 1: Temel Sürüş ve İlk İntikal
+            if (tIdx < 2) {
+                // Görev 1-2: Boş Araç İntikali ve Durak Hizalama Provası
                 howToDriveHtml = [
                     '<div style="background: rgba(34, 197, 94, 0.15); border: 1.5px solid #22c55e; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #22c55e; font-size: 1.1rem;">📋 TEKULAŞ İntikal Talimatı: 1. Sınıf Stajyer Seferi</strong><br>',
-                    '    <span style="color: #f1f5f9;">Garaj amirliğince sefere tahsis edilen aracınızla kalkış durağına intikal ediniz. Ön kapı kontrolü (E tuşu), gaz ve fren dinamiklerini emniyet sınırları dahilinde test ediniz. Hız ve takip mesafesi kurallarına riayet esastır.</span>',
+                    '    <strong style="color: #22c55e; font-size: 1.1rem;">📋 TEKULAŞ İntikal Talimatı: Boş Araç & Durak Yanaşma Provası</strong><br>',
+                    '    <span style="color: #f1f5f9;">İlk iki seferimiz yolcusuz alıştırma intikalidir. Gaz, fren ve direksiyon dinamiklerini test ediniz; durak ceplerine kademeli frenle yanaşarak kaldırıma nizami paralellikte duruş provası yapınız.</span>',
                     '</div>',
-                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Temel Sürüş ve Kabin Kontrolleri:</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Temel Sürüş Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
                     '    <li><strong>W veya Yukarı Ok:</strong> Gaz pedalı (İvmelenme).</li>',
                     '    <li><strong>S veya Aşağı Ok:</strong> Servis freni (Kademeli duruş).</li>',
                     '    <li><strong>A / D veya Sol / Sağ Ok:</strong> Direksiyon ve şerit takibi.</li>',
-                    '    <li><strong>E Tuşu:</strong> Ön kapı kontrolü (Yolcu binişleri).</li>',
-                    '    <li><strong>H Tuşu:</strong> Korna (İkaz sinyali).</li>',
+                    '    <li><strong>PageUp (Sayfa Yukarı):</strong> Ön kapı kontrolü (Durak yanaşma provası).</li>',
+                    '    <li><strong>L Tuşu:</strong> Korna (İkaz sinyali).</li>',
                     '</ul>'
                 ].join("");
-                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 İşletme Notu: Görevler ilerledikçe; Elektronik Biletleme, Akustik İniş Zili, Engelli Rampası, Merkez Telsizi ve Pnömatik Hava Freni gibi profesyonel sistemler kademeli devreye alınacaktır.</div>';
-            } else if (tIdx === 1) {
-                // Görev 2: Akbil ve Kart Okuyucu devrede
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 İşletme Notu: 3. Görevde ilk yolcu binişleri, 5. Görevde Tekirdağ Kart, 7. Görevde Duracak Zili, 9. Görevde Engelli Rampası devreye alınacaktır.</div>';
+            } else if (tIdx < 4) {
+                // Görev 3-4: İlk Yolcular & Ön Kapı
                 howToDriveHtml = [
                     '<div style="background: rgba(56, 189, 248, 0.15); border: 1.5px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">💳 Yeni Özellik: Tekirdağ Kart (Akbil) Devrede!</strong><br>',
-                    '    <span style="color: #f1f5f9;">Kapıyı açtığınızda yolcular Tekirdağ Kart basacak ve validatörden gerçek onay bipleri duyacaksınız. Bilet gelirleri bütçenize eklenecektir.</span>',
+                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">👥 İlk Yolcu Binişi: Ön Kapı (PageUp / Sayfa Yukarı) ve Yolcu Konforu Devrede!</strong><br>',
+                    '    <span style="color: #f1f5f9;">Duraklarda bekleyen yolcuları <strong>PageUp (Sayfa Yukarı)</strong> tuşu ile ön kapıyı açarak otobüse buyur ediniz. Sarsıntısız frenleme ile yolcu memnuniyetini yüksek tutunuz.</span>',
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
                     '    <li><strong>W / Yukarı Ok:</strong> Gaz | <strong>S / Aşağı Ok:</strong> Fren | <strong>A / D:</strong> Direksiyon</li>',
-                    '    <li><strong>E:</strong> Ön Kapı (Yolcular kart basar) | <strong>H:</strong> Korna</li>',
+                    '    <li><strong>PageUp (Sayfa Yukarı):</strong> Ön Kapı (Yolcu binişleri) | <strong>L:</strong> Korna</li>',
                     '</ul>'
                 ].join("");
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan İpucu: Duraklara yaklaşırken kademeli fren yaparak yolcuların rahat etmesini sağlayın.</div>';
-            } else if (tIdx < 4) {
-                // Görev 3-4: Duracak Zili & Arka Kapı devrede
+            } else if (tIdx < 6) {
+                // Görev 5-6: Tekirdağ Kart (Akbil) Validatörü
                 howToDriveHtml = [
-                    '<div style="background: rgba(239, 68, 68, 0.15); border: 1.5px solid #ef4444; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #f87171; font-size: 1.1rem;">🔔 Yolcu İniş Protokolü: Akustik Duracak Zili & Arka Kapı (Q) Aktif</strong><br>',
-                    '    <span style="color: #f1f5f9;">Durağa 200m kala inecek yolcu varsa Duracak zili çalar ve kırmızı ikaz lambası yanar. Durakta durup <strong>Q</strong> tuşu ile arka kapıyı açarak yolcuları indirin.</span>',
+                    '<div style="background: rgba(56, 189, 248, 0.15); border: 1.5px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">💳 Elektronik Ücret Toplama: Tekirdağ Kart (Akbil) Devrede!</strong><br>',
+                    '    <span style="color: #f1f5f9;">Kapıyı açtığınızda yolcular Tekirdağ Kart okutacak ve validatörden gerçek onay sesleri duyacaksınız. Bilet gelirleri bütçenize eklenecektir.</span>',
                     '</div>',
-                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Kapı Kontrolleri:</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
-                    '    <li><strong>W:</strong> Gaz | <strong>S:</strong> Fren | <strong>A / D:</strong> Direksiyon | <strong>H:</strong> Korna</li>',
-                    '    <li><strong>E:</strong> Ön Kapı (Binen yolcular) | <strong>Q:</strong> Arka Kapı (İnen yolcular)</li>',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>PageUp (Sayfa Yukarı):</strong> Ön Kapı (Kart Okutma) | <strong>L:</strong> Korna</li>',
                     '</ul>'
                 ].join("");
                 shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>C</strong> Yolcu Konforu | <strong>R</strong> Hız Göstergesi.</div>';
-            } else if (tIdx < 6) {
-                // Görev 5-6: Engelli Rampası, Kneeling & Telsiz
+            } else if (tIdx < 8) {
+                // Görev 7-8: Akustik Duracak Zili & Arka Kapı (PageDown)
+                howToDriveHtml = [
+                    '<div style="background: rgba(239, 68, 68, 0.15); border: 1.5px solid #ef4444; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #f87171; font-size: 1.1rem;">🔔 Yolcu İniş Protokolü: Akustik Duracak Zili & Arka Kapı (PageDown / Sayfa Aşağı) Aktif</strong><br>',
+                    '    <span style="color: #f1f5f9;">Durağa 200m kala inecek yolcu varsa Duracak zili çalar ve kırmızı ikaz lambası yanar. Durakta durup <strong>PageDown (Sayfa Aşağı)</strong> tuşu ile arka kapıyı açarak yolcuları indirin.</span>',
+                    '</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Kapı Kontrolleri:</div>',
+                    '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
+                    '    <li><strong>W:</strong> Gaz | <strong>S:</strong> Fren | <strong>A / D:</strong> Direksiyon | <strong>L:</strong> Korna</li>',
+                    '    <li><strong>PageUp (Sayfa Yukarı):</strong> Ön Kapı (Binen yolcular) | <strong>PageDown (Sayfa Aşağı):</strong> Arka Kapı (İnen yolcular)</li>',
+                    '</ul>'
+                ].join("");
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev Durumu | <strong>C</strong> Yolcu Konforu | <strong>R</strong> Hız Göstergesi.</div>';
+            } else if (tIdx < 10) {
+                // Görev 9-10: Engelli Rampası & Kneeling (U)
                 howToDriveHtml = [
                     '<div style="background: rgba(168, 85, 247, 0.15); border: 1.5px solid #c084fc; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
                     '    <strong style="color: #c084fc; font-size: 1.1rem;">♿ Erişilebilirlik Protokolü: Engelli Rampası & Kneeling (U) Aktif</strong><br>',
-                    '    <span style="color: #f1f5f9;">Durakta tekerlekli sandalyeli yolcu beklediğinde <strong>U</strong> tuşuna basarak rampayı açın ve otobüsü yana yatırın. Ayrıca <strong>T</strong> tuşuyla canlı TEKULAŞ telsiz anonslarını dinleyebilirsiniz!</span>',
+                    '    <span style="color: #f1f5f9;">Durakta tekerlekli sandalyeli yolcu beklediğinde <strong>U</strong> tuşuna basarak rampayı açın ve otobüsü yana yatırın.</span>',
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Sistem Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
-                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E:</strong> Ön Kapı | <strong>Q:</strong> Arka Kapı</li>',
-                    '    <li><strong>U:</strong> Engelli Rampası & Kneeling | <strong>T:</strong> TEKULAŞ Telsizi</li>',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>PageUp:</strong> Ön Kapı | <strong>PageDown:</strong> Arka Kapı | <strong>U:</strong> Engelli Rampası</li>',
                     '</ul>'
                 ].join("");
-                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>U</strong> Rampa | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>Z</strong> Sefer Dakikliği.</div>';
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>U</strong> Rampa | <strong>C</strong> Konfor | <strong>Z</strong> Sefer Dakikliği.</div>';
+            } else if (tIdx < 20) {
+                // Görev 11-20 (2. Sınıf Kıyı Kaptanı): Telsiz (T), Silecek (Shift + W), Farlar (F)
+                howToDriveHtml = [
+                    '<div style="background: rgba(14, 165, 233, 0.15); border: 1.5px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
+                    '    <strong style="color: #38bdf8; font-size: 1.1rem;">📻 2. Sınıf Kıyı Kaptanlığı: Canlı Telsiz (T), Silecek (Shift + W) & Far (F)</strong><br>',
+                    '    <span style="color: #f1f5f9;">Sefer esnasında <strong>T</strong> tuşu ile TEKULAŞ Merkez Telsizini dinleyebilir, yağışta <strong>Shift + W</strong> ile silecekleri ve gece sürüşünde <strong>F</strong> ile farları açabilirsiniz.</span>',
+                    '</div>',
+                    '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Sürüş ve Kabin Kontrolleri:</div>',
+                    '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>PageUp / PageDown:</strong> Kapılar | <strong>U:</strong> Engelli Rampası</li>',
+                    '    <li><strong>T:</strong> TEKULAŞ Telsizi | <strong>Shift + W:</strong> Yağmur Silecekleri | <strong>F:</strong> Farlar | <strong>L:</strong> Korna</li>',
+                    '</ul>'
+                ].join("");
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>T</strong> Telsiz | <strong>Shift + W</strong> Silecek | <strong>F</strong> Farlar | <strong>L</strong> Korna | <strong>H</strong> Araç Sağlık/Yakıt.</div>';
             } else {
-                // Görev 7-10: Tam Profesyonel Simülasyon
+                // Görev 21-100: Tam Profesyonel Simülasyon
                 howToDriveHtml = [
                     '<div style="background: rgba(234, 179, 8, 0.15); border: 1.5px solid #eab308; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px;">',
-                    '    <strong style="color: #facc15; font-size: 1.1rem;">⚙️ Ağır Vasıta Rejimi: Pnömatik Hava Basıncı & Kompresör İzleme</strong><br>',
-                    '    <span style="color: #f1f5f9;">Hava basıncını koruyun, kademeli frenleme yapın. Sefer saatine dakik riayet edin. 10. Görev bitiminde 18 metrelik körüklü otobüs ve tüm ilçeler açılacaktır!</span>',
+                    '    <strong style="color: #facc15; font-size: 1.1rem;">⚙️ Profesyonel İşletme Rejimi: Emniyet Kilidi & Pnömatik Hava Basıncı</strong><br>',
+                    '    <span style="color: #f1f5f9;">Araç durmadan kapıları açmayın, pnömatik hava basıncını koruyun ve kademeli frenleme ile yolcu konforunu üst düzeyde tutun.</span>',
                     '</div>',
                     '<div style="margin-bottom: 8px; font-weight: bold; color: #facc15; font-size: 1.05rem;">🕹️ Tam Kokpit Kontrolleri:</div>',
                     '<ul style="padding-left: 20px; font-size: 0.95rem; margin-bottom: 10px; line-height: 1.7;">',
-                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>E / Q:</strong> Kapılar | <strong>U:</strong> Rampa | <strong>T:</strong> Telsiz</li>',
-                    '    <li><strong>X:</strong> Yağmur Silecekleri | <strong>L:</strong> Farlar | <strong>Z:</strong> Sefer Saati</li>',
+                    '    <li><strong>W / S / A / D:</strong> Sürüş | <strong>PageUp / PageDown:</strong> Kapılar | <strong>U:</strong> Rampa | <strong>T:</strong> Telsiz</li>',
+                    '    <li><strong>Shift + W:</strong> Yağmur Silecekleri | <strong>F:</strong> Farlar | <strong>L:</strong> Korna | <strong>Z:</strong> Sefer Saati</li>',
                     '</ul>'
                 ].join("");
-                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev | <strong>U</strong> Rampa | <strong>P</strong> Bagaj | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>Z</strong> Zamanlama.</div>';
+                shortcutsNote = '<div style="font-size: 0.88rem; color: #94a3b8; font-style: italic; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;">💡 Kaptan Kısayolları: <strong>G</strong> Görev | <strong>H</strong> Araç Sağlık/Yakıt | <strong>U</strong> Rampa | <strong>P</strong> Bagaj | <strong>T</strong> Telsiz | <strong>C</strong> Konfor | <strong>Z</strong> Zamanlama.</div>';
             }
 
             const mission = (typeof CareerMissions !== 'undefined') ? CareerMissions.getMission(r.taskIndex || 0) : null;
@@ -2136,6 +2366,7 @@ const Game = {
                     ? (this.activeBus.name || this.activeBus.fullName)
                     : "Standart Şehir İçi Otobüsü";
                 const taskDisplayTitle = (mission && mission.title) ? mission.title : r.name;
+                const displayTaskNum = (mission && mission.taskNum) ? mission.taskNum : (tIdx + 1);
 
                 orderHtml = [
                     '<div style="background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8; padding: 16px 20px; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">',
@@ -2144,7 +2375,7 @@ const Game = {
                     '            <span>🎙️</span> <span>MERKEZ HAREKET AMİRLİĞİ RESMÎ SEFER TALİMATI</span>',
                     '        </span>',
                     '        <span style="background: rgba(56,189,248,0.2); color: #7dd3fc; padding: 3px 8px; border-radius: 5px; font-size: 0.85rem; font-weight: bold;">',
-                    '            Sicil: ' + ((this.completedTasks || 0) + 1) + '. Görev İntikali',
+                    '            Sicil: ' + displayTaskNum + '. Görev İntikali',
                     '        </span>',
                     '    </div>',
                     '    <div style="color: #94a3b8; font-size: 0.93rem; margin-bottom: 10px;">',
@@ -2248,8 +2479,17 @@ const Game = {
 
     beginDriving: function(restoreMode = false) {
         this.isDriving = true;
-        this.busDamage = { leftWindow: 0, rightWindow: 0, front: 0, wipers: 0, headlights: 0, exhaust: 0, health: 100 };
+        if (!this.busDamage || typeof this.busDamage.health !== 'number' || this.busDamage.health <= 0) {
+            this.busDamage = { leftWindow: 0, rightWindow: 0, headlights: 0, wipers: 0, exhaust: 0, suspension: 0, brakes: 0, front: 0, transmission: 0, engine: 0, chassis: 0, health: 100 };
+        }
         this.isHeadlightsOn = false; // Farlar başlangıçta kapalı
+        this.headlightsUsedInRoute = false;
+        this.lostAndFoundCheckingInProgress = false;
+        this.pendingFinishAfterLostCheck = false;
+        if (this.finalStopDepartTimer) {
+            clearTimeout(this.finalStopDepartTimer);
+            this.finalStopDepartTimer = null;
+        }
         this.kasisDistance = null;
         this.lastRearHitTime = 0;
         this.passengerAngerTimer = 0;
@@ -2314,12 +2554,38 @@ const Game = {
         this.driftVelocity = 0;
         this.targetDriftVelocity = 0;
         this.totalDistanceCovered = 0; // 3D Ses koordinat sistemi için
+        this.currentLegDistanceCovered = 0;
+        this.lastNPCSpawnDistance = 0;
+        this.lastRandomKasisDistance = 0;
+        this.lastPotholeSpawnDist = 0;
+        this.lastTrafficLightDist = 0;
+        this.lastRareCrashDistance = 0;
+        this.kasisWarned = false;
+        this.potholeDistance = null;
+        this.potholeWarned = false;
+        this.trafficLightDistance = null;
+        this.trafficLightWarned = false;
+        this.rareCrashEventActive = false;
+        this.isInsideTunnel = false;
+        this.isInsideBridge = false;
+        if (!restoreMode) {
+            this.currentStopIndex = 0;
+            this.passengersOnBoard = 0;
+            this.terminalAnnouncedForRoute = false;
+        }
         
         // Pnömatik (Hava) Sistemi Değişkenleri
-        this.airPressure = 120; // Tam dolu (PSI)
+        if (typeof this.airPressure !== 'number' || this.airPressure <= 0) {
+            this.airPressure = 120; // Tam dolu (PSI)
+        }
         this.isLowAirAlarmActive = false;
         this.isEmergencyBrakeLocked = false;
         this.isBrakeKeyDown = false;
+
+        // Sefer Başlatma Başarımları ve İstatistik Kaydı (Tüm iklim, yakıt, otobüs ve rota verileri hazırlandıktan sonra)
+        if (!restoreMode && typeof DriverBadges !== 'undefined' && typeof DriverBadges.recordRouteStart === 'function') {
+            try { DriverBadges.recordRouteStart(this); } catch(e) { console.warn('[Game] recordRouteStart hatası:', e); }
+        }
         
         this.obstacles = [];
         this.activeNPCs = [];
@@ -2358,6 +2624,7 @@ const Game = {
         if (rampHudPlan) rampHudPlan.style.display = 'none';
         // Her 3 durakta bir tekerlekli sandalye kullanan erişilebilir yolcu durakta bekler
         this.hasWheelchairPassengerAtStop = (this.currentStopIndex > 0 && this.currentStopIndex % 3 === 1);
+        if (!this.activeRouteData || !Array.isArray(this.activeRouteData.stops)) return;
         if (this.currentStopIndex >= this.activeRouteData.stops.length) {
             this.finishRoute(true);
             return;
@@ -2430,11 +2697,40 @@ const Game = {
             return;
         }
 
+        // TEKULAŞ İLÇE VE CADDE KİLOMETRE KALİBRASYONU (OSRM öncesi garantili yedek mesafe)
+        const prevStop = this.currentStopIndex > 0 ? this.activeRouteData.stops[this.currentStopIndex - 1] : null;
+        let rawDistKm = (this.currentStopIndex === 0)
+            ? (nextStop.gercekMesafeSonraki || 0.9)
+            : ((prevStop && prevStop.gercekMesafeSonraki) ? prevStop.gercekMesafeSonraki : (nextStop.gercekMesafeSonraki || 0.9));
+        
+        let combinedMeta = ((nextStop ? nextStop.name : '') + ' ' + (prevStop ? prevStop.name : '') + ' ' + (this.activeRouteData.name || '')).toLowerCase();
+        let isIntercityCorridor = combinedMeta.includes("otoyol") || combinedMeta.includes("çevre yolu") || combinedMeta.includes("malkara") || combinedMeta.includes("saray") || combinedMeta.includes("kınalı") || combinedMeta.includes("çorlu") || combinedMeta.includes("otogar");
+        let isBoulevardCampus = combinedMeta.includes("üniversite") || combinedMeta.includes("kampüs") || combinedMeta.includes("sanayi") || combinedMeta.includes("hastane") || combinedMeta.includes("sahil") || combinedMeta.includes("bulvar");
+
+        let calibratedMeters = rawDistKm * 1000;
+        if (isIntercityCorridor) {
+            // İlçeler arası gerçek durak mesafesi: 2.4 km - 4.2 km
+            if (calibratedMeters < 2400) calibratedMeters = 2400 + ((this.currentStopIndex * 157) % 1800);
+        } else if (isBoulevardCampus) {
+            // Ana bulvar, üniversite ve sahil mesafesi: 1.3 km - 2.1 km
+            if (calibratedMeters < 1300) calibratedMeters = 1300 + ((this.currentStopIndex * 93) % 800);
+        } else {
+            // Şehir içi TEKULAŞ cadde ve mahalle durağı: 850m - 1350m
+            if (calibratedMeters < 850) calibratedMeters = 850 + ((this.currentStopIndex * 67) % 500);
+        }
+
+        let fallbackDistance = Math.round(calibratedMeters);
+
         if (!isResume) {
-            if (this.isFetchingRoute) {
-                console.warn("Spam koruması: OSRM Rota şu an çekiliyor, mükerrer istek iptal edildi.");
-                return;
+            // Önceki duraktan kalan bekleyen OSRM isteği varsa iptal et ve yeni durağın mesafesini anında ata
+            if (this._osrmAbortController) {
+                try { this._osrmAbortController.abort(); } catch (e) {}
+                this._osrmAbortController = null;
             }
+            this.currentDistanceToNext = fallbackDistance;
+            this.currentLegTotalDistance = this.currentDistanceToNext || 1000;
+            this.currentLegDistanceCovered = 0;
+            this.routeBumps = [];
             this.isFetchingRoute = true;
 
             // OSRM HESAPLAMASI (Arka planda çalışır, aracı duraklatmaz)
@@ -2451,51 +2747,33 @@ const Game = {
                 lat2 = nextStop.lat; lon2 = nextStop.lon;
                 lat1 = lat2 - 0.01; lon1 = lon2 - 0.01; // Garajı durağa çok yakın varsayıyoruz
             } else {
-                const prevStop = this.activeRouteData.stops[this.currentStopIndex - 1];
                 lat1 = prevStop.lat; lon1 = prevStop.lon;
                 lat2 = nextStop.lat; lon2 = nextStop.lon;
-            }
-
-            this.routeBumps = [];
-            // TEKULAŞ İLÇE VE CADDE KİLOMETRE KALİBRASYONU
-            let prevStop = this.currentStopIndex > 0 ? this.activeRouteData.stops[this.currentStopIndex - 1] : null;
-            let rawDistKm = (this.currentStopIndex === 0)
-                ? (nextStop.gercekMesafeSonraki || 0.9)
-                : ((prevStop && prevStop.gercekMesafeSonraki) ? prevStop.gercekMesafeSonraki : (nextStop.gercekMesafeSonraki || 0.9));
-            
-            let combinedMeta = ((nextStop ? nextStop.name : '') + ' ' + (prevStop ? prevStop.name : '') + ' ' + (this.activeRouteData.name || '')).toLowerCase();
-            let isIntercityCorridor = combinedMeta.includes("otoyol") || combinedMeta.includes("çevre yolu") || combinedMeta.includes("malkara") || combinedMeta.includes("saray") || combinedMeta.includes("kınalı") || combinedMeta.includes("çorlu") || combinedMeta.includes("otogar");
-            let isBoulevardCampus = combinedMeta.includes("üniversite") || combinedMeta.includes("kampüs") || combinedMeta.includes("sanayi") || combinedMeta.includes("hastane") || combinedMeta.includes("sahil") || combinedMeta.includes("bulvar");
-
-            let calibratedMeters = rawDistKm * 1000;
-            if (isIntercityCorridor) {
-                // İlçeler arası gerçek durak mesafesi: 2.4 km - 4.2 km
-                if (calibratedMeters < 2400) calibratedMeters = 2400 + ((this.currentStopIndex * 157) % 1800);
-            } else if (isBoulevardCampus) {
-                // Ana bulvar, üniversite ve sahil mesafesi: 1.3 km - 2.1 km
-                if (calibratedMeters < 1300) calibratedMeters = 1300 + ((this.currentStopIndex * 93) % 800);
-            } else {
-                // Şehir içi TEKULAŞ cadde ve mahalle durağı: 850m - 1350m
-                if (calibratedMeters < 850) calibratedMeters = 850 + ((this.currentStopIndex * 67) % 500);
-            }
-
-            let fallbackDistance = Math.round(calibratedMeters);
-            if (!this.currentDistanceToNext || this.currentDistanceToNext < 850 || isNaN(this.currentDistanceToNext)) {
-                this.currentDistanceToNext = fallbackDistance;
             }
 
             if (!lat1 || !lon1 || !lat2 || !lon2 || isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
                 this.currentDistanceToNext = fallbackDistance;
                 this.isFetchingRoute = false;
             } else {
-                fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`)
+                const requestRouteId = this.activeRouteId;
+                const requestStopIndex = this.currentStopIndex;
+                const osrmController = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                this._osrmAbortController = osrmController;
+                const osrmTimeoutId = osrmController ? setTimeout(() => {
+                    try { osrmController.abort(); } catch (e) {}
+                }, 3500) : null;
+
+                fetch(`https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=full&geometries=geojson`, osrmController ? { signal: osrmController.signal } : undefined)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.routes && data.routes.length > 0) {
+                    if (this.activeRouteId !== requestRouteId || this.currentStopIndex !== requestStopIndex) return;
+                    if (data && data.routes && data.routes.length > 0) {
                         const route = data.routes[0];
                         let routeDist = route.distance;
                         if (routeDist < 850) routeDist = fallbackDistance;
-                        this.currentDistanceToNext = routeDist; // OSRM gerçek mesafe (metre)
+                        const alreadyCovered = Math.max(0, this.currentLegDistanceCovered || 0);
+                        this.currentLegTotalDistance = routeDist;
+                        this.currentDistanceToNext = Math.max(50, routeDist - alreadyCovered); // OSRM gerçek mesafe (sürülen kısım düşülerek)
                         
                         // Kasis Eşleştirme (Polyline ve OSM verisi ile)
                         const coords = route.geometry.coordinates; // [[lon, lat], [lon, lat]]
@@ -2539,24 +2817,34 @@ const Game = {
                         if (typeof UI !== 'undefined' && document.getElementById('garage-screen').classList.contains('hidden')) {
                             UI.showToast("Gerçek yol ve virajlar oluşturuldu!", "success");
                         }
-                    } else {
+                    } else if (!this.currentDistanceToNext || this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
                         this.currentDistanceToNext = fallbackDistance;
                     }
                 })
                 .catch(err => {
-                    console.error("OSRM Hatası:", err);
-                    this.currentDistanceToNext = fallbackDistance;
+                    if (this.activeRouteId !== requestRouteId || this.currentStopIndex !== requestStopIndex) return;
+                    console.warn("OSRM yedek rotaya geçildi:", err && err.name ? err.name : err);
+                    if (!this.currentDistanceToNext || this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
+                        this.currentDistanceToNext = fallbackDistance;
+                    }
                     if (typeof UI !== 'undefined') UI.showToast("OSRM bağlantısı koptu, yapay rotaya dönüldü.", "warning");
                 })
                 .finally(() => {
-                    this.isFetchingRoute = false;
+                    if (osrmTimeoutId) clearTimeout(osrmTimeoutId);
+                    if (!osrmController || this._osrmAbortController === osrmController) {
+                        this.isFetchingRoute = false;
+                        this._osrmAbortController = null;
+                    }
                     if (this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
                         this.currentDistanceToNext = fallbackDistance || 1000;
                     }
                 });
             }
-} else {
+        } else {
             this.routeBumps = this.savedState && this.savedState.routeBumps ? this.savedState.routeBumps : [];
+            if (!this.currentDistanceToNext || this.currentDistanceToNext <= 0 || isNaN(this.currentDistanceToNext)) {
+                this.currentDistanceToNext = fallbackDistance;
+            }
         }
 
         this.currentLegTotalDistance = this.currentDistanceToNext || 1000;
@@ -2690,15 +2978,34 @@ const Game = {
         // araç hareket edip 6 km/s hıza ulaştığında akıllı anons sistemi (FAZ 1) tarafından gerçekçi okunur.
     },
 
-    calculateCrashOutcome: function(damageAmount) {
-        // YÜZDELİK ŞANSLAR KALDIRILDI - KİNETİK ENERJİ VE HASAR EŞİK FORMÜLÜ
-        // Darbenin kinetik şiddetine göre deterministik fiziksel sonuç
-        if (damageAmount >= 35) {
-            return 2; // Ağır darbe eşiği: Parça veya cam tamamen kırılır (100% hasar)
-        } else if (damageAmount >= 15) {
-            return 1; // Orta darbe eşiği: Parça çatlar / gevşer (50% hasar)
+    calculateCrashOutcome: function(damageAmount, groupTier = 1) {
+        // PARÇA SAĞLAMLIK GRUPLARINA GÖRE KİNETİK ENERJİ VE HASAR EŞİK FORMÜLÜ
+        // 1. Grup (Hassas Cam/Far/Silecek): Çatlama >= 12, Kırılma >= 25 (1.0x Dayanım)
+        // 2. Grup (Orta Alt Takım/Körük/Egzoz/Fren): Orta >= 22, Ağır >= 42 (1.75x Dayanım)
+        // 3. Grup (Yüksek Gövde/Tampon/Şanzıman): Orta >= 32, Ağır >= 58 (2.6x Dayanım)
+        // 4. Grup (Ultra Sağlam Zırhlı Motor/Şasi): Orta >= 48, Ağır >= 80 (4.0x Dayanım)
+        const curBus = (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBus) ? BusFleet.getSelectedBus() : null;
+        const chassisShield = (curBus && curBus.chassisRigidity) ? (0.85 + ((curBus.chassisRigidity - 70) / 100)) : 1.0;
+
+        let crackLimit = 12 * chassisShield;
+        let breakLimit = 25 * chassisShield;
+        if (groupTier === 2) {
+            crackLimit = 22 * chassisShield;
+            breakLimit = 42 * chassisShield;
+        } else if (groupTier === 3) {
+            crackLimit = 32 * chassisShield;
+            breakLimit = 58 * chassisShield;
+        } else if (groupTier >= 4) {
+            crackLimit = 48 * chassisShield;
+            breakLimit = 80 * chassisShield;
         }
-        return 0; // Düşük darbe: Sadece hafif kaporta çizilmesi, parça sağlam kurtulur
+
+        if (damageAmount >= breakLimit) {
+            return 2; // Ağır darbe eşiği: Parça tamamen kırılır / ağır hasar alır
+        } else if (damageAmount >= crackLimit) {
+            return 1; // Orta darbe eşiği: Parça çatlar / orta hasar alır
+        }
+        return 0; // Parçanın sağlamlık grubu darbeyi başarıyla karşıladı
     },
 
 
@@ -2828,14 +3135,24 @@ const Game = {
                     if (this.speed > 35) {
                         const currentBus = (typeof BusFleet !== 'undefined') ? BusFleet.getSelectedBus() : null;
                         const susp = (currentBus && currentBus.suspensionComfort) ? currentBus.suspensionComfort : 70;
+                        const rigidity = (currentBus && currentBus.chassisRigidity) ? currentBus.chassisRigidity : 75;
+                        // 2. Grup (Havalı Süspansiyon Körükleri) çukura sert girildiğinde yıpranır
+                        if (this.speed > 45 && this.busDamage) {
+                            const rawSuspWear = (this.speed - 40) * 0.35;
+                            const group2Shield = 1.75 * (rigidity / 75);
+                            const netSuspWear = Math.max(2, Math.round(rawSuspWear / group2Shield));
+                            this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + netSuspWear);
+                        }
+                        // Süspansiyon körüğü hasarlıysa darbe sönümleme azalır
+                        const suspHealthFactor = this.busDamage ? Math.max(0.5, 1.0 - ((this.busDamage.suspension || 0) * 0.005)) : 1.0;
                         // Bağımsız havalı körük sönümleme: Setra/Travego'da konfor kaybı 6 puandan 2.2 puana iner
-                        const comfortDeduction = Math.max(1.8, 6.0 * (1.0 - (((susp - 55) / 45) * 0.65)));
+                        const comfortDeduction = Math.max(1.8, (6.0 / suspHealthFactor) * (1.0 - (((susp - 55) / 45) * 0.65)));
                         this.passengerComfort = Math.max(20, (this.passengerComfort || 90) - comfortDeduction);
                         if (typeof audio !== 'undefined' && audio.speak) {
-                            if (susp >= 90) {
-                                audio.speak("Çukurdan geçtik, lüks havalı körükler darbeyi başarıyla sönümledi.");
+                            if (susp >= 90 && (!this.busDamage || (this.busDamage.suspension || 0) < 30)) {
+                                audio.speak("Çukurdan geçtik, havalı süspansiyon körükleri darbeyi yumuşakça sönümledi.");
                             } else {
-                                audio.speak("Çukura sert girdik! Yolcular sarsıldı.");
+                                audio.speak("Çukura sert girdik! Süspansiyon körükleri zorlandı ve yolcular sarsıldı.");
                             }
                         }
                     }
@@ -3008,13 +3325,6 @@ const Game = {
         if (this.kasisDistance !== null && this.kasisDistance <= 60 && this.kasisDistance > 0 && !this.kasisWarned) {
             if (typeof audio !== 'undefined' && audio.speak) audio.speak("İleride kasis var, yavaşlayınız.");
             this.kasisWarned = true;
-        }
-        if (this.kasisDistance !== null && this.kasisDistance <= 0) {
-            if (typeof audio !== 'undefined' && typeof audio.playSuspensionBounce === 'function') {
-                audio.playSuspensionBounce();
-            }
-            this.kasisDistance = null;
-            this.kasisWarned = false;
         }
 
 
@@ -3333,16 +3643,22 @@ const Game = {
             }
         }
 
-        // --- Pnömatik Fren Sistemi ---
+        // --- Pnömatik Fren ve Canlı Kompresör / Hava Kurutucu (APU) Sistemi ---
         if (audio.isEngineRunning) {
-            // Kompresör havayı doldurur (Eğitim Modu: Hızlı dolum, bekleme yok)
+            // Kompresör havayı motor devrine (RPM) orantılı hızda doldurur
+            const rpmCompressorFactor = Math.max(0.85, (this.engineRPM || 800) / 900);
             if (this.airPressure < 120) {
                 let prevPressure = this.airPressure;
-                this.airPressure += 12 * deltaTime;
+                this.airPressure += (10.5 * rpmCompressorFactor) * deltaTime;
                 if (this.airPressure >= 120 && prevPressure < 120) {
                     this.airPressure = 120;
-                    audio.playAirGovernorCutoff(); // Tahliye valfi çuf-tıss
+                    this.lastApuPurgeTime = currentTime;
+                    audio.playAirGovernorCutoff(); // Hava kurutucu regülatör tahliyesi (Çuf-tıss)
                 }
+            } else if (this.speed > 5 && (!this.lastApuPurgeTime || (currentTime - this.lastApuPurgeTime > 85000))) {
+                // Gerçek otobüslerde belirli aralıklarla hava kurutucu (APU) nem tahliyesi yapar ve kompresör tekrar doldurur
+                this.lastApuPurgeTime = currentTime;
+                this.airPressure = 114;
             }
         }
         // Eğitim Modu Koruması: Eğitim seferinde basınç 85 altına inmez
@@ -3360,7 +3676,8 @@ const Game = {
         if (isBraking) {
             if (!this.isBrakeKeyDown) {
                 const minPressure = (this.activeRouteData && (this.activeRouteData.isTraining || this.activeRouteData.emptyBus)) ? 85 : 0;
-                this.airPressure = Math.max(minPressure, this.airPressure - 3);
+                const brakeAirLoss = 3 + (this.busDamage ? Math.floor((this.busDamage.brakes || 0) / 30) : 0);
+                this.airPressure = Math.max(minPressure, this.airPressure - brakeAirLoss);
                 this.isBrakeKeyDown = true;
                 audio.playBrakeRelease(); // Tıss
                 
@@ -3459,10 +3776,29 @@ const Game = {
                     }
                 }
             } else {
-                // TONAJ HESAPLAMASI
-                const baseWeight = 12000; // Boş otobüs 12 Ton
-                const currentWeight = baseWeight + (this.passengersOnBoard * 75);
+                // GERÇEK FABRİKA TONAJI VE PARÇA GRUBU DİNAMİKLERİ HESAPLAMASI
+                const activeBus = (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBus) ? BusFleet.getSelectedBus() : null;
+                const physSpecs = (typeof BusFleet !== 'undefined' && BusFleet.getBusPhysicsSpecs) ? BusFleet.getBusPhysicsSpecs(activeBus) : { emptyWeightKg: 12000 };
+                const baseWeight = physSpecs.emptyWeightKg || 12000;
+                const perPassKg = (activeBus && activeBus.category === 'seyahat') ? 95 : 75; // Seyahat otobüsünde yolcu + bavul 95 kg
+                const currentWeight = baseWeight + (this.passengersOnBoard * perPassKg);
                 const weightMultiplier = baseWeight / currentWeight;
+
+                // Aktif otobüsün fabrika ivmelenme, fren ve yerleşik akıllı kontrol katsayıları
+                const busChip = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(activeBus, this) : null;
+                const chipTorqueMult = (busChip && busChip.activeMode) ? busChip.activeMode.torqueMultiplier : 1.0;
+                const busAccelFactor = ((activeBus && typeof activeBus.acceleration === 'number') ? activeBus.acceleration : 1.1) * chipTorqueMult;
+                const busBrakeFactor = (activeBus && typeof activeBus.braking === 'number') ? activeBus.braking : 1.15;
+
+                // Parça sağlamlık gruplarının sürüş dinamiğine canlı etkisi:
+                // 4. Grup (Motor Bloğu) ve 2. Grup (Egzoz/DPF) hasarı -> Motor çekişini düşürür
+                const engineDmg = (this.busDamage && this.busDamage.engine) ? this.busDamage.engine : 0;
+                const exhaustDmg = (this.busDamage && this.busDamage.exhaust) ? this.busDamage.exhaust : 0;
+                const enginePowerHealth = Math.max(0.55, 1.0 - (engineDmg * 0.0035) - (exhaustDmg * 0.001));
+
+                // 2. Grup (Fren Balataları ve Körükleri) hasarı -> Fren tutuş gücünü azaltır
+                const brakePartDmg = (this.busDamage && this.busDamage.brakes) ? this.busDamage.brakes : 0;
+                const brakePartHealth = Math.max(0.55, 1.0 - (brakePartDmg * 0.0035));
                 
                 // Ehliyet seviyesine göre zorluk
                 const difficultyMultiplier = 1 + (this.licenseLevel * 0.2);
@@ -3471,16 +3807,15 @@ const Game = {
                 const isBrake = (this.keys.s || this.keys.arrowdown);
 
                 if (isThrottle) {
-                    // GERÇEKÇİ BELEDİYE OTOBÜSÜ İVMELENME FİZİĞİ (14-18 Tonluk Dizel Ağır Vasıta)
-                    // Gerçek hayatta bir belediye otobüsü 0'dan 50 km/s hıza yaklaşık 12-14 saniyede ulaşır
-                    let baseAccel = 5.8;
-                    if (this.speed > 45) baseAccel = 4.2;
-                    if (this.speed > 70) baseAccel = 2.6;
+                    // GERÇEKÇİ AĞIR VASITA DİZEL TORK EĞRİSİ VE PARÇA DİNAMİĞİ
+                    let baseAccel = 5.4 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 45) baseAccel = 3.9 * busAccelFactor * enginePowerHealth;
+                    if (this.speed > 70) baseAccel = 2.5 * busAccelFactor * enginePowerHealth;
                     this.acceleration = baseAccel * weightMultiplier;
                 } else if (isBrake) {
-                    // SERVİS VE HAVALI FREN KALİBRASYONU (Yolcuları savurmayan kademeli duruş)
-                    let baseBrake = -11.5;
-                    if (this.isBrakeKeyDown) baseBrake = -14.5;
+                    // SERVİS VE HAVALI FREN KALİBRASYONU (Araç fren gücü + 2. Grup balata kondisyonu)
+                    let baseBrake = -10.5 * busBrakeFactor * brakePartHealth;
+                    if (this.isBrakeKeyDown) baseBrake = -13.2 * busBrakeFactor * brakePartHealth;
                     if (this.isEmergencyBrakeLocked) baseBrake = -28.0;
                     
                     // Balata şişmesi (Brake Fade) verimlilik kaybı (260°C üzerinde %35'e kadar düşer)
@@ -3545,8 +3880,14 @@ const Game = {
         if (this.hasPoorVisibility && this.speed > this.maxSpeed + 10) {
             visDriftMultiplier = 3.5; // Kötü görüşte aşırı hız inanılmaz bir savrulma yaratır
         }
+        // Süspansiyon körükleri ve ana şasi hasarı varsa yanal salınım artar; yerleşik denge algoritması salınımı sönümler
+        const suspDmg = (this.busDamage && this.busDamage.suspension) ? this.busDamage.suspension : 0;
+        const chassisDmg = (this.busDamage && this.busDamage.chassis) ? this.busDamage.chassis : 0;
+        const swayChip = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(null, this) : null;
+        const stabilityDamping = (swayChip && typeof swayChip.stabilityFactor === 'number') ? swayChip.stabilityFactor : 1.0;
+        const suspensionSwayMult = (1.0 + (suspDmg * 0.01) + (chassisDmg * 0.015)) * stabilityDamping;
         
-        let lateralVelocity = (this.steeringAngle + this.driftVelocity * visDriftMultiplier + roadCurvature) * speedFactor;
+        let lateralVelocity = (this.steeringAngle + (this.driftVelocity * visDriftMultiplier * suspensionSwayMult) + roadCurvature) * speedFactor;
         
         this.lanePosition += lateralVelocity * deltaTime;
 
@@ -3593,9 +3934,10 @@ const Game = {
         }
 
         // Ses Efekti (Tire Screech)
+        const isCurveScreeching = !!(this.upcomingTurns && this.upcomingTurns[0] && this.upcomingTurns[0].isScreeching);
         if (isSkidding) {
             if (typeof audio.playTireScreech === 'function') audio.playTireScreech(skidIntensity);
-        } else {
+        } else if (!isCurveScreeching) {
             if (typeof audio.stopTireScreech === 'function') audio.stopTireScreech();
         }
 
@@ -3642,9 +3984,11 @@ const Game = {
             const incPhys = TurkeyGeographyEngine.calculateInclinePhysics(this.speed, this.currentSlopePct, deltaTime, isFootBraking, retarderLevel);
             this.brakeEfficiency = incPhys.brakeEfficiency || 1.0;
 
-            // Manuel Retarder Frenleme Kuvveti (Kademeli Hidrolik Şanzıman Freni)
+            // Manuel Retarder Frenleme Kuvveti (3. Grup Hidrolik Şanzıman/Retarder kondisyonuna bağlı)
             if (this.retarderLevel > 0 && this.speed > 8) {
-                const retarderDecel = (this.retarderLevel * 1.6) * deltaTime;
+                const transDmg = (this.busDamage && this.busDamage.transmission) ? this.busDamage.transmission : 0;
+                const transHealthFactor = Math.max(0.55, 1.0 - (transDmg * 0.004));
+                const retarderDecel = (this.retarderLevel * 1.6 * transHealthFactor) * deltaTime;
                 const maxRetarderDecel = Math.max(0, this.speed - 8);
                 this.speed -= Math.min(retarderDecel, maxRetarderDecel);
             }
@@ -3701,17 +4045,19 @@ const Game = {
             audio.stopRetarder();
         }
 
-        // RPM VE VİTES MANTIĞI
-        let isThrottleOn = this.keys.w;
-        let targetRPM = 800;
-        const gearSpeedRatios = [0, 25, 45, 65, 90, 130]; 
+        // RPM VE VİTES MANTIĞI (6 İleri Otomatik Şanzıman)
+        let isThrottleOn = (this.keys.w || this.keys.arrowup);
+        let targetRPM = this.dynamicIdleRPM || 800;
+        const gearSpeedRatios = [0, 22, 42, 62, 85, 110, 135];
+        const maxGear = 6;
+        if (this.currentGear > maxGear) this.currentGear = maxGear;
 
         if (this.speed > 0 || isThrottleOn) {
-            let currentMinSpeed = gearSpeedRatios[this.currentGear - 1];
-            let currentMaxSpeed = gearSpeedRatios[this.currentGear];
+            let currentMinSpeed = gearSpeedRatios[this.currentGear - 1] || 0;
+            let currentMaxSpeed = gearSpeedRatios[this.currentGear] || 135;
             
             let speedInGear = this.speed - currentMinSpeed;
-            let gearRange = currentMaxSpeed - currentMinSpeed;
+            let gearRange = Math.max(10, currentMaxSpeed - currentMinSpeed);
             
             let speedRatio = Math.max(0, Math.min(1, speedInGear / gearRange));
             targetRPM = 1000 + (speedRatio * 1500); // 1000 ile 2500 arası
@@ -3724,10 +4070,12 @@ const Game = {
         // RPM yumuşak geçiş
         this.engineRPM += (targetRPM - this.engineRPM) * 3 * deltaTime;
         
-        // Vites Atma (Yukarı)
-        if (this.engineRPM > 2400 && this.currentGear < 5 && this.speed > gearSpeedRatios[this.currentGear] * 0.9) {
+        // Akıllı Vites Atma (Yokuşta devri tutar, düz yolda ekonomik devirde vites büyütür)
+        const shiftChip = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(null, this) : null;
+        const smartShiftRPM = (shiftChip && shiftChip.shiftUpRPM) ? shiftChip.shiftUpRPM : 2200;
+        if (this.engineRPM > smartShiftRPM && this.currentGear < maxGear && this.speed > gearSpeedRatios[this.currentGear] * 0.88) {
             this.currentGear++;
-            this.engineRPM = 1500; // Vites atınca devir düşer
+            this.engineRPM = 1450; // Vites atınca devir tatlı tork bandına düşer
         }
         // Vites Düşürme (Aşağı)
         else if (this.currentGear > 1 && this.speed < gearSpeedRatios[this.currentGear - 1] + 5) {
@@ -3752,6 +4100,13 @@ const Game = {
             else if (pct > 15) hudFuelVal.style.color = '#facc15';
             else hudFuelVal.style.color = '#ef4444';
         }
+        if (typeof SolarPrayerEngine !== 'undefined') {
+            SolarPrayerEngine.update(this.clockMinutes, this.currentCity, this.speed, this.doorsOpen);
+        }
+        if (typeof PowertrainDynamicsEngine !== 'undefined') {
+            PowertrainDynamicsEngine.updateThermodynamics(this, deltaTime);
+        }
+
         if (typeof AkilliSistem !== 'undefined' && AkilliSistem.onCoPilotUpdate) {
             AkilliSistem.onCoPilotUpdate(this);
         }
@@ -3816,21 +4171,23 @@ const Game = {
             if (this.currentDistanceToNext <= 220 && !this.copilotFirstStopWarned && this.currentStopIndex === 0 && this.speed > 5) {
                 this.copilotFirstStopWarned = true;
                 if (window.voiceAssistant && window.voiceAssistant.isCopilotEnabled && typeof audio !== 'undefined' && audio.speak) {
-                    audio.speak("İlk durağınıza yaklaşıyorsunuz. S tuşuna basarak yavaşlayınız. Tam durduğunuzda 1 ve 2 tuşlarıyla kapıları açınız.");
+                    audio.speak("İlk durağınıza yaklaşıyorsunuz. S tuşuna basarak yavaşlayınız. Tam durduğunuzda Sayfa Yukarı ve Sayfa Aşağı tuşlarıyla kapıları açınız.");
                 }
             }
             // FAZ 1: DURAKTAN KALKIŞ ANONSU (Araç hareket edip hızlanınca)
             if (this.speed > 6 && !this.departAnnounced) {
                 this.departAnnounced = true;
-                const isInitial = (this.currentStopIndex === 0);
-                const isFinal = (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
-                const nextStop = this.activeRouteData.stops[this.currentStopIndex];
-                if (typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
-                    audio.playBusAnnouncement('depart', nextStop.name, {
-                        isInitial: isInitial,
-                        isFinal: isFinal,
-                        routeName: this.activeRouteData.name || this.activeRouteData.hatNo
-                    });
+                if (this.activeRouteData && Array.isArray(this.activeRouteData.stops)) {
+                    const isInitial = (this.currentStopIndex === 0);
+                    const isFinal = (this.currentStopIndex >= this.activeRouteData.stops.length - 1);
+                    const nextStop = this.activeRouteData.stops[this.currentStopIndex];
+                    if (nextStop && typeof audio !== 'undefined' && typeof audio.playBusAnnouncement === 'function') {
+                        audio.playBusAnnouncement('depart', nextStop.name, {
+                            isInitial: isInitial,
+                            isFinal: isFinal,
+                            routeName: this.activeRouteData.name || this.activeRouteData.hatNo
+                        });
+                    }
                 }
             }
 
@@ -3850,9 +4207,10 @@ const Game = {
             const distanceCovered = (this.speed / 3.6) * deltaTime * distanceScale; 
             this.currentDistanceToNext -= distanceCovered;
             this.totalDistanceCovered += distanceCovered;
+            this.currentLegDistanceCovered = (this.currentLegDistanceCovered || 0) + distanceCovered;
 
             // Dinamik Yakıt Tüketim Fiziği
-            if (this.engineStarted) {
+            if (this.engineStarted || (typeof audio !== 'undefined' && audio.isEngineRunning)) {
                 const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
                 if (this.currentFuelLiters === undefined) this.currentFuelLiters = cap;
                 
@@ -3860,14 +4218,21 @@ const Game = {
                     const distKm = (this.speed / 3600) * deltaTime;
                     const consRate = (typeof this.getFuelConsumptionPer100km === 'function') ? this.getFuelConsumptionPer100km() : 30;
                     let throttleFactor = 1.0;
-                    if (this.isRetarderActive && !this.keys.w && !this.keys.arrowup) {
-                        throttleFactor = 0.05; // Retarder devredeyken enjeksiyon kesme
+                    const hasRetarder = (this.isRetarderActive || (this.retarderLevel && this.retarderLevel > 0));
+                    if (hasRetarder && !this.keys.w && !this.keys.arrowup) {
+                        throttleFactor = 0.05; // Retarder devredeyken enjeksiyon kesme (Sıfıra yakın tüketim)
                     } else if (!this.keys.w && !this.keys.arrowup) {
-                        throttleFactor = 0.2; // Gazsız akış
+                        throttleFactor = 0.2; // Gazsız süzülme
                     }
-                    const passCount = this.passengers ? (this.passengers.length || 0) : 0;
-                    const loadFactor = 1.0 + (passCount * 0.003);
-                    const burned = distKm * (consRate / 100) * throttleFactor * loadFactor;
+                    const passCount = this.passengersOnBoard || 0;
+                    let loadFactor = 1.0 + (passCount * 0.003);
+                    if (this.currentSlopePct > 0) {
+                        loadFactor *= (1.0 + (this.currentSlopePct * 0.12)); // Her %1 eğim motor yakıt tüketimini %12 artırır
+                    }
+                    // Arka plandaki akıllı enjeksiyon ve eğim adaptasyonu
+                    const activeChipFuel = (typeof BusFleet !== 'undefined' && BusFleet.getBusChip) ? BusFleet.getBusChip(null, this) : null;
+                    const chipFuelMult = (activeChipFuel && activeChipFuel.activeMode) ? activeChipFuel.activeMode.fuelMultiplier : 1.0;
+                    const burned = distKm * (consRate / 100) * throttleFactor * loadFactor * chipFuelMult;
                     this.currentFuelLiters = Math.max(0, this.currentFuelLiters - burned);
                 } else {
                     // Rölanti yakıt tüketimi
@@ -3954,8 +4319,10 @@ const Game = {
         // DAKİKLİK VE ZAMANLAMA SAPMASI HESABI (DELTA ZAMANI)
         if (this.isDriving && this.activeRouteData && this.activeRouteData.stops && this.activeRouteData.stops[this.currentStopIndex]) {
             const schedTime = this.activeRouteData.stops[this.currentStopIndex].scheduledMinutes;
-            if (schedTime) {
-                const delta = this.clockMinutes - schedTime;
+            if (schedTime !== undefined) {
+                let delta = this.clockMinutes - (schedTime % 1440);
+                if (delta < -720) delta += 1440;
+                else if (delta > 720) delta -= 1440;
                 const timingEl = document.getElementById('hud-timing-val');
                 if (timingEl) {
                     if (Math.abs(delta) <= 1.0) {
@@ -4022,8 +4389,8 @@ const Game = {
         }
         this.lastRecordedSpeed = this.speed;
             
-        // Arkadan Çarpma (Rear-end collision) Mantığı
-        if (this.speed > 50 && this.acceleration < -100) {
+        // Arkadan Çarpma (Rear-end collision) Mantığı (Yüksek hızda ani imdat freninde arkadaki aracın çarpma riski)
+        if (this.speed > 50 && this.acceleration <= -22) {
             if (currentTime - this.lastRearHitTime > 5000 && Math.random() < 0.02) {
                 this.lastRearHitTime = currentTime;
                 this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 20); // Tek seferde kopmaz, %20 hasar alır
@@ -4070,24 +4437,41 @@ const Game = {
                     }
                 }
                 if (this.speed > 45) { // 45 km/h kasis hız limiti
-                    // Hız aşımına bağlı deterministik hasar formülü
+                    // Hız aşımına bağlı parça sağlamlık grubu hasar formülü
                     const excess = this.speed - 45;
-                    this.busDamage.health = Math.max(0, this.busDamage.health - Math.round(excess * 0.35));
+                    const curBus = (typeof BusFleet !== 'undefined' && BusFleet.getSelectedBus) ? BusFleet.getSelectedBus() : null;
+                    const rigidityFactor = (curBus && curBus.chassisRigidity) ? (curBus.chassisRigidity / 75) : 1.0;
+                    const group2Shield = 1.75 * rigidityFactor; // 2. Grup (Alt Takım: Egzoz ve Süspansiyon Körükleri) 1.75x dayanımlıdır
+
+                    this.busDamage.health = Math.max(0, this.busDamage.health - Math.max(2, Math.round((excess * 0.35) / rigidityFactor)));
                     if (typeof audio.playUnderbodyHit === 'function') audio.playUnderbodyHit();
                     
-                    if (excess >= 25) { // 70 km/h ve üzeri: Ağır darbe
-                        this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 50);
-                        if (typeof audio.speak === 'function') audio.speak("Kasise aşırı hızlı girdik, altını çok sert vurduk ve egzoz ağır hasar aldı!");
-                    } else if (excess >= 10) { // 55 - 70 km/h arası: Orta darbe
-                        this.busDamage.exhaust = Math.min(100, this.busDamage.exhaust + 25);
-                        if (typeof audio.speak === 'function') audio.speak("Kasise hızlı girdik, altını vurduk. Egzoz hasar aldı.");
+                    if (excess >= 25) { // 70 km/h ve üzeri: Ağır darbe (2. Grup Alt Takım + 4. Grup Şasi hafif darbe)
+                        const exhDmg = Math.round(45 / (group2Shield * 0.65));
+                        const suspDmg = Math.round(35 / (group2Shield * 0.65));
+                        this.busDamage.exhaust = Math.min(100, (this.busDamage.exhaust || 0) + exhDmg);
+                        this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + suspDmg);
+                        // Ana çelik şasi (4.0x dayanım) yalnızca bu kadar ağır darbede hafif zorlanır
+                        this.busDamage.chassis = Math.min(100, (this.busDamage.chassis || 0) + Math.max(3, Math.round(excess / (4.0 * rigidityFactor))));
+                        if (typeof audio.speak === 'function') audio.speak("Kasise aşırı hızlı girdik! Egzoz ve havalı süspansiyon körükleri ağır hasar aldı, çelik şasi darbeyi göğüsledi!");
+                    } else if (excess >= 10) { // 55 - 70 km/h arası: Orta darbe (Sadece Alt Takım etkilenir, Şasi sağlam kalır)
+                        const exhDmg = Math.round(25 / (group2Shield * 0.65));
+                        const suspDmg = Math.round(18 / (group2Shield * 0.65));
+                        this.busDamage.exhaust = Math.min(100, (this.busDamage.exhaust || 0) + exhDmg);
+                        this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + suspDmg);
+                        if (typeof audio.speak === 'function') audio.speak("Kasise hızlı girdik, altını vurduk. Egzoz ve süspansiyon körükleri hasar aldı; ana şasi sağlam.");
                     } else { // 45 - 55 km/h arası: Hafif sıyrık
-                        if (typeof audio.speak === 'function') audio.speak("Kasisten biraz hızlı geçtik, altı hafif sürttü ama egzoz sağlam kurtuldu.");
+                        this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + 5);
+                        if (typeof audio.speak === 'function') audio.speak("Kasisten biraz hızlı geçtik, süspansiyon körükleri darbeyi emdi ve egzoz sağlam kurtuldu.");
                     }
                 } else {
                     // Güvenli geçiş sesi (Hafif zıplama)
+                    if (typeof audio !== 'undefined' && typeof audio.playSuspensionBounce === 'function') {
+                        audio.playSuspensionBounce();
+                    }
                 }
                 this.kasisDistance = null; // Kasis geçildi
+                this.kasisWarned = false;
             }
         }
         
@@ -4151,6 +4535,7 @@ const Game = {
             this.busTemperature -= deltaTime * 0.1; // Saniyede 0.1 derece soğur
             if (this.busTemperature < targetTemp) this.busTemperature = targetTemp;
         }
+        this.cabinTemperature = this.busTemperature;
         
         if (document.getElementById('hud-temp')) {
             const rainInfo = (this.weather === 'rainy' && this.rainMmPerHour > 0) ? ` | 🌧️ ${this.rainMmPerHour} mm/s` : '';
@@ -4498,56 +4883,91 @@ const Game = {
                     this.busDamage.health -= damageAmount;
                     this.busDamage.health = Math.max(0, this.busDamage.health);
                     
-                    // Şeride göre bölgesel hasar ve uyarılar
-                    if (npc.x === 20) {
-                        let outcome = this.calculateCrashOutcome(damageAmount);
+                    // Şeride ve parça sağlamlık kademesine göre bölgesel hasar ve uyarılar
+                    const relCrashX = npc.x - this.lanePosition;
+                    if (relCrashX < -8) {
+                        // Hassas dış donanım (Sol Cam - 1.0x)
+                        let outcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (outcome === 2) {
                             this.busDamage.leftWindow = 100;
-                            audio.speak("Sol cama çarptık! Sol cam tamamen kırıldı, yüzde yüz hasarlı.");
+                            audio.speak("Sol taraftan çarptık! Sol cam tamamen kırıldı.");
                         } else if (outcome === 1) {
                             this.busDamage.leftWindow = Math.max(this.busDamage.leftWindow, 50);
-                            audio.speak("Sol cama çarptık! Sol cam çatladı, yüzde elli hasarlı.");
+                            audio.speak("Sol taraftan çarptık! Sol cam çatladı, yüzde elli hasarlı.");
                         } else {
-                            audio.speak("Sol taraftan çarptık! Şanslıyız, cam kırılmadı.");
+                            audio.speak("Sol taraftan hafif sürttük! Cam kırılmadı.");
                         }
-                    } else if (npc.x === 80) {
-                        let outcome = this.calculateCrashOutcome(damageAmount);
+                        // Orta-ağır yan darbede sol süspansiyon körüğü etkilenir (1.75x)
+                        if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
+                            this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(damageAmount / 1.75));
+                        }
+                    } else if (relCrashX > 8) {
+                        // Hassas dış donanım (Sağ Cam - 1.0x)
+                        let outcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (outcome === 2) {
                             this.busDamage.rightWindow = 100;
-                            audio.speak("Sağ cama çarptık! Sağ cam tamamen kırıldı, yüzde yüz hasarlı.");
+                            audio.speak("Sağ taraftan çarptık! Sağ cam tamamen kırıldı.");
                         } else if (outcome === 1) {
                             this.busDamage.rightWindow = Math.max(this.busDamage.rightWindow, 50);
-                            audio.speak("Sağ cama çarptık! Sağ cam çatladı, yüzde elli hasarlı.");
+                            audio.speak("Sağ taraftan çarptık! Sağ cam çatladı, yüzde elli hasarlı.");
                         } else {
-                            audio.speak("Sağ taraftan çarptık! Şanslıyız, cam kırılmadı.");
+                            audio.speak("Sağ taraftan hafif sürttük! Cam kırılmadı.");
+                        }
+                        if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
+                            this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(damageAmount / 1.75));
                         }
                     } else {
-                        audio.speak(`Önden çarpıştık! Kaporta ${damageAmount} puan hasar aldı!`);
-                        this.busDamage.front = Math.min(100, this.busDamage.front + damageAmount);
+                        // ÖNDEN ÇARPIŞMA: Darbe sırasıyla Far/Silecek -> Ön Çelik Tampon & Şanzıman -> Motor & Şasi üzerinden sönümlenir
+                        const frontBumpDmg = Math.max(4, Math.round(damageAmount / 1.8));
+                        this.busDamage.front = Math.min(100, (this.busDamage.front || 0) + frontBumpDmg);
+                        audio.speak(`Önden çarpıştık! Ön çelik tampon ve kaporta ${frontBumpDmg} puan hasar aldı!`);
                         
-                        let hlOutcome = this.calculateCrashOutcome(damageAmount);
+                        // Ön Farlar (1.0x)
+                        let hlOutcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (hlOutcome === 2) {
                             this.busDamage.headlights = 100;
                             if (this.isHeadlightsOn) {
                                 this.isHeadlightsOn = false;
                                 if (typeof audio.playHeadlightBust === 'function') audio.playHeadlightBust();
                             }
-                            setTimeout(() => audio.speak("Ön farlar tamamen kırıldı, yüzde yüz hasarlı! Görüş tehlikede!"), 1500);
+                            setTimeout(() => audio.speak("Ön farlar tamamen kırıldı! Gece görüşü tehlikede!"), 1500);
                         } else if (hlOutcome === 1) {
                             this.busDamage.headlights = Math.max(this.busDamage.headlights, 50);
                             setTimeout(() => audio.speak("Ön farlar yüzde elli hasar aldı, bağlantıları gevşedi."), 1500);
                         }
                         
-                        let wpOutcome = this.calculateCrashOutcome(damageAmount);
+                        // Silecek Motoru (1.0x)
+                        let wpOutcome = this.calculateCrashOutcome(damageAmount, 1);
                         if (wpOutcome === 2) {
                             this.busDamage.wipers = 100;
                             if (typeof audio.isWiperOn !== 'undefined' && audio.isWiperOn) {
                                 if (typeof audio.toggleWipers === 'function') audio.toggleWipers();
                             }
-                            setTimeout(() => audio.speak("Silecek motoru tamamen kırıldı, yüzde yüz hasarlı! Cam temizlenemeyecek!"), 3000);
+                            setTimeout(() => audio.speak("Silecek motoru tamamen kırıldı! Yağmurda cam temizlenemeyecek!"), 3000);
                         } else if (wpOutcome === 1) {
                             this.busDamage.wipers = Math.max(this.busDamage.wipers, 50);
-                            setTimeout(() => audio.speak("Silecekler yüzde elli hasar aldı, zorlanarak çalışıyor."), 3000);
+                            setTimeout(() => audio.speak("Silecek mekanizması yüzde elli hasar aldı."), 3000);
+                        }
+
+                        // Fren Körükleri ve Süspansiyon (1.75x)
+                        if (this.calculateCrashOutcome(damageAmount, 2) >= 1) {
+                            const g2Dmg = Math.round(damageAmount / 1.75);
+                            this.busDamage.brakes = Math.min(100, (this.busDamage.brakes || 0) + Math.round(g2Dmg * 0.7));
+                            this.busDamage.suspension = Math.min(100, (this.busDamage.suspension || 0) + Math.round(g2Dmg * 0.8));
+                        }
+
+                        // Şanzıman ve Retarder (2.6x)
+                        if (this.calculateCrashOutcome(damageAmount, 3) >= 1) {
+                            const g3Dmg = Math.round(damageAmount / 2.6);
+                            this.busDamage.transmission = Math.min(100, (this.busDamage.transmission || 0) + g3Dmg);
+                        }
+
+                        // Dizel Motor Bloğu ve Ana Çelik Şasi (4.0x)
+                        if (this.calculateCrashOutcome(damageAmount, 4) >= 1) {
+                            const g4Dmg = Math.round(damageAmount / 4.0);
+                            this.busDamage.engine = Math.min(100, (this.busDamage.engine || 0) + g4Dmg);
+                            this.busDamage.chassis = Math.min(100, (this.busDamage.chassis || 0) + Math.round(g4Dmg * 0.8));
+                            setTimeout(() => audio.speak(`Ağır darbe! Motor bloğu ve ana çelik şasi yüzde ${g4Dmg} sarsıntı hasarı aldı.`), 4200);
                         }
                     }
                     
@@ -4619,7 +5039,7 @@ const Game = {
                 hatNo: "ÇEKİCİ",
                 guzergah: "Kaza Yeri -> Tekirdağ Sanayi",
                 stops: [
-                    { ad: "Tekirdağ Sanayi", id: "sanayi", anons: "Tekirdağ Sanayisine hoşgeldiniz.", gercekMesafeSonraki: 5 }
+                    { name: "Tekirdağ Sanayi", ad: "Tekirdağ Sanayi", id: "sanayi", anons: "Tekirdağ Sanayisine hoşgeldiniz.", gercekMesafeSonraki: 5 }
                 ]
             };
             this.currentStopIndex = 0;
@@ -4699,7 +5119,8 @@ const Game = {
 
         // Yolcu matematiğini başta hesapla
         const isTrainingEmpty = !!(this.activeRouteData && (this.activeRouteData.emptyBus || this.activeRouteData.isTraining));
-        const remainingStops = Math.max(1, this.activeRouteData.stops.length - this.currentStopIndex - 1);
+        const totalStopsLen = (this.activeRouteData && Array.isArray(this.activeRouteData.stops)) ? this.activeRouteData.stops.length : 1;
+        const remainingStops = Math.max(1, totalStopsLen - this.currentStopIndex - 1);
         const alighting = isTrainingEmpty ? 0 : (isFinalStop ? this.passengersOnBoard : Math.min(this.passengersOnBoard, Math.max(1, Math.round(this.passengersOnBoard / (remainingStops + 1)))));
         let rawWaiting = (typeof stopData.bekleyenYolcu === 'number') ? stopData.bekleyenYolcu : 5;
         if (typeof PowertrainDynamicsEngine !== 'undefined' && !isTrainingEmpty) {
@@ -4707,7 +5128,7 @@ const Game = {
             rawWaiting = Math.max(0, Math.round(rawWaiting * rushMult));
             stopData.bekleyenYolcu = rawWaiting;
         }
-        const waiting = isTrainingEmpty ? 0 : rawWaiting;
+        const waiting = (isTrainingEmpty || isFinalStop) ? 0 : rawWaiting;
 
         if (isTrainingEmpty) {
             const emptyNotice = isFinalStop 
@@ -4744,8 +5165,10 @@ const Game = {
 
         // Dakiklik değerlendirmesi
         let timingArrivalNotice = "";
-        if (stopData && stopData.scheduledMinutes) {
-            const delta = this.clockMinutes - stopData.scheduledMinutes;
+        if (stopData && stopData.scheduledMinutes !== undefined) {
+            let delta = this.clockMinutes - (stopData.scheduledMinutes % 1440);
+            if (delta < -720) delta += 1440;
+            else if (delta > 720) delta -= 1440;
             this.timingDeviations.push(delta);
             if (delta < -1.2) {
                 const early = Math.abs(Math.round(delta));
@@ -4851,7 +5274,25 @@ const Game = {
             return;
         }
 
-        if (this.currentStopIndex >= this.activeRouteData.stops.length - 1) {
+        if (!this.activeRouteData || !Array.isArray(this.activeRouteData.stops) || this.currentStopIndex >= this.activeRouteData.stops.length - 1) {
+            if (this.lostAndFoundCheckingInProgress) {
+                this.pendingFinishAfterLostCheck = true;
+                return;
+            }
+            if (!this.hasLostItemFound && !this.isTrainingRoute && !this.finalStopDepartTimer) {
+                const waitNotice = "Son durak yolcu inişi tamamlandı. Koltuklarda unutulan eşya kontrolü için 4 saniye içinde J tuşuna basabilirsiniz.";
+                if (typeof audio !== 'undefined' && audio.speak) audio.speak(waitNotice);
+                if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🎒 Son Durak: Kayıp eşya kontrolü için 'J' tuşuna basabilirsiniz (4 sn)", "info");
+                this.finalStopDepartTimer = setTimeout(() => {
+                    this.finalStopDepartTimer = null;
+                    if (this.lostAndFoundCheckingInProgress) {
+                        this.pendingFinishAfterLostCheck = true;
+                    } else {
+                        this.finishRoute();
+                    }
+                }, 4000);
+                return;
+            }
             this.finishRoute();
             return;
         }
@@ -4969,7 +5410,7 @@ const Game = {
 
             // KOŞAN YOLCU OLAYI (Akıllı Durak Etkileşimi)
             // Seferdeyken ve kapı kapandığı anda %35 ihtimalle son anda yetişmeye çalışan yolcu belirir
-            if (!this.isDriving && !this.runningPassengerTriggeredAtStop && this.activeRouteData && (this.currentStopIndex < this.activeRouteData.stops.length - 1)) {
+            if (!this.isDriving && !this.runningPassengerTriggeredAtStop && this.activeRouteData && Array.isArray(this.activeRouteData.stops) && (this.currentStopIndex < this.activeRouteData.stops.length - 1)) {
                 const shouldTrigger = (this.currentStopIndex === 1) || (Math.random() < 0.35);
                 if (shouldTrigger) {
                     this.triggerRunningPassenger();
@@ -5059,9 +5500,9 @@ const Game = {
         if (alertEl) alertEl.classList.remove('hidden');
 
         const alertText = document.getElementById('running-passenger-text');
-        if (alertText) alertText.innerText = '🏃 Koşan Yolcu: "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı!" (Açmak için E tuşu veya buton)';
+        if (alertText) alertText.innerText = '🏃 Koşan Yolcu: "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı!" (Açmak için PageUp tuşu veya buton)';
 
-        const msg = "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı! Durağa doğru koşan bir yolcu var. Kapıyı açmak için E tuşuna veya Ön Kapıyı Aç butonuna basınız.";
+        const msg = "Kaptanım dur bekle lütfen geliyorum, kapatma kapıyııı! Durağa doğru koşan bir yolcu var. Kapıyı açmak için Sayfa Yukarı yani PageUp tuşuna veya Ön Kapıyı Aç butonuna basınız.";
         if (typeof audio !== 'undefined' && typeof audio.speak === 'function') audio.speak(msg);
         if (typeof audio !== 'undefined' && typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(msg);
 
@@ -5088,7 +5529,7 @@ const Game = {
         const choiceBox = document.getElementById('passenger-choice-box');
         if (choiceBox) choiceBox.classList.add('hidden');
 
-        const stopData = this.activeRouteData ? this.activeRouteData.stops[this.currentStopIndex] : null;
+        const stopData = (this.activeRouteData && Array.isArray(this.activeRouteData.stops)) ? this.activeRouteData.stops[this.currentStopIndex] : null;
 
         if (allowed) {
             // İzin verildi (Gönlü Zengin Kaptan)
@@ -5169,21 +5610,22 @@ const Game = {
         if (this.rearDoorOpen) {
             if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorOpen === 'function') audio.playPneumaticDoorOpen();
             else audio.playDoorOpen();
-            btn.innerText = "Arka Kapıyı Kapat";
+            if (btn) btn.innerText = "Arka Kapıyı Kapat";
             if (!this.isDriving) {
-                document.getElementById('stop-alighting-count').innerText = "0";
+                const alightEl = document.getElementById('stop-alighting-count');
+                if (alightEl) alightEl.innerText = "0";
             }
         } else {
             if (typeof audio !== 'undefined' && typeof audio.playPneumaticDoorClose === 'function') audio.playPneumaticDoorClose();
             else audio.playDoorClose();
-            btn.innerText = "Arka Kapıyı Aç";
+            if (btn) btn.innerText = "Arka Kapıyı Aç";
             if (!this.isDriving) this.checkAutoDepart();
         }
     },
 
     automatedTicketProcess: function(isStanding = false) {
         // FORMÜLE BAĞLI BİLET TÜRÜ: Durak adına ve biniş sırasına göre deterministik bilet
-        const currentStopName = (this.activeRouteData.stops[this.currentStopIndex]?.name || "").toLowerCase();
+        const currentStopName = ((this.activeRouteData && Array.isArray(this.activeRouteData.stops) && this.activeRouteData.stops[this.currentStopIndex]?.name) || "").toLowerCase();
         let pType = "tam";
         if (currentStopName.includes("üniversite") || currentStopName.includes("okul") || currentStopName.includes("fakülte") || currentStopName.includes("lise")) {
             pType = "ogrenci"; // Okul/Kampüs duraklarında öğrenci
@@ -5324,9 +5766,8 @@ const Game = {
                 comfortBonus = baseBonus + tipBonusAmt;
                 this.addMoney(comfortBonus);
                 if (typeof CompanySystem !== 'undefined' && CompanySystem.recordTransaction) CompanySystem.recordTransaction('income', 'tips', 'Yolcu Konfor & Bahşiş Primi', comfortBonus);
-                this.addXP(40);
-                const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${curBus.brand} Lüks Kabin Bonusu)` : "";
-                comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote} ve 40 tecrübe puanı kazandınız.`;
+                const tipNote = tipBonusPct > 0 ? ` (+%${tipBonusPct} ${(curBus && curBus.brand) || 'Otobüs'} Lüks Kabin Bonusu)` : "";
+                comfortMsg = ` Üstün sürüş kalitesi ve yolcu konfor primi: ${comfortBonus} Lira${tipNote}.`;
             }
             
             const resComfort = document.getElementById('res-comfort');
@@ -5376,7 +5817,8 @@ const Game = {
                     rampsUsedCount: this.rampsUsedCountInRoute || (this.rampUsedInRoute ? 1 : 0),
                     lostItemFound: !!this.hasLostItemFound,
                     isNight: !!this.isNight,
-                    isHeadlightsOn: !!this.isHeadlightsOn,
+                    isHeadlightsOn: !!(this.isHeadlightsOn || this.headlightsUsedInRoute),
+                    headlightsUsed: !!(this.isHeadlightsOn || this.headlightsUsedInRoute),
                     completedTasks: this.completedTasks,
                     totalDrivingSeconds: this.totalDrivingSeconds || 0,
                     retarderUsed: !!this.retarderUsedInRoute,
@@ -5387,6 +5829,7 @@ const Game = {
                     routeDistanceKm: (this.activeRouteData && this.activeRouteData.totalDistanceKm) ? this.activeRouteData.totalDistanceKm : Math.max(1, Math.round((this.totalDistanceCovered || 8000) / 1000)),
                     isIntercity: !!(this.activeRouteData && this.activeRouteData.isIntercity),
                     unlockedCitiesCount: (this.unlockedCities && Array.isArray(this.unlockedCities)) ? this.unlockedCities.length : 1,
+                    stopsDiscovered: (typeof StopDiscovery !== 'undefined' && typeof StopDiscovery.getDiscoveredData === 'function') ? Object.keys(StopDiscovery.getDiscoveredData()).length : 0,
                     passengersCarried: this.totalPassengersBoardedInRoute || (this.isTrainingRoute ? 0 : 15),
                     isRainOrSnow: (this.activeClimateRegime === 'yagmurlu' || this.activeClimateRegime === 'karli' || this.weather === 'rainy' || this.weather === 'snowy')
                 };
@@ -5397,7 +5840,10 @@ const Game = {
         }
         
         if (document.getElementById('res-money')) document.getElementById('res-money').innerText = `${this.sessionMoney} ₺`;
-        if (document.getElementById('res-penalties')) document.getElementById('res-penalties').innerText = '0 ₺ (Eğitimde Ceza Yok / Muaf)';
+        if (document.getElementById('res-penalties')) {
+            const penAmt = Math.round(this.sessionPenalties || 0);
+            document.getElementById('res-penalties').innerText = penAmt > 0 ? `-${penAmt} ₺ (Kırmızı Işık / Trafik Cezası)` : '0 ₺ (Kural İhlali Yok)';
+        }
 
         // Özel Yolcu Primleri Özeti
         let smartSummaries = [];
@@ -5451,10 +5897,14 @@ const Game = {
 
         const k = e.key.toLowerCase();
         // SHIFT + VİRGÜL (Shift + ,): Rastgele Telsiz Konuşmaları Yükle / Dinlet (Kanal 19)
-        // İKRAM VE MUAVİN SERVİSİ (I Tuşu)
+        // İKRAM VE MUAVİN SERVİSİ (I Tuşu) & HAT TABELASI (Shift + I)
         if (k === 'i' || k === 'ı' || e.code === 'KeyI') {
             e.preventDefault();
-            this.serveCatering();
+            if (e.shiftKey) {
+                this.reportIBISStatus();
+            } else {
+                this.serveCatering();
+            }
             return;
         }
 
@@ -5468,15 +5918,17 @@ const Game = {
         }
 
         
-        // Sürüş tuşlarını anında güncelle (Caps Lock, Türkçe klavye ve e.repeat fark etmeksizin)
-        if (k === 'w' || e.code === 'KeyW') this.keys.w = true;
-        if (k === 's' || e.code === 'KeyS') { this.keys.s = true; this.isBrakeKeyDown = true; }
-        if (k === 'a' || e.code === 'KeyA') this.keys.a = true;
-        if (k === 'd' || e.code === 'KeyD') this.keys.d = true;
-        if (k === 'arrowup' || e.code === 'ArrowUp') this.keys.arrowup = true;
-        if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = true; this.isBrakeKeyDown = true; }
-        if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = true;
-        if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = true;
+        // Sürüş tuşlarını anında güncelle (Shift/Alt/Ctrl basılı değilken)
+        if (!e.shiftKey && !e.altKey && !e.ctrlKey) {
+            if (k === 'w' || e.code === 'KeyW') this.keys.w = true;
+            if (k === 's' || e.code === 'KeyS') { this.keys.s = true; }
+            if (k === 'a' || e.code === 'KeyA') this.keys.a = true;
+            if (k === 'd' || e.code === 'KeyD') this.keys.d = true;
+            if (k === 'arrowup' || e.code === 'ArrowUp') this.keys.arrowup = true;
+            if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = true; }
+            if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = true;
+            if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = true;
+        }
         
         // Sadece oyun içindeysek ekran okuyucu veya sayfa kaydırmasını engellemek için preventDefault kullan
         if (k.startsWith('arrow') || k === ' ') {
@@ -5515,9 +5967,11 @@ const Game = {
         }
         
         if (e.shiftKey && k === 'w') {
+            e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.toggleWipers === 'function') {
                 audio.toggleWipers();
             }
+            return;
         }
 
         if (k === 'k') {
@@ -5623,6 +6077,7 @@ const Game = {
         }
 
         if (k === 'j') {
+            if (e.shiftKey) return;
             e.preventDefault();
             this.checkLostAndFound();
             return;
@@ -5786,6 +6241,12 @@ const Game = {
 
         if (k === 'h') {
             e.preventDefault();
+            if (e.shiftKey) {
+                if (typeof LiveWeather !== 'undefined') {
+                    LiveWeather.announceWeatherReport("assertive");
+                }
+                return;
+            }
             const cap = (typeof this.getFuelCapacity === 'function') ? this.getFuelCapacity() : (this.fuelTankCapacity || 500);
             const currentFuel = (this.currentFuelLiters !== undefined) ? this.currentFuelLiters : cap;
             const liters = Math.max(0, Math.floor(currentFuel));
@@ -5796,20 +6257,39 @@ const Game = {
                 fuelSpeech += "⚠️ Dikkat, düşük yakıt ikazı! ";
             }
 
-            let msg = fuelSpeech + `Araç sağlığı yüzde ${Math.floor(this.busDamage.health)}. `;
-            let hasarListesi = [];
-            
-            if (this.busDamage.leftWindow > 0) hasarListesi.push(`Sol cam yüzde ${Math.floor(this.busDamage.leftWindow)}`);
-            if (this.busDamage.rightWindow > 0) hasarListesi.push(`Sağ cam yüzde ${Math.floor(this.busDamage.rightWindow)}`);
-            if (this.busDamage.front > 0) hasarListesi.push(`Ön kaporta yüzde ${Math.floor(this.busDamage.front)}`);
-            if (this.busDamage.wipers > 0) hasarListesi.push(`Silecekler yüzde ${Math.floor(this.busDamage.wipers)}`);
-            if (this.busDamage.headlights > 0) hasarListesi.push(`Farlar yüzde ${Math.floor(this.busDamage.headlights)}`);
-            if (this.busDamage.exhaust > 0) hasarListesi.push(`Egzoz yüzde ${Math.floor(this.busDamage.exhaust)}`);
-            
-            if (hasarListesi.length > 0) {
-                msg += hasarListesi.join(", ") + " hasarlı.";
+            let msg = fuelSpeech + `Genel araç sağlığı yüzde ${Math.floor(this.busDamage.health)}. `;
+            const d = this.busDamage;
+
+            // Parçaları sağlamlık gruplarına göre doğal dille raporla
+            const g1Damages = [];
+            if (d.leftWindow > 0) g1Damages.push(`Sol cam yüzde ${Math.floor(d.leftWindow)}`);
+            if (d.rightWindow > 0) g1Damages.push(`Sağ cam yüzde ${Math.floor(d.rightWindow)}`);
+            if (d.headlights > 0) g1Damages.push(`Farlar yüzde ${Math.floor(d.headlights)}`);
+            if (d.wipers > 0) g1Damages.push(`Silecekler yüzde ${Math.floor(d.wipers)}`);
+
+            const g2Damages = [];
+            if (d.exhaust > 0) g2Damages.push(`Egzoz ve DPF yüzde ${Math.floor(d.exhaust)}`);
+            if (d.suspension > 0) g2Damages.push(`Havalı süspansiyon körükleri yüzde ${Math.floor(d.suspension)}`);
+            if (d.brakes > 0) g2Damages.push(`Fren balataları ve körükleri yüzde ${Math.floor(d.brakes)}`);
+
+            const g3Damages = [];
+            if (d.front > 0) g3Damages.push(`Ön çelik tampon ve kaporta yüzde ${Math.floor(d.front)}`);
+            if (d.transmission > 0) g3Damages.push(`Şanzıman ve retarder yüzde ${Math.floor(d.transmission)}`);
+
+            const g4Damages = [];
+            if (d.engine > 0) g4Damages.push(`Dizel motor bloğu yüzde ${Math.floor(d.engine)}`);
+            if (d.chassis > 0) g4Damages.push(`Ana çelik şasi yüzde ${Math.floor(d.chassis)}`);
+
+            const groupReports = [];
+            if (g1Damages.length > 0) groupReports.push(`Dış cam ve aydınlatma: ${g1Damages.join(", ")} hasarlı`);
+            if (g2Damages.length > 0) groupReports.push(`Alt takım ve yürüyen aksam: ${g2Damages.join(", ")} yıpranmış`);
+            if (g3Damages.length > 0) groupReports.push(`Ön gövde ve şanzıman: ${g3Damages.join(", ")} hasarlı`);
+            if (g4Damages.length > 0) groupReports.push(`Motor ve ana şasi: ${g4Damages.join(", ")} hasarlı`);
+
+            if (groupReports.length > 0) {
+                msg += "Parça durumu: " + groupReports.join(". ") + ".";
             } else {
-                msg += "Mekanik aksamda hiçbir hasar yok, her şey sağlam.";
+                msg += "Camlar, alt takım, süspansiyon körükleri, frenler, şanzıman, motor ve ana şasi dahil tüm parçalar yüzde 100 sağlam.";
             }
             
             if (typeof audio.speak === 'function') audio.speak(msg);
@@ -5832,9 +6312,9 @@ const Game = {
             if (typeof MissionReader !== 'undefined') MissionReader.exit();
             return;
         }
-        if (this.keys.hasOwnProperty(k)) this.keys[k] = true;
+        if (!e.shiftKey && !e.altKey && !e.ctrlKey && this.keys.hasOwnProperty(k)) this.keys[k] = true;
 
-        // Özel aksiyonlar (Motor Çalıştırma: M veya Boşluk tuşu)
+        // Özel aksiyonlar (M veya Boşluk tuşu: Motor Çalıştırma)
         if (k === 'm' || e.code === 'KeyM' || e.code === 'Space') {
             e.preventDefault();
             if (audio.isEngineRunning) {
@@ -5851,7 +6331,7 @@ const Game = {
             }
             if (!this.isDriving) this.checkAutoDepart();
         }
-        if (k === 'l' || k === 'k') {
+        if (k === 'l' || e.code === 'KeyL') {
             e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.playHorn === 'function') {
             // Karşıdan gelen meslektaş kornasına selam verme
@@ -5882,17 +6362,18 @@ const Game = {
                 });
             }
         }
-        if (k === 'pageup' || k === 'e') {
+        if (k === 'e' && e.shiftKey) {
             e.preventDefault();
-            if (e.shiftKey) {
-                if (typeof SolarPrayerEngine !== 'undefined' && typeof SolarPrayerEngine.speakVakitReport === 'function') {
-                    SolarPrayerEngine.speakVakitReport(this);
-                }
-                return;
+            if (typeof SolarPrayerEngine !== 'undefined' && typeof SolarPrayerEngine.speakVakitReport === 'function') {
+                SolarPrayerEngine.speakVakitReport(this);
             }
+            return;
+        }
+        if (k === 'pageup') {
+            e.preventDefault();
             this.toggleFrontDoor();
         }
-        if (k === 'pagedown' || k === 'q') {
+        if (k === 'pagedown') {
             e.preventDefault();
             this.toggleRearDoor();
         }
@@ -5918,6 +6399,7 @@ const Game = {
                 this.isHeadlightsOn = !this.isHeadlightsOn;
                 audio.playSwitchClick(); // Şalter sesi
                 if (this.isHeadlightsOn) {
+                    this.headlightsUsedInRoute = true;
                     audio.speak("Farlar açıldı.");
                 } else {
                     audio.speak("Farlar kapatıldı.");
@@ -5944,14 +6426,13 @@ const Game = {
 
     handleKeyUp: function(e) {
         const k = e.key.toLowerCase();
-        if (e.shiftKey && (k.startsWith('arrow'))) return;
         
         if (k === 'w' || e.code === 'KeyW') this.keys.w = false;
-        if (k === 's' || e.code === 'KeyS') { this.keys.s = false; this.isBrakeKeyDown = false; }
+        if (k === 's' || e.code === 'KeyS') { this.keys.s = false; }
         if (k === 'a' || e.code === 'KeyA') this.keys.a = false;
         if (k === 'd' || e.code === 'KeyD') this.keys.d = false;
         if (k === 'arrowup' || e.code === 'ArrowUp') this.keys.arrowup = false;
-        if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = false; this.isBrakeKeyDown = false; }
+        if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = false; }
         if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = false;
         if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = false;
         if (this.keys.hasOwnProperty(k)) this.keys[k] = false;
@@ -6026,6 +6507,9 @@ const SanayiMechanic = {
     start: function() {
         this.isActive = true;
         this.state = 'greeting';
+        if (typeof UI !== 'undefined' && typeof UI.switchScreen === 'function') {
+            UI.switchScreen('sanayi-screen');
+        }
         
         const dialogEl = document.getElementById('sanayi-dialog');
         const reportContainer = document.getElementById('sanayi-report-container');
@@ -6043,23 +6527,36 @@ const SanayiMechanic = {
         this.state = 'report';
         this.currentIndex = 0;
         
-        // Hasarlı parçaları tespit et
+        // Hasarlı parçaları sağlamlık sırasına (Dış donanım -> Alt takım -> Gövde/Aktarma -> Motor/Şasi) göre tespit et
         this.parts = [];
-        if (Game.busDamage.leftWindow > 0) this.parts.push({ id: 'leftWindow', name: 'Sol Cam', damage: Game.busDamage.leftWindow, toRepair: false });
-        if (Game.busDamage.rightWindow > 0) this.parts.push({ id: 'rightWindow', name: 'Sağ Cam', damage: Game.busDamage.rightWindow, toRepair: false });
-        if (Game.busDamage.front > 0) this.parts.push({ id: 'front', name: 'Ön Kaporta ve Motor', damage: Game.busDamage.front, toRepair: false });
-        if (Game.busDamage.wipers > 0) this.parts.push({ id: 'wipers', name: 'Silecek Motoru', damage: Game.busDamage.wipers, toRepair: false });
-        if (Game.busDamage.headlights > 0) this.parts.push({ id: 'headlights', name: 'Ön Farlar ve Tesisat', damage: Game.busDamage.headlights, toRepair: false });
-        if (Game.busDamage.exhaust > 0) this.parts.push({ id: 'exhaust', name: 'Egzoz ve DPF Sistemi', damage: Game.busDamage.exhaust, toRepair: false });
+        const d = Game.busDamage || {};
+        // Hassas ve Kırılgan Dış Donanım (Dayanım: 1.0x)
+        if (d.leftWindow > 0) this.parts.push({ id: 'leftWindow', groupTier: 1, groupName: 'Dış Cam ve Aydınlatma', name: 'Sol Yan Akustik Camlar', damage: d.leftWindow, effect: 'Kabin ses yalıtımını ve klima ısıtma/soğutma etkisini bozar.', toRepair: false });
+        if (d.rightWindow > 0) this.parts.push({ id: 'rightWindow', groupTier: 1, groupName: 'Dış Cam ve Aydınlatma', name: 'Sağ Yan & Kapı Camları', damage: d.rightWindow, effect: 'Kabin akustik yalıtımını ve iklimlendirmeyi bozar.', toRepair: false });
+        if (d.headlights > 0) this.parts.push({ id: 'headlights', groupTier: 1, groupName: 'Dış Cam ve Aydınlatma', name: 'Ön Farlar ve LED Aydınlatma', damage: d.headlights, effect: 'Gece ve tünellerde görüşü düşürür.', toRepair: false });
+        if (d.wipers > 0) this.parts.push({ id: 'wipers', groupTier: 1, groupName: 'Dış Cam ve Aydınlatma', name: 'Cam Silecek Motoru', damage: d.wipers, effect: 'Yağmur ve karda ön camın temizlenmesini engeller.', toRepair: false });
+
+        // Orta Dayanımlı Alt Takım & Aşınma Parçaları (Dayanım: 1.75x)
+        if (d.exhaust > 0) this.parts.push({ id: 'exhaust', groupTier: 2, groupName: 'Alt Takım ve Yürüyen Aksam', name: 'Egzoz ve Euro 6 DPF/SCR Sistemi', damage: d.exhaust, effect: 'Tıslama/sürtünme sesi yapar ve motor çekişini düşürür.', toRepair: false });
+        if (d.suspension > 0) this.parts.push({ id: 'suspension', groupTier: 2, groupName: 'Alt Takım ve Yürüyen Aksam', name: 'Pnömatik Havalı Süspansiyon Körükleri', damage: d.suspension, effect: 'Viraj savrulmasını artırır, çukurlarda yolcu konforunu düşürür.', toRepair: false });
+        if (d.brakes > 0) this.parts.push({ id: 'brakes', groupTier: 2, groupName: 'Alt Takım ve Yürüyen Aksam', name: 'Pnömatik Disk Fren Balataları & Körükleri', damage: d.brakes, effect: 'Fren mesafesini uzatır ve hava basıncını daha hızlı tüketir.', toRepair: false });
+
+        // Yüksek Dayanımlı Gövde & Aktarma Organları (Dayanım: 2.6x)
+        if (d.front > 0) this.parts.push({ id: 'front', groupTier: 3, groupName: 'Gövde ve Aktarma Organları', name: 'Ön Çelik Tampon ve Darbe Traversi', damage: d.front, effect: 'Önden darbeleri emerek motor ve radyatörü korur.', toRepair: false });
+        if (d.transmission > 0) this.parts.push({ id: 'transmission', groupTier: 3, groupName: 'Gövde ve Aktarma Organları', name: 'Şanzıman Dişli Kutusu & Retarder', damage: d.transmission, effect: 'Vites geçişlerini zorlaştırır ve Retarder yokuş frenini zayıflatır.', toRepair: false });
+
+        // Ana Omurga ve Motor Bloğu (Dayanım: 4.0x)
+        if (d.engine > 0) this.parts.push({ id: 'engine', groupTier: 4, groupName: 'Motor ve Ana Şasi', name: 'Dizel Motor Bloğu, Turbo ve Radyatör', damage: d.engine, effect: 'Motor çekiş gücünü düşürür ve harareti hızlandırır.', toRepair: false });
+        if (d.chassis > 0) this.parts.push({ id: 'chassis', groupTier: 4, groupName: 'Motor ve Ana Şasi', name: 'Ana Çelik Şasi Kafesi ve Dingiller', damage: d.chassis, effect: 'Aracın ana omurgasıdır; hasarlandığında şerit tutuşu zorlaşır.', toRepair: false });
         
         const dialogEl = document.getElementById('sanayi-dialog');
         const reportContainer = document.getElementById('sanayi-report-container');
         const listEl = document.getElementById('sanayi-parts-list');
         const statusEl = document.getElementById('sanayi-status');
         
-        statusEl.innerText = "Hasar Raporu";
-        dialogEl.innerText = "Aşağı-Yukarı yön tuşlarıyla hasarlı parçaları inceleyin. Onarmak için parçanın üzerindeyken Enter'a basın.";
-        if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Röntgen tamamlandı. Hasar raporunuz ekranda. Aşağı yukarı yön tuşlarıyla parçaları inceleyip, onarmak istediğiniz parçanın üzerinde enter tuşuna basın. İşiniz bittiğinde işlemi tamamla butonuna basabilirsiniz.");
+        statusEl.innerText = "Araç Ekspertiz ve Hasar Raporu";
+        dialogEl.innerText = "Hasarlı parçalar dış donanımdan ana şasiye doğru sıralandı. Aşağı-Yukarı oklarla inceleyip Enter ile onarım listesine ekleyin.";
+        if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion("Röntgen tamamlandı. Hasarlı parçalar listelendi. Aşağı yukarı yön tuşlarıyla parçaları ve sürüşe etkilerini inceleyip, onarmak istediğiniz parçanın üzerinde enter tuşuna basın.");
         
         reportContainer.classList.remove('hidden');
         
@@ -6073,7 +6570,7 @@ const SanayiMechanic = {
         this.parts.forEach((part, index) => {
             const li = document.createElement('li');
             li.className = 'route-item' + (index === this.currentIndex ? ' selected' : '');
-            li.innerHTML = `${part.name} - Hasar: %${Math.floor(part.damage)} ${part.toRepair ? '<span style="color:var(--primary)">[ONARILACAK]</span>' : ''}`;
+            li.innerHTML = `<span style="color:#38bdf8; font-weight:bold;">[${part.groupName}]</span> ${part.name} - Hasar: %${Math.floor(part.damage)} ${part.toRepair ? '<span style="color:var(--primary)">[ONARILACAK]</span>' : ''}<div style="font-size:0.82rem; color:#94a3b8; margin-top:2px;">⚙️ Dinamik Etki: ${part.effect || ''}</div>`;
             listEl.appendChild(li);
         });
         
@@ -6089,7 +6586,7 @@ const SanayiMechanic = {
     announceCurrentSelection: function() {
         if (this.currentIndex < this.parts.length) {
             const part = this.parts[this.currentIndex];
-            let text = `${part.name}. Yüzde ${Math.floor(part.damage)} hasarlı.`;
+            let text = `${part.groupName}: ${part.name}. Yüzde ${Math.floor(part.damage)} hasarlı. Sürüş dinamiğine etkisi: ${part.effect || ''}`;
             if (part.toRepair) text += " Onarım listesine eklendi.";
             if (typeof audio.updateNvdaLiveRegion === 'function') audio.updateNvdaLiveRegion(text);
         } else {
@@ -6198,7 +6695,7 @@ const SanayiMechanic = {
                 
                 currentRepairIndex++;
                 setTimeout(repairNext, 1200);
-            }, 2000);
+            }, repairDuration);
         };
         
         repairNext();

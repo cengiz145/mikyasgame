@@ -1,12 +1,9 @@
 /* ==========================================================================
-   OTOBÜS SİMÜLASYONU - 1900 ADET RESMİ VE DETAYLI BAŞARIM VERİTABANI
-   - Her başarım için benzersiz id, difficulty (1-1900), stat, hedef, kategori
-   - NVDA ekran okuyucu sesli betimlemesi ve anlaşılır Türkçe açıklamalar
-   - Web Audio API kutlama fanfarları ve HUD bildirim entegrasyonu
-   - Geliştirici: Ümit Ekrem Mikyas
+   MİKYAS SİMÜLASYON DÜNYASI - 1900 ŞOFÖR BAŞARISI VERİTABANI
+   Kolaydan Zora Sıralı (1 - 1900), Açık ve Anlaşılır Şartlı
    ========================================================================== */
 
-const ACHIEVEMENTS_1500 = [
+window.ACHIEVEMENTS_1500 = [
   {
     "id": "ach_0001_sefer_azmi",
     "difficulty": 1,
@@ -30,7 +27,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (5 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 5 yolcu taşıyın."
   },
   {
@@ -121,8 +118,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1 Kez)."
   },
   {
     "id": "ach_0010_durak_kesfi",
@@ -225,7 +222,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (10 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 10 yolcu taşıyın."
   },
   {
@@ -316,8 +313,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (2 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 2 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (2 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 2 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (2 Kez)."
   },
   {
     "id": "ach_0025_durak_kesfi",
@@ -420,7 +417,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (15 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 15 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 15 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 15 yolcu taşıyın."
   },
   {
@@ -511,8 +508,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (3 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 3 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (3 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 3 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (3 Kez)."
   },
   {
     "id": "ach_0040_durak_kesfi",
@@ -615,7 +612,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (20 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 20 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 20 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 20 yolcu taşıyın."
   },
   {
@@ -706,8 +703,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (4 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 4 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (4 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 4 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (4 Kez)."
   },
   {
     "id": "ach_0055_durak_kesfi",
@@ -810,7 +807,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (25 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 25 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 25 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 25 yolcu taşıyın."
   },
   {
@@ -901,8 +898,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (5 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 5 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (5 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 5 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (5 Kez)."
   },
   {
     "id": "ach_0070_durak_kesfi",
@@ -949,12 +946,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 1,
     "tierName": "Çok Kolay",
     "stat": "totalKm",
-    "targetValue": 10,
+    "targetValue": 11,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (10 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 10 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 10 kilometre yol gidin."
+    "title": "Kat Edilen Yol (11 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 11 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 11 kilometre yol gidin."
   },
   {
     "id": "ach_0074_emanet_esya",
@@ -1005,7 +1002,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (30 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 30 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 30 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 30 yolcu taşıyın."
   },
   {
@@ -1096,8 +1093,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (6 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 6 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (6 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 6 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (6 Kez)."
   },
   {
     "id": "ach_0085_durak_kesfi",
@@ -1200,7 +1197,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (35 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 35 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 35 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 35 yolcu taşıyın."
   },
   {
@@ -1291,8 +1288,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (7 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 7 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (7 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 7 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (7 Kez)."
   },
   {
     "id": "ach_0100_durak_kesfi",
@@ -1395,7 +1392,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (40 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 40 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 40 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 40 yolcu taşıyın."
   },
   {
@@ -1486,8 +1483,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (8 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 8 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (8 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 8 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (8 Kez)."
   },
   {
     "id": "ach_0115_durak_kesfi",
@@ -1590,7 +1587,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (45 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 45 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 45 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 45 yolcu taşıyın."
   },
   {
@@ -1681,8 +1678,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (9 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 9 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (9 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 9 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (9 Kez)."
   },
   {
     "id": "ach_0130_durak_kesfi",
@@ -1785,7 +1782,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Yolcu Taşıma (50 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 50 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 50 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 50 yolcu taşıyın."
   },
   {
@@ -1876,8 +1873,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (10 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 10 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (10 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 10 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (10 Kez)."
   },
   {
     "id": "ach_0145_durak_kesfi",
@@ -1980,7 +1977,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (65 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 65 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 65 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 65 yolcu taşıyın."
   },
   {
@@ -2071,8 +2068,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (12 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 12 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (12 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 12 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (12 Kez)."
   },
   {
     "id": "ach_0160_durak_kesfi",
@@ -2119,12 +2116,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 1,
     "tierName": "Çok Kolay",
     "stat": "totalKm",
-    "targetValue": 25,
+    "targetValue": 24,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (25 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 25 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 25 kilometre yol gidin."
+    "title": "Kat Edilen Yol (24 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 24 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 24 kilometre yol gidin."
   },
   {
     "id": "ach_0164_emanet_esya",
@@ -2175,7 +2172,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (80 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 80 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 80 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 80 yolcu taşıyın."
   },
   {
@@ -2266,8 +2263,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (14 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 14 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (14 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 14 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (14 Kez)."
   },
   {
     "id": "ach_0175_durak_kesfi",
@@ -2370,7 +2367,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (95 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 95 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 95 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 95 yolcu taşıyın."
   },
   {
@@ -2461,8 +2458,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (16 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 16 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (16 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 16 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (16 Kez)."
   },
   {
     "id": "ach_0190_durak_kesfi",
@@ -2565,7 +2562,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (110 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 110 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 110 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 110 yolcu taşıyın."
   },
   {
@@ -2656,8 +2653,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (18 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 18 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (18 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 18 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (18 Kez)."
   },
   {
     "id": "ach_0205_durak_kesfi",
@@ -2760,7 +2757,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (125 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 125 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 125 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 125 yolcu taşıyın."
   },
   {
@@ -2851,8 +2848,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (20 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 20 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (20 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 20 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (20 Kez)."
   },
   {
     "id": "ach_0220_durak_kesfi",
@@ -2955,7 +2952,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (140 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 140 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 140 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 140 yolcu taşıyın."
   },
   {
@@ -3046,8 +3043,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (22 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 22 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (22 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 22 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (22 Kez)."
   },
   {
     "id": "ach_0235_durak_kesfi",
@@ -3094,12 +3091,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 1,
     "tierName": "Çok Kolay",
     "stat": "totalKm",
-    "targetValue": 50,
+    "targetValue": 48,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (50 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 50 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 50 kilometre yol gidin."
+    "title": "Kat Edilen Yol (48 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 48 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 48 kilometre yol gidin."
   },
   {
     "id": "ach_0239_emanet_esya",
@@ -3150,7 +3147,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (155 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 155 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 155 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 155 yolcu taşıyın."
   },
   {
@@ -3241,8 +3238,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (24 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 24 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (24 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 24 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (24 Kez)."
   },
   {
     "id": "ach_0250_durak_kesfi",
@@ -3345,7 +3342,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (170 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 170 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 170 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 170 yolcu taşıyın."
   },
   {
@@ -3436,8 +3433,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (26 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 26 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (26 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 26 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (26 Kez)."
   },
   {
     "id": "ach_0265_durak_kesfi",
@@ -3540,7 +3537,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (185 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 185 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 185 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 185 yolcu taşıyın."
   },
   {
@@ -3631,8 +3628,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (28 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 28 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (28 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 28 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (28 Kez)."
   },
   {
     "id": "ach_0280_durak_kesfi",
@@ -3735,7 +3732,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 200 yolcu taşıyın."
   },
   {
@@ -3826,8 +3823,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (30 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 30 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (30 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 30 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (30 Kez)."
   },
   {
     "id": "ach_0295_durak_kesfi",
@@ -3930,7 +3927,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (250 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 250 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 250 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 250 yolcu taşıyın."
   },
   {
@@ -4021,8 +4018,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (35 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 35 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (35 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 35 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (35 Kez)."
   },
   {
     "id": "ach_0310_durak_kesfi",
@@ -4125,7 +4122,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (300 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 300 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 300 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 300 yolcu taşıyın."
   },
   {
@@ -4216,8 +4213,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (40 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 40 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (40 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 40 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (40 Kez)."
   },
   {
     "id": "ach_0325_durak_kesfi",
@@ -4264,12 +4261,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "totalKm",
-    "targetValue": 100,
+    "targetValue": 95,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (100 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 100 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 100 kilometre yol gidin."
+    "title": "Kat Edilen Yol (95 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 95 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 95 kilometre yol gidin."
   },
   {
     "id": "ach_0329_emanet_esya",
@@ -4320,7 +4317,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (350 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 350 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 350 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 350 yolcu taşıyın."
   },
   {
@@ -4411,8 +4408,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (45 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 45 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (45 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 45 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (45 Kez)."
   },
   {
     "id": "ach_0340_durak_kesfi",
@@ -4515,7 +4512,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 400 yolcu taşıyın."
   },
   {
@@ -4606,8 +4603,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (50 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 50 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (50 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 50 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (50 Kez)."
   },
   {
     "id": "ach_0355_durak_kesfi",
@@ -4710,7 +4707,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (450 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 450 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 450 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 450 yolcu taşıyın."
   },
   {
@@ -4801,8 +4798,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (55 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 55 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (55 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 55 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (55 Kez)."
   },
   {
     "id": "ach_0370_durak_kesfi",
@@ -4905,7 +4902,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (500 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 500 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 500 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 500 yolcu taşıyın."
   },
   {
@@ -4996,8 +4993,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (60 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 60 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (60 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 60 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (60 Kez)."
   },
   {
     "id": "ach_0385_durak_kesfi",
@@ -5100,7 +5097,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (550 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 550 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 550 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 550 yolcu taşıyın."
   },
   {
@@ -5191,8 +5188,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (65 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 65 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (65 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 65 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (65 Kez)."
   },
   {
     "id": "ach_0400_durak_kesfi",
@@ -5295,7 +5292,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 600 yolcu taşıyın."
   },
   {
@@ -5386,8 +5383,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (70 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 70 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (70 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 70 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (70 Kez)."
   },
   {
     "id": "ach_0415_durak_kesfi",
@@ -5490,7 +5487,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (650 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 650 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 650 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 650 yolcu taşıyın."
   },
   {
@@ -5581,8 +5578,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (75 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 75 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (75 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 75 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (75 Kez)."
   },
   {
     "id": "ach_0430_durak_kesfi",
@@ -5685,7 +5682,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (700 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 700 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 700 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 700 yolcu taşıyın."
   },
   {
@@ -5776,8 +5773,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (80 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 80 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (80 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 80 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (80 Kez)."
   },
   {
     "id": "ach_0445_durak_kesfi",
@@ -5880,7 +5877,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 800 yolcu taşıyın."
   },
   {
@@ -5971,8 +5968,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (90 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 90 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (90 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 90 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (90 Kez)."
   },
   {
     "id": "ach_0460_durak_kesfi",
@@ -6075,7 +6072,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (920 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 920 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 920 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 920 yolcu taşıyın."
   },
   {
@@ -6166,8 +6163,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (100 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 100 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (100 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 100 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (100 Kez)."
   },
   {
     "id": "ach_0475_durak_kesfi",
@@ -6270,7 +6267,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.040 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.040 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.040 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.040 yolcu taşıyın."
   },
   {
@@ -6361,8 +6358,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (110 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 110 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (110 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 110 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (110 Kez)."
   },
   {
     "id": "ach_0490_durak_kesfi",
@@ -6409,12 +6406,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "totalKm",
-    "targetValue": 400,
+    "targetValue": 390,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (400 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 400 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 400 kilometre yol gidin."
+    "title": "Kat Edilen Yol (390 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 390 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 390 kilometre yol gidin."
   },
   {
     "id": "ach_0494_emanet_esya",
@@ -6465,7 +6462,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.160 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.160 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.160 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.160 yolcu taşıyın."
   },
   {
@@ -6556,8 +6553,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (120 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 120 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (120 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 120 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (120 Kez)."
   },
   {
     "id": "ach_0505_durak_kesfi",
@@ -6660,7 +6657,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.280 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.280 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.280 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.280 yolcu taşıyın."
   },
   {
@@ -6751,8 +6748,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (130 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 130 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (130 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 130 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (130 Kez)."
   },
   {
     "id": "ach_0520_durak_kesfi",
@@ -6855,7 +6852,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.400 yolcu taşıyın."
   },
   {
@@ -6946,8 +6943,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (140 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 140 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (140 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 140 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (140 Kez)."
   },
   {
     "id": "ach_0535_durak_kesfi",
@@ -7050,7 +7047,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.520 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.520 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.520 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.520 yolcu taşıyın."
   },
   {
@@ -7141,8 +7138,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (150 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 150 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (150 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 150 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (150 Kez)."
   },
   {
     "id": "ach_0550_durak_kesfi",
@@ -7245,7 +7242,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.640 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.640 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.640 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.640 yolcu taşıyın."
   },
   {
@@ -7336,8 +7333,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (160 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 160 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (160 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 160 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (160 Kez)."
   },
   {
     "id": "ach_0565_durak_kesfi",
@@ -7384,12 +7381,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "totalKm",
-    "targetValue": 600,
+    "targetValue": 620,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (600 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 600 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 600 kilometre yol gidin."
+    "title": "Kat Edilen Yol (620 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 620 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 620 kilometre yol gidin."
   },
   {
     "id": "ach_0569_emanet_esya",
@@ -7440,7 +7437,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.760 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.760 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.760 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.760 yolcu taşıyın."
   },
   {
@@ -7531,8 +7528,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (170 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 170 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (170 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 170 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (170 Kez)."
   },
   {
     "id": "ach_0580_durak_kesfi",
@@ -7635,7 +7632,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (1.880 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.880 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 1.880 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 1.880 yolcu taşıyın."
   },
   {
@@ -7726,8 +7723,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (180 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 180 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (180 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 180 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (180 Kez)."
   },
   {
     "id": "ach_0595_durak_kesfi",
@@ -7830,7 +7827,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (2.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 2.000 yolcu taşıyın."
   },
   {
@@ -7921,8 +7918,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (190 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 190 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (190 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 190 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (190 Kez)."
   },
   {
     "id": "ach_0610_durak_kesfi",
@@ -8025,7 +8022,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (2.200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 2.200 yolcu taşıyın."
   },
   {
@@ -8116,8 +8113,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (200 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 200 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (200 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 200 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (200 Kez)."
   },
   {
     "id": "ach_0625_durak_kesfi",
@@ -8220,7 +8217,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (2.480 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.480 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.480 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 2.480 yolcu taşıyın."
   },
   {
@@ -8311,8 +8308,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (220 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 220 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (220 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 220 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (220 Kez)."
   },
   {
     "id": "ach_0640_durak_kesfi",
@@ -8415,7 +8412,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (2.760 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.760 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 2.760 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 2.760 yolcu taşıyın."
   },
   {
@@ -8506,8 +8503,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (235 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 235 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (235 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 235 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (235 Kez)."
   },
   {
     "id": "ach_0655_durak_kesfi",
@@ -8610,7 +8607,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (3.040 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.040 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.040 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 3.040 yolcu taşıyın."
   },
   {
@@ -8701,8 +8698,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (250 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 250 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (250 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 250 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (250 Kez)."
   },
   {
     "id": "ach_0670_durak_kesfi",
@@ -8805,7 +8802,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (3.320 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.320 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.320 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 3.320 yolcu taşıyın."
   },
   {
@@ -8896,8 +8893,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (265 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 265 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (265 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 265 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (265 Kez)."
   },
   {
     "id": "ach_0685_durak_kesfi",
@@ -9000,7 +8997,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (3.600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 3.600 yolcu taşıyın."
   },
   {
@@ -9091,8 +9088,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (280 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 280 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (280 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 280 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (280 Kez)."
   },
   {
     "id": "ach_0700_durak_kesfi",
@@ -9195,7 +9192,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (3.880 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.880 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 3.880 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 3.880 yolcu taşıyın."
   },
   {
@@ -9286,8 +9283,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (295 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 295 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (295 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 295 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (295 Kez)."
   },
   {
     "id": "ach_0715_durak_kesfi",
@@ -9390,7 +9387,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (4.160 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.160 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.160 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 4.160 yolcu taşıyın."
   },
   {
@@ -9481,8 +9478,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (310 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 310 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (310 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 310 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (310 Kez)."
   },
   {
     "id": "ach_0730_durak_kesfi",
@@ -9585,7 +9582,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (4.440 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.440 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.440 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 4.440 yolcu taşıyın."
   },
   {
@@ -9676,8 +9673,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (325 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 325 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (325 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 325 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (325 Kez)."
   },
   {
     "id": "ach_0745_durak_kesfi",
@@ -9780,7 +9777,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (4.720 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.720 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 4.720 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 4.720 yolcu taşıyın."
   },
   {
@@ -9871,8 +9868,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (340 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 340 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (340 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 340 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (340 Kez)."
   },
   {
     "id": "ach_0760_durak_kesfi",
@@ -9975,7 +9972,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (5.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 5.000 yolcu taşıyın."
   },
   {
@@ -10066,8 +10063,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (370 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 370 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (370 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 370 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (370 Kez)."
   },
   {
     "id": "ach_0775_durak_kesfi",
@@ -10114,12 +10111,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "totalKm",
-    "targetValue": 2500,
+    "targetValue": 2450,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (2.500 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 2.500 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 2.500 kilometre yol gidin."
+    "title": "Kat Edilen Yol (2.450 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 2.450 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 2.450 kilometre yol gidin."
   },
   {
     "id": "ach_0779_emanet_esya",
@@ -10170,7 +10167,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (5.500 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5.500 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 5.500 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 5.500 yolcu taşıyın."
   },
   {
@@ -10261,8 +10258,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (390 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 390 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (390 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 390 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (390 Kez)."
   },
   {
     "id": "ach_0790_durak_kesfi",
@@ -10365,7 +10362,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (6.150 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 6.150 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 6.150 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 6.150 yolcu taşıyın."
   },
   {
@@ -10456,8 +10453,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (410 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 410 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (410 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 410 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (410 Kez)."
   },
   {
     "id": "ach_0805_durak_kesfi",
@@ -10560,7 +10557,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (6.800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 6.800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 6.800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 6.800 yolcu taşıyın."
   },
   {
@@ -10651,8 +10648,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (430 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 430 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (430 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 430 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (430 Kez)."
   },
   {
     "id": "ach_0820_durak_kesfi",
@@ -10755,7 +10752,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (7.450 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 7.450 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 7.450 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 7.450 yolcu taşıyın."
   },
   {
@@ -10846,8 +10843,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (450 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 450 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (450 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 450 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (450 Kez)."
   },
   {
     "id": "ach_0835_durak_kesfi",
@@ -10950,7 +10947,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (8.100 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 8.100 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 8.100 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 8.100 yolcu taşıyın."
   },
   {
@@ -11041,8 +11038,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (470 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 470 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (470 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 470 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (470 Kez)."
   },
   {
     "id": "ach_0850_durak_kesfi",
@@ -11089,12 +11086,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "totalKm",
-    "targetValue": 3500,
+    "targetValue": 3550,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (3.500 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 3.500 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 3.500 kilometre yol gidin."
+    "title": "Kat Edilen Yol (3.550 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 3.550 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 3.550 kilometre yol gidin."
   },
   {
     "id": "ach_0854_emanet_esya",
@@ -11145,7 +11142,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (8.750 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 8.750 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 8.750 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 8.750 yolcu taşıyın."
   },
   {
@@ -11236,8 +11233,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (490 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 490 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (490 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 490 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (490 Kez)."
   },
   {
     "id": "ach_0865_durak_kesfi",
@@ -11340,7 +11337,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (9.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 9.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 9.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 9.400 yolcu taşıyın."
   },
   {
@@ -11431,8 +11428,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (510 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 510 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (510 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 510 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (510 Kez)."
   },
   {
     "id": "ach_0880_durak_kesfi",
@@ -11535,7 +11532,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (10.050 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10.050 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10.050 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 10.050 yolcu taşıyın."
   },
   {
@@ -11626,8 +11623,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (530 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 530 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (530 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 530 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (530 Kez)."
   },
   {
     "id": "ach_0895_durak_kesfi",
@@ -11674,12 +11671,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "totalKm",
-    "targetValue": 4500,
+    "targetValue": 4450,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (4.500 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 4.500 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 4.500 kilometre yol gidin."
+    "title": "Kat Edilen Yol (4.450 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 4.450 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 4.450 kilometre yol gidin."
   },
   {
     "id": "ach_0899_emanet_esya",
@@ -11730,7 +11727,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (10.700 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10.700 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 10.700 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 10.700 yolcu taşıyın."
   },
   {
@@ -11821,8 +11818,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (550 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 550 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (550 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 550 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (550 Kez)."
   },
   {
     "id": "ach_0910_durak_kesfi",
@@ -11925,7 +11922,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (11.350 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 11.350 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 11.350 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 11.350 yolcu taşıyın."
   },
   {
@@ -12016,8 +12013,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (570 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 570 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (570 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 570 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (570 Kez)."
   },
   {
     "id": "ach_0925_durak_kesfi",
@@ -12120,7 +12117,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (12.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 12.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 12.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 12.000 yolcu taşıyın."
   },
   {
@@ -12211,8 +12208,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (590 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 590 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (590 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 590 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (590 Kez)."
   },
   {
     "id": "ach_0940_durak_kesfi",
@@ -12315,7 +12312,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (13.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 13.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 13.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 13.000 yolcu taşıyın."
   },
   {
@@ -12406,8 +12403,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (610 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 610 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (610 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 610 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (610 Kez)."
   },
   {
     "id": "ach_0955_durak_kesfi",
@@ -12510,7 +12507,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (14.200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 14.200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 14.200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 14.200 yolcu taşıyın."
   },
   {
@@ -12601,8 +12598,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (630 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 630 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (630 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 630 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (630 Kez)."
   },
   {
     "id": "ach_0970_durak_kesfi",
@@ -12705,7 +12702,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (15.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 15.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 15.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 15.400 yolcu taşıyın."
   },
   {
@@ -12796,8 +12793,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (650 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 650 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (650 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 650 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (650 Kez)."
   },
   {
     "id": "ach_0985_durak_kesfi",
@@ -12900,7 +12897,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (16.600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 16.600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 16.600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 16.600 yolcu taşıyın."
   },
   {
@@ -12991,8 +12988,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (670 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 670 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (670 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 670 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (670 Kez)."
   },
   {
     "id": "ach_1000_durak_kesfi",
@@ -13095,7 +13092,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (17.800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 17.800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 17.800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 17.800 yolcu taşıyın."
   },
   {
@@ -13186,8 +13183,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (690 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 690 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (690 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 690 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (690 Kez)."
   },
   {
     "id": "ach_1015_durak_kesfi",
@@ -13290,7 +13287,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (19.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 19.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 19.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 19.000 yolcu taşıyın."
   },
   {
@@ -13381,8 +13378,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (710 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 710 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (710 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 710 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (710 Kez)."
   },
   {
     "id": "ach_1030_durak_kesfi",
@@ -13485,7 +13482,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (20.200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 20.200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 20.200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 20.200 yolcu taşıyın."
   },
   {
@@ -13576,8 +13573,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (730 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 730 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (730 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 730 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (730 Kez)."
   },
   {
     "id": "ach_1045_durak_kesfi",
@@ -13680,7 +13677,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (21.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 21.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 21.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 21.400 yolcu taşıyın."
   },
   {
@@ -13771,8 +13768,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (750 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 750 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (750 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 750 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (750 Kez)."
   },
   {
     "id": "ach_1060_durak_kesfi",
@@ -13875,7 +13872,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (22.600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 22.600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 22.600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 22.600 yolcu taşıyın."
   },
   {
@@ -13966,8 +13963,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (770 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 770 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (770 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 770 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (770 Kez)."
   },
   {
     "id": "ach_1075_durak_kesfi",
@@ -14070,7 +14067,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (23.800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 23.800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 23.800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 23.800 yolcu taşıyın."
   },
   {
@@ -14161,8 +14158,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (790 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 790 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (790 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 790 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (790 Kez)."
   },
   {
     "id": "ach_1090_durak_kesfi",
@@ -14265,7 +14262,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (25.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 25.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 25.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 25.000 yolcu taşıyın."
   },
   {
@@ -14356,8 +14353,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (810 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 810 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (810 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 810 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (810 Kez)."
   },
   {
     "id": "ach_1105_durak_kesfi",
@@ -14460,7 +14457,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (27.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 27.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 27.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 27.000 yolcu taşıyın."
   },
   {
@@ -14551,8 +14548,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (830 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 830 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (830 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 830 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (830 Kez)."
   },
   {
     "id": "ach_1120_durak_kesfi",
@@ -14655,7 +14652,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (29.300 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 29.300 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 29.300 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 29.300 yolcu taşıyın."
   },
   {
@@ -14746,8 +14743,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (850 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 850 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (850 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 850 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (850 Kez)."
   },
   {
     "id": "ach_1135_durak_kesfi",
@@ -14850,7 +14847,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (31.600 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 31.600 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 31.600 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 31.600 yolcu taşıyın."
   },
   {
@@ -14941,8 +14938,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (870 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 870 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (870 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 870 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (870 Kez)."
   },
   {
     "id": "ach_1150_durak_kesfi",
@@ -15045,7 +15042,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (33.900 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 33.900 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 33.900 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 33.900 yolcu taşıyın."
   },
   {
@@ -15136,8 +15133,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (890 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 890 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (890 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 890 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (890 Kez)."
   },
   {
     "id": "ach_1165_durak_kesfi",
@@ -15240,7 +15237,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (36.200 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 36.200 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 36.200 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 36.200 yolcu taşıyın."
   },
   {
@@ -15331,8 +15328,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (910 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 910 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (910 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 910 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (910 Kez)."
   },
   {
     "id": "ach_1180_durak_kesfi",
@@ -15435,7 +15432,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (38.500 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 38.500 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 38.500 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 38.500 yolcu taşıyın."
   },
   {
@@ -15526,8 +15523,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (930 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 930 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (930 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 930 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (930 Kez)."
   },
   {
     "id": "ach_1195_durak_kesfi",
@@ -15630,7 +15627,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (40.800 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 40.800 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 40.800 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 40.800 yolcu taşıyın."
   },
   {
@@ -15721,8 +15718,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (950 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 950 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (950 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 950 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (950 Kez)."
   },
   {
     "id": "ach_1210_durak_kesfi",
@@ -15825,7 +15822,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (43.100 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 43.100 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 43.100 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 43.100 yolcu taşıyın."
   },
   {
@@ -15916,8 +15913,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (970 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 970 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (970 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 970 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (970 Kez)."
   },
   {
     "id": "ach_1225_durak_kesfi",
@@ -15964,12 +15961,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "totalKm",
-    "targetValue": 20000,
+    "targetValue": 19800,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (20.000 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 20.000 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 20.000 kilometre yol gidin."
+    "title": "Kat Edilen Yol (19.800 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 19.800 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 19.800 kilometre yol gidin."
   },
   {
     "id": "ach_1229_emanet_esya",
@@ -16020,7 +16017,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (45.400 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 45.400 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 45.400 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 45.400 yolcu taşıyın."
   },
   {
@@ -16111,8 +16108,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (990 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 990 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (990 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 990 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (990 Kez)."
   },
   {
     "id": "ach_1240_durak_kesfi",
@@ -16215,7 +16212,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (47.700 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 47.700 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 47.700 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 47.700 yolcu taşıyın."
   },
   {
@@ -16306,8 +16303,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.010 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.010 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.010 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.010 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.010 Kez)."
   },
   {
     "id": "ach_1255_durak_kesfi",
@@ -16410,7 +16407,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (50.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 50.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 50.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 50.000 yolcu taşıyın."
   },
   {
@@ -16501,8 +16498,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.030 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.030 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.030 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.030 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.030 Kez)."
   },
   {
     "id": "ach_1270_durak_kesfi",
@@ -16605,7 +16602,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (53.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 53.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 53.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 53.000 yolcu taşıyın."
   },
   {
@@ -16696,8 +16693,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.050 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.050 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.050 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.050 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.050 Kez)."
   },
   {
     "id": "ach_1285_durak_kesfi",
@@ -16800,7 +16797,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (56.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 56.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 56.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 56.000 yolcu taşıyın."
   },
   {
@@ -16891,8 +16888,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.070 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.070 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.070 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.070 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.070 Kez)."
   },
   {
     "id": "ach_1300_durak_kesfi",
@@ -16939,12 +16936,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "totalKm",
-    "targetValue": 25000,
+    "targetValue": 24800,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (25.000 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 25.000 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 25.000 kilometre yol gidin."
+    "title": "Kat Edilen Yol (24.800 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 24.800 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 24.800 kilometre yol gidin."
   },
   {
     "id": "ach_1304_emanet_esya",
@@ -16995,7 +16992,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (59.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 59.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 59.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 59.000 yolcu taşıyın."
   },
   {
@@ -17086,8 +17083,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.090 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.090 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.090 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.090 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.090 Kez)."
   },
   {
     "id": "ach_1315_durak_kesfi",
@@ -17190,7 +17187,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (62.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 62.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 62.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 62.000 yolcu taşıyın."
   },
   {
@@ -17281,8 +17278,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.110 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.110 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.110 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.110 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.110 Kez)."
   },
   {
     "id": "ach_1330_durak_kesfi",
@@ -17385,7 +17382,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (65.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 65.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 65.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 65.000 yolcu taşıyın."
   },
   {
@@ -17476,8 +17473,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.130 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.130 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.130 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.130 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.130 Kez)."
   },
   {
     "id": "ach_1345_durak_kesfi",
@@ -17580,7 +17577,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (68.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 68.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 68.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 68.000 yolcu taşıyın."
   },
   {
@@ -17671,8 +17668,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.150 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.150 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.150 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.150 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.150 Kez)."
   },
   {
     "id": "ach_1360_durak_kesfi",
@@ -17775,7 +17772,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (71.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 71.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 71.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 71.000 yolcu taşıyın."
   },
   {
@@ -17866,8 +17863,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.170 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.170 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.170 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.170 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.170 Kez)."
   },
   {
     "id": "ach_1375_durak_kesfi",
@@ -17914,12 +17911,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "totalKm",
-    "targetValue": 30000,
+    "targetValue": 29800,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (30.000 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 30.000 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 30.000 kilometre yol gidin."
+    "title": "Kat Edilen Yol (29.800 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 29.800 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 29.800 kilometre yol gidin."
   },
   {
     "id": "ach_1379_emanet_esya",
@@ -17970,7 +17967,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (74.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 74.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 74.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 74.000 yolcu taşıyın."
   },
   {
@@ -18061,8 +18058,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.190 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.190 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.190 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.190 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.190 Kez)."
   },
   {
     "id": "ach_1390_durak_kesfi",
@@ -18165,7 +18162,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (77.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 77.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 77.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 77.000 yolcu taşıyın."
   },
   {
@@ -18256,8 +18253,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.210 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.210 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.210 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.210 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.210 Kez)."
   },
   {
     "id": "ach_1405_durak_kesfi",
@@ -18360,7 +18357,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (80.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 80.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 80.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 80.000 yolcu taşıyın."
   },
   {
@@ -18451,8 +18448,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.230 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.230 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.230 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.230 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.230 Kez)."
   },
   {
     "id": "ach_1420_durak_kesfi",
@@ -18555,7 +18552,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (83.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 83.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 83.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 83.000 yolcu taşıyın."
   },
   {
@@ -18646,8 +18643,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.250 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.250 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.250 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.250 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.250 Kez)."
   },
   {
     "id": "ach_1435_durak_kesfi",
@@ -18750,7 +18747,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (86.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 86.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 86.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 86.000 yolcu taşıyın."
   },
   {
@@ -18841,8 +18838,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.270 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.270 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.270 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.270 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.270 Kez)."
   },
   {
     "id": "ach_1450_durak_kesfi",
@@ -18889,12 +18886,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "totalKm",
-    "targetValue": 35000,
+    "targetValue": 34800,
     "category": "Gidilen Yol",
     "icon": "🛣️",
-    "title": "Kat Edilen Yol (35.000 km)",
-    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 35.000 km yol tamamlandığında açılır.",
-    "requirement": "Seferlerde otobüsünüzle toplam en az 35.000 kilometre yol gidin."
+    "title": "Kat Edilen Yol (34.800 km)",
+    "desc": "Şehir içi ve şehirlerarası yollarda otobüsünüzle yol alarak kilometrenizi artırın. Toplam 34.800 km yol tamamlandığında açılır.",
+    "requirement": "Seferlerde otobüsünüzle toplam en az 34.800 kilometre yol gidin."
   },
   {
     "id": "ach_1454_emanet_esya",
@@ -18945,7 +18942,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (89.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 89.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 89.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 89.000 yolcu taşıyın."
   },
   {
@@ -19036,8 +19033,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.290 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.290 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.290 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.290 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.290 Kez)."
   },
   {
     "id": "ach_1465_durak_kesfi",
@@ -19140,7 +19137,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (92.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 92.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 92.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 92.000 yolcu taşıyın."
   },
   {
@@ -19231,8 +19228,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.310 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.310 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.310 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.310 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.310 Kez)."
   },
   {
     "id": "ach_1480_durak_kesfi",
@@ -19335,7 +19332,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Yolcu Taşıma",
     "icon": "👥",
     "title": "Usta Taşımacı (95.000 Yolcu)",
-    "desc": "Durakta durduğunuzda 1 tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 95.000 yolcu bindiğinde bu başarı açılır.",
+    "desc": "Durakta durduğunuzda PageUp (Sayfa Yukarı) tuşuna basarak ön kapıyı açın ve yolcuların binmesini sağlayın. Toplam 95.000 yolcu bindiğinde bu başarı açılır.",
     "requirement": "Duraklarda kapıları açıp yolcuları alarak toplam 95.000 yolcu taşıyın."
   },
   {
@@ -19426,8 +19423,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Engelli Rampası",
     "icon": "♿",
     "title": "Engelli Rampası Kullanımı (1.330 Kez)",
-    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U veya R tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.330 kez uygulandığında açılır.",
-    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U veya R tuşuyla rampayı açıp kapatın (1.330 Kez)."
+    "desc": "Durakta bekleyen tekerlekli sandalyeli yolcular için U tuşuyla rampayı açın. Yolcu binince tekrar kapatıp sefere devam edin. Toplam 1.330 kez uygulandığında açılır.",
+    "requirement": "Durakta tekerlekli sandalyeli yolcu gördükten sonra U tuşuyla rampayı açıp kapatın (1.330 Kez)."
   },
   {
     "id": "ach_1495_durak_kesfi",
@@ -20474,13 +20471,13 @@ const ACHIEVEMENTS_1500 = [
     "difficulty": 1575,
     "tier": 5,
     "tierName": "Efsane",
-    "stat": "companyTotalInstitutionLevels",
-    "targetValue": 21,
+    "stat": "companyFullInfrastructure",
+    "targetValue": 1,
     "category": "Kurum Binaları",
     "icon": "🏆",
     "title": "Kusursuz Altyapı Standartları",
-    "desc": "Türkiye'nin en modern otobüs terminal ve garaj tesislerini kurun.",
-    "requirement": "Tüm kurum binalarını en üst seviyeye çıkartın."
+    "desc": "Türkiye'nin en modern otobüs terminal ve garaj tesislerini kurun: 7 kurum binasını Seviye 3'e çıkarın, 5 otogar şubesini ve 4 genel merkez (HQ) yatırımını eksiksiz tamamlayın.",
+    "requirement": "Tüm 7 kurum binasını Seviye 3 yapın, 5 büyük otogar şubesini açın ve 4 HQ yükseltmesini tamamlayın."
   },
   {
     "id": "ach_1576_sofor_ilk_kaptan",
@@ -20818,7 +20815,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🔑",
     "title": "İlk Kontak & Gösterge Kontrolü",
     "desc": "Sefer menüsünden bir rota seçip kontağı çevirin ve göstergeleri kontrol ederek sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 2 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1602_start_morningStartsCount_1",
@@ -20831,7 +20828,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌅",
     "title": "Sabah Vardiyası Kalkışı",
     "desc": "Sabah saat 06:00 ile 10:00 arasında ilk durağa yanaşıp sabah seferini başlatın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 1 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1603_start_airPressureFullStarts_1",
@@ -20844,7 +20841,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💨",
     "title": "Hava Kompresörü Hazır",
     "desc": "Otobüsün hava tankını en az 115 PSI tam basınca ulaştırarak sefere çıkın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 1 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1604_start_fullFuelStartsCount_1",
@@ -20856,8 +20853,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Sefer Başlangıcı & Hazırlık",
     "icon": "⛽",
     "title": "Dolu Depo ile İlk Çıkış",
-    "desc": "Yakıt deponuz en az %90 doluyken güvenle ilk sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 1 kez bu şartla sefere start verin."
+    "desc": "Yakıt deponuz en az %88 doluyken güvenle ilk sefere başlayın.",
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1605_start_routesStartedCount_3",
@@ -20870,7 +20867,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🪧",
     "title": "Hat Tabelası & Güzergah Tanıtımı",
     "desc": "Dijital hat tabelasını ayarlayıp toplam 3 farklı sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 3 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1606_start_routesStartedCount_4",
@@ -20883,7 +20880,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚌",
     "title": "Perona İlk Yanaşma",
     "desc": "İlk durağa düzenli yanaşarak toplam 4 sefer başlatın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 4 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1607_start_routesStartedCount_5",
@@ -20896,7 +20893,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💳",
     "title": "Takograf Kartı Aktif",
     "desc": "Resmi sürüş kaydınızı açıp toplam 5 seferin startını verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 5 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1608_start_cleanStartsCount_2",
@@ -20909,7 +20906,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "✨",
     "title": "Temiz Otobüsle Yola Çıkış",
     "desc": "Otobüsünüz %100 sağlığa sahipken hasarsız şekilde 2 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1609_start_morningStartsCount_2",
@@ -20922,7 +20919,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "☀️",
     "title": "Sabah Güneşiyle İkinci Vardiya",
     "desc": "Sabah saatlerinde toplam 2 kez sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1610_start_routesStartedCount_6",
@@ -20935,7 +20932,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⏱️",
     "title": "İki Sefer Arası Hızlı Hazırlık",
     "desc": "Toplam 6 sefer başlatarak peron hazırlık hızınızı kanıtlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 6 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 6 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1611_start_routesStartedCount_7",
@@ -20948,7 +20945,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🪞",
     "title": "Sol Ayna ve Kör Nokta Emniyeti",
     "desc": "Aynalarınızı kontrol edip toplam 7 sefere güvenle başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 7 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 7 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1612_start_airPressureFullStarts_2",
@@ -20961,7 +20958,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🟢",
     "title": "Basınç Göstergesi Yeşil Bölgede",
     "desc": "Hava basıncını tam doldurarak toplam 2 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1613_start_fullFuelStartsCount_2",
@@ -20974,7 +20971,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⛽",
     "title": "Depo Emniyeti & Dolu Başlangıç",
     "desc": "Dolu depoyla toplam 2 kez sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1614_start_cleanStartsCount_3",
@@ -20987,7 +20984,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛡️",
     "title": "İntizamlı Başlangıç Disiplini",
     "desc": "Kazasız, tertemiz araçla toplam 3 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1615_start_morningStartsCount_3",
@@ -21000,7 +20997,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "☕",
     "title": "Erken Sabah Seferi Hazırlığı",
     "desc": "Sabahın erken saatlerinde 3 kez sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1616_start_routesStartedCount_8",
@@ -21013,7 +21010,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚪",
     "title": "Kapı Fitilleri & Kilit Testi",
     "desc": "Kapıları test ederek toplam 8 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 8 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 8 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1617_start_routesStartedCount_9",
@@ -21026,7 +21023,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🏬",
     "title": "Peron Başlangıç Rutini",
     "desc": "Toplam 9 sefere zamanında start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 9 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 9 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1618_start_routesStartedCount_10",
@@ -21039,7 +21036,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👥",
     "title": "İlk Durak Yolcu Karşılama",
     "desc": "Başlangıç durağında yolcuları karşılayarak toplam 10 sefer başlatın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 10 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 10 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1619_start_routesStartedCount_11",
@@ -21052,7 +21049,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌧️",
     "title": "Ön Cam ve Silecek Hazırlığı",
     "desc": "Görüş açısını netleştirip toplam 11 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 11 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 11 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1620_start_routesStartedCount_12",
@@ -21065,7 +21062,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛑",
     "title": "Fren Testi ile Çıkış",
     "desc": "Fren pedalını yoklayıp toplam 12 sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 12 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 12 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1621_start_routesStartedCount_13",
@@ -21078,7 +21075,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⚙️",
     "title": "Retarder Kolu Hazırlığı",
     "desc": "Retarder kademesini kontrol ederek toplam 13 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 13 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 13 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1622_start_routesStartedCount_14",
@@ -21091,7 +21088,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🔢",
     "title": "Dijital Hat Kodlaması",
     "desc": "Hat numarasını IBIS ekranına vererek toplam 14 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 14 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 14 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1623_start_routesStartedCount_15",
@@ -21104,7 +21101,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "📋",
     "title": "İntizamlı Çıkış İzni",
     "desc": "Başharekât izniyle toplam 15 sefer başlatın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 15 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 15 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1624_start_routesStartedCount_16",
@@ -21117,7 +21114,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🏢",
     "title": "Garajdan Hareket Vakti",
     "desc": "Garaj kapısından çıkıp toplam 16 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 16 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 16 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1625_start_routesStartedCount_17",
@@ -21130,7 +21127,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👔",
     "title": "Düzenli Vardiya Başlangıcı",
     "desc": "Kaptan disipliniyle toplam 17 kez kontağı çevirin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 17 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 17 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1626_start_airPressureFullStarts_3",
@@ -21143,7 +21140,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💨",
     "title": "Hava Tankı Emniyeti (3. Kez)",
     "desc": "Tam hava basıncıyla toplam 3 kez sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1627_start_fullFuelStartsCount_3",
@@ -21156,7 +21153,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⛽",
     "title": "Dolu Depoyla Güvenli Sürüş (3. Kez)",
     "desc": "Dolu depoyla toplam 3 kez sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1628_start_cleanStartsCount_4",
@@ -21169,7 +21166,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛡️",
     "title": "Kazasız Başlangıç Geleneği",
     "desc": "Sıfır hasarlı otobüsle toplam 4 kez sefere çıkın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1629_start_morningStartsCount_4",
@@ -21182,7 +21179,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌅",
     "title": "Sabah Seferleri Şefi (4. Kez)",
     "desc": "Sabah saatlerinde toplam 4 sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1630_start_routesStartedCount_18",
@@ -21195,7 +21192,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🔔",
     "title": "Peron Çıkış Sinyali",
     "desc": "Sinyal verip perondan ayrılarak toplam 18 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 18 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 18 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1631_start_routesStartedCount_19",
@@ -21208,7 +21205,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💺",
     "title": "Yolcu Konforuna Hazır Kabin",
     "desc": "Klimayı ve koltukları hazırlayıp toplam 19 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 19 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 19 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1632_start_routesStartedCount_20",
@@ -21221,7 +21218,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Kaptan Koltuğunda 20. Sefer",
     "desc": "Direksiyon başına geçip toplam 20 sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 20 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 20 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1633_start_routesStartedCount_21",
@@ -21234,7 +21231,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛞",
     "title": "Lastik Basınç ve Diş Kontrolü",
     "desc": "Yürüyen aksamı kontrol edip toplam 21 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 21 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 21 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1634_start_routesStartedCount_22",
@@ -21247,7 +21244,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "☀️",
     "title": "Gündüz Seferleri Harekâtı",
     "desc": "Gündüz saatlerinde toplam 22 sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 22 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 22 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1635_start_routesStartedCount_23",
@@ -21260,7 +21257,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🔋",
     "title": "Akü ve Marş Dinamosu Testi",
     "desc": "Tek marşta çalıştırıp toplam 23 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 23 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 23 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1636_start_airPressureFullStarts_4",
@@ -21273,7 +21270,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💨",
     "title": "Hava Tankı Doldurma Rutini (4. Kez)",
     "desc": "Tam basınçla toplam 4 kez sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1637_start_fullFuelStartsCount_4",
@@ -21286,7 +21283,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⛽",
     "title": "Dolu Depoyla 4. Sefer Çıkışı",
     "desc": "Dolu yakıtla toplam 4 sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1638_start_cleanStartsCount_5",
@@ -21299,7 +21296,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "✨",
     "title": "Hasarsız Araçla 5. Çıkış",
     "desc": "Tertemiz otobüsle toplam 5 kez sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1639_start_morningStartsCount_5",
@@ -21312,7 +21309,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌅",
     "title": "Sabah 5. Vardiya Kalkışı",
     "desc": "Sabah saatlerinde 5. kez sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1640_start_routesStartedCount_24",
@@ -21325,7 +21322,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚍",
     "title": "Perondan Düzenli Ayrılış",
     "desc": "Toplam 24 sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 24 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 24 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1641_start_routesStartedCount_25",
@@ -21338,7 +21335,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🎖️",
     "title": "Kaptan Masasında 25. Başlangıç",
     "desc": "Toplam 25 sefere başarıyla başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 25 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 25 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1642_start_routesStartedCount_26",
@@ -21351,7 +21348,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🎚️",
     "title": "Süspansiyon Seviye Ayarı",
     "desc": "Körükleri dengeleyip toplam 26 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 26 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 26 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1643_start_routesStartedCount_27",
@@ -21364,7 +21361,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌡️",
     "title": "Radyatör ve Soğutma Kontrolü",
     "desc": "Motor hararetini kontrol edip toplam 27 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 27 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 27 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1644_start_airPressureFullStarts_5",
@@ -21377,7 +21374,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💨",
     "title": "Hava Basıncı 5. Tam Çıkış",
     "desc": "Hava basıncını 115+ PSI yaparak toplam 5 kez sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1645_start_fullFuelStartsCount_5",
@@ -21390,7 +21387,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⛽",
     "title": "5. Dolu Depo Başlangıcı",
     "desc": "Dolu depoyla toplam 5 sefere start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1646_start_cleanStartsCount_6",
@@ -21403,7 +21400,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛡️",
     "title": "Hasarsız Araçla 6. Başlangıç",
     "desc": "Hasarsız araçla toplam 6 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 6 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 6 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1647_start_morningStartsCount_6",
@@ -21416,7 +21413,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "☀️",
     "title": "Sabah Seferi 6. Vardiya",
     "desc": "Sabah saatlerinde toplam 6 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 6 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 6 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1648_start_routesStartedCount_28",
@@ -21429,7 +21426,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚦",
     "title": "Otogar Çıkış Kavşağı Emniyeti",
     "desc": "Kavşaktan dikkatle çıkarak toplam 28 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 28 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 28 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1649_start_routesStartedCount_29",
@@ -21442,7 +21439,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⏱️",
     "title": "Zaman Çizelgesine Uyumlu Çıkış",
     "desc": "Vaktinde perondan ayrılarak toplam 29 sefere başlayın.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 29 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 29 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1650_start_routesStartedCount_30",
@@ -21455,7 +21452,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⭐",
     "title": "30. Sefer Başlatma Başarısı",
     "desc": "Toplam 30 sefere başarıyla start verin.",
-    "requirement": "Sefere başlarken gerekli hazırlıkları tamamlayıp toplam 30 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüzün sefer hazırlıklarını tamamlayıp toplam 30 kez sefere başlangıç (start) verin."
   },
   {
     "id": "ach_1651_start_intercityStartsCount_1",
@@ -21468,7 +21465,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası İlk Çıkış",
     "desc": "Şehirlerarası bir hat seçip otogar peronundan uzun yol seferine başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 1 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1652_start_nightStartsCount_1",
@@ -21481,7 +21478,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece Nöbetine Bismillah",
     "desc": "Gece karanlığında farları yakıp ilk gece seferini başlatın.",
-    "requirement": "Farklı araç ve koşullarda toplam 1 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1653_start_rainSnowStartsCount_1",
@@ -21494,7 +21491,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌧️",
     "title": "Yağmurlu Havada Silecek Testi",
     "desc": "Yağmurlu veya karlı havada silecekleri çalıştırarak sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 1 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1654_start_midibusStartsCount_1",
@@ -21507,7 +21504,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚐",
     "title": "Midibüs ile Hatta Çıkış",
     "desc": "Küçük sınıf Otokar Sultan veya minibüs ile ilk sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 1 kez bu şartla sefere start verin."
+    "requirement": "Midibüs sınıfı (küçük boy) bir otobüsle toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1655_start_soloStartsCount_1",
@@ -21520,7 +21517,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚌",
     "title": "Solo Otobüsle Peron Kalkışı",
     "desc": "Standart 12 metre Kent LF solo otobüsle sefere start verin.",
-    "requirement": "Farklı araç ve koşullarda toplam 1 kez bu şartla sefere start verin."
+    "requirement": "12 metre Solo şehir içi otobüsle toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1656_start_articulatedStartsCount_1",
@@ -21533,7 +21530,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle Dev Kalkış",
     "desc": "18 metrelik körüklü otobüsün körüğünü düzeltip ilk sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 1 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1657_start_coachStartsCount_1",
@@ -21546,7 +21543,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Şehirlerarası Travego ile İlk Peron",
     "desc": "Lüks şehirlerarası otobüsle perondan ilk çıkışınızı yapın.",
-    "requirement": "Farklı araç ve koşullarda toplam 1 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 1 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1658_start_intercityStartsCount_2",
@@ -21559,7 +21556,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 2. Peron Çıkışı",
     "desc": "Şehirlerarası perondan toplam 2. kez uzun yol seferine başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1659_start_nightStartsCount_2",
@@ -21572,7 +21569,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌃",
     "title": "Gece Nöbetinde 2. Başlangıç",
     "desc": "Gece saatlerinde toplam 2. kez sefere start verin.",
-    "requirement": "Farklı araç ve koşullarda toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1660_start_rainSnowStartsCount_2",
@@ -21585,7 +21582,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌧️",
     "title": "Yağmur Altında 2. Sefer Çıkışı",
     "desc": "Yağışlı havada toplam 2. kez sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1661_start_midibusStartsCount_2",
@@ -21598,7 +21595,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚐",
     "title": "Midibüsle 2. Sefer Başlangıcı",
     "desc": "Midibüs ile toplam 2 sefere start verin.",
-    "requirement": "Farklı araç ve koşullarda toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Midibüs sınıfı (küçük boy) bir otobüsle toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1662_start_soloStartsCount_2",
@@ -21611,7 +21608,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚌",
     "title": "Solo Otobüsle 2. Peron Çıkışı",
     "desc": "Solo otobüs ile toplam 2 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 2 kez bu şartla sefere start verin."
+    "requirement": "12 metre Solo şehir içi otobüsle toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1663_start_articulatedStartsCount_2",
@@ -21624,7 +21621,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 2. Sefer Çıkışı",
     "desc": "Körüklü otobüs ile toplam 2 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 2 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1664_start_coachStartsCount_2",
@@ -21637,7 +21634,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 2. Çıkış",
     "desc": "Lüks otobüsle toplam 2 kez sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 2 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 2 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1665_start_intercityStartsCount_3",
@@ -21650,7 +21647,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 3. Terminal Çıkışı",
     "desc": "Şehirlerarası hatta toplam 3 sefere start verin.",
-    "requirement": "Farklı araç ve koşullarda toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1666_start_nightStartsCount_3",
@@ -21663,7 +21660,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece Vardiyası 3. Çıkış",
     "desc": "Gece saatlerinde toplam 3 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1667_start_rainSnowStartsCount_3",
@@ -21676,7 +21673,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "❄️",
     "title": "Karlı Yolda 3. Başlangıç",
     "desc": "Karlı veya yağmurlu havada toplam 3 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1668_start_midibusStartsCount_3",
@@ -21689,7 +21686,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚐",
     "title": "Midibüs ile 3. Sefer Başlangıcı",
     "desc": "Midibüs ile toplam 3 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Midibüs sınıfı (küçük boy) bir otobüsle toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1669_start_soloStartsCount_3",
@@ -21702,7 +21699,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚌",
     "title": "Solo Otobüsle 3. Sefer",
     "desc": "Solo otobüs ile toplam 3 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 3 kez bu şartla sefere start verin."
+    "requirement": "12 metre Solo şehir içi otobüsle toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1670_start_articulatedStartsCount_3",
@@ -21715,7 +21712,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 3. Sefer",
     "desc": "Körüklü otobüs ile toplam 3 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 3 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1671_start_coachStartsCount_3",
@@ -21728,7 +21725,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 3. Sefer",
     "desc": "Lüks otobüsle toplam 3 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 3 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 3 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1672_start_intercityStartsCount_4",
@@ -21741,7 +21738,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 4. Terminal Çıkışı",
     "desc": "Şehirlerarası hatta toplam 4 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1673_start_nightStartsCount_4",
@@ -21754,7 +21751,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌃",
     "title": "Gece Nöbetinde 4. Başlangıç",
     "desc": "Gece saatlerinde toplam 4 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1674_start_rainSnowStartsCount_4",
@@ -21767,7 +21764,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌧️",
     "title": "Yağışlı Havada 4. Çıkış",
     "desc": "Yağış altında toplam 4 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1675_start_midibusStartsCount_4",
@@ -21780,7 +21777,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚐",
     "title": "Midibüs ile 4. Sefer",
     "desc": "Midibüs ile toplam 4 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Midibüs sınıfı (küçük boy) bir otobüsle toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1676_start_soloStartsCount_4",
@@ -21793,7 +21790,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚌",
     "title": "Solo Otobüsle 4. Sefer",
     "desc": "Solo otobüs ile toplam 4 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 4 kez bu şartla sefere start verin."
+    "requirement": "12 metre Solo şehir içi otobüsle toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1677_start_articulatedStartsCount_4",
@@ -21806,7 +21803,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 4. Sefer",
     "desc": "Körüklü otobüs ile toplam 4 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 4 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1678_start_coachStartsCount_4",
@@ -21819,7 +21816,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 4. Sefer",
     "desc": "Lüks otobüsle toplam 4 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 4 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 4 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1679_start_intercityStartsCount_5",
@@ -21832,7 +21829,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 5. Terminal Çıkışı",
     "desc": "Şehirlerarası hatta toplam 5 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1680_start_nightStartsCount_5",
@@ -21845,7 +21842,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece 5. Vardiya Başlangıcı",
     "desc": "Gece saatlerinde toplam 5 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1681_start_rainSnowStartsCount_5",
@@ -21858,7 +21855,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "❄️",
     "title": "Yağmur/Kar 5. Başlangıç",
     "desc": "Zorlu hava koşullarında toplam 5 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1682_start_midibusStartsCount_5",
@@ -21871,7 +21868,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚐",
     "title": "Midibüs ile 5. Sefer",
     "desc": "Midibüs ile toplam 5 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Midibüs sınıfı (küçük boy) bir otobüsle toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1683_start_soloStartsCount_5",
@@ -21884,7 +21881,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚌",
     "title": "Solo Otobüsle 5. Sefer",
     "desc": "Solo otobüs ile toplam 5 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 5 kez bu şartla sefere start verin."
+    "requirement": "12 metre Solo şehir içi otobüsle toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1684_start_articulatedStartsCount_5",
@@ -21897,7 +21894,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 5. Sefer",
     "desc": "Körüklü otobüs ile toplam 5 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 5 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1685_start_coachStartsCount_5",
@@ -21910,7 +21907,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 5. Sefer",
     "desc": "Lüks otobüsle toplam 5 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 5 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 5 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1686_start_intercityStartsCount_6",
@@ -21923,7 +21920,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 6. Peron Çıkışı",
     "desc": "Şehirlerarası hatta toplam 6 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 6 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 6 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1687_start_nightStartsCount_6",
@@ -21936,7 +21933,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌃",
     "title": "Gece 6. Vardiya Çıkışı",
     "desc": "Gece saatlerinde toplam 6 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 6 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 6 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1688_start_rainSnowStartsCount_6",
@@ -21949,7 +21946,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌧️",
     "title": "Yağmur Altında 6. Çıkış",
     "desc": "Yağışlı havada toplam 6 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 6 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 6 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1689_start_intercityStartsCount_7",
@@ -21962,7 +21959,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 7. Peron Çıkışı",
     "desc": "Şehirlerarası hatta toplam 7 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 7 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 7 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1690_start_nightStartsCount_7",
@@ -21975,7 +21972,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece 7. Vardiya Çıkışı",
     "desc": "Gece saatlerinde toplam 7 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 7 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 7 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1691_start_rainSnowStartsCount_7",
@@ -21988,7 +21985,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌧️",
     "title": "Yağmur Altında 7. Çıkış",
     "desc": "Yağışlı havada toplam 7 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 7 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 7 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1692_start_intercityStartsCount_8",
@@ -22001,7 +21998,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 8. Peron Çıkışı",
     "desc": "Şehirlerarası hatta toplam 8 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 8 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 8 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1693_start_nightStartsCount_8",
@@ -22014,7 +22011,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌃",
     "title": "Gece 8. Vardiya Çıkışı",
     "desc": "Gece saatlerinde toplam 8 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 8 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 8 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1694_start_intercityStartsCount_9",
@@ -22027,7 +22024,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 9. Peron Çıkışı",
     "desc": "Şehirlerarası hatta toplam 9 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 9 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 9 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1695_start_nightStartsCount_9",
@@ -22040,7 +22037,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece 9. Vardiya Çıkışı",
     "desc": "Gece saatlerinde toplam 9 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 9 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 9 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1696_start_intercityStartsCount_10",
@@ -22053,7 +22050,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 10. Peron Çıkışı",
     "desc": "Şehirlerarası hatta toplam 10 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 10 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 10 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1697_start_nightStartsCount_10",
@@ -22066,7 +22063,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌃",
     "title": "Gece 10. Vardiya Çıkışı",
     "desc": "Gece saatlerinde toplam 10 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 10 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 10 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1698_start_rainSnowStartsCount_8",
@@ -22079,7 +22076,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌧️",
     "title": "Yağmur Altında 8. Çıkış",
     "desc": "Yağışlı havada toplam 8 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 8 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 8 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1699_start_articulatedStartsCount_6",
@@ -22092,7 +22089,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 6. Sefer",
     "desc": "Körüklü otobüs ile toplam 6 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 6 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 6 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1700_start_coachStartsCount_6",
@@ -22105,7 +22102,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 6. Sefer",
     "desc": "Lüks otobüsle toplam 6 sefere başlayın.",
-    "requirement": "Farklı araç ve koşullarda toplam 6 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 6 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1701_start_rainSnowStartsCount_10",
@@ -22118,7 +22115,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "❄️",
     "title": "Kış Fırtınasında Sefer Başlatma",
     "desc": "Kar veya yoğun yağmur altında toplam 10 kez sefere start verin.",
-    "requirement": "Zorlu koşullarda toplam 10 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 10 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1702_start_nightStartsCount_12",
@@ -22131,7 +22128,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece Yarısı Nöbetçisi (12 Gece)",
     "desc": "Gece karanlığında toplam 12 kez sefere start verin.",
-    "requirement": "Zorlu koşullarda toplam 12 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 12 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1703_start_intercityStartsCount_12",
@@ -22144,7 +22141,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 12 Terminal Çıkışı",
     "desc": "Şehirlerarası otogarlardan toplam 12 kez uzun yol seferine başlayın.",
-    "requirement": "Zorlu koşullarda toplam 12 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 12 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1704_start_articulatedStartsCount_8",
@@ -22157,7 +22154,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Dev Filo (8 Başlangıç)",
     "desc": "18 metre körüklü otobüsle toplam 8 sefere start verin.",
-    "requirement": "Zorlu koşullarda toplam 8 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 8 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1705_start_coachStartsCount_8",
@@ -22170,7 +22167,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Peron Kaptanı (8 Başlangıç)",
     "desc": "Travego / Tourismo ile toplam 8 şehirlerarası sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 8 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 8 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1706_start_airPressureFullStarts_8",
@@ -22183,7 +22180,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💨",
     "title": "Tam Basınçla 8 Kusursuz Kalkış",
     "desc": "115+ PSI tam hava basıncıyla toplam 8 kez sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 8 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 8 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1707_start_fullFuelStartsCount_8",
@@ -22195,8 +22192,8 @@ const ACHIEVEMENTS_1500 = [
     "category": "Zorlu Şartlarda Sefer Başlatma",
     "icon": "⛽",
     "title": "Dolu Depoyla 8 Sefer Çıkışı",
-    "desc": "En az %90 dolu depoyla toplam 8 kez sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 8 kez bu şartla sefere start verin."
+    "desc": "En az %88 dolu depoyla toplam 8 kez sefere başlayın.",
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 8 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1708_start_cleanStartsCount_10",
@@ -22209,7 +22206,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛡️",
     "title": "Hasarsız Araçla 10 Çıkış",
     "desc": "%100 kondisyonda tertemiz otobüsle toplam 10 kez sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 10 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 10 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1709_start_morningStartsCount_10",
@@ -22222,7 +22219,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌅",
     "title": "Sabah Seferi Disiplini (10 Vardiya)",
     "desc": "Sabah saat 06:00-10:00 arasında toplam 10 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 10 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 10 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1710_start_intercityStartsCount_14",
@@ -22235,7 +22232,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 14 Terminal Çıkışı",
     "desc": "Şehirlerarası otogarlardan toplam 14 kez sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 14 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 14 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1711_start_nightStartsCount_14",
@@ -22248,7 +22245,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌃",
     "title": "Gece Seferi Ustası (14 Gece)",
     "desc": "Gece saatlerinde toplam 14 kez sefere start verin.",
-    "requirement": "Zorlu koşullarda toplam 14 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 14 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1712_start_rainSnowStartsCount_12",
@@ -22261,7 +22258,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌧️",
     "title": "Yağmur/Kar 12 Çıkış",
     "desc": "Zorlu yağışlı havalarda toplam 12 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 12 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 12 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1713_start_articulatedStartsCount_10",
@@ -22274,7 +22271,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 10 Çıkış",
     "desc": "Körüklü otobüsle toplam 10 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 10 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 10 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1714_start_coachStartsCount_10",
@@ -22287,7 +22284,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 10 Çıkış",
     "desc": "Lüks şehirlerarası otobüsle toplam 10 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 10 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 10 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1715_start_airPressureFullStarts_10",
@@ -22300,7 +22297,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💨",
     "title": "Tam Basınçla 10 Çıkış",
     "desc": "115+ PSI basınçla toplam 10 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 10 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 10 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1716_start_fullFuelStartsCount_10",
@@ -22313,7 +22310,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⛽",
     "title": "Dolu Depoyla 10 Çıkış",
     "desc": "Dolu depoyla toplam 10 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 10 kez bu şartla sefere start verin."
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 10 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1717_start_cleanStartsCount_12",
@@ -22326,7 +22323,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛡️",
     "title": "Hasarsız Araçla 12 Çıkış",
     "desc": "Sıfır hasarla toplam 12 kez sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 12 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 12 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1718_start_morningStartsCount_12",
@@ -22339,7 +22336,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌅",
     "title": "Sabah Seferleri 12 Çıkış",
     "desc": "Sabah saatlerinde toplam 12 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 12 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 12 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1719_start_intercityStartsCount_16",
@@ -22352,7 +22349,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 16 Terminal Çıkışı",
     "desc": "Şehirlerarası hatta toplam 16 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 16 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 16 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1720_start_nightStartsCount_16",
@@ -22365,7 +22362,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece Nöbetinde 16 Başlangıç",
     "desc": "Gece saatlerinde toplam 16 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 16 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 16 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1721_start_rainSnowStartsCount_14",
@@ -22378,7 +22375,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "❄️",
     "title": "Yağışlı Havada 14 Çıkış",
     "desc": "Kış/yağış şartlarında toplam 14 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 14 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 14 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1722_start_articulatedStartsCount_12",
@@ -22391,7 +22388,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 12 Çıkış",
     "desc": "Körüklü araçla toplam 12 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 12 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 12 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1723_start_coachStartsCount_12",
@@ -22404,7 +22401,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 12 Çıkış",
     "desc": "Lüks araçla toplam 12 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 12 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 12 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1724_start_airPressureFullStarts_12",
@@ -22417,7 +22414,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💨",
     "title": "Tam Basınçla 12 Çıkış",
     "desc": "Tam basınçla toplam 12 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 12 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 12 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1725_start_fullFuelStartsCount_12",
@@ -22430,7 +22427,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⛽",
     "title": "Dolu Depoyla 12 Çıkış",
     "desc": "Dolu depoyla toplam 12 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 12 kez bu şartla sefere start verin."
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 12 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1726_start_cleanStartsCount_15",
@@ -22443,7 +22440,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛡️",
     "title": "Hasarsız Araçla 15 Çıkış",
     "desc": "Hasarsız otobüsle toplam 15 kez sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 15 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 15 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1727_start_morningStartsCount_15",
@@ -22456,7 +22453,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌅",
     "title": "Sabah Vardiyasında 15 Çıkış",
     "desc": "Sabah saatlerinde toplam 15 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 15 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 15 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1728_start_intercityStartsCount_18",
@@ -22469,7 +22466,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 18 Terminal Çıkışı",
     "desc": "Şehirlerarası hatta toplam 18 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 18 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 18 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1729_start_nightStartsCount_18",
@@ -22482,7 +22479,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece Vardiyasında 18 Başlangıç",
     "desc": "Gece saatlerinde toplam 18 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 18 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 18 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1730_start_rainSnowStartsCount_16",
@@ -22495,7 +22492,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌧️",
     "title": "Yağmur/Kar 16 Çıkış",
     "desc": "Zorlu yağış şartlarında toplam 16 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 16 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 16 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1731_start_articulatedStartsCount_15",
@@ -22508,7 +22505,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 15 Çıkış",
     "desc": "Körüklü otobüsle toplam 15 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 15 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 15 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1732_start_coachStartsCount_15",
@@ -22521,7 +22518,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 15 Çıkış",
     "desc": "Lüks otobüsle toplam 15 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 15 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 15 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1733_start_airPressureFullStarts_15",
@@ -22534,7 +22531,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💨",
     "title": "Tam Basınçla 15 Çıkış",
     "desc": "115+ PSI basınçla toplam 15 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 15 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 15 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1734_start_fullFuelStartsCount_15",
@@ -22547,7 +22544,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⛽",
     "title": "Dolu Depoyla 15 Çıkış",
     "desc": "Dolu depoyla toplam 15 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 15 kez bu şartla sefere start verin."
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 15 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1735_start_cleanStartsCount_18",
@@ -22560,7 +22557,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛡️",
     "title": "Hasarsız Araçla 18 Çıkış",
     "desc": "Sıfır hasarla toplam 18 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 18 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 18 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1736_start_morningStartsCount_18",
@@ -22573,7 +22570,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌅",
     "title": "Sabah Seferlerinde 18 Çıkış",
     "desc": "Sabah saatlerinde toplam 18 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 18 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 18 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1737_start_intercityStartsCount_20",
@@ -22586,7 +22583,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 20 Terminal Çıkışı",
     "desc": "Şehirlerarası hatta toplam 20 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 20 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 20 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1738_start_nightStartsCount_20",
@@ -22599,7 +22596,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece Nöbetinde 20 Başlangıç",
     "desc": "Gece saatlerinde toplam 20 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 20 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 20 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1739_start_rainSnowStartsCount_18",
@@ -22612,7 +22609,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "❄️",
     "title": "Yağmur/Kar 18 Çıkış",
     "desc": "Zorlu kış şartlarında toplam 18 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 18 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 18 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1740_start_articulatedStartsCount_18",
@@ -22625,7 +22622,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 18 Çıkış",
     "desc": "Körüklü otobüsle toplam 18 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 18 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 18 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1741_start_coachStartsCount_18",
@@ -22638,7 +22635,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 18 Çıkış",
     "desc": "Lüks otobüsle toplam 18 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 18 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 18 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1742_start_airPressureFullStarts_20",
@@ -22651,7 +22648,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "💨",
     "title": "Tam Basınçla 20 Çıkış",
     "desc": "115+ PSI basınçla toplam 20 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 20 kez bu şartla sefere start verin."
+    "requirement": "Hava kompresörü basıncı tam doluyken (115+ PSI) toplam 20 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1743_start_fullFuelStartsCount_20",
@@ -22664,7 +22661,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "⛽",
     "title": "Dolu Depoyla 20 Çıkış",
     "desc": "Dolu depoyla toplam 20 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 20 kez bu şartla sefere start verin."
+    "requirement": "Yakıt deposu en az %88 doluyken toplam 20 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1744_start_cleanStartsCount_20",
@@ -22677,7 +22674,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛡️",
     "title": "Hasarsız Araçla 20 Çıkış",
     "desc": "Sıfır hasarla toplam 20 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 20 kez bu şartla sefere start verin."
+    "requirement": "Otobüsünüz %100 sağlam ve hasarsız durumdayken toplam 20 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1745_start_morningStartsCount_20",
@@ -22690,7 +22687,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌅",
     "title": "Sabah Seferlerinde 20 Çıkış",
     "desc": "Sabah saatlerinde toplam 20 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 20 kez bu şartla sefere start verin."
+    "requirement": "Sabah vardiyasında (06:00 - 10:00 saatleri arasında) toplam 20 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1746_start_intercityStartsCount_25",
@@ -22703,7 +22700,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🛣️",
     "title": "Şehirlerarası 25 Terminal Çıkışı",
     "desc": "Şehirlerarası otogarlardan toplam 25 kez sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 25 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası terminal hatlarında toplam 25 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1747_start_nightStartsCount_25",
@@ -22716,7 +22713,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🌙",
     "title": "Gece Vardiyasında 25 Başlangıç",
     "desc": "Gece karanlığında toplam 25 sefere start verin.",
-    "requirement": "Zorlu koşullarda toplam 25 kez bu şartla sefere start verin."
+    "requirement": "Gece vardiyasında (19:00 - 06:00 saatleri arasında) toplam 25 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1748_start_rainSnowStartsCount_20",
@@ -22729,7 +22726,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "❄️",
     "title": "Kış Fırtınasında 20 Çıkış",
     "desc": "Kar ve fırtınada toplam 20 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 20 kez bu şartla sefere start verin."
+    "requirement": "Yağmurlu veya karlı hava koşullarında toplam 20 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1749_start_articulatedStartsCount_20",
@@ -22742,7 +22739,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🚎",
     "title": "Körüklü Otobüsle 20 Çıkış",
     "desc": "18 metrelik körüklü ile toplam 20 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 20 kez bu şartla sefere start verin."
+    "requirement": "18 metre Körüklü belediye otobüsüyle toplam 20 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1750_start_coachStartsCount_20",
@@ -22755,7 +22752,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Lüks Otobüsle 20 Çıkış",
     "desc": "Lüks şehirlerarası otobüsle toplam 20 sefere başlayın.",
-    "requirement": "Zorlu koşullarda toplam 20 kez bu şartla sefere start verin."
+    "requirement": "Şehirlerarası lüks yolcu otobüsüyle toplam 20 kez sefere başlangıç verin."
   },
   {
     "id": "ach_1751_sefer_baslatma_asama_1",
@@ -22768,7 +22765,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "🔰",
     "title": "Sefer Başlatma Ustası (Aşama I - 1 Sefer)",
     "desc": "Toplam 1 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama I unvanını kazanın.",
-    "requirement": "Toplam 1 kez sefere start verin (Seviye 1 / 50)."
+    "requirement": "Toplam 1 kez sefere başlangıç (start) verin (Seviye 1 / 50)."
   },
   {
     "id": "ach_1752_sefer_baslatma_asama_2",
@@ -22776,12 +22773,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "routesStartedCount",
-    "targetValue": 2,
+    "targetValue": 32,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🔰",
-    "title": "Sefer Başlatma Ustası (Aşama II - 2 Sefer)",
-    "desc": "Toplam 2 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama II unvanını kazanın.",
-    "requirement": "Toplam 2 kez sefere start verin (Seviye 2 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama II - 32 Sefer)",
+    "desc": "Toplam 32 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama II unvanını kazanın.",
+    "requirement": "Toplam 32 kez sefere başlangıç (start) verin (Seviye 2 / 50)."
   },
   {
     "id": "ach_1753_sefer_baslatma_asama_3",
@@ -22789,12 +22786,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "routesStartedCount",
-    "targetValue": 3,
+    "targetValue": 35,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🔰",
-    "title": "Sefer Başlatma Ustası (Aşama III - 3 Sefer)",
-    "desc": "Toplam 3 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama III unvanını kazanın.",
-    "requirement": "Toplam 3 kez sefere start verin (Seviye 3 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama III - 35 Sefer)",
+    "desc": "Toplam 35 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama III unvanını kazanın.",
+    "requirement": "Toplam 35 kez sefere başlangıç (start) verin (Seviye 3 / 50)."
   },
   {
     "id": "ach_1754_sefer_baslatma_asama_4",
@@ -22802,12 +22799,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "routesStartedCount",
-    "targetValue": 4,
+    "targetValue": 38,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🔰",
-    "title": "Sefer Başlatma Ustası (Aşama IV - 4 Sefer)",
-    "desc": "Toplam 4 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama IV unvanını kazanın.",
-    "requirement": "Toplam 4 kez sefere start verin (Seviye 4 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama IV - 38 Sefer)",
+    "desc": "Toplam 38 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama IV unvanını kazanın.",
+    "requirement": "Toplam 38 kez sefere başlangıç (start) verin (Seviye 4 / 50)."
   },
   {
     "id": "ach_1755_sefer_baslatma_asama_5",
@@ -22815,12 +22812,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "routesStartedCount",
-    "targetValue": 5,
+    "targetValue": 42,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🔰",
-    "title": "Sefer Başlatma Ustası (Aşama V - 5 Sefer)",
-    "desc": "Toplam 5 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama V unvanını kazanın.",
-    "requirement": "Toplam 5 kez sefere start verin (Seviye 5 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama V - 42 Sefer)",
+    "desc": "Toplam 42 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama V unvanını kazanın.",
+    "requirement": "Toplam 42 kez sefere başlangıç (start) verin (Seviye 5 / 50)."
   },
   {
     "id": "ach_1756_sefer_baslatma_asama_6",
@@ -22828,12 +22825,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "routesStartedCount",
-    "targetValue": 6,
+    "targetValue": 46,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🔰",
-    "title": "Sefer Başlatma Ustası (Aşama VI - 6 Sefer)",
-    "desc": "Toplam 6 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama VI unvanını kazanın.",
-    "requirement": "Toplam 6 kez sefere start verin (Seviye 6 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama VI - 46 Sefer)",
+    "desc": "Toplam 46 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama VI unvanını kazanın.",
+    "requirement": "Toplam 46 kez sefere başlangıç (start) verin (Seviye 6 / 50)."
   },
   {
     "id": "ach_1757_sefer_baslatma_asama_7",
@@ -22841,12 +22838,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "routesStartedCount",
-    "targetValue": 7,
+    "targetValue": 50,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🔰",
-    "title": "Sefer Başlatma Ustası (Aşama VII - 7 Sefer)",
-    "desc": "Toplam 7 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama VII unvanını kazanın.",
-    "requirement": "Toplam 7 kez sefere start verin (Seviye 7 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama VII - 50 Sefer)",
+    "desc": "Toplam 50 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama VII unvanını kazanın.",
+    "requirement": "Toplam 50 kez sefere başlangıç (start) verin (Seviye 7 / 50)."
   },
   {
     "id": "ach_1758_sefer_baslatma_asama_8",
@@ -22854,12 +22851,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "routesStartedCount",
-    "targetValue": 8,
+    "targetValue": 55,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🔰",
-    "title": "Sefer Başlatma Ustası (Aşama VIII - 8 Sefer)",
-    "desc": "Toplam 8 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama VIII unvanını kazanın.",
-    "requirement": "Toplam 8 kez sefere start verin (Seviye 8 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama VIII - 55 Sefer)",
+    "desc": "Toplam 55 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama VIII unvanını kazanın.",
+    "requirement": "Toplam 55 kez sefere başlangıç (start) verin (Seviye 8 / 50)."
   },
   {
     "id": "ach_1759_sefer_baslatma_asama_9",
@@ -22867,12 +22864,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "routesStartedCount",
-    "targetValue": 9,
+    "targetValue": 60,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🔰",
-    "title": "Sefer Başlatma Ustası (Aşama IX - 9 Sefer)",
-    "desc": "Toplam 9 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama IX unvanını kazanın.",
-    "requirement": "Toplam 9 kez sefere start verin (Seviye 9 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama IX - 60 Sefer)",
+    "desc": "Toplam 60 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama IX unvanını kazanın.",
+    "requirement": "Toplam 60 kez sefere başlangıç (start) verin (Seviye 9 / 50)."
   },
   {
     "id": "ach_1760_sefer_baslatma_asama_10",
@@ -22880,12 +22877,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "routesStartedCount",
-    "targetValue": 10,
+    "targetValue": 65,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🔰",
-    "title": "Sefer Başlatma Ustası (Aşama X - 10 Sefer)",
-    "desc": "Toplam 10 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama X unvanını kazanın.",
-    "requirement": "Toplam 10 kez sefere start verin (Seviye 10 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama X - 65 Sefer)",
+    "desc": "Toplam 65 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama X unvanını kazanın.",
+    "requirement": "Toplam 65 kez sefere başlangıç (start) verin (Seviye 10 / 50)."
   },
   {
     "id": "ach_1761_sefer_baslatma_asama_11",
@@ -22893,12 +22890,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 12,
+    "targetValue": 70,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XI - 12 Sefer)",
-    "desc": "Toplam 12 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XI unvanını kazanın.",
-    "requirement": "Toplam 12 kez sefere start verin (Seviye 11 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XI - 70 Sefer)",
+    "desc": "Toplam 70 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XI unvanını kazanın.",
+    "requirement": "Toplam 70 kez sefere başlangıç (start) verin (Seviye 11 / 50)."
   },
   {
     "id": "ach_1762_sefer_baslatma_asama_12",
@@ -22906,12 +22903,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 14,
+    "targetValue": 75,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XII - 14 Sefer)",
-    "desc": "Toplam 14 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XII unvanını kazanın.",
-    "requirement": "Toplam 14 kez sefere start verin (Seviye 12 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XII - 75 Sefer)",
+    "desc": "Toplam 75 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XII unvanını kazanın.",
+    "requirement": "Toplam 75 kez sefere başlangıç (start) verin (Seviye 12 / 50)."
   },
   {
     "id": "ach_1763_sefer_baslatma_asama_13",
@@ -22919,12 +22916,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 16,
+    "targetValue": 80,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XIII - 16 Sefer)",
-    "desc": "Toplam 16 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XIII unvanını kazanın.",
-    "requirement": "Toplam 16 kez sefere start verin (Seviye 13 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XIII - 80 Sefer)",
+    "desc": "Toplam 80 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XIII unvanını kazanın.",
+    "requirement": "Toplam 80 kez sefere başlangıç (start) verin (Seviye 13 / 50)."
   },
   {
     "id": "ach_1764_sefer_baslatma_asama_14",
@@ -22932,12 +22929,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 18,
+    "targetValue": 85,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XIV - 18 Sefer)",
-    "desc": "Toplam 18 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XIV unvanını kazanın.",
-    "requirement": "Toplam 18 kez sefere start verin (Seviye 14 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XIV - 85 Sefer)",
+    "desc": "Toplam 85 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XIV unvanını kazanın.",
+    "requirement": "Toplam 85 kez sefere başlangıç (start) verin (Seviye 14 / 50)."
   },
   {
     "id": "ach_1765_sefer_baslatma_asama_15",
@@ -22945,12 +22942,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 20,
+    "targetValue": 90,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XV - 20 Sefer)",
-    "desc": "Toplam 20 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XV unvanını kazanın.",
-    "requirement": "Toplam 20 kez sefere start verin (Seviye 15 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XV - 90 Sefer)",
+    "desc": "Toplam 90 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XV unvanını kazanın.",
+    "requirement": "Toplam 90 kez sefere başlangıç (start) verin (Seviye 15 / 50)."
   },
   {
     "id": "ach_1766_sefer_baslatma_asama_16",
@@ -22958,12 +22955,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 25,
+    "targetValue": 95,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XVI - 25 Sefer)",
-    "desc": "Toplam 25 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XVI unvanını kazanın.",
-    "requirement": "Toplam 25 kez sefere start verin (Seviye 16 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XVI - 95 Sefer)",
+    "desc": "Toplam 95 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XVI unvanını kazanın.",
+    "requirement": "Toplam 95 kez sefere başlangıç (start) verin (Seviye 16 / 50)."
   },
   {
     "id": "ach_1767_sefer_baslatma_asama_17",
@@ -22971,12 +22968,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 30,
+    "targetValue": 100,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XVII - 30 Sefer)",
-    "desc": "Toplam 30 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XVII unvanını kazanın.",
-    "requirement": "Toplam 30 kez sefere start verin (Seviye 17 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XVII - 100 Sefer)",
+    "desc": "Toplam 100 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XVII unvanını kazanın.",
+    "requirement": "Toplam 100 kez sefere başlangıç (start) verin (Seviye 17 / 50)."
   },
   {
     "id": "ach_1768_sefer_baslatma_asama_18",
@@ -22984,12 +22981,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 35,
+    "targetValue": 110,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XVIII - 35 Sefer)",
-    "desc": "Toplam 35 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XVIII unvanını kazanın.",
-    "requirement": "Toplam 35 kez sefere start verin (Seviye 18 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XVIII - 110 Sefer)",
+    "desc": "Toplam 110 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XVIII unvanını kazanın.",
+    "requirement": "Toplam 110 kez sefere başlangıç (start) verin (Seviye 18 / 50)."
   },
   {
     "id": "ach_1769_sefer_baslatma_asama_19",
@@ -22997,12 +22994,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 40,
+    "targetValue": 120,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XIX - 40 Sefer)",
-    "desc": "Toplam 40 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XIX unvanını kazanın.",
-    "requirement": "Toplam 40 kez sefere start verin (Seviye 19 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XIX - 120 Sefer)",
+    "desc": "Toplam 120 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XIX unvanını kazanın.",
+    "requirement": "Toplam 120 kez sefere başlangıç (start) verin (Seviye 19 / 50)."
   },
   {
     "id": "ach_1770_sefer_baslatma_asama_20",
@@ -23010,12 +23007,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 45,
+    "targetValue": 130,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XX - 45 Sefer)",
-    "desc": "Toplam 45 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XX unvanını kazanın.",
-    "requirement": "Toplam 45 kez sefere start verin (Seviye 20 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XX - 130 Sefer)",
+    "desc": "Toplam 130 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XX unvanını kazanın.",
+    "requirement": "Toplam 130 kez sefere başlangıç (start) verin (Seviye 20 / 50)."
   },
   {
     "id": "ach_1771_sefer_baslatma_asama_21",
@@ -23023,12 +23020,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 50,
+    "targetValue": 140,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XXI - 50 Sefer)",
-    "desc": "Toplam 50 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXI unvanını kazanın.",
-    "requirement": "Toplam 50 kez sefere start verin (Seviye 21 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXI - 140 Sefer)",
+    "desc": "Toplam 140 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXI unvanını kazanın.",
+    "requirement": "Toplam 140 kez sefere başlangıç (start) verin (Seviye 21 / 50)."
   },
   {
     "id": "ach_1772_sefer_baslatma_asama_22",
@@ -23036,12 +23033,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 60,
+    "targetValue": 150,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XXII - 60 Sefer)",
-    "desc": "Toplam 60 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXII unvanını kazanın.",
-    "requirement": "Toplam 60 kez sefere start verin (Seviye 22 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXII - 150 Sefer)",
+    "desc": "Toplam 150 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXII unvanını kazanın.",
+    "requirement": "Toplam 150 kez sefere başlangıç (start) verin (Seviye 22 / 50)."
   },
   {
     "id": "ach_1773_sefer_baslatma_asama_23",
@@ -23049,12 +23046,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 70,
+    "targetValue": 160,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XXIII - 70 Sefer)",
-    "desc": "Toplam 70 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXIII unvanını kazanın.",
-    "requirement": "Toplam 70 kez sefere start verin (Seviye 23 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXIII - 160 Sefer)",
+    "desc": "Toplam 160 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXIII unvanını kazanın.",
+    "requirement": "Toplam 160 kez sefere başlangıç (start) verin (Seviye 23 / 50)."
   },
   {
     "id": "ach_1774_sefer_baslatma_asama_24",
@@ -23062,12 +23059,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 80,
+    "targetValue": 170,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XXIV - 80 Sefer)",
-    "desc": "Toplam 80 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXIV unvanını kazanın.",
-    "requirement": "Toplam 80 kez sefere start verin (Seviye 24 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXIV - 170 Sefer)",
+    "desc": "Toplam 170 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXIV unvanını kazanın.",
+    "requirement": "Toplam 170 kez sefere başlangıç (start) verin (Seviye 24 / 50)."
   },
   {
     "id": "ach_1775_sefer_baslatma_asama_25",
@@ -23075,12 +23072,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "routesStartedCount",
-    "targetValue": 90,
+    "targetValue": 180,
     "category": "Kademeli Sefer Başlatma",
     "icon": "🚌",
-    "title": "Sefer Başlatma Ustası (Aşama XXV - 90 Sefer)",
-    "desc": "Toplam 90 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXV unvanını kazanın.",
-    "requirement": "Toplam 90 kez sefere start verin (Seviye 25 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXV - 180 Sefer)",
+    "desc": "Toplam 180 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXV unvanını kazanın.",
+    "requirement": "Toplam 180 kez sefere başlangıç (start) verin (Seviye 25 / 50)."
   },
   {
     "id": "ach_1776_sefer_baslatma_asama_26",
@@ -23088,12 +23085,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 100,
+    "targetValue": 190,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXVI - 100 Sefer)",
-    "desc": "Toplam 100 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXVI unvanını kazanın.",
-    "requirement": "Toplam 100 kez sefere start verin (Seviye 26 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXVI - 190 Sefer)",
+    "desc": "Toplam 190 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXVI unvanını kazanın.",
+    "requirement": "Toplam 190 kez sefere başlangıç (start) verin (Seviye 26 / 50)."
   },
   {
     "id": "ach_1777_sefer_baslatma_asama_27",
@@ -23101,12 +23098,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 110,
+    "targetValue": 200,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXVII - 110 Sefer)",
-    "desc": "Toplam 110 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXVII unvanını kazanın.",
-    "requirement": "Toplam 110 kez sefere start verin (Seviye 27 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXVII - 200 Sefer)",
+    "desc": "Toplam 200 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXVII unvanını kazanın.",
+    "requirement": "Toplam 200 kez sefere başlangıç (start) verin (Seviye 27 / 50)."
   },
   {
     "id": "ach_1778_sefer_baslatma_asama_28",
@@ -23114,12 +23111,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 120,
+    "targetValue": 215,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXVIII - 120 Sefer)",
-    "desc": "Toplam 120 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXVIII unvanını kazanın.",
-    "requirement": "Toplam 120 kez sefere start verin (Seviye 28 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXVIII - 215 Sefer)",
+    "desc": "Toplam 215 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXVIII unvanını kazanın.",
+    "requirement": "Toplam 215 kez sefere başlangıç (start) verin (Seviye 28 / 50)."
   },
   {
     "id": "ach_1779_sefer_baslatma_asama_29",
@@ -23127,12 +23124,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 130,
+    "targetValue": 230,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXIX - 130 Sefer)",
-    "desc": "Toplam 130 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXIX unvanını kazanın.",
-    "requirement": "Toplam 130 kez sefere start verin (Seviye 29 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXIX - 230 Sefer)",
+    "desc": "Toplam 230 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXIX unvanını kazanın.",
+    "requirement": "Toplam 230 kez sefere başlangıç (start) verin (Seviye 29 / 50)."
   },
   {
     "id": "ach_1780_sefer_baslatma_asama_30",
@@ -23140,12 +23137,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 140,
+    "targetValue": 245,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXX - 140 Sefer)",
-    "desc": "Toplam 140 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXX unvanını kazanın.",
-    "requirement": "Toplam 140 kez sefere start verin (Seviye 30 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXX - 245 Sefer)",
+    "desc": "Toplam 245 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXX unvanını kazanın.",
+    "requirement": "Toplam 245 kez sefere başlangıç (start) verin (Seviye 30 / 50)."
   },
   {
     "id": "ach_1781_sefer_baslatma_asama_31",
@@ -23153,12 +23150,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 150,
+    "targetValue": 260,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXXI - 150 Sefer)",
-    "desc": "Toplam 150 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXI unvanını kazanın.",
-    "requirement": "Toplam 150 kez sefere start verin (Seviye 31 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXXI - 260 Sefer)",
+    "desc": "Toplam 260 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXI unvanını kazanın.",
+    "requirement": "Toplam 260 kez sefere başlangıç (start) verin (Seviye 31 / 50)."
   },
   {
     "id": "ach_1782_sefer_baslatma_asama_32",
@@ -23166,12 +23163,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 165,
+    "targetValue": 275,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXXII - 165 Sefer)",
-    "desc": "Toplam 165 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXII unvanını kazanın.",
-    "requirement": "Toplam 165 kez sefere start verin (Seviye 32 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXXII - 275 Sefer)",
+    "desc": "Toplam 275 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXII unvanını kazanın.",
+    "requirement": "Toplam 275 kez sefere başlangıç (start) verin (Seviye 32 / 50)."
   },
   {
     "id": "ach_1783_sefer_baslatma_asama_33",
@@ -23179,12 +23176,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 180,
+    "targetValue": 290,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXXIII - 180 Sefer)",
-    "desc": "Toplam 180 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXIII unvanını kazanın.",
-    "requirement": "Toplam 180 kez sefere start verin (Seviye 33 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXXIII - 290 Sefer)",
+    "desc": "Toplam 290 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXIII unvanını kazanın.",
+    "requirement": "Toplam 290 kez sefere başlangıç (start) verin (Seviye 33 / 50)."
   },
   {
     "id": "ach_1784_sefer_baslatma_asama_34",
@@ -23192,12 +23189,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 195,
+    "targetValue": 310,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXXIV - 195 Sefer)",
-    "desc": "Toplam 195 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXIV unvanını kazanın.",
-    "requirement": "Toplam 195 kez sefere start verin (Seviye 34 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXXIV - 310 Sefer)",
+    "desc": "Toplam 310 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXIV unvanını kazanın.",
+    "requirement": "Toplam 310 kez sefere başlangıç (start) verin (Seviye 34 / 50)."
   },
   {
     "id": "ach_1785_sefer_baslatma_asama_35",
@@ -23205,12 +23202,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 210,
+    "targetValue": 330,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXXV - 210 Sefer)",
-    "desc": "Toplam 210 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXV unvanını kazanın.",
-    "requirement": "Toplam 210 kez sefere start verin (Seviye 35 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXXV - 330 Sefer)",
+    "desc": "Toplam 330 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXV unvanını kazanın.",
+    "requirement": "Toplam 330 kez sefere başlangıç (start) verin (Seviye 35 / 50)."
   },
   {
     "id": "ach_1786_sefer_baslatma_asama_36",
@@ -23218,12 +23215,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 230,
+    "targetValue": 350,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXXVI - 230 Sefer)",
-    "desc": "Toplam 230 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXVI unvanını kazanın.",
-    "requirement": "Toplam 230 kez sefere start verin (Seviye 36 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXXVI - 350 Sefer)",
+    "desc": "Toplam 350 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXVI unvanını kazanın.",
+    "requirement": "Toplam 350 kez sefere başlangıç (start) verin (Seviye 36 / 50)."
   },
   {
     "id": "ach_1787_sefer_baslatma_asama_37",
@@ -23231,12 +23228,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 250,
+    "targetValue": 370,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXXVII - 250 Sefer)",
-    "desc": "Toplam 250 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXVII unvanını kazanın.",
-    "requirement": "Toplam 250 kez sefere start verin (Seviye 37 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXXVII - 370 Sefer)",
+    "desc": "Toplam 370 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXVII unvanını kazanın.",
+    "requirement": "Toplam 370 kez sefere başlangıç (start) verin (Seviye 37 / 50)."
   },
   {
     "id": "ach_1788_sefer_baslatma_asama_38",
@@ -23244,12 +23241,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 275,
+    "targetValue": 390,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXXVIII - 275 Sefer)",
-    "desc": "Toplam 275 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXVIII unvanını kazanın.",
-    "requirement": "Toplam 275 kez sefere start verin (Seviye 38 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXXVIII - 390 Sefer)",
+    "desc": "Toplam 390 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXVIII unvanını kazanın.",
+    "requirement": "Toplam 390 kez sefere başlangıç (start) verin (Seviye 38 / 50)."
   },
   {
     "id": "ach_1789_sefer_baslatma_asama_39",
@@ -23257,12 +23254,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 300,
+    "targetValue": 410,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XXXIX - 300 Sefer)",
-    "desc": "Toplam 300 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXIX unvanını kazanın.",
-    "requirement": "Toplam 300 kez sefere start verin (Seviye 39 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XXXIX - 410 Sefer)",
+    "desc": "Toplam 410 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XXXIX unvanını kazanın.",
+    "requirement": "Toplam 410 kez sefere başlangıç (start) verin (Seviye 39 / 50)."
   },
   {
     "id": "ach_1790_sefer_baslatma_asama_40",
@@ -23270,12 +23267,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "routesStartedCount",
-    "targetValue": 325,
+    "targetValue": 430,
     "category": "Kademeli Sefer Başlatma",
     "icon": "⭐",
-    "title": "Sefer Başlatma Ustası (Aşama XL - 325 Sefer)",
-    "desc": "Toplam 325 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XL unvanını kazanın.",
-    "requirement": "Toplam 325 kez sefere start verin (Seviye 40 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XL - 430 Sefer)",
+    "desc": "Toplam 430 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XL unvanını kazanın.",
+    "requirement": "Toplam 430 kez sefere başlangıç (start) verin (Seviye 40 / 50)."
   },
   {
     "id": "ach_1791_sefer_baslatma_asama_41",
@@ -23283,12 +23280,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "routesStartedCount",
-    "targetValue": 350,
+    "targetValue": 450,
     "category": "Kademeli Sefer Başlatma",
     "icon": "👑",
-    "title": "Sefer Başlatma Ustası (Aşama XLI - 350 Sefer)",
-    "desc": "Toplam 350 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLI unvanını kazanın.",
-    "requirement": "Toplam 350 kez sefere start verin (Seviye 41 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XLI - 450 Sefer)",
+    "desc": "Toplam 450 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLI unvanını kazanın.",
+    "requirement": "Toplam 450 kez sefere başlangıç (start) verin (Seviye 41 / 50)."
   },
   {
     "id": "ach_1792_sefer_baslatma_asama_42",
@@ -23296,12 +23293,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "routesStartedCount",
-    "targetValue": 375,
+    "targetValue": 475,
     "category": "Kademeli Sefer Başlatma",
     "icon": "👑",
-    "title": "Sefer Başlatma Ustası (Aşama XLII - 375 Sefer)",
-    "desc": "Toplam 375 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLII unvanını kazanın.",
-    "requirement": "Toplam 375 kez sefere start verin (Seviye 42 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XLII - 475 Sefer)",
+    "desc": "Toplam 475 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLII unvanını kazanın.",
+    "requirement": "Toplam 475 kez sefere başlangıç (start) verin (Seviye 42 / 50)."
   },
   {
     "id": "ach_1793_sefer_baslatma_asama_43",
@@ -23309,12 +23306,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "routesStartedCount",
-    "targetValue": 400,
+    "targetValue": 500,
     "category": "Kademeli Sefer Başlatma",
     "icon": "👑",
-    "title": "Sefer Başlatma Ustası (Aşama XLIII - 400 Sefer)",
-    "desc": "Toplam 400 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLIII unvanını kazanın.",
-    "requirement": "Toplam 400 kez sefere start verin (Seviye 43 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XLIII - 500 Sefer)",
+    "desc": "Toplam 500 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLIII unvanını kazanın.",
+    "requirement": "Toplam 500 kez sefere başlangıç (start) verin (Seviye 43 / 50)."
   },
   {
     "id": "ach_1794_sefer_baslatma_asama_44",
@@ -23322,12 +23319,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "routesStartedCount",
-    "targetValue": 425,
+    "targetValue": 525,
     "category": "Kademeli Sefer Başlatma",
     "icon": "👑",
-    "title": "Sefer Başlatma Ustası (Aşama XLIV - 425 Sefer)",
-    "desc": "Toplam 425 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLIV unvanını kazanın.",
-    "requirement": "Toplam 425 kez sefere start verin (Seviye 44 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XLIV - 525 Sefer)",
+    "desc": "Toplam 525 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLIV unvanını kazanın.",
+    "requirement": "Toplam 525 kez sefere başlangıç (start) verin (Seviye 44 / 50)."
   },
   {
     "id": "ach_1795_sefer_baslatma_asama_45",
@@ -23335,12 +23332,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "routesStartedCount",
-    "targetValue": 450,
+    "targetValue": 550,
     "category": "Kademeli Sefer Başlatma",
     "icon": "👑",
-    "title": "Sefer Başlatma Ustası (Aşama XLV - 450 Sefer)",
-    "desc": "Toplam 450 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLV unvanını kazanın.",
-    "requirement": "Toplam 450 kez sefere start verin (Seviye 45 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XLV - 550 Sefer)",
+    "desc": "Toplam 550 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLV unvanını kazanın.",
+    "requirement": "Toplam 550 kez sefere başlangıç (start) verin (Seviye 45 / 50)."
   },
   {
     "id": "ach_1796_sefer_baslatma_asama_46",
@@ -23348,12 +23345,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "routesStartedCount",
-    "targetValue": 475,
+    "targetValue": 575,
     "category": "Kademeli Sefer Başlatma",
     "icon": "👑",
-    "title": "Sefer Başlatma Ustası (Aşama XLVI - 475 Sefer)",
-    "desc": "Toplam 475 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLVI unvanını kazanın.",
-    "requirement": "Toplam 475 kez sefere start verin (Seviye 46 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XLVI - 575 Sefer)",
+    "desc": "Toplam 575 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLVI unvanını kazanın.",
+    "requirement": "Toplam 575 kez sefere başlangıç (start) verin (Seviye 46 / 50)."
   },
   {
     "id": "ach_1797_sefer_baslatma_asama_47",
@@ -23361,12 +23358,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "routesStartedCount",
-    "targetValue": 500,
+    "targetValue": 600,
     "category": "Kademeli Sefer Başlatma",
     "icon": "👑",
-    "title": "Sefer Başlatma Ustası (Aşama XLVII - 500 Sefer)",
-    "desc": "Toplam 500 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLVII unvanını kazanın.",
-    "requirement": "Toplam 500 kez sefere start verin (Seviye 47 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XLVII - 600 Sefer)",
+    "desc": "Toplam 600 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLVII unvanını kazanın.",
+    "requirement": "Toplam 600 kez sefere başlangıç (start) verin (Seviye 47 / 50)."
   },
   {
     "id": "ach_1798_sefer_baslatma_asama_48",
@@ -23374,12 +23371,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "routesStartedCount",
-    "targetValue": 550,
+    "targetValue": 650,
     "category": "Kademeli Sefer Başlatma",
     "icon": "👑",
-    "title": "Sefer Başlatma Ustası (Aşama XLVIII - 550 Sefer)",
-    "desc": "Toplam 550 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLVIII unvanını kazanın.",
-    "requirement": "Toplam 550 kez sefere start verin (Seviye 48 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XLVIII - 650 Sefer)",
+    "desc": "Toplam 650 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLVIII unvanını kazanın.",
+    "requirement": "Toplam 650 kez sefere başlangıç (start) verin (Seviye 48 / 50)."
   },
   {
     "id": "ach_1799_sefer_baslatma_asama_49",
@@ -23387,12 +23384,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "routesStartedCount",
-    "targetValue": 600,
+    "targetValue": 675,
     "category": "Kademeli Sefer Başlatma",
     "icon": "👑",
-    "title": "Sefer Başlatma Ustası (Aşama XLIX - 600 Sefer)",
-    "desc": "Toplam 600 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLIX unvanını kazanın.",
-    "requirement": "Toplam 600 kez sefere start verin (Seviye 49 / 50)."
+    "title": "Sefer Başlatma Ustası (Aşama XLIX - 675 Sefer)",
+    "desc": "Toplam 675 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama XLIX unvanını kazanın.",
+    "requirement": "Toplam 675 kez sefere başlangıç (start) verin (Seviye 49 / 50)."
   },
   {
     "id": "ach_1800_sefer_baslatma_asama_50",
@@ -23405,7 +23402,7 @@ const ACHIEVEMENTS_1500 = [
     "icon": "👑",
     "title": "Karayolları Sefer Başkumandanı (Aşama L - 700 Sefer)",
     "desc": "Toplam 700 kez sefere start verip ilk duraktan hareket ederek Sefer Başlatma Kademesi Aşama L unvanını kazanın.",
-    "requirement": "Toplam 700 kez sefere start verin (Seviye 50 / 50)."
+    "requirement": "Toplam 700 kez sefere başlangıç (start) verin (Seviye 50 / 50)."
   },
   {
     "id": "ach_1801_km_tasi_10",
@@ -24050,12 +24047,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "completedTasks",
-    "targetValue": 10,
+    "targetValue": 11,
     "category": "Kariyer Görev Taşları",
     "icon": "🎓",
-    "title": "Kariyer Kilometre Taşı: 1. Sınıf Stajyer Mezuniyeti (Görev 10)",
-    "desc": "İlk 10 görevi başarıyla bitirerek stajyerlik devresini kapatın ve resmi şoför brövesini alın.",
-    "requirement": "Kariyer modunda en az 10 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Kilometre Taşı: 1. Sınıf Stajyer Mezuniyeti (Görev 11)",
+    "desc": "İlk 11 görevi başarıyla bitirerek stajyerlik devresini kapatın ve resmi şoför brövesini alın.",
+    "requirement": "Kariyer modunda en az 11 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1851_kariyer_gorev_12",
@@ -24076,12 +24073,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "completedTasks",
-    "targetValue": 15,
+    "targetValue": 14,
     "category": "Kariyer Görev Taşları",
     "icon": "🏖️",
-    "title": "Kariyer Adımı: Kumbağ Sahil Hattı (Görev 15)",
+    "title": "Kariyer Adımı: Kumbağ Sahil Hattı (Görev 14)",
     "desc": "Kumbağ tatilci ve yazlıkçı rotasında yoğun durak temposunu yönetin.",
-    "requirement": "Kariyer modunda en az 15 adet görevi başarıyla tamamlayın."
+    "requirement": "Kariyer modunda en az 14 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1853_kariyer_gorev_18",
@@ -24102,12 +24099,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "completedTasks",
-    "targetValue": 20,
+    "targetValue": 19,
     "category": "Kariyer Görev Taşları",
     "icon": "📜",
-    "title": "Kariyer Kilometre Taşı: 2. Sınıf Kıyı Kaptanı Liyakat Diploması (Görev 20)",
-    "desc": "20 görevi geride bırakarak 2. Sınıf Kıyı & Sahil Kaptanlığı diplomasına hak kazanın.",
-    "requirement": "Kariyer modunda en az 20 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Kilometre Taşı: 2. Sınıf Kıyı Kaptanı Liyakat Diploması (Görev 19)",
+    "desc": "19 görevi geride bırakarak 2. Sınıf Kıyı & Sahil Kaptanlığı diplomasına hak kazanın.",
+    "requirement": "Kariyer modunda en az 19 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1855_kariyer_gorev_22",
@@ -24128,12 +24125,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "completedTasks",
-    "targetValue": 25,
+    "targetValue": 24,
     "category": "Kariyer Görev Taşları",
     "icon": "⚙️",
-    "title": "Kariyer Adımı: Çorlu Vardiya Ringi (Görev 25)",
+    "title": "Kariyer Adımı: Çorlu Vardiya Ringi (Görev 24)",
     "desc": "Fabrika vardiya değişim saatinde yüzlerce emekçiyi dakik şekilde intikal ettirin.",
-    "requirement": "Kariyer modunda en az 25 adet görevi başarıyla tamamlayın."
+    "requirement": "Kariyer modunda en az 24 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1857_kariyer_gorev_28",
@@ -24154,12 +24151,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 3,
     "tierName": "Orta",
     "stat": "completedTasks",
-    "targetValue": 30,
+    "targetValue": 29,
     "category": "Kariyer Görev Taşları",
     "icon": "🎖️",
-    "title": "Kariyer Kilometre Taşı: 3. Sınıf Çorlu Metropol Kaptanı Brövesi (Görev 30)",
-    "desc": "30 görevi tamamlayıp metropol hatlarının kıdemli kaptanı brövesini kazanın.",
-    "requirement": "Kariyer modunda en az 30 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Kilometre Taşı: 3. Sınıf Çorlu Metropol Kaptanı Brövesi (Görev 29)",
+    "desc": "29 görevi tamamlayıp metropol hatlarının kıdemli kaptanı brövesini kazanın.",
+    "requirement": "Kariyer modunda en az 29 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1859_kariyer_gorev_33",
@@ -24206,12 +24203,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "completedTasks",
-    "targetValue": 40,
+    "targetValue": 39,
     "category": "Kariyer Görev Taşları",
     "icon": "🏅",
-    "title": "Kariyer Kilometre Taşı: 4. Sınıf Trakya Kıdemli Kaptanlık Taşı (Görev 40)",
-    "desc": "40 görevi devirerek tüm Trakya ilçe hatlarında yetkili kıdemli kaptanlığa terfi edin.",
-    "requirement": "Kariyer modunda en az 40 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Kilometre Taşı: 4. Sınıf Trakya Kıdemli Kaptanlık Taşı (Görev 39)",
+    "desc": "39 görevi devirerek tüm Trakya ilçe hatlarında yetkili kıdemli kaptanlığa terfi edin.",
+    "requirement": "Kariyer modunda en az 39 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1863_kariyer_gorev_43",
@@ -24258,12 +24255,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "completedTasks",
-    "targetValue": 50,
+    "targetValue": 49,
     "category": "Kariyer Görev Taşları",
     "icon": "🌓",
-    "title": "Kariyer Kilometre Taşı: 5. Sınıf Filo Reisi Yarı Yol Dönüm Noktası (Görev 50)",
-    "desc": "Akademinin 100 görevlik maratonunun tam yarısını (50 Görev) tamamlayarak Filo Reisi olun!",
-    "requirement": "Kariyer modunda en az 50 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Kilometre Taşı: 5. Sınıf Filo Reisi Yarı Yol Dönüm Noktası (Görev 49)",
+    "desc": "Akademinin 100 görevlik maratonunda 49 görevi tamamlayarak Filo Reisi yarı yol eşiğine ulaşın!",
+    "requirement": "Kariyer modunda en az 49 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1867_kariyer_gorev_53",
@@ -24284,12 +24281,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "completedTasks",
-    "targetValue": 55,
+    "targetValue": 54,
     "category": "Kariyer Görev Taşları",
     "icon": "🔄",
-    "title": "Kariyer Adımı: Körüklü Manevra Akrobasi Seferi (Görev 55)",
+    "title": "Kariyer Adımı: Körüklü Manevra Akrobasi Seferi (Görev 54)",
     "desc": "Körüklü otobüsü iğne deliği gibi kavşaklardan milimetrik hesapla savrulmadan geçirin.",
-    "requirement": "Kariyer modunda en az 55 adet görevi başarıyla tamamlayın."
+    "requirement": "Kariyer modunda en az 54 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1869_kariyer_gorev_58",
@@ -24310,12 +24307,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "completedTasks",
-    "targetValue": 60,
+    "targetValue": 59,
     "category": "Kariyer Görev Taşları",
     "icon": "🎖️",
-    "title": "Kariyer Kilometre Taşı: 6. Sınıf 18 Metre Baş Kaptanlık Taşı (Görev 60)",
-    "desc": "60 görevi tamamlayarak 18 Metre Körüklü Filo Baş Kaptanı unvanını tescilleyin.",
-    "requirement": "Kariyer modunda en az 60 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Kilometre Taşı: 6. Sınıf 18 Metre Baş Kaptanlık Taşı (Görev 59)",
+    "desc": "59 görevi tamamlayarak 18 Metre Körüklü Filo Baş Kaptanı unvanını tescilleyin.",
+    "requirement": "Kariyer modunda en az 59 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1871_kariyer_gorev_63",
@@ -24362,12 +24359,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "completedTasks",
-    "targetValue": 70,
+    "targetValue": 69,
     "category": "Kariyer Görev Taşları",
     "icon": "🦅",
-    "title": "Kariyer Kilometre Taşı: 7. Sınıf Trakya Dağ Müfettişi Brövesi (Görev 70)",
-    "desc": "70 görevi başarıyla bitirip Trakya Dağ Geçitleri Kıdemli Filo Müfettişi unvanını kazanın.",
-    "requirement": "Kariyer modunda en az 70 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Kilometre Taşı: 7. Sınıf Trakya Dağ Müfettişi Brövesi (Görev 69)",
+    "desc": "69 görevi başarıyla bitirip Trakya Dağ Geçitleri Kıdemli Filo Müfettişi unvanını kazanın.",
+    "requirement": "Kariyer modunda en az 69 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1875_kariyer_gorev_73",
@@ -24388,12 +24385,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "completedTasks",
-    "targetValue": 75,
+    "targetValue": 74,
     "category": "Kariyer Görev Taşları",
     "icon": "🌙",
-    "title": "Kariyer Adımı: Gece Otoyol Ringi (Görev 75)",
+    "title": "Kariyer Adımı: Gece Otoyol Ringi (Görev 74)",
     "desc": "Zifiri karanlıkta uzun hüzmeli far disiplini ve uyanık dikkatle gece seferini icra edin.",
-    "requirement": "Kariyer modunda en az 75 adet görevi başarıyla tamamlayın."
+    "requirement": "Kariyer modunda en az 74 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1877_kariyer_gorev_78",
@@ -24414,12 +24411,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "completedTasks",
-    "targetValue": 80,
+    "targetValue": 79,
     "category": "Kariyer Görev Taşları",
     "icon": "💎",
-    "title": "Kariyer Kilometre Taşı: 8. Sınıf VIP Otoyol Baş Kaptanlık Taşı (Görev 80)",
-    "desc": "80 görevi tamamlayıp Marmara-Ege VIP Transfer Şefliği brövesini hak edin.",
-    "requirement": "Kariyer modunda en az 80 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Kilometre Taşı: 8. Sınıf VIP Otoyol Baş Kaptanlık Taşı (Görev 79)",
+    "desc": "79 görevi tamamlayıp Marmara-Ege VIP Transfer Şefliği brövesini hak edin.",
+    "requirement": "Kariyer modunda en az 79 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1879_kariyer_gorev_83",
@@ -24466,12 +24463,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "completedTasks",
-    "targetValue": 90,
+    "targetValue": 89,
     "category": "Kariyer Görev Taşları",
     "icon": "🥇",
-    "title": "Kariyer Kilometre Taşı: 9. Sınıf Anadolu Dağ Üstadı Onur Madalyası (Görev 90)",
-    "desc": "90 görevi devirerek Anadolu Kar & Dağ Geçitleri Üstadı madalyasını kazanın.",
-    "requirement": "Kariyer modunda en az 90 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Kilometre Taşı: 9. Sınıf Anadolu Dağ Üstadı Onur Madalyası (Görev 89)",
+    "desc": "89 görevi devirerek Anadolu Kar & Dağ Geçitleri Üstadı madalyasını kazanın.",
+    "requirement": "Kariyer modunda en az 89 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1883_kariyer_gorev_95",
@@ -24492,12 +24489,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "completedTasks",
-    "targetValue": 98,
+    "targetValue": 96,
     "category": "Kariyer Görev Taşları",
     "icon": "🏛️",
-    "title": "Kariyer Adımı: Trakya Zafer Karşılaması Kapısı (Görev 98)",
+    "title": "Kariyer Adımı: Trakya Zafer Karşılaması Kapısı (Görev 96)",
     "desc": "Büyük finale bir adım kala onur konvoyu eşliğinde protokole intikal edin.",
-    "requirement": "Kariyer modunda en az 98 adet görevi başarıyla tamamlayın."
+    "requirement": "Kariyer modunda en az 96 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1885_kariyer_gorev_100",
@@ -24505,142 +24502,142 @@ const ACHIEVEMENTS_1500 = [
     "tier": 5,
     "tierName": "Efsane",
     "stat": "completedTasks",
-    "targetValue": 100,
+    "targetValue": 98,
     "category": "Kariyer Görev Taşları",
     "icon": "👑",
-    "title": "Kariyer Zirvesi Kilometre Taşı: 100/100 Büyük Final Onur Madalyası (Görev 100)",
-    "desc": "Mikyas Kaptanlık Akademisinin 100 görevlik devasa kariyerini eksiksiz tamamlayarak Efsane Master Kaptanlık tahtına oturun!",
-    "requirement": "Kariyer modunda en az 100 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Zirvesi Kilometre Taşı: 98/100 Büyük Final Onur Madalyası (Görev 98)",
+    "desc": "Mikyas Kaptanlık Akademisinin 98 görevlik zorlu kariyer parkurunu başarıyla tamamlayarak Büyük Final Onur Madalyasını kazanın!",
+    "requirement": "Kariyer modunda en az 98 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1886_kariyer_sinif_1",
     "difficulty": 1886,
     "tier": 1,
     "tierName": "Çok Kolay",
-    "stat": "licenseLevel",
-    "targetValue": 1,
+    "stat": "completedTasks",
+    "targetValue": 10,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🔰",
     "title": "Kariyer Rütbesi: 1. Sınıf Stajyer Şehir İçi Sürücüsü",
-    "desc": "Mikyas Kaptanlık Akademisine resmi kaydınızı yaptırıp 1. Sınıf Stajyer sürücü unvanına erişin.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 1'e yükseltin."
+    "desc": "Mikyas Kaptanlık Akademisinde ilk 10 görevinizi tamamlayarak 1. Sınıf Şehir İçi Sürücüsü kademesini tescilleyin.",
+    "requirement": "Kariyer modunda toplam 10 görev tamamlayarak 1. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1887_kariyer_sinif_2",
     "difficulty": 1887,
     "tier": 2,
     "tierName": "Kolay",
-    "stat": "licenseLevel",
-    "targetValue": 2,
+    "stat": "completedTasks",
+    "targetValue": 20,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🌊",
     "title": "Kariyer Rütbesi: 2. Sınıf Süleymanpaşa Kıyı & Sahil Kaptanı",
-    "desc": "Akademide 2. Sınıf seviyesine yükselerek sahil ve kordon hatlarının kaptanı olun.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 2'e yükseltin."
+    "desc": "Akademide ilk 20 görevi tamamlayıp 2. Sınıf seviyesini tescilleyerek sahil ve kordon hatlarının kaptanı olun.",
+    "requirement": "Kariyer modunda toplam 20 görev tamamlayarak 2. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1888_kariyer_sinif_3",
     "difficulty": 1888,
     "tier": 2,
     "tierName": "Kolay",
-    "stat": "licenseLevel",
-    "targetValue": 3,
+    "stat": "completedTasks",
+    "targetValue": 30,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🏭",
     "title": "Kariyer Rütbesi: 3. Sınıf Çorlu Sanayi & Metropol Hat Kaptanı",
-    "desc": "3. Sınıf seviyesine terfi ederek sanayi ve metropol hatlarında yetkili kaptanlık rütbesini kazanın.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 3'e yükseltin."
+    "desc": "30 görevi tamamlayıp 3. Sınıf seviyesini tescilleyerek sanayi ve metropol hatlarında yetkili kaptanlık rütbesini kazanın.",
+    "requirement": "Kariyer modunda toplam 30 görev tamamlayarak 3. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1889_kariyer_sinif_4",
     "difficulty": 1889,
     "tier": 3,
     "tierName": "Orta",
-    "stat": "licenseLevel",
-    "targetValue": 4,
+    "stat": "completedTasks",
+    "targetValue": 40,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🧭",
     "title": "Kariyer Rütbesi: 4. Sınıf Trakya Kıyı & İlçe Hatları Kıdemli Kaptanı",
-    "desc": "4. Sınıf seviyesine erişerek ilçeler arası kıdemli hat kaptanlığı unvanını kuşanın.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 4'e yükseltin."
+    "desc": "40 görevi tamamlayıp 4. Sınıf seviyesini tescilleyerek ilçeler arası kıdemli hat kaptanlığı unvanını kuşanın.",
+    "requirement": "Kariyer modunda toplam 40 görev tamamlayarak 4. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1890_kariyer_sinif_5",
     "difficulty": 1890,
     "tier": 3,
     "tierName": "Orta",
-    "stat": "licenseLevel",
-    "targetValue": 5,
+    "stat": "completedTasks",
+    "targetValue": 50,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🚛",
     "title": "Kariyer Rütbesi: 5. Sınıf Ergene & Velimeşe OSB Filo Reisi",
-    "desc": "5. Sınıf seviyesine ulaşarak organize sanayi bölgelerinin Filo Reisi rütbesine terfi edin.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 5'e yükseltin."
+    "desc": "50 görevi tamamlayıp 5. Sınıf seviyesini tescilleyerek organize sanayi bölgelerinin Filo Reisi rütbesine terfi edin.",
+    "requirement": "Kariyer modunda toplam 50 görev tamamlayarak 5. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1891_kariyer_sinif_6",
     "difficulty": 1891,
     "tier": 4,
     "tierName": "Zor",
-    "stat": "licenseLevel",
-    "targetValue": 6,
+    "stat": "completedTasks",
+    "targetValue": 60,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🚍",
     "title": "Kariyer Rütbesi: 6. Sınıf 18 Metre Körüklü Otobüs Baş Kaptanı",
-    "desc": "6. Sınıf seviyesine çıkarak körüklü dev otobüslerin baş kaptanlığı makamına layık görülün.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 6'e yükseltin."
+    "desc": "60 görevi tamamlayıp 6. Sınıf seviyesini tescilleyerek körüklü dev otobüslerin baş kaptanlığı makamına layık görülün.",
+    "requirement": "Kariyer modunda toplam 60 görev tamamlayarak 6. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1892_kariyer_sinif_7",
     "difficulty": 1892,
     "tier": 4,
     "tierName": "Zor",
-    "stat": "licenseLevel",
-    "targetValue": 7,
+    "stat": "completedTasks",
+    "targetValue": 70,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🏔️",
     "title": "Kariyer Rütbesi: 7. Sınıf Trakya Dağ Geçitleri & Kıdemli Filo Müfettişi",
-    "desc": "7. Sınıf seviyesine terfi ederek zorlu dağ hatlarının filo müfettişi yetkisini alın.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 7'e yükseltin."
+    "desc": "70 görevi tamamlayıp 7. Sınıf seviyesini tescilleyerek zorlu dağ hatlarının filo müfettişi yetkisini alın.",
+    "requirement": "Kariyer modunda toplam 70 görev tamamlayarak 7. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1893_kariyer_sinif_8",
     "difficulty": 1893,
     "tier": 5,
     "tierName": "Efsane",
-    "stat": "licenseLevel",
-    "targetValue": 8,
+    "stat": "completedTasks",
+    "targetValue": 80,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "⭐",
     "title": "Kariyer Rütbesi: 8. Sınıf Marmara - Ege Otoyol Baş Kaptanı & VIP Transfer Şefi",
-    "desc": "8. Sınıf seviyesine erişerek şehirlerarası VIP transfer şefliği payesini göğsünüze takın.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 8'e yükseltin."
+    "desc": "80 görevi tamamlayıp 8. Sınıf seviyesini tescilleyerek şehirlerarası VIP transfer şefliği payesini göğsünüze takın.",
+    "requirement": "Kariyer modunda toplam 80 görev tamamlayarak 8. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1894_kariyer_sinif_9",
     "difficulty": 1894,
     "tier": 5,
     "tierName": "Efsane",
-    "stat": "licenseLevel",
-    "targetValue": 9,
+    "stat": "completedTasks",
+    "targetValue": 90,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "🦅",
     "title": "Kariyer Rütbesi: 9. Sınıf Anadolu Kar & Dağ Geçitleri Üstadı & Gece Kartalı",
-    "desc": "9. Sınıf seviyesine çıkarak Anadolu yollarının efsanevi Gece Kartalı üstadı olun.",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 9'e yükseltin."
+    "desc": "90 görevi tamamlayıp 9. Sınıf seviyesini tescilleyerek Anadolu yollarının efsanevi Gece Kartalı üstadı olun.",
+    "requirement": "Kariyer modunda toplam 90 görev tamamlayarak 9. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1895_kariyer_sinif_10",
     "difficulty": 1895,
     "tier": 5,
     "tierName": "Efsane",
-    "stat": "licenseLevel",
-    "targetValue": 10,
+    "stat": "completedTasks",
+    "targetValue": 99,
     "category": "Kariyer Sınıf Terfileri",
     "icon": "👑",
     "title": "Kariyer Rütbesi: 10. Sınıf EFSANE MİKYAS MASTER KAPTANI (Altın Direksiyon Brövesi)",
-    "desc": "10. Sınıf seviyesine yükselerek akademinin en yüksek liyakat ödülü olan Altın Direksiyon Brövesini kazanın!",
-    "requirement": "Kariyer seviyenizi (Ehliyet Sınıfı) en az Seviye 10'e yükseltin."
+    "desc": "99 görevi tamamlayıp 10. Sınıf seviyesini tescilleyerek akademinin en yüksek liyakat ödülü olan Altın Direksiyon Brövesini kazanın!",
+    "requirement": "Kariyer modunda toplam 99 görev tamamlayarak 10. Sınıf Kaptanlık kademesini tescilleyin."
   },
   {
     "id": "ach_1896_kariyer_zirve_10",
@@ -24648,12 +24645,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 2,
     "tierName": "Kolay",
     "stat": "completedTasks",
-    "targetValue": 10,
+    "targetValue": 15,
     "category": "Kariyer Zirve Taşları",
     "icon": "🌟",
-    "title": "Kariyer Dönüm Taşı: İlk Onlu Baraj (10 Görev)",
-    "desc": "Kariyer modunda ilk 10 görevi başarıyla arkada bırakarak temelleri sağlam atın.",
-    "requirement": "Kariyer modunda toplam 10 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Dönüm Taşı: On Beşinci Görev Barajı (15 Görev)",
+    "desc": "Kariyer modunda azimle ilerleyerek toplam 15 görevi tamamlayın ve bu dönüm taşını açın.",
+    "requirement": "Kariyer modunda toplam 15 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1897_kariyer_zirve_25",
@@ -24665,7 +24662,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Kariyer Zirve Taşları",
     "icon": "🥉",
     "title": "Kariyer Dönüm Taşı: Çeyrek Asır Görev Kıdemi (25 Görev)",
-    "desc": "Kariyer görevlerinde 25 göreve ulaşarak çeyrek yol kıdemini hak edin.",
+    "desc": "Kariyer modunda azimle ilerleyerek toplam 25 görevi tamamlayın ve bu dönüm taşını açın.",
     "requirement": "Kariyer modunda toplam 25 adet görevi başarıyla tamamlayın."
   },
   {
@@ -24674,12 +24671,12 @@ const ACHIEVEMENTS_1500 = [
     "tier": 4,
     "tierName": "Zor",
     "stat": "completedTasks",
-    "targetValue": 50,
+    "targetValue": 55,
     "category": "Kariyer Zirve Taşları",
     "icon": "🥈",
-    "title": "Kariyer Dönüm Taşı: Yarı Maraton Filo Kıdemi (50 Görev)",
-    "desc": "Tam 50 kariyer görevini geride bırakarak akademinin en güvenilir kaptanları arasına girin.",
-    "requirement": "Kariyer modunda toplam 50 adet görevi başarıyla tamamlayın."
+    "title": "Kariyer Dönüm Taşı: Yarı Maraton Üstü Filo Kıdemi (55 Görev)",
+    "desc": "Kariyer modunda azimle ilerleyerek toplam 55 görevi tamamlayın ve bu dönüm taşını açın.",
+    "requirement": "Kariyer modunda toplam 55 adet görevi başarıyla tamamlayın."
   },
   {
     "id": "ach_1899_kariyer_zirve_75",
@@ -24691,7 +24688,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Kariyer Zirve Taşları",
     "icon": "🥇",
     "title": "Kariyer Dönüm Taşı: Üç Çeyrek Zirve Yaklaşımı (75 Görev)",
-    "desc": "75 kariyer görevini bitirerek şampiyonluk zirvesine emin adımlarla yaklaşın.",
+    "desc": "Kariyer modunda azimle ilerleyerek toplam 75 görevi tamamlayın ve bu dönüm taşını açın.",
     "requirement": "Kariyer modunda toplam 75 adet görevi başarıyla tamamlayın."
   },
   {
@@ -24704,14 +24701,7 @@ const ACHIEVEMENTS_1500 = [
     "category": "Kariyer Zirve Taşları",
     "icon": "👑",
     "title": "MİKYAS KAPTANLIK AKADEMİSİ NİHAİ KİLOMETRE TAŞI: EBEDİ ŞAMPİYONLUK TAŞI (100 Görev)",
-    "desc": "Kariyer modundaki tüm 100 görevi eksiksiz tamamlayarak ebedi şampiyonluk anıtına adınızı altın harflerle kazıyın!",
+    "desc": "Kariyer modunda azimle ilerleyerek toplam 100 görevi tamamlayın ve bu dönüm taşını açın.",
     "requirement": "Kariyer modunda toplam 100 adet görevi başarıyla tamamlayın."
   }
 ];
-
-if (typeof window !== 'undefined') {
-    window.ACHIEVEMENTS_1500 = ACHIEVEMENTS_1500;
-}
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = ACHIEVEMENTS_1500;
-}

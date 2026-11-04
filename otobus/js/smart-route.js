@@ -111,7 +111,7 @@ const AkilliRotaSistemi = {
         const hasPassed10 = (typeof Game !== 'undefined' && Game.hasPassedLevel10) ? Game.hasPassedLevel10() : false;
         const activeDist = this.getActiveDistrict();
 
-        if (activeDist === "all" && hasPassed10) {
+        if (hasPassed10 || activeDist === "all") {
             return this.mahallelerVeAnaDuraklar;
         }
 
@@ -129,8 +129,8 @@ const AkilliRotaSistemi = {
         { label: "100. Yıl Mahallesi (Atatürk Spor Salonu)", district: "Süleymanpaşa", stopName: "Atatürk Spor Salonu Caddesi", keys: ["100 yil", "spor salonu", "yuzuncu yil"] },
         { label: "Altınova Mahallesi (Sahil & Liman)", district: "Süleymanpaşa", stopName: "Altınova Sahil Caddesi", keys: ["altinova", "sahil", "liman"] },
         { label: "Hürriyet Mahallesi (Baykallar & Çarşı)", district: "Süleymanpaşa", stopName: "Baykallar Caddesi", keys: ["hurriyet", "baykallar", "emniyet"] },
-        { label: "Süleymanpaşa İlçe Merkezi & Yeni Otogar", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa", "tekirdag merkez", "suleymanpasa merkez", "suleymanpasa otogar", "tekirdag otogar", "yeni otogar", "otogar", "terminal", "otobus terminali"] },
-        { label: "Süleymanpaşa Yeni Otogar (Otobüs Terminali)", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa otogar", "tekirdag otogar", "yeni otogar", "otogar", "terminal", "otobus terminali"] },
+        { label: "Süleymanpaşa İlçe Merkezi & Yeni Otogar", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa", "tekirdag merkez", "suleymanpasa merkez", "suleymanpasa otogar", "tekirdag otogar", "suleymanpasa yeni otogar"] },
+        { label: "Süleymanpaşa Yeni Otogar (Otobüs Terminali)", district: "Süleymanpaşa", stopName: "Süleymanpaşa Yeni Otobüs Terminali", keys: ["suleymanpasa otogar", "tekirdag otogar", "suleymanpasa yeni otogar", "suleymanpasa yeni otobus terminali"] },
 
         // SARAY MAHALLELERİ VE ANA MERKEZLER
         { label: "Ayaspaşa Mahallesi (Saray Çarşı & Park)", district: "Saray", stopName: "Cumhuriyet Meydanı & Park", keys: ["ayaspasa", "saray park", "saray carsi", "saray merkez"] },
@@ -142,7 +142,7 @@ const AkilliRotaSistemi = {
         { label: "Çukuryurt Mahallesi (Meydan)", district: "Saray", stopName: "Çukuryurt Köy Meydanı", keys: ["cukuryurt"] },
 
         // VELİMEŞE & ERGENE
-        { label: "Velimeşe Mahallesi (Merkez Meydan)", district: "Velimeşe", stopName: "Velimeşe Merkez Meydan", keys: ["velimese", "velimese merkez", "cetin"] },
+        { label: "Velimeşe Mahallesi (Merkez Meydan)", district: "Velimeşe", stopName: "Velimeşe Merkez Meydan", keys: ["velimese", "velimese merkez", "velimese meydan"] },
         { label: "Velimeşe Sanayi Bölgesi", district: "Velimeşe", stopName: "Sanayi Caddesi", keys: ["velimese sanayi", "osb"] },
         { label: "Velimeşe TOKİ Konutları", district: "Velimeşe", stopName: "TOKİ 233. Sokak", keys: ["velimese toki", "toki"] },
 
@@ -1001,9 +1001,15 @@ const AkilliRotaSistemi = {
             };
         }
 
-        const db = (typeof window !== 'undefined' && window.tekulasHatVeritabani && window.tekulasHatVeritabani.length > 0 && currentCity === "Tekirdağ")
+        const ilceList = (typeof ilceRotalari !== 'undefined' && ilceRotalari[currentCity])
+            ? ilceRotalari[currentCity]
+            : ((typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) ? ilceRotalari["Tekirdağ"] : []);
+        const tekulasList = (typeof window !== 'undefined' && window.tekulasHatVeritabani && window.tekulasHatVeritabani.length > 0 && currentCity === "Tekirdağ")
             ? window.tekulasHatVeritabani
-            : ((typeof ilceRotalari !== 'undefined' && ilceRotalari[currentCity]) ? ilceRotalari[currentCity] : ((typeof ilceRotalari !== 'undefined' && ilceRotalari["Tekirdağ"]) ? ilceRotalari["Tekirdağ"] : (typeof routesData !== 'undefined' ? Object.values(routesData) : [])));
+            : [];
+        const db = (ilceList.length > 0 || tekulasList.length > 0)
+            ? [...ilceList, ...tekulasList]
+            : (typeof routesData !== 'undefined' ? Object.values(routesData) : []);
 
         if (!db || db.length === 0) {
             return { success: false, message: "Hat veritabanı yüklenemedi." };
@@ -1035,13 +1041,16 @@ const AkilliRotaSistemi = {
                 if (fromIdx === -1 && checkMatch(s.name, neredenQuery, fromHub)) {
                     fromIdx = i;
                 }
-                if (fromIdx !== -1 && i > fromIdx && checkMatch(s.name, nereyeQuery, toHub)) {
+                if (toIdx === -1 && i !== fromIdx && checkMatch(s.name, nereyeQuery, toHub)) {
                     toIdx = i;
                 }
             }
 
-            if (fromIdx !== -1 && toIdx !== -1 && fromIdx < toIdx) {
-                const subStops = route.stops.slice(fromIdx, toIdx + 1);
+            if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+                const isReverseDir = fromIdx > toIdx;
+                const subStops = isReverseDir
+                    ? route.stops.slice(toIdx, fromIdx + 1).slice().reverse()
+                    : route.stops.slice(fromIdx, toIdx + 1);
                 const dist = subStops.reduce((sum, s) => sum + (s.gercekMesafeSonraki || 0), 0);
                 candidates.push({
                     route: route,

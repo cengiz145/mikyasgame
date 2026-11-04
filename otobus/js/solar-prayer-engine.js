@@ -181,8 +181,12 @@
 
             this.isFetching = true;
             const url = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(cityName)}&country=Turkey&method=13`;
+            const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(() => {
+                try { controller.abort(); } catch (e) {}
+            }, 3500) : null;
 
-            fetch(url)
+            fetch(url, controller ? { signal: controller.signal } : undefined)
                 .then(r => r.json())
                 .then(res => {
                     this.isFetching = false;
@@ -217,6 +221,10 @@
                     }
                 })
                 .catch(() => {
+                    this.isFetching = false;
+                })
+                .finally(() => {
+                    if (timeoutId) clearTimeout(timeoutId);
                     this.isFetching = false;
                 });
         },

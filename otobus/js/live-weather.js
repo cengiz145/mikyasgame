@@ -184,29 +184,47 @@
             // 1. Kullanıcı OpenWeatherMap API anahtarı tanımlamışsa onu kullan
             const owmKey = (typeof localStorage !== 'undefined') ? localStorage.getItem('openweather_api_key') : null;
             if (owmKey && owmKey.trim()) {
+                let owmTimeoutId = null;
                 try {
+                    const owmController = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                    if (owmController) {
+                        owmTimeoutId = setTimeout(() => {
+                            try { owmController.abort(); } catch (e) {}
+                        }, 3500);
+                    }
                     const owmUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&appid=${owmKey.trim()}&units=metric&lang=tr`;
-                    const res = await fetch(owmUrl);
+                    const res = await fetch(owmUrl, owmController ? { signal: owmController.signal } : undefined);
                     if (res.ok) {
                         const json = await res.json();
                         weatherData = this.parseOpenWeatherMap(json, cityName, districtName);
                     }
                 } catch(err) {
                     console.warn("[LiveWeather] OpenWeatherMap sorgusu başarısız, Open-Meteo'ya geçiliyor...", err);
+                } finally {
+                    if (owmTimeoutId) clearTimeout(owmTimeoutId);
                 }
             }
 
             // 2. Open-Meteo Açık Kaynak Meteoroloji Uydusu (Sıfır Key, %100 Ücretsiz, Sınırsız)
             if (!weatherData) {
+                let omTimeoutId = null;
                 try {
+                    const omController = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                    if (omController) {
+                        omTimeoutId = setTimeout(() => {
+                            try { omController.abort(); } catch (e) {}
+                        }, 3500);
+                    }
                     const omUrl = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,wind_speed_10m,is_day`;
-                    const res = await fetch(omUrl);
+                    const res = await fetch(omUrl, omController ? { signal: omController.signal } : undefined);
                     if (res.ok) {
                         const json = await res.json();
                         weatherData = this.parseOpenMeteo(json, cityName, districtName);
                     }
                 } catch(err) {
                     console.warn("[LiveWeather] Open-Meteo sorgusu başarısız, çevrimdışı yedeğe geçiliyor...", err);
+                } finally {
+                    if (omTimeoutId) clearTimeout(omTimeoutId);
                 }
             }
 
@@ -414,10 +432,14 @@
         init: function() {
             console.log("[LiveWeather] Canlı Meteoroloji ve Gerçek Zamanlı Çevre Motoru hazır.");
 
-            // Shift + H Kısayolu: Canlı Hava Durumu Raporunu Oku
+            // Shift + H Kısayolu: Sadece sürüş ekranı dışındayken buradan tetikle (Sürüş ekranında Game.handleKeyDown zaten yönetir)
             if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
                 window.addEventListener("keydown", (e) => {
-                if (e.shiftKey && (e.key === 'h' || e.key === 'H' || e.code === 'KeyH')) {
+                if (e.shiftKey && !e.altKey && !e.ctrlKey && (e.key === 'h' || e.key === 'H' || e.code === 'KeyH')) {
+                    const inBus = (typeof Game !== 'undefined' && Game.isDriving)
+                        || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'))
+                        || (document.getElementById('stop-screen') && !document.getElementById('stop-screen').classList.contains('hidden'));
+                    if (inBus) return;
                     e.preventDefault();
                     if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
                     LiveWeather.announceWeatherReport("assertive");
