@@ -188,7 +188,11 @@
         moneyLastCommittedSignature: '',
         moneyLastCommittedAt: 0,
         moneyEmptyFramesSinceCommit: 0,
-        moneyLiveCandidate: null
+        moneyLiveCandidate: null,
+        moneyLiveOcrBusy: false,
+        moneyLastLiveOcrAt: 0,
+        moneyLastLiveBanknoteSig: '',
+        moneyLastLiveBanknoteAt: 0
     };
 
     const el = {
@@ -2401,7 +2405,72 @@
         state.moneyPendingFrames = 0;
         state.moneyEmptyFramesSinceCommit++;
 
-        if (el.moneyLiveSeen) {
+        // HİÇBİR TUŞA BASMADAN CANLI KAĞIT PARA OKUMA VE OTOMATİK TOPLAMA:
+        // Kameranın önünde yazı/rakam dokusu olan net bir yüzey (kağıt para) varsa arka planda otomatik tanı ve cüzdana ekle!
+        const nowMs = performance.now();
+        if (state.moneyAutoAccumulate &&
+            !state.moneyLiveOcrBusy &&
+            !state.isProcessingOcr &&
+            typeof window.Tesseract !== 'undefined' &&
+            metrics.sharpness >= 6.2 &&
+            (nowMs - state.moneyLastLiveOcrAt >= 1500)) {
+
+            const strokeScan = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
+            if (strokeScan.hasTextLikely) {
+                state.moneyLiveOcrBusy = true;
+                state.moneyLastLiveOcrAt = nowMs;
+
+                const snapCanvas = document.createElement('canvas');
+                snapCanvas.width = el.analysisCanvas.width;
+                snapCanvas.height = el.analysisCanvas.height;
+                snapCanvas.getContext('2d').drawImage(el.analysisCanvas, 0, 0);
+
+                window.Tesseract.recognize(snapCanvas, 'tur+eng')
+                    .then(ocrRes => {
+                        if (state.mode !== 'color_cloth') return;
+                        const rawTxt = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text : '';
+                        const upper = rawTxt.toUpperCase();
+                        // Canlı akışta yanlışlıkla rastgele sayı okunmasını önlemek için para/banknot ipucu veya net kupür kontrolü
+                        const hasBanknoteWord = upper.includes('TÜRK') || upper.includes('TURK') || upper.includes('LİRA') || upper.includes('LIRA') || upper.includes('MERKEZ') || upper.includes('BANKA') || /\b(?:200|100|50|20|10)\b/.test(upper);
+                        if (!hasBanknoteWord) return;
+
+                        const noteInfo = detectTurkishBanknoteDetailsFromText(rawTxt);
+                        if (!noteInfo) return;
+
+                        const tNow = performance.now();
+                        const isNewNote = (noteInfo.signature !== state.moneyLastLiveBanknoteSig) ||
+                            (state.moneyEmptyFramesSinceCommit >= 6 && (tNow - state.moneyLastLiveBanknoteAt > 3800));
+
+                        state.moneyLiveCandidate = {
+                            signature: noteInfo.signature,
+                            kurus: noteInfo.kurus,
+                            label: `${noteInfo.label} (Kağıt Para)`,
+                            items: noteInfo.items
+                        };
+                        if (el.moneyLiveSeen) {
+                            el.moneyLiveSeen.textContent = `💵 ${noteInfo.label} (Kağıt Para)`;
+                        }
+
+                        if (isNewNote) {
+                            state.moneyLastLiveBanknoteSig = noteInfo.signature;
+                            state.moneyLastLiveBanknoteAt = tNow;
+                            state.moneyEmptyFramesSinceCommit = 0;
+                            addMoneyToRunningTotal(
+                                noteInfo.kurus,
+                                `${noteInfo.label} (Kağıt Para)`,
+                                noteInfo.items,
+                                'live_banknote'
+                            );
+                        }
+                    })
+                    .catch(() => {})
+                    .finally(() => {
+                        state.moneyLiveOcrBusy = false;
+                    });
+            }
+        }
+
+        if (el.moneyLiveSeen && !state.moneyLiveOcrBusy) {
             el.moneyLiveSeen.textContent = `Yüzey Rengi: ${metrics.centerColor.name}`;
         }
 
@@ -2414,9 +2483,9 @@
             : pattern;
 
         const walletHint = state.moneyTotalKurus > 0
-            ? ` Şu ana kadar saydığınız toplam para: ${formatTurkishKurusTotal(state.moneyTotalKurus)}. Toplamı dinlemek için Ne Kadar Param Var düğmesine veya N tuşuna basabilirsiniz.`
-            : ' Paraları gösterdikçe bir yandan toplarım; istediğiniz an Ne Kadar Param Var düğmesine basarak toplamınızı öğrenebilirsiniz.';
-        const msg = `Merkezdeki renk: ${colorName} (${pattern}).${walletHint} Kağıt para okutmak için ekrana çift dokunun veya Boşluk tuşuna basın.`;
+            ? ` Şu ana kadar saydığınız toplam para: ${formatTurkishKurusTotal(state.moneyTotalKurus)}. Toplamı dinlemek için Ne Kadar Param Var düğmesine basabilirsiniz.`
+            : ' Elinizdeki kağıt ve demir paraları kameraya gösterdikçe hiçbir tuşa basmanıza gerek kalmadan otomatik tanıyıp toplarım.';
+        const msg = `Merkezdeki renk: ${colorName} (${pattern}).${walletHint}`;
         announceGuidance(msg, {
             bannerState: 'centered',
             minIntervalMs: 3800
@@ -3318,13 +3387,43 @@
         const isMoneyContext = clean.includes('TÜRK') || clean.includes('TURK') || clean.includes('LİRA') || clean.includes('LIRA') || clean.includes('MERKEZ') || clean.includes('BANKA') || (state.mode === 'color_cloth');
         if (!isMoneyContext) return null;
 
-        if (/\b200\b|İKİ\s*YÜZ|IKI\s*YUZ/.test(clean)) return { kurus: 20000, label: '200 Türk Lirası' };
-        if (/\b100\b|\bYÜZ\b|\bYUZ\b/.test(clean)) return { kurus: 10000, label: '100 Türk Lirası' };
-        if (/\b50\b|ELLİ|ELLI/.test(clean)) return { kurus: 5000, label: '50 Türk Lirası' };
-        if (/\b20\b|YİRMİ|YIRMI/.test(clean)) return { kurus: 2000, label: '20 Türk Lirası' };
-        if (/\b10\b|\bON\s*TÜRK|\bON\s*LİRA/.test(clean)) return { kurus: 1000, label: '10 Türk Lirası' };
-        if (/\b5\b|BEŞ\s*TÜRK|BES\s*TURK|BEŞ\s*LİRA/.test(clean)) return { kurus: 500, label: '5 Türk Lirası' };
-        return null;
+        const foundNotes = [];
+        const addMatches = (regex, kurus, label) => {
+            const matches = clean.match(regex);
+            if (matches && matches.length > 0) {
+                foundNotes.push({
+                    kurus,
+                    label,
+                    count: 1
+                });
+            }
+        };
+
+        addMatches(/\b200\b|İKİ\s*YÜZ|IKI\s*YUZ/g, 20000, '200 Türk Lirası');
+        addMatches(/\b100\b|\bYÜZ\s*(?:TÜRK|LİRA)|\bYUZ\s*(?:TURK|LIRA)/g, 10000, '100 Türk Lirası');
+        addMatches(/\b50\b|ELLİ\s*(?:TÜRK|LİRA)|ELLI\s*(?:TURK|LIRA)/g, 5000, '50 Türk Lirası');
+        addMatches(/\b20\b|YİRMİ\s*(?:TÜRK|LİRA)|YIRMI\s*(?:TURK|LIRA)/g, 2000, '20 Türk Lirası');
+        addMatches(/\b10\b|\bON\s*(?:TÜRK|LİRA)|\bON\s*(?:TURK|LIRA)/g, 1000, '10 Türk Lirası');
+        addMatches(/\b5\b\s*(?:TÜRK|TURK|LİRA|LIRA|TL)|BEŞ\s*(?:TÜRK|LİRA)|BES\s*(?:TURK|LIRA)/g, 500, '5 Türk Lirası');
+
+        if (foundNotes.length === 0) return null;
+
+        const totalKurus = foundNotes.reduce((acc, n) => acc + n.kurus * n.count, 0);
+        const label = foundNotes.length === 1
+            ? foundNotes[0].label
+            : foundNotes.map(n => n.label).join(' + ');
+        const items = foundNotes.map(n => ({
+            valueKurus: n.kurus,
+            label: `${n.label} (Kağıt Para)`,
+            count: n.count
+        }));
+
+        return {
+            kurus: totalKurus,
+            label,
+            items,
+            signature: 'NOTE_' + foundNotes.map(n => n.kurus).sort((a, b) => b - a).join('+')
+        };
     }
 
     function detectTurkishBanknoteFromTextAndColor(ocrText) {
@@ -3830,31 +3929,32 @@
                 // ÖZEL MOD 5 (PARA SAYMA): ÇEKİLEN FOTOĞRAFTA KAĞIT PARA VEYA DEMİR PARA VARSA OTOMATİK TOPLAMA EKLE
                 const banknoteDetails = detectTurkishBanknoteDetailsFromText(cleanText);
                 const photoCoins = detectAndClassifyTurkishCoins(metrics, capCanvas.width, capCanvas.height, cleanText);
-                if (banknoteDetails) {
-                    addMoneyToRunningTotal(
-                        banknoteDetails.kurus,
-                        `${banknoteDetails.label} (Kağıt Para)`,
-                        [{ valueKurus: banknoteDetails.kurus, label: `${banknoteDetails.label} (Kağıt Para)`, count: 1 }],
-                        'ocr_banknote'
-                    );
+                if (banknoteDetails || (state.mode === 'color_cloth' && photoCoins.coins.length > 0)) {
+                    let combinedKurus = 0;
+                    const combinedLabels = [];
+                    const combinedItems = [];
+
+                    if (banknoteDetails) {
+                        combinedKurus += banknoteDetails.kurus;
+                        combinedLabels.push(`${banknoteDetails.label} (Kağıt Para)`);
+                        combinedItems.push(...(banknoteDetails.items || [{ valueKurus: banknoteDetails.kurus, label: `${banknoteDetails.label} (Kağıt Para)`, count: 1 }]));
+                    }
+                    if (photoCoins.coins.length > 0) {
+                        combinedKurus += photoCoins.totalKurus;
+                        const coinLabel = photoCoins.coins.length === 1
+                            ? photoCoins.coins[0].name
+                            : `${photoCoins.coins.length} adet demir para (${photoCoins.totalFormatted})`;
+                        combinedLabels.push(coinLabel);
+                        combinedItems.push(...photoCoins.coins.map(c => ({ valueKurus: c.valueKurus, label: c.name, count: 1 })));
+                    }
+
+                    const fullAddedLabel = combinedLabels.join(' + ');
+                    addMoneyToRunningTotal(combinedKurus, fullAddedLabel, combinedItems, 'ocr_money');
                     const totalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
                     const breakdown = computeMoneyBreakdownSummary();
                     showDetectedResult(
-                        `💵 ${banknoteDetails.label} Eklendi — Toplam: ${totalFormatted}`,
-                        `Okunan Kağıt Para: ${banknoteDetails.label}\nŞu Anki Toplam Paranız: ${totalFormatted}\nSayılan Paralar: ${breakdown.spokenBreakdown}\n\n--- Detaylı Betimleme ---\n${fullStory}`
-                    );
-                    return;
-                } else if (state.mode === 'color_cloth' && photoCoins.coins.length > 0) {
-                    const coinItems = photoCoins.coins.map(c => ({ valueKurus: c.valueKurus, label: c.name, count: 1 }));
-                    const coinLabel = photoCoins.coins.length === 1
-                        ? photoCoins.coins[0].name
-                        : `${photoCoins.coins.length} adet demir para (${photoCoins.totalFormatted})`;
-                    addMoneyToRunningTotal(photoCoins.totalKurus, coinLabel, coinItems, 'photo_coins');
-                    const totalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
-                    const breakdown = computeMoneyBreakdownSummary();
-                    showDetectedResult(
-                        `🪙 ${coinLabel} Eklendi — Toplam: ${totalFormatted}`,
-                        `Eklenen Demir Para: ${coinLabel}\nŞu Anki Toplam Paranız: ${totalFormatted}\nSayılan Paralar: ${breakdown.spokenBreakdown}`
+                        `💵🪙 ${fullAddedLabel} Eklendi — Toplam: ${totalFormatted}`,
+                        `Eklenen Para: ${fullAddedLabel}\nŞu Anki Toplam Paranız: ${totalFormatted}\nSayılan Paralar: ${breakdown.spokenBreakdown}\n\n--- Detaylı Betimleme ---\n${fullStory}`
                     );
                     return;
                 }
