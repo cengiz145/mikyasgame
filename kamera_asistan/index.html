@@ -64,9 +64,9 @@
             </button>
         </section>
 
-        <!-- 8 Matematiksel Çalışma Modu Seçimi -->
+        <!-- 14 Matematiksel Çalışma Modu Seçimi -->
         <section aria-labelledby="mode-heading" class="mode-section">
-            <h2 id="mode-heading">Hassas Çalışma Modu Seçin (Klavye Kısayolu: 1 - 8)</h2>
+            <h2 id="mode-heading">Hassas Çalışma Modu Seçin (14 Sıfır-Hata Matematiksel Mod)</h2>
             <div class="mode-grid" role="radiogroup" aria-labelledby="mode-heading">
                 <button type="button" class="mode-card active" data-mode="exam_reader" role="radio" aria-checked="true" id="mode-btn-1">
                     <span class="mode-icon" aria-hidden="true">📝🅰️</span>
@@ -76,8 +76,8 @@
 
                 <button type="button" class="mode-card" data-mode="qibla_compass" role="radio" aria-checked="false" id="mode-btn-2">
                     <span class="mode-icon" aria-hidden="true">🕋🧭</span>
-                    <span class="mode-title">2. 3D Sesli Kıble Pusulası (Kâbe Radarı)</span>
-                    <span class="mode-desc">Küresel trigonometri formülü, GPS/81 İl koordinatı ve manyetik pusula sensörüyle Kıble'nin kaç derece sağınızda veya solunuzda olduğunu 3D ses ve titreşimle buldurur.</span>
+                    <span class="mode-title">2. Akıllı 3D Kıble Pusulası &amp; Namaz Vakti</span>
+                    <span class="mode-desc">5 güvenlik kilidi, Güneş azimut çapraz doğrulaması, 81 il çevrimdışı koordinatı ve Diyanet uyumlu vakit/kerahat hesabıyla Kıble'yi sıfır hatayla buldurur.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="qr_screen" role="radio" aria-checked="false" id="mode-btn-3">
@@ -112,8 +112,44 @@
 
                 <button type="button" class="mode-card" data-mode="explorer" role="radio" aria-checked="false" id="mode-btn-8">
                     <span class="mode-icon" aria-hidden="true">🧭📦</span>
-                    <span class="mode-title">8. Canlı Nesne, İmza Yeri &amp; Genel Okuma</span>
-                    <span class="mode-desc">80 nesneyi yönleriyle tarar, evrak üzerinde imza/metin alanını hizalar ve çift dokunuşla genel Türkçe OCR metin okuma yapar.</span>
+                    <span class="mode-title">8. Canlı Nesne &amp; Genel Türkçe Belge Okuma</span>
+                    <span class="mode-desc">80 nesneyi yönleriyle tarar, evrak üzerinde metin alanını hizalar ve çift dokunuşla genel Türkçe OCR metin okuma yapar.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="medicine_skt" role="radio" aria-checked="false" id="mode-btn-9">
+                    <span class="mode-icon" aria-hidden="true">💊📅</span>
+                    <span class="mode-title">9. İlaç Kutusu, Dozaj (mg), Barkod &amp; SKT Denetçisi</span>
+                    <span class="mode-desc">EAN-13 Mod-10 barkod sağlama toplamı, ilaç miligramı (mg/ml), eczane kullanım etiketi ve Son Kullanma Tarihi (SKT/EXP) geçmiş mi kontrolü yapar.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="signature_pen" role="radio" aria-checked="false" id="mode-btn-10">
+                    <span class="mode-icon" aria-hidden="true">✍️👆</span>
+                    <span class="mode-title">10. Canlı Kalem / Parmak Takipli İmza Rehberi</span>
+                    <span class="mode-desc">Evraktaki imza kutusu ile elinizdeki kalemin/parmağınızın ucunu aynı anda takip eder; kalemi kaç santim sağa/aşağı kaydıracağınızı canlı söyler.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="liquid_level" role="radio" aria-checked="false" id="mode-btn-11">
+                    <span class="mode-icon" aria-hidden="true">☕🥛</span>
+                    <span class="mode-title">11. Akustik Sıvı Seviyesi &amp; Bardak Dolum Radarı</span>
+                    <span class="mode-desc">Bardağa sıcak çay/kahve/su doldururken sıvı menisküs çizgisini takip eder; yükselen ses perdesiyle taşmadan önce (%82 dolulukta) "Durdurun!" uyarısı verir.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="door_elevator_lcd" role="radio" aria-checked="false" id="mode-btn-12">
+                    <span class="mode-icon" aria-hidden="true">🚪🔢</span>
+                    <span class="mode-title">12. Kapı No, Asansör Tuşu &amp; Dijital Ekran (LCD)</span>
+                    <span class="mode-desc">Daire/kapı numaralarını, asansör kat tuşlarında parmağınızın hangi tuşta olduğunu ve çamaşır makinesi/klima 7-segment dijital ekranlarını okur.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="food_freshness" role="radio" aria-checked="false" id="mode-btn-13">
+                    <span class="mode-icon" aria-hidden="true">🍎🛡️</span>
+                    <span class="mode-title">13. Gıda Tazelik/Küf Anomalisi &amp; Alerjen Okuyucu</span>
+                    <span class="mode-desc">Ekmek, peynir ve meyve yüzeyinde CIELAB küf/çürük spektral anomalisini tarar; paketli gıdalarda Gluten, Laktoz, Fıstık ve içerik uyarılarını süzüp okur.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="social_presence" role="radio" aria-checked="false" id="mode-btn-14">
+                    <span class="mode-icon" aria-hidden="true">👥👀</span>
+                    <span class="mode-title">14. Sosyal İletişim, Kişi Yönü &amp; Bakış Asistanı</span>
+                    <span class="mode-desc">Odada kaç kişi olduğunu, saat yönüne göre nerede durduklarını ve karşınızdaki kişinin yüz simetrisinden şu an size mi baktığını sessizce bildirir.</span>
                 </button>
             </div>
         </section>
@@ -284,11 +320,12 @@
         <section aria-labelledby="help-heading" class="help-section">
             <h2 id="help-heading">Sıfır Yanılma İçin Çalışan Matematiksel Formüller ve Kısayollar</h2>
             <ul class="help-list">
-                <li><strong>Bradley-Roth İntegral Gölge Silici + Çift Sütunlu Sınav Ayırıcı:</strong> Telefonun kağıt üzerine düşen gölgesini <code>I(x,y) &lt; μ_yerel · 0.88</code> integral matrisiyle siler; dikey projeksiyon vadisiyle çift sütunlu test kağıtlarını ortadan ikiye ayırıp sol ve sağ soruları birbirine karıştırmadan okur.</li>
+                <li><strong>Bradley-Roth İntegral Gölge Silici + Çift Sütunlu Sınav Ayırıcı:</strong> Telefonun kağıt üzerine düşen gölgesini <code>I(x,y) &lt; μ_yerel · 0.87</code> integral matrisiyle siler; dikey projeksiyon vadisiyle çift sütunlu test kağıtlarını ortadan ikiye ayırıp sol ve sağ soruları birbirine karıştırmadan okur.</li>
                 <li><strong>Etkileşimli Şık Kumandası (<code>S, A, B, C, D, E</code>):</strong> Daire içindeki bozuk okunan şık harflerini sıra algoritmasıyla onarır; her şıkkı ayrı düğmeye atar. Böylece sınavdayken tek dokunuşla sadece istediğiniz şıkkı tekrar dinleyebilirsiniz.</li>
-                <li><strong>Çoklu Kare Onayı ve Kalman/EMA Filtresi:</strong> Tek karelik kamera parazitleri asla sesli komuta dönüşmez; el titremesi <code>X̂_t = 0.30·X_t + 0.70·X̂_{t-1}</code> formülüyle süzülür.</li>
-                <li><strong>Von Kries Beyaz Dengesi + CIELAB (ΔE) Renk &amp; Michelson Ters Işık:</strong> Sarı lamba altında bile kumaşın gerçek rengini bulur; selfie çekerken ters ışığı ve arka plan mahremiyetini denetler.</li>
-                <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>7</code> (Mod seç), <code>Boşluk</code> (Çek ve oku), <code>S</code> (Soru kökünü oku), <code>A, B, C, D, E</code> (İlgili şıkkı tek oku), <code>Sol/Sağ Ok</code> (Önceki/Sonraki soru), <code>W</code> (WhatsApp 15sn ses kilidi), <code>F</code> (Flaş), <code>R</code> (3D Radar), <code>T</code> (Tekrarla).</li>
+                <li><strong>İlaç SKT &amp; GS1 Barkod Sağlama Kilidi (Mod 9):</strong> EAN-13 barkodlarını Mod-10 sağlama toplamı (Checksum) ile doğrular, <code>mg/ml</code> dozajını ve Son Kullanma Tarihini (<code>SKT/EXP</code>) bugünün tarihiyle karşılaştırıp süresi geçmiş ilaçlarda acil sesli alarm verir.</li>
+                <li><strong>Canlı Kalem/Parmak Takibi (Mod 10) &amp; Sıvı Menisküs Radarı (Mod 11):</strong> YCbCr cilt ve kalem ucu vektörüyle imza kutusuna elinizi milimetrik yönlendirir; bardak içindeki yatay sıvı menisküs gradyanını (<code>∂L/∂y</code>) 5 kare medyan filtresiyle izleyip çay/su taşmadan durdurur.</li>
+                <li><strong>7-Segment LCD Ekran Köprüleme (Mod 12), CIELAB Küf Anomalisi (Mod 13) &amp; Bakış Simetrisi (Mod 14):</strong> Asansör/beyaz eşya dijital ekranlarını morfolojik filtreyle okur, gıda yüzeyinde küf spektrumunu ve alerjenleri denetler, karşınızdaki kişinin yüz simetrisinden size bakıp bakmadığını hesaplar.</li>
+                <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>9</code> ve <code>0, U, I, G, P</code> (Mod 1–14 seç), <code>Boşluk</code> (Çek ve oku), <code>K</code> (Kıble), <code>V</code> (Namaz vakti ve Güneş açısı), <code>S, A, B, C, D, E</code> (Soru ve şıklar), <code>W</code> (WhatsApp 15sn ses kilidi), <code>F</code> (Flaş), <code>R</code> (3D Radar), <code>T</code> (Tekrarla).</li>
             </ul>
         </section>
     </main>

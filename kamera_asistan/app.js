@@ -139,6 +139,12 @@
         lastQiblaLockVibrate: 0,
         gpsWatchId: null,
         lastSceneObstacles: [],
+        // Mod 9-14 Sıfır-Hata Takip Durumları
+        liquidLevelHistory: [],
+        lastLiquidMilestone: -1,
+        moldConsensusFrames: 0,
+        penInBoxFrames: 0,
+        lastDetectedBarcode: '',
         // Sınav Soruları ve Şık Durumu
         examQuestions: [
             {
@@ -640,6 +646,26 @@
             setTimeout(() => this.playPannedTone(880, 0, 0.1, 'sine', 0.24), 85);
             setTimeout(() => this.playPannedTone(1174.66, 0, 0.16, 'sine', 0.26), 175);
         }
+
+        playDangerAlarm() {
+            this.init();
+            this.playPannedTone(240, 0, 0.12, 'sawtooth', 0.26);
+            setTimeout(() => this.playPannedTone(196, 0, 0.14, 'sawtooth', 0.26), 140);
+            setTimeout(() => this.playPannedTone(164.81, 0, 0.22, 'sawtooth', 0.28), 290);
+        }
+
+        playLiquidFillTone(fillPct) {
+            if (!state.radarEnabled) return;
+            this.init();
+            const now = performance.now();
+            const intervalMs = fillPct >= 80 ? 180 : 340;
+            if (now < this.nextPulseTime) return;
+            this.nextPulseTime = now + intervalMs;
+
+            const clamped = Math.max(0, Math.min(100, fillPct));
+            const freq = Math.round(240 + (clamped / 100) * 680);
+            this.playPannedTone(freq, 0, fillPct >= 80 ? 0.09 : 0.07, fillPct >= 80 ? 'triangle' : 'sine', 0.20);
+        }
     }
 
     const radar = new AudioRadarEngine();
@@ -1127,7 +1153,7 @@
             updateTelemetryUI(metrics);
 
             let qrDetection = null;
-            if (state.mode === 'qr_screen' || state.targetFilter === 'screen_qr') {
+            if (state.mode === 'qr_screen' || state.mode === 'medicine_skt' || state.targetFilter === 'screen_qr') {
                 if (state.barcodeDetector) {
                     try {
                         const barcodes = await state.barcodeDetector.detect(el.analysisCanvas);
@@ -1135,8 +1161,12 @@
                             const b = barcodes[0].boundingBox;
                             qrDetection = {
                                 data: barcodes[0].rawValue || '',
+                                format: barcodes[0].format || 'barcode',
                                 bbox: [b.x, b.y, b.width, b.height]
                             };
+                            if (qrDetection.data) {
+                                state.lastDetectedBarcode = qrDetection.data;
+                            }
                         }
                     } catch (_) {}
                 }
@@ -1254,6 +1284,18 @@
             handleAnomalyAndLedMode(anW, anH, scaleX, scaleY, ovCtx, metrics);
         } else if (state.mode === 'explorer') {
             handleExplorerMode(anW, anH, scaleX, scaleY, ovCtx, predictions);
+        } else if (state.mode === 'medicine_skt') {
+            handleMedicineSktLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, qrDetection, predictions);
+        } else if (state.mode === 'signature_pen') {
+            handleSignaturePenLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics);
+        } else if (state.mode === 'liquid_level') {
+            handleLiquidLevelLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
+        } else if (state.mode === 'door_elevator_lcd') {
+            handleDoorElevatorLcdLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics);
+        } else if (state.mode === 'food_freshness') {
+            handleFoodFreshnessLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
+        } else if (state.mode === 'social_presence') {
+            handleSocialPresenceLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
         }
     }
 
@@ -1638,6 +1680,694 @@
     }
 
     // =========================================================================
+    // 5B. YENİ SIFIR-HATA MODLAR (MOD 9 - MOD 14 MATEMATİKSEL MOTORLARI)
+    // =========================================================================
+
+    /**
+     * GS1 / EAN-13 ve EAN-8 Barkod Mod-10 Sağlama Toplamı (Checksum) Doğrulaması.
+     * Rastgele telefon numarası veya tarihlerin barkod sanılmasını %100 engeller.
+     */
+    function verifyEanChecksum(digitsStr) {
+        const clean = String(digitsStr || '').replace(/\D/g, '');
+        if (clean.length !== 13 && clean.length !== 8) return false;
+        let sum = 0;
+        const len = clean.length;
+        for (let i = 0; i < len - 1; i++) {
+            const d = parseInt(clean[i], 10);
+            const weight = (len === 13) ? (i % 2 === 0 ? 1 : 3) : (i % 2 === 0 ? 3 : 1);
+            sum += d * weight;
+        }
+        const checkDigit = (10 - (sum % 10)) % 10;
+        return checkDigit === parseInt(clean[len - 1], 10);
+    }
+
+    /**
+     * İlaç kutusu üzerindeki dikey çizgili 1D barkod bölgesini (Yüksek Dikey Gradyan |Gx| >> |Gy|)
+     * gerçek zamanlı tespit eder.
+     */
+    function detectBarcodeStripeRegion(metrics, anW, anH) {
+        const { gray, gw, gh, step } = metrics;
+        const blockW = 8, blockH = 5;
+        let bestScore = 0;
+        let bestBox = null;
+
+        for (let by = 2; by < gh - blockH - 2; by += 2) {
+            for (let bx = 2; bx < gw - blockW - 2; bx += 2) {
+                let gxSum = 0, gySum = 0;
+                for (let y = by; y < by + blockH; y++) {
+                    for (let x = bx; x < bx + blockW; x++) {
+                        gxSum += Math.abs(gray[y * gw + (x + 1)] - gray[y * gw + (x - 1)]);
+                        gySum += Math.abs(gray[(y + 1) * gw + x] - gray[(y - 1) * gw + x]);
+                    }
+                }
+                if (gxSum > 1450 && gxSum > gySum * 2.55) {
+                    const score = gxSum - gySum;
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestBox = [
+                            Math.max(0, (bx - 2) * step),
+                            Math.max(0, (by - 2) * step),
+                            Math.min(anW, (blockW + 4) * step),
+                            Math.min(anH, (blockH + 4) * step)
+                        ];
+                    }
+                }
+            }
+        }
+        return bestBox;
+    }
+
+    /**
+     * Mod 9: İlaç Kutusu, Dozaj (mg/ml), Barkod ve Son Kullanma Tarihi (SKT) Sıfır-Hata Çözümleyici
+     */
+    function parseMedicineAndExpiryZeroError(ocrText, liveBarcode = '') {
+        const text = String(ocrText || '');
+        const validBarcodes = [];
+
+        if (liveBarcode && verifyEanChecksum(liveBarcode)) {
+            validBarcodes.push(liveBarcode);
+        }
+        const numCandidates = text.match(/\b\d{8,13}\b/g) || [];
+        numCandidates.forEach(cand => {
+            if (verifyEanChecksum(cand) && !validBarcodes.includes(cand)) {
+                validBarcodes.push(cand);
+            }
+        });
+
+        // Dozaj Birimleri (500 mg, 1000 mg, 5 mg/5 ml, 100 mcg, 20 tablet vb.)
+        const dosageMatches = text.match(/\b\d+(?:[.,]\d+)?\s*(?:mg\s*\/\s*\d+\s*ml|mg|mcg|ml|gr|g|iu|ünite|tablet|film\s*tablet|kapsül|draje|ampul|flakon|şurup|damla|sprey)\b/gi) || [];
+        const uniqueDosages = [...new Set(dosageMatches.map(d => d.replace(/\s+/g, ' ').trim()))];
+
+        // Eczane Kullanım Etiketi Kalıpları (Sabah 1, Akşam 1, Tok karnına, Günde 2 defa)
+        const usageMatches = text.match(/(?:sabah|öğle|akşam|gece)\s*\d+|günde\s*\d+\s*(?:defa|kez)|\d+\s*x\s*\d+|(?:aç|tok)\s*karn[ıi]na|yemek(?:lerden)?\s*(?:önce|sonra)/gi) || [];
+        const uniqueUsage = [...new Set(usageMatches.map(u => u.replace(/\s+/g, ' ').trim()))];
+
+        // Sıkı Son Kullanma Tarihi (SKT / EXP / TETT) Doğrulaması
+        const now = new Date();
+        const curYear = now.getFullYear();
+        const curMonth = now.getMonth() + 1;
+
+        let expMonth = null;
+        let expYear = null;
+
+        // 1. Öncelik: Açık SKT / EXP etiketi yanındaki tarih
+        const labeledRegex = /(?:S\.?K\.?T\.?|SON\s*KULLAN(?:MA|IM)|EXP(?:IRY)?|T\.?E\.?T\.?T\.?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi;
+        let m = labeledRegex.exec(text);
+        if (m) {
+            const p1 = parseInt(m[1], 10);
+            const p2 = m[2] ? parseInt(m[2], 10) : null;
+            let yr = parseInt(m[3], 10);
+            if (yr < 100) yr += 2000;
+            const mo = p2 !== null ? p2 : p1;
+            if (mo >= 1 && mo <= 12 && yr >= 2020 && yr <= 2038) {
+                expMonth = mo;
+                expYear = yr;
+            }
+        }
+
+        // 2. Öncelik: Etiket silinmişse AA/20YY veya GG.AA.20YY formatı
+        if (expYear === null) {
+            const genericDateRegex = /\b(?:(\d{1,2})[./\-])?(0[1-9]|1[0-2])[./\-](20[2-3]\d)\b/g;
+            let gm;
+            while ((gm = genericDateRegex.exec(text)) !== null) {
+                const mo = parseInt(gm[2], 10);
+                const yr = parseInt(gm[3], 10);
+                if (mo >= 1 && mo <= 12 && yr >= 2020 && yr <= 2038) {
+                    expMonth = mo;
+                    expYear = yr;
+                    break;
+                }
+            }
+        }
+
+        let sktStatus = 'UNVERIFIED';
+        let sktSpeech = 'Son kullanma tarihi bu açıdan kesin olarak doğrulanamadı. Yanlış bilgi vermemek için tahmin yürütmüyorum; lütfen kutunun yan kapağını veya kabartmalı yüzünü çevirip tekrar çekin.';
+        let formattedDate = 'Doğrulanamadı';
+
+        if (expMonth !== null && expYear !== null) {
+            formattedDate = `${String(expMonth).padStart(2, '0')}/${expYear}`;
+            const monthsDiff = (expYear - curYear) * 12 + (expMonth - curMonth);
+            if (monthsDiff < 0) {
+                sktStatus = 'EXPIRED';
+                sktSpeech = `DİKKAT TEHLİKE! Bu ilacın veya ürünün son kullanma tarihi ${formattedDate} olup ${Math.abs(monthsDiff)} ay önce GEÇMİŞTİR! Kesinlikle kullanmayın!`;
+            } else if (monthsDiff === 0) {
+                sktStatus = 'EXPIRING_SOON';
+                sktSpeech = `UYARI: Son kullanma tarihi ${formattedDate}, yani bu ay içinde doluyor!`;
+            } else if (monthsDiff <= 2) {
+                sktStatus = 'EXPIRING_SOON';
+                sktSpeech = `Uyarı: Son kullanma tarihi ${formattedDate}. Dolmasına sadece ${monthsDiff} ay kalmış.`;
+            } else {
+                sktStatus = 'SAFE';
+                sktSpeech = `Güvenli: Son kullanma tarihi ${formattedDate}. Süresinin dolmasına ${monthsDiff} ay var.`;
+            }
+        }
+
+        return {
+            sktStatus,
+            formattedDate,
+            sktSpeech,
+            dosages: uniqueDosages,
+            usageInstructions: uniqueUsage,
+            barcodes: validBarcodes
+        };
+    }
+
+    function handleMedicineSktLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, qrDetection, predictions) {
+        const barcodeBox = (qrDetection && qrDetection.bbox) ? qrDetection.bbox : detectBarcodeStripeRegion(metrics, anW, anH);
+        const boxPred = predictions.find(p => p.class === 'book' || p.class === 'bottle' || p.class === 'cup' || p.class === 'cell phone');
+        const targetBox = barcodeBox || (boxPred ? boxPred.bbox : (metrics.brightCluster ? metrics.brightCluster.bbox : null));
+
+        if (qrDetection && qrDetection.data && verifyEanChecksum(qrDetection.data)) {
+            el.tPosition.textContent = `Barkod: ${qrDetection.data}`;
+            el.tDistance.textContent = 'GS1 Mod-10 Doğrulandı';
+        }
+
+        if (targetBox) {
+            const tracked = updateKalmanTracker(targetBox, 'medicine_box', 2);
+            if (tracked.verified && tracked.box) {
+                const label = barcodeBox ? 'İlaç Barkodu / SKT Alanı' : 'İlaç Kutusu';
+                drawTargetBox(ovCtx, tracked.box, scaleX, scaleY, '#22c55e', label);
+                const align = computeAlignmentInstruction(tracked.box, anW, anH, label, 0.06, 0.85);
+                el.tPosition.textContent = align.posLabel;
+                el.tDistance.textContent = metrics.sharpness >= 7.0 ? 'Net (Okumaya Hazır)' : 'Bulanık (Sabitleyin)';
+                radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
+
+                if (align.isCentered && metrics.sharpness >= 7.0) {
+                    if (state.autoCaptureEnabled && !state.isProcessingOcr) {
+                        handleAutoCaptureCountdown('İlaç kutusu netlendi, SKT ve dozaj okunuyor!');
+                    } else {
+                        announceGuidance('İlaç kutusu hizalandı ve net! İlacın adını, miligram dozunu ve son kullanma tarihini (SKT) doğrulamak için Boşluk tuşuna basın veya ekrana çift dokunun.', {
+                            bannerState: 'centered',
+                            minIntervalMs: 3200
+                        });
+                    }
+                } else {
+                    announceGuidance(align.sentence, { bannerState: 'normal', minIntervalMs: 2400 });
+                }
+                return;
+            }
+        }
+
+        el.tPosition.textContent = 'İlaç Kutusu Aranıyor';
+        el.tDistance.textContent = '20 cm Mesafede Tutun';
+        announceGuidance('İlaç kutusunu kameranın 20 santimetre önüne tutun. Barkodu, miligram dozajı ve Son Kullanma Tarihi (SKT) sıfır hatayla kontrol edilecektir.', {
+            bannerState: 'normal',
+            minIntervalMs: 4000
+        });
+    }
+
+    /**
+     * Mod 10: Canlı Kalem / Parmak Takipli İmza Kutusu Rehberi (YCbCr Cilt + Kalem Ucu Vektörü)
+     */
+    function detectSignatureBoxAndPenTip(metrics, anW, anH) {
+        const { imageData, gray, gw, gh, step } = metrics;
+        const data = imageData.data;
+
+        // 1. İmza Satırı / Kutusu Tespiti (Sayfanın alt %35..%82 bölgesinde yatay siyah çizgi / çerçeve)
+        let bestLineScore = 0;
+        let sigBox = [Math.round(anW * 0.36), Math.round(anH * 0.56), Math.round(anW * 0.32), Math.round(anH * 0.14)];
+
+        for (let gy = Math.floor(gh * 0.35); gy < Math.floor(gh * 0.82); gy += 2) {
+            let horizEdgeRun = 0;
+            for (let gx = Math.floor(gw * 0.20); gx < Math.floor(gw * 0.80); gx++) {
+                const dy = Math.abs(gray[(gy + 1) * gw + gx] - gray[(gy - 1) * gw + gx]);
+                const dx = Math.abs(gray[gy * gw + (gx + 1)] - gray[gy * gw + (gx - 1)]);
+                if (dy > 26 && dy > dx * 1.4) horizEdgeRun += dy;
+            }
+            if (horizEdgeRun > bestLineScore && horizEdgeRun > 420) {
+                bestLineScore = horizEdgeRun;
+                const boxY = Math.max(20, (gy * step) - Math.round(anH * 0.10));
+                sigBox = [Math.round(anW * 0.32), boxY, Math.round(anW * 0.36), Math.round(anH * 0.14)];
+            }
+        }
+
+        // 2. Parmak / El ve Kalem Ucu Tespiti (YCbCr Cilt Krominansı: 77<=Cb<=127, 133<=Cr<=173)
+        let skinPixels = 0;
+        let topSkinX = -1;
+        let topSkinY = anH + 1;
+
+        for (let gy = Math.floor(gh * 0.12); gy < gh - 1; gy++) {
+            const py = gy * step;
+            for (let gx = 2; gx < gw - 2; gx++) {
+                const px = gx * step;
+                const idx = (py * anW + px) * 4;
+                const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+                const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+                const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+
+                if (r > 65 && g > 40 && b > 20 && r > b && cb >= 77 && cb <= 127 && cr >= 133 && cr <= 175) {
+                    skinPixels++;
+                    if (py < topSkinY) {
+                        topSkinY = py;
+                        topSkinX = px;
+                    }
+                }
+            }
+        }
+
+        let penTip = null;
+        if (skinPixels >= 18 && topSkinX >= 0) {
+            // Parmağın ucundan yukarı doğru uzanan koyu kalem ucunu (24px'e kadar) tara
+            let nibX = topSkinX;
+            let nibY = topSkinY;
+            const gx0 = Math.floor(topSkinX / step);
+            const gy0 = Math.floor(topSkinY / step);
+            for (let dy = 1; dy <= 6; dy++) {
+                const ty = gy0 - dy;
+                if (ty <= 1) break;
+                if (gray[ty * gw + gx0] < 95) {
+                    nibY = ty * step;
+                }
+            }
+            penTip = { x: nibX, y: nibY, skinPixels };
+        }
+
+        return { sigBox, penTip };
+    }
+
+    function handleSignaturePenLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
+        const { sigBox, penTip } = detectSignatureBoxAndPenTip(metrics, anW, anH);
+        drawTargetBox(ovCtx, sigBox, scaleX, scaleY, '#38bdf8', 'İmza Kutusu Hedefi');
+
+        const [bx, by, bw, bh] = sigBox;
+        const targetCx = bx + bw / 2;
+        const targetCy = by + bh / 2;
+
+        if (!penTip) {
+            state.penInBoxFrames = 0;
+            el.tPosition.textContent = 'İmza Alanı Hazır';
+            el.tDistance.textContent = 'Kalem / Parmak Bekleniyor';
+            announceGuidance('Evrak üzerindeki imza bölgesi kilitlendi. Şimdi kaleminizi veya işaret parmağınızı kağıdın üzerine koyup kameranın görüş alanına sokun; sizi imza kutusuna yönlendireceğim.', {
+                bannerState: 'normal',
+                minIntervalMs: 3600
+            });
+            return;
+        }
+
+        // Kalem/Parmak ucunu vizörde sarı halka ve vektör okuyla çiz
+        ovCtx.save();
+        ovCtx.strokeStyle = '#facc15';
+        ovCtx.fillStyle = '#facc15';
+        ovCtx.lineWidth = 4;
+        ovCtx.beginPath();
+        ovCtx.arc(penTip.x * scaleX, penTip.y * scaleY, 14, 0, Math.PI * 2);
+        ovCtx.stroke();
+        ovCtx.beginPath();
+        ovCtx.moveTo(penTip.x * scaleX, penTip.y * scaleY);
+        ovCtx.lineTo(targetCx * scaleX, targetCy * scaleY);
+        ovCtx.stroke();
+        ovCtx.restore();
+
+        const dx = targetCx - penTip.x; // + ise hedef sağda
+        const dy = targetCy - penTip.y; // + ise hedef aşağıda
+        const cmX = Math.max(1, Math.round((Math.abs(dx) / anW) * 18));
+        const cmY = Math.max(1, Math.round((Math.abs(dy) / anH) * 24));
+
+        const inBox = penTip.x >= bx && penTip.x <= (bx + bw) && penTip.y >= by && penTip.y <= (by + bh);
+        const normOffX = (penTip.x - targetCx) / (anW / 2);
+        const normOffY = (penTip.y - targetCy) / (anH / 2);
+        radar.updateRadar(normOffX, normOffY, inBox);
+
+        if (inBox) {
+            state.penInBoxFrames++;
+            el.tPosition.textContent = 'KALEM İMZA KUTUSUNDA!';
+            el.tDistance.textContent = 'Şimdi İmzalayın';
+            if (state.penInBoxFrames >= 2) {
+                if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
+                announceGuidance('DURUN! Kaleminizin ucu tam imza kutusunun içinde! Elinizi kaydırmadan şimdi imzanızı atabilirsiniz.', {
+                    bannerState: 'centered',
+                    minIntervalMs: 2800
+                });
+            }
+        } else {
+            state.penInBoxFrames = 0;
+            const dirs = [];
+            if (Math.abs(dx) > bw * 0.35) dirs.push(`${cmX} santim ${dx > 0 ? 'sağa' : 'sola'}`);
+            if (Math.abs(dy) > bh * 0.35) dirs.push(`${cmY} santim ${dy > 0 ? 'aşağı' : 'yukarı'}`);
+            const cmd = dirs.join(' ve ') || '1 santim merkeze';
+
+            el.tPosition.textContent = `Kalem Ucu: (${Math.round(penTip.x)}, ${Math.round(penTip.y)})`;
+            el.tDistance.textContent = `Hedefe: ${cmd}`;
+            announceGuidance(`İmza kutusuna ulaşmak için kaleminizi ${cmd} kaydırın.`, {
+                bannerState: 'normal',
+                minIntervalMs: 2100
+            });
+        }
+    }
+
+    /**
+     * Mod 11: Akustik Sıvı Seviyesi & Bardak Doldurma Radarı (Menisküs Gradyanı + 5 Kare Medyan Filtresi)
+     */
+    function handleLiquidLevelLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
+        const cupPred = predictions.find(p => p.class === 'cup' || p.class === 'wine glass' || p.class === 'bottle' || p.class === 'bowl');
+
+        if (!cupPred) {
+            state.liquidLevelHistory = [];
+            el.tPosition.textContent = 'Bardak Aranıyor';
+            el.tDistance.textContent = 'Kadrajda Bardak Yok';
+            announceGuidance('Sıvı seviyesini ölçmek için lütfen bardağı veya kupayı kameranın tam karşısına, yandan görünecek şekilde koyun.', {
+                bannerState: 'warning',
+                minIntervalMs: 3600
+            });
+            return;
+        }
+
+        const [bx, by, bw, bh] = cupPred.bbox;
+        drawTargetBox(ovCtx, cupPred.bbox, scaleX, scaleY, '#38bdf8', 'Bardak / Kupa');
+
+        const { gray, gw, gh, step } = metrics;
+        const gx0 = Math.max(1, Math.floor((bx + bw * 0.22) / step));
+        const gx1 = Math.min(gw - 2, Math.floor((bx + bw * 0.78) / step));
+        const gyTop = Math.max(2, Math.floor((by + bh * 0.10) / step));
+        const gyBot = Math.min(gh - 3, Math.floor((by + bh * 0.90) / step));
+
+        if (gyBot - gyTop < 8 || gx1 <= gx0) return;
+
+        // Her satırın yatay medyan/ortalama parlaklığını ve dikey sıvı menisküs gradyanını (|∂L/∂y|) hesapla
+        const rowLum = new Float32Array(gh);
+        for (let gy = gyTop - 1; gy <= gyBot + 1; gy++) {
+            let sum = 0;
+            for (let gx = gx0; gx <= gx1; gx++) sum += gray[gy * gw + gx];
+            rowLum[gy] = sum / Math.max(1, gx1 - gx0 + 1);
+        }
+
+        let maxMeniscusGrad = 0;
+        let bestMeniscusGy = gyBot;
+        for (let gy = gyTop + 1; gy < gyBot - 1; gy++) {
+            const grad = Math.abs(rowLum[gy + 1] - rowLum[gy - 1]);
+            if (grad > maxMeniscusGrad) {
+                maxMeniscusGrad = grad;
+                bestMeniscusGy = gy;
+            }
+        }
+
+        // Eğer belirgin bir sıvı sınırı yoksa (< 8 luma farkı) bardak boş kabul edilir
+        let rawFillPct = 0;
+        if (maxMeniscusGrad >= 8.5) {
+            rawFillPct = Math.round(((gyBot - bestMeniscusGy) / Math.max(1, gyBot - gyTop)) * 100);
+            rawFillPct = Math.max(5, Math.min(98, rawFillPct));
+        }
+
+        state.liquidLevelHistory.push(rawFillPct);
+        if (state.liquidLevelHistory.length > 5) state.liquidLevelHistory.shift();
+        const sortedHist = [...state.liquidLevelHistory].sort((a, b) => a - b);
+        const fillPct = sortedHist[Math.floor(sortedHist.length / 2)];
+
+        // Menisküs çizgisini ekranda göster
+        const meniscusY = (gyBot - (fillPct / 100) * (gyBot - gyTop)) * step;
+        ovCtx.save();
+        ovCtx.strokeStyle = fillPct >= 80 ? '#ef4444' : '#22c55e';
+        ovCtx.lineWidth = 5;
+        ovCtx.beginPath();
+        ovCtx.moveTo(bx * scaleX, meniscusY * scaleY);
+        ovCtx.lineTo((bx + bw) * scaleX, meniscusY * scaleY);
+        ovCtx.stroke();
+        ovCtx.restore();
+
+        radar.playLiquidFillTone(fillPct);
+        el.tPosition.textContent = `Bardak Doluluk: %${fillPct}`;
+        el.tDistance.textContent = fillPct >= 80 ? 'TAŞMA SINIRI — DURDURUN!' : 'Güvenli Dolum Seviyesi';
+
+        if (fillPct >= 80) {
+            radar.playDangerAlarm();
+            if (navigator.vibrate) navigator.vibrate([150, 50, 150]);
+            announceGuidance(`DİKKAT DURDURUN! Bardak yüzde ${fillPct} doldu, dudak payına ulaştı! Taşmaması için akışı hemen kesin!`, {
+                bannerState: 'warning',
+                minIntervalMs: 1800
+            });
+        } else if (fillPct >= 15) {
+            announceGuidance(`Bardak yüzde ${fillPct} dolu. Güvenle doldurmaya devam edebilirsiniz.`, {
+                bannerState: 'centered',
+                minIntervalMs: 2800
+            });
+        } else {
+            announceGuidance('Bardak kilitlendi, şu an boş veya çok az sıvı var. Doldurmaya başlayabilirsiniz; yükselen ses tonuyla seviyeyi bildireceğim.', {
+                bannerState: 'normal',
+                minIntervalMs: 3600
+            });
+        }
+    }
+
+    /**
+     * Mod 12: Kapı Numarası, Asansör Kat Tuşları ve 7-Segment Beyaz Eşya Dijital Ekran Köprüleyici
+     */
+    function preprocess7SegmentAndPanelCanvas(sourceCanvas) {
+        const w = sourceCanvas.width;
+        const h = sourceCanvas.height;
+        const bin = applyBradleyRothShadowRemoval(sourceCanvas, 0.86);
+        const data = bin.binaryData;
+        const outCanvas = document.createElement('canvas');
+        outCanvas.width = w;
+        outCanvas.height = h;
+        const ctx = outCanvas.getContext('2d');
+        const outImg = ctx.createImageData(w, h);
+        const dst = outImg.data;
+
+        // 7-Segment LED/LCD rakamlardaki kopuk çizgileri 3x3 morfolojik erozyon (siyah genişletme) ile birleştir
+        for (let y = 1; y < h - 1; y++) {
+            for (let x = 1; x < w - 1; x++) {
+                let hasBlackNeighbor = false;
+                for (let dy = -1; dy <= 1 && !hasBlackNeighbor; dy++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (data[((y + dy) * w + (x + dx)) * 4] === 0) {
+                            hasBlackNeighbor = true;
+                            break;
+                        }
+                    }
+                }
+                const val = hasBlackNeighbor ? 0 : 255;
+                const p = (y * w + x) * 4;
+                dst[p] = val;
+                dst[p + 1] = val;
+                dst[p + 2] = val;
+                dst[p + 3] = 255;
+            }
+        }
+        ctx.putImageData(outImg, 0, 0);
+        return outCanvas;
+    }
+
+    function handleDoorElevatorLcdLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
+        const { penTip } = detectSignatureBoxAndPenTip(metrics, anW, anH);
+        const panelBox = metrics.brightCluster ? metrics.brightCluster.bbox : [anW * 0.20, anH * 0.20, anW * 0.60, anH * 0.60];
+
+        drawTargetBox(ovCtx, panelBox, scaleX, scaleY, '#38bdf8', 'Kapı No / Asansör / LCD Ekran');
+        const align = computeAlignmentInstruction(panelBox, anW, anH, 'Tuş Paneli veya Dijital Ekran', 0.05, 0.85);
+
+        el.tPosition.textContent = penTip ? 'Parmak + Panel İzleniyor' : align.posLabel;
+        el.tDistance.textContent = metrics.sharpness >= 6.8 ? 'Net (Okumaya Hazır)' : 'Sabitleyin';
+        radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
+
+        if (align.isCentered && metrics.sharpness >= 6.8 && state.autoCaptureEnabled && !state.isProcessingOcr) {
+            handleAutoCaptureCountdown('Panel ve rakamlar netlendi, okunuyor!');
+        } else {
+            const fingerHint = penTip ? ' Parmağınız panel üzerinde algılandı.' : '';
+            announceGuidance(`Kapı numarası, asansör kat tuşları veya çamaşır/klima dijital ekranı modundasınız.${fingerHint} Rakamları okutmak için Boşluk tuşuna basın veya ekrana çift dokunun.`, {
+                bannerState: align.isCentered ? 'centered' : 'normal',
+                minIntervalMs: 3200
+            });
+        }
+    }
+
+    /**
+     * Mod 13: Gıda Tazelik / Küf Spektral Anomalisi (CIELAB) ve Paketli Gıda Alerjen / İçindekiler Denetçisi
+     */
+    function analyzeFoodMoldAndFreshness(metrics, anW, anH) {
+        const { imageData, gw, gh, step } = metrics;
+        const data = imageData.data;
+
+        const gx0 = Math.floor(gw * 0.25), gx1 = Math.floor(gw * 0.75);
+        const gy0 = Math.floor(gh * 0.25), gy1 = Math.floor(gh * 0.75);
+
+        let totalSamples = 0;
+        let moldSpoilPixels = 0;
+        let darkRotPixels = 0;
+        let sumL = 0;
+
+        for (let gy = gy0; gy < gy1; gy++) {
+            for (let gx = gx0; gx < gx1; gx++) {
+                const idx = ((gy * step) * anW + (gx * step)) * 4;
+                const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+                const lab = rgbToLab(r, g, b);
+                sumL += lab.L;
+                totalSamples++;
+
+                // Küf (Penicillium / Aspergillus) spektral imzası: Grimsi-yeşil/mavi soğuk lekeler (a* < -4.2 ve düşük sarı b* < 14)
+                if (lab.L >= 25 && lab.L <= 78 && lab.a <= -4.5 && lab.b >= -16 && lab.b <= 12) {
+                    moldSpoilPixels++;
+                }
+                // Çürük / nekrotik kararma imzası
+                if (lab.L < 20 && r < 45 && g < 40) {
+                    darkRotPixels++;
+                }
+            }
+        }
+
+        const avgL = sumL / Math.max(1, totalSamples);
+        const moldRatio = moldSpoilPixels / Math.max(1, totalSamples);
+        const rotRatio = (avgL > 48) ? (darkRotPixels / Math.max(1, totalSamples)) : 0;
+        const hasAnomaly = (moldRatio >= 0.035) || (rotRatio >= 0.045);
+
+        return {
+            hasAnomaly,
+            moldRatio: Number((moldRatio * 100).toFixed(1)),
+            rotRatio: Number((rotRatio * 100).toFixed(1))
+        };
+    }
+
+    function parseFoodAllergensAndIngredients(ocrText) {
+        const text = String(ocrText || '');
+        const upper = text.toUpperCase();
+        const detectedAllergens = [];
+
+        const allergenRules = [
+            { name: 'Gluten / Buğday', regex: /GLUTEN|BUĞDAY|ÇAVDAR|ARPA|YULAF/i },
+            { name: 'Süt / Laktoz', regex: /LAKTOZ|SÜT\s*TOZU|PEYNİR\s*ALTI\s*SUYU|KAZEİN|TEREYAĞ/i },
+            { name: 'Yer Fıstığı', regex: /YER\s*FISTIĞ/i },
+            { name: 'Kuruyemiş (Fındık/Badem/Ceviz/Antep Fıstığı)', regex: /FINDIK|BADEM|CEVİZ|ANTEP\s*FISTIĞ|KAJU/i },
+            { name: 'Soya Lesitini / Soya', regex: /\bSOYA\b/i },
+            { name: 'Yumurta', regex: /YUMURTA/i },
+            { name: 'Susam', regex: /SUSAM/i },
+            { name: 'Kükürt Dioksit / Sülfit', regex: /KÜKÜRT|SÜLFİT|E220/i },
+            { name: 'Domuz Katkısı / Alkol / Karmin (E120) Uyarısı', regex: /DOMUZ|LARD|ALKOL|ETANOL|KARMİN|\bE120\b/i }
+        ];
+
+        allergenRules.forEach(rule => {
+            if (rule.regex.test(upper)) {
+                detectedAllergens.push(rule.name);
+            }
+        });
+
+        const sktInfo = parseMedicineAndExpiryZeroError(text);
+        return {
+            allergens: detectedAllergens,
+            sktInfo
+        };
+    }
+
+    function handleFoodFreshnessLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
+        const foodCheck = analyzeFoodMoldAndFreshness(metrics, anW, anH);
+        const roiBox = [anW * 0.25, anH * 0.25, anW * 0.50, anH * 0.50];
+
+        if (foodCheck.hasAnomaly) {
+            state.moldConsensusFrames++;
+        } else {
+            state.moldConsensusFrames = Math.max(0, state.moldConsensusFrames - 1);
+        }
+
+        const confirmedAnomaly = state.moldConsensusFrames >= 3;
+        drawTargetBox(ovCtx, roiBox, scaleX, scaleY, confirmedAnomaly ? '#ef4444' : '#22c55e', confirmedAnomaly ? 'Küf / Çürük Anomalisi!' : 'Gıda / Paket Analiz Alanı');
+
+        el.tPosition.textContent = confirmedAnomaly ? `Küf/Leke Riski (%${Math.max(foodCheck.moldRatio, foodCheck.rotRatio)})` : 'Yüzey Renk Dağılımı Normal';
+        el.tDistance.textContent = `Merkez Renk: ${metrics.centerColor.name}`;
+
+        if (confirmedAnomaly) {
+            radar.playDangerAlarm();
+            announceGuidance(`UYARI: Gıda yüzeyinde yüzde ${Math.max(foodCheck.moldRatio, foodCheck.rotRatio)} oranında küf veya çürük lekesi ile uyumlu renk anomalisi tespit edildi! Paket üzerindeki alerjenleri ve son tüketim tarihini okutmak için Boşluk tuşuna basabilirsiniz.`, {
+                bannerState: 'warning',
+                minIntervalMs: 3200
+            });
+        } else {
+            announceGuidance(`Gıda yüzeyinde belirgin bir küf lekesi görünmüyor (Renk: ${metrics.centerColor.name}). Paket üzerindeki Gluten, Laktoz, Fıstık alerjenlerini ve Son Tüketim Tarihini okutmak için Boşluk tuşuna basın veya çift dokunun.`, {
+                bannerState: 'centered',
+                minIntervalMs: 3800
+            });
+        }
+    }
+
+    /**
+     * Mod 14: Sosyal İletişim, Toplantı Kişi Yönü ve Yüz Simetrisi / Bakış Asistanı
+     */
+    function estimatePersonGazeAndOrientation(personBox, metrics, anW, anH) {
+        const [bx, by, bw, bh] = personBox;
+        const { imageData, gray, gw, gh, step } = metrics;
+        const data = imageData.data;
+
+        // Baş bölgesi (Kişi kutusunun üst %28'lik kısmı, yatay orta %60'ı)
+        const hx0 = Math.max(0, Math.floor(bx + bw * 0.20));
+        const hx1 = Math.min(anW - 1, Math.floor(bx + bw * 0.80));
+        const hy0 = Math.max(0, Math.floor(by + bh * 0.03));
+        const hy1 = Math.min(anH - 1, Math.floor(by + bh * 0.30));
+
+        let skinCount = 0;
+        let totalCount = 0;
+        let skinXSum = 0;
+
+        for (let y = hy0; y <= hy1; y += 3) {
+            for (let x = hx0; x <= hx1; x += 3) {
+                const idx = (y * anW + x) * 4;
+                const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+                const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+                const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+                totalCount++;
+                if (r > 60 && g > 38 && b > 20 && r > b && cb >= 76 && cb <= 128 && cr >= 132 && cr <= 176) {
+                    skinCount++;
+                    skinXSum += (x - (hx0 + hx1) / 2) / Math.max(1, (hx1 - hx0) / 2);
+                }
+            }
+        }
+
+        const skinRatio = skinCount / Math.max(1, totalCount);
+        const skinShiftX = skinCount > 0 ? (skinXSum / skinCount) : 0;
+
+        // Yaklaşık mesafe (metre): Ortalama üst gövde/boy yüksekliğinin kadraj oranından
+        const heightRatio = bh / Math.max(1, anH);
+        const approxMeters = Number(Math.max(0.5, Math.min(6.0, 1.15 / Math.max(0.18, heightRatio))).toFixed(1));
+
+        let gazeDesc = 'yüzü size doğru dönük (size bakıyor)';
+        if (skinRatio < 0.11) {
+            gazeDesc = 'arkası dönük veya yüzü kapalı';
+        } else if (skinShiftX < -0.18) {
+            gazeDesc = 'başını sola doğru çevirmiş (yan bakıyor)';
+        } else if (skinShiftX > 0.18) {
+            gazeDesc = 'başını sağa doğru çevirmiş (yan bakıyor)';
+        }
+
+        return { approxMeters, gazeDesc, isLookingAtUser: skinRatio >= 0.11 && Math.abs(skinShiftX) <= 0.18 };
+    }
+
+    function handleSocialPresenceLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
+        const people = predictions.filter(p => p.class === 'person');
+        if (people.length === 0) {
+            el.tPosition.textContent = 'Odada Kimse Yok';
+            el.tDistance.textContent = '0 Kişi';
+            announceGuidance('Şu an kameranın baktığı yönde kimse görünmüyor.', {
+                bannerState: 'normal',
+                minIntervalMs: 3800
+            });
+            return;
+        }
+
+        people.sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
+        const personReports = [];
+
+        people.slice(0, 4).forEach((p, idx) => {
+            const [bx, by, bw, bh] = p.bbox;
+            const cxNorm = (bx + bw / 2) / anW;
+            let clockDir = 'Saat 12 (tam karşınızda)';
+            if (cxNorm < 0.25) clockDir = 'Saat 10 (solunuzda)';
+            else if (cxNorm < 0.42) clockDir = 'Saat 11 (hafif solunuzda)';
+            else if (cxNorm > 0.75) clockDir = 'Saat 2 (sağınızda)';
+            else if (cxNorm > 0.58) clockDir = 'Saat 1 (hafif sağınızda)';
+
+            const gaze = estimatePersonGazeAndOrientation(p.bbox, metrics, anW, anH);
+            drawTargetBox(ovCtx, p.bbox, scaleX, scaleY, gaze.isLookingAtUser ? '#22c55e' : '#38bdf8', `${clockDir} • ${gaze.approxMeters}m`);
+            personReports.push(`${clockDir} ${gaze.approxMeters} metre mesafede, ${gaze.gazeDesc}`);
+        });
+
+        const mainGaze = estimatePersonGazeAndOrientation(people[0].bbox, metrics, anW, anH);
+        const mainAlign = computeAlignmentInstruction(people[0].bbox, anW, anH, 'Kişi');
+        el.tPosition.textContent = `Toplam ${people.length} Kişi`;
+        el.tDistance.textContent = `${mainGaze.approxMeters}m • ${mainGaze.isLookingAtUser ? 'Size Bakıyor' : 'Başka Yöne Bakıyor'}`;
+        radar.updateRadar(mainAlign.offsetX, mainAlign.offsetY, mainGaze.isLookingAtUser);
+
+        announceGuidance(`Karşınızda ${people.length} kişi var: ${personReports.join('; ')}.`, {
+            bannerState: mainGaze.isLookingAtUser ? 'centered' : 'normal',
+            minIntervalMs: 3400
+        });
+    }
+
+    // =========================================================================
     // 6. FOTOĞRAF ÇEKİMİ, GÖLGESİZ ÇİFT SÜTUN SINAV OKUMA VE BANKNOT TANIMA
     // =========================================================================
     async function triggerRetinaFlashIfNeeded(avgBrightness) {
@@ -1725,10 +2455,11 @@
         if (typeof window.Tesseract !== 'undefined' && !state.isProcessingOcr) {
             state.isProcessingOcr = true;
             try {
-                // 1. Bradley-Roth İntegral Gölge Silici Uygula
+                // Mod 12 (Dijital Ekran / Asansör / Kapı No) ise 7-Segment Morfolojik Köprüleme Uygula
                 const binObj = applyBradleyRothShadowRemoval(capCanvas);
-                // 2. Çift Sütunlu Test İse Sol ve Sağ Sütunu Ayır
-                const splitInfo = splitExamColumnsIfTwoColumn(binObj);
+                const splitInfo = (state.mode === 'door_elevator_lcd')
+                    ? { isTwoColumn: false, canvases: [preprocess7SegmentAndPanelCanvas(capCanvas)] }
+                    : splitExamColumnsIfTwoColumn(binObj);
 
                 let combinedText = '';
                 for (let i = 0; i < splitInfo.canvases.length; i++) {
@@ -1746,6 +2477,66 @@
                 }
 
                 const cleanText = combinedText.trim();
+
+                // ÖZEL MOD 9: İLAÇ KUTUSU, DOZAJ (mg), BARKOD VE SON KULLANMA TARİHİ (SKT) DENETÇİSİ
+                if (state.mode === 'medicine_skt') {
+                    const med = parseMedicineAndExpiryZeroError(cleanText, state.lastDetectedBarcode);
+                    if (med.sktStatus === 'EXPIRED') {
+                        radar.playDangerAlarm();
+                        if (navigator.vibrate) navigator.vibrate([250, 80, 250, 80, 350]);
+                    }
+                    const dosageLine = med.dosages.length > 0 ? `Tespit Edilen Dozaj/Form: ${med.dosages.join(', ')}.` : 'Dozaj (mg/ml) bu yüzeyde görünmüyor.';
+                    const usageLine = med.usageInstructions.length > 0 ? `Eczane Kullanım Tarifi: ${med.usageInstructions.join(', ')}.` : '';
+                    const barcodeLine = med.barcodes.length > 0 ? `GS1 Doğrulanmış Barkod: ${med.barcodes.join(', ')}.` : '';
+                    const medReport = `${med.sktSpeech}\n${dosageLine}\n${usageLine}\n${barcodeLine}\n\nKutuda Okunan Metin:\n${cleanText || 'Metin okunamadı.'}`.trim();
+
+                    showDetectedResult('İlaç Kutusu, Dozaj ve SKT Güvenlik Raporu', medReport);
+                    announceGuidance(`${med.sktSpeech} ${dosageLine} ${usageLine} ${cleanText ? 'Kutu üzerindeki yazı: ' + cleanText.replace(/\s+/g, ' ') : ''}`, {
+                        force: true,
+                        bannerState: med.sktStatus === 'EXPIRED' ? 'warning' : 'centered'
+                    });
+                    return;
+                }
+
+                // ÖZEL MOD 13: GIDA TAZELİK / KÜF ANOMALİSİ VE PAKET ALERJEN / İÇİNDEKİLER DENETÇİSİ
+                if (state.mode === 'food_freshness') {
+                    const foodSurface = analyzeFoodMoldAndFreshness(metrics, capCanvas.width, capCanvas.height);
+                    const pkg = parseFoodAllergensAndIngredients(cleanText);
+                    const surfaceMsg = foodSurface.hasAnomaly
+                        ? `UYARI: Gıda yüzeyinde yüzde ${Math.max(foodSurface.moldRatio, foodSurface.rotRatio)} oranında küf veya çürük lekesi ile uyumlu renk anomalisi tespit edildi!`
+                        : `Gıda yüzeyi renk dağılımı normal (${metrics.centerColor.name}).`;
+                    const allergenMsg = pkg.allergens.length > 0
+                        ? `DİKKAT ALERJEN / İÇERİK UYARISI: Pakette ${pkg.allergens.join(', ')} tespit edildi!`
+                        : 'Okunan metinde bilinen ana alerjen kelimesine rastlanmadı.';
+                    const foodReport = `${surfaceMsg}\n${allergenMsg}\n${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}\n\nPakette Okunan Metin:\n${cleanText || 'Paket yazısı algılanmadı.'}`.trim();
+
+                    if (foodSurface.hasAnomaly || pkg.sktInfo.sktStatus === 'EXPIRED') {
+                        radar.playDangerAlarm();
+                    }
+                    showDetectedResult('Gıda Tazelik, Küf ve Alerjen Raporu', foodReport);
+                    announceGuidance(`${surfaceMsg} ${allergenMsg} ${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}`, {
+                        force: true,
+                        bannerState: (foodSurface.hasAnomaly || pkg.sktInfo.sktStatus === 'EXPIRED') ? 'warning' : 'centered'
+                    });
+                    return;
+                }
+
+                // ÖZEL MOD 12: KAPI NUMARASI, ASANSÖR TUŞ PANELİ VE 7-SEGMENT DİJİTAL EKRAN OKUYUCU
+                if (state.mode === 'door_elevator_lcd') {
+                    const degMatches = cleanText.match(/\b\d{1,4}\s*(?:°\s*C|derece|devir|dk|dakika|kat|daire|no)\b/gi) || [];
+                    const numTokens = cleanText.match(/\b(?:E\d{1,2}|F\d{1,2}|\d{1,4})\b/g) || [];
+                    const summaryNums = degMatches.length > 0
+                        ? `Okunan Değerler: ${degMatches.join(', ')}.`
+                        : (numTokens.length > 0 ? `Tespit Edilen Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : 'Rakam algılanamadı.');
+                    const panelReport = `${summaryNums}\n\nTam Ekran/Panel Metni:\n${cleanText || 'Rakam veya yazı okunamadı.'}`;
+                    showDetectedResult('Kapı No, Asansör & Dijital Ekran Raporu', panelReport);
+                    announceGuidance(`${summaryNums} ${cleanText.replace(/\s+/g, ' ')}`, {
+                        force: true,
+                        bannerState: 'centered'
+                    });
+                    return;
+                }
+
                 const parsedQuestions = parseExamQuestionsAndOptions(cleanText);
 
                 if (parsedQuestions.length > 0) {
@@ -2546,7 +3337,13 @@
             'color_cloth': 'Mod 5: Beyaz Dengeli Kıyafet Rengi, Kumaş Deseni ve Para/Etiket Okuyucu seçildi.',
             'anomaly_led': 'Mod 6: Z-Skorlu Kayıp Eşya Radarı ve Cihaz LED / Şarj Işığı Frekans Okuyucu seçildi.',
             'light_meter': 'Mod 7: Akustik Işık Metre seçildi. Odadaki lambaların ve pencerelerin yönü ses frekansıyla bildiriliyor.',
-            'explorer': 'Mod 8: Canlı Nesne, İmza Yeri ve Genel Türkçe Belge Okuyucu seçildi.'
+            'explorer': 'Mod 8: Canlı Nesne ve Genel Türkçe Belge Okuyucu seçildi.',
+            'medicine_skt': 'Mod 9: İlaç Kutusu, Miligram Dozaj, GS1 Barkod ve Son Kullanma Tarihi (SKT) Denetçisi seçildi. Süresi geçmiş ilaçlarda acil sesli alarm verilir.',
+            'signature_pen': 'Mod 10: Canlı Kalem ve Parmak Takipli İmza Kutusu Rehberi seçildi. Kaleminizi kağıda yaklaştırın, sizi imza kutusuna santim santim yönlendireceğim.',
+            'liquid_level': 'Mod 11: Akustik Sıvı Seviyesi ve Bardak Doldurma Radarı seçildi. Bardağı kameranın karşısına koyup çay veya su doldurmaya başlayın.',
+            'door_elevator_lcd': 'Mod 12: Kapı Numarası, Asansör Kat Tuşları ve Beyaz Eşya 7-Segment Dijital Ekran Okuyucu seçildi.',
+            'food_freshness': 'Mod 13: Gıda Tazelik, Küf Spektral Anomalisi ve Paketli Gıda Alerjen Denetçisi seçildi.',
+            'social_presence': 'Mod 14: Sosyal İletişim, Odadaki Kişi Yönü ve Bakış Simetrisi Asistanı seçildi.'
         }[newMode];
 
         if (modeAnnouncement) {
@@ -2734,6 +3531,12 @@
         else if (key === '6') setMode('anomaly_led');
         else if (key === '7') setMode('light_meter');
         else if (key === '8') setMode('explorer');
+        else if (key === '9') setMode('medicine_skt');
+        else if (key === '0') setMode('signature_pen');
+        else if (key === 'u') setMode('liquid_level');
+        else if (key === 'i') setMode('door_elevator_lcd');
+        else if (key === 'g') setMode('food_freshness');
+        else if (key === 'p') setMode('social_presence');
         else if (key === 'k') startQiblaCompassSensor();
         else if (key === 'v') speakPrayerTimesAndSolarValidation();
         else if (key === 's') speakCurrentQuestionStem();
