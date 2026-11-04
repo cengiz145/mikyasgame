@@ -96,10 +96,10 @@
                     <span class="mode-desc" aria-hidden="true">Yüzünüzün tam ortada olup olmadığını, arkanızdan vuran ışığın yüzünüzü karartıp karartmadığını ve arkada görünmemesi gereken bir eşya olup olmadığını söyleyip 3-2-1 diye çeker.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="color_cloth" role="radio" aria-checked="false" id="mode-btn-5" aria-label="5. Demir Para, Kağıt Para ve Kıyafet Rengi Tanıma">
+                <button type="button" class="mode-card" data-mode="color_cloth" role="radio" aria-checked="false" id="mode-btn-5" aria-label="5. Demir Para, Kağıt Para Sayacı ve Kıyafet Rengi Tanıma">
                     <span class="mode-icon" aria-hidden="true">🪙💵</span>
-                    <span class="mode-title">5. Demir Para, Kağıt Para ve Kıyafet Rengi Tanıma</span>
-                    <span class="mode-desc" aria-hidden="true">Masadaki veya avucunuzdaki demir paraları (5 TL, 1 TL, 50, 25, 10 ve 5 Kuruş) tek tek tanıyıp toplam kaç lira kaç kuruş ettiğini hesaplar; ayrıca kağıt paraları ve kıyafetinizin gerçek rengini/desenini söyler.</span>
+                    <span class="mode-title">5. Demir Para, Kağıt Para Sayacı ve Kıyafet Rengi</span>
+                    <span class="mode-desc" aria-hidden="true">Elinizdeki kağıt ve demir paraları gösterdikçe bir yandan kumbarada toplar; "Ne Kadar Param Var?" düğmesine bastığınızda tek tek neler olduğunu ve toplam kaç lira kaç kuruşunuz olduğunu sesli söyler.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="anomaly_led" role="radio" aria-checked="false" id="mode-btn-6" aria-label="6. Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü">
@@ -315,6 +315,70 @@
                 <button type="button" class="exam-opt-btn" data-opt="E" id="btn-opt-e" aria-label="E Şıkkını Sesli Oku (Kısayol: E)">
                     <strong>E Şıkkı:</strong> <span id="text-opt-e">Henüz okutulmadı</span>
                 </button>
+            </div>
+        </section>
+
+        <!-- AKILLI CANLI PARA SAYMA, BİRİKTİRME VE TOPLAM CÜZDAN PANELİ -->
+        <section id="money-counter-panel" hidden aria-labelledby="money-counter-heading" class="exam-remote-section" style="border-color: #22c55e;">
+            <div class="exam-remote-header">
+                <h2 id="money-counter-heading" style="color: #4ade80;">💵🪙 Canlı Para Sayma ve Toplam Hesaplayıcı</h2>
+                <span id="money-status-badge" class="status-badge ready">Toplam: 0 TL</span>
+            </div>
+            <p class="exam-remote-hint">
+                Elinizdeki paraları kameraya tek tek gösterin; sistem gördüğü demir ve kağıt paraları bir yandan otomatik toplar (veya aşağıdaki düğmelerle de ekleyebilirsiniz). İstediğiniz an <strong>"Ne Kadar Param Var?"</strong> düğmesine basarak toplam paranızı sesli dinleyin:
+            </p>
+            <div class="exam-nav-row" role="group" aria-label="Para Sayma ve Toplam Sorgulama Kontrolleri">
+                <button type="button" id="btn-how-much-money" class="primary-btn" style="background: linear-gradient(135deg, #16a34a, #059669); font-size: 1.08rem;" aria-label="Ne Kadar Param Var? Şimdiye Kadar Sayılan Tüm Paraların Toplamını ve Dökümünü Sesli Söyle (Kısayol: N)">
+                    💰 Ne Kadar Param Var? (N)
+                </button>
+                <button type="button" id="btn-money-add-current" class="secondary-btn" aria-label="Şu An Kameranın Gördüğü Parayı Hemen Toplama Ekle (Kısayol: Artı veya Z)">
+                    ➕ Görünen Parayı Şimdi Ekle (Z)
+                </button>
+                <button type="button" id="btn-money-auto-toggle" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Kameraya Gösterilen Paraları Bir Yandan Otomatik Toplama Modunu Aç veya Kapat">
+                    🔄 Otomatik Biriktirme: Açık
+                </button>
+                <button type="button" id="btn-money-undo" class="secondary-btn" aria-label="Son Eklenen Parayı Geri Al ve Toplamdan Düş">
+                    ↩️ Son Parayı Geri Al
+                </button>
+                <button type="button" id="btn-money-reset" class="secondary-btn" aria-label="Sayılan Paraları Sıfırla ve Yeniden Saymaya Başla">
+                    🗑️ Sayacı Sıfırla
+                </button>
+            </div>
+            <div class="telemetry-grid" role="list" aria-label="Canlı Para Sayacı Bilgileri" style="margin-top: 0.7rem;">
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Şu An Toplam Paranız:</span>
+                    <strong id="money-total-display" style="color: #4ade80; font-size: 1.15rem;">0 Türk Lirası</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Son Eklenen Para:</span>
+                    <strong id="money-last-added">Henüz para eklenmedi</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Kamerada Şu An Görünen:</span>
+                    <strong id="money-live-seen">Para bekleniyor...</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Sayılan Para Dökümü:</span>
+                    <strong id="money-breakdown-text">Sayaç boş (0 adet)</strong>
+                </div>
+            </div>
+            <div style="margin-top: 0.75rem;">
+                <p class="exam-remote-hint" style="margin-bottom: 0.4rem;">
+                    👆 <strong>Hızlı Elle Para Ekleme Düğmeleri (Tek Dokunuşla Toplama Ekler ve Sesli Söyler):</strong>
+                </p>
+                <div class="exam-nav-row" role="group" aria-label="Kağıt ve Demir Paraları Tek Dokunuşla Toplama Ekleme Düğmeleri">
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="20000" data-label="200 Türk Lirası" aria-label="200 Türk Lirası Ekle">+200 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="10000" data-label="100 Türk Lirası" aria-label="100 Türk Lirası Ekle">+100 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="5000" data-label="50 Türk Lirası" aria-label="50 Türk Lirası Ekle">+50 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="2000" data-label="20 Türk Lirası" aria-label="20 Türk Lirası Ekle">+20 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="1000" data-label="10 Türk Lirası" aria-label="10 Türk Lirası Ekle">+10 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="500" data-label="5 Türk Lirası" aria-label="5 Türk Lirası Ekle">+5 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="100" data-label="1 Türk Lirası" aria-label="1 Türk Lirası Ekle">+1 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="50" data-label="50 Kuruş" aria-label="50 Kuruş Ekle">+50 Kr</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="25" data-label="25 Kuruş" aria-label="25 Kuruş Ekle">+25 Kr</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="10" data-label="10 Kuruş" aria-label="10 Kuruş Ekle">+10 Kr</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="5" data-label="5 Kuruş" aria-label="5 Kuruş Ekle">+5 Kr</button>
+                </div>
             </div>
         </section>
 

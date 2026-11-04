@@ -178,7 +178,17 @@
                 options: { A: '', B: '', C: '', D: '', E: '' }
             }
         ],
-        currentExamIndex: 0
+        currentExamIndex: 0,
+        // Canlı Para Sayma ve Biriktirme (Kumbara / Cüzdan) Durumu
+        moneyAutoAccumulate: true,
+        moneyTotalKurus: 0,
+        moneyLedger: [],
+        moneyPendingSignature: '',
+        moneyPendingFrames: 0,
+        moneyLastCommittedSignature: '',
+        moneyLastCommittedAt: 0,
+        moneyEmptyFramesSinceCommit: 0,
+        moneyLiveCandidate: null
     };
 
     const el = {
@@ -198,6 +208,7 @@
         targetSelect: document.getElementById('target-object-select'),
         targetFilterSection: document.getElementById('target-filter-section'),
         examRemotePanel: document.getElementById('exam-remote-panel'),
+        moneyCounterPanel: document.getElementById('money-counter-panel'),
         qiblaCompassPanel: document.getElementById('qibla-compass-panel'),
         songFinderPanel: document.getElementById('song-finder-panel'),
         modeButtons: document.querySelectorAll('.mode-card'),
@@ -273,7 +284,19 @@
         songAlternativesList: document.getElementById('song-alternatives-list'),
         songExternalLinks: document.getElementById('song-external-links'),
         btnSongYoutube: document.getElementById('btn-song-youtube'),
-        btnSongSpotify: document.getElementById('btn-song-spotify')
+        btnSongSpotify: document.getElementById('btn-song-spotify'),
+        // Canlı Para Sayacı Elemanları
+        moneyStatusBadge: document.getElementById('money-status-badge'),
+        btnHowMuchMoney: document.getElementById('btn-how-much-money'),
+        btnMoneyAddCurrent: document.getElementById('btn-money-add-current'),
+        btnMoneyAutoToggle: document.getElementById('btn-money-auto-toggle'),
+        btnMoneyUndo: document.getElementById('btn-money-undo'),
+        btnMoneyReset: document.getElementById('btn-money-reset'),
+        moneyTotalDisplay: document.getElementById('money-total-display'),
+        moneyLastAdded: document.getElementById('money-last-added'),
+        moneyLiveSeen: document.getElementById('money-live-seen'),
+        moneyBreakdownText: document.getElementById('money-breakdown-text'),
+        moneyQuickAddBtns: document.querySelectorAll('.money-quick-add-btn')
     };
 
     // =========================================================================
@@ -1574,15 +1597,225 @@
     }
 
     // =========================================================================
-    // KUSURSUZ T.C. DARPHANE MADENİ (DEMİR) PARA TANIMA VE TOPLAM TUTAR MOTORU
-    // (1 TL, 50 Kuruş, 25 Kuruş, 10 Kuruş, 5 Kuruş, 5 TL Çift Halka CIELAB + Çap Oranı)
+    // KUSURSUZ T.C. DARPHANE MADENİ (DEMİR) PARA TANIMA, KAĞIT PARA VE CANLI CÜZDAN TOPLAMA MOTORU
+    // (1 TL, 50 Kuruş, 25 Kuruş, 10 Kuruş, 5 Kuruş, 5 TL + 5..200 TL Banknotlar)
     // =========================================================================
+    const MONEY_WALLET_STORAGE_KEY = 'mikyas_kamera_money_ledger_v1';
+
     function formatTurkishKurusTotal(totalKurus) {
+        if (!totalKurus || totalKurus <= 0) return '0 Türk Lirası';
         const lira = Math.floor(totalKurus / 100);
         const kurus = totalKurus % 100;
         if (lira > 0 && kurus > 0) return `${lira} Lira ${kurus} Kuruş`;
         if (lira > 0) return `${lira} Türk Lirası`;
         return `${kurus} Kuruş`;
+    }
+
+    function computeMoneyBreakdownSummary() {
+        if (!Array.isArray(state.moneyLedger) || state.moneyLedger.length === 0) {
+            return {
+                totalCount: 0,
+                shortText: 'Sayaç boş (0 adet)',
+                spokenBreakdown: 'Henüz sayılmış bir para yok.'
+            };
+        }
+        const counts = new Map();
+        let totalItems = 0;
+        state.moneyLedger.forEach(entry => {
+            if (Array.isArray(entry.items) && entry.items.length > 0) {
+                entry.items.forEach(it => {
+                    const key = `${it.valueKurus}|${it.label}`;
+                    const prev = counts.get(key) || { valueKurus: it.valueKurus, label: it.label, count: 0 };
+                    prev.count += (it.count || 1);
+                    counts.set(key, prev);
+                    totalItems += (it.count || 1);
+                });
+            } else {
+                const key = `${entry.kurus}|${entry.label}`;
+                const prev = counts.get(key) || { valueKurus: entry.kurus, label: entry.label, count: 0 };
+                prev.count += 1;
+                counts.set(key, prev);
+                totalItems += 1;
+            }
+        });
+
+        const sorted = [...counts.values()].sort((a, b) => b.valueKurus - a.valueKurus);
+        const parts = sorted.map(g => `${g.count} adet ${g.label}`);
+        return {
+            totalCount: totalItems,
+            shortText: `${totalItems} adet (${parts.join(', ')})`,
+            spokenBreakdown: parts.join(', ')
+        };
+    }
+
+    function saveMoneyLedgerToStorage() {
+        try {
+            localStorage.setItem(MONEY_WALLET_STORAGE_KEY, JSON.stringify({
+                totalKurus: state.moneyTotalKurus,
+                ledger: state.moneyLedger.slice(-50)
+            }));
+        } catch (_) {}
+    }
+
+    function loadMoneyLedgerFromStorage() {
+        try {
+            const raw = localStorage.getItem(MONEY_WALLET_STORAGE_KEY);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.ledger)) {
+                state.moneyLedger = parsed.ledger;
+                state.moneyTotalKurus = state.moneyLedger.reduce((acc, item) => acc + (Number(item.kurus) || 0), 0);
+            }
+        } catch (_) {}
+        updateMoneyCounterUI();
+    }
+
+    function updateMoneyCounterUI() {
+        const totalStr = formatTurkishKurusTotal(state.moneyTotalKurus);
+        const breakdown = computeMoneyBreakdownSummary();
+
+        if (el.moneyStatusBadge) {
+            el.moneyStatusBadge.textContent = `Toplam: ${totalStr}`;
+        }
+        if (el.moneyTotalDisplay) {
+            el.moneyTotalDisplay.textContent = totalStr;
+        }
+        if (el.moneyBreakdownText) {
+            el.moneyBreakdownText.textContent = breakdown.shortText;
+        }
+        if (el.moneyLastAdded) {
+            const last = state.moneyLedger.length > 0 ? state.moneyLedger[state.moneyLedger.length - 1] : null;
+            el.moneyLastAdded.textContent = last ? `${last.label} (+${formatTurkishKurusTotal(last.kurus)})` : 'Henüz para eklenmedi';
+        }
+        if (el.btnMoneyUndo) {
+            el.btnMoneyUndo.disabled = state.moneyLedger.length === 0;
+        }
+        if (el.btnMoneyReset) {
+            el.btnMoneyReset.disabled = state.moneyLedger.length === 0;
+        }
+    }
+
+    function addMoneyToRunningTotal(kurus, label, items = null, source = 'auto') {
+        const cleanKurus = Math.round(Number(kurus) || 0);
+        if (cleanKurus <= 0) return;
+
+        radar.init();
+        radar.playQrSuccessSound();
+        if (navigator.vibrate) navigator.vibrate([70, 40, 110]);
+
+        state.moneyTotalKurus += cleanKurus;
+        state.moneyLedger.push({
+            kurus: cleanKurus,
+            label: label || formatTurkishKurusTotal(cleanKurus),
+            items: Array.isArray(items) ? items : [{ valueKurus: cleanKurus, label: label || formatTurkishKurusTotal(cleanKurus), count: 1 }],
+            source,
+            addedAt: Date.now()
+        });
+
+        saveMoneyLedgerToStorage();
+        updateMoneyCounterUI();
+
+        const addedFormatted = formatTurkishKurusTotal(cleanKurus);
+        const newTotalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
+        const msg = `${label || addedFormatted} eklendi. Şu anki toplam paranız: ${newTotalFormatted}.`;
+
+        announceGuidance(msg, {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
+    function speakHowMuchMoneyIHave() {
+        radar.init();
+        if (state.moneyTotalKurus <= 0 || state.moneyLedger.length === 0) {
+            const liveHint = state.moneyLiveCandidate
+                ? ` Ancak şu an kameranın önünde ${state.moneyLiveCandidate.label} görünüyor; toplama eklemek için Görünen Parayı Şimdi Ekle düğmesine basabilirsiniz.`
+                : ' Paralarınızı kameraya gösterdikçe veya hızlı para ekleme düğmelerine bastıkça sizin için toplayacağım.';
+            announceGuidance(`Henüz sayılmış bir paranız yok, toplam 0 Türk Lirası.${liveHint}`, {
+                force: true,
+                bannerState: 'warning'
+            });
+            return;
+        }
+
+        const totalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
+        const breakdown = computeMoneyBreakdownSummary();
+        const reportText = `💰 Toplam Paranız: ${totalFormatted}\nToplam Adet: ${breakdown.totalCount} adet para\nDetaylı Döküm: ${breakdown.spokenBreakdown}`;
+        showDetectedResult(`💰 Ne Kadar Param Var? — Toplam: ${totalFormatted}`, reportText);
+
+        announceGuidance(`Toplam ${totalFormatted} paranız var. Sayılan toplam ${breakdown.totalCount} adet paranın dökümü şöyle: ${breakdown.spokenBreakdown}.`, {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
+    function undoLastAddedMoney() {
+        if (state.moneyLedger.length === 0) {
+            announceGuidance('Geri alınacak bir para yok, sayaç şu an boş.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const removed = state.moneyLedger.pop();
+        state.moneyTotalKurus = Math.max(0, state.moneyTotalKurus - (Number(removed.kurus) || 0));
+        state.moneyLastCommittedSignature = '';
+        saveMoneyLedgerToStorage();
+        updateMoneyCounterUI();
+
+        const newTotalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
+        announceGuidance(`Son eklenen ${removed.label} geri alındı. Kalan toplam paranız: ${newTotalFormatted}.`, {
+            force: true,
+            bannerState: 'normal'
+        });
+    }
+
+    function resetMoneyCounter() {
+        state.moneyTotalKurus = 0;
+        state.moneyLedger = [];
+        state.moneyPendingSignature = '';
+        state.moneyPendingFrames = 0;
+        state.moneyLastCommittedSignature = '';
+        state.moneyEmptyFramesSinceCommit = 0;
+        saveMoneyLedgerToStorage();
+        updateMoneyCounterUI();
+
+        announceGuidance('Para sayacı sıfırlandı. Şimdi elinizdeki paraları baştan saymaya başlayabilirsiniz.', {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
+    function toggleMoneyAutoAccumulate() {
+        state.moneyAutoAccumulate = !state.moneyAutoAccumulate;
+        if (el.btnMoneyAutoToggle) {
+            el.btnMoneyAutoToggle.classList.toggle('active-toggle', state.moneyAutoAccumulate);
+            el.btnMoneyAutoToggle.setAttribute('aria-pressed', String(state.moneyAutoAccumulate));
+            el.btnMoneyAutoToggle.textContent = `🔄 Otomatik Biriktirme: ${state.moneyAutoAccumulate ? 'Açık' : 'Kapalı'}`;
+        }
+        announceGuidance(
+            state.moneyAutoAccumulate
+                ? 'Otomatik para biriktirme açıldı. Kameraya tuttuğunuz paralar netleştiğinde bir yandan otomatik olarak toplam paranıza eklenecek.'
+                : 'Otomatik para biriktirme kapatıldı. Paraları sadece siz Görünen Parayı Ekle düğmesine bastığınızda veya çift dokunduğunuzda ekleyeceğim.',
+            { force: true, bannerState: 'centered' }
+        );
+    }
+
+    function addCurrentlyVisibleMoneyManually() {
+        if (state.moneyLiveCandidate && state.moneyLiveCandidate.kurus > 0) {
+            const cand = state.moneyLiveCandidate;
+            state.moneyLastCommittedSignature = cand.signature;
+            state.moneyLastCommittedAt = performance.now();
+            state.moneyEmptyFramesSinceCommit = 0;
+            addMoneyToRunningTotal(cand.kurus, cand.label, cand.items, 'manual_live');
+            return;
+        }
+        if (state.isRunning) {
+            announceGuidance('Kameradaki kağıt veya demir para okunup toplama ekleniyor...', { force: true });
+            captureAndDescribePhoto(false);
+        } else {
+            announceGuidance('Şu an kamerada görünen bir para yok. Lütfen önce kamerayı başlatıp parayı gösterin veya aşağıdaki hızlı para ekleme düğmelerini kullanın.', {
+                force: true,
+                bannerState: 'warning'
+            });
+        }
     }
 
     function drawCoinCircleOverlay(ctx, coin, scaleX, scaleY) {
@@ -2106,29 +2339,87 @@
             const mainCoin = coinReport.coins[0];
             const align = computeAlignmentInstruction(mainCoin.bbox, anW, anH, mainCoin.name, 0.01, 0.70);
 
+            const sig = coinReport.coins.map(c => c.valueKurus).sort((a, b) => b - a).join('+');
+            const label = coinReport.coins.length === 1
+                ? coinReport.coins[0].name
+                : `${coinReport.coins.length} adet demir para (${coinReport.totalFormatted})`;
+            const items = coinReport.coins.map(c => ({
+                valueKurus: c.valueKurus,
+                label: c.name,
+                count: 1
+            }));
+
+            state.moneyLiveCandidate = {
+                signature: sig,
+                kurus: coinReport.totalKurus,
+                label,
+                items
+            };
+
+            if (el.moneyLiveSeen) {
+                el.moneyLiveSeen.textContent = `${label} (${coinReport.totalFormatted})`;
+            }
+
             el.tPosition.textContent = coinReport.coins.length === 1
                 ? `${mainCoin.name} (${mainCoin.posWord})`
                 : `${coinReport.coins.length} Demir Para`;
-            el.tDistance.textContent = `Toplam: ${coinReport.totalFormatted}`;
+            el.tDistance.textContent = `Görünen: ${coinReport.totalFormatted} • Cüzdan: ${formatTurkishKurusTotal(state.moneyTotalKurus)}`;
             radar.updateRadar(align.offsetX, align.offsetY, true);
 
-            announceGuidance(coinReport.summarySpeech, {
+            if (state.moneyPendingSignature === sig) {
+                state.moneyPendingFrames++;
+            } else {
+                state.moneyPendingSignature = sig;
+                state.moneyPendingFrames = 1;
+            }
+
+            const now = performance.now();
+            const isNewBatch = (sig !== state.moneyLastCommittedSignature) ||
+                (state.moneyEmptyFramesSinceCommit >= 8 && (now - state.moneyLastCommittedAt > 3200));
+
+            if (state.moneyAutoAccumulate && state.moneyPendingFrames >= 5 && isNewBatch) {
+                state.moneyLastCommittedSignature = sig;
+                state.moneyLastCommittedAt = now;
+                state.moneyEmptyFramesSinceCommit = 0;
+                addMoneyToRunningTotal(coinReport.totalKurus, label, items, 'live_coin');
+                return;
+            }
+
+            state.moneyEmptyFramesSinceCommit = 0;
+            const walletNote = state.moneyTotalKurus > 0
+                ? ` Şimdiye kadar sayılan toplam paranız: ${formatTurkishKurusTotal(state.moneyTotalKurus)}.`
+                : '';
+            announceGuidance(`${coinReport.summarySpeech}${walletNote}`, {
                 bannerState: 'centered',
                 minIntervalMs: 2800
             });
             return;
         }
 
+        state.moneyLiveCandidate = null;
+        state.moneyPendingSignature = '';
+        state.moneyPendingFrames = 0;
+        state.moneyEmptyFramesSinceCommit++;
+
+        if (el.moneyLiveSeen) {
+            el.moneyLiveSeen.textContent = `Yüzey Rengi: ${metrics.centerColor.name}`;
+        }
+
         const colorName = metrics.centerColor.name;
         const pattern = metrics.patternType;
 
         el.tPosition.textContent = colorName;
-        el.tDistance.textContent = pattern;
+        el.tDistance.textContent = state.moneyTotalKurus > 0
+            ? `Toplam Paranız: ${formatTurkishKurusTotal(state.moneyTotalKurus)}`
+            : pattern;
 
-        const msg = `Merkezdeki yüzey rengi: ${colorName}. Kumaş veya yüzey dokusu: ${pattern}. Demir paraları (1 TL, 50, 25, 10, 5 Kuruş) masaya veya avucunuza koyup gösterirseniz anında tanıyıp toplamını hesaplarım; kağıt para veya etiket okutmak için ekrana çift dokunun.`;
+        const walletHint = state.moneyTotalKurus > 0
+            ? ` Şu ana kadar saydığınız toplam para: ${formatTurkishKurusTotal(state.moneyTotalKurus)}. Toplamı dinlemek için Ne Kadar Param Var düğmesine veya N tuşuna basabilirsiniz.`
+            : ' Paraları gösterdikçe bir yandan toplarım; istediğiniz an Ne Kadar Param Var düğmesine basarak toplamınızı öğrenebilirsiniz.';
+        const msg = `Merkezdeki renk: ${colorName} (${pattern}).${walletHint} Kağıt para okutmak için ekrana çift dokunun veya Boşluk tuşuna basın.`;
         announceGuidance(msg, {
             bannerState: 'centered',
-            minIntervalMs: 3600
+            minIntervalMs: 3800
         });
     }
 
@@ -3022,15 +3313,23 @@
         if (el.retinaFlash) el.retinaFlash.hidden = true;
     }
 
-    function detectTurkishBanknoteFromTextAndColor(ocrText) {
-        const clean = ocrText.toUpperCase();
-        if (/\b200\b/.test(clean) && (clean.includes('TÜRK') || clean.includes('LİRA') || clean.includes('MERKEZ'))) return '200 Türk Lirası';
-        if (/\b100\b/.test(clean) && (clean.includes('TÜRK') || clean.includes('LİRA') || clean.includes('MERKEZ'))) return '100 Türk Lirası';
-        if (/\b50\b/.test(clean) && (clean.includes('TÜRK') || clean.includes('LİRA') || clean.includes('MERKEZ'))) return '50 Türk Lirası';
-        if (/\b20\b/.test(clean) && (clean.includes('TÜRK') || clean.includes('LİRA') || clean.includes('MERKEZ'))) return '20 Türk Lirası';
-        if (/\b10\b/.test(clean) && (clean.includes('TÜRK') || clean.includes('LİRA') || clean.includes('MERKEZ'))) return '10 Türk Lirası';
-        if (/\b5\b/.test(clean) && (clean.includes('TÜRK') || clean.includes('LİRA') || clean.includes('MERKEZ'))) return '5 Türk Lirası';
+    function detectTurkishBanknoteDetailsFromText(ocrText) {
+        const clean = String(ocrText || '').toUpperCase();
+        const isMoneyContext = clean.includes('TÜRK') || clean.includes('TURK') || clean.includes('LİRA') || clean.includes('LIRA') || clean.includes('MERKEZ') || clean.includes('BANKA') || (state.mode === 'color_cloth');
+        if (!isMoneyContext) return null;
+
+        if (/\b200\b|İKİ\s*YÜZ|IKI\s*YUZ/.test(clean)) return { kurus: 20000, label: '200 Türk Lirası' };
+        if (/\b100\b|\bYÜZ\b|\bYUZ\b/.test(clean)) return { kurus: 10000, label: '100 Türk Lirası' };
+        if (/\b50\b|ELLİ|ELLI/.test(clean)) return { kurus: 5000, label: '50 Türk Lirası' };
+        if (/\b20\b|YİRMİ|YIRMI/.test(clean)) return { kurus: 2000, label: '20 Türk Lirası' };
+        if (/\b10\b|\bON\s*TÜRK|\bON\s*LİRA/.test(clean)) return { kurus: 1000, label: '10 Türk Lirası' };
+        if (/\b5\b|BEŞ\s*TÜRK|BES\s*TURK|BEŞ\s*LİRA/.test(clean)) return { kurus: 500, label: '5 Türk Lirası' };
         return null;
+    }
+
+    function detectTurkishBanknoteFromTextAndColor(ocrText) {
+        const info = detectTurkishBanknoteDetailsFromText(ocrText);
+        return info ? info.label : null;
     }
 
     /**
@@ -3525,6 +3824,38 @@
                         force: true,
                         bannerState: 'centered'
                     });
+                    return;
+                }
+
+                // ÖZEL MOD 5 (PARA SAYMA): ÇEKİLEN FOTOĞRAFTA KAĞIT PARA VEYA DEMİR PARA VARSA OTOMATİK TOPLAMA EKLE
+                const banknoteDetails = detectTurkishBanknoteDetailsFromText(cleanText);
+                const photoCoins = detectAndClassifyTurkishCoins(metrics, capCanvas.width, capCanvas.height, cleanText);
+                if (banknoteDetails) {
+                    addMoneyToRunningTotal(
+                        banknoteDetails.kurus,
+                        `${banknoteDetails.label} (Kağıt Para)`,
+                        [{ valueKurus: banknoteDetails.kurus, label: `${banknoteDetails.label} (Kağıt Para)`, count: 1 }],
+                        'ocr_banknote'
+                    );
+                    const totalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
+                    const breakdown = computeMoneyBreakdownSummary();
+                    showDetectedResult(
+                        `💵 ${banknoteDetails.label} Eklendi — Toplam: ${totalFormatted}`,
+                        `Okunan Kağıt Para: ${banknoteDetails.label}\nŞu Anki Toplam Paranız: ${totalFormatted}\nSayılan Paralar: ${breakdown.spokenBreakdown}\n\n--- Detaylı Betimleme ---\n${fullStory}`
+                    );
+                    return;
+                } else if (state.mode === 'color_cloth' && photoCoins.coins.length > 0) {
+                    const coinItems = photoCoins.coins.map(c => ({ valueKurus: c.valueKurus, label: c.name, count: 1 }));
+                    const coinLabel = photoCoins.coins.length === 1
+                        ? photoCoins.coins[0].name
+                        : `${photoCoins.coins.length} adet demir para (${photoCoins.totalFormatted})`;
+                    addMoneyToRunningTotal(photoCoins.totalKurus, coinLabel, coinItems, 'photo_coins');
+                    const totalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
+                    const breakdown = computeMoneyBreakdownSummary();
+                    showDetectedResult(
+                        `🪙 ${coinLabel} Eklendi — Toplam: ${totalFormatted}`,
+                        `Eklenen Demir Para: ${coinLabel}\nŞu Anki Toplam Paranız: ${totalFormatted}\nSayılan Paralar: ${breakdown.spokenBreakdown}`
+                    );
                     return;
                 }
 
@@ -6453,6 +6784,9 @@
         if (el.examRemotePanel) {
             el.examRemotePanel.hidden = (activeMode !== 'exam_reader');
         }
+        if (el.moneyCounterPanel) {
+            el.moneyCounterPanel.hidden = (activeMode !== 'color_cloth');
+        }
         if (el.qiblaCompassPanel) {
             el.qiblaCompassPanel.hidden = (activeMode !== 'qibla_compass');
         }
@@ -6491,7 +6825,7 @@
                 : '2. Bölüm: Sesli Kıble Pusulası açıldı. Şu an bulunduğunuz şehir bulunuyor; isterseniz listeden kendi ilinizi de seçebilirsiniz.',
             'qr_screen': '3. Bölüm: WhatsApp Web ve Bilgisayar Ekranı Hizalama açıldı. Telefonu bilgisayar ekranına tutun, karekodu ortalamanız için sağa sola yönlendireceğim.',
             'portrait': '4. Bölüm: Özçekim ve Fotoğraf Çekim Yardımcısı açıldı. Yüzünüz tam ortalandığında ve ışık güzel olduğunda 3, 2, 1 diye sayıp fotoğrafınızı çekeceğim.',
-            'color_cloth': '5. Bölüm: Kağıt Para, Demir Para (1 TL, 50, 25, 10, 5 Kuruş) ve Kıyafet Rengi Tanıma açıldı. Demir paraları masaya veya avucunuza koyup gösterirseniz tek tek tanır ve toplam kaç lira kaç kuruş olduğunu hesaplarım.',
+            'color_cloth': `5. Bölüm: Canlı Para Sayma, Biriktirme ve Kıyafet Rengi Tanıma açıldı. Elinizdeki demir ve kağıt paraları gösterdikçe bir yandan toplarım; istediğiniz an Ne Kadar Param Var düğmesine veya N tuşuna basarak toplam kaç paranız olduğunu dinleyebilirsiniz.${state.moneyTotalKurus > 0 ? ' Şu an sayaçta ' + formatTurkishKurusTotal(state.moneyTotalKurus) + ' kayıtlı.' : ''}`,
             'anomaly_led': '6. Bölüm: Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü açıldı. Kamerayı yere veya modemin, şarj aletinin ışığına tutun.',
             'light_meter': '7. Bölüm: Lamba Açık mı Kapalı mı ve Pencere Bulucu açıldı. Işığın olduğu tarafa döndükçe ses incelir.',
             'explorer': '8. Bölüm: Etrafımda Ne Var ve Evrak Okuyucu açıldı. Odanızdaki eşyaları söyler, çift dokunursanız elinizdeki kağıdı okur.',
@@ -6713,11 +7047,39 @@
     el.btnExamStem.addEventListener('click', speakCurrentQuestionStem);
     el.btnExamAll.addEventListener('click', speakEntireQuestionAndOptions);
 
-    ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+        ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
         if (el.optBtns[letter]) {
             el.optBtns[letter].addEventListener('click', () => speakSingleOption(letter));
         }
     });
+
+    // Canlı Para Sayma ve Biriktirme (Kumbara / Cüzdan) Düğmeleri
+    if (el.btnHowMuchMoney) {
+        el.btnHowMuchMoney.addEventListener('click', speakHowMuchMoneyIHave);
+    }
+    if (el.btnMoneyAddCurrent) {
+        el.btnMoneyAddCurrent.addEventListener('click', addCurrentlyVisibleMoneyManually);
+    }
+    if (el.btnMoneyAutoToggle) {
+        el.btnMoneyAutoToggle.addEventListener('click', toggleMoneyAutoAccumulate);
+    }
+    if (el.btnMoneyUndo) {
+        el.btnMoneyUndo.addEventListener('click', undoLastAddedMoney);
+    }
+    if (el.btnMoneyReset) {
+        el.btnMoneyReset.addEventListener('click', resetMoneyCounter);
+    }
+    if (el.moneyQuickAddBtns && el.moneyQuickAddBtns.length > 0) {
+        el.moneyQuickAddBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const kurus = parseInt(btn.getAttribute('data-kurus') || '0', 10);
+                const label = btn.getAttribute('data-label') || formatTurkishKurusTotal(kurus);
+                if (kurus > 0) {
+                    addMoneyToRunningTotal(kurus, label, [{ valueKurus: kurus, label, count: 1 }], 'quick_button');
+                }
+            });
+        });
+    }
 
     el.targetSelect.addEventListener('change', () => {
         state.targetFilter = el.targetSelect.value;
@@ -6795,6 +7157,8 @@
         else if (key === 'w') startWhatsapp15SecAudioHold();
         else if (key === 'm' && el.photoFileInput) el.photoFileInput.click();
         else if (key === 't') el.btnRepeat.click();
+        else if (key === 'n') speakHowMuchMoneyIHave();
+        else if (key === 'z' || ev.key === '+') addCurrentlyVisibleMoneyManually();
         else if (ev.code === 'Space') {
             ev.preventDefault();
             if (!state.isRunning) startCamera();
@@ -6803,6 +7167,7 @@
     });
 
     window.addEventListener('load', () => {
+        loadMoneyLedgerFromStorage();
         syncModePanelsVisibility(state.mode);
         autoAcquireLocationAndWatch();
         updateExamRemoteUI();
