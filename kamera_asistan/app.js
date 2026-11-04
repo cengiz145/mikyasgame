@@ -3827,8 +3827,134 @@
         return verifiedLines.join(' — ');
     }
 
+    /**
+     * Profesyonel Sesli Film Betimleme (Audio Description / SEBEDER) standardında
+     * tek bir karedeki kişinin dış görünüşünü (üst/alt kıyafet rengi, deseni), duruşunu,
+     * bakış yönünü ve çevresindeki nesnelerle olan gerçek etkileşimini (ne yaptığını) betimler.
+     */
+    function analyzePersonAppearanceAndActionInFrame(p, allObjects, metrics, w, h, pixelMotion) {
+        const [bx, by, bw, bh] = p.bbox;
+        const imgData = metrics.imageData;
+        const cxNorm = (bx + bw / 2) / w;
+        const posWord = cxNorm < 0.34 ? 'sol tarafta' : (cxNorm > 0.66 ? 'sağ tarafta' : 'ortada');
+
+        // Çekim planı ve duruş (Yakın plan portre mi, bel üstü mü, boydan mı?)
+        const heightRatio = bh / Math.max(1, h);
+        const aspect = bh / Math.max(1, bw);
+        let shotAndPosture = 'orta planda';
+        if (heightRatio >= 0.68 && aspect < 1.55) {
+            shotAndPosture = 'yakın planda (bel/göğüs üstü)';
+        } else if (heightRatio >= 0.62 && aspect >= 1.65) {
+            shotAndPosture = 'boydan';
+        } else if (heightRatio < 0.38) {
+            shotAndPosture = 'arka/uzak planda';
+        }
+
+        // Bakış yönü
+        const gaze = estimatePersonGazeAndOrientation(p.bbox, metrics, w, h);
+
+        // Üst kıyafet (Gövde: %26 - %60 arası)
+        const upperCloth = measureRegionColorAndPattern(
+            imgData, w, h,
+            bx + bw * 0.22, by + bh * 0.26,
+            Math.max(12, bw * 0.56), Math.max(12, bh * 0.34)
+        );
+
+        // Alt kıyafet (Eğer kişi boydan veya diz üstü görünüyorsa: %62 - %88 arası)
+        let clothText = `üzerinde ${upperCloth.colorName} renginde ${upperCloth.pattern} bir üst kıyafet var`;
+        if (heightRatio >= 0.55 && aspect >= 1.55 && (by + bh) <= h * 0.98) {
+            const lowerCloth = measureRegionColorAndPattern(
+                imgData, w, h,
+                bx + bw * 0.24, by + bh * 0.62,
+                Math.max(12, bw * 0.52), Math.max(12, bh * 0.26)
+            );
+            if (lowerCloth.colorName !== upperCloth.colorName) {
+                clothText = `üstünde ${upperCloth.colorName} (${upperCloth.pattern}) kıyafet, altında ${lowerCloth.colorName} pantolon/alt kıyafet var`;
+            }
+        }
+
+        // Kişinin eşyalarla gerçek geometrik etkileşimi (Ne yapıyor?)
+        const actions = [];
+        let isSittingOnFurniture = false;
+
+        for (let i = 0; i < allObjects.length; i++) {
+            const obj = allObjects[i];
+            const [ox, oy, ow, oh] = obj.bbox;
+            const ocx = ox + ow / 2;
+            const ocy = oy + oh / 2;
+            const trObj = TR_LABELS[obj.class] || obj.class;
+
+            // Kişi kutusu ile nesne kutusu arasındaki yakınlık / kesişim kontrolü
+            const horizOverlap = Math.max(0, Math.min(bx + bw, ox + ow) - Math.max(bx, ox));
+            const vertOverlap = Math.max(0, Math.min(by + bh, oy + oh) - Math.max(by, oy));
+            const isTouchingOrInside = (horizOverlap > 0 && vertOverlap > 0) ||
+                (Math.abs(ocx - (bx + bw / 2)) <= bw * 0.75 && Math.abs(ocy - (by + bh / 2)) <= bh * 0.65);
+
+            if (!isTouchingOrInside) continue;
+
+            if (obj.class === 'chair' || obj.class === 'couch' || obj.class === 'bench') {
+                isSittingOnFurniture = true;
+                actions.push(`${trObj.toLowerCase()} üzerinde oturuyor`);
+            } else if (obj.class === 'dining table') {
+                actions.push('masanın başında bulunuyor');
+            } else if (obj.class === 'cell phone') {
+                actions.push('elinde cep telefonu tutuyor');
+            } else if (obj.class === 'cup' || obj.class === 'wine glass' || obj.class === 'bottle') {
+                actions.push(`elinde veya hemen önünde ${trObj.toLowerCase()} tutuyor`);
+            } else if (obj.class === 'laptop' || obj.class === 'keyboard') {
+                actions.push('önündeki bilgisayarla ilgileniyor');
+            } else if (obj.class === 'book') {
+                actions.push('elinde veya önünde kitap tutuyor');
+            } else if (obj.class === 'backpack' || obj.class === 'handbag') {
+                actions.push(`üzerinde/elinde ${trObj.toLowerCase()} taşıyor`);
+            } else if (obj.class === 'umbrella') {
+                actions.push('elinde şemsiye tutuyor');
+            } else if (obj.class === 'fork' || obj.class === 'spoon' || obj.class === 'knife' || obj.class === 'bowl') {
+                actions.push('yemek yiyor veya sofra gereci kullanıyor');
+            }
+        }
+
+        // Eğer sandalye/koltuk görünmüyorsa bile kişinin en/boy ve kadraj konumundan duruşunu belirle
+        if (!isSittingOnFurniture && actions.length === 0) {
+            if (aspect >= 1.75) {
+                actions.push('ayakta duruyor');
+            } else {
+                actions.push('bulunduğu yerde duruyor');
+            }
+        }
+
+        // Kişinin bulunduğu bölgede aktif el/kol veya baş hareketi var mı?
+        if (pixelMotion && pixelMotion.isSubjectMotion && pixelMotion.changedPct >= 5) {
+            const mPx = pixelMotion.motionCx * w;
+            const mPy = pixelMotion.motionCy * h;
+            if (mPx >= bx - bw * 0.25 && mPx <= bx + bw * 1.25 && mPy >= by - bh * 0.15 && mPy <= by + bh * 1.15) {
+                const relMotionY = (mPy - by) / Math.max(1, bh);
+                if (relMotionY < 0.35) {
+                    actions.push('başını hareket ettiriyor / konuşuyor');
+                } else if (relMotionY < 0.78) {
+                    actions.push('elini veya kolunu hareket ettiriyor');
+                } else {
+                    actions.push('adım atıyor / hareket ediyor');
+                }
+            }
+        }
+
+        const uniqueActions = [...new Set(actions)];
+        return {
+            posWord,
+            shotAndPosture,
+            gazeDesc: gaze.gazeDesc,
+            clothText,
+            upperColor: upperCloth.colorName,
+            actionText: uniqueActions.join(', '),
+            cxNorm,
+            cyNorm: (by + bh / 2) / h,
+            areaNorm: (bw * bh) / Math.max(1, w * h)
+        };
+    }
+
     function buildSingleKeyframeCompactSummary(frameAnalysis) {
-        const { canvas, metrics, preds } = frameAnalysis;
+        const { canvas, metrics, preds, pixelMotion } = frameAnalysis;
         const w = canvas.width;
         const h = canvas.height;
         const imgData = metrics.imageData;
@@ -3840,111 +3966,128 @@
         const objects = verifiedPreds.filter(p => p.class !== 'person').sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
 
         if (people.length > 0) {
-            const p0 = people[0];
-            const [bx, by, bw, bh] = p0.bbox;
-            const cxNorm = (bx + bw / 2) / w;
-            const posWord = cxNorm < 0.34 ? 'solda' : (cxNorm > 0.66 ? 'sağda' : 'ortada');
-            const torsoCloth = measureRegionColorAndPattern(
-                imgData, w, h,
-                bx + bw * 0.22, by + bh * 0.38,
-                Math.max(12, bw * 0.56), Math.max(12, bh * 0.40)
-            );
+            const pInfo = analyzePersonAppearanceAndActionInFrame(people[0], objects, metrics, w, h, pixelMotion);
+            frameAnalysis.primaryPersonInfo = pInfo;
+
             if (people.length === 1) {
-                parts.push(`${posWord} 1 kişi (${torsoCloth.colorName} kıyafetli)`);
+                parts.push(
+                    `Kadrajın ${pInfo.posWord} kısmında ${pInfo.shotAndPosture} bir kişi var; ${pInfo.clothText}, ${pInfo.gazeDesc} ve ${pInfo.actionText}`
+                );
             } else {
-                parts.push(`${people.length} kişi (öndeki ${posWord}, ${torsoCloth.colorName} kıyafetli)`);
+                const p2Info = analyzePersonAppearanceAndActionInFrame(people[1], objects, metrics, w, h, pixelMotion);
+                parts.push(
+                    `Sahnedeki ${people.length} kişiden öndeki ${pInfo.posWord} (${pInfo.clothText}, ${pInfo.actionText}), ikinci kişi ise ${p2Info.posWord} (${p2Info.upperColor} kıyafetli, ${p2Info.actionText})`
+                );
             }
         }
 
         if (objects.length > 0) {
             const objList = objects.slice(0, 4).map(o => {
-                const [bx, , bw] = o.bbox;
+                const [bx, by, bw, bh] = o.bbox;
                 const cx = (bx + bw / 2) / w;
                 const pos = cx < 0.34 ? 'solda' : (cx > 0.66 ? 'sağda' : 'ortada');
-                return `${pos} ${TR_LABELS[o.class] || o.class}`;
+                const objColor = measureRegionColorAndPattern(imgData, w, h, bx + bw * 0.2, by + bh * 0.2, Math.max(8, bw * 0.6), Math.max(8, bh * 0.6));
+                return `${pos} ${objColor.colorName.toLowerCase()} ${TR_LABELS[o.class] || o.class}`;
             });
-            parts.push(objList.join(', '));
+            parts.push(`Çevrede ${objList.join(', ')} yer alıyor`);
         }
 
         if (parts.length === 0) {
-            const bgTone = metrics.avgBrightness < 60 ? 'loş/karanlık' : (metrics.avgBrightness > 180 ? 'parlak aydınlık' : 'aydınlık');
-            parts.push(`${bgTone} görünümde ${metrics.centerColor.name} ağırlıklı görüntü`);
+            const topBg = measureRegionColorAndPattern(imgData, w, h, w * 0.15, h * 0.08, w * 0.70, h * 0.25);
+            const botBg = measureRegionColorAndPattern(imgData, w, h, w * 0.15, h * 0.65, w * 0.70, h * 0.25);
+            const bgTone = metrics.avgBrightness < 60 ? 'Loş ortamda' : (metrics.avgBrightness > 180 ? 'Aydınlık ortamda' : 'Ortamda');
+            parts.push(`${bgTone} üst kısımda ${topBg.colorName.toLowerCase()}, alt zeminde ${botBg.colorName.toLowerCase()} tonlarında görüntü`);
         }
 
-        return parts.join('; ');
+        return parts.join('. ');
     }
 
+    /**
+     * Teknik kamera/piksel istatistiği yerine, profesyonel bir Sesli Film Betimlemecisi gibi
+     * videonun başından sonuna kadar kişinin ne yaptığını, nereye yürüdüğünü, hangi eşyayı
+     * eline aldığını veya bıraktığını doğal bir öykü akışıyla özetler.
+     */
     function computeTemporalVideoMotionAndTransition(frameAnalyses) {
         if (!Array.isArray(frameAnalyses) || frameAnalyses.length < 2) return '';
-        const motionEvents = [];
+        const narrativeEvents = [];
         let totalChangedPct = 0;
-        let cameraPanCount = 0;
-        let subjectMotionCount = 0;
         let sceneCutTimes = [];
-        let firstActiveMotion = null;
-        let lastActiveMotion = null;
 
-        for (let i = 1; i < frameAnalyses.length; i++) {
-            const prev = frameAnalyses[i - 1];
+        const personTimeline = [];
+
+        for (let i = 0; i < frameAnalyses.length; i++) {
             const curr = frameAnalyses[i];
-            const m = curr.pixelMotion;
-            if (!m) continue;
+            if (curr.primaryPersonInfo) {
+                personTimeline.push({
+                    timeSec: curr.timeSec,
+                    info: curr.primaryPersonInfo,
+                    objects: curr.preds.filter(p => p.class !== 'person' && (p.score || 0) >= 0.52).map(p => TR_LABELS[p.class] || p.class)
+                });
+            }
+            if (i > 0) {
+                const prev = frameAnalyses[i - 1];
+                const m = curr.pixelMotion;
+                if (m) {
+                    totalChangedPct += m.changedPct;
+                    if (m.isSceneCut) {
+                        sceneCutTimes.push(`${curr.timeSec}. saniye`);
+                    }
+                }
+                const prevHasPerson = Boolean(prev.primaryPersonInfo);
+                const currHasPerson = Boolean(curr.primaryPersonInfo);
+                if (!prevHasPerson && currHasPerson) {
+                    narrativeEvents.push(`${curr.timeSec}. saniyede kişi sahneye giriyor.`);
+                } else if (prevHasPerson && !currHasPerson) {
+                    narrativeEvents.push(`${curr.timeSec}. saniyede kişi sahneden ayrılıyor.`);
+                }
+            }
+        }
 
-            totalChangedPct += m.changedPct;
-            if (m.isCameraPan) cameraPanCount++;
-            if (m.isSubjectMotion) subjectMotionCount++;
+        // Kişinin video boyunca yaptığı ana eylem (Yürüme, yaklaşma, uzaklaşma, oturma/kalkma, eşya alma)
+        if (personTimeline.length >= 2) {
+            const firstP = personTimeline[0];
+            const lastP = personTimeline[personTimeline.length - 1];
+            const dx = lastP.info.cxNorm - firstP.info.cxNorm;
+            const dy = lastP.info.cyNorm - firstP.info.cyNorm;
+            const areaRatio = lastP.info.areaNorm / Math.max(0.01, firstP.info.areaNorm);
 
-            if (m.isSceneCut) {
-                sceneCutTimes.push(`${curr.timeSec}. saniye`);
-            } else if (m.changedPct >= 5) {
-                if (!firstActiveMotion) firstActiveMotion = { timeSec: curr.timeSec, ...m };
-                lastActiveMotion = { timeSec: curr.timeSec, ...m };
+            if (Math.abs(dx) >= 0.16) {
+                const walkDir = dx > 0 ? 'sol taraftan sağ tarafa doğru' : 'sağ taraftan sol tarafa doğru';
+                narrativeEvents.push(`Kişi video boyunca ${walkDir} yürüyor / ilerliyor.`);
+            }
+            if (areaRatio >= 1.32) {
+                narrativeEvents.push('Kişi adım adım kameraya doğru yaklaşıyor.');
+            } else if (areaRatio <= 0.74) {
+                narrativeEvents.push('Kişi kameradan uzaklaşıp arka plana doğru gidiyor.');
+            } else if (dy >= 0.14) {
+                narrativeEvents.push('Kişi eğiliyor veya aşağı doğru oturuyor.');
+            } else if (dy <= -0.14) {
+                narrativeEvents.push('Kişi bulunduğu yerden doğrulup ayağa kalkıyor.');
             }
 
-            // Doğrulanmış kişinin veya nesnenin ardışık kareler arasındaki gerçek yer değiştirmesi
-            const prevP = prev.preds.find(p => p.class === 'person' && (p.score || 0) >= 0.52);
-            const currP = curr.preds.find(p => p.class === 'person' && (p.score || 0) >= 0.52);
-            if (!prevP && currP) {
-                motionEvents.push(`${curr.timeSec}. saniyede görüntüye kişi giriyor.`);
-            } else if (prevP && !currP) {
-                motionEvents.push(`${curr.timeSec}. saniyede kişi görüntüden çıkıyor.`);
+            // Video sırasında eline yeni bir eşya aldı mı veya masaya bir şey koydu mu?
+            const initialObjs = new Set(firstP.objects);
+            for (let t = 1; t < personTimeline.length; t++) {
+                const step = personTimeline[t];
+                for (const objName of step.objects) {
+                    if (!initialObjs.has(objName)) {
+                        initialObjs.add(objName);
+                        narrativeEvents.push(`${step.timeSec}. saniye civarında kişinin elinde veya önünde ${objName} beliriyor.`);
+                    }
+                }
             }
+        }
+
+        if (sceneCutTimes.length > 0) {
+            narrativeEvents.push(`${sceneCutTimes.join(' ve ')} civarında sahne değişiyor ve yeni bir görüntüye geçiliyor.`);
         }
 
         const avgMotionPct = Math.round(totalChangedPct / Math.max(1, frameAnalyses.length - 1));
-        const summaryNotes = [];
-
-        if (sceneCutTimes.length > 0) {
-            summaryNotes.push(`Sahne Değişimi: Videoda ${sceneCutTimes.join(' ve ')} civarında kamera açısı veya sahne tamamen değişiyor.`);
+        if (avgMotionPct < 3 && narrativeEvents.length === 0) {
+            narrativeEvents.push('Sahne boyunca kişi veya eşyalarda bir hareket olmuyor, görüntü sabit kalıyor.');
         }
 
-        if (avgMotionPct < 3 && !firstActiveMotion) {
-            summaryNotes.push('Hareket Durumu: Video boyunca piksellerde neredeyse hiç hareket yok (sabit/hareketsiz görüntü).');
-        } else {
-            const motionOrigin = cameraPanCount > subjectMotionCount
-                ? 'Kameranın kendisi hareket ediyor/dönüyor'
-                : 'Kamera sabit, görüntünün içindeki kişi veya nesne hareket ediyor';
-            if (firstActiveMotion && lastActiveMotion) {
-                const dx = lastActiveMotion.motionCx - firstActiveMotion.motionCx;
-                const dy = lastActiveMotion.motionCy - firstActiveMotion.motionCy;
-                let dirText = `en yoğun hareket ${lastActiveMotion.zoneLabel} bölgesinde (%${avgMotionPct} hareket yoğunluğu)`;
-                if (Math.abs(dx) >= 0.12) {
-                    dirText += dx > 0 ? ', hareket soldan sağa doğru ilerliyor' : ', hareket sağdan sola doğru ilerliyor';
-                }
-                if (Math.abs(dy) >= 0.12) {
-                    dirText += dy > 0 ? ' ve yukarıdan aşağıya doğru kayıyor' : ' ve aşağıdan yukarıya doğru çıkıyor';
-                }
-                summaryNotes.push(`Ölçülen Gerçek Hareket: ${motionOrigin}; ${dirText}.`);
-            } else {
-                summaryNotes.push(`Ölçülen Gerçek Hareket: ${motionOrigin} (ortalama %${avgMotionPct} hareketlilik).`);
-            }
-        }
-
-        if (motionEvents.length > 0) {
-            summaryNotes.push(motionEvents.slice(0, 3).join(' '));
-        }
-
-        return summaryNotes.join(' ');
+        return narrativeEvents.join(' ');
     }
 
     async function analyzeVideoKeyframesAndDescribe(frames, durationSec, sourceLabel = 'Seçilen Video') {
@@ -3985,21 +4128,23 @@
                 }
             }
 
-            const descText = buildSingleKeyframeCompactSummary({ canvas: f.canvas, metrics, preds });
-            const score = preds.length * 25 + metrics.sharpnessScore;
-            if (score > bestFrameScore) {
-                bestFrameScore = score;
-                bestFrameIdx = i;
-            }
-            frameAnalyses.push({
+            const frameEntry = {
                 stepIndex: i,
                 timeSec: f.timeSec,
                 canvas: f.canvas,
                 metrics,
                 preds,
                 pixelMotion,
-                descText
-            });
+                primaryPersonInfo: null,
+                descText: ''
+            };
+            frameEntry.descText = buildSingleKeyframeCompactSummary(frameEntry);
+            const score = preds.length * 25 + metrics.sharpnessScore;
+            if (score > bestFrameScore) {
+                bestFrameScore = score;
+                bestFrameIdx = i;
+            }
+            frameAnalyses.push(frameEntry);
         }
 
         const bestFrame = frameAnalyses[bestFrameIdx] || frameAnalyses[0];
@@ -4032,11 +4177,20 @@
 
         const motionSummary = computeTemporalVideoMotionAndTransition(frameAnalyses);
         const avgLum = Math.round(frameAnalyses.reduce((acc, fa) => acc + fa.metrics.avgBrightness, 0) / frameAnalyses.length);
-        const lightDesc = avgLum < 60 ? 'loş/karanlık' : (avgLum > 180 ? 'parlak aydınlık' : 'normal aydınlıkta');
+        const lightDesc = avgLum < 60 ? 'Loş ışıklı bir ortam' : (avgLum > 180 ? 'Bol ışıklı ve aydınlık bir ortam' : 'Aydınlık bir ortam');
+        const firstBg = measureRegionColorAndPattern(
+            bestFrame.metrics.imageData,
+            bestFrame.canvas.width,
+            bestFrame.canvas.height,
+            bestFrame.canvas.width * 0.15,
+            bestFrame.canvas.height * 0.05,
+            bestFrame.canvas.width * 0.70,
+            bestFrame.canvas.height * 0.20
+        );
 
         const initialVideoStory =
-            `${durationSec} saniyelik video baştan sona ${frameAnalyses.length} ayrı zaman adımında izlendi (Ortam ${lightDesc}). ` +
-            `Zaman Akışı: ${timelineSentences.join(' ')} ${motionSummary}`.trim();
+            `Sesli Video Betimlemesi (${durationSec} saniye): ${lightDesc}, arka plan genel olarak ${firstBg.colorName.toLowerCase()} tonlarında. ` +
+            `${timelineSentences.join(' ')} ${motionSummary}`.trim();
 
         populatePhotoExplorerMap(bestFrame.canvas, bestFrame.metrics, bestFrame.preds, [], initialVideoStory);
         showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Gerçek Zaman Sıralı Video Analizi`, initialVideoStory + '\n\n(Videodaki tüm karelerde gerçek ekran yazısı ve altyazı kontrolü yapılıyor...)');
