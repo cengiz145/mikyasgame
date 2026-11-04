@@ -4,3 +4,4 @@
     <string name="accessibility_service_label">Mikyas WhatsApp ve QR Sesli Hizalama Radarı</string>
     <string name="accessibility_service_description">WhatsApp Cihaz Bağla ve mobil bankacılık QR ekranlarında ekran görüntüsünü analiz ederek telefonu nereye tutacağınızı Türkçe sesle ve 3D radarla bildirir. Ses Açma ve Ses Kısma tuşlarıyla kontrol edilir.</string>
 </resources>
+

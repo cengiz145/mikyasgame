@@ -125,6 +125,14 @@
         ledHistory: [],
         whatsappHoldTimer: null,
         whatsappHoldEnd: 0,
+        // Kıble Pusulası Durumu (Kâbe Koordinatları: 21.422487 N, 39.826206 E)
+        qiblaActive: false,
+        userLat: 41.0082,
+        userLon: 28.9784,
+        qiblaTargetBearing: 151.6,
+        compassHeading: null,
+        smoothedHeading: null,
+        lastQiblaLockVibrate: 0,
         // Sınav Soruları ve Şık Durumu
         examQuestions: [
             {
@@ -166,6 +174,13 @@
         retinaFlash: document.getElementById('retina-flash-overlay'),
         srAssertive: document.getElementById('sr-live-assertive'),
         srPolite: document.getElementById('sr-live-polite'),
+        // Kıble Pusulası Elemanları
+        qiblaStatusBadge: document.getElementById('qibla-status-badge'),
+        btnStartQibla: document.getElementById('btn-start-qibla'),
+        btnQiblaGps: document.getElementById('btn-qibla-gps'),
+        qiblaCitySelect: document.getElementById('qibla-city-select'),
+        qiblaTargetDeg: document.getElementById('qibla-target-deg'),
+        qiblaCurrentDeg: document.getElementById('qibla-current-deg'),
         // Sınav Kumandası Elemanları
         examCounter: document.getElementById('exam-question-counter'),
         btnExamPrev: document.getElementById('btn-exam-prev'),
@@ -1183,6 +1198,11 @@
 
         drawCrosshair(ovCtx, vw, vh);
 
+        if (state.mode === 'qibla_compass') {
+            drawQiblaOverlayArrow(ovCtx, vw, vh);
+            return;
+        }
+
         if (state.mode === 'light_meter') {
             handleLightMeterMode(anW, anH, metrics);
             return;
@@ -1935,6 +1955,167 @@
         announceGuidance('Kamera ve sesli radar durduruldu.', { force: true });
     }
 
+    // =========================================================================
+    // KIBLE PUSULASI: BÜYÜK DAİRE KÜRESEL TRİGONOMETRİ FORMÜLÜ VE 3D SESLİ RADAR
+    // =========================================================================
+    /**
+     * Kâbe-i Muazzama (21.422487° N, 39.826206° E) için Büyük Daire (Great-Circle)
+     * Küresel Trigonometri formülüyle gerçek kuzeyden Kıble açısını hesaplar.
+     */
+    function calculateQiblaBearing(latDeg, lonDeg) {
+        const kaabaLat = 21.422487 * (Math.PI / 180);
+        const kaabaLon = 39.826206 * (Math.PI / 180);
+        const phiU = latDeg * (Math.PI / 180);
+        const lamU = lonDeg * (Math.PI / 180);
+
+        const dLon = kaabaLon - lamU;
+        const y = Math.sin(dLon);
+        const x = Math.cos(phiU) * Math.tan(kaabaLat) - Math.sin(phiU) * Math.cos(dLon);
+        const thetaRad = Math.atan2(y, x);
+        const bearing = ((thetaRad * 180 / Math.PI) + 360) % 360;
+        return Number(bearing.toFixed(1));
+    }
+
+    function updateQiblaTargetDisplay(cityName = '') {
+        state.qiblaTargetBearing = calculateQiblaBearing(state.userLat, state.userLon);
+        const prefix = cityName ? `${cityName} • ` : '';
+        if (el.qiblaStatusBadge) {
+            el.qiblaStatusBadge.textContent = `${prefix}Kıble Açısı: ${state.qiblaTargetBearing}°`;
+        }
+        if (el.qiblaTargetDeg) {
+            el.qiblaTargetDeg.textContent = `${state.qiblaTargetBearing}° (Kuzeyden Saat Yönünde)`;
+        }
+    }
+
+    function handleCompassHeadingEvent(rawHeadingDeg) {
+        if (typeof rawHeadingDeg !== 'number' || isNaN(rawHeadingDeg)) return;
+        const normHeading = ((rawHeadingDeg % 360) + 360) % 360;
+
+        // Açısal EMA yumuşatması (359° -> 1° geçişinde sıçramayı önlemek için sin/cos vektörel ortalama)
+        if (state.smoothedHeading === null) {
+            state.smoothedHeading = normHeading;
+        } else {
+            const diff = ((normHeading - state.smoothedHeading + 540) % 360) - 180;
+            state.smoothedHeading = ((state.smoothedHeading + 0.25 * diff) + 360) % 360;
+        }
+
+        state.compassHeading = Number(state.smoothedHeading.toFixed(1));
+
+        // Kıbleye olan açısal fark: -180° (Sol) .. +180° (Sağ)
+        const deltaDeg = ((state.qiblaTargetBearing - state.compassHeading + 540) % 360) - 180;
+        const absDelta = Math.abs(deltaDeg);
+        const isAligned = absDelta <= 4.5;
+
+        if (el.qiblaCurrentDeg) {
+            const dirStr = isAligned
+                ? 'TAM KIBLE HİZASINDA!'
+                : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağınızda' : 'Solunuzda'}`;
+            el.qiblaCurrentDeg.textContent = `Pusula: ${Math.round(state.compassHeading)}° • Kıble: ${dirStr}`;
+        }
+
+        if (!state.qiblaActive && state.mode !== 'qibla_compass') return;
+
+        el.tPosition.textContent = `Pusula: ${Math.round(state.compassHeading)}° (Kıble: ${state.qiblaTargetBearing}°)`;
+        el.tDistance.textContent = isAligned ? 'Tam Kıble Yönü!' : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağa' : 'Sola'} Dönün`;
+
+        // 3D Sesli Radar: Kıble soldaysa sol kulaklık, sağdaysa sağ kulaklık
+        const panX = Math.max(-1, Math.min(1, deltaDeg / 75));
+        radar.updateRadar(panX, 0, isAligned);
+
+        if (isAligned) {
+            const now = performance.now();
+            if (navigator.vibrate && now - state.lastQiblaLockVibrate > 2500) {
+                navigator.vibrate([120, 60, 180]);
+                state.lastQiblaLockVibrate = now;
+            }
+            announceGuidance(`Tam Kıble yönündesiniz! Telefonunuz ${state.qiblaTargetBearing} derece Kâbe açısıyla birebir hizalandı.`, {
+                bannerState: 'centered',
+                minIntervalMs: 3200
+            });
+        } else {
+            const turnDir = deltaDeg > 0 ? 'sağa' : 'sola';
+            const amount = Math.round(absDelta);
+            announceGuidance(`Kıble ${amount} derece ${deltaDeg > 0 ? 'sağınızda' : 'solunuzda'}. Lütfen telefonla birlikte yavaşça ${turnDir} dönün.`, {
+                bannerState: 'normal',
+                minIntervalMs: 2400
+            });
+        }
+    }
+
+    function drawQiblaOverlayArrow(ctx, w, h) {
+        const cx = w / 2;
+        const cy = h / 2;
+        const deltaDeg = state.compassHeading !== null
+            ? (((state.qiblaTargetBearing - state.compassHeading + 540) % 360) - 180)
+            : 0;
+        const rad = (deltaDeg - 90) * (Math.PI / 180);
+        const len = Math.min(w, h) * 0.28;
+
+        ctx.save();
+        ctx.strokeStyle = Math.abs(deltaDeg) <= 4.5 ? '#22c55e' : '#38bdf8';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(rad) * len, cy + Math.sin(rad) * len);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    async function startQiblaCompassSensor() {
+        radar.init();
+        state.qiblaActive = true;
+        setMode('qibla_compass');
+
+        // iOS 13+ Pusula İzni İsteği
+        if (typeof window.DeviceOrientationEvent !== 'undefined' &&
+            typeof window.DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const perm = await window.DeviceOrientationEvent.requestPermission();
+                if (perm !== 'granted') {
+                    announceGuidance('iPhone pusula sensörü izni reddedildi. Lütfen Safari ayarlarından hareket ve yön erişimine izin verin.', {
+                        force: true,
+                        bannerState: 'warning'
+                    });
+                    return;
+                }
+            } catch (_) {}
+        }
+
+        announceGuidance(`3 boyutlu sesli Kıble pusulası başlatıldı. Hedef Kıble açısı ${state.qiblaTargetBearing} derece. Telefonu yere paralel düz tutarak kendi etrafınızda yavaşça dönün.`, {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
+    function requestQiblaGpsLocation() {
+        if (!('geolocation' in navigator)) {
+            announceGuidance('Cihazınızda GPS konum servisi bulunamadı, şehir listesinden seçebilirsiniz.', {
+                force: true,
+                bannerState: 'warning'
+            });
+            return;
+        }
+        announceGuidance('GPS konumunuz alınıyor, lütfen bekleyin...', { force: true });
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                state.userLat = pos.coords.latitude;
+                state.userLon = pos.coords.longitude;
+                updateQiblaTargetDisplay('GPS Konumu');
+                announceGuidance(`GPS konumunuz güncellendi! Bulunduğunuz noktadan kesin Kıble açısı: ${state.qiblaTargetBearing} derece.`, {
+                    force: true,
+                    bannerState: 'centered'
+                });
+            },
+            () => {
+                announceGuidance('GPS konumu alınamadı. Şehir seçim kutusundaki il koordinatları kullanılıyor.', {
+                    force: true,
+                    bannerState: 'warning'
+                });
+            },
+            { enableHighAccuracy: true, timeout: 8000 }
+        );
+    }
+
     function getActiveModeTitle() {
         const activeBtn = document.querySelector('.mode-card.active .mode-title');
         return activeBtn ? activeBtn.textContent : 'Sınav ve Şık Okuyucu';
@@ -1945,6 +2126,12 @@
         state.countdownStage = 0;
         state.kalmanBox = null;
         state.consensusFrames = 0;
+        if (newMode === 'qibla_compass') {
+            state.qiblaActive = true;
+            radar.init();
+        } else {
+            state.qiblaActive = false;
+        }
 
         el.modeButtons.forEach(btn => {
             const isMatch = btn.getAttribute('data-mode') === newMode;
@@ -1954,12 +2141,13 @@
 
         const modeAnnouncement = {
             'exam_reader': 'Mod 1: Sınav ve Test Şıkkı Okuyucu seçildi. Kağıt gölgesi silinir, çift sütunlu testler ayrılır ve A, B, C, D, E şıkları tek tek düğmelerle okunur.',
-            'qr_screen': 'Mod 2: WhatsApp Web, Bilgisayar Ekranı ve QR Kod Hizalama seçildi.',
-            'portrait': 'Mod 3: Portre, Selfie ve Sosyal Medya Ters Işık / Mahremiyet Koçu seçildi.',
-            'color_cloth': 'Mod 4: Beyaz Dengeli Kıyafet Rengi, Kumaş Deseni ve Para/Etiket Okuyucu seçildi.',
-            'anomaly_led': 'Mod 5: Z-Skorlu Kayıp Eşya Radarı ve Cihaz LED / Şarj Işığı Frekans Okuyucu seçildi.',
-            'light_meter': 'Mod 6: Akustik Işık Metre seçildi. Odadaki lambaların ve pencerelerin yönü ses frekansıyla bildiriliyor.',
-            'explorer': 'Mod 7: Canlı Nesne, İmza Yeri ve Genel Türkçe Belge Okuyucu seçildi.'
+            'qibla_compass': `Mod 2: 3 Boyutlu Sesli Kıble Pusulası seçildi. Hedef Kıble açınız ${state.qiblaTargetBearing} derece. Telefonu yere paralel düz tutup yavaşça dönün.`,
+            'qr_screen': 'Mod 3: WhatsApp Web, Bilgisayar Ekranı ve QR Kod Hizalama seçildi.',
+            'portrait': 'Mod 4: Portre, Selfie ve Sosyal Medya Ters Işık / Mahremiyet Koçu seçildi.',
+            'color_cloth': 'Mod 5: Beyaz Dengeli Kıyafet Rengi, Kumaş Deseni ve Para/Etiket Okuyucu seçildi.',
+            'anomaly_led': 'Mod 6: Z-Skorlu Kayıp Eşya Radarı ve Cihaz LED / Şarj Işığı Frekans Okuyucu seçildi.',
+            'light_meter': 'Mod 7: Akustik Işık Metre seçildi. Odadaki lambaların ve pencerelerin yönü ses frekansıyla bildiriliyor.',
+            'explorer': 'Mod 8: Canlı Nesne, İmza Yeri ve Genel Türkçe Belge Okuyucu seçildi.'
         }[newMode];
 
         if (modeAnnouncement) {
@@ -1968,13 +2156,27 @@
     }
 
     // =========================================================================
-    // 7. OLAY DİNLEYİCİLERİ, SINAV KUMANDASI VE KLAVYE KISAYOLLARI
+    // 7. OLAY DİNLEYİCİLERİ, KIBLE SENSÖRÜ, SINAV KUMANDASI VE KLAVYE KISAYOLLARI
     // =========================================================================
+    window.addEventListener('deviceorientationabsolute', (ev) => {
+        if (typeof ev.alpha === 'number') {
+            // Android mutlak manyetik kuzey + Türkiye manyetik sapma düzeltmesi (+5.5°)
+            const heading = (360 - ev.alpha + 5.5) % 360;
+            handleCompassHeadingEvent(heading);
+        }
+    }, true);
+
     window.addEventListener('deviceorientation', (ev) => {
         if (typeof ev.gamma === 'number' && typeof ev.beta === 'number') {
             state.hasOrientationSensor = true;
             state.tiltRoll = Math.round(ev.gamma);
             state.tiltPitch = Math.round(ev.beta);
+        }
+        // iOS Safari webkitCompassHeading desteği
+        if (typeof ev.webkitCompassHeading === 'number') {
+            handleCompassHeadingEvent(ev.webkitCompassHeading);
+        } else if (typeof ev.alpha === 'number' && ev.absolute === true) {
+            handleCompassHeadingEvent((360 - ev.alpha + 5.5) % 360);
         }
     });
 
@@ -2019,6 +2221,29 @@
     el.btnCaptureNow.addEventListener('click', () => captureAndDescribePhoto(false));
     el.btnWhatsappHold.addEventListener('click', startWhatsapp15SecAudioHold);
     el.btnRepeat.addEventListener('click', () => announceGuidance(state.lastSpeechText, { force: true }));
+
+    // Kıble Pusulası Düğmeleri
+    if (el.btnStartQibla) {
+        el.btnStartQibla.addEventListener('click', startQiblaCompassSensor);
+    }
+    if (el.btnQiblaGps) {
+        el.btnQiblaGps.addEventListener('click', requestQiblaGpsLocation);
+    }
+    if (el.qiblaCitySelect) {
+        el.qiblaCitySelect.addEventListener('change', () => {
+            const parts = el.qiblaCitySelect.value.split(',');
+            if (parts.length === 2) {
+                state.userLat = parseFloat(parts[0]);
+                state.userLon = parseFloat(parts[1]);
+                const cityLabel = el.qiblaCitySelect.options[el.qiblaCitySelect.selectedIndex].text.split('(')[0].trim();
+                updateQiblaTargetDisplay(cityLabel);
+                announceGuidance(`${cityLabel} seçildi. Hedef Kıble açısı: ${state.qiblaTargetBearing} derece.`, {
+                    force: true,
+                    bannerState: 'centered'
+                });
+            }
+        });
+    }
 
     // Sınav Kumandası Düğmeleri
     el.btnExamPrev.addEventListener('click', () => {
@@ -2093,12 +2318,14 @@
         }
         const key = ev.key.toLowerCase();
         if (key === '1') setMode('exam_reader');
-        else if (key === '2') setMode('qr_screen');
-        else if (key === '3') setMode('portrait');
-        else if (key === '4') setMode('color_cloth');
-        else if (key === '5') setMode('anomaly_led');
-        else if (key === '6') setMode('light_meter');
-        else if (key === '7') setMode('explorer');
+        else if (key === '2') setMode('qibla_compass');
+        else if (key === '3') setMode('qr_screen');
+        else if (key === '4') setMode('portrait');
+        else if (key === '5') setMode('color_cloth');
+        else if (key === '6') setMode('anomaly_led');
+        else if (key === '7') setMode('light_meter');
+        else if (key === '8') setMode('explorer');
+        else if (key === 'k') startQiblaCompassSensor();
         else if (key === 's') speakCurrentQuestionStem();
         else if (key === 'a') speakSingleOption('A');
         else if (key === 'b') speakSingleOption('B');
@@ -2120,6 +2347,7 @@
     });
 
     window.addEventListener('load', () => {
+        updateQiblaTargetDisplay('İstanbul');
         updateExamRemoteUI();
         setTimeout(initAiModel, 350);
     });

@@ -64,9 +64,9 @@
             </button>
         </section>
 
-        <!-- 7 Matematiksel Çalışma Modu Seçimi -->
+        <!-- 8 Matematiksel Çalışma Modu Seçimi -->
         <section aria-labelledby="mode-heading" class="mode-section">
-            <h2 id="mode-heading">Hassas Çalışma Modu Seçin (Klavye Kısayolu: 1 - 7)</h2>
+            <h2 id="mode-heading">Hassas Çalışma Modu Seçin (Klavye Kısayolu: 1 - 8)</h2>
             <div class="mode-grid" role="radiogroup" aria-labelledby="mode-heading">
                 <button type="button" class="mode-card active" data-mode="exam_reader" role="radio" aria-checked="true" id="mode-btn-1">
                     <span class="mode-icon" aria-hidden="true">📝🅰️</span>
@@ -74,41 +74,99 @@
                     <span class="mode-desc">Kağıt gölgesini (Bradley-Roth formülüyle) siler, çift sütunlu testleri ortadan ayırır; Soru kökünü ve A, B, C, D, E şıklarını karıştırmadan tek tek tuşla okur!</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="qr_screen" role="radio" aria-checked="false" id="mode-btn-2">
+                <button type="button" class="mode-card" data-mode="qibla_compass" role="radio" aria-checked="false" id="mode-btn-2">
+                    <span class="mode-icon" aria-hidden="true">🕋🧭</span>
+                    <span class="mode-title">2. 3D Sesli Kıble Pusulası (Kâbe Radarı)</span>
+                    <span class="mode-desc">Küresel trigonometri formülü, GPS/81 İl koordinatı ve manyetik pusula sensörüyle Kıble'nin kaç derece sağınızda veya solunuzda olduğunu 3D ses ve titreşimle buldurur.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="qr_screen" role="radio" aria-checked="false" id="mode-btn-3">
                     <span class="mode-icon" aria-hidden="true">💻📱</span>
-                    <span class="mode-title">2. WhatsApp Web / Ekran &amp; QR Hizalama</span>
+                    <span class="mode-title">3. WhatsApp Web / Ekran &amp; QR Hizalama</span>
                     <span class="mode-desc">Bilgisayar ekranını ve QR kodu geniş açıdan yakalar; ekranın üstüne mi altına mı tuttuğunuzu söyler ve WhatsApp geçişinde 15 sn sesli kilit sağlar.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="portrait" role="radio" aria-checked="false" id="mode-btn-3">
+                <button type="button" class="mode-card" data-mode="portrait" role="radio" aria-checked="false" id="mode-btn-4">
                     <span class="mode-icon" aria-hidden="true">🧑🛡️</span>
-                    <span class="mode-title">3. Portre, Selfie &amp; Mahremiyet Koçu</span>
+                    <span class="mode-title">4. Portre, Selfie &amp; Mahremiyet Koçu</span>
                     <span class="mode-desc">Kişiyi ortalar, Michelson formülüyle ters ışığı (silüeti), baş/omuz kesilmesini ve arka plandaki yabancı ekran/eşyaları denetleyip 3-2-1 otomatik çeker.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="color_cloth" role="radio" aria-checked="false" id="mode-btn-4">
+                <button type="button" class="mode-card" data-mode="color_cloth" role="radio" aria-checked="false" id="mode-btn-5">
                     <span class="mode-icon" aria-hidden="true">👕🎨</span>
-                    <span class="mode-title">4. Kıyafet Rengi, Desen &amp; Para/Belge</span>
+                    <span class="mode-title">5. Kıyafet Rengi, Desen &amp; Para/Belge</span>
                     <span class="mode-desc">Von Kries beyaz dengesi ve CIELAB (ΔE) formülüyle sarı ışıkta bile gerçek rengi, kumaşın düz/çizgili olduğunu ve TL banknot/yazıları okur.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="anomaly_led" role="radio" aria-checked="false" id="mode-btn-5">
+                <button type="button" class="mode-card" data-mode="anomaly_led" role="radio" aria-checked="false" id="mode-btn-6">
                     <span class="mode-icon" aria-hidden="true">🔦🔍</span>
-                    <span class="mode-title">5. Kayıp Eşya (Z-Skor) &amp; Cihaz LED Okuyucu</span>
+                    <span class="mode-title">6. Kayıp Eşya (Z-Skor) &amp; Cihaz LED Okuyucu</span>
                     <span class="mode-desc">Düz zeminde düşen küçük cismi (3.5σ Z-skoruyla) bulur; modem/şarj kutusu LED ışığının rengini ve yanıp sönme hızını (Hz) ölçer.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="light_meter" role="radio" aria-checked="false" id="mode-btn-6">
+                <button type="button" class="mode-card" data-mode="light_meter" role="radio" aria-checked="false" id="mode-btn-7">
                     <span class="mode-icon" aria-hidden="true">💡🧭</span>
-                    <span class="mode-title">6. Akustik Işık Metre (Lamba &amp; Pencere)</span>
+                    <span class="mode-title">7. Akustik Işık Metre (Lamba &amp; Pencere)</span>
                     <span class="mode-desc">Odadaki lambaların açık/kapalı olduğunu ve pencere/güneş yönünü anlık ses frekansıyla (180Hz-980Hz) ve Türkçe raporla bildirir.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="explorer" role="radio" aria-checked="false" id="mode-btn-7">
+                <button type="button" class="mode-card" data-mode="explorer" role="radio" aria-checked="false" id="mode-btn-8">
                     <span class="mode-icon" aria-hidden="true">🧭📦</span>
-                    <span class="mode-title">7. Canlı Nesne, İmza Yeri &amp; Genel Okuma</span>
+                    <span class="mode-title">8. Canlı Nesne, İmza Yeri &amp; Genel Okuma</span>
                     <span class="mode-desc">80 nesneyi yönleriyle tarar, evrak üzerinde imza/metin alanını hizalar ve çift dokunuşla genel Türkçe OCR metin okuma yapar.</span>
                 </button>
+            </div>
+        </section>
+
+        <!-- 3D SESLİ KIBLE PUSULASI KONTROL PANELİ -->
+        <section id="qibla-compass-panel" aria-labelledby="qibla-heading" class="exam-remote-section" style="border-color: #38bdf8;">
+            <div class="exam-remote-header">
+                <h2 id="qibla-heading" style="color: #38bdf8;">🕋 3D Sesli Kıble Pusulası (Küresel Trigonometri &amp; Sensör)</h2>
+                <span id="qibla-status-badge" class="status-badge ready">Kıble Açısı: 151.6°</span>
+            </div>
+            <p class="exam-remote-hint">
+                Telefonunuzu yere paralel (masanın üzerinde düz tutar gibi) tutun ve kendi etrafınızda yavaşça dönün. Sol/sağ kulaklık radarı ve Türkçe ses sizi tam Kâbe yönüne kilitleyecektir.
+            </p>
+            <div class="exam-nav-row" role="group" aria-label="Kıble Pusulası ve Konum Kontrolleri">
+                <button type="button" id="btn-start-qibla" class="primary-btn" aria-label="3 Boyutlu Sesli Kıble Pusulasını ve Sensörü Başlat (Kısayol: K)">
+                    🕋 Kıble Pusulasını Başlat / Kalibre Et (K)
+                </button>
+                <button type="button" id="btn-qibla-gps" class="secondary-btn" aria-label="GPS ile Tam Konumumu Bul ve Kıble Açısını Hesapla">
+                    📍 GPS Konumumu Güncelle
+                </button>
+                <label for="qibla-city-select" style="display:flex; align-items:center; font-weight:700;">Şehir Seçimi (GPS Kapalıysa):</label>
+                <select id="qibla-city-select" aria-label="Kıble Hesabı İçin Bulunduğunuz Şehri Seçin">
+                    <option value="41.0082,28.9784">İstanbul (151.6°)</option>
+                    <option value="39.9334,32.8597">Ankara (160.0°)</option>
+                    <option value="38.4237,27.1428">İzmir (144.8°)</option>
+                    <option value="40.1885,29.0610">Bursa (150.3°)</option>
+                    <option value="36.8969,30.7133">Antalya (150.2°)</option>
+                    <option value="37.0000,35.3213">Adana (164.8°)</option>
+                    <option value="37.8746,32.4932">Konya (156.9°)</option>
+                    <option value="37.0662,37.3833">Gaziantep (171.6°)</option>
+                    <option value="37.1591,38.7969">Şanlıurfa (176.6°)</option>
+                    <option value="37.9144,40.2306">Diyarbakır (181.4°)</option>
+                    <option value="38.7312,35.4787">Kayseri (166.1°)</option>
+                    <option value="39.7767,30.5206">Eskişehir (153.2°)</option>
+                    <option value="41.2867,36.3300">Samsun (169.3°)</option>
+                    <option value="41.0027,39.7168">Trabzon (179.6°)</option>
+                    <option value="39.9043,41.2679">Erzurum (184.4°)</option>
+                    <option value="38.3552,38.3095">Malatya (175.0°)</option>
+                    <option value="37.5858,36.9371">Kahramanmaraş (170.2°)</option>
+                    <option value="38.4942,43.3800">Van (190.8°)</option>
+                    <option value="40.7654,29.9408">Kocaeli (152.8°)</option>
+                    <option value="36.8000,34.6333">Mersin (162.3°)</option>
+                </select>
+            </div>
+            <div class="telemetry-grid" role="list" aria-label="Kıble Pusulası Canlı Açı Ölçümleri">
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Hedef Kıble Açısı (Kuzeyden):</span>
+                    <strong id="qibla-target-deg">151.6° Güneydoğu</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Telefonun Baktığı Yön / Sapma:</span>
+                    <strong id="qibla-current-deg">Sensör Bekleniyor</strong>
+                </div>
             </div>
         </section>
 
