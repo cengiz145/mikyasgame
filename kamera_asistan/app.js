@@ -145,6 +145,11 @@
         moldConsensusFrames: 0,
         penInBoxFrames: 0,
         lastDetectedBarcode: '',
+        // Detaylı Fotoğraf Betimleyici ve Dokunarak Keşif Durumu
+        exploredPhoto: null,
+        lastExplorerLabel: '',
+        lastExplorerVibrateAt: 0,
+        lastStoryText: '',
         // Sınav Soruları ve Şık Durumu
         examQuestions: [
             {
@@ -163,6 +168,11 @@
         btnToggleRadar: document.getElementById('btn-toggle-radar'),
         btnToggleAuto: document.getElementById('btn-toggle-auto'),
         btnCaptureNow: document.getElementById('btn-capture-now'),
+        btnUploadPhoto: document.getElementById('btn-upload-photo'),
+        photoFileInput: document.getElementById('photo-file-input'),
+        btnSpeakStory: document.getElementById('btn-speak-story'),
+        photoExplorerCanvas: document.getElementById('photo-explorer-canvas'),
+        photoExplorerStatus: document.getElementById('photo-explorer-status'),
         btnWhatsappHold: document.getElementById('btn-whatsapp-hold'),
         btnRepeat: document.getElementById('btn-repeat-guidance'),
         targetSelect: document.getElementById('target-object-select'),
@@ -2414,9 +2424,295 @@
         return null;
     }
 
+    /**
+     * Fotoğrafın herhangi bir alt bölgesinin (örneğin kişinin üzerindeki kıyafetin,
+     * arka plan duvarının veya parmağın dokunduğu noktanın) gerçek rengini ve desenini ölçer.
+     */
+    function measureRegionColorAndPattern(imageData, width, height, rx, ry, rw, rh) {
+        const data = imageData.data;
+        const x0 = Math.max(1, Math.min(width - 2, Math.floor(rx)));
+        const y0 = Math.max(1, Math.min(height - 2, Math.floor(ry)));
+        const x1 = Math.max(x0 + 1, Math.min(width - 2, Math.floor(rx + rw)));
+        const y1 = Math.max(y0 + 1, Math.min(height - 2, Math.floor(ry + rh)));
+
+        let rSum = 0, gSum = 0, bSum = 0, lumSum = 0, cnt = 0;
+        let sobelH = 0, sobelV = 0, strongEdges = 0;
+        const step = Math.max(1, Math.floor(Math.min(x1 - x0, y1 - y0) / 18));
+
+        for (let y = y0; y <= y1; y += step) {
+            for (let x = x0; x <= x1; x += step) {
+                const idx = (y * width + x) * 4;
+                const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+                rSum += r;
+                gSum += g;
+                bSum += b;
+                lumSum += (0.299 * r + 0.587 * g + 0.114 * b);
+                cnt++;
+
+                const idxL = (y * width + (x - 1)) * 4;
+                const idxR = (y * width + (x + 1)) * 4;
+                const idxU = ((y - 1) * width + x) * 4;
+                const idxD = ((y + 1) * width + x) * 4;
+                const gx = Math.abs(data[idxR] - data[idxL]);
+                const gy = Math.abs(data[idxD] - data[idxU]);
+                sobelH += gy;
+                sobelV += gx;
+                if (gx + gy > 42) strongEdges++;
+            }
+        }
+
+        const avgR = Math.round(rSum / Math.max(1, cnt));
+        const avgG = Math.round(gSum / Math.max(1, cnt));
+        const avgB = Math.round(bSum / Math.max(1, cnt));
+        const avgLum = Math.round(lumSum / Math.max(1, cnt));
+        const color = classifyColorCIELAB(avgR, avgG, avgB);
+
+        const edgeRatio = strongEdges / Math.max(1, cnt);
+        let pattern = 'düz dokulu';
+        if (edgeRatio > 0.18) {
+            if (sobelH > sobelV * 1.5) pattern = 'yatay çizgili';
+            else if (sobelV > sobelH * 1.5) pattern = 'dikey çizgili';
+            else pattern = 'kareli veya desenli';
+        }
+
+        return { colorName: color.name, pattern, avgLum };
+    }
+
+    /**
+     * iPhone Görüntü Betimleyici'den Daha Detaylı, Doğal Türkçe Hikâye Betimleme Motoru.
+     * Ortam ışığını, arka planı, kişilerin duruşunu, bakış yönünü, kıyafet rengini/desenini,
+     * çevredeki eşyaların konumunu ve fotoğraftaki yazıları sıcak bir dille anlatır.
+     */
+    function buildRichTurkishPhotoStory(capCanvas, metrics, preds, cleanText = '') {
+        const w = capCanvas.width;
+        const h = capCanvas.height;
+        const imgData = metrics.imageData;
+        const sentences = [];
+
+        // 1. Ortam Işığı, Netlik ve Arka Plan Atmosferi
+        let lightDesc = 'aydınlık ve dengeli ışıklı';
+        if (metrics.avgBrightness < 42) lightDesc = 'oldukça karanlık';
+        else if (metrics.avgBrightness < 82) lightDesc = 'loş ışıklı';
+        else if (metrics.avgBrightness > 205) lightDesc = 'bol ışıklı ve parlak';
+
+        const sharpDesc = metrics.sharpness >= 7.0 ? 'net çıkmış' : 'biraz bulanık çıkmış';
+        const topBg = measureRegionColorAndPattern(imgData, w, h, w * 0.15, h * 0.04, w * 0.70, h * 0.18);
+        sentences.push(`Fotoğraf betimlemesi: ${lightDesc}, ${sharpDesc} bir görüntü; arka plan genel olarak ${topBg.colorName} tonlarında.`);
+
+        // 2. İnsanlar, Bakış Yönü, Mesafe ve Üzerlerindeki Kıyafet Rengi/Deseni
+        const people = preds.filter(p => p.class === 'person');
+        if (people.length > 0) {
+            people.sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
+            people.slice(0, 3).forEach((p, idx) => {
+                const [bx, by, bw, bh] = p.bbox;
+                const cx = (bx + bw / 2) / w;
+                let posWord = 'tam ortada';
+                if (cx < 0.36) posWord = 'sol tarafta';
+                else if (cx > 0.64) posWord = 'sağ tarafta';
+
+                const gaze = estimatePersonGazeAndOrientation(p.bbox, metrics, w, h);
+                // Gövde/Kıyafet Bölgesi (Kutunun ortasından aşağı %40..%82 arası)
+                const torso = measureRegionColorAndPattern(
+                    imgData, w, h,
+                    bx + bw * 0.22,
+                    by + bh * 0.40,
+                    bw * 0.56,
+                    bh * 0.42
+                );
+
+                const personTitle = people.length === 1 ? 'Fotoğrafın' : `${idx + 1}. kişi fotoğrafın`;
+                sentences.push(
+                    `${personTitle} ${posWord} kısmında, yaklaşık ${gaze.approxMeters} metre mesafede duruyor ve ${gaze.gazeDesc}. ` +
+                    `Üzerinde ${torso.colorName} renginde, ${torso.pattern} bir kıyafet var.`
+                );
+
+                if (idx === 0) {
+                    const audit = evaluatePortraitPrivacyAndBacklight(p.bbox, metrics, preds, w, h);
+                    if (audit.hasBacklight) {
+                        sentences.push('Uyarı: Arkadan güçlü ışık vurduğu için yüzü biraz gölgede kalmış.');
+                    } else if (audit.clippedParts.length > 0) {
+                        sentences.push(`Kadraj notu: Kişinin ${audit.clippedParts.join(' ve ')} fotoğraf kenarına çok yakın.`);
+                    } else {
+                        sentences.push('Kişinin baş ve omuzları kesilmeden kadraja tam ve güzel yerleşmiş.');
+                    }
+                }
+            });
+        }
+
+        // 3. Çevredeki Diğer Eşyalar ve Fotoğraftaki Konumları
+        const otherObjs = preds.filter(p => p.class !== 'person');
+        if (otherObjs.length > 0) {
+            const itemPhrases = otherObjs.slice(0, 6).map(obj => {
+                const [bx, by, bw, bh] = obj.bbox;
+                const cx = (bx + bw / 2) / w;
+                const cy = (by + bh / 2) / h;
+                let loc = 'ortada';
+                if (cx < 0.35 && cy < 0.45) loc = 'sol üstte';
+                else if (cx < 0.35 && cy >= 0.45) loc = 'sol tarafta';
+                else if (cx > 0.65 && cy < 0.45) loc = 'sağ üstte';
+                else if (cx > 0.65 && cy >= 0.45) loc = 'sağ tarafta';
+                else if (cy > 0.65) loc = 'alt kısımda';
+
+                const objColor = measureRegionColorAndPattern(imgData, w, h, bx + bw * 0.2, by + bh * 0.2, bw * 0.6, bh * 0.6);
+                const trName = TR_LABELS[obj.class] || obj.class;
+                return `${loc} ${objColor.colorName} tonlarında ${trName}`;
+            });
+            sentences.push(`Çevredeki eşyalar: ${itemPhrases.join(', ')} görünüyor.`);
+        } else if (people.length === 0) {
+            // Hiç insan veya nesne yoksa yakın plan yüzey/manzara anlatımı
+            const mid = measureRegionColorAndPattern(imgData, w, h, w * 0.25, h * 0.25, w * 0.50, h * 0.50);
+            const bot = measureRegionColorAndPattern(imgData, w, h, w * 0.20, h * 0.68, w * 0.60, h * 0.24);
+            sentences.push(`Fotoğrafın merkezinde ${mid.colorName} renginde (${mid.pattern}) bir yüzey veya alan yer alıyor; alt kısım ise ${bot.colorName} tonlarında.`);
+        }
+
+        // 4. Kağıt Para veya Yazı Özeti
+        if (cleanText && cleanText.trim().length >= 3) {
+            const banknote = detectTurkishBanknoteFromTextAndColor(cleanText);
+            if (banknote) {
+                sentences.push(`Fotoğrafta ${banknote} kağıt para görünüyor.`);
+            }
+            const shortText = cleanText.replace(/\s+/g, ' ').trim();
+            sentences.push(`Fotoğrafın üzerindeki yazı: "${shortText}".`);
+        }
+
+        sentences.push('İpucu: Şimdi parmağınızı aşağıdaki fotoğrafın üzerinde gezdirerek dokunduğunuz her noktada ne olduğunu tek tek keşfedebilirsiniz.');
+        return sentences.join(' ');
+    }
+
+    /**
+     * Parmağınla Dokunarak Fotoğraf Keşfi (Touch-to-Explore Image Map).
+     * Kullanıcı parmağını fotoğraf üzerinde gezdirdikçe altında ne olduğunu (yüz, kıyafet rengi,
+     * eşya, yazı veya arka plan rengi) seslendirir ve titreşim verir.
+     */
+    function populatePhotoExplorerMap(capCanvas, metrics, preds, ocrLines = [], storyText = '') {
+        state.lastStoryText = storyText;
+        if (!el.photoExplorerCanvas) return;
+
+        const expCanvas = el.photoExplorerCanvas;
+        const targetW = 480;
+        const targetH = Math.max(240, Math.round((capCanvas.height / Math.max(1, capCanvas.width)) * targetW));
+        expCanvas.width = targetW;
+        expCanvas.height = targetH;
+
+        const ctx = expCanvas.getContext('2d');
+        ctx.drawImage(capCanvas, 0, 0, targetW, targetH);
+
+        const scaleX = targetW / capCanvas.width;
+        const scaleY = targetH / capCanvas.height;
+
+        // Nesneleri keşif haritası üzerinde de işaretle
+        preds.forEach(p => {
+            const trName = TR_LABELS[p.class] || p.class;
+            drawTargetBox(ctx, p.bbox, scaleX, scaleY, p.class === 'person' ? '#22c55e' : '#38bdf8', trName);
+        });
+
+        state.exploredPhoto = {
+            width: capCanvas.width,
+            height: capCanvas.height,
+            imageData: metrics.imageData,
+            preds,
+            ocrLines,
+            storyText
+        };
+    }
+
+    function handlePhotoExplorerPointerEvent(ev) {
+        if (!state.exploredPhoto || !el.photoExplorerCanvas) return;
+        ev.preventDefault();
+
+        const rect = el.photoExplorerCanvas.getBoundingClientRect();
+        let clientX = ev.clientX;
+        let clientY = ev.clientY;
+        if (ev.touches && ev.touches.length > 0) {
+            clientX = ev.touches[0].clientX;
+            clientY = ev.touches[0].clientY;
+        }
+        if (typeof clientX !== 'number' || typeof clientY !== 'number') return;
+
+        const nx = Math.max(0, Math.min(1, (clientX - rect.left) / Math.max(1, rect.width)));
+        const ny = Math.max(0, Math.min(1, (clientY - rect.top) / Math.max(1, rect.height)));
+
+        const { width, height, imageData, preds, ocrLines } = state.exploredPhoto;
+        const px = nx * width;
+        const py = ny * height;
+
+        // Bölge Adı (Üst Sol, Tam Orta, Sağ Alt vb.)
+        const hPos = nx < 0.33 ? 'Sol' : (nx > 0.66 ? 'Sağ' : 'Orta');
+        const vPos = ny < 0.33 ? 'Üst' : (ny > 0.66 ? 'Alt' : 'Orta');
+        const zoneName = (hPos === 'Orta' && vPos === 'Orta') ? 'Tam Merkez' : `${vPos} ${hPos}`;
+
+        const patch = measureRegionColorAndPattern(imageData, width, height, px - 18, py - 18, 36, 36);
+        let hitDescription = '';
+
+        // 1. Öncelik: Parmağın altında insan veya eşya var mı?
+        for (let i = 0; i < preds.length; i++) {
+            const p = preds[i];
+            const [bx, by, bw, bh] = p.bbox;
+            if (px >= bx && px <= bx + bw && py >= by && py <= by + bh) {
+                if (p.class === 'person') {
+                    const relY = (py - by) / Math.max(1, bh);
+                    if (relY < 0.32) {
+                        hitDescription = `${zoneName}: Kişinin baş ve yüz kısmı`;
+                    } else if (relY < 0.80) {
+                        hitDescription = `${zoneName}: Kişinin kıyafeti, ${patch.colorName} (${patch.pattern})`;
+                    } else {
+                        hitDescription = `${zoneName}: Kişinin alt kısmı (${patch.colorName})`;
+                    }
+                } else {
+                    const trName = TR_LABELS[p.class] || p.class;
+                    hitDescription = `${zoneName}: ${trName} (${patch.colorName})`;
+                }
+                break;
+            }
+        }
+
+        // 2. Öncelik: Parmağın altında okunan bir yazı satırı var mı?
+        if (!hitDescription && ocrLines && ocrLines.length > 0) {
+            for (let i = 0; i < ocrLines.length; i++) {
+                const ln = ocrLines[i];
+                if (ln.bbox && px >= ln.bbox.x0 && px <= ln.bbox.x1 && py >= ln.bbox.y0 && py <= ln.bbox.y1) {
+                    const cleanLn = (ln.text || '').replace(/\s+/g, ' ').trim();
+                    if (cleanLn.length >= 2) {
+                        hitDescription = `${zoneName} yazı: ${cleanLn}`;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 3. Arka plan / yüzey rengi ve parlaklığı
+        if (!hitDescription) {
+            const lumWord = patch.avgLum < 50 ? 'karanlık' : (patch.avgLum > 195 ? 'parlak' : 'aydınlık');
+            hitDescription = `${zoneName}: Arka plan veya yüzey, ${patch.colorName} (${lumWord})`;
+        }
+
+        if (el.photoExplorerStatus) {
+            el.photoExplorerStatus.textContent = `👆 ${hitDescription}`;
+        }
+
+        // Farklı bir nesneye/bölgeye geçildiğinde avuç içinde hafif tık titreşimi ve sesli okuma
+        if (hitDescription !== state.lastExplorerLabel) {
+            state.lastExplorerLabel = hitDescription;
+            const now = performance.now();
+            if (navigator.vibrate && now - state.lastExplorerVibrateAt > 180) {
+                navigator.vibrate(25);
+                state.lastExplorerVibrateAt = now;
+            }
+            radar.playLightMeterTone(patch.avgLum, (nx - 0.5) * 1.4);
+            announceGuidance(hitDescription, {
+                force: true,
+                updateBanner: false,
+                minIntervalMs: 350
+            });
+        }
+    }
+
     async function captureAndDescribePhoto(isAutoTriggered = false) {
         if (!state.isRunning || el.video.readyState < 2) {
-            announceGuidance('Önce kamerayı başlatmanız gerekiyor.', { force: true, bannerState: 'warning' });
+            announceGuidance('Kameradan çekmek için önce kamerayı başlatın veya üstteki "Galeriden Fotoğraf Seç" düğmesiyle telefonunuzdaki bir fotoğrafı betimletin.', {
+                force: true,
+                bannerState: 'warning'
+            });
             return;
         }
 
@@ -2437,39 +2733,39 @@
         ctx.drawImage(el.video, 0, 0, capCanvas.width, capCanvas.height);
         hideRetinaFlash();
 
+        await analyzePhotoCanvasAndDescribe(capCanvas, isAutoTriggered ? 'Otomatik Çekilen Fotoğraf' : 'Kamera Fotoğrafı');
+    }
+
+    /**
+     * Hem kameradan çekilen fotoğrafı, hem Galeriden seçilen fotoğrafı, hem de WhatsApp'tan
+     * "Paylaş -> Mikyas Kamera Asistanı" ile gönderilen fotoğrafı detaylı betimler ve okur.
+     */
+    async function analyzePhotoCanvasAndDescribe(capCanvas, sourceLabel = 'Fotoğraf') {
+        const ctx = capCanvas.getContext('2d');
         state.lastCapturedDataUrl = capCanvas.toDataURL('image/jpeg', 0.92);
         el.btnDownloadPhoto.hidden = false;
 
         const metrics = analyzeFrameMathematics(ctx, capCanvas.width, capCanvas.height);
         let preds = [];
+        if (!state.cocoModel && typeof window.cocoSsd !== 'undefined') {
+            try {
+                state.cocoModel = await window.cocoSsd.load({ base: 'lite_mobilenet_v2' });
+            } catch (_) {}
+        }
         if (state.cocoModel) {
             try {
-                preds = await state.cocoModel.detect(capCanvas, 10, 0.35);
+                preds = await state.cocoModel.detect(capCanvas, 12, 0.32);
             } catch (_) {
                 preds = [];
             }
         }
 
-        const objNames = preds.map(p => TR_LABELS[p.class] || p.class);
-        const uniqueObjs = [...new Set(objNames)];
-        const scenePart = uniqueObjs.length > 0
-            ? `Kadrajdaki nesneler: ${uniqueObjs.join(', ')}.`
-            : 'Kadrajda sınav kağıdı veya yakın plan belge alanı var.';
+        // İlk anlık doğal Türkçe sahne betimlemesini hemen oluştur ve kullanıcıyı bekletmeden söyle!
+        const initialStory = buildRichTurkishPhotoStory(capCanvas, metrics, preds, '');
+        populatePhotoExplorerMap(capCanvas, metrics, preds, [], initialStory);
 
-        const colorPart = `Merkez renk: ${metrics.centerColor.name} (${metrics.patternType}).`;
-
-        let privacyPart = '';
-        const mainPerson = preds.find(p => p.class === 'person');
-        if (mainPerson) {
-            const audit = evaluatePortraitPrivacyAndBacklight(mainPerson.bbox, metrics, preds, capCanvas.width, capCanvas.height);
-            privacyPart = `${audit.hasBacklight ? 'Uyarı: Ters ışık var. ' : 'Işık yönü uygun. '}${audit.privacyReport}`;
-        }
-
-        const prefix = isAutoTriggered ? 'Otomatik fotoğraf çekildi!' : 'Fotoğraf çekildi!';
-        const baseSummary = `${prefix} ${scenePart} ${colorPart} ${privacyPart}`.trim();
-
-        showDetectedResult('Sınav, Şık ve Metin Analizi', baseSummary + '\n\nKağıt gölgesi siliniyor, sütunlar ve A-B-C-D-E şıkları ayrıştırılıyor...');
-        announceGuidance('Fotoğraf çekildi! Kağıt üzerindeki gölgeler siliniyor ve sınav şıkları ayrıştırılıyor, lütfen bekleyin...', {
+        showDetectedResult(`${sourceLabel} — Detaylı Türkçe Betimleme`, initialStory + '\n\n(Fotoğrafın üzerindeki yazılar ve şıklar okunuyor...)');
+        announceGuidance(`${initialStory} Şimdi fotoğraftaki yazıları da kontrol ediyorum...`, {
             force: true,
             bannerState: 'centered'
         });
@@ -2477,28 +2773,35 @@
         if (typeof window.Tesseract !== 'undefined' && !state.isProcessingOcr) {
             state.isProcessingOcr = true;
             try {
-                // Mod 12 (Dijital Ekran / Asansör / Kapı No) ise 7-Segment Morfolojik Köprüleme Uygula
                 const binObj = applyBradleyRothShadowRemoval(capCanvas);
                 const splitInfo = (state.mode === 'door_elevator_lcd')
                     ? { isTwoColumn: false, canvases: [preprocess7SegmentAndPanelCanvas(capCanvas)] }
                     : splitExamColumnsIfTwoColumn(binObj);
 
                 let combinedText = '';
+                let collectedLines = [];
                 for (let i = 0; i < splitInfo.canvases.length; i++) {
                     const ocrRes = await window.Tesseract.recognize(splitInfo.canvases[i], 'tur+eng');
                     const partText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
                     if (partText) {
                         combinedText += (combinedText ? '\n\n' : '') + partText;
                     }
+                    if (ocrRes && ocrRes.data && Array.isArray(ocrRes.data.lines) && !splitInfo.isTwoColumn) {
+                        collectedLines = ocrRes.data.lines;
+                    }
                 }
 
-                // Eğer gölge silinmiş görüntüde çok az metin çıktıysa ham görüntüyle yedekle
                 if (combinedText.trim().length < 8) {
                     const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
                     combinedText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
+                    if (fallbackRes && fallbackRes.data && Array.isArray(fallbackRes.data.lines)) {
+                        collectedLines = fallbackRes.data.lines;
+                    }
                 }
 
                 const cleanText = combinedText.trim();
+                const fullStory = buildRichTurkishPhotoStory(capCanvas, metrics, preds, cleanText);
+                populatePhotoExplorerMap(capCanvas, metrics, preds, collectedLines, fullStory);
 
                 // ÖZEL MOD 9: İLAÇ KUTUSU, DOZAJ (mg), BARKOD VE SON KULLANMA TARİHİ (SKT) DENETÇİSİ
                 if (state.mode === 'medicine_skt') {
@@ -2507,12 +2810,12 @@
                         radar.playDangerAlarm();
                         if (navigator.vibrate) navigator.vibrate([250, 80, 250, 80, 350]);
                     }
-                    const dosageLine = med.dosages.length > 0 ? `Tespit Edilen Dozaj/Form: ${med.dosages.join(', ')}.` : 'Dozaj (mg/ml) bu yüzeyde görünmüyor.';
+                    const dosageLine = med.dosages.length > 0 ? `İlaç Miktarı/Formu: ${med.dosages.join(', ')}.` : 'Miligram bilgisi bu yüzde görünmüyor.';
                     const usageLine = med.usageInstructions.length > 0 ? `Eczane Kullanım Tarifi: ${med.usageInstructions.join(', ')}.` : '';
-                    const barcodeLine = med.barcodes.length > 0 ? `GS1 Doğrulanmış Barkod: ${med.barcodes.join(', ')}.` : '';
-                    const medReport = `${med.sktSpeech}\n${dosageLine}\n${usageLine}\n${barcodeLine}\n\nKutuda Okunan Metin:\n${cleanText || 'Metin okunamadı.'}`.trim();
+                    const barcodeLine = med.barcodes.length > 0 ? `Doğrulanmış Barkod: ${med.barcodes.join(', ')}.` : '';
+                    const medReport = `${med.sktSpeech}\n${dosageLine}\n${usageLine}\n${barcodeLine}\n\nKutuda Okunan Yazı:\n${cleanText || 'Yazı okunamadı.'}`.trim();
 
-                    showDetectedResult('İlaç Kutusu, Dozaj ve SKT Güvenlik Raporu', medReport);
+                    showDetectedResult('İlaç Kutusu ve Son Kullanma Tarihi Raporu', medReport);
                     announceGuidance(`${med.sktSpeech} ${dosageLine} ${usageLine} ${cleanText ? 'Kutu üzerindeki yazı: ' + cleanText.replace(/\s+/g, ' ') : ''}`, {
                         force: true,
                         bannerState: med.sktStatus === 'EXPIRED' ? 'warning' : 'centered'
@@ -2520,22 +2823,22 @@
                     return;
                 }
 
-                // ÖZEL MOD 13: GIDA TAZELİK / KÜF ANOMALİSİ VE PAKET ALERJEN / İÇİNDEKİLER DENETÇİSİ
+                // ÖZEL MOD 13: GIDA TAZELİK / KÜF VE PAKET İÇERİĞİ DENETÇİSİ
                 if (state.mode === 'food_freshness') {
                     const foodSurface = analyzeFoodMoldAndFreshness(metrics, capCanvas.width, capCanvas.height);
                     const pkg = parseFoodAllergensAndIngredients(cleanText);
                     const surfaceMsg = foodSurface.hasAnomaly
-                        ? `UYARI: Gıda yüzeyinde yüzde ${Math.max(foodSurface.moldRatio, foodSurface.rotRatio)} oranında küf veya çürük lekesi ile uyumlu renk anomalisi tespit edildi!`
-                        : `Gıda yüzeyi renk dağılımı normal (${metrics.centerColor.name}).`;
+                        ? 'UYARI: Yiyeceğin üzerinde küf veya çürük lekesi görünüyor!'
+                        : `Yiyeceğin üzerinde küf veya bozulma lekesi görünmüyor (Rengi: ${metrics.centerColor.name}).`;
                     const allergenMsg = pkg.allergens.length > 0
-                        ? `DİKKAT ALERJEN / İÇERİK UYARISI: Pakette ${pkg.allergens.join(', ')} tespit edildi!`
-                        : 'Okunan metinde bilinen ana alerjen kelimesine rastlanmadı.';
-                    const foodReport = `${surfaceMsg}\n${allergenMsg}\n${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}\n\nPakette Okunan Metin:\n${cleanText || 'Paket yazısı algılanmadı.'}`.trim();
+                        ? `DİKKAT ALERJİ UYARISI: Pakette ${pkg.allergens.join(', ')} var!`
+                        : 'Okunan yazıda bilinen bir alerji maddesine rastlanmadı.';
+                    const foodReport = `${surfaceMsg}\n${allergenMsg}\n${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}\n\nPakette Okunan Yazı:\n${cleanText || 'Paket yazısı algılanmadı.'}`.trim();
 
                     if (foodSurface.hasAnomaly || pkg.sktInfo.sktStatus === 'EXPIRED') {
                         radar.playDangerAlarm();
                     }
-                    showDetectedResult('Gıda Tazelik, Küf ve Alerjen Raporu', foodReport);
+                    showDetectedResult('Yiyecek Tazelik ve Paket İçeriği Raporu', foodReport);
                     announceGuidance(`${surfaceMsg} ${allergenMsg} ${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}`, {
                         force: true,
                         bannerState: (foodSurface.hasAnomaly || pkg.sktInfo.sktStatus === 'EXPIRED') ? 'warning' : 'centered'
@@ -2543,15 +2846,15 @@
                     return;
                 }
 
-                // ÖZEL MOD 12: KAPI NUMARASI, ASANSÖR TUŞ PANELİ VE 7-SEGMENT DİJİTAL EKRAN OKUYUCU
+                // ÖZEL MOD 12: KAPI NUMARASI, ASANSÖR TUŞ PANELİ VE MAKİNE EKRANI OKUYUCU
                 if (state.mode === 'door_elevator_lcd') {
                     const degMatches = cleanText.match(/\b\d{1,4}\s*(?:°\s*C|derece|devir|dk|dakika|kat|daire|no)\b/gi) || [];
                     const numTokens = cleanText.match(/\b(?:E\d{1,2}|F\d{1,2}|\d{1,4})\b/g) || [];
                     const summaryNums = degMatches.length > 0
                         ? `Okunan Değerler: ${degMatches.join(', ')}.`
-                        : (numTokens.length > 0 ? `Tespit Edilen Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : 'Rakam algılanamadı.');
-                    const panelReport = `${summaryNums}\n\nTam Ekran/Panel Metni:\n${cleanText || 'Rakam veya yazı okunamadı.'}`;
-                    showDetectedResult('Kapı No, Asansör & Dijital Ekran Raporu', panelReport);
+                        : (numTokens.length > 0 ? `Okunan Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : 'Rakam algılanamadı.');
+                    const panelReport = `${summaryNums}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`;
+                    showDetectedResult('Kapı Numarası, Asansör & Makine Ekranı Raporu', panelReport);
                     announceGuidance(`${summaryNums} ${cleanText.replace(/\s+/g, ' ')}`, {
                         force: true,
                         bannerState: 'centered'
@@ -2560,54 +2863,81 @@
                 }
 
                 const parsedQuestions = parseExamQuestionsAndOptions(cleanText);
-
                 if (parsedQuestions.length > 0) {
                     state.examQuestions = parsedQuestions;
                     state.currentExamIndex = 0;
                     updateExamRemoteUI();
                 }
 
-                const banknote = detectTurkishBanknoteFromTextAndColor(cleanText);
-                const hasSignatureKeyword = /imza|ad\s*soyad|teslim\s*alan|onay/i.test(cleanText);
-                const colNote = splitInfo.isTwoColumn ? 'Çift sütunlu test kağıdı tespit edildi ve sütunlar birbirine karışmadan ayrı ayrı okundu.' : '';
+                const firstQ = state.examQuestions[0];
+                const hasOptions = firstQ && (firstQ.options.A || firstQ.options.B || firstQ.options.C);
 
-                if (cleanText.length >= 3) {
-                    const firstQ = state.examQuestions[0];
-                    const hasOptions = firstQ && (firstQ.options.A || firstQ.options.B || firstQ.options.C);
-
-                    if (hasOptions || state.mode === 'exam_reader') {
-                        const finalReport = `${colNote}\nToplam ${state.examQuestions.length} soru ayrıştırıldı.\n\nSoru ${firstQ.number}: ${firstQ.stem}\n` +
-                            ['A', 'B', 'C', 'D', 'E']
-                                .filter(k => Boolean(firstQ.options[k]))
-                                .map(k => `${k}) ${firstQ.options[k]}`)
-                                .join('\n');
-                        showDetectedResult('Ayrıştırılan Sınav Sorusu ve Şıklar', finalReport.trim());
-                        speakCurrentQuestionStem();
-                    } else {
-                        const extraNotes = [];
-                        if (banknote) extraNotes.push(`Tespit Edilen Banknot: ${banknote}!`);
-                        if (hasSignatureKeyword) extraNotes.push('Evrak üzerinde İMZA / AD SOYAD alanı tespit edildi.');
-                        const finalReport = `${baseSummary}\n\n${extraNotes.join(' ')}\n${ cleanText }`;
-                        showDetectedResult('Tam Analiz ve Okunan Metin', finalReport.trim());
-                        announceGuidance(`${extraNotes.join(' ')} Okunan metin: ${cleanText.replace(/\s+/g, ' ')}`, {
-                            force: true,
-                            bannerState: 'centered'
-                        });
-                    }
+                if (hasOptions) {
+                    const colNote = splitInfo.isTwoColumn ? 'Yan yana iki sütunlu test kağıdı birbirine karışmadan ayrıldı.' : '';
+                    const finalReport = `${colNote}\nToplam ${state.examQuestions.length} soru bulundu.\n\nSoru ${firstQ.number}: ${firstQ.stem}\n` +
+                        ['A', 'B', 'C', 'D', 'E']
+                            .filter(k => Boolean(firstQ.options[k]))
+                            .map(k => `${k}) ${firstQ.options[k]}`)
+                            .join('\n') + `\n\n--- Sahne Betimlemesi ---\n${fullStory}`;
+                    showDetectedResult('Sınav Sorusu ve Şıklar', finalReport.trim());
+                    speakCurrentQuestionStem();
                 } else {
-                    showDetectedResult('Fotoğraf Raporu', `${baseSummary}\n\nFotoğraf üzerinde okunabilir bir soru veya yazı bulunamadı. Kamerayı kağıda 25 santim mesafede dik tutup tekrar deneyin.`);
-                    announceGuidance('Kağıt üzerinde okunabilir bir soru veya şık bulunamadı. Lütfen kamerayı kağıda 25 santimetre mesafede dik tutup tekrar deneyin.', {
+                    showDetectedResult(`${sourceLabel} — Detaylı Betimleme ve Yazılar`, fullStory);
+                    announceGuidance(fullStory, {
                         force: true,
-                        bannerState: 'warning'
+                        bannerState: 'centered'
                     });
                 }
             } catch (_) {
-                showDetectedResult('Fotoğraf Raporu', baseSummary);
+                showDetectedResult(`${sourceLabel} — Detaylı Betimleme`, initialStory);
             } finally {
                 state.isProcessingOcr = false;
             }
         }
     }
+
+    function handleGalleryFileSelect(file) {
+        if (!file) return;
+        radar.init();
+        announceGuidance('Seçtiğiniz fotoğraf yükleniyor ve detaylı olarak betimleniyor, lütfen bekleyin...', {
+            force: true,
+            bannerState: 'centered'
+        });
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (e.target && e.target.result) {
+                loadImageDataUrlAndAnalyze(e.target.result, 'Galeriden Seçilen Fotoğraf');
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function loadImageDataUrlAndAnalyze(dataUrl, label = 'Paylaşılan Fotoğraf') {
+        const img = new Image();
+        img.onload = async () => {
+            const capCanvas = document.createElement('canvas');
+            const maxDim = 1280;
+            let w = img.naturalWidth || img.width || 800;
+            let h = img.naturalHeight || img.height || 600;
+            if (w > maxDim || h > maxDim) {
+                const ratio = Math.min(maxDim / w, maxDim / h);
+                w = Math.round(w * ratio);
+                h = Math.round(h * ratio);
+            }
+            capCanvas.width = w;
+            capCanvas.height = h;
+            capCanvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            await analyzePhotoCanvasAndDescribe(capCanvas, label);
+        };
+        img.src = dataUrl;
+    }
+
+    // Android "Paylaş -> Mikyas Kamera Asistanı" (WhatsApp / Galeri fotoğraf paylaşımı) köprüsü
+    window.receiveSharedPhotoFromAndroid = function (base64DataUrl) {
+        if (!base64DataUrl) return;
+        radar.init();
+        loadImageDataUrlAndAnalyze(base64DataUrl, 'WhatsApp / Galeriden Paylaşılan Fotoğraf');
+    };
 
     function showDetectedResult(title, content) {
         el.resultPanel.hidden = false;
@@ -3443,6 +3773,31 @@
     });
 
     el.btnCaptureNow.addEventListener('click', () => captureAndDescribePhoto(false));
+    if (el.btnUploadPhoto && el.photoFileInput) {
+        el.btnUploadPhoto.addEventListener('click', () => el.photoFileInput.click());
+        el.photoFileInput.addEventListener('change', () => {
+            if (el.photoFileInput.files && el.photoFileInput.files[0]) {
+                handleGalleryFileSelect(el.photoFileInput.files[0]);
+                el.photoFileInput.value = '';
+            }
+        });
+    }
+    if (el.btnSpeakStory) {
+        el.btnSpeakStory.addEventListener('click', () => {
+            const txt = state.lastStoryText || state.lastSpeechText;
+            announceGuidance(txt, { force: true, bannerState: 'centered' });
+        });
+    }
+    if (el.photoExplorerCanvas) {
+        el.photoExplorerCanvas.addEventListener('pointerdown', handlePhotoExplorerPointerEvent);
+        el.photoExplorerCanvas.addEventListener('pointermove', (ev) => {
+            if (ev.buttons > 0 || ev.pointerType === 'touch') {
+                handlePhotoExplorerPointerEvent(ev);
+            }
+        });
+        el.photoExplorerCanvas.addEventListener('touchstart', handlePhotoExplorerPointerEvent, { passive: false });
+        el.photoExplorerCanvas.addEventListener('touchmove', handlePhotoExplorerPointerEvent, { passive: false });
+    }
     el.btnWhatsappHold.addEventListener('click', startWhatsapp15SecAudioHold);
     el.btnRepeat.addEventListener('click', () => announceGuidance(state.lastSpeechText, { force: true }));
 
@@ -3573,6 +3928,7 @@
         else if (key === 'o') el.btnToggleAuto.click();
         else if (key === 'f' && !el.btnToggleFlash.disabled) el.btnToggleFlash.click();
         else if (key === 'w') startWhatsapp15SecAudioHold();
+        else if (key === 'm' && el.photoFileInput) el.photoFileInput.click();
         else if (key === 't') el.btnRepeat.click();
         else if (ev.code === 'Space') {
             ev.preventDefault();

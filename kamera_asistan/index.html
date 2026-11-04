@@ -59,9 +59,13 @@
             <button id="btn-toggle-auto" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Tam Hizalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O)">
                 ⚡ Otomatik Çekim: Açık
             </button>
-            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek ve Sesli Oku (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
-                📸 Şimdi Çek ve Oku (Boşluk)
+            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek, Detaylı Betimle ve Sesli Oku (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
+                📸 Şimdi Çek &amp; Betimle (Boşluk)
             </button>
+            <button id="btn-upload-photo" class="primary-btn" type="button" style="background: linear-gradient(135deg, #0ea5e9, #2563eb);" aria-label="Telefon Galerisinden veya WhatsApp'tan Gelen Bir Fotoğrafı Seçip Detaylı Betimlet ve Okut (Kısayol: M)">
+                🖼️ Galeriden Fotoğraf Seç &amp; Betimle (M)
+            </button>
+            <input type="file" id="photo-file-input" accept="image/*" hidden aria-hidden="true">
         </section>
 
         <!-- 14 Günlük Yaşam Modu Seçimi -->
@@ -293,14 +297,29 @@
                     </div>
                 </div>
 
-                <!-- Algılanan Sonuç Kutusu -->
+                <!-- Algılanan Sonuç Kutusu ve Dokunarak Fotoğraf Keşfi (iPhone Görüntü Araştırıcı Üstü) -->
                 <div id="detected-result-panel" class="result-panel" hidden>
-                    <h3 id="result-title">Okuma Sonucu</h3>
+                    <h3 id="result-title">Detaylı Fotoğraf Betimlemesi ve Okuma Sonucu</h3>
                     <p id="result-text" tabindex="0"></p>
                     <div class="result-actions">
-                        <button id="btn-copy-result" class="secondary-btn">📋 Yazıyı Kopyala</button>
+                        <button id="btn-speak-story" type="button" class="primary-btn" aria-label="Fotoğrafın Detaylı Hikaye Betimlemesini Tekrar Sesli Dinle (Kısayol: B)">🗣️ Betimlemeyi Dinle (B)</button>
+                        <button id="btn-copy-result" type="button" class="secondary-btn">📋 Yazıyı Kopyala</button>
                         <a id="btn-open-link" href="#" target="_blank" rel="noopener noreferrer" class="primary-btn" hidden>🌐 Bağlantıyı Aç</a>
-                        <button id="btn-download-photo" class="secondary-btn" hidden>💾 Fotoğrafı Kaydet</button>
+                        <button id="btn-download-photo" type="button" class="secondary-btn" hidden>💾 Fotoğrafı Kaydet</button>
+                    </div>
+
+                    <!-- PARMAĞINLA DOKUNARAK FOTOĞRAF KEŞFİ (TOUCH-TO-EXPLORE IMAGE MAP) -->
+                    <div id="photo-explorer-section" style="margin-top: 14px; border-top: 2px solid #38bdf8; padding-top: 12px;">
+                        <h4 style="color: #facc15; margin: 0 0 6px 0; font-size: 1.05rem;">
+                            👆 Parmağınızı Fotoğrafın Üzerinde Gezdirerek Keşfedin
+                        </h4>
+                        <p style="font-size: 0.92rem; color: #cbd5e1; margin: 0 0 8px 0;">
+                            Parmağınızı aşağıdaki fotoğrafın üzerinde yavaşça gezdirin; parmağınızın değdiği yerdeki insanı, yüzünü, kıyafet rengini, eşyaları ve yazıları anında sesli söyler ve titreşim verir:
+                        </p>
+                        <div id="photo-explorer-status" role="status" aria-live="polite" style="background:#0f172a; color:#38bdf8; padding:8px 12px; border-radius:8px; font-weight:700; margin-bottom:8px;">
+                            Keşfetmek için parmağınızı fotoğrafın üzerinde gezdirin.
+                        </div>
+                        <canvas id="photo-explorer-canvas" tabindex="0" role="application" aria-label="Dokunmatik Fotoğraf Keşif Haritası. Parmağınızı bu alanın üzerinde gezdirerek fotoğraftaki kişilerin, kıyafetlerin, eşyaların ve yazıların yerini sesli ve titreşimli olarak öğrenebilirsiniz." style="width:100%; max-height:340px; border:2px solid #facc15; border-radius:10px; touch-action:none; cursor:crosshair; display:block;"></canvas>
                     </div>
                 </div>
             </div>
