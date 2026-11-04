@@ -118,54 +118,49 @@
             </div>
         </section>
 
-        <!-- 3D SESLİ KIBLE PUSULASI KONTROL PANELİ -->
+        <!-- AKILLI 3D SESLİ KIBLE PUSULASI VE NAMAZ VAKTİ PANELİ -->
         <section id="qibla-compass-panel" aria-labelledby="qibla-heading" class="exam-remote-section" style="border-color: #38bdf8;">
             <div class="exam-remote-header">
-                <h2 id="qibla-heading" style="color: #38bdf8;">🕋 3D Sesli Kıble Pusulası (Küresel Trigonometri &amp; Sensör)</h2>
-                <span id="qibla-status-badge" class="status-badge ready">Kıble Açısı: 151.6°</span>
+                <h2 id="qibla-heading" style="color: #38bdf8;">🕋 Akıllı Kıble Pusulası, Güneş Doğrulaması &amp; Namaz Vakitleri</h2>
+                <span id="qibla-status-badge" class="status-badge ready">Konum Doğrulanıyor...</span>
             </div>
             <p class="exam-remote-hint">
-                Telefonunuzu yere paralel (masanın üzerinde düz tutar gibi) tutun ve kendi etrafınızda yavaşça dönün. Sol/sağ kulaklık radarı ve Türkçe ses sizi tam Kâbe yönüne kilitleyecektir.
+                Manyetik pusula + Kamera Optik Akış (Görsel Dönüş) + Astronomik Güneş Açısı ile çapraz doğrulama yapar. Telefonu avucunuzda yere paralel düz tutarak yavaşça dönün.
             </p>
-            <div class="exam-nav-row" role="group" aria-label="Kıble Pusulası ve Konum Kontrolleri">
-                <button type="button" id="btn-start-qibla" class="primary-btn" aria-label="3 Boyutlu Sesli Kıble Pusulasını ve Sensörü Başlat (Kısayol: K)">
-                    🕋 Kıble Pusulasını Başlat / Kalibre Et (K)
+            <div class="exam-nav-row" role="group" aria-label="Akıllı Kıble ve Namaz Vakti Kontrolleri">
+                <button type="button" id="btn-start-qibla" class="primary-btn" aria-label="Akıllı 3 Boyutlu Sesli Kıble Pusulasını Başlat (Kısayol: K)">
+                    🕋 Akıllı Kıble Radarı Başlat (K)
+                </button>
+                <button type="button" id="btn-qibla-prayer-times" class="secondary-btn" aria-label="Bulunduğunuz Konum İçin Diyanet Uyumlu Namaz Vakitlerini, Kalan Süreyi ve Güneşin Kıbleye Göre Konumunu Sesli Oku (Kısayol: V)">
+                    🕰️ Namaz Vakti &amp; Güneş Açısını Oku (V)
+                </button>
+                <button type="button" id="btn-qibla-save-room" class="secondary-btn" aria-label="Bulunduğunuz Odadaki Kıble Yönünü ve Kamera Referansını Hafızaya Kaydet">
+                    📌 Bu Odadaki Kıbleyi Hafızaya Kaydet
                 </button>
                 <button type="button" id="btn-qibla-gps" class="secondary-btn" aria-label="GPS ile Tam Konumumu Bul ve Kıble Açısını Hesapla">
-                    📍 GPS Konumumu Güncelle
+                    📍 Kesin GPS Güncelle
                 </button>
-                <label for="qibla-city-select" style="display:flex; align-items:center; font-weight:700;">Şehir Seçimi (GPS Kapalıysa):</label>
-                <select id="qibla-city-select" aria-label="Kıble Hesabı İçin Bulunduğunuz Şehri Seçin">
-                    <option value="41.0082,28.9784">İstanbul (151.6°)</option>
-                    <option value="39.9334,32.8597">Ankara (160.0°)</option>
-                    <option value="38.4237,27.1428">İzmir (144.8°)</option>
-                    <option value="40.1885,29.0610">Bursa (150.3°)</option>
-                    <option value="36.8969,30.7133">Antalya (150.2°)</option>
-                    <option value="37.0000,35.3213">Adana (164.8°)</option>
-                    <option value="37.8746,32.4932">Konya (156.9°)</option>
-                    <option value="37.0662,37.3833">Gaziantep (171.6°)</option>
-                    <option value="37.1591,38.7969">Şanlıurfa (176.6°)</option>
-                    <option value="37.9144,40.2306">Diyarbakır (181.4°)</option>
-                    <option value="38.7312,35.4787">Kayseri (166.1°)</option>
-                    <option value="39.7767,30.5206">Eskişehir (153.2°)</option>
-                    <option value="41.2867,36.3300">Samsun (169.3°)</option>
-                    <option value="41.0027,39.7168">Trabzon (179.6°)</option>
-                    <option value="39.9043,41.2679">Erzurum (184.4°)</option>
-                    <option value="38.3552,38.3095">Malatya (175.0°)</option>
-                    <option value="37.5858,36.9371">Kahramanmaraş (170.2°)</option>
-                    <option value="38.4942,43.3800">Van (190.8°)</option>
-                    <option value="40.7654,29.9408">Kocaeli (152.8°)</option>
-                    <option value="36.8000,34.6333">Mersin (162.3°)</option>
-                </select>
             </div>
-            <div class="telemetry-grid" role="list" aria-label="Kıble Pusulası Canlı Açı Ölçümleri">
+            <div class="exam-nav-row" style="align-items:center;">
+                <label for="qibla-city-select" style="font-weight:700;">81 İl Çevrimdışı Konum Seçimi:</label>
+                <select id="qibla-city-select" aria-label="Kıble ve Namaz Vakti Hesabı İçin 81 İlden Birini Seçin"></select>
+            </div>
+            <div class="telemetry-grid" role="list" aria-label="Akıllı Kıble, Güneş ve Namaz Vakti Ölçümleri">
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Hedef Kıble Açısı (Kuzeyden):</span>
-                    <strong id="qibla-target-deg">151.6° Güneydoğu</strong>
+                    <span class="t-label">Kıble Açısı &amp; Kâbe Uzaklığı:</span>
+                    <strong id="qibla-target-deg">Konum Bekleniyor</strong>
                 </div>
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Telefonun Baktığı Yön / Sapma:</span>
+                    <span class="t-label">Pusula / Kıble Sapması:</span>
                     <strong id="qibla-current-deg">Sensör Bekleniyor</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Sensör Güven Puanı &amp; Güneş Yönü:</span>
+                    <strong id="qibla-confidence-sun">Hesaplanıyor...</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Aktif Namaz Vakti &amp; Kalan Süre:</span>
+                    <strong id="qibla-prayer-info">Hesaplanıyor...</strong>
                 </div>
             </div>
         </section>

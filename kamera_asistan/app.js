@@ -183,10 +183,14 @@
         // Kıble Pusulası Elemanları
         qiblaStatusBadge: document.getElementById('qibla-status-badge'),
         btnStartQibla: document.getElementById('btn-start-qibla'),
+        btnQiblaPrayerTimes: document.getElementById('btn-qibla-prayer-times'),
+        btnQiblaSaveRoom: document.getElementById('btn-qibla-save-room'),
         btnQiblaGps: document.getElementById('btn-qibla-gps'),
         qiblaCitySelect: document.getElementById('qibla-city-select'),
         qiblaTargetDeg: document.getElementById('qibla-target-deg'),
         qiblaCurrentDeg: document.getElementById('qibla-current-deg'),
+        qiblaConfidenceSun: document.getElementById('qibla-confidence-sun'),
+        qiblaPrayerInfo: document.getElementById('qibla-prayer-info'),
         // Sınav Kumandası Elemanları
         examCounter: document.getElementById('exam-question-counter'),
         btnExamPrev: document.getElementById('btn-exam-prev'),
@@ -1967,12 +1971,50 @@
     }
 
     // =========================================================================
-    // KIBLE PUSULASI: 5 KADEMELİ GÜVENLİK KİLİDİ VE KÜRESEL TRİGONOMETRİ MOTORU
+    // AKILLI KIBLE PUSULASI: 81 İL, HAVERSINE MESAFE, GÜNEŞ AZİMUTU VE NAMAZ VAKİTLERİ
     // =========================================================================
-    /**
-     * Kâbe-i Muazzama (21.422487° N, 39.826206° E) için Büyük Daire (Great-Circle)
-     * Küresel Trigonometri formülüyle gerçek coğrafi kuzeyden Kıble açısını hesaplar.
-     */
+    const TURKEY_81_PROVINCES = [
+        ['İstanbul', 41.0082, 28.9784], ['Ankara', 39.9334, 32.8597], ['İzmir', 38.4237, 27.1428],
+        ['Bursa', 40.1885, 29.0610], ['Antalya', 36.8969, 30.7133], ['Adana', 37.0000, 35.3213],
+        ['Konya', 37.8746, 32.4932], ['Şanlıurfa', 37.1591, 38.7969], ['Gaziantep', 37.0662, 37.3833],
+        ['Kocaeli', 40.7654, 29.9408], ['Mersin', 36.8000, 34.6333], ['Diyarbakır', 37.9144, 40.2306],
+        ['Hatay', 36.2021, 36.1606], ['Manisa', 38.6191, 27.4289], ['Kayseri', 38.7312, 35.4787],
+        ['Samsun', 41.2867, 36.3300], ['Balıkesir', 39.6484, 27.8826], ['Kahramanmaraş', 37.5858, 36.9371],
+        ['Van', 38.4942, 43.3800], ['Aydın', 37.8444, 27.8458], ['Tekirdağ', 40.9833, 27.5167],
+        ['Sakarya', 40.7569, 30.3783], ['Denizli', 37.7765, 29.0864], ['Muğla', 37.2153, 28.3636],
+        ['Eskişehir', 39.7767, 30.5206], ['Mardin', 37.3212, 40.7245], ['Trabzon', 41.0027, 39.7168],
+        ['Erzurum', 39.9043, 41.2679], ['Ordu', 40.9839, 37.8764], ['Malatya', 38.3552, 38.3095],
+        ['Afyonkarahisar', 38.7507, 30.5567], ['Batman', 37.8812, 41.1351], ['Tokat', 40.3167, 36.5500],
+        ['Elazığ', 38.6810, 39.2264], ['Sivas', 39.7477, 37.0179], ['Adıyaman', 37.7648, 38.2786],
+        ['Zonguldak', 41.4564, 31.7987], ['Kütahya', 39.4167, 29.9833], ['Çorum', 40.5506, 34.9556],
+        ['Çanakkale', 40.1553, 26.4142], ['Osmaniye', 37.0742, 36.2478], ['Şırnak', 37.5164, 42.4611],
+        ['Ağrı', 39.7191, 43.0503], ['Giresun', 40.9128, 38.3895], ['Isparta', 37.7648, 30.5566],
+        ['Aksaray', 38.3687, 34.0370], ['Yozgat', 39.8181, 34.8147], ['Muş', 38.9462, 41.7539],
+        ['Edirne', 41.6771, 26.5557], ['Düzce', 40.8438, 31.1565], ['Kastamonu', 41.3887, 33.7827],
+        ['Uşak', 38.6823, 29.4082], ['Niğde', 37.9667, 34.6833], ['Kırklareli', 41.7333, 27.2167],
+        ['Bitlis', 38.4000, 42.1167], ['Rize', 41.0201, 40.5234], ['Amasya', 40.6499, 35.8353],
+        ['Siirt', 37.9333, 41.9500], ['Bolu', 40.7392, 31.6089], ['Nevşehir', 38.6244, 34.7144],
+        ['Kars', 40.6013, 43.0975], ['Bingöl', 38.8854, 40.4966], ['Kırıkkale', 39.8468, 33.5153],
+        ['Hakkari', 37.5833, 43.7333], ['Burdur', 37.7203, 30.2908], ['Karaman', 37.1759, 33.2287],
+        ['Karabük', 41.2061, 32.6204], ['Kırşehir', 39.1425, 34.1709], ['Erzincan', 39.7500, 39.5000],
+        ['Bilecik', 40.1451, 29.9799], ['Sinop', 42.0231, 35.1531], ['Iğdır', 39.9167, 44.0333],
+        ['Bartın', 41.6344, 32.3375], ['Çankırı', 40.6013, 33.6134], ['Artvin', 41.1828, 41.8183],
+        ['Gümüşhane', 40.4603, 39.4814], ['Kilis', 36.7184, 37.1212], ['Ardahan', 41.1105, 42.7022],
+        ['Tunceli', 39.1079, 39.5401], ['Bayburt', 40.2552, 40.2249], ['Yalova', 40.6500, 29.2667]
+    ];
+
+    function populate81ProvincesSelect() {
+        if (!el.qiblaCitySelect) return;
+        el.qiblaCitySelect.innerHTML = '<option value="">-- Şehir Seçin (Veya GPS Otomatik Bulur) --</option>';
+        TURKEY_81_PROVINCES.forEach(([name, lat, lon]) => {
+            const bearing = calculateQiblaBearing(lat, lon);
+            const opt = document.createElement('option');
+            opt.value = `${lat},${lon},${name}`;
+            opt.textContent = `${name} (Kıble: ${bearing}°)`;
+            el.qiblaCitySelect.appendChild(opt);
+        });
+    }
+
     function calculateQiblaBearing(latDeg, lonDeg) {
         const kaabaLat = 21.422487 * (Math.PI / 180);
         const kaabaLon = 39.826206 * (Math.PI / 180);
@@ -1988,30 +2030,264 @@
     }
 
     /**
-     * Bulunulan enlem/boylama göre Türkiye ve çevresi için IGRF/WMM manyetik sapma açısını hesaplar.
+     * Haversine Formülü ile Kâbe-i Muazzama'ya olan kuş uçuşu mesafeyi (km) hesaplar.
      */
+    function calculateDistanceToKaabaKm(latDeg, lonDeg) {
+        const R = 6371;
+        const dLat = (21.422487 - latDeg) * (Math.PI / 180);
+        const dLon = (39.826206 - lonDeg) * (Math.PI / 180);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(latDeg * Math.PI / 180) * Math.cos(21.422487 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return Math.round(R * c);
+    }
+
     function calculateMagneticDeclination(latDeg, lonDeg) {
-        // Türkiye (36-42N, 26-45E) için WMM doğrusal yaklaşım modeli (+4.8° batı .. +6.8° doğu)
         return Number((4.8 + (lonDeg - 26.0) * 0.105 + (latDeg - 36.0) * 0.04).toFixed(2));
+    }
+
+    /**
+     * Astronomik Güneş Konumu (Azimut & Yükseklik) ve Diyanet Uyumlu 6 Namaz Vakti + Kerahat Hesabı
+     */
+    function calculateSolarAndPrayerTimes(lat, lon) {
+        const now = new Date();
+        const startOfYear = new Date(now.getFullYear(), 0, 0);
+        const dayOfYear = Math.floor((now - startOfYear) / 86400000);
+        const rad = Math.PI / 180;
+        const deg = 180 / Math.PI;
+
+        // Güneş Deklinasyonu (δ) ve Zaman Denklemi (EoT - dakika)
+        const gamma = ((2 * Math.PI) / 365) * (dayOfYear - 1 + (now.getHours() - 12) / 24);
+        const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma)
+            - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
+        const declRad = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma)
+            - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma);
+
+        const tzOffsetHours = -now.getTimezoneOffset() / 60; // Türkiye için +3
+        const solarNoonMin = 720 - (4 * lon) - eqTime + (tzOffsetHours * 60);
+
+        function hourAngleForElevation(elevDeg) {
+            const cosHA = (Math.sin(elevDeg * rad) - Math.sin(lat * rad) * Math.sin(declRad)) /
+                (Math.cos(lat * rad) * Math.cos(declRad));
+            if (cosHA < -1 || cosHA > 1) return 360;
+            return Math.acos(cosHA) * deg * 4; // dakika cinsinden
+        }
+
+        const sunriseDiff = hourAngleForElevation(-0.833);
+        const fajrDiff = hourAngleForElevation(-18.0);
+        const ishaDiff = hourAngleForElevation(-17.0);
+
+        // İkindi (Asr-ı Evvel) güneş yüksekliği
+        const noonAltRad = Math.asin(Math.sin(lat * rad) * Math.sin(declRad) + Math.cos(lat * rad) * Math.cos(declRad));
+        const asrAltDeg = Math.atan(1 / (1 + (1 / Math.tan(noonAltRad)))) * deg;
+        const asrDiff = hourAngleForElevation(asrAltDeg);
+
+        // Diyanet temkin süreleri (dakika)
+        const timesMin = {
+            imsak: Math.round(solarNoonMin - fajrDiff),
+            gunes: Math.round(solarNoonMin - sunriseDiff - 6),
+            ogle: Math.round(solarNoonMin + 6),
+            ikindi: Math.round(solarNoonMin + asrDiff + 5),
+            aksam: Math.round(solarNoonMin + sunriseDiff + 7),
+            yatsi: Math.round(solarNoonMin + ishaDiff + 2)
+        };
+
+        function fmtTime(m) {
+            const norm = ((m % 1440) + 1440) % 1440;
+            const hh = String(Math.floor(norm / 60)).padStart(2, '0');
+            const mm = String(norm % 60).padStart(2, '0');
+            return `${hh}:${mm}`;
+        }
+
+        const curMin = now.getHours() * 60 + now.getMinutes();
+        let activePrayer = 'Yatsı';
+        let nextPrayerName = 'İmsak';
+        let minsToNext = 0;
+
+        if (curMin < timesMin.imsak) {
+            activePrayer = 'Yatsı (Gece)';
+            nextPrayerName = 'İmsak';
+            minsToNext = timesMin.imsak - curMin;
+        } else if (curMin < timesMin.gunes) {
+            activePrayer = 'Sabah Namazı Vakti';
+            nextPrayerName = 'Güneş Doğuşu';
+            minsToNext = timesMin.gunes - curMin;
+        } else if (curMin < timesMin.ogle) {
+            activePrayer = 'Kuşluk / Sabah Sonrası';
+            nextPrayerName = 'Öğle';
+            minsToNext = timesMin.ogle - curMin;
+        } else if (curMin < timesMin.ikindi) {
+            activePrayer = 'Öğle Namazı Vakti';
+            nextPrayerName = 'İkindi';
+            minsToNext = timesMin.ikindi - curMin;
+        } else if (curMin < timesMin.aksam) {
+            activePrayer = 'İkindi Namazı Vakti';
+            nextPrayerName = 'Akşam';
+            minsToNext = timesMin.aksam - curMin;
+        } else if (curMin < timesMin.yatsi) {
+            activePrayer = 'Akşam Namazı Vakti';
+            nextPrayerName = 'Yatsı';
+            minsToNext = timesMin.yatsi - curMin;
+        } else {
+            activePrayer = 'Yatsı Namazı Vakti';
+            nextPrayerName = 'İmsak';
+            minsToNext = (1440 - curMin) + timesMin.imsak;
+        }
+
+        // Kerahat Vakti Kontrolü (Güneş doğduktan sonra 45dk, Öğleden önce 35dk, Akşamdan önce 45dk)
+        let kerahatWarning = '';
+        if (curMin >= timesMin.gunes && curMin <= timesMin.gunes + 45) {
+            kerahatWarning = 'Dikkat: Şu an Güneş doğuşu sonrası kerahat vaktindeyiz.';
+        } else if (curMin >= timesMin.ogle - 35 && curMin < timesMin.ogle) {
+            kerahatWarning = 'Dikkat: Şu an Öğle namazı öncesi (İstiva) kerahat vaktindeyiz.';
+        } else if (curMin >= timesMin.aksam - 45 && curMin < timesMin.aksam) {
+            kerahatWarning = 'Dikkat: Şu an Güneş batışı öncesi kerahat vaktindeyiz (Sadece günün İkindi farzı kılınabilir).';
+        }
+
+        // Şu anki Güneş Azimut Açısı (Kıble Çapraz Doğrulaması İçin)
+        const trueSolarTimeMin = (curMin + eqTime + 4 * lon - 60 * tzOffsetHours + 1440) % 1440;
+        const haDeg = (trueSolarTimeMin / 4) - 180;
+        const haRad = haDeg * rad;
+        const cosZenith = Math.sin(lat * rad) * Math.sin(declRad) + Math.cos(lat * rad) * Math.cos(declRad) * Math.cos(haRad);
+        const zenithRad = Math.acos(Math.max(-1, Math.min(1, cosZenith)));
+        const sunElevDeg = Number((90 - zenithRad * deg).toFixed(1));
+
+        let sunAzimuthDeg = 180;
+        const denom = Math.cos(lat * rad) * Math.sin(zenithRad);
+        if (Math.abs(denom) > 0.001) {
+            let cosAz = (Math.sin(lat * rad) * Math.cos(zenithRad) - Math.sin(declRad)) / denom;
+            cosAz = Math.max(-1, Math.min(1, cosAz));
+            const az = 180 - Math.acos(cosAz) * deg;
+            sunAzimuthDeg = Number((haDeg > 0 ? (360 - az) : az).toFixed(1));
+        }
+
+        const remHours = Math.floor(minsToNext / 60);
+        const remMins = minsToNext % 60;
+        const remainingStr = remHours > 0 ? `${remHours} saat ${remMins} dk` : `${remMins} dakika`;
+
+        return {
+            formatted: {
+                imsak: fmtTime(timesMin.imsak),
+                gunes: fmtTime(timesMin.gunes),
+                ogle: fmtTime(timesMin.ogle),
+                ikindi: fmtTime(timesMin.ikindi),
+                aksam: fmtTime(timesMin.aksam),
+                yatsi: fmtTime(timesMin.yatsi)
+            },
+            activePrayer,
+            nextPrayerName,
+            remainingStr,
+            kerahatWarning,
+            sunElevDeg,
+            sunAzimuthDeg
+        };
     }
 
     function updateQiblaTargetDisplay(sourceLabel = '') {
         if (typeof state.userLat !== 'number' || typeof state.userLon !== 'number') return;
         state.qiblaTargetBearing = calculateQiblaBearing(state.userLat, state.userLon);
+        const distKm = calculateDistanceToKaabaKm(state.userLat, state.userLon);
         state.qiblaLocationVerified = true;
         if (sourceLabel) state.qiblaLocationSource = sourceLabel;
 
         const prefix = state.qiblaLocationSource ? `${state.qiblaLocationSource} • ` : '';
         if (el.qiblaStatusBadge) {
-            el.qiblaStatusBadge.textContent = `${prefix}Kıble Açısı: ${state.qiblaTargetBearing}°`;
+            el.qiblaStatusBadge.textContent = `${prefix}Kıble: ${state.qiblaTargetBearing}° (${distKm} km)`;
         }
         if (el.qiblaTargetDeg) {
-            el.qiblaTargetDeg.textContent = `${state.qiblaTargetBearing}° (${state.qiblaLocationSource} Doğrulandı)`;
+            el.qiblaTargetDeg.textContent = `${state.qiblaTargetBearing}° • Kâbe Uzaklığı: ${distKm} km`;
+        }
+
+        const solar = calculateSolarAndPrayerTimes(state.userLat, state.userLon);
+        if (el.qiblaPrayerInfo) {
+            el.qiblaPrayerInfo.textContent = `${solar.activePrayer} (${solar.nextPrayerName} vaktine ${solar.remainingStr})`;
+        }
+        if (el.qiblaConfidenceSun) {
+            if (solar.sunElevDeg > 3) {
+                const sunDiff = Math.round(((state.qiblaTargetBearing - solar.sunAzimuthDeg + 540) % 360) - 180);
+                const sunRel = Math.abs(sunDiff) <= 6
+                    ? 'Güneş Tam Kıble Yönünde!'
+                    : `Kıble Güneşin ${Math.abs(sunDiff)}° ${sunDiff > 0 ? 'Sağında' : 'Solunda'}`;
+                el.qiblaConfidenceSun.textContent = sunRel;
+            } else {
+                el.qiblaConfidenceSun.textContent = 'Gece Modu • Manyetik + Kamera Kilitli';
+            }
+        }
+    }
+
+    function speakPrayerTimesAndSolarValidation() {
+        if (!state.qiblaLocationVerified || typeof state.userLat !== 'number') {
+            announceGuidance('Namaz vakitlerini ve Güneş açısını hesaplamak için önce konumunuz doğrulanıyor, lütfen listeden şehrinizi seçin veya GPS izni verin.', {
+                force: true,
+                bannerState: 'warning'
+            });
+            return;
+        }
+        const solar = calculateSolarAndPrayerTimes(state.userLat, state.userLon);
+        const distKm = calculateDistanceToKaabaKm(state.userLat, state.userLon);
+
+        let sunValidationMsg = '';
+        if (solar.sunElevDeg > 3) {
+            const sunDiff = Math.round(((state.qiblaTargetBearing - solar.sunAzimuthDeg + 540) % 360) - 180);
+            if (Math.abs(sunDiff) <= 6) {
+                sunValidationMsg = 'Güneş doğrulaması: Şu an Güneş gökyüzünde tam Kıble hizasında bulunuyor! Yüzünüzü doğrudan Güneş ışığına döndüğünüzde tam Kıbleye bakmış olursunuz.';
+            } else {
+                sunValidationMsg = `Güneş doğrulaması: Yüzünüzü Güneşe döndüğünüzde Kıble tam ${Math.abs(sunDiff)} derece ${sunDiff > 0 ? 'sağınızda' : 'solunuzda'} kalmaktadır.`;
+            }
+        }
+
+        const f = solar.formatted;
+        const msg = `${state.qiblaLocationSource} için Kâbe uzaklığınız ${distKm} kilometre, Kıble açınız ${state.qiblaTargetBearing} derece. ` +
+            `Şu an ${solar.activePrayer} içindeyiz; ${solar.nextPrayerName} vaktine ${solar.remainingStr} kaldı. ` +
+            `${solar.kerahatWarning ? solar.kerahatWarning + ' ' : ''}` +
+            `Bugünkü vakitler: İmsak ${f.imsak}, Güneş ${f.gunes}, Öğle ${f.ogle}, İkindi ${f.ikindi}, Akşam ${f.aksam}, Yatsı ${f.yatsi}. ` +
+            `${sunValidationMsg}`;
+
+        showDetectedResult('Akıllı Kıble, Güneş Doğrulaması ve Diyanet Uyumlu Namaz Vakitleri', msg);
+        announceGuidance(msg, { force: true, bannerState: 'centered' });
+    }
+
+    function saveRoomQiblaProfile() {
+        if (!state.qiblaLocationVerified || state.qiblaTargetBearing === null) {
+            announceGuidance('Oda Kıble hafızasını kaydetmek için önce konumunuzun doğrulanmış olması gerekir.', {
+                force: true,
+                bannerState: 'warning'
+            });
+            return;
+        }
+        const landmarks = state.lastSceneObstacles.length > 0
+            ? state.lastSceneObstacles.join(', ')
+            : 'açık alan / duvar';
+        const profile = {
+            city: state.qiblaLocationSource,
+            bearing: state.qiblaTargetBearing,
+            landmarks,
+            savedAt: new Date().toLocaleDateString('tr-TR')
+        };
+        try {
+            localStorage.setItem('mikyas_saved_room_qibla', JSON.stringify(profile));
+        } catch (_) {}
+        announceGuidance(`Bu odadaki Kıble yönünüz (${profile.bearing} derece, önünüzdeki referans: ${landmarks}) başarıyla hafızaya kaydedildi!`, {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
+    function getSavedRoomQiblaNote() {
+        try {
+            const raw = localStorage.getItem('mikyas_saved_room_qibla');
+            if (!raw) return '';
+            const p = JSON.parse(raw);
+            return ` Kayıtlı oda hafızası: ${p.bearing}° yönünde (${p.landmarks}) olarak işaretlenmişti.`;
+        } catch (_) {
+            return '';
         }
     }
 
     function autoAcquireLocationAndWatch() {
-        // 1. Önce Canlı GPS (watchPosition) başlat
+        populate81ProvincesSelect();
+
         if ('geolocation' in navigator && state.gpsWatchId === null) {
             state.gpsWatchId = navigator.geolocation.watchPosition(
                 (pos) => {
@@ -2031,7 +2307,6 @@
             );
         }
 
-        // 2. GPS uydusu bina içinde gecikirse otomatik IP Konum servisinden şehri/koordinatı doğrula
         fetch('https://ipwho.is/')
             .then(r => r.json())
             .then(data => {
@@ -2049,17 +2324,17 @@
         if (typeof rawHeadingDeg !== 'number' || isNaN(rawHeadingDeg)) return;
         if (!state.qiblaActive && state.mode !== 'qibla_compass') return;
 
-        // KİLİT 1: Konum henüz doğrulanmadıysa ezbere yön söyleme!
+        // KİLİT 1: Konum Doğrulaması
         if (!state.qiblaLocationVerified || state.qiblaTargetBearing === null) {
             el.qiblaCurrentDeg.textContent = 'Önce Konum Doğrulanıyor...';
-            announceGuidance('Yanlış Kıble göstermemek için önce konumunuz doğrulanıyor. Lütfen GPS iznini onaylayın veya listeden şehrinizi seçin.', {
+            announceGuidance('Yanlış Kıble göstermemek için önce konumunuz doğrulanıyor. Lütfen GPS iznini onaylayın veya 81 il listesinden şehrinizi seçin.', {
                 bannerState: 'warning',
                 minIntervalMs: 4000
             });
             return;
         }
 
-        // KİLİT 2: Telefon yere paralel (düz) tutulmuyorsa pusula açısı kayar; uyar ve kilitle!
+        // KİLİT 2: Telefon Düz Tutulma Kilidi
         if (state.hasOrientationSensor && (Math.abs(state.tiltRoll) > 16 || Math.abs(state.tiltPitch) > 22)) {
             state.qiblaStableSince = 0;
             el.qiblaCurrentDeg.textContent = `Telefon Eğik (Yatay: ${state.tiltRoll}°, Dikey: ${state.tiltPitch}°) — Düz Tutun`;
@@ -2070,7 +2345,7 @@
             return;
         }
 
-        // KİLİT 3: Manyetik Parazit / Mıknatıs / Kalibrasyon Bozukluğu Kontrolü
+        // KİLİT 3: Manyetik Parazit ve Kalibrasyon Kararlılık Testi
         const normHeading = ((rawHeadingDeg % 360) + 360) % 360;
         state.headingSamples.push(normHeading);
         if (state.headingSamples.length > 12) state.headingSamples.shift();
@@ -2092,7 +2367,11 @@
             return;
         }
 
-        // Açısal EMA yumuşatması
+        // Matematiksel Güven Puanı Hesabı (%0 - %100)
+        const tiltPenalty = state.hasOrientationSensor ? Math.min(20, Math.hypot(state.tiltRoll, state.tiltPitch)) : 0;
+        const jitterPenalty = Math.min(30, avgJitter * 2);
+        const confidencePct = Math.max(60, Math.min(99, Math.round(100 - tiltPenalty * 0.6 - jitterPenalty)));
+
         if (state.smoothedHeading === null) {
             state.smoothedHeading = normHeading;
         } else {
@@ -2102,30 +2381,28 @@
 
         state.compassHeading = Number(state.smoothedHeading.toFixed(1));
 
-        // Kıbleye olan açısal fark: -180° (Sol) .. +180° (Sağ)
         const deltaDeg = ((state.qiblaTargetBearing - state.compassHeading + 540) % 360) - 180;
         const absDelta = Math.abs(deltaDeg);
         const isAligned = absDelta <= 4.0;
 
         if (el.qiblaCurrentDeg) {
             const dirStr = isAligned
-                ? 'TAM KIBLE HİZASINDA (DOĞRULANDI)!'
-                : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağınızda' : 'Solunuzda'}`;
-            el.qiblaCurrentDeg.textContent = `Pusula: ${Math.round(state.compassHeading)}° • Kıble: ${dirStr}`;
+                ? `TAM KIBLE HİZASINDA (Güven: %${confidencePct})`
+                : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağınızda' : 'Solunuzda'} (Güven: %${confidencePct})`;
+            el.qiblaCurrentDeg.textContent = `Pusula: ${Math.round(state.compassHeading)}° • ${dirStr}`;
         }
 
         el.tPosition.textContent = `Pusula: ${Math.round(state.compassHeading)}° (Kıble: ${state.qiblaTargetBearing}°)`;
-        el.tDistance.textContent = isAligned ? 'Tam Kıble Yönü!' : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağa' : 'Sola'} Dönün`;
+        el.tDistance.textContent = isAligned ? `Tam Kıble (%${confidencePct} Güven)` : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağa' : 'Sola'} Dönün`;
 
         const panX = Math.max(-1, Math.min(1, deltaDeg / 75));
         radar.updateRadar(panX, 0, isAligned);
 
-        // KİLİT 4 & 5: Kesin Kıble Onayı + Kamera ile Secde Alanı Engel Kontrolü
         if (isAligned) {
             const now = performance.now();
             if (state.qiblaStableSince === 0) state.qiblaStableSince = now;
 
-            if (now - state.qiblaStableSince >= 1400) {
+            if (now - state.qiblaStableSince >= 1300) {
                 if (navigator.vibrate && now - state.lastQiblaLockVibrate > 2500) {
                     navigator.vibrate([120, 60, 180]);
                     state.lastQiblaLockVibrate = now;
@@ -2135,7 +2412,7 @@
                     ? ` Ancak kamerada önünüzde ${uniqueObs.join(', ')} görünüyor, secde alanı için 1 adım yana geçebilirsiniz.`
                     : ' Önünüzdeki secde alanı da açık görünüyor.';
 
-                announceGuidance(`Kesin doğrulama tamamlandı: Tam Kıble yönündesiniz! (${state.qiblaLocationSource}, ${state.qiblaTargetBearing} derece Kâbe açısı).${obstacleNote}`, {
+                announceGuidance(`Yüzde ${confidencePct} güvenle doğrulandı: Tam Kıble yönündesiniz! (${state.qiblaLocationSource}, ${state.qiblaTargetBearing} derece Kâbe açısı).${obstacleNote}`, {
                     bannerState: 'centered',
                     minIntervalMs: 3600
                 });
@@ -2191,13 +2468,15 @@
             } catch (_) {}
         }
 
+        const roomNote = getSavedRoomQiblaNote();
         if (state.qiblaLocationVerified) {
-            announceGuidance(`5 güvenlik kilitli Kıble pusulası aktif. Konum: ${state.qiblaLocationSource}, Hedef Kıble açısı ${state.qiblaTargetBearing} derece. Telefonu avucunuzda yere paralel düz tutarak yavaşça dönün.`, {
+            const solar = calculateSolarAndPrayerTimes(state.userLat, state.userLon);
+            announceGuidance(`Akıllı Kıble pusulası aktif. Konum: ${state.qiblaLocationSource}, Kıble açınız ${state.qiblaTargetBearing} derece. Şu an ${solar.activePrayer} içindeyiz.${roomNote} Telefonu avucunuzda yere paralel düz tutarak yavaşça dönün.`, {
                 force: true,
                 bannerState: 'centered'
             });
         } else {
-            announceGuidance('5 güvenlik kilitli Kıble pusulası başlatıldı. Yanlış yön göstermemek için şu an canlı GPS ve konumunuz doğrulanıyor, ayrıca listeden şehrinizi de seçebilirsiniz.', {
+            announceGuidance(`Akıllı Kıble pusulası başlatıldı.${roomNote} Yanlış yön göstermemek için şu an canlı GPS ve konumunuz doğrulanıyor, dilerseniz 81 il listesinden şehrinizi de seçebilirsiniz.`, {
                 force: true,
                 bannerState: 'normal'
             });
@@ -2355,18 +2634,22 @@
     if (el.btnQiblaGps) {
         el.btnQiblaGps.addEventListener('click', requestQiblaGpsLocation);
     }
+    if (el.btnQiblaPrayerTimes) {
+        el.btnQiblaPrayerTimes.addEventListener('click', speakPrayerTimesAndSolarValidation);
+    }
+    if (el.btnQiblaSaveRoom) {
+        el.btnQiblaSaveRoom.addEventListener('click', saveRoomQiblaProfile);
+    }
     if (el.qiblaCitySelect) {
         el.qiblaCitySelect.addEventListener('change', () => {
             const parts = el.qiblaCitySelect.value.split(',');
-            if (parts.length === 2) {
+            if (parts.length >= 2) {
                 state.userLat = parseFloat(parts[0]);
                 state.userLon = parseFloat(parts[1]);
-                const cityLabel = el.qiblaCitySelect.options[el.qiblaCitySelect.selectedIndex].text.split('(')[0].trim();
-                updateQiblaTargetDisplay(cityLabel);
-                announceGuidance(`${cityLabel} seçildi. Hedef Kıble açısı: ${state.qiblaTargetBearing} derece.`, {
-                    force: true,
-                    bannerState: 'centered'
-                });
+                state.locationSource = 'city_select';
+                const cityLabel = parts[2] || el.qiblaCitySelect.options[el.qiblaCitySelect.selectedIndex].text.split('(')[0].trim();
+                updateQiblaTargetDisplay(`${cityLabel} (81 İl Listesi)`);
+                speakPrayerTimesAndSolarValidation();
             }
         });
     }
@@ -2452,6 +2735,7 @@
         else if (key === '7') setMode('light_meter');
         else if (key === '8') setMode('explorer');
         else if (key === 'k') startQiblaCompassSensor();
+        else if (key === 'v') speakPrayerTimesAndSolarValidation();
         else if (key === 's') speakCurrentQuestionStem();
         else if (key === 'a') speakSingleOption('A');
         else if (key === 'b') speakSingleOption('B');
