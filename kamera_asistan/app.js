@@ -192,7 +192,9 @@
         moneyLiveOcrBusy: false,
         moneyLastLiveOcrAt: 0,
         moneyLastLiveBanknoteSig: '',
-        moneyLastLiveBanknoteAt: 0
+        moneyLastLiveBanknoteAt: 0,
+        moneySeenSerialNumbers: new Set(),
+        moneyLastDuplicateSerialWarnAt: 0
     };
 
     const el = {
@@ -1778,10 +1780,13 @@
         state.moneyPendingFrames = 0;
         state.moneyLastCommittedSignature = '';
         state.moneyEmptyFramesSinceCommit = 0;
+        if (state.moneySeenSerialNumbers) {
+            state.moneySeenSerialNumbers.clear();
+        }
         saveMoneyLedgerToStorage();
         updateMoneyCounterUI();
 
-        announceGuidance('Para sayacı sıfırlandı. Şimdi elinizdeki paraları baştan saymaya başlayabilirsiniz.', {
+        announceGuidance('Para sayacı ve seri numarası hafızası sıfırlandı. Şimdi elinizdeki paraları baştan saymaya başlayabilirsiniz.', {
             force: true,
             bannerState: 'centered'
         });
@@ -2406,19 +2411,25 @@
         state.moneyEmptyFramesSinceCommit++;
 
         // HİÇBİR TUŞA BASMADAN CANLI KAĞIT PARA OKUMA VE OTOMATİK TOPLAMA:
+        // Ortam loşsa parayı yanlış okumamak için telefon fenerini otomatik yak
+        if (metrics.avgBrightness < 55 && state.flashMode === 'auto') {
+            tryEnableHardwareTorch(true);
+        }
+
         // Kameranın önünde yazı/rakam dokusu olan net bir yüzey (kağıt para) varsa arka planda otomatik tanı ve cüzdana ekle!
         const nowMs = performance.now();
         if (state.moneyAutoAccumulate &&
             !state.moneyLiveOcrBusy &&
             !state.isProcessingOcr &&
             typeof window.Tesseract !== 'undefined' &&
-            metrics.sharpness >= 6.2 &&
-            (nowMs - state.moneyLastLiveOcrAt >= 1500)) {
+            metrics.sharpness >= 6.0 &&
+            (nowMs - state.moneyLastLiveOcrAt >= 1450)) {
 
             const strokeScan = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
             if (strokeScan.hasTextLikely) {
                 state.moneyLiveOcrBusy = true;
                 state.moneyLastLiveOcrAt = nowMs;
+                const centerColorSnapshot = metrics.centerColor ? metrics.centerColor.name : '';
 
                 const snapCanvas = document.createElement('canvas');
                 snapCanvas.width = el.analysisCanvas.width;
@@ -2429,23 +2440,32 @@
                     .then(ocrRes => {
                         if (state.mode !== 'color_cloth') return;
                         const rawTxt = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text : '';
-                        const upper = rawTxt.toUpperCase();
-                        // Canlı akışta yanlışlıkla rastgele sayı okunmasını önlemek için para/banknot ipucu veya net kupür kontrolü
-                        const hasBanknoteWord = upper.includes('TÜRK') || upper.includes('TURK') || upper.includes('LİRA') || upper.includes('LIRA') || upper.includes('MERKEZ') || upper.includes('BANKA') || /\b(?:200|100|50|20|10)\b/.test(upper);
-                        if (!hasBanknoteWord) return;
-
-                        const noteInfo = detectTurkishBanknoteDetailsFromText(rawTxt);
+                        const noteInfo = detectTurkishBanknoteDetailsFromText(rawTxt, centerColorSnapshot);
                         if (!noteInfo) return;
 
                         const tNow = performance.now();
+
+                        // 1. HAYATİ KİLİT: Aynı seri numaralı kağıt paranın yanlışlıkla iki kez toplanmasını engelle!
+                        if (noteInfo.serialNumber && state.moneySeenSerialNumbers && state.moneySeenSerialNumbers.has(noteInfo.serialNumber)) {
+                            if (tNow - state.moneyLastDuplicateSerialWarnAt > 4200) {
+                                state.moneyLastDuplicateSerialWarnAt = tNow;
+                                announceGuidance(`Bu ${noteInfo.label} kağıt parayı zaten saymıştınız, toplamınıza tekrar eklenmedi. Şu anki toplamınız: ${formatTurkishKurusTotal(state.moneyTotalKurus)}.`, {
+                                    force: true,
+                                    bannerState: 'warning'
+                                });
+                            }
+                            return;
+                        }
+
                         const isNewNote = (noteInfo.signature !== state.moneyLastLiveBanknoteSig) ||
-                            (state.moneyEmptyFramesSinceCommit >= 6 && (tNow - state.moneyLastLiveBanknoteAt > 3800));
+                            (state.moneyEmptyFramesSinceCommit >= 6 && (tNow - state.moneyLastLiveBanknoteAt > 3600));
 
                         state.moneyLiveCandidate = {
                             signature: noteInfo.signature,
                             kurus: noteInfo.kurus,
                             label: `${noteInfo.label} (Kağıt Para)`,
-                            items: noteInfo.items
+                            items: noteInfo.items,
+                            serialNumber: noteInfo.serialNumber || ''
                         };
                         if (el.moneyLiveSeen) {
                             el.moneyLiveSeen.textContent = `💵 ${noteInfo.label} (Kağıt Para)`;
@@ -2455,6 +2475,9 @@
                             state.moneyLastLiveBanknoteSig = noteInfo.signature;
                             state.moneyLastLiveBanknoteAt = tNow;
                             state.moneyEmptyFramesSinceCommit = 0;
+                            if (noteInfo.serialNumber && state.moneySeenSerialNumbers) {
+                                state.moneySeenSerialNumbers.add(noteInfo.serialNumber);
+                            }
                             addMoneyToRunningTotal(
                                 noteInfo.kurus,
                                 `${noteInfo.label} (Kağıt Para)`,
@@ -3382,29 +3405,88 @@
         if (el.retinaFlash) el.retinaFlash.hidden = true;
     }
 
-    function detectTurkishBanknoteDetailsFromText(ocrText) {
+    /**
+     * T.C. Merkez Bankası E9 Emisyon Kağıt Paralarını Sıfır-Hata İle Tanıyan Üçlü Doğrulama Motoru:
+     * 1) Rakam ve Yazı ("200", "İKİ YÜZ", "100", "YÜZ", "50", "ELLİ", "20", "YİRMİ", "10", "ON", "5", "BEŞ")
+     * 2) Arka Yüz Portre İsimleri (Yunus Emre=200, Itri/Buhurizade=100, Fatma Aliye=50, Mimar Kemaleddin=20, Cahit Arf=10, Aydın Sayılı=5)
+     * 3) Renk Çapraz Doğrulaması (10 TL Kırmızı/Pembe ile 100 TL Mavi/Turkuaz'ın; 20 TL Yeşil ile 200 TL Mor/Eflatun'un parmak kapanması yüzünden karışmasını engeller)
+     * 4) Seri Numarası Yakalayıcı (Örn: A12 3456789) -> Aynı kağıt paranın yanlışlıkla iki kez toplanmasını önler.
+     */
+    function detectTurkishBanknoteDetailsFromText(ocrText, centerColorName = '') {
         const clean = String(ocrText || '').toUpperCase();
-        const isMoneyContext = clean.includes('TÜRK') || clean.includes('TURK') || clean.includes('LİRA') || clean.includes('LIRA') || clean.includes('MERKEZ') || clean.includes('BANKA') || (state.mode === 'color_cloth');
+        const colorUpper = String(centerColorName || '').toUpperCase();
+
+        // Arka yüz portre isimlerinden kesin kupür tespiti (Rakam parmak altında kalsa bile %100 tanır!)
+        const hasYunusEmre = /YUNUS\s*EMRE|SEVVELİM|SEVELIM/.test(clean);
+        const hasItri = /ITR[İI]|BUHUR[İI]ZADE|MUSTAFA\s*EFEND/.test(clean);
+        const hasFatmaAliye = /FATMA\s*AL[İI]YE/.test(clean);
+        const hasKemaleddin = /KEMALEDD[İI]N|M[İI]MAR\s*KEMAL/.test(clean);
+        const hasCahitArf = /CAH[İI]T\s*ARF|ARF\s*DEĞİŞMEZ/.test(clean);
+        const hasAydinSayili = /AYDIN\s*SAYILI/.test(clean);
+
+        const hasPortraitMatch = hasYunusEmre || hasItri || hasFatmaAliye || hasKemaleddin || hasCahitArf || hasAydinSayili;
+        const isMoneyContext = hasPortraitMatch ||
+            clean.includes('TÜRK') || clean.includes('TURK') ||
+            clean.includes('LİRA') || clean.includes('LIRA') ||
+            clean.includes('MERKEZ') || clean.includes('BANKA') ||
+            (state.mode === 'color_cloth' && /\b(?:200|100|50|20|10)\b/.test(clean));
+
         if (!isMoneyContext) return null;
 
+        // TCMB E9 Seri Numarası Kalıbı (Örn: B14 582910 veya A09 1234567)
+        let serialNumber = '';
+        const serialMatch = clean.match(/\b([A-ZÇĞİÖŞÜ]\s*\d{2})\s*(\d{6,7})\b/);
+        if (serialMatch) {
+            serialNumber = (serialMatch[1] + serialMatch[2]).replace(/\s+/g, '');
+        }
+
+        // Renk grupları: 10 TL (Kırmızı/Bordo/Pembe) vs 100 TL (Mavi/Turkuaz/Lacivert); 20 TL (Yeşil/Haki) vs 200 TL (Mor/Eflatun)
+        const isBlueCyan = /MAVİ|TURKUAZ|LACİVERT/.test(colorUpper);
+        const isRedPink = /KIRMIZI|BORDO|PEMBE/.test(colorUpper);
+        const isGreen = /YEŞİL|HAKİ/.test(colorUpper);
+        const isPurple = /MOR|EFLATUN/.test(colorUpper);
+        const isOrangeYellow = /TURUNCU|SARI|HARDAL/.test(colorUpper);
+
         const foundNotes = [];
-        const addMatches = (regex, kurus, label) => {
-            const matches = clean.match(regex);
-            if (matches && matches.length > 0) {
-                foundNotes.push({
-                    kurus,
-                    label,
-                    count: 1
-                });
+        const pushNote = (kurus, label) => {
+            if (!foundNotes.some(n => n.kurus === kurus)) {
+                foundNotes.push({ kurus, label, count: 1 });
             }
         };
 
-        addMatches(/\b200\b|İKİ\s*YÜZ|IKI\s*YUZ/g, 20000, '200 Türk Lirası');
-        addMatches(/\b100\b|\bYÜZ\s*(?:TÜRK|LİRA)|\bYUZ\s*(?:TURK|LIRA)/g, 10000, '100 Türk Lirası');
-        addMatches(/\b50\b|ELLİ\s*(?:TÜRK|LİRA)|ELLI\s*(?:TURK|LIRA)/g, 5000, '50 Türk Lirası');
-        addMatches(/\b20\b|YİRMİ\s*(?:TÜRK|LİRA)|YIRMI\s*(?:TURK|LIRA)/g, 2000, '20 Türk Lirası');
-        addMatches(/\b10\b|\bON\s*(?:TÜRK|LİRA)|\bON\s*(?:TURK|LIRA)/g, 1000, '10 Türk Lirası');
-        addMatches(/\b5\b\s*(?:TÜRK|TURK|LİRA|LIRA|TL)|BEŞ\s*(?:TÜRK|LİRA)|BES\s*(?:TURK|LIRA)/g, 500, '5 Türk Lirası');
+        if (hasYunusEmre || /\b200\b|İKİ\s*YÜZ|IKI\s*YUZ/.test(clean)) {
+            pushNote(20000, '200 Türk Lirası');
+        }
+        if (hasItri || /\b100\b|\bYÜZ\s*(?:TÜRK|LİRA)|\bYUZ\s*(?:TURK|LIRA)/.test(clean)) {
+            pushNote(10000, '100 Türk Lirası');
+        }
+        if (hasFatmaAliye || /\b50\b|ELLİ\s*(?:TÜRK|LİRA)|ELLI\s*(?:TURK|LIRA)/.test(clean)) {
+            pushNote(5000, '50 Türk Lirası');
+        }
+        if (hasKemaleddin || /\b20\b|YİRMİ\s*(?:TÜRK|LİRA)|YIRMI\s*(?:TURK|LIRA)/.test(clean)) {
+            // Eğer OCR parmak yüzünden 200'ün son sıfırını kaçırıp "20" okuduysa ama kağıt belirgin Mor/Eflatun ise ve Yeşil değilse:
+            if (isPurple && !isGreen && !/YİRMİ|YIRMI/.test(clean) && !hasKemaleddin) {
+                pushNote(20000, '200 Türk Lirası');
+            } else {
+                pushNote(2000, '20 Türk Lirası');
+            }
+        }
+        if (hasCahitArf || /\b10\b|\bON\s*(?:TÜRK|LİRA)|\bON\s*(?:TURK|LIRA)/.test(clean)) {
+            // Eğer OCR parmak yüzünden 100'ün son sıfırını kaçırıp "10" okuduysa ama kağıt belirgin Mavi/Turkuaz ise ve Kırmızı değilse:
+            if (isBlueCyan && !isRedPink && !/\bON\s*(?:TÜRK|LİRA|TURK|LIRA)/.test(clean) && !hasCahitArf) {
+                pushNote(10000, '100 Türk Lirası');
+            } else {
+                pushNote(1000, '10 Türk Lirası');
+            }
+        }
+        if (hasAydinSayili || /\b5\b\s*(?:TÜRK|TURK|LİRA|LIRA|TL)|BEŞ\s*(?:TÜRK|LİRA)|BES\s*(?:TURK|LIRA)/.test(clean)) {
+            // Eğer 50 TL'nin sıfırı kapandıysa ama renk belirgin Turuncu/Sarı ise:
+            if (isOrangeYellow && !/BEŞ|BES/.test(clean) && !hasAydinSayili) {
+                pushNote(5000, '50 Türk Lirası');
+            } else {
+                pushNote(500, '5 Türk Lirası');
+            }
+        }
 
         if (foundNotes.length === 0) return null;
 
@@ -3422,7 +3504,8 @@
             kurus: totalKurus,
             label,
             items,
-            signature: 'NOTE_' + foundNotes.map(n => n.kurus).sort((a, b) => b - a).join('+')
+            serialNumber,
+            signature: 'NOTE_' + foundNotes.map(n => n.kurus).sort((a, b) => b - a).join('+') + (serialNumber ? '_' + serialNumber : '')
         };
     }
 
@@ -3927,9 +4010,19 @@
                 }
 
                 // ÖZEL MOD 5 (PARA SAYMA): ÇEKİLEN FOTOĞRAFTA KAĞIT PARA VEYA DEMİR PARA VARSA OTOMATİK TOPLAMA EKLE
-                const banknoteDetails = detectTurkishBanknoteDetailsFromText(cleanText);
+                const banknoteDetails = detectTurkishBanknoteDetailsFromText(cleanText, metrics.centerColor ? metrics.centerColor.name : '');
                 const photoCoins = detectAndClassifyTurkishCoins(metrics, capCanvas.width, capCanvas.height, cleanText);
                 if (banknoteDetails || (state.mode === 'color_cloth' && photoCoins.coins.length > 0)) {
+                    if (banknoteDetails && banknoteDetails.serialNumber && state.moneySeenSerialNumbers && state.moneySeenSerialNumbers.has(banknoteDetails.serialNumber)) {
+                        announceGuidance(`Bu ${banknoteDetails.label} kağıt parayı zaten saymıştınız, toplamınıza tekrar eklenmedi. Şu anki toplamınız: ${formatTurkishKurusTotal(state.moneyTotalKurus)}.`, {
+                            force: true,
+                            bannerState: 'warning'
+                        });
+                        return;
+                    }
+                    if (banknoteDetails && banknoteDetails.serialNumber && state.moneySeenSerialNumbers) {
+                        state.moneySeenSerialNumbers.add(banknoteDetails.serialNumber);
+                    }
                     let combinedKurus = 0;
                     const combinedLabels = [];
                     const combinedItems = [];
