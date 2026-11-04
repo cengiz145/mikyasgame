@@ -22,7 +22,6 @@ android {
             keyPassword "mikyas2026"
             v1SigningEnabled true
             v2SigningEnabled true
-            v3SigningEnabled true
         }
     }
 
