@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Mikyas Studio | Erişilebilir Kamera, QR ve Hassas Sensör Asistanı</title>
-    <meta name="description" content="Görme engelliler için matematiksel doğrulamalı 3D sesli radar, WhatsApp Web QR hizalama, sosyal medya ters ışık/mahremiyet denetimi, CIELAB renk/kıyafet analizi, kayıp eşya ve LED durum okuyucu.">
+    <title>Mikyas Studio | Erişilebilir Kamera, Sınav Okuyucu ve QR Asistanı</title>
+    <meta name="description" content="Görme engelliler için matematiksel doğrulamalı 3D sesli radar, Sınav ve Test Şıkkı Okuyucu (A-B-C-D-E tek tek dinleme), WhatsApp Web QR hizalama, sosyal medya ters ışık/mahremiyet denetimi, CIELAB renk/kıyafet analizi, kayıp eşya ve LED okuyucu.">
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,11 +30,14 @@
     <header class="app-header" role="banner">
         <div class="header-top">
             <a href="../index.html" class="back-btn" aria-label="Mikyas Studio Ana Sayfasına Dön">← Ana Sayfa</a>
-            <h1>Erişilebilir Kamera, QR &amp; Hassas Sensör Asistanı</h1>
+            <h1>Erişilebilir Kamera, Sınav &amp; QR Asistanı</h1>
+            <a href="MikyasKameraAsistani.apk" download="MikyasKameraAsistani.apk" class="apk-download-btn" aria-label="Android Telefonlar İçin Mikyas Kamera ve Sınav Asistanı APK Dosyasını İndir">
+                📱 Android APK İndir
+            </a>
             <span id="ai-status-badge" class="status-badge" role="status">Matematiksel Motor Hazırlanıyor...</span>
         </div>
         <p class="subtitle">
-            Çoklu kare doğrulamalı (Sıfır Yanlış Alarm), <strong>Kalman/EMA sarsıntı filtreli 3D Sesli Nişangâh Radarı</strong> ve <strong>6 Profesyonel Görme Asistanı Modu</strong>.
+            Çoklu kare doğrulamalı (Sıfır Yanlış Alarm), <strong>Kalman Filtreli 3D Sesli Nişangâh Radarı</strong>, <strong>Çift Sütunlu Sınav &amp; Şık Okuyucu (A-B-C-D-E)</strong> ve <strong>7 Profesyonel Görme Asistanı Modu</strong>.
         </p>
     </header>
 
@@ -44,7 +47,7 @@
             <button id="btn-start-camera" class="primary-btn pulse-btn" aria-pressed="false">
                 📷 Kamerayı ve Sesli Asistanı Başlat
             </button>
-            <button id="btn-switch-camera" class="secondary-btn" disabled aria-label="Ön ve Arka Kamera Arasında Geçiş Yap (Kısayol: C)">
+            <button id="btn-switch-camera" class="secondary-btn" disabled aria-label="Ön ve Arka Kamera Arasında Geçiş Yap">
                 🔄 Kamera: Arka
             </button>
             <button id="btn-toggle-flash" class="secondary-btn" disabled aria-pressed="false" aria-label="El Fenerini veya Ekran Flaşını Aç Kapat (Kısayol: F)">
@@ -56,49 +59,97 @@
             <button id="btn-toggle-auto" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Hedef Ortalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O)">
                 ⚡ Otomatik Çekim: Açık
             </button>
-            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek, Mahremiyet ve Yazıları Analiz Et (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
-                📸 Şimdi Çek &amp; Analiz Et (Boşluk)
+            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek, Sınav Şıklarını veya Sahneyi Analiz Et (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
+                📸 Şimdi Çek &amp; Oku (Boşluk)
             </button>
         </section>
 
-        <!-- 6 Matematiksel Çalışma Modu Seçimi -->
+        <!-- 7 Matematiksel Çalışma Modu Seçimi -->
         <section aria-labelledby="mode-heading" class="mode-section">
-            <h2 id="mode-heading">Hassas Çalışma Modu Seçin (Klavye Kısayolu: 1 - 6)</h2>
+            <h2 id="mode-heading">Hassas Çalışma Modu Seçin (Klavye Kısayolu: 1 - 7)</h2>
             <div class="mode-grid" role="radiogroup" aria-labelledby="mode-heading">
-                <button type="button" class="mode-card active" data-mode="qr_screen" role="radio" aria-checked="true" id="mode-btn-1">
+                <button type="button" class="mode-card active" data-mode="exam_reader" role="radio" aria-checked="true" id="mode-btn-1">
+                    <span class="mode-icon" aria-hidden="true">📝🅰️</span>
+                    <span class="mode-title">1. Sınav &amp; Test Şıkkı Okuyucu (A-B-C-D-E)</span>
+                    <span class="mode-desc">Kağıt gölgesini (Bradley-Roth formülüyle) siler, çift sütunlu testleri ortadan ayırır; Soru kökünü ve A, B, C, D, E şıklarını karıştırmadan tek tek tuşla okur!</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="qr_screen" role="radio" aria-checked="false" id="mode-btn-2">
                     <span class="mode-icon" aria-hidden="true">💻📱</span>
-                    <span class="mode-title">1. WhatsApp Web / Ekran &amp; QR Hizalama</span>
+                    <span class="mode-title">2. WhatsApp Web / Ekran &amp; QR Hizalama</span>
                     <span class="mode-desc">Bilgisayar ekranını ve QR kodu geniş açıdan yakalar; ekranın üstüne mi altına mı tuttuğunuzu söyler ve WhatsApp geçişinde 15 sn sesli kilit sağlar.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="portrait" role="radio" aria-checked="false" id="mode-btn-2">
+                <button type="button" class="mode-card" data-mode="portrait" role="radio" aria-checked="false" id="mode-btn-3">
                     <span class="mode-icon" aria-hidden="true">🧑🛡️</span>
-                    <span class="mode-title">2. Portre, Selfie &amp; Mahremiyet Koçu</span>
+                    <span class="mode-title">3. Portre, Selfie &amp; Mahremiyet Koçu</span>
                     <span class="mode-desc">Kişiyi ortalar, Michelson formülüyle ters ışığı (silüeti), baş/omuz kesilmesini ve arka plandaki yabancı ekran/eşyaları denetleyip 3-2-1 otomatik çeker.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="color_cloth" role="radio" aria-checked="false" id="mode-btn-3">
+                <button type="button" class="mode-card" data-mode="color_cloth" role="radio" aria-checked="false" id="mode-btn-4">
                     <span class="mode-icon" aria-hidden="true">👕🎨</span>
-                    <span class="mode-title">3. Kıyafet Rengi, Desen &amp; Para/Belge</span>
+                    <span class="mode-title">4. Kıyafet Rengi, Desen &amp; Para/Belge</span>
                     <span class="mode-desc">Von Kries beyaz dengesi ve CIELAB (ΔE) formülüyle sarı ışıkta bile gerçek rengi, kumaşın düz/çizgili olduğunu ve TL banknot/yazıları okur.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="anomaly_led" role="radio" aria-checked="false" id="mode-btn-4">
+                <button type="button" class="mode-card" data-mode="anomaly_led" role="radio" aria-checked="false" id="mode-btn-5">
                     <span class="mode-icon" aria-hidden="true">🔦🔍</span>
-                    <span class="mode-title">4. Kayıp Eşya (Z-Skor) &amp; Cihaz LED Okuyucu</span>
+                    <span class="mode-title">5. Kayıp Eşya (Z-Skor) &amp; Cihaz LED Okuyucu</span>
                     <span class="mode-desc">Düz zeminde düşen küçük cismi (3.5σ Z-skoruyla) bulur; modem/şarj kutusu LED ışığının rengini ve yanıp sönme hızını (Hz) ölçer.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="light_meter" role="radio" aria-checked="false" id="mode-btn-5">
+                <button type="button" class="mode-card" data-mode="light_meter" role="radio" aria-checked="false" id="mode-btn-6">
                     <span class="mode-icon" aria-hidden="true">💡🧭</span>
-                    <span class="mode-title">5. Akustik Işık Metre (Lamba &amp; Pencere)</span>
+                    <span class="mode-title">6. Akustik Işık Metre (Lamba &amp; Pencere)</span>
                     <span class="mode-desc">Odadaki lambaların açık/kapalı olduğunu ve pencere/güneş yönünü anlık ses frekansıyla (180Hz-980Hz) ve Türkçe raporla bildirir.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="explorer" role="radio" aria-checked="false" id="mode-btn-6">
+                <button type="button" class="mode-card" data-mode="explorer" role="radio" aria-checked="false" id="mode-btn-7">
                     <span class="mode-icon" aria-hidden="true">🧭📦</span>
-                    <span class="mode-title">6. Canlı Nesne, İmza Yeri &amp; Belge Okuma</span>
-                    <span class="mode-desc">80 nesneyi yönleriyle tarar, evrak üzerinde imza/metin alanını hizalar ve çift dokunuşla Türkçe OCR metin okuma yapar.</span>
+                    <span class="mode-title">7. Canlı Nesne, İmza Yeri &amp; Genel Okuma</span>
+                    <span class="mode-desc">80 nesneyi yönleriyle tarar, evrak üzerinde imza/metin alanını hizalar ve çift dokunuşla genel Türkçe OCR metin okuma yapar.</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ETKİLEŞİMLİ SINAV VE ŞIK KUMANDASI (Soru Kökü + A, B, C, D, E Tek Tek Dinleme) -->
+        <section id="exam-remote-panel" aria-labelledby="exam-remote-heading" class="exam-remote-section">
+            <div class="exam-remote-header">
+                <h2 id="exam-remote-heading">📝 Etkileşimli Sınav ve Şık Kumandası (Tek Dokunuşla Dinle)</h2>
+                <span id="exam-question-counter" class="status-badge ready">Sınav Kağıdı Bekleniyor</span>
+            </div>
+            <p class="exam-remote-hint">
+                Sınav kağıdını çektiğinizde sorular ve şıklar otomatik ayrıştırılır. İstediğiniz şıkkı karıştırmadan tekrar tekrar dinlemek için aşağıdaki düğmelere dokunun veya klavyede <code>S</code>, <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code> tuşlarına basın:
+            </p>
+            <div class="exam-nav-row" role="group" aria-label="Sorular Arası Geçiş">
+                <button type="button" id="btn-exam-prev" class="secondary-btn" aria-label="Önceki Soruya Geç (Kısayol: Sol Ok)">
+                    ⬅️ Önceki Soru
+                </button>
+                <button type="button" id="btn-exam-stem" class="primary-btn" aria-label="Soru Kökünü ve Metnini Sesli Oku (Kısayol: S)">
+                    ❓ Soru Kökünü Oku (S)
+                </button>
+                <button type="button" id="btn-exam-all" class="secondary-btn" aria-label="Soruyu ve Tüm Şıkları Sırayla Oku">
+                    🔊 Tüm Soruyu ve Şıkları Oku
+                </button>
+                <button type="button" id="btn-exam-next" class="secondary-btn" aria-label="Sonraki Soruya Geç (Kısayol: Sağ Ok)">
+                    Sonraki Soru ➡️
+                </button>
+            </div>
+            <div class="exam-options-grid" role="group" aria-label="Şıkları Tek Tek Dinleme Düğmeleri">
+                <button type="button" class="exam-opt-btn" data-opt="A" id="btn-opt-a" aria-label="A Şıkkını Sesli Oku (Kısayol: A)">
+                    <strong>A Şıkkı:</strong> <span id="text-opt-a">Henüz okutulmadı</span>
+                </button>
+                <button type="button" class="exam-opt-btn" data-opt="B" id="btn-opt-b" aria-label="B Şıkkını Sesli Oku (Kısayol: B)">
+                    <strong>B Şıkkı:</strong> <span id="text-opt-b">Henüz okutulmadı</span>
+                </button>
+                <button type="button" class="exam-opt-btn" data-opt="C" id="btn-opt-c" aria-label="C Şıkkını Sesli Oku (Kısayol: C)">
+                    <strong>C Şıkkı:</strong> <span id="text-opt-c">Henüz okutulmadı</span>
+                </button>
+                <button type="button" class="exam-opt-btn" data-opt="D" id="btn-opt-d" aria-label="D Şıkkını Sesli Oku (Kısayol: D)">
+                    <strong>D Şıkkı:</strong> <span id="text-opt-d">Henüz okutulmadı</span>
+                </button>
+                <button type="button" class="exam-opt-btn" data-opt="E" id="btn-opt-e" aria-label="E Şıkkını Sesli Oku (Kısayol: E)">
+                    <strong>E Şıkkı:</strong> <span id="text-opt-e">Henüz okutulmadı</span>
                 </button>
             </div>
         </section>
@@ -113,7 +164,7 @@
                 <option value="cell phone">Cep Telefonu</option>
                 <option value="cup">Bardak / Kupa / Şişe</option>
                 <option value="chair">Sandalye / Koltuk</option>
-                <option value="book">Kitap / Evrak / İmza Kağıdı</option>
+                <option value="book">Kitap / Sınav Kağıdı / Evrak</option>
                 <option value="keyboard">Klavye / Fare</option>
                 <option value="door_table">Masa / Çalışma Masası</option>
             </select>
@@ -136,7 +187,7 @@
 
                 <div class="telemetry-grid" role="list" aria-label="Matematiksel Sensör ve Kadraj Ölçümleri">
                     <div class="telemetry-item" role="listitem">
-                        <span class="t-label">Kalman Konum &amp; Doğrulama:</span>
+                        <span class="t-label">Kalman Konum &amp; Kenar Kontrolü:</span>
                         <strong id="t-position">Bekleniyor</strong>
                     </div>
                     <div class="telemetry-item" role="listitem">
@@ -153,7 +204,7 @@
                     </div>
                 </div>
 
-                <!-- Algılanan QR, Mahremiyet Raporu veya OCR Sonuç Kutusu -->
+                <!-- Algılanan QR, Sınav Sorusu, Mahremiyet Raporu veya OCR Sonuç Kutusu -->
                 <div id="detected-result-panel" class="result-panel" hidden>
                     <h3 id="result-title">Analiz ve Okuma Sonucu</h3>
                     <p id="result-text" tabindex="0"></p>
@@ -166,12 +217,12 @@
             </div>
 
             <!-- Sağ: Kamera Görüntüsü ve 3D Nişangâh Çizimi -->
-            <div class="camera-wrapper" id="camera-touch-zone" tabindex="0" role="button" aria-label="Kamera Vizör Alanı. Anında fotoğraf çekmek, mahremiyet denetimi yapmak ve yazıları okutmak için buraya çift dokunun veya Boşluk tuşuna basın.">
+            <div class="camera-wrapper" id="camera-touch-zone" tabindex="0" role="button" aria-label="Kamera Vizör Alanı. Anında fotoğraf çekmek, sınav şıklarını ayrıştırmak ve yazıları okutmak için buraya çift dokunun veya Boşluk tuşuna basın.">
                 <video id="camera-video" playsinline muted autoplay></video>
                 <canvas id="overlay-canvas" aria-hidden="true"></canvas>
                 <canvas id="analysis-canvas" hidden aria-hidden="true"></canvas>
                 <div class="touch-hint" aria-hidden="true">
-                    Vizöre <strong>çift dokunarak</strong> veya <strong>Boşluk (Space)</strong> tuşuyla anında çekim ve tam analiz yapabilirsiniz.
+                    Vizöre <strong>çift dokunarak</strong> veya <strong>Boşluk (Space)</strong> tuşuyla sınav kağıdını / sahneyi anında okutabilirsiniz.
                 </div>
             </div>
         </section>
@@ -180,17 +231,17 @@
         <section aria-labelledby="help-heading" class="help-section">
             <h2 id="help-heading">Sıfır Yanılma İçin Çalışan Matematiksel Formüller ve Kısayollar</h2>
             <ul class="help-list">
-                <li><strong>Çoklu Kare Onayı ve Kalman/EMA Filtresi:</strong> Tek karelik kamera parazitleri asla sesli komuta dönüşmez; hedef en az 4 ardışık karede doğrulanır ve el titremesi <code>X̂_t = 0.28·X_t + 0.72·X̂_{t-1}</code> formülüyle süzülür.</li>
-                <li><strong>Von Kries Beyaz Dengesi + CIELAB (ΔE) Renk Motoru:</strong> Ortamdaki sarı ampul sapmasını matematiksel olarak böler, insan gözü renk uzayında (L*a*b*) ΔE uzaklığıyla kumaşın gerçek rengini ve Sobel gradyan oranıyla düz/çizgili desenini bulur.</li>
-                <li><strong>Michelson Ters Işık ve Mahremiyet Denetimi:</strong> Kişi kutusu içi parlaklık ile arka plan oranını (<code>L_arka / L_kişi &gt; 2.05</code>) ölçer; silüet çıkmayı, baş/omuz kesilmesini ve arkada unutulmuş açık ekranları paylaşım öncesi haber verir.</li>
-                <li><strong>Z-Skorlu (3.5σ) Zemin Anomali &amp; LED Frekans (Hz) Ölçümü:</strong> Desenli halılarda yanlış alarmı otomatik kilitler; düz zeminde düşen cismi ve modem/şarj cihazlarındaki LED'in rengi ile saniyedeki yanıp sönme sayısını (Hz) hesaplar.</li>
-                <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>6</code> (Mod seç), <code>Boşluk</code> (Çek ve analiz et), <code>W</code> (WhatsApp 15sn ses kilidi), <code>F</code> (Flaş/Ekran ışığı), <code>R</code> (3D Radar), <code>C</code> (Kamera çevir), <code>T</code> (Son raporu tekrarla).</li>
+                <li><strong>Bradley-Roth İntegral Gölge Silici + Çift Sütunlu Sınav Ayırıcı:</strong> Telefonun kağıt üzerine düşen gölgesini <code>I(x,y) &lt; μ_yerel · 0.88</code> integral matrisiyle siler; dikey projeksiyon vadisiyle çift sütunlu test kağıtlarını ortadan ikiye ayırıp sol ve sağ soruları birbirine karıştırmadan okur.</li>
+                <li><strong>Etkileşimli Şık Kumandası (<code>S, A, B, C, D, E</code>):</strong> Daire içindeki bozuk okunan şık harflerini sıra algoritmasıyla onarır; her şıkkı ayrı düğmeye atar. Böylece sınavdayken tek dokunuşla sadece istediğiniz şıkkı tekrar dinleyebilirsiniz.</li>
+                <li><strong>Çoklu Kare Onayı ve Kalman/EMA Filtresi:</strong> Tek karelik kamera parazitleri asla sesli komuta dönüşmez; el titremesi <code>X̂_t = 0.30·X_t + 0.70·X̂_{t-1}</code> formülüyle süzülür.</li>
+                <li><strong>Von Kries Beyaz Dengesi + CIELAB (ΔE) Renk &amp; Michelson Ters Işık:</strong> Sarı lamba altında bile kumaşın gerçek rengini bulur; selfie çekerken ters ışığı ve arka plan mahremiyetini denetler.</li>
+                <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>7</code> (Mod seç), <code>Boşluk</code> (Çek ve oku), <code>S</code> (Soru kökünü oku), <code>A, B, C, D, E</code> (İlgili şıkkı tek oku), <code>Sol/Sağ Ok</code> (Önceki/Sonraki soru), <code>W</code> (WhatsApp 15sn ses kilidi), <code>F</code> (Flaş), <code>R</code> (3D Radar), <code>T</code> (Tekrarla).</li>
             </ul>
         </section>
     </main>
 
     <footer role="contentinfo" class="app-footer">
-        <p>© 2026 Mikyas Studio — Görme Engelliler İçin %100 Cihaz İçi, Matematiksel Doğrulamalı Yapay Zeka Vizörü. Hiçbir görüntü sunucuya gönderilmez.</p>
+        <p>© 2026 Mikyas Studio — Görme Engelliler İçin %100 Cihaz İçi, Matematiksel Doğrulamalı Yapay Zeka Vizörü ve Sınav Okuyucu.</p>
     </footer>
 
     <script src="app.js"></script>

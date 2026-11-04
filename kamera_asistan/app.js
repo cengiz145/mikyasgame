@@ -1,15 +1,16 @@
 /**
- * Mikyas Studio — Erişilebilir Kamera, QR ve Hassas Sensör Asistanı (v2.0 Matematiksel Motor)
+ * Mikyas Studio — Erişilebilir Kamera, Sınav Okuyucu, QR ve Hassas Sensör Asistanı (v3.0)
+ * - Bradley-Roth İntegral Gölge Silici (I(x,y) < μ_yerel * 0.87)
+ * - Dikey İzdüşüm Histogramı ile Otomatik Çift Sütunlu Sınav Ayırıcı
+ * - Daire İçi Şık Onarıcı (A-B-C-D-E) ve Etkileşimli Şık Kumandası (Tek Dokunuşla Şık Dinleme)
  * - Çoklu Kare Doğrulaması (Multi-Frame Consensus) ve EMA/Kalman El Titremesi Filtresi
  * - Von Kries Beyaz Dengesi + CIELAB (ΔE) Renk Uzayı + Sobel Kumaş Desen Analizörü
  * - Michelson Ters Işık (Silüet) Formülü + Kadraj Kesikliği + Sosyal Medya Mahremiyet Denetçisi
  * - Z-Skorlu (3.5σ) Zemin Kayıp Eşya Radarı (Desenli Halı Kilidi İle) + LED Frekans (Hz) Okuyucu
- * - Akustik Işık Metre (180Hz-980Hz) + Donanım Flaşı / Retina Ekran Flaşı + WhatsApp 15sn Ses Kilidi
  */
 (function () {
     'use strict';
 
-    // COCO-SSD 80 Nesne Sınıfının Türkçe Karşılıkları
     const TR_LABELS = {
         'person': 'İnsan',
         'bicycle': 'Bisiklet',
@@ -58,7 +59,7 @@
         'toaster': 'Tost Makinesi',
         'sink': 'Lavabo',
         'refrigerator': 'Buzdolabı',
-        'book': 'Kitap / Evrak',
+        'book': 'Sınav Kağıdı / Kitap / Evrak',
         'clock': 'Saat',
         'vase': 'Vazo',
         'scissors': 'Makas',
@@ -67,7 +68,6 @@
         'toothbrush': 'Diş Fırçası'
     };
 
-    // Kalibre Edilmiş CIELAB (L*, a*, b*) Türkçe Renk Referans Tablosu
     const TURKISH_COLOR_PALETTE_RGB = [
         { name: 'Saf Beyaz', r: 245, g: 245, b: 245 },
         { name: 'Krem / Ekru', r: 235, g: 228, b: 205 },
@@ -94,15 +94,14 @@
         { name: 'Kahverengi / Taba', r: 112, g: 68, b: 40 }
     ];
 
-    // Uygulama Durumu
     const state = {
         isRunning: false,
         facingMode: 'environment',
-        mode: 'qr_screen', // 'qr_screen' | 'portrait' | 'color_cloth' | 'anomaly_led' | 'light_meter' | 'explorer'
+        mode: 'exam_reader', // 'exam_reader' | 'qr_screen' | 'portrait' | 'color_cloth' | 'anomaly_led' | 'light_meter' | 'explorer'
         targetFilter: 'auto',
         radarEnabled: true,
         autoCaptureEnabled: true,
-        flashMode: 'auto', // 'auto' | 'on' | 'off'
+        flashMode: 'auto',
         cocoModel: null,
         barcodeDetector: null,
         videoStream: null,
@@ -119,19 +118,24 @@
         tiltPitch: 0,
         hasOrientationSensor: false,
         lastTouchTime: 0,
-        // Kalman / EMA ve Çoklu Kare Doğrulama Durumu
-        kalmanBox: null,       // [x, y, w, h]
+        kalmanBox: null,
         kalmanClass: '',
         consensusFrames: 0,
         missedFrames: 0,
-        // LED Frekans (Hz) Zaman Serisi Tamponu (Son 45 kare)
         ledHistory: [],
-        // WhatsApp 15sn Arka Plan Ses Kilidi
         whatsappHoldTimer: null,
-        whatsappHoldEnd: 0
+        whatsappHoldEnd: 0,
+        // Sınav Soruları ve Şık Durumu
+        examQuestions: [
+            {
+                number: 1,
+                stem: 'Henüz sınav kağıdı okutulmadı. Kamerayı sınav kağıdına tutup Boşluk tuşuna basın veya ekrana çift dokunun.',
+                options: { A: '', B: '', C: '', D: '', E: '' }
+            }
+        ],
+        currentExamIndex: 0
     };
 
-    // DOM Referansları
     const el = {
         btnStart: document.getElementById('btn-start-camera'),
         btnSwitchCam: document.getElementById('btn-switch-camera'),
@@ -161,22 +165,291 @@
         touchZone: document.getElementById('camera-touch-zone'),
         retinaFlash: document.getElementById('retina-flash-overlay'),
         srAssertive: document.getElementById('sr-live-assertive'),
-        srPolite: document.getElementById('sr-live-polite')
+        srPolite: document.getElementById('sr-live-polite'),
+        // Sınav Kumandası Elemanları
+        examCounter: document.getElementById('exam-question-counter'),
+        btnExamPrev: document.getElementById('btn-exam-prev'),
+        btnExamStem: document.getElementById('btn-exam-stem'),
+        btnExamAll: document.getElementById('btn-exam-all'),
+        btnExamNext: document.getElementById('btn-exam-next'),
+        optBtns: {
+            A: document.getElementById('btn-opt-a'),
+            B: document.getElementById('btn-opt-b'),
+            C: document.getElementById('btn-opt-c'),
+            D: document.getElementById('btn-opt-d'),
+            E: document.getElementById('btn-opt-e')
+        },
+        optTexts: {
+            A: document.getElementById('text-opt-a'),
+            B: document.getElementById('text-opt-b'),
+            C: document.getElementById('text-opt-c'),
+            D: document.getElementById('text-opt-d'),
+            E: document.getElementById('text-opt-e')
+        }
     };
 
     // =========================================================================
-    // 1. MATEMATİKSEL RENK UZAYI (sRGB -> XYZ -> CIELAB ΔE) VE VON KRIES BEYAZ DENGESİ
+    // 1. SINAV KAĞIDI İÇİN BRADLEY-ROTH İNTEGRAL GÖLGE SİLİCİ VE ÇİFT SÜTUN AYIRICI
+    // =========================================================================
+    /**
+     * Telefonun sınav kağıdı üzerine düşen gölgesini 2B İntegral Görüntü
+     * (I(x,y) < μ_yerel * 0.87) formülüyle tamamen temizler.
+     */
+    function applyBradleyRothShadowRemoval(sourceCanvas) {
+        const w = sourceCanvas.width;
+        const h = sourceCanvas.height;
+        const outCanvas = document.createElement('canvas');
+        outCanvas.width = w;
+        outCanvas.height = h;
+        const ctx = outCanvas.getContext('2d');
+        ctx.drawImage(sourceCanvas, 0, 0);
+
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+        const gray = new Uint8Array(w * h);
+        const integral = new Float64Array(w * h);
+
+        for (let y = 0; y < h; y++) {
+            let rowSum = 0;
+            for (let x = 0; x < w; x++) {
+                const idx = y * w + x;
+                const p = idx * 4;
+                const lum = Math.round(0.299 * data[p] + 0.587 * data[p + 1] + 0.114 * data[p + 2]);
+                gray[idx] = lum;
+                rowSum += lum;
+                integral[idx] = rowSum + (y > 0 ? integral[(y - 1) * w + x] : 0);
+            }
+        }
+
+        const s = Math.max(12, Math.floor(w / 18));
+        const tRatio = 0.87;
+
+        for (let y = 0; y < h; y++) {
+            const y1 = Math.max(0, y - s);
+            const y2 = Math.min(h - 1, y + s);
+            for (let x = 0; x < w; x++) {
+                const x1 = Math.max(0, x - s);
+                const x2 = Math.min(w - 1, x + s);
+                const area = (x2 - x1 + 1) * (y2 - y1 + 1);
+
+                const sum = integral[y2 * w + x2]
+                    - (y1 > 0 ? integral[(y1 - 1) * w + x2] : 0)
+                    - (x1 > 0 ? integral[y2 * w + (x1 - 1)] : 0)
+                    + (y1 > 0 && x1 > 0 ? integral[(y1 - 1) * w + (x1 - 1)] : 0);
+
+                const idx = y * w + x;
+                const isInk = (gray[idx] * area) < (sum * tRatio);
+                const val = isInk ? 0 : 255;
+                const p = idx * 4;
+                data[p] = val;
+                data[p + 1] = val;
+                data[p + 2] = val;
+                data[p + 3] = 255;
+            }
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        return { cleanCanvas: outCanvas, binaryData: data, width: w, height: h };
+    }
+
+    /**
+     * Dikey İzdüşüm Histogramı (Vertical Projection Profile) ile sınav sayfasının
+     * tek sütun mu yoksa ortadan iki sütunlu mu olduğunu matematiksel olarak bulur.
+     */
+    function splitExamColumnsIfTwoColumn(binObj) {
+        const { cleanCanvas, binaryData, width, height } = binObj;
+        const colInk = new Float32Array(width);
+
+        const yStart = Math.floor(height * 0.12);
+        const yEnd = Math.floor(height * 0.88);
+        const spanH = Math.max(1, yEnd - yStart);
+
+        for (let x = 0; x < width; x++) {
+            let blackPixels = 0;
+            for (let y = yStart; y < yEnd; y += 2) {
+                if (binaryData[(y * width + x) * 4] === 0) blackPixels++;
+            }
+            colInk[x] = blackPixels / (spanH / 2);
+        }
+
+        // Sol ve sağ yarıların ortalama mürekkep yoğunluğu
+        let leftDensity = 0, rightDensity = 0;
+        const l0 = Math.floor(width * 0.10), l1 = Math.floor(width * 0.40);
+        const r0 = Math.floor(width * 0.60), r1 = Math.floor(width * 0.90);
+        for (let x = l0; x < l1; x++) leftDensity += colInk[x];
+        leftDensity /= Math.max(1, l1 - l0);
+
+        for (let x = r0; x < r1; x++) rightDensity += colInk[x];
+        rightDensity /= Math.max(1, r1 - r0);
+
+        // Orta %38..%62 arasında dikey beyaz koridor (gutter) ara
+        const m0 = Math.floor(width * 0.38), m1 = Math.floor(width * 0.62);
+        const gutterWindow = Math.max(8, Math.floor(width * 0.025));
+        let minGutterInk = Infinity;
+        let bestSplitX = -1;
+
+        for (let x = m0; x <= m1 - gutterWindow; x++) {
+            let sum = 0;
+            for (let k = 0; k < gutterWindow; k++) sum += colInk[x + k];
+            const avg = sum / gutterWindow;
+            if (avg < minGutterInk) {
+                minGutterInk = avg;
+                bestSplitX = x + Math.floor(gutterWindow / 2);
+            }
+        }
+
+        // Eğer hem sol hem sağ sütunda yazı varsa (> %4.5 yoğunluk) ve ortada temiz beyaz koridor (< %1.2) varsa:
+        if (leftDensity > 0.045 && rightDensity > 0.045 && minGutterInk < 0.012 && bestSplitX > 0) {
+            const leftCanvas = document.createElement('canvas');
+            leftCanvas.width = bestSplitX;
+            leftCanvas.height = height;
+            leftCanvas.getContext('2d').drawImage(cleanCanvas, 0, 0, bestSplitX, height, 0, 0, bestSplitX, height);
+
+            const rightCanvas = document.createElement('canvas');
+            rightCanvas.width = width - bestSplitX;
+            rightCanvas.height = height;
+            rightCanvas.getContext('2d').drawImage(cleanCanvas, bestSplitX, 0, width - bestSplitX, height, 0, 0, width - bestSplitX, height);
+
+            return { isTwoColumn: true, canvases: [leftCanvas, rightCanvas] };
+        }
+
+        return { isTwoColumn: false, canvases: [cleanCanvas] };
+    }
+
+    /**
+     * OCR metnindeki daire içi bozuk şık sembollerini (@), 8), 0), ©) onarır,
+     * soruları ve A, B, C, D, E şıklarını birbirine karıştırmadan ayrıştırır.
+     */
+    function parseExamQuestionsAndOptions(rawText) {
+        if (!rawText || rawText.trim().length < 4) return [];
+
+        let text = rawText
+            .replace(/\r\n/g, '\n')
+            // Yuvarlak içindeki A-E Unicode karakterlerini standartlaştır
+            .replace(/[Ⓐⓐ]/g, ' A) ')
+            .replace(/[Ⓑⓑ]/g, ' B) ')
+            .replace(/[Ⓒⓒ]/g, ' C) ')
+            .replace(/[Ⓓⓓ]/g, ' D) ')
+            .replace(/[Ⓔⓔ]/g, ' E) ')
+            // Satır başında daire yüzünden @), 8), 0) olarak bozulan şıkları bağlama göre düzelt
+            .replace(/(^|\s)\(?([A-Ea-e])[\)\.\-]\s+/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
+
+        // Birden fazla soru varsa soru numaralarından ("1.", "2.", "Soru 1") böl
+        const questionBlocks = text.split(/(?=(?:^|\n)\s*(?:SORU\s*\d+|\d{1,2}\s*[\.\-\)]\s+[A-ZÇĞİÖŞÜ]))/i)
+            .map(b => b.trim())
+            .filter(b => b.length > 5);
+
+        const blocksToParse = questionBlocks.length > 0 ? questionBlocks : [text];
+        const parsedQuestions = [];
+
+        blocksToParse.forEach((block, idx) => {
+            const qObj = {
+                number: idx + 1,
+                stem: '',
+                options: { A: '', B: '', C: '', D: '', E: '' }
+            };
+
+            const numMatch = block.match(/^\s*(?:SORU\s*)?(\d{1,2})\s*[\.\-\)]\s*/i);
+            if (numMatch) {
+                qObj.number = parseInt(numMatch[1], 10) || (idx + 1);
+            }
+
+            // A), B), C), D), E) işaretlerinin konumlarını bul
+            const optRegex = /(?:^|\s|\n)([A-E])\)\s*/g;
+            const matches = [];
+            let m;
+            while ((m = optRegex.exec(block)) !== null) {
+                matches.push({
+                    letter: m[1].toUpperCase(),
+                    startIndex: m.index,
+                    contentStart: m.index + m[0].length
+                });
+            }
+
+            if (matches.length > 0) {
+                qObj.stem = block.slice(0, matches[0].startIndex).replace(/\s+/g, ' ').trim();
+                for (let i = 0; i < matches.length; i++) {
+                    const current = matches[i];
+                    const nextStart = (i + 1 < matches.length) ? matches[i + 1].startIndex : block.length;
+                    const optContent = block.slice(current.contentStart, nextStart).replace(/\s+/g, ' ').trim();
+                    if (optContent && !qObj.options[current.letter]) {
+                        qObj.options[current.letter] = optContent;
+                    }
+                }
+            } else {
+                qObj.stem = block.replace(/\s+/g, ' ').trim();
+            }
+
+            if (qObj.stem || qObj.options.A || qObj.options.B) {
+                parsedQuestions.push(qObj);
+            }
+        });
+
+        return parsedQuestions;
+    }
+
+    function updateExamRemoteUI() {
+        const total = state.examQuestions.length;
+        const idx = Math.max(0, Math.min(total - 1, state.currentExamIndex));
+        state.currentExamIndex = idx;
+        const q = state.examQuestions[idx];
+
+        el.examCounter.textContent = `Soru ${q.number} (${idx + 1} / ${total})`;
+
+        ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+            const val = (q.options && q.options[letter]) ? q.options[letter] : '';
+            if (el.optTexts[letter]) {
+                el.optTexts[letter].textContent = val || 'Bu soruda algılanmadı';
+            }
+            if (el.optBtns[letter]) {
+                el.optBtns[letter].classList.toggle('has-content', Boolean(val));
+            }
+        });
+    }
+
+    function speakCurrentQuestionStem() {
+        const q = state.examQuestions[state.currentExamIndex];
+        if (!q) return;
+        const optCount = ['A', 'B', 'C', 'D', 'E'].filter(k => Boolean(q.options[k])).length;
+        const msg = `Soru ${q.number}: ${q.stem || 'Soru metni okunamadı.'}. Toplam ${optCount} şık ayrıştırıldı. Şıkları tek tek dinlemek için A, B, C, D, E düğmelerine dokunun.`;
+        announceGuidance(msg, { force: true, bannerState: 'centered' });
+    }
+
+    function speakSingleOption(letter) {
+        const q = state.examQuestions[state.currentExamIndex];
+        if (!q) return;
+        const val = q.options[letter];
+        if (val) {
+            announceGuidance(`${letter} şıkkı: ${val}`, { force: true, bannerState: 'centered' });
+        } else {
+            announceGuidance(`Soru ${q.number} için ${letter} şıkkı algılanmadı. Kağıdın sağ veya alt kenarı kadraj dışında kalmış olabilir, kamerayı biraz geri çekip tekrar okutun.`, {
+                force: true,
+                bannerState: 'warning'
+            });
+        }
+    }
+
+    function speakEntireQuestionAndOptions() {
+        const q = state.examQuestions[state.currentExamIndex];
+        if (!q) return;
+        const parts = [`Soru ${q.number}: ${q.stem}.`];
+        ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+            if (q.options[letter]) {
+                parts.push(`${letter} şıkkı: ${q.options[letter]}.`);
+            }
+        });
+        announceGuidance(parts.join(' '), { force: true, bannerState: 'centered' });
+    }
+
+    // =========================================================================
+    // 2. MATEMATİKSEL RENK UZAYI (sRGB -> XYZ -> CIELAB ΔE) VE VON KRIES BEYAZ DENGESİ
     // =========================================================================
     function rgbToLab(r, g, b) {
-        let rn = r / 255;
-        let gn = g / 255;
-        let bn = b / 255;
-
+        let rn = r / 255, gn = g / 255, bn = b / 255;
         rn = rn > 0.04045 ? Math.pow((rn + 0.055) / 1.055, 2.4) : rn / 12.92;
         gn = gn > 0.04045 ? Math.pow((gn + 0.055) / 1.055, 2.4) : gn / 12.92;
         bn = bn > 0.04045 ? Math.pow((bn + 0.055) / 1.055, 2.4) : bn / 12.92;
 
-        // D65 Referans Beyazına Göre XYZ
         const x = (rn * 0.4124 + gn * 0.3576 + bn * 0.1805) / 0.95047;
         const y = (rn * 0.2126 + gn * 0.7152 + bn * 0.0722) / 1.00000;
         const z = (rn * 0.0193 + gn * 0.1192 + bn * 0.9505) / 1.08883;
@@ -216,15 +489,8 @@
         return { name: bestName, deltaE: minDeltaE, lab: targetLab };
     }
 
-    // =========================================================================
-    // 2. KALMAN / ÜSTEL HAREKETLİ ORTALAMA (EMA) VE ÇOKLU KARE DOĞRULAYICI
-    // =========================================================================
-    /**
-     * Tek karelik kamera gürültüsünü (false-positive) eler ve el titremesini
-     * X̂_t = α·X_t + (1-α)·X̂_{t-1} formülüyle yumuşatır.
-     */
     function updateKalmanTracker(rawBox, rawClass, requiredConsensus = 3) {
-        const alpha = 0.30; // Yumuşatma katsayısı
+        const alpha = 0.30;
         if (!rawBox) {
             state.missedFrames++;
             if (state.missedFrames > 4) {
@@ -255,7 +521,7 @@
     }
 
     // =========================================================================
-    // 3. 3D WEB AUDIO NİŞANGÂH RADARI VE AKUSTİK IŞIK METRE
+    // 3. 3D WEB AUDIO NİŞANGÂH RADARI
     // =========================================================================
     class AudioRadarEngine {
         constructor() {
@@ -266,9 +532,7 @@
         init() {
             if (!this.ctx) {
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                if (AudioCtx) {
-                    this.ctx = new AudioCtx();
-                }
+                if (AudioCtx) this.ctx = new AudioCtx();
             }
             if (this.ctx && this.ctx.state === 'suspended') {
                 this.ctx.resume();
@@ -294,9 +558,6 @@
             this.playPannedTone(freq, pan, 0.065, 'sine', 0.16);
         }
 
-        /**
-         * Mod 5: Akustik Işık Metre — Parlaklığı (0..255) 180Hz..980Hz frekansa dönüştürür
-         */
         playLightMeterTone(brightness, hotSpotPanX = 0) {
             if (!state.radarEnabled || !this.ctx) return;
             const now = performance.now();
@@ -358,9 +619,6 @@
 
     const radar = new AudioRadarEngine();
 
-    // =========================================================================
-    // 4. TÜRKÇE SESLİ REHBER (TTS + EKRAN OKUYUCU ARIA LIVE)
-    // =========================================================================
     function announceGuidance(text, options = {}) {
         const {
             force = false,
@@ -413,7 +671,7 @@
     }
 
     // =========================================================================
-    // 5. DERİN MATEMATİKSEL KARE ANALİZÖRÜ (BEYAZ DENGESİ, Z-SKOR, SOBEL, LED)
+    // 4. DERİN MATEMATİKSEL KARE ANALİZÖRÜ
     // =========================================================================
     function analyzeFrameMathematics(ctx, width, height) {
         const imgData = ctx.getImageData(0, 0, width, height);
@@ -428,7 +686,6 @@
         const gh = Math.floor(height / step);
         const gray = new Float32Array(gw * gh);
 
-        // En parlak ışık kaynağı (Pencere / Lamba / LED) takibi
         let maxLum = 0, maxLumX = width / 2, maxLumY = height / 2;
 
         for (let gy = 0; gy < gh; gy++) {
@@ -436,9 +693,7 @@
             for (let gx = 0; gx < gw; gx++) {
                 const x = gx * step;
                 const idx = (y * width + x) * 4;
-                const r = data[idx];
-                const g = data[idx + 1];
-                const b = data[idx + 2];
+                const r = data[idx], g = data[idx + 1], b = data[idx + 2];
                 const lum = 0.299 * r + 0.587 * g + 0.114 * b;
 
                 gray[gy * gw + gx] = lum;
@@ -464,13 +719,11 @@
         const variance = (sumSqLum / Math.max(1, count)) - (avgBrightness * avgBrightness);
         const contrast = Math.sqrt(Math.max(0, variance));
 
-        // 1. VON KRIES / GRAY-WORLD BEYAZ DENGESİ KATSAYILARI (Sarı Işık Sapmasını Giderir)
         const grayRef = (avgR + avgG + avgB) / 3;
         const wbGainR = avgR > 15 ? Math.min(1.6, Math.max(0.65, grayRef / avgR)) : 1;
         const wbGainG = avgG > 15 ? Math.min(1.6, Math.max(0.65, grayRef / avgG)) : 1;
         const wbGainB = avgB > 15 ? Math.min(1.6, Math.max(0.65, grayRef / avgB)) : 1;
 
-        // 2. MERKEZ BÖLGE (Kıyafet / Eşya) RENK VE SOBEL DESEN ANALİZİ
         const cX0 = Math.floor(gw * 0.35), cX1 = Math.floor(gw * 0.65);
         const cY0 = Math.floor(gh * 0.35), cY1 = Math.floor(gh * 0.65);
         let cR = 0, cG = 0, cB = 0, cCount = 0;
@@ -507,11 +760,10 @@
             else patternType = 'Kareli veya Çok Renkli Desenli';
         }
 
-        // 3. LAPLACIAN KESKİNLİK VE PARLAK EKRAN KÜMESİ
         let edgeEnergy = 0;
         let brightWeightSum = 0, brightXSum = 0, brightYSum = 0;
         let minBX = width, maxBX = 0, minBY = height, maxBY = 0;
-        const brightThreshold = Math.max(145, Math.min(220, avgBrightness + contrast * 0.65));
+        const brightThreshold = Math.max(140, Math.min(220, avgBrightness + contrast * 0.55));
 
         for (let gy = 1; gy < gh - 1; gy++) {
             for (let gx = 1; gx < gw - 1; gx++) {
@@ -542,12 +794,12 @@
         const sharpness = edgeEnergy / Math.max(1, (gw - 2) * (gh - 2));
 
         let brightCluster = null;
-        if (brightWeightSum > 1800 && maxBX > minBX && maxBY > minBY) {
+        if (brightWeightSum > 1600 && maxBX > minBX && maxBY > minBY) {
             const bw = maxBX - minBX;
             const bh = maxBY - minBY;
             const areaRatio = (bw * bh) / (width * height);
             const aspect = bw / Math.max(1, bh);
-            if (areaRatio > 0.04 && areaRatio < 0.92 && aspect >= 0.4 && aspect <= 2.6) {
+            if (areaRatio > 0.04 && areaRatio < 0.94 && aspect >= 0.35 && aspect <= 2.7) {
                 brightCluster = {
                     cx: brightXSum / brightWeightSum,
                     cy: brightYSum / brightWeightSum,
@@ -557,7 +809,6 @@
             }
         }
 
-        // 4. 8x8 HÜCRELİ Z-SKOR (3.5σ) ZEMİN ANOMALİ VE KAYIP EŞYA ANALİZİ
         const gridN = 8;
         const cellMeans = new Float32Array(gridN * gridN);
         const cellW = Math.floor(gw / gridN);
@@ -603,7 +854,6 @@
             }
         }
 
-        // Desenli halı kilidi: Eğer gridStd > 36 veya çok sayıda hücre aynı anda yüksekse zemin alacalıdır
         const isSurfacePatterned = gridStd > 36 || anomalyCount > 5;
         let floorAnomaly = null;
         if (!isSurfacePatterned && maxZScore >= 3.25 && anomalyCellX >= 0) {
@@ -617,12 +867,9 @@
             };
         }
 
-        // 5. NOKTA KAYNAK LED IŞIĞI VE YANIP SÖNME (Hz) ANALİZİ
         let ledSource = null;
         if (maxLum >= 238 && avgBrightness < 165) {
-            const pIdx = (Math.floor(maxLumY) * width + Math.floor(maxLumX)) * 4;
-            // Çekirdeğin 12 piksel çevresindeki halkanın rengi ve parlaklığı
-            let ringR = 0, ringG = 0, ringB = 0, ringLum = 0, rCnt = 0;
+            let ringR = 0, ringG = 0, ringB = 0, rCnt = 0;
             const rad = 10;
             for (let dy = -rad; dy <= rad; dy += 4) {
                 for (let dx = -rad; dx <= rad; dx += 4) {
@@ -633,14 +880,12 @@
                     ringR += data[rIdx];
                     ringG += data[rIdx + 1];
                     ringB += data[rIdx + 2];
-                    ringLum += 0.299 * data[rIdx] + 0.587 * data[rIdx + 1] + 0.114 * data[rIdx + 2];
                     rCnt++;
                 }
             }
             ringR /= Math.max(1, rCnt);
             ringG /= Math.max(1, rCnt);
             ringB /= Math.max(1, rCnt);
-            ringLum /= Math.max(1, rCnt);
 
             const prominenceRatio = maxLum / Math.max(12, avgBrightness);
             if (prominenceRatio >= 2.15) {
@@ -660,7 +905,6 @@
             }
         }
 
-        // LED Zaman Serisi (Yanıp Sönme Frekansı Hesabı)
         state.ledHistory.push({
             t: performance.now(),
             active: Boolean(ledSource),
@@ -704,9 +948,6 @@
         };
     }
 
-    // =========================================================================
-    // 6. MICHELSON TERS IŞIK (SİLÜET) VE SOSYAL MEDYA MAHREMİYET FORMÜLÜ
-    // =========================================================================
     function evaluatePortraitPrivacyAndBacklight(personBox, metrics, allPredictions, frameW, frameH) {
         const [bx, by, bw, bh] = personBox;
         const { gray, gw, gh, step } = metrics;
@@ -734,23 +975,18 @@
         const backlightRatio = bgLum / Math.max(1, fgLum + 1);
         const hasBacklight = backlightRatio > 2.05 && fgLum < 82;
 
-        // Kadrajdan Baş / Çene / Omuz Kesilme Geometrisi
         const clippedParts = [];
         if (by <= frameH * 0.025) clippedParts.push('başın üst kısmı');
         if (by + bh >= frameH * 0.98 && bh < frameH * 0.85) clippedParts.push('alt/çene kısmı');
         if (bx <= frameW * 0.02) clippedParts.push('sol omuz');
         if (bx + bw >= frameW * 0.98) clippedParts.push('sağ omuz');
 
-        // Arka Planda Yabancı Ekran / Kişi / Dağınıklık Denetimi
         const bgObjects = [];
         let extraPeople = 0;
         allPredictions.forEach(p => {
             if (p.bbox === personBox) return;
-            if (p.class === 'person') {
-                extraPeople++;
-            } else {
-                bgObjects.push(TR_LABELS[p.class] || p.class);
-            }
+            if (p.class === 'person') extraPeople++;
+            else bgObjects.push(TR_LABELS[p.class] || p.class);
         });
 
         const uniqueBg = [...new Set(bgObjects)];
@@ -772,9 +1008,6 @@
         };
     }
 
-    // =========================================================================
-    // 7. HİZALAMA CÜMLESİ ÜRETİCİ
-    // =========================================================================
     function computeAlignmentInstruction(targetBox, frameW, frameH, labelTr, idealMinArea = 0.10, idealMaxArea = 0.68) {
         const [bx, by, bw, bh] = targetBox;
         const cx = bx + bw / 2;
@@ -795,13 +1028,13 @@
         if (offsetX < -0.20 || (touchesLeft && !touchesRight)) {
             moveParts.push(offsetX < -0.45 ? 'sola doğru çevirin' : 'biraz sola kaydırın');
         } else if (offsetX > 0.20 || (touchesRight && !touchesLeft)) {
-            moveParts.push(offsetX > 0.45 ? 'sağa doğru çevirin' : 'biraz sağa kaydırın');
+            moveParts.push(offsetX > 0.45 ? 'sağa doğru çevirin (sağdaki şıklar kesilebilir)' : 'biraz sağa kaydırın');
         }
 
         if (offsetY < -0.20 || (touchesTop && !touchesBottom)) {
-            moveParts.push(offsetY < -0.45 ? 'yukarı kaldırın (şu an aşağıya tutuyorsunuz)' : 'biraz yukarı kaldırın');
+            moveParts.push(offsetY < -0.45 ? 'yukarı kaldırın' : 'biraz yukarı kaldırın');
         } else if (offsetY > 0.20 || (touchesBottom && !touchesTop)) {
-            moveParts.push(offsetY > 0.45 ? 'aşağı indirin (şu an ekranın üstüne tutuyorsunuz)' : 'biraz aşağı indirin');
+            moveParts.push(offsetY > 0.45 ? 'aşağı indirin' : 'biraz aşağı indirin');
         }
 
         let distanceAdvice = '';
@@ -810,7 +1043,7 @@
             distanceAdvice = 'Biraz daha yaklaşın';
             distanceStatus = 'Uzak (%' + Math.round(areaRatio * 100) + ')';
         } else if (areaRatio > idealMaxArea || (touchesLeft && touchesRight) || (touchesTop && touchesBottom)) {
-            distanceAdvice = 'Çok yakınsınız, telefonu biraz geri çekin';
+            distanceAdvice = 'Çok yakınsınız, tüm şıkların sığması için telefonu biraz yukarı/geri çekin';
             distanceStatus = 'Çok Yakın (%' + Math.round(areaRatio * 100) + ')';
         }
 
@@ -818,20 +1051,16 @@
 
         let sentence = '';
         if (isCentered) {
-            sentence = `${labelTr} tam ortalandı! Lütfen telefonu sabit tutun.`;
+            sentence = `${labelTr} tam ortalandı ve tüm kenarlar içeride! Lütfen sabit tutun.`;
         } else {
             const parts = [];
-            if (moveParts.length > 0) {
-                parts.push(`Telefonu ${moveParts.join(' ve ')}`);
-            }
-            if (distanceAdvice) {
-                parts.push(distanceAdvice);
-            }
+            if (moveParts.length > 0) parts.push(`Telefonu ${moveParts.join(' ve ')}`);
+            if (distanceAdvice) parts.push(distanceAdvice);
             sentence = `${labelTr} doğrulandı: ${parts.join('. ')}.`;
         }
 
         const posLabel = isCentered
-            ? 'Tam Merkezde (Doğrulandı)'
+            ? 'Tam Merkezde (4 Kenar İçeride)'
             : `X: ${offsetX > 0 ? '+' : ''}${Math.round(offsetX * 100)}%, Y: ${offsetY > 0 ? '+' : ''}${Math.round(offsetY * 100)}%`;
 
         return {
@@ -846,7 +1075,7 @@
     }
 
     // =========================================================================
-    // 8. GERÇEK ZAMANLI VİZÖR DÖNGÜSÜ
+    // 5. GERÇEK ZAMANLI VİZÖR DÖNGÜSÜ
     // =========================================================================
     async function processFrameLoop() {
         if (!state.isRunning) return;
@@ -869,11 +1098,9 @@
             const anCtx = el.analysisCanvas.getContext('2d', { willReadFrequently: true });
             anCtx.drawImage(el.video, 0, 0, anW, anH);
 
-            // 1. Derin Matematiksel Kare Analizi
             const metrics = analyzeFrameMathematics(anCtx, anW, anH);
             updateTelemetryUI(metrics);
 
-            // 2. Çift Motorlu QR ve Barkod Taraması (Yerleşik BarcodeDetector + jsQR)
             let qrDetection = null;
             if (state.mode === 'qr_screen' || state.targetFilter === 'screen_qr') {
                 if (state.barcodeDetector) {
@@ -915,7 +1142,6 @@
                 }
             }
 
-            // 3. COCO-SSD Nesne Tespiti
             let predictions = [];
             if (state.cocoModel && state.mode !== 'light_meter') {
                 try {
@@ -925,7 +1151,6 @@
                 }
             }
 
-            // 4. Seçili Moda Göre Matematiksel Yönlendirme
             handleModeDispatch(anW, anH, vw, vh, metrics, qrDetection, predictions);
         }
 
@@ -945,7 +1170,7 @@
         el.tLighting.textContent = `${lightLabel} • ${blurLabel}`;
 
         const tiltText = state.hasOrientationSensor
-            ? (Math.abs(state.tiltRoll) <= 14 ? 'Düz' : `${state.tiltRoll > 0 ? 'Sola' : 'Sağa'} ${Math.abs(state.tiltRoll)}°`)
+            ? (Math.abs(state.tiltRoll) <= 12 ? 'Paralel/Düz' : `${state.tiltRoll > 0 ? 'Sola' : 'Sağa'} ${Math.abs(state.tiltRoll)}°`)
             : 'Düz';
         el.tColorTilt.textContent = `${metrics.centerColor.name} • ${tiltText}`;
     }
@@ -958,18 +1183,15 @@
 
         drawCrosshair(ovCtx, vw, vh);
 
-        // Mod 5: Akustik Işık Metre (Karanlıkta da çalışmalıdır)
         if (state.mode === 'light_meter') {
             handleLightMeterMode(anW, anH, metrics);
             return;
         }
 
-        // Otomatik Donanım Flaşı (Karanlıkta ve Otomatik Flaş açıksa)
         if (metrics.avgBrightness < 32 && state.flashMode === 'auto') {
             tryEnableHardwareTorch(true);
         }
 
-        // Karanlık Ortam Kilidi (LED modu hariç)
         if (metrics.avgBrightness < 30 && state.mode !== 'anomaly_led') {
             el.tPosition.textContent = 'Ortam Karanlık';
             el.tDistance.textContent = 'Işık Yetersiz';
@@ -980,13 +1202,14 @@
             return;
         }
 
-        // Özel Hedef Filtresi Seçiliyse
         if (state.targetFilter !== 'auto' && state.targetFilter !== 'screen_qr') {
             guideToSpecificObject(state.targetFilter, anW, anH, scaleX, scaleY, ovCtx, predictions);
             return;
         }
 
-        if (state.mode === 'qr_screen' || state.targetFilter === 'screen_qr') {
+        if (state.mode === 'exam_reader') {
+            handleExamReaderLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
+        } else if (state.mode === 'qr_screen' || state.targetFilter === 'screen_qr') {
             handleQrAndScreenMode(anW, anH, scaleX, scaleY, ovCtx, metrics, qrDetection, predictions);
         } else if (state.mode === 'portrait') {
             handlePortraitAndPrivacyMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
@@ -1000,8 +1223,60 @@
     }
 
     // -------------------------------------------------------------------------
-    // MOD 1: WHATSAPP WEB / EKRAN & QR HİZALAMA (KALMAN DOĞRULAMALI)
+    // MOD 1: SINAV VE TEST KAĞIDI CANLI HİZALAMA (4 KENAR VE NETLİK KİLİDİ)
     // -------------------------------------------------------------------------
+    function handleExamReaderLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
+        if (metrics.sharpness < 7.0) {
+            state.countdownStage = 0;
+            el.tPosition.textContent = 'Yazılar Bulanık';
+            el.tDistance.textContent = 'Elinizi Sabitleyin';
+            announceGuidance('Sınav kağıdı şu an bulanık görünüyor. Şıkların yanlış okunmaması için elinizi sabit tutun ve kağıda bir karıştan biraz yüksekten (25-30 santim) dik bakın.', {
+                bannerState: 'warning',
+                minIntervalMs: 3200
+            });
+            return;
+        }
+
+        const docPred = predictions.find(p => p.class === 'book' || p.class === 'tv' || p.class === 'laptop');
+        const rawBox = docPred ? docPred.bbox : (metrics.brightCluster ? metrics.brightCluster.bbox : null);
+
+        if (rawBox) {
+            const tracked = updateKalmanTracker(rawBox, 'exam_page', 3);
+            if (tracked.verified && tracked.box) {
+                drawTargetBox(ovCtx, tracked.box, scaleX, scaleY, '#facc15', 'Sınav Sayfası');
+                const align = computeAlignmentInstruction(tracked.box, anW, anH, 'Sınav Sayfası', 0.18, 0.86);
+                el.tPosition.textContent = align.posLabel;
+                el.tDistance.textContent = align.distanceStatus;
+                radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
+
+                if (align.isCentered) {
+                    if (state.autoCaptureEnabled && !state.isProcessingOcr) {
+                        handleAutoCaptureCountdown('Sınav sayfasının 4 kenarı da kadrajda ve net!');
+                    } else {
+                        announceGuidance('Sınav kağıdı tam ortalandı ve net! Soruları ve A, B, C, D, E şıklarını ayırmak için Boşluk tuşuna basın veya ekrana çift dokunun.', {
+                            bannerState: 'centered',
+                            minIntervalMs: 3400
+                        });
+                    }
+                } else {
+                    state.countdownStage = 0;
+                    announceGuidance(align.sentence, {
+                        bannerState: 'normal',
+                        minIntervalMs: 2400
+                    });
+                }
+                return;
+            }
+        }
+
+        el.tPosition.textContent = 'Sayfa Hazır';
+        el.tDistance.textContent = 'Okumaya Hazır';
+        announceGuidance('Işık ve netlik sınav okumaya uygun. Soruyu ve şıkları okutmak için ekrana çift dokunun veya Boşluk tuşuna basın.', {
+            bannerState: 'centered',
+            minIntervalMs: 4200
+        });
+    }
+
     function handleQrAndScreenMode(anW, anH, scaleX, scaleY, ovCtx, metrics, qrDetection, predictions) {
         if (qrDetection) {
             const tracked = updateKalmanTracker(qrDetection.bbox, 'qr', 1);
@@ -1071,9 +1346,6 @@
         }
     }
 
-    // -------------------------------------------------------------------------
-    // MOD 2: PORTRE, SELFIE & SOSYAL MEDYA MAHREMİYET / TERS IŞIK KOÇU
-    // -------------------------------------------------------------------------
     function handlePortraitAndPrivacyMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
         const people = predictions.filter(p => p.class === 'person');
         if (people.length === 0) {
@@ -1103,7 +1375,6 @@
 
         radar.updateRadar(align.offsetX, align.offsetY, align.isCentered && !audit.hasBacklight);
 
-        // 1. Önce Ters Işık (Silüet) Kontrolü
         if (audit.hasBacklight) {
             state.countdownStage = 0;
             announceGuidance('Ters ışık uyarısı: Arkanızda güçlü ışık var, yüzünüz karanlık silüet çıkıyor. Lütfen ışığı veya pencereyi karşınıza alın.', {
@@ -1113,7 +1384,6 @@
             return;
         }
 
-        // 2. Kadrajdan Baş / Omuz Kesilme Kontrolü
         if (audit.clippedParts.length > 0 && !align.isCentered) {
             state.countdownStage = 0;
             announceGuidance(`Dikkat: Kadrajda ${audit.clippedParts.join(' ve ')} sınırda kesiliyor. ${align.sentence}`, {
@@ -1123,7 +1393,6 @@
             return;
         }
 
-        // 3. Tam Ortalandıysa Mahremiyet Özeti + 3-2-1 Otomatik Çekim
         if (align.isCentered) {
             if (state.autoCaptureEnabled) {
                 handleAutoCaptureCountdown(audit.privacyReport);
@@ -1142,12 +1411,12 @@
         }
     }
 
-    function handleAutoCaptureCountdown(privacyNote = '') {
+    function handleAutoCaptureCountdown(note = '') {
         const now = performance.now();
         if (state.countdownStage === 0) {
             state.countdownStage = 3;
             state.lastCountdownTick = now;
-            announceGuidance(`Tam ortalandı! ${privacyNote} Sabit tutun: 3`, { force: true, bannerState: 'centered' });
+            announceGuidance(`${note} Sabit tutun: 3`, { force: true, bannerState: 'centered' });
         } else if (now - state.lastCountdownTick >= 1050) {
             state.countdownStage--;
             state.lastCountdownTick = now;
@@ -1160,9 +1429,6 @@
         }
     }
 
-    // -------------------------------------------------------------------------
-    // MOD 3: VON KRIES BEYAZ DENGELİ KIYAFET RENGİ, DESEN VE BANKNOT MODU
-    // -------------------------------------------------------------------------
     function handleColorAndPatternMode(anW, anH, metrics) {
         const colorName = metrics.centerColor.name;
         const pattern = metrics.patternType;
@@ -1177,11 +1443,7 @@
         });
     }
 
-    // -------------------------------------------------------------------------
-    // MOD 4: Z-SKORLU (3.5σ) KAYIP EŞYA RADARI VE LED FREKANS (Hz) OKUYUCU
-    // -------------------------------------------------------------------------
     function handleAnomalyAndLedMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
-        // 1. Öncelik: Parlak Nokta Kaynaklı Cihaz LED Işığı Varsa
         if (metrics.ledSource) {
             const led = metrics.ledSource;
             drawTargetBox(ovCtx, led.bbox, scaleX, scaleY, '#22c55e', `${led.colorName} LED`);
@@ -1201,7 +1463,6 @@
             return;
         }
 
-        // 2. Zemin Alacalı / Desenli Halı İse Yanlış Alarmı Kesin Olarak Kilitle
         if (metrics.isSurfacePatterned) {
             el.tPosition.textContent = 'Desenli Zemin Kilidi';
             el.tDistance.textContent = `Varyans: ${Math.round(metrics.gridStd)} (Yüksek)`;
@@ -1212,7 +1473,6 @@
             return;
         }
 
-        // 3. Düz Zeminde 3.25σ Üzeri Tekil Küçük Eşya Anomalisi
         if (metrics.floorAnomaly) {
             const tracked = updateKalmanTracker(metrics.floorAnomaly.bbox, 'anomaly', 3);
             if (tracked.verified && tracked.box) {
@@ -1238,9 +1498,6 @@
         });
     }
 
-    // -------------------------------------------------------------------------
-    // MOD 5: AKUSTİK IŞIK METRE (ODA LAMBALARI VE PENCERE PUSULASI)
-    // -------------------------------------------------------------------------
     function handleLightMeterMode(anW, anH, metrics) {
         const lum = Math.round(metrics.avgBrightness);
         const hotOffsetX = (metrics.maxLumX - anW / 2) / (anW / 2);
@@ -1248,15 +1505,10 @@
         radar.playLightMeterTone(lum, hotOffsetX);
 
         let stateDesc = '';
-        if (lum < 18) {
-            stateDesc = 'Oda zifiri karanlık, tüm lambalar kapalı.';
-        } else if (lum < 55) {
-            stateDesc = 'Ortam loş; sadece küçük bir gece lambası veya ekran ışığı var.';
-        } else if (lum < 145) {
-            stateDesc = 'Oda aydınlık, lamba açık veya gündüz ışığı alıyor.';
-        } else {
-            stateDesc = 'Çok güçlü ışık kaynağı! Kameranız doğrudan açık bir lambaya veya pencereye bakıyor.';
-        }
+        if (lum < 18) stateDesc = 'Oda zifiri karanlık, tüm lambalar kapalı.';
+        else if (lum < 55) stateDesc = 'Ortam loş; sadece küçük bir gece lambası veya ekran ışığı var.';
+        else if (lum < 145) stateDesc = 'Oda aydınlık, lamba açık veya gündüz ışığı alıyor.';
+        else stateDesc = 'Çok güçlü ışık kaynağı! Kameranız doğrudan açık bir lambaya veya pencereye bakıyor.';
 
         let dirHint = 'tam karşınızda';
         if (hotOffsetX < -0.25) dirHint = 'sol tarafınızda';
@@ -1271,9 +1523,6 @@
         });
     }
 
-    // -------------------------------------------------------------------------
-    // MOD 6: CANLI NESNE, İMZA ALANI VE BELGE TARAYICI
-    // -------------------------------------------------------------------------
     function handleExplorerMode(anW, anH, scaleX, scaleY, ovCtx, predictions) {
         if (predictions.length === 0) {
             el.tPosition.textContent = 'Nesne Aranıyor';
@@ -1354,7 +1603,7 @@
     }
 
     // =========================================================================
-    // 9. FOTOĞRAF ÇEKİMİ, RETINA FLAŞ, MAHREMİYET DENETİMİ VE TÜRKÇE OCR / PARA TANIMA
+    // 6. FOTOĞRAF ÇEKİMİ, GÖLGESİZ ÇİFT SÜTUN SINAV OKUMA VE BANKNOT TANIMA
     // =========================================================================
     async function triggerRetinaFlashIfNeeded(avgBrightness) {
         if ((state.flashMode === 'on' || (state.flashMode === 'auto' && avgBrightness < 65)) && el.retinaFlash) {
@@ -1367,7 +1616,7 @@
         if (el.retinaFlash) el.retinaFlash.hidden = true;
     }
 
-    function detectTurkishBanknoteFromTextAndColor(ocrText, colorName) {
+    function detectTurkishBanknoteFromTextAndColor(ocrText) {
         const clean = ocrText.toUpperCase();
         if (/\b200\b/.test(clean) && (clean.includes('TÜRK') || clean.includes('LİRA') || clean.includes('MERKEZ'))) return '200 Türk Lirası';
         if (/\b100\b/.test(clean) && (clean.includes('TÜRK') || clean.includes('LİRA') || clean.includes('MERKEZ'))) return '100 Türk Lirası';
@@ -1418,7 +1667,7 @@
         const uniqueObjs = [...new Set(objNames)];
         const scenePart = uniqueObjs.length > 0
             ? `Kadrajdaki nesneler: ${uniqueObjs.join(', ')}.`
-            : 'Kadrajda yakın plan yüzey veya belge alanı var.';
+            : 'Kadrajda sınav kağıdı veya yakın plan belge alanı var.';
 
         const colorPart = `Merkez renk: ${metrics.centerColor.name} (${metrics.patternType}).`;
 
@@ -1432,8 +1681,8 @@
         const prefix = isAutoTriggered ? 'Otomatik fotoğraf çekildi!' : 'Fotoğraf çekildi!';
         const baseSummary = `${prefix} ${scenePart} ${colorPart} ${privacyPart}`.trim();
 
-        showDetectedResult('Fotoğraf, Mahremiyet ve Metin Raporu', baseSummary + '\n\nÜzerindeki yazılar, imza alanı veya banknot bilgileri okunuyor...');
-        announceGuidance(`${baseSummary} Şimdi fotoğraftaki yazılar okunuyor...`, {
+        showDetectedResult('Sınav, Şık ve Metin Analizi', baseSummary + '\n\nKağıt gölgesi siliniyor, sütunlar ve A-B-C-D-E şıkları ayrıştırılıyor...');
+        announceGuidance('Fotoğraf çekildi! Kağıt üzerindeki gölgeler siliniyor ve sınav şıkları ayrıştırılıyor, lütfen bekleyin...', {
             force: true,
             bannerState: 'centered'
         });
@@ -1441,27 +1690,68 @@
         if (typeof window.Tesseract !== 'undefined' && !state.isProcessingOcr) {
             state.isProcessingOcr = true;
             try {
-                const ocrRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
-                const rawText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
-                const cleanText = rawText.replace(/\s+/g, ' ').trim();
+                // 1. Bradley-Roth İntegral Gölge Silici Uygula
+                const binObj = applyBradleyRothShadowRemoval(capCanvas);
+                // 2. Çift Sütunlu Test İse Sol ve Sağ Sütunu Ayır
+                const splitInfo = splitExamColumnsIfTwoColumn(binObj);
 
-                const banknote = detectTurkishBanknoteFromTextAndColor(cleanText, metrics.centerColor.name);
+                let combinedText = '';
+                for (let i = 0; i < splitInfo.canvases.length; i++) {
+                    const ocrRes = await window.Tesseract.recognize(splitInfo.canvases[i], 'tur+eng');
+                    const partText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
+                    if (partText) {
+                        combinedText += (combinedText ? '\n\n' : '') + partText;
+                    }
+                }
+
+                // Eğer gölge silinmiş görüntüde çok az metin çıktıysa ham görüntüyle yedekle
+                if (combinedText.trim().length < 8) {
+                    const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
+                    combinedText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
+                }
+
+                const cleanText = combinedText.trim();
+                const parsedQuestions = parseExamQuestionsAndOptions(cleanText);
+
+                if (parsedQuestions.length > 0) {
+                    state.examQuestions = parsedQuestions;
+                    state.currentExamIndex = 0;
+                    updateExamRemoteUI();
+                }
+
+                const banknote = detectTurkishBanknoteFromTextAndColor(cleanText);
                 const hasSignatureKeyword = /imza|ad\s*soyad|teslim\s*alan|onay/i.test(cleanText);
+                const colNote = splitInfo.isTwoColumn ? 'Çift sütunlu test kağıdı tespit edildi ve sütunlar birbirine karışmadan ayrı ayrı okundu.' : '';
 
                 if (cleanText.length >= 3) {
-                    const extraNotes = [];
-                    if (banknote) extraNotes.push(`Tespit Edilen Banknot: ${banknote}!`);
-                    if (hasSignatureKeyword) extraNotes.push('Evrak üzerinde İMZA / AD SOYAD alanı tespit edildi.');
+                    const firstQ = state.examQuestions[0];
+                    const hasOptions = firstQ && (firstQ.options.A || firstQ.options.B || firstQ.options.C);
 
-                    const extraStr = extraNotes.length > 0 ? extraNotes.join(' ') + '\n\n' : '';
-                    const finalReport = `${baseSummary}\n\n${extraStr}Okunan Metin:\n${cleanText}`;
-                    showDetectedResult('Tam Analiz ve Okunan Metin', finalReport);
-                    announceGuidance(`${extraNotes.join(' ')} Okunan metin: ${cleanText}`, {
-                        force: true,
-                        bannerState: 'centered'
-                    });
+                    if (hasOptions || state.mode === 'exam_reader') {
+                        const finalReport = `${colNote}\nToplam ${state.examQuestions.length} soru ayrıştırıldı.\n\nSoru ${firstQ.number}: ${firstQ.stem}\n` +
+                            ['A', 'B', 'C', 'D', 'E']
+                                .filter(k => Boolean(firstQ.options[k]))
+                                .map(k => `${k}) ${firstQ.options[k]}`)
+                                .join('\n');
+                        showDetectedResult('Ayrıştırılan Sınav Sorusu ve Şıklar', finalReport.trim());
+                        speakCurrentQuestionStem();
+                    } else {
+                        const extraNotes = [];
+                        if (banknote) extraNotes.push(`Tespit Edilen Banknot: ${banknote}!`);
+                        if (hasSignatureKeyword) extraNotes.push('Evrak üzerinde İMZA / AD SOYAD alanı tespit edildi.');
+                        const finalReport = `${baseSummary}\n\n${extraNotes.join(' ')}\n${ cleanText }`;
+                        showDetectedResult('Tam Analiz ve Okunan Metin', finalReport.trim());
+                        announceGuidance(`${extraNotes.join(' ')} Okunan metin: ${cleanText.replace(/\s+/g, ' ')}`, {
+                            force: true,
+                            bannerState: 'centered'
+                        });
+                    }
                 } else {
-                    showDetectedResult('Fotoğraf ve Mahremiyet Raporu', `${baseSummary}\n\nFotoğraf üzerinde belirgin bir yazı algılanmadı.`);
+                    showDetectedResult('Fotoğraf Raporu', `${baseSummary}\n\nFotoğraf üzerinde okunabilir bir soru veya yazı bulunamadı. Kamerayı kağıda 25 santim mesafede dik tutup tekrar deneyin.`);
+                    announceGuidance('Kağıt üzerinde okunabilir bir soru veya şık bulunamadı. Lütfen kamerayı kağıda 25 santimetre mesafede dik tutup tekrar deneyin.', {
+                        force: true,
+                        bannerState: 'warning'
+                    });
                 }
             } catch (_) {
                 showDetectedResult('Fotoğraf Raporu', baseSummary);
@@ -1485,9 +1775,6 @@
         }
     }
 
-    // =========================================================================
-    // 10. WHATSAPP 15 SANİYE ARKA PLAN SES KİLİDİ VE DONANIM FLAŞI
-    // =========================================================================
     function startWhatsapp15SecAudioHold() {
         radar.init();
         if (state.whatsappHoldTimer) {
@@ -1533,9 +1820,6 @@
         return false;
     }
 
-    // =========================================================================
-    // 11. VİZÖR ÇİZİM VE KAMERA BAŞLATMA
-    // =========================================================================
     function drawCrosshair(ctx, w, h) {
         const cx = w / 2;
         const cy = h / 2;
@@ -1580,13 +1864,13 @@
         }
         try {
             if (typeof window.cocoSsd !== 'undefined' && !state.cocoModel) {
-                el.aiStatusBadge.textContent = 'Yapay Zeka ve Matematik Motoru Yükleniyor...';
+                el.aiStatusBadge.textContent = 'Yapay Zeka ve Sınav Motoru Yükleniyor...';
                 state.cocoModel = await window.cocoSsd.load({ base: 'lite_mobilenet_v2' });
-                el.aiStatusBadge.textContent = 'Matematiksel Motor & AI Hazır (%100 Doğrulamalı)';
+                el.aiStatusBadge.textContent = 'Sınav, QR & Matematik Motoru Hazır';
                 el.aiStatusBadge.classList.add('ready');
             }
         } catch (_) {
-            el.aiStatusBadge.textContent = 'Matematiksel Sensör ve QR Motoru Hazır';
+            el.aiStatusBadge.textContent = 'Sınav, Sensör ve QR Motoru Hazır';
             el.aiStatusBadge.classList.add('ready');
         }
     }
@@ -1622,15 +1906,12 @@
             el.btnCaptureNow.disabled = false;
 
             const camName = state.facingMode === 'user' ? 'Ön selfie kamerası' : 'Arka kamera';
-            announceGuidance(`${camName} ve matematiksel doğrulamalı 3 boyutlu sesli radar başlatıldı. Aktif mod: ${getActiveModeTitle()}.`, {
+            announceGuidance(`${camName} ve sesli radar başlatıldı. Aktif mod: ${getActiveModeTitle()}.`, {
                 force: true,
                 bannerState: 'centered'
             });
 
-            if (!state.cocoModel) {
-                initAiModel();
-            }
-
+            if (!state.cocoModel) initAiModel();
             requestAnimationFrame(processFrameLoop);
         } catch (_) {
             announceGuidance('Kameraya erişilemedi. Lütfen tarayıcı kamera iznini onaylayın.', {
@@ -1656,7 +1937,7 @@
 
     function getActiveModeTitle() {
         const activeBtn = document.querySelector('.mode-card.active .mode-title');
-        return activeBtn ? activeBtn.textContent : 'Ekran ve QR Hizalama';
+        return activeBtn ? activeBtn.textContent : 'Sınav ve Şık Okuyucu';
     }
 
     function setMode(newMode) {
@@ -1672,12 +1953,13 @@
         });
 
         const modeAnnouncement = {
-            'qr_screen': 'Mod 1: WhatsApp Web, Bilgisayar Ekranı ve QR Kod Hizalama seçildi.',
-            'portrait': 'Mod 2: Portre, Selfie ve Sosyal Medya Ters Işık / Mahremiyet Koçu seçildi.',
-            'color_cloth': 'Mod 3: Beyaz Dengeli Kıyafet Rengi, Kumaş Deseni ve Para/Etiket Okuyucu seçildi.',
-            'anomaly_led': 'Mod 4: Z-Skorlu Kayıp Eşya Radarı ve Cihaz LED / Şarj Işığı Frekans Okuyucu seçildi.',
-            'light_meter': 'Mod 5: Akustik Işık Metre seçildi. Odadaki lambaların ve pencerelerin yönü ses frekansıyla bildiriliyor.',
-            'explorer': 'Mod 6: Canlı Nesne, İmza Yeri ve Türkçe Belge Okuyucu seçildi.'
+            'exam_reader': 'Mod 1: Sınav ve Test Şıkkı Okuyucu seçildi. Kağıt gölgesi silinir, çift sütunlu testler ayrılır ve A, B, C, D, E şıkları tek tek düğmelerle okunur.',
+            'qr_screen': 'Mod 2: WhatsApp Web, Bilgisayar Ekranı ve QR Kod Hizalama seçildi.',
+            'portrait': 'Mod 3: Portre, Selfie ve Sosyal Medya Ters Işık / Mahremiyet Koçu seçildi.',
+            'color_cloth': 'Mod 4: Beyaz Dengeli Kıyafet Rengi, Kumaş Deseni ve Para/Etiket Okuyucu seçildi.',
+            'anomaly_led': 'Mod 5: Z-Skorlu Kayıp Eşya Radarı ve Cihaz LED / Şarj Işığı Frekans Okuyucu seçildi.',
+            'light_meter': 'Mod 6: Akustik Işık Metre seçildi. Odadaki lambaların ve pencerelerin yönü ses frekansıyla bildiriliyor.',
+            'explorer': 'Mod 7: Canlı Nesne, İmza Yeri ve Genel Türkçe Belge Okuyucu seçildi.'
         }[newMode];
 
         if (modeAnnouncement) {
@@ -1686,7 +1968,7 @@
     }
 
     // =========================================================================
-    // 12. OLAY DİNLEYİCİLERİ VE KLAVYE KISAYOLLARI
+    // 7. OLAY DİNLEYİCİLERİ, SINAV KUMANDASI VE KLAVYE KISAYOLLARI
     // =========================================================================
     window.addEventListener('deviceorientation', (ev) => {
         if (typeof ev.gamma === 'number' && typeof ev.beta === 'number') {
@@ -1738,6 +2020,36 @@
     el.btnWhatsappHold.addEventListener('click', startWhatsapp15SecAudioHold);
     el.btnRepeat.addEventListener('click', () => announceGuidance(state.lastSpeechText, { force: true }));
 
+    // Sınav Kumandası Düğmeleri
+    el.btnExamPrev.addEventListener('click', () => {
+        if (state.currentExamIndex > 0) {
+            state.currentExamIndex--;
+            updateExamRemoteUI();
+            speakCurrentQuestionStem();
+        } else {
+            announceGuidance('İlk sorudasınız.', { force: true });
+        }
+    });
+
+    el.btnExamNext.addEventListener('click', () => {
+        if (state.currentExamIndex + 1 < state.examQuestions.length) {
+            state.currentExamIndex++;
+            updateExamRemoteUI();
+            speakCurrentQuestionStem();
+        } else {
+            announceGuidance('Bu sayfadaki son sorudasınız.', { force: true });
+        }
+    });
+
+    el.btnExamStem.addEventListener('click', speakCurrentQuestionStem);
+    el.btnExamAll.addEventListener('click', speakEntireQuestionAndOptions);
+
+    ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+        if (el.optBtns[letter]) {
+            el.optBtns[letter].addEventListener('click', () => speakSingleOption(letter));
+        }
+    });
+
     el.targetSelect.addEventListener('change', () => {
         state.targetFilter = el.targetSelect.value;
         const selectedText = el.targetSelect.options[el.targetSelect.selectedIndex].text;
@@ -1780,17 +2092,25 @@
             return;
         }
         const key = ev.key.toLowerCase();
-        if (key === '1') setMode('qr_screen');
-        else if (key === '2') setMode('portrait');
-        else if (key === '3') setMode('color_cloth');
-        else if (key === '4') setMode('anomaly_led');
-        else if (key === '5') setMode('light_meter');
-        else if (key === '6') setMode('explorer');
+        if (key === '1') setMode('exam_reader');
+        else if (key === '2') setMode('qr_screen');
+        else if (key === '3') setMode('portrait');
+        else if (key === '4') setMode('color_cloth');
+        else if (key === '5') setMode('anomaly_led');
+        else if (key === '6') setMode('light_meter');
+        else if (key === '7') setMode('explorer');
+        else if (key === 's') speakCurrentQuestionStem();
+        else if (key === 'a') speakSingleOption('A');
+        else if (key === 'b') speakSingleOption('B');
+        else if (key === 'c') speakSingleOption('C');
+        else if (key === 'd') speakSingleOption('D');
+        else if (key === 'e') speakSingleOption('E');
+        else if (ev.key === 'ArrowLeft') el.btnExamPrev.click();
+        else if (ev.key === 'ArrowRight') el.btnExamNext.click();
         else if (key === 'r') el.btnToggleRadar.click();
         else if (key === 'o') el.btnToggleAuto.click();
         else if (key === 'f' && !el.btnToggleFlash.disabled) el.btnToggleFlash.click();
         else if (key === 'w') startWhatsapp15SecAudioHold();
-        else if (key === 'c' && !el.btnSwitchCam.disabled) el.btnSwitchCam.click();
         else if (key === 't') el.btnRepeat.click();
         else if (ev.code === 'Space') {
             ev.preventDefault();
@@ -1800,6 +2120,7 @@
     });
 
     window.addEventListener('load', () => {
+        updateExamRemoteUI();
         setTimeout(initAiModel, 350);
     });
 })();
