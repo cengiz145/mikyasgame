@@ -179,49 +179,61 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (Exception ignored) {}
         } else if (intent.getType().startsWith("video/")) {
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            try {
-                retriever.setDataSource(this, mediaUri);
-                String durStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-                long durationMs = durStr != null ? Long.parseLong(durStr) : 6000L;
-                if (durationMs < 1000L) durationMs = 4000L;
-                int durationSec = Math.max(1, Math.round(durationMs / 1000f));
+            final Uri videoUri = mediaUri;
+            new Thread(() -> {
+                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                try {
+                    retriever.setDataSource(MainActivity.this, videoUri);
+                    String durStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                    long durationMs = durStr != null ? Long.parseLong(durStr) : 6000L;
+                    if (durationMs < 1000L) durationMs = 4000L;
+                    int durationSec = Math.max(1, Math.round(durationMs / 1000f));
 
-                int stepCount = Math.min(8, Math.max(4, (int) Math.ceil(durationSec / 1.5)));
-                StringBuilder jsArray = new StringBuilder("[");
-                boolean first = true;
+                    int stepCount = Math.min(8, Math.max(4, (int) Math.ceil(durationSec / 1.5)));
+                    StringBuilder jsArray = new StringBuilder("[");
+                    boolean first = true;
 
-                for (int i = 0; i < stepCount; i++) {
-                    double r = stepCount == 1 ? 0.5 : (0.04 + ((double) i / (stepCount - 1)) * 0.90);
-                    long timeUs = (long) (durationMs * r * 1000.0);
-                    Bitmap frame = retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST);
-                    if (frame == null) {
-                        frame = retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-                    }
-                    if (frame != null) {
-                        int w = frame.getWidth();
-                        int h = frame.getHeight();
-                        int maxDim = 640;
-                        if (w > maxDim || h > maxDim) {
-                            float scale = Math.min((float) maxDim / w, (float) maxDim / h);
-                            frame = Bitmap.createScaledBitmap(frame, Math.max(1, Math.round(w * scale)), Math.max(1, Math.round(h * scale)), true);
+                    for (int i = 0; i < stepCount; i++) {
+                        double r = stepCount == 1 ? 0.5 : (0.04 + ((double) i / (stepCount - 1)) * 0.90);
+                        long timeUs = (long) (durationMs * r * 1000.0);
+                        Bitmap rawFrame = retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST);
+                        if (rawFrame == null) {
+                            rawFrame = retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
                         }
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        frame.compress(Bitmap.CompressFormat.JPEG, 82, bos);
-                        String b64 = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
-                        if (!first) jsArray.append(",");
-                        jsArray.append("'data:image/jpeg;base64,").append(b64).append("'");
-                        first = false;
+                        if (rawFrame != null) {
+                            int w = rawFrame.getWidth();
+                            int h = rawFrame.getHeight();
+                            int maxDim = 640;
+                            Bitmap targetFrame = rawFrame;
+                            if (w > maxDim || h > maxDim) {
+                                float scale = Math.min((float) maxDim / w, (float) maxDim / h);
+                                targetFrame = Bitmap.createScaledBitmap(rawFrame, Math.max(1, Math.round(w * scale)), Math.max(1, Math.round(h * scale)), true);
+                                if (targetFrame != rawFrame) {
+                                    rawFrame.recycle();
+                                }
+                            }
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            targetFrame.compress(Bitmap.CompressFormat.JPEG, 80, bos);
+                            targetFrame.recycle();
+                            String b64 = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+                            if (!first) jsArray.append(",");
+                            jsArray.append("'data:image/jpeg;base64,").append(b64).append("'");
+                            first = false;
+                        }
                     }
+                    jsArray.append("]");
+                    if (!first) {
+                        final String builtCall = "if (typeof window.receiveSharedVideoFramesFromAndroid === 'function') { window.receiveSharedVideoFramesFromAndroid(" + durationSec + ", " + jsArray.toString() + "); }";
+                        runOnUiThread(() -> {
+                            pendingSharedVideoJsCall = builtCall;
+                            deliverPendingSharedImageToWebView();
+                        });
+                    }
+                } catch (Exception ignored) {
+                } finally {
+                    try { retriever.release(); } catch (Exception ignored) {}
                 }
-                jsArray.append("]");
-                if (!first) {
-                    pendingSharedVideoJsCall = "if (typeof window.receiveSharedVideoFramesFromAndroid === 'function') { window.receiveSharedVideoFramesFromAndroid(" + durationSec + ", " + jsArray.toString() + "); }";
-                }
-            } catch (Exception ignored) {
-            } finally {
-                try { retriever.release(); } catch (Exception ignored) {}
-            }
+            }).start();
         }
     }
 
