@@ -2657,6 +2657,7 @@
             }
 
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            const totalAvailableFunds = (this.data.companyTreasury || 0) + currentBudget;
             if (!isFreeGift && currentBudget < driverInfo.hireFee) {
                 const msg = `Yetersiz bakiye! ${driverInfo.name} transferi için ${driverInfo.hireFee} ₺ gerekiyor. Bakiyeniz: ${currentBudget} ₺.`;
                 if (typeof audio !== 'undefined' && audio.speak) audio.speak(msg);
@@ -3189,11 +3190,20 @@
             const trend = (this.data.marketTrends && this.data.marketTrends[route.id]) ? this.data.marketTrends[route.id] : null;
             const marketMultiplier = trend ? trend.multiplier : 1.0;
 
-            // 2. YOLCU KAPASİTESİ VE BİLET HASILATI
+            // 2. YOLCU KAPASİTESİ VE BİLET HASILATI (Otogar Bilet Yazıhaneleri + Bilet Fiyat Politikası)
             let basePass = route.avgPassengers + Math.floor(Math.random() * 6);
-            const ticketingLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('ticketing_network') : 1;
-            if (ticketingLvl === 2) basePass = Math.round(basePass * 1.35);
-            else if (ticketingLvl === 3) basePass = Math.round(basePass * 1.60);
+            const terminalLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('terminal_offices') : 1;
+            const pricingMult = (typeof this.data.ticketPricingMultiplier === 'number' && !isNaN(this.data.ticketPricingMultiplier))
+                ? this.data.ticketPricingMultiplier : 1.0;
+
+            // Bilet fiyat politikası doluluk etkisi: İndirimli (0.8x) -> +%15 yolcu, Fahiş (1.6x) -> -%35 yolcu
+            if (pricingMult < 1.0) {
+                basePass = Math.round(basePass * 1.15);
+            } else if (pricingMult >= 1.55) {
+                basePass = Math.round(basePass * 0.65);
+            } else if (pricingMult >= 1.25) {
+                basePass = Math.round(basePass * 0.90);
+            }
 
             if (this.data.hqUpgrades && this.data.hqUpgrades.terminalPlatform) {
                 basePass = Math.round(basePass * 1.25); // +%25 peron yolcu çekme
@@ -3203,7 +3213,10 @@
             const passengerCount = Math.min(bus.seatCapacity || 45, basePass);
 
             // Bilet Fiyatı & Çarpanlar
-            let ticketPrice = route.baseTicketPrice * (rankInfo.bonusRev || 1.0) * marketMultiplier;
+            let ticketPrice = route.baseTicketPrice * (rankInfo.bonusRev || 1.0) * marketMultiplier * pricingMult;
+            if (terminalLvl === 2) ticketPrice *= 1.15;
+            else if (terminalLvl >= 3) ticketPrice *= 1.30;
+
             if (this.data.hqUpgrades && this.data.hqUpgrades.corporateBrand) {
                 ticketPrice *= 1.25; // Marka primi
             }
@@ -3211,12 +3224,27 @@
             // 3. SİNERJİ VE ÖZEL YETENEK (TRAIT) BONUSA HESAPLAMASI
             let grossRevenue = Math.round(passengerCount * ticketPrice);
 
-            // Trait: Ayşe Kaptan VIP İkram & Zerafet
+            // Otogar Bilet Yazıhaneleri & VIP Lounge Pasif Kira / Acente Geliri
+            if (terminalLvl === 2) grossRevenue += 1500;
+            else if (terminalLvl >= 3) grossRevenue += 3500;
+
+            // Otobüs Yıkama & Kuaför İstasyonu Prestij Hasılat Bonusu
+            const washLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('bus_wash') : 1;
+            if (washLvl === 2) grossRevenue = Math.round(grossRevenue * 1.15);
+            else if (washLvl >= 3) grossRevenue = Math.round(grossRevenue * 1.30);
+
+            // İkram Mutfağı & Lojistik Kargo Merkezi Kargo Geliri
+            const cateringHubLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('catering_cargo_hub') : 1;
+            if (cateringHubLvl === 1) grossRevenue += 400;
+            else if (cateringHubLvl === 2) grossRevenue += 1200;
+            else if (cateringHubLvl >= 3) grossRevenue += 2500;
+
+            // Trait: Ayşe Kaptan / VIP İkram & Zerafet
             if (driver.traitId === "trait_vip") {
                 grossRevenue = Math.round(grossRevenue * 1.45);
             }
 
-            // Trait: Fatma Kaptan Dakiklik Bonusu
+            // Trait: Fatma Kaptan / Dakiklik Bonusu
             if (driver.traitId === "trait_punctual") {
                 grossRevenue = Math.round(grossRevenue * 1.25);
             }
@@ -3232,23 +3260,36 @@
                 grossRevenue = Math.round(grossRevenue * 1.25);
             }
 
-            // Kemal Usta Mentor Liderlik Bonusu (Tüm filoya +%12)
-            const hasKemalUsta = this.data.hiredDrivers.some(d => d.id === "drv_kemal");
-            if (hasKemalUsta) {
+            // Kemal Usta veya Cemal Ağa Mentor Liderlik Bonusu (Tüm filoya +%12)
+            const hasMentor = this.data.hiredDrivers.some(d => d.id === "drv_kemal" || d.traitId === "trait_mentor");
+            if (hasMentor) {
                 grossRevenue = Math.round(grossRevenue * 1.12);
             }
 
             // 4. GİDERLER: YAKIT + MAAŞ + AŞINMA
             let fuel = route.fuelCost || 300;
+            const fuelDepotLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('fuel_depot') : 1;
+            const maintDepotLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('maintenance_depot') : 1;
 
-            // Trait: Mehmet Kaptan Ekonomik Ayak (-%30 Yakıt)
-            if (driver.traitId === "trait_eco") {
-                fuel = Math.round(fuel * 0.70);
-            }
+            if (fuelDepotLvl >= 3) {
+                fuel = 0; // Seviye 3 Rafineri Kontratı: %100 ÜCRETSİZ YAKIT
+            } else {
+                if (fuelDepotLvl === 1) fuel = Math.round(fuel * 0.90);
+                else if (fuelDepotLvl === 2) fuel = Math.round(fuel * 0.70);
 
-            // Şirket Akaryakıt Anlaşması (-%20 Yakıt)
-            if (this.data.hqUpgrades && this.data.hqUpgrades.fuelContract) {
-                fuel = Math.round(fuel * 0.80);
+                if (maintDepotLvl >= 3) fuel = Math.round(fuel * 0.85);
+
+                // Trait: Mehmet Kaptan Ekonomik Ayak (-%30 Yakıt) veya Yakıt Cimrisi (-%45 Yakıt)
+                if (driver.traitId === "trait_eco") {
+                    fuel = Math.round(fuel * 0.70);
+                } else if (driver.traitId === "trait_fuel") {
+                    fuel = Math.round(fuel * 0.55);
+                }
+
+                // Şirket Akaryakıt Anlaşması (-%20 Yakıt)
+                if (this.data.hqUpgrades && this.data.hqUpgrades.fuelContract) {
+                    fuel = Math.round(fuel * 0.80);
+                }
             }
 
             // Araç ve Rota Sinerjisi (Şehir içine küçük otobüs girdiyse yakıt %35 düşer; büyük girdiyse %30 artar)
@@ -3260,7 +3301,7 @@
 
             const wage = driver.wagePerTrip || 250;
 
-            // İkram Paketi Gideri
+            // İkram Paketi Gideri (İkram Mutfağı kurumu indirimiyle)
             let cateringCost = 0;
             if (this.data.cateringPackage === 'vip') {
                 cateringCost = Math.round(passengerCount * 65);
@@ -3269,13 +3310,20 @@
             } else if (this.data.cateringPackage === 'ekonomik') {
                 cateringCost = Math.round(passengerCount * 12);
             }
+            if (cateringCost > 0) {
+                if (cateringHubLvl === 1) cateringCost = Math.round(cateringCost * 0.90);
+                else if (cateringHubLvl === 2) cateringCost = Math.round(cateringCost * 0.60);
+                else if (cateringHubLvl >= 3) cateringCost = Math.round(cateringCost * 0.30);
+            }
 
             const totalTripExpenses = fuel + wage + cateringCost;
             const netProfit = grossRevenue - totalTripExpenses;
 
             // Muhasebe Defterine Detaylı Gelir ve Gider Kaydı
             this.recordTransaction('income', 'tickets', `${driver.name} - ${route.name} Sefer Hasılatı`, grossRevenue);
-            this.recordTransaction('expense', 'fuel', `${driver.name} - Akaryakıt Tüketimi`, fuel);
+            if (fuel > 0) {
+                this.recordTransaction('expense', 'fuel', `${driver.name} - Akaryakıt Tüketimi`, fuel);
+            }
             this.recordTransaction('expense', 'wages', `${driver.name} - Seferlik Harcırah & Maaş`, wage);
             if (cateringCost > 0) {
                 this.recordTransaction('expense', 'catering', `${driver.name} - İkram Paketi Gideri`, cateringCost);
@@ -3284,7 +3332,14 @@
             // 5. KONDİSYON AŞINMASI
             const curCond = this.getBusCondition(driver.assignedBusId);
             let wearAmount = (route.distKm > 500) ? 5 : ((route.distKm > 100) ? 3 : 2);
-            if (driver.traitId === "trait_eco") wearAmount = Math.max(1, Math.round(wearAmount / 2));
+            const garageLvl = (typeof this.getInstitutionLevel === 'function') ? this.getInstitutionLevel('bus_garage') : 1;
+            if (garageLvl === 2) wearAmount *= 0.75;
+            else if (garageLvl >= 3) wearAmount *= 0.50;
+            if (maintDepotLvl === 2) wearAmount *= 0.75;
+            else if (maintDepotLvl >= 3) wearAmount *= 0.50;
+            if (driver.traitId === "trait_eco") wearAmount *= 0.50;
+            else if (driver.traitId === "trait_mechanic") wearAmount *= 0.25;
+            wearAmount = Math.max(1, Math.round(wearAmount));
             this.data.busConditions[driver.assignedBusId] = Math.max(5, curCond - wearAmount);
 
             // 6. ENERJİ TÜKETİMİ
@@ -4498,6 +4553,7 @@
             if (!card) return;
 
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            const totalAvailableFunds = (this.data.companyTreasury || 0) + currentBudget;
             const companyTreasury = (this.data.companyTreasury !== undefined) ? this.data.companyTreasury : 50000;
             const sharePercent = (this.data.revenueSharePercent !== undefined) ? this.data.revenueSharePercent : 50;
             const captainPercent = 100 - sharePercent;
@@ -4710,7 +4766,7 @@
                         Game.resetAllGameData(true);
                     } else {
                         this.resetToDefault();
-                        this.renderModal('overview');
+                        this.renderAll();
                     }
                 });
             }
@@ -5036,6 +5092,7 @@
 
             container.innerHTML = '';
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            const totalAvailableFunds = (this.data.companyTreasury || 0) + currentBudget;
 
             this.driverMarket.forEach(d => {
                 const isHired = this.data.hiredDrivers.some(hd => hd.id === d.id);
@@ -5098,6 +5155,7 @@
             if (!container) return;
 
             const currentBudget = (typeof Game !== 'undefined' && Game.playerBudget) ? Game.playerBudget : 0;
+            const totalAvailableFunds = (this.data.companyTreasury || 0) + currentBudget;
             const upgrades = [
                 {
                     key: "fuelContract",
@@ -5218,7 +5276,7 @@
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     ${upgrades.map(up => {
                         const isOwned = this.data.hqUpgrades && this.data.hqUpgrades[up.key];
-                        const canAfford = currentBudget >= up.cost;
+                        const canAfford = totalAvailableFunds >= up.cost;
 
                         return `
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
@@ -5272,7 +5330,7 @@
                         Game.resetAllGameData(true);
                     } else {
                         this.resetToDefault();
-                        this.renderModal('upgrades');
+                        this.renderAll();
                     }
                 });
             }

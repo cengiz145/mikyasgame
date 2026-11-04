@@ -436,7 +436,7 @@ const BusFleet = {
             brand: "Isuzu",
             model: "Novo Lux 7.3M",
             fullName: "Anadolu Isuzu Novo Lux (7.31m İlçe & Turizm)",
-            category: "sehirici",
+            category: "belediye",
             categoryName: "İlçe ve Kasaba Hattı",
             icon: "🚐",
             requiredLevel: 1,

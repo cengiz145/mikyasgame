@@ -432,10 +432,14 @@
         init: function() {
             console.log("[LiveWeather] Canlı Meteoroloji ve Gerçek Zamanlı Çevre Motoru hazır.");
 
-            // Shift + H Kısayolu: Canlı Hava Durumu Raporunu Oku
+            // Shift + H Kısayolu: Sadece sürüş ekranı dışındayken buradan tetikle (Sürüş ekranında Game.handleKeyDown zaten yönetir)
             if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
                 window.addEventListener("keydown", (e) => {
-                if (e.shiftKey && (e.key === 'h' || e.key === 'H' || e.code === 'KeyH')) {
+                if (e.shiftKey && !e.altKey && !e.ctrlKey && (e.key === 'h' || e.key === 'H' || e.code === 'KeyH')) {
+                    const inBus = (typeof Game !== 'undefined' && Game.isDriving)
+                        || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'))
+                        || (document.getElementById('stop-screen') && !document.getElementById('stop-screen').classList.contains('hidden'));
+                    if (inBus) return;
                     e.preventDefault();
                     if (typeof audio !== 'undefined' && audio.playSelect) audio.playSelect();
                     LiveWeather.announceWeatherReport("assertive");

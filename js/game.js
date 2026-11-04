@@ -2082,6 +2082,12 @@ const Game = {
         this.activeRouteId = routeId;
         this.roadCurvature = 0;
 
+        if (!isResume) {
+            this.currentStopIndex = 0;
+            this.passengersOnBoard = 0;
+            this.terminalAnnouncedForRoute = false;
+        }
+
         this.completedTunnels = [];
         this.completedBridges = [];
         this.activeRealTunnel = null;
@@ -2548,6 +2554,25 @@ const Game = {
         this.driftVelocity = 0;
         this.targetDriftVelocity = 0;
         this.totalDistanceCovered = 0; // 3D Ses koordinat sistemi için
+        this.currentLegDistanceCovered = 0;
+        this.lastNPCSpawnDistance = 0;
+        this.lastRandomKasisDistance = 0;
+        this.lastPotholeSpawnDist = 0;
+        this.lastTrafficLightDist = 0;
+        this.lastRareCrashDistance = 0;
+        this.kasisWarned = false;
+        this.potholeDistance = null;
+        this.potholeWarned = false;
+        this.trafficLightDistance = null;
+        this.trafficLightWarned = false;
+        this.rareCrashEventActive = false;
+        this.isInsideTunnel = false;
+        this.isInsideBridge = false;
+        if (!restoreMode) {
+            this.currentStopIndex = 0;
+            this.passengersOnBoard = 0;
+            this.terminalAnnouncedForRoute = false;
+        }
         
         // Pnömatik (Hava) Sistemi Değişkenleri
         if (typeof this.airPressure !== 'number' || this.airPressure <= 0) {
@@ -3301,13 +3326,6 @@ const Game = {
             if (typeof audio !== 'undefined' && audio.speak) audio.speak("İleride kasis var, yavaşlayınız.");
             this.kasisWarned = true;
         }
-        if (this.kasisDistance !== null && this.kasisDistance <= 0) {
-            if (typeof audio !== 'undefined' && typeof audio.playSuspensionBounce === 'function') {
-                audio.playSuspensionBounce();
-            }
-            this.kasisDistance = null;
-            this.kasisWarned = false;
-        }
 
 
         // Çekici (Tow Truck) Yapay Zeka (Otopilot) Modu
@@ -3916,9 +3934,10 @@ const Game = {
         }
 
         // Ses Efekti (Tire Screech)
+        const isCurveScreeching = !!(this.upcomingTurns && this.upcomingTurns[0] && this.upcomingTurns[0].isScreeching);
         if (isSkidding) {
             if (typeof audio.playTireScreech === 'function') audio.playTireScreech(skidIntensity);
-        } else {
+        } else if (!isCurveScreeching) {
             if (typeof audio.stopTireScreech === 'function') audio.stopTireScreech();
         }
 
@@ -4188,6 +4207,7 @@ const Game = {
             const distanceCovered = (this.speed / 3.6) * deltaTime * distanceScale; 
             this.currentDistanceToNext -= distanceCovered;
             this.totalDistanceCovered += distanceCovered;
+            this.currentLegDistanceCovered = (this.currentLegDistanceCovered || 0) + distanceCovered;
 
             // Dinamik Yakıt Tüketim Fiziği
             if (this.engineStarted || (typeof audio !== 'undefined' && audio.isEngineRunning)) {
@@ -4446,8 +4466,12 @@ const Game = {
                     }
                 } else {
                     // Güvenli geçiş sesi (Hafif zıplama)
+                    if (typeof audio !== 'undefined' && typeof audio.playSuspensionBounce === 'function') {
+                        audio.playSuspensionBounce();
+                    }
                 }
                 this.kasisDistance = null; // Kasis geçildi
+                this.kasisWarned = false;
             }
         }
         
@@ -5015,7 +5039,7 @@ const Game = {
                 hatNo: "ÇEKİCİ",
                 guzergah: "Kaza Yeri -> Tekirdağ Sanayi",
                 stops: [
-                    { ad: "Tekirdağ Sanayi", id: "sanayi", anons: "Tekirdağ Sanayisine hoşgeldiniz.", gercekMesafeSonraki: 5 }
+                    { name: "Tekirdağ Sanayi", ad: "Tekirdağ Sanayi", id: "sanayi", anons: "Tekirdağ Sanayisine hoşgeldiniz.", gercekMesafeSonraki: 5 }
                 ]
             };
             this.currentStopIndex = 0;
@@ -5894,15 +5918,17 @@ const Game = {
         }
 
         
-        // Sürüş tuşlarını anında güncelle (Caps Lock, Türkçe klavye ve e.repeat fark etmeksizin)
-        if (k === 'w' || e.code === 'KeyW') this.keys.w = true;
-        if (k === 's' || e.code === 'KeyS') { this.keys.s = true; this.isBrakeKeyDown = true; }
-        if (k === 'a' || e.code === 'KeyA') this.keys.a = true;
-        if (k === 'd' || e.code === 'KeyD') this.keys.d = true;
-        if (k === 'arrowup' || e.code === 'ArrowUp') this.keys.arrowup = true;
-        if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = true; this.isBrakeKeyDown = true; }
-        if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = true;
-        if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = true;
+        // Sürüş tuşlarını anında güncelle (Shift/Alt/Ctrl basılı değilken)
+        if (!e.shiftKey && !e.altKey && !e.ctrlKey) {
+            if (k === 'w' || e.code === 'KeyW') this.keys.w = true;
+            if (k === 's' || e.code === 'KeyS') { this.keys.s = true; }
+            if (k === 'a' || e.code === 'KeyA') this.keys.a = true;
+            if (k === 'd' || e.code === 'KeyD') this.keys.d = true;
+            if (k === 'arrowup' || e.code === 'ArrowUp') this.keys.arrowup = true;
+            if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = true; }
+            if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = true;
+            if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = true;
+        }
         
         // Sadece oyun içindeysek ekran okuyucu veya sayfa kaydırmasını engellemek için preventDefault kullan
         if (k.startsWith('arrow') || k === ' ') {
@@ -5941,9 +5967,11 @@ const Game = {
         }
         
         if (e.shiftKey && k === 'w') {
+            e.preventDefault();
             if (typeof audio !== 'undefined' && typeof audio.toggleWipers === 'function') {
                 audio.toggleWipers();
             }
+            return;
         }
 
         if (k === 'k') {
@@ -6049,6 +6077,7 @@ const Game = {
         }
 
         if (k === 'j') {
+            if (e.shiftKey) return;
             e.preventDefault();
             this.checkLostAndFound();
             return;
@@ -6283,7 +6312,7 @@ const Game = {
             if (typeof MissionReader !== 'undefined') MissionReader.exit();
             return;
         }
-        if (this.keys.hasOwnProperty(k)) this.keys[k] = true;
+        if (!e.shiftKey && !e.altKey && !e.ctrlKey && this.keys.hasOwnProperty(k)) this.keys[k] = true;
 
         // Özel aksiyonlar (M veya Boşluk tuşu: Motor Çalıştırma)
         if (k === 'm' || e.code === 'KeyM' || e.code === 'Space') {
@@ -6397,14 +6426,13 @@ const Game = {
 
     handleKeyUp: function(e) {
         const k = e.key.toLowerCase();
-        if (e.shiftKey && (k.startsWith('arrow'))) return;
         
         if (k === 'w' || e.code === 'KeyW') this.keys.w = false;
-        if (k === 's' || e.code === 'KeyS') { this.keys.s = false; this.isBrakeKeyDown = false; }
+        if (k === 's' || e.code === 'KeyS') { this.keys.s = false; }
         if (k === 'a' || e.code === 'KeyA') this.keys.a = false;
         if (k === 'd' || e.code === 'KeyD') this.keys.d = false;
         if (k === 'arrowup' || e.code === 'ArrowUp') this.keys.arrowup = false;
-        if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = false; this.isBrakeKeyDown = false; }
+        if (k === 'arrowdown' || e.code === 'ArrowDown') { this.keys.arrowdown = false; }
         if (k === 'arrowleft' || e.code === 'ArrowLeft') this.keys.arrowleft = false;
         if (k === 'arrowright' || e.code === 'ArrowRight') this.keys.arrowright = false;
         if (this.keys.hasOwnProperty(k)) this.keys[k] = false;
@@ -6479,6 +6507,9 @@ const SanayiMechanic = {
     start: function() {
         this.isActive = true;
         this.state = 'greeting';
+        if (typeof UI !== 'undefined' && typeof UI.switchScreen === 'function') {
+            UI.switchScreen('sanayi-screen');
+        }
         
         const dialogEl = document.getElementById('sanayi-dialog');
         const reportContainer = document.getElementById('sanayi-report-container');
@@ -6664,7 +6695,7 @@ const SanayiMechanic = {
                 
                 currentRepairIndex++;
                 setTimeout(repairNext, 1200);
-            }, 2000);
+            }, repairDuration);
         };
         
         repairNext();

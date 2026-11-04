@@ -267,9 +267,9 @@
             const btnRp = document.createElement('button');
             btnRp.id = 'hud-roleplay-btn';
             btnRp.style.cssText = 'background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #c084fc; padding: 5px 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px;';
-            btnRp.innerHTML = '🎭 ROL YAPMA (F2)';
-            btnRp.title = 'Rol Yapma & Freesound Ses Efektleri Paneli (Kısayol: F2)';
-            btnRp.setAttribute('aria-label', 'Rol Yapma ve Ses Efektleri Paneli (F2)');
+            btnRp.innerHTML = '🎭 ROL YAPMA (F3)';
+            btnRp.title = 'Rol Yapma & Freesound Ses Efektleri Paneli (Kısayol: F3)';
+            btnRp.setAttribute('aria-label', 'Rol Yapma ve Ses Efektleri Paneli (F3)');
             btnRp.addEventListener('click', () => this.toggleModal());
             container.appendChild(btnRp);
         },
@@ -278,23 +278,23 @@
             window.addEventListener('keydown', (e) => {
                 if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
 
-                // F2: Rol Yapma Panelini Aç / Kapat
-                if (e.key === 'F2') {
+                // F3: Rol Yapma Panelini Aç / Kapat (F2 Kaptan Rehberi ile çakışmaması için)
+                if (e.key === 'F3') {
                     e.preventDefault();
                     this.toggleModal();
                     return;
                 }
 
-                // Hızlı Kısayollar (Shift kombinasyonları ile sıfır çakışma!)
-                if (e.shiftKey) {
+                // Hızlı Kısayollar (Alt kombinasyonları ile Shift+V/P/Z telemetri raporlarıyla sıfır çakışma!)
+                if (e.altKey && !e.shiftKey && !e.ctrlKey) {
                     const k = e.key.toLowerCase();
-                    if (k === 'v') {
+                    if (k === 'v' || e.code === 'KeyV') {
                         e.preventDefault();
                         this.triggerCologneService();
-                    } else if (k === 'p') {
+                    } else if (k === 'p' || e.code === 'KeyP') {
                         e.preventDefault();
                         this.triggerLuggageAndTerminal();
-                    } else if (k === 'z') {
+                    } else if (k === 'z' || e.code === 'KeyZ') {
                         e.preventDefault();
                         this.triggerPoliceInspection();
                     }
@@ -368,7 +368,7 @@
                         <p style="color: #cbd5e1; font-size: 0.85rem; margin: 6px 0 12px 0;">
                             Muavin koridorda limon kolonyası sıkar (Fıs-fıs sesi), yolcular teşekkür eder. Yolcu memnuniyeti artar.
                         </p>
-                        <div style="color: #a855f7; font-size: 0.8rem; font-weight: bold;">Hızlı Kısayol: Shift + V</div>
+                        <div style="color: #a855f7; font-size: 0.8rem; font-weight: bold;">Hızlı Kısayol: Alt + V</div>
                     </div>
                     <button id="rp-btn-cologne" class="modern-btn" style="margin-top: 14px; padding: 10px; background: #9333ea; color: #fff; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;" aria-label="Limon kolonyası ve ikram servisi başlat">
                         Fıs Fıs! Kolonya Dağıt
@@ -382,7 +382,7 @@
                         <p style="color: #cbd5e1; font-size: 0.85rem; margin: 6px 0 10px 0;">
                             3'lü anons zili (Dı-dı-dııın / 3 zilin birleşimi) veya tekli derin gong (Dıııın) ve ardından metalik bagaj kuponu zımbalama sesi (Çat-çat!).
                         </p>
-                        <div style="color: #60a5fa; font-size: 0.8rem; font-weight: bold; margin-bottom: 8px;">Hızlı Kısayol: Shift + P</div>
+                        <div style="color: #60a5fa; font-size: 0.8rem; font-weight: bold; margin-bottom: 8px;">Hızlı Kısayol: Alt + P</div>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 8px;">
                         <button id="rp-btn-luggage" class="modern-btn" style="padding: 9px; background: #2563eb; color: #fff; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;" aria-label="3'lü zil ve bagaj fişi zımbalama başlat (+45 Lira)">
@@ -406,7 +406,7 @@
                         <p style="color: #cbd5e1; font-size: 0.85rem; margin: 6px 0 12px 0;">
                             Polis düdüğü (Fiiüüütt!), megafonla sağa çekme ve takograf yazıcısının kağıt çıkarma sesi (Zzzzt-çat!).
                         </p>
-                        <div style="color: #facc15; font-size: 0.8rem; font-weight: bold;">Hızlı Kısayol: Shift + Z</div>
+                        <div style="color: #facc15; font-size: 0.8rem; font-weight: bold;">Hızlı Kısayol: Alt + Z</div>
                     </div>
                     <button id="rp-btn-police" class="modern-btn" style="margin-top: 14px; padding: 10px; background: #ca8a04; color: #000; font-weight: bold; border-radius: 8px; border: none; cursor: pointer;" aria-label="Bölge trafik polisi denetimine gir">
                         Düdük & Takograf Denetimi

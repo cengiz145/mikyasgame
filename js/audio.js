@@ -1004,7 +1004,7 @@ startEngine() {
         this.tireGain.gain.value = 0;
     }
 
-    updateTireNoise(speed, roadType) {
+    updateTireNoise(speed, roadType, passengersCount = 0) {
         if (!this.tireGain || !this.tireFilter) return;
         
         // Araç duruyorsa veya hız çok düşükse tüm yol ve rüzgar seslerini yumuşakça sustur
@@ -2923,62 +2923,11 @@ startEngine() {
 
     // 4. KÖPRÜ VE ALTGEÇİT YANKISI (REVERB / ECHO LOOP)
     enableTunnelReverb() {
-        this.init();
-        if (!this.ctx || this.tunnelActive) return;
-        this.tunnelActive = true;
-
-        const ctx = this.ctx;
-        const delay = ctx.createDelay(1.0);
-        delay.delayTime.value = 0.16; // 160ms yankı gecikmesi
-
-        const feedback = ctx.createGain();
-        feedback.gain.value = 0.38; // Yumuşak sönümlenme
-
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.value = 1600; // Tünel içi beton yutumu
-
-        delay.connect(filter);
-        filter.connect(feedback);
-        feedback.connect(delay);
-        filter.connect(ctx.destination);
-
-        this.tunnelDelay = delay;
-        this.tunnelFeedback = feedback;
-        this.tunnelFilter = filter;
-
-        // Hafif tünel uğultusu
-        const ambientOsc = ctx.createOscillator();
-        const ambientGain = ctx.createGain();
-        ambientOsc.type = 'sine';
-        ambientOsc.frequency.value = 85;
-        ambientGain.gain.setValueAtTime(0.001, ctx.currentTime);
-        ambientGain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.5);
-        ambientOsc.connect(ambientGain);
-        ambientGain.connect(delay);
-        ambientOsc.start();
-        this.tunnelAmbient = ambientOsc;
-        this.tunnelAmbientGain = ambientGain;
+        this.setTunnelMode(true);
     }
 
     disableTunnelReverb() {
-        if (!this.tunnelActive) return;
-        this.tunnelActive = false;
-        const now = this.ctx.currentTime;
-        try {
-            if (this.tunnelAmbientGain) this.tunnelAmbientGain.gain.linearRampToValueAtTime(0.001, now + 0.5);
-            if (this.tunnelFeedback) this.tunnelFeedback.gain.linearRampToValueAtTime(0.001, now + 0.5);
-            setTimeout(() => {
-                try {
-                    if (this.tunnelAmbient) this.tunnelAmbient.stop();
-                    if (this.tunnelAmbient) this.tunnelAmbient.disconnect();
-                    if (this.tunnelAmbientGain) this.tunnelAmbientGain.disconnect();
-                    if (this.tunnelDelay) this.tunnelDelay.disconnect();
-                    if (this.tunnelFeedback) this.tunnelFeedback.disconnect();
-                    if (this.tunnelFilter) this.tunnelFilter.disconnect();
-                } catch(e){}
-            }, 600);
-        } catch(e){}
+        this.setTunnelMode(false);
     }
 
     // 5. KASİS GEÇİŞİ SÜSPANSİYON ESNEYESİ ("GÜM-PISS")
@@ -3227,33 +3176,6 @@ startEngine() {
             this.lowAirGain.disconnect();
             this.lowAirGain = null;
         }
-    }
-
-    playNavChime() {
-        this.init();
-        const osc = this.ctx.createOscillator();
-        const gainNode = this.ctx.createGain();
-
-        osc.type = 'sine';
-        // Google Maps style Da-Ding
-        osc.frequency.setValueAtTime(600, this.ctx.currentTime);
-        osc.frequency.setValueAtTime(800, this.ctx.currentTime + 0.15);
-
-        gainNode.gain.setValueAtTime(0, this.ctx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.05);
-        gainNode.gain.setValueAtTime(0.3, this.ctx.currentTime + 0.1);
-        gainNode.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15);
-        
-        gainNode.gain.setValueAtTime(0, this.ctx.currentTime + 0.15);
-        gainNode.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.2);
-        gainNode.gain.setValueAtTime(0.3, this.ctx.currentTime + 0.4);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.8);
-
-        osc.connect(gainNode);
-        gainNode.connect(this.environmentMixer);
-        
-        osc.start(this.ctx.currentTime);
-        osc.stop(this.ctx.currentTime + 0.8);
     }
 
     playAirGovernorCutoff() {

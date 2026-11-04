@@ -245,7 +245,7 @@
                             companyTreasury: parseFloat(compData.companyTreasury) || 50000,
                             totalRevenue: parseFloat(compData.totalRevenue) || 0,
                             satisfactionRating: parseFloat(compData.satisfactionRating) || 4.9,
-                            badgesCount: (u.badgesData) ? Object.keys(u.badgesData).length : 0,
+                            badgesCount: (u.badgesData) ? Object.values(u.badgesData).filter(b => b && b.unlocked).length : 0,
                             lastSavedTimestamp: u.lastSavedTimestamp || 0
                         });
                     });

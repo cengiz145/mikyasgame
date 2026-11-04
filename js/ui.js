@@ -314,7 +314,7 @@ const UI = {
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         
-        const icon = type === 'success' ? 'âœ…' : (type === 'error' ? 'âŒ' : 'âš ï¸');
+        const icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : '⚠️');
         toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
         
         container.appendChild(toast);
@@ -1004,11 +1004,19 @@ window.addEventListener('keydown', (e) => {
             'intercity-dest-modal',
             'district-dest-modal',
             'smart-route-modal',
+            'bus-garage-modal',
             'garage-fleet-modal',
             'sound-gallery-modal',
+            'driver-badges-modal',
             'badges-modal',
             'stop-collection-modal',
+            'tutorial-assistant-modal',
             'tutorial-modal',
+            'multiplayer-radar-modal',
+            'facility-modal',
+            'hgs-modal',
+            'roleplay-modal',
+            'bus-concept-modal',
             'exit-screen'
         ];
         for (const mId of modalIds) {
@@ -1069,14 +1077,12 @@ window.addEventListener('keydown', (e) => {
     // "ana menüde müziğin sesini açmak için sayfa yukarı sayfa aşşağı tuşları kullanılsın
     // oyun ses düzzeyi ni kısıp açmak isiçinde home ve ent tuşları kullanılsın."
     if (!isFormFieldElement(activeEl) || !isTextInputElement(activeEl)) {
-        const inBus = isDriving || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'));
+        const inBus = isDriving
+            || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'))
+            || (document.getElementById('stop-screen') && !document.getElementById('stop-screen').classList.contains('hidden'));
         if (e.key === 'PageUp') {
-            e.preventDefault();
-            if (inBus) {
-                if (typeof Game !== 'undefined' && typeof Game.toggleFrontDoor === 'function') {
-                    Game.toggleFrontDoor();
-                }
-            } else {
+            if (!inBus) {
+                e.preventDefault();
                 if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
                     audio.adjustMusicVolume(0.1);
                 }
@@ -1084,12 +1090,8 @@ window.addEventListener('keydown', (e) => {
             return;
         }
         if (e.key === 'PageDown') {
-            e.preventDefault();
-            if (inBus) {
-                if (typeof Game !== 'undefined' && typeof Game.toggleRearDoor === 'function') {
-                    Game.toggleRearDoor();
-                }
-            } else {
+            if (!inBus) {
+                e.preventDefault();
                 if (typeof audio !== 'undefined' && audio.adjustMusicVolume) {
                     audio.adjustMusicVolume(-0.1);
                 }
@@ -1097,20 +1099,8 @@ window.addEventListener('keydown', (e) => {
             return;
         }
         if (e.key === 'Home') {
-            e.preventDefault();
-            const inBus = isDriving || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'));
-            if (inBus) {
-                if (typeof audio !== 'undefined') {
-                    if (audio.playWindowSound) audio.playWindowSound(true);
-                    audio.setWindowOpen(true);
-                    if (typeof Game !== 'undefined' && Game.busDamage) {
-                        audio.updateAcoustics(Game.busDamage.leftWindow, Game.busDamage.rightWindow);
-                    }
-                    const winMsg = "Kaptan camı açıldı. Dış sesler ve serin hava kokpite doluyor.";
-                    if (typeof audio.speak === 'function') audio.speak(winMsg);
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Açıldı (Home)", "info");
-                }
-            } else {
+            if (!inBus) {
+                e.preventDefault();
                 if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
                     audio.adjustGameSoundVolume(0.1);
                 }
@@ -1118,20 +1108,8 @@ window.addEventListener('keydown', (e) => {
             return;
         }
         if (e.key === 'End') {
-            e.preventDefault();
-            const inBus = isDriving || (document.getElementById('driving-screen') && !document.getElementById('driving-screen').classList.contains('hidden'));
-            if (inBus) {
-                if (typeof audio !== 'undefined') {
-                    if (audio.playWindowSound) audio.playWindowSound(false);
-                    audio.setWindowOpen(false);
-                    if (typeof Game !== 'undefined' && Game.busDamage) {
-                        audio.updateAcoustics(Game.busDamage.leftWindow, Game.busDamage.rightWindow);
-                    }
-                    const winMsg = "Kaptan camı kapatıldı. Kabin yalıtımı sağlandı.";
-                    if (typeof audio.speak === 'function') audio.speak(winMsg);
-                    if (typeof UI !== 'undefined' && UI.showToast) UI.showToast("🪟 Sol Cam Kapatıldı (End)", "info");
-                }
-            } else {
+            if (!inBus) {
+                e.preventDefault();
                 if (typeof audio !== 'undefined' && audio.adjustGameSoundVolume) {
                     audio.adjustGameSoundVolume(-0.1);
                 }

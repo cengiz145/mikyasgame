@@ -1727,7 +1727,10 @@ document.addEventListener('DOMContentLoaded', () => {
             UI.showToast("Bu seviyedeki görevleri tamamladınız! Görev listesine dönülüyor.", "success");
             Game.activeRouteId = null;
             const btnStart = document.getElementById('btn-start-game');
-            if (btnStart) btnStart.innerText = "Yeni Bir Oyuna Başla";
+            if (btnStart) {
+                btnStart.onclick = null;
+                btnStart.innerText = "Yeni Bir Oyuna Başla";
+            }
             UI.renderRoutes(Game.currentCity || "Tekirdağ", Game.completedTasks);
             UI.switchScreen('route-menu');
         }
