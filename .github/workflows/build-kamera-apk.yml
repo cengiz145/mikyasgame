@@ -27,6 +27,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Ensure Release Keystore Exists
+        run: |
+          if [ ! -f kamera_asistan_android/app/mikyas-release.jks ]; then
+            keytool -genkeypair -v \
+              -keystore kamera_asistan_android/app/mikyas-release.jks \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -alias mikyas_release \
+              -storepass mikyas2026 -keypass mikyas2026 \
+              -dname "CN=Erisilebilir Kamera Uygulamasi, OU=Erisilebilirlik, O=Mikyas Studio, L=Istanbul, ST=Istanbul, C=TR"
+          fi
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
@@ -49,8 +60,8 @@ jobs:
           cp kamera_asistan_android/app/build/outputs/apk/release/app-release.apk kamera_asistan/MikyasKameraAsistani.apk
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add kamera_asistan/MikyasKameraAsistani.apk
+          git add -f kamera_asistan/MikyasKameraAsistani.apk kamera_asistan_android/app/mikyas-release.jks
           if ! git diff --staged --quiet; then
-            git commit -m "build(apk): Update compiled MikyasKameraAsistani.apk [skip ci]"
+            git commit -m "build(apk): Update Play Protect clean signed MikyasKameraAsistani.apk [skip ci]"
             git push origin HEAD:main
           fi

@@ -17,6 +17,8 @@ import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -25,17 +27,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQ_PERMS = 1001;
     private static final int REQ_FILE_CHOOSER = 1002;
     private static final int REQ_VOICE_SONG = 1003;
+    private static final String LIVE_APP_URL = "https://cengiz145.github.io/mikyasgame/kamera_asistan/";
+    private static final String LOCAL_FALLBACK_URL = "file:///android_asset/www/index.html";
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private String pendingSharedImageDataUrl = null;
@@ -59,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
-        settings.setAllowFileAccessFromFileURLs(true);
-        settings.setAllowUniversalAccessFromFileURLs(true);
 
         webView.addJavascriptInterface(new AndroidSongBridge(), "AndroidSongBridge");
 
@@ -69,6 +67,13 @@ public class MainActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 deliverPendingSharedImageToWebView();
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request != null && request.isForMainFrame()) {
+                    view.loadUrl(LOCAL_FALLBACK_URL);
+                }
             }
         });
 
@@ -134,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
         @JavascriptInterface
         public boolean launchGoogleHumToSearch() {
             try {
-                // 1. Öncelik: Google Hızlı Arama Kutusu "Bu Hangi Şarkı? (Mırıldanarak/Dinleyerek Şarkı Bulma)"
                 Intent googleMusicIntent = new Intent("com.google.android.googlequicksearchbox.MUSIC_SEARCH");
                 if (googleMusicIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(googleMusicIntent);
@@ -142,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (Exception ignored) {}
             try {
-                // 2. Öncelik: Android Standart Müzik / Şarkı Arama İntenti
                 Intent stdMusicIntent = new Intent("android.intent.action.MUSIC_SEARCH");
                 if (stdMusicIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(stdMusicIntent);
@@ -286,115 +289,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadAssistantApp() {
-        // 1. Öncelik: Daha önce buluttan (OTA) indirilmiş güncel yerel kopya varsa anında onu aç, yoksa APK içindeki sürümü aç
-        final File otaDir = new File(getFilesDir(), "ota_www");
-        final File otaIndex = new File(otaDir, "index.html");
-        final File otaAppJs = new File(otaDir, "app.js");
-
-        if (otaIndex.exists() && otaIndex.length() > 500 && otaAppJs.exists() && otaAppJs.length() > 1000) {
-            webView.loadUrl("file://" + otaIndex.getAbsolutePath());
-        } else {
-            webView.loadUrl("file:///android_asset/www/index.html");
-        }
-
-        // 2. Arka Planda Otomatik Canlı Güncelleme (OTA):
-        // GitHub / Mikyas Studio sunucusundaki en son index.html, app.js, style.css ve manifest.json dosyalarını kontrol eder.
-        // Değişiklik varsa indirip kaydeder ve ekranı anında yeni sürüme geçirir (kullanıcıya tekrar APK atmaya gerek kalmaz).
-        checkForOtaWebUpdatesInBackground(otaDir);
-    }
-
-    private void checkForOtaWebUpdatesInBackground(final File otaDir) {
-        new Thread(() -> {
-            try {
-                if (!otaDir.exists()) {
-                    otaDir.mkdirs();
-                }
-                final String baseUrl = "https://raw.githubusercontent.com/cengiz145/mikyasgame/main/kamera_asistan/";
-                final String[] files = new String[]{"index.html", "app.js", "style.css", "manifest.json"};
-                boolean anyUpdated = false;
-
-                for (String fileName : files) {
-                    byte[] remoteBytes = downloadFileBytes(baseUrl + fileName + "?t=" + System.currentTimeMillis());
-                    if (remoteBytes == null || remoteBytes.length < 100) {
-                        continue;
-                    }
-                    File localFile = new File(otaDir, fileName);
-                    boolean isDifferent = !localFile.exists() || localFile.length() != remoteBytes.length;
-                    if (!isDifferent) {
-                        byte[] existingBytes = readFileBytes(localFile);
-                        if (!java.util.Arrays.equals(existingBytes, remoteBytes)) {
-                            isDifferent = true;
-                        }
-                    }
-                    if (isDifferent) {
-                        File tempFile = new File(otaDir, fileName + ".tmp");
-                        try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                            fos.write(remoteBytes);
-                            fos.flush();
-                        }
-                        if (localFile.exists()) {
-                            localFile.delete();
-                        }
-                        tempFile.renameTo(localFile);
-                        if ("index.html".equals(fileName) || "app.js".equals(fileName)) {
-                            anyUpdated = true;
-                        }
-                    }
-                }
-
-                final File updatedIndex = new File(otaDir, "index.html");
-                if (anyUpdated && updatedIndex.exists() && webView != null) {
-                    runOnUiThread(() -> {
-                        webView.clearCache(false);
-                        webView.loadUrl("file://" + updatedIndex.getAbsolutePath());
-                    });
-                }
-            } catch (Exception ignored) {}
-        }).start();
-    }
-
-    private byte[] downloadFileBytes(String urlStr) {
-        HttpURLConnection conn = null;
-        try {
-            URL url = new URL(urlStr);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setConnectTimeout(6000);
-            conn.setReadTimeout(8000);
-            conn.setUseCaches(false);
-            conn.setRequestProperty("Cache-Control", "no-cache");
-            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                return null;
-            }
-            try (InputStream is = conn.getInputStream();
-                 ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-                byte[] buf = new byte[8192];
-                int n;
-                while ((n = is.read(buf)) != -1) {
-                    bos.write(buf, 0, n);
-                }
-                return bos.toByteArray();
-            }
-        } catch (Exception e) {
-            return null;
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }
-
-    private byte[] readFileBytes(File file) {
-        try (InputStream is = new java.io.FileInputStream(file);
-             ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            byte[] buf = new byte[8192];
-            int n;
-            while ((n = is.read(buf)) != -1) {
-                bos.write(buf, 0, n);
-            }
-            return bos.toByteArray();
-        } catch (Exception e) {
-            return null;
-        }
+        // Canlı HTTPS web sürümünü yükle (böylece yapılan tüm güncellemeler APK yeniden kurulmadan anında yansır).
+        // İnternet yoksa WebViewClient.onReceivedError otomatik olarak çevrimdışı yerel kopyayı (LOCAL_FALLBACK_URL) açar.
+        webView.loadUrl(LIVE_APP_URL + "?t=" + (System.currentTimeMillis() / 60000L));
     }
 
     @Override
@@ -410,16 +307,27 @@ public class MainActivity extends AppCompatActivity {
             webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'Space', key: ' '}));", null);
             return true;
         }
-        // Ses Kısma Tuşuna Çift Basış: Son Betimlemeyi Tekrarla (T Kısayolu)
+        // Ses Kısma Tuşu: Tek basışta Sesli Komut (F), Çift basışta 8 Mod Arası Geçiş (M)
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             long now = System.currentTimeMillis();
-            if (now - lastVolumeDownTime < 450) {
-                webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {key: 't'}));", null);
+            if (now - lastVolumeDownTime < 420) {
+                webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'KeyM', key: 'm'}));", null);
                 lastVolumeDownTime = 0;
-                return true;
+            } else {
+                webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'KeyF', key: 'f'}));", null);
+                lastVolumeDownTime = now;
             }
-            lastVolumeDownTime = now;
+            return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView != null && webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

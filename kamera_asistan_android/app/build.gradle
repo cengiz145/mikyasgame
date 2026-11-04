@@ -10,14 +10,25 @@ android {
         applicationId "tr.com.mikyasstudio.kameraasistani"
         minSdk 24
         targetSdk 34
-        versionCode 4
-        versionName "4.0.0"
+        versionCode 5
+        versionName "5.0.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("mikyas-release.jks")
+            storePassword "mikyas2026"
+            keyAlias "mikyas_release"
+            keyPassword "mikyas2026"
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
         debug {
             signingConfig signingConfigs.debug
@@ -32,6 +43,4 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.webkit:webkit:1.10.0'
 }
-
