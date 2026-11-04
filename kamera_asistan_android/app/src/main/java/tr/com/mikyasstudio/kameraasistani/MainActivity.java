@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private String pendingSharedImageDataUrl = null;
+    private String pendingSharedVideoJsCall = null;
     private long lastVolumeDownTime = 0;
 
     @Override
@@ -85,8 +88,9 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("image/*");
-                    startActivityForResult(Intent.createChooser(intent, "Betimlenecek Fotoğrafı Seçin"), REQ_FILE_CHOOSER);
+                    intent.setType("*/*");
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
+                    startActivityForResult(Intent.createChooser(intent, "Betimlenecek Fotoğrafı veya Videoyu Seçin"), REQ_FILE_CHOOSER);
                     return true;
                 } catch (Exception e) {
                     MainActivity.this.filePathCallback = null;
@@ -155,22 +159,64 @@ public class MainActivity extends AppCompatActivity {
 
     private void extractSharedImageIfPresent(Intent intent) {
         if (intent == null) return;
-        if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null && intent.getType().startsWith("image/")) {
-            Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
-            if (imageUri != null) {
-                try (InputStream is = getContentResolver().openInputStream(imageUri)) {
-                    if (is != null) {
-                        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                        byte[] data = new byte[8192];
-                        int nRead;
-                        while ((nRead = is.read(data, 0, data.length)) != -1) {
-                            buffer.write(data, 0, nRead);
-                        }
-                        buffer.flush();
-                        String base64 = Base64.encodeToString(buffer.toByteArray(), Base64.NO_WRAP);
-                        pendingSharedImageDataUrl = "data:" + intent.getType() + ";base64," + base64;
+        if (!Intent.ACTION_SEND.equals(intent.getAction()) || intent.getType() == null) return;
+
+        Uri mediaUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        if (mediaUri == null) return;
+
+        if (intent.getType().startsWith("image/")) {
+            try (InputStream is = getContentResolver().openInputStream(mediaUri)) {
+                if (is != null) {
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                    byte[] data = new byte[8192];
+                    int nRead;
+                    while ((nRead = is.read(data, 0, data.length)) != -1) {
+                        buffer.write(data, 0, nRead);
                     }
-                } catch (Exception ignored) {}
+                    buffer.flush();
+                    String base64 = Base64.encodeToString(buffer.toByteArray(), Base64.NO_WRAP);
+                    pendingSharedImageDataUrl = "data:" + intent.getType() + ";base64," + base64;
+                }
+            } catch (Exception ignored) {}
+        } else if (intent.getType().startsWith("video/")) {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            try {
+                retriever.setDataSource(this, mediaUri);
+                String durStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                long durationMs = durStr != null ? Long.parseLong(durStr) : 6000L;
+                if (durationMs < 1000L) durationMs = 4000L;
+                int durationSec = Math.max(1, Math.round(durationMs / 1000f));
+
+                double[] ratios = new double[]{0.05, 0.35, 0.65, 0.92};
+                StringBuilder jsArray = new StringBuilder("[");
+                boolean first = true;
+
+                for (double r : ratios) {
+                    long timeUs = (long) (durationMs * r * 1000.0);
+                    Bitmap frame = retriever.getFrameAtTime(timeUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                    if (frame != null) {
+                        int w = frame.getWidth();
+                        int h = frame.getHeight();
+                        int maxDim = 640;
+                        if (w > maxDim || h > maxDim) {
+                            float scale = Math.min((float) maxDim / w, (float) maxDim / h);
+                            frame = Bitmap.createScaledBitmap(frame, Math.max(1, Math.round(w * scale)), Math.max(1, Math.round(h * scale)), true);
+                        }
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        frame.compress(Bitmap.CompressFormat.JPEG, 82, bos);
+                        String b64 = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+                        if (!first) jsArray.append(",");
+                        jsArray.append("'data:image/jpeg;base64,").append(b64).append("'");
+                        first = false;
+                    }
+                }
+                jsArray.append("]");
+                if (!first) {
+                    pendingSharedVideoJsCall = "if (typeof window.receiveSharedVideoFramesFromAndroid === 'function') { window.receiveSharedVideoFramesFromAndroid(" + durationSec + ", " + jsArray.toString() + "); }";
+                }
+            } catch (Exception ignored) {
+            } finally {
+                try { retriever.release(); } catch (Exception ignored) {}
             }
         }
     }
@@ -183,6 +229,13 @@ public class MainActivity extends AppCompatActivity {
                 String js = "if (typeof window.receiveSharedPhotoFromAndroid === 'function') { window.receiveSharedPhotoFromAndroid('" + payload + "'); }";
                 webView.evaluateJavascript(js, null);
             }, 600);
+        }
+        if (pendingSharedVideoJsCall != null && webView != null) {
+            final String jsCall = pendingSharedVideoJsCall;
+            pendingSharedVideoJsCall = null;
+            webView.postDelayed(() -> {
+                webView.evaluateJavascript(jsCall, null);
+            }, 700);
         }
     }
 

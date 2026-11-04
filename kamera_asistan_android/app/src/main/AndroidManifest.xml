@@ -29,11 +29,12 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- WhatsApp veya Galeriden "Paylaş -> Mikyas Kamera Asistanı" ile Fotoğraf Betimleme -->
+            <!-- WhatsApp veya Galeriden "Paylaş -> Erişilebilir Kamera Uygulaması" ile Fotoğraf ve Video Betimleme -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
             </intent-filter>
         </activity>
 
