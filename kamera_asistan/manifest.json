@@ -1,7 +1,7 @@
 {
-  "name": "Mikyas Erişilebilir Kamera ve QR Asistanı",
-  "short_name": "Kamera Asistanı",
-  "description": "Görme engelliler için gerçek zamanlı 3D sesli radar, WhatsApp Web QR hizalama, otomatik portre kadrajlama ve nesne tarama asistanı.",
+  "name": "Erişilebilir Kamera Uygulaması",
+  "short_name": "Erişilebilir Kamera",
+  "description": "Bir kamera uygulamasından fazlasını ayağınıza getiriyoruz. Görme engelliler için Sınav Okuyucu, Sesli Kıble ve Namaz Vakti Rehberi, Demir/Kağıt Para Hesaplayıcı, Çalan Şarkıyı Bulucu ve 15 Günlük Yaşam Yardımcısı.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#090d16",
