@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Erişilebilir Kamera Uygulaması | Bir Kamera Uygulamasından Fazlasını Ayağınıza Getiriyoruz</title>
+    <meta name="description" content="Bir kamera uygulamasından fazlasını ayağınıza getiriyoruz! Görme engelliler için Sınav ve Test Şıkkı Okuyucu, Sesli Kıble ve Namaz Vakti Rehberi, Demir ve Kağıt Para Hesaplayıcı, Çalan Şarkıyı Bulucu ve 15 Günlük Yaşam Yardımcısı.">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Erişilebilir Kamera">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <!-- Cihaz İçi Gerçek Zamanlı Yapay Zeka ve QR Kütüphaneleri -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js" defer></script>
+</head>
+<body>
+    <a href="#main-controls" class="skip-link">Ana Kontrollere Atla</a>
+
+    <!-- Karanlıkta Selfie / Belge Çekimi İçin Tam Ekran Beyaz Retina Flaşı -->
+    <div id="retina-flash-overlay" class="retina-flash" hidden aria-hidden="true"></div>
+
+    <!-- Ekran Okuyucu (NVDA / TalkBack / VoiceOver) Canlı Bildirim Alanları -->
+    <div id="sr-live-assertive" class="sr-only" role="status" aria-live="assertive" aria-atomic="true"></div>
+    <div id="sr-live-polite" class="sr-only" role="log" aria-live="polite" aria-atomic="true"></div>
+
+    <header class="app-header" role="banner">
+        <div class="header-top">
+            <a href="../index.html" class="back-btn" aria-label="Mikyas Studio Ana Sayfasına Dön">← Ana Sayfa</a>
+            <h1>Erişilebilir Kamera Uygulaması</h1>
+            <a href="MikyasKameraAsistani.apk" download="MikyasKameraAsistani.apk" class="apk-download-btn" aria-label="Android Telefonlar İçin Erişilebilir Kamera Uygulaması APK Dosyasını İndir">
+                📱 Telefona İndir (Android APK)
+            </a>
+            <span id="ai-status-badge" class="status-badge" role="status">Sesli Asistan Hazırlanıyor...</span>
+        </div>
+        <p class="subtitle">
+            <strong>Bir kamera uygulamasından fazlasını ayağınıza getiriyoruz.</strong> Görme engelliler için <strong>Sıfır Hatalı Sınav Okuyucu</strong>, <strong>Sesli Kıble ve Namaz Vakti Rehberi</strong>, <strong>Demir/Kağıt Para Hesaplayıcı</strong>, <strong>Çalan Şarkıyı Bulucu</strong> ve <strong>15 Günlük Yaşam Yardımcısı</strong>.
+        </p>
+    </header>
+
+    <main id="main-controls" role="main" class="app-container">
+        <!-- Hızlı Başlat / Kamera ve Donanım Kontrol Çubuğu -->
+        <section aria-label="Kamera, Flaş ve Ses Kontrolleri" class="control-bar">
+            <button id="btn-start-camera" class="primary-btn pulse-btn" aria-pressed="false">
+                📷 Kamerayı ve Sesli Rehberi Başlat
+            </button>
+            <button id="btn-switch-camera" class="secondary-btn" disabled aria-label="Ön ve Arka Kamera Arasında Geçiş Yap">
+                🔄 Kamera: Arka
+            </button>
+            <button id="btn-toggle-flash" class="secondary-btn" disabled aria-pressed="false" aria-label="Telefon Işığını (Feneri) Aç veya Kapat (Kısayol: F)">
+                🔦 Işık / Fener: Otomatik
+            </button>
+            <button id="btn-toggle-radar" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Yön Bulduran Sesli Sinyali Aç veya Kapat (Kısayol: R)">
+                🎯 Sesli Yön Sinyali: Açık
+            </button>
+            <button id="btn-toggle-auto" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Tam Hizalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O)">
+                ⚡ Otomatik Çekim: Açık
+            </button>
+            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek, Detaylı Betimle ve Sesli Oku (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
+                📸 Şimdi Çek &amp; Betimle (Boşluk)
+            </button>
+            <button id="btn-upload-photo" class="primary-btn" type="button" style="background: linear-gradient(135deg, #0ea5e9, #2563eb);" aria-label="Telefon Galerisinden veya WhatsApp'tan Gelen Bir Fotoğrafı ya da Videoyu Seçip Sahne Sahne Detaylı Betimlet ve Okut (Kısayol: M)">
+                🖼️🎬 Fotoğraf veya Video Seç &amp; Betimle (M)
+            </button>
+            <input type="file" id="photo-file-input" accept="image/*,video/*" hidden aria-hidden="true">
+        </section>
+
+        <!-- 15 Günlük Yaşam Modu Seçimi -->
+        <section aria-labelledby="mode-heading" class="mode-section">
+            <h2 id="mode-heading">Ne Yapmak İstiyorsunuz? (15 Günlük Yaşam Yardımcısı)</h2>
+            <div class="mode-grid" role="radiogroup" aria-labelledby="mode-heading">
+                <button type="button" class="mode-card active" data-mode="exam_reader" role="radio" aria-checked="true" id="mode-btn-1" aria-label="1. Sınav Sorusu ve Şık Okuyucu (A, B, C, D, E)">
+                    <span class="mode-icon" aria-hidden="true">📝🅰️</span>
+                    <span class="mode-title">1. Sınav Sorusu ve Şık Okuyucu (A, B, C, D, E)</span>
+                    <span class="mode-desc" aria-hidden="true">Kağıdın üzerindeki el ve telefon gölgesini temizler, yan yana iki sütunlu testleri birbirine karıştırmadan ayırır. Soruyu ve A, B, C, D, E şıklarını tek tek düğmeyle okur.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="qibla_compass" role="radio" aria-checked="false" id="mode-btn-2" aria-label="2. Sesli Kıble Pusulası ve Namaz Vakitleri">
+                    <span class="mode-icon" aria-hidden="true">🕋🧭</span>
+                    <span class="mode-title">2. Sesli Kıble Pusulası ve Namaz Vakitleri</span>
+                    <span class="mode-desc" aria-hidden="true">Kıble yönünü hem pusula hem de Güneşin yönüyle kontrol ederek yanılmadan buldurur. 81 ilin namaz vakitlerini, ne kadar süre kaldığını ve kerahat saatini sesli söyler.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="qr_screen" role="radio" aria-checked="false" id="mode-btn-3" aria-label="3. WhatsApp Web ve Bilgisayar Ekranı Hizalama">
+                    <span class="mode-icon" aria-hidden="true">💻📱</span>
+                    <span class="mode-title">3. WhatsApp Web ve Bilgisayar Ekranı Hizalama</span>
+                    <span class="mode-desc" aria-hidden="true">Telefonu bilgisayar ekranına tuttuğunuzda "biraz sağa, biraz yukarı" diyerek karekodu (QR) tam ortalamanızı sağlar. WhatsApp'a geçerken eliniz kaymasın diye 15 saniye sesle rehberlik eder.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="portrait" role="radio" aria-checked="false" id="mode-btn-4" aria-label="4. Özçekim (Selfie) ve Fotoğraf Çekim Yardımcısı">
+                    <span class="mode-icon" aria-hidden="true">🧑🛡️</span>
+                    <span class="mode-title">4. Özçekim (Selfie) ve Fotoğraf Çekim Yardımcısı</span>
+                    <span class="mode-desc" aria-hidden="true">Yüzünüzün tam ortada olup olmadığını, arkanızdan vuran ışığın yüzünüzü karartıp karartmadığını ve arkada görünmemesi gereken bir eşya olup olmadığını söyleyip 3-2-1 diye çeker.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="color_cloth" role="radio" aria-checked="false" id="mode-btn-5" aria-label="5. Demir Para, Kağıt Para Sayacı ve Kıyafet Rengi Tanıma">
+                    <span class="mode-icon" aria-hidden="true">🪙💵</span>
+                    <span class="mode-title">5. Demir Para, Kağıt Para Sayacı ve Kıyafet Rengi</span>
+                    <span class="mode-desc" aria-hidden="true">Elinizdeki kağıt ve demir paraları gösterdikçe bir yandan kumbarada toplar; "Ne Kadar Param Var?" düğmesine bastığınızda tek tek neler olduğunu ve toplam kaç lira kaç kuruşunuz olduğunu sesli söyler.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="anomaly_led" role="radio" aria-checked="false" id="mode-btn-6" aria-label="6. Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü">
+                    <span class="mode-icon" aria-hidden="true">🔦🔍</span>
+                    <span class="mode-title">6. Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü</span>
+                    <span class="mode-desc" aria-hidden="true">Yere düşen anahtar, yüzük, hap gibi küçük eşyaları bulur; ayrıca modem, şarj aleti veya kombinin küçük ışığının yanıp sönüp sönmediğini ve rengini söyler.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="light_meter" role="radio" aria-checked="false" id="mode-btn-7" aria-label="7. Lamba Açık mı Kapalı mı ve Pencere Bulucu">
+                    <span class="mode-icon" aria-hidden="true">💡🧭</span>
+                    <span class="mode-title">7. Lamba Açık mı Kapalı mı ve Pencere Bulucu</span>
+                    <span class="mode-desc" aria-hidden="true">Odadaki lambaların açık mı kapalı mı olduğunu ve güneş ışığının hangi pencereden geldiğini ses tonuyla ve konuşarak haber verir.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="explorer" role="radio" aria-checked="false" id="mode-btn-8" aria-label="8. Etrafımda Ne Var ve Evrak Okuyucu">
+                    <span class="mode-icon" aria-hidden="true">🧭📦</span>
+                    <span class="mode-title">8. Etrafımda Ne Var ve Evrak / Yazı Okuyucu</span>
+                    <span class="mode-desc" aria-hidden="true">Odanızdaki eşyaların (sandalye, masa, kapı, bardak) ne tarafta olduğunu söyler ve elinizdeki her türlü kağıt, fatura veya mektubu Türkçe seslendirir.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="medicine_skt" role="radio" aria-checked="false" id="mode-btn-9" aria-label="9. İlaç Kutusu ve Son Kullanma Tarihi Kontrolü">
+                    <span class="mode-icon" aria-hidden="true">💊📅</span>
+                    <span class="mode-title">9. İlaç Kutusu ve Son Kullanma Tarihi Kontrolü</span>
+                    <span class="mode-desc" aria-hidden="true">İlacın adını, kaç miligram olduğunu, eczacının yazdığı "sabah-akşam" kullanım tarifini ve ilacın son kullanma tarihinin geçip geçmediğini kontrol edip sesli uyarır.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="signature_pen" role="radio" aria-checked="false" id="mode-btn-10" aria-label="10. İmza Atarken Kalem Yönlendirici">
+                    <span class="mode-icon" aria-hidden="true">✍️👆</span>
+                    <span class="mode-title">10. İmza Atarken Kalem Yönlendirici</span>
+                    <span class="mode-desc" aria-hidden="true">Kağıttaki imza yerini ve elinizdeki kalemin ucunu aynı anda görür; "Kalemi biraz sağa, biraz aşağı götür... Tamam dur, şimdi imzala!" diyerek doğru yeri imzalatır.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="liquid_level" role="radio" aria-checked="false" id="mode-btn-11" aria-label="11. Bardağa Çay ve Su Doldurma Yardımcısı">
+                    <span class="mode-icon" aria-hidden="true">☕🥛</span>
+                    <span class="mode-title">11. Bardağa Çay ve Su Doldurma Yardımcısı</span>
+                    <span class="mode-desc" aria-hidden="true">Bardağa sıcak çay, kahve veya su doldururken elinizi yakmadan bardağın ne kadar dolduğunu sesle takip eder; taşmasına yakın "Bardak doldu, durdurun!" diye uyarır.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="door_elevator_lcd" role="radio" aria-checked="false" id="mode-btn-12" aria-label="12. Kapı Numarası, Asansör Tuşu ve Makine Ekranı">
+                    <span class="mode-icon" aria-hidden="true">🚪🔢</span>
+                    <span class="mode-title">12. Kapı Numarası, Asansör Tuşu ve Makine Ekranı</span>
+                    <span class="mode-desc" aria-hidden="true">Apartman kapı numaralarını, asansörde parmağınızın hangi kat tuşunda olduğunu ve çamaşır makinesi, klima veya kombinin dijital ekranındaki dereceyi okur.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="food_freshness" role="radio" aria-checked="false" id="mode-btn-13" aria-label="13. Yiyecek Bozulmuş mu ve Paket İçeriği Okuyucu">
+                    <span class="mode-icon" aria-hidden="true">🍎🛡️</span>
+                    <span class="mode-title">13. Yiyecek Bozulmuş mu ve Paket İçeriği Okuyucu</span>
+                    <span class="mode-desc" aria-hidden="true">Ekmek, peynir veya meyvenin üzerinde küf ya da çürük lekesi olup olmadığını kontrol eder; market paketlerindeki alerji yapan maddeleri (gluten, süt, fıstık) ve tarihi okur.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="social_presence" role="radio" aria-checked="false" id="mode-btn-14" aria-label="14. Odada Kim Var ve Bana Bakıyor mu? (Titreşimli)">
+                    <span class="mode-icon" aria-hidden="true">👥👀</span>
+                    <span class="mode-title">14. Odada Kim Var ve Bana Bakıyor mu? (Titreşimli)</span>
+                    <span class="mode-desc" aria-hidden="true">Kulaklık gerekmez! Odada kimse duymadan, karşınızdaki kişi size baktığında telefonu avucunuzda çift titreştirir; çift dokunursanız hoparlörden de söyler.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="song_finder" role="radio" aria-checked="false" id="mode-btn-15" aria-label="15. Bu Çalan Hangi Şarkı? (Otomatik Dinle ve Bul)">
+                    <span class="mode-icon" aria-hidden="true">🎵🎤</span>
+                    <span class="mode-title">15. Bu Çalan Hangi Şarkı? (Dinle, Mırıldan veya Söz Söyle)</span>
+                    <span class="mode-desc" aria-hidden="true">Televizyonda, radyoda veya kafede çalan şarkıyı dinler ya da hatırladığınız birkaç kelimesini/melodisini söylediğinizde şarkının adını, sanatçısını ve tüm sözlerini bulup size dinletir.</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- AKILLI SESLİ ŞARKI, MELODİ VE ŞARKI SÖZÜ BULUCU PANELİ -->
+        <section id="song-finder-panel" hidden aria-labelledby="song-finder-heading" class="exam-remote-section" style="border-color: #a855f7;">
+            <div class="exam-remote-header">
+                <h2 id="song-finder-heading" style="color: #c084fc;">🎵 Bu Çalan Hangi Şarkı? (Sesli Şarkı, Melodi ve Söz Bulucu)</h2>
+                <span id="song-status-badge" class="status-badge ready">Dinlemeye Hazır</span>
+            </div>
+            <p class="exam-remote-hint">
+                Bu bölüme geçtiğinizde mikrofon otomatik olarak dinlemeye başlar. Çalan şarkıyı dinletin, birkaç kelimesini söyleyin veya sözlerini bilmiyorsanız <strong>sadece melodisini mırıldanın / ıslık çalın</strong>:
+            </p>
+            <div class="exam-nav-row" role="group" aria-label="Şarkı Dinleme ve Bulma Kontrolleri">
+                <button type="button" id="btn-song-listen" class="primary-btn" style="background: linear-gradient(135deg, #9333ea, #6366f1);" aria-label="Mikrofonla Çalan Şarkıyı, Mırıldanmayı veya Söylediğiniz Sözleri Dinleyip Bul (Kısayol: H)">
+                    🎤 Şarkıyı / Mırıldanmayı Dinle (H)
+                </button>
+                <button type="button" id="btn-song-auto-radar" class="secondary-btn" aria-pressed="false" aria-label="Çalan Her Yeni Şarkıyı Otomatik Bulup Haber Veren Otomatik Başlatma ve Takip Modunu Aç veya Kapat">
+                    📡 Otomatik Şarkı Takibi: Kapalı
+                </button>
+                <button type="button" id="btn-google-hum-search" class="secondary-btn" aria-label="Google Mırıldanarak veya Islık Çalarak Şarkı Bulma Motorunu Aç">
+                    🎶 Google Mırıldanarak Ara
+                </button>
+                <button type="button" id="btn-song-preview" class="secondary-btn" disabled aria-label="Bulunan Şarkının 30 Saniyelik Orijinal Kaydını Dinle veya Durdur">
+                    ▶️ Bulunan Şarkıyı Dinle (Doğrula)
+                </button>
+                <button type="button" id="btn-song-read-lyrics" class="secondary-btn" disabled aria-label="Bulunan Şarkının Sözlerini Sesli Oku">
+                    📜 Şarkı Sözlerini Oku
+                </button>
+            </div>
+            <div class="exam-nav-row" style="align-items:center; gap: 0.6rem; margin-top: 0.6rem;">
+                <label for="song-search-input" style="font-weight:700;">Söz veya Şarkı Yazın:</label>
+                <input type="text" id="song-search-input" placeholder="Örn: Fikrimin ince gülü, Gülpembe, Uzun ince bir yoldayım..." aria-label="Hatırladığınız şarkı sözünü, şarkı adını veya sanatçıyı yazın" style="flex:1; min-width: 210px; padding: 0.65rem 0.85rem; border-radius: 10px; border: 2px solid #475569; background: #0f172a; color: #f8fafc; font-size: 1rem;">
+                <button type="button" id="btn-song-text-search" class="secondary-btn" aria-label="Yazılan Sözden veya İsimden Şarkıyı Bul">
+                    🔍 Sözden Şarkıyı Bul
+                </button>
+            </div>
+            <div class="telemetry-grid" role="list" aria-label="Bulunan Şarkı ve Melodi Bilgileri" style="margin-top: 0.7rem;">
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Bulunan Şarkı ve Sanatçı:</span>
+                    <strong id="song-found-title">Henüz şarkı aranmadı</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Albüm, Yıl ve Müzik Türü:</span>
+                    <strong id="song-found-album">-</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Mikrofondan Duyulan Sözler:</span>
+                    <strong id="song-heard-words">Dinleme bekleniyor...</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Melodi Tonu ve Tempo (BPM):</span>
+                    <strong id="song-melody-bpm">Ölçüm bekleniyor...</strong>
+                </div>
+            </div>
+            <div id="song-alternatives-box" hidden style="margin-top: 0.65rem;">
+                <p class="exam-remote-hint" style="margin-bottom: 0.35rem;">🎶 <strong>Diğer Eşleşen Şarkılar (Tek Dokunuşla Seçin):</strong></p>
+                <div id="song-alternatives-list" class="exam-nav-row" role="group" aria-label="Alternatif Şarkı Sonuçları"></div>
+            </div>
+            <div class="exam-nav-row" id="song-external-links" hidden style="margin-top: 0.65rem;">
+                <a id="btn-song-youtube" href="#" target="_blank" rel="noopener" class="action-btn" style="text-decoration:none; display:inline-block;" aria-label="Bulunan Şarkıyı YouTube Üzerinde Aç ve Dinle">
+                    📺 YouTube'da Tamamını Dinle
+                </a>
+                <a id="btn-song-spotify" href="#" target="_blank" rel="noopener" class="secondary-btn" style="text-decoration:none; display:inline-block;" aria-label="Bulunan Şarkıyı Spotify Üzerinde Aç">
+                    🟢 Spotify'da Aç
+                </a>
+            </div>
+        </section>
+
+        <!-- AKILLI 3D SESLİ KIBLE PUSULASI VE NAMAZ VAKTİ PANELİ -->
+        <section id="qibla-compass-panel" hidden aria-labelledby="qibla-heading" class="exam-remote-section" style="border-color: #38bdf8;">
+            <div class="exam-remote-header">
+                <h2 id="qibla-heading" style="color: #38bdf8;">🕋 Sesli Kıble Pusulası ve Namaz Vakitleri</h2>
+                <span id="qibla-status-badge" class="status-badge ready">Konumunuz Bulunuyor...</span>
+            </div>
+            <p class="exam-remote-hint">
+                Kıble yönünü hem pusula hem de Güneşin gökyüzündeki yeriyle kontrol eder. Telefonu avucunuzun içinde yere düz (paralel) tutarak yavaşça dönün.
+            </p>
+            <div class="exam-nav-row" role="group" aria-label="Kıble ve Namaz Vakti Kontrolleri">
+                <button type="button" id="btn-start-qibla" class="primary-btn" aria-label="Sesli Kıble Pusulasını Başlat (Kısayol: K)">
+                    🕋 Kıbleyi Bulmaya Başla (K)
+                </button>
+                <button type="button" id="btn-qibla-prayer-times" class="secondary-btn" aria-label="Namaz Vakitlerini, Vaktin Çıkmasına Kalan Süreyi ve Güneş Yönünü Sesli Oku (Kısayol: V)">
+                    🕰️ Namaz Vakitlerini Sesli Oku (V)
+                </button>
+                <button type="button" id="btn-qibla-save-room" class="secondary-btn" aria-label="Bu Odadaki Kıble Yönünü Telefon Hafızasına Kaydet">
+                    📌 Bu Odanın Kıblesini Kaydet
+                </button>
+                <button type="button" id="btn-qibla-gps" class="secondary-btn" aria-label="Bulunduğum Konumu Şimdi Yenile">
+                    📍 Konumumu Yenile
+                </button>
+            </div>
+            <div class="exam-nav-row" style="align-items:center;">
+                <label for="qibla-city-select" style="font-weight:700;">Şehrinizi Seçin (İnternetsiz 81 İl):</label>
+                <select id="qibla-city-select" aria-label="Kıble ve Namaz Vakti Hesabı İçin 81 İlden Birini Seçin"></select>
+            </div>
+            <div class="telemetry-grid" role="list" aria-label="Kıble ve Namaz Vakti Bilgileri">
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Kıble Yönü ve Kâbe Uzaklığı:</span>
+                    <strong id="qibla-target-deg">Konum Bekleniyor</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Ne Tarafa Dönmelisiniz:</span>
+                    <strong id="qibla-current-deg">Pusula Bekleniyor</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Güneşe Göre Kıble Yönü:</span>
+                    <strong id="qibla-confidence-sun">Hesaplanıyor...</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Şu Anki Namaz Vakti ve Kalan Süre:</span>
+                    <strong id="qibla-prayer-info">Hesaplanıyor...</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- ETKİLEŞİMLİ SINAV VE ŞIK KUMANDASI (Soru Kökü + A, B, C, D, E Tek Tek Dinleme) -->
+        <section id="exam-remote-panel" aria-labelledby="exam-remote-heading" class="exam-remote-section">
+            <div class="exam-remote-header">
+                <h2 id="exam-remote-heading">📝 Sınav Sorusu ve Şık Dinleme Kumandası</h2>
+                <span id="exam-question-counter" class="status-badge ready">Sınav Kağıdı Bekleniyor</span>
+            </div>
+            <p class="exam-remote-hint">
+                Sınav kağıdının fotoğrafını çektiğinizde soru ve şıklar birbirinden ayrılır. İstediğiniz şıkkı karıştırmadan tekrar tekrar dinlemek için aşağıdaki düğmelere dokunun veya klavyede <code>S</code>, <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code> tuşlarına basın:
+            </p>
+            <div class="exam-nav-row" role="group" aria-label="Sorular Arası Geçiş">
+                <button type="button" id="btn-exam-prev" class="secondary-btn" aria-label="Önceki Soruya Geç (Kısayol: Sol Ok)">
+                    ⬅️ Önceki Soru
+                </button>
+                <button type="button" id="btn-exam-stem" class="primary-btn" aria-label="Sadece Soruyu Sesli Oku (Kısayol: S)">
+                    ❓ Sadece Soruyu Oku (S)
+                </button>
+                <button type="button" id="btn-exam-all" class="secondary-btn" aria-label="Soruyu ve Tüm Şıkları Sırayla Oku">
+                    🔊 Soruyu ve Tüm Şıkları Oku
+                </button>
+                <button type="button" id="btn-exam-next" class="secondary-btn" aria-label="Sonraki Soruya Geç (Kısayol: Sağ Ok)">
+                    Sonraki Soru ➡️
+                </button>
+            </div>
+            <div class="exam-options-grid" role="group" aria-label="Şıkları Tek Tek Dinleme Düğmeleri">
+                <button type="button" class="exam-opt-btn" data-opt="A" id="btn-opt-a" aria-label="A Şıkkını Sesli Oku (Kısayol: A)">
+                    <strong>A Şıkkı:</strong> <span id="text-opt-a">Henüz okutulmadı</span>
+                </button>
+                <button type="button" class="exam-opt-btn" data-opt="B" id="btn-opt-b" aria-label="B Şıkkını Sesli Oku (Kısayol: B)">
+                    <strong>B Şıkkı:</strong> <span id="text-opt-b">Henüz okutulmadı</span>
+                </button>
+                <button type="button" class="exam-opt-btn" data-opt="C" id="btn-opt-c" aria-label="C Şıkkını Sesli Oku (Kısayol: C)">
+                    <strong>C Şıkkı:</strong> <span id="text-opt-c">Henüz okutulmadı</span>
+                </button>
+                <button type="button" class="exam-opt-btn" data-opt="D" id="btn-opt-d" aria-label="D Şıkkını Sesli Oku (Kısayol: D)">
+                    <strong>D Şıkkı:</strong> <span id="text-opt-d">Henüz okutulmadı</span>
+                </button>
+                <button type="button" class="exam-opt-btn" data-opt="E" id="btn-opt-e" aria-label="E Şıkkını Sesli Oku (Kısayol: E)">
+                    <strong>E Şıkkı:</strong> <span id="text-opt-e">Henüz okutulmadı</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- AKILLI CANLI PARA SAYMA, BİRİKTİRME VE TOPLAM CÜZDAN PANELİ -->
+        <section id="money-counter-panel" hidden aria-labelledby="money-counter-heading" class="exam-remote-section" style="border-color: #22c55e;">
+            <div class="exam-remote-header">
+                <h2 id="money-counter-heading" style="color: #4ade80;">💵🪙 Canlı Para Sayma ve Toplam Hesaplayıcı</h2>
+                <span id="money-status-badge" class="status-badge ready">Toplam: 0 TL</span>
+            </div>
+            <p class="exam-remote-hint">
+                Elinizdeki paraları kameraya tek tek gösterin; sistem gördüğü demir ve kağıt paraları bir yandan otomatik toplar (veya aşağıdaki düğmelerle de ekleyebilirsiniz). İstediğiniz an <strong>"Ne Kadar Param Var?"</strong> düğmesine basarak toplam paranızı sesli dinleyin:
+            </p>
+            <div class="exam-nav-row" role="group" aria-label="Para Sayma ve Toplam Sorgulama Kontrolleri">
+                <button type="button" id="btn-how-much-money" class="primary-btn" style="background: linear-gradient(135deg, #16a34a, #059669); font-size: 1.08rem;" aria-label="Ne Kadar Param Var? Şimdiye Kadar Sayılan Tüm Paraların Toplamını ve Dökümünü Sesli Söyle (Kısayol: N)">
+                    💰 Ne Kadar Param Var? (N)
+                </button>
+                <button type="button" id="btn-money-add-current" class="secondary-btn" aria-label="Şu An Kameranın Gördüğü Parayı Hemen Toplama Ekle (Kısayol: Artı veya Z)">
+                    ➕ Görünen Parayı Şimdi Ekle (Z)
+                </button>
+                <button type="button" id="btn-money-auto-toggle" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Kameraya Gösterilen Paraları Bir Yandan Otomatik Toplama Modunu Aç veya Kapat">
+                    🔄 Otomatik Biriktirme: Açık
+                </button>
+                <button type="button" id="btn-money-undo" class="secondary-btn" aria-label="Son Eklenen Parayı Geri Al ve Toplamdan Düş">
+                    ↩️ Son Parayı Geri Al
+                </button>
+                <button type="button" id="btn-money-reset" class="secondary-btn" aria-label="Sayılan Paraları Sıfırla ve Yeniden Saymaya Başla">
+                    🗑️ Sayacı Sıfırla
+                </button>
+            </div>
+            <div class="telemetry-grid" role="list" aria-label="Canlı Para Sayacı Bilgileri" style="margin-top: 0.7rem;">
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Şu An Toplam Paranız:</span>
+                    <strong id="money-total-display" style="color: #4ade80; font-size: 1.15rem;">0 Türk Lirası</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Son Eklenen Para:</span>
+                    <strong id="money-last-added">Henüz para eklenmedi</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Kamerada Şu An Görünen:</span>
+                    <strong id="money-live-seen">Para bekleniyor...</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Sayılan Para Dökümü:</span>
+                    <strong id="money-breakdown-text">Sayaç boş (0 adet)</strong>
+                </div>
+            </div>
+            <div style="margin-top: 0.75rem;">
+                <p class="exam-remote-hint" style="margin-bottom: 0.4rem;">
+                    👆 <strong>Hızlı Elle Para Ekleme Düğmeleri (Tek Dokunuşla Toplama Ekler ve Sesli Söyler):</strong>
+                </p>
+                <div class="exam-nav-row" role="group" aria-label="Kağıt ve Demir Paraları Tek Dokunuşla Toplama Ekleme Düğmeleri">
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="20000" data-label="200 Türk Lirası" aria-label="200 Türk Lirası Ekle">+200 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="10000" data-label="100 Türk Lirası" aria-label="100 Türk Lirası Ekle">+100 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="5000" data-label="50 Türk Lirası" aria-label="50 Türk Lirası Ekle">+50 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="2000" data-label="20 Türk Lirası" aria-label="20 Türk Lirası Ekle">+20 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="1000" data-label="10 Türk Lirası" aria-label="10 Türk Lirası Ekle">+10 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="500" data-label="5 Türk Lirası" aria-label="5 Türk Lirası Ekle">+5 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="100" data-label="1 Türk Lirası" aria-label="1 Türk Lirası Ekle">+1 TL</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="50" data-label="50 Kuruş" aria-label="50 Kuruş Ekle">+50 Kr</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="25" data-label="25 Kuruş" aria-label="25 Kuruş Ekle">+25 Kr</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="10" data-label="10 Kuruş" aria-label="10 Kuruş Ekle">+10 Kr</button>
+                    <button type="button" class="secondary-btn money-quick-add-btn" data-kurus="5" data-label="5 Kuruş" aria-label="5 Kuruş Ekle">+5 Kr</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Özel Hedef Filtresi ve WhatsApp Sabitleyici Çubuğu -->
+        <section id="target-filter-section" aria-label="Aradığınız Eşyayı Seçin ve Yardımcı Araçlar" class="filter-bar">
+            <label for="target-object-select">🎯 Aradığınız Özel Eşya:</label>
+            <select id="target-object-select" aria-label="Kameranın Özellikle Aramasını İstediğiniz Eşyayı Seçin">
+                <option value="auto">Otomatik (Seçtiğiniz Bölüme Göre Kendisi Bulur)</option>
+                <option value="screen_qr">Bilgisayar Ekranı / Karekod (QR)</option>
+                <option value="person">İnsan / Yüz</option>
+                <option value="cell phone">Cep Telefonu</option>
+                <option value="cup">Bardak / Kupa / Şişe</option>
+                <option value="chair">Sandalye / Koltuk</option>
+                <option value="book">Kitap / Sınav Kağıdı / Evrak</option>
+                <option value="keyboard">Klavye / Fare</option>
+                <option value="door_table">Masa / Çalışma Masası</option>
+            </select>
+            <button id="btn-whatsapp-hold" class="secondary-btn" aria-label="WhatsApp Uygulamasına Geçerken 15 Saniye Boyunca Eliniz Kaymasın Diye Sesli Rehberi Başlat (Kısayol: W)">
+                🔒 WhatsApp 15 Saniye Sabit Tutma Sesi (W)
+            </button>
+            <button id="btn-repeat-guidance" class="secondary-btn" aria-label="Son Söylenen Cümleyi Tekrar Dinle (Kısayol: T)">
+                🔊 Son Söyleneni Tekrarla (T)
+            </button>
+        </section>
+
+        <!-- Canlı Yönlendirme ve Vizör Paneli -->
+        <section aria-label="Canlı Sesli Yönlendirme ve Kamera Görüntüsü" class="visor-grid">
+            <!-- Sol: Canlı Sesli Rehber ve Durum Özeti -->
+            <div class="guidance-panel">
+                <h2>Canlı Sesli Yönlendirme ve Durum</h2>
+                <div id="live-direction-box" class="direction-banner" role="region" aria-label="Anlık Sesli Yönlendirme">
+                    Başlamak için üstteki "Kamerayı ve Sesli Rehberi Başlat" düğmesine veya Boşluk tuşuna basın.
+                </div>
+
+                <div class="telemetry-grid" role="list" aria-label="Kamera ve Ortam Durumu">
+                    <div class="telemetry-item" role="listitem">
+                        <span class="t-label">Hizalama Durumu:</span>
+                        <strong id="t-position">Bekleniyor</strong>
+                    </div>
+                    <div class="telemetry-item" role="listitem">
+                        <span class="t-label">Yakınlık ve Mesafe:</span>
+                        <strong id="t-distance">Bekleniyor</strong>
+                    </div>
+                    <div class="telemetry-item" role="listitem">
+                        <span class="t-label">Oda Işığı ve Görüntü Netliği:</span>
+                        <strong id="t-lighting">Bekleniyor</strong>
+                    </div>
+                    <div class="telemetry-item" role="listitem">
+                        <span class="t-label">Görünen Renk ve Telefon Duruşu:</span>
+                        <strong id="t-color-tilt">Bekleniyor</strong>
+                    </div>
+                </div>
+
+                <!-- Algılanan Sonuç Kutusu ve Dokunarak Fotoğraf Keşfi (iPhone Görüntü Araştırıcı Üstü) -->
+                <div id="detected-result-panel" class="result-panel" hidden>
+                    <h3 id="result-title">Detaylı Fotoğraf Betimlemesi ve Okuma Sonucu</h3>
+                    <p id="result-text" tabindex="0"></p>
+                    <div class="result-actions">
+                        <button id="btn-speak-story" type="button" class="primary-btn" aria-label="Fotoğrafın Detaylı Hikaye Betimlemesini Tekrar Sesli Dinle (Kısayol: B)">🗣️ Betimlemeyi Dinle (B)</button>
+                        <button id="btn-copy-result" type="button" class="secondary-btn">📋 Yazıyı Kopyala</button>
+                        <a id="btn-open-link" href="#" target="_blank" rel="noopener noreferrer" class="primary-btn" hidden>🌐 Bağlantıyı Aç</a>
+                        <button id="btn-download-photo" type="button" class="secondary-btn" hidden>💾 Fotoğrafı Kaydet</button>
+                    </div>
+
+                    <!-- PARMAĞINLA DOKUNARAK FOTOĞRAF KEŞFİ (TOUCH-TO-EXPLORE IMAGE MAP) -->
+                    <div id="photo-explorer-section" style="margin-top: 14px; border-top: 2px solid #38bdf8; padding-top: 12px;">
+                        <h4 style="color: #facc15; margin: 0 0 6px 0; font-size: 1.05rem;">
+                            👆 Parmağınızı Fotoğrafın Üzerinde Gezdirerek Keşfedin
+                        </h4>
+                        <p style="font-size: 0.92rem; color: #cbd5e1; margin: 0 0 8px 0;">
+                            Parmağınızı aşağıdaki fotoğrafın üzerinde yavaşça gezdirin; parmağınızın değdiği yerdeki insanı, yüzünü, kıyafet rengini, eşyaları ve yazıları anında sesli söyler ve titreşim verir:
+                        </p>
+                        <div id="photo-explorer-status" role="status" aria-live="polite" style="background:#0f172a; color:#38bdf8; padding:8px 12px; border-radius:8px; font-weight:700; margin-bottom:8px;">
+                            Keşfetmek için parmağınızı fotoğrafın üzerinde gezdirin.
+                        </div>
+                        <canvas id="photo-explorer-canvas" tabindex="0" role="application" aria-label="Dokunmatik Fotoğraf Keşif Haritası. Parmağınızı bu alanın üzerinde gezdirerek fotoğraftaki kişilerin, kıyafetlerin, eşyaların ve yazıların yerini sesli ve titreşimli olarak öğrenebilirsiniz." style="width:100%; max-height:340px; border:2px solid #facc15; border-radius:10px; touch-action:none; cursor:crosshair; display:block;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ: Kamera Görüntüsü -->
+            <div class="camera-wrapper" id="camera-touch-zone" tabindex="0" role="button" aria-label="Kamera Ekranı. Fotoğraf çekmek ve okutmak için buraya iki kez üst üste dokunun veya Boşluk tuşuna basın.">
+                <video id="camera-video" playsinline muted autoplay></video>
+                <canvas id="overlay-canvas" aria-hidden="true"></canvas>
+                <canvas id="analysis-canvas" hidden aria-hidden="true"></canvas>
+                <div class="touch-hint" aria-hidden="true">
+                    Ekrana <strong>çift dokunarak</strong> veya <strong>Boşluk</strong> tuşuna basarak anında okutabilirsiniz.
+                </div>
+            </div>
+        </section>
+
+        <!-- Kullanım Rehberi -->
+        <section aria-labelledby="help-heading" class="help-section">
+            <h2 id="help-heading">Nasıl Kullanılır? (Kısa ve Kolay Rehber)</h2>
+            <ul class="help-list">
+                <li><strong>Sınav Kağıdı Okurken:</strong> Telefonu kağıdın biraz yukarısında düz tutun. Elinizin gölgesi kağıda düşse bile sistem gölgeyi siler, şıkları birbirine karıştırmaz. Çekimden sonra <code>A, B, C, D, E</code> düğmelerine basarak istediğiniz şıkkı tek tek dinleyebilirsiniz.</li>
+                <li><strong>Kıbleyi Bulurken:</strong> Telefonu avucunuzun içinde yere düz tutarak kendi etrafınızda yavaşça dönün. Eğer çevrede mıknatıs veya demir varsa sistem yanılmamak için sizi uyarır ve Güneşin yönüne göre de Kıbleyi tarif eder.</li>
+                <li><strong>İlaç Tarihi ve Yiyecek Kontrolü:</strong> İlaç kutusunu okuttuğunuzda son kullanma tarihi geçmişse acil uyarı sesi çalar. Yiyecek paketlerinde ise alerji yapan maddeleri (gluten, süt, fıstık vb.) hemen ayıklayıp söyler.</li>
+                <li><strong>İmza Atarken ve Çay Doldururken:</strong> İmza modunda kaleminizi kağıda yaklaştırın; nereye götüreceğinizi santim santim söyler. Çay/su doldurma modunda ise bardağı karşısına koyun; bardak doldukça ses incelir ve taşmadan önce "Durdurun!" der.</li>
+                <li><strong>Kulaklıksız Hoparlör ve Titreşim Dili:</strong> Bu uygulama kulaklık olmadan, doğrudan telefonun kendi hoparlörü ve avuç içi titreşimiyle kullanılmak üzere tasarlanmıştır. Sola dönmeniz gerektiğinde <strong>çift tok ses (tık-tık)</strong>, sağa dönmeniz gerektiğinde <strong>tek ince ses (biip)</strong>, tam ortaladığınızda ise <strong>üçlü onay melodisi ve titreşim</strong> verir.</li>
+                <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>9</code> ve <code>0, U, I, G, P</code> (14 moddan birini seçer), <code>Boşluk</code> (Çeker ve okur), <code>K</code> (Kıbleyi başlatır), <code>V</code> (Namaz vakitlerini okur), <code>S, A, B, C, D, E</code> (Soruyu ve şıkları tek tek okur), <code>T</code> (Son cümleyi tekrarlar).</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer role="contentinfo" class="app-footer">
+        <p>© 2026 Mikyas Studio — Görme Engelliler İçin %100 Cihaz İçi, Matematiksel Doğrulamalı Yapay Zeka Vizörü ve Sınav Okuyucu.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
