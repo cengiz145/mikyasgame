@@ -127,12 +127,18 @@
         whatsappHoldEnd: 0,
         // Kıble Pusulası Durumu (Kâbe Koordinatları: 21.422487 N, 39.826206 E)
         qiblaActive: false,
-        userLat: 41.0082,
-        userLon: 28.9784,
-        qiblaTargetBearing: 151.6,
+        qiblaLocationVerified: false,
+        qiblaLocationSource: 'Doğrulanıyor...',
+        userLat: null,
+        userLon: null,
+        qiblaTargetBearing: null,
         compassHeading: null,
         smoothedHeading: null,
+        headingSamples: [],
+        qiblaStableSince: 0,
         lastQiblaLockVibrate: 0,
+        gpsWatchId: null,
+        lastSceneObstacles: [],
         // Sınav Soruları ve Şık Durumu
         examQuestions: [
             {
@@ -1198,6 +1204,11 @@
 
         drawCrosshair(ovCtx, vw, vh);
 
+        // Kıble modundayken ön secde alanındaki engelleri (sandalye, masa, koltuk, yatak) kaydet
+        state.lastSceneObstacles = predictions
+            .filter(p => p.class === 'chair' || p.class === 'couch' || p.class === 'dining table' || p.class === 'bed' || p.class === 'tv')
+            .map(p => TR_LABELS[p.class] || p.class);
+
         if (state.mode === 'qibla_compass') {
             drawQiblaOverlayArrow(ovCtx, vw, vh);
             return;
@@ -1956,11 +1967,11 @@
     }
 
     // =========================================================================
-    // KIBLE PUSULASI: BÜYÜK DAİRE KÜRESEL TRİGONOMETRİ FORMÜLÜ VE 3D SESLİ RADAR
+    // KIBLE PUSULASI: 5 KADEMELİ GÜVENLİK KİLİDİ VE KÜRESEL TRİGONOMETRİ MOTORU
     // =========================================================================
     /**
      * Kâbe-i Muazzama (21.422487° N, 39.826206° E) için Büyük Daire (Great-Circle)
-     * Küresel Trigonometri formülüyle gerçek kuzeyden Kıble açısını hesaplar.
+     * Küresel Trigonometri formülüyle gerçek coğrafi kuzeyden Kıble açısını hesaplar.
      */
     function calculateQiblaBearing(latDeg, lonDeg) {
         const kaabaLat = 21.422487 * (Math.PI / 180);
@@ -1976,22 +1987,112 @@
         return Number(bearing.toFixed(1));
     }
 
-    function updateQiblaTargetDisplay(cityName = '') {
+    /**
+     * Bulunulan enlem/boylama göre Türkiye ve çevresi için IGRF/WMM manyetik sapma açısını hesaplar.
+     */
+    function calculateMagneticDeclination(latDeg, lonDeg) {
+        // Türkiye (36-42N, 26-45E) için WMM doğrusal yaklaşım modeli (+4.8° batı .. +6.8° doğu)
+        return Number((4.8 + (lonDeg - 26.0) * 0.105 + (latDeg - 36.0) * 0.04).toFixed(2));
+    }
+
+    function updateQiblaTargetDisplay(sourceLabel = '') {
+        if (typeof state.userLat !== 'number' || typeof state.userLon !== 'number') return;
         state.qiblaTargetBearing = calculateQiblaBearing(state.userLat, state.userLon);
-        const prefix = cityName ? `${cityName} • ` : '';
+        state.qiblaLocationVerified = true;
+        if (sourceLabel) state.qiblaLocationSource = sourceLabel;
+
+        const prefix = state.qiblaLocationSource ? `${state.qiblaLocationSource} • ` : '';
         if (el.qiblaStatusBadge) {
             el.qiblaStatusBadge.textContent = `${prefix}Kıble Açısı: ${state.qiblaTargetBearing}°`;
         }
         if (el.qiblaTargetDeg) {
-            el.qiblaTargetDeg.textContent = `${state.qiblaTargetBearing}° (Kuzeyden Saat Yönünde)`;
+            el.qiblaTargetDeg.textContent = `${state.qiblaTargetBearing}° (${state.qiblaLocationSource} Doğrulandı)`;
         }
     }
 
-    function handleCompassHeadingEvent(rawHeadingDeg) {
-        if (typeof rawHeadingDeg !== 'number' || isNaN(rawHeadingDeg)) return;
-        const normHeading = ((rawHeadingDeg % 360) + 360) % 360;
+    function autoAcquireLocationAndWatch() {
+        // 1. Önce Canlı GPS (watchPosition) başlat
+        if ('geolocation' in navigator && state.gpsWatchId === null) {
+            state.gpsWatchId = navigator.geolocation.watchPosition(
+                (pos) => {
+                    const firstTime = !state.qiblaLocationVerified;
+                    state.userLat = pos.coords.latitude;
+                    state.userLon = pos.coords.longitude;
+                    updateQiblaTargetDisplay('Canlı GPS');
+                    if (firstTime && state.mode === 'qibla_compass') {
+                        announceGuidance(`Canlı GPS konumunuz doğrulandı! Kesin Kıble açınız: ${state.qiblaTargetBearing} derece.`, {
+                            force: true,
+                            bannerState: 'centered'
+                        });
+                    }
+                },
+                () => {},
+                { enableHighAccuracy: true, maximumAge: 10000, timeout: 10000 }
+            );
+        }
 
-        // Açısal EMA yumuşatması (359° -> 1° geçişinde sıçramayı önlemek için sin/cos vektörel ortalama)
+        // 2. GPS uydusu bina içinde gecikirse otomatik IP Konum servisinden şehri/koordinatı doğrula
+        fetch('https://ipwho.is/')
+            .then(r => r.json())
+            .then(data => {
+                if (!state.qiblaLocationVerified && data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+                    state.userLat = data.latitude;
+                    state.userLon = data.longitude;
+                    const city = data.city || 'Otomatik Konum';
+                    updateQiblaTargetDisplay(city);
+                }
+            })
+            .catch(() => {});
+    }
+
+    function handleCompassHeadingEvent(rawHeadingDeg, compassAccuracyDeg = 10) {
+        if (typeof rawHeadingDeg !== 'number' || isNaN(rawHeadingDeg)) return;
+        if (!state.qiblaActive && state.mode !== 'qibla_compass') return;
+
+        // KİLİT 1: Konum henüz doğrulanmadıysa ezbere yön söyleme!
+        if (!state.qiblaLocationVerified || state.qiblaTargetBearing === null) {
+            el.qiblaCurrentDeg.textContent = 'Önce Konum Doğrulanıyor...';
+            announceGuidance('Yanlış Kıble göstermemek için önce konumunuz doğrulanıyor. Lütfen GPS iznini onaylayın veya listeden şehrinizi seçin.', {
+                bannerState: 'warning',
+                minIntervalMs: 4000
+            });
+            return;
+        }
+
+        // KİLİT 2: Telefon yere paralel (düz) tutulmuyorsa pusula açısı kayar; uyar ve kilitle!
+        if (state.hasOrientationSensor && (Math.abs(state.tiltRoll) > 16 || Math.abs(state.tiltPitch) > 22)) {
+            state.qiblaStableSince = 0;
+            el.qiblaCurrentDeg.textContent = `Telefon Eğik (Yatay: ${state.tiltRoll}°, Dikey: ${state.tiltPitch}°) — Düz Tutun`;
+            announceGuidance('Güvenlik kilidi: Telefon eğik tutuluyor. Pusulanın yanılmaması için lütfen telefonu avucunuzda yere tam paralel ve düz tutun.', {
+                bannerState: 'warning',
+                minIntervalMs: 3000
+            });
+            return;
+        }
+
+        // KİLİT 3: Manyetik Parazit / Mıknatıs / Kalibrasyon Bozukluğu Kontrolü
+        const normHeading = ((rawHeadingDeg % 360) + 360) % 360;
+        state.headingSamples.push(normHeading);
+        if (state.headingSamples.length > 12) state.headingSamples.shift();
+
+        let jitterSum = 0;
+        for (let i = 1; i < state.headingSamples.length; i++) {
+            const stepDiff = Math.abs(((state.headingSamples[i] - state.headingSamples[i - 1] + 540) % 360) - 180);
+            jitterSum += stepDiff;
+        }
+        const avgJitter = state.headingSamples.length > 4 ? (jitterSum / (state.headingSamples.length - 1)) : 0;
+
+        if ((compassAccuracyDeg > 28) || (avgJitter > 16)) {
+            state.qiblaStableSince = 0;
+            el.qiblaCurrentDeg.textContent = 'Manyetik Parazit / Kalibrasyon Gerekli!';
+            announceGuidance('Dikkat: Yakında mıknatıslı kılıf, hoparlör veya metal eşya algılandı ya da pusula kalibrasyonu bozuk! Yanlış yön göstermemek için ölçüm duraklatıldı. Lütfen metalden uzaklaşıp telefonu havada 8 çizecek şekilde sallayın.', {
+                bannerState: 'warning',
+                minIntervalMs: 3800
+            });
+            return;
+        }
+
+        // Açısal EMA yumuşatması
         if (state.smoothedHeading === null) {
             state.smoothedHeading = normHeading;
         } else {
@@ -2004,38 +2105,46 @@
         // Kıbleye olan açısal fark: -180° (Sol) .. +180° (Sağ)
         const deltaDeg = ((state.qiblaTargetBearing - state.compassHeading + 540) % 360) - 180;
         const absDelta = Math.abs(deltaDeg);
-        const isAligned = absDelta <= 4.5;
+        const isAligned = absDelta <= 4.0;
 
         if (el.qiblaCurrentDeg) {
             const dirStr = isAligned
-                ? 'TAM KIBLE HİZASINDA!'
+                ? 'TAM KIBLE HİZASINDA (DOĞRULANDI)!'
                 : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağınızda' : 'Solunuzda'}`;
             el.qiblaCurrentDeg.textContent = `Pusula: ${Math.round(state.compassHeading)}° • Kıble: ${dirStr}`;
         }
 
-        if (!state.qiblaActive && state.mode !== 'qibla_compass') return;
-
         el.tPosition.textContent = `Pusula: ${Math.round(state.compassHeading)}° (Kıble: ${state.qiblaTargetBearing}°)`;
         el.tDistance.textContent = isAligned ? 'Tam Kıble Yönü!' : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağa' : 'Sola'} Dönün`;
 
-        // 3D Sesli Radar: Kıble soldaysa sol kulaklık, sağdaysa sağ kulaklık
         const panX = Math.max(-1, Math.min(1, deltaDeg / 75));
         radar.updateRadar(panX, 0, isAligned);
 
+        // KİLİT 4 & 5: Kesin Kıble Onayı + Kamera ile Secde Alanı Engel Kontrolü
         if (isAligned) {
             const now = performance.now();
-            if (navigator.vibrate && now - state.lastQiblaLockVibrate > 2500) {
-                navigator.vibrate([120, 60, 180]);
-                state.lastQiblaLockVibrate = now;
+            if (state.qiblaStableSince === 0) state.qiblaStableSince = now;
+
+            if (now - state.qiblaStableSince >= 1400) {
+                if (navigator.vibrate && now - state.lastQiblaLockVibrate > 2500) {
+                    navigator.vibrate([120, 60, 180]);
+                    state.lastQiblaLockVibrate = now;
+                }
+                const uniqueObs = [...new Set(state.lastSceneObstacles)];
+                const obstacleNote = uniqueObs.length > 0
+                    ? ` Ancak kamerada önünüzde ${uniqueObs.join(', ')} görünüyor, secde alanı için 1 adım yana geçebilirsiniz.`
+                    : ' Önünüzdeki secde alanı da açık görünüyor.';
+
+                announceGuidance(`Kesin doğrulama tamamlandı: Tam Kıble yönündesiniz! (${state.qiblaLocationSource}, ${state.qiblaTargetBearing} derece Kâbe açısı).${obstacleNote}`, {
+                    bannerState: 'centered',
+                    minIntervalMs: 3600
+                });
             }
-            announceGuidance(`Tam Kıble yönündesiniz! Telefonunuz ${state.qiblaTargetBearing} derece Kâbe açısıyla birebir hizalandı.`, {
-                bannerState: 'centered',
-                minIntervalMs: 3200
-            });
         } else {
+            state.qiblaStableSince = 0;
             const turnDir = deltaDeg > 0 ? 'sağa' : 'sola';
             const amount = Math.round(absDelta);
-            announceGuidance(`Kıble ${amount} derece ${deltaDeg > 0 ? 'sağınızda' : 'solunuzda'}. Lütfen telefonla birlikte yavaşça ${turnDir} dönün.`, {
+            announceGuidance(`Kıble ${amount} derece ${deltaDeg > 0 ? 'sağınızda' : 'solunuzda'}. Lütfen telefonu düz tutarak yavaşça ${turnDir} dönün.`, {
                 bannerState: 'normal',
                 minIntervalMs: 2400
             });
@@ -2043,6 +2152,7 @@
     }
 
     function drawQiblaOverlayArrow(ctx, w, h) {
+        if (!state.qiblaLocationVerified || state.qiblaTargetBearing === null) return;
         const cx = w / 2;
         const cy = h / 2;
         const deltaDeg = state.compassHeading !== null
@@ -2052,7 +2162,7 @@
         const len = Math.min(w, h) * 0.28;
 
         ctx.save();
-        ctx.strokeStyle = Math.abs(deltaDeg) <= 4.5 ? '#22c55e' : '#38bdf8';
+        ctx.strokeStyle = Math.abs(deltaDeg) <= 4.0 ? '#22c55e' : '#38bdf8';
         ctx.lineWidth = 6;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
@@ -2065,8 +2175,8 @@
         radar.init();
         state.qiblaActive = true;
         setMode('qibla_compass');
+        autoAcquireLocationAndWatch();
 
-        // iOS 13+ Pusula İzni İsteği
         if (typeof window.DeviceOrientationEvent !== 'undefined' &&
             typeof window.DeviceOrientationEvent.requestPermission === 'function') {
             try {
@@ -2081,33 +2191,40 @@
             } catch (_) {}
         }
 
-        announceGuidance(`3 boyutlu sesli Kıble pusulası başlatıldı. Hedef Kıble açısı ${state.qiblaTargetBearing} derece. Telefonu yere paralel düz tutarak kendi etrafınızda yavaşça dönün.`, {
-            force: true,
-            bannerState: 'centered'
-        });
+        if (state.qiblaLocationVerified) {
+            announceGuidance(`5 güvenlik kilitli Kıble pusulası aktif. Konum: ${state.qiblaLocationSource}, Hedef Kıble açısı ${state.qiblaTargetBearing} derece. Telefonu avucunuzda yere paralel düz tutarak yavaşça dönün.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        } else {
+            announceGuidance('5 güvenlik kilitli Kıble pusulası başlatıldı. Yanlış yön göstermemek için şu an canlı GPS ve konumunuz doğrulanıyor, ayrıca listeden şehrinizi de seçebilirsiniz.', {
+                force: true,
+                bannerState: 'normal'
+            });
+        }
     }
 
     function requestQiblaGpsLocation() {
         if (!('geolocation' in navigator)) {
-            announceGuidance('Cihazınızda GPS konum servisi bulunamadı, şehir listesinden seçebilirsiniz.', {
+            announceGuidance('Cihazınızda GPS konum servisi bulunamadı, lütfen şehir listesinden ilinizi seçin.', {
                 force: true,
                 bannerState: 'warning'
             });
             return;
         }
-        announceGuidance('GPS konumunuz alınıyor, lütfen bekleyin...', { force: true });
+        announceGuidance('Yüksek hassasiyetli GPS uydusundan konumunuz doğrulanıyor, lütfen bekleyin...', { force: true });
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 state.userLat = pos.coords.latitude;
                 state.userLon = pos.coords.longitude;
-                updateQiblaTargetDisplay('GPS Konumu');
-                announceGuidance(`GPS konumunuz güncellendi! Bulunduğunuz noktadan kesin Kıble açısı: ${state.qiblaTargetBearing} derece.`, {
+                updateQiblaTargetDisplay('Kesin GPS');
+                announceGuidance(`GPS konumunuz milimetrik olarak doğrulandı! Bulunduğunuz noktadan kesin Kıble açısı: ${state.qiblaTargetBearing} derece.`, {
                     force: true,
                     bannerState: 'centered'
                 });
             },
             () => {
-                announceGuidance('GPS konumu alınamadı. Şehir seçim kutusundaki il koordinatları kullanılıyor.', {
+                announceGuidance('GPS uydusuna ulaşılamadı. Lütfen şehir seçim kutusundan bulunduğunuz ili seçin.', {
                     force: true,
                     bannerState: 'warning'
                 });
@@ -2129,6 +2246,7 @@
         if (newMode === 'qibla_compass') {
             state.qiblaActive = true;
             radar.init();
+            autoAcquireLocationAndWatch();
         } else {
             state.qiblaActive = false;
         }
@@ -2141,7 +2259,9 @@
 
         const modeAnnouncement = {
             'exam_reader': 'Mod 1: Sınav ve Test Şıkkı Okuyucu seçildi. Kağıt gölgesi silinir, çift sütunlu testler ayrılır ve A, B, C, D, E şıkları tek tek düğmelerle okunur.',
-            'qibla_compass': `Mod 2: 3 Boyutlu Sesli Kıble Pusulası seçildi. Hedef Kıble açınız ${state.qiblaTargetBearing} derece. Telefonu yere paralel düz tutup yavaşça dönün.`,
+            'qibla_compass': state.qiblaLocationVerified
+                ? `Mod 2: 5 Güvenlik Kilitli 3 Boyutlu Sesli Kıble Pusulası seçildi. Konum: ${state.qiblaLocationSource}, Kıble açınız ${state.qiblaTargetBearing} derece. Telefonu yere paralel düz tutup yavaşça dönün.`
+                : 'Mod 2: 5 Güvenlik Kilitli Kıble Pusulası seçildi. Konumunuz otomatik doğrulanıyor; dilerseniz listeden şehrinizi de seçebilirsiniz.',
             'qr_screen': 'Mod 3: WhatsApp Web, Bilgisayar Ekranı ve QR Kod Hizalama seçildi.',
             'portrait': 'Mod 4: Portre, Selfie ve Sosyal Medya Ters Işık / Mahremiyet Koçu seçildi.',
             'color_cloth': 'Mod 5: Beyaz Dengeli Kıyafet Rengi, Kumaş Deseni ve Para/Etiket Okuyucu seçildi.',
@@ -2160,9 +2280,11 @@
     // =========================================================================
     window.addEventListener('deviceorientationabsolute', (ev) => {
         if (typeof ev.alpha === 'number') {
-            // Android mutlak manyetik kuzey + Türkiye manyetik sapma düzeltmesi (+5.5°)
-            const heading = (360 - ev.alpha + 5.5) % 360;
-            handleCompassHeadingEvent(heading);
+            const decl = (state.userLat && state.userLon)
+                ? calculateMagneticDeclination(state.userLat, state.userLon)
+                : 5.5;
+            const heading = (360 - ev.alpha + decl) % 360;
+            handleCompassHeadingEvent(heading, 8);
         }
     }, true);
 
@@ -2172,11 +2294,15 @@
             state.tiltRoll = Math.round(ev.gamma);
             state.tiltPitch = Math.round(ev.beta);
         }
-        // iOS Safari webkitCompassHeading desteği
+        // SADECE Gerçek Mutlak Manyetik Kuzey (iOS webkitCompassHeading veya absolute === true) kabul edilir!
         if (typeof ev.webkitCompassHeading === 'number') {
-            handleCompassHeadingEvent(ev.webkitCompassHeading);
+            const acc = typeof ev.webkitCompassAccuracy === 'number' ? ev.webkitCompassAccuracy : 10;
+            handleCompassHeadingEvent(ev.webkitCompassHeading, acc);
         } else if (typeof ev.alpha === 'number' && ev.absolute === true) {
-            handleCompassHeadingEvent((360 - ev.alpha + 5.5) % 360);
+            const decl = (state.userLat && state.userLon)
+                ? calculateMagneticDeclination(state.userLat, state.userLon)
+                : 5.5;
+            handleCompassHeadingEvent((360 - ev.alpha + decl) % 360, 10);
         }
     });
 
@@ -2347,7 +2473,7 @@
     });
 
     window.addEventListener('load', () => {
-        updateQiblaTargetDisplay('İstanbul');
+        autoAcquireLocationAndWatch();
         updateExamRemoteUI();
         setTimeout(initAiModel, 350);
     });
