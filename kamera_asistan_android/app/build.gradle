@@ -7,11 +7,11 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "tr.com.mikyasstudio.kameraasistani"
+        applicationId "tr.com.mikyasstudio.erisilebilirkamera"
         minSdk 24
-        targetSdk 34
-        versionCode 5
-        versionName "5.0.0"
+        targetSdk 33
+        versionCode 6
+        versionName "6.0.0"
     }
 
     signingConfigs {
@@ -22,6 +22,7 @@ android {
             keyPassword "mikyas2026"
             v1SigningEnabled true
             v2SigningEnabled true
+            v3SigningEnabled true
         }
     }
 

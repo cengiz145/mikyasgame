@@ -8,12 +8,9 @@ import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.WindowManager;
-import android.webkit.GeolocationPermissions;
-import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -28,12 +25,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private static final int REQ_PERMS = 1001;
     private static final int REQ_FILE_CHOOSER = 1002;
-    private static final int REQ_VOICE_SONG = 1003;
     private static final String LIVE_APP_URL = "https://cengiz145.github.io/mikyasgame/kamera_asistan/";
     private static final String LOCAL_FALLBACK_URL = "file:///android_asset/www/index.html";
     private WebView webView;
@@ -55,12 +50,9 @@ public class MainActivity extends AppCompatActivity {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        settings.setGeolocationEnabled(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
-
-        webView.addJavascriptInterface(new AndroidSongBridge(), "AndroidSongBridge");
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -84,11 +76,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-                callback.invoke(origin, true, false);
-            }
-
-            @Override
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
                 if (MainActivity.this.filePathCallback != null) {
                     MainActivity.this.filePathCallback.onReceiveValue(null);
@@ -108,51 +95,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{
-                Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.CAMERA
             }, REQ_PERMS);
         } else {
             loadAssistantApp();
-        }
-    }
-
-    public class AndroidSongBridge {
-        @JavascriptInterface
-        public void startNativeVoiceLyricsCapture() {
-            runOnUiThread(() -> {
-                try {
-                    Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "tr-TR");
-                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Çalan şarkının sözlerini dinletin veya hatırladığınız birkaç kelimesini söyleyin...");
-                    startActivityForResult(intent, REQ_VOICE_SONG);
-                } catch (Exception ignored) {}
-            });
-        }
-
-        @JavascriptInterface
-        public boolean launchGoogleHumToSearch() {
-            try {
-                Intent googleMusicIntent = new Intent("com.google.android.googlequicksearchbox.MUSIC_SEARCH");
-                if (googleMusicIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(googleMusicIntent);
-                    return true;
-                }
-            } catch (Exception ignored) {}
-            try {
-                Intent stdMusicIntent = new Intent("android.intent.action.MUSIC_SEARCH");
-                if (stdMusicIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(stdMusicIntent);
-                    return true;
-                }
-            } catch (Exception ignored) {}
-            return false;
         }
     }
 
@@ -276,21 +224,10 @@ public class MainActivity extends AppCompatActivity {
             }
             filePathCallback.onReceiveValue(results);
             filePathCallback = null;
-        } else if (requestCode == REQ_VOICE_SONG && resultCode == Activity.RESULT_OK && data != null) {
-            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if (matches != null && !matches.isEmpty() && webView != null) {
-                String spoken = matches.get(0).replace("'", "\\'").replace("\n", " ");
-                webView.evaluateJavascript(
-                    "if (typeof window.receiveRecognizedSongWordsFromAndroid === 'function') { window.receiveRecognizedSongWordsFromAndroid('" + spoken + "'); }",
-                    null
-                );
-            }
         }
     }
 
     private void loadAssistantApp() {
-        // Canlı HTTPS web sürümünü yükle (böylece yapılan tüm güncellemeler APK yeniden kurulmadan anında yansır).
-        // İnternet yoksa WebViewClient.onReceivedError otomatik olarak çevrimdışı yerel kopyayı (LOCAL_FALLBACK_URL) açar.
         webView.loadUrl(LIVE_APP_URL + "?t=" + (System.currentTimeMillis() / 60000L));
     }
 
@@ -302,12 +239,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Ses Açma Tuşu: Anında Fotoğraf / Sınav Kağıdı Çek ve Betimle (Space Kısayolu)
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'Space', key: ' '}));", null);
             return true;
         }
-        // Ses Kısma Tuşu: Tek basışta Sesli Komut (F), Çift basışta 8 Mod Arası Geçiş (M)
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             long now = System.currentTimeMillis();
             if (now - lastVolumeDownTime < 420) {
