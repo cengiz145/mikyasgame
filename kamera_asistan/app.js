@@ -1215,17 +1215,16 @@
     }
 
     function updateTelemetryUI(metrics) {
-        let lightLabel = `Luma: ${Math.round(metrics.avgBrightness)}`;
-        if (metrics.avgBrightness < 38) lightLabel += ' (Karanlık)';
-        else if (metrics.avgBrightness < 75) lightLabel += ' (Loş)';
-        else if (metrics.avgBrightness > 230) lightLabel += ' (Parlak)';
-        else lightLabel += ' (İyi)';
+        let lightLabel = 'Aydınlık';
+        if (metrics.avgBrightness < 38) lightLabel = 'Çok Karanlık';
+        else if (metrics.avgBrightness < 75) lightLabel = 'Loş Işık';
+        else if (metrics.avgBrightness > 230) lightLabel = 'Çok Parlak';
 
-        const blurLabel = metrics.sharpness < 7.2 ? 'Bulanık' : 'Net';
+        const blurLabel = metrics.sharpness < 7.2 ? 'Görüntü Bulanık' : 'Görüntü Net';
         el.tLighting.textContent = `${lightLabel} • ${blurLabel}`;
 
         const tiltText = state.hasOrientationSensor
-            ? (Math.abs(state.tiltRoll) <= 12 ? 'Paralel/Düz' : `${state.tiltRoll > 0 ? 'Sola' : 'Sağa'} ${Math.abs(state.tiltRoll)}°`)
+            ? (Math.abs(state.tiltRoll) <= 12 ? 'Telefon Düz' : `${state.tiltRoll > 0 ? 'Sola' : 'Sağa'} Eğik`)
             : 'Düz';
         el.tColorTilt.textContent = `${metrics.centerColor.name} • ${tiltText}`;
     }
@@ -1541,9 +1540,9 @@
         }
 
         if (metrics.isSurfacePatterned) {
-            el.tPosition.textContent = 'Desenli Zemin Kilidi';
-            el.tDistance.textContent = `Varyans: ${Math.round(metrics.gridStd)} (Yüksek)`;
-            announceGuidance('Zemin çok desenli veya alacalı olduğu için yanlış alarm vermemek adına halı deseni filtrelendi. Lütfen kamerayı yere daha yakın tutun veya parlak cisme odaklayın.', {
+            el.tPosition.textContent = 'Halı Çok Desenli';
+            el.tDistance.textContent = 'Biraz Daha Yaklaştırın';
+            announceGuidance('Yerdeki halı çok desenli olduğu için halı desenini eşya sanmamak adına bekliyorum. Lütfen telefonu yere biraz daha yaklaştırın.', {
                 bannerState: 'warning',
                 minIntervalMs: 4200
             });
@@ -1553,10 +1552,10 @@
         if (metrics.floorAnomaly) {
             const tracked = updateKalmanTracker(metrics.floorAnomaly.bbox, 'anomaly', 3);
             if (tracked.verified && tracked.box) {
-                drawTargetBox(ovCtx, tracked.box, scaleX, scaleY, '#facc15', `Cisim (Z=${metrics.floorAnomaly.zScore.toFixed(1)}σ)`);
-                const align = computeAlignmentInstruction(tracked.box, anW, anH, 'Zeminden farklı küçük cisim', 0.005, 0.35);
+                drawTargetBox(ovCtx, tracked.box, scaleX, scaleY, '#facc15', 'Yerde Küçük Eşya');
+                const align = computeAlignmentInstruction(tracked.box, anW, anH, 'Yerdeki küçük eşya', 0.005, 0.35);
                 el.tPosition.textContent = align.posLabel;
-                el.tDistance.textContent = `Z-Skoru: ${metrics.floorAnomaly.zScore.toFixed(1)}σ`;
+                el.tDistance.textContent = 'Yerde Eşya Bulundu';
                 radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
 
                 announceGuidance(align.sentence, {
@@ -1567,9 +1566,9 @@
             }
         }
 
-        el.tPosition.textContent = 'Zemin Temiz / Homojen';
-        el.tDistance.textContent = `Varyans: ${Math.round(metrics.gridStd)} (Düz)`;
-        announceGuidance('Düz zemin taranıyor; şu an kadrajda zeminden farklı bir cisim veya aktif bir cihaz LED ışığı görünmüyor.', {
+        el.tPosition.textContent = 'Yerde Eşya Görünmüyor';
+        el.tDistance.textContent = 'Zemin Boş';
+        announceGuidance('Yere bakıyorum; şu an yerde düşmüş bir eşya veya yanan bir cihaz ışığı görünmüyor.', {
             bannerState: 'normal',
             minIntervalMs: 4200
         });
@@ -2263,12 +2262,12 @@
 
         if (confirmedAnomaly) {
             radar.playDangerAlarm();
-            announceGuidance(`UYARI: Gıda yüzeyinde yüzde ${Math.max(foodCheck.moldRatio, foodCheck.rotRatio)} oranında küf veya çürük lekesi ile uyumlu renk anomalisi tespit edildi! Paket üzerindeki alerjenleri ve son tüketim tarihini okutmak için Boşluk tuşuna basabilirsiniz.`, {
+            announceGuidance('UYARI: Yiyeceğin üzerinde küf veya çürük lekesi görünüyor! Paket üzerindeki içindekileri ve son tüketim tarihini okutmak için Boşluk tuşuna basabilirsiniz.', {
                 bannerState: 'warning',
                 minIntervalMs: 3200
             });
         } else {
-            announceGuidance(`Gıda yüzeyinde belirgin bir küf lekesi görünmüyor (Renk: ${metrics.centerColor.name}). Paket üzerindeki Gluten, Laktoz, Fıstık alerjenlerini ve Son Tüketim Tarihini okutmak için Boşluk tuşuna basın veya çift dokunun.`, {
+            announceGuidance(`Yiyeceğin üzerinde küf veya bozulma lekesi görünmüyor (Rengi: ${metrics.centerColor.name}). Paketin içindekileri, alerji yapan maddeleri ve tarihini okutmak için Boşluk tuşuna basın veya ekrana çift dokunun.`, {
                 bannerState: 'centered',
                 minIntervalMs: 3800
             });
@@ -3328,22 +3327,22 @@
         });
 
         const modeAnnouncement = {
-            'exam_reader': 'Mod 1: Sınav ve Test Şıkkı Okuyucu seçildi. Kağıt gölgesi silinir, çift sütunlu testler ayrılır ve A, B, C, D, E şıkları tek tek düğmelerle okunur.',
+            'exam_reader': '1. Bölüm: Sınav Sorusu ve Şık Okuyucu açıldı. Telefonu sınav kağıdına tutun; soruyu ve A, B, C, D, E şıklarını birbirine karıştırmadan tek tek size okuyacağım.',
             'qibla_compass': state.qiblaLocationVerified
-                ? `Mod 2: 5 Güvenlik Kilitli 3 Boyutlu Sesli Kıble Pusulası seçildi. Konum: ${state.qiblaLocationSource}, Kıble açınız ${state.qiblaTargetBearing} derece. Telefonu yere paralel düz tutup yavaşça dönün.`
-                : 'Mod 2: 5 Güvenlik Kilitli Kıble Pusulası seçildi. Konumunuz otomatik doğrulanıyor; dilerseniz listeden şehrinizi de seçebilirsiniz.',
-            'qr_screen': 'Mod 3: WhatsApp Web, Bilgisayar Ekranı ve QR Kod Hizalama seçildi.',
-            'portrait': 'Mod 4: Portre, Selfie ve Sosyal Medya Ters Işık / Mahremiyet Koçu seçildi.',
-            'color_cloth': 'Mod 5: Beyaz Dengeli Kıyafet Rengi, Kumaş Deseni ve Para/Etiket Okuyucu seçildi.',
-            'anomaly_led': 'Mod 6: Z-Skorlu Kayıp Eşya Radarı ve Cihaz LED / Şarj Işığı Frekans Okuyucu seçildi.',
-            'light_meter': 'Mod 7: Akustik Işık Metre seçildi. Odadaki lambaların ve pencerelerin yönü ses frekansıyla bildiriliyor.',
-            'explorer': 'Mod 8: Canlı Nesne ve Genel Türkçe Belge Okuyucu seçildi.',
-            'medicine_skt': 'Mod 9: İlaç Kutusu, Miligram Dozaj, GS1 Barkod ve Son Kullanma Tarihi (SKT) Denetçisi seçildi. Süresi geçmiş ilaçlarda acil sesli alarm verilir.',
-            'signature_pen': 'Mod 10: Canlı Kalem ve Parmak Takipli İmza Kutusu Rehberi seçildi. Kaleminizi kağıda yaklaştırın, sizi imza kutusuna santim santim yönlendireceğim.',
-            'liquid_level': 'Mod 11: Akustik Sıvı Seviyesi ve Bardak Doldurma Radarı seçildi. Bardağı kameranın karşısına koyup çay veya su doldurmaya başlayın.',
-            'door_elevator_lcd': 'Mod 12: Kapı Numarası, Asansör Kat Tuşları ve Beyaz Eşya 7-Segment Dijital Ekran Okuyucu seçildi.',
-            'food_freshness': 'Mod 13: Gıda Tazelik, Küf Spektral Anomalisi ve Paketli Gıda Alerjen Denetçisi seçildi.',
-            'social_presence': 'Mod 14: Sosyal İletişim, Odadaki Kişi Yönü ve Bakış Simetrisi Asistanı seçildi.'
+                ? `2. Bölüm: Sesli Kıble Pusulası ve Namaz Vakitleri açıldı. Bulunduğunuz yer: ${state.qiblaLocationSource}. Telefonu avucunuzda yere düz tutup yavaşça dönün, Kıbleye gelince haber vereceğim.`
+                : '2. Bölüm: Sesli Kıble Pusulası açıldı. Şu an bulunduğunuz şehir bulunuyor; isterseniz listeden kendi ilinizi de seçebilirsiniz.',
+            'qr_screen': '3. Bölüm: WhatsApp Web ve Bilgisayar Ekranı Hizalama açıldı. Telefonu bilgisayar ekranına tutun, karekodu ortalamanız için sağa sola yönlendireceğim.',
+            'portrait': '4. Bölüm: Özçekim ve Fotoğraf Çekim Yardımcısı açıldı. Yüzünüz tam ortalandığında ve ışık güzel olduğunda 3, 2, 1 diye sayıp fotoğrafınızı çekeceğim.',
+            'color_cloth': '5. Bölüm: Kıyafet Rengi, Deseni ve Kağıt Para Tanıma açıldı. Kıyafetinizi veya kağıt parayı kameraya gösterin.',
+            'anomaly_led': '6. Bölüm: Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü açıldı. Kamerayı yere veya modemin, şarj aletinin ışığına tutun.',
+            'light_meter': '7. Bölüm: Lamba Açık mı Kapalı mı ve Pencere Bulucu açıldı. Işığın olduğu tarafa döndükçe ses incelir.',
+            'explorer': '8. Bölüm: Etrafımda Ne Var ve Evrak Okuyucu açıldı. Odanızdaki eşyaları söyler, çift dokunursanız elinizdeki kağıdı okur.',
+            'medicine_skt': '9. Bölüm: İlaç Kutusu ve Son Kullanma Tarihi Kontrolü açıldı. İlacın adını, kaç miligram olduğunu ve tarihinin geçip geçmediğini kontrol etmek için kutuyu kameraya tutun.',
+            'signature_pen': '10. Bölüm: İmza Atarken Kalem Yönlendirici açıldı. Evrakı masaya koyup kaleminizi kağıda yaklaştırın; kalemi nereye götüreceğinizi söyleyeceğim.',
+            'liquid_level': '11. Bölüm: Bardağa Çay ve Su Doldurma Yardımcısı açıldı. Bardağı kameranın karşısına koyup doldurmaya başlayın; taşmadan önce durmanızı söyleyeceğim.',
+            'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya çamaşır makinesi ekranını okutmak için Boşluk tuşuna basın.',
+            'food_freshness': '13. Bölüm: Yiyecek Küflü mü ve Paket İçeriği Okuyucu açıldı. Ekmeği, meyveyi veya market paketini kameraya gösterin.',
+            'social_presence': '14. Bölüm: Odada Kim Var ve Bana Bakıyor mu Yardımcısı açıldı. Karşınızdaki kişilerin ne tarafta durduğunu ve size bakıp bakmadığını söyleyeceğim.'
         }[newMode];
 
         if (modeAnnouncement) {

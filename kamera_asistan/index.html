@@ -30,14 +30,14 @@
     <header class="app-header" role="banner">
         <div class="header-top">
             <a href="../index.html" class="back-btn" aria-label="Mikyas Studio Ana Sayfasına Dön">← Ana Sayfa</a>
-            <h1>Erişilebilir Kamera, Sınav &amp; QR Asistanı</h1>
-            <a href="MikyasKameraAsistani.apk" download="MikyasKameraAsistani.apk" class="apk-download-btn" aria-label="Android Telefonlar İçin Mikyas Kamera ve Sınav Asistanı APK Dosyasını İndir">
-                📱 Android APK İndir
+            <h1>Sesli Göz ve Günlük Yaşam Asistanı</h1>
+            <a href="MikyasKameraAsistani.apk" download="MikyasKameraAsistani.apk" class="apk-download-btn" aria-label="Android Telefonlar İçin Sesli Göz ve Kamera Asistanı APK Dosyasını İndir">
+                📱 Telefona İndir (Android APK)
             </a>
-            <span id="ai-status-badge" class="status-badge" role="status">Matematiksel Motor Hazırlanıyor...</span>
+            <span id="ai-status-badge" class="status-badge" role="status">Sesli Asistan Hazırlanıyor...</span>
         </div>
         <p class="subtitle">
-            Çoklu kare doğrulamalı (Sıfır Yanlış Alarm), <strong>Kalman Filtreli 3D Sesli Nişangâh Radarı</strong>, <strong>Çift Sütunlu Sınav &amp; Şık Okuyucu (A-B-C-D-E)</strong> ve <strong>7 Profesyonel Görme Asistanı Modu</strong>.
+            Görme engelliler için <strong>Sıfır Hatalı Sınav Okuyucu</strong>, <strong>Sesli Kıble ve Namaz Vakti Rehberi</strong>, <strong>İlaç Tarihi Kontrolü</strong>, <strong>İmza Yönlendirici</strong> ve <strong>14 Günlük Yaşam Yardımcısı</strong>.
         </p>
     </header>
 
@@ -45,111 +45,111 @@
         <!-- Hızlı Başlat / Kamera ve Donanım Kontrol Çubuğu -->
         <section aria-label="Kamera, Flaş ve Ses Kontrolleri" class="control-bar">
             <button id="btn-start-camera" class="primary-btn pulse-btn" aria-pressed="false">
-                📷 Kamerayı ve Sesli Asistanı Başlat
+                📷 Kamerayı ve Sesli Rehberi Başlat
             </button>
             <button id="btn-switch-camera" class="secondary-btn" disabled aria-label="Ön ve Arka Kamera Arasında Geçiş Yap">
                 🔄 Kamera: Arka
             </button>
-            <button id="btn-toggle-flash" class="secondary-btn" disabled aria-pressed="false" aria-label="El Fenerini veya Ekran Flaşını Aç Kapat (Kısayol: F)">
-                🔦 Flaş / Işık: Otomatik
+            <button id="btn-toggle-flash" class="secondary-btn" disabled aria-pressed="false" aria-label="Telefon Işığını (Feneri) Aç veya Kapat (Kısayol: F)">
+                🔦 Işık / Fener: Otomatik
             </button>
-            <button id="btn-toggle-radar" class="secondary-btn active-toggle" aria-pressed="true" aria-label="3 Boyutlu Sesli Nişangah Radarını Aç veya Kapat (Kısayol: R)">
-                🎯 3D Sesli Radar: Açık
+            <button id="btn-toggle-radar" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Yön Bulduran Sesli Sinyali Aç veya Kapat (Kısayol: R)">
+                🎯 Sesli Yön Sinyali: Açık
             </button>
-            <button id="btn-toggle-auto" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Hedef Ortalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O)">
+            <button id="btn-toggle-auto" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Tam Hizalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O)">
                 ⚡ Otomatik Çekim: Açık
             </button>
-            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek, Sınav Şıklarını veya Sahneyi Analiz Et (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
-                📸 Şimdi Çek &amp; Oku (Boşluk)
+            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek ve Sesli Oku (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
+                📸 Şimdi Çek ve Oku (Boşluk)
             </button>
         </section>
 
-        <!-- 14 Matematiksel Çalışma Modu Seçimi -->
+        <!-- 14 Günlük Yaşam Modu Seçimi -->
         <section aria-labelledby="mode-heading" class="mode-section">
-            <h2 id="mode-heading">Hassas Çalışma Modu Seçin (14 Sıfır-Hata Matematiksel Mod)</h2>
+            <h2 id="mode-heading">Ne Yapmak İstiyorsunuz? (14 Günlük Yaşam Yardımcısı)</h2>
             <div class="mode-grid" role="radiogroup" aria-labelledby="mode-heading">
                 <button type="button" class="mode-card active" data-mode="exam_reader" role="radio" aria-checked="true" id="mode-btn-1">
                     <span class="mode-icon" aria-hidden="true">📝🅰️</span>
-                    <span class="mode-title">1. Sınav &amp; Test Şıkkı Okuyucu (A-B-C-D-E)</span>
-                    <span class="mode-desc">Kağıt gölgesini (Bradley-Roth formülüyle) siler, çift sütunlu testleri ortadan ayırır; Soru kökünü ve A, B, C, D, E şıklarını karıştırmadan tek tek tuşla okur!</span>
+                    <span class="mode-title">1. Sınav Sorusu ve Şık Okuyucu (A, B, C, D, E)</span>
+                    <span class="mode-desc">Kağıdın üzerindeki el ve telefon gölgesini temizler, yan yana iki sütunlu testleri birbirine karıştırmadan ayırır. Soruyu ve A, B, C, D, E şıklarını tek tek düğmeyle okur.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="qibla_compass" role="radio" aria-checked="false" id="mode-btn-2">
                     <span class="mode-icon" aria-hidden="true">🕋🧭</span>
-                    <span class="mode-title">2. Akıllı 3D Kıble Pusulası &amp; Namaz Vakti</span>
-                    <span class="mode-desc">5 güvenlik kilidi, Güneş azimut çapraz doğrulaması, 81 il çevrimdışı koordinatı ve Diyanet uyumlu vakit/kerahat hesabıyla Kıble'yi sıfır hatayla buldurur.</span>
+                    <span class="mode-title">2. Sesli Kıble Pusulası ve Namaz Vakitleri</span>
+                    <span class="mode-desc">Kıble yönünü hem pusula hem de Güneşin yönüyle kontrol ederek yanılmadan buldurur. 81 ilin namaz vakitlerini, ne kadar süre kaldığını ve kerahat saatini sesli söyler.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="qr_screen" role="radio" aria-checked="false" id="mode-btn-3">
                     <span class="mode-icon" aria-hidden="true">💻📱</span>
-                    <span class="mode-title">3. WhatsApp Web / Ekran &amp; QR Hizalama</span>
-                    <span class="mode-desc">Bilgisayar ekranını ve QR kodu geniş açıdan yakalar; ekranın üstüne mi altına mı tuttuğunuzu söyler ve WhatsApp geçişinde 15 sn sesli kilit sağlar.</span>
+                    <span class="mode-title">3. WhatsApp Web ve Bilgisayar Ekranı Hizalama</span>
+                    <span class="mode-desc">Telefonu bilgisayar ekranına tuttuğunuzda "biraz sağa, biraz yukarı" diyerek karekodu (QR) tam ortalamanızı sağlar. WhatsApp'a geçerken eliniz kaymasın diye 15 saniye sesle rehberlik eder.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="portrait" role="radio" aria-checked="false" id="mode-btn-4">
                     <span class="mode-icon" aria-hidden="true">🧑🛡️</span>
-                    <span class="mode-title">4. Portre, Selfie &amp; Mahremiyet Koçu</span>
-                    <span class="mode-desc">Kişiyi ortalar, Michelson formülüyle ters ışığı (silüeti), baş/omuz kesilmesini ve arka plandaki yabancı ekran/eşyaları denetleyip 3-2-1 otomatik çeker.</span>
+                    <span class="mode-title">4. Özçekim (Selfie) ve Fotoğraf Çekim Yardımcısı</span>
+                    <span class="mode-desc">Yüzünüzün tam ortada olup olmadığını, arkanızdan vuran ışığın yüzünüzü karartıp karartmadığını ve arkada görünmemesi gereken bir eşya olup olmadığını söyleyip 3-2-1 diye çeker.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="color_cloth" role="radio" aria-checked="false" id="mode-btn-5">
                     <span class="mode-icon" aria-hidden="true">👕🎨</span>
-                    <span class="mode-title">5. Kıyafet Rengi, Desen &amp; Para/Belge</span>
-                    <span class="mode-desc">Von Kries beyaz dengesi ve CIELAB (ΔE) formülüyle sarı ışıkta bile gerçek rengi, kumaşın düz/çizgili olduğunu ve TL banknot/yazıları okur.</span>
+                    <span class="mode-title">5. Kıyafet Rengi, Deseni ve Kağıt Para Tanıma</span>
+                    <span class="mode-desc">Oda ışığı sarı bile olsa kıyafetinizin gerçek rengini, düz mü yoksa çizgili/kareli mi olduğunu ve elinizdeki Türk Lirası kağıt paranın kaç lira olduğunu söyler.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="anomaly_led" role="radio" aria-checked="false" id="mode-btn-6">
                     <span class="mode-icon" aria-hidden="true">🔦🔍</span>
-                    <span class="mode-title">6. Kayıp Eşya (Z-Skor) &amp; Cihaz LED Okuyucu</span>
-                    <span class="mode-desc">Düz zeminde düşen küçük cismi (3.5σ Z-skoruyla) bulur; modem/şarj kutusu LED ışığının rengini ve yanıp sönme hızını (Hz) ölçer.</span>
+                    <span class="mode-title">6. Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü</span>
+                    <span class="mode-desc">Yere düşen anahtar, yüzük, hap gibi küçük eşyaları bulur; ayrıca modem, şarj aleti veya kombinin küçük ışığının yanıp sönüp sönmediğini ve rengini söyler.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="light_meter" role="radio" aria-checked="false" id="mode-btn-7">
                     <span class="mode-icon" aria-hidden="true">💡🧭</span>
-                    <span class="mode-title">7. Akustik Işık Metre (Lamba &amp; Pencere)</span>
-                    <span class="mode-desc">Odadaki lambaların açık/kapalı olduğunu ve pencere/güneş yönünü anlık ses frekansıyla (180Hz-980Hz) ve Türkçe raporla bildirir.</span>
+                    <span class="mode-title">7. Lamba Açık mı Kapalı mı ve Pencere Bulucu</span>
+                    <span class="mode-desc">Odadaki lambaların açık mı kapalı mı olduğunu ve güneş ışığının hangi pencereden geldiğini ses tonuyla ve konuşarak haber verir.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="explorer" role="radio" aria-checked="false" id="mode-btn-8">
                     <span class="mode-icon" aria-hidden="true">🧭📦</span>
-                    <span class="mode-title">8. Canlı Nesne &amp; Genel Türkçe Belge Okuma</span>
-                    <span class="mode-desc">80 nesneyi yönleriyle tarar, evrak üzerinde metin alanını hizalar ve çift dokunuşla genel Türkçe OCR metin okuma yapar.</span>
+                    <span class="mode-title">8. Etrafımda Ne Var ve Evrak / Yazı Okuyucu</span>
+                    <span class="mode-desc">Odanızdaki eşyaların (sandalye, masa, kapı, bardak) ne tarafta olduğunu söyler ve elinizdeki her türlü kağıt, fatura veya mektubu Türkçe seslendirir.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="medicine_skt" role="radio" aria-checked="false" id="mode-btn-9">
                     <span class="mode-icon" aria-hidden="true">💊📅</span>
-                    <span class="mode-title">9. İlaç Kutusu, Dozaj (mg), Barkod &amp; SKT Denetçisi</span>
-                    <span class="mode-desc">EAN-13 Mod-10 barkod sağlama toplamı, ilaç miligramı (mg/ml), eczane kullanım etiketi ve Son Kullanma Tarihi (SKT/EXP) geçmiş mi kontrolü yapar.</span>
+                    <span class="mode-title">9. İlaç Kutusu ve Son Kullanma Tarihi Kontrolü</span>
+                    <span class="mode-desc">İlacın adını, kaç miligram olduğunu, eczacının yazdığı "sabah-akşam" kullanım tarifini ve ilacın son kullanma tarihinin geçip geçmediğini kontrol edip sesli uyarır.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="signature_pen" role="radio" aria-checked="false" id="mode-btn-10">
                     <span class="mode-icon" aria-hidden="true">✍️👆</span>
-                    <span class="mode-title">10. Canlı Kalem / Parmak Takipli İmza Rehberi</span>
-                    <span class="mode-desc">Evraktaki imza kutusu ile elinizdeki kalemin/parmağınızın ucunu aynı anda takip eder; kalemi kaç santim sağa/aşağı kaydıracağınızı canlı söyler.</span>
+                    <span class="mode-title">10. İmza Atarken Kalem Yönlendirici</span>
+                    <span class="mode-desc">Kağıttaki imza yerini ve elinizdeki kalemin ucunu aynı anda görür; "Kalemi biraz sağa, biraz aşağı götür... Tamam dur, şimdi imzala!" diyerek doğru yeri imzalatır.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="liquid_level" role="radio" aria-checked="false" id="mode-btn-11">
                     <span class="mode-icon" aria-hidden="true">☕🥛</span>
-                    <span class="mode-title">11. Akustik Sıvı Seviyesi &amp; Bardak Dolum Radarı</span>
-                    <span class="mode-desc">Bardağa sıcak çay/kahve/su doldururken sıvı menisküs çizgisini takip eder; yükselen ses perdesiyle taşmadan önce (%82 dolulukta) "Durdurun!" uyarısı verir.</span>
+                    <span class="mode-title">11. Bardağa Çay ve Su Doldurma Yardımcısı</span>
+                    <span class="mode-desc">Bardağa sıcak çay, kahve veya su doldururken elinizi yakmadan bardağın ne kadar dolduğunu sesle takip eder; taşmasına yakın "Bardak doldu, durdurun!" diye uyarır.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="door_elevator_lcd" role="radio" aria-checked="false" id="mode-btn-12">
                     <span class="mode-icon" aria-hidden="true">🚪🔢</span>
-                    <span class="mode-title">12. Kapı No, Asansör Tuşu &amp; Dijital Ekran (LCD)</span>
-                    <span class="mode-desc">Daire/kapı numaralarını, asansör kat tuşlarında parmağınızın hangi tuşta olduğunu ve çamaşır makinesi/klima 7-segment dijital ekranlarını okur.</span>
+                    <span class="mode-title">12. Kapı Numarası, Asansör Tuşu ve Makine Ekranı</span>
+                    <span class="mode-desc">Apartman kapı numaralarını, asansörde parmağınızın hangi kat tuşunda olduğunu ve çamaşır makinesi, klima veya kombinin dijital ekranındaki dereceyi okur.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="food_freshness" role="radio" aria-checked="false" id="mode-btn-13">
                     <span class="mode-icon" aria-hidden="true">🍎🛡️</span>
-                    <span class="mode-title">13. Gıda Tazelik/Küf Anomalisi &amp; Alerjen Okuyucu</span>
-                    <span class="mode-desc">Ekmek, peynir ve meyve yüzeyinde CIELAB küf/çürük spektral anomalisini tarar; paketli gıdalarda Gluten, Laktoz, Fıstık ve içerik uyarılarını süzüp okur.</span>
+                    <span class="mode-title">13. Yiyecek Bozulmuş mu ve Paket İçeriği Okuyucu</span>
+                    <span class="mode-desc">Ekmek, peynir veya meyvenin üzerinde küf ya da çürük lekesi olup olmadığını kontrol eder; market paketlerindeki alerji yapan maddeleri (gluten, süt, fıstık) ve tarihi okur.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="social_presence" role="radio" aria-checked="false" id="mode-btn-14">
                     <span class="mode-icon" aria-hidden="true">👥👀</span>
-                    <span class="mode-title">14. Sosyal İletişim, Kişi Yönü &amp; Bakış Asistanı</span>
-                    <span class="mode-desc">Odada kaç kişi olduğunu, saat yönüne göre nerede durduklarını ve karşınızdaki kişinin yüz simetrisinden şu an size mi baktığını sessizce bildirir.</span>
+                    <span class="mode-title">14. Odada Kim Var ve Bana Bakıyor mu?</span>
+                    <span class="mode-desc">Bulunduğunuz odada kaç kişi olduğunu, ne tarafınızda durduklarını ve konuştuğunuz kişinin o an yüzünü size dönüp dönmediğini kulaklıktan haber verir.</span>
                 </button>
             </div>
         </section>
@@ -157,45 +157,45 @@
         <!-- AKILLI 3D SESLİ KIBLE PUSULASI VE NAMAZ VAKTİ PANELİ -->
         <section id="qibla-compass-panel" aria-labelledby="qibla-heading" class="exam-remote-section" style="border-color: #38bdf8;">
             <div class="exam-remote-header">
-                <h2 id="qibla-heading" style="color: #38bdf8;">🕋 Akıllı Kıble Pusulası, Güneş Doğrulaması &amp; Namaz Vakitleri</h2>
-                <span id="qibla-status-badge" class="status-badge ready">Konum Doğrulanıyor...</span>
+                <h2 id="qibla-heading" style="color: #38bdf8;">🕋 Sesli Kıble Pusulası ve Namaz Vakitleri</h2>
+                <span id="qibla-status-badge" class="status-badge ready">Konumunuz Bulunuyor...</span>
             </div>
             <p class="exam-remote-hint">
-                Manyetik pusula + Kamera Optik Akış (Görsel Dönüş) + Astronomik Güneş Açısı ile çapraz doğrulama yapar. Telefonu avucunuzda yere paralel düz tutarak yavaşça dönün.
+                Kıble yönünü hem pusula hem de Güneşin gökyüzündeki yeriyle kontrol eder. Telefonu avucunuzun içinde yere düz (paralel) tutarak yavaşça dönün.
             </p>
-            <div class="exam-nav-row" role="group" aria-label="Akıllı Kıble ve Namaz Vakti Kontrolleri">
-                <button type="button" id="btn-start-qibla" class="primary-btn" aria-label="Akıllı 3 Boyutlu Sesli Kıble Pusulasını Başlat (Kısayol: K)">
-                    🕋 Akıllı Kıble Radarı Başlat (K)
+            <div class="exam-nav-row" role="group" aria-label="Kıble ve Namaz Vakti Kontrolleri">
+                <button type="button" id="btn-start-qibla" class="primary-btn" aria-label="Sesli Kıble Pusulasını Başlat (Kısayol: K)">
+                    🕋 Kıbleyi Bulmaya Başla (K)
                 </button>
-                <button type="button" id="btn-qibla-prayer-times" class="secondary-btn" aria-label="Bulunduğunuz Konum İçin Diyanet Uyumlu Namaz Vakitlerini, Kalan Süreyi ve Güneşin Kıbleye Göre Konumunu Sesli Oku (Kısayol: V)">
-                    🕰️ Namaz Vakti &amp; Güneş Açısını Oku (V)
+                <button type="button" id="btn-qibla-prayer-times" class="secondary-btn" aria-label="Namaz Vakitlerini, Vaktin Çıkmasına Kalan Süreyi ve Güneş Yönünü Sesli Oku (Kısayol: V)">
+                    🕰️ Namaz Vakitlerini Sesli Oku (V)
                 </button>
-                <button type="button" id="btn-qibla-save-room" class="secondary-btn" aria-label="Bulunduğunuz Odadaki Kıble Yönünü ve Kamera Referansını Hafızaya Kaydet">
-                    📌 Bu Odadaki Kıbleyi Hafızaya Kaydet
+                <button type="button" id="btn-qibla-save-room" class="secondary-btn" aria-label="Bu Odadaki Kıble Yönünü Telefon Hafızasına Kaydet">
+                    📌 Bu Odanın Kıblesini Kaydet
                 </button>
-                <button type="button" id="btn-qibla-gps" class="secondary-btn" aria-label="GPS ile Tam Konumumu Bul ve Kıble Açısını Hesapla">
-                    📍 Kesin GPS Güncelle
+                <button type="button" id="btn-qibla-gps" class="secondary-btn" aria-label="Bulunduğum Konumu Şimdi Yenile">
+                    📍 Konumumu Yenile
                 </button>
             </div>
             <div class="exam-nav-row" style="align-items:center;">
-                <label for="qibla-city-select" style="font-weight:700;">81 İl Çevrimdışı Konum Seçimi:</label>
+                <label for="qibla-city-select" style="font-weight:700;">Şehrinizi Seçin (İnternetsiz 81 İl):</label>
                 <select id="qibla-city-select" aria-label="Kıble ve Namaz Vakti Hesabı İçin 81 İlden Birini Seçin"></select>
             </div>
-            <div class="telemetry-grid" role="list" aria-label="Akıllı Kıble, Güneş ve Namaz Vakti Ölçümleri">
+            <div class="telemetry-grid" role="list" aria-label="Kıble ve Namaz Vakti Bilgileri">
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Kıble Açısı &amp; Kâbe Uzaklığı:</span>
+                    <span class="t-label">Kıble Yönü ve Kâbe Uzaklığı:</span>
                     <strong id="qibla-target-deg">Konum Bekleniyor</strong>
                 </div>
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Pusula / Kıble Sapması:</span>
-                    <strong id="qibla-current-deg">Sensör Bekleniyor</strong>
+                    <span class="t-label">Ne Tarafa Dönmelisiniz:</span>
+                    <strong id="qibla-current-deg">Pusula Bekleniyor</strong>
                 </div>
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Sensör Güven Puanı &amp; Güneş Yönü:</span>
+                    <span class="t-label">Güneşe Göre Kıble Yönü:</span>
                     <strong id="qibla-confidence-sun">Hesaplanıyor...</strong>
                 </div>
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Aktif Namaz Vakti &amp; Kalan Süre:</span>
+                    <span class="t-label">Şu Anki Namaz Vakti ve Kalan Süre:</span>
                     <strong id="qibla-prayer-info">Hesaplanıyor...</strong>
                 </div>
             </div>
@@ -204,21 +204,21 @@
         <!-- ETKİLEŞİMLİ SINAV VE ŞIK KUMANDASI (Soru Kökü + A, B, C, D, E Tek Tek Dinleme) -->
         <section id="exam-remote-panel" aria-labelledby="exam-remote-heading" class="exam-remote-section">
             <div class="exam-remote-header">
-                <h2 id="exam-remote-heading">📝 Etkileşimli Sınav ve Şık Kumandası (Tek Dokunuşla Dinle)</h2>
+                <h2 id="exam-remote-heading">📝 Sınav Sorusu ve Şık Dinleme Kumandası</h2>
                 <span id="exam-question-counter" class="status-badge ready">Sınav Kağıdı Bekleniyor</span>
             </div>
             <p class="exam-remote-hint">
-                Sınav kağıdını çektiğinizde sorular ve şıklar otomatik ayrıştırılır. İstediğiniz şıkkı karıştırmadan tekrar tekrar dinlemek için aşağıdaki düğmelere dokunun veya klavyede <code>S</code>, <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code> tuşlarına basın:
+                Sınav kağıdının fotoğrafını çektiğinizde soru ve şıklar birbirinden ayrılır. İstediğiniz şıkkı karıştırmadan tekrar tekrar dinlemek için aşağıdaki düğmelere dokunun veya klavyede <code>S</code>, <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code> tuşlarına basın:
             </p>
             <div class="exam-nav-row" role="group" aria-label="Sorular Arası Geçiş">
                 <button type="button" id="btn-exam-prev" class="secondary-btn" aria-label="Önceki Soruya Geç (Kısayol: Sol Ok)">
                     ⬅️ Önceki Soru
                 </button>
-                <button type="button" id="btn-exam-stem" class="primary-btn" aria-label="Soru Kökünü ve Metnini Sesli Oku (Kısayol: S)">
-                    ❓ Soru Kökünü Oku (S)
+                <button type="button" id="btn-exam-stem" class="primary-btn" aria-label="Sadece Soruyu Sesli Oku (Kısayol: S)">
+                    ❓ Sadece Soruyu Oku (S)
                 </button>
                 <button type="button" id="btn-exam-all" class="secondary-btn" aria-label="Soruyu ve Tüm Şıkları Sırayla Oku">
-                    🔊 Tüm Soruyu ve Şıkları Oku
+                    🔊 Soruyu ve Tüm Şıkları Oku
                 </button>
                 <button type="button" id="btn-exam-next" class="secondary-btn" aria-label="Sonraki Soruya Geç (Kısayol: Sağ Ok)">
                     Sonraki Soru ➡️
@@ -244,12 +244,12 @@
         </section>
 
         <!-- Özel Hedef Filtresi ve WhatsApp Sabitleyici Çubuğu -->
-        <section id="target-filter-section" aria-label="Özel Hedef ve Yardımcı Araçlar" class="filter-bar">
-            <label for="target-object-select">🎯 Özel Radar Hedefi:</label>
-            <select id="target-object-select" aria-label="3D Sesli Radarın Odaklanacağı Hedefi Seçin">
-                <option value="auto">Otomatik (Seçili Moda Göre Matematiksel Hedefleme)</option>
-                <option value="screen_qr">Bilgisayar Ekranı / Monitör / QR Kod</option>
-                <option value="person">İnsan / Yüz (Portre &amp; Selfie)</option>
+        <section id="target-filter-section" aria-label="Aradığınız Eşyayı Seçin ve Yardımcı Araçlar" class="filter-bar">
+            <label for="target-object-select">🎯 Aradığınız Özel Eşya:</label>
+            <select id="target-object-select" aria-label="Kameranın Özellikle Aramasını İstediğiniz Eşyayı Seçin">
+                <option value="auto">Otomatik (Seçtiğiniz Bölüme Göre Kendisi Bulur)</option>
+                <option value="screen_qr">Bilgisayar Ekranı / Karekod (QR)</option>
+                <option value="person">İnsan / Yüz</option>
                 <option value="cell phone">Cep Telefonu</option>
                 <option value="cup">Bardak / Kupa / Şişe</option>
                 <option value="chair">Sandalye / Koltuk</option>
@@ -257,75 +257,74 @@
                 <option value="keyboard">Klavye / Fare</option>
                 <option value="door_table">Masa / Çalışma Masası</option>
             </select>
-            <button id="btn-whatsapp-hold" class="secondary-btn" aria-label="WhatsApp Uygulamasına Geçerken 15 Saniye Boyunca Arka Planda Sesli Hizalama Kilidini Başlat (Kısayol: W)">
-                🔒 WhatsApp 15sn Ses Kilidi (W)
+            <button id="btn-whatsapp-hold" class="secondary-btn" aria-label="WhatsApp Uygulamasına Geçerken 15 Saniye Boyunca Eliniz Kaymasın Diye Sesli Rehberi Başlat (Kısayol: W)">
+                🔒 WhatsApp 15 Saniye Sabit Tutma Sesi (W)
             </button>
-            <button id="btn-repeat-guidance" class="secondary-btn" aria-label="Son Sesli Raporu Tekrar Oku (Kısayol: T)">
-                🔊 Son Raporu Tekrarla (T)
+            <button id="btn-repeat-guidance" class="secondary-btn" aria-label="Son Söylenen Cümleyi Tekrar Dinle (Kısayol: T)">
+                🔊 Son Söyleneni Tekrarla (T)
             </button>
         </section>
 
-        <!-- Canlı Yönlendirme, Matematiksel Telemetri ve Vizör Paneli -->
-        <section aria-label="Canlı Kamera Vizörü ve Matematiksel Ölçüm Durumu" class="visor-grid">
-            <!-- Sol: Canlı Sesli Rehber ve Sensör Ölçümleri -->
+        <!-- Canlı Yönlendirme ve Vizör Paneli -->
+        <section aria-label="Canlı Sesli Yönlendirme ve Kamera Görüntüsü" class="visor-grid">
+            <!-- Sol: Canlı Sesli Rehber ve Durum Özeti -->
             <div class="guidance-panel">
-                <h2>Canlı Matematiksel Hizalama ve Sensör Raporu</h2>
-                <div id="live-direction-box" class="direction-banner" role="region" aria-label="Anlık Yönlendirme Komutu">
-                    Kamerayı başlatmak için üstteki "Kamerayı ve Sesli Asistanı Başlat" düğmesine veya Boşluk tuşuna basın.
+                <h2>Canlı Sesli Yönlendirme ve Durum</h2>
+                <div id="live-direction-box" class="direction-banner" role="region" aria-label="Anlık Sesli Yönlendirme">
+                    Başlamak için üstteki "Kamerayı ve Sesli Rehberi Başlat" düğmesine veya Boşluk tuşuna basın.
                 </div>
 
-                <div class="telemetry-grid" role="list" aria-label="Matematiksel Sensör ve Kadraj Ölçümleri">
+                <div class="telemetry-grid" role="list" aria-label="Kamera ve Ortam Durumu">
                     <div class="telemetry-item" role="listitem">
-                        <span class="t-label">Kalman Konum &amp; Kenar Kontrolü:</span>
+                        <span class="t-label">Hizalama Durumu:</span>
                         <strong id="t-position">Bekleniyor</strong>
                     </div>
                     <div class="telemetry-item" role="listitem">
-                        <span class="t-label">Mesafe / Ters Işık Oranı:</span>
+                        <span class="t-label">Yakınlık ve Mesafe:</span>
                         <strong id="t-distance">Bekleniyor</strong>
                     </div>
                     <div class="telemetry-item" role="listitem">
-                        <span class="t-label">Işık (Luma) &amp; Netlik (Laplacian):</span>
+                        <span class="t-label">Oda Işığı ve Görüntü Netliği:</span>
                         <strong id="t-lighting">Bekleniyor</strong>
                     </div>
                     <div class="telemetry-item" role="listitem">
-                        <span class="t-label">Merkez Renk (CIELAB) / Eğim:</span>
+                        <span class="t-label">Görünen Renk ve Telefon Duruşu:</span>
                         <strong id="t-color-tilt">Bekleniyor</strong>
                     </div>
                 </div>
 
-                <!-- Algılanan QR, Sınav Sorusu, Mahremiyet Raporu veya OCR Sonuç Kutusu -->
+                <!-- Algılanan Sonuç Kutusu -->
                 <div id="detected-result-panel" class="result-panel" hidden>
-                    <h3 id="result-title">Analiz ve Okuma Sonucu</h3>
+                    <h3 id="result-title">Okuma Sonucu</h3>
                     <p id="result-text" tabindex="0"></p>
                     <div class="result-actions">
-                        <button id="btn-copy-result" class="secondary-btn">📋 Raporu / Metni Kopyala</button>
+                        <button id="btn-copy-result" class="secondary-btn">📋 Yazıyı Kopyala</button>
                         <a id="btn-open-link" href="#" target="_blank" rel="noopener noreferrer" class="primary-btn" hidden>🌐 Bağlantıyı Aç</a>
-                        <button id="btn-download-photo" class="secondary-btn" hidden>💾 Fotoğrafı Cihaza Kaydet</button>
+                        <button id="btn-download-photo" class="secondary-btn" hidden>💾 Fotoğrafı Kaydet</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Sağ: Kamera Görüntüsü ve 3D Nişangâh Çizimi -->
-            <div class="camera-wrapper" id="camera-touch-zone" tabindex="0" role="button" aria-label="Kamera Vizör Alanı. Anında fotoğraf çekmek, sınav şıklarını ayrıştırmak ve yazıları okutmak için buraya çift dokunun veya Boşluk tuşuna basın.">
+            <!-- Sağ: Kamera Görüntüsü -->
+            <div class="camera-wrapper" id="camera-touch-zone" tabindex="0" role="button" aria-label="Kamera Ekranı. Fotoğraf çekmek ve okutmak için buraya iki kez üst üste dokunun veya Boşluk tuşuna basın.">
                 <video id="camera-video" playsinline muted autoplay></video>
                 <canvas id="overlay-canvas" aria-hidden="true"></canvas>
                 <canvas id="analysis-canvas" hidden aria-hidden="true"></canvas>
                 <div class="touch-hint" aria-hidden="true">
-                    Vizöre <strong>çift dokunarak</strong> veya <strong>Boşluk (Space)</strong> tuşuyla sınav kağıdını / sahneyi anında okutabilirsiniz.
+                    Ekrana <strong>çift dokunarak</strong> veya <strong>Boşluk</strong> tuşuna basarak anında okutabilirsiniz.
                 </div>
             </div>
         </section>
 
-        <!-- Matematiksel Algoritmalar ve Kısayol Kılavuzu -->
+        <!-- Kullanım Rehberi -->
         <section aria-labelledby="help-heading" class="help-section">
-            <h2 id="help-heading">Sıfır Yanılma İçin Çalışan Matematiksel Formüller ve Kısayollar</h2>
+            <h2 id="help-heading">Nasıl Kullanılır? (Kısa ve Kolay Rehber)</h2>
             <ul class="help-list">
-                <li><strong>Bradley-Roth İntegral Gölge Silici + Çift Sütunlu Sınav Ayırıcı:</strong> Telefonun kağıt üzerine düşen gölgesini <code>I(x,y) &lt; μ_yerel · 0.87</code> integral matrisiyle siler; dikey projeksiyon vadisiyle çift sütunlu test kağıtlarını ortadan ikiye ayırıp sol ve sağ soruları birbirine karıştırmadan okur.</li>
-                <li><strong>Etkileşimli Şık Kumandası (<code>S, A, B, C, D, E</code>):</strong> Daire içindeki bozuk okunan şık harflerini sıra algoritmasıyla onarır; her şıkkı ayrı düğmeye atar. Böylece sınavdayken tek dokunuşla sadece istediğiniz şıkkı tekrar dinleyebilirsiniz.</li>
-                <li><strong>İlaç SKT &amp; GS1 Barkod Sağlama Kilidi (Mod 9):</strong> EAN-13 barkodlarını Mod-10 sağlama toplamı (Checksum) ile doğrular, <code>mg/ml</code> dozajını ve Son Kullanma Tarihini (<code>SKT/EXP</code>) bugünün tarihiyle karşılaştırıp süresi geçmiş ilaçlarda acil sesli alarm verir.</li>
-                <li><strong>Canlı Kalem/Parmak Takibi (Mod 10) &amp; Sıvı Menisküs Radarı (Mod 11):</strong> YCbCr cilt ve kalem ucu vektörüyle imza kutusuna elinizi milimetrik yönlendirir; bardak içindeki yatay sıvı menisküs gradyanını (<code>∂L/∂y</code>) 5 kare medyan filtresiyle izleyip çay/su taşmadan durdurur.</li>
-                <li><strong>7-Segment LCD Ekran Köprüleme (Mod 12), CIELAB Küf Anomalisi (Mod 13) &amp; Bakış Simetrisi (Mod 14):</strong> Asansör/beyaz eşya dijital ekranlarını morfolojik filtreyle okur, gıda yüzeyinde küf spektrumunu ve alerjenleri denetler, karşınızdaki kişinin yüz simetrisinden size bakıp bakmadığını hesaplar.</li>
-                <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>9</code> ve <code>0, U, I, G, P</code> (Mod 1–14 seç), <code>Boşluk</code> (Çek ve oku), <code>K</code> (Kıble), <code>V</code> (Namaz vakti ve Güneş açısı), <code>S, A, B, C, D, E</code> (Soru ve şıklar), <code>W</code> (WhatsApp 15sn ses kilidi), <code>F</code> (Flaş), <code>R</code> (3D Radar), <code>T</code> (Tekrarla).</li>
+                <li><strong>Sınav Kağıdı Okurken:</strong> Telefonu kağıdın biraz yukarısında düz tutun. Elinizin gölgesi kağıda düşse bile sistem gölgeyi siler, şıkları birbirine karıştırmaz. Çekimden sonra <code>A, B, C, D, E</code> düğmelerine basarak istediğiniz şıkkı tek tek dinleyebilirsiniz.</li>
+                <li><strong>Kıbleyi Bulurken:</strong> Telefonu avucunuzun içinde yere düz tutarak kendi etrafınızda yavaşça dönün. Eğer çevrede mıknatıs veya demir varsa sistem yanılmamak için sizi uyarır ve Güneşin yönüne göre de Kıbleyi tarif eder.</li>
+                <li><strong>İlaç Tarihi ve Yiyecek Kontrolü:</strong> İlaç kutusunu okuttuğunuzda son kullanma tarihi geçmişse acil uyarı sesi çalar. Yiyecek paketlerinde ise alerji yapan maddeleri (gluten, süt, fıstık vb.) hemen ayıklayıp söyler.</li>
+                <li><strong>İmza Atarken ve Çay Doldururken:</strong> İmza modunda kaleminizi kağıda yaklaştırın; nereye götüreceğinizi santim santim söyler. Çay/su doldurma modunda ise bardağı karşısına koyun; bardak doldukça ses incelir ve taşmadan önce "Durdurun!" der.</li>
+                <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>9</code> ve <code>0, U, I, G, P</code> (14 moddan birini seçer), <code>Boşluk</code> (Çeker ve okur), <code>K</code> (Kıbleyi başlatır), <code>V</code> (Namaz vakitlerini okur), <code>S, A, B, C, D, E</code> (Soruyu ve şıkları tek tek okur), <code>T</code> (Son cümleyi tekrarlar).</li>
             </ul>
         </section>
     </main>
