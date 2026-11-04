@@ -196,6 +196,10 @@
         btnWhatsappHold: document.getElementById('btn-whatsapp-hold'),
         btnRepeat: document.getElementById('btn-repeat-guidance'),
         targetSelect: document.getElementById('target-object-select'),
+        targetFilterSection: document.getElementById('target-filter-section'),
+        examRemotePanel: document.getElementById('exam-remote-panel'),
+        qiblaCompassPanel: document.getElementById('qibla-compass-panel'),
+        songFinderPanel: document.getElementById('song-finder-panel'),
         modeButtons: document.querySelectorAll('.mode-card'),
         aiStatusBadge: document.getElementById('ai-status-badge'),
         liveDirectionBox: document.getElementById('live-direction-box'),
@@ -5570,11 +5574,27 @@
         setTimeout(() => toggleSongListening(), 900);
     }
 
+    function syncModePanelsVisibility(activeMode) {
+        if (el.examRemotePanel) {
+            el.examRemotePanel.hidden = (activeMode !== 'exam_reader');
+        }
+        if (el.qiblaCompassPanel) {
+            el.qiblaCompassPanel.hidden = (activeMode !== 'qibla_compass');
+        }
+        if (el.songFinderPanel) {
+            el.songFinderPanel.hidden = (activeMode !== 'song_finder');
+        }
+        if (el.targetFilterSection) {
+            el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder');
+        }
+    }
+
     function setMode(newMode) {
         state.mode = newMode;
         state.countdownStage = 0;
         state.kalmanBox = null;
         state.consensusFrames = 0;
+        syncModePanelsVisibility(newMode);
         if (newMode === 'qibla_compass') {
             state.qiblaActive = true;
             radar.init();
@@ -5908,6 +5928,7 @@
     });
 
     window.addEventListener('load', () => {
+        syncModePanelsVisibility(state.mode);
         autoAcquireLocationAndWatch();
         updateExamRemoteUI();
         setTimeout(initAiModel, 350);
