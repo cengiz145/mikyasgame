@@ -41,6 +41,15 @@ body {
     border: 0;
 }
 
+/* Karanlık ortamlar için tam ekran beyaz Retina Flaşı */
+.retina-flash {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    z-index: 99999;
+    pointer-events: none;
+}
+
 .skip-link {
     position: absolute;
     top: -100px;
@@ -450,3 +459,4 @@ code {
     border-top: 1px solid var(--border-color);
     margin-top: auto;
 }
+

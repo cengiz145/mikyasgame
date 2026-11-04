@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>Mikyas Studio | Erişilebilir Kamera, Fotoğraf ve QR Hizalama Asistanı</title>
-    <meta name="description" content="Görme engelliler için %100 ücretsiz, gerçek zamanlı 3D sesli radar, WhatsApp Web ekran ve QR kod hizalama, otomatik portre kadrajlama ve nesne tarama asistanı.">
+    <title>Mikyas Studio | Erişilebilir Kamera, QR ve Hassas Sensör Asistanı</title>
+    <meta name="description" content="Görme engelliler için matematiksel doğrulamalı 3D sesli radar, WhatsApp Web QR hizalama, sosyal medya ters ışık/mahremiyet denetimi, CIELAB renk/kıyafet analizi, kayıp eşya ve LED durum okuyucu.">
     <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Kamera Asistanı">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <!-- Cihaz İçi Gerçek Zamanlı Yapay Zeka ve QR Kütüphaneleri -->
@@ -17,29 +20,35 @@
 <body>
     <a href="#main-controls" class="skip-link">Ana Kontrollere Atla</a>
 
-    <!-- Ekran Okuyucu (NVDA / TalkBack / VoiceOver) Canlı Bildirim Alanı -->
+    <!-- Karanlıkta Selfie / Belge Çekimi İçin Tam Ekran Beyaz Retina Flaşı -->
+    <div id="retina-flash-overlay" class="retina-flash" hidden aria-hidden="true"></div>
+
+    <!-- Ekran Okuyucu (NVDA / TalkBack / VoiceOver) Canlı Bildirim Alanları -->
     <div id="sr-live-assertive" class="sr-only" role="status" aria-live="assertive" aria-atomic="true"></div>
-    <div id="sr-live-polite" class="sr-only" role=" log" aria-live="polite" aria-atomic="true"></div>
+    <div id="sr-live-polite" class="sr-only" role="log" aria-live="polite" aria-atomic="true"></div>
 
     <header class="app-header" role="banner">
         <div class="header-top">
             <a href="../index.html" class="back-btn" aria-label="Mikyas Studio Ana Sayfasına Dön">← Ana Sayfa</a>
-            <h1>Erişilebilir Kamera &amp; QR Asistanı</h1>
-            <span id="ai-status-badge" class="status-badge" role="status">Yapay Zeka Hazırlanıyor...</span>
+            <h1>Erişilebilir Kamera, QR &amp; Hassas Sensör Asistanı</h1>
+            <span id="ai-status-badge" class="status-badge" role="status">Matematiksel Motor Hazırlanıyor...</span>
         </div>
         <p class="subtitle">
-            Kamerayı nereye tutacağınızı <strong>3D Sesli Nişangâh Radarı</strong> ve <strong>Türkçe Sesli Yönlendirme</strong> ile anlık bildiren akıllı vizör.
+            Çoklu kare doğrulamalı (Sıfır Yanlış Alarm), <strong>Kalman/EMA sarsıntı filtreli 3D Sesli Nişangâh Radarı</strong> ve <strong>6 Profesyonel Görme Asistanı Modu</strong>.
         </p>
     </header>
 
     <main id="main-controls" role="main" class="app-container">
-        <!-- Hızlı Başlat / Kamera Kontrol Çubuğu -->
-        <section aria-label="Kamera ve Ses Kontrolleri" class="control-bar">
+        <!-- Hızlı Başlat / Kamera ve Donanım Kontrol Çubuğu -->
+        <section aria-label="Kamera, Flaş ve Ses Kontrolleri" class="control-bar">
             <button id="btn-start-camera" class="primary-btn pulse-btn" aria-pressed="false">
                 📷 Kamerayı ve Sesli Asistanı Başlat
             </button>
             <button id="btn-switch-camera" class="secondary-btn" disabled aria-label="Ön ve Arka Kamera Arasında Geçiş Yap (Kısayol: C)">
-                🔄 Kamera Değiştir (Arka)
+                🔄 Kamera: Arka
+            </button>
+            <button id="btn-toggle-flash" class="secondary-btn" disabled aria-pressed="false" aria-label="El Fenerini veya Ekran Flaşını Aç Kapat (Kısayol: F)">
+                🔦 Flaş / Işık: Otomatik
             </button>
             <button id="btn-toggle-radar" class="secondary-btn active-toggle" aria-pressed="true" aria-label="3 Boyutlu Sesli Nişangah Radarını Aç veya Kapat (Kısayol: R)">
                 🎯 3D Sesli Radar: Açık
@@ -47,126 +56,141 @@
             <button id="btn-toggle-auto" class="secondary-btn active-toggle" aria-pressed="true" aria-label="Hedef Ortalandığında Otomatik Fotoğraf Çekimini Aç veya Kapat (Kısayol: O)">
                 ⚡ Otomatik Çekim: Açık
             </button>
-            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek ve Betimle (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
-                📸 Şimdi Çek &amp; Oku (Boşluk)
+            <button id="btn-capture-now" class="action-btn" disabled aria-label="Şimdi Fotoğraf Çek, Mahremiyet ve Yazıları Analiz Et (Kısayol: Boşluk Tuşu veya Ekrana Çift Dokunuş)">
+                📸 Şimdi Çek &amp; Analiz Et (Boşluk)
             </button>
         </section>
 
-        <!-- 4 Ana Çalışma Modu Seçimi -->
+        <!-- 6 Matematiksel Çalışma Modu Seçimi -->
         <section aria-labelledby="mode-heading" class="mode-section">
-            <h2 id="mode-heading">Çalışma Modu Seçin (Klavye: 1 - 4)</h2>
+            <h2 id="mode-heading">Hassas Çalışma Modu Seçin (Klavye Kısayolu: 1 - 6)</h2>
             <div class="mode-grid" role="radiogroup" aria-labelledby="mode-heading">
                 <button type="button" class="mode-card active" data-mode="qr_screen" role="radio" aria-checked="true" id="mode-btn-1">
                     <span class="mode-icon" aria-hidden="true">💻📱</span>
                     <span class="mode-title">1. WhatsApp Web / Ekran &amp; QR Hizalama</span>
-                    <span class="mode-desc">Bilgisayar ekranını ve QR kodu geniş açıdan algılar; telefonu ekranın üstüne mi, altına mı, sağına mı tuttuğunuzu anlık söyler.</span>
+                    <span class="mode-desc">Bilgisayar ekranını ve QR kodu geniş açıdan yakalar; ekranın üstüne mi altına mı tuttuğunuzu söyler ve WhatsApp geçişinde 15 sn sesli kilit sağlar.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="portrait" role="radio" aria-checked="false" id="mode-btn-2">
-                    <span class="mode-icon" aria-hidden="true">🧑📸</span>
-                    <span class="mode-title">2. Portre &amp; Selfie Kadraj Asistanı</span>
-                    <span class="mode-desc">Kişiyi ve yüzü algılar, mesafeyi ve ortalamayı sesle yönlendirir. Tam ortalandığında 3-2-1 sayarak otomatik fotoğraf çeker.</span>
+                    <span class="mode-icon" aria-hidden="true">🧑🛡️</span>
+                    <span class="mode-title">2. Portre, Selfie &amp; Mahremiyet Koçu</span>
+                    <span class="mode-desc">Kişiyi ortalar, Michelson formülüyle ters ışığı (silüeti), baş/omuz kesilmesini ve arka plandaki yabancı ekran/eşyaları denetleyip 3-2-1 otomatik çeker.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="explorer" role="radio" aria-checked="false" id="mode-btn-3">
-                    <span class="mode-icon" aria-hidden="true">🧭🔍</span>
-                    <span class="mode-title">3. Canlı Nesne &amp; Çevre Tarayıcı</span>
-                    <span class="mode-desc">Kameranın önündeki nesneleri yönleriyle (solunuzda sandalye, karşınızda bilgisayar, sağda bardak) gerçek zamanlı okur.</span>
+                <button type="button" class="mode-card" data-mode="color_cloth" role="radio" aria-checked="false" id="mode-btn-3">
+                    <span class="mode-icon" aria-hidden="true">👕🎨</span>
+                    <span class="mode-title">3. Kıyafet Rengi, Desen &amp; Para/Belge</span>
+                    <span class="mode-desc">Von Kries beyaz dengesi ve CIELAB (ΔE) formülüyle sarı ışıkta bile gerçek rengi, kumaşın düz/çizgili olduğunu ve TL banknot/yazıları okur.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="document" role="radio" aria-checked="false" id="mode-btn-4">
-                    <span class="mode-icon" aria-hidden="true">📄🔤</span>
-                    <span class="mode-title">4. Belge / Metin Okuma &amp; Fotoğraf Betimleme</span>
-                    <span class="mode-desc">Işık ve netliği kontrol eder, fotoğrafı çekip üzerindeki Türkçe yazıları (OCR) ve sahne detaylarını sesli okur.</span>
+                <button type="button" class="mode-card" data-mode="anomaly_led" role="radio" aria-checked="false" id="mode-btn-4">
+                    <span class="mode-icon" aria-hidden="true">🔦🔍</span>
+                    <span class="mode-title">4. Kayıp Eşya (Z-Skor) &amp; Cihaz LED Okuyucu</span>
+                    <span class="mode-desc">Düz zeminde düşen küçük cismi (3.5σ Z-skoruyla) bulur; modem/şarj kutusu LED ışığının rengini ve yanıp sönme hızını (Hz) ölçer.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="light_meter" role="radio" aria-checked="false" id="mode-btn-5">
+                    <span class="mode-icon" aria-hidden="true">💡🧭</span>
+                    <span class="mode-title">5. Akustik Işık Metre (Lamba &amp; Pencere)</span>
+                    <span class="mode-desc">Odadaki lambaların açık/kapalı olduğunu ve pencere/güneş yönünü anlık ses frekansıyla (180Hz-980Hz) ve Türkçe raporla bildirir.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="explorer" role="radio" aria-checked="false" id="mode-btn-6">
+                    <span class="mode-icon" aria-hidden="true">🧭📦</span>
+                    <span class="mode-title">6. Canlı Nesne, İmza Yeri &amp; Belge Okuma</span>
+                    <span class="mode-desc">80 nesneyi yönleriyle tarar, evrak üzerinde imza/metin alanını hizalar ve çift dokunuşla Türkçe OCR metin okuma yapar.</span>
                 </button>
             </div>
         </section>
 
-        <!-- Nesne Arama Filtresi (Mod 3 veya Genel Hedefleme İçin) -->
-        <section id="target-filter-section" aria-label="Hedef Nesne Seçimi" class="filter-bar">
-            <label for="target-object-select">🎯 Radarla Aranacak Özel Hedef:</label>
+        <!-- Özel Hedef Filtresi ve WhatsApp Sabitleyici Çubuğu -->
+        <section id="target-filter-section" aria-label="Özel Hedef ve Yardımcı Araçlar" class="filter-bar">
+            <label for="target-object-select">🎯 Özel Radar Hedefi:</label>
             <select id="target-object-select" aria-label="3D Sesli Radarın Odaklanacağı Hedefi Seçin">
-                <option value="auto">Otomatik (Seçili Moda Göre Hedefle)</option>
-                <option value="screen_qr">Bilgisayar Ekranı / TV / QR Kod</option>
-                <option value="person">İnsan / Yüz (Portre)</option>
+                <option value="auto">Otomatik (Seçili Moda Göre Matematiksel Hedefleme)</option>
+                <option value="screen_qr">Bilgisayar Ekranı / Monitör / QR Kod</option>
+                <option value="person">İnsan / Yüz (Portre &amp; Selfie)</option>
                 <option value="cell phone">Cep Telefonu</option>
                 <option value="cup">Bardak / Kupa / Şişe</option>
                 <option value="chair">Sandalye / Koltuk</option>
-                <option value="book">Kitap / Belge</option>
+                <option value="book">Kitap / Evrak / İmza Kağıdı</option>
                 <option value="keyboard">Klavye / Fare</option>
-                <option value="door_table">Masa / Yemek Masası</option>
+                <option value="door_table">Masa / Çalışma Masası</option>
             </select>
-            <button id="btn-repeat-guidance" class="secondary-btn" aria-label="Son Sesli Yönlendirmeyi Tekrar Oku (Kısayol: T)">
-                🔊 Son Durumu Tekrarla (T)
+            <button id="btn-whatsapp-hold" class="secondary-btn" aria-label="WhatsApp Uygulamasına Geçerken 15 Saniye Boyunca Arka Planda Sesli Hizalama Kilidini Başlat (Kısayol: W)">
+                🔒 WhatsApp 15sn Ses Kilidi (W)
+            </button>
+            <button id="btn-repeat-guidance" class="secondary-btn" aria-label="Son Sesli Raporu Tekrar Oku (Kısayol: T)">
+                🔊 Son Raporu Tekrarla (T)
             </button>
         </section>
 
-        <!-- Canlı Yönlendirme ve Vizör Paneli -->
-        <section aria-label="Canlı Kamera Vizörü ve Yönlendirme Durumu" class="visor-grid">
-            <!-- Sol: Canlı Sesli Rehber Gösterge Paneli -->
+        <!-- Canlı Yönlendirme, Matematiksel Telemetri ve Vizör Paneli -->
+        <section aria-label="Canlı Kamera Vizörü ve Matematiksel Ölçüm Durumu" class="visor-grid">
+            <!-- Sol: Canlı Sesli Rehber ve Sensör Ölçümleri -->
             <div class="guidance-panel">
-                <h2>Canlı Hizalama ve Kadraj Rehberi</h2>
+                <h2>Canlı Matematiksel Hizalama ve Sensör Raporu</h2>
                 <div id="live-direction-box" class="direction-banner" role="region" aria-label="Anlık Yönlendirme Komutu">
-                    Kamerayı başlatmak için üstteki "Kamerayı ve Sesli Asistanı Başlat" düğmesine basın.
+                    Kamerayı başlatmak için üstteki "Kamerayı ve Sesli Asistanı Başlat" düğmesine veya Boşluk tuşuna basın.
                 </div>
 
-                <div class="telemetry-grid" role="list" aria-label="Sensör ve Kadraj Ölçümleri">
+                <div class="telemetry-grid" role="list" aria-label="Matematiksel Sensör ve Kadraj Ölçümleri">
                     <div class="telemetry-item" role="listitem">
-                        <span class="t-label">Yatay / Dikey Konum:</span>
+                        <span class="t-label">Kalman Konum &amp; Doğrulama:</span>
                         <strong id="t-position">Bekleniyor</strong>
                     </div>
                     <div class="telemetry-item" role="listitem">
-                        <span class="t-label">Mesafe / Kadraj Oranı:</span>
+                        <span class="t-label">Mesafe / Ters Işık Oranı:</span>
                         <strong id="t-distance">Bekleniyor</strong>
                     </div>
                     <div class="telemetry-item" role="listitem">
-                        <span class="t-label">Işık ve Netlik:</span>
+                        <span class="t-label">Işık (Luma) &amp; Netlik (Laplacian):</span>
                         <strong id="t-lighting">Bekleniyor</strong>
                     </div>
                     <div class="telemetry-item" role="listitem">
-                        <span class="t-label">Telefon Tutuş Eğimi:</span>
-                        <strong id="t-tilt">Düz</strong>
+                        <span class="t-label">Merkez Renk (CIELAB) / Eğim:</span>
+                        <strong id="t-color-tilt">Bekleniyor</strong>
                     </div>
                 </div>
 
-                <!-- QR veya OCR Sonuç Kutusu -->
+                <!-- Algılanan QR, Mahremiyet Raporu veya OCR Sonuç Kutusu -->
                 <div id="detected-result-panel" class="result-panel" hidden>
-                    <h3 id="result-title">Algılanan İçerik</h3>
+                    <h3 id="result-title">Analiz ve Okuma Sonucu</h3>
                     <p id="result-text" tabindex="0"></p>
                     <div class="result-actions">
-                        <button id="btn-copy-result" class="secondary-btn">📋 Metni / Bağlantıyı Kopyala</button>
+                        <button id="btn-copy-result" class="secondary-btn">📋 Raporu / Metni Kopyala</button>
                         <a id="btn-open-link" href="#" target="_blank" rel="noopener noreferrer" class="primary-btn" hidden>🌐 Bağlantıyı Aç</a>
-                        <button id="btn-download-photo" class="secondary-btn" hidden>💾 Çekilen Fotoğrafı İndir</button>
+                        <button id="btn-download-photo" class="secondary-btn" hidden>💾 Fotoğrafı Cihaza Kaydet</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Sağ: Kamera Görüntüsü ve 3D Nişangâh Çizimi (Çift Dokunuşla Çekim Destekli) -->
-            <div class="camera-wrapper" id="camera-touch-zone" tabindex="0" role="button" aria-label="Kamera Vizör Alanı. Anında fotoğraf çekmek ve betimlemek için buraya çift dokunun veya Boşluk tuşuna basın.">
+            <!-- Sağ: Kamera Görüntüsü ve 3D Nişangâh Çizimi -->
+            <div class="camera-wrapper" id="camera-touch-zone" tabindex="0" role="button" aria-label="Kamera Vizör Alanı. Anında fotoğraf çekmek, mahremiyet denetimi yapmak ve yazıları okutmak için buraya çift dokunun veya Boşluk tuşuna basın.">
                 <video id="camera-video" playsinline muted autoplay></video>
                 <canvas id="overlay-canvas" aria-hidden="true"></canvas>
                 <canvas id="analysis-canvas" hidden aria-hidden="true"></canvas>
                 <div class="touch-hint" aria-hidden="true">
-                    Ekrana çift dokunarak veya <strong>Boşluk (Space)</strong> tuşuyla anında fotoğraf çekip okutabilirsiniz.
+                    Vizöre <strong>çift dokunarak</strong> veya <strong>Boşluk (Space)</strong> tuşuyla anında çekim ve tam analiz yapabilirsiniz.
                 </div>
             </div>
         </section>
 
-        <!-- Kullanım Kılavuzu ve Sesli Radar Açıklaması -->
+        <!-- Matematiksel Algoritmalar ve Kısayol Kılavuzu -->
         <section aria-labelledby="help-heading" class="help-section">
-            <h2 id="help-heading">Nasıl Çalışır? (3D Sesli Radar ve Klavye Kısayolları)</h2>
+            <h2 id="help-heading">Sıfır Yanılma İçin Çalışan Matematiksel Formüller ve Kısayollar</h2>
             <ul class="help-list">
-                <li><strong>Sol / Sağ Kulaklık (Stereo Pan):</strong> Hedef (insan yüzü, bilgisayar ekranı veya QR kod) kameranın solundaysa bip sesi sol kulağınızdan, sağındaysa sağ kulağınızdan gelir.</li>
-                <li><strong>Yukarı / Aşağı Ses İnceliği (Pitch):</strong> Hedef yukarıdaysa daha ince (tiz) ses, aşağıdaysa daha kalın (pes) ses duyarsınız.</li>
-                <li><strong>Merkeze Yaklaşma Hızı ve Onay Akoru:</strong> Hedef ekranın tam ortasına yaklaştıkça bip sesleri hızlanır; tam ortalandığında <strong>üçlü onay melodisi</strong> çalar ve Türkçe olarak <em>"Tam ortalandı, sabit tutun"</em> der.</li>
-                <li><strong>WhatsApp Web / QR Kod Hizalama İpucu:</strong> Telefonu bilgisayar ekranına 25-35 cm mesafeden tutun. Asistan önce parlak bilgisayar ekranını yakalar ve <em>"Ekran aşağıda kaldı, telefonu biraz aşağı indirin"</em> veya <em>"Çok yakınsınız, biraz geri çekin"</em> diyerek sizi tam QR kodun üzerine götürür.</li>
-                <li><strong>Klavye Kısayolları:</strong> <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code> (Mod değiştir), <code>Boşluk</code> (Fotoğraf çek ve betimle), <code>R</code> (3D sesli radarı aç/kapat), <code>C</code> (Ön/Arka kamera değiştir), <code>T</code> (Son yönlendirmeyi tekrarla).</li>
+                <li><strong>Çoklu Kare Onayı ve Kalman/EMA Filtresi:</strong> Tek karelik kamera parazitleri asla sesli komuta dönüşmez; hedef en az 4 ardışık karede doğrulanır ve el titremesi <code>X̂_t = 0.28·X_t + 0.72·X̂_{t-1}</code> formülüyle süzülür.</li>
+                <li><strong>Von Kries Beyaz Dengesi + CIELAB (ΔE) Renk Motoru:</strong> Ortamdaki sarı ampul sapmasını matematiksel olarak böler, insan gözü renk uzayında (L*a*b*) ΔE uzaklığıyla kumaşın gerçek rengini ve Sobel gradyan oranıyla düz/çizgili desenini bulur.</li>
+                <li><strong>Michelson Ters Işık ve Mahremiyet Denetimi:</strong> Kişi kutusu içi parlaklık ile arka plan oranını (<code>L_arka / L_kişi &gt; 2.05</code>) ölçer; silüet çıkmayı, baş/omuz kesilmesini ve arkada unutulmuş açık ekranları paylaşım öncesi haber verir.</li>
+                <li><strong>Z-Skorlu (3.5σ) Zemin Anomali &amp; LED Frekans (Hz) Ölçümü:</strong> Desenli halılarda yanlış alarmı otomatik kilitler; düz zeminde düşen cismi ve modem/şarj cihazlarındaki LED'in rengi ile saniyedeki yanıp sönme sayısını (Hz) hesaplar.</li>
+                <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>6</code> (Mod seç), <code>Boşluk</code> (Çek ve analiz et), <code>W</code> (WhatsApp 15sn ses kilidi), <code>F</code> (Flaş/Ekran ışığı), <code>R</code> (3D Radar), <code>C</code> (Kamera çevir), <code>T</code> (Son raporu tekrarla).</li>
             </ul>
         </section>
     </main>
 
     <footer role="contentinfo" class="app-footer">
-        <p>© 2026 Mikyas Studio — Görme Engelliler İçin %100 Ücretsiz ve Cihaz İçi Yapay Zeka Çözümü. Hiçbir görüntü sunucuya gönderilmez.</p>
+        <p>© 2026 Mikyas Studio — Görme Engelliler İçin %100 Cihaz İçi, Matematiksel Doğrulamalı Yapay Zeka Vizörü. Hiçbir görüntü sunucuya gönderilmez.</p>
     </footer>
 
     <script src="app.js"></script>
