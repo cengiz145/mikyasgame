@@ -4599,10 +4599,36 @@
     }
 
     /**
-     * Sözsüz Mırıldanma / Islık / Enstrüman Melodisi Eşleştirici:
-     * Kullanıcının mırıldandığı MIDI notalarının yarı-ton farklarını (Δm = MIDI[i] - MIDI[i-1])
-     * ve Parsons yön kodunu (Çıkış/İniş/Aynı) veritabanındaki melodilerle karşılaştırır.
+     * Dinamik Zaman Bükmesi (Dynamic Time Warping - DTW) Tabanlı Yarı-Ton Melodi Hizalama Motoru:
+     * Kullanıcı melodiyi orijinalinden daha hızlı, daha yavaş veya arada fazladan nefes/nota
+     * uzatmasıyla mırıldansa bile O(N*M) DTW maliyet matrisi ile zaman eksenini esneterek
+     * transpozisyondan ve tempodan bağımsız en doğru melodi eşleşmesini hesaplar.
      */
+    function computeSemitoneDtwSimilarity(seqA, seqB) {
+        const n = seqA.length;
+        const m = seqB.length;
+        if (n === 0 || m === 0) return 0;
+
+        const dp = Array.from({ length: n + 1 }, () => new Float32Array(m + 1).fill(1e6));
+        dp[0][0] = 0;
+
+        for (let i = 1; i <= n; i++) {
+            for (let j = 1; j <= m; j++) {
+                const diff = Math.abs(seqA[i - 1] - seqB[j - 1]);
+                const dirBonus = (Math.sign(seqA[i - 1]) === Math.sign(seqB[j - 1])) ? 0 : 0.65;
+                const cost = Math.max(0, diff - 0.35) + dirBonus;
+                dp[i][j] = cost + Math.min(
+                    dp[i - 1][j - 1], // birebir eşleşme
+                    dp[i - 1][j] + 0.85, // uzatılmış nota
+                    dp[i][j - 1] + 0.85  // atlanmış geçit notası
+                );
+            }
+        }
+
+        const normCost = dp[n][m] / Math.max(n, m);
+        return Math.max(0, Math.min(1, 1 - (normCost / 4.6)));
+    }
+
     function matchMelodyBySemitoneContour(midiNotes) {
         if (!Array.isArray(midiNotes) || midiNotes.length < 5) return null;
         const userIntervals = [];
@@ -4619,33 +4645,23 @@
             const ref = song.semitoneIntervals;
             if (!ref || ref.length < 5) continue;
 
-            const winLen = Math.min(userIntervals.length, ref.length);
-            let maxSlideSim = 0;
+            // Alt-pencere DTW taraması: şarkının giriş veya nakarat kesitiyle en iyi DTW uyumunu bul
+            const winLen = Math.min(userIntervals.length + 2, ref.length);
+            let maxDtwSim = computeSemitoneDtwSimilarity(userIntervals, ref);
 
             for (let offset = 0; offset <= Math.max(0, ref.length - winLen); offset++) {
-                let errSum = 0;
-                let dirMatches = 0;
-                for (let k = 0; k < winLen; k++) {
-                    const u = userIntervals[k];
-                    const r = ref[offset + k];
-                    errSum += Math.abs(u - r);
-                    if (Math.sign(u) === Math.sign(r) || Math.abs(u - r) <= 1) {
-                        dirMatches++;
-                    }
-                }
-                const meanErr = errSum / winLen;
-                const dirRatio = dirMatches / winLen;
-                const sim = Math.max(0, 1 - meanErr / 4.8) * 0.65 + dirRatio * 0.35;
-                if (sim > maxSlideSim) maxSlideSim = sim;
+                const subRef = ref.slice(offset, offset + winLen);
+                const sim = computeSemitoneDtwSimilarity(userIntervals, subRef);
+                if (sim > maxDtwSim) maxDtwSim = sim;
             }
 
-            if (maxSlideSim > bestScore) {
-                bestScore = maxSlideSim;
+            if (maxDtwSim > bestScore) {
+                bestScore = maxDtwSim;
                 bestSong = song;
             }
         }
 
-        if (bestSong && bestScore >= 0.58) {
+        if (bestSong && bestScore >= 0.57) {
             return {
                 song: bestSong,
                 confidencePct: Math.min(98, Math.round(bestScore * 100))
@@ -5183,7 +5199,7 @@
             ? 'Orijinal kaydını dinlemek için "Bulunan Şarkıyı Dinle" düğmesine basabilirsiniz.'
             : 'Tamamını YouTube düğmesiyle dinleyebilirsiniz.';
         const lyricsHint = state.songLyricLines.length > 0
-            ? ` Şarkının ${state.songLyricLines.length} mısralık sözlerini tek tek gezmek için Önceki ve Sonraki Mısra düğmelerini kullanabilirsiniz.`
+            ? ' Şarkının sözlerini dinlemek için Şarkı Sözlerini Oku düğmesine basabilirsiniz.'
             : '';
 
         announceGuidance(`${melodyPrefix}Sanatçı: ${foundTrack.artist}, Şarkı Adı: ${foundTrack.title}, Albüm: ${foundTrack.album}. ${previewHint}${lyricsHint}`, {
@@ -5192,11 +5208,50 @@
         });
     }
 
+    const songQueryCache = new Map();
+    const TURKISH_SPEECH_FILLER_STOPWORDS = new Set([
+        'evet', 'simdi', 'arkadaslar', 'yani', 'iste', 'sey', 'acaba', 'bu', 'su',
+        'calan', 'sarki', 'hangisi', 'nedir', 'dinle', 'bakalim', 'merhaba', 'alo'
+    ]);
+
+    function extractCleanAnchorQueries(rawText) {
+        const cleaned = String(rawText || '').replace(/[^\p{L}\p{N}\s']/gu, ' ').replace(/\s+/g, ' ').trim();
+        if (!cleaned) return [];
+        const words = cleaned.split(' ').filter(w => {
+            const norm = normalizeTurkishPhonetic(w);
+            return norm.length >= 2 && !TURKISH_SPEECH_FILLER_STOPWORDS.has(norm);
+        });
+        const queries = [cleaned];
+        if (words.length >= 2) {
+            const filteredPhrase = words.join(' ');
+            if (!queries.includes(filteredPhrase)) queries.unshift(filteredPhrase);
+        }
+        if (words.length > 5) {
+            const tailWindow = words.slice(-5).join(' ');
+            if (!queries.includes(tailWindow)) queries.push(tailWindow);
+        }
+        return queries.slice(0, 3);
+    }
+
+    async function fetchJsonWithTimeout(url, timeoutMs = 4500) {
+        const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timer = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
+        try {
+            const resp = await fetch(url, ctrl ? { signal: ctrl.signal } : undefined);
+            if (!resp.ok) return null;
+            return await resp.json();
+        } catch (_) {
+            return null;
+        } finally {
+            if (timer) clearTimeout(timer);
+        }
+    }
+
     /**
-     * Akıllı Çok Katmanlı Şarkı Arama Motoru:
-     * 1) Türkçe Fonetik 3-Gram Bulanık Eşleşme (Gürültülü ortamda eksik/bozuk duyulan kelimeleri tamamlar),
-     * 2) LRCLIB Küresel Tam Şarkı Sözü & Senkronize Karaoke Veritabanı,
-     * 3) Apple iTunes Türkiye Kataloğu + Sanatçının Diğer Popüler Eserleri Önericisi.
+     * Akıllı Çok Katmanlı Şarkı Arama Motoru (Paralel Sorgu, Önbellek ve Gürültü Filtreli Mimari):
+     * 1) Konuşma Gürültüsü Temizleyici + Türkçe Fonetik 3-Gram Bulanık Eşleşme,
+     * 2) AbortController Zaman Aşımlı Paralel LRCLIB + Apple iTunes Türkiye Kataloğu Taraması,
+     * 3) Bellek İçi (In-Memory LRU) Sorgu Önbelleği.
      */
     async function searchSongByLyricsOrQuery(rawQuery, melodyConfidencePct = null) {
         const query = String(rawQuery || '').trim();
@@ -5219,6 +5274,17 @@
             });
         }
 
+        const cacheKey = normalizeTurkishPhonetic(query);
+        if (cacheKey && songQueryCache.has(cacheKey)) {
+            const cached = songQueryCache.get(cacheKey);
+            state.songAlternatives = cached.alternatives;
+            applyFoundSongToUI(cached.foundTrack, cached.alternatives, melodyConfidencePct);
+            return;
+        }
+
+        const anchorQueries = extractCleanAnchorQueries(query);
+        const primaryQuery = anchorQueries[0] || query;
+
         let foundTrack = null;
         const alternativeCandidates = [];
 
@@ -5227,14 +5293,17 @@
         let bestOfflineItem = null;
         for (let i = 0; i < TURKISH_OFFLINE_SONG_DB.length; i++) {
             const item = TURKISH_OFFLINE_SONG_DB[i];
-            let maxSim = computeTrigramSimilarity(query, `${item.artist} ${item.title}`);
-            for (let k = 0; k < item.keywords.length; k++) {
-                const kwSim = computeTrigramSimilarity(query, item.keywords[k]);
-                if (kwSim > maxSim) maxSim = kwSim;
-            }
-            if (maxSim > bestOfflineSim) {
-                bestOfflineSim = maxSim;
-                bestOfflineItem = item;
+            for (let qIdx = 0; qIdx < anchorQueries.length; qIdx++) {
+                const qText = anchorQueries[qIdx];
+                let maxSim = computeTrigramSimilarity(qText, `${item.artist} ${item.title}`);
+                for (let k = 0; k < item.keywords.length; k++) {
+                    const kwSim = computeTrigramSimilarity(qText, item.keywords[k]);
+                    if (kwSim > maxSim) maxSim = kwSim;
+                }
+                if (maxSim > bestOfflineSim) {
+                    bestOfflineSim = maxSim;
+                    bestOfflineItem = item;
+                }
             }
         }
 
@@ -5249,88 +5318,95 @@
             };
         }
 
-        // 2. AŞAMA: LRCLIB Tam Şarkı Sözü Veritabanı Sorgusu
-        try {
-            const lrcResp = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(query)}`);
-            if (lrcResp.ok) {
-                const lrcList = await lrcResp.json();
-                if (Array.isArray(lrcList) && lrcList.length > 0) {
-                    lrcList.slice(0, 4).forEach((item, idx) => {
-                        const cand = {
-                            title: item.trackName || item.name || 'Bilinmeyen Şarkı',
-                            artist: item.artistName || 'Bilinmeyen Sanatçı',
-                            album: item.albumName || 'Albüm Bilgisi Yok',
-                            genre: 'Müzik',
-                            lyrics: item.plainLyrics || item.syncedLyrics || '',
-                            previewUrl: ''
+        // 2. AŞAMA: Paralel LRCLIB + Apple iTunes Türkiye Sorgu Hattı (Promise.allSettled)
+        const lrcUrl = `https://lrclib.net/api/search?q=${encodeURIComponent(primaryQuery)}`;
+        const itunesInitialTerm = foundTrack ? `${foundTrack.artist} ${foundTrack.title}` : primaryQuery;
+        const itunesUrl = `https://itunes.apple.com/search?term=${encodeURIComponent(itunesInitialTerm)}&country=TR&media=music&limit=5`;
+
+        const [lrcRes, itunesRes] = await Promise.allSettled([
+            fetchJsonWithTimeout(lrcUrl, 4500),
+            fetchJsonWithTimeout(itunesUrl, 4500)
+        ]);
+
+        const lrcList = lrcRes.status === 'fulfilled' ? lrcRes.value : null;
+        if (Array.isArray(lrcList) && lrcList.length > 0) {
+            lrcList.slice(0, 4).forEach((item, idx) => {
+                const cand = {
+                    title: item.trackName || item.name || 'Bilinmeyen Şarkı',
+                    artist: item.artistName || 'Bilinmeyen Sanatçı',
+                    album: item.albumName || 'Albüm Bilgisi Yok',
+                    genre: 'Müzik',
+                    lyrics: item.plainLyrics || item.syncedLyrics || '',
+                    previewUrl: ''
+                };
+                if (idx === 0 && !foundTrack) {
+                    foundTrack = cand;
+                } else if (idx === 0 && foundTrack && cand.lyrics.length > (foundTrack.lyrics || '').length) {
+                    foundTrack.lyrics = cand.lyrics;
+                } else {
+                    alternativeCandidates.push(cand);
+                }
+            });
+        }
+
+        let itData = itunesRes.status === 'fulfilled' ? itunesRes.value : null;
+        // Eğer LRCLIB şarkıyı sözden bulduysa ve iTunes ilk sorguda farklı terim aradıysa, bulunan şarkının ses önizlemesini tamamla
+        if (foundTrack && (!itData || !Array.isArray(itData.results) || itData.results.length === 0 || itunesInitialTerm === primaryQuery)) {
+            const exactTerm = `${foundTrack.artist} ${foundTrack.title}`;
+            if (normalizeTurkishPhonetic(exactTerm) !== normalizeTurkishPhonetic(itunesInitialTerm)) {
+                const enrichedItunes = await fetchJsonWithTimeout(
+                    `https://itunes.apple.com/search?term=${encodeURIComponent(exactTerm)}&country=TR&media=music&limit=5`,
+                    3800
+                );
+                if (enrichedItunes && Array.isArray(enrichedItunes.results) && enrichedItunes.results.length > 0) {
+                    itData = enrichedItunes;
+                }
+            }
+        }
+
+        if (itData && Array.isArray(itData.results) && itData.results.length > 0) {
+            itData.results.forEach((hit, idx) => {
+                const releaseYear = hit.releaseDate ? hit.releaseDate.slice(0, 4) : '';
+                const albumStr = `${hit.collectionName || 'Tekli'}${releaseYear ? ' (' + releaseYear + ')' : ''}`;
+                if (idx === 0) {
+                    if (!foundTrack) {
+                        foundTrack = {
+                            title: hit.trackName || 'Bilinmeyen Şarkı',
+                            artist: hit.artistName || 'Bilinmeyen Sanatçı',
+                            album: albumStr,
+                            genre: hit.primaryGenreName || 'Müzik',
+                            lyrics: '',
+                            previewUrl: hit.previewUrl || ''
                         };
-                        if (idx === 0 && !foundTrack) {
-                            foundTrack = cand;
-                        } else if (idx === 0 && foundTrack && cand.lyrics.length > (foundTrack.lyrics || '').length) {
-                            foundTrack.lyrics = cand.lyrics;
-                        } else {
-                            alternativeCandidates.push(cand);
+                    } else {
+                        if (hit.previewUrl) foundTrack.previewUrl = hit.previewUrl;
+                        if (hit.primaryGenreName) foundTrack.genre = hit.primaryGenreName;
+                        if ((!foundTrack.album || foundTrack.album === 'Albüm Bilgisi Yok') && hit.collectionName) {
+                            foundTrack.album = albumStr;
                         }
-                    });
-                }
-            }
-        } catch (_) {}
-
-        // 3. AŞAMA: Apple iTunes Türkiye Müzik Kataloğu + Sanatçının Diğer Eserleri
-        try {
-            const itunesSearchTerm = foundTrack
-                ? `${foundTrack.artist} ${foundTrack.title}`
-                : query;
-            const itResp = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(itunesSearchTerm)}&country=TR&media=music&limit=5`);
-            if (itResp.ok) {
-                const itData = await itResp.json();
-                if (itData && Array.isArray(itData.results) && itData.results.length > 0) {
-                    itData.results.forEach((hit, idx) => {
-                        const releaseYear = hit.releaseDate ? hit.releaseDate.slice(0, 4) : '';
-                        const albumStr = `${hit.collectionName || 'Tekli'}${releaseYear ? ' (' + releaseYear + ')' : ''}`;
-                        if (idx === 0) {
-                            if (!foundTrack) {
-                                foundTrack = {
-                                    title: hit.trackName || 'Bilinmeyen Şarkı',
-                                    artist: hit.artistName || 'Bilinmeyen Sanatçı',
-                                    album: albumStr,
-                                    genre: hit.primaryGenreName || 'Müzik',
-                                    lyrics: '',
-                                    previewUrl: hit.previewUrl || ''
-                                };
-                            } else {
-                                if (hit.previewUrl) foundTrack.previewUrl = hit.previewUrl;
-                                if (hit.primaryGenreName) foundTrack.genre = hit.primaryGenreName;
-                                if ((!foundTrack.album || foundTrack.album === 'Albüm Bilgisi Yok') && hit.collectionName) {
-                                    foundTrack.album = albumStr;
-                                }
-                            }
-                        } else {
-                            alternativeCandidates.push({
-                                title: hit.trackName || 'Şarkı',
-                                artist: hit.artistName || 'Sanatçı',
-                                album: albumStr,
-                                genre: hit.primaryGenreName || 'Müzik',
-                                lyrics: '',
-                                previewUrl: hit.previewUrl || ''
-                            });
-                        }
-                    });
-
-                    if (foundTrack && !foundTrack.lyrics) {
-                        try {
-                            const lrcFollow = await fetch(`https://lrclib.net/api/search?q=${encodeURIComponent(foundTrack.artist + ' ' + foundTrack.title)}`);
-                            if (lrcFollow.ok) {
-                                const followArr = await lrcFollow.json();
-                                if (Array.isArray(followArr) && followArr.length > 0 && followArr[0].plainLyrics) {
-                                    foundTrack.lyrics = followArr[0].plainLyrics;
-                                }
-                            }
-                        } catch (_) {}
                     }
+                } else {
+                    alternativeCandidates.push({
+                        title: hit.trackName || 'Şarkı',
+                        artist: hit.artistName || 'Sanatçı',
+                        album: albumStr,
+                        genre: hit.primaryGenreName || 'Müzik',
+                        lyrics: '',
+                        previewUrl: hit.previewUrl || ''
+                    });
+                }
+            });
+
+            if (foundTrack && !foundTrack.lyrics) {
+                const followArr = await fetchJsonWithTimeout(
+                    `https://lrclib.net/api/search?q=${encodeURIComponent(foundTrack.artist + ' ' + foundTrack.title)}`,
+                    3500
+                );
+                if (Array.isArray(followArr) && followArr.length > 0 && followArr[0].plainLyrics) {
+                    foundTrack.lyrics = followArr[0].plainLyrics;
                 }
             }
-        } catch (_) {}
+        }
 
         if (!foundTrack) {
             if (el.songStatusBadge) el.songStatusBadge.textContent = 'Eşleşme Bulunamadı';
@@ -5343,7 +5419,18 @@
             return;
         }
 
-        // Eğer Kafe/Radyo Sürekli Takip modundaysak ve aynı şarkı çalmaya devam ediyorsa tekrar tekrar konuşup rahatsız etme
+        if (cacheKey) {
+            if (songQueryCache.size > 40) {
+                const oldestKey = songQueryCache.keys().next().value;
+                songQueryCache.delete(oldestKey);
+            }
+            songQueryCache.set(cacheKey, {
+                foundTrack,
+                alternatives: alternativeCandidates
+            });
+        }
+
+        // Eğer Otomatik Şarkı Takibi modundaysak ve aynı şarkı çalmaya devam ediyorsa tekrar tekrar konuşup rahatsız etme
         if (state.songAutoRadarEnabled && state.lastFoundSong &&
             state.lastFoundSong.title === foundTrack.title &&
             state.lastFoundSong.artist === foundTrack.artist) {
@@ -5360,7 +5447,7 @@
         if (el.btnSongAutoRadar) {
             el.btnSongAutoRadar.classList.toggle('active-toggle', state.songAutoRadarEnabled);
             el.btnSongAutoRadar.setAttribute('aria-pressed', String(state.songAutoRadarEnabled));
-            el.btnSongAutoRadar.textContent = `📡 Sürekli Şarkı Takibi (Kafe/Radyo): ${state.songAutoRadarEnabled ? 'Açık' : 'Kapalı'}`;
+            el.btnSongAutoRadar.textContent = `📡 Otomatik Şarkı Takibi: ${state.songAutoRadarEnabled ? 'Açık' : 'Kapalı'}`;
         }
 
         if (state.songAutoRadarInterval) {
@@ -5369,7 +5456,7 @@
         }
 
         if (state.songAutoRadarEnabled) {
-            announceGuidance('Sürekli Şarkı Takibi (Kafe ve Radyo Modu) açıldı! Ortamda çalan her yeni şarkıyı otomatik dinleyip size adını ve sanatçısını haber vereceğim.', {
+            announceGuidance('Otomatik Şarkı Takibi açıldı! Ortamda çalan her yeni şarkıyı otomatik dinleyip size adını ve sanatçısını haber vereceğim.', {
                 force: true,
                 bannerState: 'centered'
             });
@@ -5381,7 +5468,7 @@
             }, 22000);
         } else {
             stopSongListening();
-            announceGuidance('Sürekli şarkı takibi kapatıldı.', { force: true });
+            announceGuidance('Otomatik şarkı takibi kapatıldı.', { force: true });
         }
     }
 
@@ -5519,11 +5606,23 @@
             'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya çamaşır makinesi ekranını okutmak için Boşluk tuşuna basın.',
             'food_freshness': '13. Bölüm: Yiyecek Küflü mü ve Paket İçeriği Okuyucu açıldı. Ekmeği, meyveyi veya market paketini kameraya gösterin.',
             'social_presence': '14. Bölüm: Odada Kim Var ve Bana Bakıyor mu Yardımcısı açıldı. Kulaklık gerekmez; odadakiler duymasın diye karşınızdaki kişi size baktığında telefon avucunuzda çift titrer. Sesli söylemesini isterseniz ekrana çift dokunun veya T tuşuna basın.',
-            'song_finder': '15. Bölüm: Bu Çalan Hangi Şarkı? Sesli Şarkı, Melodi ve Söz Bulucu açıldı. Çalan şarkıyı dinletmek veya hatırladığınız birkaç kelimesini söylemek için H tuşuna veya Şarkıyı Dinle düğmesine basın.'
+            'song_finder': '15. Bölüm: Bu Çalan Hangi Şarkı? Sesli Şarkı, Melodi ve Söz Bulucu açıldı; mikrofon otomatik olarak dinlemeye başlıyor.'
         }[newMode];
 
         if (modeAnnouncement) {
             announceGuidance(modeAnnouncement, { force: true, bannerState: 'normal' });
+        }
+
+        if (newMode === 'song_finder') {
+            if (!state.songListening) {
+                setTimeout(() => {
+                    if (state.mode === 'song_finder' && !state.songListening) {
+                        toggleSongListening();
+                    }
+                }, 1400);
+            }
+        } else if (state.songListening && !state.songAutoRadarEnabled) {
+            stopSongListening();
         }
     }
 
