@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Erişilebilir Kamera Uygulaması</string>
-    <string name="accessibility_service_label">Erişilebilir Kamera: WhatsApp ve QR Sesli Hizalama</string>
-    <string name="accessibility_service_description">Bir kamera uygulamasından fazlasını ayağınıza getiriyoruz. WhatsApp Cihaz Bağla ve mobil bankacılık QR ekranlarında ekran görüntüsünü analiz ederek telefonu nereye tutacağınızı Türkçe sesle ve 3D radarla bildirir. Ses Açma ve Ses Kısma tuşlarıyla kontrol edilir.</string>
+    <string name="accessibility_service_label">Erişilebilir Kamera: Sesli Ekran Ortalama Asistanı</string>
+    <string name="accessibility_service_description">Görme engelli kullanıcılar için sesli hizalama ve yönlendirme aracıdır. Ses Açma tuşuna çift basıldığında ekran parlaklık merkezini hesaplayarak telefonu doğru yöne tutmanız için Türkçe sesli rehberlik sağlar.</string>
 </resources>
-

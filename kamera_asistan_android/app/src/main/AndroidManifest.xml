@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
@@ -19,7 +18,6 @@
         android:roundIcon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
 
         <activity
@@ -44,7 +42,7 @@
             </intent-filter>
         </activity>
 
-        <!-- WhatsApp ve Banka QR Ekranlarında Arka Planda Çalışan Erişilebilirlik Servisi -->
+        <!-- Görme Engelliler İçin Sesli Ekran Ortalama Erişilebilirlik Aracı -->
         <service
             android:name=".MikyasOverlayAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"

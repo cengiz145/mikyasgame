@@ -57,7 +57,7 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
             if (now - lastVolUpPress < 450) {
                 liveScanActive = !liveScanActive;
                 if (liveScanActive) {
-                    speakTurkish("Mikyas WhatsApp ve QR ekran radarı devreye girdi. Telefonu bilgisayar ekranına tutun.", true);
+                    speakTurkish("Sesli ekran ortalama radarı devreye girdi. Telefonu bilgisayar ekranına tutun.", true);
                     triggerPeriodicScreenAnalysis(8);
                 } else {
                     speakTurkish("Ekran radarı kapatıldı.", true);
@@ -169,3 +169,4 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
         super.onDestroy();
     }
 }
+
