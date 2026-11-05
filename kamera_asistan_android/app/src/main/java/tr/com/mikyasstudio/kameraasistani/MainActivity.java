@@ -23,6 +23,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
@@ -45,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
         extractSharedImageIfPresent(getIntent());
 
         webView = new WebView(this);
+        webView.setBackgroundColor(0xFF0F172A);
+        ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
+            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
+            v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
         setContentView(webView);
 
         WebSettings settings = webView.getSettings();

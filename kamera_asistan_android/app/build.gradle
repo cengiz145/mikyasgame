@@ -4,14 +4,14 @@ plugins {
 
 android {
     namespace 'tr.com.mikyasstudio.kameraasistani'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "tr.com.mikyasstudio.erisilebilirkamera"
         minSdk 24
-        targetSdk 33
-        versionCode 6
-        versionName "6.0.0"
+        targetSdk 36
+        versionCode 7
+        versionName "7.0.0"
     }
 
     signingConfigs {
