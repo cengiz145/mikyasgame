@@ -217,6 +217,13 @@
         moneyCounterPanel: document.getElementById('money-counter-panel'),
         qiblaCompassPanel: document.getElementById('qibla-compass-panel'),
         songFinderPanel: document.getElementById('song-finder-panel'),
+        busStopPanel: document.getElementById('bus-stop-panel'),
+        posIbanPanel: document.getElementById('pos-iban-panel'),
+        itemMemoryPanel: document.getElementById('item-memory-panel'),
+        tvSubtitlePanel: document.getElementById('tv-subtitle-panel'),
+        sockOutfitPanel: document.getElementById('sock-outfit-panel'),
+        whereAmIPanel: document.getElementById('where-am-i-panel'),
+        categoryTabs: document.querySelectorAll('.category-tab'),
         modeButtons: document.querySelectorAll('.mode-card'),
         aiStatusBadge: document.getElementById('ai-status-badge'),
         liveDirectionBox: document.getElementById('live-direction-box'),
@@ -1392,6 +1399,18 @@
             handleFoodFreshnessLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
         } else if (state.mode === 'social_presence') {
             handleSocialPresenceLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
+        } else if (state.mode === 'bus_stop_tracker') {
+            handleBusStopLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
+        } else if (state.mode === 'pos_iban_reader') {
+            handleDoorElevatorLcdLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics);
+        } else if (state.mode === 'item_memory') {
+            handleItemMemoryLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
+        } else if (state.mode === 'tv_subtitle_score') {
+            handleTvSubtitleLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
+        } else if (state.mode === 'sock_outfit_check') {
+            handleSockAndOutfitLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics);
+        } else if (state.mode === 'where_am_i') {
+            handleExplorerMode(anW, anH, scaleX, scaleY, ovCtx, predictions);
         }
     }
 
@@ -4116,6 +4135,52 @@
                         force: true,
                         bannerState: 'centered'
                     });
+                    return;
+                }
+
+                // ÖZEL MOD 16: OTOBÜS / MİNİBÜS HAT NUMARASI VE DURAK TABELASI OKUYUCU
+                if (state.mode === 'bus_stop_tracker') {
+                    const busReport = processBusRouteOcrResult(cleanText, preds);
+                    showDetectedResult('🚌 Otobüs / Minibüs Hat Numarası ve Durak Raporu', busReport.fullText);
+                    announceGuidance(busReport.speechText, { force: true, bannerState: 'centered' });
+                    return;
+                }
+
+                // ÖZEL MOD 17: POS CİHAZI TUTARI DOĞRULAYICI VE TEK TUŞLA IBAN KOPYALAYICI
+                if (state.mode === 'pos_iban_reader') {
+                    const posIban = processPosAmountAndIbanText(cleanText);
+                    showDetectedResult('💳 POS Cihazı Tutarı ve IBAN Raporu', posIban.fullText);
+                    announceGuidance(posIban.speechText, { force: true, bannerState: 'centered' });
+                    return;
+                }
+
+                // ÖZEL MOD 18: EŞYAMI NEREYE KOYDUM VE KAVANOZ / KUTU TANITICI
+                if (state.mode === 'item_memory') {
+                    const jarMatch = matchOrDescribeJarAndMemoryItem(capCanvas, metrics, cleanText);
+                    showDetectedResult('🎙️ Eşya Hafızası ve Kavanoz / Kutu Tanıma', jarMatch.fullText);
+                    announceGuidance(jarMatch.speechText, { force: true, bannerState: 'centered' });
+                    return;
+                }
+
+                // ÖZEL MOD 19: TELEVİZYON ALTYAZI OKUYUCU VE CANLI MAÇ SKORU SPİKERİ
+                if (state.mode === 'tv_subtitle_score') {
+                    const tvReport = processTvSubtitleAndScoreText(cleanText, false);
+                    showDetectedResult('📺 Televizyon Altyazı ve Canlı Maç Skoru', tvReport.fullText);
+                    announceGuidance(tvReport.speechText, { force: true, bannerState: 'centered' });
+                    return;
+                }
+
+                // ÖZEL MOD 20: ÇORAP EŞLEŞTİRİCİ, KOMBİN UYUMU VE LEKE KONTROLÜ
+                if (state.mode === 'sock_outfit_check') {
+                    const sockReport = analyzeSocksAndOutfitStains(capCanvas, metrics, cleanText);
+                    showDetectedResult('🧦 Çorap Eşleştirme, Kombin ve Leke Raporu', sockReport.fullText);
+                    announceGuidance(sockReport.speechText, { force: true, bannerState: 'centered' });
+                    return;
+                }
+
+                // ÖZEL MOD 21: TAM OLARAK NEREDEYİM (SOKAK + TABELA + WHATSAPP KONUM TARİFİ)
+                if (state.mode === 'where_am_i') {
+                    await announceWhereAmIFullAddressAndSignboard(cleanText, preds);
                     return;
                 }
 
@@ -7097,6 +7162,766 @@
         setTimeout(() => toggleSongListening(), 900);
     }
 
+    // =========================================================================
+    // 6.5. YENİ HAYAT ALANI KATEGORİLERİ VE 16-21 ARASI EFSANE GÜNLÜK YAŞAM MODLARI
+    // =========================================================================
+    const LIFE_CATEGORY_LABELS = {
+        'all': 'Tüm Hayat Alanları (21 Özellik Bir Arada)',
+        'ev_mutfak': 'Evde ve Mutfakta Lazım Olan 5 Yardımcı',
+        'sokak_ulasim': 'Sokakta, Otobüste ve Yolda Lazım Olan 4 Yardımcı',
+        'alisveris_odeme': 'Alışverişte, Kasada ve Bankada Lazım Olan 3 Yardımcı',
+        'giyim_saglik': 'Giyinirken, Bakımda ve Sağlıkta Lazım Olan 3 Yardımcı',
+        'egitim_ibadet': 'Sınavda, Okulda ve İbadette Lazım Olan 2 Yardımcı',
+        'medya_ortam': 'Televizyonda, Müzikte ve Ortamda Lazım Olan 4 Yardımcı'
+    };
+
+    function filterModesByLifeCategory(catId) {
+        if (!el.categoryTabs || !el.modeButtons) return;
+        el.categoryTabs.forEach(tab => {
+            const isSel = tab.getAttribute('data-category') === catId;
+            tab.classList.toggle('active-toggle', isSel);
+            tab.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+        });
+        let visibleCount = 0;
+        let firstVisibleMode = null;
+        el.modeButtons.forEach(btn => {
+            const btnCat = btn.getAttribute('data-category') || 'all';
+            const show = (catId === 'all' || btnCat === catId);
+            btn.hidden = !show;
+            btn.style.display = show ? '' : 'none';
+            if (show) {
+                visibleCount++;
+                if (!firstVisibleMode) {
+                    firstVisibleMode = btn.getAttribute('data-mode');
+                }
+            }
+        });
+        const label = LIFE_CATEGORY_LABELS[catId] || 'Seçili Kategori';
+        announceGuidance(`${label} açıldı. Bu bölümde ${visibleCount} özellik listeleniyor.`, {
+            force: true,
+            bannerState: 'normal'
+        });
+    }
+
+    // --- MOD 16: OTOBÜS NUMARASI YAKALAYICI VE DURAĞA YAKLAŞMA ALARMI ---
+    state.busTargetStop = null;
+    state.busStopWatchTimer = null;
+    state.busStopAlert300Fired = false;
+    state.busStopAlert60Fired = false;
+    state.lastSeenBusRoute = '';
+
+    const POPULAR_STOP_LANDMARKS = [
+        { name: 'Kadıköy İskele', lat: 40.9917, lon: 29.0230 },
+        { name: 'Mecidiyeköy Meydan', lat: 41.0672, lon: 28.9958 },
+        { name: 'Taksim Meydan', lat: 41.0369, lon: 28.9850 },
+        { name: 'Beşiktaş Meydan', lat: 41.0422, lon: 29.0067 },
+        { name: 'Üsküdar İskele', lat: 41.0264, lon: 29.0151 },
+        { name: 'Bakırköy Meydan', lat: 40.9792, lon: 28.8722 },
+        { name: 'Avcılar Merkez', lat: 40.9796, lon: 28.7214 },
+        { name: 'Beylikdüzü Meydan', lat: 41.0014, lon: 28.6419 },
+        { name: 'Pendik Köprüsü', lat: 40.8878, lon: 29.2544 },
+        { name: 'Kartal Meydan', lat: 40.8886, lon: 29.1856 },
+        { name: 'Ankara Kızılay Meydan', lat: 39.9208, lon: 32.8541 },
+        { name: 'Ankara Ulus', lat: 39.9417, lon: 32.8543 },
+        { name: 'İzmir Konak Meydan', lat: 38.4189, lon: 27.1287 },
+        { name: 'İzmir Bornova', lat: 38.4622, lon: 27.2164 },
+        { name: 'Bursa Heykel / Osmangazi', lat: 40.1826, lon: 29.0669 },
+        { name: 'Antalya Meydan', lat: 36.8874, lon: 30.7075 }
+    ];
+
+    function handleBusStopLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
+        const busPred = predictions.find(p => p.class === 'bus' || p.class === 'car' || p.class === 'truck');
+        if (busPred) {
+            const [bx, by, bw, bh] = busPred.bbox;
+            ovCtx.strokeStyle = '#fb923c';
+            ovCtx.lineWidth = 4;
+            ovCtx.strokeRect(bx * scaleX, by * scaleY, bw * scaleX, bh * scaleY);
+            el.tPosition.textContent = busPred.class === 'bus' ? 'Otobüs Yaklaşıyor!' : 'Araç Göründü';
+            el.tDistance.textContent = 'Hat Okunuyor...';
+            if (busPred.class === 'bus') {
+                announceGuidance('Karşıdan otobüs veya minibüs yaklaşıyor! Hat numarasını okumak için kamerayı aracın ön camına doğru sabit tutun veya Boşluk tuşuna basın.', {
+                    bannerState: 'centered',
+                    minIntervalMs: 3800
+                });
+                if (state.autoCaptureEnabled && !state.isProcessingOcr) {
+                    captureAndDescribePhoto(true);
+                }
+                return;
+            }
+        }
+        el.tPosition.textContent = 'Yol Taranıyor';
+        el.tDistance.textContent = state.busTargetStop ? `Durak: ${state.busTargetStop.name}` : 'Otobüs Bekleniyor';
+        announceGuidance('Kamerayı durağa yaklaşan otobüs yönüne tutun; araç göründüğünde hat numarasını sesli okuyacağım.', {
+            bannerState: 'normal',
+            minIntervalMs: 6500
+        });
+    }
+
+    function processBusRouteOcrResult(cleanText, preds) {
+        const upper = String(cleanText || '').toUpperCase();
+        const routeMatches = upper.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3}|[1-9]\d{0,3})\b/g) || [];
+        const filteredRoutes = [...new Set(routeMatches)].filter(tok => tok.length >= 2 && tok !== '2026');
+        const hasBus = Array.isArray(preds) && preds.some(p => p.class === 'bus');
+        const badgeEl = document.getElementById('bus-seen-number');
+
+        if (filteredRoutes.length > 0) {
+            const topRoute = filteredRoutes.slice(0, 3).join(', ');
+            state.lastSeenBusRoute = topRoute;
+            if (badgeEl) badgeEl.textContent = `${topRoute} Numaralı Hat`;
+            if (navigator.vibrate) navigator.vibrate([180, 70, 220]);
+            const speech = `Dikkat! Yaklaşan otobüs veya tabelada okunan hat numarası: ${topRoute}. ${cleanText.replace(/\s+/g, ' ').slice(0, 120)}`;
+            return {
+                speechText: speech,
+                fullText: `Okunan Hat Numarası: ${topRoute}\nAraç Algılandı mı: ${hasBus ? 'Evet (Otobüs/Minibüs)' : 'Tabela / Ön Yazı'}\n\nTam Okunan Metin:\n${cleanText}`
+            };
+        }
+        const fallbackSpeech = hasBus
+            ? 'Otobüs algılandı ancak ön tabeladaki hat numarası tam seçilemedi, lütfen biraz daha yaklaşınca tekrar okutun.'
+            : (cleanText ? `Durak veya tabela yazısı: ${cleanText.replace(/\s+/g, ' ')}` : 'Henüz otobüs hat numarası algılanmadı.');
+        return {
+            speechText: fallbackSpeech,
+            fullText: fallbackSpeech
+        };
+    }
+
+    async function setBusDestinationStopAlarm(queryStr) {
+        const q = String(queryStr || '').trim();
+        if (!q) {
+            announceGuidance('Lütfen ineceğiniz durağın veya semtin adını yazın ya da Sesle Söyle düğmesine basın.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const remEl = document.getElementById('bus-remaining-distance');
+        const badgeEl = document.getElementById('bus-stop-badge');
+        if (remEl) remEl.textContent = `"${q}" aranıyor...`;
+
+        let target = null;
+        const qLower = q.toLocaleLowerCase('tr-TR');
+        for (const lm of POPULAR_STOP_LANDMARKS) {
+            if (lm.name.toLocaleLowerCase('tr-TR').includes(qLower) || qLower.includes(lm.name.toLocaleLowerCase('tr-TR'))) {
+                target = { name: lm.name, lat: lm.lat, lon: lm.lon };
+                break;
+            }
+        }
+        if (!target && typeof TURKEY_81_CITIES !== 'undefined') {
+            for (const c of TURKEY_81_CITIES) {
+                if (c[0].toLocaleLowerCase('tr-TR').includes(qLower)) {
+                    target = { name: `${c[0]} Merkez`, lat: c[1], lon: c[2] };
+                    break;
+                }
+            }
+        }
+        if (!target) {
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=tr&limit=1&q=${encodeURIComponent(q)}`;
+                const res = await fetch(url, { headers: { 'Accept-Language': 'tr' } });
+                if (res.ok) {
+                    const arr = await res.json();
+                    if (Array.isArray(arr) && arr.length > 0) {
+                        target = {
+                            name: (arr[0].display_name || q).split(',').slice(0, 2).join(', '),
+                            lat: parseFloat(arr[0].lat),
+                            lon: parseFloat(arr[0].lon)
+                        };
+                    }
+                }
+            } catch (_) {}
+        }
+
+        if (!target) {
+            announceGuidance(`"${q}" durağı için konum bulunamadı. Lütfen semt veya cadde adıyla tekrar deneyin ya da bulunduğunuz yeri durak olarak kaydedin.`, { force: true, bannerState: 'warning' });
+            if (remEl) remEl.textContent = 'Durak konumu bulunamadı';
+            return;
+        }
+
+        state.busTargetStop = target;
+        state.busStopAlert300Fired = false;
+        state.busStopAlert60Fired = false;
+        if (badgeEl) badgeEl.textContent = `Hedef: ${target.name}`;
+        if (state.busStopWatchTimer) clearInterval(state.busStopWatchTimer);
+        state.busStopWatchTimer = setInterval(() => checkBusDestinationDistance(false), 7000);
+        checkBusDestinationDistance(true);
+    }
+
+    function computeDistanceMetersHaversine(lat1, lon1, lat2, lon2) {
+        const R = 6371000;
+        const toRad = d => (d * Math.PI) / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLon = toRad(lon2 - lon1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    }
+
+    function checkBusDestinationDistance(speakImmediately = true) {
+        if (!state.busTargetStop) {
+            if (speakImmediately) {
+                announceGuidance('Henüz hedef durak seçilmedi. Önce ineceğiniz durağın adını yazıp veya söyleyip alarm kurun.', { force: true });
+            }
+            return;
+        }
+        if (!state.userLat || !state.userLon) {
+            autoAcquireLocationAndWatch();
+            if (speakImmediately) {
+                announceGuidance(`${state.busTargetStop.name} durağı için alarm kuruldu, GPS konumunuz alınıyor.`, { force: true });
+            }
+            return;
+        }
+        const distM = computeDistanceMetersHaversine(state.userLat, state.userLon, state.busTargetStop.lat, state.busTargetStop.lon);
+        const remEl = document.getElementById('bus-remaining-distance');
+        const distFormatted = distM >= 1000 ? `${(distM / 1000).toFixed(1)} kilometre (${distM} metre)` : `${distM} metre`;
+        if (remEl) remEl.textContent = `${state.busTargetStop.name} — Kalan: ${distFormatted}`;
+
+        if (distM <= 70 && !state.busStopAlert60Fired) {
+            state.busStopAlert60Fired = true;
+            radar.playLockedChime();
+            if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 400]);
+            announceGuidance(`DİKKAT! İneceğiniz ${state.busTargetStop.name} durağına geldiniz! Sadece ${distM} metre kaldı, şimdi inme düğmesine basın!`, {
+                force: true,
+                bannerState: 'centered'
+            });
+            return;
+        }
+        if (distM <= 320 && !state.busStopAlert300Fired) {
+            state.busStopAlert300Fired = true;
+            if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
+            announceGuidance(`Hazırlanın! İneceğiniz ${state.busTargetStop.name} durağına ${distM} metre kaldı. Kapıya doğru hazırlanabilirsiniz.`, {
+                force: true,
+                bannerState: 'warning'
+            });
+            return;
+        }
+        if (speakImmediately) {
+            announceGuidance(`Hedef durağınız: ${state.busTargetStop.name}. Şu an kalan mesafe: ${distFormatted}. Durağa 300 metre ve 50 metre kala size sesli ve titreşimli haber vereceğim.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        }
+    }
+
+    function saveCurrentGpsAsBusStop() {
+        if (!state.userLat || !state.userLon) {
+            announceGuidance('Henüz GPS konumunuz alınamadı, lütfen birkaç saniye sonra tekrar deneyin.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const inp = document.getElementById('bus-dest-input');
+        const customName = (inp && inp.value.trim()) ? inp.value.trim() : 'Kayıtlı Favori Durağım';
+        state.busTargetStop = { name: customName, lat: state.userLat, lon: state.userLon };
+        try {
+            localStorage.setItem('mikyas_saved_bus_stop', JSON.stringify(state.busTargetStop));
+        } catch (_) {}
+        announceGuidance(`Şu an bulunduğunuz konum "${customName}" olarak kaydedildi.`, { force: true, bannerState: 'centered' });
+    }
+
+    function cancelBusStopAlarm() {
+        if (state.busStopWatchTimer) {
+            clearInterval(state.busStopWatchTimer);
+            state.busStopWatchTimer = null;
+        }
+        state.busTargetStop = null;
+        const remEl = document.getElementById('bus-remaining-distance');
+        if (remEl) remEl.textContent = 'Durak alarmı kapatıldı';
+        announceGuidance('Durak yaklaşma alarmı kapatıldı.', { force: true });
+    }
+
+    // --- MOD 17: POS CİHAZI TUTARI DOĞRULAYICI VE TEK TUŞLA IBAN KOPYALAYICI ---
+    state.lastDetectedIban = '';
+    state.lastDetectedPosAmount = '';
+
+    function validateTurkishIbanMod97(rawIbanCandidate) {
+        const cleaned = String(rawIbanCandidate || '')
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, '')
+            .replace(/^TR/, 'TR');
+        if (!cleaned.startsWith('TR') || cleaned.length !== 26) return null;
+        const body = cleaned.slice(2)
+            .replace(/O/g, '0')
+            .replace(/I/g, '1')
+            .replace(/S/g, '5')
+            .replace(/B/g, '8');
+        if (!/^\d{24}$/.test(body)) return null;
+        const fullIban = 'TR' + body;
+        // ISO 7064 Mod 97-10 kontrolü: İlk 4 karakteri sona taşı, T=29, R=27
+        const rearranged = body.slice(2) + '2927' + body.slice(0, 2);
+        let remainder = 0;
+        for (let i = 0; i < rearranged.length; i++) {
+            remainder = (remainder * 10 + parseInt(rearranged[i], 10)) % 97;
+        }
+        return {
+            iban: fullIban,
+            formatted: fullIban.replace(/(.{4})/g, '$1 ').trim(),
+            isValidChecksum: remainder === 1
+        };
+    }
+
+    function processPosAmountAndIbanText(cleanText) {
+        const text = String(cleanText || '');
+        const compactNoSpaces = text.toUpperCase().replace(/[\s\-.,]/g, '');
+        const ibanRegex = /TR[0-9OISB]{24}/g;
+        const rawIbans = compactNoSpaces.match(ibanRegex) || [];
+        let foundIbanObj = null;
+        for (const cand of rawIbans) {
+            const checked = validateTurkishIbanMod97(cand);
+            if (checked) {
+                foundIbanObj = checked;
+                if (checked.isValidChecksum) break;
+            }
+        }
+
+        // POS veya Fiş Tutarı Yakalama
+        const amountMatches = text.match(/(?:TUTAR|TOPLAM|SATIŞ|ODEME|ÖDEME|NAKİT|KART|TL|₺)?\s*\b\d{1,6}(?:[.,]\d{2})?\s*(?:TL|₺|TÜRK LİRASI|LİRA)\b/gi)
+            || text.match(/\b\d{1,5}[.,]\d{2}\b/g)
+            || [];
+        const cleanAmounts = [...new Set(amountMatches.map(a => a.trim()))];
+
+        const posEl = document.getElementById('pos-detected-amount');
+        const ibanEl = document.getElementById('pos-detected-iban');
+        const speechParts = [];
+
+        if (cleanAmounts.length > 0) {
+            state.lastDetectedPosAmount = cleanAmounts[0];
+            if (posEl) posEl.textContent = cleanAmounts.join(' / ');
+            speechParts.push(`Ekranda okunan ödeme tutarı: ${cleanAmounts[0]}.`);
+        }
+
+        if (foundIbanObj) {
+            state.lastDetectedIban = foundIbanObj.formatted;
+            if (ibanEl) ibanEl.textContent = `${foundIbanObj.formatted} ${foundIbanObj.isValidChecksum ? '(Doğrulandı)' : '(Kontrol Edin)'}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(foundIbanObj.iban).catch(() => {});
+            }
+            speechParts.push(`26 haneli IBAN numarası bulundu ve telefonunuzun panosuna otomatik kopyalandı: ${foundIbanObj.formatted}.`);
+        }
+
+        if (speechParts.length === 0) {
+            const msg = text
+                ? `POS tutarı veya IBAN net seçilemedi. Okunan yazı: ${text.replace(/\s+/g, ' ')}`
+                : 'Ekranda henüz POS tutarı veya TR ile başlayan IBAN algılanmadı. Lütfen kamerayı ekrana dik tutup tekrar okutun.';
+            return { speechText: msg, fullText: msg };
+        }
+
+        return {
+            speechText: speechParts.join(' '),
+            fullText: `${speechParts.join('\n')}\n\nOkunan Tam Metin:\n${text}`
+        };
+    }
+
+    async function copyDetectedIbanToClipboard() {
+        if (!state.lastDetectedIban) {
+            announceGuidance('Henüz okutulmuş bir IBAN numarası yok. Önce kağıdı veya ekranı kameraya gösterip okutun.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const raw = state.lastDetectedIban.replace(/\s+/g, '');
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            try {
+                await navigator.clipboard.writeText(raw);
+            } catch (_) {}
+        }
+        announceGuidance(`IBAN numarası panoya kopyalandı: ${state.lastDetectedIban}`, { force: true, bannerState: 'centered' });
+    }
+
+    function speakDetectedPosAmount() {
+        if (!state.lastDetectedPosAmount) {
+            announceGuidance('Henüz okutulmuş bir POS veya fiş tutarı yok.', { force: true });
+            return;
+        }
+        announceGuidance(`Son okunan POS veya fiş tutarı: ${state.lastDetectedPosAmount}`, { force: true, bannerState: 'centered' });
+    }
+
+    // --- MOD 18: "EŞYAMI NEREYE KOYDUM?" SESLİ HAFIZA VE KAVANOZ TANITICI ---
+    const ITEM_MEMORY_STORAGE_KEY = 'mikyas_blind_item_memory_v1';
+    state.itemMemories = [];
+
+    function loadItemMemoriesFromStorage() {
+        try {
+            const raw = localStorage.getItem(ITEM_MEMORY_STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) state.itemMemories = parsed;
+            }
+        } catch (_) {}
+        updateItemMemorySummaryUI();
+    }
+
+    function saveItemMemoriesToStorage() {
+        try {
+            localStorage.setItem(ITEM_MEMORY_STORAGE_KEY, JSON.stringify(state.itemMemories));
+        } catch (_) {}
+        updateItemMemorySummaryUI();
+    }
+
+    function updateItemMemorySummaryUI() {
+        const sumEl = document.getElementById('item-memory-summary');
+        const badgeEl = document.getElementById('item-memory-badge');
+        if (badgeEl) badgeEl.textContent = `${state.itemMemories.length} Kayıtlı Eşya`;
+        if (!sumEl) return;
+        if (state.itemMemories.length === 0) {
+            sumEl.textContent = 'Henüz eşya yeri kaydedilmedi.';
+        } else {
+            sumEl.textContent = state.itemMemories.slice(0, 6).map((m, idx) => `${idx + 1}. ${m.text}`).join(' | ');
+        }
+    }
+
+    function saveItemMemoryEntry(noteText, colorTag = '') {
+        const clean = String(noteText || '').trim();
+        if (!clean || clean.length < 3) {
+            announceGuidance('Lütfen eşyanızın adını ve nereye koyduğunuzu yazın veya sesle söyleyin.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const entry = {
+            id: Date.now(),
+            text: clean,
+            colorTag: colorTag || '',
+            dateStr: new Date().toLocaleDateString('tr-TR')
+        };
+        state.itemMemories.unshift(entry);
+        if (state.itemMemories.length > 100) state.itemMemories.pop();
+        saveItemMemoriesToStorage();
+        const inp = document.getElementById('memory-note-input');
+        if (inp) inp.value = '';
+        announceGuidance(`Hafızaya kaydedildi: "${clean}". İstediğiniz zaman bu eşyayı sorabilirsiniz.`, {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
+    function searchItemMemoryByQuery(queryText) {
+        const q = String(queryText || '').trim().toLocaleLowerCase('tr-TR');
+        if (!q) {
+            announceGuidance('Aramak istediğiniz eşyanın adını söyleyin veya kutuya yazın.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const words = q.replace(/\b(?:nerede|nereye|koydum|acaba|benim|hangi)\b/g, '').trim().split(/\s+/).filter(w => w.length >= 2);
+        const matches = state.itemMemories.filter(item => {
+            const hay = item.text.toLocaleLowerCase('tr-TR');
+            return hay.includes(q) || words.some(w => hay.includes(w.slice(0, Math.max(3, w.length - 2))));
+        });
+
+        if (matches.length > 0) {
+            const best = matches.slice(0, 3).map(m => m.text).join('. Ayrıca: ');
+            announceGuidance(`Bulundu! Kaydınıza göre: ${best}.`, { force: true, bannerState: 'centered' });
+        } else {
+            announceGuidance(`"${queryText}" ile ilgili kayıtlı bir eşya yeri bulunamadı.`, { force: true, bannerState: 'warning' });
+        }
+    }
+
+    function speakAllSavedItemMemories() {
+        if (state.itemMemories.length === 0) {
+            announceGuidance('Hafıza defterinizde henüz kayıtlı bir eşya yok. Sesle Eşya Yeri Kaydet düğmesine basarak eşyalarınızın yerini kaydedebilirsiniz.', { force: true });
+            return;
+        }
+        const allText = state.itemMemories.slice(0, 10).map((m, i) => `${i + 1}: ${m.text}`).join('. ');
+        announceGuidance(`Toplam ${state.itemMemories.length} kayıtlı eşyanız var. ${allText}`, { force: true, bannerState: 'centered' });
+    }
+
+    function startVoiceItemMemoryCapture(modeType = 'save') {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {
+            announceGuidance('Tarayıcınız doğrudan ses tanımayı desteklemiyor, lütfen eşya adını kutuya yazın.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const promptMsg = modeType === 'save'
+            ? 'Şimdi eşyanızı nereye koyduğunuzu söyleyin, örneğin: Yedek anahtarı vestiyerin üst çekmecesine koydum.'
+            : 'Şimdi aradığınız eşyanın adını söyleyin, örneğin: Yedek anahtar nerede?';
+        announceGuidance(promptMsg, { force: true });
+
+        setTimeout(() => {
+            try {
+                const rec = new SpeechRec();
+                rec.lang = 'tr-TR';
+                rec.interimResults = false;
+                rec.maxAlternatives = 1;
+                rec.onresult = (ev) => {
+                    const transcript = (ev.results && ev.results[0] && ev.results[0][0]) ? ev.results[0][0].transcript : '';
+                    if (transcript) {
+                        if (modeType === 'save') {
+                            saveItemMemoryEntry(transcript);
+                        } else if (modeType === 'bus_dest') {
+                            const inp = document.getElementById('bus-dest-input');
+                            if (inp) inp.value = transcript;
+                            setBusDestinationStopAlarm(transcript);
+                        } else {
+                            searchItemMemoryByQuery(transcript);
+                        }
+                    }
+                };
+                rec.start();
+            } catch (_) {}
+        }, 1600);
+    }
+
+    function handleItemMemoryLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
+        const col = metrics.centerColor ? metrics.centerColor.name : 'Bilinmiyor';
+        el.tPosition.textContent = `Kavanoz / Eşya Rengi: ${col}`;
+        el.tDistance.textContent = `${state.itemMemories.length} Eşya Kayıtlı`;
+    }
+
+    function tagVisibleJarInCamera() {
+        const inp = document.getElementById('memory-note-input');
+        const label = inp ? inp.value.trim() : '';
+        if (!label) {
+            announceGuidance('Kavanozu etiketlemek için önce kutuya kavanozun içinde ne olduğunu yazın (Örn: Ihlamur veya Kaya Tuzu).', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const col = (state.lastMetrics && state.lastMetrics.centerColor) ? state.lastMetrics.centerColor.name : 'genel renkli';
+        saveItemMemoryEntry(`Etiketlenen Kavanoz/Kutu (${col}): ${label}`, col);
+    }
+
+    function matchOrDescribeJarAndMemoryItem(capCanvas, metrics, cleanText) {
+        const col = (metrics && metrics.centerColor) ? metrics.centerColor.name : '';
+        const jarMemories = state.itemMemories.filter(m => m.colorTag && m.colorTag === col);
+        const jarNote = jarMemories.length > 0
+            ? `Bu ${col} kavanoz/kutu için daha önce kaydettiğiniz etiket: ${jarMemories[0].text}.`
+            : `Görünen kavanoz veya kutunun rengi: ${col}.`;
+        const ocrNote = cleanText ? `Üzerinde okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.` : '';
+        const combined = `${jarNote} ${ocrNote}`.trim();
+        return { speechText: combined, fullText: combined };
+    }
+
+    // --- MOD 19: TELEVİZYON ALTYAZI OKUYUCU VE CANLI MAÇ SKORU SPİKERİ ---
+    state.tvAutoReaderActive = false;
+    state.tvAutoReaderTimer = null;
+    state.lastSpokenTvSubtitle = '';
+
+    function handleTvSubtitleLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
+        const tvPred = predictions.find(p => p.class === 'tv' || p.class === 'laptop');
+        if (tvPred) {
+            const [x, y, w, h] = tvPred.bbox;
+            ovCtx.strokeStyle = '#f472b6';
+            ovCtx.lineWidth = 4;
+            ovCtx.strokeRect(x * scaleX, y * scaleY, w * scaleX, h * scaleY);
+            el.tPosition.textContent = 'TV Ekranı Hizalandı';
+            el.tDistance.textContent = state.tvAutoReaderActive ? 'Canlı Spiker Açık' : 'Okumaya Hazır';
+        } else {
+            el.tPosition.textContent = 'TV Ekranına Tutun';
+            el.tDistance.textContent = 'Altyazı & Skor';
+        }
+    }
+
+    function processTvSubtitleAndScoreText(cleanText, isSilentAuto = false) {
+        const raw = String(cleanText || '').trim();
+        const subEl = document.getElementById('tv-last-subtitle');
+        const scoreEl = document.getElementById('tv-last-score');
+
+        const scoreRegex = /\b(?:[A-ZÇĞİÖŞÜ]{2,12}\s*\d{1,2}\s*[-:]\s*\d{1,2}\s*[A-ZÇĞİÖŞÜ]{2,12}|\d{1,2}\s*[-:]\s*\d{1,2}|\d{1,2}['’]\s*DK|\d{2}:\d{2})\b/gi;
+        const scoreMatches = raw.match(scoreRegex) || [];
+        const scoreStr = scoreMatches.length > 0 ? scoreMatches.slice(0, 3).join(' | ') : '';
+
+        if (scoreStr && scoreEl) {
+            scoreEl.textContent = scoreStr;
+        }
+        const cleanLines = raw.split(/\n+/).map(l => l.trim()).filter(l => l.length >= 3);
+        const subtitleLine = cleanLines.slice(-2).join(' ');
+        if (subtitleLine && subEl) {
+            subEl.textContent = subtitleLine;
+        }
+
+        const spoken = `${scoreStr ? 'Maç Skoru / Süre: ' + scoreStr + '. ' : ''}${subtitleLine ? 'Altyazı: ' + subtitleLine : 'Televizyon ekranında şu an altyazı görünmüyor.'}`;
+        return {
+            speechText: spoken,
+            fullText: `Maç Skoru / Tabela: ${scoreStr || 'Yok'}\nSon Altyazı / Bant: ${subtitleLine || 'Yok'}\n\nEkrandaki Tüm Yazılar:\n${raw}`,
+            hasNewSubtitle: Boolean(subtitleLine && subtitleLine !== state.lastSpokenTvSubtitle),
+            subtitleLine
+        };
+    }
+
+    function toggleTvAutoSubtitleSpeaker() {
+        state.tvAutoReaderActive = !state.tvAutoReaderActive;
+        const btn = document.getElementById('btn-tv-auto-toggle');
+        const badge = document.getElementById('tv-subtitle-badge');
+        if (btn) {
+            btn.classList.toggle('active-toggle', state.tvAutoReaderActive);
+            btn.setAttribute('aria-pressed', state.tvAutoReaderActive ? 'true' : 'false');
+            btn.textContent = state.tvAutoReaderActive
+                ? '⏹️ Otomatik TV Altyazı & Skor Spikerini Durdur'
+                : '▶️ Otomatik TV Altyazı & Skor Spikerini Başlat';
+        }
+        if (badge) {
+            badge.textContent = state.tvAutoReaderActive ? 'Canlı TV Spikeri Açık' : 'TV Spikeri Hazır';
+        }
+        if (state.tvAutoReaderTimer) {
+            clearInterval(state.tvAutoReaderTimer);
+            state.tvAutoReaderTimer = null;
+        }
+        if (state.tvAutoReaderActive) {
+            announceGuidance('Otomatik televizyon altyazı ve maç skoru spikeri başlatıldı. Telefonu televizyona doğru tutun; yeni altyazı çıktıkça sesli okuyacağım.', {
+                force: true,
+                bannerState: 'centered'
+            });
+            state.tvAutoReaderTimer = setInterval(() => {
+                if (state.isRunning && state.mode === 'tv_subtitle_score' && !state.isProcessingOcr) {
+                    readTvScreenNow(true);
+                }
+            }, 3800);
+        } else {
+            announceGuidance('Otomatik televizyon spikeri durduruldu.', { force: true });
+        }
+    }
+
+    async function readTvScreenNow(isAutoTick = false) {
+        if (!state.isRunning || !el.video.videoWidth || typeof window.Tesseract === 'undefined' || state.isProcessingOcr) {
+            if (!isAutoTick && !state.isRunning) {
+                announceGuidance('Önce kamerayı başlatın ve televizyona doğru tutun.', { force: true, bannerState: 'warning' });
+            }
+            return;
+        }
+        state.isProcessingOcr = true;
+        try {
+            const c = document.createElement('canvas');
+            c.width = el.video.videoWidth;
+            c.height = el.video.videoHeight;
+            c.getContext('2d').drawImage(el.video, 0, 0);
+            const ocrRes = await window.Tesseract.recognize(c, 'tur+eng');
+            const text = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
+            const parsed = processTvSubtitleAndScoreText(text, isAutoTick);
+            if (!isAutoTick || (parsed.hasNewSubtitle && parsed.subtitleLine.length > 4)) {
+                state.lastSpokenTvSubtitle = parsed.subtitleLine;
+                announceGuidance(parsed.speechText, { force: true, bannerState: 'centered' });
+            }
+        } catch (_) {
+        } finally {
+            state.isProcessingOcr = false;
+        }
+    }
+
+    // --- MOD 20: ÇORAP EŞLEŞTİRİCİ, KIYAFET KOMBİN UYUMU VE LEKE KONTROLÜ ---
+    function handleSockAndOutfitLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
+        const col = metrics.centerColor ? metrics.centerColor.name : 'Bilinmiyor';
+        el.tPosition.textContent = `Görünen Renk: ${col}`;
+        el.tDistance.textContent = `Desen: ${metrics.patternType || 'Düz'}`;
+    }
+
+    function sampleRegionRgbAndContrast(ctx, x0, y0, w, h) {
+        const img = ctx.getImageData(Math.max(0, Math.floor(x0)), Math.max(0, Math.floor(y0)), Math.max(1, Math.floor(w)), Math.max(1, Math.floor(h)));
+        const d = img.data;
+        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+        let lumSqSum = 0, lumSum = 0;
+        let outlierPixels = 0;
+
+        for (let i = 0; i < d.length; i += 16) {
+            const r = d[i], g = d[i + 1], b = d[i + 2];
+            const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+            rSum += r; gSum += g; bSum += b;
+            lumSum += lum;
+            lumSqSum += lum * lum;
+            count++;
+        }
+        const avgR = Math.round(rSum / Math.max(1, count));
+        const avgG = Math.round(gSum / Math.max(1, count));
+        const avgB = Math.round(bSum / Math.max(1, count));
+        const avgLum = lumSum / Math.max(1, count);
+        const stdDev = Math.sqrt(Math.max(0, lumSqSum / Math.max(1, count) - avgLum * avgLum));
+
+        for (let i = 0; i < d.length; i += 16) {
+            const dr = d[i] - avgR, dg = d[i + 1] - avgG, db = d[i + 2] - avgB;
+            const dist = Math.sqrt(dr * dr + dg * dg + db * db);
+            if (dist > 58) outlierPixels++;
+        }
+        const outlierRatio = outlierPixels / Math.max(1, count);
+        return {
+            r: avgR, g: avgG, b: avgB,
+            colorInfo: classifyTurkishColorName(avgR, avgG, avgB),
+            stdDev,
+            outlierRatio
+        };
+    }
+
+    function analyzeSocksAndOutfitStains(capCanvas, metrics, cleanText) {
+        const ctx = capCanvas.getContext('2d');
+        const w = capCanvas.width;
+        const h = capCanvas.height;
+
+        const leftHalf = sampleRegionRgbAndContrast(ctx, w * 0.08, h * 0.2, w * 0.38, h * 0.6);
+        const rightHalf = sampleRegionRgbAndContrast(ctx, w * 0.54, h * 0.2, w * 0.38, h * 0.6);
+
+        const colorDist = Math.sqrt(
+            Math.pow(leftHalf.r - rightHalf.r, 2) +
+            Math.pow(leftHalf.g - rightHalf.g, 2) +
+            Math.pow(leftHalf.b - rightHalf.b, 2)
+        );
+        const sameColorName = leftHalf.colorInfo.name === rightHalf.colorInfo.name;
+        const isPairMatch = sameColorName || colorDist < 34;
+
+        const sockMsg = isPairMatch
+            ? `Çorap / Kıyafet Eşleşmesi: Sol taraf (${leftHalf.colorInfo.name}) ile sağ taraf (${rightHalf.colorInfo.name}) birbirinin EŞİ ve uyumlu!`
+            : `DİKKAT EŞ DEĞİL: Sol taraftaki parça ${leftHalf.colorInfo.name}, sağ taraftaki parça ise ${rightHalf.colorInfo.name} görünüyor; birbirinden farklı!`;
+
+        const centerSample = sampleRegionRgbAndContrast(ctx, w * 0.25, h * 0.25, w * 0.5, h * 0.5);
+        const hasStain = centerSample.outlierRatio > 0.045 && centerSample.outlierRatio < 0.26 && centerSample.stdDev < 45;
+        const stainMsg = hasStain
+            ? 'Leke Kontrolü: Kumaşın orta kısmında ana renkten farklı bir leke veya iz görünüyor, kontrol etmeniz önerilir.'
+            : `Leke Kontrolü: ${centerSample.colorInfo.name} kumaş yüzeyinde belirgin bir çay veya yemek lekesi görünmüyor, temiz.`;
+
+        const sockEl = document.getElementById('sock-match-result');
+        const stainEl = document.getElementById('outfit-stain-result');
+        if (sockEl) sockEl.textContent = isPairMatch ? `EŞLEŞTİ (${leftHalf.colorInfo.name})` : `FARKLI (${leftHalf.colorInfo.name} / ${rightHalf.colorInfo.name})`;
+        if (stainEl) stainEl.textContent = hasStain ? 'Leke / İz Şüphesi Var' : 'Temiz Görünüyor';
+
+        const speech = `${sockMsg} ${stainMsg} ${cleanText ? 'Etiket yazısı: ' + cleanText.replace(/\s+/g, ' ') : ''}`;
+        return {
+            speechText: speech,
+            fullText: `${sockMsg}\n${stainMsg}\n\nEtiket Yazısı:\n${cleanText || 'Etiket yazısı yok.'}`
+        };
+    }
+
+    // --- MOD 21: "TAM OLARAK NEREDEYİM?" SOKAK + TABELA + WHATSAPP KONUM TARİFİ ---
+    state.lastWhereAmISummary = '';
+
+    async function announceWhereAmIFullAddressAndSignboard(optionalOcrText = '', optionalPreds = []) {
+        const addrEl = document.getElementById('where-address-text');
+        const signEl = document.getElementById('where-signboard-text');
+        if (addrEl) addrEl.textContent = 'Açık adresiniz bulunuyor...';
+
+        let addressDesc = state.qiblaLocationSource || 'Konum bilgisi alınıyor';
+        if (state.userLat && state.userLon) {
+            try {
+                const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${state.userLat}&lon=${state.userLon}&zoom=18&addressdetails=1`;
+                const res = await fetch(url, { headers: { 'Accept-Language': 'tr' } });
+                if (res.ok) {
+                    const data = await res.json();
+                    const a = data.address || {};
+                    const parts = [
+                        a.suburb || a.neighbourhood || a.quarter,
+                        a.road || a.pedestrian,
+                        a.house_number ? `No: ${a.house_number}` : '',
+                        a.town || a.city_district || a.district,
+                        a.city || a.province
+                    ].filter(Boolean);
+                    if (parts.length > 0) {
+                        addressDesc = parts.join(', ');
+                    } else if (data.display_name) {
+                        addressDesc = data.display_name.split(',').slice(0, 4).join(', ');
+                    }
+                }
+            } catch (_) {}
+        }
+        if (addrEl) addrEl.textContent = addressDesc;
+
+        const cleanSign = String(optionalOcrText || '').replace(/\s+/g, ' ').trim();
+        const signDesc = cleanSign.length >= 3
+            ? `Önünüzdeki tabelada okunan yazı: ${cleanSign}.`
+            : 'Kamerayı önünüzdeki dükkan veya sokak tabelasına tutup Boşluk tuşuna basarsanız tabelayı da eklerim.';
+        if (signEl) signEl.textContent = cleanSign.length >= 3 ? cleanSign : 'Henüz tabela okutulmadı';
+
+        const fullSpeech = `Şu an bulunduğunuz açık adres: ${addressDesc}. ${signDesc}`;
+        state.lastWhereAmISummary = fullSpeech;
+        showDetectedResult('📍 Tam Olarak Neredeyim? Açık Adres ve Tabela Raporu', fullSpeech);
+        announceGuidance(fullSpeech, { force: true, bannerState: 'centered' });
+    }
+
+    function shareWhereAmIOnWhatsapp() {
+        const mapLink = (state.userLat && state.userLon)
+            ? `https://maps.google.com/?q=${state.userLat},${state.userLon}`
+            : '';
+        const textToShare = `${state.lastWhereAmISummary || 'Şu an bulunduğum konum:'} ${mapLink ? '\nHarita Konumum: ' + mapLink : ''}`.trim();
+        const waUrl = `https://wa.me/?text=${encodeURIComponent(textToShare)}`;
+        window.open(waUrl, '_blank', 'noopener');
+        announceGuidance('Açık adresiniz, tabela tarifiniz ve harita konumunuz WhatsApp üzerinden gönderilmek üzere hazırlandı.', {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
     function syncModePanelsVisibility(activeMode) {
         if (el.examRemotePanel) {
             el.examRemotePanel.hidden = (activeMode !== 'exam_reader');
@@ -7110,8 +7935,26 @@
         if (el.songFinderPanel) {
             el.songFinderPanel.hidden = (activeMode !== 'song_finder');
         }
+        if (el.busStopPanel) {
+            el.busStopPanel.hidden = (activeMode !== 'bus_stop_tracker');
+        }
+        if (el.posIbanPanel) {
+            el.posIbanPanel.hidden = (activeMode !== 'pos_iban_reader');
+        }
+        if (el.itemMemoryPanel) {
+            el.itemMemoryPanel.hidden = (activeMode !== 'item_memory');
+        }
+        if (el.tvSubtitlePanel) {
+            el.tvSubtitlePanel.hidden = (activeMode !== 'tv_subtitle_score');
+        }
+        if (el.sockOutfitPanel) {
+            el.sockOutfitPanel.hidden = (activeMode !== 'sock_outfit_check');
+        }
+        if (el.whereAmIPanel) {
+            el.whereAmIPanel.hidden = (activeMode !== 'where_am_i');
+        }
         if (el.targetFilterSection) {
-            el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder');
+            el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder' || activeMode === 'item_memory');
         }
     }
 
@@ -7152,11 +7995,21 @@
             'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya çamaşır makinesi ekranını okutmak için Boşluk tuşuna basın.',
             'food_freshness': '13. Bölüm: Yiyecek Küflü mü ve Paket İçeriği Okuyucu açıldı. Ekmeği, meyveyi veya market paketini kameraya gösterin.',
             'social_presence': '14. Bölüm: Odada Kim Var ve Bana Bakıyor mu Yardımcısı açıldı. Kulaklık gerekmez; odadakiler duymasın diye karşınızdaki kişi size baktığında telefon avucunuzda çift titrer. Sesli söylemesini isterseniz ekrana çift dokunun veya T tuşuna basın.',
-            'song_finder': '15. Bölüm: Bu Çalan Hangi Şarkı? Sesli Şarkı, Melodi ve Söz Bulucu açıldı; mikrofon otomatik olarak dinlemeye başlıyor.'
+            'song_finder': '15. Bölüm: Bu Çalan Hangi Şarkı? Sesli Şarkı, Melodi ve Söz Bulucu açıldı; mikrofon otomatik olarak dinlemeye başlıyor.',
+            'bus_stop_tracker': '16. Bölüm: Otobüs Numarası Yakalayıcı ve İneceğim Durağa Geldim mi Alarmı açıldı. Durakta yaklaşan otobüsün hat numarasını okumak için kamerayı yola tutun veya otobüsteyseniz aşağıdan ineceğiniz durağın alarmını kurun.',
+            'pos_iban_reader': '17. Bölüm: POS Cihazı Tutarı Doğrulayıcı ve Tek Tuşla IBAN Kopyalayıcı açıldı. Kartınızı okutmadan önce POS ekranını veya faturadaki TR IBAN numarasını kameraya gösterip Boşluk tuşuna basın.',
+            'item_memory': `18. Bölüm: Eşyamı Nereye Koydum Sesli Hafıza ve Kavanoz Tanıtıcı açıldı. Şu an hafızanızda ${state.itemMemories ? state.itemMemories.length : 0} eşya kayıtlı. Eşya Yeri Kaydet veya Eşyam Nerede Sor düğmelerini kullanabilirsiniz.`,
+            'tv_subtitle_score': '19. Bölüm: Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri açıldı. Telefonu televizyona doğru tutun ve Otomatik TV Spikerini Başlat düğmesine basın.',
+            'sock_outfit_check': '20. Bölüm: Çorap Eşleştirici, Kıyafet Kombin Uyumu ve Leke Kontrolü açıldı. İki çorabı yan yana kameraya tutup Boşluk tuşuna basın; birbirinin eşi olup olmadığını ve leke durumunu söyleyeceğim.',
+            'where_am_i': '21. Bölüm: Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Tarif Edici açıldı. Bulunduğunuz cadde ve sokağı hemen öğreniliyor.'
         }[newMode];
 
         if (modeAnnouncement) {
             announceGuidance(modeAnnouncement, { force: true, bannerState: 'normal' });
+        }
+
+        if (newMode === 'where_am_i') {
+            setTimeout(() => announceWhereAmIFullAddressAndSignboard('', []), 900);
         }
 
         if (newMode === 'song_finder') {
@@ -7408,6 +8261,77 @@
         btn.addEventListener('click', () => setMode(btn.getAttribute('data-mode')));
     });
 
+    if (el.categoryTabs && el.categoryTabs.length > 0) {
+        el.categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                filterModesByLifeCategory(tab.getAttribute('data-category') || 'all');
+            });
+        });
+    }
+
+    // 16-21 Arası Yeni Günlük Yaşam Panellerinin Düğme Dinleyicileri
+    const btnBusSetAlarm = document.getElementById('btn-bus-set-alarm');
+    const busDestInput = document.getElementById('bus-dest-input');
+    const btnBusVoiceDest = document.getElementById('btn-bus-voice-dest');
+    const btnBusCheckDist = document.getElementById('btn-bus-check-dist');
+    const btnBusSaveCurrent = document.getElementById('btn-bus-save-current');
+    const btnBusCancelAlarm = document.getElementById('btn-bus-cancel-alarm');
+
+    if (btnBusSetAlarm && busDestInput) {
+        btnBusSetAlarm.addEventListener('click', () => setBusDestinationStopAlarm(busDestInput.value));
+        busDestInput.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                setBusDestinationStopAlarm(busDestInput.value);
+            }
+        });
+    }
+    if (btnBusVoiceDest) btnBusVoiceDest.addEventListener('click', () => startVoiceItemMemoryCapture('bus_dest'));
+    if (btnBusCheckDist) btnBusCheckDist.addEventListener('click', () => checkBusDestinationDistance(true));
+    if (btnBusSaveCurrent) btnBusSaveCurrent.addEventListener('click', saveCurrentGpsAsBusStop);
+    if (btnBusCancelAlarm) btnBusCancelAlarm.addEventListener('click', cancelBusStopAlarm);
+
+    const btnPosScanNow = document.getElementById('btn-pos-scan-now');
+    const btnCopyIban = document.getElementById('btn-copy-iban');
+    const btnSpeakPosAmount = document.getElementById('btn-speak-pos-amount');
+    if (btnPosScanNow) btnPosScanNow.addEventListener('click', () => captureAndDescribePhoto(false));
+    if (btnCopyIban) btnCopyIban.addEventListener('click', copyDetectedIbanToClipboard);
+    if (btnSpeakPosAmount) btnSpeakPosAmount.addEventListener('click', speakDetectedPosAmount);
+
+    const memoryNoteInput = document.getElementById('memory-note-input');
+    const btnMemorySaveText = document.getElementById('btn-memory-save-text');
+    const btnMemoryVoiceSave = document.getElementById('btn-memory-voice-save');
+    const btnMemoryVoiceAsk = document.getElementById('btn-memory-voice-ask');
+    const btnMemorySearchText = document.getElementById('btn-memory-search-text');
+    const btnMemoryReadAll = document.getElementById('btn-memory-read-all');
+    const btnMemoryTagJar = document.getElementById('btn-memory-tag-jar');
+
+    if (btnMemorySaveText && memoryNoteInput) {
+        btnMemorySaveText.addEventListener('click', () => saveItemMemoryEntry(memoryNoteInput.value));
+    }
+    if (btnMemoryVoiceSave) btnMemoryVoiceSave.addEventListener('click', () => startVoiceItemMemoryCapture('save'));
+    if (btnMemoryVoiceAsk) btnMemoryVoiceAsk.addEventListener('click', () => startVoiceItemMemoryCapture('ask'));
+    if (btnMemorySearchText && memoryNoteInput) {
+        btnMemorySearchText.addEventListener('click', () => searchItemMemoryByQuery(memoryNoteInput.value));
+    }
+    if (btnMemoryReadAll) btnMemoryReadAll.addEventListener('click', speakAllSavedItemMemories);
+    if (btnMemoryTagJar) btnMemoryTagJar.addEventListener('click', tagVisibleJarInCamera);
+
+    const btnTvAutoToggle = document.getElementById('btn-tv-auto-toggle');
+    const btnTvReadNow = document.getElementById('btn-tv-read-now');
+    if (btnTvAutoToggle) btnTvAutoToggle.addEventListener('click', toggleTvAutoSubtitleSpeaker);
+    if (btnTvReadNow) btnTvReadNow.addEventListener('click', () => readTvScreenNow(false));
+
+    const btnSockCompare = document.getElementById('btn-sock-compare');
+    const btnOutfitStain = document.getElementById('btn-outfit-stain');
+    if (btnSockCompare) btnSockCompare.addEventListener('click', () => captureAndDescribePhoto(false));
+    if (btnOutfitStain) btnOutfitStain.addEventListener('click', () => captureAndDescribePhoto(false));
+
+    const btnWhereAmINow = document.getElementById('btn-where-am-i-now');
+    const btnWhereWhatsapp = document.getElementById('btn-where-whatsapp');
+    if (btnWhereAmINow) btnWhereAmINow.addEventListener('click', () => announceWhereAmIFullAddressAndSignboard('', []));
+    if (btnWhereWhatsapp) btnWhereWhatsapp.addEventListener('click', shareWhereAmIOnWhatsapp);
+
     el.touchZone.addEventListener('click', () => {
         const now = performance.now();
         if (now - state.lastTouchTime < 420) {
@@ -7485,6 +8409,7 @@
 
     window.addEventListener('load', () => {
         loadMoneyLedgerFromStorage();
+        loadItemMemoriesFromStorage();
         syncModePanelsVisibility(state.mode);
         autoAcquireLocationAndWatch();
         updateExamRemoteUI();
