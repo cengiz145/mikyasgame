@@ -72,7 +72,7 @@
         <section aria-labelledby="mode-heading" class="mode-section">
             <h2 id="mode-heading">Kategoriler</h2>
             <div class="category-bar" role="group" aria-label="Uygulama Kategorileri" style="display:flex; flex-wrap:wrap; gap:0.55rem; margin-bottom:0.9rem;">
-                <button type="button" class="secondary-btn category-tab active-toggle" data-category="all" aria-pressed="true" aria-label="Tümü: 21 Özelliğin Tamamını Göster">
+                <button type="button" class="secondary-btn category-tab active-toggle" data-category="all" aria-pressed="true" aria-label="Tümü: 22 Özelliğin Tamamını Göster">
                     🌟 Tümü
                 </button>
                 <button type="button" class="secondary-btn category-tab" data-category="ev" aria-pressed="false" aria-label="Ev Kategorisi">
@@ -216,6 +216,12 @@
                     <span class="mode-icon" aria-hidden="true">📍🏪</span>
                     <span class="mode-title">21. "Tam Olarak Neredeyim?" Sokak + Tabela + WhatsApp Tarif</span>
                     <span class="mode-desc" aria-hidden="true">Bulunduğunuz cadde ve sokağı GPS'ten bulur, önünüzdeki dükkan tabelasını kameradan okur ve "Şu caddedeyim, önümde şu dükkan var" diyerek tek tuşla WhatsApp'tan gönderir.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="step_calorie_guide" data-category="saglik" role="radio" aria-checked="false" id="mode-btn-22" aria-label="22. Sesli Adım Sayacı ve Kalori / Besin Değeri Rehberi">
+                    <span class="mode-icon" aria-hidden="true">👟🥗</span>
+                    <span class="mode-title">22. Sesli Adım Sayacı ve Kalori / Besin Rehberi</span>
+                    <span class="mode-desc" aria-hidden="true">Yürürken adımlarınızı, yürüdüğünüz mesafeyi ve harcadığınız enerjiyi motive edici tatlı bir dille sesli sayar; Türk yemeklerinin ve paketli gıdaların kalori ile besin değerlerini söyler.</span>
                 </button>
             </div>
         </section>
@@ -634,6 +640,56 @@
                 <div class="telemetry-item" role="listitem">
                     <span class="t-label">Önünüzdeki Tabela ve Çevre:</span>
                     <strong id="where-signboard-text">Kamerayı tabelaya tutun...</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- 22. SESLİ ADIM SAYACI VE KALORİ / BESİN DEĞERİ REHBERİ PANELİ -->
+        <section id="step-calorie-panel" hidden aria-labelledby="step-calorie-heading" class="exam-remote-section" style="border-color: #14b8a6;">
+            <div class="exam-remote-header">
+                <h2 id="step-calorie-heading" style="color: #2dd4bf;">👟🥗 Sesli Adım Sayacı &amp; Kalori / Besin Değeri Rehberi</h2>
+                <span id="step-calorie-badge" class="status-badge ready">Sağlık ve Enerji Dostunuz</span>
+            </div>
+            <p class="exam-remote-hint">
+                Telefon cebinizde veya elinizde yürürken adımlarınızı otomatik sayar ve moral veren tatlı bir dille bilgilendirir. Ayrıca yediğiniz yemeği aşağıya yazıp/söyleyip veya paketi kameraya gösterip <strong>kalori ve besin değerini</strong> öğrenebilirsiniz:
+            </p>
+            <div class="exam-nav-row" role="group" aria-label="Sesli Adım Sayacı Kontrolleri">
+                <button type="button" id="btn-step-toggle" class="primary-btn" style="background: linear-gradient(135deg, #0d9488, #059669);" aria-pressed="true" aria-label="Sesli Adım Sayacını Başlat veya Duraklat">
+                    👟 Adım Sayacı: Açık (Yürüdükçe Sayar)
+                </button>
+                <button type="button" id="btn-step-speak-status" class="secondary-btn" aria-label="Bugün Kaç Adım Attığımı, Kaç Metre Yürüdüğümü ve Harcadığım Enerjiyi Sesli Söyle">
+                    🔊 Bugün Kaç Adım Attım?
+                </button>
+                <button type="button" id="btn-step-reset" class="secondary-btn" aria-label="Günlük Adım ve Kalori Sayacını Sıfırla">
+                    🔄 Günlük Sayacı Sıfırla
+                </button>
+            </div>
+            <div class="exam-nav-row" style="align-items:center; gap: 0.6rem; margin-top: 0.5rem;">
+                <label for="calorie-food-input" style="font-weight:700;">Yemek / İçecek Adı:</label>
+                <input type="text" id="calorie-food-input" placeholder="Örn: Mercimek çorbası, 1 simit, kuru fasulye, pilav, elma..." aria-label="Kalorisini öğrenmek veya günlüğünüze eklemek istediğiniz yemeğin adını yazın" style="flex:1; min-width: 200px; padding: 0.65rem 0.85rem; border-radius: 10px; border: 2px solid #475569; background: #0f172a; color: #f8fafc; font-size: 1rem;">
+                <button type="button" id="btn-calorie-calc" class="primary-btn" style="background: linear-gradient(135deg, #0284c7, #2563eb);" aria-label="Yazılan Yemeğin Kalorisini ve Besin Değerini Hesapla ve Sesli Söyle">
+                    🍽️ Kalorisini Söyle &amp; Ekle
+                </button>
+                <button type="button" id="btn-calorie-voice" class="secondary-btn" aria-label="Yediğiniz Yemeği Mikrofonla Söyleyerek Kalorisini Öğrenin">
+                    🎤 Yemeği Sesle Söyle
+                </button>
+            </div>
+            <div class="telemetry-grid" role="list" aria-label="Adım Sayacı ve Kalori Bilgileri">
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Bugünkü Adım ve Yürüyüş Mesafesi:</span>
+                    <strong id="step-count-display" style="color:#2dd4bf;">0 Adım (0 metre)</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Yürüyüşle Harcanan Enerji:</span>
+                    <strong id="step-burned-display">0 kcal (Harika başlangıç!)</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Son Sorgulanan Yemek / Paket:</span>
+                    <strong id="calorie-last-food">Henüz yemek sorgulanmadı</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Bugün Alınan Toplam Enerji:</span>
+                    <strong id="calorie-intake-total">0 kcal</strong>
                 </div>
             </div>
         </section>

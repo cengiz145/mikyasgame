@@ -223,6 +223,7 @@
         tvSubtitlePanel: document.getElementById('tv-subtitle-panel'),
         sockOutfitPanel: document.getElementById('sock-outfit-panel'),
         whereAmIPanel: document.getElementById('where-am-i-panel'),
+        stepCaloriePanel: document.getElementById('step-calorie-panel'),
         categoryTabs: document.querySelectorAll('.category-tab'),
         modeButtons: document.querySelectorAll('.mode-card'),
         aiStatusBadge: document.getElementById('ai-status-badge'),
@@ -1411,6 +1412,8 @@
             handleSockAndOutfitLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics);
         } else if (state.mode === 'where_am_i') {
             handleExplorerMode(anW, anH, scaleX, scaleY, ovCtx, predictions);
+        } else if (state.mode === 'step_calorie_guide') {
+            handleFoodFreshnessLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
         }
     }
 
@@ -4181,6 +4184,14 @@
                 // ÖZEL MOD 21: TAM OLARAK NEREDEYİM (SOKAK + TABELA + WHATSAPP KONUM TARİFİ)
                 if (state.mode === 'where_am_i') {
                     await announceWhereAmIFullAddressAndSignboard(cleanText, preds);
+                    return;
+                }
+
+                // ÖZEL MOD 22: SESLİ ADIM SAYACI VE KALORİ / BESİN DEĞERİ REHBERİ (PAKET / MENÜ OKUMA)
+                if (state.mode === 'step_calorie_guide') {
+                    const calReport = parsePackageOrMenuCaloriesKind(cleanText);
+                    showDetectedResult('👟🥗 Besin Değeri ve Sağlıklı Yaşam Raporu', calReport.fullText);
+                    announceGuidance(calReport.speechText, { force: true, bannerState: 'centered' });
                     return;
                 }
 
@@ -7166,7 +7177,7 @@
     // 6.5. YENİ HAYAT ALANI KATEGORİLERİ VE 16-21 ARASI EFSANE GÜNLÜK YAŞAM MODLARI
     // =========================================================================
     const LIFE_CATEGORY_LABELS = {
-        'all': 'Tümü (21 Özellik)',
+        'all': 'Tümü (22 Özellik)',
         'ev': 'Ev Kategorisi',
         'is_egitim': 'İş ve Eğitim Kategorisi',
         'saglik': 'Sağlık Kategorisi',
@@ -7921,6 +7932,191 @@
         });
     }
 
+    // --- MOD 22: SESLİ ADIM SAYACI VE NAZİK / MOTİVE EDİCİ KALORİ & BESİN REHBERİ ---
+    const STEP_CALORIE_STORAGE_KEY = 'mikyas_step_calorie_daily_v1';
+    state.stepCounterEnabled = true;
+    state.dailySteps = 0;
+    state.dailyIntakeKcal = 0;
+    state.lastStepPeakTime = 0;
+    state.lastAccelMag = 9.8;
+
+    const TURKISH_FOOD_NUTRITION_DB = [
+        { keys: ['mercimek çorbası', 'mercimek', 'çorba'], name: '1 Kase Mercimek Çorbası', kcal: 135, benefit: 'Lif ve bitkisel protein açısından çok zengindir, içinizi ısıtır ve uzun süre tok tutar.' },
+        { keys: ['ezogelin', 'tarhana', 'yayla çorbası'], name: '1 Kase Geleneksel Çorba', kcal: 140, benefit: 'Bağışıklığı güçlendirir ve sindirimi rahatlatır.' },
+        { keys: ['kuru fasulye', 'fasulye', 'nohut'], name: '1 Porsiyon Kuru Fasulye / Nohut', kcal: 240, benefit: 'Harika bir protein ve demir kaynağıdır, vücuda güç verir.' },
+        { keys: ['pilav', 'pirinç pilavı', 'bulgur pilavı', 'bulgur'], name: '1 Porsiyon Pilav', kcal: 210, benefit: 'Gün boyu zinde kalmanız için dengeli enerji sağlar.' },
+        { keys: ['simit', 'gevrek', 'poğaça'], name: '1 Adet Susamlı Simit', kcal: 275, benefit: 'Susamındaki sağlıklı yağlar ve tahılıyla kahvaltının en güzel keyfidir.' },
+        { keys: ['yumurta', 'haşlanmış yumurta', 'omlet', 'menemen'], name: 'Yumurta / Menemen', kcal: 155, benefit: 'En kaliteli protein ve B12 kaynağıdır, hafızayı ve kasları güçlendirir.' },
+        { keys: ['peynir', 'beyaz peynir', 'kaşar', 'zeytin'], name: 'Kahvaltılık Peynir ve Zeytin Porsiyonu', kcal: 120, benefit: 'Kalsiyum ve sağlıklı E vitamini ile kemiklerinizi korur.' },
+        { keys: ['köfte', 'ızgara köfte', 'et', 'kebap', 'tavuk', 'balık'], name: '1 Porsiyon Et / Tavuk / Balık / Köfte', kcal: 260, benefit: 'Yüksek protein değeriyle dokuları yeniler ve enerji verir.' },
+        { keys: ['makarna', 'mantı', 'börek'], name: '1 Porsiyon Makarna / Börek / Mantı', kcal: 290, benefit: 'Mutluluk hormonu salgılanmasına yardımcı olan doyurucu bir öğündür.' },
+        { keys: ['salata', 'çoban salata', 'yeşillik', 'cacık', 'yoğurt', 'ayran'], name: '1 Kase Yoğurt / Ayran / Taze Salata', kcal: 95, benefit: 'Ferahlatıcıdır, vitamin ve probiyotik desteğiyle vücudu yeniler.' },
+        { keys: ['elma', 'muz', 'portakal', 'mandalina', 'çilek', 'karpuz', 'meyve'], name: '1 Porsiyon Taze Meyve', kcal: 75, benefit: 'Doğal C vitamini ve antioksidan deposudur, cilde ve bağışıklığa çok iyi gelir.' },
+        { keys: ['çay', 'türk kahvesi', 'kahve', 'ıhlamur', 'bitki çayı'], name: 'Şekersiz Çay / Türk Kahvesi', kcal: 5, benefit: 'Zihni açar, yorgunluğu alır ve neredeyse hiç kalorisi yoktur.' },
+        { keys: ['baklava', 'sütlaç', 'tatlı', 'çikolata', 'kek', 'pasta', 'dondurma'], name: '1 Porsiyon Tatlı / Çikolata Keyfi', kcal: 250, benefit: 'Ruhu tatlandırır ve moral verir! Küçük bir yürüyüşle enerjisi keyfe dönüşür.' },
+        { keys: ['ekmek', 'tam buğday', 'tost'], name: '1 Dilim Ekmek / Tost', kcal: 85, benefit: 'B vitaminleri içerir ve öğünlerinize doyuruculuk katar.' }
+    ];
+
+    function loadStepCalorieFromStorage() {
+        try {
+            const todayKey = new Date().toISOString().slice(0, 10);
+            const raw = localStorage.getItem(STEP_CALORIE_STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.date === todayKey) {
+                    state.dailySteps = Number(parsed.steps) || 0;
+                    state.dailyIntakeKcal = Number(parsed.intakeKcal) || 0;
+                }
+            }
+        } catch (_) {}
+        updateStepCalorieUI();
+    }
+
+    function saveStepCalorieToStorage() {
+        try {
+            const todayKey = new Date().toISOString().slice(0, 10);
+            localStorage.setItem(STEP_CALORIE_STORAGE_KEY, JSON.stringify({
+                date: todayKey,
+                steps: state.dailySteps,
+                intakeKcal: state.dailyIntakeKcal
+            }));
+        } catch (_) {}
+        updateStepCalorieUI();
+    }
+
+    function updateStepCalorieUI() {
+        const distM = Math.round(state.dailySteps * 0.72);
+        const burnedKcal = Math.round(state.dailySteps * 0.045);
+        const stepEl = document.getElementById('step-count-display');
+        const burnEl = document.getElementById('step-burned-display');
+        const intakeEl = document.getElementById('calorie-intake-total');
+        const badgeEl = document.getElementById('step-calorie-badge');
+
+        const distText = distM >= 1000 ? `${(distM / 1000).toFixed(2)} km` : `${distM} metre`;
+        if (stepEl) stepEl.textContent = `${state.dailySteps} Adım (${distText})`;
+        if (burnEl) burnEl.textContent = `${burnedKcal} kcal (Harikasınız!)`;
+        if (intakeEl) intakeEl.textContent = `${state.dailyIntakeKcal} kcal (Afiyet şifa olsun)`;
+        if (badgeEl) badgeEl.textContent = `${state.dailySteps} Adım | ${burnedKcal} kcal`;
+    }
+
+    window.addEventListener('devicemotion', (ev) => {
+        if (!state.stepCounterEnabled) return;
+        const acc = ev.accelerationIncludingGravity || ev.acceleration;
+        if (!acc || typeof acc.x !== 'number') return;
+        const mag = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+        const delta = Math.abs(mag - state.lastAccelMag);
+        state.lastAccelMag = mag * 0.8 + state.lastAccelMag * 0.2;
+
+        const now = performance.now();
+        if (delta > 3.1 && (now - state.lastStepPeakTime) > 340) {
+            state.lastStepPeakTime = now;
+            state.dailySteps++;
+            saveStepCalorieToStorage();
+            if (state.dailySteps > 0 && state.dailySteps % 100 === 0) {
+                const distM = Math.round(state.dailySteps * 0.72);
+                const burned = Math.round(state.dailySteps * 0.045);
+                announceGuidance(`Maşallah çok güzel yürüyorsunuz! Bugün ${state.dailySteps} adıma ulaştınız, yaklaşık ${distM} metre yürüdünüz ve ${burned} kalori enerji harcadınız. Attığınız her adım sağlığınıza sağlık katıyor!`, {
+                    force: true,
+                    bannerState: 'centered'
+                });
+            }
+        }
+    });
+
+    function toggleStepCounterActive() {
+        state.stepCounterEnabled = !state.stepCounterEnabled;
+        const btn = document.getElementById('btn-step-toggle');
+        if (btn) {
+            btn.classList.toggle('active-toggle', state.stepCounterEnabled);
+            btn.setAttribute('aria-pressed', state.stepCounterEnabled ? 'true' : 'false');
+            btn.textContent = state.stepCounterEnabled
+                ? '👟 Adım Sayacı: Açık (Yürüdükçe Sayar)'
+                : '⏸️ Adım Sayacı: Duraklatıldı';
+        }
+        announceGuidance(state.stepCounterEnabled
+            ? 'Sesli adım sayacı açıldı. Telefon cebinizde veya elinizde yürürken adımlarınızı sayıp her 100 adımda size moral vererek haber vereceğim.'
+            : 'Adım sayacı duraklatıldı.', { force: true });
+    }
+
+    function speakCurrentStepAndCalorieStatus() {
+        const distM = Math.round(state.dailySteps * 0.72);
+        const burnedKcal = Math.round(state.dailySteps * 0.045);
+        const distText = distM >= 1000 ? `${(distM / 1000).toFixed(2)} kilometre` : `${distM} metre`;
+        const cheer = state.dailySteps >= 500
+            ? 'Enerjiniz ve gayretiniz harika, kendinizle gurur duyabilirsiniz!'
+            : 'Önemli olan sayı değil, kendinizi iyi ve huzurlu hissetmenizdir; attığınız her adım çok kıymetli!';
+        announceGuidance(`Bugün şimdiye kadar ${state.dailySteps} adım attınız, yani yaklaşık ${distText} yürüdünüz ve ${burnedKcal} kalori harcadınız. Bugün kaydettiğiniz yemeklerden aldığınız enerji ise ${state.dailyIntakeKcal} kalori. ${cheer}`, {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
+    function resetDailyStepAndCalorieCounter() {
+        state.dailySteps = 0;
+        state.dailyIntakeKcal = 0;
+        saveStepCalorieToStorage();
+        announceGuidance('Günlük adım ve enerji sayacınız sıfırlandı. Yeni ve sağlıklı bir güne merhaba!', { force: true });
+    }
+
+    function calculateAndSpeakFoodCalories(foodQuery) {
+        const q = String(foodQuery || '').trim().toLocaleLowerCase('tr-TR');
+        if (!q) {
+            announceGuidance('Lütfen yediğiniz veya merak ettiğiniz yemeğin adını yazın ya da Yemeği Sesle Söyle düğmesine basın.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        let matched = null;
+        for (const item of TURKISH_FOOD_NUTRITION_DB) {
+            if (item.keys.some(k => q.includes(k) || k.includes(q))) {
+                matched = item;
+                break;
+            }
+        }
+        const lastFoodEl = document.getElementById('calorie-last-food');
+        const inp = document.getElementById('calorie-food-input');
+        if (inp) inp.value = '';
+
+        if (matched) {
+            state.dailyIntakeKcal += matched.kcal;
+            saveStepCalorieToStorage();
+            if (lastFoodEl) lastFoodEl.textContent = `${matched.name} (${matched.kcal} kcal)`;
+            announceGuidance(`Afiyet ve şifa olsun! ${matched.name} yaklaşık ${matched.kcal} kaloridir. ${matched.benefit} Günlük enerji toplamınız ${state.dailyIntakeKcal} kalori oldu.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        } else {
+            const estKcal = 180;
+            state.dailyIntakeKcal += estKcal;
+            saveStepCalorieToStorage();
+            if (lastFoodEl) lastFoodEl.textContent = `${foodQuery} (~${estKcal} kcal)`;
+            announceGuidance(`Afiyet olsun! "${foodQuery}" için ortalama bir porsiyon değeri yaklaşık ${estKcal} kaloridir ve vücudunuza güzel bir enerji sağlar. Günlük toplamınız ${state.dailyIntakeKcal} kalori oldu.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        }
+    }
+
+    function parsePackageOrMenuCaloriesKind(cleanText) {
+        const text = String(cleanText || '');
+        const kcalMatches = text.match(/\b\d{1,4}\s*(?:kcal|kalori|cal)\b/gi) || [];
+        const protMatches = text.match(/protein\s*[:\-]?\s*\d+(?:[.,]\d+)?\s*g/gi) || [];
+        const carbMatches = text.match(/karbonhidrat\s*[:\-]?\s*\d+(?:[.,]\d+)?\s*g/gi) || [];
+        const sugarMatches = text.match(/şeker\s*[:\-]?\s*\d+(?:[.,]\d+)?\s*g/gi) || [];
+
+        const parts = [];
+        if (kcalMatches.length > 0) parts.push(`Enerji Değeri: ${kcalMatches[0]}`);
+        if (protMatches.length > 0) parts.push(protMatches[0]);
+        if (carbMatches.length > 0) parts.push(carbMatches[0]);
+        if (sugarMatches.length > 0) parts.push(sugarMatches[0]);
+
+        const summary = parts.length > 0
+            ? `Pakette okunan besin değerleri: ${parts.join(', ')}. Afiyet ve şifa olsun!`
+            : (text ? `Paket veya menü yazısı: ${text.replace(/\s+/g, ' ')}` : 'Paketin üzerindeki besin değeri tablosu net görünmedi, lütfen biraz daha yaklaştırıp tekrar okutun.');
+        return {
+            speechText: summary,
+            fullText: `${summary}\n\nTam Okunan Metin:\n${text}`
+        };
+    }
+
     function syncModePanelsVisibility(activeMode) {
         if (el.examRemotePanel) {
             el.examRemotePanel.hidden = (activeMode !== 'exam_reader');
@@ -7952,8 +8148,11 @@
         if (el.whereAmIPanel) {
             el.whereAmIPanel.hidden = (activeMode !== 'where_am_i');
         }
+        if (el.stepCaloriePanel) {
+            el.stepCaloriePanel.hidden = (activeMode !== 'step_calorie_guide');
+        }
         if (el.targetFilterSection) {
-            el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder' || activeMode === 'item_memory');
+            el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder' || activeMode === 'item_memory' || activeMode === 'step_calorie_guide');
         }
     }
 
@@ -8000,7 +8199,8 @@
             'item_memory': `18. Bölüm: Eşyamı Nereye Koydum Sesli Hafıza ve Kavanoz Tanıtıcı açıldı. Şu an hafızanızda ${state.itemMemories ? state.itemMemories.length : 0} eşya kayıtlı. Eşya Yeri Kaydet veya Eşyam Nerede Sor düğmelerini kullanabilirsiniz.`,
             'tv_subtitle_score': '19. Bölüm: Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri açıldı. Telefonu televizyona doğru tutun ve Otomatik TV Spikerini Başlat düğmesine basın.',
             'sock_outfit_check': '20. Bölüm: Çorap Eşleştirici, Kıyafet Kombin Uyumu ve Leke Kontrolü açıldı. İki çorabı yan yana kameraya tutup Boşluk tuşuna basın; birbirinin eşi olup olmadığını ve leke durumunu söyleyeceğim.',
-            'where_am_i': '21. Bölüm: Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Tarif Edici açıldı. Bulunduğunuz cadde ve sokağı hemen öğreniliyor.'
+            'where_am_i': '21. Bölüm: Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Tarif Edici açıldı. Bulunduğunuz cadde ve sokağı hemen öğreniliyor.',
+            'step_calorie_guide': `22. Bölüm: Sesli Adım Sayacı ve Sağlıklı Besin Rehberi açıldı. Bugün ${state.dailySteps || 0} adım attınız. Telefon cebinizde yürürken adımlarınızı sayarım; ayrıca yediğiniz yemeği söyleyip veya paketi kameraya gösterip besin değerini öğrenebilirsiniz.`
         }[newMode];
 
         if (modeAnnouncement) {
@@ -8331,6 +8531,47 @@
     if (btnWhereAmINow) btnWhereAmINow.addEventListener('click', () => announceWhereAmIFullAddressAndSignboard('', []));
     if (btnWhereWhatsapp) btnWhereWhatsapp.addEventListener('click', shareWhereAmIOnWhatsapp);
 
+    const btnStepToggle = document.getElementById('btn-step-toggle');
+    const btnStepSpeakStatus = document.getElementById('btn-step-speak-status');
+    const btnStepReset = document.getElementById('btn-step-reset');
+    const calorieFoodInput = document.getElementById('calorie-food-input');
+    const btnCalorieCalc = document.getElementById('btn-calorie-calc');
+    const btnCalorieVoice = document.getElementById('btn-calorie-voice');
+
+    if (btnStepToggle) btnStepToggle.addEventListener('click', toggleStepCounterActive);
+    if (btnStepSpeakStatus) btnStepSpeakStatus.addEventListener('click', speakCurrentStepAndCalorieStatus);
+    if (btnStepReset) btnStepReset.addEventListener('click', resetDailyStepAndCalorieCounter);
+    if (btnCalorieCalc && calorieFoodInput) {
+        btnCalorieCalc.addEventListener('click', () => calculateAndSpeakFoodCalories(calorieFoodInput.value));
+        calorieFoodInput.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                calculateAndSpeakFoodCalories(calorieFoodInput.value);
+            }
+        });
+    }
+    if (btnCalorieVoice) {
+        btnCalorieVoice.addEventListener('click', () => {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) {
+                announceGuidance('Lütfen yemeğin adını kutuya yazın.', { force: true });
+                return;
+            }
+            announceGuidance('Şimdi yediğiniz veya merak ettiğiniz yemeğin adını söyleyin, örneğin: Mercimek çorbası veya 1 simit.', { force: true });
+            setTimeout(() => {
+                try {
+                    const rec = new SpeechRec();
+                    rec.lang = 'tr-TR';
+                    rec.onresult = (ev) => {
+                        const t = (ev.results && ev.results[0] && ev.results[0][0]) ? ev.results[0][0].transcript : '';
+                        if (t) calculateAndSpeakFoodCalories(t);
+                    };
+                    rec.start();
+                } catch (_) {}
+            }, 1500);
+        });
+    }
+
     el.touchZone.addEventListener('click', () => {
         const now = performance.now();
         if (now - state.lastTouchTime < 420) {
@@ -8409,6 +8650,7 @@
     window.addEventListener('load', () => {
         loadMoneyLedgerFromStorage();
         loadItemMemoriesFromStorage();
+        loadStepCalorieFromStorage();
         syncModePanelsVisibility(state.mode);
         autoAcquireLocationAndWatch();
         updateExamRemoteUI();
