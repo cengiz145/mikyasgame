@@ -68,154 +68,151 @@
             <input type="file" id="photo-file-input" accept="image/*,video/*" hidden aria-hidden="true">
         </section>
 
-        <!-- Hayatın Alanlarına Göre Kategoriler ve 21 Günlük Yaşam Yardımcısı -->
+        <!-- Kategoriler ve 21 Yardımcı Özellik -->
         <section aria-labelledby="mode-heading" class="mode-section">
-            <h2 id="mode-heading">Şu An Hayatın Hangi Alanındasınız? (Önce Alanı Seçin veya Tümünü Görün)</h2>
-            <div class="category-bar" role="group" aria-label="Hayatın Alanlarına Göre Yardımcı Kategorileri" style="display:flex; flex-wrap:wrap; gap:0.55rem; margin-bottom:0.9rem;">
-                <button type="button" class="secondary-btn category-tab active-toggle" data-category="all" aria-pressed="true" aria-label="Tüm Hayat Alanları: 21 Özelliğin Tamamını Göster">
-                    🌟 Tümü (21 Özellik)
+            <h2 id="mode-heading">Kategoriler</h2>
+            <div class="category-bar" role="group" aria-label="Uygulama Kategorileri" style="display:flex; flex-wrap:wrap; gap:0.55rem; margin-bottom:0.9rem;">
+                <button type="button" class="secondary-btn category-tab active-toggle" data-category="all" aria-pressed="true" aria-label="Tümü: 21 Özelliğin Tamamını Göster">
+                    🌟 Tümü
                 </button>
-                <button type="button" class="secondary-btn category-tab" data-category="ev_mutfak" aria-pressed="false" aria-label="Evde ve Mutfakta Lazım Olanlar: Çay Doldurma, Yiyecek Kontrolü, Eşyam Nerede Hafızası, Düşen Eşya ve Işık Bulucu">
-                    🏠 Evde ve Mutfakta (5)
+                <button type="button" class="secondary-btn category-tab" data-category="ev" aria-pressed="false" aria-label="Ev Kategorisi">
+                    🏠 Ev
                 </button>
-                <button type="button" class="secondary-btn category-tab" data-category="sokak_ulasim" aria-pressed="false" aria-label="Sokakta, Otobüste ve Yolda Lazım Olanlar: Otobüs Numarası ve Durak Alarmı, Tam Olarak Neredeyim, Kapı ve Asansör Okuyucu">
-                    🚌 Sokakta, Otobüste ve Yolda (4)
+                <button type="button" class="secondary-btn category-tab" data-category="is_egitim" aria-pressed="false" aria-label="İş ve Eğitim Kategorisi">
+                    💼 İş ve Eğitim
                 </button>
-                <button type="button" class="secondary-btn category-tab" data-category="alisveris_odeme" aria-pressed="false" aria-label="Alışverişte, Kasada ve Bankada Lazım Olanlar: Para Sayacı, POS Tutarı ve IBAN Kopyalayıcı, İmza Kalem Rehberi">
-                    🛒 Alışverişte, Kasada ve Bankada (3)
+                <button type="button" class="secondary-btn category-tab" data-category="saglik" aria-pressed="false" aria-label="Sağlık Kategorisi">
+                    🏥 Sağlık
                 </button>
-                <button type="button" class="secondary-btn category-tab" data-category="giyim_saglik" aria-pressed="false" aria-label="Giyinirken, Bakımda ve Sağlıkta Lazım Olanlar: Çorap Eşleştirici ve Leke Kontrolü, İlaç Tarihi, Özçekim Yardımcısı">
-                    👔 Giyinirken, Bakımda ve Sağlıkta (3)
+                <button type="button" class="secondary-btn category-tab" data-category="navigasyon" aria-pressed="false" aria-label="Navigasyon Kategorisi">
+                    🧭 Navigasyon
                 </button>
-                <button type="button" class="secondary-btn category-tab" data-category="egitim_ibadet" aria-pressed="false" aria-label="Sınavda, Okulda ve İbadette Lazım Olanlar: Sınav Sorusu ve Şık Okuyucu, Sesli Kıble Pusulası ve Namaz Vakitleri">
-                    📚 Sınavda, Okulda ve İbadette (2)
-                </button>
-                <button type="button" class="secondary-btn category-tab" data-category="medya_ortam" aria-pressed="false" aria-label="Televizyonda, Müzikte ve Ortamda Lazım Olanlar: Çalan Şarkıyı Bulucu, TV Altyazı ve Maç Skoru Spikeri, Bilgisayar QR, Odada Kim Var">
-                    📺 Televizyonda, Müzikte ve Ortamda (4)
+                <button type="button" class="secondary-btn category-tab" data-category="gunluk_yasam" aria-pressed="false" aria-label="Günlük Yaşam Kategorisi">
+                    🌿 Günlük Yaşam
                 </button>
             </div>
             <div class="mode-grid" role="radiogroup" aria-labelledby="mode-heading">
-                <button type="button" class="mode-card active" data-mode="exam_reader" data-category="egitim_ibadet" role="radio" aria-checked="true" id="mode-btn-1" aria-label="1. Sınav Sorusu ve Şık Okuyucu (A, B, C, D, E)">
+                <button type="button" class="mode-card active" data-mode="exam_reader" data-category="is_egitim" role="radio" aria-checked="true" id="mode-btn-1" aria-label="1. Sınav Sorusu ve Şık Okuyucu (A, B, C, D, E)">
                     <span class="mode-icon" aria-hidden="true">📝🅰️</span>
                     <span class="mode-title">1. Sınav Sorusu ve Şık Okuyucu (A, B, C, D, E)</span>
                     <span class="mode-desc" aria-hidden="true">Kağıdın üzerindeki el ve telefon gölgesini temizler, yan yana iki sütunlu testleri birbirine karıştırmadan ayırır. Soruyu ve A, B, C, D, E şıklarını tek tek düğmeyle okur.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="qibla_compass" data-category="egitim_ibadet" role="radio" aria-checked="false" id="mode-btn-2" aria-label="2. Sesli Kıble Pusulası ve Namaz Vakitleri">
+                <button type="button" class="mode-card" data-mode="qibla_compass" data-category="navigasyon" role="radio" aria-checked="false" id="mode-btn-2" aria-label="2. Sesli Kıble Pusulası ve Namaz Vakitleri">
                     <span class="mode-icon" aria-hidden="true">🕋🧭</span>
                     <span class="mode-title">2. Sesli Kıble Pusulası ve Namaz Vakitleri</span>
                     <span class="mode-desc" aria-hidden="true">Kıble yönünü hem pusula hem de Güneşin yönüyle kontrol ederek yanılmadan buldurur. 81 ilin namaz vakitlerini, ne kadar süre kaldığını ve kerahat saatini sesli söyler.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="qr_screen" data-category="medya_ortam" role="radio" aria-checked="false" id="mode-btn-3" aria-label="3. WhatsApp Web ve Bilgisayar Ekranı Hizalama">
+                <button type="button" class="mode-card" data-mode="qr_screen" data-category="is_egitim" role="radio" aria-checked="false" id="mode-btn-3" aria-label="3. WhatsApp Web ve Bilgisayar Ekranı Hizalama">
                     <span class="mode-icon" aria-hidden="true">💻📱</span>
                     <span class="mode-title">3. WhatsApp Web ve Bilgisayar Ekranı Hizalama</span>
                     <span class="mode-desc" aria-hidden="true">Telefonu bilgisayar ekranına tuttuğunuzda "biraz sağa, biraz yukarı" diyerek karekodu (QR) tam ortalamanızı sağlar. WhatsApp'a geçerken eliniz kaymasın diye 15 saniye sesle rehberlik eder.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="portrait" data-category="giyim_saglik" role="radio" aria-checked="false" id="mode-btn-4" aria-label="4. Özçekim (Selfie) ve Fotoğraf Çekim Yardımcısı">
+                <button type="button" class="mode-card" data-mode="portrait" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-4" aria-label="4. Özçekim (Selfie) ve Fotoğraf Çekim Yardımcısı">
                     <span class="mode-icon" aria-hidden="true">🧑🛡️</span>
                     <span class="mode-title">4. Özçekim (Selfie) ve Fotoğraf Çekim Yardımcısı</span>
                     <span class="mode-desc" aria-hidden="true">Yüzünüzün tam ortada olup olmadığını, arkanızdan vuran ışığın yüzünüzü karartıp karartmadığını ve arkada görünmemesi gereken bir eşya olup olmadığını söyleyip 3-2-1 diye çeker.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="color_cloth" data-category="alisveris_odeme" role="radio" aria-checked="false" id="mode-btn-5" aria-label="5. Demir Para, Kağıt Para Sayacı ve Kıyafet Rengi Tanıma">
+                <button type="button" class="mode-card" data-mode="color_cloth" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-5" aria-label="5. Demir Para, Kağıt Para Sayacı ve Kıyafet Rengi Tanıma">
                     <span class="mode-icon" aria-hidden="true">🪙💵</span>
                     <span class="mode-title">5. Demir Para, Kağıt Para Sayacı ve Kıyafet Rengi</span>
                     <span class="mode-desc" aria-hidden="true">Elinizdeki kağıt ve demir paraları gösterdikçe bir yandan kumbarada toplar; "Ne Kadar Param Var?" düğmesine bastığınızda tek tek neler olduğunu ve toplam kaç lira kaç kuruşunuz olduğunu sesli söyler.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="anomaly_led" data-category="ev_mutfak" role="radio" aria-checked="false" id="mode-btn-6" aria-label="6. Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü">
+                <button type="button" class="mode-card" data-mode="anomaly_led" data-category="ev" role="radio" aria-checked="false" id="mode-btn-6" aria-label="6. Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü">
                     <span class="mode-icon" aria-hidden="true">🔦🔍</span>
                     <span class="mode-title">6. Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü</span>
                     <span class="mode-desc" aria-hidden="true">Yere düşen anahtar, yüzük, hap gibi küçük eşyaları bulur; ayrıca modem, şarj aleti veya kombinin küçük ışığının yanıp sönüp sönmediğini ve rengini söyler.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="light_meter" data-category="ev_mutfak" role="radio" aria-checked="false" id="mode-btn-7" aria-label="7. Lamba Açık mı Kapalı mı ve Pencere Bulucu">
+                <button type="button" class="mode-card" data-mode="light_meter" data-category="ev" role="radio" aria-checked="false" id="mode-btn-7" aria-label="7. Lamba Açık mı Kapalı mı ve Pencere Bulucu">
                     <span class="mode-icon" aria-hidden="true">💡🧭</span>
                     <span class="mode-title">7. Lamba Açık mı Kapalı mı ve Pencere Bulucu</span>
                     <span class="mode-desc" aria-hidden="true">Odadaki lambaların açık mı kapalı mı olduğunu ve güneş ışığının hangi pencereden geldiğini ses tonuyla ve konuşarak haber verir.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="explorer" data-category="sokak_ulasim" role="radio" aria-checked="false" id="mode-btn-8" aria-label="8. Etrafımda Ne Var ve Evrak Okuyucu">
+                <button type="button" class="mode-card" data-mode="explorer" data-category="is_egitim" role="radio" aria-checked="false" id="mode-btn-8" aria-label="8. Etrafımda Ne Var ve Evrak Okuyucu">
                     <span class="mode-icon" aria-hidden="true">🧭📦</span>
                     <span class="mode-title">8. Etrafımda Ne Var ve Evrak / Yazı Okuyucu</span>
                     <span class="mode-desc" aria-hidden="true">Odanızdaki eşyaların (sandalye, masa, kapı, bardak) ne tarafta olduğunu söyler ve elinizdeki her türlü kağıt, fatura veya mektubu Türkçe seslendirir.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="medicine_skt" data-category="giyim_saglik" role="radio" aria-checked="false" id="mode-btn-9" aria-label="9. İlaç Kutusu ve Son Kullanma Tarihi Kontrolü">
+                <button type="button" class="mode-card" data-mode="medicine_skt" data-category="saglik" role="radio" aria-checked="false" id="mode-btn-9" aria-label="9. İlaç Kutusu ve Son Kullanma Tarihi Kontrolü">
                     <span class="mode-icon" aria-hidden="true">💊📅</span>
                     <span class="mode-title">9. İlaç Kutusu ve Son Kullanma Tarihi Kontrolü</span>
                     <span class="mode-desc" aria-hidden="true">İlacın adını, kaç miligram olduğunu, eczacının yazdığı "sabah-akşam" kullanım tarifini ve ilacın son kullanma tarihinin geçip geçmediğini kontrol edip sesli uyarır.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="signature_pen" data-category="alisveris_odeme" role="radio" aria-checked="false" id="mode-btn-10" aria-label="10. İmza Atarken Kalem Yönlendirici">
+                <button type="button" class="mode-card" data-mode="signature_pen" data-category="is_egitim" role="radio" aria-checked="false" id="mode-btn-10" aria-label="10. İmza Atarken Kalem Yönlendirici">
                     <span class="mode-icon" aria-hidden="true">✍️👆</span>
                     <span class="mode-title">10. İmza Atarken Kalem Yönlendirici</span>
                     <span class="mode-desc" aria-hidden="true">Kağıttaki imza yerini ve elinizdeki kalemin ucunu aynı anda görür; "Kalemi biraz sağa, biraz aşağı götür... Tamam dur, şimdi imzala!" diyerek doğru yeri imzalatır.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="liquid_level" data-category="ev_mutfak" role="radio" aria-checked="false" id="mode-btn-11" aria-label="11. Bardağa Çay ve Su Doldurma Yardımcısı">
+                <button type="button" class="mode-card" data-mode="liquid_level" data-category="ev" role="radio" aria-checked="false" id="mode-btn-11" aria-label="11. Bardağa Çay ve Su Doldurma Yardımcısı">
                     <span class="mode-icon" aria-hidden="true">☕🥛</span>
                     <span class="mode-title">11. Bardağa Çay ve Su Doldurma Yardımcısı</span>
                     <span class="mode-desc" aria-hidden="true">Bardağa sıcak çay, kahve veya su doldururken elinizi yakmadan bardağın ne kadar dolduğunu sesle takip eder; taşmasına yakın "Bardak doldu, durdurun!" diye uyarır.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="door_elevator_lcd" data-category="sokak_ulasim" role="radio" aria-checked="false" id="mode-btn-12" aria-label="12. Kapı Numarası, Asansör Tuşu ve Makine Ekranı">
+                <button type="button" class="mode-card" data-mode="door_elevator_lcd" data-category="navigasyon" role="radio" aria-checked="false" id="mode-btn-12" aria-label="12. Kapı Numarası, Asansör Tuşu ve Makine Ekranı">
                     <span class="mode-icon" aria-hidden="true">🚪🔢</span>
                     <span class="mode-title">12. Kapı Numarası, Asansör Tuşu ve Makine Ekranı</span>
                     <span class="mode-desc" aria-hidden="true">Apartman kapı numaralarını, asansörde parmağınızın hangi kat tuşunda olduğunu ve çamaşır makinesi, klima veya kombinin dijital ekranındaki dereceyi okur.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="food_freshness" data-category="ev_mutfak" role="radio" aria-checked="false" id="mode-btn-13" aria-label="13. Yiyecek Bozulmuş mu ve Paket İçeriği Okuyucu">
+                <button type="button" class="mode-card" data-mode="food_freshness" data-category="saglik" role="radio" aria-checked="false" id="mode-btn-13" aria-label="13. Yiyecek Bozulmuş mu ve Paket İçeriği Okuyucu">
                     <span class="mode-icon" aria-hidden="true">🍎🛡️</span>
                     <span class="mode-title">13. Yiyecek Bozulmuş mu ve Paket İçeriği Okuyucu</span>
                     <span class="mode-desc" aria-hidden="true">Ekmek, peynir veya meyvenin üzerinde küf ya da çürük lekesi olup olmadığını kontrol eder; market paketlerindeki alerji yapan maddeleri (gluten, süt, fıstık) ve tarihi okur.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="social_presence" data-category="medya_ortam" role="radio" aria-checked="false" id="mode-btn-14" aria-label="14. Odada Kim Var ve Bana Bakıyor mu? (Titreşimli)">
+                <button type="button" class="mode-card" data-mode="social_presence" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-14" aria-label="14. Odada Kim Var ve Bana Bakıyor mu? (Titreşimli)">
                     <span class="mode-icon" aria-hidden="true">👥👀</span>
                     <span class="mode-title">14. Odada Kim Var ve Bana Bakıyor mu? (Titreşimli)</span>
                     <span class="mode-desc" aria-hidden="true">Kulaklık gerekmez! Odada kimse duymadan, karşınızdaki kişi size baktığında telefonu avucunuzda çift titreştirir; çift dokunursanız hoparlörden de söyler.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="song_finder" data-category="medya_ortam" role="radio" aria-checked="false" id="mode-btn-15" aria-label="15. Bu Çalan Hangi Şarkı? (Otomatik Dinle ve Bul)">
+                <button type="button" class="mode-card" data-mode="song_finder" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-15" aria-label="15. Bu Çalan Hangi Şarkı? (Otomatik Dinle ve Bul)">
                     <span class="mode-icon" aria-hidden="true">🎵🎤</span>
                     <span class="mode-title">15. Bu Çalan Hangi Şarkı? (Dinle, Mırıldan veya Söz Söyle)</span>
                     <span class="mode-desc" aria-hidden="true">Televizyonda, radyoda veya kafede çalan şarkıyı dinler ya da hatırladığınız birkaç kelimesini/melodisini söylediğinizde şarkının adını, sanatçısını ve tüm sözlerini bulup size dinletir.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="bus_stop_tracker" data-category="sokak_ulasim" role="radio" aria-checked="false" id="mode-btn-16" aria-label="16. Otobüs Numarası Yakalayıcı ve İneceğim Durağa Geldim mi Alarmı">
+                <button type="button" class="mode-card" data-mode="bus_stop_tracker" data-category="navigasyon" role="radio" aria-checked="false" id="mode-btn-16" aria-label="16. Otobüs Numarası Yakalayıcı ve İneceğim Durağa Geldim mi Alarmı">
                     <span class="mode-icon" aria-hidden="true">🚌🔔</span>
                     <span class="mode-title">16. Otobüs Numarası ve "İneceğim Durağa Geldim mi?" Alarmı</span>
                     <span class="mode-desc" aria-hidden="true">Durakta yaklaşan otobüsün hat numarasını uzaktan okuyup titreştirir. Otobüse binince gideceğiniz durağı seçersiniz; durağa 300 metre ve 50 metre kala sesli ve titreşimli alarm verir.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="pos_iban_reader" data-category="alisveris_odeme" role="radio" aria-checked="false" id="mode-btn-17" aria-label="17. POS Cihazı Tutarı Okuyucu ve Tek Tuşla IBAN Kopyalayıcı">
+                <button type="button" class="mode-card" data-mode="pos_iban_reader" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-17" aria-label="17. POS Cihazı Tutarı Okuyucu ve Tek Tuşla IBAN Kopyalayıcı">
                     <span class="mode-icon" aria-hidden="true">💳📋</span>
                     <span class="mode-title">17. POS Cihazı Tutarı Okuyucu ve Tek Tuşla IBAN Kopyalayıcı</span>
                     <span class="mode-desc" aria-hidden="true">Kartınızı okutmadan önce POS ekranında kaç TL çekildiğini sesli söyler. Kağıttaki veya ekrandaki 26 haneli TR IBAN numarasını doğrulayıp tek tuşla telefon panosuna kopyalar.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="item_memory" data-category="ev_mutfak" role="radio" aria-checked="false" id="mode-btn-18" aria-label="18. Eşyamı Nereye Koydum Sesli Hafıza ve Kavanoz Etiketleyici">
+                <button type="button" class="mode-card" data-mode="item_memory" data-category="ev" role="radio" aria-checked="false" id="mode-btn-18" aria-label="18. Eşyamı Nereye Koydum Sesli Hafıza ve Kavanoz Etiketleyici">
                     <span class="mode-icon" aria-hidden="true">🎙️🏷️</span>
                     <span class="mode-title">18. "Eşyamı Nereye Koydum?" Sesli Hafıza ve Kavanoz Tanıtıcı</span>
                     <span class="mode-desc" aria-hidden="true">Anahtar, pasaport, ilaç gibi eşyalarınızı nereye koyduğunuzu sesle kaydeder ve sorduğunuzda anında hatırlatır; mutfaktaki kavanozları ve kutuları kameradan tanır.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="tv_subtitle_score" data-category="medya_ortam" role="radio" aria-checked="false" id="mode-btn-19" aria-label="19. Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri">
+                <button type="button" class="mode-card" data-mode="tv_subtitle_score" data-category="gunluk_yasam" role="radio" aria-checked="false" id="mode-btn-19" aria-label="19. Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri">
                     <span class="mode-icon" aria-hidden="true">📺⚽</span>
                     <span class="mode-title">19. Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri</span>
                     <span class="mode-desc" aria-hidden="true">Televizyondaki yabancı dizi/film altyazılarını, haberlerdeki son dakika bantlarını ve maçlardaki dakika ile skoru gerçek zamanlı takip edip Türkçe sesle okur.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="sock_outfit_check" data-category="giyim_saglik" role="radio" aria-checked="false" id="mode-btn-20" aria-label="20. Çorap Eşleştirici, Kıyafet Kombin Uyumu ve Leke Kontrolü">
+                <button type="button" class="mode-card" data-mode="sock_outfit_check" data-category="ev" role="radio" aria-checked="false" id="mode-btn-20" aria-label="20. Çorap Eşleştirici, Kıyafet Kombin Uyumu ve Leke Kontrolü">
                     <span class="mode-icon" aria-hidden="true">🧦👔</span>
                     <span class="mode-title">20. Çorap Eşleştirici, Kombin Uyumu ve Leke Kontrolü</span>
                     <span class="mode-desc" aria-hidden="true">Elinizdeki iki çorabın birbirinin eşi olup olmadığını, gömlek ve pantolon renk uyumunu ve kıyafetinizin üzerinde çay/yemek lekesi olup olmadığını anında söyler.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="where_am_i" data-category="sokak_ulasim" role="radio" aria-checked="false" id="mode-btn-21" aria-label="21. Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Paylaş">
+                <button type="button" class="mode-card" data-mode="where_am_i" data-category="navigasyon" role="radio" aria-checked="false" id="mode-btn-21" aria-label="21. Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Paylaş">
                     <span class="mode-icon" aria-hidden="true">📍🏪</span>
                     <span class="mode-title">21. "Tam Olarak Neredeyim?" Sokak + Tabela + WhatsApp Tarif</span>
                     <span class="mode-desc" aria-hidden="true">Bulunduğunuz cadde ve sokağı GPS'ten bulur, önünüzdeki dükkan tabelasını kameradan okur ve "Şu caddedeyim, önümde şu dükkan var" diyerek tek tuşla WhatsApp'tan gönderir.</span>

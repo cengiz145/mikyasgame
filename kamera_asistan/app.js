@@ -7166,13 +7166,12 @@
     // 6.5. YENİ HAYAT ALANI KATEGORİLERİ VE 16-21 ARASI EFSANE GÜNLÜK YAŞAM MODLARI
     // =========================================================================
     const LIFE_CATEGORY_LABELS = {
-        'all': 'Tüm Hayat Alanları (21 Özellik Bir Arada)',
-        'ev_mutfak': 'Evde ve Mutfakta Lazım Olan 5 Yardımcı',
-        'sokak_ulasim': 'Sokakta, Otobüste ve Yolda Lazım Olan 4 Yardımcı',
-        'alisveris_odeme': 'Alışverişte, Kasada ve Bankada Lazım Olan 3 Yardımcı',
-        'giyim_saglik': 'Giyinirken, Bakımda ve Sağlıkta Lazım Olan 3 Yardımcı',
-        'egitim_ibadet': 'Sınavda, Okulda ve İbadette Lazım Olan 2 Yardımcı',
-        'medya_ortam': 'Televizyonda, Müzikte ve Ortamda Lazım Olan 4 Yardımcı'
+        'all': 'Tümü (21 Özellik)',
+        'ev': 'Ev Kategorisi',
+        'is_egitim': 'İş ve Eğitim Kategorisi',
+        'saglik': 'Sağlık Kategorisi',
+        'navigasyon': 'Navigasyon Kategorisi',
+        'gunluk_yasam': 'Günlük Yaşam Kategorisi'
     };
 
     function filterModesByLifeCategory(catId) {
