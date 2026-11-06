@@ -898,6 +898,22 @@
 
     function stopAllSpeechImmediately() {
         state.isCurrentlySpeaking = false;
+        if (state.whatsappHoldTimer) {
+            clearInterval(state.whatsappHoldTimer);
+            state.whatsappHoldTimer = null;
+        }
+        if (state.voiceCapturePendingTimer) {
+            clearTimeout(state.voiceCapturePendingTimer);
+            state.voiceCapturePendingTimer = null;
+        }
+        if (state.whereAmIAutoTimer) {
+            clearTimeout(state.whereAmIAutoTimer);
+            state.whereAmIAutoTimer = null;
+        }
+        if (state.songAutoStartTimer) {
+            clearTimeout(state.songAutoStartTimer);
+            state.songAutoStartTimer = null;
+        }
         if ('speechSynthesis' in window) {
             try { window.speechSynthesis.cancel(); } catch (_) {}
         }
@@ -988,6 +1004,10 @@
 
         state.lastSpokenAt = now;
         state.lastSpokenPhrase = text;
+
+        if (typeof document !== 'undefined' && document.hidden) {
+            return;
+        }
 
         let spokeViaTts = false;
         const hasNativeBridge = Boolean(window.AndroidSongBridge && typeof window.AndroidSongBridge.speakNativeTurkish === 'function');
@@ -1490,7 +1510,7 @@
         if (elapsed >= CAMERA_IDLE_SLEEP_MS) {
             tryEnableHardwareTorch(false);
             stopCamera();
-            announceGuidance('Pil koruma uyarısı: 5 dakikadır hiçbir tuşa basılmadığı için telefonunuzun ısınmaması ve şarjınızın bitmemesi amacıyla kamera ve flaş otomatik olarak uyku moduna alındı. Tekrar başlatmak için ekrana çift dokunabilir veya Boşluk tuşuna basabilirsiniz.', {
+            announceGuidance('Pil koruma uyarısı: 5 dakikadır işlem yapılmadığı için cihazın ısınmasını ve pil tüketimini önlemek amacıyla kamera ve flaş otomatik olarak uyku moduna alındı. Tekrar başlatmak için ekrana çift dokunabilir veya Boşluk tuşuna basabilirsiniz.', {
                 force: true,
                 bannerState: 'warning'
             });
@@ -1928,7 +1948,7 @@
                 state.lastQrAt = now;
                 radar.playQrSuccessSound();
                 showDetectedResult('QR Kod Başarıyla Çözüldü', qrDetection.data);
-                announceGuidance(`QR kod tam hizalandı ve okundu: ${qrDetection.data}. WhatsApp Web taraması için elinizi hiç kıpırdatmadan sabit tutun!`, {
+                announceGuidance(`QR kod tam hizalandı ve okundu: ${qrDetection.data}. WhatsApp Web eşleştirmesi için cihazı sabit tutun.`, {
                     force: true,
                     bannerState: 'centered'
                 });
@@ -1959,7 +1979,7 @@
             radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
 
             if (align.isCentered) {
-                announceGuidance(`${targetName} tam karşınızda ortalandı! WhatsApp'a geçerken elinizi sabit tutmak için W tuşuna veya 15 saniye ses kilidi düğmesine basabilirsiniz.`, {
+                announceGuidance(`${targetName} tam karşınızda ortalandı. WhatsApp'a geçerken cihazı sabit tutmak için W tuşuna veya 15 saniye sabitleme rehberi düğmesine basabilirsiniz.`, {
                     bannerState: 'centered',
                     minIntervalMs: 3000
                 });
@@ -2219,10 +2239,10 @@
 
         const totalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
         const breakdown = computeMoneyBreakdownSummary();
-        const reportText = `💰 Toplam Paranız: ${totalFormatted}\nToplam Adet: ${breakdown.totalCount} adet para\nDetaylı Döküm: ${breakdown.spokenBreakdown}`;
-        showDetectedResult(`💰 Ne Kadar Param Var? — Toplam: ${totalFormatted}`, reportText);
+        const reportText = `💰 Toplam Tutar: ${totalFormatted}\nToplam Adet: ${breakdown.totalCount} adet para\nDetaylı Döküm: ${breakdown.spokenBreakdown}`;
+        showDetectedResult(`💰 Para Sayacı Raporu — Toplam: ${totalFormatted}`, reportText);
 
-        announceGuidance(`Toplam ${totalFormatted} paranız var. Sayılan toplam ${breakdown.totalCount} adet paranın dökümü şöyle: ${breakdown.spokenBreakdown}.`, {
+        announceGuidance(`Sayılan toplam tutar ${totalFormatted}. Toplam ${breakdown.totalCount} adet paranın dökümü: ${breakdown.spokenBreakdown}.`, {
             force: true,
             bannerState: 'centered'
         });
@@ -2320,7 +2340,7 @@
             return;
         }
         if (state.isRunning) {
-            announceGuidance('Kameradaki kağıt veya demir para okunup toplama ekleniyor...', { force: true });
+            announceGuidance('Kameradaki kağıt veya madeni para okunup toplama ekleniyor...', { force: true });
             captureAndDescribePhoto(false);
         } else {
             announceGuidance('Şu an kamerada görünen bir para yok. Lütfen önce kamerayı başlatıp parayı gösterin veya aşağıdaki hızlı para ekleme düğmelerini kullanın.', {
@@ -2794,10 +2814,10 @@
         let summarySpeech = '';
         if (classifiedCoins.length === 1) {
             const single = classifiedCoins[0];
-            summarySpeech = `Demir para algılandı: ${single.posWord} 1 adet ${single.name} (${single.metalDesc}).`;
+            summarySpeech = `Madeni para algılandı: ${single.posWord} 1 adet ${single.name} (${single.metalDesc}).`;
         } else if (classifiedCoins.length > 1) {
             const listStr = classifiedCoins.map(c => `${c.posWord} ${c.name}`).join(', ');
-            summarySpeech = `Toplam ${classifiedCoins.length} adet demir para algılandı: ${listStr}. Paraların toplam tutarı: ${totalFormatted}.`;
+            summarySpeech = `Toplam ${classifiedCoins.length} adet madeni para algılandı: ${listStr}. Paraların toplam tutarı: ${totalFormatted}.`;
         }
 
         return {
@@ -2819,7 +2839,7 @@
             const sig = coinReport.coins.map(c => c.valueKurus).sort((a, b) => b - a).join('+');
             const label = coinReport.coins.length === 1
                 ? coinReport.coins[0].name
-                : `${coinReport.coins.length} adet demir para (${coinReport.totalFormatted})`;
+                : `${coinReport.coins.length} adet madeni para (${coinReport.totalFormatted})`;
             const items = coinReport.coins.map(c => ({
                 valueKurus: c.valueKurus,
                 label: c.name,
@@ -2839,7 +2859,7 @@
 
             el.tPosition.textContent = coinReport.coins.length === 1
                 ? `${mainCoin.name} (${mainCoin.posWord})`
-                : `${coinReport.coins.length} Demir Para`;
+                : `${coinReport.coins.length} Madeni Para`;
             el.tDistance.textContent = `Görünen: ${coinReport.totalFormatted} • Cüzdan: ${formatTurkishKurusTotal(state.moneyTotalKurus)}`;
             radar.updateRadar(align.offsetX, align.offsetY, true);
 
@@ -3000,8 +3020,8 @@
             : pattern;
 
         const walletHint = state.moneyTotalKurus > 0
-            ? ` Şu ana kadar saydığınız toplam para: ${formatTurkishKurusTotal(state.moneyTotalKurus)}. Toplamı dinlemek için Ne Kadar Param Var düğmesine basabilirsiniz.`
-            : ' Elinizdeki kağıt ve demir paraları kameraya gösterdikçe hiçbir tuşa basmanıza gerek kalmadan otomatik tanıyıp toplarım.';
+            ? ` Şu ana kadar sayılan toplam tutar: ${formatTurkishKurusTotal(state.moneyTotalKurus)}. Toplamı dinlemek için Toplam Tutarı Dinle düğmesine basabilirsiniz.`
+            : ' Kağıt ve madeni paraları kameraya gösterdiğinizde otomatik olarak tanınır ve toplama eklenir.';
         const msg = `Merkezdeki renk: ${colorName} (${pattern}).${walletHint}`;
         announceGuidance(msg, {
             bannerState: 'centered',
@@ -3039,7 +3059,7 @@
             el.tDistance.textContent = `Toplam: ${coinCheck.totalFormatted}`;
             radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
 
-            announceGuidance(`Yerde düşmüş demir para bulundu! ${coinCheck.summarySpeech} ${align.sentence}`, {
+            announceGuidance(`Zeminde madeni para tespit edildi: ${coinCheck.summarySpeech} ${align.sentence}`, {
                 bannerState: 'centered',
                 minIntervalMs: 2500
             });
@@ -3049,7 +3069,7 @@
         if (metrics.isSurfacePatterned) {
             el.tPosition.textContent = 'Halı Çok Desenli';
             el.tDistance.textContent = 'Biraz Daha Yaklaştırın';
-            announceGuidance('Yerdeki halı çok desenli olduğu için halı desenini eşya sanmamak adına bekliyorum. Lütfen telefonu yere biraz daha yaklaştırın.', {
+            announceGuidance('Zemin yüzeyi yoğun desenli olduğu için hatalı algılamayı önlemek üzere bekleniyor. Lütfen cihazı zemine biraz daha yaklaştırın.', {
                 bannerState: 'warning',
                 minIntervalMs: 4200
             });
@@ -3077,7 +3097,7 @@
 
         el.tPosition.textContent = 'Yerde Eşya Görünmüyor';
         el.tDistance.textContent = 'Zemin Boş';
-        announceGuidance('Yere bakıyorum; şu an yerde düşmüş bir eşya veya yanan bir cihaz ışığı görünmüyor.', {
+        announceGuidance('Zemin taranıyor; şu an yerde küçük bir eşya veya aktif bir cihaz ışığı görünmüyor.', {
             bannerState: 'normal',
             minIntervalMs: 4200
         });
@@ -4359,7 +4379,7 @@
     }
 
     async function captureAndDescribePhoto(isAutoTriggered = false) {
-        if (!state.isRunning && !isAutoTriggered && el.video.readyState < 2) {
+        if (!state.isRunning && !isAutoTriggered) {
             await startCamera();
         }
         if (!state.isRunning || el.video.readyState < 2) {
@@ -4734,7 +4754,7 @@
                     return;
                 }
 
-                // ÖZEL MOD 16: OTOBÜS / MİNİBÜS HAT NUMARASI VE DURAK TABELASI OKUYUCU
+                // ÖZEL MOD 15: OTOBÜS / MİNİBÜS HAT NUMARASI VE DURAK TABELASI OKUYUCU
                 if (state.mode === 'bus_stop_tracker') {
                     const busReport = processBusRouteOcrResult(cleanText, preds);
                     showDetectedResult('🚌 Otobüs / Minibüs Hat Numarası ve Durak Raporu', busReport.fullText);
@@ -4742,7 +4762,7 @@
                     return;
                 }
 
-                // ÖZEL MOD 17: POS CİHAZI TUTARI DOĞRULAYICI VE TEK TUŞLA IBAN KOPYALAYICI
+                // ÖZEL MOD 16: POS CİHAZI TUTARI DOĞRULAYICI VE TEK TUŞLA IBAN KOPYALAYICI
                 if (state.mode === 'pos_iban_reader') {
                     const posIban = processPosAmountAndIbanText(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText);
                     showDetectedResult('💳 POS Cihazı Tutarı ve IBAN Raporu', posIban.fullText);
@@ -4750,15 +4770,15 @@
                     return;
                 }
 
-                // ÖZEL MOD 18: EŞYAMI NEREYE KOYDUM VE KAVANOZ / KUTU TANITICI
+                // ÖZEL MOD 17: SESLİ EŞYA KONUM KAYDI VE KAVANOZ ETİKETLEYİCİ
                 if (state.mode === 'item_memory') {
                     const jarMatch = matchOrDescribeJarAndMemoryItem(capCanvas, metrics, cleanText);
-                    showDetectedResult('🎙️ Eşya Hafızası ve Kavanoz / Kutu Tanıma', jarMatch.fullText);
+                    showDetectedResult('🎙️ Eşya Konum Kaydı ve Kavanoz / Kutu Tanıma Raporu', jarMatch.fullText);
                     announceGuidance(jarMatch.speechText, { force: true, bannerState: 'centered' });
                     return;
                 }
 
-                // ÖZEL MOD 19: TELEVİZYON ALTYAZI OKUYUCU VE CANLI MAÇ SKORU SPİKERİ
+                // ÖZEL MOD 18: TELEVİZYON ALTYAZI OKUYUCU VE CANLI MAÇ SKORU SPİKERİ
                 if (state.mode === 'tv_subtitle_score') {
                     const tvReport = processTvSubtitleAndScoreText(cleanText, false);
                     showDetectedResult('📺 Televizyon Altyazı ve Canlı Maç Skoru', tvReport.fullText);
@@ -4766,29 +4786,29 @@
                     return;
                 }
 
-                // ÖZEL MOD 20: ÇORAP EŞLEŞTİRİCİ, KOMBİN UYUMU VE LEKE KONTROLÜ
+                // ÖZEL MOD 19: ÇORAP EŞLEŞTİRİCİ, KIYAFET RENK UYUMU VE LEKE KONTROLÜ
                 if (state.mode === 'sock_outfit_check') {
                     const sockReport = analyzeSocksAndOutfitStains(capCanvas, metrics, cleanText);
-                    showDetectedResult('🧦 Çorap Eşleştirme, Kombin ve Leke Raporu', sockReport.fullText);
+                    showDetectedResult('🧦 Çorap Eşleştirme, Renk Uyumu ve Leke Raporu', sockReport.fullText);
                     announceGuidance(sockReport.speechText, { force: true, bannerState: 'centered' });
                     return;
                 }
 
-                // ÖZEL MOD 21: TAM OLARAK NEREDEYİM (SOKAK + TABELA + WHATSAPP KONUM TARİFİ)
+                // ÖZEL MOD 20: KONUM, AÇIK ADRES VE ÇEVRE TABELASI BİLDİRİMİ
                 if (state.mode === 'where_am_i') {
                     await announceWhereAmIFullAddressAndSignboard(cleanText, preds);
                     return;
                 }
 
-                // ÖZEL MOD 22: SESLİ ADIM SAYACI VE KALORİ / BESİN DEĞERİ REHBERİ (PAKET / MENÜ OKUMA)
+                // ÖZEL MOD 21: SESLİ ADIM SAYACI VE KALORİ / BESİN DEĞERİ REHBERİ (PAKET / MENÜ OKUMA)
                 if (state.mode === 'step_calorie_guide') {
                     const calReport = parsePackageOrMenuCaloriesKind(cleanText);
-                    showDetectedResult('👟🥗 Besin Değeri ve Sağlıklı Yaşam Raporu', calReport.fullText);
+                    showDetectedResult('👟🥗 Adım Sayacı ve Besin Değeri Raporu', calReport.fullText);
                     announceGuidance(calReport.speechText, { force: true, bannerState: 'centered' });
                     return;
                 }
 
-                // ÖZEL MOD 23: ADIM ADIM SESLİ YEMEK TARİFLERİ REHBERİ (HEM KAMERADAKİ MALZEME/PAKET YAZISINI OKUR HEM TARİF ADIMINI SÖYLER)
+                // ÖZEL MOD 22: ADIM ADIM SESLİ YEMEK TARİFLERİ REHBERİ (HEM KAMERADAKİ MALZEME/PAKET YAZISINI OKUR HEM TARİF ADIMINI SÖYLER)
                 if (state.mode === 'cooking_guide') {
                     if (cleanText) {
                         const cookInsights = buildUniversalSmartInsights(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText);
@@ -4845,7 +4865,7 @@
                         combinedKurus += photoCoins.totalKurus;
                         const coinLabel = photoCoins.coins.length === 1
                             ? photoCoins.coins[0].name
-                            : `${photoCoins.coins.length} adet demir para (${photoCoins.totalFormatted})`;
+                            : `${photoCoins.coins.length} adet madeni para (${photoCoins.totalFormatted})`;
                         combinedLabels.push(coinLabel);
                         combinedItems.push(...photoCoins.coins.map(c => ({ valueKurus: c.valueKurus, label: c.name, count: 1 })));
                     }
@@ -4856,15 +4876,15 @@
                     const breakdown = computeMoneyBreakdownSummary();
                     showDetectedResult(
                         `💵🪙 ${fullAddedLabel} Eklendi — Toplam: ${totalFormatted}`,
-                        `Eklenen Para: ${fullAddedLabel}\nŞu Anki Toplam Paranız: ${totalFormatted}\nSayılan Paralar: ${breakdown.spokenBreakdown}\n\n--- Detaylı Betimleme ---\n${fullStory}`
+                        `Eklenen Para: ${fullAddedLabel}\nŞu Anki Toplam Tutar: ${totalFormatted}\nSayılan Paralar: ${breakdown.spokenBreakdown}\n\n--- Detaylı Betimleme ---\n${fullStory}`
                     );
                     return;
                 } else if (banknoteDetails && state.mode !== 'color_cloth') {
                     showDetectedResult(
                         `💵 Algılanan Kağıt Para: ${banknoteDetails.label}`,
-                        `Görüntüdeki Kağıt Para: ${banknoteDetails.label}\n(Not: Paralarınızı cüzdan toplamınıza eklemek isterseniz 5. Bölüm olan Canlı Para Sayma moduna geçebilirsiniz.)\n\n--- Detaylı Betimleme ---\n${fullStory}`
+                        `Görüntüdeki Kağıt Para: ${banknoteDetails.label}\n(Not: Paraları sayaç toplamına eklemek için 5. Bölüm olan Madeni ve Kağıt Para Sayacı moduna geçebilirsiniz.)\n\n--- Detaylı Betimleme ---\n${fullStory}`
                     );
-                    announceGuidance(`Görüntüde ${banknoteDetails.label} kağıt para algılandı. Paralarınızı toplamak isterseniz 5. Bölüm olan Canlı Para Sayma moduna geçebilirsiniz.`, {
+                    announceGuidance(`Görüntüde ${banknoteDetails.label} kağıt para algılandı. Paraları toplamak için 5. Bölüm olan Madeni ve Kağıt Para Sayacı moduna geçebilirsiniz.`, {
                         force: true,
                         bannerState: 'centered'
                     });
@@ -5791,12 +5811,12 @@
         if (state.whatsappHoldTimer) {
             clearInterval(state.whatsappHoldTimer);
             state.whatsappHoldTimer = null;
-            announceGuidance('WhatsApp ses kilidi durduruldu.', { force: true });
+            announceGuidance('WhatsApp sabitleme rehberi durduruldu.', { force: true });
             return;
         }
 
         state.whatsappHoldEnd = performance.now() + 15000;
-        announceGuidance('15 saniyelik WhatsApp hizalama ses kilidi başladı! Elinizi hiç kıpırdatmadan şimdi WhatsApp uygulamasına geçip Cihaz Bağla düğmesine basın.', {
+        announceGuidance('15 saniyelik WhatsApp sabitleme rehberi başlatıldı. Cihazı sabit tutarak WhatsApp uygulamasına geçip Cihaz Bağla düğmesine basabilirsiniz.', {
             force: true,
             bannerState: 'centered'
         });
@@ -5896,8 +5916,17 @@
         radar.init();
 
         if (state.videoStream) {
+            tryEnableHardwareTorch(false);
             state.videoStream.getTracks().forEach(t => t.stop());
             state.videoStream = null;
+        }
+        state.torchActive = false;
+        hideRetinaFlash();
+        if (el.overlayCanvas && typeof el.overlayCanvas.getContext === 'function') {
+            try {
+                const ovCtx = el.overlayCanvas.getContext('2d');
+                if (ovCtx) ovCtx.clearRect(0, 0, el.overlayCanvas.width || 480, el.overlayCanvas.height || 360);
+            } catch (_) {}
         }
 
         const constraints = {
@@ -5959,8 +5988,17 @@
             }
         }
         if (state.videoStream) {
+            tryEnableHardwareTorch(false);
             state.videoStream.getTracks().forEach(t => t.stop());
             state.videoStream = null;
+        }
+        state.torchActive = false;
+        hideRetinaFlash();
+        if (el.overlayCanvas && typeof el.overlayCanvas.getContext === 'function') {
+            try {
+                const ovCtx = el.overlayCanvas.getContext('2d');
+                if (ovCtx) ovCtx.clearRect(0, 0, el.overlayCanvas.width || 480, el.overlayCanvas.height || 360);
+            } catch (_) {}
         }
         el.btnStart.textContent = '📷 Kamerayı ve Sesli Rehberi Başlat';
         el.btnStart.setAttribute('aria-pressed', 'false');
@@ -6512,7 +6550,7 @@
         radar.init();
         state.qiblaActive = true;
         if (state.mode !== 'qibla_compass') {
-            setMode('qibla_compass');
+            setMode('qibla_compass', { silentAnnouncement: true });
         }
         autoAcquireLocationAndWatch();
 
@@ -7392,7 +7430,7 @@
             const raw = localStorage.getItem(SAVED_SONGS_STORAGE_KEY);
             const list = raw ? JSON.parse(raw) : [];
             if (!Array.isArray(list) || list.length === 0) {
-                announceGuidance('Bulduğunuz şarkılar defterinde henüz kayıtlı bir şarkı yok. Bir şarkı bulduğunuzda otomatik olarak buraya kaydedilir.', {
+                announceGuidance('Kayıtlı şarkı geçmişinde henüz bir eser bulunmuyor. Tanımlanan şarkılar otomatik olarak buraya kaydedilir.', {
                     force: true,
                     bannerState: 'normal'
                 });
@@ -7401,12 +7439,12 @@
             const summaryItems = list.slice(0, 6).map((item, idx) =>
                 `${idx + 1}: ${item.artist} — ${item.title} (Saat ${item.savedAt})`
             );
-            const textReport = `📒 Bulduğunuz Şarkılar Defteri (${list.length} Şarkı):\n\n` +
+            const textReport = `📒 Kayıtlı Şarkı Geçmişi (${list.length} Şarkı):\n\n` +
                 list.map((item, idx) => `${idx + 1}. ${item.title} — ${item.artist} (${item.album}) [Saat ${item.savedAt}]`).join('\n');
-            showDetectedResult('📒 Bulduğum Şarkılar Defteri', textReport);
+            showDetectedResult('📒 Kayıtlı Şarkı Geçmişi', textReport);
             state.songAlternatives = list.slice(0, 5);
-            renderSongAlternatives(state.songAlternatives, 'Kayıtlı Şarkılarınızdan Tek Dokunuşla Dinleyin:');
-            announceGuidance(`Şarkı defterinizde toplam ${list.length} şarkı kayıtlı: ${summaryItems.join(', ')}.`, {
+            renderSongAlternatives(state.songAlternatives, 'Kayıtlı Şarkılardan Seçin:');
+            announceGuidance(`Şarkı geçmişinizde toplam ${list.length} eser kayıtlı: ${summaryItems.join(', ')}.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -7820,7 +7858,7 @@
         }
 
         if (state.songAutoRadarEnabled) {
-            announceGuidance('Otomatik Şarkı Takibi açıldı! Ortamda çalan her yeni şarkıyı otomatik dinleyip size adını ve sanatçısını haber vereceğim.', {
+            announceGuidance('Otomatik şarkı takibi etkinleştirildi. Ortamda çalan yeni şarkılar otomatik olarak tanımlanıp sesli bildirilecektir.', {
                 force: true,
                 bannerState: 'centered'
             });
@@ -7846,7 +7884,7 @@
         }
 
         if (state.songTunerActive) {
-            announceGuidance('Sesli Enstrüman Akort ve Makam Bulucu açıldı! Bağlama, gitar, keman veya ney çaldığınızda hangi notada olduğunuzu, teli sıkmanız mı yoksa gevşetmeniz mi gerektiğini ve makam dizisini sesli söyleyeceğim.', {
+            announceGuidance('Sesli Enstrüman Akort ve Makam Analizi etkinleştirildi. Enstrüman çaldığınızda nota frekansı, akort yönlendirmesi ve makam dizisi sesli olarak bildirilecektir.', {
                 force: true,
                 bannerState: 'centered'
             });
@@ -7879,9 +7917,7 @@
         }
 
         stopSongPreviewPlayback();
-        if ('speechSynthesis' in window) {
-            try { window.speechSynthesis.cancel(); } catch (_) {}
-        }
+        stopAllSpeechImmediately();
 
         const audio = new Audio(state.lastFoundSong.previewUrl);
         state.songPreviewAudio = audio;
@@ -8218,7 +8254,7 @@
             state.busStopAlert300Fired = false;
         }
         if (speakImmediately) {
-            announceGuidance(`Hedef durağınız: ${state.busTargetStop.name}. Şu an kalan mesafe: ${distFormatted}. Durağa 300 metre ve 50 metre kala size sesli ve titreşimli haber vereceğim.`, {
+            announceGuidance(`Hedef durağınız: ${state.busTargetStop.name}. Şu an kalan mesafe: ${distFormatted}. Durağa 300 metre ve 50 metre kala sesli ve titreşimli bildirim yapılacaktır.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -8231,7 +8267,7 @@
             return;
         }
         const inp = document.getElementById('bus-dest-input');
-        const customName = (inp && inp.value.trim()) ? inp.value.trim() : 'Kayıtlı Favori Durağım';
+        const customName = (inp && inp.value.trim()) ? inp.value.trim() : 'Kayıtlı Durağım';
         state.busTargetStop = { name: customName, lat: state.userLat, lon: state.userLon };
         // Şu an zaten bu durakta (0 metrede) olduğumuz için 7 saniye sonra yanlış "0 metre kaldı, inin!" alarmı çalmaması adına bayrakları işaretle;
         // duraktan 150 metre uzaklaşıldığında sistem bayrakları otomatik sıfırlayıp dönüşte alarm çalacaktır.
@@ -8249,7 +8285,7 @@
         } catch (_) {}
         if (state.busStopWatchTimer) clearInterval(state.busStopWatchTimer);
         state.busStopWatchTimer = setInterval(() => checkBusDestinationDistance(false), 7000);
-        announceGuidance(`Şu an bulunduğunuz konum "${customName}" olarak kaydedildi. Bir sonraki yolculuğunuzda bu durağa yaklaşırken 300 metre ve 50 metre kala size sesli haber vereceğim.`, { force: true, bannerState: 'centered' });
+        announceGuidance(`Mevcut konumunuz "${customName}" olarak kaydedildi. Bu durağa yaklaşırken 300 metre ve 50 metre kala sesli bildirim yapılacaktır.`, { force: true, bannerState: 'centered' });
     }
 
     function cancelBusStopAlarm() {
@@ -8515,7 +8551,7 @@
 
     function speakAllSavedItemMemories() {
         if (state.itemMemories.length === 0) {
-            announceGuidance('Hafıza defterinizde henüz kayıtlı bir eşya yok. Sesle Eşya Yeri Kaydet düğmesine basarak eşyalarınızın yerini kaydedebilirsiniz.', { force: true });
+            announceGuidance('Hafıza kayıtlarında henüz kayıtlı bir eşya bulunmuyor. Sesle Eşya Konumu Kaydet düğmesine basarak kayıt oluşturabilirsiniz.', { force: true });
             return;
         }
         const allText = state.itemMemories.slice(0, 10).map((m, i) => `${i + 1}: ${m.text}`).join('. ');
@@ -8524,7 +8560,7 @@
 
     function deleteLastItemMemoryEntry() {
         if (!state.itemMemories || state.itemMemories.length === 0) {
-            announceGuidance('Hafıza defterinizde silinecek kayıtlı bir eşya bulunmuyor.', { force: true, bannerState: 'warning' });
+            announceGuidance('Silinecek kayıtlı bir eşya konumu bulunmuyor.', { force: true, bannerState: 'warning' });
             return;
         }
         const removed = state.itemMemories.shift();
@@ -8557,25 +8593,60 @@
             return 'active_mode_status';
         }
 
+        // 0B. Doğrudan Bölüm Numarasıyla Seçim ("1. bölüm", "14. bölümü aç", "bölüm 22", "5. mod")
+        const modeNumMatch = q.match(/(?:^|\s)(?:bölüm\s*(\d{1,2})|mod\s*(\d{1,2})|(\d{1,2})\s*\.?\s*(?:bölüm|mod))/u);
+        if (modeNumMatch) {
+            const num = parseInt(modeNumMatch[1] || modeNumMatch[2] || modeNumMatch[3], 10);
+            const modeByNumber = {
+                1: 'exam_reader',
+                2: 'qibla_compass',
+                3: 'qr_screen',
+                4: 'portrait',
+                5: 'color_cloth',
+                6: 'anomaly_led',
+                7: 'light_meter',
+                8: 'explorer',
+                9: 'medicine_skt',
+                10: 'signature_pen',
+                11: 'liquid_level',
+                12: 'door_elevator_lcd',
+                13: 'food_freshness',
+                14: 'song_finder',
+                15: 'bus_stop_tracker',
+                16: 'pos_iban_reader',
+                17: 'item_memory',
+                18: 'tv_subtitle_score',
+                19: 'sock_outfit_check',
+                20: 'where_am_i',
+                21: 'step_calorie_guide',
+                22: 'cooking_guide'
+            }[num];
+            if (modeByNumber) {
+                setMode(modeByNumber);
+                return modeByNumber;
+            }
+        }
+
         // 1. Otobüs Durağı Alarmı ve Yolculuk Senaryosu
         if (/(?:otobüs|minibüs|dolmuş|durak|durağı|durağında|durağına|ineceğim|hat\s*numarası)/u.test(q)) {
-            setMode('bus_stop_tracker');
             let stopCandidate = q
                 .replace(/(?:otobüs|minibüs|dolmuş|durağında|durağına|durağı|durak|ineceğim|alarm\s*kur|alarmı\s*kur|geldim\s*mi|ne\s*kadar\s*kaldı|beni\s*uyar|haber\s*ver)/gu, ' ')
                 .replace(/\s+/g, ' ')
                 .trim();
             if (stopCandidate.length >= 3 && !/^(?:numarası|hat|kaç|geliyor|var\s*mı)$/u.test(stopCandidate)) {
+                setMode('bus_stop_tracker', { silentAnnouncement: true });
                 const inp = document.getElementById('bus-dest-input');
                 if (inp) inp.value = stopCandidate;
                 setBusDestinationStopAlarm(stopCandidate);
                 return 'bus_stop_alarm';
             }
+            setMode('bus_stop_tracker');
             return 'bus_stop_tracker';
         }
 
         // 2. Tam Olarak Neredeyim & Konum Paylaşma Senaryosu
         if (/(?:neredeyim|hangi\s*sokak|hangi\s*cadde|açık\s*adres|konumumu|konum\s*gönder|konum\s*paylaş|kayboldum)/u.test(q)) {
-            setMode('where_am_i');
+            setMode('where_am_i', { silentAnnouncement: true });
             if (/(?:gönder|paylaş|whatsapp)/u.test(q)) {
                 shareWhereAmIOnWhatsapp();
                 return 'where_am_i_whatsapp';
@@ -8586,7 +8657,7 @@
 
         // 3. Kıble Pusulası ve Namaz Vakitleri Senaryosu
         if (/(?:kıble|namaz|ezan|imsak|iftar|sahur|öğle\s*vakti|ikindi|akşam\s*ezanı|yatsı|kabe)/u.test(q)) {
-            setMode('qibla_compass');
+            setMode('qibla_compass', { silentAnnouncement: true });
             if (/(?:vakit|vakti|saat|ezan|imsak|iftar|sahur|kaçta|ne\s*kadar)/u.test(q)) {
                 speakPrayerTimesAndSolarValidation();
                 return 'qibla_prayer_times';
@@ -8597,21 +8668,23 @@
 
         // 4. POS Tutarı ve IBAN Kopyalama Senaryosu
         if (/(?:\biban\b|pos\s*cihaz|pos\s*ekran|kredi\s*kart|ödeme\s*tutar|fiş\s*tutar)/u.test(q)) {
-            setMode('pos_iban_reader');
             if (/kopyala/u.test(q) && state.lastDetectedIban) {
+                setMode('pos_iban_reader', { silentAnnouncement: true });
                 copyDetectedIbanToClipboard();
                 return 'pos_iban_copy';
             }
+            setMode('pos_iban_reader');
             return 'pos_iban_reader';
         }
 
         // 5. Canlı Para Sayma, Cüzdan ve Kumbara Senaryosu
-        if (/(?:kaç\s*lira|ne\s*kadar\s*param|para\s*say|cüzdan|kumbara|kağıt\s*para|bozuk\s*para|demir\s*para|kaç\s*param\s*var)/u.test(q)) {
-            setMode('color_cloth');
-            if (/(?:ne\s*kadar\s*param|kaç\s*param|toplam\s*kaç|cüzdanımda)/u.test(q)) {
+        if (/(?:kaç\s*lira|ne\s*kadar\s*param|para\s*say|cüzdan|kumbara|kağıt\s*para|bozuk\s*para|demir\s*para|madeni\s*para|toplam\s*tutar|kıyafet\s*rengi|kaç\s*param\s*var)/u.test(q)) {
+            if (/(?:ne\s*kadar\s*param|kaç\s*param|toplam\s*kaç|toplam\s*tutar|cüzdanımda)/u.test(q)) {
+                setMode('color_cloth', { silentAnnouncement: true });
                 speakHowMuchMoneyIHave();
                 return 'money_total';
             }
+            setMode('color_cloth');
             return 'color_cloth';
         }
 
@@ -8622,22 +8695,29 @@
         }
 
         // 7. Eşyamı Nereye Koydum (Sorma veya Kaydetme) & Kavanoz Senaryosu
-        if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum|kavanoz|\b(?:koydum|bıraktım|sakladım|astım)\b)/u.test(q)) {
-            setMode('item_memory');
+        if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum|kavanoz|eşya\s*konum|kayıtlı\s*eşya|\b(?:koydum|bıraktım|sakladım|astım)\b)/u.test(q)) {
+            if (/kayıtlı\s*eşya/u.test(q)) {
+                setMode('item_memory', { silentAnnouncement: true });
+                speakAllSavedItemMemories();
+                return 'item_memory';
+            }
             if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum)/u.test(q)) {
+                setMode('item_memory', { silentAnnouncement: true });
                 searchItemMemoryByQuery(raw);
                 return 'item_memory_search';
             }
             if (/\b(?:koydum|bıraktım|sakladım|astım)\b/u.test(q)) {
+                setMode('item_memory', { silentAnnouncement: true });
                 saveItemMemoryEntry(raw);
                 return 'item_memory_save';
             }
+            setMode('item_memory');
             return 'item_memory';
         }
 
         // 8. Adım Sayacı ve Yemek Kalori Hesaplama Senaryosu
         if (/(?:kaç\s*adım|adım\s*say|ne\s*kadar\s*yürüdüm|kalori|kaç\s*kalori|besin\s*değeri)/u.test(q)) {
-            setMode('step_calorie_guide');
+            setMode('step_calorie_guide', { silentAnnouncement: true });
             if (/(?:kalori|besin)/u.test(q)) {
                 const foodPart = q.replace(/(?:kaç\s*kalori|kalorisi\s*kaç|kalori|besin\s*değeri|nedir|acaba)/gu, ' ').trim();
                 if (foodPart.length >= 2) {
@@ -8651,25 +8731,29 @@
 
         // 9. Sesli Yemek Tarifleri ve Evdeki Malzemeyle Tarif Bulma Senaryosu
         if (/(?:yemek\s*tarif|ne\s*pişir|nasıl\s*yapılır|tarifi\b|ocaksız|evde\s+.*?\s+var|çorba\s*tarif|pilav\s*tarif|menemen|mercimek)/u.test(q)) {
-            setMode('cooking_guide');
             if (/ocaksız/u.test(q)) {
+                setMode('cooking_guide', { silentAnnouncement: true });
                 filterCookingRecipesByCategory('ocaksiz', true);
                 return 'cooking_ocaksiz';
             }
             const recipeQuery = q.replace(/(?:yemek\s*tarifleri|yemek\s*tarifi|ne\s*pişireyim|ne\s*pişirsem|nasıl\s*yapılır|tarifi\s*ver|bana\s*tarif)/gu, ' ').trim();
             if (recipeQuery.length >= 3) {
+                setMode('cooking_guide', { silentAnnouncement: true });
                 findRecipeByIngredientsOrName(raw);
                 return 'cooking_recipe_search';
             }
+            setMode('cooking_guide');
             return 'cooking_guide';
         }
 
         // 10. Televizyon Altyazı ve Canlı Maç Skoru Senaryosu
         if (/(?:televizyon|tv\s*oku|altyazı|maç\s*kaç\s*kaç|maç\s*skoru|skor\s*ne)/u.test(q)) {
-            setMode('tv_subtitle_score');
             if (/(?:başlat|otomatik|spiker)/u.test(q) && !state.tvAutoReaderActive) {
+                setMode('tv_subtitle_score', { silentAnnouncement: true });
                 toggleTvAutoSubtitleSpeaker();
+                return 'tv_subtitle_score';
             }
+            setMode('tv_subtitle_score');
             return 'tv_subtitle_score';
         }
 
@@ -8680,19 +8764,24 @@
         }
 
         // 12. Şarkı Bulucu ve Enstrüman Akort Senaryosu
-        if (/(?:hangi\s*şarkı|çalan\s*şarkı|şarkı\s*bul|şarkıyı\s*bul|mırıldan|akort|bağlama|gitar\s*akort|makam)/u.test(q)) {
-            setMode('song_finder');
+        if (/(?:hangi\s*şarkı|çalan\s*şarkı|şarkı\s*bul|şarkıyı\s*bul|şarkı\s*tanı|müzik\s*tanı|melodi\s*tanı|melodi\s*bul|şarkı\s*sözü|mırıldan|akort|bağlama|gitar\s*akort|makam)/u.test(q)) {
             if (/(?:akort|bağlama|gitar)/u.test(q) && !state.songTunerActive) {
+                setMode('song_finder', { silentAnnouncement: true });
                 toggleInstrumentTunerAndMakam();
                 return 'song_tuner';
             }
+            setMode('song_finder');
             return 'song_finder';
         }
 
         // 13. Sınav ve Test Okuyucu Senaryosu
         if (/(?:sınav|test\s*soru|şık\s*oku|soruyu\s*oku)/u.test(q)) {
+            if (/soruyu\s*oku/u.test(q)) {
+                setMode('exam_reader', { silentAnnouncement: true });
+                speakCurrentQuestionStem();
+                return 'exam_reader';
+            }
             setMode('exam_reader');
-            if (/soruyu\s*oku/u.test(q)) speakCurrentQuestionStem();
             return 'exam_reader';
         }
 
@@ -8780,7 +8869,14 @@
         };
 
         announceGuidance(promptMsg, { force: true });
-        setTimeout(launchRec, 2400);
+        if (state.voiceCapturePendingTimer) {
+            clearTimeout(state.voiceCapturePendingTimer);
+        }
+        state.voiceCapturePendingTimer = setTimeout(() => {
+            state.voiceCapturePendingTimer = null;
+            if (typeof document !== 'undefined' && document.hidden) return;
+            launchRec();
+        }, 2400);
     }
 
     function handleItemMemoryLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
@@ -8914,7 +9010,7 @@
             if (!state.isRunning) {
                 startCamera();
             }
-            announceGuidance('Otomatik televizyon altyazı ve maç skoru spikeri başlatıldı. Telefonu televizyona doğru tutun; yeni altyazı çıktıkça sesli okuyacağım.', {
+            announceGuidance('Otomatik televizyon altyazı ve maç skoru spikeri başlatıldı. Cihazı televizyon ekranına yöneltin; yeni altyazı ve skor bilgileri otomatik olarak seslendirilecektir.', {
                 force: true,
                 bannerState: 'centered'
             });
@@ -8929,7 +9025,7 @@
     }
 
     async function readTvScreenNow(isAutoTick = false) {
-        if (!state.isRunning && !isAutoTick && !el.video.videoWidth) {
+        if (!state.isRunning && !isAutoTick) {
             await startCamera();
         }
         if (!state.isRunning || !el.video.videoWidth || typeof window.Tesseract === 'undefined' || state.isProcessingOcr) {
@@ -9158,12 +9254,12 @@
         const cleanSign = String(optionalOcrText || '').replace(/\s+/g, ' ').trim();
         const signDesc = cleanSign.length >= 3
             ? `Önünüzdeki tabelada okunan yazı: ${cleanSign}.`
-            : 'Kamerayı önünüzdeki dükkan veya sokak tabelasına tutup Boşluk tuşuna basarsanız tabelayı da eklerim.';
+            : 'Kamerayı çevre veya sokak tabelasına yöneltip Boşluk tuşuna basarak tabela bilgisini de ekleyebilirsiniz.';
         if (signEl) signEl.textContent = cleanSign.length >= 3 ? cleanSign : 'Henüz tabela okutulmadı';
 
         const fullSpeech = `Şu an bulunduğunuz açık adres: ${addressDesc}. ${signDesc}`;
         state.lastWhereAmISummary = fullSpeech;
-        showDetectedResult('📍 Tam Olarak Neredeyim? Açık Adres ve Tabela Raporu', fullSpeech);
+        showDetectedResult('📍 Konum, Açık Adres ve Çevre Tabelası Raporu', fullSpeech);
         announceGuidance(fullSpeech, { force: true, bannerState: 'centered' });
     }
 
@@ -9192,22 +9288,22 @@
     state.lastAccelMag = 9.8;
 
     const TURKISH_FOOD_NUTRITION_DB = [
-        { keys: ['mercimek çorbası', 'mercimek', 'çorba'], name: '1 Kase Mercimek Çorbası', kcal: 135, benefit: 'Lif ve bitkisel protein açısından çok zengindir, içinizi ısıtır ve uzun süre tok tutar.' },
-        { keys: ['ezogelin', 'tarhana', 'yayla çorbası'], name: '1 Kase Geleneksel Çorba', kcal: 140, benefit: 'Bağışıklığı güçlendirir ve sindirimi rahatlatır.' },
-        { keys: ['kuru fasulye', 'fasulye', 'nohut'], name: '1 Porsiyon Kuru Fasulye / Nohut', kcal: 240, benefit: 'Harika bir protein ve demir kaynağıdır, vücuda güç verir.' },
-        { keys: ['pilav', 'pirinç pilavı', 'bulgur pilavı', 'bulgur'], name: '1 Porsiyon Pilav', kcal: 210, benefit: 'Gün boyu zinde kalmanız için dengeli enerji sağlar.' },
-        { keys: ['simit', 'gevrek', 'poğaça'], name: '1 Adet Susamlı Simit', kcal: 275, benefit: 'Susamındaki sağlıklı yağlar ve tahılıyla kahvaltının en güzel keyfidir.' },
-        { keys: ['yumurta', 'haşlanmış yumurta', 'omlet', 'menemen'], name: 'Yumurta / Menemen', kcal: 155, benefit: 'En kaliteli protein ve B12 kaynağıdır, hafızayı ve kasları güçlendirir.' },
-        { keys: ['peynir', 'beyaz peynir', 'kaşar', 'zeytin'], name: 'Kahvaltılık Peynir ve Zeytin Porsiyonu', kcal: 120, benefit: 'Kalsiyum ve sağlıklı E vitamini ile kemiklerinizi korur.' },
-        { keys: ['köfte', 'ızgara köfte', 'dana eti', 'kırmızı et', 'kuşbaşı et', 'kebap', 'tavuk', 'balık'], name: '1 Porsiyon Et / Tavuk / Balık / Köfte', kcal: 260, benefit: 'Yüksek protein değeriyle dokuları yeniler ve enerji verir.' },
-        { keys: ['makarna', 'mantı', 'börek'], name: '1 Porsiyon Makarna / Börek / Mantı', kcal: 290, benefit: 'Mutluluk hormonu salgılanmasına yardımcı olan doyurucu bir öğündür.' },
-        { keys: ['süt', '1 bardak süt', 'tam yağlı süt', 'keçi sütü'], name: '1 Su Bardağı Süt (200 ml)', kcal: 122, benefit: '6.8 gram kaliteli protein ve bol kalsiyum içerir; kemik sağlığını güçlendirir ve rahat bir uyku sağlar.' },
-        { keys: ['salata', 'çoban salata', 'yeşillik', 'cacık', 'yoğurt', 'ayran'], name: '1 Kase Yoğurt / Ayran / Taze Salata', kcal: 95, benefit: 'Ferahlatıcıdır, vitamin ve probiyotik desteğiyle vücudu yeniler.' },
-        { keys: ['elma', 'muz', 'portakal', 'mandalina', 'çilek', 'karpuz', 'meyve'], name: '1 Porsiyon Taze Meyve', kcal: 75, benefit: 'Doğal C vitamini ve antioksidan deposudur, cilde ve bağışıklığa çok iyi gelir.' },
-        { keys: ['çay', 'türk kahvesi', 'kahve', 'ıhlamur', 'bitki çayı'], name: 'Şekersiz Çay / Türk Kahvesi', kcal: 5, benefit: 'Zihni açar, yorgunluğu alır ve neredeyse hiç kalorisi yoktur.' },
-        { keys: ['içme suyu', 'maden suyu', 'soda'], name: 'Su / Doğal Maden Suyu', kcal: 0, benefit: '0 kaloridir; vücudunuzun su ve mineral dengesini korur.' },
-        { keys: ['baklava', 'sütlaç', 'tatlı', 'çikolata', 'kek', 'pasta', 'dondurma'], name: '1 Porsiyon Tatlı / Çikolata Keyfi', kcal: 250, benefit: 'Ruhu tatlandırır ve moral verir! Küçük bir yürüyüşle enerjisi keyfe dönüşür.' },
-        { keys: ['ekmek', 'tam buğday', 'tost'], name: '1 Dilim Ekmek / Tost', kcal: 85, benefit: 'B vitaminleri içerir ve öğünlerinize doyuruculuk katar.' }
+        { keys: ['mercimek çorbası', 'mercimek', 'çorba'], name: '1 Kase Mercimek Çorbası', kcal: 135, benefit: 'Lif ve bitkisel protein açısından zengindir; uzun süre tokluk sağlar ve sindirimi destekler.' },
+        { keys: ['ezogelin', 'tarhana', 'yayla çorbası'], name: '1 Kase Geleneksel Çorba', kcal: 140, benefit: 'Bağışıklık sistemini destekler ve sindirimi kolaylaştırır.' },
+        { keys: ['kuru fasulye', 'fasulye', 'nohut'], name: '1 Porsiyon Kuru Fasulye / Nohut', kcal: 240, benefit: 'Yüksek bitkisel protein ve demir kaynağıdır.' },
+        { keys: ['pilav', 'pirinç pilavı', 'bulgur pilavı', 'bulgur'], name: '1 Porsiyon Pilav', kcal: 210, benefit: 'Günlük enerji ihtiyacını karşılamaya yardımcı kompleks karbonhidrat içerir.' },
+        { keys: ['simit', 'gevrek', 'poğaça'], name: '1 Adet Susamlı Simit', kcal: 275, benefit: 'Karbonhidrat ve bitkisel yağ açısından doyurucu bir besindir.' },
+        { keys: ['yumurta', 'haşlanmış yumurta', 'omlet', 'menemen'], name: 'Yumurta / Menemen', kcal: 155, benefit: 'Yüksek kaliteli protein ve B12 vitamini kaynağıdır; kas yapısını destekler.' },
+        { keys: ['peynir', 'beyaz peynir', 'kaşar', 'zeytin'], name: 'Kahvaltılık Peynir ve Zeytin Porsiyonu', kcal: 120, benefit: 'Kalsiyum ve E vitamini içeriğiyle kemik sağlığını destekler.' },
+        { keys: ['köfte', 'ızgara köfte', 'dana eti', 'kırmızı et', 'kuşbaşı et', 'kebap', 'tavuk', 'balık'], name: '1 Porsiyon Et / Tavuk / Balık / Köfte', kcal: 260, benefit: 'Yüksek protein değeriyle doku onarımını destekler ve enerji sağlar.' },
+        { keys: ['makarna', 'mantı', 'börek'], name: '1 Porsiyon Makarna / Börek / Mantı', kcal: 290, benefit: 'Karbonhidrat açısından zengin, enerji verici bir öğündür.' },
+        { keys: ['süt', '1 bardak süt', 'tam yağlı süt', 'keçi sütü'], name: '1 Su Bardağı Süt (200 ml)', kcal: 122, benefit: '6.8 gram protein ve kalsiyum içerir; kemik gelişimini ve korunmasını destekler.' },
+        { keys: ['salata', 'çoban salata', 'yeşillik', 'cacık', 'yoğurt', 'ayran'], name: '1 Kase Yoğurt / Ayran / Taze Salata', kcal: 95, benefit: 'Vitamin, mineral ve probiyotik içeriğiyle sindirim sistemini destekler.' },
+        { keys: ['elma', 'muz', 'portakal', 'mandalina', 'çilek', 'karpuz', 'meyve'], name: '1 Porsiyon Taze Meyve', kcal: 75, benefit: 'Doğal C vitamini, lif ve antioksidan kaynağıdır.' },
+        { keys: ['çay', 'türk kahvesi', 'kahve', 'ıhlamur', 'bitki çayı'], name: 'Şekersiz Çay / Türk Kahvesi', kcal: 5, benefit: 'Düşük kalorilidir ve antioksidan bileşenler içerir.' },
+        { keys: ['içme suyu', 'maden suyu', 'soda'], name: 'Su / Doğal Maden Suyu', kcal: 0, benefit: '0 kaloridir; vücudun sıvı ve mineral dengesini korur.' },
+        { keys: ['baklava', 'sütlaç', 'tatlı', 'çikolata', 'kek', 'pasta', 'dondurma'], name: '1 Porsiyon Tatlı / Çikolata', kcal: 250, benefit: 'Yüksek karbonhidrat ve enerji içerir; dengeli tüketilmesi önerilir.' },
+        { keys: ['ekmek', 'tam buğday', 'tost'], name: '1 Dilim Ekmek / Tost', kcal: 85, benefit: 'B grubu vitaminleri içerir ve öğünlere karbonhidrat desteği sağlar.' }
     ];
 
     function getLocalTodayDateKey() {
@@ -9252,8 +9348,8 @@
 
         const distText = distM >= 1000 ? `${(distM / 1000).toFixed(2)} km` : `${distM} metre`;
         if (stepEl) stepEl.textContent = `${state.dailySteps} Adım (${distText})`;
-        if (burnEl) burnEl.textContent = `${burnedKcal} kcal (Harikasınız!)`;
-        if (intakeEl) intakeEl.textContent = `${state.dailyIntakeKcal} kcal (Afiyet şifa olsun)`;
+        if (burnEl) burnEl.textContent = `${burnedKcal} kcal`;
+        if (intakeEl) intakeEl.textContent = `${state.dailyIntakeKcal} kcal`;
         if (badgeEl) badgeEl.textContent = `${state.dailySteps} Adım | ${burnedKcal} kcal`;
     }
 
@@ -9273,7 +9369,7 @@
             if (state.mode === 'step_calorie_guide' && state.dailySteps > 0 && state.dailySteps % 100 === 0) {
                 const distM = Math.round(state.dailySteps * 0.72);
                 const burned = Math.round(state.dailySteps * 0.045);
-                announceGuidance(`Maşallah çok güzel yürüyorsunuz! Bugün ${state.dailySteps} adıma ulaştınız, yaklaşık ${distM} metre yürüdünüz ve ${burned} kalori enerji harcadınız. Attığınız her adım sağlığınıza sağlık katıyor!`, {
+                announceGuidance(`Yürüyüş bilgilendirmesi: Bugün ${state.dailySteps} adıma ulaştınız, yaklaşık ${distM} metre yürüdünüz ve ${burned} kalori enerji harcadınız.`, {
                     force: true,
                     bannerState: 'centered'
                 });
@@ -9292,7 +9388,7 @@
                 : '⏸️ Adım Sayacı: Duraklatıldı';
         }
         announceGuidance(state.stepCounterEnabled
-            ? 'Sesli adım sayacı açıldı. Telefon cebinizde veya elinizde yürürken adımlarınızı sayıp her 100 adımda size moral vererek haber vereceğim.'
+            ? 'Sesli adım sayacı etkinleştirildi. Yürüyüş sırasında adımlarınız sayılacak ve her 100 adımda sesli bilgilendirme yapılacaktır.'
             : 'Adım sayacı duraklatıldı.', { force: true });
     }
 
@@ -9300,10 +9396,7 @@
         const distM = Math.round(state.dailySteps * 0.72);
         const burnedKcal = Math.round(state.dailySteps * 0.045);
         const distText = distM >= 1000 ? `${(distM / 1000).toFixed(2)} kilometre` : `${distM} metre`;
-        const cheer = state.dailySteps >= 500
-            ? 'Enerjiniz ve gayretiniz harika, kendinizle gurur duyabilirsiniz!'
-            : 'Önemli olan sayı değil, kendinizi iyi ve huzurlu hissetmenizdir; attığınız her adım çok kıymetli!';
-        announceGuidance(`Bugün şimdiye kadar ${state.dailySteps} adım attınız, yani yaklaşık ${distText} yürüdünüz ve ${burnedKcal} kalori harcadınız. Bugün kaydettiğiniz yemeklerden aldığınız enerji ise ${state.dailyIntakeKcal} kalori. ${cheer}`, {
+        announceGuidance(`Bugün şimdiye kadar ${state.dailySteps} adım attınız, yaklaşık ${distText} yürüdünüz ve ${burnedKcal} kalori enerji harcadınız. Kaydedilen besinlerden alınan toplam enerji ise ${state.dailyIntakeKcal} kaloridir.`, {
             force: true,
             bannerState: 'centered'
         });
@@ -9315,7 +9408,7 @@
             state.dailyIntakeKcal = state.stepCalorieBackupBeforeReset.dailyIntakeKcal || 0;
             state.stepCalorieBackupBeforeReset = null;
             saveStepCalorieToStorage();
-            announceGuidance(`Yanlışlıkla sıfırlanan ${state.dailySteps} adım ve ${state.dailyIntakeKcal} kalori bilginiz başarıyla geri yüklendi!`, {
+            announceGuidance(`Yanlışlıkla sıfırlanan ${state.dailySteps} adım ve ${state.dailyIntakeKcal} kalori bilginiz başarıyla geri yüklendi.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -9330,7 +9423,7 @@
         state.dailySteps = 0;
         state.dailyIntakeKcal = 0;
         saveStepCalorieToStorage();
-        announceGuidance('Günlük adım ve enerji sayacınız sıfırlandı. Yanlışlıkla sıfırladıysanız bu düğmeye tekrar basarak adımlarınızı geri yükleyebilirsiniz. Yeni ve sağlıklı bir güne merhaba!', { force: true });
+        announceGuidance('Günlük adım ve enerji sayacınız sıfırlandı. Yanlışlıkla sıfırladıysanız bu düğmeye tekrar basarak verilerinizi geri yükleyebilirsiniz.', { force: true });
     }
 
     function calculateAndSpeakFoodCalories(foodQuery) {
@@ -9412,8 +9505,8 @@
             const benefitsSummary = matchedItems.map(m => m.benefit).join(' ');
             const speechIntro = matchedItems.length === 1
                 ? `${formatItemLabel(matchedItems[0]).replace(/\s*\(\d+\s*kcal\)/, '')} yaklaşık ${totalAddedKcal} kaloridir.`
-                : `Söylediğiniz ${matchedItems.length} besin (${namesSummary}) toplam yaklaşık ${totalAddedKcal} kaloridir.`;
-            announceGuidance(`Afiyet ve şifa olsun! ${speechIntro} ${benefitsSummary} Günlük enerji toplamınız ${state.dailyIntakeKcal} kalori oldu.`, {
+                : `Sorgulanan ${matchedItems.length} besin (${namesSummary}) toplam yaklaşık ${totalAddedKcal} kaloridir.`;
+            announceGuidance(`Besin değeri bilgisi: ${speechIntro} ${benefitsSummary} Günlük enerji toplamınız ${state.dailyIntakeKcal} kalori olarak güncellendi.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -9448,7 +9541,7 @@
         if (saltMatches.length > 0) parts.push(saltMatches[0]);
 
         const summary = parts.length > 0
-            ? `Pakette okunan besin değerleri: ${parts.join(', ')}. Afiyet ve şifa olsun!`
+            ? `Pakette okunan besin değerleri: ${parts.join(', ')}.`
             : (text ? `Paket veya menü yazısı: ${text.replace(/\s+/g, ' ')}` : 'Paketin üzerindeki besin değeri tablosu net görünmedi, lütfen biraz daha yaklaştırıp tekrar okutun.');
         return {
             speechText: summary,
@@ -9492,7 +9585,7 @@
                     timerMinutes: 3
                 },
                 {
-                    text: '3. Adım (Yeşillik, Zeytinyağı ve Nar Ekşisi): İnce doğranmış taze soğan, maydanoz, yarım çay bardağı zeytinyağı, 3 yemek kaşığı nar ekşisi ve 1 limon suyunu ekleyip harmanlayın. Hiç ocak yakmadan efsane kısırınız hazır!',
+                    text: '3. Adım (Yeşillik, Zeytinyağı ve Nar Ekşisi): İnce doğranmış taze soğan, maydanoz, yarım çay bardağı zeytinyağı, 3 yemek kaşığı nar ekşisi ve 1 limon suyunu ekleyip harmanlayın. Ocak kullanmadan hazırlanan kısır servise hazırdır.',
                     timerMinutes: 0
                 }
             ]
@@ -9526,7 +9619,7 @@
                     timerMinutes: 2
                 },
                 {
-                    text: '2. Adım (Fasulye ile Buluşturma): Süzülmüş hazır haşlanmış fasulyeleri servis tabağına alın, üzerine piyazlık doğranmış soğan ve domatesi ekleyin. Hazırladığınız tahinli sosu ve 3 yemek kaşığı zeytinyağını üzerine gezdirin. Çok doyurucu ve tamamen ocaksız Antalya piyazınız hazır!',
+                    text: '2. Adım (Fasulye ile Buluşturma): Süzülmüş hazır haşlanmış fasulyeleri servis tabağına alın, üzerine piyazlık doğranmış soğan ve domatesi ekleyin. Hazırladığınız tahinli sosu ve 3 yemek kaşığı zeytinyağını üzerine gezdirin. Antalya usulü tahinli piyaz servise hazırdır.',
                     timerMinutes: 0
                 }
             ]
@@ -9611,7 +9704,7 @@
                     timerMinutes: 1
                 },
                 {
-                    text: '2. Adım (Sarımsaklı Yoğurtla Harmanlama): Üzerine sarımsaklı süzme yoğurt, zeytinyağı, limon suyu ve tuzu ekleyip 2 dakika karıştırın. Ocak başında patlıcan közleme zahmeti olmadan nefis köz patlıcan mezesi hazır!',
+                    text: '2. Adım (Sarımsaklı Yoğurtla Harmanlama): Üzerine sarımsaklı süzme yoğurt, zeytinyağı, limon suyu ve tuzu ekleyip 2 dakika karıştırın. Közlenmiş patlıcan mezesi servise hazırdır.',
                     timerMinutes: 2
                 }
             ]
@@ -9670,7 +9763,7 @@
         {
             id: 'ocaksiz_biskuvili_mozaik_pasta',
             category: 'ocaksiz',
-            title: '🥗 [Ocaksız Tatlı] Pişirmeden Soğuk Sütle Yapılan Anne Usulü Bisküvili Mozaik Pasta',
+            title: '🥗 [Ocaksız Tatlı] Pişirmeden Soğuk Sütle Yapılan Klasik Bisküvili Mozaik Pasta',
             keywords: ['mozaik pasta', 'pasta', 'bisküvi', 'tatlı', 'kakao', 'çikolata', 'ocaksız'],
             ingredients: '2 paket (yaklaşık 350 gram) petibör bisküvi, 1 su bardağı soğuk süt, 3 yemek kaşığı kakao, 3 yemek kaşığı pudra şekeri (veya toz şeker), 3 yemek kaşığı sıvı yağ (veya oda sıcaklığında yumuşamış tereyağı), yarım su bardağı kırılmış ceviz veya fındık.',
             steps: [
@@ -9683,7 +9776,7 @@
                     timerMinutes: 0
                 },
                 {
-                    text: '3. Adım (Şekil Verme ve Soğutma): Karışımı streç filme veya derin bir kaseye bastırarak yerleştirin, buzdolabında veya dondurucuda 45 dakika dinlendirip dilimleyerek servis yapın!',
+                    text: '3. Adım (Şekil Verme ve Soğutma): Karışımı streç filme veya derin bir kaseye bastırarak yerleştirin, buzdolabında veya dondurucuda 45 dakika dinlendirip dilimleyerek servis yapın.',
                     timerMinutes: 45
                 }
             ]
@@ -9691,7 +9784,7 @@
         {
             id: 'ocaksiz_meyveli_yogurtlu_parfe',
             category: 'ocaksiz',
-            title: '🥗 [Ocaksız Tatlı] Muzlu, Ballı, Cevizli ve Bisküvili Soğuk Kuplar (Magnolia Tadında)',
+            title: '🥗 [Ocaksız Tatlı] Muzlu, Ballı, Cevizli ve Bisküvili Soğuk Kuplar (Meyveli ve Yoğurtlu Tatlı)',
             keywords: ['magnolia', 'parfe', 'muz', 'tatlı', 'yoğurt', 'bal', 'yulaf', 'ocaksız'],
             ingredients: '1 buçuk su bardağı süzme yoğurt (veya labne + krema), 2 yemek kaşığı süzme bal veya pekmez, 2 adet olgun muz, 10 adet ufalanmış petibör veya burçak bisküvi, yarım su bardağı ceviz veya fındık, yarım çay kaşığı tarçın.',
             steps: [
@@ -9700,7 +9793,7 @@
                     timerMinutes: 2
                 },
                 {
-                    text: '2. Adım (Kat Kat Kuplara Dizme): Kaselerin en altına elinizle ufaladığınız bisküvileri, ortasına dilimlenmiş muzları, üzerine ballı süzme yoğurt kremasını ve en üste cevizleri serpiştirin. Hiç pişirmeden 3 dakikada enfes tatlı!',
+                    text: '2. Adım (Kat Kat Kuplara Dizme): Kaselerin en altına elinizle ufaladığınız bisküvileri, ortasına dilimlenmiş muzları, üzerine ballı süzme yoğurt kremasını ve en üste cevizleri serpiştirin. Tatlı servise hazırdır.',
                     timerMinutes: 3
                 }
             ]
@@ -9708,7 +9801,7 @@
         {
             id: 'tahinli_cevizli_enerji_toplari',
             category: 'ocaksiz',
-            title: '🥗 [Ocaksız Tatlı] Tahinli, Pekmezli ve Cevizli Atom Enerji Topları (Pişirmeden)',
+            title: '🥗 [Ocaksız Tatlı] Tahinli, Pekmezli ve Cevizli Enerji Topları (Pişirmeden)',
             keywords: ['enerji topu', 'atom', 'tahin', 'pekmez', 'yulaf', 'bisküvi', 'hindistan cevizi', 'ocaksız'],
             ingredients: '1 paket ufalanmış petibör bisküvi (veya 1 buçuk su bardağı ince yulaf ezmesi), 4 yemek kaşığı tahin, 4 yemek kaşığı üzüm veya dut pekmezi, yarım su bardağı dövülmüş ceviz, 2 yemek kaşığı kakao, dışını bulamak için Hindistan cevizi.',
             steps: [
@@ -9717,7 +9810,7 @@
                     timerMinutes: 3
                 },
                 {
-                    text: '2. Adım (Yuvarlama ve Hindistan Cevizine Bulama): Harçtan ceviz büyüklüğünde parçalar koparıp avuç içinizde yuvarlayın ve Hindistan cevizine bulayın. Çayın ve kahvenin yanına pişirmeden lokum gibi ikramlık!',
+                    text: '2. Adım (Yuvarlama ve Hindistan Cevizine Bulama): Harçtan ceviz büyüklüğünde parçalar koparıp avuç içinizde yuvarlayın ve Hindistan cevizine bulayın. İkramlık enerji topları servise hazırdır.',
                     timerMinutes: 2
                 }
             ]
@@ -9755,7 +9848,7 @@
         {
             id: 'sehrive_tarhana_corbasi',
             category: 'ocakli',
-            title: '🔥 [Ocaklı] Şifa Deposu Domatesli Arpa Şehriye (veya Tarhana) Çorbası',
+            title: '🔥 [Ocaklı] Domatesli Arpa Şehriye (veya Tarhana) Çorbası',
             keywords: ['şehriye çorbası', 'tarhana', 'tarhana çorbası', 'domates çorbası', 'çorba'],
             ingredients: '1 çay bardağı arpa şehriye (veya 4 yemek kaşığı toz tarhana), 1 yemek kaşığı tereyağı, 1 yemek kaşığı domates salçası, 1 tatlı kaşığı kuru nane, 1 tatlı kaşığı tuz, 5 buçuk su bardağı su.',
             steps: [
@@ -9818,7 +9911,7 @@
         {
             id: 'anne_usulu_kuru_fasulye',
             category: 'ocakli',
-            title: '🔥 [Ocaklı] Anne Usulü Lokum Gibi Kuru Fasulye',
+            title: '🔥 [Ocaklı] Geleneksel Usul Kuru Fasulye',
             keywords: ['kuru fasulye', 'fasulye', 'salça', 'soğan', 'etli kuru fasulye'],
             ingredients: '2 su bardağı haşlanmış kuru fasulye, 1 adet orta boy kuru soğan, 1 yemek kaşığı domates salçası, 1 tatlı kaşığı biber salçası, 2 yemek kaşığı tereyağı, 3 buçuk su bardağı sıcak su, 1 tatlı kaşığı tuz, yarım çay kaşığı kimyon.',
             steps: [
@@ -9839,7 +9932,7 @@
         {
             id: 'tam_kivaminda_menemen',
             category: 'ocakli',
-            title: '🔥 [Ocaklı] Tam Kıvamında Sulu ve Ekmek Banmalık Menemen',
+            title: '🔥 [Ocaklı] Geleneksel Usul Domatesli ve Biberli Menemen',
             keywords: ['menemen', 'yumurta', 'domates', 'biber', 'kahvaltı'],
             ingredients: '3 adet orta boy olgun domates, 2 adet yeşil biber, 3 adet yumurta, 2 yemek kaşığı tereyağı veya zeytinyağı, 1 çay kaşığı tuz, yarım çay kaşığı pul biber.',
             steps: [
@@ -9890,7 +9983,7 @@
                     timerMinutes: 6
                 },
                 {
-                    text: '2. Adım (Kızartmadan Dizme ve Buharda Pişirme): Halka doğranmış patlıcanları ve dilimlenmiş domatesleri kıymanın üzerine yayın. 3 yemek kaşığı zeytinyağı ve 1 buçuk su bardağı sıcak suyu gezdirip kapağı kapatın; kısık ateşte patlıcanlar pamuk gibi olana kadar 25 dakika pişirin.',
+                    text: '2. Adım (Kızartmadan Dizme ve Buharda Pişirme): Halka doğranmış patlıcanları ve dilimlenmiş domatesleri kıymanın üzerine yayın. 3 yemek kaşığı zeytinyağı ve 1 buçuk su bardağı sıcak suyu gezdirip kapağı kapatın; kısık ateşte patlıcanlar yumuşayana kadar 25 dakika pişirin.',
                     timerMinutes: 25
                 }
             ]
@@ -9953,7 +10046,7 @@
         {
             id: 'kabaran_anne_keki',
             category: 'ocakli',
-            title: '🔥 [Fırın / Tencere] 3-2-1 Bardak Ölçülü Garantili Kabaran Anne Keki',
+            title: '🔥 [Fırın / Tencere] Tam Ölçülü Cevizli ve Tarçınlı Ev Keki',
             keywords: ['kek', 'tatlı', 'yumurta', 'ceviz', 'tarçın', 'anne keki'],
             ingredients: '3 adet yumurta, 1 su bardağı toz şeker, 1 su bardağı süt, yarım su bardağı sıvı yağ, 2 buçuk su bardağı un, 1 paket kabartma tozu, 1 paket vanilya, 1 tatlı kaşığı tarçın, yarım su bardağı kırılmış ceviz.',
             steps: [
@@ -9974,7 +10067,7 @@
         {
             id: 'tavsan_kani_cay_ve_turk_kahvesi',
             category: 'ocakli',
-            title: '🔥 [Ocaklı] Tavşan Kanı Türk Çayı ve Bol Köpüklü Türk Kahvesi Ölçüsü',
+            title: '🔥 [Ocaklı] Tam Ölçülü Türk Çayı Demleme ve Türk Kahvesi Rehberi',
             keywords: ['çay', 'kahve', 'türk kahvesi', 'demleme', 'içecek'],
             ingredients: 'Çay için: Her 1 su bardağı sıcak suya 1 tatlı kaşığı kuru çay. Türk Kahvesi için (1 Fincan): 1 kahve fincanı soğuk su, 2 çay kaşığı tepeleme Türk kahvesi, isteğe göre şeker.',
             steps: [
@@ -9983,7 +10076,7 @@
                     timerMinutes: 3
                 },
                 {
-                    text: '2. Adım (Tavşan Kanı Çay Demleme): Üst demliğe 4 yemek kaşığı kuru çay koyup üzerine 3 su bardağı kaynar suyu yavaşça gezdirin ve kısık ateşte 15 dakika demlendirin.',
+                    text: '2. Adım (Çay Demleme): Üst demliğe 4 yemek kaşığı kuru çay koyup üzerine 3 su bardağı kaynar suyu yavaşça gezdirin ve kısık ateşte 15 dakika demlendirin.',
                     timerMinutes: 15
                 }
             ]
@@ -10103,7 +10196,7 @@
             btn.textContent = '⏲️ Adım Süresini Başlat';
         }
         if (speakStopped) {
-            announceGuidance('Konuşan mutfak saati durduruldu.', { force: true });
+            announceGuidance('Mutfak zamanlayıcısı durduruldu.', { force: true });
         }
     }
 
@@ -10124,9 +10217,9 @@
         if (btn) {
             btn.classList.add('active-toggle');
             btn.setAttribute('aria-pressed', 'true');
-            btn.textContent = `⏹️ Mutfak Saati: ${minutes}:00`;
+            btn.textContent = `⏹️ Kalan Süre: ${minutes}:00`;
         }
-        announceGuidance(`Konuşan mutfak saati ${minutes} dakika olarak başlatıldı (${rec.title}, ${state.currentCookingStepIndex + 1}. adım). Sürenin yarısında, son 1 dakikada ve süre bittiğinde size sesli haber vereceğim.`, {
+        announceGuidance(`Mutfak zamanlayıcısı ${minutes} dakika olarak başlatıldı (${rec.title}, ${state.currentCookingStepIndex + 1}. adım). Sürenin yarısında, son 1 dakikada ve süre tamamlandığında sesli bildirim yapılacaktır.`, {
             force: true,
             bannerState: 'centered'
         });
@@ -10136,24 +10229,24 @@
             const remMin = Math.floor(state.cookingTimerRemainingSec / 60);
             const remSec = state.cookingTimerRemainingSec % 60;
             const timeLabel = `${remMin}:${String(remSec).padStart(2, '0')}`;
-            if (btn) btn.textContent = `⏹️ Mutfak Saati: ${timeLabel}`;
+            if (btn) btn.textContent = `⏹️ Kalan Süre: ${timeLabel}`;
             if (badgeEl) badgeEl.textContent = `⏲️ Kalan Süre: ${timeLabel}`;
 
             if (state.cookingTimerRemainingSec <= 0) {
                 stopCookingStepTimer(false);
                 radar.playQrSuccessSound();
                 if (navigator.vibrate) navigator.vibrate([250, 100, 250, 100, 350]);
-                announceGuidance(`Süre doldu! ${rec.title} tarifinin ${state.currentCookingStepIndex + 1}. adım süresi (${minutes} dakika) tamamlandı. Lütfen yemeğinizi veya ocağınızı kontrol edin.`, {
+                announceGuidance(`Süre tamamlandı. ${rec.title} tarifinin ${state.currentCookingStepIndex + 1}. adım süresi (${minutes} dakika) sona erdi. Lütfen yemeğinizi veya ocağınızı kontrol edin.`, {
                     force: true,
                     bannerState: 'warning'
                 });
             } else if (state.cookingTimerRemainingSec === 60 && state.cookingTotalStepSec >= 120) {
-                announceGuidance(`Mutfak saati uyarısı: ${state.currentCookingStepIndex + 1}. adımın bitmesine son 1 dakika kaldı.`, {
+                announceGuidance(`Süre bilgilendirmesi: ${state.currentCookingStepIndex + 1}. adımın tamamlanmasına son 1 dakika kaldı.`, {
                     force: true,
                     bannerState: 'centered'
                 });
             } else if (state.cookingTotalStepSec >= 240 && state.cookingTimerRemainingSec === Math.floor(state.cookingTotalStepSec / 2)) {
-                announceGuidance(`Mutfak saati bilgisi: Sürenin yarısı tamamlandı, kalan süre ${remMin} dakika.`, {
+                announceGuidance(`Süre bilgilendirmesi: Sürenin yarısı tamamlandı, kalan süre ${remMin} dakika.`, {
                     force: true,
                     bannerState: 'normal'
                 });
@@ -10169,7 +10262,7 @@
             return;
         }
         if (delta > 0 && state.currentCookingStepIndex >= rec.steps.length - 1) {
-            announceGuidance(`Tebrikler, ${rec.title} tarifinin tüm adımları tamamlandı! Ellerinize sağlık, afiyet olsun.`, {
+            announceGuidance(`${rec.title} tarifinin tüm adımları tamamlanmıştır. Afiyet olsun.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -10302,7 +10395,8 @@
         return `Şu an aktif bölüm: ${activeLabel}. ${camState}`;
     }
 
-    function setMode(newMode) {
+    function setMode(newMode, options = {}) {
+        const silentAnnouncement = Boolean(options && options.silentAnnouncement);
         const prevMode = state.mode;
         state.mode = newMode;
         state.lastUserInteractionAt = performance.now();
@@ -10328,11 +10422,13 @@
             clearInterval(state.whatsappHoldTimer);
             state.whatsappHoldTimer = null;
         }
-        if (prevMode === 'tv_subtitle_score' && newMode !== 'tv_subtitle_score' && state.tvAutoReaderTimer) {
-            clearInterval(state.tvAutoReaderTimer);
-            state.tvAutoReaderTimer = null;
+        if (prevMode === 'tv_subtitle_score' && newMode !== 'tv_subtitle_score' && (state.tvAutoReaderTimer || state.tvAutoReaderActive)) {
+            if (state.tvAutoReaderTimer) {
+                clearInterval(state.tvAutoReaderTimer);
+                state.tvAutoReaderTimer = null;
+            }
             state.tvAutoReaderActive = false;
-            const tvBtn = document.getElementById('btn-tv-auto-toggle');
+            const tvBtn = document.getElementById('btn-tv-auto-toggle') || el.btnTvToggleAuto;
             if (tvBtn) {
                 tvBtn.classList.remove('active-toggle');
                 tvBtn.setAttribute('aria-pressed', 'false');
@@ -10341,6 +10437,14 @@
         }
         if (prevMode === 'song_finder' && newMode !== 'song_finder') {
             stopSongPreviewPlayback();
+            if (state.songTunerActive) {
+                state.songTunerActive = false;
+                if (el.btnSongTuner) {
+                    el.btnSongTuner.classList.remove('active-toggle');
+                    el.btnSongTuner.setAttribute('aria-pressed', 'false');
+                    el.btnSongTuner.textContent = '🎸 Sesli Enstrüman Akort & Makam: Kapalı';
+                }
+            }
         }
         const nonCameraModes = new Set(['qibla_compass', 'song_finder', 'step_calorie_guide', 'cooking_guide']);
         if (nonCameraModes.has(newMode) && state.flashMode === 'auto') {
@@ -10379,48 +10483,55 @@
         });
 
         const modeAnnouncement = {
-            'exam_reader': '1. Bölüm: Sınav Sorusu ve Şık Okuyucu açıldı. Telefonu sınav kağıdına tutun; soruyu ve A, B, C, D, E şıklarını birbirine karıştırmadan tek tek size okuyacağım.',
+            'exam_reader': '1. Bölüm: Sınav Sorusu ve Şık Okuyucu açıldı. Telefonu sınav kağıdına tutun; soru kökünü ve A, B, C, D, E şıklarını birbirinden ayırarak tek tek okuyacağım.',
             'qibla_compass': state.qiblaLocationVerified
-                ? `2. Bölüm: Sesli Kıble Pusulası ve Namaz Vakitleri açıldı. Bulunduğunuz yer: ${state.qiblaLocationSource}. Telefonu avucunuzda yere düz tutup yavaşça dönün, Kıbleye gelince haber vereceğim.`
-                : '2. Bölüm: Sesli Kıble Pusulası açıldı. Şu an bulunduğunuz şehir bulunuyor; isterseniz listeden kendi ilinizi de seçebilirsiniz.',
-            'qr_screen': '3. Bölüm: WhatsApp Web ve Bilgisayar Ekranı Hizalama açıldı. Telefonu bilgisayar ekranına tutun, karekodu ortalamanız için sağa sola yönlendireceğim.',
-            'portrait': '4. Bölüm: Özçekim ve Fotoğraf Çekim Yardımcısı açıldı. Yüzünüz tam ortalandığında ve ışık güzel olduğunda 3, 2, 1 diye sayıp fotoğrafınızı çekeceğim.',
-            'color_cloth': `5. Bölüm: Canlı Para Sayma, Biriktirme ve Kıyafet Rengi Tanıma açıldı. Elinizdeki demir ve kağıt paraları gösterdikçe bir yandan toplarım; istediğiniz an Ne Kadar Param Var düğmesine veya N tuşuna basarak toplam kaç paranız olduğunu dinleyebilirsiniz.${state.moneyTotalKurus > 0 ? ' Şu an sayaçta ' + formatTurkishKurusTotal(state.moneyTotalKurus) + ' kayıtlı.' : ''}`,
-            'anomaly_led': '6. Bölüm: Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü açıldı. Kamerayı yere veya modemin, şarj aletinin ışığına tutun.',
-            'light_meter': '7. Bölüm: Lamba Açık mı Kapalı mı ve Pencere Bulucu açıldı. Işığın olduğu tarafa döndükçe ses incelir.',
-            'explorer': '8. Bölüm: Etrafımda Ne Var ve Evrak Okuyucu açıldı. Odanızdaki eşyaları söyler, çift dokunursanız elinizdeki kağıdı okur. Yürürken güvenliğiniz için mutlaka beyaz bastonunuzu kullanmaya devam edin.',
-            'medicine_skt': '9. Bölüm: İlaç Kutusu ve Son Kullanma Tarihi Kontrolü açıldı. İlacın adını, kaç miligram olduğunu ve tarihinin geçip geçmediğini kontrol etmek için kutuyu kameraya tutun.',
-            'signature_pen': '10. Bölüm: İmza Atarken Kalem Yönlendirici açıldı. Güvenliğiniz için önce evrakta ne yazdığını doğrulamak üzere ekrana çift dokunun veya Boşluk tuşuna basın; evrak okunduktan sonra kaleminizi imza alanına yönlendireceğim.',
-            'liquid_level': '11. Bölüm: Masadaki Bardak, Kupa ve Şişe Bulucu açıldı. Masadaki bardağı veya şişeyi elinizi çarpmadan bulmak için kamerayı masaya tutun. Güvenliğiniz için kaynar çay veya sıcak su doldururken kameraya güvenmeyin.',
-            'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya çamaşır makinesi ekranını okutmak için Boşluk tuşuna basın.',
-            'food_freshness': '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve Son Tüketim Tarihi Okuyucu açıldı. Market paketinin içindekiler ve tarih kısmını kameraya gösterip Boşluk tuşuna basın.',
-            'song_finder': '14. Bölüm: Bu Çalan Hangi Şarkı? Sesli Şarkı, Melodi ve Söz Bulucu açıldı; mikrofon otomatik olarak dinlemeye başlıyor.',
-            'bus_stop_tracker': '15. Bölüm: Otobüs Numarası Yakalayıcı ve İneceğim Durağa Geldim mi Alarmı açıldı. Durakta yaklaşan otobüsün hat numarasını okumak için kamerayı yola tutun veya otobüsteyseniz aşağıdan ineceğiniz durağın alarmını kurun.',
-            'pos_iban_reader': '16. Bölüm: POS Cihazı Tutarı Doğrulayıcı ve Tek Tuşla IBAN Kopyalayıcı açıldı. Kartınızı okutmadan önce POS ekranını veya faturadaki TR IBAN numarasını kameraya gösterip Boşluk tuşuna basın.',
-            'item_memory': `17. Bölüm: Eşyamı Nereye Koydum Sesli Hafıza ve Kavanoz Tanıtıcı açıldı. Şu an hafızanızda ${state.itemMemories ? state.itemMemories.length : 0} eşya kayıtlı. Eşya Yeri Kaydet veya Eşyam Nerede Sor düğmelerini kullanabilirsiniz.`,
-            'tv_subtitle_score': '18. Bölüm: Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri açıldı. Telefonu televizyona doğru tutun ve Otomatik TV Spikerini Başlat düğmesine basın.',
-            'sock_outfit_check': '19. Bölüm: Çorap Eşleştirici, Kıyafet Kombin Uyumu ve Leke Kontrolü açıldı. İki çorabı yan yana kameraya tutup Boşluk tuşuna basın; birbirinin eşi olup olmadığını ve leke durumunu söyleyeceğim.',
-            'where_am_i': '20. Bölüm: Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Tarif Edici açıldı. Bulunduğunuz cadde ve sokağı hemen öğreniliyor.',
-            'step_calorie_guide': `21. Bölüm: Sesli Adım Sayacı ve Sağlıklı Besin Rehberi açıldı. Bugün ${state.dailySteps || 0} adım attınız. Telefon cebinizde yürürken adımlarınızı sayarım; ayrıca yediğiniz yemeği söyleyip veya paketi kameraya gösterip besin değerini öğrenebilirsiniz.`,
-            'cooking_guide': '22. Bölüm: Adım Adım Sesli Yemek Tarifleri Rehberi açıldı. İstediğiniz yemeği listeden seçin veya evdeki malzemeleri söyleyin; malzemeleri ve hazırlanışını adım adım sesli olarak tarif edeceğim.'
+                ? `2. Bölüm: Sesli Kıble Pusulası ve Namaz Vakitleri açıldı. Bulunduğunuz yer: ${state.qiblaLocationSource}. Telefonu avucunuzda yere paralel tutup yavaşça dönün, Kıble yönüne hizalandığında bildireceğim.`
+                : '2. Bölüm: Sesli Kıble Pusulası açıldı. Bulunduğunuz şehir belirleniyor; dilerseniz listeden ilinizi manuel olarak da seçebilirsiniz.',
+            'qr_screen': '3. Bölüm: WhatsApp Web ve Bilgisayar Ekranı Hizalama açıldı. Telefonu bilgisayar ekranına tutun, karekodu ortalamanız için sesli yönlendirme yapacağım.',
+            'portrait': '4. Bölüm: Özçekim ve Fotoğraf Çekim Yardımcısı açıldı. Yüzünüz kadraj merkezine hizalandığında ve aydınlatma uygun olduğunda sesli geri sayım ile fotoğraf çekilecektir.',
+            'color_cloth': `5. Bölüm: Madeni ve Kağıt Para Sayacı ile Kıyafet Rengi Tanıma açıldı. Kameraya gösterilen madeni ve kağıt paralar otomatik olarak toplanır; istediğiniz an Toplam Tutarı Dinle düğmesine veya N tuşuna basarak genel toplamı dinleyebilirsiniz.${state.moneyTotalKurus > 0 ? ' Şu an sayaçta ' + formatTurkishKurusTotal(state.moneyTotalKurus) + ' kayıtlı.' : ''}`,
+            'anomaly_led': '6. Bölüm: Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü açıldı. Kamerayı zemine veya kontrol etmek istediğiniz cihazın durum ışığına yöneltin.',
+            'light_meter': '7. Bölüm: Aydınlatma Kontrolü ve Işık Kaynağı Yönlendirici açıldı. Işık kaynağının bulunduğu yöne döndükçe ses sinyali frekansı yükselir.',
+            'explorer': '8. Bölüm: Çevre Nesne Tanıma ve Belge Okuyucu açıldı. Çevredeki nesnelerin konumunu bildirir; ekrana çift dokunduğunuzda belgedeki metni okur. Yürüyüş sırasında güvenliğiniz için lütfen beyaz bastonunuzu kullanmaya devam edin.',
+            'medicine_skt': '9. Bölüm: İlaç Kutusu ve Son Kullanma Tarihi Kontrolü açıldı. İlacın adını, miligram bilgisini ve son kullanma tarihini kontrol etmek için kutuyu kameraya tutun.',
+            'signature_pen': '10. Bölüm: İmza Alanı ve Kalem Yönlendirici açıldı. Güvenliğiniz için önce belgedeki metni doğrulamak üzere ekrana çift dokunun veya Boşluk tuşuna basın; belge okunduktan sonra kaleminizi imza alanına yönlendireceğim.',
+            'liquid_level': '11. Bölüm: Masadaki Bardak, Kupa ve Şişe Bulucu açıldı. Masadaki bardağı veya şişeyi güvenli şekilde tespit etmek için kamerayı masaya yöneltin. Güvenliğiniz için kaynar sıvı doldururken yalnızca kamera yönlendirmesine güvenmeyin.',
+            'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya dijital makine ekranını okutmak için Boşluk tuşuna basın.',
+            'food_freshness': '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve Son Tüketim Tarihi Okuyucu açıldı. Ürün paketinin içindekiler ve tarih kısmını kameraya gösterip Boşluk tuşuna basın.',
+            'song_finder': '14. Bölüm: Sesli Müzik, Melodi ve Şarkı Sözü Tanıma açıldı; mikrofon otomatik olarak dinlemeye başlıyor.',
+            'bus_stop_tracker': '15. Bölüm: Otobüs Hat Numarası Okuyucu ve Durak Yaklaşma Bildirimi açıldı. Durağa yaklaşan aracın hat numarasını okumak için kamerayı yola yöneltin veya araç içindeyseniz hedef durağınız için yaklaşma bildirimini etkinleştirin.',
+            'pos_iban_reader': '16. Bölüm: POS Cihazı Tutarı Doğrulayıcı ve Tek Tuşla IBAN Kopyalayıcı açıldı. Ödeme öncesinde POS ekranını veya belgedeki TR IBAN numarasını kameraya gösterip Boşluk tuşuna basın.',
+            'item_memory': `17. Bölüm: Sesli Eşya Konum Kaydı ve Kavanoz Etiketleyici açıldı. Şu an hafızada ${state.itemMemories ? state.itemMemories.length : 0} eşya kaydı bulunuyor. Eşya Yeri Kaydet veya Eşya Sorgula düğmelerini kullanabilirsiniz.`,
+            'tv_subtitle_score': '18. Bölüm: Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri açıldı. Telefonu televizyon ekranına yöneltin ve Otomatik TV Spikerini Başlat düğmesine basın.',
+            'sock_outfit_check': '19. Bölüm: Çorap Eşleştirici, Kıyafet Renk Uyumu ve Leke Kontrolü açıldı. İki çorabı yan yana kameraya tutup Boşluk tuşuna basın; renk eşleşmesini ve yüzey leke durumunu bildireceğim.',
+            'where_am_i': '20. Bölüm: Konum, Açık Adres ve Çevre Tabelası Bildirimi açıldı. Bulunduğunuz cadde ve sokak bilgisi sorgulanıyor.',
+            'step_calorie_guide': `21. Bölüm: Sesli Adım Sayacı ve Besin Değeri Rehberi açıldı. Bugün ${state.dailySteps || 0} adım attınız. Yürüyüş sırasında adımlarınız otomatik olarak sayılır; ayrıca besin adını söyleyerek veya ürün paketini kameraya okutarak kalori bilgisini öğrenebilirsiniz.`,
+            'cooking_guide': '22. Bölüm: Adım Adım Sesli Yemek Tarifleri Rehberi açıldı. İstediğiniz tarifi listeden seçin veya mevcut malzemeleri söyleyin; malzeme ölçülerini ve hazırlanış adımlarını sırayla seslendireceğim.'
         }[newMode];
 
-        if (modeAnnouncement) {
+        if (modeAnnouncement && !silentAnnouncement) {
             announceGuidance(modeAnnouncement, { force: true, bannerState: 'normal' });
         }
 
-        if (newMode === 'where_am_i') {
-            setTimeout(() => {
-                if (state.mode === 'where_am_i') {
+        if (newMode === 'where_am_i' && !silentAnnouncement) {
+            if (state.whereAmIAutoTimer) clearTimeout(state.whereAmIAutoTimer);
+            state.whereAmIAutoTimer = setTimeout(() => {
+                state.whereAmIAutoTimer = null;
+                if (state.mode === 'where_am_i' && (!document || !document.hidden)) {
                     announceWhereAmIFullAddressAndSignboard('', []);
                 }
             }, 900);
         }
 
         if (newMode === 'song_finder') {
-            if (!state.songListening) {
-                setTimeout(() => {
-                    if (state.mode === 'song_finder' && !state.songListening) {
+            if (!state.songListening && !silentAnnouncement) {
+                if (state.songAutoStartTimer) clearTimeout(state.songAutoStartTimer);
+                state.songAutoStartTimer = setTimeout(() => {
+                    state.songAutoStartTimer = null;
+                    if (state.mode === 'song_finder' && !state.songListening &&
+                        (!document || !document.hidden) &&
+                        (!state.songPreviewAudio || state.songPreviewAudio.paused) &&
+                        (!el.resultPanel || el.resultPanel.hidden)) {
                         toggleSongListening();
                     }
                 }, 1400);
@@ -10930,7 +11041,7 @@
         }
         else if (key === 'k') startQiblaCompassSensor();
         else if (key === 'v') {
-            if (state.mode !== 'qibla_compass') setMode('qibla_compass');
+            if (state.mode !== 'qibla_compass') setMode('qibla_compass', { silentAnnouncement: true });
             speakPrayerTimesAndSolarValidation();
         }
         else if (key === 's' && state.mode === 'exam_reader') speakCurrentQuestionStem();
@@ -10993,6 +11104,10 @@
         if (document.hidden) {
             stopAllSpeechImmediately();
             stopSongPreviewPlayback();
+            if (state.songListening && !state.songAutoRadarEnabled) {
+                stopSongListening();
+            }
+            state.countdownStage = 0;
             state.isProcessingOcr = false;
             state.moneyLiveOcrBusy = false;
             state.isLiveBgOcrBusy = false;
