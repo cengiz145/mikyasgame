@@ -1306,7 +1306,8 @@
             let predictions = [];
             if (state.cocoModel && state.mode !== 'light_meter') {
                 try {
-                    predictions = await state.cocoModel.detect(el.analysisCanvas, 8, 0.40);
+                    const rawPreds = await state.cocoModel.detect(el.analysisCanvas, 8, 0.58);
+                    predictions = rawPreds.filter(p => (p.score || 0) >= 0.58);
                 } catch (_) {
                     predictions = [];
                 }
@@ -2673,32 +2674,34 @@
     }
 
     function handleExplorerMode(anW, anH, scaleX, scaleY, ovCtx, predictions) {
-        if (predictions.length === 0) {
+        const verified = (predictions || []).filter(p => (p.score || 0) >= 0.58);
+        if (verified.length === 0) {
             el.tPosition.textContent = 'Nesne Aranıyor';
             el.tDistance.textContent = 'Belirgin Nesne Yok';
-            announceGuidance('Önünüzde belirgin bir nesne algılanmadı. Yazı veya belge okutmak için ekrana çift dokunabilirsiniz.', {
+            announceGuidance('Önünüzde yüksek güvenle tanınan bir nesne görünmüyor. Yazı veya belge okutmak için ekrana çift dokunabilirsiniz.', {
                 bannerState: 'normal',
                 minIntervalMs: 4200
             });
             return;
         }
 
-        const sorted = [...predictions].sort((a, b) => a.bbox[0] - b.bbox[0]);
+        const sorted = [...verified].sort((a, b) => a.bbox[0] - b.bbox[0]);
         const descriptions = [];
 
         sorted.slice(0, 4).forEach((pred, idx) => {
             const trName = TR_LABELS[pred.class] || pred.class;
-            drawTargetBox(ovCtx, pred.bbox, scaleX, scaleY, idx === 0 ? '#22c55e' : '#38bdf8', trName);
+            const confPct = Math.round((pred.score || 0) * 100);
+            drawTargetBox(ovCtx, pred.bbox, scaleX, scaleY, idx === 0 ? '#22c55e' : '#38bdf8', `${trName} (%${confPct})`);
 
             const cx = (pred.bbox[0] + pred.bbox[2] / 2) / anW;
             let dir = 'tam karşınızda';
             if (cx < 0.35) dir = 'solunuzda';
             else if (cx > 0.65) dir = 'sağınızda';
 
-            descriptions.push(`${dir} ${trName}`);
+            descriptions.push(`${dir} yüzde ${confPct} güvenle ${trName}`);
         });
 
-        const mainPred = predictions[0];
+        const mainPred = verified[0];
         const align = computeAlignmentInstruction(
             mainPred.bbox,
             anW,
@@ -2706,10 +2709,10 @@
             TR_LABELS[mainPred.class] || mainPred.class
         );
         el.tPosition.textContent = align.posLabel;
-        el.tDistance.textContent = `${predictions.length} Nesne Doğrulandı`;
+        el.tDistance.textContent = `${verified.length} Nesne Doğrulandı`;
         radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
 
-        announceGuidance(`Kamera önünde: ${descriptions.join(', ')} var.`, {
+        announceGuidance(`Kamera önünde: ${descriptions.join(', ')} görünüyor.`, {
             bannerState: 'centered',
             minIntervalMs: 3600
         });
@@ -3714,39 +3717,32 @@
         const imgData = metrics.imageData;
         const sentences = [];
 
-        // 1. Ortam Işığı, Netlik ve Arka Plan Atmosferi
-        let lightDesc = 'aydınlık ve dengeli ışıklı';
-        if (metrics.avgBrightness < 42) lightDesc = 'oldukça karanlık';
-        else if (metrics.avgBrightness < 82) lightDesc = 'loş ışıklı';
-        else if (metrics.avgBrightness > 205) lightDesc = 'bol ışıklı ve parlak';
+        // 1. Ortam Işığı Yüzdesi, Netlik ve Gerçek Renkler (Sıfır Halüsinasyon)
+        const lumPct = Math.round(((metrics.avgBrightness || 0) / 255) * 100);
+        let lightDesc = `yüzde ${lumPct} aydınlıkta`;
+        if (metrics.avgBrightness < 42) lightDesc = `oldukça karanlık (yüzde ${lumPct} ışık)`;
+        else if (metrics.avgBrightness < 82) lightDesc = `loş ışıklı (yüzde ${lumPct} ışık)`;
+        else if (metrics.avgBrightness > 205) lightDesc = `parlak ışıklı (yüzde ${lumPct} ışık)`;
 
-        const sharpDesc = metrics.sharpness >= 7.0 ? 'net çıkmış' : 'biraz bulanık çıkmış';
+        const sharpDesc = metrics.sharpness >= 7.0 ? 'net' : 'bulanık';
         const topBg = measureRegionColorAndPattern(imgData, w, h, w * 0.15, h * 0.04, w * 0.70, h * 0.18);
-        sentences.push(`Fotoğraf betimlemesi: ${lightDesc}, ${sharpDesc} bir görüntü; arka plan genel olarak ${topBg.colorName} tonlarında.`);
+        const midRegion = measureRegionColorAndPattern(imgData, w, h, w * 0.25, h * 0.25, w * 0.50, h * 0.50);
+        sentences.push(`Görüntü analizi: ${lightDesc}, ${sharpDesc} bir görüntü. Merkezdeki renk ${midRegion.colorName}, üst arka plan ${topBg.colorName} tonlarında.`);
 
-        // 2. İnsan Sayısı (Net Vurgu), Soldan Sağa Sıralama, Birbirine & Eşyalara Göre Konum ve Kıyafetleri
-        const people = preds.filter(p => p.class === 'person' && (p.score || 0) >= 0.45);
-        const otherObjs = preds.filter(p => p.class !== 'person');
+        // 2. SADECE Yüksek Güvenli (>= %58) Gerçek Nesne ve Kişi Tespiti (Tahmin ve Halüsinasyon Yok)
+        const verifiedPreds = (preds || []).filter(p => (p.score || 0) >= 0.58);
+        const people = verifiedPreds.filter(p => p.class === 'person');
+        const otherObjs = verifiedPreds.filter(p => p.class !== 'person');
+
         if (people.length === 0) {
-            sentences.push('Kişi sayısı: Etrafta hiç kimse görünmüyor (0 kişi).');
+            sentences.push('Kişi: Görüntüde insan görünmüyor (0 kişi).');
         } else {
-            // Soldan sağa doğru sırala (en soldaki 1. kişi, onun sağındaki 2. kişi...)
             people.sort((a, b) => (a.bbox[0] + a.bbox[2] / 2) - (b.bbox[0] + b.bbox[2] / 2));
-            if (people.length === 1) {
-                sentences.push('Kişi sayısı: Etrafta 1 kişi var.');
-            } else {
-                sentences.push(`Kişi sayısı: Etrafta soldan sağa doğru toplam ${people.length} kişi var.`);
-            }
-
-            const analyzedPhotoPeople = [];
-            people.slice(0, 4).forEach((p, idx) => {
+            const personItems = people.slice(0, 4).map((p, idx) => {
                 const [bx, by, bw, bh] = p.bbox;
+                const confPct = Math.round((p.score || 0) * 100);
                 const cx = (bx + bw / 2) / w;
-                let posWord = 'ortadaki';
-                if (cx < 0.36) posWord = 'soldaki';
-                else if (cx > 0.64) posWord = 'sağdaki';
-
-                const gaze = estimatePersonGazeAndOrientation(p.bbox, metrics, w, h);
+                const posWord = cx < 0.36 ? 'solda' : (cx > 0.64 ? 'sağda' : 'ortada');
                 const torso = measureRegionColorAndPattern(
                     imgData, w, h,
                     bx + bw * 0.22,
@@ -3754,90 +3750,52 @@
                     Math.max(12, bw * 0.56),
                     Math.max(12, bh * 0.38)
                 );
-                const anchorRel = findNearestObjectRelativePhrase(p.bbox, otherObjs, w, h);
-                analyzedPhotoPeople.push({ p, cx, posWord, gaze, torso, anchorRel });
+                return `${idx + 1}. kişi (${posWord}, yüzde ${confPct} güven, orta bölge rengi ${torso.colorName})`;
             });
-
-            analyzedPhotoPeople.forEach((item, idx) => {
-                const { p, posWord, gaze, torso, anchorRel } = item;
-                let personTitle = '';
-                if (analyzedPhotoPeople.length === 1) {
-                    const anchorText = anchorRel ? ` (${anchorRel} kişi)` : '';
-                    personTitle = `Görüntüdeki tek kişi (${posWord} kişi${anchorText})`;
-                } else if (idx === 0) {
-                    const nextPerson = analyzedPhotoPeople[1];
-                    const relToNext = nextPerson ? `, ${nextPerson.torso.colorName.toLowerCase()} kıyafetli kişinin solundaki kişi` : '';
-                    const anchorText = anchorRel ? `, ${anchorRel} kişi` : '';
-                    personTitle = `En soldaki 1. kişi (${posWord}${relToNext}${anchorText})`;
-                } else {
-                    const prevPerson = analyzedPhotoPeople[idx - 1];
-                    const orderLabel = (idx === analyzedPhotoPeople.length - 1 && analyzedPhotoPeople.length >= 2)
-                        ? (analyzedPhotoPeople.length === 2 ? 'Sağdaki 2. kişi' : `En sağdaki ${idx + 1}. kişi`)
-                        : `Ortadaki ${idx + 1}. kişi`;
-                    const relToPrev = `${prevPerson.torso.colorName.toLowerCase()} kıyafetli kişinin sağındaki kişi`;
-                    const anchorText = anchorRel ? `, ${anchorRel} kişi` : '';
-                    personTitle = `${orderLabel} (${relToPrev}${anchorText})`;
-                }
-
-                sentences.push(
-                    `${personTitle}: Yaklaşık ${gaze.approxMeters} metre mesafede duruyor ve ${gaze.gazeDesc}. ` +
-                    `Üzerinde ${torso.colorName} renginde, ${torso.pattern} bir kıyafet var.`
-                );
-
-                if (idx === 0) {
-                    const audit = evaluatePortraitPrivacyAndBacklight(p.bbox, metrics, preds, w, h);
-                    if (audit.hasBacklight) {
-                        sentences.push('Uyarı: Arkadan güçlü ışık vurduğu için yüzü biraz gölgede kalmış.');
-                    } else if (audit.clippedParts.length > 0) {
-                        sentences.push(`Kadraj notu: Kişinin ${audit.clippedParts.join(' ve ')} fotoğraf kenarına çok yakın.`);
-                    } else {
-                        sentences.push('Kişinin baş ve omuzları kesilmeden kadraja tam ve güzel yerleşmiş.');
-                    }
-                }
-            });
+            sentences.push(`Kişi sayısı: Toplam ${people.length} kişi algılandı — ${personItems.join(', ')}.`);
         }
 
-        // 3. Çevredeki Diğer Eşyalar ve Fotoğraftaki Konumları
+        // 3. Yüksek Güvenle Tanınan Diğer Eşyalar ve Yüzdeleri
         if (otherObjs.length > 0) {
             const itemPhrases = otherObjs.slice(0, 6).map(obj => {
                 const [bx, by, bw, bh] = obj.bbox;
+                const confPct = Math.round((obj.score || 0) * 100);
                 const cx = (bx + bw / 2) / w;
                 const cy = (by + bh / 2) / h;
                 let loc = 'ortada';
                 if (cx < 0.35 && cy < 0.45) loc = 'sol üstte';
-                else if (cx < 0.35 && cy >= 0.45) loc = 'sol tarafta';
+                else if (cx < 0.35 && cy >= 0.45) loc = 'solda';
                 else if (cx > 0.65 && cy < 0.45) loc = 'sağ üstte';
-                else if (cx > 0.65 && cy >= 0.45) loc = 'sağ tarafta';
+                else if (cx > 0.65 && cy >= 0.45) loc = 'sağda';
                 else if (cy > 0.65) loc = 'alt kısımda';
 
                 const objColor = measureRegionColorAndPattern(imgData, w, h, bx + bw * 0.2, by + bh * 0.2, bw * 0.6, bh * 0.6);
                 const trName = TR_LABELS[obj.class] || obj.class;
-                return `${loc} ${objColor.colorName} tonlarında ${trName}`;
+                return `${loc} yüzde ${confPct} güvenle ${objColor.colorName} ${trName}`;
             });
-            sentences.push(`Çevredeki eşyalar: ${itemPhrases.join(', ')} görünüyor.`);
+            sentences.push(`Algılanan nesneler: ${itemPhrases.join(', ')}.`);
         } else if (people.length === 0) {
-            // Hiç insan veya nesne yoksa yakın plan yüzey/manzara anlatımı
-            const mid = measureRegionColorAndPattern(imgData, w, h, w * 0.25, h * 0.25, w * 0.50, h * 0.50);
             const bot = measureRegionColorAndPattern(imgData, w, h, w * 0.20, h * 0.68, w * 0.60, h * 0.24);
-            sentences.push(`Fotoğrafın merkezinde ${mid.colorName} renginde (${mid.pattern}) bir yüzey veya alan yer alıyor; alt kısım ise ${bot.colorName} tonlarında.`);
+            sentences.push(`Yüksek güvenle tanınan bir eşya görünmüyor; sadece merkezde ${midRegion.colorName}, alt kısımda ${bot.colorName} yüzey görülüyor.`);
         }
 
-        // 4. Madeni (Demir) Paralar, Kağıt Para veya Yazı Özeti
-        const coinScan = detectAndClassifyTurkishCoins(metrics, w, h, cleanText);
-        if (coinScan.coins.length > 0) {
-            sentences.push(coinScan.summarySpeech);
+        // 4. Sadece Para Modundayken Demir Para Kontrolü ve Doğrulanmış Yazı Özeti
+        if (state.mode === 'color_cloth' || state.mode === 'anomaly_led') {
+            const coinScan = detectAndClassifyTurkishCoins(metrics, w, h, cleanText);
+            if (coinScan.coins.length > 0) {
+                sentences.push(coinScan.summarySpeech);
+            }
         }
 
         if (cleanText && cleanText.trim().length >= 3) {
             const banknote = detectTurkishBanknoteFromTextAndColor(cleanText);
             if (banknote) {
-                sentences.push(`Fotoğrafta ${banknote} kağıt para görünüyor.`);
+                sentences.push(`Fotoğrafta ${banknote} kağıt para yazısı okundu.`);
             }
             const shortText = cleanText.replace(/\s+/g, ' ').trim();
-            sentences.push(`Fotoğrafın üzerindeki yazı: "${shortText}".`);
+            sentences.push(`Okunan gerçek yazı: "${shortText}".`);
         }
 
-        sentences.push('İpucu: Şimdi parmağınızı aşağıdaki fotoğrafın üzerinde gezdirerek dokunduğunuz her noktada ne olduğunu tek tek keşfedebilirsiniz.');
         return sentences.join(' ');
     }
 
@@ -3862,14 +3820,17 @@
         const scaleX = targetW / capCanvas.width;
         const scaleY = targetH / capCanvas.height;
 
-        // Nesneleri keşif haritası üzerinde de işaretle
-        preds.forEach(p => {
+        const verifiedPreds = (preds || []).filter(p => (p.score || 0) >= 0.58);
+        verifiedPreds.forEach(p => {
             const trName = TR_LABELS[p.class] || p.class;
-            drawTargetBox(ctx, p.bbox, scaleX, scaleY, p.class === 'person' ? '#22c55e' : '#38bdf8', trName);
+            const confPct = Math.round((p.score || 0) * 100);
+            drawTargetBox(ctx, p.bbox, scaleX, scaleY, p.class === 'person' ? '#22c55e' : '#38bdf8', `${trName} (%${confPct})`);
         });
 
-        // Madeni (demir) paraları keşif haritası üzerinde işaretle ve parmakla dokunma için kaydet
-        const coinScan = detectAndClassifyTurkishCoins(metrics, capCanvas.width, capCanvas.height);
+        // Madeni paraları sadece para veya düşen eşya modundaysa işaretle
+        const coinScan = (state.mode === 'color_cloth' || state.mode === 'anomaly_led')
+            ? detectAndClassifyTurkishCoins(metrics, capCanvas.width, capCanvas.height)
+            : { coins: [] };
         coinScan.coins.forEach(coin => {
             drawCoinCircleOverlay(ctx, coin, scaleX, scaleY);
         });
@@ -3878,7 +3839,7 @@
             width: capCanvas.width,
             height: capCanvas.height,
             imageData: metrics.imageData,
-            preds,
+            preds: verifiedPreds,
             coins: coinScan.coins,
             ocrLines,
             storyText
@@ -4036,7 +3997,8 @@
         }
         if (state.cocoModel) {
             try {
-                preds = await state.cocoModel.detect(capCanvas, 12, 0.32);
+                const rawPreds = await state.cocoModel.detect(capCanvas, 12, 0.58);
+                preds = rawPreds.filter(p => (p.score || 0) >= 0.58);
             } catch (_) {
                 preds = [];
             }
@@ -4046,7 +4008,7 @@
         const initialStory = buildRichTurkishPhotoStory(capCanvas, metrics, preds, '');
         populatePhotoExplorerMap(capCanvas, metrics, preds, [], initialStory);
 
-        showDetectedResult(`${sourceLabel} — Detaylı Türkçe Betimleme`, initialStory + '\n\n(Fotoğrafın üzerindeki yazılar ve şıklar okunuyor...)');
+        showDetectedResult(`${sourceLabel} — Detaylı Türkçe Betimleme`, initialStory + '\n\n(Fotoğrafın üzerindeki yazılar kontrol ediliyor...)');
         announceGuidance(`${initialStory} Şimdi fotoğraftaki yazıları da kontrol ediyorum...`, {
             force: true,
             bannerState: 'centered'
@@ -4061,12 +4023,17 @@
                     : splitExamColumnsIfTwoColumn(binObj);
 
                 let combinedText = '';
+                let verifiedCombinedText = '';
                 let collectedLines = [];
                 for (let i = 0; i < splitInfo.canvases.length; i++) {
                     const ocrRes = await window.Tesseract.recognize(splitInfo.canvases[i], 'tur+eng');
                     const partText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
+                    const partVerified = extractVerifiedRealTextFromOcrResult(ocrRes);
                     if (partText) {
                         combinedText += (combinedText ? '\n\n' : '') + partText;
+                    }
+                    if (partVerified) {
+                        verifiedCombinedText += (verifiedCombinedText ? ' — ' : '') + partVerified;
                     }
                     if (ocrRes && ocrRes.data && Array.isArray(ocrRes.data.lines) && !splitInfo.isTwoColumn) {
                         collectedLines = ocrRes.data.lines;
@@ -4076,13 +4043,14 @@
                 if (combinedText.trim().length < 8) {
                     const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
                     combinedText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
+                    verifiedCombinedText = extractVerifiedRealTextFromOcrResult(fallbackRes);
                     if (fallbackRes && fallbackRes.data && Array.isArray(fallbackRes.data.lines)) {
                         collectedLines = fallbackRes.data.lines;
                     }
                 }
 
                 const cleanText = combinedText.trim();
-                const fullStory = buildRichTurkishPhotoStory(capCanvas, metrics, preds, cleanText);
+                const fullStory = buildRichTurkishPhotoStory(capCanvas, metrics, preds, verifiedCombinedText);
                 populatePhotoExplorerMap(capCanvas, metrics, preds, collectedLines, fullStory);
 
                 // ÖZEL MOD 9: İLAÇ KUTUSU, DOZAJ (mg), BARKOD VE SON KULLANMA TARİHİ (SKT) DENETÇİSİ
@@ -4198,11 +4166,11 @@
                     return;
                 }
 
-                // ÖZEL MOD 23: ERİŞİLEBİLİR YEMEK YAPMA REHBERİ (OCAK ATEŞİ, KIZARMIŞLIK VE ÇAY DEMİ KONTROLÜ)
+                // ÖZEL MOD 23: ERİŞİLEBİLİR YEMEK YAPMA REHBERİ (SADECE KAMERANIN GERÇEKTEN GÖRDÜKLERİ VE YÜZDELERİ)
                 if (state.mode === 'cooking_guide') {
-                    const cookCheck = analyzeStoveFlameAndFoodBrowning(capCanvas, metrics, cleanText);
-                    showDetectedResult('👩‍🍳🔥 Ocak Ateşi, Kızarmışlık ve Dem Raporu', cookCheck.fullText);
-                    announceGuidance(cookCheck.speechText, { force: true, bannerState: cookCheck.isBurntRisk ? 'warning' : 'centered' });
+                    const cookCheck = analyzeStoveFlameAndFoodBrowning(capCanvas, metrics, verifiedCombinedText, preds);
+                    showDetectedResult('👩‍🍳👁️ Kameranın Gördüğü Gerçek Nesne, Renk ve Yazı Raporu', cookCheck.fullText);
+                    announceGuidance(cookCheck.speechText, { force: true, bannerState: 'centered' });
                     return;
                 }
 
@@ -4575,7 +4543,7 @@
         for (let i = 0; i < lines.length; i++) {
             const ln = lines[i];
             const conf = typeof ln.confidence === 'number' ? ln.confidence : (ocrRes.data.confidence || 0);
-            if (conf < 56) continue;
+            if (conf < 65) continue;
 
             const raw = String(ln.text || '').replace(/\s+/g, ' ').trim();
             if (raw.length < 3) continue;
@@ -4583,7 +4551,7 @@
             // Gerçek harf veya rakam oranı kontrolü (yaprak/duvar dokusundan çıkan "| \ / _ ~" çöplerini reddet)
             const alphaNumMatches = raw.match(/[\p{L}\p{N}]/gu) || [];
             const alphaRatio = alphaNumMatches.length / raw.length;
-            if (alphaNumMatches.length < 3 || alphaRatio < 0.62) continue;
+            if (alphaNumMatches.length < 3 || alphaRatio < 0.68) continue;
 
             // En az bir anlamlı (2+ harfli) kelime veya 2+ haneli sayı içermeli
             if (!/[\p{L}]{2,}|\d{2,}/u.test(raw)) continue;
@@ -8836,9 +8804,9 @@
             if (btn) {
                 btn.classList.remove('active-toggle');
                 btn.setAttribute('aria-pressed', 'false');
-                btn.textContent = '👁️ Kamera Taşma & Yanma Nöbetçisi: Kapalı';
+                btn.textContent = '👁️ Kamera Görsel Gözlemcisi: Kapalı';
             }
-            announceGuidance('Kamera ile görsel taşma ve yanma nöbetçisi kapatıldı.', { force: true });
+            announceGuidance('Kamera görsel gözlemcisi kapatıldı.', { force: true });
             return;
         }
 
@@ -8849,13 +8817,13 @@
         if (btn) {
             btn.classList.add('active-toggle');
             btn.setAttribute('aria-pressed', 'true');
-            btn.textContent = '👁️ Kamera Taşma & Yanma Nöbetçisi: AÇIK (%100 Görsel)';
+            btn.textContent = '👁️ Kamera Görsel Gözlemcisi: AÇIK (Sıfır Halüsinasyon)';
         }
         if (donenessEl) {
-            donenessEl.textContent = '👁️ Kamera Görüntüsü Yüzde (%) İle İzleniyor';
+            donenessEl.textContent = '👁️ Sadece Gerçek Nesneler ve Renk Yüzdeleri İzleniyor';
         }
 
-        announceGuidance('Kamera ile Görsel Taşma ve Yanma Nöbetçisi açıldı! Ortam sesi dinlemez; yüzde yüz sadece kameranın gördüğü beyaz köpük yüzdesine, altın sarısı kızarma yüzdesine, koyu kararma yüzdesine ve ocak alevi yüzdesine göre yorum yapar.', {
+        announceGuidance('Kamera Görsel Gözlemcisi açıldı! Hiçbir varsayım veya uydurma yapmaz; sadece kamerada yüzde 58 ve üzeri güvenle gerçekten tanınan nesneleri, ölçülen gerçek renkleri ve aydınlık yüzdelerini bildirir.', {
             force: true,
             bannerState: 'centered'
         });
@@ -9023,90 +8991,69 @@
             '2 (Üstten 4 Parmak Boşluk Kuralı): Tencereye veya cezveye su koyarken işaret parmağınızın ikinci boğumuyla tencerenin üst kenarını kontrol edin; en üstten en az 3-4 parmak boşluk bırakın. ' +
             '3 (Soğuk Tava & Orta-Kısık Ateş Kuralı): Soğanı, salçayı ve şehriyeyi asla harlı ateşte kavurmayın; malzemeyi soğuk tavaya koyup ocağı orta-kısık ateşe ayarlayın, böylece ne yağ sıçrar ne de dibi yanar. ' +
             '4 (Tencere Sapı ve Merkez Kilidi): Ocağı yakmadan önce tencerenin ızgaranın tam ortasında oturduğunu iki elinizle kontrol edin ve sapını mutlaka tezgahın içine doğru çevirin ki eliniz çarpmasın. ' +
-            '5 (Yüzde Yüz Kamera Görüşlü Nöbetçi): Kamera Taşma ve Yanma Nöbetçisi ortam sesi dinlemez; yüzde yüz sadece kameranın gördüğü beyaz köpük yüzdesini, altın sarısı kızarma yüzdesini, koyu yanık yüzdesini ve ocak alevi yüzdesini analiz ederek yorum yapar. ' +
+            '5 (Sıfır Halüsinasyonlu Kamera Gözlemcisi): Kamera gözlemcisi uydurma yorum yapmaz; sadece gerçekten gördüğü doğrulanmış nesneleri güven yüzdesiyle, gerçek renkleri ve aydınlık oranlarını söyler. ' +
             '6 (Ocağı Kapattım Güvenlik Onayı): Yemek bittiğinde siz Ocağı Kapattım düğmesine basana kadar uygulama ocağı açık unutmamanız için size sesli hatırlatma yapar.';
         showDetectedResult('🛡️ Yanma ve Taşma Önleyici 6 Altın Mutfak Kuralı', tips);
         announceGuidance(tips, { force: true, bannerState: 'centered' });
     }
 
-    function analyzeStoveFlameAndFoodBrowning(capCanvas, metrics, cleanText = '') {
+    function analyzeStoveFlameAndFoodBrowning(capCanvas, metrics, cleanText = '', verifiedPreds = []) {
         const ctx = capCanvas.getContext('2d');
         const w = capCanvas.width;
         const h = capCanvas.height;
         const img = ctx.getImageData(Math.floor(w * 0.15), Math.floor(h * 0.15), Math.floor(w * 0.7), Math.floor(h * 0.7));
         const d = img.data;
 
-        let blueFlamePixels = 0;
-        let orangeFlameGlowPixels = 0;
-        let whiteFoamPixels = 0;
-        let goldenBrownPixels = 0;
-        let darkBurntPixels = 0;
+        let lightTonePixels = 0;
+        let midTonePixels = 0;
+        let darkTonePixels = 0;
         let total = 0;
 
         for (let i = 0; i < d.length; i += 16) {
             const r = d[i], g = d[i + 1], b = d[i + 2];
+            const lum = 0.299 * r + 0.587 * g + 0.114 * b;
             total++;
-            // Mavi doğalgaz/ocak alevi (Yüksek mavi/camgöbeği parlaklık)
-            if (b > 175 && g > 110 && r < 120 && (b - r) > 65) {
-                blueFlamePixels++;
-            }
-            // Turuncu/kırmızı ateş veya elektrikli ocak koru
-            if (r > 215 && g > 85 && g < 185 && b < 70 && (r - b) > 140) {
-                orangeFlameGlowPixels++;
-            }
-            // Beyaz kaynama köpüğü / süt-çorba-makarna kabarması
-            if (r > 218 && g > 218 && b > 212 && Math.abs(r - b) < 22) {
-                whiteFoamPixels++;
-            }
-            // Altın sarısı / karamelize kızarmış yemek tonu (pilav şehriyesi, kek üstü, köfte, börek)
-            if (r >= 135 && r <= 225 && g >= 75 && g <= 165 && b >= 20 && b <= 95 && (r - g) >= 30 && (g - b) >= 25) {
-                goldenBrownPixels++;
-            }
-            // Çok koyu / yanmaya yüz tutmuş yüzey
-            if (r < 36 && g < 32 && b < 30) {
-                darkBurntPixels++;
+            if (lum >= 185) {
+                lightTonePixels++;
+            } else if (lum <= 55) {
+                darkTonePixels++;
+            } else {
+                midTonePixels++;
             }
         }
 
-        const bluePct = Math.round((blueFlamePixels / Math.max(1, total)) * 100);
-        const orangePct = Math.round((orangeFlameGlowPixels / Math.max(1, total)) * 100);
-        const foamPct = Math.round((whiteFoamPixels / Math.max(1, total)) * 100);
-        const goldenPct = Math.round((goldenBrownPixels / Math.max(1, total)) * 100);
-        const burntPct = Math.round((darkBurntPixels / Math.max(1, total)) * 100);
-        const brightPct = Math.round(((metrics && metrics.avgBrightness ? metrics.avgBrightness : 120) / 255) * 100);
+        const lightPct = Math.round((lightTonePixels / Math.max(1, total)) * 100);
+        const midPct = Math.round((midTonePixels / Math.max(1, total)) * 100);
+        const darkPct = Math.round((darkTonePixels / Math.max(1, total)) * 100);
+        const brightPct = Math.round(((metrics && typeof metrics.avgBrightness === 'number' ? metrics.avgBrightness : 120) / 255) * 100);
 
-        const hasFlame = bluePct >= 1 || orangePct >= 1;
-        const flameMsg = hasFlame
-            ? (bluePct >= orangePct
-                ? `Ocak Alevi: Görüntüde yüzde ${bluePct} oranında mavi doğalgaz alevi görünüyor (Ocak AÇIK).`
-                : `Ocak Ateşi: Görüntüde yüzde ${orangePct} oranında turuncu-kırmızı ateş/rezistans koru görünüyor (Ocak AÇIK).`)
-            : 'Ocak Alevi: Görüntüde yüzde 0 ocak alevi var (Açık ateş görünmüyor).';
+        const centerCol = (metrics && metrics.centerColor) ? metrics.centerColor.name : sampleRegionTurkishColor(ctx, w * 0.35, h * 0.35, w * 0.3, h * 0.3);
+        const topCol = sampleRegionTurkishColor(ctx, w * 0.25, h * 0.08, w * 0.5, h * 0.22);
+        const bottomCol = sampleRegionTurkishColor(ctx, w * 0.25, h * 0.70, w * 0.5, h * 0.22);
 
-        const colName = (metrics && metrics.centerColor) ? metrics.centerColor.name : 'Normal';
-        let donenessMsg = `Kameranın Yüzde Yüz Gördüğü Görsel Oranlar: Merkezdeki baskın renk ${colName}, ortam aydınlığı yüzde ${brightPct}, beyaz köpük/açık yüzey oranı yüzde ${foamPct}, altın sarısı kızarmışlık oranı yüzde ${goldenPct}, koyu kararma/yanık oranı yüzde ${burntPct}.`;
-        let isBurntRisk = false;
+        const highConfObjs = Array.isArray(verifiedPreds)
+            ? verifiedPreds.filter(p => (p.score || 0) >= 0.58)
+            : [];
 
-        if (burntPct >= 32 && (metrics ? metrics.avgBrightness > 45 : true)) {
-            donenessMsg += ` DİKKAT: Görüntünün yüzde ${burntPct} kadarı çok koyu/kararmış görünüyor; yanma riskine karşı ocağı kısın veya karıştırın!`;
-            isBurntRisk = true;
-        } else if (foamPct >= 42) {
-            donenessMsg += ` DİKKAT: Görüntünün yüzde ${foamPct} kadarı parlak beyaz köpükle kaplı; taşma riskine karşı ocağı kısın!`;
-        } else if (goldenPct >= 18) {
-            donenessMsg += ` Yiyecek yüzde ${goldenPct} oranında altın sarısı kızarmış kıvama ulaşmış.`;
-        } else {
-            donenessMsg += ' Yiyecek yüzeyinde yanık veya taşma köpüğü görünmüyor.';
-        }
+        const objMsg = highConfObjs.length > 0
+            ? 'Doğrulanmış Nesneler: ' + highConfObjs.map(p => `yüzde ${Math.round((p.score || 0) * 100)} güvenle ${TR_LABELS[p.class] || p.class}`).join(', ') + '.'
+            : 'Doğrulanmış Nesne: Kamerada yüksek güvenle tanınan bir nesne görünmüyor.';
+
+        const colorAndToneMsg = `Gerçek Görsel Ölçüm: Merkez rengi ${centerCol}, üst bölge rengi ${topCol}, alt bölge rengi ${bottomCol}. Genel aydınlık yüzde ${brightPct} (açık renk tonu yüzde ${lightPct}, orta renk tonu yüzde ${midPct}, koyu renk tonu yüzde ${darkPct}).`;
 
         const statusEl = document.getElementById('cooking-doneness-display');
         if (statusEl) {
-            statusEl.textContent = `Renk: ${colName} | Köpük: %${foamPct} | Kızarma: %${goldenPct} | Kararma: %${burntPct} | Alev: %${Math.max(bluePct, orangePct)}`;
+            const firstObj = highConfObjs.length > 0
+                ? `${TR_LABELS[highConfObjs[0].class] || highConfObjs[0].class} (%${Math.round(highConfObjs[0].score * 100)})`
+                : 'Nesne Yok';
+            statusEl.textContent = `Nesne: ${firstObj} | Merkez Rengi: ${centerCol} | Aydınlık: %${brightPct} | Açık Ton: %${lightPct} | Koyu Ton: %${darkPct}`;
         }
 
-        const speech = `${flameMsg} ${donenessMsg} ${cleanText ? 'Kamerada okunan yazı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
+        const speech = `${objMsg} ${colorAndToneMsg} ${cleanText ? 'Kamerada okunan doğrulanmış yazı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
         return {
             speechText: speech,
-            fullText: `${flameMsg}\n${donenessMsg}\n\nOkunan Yazı / Derece:\n${cleanText || 'Yazı yok.'}`,
-            isBurntRisk
+            fullText: `${objMsg}\n${colorAndToneMsg}\n\nOkunan Doğrulanmış Yazı:\n${cleanText || 'Okunabilir yazı yok.'}`,
+            isBurntRisk: false
         };
     }
 
@@ -9115,79 +9062,60 @@
         el.tPosition.textContent = `Kamera Merkez Rengi: ${col}`;
         el.tDistance.textContent = state.cookingTimerInterval
             ? `Sayaç: ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}`
-            : (state.boilBurnGuardActive ? 'Kamera Nöbetçisi Açık (%100 Görsel)' : 'Aşçı Rehberi Hazır');
+            : (state.boilBurnGuardActive ? 'Görsel Gözlemci Açık (Sıfır Halüsinasyon)' : 'Aşçı Rehberi Hazır');
 
-        // Sadece Kameranın Gördüğü Görüntüden Yüzde (%) Hesabı
         if (metrics && metrics.imageData) {
             const d = metrics.imageData.data;
-            let whiteFoamCount = 0;
-            let goldenBrownCount = 0;
-            let darkCharCount = 0;
-            let flameCount = 0;
+            let lightCount = 0;
+            let midCount = 0;
+            let darkCount = 0;
             let samples = 0;
             for (let i = 0; i < d.length; i += 32) {
                 const r = d[i], g = d[i + 1], b = d[i + 2];
+                const lum = 0.299 * r + 0.587 * g + 0.114 * b;
                 samples++;
-                if (r > 218 && g > 218 && b > 212 && Math.abs(r - b) < 22) {
-                    whiteFoamCount++;
-                }
-                if (r >= 135 && r <= 225 && g >= 75 && g <= 165 && b >= 20 && b <= 95 && (r - g) >= 30 && (g - b) >= 25) {
-                    goldenBrownCount++;
-                }
-                if (r < 32 && g < 28 && b < 26) {
-                    darkCharCount++;
-                }
-                if ((b > 175 && g > 110 && r < 120 && (b - r) > 65) || (r > 215 && g > 85 && g < 185 && b < 70 && (r - b) > 140)) {
-                    flameCount++;
+                if (lum >= 185) {
+                    lightCount++;
+                } else if (lum <= 55) {
+                    darkCount++;
+                } else {
+                    midCount++;
                 }
             }
-            const foamPct = Math.round((whiteFoamCount / Math.max(1, samples)) * 100);
-            const goldenPct = Math.round((goldenBrownCount / Math.max(1, samples)) * 100);
-            const charPct = Math.round((darkCharCount / Math.max(1, samples)) * 100);
-            const flamePct = Math.round((flameCount / Math.max(1, samples)) * 100);
-            const brightJump = metrics.avgBrightness - (state.prevCookingCenterBrightness || metrics.avgBrightness);
-            state.prevCookingCenterBrightness = metrics.avgBrightness;
+            const lightPct = Math.round((lightCount / Math.max(1, samples)) * 100);
+            const midPct = Math.round((midCount / Math.max(1, samples)) * 100);
+            const darkPct = Math.round((darkCount / Math.max(1, samples)) * 100);
+            const brightPct = Math.round(((metrics.avgBrightness || 0) / 255) * 100);
+
+            const highConfPreds = Array.isArray(predictions)
+                ? predictions.filter(p => (p.score || 0) >= 0.58)
+                : [];
 
             const statusEl = document.getElementById('cooking-doneness-display');
             if (statusEl) {
-                statusEl.textContent = `Renk: ${col} | Köpük: %${foamPct} | Kızarma: %${goldenPct} | Kararma: %${charPct} | Alev: %${flamePct}`;
+                const objSummary = highConfPreds.length > 0
+                    ? highConfPreds.slice(0, 2).map(p => `${TR_LABELS[p.class] || p.class} (%${Math.round(p.score * 100)})`).join(', ')
+                    : 'Nesne yok';
+                statusEl.textContent = `Nesne: ${objSummary} | Renk: ${col} | Aydınlık: %${brightPct} | Açık Ton: %${lightPct} | Koyu Ton: %${darkPct}`;
             }
 
             const now = performance.now();
-            if (state.boilBurnGuardActive && (now - state.lastBoilBurnAlertAt > 8000)) {
-                if (foamPct >= 42 && brightJump > 5) {
-                    state.lastBoilBurnAlertAt = now;
-                    radar.playDangerAlarm();
-                    if (navigator.vibrate) navigator.vibrate([300, 80, 300]);
-                    announceGuidance(`KAMERA GÖRSEL UYARISI: Kameranın gördüğü alanın yüzde ${foamPct} kadarı parlak beyaz köpükle kaplandı! Köpük yükseliyor olabilir, lütfen ocağı kontrol edin.`, {
-                        force: true,
-                        bannerState: 'warning'
-                    });
-                } else if (charPct >= 38 && metrics.avgBrightness > 45) {
-                    state.lastBoilBurnAlertAt = now;
-                    radar.playDangerAlarm();
-                    if (navigator.vibrate) navigator.vibrate([300, 80, 300]);
-                    announceGuidance(`KAMERA GÖRSEL UYARISI: Kameranın gördüğü alanın yüzde ${charPct} kadarı çok koyu siyah-kahverengi görünüyor! Kararma riskine karşı kontrol edin.`, {
-                        force: true,
-                        bannerState: 'warning'
-                    });
-                } else if (now - state.lastBoilBurnAlertAt > 14000) {
-                    state.lastBoilBurnAlertAt = now;
-                    const objList = (predictions && predictions.length > 0)
-                        ? ` Tanınan nesne: ${translateClass(predictions[0].class)} (yüzde ${Math.round(predictions[0].score * 100)} güven).`
-                        : '';
-                    announceGuidance(`Kamera görüntüsü: Merkez rengi ${col}, beyaz köpük yüzde ${foamPct}, altın sarısı kızarma yüzde ${goldenPct}, koyu kararma yüzde ${charPct}, ocak alevi yüzde ${flamePct}.${objList}`, {
-                        force: false,
-                        bannerState: 'normal'
-                    });
-                }
+            if (state.boilBurnGuardActive && (now - state.lastBoilBurnAlertAt > 12000)) {
+                state.lastBoilBurnAlertAt = now;
+                const objSpeech = highConfPreds.length > 0
+                    ? 'Görünen doğrulanmış nesneler: ' + highConfPreds.slice(0, 3).map(p => `yüzde ${Math.round(p.score * 100)} güvenle ${TR_LABELS[p.class] || p.class}`).join(', ') + '.'
+                    : 'Görüntüde yüksek güvenle tanınan bir nesne yok.';
+                announceGuidance(`${objSpeech} Merkez rengi ${col}, ortam aydınlığı yüzde ${brightPct}, açık renk tonu yüzde ${lightPct}, orta ton yüzde ${midPct}, koyu ton yüzde ${darkPct}.`, {
+                    force: false,
+                    bannerState: 'normal'
+                });
             }
         }
     }
 
     function checkStoveFlameAndFoodDoneness() {
         if (!state.isRunning) {
-            announceGuidance('Ocak ateşini ve yemeğin kızarmışlığını kontrol etmek için önce üstteki Kamerayı Başlat düğmesine basın, ardından kamerayı tencereye veya ocağa tutun.', {
+            announceGuidance('Kamerada gerçekten görünen nesneleri ve renk yüzdelerini dinlemek için önce üstteki Kamerayı Başlat düğmesine basın.', {
                 force: true,
                 bannerState: 'warning'
             });
