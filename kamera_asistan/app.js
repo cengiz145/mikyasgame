@@ -1325,12 +1325,15 @@
         const touchesTop = by <= frameH * 0.03;
         const touchesBottom = (by + bh) >= frameH * 0.97;
 
+        const isExamContext = state.mode === 'exam_reader' || /Sınav/i.test(labelTr || '');
         const moveParts = [];
 
         if (offsetX < -0.20 || (touchesLeft && !touchesRight)) {
             moveParts.push(offsetX < -0.45 ? 'sola doğru çevirin' : 'biraz sola kaydırın');
         } else if (offsetX > 0.20 || (touchesRight && !touchesLeft)) {
-            moveParts.push(offsetX > 0.45 ? 'sağa doğru çevirin (sağdaki şıklar kesilebilir)' : 'biraz sağa kaydırın');
+            moveParts.push(offsetX > 0.45
+                ? (isExamContext ? 'sağa doğru çevirin (sağdaki şıklar kesilebilir)' : 'sağa doğru çevirin')
+                : 'biraz sağa kaydırın');
         }
 
         if (offsetY < -0.20 || (touchesTop && !touchesBottom)) {
@@ -1345,7 +1348,9 @@
             distanceAdvice = 'Biraz daha yaklaşın';
             distanceStatus = 'Uzak (Yaklaşın)';
         } else if (areaRatio > idealMaxArea || (touchesLeft && touchesRight) || (touchesTop && touchesBottom)) {
-            distanceAdvice = 'Çok yakınsınız, tüm şıkların sığması için telefonu biraz yukarı/geri çekin';
+            distanceAdvice = isExamContext
+                ? 'Çok yakınsınız, tüm şıkların sığması için telefonu biraz yukarı/geri çekin'
+                : 'Çok yakınsınız, tamamının kadraja sığması için telefonu biraz geri çekin';
             distanceStatus = 'Çok Yakın (Geri Çekin)';
         }
 
@@ -3007,7 +3012,8 @@
     function guideToSpecificObject(targetClass, anW, anH, scaleX, scaleY, ovCtx, predictions) {
         const matches = predictions.filter(p => {
             if (targetClass === 'door_table') return p.class === 'dining table' || p.class === 'bench' || p.class === 'couch';
-            if (targetClass === 'cup') return p.class === 'cup' || p.class === 'bottle' || p.class === 'wine glass';
+            if (targetClass === 'chair') return p.class === 'chair' || p.class === 'couch' || p.class === 'bench';
+            if (targetClass === 'cup') return p.class === 'cup' || p.class === 'bottle' || p.class === 'wine glass' || p.class === 'bowl';
             if (targetClass === 'keyboard') return p.class === 'keyboard' || p.class === 'mouse' || p.class === 'laptop';
             return p.class === targetClass;
         });
@@ -4393,7 +4399,7 @@
             hasOcrEngine ? (initialStory + '\n\n(Fotoğrafın üzerindeki yazılar kontrol ediliyor...)') : initialStory
         );
         announceGuidance(
-            hasOcrEngine ? `${initialStory} Şimdi fotoğraftaki yazıları da kontrol ediyorum...` : initialStory,
+            hasOcrEngine ? `${sourceLabel} inceleniyor, sahne ve yazılar okunuyor...` : initialStory,
             {
                 force: true,
                 bannerState: 'centered'
@@ -4786,7 +4792,10 @@
                         : '';
 
                     if (cleanText) {
-                        const directSpeech = `Okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.${insightSpeech}`;
+                        const includeSceneWithText = preds.length > 0 || state.mode === 'explorer' || state.mode === 'portrait';
+                        const directSpeech = includeSceneWithText
+                            ? `${fullStory}${insightSpeech}`
+                            : `Okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.${insightSpeech}`;
                         showDetectedResult(
                             `${sourceLabel} — Okunan Yazı ve Detaylı Betimleme`,
                             `Okunan Yazı:\n${cleanText}${insightReport}\n\n--- Sahne Betimlemesi ---\n${fullStory}`
@@ -5904,8 +5913,8 @@
     /**
      * Astronomik Güneş Konumu (Azimut & Yükseklik) ve Diyanet Uyumlu 6 Namaz Vakti + Kerahat Hesabı
      */
-    function calculateSolarAndPrayerTimes(lat, lon) {
-        const now = new Date();
+    function calculateSolarAndPrayerTimes(lat, lon, customDate = null) {
+        const now = (customDate instanceof Date && !isNaN(customDate.getTime())) ? customDate : new Date();
         const startOfYear = new Date(now.getFullYear(), 0, 0);
         const dayOfYear = Math.floor((now - startOfYear) / 86400000);
         const rad = Math.PI / 180;
@@ -5918,7 +5927,8 @@
         const declRad = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma)
             - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma);
 
-        const tzOffsetHours = -now.getTimezoneOffset() / 60; // Türkiye için +3
+        const isTurkeyCoord = (lat >= 35.5 && lat <= 42.5 && lon >= 25.5 && lon <= 45.0);
+        const tzOffsetHours = isTurkeyCoord ? 3 : (-now.getTimezoneOffset() / 60); // Türkiye koordinatlarında kalıcı UTC+3 kilidi
         const solarNoonMin = 720 - (4 * lon) - eqTime + (tzOffsetHours * 60);
 
         function hourAngleForElevation(elevDeg) {
@@ -5954,7 +5964,9 @@
             return `${hh}:${mm}`;
         }
 
-        const curMin = now.getHours() * 60 + now.getMinutes();
+        const curMin = isTurkeyCoord
+            ? (((now.getUTCHours() + 3) % 24) * 60 + now.getUTCMinutes())
+            : (now.getHours() * 60 + now.getMinutes());
         let activePrayer = 'Yatsı';
         let nextPrayerName = 'İmsak';
         let minsToNext = 0;
@@ -6103,6 +6115,11 @@
     }
 
     function saveRoomQiblaProfile() {
+        if ((!state.qiblaLocationVerified || state.qiblaTargetBearing === null) &&
+            typeof state.userLat === 'number' && typeof state.userLon === 'number') {
+            state.qiblaTargetBearing = calculateQiblaBearing(state.userLat, state.userLon);
+            state.qiblaLocationVerified = true;
+        }
         if (!state.qiblaLocationVerified || state.qiblaTargetBearing === null) {
             announceGuidance('Oda Kıble hafızasını kaydetmek için önce konumunuzun doğrulanmış olması gerekir.', {
                 force: true,
@@ -6110,11 +6127,21 @@
             });
             return;
         }
+        if (typeof state.smoothedHeading === 'number') {
+            const diff = Math.abs(((state.qiblaTargetBearing - state.smoothedHeading + 540) % 360) - 180);
+            if (diff > 15) {
+                announceGuidance(`Oda Kıble referansını doğru kaydetmek için lütfen önce telefonu Kıble açısına (${Math.round(state.qiblaTargetBearing)} dereceye) çevirin, ardından kaydedin.`, {
+                    force: true,
+                    bannerState: 'warning'
+                });
+                return;
+            }
+        }
         const landmarks = state.lastSceneObstacles.length > 0
             ? state.lastSceneObstacles.join(', ')
             : 'açık alan / duvar';
         const profile = {
-            city: state.qiblaLocationSource,
+            city: state.qiblaLocationSource || 'Seçili Konum',
             bearing: state.qiblaTargetBearing,
             landmarks,
             savedAt: new Date().toLocaleDateString('tr-TR')
@@ -6122,7 +6149,7 @@
         try {
             localStorage.setItem('mikyas_saved_room_qibla', JSON.stringify(profile));
         } catch (_) {}
-        announceGuidance(`Bu odadaki Kıble yönünüz (${profile.bearing} derece, önünüzdeki referans: ${landmarks}) başarıyla hafızaya kaydedildi!`, {
+        announceGuidance(`Bu odadaki Kıble yönünüz (${profile.city}, ${Math.round(profile.bearing)} derece, önünüzdeki referans: ${landmarks}) başarıyla hafızaya kaydedildi!`, {
             force: true,
             bannerState: 'centered'
         });
@@ -6133,7 +6160,7 @@
             const raw = localStorage.getItem('mikyas_saved_room_qibla');
             if (!raw) return '';
             const p = JSON.parse(raw);
-            return ` Kayıtlı oda hafızası: ${p.bearing}° yönünde (${p.landmarks}) olarak işaretlenmişti.`;
+            return ` Kayıtlı oda hafızası (${p.city || 'Oda'}): ${Math.round(Number(p.bearing) || 0)} derece (${p.bearing}°) yönünde (${p.landmarks}) olarak işaretlenmişti.`;
         } catch (_) {
             return '';
         }
@@ -6797,19 +6824,34 @@
         const c = new Float32Array(newSize);
         for (let i = 0; i < newSize; i++) {
             let sum = 0;
-            for (let j = 0; j < newSize - i; j++) {
+            const overlap = newSize - i;
+            for (let j = 0; j < overlap; j++) {
                 sum += slice[j] * slice[j + i];
             }
-            c[i] = sum;
+            c[i] = sum / Math.max(1, overlap);
         }
 
         let d = 0;
+        while (d < newSize && c[d] > 0) d++;
         while (d + 1 < newSize && c[d] > c[d + 1]) d++;
+
+        const minLag = Math.max(d, Math.floor(sampleRate / 1150));
+        const maxLag = Math.min(newSize - 2, Math.ceil(sampleRate / 65));
         let maxval = -1, maxpos = -1;
-        for (let i = d; i < newSize; i++) {
+        for (let i = minLag; i <= maxLag; i++) {
             if (c[i] > maxval) {
                 maxval = c[i];
                 maxpos = i;
+            }
+        }
+        // Alt-oktav sıçramalarını önlemek için ilk güçlü yerel zirveyi (McLeod Pitch Method >= %88 eşiği) seç
+        if (maxval > 0) {
+            const keyThreshold = maxval * 0.88;
+            for (let i = minLag + 1; i <= maxLag - 1; i++) {
+                if (c[i] >= keyThreshold && c[i] >= c[i - 1] && c[i] >= c[i + 1]) {
+                    maxpos = i;
+                    break;
+                }
             }
         }
         if (maxpos <= 0) return { hz: null, rms };
