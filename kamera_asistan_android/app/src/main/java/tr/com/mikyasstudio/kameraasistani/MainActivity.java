@@ -254,6 +254,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
 
         @JavascriptInterface
+        public boolean isNativeSpeaking() {
+            if (nativeTtsReady && nativeTts != null) {
+                try { return nativeTts.isSpeaking(); } catch (Exception ignored) {}
+            }
+            return false;
+        }
+
+        @JavascriptInterface
         public boolean copyToClipboard(final String label, final String text) {
             if (text == null) return false;
             try {
@@ -575,6 +583,19 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
     @Override
+    protected void onPause() {
+        if (nativeTts != null) {
+            try { nativeTts.stop(); } catch (Exception ignored) {}
+        }
+        if (webView != null) {
+            try {
+                webView.evaluateJavascript("if (typeof window.stopAllSpeechImmediately === 'function') { window.stopAllSpeechImmediately(); }", null);
+            } catch (Exception ignored) {}
+        }
+        super.onPause();
+    }
+
+    @Override
     protected void onDestroy() {
         if (nativeTts != null) {
             try {
@@ -588,6 +609,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     @Override
     @SuppressWarnings("deprecation")
     public void onBackPressed() {
+        if (nativeTts != null) {
+            try {
+                if (nativeTts.isSpeaking()) {
+                    nativeTts.stop();
+                    return;
+                }
+            } catch (Exception ignored) {}
+        }
         if (webView != null) {
             webView.evaluateJavascript(
                     "(function(){ try { return (typeof window.handleAndroidBackButton === 'function') ? Boolean(window.handleAndroidBackButton()) : false; } catch(e) { return false; } })()",

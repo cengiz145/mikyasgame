@@ -130,6 +130,7 @@
         lastSpeechText: 'Henüz yönlendirme başlamadı.',
         lastSpokenAt: 0,
         lastSpokenPhrase: '',
+        isCurrentlySpeaking: false,
         countdownStage: 0,
         lastCountdownTick: 0,
         lastQrCode: '',
@@ -227,6 +228,7 @@
         btnToggleAuto: document.getElementById('btn-toggle-auto'),
         btnCaptureNow: document.getElementById('btn-capture-now'),
         btnUploadPhoto: document.getElementById('btn-upload-photo'),
+        btnSilenceSpeech: document.getElementById('btn-silence-speech'),
         photoFileInput: document.getElementById('photo-file-input'),
         btnSpeakStory: document.getElementById('btn-speak-story'),
         photoExplorerCanvas: document.getElementById('photo-explorer-canvas'),
@@ -884,6 +886,32 @@
         window.open(urlStr, '_blank', 'noopener');
     }
 
+    function stopAllSpeechImmediately() {
+        state.isCurrentlySpeaking = false;
+        if ('speechSynthesis' in window) {
+            try { window.speechSynthesis.cancel(); } catch (_) {}
+        }
+        if (window.AndroidSongBridge && typeof window.AndroidSongBridge.stopNativeSpeech === 'function') {
+            try { window.AndroidSongBridge.stopNativeSpeech(); } catch (_) {}
+        }
+        if (el.srAssertive) {
+            el.srAssertive.textContent = '';
+        }
+    }
+    window.stopAllSpeechImmediately = stopAllSpeechImmediately;
+
+    function isAnySpeechPlaying() {
+        if (window.AndroidSongBridge && typeof window.AndroidSongBridge.isNativeSpeaking === 'function') {
+            try {
+                if (window.AndroidSongBridge.isNativeSpeaking()) return true;
+            } catch (_) {}
+        }
+        if ('speechSynthesis' in window && window.speechSynthesis && window.speechSynthesis.speaking) {
+            return true;
+        }
+        return Boolean(state.isCurrentlySpeaking);
+    }
+
     function announceGuidance(text, options = {}) {
         const {
             force = false,
@@ -904,45 +932,61 @@
 
         if (!force) {
             if (now - state.lastSpokenAt < minIntervalMs) return;
-            if (text === state.lastSpokenPhrase && now - state.lastSpokenAt < 5200) return;
+            // İnsan Odaklı Sakinlik Kalkanı: Kamera önünde hiçbir şey değişmediyse aynı cümleyi 5 saniyede bir değil 15 saniyede bir tekrarlar;
+            // ancak sahne veya yön değiştiği anda (text !== state.lastSpokenPhrase) beklemeden hemen söyler!
+            if (text === state.lastSpokenPhrase && now - state.lastSpokenAt < 15000) return;
         }
 
         state.lastSpokenAt = now;
         state.lastSpokenPhrase = text;
 
-        if (el.srAssertive) {
-            el.srAssertive.textContent = '';
-            setTimeout(() => {
-                el.srAssertive.textContent = text;
-            }, 25);
+        let spokeViaTts = false;
+        const hasNativeBridge = Boolean(window.AndroidSongBridge && typeof window.AndroidSongBridge.speakNativeTurkish === 'function');
+
+        // 1. Öncelik: Android üzerinde her zaman kullanıcının kendi doğal Türkçe TTS motorunu kullan (robotik WebView sesi ve çift konuşmayı önler)
+        if (hasNativeBridge) {
+            try {
+                if ('speechSynthesis' in window) {
+                    try { window.speechSynthesis.cancel(); } catch (_) {}
+                }
+                window.AndroidSongBridge.speakNativeTurkish(text, Boolean(force));
+                spokeViaTts = true;
+                state.isCurrentlySpeaking = true;
+            } catch (_) {}
         }
 
-        let spokeViaWebSpeech = false;
-        if ('speechSynthesis' in window) {
+        // 2. Öncelik: Web / Masaüstü / iOS Tarayıcı TTS Motoru
+        if (!spokeViaTts && 'speechSynthesis' in window && window.speechSynthesis && typeof window.speechSynthesis.speak === 'function') {
             try {
                 const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
-                const hasNativeBridge = Boolean(window.AndroidSongBridge && typeof window.AndroidSongBridge.speakNativeTurkish === 'function');
-                if (!hasNativeBridge || (Array.isArray(voices) && voices.length > 0)) {
-                    if (force) {
-                        window.speechSynthesis.cancel();
-                    } else if (window.speechSynthesis.speaking) {
-                        return;
-                    }
-                    const utter = new SpeechSynthesisUtterance(text);
-                    utter.lang = 'tr-TR';
-                    utter.rate = 1.12;
-                    const trVoice = Array.isArray(voices) ? voices.find(v => v.lang && v.lang.toLowerCase().startsWith('tr')) : null;
-                    if (trVoice) utter.voice = trVoice;
-                    window.speechSynthesis.speak(utter);
-                    spokeViaWebSpeech = true;
+                if (force) {
+                    window.speechSynthesis.cancel();
+                } else if (window.speechSynthesis.speaking) {
+                    return;
                 }
+                const utter = new SpeechSynthesisUtterance(text);
+                utter.lang = 'tr-TR';
+                utter.rate = 1.12;
+                const trVoice = Array.isArray(voices) ? voices.find(v => v.lang && v.lang.toLowerCase().startsWith('tr')) : null;
+                if (trVoice) utter.voice = trVoice;
+                utter.onend = () => { state.isCurrentlySpeaking = false; };
+                utter.onerror = () => { state.isCurrentlySpeaking = false; };
+                state.isCurrentlySpeaking = true;
+                window.speechSynthesis.speak(utter);
+                spokeViaTts = true;
             } catch (_) {}
         }
 
-        if (!spokeViaWebSpeech && window.AndroidSongBridge && typeof window.AndroidSongBridge.speakNativeTurkish === 'function') {
-            try {
-                window.AndroidSongBridge.speakNativeTurkish(text, Boolean(force));
-            } catch (_) {}
+        // 3. Çift Ses (TalkBack / NVDA Yankısı) Önleyici: Sadece sesli motor (TTS) konuşmadıysa aria-live="assertive" tetiklenir
+        if (el.srAssertive) {
+            if (spokeViaTts) {
+                el.srAssertive.textContent = '';
+            } else {
+                el.srAssertive.textContent = '';
+                setTimeout(() => {
+                    el.srAssertive.textContent = text;
+                }, 25);
+            }
         }
     }
 
@@ -4045,7 +4089,9 @@
         const otherObjs = verifiedPreds.filter(p => p.class !== 'person');
 
         if (people.length === 0) {
-            sentences.push('Görüntüde insan görünmüyor.');
+            if (otherObjs.length === 0 || state.mode === 'portrait' || state.mode === 'social_presence') {
+                sentences.push('Görüntüde insan görünmüyor.');
+            }
         } else {
             people.sort((a, b) => (a.bbox[0] + a.bbox[2] / 2) - (b.bbox[0] + b.bbox[2] / 2));
             const personItems = people.slice(0, 4).map((p, idx) => {
@@ -4792,7 +4838,7 @@
                         : '';
 
                     if (cleanText) {
-                        const includeSceneWithText = preds.length > 0 || state.mode === 'explorer' || state.mode === 'portrait';
+                        const includeSceneWithText = preds.length > 0;
                         const directSpeech = includeSceneWithText
                             ? `${fullStory}${insightSpeech}`
                             : `Okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.${insightSpeech}`;
@@ -6190,22 +6236,24 @@
 
         // Mobil veri santrali (CGNAT) IP adresleri gerçek ilden ratusan km uzaktaki bölge müdürlüğünü (İstanbul/Ankara/İzmir)
         // gösterebildiği için IP konumunu Kıble pusulasında otomatik "doğrulanmış" kabul etme; sadece kaba ön bilgi olarak tut!
-        fetch('https://ipwho.is/')
-            .then(r => r.json())
-            .then(data => {
-                if (!state.qiblaLocationVerified && !state.userLat && data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
-                    state.ipHintCity = data.city || '';
-                    if (el.qiblaCitySelect && state.ipHintCity) {
-                        for (let i = 0; i < el.qiblaCitySelect.options.length; i++) {
-                            if (el.qiblaCitySelect.options[i].text.toLocaleLowerCase('tr-TR').startsWith(state.ipHintCity.toLocaleLowerCase('tr-TR'))) {
-                                el.qiblaCitySelect.selectedIndex = i;
-                                break;
+        if (typeof fetch === 'function') {
+            fetch('https://ipwho.is/')
+                .then(r => r.json())
+                .then(data => {
+                    if (!state.qiblaLocationVerified && !state.userLat && data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+                        state.ipHintCity = data.city || '';
+                        if (el.qiblaCitySelect && state.ipHintCity) {
+                            for (let i = 0; i < el.qiblaCitySelect.options.length; i++) {
+                                if (el.qiblaCitySelect.options[i].text.toLocaleLowerCase('tr-TR').startsWith(state.ipHintCity.toLocaleLowerCase('tr-TR'))) {
+                                    el.qiblaCitySelect.selectedIndex = i;
+                                    break;
+                                }
                             }
                         }
                     }
-                }
-            })
-            .catch(() => {});
+                })
+                .catch(() => {});
+        }
     }
 
     function handleCompassHeadingEvent(rawHeadingDeg, compassAccuracyDeg = 10) {
@@ -9782,6 +9830,9 @@
             autoAcquireLocationAndWatch();
         } else {
             state.qiblaActive = false;
+            if (newMode === 'bus_stop_tracker' || newMode === 'where_am_i') {
+                autoAcquireLocationAndWatch();
+            }
         }
 
         el.modeButtons.forEach(btn => {
@@ -9946,6 +9997,9 @@
             el.photoExplorerCanvas.addEventListener('touchstart', handlePhotoExplorerPointerEvent, { passive: false });
             el.photoExplorerCanvas.addEventListener('touchmove', handlePhotoExplorerPointerEvent, { passive: false });
         }
+    }
+    if (el.btnSilenceSpeech) {
+        el.btnSilenceSpeech.addEventListener('click', () => stopAllSpeechImmediately());
     }
     el.btnWhatsappHold.addEventListener('click', startWhatsapp15SecAudioHold);
     el.btnRepeat.addEventListener('click', () => announceGuidance(state.lastSpeechText, { force: true }));
@@ -10276,6 +10330,10 @@
     });
 
     window.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape' || ev.key === 'Control') {
+            stopAllSpeechImmediately();
+            return;
+        }
         if (ev.target && (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA' || ev.target.tagName === 'SELECT')) {
             return;
         }
@@ -10336,7 +10394,15 @@
         else if (key === 'z' || ev.key === '+') addCurrentlyVisibleMoneyManually();
         else if (ev.code === 'Space') {
             ev.preventDefault();
-            if (!state.isRunning) startCamera();
+            if (!state.isRunning) {
+                if (state.mode === 'song_finder') toggleSongListening();
+                else if (state.mode === 'cooking_guide') stepCookingInstruction(0);
+                else if (state.mode === 'qibla_compass') speakPrayerTimesAndSolarValidation();
+                else if (state.mode === 'step_calorie_guide') speakCurrentStepAndCalorieStatus();
+                else if (state.mode === 'where_am_i') announceWhereAmIFullAddressAndSignboard('', []);
+                else if (state.mode === 'item_memory') speakAllSavedItemMemories();
+                else startCamera();
+            }
             else if (state.mode === 'social_presence') {
                 announceGuidance(state.lastSpeechText || 'Odada henüz doğrulanmış bir kişi algılanmadı.', {
                     force: true,
@@ -10349,9 +10415,7 @@
 
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-            if ('speechSynthesis' in window) {
-                try { window.speechSynthesis.cancel(); } catch (_) {}
-            }
+            stopAllSpeechImmediately();
             state.isProcessingOcr = false;
             state.moneyLiveOcrBusy = false;
             state.isLiveBgOcrBusy = false;
@@ -10379,8 +10443,8 @@
         loadItemMemoriesFromStorage();
         loadStepCalorieFromStorage();
         populateCookingRecipesSelect();
+        populate81ProvincesSelect();
         syncModePanelsVisibility(state.mode);
-        autoAcquireLocationAndWatch();
         updateExamRemoteUI();
         setTimeout(initAiModel, 350);
     });
@@ -10388,9 +10452,7 @@
     window.handleAndroidBackButton = function () {
         if (el.resultPanel && !el.resultPanel.hidden) {
             el.resultPanel.hidden = true;
-            if ('speechSynthesis' in window) {
-                try { window.speechSynthesis.cancel(); } catch (_) {}
-            }
+            stopAllSpeechImmediately();
             announceGuidance('Sonuç paneli kapatıldı.', { force: true });
             return true;
         }
@@ -10400,11 +10462,16 @@
         }
         if (state.qiblaActive) {
             state.qiblaActive = false;
+            stopAllSpeechImmediately();
             announceGuidance('Kıble pusulası durduruldu.', { force: true });
             return true;
         }
         if (state.isRunning) {
             stopCamera();
+            return true;
+        }
+        if (isAnySpeechPlaying()) {
+            stopAllSpeechImmediately();
             return true;
         }
         return false;
