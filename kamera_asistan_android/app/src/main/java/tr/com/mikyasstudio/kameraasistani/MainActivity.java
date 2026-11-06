@@ -262,6 +262,16 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         }
 
         @JavascriptInterface
+        public void setNativeSpeechRate(final float rate) {
+            if (nativeTtsReady && nativeTts != null) {
+                try {
+                    float clamped = Math.max(0.6f, Math.min(2.2f, rate));
+                    nativeTts.setSpeechRate(clamped);
+                } catch (Exception ignored) {}
+            }
+        }
+
+        @JavascriptInterface
         public boolean copyToClipboard(final String label, final String text) {
             if (text == null) return false;
             try {

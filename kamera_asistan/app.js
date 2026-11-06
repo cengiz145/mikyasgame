@@ -217,7 +217,11 @@
         moneyLastLiveBanknoteSig: '',
         moneyLastLiveBanknoteAt: 0,
         moneySeenSerialNumbers: new Set(),
-        moneyLastDuplicateSerialWarnAt: 0
+        moneyLastDuplicateSerialWarnAt: 0,
+        speechRate: 1.0,
+        lastUserInteractionAt: performance.now(),
+        deletedItemMemoryBackup: null,
+        stepCalorieBackupBeforeReset: null
     };
 
     const el = {
@@ -229,6 +233,7 @@
         btnCaptureNow: document.getElementById('btn-capture-now'),
         btnUploadPhoto: document.getElementById('btn-upload-photo'),
         btnSilenceSpeech: document.getElementById('btn-silence-speech'),
+        btnSpeechRate: document.getElementById('btn-speech-rate'),
         photoFileInput: document.getElementById('photo-file-input'),
         btnSpeakStory: document.getElementById('btn-speak-story'),
         photoExplorerCanvas: document.getElementById('photo-explorer-canvas'),
@@ -912,6 +917,45 @@
         return Boolean(state.isCurrentlySpeaking);
     }
 
+    const SPEECH_RATE_STORAGE_KEY = 'mikyas_speech_rate';
+    const SPEECH_RATE_PRESETS = [
+        { rate: 1.0, label: 'Normal (1.0x)', spoken: 'Normal hız (1.0 çarpı)' },
+        { rate: 1.3, label: 'Hızlı (1.3x)', spoken: 'Hızlı okuma (1.3 çarpı)' },
+        { rate: 1.6, label: 'Çok Hızlı (1.6x)', spoken: 'Çok hızlı okuma (1.6 çarpı)' },
+        { rate: 0.85, label: 'Yavaş (0.85x)', spoken: 'Yavaş ve tane tane okuma (0.85 çarpı)' }
+    ];
+
+    function updateSpeechRateButtonUI() {
+        const preset = SPEECH_RATE_PRESETS.find(p => Math.abs(p.rate - state.speechRate) < 0.05) || SPEECH_RATE_PRESETS[0];
+        if (el.btnSpeechRate) {
+            el.btnSpeechRate.textContent = `🗣️ Okuma Hızı: ${preset.label}`;
+        }
+        if (window.AndroidSongBridge && typeof window.AndroidSongBridge.setNativeSpeechRate === 'function') {
+            try { window.AndroidSongBridge.setNativeSpeechRate(state.speechRate); } catch (_) {}
+        }
+    }
+
+    function loadSpeechRateFromStorage() {
+        try {
+            const saved = parseFloat(localStorage.getItem(SPEECH_RATE_STORAGE_KEY) || '');
+            if (!isNaN(saved) && saved >= 0.6 && saved <= 2.2) {
+                state.speechRate = saved;
+            }
+        } catch (_) {}
+        updateSpeechRateButtonUI();
+    }
+
+    function cycleSpeechRate() {
+        const curIdx = SPEECH_RATE_PRESETS.findIndex(p => Math.abs(p.rate - state.speechRate) < 0.05);
+        const nextIdx = (curIdx + 1) % SPEECH_RATE_PRESETS.length;
+        const nextPreset = SPEECH_RATE_PRESETS[nextIdx];
+        state.speechRate = nextPreset.rate;
+        try { localStorage.setItem(SPEECH_RATE_STORAGE_KEY, String(state.speechRate)); } catch (_) {}
+        updateSpeechRateButtonUI();
+        announceGuidance(`Sesli okuma hızı değiştirildi: ${nextPreset.spoken}.`, { force: true, bannerState: 'centered' });
+    }
+    window.cycleSpeechRate = cycleSpeechRate;
+
     function announceGuidance(text, options = {}) {
         const {
             force = false,
@@ -966,7 +1010,7 @@
                 }
                 const utter = new SpeechSynthesisUtterance(text);
                 utter.lang = 'tr-TR';
-                utter.rate = 1.12;
+                utter.rate = state.speechRate || 1.0;
                 const trVoice = Array.isArray(voices) ? voices.find(v => v.lang && v.lang.toLowerCase().startsWith('tr')) : null;
                 if (trVoice) utter.voice = trVoice;
                 utter.onend = () => { state.isCurrentlySpeaking = false; };
@@ -1426,10 +1470,34 @@
     }
 
     // =========================================================================
-    // 5. GERÇEK ZAMANLI VİZÖR DÖNGÜSÜ
+    // 5. GERÇEK ZAMANLI VİZÖR DÖNGÜSÜ VE 5 DAKİKA BOŞTA KALMA PİL/ISINMA KORUMASI
     // =========================================================================
+    const CAMERA_IDLE_SLEEP_MS = 300000; // 5 dakika boyunca hiçbir tuşa basılmazsa kamerayı ve flaşı uyku moduna al
+
+    function markUserInteraction() {
+        state.lastUserInteractionAt = performance.now();
+    }
+
+    function checkCameraIdleSleep(nowMs) {
+        if (!state.isRunning) return false;
+        if (state.tvAutoReaderActive || state.busTargetStop || state.whatsappHoldTimer) return false;
+        const elapsed = (nowMs || performance.now()) - (state.lastUserInteractionAt || 0);
+        if (elapsed >= CAMERA_IDLE_SLEEP_MS) {
+            tryEnableHardwareTorch(false);
+            stopCamera();
+            announceGuidance('Pil koruma uyarısı: 5 dakikadır hiçbir tuşa basılmadığı için telefonunuzun ısınmaması ve şarjınızın bitmemesi amacıyla kamera ve flaş otomatik olarak uyku moduna alındı. Tekrar başlatmak için ekrana çift dokunabilir veya Boşluk tuşuna basabilirsiniz.', {
+                force: true,
+                bannerState: 'warning'
+            });
+            return true;
+        }
+        return false;
+    }
+    window.checkCameraIdleSleep = checkCameraIdleSleep;
+
     async function processFrameLoop() {
         if (!state.isRunning) return;
+        if (checkCameraIdleSleep(performance.now())) return;
 
         if (el.video.readyState >= 2 && el.video.videoWidth > 0) {
             const vw = el.video.videoWidth;
@@ -4333,6 +4401,9 @@
     }
 
     async function captureAndDescribePhoto(isAutoTriggered = false) {
+        if (!state.isRunning && !isAutoTriggered && el.video.readyState < 2) {
+            await startCamera();
+        }
         if (!state.isRunning || el.video.readyState < 2) {
             announceGuidance('Kameradan çekmek için önce kamerayı başlatın veya üstteki "Galeriden Fotoğraf Seç" düğmesiyle telefonunuzdaki bir fotoğrafı betimletin.', {
                 force: true,
@@ -5854,6 +5925,7 @@
             await el.video.play();
 
             state.isRunning = true;
+            state.lastUserInteractionAt = performance.now();
             el.btnStart.textContent = '⏹️ Kamerayı Durdur';
             el.btnStart.setAttribute('aria-pressed', 'true');
             el.btnSwitchCam.disabled = false;
@@ -8342,9 +8414,21 @@
     function saveItemMemoryEntry(noteText, colorTag = '') {
         const clean = String(noteText || '').trim();
         if (!clean || clean.length < 3) {
+            if (!clean && state.deletedItemMemoryBackup) {
+                const restored = state.deletedItemMemoryBackup;
+                state.deletedItemMemoryBackup = null;
+                state.itemMemories.unshift(restored);
+                saveItemMemoriesToStorage();
+                announceGuidance(`Yanlışlıkla silinen eşya kaydınız hafızaya geri yüklendi: "${restored.text}".`, {
+                    force: true,
+                    bannerState: 'centered'
+                });
+                return;
+            }
             announceGuidance('Lütfen eşyanızın adını ve nereye koyduğunuzu yazın veya sesle söyleyin.', { force: true, bannerState: 'warning' });
             return;
         }
+        state.deletedItemMemoryBackup = null;
         const entry = {
             id: Date.now(),
             text: clean,
@@ -8424,8 +8508,9 @@
             return;
         }
         const removed = state.itemMemories.shift();
+        state.deletedItemMemoryBackup = removed;
         saveItemMemoriesToStorage();
-        announceGuidance(`Son kaydedilen eşya hafızadan silindi: "${removed.text}". Kalan kayıt sayısı: ${state.itemMemories.length}.`, {
+        announceGuidance(`Son kaydedilen eşya hafızadan silindi: "${removed.text}". Yanlışlıkla sildiyseniz kutu boşken Eşya Yerini Kaydet düğmesine basarak geri yükleyebilirsiniz. Kalan kayıt sayısı: ${state.itemMemories.length}.`, {
             force: true,
             bannerState: 'centered'
         });
@@ -8633,6 +8718,9 @@
     }
 
     async function readTvScreenNow(isAutoTick = false) {
+        if (!state.isRunning && !isAutoTick && !el.video.videoWidth) {
+            await startCamera();
+        }
         if (!state.isRunning || !el.video.videoWidth || typeof window.Tesseract === 'undefined' || state.isProcessingOcr) {
             if (!isAutoTick && !state.isRunning) {
                 announceGuidance('Önce kamerayı başlatın ve televizyona doğru tutun.', { force: true, bannerState: 'warning' });
@@ -8776,33 +8864,77 @@
     // --- MOD 21: "TAM OLARAK NEREDEYİM?" SOKAK + TABELA + WHATSAPP KONUM TARİFİ ---
     state.lastWhereAmISummary = '';
 
+    function resolveOfflineNearestAddress(lat, lon) {
+        if (typeof lat !== 'number' || typeof lon !== 'number' || isNaN(lat) || isNaN(lon)) return '';
+        let nearestProvince = '';
+        let minProvDistM = Infinity;
+        for (let i = 0; i < TURKEY_81_PROVINCES.length; i++) {
+            const [pName, pLat, pLon] = TURKEY_81_PROVINCES[i];
+            const d = computeDistanceMetersHaversine(lat, lon, pLat, pLon);
+            if (d < minProvDistM) {
+                minProvDistM = d;
+                nearestProvince = pName;
+            }
+        }
+        let nearestStop = null;
+        let minStopDistM = Infinity;
+        for (let i = 0; i < POPULAR_STOP_LANDMARKS.length; i++) {
+            const stop = POPULAR_STOP_LANDMARKS[i];
+            const d = computeDistanceMetersHaversine(lat, lon, stop.lat, stop.lon);
+            if (d < minStopDistM) {
+                minStopDistM = d;
+                nearestStop = stop;
+            }
+        }
+        const coordStr = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+        if (nearestStop && minStopDistM <= 12000) {
+            const distDesc = minStopDistM < 1000
+                ? `yaklaşık ${minStopDistM} metre`
+                : `yaklaşık ${(minStopDistM / 1000).toFixed(1)} kilometre`;
+            return `${nearestStop.name} yakını (${distDesc}), ${nearestProvince || 'Türkiye'} (Çevrimdışı GPS: ${coordStr})`;
+        }
+        if (nearestProvince && minProvDistM <= 150000) {
+            return `${nearestProvince} ili sınırları (${(minProvDistM / 1000).toFixed(1)} km merkez mesafesi, Çevrimdışı GPS: ${coordStr})`;
+        }
+        return `Çevrimdışı GPS Koordinatı: ${coordStr}`;
+    }
+
     async function announceWhereAmIFullAddressAndSignboard(optionalOcrText = '', optionalPreds = []) {
         const addrEl = document.getElementById('where-address-text');
         const signEl = document.getElementById('where-signboard-text');
         if (addrEl) addrEl.textContent = 'Açık adresiniz bulunuyor...';
 
         let addressDesc = state.qiblaLocationSource || 'Konum bilgisi alınıyor';
+        let resolvedOnline = false;
         if (state.userLat && state.userLon) {
-            try {
-                const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${state.userLat}&lon=${state.userLon}&zoom=18&addressdetails=1`;
-                const res = await fetch(url, { headers: { 'Accept-Language': 'tr' } });
-                if (res.ok) {
-                    const data = await res.json();
-                    const a = data.address || {};
-                    const parts = [
-                        a.suburb || a.neighbourhood || a.quarter,
-                        a.road || a.pedestrian,
-                        a.house_number ? `No: ${a.house_number}` : '',
-                        a.town || a.city_district || a.district,
-                        a.city || a.province
-                    ].filter(Boolean);
-                    if (parts.length > 0) {
-                        addressDesc = parts.join(', ');
-                    } else if (data.display_name) {
-                        addressDesc = data.display_name.split(',').slice(0, 4).join(', ');
+            if (typeof fetch === 'function') {
+                try {
+                    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${state.userLat}&lon=${state.userLon}&zoom=18&addressdetails=1`;
+                    const res = await fetch(url, { headers: { 'Accept-Language': 'tr' } });
+                    if (res.ok) {
+                        const data = await res.json();
+                        const a = data.address || {};
+                        const parts = [
+                            a.suburb || a.neighbourhood || a.quarter,
+                            a.road || a.pedestrian,
+                            a.house_number ? `No: ${a.house_number}` : '',
+                            a.town || a.city_district || a.district,
+                            a.city || a.province
+                        ].filter(Boolean);
+                        if (parts.length > 0) {
+                            addressDesc = parts.join(', ');
+                            resolvedOnline = true;
+                        } else if (data.display_name) {
+                            addressDesc = data.display_name.split(',').slice(0, 4).join(', ');
+                            resolvedOnline = true;
+                        }
                     }
-                }
-            } catch (_) {}
+                } catch (_) {}
+            }
+            if (!resolvedOnline) {
+                const offlineAddr = resolveOfflineNearestAddress(state.userLat, state.userLon);
+                if (offlineAddr) addressDesc = offlineAddr;
+            }
         }
         if (addrEl) addrEl.textContent = addressDesc;
 
@@ -8961,10 +9093,27 @@
     }
 
     function resetDailyStepAndCalorieCounter() {
+        if (state.dailySteps === 0 && state.dailyIntakeKcal === 0 && state.stepCalorieBackupBeforeReset) {
+            state.dailySteps = state.stepCalorieBackupBeforeReset.dailySteps || 0;
+            state.dailyIntakeKcal = state.stepCalorieBackupBeforeReset.dailyIntakeKcal || 0;
+            state.stepCalorieBackupBeforeReset = null;
+            saveStepCalorieToStorage();
+            announceGuidance(`Yanlışlıkla sıfırlanan ${state.dailySteps} adım ve ${state.dailyIntakeKcal} kalori bilginiz başarıyla geri yüklendi!`, {
+                force: true,
+                bannerState: 'centered'
+            });
+            return;
+        }
+        if (state.dailySteps > 0 || state.dailyIntakeKcal > 0) {
+            state.stepCalorieBackupBeforeReset = {
+                dailySteps: state.dailySteps,
+                dailyIntakeKcal: state.dailyIntakeKcal
+            };
+        }
         state.dailySteps = 0;
         state.dailyIntakeKcal = 0;
         saveStepCalorieToStorage();
-        announceGuidance('Günlük adım ve enerji sayacınız sıfırlandı. Yeni ve sağlıklı bir güne merhaba!', { force: true });
+        announceGuidance('Günlük adım ve enerji sayacınız sıfırlandı. Yanlışlıkla sıfırladıysanız bu düğmeye tekrar basarak adımlarınızı geri yükleyebilirsiniz. Yeni ve sağlıklı bir güne merhaba!', { force: true });
     }
 
     function calculateAndSpeakFoodCalories(foodQuery) {
@@ -9919,6 +10068,7 @@
     function setMode(newMode) {
         const prevMode = state.mode;
         state.mode = newMode;
+        state.lastUserInteractionAt = performance.now();
         state.countdownStage = 0;
         state.kalmanBox = null;
         state.consensusFrames = 0;
@@ -10127,6 +10277,11 @@
     if (el.btnSilenceSpeech) {
         el.btnSilenceSpeech.addEventListener('click', () => stopAllSpeechImmediately());
     }
+    if (el.btnSpeechRate) {
+        el.btnSpeechRate.addEventListener('click', () => cycleSpeechRate());
+    }
+    window.addEventListener('click', markUserInteraction, true);
+    window.addEventListener('touchstart', markUserInteraction, { passive: true });
     el.btnWhatsappHold.addEventListener('click', startWhatsapp15SecAudioHold);
     el.btnRepeat.addEventListener('click', () => announceGuidance(state.lastSpeechText, { force: true }));
 
@@ -10473,6 +10628,7 @@
     });
 
     window.addEventListener('keydown', (ev) => {
+        markUserInteraction();
         if (ev.key === 'Escape' || ev.key === 'Control') {
             stopAllSpeechImmediately();
             return;
@@ -10541,6 +10697,7 @@
         }
         else if (key === 'm' && el.photoFileInput) el.photoFileInput.click();
         else if (key === 't') el.btnRepeat.click();
+        else if (key === 'y') cycleSpeechRate();
         else if (key === 'n') speakHowMuchMoneyIHave();
         else if (key === 'z' || ev.key === '+') addCurrentlyVisibleMoneyManually();
         else if (ev.code === 'Space') {
@@ -10590,6 +10747,7 @@
                 }
             }
         } catch (_) {}
+        loadSpeechRateFromStorage();
         loadMoneyLedgerFromStorage();
         loadItemMemoriesFromStorage();
         loadStepCalorieFromStorage();
