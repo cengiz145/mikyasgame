@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.ColorSpace;
 import android.hardware.HardwareBuffer;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -22,10 +24,12 @@ import java.util.concurrent.Executors;
 public class MikyasOverlayAccessibilityService extends AccessibilityService implements TextToSpeech.OnInitListener {
     private TextToSpeech tts;
     private boolean ttsReady = false;
-    private boolean liveScanActive = false;
+    private volatile boolean liveScanActive = false;
+    private volatile int scanSessionId = 0;
     private long lastVolUpPress = 0;
     private long lastSpokenTime = 0;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     public void onCreate() {
@@ -56,9 +60,12 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
             long now = System.currentTimeMillis();
             if (now - lastVolUpPress < 450) {
                 liveScanActive = !liveScanActive;
+                scanSessionId++;
+                mainHandler.removeCallbacksAndMessages(null);
                 if (liveScanActive) {
+                    final int currentSession = scanSessionId;
                     speakTurkish("Sesli ekran ortalama radarı devreye girdi. Telefonu bilgisayar ekranına tutun.", true);
-                    triggerPeriodicScreenAnalysis(8);
+                    triggerPeriodicScreenAnalysis(8, currentSession);
                 } else {
                     speakTurkish("Ekran radarı kapatıldı.", true);
                 }
@@ -70,9 +77,11 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
         return super.onKeyEvent(event);
     }
 
-    private void triggerPeriodicScreenAnalysis(final int remainingTicks) {
-        if (!liveScanActive || remainingTicks <= 0) {
-            liveScanActive = false;
+    private void triggerPeriodicScreenAnalysis(final int remainingTicks, final int sessionId) {
+        if (!liveScanActive || sessionId != scanSessionId || remainingTicks <= 0) {
+            if (sessionId == scanSessionId) {
+                liveScanActive = false;
+            }
             return;
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -80,6 +89,9 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
                 @Override
                 public void onSuccess(@NonNull ScreenshotResult screenshotResult) {
                     try (HardwareBuffer buffer = screenshotResult.getHardwareBuffer()) {
+                        if (!liveScanActive || sessionId != scanSessionId) {
+                            return;
+                        }
                         Bitmap hwBitmap = Bitmap.wrapHardwareBuffer(buffer, ColorSpace.get(ColorSpace.Named.SRGB));
                         if (hwBitmap != null) {
                             Bitmap soft = hwBitmap.copy(Bitmap.Config.ARGB_8888, false);
@@ -87,19 +99,22 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
                             if (soft != null) {
                                 String guidance = analyzeScreenBitmapForMonitorCenter(soft);
                                 soft.recycle();
-                                speakTurkish(guidance, false);
+                                if (liveScanActive && sessionId == scanSessionId) {
+                                    speakTurkish(guidance, false);
+                                }
                             }
                         }
                     } catch (Throwable ignored) {}
-                    try {
-                        Thread.sleep(1600);
-                    } catch (InterruptedException ignored) {}
-                    triggerPeriodicScreenAnalysis(remainingTicks - 1);
+                    if (liveScanActive && sessionId == scanSessionId) {
+                        mainHandler.postDelayed(() -> triggerPeriodicScreenAnalysis(remainingTicks - 1, sessionId), 1600);
+                    }
                 }
 
                 @Override
                 public void onFailure(int errorCode) {
-                    liveScanActive = false;
+                    if (sessionId == scanSessionId) {
+                        liveScanActive = false;
+                    }
                 }
             });
         } else {
@@ -163,6 +178,8 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
     @Override
     public void onDestroy() {
         liveScanActive = false;
+        scanSessionId++;
+        mainHandler.removeCallbacksAndMessages(null);
         executor.shutdownNow();
         if (tts != null) {
             tts.stop();

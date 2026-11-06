@@ -586,9 +586,22 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
+        if (webView != null) {
+            webView.evaluateJavascript(
+                    "(function(){ try { return (typeof window.handleAndroidBackButton === 'function') ? Boolean(window.handleAndroidBackButton()) : false; } catch(e) { return false; } })()",
+                    value -> {
+                        if ("true".equals(value)) {
+                            return;
+                        }
+                        if (webView.canGoBack()) {
+                            webView.goBack();
+                        } else {
+                            MainActivity.super.onBackPressed();
+                        }
+                    }
+            );
         } else {
             super.onBackPressed();
         }

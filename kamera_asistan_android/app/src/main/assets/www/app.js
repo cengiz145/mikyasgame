@@ -485,7 +485,7 @@
         // Soru numaralarından ("1.", "2.", "Soru 1") aday bloklara böl;
         // ancak "1. öncül", "19. yüzyıl" gibi ifadelerin soruyu ortadan bölmemesi için
         // şık içermeyen alt parçaları bir önceki soru köküne geri birleştir!
-        const rawBlocks = text.split(/(?=(?:^|\n)\s*(?:SORU\s*\d+|\d{1,2}\s*[\.\)]\s+[A-ZÇĞİÖŞÜ]))/i)
+        const rawBlocks = text.split(/(?=(?:^|\n)\s*(?:SORU\s*\d+|\d{1,2}\s*[\.\-\)]\s+\S))/i)
             .map(b => b.trim())
             .filter(b => b.length > 5);
 
@@ -1853,8 +1853,8 @@
         try {
             localStorage.setItem(MONEY_WALLET_STORAGE_KEY, JSON.stringify({
                 totalKurus: state.moneyTotalKurus,
-                ledger: state.moneyLedger.slice(-50),
-                seenSerials: state.moneySeenSerialNumbers ? Array.from(state.moneySeenSerialNumbers).slice(-100) : []
+                ledger: state.moneyLedger.slice(-500),
+                seenSerials: state.moneySeenSerialNumbers ? Array.from(state.moneySeenSerialNumbers).slice(-200) : []
             }));
         } catch (_) {}
     }
@@ -1866,7 +1866,9 @@
             const parsed = JSON.parse(raw);
             if (parsed && Array.isArray(parsed.ledger)) {
                 state.moneyLedger = parsed.ledger;
-                state.moneyTotalKurus = state.moneyLedger.reduce((acc, item) => acc + (Number(item.kurus) || 0), 0);
+                const ledgerSum = state.moneyLedger.reduce((acc, item) => acc + (Number(item.kurus) || 0), 0);
+                const savedTotal = Number(parsed.totalKurus);
+                state.moneyTotalKurus = (Number.isFinite(savedTotal) && savedTotal >= ledgerSum) ? savedTotal : ledgerSum;
             }
             if (parsed && Array.isArray(parsed.seenSerials) && state.moneySeenSerialNumbers) {
                 parsed.seenSerials.forEach(s => {
@@ -3740,34 +3742,39 @@
             }
         };
 
-        if (hasYunusEmre || hasUpsideDown200 || /\b200\b|İKİ\s*YÜZ|IKI\s*YUZ/.test(clean)) {
+        // Seri numarasındaki rakamların ("B 10 582910" içindeki 10 gibi) veya "İKİ YÜZ" içindeki "YÜZ" kelimesinin
+        // yanlışlıkla ikinci bir kupür olarak algılanmasını önle:
+        const cleanWithoutSerial = serialMatch ? clean.replace(serialMatch[0], ' ') : clean;
+        const cleanWithout200 = cleanWithoutSerial.replace(/İKİ\s*YÜZ|IKI\s*YUZ/g, ' ');
+
+        if (hasYunusEmre || hasUpsideDown200 || /\b200\b|İKİ\s*YÜZ|IKI\s*YUZ/.test(cleanWithoutSerial)) {
             pushNote(20000, '200 Türk Lirası');
         }
-        if (hasItri || hasUpsideDown100 || /\b100\b|\bYÜZ\s*(?:TÜRK|LİRA)|\bYUZ\s*(?:TURK|LIRA)/.test(clean)) {
+        if (hasItri || hasUpsideDown100 || /\b100\b|\bYÜZ\s*(?:TÜRK|LİRA)|\bYUZ\s*(?:TURK|LIRA)/.test(cleanWithout200)) {
             pushNote(10000, '100 Türk Lirası');
         }
-        if (hasFatmaAliye || hasUpsideDown50 || /\b50\b|ELLİ\s*(?:TÜRK|LİRA)|ELLI\s*(?:TURK|LIRA)/.test(clean)) {
+        if (hasFatmaAliye || hasUpsideDown50 || /\b50\b|ELLİ\s*(?:TÜRK|LİRA)|ELLI\s*(?:TURK|LIRA)/.test(cleanWithoutSerial)) {
             pushNote(5000, '50 Türk Lirası');
         }
-        if (hasKemaleddin || hasUpsideDown20 || /\b20\b|YİRMİ\s*(?:TÜRK|LİRA)|YIRMI\s*(?:TURK|LIRA)/.test(clean)) {
+        if (hasKemaleddin || hasUpsideDown20 || /\b20\b|YİRMİ\s*(?:TÜRK|LİRA)|YIRMI\s*(?:TURK|LIRA)/.test(cleanWithoutSerial)) {
             // Eğer OCR parmak yüzünden 200'ün son sıfırını kaçırıp "20" okuduysa ama kağıt belirgin Mor/Eflatun ise ve Yeşil değilse:
-            if (isPurple && !isGreen && !/YİRMİ|YIRMI/.test(clean) && !hasKemaleddin) {
+            if (isPurple && !isGreen && !/YİRMİ|YIRMI/.test(cleanWithoutSerial) && !hasKemaleddin) {
                 pushNote(20000, '200 Türk Lirası');
             } else {
                 pushNote(2000, '20 Türk Lirası');
             }
         }
-        if (hasCahitArf || hasUpsideDown10 || /\b10\b|\bON\s*(?:TÜRK|LİRA)|\bON\s*(?:TURK|LIRA)/.test(clean)) {
+        if (hasCahitArf || hasUpsideDown10 || /\b10\b|\bON\s*(?:TÜRK|LİRA)|\bON\s*(?:TURK|LIRA)/.test(cleanWithoutSerial)) {
             // Eğer OCR parmak yüzünden 100'ün son sıfırını kaçırıp "10" okuduysa ama kağıt belirgin Mavi/Turkuaz ise ve Kırmızı değilse:
-            if (isBlueCyan && !isRedPink && !/\bON\s*(?:TÜRK|LİRA|TURK|LIRA)/.test(clean) && !hasCahitArf) {
+            if (isBlueCyan && !isRedPink && !/\bON\s*(?:TÜRK|LİRA|TURK|LIRA)/.test(cleanWithoutSerial) && !hasCahitArf) {
                 pushNote(10000, '100 Türk Lirası');
             } else {
                 pushNote(1000, '10 Türk Lirası');
             }
         }
-        if (hasAydinSayili || /\b5\b\s*(?:TÜRK|TURK|LİRA|LIRA|TL)|BEŞ\s*(?:TÜRK|LİRA)|BES\s*(?:TURK|LIRA)/.test(clean)) {
+        if (hasAydinSayili || /\b5\b\s*(?:TÜRK|TURK|LİRA|LIRA|TL)|BEŞ\s*(?:TÜRK|LİRA)|BES\s*(?:TURK|LIRA)/.test(cleanWithoutSerial)) {
             // Eğer 50 TL'nin sıfırı kapandıysa ama renk belirgin Turuncu/Sarı ise:
-            if (isOrangeYellow && !/BEŞ|BES/.test(clean) && !hasAydinSayili) {
+            if (isOrangeYellow && !/BEŞ|BES/.test(cleanWithoutSerial) && !hasAydinSayili) {
                 pushNote(5000, '50 Türk Lirası');
             } else {
                 pushNote(500, '5 Türk Lirası');
@@ -4154,20 +4161,23 @@
         const initialStory = buildRichTurkishPhotoStory(capCanvas, metrics, preds, '');
         populatePhotoExplorerMap(capCanvas, metrics, preds, [], initialStory);
 
-        showDetectedResult(`${sourceLabel} — Detaylı Türkçe Betimleme`, initialStory + '\n\n(Fotoğrafın üzerindeki yazılar kontrol ediliyor...)');
-        announceGuidance(`${initialStory} Şimdi fotoğraftaki yazıları da kontrol ediyorum...`, {
-            force: true,
-            bannerState: 'centered'
-        });
+        const hasOcrEngine = typeof window.Tesseract !== 'undefined';
+        showDetectedResult(
+            `${sourceLabel} — Detaylı Türkçe Betimleme`,
+            hasOcrEngine ? (initialStory + '\n\n(Fotoğrafın üzerindeki yazılar kontrol ediliyor...)') : initialStory
+        );
+        announceGuidance(
+            hasOcrEngine ? `${initialStory} Şimdi fotoğraftaki yazıları da kontrol ediyorum...` : initialStory,
+            {
+                force: true,
+                bannerState: 'centered'
+            }
+        );
 
-        if (typeof window.Tesseract !== 'undefined' && !state.isProcessingOcr) {
+        if (!state.isProcessingOcr) {
             state.isProcessingOcr = true;
             try {
-                const binObj = applyBradleyRothShadowRemoval(capCanvas);
-                const splitInfo = (state.mode === 'door_elevator_lcd')
-                    ? { isTwoColumn: false, canvases: [capCanvas, preprocess7SegmentAndPanelCanvas(capCanvas)] }
-                    : splitExamColumnsIfTwoColumn(binObj);
-
+                let splitInfo = { isTwoColumn: false, canvases: [capCanvas] };
                 let combinedText = '';
                 let verifiedCombinedText = '';
                 let verifiedMultilineText = '';
@@ -4175,51 +4185,58 @@
                 let primaryPassVerifiedText = '';
                 let secondaryRawVerifiedText = '';
 
-                for (let i = 0; i < splitInfo.canvases.length; i++) {
-                    const ocrRes = await window.Tesseract.recognize(splitInfo.canvases[i], 'tur+eng');
-                    const partText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
-                    const partVerified = extractVerifiedRealTextFromOcrResult(ocrRes);
-                    const partMultiline = extractVerifiedRealTextFromOcrResult(ocrRes, '\n');
-                    if (partText) {
-                        combinedText += (combinedText ? '\n\n' : '') + partText;
-                    }
-                    if (partVerified && verifiedCombinedText !== partVerified && !verifiedCombinedText.endsWith(partVerified)) {
-                        verifiedCombinedText += (verifiedCombinedText ? ' — ' : '') + partVerified;
-                    }
-                    if (partMultiline && verifiedMultilineText !== partMultiline) {
-                        verifiedMultilineText += (verifiedMultilineText ? '\n\n' : '') + partMultiline;
-                    }
-                    if (ocrRes && ocrRes.data && Array.isArray(ocrRes.data.lines) && !splitInfo.isTwoColumn && (collectedLines.length === 0 || i === 0)) {
-                        collectedLines = ocrRes.data.lines;
-                    }
-                }
-                primaryPassVerifiedText = verifiedCombinedText.trim();
+                if (hasOcrEngine) {
+                    const binObj = applyBradleyRothShadowRemoval(capCanvas);
+                    splitInfo = (state.mode === 'door_elevator_lcd')
+                        ? { isTwoColumn: false, canvases: [capCanvas, preprocess7SegmentAndPanelCanvas(capCanvas)] }
+                        : splitExamColumnsIfTwoColumn(binObj);
 
-                // MAKSİMUM GÜVENLİK ÇİFT-GEÇİŞLİ (DUAL-PASS) OCR KİLİDİ:
-                // İlaç, Gıda Alerjeni, POS/IBAN, İmza Evrakı ve Para modlarında gölge silici filtre parlak yüzeyde
-                // baştaki bir rakamı ("1500 TL" -> "500 TL" gibi) silmesin diye HAM RENKLİ GÖRÜNTÜYÜ de mutlaka okut ve çapraz doğrula!
-                const isHighStakesSafetyMode = (
-                    state.mode === 'medicine_skt' ||
-                    state.mode === 'food_freshness' ||
-                    state.mode === 'pos_iban_reader' ||
-                    state.mode === 'signature_pen' ||
-                    state.mode === 'color_cloth'
-                );
-
-                if (state.mode !== 'door_elevator_lcd' && (verifiedCombinedText.trim().length < 6 || isHighStakesSafetyMode)) {
-                    const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
-                    const rawText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
-                    secondaryRawVerifiedText = extractVerifiedRealTextFromOcrResult(fallbackRes).trim();
-                    const rawMultiline = extractVerifiedRealTextFromOcrResult(fallbackRes, '\n');
-                    if (verifiedCombinedText.trim().length < 6) {
-                        combinedText = rawText;
-                        verifiedCombinedText = secondaryRawVerifiedText;
-                        verifiedMultilineText = rawMultiline;
-                        if (fallbackRes && fallbackRes.data && Array.isArray(fallbackRes.data.lines)) {
-                            collectedLines = fallbackRes.data.lines;
+                    for (let i = 0; i < splitInfo.canvases.length; i++) {
+                        const ocrRes = await window.Tesseract.recognize(splitInfo.canvases[i], 'tur+eng');
+                        const partText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
+                        const partVerified = extractVerifiedRealTextFromOcrResult(ocrRes);
+                        const partMultiline = extractVerifiedRealTextFromOcrResult(ocrRes, '\n');
+                        if (partText) {
+                            combinedText += (combinedText ? '\n\n' : '') + partText;
                         }
-                    } else if (secondaryRawVerifiedText && secondaryRawVerifiedText !== primaryPassVerifiedText) {
-                        verifiedCombinedText = `${primaryPassVerifiedText} — ${secondaryRawVerifiedText}`;
+                        if (partVerified && verifiedCombinedText !== partVerified && !verifiedCombinedText.endsWith(partVerified)) {
+                            verifiedCombinedText += (verifiedCombinedText ? ' — ' : '') + partVerified;
+                        }
+                        if (partMultiline && verifiedMultilineText !== partMultiline) {
+                            verifiedMultilineText += (verifiedMultilineText ? '\n\n' : '') + partMultiline;
+                        }
+                        if (ocrRes && ocrRes.data && Array.isArray(ocrRes.data.lines) && !splitInfo.isTwoColumn && (collectedLines.length === 0 || i === 0)) {
+                            collectedLines = ocrRes.data.lines;
+                        }
+                    }
+                    primaryPassVerifiedText = verifiedCombinedText.trim();
+
+                    // MAKSİMUM GÜVENLİK ÇİFT-GEÇİŞLİ (DUAL-PASS) OCR KİLİDİ:
+                    // İlaç, Gıda Alerjeni, POS/IBAN, İmza Evrakı ve Para modlarında gölge silici filtre parlak yüzeyde
+                    // baştaki bir rakamı ("1500 TL" -> "500 TL" gibi) silmesin diye HAM RENKLİ GÖRÜNTÜYÜ de mutlaka okut ve çapraz doğrula!
+                    const isHighStakesSafetyMode = (
+                        state.mode === 'medicine_skt' ||
+                        state.mode === 'food_freshness' ||
+                        state.mode === 'pos_iban_reader' ||
+                        state.mode === 'signature_pen' ||
+                        state.mode === 'color_cloth'
+                    );
+
+                    if (state.mode !== 'door_elevator_lcd' && (verifiedCombinedText.trim().length < 6 || isHighStakesSafetyMode)) {
+                        const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
+                        const rawText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
+                        secondaryRawVerifiedText = extractVerifiedRealTextFromOcrResult(fallbackRes).trim();
+                        const rawMultiline = extractVerifiedRealTextFromOcrResult(fallbackRes, '\n');
+                        if (verifiedCombinedText.trim().length < 6) {
+                            combinedText = rawText;
+                            verifiedCombinedText = secondaryRawVerifiedText;
+                            verifiedMultilineText = rawMultiline;
+                            if (fallbackRes && fallbackRes.data && Array.isArray(fallbackRes.data.lines)) {
+                                collectedLines = fallbackRes.data.lines;
+                            }
+                        } else if (secondaryRawVerifiedText && secondaryRawVerifiedText !== primaryPassVerifiedText) {
+                            verifiedCombinedText = `${primaryPassVerifiedText} — ${secondaryRawVerifiedText}`;
+                        }
                     }
                 }
 
@@ -5172,14 +5189,14 @@
             `${timelineSentences.join(' ')} ${motionSummary}`.trim();
 
         populatePhotoExplorerMap(bestFrame.canvas, bestFrame.metrics, bestFrame.preds, [], initialVideoStory);
-        showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Gerçek Zaman Sıralı Video Analizi`, initialVideoStory + '\n\n(Videodaki tüm karelerde gerçek ekran yazısı ve altyazı kontrolü yapılıyor...)');
-        announceGuidance(`${initialVideoStory} Şimdi videodaki karelerde geçen gerçek yazıları okuyorum...`, {
-            force: true,
-            bannerState: 'centered'
-        });
 
         // OPTİMİZASYON 2: 2ms'lik Yazı-Kenarı (Text-Stroke) Ön Tarayıcı + Sadece Yazı Şeridini Kırparak Hızlı OCR
         if (typeof window.Tesseract !== 'undefined' && !state.isProcessingOcr) {
+            showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Gerçek Zaman Sıralı Video Analizi`, initialVideoStory + '\n\n(Videodaki tüm karelerde gerçek ekran yazısı ve altyazı kontrolü yapılıyor...)');
+            announceGuidance(`${initialVideoStory} Şimdi videodaki karelerde geçen gerçek yazıları okuyorum...`, {
+                force: true,
+                bannerState: 'centered'
+            });
             state.isProcessingOcr = true;
             try {
                 const candidateIndices = [0];
@@ -5240,6 +5257,10 @@
             }
         } else {
             showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Gerçek Zaman Sıralı Video Analizi`, initialVideoStory);
+            announceGuidance(initialVideoStory, {
+                force: true,
+                bannerState: 'centered'
+            });
         }
     }
 
@@ -5311,7 +5332,7 @@
 
         const urlMatch = content.match(/https?:\/\/[^\s]+/i);
         if (urlMatch) {
-            el.btnOpenLink.href = urlMatch[0];
+            el.btnOpenLink.href = urlMatch[0].replace(/[.,;!?)\]"'>]+$/, '');
             el.btnOpenLink.hidden = false;
         } else {
             el.btnOpenLink.hidden = true;
@@ -5476,11 +5497,17 @@
             clearInterval(state.whatsappHoldTimer);
             state.whatsappHoldTimer = null;
         }
-        if (state.tvAutoReaderTimer) {
-            clearInterval(state.tvAutoReaderTimer);
-            state.tvAutoReaderTimer = null;
-            if (el.btnTvToggleAuto) {
-                el.btnTvToggleAuto.textContent = '▶️ Otomatik Altyazı Spikerini Başlat';
+        if (state.tvAutoReaderTimer || state.tvAutoReaderActive) {
+            if (state.tvAutoReaderTimer) {
+                clearInterval(state.tvAutoReaderTimer);
+                state.tvAutoReaderTimer = null;
+            }
+            state.tvAutoReaderActive = false;
+            const tvBtn = document.getElementById('btn-tv-auto-toggle') || el.btnTvToggleAuto;
+            if (tvBtn) {
+                tvBtn.classList.remove('active-toggle');
+                tvBtn.setAttribute('aria-pressed', 'false');
+                tvBtn.textContent = '▶️ Otomatik TV Spikerini Başlat';
             }
         }
         if (state.videoStream) {
@@ -6599,6 +6626,10 @@
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                if (!state.songListening || (state.mode !== 'song_finder' && !state.songAutoRadarEnabled)) {
+                    stream.getTracks().forEach(t => t.stop());
+                    return;
+                }
                 state.songAudioStream = stream;
                 const AudioCtx = window.AudioContext || window.webkitAudioContext;
                 const audioCtx = radar.ctx || (AudioCtx ? new AudioCtx() : null);
@@ -7612,6 +7643,10 @@
 
         if (distM <= 70 && !state.busStopAlert60Fired) {
             state.busStopAlert60Fired = true;
+            if (state.busStopWatchTimer) {
+                clearInterval(state.busStopWatchTimer);
+                state.busStopWatchTimer = null;
+            }
             radar.playLockChord();
             if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 400]);
             announceGuidance(`DİKKAT! İneceğiniz ${state.busTargetStop.name} durağına geldiniz! Sadece ${distM} metre kaldı, şimdi inme düğmesine basın!`, {
@@ -7629,6 +7664,11 @@
             });
             return;
         }
+        if (distM > 150 && state.busStopAlert60Fired) {
+            // Kullanıcı kaydettiği duraktan uzaklaştığında (veya başka yerden durağa yaklaşırken) varış alarmını otomatik hazırla
+            state.busStopAlert60Fired = false;
+            if (distM > 380) state.busStopAlert300Fired = false;
+        }
         if (speakImmediately) {
             announceGuidance(`Hedef durağınız: ${state.busTargetStop.name}. Şu an kalan mesafe: ${distFormatted}. Durağa 300 metre ve 50 metre kala size sesli ve titreşimli haber vereceğim.`, {
                 force: true,
@@ -7645,10 +7685,14 @@
         const inp = document.getElementById('bus-dest-input');
         const customName = (inp && inp.value.trim()) ? inp.value.trim() : 'Kayıtlı Favori Durağım';
         state.busTargetStop = { name: customName, lat: state.userLat, lon: state.userLon };
-        state.busStopAlert300Fired = false;
-        state.busStopAlert60Fired = false;
+        // Şu an zaten bu durakta (0 metrede) olduğumuz için 7 saniye sonra yanlış "0 metre kaldı, inin!" alarmı çalmaması adına bayrakları işaretle;
+        // duraktan 150 metre uzaklaşıldığında sistem bayrakları otomatik sıfırlayıp dönüşte alarm çalacaktır.
+        state.busStopAlert300Fired = true;
+        state.busStopAlert60Fired = true;
         const badgeEl = document.getElementById('bus-stop-badge');
         if (badgeEl) badgeEl.textContent = `Hedef: ${customName}`;
+        const remEl = document.getElementById('bus-remaining-distance');
+        if (remEl) remEl.textContent = `${customName} — Konum Kaydedildi (0 metre)`;
         try {
             localStorage.setItem('mikyas_saved_bus_stop', JSON.stringify(state.busTargetStop));
             const existingIdx = POPULAR_STOP_LANDMARKS.findIndex(x => x.name === customName);
@@ -7657,7 +7701,7 @@
         } catch (_) {}
         if (state.busStopWatchTimer) clearInterval(state.busStopWatchTimer);
         state.busStopWatchTimer = setInterval(() => checkBusDestinationDistance(false), 7000);
-        announceGuidance(`Şu an bulunduğunuz konum "${customName}" olarak kaydedildi ve durak yaklaşma alarmı aktif edildi.`, { force: true, bannerState: 'centered' });
+        announceGuidance(`Şu an bulunduğunuz konum "${customName}" olarak kaydedildi. Bir sonraki yolculuğunuzda bu durağa yaklaşırken 300 metre ve 50 metre kala size sesli haber vereceğim.`, { force: true, bannerState: 'centered' });
     }
 
     function cancelBusStopAlarm() {
@@ -7666,6 +7710,8 @@
             state.busStopWatchTimer = null;
         }
         state.busTargetStop = null;
+        const badgeEl = document.getElementById('bus-stop-badge');
+        if (badgeEl) badgeEl.textContent = 'Hedef Durak: Seçilmedi';
         const remEl = document.getElementById('bus-remaining-distance');
         if (remEl) remEl.textContent = 'Durak alarmı kapatıldı';
         announceGuidance('Durak yaklaşma alarmı kapatıldı.', { force: true });
@@ -7980,7 +8026,11 @@
             announceGuidance('Kavanozu etiketlemek için önce kutuya kavanozun içinde ne olduğunu yazın (Örn: Ihlamur veya Kaya Tuzu).', { force: true, bannerState: 'warning' });
             return;
         }
-        const col = (state.lastMetrics && state.lastMetrics.centerColor) ? state.lastMetrics.centerColor.name : 'genel renkli';
+        if (!state.isRunning || !state.lastMetrics || !state.lastMetrics.centerColor) {
+            announceGuidance('Kavanozun gerçek kapak veya yüzey rengini kaydedebilmem için lütfen önce Kamerayı Başlat düğmesine basın ve kamerayı kavanoza tutun.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const col = state.lastMetrics.centerColor.name;
         saveItemMemoryEntry(`Etiketlenen Kavanoz/Kutu (${col}): ${label}`, col);
     }
 
@@ -8410,7 +8460,7 @@
         }
         // "1 adet elma" içindeki "et" veya "1 su bardağı süt" içindeki "su" hecesinin yanlış eşleşmesini önlemek için tam kelime sınırı kontrolü:
         const qClean = q.replace(/\b(?:\d+|bir|iki|üç|yarım|adet|tane|porsiyon|tabak|kase|bardak|su\s+bardağı|çay\s+bardağı|dilim|kaşık)\b/gu, ' ').replace(/\s+/g, ' ').trim() || q;
-        let matched = null;
+        const matchedItems = [];
         for (const item of TURKISH_FOOD_NUTRITION_DB) {
             const hasKeyMatch = item.keys.some(k => {
                 const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -8418,25 +8468,32 @@
                 return wordRegex.test(qClean) || wordRegex.test(q);
             });
             if (hasKeyMatch) {
-                matched = item;
-                break;
+                matchedItems.push(item);
             }
         }
-        if (!matched && /^(?:su|1\s*bardak\s*su|bir\s*bardak\s*su)$/iu.test(q)) {
-            matched = TURKISH_FOOD_NUTRITION_DB.find(x => x.kcal === 0);
+        if (matchedItems.length === 0 && /^(?:su|1\s*bardak\s*su|bir\s*bardak\s*su)$/iu.test(q)) {
+            const waterItem = TURKISH_FOOD_NUTRITION_DB.find(x => x.kcal === 0);
+            if (waterItem) matchedItems.push(waterItem);
         }
-        if (!matched && /(?:^|[^\p{L}])et(?=$|[^\p{L}])/iu.test(qClean)) {
-            matched = TURKISH_FOOD_NUTRITION_DB.find(x => x.kcal === 260);
+        if (matchedItems.length === 0 && /(?:^|[^\p{L}])et(?=$|[^\p{L}])/iu.test(qClean)) {
+            const meatItem = TURKISH_FOOD_NUTRITION_DB.find(x => x.kcal === 260);
+            if (meatItem) matchedItems.push(meatItem);
         }
         const lastFoodEl = document.getElementById('calorie-last-food');
         const inp = document.getElementById('calorie-food-input');
         if (inp) inp.value = '';
 
-        if (matched) {
-            state.dailyIntakeKcal += matched.kcal;
+        if (matchedItems.length > 0) {
+            const totalAddedKcal = matchedItems.reduce((acc, m) => acc + m.kcal, 0);
+            state.dailyIntakeKcal += totalAddedKcal;
             saveStepCalorieToStorage();
-            if (lastFoodEl) lastFoodEl.textContent = `${matched.name} (${matched.kcal} kcal)`;
-            announceGuidance(`Afiyet ve şifa olsun! ${matched.name} yaklaşık ${matched.kcal} kaloridir. ${matched.benefit} Günlük enerji toplamınız ${state.dailyIntakeKcal} kalori oldu.`, {
+            const namesSummary = matchedItems.map(m => `${m.name} (${m.kcal} kcal)`).join(' + ');
+            if (lastFoodEl) lastFoodEl.textContent = namesSummary;
+            const benefitsSummary = matchedItems.map(m => m.benefit).join(' ');
+            const speechIntro = matchedItems.length === 1
+                ? `${matchedItems[0].name} yaklaşık ${totalAddedKcal} kaloridir.`
+                : `Söylediğiniz ${matchedItems.length} besin (${namesSummary}) toplam yaklaşık ${totalAddedKcal} kaloridir.`;
+            announceGuidance(`Afiyet ve şifa olsun! ${speechIntro} ${benefitsSummary} Günlük enerji toplamınız ${state.dailyIntakeKcal} kalori oldu.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -9091,7 +9148,10 @@
         state.currentCookingStepIndex = Math.max(0, Math.min(rec.steps.length - 1, state.currentCookingStepIndex + delta));
         updateCookingGuideUI();
         const stepObj = rec.steps[state.currentCookingStepIndex];
-        announceGuidance(`${rec.title}, ${state.currentCookingStepIndex + 1}. adım (toplam ${rec.steps.length} adım): ${stepObj.text}`, {
+        const timerHint = (stepObj.timerMinutes && stepObj.timerMinutes > 0)
+            ? ` (Önerilen süre: ${stepObj.timerMinutes} dakika)`
+            : '';
+        announceGuidance(`${rec.title}, ${state.currentCookingStepIndex + 1}. adım (toplam ${rec.steps.length} adım)${timerHint}: ${stepObj.text}`, {
             force: true,
             bannerState: 'centered'
         });
@@ -9276,7 +9336,11 @@
         }
 
         if (newMode === 'where_am_i') {
-            setTimeout(() => announceWhereAmIFullAddressAndSignboard('', []), 900);
+            setTimeout(() => {
+                if (state.mode === 'where_am_i') {
+                    announceWhereAmIFullAddressAndSignboard('', []);
+                }
+            }, 900);
         }
 
         if (newMode === 'song_finder') {
@@ -9830,4 +9894,29 @@
         updateExamRemoteUI();
         setTimeout(initAiModel, 350);
     });
+
+    window.handleAndroidBackButton = function () {
+        if (el.resultPanel && !el.resultPanel.hidden) {
+            el.resultPanel.hidden = true;
+            if ('speechSynthesis' in window) {
+                try { window.speechSynthesis.cancel(); } catch (_) {}
+            }
+            announceGuidance('Sonuç paneli kapatıldı.', { force: true });
+            return true;
+        }
+        if (state.songListening) {
+            stopSongListening();
+            return true;
+        }
+        if (state.qiblaActive) {
+            state.qiblaActive = false;
+            announceGuidance('Kıble pusulası durduruldu.', { force: true });
+            return true;
+        }
+        if (state.isRunning) {
+            stopCamera();
+            return true;
+        }
+        return false;
+    };
 })();
