@@ -457,15 +457,32 @@
             .replace(/[Ⓒⓒ]/g, ' C) ')
             .replace(/[Ⓓⓓ]/g, ' D) ')
             .replace(/[Ⓔⓔ]/g, ' E) ')
-            // Satır başında daire yüzünden @), 8), 0) olarak bozulan şıkları bağlama göre düzelt
-            .replace(/(^|\s)\(?([A-Ea-e])[\)\.\-]\s+/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
+            // Sadece parantezli A), (A) veya satır başındaki A., A- şıklarını standartlaştır (cümle ortası noktalı kısaltmaları bozma!)
+            .replace(/(^|\s)\(?([A-Ea-e])\)\s+/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `)
+            .replace(/(^|\n)\s*([A-Ea-e])[\.\-]\s+/g, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
 
-        // Birden fazla soru varsa soru numaralarından ("1.", "2.", "Soru 1") böl
-        const questionBlocks = text.split(/(?=(?:^|\n)\s*(?:SORU\s*\d+|\d{1,2}\s*[\.\-\)]\s+[A-ZÇĞİÖŞÜ]))/i)
+        // Soru numaralarından ("1.", "2.", "Soru 1") aday bloklara böl;
+        // ancak "1. öncül", "19. yüzyıl" gibi ifadelerin soruyu ortadan bölmemesi için
+        // şık içermeyen alt parçaları bir önceki soru köküne geri birleştir!
+        const rawBlocks = text.split(/(?=(?:^|\n)\s*(?:SORU\s*\d+|\d{1,2}\s*[\.\)]\s+[A-ZÇĞİÖŞÜ]))/i)
             .map(b => b.trim())
             .filter(b => b.length > 5);
 
-        const blocksToParse = questionBlocks.length > 0 ? questionBlocks : [text];
+        const mergedBlocks = [];
+        for (let i = 0; i < rawBlocks.length; i++) {
+            const blk = rawBlocks[i];
+            const hasOptionPair = /(?:^|\s|\n)[A-C]\)\s+\S/.test(blk) && /(?:^|\s|\n)[B-E]\)\s+\S/.test(blk);
+            if (mergedBlocks.length > 0 && !hasOptionPair) {
+                const prevHasOptions = /(?:^|\s|\n)[A-C]\)\s+\S/.test(mergedBlocks[mergedBlocks.length - 1]);
+                if (!prevHasOptions) {
+                    mergedBlocks[mergedBlocks.length - 1] += '\n' + blk;
+                    continue;
+                }
+            }
+            mergedBlocks.push(blk);
+        }
+
+        const blocksToParse = mergedBlocks.length > 0 ? mergedBlocks : [text];
         const parsedQuestions = [];
 
         blocksToParse.forEach((block, idx) => {
@@ -506,7 +523,7 @@
                 qObj.stem = block.replace(/\s+/g, ' ').trim();
             }
 
-            if (qObj.stem || qObj.options.A || qObj.options.B) {
+            if (qObj.options.A || qObj.options.B || qObj.options.C) {
                 parsedQuestions.push(qObj);
             }
         });
@@ -1196,13 +1213,13 @@
         }
 
         let distanceAdvice = '';
-        let distanceStatus = 'İdeal (%' + Math.round(areaRatio * 100) + ')';
+        let distanceStatus = 'İdeal Mesafe';
         if (areaRatio < idealMinArea) {
             distanceAdvice = 'Biraz daha yaklaşın';
-            distanceStatus = 'Uzak (%' + Math.round(areaRatio * 100) + ')';
+            distanceStatus = 'Uzak (Yaklaşın)';
         } else if (areaRatio > idealMaxArea || (touchesLeft && touchesRight) || (touchesTop && touchesBottom)) {
             distanceAdvice = 'Çok yakınsınız, tüm şıkların sığması için telefonu biraz yukarı/geri çekin';
-            distanceStatus = 'Çok Yakın (%' + Math.round(areaRatio * 100) + ')';
+            distanceStatus = 'Çok Yakın (Geri Çekin)';
         }
 
         const isCentered = moveParts.length === 0 && !distanceAdvice;
@@ -1219,7 +1236,7 @@
 
         const posLabel = isCentered
             ? 'Tam Merkezde (4 Kenar İçeride)'
-            : `X: ${offsetX > 0 ? '+' : ''}${Math.round(offsetX * 100)}%, Y: ${offsetY > 0 ? '+' : ''}${Math.round(offsetY * 100)}%`;
+            : (moveParts.length > 0 ? moveParts.join(', ') : 'Hizalanıyor');
 
         return {
             offsetX,
@@ -1476,18 +1493,32 @@
     // MOD 1: SINAV VE TEST KAĞIDI CANLI HİZALAMA (4 KENAR VE NETLİK KİLİDİ)
     // -------------------------------------------------------------------------
     function handleExamReaderLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
+        const docPred = predictions.find(p => p.class === 'book');
+        const textCheck = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
+        const hasPaperAndText = Boolean(textCheck && textCheck.hasTextLikely && metrics.avgBrightness >= 80);
+
+        if (!docPred && !hasPaperAndText) {
+            state.countdownStage = 0;
+            el.tPosition.textContent = 'Sınav Kağıdı Aranıyor';
+            el.tDistance.textContent = 'Kağıda Tutun';
+            announceGuidance('Henüz sınav kağıdı veya soru satırı algılanmadı. Lütfen kamerayı sınav kağıdının üzerine 25-30 santimetre mesafeden tutun.', {
+                bannerState: 'normal',
+                minIntervalMs: 3800
+            });
+            return;
+        }
+
         if (metrics.sharpness < 7.0) {
             state.countdownStage = 0;
             el.tPosition.textContent = 'Yazılar Bulanık';
             el.tDistance.textContent = 'Elinizi Sabitleyin';
-            announceGuidance('Sınav kağıdı şu an bulanık görünüyor. Şıkların yanlış okunmaması için elinizi sabit tutun ve kağıda bir karıştan biraz yüksekten (25-30 santim) dik bakın.', {
+            announceGuidance('Sınav kağıdı algılandı ancak şu an bulanık görünüyor. Şıkların yanlış okunmaması için elinizi sabit tutun.', {
                 bannerState: 'warning',
                 minIntervalMs: 3200
             });
             return;
         }
 
-        const docPred = predictions.find(p => p.class === 'book' || p.class === 'tv' || p.class === 'laptop');
         const rawBox = docPred ? docPred.bbox : null;
 
         if (rawBox) {
@@ -1519,9 +1550,9 @@
             }
         }
 
-        el.tPosition.textContent = 'Sayfa Hazır';
+        el.tPosition.textContent = 'Yazı Satırları Net';
         el.tDistance.textContent = 'Okumaya Hazır';
-        announceGuidance('Işık ve netlik sınav okumaya uygun. Soruyu ve şıkları okutmak için ekrana çift dokunun veya Boşluk tuşuna basın.', {
+        announceGuidance('Yazı satırları net görünüyor. Soruyu ve şıkları okutmak için ekrana çift dokunun veya Boşluk tuşuna basın.', {
             bannerState: 'centered',
             minIntervalMs: 4200
         });
@@ -2678,7 +2709,12 @@
         if (hotOffsetX < -0.25) dirHint = 'sol tarafınızda';
         else if (hotOffsetX > 0.25) dirHint = 'sağ tarafınızda';
 
-        el.tPosition.textContent = `Parlaklık: %${Math.round((lum / 255) * 100)} (${lum}/255)`;
+        let levelWord = 'Normal Aydınlık';
+        if (lum < 18) levelWord = 'Zifiri Karanlık';
+        else if (lum < 55) levelWord = 'Loş Işık';
+        else if (lum >= 145) levelWord = 'Güçlü Işık';
+
+        el.tPosition.textContent = `Işık Seviyesi: ${levelWord}`;
         el.tDistance.textContent = `En Güçlü Işık: ${dirHint}`;
 
         announceGuidance(`${stateDesc} En güçlü ışık kaynağı ${dirHint}.`, {
@@ -2991,21 +3027,23 @@
             }
         }
 
-        // 2. Parmak / El ve Kalem Ucu Tespiti (YCbCr Cilt Krominansı: 77<=Cb<=127, 133<=Cr<=173)
+        // 2. Parmak / El ve Kalem Ucu Tespiti (Ahşap masayı el sanmamak için bölgesel oran ve kalem ucu kontrast kilidi!)
         let skinPixels = 0;
+        let totalSampled = 0;
         let topSkinX = -1;
         let topSkinY = anH + 1;
 
         for (let gy = Math.floor(gh * 0.12); gy < gh - 1; gy++) {
             const py = gy * step;
             for (let gx = 2; gx < gw - 2; gx++) {
+                totalSampled++;
                 const px = gx * step;
                 const idx = (py * anW + px) * 4;
                 const r = data[idx], g = data[idx + 1], b = data[idx + 2];
                 const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
                 const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
 
-                if (r > 65 && g > 40 && b > 20 && r > b && cb >= 77 && cb <= 127 && cr >= 133 && cr <= 175) {
+                if (r > 75 && g > 45 && b > 25 && (r - g) >= 12 && r > b && cb >= 80 && cb <= 124 && cr >= 136 && cr <= 172) {
                     skinPixels++;
                     if (py < topSkinY) {
                         topSkinY = py;
@@ -3015,20 +3053,26 @@
             }
         }
 
+        const skinRatio = skinPixels / Math.max(1, totalSampled);
         let penTip = null;
-        if (skinPixels >= 24 && topSkinX >= 0) {
+        // Eğer ekranın %30'undan fazlası ten rengiyse bu bir ahşap masa veya sarı zemindir, el değildir!
+        if (skinPixels >= 28 && skinRatio >= 0.015 && skinRatio <= 0.28 && topSkinX >= 0) {
             let nibX = topSkinX;
             let nibY = topSkinY;
+            let foundDarkNib = false;
             const gx0 = Math.floor(topSkinX / step);
             const gy0 = Math.floor(topSkinY / step);
             for (let dy = 1; dy <= 6; dy++) {
                 const ty = gy0 - dy;
                 if (ty <= 1) break;
-                if (gray[ty * gw + gx0] < 95) {
+                if (gray[ty * gw + gx0] < 92) {
                     nibY = ty * step;
+                    foundDarkNib = true;
                 }
             }
-            penTip = { x: nibX, y: nibY, skinPixels };
+            if (foundDarkNib || sigBox) {
+                penTip = { x: nibX, y: nibY, skinPixels };
+            }
         }
 
         return { sigBox, penTip };
@@ -3945,26 +3989,32 @@
 
                 let combinedText = '';
                 let verifiedCombinedText = '';
+                let verifiedMultilineText = '';
                 let collectedLines = [];
                 for (let i = 0; i < splitInfo.canvases.length; i++) {
                     const ocrRes = await window.Tesseract.recognize(splitInfo.canvases[i], 'tur+eng');
                     const partText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
                     const partVerified = extractVerifiedRealTextFromOcrResult(ocrRes);
+                    const partMultiline = extractVerifiedRealTextFromOcrResult(ocrRes, '\n');
                     if (partText) {
                         combinedText += (combinedText ? '\n\n' : '') + partText;
                     }
                     if (partVerified) {
                         verifiedCombinedText += (verifiedCombinedText ? ' — ' : '') + partVerified;
                     }
+                    if (partMultiline) {
+                        verifiedMultilineText += (verifiedMultilineText ? '\n\n' : '') + partMultiline;
+                    }
                     if (ocrRes && ocrRes.data && Array.isArray(ocrRes.data.lines) && !splitInfo.isTwoColumn) {
                         collectedLines = ocrRes.data.lines;
                     }
                 }
 
-                if (combinedText.trim().length < 8) {
+                if (verifiedCombinedText.trim().length < 6) {
                     const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
                     combinedText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
                     verifiedCombinedText = extractVerifiedRealTextFromOcrResult(fallbackRes);
+                    verifiedMultilineText = extractVerifiedRealTextFromOcrResult(fallbackRes, '\n');
                     if (fallbackRes && fallbackRes.data && Array.isArray(fallbackRes.data.lines)) {
                         collectedLines = fallbackRes.data.lines;
                     }
@@ -4152,15 +4202,17 @@
                 }
 
                 const parsedQuestions = (state.mode === 'exam_reader')
-                    ? parseExamQuestionsAndOptions(combinedText.trim())
+                    ? parseExamQuestionsAndOptions(verifiedMultilineText.trim())
                     : [];
-                if (parsedQuestions.length > 0) {
+                if (state.mode === 'exam_reader') {
                     state.examQuestions = parsedQuestions;
                     state.currentExamIndex = 0;
-                    updateExamRemoteUI();
+                    if (parsedQuestions.length > 0) {
+                        updateExamRemoteUI();
+                    }
                 }
 
-                const firstQ = state.examQuestions[0];
+                const firstQ = (state.mode === 'exam_reader' && state.examQuestions.length > 0) ? state.examQuestions[0] : null;
                 const hasOptions = firstQ && (firstQ.options.A || firstQ.options.B || firstQ.options.C);
 
                 if (hasOptions) {
@@ -4172,6 +4224,15 @@
                             .join('\n') + `\n\n--- Sahne Betimlemesi ---\n${fullStory}`;
                     showDetectedResult('Sınav Sorusu ve Şıklar', finalReport.trim());
                     speakCurrentQuestionStem();
+                } else if (state.mode === 'exam_reader') {
+                    const msg = cleanText
+                        ? `Bu sayfada A, B, C, D, E şıklı bir test sorusu algılanmadı. Sayfada okunan düz metin: ${cleanText.replace(/\s+/g, ' ')}`
+                        : 'Bu görüntüde okunabilir bir sınav sorusu veya şık bulunamadı. Lütfen kamerayı sınav kağıdına dik ve net şekilde tutup tekrar deneyin.';
+                    showDetectedResult('Sınav Okuyucu Sonucu', msg);
+                    announceGuidance(msg, {
+                        force: true,
+                        bannerState: cleanText ? 'centered' : 'warning'
+                    });
                 } else {
                     showDetectedResult(`${sourceLabel} — Detaylı Betimleme ve Yazılar`, fullStory);
                     announceGuidance(fullStory, {
@@ -4457,7 +4518,7 @@
      * Tesseract OCR çıktısından gelen gürültü/doku uydurmalarını (halüsinasyonları) eler;
      * SADECE gerçek harf/kelime içeren ve güven skoru yüksek olan gerçek ekran yazılarını döndürür.
      */
-    function extractVerifiedRealTextFromOcrResult(ocrRes) {
+    function extractVerifiedRealTextFromOcrResult(ocrRes, separator = ' — ') {
         if (!ocrRes || !ocrRes.data) return '';
         const lines = Array.isArray(ocrRes.data.lines) ? ocrRes.data.lines : [];
         const verifiedLines = [];
@@ -4481,7 +4542,7 @@
             verifiedLines.push(raw);
         }
 
-        return verifiedLines.join(' — ');
+        return verifiedLines.join(separator);
     }
 
     const GENITIVE_TR_OBJECT_LABELS = {
@@ -5557,13 +5618,13 @@
 
         if (el.qiblaCurrentDeg) {
             const dirStr = isAligned
-                ? `TAM KIBLE HİZASINDA (Güven: %${confidencePct})`
-                : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağınızda' : 'Solunuzda'} (Güven: %${confidencePct})`;
+                ? 'TAM KIBLE HİZASINDA (Doğrulandı)'
+                : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağınızda' : 'Solunuzda'}`;
             el.qiblaCurrentDeg.textContent = `Pusula: ${Math.round(state.compassHeading)}° • ${dirStr}`;
         }
 
         el.tPosition.textContent = `Pusula: ${Math.round(state.compassHeading)}° (Kıble: ${state.qiblaTargetBearing}°)`;
-        el.tDistance.textContent = isAligned ? `Tam Kıble (%${confidencePct} Güven)` : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağa' : 'Sola'} Dönün`;
+        el.tDistance.textContent = isAligned ? 'Tam Kıble Hizasında' : `${Math.round(absDelta)}° ${deltaDeg > 0 ? 'Sağa' : 'Sola'} Dönün`;
 
         const panX = Math.max(-1, Math.min(1, deltaDeg / 75));
         radar.updateRadar(panX, 0, isAligned);
@@ -6027,7 +6088,7 @@
     }
 
     function matchMelodyBySemitoneContour(midiNotes) {
-        if (!Array.isArray(midiNotes) || midiNotes.length < 5) return null;
+        if (!Array.isArray(midiNotes) || midiNotes.length < 7) return null;
         const userIntervals = [];
         for (let i = 1; i < midiNotes.length; i++) {
             const diff = Math.max(-9, Math.min(9, midiNotes[i] - midiNotes[i - 1]));
@@ -6058,7 +6119,7 @@
             }
         }
 
-        if (bestSong && bestScore >= 0.57) {
+        if (bestSong && bestScore >= 0.74) {
             return {
                 song: bestSong,
                 confidencePct: Math.min(98, Math.round(bestScore * 100))
@@ -6367,7 +6428,7 @@
             const humMatch = matchMelodyBySemitoneContour(midiSnapshot);
             if (humMatch) {
                 if (el.songHeardWords) {
-                    el.songHeardWords.textContent = `Mırıldanan Melodi (%${humMatch.confidencePct} uyum): ${notesSnapshot.slice(-6).join(' → ')}`;
+                    el.songHeardWords.textContent = `Mırıldanan Melodi: ${notesSnapshot.slice(-6).join(' → ')}`;
                 }
                 searchSongByLyricsOrQuery(`${humMatch.song.artist} ${humMatch.song.title}`, humMatch.confidencePct);
                 return;
@@ -6553,7 +6614,7 @@
 
         if (el.songStatusBadge) {
             el.songStatusBadge.textContent = melodyConfidencePct
-                ? `✅ Melodiden Bulundu (%${melodyConfidencePct})`
+                ? '✅ Melodiden Bulundu'
                 : '✅ Şarkı Bulundu!';
         }
         if (el.songFoundTitle) el.songFoundTitle.textContent = `${foundTrack.title} — ${foundTrack.artist}`;
@@ -7064,8 +7125,14 @@
 
     function processBusRouteOcrResult(cleanText, preds) {
         const upper = String(cleanText || '').toUpperCase();
-        const routeMatches = upper.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3}|[1-9]\d{0,3})\b/g) || [];
-        const filteredRoutes = [...new Set(routeMatches)].filter(tok => tok.length >= 2 && tok !== '2026');
+        const hasVehicle = Array.isArray(preds) && preds.some(p => p.class === 'bus' || p.class === 'truck' || p.class === 'car');
+        const hasBusContextWords = /\b(?:HAT|OTOBÜS|OTOBUS|MİNİBÜS|MINIBUS|DOLMUŞ|DOLMUS|DURAK|DURAĞI|İETT|IETT|EGO|ESHOT|METRO|METROBÜS|TRAMVAY|PERON)\b/.test(upper);
+        const alphaNumRouteMatches = upper.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [];
+        const pureNumMatches = (hasVehicle || hasBusContextWords)
+            ? (upper.match(/\b[1-9]\d{0,3}\b/g) || [])
+            : [];
+        const routeMatches = [...alphaNumRouteMatches, ...pureNumMatches];
+        const filteredRoutes = [...new Set(routeMatches)].filter(tok => tok.length >= 2 && tok !== '2026' && tok !== '2025');
         const hasBus = Array.isArray(preds) && preds.some(p => p.class === 'bus');
         const badgeEl = document.getElementById('bus-seen-number');
 
@@ -7074,7 +7141,7 @@
             state.lastSeenBusRoute = topRoute;
             if (badgeEl) badgeEl.textContent = `${topRoute} Numaralı Hat`;
             if (navigator.vibrate) navigator.vibrate([180, 70, 220]);
-            const speech = `Dikkat! Yaklaşan otobüs veya tabelada okunan hat numarası: ${topRoute}. ${cleanText.replace(/\s+/g, ' ').slice(0, 120)}`;
+            const speech = `Dikkat! Yaklaşan otobüs veya durak tabelasında okunan hat numarası: ${topRoute}. ${cleanText.replace(/\s+/g, ' ').slice(0, 120)}`;
             return {
                 speechText: speech,
                 fullText: `Okunan Hat Numarası: ${topRoute}\nAraç Algılandı mı: ${hasBus ? 'Evet (Otobüs/Minibüs)' : 'Tabela / Ön Yazı'}\n\nTam Okunan Metin:\n${cleanText}`
@@ -7082,7 +7149,7 @@
         }
         const fallbackSpeech = hasBus
             ? 'Otobüs algılandı ancak ön tabeladaki hat numarası tam seçilemedi, lütfen biraz daha yaklaşınca tekrar okutun.'
-            : (cleanText ? `Durak veya tabela yazısı: ${cleanText.replace(/\s+/g, ' ')}` : 'Henüz otobüs hat numarası algılanmadı.');
+            : (cleanText ? `Kamerada otobüs görünmüyor; okunan yazı: ${cleanText.replace(/\s+/g, ' ')}` : 'Henüz yaklaşan bir otobüs veya hat numarası algılanmadı.');
         return {
             speechText: fallbackSpeech,
             fullText: fallbackSpeech
@@ -7273,9 +7340,8 @@
             }
         }
 
-        // POS veya Fiş Tutarı Yakalama
-        const amountMatches = text.match(/(?:TUTAR|TOPLAM|SATIŞ|ODEME|ÖDEME|NAKİT|KART|TL|₺)?\s*\b\d{1,6}(?:[.,]\d{2})?\s*(?:TL|₺|TÜRK LİRASI|LİRA)\b/gi)
-            || text.match(/\b\d{1,5}[.,]\d{2}\b/g)
+        // POS veya Fiş Tutarı Yakalama (Saati veya tarihi tutar sanmamak için mutlaka para birimi veya ödeme etiketi şart!)
+        const amountMatches = text.match(/(?:(?:TUTAR|TOPLAM|SATIŞ|SATIS|ÖDEME|ODEME|NAKİT|NAKIT|KART)\s*[:\-]?\s*\d{1,6}(?:[.,]\d{2})?(?:\s*(?:TL|₺|TÜRK\s*LİRASI|LİRA|TRY))?|\b\d{1,6}(?:[.,]\d{2})?\s*(?:TL|₺|TÜRK\s*LİRASI|LİRA|TRY|EUR|USD|€|\$)\b)/gi)
             || [];
         const cleanAmounts = [...new Set(amountMatches.map(a => a.trim()))];
 
@@ -7475,10 +7541,10 @@
     function matchOrDescribeJarAndMemoryItem(capCanvas, metrics, cleanText) {
         const col = (metrics && metrics.centerColor) ? metrics.centerColor.name : '';
         const jarMemories = state.itemMemories.filter(m => m.colorTag && m.colorTag === col);
+        const ocrNote = cleanText ? `Üzerinde okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.` : 'Üzerinde okunabilir bir etiket yazısı görünmüyor.';
         const jarNote = jarMemories.length > 0
-            ? `Bu ${col} kavanoz/kutu için daha önce kaydettiğiniz etiket: ${jarMemories[0].text}.`
+            ? `Görünen yüzeyin rengi ${col}. Hafızanızda ${col} renkli kavanoz/kutu için "${jarMemories[0].text}" kaydı bulunuyor; ancak üzerinde yazı yoksa aynı renkteki kavanozları (örneğin tuz ile şekeri) karıştırmamak için lütfen kokusunu veya dokusunu da kontrol edin.`
             : `Görünen kavanoz veya kutunun rengi: ${col}.`;
-        const ocrNote = cleanText ? `Üzerinde okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.` : '';
         const combined = `${jarNote} ${ocrNote}`.trim();
         return { speechText: combined, fullText: combined };
     }
@@ -7636,14 +7702,38 @@
         const w = capCanvas.width;
         const h = capCanvas.height;
 
-        const leftHalf = sampleRegionRgbAndContrast(ctx, w * 0.08, h * 0.2, w * 0.38, h * 0.6);
-        const rightHalf = sampleRegionRgbAndContrast(ctx, w * 0.54, h * 0.2, w * 0.38, h * 0.6);
+        const leftHalf = sampleRegionRgbAndContrast(ctx, w * 0.08, h * 0.2, w * 0.36, h * 0.6);
+        const rightHalf = sampleRegionRgbAndContrast(ctx, w * 0.56, h * 0.2, w * 0.36, h * 0.6);
+        const midStrip = sampleRegionRgbAndContrast(ctx, w * 0.44, h * 0.2, w * 0.12, h * 0.6);
+        const topBorder = sampleRegionRgbAndContrast(ctx, w * 0.15, h * 0.02, w * 0.70, h * 0.12);
 
         const colorDist = Math.sqrt(
             Math.pow(leftHalf.r - rightHalf.r, 2) +
             Math.pow(leftHalf.g - rightHalf.g, 2) +
             Math.pow(leftHalf.b - rightHalf.b, 2)
         );
+        const distLeftMid = Math.hypot(leftHalf.r - midStrip.r, leftHalf.g - midStrip.g, leftHalf.b - midStrip.b);
+        const distRightMid = Math.hypot(rightHalf.r - midStrip.r, rightHalf.g - midStrip.g, rightHalf.b - midStrip.b);
+        const distTopCenter = Math.hypot(leftHalf.r - topBorder.r, leftHalf.g - topBorder.g, leftHalf.b - topBorder.b);
+
+        // Boş masa veya tek parça kıyafet kontrolü: Sol, orta şerit ve sağ tamamen aynıysa ve ortada ayırıcı boşluk yoksa:
+        const isSingleUniformSurface = (colorDist < 18 && distLeftMid < 14 && distRightMid < 14 && distTopCenter < 16 && leftHalf.stdDev < 18 && rightHalf.stdDev < 18);
+
+        const centerSample = sampleRegionRgbAndContrast(ctx, w * 0.25, h * 0.25, w * 0.5, h * 0.5);
+        const sockEl = document.getElementById('sock-match-result');
+        const stainEl = document.getElementById('outfit-stain-result');
+
+        if (isSingleUniformSurface) {
+            const singleMsg = `Tek Parça Yüzey: Kamerada yan yana iki ayrı çorap ayırt edilemedi; tamamı ${centerSample.colorInfo.name} tek bir yüzey görünüyor. İki çorabı karşılaştırmak için aralarında biraz boşluk bırakarak yan yana koyun.`;
+            if (sockEl) sockEl.textContent = `TEK YÜZEY (${centerSample.colorInfo.name})`;
+            if (stainEl) stainEl.textContent = `Merkez Renk: ${centerSample.colorInfo.name}`;
+            const speech = `${singleMsg} ${cleanText ? 'Etiket yazısı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
+            return {
+                speechText: speech,
+                fullText: `${singleMsg}\n\nEtiket Yazısı:\n${cleanText || 'Etiket yazısı yok.'}`
+            };
+        }
+
         const sameColorName = leftHalf.colorInfo.name === rightHalf.colorInfo.name;
         const isPairMatch = sameColorName || colorDist < 34;
 
@@ -7651,11 +7741,8 @@
             ? `Çorap ve Kıyafet Eşleşmesi: Sol taraftaki parça (${leftHalf.colorInfo.name}) ile sağ taraftaki parça (${rightHalf.colorInfo.name}) aynı renkte ve birbiriyle eşleşiyor.`
             : `Farklı Renk: Sol taraftaki parça ${leftHalf.colorInfo.name}, sağ taraftaki parça ise ${rightHalf.colorInfo.name}; birbirinden farklı.`;
 
-        const centerSample = sampleRegionRgbAndContrast(ctx, w * 0.25, h * 0.25, w * 0.5, h * 0.5);
         const stainMsg = `Merkez bölge rengi: ${centerSample.colorInfo.name}.`;
 
-        const sockEl = document.getElementById('sock-match-result');
-        const stainEl = document.getElementById('outfit-stain-result');
         if (sockEl) sockEl.textContent = isPairMatch ? `EŞLEŞTİ (${leftHalf.colorInfo.name})` : `FARKLI (${leftHalf.colorInfo.name} / ${rightHalf.colorInfo.name})`;
         if (stainEl) stainEl.textContent = `Merkez Renk: ${centerSample.colorInfo.name}`;
 
@@ -7745,6 +7832,7 @@
         { keys: ['salata', 'çoban salata', 'yeşillik', 'cacık', 'yoğurt', 'ayran'], name: '1 Kase Yoğurt / Ayran / Taze Salata', kcal: 95, benefit: 'Ferahlatıcıdır, vitamin ve probiyotik desteğiyle vücudu yeniler.' },
         { keys: ['elma', 'muz', 'portakal', 'mandalina', 'çilek', 'karpuz', 'meyve'], name: '1 Porsiyon Taze Meyve', kcal: 75, benefit: 'Doğal C vitamini ve antioksidan deposudur, cilde ve bağışıklığa çok iyi gelir.' },
         { keys: ['çay', 'türk kahvesi', 'kahve', 'ıhlamur', 'bitki çayı'], name: 'Şekersiz Çay / Türk Kahvesi', kcal: 5, benefit: 'Zihni açar, yorgunluğu alır ve neredeyse hiç kalorisi yoktur.' },
+        { keys: ['su', 'içme suyu', 'maden suyu', 'soda'], name: 'Su / Doğal Maden Suyu', kcal: 0, benefit: '0 kaloridir; vücudunuzun su ve mineral dengesini korur.' },
         { keys: ['baklava', 'sütlaç', 'tatlı', 'çikolata', 'kek', 'pasta', 'dondurma'], name: '1 Porsiyon Tatlı / Çikolata Keyfi', kcal: 250, benefit: 'Ruhu tatlandırır ve moral verir! Küçük bir yürüyüşle enerjisi keyfe dönüşür.' },
         { keys: ['ekmek', 'tam buğday', 'tost'], name: '1 Dilim Ekmek / Tost', kcal: 85, benefit: 'B vitaminleri içerir ve öğünlerinize doyuruculuk katar.' }
     ];
@@ -7876,13 +7964,10 @@
                 bannerState: 'centered'
             });
         } else {
-            const estKcal = 180;
-            state.dailyIntakeKcal += estKcal;
-            saveStepCalorieToStorage();
-            if (lastFoodEl) lastFoodEl.textContent = `${foodQuery} (~${estKcal} kcal)`;
-            announceGuidance(`Afiyet olsun! "${foodQuery}" için ortalama bir porsiyon değeri yaklaşık ${estKcal} kaloridir ve vücudunuza güzel bir enerji sağlar. Günlük toplamınız ${state.dailyIntakeKcal} kalori oldu.`, {
+            if (lastFoodEl) lastFoodEl.textContent = `${foodQuery} (Listede Yok — Kalori Eklenmedi)`;
+            announceGuidance(`"${foodQuery}" besin veritabanımızda kayıtlı olmadığı için yanlış bilgi vermemek adına günlük kalori toplamınıza tahmini bir sayı eklemedim. Eğer paketli bir ürünse kameraya gösterip Boşluk tuşuna basarak üzerindeki gerçek besin değeri tablosunu okutabilirsiniz.`, {
                 force: true,
-                bannerState: 'centered'
+                bannerState: 'warning'
             });
         }
     }
