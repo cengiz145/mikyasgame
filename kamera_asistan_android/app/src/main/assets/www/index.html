@@ -65,6 +65,9 @@
             <button id="btn-upload-photo" class="primary-btn" type="button" style="background: linear-gradient(135deg, #0ea5e9, #2563eb);" aria-label="Telefon Galerisinden veya WhatsApp'tan Gelen Bir Fotoğrafı ya da Videoyu Seçip Sahne Sahne Detaylı Betimlet ve Okut (Kısayol: M)">
                 🖼️🎬 Fotoğraf veya Video Seç &amp; Betimle (M)
             </button>
+            <button id="btn-smart-voice-intent" class="primary-btn" type="button" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);" aria-label="Akıllı Sesli Senaryo Asistanı: Ne Yapmak İstediğinizi Söyleyin, Uygun Modu ve İşlemi Otomatik Başlatayım (Kısayol: J)">
+                🎙️ Ne Yapmak İstiyorsunuz? Söyleyin (J)
+            </button>
             <button id="btn-silence-speech" class="secondary-btn" type="button" aria-label="Konuşmayı Hemen Sustur (Kısayol: Escape veya Ctrl Tuşu)">
                 🤫 Sesi Sustur (Esc)
             </button>
@@ -76,6 +79,24 @@
 
         <!-- Kategoriler ve 23 Yardımcı Özellik -->
         <section aria-labelledby="mode-heading" class="mode-section">
+            <h2 id="scenario-heading" style="font-size:1.05rem; margin-bottom:0.45rem;">🎯 Akıllı Kullanım Senaryoları (Tek Tuşla Ortama Göre Hazırla)</h2>
+            <div class="scenario-bar" role="group" aria-label="Akıllı Kullanım Senaryoları" style="display:flex; flex-wrap:wrap; gap:0.55rem; margin-bottom:0.95rem;">
+                <button type="button" class="secondary-btn scenario-preset-btn" data-scenario="shopping" aria-pressed="false" aria-label="Market ve Ödeme Senaryosu: Para Sayma, POS Tutar Doğrulama, IBAN ve Gıda Paketi Okumayı Birlikte Hazırlar">
+                    🛒 Market &amp; Ödeme
+                </button>
+                <button type="button" class="secondary-btn scenario-preset-btn" data-scenario="commute" aria-pressed="false" aria-label="Sokakta ve Yolculukta Senaryosu: Otobüs Numarası, Durak Alarmı ve Tam Olarak Neredeyim Adres Tarifini Hazırlar">
+                    🚌 Sokakta &amp; Yolculukta
+                </button>
+                <button type="button" class="secondary-btn scenario-preset-btn" data-scenario="kitchen_home" aria-pressed="false" aria-label="Evde ve Mutfakta Senaryosu: Sesli Yemek Tarifleri, Eşya Hafızası, Kavanoz ve Çorap Eşleştirmeyi Hazırlar">
+                    🏠 Evde &amp; Mutfakta
+                </button>
+                <button type="button" class="secondary-btn scenario-preset-btn" data-scenario="health" aria-pressed="false" aria-label="Sağlık ve İlaç Senaryosu: İlaç Kutusu, Son Kullanma Tarihi, Alerjen ve Kalori Kontrolünü Hazırlar">
+                    💊 Sağlık &amp; İlaç
+                </button>
+                <button type="button" class="secondary-btn scenario-preset-btn" data-scenario="study_work" aria-pressed="false" aria-label="Sınav ve Evrak Senaryosu: Sınav Şık Okuyucu, İmza Kalem Yönlendirici ve Belge Okuyucuyu Hazırlar">
+                    📚 Sınav &amp; Evrak
+                </button>
+            </div>
             <h2 id="mode-heading">Kategoriler</h2>
             <div class="category-bar" role="group" aria-label="Uygulama Kategorileri" style="display:flex; flex-wrap:wrap; gap:0.55rem; margin-bottom:0.9rem;">
                 <button type="button" class="secondary-btn category-tab active-toggle" data-category="all" aria-pressed="true" aria-label="Tümü: 23 Özelliğin Tamamını Göster">

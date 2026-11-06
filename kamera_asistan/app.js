@@ -221,7 +221,8 @@
         speechRate: 1.0,
         lastUserInteractionAt: performance.now(),
         deletedItemMemoryBackup: null,
-        stepCalorieBackupBeforeReset: null
+        stepCalorieBackupBeforeReset: null,
+        activeScenarioPreset: ''
     };
 
     const el = {
@@ -232,6 +233,7 @@
         btnToggleAuto: document.getElementById('btn-toggle-auto'),
         btnCaptureNow: document.getElementById('btn-capture-now'),
         btnUploadPhoto: document.getElementById('btn-upload-photo'),
+        btnSmartVoiceIntent: document.getElementById('btn-smart-voice-intent'),
         btnSilenceSpeech: document.getElementById('btn-silence-speech'),
         btnSpeechRate: document.getElementById('btn-speech-rate'),
         photoFileInput: document.getElementById('photo-file-input'),
@@ -254,6 +256,7 @@
         whereAmIPanel: document.getElementById('where-am-i-panel'),
         stepCaloriePanel: document.getElementById('step-calorie-panel'),
         cookingGuidePanel: document.getElementById('cooking-guide-panel'),
+        scenarioPresetBtns: document.querySelectorAll('.scenario-preset-btn'),
         categoryTabs: document.querySelectorAll('.category-tab'),
         modeButtons: document.querySelectorAll('.mode-card'),
         aiStatusBadge: document.getElementById('ai-status-badge'),
@@ -4481,12 +4484,13 @@
             reportLines.push(alStr);
         }
 
-        // 3. TR IBAN ve POS / Fiş Toplam Tutarı Kontrolü
+        // 3. TR IBAN ve POS / Fiş Toplam Tutarı Kontrolü (Yanlış modda olsa bile IBAN Kopyala panelini otomatik görünür yapar)
         const hasIbanCandidate = /\bTR\s*[0-9OISB\s\-]{16,34}/i.test(text);
         const hasExplicitPosTotal = /(?:TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS)\s*[:.]?\s*(?:₺\s*)?\d/i.test(text);
         if (hasIbanCandidate || hasExplicitPosTotal) {
             const posIban = processPosAmountAndIbanText(text, primaryPassVerifiedText, secondaryRawVerifiedText);
             if (posIban && posIban.speechText && !posIban.speechText.startsWith('POS tutarı veya IBAN net seçilemedi') && !posIban.speechText.startsWith('Ekranda henüz')) {
+                if (el.posIbanPanel) el.posIbanPanel.hidden = false;
                 speechNotes.push(posIban.speechText);
                 reportLines.push(posIban.speechText);
             }
@@ -4498,6 +4502,16 @@
             if (calInfo && calInfo.speechText && calInfo.speechText.startsWith('Pakette okunan besin değerleri')) {
                 speechNotes.push(calInfo.speechText);
                 reportLines.push(calInfo.speechText);
+            }
+        }
+
+        // 5. Canlı Maç Skoru Tabelası Kontrolü (Herhangi bir modda TV veya ekran görüntüsü okutulduğunda)
+        if (/\b[A-ZÇĞİÖŞÜ]{2,12}\s+\d{1,2}\s*[-:]\s*\d{1,2}\s+[A-ZÇĞİÖŞÜ]{2,12}\b/i.test(text)) {
+            const tvCheck = processTvSubtitleAndScoreText(text, true);
+            if (tvCheck && tvCheck.speechText && tvCheck.speechText.startsWith('Canlı Maç Skoru:')) {
+                const scoreOnly = tvCheck.speechText.split('. ')[0] + '.';
+                speechNotes.push(scoreOnly);
+                reportLines.push(scoreOnly);
             }
         }
 
@@ -4929,6 +4943,13 @@
                     speakCurrentQuestionStem();
                 } else {
                     const universalInsights = buildUniversalSmartInsights(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText);
+                    if (Array.isArray(preds) && preds.some(p => p.class === 'bus') && cleanText) {
+                        const busAuto = processBusRouteOcrResult(cleanText, preds);
+                        if (busAuto && busAuto.speechText && busAuto.speechText.startsWith('Yaklaşan otobüs')) {
+                            universalInsights.speechNotes.unshift(busAuto.speechText);
+                            universalInsights.reportLines.unshift(busAuto.speechText);
+                        }
+                    }
                     const insightSpeech = universalInsights.speechNotes.length > 0
                         ? ` ${universalInsights.speechNotes.join(' ')}`
                         : '';
@@ -7954,7 +7975,98 @@
         'gunluk_yasam': 'Günlük Yaşam Kategorisi'
     };
 
+    const SMART_SCENARIO_PRESETS = {
+        'shopping': {
+            title: 'Market ve Ödeme Senaryosu',
+            primaryMode: 'color_cloth',
+            modes: ['color_cloth', 'pos_iban_reader', 'food_freshness', 'medicine_skt'],
+            speech: 'Market ve Ödeme Senaryosu hazırlandı! Kameraya kağıt veya demir para tutarsanız paranızı sayıp toplarım, POS ekranı veya fatura tutarsanız ödenecek tutarı doğrulayıp IBAN numarasını kopyalarım, market paketi tutarsanız son tüketim tarihini ve alerjenleri okurum.'
+        },
+        'commute': {
+            title: 'Sokakta ve Yolculukta Senaryosu',
+            primaryMode: 'bus_stop_tracker',
+            modes: ['bus_stop_tracker', 'where_am_i', 'explorer', 'qibla_compass'],
+            speech: 'Sokakta ve Yolculukta Senaryosu hazırlandı! GPS konumunuz, durak alarmınız ve açık adres tarifiniz hazır. Kamerayı yola tutarsanız yaklaşan otobüsün hat numarasını ve sokak tabelalarını okurum.'
+        },
+        'kitchen_home': {
+            title: 'Evde ve Mutfakta Senaryosu',
+            primaryMode: 'cooking_guide',
+            modes: ['cooking_guide', 'item_memory', 'liquid_level', 'door_elevator_lcd', 'sock_outfit_check', 'light_meter', 'anomaly_led'],
+            speech: 'Evde ve Mutfakta Senaryosu hazırlandı! Adım adım sesli yemek tarifleri, konuşan mutfak saati, kavanoz ve eşya hafızası ile çorap eşleştirici tek ekranda hazır.'
+        },
+        'health': {
+            title: 'Sağlık ve İlaç Senaryosu',
+            primaryMode: 'medicine_skt',
+            modes: ['medicine_skt', 'food_freshness', 'step_calorie_guide'],
+            speech: 'Sağlık ve İlaç Senaryosu hazırlandı! İlaç kutusunu kameraya tuttuğunuzda adını, miligram dozajını, kullanım tarifini ve son kullanma tarihinin geçip geçmediğini sıfır hata kilidiyle kontrol ederim.'
+        },
+        'study_work': {
+            title: 'Sınav ve Evrak Senaryosu',
+            primaryMode: 'exam_reader',
+            modes: ['exam_reader', 'signature_pen', 'qr_screen', 'explorer'],
+            speech: 'Sınav ve Evrak Senaryosu hazırlandı! Sınav kağıdındaki soruları ve A, B, C, D, E şıklarını iki sütunlu olsa bile birbirine karıştırmadan ayırırım; resmi belgelerde ise imza alanını kaleminize yönlendiririm.'
+        }
+    };
+
+    function activateSmartUsageScenarioPreset(scenarioId) {
+        const preset = SMART_SCENARIO_PRESETS[scenarioId];
+        if (!preset) return false;
+        state.activeScenarioPreset = scenarioId;
+
+        if (el.scenarioPresetBtns) {
+            el.scenarioPresetBtns.forEach(btn => {
+                const isSel = btn.getAttribute('data-scenario') === scenarioId;
+                btn.classList.toggle('active-toggle', isSel);
+                btn.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+            });
+        }
+        if (el.categoryTabs) {
+            el.categoryTabs.forEach(tab => {
+                tab.classList.remove('active-toggle');
+                tab.setAttribute('aria-pressed', 'false');
+            });
+        }
+        const allowedModes = new Set(preset.modes);
+        if (el.modeButtons) {
+            el.modeButtons.forEach(btn => {
+                const m = btn.getAttribute('data-mode') || '';
+                const show = allowedModes.has(m);
+                btn.hidden = !show;
+                btn.style.display = show ? '' : 'none';
+            });
+        }
+
+        setMode(preset.primaryMode);
+        // Senaryoya özel yardımcı panelleri aynı anda görünür kıl ki kullanıcı mod değiştirmeden kullanabilsin
+        if (scenarioId === 'shopping') {
+            if (el.moneyCounterPanel) el.moneyCounterPanel.hidden = false;
+            if (el.posIbanPanel) el.posIbanPanel.hidden = false;
+        } else if (scenarioId === 'commute') {
+            if (el.busStopPanel) el.busStopPanel.hidden = false;
+            if (el.whereAmIPanel) el.whereAmIPanel.hidden = false;
+            autoAcquireLocationAndWatch();
+        } else if (scenarioId === 'kitchen_home') {
+            if (el.cookingGuidePanel) el.cookingGuidePanel.hidden = false;
+            if (el.itemMemoryPanel) el.itemMemoryPanel.hidden = false;
+        } else if (scenarioId === 'health') {
+            if (el.stepCaloriePanel) el.stepCaloriePanel.hidden = false;
+        } else if (scenarioId === 'study_work') {
+            if (el.examRemotePanel) el.examRemotePanel.hidden = false;
+        }
+
+        announceGuidance(preset.speech, { force: true, bannerState: 'centered' });
+        return true;
+    }
+    window.activateSmartUsageScenarioPreset = activateSmartUsageScenarioPreset;
+
     function filterModesByLifeCategory(catId) {
+        state.activeScenarioPreset = '';
+        if (el.scenarioPresetBtns) {
+            el.scenarioPresetBtns.forEach(btn => {
+                btn.classList.remove('active-toggle');
+                btn.setAttribute('aria-pressed', 'false');
+            });
+        }
         if (!el.categoryTabs || !el.modeButtons) return;
         el.categoryTabs.forEach(tab => {
             const isSel = tab.getAttribute('data-category') === catId;
@@ -8516,10 +8628,184 @@
         });
     }
 
+    /**
+     * AKILLI DOĞAL DİL VE KULLANIM SENARYOSU YÖNLENDİRİCİ ("NE YAPMAK İSTİYORSUNUZ? SÖYLEYİN, BEN AÇAYIM"):
+     * Kullanıcının söylediği doğal Türkçe cümleyi ("Elimde kaç lira var", "Kadıköy durağında ineceğim",
+     * "Anahtarımı nereye koydum", "Bu ilacın tarihi geçmiş mi", "Evde mercimek var ne pişireyim") analiz eder;
+     * uygun modu otomatik açar ve ilgili alt işlemi (arama, kaydetme, alarm kurma, okuma) tek adımda çalıştırır.
+     */
+    function routeSmartVoiceScenarioCommand(spokenText) {
+        const raw = String(spokenText || '').trim();
+        if (!raw) {
+            announceGuidance('Lütfen yapmak istediğiniz işlemi söyleyin.', { force: true, bannerState: 'warning' });
+            return null;
+        }
+        const q = raw.toLocaleLowerCase('tr-TR');
+
+        // 1. Otobüs Durağı Alarmı ve Yolculuk Senaryosu
+        if (/(?:otobüs|minibüs|dolmuş|durak|durağı|durağında|durağına|ineceğim|hat\s*numarası)/u.test(q)) {
+            setMode('bus_stop_tracker');
+            let stopCandidate = q
+                .replace(/(?:otobüs|minibüs|dolmuş|durağında|durağına|durağı|durak|ineceğim|alarm\s*kur|alarmı\s*kur|geldim\s*mi|ne\s*kadar\s*kaldı|beni\s*uyar|haber\s*ver)/gu, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (stopCandidate.length >= 3 && !/^(?:numarası|hat|kaç|geliyor|var\s*mı)$/u.test(stopCandidate)) {
+                const inp = document.getElementById('bus-dest-input');
+                if (inp) inp.value = stopCandidate;
+                setBusDestinationStopAlarm(stopCandidate);
+                return 'bus_stop_alarm';
+            }
+            return 'bus_stop_tracker';
+        }
+
+        // 2. Tam Olarak Neredeyim & Konum Paylaşma Senaryosu
+        if (/(?:neredeyim|hangi\s*sokak|hangi\s*cadde|açık\s*adres|konumumu|konum\s*gönder|konum\s*paylaş|kayboldum)/u.test(q)) {
+            setMode('where_am_i');
+            if (/(?:gönder|paylaş|whatsapp)/u.test(q)) {
+                shareWhereAmIOnWhatsapp();
+                return 'where_am_i_whatsapp';
+            }
+            announceWhereAmIFullAddressAndSignboard('', []);
+            return 'where_am_i';
+        }
+
+        // 3. Kıble Pusulası ve Namaz Vakitleri Senaryosu
+        if (/(?:kıble|namaz|ezan|imsak|iftar|sahur|öğle\s*vakti|ikindi|akşam\s*ezanı|yatsı|kabe)/u.test(q)) {
+            setMode('qibla_compass');
+            if (/(?:vakit|vakti|saat|ezan|imsak|iftar|sahur|kaçta|ne\s*kadar)/u.test(q)) {
+                speakPrayerTimesAndSolarValidation();
+                return 'qibla_prayer_times';
+            }
+            startQiblaCompassSensor();
+            return 'qibla_compass';
+        }
+
+        // 4. POS Tutarı ve IBAN Kopyalama Senaryosu
+        if (/(?:\biban\b|pos\s*cihaz|pos\s*ekran|kredi\s*kart|ödeme\s*tutar|fiş\s*tutar)/u.test(q)) {
+            setMode('pos_iban_reader');
+            if (/kopyala/u.test(q) && state.lastDetectedIban) {
+                copyDetectedIbanToClipboard();
+                return 'pos_iban_copy';
+            }
+            return 'pos_iban_reader';
+        }
+
+        // 5. Canlı Para Sayma, Cüzdan ve Kumbara Senaryosu
+        if (/(?:kaç\s*lira|ne\s*kadar\s*param|para\s*say|cüzdan|kumbara|kağıt\s*para|bozuk\s*para|demir\s*para|kaç\s*param\s*var)/u.test(q)) {
+            setMode('color_cloth');
+            if (/(?:ne\s*kadar\s*param|kaç\s*param|toplam\s*kaç|cüzdanımda)/u.test(q)) {
+                speakHowMuchMoneyIHave();
+                return 'money_total';
+            }
+            return 'color_cloth';
+        }
+
+        // 6. İlaç Kutusu, Dozaj ve Son Kullanma Tarihi Senaryosu
+        if (/(?:ilaç|ilacın|hap\b|hapın|şurup|son\s*kullanma|tarihi\s*geçmiş|skt\b|prospektüs|kaç\s*miligram)/u.test(q)) {
+            setMode('medicine_skt');
+            return 'medicine_skt';
+        }
+
+        // 7. Eşyamı Nereye Koydum (Sorma veya Kaydetme) & Kavanoz Senaryosu
+        if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum|kavanoz|\b(?:koydum|bıraktım|sakladım|astım)\b)/u.test(q)) {
+            setMode('item_memory');
+            if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum)/u.test(q)) {
+                searchItemMemoryByQuery(raw);
+                return 'item_memory_search';
+            }
+            if (/\b(?:koydum|bıraktım|sakladım|astım)\b/u.test(q)) {
+                saveItemMemoryEntry(raw);
+                return 'item_memory_save';
+            }
+            return 'item_memory';
+        }
+
+        // 8. Adım Sayacı ve Yemek Kalori Hesaplama Senaryosu
+        if (/(?:kaç\s*adım|adım\s*say|ne\s*kadar\s*yürüdüm|kalori|kaç\s*kalori|besin\s*değeri)/u.test(q)) {
+            setMode('step_calorie_guide');
+            if (/(?:kalori|besin)/u.test(q)) {
+                const foodPart = q.replace(/(?:kaç\s*kalori|kalorisi\s*kaç|kalori|besin\s*değeri|nedir|acaba)/gu, ' ').trim();
+                if (foodPart.length >= 2) {
+                    calculateAndSpeakFoodCalories(raw);
+                    return 'calorie_calc';
+                }
+            }
+            speakCurrentStepAndCalorieStatus();
+            return 'step_calorie_guide';
+        }
+
+        // 9. Sesli Yemek Tarifleri ve Evdeki Malzemeyle Tarif Bulma Senaryosu
+        if (/(?:yemek\s*tarif|ne\s*pişir|nasıl\s*yapılır|tarifi\b|ocaksız|evde\s+.*?\s+var|çorba\s*tarif|pilav\s*tarif|menemen|mercimek)/u.test(q)) {
+            setMode('cooking_guide');
+            if (/ocaksız/u.test(q)) {
+                filterCookingRecipesByCategory('ocaksiz', true);
+                return 'cooking_ocaksiz';
+            }
+            const recipeQuery = q.replace(/(?:yemek\s*tarifleri|yemek\s*tarifi|ne\s*pişireyim|ne\s*pişirsem|nasıl\s*yapılır|tarifi\s*ver|bana\s*tarif)/gu, ' ').trim();
+            if (recipeQuery.length >= 3) {
+                findRecipeByIngredientsOrName(raw);
+                return 'cooking_recipe_search';
+            }
+            return 'cooking_guide';
+        }
+
+        // 10. Televizyon Altyazı ve Canlı Maç Skoru Senaryosu
+        if (/(?:televizyon|tv\s*oku|altyazı|maç\s*kaç\s*kaç|maç\s*skoru|skor\s*ne)/u.test(q)) {
+            setMode('tv_subtitle_score');
+            if (/(?:başlat|otomatik|spiker)/u.test(q) && !state.tvAutoReaderActive) {
+                toggleTvAutoSubtitleSpeaker();
+            }
+            return 'tv_subtitle_score';
+        }
+
+        // 11. Çorap Eşleştirici, Kombin ve Leke Kontrolü Senaryosu
+        if (/(?:çorap|çoraplarım|leke\s*var\s*mı|kıyafet\s*uyum|kombin)/u.test(q)) {
+            setMode('sock_outfit_check');
+            return 'sock_outfit_check';
+        }
+
+        // 12. Şarkı Bulucu ve Enstrüman Akort Senaryosu
+        if (/(?:hangi\s*şarkı|çalan\s*şarkı|şarkı\s*bul|şarkıyı\s*bul|mırıldan|akort|bağlama|gitar\s*akort|makam)/u.test(q)) {
+            setMode('song_finder');
+            if (/(?:akort|bağlama|gitar)/u.test(q) && !state.songTunerActive) {
+                toggleInstrumentTunerAndMakam();
+                return 'song_tuner';
+            }
+            return 'song_finder';
+        }
+
+        // 13. Sınav ve Test Okuyucu Senaryosu
+        if (/(?:sınav|test\s*soru|şık\s*oku|soruyu\s*oku)/u.test(q)) {
+            setMode('exam_reader');
+            if (/soruyu\s*oku/u.test(q)) speakCurrentQuestionStem();
+            return 'exam_reader';
+        }
+
+        // 14. İmza, Bardak/Sıvı, Kapı/Asansör/Kombi, Gıda Alerjen, Odada Kim Var, Lamba/Işık, Düşen Eşya, Özçekim, WhatsApp QR
+        if (/(?:imza|kalem\s*yönlendir)/u.test(q)) { setMode('signature_pen'); return 'signature_pen'; }
+        if (/(?:bardak|kupa|şişe\s*bul|çay\s*bardağı)/u.test(q)) { setMode('liquid_level'); return 'liquid_level'; }
+        if (/(?:kapı\s*numara|asansör|kombi|çamaşır\s*makine)/u.test(q)) { setMode('door_elevator_lcd'); return 'door_elevator_lcd'; }
+        if (/(?:alerjen|gluten|laktoz|içindekiler|gıda\s*paket)/u.test(q)) { setMode('food_freshness'); return 'food_freshness'; }
+        if (/(?:odada\s*kim|bana\s*bakıyor|kaç\s*kişi\s*var)/u.test(q)) { setMode('social_presence'); return 'social_presence'; }
+        if (/(?:lamba\s*açık|ışık\s*açık|pencere\s*ne\s*tarafta)/u.test(q)) { setMode('light_meter'); return 'light_meter'; }
+        if (/(?:yere\s*düşen|düşen\s*eşya|modem\s*ışığı)/u.test(q)) { setMode('anomaly_led'); return 'anomaly_led'; }
+        if (/(?:özçekim|selfie|vesikalık)/u.test(q)) { setMode('portrait'); return 'portrait'; }
+        if (/(?:karekod|qr\s*kod|whatsapp\s*web)/u.test(q)) { setMode('qr_screen'); return 'qr_screen'; }
+
+        // Varsayılan: Etrafımda Ne Var & Evrak Okuyucu
+        setMode('explorer');
+        return 'explorer';
+    }
+    window.routeSmartVoiceScenarioCommand = routeSmartVoiceScenarioCommand;
+
     window.receiveNativeVoiceCaptureFromAndroid = function (purpose, spokenText) {
         const clean = String(spokenText || '').trim();
         if (!clean) {
             announceGuidance('Ses algılanamadı veya konuşma penceresi kapatıldı.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        if (purpose === 'smart_intent') {
+            routeSmartVoiceScenarioCommand(clean);
             return;
         }
         if (purpose === 'save') {
@@ -8543,6 +8829,7 @@
 
     function startVoiceItemMemoryCapture(modeType = 'save') {
         const promptMap = {
+            'smart_intent': 'Şimdi ne yapmak istediğinizi söyleyin. Örneğin: Elimde kaç lira var, Bu ilacın tarihi geçmiş mi, Kadıköy durağına alarm kur, Anahtarım nerede veya Mercimek çorbası tarifi.',
             'save': 'Şimdi eşyanızı nereye koyduğunuzu söyleyin, örneğin: Yedek anahtarı vestiyerin üst çekmecesine koydum.',
             'bus_dest': 'Şimdi ineceğiniz durağın veya semtin adını söyleyin, örneğin: Kadıköy İskele veya Kızılay.',
             'calorie': 'Şimdi yediğiniz veya merak ettiğiniz yemeğin adını söyleyin, örneğin: Mercimek çorbası veya 1 bardak süt.',
@@ -10274,6 +10561,9 @@
             el.photoExplorerCanvas.addEventListener('touchmove', handlePhotoExplorerPointerEvent, { passive: false });
         }
     }
+    if (el.btnSmartVoiceIntent) {
+        el.btnSmartVoiceIntent.addEventListener('click', () => startVoiceItemMemoryCapture('smart_intent'));
+    }
     if (el.btnSilenceSpeech) {
         el.btnSilenceSpeech.addEventListener('click', () => stopAllSpeechImmediately());
     }
@@ -10423,6 +10713,14 @@
     el.modeButtons.forEach(btn => {
         btn.addEventListener('click', () => setMode(btn.getAttribute('data-mode')));
     });
+
+    if (el.scenarioPresetBtns && el.scenarioPresetBtns.length > 0) {
+        el.scenarioPresetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                activateSmartUsageScenarioPreset(btn.getAttribute('data-scenario') || 'shopping');
+            });
+        });
+    }
 
     if (el.categoryTabs && el.categoryTabs.length > 0) {
         el.categoryTabs.forEach(tab => {
@@ -10698,6 +10996,7 @@
         else if (key === 'm' && el.photoFileInput) el.photoFileInput.click();
         else if (key === 't') el.btnRepeat.click();
         else if (key === 'y') cycleSpeechRate();
+        else if (key === 'j') startVoiceItemMemoryCapture('smart_intent');
         else if (key === 'n') speakHowMuchMoneyIHave();
         else if (key === 'z' || ev.key === '+') addCurrentlyVisibleMoneyManually();
         else if (ev.code === 'Space') {
