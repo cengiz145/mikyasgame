@@ -1378,7 +1378,8 @@
             updateTelemetryUI(metrics);
 
             let qrDetection = null;
-            if (state.mode === 'qr_screen' || state.mode === 'medicine_skt' || state.targetFilter === 'screen_qr') {
+            const isVisualCameraMode = state.mode !== 'light_meter' && state.mode !== 'qibla_compass' && state.mode !== 'song_finder';
+            if (isVisualCameraMode) {
                 if (state.barcodeDetector) {
                     try {
                         const barcodes = await state.barcodeDetector.detect(el.analysisCanvas);
@@ -1425,11 +1426,28 @@
                 }
             }
 
+            // Herhangi bir moddayken QR kod veya İlaç GS1 Karekod görülürse mod değiştirmeye gerek kalmadan anında oku!
+            if (qrDetection && qrDetection.data && state.mode !== 'qr_screen') {
+                const nowQr = performance.now();
+                if (qrDetection.data !== state.lastQrCode || nowQr - (state.lastQrAt || 0) > 6500) {
+                    state.lastQrCode = qrDetection.data;
+                    state.lastQrAt = nowQr;
+                    radar.playQrSuccessSound();
+                    const gs1 = parseGs1MedicineDataMatrix(qrDetection.data);
+                    if (gs1) {
+                        const medCheck = parseMedicineAndExpiryZeroError('', qrDetection.data, '');
+                        showDetectedResult('💊 Karekod / Barkod Otomatik Okundu', `${medCheck.sktSpeech}\nBarkod: ${gs1.gtin}`);
+                        announceGuidance(`Karekod okundu! ${medCheck.sktSpeech}`, { force: true, bannerState: medCheck.sktStatus === 'EXPIRED' ? 'warning' : 'centered' });
+                    } else {
+                        showDetectedResult('📱 QR Kod / Barkod Otomatik Okundu', qrDetection.data);
+                        announceGuidance(`Kamerada QR kod veya barkod okundu: ${qrDetection.data}`, { force: true, bannerState: 'centered' });
+                    }
+                }
+            }
+
             let predictions = [];
             const nonObjectModes = new Set([
-                'light_meter', 'color_cloth', 'anomaly_led', 'signature_pen',
-                'door_elevator_lcd', 'pos_iban_reader', 'sock_outfit_check',
-                'song_finder', 'cooking_guide'
+                'light_meter', 'qibla_compass', 'song_finder'
             ]);
             const shouldDetectObjects = state.cocoModel &&
                 (!nonObjectModes.has(state.mode) || (state.targetFilter !== 'auto' && state.targetFilter !== 'screen_qr'));
@@ -1443,11 +1461,74 @@
             }
 
             handleModeDispatch(anW, anH, vw, vh, metrics, qrDetection, predictions);
+            triggerUniversalLiveOcrIfSteady(metrics, predictions);
         }
 
         if (state.isRunning) {
             requestAnimationFrame(processFrameLoop);
         }
+    }
+
+    /**
+     * CANLI KAMERADA "NE GÖRÜRSE DOĞRUDAN OKUYAN" EVRENSEL ARKA PLAN OCR MOTORU:
+     * Kullanıcı tuşa basmasa veya mod değiştirmese bile kamera net bir yazıya tutulduğunda
+     * (tabela, kağıt, ilaç kutusu, ekran, kapı numarası, fiş, otobüs hattı) yazıyı otomatik okur.
+     */
+    state.lastLiveAutoOcrAt = 0;
+    state.lastLiveSpokenText = '';
+    state.lastLiveSpokenAt = 0;
+
+    function triggerUniversalLiveOcrIfSteady(metrics, predictions) {
+        if (!state.isRunning || state.isProcessingOcr || typeof window.Tesseract === 'undefined') return;
+        if (state.mode === 'light_meter' || state.mode === 'qibla_compass' || state.mode === 'song_finder') return;
+        if (!metrics || metrics.sharpness < 6.0 || metrics.avgBrightness < 38) return;
+
+        const now = performance.now();
+        if (now - (state.lastLiveAutoOcrAt || 0) < 3400) return;
+
+        const strokeCheck = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
+        if (!strokeCheck || !strokeCheck.hasTextLikely) return;
+
+        state.lastLiveAutoOcrAt = now;
+        state.isProcessingOcr = true;
+        const targetCanvas = strokeCheck.ocrCanvas || el.analysisCanvas;
+
+        Promise.resolve()
+            .then(() => window.Tesseract.recognize(targetCanvas, 'tur+eng'))
+            .then((ocrRes) => {
+                if (!state.isRunning) return;
+                const liveText = extractVerifiedRealTextFromOcrResult(ocrRes).trim();
+                if (!liveText || liveText.length < 2) return;
+
+                const tNow = performance.now();
+                const isSameAsLast = state.lastLiveSpokenText &&
+                    (state.lastLiveSpokenText === liveText || computeTrigramSimilarity(state.lastLiveSpokenText, liveText) >= 0.72);
+                if (isSameAsLast && (tNow - (state.lastLiveSpokenAt || 0) < 12000)) return;
+
+                state.lastLiveSpokenText = liveText;
+                state.lastLiveSpokenAt = tNow;
+
+                if (state.mode === 'bus_stop_tracker') {
+                    const busRep = processBusRouteOcrResult(liveText, predictions);
+                    showDetectedResult('🚌 Canlı Otobüs / Durak Yazısı', busRep.fullText);
+                    announceGuidance(busRep.speechText, { force: true, bannerState: 'centered' });
+                    return;
+                }
+
+                const insights = buildUniversalSmartInsights(liveText, liveText, '');
+                const extraSpeech = insights.speechNotes.length > 0 ? ` ${insights.speechNotes.join(' ')}` : '';
+                const extraReport = insights.reportLines.length > 0 ? `\n\n${insights.reportLines.join('\n')}` : '';
+
+                showDetectedResult('👁️ Canlı Kamerada Okunan Yazı', `${liveText}${extraReport}`);
+                announceGuidance(`Okunan yazı: ${liveText.replace(/\s+/g, ' ')}.${extraSpeech}`, {
+                    force: true,
+                    bannerState: insights.hasExpiredAlarm ? 'warning' : 'centered'
+                });
+            })
+            .catch(() => {})
+            .finally(() => {
+                state.isProcessingOcr = false;
+            });
     }
 
     /**
@@ -3967,7 +4048,7 @@
             }
         }
 
-        if (cleanText && cleanText.trim().length >= 3) {
+        if (cleanText && cleanText.trim().length >= 1) {
             const banknote = detectTurkishBanknoteFromTextAndColor(cleanText);
             if (banknote) {
                 sentences.push(`Fotoğrafta ${banknote} kağıt para yazısı okundu.`);
@@ -4092,11 +4173,11 @@
         if (!hitDescription && ocrLines && ocrLines.length > 0) {
             for (let i = 0; i < ocrLines.length; i++) {
                 const ln = ocrLines[i];
-                const lineConf = typeof ln.confidence === 'number' ? ln.confidence : 0;
-                if (lineConf >= 66 && ln.bbox && px >= ln.bbox.x0 && px <= ln.bbox.x1 && py >= ln.bbox.y0 && py <= ln.bbox.y1) {
+                const lineConf = typeof ln.confidence === 'number' ? ln.confidence : 75;
+                if (lineConf >= 38 && ln.bbox && px >= ln.bbox.x0 && px <= ln.bbox.x1 && py >= ln.bbox.y0 && py <= ln.bbox.y1) {
                     const cleanLn = (ln.text || '').replace(/\s+/g, ' ').trim();
-                    const alphaCount = (cleanLn.match(/[A-Za-zÇĞİÖŞÜçğıöşü0-9]/g) || []).length;
-                    if (cleanLn.length >= 2 && alphaCount >= 2 && (alphaCount / cleanLn.length) >= 0.65) {
+                    const alphaCount = (cleanLn.match(/[\p{L}\p{N}]/gu) || []).length;
+                    if (cleanLn.length >= 1 && alphaCount >= 1 && (alphaCount / cleanLn.length) >= 0.42) {
                         hitDescription = `${zoneName} yazı: ${cleanLn}`;
                         break;
                     }
@@ -4157,6 +4238,82 @@
         hideRetinaFlash();
 
         await analyzePhotoCanvasAndDescribe(capCanvas, isAutoTriggered ? 'Otomatik Çekilen Fotoğraf' : 'Kamera Fotoğrafı');
+    }
+
+    /**
+     * EVRENSEL AKILLI METİN DENETÇİSİ ("NE GÖRÜRSE OKUYAN VE ANLAYAN KAMERA"):
+     * Kullanıcı hangi modda olursa olsun kamerada okunan bir metin içinde Son Kullanma Tarihi (SKT),
+     * İlaç Dozajı, Gıda Alerjeni, IBAN, POS Tutarı, Besin Değeri veya Maç Skoru varsa
+     * mod değiştirmeye gerek kalmadan otomatik yakalar ve kullanıcıya bildirir.
+     */
+    function buildUniversalSmartInsights(cleanText, primaryPassVerifiedText = '', secondaryRawVerifiedText = '') {
+        const text = String(cleanText || '').trim();
+        if (!text) return { speechNotes: [], reportLines: [], hasExpiredAlarm: false };
+
+        const speechNotes = [];
+        const reportLines = [];
+        let hasExpiredAlarm = false;
+
+        // 1. İlaç / Gıda Son Kullanma Tarihi (SKT / TETT / EXP) ve Dozaj Kontrolü
+        const med = parseMedicineAndExpiryZeroError(primaryPassVerifiedText || text, state.lastDetectedBarcode, secondaryRawVerifiedText);
+        if (med.formattedDate !== 'Doğrulanamadı') {
+            if (med.sktStatus === 'EXPIRED') {
+                hasExpiredAlarm = true;
+                radar.playDangerAlarm();
+                if (navigator.vibrate) navigator.vibrate([250, 80, 250, 80, 350]);
+            }
+            speechNotes.push(med.sktSpeech);
+            reportLines.push(`Son Kullanma Tarihi: ${med.sktSpeech}`);
+        }
+        if (med.dosages.length > 0) {
+            const dosStr = `Miktar / Dozaj: ${med.dosages.join(', ')}.`;
+            speechNotes.push(dosStr);
+            reportLines.push(dosStr);
+        }
+        if (med.usageInstructions.length > 0) {
+            const useStr = `Kullanım Tarifi: ${med.usageInstructions.join(', ')}.`;
+            speechNotes.push(useStr);
+            reportLines.push(useStr);
+        }
+
+        // 2. Gıda Alerjeni ve Güvenli İbare Kontrolü
+        const pkg = parseFoodAllergensAndIngredients(text);
+        if (pkg.freeFromNotes && pkg.freeFromNotes.length > 0) {
+            const freeStr = `Güvenli İbare: ${pkg.freeFromNotes.join(', ')}.`;
+            speechNotes.push(freeStr);
+            reportLines.push(freeStr);
+        }
+        if (pkg.allergens && pkg.allergens.length > 0) {
+            const alStr = `DİKKAT ALERJİ UYARISI: ${pkg.allergens.join(', ')} içeriyor!`;
+            speechNotes.push(alStr);
+            reportLines.push(alStr);
+        }
+
+        // 3. TR IBAN ve POS / Fiş Toplam Tutarı Kontrolü
+        const hasIbanCandidate = /\bTR\s*[0-9OISB\s\-]{16,34}/i.test(text);
+        const hasExplicitPosTotal = /(?:TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS)\s*[:.]?\s*(?:₺\s*)?\d/i.test(text);
+        if (hasIbanCandidate || hasExplicitPosTotal) {
+            const posIban = processPosAmountAndIbanText(text, primaryPassVerifiedText, secondaryRawVerifiedText);
+            if (posIban && posIban.speechText && !posIban.speechText.startsWith('POS tutarı veya IBAN net seçilemedi') && !posIban.speechText.startsWith('Ekranda henüz')) {
+                speechNotes.push(posIban.speechText);
+                reportLines.push(posIban.speechText);
+            }
+        }
+
+        // 4. Besin Değeri / Kalori Tablosu Kontrolü
+        if (/(?:ENERJİ|ENERJI|BESİN|BESIN|KCAL|KKAL|KALORİ|KALORI)/i.test(text)) {
+            const calInfo = parsePackageOrMenuCaloriesKind(text);
+            if (calInfo && calInfo.speechText && calInfo.speechText.startsWith('Pakette okunan besin değerleri')) {
+                speechNotes.push(calInfo.speechText);
+                reportLines.push(calInfo.speechText);
+            }
+        }
+
+        return {
+            speechNotes,
+            reportLines,
+            hasExpiredAlarm
+        };
     }
 
     /**
@@ -4365,12 +4522,37 @@
                         { name: 'Regal', regex: /\bREGAL\b/i },
                         { name: 'Grundig', regex: /\bGRUNDIG\b/i },
                         { name: 'Samsung', regex: /\bSAMSUNG\b/i },
-                        { name: 'LG', regex: /\bLG\b/ }
+                        { name: 'LG', regex: /\bLG\b/ },
+                        { name: 'Midea', regex: /\bMIDEA\b/i },
+                        { name: 'Electrolux', regex: /\bELECTROLUX\b/i },
+                        { name: 'Teka', regex: /\bTEKA\b/i },
+                        { name: 'Franke', regex: /\bFRANKE\b/i },
+                        { name: 'Silverline', regex: /\bSILVERLINE\b/i },
+                        { name: 'Mitsubishi', regex: /\bMITSUBISHI\b/i },
+                        { name: 'Toshiba', regex: /\bTOSHIBA\b/i },
+                        { name: 'Kumtel', regex: /\bKUMTEL\b/i },
+                        { name: 'Luxell', regex: /\bLUXELL\b/i },
+                        { name: 'Fakir', regex: /\bFAKIR\b/i },
+                        { name: 'Philips', regex: /\bPHILIPS\b/i },
+                        { name: 'Korkmaz', regex: /\bKORKMAZ\b/i },
+                        { name: 'Karaca', regex: /\bKARACA\b/i },
+                        { name: 'Simfer', regex: /\bS[İI]MFER\b/i },
+                        { name: 'Hoover', regex: /\bHOOVER\b/i },
+                        { name: 'Candy', regex: /\bCANDY\b/i },
+                        { name: 'Indesit', regex: /\bINDESIT\b/i },
+                        { name: 'Hotpoint', regex: /\bHOTPOINT\b/i },
+                        { name: 'Whirlpool', regex: /\bWHIRLPOOL\b/i },
+                        { name: 'Miele', regex: /\bMIELE\b/i },
+                        { name: 'Gree', regex: /\bGREE\b/i },
+                        { name: 'Baxi', regex: /\bBAXI\b/i },
+                        { name: 'Immergas', regex: /\bIMMERGAS\b/i }
                     ];
                     const verifiedBrands = brandRules.filter(b => b.regex.test(cleanText)).map(b => b.name);
                     const brandLine = verifiedBrands.length > 0
                         ? `Doğrulanmış Cihaz / Kombi Markası: ${verifiedBrands.join(', ')}.`
-                        : 'Cihazın üzerindeki marka yazısı bu açıdan harf harf okunamadı; yanlış servis çağırmamanız için markayı kesinlikle tahmin etmiyorum.';
+                        : (cleanText
+                            ? `Okunan Ekran / Kapı / Cihaz Yazısı: ${cleanText.replace(/\s+/g, ' ')}.`
+                            : 'Bu açıdan henüz yazı veya rakam okunamadı.');
 
                     const degMatches = cleanText.match(/\b\d{1,4}(?:[.,]\d)?\s*(?:°\s*C|derece|bar|devir|dk|dakika|kat|daire|no)\b/gi) || [];
                     const errMatches = cleanText.match(/\b(?:E|F|ERR|HATA)\s*[-:]?\s*\d{1,3}\b/gi) || [];
@@ -4378,11 +4560,14 @@
                     const errLine = errMatches.length > 0 ? `Algılanan Arıza Kodu: ${[...new Set(errMatches)].join(', ')}. ` : '';
                     const summaryNums = degMatches.length > 0
                         ? `${errLine}Birimli Değerler: ${degMatches.join(', ')}.`
-                        : (numTokens.length > 0 ? `${errLine}Okunan Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : (errLine || 'Rakam algılanamadı.'));
+                        : (numTokens.length > 0 ? `${errLine}Okunan Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : (errLine || ''));
                     const boilerSafetyNote = 'Güvenlik uyarısı: Kombi su basıncı veya gaz vanası gibi kritik müdahalelerde kameradaki rakama tek başına güvenmeyin; mutlaka gören bir yakınınıza veya yetkili servise kontrol ettirin.';
-                    const panelReport = `${brandLine}\n${summaryNums}\n\n⚠️ ${boilerSafetyNote}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`;
+                    const panelReport = `${brandLine}\n${summaryNums}\n\n⚠️ ${boilerSafetyNote}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`.trim();
                     showDetectedResult('Kapı Numarası, Asansör & Kombi / Makine Ekranı Raporu', panelReport);
-                    announceGuidance(`${brandLine} ${summaryNums} ${cleanText.replace(/\s+/g, ' ')}. ${boilerSafetyNote}`, {
+                    const spokenPanel = verifiedBrands.length > 0
+                        ? `${brandLine} ${summaryNums} ${cleanText.replace(/\s+/g, ' ')}. ${boilerSafetyNote}`
+                        : `${brandLine} ${summaryNums} ${boilerSafetyNote}`;
+                    announceGuidance(spokenPanel.replace(/\s+/g, ' ').trim(), {
                         force: true,
                         bannerState: 'centered'
                     });
@@ -4443,13 +4628,20 @@
                     return;
                 }
 
-                // ÖZEL MOD 23: ADIM ADIM SESLİ YEMEK TARİFLERİ REHBERİ (SADECE SESLİ TARİF ADIMINI OKUR)
+                // ÖZEL MOD 23: ADIM ADIM SESLİ YEMEK TARİFLERİ REHBERİ (HEM KAMERADAKİ MALZEME/PAKET YAZISINI OKUR HEM TARİF ADIMINI SÖYLER)
                 if (state.mode === 'cooking_guide') {
-                    stepCookingInstruction(0);
+                    if (cleanText) {
+                        const cookInsights = buildUniversalSmartInsights(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText);
+                        const extraNotes = cookInsights.speechNotes.length > 0 ? ` ${cookInsights.speechNotes.join(' ')}` : '';
+                        showDetectedResult('🍳 Yemek Rehberi — Okunan Malzeme / Paket Yazısı', `Okunan Yazı: ${cleanText}\n${cookInsights.reportLines.join('\n')}\n\n${fullStory}`.trim());
+                        announceGuidance(`Kamerada okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.${extraNotes}`, { force: true, bannerState: 'centered' });
+                    } else {
+                        stepCookingInstruction(0);
+                    }
                     return;
                 }
 
-                // ÖZEL MOD 5 (PARA SAYMA): ÇEKİLEN FOTOĞRAFTA KAĞIT PARA VEYA DEMİR PARA VARSA OTOMATİK TOPLAMA EKLE
+                // ÖZEL MOD 5 (PARA SAYMA VE TÜM GENEL MODLAR): ÇEKİLEN FOTOĞRAFTA KAĞIT PARA VEYA DEMİR PARA VARSA OTOMATİK TOPLAMA EKLE
                 const centerColName = metrics.centerColor ? metrics.centerColor.name : '';
                 let banknoteDetails = detectTurkishBanknoteDetailsFromText(cleanText, centerColName);
                 if (!banknoteDetails && state.mode === 'color_cloth') {
@@ -4508,18 +4700,20 @@
                     return;
                 }
 
-                const parsedQuestions = (state.mode === 'exam_reader')
-                    ? parseExamQuestionsAndOptions(verifiedMultilineText.trim())
-                    : [];
-                if (state.mode === 'exam_reader') {
+                // EVRENSEL SINAV VE DÜZ METİN OKUYUCU: Hangi genel modda olunursa olunsun A-B-C-D-E şıklı soru varsa kumandayı açar;
+                // şıklı soru yoksa kullanıcıyı "şıklı soru algılanmadı" diye uyarmak yerine gördüğü her yazıyı ve akıllı bulguları doğrudan okur!
+                const parsedQuestions = parseExamQuestionsAndOptions((verifiedMultilineText || cleanText).trim());
+                const hasDetectedExamOptions = parsedQuestions.length > 0 && Boolean(parsedQuestions[0].options.A || parsedQuestions[0].options.B || parsedQuestions[0].options.C);
+
+                if (hasDetectedExamOptions || state.mode === 'exam_reader') {
                     if (parsedQuestions.length > 0) {
                         state.examQuestions = parsedQuestions;
                     } else {
                         state.examQuestions = [{
                             number: 1,
                             stem: cleanText
-                                ? `Bu sayfada şıklı soru algılanmadı. Okunan düz metin: ${cleanText.replace(/\s+/g, ' ')}`
-                                : 'Bu görüntüde okunabilir bir sınav sorusu veya şık bulunamadı.',
+                                ? `Okunan Metin: ${cleanText.replace(/\s+/g, ' ')}`
+                                : 'Bu görüntüde henüz okunabilir bir yazı bulunamadı.',
                             options: { A: '', B: '', C: '', D: '', E: '' }
                         }];
                     }
@@ -4527,8 +4721,8 @@
                     updateExamRemoteUI();
                 }
 
-                const firstQ = (state.mode === 'exam_reader' && state.examQuestions.length > 0) ? state.examQuestions[0] : null;
-                const hasOptions = firstQ && (firstQ.options.A || firstQ.options.B || firstQ.options.C);
+                const firstQ = (state.examQuestions && state.examQuestions.length > 0) ? state.examQuestions[0] : null;
+                const hasOptions = hasDetectedExamOptions && firstQ && (firstQ.options.A || firstQ.options.B || firstQ.options.C);
 
                 if (hasOptions) {
                     const colNote = splitInfo.isTwoColumn ? 'Yan yana iki sütunlu test kağıdı birbirine karışmadan ayrıldı.' : '';
@@ -4539,21 +4733,32 @@
                             .join('\n') + `\n\n--- Sahne Betimlemesi ---\n${fullStory}`;
                     showDetectedResult('Sınav Sorusu ve Şıklar', finalReport.trim());
                     speakCurrentQuestionStem();
-                } else if (state.mode === 'exam_reader') {
-                    const msg = cleanText
-                        ? `Bu sayfada A, B, C, D, E şıklı bir test sorusu algılanmadı. Sayfada okunan düz metin: ${cleanText.replace(/\s+/g, ' ')}`
-                        : 'Bu görüntüde okunabilir bir sınav sorusu veya şık bulunamadı. Lütfen kamerayı sınav kağıdına dik ve net şekilde tutup tekrar deneyin.';
-                    showDetectedResult('Sınav Okuyucu Sonucu', msg);
-                    announceGuidance(msg, {
-                        force: true,
-                        bannerState: cleanText ? 'centered' : 'warning'
-                    });
                 } else {
-                    showDetectedResult(`${sourceLabel} — Detaylı Betimleme ve Yazılar`, fullStory);
-                    announceGuidance(fullStory, {
-                        force: true,
-                        bannerState: 'centered'
-                    });
+                    const universalInsights = buildUniversalSmartInsights(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText);
+                    const insightSpeech = universalInsights.speechNotes.length > 0
+                        ? ` ${universalInsights.speechNotes.join(' ')}`
+                        : '';
+                    const insightReport = universalInsights.reportLines.length > 0
+                        ? `\n\n--- Akıllı Denetçi Bulguları ---\n${universalInsights.reportLines.join('\n')}`
+                        : '';
+
+                    if (cleanText) {
+                        const directSpeech = `Okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.${insightSpeech}`;
+                        showDetectedResult(
+                            `${sourceLabel} — Okunan Yazı ve Detaylı Betimleme`,
+                            `Okunan Yazı:\n${cleanText}${insightReport}\n\n--- Sahne Betimlemesi ---\n${fullStory}`
+                        );
+                        announceGuidance(directSpeech, {
+                            force: true,
+                            bannerState: universalInsights.hasExpiredAlarm ? 'warning' : 'centered'
+                        });
+                    } else {
+                        showDetectedResult(`${sourceLabel} — Detaylı Betimleme`, fullStory);
+                        announceGuidance(fullStory, {
+                            force: true,
+                            bannerState: 'centered'
+                        });
+                    }
                 }
             } catch (_) {
                 showDetectedResult(`${sourceLabel} — Detaylı Betimleme`, initialStory);
@@ -4831,7 +5036,7 @@
 
     /**
      * Tesseract OCR çıktısından gelen gürültü/doku uydurmalarını (halüsinasyonları) eler;
-     * SADECE gerçek harf/kelime içeren ve güven skoru yüksek olan gerçek ekran yazılarını döndürür.
+     * kameranın gördüğü her türlü gerçek yazıyı, kısa kodu, kapı numarasını, markayı ve etiketi eksiksiz döndürür.
      */
     function extractVerifiedRealTextFromOcrResult(ocrRes, separator = ' — ') {
         if (!ocrRes || !ocrRes.data) return '';
@@ -4840,30 +5045,43 @@
 
         for (let i = 0; i < lines.length; i++) {
             const ln = lines[i];
-            const conf = typeof ln.confidence === 'number' ? ln.confidence : (ocrRes.data.confidence || 0);
-            if (conf < 65) continue;
+            const conf = typeof ln.confidence === 'number'
+                ? ln.confidence
+                : (typeof ocrRes.data.confidence === 'number' ? ocrRes.data.confidence : 75);
+            if (conf < 38) continue;
 
             const raw = String(ln.text || '').replace(/\s+/g, ' ').trim();
             if (!raw) continue;
 
-            // Kısa kapı numaraları ("5", "12"), kağıt para kupürleri ("5", "10", "20", "50", "100", "200")
-            // ve kısa sınav şıkları ("A) 5", "B) -2") yüksek güven skorluysa elenmesin!
-            const isShortValidNumber = /^\d{1,3}$/.test(raw) && conf >= 70;
-            const isShortExamOption = /^(?:[\(\[]?[A-Ea-e][\)\]\.\-:]\s*\S+)/.test(raw) && conf >= 65;
+            // Kısa kapı/kat numaraları ("5", "12", "B1", "Z"), kısa markalar ("LG"), arıza kodları ("E4", "F2")
+            // ve kısa sınav şıkları ("A) 5", "B) -2") elenmesin!
+            const isShortValidToken = /^[\p{L}\p{N}]{1,3}$/u.test(raw) && conf >= 42;
+            const isShortExamOption = /^(?:[\(\[]?[A-Ea-e][\)\]\.\-:]\s*\S+)/.test(raw) && conf >= 38;
 
-            if (!isShortValidNumber && !isShortExamOption) {
-                if (raw.length < 3) continue;
-
-                // Gerçek harf veya rakam oranı kontrolü (yaprak/duvar dokusundan çıkan "| \ / _ ~" çöplerini reddet)
+            if (!isShortValidToken && !isShortExamOption) {
                 const alphaNumMatches = raw.match(/[\p{L}\p{N}]/gu) || [];
-                const alphaRatio = alphaNumMatches.length / raw.length;
-                if (alphaNumMatches.length < 3 || alphaRatio < 0.65) continue;
+                const alphaRatio = alphaNumMatches.length / Math.max(1, raw.length);
+                if (alphaNumMatches.length < 1 || alphaRatio < 0.42) continue;
 
-                // En az bir anlamlı (2+ harfli) kelime veya 1+ haneli sayı içermeli
-                if (!/[\p{L}]{2,}|\d{1,}/u.test(raw)) continue;
+                if (!/[\p{L}\p{N}]+/u.test(raw)) continue;
             }
 
             verifiedLines.push(raw);
+        }
+
+        if (verifiedLines.length === 0 && typeof ocrRes.data.text === 'string' && ocrRes.data.text.trim()) {
+            const overallConf = typeof ocrRes.data.confidence === 'number' ? ocrRes.data.confidence : 75;
+            if (overallConf >= 35) {
+                const rawLines = ocrRes.data.text.split(/\r?\n/);
+                for (let j = 0; j < rawLines.length; j++) {
+                    const rLine = rawLines[j].replace(/\s+/g, ' ').trim();
+                    if (!rLine) continue;
+                    const anMatches = rLine.match(/[\p{L}\p{N}]/gu) || [];
+                    if (anMatches.length >= 1 && (anMatches.length / rLine.length) >= 0.42) {
+                        verifiedLines.push(rLine);
+                    }
+                }
+            }
         }
 
         return verifiedLines.join(separator);
@@ -7546,16 +7764,14 @@
     function processBusRouteOcrResult(cleanText, preds) {
         const upper = String(cleanText || '').toUpperCase();
         const hasBus = Array.isArray(preds) && preds.some(p => p.class === 'bus');
-        const hasBusContextWords = /(?:^|[^\p{L}])(?:HAT|OTOBÜS|OTOBUS|MİNİBÜS|MINIBUS|DOLMUŞ|DOLMUS|DURAK|DURAĞI|İETT|IETT|EGO|ESHOT|METRO|METROBÜS|TRAMVAY|PERON)(?=$|[^\p{L}])/iu.test(upper);
-        const cleanedForBus = upper.replace(/\b(?:PERON|SAAT|KAPI|HAT\s*BOYU)\s*[:.]?\s*\d{1,4}\b/g, ' ');
-        const alphaNumRouteMatches = (hasBus || hasBusContextWords)
-            ? (cleanedForBus.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [])
-            : [];
-        const pureNumMatches = (hasBus || hasBusContextWords)
-            ? (cleanedForBus.match(/\b[1-9]\d{0,3}\b/g) || [])
-            : [];
+        const cleanedForBus = upper
+            .replace(/\b(?:PERON|SAAT|KAPI|HAT\s*BOYU)\s*[:.]?\s*\d{1,4}\b/g, ' ')
+            .replace(/\b\d{1,4}\s*(?:TL|KR|KURUŞ|MG|ML|GR|KG|CM|MM|DK|SN|GB|MB|HZ|W|V|DERECE|KKAL|KCAL)\b/g, ' ');
+        const alphaNumRouteMatches = (cleanedForBus.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [])
+            .filter(tok => !/^(?:\d+(?:TL|KR|MG|ML|GR|KG|CM|MM|DK|SN|GB|MB|HZ)|3D|4K|2D)$/i.test(tok));
+        const pureNumMatches = cleanedForBus.match(/\b[1-9]\d{0,3}\b/g) || [];
         const routeMatches = alphaNumRouteMatches.length > 0 ? alphaNumRouteMatches : pureNumMatches;
-        const filteredRoutes = [...new Set(routeMatches)].filter(tok => tok.length >= 1 && tok !== '2026' && tok !== '2025');
+        const filteredRoutes = [...new Set(routeMatches)].filter(tok => tok.length >= 1 && tok !== '2026' && tok !== '2025' && tok !== '2024');
         const badgeEl = document.getElementById('bus-seen-number');
 
         if (filteredRoutes.length > 0) {
@@ -7563,15 +7779,17 @@
             state.lastSeenBusRoute = topRoute;
             if (badgeEl) badgeEl.textContent = `${topRoute} Numaralı Hat`;
             if (navigator.vibrate) navigator.vibrate([180, 70, 220]);
-            const speech = `Yaklaşan otobüs veya durak tabelasında okunan hat numarası: ${topRoute}. Güvenliğiniz için kaldırımdan inmeyin ve binmeden önce şoföre hattı teyit ettirin. ${cleanText.replace(/\s+/g, ' ').slice(0, 100)}`;
+            const speech = `Yaklaşan otobüs veya durak tabelasında okunan hat numarası: ${topRoute}. Tabeladaki tam yazı: ${cleanText.replace(/\s+/g, ' ').slice(0, 140)}. Güvenliğiniz için kaldırımdan inmeyin ve binmeden önce şoföre hattı teyit ettirin.`;
             return {
                 speechText: speech,
                 fullText: `Okunan Hat Numarası: ${topRoute}\nAraç Algılandı mı: ${hasBus ? 'Evet (Otobüs/Minibüs)' : 'Durak Tabelası / Hat Yazısı'}\nGüvenlik Notu: Binmeden önce şoföre hattı teyit ettirin.\n\nTam Okunan Metin:\n${cleanText}`
             };
         }
-        const fallbackSpeech = hasBus
-            ? 'Otobüs algılandı ancak ön tabeladaki hat numarası tam seçilemedi, lütfen kaldırımda güvenli şekilde bekleyip araç yaklaşınca tekrar okutun.'
-            : (cleanText ? `Kamerada henüz otobüs görünmüyor; okunan yazı: ${cleanText.replace(/\s+/g, ' ')}` : 'Henüz yaklaşan bir otobüs veya hat numarası algılanmadı.');
+        const fallbackSpeech = cleanText
+            ? `Okunan tabela veya yazı: ${cleanText.replace(/\s+/g, ' ')}`
+            : (hasBus
+                ? 'Otobüs algılandı ancak ön tabeladaki hat numarası tam seçilemedi, lütfen kaldırımda güvenli şekilde bekleyip araç yaklaşınca tekrar okutun.'
+                : 'Henüz yaklaşan bir otobüs veya hat numarası algılanmadı.');
         return {
             speechText: fallbackSpeech,
             fullText: fallbackSpeech
