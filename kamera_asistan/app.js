@@ -4846,7 +4846,7 @@
                     return;
                 }
 
-                // ÖZEL MOD 5 (PARA SAYMA VE TÜM GENEL MODLAR): ÇEKİLEN FOTOĞRAFTA KAĞIT PARA VEYA DEMİR PARA VARSA OTOMATİK TOPLAMA EKLE
+                // ÖZEL MOD 5 (PARA SAYMA VE TÜM GENEL MODLAR): KAĞIT PARA ALGILANDIĞINDA SADECE 5. MODDA TOPLAMA EKLE, DİĞER MODLARDA SADECE SÖYLE
                 const centerColName = metrics.centerColor ? metrics.centerColor.name : '';
                 let banknoteDetails = detectTurkishBanknoteDetailsFromText(cleanText, centerColName);
                 const hasBanknoteWordsInText = /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|MERKEZ\s*BANK|CUMHUR[İI]YET\s*MERKEZ/i.test(cleanText || '');
@@ -4866,7 +4866,7 @@
                 const photoCoins = (state.mode === 'color_cloth' || state.mode === 'anomaly_led')
                     ? detectAndClassifyTurkishCoins(metrics, capCanvas.width, capCanvas.height, cleanText)
                     : { coins: [], totalKurus: 0, totalFormatted: '0 Kuruş' };
-                if (banknoteDetails || (state.mode === 'color_cloth' && photoCoins.coins.length > 0)) {
+                if (state.mode === 'color_cloth' && (banknoteDetails || photoCoins.coins.length > 0)) {
                     if (banknoteDetails && banknoteDetails.serialNumber && state.moneySeenSerialNumbers && state.moneySeenSerialNumbers.has(banknoteDetails.serialNumber)) {
                         announceGuidance(`Bu ${banknoteDetails.label} kağıt parayı zaten saymıştınız, toplamınıza tekrar eklenmedi. Şu anki toplamınız: ${formatTurkishKurusTotal(state.moneyTotalKurus)}.`, {
                             force: true,
@@ -4903,6 +4903,16 @@
                         `💵🪙 ${fullAddedLabel} Eklendi — Toplam: ${totalFormatted}`,
                         `Eklenen Para: ${fullAddedLabel}\nŞu Anki Toplam Paranız: ${totalFormatted}\nSayılan Paralar: ${breakdown.spokenBreakdown}\n\n--- Detaylı Betimleme ---\n${fullStory}`
                     );
+                    return;
+                } else if (banknoteDetails && state.mode !== 'color_cloth') {
+                    showDetectedResult(
+                        `💵 Algılanan Kağıt Para: ${banknoteDetails.label}`,
+                        `Görüntüdeki Kağıt Para: ${banknoteDetails.label}\n(Not: Paralarınızı cüzdan toplamınıza eklemek isterseniz 5. Bölüm olan Canlı Para Sayma moduna geçebilirsiniz.)\n\n--- Detaylı Betimleme ---\n${fullStory}`
+                    );
+                    announceGuidance(`Görüntüde ${banknoteDetails.label} kağıt para algılandı. Paralarınızı toplamak isterseniz 5. Bölüm olan Canlı Para Sayma moduna geçebilirsiniz.`, {
+                        force: true,
+                        bannerState: 'centered'
+                    });
                     return;
                 }
 
@@ -8567,6 +8577,13 @@
         }
         const q = raw.toLocaleLowerCase('tr-TR');
 
+        // 0. "Hangi Bölümdeyim / Hangi Moddayım" Durum Sorgusu
+        if (/(?:hangi\s*bölüm|hangi\s*mod|ne\s*açık|şu\s*an\s*ne\s*açık)/u.test(q)) {
+            const activeStatus = getActiveModeSpokenStatus();
+            announceGuidance(activeStatus, { force: true, bannerState: 'centered' });
+            return 'active_mode_status';
+        }
+
         // 1. Otobüs Durağı Alarmı ve Yolculuk Senaryosu
         if (/(?:otobüs|minibüs|dolmuş|durak|durağı|durağında|durağına|ineceğim|hat\s*numarası)/u.test(q)) {
             setMode('bus_stop_tracker');
@@ -10275,6 +10292,23 @@
         if (el.targetFilterSection) {
             el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder' || activeMode === 'item_memory' || activeMode === 'step_calorie_guide' || activeMode === 'cooking_guide');
         }
+        if (el.btnWhatsappHold) {
+            el.btnWhatsappHold.hidden = (activeMode !== 'qr_screen');
+        }
+    }
+
+    function getActiveModeSpokenStatus() {
+        let activeLabel = state.mode;
+        if (el.modeButtons && el.modeButtons.length > 0) {
+            for (const btn of el.modeButtons) {
+                if (btn.getAttribute('data-mode') === state.mode) {
+                    activeLabel = btn.getAttribute('aria-label') || btn.textContent.trim();
+                    break;
+                }
+            }
+        }
+        const camState = state.isRunning ? 'Kamera şu an açık.' : 'Kamera şu an kapalı.';
+        return `Şu an aktif bölüm: ${activeLabel}. ${camState}`;
     }
 
     function setMode(newMode) {
@@ -10287,6 +10321,17 @@
         state.signatureDocVerified = false;
         state.lastDetectedBarcode = '';
         state.sockSubMode = 'sock';
+
+        // Ön (Selfie) kamerada unutulma şikayetini önle: Özçekim (4) ve Odada Kim Var (14) dışındaki belge/nesne modlarına geçildiğinde otomatik Arka Kameraya dön
+        if (newMode !== 'portrait' && newMode !== 'social_presence' && state.facingMode === 'user') {
+            state.facingMode = 'environment';
+            if (el.btnSwitchCam) {
+                el.btnSwitchCam.textContent = '🔄 Kamera: Arka';
+            }
+            if (state.isRunning) {
+                startCamera();
+            }
+        }
 
         if (newMode !== 'qr_screen' && state.whatsappHoldTimer) {
             clearInterval(state.whatsappHoldTimer);
@@ -10498,7 +10543,12 @@
     window.addEventListener('click', markUserInteraction, true);
     window.addEventListener('touchstart', markUserInteraction, { passive: true });
     el.btnWhatsappHold.addEventListener('click', startWhatsapp15SecAudioHold);
-    el.btnRepeat.addEventListener('click', () => announceGuidance(state.lastSpeechText, { force: true }));
+    el.btnRepeat.addEventListener('click', () => {
+        const textToRepeat = (state.lastSpeechText && state.lastSpeechText.trim())
+            ? state.lastSpeechText
+            : getActiveModeSpokenStatus();
+        announceGuidance(textToRepeat, { force: true });
+    });
 
     // Kıble Pusulası Düğmeleri
     if (el.btnStartQibla) {
