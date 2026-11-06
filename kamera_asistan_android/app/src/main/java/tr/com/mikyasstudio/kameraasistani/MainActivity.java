@@ -575,7 +575,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
     }
 
     private void loadAssistantApp() {
-        // Güvenli HTTPS üzerinden en güncel sürümü doğrudan yükler (FileOutputStream dropper kullanmadan).
+        // Güvenli HTTPS üzerinden en güncel sürümü doğrudan yükler.
         // İnternet yoksa WebViewClient.onReceivedError otomatik olarak çevrimdışı yerel kopyayı (LOCAL_FALLBACK_URL) açar.
         webView.loadUrl(LIVE_APP_URL + "?t=" + (System.currentTimeMillis() / 60000L));
     }

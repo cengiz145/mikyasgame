@@ -1512,7 +1512,7 @@
 
     function checkCameraIdleSleep(nowMs) {
         if (!state.isRunning) return false;
-        if (state.tvAutoReaderActive || state.degreeLiveTrackingActive || state.busTargetStop || state.whatsappHoldTimer) return false;
+        if (state.tvAutoReaderActive || state.degreeLiveTrackingActive || state.laundrySortLiveActive || state.busTargetStop || state.whatsappHoldTimer) return false;
         const elapsed = (nowMs || performance.now()) - (state.lastUserInteractionAt || 0);
         if (elapsed >= CAMERA_IDLE_SLEEP_MS) {
             tryEnableHardwareTorch(false);
@@ -1656,7 +1656,7 @@
     state.isLiveBgOcrBusy = false;
 
     function triggerUniversalLiveOcrIfSteady(metrics, predictions) {
-        if (!state.isRunning || state.isProcessingOcr || state.isLiveBgOcrBusy || state.moneyLiveOcrBusy || state.countdownStage > 0 || typeof window.Tesseract === 'undefined') return;
+        if (!state.isRunning || state.isProcessingOcr || state.isLiveBgOcrBusy || state.moneyLiveOcrBusy || state.laundrySortLiveActive || state.countdownStage > 0 || typeof window.Tesseract === 'undefined') return;
         const liveOcrExcludedModes = new Set([
             'light_meter', 'qibla_compass', 'song_finder',
             'color_cloth', 'signature_pen',
@@ -1981,11 +1981,20 @@
                 state.lastQrCode = qrDetection.data;
                 state.lastQrAt = now;
                 radar.playQrSuccessSound();
-                showDetectedResult('QR Kod Başarıyla Çözüldü', qrDetection.data);
-                announceGuidance(`QR kod tam hizalandı ve okundu: ${qrDetection.data}. WhatsApp Web eşleştirmesi için cihazı sabit tutun.`, {
-                    force: true,
-                    bannerState: 'centered'
-                });
+                const isMenuOrWebUrl = /^https?:\/\//i.test(qrDetection.data.trim()) && !/whatsapp/i.test(qrDetection.data);
+                showDetectedResult(isMenuOrWebUrl ? '🍽️🔗 QR Kod / Menü Bağlantısı Okundu' : 'QR Kod Başarıyla Çözüldü', qrDetection.data);
+                if (isMenuOrWebUrl) {
+                    copyTextUniversal(qrDetection.data.trim(), 'QR Menü Bağlantısı');
+                    announceGuidance(`QR kod tam hizalandı ve okundu, bağlantı panoya kopyalandı: ${qrDetection.data}. Eğer bu bir restoran veya kafe menüsüyse, açılan görsel menüyü sesli yemek ve fiyat listesine dönüştürmek için ekrana çift dokunabilir veya Ses Kısma tuşuna çift basarak Ekran Kurtarıcısını kullanabilirsiniz.`, {
+                        force: true,
+                        bannerState: 'centered'
+                    });
+                } else {
+                    announceGuidance(`QR kod tam hizalandı ve okundu: ${qrDetection.data}. WhatsApp Web eşleştirmesi için cihazı sabit tutun.`, {
+                        force: true,
+                        bannerState: 'centered'
+                    });
+                }
             }
             return;
         }
@@ -5914,7 +5923,7 @@
 
                 if (hasOptions) {
                     if (el.examRemotePanel) {
-                        el.examRemotePanel.hidden = (state.mode !== 'exam_reader');
+                        el.examRemotePanel.hidden = false;
                     }
                     const colNote = splitInfo.isTwoColumn ? 'Yan yana iki sütunlu test kağıdı birbirine karışmadan ayrıldı.' : '';
                     const finalReport = `${colNote}\nToplam ${state.examQuestions.length} soru bulundu.\n\nSoru ${firstQ.number}: ${firstQ.stem}\n` +
@@ -9839,13 +9848,13 @@
         }
 
         // 7. Eşyamı Nereye Koydum (Sorma veya Kaydetme) & Görsel Kavanoz / Derin Dondurucu Poşeti Hafızası Senaryosu
-        if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum|kavanoz|dondurucu|poşet|eşya\s*konum|kayıtlı\s*eşya|\b(?:koydum|bıraktım|sakladım|astım|olarak\s*kaydet)\b)/u.test(q)) {
+        if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum|kavanoz|dondurucu|poşet|poşette|eşya\s*konum|kayıtlı\s*eşya|\b(?:koydum|bıraktım|sakladım|astım|olarak\s*kaydet)\b)/u.test(q)) {
             if (/kayıtlı\s*eşya/u.test(q)) {
                 setMode('item_memory', { silentAnnouncement: true });
                 speakAllSavedItemMemories();
                 return 'item_memory';
             }
-            if (/(?:bu\s*kavanoz\s*ne|bu\s*poşet\s*ne|içinde\s*ne\s*var|kavanozu\s*tanı|eşyamı\s*tanı)/u.test(q)) {
+            if (/(?:bu\s*kavanoz|elimdeki\s*kavanoz|bu\s*poşet|bu\s*poşette|içinde\s*ne\s*var|kavanozu\s*tanı|eşyamı\s*tanı)/u.test(q)) {
                 setMode('item_memory', { silentAnnouncement: true });
                 recognizeVisibleJarFromMemory();
                 return 'item_memory_recognize';
@@ -9907,8 +9916,8 @@
         }
 
         // 11. Çorap Eşleştirici, Kombin, Leke, Ters/Düz ve Renkli Çamaşır Ayıklama Senaryosu
-        if (/(?:çorap|çoraplarım|leke\s*var\s*mı|kıyafet\s*uyum|kombin|ters\s*mi|düz\s*mü|dikiş|çamaşır\s*ayıkla|renkli\s*çamaşır|beyaz\s*çamaşır)/u.test(q)) {
-            if (/(?:çamaşır\s*ayıkla|renkli\s*çamaşır|beyaz\s*çamaşır)/u.test(q) && !state.laundrySortLiveActive) {
+        if (/(?:çorap|çoraplarım|leke\s*var\s*mı|kıyafet\s*uyum|kombin|ters\s*mi|düz\s*mü|dikiş|çamaşır\s*ayıkla|çamaşırları\s*ayıkla|beyazlarla\s*renklileri|renkli\s*çamaşır|beyaz\s*çamaşır)/u.test(q)) {
+            if (/(?:çamaşır\s*ayıkla|çamaşırları\s*ayıkla|beyazlarla\s*renklileri|renkli\s*çamaşır|beyaz\s*çamaşır)/u.test(q) && !state.laundrySortLiveActive) {
                 setMode('sock_outfit_check', { silentAnnouncement: true });
                 toggleLaundrySortingLiveMode();
                 return 'sock_laundry_sort';
@@ -9959,9 +9968,9 @@
             return 'door_elevator_lcd';
         }
         if (/(?:alerjen|gluten|laktoz|içindekiler|gıda\s*paket|birim\s*fiyat|kilosu\s*kaç|2\s*al\s*1|indirim\s*karşılaştır)/u.test(q)) { setMode('food_freshness'); return 'food_freshness'; }
-        if (/(?:lamba\s*açık|ışık\s*açık|pencere\s*ne\s*tarafta|evden\s*çıkış|açık\s*kalan\s*ışık|pencere\s*açık\s*mı|kapı\s*aralık)/u.test(q)) { setMode('light_meter'); return 'light_meter'; }
-        if (/(?:yere\s*düşen|düşen\s*eşya|düşen\s*anahtar|düşen\s*para|düşen\s*yüzük|modem\s*ışığı)/u.test(q)) { setMode('anomaly_led'); return 'anomaly_led'; }
-        if (/(?:özçekim|selfie|vesikalık|tıraş|sakal|görüntülü\s*görüşme|saçım\s*nasıl|ayna\s*karşı)/u.test(q)) { setMode('portrait'); return 'portrait'; }
+        if (/(?:lamba\s*açık|ışık\s*açık|pencere\s*ne\s*tarafta|evden\s*çıkış|evden\s*çıkıyorum|açık\s*kalan\s*ışık|açık\s*ışık|pencere\s*açık\s*mı|kapı\s*aralık)/u.test(q)) { setMode('light_meter'); return 'light_meter'; }
+        if (/(?:yere\s*düşen|düşen\s*eşya|düşen\s*anahtar|anahtar\s*düştü|para\s*düştü|yüzüğüm\s*düştü|düşen\s*para|düşen\s*yüzük|modem\s*ışığı)/u.test(q)) { setMode('anomaly_led'); return 'anomaly_led'; }
+        if (/(?:özçekim|selfie|vesikalık|tıraş|sakal|sakalım|görüntülü\s*görüşme|saçım\s*nasıl|saçım\s*düzgün|ayna\s*karşı)/u.test(q)) { setMode('portrait'); return 'portrait'; }
         if (/(?:karekod|qr\s*kod|whatsapp\s*web|qr\s*menü|restoran\s*menü|kafe\s*menü)/u.test(q)) { setMode('qr_screen'); return 'qr_screen'; }
 
         // Varsayılan: Etrafımda Ne Var & Evrak Okuyucu
@@ -10059,8 +10068,30 @@
         }, 2400);
     }
 
+    state.lastLiveJarMatchId = null;
+    state.lastLiveJarMatchAt = 0;
+
     function handleItemMemoryLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
         const col = metrics.centerColor ? metrics.centerColor.name : 'Bilinmiyor';
+        const hasVisualMemories = Array.isArray(state.itemMemories) && state.itemMemories.some(m => Array.isArray(m.visualSignature));
+        if (hasVisualMemories && metrics && metrics.imageData) {
+            const liveSig = computeVisualObjectFingerprint(el.analysisCanvas, metrics);
+            const match = liveSig ? matchVisualObjectFingerprint(liveSig, state.itemMemories) : null;
+            if (match && match.entry && match.confidencePct >= 78) {
+                el.tPosition.textContent = `Tanındı: ${match.entry.text.slice(0, 26)}`;
+                el.tDistance.textContent = `Görsel Uyum (%${match.confidencePct})`;
+                const now = performance.now();
+                if (state.lastLiveJarMatchId !== match.entry.id || (now - state.lastLiveJarMatchAt > 6500)) {
+                    state.lastLiveJarMatchId = match.entry.id;
+                    state.lastLiveJarMatchAt = now;
+                    announceGuidance(`Görsel hafızadan tanındı: ${match.entry.text}.`, {
+                        bannerState: 'centered',
+                        minIntervalMs: 3200
+                    });
+                }
+                return;
+            }
+        }
         el.tPosition.textContent = `Kavanoz / Eşya Rengi: ${col}`;
         el.tDistance.textContent = `${state.itemMemories.length} Eşya Kayıtlı`;
     }
@@ -10173,7 +10204,12 @@
             return;
         }
         if (!state.isRunning || !state.lastMetrics || !state.lastMetrics.centerColor) {
-            announceGuidance('Kavanozun veya poşetin görsel parmak izini ve rengini kaydedebilmem için lütfen önce Kamerayı Başlat düğmesine basın ve kamerayı nesneye tutun.', { force: true, bannerState: 'warning' });
+            if (!state.isRunning) {
+                startCamera();
+                announceGuidance('Kamera otomatik olarak başlatıldı. Şimdi kavanozu veya poşeti kameranın önüne tutup kaydet düğmesine tekrar basın.', { force: true, bannerState: 'centered' });
+                return;
+            }
+            announceGuidance('Kavanozun veya poşetin görsel parmak izini kaydedebilmem için lütfen kamerayı nesneye tutun.', { force: true, bannerState: 'warning' });
             return;
         }
         const col = state.lastMetrics.centerColor.name;
@@ -10183,7 +10219,8 @@
 
     function recognizeVisibleJarFromMemory() {
         if (!state.isRunning && (!state.lastMetrics || !state.lastMetrics.imageData)) {
-            announceGuidance('Bu kavanozu veya poşeti tanımam için lütfen önce kamerayı başlatıp nesneye tutun.', { force: true, bannerState: 'warning' });
+            startCamera();
+            announceGuidance('Kamera otomatik olarak başlatıldı. Şimdi tanımak istediğiniz kavanozu veya poşeti kameraya tutun; otomatik olarak veya bu düğmeye bastığınızda tanıyacağım.', { force: true, bannerState: 'centered' });
             return;
         }
         const result = matchOrDescribeJarAndMemoryItem(el.analysisCanvas, state.lastMetrics, '');
