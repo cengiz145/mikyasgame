@@ -10964,8 +10964,8 @@
         }
         else if (key === 'k') startQiblaCompassSensor();
         else if (key === 'v') speakPrayerTimesAndSolarValidation();
-        else if (key === 's') speakCurrentQuestionStem();
-        else if (key === 'a') speakSingleOption('A');
+        else if (key === 's' && state.mode === 'exam_reader') speakCurrentQuestionStem();
+        else if (key === 'a' && state.mode === 'exam_reader') speakSingleOption('A');
         else if (key === 'b') {
             const curQ = state.examQuestions && state.examQuestions[state.currentExamIndex || 0];
             if (state.mode === 'bus_stop_tracker') {
@@ -10976,18 +10976,18 @@
                 el.btnSpeakStory.click();
             }
         }
-        else if (key === 'c') speakSingleOption('C');
-        else if (key === 'd') speakSingleOption('D');
-        else if (key === 'e') speakSingleOption('E');
+        else if (key === 'c' && state.mode === 'exam_reader') speakSingleOption('C');
+        else if (key === 'd' && state.mode === 'exam_reader') speakSingleOption('D');
+        else if (key === 'e' && state.mode === 'exam_reader') speakSingleOption('E');
         else if (ev.key === 'ArrowLeft') {
             if (state.mode === 'song_finder') stepLyricLine(-1);
             else if (state.mode === 'cooking_guide') stepCookingInstruction(-1);
-            else el.btnExamPrev.click();
+            else if (state.mode === 'exam_reader') el.btnExamPrev.click();
         }
         else if (ev.key === 'ArrowRight') {
             if (state.mode === 'song_finder') stepLyricLine(1);
             else if (state.mode === 'cooking_guide') stepCookingInstruction(1);
-            else el.btnExamNext.click();
+            else if (state.mode === 'exam_reader') el.btnExamNext.click();
         }
         else if (key === 'r') el.btnToggleRadar.click();
         else if (key === 'o') el.btnToggleAuto.click();
@@ -10995,7 +10995,7 @@
         else if (key === 'w') {
             if (state.mode === 'where_am_i') {
                 announceWhereAmIFullAddressAndSignboard('', []);
-            } else {
+            } else if (state.mode === 'qr_screen' || state.whatsappHoldTimer) {
                 startWhatsapp15SecAudioHold();
             }
         }
@@ -11029,6 +11029,7 @@
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             stopAllSpeechImmediately();
+            stopSongPreviewPlayback();
             state.isProcessingOcr = false;
             state.moneyLiveOcrBusy = false;
             state.isLiveBgOcrBusy = false;
