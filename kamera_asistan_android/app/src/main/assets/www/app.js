@@ -4484,13 +4484,12 @@
             reportLines.push(alStr);
         }
 
-        // 3. TR IBAN ve POS / Fiş Toplam Tutarı Kontrolü (Yanlış modda olsa bile IBAN Kopyala panelini otomatik görünür yapar)
+        // 3. TR IBAN ve POS / Fiş Toplam Tutarı Kontrolü
         const hasIbanCandidate = /\bTR\s*[0-9OISB\s\-]{16,34}/i.test(text);
         const hasExplicitPosTotal = /(?:TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS)\s*[:.]?\s*(?:₺\s*)?\d/i.test(text);
         if (hasIbanCandidate || hasExplicitPosTotal) {
             const posIban = processPosAmountAndIbanText(text, primaryPassVerifiedText, secondaryRawVerifiedText);
             if (posIban && posIban.speechText && !posIban.speechText.startsWith('POS tutarı veya IBAN net seçilemedi') && !posIban.speechText.startsWith('Ekranda henüz')) {
-                if (el.posIbanPanel) el.posIbanPanel.hidden = false;
                 speechNotes.push(posIban.speechText);
                 reportLines.push(posIban.speechText);
             }
@@ -7976,97 +7975,23 @@
     };
 
     const SMART_SCENARIO_PRESETS = {
-        'shopping': {
-            title: 'Market ve Ödeme Senaryosu',
-            primaryMode: 'color_cloth',
-            modes: ['color_cloth', 'pos_iban_reader', 'food_freshness', 'medicine_skt'],
-            speech: 'Market ve Ödeme Senaryosu hazırlandı! Kameraya kağıt veya demir para tutarsanız paranızı sayıp toplarım, POS ekranı veya fatura tutarsanız ödenecek tutarı doğrulayıp IBAN numarasını kopyalarım, market paketi tutarsanız son tüketim tarihini ve alerjenleri okurum.'
-        },
-        'commute': {
-            title: 'Sokakta ve Yolculukta Senaryosu',
-            primaryMode: 'bus_stop_tracker',
-            modes: ['bus_stop_tracker', 'where_am_i', 'explorer', 'qibla_compass'],
-            speech: 'Sokakta ve Yolculukta Senaryosu hazırlandı! GPS konumunuz, durak alarmınız ve açık adres tarifiniz hazır. Kamerayı yola tutarsanız yaklaşan otobüsün hat numarasını ve sokak tabelalarını okurum.'
-        },
-        'kitchen_home': {
-            title: 'Evde ve Mutfakta Senaryosu',
-            primaryMode: 'cooking_guide',
-            modes: ['cooking_guide', 'item_memory', 'liquid_level', 'door_elevator_lcd', 'sock_outfit_check', 'light_meter', 'anomaly_led'],
-            speech: 'Evde ve Mutfakta Senaryosu hazırlandı! Adım adım sesli yemek tarifleri, konuşan mutfak saati, kavanoz ve eşya hafızası ile çorap eşleştirici tek ekranda hazır.'
-        },
-        'health': {
-            title: 'Sağlık ve İlaç Senaryosu',
-            primaryMode: 'medicine_skt',
-            modes: ['medicine_skt', 'food_freshness', 'step_calorie_guide'],
-            speech: 'Sağlık ve İlaç Senaryosu hazırlandı! İlaç kutusunu kameraya tuttuğunuzda adını, miligram dozajını, kullanım tarifini ve son kullanma tarihinin geçip geçmediğini sıfır hata kilidiyle kontrol ederim.'
-        },
-        'study_work': {
-            title: 'Sınav ve Evrak Senaryosu',
-            primaryMode: 'exam_reader',
-            modes: ['exam_reader', 'signature_pen', 'qr_screen', 'explorer'],
-            speech: 'Sınav ve Evrak Senaryosu hazırlandı! Sınav kağıdındaki soruları ve A, B, C, D, E şıklarını iki sütunlu olsa bile birbirine karıştırmadan ayırırım; resmi belgelerde ise imza alanını kaleminize yönlendiririm.'
-        }
+        'shopping': { title: 'Mutfak ve Alışveriş', category: 'mutfak', primaryMode: 'color_cloth' },
+        'commute': { title: 'Navigasyon ve Yolculuk', category: 'navigasyon', primaryMode: 'bus_stop_tracker' },
+        'kitchen_home': { title: 'Ev ve Mutfak', category: 'mutfak', primaryMode: 'cooking_guide' },
+        'health': { title: 'Sağlık ve İlaç', category: 'saglik', primaryMode: 'medicine_skt' },
+        'study_work': { title: 'İş ve Eğitim', category: 'is_egitim', primaryMode: 'exam_reader' }
     };
 
     function activateSmartUsageScenarioPreset(scenarioId) {
         const preset = SMART_SCENARIO_PRESETS[scenarioId];
         if (!preset) return false;
-        state.activeScenarioPreset = scenarioId;
-
-        if (el.scenarioPresetBtns) {
-            el.scenarioPresetBtns.forEach(btn => {
-                const isSel = btn.getAttribute('data-scenario') === scenarioId;
-                btn.classList.toggle('active-toggle', isSel);
-                btn.setAttribute('aria-pressed', isSel ? 'true' : 'false');
-            });
-        }
-        if (el.categoryTabs) {
-            el.categoryTabs.forEach(tab => {
-                tab.classList.remove('active-toggle');
-                tab.setAttribute('aria-pressed', 'false');
-            });
-        }
-        const allowedModes = new Set(preset.modes);
-        if (el.modeButtons) {
-            el.modeButtons.forEach(btn => {
-                const m = btn.getAttribute('data-mode') || '';
-                const show = allowedModes.has(m);
-                btn.hidden = !show;
-                btn.style.display = show ? '' : 'none';
-            });
-        }
-
+        filterModesByLifeCategory(preset.category);
         setMode(preset.primaryMode);
-        // Senaryoya özel yardımcı panelleri aynı anda görünür kıl ki kullanıcı mod değiştirmeden kullanabilsin
-        if (scenarioId === 'shopping') {
-            if (el.moneyCounterPanel) el.moneyCounterPanel.hidden = false;
-            if (el.posIbanPanel) el.posIbanPanel.hidden = false;
-        } else if (scenarioId === 'commute') {
-            if (el.busStopPanel) el.busStopPanel.hidden = false;
-            if (el.whereAmIPanel) el.whereAmIPanel.hidden = false;
-            autoAcquireLocationAndWatch();
-        } else if (scenarioId === 'kitchen_home') {
-            if (el.cookingGuidePanel) el.cookingGuidePanel.hidden = false;
-            if (el.itemMemoryPanel) el.itemMemoryPanel.hidden = false;
-        } else if (scenarioId === 'health') {
-            if (el.stepCaloriePanel) el.stepCaloriePanel.hidden = false;
-        } else if (scenarioId === 'study_work') {
-            if (el.examRemotePanel) el.examRemotePanel.hidden = false;
-        }
-
-        announceGuidance(preset.speech, { force: true, bannerState: 'centered' });
         return true;
     }
     window.activateSmartUsageScenarioPreset = activateSmartUsageScenarioPreset;
 
     function filterModesByLifeCategory(catId) {
-        state.activeScenarioPreset = '';
-        if (el.scenarioPresetBtns) {
-            el.scenarioPresetBtns.forEach(btn => {
-                btn.classList.remove('active-toggle');
-                btn.setAttribute('aria-pressed', 'false');
-            });
-        }
         if (!el.categoryTabs || !el.modeButtons) return;
         el.categoryTabs.forEach(tab => {
             const isSel = tab.getAttribute('data-category') === catId;
