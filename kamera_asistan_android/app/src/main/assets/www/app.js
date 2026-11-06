@@ -1632,7 +1632,7 @@
         if (!state.isRunning || state.isProcessingOcr || state.isLiveBgOcrBusy || state.moneyLiveOcrBusy || state.countdownStage > 0 || typeof window.Tesseract === 'undefined') return;
         const liveOcrExcludedModes = new Set([
             'light_meter', 'qibla_compass', 'song_finder',
-            'social_presence', 'color_cloth', 'signature_pen',
+            'color_cloth', 'signature_pen',
             'portrait', 'qr_screen', 'step_calorie_guide', 'cooking_guide'
         ]);
         if (liveOcrExcludedModes.has(state.mode)) return;
@@ -1825,8 +1825,6 @@
             handleDoorElevatorLcdLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics);
         } else if (state.mode === 'food_freshness') {
             handleFoodFreshnessLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
-        } else if (state.mode === 'social_presence') {
-            handleSocialPresenceLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
         } else if (state.mode === 'bus_stop_tracker') {
             handleBusStopLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
         } else if (state.mode === 'pos_iban_reader') {
@@ -3860,56 +3858,6 @@
         };
     }
 
-    function handleSocialPresenceLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
-        const people = (predictions || []).filter(p => p.class === 'person');
-        if (people.length === 0) {
-            el.tPosition.textContent = 'Kişi Görünmüyor';
-            el.tDistance.textContent = '0 Kişi';
-            announceGuidance('Şu an kameranın baktığı yönde kimse görünmüyor.', {
-                bannerState: 'normal',
-                minIntervalMs: 3800
-            });
-            return;
-        }
-
-        people.sort((a, b) => (b.bbox[2] * b.bbox[3]) - (a.bbox[2] * a.bbox[3]));
-        const personReports = [];
-
-        people.slice(0, 4).forEach((p) => {
-            const [bx, by, bw, bh] = p.bbox;
-            const cxNorm = (bx + bw / 2) / anW;
-            let clockDir = 'Saat 12 yönünde (tam karşınızda)';
-            if (cxNorm < 0.25) clockDir = 'Saat 10 yönünde (solunuzda)';
-            else if (cxNorm < 0.42) clockDir = 'Saat 11 yönünde (hafif solunuzda)';
-            else if (cxNorm > 0.75) clockDir = 'Saat 2 yönünde (sağınızda)';
-            else if (cxNorm > 0.58) clockDir = 'Saat 1 yönünde (hafif sağınızda)';
-
-            const cloth = measureRegionColorAndPattern(
-                metrics.imageData, anW, anH,
-                bx + bw * 0.22, by + bh * 0.28,
-                Math.max(10, bw * 0.56), Math.max(10, bh * 0.34)
-            );
-            drawTargetBox(ovCtx, p.bbox, scaleX, scaleY, '#22c55e', clockDir);
-            personReports.push(`${clockDir} ${cloth.colorName.toLowerCase()} kıyafetli bir kişi`);
-        });
-
-        el.tPosition.textContent = `Toplam ${people.length} Kişi`;
-        el.tDistance.textContent = 'Konum Doğrulandı';
-
-        const now = performance.now();
-        if (navigator.vibrate && now - state.lastQiblaLockVibrate > 2500) {
-            navigator.vibrate([70, 60, 110]);
-            state.lastQiblaLockVibrate = now;
-        }
-
-        const summaryBanner = `Karşınızda ${people.length} kişi var: ${personReports.join('; ')}. (Sessiz titreşim aktif; sesli dinlemek için ekrana çift dokunun).`;
-        state.lastSpeechText = `Karşınızda ${people.length} kişi var: ${personReports.join('; ')}.`;
-        if (el.liveDirectionBox) {
-            el.liveDirectionBox.textContent = summaryBanner;
-            el.liveDirectionBox.classList.add('centered');
-        }
-    }
-
     // =========================================================================
     // 6. FOTOĞRAF ÇEKİMİ, GÖLGESİZ ÇİFT SÜTUN SINAV OKUMA VE BANKNOT TANIMA
     // =========================================================================
@@ -4195,7 +4143,7 @@
         const otherObjs = verifiedPreds.filter(p => p.class !== 'person');
 
         if (people.length === 0) {
-            if (otherObjs.length === 0 || state.mode === 'portrait' || state.mode === 'social_presence') {
+            if (otherObjs.length === 0 || state.mode === 'portrait') {
                 sentences.push('Görüntüde insan görünmüyor.');
             }
         } else {
@@ -7988,7 +7936,7 @@
     // 6.5. YENİ HAYAT ALANI KATEGORİLERİ VE 16-21 ARASI EFSANE GÜNLÜK YAŞAM MODLARI
     // =========================================================================
     const LIFE_CATEGORY_LABELS = {
-        'all': 'Tümü (23 Özellik)',
+        'all': 'Tümü (22 Özellik)',
         'mutfak': 'Mutfak ve Yemek Yapma Kategorisi',
         'ev': 'Ev Kategorisi',
         'is_egitim': 'İş ve Eğitim Kategorisi',
@@ -8746,12 +8694,11 @@
             return 'exam_reader';
         }
 
-        // 14. İmza, Bardak/Sıvı, Kapı/Asansör/Kombi, Gıda Alerjen, Odada Kim Var, Lamba/Işık, Düşen Eşya, Özçekim, WhatsApp QR
+        // 14. İmza, Bardak/Sıvı, Kapı/Asansör/Kombi, Gıda Alerjen, Lamba/Işık, Düşen Eşya, Özçekim, WhatsApp QR
         if (/(?:imza|kalem\s*yönlendir)/u.test(q)) { setMode('signature_pen'); return 'signature_pen'; }
         if (/(?:bardak|kupa|şişe\s*bul|çay\s*bardağı)/u.test(q)) { setMode('liquid_level'); return 'liquid_level'; }
         if (/(?:kapı\s*numara|asansör|kombi|çamaşır\s*makine)/u.test(q)) { setMode('door_elevator_lcd'); return 'door_elevator_lcd'; }
         if (/(?:alerjen|gluten|laktoz|içindekiler|gıda\s*paket)/u.test(q)) { setMode('food_freshness'); return 'food_freshness'; }
-        if (/(?:odada\s*kim|bana\s*bakıyor|kaç\s*kişi\s*var)/u.test(q)) { setMode('social_presence'); return 'social_presence'; }
         if (/(?:lamba\s*açık|ışık\s*açık|pencere\s*ne\s*tarafta)/u.test(q)) { setMode('light_meter'); return 'light_meter'; }
         if (/(?:yere\s*düşen|düşen\s*eşya|modem\s*ışığı)/u.test(q)) { setMode('anomaly_led'); return 'anomaly_led'; }
         if (/(?:özçekim|selfie|vesikalık)/u.test(q)) { setMode('portrait'); return 'portrait'; }
@@ -10364,8 +10311,8 @@
         state.lastDetectedBarcode = '';
         state.sockSubMode = 'sock';
 
-        // Ön (Selfie) kamerada unutulma şikayetini önle: Özçekim (4) ve Odada Kim Var (14) dışındaki belge/nesne modlarına geçildiğinde otomatik Arka Kameraya dön
-        if (newMode !== 'portrait' && newMode !== 'social_presence' && state.facingMode === 'user') {
+        // Ön (Selfie) kamerada unutulma şikayetini önle: Özçekim (4) dışındaki belge/nesne modlarına geçildiğinde otomatik Arka Kameraya dön
+        if (newMode !== 'portrait' && state.facingMode === 'user') {
             state.facingMode = 'environment';
             if (el.btnSwitchCam) {
                 el.btnSwitchCam.textContent = '🔄 Kamera: Arka';
@@ -10445,16 +10392,15 @@
             'liquid_level': '11. Bölüm: Masadaki Bardak, Kupa ve Şişe Bulucu açıldı. Masadaki bardağı veya şişeyi elinizi çarpmadan bulmak için kamerayı masaya tutun. Güvenliğiniz için kaynar çay veya sıcak su doldururken kameraya güvenmeyin.',
             'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya çamaşır makinesi ekranını okutmak için Boşluk tuşuna basın.',
             'food_freshness': '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve Son Tüketim Tarihi Okuyucu açıldı. Market paketinin içindekiler ve tarih kısmını kameraya gösterip Boşluk tuşuna basın.',
-            'social_presence': '14. Bölüm: Odada Kim Var ve Bana Bakıyor mu Yardımcısı açıldı. Kulaklık gerekmez; odadakiler duymasın diye karşınızdaki kişi size baktığında telefon avucunuzda çift titrer. Sesli söylemesini isterseniz ekrana çift dokunun veya T tuşuna basın.',
-            'song_finder': '15. Bölüm: Bu Çalan Hangi Şarkı? Sesli Şarkı, Melodi ve Söz Bulucu açıldı; mikrofon otomatik olarak dinlemeye başlıyor.',
-            'bus_stop_tracker': '16. Bölüm: Otobüs Numarası Yakalayıcı ve İneceğim Durağa Geldim mi Alarmı açıldı. Durakta yaklaşan otobüsün hat numarasını okumak için kamerayı yola tutun veya otobüsteyseniz aşağıdan ineceğiniz durağın alarmını kurun.',
-            'pos_iban_reader': '17. Bölüm: POS Cihazı Tutarı Doğrulayıcı ve Tek Tuşla IBAN Kopyalayıcı açıldı. Kartınızı okutmadan önce POS ekranını veya faturadaki TR IBAN numarasını kameraya gösterip Boşluk tuşuna basın.',
-            'item_memory': `18. Bölüm: Eşyamı Nereye Koydum Sesli Hafıza ve Kavanoz Tanıtıcı açıldı. Şu an hafızanızda ${state.itemMemories ? state.itemMemories.length : 0} eşya kayıtlı. Eşya Yeri Kaydet veya Eşyam Nerede Sor düğmelerini kullanabilirsiniz.`,
-            'tv_subtitle_score': '19. Bölüm: Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri açıldı. Telefonu televizyona doğru tutun ve Otomatik TV Spikerini Başlat düğmesine basın.',
-            'sock_outfit_check': '20. Bölüm: Çorap Eşleştirici, Kıyafet Kombin Uyumu ve Leke Kontrolü açıldı. İki çorabı yan yana kameraya tutup Boşluk tuşuna basın; birbirinin eşi olup olmadığını ve leke durumunu söyleyeceğim.',
-            'where_am_i': '21. Bölüm: Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Tarif Edici açıldı. Bulunduğunuz cadde ve sokağı hemen öğreniliyor.',
-            'step_calorie_guide': `22. Bölüm: Sesli Adım Sayacı ve Sağlıklı Besin Rehberi açıldı. Bugün ${state.dailySteps || 0} adım attınız. Telefon cebinizde yürürken adımlarınızı sayarım; ayrıca yediğiniz yemeği söyleyip veya paketi kameraya gösterip besin değerini öğrenebilirsiniz.`,
-            'cooking_guide': '23. Bölüm: Adım Adım Sesli Yemek Tarifleri Rehberi açıldı. İstediğiniz yemeği listeden seçin veya evdeki malzemeleri söyleyin; malzemeleri ve hazırlanışını adım adım sesli olarak tarif edeceğim.'
+            'song_finder': '14. Bölüm: Bu Çalan Hangi Şarkı? Sesli Şarkı, Melodi ve Söz Bulucu açıldı; mikrofon otomatik olarak dinlemeye başlıyor.',
+            'bus_stop_tracker': '15. Bölüm: Otobüs Numarası Yakalayıcı ve İneceğim Durağa Geldim mi Alarmı açıldı. Durakta yaklaşan otobüsün hat numarasını okumak için kamerayı yola tutun veya otobüsteyseniz aşağıdan ineceğiniz durağın alarmını kurun.',
+            'pos_iban_reader': '16. Bölüm: POS Cihazı Tutarı Doğrulayıcı ve Tek Tuşla IBAN Kopyalayıcı açıldı. Kartınızı okutmadan önce POS ekranını veya faturadaki TR IBAN numarasını kameraya gösterip Boşluk tuşuna basın.',
+            'item_memory': `17. Bölüm: Eşyamı Nereye Koydum Sesli Hafıza ve Kavanoz Tanıtıcı açıldı. Şu an hafızanızda ${state.itemMemories ? state.itemMemories.length : 0} eşya kayıtlı. Eşya Yeri Kaydet veya Eşyam Nerede Sor düğmelerini kullanabilirsiniz.`,
+            'tv_subtitle_score': '18. Bölüm: Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri açıldı. Telefonu televizyona doğru tutun ve Otomatik TV Spikerini Başlat düğmesine basın.',
+            'sock_outfit_check': '19. Bölüm: Çorap Eşleştirici, Kıyafet Kombin Uyumu ve Leke Kontrolü açıldı. İki çorabı yan yana kameraya tutup Boşluk tuşuna basın; birbirinin eşi olup olmadığını ve leke durumunu söyleyeceğim.',
+            'where_am_i': '20. Bölüm: Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Tarif Edici açıldı. Bulunduğunuz cadde ve sokağı hemen öğreniliyor.',
+            'step_calorie_guide': `21. Bölüm: Sesli Adım Sayacı ve Sağlıklı Besin Rehberi açıldı. Bugün ${state.dailySteps || 0} adım attınız. Telefon cebinizde yürürken adımlarınızı sayarım; ayrıca yediğiniz yemeği söyleyip veya paketi kameraya gösterip besin değerini öğrenebilirsiniz.`,
+            'cooking_guide': '22. Bölüm: Adım Adım Sesli Yemek Tarifleri Rehberi açıldı. İstediğiniz yemeği listeden seçin veya evdeki malzemeleri söyleyin; malzemeleri ve hazırlanışını adım adım sesli olarak tarif edeceğim.'
         }[newMode];
 
         if (modeAnnouncement) {
@@ -10917,11 +10863,6 @@
         if (now - state.lastTouchTime < 420) {
             if (!state.isRunning) {
                 startCamera();
-            } else if (state.mode === 'social_presence') {
-                announceGuidance(state.lastSpeechText || 'Odada henüz doğrulanmış bir kişi algılanmadı.', {
-                    force: true,
-                    bannerState: 'centered'
-                });
             } else {
                 captureAndDescribePhoto(false);
             }
@@ -10978,7 +10919,6 @@
         else if (key === 'u') setMode('liquid_level');
         else if (key === 'i') setMode('door_elevator_lcd');
         else if (key === 'g') setMode('food_freshness');
-        else if (key === 'p') setMode('social_presence');
         else if (key === 'h') {
             if (state.mode !== 'song_finder') {
                 setMode('song_finder');
@@ -11042,12 +10982,6 @@
                 else if (state.mode === 'where_am_i') announceWhereAmIFullAddressAndSignboard('', []);
                 else if (state.mode === 'item_memory') speakAllSavedItemMemories();
                 else startCamera();
-            }
-            else if (state.mode === 'social_presence') {
-                announceGuidance(state.lastSpeechText || 'Odada henüz doğrulanmış bir kişi algılanmadı.', {
-                    force: true,
-                    bannerState: 'centered'
-                });
             }
             else captureAndDescribePhoto(false);
         }

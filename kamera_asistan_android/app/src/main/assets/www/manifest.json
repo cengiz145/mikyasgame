@@ -1,7 +1,7 @@
 {
   "name": "Erişilebilir Kamera Uygulaması",
   "short_name": "Erişilebilir Kamera",
-  "description": "Bir kamera uygulamasından fazlasını ayağınıza getiriyoruz. Görme engelliler için Sınav Okuyucu, Sesli Kıble ve Namaz Vakti Rehberi, Demir/Kağıt Para Hesaplayıcı, Çalan Şarkıyı Bulucu ve 23 Günlük Yaşam Yardımcısı.",
+  "description": "Bir kamera uygulamasından fazlasını ayağınıza getiriyoruz. Görme engelliler için Sınav Okuyucu, Sesli Kıble ve Namaz Vakti Rehberi, Demir/Kağıt Para Hesaplayıcı, Çalan Şarkıyı Bulucu ve 22 Günlük Yaşam Yardımcısı.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#090d16",
