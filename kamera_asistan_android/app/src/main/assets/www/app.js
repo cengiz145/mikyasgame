@@ -1385,12 +1385,12 @@
         });
 
         const uniqueBg = [...new Set(bgObjects)];
-        let privacyReport = 'Arka plan temiz, yabancı ekran veya nesne görünmüyor.';
+        let privacyReport = 'Arka plan sade ve düzenli görünüyor.';
         if (extraPeople > 0 || uniqueBg.length > 0) {
             const warnings = [];
             if (extraPeople > 0) warnings.push(`arkada ${extraPeople} kişi daha var`);
             if (uniqueBg.length > 0) warnings.push(`arka planda ${uniqueBg.join(', ')} görünüyor`);
-            privacyReport = `Mahremiyet uyarısı: ${warnings.join(' ve ')}.`;
+            privacyReport = `Arka plan bilgisi: ${warnings.join(' ve ')}.`;
         }
 
         return {
@@ -5881,13 +5881,13 @@
         }
         try {
             if (typeof window.cocoSsd !== 'undefined' && !state.cocoModel) {
-                el.aiStatusBadge.textContent = 'Yapay Zeka ve Sınav Motoru Yükleniyor...';
+                el.aiStatusBadge.textContent = 'Sesli Kamera ve Okuma Asistanı Yükleniyor...';
                 state.cocoModel = await window.cocoSsd.load({ base: 'lite_mobilenet_v2' });
-                el.aiStatusBadge.textContent = 'Sınav, QR & Matematik Motoru Hazır';
+                el.aiStatusBadge.textContent = 'Sesli Kamera ve Okuma Asistanı Hazır';
                 el.aiStatusBadge.classList.add('ready');
             }
         } catch (_) {
-            el.aiStatusBadge.textContent = 'Sınav, Sensör ve QR Motoru Hazır';
+            el.aiStatusBadge.textContent = 'Sesli Kamera ve Okuma Asistanı Hazır';
             el.aiStatusBadge.classList.add('ready');
         }
     }
@@ -5962,12 +5962,12 @@
             state.videoStream.getTracks().forEach(t => t.stop());
             state.videoStream = null;
         }
-        el.btnStart.textContent = '📷 Kamerayı ve Sesli Asistanı Başlat';
+        el.btnStart.textContent = '📷 Kamerayı ve Sesli Rehberi Başlat';
         el.btnStart.setAttribute('aria-pressed', 'false');
         el.btnSwitchCam.disabled = true;
         el.btnToggleFlash.disabled = true;
         el.btnCaptureNow.disabled = true;
-        announceGuidance('Kamera ve sesli radar durduruldu.', { force: true });
+        announceGuidance('Kamera ve sesli rehber durduruldu.', { force: true });
     }
 
     // =========================================================================
@@ -6511,7 +6511,9 @@
     async function startQiblaCompassSensor() {
         radar.init();
         state.qiblaActive = true;
-        setMode('qibla_compass');
+        if (state.mode !== 'qibla_compass') {
+            setMode('qibla_compass');
+        }
         autoAcquireLocationAndWatch();
 
         if (typeof window.DeviceOrientationEvent !== 'undefined' &&
@@ -6557,7 +6559,7 @@
                 state.userLat = pos.coords.latitude;
                 state.userLon = pos.coords.longitude;
                 updateQiblaTargetDisplay('Kesin GPS');
-                announceGuidance(`GPS konumunuz milimetrik olarak doğrulandı! Bulunduğunuz noktadan kesin Kıble açısı: ${state.qiblaTargetBearing} derece.`, {
+                announceGuidance(`GPS konumunuz başarıyla doğrulandı! Bulunduğunuz noktadan Kıble açısı: ${state.qiblaTargetBearing} derece.`, {
                     force: true,
                     bannerState: 'centered'
                 });
