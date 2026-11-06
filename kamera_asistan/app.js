@@ -224,6 +224,7 @@
         sockOutfitPanel: document.getElementById('sock-outfit-panel'),
         whereAmIPanel: document.getElementById('where-am-i-panel'),
         stepCaloriePanel: document.getElementById('step-calorie-panel'),
+        cookingGuidePanel: document.getElementById('cooking-guide-panel'),
         categoryTabs: document.querySelectorAll('.category-tab'),
         modeButtons: document.querySelectorAll('.mode-card'),
         aiStatusBadge: document.getElementById('ai-status-badge'),
@@ -1414,6 +1415,8 @@
             handleExplorerMode(anW, anH, scaleX, scaleY, ovCtx, predictions);
         } else if (state.mode === 'step_calorie_guide') {
             handleFoodFreshnessLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
+        } else if (state.mode === 'cooking_guide') {
+            handleCookingGuideLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions);
         }
     }
 
@@ -4192,6 +4195,14 @@
                     const calReport = parsePackageOrMenuCaloriesKind(cleanText);
                     showDetectedResult('👟🥗 Besin Değeri ve Sağlıklı Yaşam Raporu', calReport.fullText);
                     announceGuidance(calReport.speechText, { force: true, bannerState: 'centered' });
+                    return;
+                }
+
+                // ÖZEL MOD 23: ERİŞİLEBİLİR YEMEK YAPMA REHBERİ (OCAK ATEŞİ, KIZARMIŞLIK VE ÇAY DEMİ KONTROLÜ)
+                if (state.mode === 'cooking_guide') {
+                    const cookCheck = analyzeStoveFlameAndFoodBrowning(capCanvas, metrics, cleanText);
+                    showDetectedResult('👩‍🍳🔥 Ocak Ateşi, Kızarmışlık ve Dem Raporu', cookCheck.fullText);
+                    announceGuidance(cookCheck.speechText, { force: true, bannerState: cookCheck.isBurntRisk ? 'warning' : 'centered' });
                     return;
                 }
 
@@ -7177,7 +7188,8 @@
     // 6.5. YENİ HAYAT ALANI KATEGORİLERİ VE 16-21 ARASI EFSANE GÜNLÜK YAŞAM MODLARI
     // =========================================================================
     const LIFE_CATEGORY_LABELS = {
-        'all': 'Tümü (22 Özellik)',
+        'all': 'Tümü (23 Özellik)',
+        'mutfak': 'Mutfak ve Yemek Yapma Kategorisi',
         'ev': 'Ev Kategorisi',
         'is_egitim': 'İş ve Eğitim Kategorisi',
         'saglik': 'Sağlık Kategorisi',
@@ -8117,6 +8129,517 @@
         };
     }
 
+    // --- MOD 23: ERİŞİLEBİLİR YEMEK YAPMA REHBERİ, KONUŞAN AŞÇI VE OCAK/PİŞMİŞLİK DENETÇİSİ ---
+    state.selectedRecipeIndex = 0;
+    state.currentCookingStepIndex = 0;
+    state.cookingTimerInterval = null;
+    state.cookingTimerRemainingSec = 0;
+
+    const BLIND_ACCESSIBLE_RECIPES = [
+        {
+            id: 'mercimek_corbasi',
+            title: 'Lokanta Usulü Süzme Mercimek Çorbası (4 Kişilik)',
+            keywords: ['mercimek', 'çorba', 'kırmızı mercimek', 'soğan', 'havuç', 'patates'],
+            ingredients: '1 su bardağı kırmızı mercimek, 1 adet orta boy kuru soğan (dörde bölünmüş), 1 yemek kaşığı un, 1 yemek kaşığı tereyağı, 2 yemek kaşığı sıvı yağ, 1 tatlı kaşığı tuz, yarım çay kaşığı karabiber ve zerdeçal, 6 su bardağı sıcak su.',
+            steps: [
+                {
+                    text: '1. Adım (Hazırlık ve Yıkama): 1 su bardağı kırmızı mercimeği tel süzgece koyup musluk altında elinizle karıştırarak yıkayın; suyun kayganlığı gidip berraklaştığında süzgeci silkeleyin.',
+                    timerMinutes: 0
+                },
+                {
+                    text: '2. Adım (Kokuya ve Sese Göre Kavurma): Derin tencereye 2 yemek kaşığı sıvı yağ ve 1 yemek kaşığı tereyağı koyup orta ateşi açın. İri doğranmış 1 soğanı ekleyin. Yağdan "cızır cızır" ses gelmeye başladıktan sonra tahta kaşıkla 3 dakika çevirin; tatlımsı kavrulmuş soğan kokusu burnunuza geldiğinde 1 yemek kaşığı unu ekleyip 1 dakika daha karıştırın.',
+                    timerMinutes: 3
+                },
+                {
+                    text: '3. Adım (Su Ekleme ve Kaynatma): Yıkanmış mercimeği, 1 tatlı kaşığı tuzu ve 6 su bardağı suyu tencereye dikkatlice ekleyin. Kapağı hafif aralık bırakın. Fokurdama sesini duyduktan sonra ocağı kısığa alıp mercimekler tamamen yumuşayana kadar 20 dakika pişirin.',
+                    timerMinutes: 20
+                },
+                {
+                    text: '4. Adım (Kıvam ve Servis): Ocağı kapatın. El blenderını tencerenin tabanına dik oturtup dışarı sıçramaması için çalıştırmadan önce tamamen sıvının içine daldırın ve 1 dakika pürüzsüz olana kadar çekin. Mis gibi çorbanız servise hazır, ellerinize sağlık!',
+                    timerMinutes: 1
+                }
+            ]
+        },
+        {
+            id: 'tereyagli_pirinc_pilavi',
+            title: 'Tane Tane Tereyağlı Şehriyeli Pirinç Pilavı',
+            keywords: ['pilav', 'pirinç', 'pirinç pilavı', 'şehriye', 'tereyağı'],
+            ingredients: '2 su bardağı baldo pirinç, 2 yemek kaşığı arpa şehriye, 2 dolu yemek kaşığı tereyağı, 1 yemek kaşığı sıvı yağ, 3 su bardağı sıcak su (1 bardak pirince 1 buçuk bardak su ölçüsü), 1 buçuk tatlı kaşığı tuz.',
+            steps: [
+                {
+                    text: '1. Adım (Nişasta Akıtma): 2 su bardağı pirinci derin bir kaba alıp üzerini geçecek kadar ılık su ve 1 çay kaşığı tuz ekleyin. 15 dakika bekletip süzgeçte soğuk suyla yıkayın ve iyice süzün.',
+                    timerMinutes: 15
+                },
+                {
+                    text: '2. Adım (Şehriyeyi Kokusundan Anlama): Pilav tenceresine 1 yemek kaşığı sıvı yağ ve 2 yemek kaşığı tereyağını koyup orta ateşi açın. 2 yemek kaşığı arpa şehriyeyi ekleyin. Sürekli karıştırırken yaklaşık 2 dakika sonra fındıksı, kavruk ve sıcak bir koku burnunuza gelecek ve şehriyeler kaşığa daha sert çarpmaya başlayacak; işte tam o an şehriyeler altın rengi olmuştur.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '3. Adım (Kaşık Direnciyle Pirinç Kavurma): Süzülmüş pirinçleri ekleyin. Kırmadan alttan üste doğru 3-4 dakika kavurun. Başta yumuşak dönen kaşık, pirinçler kavrulup şeffaflaştıkça birbirine tutunup kaşığa hafif ağırlaşarak direnç göstermeye başlayacak ve tıkır tıkır ses çıkaracaktır.',
+                    timerMinutes: 4
+                },
+                {
+                    text: '4. Adım (Pişirme ve Göz Göz Olma Sesi): 3 su bardağı sıcak suyu ve 1 buçuk tatlı kaşığı tuzu ekleyip sadece bir kez karıştırın, kapağı kapatın. Kaynama fokurtusunu duyunca ocağı en kısık ateşe alın. 12 dakika pişirin; tencereden gelen fokurtu sesi kesilip sadece ince bir "çıtır-pıtır" yağ sesi kaldığında suyunu tamamen çekmiş demektir.',
+                    timerMinutes: 12
+                },
+                {
+                    text: '5. Adım (Demlendirme): Ocağı kapatın, kapağın altına temiz bir kağıt havlu veya bez koyup kapağı kapatın ve 10 dakika hiç açmadan dinlendirin. Tane tane pilavınız hazır!',
+                    timerMinutes: 10
+                }
+            ]
+        },
+        {
+            id: 'anne_usulu_kuru_fasulye',
+            title: 'Anne Usulü Lokum Gibi Kuru Fasulye',
+            keywords: ['kuru fasulye', 'fasulye', 'salça', 'soğan', 'etli kuru fasulye'],
+            ingredients: '2 su bardağı haşlanmış kuru fasulye, 1 adet orta boy kuru soğan, 1 yemek kaşığı domates salçası, 1 tatlı kaşığı biber salçası, 2 yemek kaşığı tereyağı, 3 buçuk su bardağı sıcak su, 1 tatlı kaşığı tuz, yarım çay kaşığı kimyon (gazını alır).',
+            steps: [
+                {
+                    text: '1. Adım (Soğan ve Salça Kokusu): Tencereye 2 yemek kaşığı tereyağını alıp eritin. Küp doğranmış soğanı ekleyip cızırtı sesiyle birlikte 4 dakika yumuşayana kadar kavurun. Ardından 1 yemek kaşığı domates ve 1 tatlı kaşığı biber salçasını ekleyip salçanın ekşi çiğ kokusu gidip tatlı kavruk kokusu çıkana kadar 2 dakika karıştırın.',
+                    timerMinutes: 6
+                },
+                {
+                    text: '2. Adım (Fasulye ve Su): 2 su bardağı haşlanmış kuru fasulyeyi ekleyip 1 dakika salçayla harmanlayın. Üzerine 3 buçuk su bardağı sıcak su, 1 tatlı kaşığı tuz ve yarım çay kaşığı kimyon ekleyin.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '3. Adım (Özleşme): Tencerenin kapağını kapatın, kaynama sesini duyunca kısık ateşe alın ve suyu koyulaşıp özleşene kadar 25 dakika pişirin. Lokum gibi kuru fasulyeniz hazır!',
+                    timerMinutes: 25
+                }
+            ]
+        },
+        {
+            id: 'tam_kivaminda_menemen',
+            title: 'Tam Kıvamında Sulu ve Ekmek Banmalık Menemen',
+            keywords: ['menemen', 'yumurta', 'domates', 'biber', 'kahvaltı'],
+            ingredients: '3 adet orta boy olgun domates (rendelenmiş veya küp doğranmış), 2 adet yeşil biber, 3 adet yumurta, 2 yemek kaşığı tereyağı veya zeytinyağı, 1 çay kaşığı tuz, yarım çay kaşığı pul biber.',
+            steps: [
+                {
+                    text: '1. Adım (Biber Kokusu Çıkana Kadar): Geniş tavaya 2 yemek kaşığı yağı ve ince doğranmış 2 yeşil biberi soğukken koyup orta ateşi açın (böylece yağ sıçramaz). Biberlerin cızırtısı ve mis gibi köz/biber kokusu yükselene kadar 3 dakika karıştırın.',
+                    timerMinutes: 3
+                },
+                {
+                    text: '2. Adım (Domatesin Suyunu Çekmesi): Doğranmış veya rendelenmiş 3 domatesi ve 1 çay kaşığı tuzu ekleyin. Domatesler başta sulu bir fokurtu sesi çıkarır; yaklaşık 6 dakika sonra fokurtu sesi toklaşır ve kaşık tavada iz bırakacak kadar koyulaşır.',
+                    timerMinutes: 6
+                },
+                {
+                    text: '3. Adım (Yumurtaları Kırma ve 90 Saniye Kuralı): 3 yumurtayı ayrı bir kaseye kırıp kabuk kaçmadığından emin olduktan sonra tavaya dökün. Kaşığın tersiyle hafifçe karıştırıp sadece 1 buçuk dakika (90 saniye) pişirin ve hemen ocağı kapatın ki menemeni kurutmasın. Ekmek banmalık menemeniniz hazır!',
+                    timerMinutes: 2
+                }
+            ]
+        },
+        {
+            id: 'sulu_patatesli_izmir_kofte',
+            title: 'Tencerede veya Fırında Sulu Patatesli İzmir Köfte',
+            keywords: ['köfte', 'kıyma', 'patates', 'izmir köfte', 'et'],
+            ingredients: '400 gram kıyma, 1 adet rendelenmiş soğan, 3 yemek kaşığı galeta unu veya ufalanmış ekmek içi, 1 diş sarımsak, 1 çay kaşığı kimyon, 1 çay kaşığı karabiber, 1 tatlı kaşığı tuz. Sebzesi için: 3 adet patates, 1 yemek kaşığı salça, 2 su bardağı sıcak su.',
+            steps: [
+                {
+                    text: '1. Adım (Dokunarak Köfte Yoğurma): Derin bir kapta 400 gram kıyma, rendelenmiş soğan, 3 yemek kaşığı galeta unu, tuz ve kimyonu elinizle 6-7 dakika yoğurun. Kıymanın elinize yapışmayı bırakıp oyun hamuru gibi tek parça toparlandığını hissettiğinizde kıvamı tamamdır. Ceviz büyüklüğünde parçalar koparıp avuç içinizde parmak boyunda yuvarlayın.',
+                    timerMinutes: 7
+                },
+                {
+                    text: '2. Adım (Geniş Tencerede Dizme): 3 adet patatesi elma dilimi doğrayın. Geniş yayvan bir tencerenin tabanına bir patates bir köfte olacak şekilde yan yana çember halinde dizin.',
+                    timerMinutes: 0
+                },
+                {
+                    text: '3. Adım (Salçalı Sos ve Pişirme): 1 yemek kaşığı salçayı 2 su bardağı sıcak su ve 3 yemek kaşığı zeytinyağı ile bir kasede çatal yardımıyla eritip köftelerin üzerine gezdirin. Kapağı kapatıp kısık ateşte patateslerin üzerine çatal batırdığınızda kolayca girene kadar 28 dakika pişirin.',
+                    timerMinutes: 28
+                }
+            ]
+        },
+        {
+            id: 'firinda_soslu_tavuk_patates',
+            title: 'Yumuşacık Fırında (veya Tencerede) Soslu Tavuk ve Patates',
+            keywords: ['tavuk', 'patates', 'fırında tavuk', 'baget', 'tavuk göğsü'],
+            ingredients: '600 gram kuşbaşı veya baget tavuk eti, 3 adet patates, 2 yemek kaşığı yoğurt, 3 yemek kaşığı zeytinyağı, 1 tatlı kaşığı domates salçası, 1 tatlı kaşığı kekik, 1 tatlı kaşığı tuz.',
+            steps: [
+                {
+                    text: '1. Adım (Elinizle Soslama): Derin bir kapta 2 yemek kaşığı yoğurt, 3 yemek kaşığı zeytinyağı, 1 tatlı kaşığı salça, tuz ve kekiği karıştırın. Tavukları ve iri doğranmış patatesleri içine atıp her yerine sos değecek şekilde elinizle harmanlayın.',
+                    timerMinutes: 0
+                },
+                {
+                    text: '2. Adım (Pişirme): Malzemeleri fırın tepsisine veya geniş kapaklı bir tencereye yayın. Fırında 200 derecede 35 dakika; tencerede ise yarım su bardağı su ilavesiyle kısık ateşte 30 dakika pişirin. Mis gibi kekik kokusu mutfağı sardığında yemeğiniz hazırdır!',
+                    timerMinutes: 30
+                }
+            ]
+        },
+        {
+            id: 'salcali_soslu_makarna',
+            title: 'Süzmeden Tam Ölçülü Salçalı ve Peynirli Demleme Makarna (Yanma Riski Sıfır!)',
+            keywords: ['makarna', 'spagetti', 'peynir', 'salçalı makarna', 'burgu makarna'],
+            ingredients: 'Yarım paket (250 gram / yaklaşık 3 su bardağı) burgu veya kalem makarna, 1 yemek kaşığı tereyağı, 2 yemek kaşığı sıvı yağ, 1 dolu yemek kaşığı domates salçası, 1 tatlı kaşığı kuru nane veya kekik, 1 tatlı kaşığı tuz, tam 3 su bardağı sıcak su.',
+            steps: [
+                {
+                    text: '1. Adım (Güvenli Demleme Yöntemi - Kaynar Su Süzme Tehlikesi Yok!): Görme engelli aşçılar için kaynar makarna suyunu lavaboda süzmek yerine çok daha lezzetli olan "demleme makarna" yöntemini kullanıyoruz. Tencereye yağları ve 1 yemek kaşığı salçayı koyup kokusu çıkana kadar 2 dakika kavurun.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '2. Adım (Tam Ölçü Su ve Makarna): 3 su bardağı kuru makarnayı, 1 tatlı kaşığı tuzu, naneyi ve tam 3 su bardağı sıcak suyu tencereye ekleyin. Karıştırıp kapağını kapatın.',
+                    timerMinutes: 0
+                },
+                {
+                    text: '3. Adım (11 Dakika Kısık Ateş): Kaynama sesini duyunca ocağı kısığa alın ve arada bir karıştırarak 11 dakika pişirin. Makarna tüm soslu suyu içine çekip lokum gibi pişecektir; hiç süzmenize gerek kalmadan doğrudan tabağa alabilirsiniz!',
+                    timerMinutes: 11
+                }
+            ]
+        },
+        {
+            id: 'zeytinyagli_taze_fasulye',
+            title: 'Susuz Kendi Buharında Pişen Zeytinyağlı Taze Fasulye',
+            keywords: ['taze fasulye', 'zeytinyağlı', 'domates', 'fasulye'],
+            ingredients: 'Yarım kilo taze fasulye (uçları kırılıp ikiye bölünmüş), 2 adet orta boy kuru soğan, 3 adet olgun domates, yarım çay bardağı zeytinyağı, 1 tatlı kaşığı toz şeker, 1 tatlı kaşığı tuz, yarım su bardağı sıcak su.',
+            steps: [
+                {
+                    text: '1. Adım (Çiğden Kat Kat Dizme): Tencerenin en altına doğranmış soğanları, onun üzerine yıkanmış taze fasulyeleri, en üste ise küp doğranmış domatesleri yayın. Üzerine 1 tatlı kaşığı tuz, 1 tatlı kaşığı şeker, yarım çay bardağı zeytinyağı ve yarım su bardağı su gezdirin.',
+                    timerMinutes: 0
+                },
+                {
+                    text: '2. Adım (Kısık Ateşte 35 Dakika): Tencerenin kapağını kapatın, ilk 5 dakika orta ateşte fokurdama sesini duyduktan sonra en kısık ateşe alın ve 35 dakika pişirin. Çatalla kontrol ettiğinizde fasulyeler yumuşacıksa altını kapatıp soğumaya bırakın.',
+                    timerMinutes: 35
+                }
+            ]
+        },
+        {
+            id: 'kabaran_anne_keki',
+            title: '3-2-1 Bardak Ölçülü Garantili Kabaran Anne Keki (Cevizli & Tarçınlı)',
+            keywords: ['kek', 'tatlı', 'yumurta', 'ceviz', 'tarçın', 'anne keki', 'pasta'],
+            ingredients: '3 adet yumurta, 1 su bardağı toz şeker, 1 su bardağı süt, yarım su bardağı sıvı yağ, 2 buçuk su bardağı un, 1 paket kabartma tozu, 1 paket vanilya, 1 tatlı kaşığı tarçın, yarım su bardağı kırılmış ceviz.',
+            steps: [
+                {
+                    text: '1. Adım (Şeker Eriyene Kadar Çırpma): Derin çırpma kabına 3 yumurta ve 1 su bardağı şekeri koyun. Çırpma teli veya mikserle 4 dakika çırpın; kabın dibinde şeker tanelerinin çıtırtı sesi kesilip karışım köpük köpük olduğunda 1 su bardağı süt ve yarım su bardağı sıvı yağı ekleyin.',
+                    timerMinutes: 4
+                },
+                {
+                    text: '2. Adım (Un, Tarçın ve Ceviz): 2 buçuk su bardağı unu, 1 paket kabartma tozunu, vanilyayı, 1 tatlı kaşığı tarçını ve cevizi ekleyip 1 dakika daha karıştırın. Tereyağı ile yağlanmış kek kalıbına veya tepsiye dökün.',
+                    timerMinutes: 1
+                },
+                {
+                    text: '3. Adım (Kürdan ve Koku Testi): 180 derece fırında 35 dakika pişirin. 30. dakikadan itibaren evi mis gibi vanilya ve tarçın kokusu saracaktır. 35. dakikada kekin ortasına bir kürdan batırıp çıkarın; kürdanı dudağınıza veya parmak ucunuza dokundurduğunuzda ıslak hamur gelmiyorsa kekiniz mükemmel pişmiştir!',
+                    timerMinutes: 35
+                }
+            ]
+        },
+        {
+            id: 'tavsan_kani_cay_ve_turk_kahvesi',
+            title: 'Tavşan Kanı Türk Çayı ve Bol Köpüklü Türk Kahvesi Ölçüsü',
+            keywords: ['çay', 'kahve', 'türk kahvesi', 'demleme', 'içecek'],
+            ingredients: 'Çay için: Her 1 su bardağı sıcak suya 1 tatlı kaşığı kuru çay. Türk Kahvesi için (1 Fincan): 1 kahve fincanı soğuk su, 2 çay kaşığı tepeleme Türk kahvesi, isteğe göre 1 veya 2 çay kaşığı şeker.',
+            steps: [
+                {
+                    text: '1. Adım (Türk Kahvesi Sesli Köpük Takibi): Cezveye her fincan için 1 fincan soğuk su ve 2 çay kaşığı tepeleme kahve koyup ocağı açmadan önce 15 saniye iyice karıştırın. En kısık ateşe koyun ve bir daha karıştırmayın. Yaklaşık 2 buçuk dakika sonra cezvenin kenarlarından hafif bir "fısır-fısır" kabarma sesi duyacaksınız; tam kaynamadan hemen önce ocağı kapatıp fincana yavaşça dökün.',
+                    timerMinutes: 3
+                },
+                {
+                    text: '2. Adım (Tavşan Kanı Çay Demleme): Alt çaydanlıkta su kaynadığında, üst demliğe 4 yemek kaşığı kuru çay koyup üzerine 3 su bardağı kaynar suyu yavaşça gezdirin. Altını kısığa alıp 15 dakika demlendirin. Çayınız hazır!',
+                    timerMinutes: 15
+                }
+            ]
+        }
+    ];
+
+    function populateCookingRecipesSelect() {
+        const sel = document.getElementById('cooking-recipe-select');
+        if (!sel) return;
+        sel.innerHTML = '';
+        BLIND_ACCESSIBLE_RECIPES.forEach((rec, idx) => {
+            const opt = document.createElement('option');
+            opt.value = String(idx);
+            opt.textContent = `${idx + 1}. ${rec.title}`;
+            sel.appendChild(opt);
+        });
+        updateCookingGuideUI();
+    }
+
+    function updateCookingGuideUI() {
+        const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
+        if (!rec) return;
+        const stepObj = rec.steps[state.currentCookingStepIndex] || rec.steps[0];
+        const titleEl = document.getElementById('cooking-recipe-title');
+        const stepEl = document.getElementById('cooking-step-text');
+        const timerBtn = document.getElementById('btn-cooking-timer');
+
+        if (titleEl) {
+            titleEl.textContent = `${rec.title} — ${rec.ingredients}`;
+        }
+        if (stepEl && stepObj) {
+            stepEl.textContent = `(${state.currentCookingStepIndex + 1}/${rec.steps.length}) ${stepObj.text}`;
+        }
+        if (timerBtn && stepObj && !state.cookingTimerInterval) {
+            const mins = stepObj.timerMinutes || 3;
+            timerBtn.textContent = `⏱️ Bu Adımın Pişme Süresini Başlat (${mins} Dakika Konuşan Saat)`;
+        }
+    }
+
+    function selectCookingRecipe(index, speakNow = true) {
+        const idx = Math.max(0, Math.min(BLIND_ACCESSIBLE_RECIPES.length - 1, Number(index) || 0));
+        state.selectedRecipeIndex = idx;
+        state.currentCookingStepIndex = 0;
+        const sel = document.getElementById('cooking-recipe-select');
+        if (sel) sel.value = String(idx);
+        updateCookingGuideUI();
+        if (speakNow) {
+            const rec = BLIND_ACCESSIBLE_RECIPES[idx];
+            announceGuidance(`Seçilen yemek: ${rec.title}. Gerekli malzemeler: ${rec.ingredients} Şimdi 1. adıma başlamak için Bu Adımı Oku düğmesine basabilirsiniz.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        }
+    }
+
+    function speakCookingIngredients() {
+        const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
+        if (!rec) return;
+        announceGuidance(`${rec.title} için tam bardak ve kaşık ölçüsüyle malzemeler: ${rec.ingredients}`, {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
+    function stepCookingInstruction(delta) {
+        const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
+        if (!rec) return;
+        if (delta < 0 && state.currentCookingStepIndex <= 0) {
+            announceGuidance(`İlk adımdasınız. ${rec.steps[0].text}`, { force: true });
+            return;
+        }
+        if (delta > 0 && state.currentCookingStepIndex >= rec.steps.length - 1) {
+            announceGuidance(`Tebrikler, ${rec.title} tarifinin son adımındasınız! Yemeğiniz hazır, ellerinize sağlık ve afiyet olsun!`, {
+                force: true,
+                bannerState: 'centered'
+            });
+            return;
+        }
+        state.currentCookingStepIndex = Math.max(0, Math.min(rec.steps.length - 1, state.currentCookingStepIndex + delta));
+        updateCookingGuideUI();
+        const stepObj = rec.steps[state.currentCookingStepIndex];
+        const timerHint = stepObj.timerMinutes > 0
+            ? ` Bu adımın pişme süresi ${stepObj.timerMinutes} dakikadır; Konuşan Tencere Saatini Başlat düğmesine basarak süreyi başlatabilirsiniz.`
+            : '';
+        announceGuidance(`${stepObj.text}${timerHint}`, {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
+
+    function formatMinutesSecondsTurkish(totalSec) {
+        const m = Math.floor(totalSec / 60);
+        const s = totalSec % 60;
+        if (m > 0 && s > 0) return `${m} dakika ${s} saniye`;
+        if (m > 0) return `${m} dakika`;
+        return `${s} saniye`;
+    }
+
+    function toggleCookingStepTimer() {
+        const timerEl = document.getElementById('cooking-timer-display');
+        const timerBtn = document.getElementById('btn-cooking-timer');
+        const badgeEl = document.getElementById('cooking-status-badge');
+
+        if (state.cookingTimerInterval) {
+            clearInterval(state.cookingTimerInterval);
+            state.cookingTimerInterval = null;
+            state.cookingTimerRemainingSec = 0;
+            if (timerEl) timerEl.textContent = 'Sayaç durduruldu';
+            if (badgeEl) badgeEl.textContent = 'Mutfak Şefiniz Hazır';
+            updateCookingGuideUI();
+            announceGuidance('Konuşan tencere ve fırın saati durduruldu.', { force: true });
+            return;
+        }
+
+        const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
+        const stepObj = rec ? rec.steps[state.currentCookingStepIndex] : null;
+        const minutes = (stepObj && stepObj.timerMinutes > 0) ? stepObj.timerMinutes : 3;
+        state.cookingTimerRemainingSec = minutes * 60;
+
+        if (timerBtn) {
+            timerBtn.textContent = '⏹️ Konuşan Tencere Saatini Durdur';
+        }
+        if (badgeEl) {
+            badgeEl.textContent = `⏱️ Pişiyor: ${minutes} dk`;
+        }
+        if (timerEl) {
+            timerEl.textContent = `Kalan Süre: ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}`;
+        }
+        announceGuidance(`${minutes} dakikalık konuşan tencere saati başlatıldı! Her dakikada kalan süreyi size sesli bildireceğim ve süre bittiğinde alarm çalacağım.`, {
+            force: true,
+            bannerState: 'centered'
+        });
+
+        state.cookingTimerInterval = setInterval(() => {
+            state.cookingTimerRemainingSec--;
+            if (timerEl) {
+                timerEl.textContent = `Kalan Süre: ${formatMinutesSecondsTurkish(Math.max(0, state.cookingTimerRemainingSec))}`;
+            }
+
+            if (state.cookingTimerRemainingSec <= 0) {
+                clearInterval(state.cookingTimerInterval);
+                state.cookingTimerInterval = null;
+                radar.playLockedChime();
+                if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 400]);
+                if (timerEl) timerEl.textContent = 'SÜRE DOLDU! Pişme tamamlandı!';
+                if (badgeEl) badgeEl.textContent = '✅ Pişme Süresi Doldu!';
+                updateCookingGuideUI();
+                announceGuidance('DİKKAT SÜRE DOLDU! Tencere veya fırın saatiniz tamamlandı! Lütfen ocağı kontrol edin veya Sonraki Adım düğmesine geçin.', {
+                    force: true,
+                    bannerState: 'centered'
+                });
+                return;
+            }
+
+            if (state.cookingTimerRemainingSec === 30) {
+                announceGuidance('Pişme süresinin bitmesine son 30 saniye kaldı.', { force: true });
+            } else if (state.cookingTimerRemainingSec <= 5 && state.cookingTimerRemainingSec > 0) {
+                announceGuidance(String(state.cookingTimerRemainingSec), { force: true });
+            } else if (state.cookingTimerRemainingSec % 60 === 0) {
+                const remMin = Math.round(state.cookingTimerRemainingSec / 60);
+                announceGuidance(`Tencere saati bilgisi: Pişmenin tamamlanmasına ${remMin} dakika kaldı.`, { force: true });
+            }
+        }, 1000);
+    }
+
+    function findRecipeByIngredientsOrName(queryText) {
+        const q = String(queryText || '').trim().toLocaleLowerCase('tr-TR');
+        if (!q) {
+            announceGuidance('Lütfen evdeki malzemeleri veya yapmak istediğiniz yemeğin adını yazın ya da Sesle Malzeme Söyle düğmesine basın.', {
+                force: true,
+                bannerState: 'warning'
+            });
+            return;
+        }
+        const words = q.split(/[\s,;.]+/).filter(w => w.length >= 3);
+        let bestIdx = -1;
+        let bestScore = 0;
+
+        BLIND_ACCESSIBLE_RECIPES.forEach((rec, idx) => {
+            const hay = `${rec.title} ${rec.keywords.join(' ')} ${rec.ingredients}`.toLocaleLowerCase('tr-TR');
+            let score = 0;
+            if (hay.includes(q)) score += 5;
+            words.forEach(w => {
+                if (hay.includes(w)) score += 2;
+            });
+            if (score > bestScore) {
+                bestScore = score;
+                bestIdx = idx;
+            }
+        });
+
+        if (bestIdx >= 0 && bestScore > 0) {
+            selectCookingRecipe(bestIdx, false);
+            const rec = BLIND_ACCESSIBLE_RECIPES[bestIdx];
+            announceGuidance(`Söylediğiniz malzemelere en uygun yemek bulundu: ${rec.title}! Gerekli malzemeler: ${rec.ingredients} Şimdi 1. adımdan başlıyoruz: ${rec.steps[0].text}`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        } else {
+            announceGuidance(`"${queryText}" için tam eşleşen bir tarif bulunamadı, ancak listedeki 10 erişilebilir Türk yemeğinden dilediğinizi seçebilirsiniz.`, {
+                force: true,
+                bannerState: 'warning'
+            });
+        }
+    }
+
+    function speakBlindCookingSafetyTips() {
+        const tips = 'Görme Engelli Aşçılar İçin 5 Altın Mutfak Püf Noktası: ' +
+            '1: Soğan, sarımsak veya eti asla kızgın yağa atmayın; önce tavaya soğukken koyup ocağı sonra açın, böylece yağ elinize sıçramaz. ' +
+            '2: Doğrama yaparken bıçağın ucu tahtadan hiç kalkmasın, sol elinizin parmak uçlarını içeri doğru "pençe" gibi kıvırarak sebzeyi tutun. ' +
+            '3: Tencereyi ocağın tam ortasına oturttuğunuzdan emin olmak için ocağı yakmadan önce tencereyi ızgarada hafifçe sağa sola yoklayın ve sapını her zaman içe doğru çevirin ki kolunuz çarpmasın. ' +
+            '4: Makarna yaparken kaynar su süzmek yerine tariflerimizdeki bire bir su ölçülü "demleme makarna" yöntemini kullanın. ' +
+            '5: Yemeğin pişip pişmediğini anlamak için kameramızı tencereye veya ocağa tutup Ocak Ateşi ve Kızarmışlık Kontrolü düğmesine basabilirsiniz.';
+        showDetectedResult('🛡️ Görme Engelli Aşçılar İçin Güvenli Mutfak Rehberi', tips);
+        announceGuidance(tips, { force: true, bannerState: 'centered' });
+    }
+
+    function analyzeStoveFlameAndFoodBrowning(capCanvas, metrics, cleanText = '') {
+        const ctx = capCanvas.getContext('2d');
+        const w = capCanvas.width;
+        const h = capCanvas.height;
+        const img = ctx.getImageData(Math.floor(w * 0.15), Math.floor(h * 0.15), Math.floor(w * 0.7), Math.floor(h * 0.7));
+        const d = img.data;
+
+        let blueFlamePixels = 0;
+        let orangeFlameGlowPixels = 0;
+        let goldenBrownPixels = 0;
+        let darkBurntPixels = 0;
+        let total = 0;
+
+        for (let i = 0; i < d.length; i += 16) {
+            const r = d[i], g = d[i + 1], b = d[i + 2];
+            total++;
+            // Mavi doğalgaz/ocak alevi (Yüksek mavi/camgöbeği parlaklık)
+            if (b > 175 && g > 110 && r < 120 && (b - r) > 65) {
+                blueFlamePixels++;
+            }
+            // Turuncu/kırmızı ateş veya elektrikli ocak koru
+            if (r > 215 && g > 85 && g < 185 && b < 70 && (r - b) > 140) {
+                orangeFlameGlowPixels++;
+            }
+            // Altın sarısı / karamelize kızarmış yemek tonu (pilav şehriyesi, kek üstü, köfte, börek)
+            if (r >= 135 && r <= 225 && g >= 75 && g <= 165 && b >= 20 && b <= 95 && (r - g) >= 30 && (g - b) >= 25) {
+                goldenBrownPixels++;
+            }
+            // Çok koyu / yanmaya yüz tutmuş yüzey
+            if (r < 36 && g < 32 && b < 30) {
+                darkBurntPixels++;
+            }
+        }
+
+        const blueRatio = blueFlamePixels / Math.max(1, total);
+        const orangeRatio = orangeFlameGlowPixels / Math.max(1, total);
+        const goldenRatio = goldenBrownPixels / Math.max(1, total);
+        const burntRatio = darkBurntPixels / Math.max(1, total);
+
+        const hasFlame = blueRatio > 0.008 || orangeRatio > 0.012;
+        const flameMsg = hasFlame
+            ? (blueRatio >= orangeRatio
+                ? 'Ocak Ateşi Kontrolü: Ocak AÇIK, mavi doğalgaz alevi net olarak yanıyor.'
+                : 'Ocak Ateşi Kontrolü: Ocak veya fırın rezistansı AÇIK, turuncu-kırmızı ateş/kor algılandı.')
+            : 'Ocak Ateşi Kontrolü: Görüntüde açık bir mavi veya turuncu ocak alevi görünmüyor.';
+
+        const colName = (metrics && metrics.centerColor) ? metrics.centerColor.name : 'Normal';
+        let donenessMsg = '';
+        let isBurntRisk = false;
+
+        if (burntRatio > 0.32 && metrics.avgBrightness > 45) {
+            donenessMsg = `DİKKAT YANMA UYARISI: Yemeğin veya tavanın orta kısmında koyu kararma (%${Math.round(burntRatio * 100)}) algılandı! Lütfen hemen ocağı kısın veya karıştırın!`;
+            isBurntRisk = true;
+        } else if (goldenRatio > 0.18) {
+            donenessMsg = `Pişmişlik ve Kızarmışlık: Harika görünüyor! Yiyecek altın sarısı / kızarmış kıvama (%${Math.round(goldenRatio * 100)} karamelize ton, ${colName}) ulaşmış.`;
+        } else {
+            donenessMsg = `Yüzey ve Renk Durumu: Merkezdeki renk ${colName}. Yiyecek henüz açık renkte / pişme aşamasında, yanık izi yok.`;
+        }
+
+        const statusEl = document.getElementById('cooking-doneness-display');
+        if (statusEl) {
+            statusEl.textContent = `${hasFlame ? '🔥 Ocak Açık' : 'Ocak Alevi Yok'} | ${isBurntRisk ? '⚠️ Kararma/Yanık Riski' : (goldenRatio > 0.18 ? '✅ Altın Sarısı Kızarmış' : colName)}`;
+        }
+
+        const speech = `${flameMsg} ${donenessMsg} ${cleanText ? 'Okunan paket/fırın yazısı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
+        return {
+            speechText: speech,
+            fullText: `${flameMsg}\n${donenessMsg}\n\nOkunan Yazı / Derece:\n${cleanText || 'Yazı yok.'}`,
+            isBurntRisk
+        };
+    }
+
+    function handleCookingGuideLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
+        const col = metrics.centerColor ? metrics.centerColor.name : 'Bilinmiyor';
+        el.tPosition.textContent = `Tencere / Ocak Rengi: ${col}`;
+        el.tDistance.textContent = state.cookingTimerInterval
+            ? `Sayaç: ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}`
+            : 'Aşçı Rehberi Hazır';
+    }
+
+    function checkStoveFlameAndFoodDoneness() {
+        if (!state.isRunning) {
+            announceGuidance('Ocak ateşini ve yemeğin kızarmışlığını kontrol etmek için önce üstteki Kamerayı Başlat düğmesine basın, ardından kamerayı tencereye veya ocağa tutun.', {
+                force: true,
+                bannerState: 'warning'
+            });
+            return;
+        }
+        captureAndDescribePhoto(false);
+    }
+
     function syncModePanelsVisibility(activeMode) {
         if (el.examRemotePanel) {
             el.examRemotePanel.hidden = (activeMode !== 'exam_reader');
@@ -8151,8 +8674,11 @@
         if (el.stepCaloriePanel) {
             el.stepCaloriePanel.hidden = (activeMode !== 'step_calorie_guide');
         }
+        if (el.cookingGuidePanel) {
+            el.cookingGuidePanel.hidden = (activeMode !== 'cooking_guide');
+        }
         if (el.targetFilterSection) {
-            el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder' || activeMode === 'item_memory' || activeMode === 'step_calorie_guide');
+            el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder' || activeMode === 'item_memory' || activeMode === 'step_calorie_guide' || activeMode === 'cooking_guide');
         }
     }
 
@@ -8200,7 +8726,8 @@
             'tv_subtitle_score': '19. Bölüm: Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri açıldı. Telefonu televizyona doğru tutun ve Otomatik TV Spikerini Başlat düğmesine basın.',
             'sock_outfit_check': '20. Bölüm: Çorap Eşleştirici, Kıyafet Kombin Uyumu ve Leke Kontrolü açıldı. İki çorabı yan yana kameraya tutup Boşluk tuşuna basın; birbirinin eşi olup olmadığını ve leke durumunu söyleyeceğim.',
             'where_am_i': '21. Bölüm: Tam Olarak Neredeyim? Sokak, Bina, Tabela ve WhatsApp Konum Tarif Edici açıldı. Bulunduğunuz cadde ve sokağı hemen öğreniliyor.',
-            'step_calorie_guide': `22. Bölüm: Sesli Adım Sayacı ve Sağlıklı Besin Rehberi açıldı. Bugün ${state.dailySteps || 0} adım attınız. Telefon cebinizde yürürken adımlarınızı sayarım; ayrıca yediğiniz yemeği söyleyip veya paketi kameraya gösterip besin değerini öğrenebilirsiniz.`
+            'step_calorie_guide': `22. Bölüm: Sesli Adım Sayacı ve Sağlıklı Besin Rehberi açıldı. Bugün ${state.dailySteps || 0} adım attınız. Telefon cebinizde yürürken adımlarınızı sayarım; ayrıca yediğiniz yemeği söyleyip veya paketi kameraya gösterip besin değerini öğrenebilirsiniz.`,
+            'cooking_guide': '23. Bölüm: Erişilebilir Yemek Yapma Rehberi ve Konuşan Aşçı açıldı. Tüm yemek tariflerimiz kokuya, cızırtı sesine, tam bardak ölçüsüne ve dakikaya göre hazırlanmıştır. İstediğiniz yemeği seçin veya evdeki malzemeleri söyleyin, adım adım birlikte pişirelim.'
         }[newMode];
 
         if (modeAnnouncement) {
@@ -8572,6 +9099,65 @@
         });
     }
 
+    // 23. Erişilebilir Yemek Yapma Rehberi ve Konuşan Aşçı Düğmeleri
+    const cookingRecipeSelect = document.getElementById('cooking-recipe-select');
+    const cookingIngredientInput = document.getElementById('cooking-ingredient-input');
+    const btnCookingFind = document.getElementById('btn-cooking-find');
+    const btnCookingVoice = document.getElementById('btn-cooking-voice');
+    const btnCookingIngredients = document.getElementById('btn-cooking-ingredients');
+    const btnCookingPrev = document.getElementById('btn-cooking-prev');
+    const btnCookingCurrent = document.getElementById('btn-cooking-current');
+    const btnCookingNext = document.getElementById('btn-cooking-next');
+    const btnCookingTimer = document.getElementById('btn-cooking-timer');
+    const btnCookingCheckDoneness = document.getElementById('btn-cooking-check-doneness');
+    const btnCookingSafetyTips = document.getElementById('btn-cooking-safety-tips');
+
+    if (cookingRecipeSelect) {
+        cookingRecipeSelect.addEventListener('change', () => {
+            selectCookingRecipe(cookingRecipeSelect.value, true);
+        });
+    }
+    if (btnCookingFind && cookingIngredientInput) {
+        btnCookingFind.addEventListener('click', () => findRecipeByIngredientsOrName(cookingIngredientInput.value));
+        cookingIngredientInput.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                findRecipeByIngredientsOrName(cookingIngredientInput.value);
+            }
+        });
+    }
+    if (btnCookingVoice) {
+        btnCookingVoice.addEventListener('click', () => {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRec) {
+                announceGuidance('Lütfen evdeki malzemeleri veya yemek adını kutuya yazın.', { force: true });
+                return;
+            }
+            announceGuidance('Evde hangi malzemeler var veya hangi yemeği yapmak istiyorsunuz? Şimdi söyleyin, örneğin: Patates ve kıyma var ya da pirinç pilavı.', { force: true });
+            setTimeout(() => {
+                try {
+                    const rec = new SpeechRec();
+                    rec.lang = 'tr-TR';
+                    rec.onresult = (ev) => {
+                        const t = (ev.results && ev.results[0] && ev.results[0][0]) ? ev.results[0][0].transcript : '';
+                        if (t) {
+                            if (cookingIngredientInput) cookingIngredientInput.value = t;
+                            findRecipeByIngredientsOrName(t);
+                        }
+                    };
+                    rec.start();
+                } catch (_) {}
+            }, 1600);
+        });
+    }
+    if (btnCookingIngredients) btnCookingIngredients.addEventListener('click', speakCookingIngredients);
+    if (btnCookingPrev) btnCookingPrev.addEventListener('click', () => stepCookingInstruction(-1));
+    if (btnCookingCurrent) btnCookingCurrent.addEventListener('click', () => stepCookingInstruction(0));
+    if (btnCookingNext) btnCookingNext.addEventListener('click', () => stepCookingInstruction(1));
+    if (btnCookingTimer) btnCookingTimer.addEventListener('click', toggleCookingStepTimer);
+    if (btnCookingCheckDoneness) btnCookingCheckDoneness.addEventListener('click', checkStoveFlameAndFoodDoneness);
+    if (btnCookingSafetyTips) btnCookingSafetyTips.addEventListener('click', speakBlindCookingSafetyTips);
+
     el.touchZone.addEventListener('click', () => {
         const now = performance.now();
         if (now - state.lastTouchTime < 420) {
@@ -8651,6 +9237,7 @@
         loadMoneyLedgerFromStorage();
         loadItemMemoriesFromStorage();
         loadStepCalorieFromStorage();
+        populateCookingRecipesSelect();
         syncModePanelsVisibility(state.mode);
         autoAcquireLocationAndWatch();
         updateExamRemoteUI();

@@ -72,8 +72,11 @@
         <section aria-labelledby="mode-heading" class="mode-section">
             <h2 id="mode-heading">Kategoriler</h2>
             <div class="category-bar" role="group" aria-label="Uygulama Kategorileri" style="display:flex; flex-wrap:wrap; gap:0.55rem; margin-bottom:0.9rem;">
-                <button type="button" class="secondary-btn category-tab active-toggle" data-category="all" aria-pressed="true" aria-label="Tümü: 22 Özelliğin Tamamını Göster">
+                <button type="button" class="secondary-btn category-tab active-toggle" data-category="all" aria-pressed="true" aria-label="Tümü: 23 Özelliğin Tamamını Göster">
                     🌟 Tümü
+                </button>
+                <button type="button" class="secondary-btn category-tab" data-category="mutfak" aria-pressed="false" aria-label="Mutfak ve Yemek Yapma Kategorisi">
+                    🍳 Mutfak
                 </button>
                 <button type="button" class="secondary-btn category-tab" data-category="ev" aria-pressed="false" aria-label="Ev Kategorisi">
                     🏠 Ev
@@ -152,7 +155,7 @@
                     <span class="mode-desc" aria-hidden="true">Kağıttaki imza yerini ve elinizdeki kalemin ucunu aynı anda görür; "Kalemi biraz sağa, biraz aşağı götür... Tamam dur, şimdi imzala!" diyerek doğru yeri imzalatır.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="liquid_level" data-category="ev" role="radio" aria-checked="false" id="mode-btn-11" aria-label="11. Bardağa Çay ve Su Doldurma Yardımcısı">
+                <button type="button" class="mode-card" data-mode="liquid_level" data-category="mutfak" role="radio" aria-checked="false" id="mode-btn-11" aria-label="11. Bardağa Çay ve Su Doldurma Yardımcısı">
                     <span class="mode-icon" aria-hidden="true">☕🥛</span>
                     <span class="mode-title">11. Bardağa Çay ve Su Doldurma Yardımcısı</span>
                     <span class="mode-desc" aria-hidden="true">Bardağa sıcak çay, kahve veya su doldururken elinizi yakmadan bardağın ne kadar dolduğunu sesle takip eder; taşmasına yakın "Bardak doldu, durdurun!" diye uyarır.</span>
@@ -164,7 +167,7 @@
                     <span class="mode-desc" aria-hidden="true">Apartman kapı numaralarını, asansörde parmağınızın hangi kat tuşunda olduğunu ve çamaşır makinesi, klima veya kombinin dijital ekranındaki dereceyi okur.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="food_freshness" data-category="saglik" role="radio" aria-checked="false" id="mode-btn-13" aria-label="13. Yiyecek Bozulmuş mu ve Paket İçeriği Okuyucu">
+                <button type="button" class="mode-card" data-mode="food_freshness" data-category="mutfak" role="radio" aria-checked="false" id="mode-btn-13" aria-label="13. Yiyecek Bozulmuş mu ve Paket İçeriği Okuyucu">
                     <span class="mode-icon" aria-hidden="true">🍎🛡️</span>
                     <span class="mode-title">13. Yiyecek Bozulmuş mu ve Paket İçeriği Okuyucu</span>
                     <span class="mode-desc" aria-hidden="true">Ekmek, peynir veya meyvenin üzerinde küf ya da çürük lekesi olup olmadığını kontrol eder; market paketlerindeki alerji yapan maddeleri (gluten, süt, fıstık) ve tarihi okur.</span>
@@ -222,6 +225,12 @@
                     <span class="mode-icon" aria-hidden="true">👟🥗</span>
                     <span class="mode-title">22. Sesli Adım Sayacı ve Kalori / Besin Rehberi</span>
                     <span class="mode-desc" aria-hidden="true">Yürürken adımlarınızı, yürüdüğünüz mesafeyi ve harcadığınız enerjiyi motive edici tatlı bir dille sesli sayar; Türk yemeklerinin ve paketli gıdaların kalori ile besin değerlerini söyler.</span>
+                </button>
+
+                <button type="button" class="mode-card" data-mode="cooking_guide" data-category="mutfak" role="radio" aria-checked="false" id="mode-btn-23" aria-label="23. Erişilebilir Yemek Yapma Rehberi ve Konuşan Aşçı">
+                    <span class="mode-icon" aria-hidden="true">👩‍🍳🍲</span>
+                    <span class="mode-title">23. Erişilebilir Yemek Yapma Rehberi ve Konuşan Aşçı</span>
+                    <span class="mode-desc" aria-hidden="true">Görme engelliler için kokuya, cızırtı sesine, tam bardak/kaşık ölçüsüne ve dakikaya göre adım adım yemek yaptırır. Konuşan tencere saati kurar; kameradan ocak ateşini ve yemeğin kızarmışlığını kontrol eder.</span>
                 </button>
             </div>
         </section>
@@ -690,6 +699,74 @@
                 <div class="telemetry-item" role="listitem">
                     <span class="t-label">Bugün Alınan Toplam Enerji:</span>
                     <strong id="calorie-intake-total">0 kcal</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- 23. ERİŞİLEBİLİR YEMEK YAPMA REHBERİ VE KONUŞAN AŞÇI PANELİ -->
+        <section id="cooking-guide-panel" hidden aria-labelledby="cooking-guide-heading" class="exam-remote-section" style="border-color: #f59e0b;">
+            <div class="exam-remote-header">
+                <h2 id="cooking-guide-heading" style="color: #fbbf24;">👩‍🍳🍲 Erişilebilir Yemek Yapma Rehberi &amp; Konuşan Aşçı</h2>
+                <span id="cooking-status-badge" class="status-badge ready">Mutfak Şefiniz Hazır</span>
+            </div>
+            <p class="exam-remote-hint">
+                Tüm tarifler görme engelli aşçılar için <strong>tam bardak/kaşık ölçüsüyle, kokuya, tencere sesine ve dakikaya göre</strong> hazırlanmıştır. İstediğiniz yemeği seçin veya evdeki malzemeleri söyleyin; adım adım birlikte pişirelim:
+            </p>
+            <div class="exam-nav-row" style="align-items:center; gap: 0.6rem;">
+                <label for="cooking-recipe-select" style="font-weight:700;">Yemek Seçin:</label>
+                <select id="cooking-recipe-select" aria-label="Adım adım yapmak istediğiniz yemeği listeden seçin" style="flex:1; min-width: 210px; padding: 0.65rem 0.85rem; border-radius: 10px; border: 2px solid #475569; background: #0f172a; color: #f8fafc; font-size: 1rem;"></select>
+            </div>
+            <div class="exam-nav-row" style="align-items:center; gap: 0.6rem;">
+                <label for="cooking-ingredient-input" style="font-weight:700;">Evdeki Malzeme / Yemek Ara:</label>
+                <input type="text" id="cooking-ingredient-input" placeholder="Örn: Patates ve kıyma var, mercimek, pilav, kek..." aria-label="Evdeki malzemeleri veya yapmak istediğiniz yemeği yazın" style="flex:1; min-width: 200px; padding: 0.65rem 0.85rem; border-radius: 10px; border: 2px solid #475569; background: #0f172a; color: #f8fafc; font-size: 1rem;">
+                <button type="button" id="btn-cooking-find" class="secondary-btn" aria-label="Yazılan Malzemeye Göre Uygun Yemeği Bul">
+                    🔍 Malzemeye Göre Tarif Bul
+                </button>
+                <button type="button" id="btn-cooking-voice" class="secondary-btn" aria-label="Evdeki Malzemeyi veya Yemek Adını Mikrofonla Söyleyin">
+                    🎤 Sesle Malzeme / Yemek Söyle
+                </button>
+            </div>
+            <div class="exam-nav-row" role="group" aria-label="Adım Adım Yemek Yapma Kumandası">
+                <button type="button" id="btn-cooking-ingredients" class="secondary-btn" aria-label="Seçili Yemeğin Tüm Malzemelerini Tam Bardak ve Kaşık Ölçüsüyle Sesli Oku">
+                    🥣 Malzemeleri ve Ölçüleri Oku
+                </button>
+                <button type="button" id="btn-cooking-prev" class="secondary-btn" aria-label="Önceki Pişirme Adımına Dön">
+                    ⬅️ Önceki Adım
+                </button>
+                <button type="button" id="btn-cooking-current" class="primary-btn" style="background: linear-gradient(135deg, #d97706, #b45309);" aria-label="Şu Anki Pişirme Adımını Sesli Oku">
+                    🔊 Bu Adımı Oku
+                </button>
+                <button type="button" id="btn-cooking-next" class="primary-btn" style="background: linear-gradient(135deg, #16a34a, #059669);" aria-label="Sonraki Pişirme Adımına Geç">
+                    Sonraki Adım ➡️
+                </button>
+            </div>
+            <div class="exam-nav-row" role="group" aria-label="Konuşan Tencere Saati ve Kamera ile Ocak / Pişmişlik Kontrolü">
+                <button type="button" id="btn-cooking-timer" class="secondary-btn" aria-label="Bu Adımdaki Pişirme Süresi İçin Konuşan Tencere Saatini Başlat veya Durdur">
+                    ⏱️ Bu Adımın Pişme Süresini Başlat (Konuşan Saat)
+                </button>
+                <button type="button" id="btn-cooking-check-doneness" class="secondary-btn" aria-label="Kamerayla Ocak Ateşinin Yanıp Yanmadığını ve Yemeğin Kızarıp Kızarmadığını Kontrol Et">
+                    🔥 Kamerayla Ocak Ateşi &amp; Kızarmışlık Kontrolü Yap
+                </button>
+                <button type="button" id="btn-cooking-safety-tips" class="secondary-btn" aria-label="Görme Engelli Aşçılar İçin Güvenli Doğrama, Kızartma ve Ölçü Püf Noktalarını Dinle">
+                    🛡️ Görme Engelli Aşçı Püf Noktaları
+                </button>
+            </div>
+            <div class="telemetry-grid" role="list" aria-label="Yemek Tarifi ve Tencere Saati Bilgileri">
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Seçili Yemek ve Malzemeler:</span>
+                    <strong id="cooking-recipe-title">-</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Şu Anki Pişirme Adımı:</span>
+                    <strong id="cooking-step-text" style="color:#fbbf24;">Adım bekleniyor...</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Konuşan Tencere / Fırın Saati:</span>
+                    <strong id="cooking-timer-display">Sayaç kapalı</strong>
+                </div>
+                <div class="telemetry-item" role="listitem">
+                    <span class="t-label">Ocak Ateşi ve Kızarmışlık Durumu:</span>
+                    <strong id="cooking-doneness-display">Kamera kontrolü bekleniyor...</strong>
                 </div>
             </div>
         </section>
