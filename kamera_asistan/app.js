@@ -478,13 +478,19 @@
             .replace(/[Ⓓⓓ]/g, ' D) ')
             .replace(/[Ⓔⓔ]/g, ' E) ')
             .replace(/(^|\s)@\)\s*/gm, '$1A) ')
-            // Sadece parantezli A), (A) veya satır başındaki A., A- şıklarını standartlaştır (boşluksuz a)5 dahil)
-            .replace(/(^|\s)\(?([A-Ea-e])\)\s*(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `)
-            .replace(/(^|\n)\s*([A-Ea-e])[\.\-]\s+/g, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
+            // Parantez içi boşluklu "( A )" veya "A )" şıklarını ve satır içi "A. ... B. ... C. ..." şıklarını standartlaştır
+            .replace(/(^|\s)\(\s*([A-Ea-e])\s*\)\s*(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `)
+            .replace(/(^|\s)\(?([A-Ea-e])\s*\)\s*(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
+
+        if (/(?:^|\s)[A-Ea-e][\.\-]\s+\S[\s\S]*?(?:^|\s)[B-Eb-e][\.\-]\s+\S[\s\S]*?(?:^|\s)[C-Ec-e][\.\-]\s+\S/i.test(text)) {
+            text = text.replace(/(^|\s)([A-Ea-e])[\.\-]\s+(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
+        } else {
+            text = text.replace(/(^|\n)\s*([A-Ea-e])[\.\-]\s+/g, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
+        }
 
         // Soru numaralarından ("1.", "2.", "Soru 1") aday bloklara böl;
-        // ancak "1. öncül", "19. yüzyıl" gibi ifadelerin soruyu ortadan bölmemesi için
-        // şık içermeyen alt parçaları bir önceki soru köküne geri birleştir!
+        // ancak "1. öncül", "2. öncül" gibi soru kökündeki maddelerin soruyu ortadan bölmemesi için
+        // henüz A)-B) şıkları tamamlanmamış soru bloklarına alt maddeleri geri birleştir!
         const rawBlocks = text.split(/(?=(?:^|\n)\s*(?:SORU\s*\d+|\d{1,2}\s*[\.\-\)]\s+\S))/i)
             .map(b => b.trim())
             .filter(b => b.length > 5);
@@ -493,9 +499,14 @@
         for (let i = 0; i < rawBlocks.length; i++) {
             const blk = rawBlocks[i];
             const hasOptionPair = /(?:^|\s|\n)[A-C]\)\s+\S/.test(blk) && /(?:^|\s|\n)[B-E]\)\s+\S/.test(blk);
-            if (mergedBlocks.length > 0 && !hasOptionPair) {
-                const prevHasOptions = /(?:^|\s|\n)[A-C]\)\s+\S/.test(mergedBlocks[mergedBlocks.length - 1]);
+            if (mergedBlocks.length > 0) {
+                const prev = mergedBlocks[mergedBlocks.length - 1];
+                const prevHasOptions = /(?:^|\s|\n)[A-C]\)\s+\S/.test(prev) && /(?:^|\s|\n)[B-E]\)\s+\S/.test(prev);
                 if (!prevHasOptions) {
+                    mergedBlocks[mergedBlocks.length - 1] += '\n' + blk;
+                    continue;
+                }
+                if (!hasOptionPair && !/^\s*(?:SORU\s*)?\d{1,2}\s*[\.\-\)]/i.test(blk)) {
                     mergedBlocks[mergedBlocks.length - 1] += '\n' + blk;
                     continue;
                 }
@@ -531,10 +542,23 @@
             }
 
             if (matches.length > 0) {
-                qObj.stem = block.slice(0, matches[0].startIndex).replace(/\s+/g, ' ').trim();
-                for (let i = 0; i < matches.length; i++) {
-                    const current = matches[i];
-                    const nextStart = (i + 1 < matches.length) ? matches[i + 1].startIndex : block.length;
+                // Soru kökünde "A) kabındaki su B) kabına dökülüyor" gibi ifadeler geçtiğinde
+                // gerçek şık listesinin başladığı son A-B-C dizisini bul:
+                let optionStartIdx = 0;
+                for (let k = matches.length - 1; k >= 0; k--) {
+                    if (matches[k].letter === 'A') {
+                        const tailLetters = matches.slice(k + 1).map(x => x.letter);
+                        if (tailLetters.includes('B') && (tailLetters.includes('C') || tailLetters.includes('D'))) {
+                            optionStartIdx = k;
+                            break;
+                        }
+                    }
+                }
+                const realMatches = matches.slice(optionStartIdx);
+                qObj.stem = block.slice(0, realMatches[0].startIndex).replace(/\s+/g, ' ').trim();
+                for (let i = 0; i < realMatches.length; i++) {
+                    const current = realMatches[i];
+                    const nextStart = (i + 1 < realMatches.length) ? realMatches[i + 1].startIndex : block.length;
                     const optContent = block.slice(current.contentStart, nextStart).replace(/\s+/g, ' ').trim();
                     if (optContent && !qObj.options[current.letter]) {
                         qObj.options[current.letter] = optContent;
@@ -2961,8 +2985,8 @@
      * verisini %100 matematiksel kesinlikle (sıfır OCR hatasıyla) çıkarır.
      */
     function parseGs1MedicineDataMatrix(rawBarcode) {
-        const raw = String(rawBarcode || '').replace(/[\u001d\s]/g, '');
-        const m = raw.match(/01(\d{14})17(\d{2})(0[1-9]|1[0-2])(0[0-9]|[12]\d|3[01])/);
+        const raw = String(rawBarcode || '').replace(/[\u001d\s()]/g, '');
+        const m = raw.match(/01(\d{14})(?:17|.*?17)(\d{2})(0[1-9]|1[0-2])(0[0-9]|[12]\d|3[01])/);
         if (!m) return null;
         const gtin = m[1];
         const expYear = 2000 + parseInt(m[2], 10);
@@ -3013,7 +3037,11 @@
         const extractExpiryFromSingleText = (srcText) => {
             let eMonth = null;
             let eYear = null;
-            const cleaned = String(srcText || '').replace(/(?:[ÜU]\.?\s*R\.?\s*T\.?|[ÜU]\.?R\.?T\.?|[ÜU]\.?\s*T\.?|[ÜU]RET[İI]M(?:\s*TAR[İI]H[İI])?|[İI]MAL(?:\s*TAR[İI]H[İI])?|MFG|M\.?F\.?G\.?|PRD|P\.?\s*D\.?|PROD(?:UCTION)?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi, ' ');
+            const ocrZeroFixed = String(srcText || '')
+                .replace(/([0-9./\-])[Oo](?=[0-9./\-]|$)/g, '$10')
+                .replace(/(^|[\s:.\-/])[Oo](?=[0-9])/g, '$10')
+                .replace(/([0-9])[Oo](?=[0-9])/g, '$10');
+            const cleaned = ocrZeroFixed.replace(/(?:[ÜU]\.?\s*R\.?\s*T\.?|[ÜU]\.?R\.?T\.?|[ÜU]\.?\s*T\.?|[ÜU]RET[İI]M(?:\s*TAR[İI]H[İI])?|[İI]MAL(?:\s*TAR[İI]H[İI])?|MFG|M\.?F\.?G\.?|PRD|P\.?\s*D\.?|PROD(?:UCTION)?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi, ' ');
             const labeledRx = /(?:S\.?K\.?T\.?|SON\s*KULLAN(?:MA|IM)|SON\s*T[ÜU]KET[İI]M|EXP(?:IRY)?|T\.?E\.?T\.?T\.?|B\.?\s*B\.?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi;
             let m;
             while ((m = labeledRx.exec(cleaned)) !== null) {
@@ -7519,14 +7547,15 @@
         const upper = String(cleanText || '').toUpperCase();
         const hasBus = Array.isArray(preds) && preds.some(p => p.class === 'bus');
         const hasBusContextWords = /(?:^|[^\p{L}])(?:HAT|OTOBÜS|OTOBUS|MİNİBÜS|MINIBUS|DOLMUŞ|DOLMUS|DURAK|DURAĞI|İETT|IETT|EGO|ESHOT|METRO|METROBÜS|TRAMVAY|PERON)(?=$|[^\p{L}])/iu.test(upper);
+        const cleanedForBus = upper.replace(/\b(?:PERON|SAAT|KAPI|HAT\s*BOYU)\s*[:.]?\s*\d{1,4}\b/g, ' ');
         const alphaNumRouteMatches = (hasBus || hasBusContextWords)
-            ? (upper.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [])
+            ? (cleanedForBus.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [])
             : [];
         const pureNumMatches = (hasBus || hasBusContextWords)
-            ? (upper.match(/\b[1-9]\d{0,3}\b/g) || [])
+            ? (cleanedForBus.match(/\b[1-9]\d{0,3}\b/g) || [])
             : [];
-        const routeMatches = [...alphaNumRouteMatches, ...pureNumMatches];
-        const filteredRoutes = [...new Set(routeMatches)].filter(tok => tok.length >= 2 && tok !== '2026' && tok !== '2025');
+        const routeMatches = alphaNumRouteMatches.length > 0 ? alphaNumRouteMatches : pureNumMatches;
+        const filteredRoutes = [...new Set(routeMatches)].filter(tok => tok.length >= 1 && tok !== '2026' && tok !== '2025');
         const badgeEl = document.getElementById('bus-seen-number');
 
         if (filteredRoutes.length > 0) {
@@ -7761,10 +7790,11 @@
             }
         }
 
-        // POS veya Fiş Tutarı Yakalama (Binlik ayırıcı "1.250,00 TL" dahil, ₺/€/$ sembollerinde \b hatası olmadan!)
+        // POS veya Fiş Tutarı Yakalama (Binlik ayırıcı "1.250,00 TL" ve "₺480,50" dahil, ₺/€/$ sembollerinde \b hatası olmadan!)
         const amountNumberPattern = '(?:\\d{1,3}(?:[.\\s]\\d{3})+(?:,\\d{2})?|\\d{1,6}(?:[.,]\\d{2})?)';
+        const currencyToken = '(?:TL|₺|TÜRK\\s*LİRASI|LİRA|TRY|EUR|USD|€|\\$)';
         const amountRegex = new RegExp(
-            `(?:(?:GENEL\\s*TOPLAM|TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS|ÖDEME|ODEME|NAKİT|NAKIT|KART)\\s*[:\\-*]?\\s*${amountNumberPattern}(?:\\s*(?:TL|₺|TÜRK\\s*LİRASI|LİRA|TRY|EUR|USD|€|\\$))?|\\b${amountNumberPattern}\\s*(?:TL|₺|TÜRK\\s*LİRASI|LİRA|TRY|EUR|USD|€|\\$)(?=$|[^\\p{L}\\p{N}]))`,
+            `(?:(?:GENEL\\s*TOPLAM|TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS|ÖDEME|ODEME|NAKİT|NAKIT|KART)\\s*[:\\-*]?\\s*(?:${currencyToken}\\s*)?${amountNumberPattern}(?:\\s*${currencyToken})?|(?:₺|€|\\$)\\s*${amountNumberPattern}|\\b${amountNumberPattern}\\s*${currencyToken}(?=$|[^\\p{L}\\p{N}]))`,
             'giu'
         );
         const amountMatches = text.match(amountRegex) || [];
@@ -7905,16 +7935,43 @@
         });
     }
 
+    function buildTurkishStemVariants(word) {
+        const clean = String(word || '').toLocaleLowerCase('tr-TR').replace(/[^a-zçğıöşü0-9]/gu, '');
+        if (!clean) return [];
+        const variants = new Set([clean]);
+        // İyelik ve hal eklerini soy ("gözlüğümü" -> "gözlüğ", "anahtarımı" -> "anahtar", "ilacım" -> "ilac")
+        const stripped = clean.replace(/(?:l[ae]r)?(?:[ıiuü]m[ıiuü]z?|[ıiuü]n[ıiuü]z?|[sşy]?[ıiuü](?:n[ıiuü]|ndan|nda|na|n)?|d[ae]n?|t[ae]n?|[y]?[ae])$/u, '');
+        if (stripped.length >= 2) {
+            variants.add(stripped);
+            // Ünsüz yumuşaması geri çevirme (ğ->k, c->ç, b->p, d->t)
+            if (stripped.endsWith('ğ')) variants.add(stripped.slice(0, -1) + 'k');
+            if (stripped.endsWith('c')) variants.add(stripped.slice(0, -1) + 'ç');
+            if (stripped.endsWith('b')) variants.add(stripped.slice(0, -1) + 'p');
+            if (stripped.endsWith('d')) variants.add(stripped.slice(0, -1) + 't');
+        }
+        if (clean.length >= 4) {
+            const prefix = clean.slice(0, Math.max(3, clean.length - 3));
+            variants.add(prefix);
+            if (prefix.endsWith('ğ')) variants.add(prefix.slice(0, -1) + 'k');
+            if (prefix.endsWith('c')) variants.add(prefix.slice(0, -1) + 'ç');
+            if (prefix.endsWith('b')) variants.add(prefix.slice(0, -1) + 'p');
+            if (prefix.endsWith('d')) variants.add(prefix.slice(0, -1) + 't');
+        }
+        return Array.from(variants).filter(v => v.length >= 3);
+    }
+
     function searchItemMemoryByQuery(queryText) {
-        const q = String(queryText || '').trim().toLocaleLowerCase('tr-TR');
+        const q = String(queryText || '').trim().toLocaleLowerCase('tr-TR').replace(/[?.,!;:'"()]/g, ' ').replace(/\s+/g, ' ').trim();
         if (!q) {
             announceGuidance('Aramak istediğiniz eşyanın adını söyleyin veya kutuya yazın.', { force: true, bannerState: 'warning' });
             return;
         }
-        const words = q.replace(/\b(?:nerede|nereye|koydum|acaba|benim|hangi)\b/g, '').trim().split(/\s+/).filter(w => w.length >= 2);
+        const stopRegex = /(?:^|\s)(?:nerede|nereye|neredeydi|koydum|koymuştum|bıraktım|acaba|benim|hangi|olan)(?=$|\s)/gu;
+        const words = q.replace(stopRegex, ' ').trim().split(/\s+/).filter(w => w.length >= 2);
+        const queryStems = words.flatMap(buildTurkishStemVariants);
         const matches = state.itemMemories.filter(item => {
             const hay = item.text.toLocaleLowerCase('tr-TR');
-            return hay.includes(q) || words.some(w => hay.includes(w.slice(0, Math.max(3, w.length - 2))));
+            return hay.includes(q) || queryStems.some(stem => hay.includes(stem));
         });
 
         if (matches.length > 0) {
@@ -8070,9 +8127,29 @@
         const subEl = document.getElementById('tv-last-subtitle');
         const scoreEl = document.getElementById('tv-last-score');
 
-        const scoreRegex = /\b(?:[A-ZÇĞİÖŞÜ]{2,12}\s*\d{1,2}\s*[-:]\s*\d{1,2}\s*[A-ZÇĞİÖŞÜ]{2,12}|\d{1,2}\s*[-:]\s*\d{1,2}|\d{1,2}['’]\s*DK|\d{2}:\d{2})\b/gi;
-        const scoreMatches = raw.match(scoreRegex) || [];
-        const scoreStr = scoreMatches.length > 0 ? scoreMatches.slice(0, 3).join(' | ') : '';
+        const nonTeamWords = /^(?:SAAT|HABER|HABERLER|BÜLTEN|BÜLTENİ|CANLI|YAYIN|BÖLÜM|SEZON|KANAL|TARİH|SAYFA|SON|DAKİKA)$/i;
+        const teamScoreRegex = /\b([A-ZÇĞİÖŞÜ]{2,12})\s+(\d{1,2})\s*[-:]\s*(\d{1,2})\s+([A-ZÇĞİÖŞÜ]{2,12})\b/gi;
+        const spokenScores = [];
+        const rawScores = [];
+        let tm;
+        while ((tm = teamScoreRegex.exec(raw)) !== null) {
+            const t1 = tm[1].toUpperCase();
+            const s1 = parseInt(tm[2], 10);
+            const s2 = parseInt(tm[3], 10);
+            const t2 = tm[4].toUpperCase();
+            if (!nonTeamWords.test(t1) && !nonTeamWords.test(t2) && !(t1 === 'SAAT' && s1 <= 24 && s2 <= 59)) {
+                rawScores.push(`${t1} ${s1} - ${s2} ${t2}`);
+                spokenScores.push(`${t1} ${s1}, ${t2} ${s2}`);
+            }
+        }
+        const minuteMatches = raw.match(/\b(?:\d{1,2}['’]\s*DK|\d{2}:\d{2})\b/gi) || [];
+        if (rawScores.length > 0 && minuteMatches.length > 0) {
+            rawScores.push(minuteMatches[0]);
+        }
+        const scoreStr = rawScores.length > 0 ? rawScores.slice(0, 3).join(' | ') : '';
+        const spokenScoreSentence = spokenScores.length > 0
+            ? `Canlı Maç Skoru: ${spokenScores[0]}${minuteMatches.length > 0 ? ' (Süre: ' + minuteMatches[0] + ')' : ''}. `
+            : '';
 
         if (scoreStr && scoreEl) {
             scoreEl.textContent = scoreStr;
@@ -8083,7 +8160,7 @@
             subEl.textContent = subtitleLine;
         }
 
-        const spoken = `${scoreStr ? 'Maç Skoru / Süre: ' + scoreStr + '. ' : ''}${subtitleLine ? 'Altyazı: ' + subtitleLine : 'Televizyon ekranında şu an altyazı görünmüyor.'}`;
+        const spoken = `${spokenScoreSentence}${subtitleLine ? 'Altyazı: ' + subtitleLine : 'Televizyon ekranında şu an altyazı görünmüyor.'}`;
         return {
             speechText: spoken,
             fullText: `Maç Skoru / Tabela: ${scoreStr || 'Yok'}\nSon Altyazı / Bant: ${subtitleLine || 'Yok'}\n\nEkrandaki Tüm Yazılar:\n${raw}`,
@@ -8460,38 +8537,77 @@
         }
         // "1 adet elma" içindeki "et" veya "1 su bardağı süt" içindeki "su" hecesinin yanlış eşleşmesini önlemek için tam kelime sınırı kontrolü:
         const qClean = q.replace(/\b(?:\d+|bir|iki|üç|yarım|adet|tane|porsiyon|tabak|kase|bardak|su\s+bardağı|çay\s+bardağı|dilim|kaşık)\b/gu, ' ').replace(/\s+/g, ' ').trim() || q;
+        const extractPortionMultiplier = (fullQuery, matchedKey) => {
+            if (!matchedKey) return 1;
+            const escaped = matchedKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const keyRegex = new RegExp(`(?:^|[^\\p{L}])${escaped}(?=$|[^\\p{L}])`, 'iu');
+            // Cümleyi "ve", "ile", "bir de", virgül veya artı işaretlerinden alt yemek öbeklerine böl:
+            const clauses = fullQuery.split(/(?:,|;|\+|(?:^|\s)(?:ve|ile|bir\s+de)(?=\s|$))/iu);
+            const targetClause = clauses.find(c => keyRegex.test(c)) || fullQuery;
+            const idx = targetClause.search(new RegExp(escaped, 'iu'));
+            const prefix = (idx >= 0 ? targetClause.slice(0, idx) : targetClause).toLocaleLowerCase('tr-TR');
+            if (/(?:^|[^\p{L}])(?:yarım|0[.,]5|1\/2)(?=$|[^\p{L}])/u.test(prefix)) return 0.5;
+            if (/(?:^|[^\p{L}])(?:bir\s+buçuk|1[.,]5)(?=$|[^\p{L}])/u.test(prefix)) return 1.5;
+            const numWordMap = { 'bir': 1, 'iki': 2, 'üç': 3, 'dört': 4, 'beş': 5, 'altı': 6, 'yedi': 7, 'sekiz': 8, 'dokuz': 9, 'on': 10 };
+            const wordMatch = prefix.match(/(?:^|[^\p{L}])(bir|iki|üç|dört|beş|altı|yedi|sekiz|dokuz|on)(?=$|[^\p{L}])/u);
+            if (wordMatch && numWordMap[wordMatch[1]]) return numWordMap[wordMatch[1]];
+            const digitMatch = prefix.match(/\b(\d{1,2})\b/);
+            if (digitMatch) {
+                const n = parseInt(digitMatch[1], 10);
+                if (n >= 1 && n <= 20) return n;
+            }
+            return 1;
+        };
+
         const matchedItems = [];
         for (const item of TURKISH_FOOD_NUTRITION_DB) {
-            const hasKeyMatch = item.keys.some(k => {
+            let foundKey = null;
+            for (const k of item.keys) {
                 const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const wordRegex = new RegExp(`(?:^|[^\\p{L}])${escaped}(?=$|[^\\p{L}])`, 'iu');
-                return wordRegex.test(qClean) || wordRegex.test(q);
-            });
-            if (hasKeyMatch) {
-                matchedItems.push(item);
+                if (wordRegex.test(qClean) || wordRegex.test(q)) {
+                    foundKey = k;
+                    break;
+                }
+            }
+            if (foundKey) {
+                const mult = extractPortionMultiplier(q, foundKey);
+                matchedItems.push({
+                    ...item,
+                    portionMultiplier: mult,
+                    totalKcal: Math.round(item.kcal * mult)
+                });
             }
         }
         if (matchedItems.length === 0 && /^(?:su|1\s*bardak\s*su|bir\s*bardak\s*su)$/iu.test(q)) {
             const waterItem = TURKISH_FOOD_NUTRITION_DB.find(x => x.kcal === 0);
-            if (waterItem) matchedItems.push(waterItem);
+            if (waterItem) matchedItems.push({ ...waterItem, portionMultiplier: 1, totalKcal: 0 });
         }
         if (matchedItems.length === 0 && /(?:^|[^\p{L}])et(?=$|[^\p{L}])/iu.test(qClean)) {
             const meatItem = TURKISH_FOOD_NUTRITION_DB.find(x => x.kcal === 260);
-            if (meatItem) matchedItems.push(meatItem);
+            if (meatItem) {
+                const mult = extractPortionMultiplier(q, 'et');
+                matchedItems.push({ ...meatItem, portionMultiplier: mult, totalKcal: Math.round(meatItem.kcal * mult) });
+            }
         }
         const lastFoodEl = document.getElementById('calorie-last-food');
         const inp = document.getElementById('calorie-food-input');
         if (inp) inp.value = '';
 
         if (matchedItems.length > 0) {
-            const totalAddedKcal = matchedItems.reduce((acc, m) => acc + m.kcal, 0);
+            const totalAddedKcal = matchedItems.reduce((acc, m) => acc + m.totalKcal, 0);
             state.dailyIntakeKcal += totalAddedKcal;
             saveStepCalorieToStorage();
-            const namesSummary = matchedItems.map(m => `${m.name} (${m.kcal} kcal)`).join(' + ');
+            const formatItemLabel = (m) => {
+                if (m.portionMultiplier === 0.5) return `Yarım Porsiyon ${m.name.replace(/^1\s+\S+\s+/u, '')} (${m.totalKcal} kcal)`;
+                if (m.portionMultiplier !== 1) return `${m.portionMultiplier}x ${m.name} (${m.totalKcal} kcal)`;
+                return `${m.name} (${m.totalKcal} kcal)`;
+            };
+            const namesSummary = matchedItems.map(formatItemLabel).join(' + ');
             if (lastFoodEl) lastFoodEl.textContent = namesSummary;
             const benefitsSummary = matchedItems.map(m => m.benefit).join(' ');
             const speechIntro = matchedItems.length === 1
-                ? `${matchedItems[0].name} yaklaşık ${totalAddedKcal} kaloridir.`
+                ? `${formatItemLabel(matchedItems[0]).replace(/\s*\(\d+\s*kcal\)/, '')} yaklaşık ${totalAddedKcal} kaloridir.`
                 : `Söylediğiniz ${matchedItems.length} besin (${namesSummary}) toplam yaklaşık ${totalAddedKcal} kaloridir.`;
             announceGuidance(`Afiyet ve şifa olsun! ${speechIntro} ${benefitsSummary} Günlük enerji toplamınız ${state.dailyIntakeKcal} kalori oldu.`, {
                 force: true,
@@ -8508,16 +8624,24 @@
 
     function parsePackageOrMenuCaloriesKind(cleanText) {
         const text = String(cleanText || '');
-        const kcalMatches = text.match(/\b\d{1,4}\s*(?:kcal|kalori|cal)\b/gi) || [];
-        const protMatches = text.match(/protein\s*[:\-]?\s*\d+(?:[.,]\d+)?\s*g/gi) || [];
-        const carbMatches = text.match(/karbonhidrat\s*[:\-]?\s*\d+(?:[.,]\d+)?\s*g/gi) || [];
-        const sugarMatches = text.match(/şeker\s*[:\-]?\s*\d+(?:[.,]\d+)?\s*g/gi) || [];
+        const kcalMatches = text.match(/\b\d{1,4}\s*(?:kcal|kkal|kalori|cal)\b/gi) || [];
+        if (kcalMatches.length === 0) {
+            const slashKcal = text.match(/enerji[^0-9\n]*\d{2,5}\s*(?:kj)?\s*\/\s*(\d{1,4})\b/i);
+            if (slashKcal) kcalMatches.push(`${slashKcal[1]} kcal`);
+        }
+        const protMatches = text.match(/protein(?:\s*\(\s*g\s*\))?\s*[:\-]?\s*\d+(?:[.,]\d+)?(?:\s*g)?/gi) || [];
+        const carbMatches = text.match(/karbonhidrat(?:\s*\(\s*g\s*\))?\s*[:\-]?\s*\d+(?:[.,]\d+)?(?:\s*g)?/gi) || [];
+        const sugarMatches = text.match(/şeker(?:ler)?(?:\s*\(\s*g\s*\))?\s*[:\-]?\s*\d+(?:[.,]\d+)?(?:\s*g)?/gi) || [];
+        const fatMatches = text.match(/(?:toplam\s+)?yağ(?:\s*\(\s*g\s*\))?\s*[:\-]?\s*\d+(?:[.,]\d+)?(?:\s*g)?/gi) || [];
+        const saltMatches = text.match(/tuz(?:\s*\(\s*g\s*\))?\s*[:\-]?\s*\d+(?:[.,]\d+)?(?:\s*g)?/gi) || [];
 
         const parts = [];
         if (kcalMatches.length > 0) parts.push(`Enerji Değeri: ${kcalMatches[0]}`);
         if (protMatches.length > 0) parts.push(protMatches[0]);
         if (carbMatches.length > 0) parts.push(carbMatches[0]);
         if (sugarMatches.length > 0) parts.push(sugarMatches[0]);
+        if (fatMatches.length > 0) parts.push(fatMatches[0]);
+        if (saltMatches.length > 0) parts.push(saltMatches[0]);
 
         const summary = parts.length > 0
             ? `Pakette okunan besin değerleri: ${parts.join(', ')}. Afiyet ve şifa olsun!`
