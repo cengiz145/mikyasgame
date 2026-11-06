@@ -1011,9 +1011,9 @@
             }
         }
 
-        const isSurfacePatterned = gridStd > 36 || anomalyCount > 5;
+        const isSurfacePatterned = gridStd > 34 || anomalyCount > 4;
         let floorAnomaly = null;
-        if (!isSurfacePatterned && maxZScore >= 3.25 && anomalyCellX >= 0) {
+        if (!isSurfacePatterned && maxZScore >= 3.65 && anomalyCellX >= 0) {
             const ax = (anomalyCellX / gridN) * width;
             const ay = (anomalyCellY / gridN) * height;
             const aw = width / gridN;
@@ -1025,7 +1025,7 @@
         }
 
         let ledSource = null;
-        if (maxLum >= 238 && avgBrightness < 165) {
+        if (maxLum >= 244 && avgBrightness < 145) {
             let ringR = 0, ringG = 0, ringB = 0, rCnt = 0;
             const rad = 10;
             for (let dy = -rad; dy <= rad; dy += 4) {
@@ -1045,13 +1045,14 @@
             ringB /= Math.max(1, rCnt);
 
             const prominenceRatio = maxLum / Math.max(12, avgBrightness);
-            if (prominenceRatio >= 2.15) {
-                let ledColorName = 'Beyaz / Sarı';
-                if (ringR > ringG * 1.35 && ringR > ringB * 1.35) ledColorName = 'Kırmızı';
-                else if (ringG > ringR * 1.25 && ringG > ringB * 1.18) ledColorName = 'Yeşil';
-                else if (ringB > ringR * 1.30 && ringB > ringG * 1.15) ledColorName = 'Mavi';
-                else if (ringR > 180 && ringG > 110 && ringB < 90) ledColorName = 'Turuncu / Kehribar';
+            let ledColorName = '';
+            if (ringR > ringG * 1.38 && ringR > ringB * 1.38 && ringR >= 130) ledColorName = 'Kırmızı';
+            else if (ringG > ringR * 1.28 && ringG > ringB * 1.20 && ringG >= 120) ledColorName = 'Yeşil';
+            else if (ringB > ringR * 1.35 && ringB > ringG * 1.20 && ringB >= 130) ledColorName = 'Mavi';
+            else if (ringR > 185 && ringG > 110 && ringB < 85) ledColorName = 'Turuncu / Kehribar';
+            else if (avgBrightness < 85 && prominenceRatio >= 3.4) ledColorName = 'Beyaz / Sarı';
 
+            if (ledColorName && prominenceRatio >= 2.35) {
                 ledSource = {
                     x: maxLumX,
                     y: maxLumY,
@@ -2100,11 +2101,11 @@
                 if (diamPx < minCoinDiamPx || diamPx > maxCoinDiamPx) continue;
 
                 const aspect = bwCells / Math.max(1, bhCells);
-                if (aspect < 0.70 || aspect > 1.42) continue;
+                if (aspect < 0.78 || aspect > 1.26) continue;
 
                 // İdeal dairenin kutu doluluk oranı π/4 ≈ 0.785'tir. Dikdörtgen kutu/kağıtları elemek için:
                 const boxFillRatio = areaCells / Math.max(1, bwCells * bhCells);
-                if (boxFillRatio < 0.52 || boxFillRatio > 0.90) continue;
+                if (boxFillRatio < 0.58 || boxFillRatio > 0.88) continue;
 
                 const centerGX = (minX + maxX) * 0.5;
                 const centerGY = (minY + maxY) * 0.5;
@@ -2129,7 +2130,7 @@
 
                 const innerDensity = innerHits / Math.max(1, innerTotal);
                 const cornerDensity = cornerHits / Math.max(1, cornerTotal);
-                if (innerDensity < 0.68 || cornerDensity > 0.38) continue;
+                if (innerDensity < 0.76 || cornerDensity > 0.26) continue;
 
                 candidateCircles.push({
                     cx: ((sumX / areaCells) + 0.5) * step,
@@ -2232,6 +2233,21 @@
             return { coins: [], totalKurus: 0, totalFormatted: '0 Kuruş', summarySpeech: '' };
         }
 
+        // Gömlek düğmesi, fermuar halkası veya bardak altlığı gibi tekil tek-renk yuvarlak nesneleri
+        // yanlışlıkla "25 Kuruş / 10 Kuruş" sanıp cüzdana eklememek için:
+        // Tek bir yuvarlak aday varsa ve OCR ile üzerinde rakam okunmadıysa, mutlaka çift-halkalı (bi-metalik: 1 TL veya 50 Kr)
+        // kontrastına sahip olmasını veya yüksek rölyefli çift metal sınırını sağlamasını şart koş!
+        const upperOcr = String(ocrText || '').toUpperCase();
+        const hasCoinOcrHint = /\b(?:1|5|10|25|50)\b|KURUŞ|KURUS|LİRA|LIRA|TÜRK|TURK/.test(upperOcr);
+        if (analyzedCoins.length === 1 && !hasCoinOcrHint) {
+            const only = analyzedCoins[0];
+            const isClearlyBiMetallic = (only.deltaBRingCore >= 3.1 && (only.ringB >= 7.2 || only.deltaChroma >= 3.2)) ||
+                (only.deltaBRingCore <= -3.1 && (only.coreB >= 7.2 || only.deltaChroma <= -3.2));
+            if (!isClearlyBiMetallic) {
+                return { coins: [], totalKurus: 0, totalFormatted: '0 Kuruş', summarySpeech: '' };
+            }
+        }
+
         // 6. Çoklu Para Varsa Milimetrik Çap Kalibrasyonu (Darphane Standartları: 1 TL = 26.15mm, 50 Kr = 23.85mm)
         let refMmPerPx = null;
         const oneTlRef = analyzedCoins.find(c => c.deltaBRingCore >= 3.2 && c.ringB >= 7.5);
@@ -2245,7 +2261,6 @@
             refMmPerPx = 26.15 / (maxRad * 2);
         }
 
-        const upperOcr = String(ocrText || '').toUpperCase();
         const classifiedCoins = analyzedCoins.map(c => {
             const estMm = refMmPerPx ? (c.radius * 2 * refMmPerPx) : null;
             let valueKurus = 100;
@@ -2411,7 +2426,7 @@
             const isNewBatch = (sig !== state.moneyLastCommittedSignature) ||
                 (state.moneyEmptyFramesSinceCommit >= 8 && (now - state.moneyLastCommittedAt > 3200));
 
-            if (state.moneyAutoAccumulate && state.moneyPendingFrames >= 5 && isNewBatch) {
+            if (state.moneyAutoAccumulate && state.moneyPendingFrames >= 8 && isNewBatch) {
                 state.moneyLastCommittedSignature = sig;
                 state.moneyLastCommittedAt = now;
                 state.moneyEmptyFramesSinceCommit = 0;
@@ -2908,7 +2923,7 @@
     function handleMedicineSktLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, qrDetection, predictions) {
         const barcodeBox = (qrDetection && qrDetection.bbox) ? qrDetection.bbox : detectBarcodeStripeRegion(metrics, anW, anH);
         const boxPred = predictions.find(p => p.class === 'book' || p.class === 'bottle' || p.class === 'cup' || p.class === 'cell phone');
-        const targetBox = barcodeBox || (boxPred ? boxPred.bbox : (metrics.brightCluster ? metrics.brightCluster.bbox : null));
+        const targetBox = barcodeBox || (boxPred ? boxPred.bbox : null);
 
         if (qrDetection && qrDetection.data && verifyEanChecksum(qrDetection.data)) {
             el.tPosition.textContent = `Barkod: ${qrDetection.data}`;
@@ -3181,23 +3196,22 @@
     }
 
     function handleDoorElevatorLcdLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
-        const { penTip } = detectSignatureBoxAndPenTip(metrics, anW, anH);
-        const panelBox = metrics.brightCluster ? metrics.brightCluster.bbox : [anW * 0.20, anH * 0.20, anW * 0.60, anH * 0.60];
+        const textCheck = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
+        const hasPanelOrDigits = Boolean(textCheck && textCheck.hasTextLikely);
+        const panelBox = [anW * 0.20, anH * 0.20, anW * 0.60, anH * 0.60];
 
-        drawTargetBox(ovCtx, panelBox, scaleX, scaleY, '#38bdf8', 'Kapı No / Asansör / LCD Ekran');
-        const align = computeAlignmentInstruction(panelBox, anW, anH, 'Tuş Paneli veya Dijital Ekran', 0.05, 0.85);
+        drawTargetBox(ovCtx, panelBox, scaleX, scaleY, hasPanelOrDigits ? '#22c55e' : '#38bdf8', 'Kapı No / Asansör / LCD Ekran');
 
-        el.tPosition.textContent = penTip ? 'Parmak + Panel İzleniyor' : align.posLabel;
-        el.tDistance.textContent = metrics.sharpness >= 6.8 ? 'Net (Okumaya Hazır)' : 'Sabitleyin';
-        radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
+        el.tPosition.textContent = hasPanelOrDigits ? 'Rakam / Panel Algılandı' : 'Panel Aranıyor';
+        el.tDistance.textContent = (hasPanelOrDigits && metrics.sharpness >= 6.8) ? 'Net (Okumaya Hazır)' : 'Hizalayın ve Sabitleyin';
+        radar.updateRadar(0, 0, hasPanelOrDigits);
 
-        if (align.isCentered && metrics.sharpness >= 6.8 && state.autoCaptureEnabled && !state.isProcessingOcr) {
+        if (hasPanelOrDigits && metrics.sharpness >= 6.8 && state.autoCaptureEnabled && !state.isProcessingOcr) {
             handleAutoCaptureCountdown('Panel ve rakamlar netlendi, okunuyor!');
         } else {
-            const fingerHint = penTip ? ' Parmağınız panel üzerinde algılandı.' : '';
-            announceGuidance(`Kapı numarası, asansör kat tuşları veya çamaşır/klima dijital ekranı modundasınız.${fingerHint} Rakamları okutmak için Boşluk tuşuna basın veya ekrana çift dokunun.`, {
-                bannerState: align.isCentered ? 'centered' : 'normal',
-                minIntervalMs: 3200
+            announceGuidance('Kapı numarası, asansör kat tuşları veya çamaşır/klima dijital ekranı modundasınız. Rakamları okutmak için kamerayı panele tutup Boşluk tuşuna basın veya ekrana çift dokunun.', {
+                bannerState: hasPanelOrDigits ? 'centered' : 'normal',
+                minIntervalMs: 3600
             });
         }
     }
@@ -3407,9 +3421,9 @@
         let sawBanknoteWordsWithoutNumber = false;
         const hasBanknoteWords = (txt) => /TÜRK|TURK|LİRA|LIRA|MERKEZ|BANKA|CUMHURİYET|CUMHURIYET/i.test(txt || '');
 
-        // 1. Düz (0°) kontrol et (Aynı anda ters rakam kalıplarını 002, 001, 05, 02, 01 de yakalar)
+        // 1. Düz (0°) kontrol et (Sadece gerçek OCR doğrulamasından geçen temiz metinleri kullan)
         const res0 = await window.Tesseract.recognize(sourceCanvas, 'tur+eng');
-        const txt0 = (res0 && res0.data && res0.data.text) ? res0.data.text : '';
+        const txt0 = extractVerifiedRealTextFromOcrResult(res0);
         const match0 = detectTurkishBanknoteDetailsFromText(txt0, centerColorName);
         if (match0) return match0;
         if (hasBanknoteWords(txt0)) sawBanknoteWordsWithoutNumber = true;
@@ -3417,7 +3431,7 @@
         // 2. Baş Aşağı Ters (180°) çevrilmiş kağıt para kontrolü
         const canvas180 = createRotatedCanvas(sourceCanvas, 180);
         const res180 = await window.Tesseract.recognize(canvas180, 'tur+eng');
-        const txt180 = (res180 && res180.data && res180.data.text) ? res180.data.text : '';
+        const txt180 = extractVerifiedRealTextFromOcrResult(res180);
         const match180 = detectTurkishBanknoteDetailsFromText(txt180, centerColorName);
         if (match180) return match180;
         if (hasBanknoteWords(txt180)) sawBanknoteWordsWithoutNumber = true;
@@ -3425,7 +3439,7 @@
         // 3. Sağa Dik / Yan (90°) tutulmuş kağıt para kontrolü
         const canvas90 = createRotatedCanvas(sourceCanvas, 90);
         const res90 = await window.Tesseract.recognize(canvas90, 'tur+eng');
-        const txt90 = (res90 && res90.data && res90.data.text) ? res90.data.text : '';
+        const txt90 = extractVerifiedRealTextFromOcrResult(res90);
         const match90 = detectTurkishBanknoteDetailsFromText(txt90, centerColorName);
         if (match90) return match90;
         if (hasBanknoteWords(txt90)) sawBanknoteWordsWithoutNumber = true;
@@ -3433,7 +3447,7 @@
         // 4. Sola Dik / Yan (270°) tutulmuş kağıt para kontrolü
         const canvas270 = createRotatedCanvas(sourceCanvas, 270);
         const res270 = await window.Tesseract.recognize(canvas270, 'tur+eng');
-        const txt270 = (res270 && res270.data && res270.data.text) ? res270.data.text : '';
+        const txt270 = extractVerifiedRealTextFromOcrResult(res270);
         const match270 = detectTurkishBanknoteDetailsFromText(txt270, centerColorName);
         if (match270) return match270;
         if (hasBanknoteWords(txt270)) sawBanknoteWordsWithoutNumber = true;
@@ -3462,6 +3476,8 @@
         const isPurple = /MOR|EFLATUN/.test(colorUpper);
         const isOrangeYellow = /TURUNCU|SARI|HARDAL/.test(colorUpper);
 
+        const hasExplicitMoneyWord = /TÜRK|TURK|LİRA|LIRA|MERKEZ|BANKA|CUMHURİYET|CUMHURIYET|İKİ\s*YÜZ|IKI\s*YUZ|\bYÜZ\s*TÜRK|\bELLİ\s*TÜRK|\bYİRMİ\s*TÜRK/.test(clean);
+
         // Arka yüz portre isimlerinden kesin kupür tespiti (Kullanıcıya asla söylenmez, sadece iç doğrulama!)
         const hasYunusEmre = /YUNUS\s*EMRE|SEVVELİM|SEVELIM/.test(clean);
         const hasItri = /ITR[İI]|BUHUR[İI]ZADE|MUSTAFA\s*EFEND/.test(clean);
@@ -3470,22 +3486,12 @@
         const hasCahitArf = /CAH[İI]T\s*ARF|ARF\s*DEĞİŞMEZ/.test(clean);
         const hasAydinSayili = /AYDIN\s*SAYILI/.test(clean);
 
-        // Baş aşağı (180 derece ters) tutulduğunda OCR'ın "002", "001", "05", "02", "01" okuma ihtimali
-        const hasUpsideDown200 = /\b002\b|\b00Z\b/.test(clean);
-        const hasUpsideDown100 = /\b001\b/.test(clean);
-        const hasUpsideDown50 = /\b05\b/.test(clean) && (isOrangeYellow || clean.includes('TÜRK') || clean.includes('LİRA'));
-        const hasUpsideDown20 = /\b02\b|\b0Z\b/.test(clean) && (isGreen || clean.includes('TÜRK') || clean.includes('LİRA'));
-        const hasUpsideDown10 = /\b01\b/.test(clean) && (isRedPink || clean.includes('TÜRK') || clean.includes('LİRA'));
-
-        const hasPortraitMatch = hasYunusEmre || hasItri || hasFatmaAliye || hasKemaleddin || hasCahitArf || hasAydinSayili;
-        const hasUpsideDownMatch = hasUpsideDown200 || hasUpsideDown100 || hasUpsideDown50 || hasUpsideDown20 || hasUpsideDown10;
-        const isMoneyContext = hasPortraitMatch || hasUpsideDownMatch ||
-            clean.includes('TÜRK') || clean.includes('TURK') ||
-            clean.includes('LİRA') || clean.includes('LIRA') ||
-            clean.includes('MERKEZ') || clean.includes('BANKA') ||
-            (state.mode === 'color_cloth' && /\b(?:200|100|50|20|10)\b/.test(clean));
-
-        if (!isMoneyContext) return null;
+        // Baş aşağı (180 derece ters) tutulduğunda OCR'ın "002", "001", "05", "02", "01" okuma ihtimali (Mutlaka renk veya para kelimesi kilidiyle!)
+        const hasUpsideDown200 = (/\b002\b|\b00Z\b/.test(clean)) && (isPurple || hasExplicitMoneyWord);
+        const hasUpsideDown100 = (/\b001\b/.test(clean)) && (isBlueCyan || hasExplicitMoneyWord);
+        const hasUpsideDown50 = /\b05\b/.test(clean) && (isOrangeYellow || hasExplicitMoneyWord);
+        const hasUpsideDown20 = (/\b02\b|\b0Z\b/.test(clean)) && (isGreen || hasExplicitMoneyWord);
+        const hasUpsideDown10 = /\b01\b/.test(clean) && (isRedPink || hasExplicitMoneyWord);
 
         // TCMB E9 Seri Numarası Kalıbı (Örn: B14 582910 veya A09 1234567)
         let serialNumber = '';
@@ -3493,6 +3499,14 @@
         if (serialMatch) {
             serialNumber = (serialMatch[1] + serialMatch[2]).replace(/\s+/g, '');
         }
+
+        const hasPortraitMatch = hasYunusEmre || hasItri || hasFatmaAliye || hasKemaleddin || hasCahitArf || hasAydinSayili;
+        const hasUpsideDownMatch = hasUpsideDown200 || hasUpsideDown100 || hasUpsideDown50 || hasUpsideDown20 || hasUpsideDown10;
+        // Kitap sayfası, cetvel veya takvim üzerindeki "10, 20, 50, 100" sayılarını asla para sanmamak için
+        // mutlaka para kelimesi, portre adı, seri numarası veya renk+ters-rakam doğrulaması şarttır!
+        const isMoneyContext = hasPortraitMatch || hasUpsideDownMatch || hasExplicitMoneyWord || Boolean(serialNumber);
+
+        if (!isMoneyContext) return null;
 
         const foundNotes = [];
         const pushNote = (kurus, label) => {
@@ -3814,13 +3828,15 @@
             }
         }
 
-        // 2. Öncelik: Parmağın altında okunan bir yazı satırı var mı?
+        // 2. Öncelik: Parmağın altında gerçekten doğrulanmış bir yazı satırı var mı?
         if (!hitDescription && ocrLines && ocrLines.length > 0) {
             for (let i = 0; i < ocrLines.length; i++) {
                 const ln = ocrLines[i];
-                if (ln.bbox && px >= ln.bbox.x0 && px <= ln.bbox.x1 && py >= ln.bbox.y0 && py <= ln.bbox.y1) {
+                const lineConf = typeof ln.confidence === 'number' ? ln.confidence : 0;
+                if (lineConf >= 66 && ln.bbox && px >= ln.bbox.x0 && px <= ln.bbox.x1 && py >= ln.bbox.y0 && py <= ln.bbox.y1) {
                     const cleanLn = (ln.text || '').replace(/\s+/g, ' ').trim();
-                    if (cleanLn.length >= 2) {
+                    const alphaCount = (cleanLn.match(/[A-Za-zÇĞİÖŞÜçğıöşü0-9]/g) || []).length;
+                    if (cleanLn.length >= 2 && alphaCount >= 2 && (alphaCount / cleanLn.length) >= 0.65) {
                         hitDescription = `${zoneName} yazı: ${cleanLn}`;
                         break;
                     }
