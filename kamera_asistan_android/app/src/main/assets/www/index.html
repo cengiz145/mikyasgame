@@ -173,10 +173,10 @@
                     <span class="mode-desc" aria-hidden="true">Masadaki bardağın, kupanın veya şişenin tam yerini bulup elinizi çarpmadan ve devirmeden almanızı sağlar; üst ve alt kısmının rengini söyler.</span>
                 </button>
 
-                <button type="button" class="mode-card" data-mode="door_elevator_lcd" data-category="ev" role="radio" aria-checked="false" id="mode-btn-12" aria-label="12. Sesli Derece Ayarlama, Kombi, Klima, Makine Ekranı ve Kapı Numarası">
-                    <span class="mode-icon" aria-hidden="true">🌡️🔢</span>
-                    <span class="mode-title">12. Sesli Derece Ayarlama, Kombi, Klima ve Makine Ekranı</span>
-                    <span class="mode-desc" aria-hidden="true">Klima, kombi, çamaşır makinesi ve fırın ekranındaki dereceyi canlı okuyarak istediğiniz sıcaklığa adım adım ayarlamanızı sağlar; kapı numaralarını ve asansör tuşlarını seslendirir.</span>
+                <button type="button" class="mode-card" data-mode="door_elevator_lcd" data-category="ev" role="radio" aria-checked="false" id="mode-btn-12" aria-label="12. Derece Okuma ve Elle Ayarlama Yol Göstericisi (Kombi, Klima, Makine Ekranı ve Kapı Numarası)">
+                    <span class="mode-icon" aria-hidden="true">🌡️🧭</span>
+                    <span class="mode-title">12. Derece Okuma ve Elle Ayarlama Yol Göstericisi</span>
+                    <span class="mode-desc" aria-hidden="true">Cihazlara hiçbir komut göndermez; yalnızca kamerayla ekranı okuyup siz kendi elinizle tuşa bastıkça veya düğmeyi çevirdikçe ekranda kaç derece yazdığını söyleyerek size yol gösterir.</span>
                 </button>
 
                 <button type="button" class="mode-card" data-mode="food_freshness" data-category="mutfak" role="radio" aria-checked="false" id="mode-btn-13" aria-label="13. Paketli Gıda İçindekiler, Alerjen ve SKT Okuyucu">
@@ -476,62 +476,62 @@
             </div>
         </section>
 
-        <!-- 12. SESLİ DERECE AYARLAMA, KOMBİ, KLİMA VE MAKİNE EKRANI REHBERİ PANELİ -->
+        <!-- 12. DERECE OKUMA VE ELLE AYARLAMA YOL GÖSTERİCİSİ PANELİ (CİHAZA KOMUT GÖNDERMEZ) -->
         <section id="appliance-degree-panel" hidden aria-labelledby="appliance-degree-heading" class="exam-remote-section" style="border-color: #0ea5e9;">
             <div class="exam-remote-header">
-                <h2 id="appliance-degree-heading" style="color: #38bdf8;">🌡️ Sesli Derece Ayarlama, Kombi, Klima ve Makine Ekranı Rehberi</h2>
-                <span id="appliance-degree-badge" class="status-badge ready">Derece Rehberi Hazır</span>
+                <h2 id="appliance-degree-heading" style="color: #38bdf8;">🌡️🧭 Derece Okuma ve Elle Ayarlama Yol Göstericisi (Cihaza Komut Göndermez)</h2>
+                <span id="appliance-degree-badge" class="status-badge ready">Yol Gösterici Hazır</span>
             </div>
             <p class="exam-remote-hint">
-                Klima kumandası, kombi, çamaşır/bulaşık makinesi veya fırın ekranındaki dereceyi canlı takip eder. Aşağıdan <strong>istediğiniz hedef dereceyi</strong> seçin (veya sesle söyleyin); siz cihazın artırma (+) veya azaltma (-) tuşuna bastıkça ekrandaki yeni dereceyi ve hedefe kaç kademe kaldığını anında sesli olarak bildirir:
+                <strong>Güvenlik Bilgilendirmesi:</strong> Bu bölüm kombi, klima veya makinenize <strong>kesinlikle hiçbir elektronik sinyal ya da komut göndermez</strong>; eşyalarınıza müdahale etmez. Yalnızca kamerayla ekranı izler, eliniz ekranı kapatırsa sizi uyarır ve siz <strong>kendi elinizle</strong> cihazın düğmesine dokundukça ekranda kaç derece yazdığını seslendirerek size yol gösterir:
             </p>
-            <div class="exam-nav-row" role="group" aria-label="Canlı Derece Takibi ve Okuma Kontrolleri">
-                <button type="button" id="btn-degree-live-toggle" class="primary-btn" style="background: linear-gradient(135deg, #0284c7, #2563eb);" aria-pressed="false" aria-label="Ekrandaki Derece Değişimlerini Otomatik ve Canlı Olarak Seslendiren Derece Takip Rehberini Başlat veya Durdur">
-                    ▶️ Canlı Derece Takibini Başlat
+            <div class="exam-nav-row" role="group" aria-label="Canlı Ekran Okuma ve Yol Gösterici Kontrolleri">
+                <button type="button" id="btn-degree-live-toggle" class="primary-btn" style="background: linear-gradient(135deg, #0284c7, #2563eb);" aria-pressed="false" aria-label="Siz Kendi Elinizle Ayar Yaparken Ekrandaki Dereceyi Canlı Okuyup Yol Gösteren Takibi Başlat veya Durdur">
+                    ▶️ Canlı Yol Göstericiyi Başlat (El İle Ayarlarken Söyler)
                 </button>
-                <button type="button" id="btn-degree-read-now" class="secondary-btn" aria-label="Şu An Cihaz Ekranında Yazan Dereceyi ve Bilgileri Hemen Oku">
-                    🔍 Ekrandaki Dereceyi Şimdi Oku
+                <button type="button" id="btn-degree-read-now" class="secondary-btn" aria-label="Şu An Cihaz Ekranında Kaç Derece Yazdığını Hemen Oku">
+                    🔍 Şu An Ekranda Kaç Derece Yazdığını Oku
                 </button>
-                <button type="button" id="btn-degree-voice-target" class="secondary-btn" aria-label="Ayarlamak İstediğiniz Hedef Dereceyi Mikrofonla Söyleyin (Örneğin: 24 derece, 40 derece, 180 derece)">
-                    🎤 Hedef Dereceyi Sesle Söyle
+                <button type="button" id="btn-degree-voice-target" class="secondary-btn" aria-label="Kendi Elinizle Ulaşmak İstediğiniz Dereceyi Söyleyin, O Sayıya Geldiğinizde Size Haber Versin">
+                    🎤 Ulaşmak İstediğim Dereceyi Sesle Söyle
                 </button>
-                <button type="button" id="btn-degree-clear-target" class="secondary-btn" aria-label="Seçili Hedef Dereceyi Temizle">
-                    ❌ Hedefi Temizle
+                <button type="button" id="btn-degree-clear-target" class="secondary-btn" aria-label="Rehber Dereceyi Temizle, Sadece Ekranda Yazanı Okusun">
+                    ❌ Rehber Sayıyı Temizle
                 </button>
             </div>
             <div style="margin-top: 0.5rem;">
-                <p class="exam-remote-hint" style="margin-bottom: 0.35rem;">🎯 <strong>Hızlı Hedef Derece Seçimi (Tek Dokunuşla):</strong></p>
-                <div class="exam-nav-row" role="group" aria-label="Hızlı Hedef Derece Seçim Düğmeleri">
-                    <button type="button" class="secondary-btn degree-preset-btn" data-target-deg="20" aria-label="Hedef Dereceyi 20 Derece (Klima / Oda Sıcaklığı) Olarak Ayarla">20°C (Oda/Klima)</button>
-                    <button type="button" class="secondary-btn degree-preset-btn" data-target-deg="22" aria-label="Hedef Dereceyi 22 Derece (Klima / Oda Sıcaklığı) Olarak Ayarla">22°C (Oda/Klima)</button>
-                    <button type="button" class="secondary-btn degree-preset-btn" data-target-deg="24" aria-label="Hedef Dereceyi 24 Derece (Klima / Oda Sıcaklığı) Olarak Ayarla">24°C (Oda/Klima)</button>
-                    <button type="button" class="secondary-btn degree-preset-btn" data-target-deg="30" aria-label="Hedef Dereceyi 30 Derece (Hassas Çamaşır Yıkama) Olarak Ayarla">30°C (Hassas)</button>
-                    <button type="button" class="secondary-btn degree-preset-btn" data-target-deg="40" aria-label="Hedef Dereceyi 40 Derece (Çamaşır Makinesi / Kombi) Olarak Ayarla">40°C (Çamaşır/Kombi)</button>
-                    <button type="button" class="secondary-btn degree-preset-btn" data-target-deg="45" aria-label="Hedef Dereceyi 45 Derece (Kombi Sıcak Su / Petek) Olarak Ayarla">45°C (Kombi)</button>
-                    <button type="button" class="secondary-btn degree-preset-btn" data-target-deg="60" aria-label="Hedef Dereceyi 60 Derece (Pamuklu Çamaşır / Bulaşık / Kombi) Olarak Ayarla">60°C (Pamuklu/Kombi)</button>
-                    <button type="button" class="secondary-btn degree-preset-btn" data-target-deg="180" aria-label="Hedef Dereceyi 180 Derece (Fırın Pişirme Sıcaklığı) Olarak Ayarla">180°C (Fırın)</button>
-                    <button type="button" class="secondary-btn degree-preset-btn" data-target-deg="200" aria-label="Hedef Dereceyi 200 Derece (Fırın Pişirme Sıcaklığı) Olarak Ayarla">200°C (Fırın)</button>
+                <p class="exam-remote-hint" style="margin-bottom: 0.35rem;">🧭 <strong>Kendi Elinizle Ulaşmak İstediğiniz Derece (O Sayıya Gelince Size Haber Verir):</strong></p>
+                <div class="exam-nav-row" role="group" aria-label="Ulaşmak İstediğiniz Derece Seçim Düğmeleri">
+                    <button type="button" class="secondary-btn degree-preset-btn" data-deg="20" data-target-deg="20" aria-label="20 Dereceye Ulaşınca Haber Ver (Klima ve Oda Sıcaklığı Yol Göstericisi)">20°C İçin Yol Göster</button>
+                    <button type="button" class="secondary-btn degree-preset-btn" data-deg="22" data-target-deg="22" aria-label="22 Dereceye Ulaşınca Haber Ver (Klima ve Oda Sıcaklığı Yol Göstericisi)">22°C İçin Yol Göster</button>
+                    <button type="button" class="secondary-btn degree-preset-btn" data-deg="24" data-target-deg="24" aria-label="24 Dereceye Ulaşınca Haber Ver (Klima ve Oda Sıcaklığı Yol Göstericisi)">24°C İçin Yol Göster</button>
+                    <button type="button" class="secondary-btn degree-preset-btn" data-deg="30" data-target-deg="30" aria-label="30 Dereceye Ulaşınca Haber Ver (Hassas Çamaşır Yol Göstericisi)">30°C İçin Yol Göster</button>
+                    <button type="button" class="secondary-btn degree-preset-btn" data-deg="40" data-target-deg="40" aria-label="40 Dereceye Ulaşınca Haber Ver (Çamaşır Makinesi ve Kombi Su Yol Göstericisi)">40°C İçin Yol Göster</button>
+                    <button type="button" class="secondary-btn degree-preset-btn" data-deg="45" data-target-deg="45" aria-label="45 Dereceye Ulaşınca Haber Ver (Kombi Sıcak Su ve Petek Yol Göstericisi)">45°C İçin Yol Göster</button>
+                    <button type="button" class="secondary-btn degree-preset-btn" data-deg="60" data-target-deg="60" aria-label="60 Dereceye Ulaşınca Haber Ver (Pamuklu Çamaşır ve Bulaşık Yol Göstericisi)">60°C İçin Yol Göster</button>
+                    <button type="button" class="secondary-btn degree-preset-btn" data-deg="180" data-target-deg="180" aria-label="180 Dereceye Ulaşınca Haber Ver (Fırın Yol Göstericisi)">180°C İçin Yol Göster</button>
+                    <button type="button" class="secondary-btn degree-preset-btn" data-deg="200" data-target-deg="200" aria-label="200 Dereceye Ulaşınca Haber Ver (Fırın Yol Göstericisi)">200°C İçin Yol Göster</button>
                 </div>
             </div>
             <div class="exam-nav-row" style="align-items:center; gap: 0.6rem; margin-top: 0.5rem;">
-                <label for="degree-target-input" style="font-weight:700;">Özel Hedef Derece (°C):</label>
-                <input type="number" id="degree-target-input" min="10" max="260" step="1" placeholder="Örn: 23, 35, 50, 175..." aria-label="Ayarlamak istediğiniz özel hedef dereceyi rakamla yazın" style="flex:1; min-width: 160px; padding: 0.65rem 0.85rem; border-radius: 10px; border: 2px solid #475569; background: #0f172a; color: #f8fafc; font-size: 1rem;">
-                <button type="button" id="btn-degree-set-target" class="primary-btn" style="background: linear-gradient(135deg, #0284c7, #0369a1);" aria-label="Yazılan Özel Hedef Dereceyi Kaydet ve Takibi Başlat">
-                    🎯 Hedef Dereceyi Ayarla
+                <label for="degree-target-input" style="font-weight:700;">Ulaşmak İstediğiniz Derece (°C):</label>
+                <input type="number" id="degree-target-input" min="10" max="260" step="1" placeholder="Örn: 23, 35, 50, 175..." aria-label="Kendi elinizle ulaşmak istediğiniz dereceyi rakamla yazın" style="flex:1; min-width: 160px; padding: 0.65rem 0.85rem; border-radius: 10px; border: 2px solid #475569; background: #0f172a; color: #f8fafc; font-size: 1rem;">
+                <button type="button" id="btn-degree-set-target" class="primary-btn" style="background: linear-gradient(135deg, #0284c7, #0369a1);" aria-label="Yazılan Dereceye Geldiğinizde Haber Vermesi İçin Yol Göstericiyi Başlat">
+                    🧭 Bu Dereceye Gelince Haber Ver
                 </button>
             </div>
-            <div class="telemetry-grid" role="list" aria-label="Derece Ayarlama ve Ekran Okuma Bilgileri" style="margin-top: 0.55rem;">
+            <div class="telemetry-grid" role="list" aria-label="Ekran Okuma ve Elle Ayarlama Yol Gösterici Bilgileri" style="margin-top: 0.55rem;">
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Ekranda Okunan Güncel Derece:</span>
+                    <span class="t-label">Ekranda Şu An Okunan Derece:</span>
                     <strong id="degree-current-display" style="color: #38bdf8; font-size: 1.15rem;">Henüz okunmadı</strong>
                 </div>
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Seçili Hedef Derece ve Yönlendirme:</span>
-                    <strong id="degree-target-display" style="color: #facc15;">Hedef seçilmedi (Serbest okuma)</strong>
+                    <span class="t-label">Sesli Yol Gösterici Durumu:</span>
+                    <strong id="degree-target-display" style="color: #facc15;">Serbest Okuma (Ekranda yazanı söyler)</strong>
                 </div>
                 <div class="telemetry-item" role="listitem">
-                    <span class="t-label">Cihaz / Ekran Ek Bilgisi (Devir, Basınç, Kapı No):</span>
-                    <strong id="degree-extra-display">-</strong>
+                    <span class="t-label">Ekran Hizalama, Parmak Konumu ve Ek Bilgi:</span>
+                    <strong id="degree-extra-display">Kamerayı ekrana tutun</strong>
                 </div>
             </div>
         </section>

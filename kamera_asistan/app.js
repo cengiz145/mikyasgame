@@ -3968,7 +3968,7 @@
 
         const presetBtns = document.querySelectorAll('.degree-preset-btn');
         presetBtns.forEach(btn => {
-            const bDeg = parseFloat(btn.getAttribute('data-deg') || '');
+            const bDeg = parseFloat(btn.getAttribute('data-deg') || btn.getAttribute('data-target-deg') || '');
             const isMatch = bDeg === num;
             btn.classList.toggle('active-toggle', isMatch);
             btn.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
@@ -3979,17 +3979,20 @@
             if (state.lastDetectedDegree !== null) {
                 const diff = Number((num - state.lastDetectedDegree).toFixed(1));
                 if (Math.abs(diff) < 0.05) {
-                    currentComparison = ` Ekranda zaten ${state.lastDetectedDegree} derece yazıyor; hedef sıcaklıktasınız.`;
+                    currentComparison = ` Ekranda zaten ${state.lastDetectedDegree} derece yazıyor; istediğiniz değerdesiniz.`;
                 } else if (diff > 0) {
-                    currentComparison = ` Son okunan ekran değeri ${state.lastDetectedDegree} dereceydi; hedefe ulaşmak için ${diff} derece artırmanız gerekiyor.`;
+                    currentComparison = ` Son okunan ekran değeri ${state.lastDetectedDegree} dereceydi; kendi elinizle ${diff} derece artırmanız gerekiyor.`;
                 } else {
-                    currentComparison = ` Son okunan ekran değeri ${state.lastDetectedDegree} dereceydi; hedefe ulaşmak için ${Math.abs(diff)} derece azaltmanız gerekiyor.`;
+                    currentComparison = ` Son okunan ekran değeri ${state.lastDetectedDegree} dereceydi; kendi elinizle ${Math.abs(diff)} derece azaltmanız gerekiyor.`;
                 }
             }
+            const kombiSafetyNote = (num >= 55 && num <= 85)
+                ? ' Güvenlik hatırlatması: Kombi sıcak su ayarı genellikle 40 ile 50 derece, petek ısıtma ayarı ise 40 ile 60 derece arasındadır; bilmediğiniz vana veya reset tuşlarına basmayın.'
+                : '';
             const prefix = options.fromVoice
-                ? `12. Bölüm: Sesli Derece Ayarlama Rehberi açıldı ve hedef sıcaklık ${num} derece olarak ayarlandı.`
-                : `Hedef sıcaklık ${num} derece olarak ayarlandı.`;
-            announceGuidance(`${prefix}${currentComparison} Kamerayı cihazın ekranına tutun ve artı veya eksi tuşlarına basın; ekrandaki dereceyi okuyarak ${num} dereceye ulaşana kadar sizi adım adım yönlendireceğim.`, {
+                ? `12. Bölüm: Derece Okuma ve Elle Ayarlama Yol Göstericisi açıldı; ulaşmak istediğiniz ${num} derece rehber olarak kaydedildi. Uygulama cihaza hiçbir komut göndermez.`
+                : `Ulaşmak istediğiniz ${num} derece yol göstericiye kaydedildi. Uygulama cihaza hiçbir komut göndermez.`;
+            announceGuidance(`${prefix}${currentComparison}${kombiSafetyNote} Kamerayı cihazın ekranına tutun ve kendi elinizle artı veya eksi tuşlarına dokunun; ekrandaki dereceyi okuyarak ${num} dereceye ulaşana kadar size adım adım yol göstereceğim.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -4002,10 +4005,10 @@
         const inp = document.getElementById('degree-target-input');
         if (inp) inp.value = '';
         const targetEl = document.getElementById('degree-target-display');
-        if (targetEl) targetEl.textContent = 'Henüz hedef seçilmedi (Sadece okunan dereceyi söyler)';
+        if (targetEl) targetEl.textContent = 'Serbest Okuma (Ekranda yazanı söyler)';
         const badgeEl = document.getElementById('appliance-degree-badge');
         if (badgeEl) {
-            badgeEl.textContent = state.degreeLiveTrackingActive ? 'Canlı Derece Takibi Açık' : 'Derece Rehberi Hazır';
+            badgeEl.textContent = state.degreeLiveTrackingActive ? 'Canlı Yol Gösterici Açık' : 'Yol Gösterici Hazır';
         }
         const presetBtns = document.querySelectorAll('.degree-preset-btn');
         presetBtns.forEach(btn => {
@@ -4013,7 +4016,7 @@
             btn.setAttribute('aria-pressed', 'false');
         });
         if (!silent) {
-            announceGuidance('Hedef derece kaldırıldı. Kamerayı ekrana tuttuğunuzda yalnızca o an ekranda yazan derece seslendirilecektir.', {
+            announceGuidance('Rehber derece sayısı temizlendi. Kamerayı ekrana tuttuğunuzda yalnızca o an ekranda yazan derece seslendirilecektir.', {
                 force: true
             });
         }
@@ -4078,13 +4081,13 @@
             btn.classList.toggle('active-toggle', state.degreeLiveTrackingActive);
             btn.setAttribute('aria-pressed', state.degreeLiveTrackingActive ? 'true' : 'false');
             btn.textContent = state.degreeLiveTrackingActive
-                ? '⏹️ Canlı Derece Takibini Durdur'
-                : '▶️ Canlı Derece Takibini Başlat (Tuşa Bastıkça Söyler)';
+                ? '⏹️ Canlı Yol Göstericiyi Durdur'
+                : '▶️ Canlı Yol Göstericiyi Başlat (El İle Ayarlarken Söyler)';
         }
         if (badge) {
             badge.textContent = state.degreeLiveTrackingActive
-                ? (state.targetApplianceDegree !== null ? `Canlı Takip (Hedef: ${state.targetApplianceDegree}°C)` : 'Canlı Derece Takibi Açık')
-                : 'Derece Rehberi Hazır';
+                ? (state.targetApplianceDegree !== null ? `Canlı Yol Gösterici (${state.targetApplianceDegree}°C)` : 'Canlı Yol Gösterici Açık')
+                : 'Yol Gösterici Hazır';
         }
         if (state.degreeLiveTimer) {
             clearInterval(state.degreeLiveTimer);
@@ -4095,9 +4098,9 @@
                 startCamera();
             }
             const targetHint = state.targetApplianceDegree !== null
-                ? ` Hedef dereceniz ${state.targetApplianceDegree} derece.`
+                ? ` Ulaşmak istediğiniz derece: ${state.targetApplianceDegree} derece.`
                 : '';
-            announceGuidance(`Canlı sesli derece takibi başlatıldı.${targetHint} Kamerayı kombi, klima, fırın veya çamaşır makinesi ekranına tutun ve cihazın artı veya eksi tuşuna basın; ekrandaki derece değiştikçe anında seslendirilecektir.`, {
+            announceGuidance(`Canlı ekran okuyucu ve elle ayarlama yol göstericisi başlatıldı.${targetHint} Uygulama cihaza hiçbir komut göndermez; kamerayı kombi, klima, fırın veya çamaşır makinesi ekranına tutun ve kendi elinizle tuşa dokunun; ekrandaki derece değiştikçe anında seslendirilecektir.`, {
                 force: true,
                 bannerState: 'centered'
             });
@@ -4107,7 +4110,7 @@
                 }
             }, 1800);
         } else {
-            announceGuidance('Canlı sesli derece takibi durduruldu.', { force: true });
+            announceGuidance('Canlı ekran okuyucu ve yol gösterici durduruldu.', { force: true });
         }
     }
 
@@ -4176,14 +4179,58 @@
         }
     }
 
+    function detectHandBlockingPanelScreen(metrics) {
+        if (!metrics || !metrics.imageData || !metrics.gw || !metrics.gh) return false;
+        const data = metrics.imageData.data;
+        const gw = metrics.gw, gh = metrics.gh, step = metrics.step || 4;
+        const width = gw * step;
+        let centerSkin = 0, centerTotal = 0;
+        let outerSkin = 0, outerTotal = 0;
+
+        for (let gy = 2; gy < gh - 2; gy++) {
+            for (let gx = 2; gx < gw - 2; gx++) {
+                const idx = ((gy * step) * width + (gx * step)) * 4;
+                const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+                const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+                const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+                const isSkin = (cr >= 136 && cr <= 172 && cb >= 80 && cb <= 124 && r > 75 && g > 45 && b > 30 && (r - g) >= 12);
+
+                const inCenter = (gx >= gw * 0.32 && gx <= gw * 0.68 && gy >= gh * 0.30 && gy <= gh * 0.70);
+                if (inCenter) {
+                    centerTotal++;
+                    if (isSkin) centerSkin++;
+                } else {
+                    outerTotal++;
+                    if (isSkin) outerSkin++;
+                }
+            }
+        }
+        const centerRatio = centerSkin / Math.max(1, centerTotal);
+        const outerRatio = outerSkin / Math.max(1, outerTotal);
+        // Sadece el/parmak gerçekten ekranın ortasını kapatıyorsa (ve tüm arka plan ahşap duvar değilse) uyar:
+        return (centerRatio >= 0.28 && outerRatio <= 0.42 && centerRatio > outerRatio * 1.35);
+    }
+
     function handleDoorElevatorLcdLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
         const textCheck = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
         const hasPanelOrDigits = Boolean(textCheck && textCheck.hasTextLikely);
-        const panelBox = [anW * 0.20, anH * 0.20, anW * 0.60, anH * 0.60];
+        const panelBox = (textCheck && textCheck.bbox) ? textCheck.bbox : [anW * 0.20, anH * 0.20, anW * 0.60, anH * 0.60];
         const isPosMode = state.mode === 'pos_iban_reader';
         const boxLabel = isPosMode ? 'POS Ekranı / Fiş / IBAN Alanı' : 'Derece Ekranı / Kapı No / Asansör';
 
         drawTargetBox(ovCtx, panelBox, scaleX, scaleY, hasPanelOrDigits ? '#22c55e' : '#38bdf8', boxLabel);
+
+        if (!isPosMode && detectHandBlockingPanelScreen(metrics)) {
+            el.tPosition.textContent = 'Eliniz Ekranı Kapatıyor';
+            el.tDistance.textContent = 'Parmağınızı Kenara Kaydırın';
+            const extraEl = document.getElementById('degree-extra-display');
+            if (extraEl) extraEl.textContent = 'Eliniz ekranın önünde; parmağınızı tuşların olduğu alt/yan kısma çekin';
+            announceGuidance('Dikkat: Eliniz veya parmağınız şu an dijital ekranın önünü kapatıyor. Kamera ekranı okuyup size yol gösterebilsin diye parmağınızı ekranın biraz altına veya yanındaki tuşlara doğru çekin.', {
+                bannerState: 'warning',
+                minIntervalMs: 3200
+            });
+            return;
+        }
 
         el.tPosition.textContent = hasPanelOrDigits ? 'Rakam / Yazı Algılandı' : (isPosMode ? 'POS / IBAN Aranıyor' : 'Ekran / Panel Aranıyor');
         el.tDistance.textContent = (hasPanelOrDigits && metrics.sharpness >= 6.2) ? 'Net (Okumaya Hazır)' : 'Hizalayın ve Sabitleyin';
@@ -4198,9 +4245,9 @@
             });
         } else if (!state.degreeLiveTrackingActive) {
             const targetReminder = state.targetApplianceDegree !== null
-                ? ` Hedef dereceniz ${state.targetApplianceDegree} derece.`
+                ? ` Ulaşmak istediğiniz rehber derece: ${state.targetApplianceDegree} derece.`
                 : '';
-            announceGuidance(`Sesli derece ayarlama, kombi, klima ve kapı ekranı modundasınız.${targetReminder} Kamerayı cihazın ekranına tuttuğunuzda yazan derece otomatik okunur; dilerseniz Boşluk tuşuna da basabilirsiniz.`, {
+            announceGuidance(`Derece okuma ve elle ayarlama yol göstericisi modundasınız.${targetReminder} Uygulama cihaza hiçbir komut göndermez; kamerayı ekrana tuttuğunuzda yazan dereceyi okur ve kendi elinizle ayarlarken size yol gösterir.`, {
                 bannerState: hasPanelOrDigits ? 'centered' : 'normal',
                 minIntervalMs: 3600
             });
@@ -11026,7 +11073,7 @@
             'medicine_skt': '9. Bölüm: İlaç Kutusu ve Son Kullanma Tarihi Kontrolü açıldı. İlacın adını, miligram bilgisini ve son kullanma tarihini kontrol etmek için kutuyu kameraya tutun.',
             'signature_pen': '10. Bölüm: İmza Alanı ve Kalem Yönlendirici açıldı. Güvenliğiniz için önce belgedeki metni doğrulamak üzere ekrana çift dokunun veya Boşluk tuşuna basın; belge okunduktan sonra kaleminizi imza alanına yönlendireceğim.',
             'liquid_level': '11. Bölüm: Masadaki Bardak, Kupa ve Şişe Bulucu açıldı. Masadaki bardağı veya şişeyi güvenli şekilde tespit etmek için kamerayı masaya yöneltin. Güvenliğiniz için kaynar sıvı doldururken yalnızca kamera yönlendirmesine güvenmeyin.',
-            'door_elevator_lcd': '12. Bölüm: Sesli Derece Ayarlama, Kombi, Klima ve Makine Ekranı Okuyucu açıldı. Kombi, klima, fırın veya çamaşır makinesi derecesini ayarlamak için hedef derece seçebilir ve kamerayı ekrana tutarak artı veya eksi tuşuna bastıkça canlı sesli yönlendirme alabilirsiniz.',
+            'door_elevator_lcd': '12. Bölüm: Derece Okuma ve Elle Ayarlama Yol Göstericisi açıldı. Bu bölüm kombi, klima veya makinenize kesinlikle hiçbir sinyal ya da komut göndermez; yalnızca kamerayla ekranı okuyup siz kendi elinizle tuşa bastıkça ekranda kaç derece yazdığını söyleyerek size yol gösterir.',
             'food_freshness': '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve Son Tüketim Tarihi Okuyucu açıldı. Ürün paketinin içindekiler ve tarih kısmını kameraya gösterip Boşluk tuşuna basın.',
             'song_finder': '14. Bölüm: Sesli Müzik, Melodi ve Şarkı Sözü Tanıma açıldı; mikrofon otomatik olarak dinlemeye başlıyor.',
             'bus_stop_tracker': '15. Bölüm: Otobüs Hat Numarası Okuyucu ve Durak Yaklaşma Bildirimi açıldı. Durağa yaklaşan aracın hat numarasını okumak için kamerayı yola yöneltin veya araç içindeyseniz hedef durağınız için yaklaşma bildirimini etkinleştirin.',
@@ -11441,7 +11488,7 @@
     if (degreePresetBtns && degreePresetBtns.length > 0) {
         degreePresetBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                const degVal = btn.getAttribute('data-deg');
+                const degVal = btn.getAttribute('data-deg') || btn.getAttribute('data-target-deg');
                 if (degVal) setTargetApplianceDegree(degVal);
             });
         });
