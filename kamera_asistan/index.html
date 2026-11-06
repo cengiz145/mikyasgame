@@ -77,8 +77,40 @@
             <button id="btn-speech-rate" class="secondary-btn" type="button" aria-label="Sesli Okuma Hızını Değiştir: Yavaş, Normal veya Hızlı (Kısayol: Y)">
                 🗣️ Okuma Hızı: Normal (1.0x)
             </button>
+            <button id="btn-open-mode-info" class="secondary-btn" type="button" aria-label="Aktif Bölümün Kullanım Talimatlarını, Eller ve Telefon Tutuş Betimlemesini ve Güvenlik Uyarılarını Aç">
+                ℹ️ Bölüm Talimatları ve Uyarılar
+            </button>
             <input type="file" id="photo-file-input" accept="image/*,video/*" hidden aria-hidden="true">
         </section>
+
+        <!-- 22 BÖLÜM İÇİN İLK KULLANIM BİLGİLENDİRME, TALİMATLAR VE GÜVENLİK UYARILARI PENCERESİ -->
+        <div id="mode-onboarding-backdrop" class="mode-onboarding-backdrop" hidden>
+            <section id="mode-onboarding-dialog" role="dialog" aria-modal="true" aria-labelledby="mode-onboarding-title" aria-describedby="mode-onboarding-body" class="mode-onboarding-modal" tabindex="-1">
+                <div class="exam-remote-header">
+                    <h2 id="mode-onboarding-title" style="color: #38bdf8; font-size: 1.25rem; margin: 0;">ℹ️ Bölüm Kullanım Talimatları ve Güvenlik Uyarıları</h2>
+                    <span id="mode-onboarding-badge" class="status-badge ready">İlk Kullanım Bilgilendirmesi</span>
+                </div>
+                <div id="mode-onboarding-body" class="mode-onboarding-body">
+                    <p id="mode-onboarding-summary" style="font-size: 1.02rem; line-height: 1.55; margin: 0.65rem 0;"></p>
+                    <div style="background: rgba(15, 23, 42, 0.85); padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid rgba(56, 189, 248, 0.4); margin-bottom: 0.7rem;">
+                        <h3 style="color: #7dd3fc; font-size: 1rem; margin: 0 0 0.4rem 0;">🧭 Görme Engelli Kullanıcılar İçin Adım Adım Uygulama Talimatları:</h3>
+                        <ol id="mode-onboarding-steps" style="margin: 0 0 0 1.25rem; line-height: 1.58; font-size: 0.96rem;"></ol>
+                    </div>
+                    <div style="background: rgba(127, 29, 29, 0.32); padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid rgba(248, 113, 113, 0.5); margin-bottom: 0.8rem;">
+                        <h3 style="color: #fca5a5; font-size: 1rem; margin: 0 0 0.4rem 0;">⚠️ Uyarılar ve Dikkat Edilmesi Gereken Tüm Hususlar:</h3>
+                        <ul id="mode-onboarding-warnings" style="margin: 0 0 0 1.25rem; line-height: 1.58; font-size: 0.96rem;"></ul>
+                    </div>
+                </div>
+                <div class="exam-nav-row" role="group" aria-label="Bilgilendirme Penceresi Onay Kontrolleri" style="justify-content: flex-end; gap: 0.65rem;">
+                    <button type="button" id="btn-mode-onboarding-speak" class="secondary-btn" aria-label="Bu Bölümün Talimatlarını ve Uyarılarını Baştan Sona Sesli Dinle">
+                        🔊 Talimatları ve Uyarıları Sesli Dinle
+                    </button>
+                    <button type="button" id="btn-mode-onboarding-accept" class="primary-btn" style="background: linear-gradient(135deg, #16a34a, #15803d); font-weight: 700;" aria-label="Talimatları ve Uyarıları Okudum ve Anladım, Bölümü Kullanmaya Başla">
+                        ✅ Okudum ve Anladım (Bölümü Kullanmaya Başla)
+                    </button>
+                </div>
+            </section>
+        </div>
 
         <!-- Kategoriler ve 22 Yardımcı Özellik -->
         <section aria-labelledby="mode-heading" class="mode-section">

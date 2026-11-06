@@ -10959,6 +10959,388 @@
         return `Şu an aktif bölüm: ${activeLabel}. ${camState}`;
     }
 
+    const MODE_ONBOARDING_GUIDES = {
+        'exam_reader': {
+            title: '1. Bölüm: Sınav Sorusu ve Şık Okuyucu',
+            summary: 'Basılı sınav kağıtlarındaki, test kitaplarındaki ve resmi evraklardaki soruları ve A, B, C, D, E şıklarını birbirinden ayırarak tek tek seslendirir.',
+            steps: [
+                '1. Adım: Sınav kağıdını veya belgeyi düz bir masanın üzerine koyun ve köşelerinin kıvrık olmadığından emin olun.',
+                '2. Adım: Telefonu kağıdın tam ortasına değdirip iki elinizle yere paralel şekilde yaklaşık bir buçuk karış (25–30 santimetre) yukarı kaldırın.',
+                '3. Adım: Sesli yön sinyali ortalamayı onayladığında ekrana çift dokunun veya Boşluk tuşuna basın; okuma bitince A, B, C, D, E düğmeleriyle şıkları tek tek dinleyin.'
+            ],
+            warnings: [
+                'Elinizin veya kolunuzun gölgesinin sayfanın tam ortasını kapatmamasına dikkat edin.',
+                'Çok sütunlu sınav kağıtlarında sayfanın tamamının kadraja girmesi için telefonu çok yakın değil, 25–30 santimetre yükseklikte tutun.'
+            ]
+        },
+        'qibla_compass': {
+            title: '2. Bölüm: Sesli Kıble Pusulası ve Namaz Vakitleri',
+            summary: 'Bulunduğunuz il veya GPS konumuna göre Kâbe yönünü sesli sinyallerle buldurur ve günlük namaz vakitlerini seslendirir.',
+            steps: [
+                '1. Adım: Listeden bulunduğunuz ili seçin veya GPS ile Konum Doğrula düğmesine basın.',
+                '2. Adım: Telefonu avucunuzun içinde yere tam paralel (ekran tavana bakacak şekilde) düz tutun.',
+                '3. Adım: Kendi etrafınızda yavaşça dönün; Kıble açısına tam hizalandığınızda üçlü onay sesi ve titreşim verilecektir.'
+            ],
+            warnings: [
+                'Mıknatıslı telefon kılıfları, demir masalar, kalorifer petekleri ve televizyon/hoparlör yanları pusula sensörünü yanıltabilir; ölçümü metal eşyalardan en az 1 metre uzakta yapın.',
+                'Manyetik sapma uyarısı duyarsanız telefonunuzu havada sekiz (8) çizecek şekilde sallayarak pusulayı kalibre edin.'
+            ]
+        },
+        'qr_screen': {
+            title: '3. Bölüm: WhatsApp Web ve Bilgisayar Ekranı Hizalama',
+            summary: 'Bilgisayar ekranındaki karekodu (QR) veya ekran penceresini ortalamanız için sesli yönlendirme yapar ve 15 saniye sabit tutma sayacı sunar.',
+            steps: [
+                '1. Adım: Telefonun arka kamerasını bilgisayar ekranının ortasına hafifçe yaklaştırıp yaklaşık iki karış (30–35 santimetre) kendinize doğru geri çekin.',
+                '2. Adım: Sesli yön komutlarını (biraz sola, sağa, yukarı) takip ederek ekranı ortalayın.',
+                '3. Adım: WhatsApp Web eşleştirmesi için 15 Saniye Sabit Tutma Sesi düğmesine basıp geri sayım bitene kadar elinizi sabit tutun.'
+            ],
+            warnings: [
+                'Bilgisayar ekranının parlaklığı tamamen kapalıysa kamera ekranı göremez; bilgisayar ekran ışığının açık olduğundan emin olun.',
+                'Kişisel hesap güvenliğiniz için tanımadığınız kişilerin bilgisayarlarında WhatsApp Web karekodu okutmayın.'
+            ]
+        },
+        'portrait': {
+            title: '4. Bölüm: Özçekim ve Fotoğraf Çekim Yardımcısı',
+            summary: 'Ön veya arka kamerada yüzünüzün kadrajın tam ortasında olup olmadığını ve ışık durumunu seslendirerek düzgün fotoğraf çekmenizi sağlar.',
+            steps: [
+                '1. Adım: Telefonu yüzünüzün karşısında kol mesafesinde (yaklaşık 40–50 santimetre) dik tutun.',
+                '2. Adım: Uygulamanın başınızı hafif sağa, sola veya aşağı eğmeniz yönündeki sesli komutlarını dinleyerek yüzünüzü ortalayın.',
+                '3. Adım: Hizalama tamamlandığında 3-2-1 sesli geri sayımıyla fotoğraf otomatik olarak çekilir.'
+            ],
+            warnings: [
+                'Arkanızda doğrudan güneş veya güçlü pencere ışığı varsa yüzünüz karanlık (ters ışıkta) çıkabilir; uygulama ters ışık uyarısı verirse yüzünüzü ışığa doğru dönün.'
+            ]
+        },
+        'color_cloth': {
+            title: '5. Bölüm: Madeni ve Kağıt Para Sayacı & Kıyafet Rengi',
+            summary: 'Kameraya gösterilen Türk Lirası banknotları ve madeni paraları tanıyıp toplar; ayrıca kıyafetlerin rengini ve desenini söyler.',
+            steps: [
+                '1. Adım: Parayı düz bir zemine koyun veya bir elinizde düz tutun; diğer elinizle telefonu yaklaşık bir karış (15–20 santimetre) yukarıdan paraya yöneltin.',
+                '2. Adım: Uygulama parayı tanıdığında tutarı seslendirir ve cüzdan toplamına ekler; Cüzdanımda Ne Kadar Var (N) düğmesiyle toplamı dinleyin.',
+                '3. Adım: Kıyafet rengi için kumaşı kameranın karşısına tutup Boşluk tuşuna basın veya ekrana çift dokunun.'
+            ],
+            warnings: [
+                'Kağıt paraların doğru okunması için parayı ikiye katlanmış halde değil, ön veya arka yüzü tam görünecek şekilde düz tutun.',
+                'Çok karanlık ortamlarda renk yanılması olmaması için telefon ışığını (feneri) açık tutun.'
+            ]
+        },
+        'anomaly_led': {
+            title: '6. Bölüm: Yere Düşen Eşyayı Bulma & Cihaz Işığı Kontrolü',
+            summary: 'Zemine düşen küçük eşyaların (anahtar, bozuk para, kapak) yerini ve modem veya şarj aleti gibi cihazların durum ışıklarının yanıp yanmadığını bildirir.',
+            steps: [
+                '1. Adım: Yere düşen eşya için telefonu bel hizasından yere doğru yaklaşık 45 derece açıyla tutarak zemini yavaşça sağdan sola tarayın.',
+                '2. Adım: Cihaz ışığı kontrolü için kamerayı modemin veya şarj aletinin ışık bölümüne bir karış (15 santimetre) mesafeden tutun.'
+            ],
+            warnings: [
+                'Yerdeki eşyayı ararken eğildiğinizde masa köşesi veya sandalye gibi engellere çarpmamak için önce elinizle çevreyi kontrol edin.',
+                'Yoğun desenli halılarda küçük eşyaları doğrulamak için kamerayı zemine biraz daha yaklaştırarak tarayın.'
+            ]
+        },
+        'light_meter': {
+            title: '7. Bölüm: Aydınlatma Kontrolü ve Işık Kaynağı Yönlendirici',
+            summary: 'Odadaki lambanın veya pencerenin açık olup olmadığını ve ışık şiddetini yükselen ve alçalan ses tonuyla bildirir.',
+            steps: [
+                '1. Adım: Kamerayı başlatıp telefonu odanın tavanına, lambaya veya pencere yönüne doğru yavaşça çevirin.',
+                '2. Adım: Işık kaynağına yaklaştıkça ses sinyalinin tizleştiğini (yükseldiğini), karanlığa döndükçe kalınlaştığını dinleyin.'
+            ],
+            warnings: [
+                'Lambanın açık olup olmadığını kontrol ederken elinizi asla sıcak ampule değdirmeyin; yalnızca uzaktan telefon kamerasıyla kontrol edin.'
+            ]
+        },
+        'explorer': {
+            title: '8. Bölüm: Çevre Nesne Tanıma ve Belge Okuyucu',
+            summary: 'Çevrenizdeki nesnelerin (sandalye, masa, kapı, insan, bardak) yönünü ve mesafesini seslendirir; çift dokunuşta karşınızdaki yazıları okur.',
+            steps: [
+                '1. Adım: Telefonu göğüs hizasında karşıya doğru dik tutarak çevrenizi yavaşça tarayın.',
+                '2. Adım: Detaylı sahne betimlemesini ve yazıları dinlemek için ekrana çift dokunun veya Boşluk tuşuna basın.',
+                '3. Adım: Çekilen fotoğrafın üzerinde parmağınızı gezdirerek nesnelerin ekranın neresinde olduğunu dokunarak keşfedin.'
+            ],
+            warnings: [
+                'Çok Önemli Güvenlik Uyarısı: Bu bölüm yardımcı bir görsel bilgilendirme aracıdır; yürürken, merdiven inerken veya cadde geçerken beyaz bastonunuzun yerini tutmaz. Yürüyüş sırasında her zaman beyaz bastonunuzu kullanmaya devam edin.'
+            ]
+        },
+        'medicine_skt': {
+            title: '9. Bölüm: İlaç Kutusu ve Son Kullanma Tarihi Kontrolü',
+            summary: 'İlaç kutusunun adını, miligram dozunu, barkodunu ve son kullanma tarihini (SKT) okuyarak tarihi geçmişse sesli uyarı verir.',
+            steps: [
+                '1. Adım: İlaç kutusunu bir elinizde tutun, diğer elinizle telefonu kutudan yaklaşık bir karış (15–20 santimetre) uzakta sabit tutun.',
+                '2. Adım: İlk yüzü okuttuktan sonra son kullanma tarihi kutunun yan kapağındaysa kutuyu 90 derece çevirip tekrar çift dokunarak okutun.'
+            ],
+            warnings: [
+                'Sağlık Uyarısı: Kutunun üzerindeki kabartma veya baskı silinmişse, yırtılmışsa ya da uygulama tarihi net okuyamadığını söylüyorsa ilacı kesinlikle kullanmayın; mutlaka eczacınıza veya hekiminize danışın.'
+            ]
+        },
+        'signature_pen': {
+            title: '10. Bölüm: İmza Alanı ve Kalem Yönlendirici',
+            summary: 'Resmi belgelerde önce belge metnini size okur, ardından kaleminizin ucunu İmza / Ad Soyad kutusuna santimetre hassasiyetiyle yönlendirir.',
+            steps: [
+                '1. Adım (Önce Belgeyi Okutun): İmza atmadan önce telefonu belgenin tamamını görecek şekilde tutup ekrana çift dokunun ve belgede ne yazdığını sonuna kadar dinleyin.',
+                '2. Adım: Belge içeriğini onayladıktan sonra bir elinizle telefonu sabit tutarken diğer elinizle kalemin ucunu kağıda yaklaştırın.',
+                '3. Adım: Uygulamanın kalemi sağa, sola veya aşağı kaydırmanız yönündeki santimetre komutlarını takip ederek imza alanına ulaşın.'
+            ],
+            warnings: [
+                'Hukuki Güvenlik Uyarısı: İçeriğini baştan sona okutmadığınız ve doğruluğundan emin olmadığınız hiçbir belgeye, sözleşmeye veya evraka imza atmayın.'
+            ]
+        },
+        'liquid_level': {
+            title: '11. Bölüm: Masadaki Bardak, Kupa ve Şişe Bulucu',
+            summary: 'Masanın üzerindeki bardak, kupa veya şişenin saat yönüne göre konumunu ve elinizin bardağa çarpma riskini seslendirir.',
+            steps: [
+                '1. Adım: Telefonu masanın kenarından masanın üst yüzeyine doğru hafif eğimli tutarak yavaşça tarayın.',
+                '2. Adım: Uygulama bardağın solunuzda, ortada veya sağınızda olduğunu bildirdiğinde elinizi masanın yüzeyinden yavaşça kaydırarak bardağın alt gövdesine dokunun.'
+            ],
+            warnings: [
+                'Yanık Tehlikesi Uyarısı: Çay, kahve veya kaynar su doldururken yalnızca kamera yönlendirmesine güvenmeyin; sıcak sıvı dökülmesi ve yanık riskine karşı sıvı seviyesi uyarı cihazı kullanın.'
+            ]
+        },
+        'door_elevator_lcd': {
+            title: '12. Bölüm: Derece Okuma ve Elle Ayarlama Yol Göstericisi (Cihaza Komut Göndermez)',
+            summary: 'Kombi, klima, çamaşır/bulaşık makinesi ve fırın ekranlarında kaç derece yazdığını okur; siz kendi parmağınızla tuşa bastıkça değişen sayıyı seslendirerek istediğiniz dereceye ulaşmanıza yol gösterir.',
+            steps: [
+                '1. Adım (Dokunarak Keşfedin): Telefonu kaldırmadan önce iki elinizle cihazın ön yüzeyine dokunarak düz ve pürüzsüz cam/plastik ekran penceresini ve hemen yanındaki veya altındaki artırma (+), azaltma (-) tuşlarını ya da çevrilen düğmeyi hissedip yerlerini belirleyin.',
+                '2. Adım (Bir Karış Mesafe): Bir elinizle telefonun arka kamerasını pürüzsüz ekran penceresine hafifçe değdirip yaklaşık bir karış (15–20 santimetre) kendinize doğru geri çekin; uygulama ekranın ışığını algılayıp ortalamanız için sesli yön verir.',
+                '3. Adım (Diğer Elinizi Düğmeye Koyun): Telefonu tutan elinizi sabit tutarken, boştaki diğer elinizi kameranın önünden geçirmeden (aşağıdan veya yandan dolaştırarak) cihazın düğmesinin üzerine koyun.',
+                '4. Adım (Tek Tek Basıp Dinleyin): Kendi parmağınızla düğmeye bir kez basın ve 1–2 saniye bekleyin; uygulama değişen dereceyi anında okur ve istediğiniz sayıya geldiğinizde üçlü onay sinyaliyle düğmeden elinizi çekebileceğinizi söyler.'
+            ],
+            warnings: [
+                '%100 Güvenli Gözlem Garantisi: Bu uygulama kombi, klima veya makinenize kesinlikle hiçbir elektronik sinyal, kızılötesi, Wi-Fi ya da uzaktan kumanda komutu göndermez; eşyalarınıza dışarıdan müdahale etmez ve cihazlarınıza zarar verme ihtimali sıfırdır.',
+                'Eliniz yanlışlıkla ekranın önünü kapatırsa uygulama sizi sesli uyarır; ayrıca sıcak fırın kapağına değil yalnızca kontrol düğmelerine dokunmaya dikkat edin.'
+            ]
+        },
+        'food_freshness': {
+            title: '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve SKT Okuyucu',
+            summary: 'Gıda paketlerinin üzerindeki son tüketim tarihini (STT/TETT) ve içindekiler listesindeki alerjen uyarılarını (gluten, laktoz, yer fıstığı, soya vb.) okur.',
+            steps: [
+                '1. Adım: Gıda paketini bir elinizde tutun, diğer elinizle telefonu paketten yaklaşık bir karış (15–20 santimetre) uzakta tutarak ekrana çift dokunun.',
+                '2. Adım: İçindekiler yazısı paketin arka veya yan yüzündeyse paketi çevirip tekrar çift dokunarak okutun.'
+            ],
+            warnings: [
+                'Gıda ve Alerji Uyarısı: Paketi açılmış, şişmiş, kokusu değişmiş veya tarihi silinmiş gıdaları tüketmeyin. Ciddi gıda alerjiniz varsa ambalaj kıvrımları nedeniyle okunamayan kısımlar olabileceğini unutmayın ve şüphede kaldığınız ürünü tüketmeyin.'
+            ]
+        },
+        'song_finder': {
+            title: '14. Bölüm: Sesli Müzik, Melodi ve Şarkı Sözü Tanıma',
+            summary: 'Ortamda çalan şarkıyı, söylediğiniz sözleri veya mırıldandığınız melodiyi dinleyerek eseri bulur, sözlerini satır satır okur ve enstrüman akort/makam analizi yapar.',
+            steps: [
+                '1. Adım: Bölümü açtığınızda mikrofon otomatik dinlemeye başlar; telefonun alt mikrofon kısmını müziğin geldiği yöne doğru tutun veya şarkı sözlerini net bir sesle söyleyin.',
+                '2. Adım: Şarkı bulunduğunda Sağ/Sol ok tuşları veya Önceki/Sonraki Satır düğmeleriyle şarkı sözlerini mısra mısra dinleyin.'
+            ],
+            warnings: [
+                'En doğru sonuç için dinleme sırasında arka planda başka bir televizyon veya yoğun konuşma gürültüsü olmamasına özen gösterin.'
+            ]
+        },
+        'bus_stop_tracker': {
+            title: '15. Bölüm: Otobüs Hat Numarası Okuyucu ve Durak Bildirimi',
+            summary: 'Durağa yaklaşan otobüsün ön tabelasını okur ve otobüs içindeyken ineceğiniz durağa yaklaştığınızda (300 metre ve 100 metre kala) sesli ve titreşimli alarm verir.',
+            steps: [
+                '1. Adım: Otobüse bindiğinizde İneceğiniz Durak / Semt kutusuna durağınızı yazın veya sesle söyleyip Durak Yaklaşma Alarmı Kur düğmesine basın.',
+                '2. Adım: Durakta beklerken telefonu kaldırımın güvenli iç kısmından gelen aracın yönüne doğru tutup hat numarasını okutun.'
+            ],
+            warnings: [
+                'Trafik Güvenliği Uyarısı: Otobüs tabelasını okuturken kesinlikle kaldırımdan araç yoluna inmeyin; kaldırımın güvenli iç kısmında durun ve araca binerken şoförden de sesli teyit alın.'
+            ]
+        },
+        'pos_iban_reader': {
+            title: '16. Bölüm: POS Cihazı Tutarı Doğrulayıcı ve IBAN Kopyalayıcı',
+            summary: 'Ödeme yapmadan önce POS cihazı ekranında yazan çekilecek TL tutarını seslendirir ve kağıt veya ekran üzerindeki 26 haneli TR IBAN numarasını doğrulayıp panoya kopyalar.',
+            steps: [
+                '1. Adım: Kartınızı POS cihazına yaklaştırmadan önce telefonu POS ekranının bir karış (15 santimetre) üzerine tutup POS Tutarını ve IBAN\'ı Şimdi Oku düğmesine basın.',
+                '2. Adım: Uygulama ekrandaki tutarı okuduğunda kasadaki görevlinin söylediği tutarla aynı olup olmadığını kontrol edin.'
+            ],
+            warnings: [
+                'Ödeme Güvenliği Uyarısı: POS ekranı ışıktan parlıyorsa veya tutar net okunamadıysa kartınızı okutmayın; cihazı hafif eğerek tekrar okutun. İşlem sırasında kamerayı tuş takımına tutmayın.'
+            ]
+        },
+        'item_memory': {
+            title: '17. Bölüm: Sesli Eşya Konum Kaydı ve Kavanoz Etiketleyici',
+            summary: 'Evde nereye koyduğunuzu unutmamak için eşyalarınızın yerini sesli kaydeder; sorduğunuzda hangi çekmecede veya rafta olduğunu söyler ve kavanozları etiketler.',
+            steps: [
+                '1. Adım: Bir eşyayı kaldırdığınızda Sesle Eşya Yeri Kaydet düğmesine basıp örneğin "Yedek anahtarı koridordaki üst çekmeceye koydum" deyin.',
+                '2. Adım: Aradığınızda Sesle Eşya Yeri Sor düğmesine basıp "Yedek anahtar nerede?" diye sorun.'
+            ],
+            warnings: [
+                'Eşyanın yerini değiştirdiğinizde eski kaydın sizi yanıltmaması için yeni yerini tekrar sesli olarak kaydedin.'
+            ]
+        },
+        'tv_subtitle_score': {
+            title: '18. Bölüm: Televizyon Altyazı Okuyucu ve Canlı Maç Skoru Spikeri',
+            summary: 'Televizyon ekranındaki dizi ve film altyazılarını, haber bantlarını ve maç skorlarını takip ederek değiştikçe otomatik seslendirir.',
+            steps: [
+                '1. Adım: Koltuğunuzda otururken telefonu televizyon ekranının karşısına gelecek şekilde tutun veya sabitleyin.',
+                '2. Adım: Uygulama "Televizyon ekranı kadrajda hizalandı" dediğinde Otomatik TV Altyazı & Skor Spikerini Başlat düğmesine basın.'
+            ],
+            warnings: [
+                'Odanın tavan lambası televizyon camında parlama yapıyorsa tavan ışığını kapatmanız altyazıların çok daha net okunmasını sağlar.'
+            ]
+        },
+        'sock_outfit_check': {
+            title: '19. Bölüm: Çorap Eşleştirici, Kıyafet Uyumu ve Leke Kontrolü',
+            summary: 'İki çorabın aynı çift olup olmadığını, alt-üst kıyafetlerinizin renk uyumunu ve kumaş üzerinde belirgin bir leke bulunup bulunmadığını bildirir.',
+            steps: [
+                '1. Adım: İki çorabı düz bir zemine birbirine değmeden yan yana (aralarında 3–4 parmak boşluk bırakarak) koyun.',
+                '2. Adım: Telefonu yaklaşık bir buçuk karış (25 santimetre) yukarıdan tutup İki Çorabı Karşılaştır düğmesine basın; leke kontrolü için kıyafeti düz serip Kıyafet Uyumu & Leke Kontrolü düğmesine basın.'
+            ],
+            warnings: [
+                'Koyu lacivert ile siyah çorapların doğru ayırt edilebilmesi için ölçümü aydınlık bir odada veya telefon feneri açıkken yapın.'
+            ]
+        },
+        'where_am_i': {
+            title: '20. Bölüm: Konum, Açık Adres ve Çevre Tabelası Bildirimi',
+            summary: 'Bulunduğunuz il, ilçe, mahalle, cadde ve sokak adını seslendirir; dilerseniz konumunuzu tek tuşla WhatsApp üzerinden yakınınıza gönderir.',
+            steps: [
+                '1. Adım: Bölümü açtığınızda açık adresiniz otomatik olarak sorgulanır ve seslendirilir; tekrar dinlemek için Açık Adresimi ve Caddeyi Şimdi Söyle (W) düğmesine basın.',
+                '2. Adım: Bir yakınınıza yerinizi bildirmek için Konumumu WhatsApp İle Gönder düğmesine basın.'
+            ],
+            warnings: [
+                'Bina içlerinde GPS sinyali birkaç sokak yanılma payı gösterebilir; en doğru cadde ve kapı numarası için açık havada ölçüm yapın.'
+            ]
+        },
+        'step_calorie_guide': {
+            title: '21. Bölüm: Sesli Adım Sayacı ve Besin Değeri Rehberi',
+            summary: 'Günlük adım sayınızı, yürüdüğünüz mesafeyi ve yaktığınız kaloriyi takip eder; ayrıca söylediğiniz yemeklerin kalori ve karbonhidrat değerlerini hesaplar.',
+            steps: [
+                '1. Adım: Yürüyüşe çıkarken Adım Sayacı: Açık düğmesinin etkin olduğundan emin olun ve telefonu cebinizde veya çantanızda taşıyın.',
+                '2. Adım: Yediğiniz bir yemeğin besin değerini öğrenmek için Yediğim Yemeği Sesle Söyle düğmesine basıp örneğin "Bir tabak mercimek çorbası" deyin.'
+            ],
+            warnings: [
+                'Sağlık Uyarısı: Sunulan kalori ve karbonhidrat değerleri standart porsiyon ortalamalarıdır; diyabet veya özel diyet takibinde doktorunuzun ve diyetisyeninizin ölçülerine uyun.'
+            ]
+        },
+        'cooking_guide': {
+            title: '22. Bölüm: Adım Adım Sesli Yemek Tarifleri Rehberi',
+            summary: 'Evdeki malzemelerinize göre yemek önerir; seçtiğiniz tarifin malzemelerini ve pişirme adımlarını tek tek seslendirir ve her adım için sesli dakika sayacı kurar.',
+            steps: [
+                '1. Adım: Listeden bir yemek seçin veya Evdeki Malzemeleri Sesle Söyle düğmesine basıp elinizdeki malzemeleri söyleyin.',
+                '2. Adım: Önce Malzeme Listesini Oku düğmesiyle tüm malzemeleri tezgaha hazırlayın.',
+                '3. Adım: Sonraki Adım düğmesiyle pişirme aşamalarını sırayla dinleyin ve pişirme süresini başlatmak için Bu Adım İçin Dakika Sayacı Başlat düğmesine basın.'
+            ],
+            warnings: [
+                'Mutfak Güvenliği Uyarısı: Telefonunuzu yanan ocak gözünün, sıcak fırın kapağının veya su ve yağ sıçrayabilecek tencerenin hemen yanına koymayın; tezgahın güvenli ve kuru bir köşesinde tutun. Ocak ve kesici alet kullanırken azami dikkat gösterin.'
+            ]
+        }
+    };
+
+    state.acceptedModeIntros = {};
+    state.activeOnboardingMode = '';
+
+    function loadAcceptedModeIntrosFromStorage() {
+        try {
+            const raw = localStorage.getItem('mikyas_accepted_mode_intros_v1');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed && typeof parsed === 'object') {
+                    state.acceptedModeIntros = parsed;
+                }
+            }
+        } catch (_) {}
+    }
+
+    function saveAcceptedModeIntrosToStorage() {
+        try {
+            localStorage.setItem('mikyas_accepted_mode_intros_v1', JSON.stringify(state.acceptedModeIntros || {}));
+        } catch (_) {}
+    }
+
+    function hasAcceptedModeOnboarding(modeKey) {
+        return Boolean(state.acceptedModeIntros && state.acceptedModeIntros[modeKey]);
+    }
+
+    function setModalBackgroundAriaHidden(isHidden) {
+        const mainEl = document.getElementById('main-controls');
+        if (!mainEl || !mainEl.children) return;
+        for (let i = 0; i < mainEl.children.length; i++) {
+            const child = mainEl.children[i];
+            if (!child || child.id === 'mode-onboarding-backdrop') continue;
+            if (isHidden) {
+                child.setAttribute('aria-hidden', 'true');
+            } else {
+                child.removeAttribute('aria-hidden');
+            }
+        }
+    }
+
+    function buildModeOnboardingSpeechText(modeKey) {
+        const guide = MODE_ONBOARDING_GUIDES[modeKey] || MODE_ONBOARDING_GUIDES['exam_reader'];
+        if (!guide) return '';
+        const stepsTxt = (guide.steps || []).join(' ');
+        const warnTxt = (guide.warnings || []).join(' ');
+        return `${guide.title} bilgilendirme penceresi. Özeti: ${guide.summary} Görme engelli kullanıcılar için uygulama talimatları: ${stepsTxt} Uyarılar ve dikkat edilmesi gereken hususlar: ${warnTxt} Bu metni ekran okuyucunuzla inceledikten sonra bölümü kullanmaya başlamak için Okudum ve Anladım düğmesine basın.`;
+    }
+
+    function openModeOnboardingModal(modeKey, isManualReopen = false) {
+        const guide = MODE_ONBOARDING_GUIDES[modeKey] || MODE_ONBOARDING_GUIDES['exam_reader'];
+        const backdrop = document.getElementById('mode-onboarding-backdrop');
+        const dialog = document.getElementById('mode-onboarding-dialog');
+        const titleEl = document.getElementById('mode-onboarding-title');
+        const badgeEl = document.getElementById('mode-onboarding-badge');
+        const summaryEl = document.getElementById('mode-onboarding-summary');
+        const stepsEl = document.getElementById('mode-onboarding-steps');
+        const warningsEl = document.getElementById('mode-onboarding-warnings');
+        if (!backdrop || !guide) return;
+
+        state.activeOnboardingMode = modeKey;
+        if (titleEl) titleEl.textContent = `ℹ️ ${guide.title} — Talimatlar ve Uyarılar`;
+        if (badgeEl) {
+            badgeEl.textContent = hasAcceptedModeOnboarding(modeKey)
+                ? 'Bölüm Talimatları ve Uyarılar'
+                : 'İlk Kullanım Bilgilendirmesi';
+        }
+        if (summaryEl) summaryEl.textContent = guide.summary;
+        if (stepsEl) {
+            stepsEl.innerHTML = '';
+            (guide.steps || []).forEach(st => {
+                const li = document.createElement('li');
+                li.textContent = st;
+                stepsEl.appendChild(li);
+            });
+        }
+        if (warningsEl) {
+            warningsEl.innerHTML = '';
+            (guide.warnings || []).forEach(w => {
+                const li = document.createElement('li');
+                li.textContent = w;
+                warningsEl.appendChild(li);
+            });
+        }
+
+        backdrop.hidden = false;
+        setModalBackgroundAriaHidden(true);
+        if (dialog && typeof dialog.focus === 'function') {
+            try { dialog.focus(); } catch (_) {}
+        }
+        if (isManualReopen) {
+            announceGuidance(buildModeOnboardingSpeechText(modeKey), { force: true, bannerState: 'centered' });
+        }
+    }
+
+    function speakActiveModeOnboardingGuide() {
+        const modeKey = state.activeOnboardingMode || state.mode || 'exam_reader';
+        announceGuidance(buildModeOnboardingSpeechText(modeKey), { force: true, bannerState: 'centered' });
+    }
+
+    function acceptActiveModeOnboarding() {
+        const modeKey = state.activeOnboardingMode || state.mode || 'exam_reader';
+        if (!state.acceptedModeIntros) state.acceptedModeIntros = {};
+        state.acceptedModeIntros[modeKey] = true;
+        saveAcceptedModeIntrosToStorage();
+
+        const backdrop = document.getElementById('mode-onboarding-backdrop');
+        if (backdrop) backdrop.hidden = true;
+        setModalBackgroundAriaHidden(false);
+
+        const guide = MODE_ONBOARDING_GUIDES[modeKey];
+        const title = guide ? guide.title : 'Aktif bölüm';
+        announceGuidance(`Okudum ve anladım onaylandı. ${title} bölümünü artık güvenle kullanmaya başlayabilirsiniz.`, {
+            force: true,
+            bannerState: 'centered'
+        });
+
+        const activeBtn = Array.from(el.modeButtons || []).find(b => b.getAttribute('data-mode') === modeKey);
+        if (activeBtn && typeof activeBtn.focus === 'function') {
+            try { activeBtn.focus(); } catch (_) {}
+        }
+    }
+
     function setMode(newMode, options = {}) {
         const silentAnnouncement = Boolean(options && options.silentAnnouncement);
         const prevMode = state.mode;
@@ -11088,6 +11470,10 @@
 
         if (modeAnnouncement && !silentAnnouncement) {
             announceGuidance(modeAnnouncement, { force: true, bannerState: 'normal' });
+        }
+
+        if (!silentAnnouncement && !hasAcceptedModeOnboarding(newMode)) {
+            openModeOnboardingModal(newMode, false);
         }
 
         if (newMode === 'where_am_i' && !silentAnnouncement) {
@@ -11753,6 +12139,7 @@
             }
         } catch (_) {}
         loadSpeechRateFromStorage();
+        loadAcceptedModeIntrosFromStorage();
         loadMoneyLedgerFromStorage();
         loadItemMemoriesFromStorage();
         loadStepCalorieFromStorage();
@@ -11760,8 +12147,24 @@
         populate81ProvincesSelect();
         syncModePanelsVisibility(state.mode);
         updateExamRemoteUI();
+        if (!hasAcceptedModeOnboarding(state.mode)) {
+            openModeOnboardingModal(state.mode, false);
+        }
         setTimeout(initAiModel, 350);
     });
+
+    const btnOpenModeInfo = document.getElementById('btn-open-mode-info');
+    const btnModeOnboardingSpeak = document.getElementById('btn-mode-onboarding-speak');
+    const btnModeOnboardingAccept = document.getElementById('btn-mode-onboarding-accept');
+    if (btnOpenModeInfo) {
+        btnOpenModeInfo.addEventListener('click', () => openModeOnboardingModal(state.mode, true));
+    }
+    if (btnModeOnboardingSpeak) {
+        btnModeOnboardingSpeak.addEventListener('click', speakActiveModeOnboardingGuide);
+    }
+    if (btnModeOnboardingAccept) {
+        btnModeOnboardingAccept.addEventListener('click', acceptActiveModeOnboarding);
+    }
 
     window.handleAndroidBackButton = function () {
         if (el.resultPanel && !el.resultPanel.hidden) {
@@ -11786,6 +12189,11 @@
         }
         if (isAnySpeechPlaying()) {
             stopAllSpeechImmediately();
+            return true;
+        }
+        const onboardingBackdrop = document.getElementById('mode-onboarding-backdrop');
+        if (onboardingBackdrop && !onboardingBackdrop.hidden) {
+            announceGuidance('Bölümü kullanmaya başlamak için lütfen bilgilendirme penceresindeki Okudum ve Anladım düğmesine basın.', { force: true });
             return true;
         }
         return false;
