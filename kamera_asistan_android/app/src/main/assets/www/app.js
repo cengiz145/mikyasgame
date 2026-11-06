@@ -17,6 +17,7 @@
             if (typeof state !== 'undefined' && state) {
                 state.isProcessingOcr = false;
                 state.moneyLiveOcrBusy = false;
+                state.isLiveBgOcrBusy = false;
             }
         } catch (_) {}
     });
@@ -25,6 +26,7 @@
             if (typeof state !== 'undefined' && state) {
                 state.isProcessingOcr = false;
                 state.moneyLiveOcrBusy = false;
+                state.isLiveBgOcrBusy = false;
             }
         } catch (_) {}
     });
@@ -5346,16 +5348,24 @@
             } else if (areaRatio <= 0.74) {
                 narrativeEvents.push('Kişi kameradan uzaklaşıp arka plana doğru gidiyor.');
             }
+        }
 
-            // Video sırasında eline yeni bir eşya aldı mı veya masaya bir şey koydu mu?
-            const initialObjs = new Set(firstP.objects);
-            for (let t = 1; t < personTimeline.length; t++) {
-                const step = personTimeline[t];
-                for (const objName of step.objects) {
-                    if (!initialObjs.has(objName)) {
-                        initialObjs.add(objName);
-                        narrativeEvents.push(`${step.timeSec}. saniye civarında kişinin elinde veya önünde ${objName} beliriyor.`);
-                    }
+        // Video sırasında eline yeni bir eşya aldı mı veya sahneye/masaya yeni bir eşya girdi mi?
+        // İlk karedeki (frameAnalyses[0]) eşyaları baz al ki ilk karede insan yokken sonradan insanla birlikte giren eşyalar da yakalansın!
+        const initialObjs = new Set(
+            (frameAnalyses[0].preds || [])
+                .filter(p => p.class !== 'person')
+                .map(p => TR_LABELS[p.class] || p.class)
+        );
+        for (let i = 1; i < frameAnalyses.length; i++) {
+            const curr = frameAnalyses[i];
+            const frameObjs = (curr.preds || [])
+                .filter(p => p.class !== 'person')
+                .map(p => TR_LABELS[p.class] || p.class);
+            for (const objName of frameObjs) {
+                if (!initialObjs.has(objName)) {
+                    initialObjs.add(objName);
+                    narrativeEvents.push(`${curr.timeSec}. saniye civarında kişinin elinde veya önünde ${objName} beliriyor.`);
                 }
             }
         }
@@ -5522,17 +5532,22 @@
                 let finalVideoStory = initialVideoStory;
                 if (uniqueCaptions.length > 0) {
                     const captionSpeech = uniqueCaptions.map(c => `${c.timeSec}. saniyede ekranda: "${c.text}"`).join('; ');
-                    finalVideoStory += `\n\nVideoda Okunan Gerçek Yazılar / Altyazılar:\n${captionSpeech}.`;
+                    const combinedVideoText = uniqueCaptions.map(c => c.text).join('\n');
+                    const videoInsights = buildUniversalSmartInsights(combinedVideoText, combinedVideoText, '');
+                    const insightSpeech = videoInsights.speechNotes.length > 0 ? ` ${videoInsights.speechNotes.join(' ')}` : '';
+                    const insightReport = videoInsights.reportLines.length > 0 ? `\n\n--- Akıllı Denetçi Bulguları ---\n${videoInsights.reportLines.join('\n')}` : '';
+
+                    finalVideoStory += `\n\nVideoda Okunan Gerçek Yazılar / Altyazılar:\n${captionSpeech}.${insightReport}`;
                     showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Video Analizi ve Okunan Yazılar`, finalVideoStory);
                     populatePhotoExplorerMap(bestFrame.canvas, bestFrame.metrics, bestFrame.preds, [], finalVideoStory);
-                    announceGuidance(`Videoda ekranda şu yazılar yer alıyor: ${captionSpeech}.`, {
+                    announceGuidance(`${initialVideoStory} Videoda ekranda şu yazılar yer alıyor: ${captionSpeech}.${insightSpeech}`, {
                         force: true,
-                        bannerState: 'centered'
+                        bannerState: videoInsights.hasExpiredAlarm ? 'warning' : 'centered'
                     });
                 } else {
                     finalVideoStory += '\n\nVideoda ekranda herhangi bir yazı veya altyazı yer almıyor.';
                     showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Gerçek Zaman Sıralı Video Analizi`, finalVideoStory);
-                    announceGuidance('Videoda ekranda herhangi bir yazı veya altyazı yer almıyor.', {
+                    announceGuidance(`${initialVideoStory} Videoda ekranda herhangi bir yazı veya altyazı yer almıyor.`, {
                         force: true,
                         bannerState: 'centered'
                     });
@@ -5794,7 +5809,7 @@
             if (tvBtn) {
                 tvBtn.classList.remove('active-toggle');
                 tvBtn.setAttribute('aria-pressed', 'false');
-                tvBtn.textContent = '▶️ Otomatik TV Spikerini Başlat';
+                tvBtn.textContent = '▶️ Otomatik TV Altyazı & Skor Spikerini Başlat';
             }
         }
         if (state.videoStream) {
@@ -6246,7 +6261,15 @@
 
         if (isAligned) {
             const now = performance.now();
-            if (state.qiblaStableSince === 0) state.qiblaStableSince = now;
+            if (state.qiblaStableSince === 0) {
+                state.qiblaStableSince = now;
+                if (navigator.vibrate) navigator.vibrate(50);
+                announceGuidance('Kıble hizasına geldiniz, doğrulama için 1 saniye sabit tutun.', {
+                    bannerState: 'centered',
+                    minIntervalMs: 1200
+                });
+                return;
+            }
 
             if (now - state.qiblaStableSince >= 1300) {
                 if (navigator.vibrate && now - state.lastQiblaLockVibrate > 2500) {
@@ -6259,6 +6282,7 @@
                     : ' Önünüzdeki secde alanı da açık görünüyor.';
 
                 announceGuidance(`Doğrulandı: Tam Kıble yönündesiniz! (${state.qiblaLocationSource}, ${state.qiblaTargetBearing} derece Kâbe açısı).${obstacleNote}`, {
+                    force: true,
                     bannerState: 'centered',
                     minIntervalMs: 3600
                 });
@@ -8554,15 +8578,23 @@
         const isSingleUniformSurface = (colorDist < 18 && distLeftMid < 14 && distRightMid < 14 && distTopCenter < 16 && leftHalf.stdDev < 18 && rightHalf.stdDev < 18);
 
         const centerSample = sampleRegionRgbAndContrast(ctx, w * 0.25, h * 0.25, w * 0.5, h * 0.5);
+        const leftCore = sampleRegionRgbAndContrast(ctx, w * 0.14, h * 0.25, w * 0.24, h * 0.5);
+        const rightCore = sampleRegionRgbAndContrast(ctx, w * 0.62, h * 0.25, w * 0.24, h * 0.5);
         const sockEl = document.getElementById('sock-match-result');
         const stainEl = document.getElementById('outfit-stain-result');
-        const hasStainOrSpot = centerSample.outlierRatio >= 0.08 && centerSample.stdDev >= 20;
+
+        // İki çorap yan yana karşılaştırılırken ortadaki masa boşluğunu (midStrip) leke sanmamak için her iki parçanın kendi iç yüzey homojenliğini denetle!
+        const isTwoPieceComparison = !isSingleUniformSurface && state.sockSubMode !== 'outfit';
+        const hasStainOrSpot = isTwoPieceComparison
+            ? ((leftCore.outlierRatio >= 0.08 && leftCore.stdDev >= 20) || (rightCore.outlierRatio >= 0.08 && rightCore.stdDev >= 20))
+            : (centerSample.outlierRatio >= 0.08 && centerSample.stdDev >= 20);
+        const refColorName = isTwoPieceComparison ? leftCore.colorInfo.name : centerSample.colorInfo.name;
         const stainDetail = hasStainOrSpot
-            ? `Merkez renk: ${centerSample.colorInfo.name}. Dikkat: Kumaş yüzeyinde ana renkten belirgin şekilde ayrılan bir renk farkı, desen veya leke izi algılandı; giymeden önce elinizle veya yakınınızla kontrol edebilirsiniz.`
-            : `Merkez renk: ${centerSample.colorInfo.name}, yüzey homojen ve temiz görünüyor.`;
+            ? `Merkez renk: ${refColorName}. Dikkat: Kumaş yüzeyinde ana renkten belirgin şekilde ayrılan bir renk farkı, desen veya leke izi algılandı; giymeden önce elinizle veya yakınınızla kontrol edebilirsiniz.`
+            : `Merkez renk: ${refColorName}, yüzey homojen ve temiz görünüyor.`;
         const stainShortBadge = hasStainOrSpot
-            ? `${centerSample.colorInfo.name} (Farklı Leke/Desen İzi Var)`
-            : `${centerSample.colorInfo.name} (Homojen / Temiz)`;
+            ? `${refColorName} (Farklı Leke/Desen İzi Var)`
+            : `${refColorName} (Homojen / Temiz)`;
 
         if (isSingleUniformSurface || state.sockSubMode === 'outfit') {
             const singleMsg = state.sockSubMode === 'outfit'
@@ -10279,6 +10311,8 @@
                 try { window.speechSynthesis.cancel(); } catch (_) {}
             }
             state.isProcessingOcr = false;
+            state.moneyLiveOcrBusy = false;
+            state.isLiveBgOcrBusy = false;
             state.isDetectingObjects = false;
         }
     });

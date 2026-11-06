@@ -508,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             if (resultCode == Activity.RESULT_OK && data != null) {
                 ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                 if (matches != null && !matches.isEmpty() && matches.get(0) != null) {
-                    spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+                    spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\r", " ").replace("\n", " ");
                 }
             }
             if (webView != null) {
@@ -522,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             if (resultCode == Activity.RESULT_OK && data != null) {
                 ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                 if (matches != null && !matches.isEmpty() && matches.get(0) != null) {
-                    spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+                    spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\r", " ").replace("\n", " ");
                 }
             }
             if (webView != null) {
