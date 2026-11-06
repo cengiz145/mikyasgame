@@ -8,25 +8,34 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
+import android.util.Base64;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 import androidx.annotation.NonNull;
+import java.io.ByteArrayOutputStream;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * WhatsApp "Cihaz Bağla" veya Bilgisayar Karekod (QR) ekranları açıkken arka planda ekranı
- * analiz edip bilgisayar ekranının konumunu Türkçe sesle söyleyen Erişilebilirlik Servisi.
- * Ses Açma tuşuna çift basıldığında 15 saniyelik canlı ekran hizalama taramasını başlatır.
+ * Görme engelli kullanıcılar için Resmi Erişilebilirlik Yardımcı Servisi (isAccessibilityTool="true"):
+ * 1) Ses Açma tuşuna çift basıldığında: Bilgisayar ekranı ve karekod (QR) ortalama radarını çalıştırır.
+ * 2) Ses Kısma tuşuna çift basıldığında: Erişilemeyen Uygulama Kurtarıcısı (Anlık Ekran Betimleme Köprüsü)
+ *    olarak o anki ekran görüntüsünü bellekte analiz eder; etiketsiz butonların, afişlerin ve görsel
+ *    bölgelerin ekranın neresinde (Üst, Orta, Alt) olduğunu seslendirir ve tam OCR analizi için
+ *    Kamera Asistanı köprüsüne aktarır.
  */
 public class MikyasOverlayAccessibilityService extends AccessibilityService implements TextToSpeech.OnInitListener {
+    public static volatile String latestCapturedScreenDataUrl = null;
+    public static volatile String latestCapturedScreenSummary = null;
+
     private TextToSpeech tts;
     private boolean ttsReady = false;
     private volatile boolean liveScanActive = false;
     private volatile int scanSessionId = 0;
     private long lastVolUpPress = 0;
+    private long lastVolDownPress = 0;
     private long lastSpokenTime = 0;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -74,7 +83,120 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
             }
             lastVolUpPress = now;
         }
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            long now = System.currentTimeMillis();
+            if (now - lastVolDownPress < 450) {
+                lastVolDownPress = 0;
+                triggerInstantScreenRescueBridge();
+                return true;
+            }
+            lastVolDownPress = now;
+        }
         return super.onKeyEvent(event);
+    }
+
+    /**
+     * Erişilemeyen Uygulama Kurtarıcısı (Anlık Ekran Betimleme Köprüsü):
+     * Resmi Android 11+ takeScreenshot API'sini kullanarak ekran görüntüsünü tamamen bellekte analiz eder,
+     * etiketsiz butonların ve görsel afişlerin ekran bölgelerini (Üst, Orta, Alt) anında seslendirir.
+     */
+    private void triggerInstantScreenRescueBridge() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            speakTurkish("Erişilemeyen uygulama ekran kurtarıcısı Android 11 ve üzeri sürümlerde çalışır.", true);
+            return;
+        }
+        speakTurkish("Erişilemeyen ekran kurtarıcısı devrede, ekran analiz ediliyor.", true);
+        takeScreenshot(Display.DEFAULT_DISPLAY, executor, new TakeScreenshotCallback() {
+            @Override
+            public void onSuccess(@NonNull ScreenshotResult screenshotResult) {
+                try (HardwareBuffer buffer = screenshotResult.getHardwareBuffer()) {
+                    Bitmap hwBitmap = Bitmap.wrapHardwareBuffer(buffer, ColorSpace.get(ColorSpace.Named.SRGB));
+                    if (hwBitmap != null) {
+                        Bitmap soft = hwBitmap.copy(Bitmap.Config.ARGB_8888, false);
+                        hwBitmap.recycle();
+                        if (soft != null) {
+                            String summary = analyzeUnlabelledScreenRegions(soft);
+                            int w = soft.getWidth();
+                            int h = soft.getHeight();
+                            int maxDim = 960;
+                            Bitmap scaled = soft;
+                            if (w > maxDim || h > maxDim) {
+                                float ratio = Math.min((float) maxDim / w, (float) maxDim / h);
+                                scaled = Bitmap.createScaledBitmap(
+                                    soft,
+                                    Math.max(1, Math.round(w * ratio)),
+                                    Math.max(1, Math.round(h * ratio)),
+                                    true
+                                );
+                            }
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            scaled.compress(Bitmap.CompressFormat.JPEG, 82, bos);
+                            if (scaled != soft) {
+                                scaled.recycle();
+                            }
+                            soft.recycle();
+                            String b64 = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+                            latestCapturedScreenDataUrl = "data:image/jpeg;base64," + b64;
+                            latestCapturedScreenSummary = summary;
+                            speakTurkish(summary, true);
+                        }
+                    }
+                } catch (Throwable ignored) {}
+            }
+
+            @Override
+            public void onFailure(int errorCode) {
+                speakTurkish("Bu ekran güvenlik kısıtlaması nedeniyle görüntüyü paylaşmaya izin vermiyor.", true);
+            }
+        });
+    }
+
+    private String analyzeUnlabelledScreenRegions(Bitmap bmp) {
+        int w = bmp.getWidth();
+        int h = bmp.getHeight();
+        int step = 8;
+        long topEdges = 0, midEdges = 0, botEdges = 0;
+        long botSatCount = 0, botSamples = 0;
+
+        for (int y = step; y < h - step; y += step) {
+            for (int x = step; x < w - step; x += step) {
+                int p = bmp.getPixel(x, y);
+                int pr = bmp.getPixel(x + step, y);
+                int pd = bmp.getPixel(x, y + step);
+                int lum = (((p >> 16) & 0xff) * 3 + ((p >> 8) & 0xff) * 6 + (p & 0xff)) / 10;
+                int lumR = (((pr >> 16) & 0xff) * 3 + ((pr >> 8) & 0xff) * 6 + (pr & 0xff)) / 10;
+                int lumD = (((pd >> 16) & 0xff) * 3 + ((pd >> 8) & 0xff) * 6 + (pd & 0xff)) / 10;
+                int grad = Math.abs(lum - lumR) + Math.abs(lum - lumD);
+
+                if (y < h * 0.28) {
+                    if (grad > 38) topEdges++;
+                } else if (y < h * 0.72) {
+                    if (grad > 38) midEdges++;
+                } else {
+                    if (grad > 38) botEdges++;
+                    int r = (p >> 16) & 0xff;
+                    int g = (p >> 8) & 0xff;
+                    int b = p & 0xff;
+                    int maxC = Math.max(r, Math.max(g, b));
+                    int minC = Math.min(r, Math.min(g, b));
+                    if (maxC - minC > 55) botSatCount++;
+                    botSamples++;
+                }
+            }
+        }
+
+        StringBuilder sb = new StringBuilder("Ekran düzeni özeti: ");
+        if (topEdges > 120) {
+            sb.append("Ekranın üst kısmında başlık ve görsel afiş alanı yer alıyor. ");
+        }
+        if (midEdges > 180) {
+            sb.append("Orta kısımda ürün kartları, görseller veya liste öğeleri bulunuyor. ");
+        }
+        if (botSamples > 0 && ((double) botSatCount / botSamples > 0.14 || botEdges > 110)) {
+            sb.append("Ekranın alt kısmında belirgin renkli bir onay veya devam düğmesi tespit edildi. ");
+        }
+        sb.append("Ekran üzerindeki tüm metinleri ve etiketsiz butonları dinlemek için Kamera Asistanı uygulamasına geçebilirsiniz.");
+        return sb.toString();
     }
 
     private void triggerPeriodicScreenAnalysis(final int remainingTicks, final int sessionId) {

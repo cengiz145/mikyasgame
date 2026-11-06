@@ -3063,7 +3063,56 @@
         });
     }
 
+    /**
+     * Yere düşen anahtar, yüzük, ilaç hapı veya bozuk paranın kadrajdaki konumundan
+     * saat yönünü (Saat 10, 11, 12, 1, 2 yönü) ve ayağınızın kaç santimetre ilerisinde olduğunu hesaplar.
+     */
+    function computeClockDirectionAndFloorDistance(bbox, anW, anH) {
+        if (!bbox || bbox.length < 4) {
+            return {
+                clockHour: 12,
+                clockLabel: 'Saat 12 yönünde (tam karşınızda)',
+                distCm: 35,
+                fullPhrase: 'Saat 12 yönünde, ayağınızın yaklaşık 35 santimetre ilerisinde'
+            };
+        }
+        const [bx, by, bw, bh] = bbox;
+        const cx = (bx + bw * 0.5) / Math.max(1, anW);
+        const cy = (by + bh * 0.5) / Math.max(1, anH);
+        const areaRatio = (bw * bh) / Math.max(1, anW * anH);
+
+        let clockHour = 12;
+        if (cx < 0.22) clockHour = 10;
+        else if (cx < 0.40) clockHour = 11;
+        else if (cx <= 0.60) clockHour = 12;
+        else if (cx <= 0.78) clockHour = 1;
+        else clockHour = 2;
+
+        const clockDirDesc = clockHour === 12
+            ? 'Saat 12 yönünde (tam önünüzde)'
+            : `Saat ${clockHour} yönünde`;
+
+        // Dikey konum (cy: 0 üst/uzak -> 1 alt/ayağın dibi) ve görünür alandan santimetre tahmini (15 cm .. 85 cm)
+        const depthFactor = Math.max(0, Math.min(1, 1 - cy));
+        const sizeFactor = areaRatio > 0.08 ? -8 : (areaRatio < 0.015 ? 10 : 0);
+        const rawCm = Math.round(18 + depthFactor * 52 + sizeFactor);
+        const distCm = Math.max(10, Math.min(90, Math.round(rawCm / 5) * 5));
+
+        return {
+            clockHour,
+            clockLabel: clockDirDesc,
+            distCm,
+            fullPhrase: `${clockDirDesc}, ayağınızın yaklaşık ${distCm} santimetre ilerisinde`
+        };
+    }
+    window.computeClockDirectionAndFloorDistance = computeClockDirectionAndFloorDistance;
+
     function handleAnomalyAndLedMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
+        // Yerdeki metal anahtar, yüzük, ilaç hapı veya bozuk para yansımasını yakalamak için ortam loşsa feneri otomatik aç
+        if (metrics.avgBrightness < 68 && state.flashMode === 'auto') {
+            tryEnableHardwareTorch(true);
+        }
+
         if (metrics.ledSource) {
             const led = metrics.ledSource;
             drawTargetBox(ovCtx, led.bbox, scaleX, scaleY, '#22c55e', `${led.colorName} LED`);
@@ -3083,17 +3132,18 @@
             return;
         }
 
-        // Yere düşen şey bir madeni (demir) para ise doğrudan kaç lira/kuruş olduğunu söyle!
+        // Yere düşen şey bir madeni (demir) para ise doğrudan kaç lira/kuruş olduğunu ve saat yönü + santimetre mesafesini söyle!
         const coinCheck = detectAndClassifyTurkishCoins(metrics, anW, anH);
         if (coinCheck.coins.length > 0) {
             coinCheck.coins.forEach(coin => drawCoinCircleOverlay(ovCtx, coin, scaleX, scaleY));
             const firstCoin = coinCheck.coins[0];
             const align = computeAlignmentInstruction(firstCoin.bbox, anW, anH, `Yerdeki ${firstCoin.name}`, 0.005, 0.55);
-            el.tPosition.textContent = `Yerde ${firstCoin.shortLabel} Bulundu`;
-            el.tDistance.textContent = `Toplam: ${coinCheck.totalFormatted}`;
+            const clockInfo = computeClockDirectionAndFloorDistance(firstCoin.bbox, anW, anH);
+            el.tPosition.textContent = `Yerde ${firstCoin.shortLabel} (${clockInfo.clockLabel})`;
+            el.tDistance.textContent = `${clockInfo.distCm} cm • Toplam: ${coinCheck.totalFormatted}`;
             radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
 
-            announceGuidance(`Zeminde madeni para tespit edildi: ${coinCheck.summarySpeech} ${align.sentence}`, {
+            announceGuidance(`Kayıp Eşya Radarı: Zeminde madeni para bulundu! ${coinCheck.summarySpeech} Konumu: ${clockInfo.fullPhrase}. ${align.sentence}`, {
                 bannerState: 'centered',
                 minIntervalMs: 2500
             });
@@ -3115,13 +3165,14 @@
             if (tracked.verified && tracked.box) {
                 drawTargetBox(ovCtx, tracked.box, scaleX, scaleY, '#facc15', 'Yerde Küçük Eşya');
                 const align = computeAlignmentInstruction(tracked.box, anW, anH, 'Yerdeki küçük eşya', 0.005, 0.35);
-                el.tPosition.textContent = align.posLabel;
+                const clockInfo = computeClockDirectionAndFloorDistance(tracked.box, anW, anH);
+                el.tPosition.textContent = `Saat ${clockInfo.clockHour} Yönü (${clockInfo.distCm} cm)`;
                 el.tDistance.textContent = 'Yerde Eşya Bulundu';
                 radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
 
-                announceGuidance(`${align.sentence} (Güvenlik uyarısı: Kırık cam veya kesici bir cisim olma ihtimaline karşı elinizi yerde doğrudan süpürerek gezdirmeyin).`, {
+                announceGuidance(`Kayıp Eşya Radarı: Yerde düşen küçük eşya (anahtar, yüzük veya hap) algılandı! ${clockInfo.fullPhrase}. ${align.sentence} (Güvenlik uyarısı: Kırık cam veya kesici bir cisim olma ihtimaline karşı elinizi yerde doğrudan süpürerek gezdirmeyin).`, {
                     bannerState: align.isCentered ? 'centered' : 'normal',
-                    minIntervalMs: 2800
+                    minIntervalMs: 2600
                 });
                 return;
             }
@@ -3137,26 +3188,140 @@
         });
     }
 
+    /**
+     * Aralık kalmış kapı, balkon kapısı veya perde/pencere aralığından sızan ince dikey ışık şeridini (Ajar Gap Light Leak) tespit eder.
+     */
+    function detectVerticalAjarGapLight(metrics) {
+        if (!metrics || !metrics.gray || !metrics.gw || !metrics.gh) {
+            return { hasAjarGap: false, directionWord: '', gapBrightness: 0 };
+        }
+        const { gray, gw, gh } = metrics;
+        const colAvgs = new Float32Array(gw);
+        let globalSum = 0;
+        const y0 = Math.floor(gh * 0.12);
+        const y1 = Math.max(y0 + 1, Math.floor(gh * 0.88));
+        const spanH = y1 - y0;
+
+        for (let gx = 0; gx < gw; gx++) {
+            let sum = 0;
+            for (let gy = y0; gy < y1; gy++) {
+                sum += gray[gy * gw + gx];
+            }
+            colAvgs[gx] = sum / spanH;
+            globalSum += colAvgs[gx];
+        }
+        const globalMean = globalSum / Math.max(1, gw);
+
+        // Karanlık veya loş odada aralık kalmış kapı/pencere/perde kenarından sızan belirgin dikey parlak şerit kontrolü
+        let bestPeak = 0;
+        let bestGx = -1;
+        for (let gx = 2; gx < gw - 2; gx++) {
+            const stripAvg = (colAvgs[gx - 1] + colAvgs[gx] + colAvgs[gx + 1]) / 3;
+            const leftBg = colAvgs[Math.max(0, gx - 5)];
+            const rightBg = colAvgs[Math.min(gw - 1, gx + 5)];
+            const localBg = (leftBg + rightBg) * 0.5;
+            const contrast = stripAvg - localBg;
+            if (stripAvg >= 95 && contrast >= 38 && stripAvg > globalMean + 32) {
+                if (contrast > bestPeak) {
+                    bestPeak = contrast;
+                    bestGx = gx;
+                }
+            }
+        }
+
+        if (bestGx < 0) {
+            return { hasAjarGap: false, directionWord: '', gapBrightness: 0 };
+        }
+        const nx = bestGx / Math.max(1, gw);
+        let directionWord = 'tam karşınızda';
+        if (nx < 0.35) directionWord = 'sol tarafınızda';
+        else if (nx > 0.65) directionWord = 'sağ tarafınızda';
+
+        return {
+            hasAjarGap: true,
+            directionWord,
+            gapBrightness: Math.round(colAvgs[bestGx])
+        };
+    }
+
+    /**
+     * Mod 7: Evden Çıkış ve Gece Güvenlik Taraması (Açık Kalan Lamba, Açık TV Ekranı ve Aralık Kapı/Pencere/Perde Denetimi)
+     */
+    function analyzeHomeExitSecurityScan(capCanvas, metrics, preds = []) {
+        const lum = Math.round(metrics ? metrics.avgBrightness : 0);
+        const w = capCanvas ? capCanvas.width : 320;
+        const hotOffsetX = metrics ? ((metrics.maxLumX - w / 2) / Math.max(1, w / 2)) : 0;
+        let dirHint = 'tam karşınızda';
+        if (hotOffsetX < -0.25) dirHint = 'sol tarafınızda';
+        else if (hotOffsetX > 0.25) dirHint = 'sağ tarafınızda';
+
+        const ajarInfo = detectVerticalAjarGapLight(metrics);
+        const activeScreens = (preds || []).filter(p => p.class === 'tv' || p.class === 'laptop' || p.class === 'cell phone');
+        const findings = [];
+        let isAllSecureAndDark = false;
+
+        if (lum < 18 && !ajarInfo.hasAjarGap && activeScreens.length === 0) {
+            isAllSecureAndDark = true;
+            findings.push('Oda tamamen karanlık; açık unutulmuş tavan lambası, açık televizyon ekranı veya ışık sızdıran aralık kapı/pencere görünmüyor. Evden güvenle çıkabilirsiniz.');
+        } else {
+            if (lum >= 145) {
+                findings.push(`AÇIK LAMBA / GÜÇLÜ IŞIK UYARISI: Odada güçlü bir aydınlatma veya açık pencere ışığı (${dirHint}) tespit edildi.`);
+            } else if (lum >= 58) {
+                findings.push(`AÇIK IŞIK UYARISI: Oda aydınlık; ${dirHint} açık bir lamba veya gündüz ışığı bulunuyor.`);
+            } else {
+                findings.push(`Ortam loş; ${dirHint} zayıf bir gece lambası veya bekleme ışığı var.`);
+            }
+
+            if (activeScreens.length > 0) {
+                findings.push('AÇIK EKRAN UYARISI: Odada açık kalmış bir televizyon veya bilgisayar ekranı algılandı.');
+            }
+            if (ajarInfo.hasAjarGap) {
+                findings.push(`ARALIK KAPI / PENCERE / PERDE UYARISI: ${ajarInfo.directionWord.charAt(0).toUpperCase() + ajarInfo.directionWord.slice(1)} dikey bir ışık sızıntısı şeridi algılandı; kapı, balkon kapısı veya perde tam kapanmamış (aralık kalmış) olabilir.`);
+            }
+        }
+
+        const speechText = `Evden Çıkış ve Aydınlatma Güvenlik Raporu: ${findings.join(' ')}`;
+        return {
+            lum,
+            isAllSecureAndDark,
+            hasAjarGap: ajarInfo.hasAjarGap,
+            hasOpenLight: lum >= 58,
+            hasActiveScreen: activeScreens.length > 0,
+            speechText,
+            fullText: `🏠 Evden Çıkış Güvenlik ve Aydınlatma Taraması:\n• Ortalama Parlaklık: ${lum} / 255\n• Aralık Kapı/Pencere Işık Sızıntısı: ${ajarInfo.hasAjarGap ? 'Evet (' + ajarInfo.directionWord + ')' : 'Hayır'}\n• Açık TV / Monitör: ${activeScreens.length > 0 ? 'Evet' : 'Hayır'}\n\nDetaylı Sonuç:\n${findings.join('\n')}`
+        };
+    }
+    window.analyzeHomeExitSecurityScan = analyzeHomeExitSecurityScan;
+
     function handleLightMeterMode(anW, anH, metrics) {
         const lum = Math.round(metrics.avgBrightness);
         const hotOffsetX = (metrics.maxLumX - anW / 2) / (anW / 2);
 
         radar.playLightMeterTone(lum, hotOffsetX);
 
+        const ajarInfo = detectVerticalAjarGapLight(metrics);
+
         let stateDesc = '';
-        if (lum < 18) stateDesc = 'Oda zifiri karanlık, tüm lambalar kapalı.';
-        else if (lum < 55) stateDesc = 'Ortam loş; sadece küçük bir gece lambası veya ekran ışığı var.';
-        else if (lum < 145) stateDesc = 'Oda aydınlık, lamba açık veya gündüz ışığı alıyor.';
-        else stateDesc = 'Çok güçlü ışık kaynağı! Kameranız doğrudan açık bir lambaya veya pencereye bakıyor.';
+        if (lum < 18 && !ajarInfo.hasAjarGap) {
+            stateDesc = 'Ev Güvenlik Taraması: Oda zifiri karanlık, tüm lambalar kapalı ve ışık sızıntısı yok.';
+        } else if (lum < 55) {
+            stateDesc = ajarInfo.hasAjarGap
+                ? `Dikkat: Ortam loş ancak ${ajarInfo.directionWord} aralık kalmış kapı, balkon kapısı veya perde aralığından sızan dikey ışık şeridi var!`
+                : 'Ortam loş; sadece küçük bir gece lambası veya ekran ışığı var.';
+        } else if (lum < 145) {
+            stateDesc = 'Oda aydınlık, lamba açık veya pencereden gündüz ışığı alıyor.';
+        } else {
+            stateDesc = 'Çok güçlü ışık kaynağı! Kameranız doğrudan açık bir lambaya veya pencereye bakıyor.';
+        }
 
         let dirHint = 'tam karşınızda';
         if (hotOffsetX < -0.25) dirHint = 'sol tarafınızda';
         else if (hotOffsetX > 0.25) dirHint = 'sağ tarafınızda';
 
         let levelWord = 'Normal Aydınlık';
-        if (lum < 18) levelWord = 'Zifiri Karanlık';
-        else if (lum < 55) levelWord = 'Loş Işık';
-        else if (lum >= 145) levelWord = 'Güçlü Işık';
+        if (lum < 18) levelWord = 'Zifiri Karanlık (Güvenli)';
+        else if (lum < 55) levelWord = ajarInfo.hasAjarGap ? 'Aralık Kapı/Pencere Sızıntısı' : 'Loş Işık';
+        else if (lum >= 145) levelWord = 'Güçlü Açık Işık';
 
         el.tPosition.textContent = `Işık Seviyesi: ${levelWord}`;
         el.tDistance.textContent = `En Güçlü Işık: ${dirHint}`;
@@ -4651,6 +4816,265 @@
     }
 
     /**
+     * Mod 4: Ayna Karşısında Kişisel Bakım (Tıraş/Sakal Simetrisi, Saç Düzeni) ve Görüntülü Görüşme (Zoom/WhatsApp) Kadraj & Arka Plan Asistanı
+     */
+    function analyzePersonalGroomingAndVideoCallReadiness(capCanvas, metrics, preds = []) {
+        const w = capCanvas.width;
+        const h = capCanvas.height;
+        const imgData = metrics.imageData;
+        const verifiedPreds = verifyPredictionsInAiBrain(preds || [], w, h, false);
+        const people = verifiedPreds.filter(p => p.class === 'person');
+        const bgObjects = verifiedPreds.filter(p => p.class !== 'person');
+
+        let faceBox = [Math.round(w * 0.26), Math.round(h * 0.16), Math.round(w * 0.48), Math.round(h * 0.52)];
+        let isCentered = true;
+        let frameGuidance = 'Yüzünüz ve omuz hizanız kamera kadrajında ortalanmış durumda; Zoom veya WhatsApp görüntülü görüşmesine hazırsınız.';
+
+        if (people.length > 0) {
+            faceBox = people[0].bbox;
+            const [bx, by, bw, bh] = faceBox;
+            const cx = (bx + bw * 0.5) / Math.max(1, w);
+            const cy = (by + bh * 0.35) / Math.max(1, h);
+            const dirs = [];
+            if (cx < 0.36) dirs.push('hafif sağa');
+            else if (cx > 0.64) dirs.push('hafif sola');
+            if (cy < 0.22) dirs.push('biraz aşağı');
+            else if (cy > 0.65) dirs.push('biraz yukarı');
+            if (dirs.length > 0) {
+                isCentered = false;
+                frameGuidance = `Görüntülü görüşme kadrajı için başınızı veya telefonu ${dirs.join(' ve ')} kaydırarak ortalayın.`;
+            }
+        } else if (metrics.skinRatio >= 0.04) {
+            isCentered = true;
+        } else {
+            isCentered = false;
+            frameGuidance = 'Kamerada şu an net bir yüz algılanmadı; lütfen telefonu yüzünüzün karşısında yaklaşık 40 santimetre mesafede dik tutun.';
+        }
+
+        // Sol ve Sağ Yanak / Çene Hattı (Tıraş ve Sakal Gölge/Doku Simetrisi) Analizi
+        const [fx, fy, fw, fh] = faceBox;
+        const jawY = Math.min(h - 16, Math.max(8, Math.floor(fy + fh * 0.42)));
+        const jawH = Math.max(14, Math.floor(fh * 0.36));
+        const leftJawW = Math.max(14, Math.floor(fw * 0.34));
+        const leftJawX = Math.max(4, Math.floor(fx + fw * 0.12));
+        const rightJawX = Math.min(w - leftJawW - 4, Math.floor(fx + fw * 0.54));
+
+        const leftJaw = measureRegionColorAndPattern(imgData, w, h, leftJawX, jawY, leftJawW, jawH);
+        const rightJaw = measureRegionColorAndPattern(imgData, w, h, rightJawX, jawY, leftJawW, jawH);
+        const jawLumDiff = Math.abs(leftJaw.avgLum - rightJaw.avgLum);
+
+        let shaveSymmetryNote = '';
+        if (jawLumDiff >= 26) {
+            const darkerSide = leftJaw.avgLum < rightJaw.avgLum ? 'sol çene ve yanak' : 'sağ çene ve yanak';
+            shaveSymmetryNote = `Kişisel Bakım ve Tıraş Kontrolü: Yüzünüzün ${darkerSide} bölgesinde diğer tarafa göre daha koyu doku/gölge farkı algılandı; tıraş oluyorsanız bu bölgede kesilmemiş sakal kalmış olabilir veya ışık tek taraftan vuruyor olabilir, elinizle kontrol edebilirsiniz.`;
+        } else {
+            shaveSymmetryNote = 'Kişisel Bakım ve Tıraş Kontrolü: Sağ ve sol yanak ile çene hattınızın ton ve doku simetrisi dengeli ve düzgün görünüyor.';
+        }
+
+        // Üst Saç ve Baş Hizası Kontrolü
+        const hairY = Math.max(2, Math.floor(fy - fh * 0.06));
+        const hairH = Math.max(12, Math.floor(fh * 0.22));
+        const leftHair = measureRegionColorAndPattern(imgData, w, h, leftJawX, hairY, leftJawW, hairH);
+        const rightHair = measureRegionColorAndPattern(imgData, w, h, rightJawX, hairY, leftJawW, hairH);
+        const hairNote = Math.abs(leftHair.avgLum - rightHair.avgLum) >= 34
+            ? 'Saç ve Üst Kadraj: Başınızın üst kısmında sağ ve sol taraf arasında belirgin ton/dağınıklık farkı veya kadraj kesilmesi var; saçınızı elinizle düzeltip başınızı biraz ortalayabilirsiniz.'
+            : 'Saç ve Üst Kadraj: Başınızın üst kısmı kadrajın içinde tam görünüyor ve saç hizanız dengeli.';
+
+        // Arka Plan Düzeni (Görüntülü Görüşme Öncesi Kontrol)
+        const topBg = measureRegionColorAndPattern(imgData, w, h, w * 0.12, h * 0.03, w * 0.76, h * 0.18);
+        let bgDesc = `Arka planınız ${topBg.colorName} tonlarında (${topBg.pattern}) ve sade görünüyor.`;
+        if (bgObjects.length > 0) {
+            const bgNames = [...new Set(bgObjects.map(o => TR_LABELS[o.class] || o.class))].slice(0, 4).join(', ');
+            bgDesc = `Görüntülü Görüşme Arka Planı: Arkanızda ${bgNames} görünüyor (${topBg.colorName} arka plan).`;
+        }
+
+        const speechText = `Ayna ve Görüntülü Görüşme Asistanı: ${frameGuidance} ${shaveSymmetryNote} ${hairNote} ${bgDesc}`;
+        return {
+            isCentered,
+            jawLumDiff,
+            frameGuidance,
+            shaveSymmetryNote,
+            hairNote,
+            bgDesc,
+            speechText,
+            fullText: `🪞 Ayna Karşısında Kişisel Bakım ve Görüntülü Görüşme Raporu:\n• Kadraj Durumu: ${frameGuidance}\n• ${shaveSymmetryNote}\n• ${hairNote}\n• ${bgDesc}`
+        };
+    }
+    window.analyzePersonalGroomingAndVideoCallReadiness = analyzePersonalGroomingAndVideoCallReadiness;
+
+    /**
+     * Mod 13 & Mod 3: Restoran/Kafe Görsel QR Menü Okuyucu ve Market Rafı Birim Fiyat / İndirim ("2 Al 1 Öde", Kilosu/Litresi X TL) Hesaplayıcı
+     */
+    function analyzeShelfUnitPriceAndVisualMenu(rawText) {
+        const text = String(rawText || '').trim();
+        if (!text) {
+            return {
+                unitPriceNotes: [],
+                campaignNotes: [],
+                menuItems: [],
+                speechSummary: '',
+                reportSummary: ''
+            };
+        }
+
+        const unitPriceNotes = [];
+        const campaignNotes = [];
+        const menuItems = [];
+
+        // 1. "2 Al 1 Öde", "3 Al 2 Öde", "İkincisi %50 İndirimli", "%25 İndirim" Kampanya Yakalayıcı
+        const multiBuyRegex = /\b([234])\s*AL\s*([123])\s*[ÖO]DE\b/gi;
+        let mb;
+        while ((mb = multiBuyRegex.exec(text)) !== null) {
+            const buyN = parseInt(mb[1], 10);
+            const payM = parseInt(mb[2], 10);
+            if (buyN > payM && payM >= 1) {
+                const discountPct = Math.round(((buyN - payM) / buyN) * 100);
+                campaignNotes.push(`Kampanya Analizi: "${buyN} Al ${payM} Öde" fırsatı algılandı (Birim başına gerçek indirim oranı: yüzde ${discountPct}).`);
+            }
+        }
+        const pctDiscountMatch = text.match(/(?:%\s*(\d{1,2})|(\d{1,2})\s*%)\s*(?:İNDİRİM|INDIRIM)/i);
+        if (pctDiscountMatch) {
+            const pct = pctDiscountMatch[1] || pctDiscountMatch[2];
+            campaignNotes.push(`İndirim Etiketi: Yüzde ${pct} indirim ibaresi okundu.`);
+        }
+
+        // 2. Paket Gramajı / Litresi ve Fiyatından Gerçek Kilosu / Litresi Birim Fiyat Hesaplama
+        const parseTrFloat = (str) => {
+            const s = String(str || '').trim().replace(/\s+/g, '');
+            if (s.includes(',') && s.includes('.')) {
+                return parseFloat(s.replace(/\./g, '').replace(',', '.'));
+            }
+            return parseFloat(s.replace(',', '.'));
+        };
+
+        const weightMatch = text.match(/\b(\d{1,4}(?:[.,]\d{1,2})?)\s*(kg|kilo|kilogram|gr|gram|g|lt|litre|l|ml)\b/i);
+        const priceMatches = [...text.matchAll(/(?:(\d{1,4}(?:[.,]\d{1,2})?)\s*(?:TL|₺|LİRA|LIRA)|(?:TL|₺)\s*(\d{1,4}(?:[.,]\d{1,2})?))/gi)];
+
+        if (weightMatch && priceMatches.length > 0) {
+            const rawQty = parseTrFloat(weightMatch[1]);
+            const unitRaw = weightMatch[2].toLowerCase();
+            const rawPriceStr = priceMatches[0][1] || priceMatches[0][2];
+            const pkgPrice = parseTrFloat(rawPriceStr);
+
+            if (rawQty > 0 && pkgPrice > 0 && pkgPrice < 50000) {
+                if (unitRaw === 'gr' || unitRaw === 'gram' || unitRaw === 'g') {
+                    if (rawQty >= 20 && rawQty <= 5000) {
+                        const perKg = (pkgPrice * 1000) / rawQty;
+                        const perKgFormatted = perKg.toFixed(2).replace('.', ',');
+                        unitPriceNotes.push(`Market Birim Fiyat Hesabı: ${rawQty} gram paket fiyatı ${pkgPrice} TL; bu ürünün 1 kilogram (kilosu) gerçek birim fiyatı ${perKgFormatted} Türk Lirasıdır.`);
+                    }
+                } else if (unitRaw === 'ml') {
+                    if (rawQty >= 30 && rawQty <= 5000) {
+                        const perLiter = (pkgPrice * 1000) / rawQty;
+                        const perLiterFormatted = perLiter.toFixed(2).replace('.', ',');
+                        unitPriceNotes.push(`Market Birim Fiyat Hesabı: ${rawQty} mililitre ürün fiyatı ${pkgPrice} TL; bu ürünün 1 litre gerçek birim fiyatı ${perLiterFormatted} Türk Lirasıdır.`);
+                    }
+                } else if (unitRaw === 'kg' || unitRaw === 'kilo' || unitRaw === 'kilogram') {
+                    const perKg = pkgPrice / rawQty;
+                    const perKgFormatted = perKg.toFixed(2).replace('.', ',');
+                    unitPriceNotes.push(`Market Birim Fiyat Hesabı: ${rawQty} kilogram ürün fiyatı ${pkgPrice} TL (Kilosu: ${perKgFormatted} TL).`);
+                } else if (unitRaw === 'lt' || unitRaw === 'litre' || unitRaw === 'l') {
+                    const perLiter = pkgPrice / rawQty;
+                    const perLiterFormatted = perLiter.toFixed(2).replace('.', ',');
+                    unitPriceNotes.push(`Market Birim Fiyat Hesabı: ${rawQty} litre ürün fiyatı ${pkgPrice} TL (Litresi: ${perLiterFormatted} TL).`);
+                }
+
+                // Eğer hem "2 Al 1 Öde" / "3 Al 2 Öde" hem de paket fiyatı varsa tanesinin kaça geldiğini de söyle!
+                multiBuyRegex.lastIndex = 0;
+                const firstMb = multiBuyRegex.exec(text);
+                if (firstMb) {
+                    const buyN = parseInt(firstMb[1], 10);
+                    const payM = parseInt(firstMb[2], 10);
+                    const effectiveUnit = ((pkgPrice * payM) / buyN).toFixed(2).replace('.', ',');
+                    campaignNotes.push(`${buyN} Al ${payM} Öde kampanyasıyla tanesi ${pkgPrice} TL yerine ${effectiveUnit} TL'ye geliyor.`);
+                }
+            }
+        }
+
+        // 3. Restoran / Kafe Görsel Menü Satırları (Yemek/İçecek Adı .... Fiyat TL)
+        const lines = text.split(/(?:\r?\n|\s+—\s+)/).map(l => l.trim()).filter(Boolean);
+        const menuRowRegex = /^([A-ZÇĞİÖŞÜa-zçğıöşü][A-ZÇĞİÖŞÜa-zçğıöşü0-9\s()\/,&\-]{2,42}?)\s*[:.\-…]*\s*(\d{2,4}(?:[.,]\d{1,2})?)\s*(?:TL|₺|LİRA|LIRA)\b/i;
+        for (const ln of lines) {
+            if (/(?:TOPLAM|KDV|NAKİT|KART|İNDİRİM|GRAM|KİLO|LİTRE)/i.test(ln)) continue;
+            const m = ln.match(menuRowRegex);
+            if (m) {
+                const dishName = m[1].replace(/[.\-_]+$/g, '').replace(/\s+/g, ' ').trim();
+                const dishPrice = m[2].trim();
+                if (dishName.length >= 3) {
+                    menuItems.push(`${dishName}: ${dishPrice} TL`);
+                }
+            }
+        }
+
+        const speechParts = [];
+        if (unitPriceNotes.length > 0) speechParts.push(unitPriceNotes.join(' '));
+        if (campaignNotes.length > 0) speechParts.push(campaignNotes.join(' '));
+        if (menuItems.length >= 2) {
+            speechParts.push(`Görsel Menü Listesi (${menuItems.length} çeşit okundu): ${menuItems.slice(0, 10).join(', ')}.`);
+        } else if (menuItems.length === 1 && unitPriceNotes.length === 0) {
+            speechParts.push(`Menü / Etiket Fiyatı: ${menuItems[0]}.`);
+        }
+
+        return {
+            unitPriceNotes,
+            campaignNotes,
+            menuItems,
+            speechSummary: speechParts.join(' '),
+            reportSummary: speechParts.join('\n')
+        };
+    }
+    window.analyzeShelfUnitPriceAndVisualMenu = analyzeShelfUnitPriceAndVisualMenu;
+
+    /**
+     * Erişilemeyen Uygulama Kurtarıcısı (Anlık Ekran Betimleme Köprüsü):
+     * Başka bir uygulamadan alınan ekran görüntüsündeki veya görsel afişteki etiketsiz butonları,
+     * üst/orta/alt ekran bölgelerindeki yazıları ve indirim afişlerini analiz edip seslendirir.
+     */
+    function analyzeUnlabelledScreenAndUiRegions(capCanvas, cleanText, collectedLines = []) {
+        const w = capCanvas ? capCanvas.width : 480;
+        const h = capCanvas ? capCanvas.height : 800;
+        const topTexts = [];
+        const midTexts = [];
+        const botTexts = [];
+
+        if (Array.isArray(collectedLines) && collectedLines.length > 0) {
+            for (const ln of collectedLines) {
+                const raw = String(ln.text || '').replace(/\s+/g, ' ').trim();
+                if (raw.length < 2) continue;
+                const cy = (ln.bbox && typeof ln.bbox.y0 === 'number' && typeof ln.bbox.y1 === 'number')
+                    ? ((ln.bbox.y0 + ln.bbox.y1) * 0.5) / Math.max(1, h)
+                    : 0.5;
+                if (cy < 0.30) topTexts.push(raw);
+                else if (cy > 0.72) botTexts.push(raw);
+                else midTexts.push(raw);
+            }
+        }
+
+        const uiParts = [];
+        if (topTexts.length > 0) uiParts.push(`Ekranın üst kısmında: "${topTexts.slice(0, 4).join(', ')}"`);
+        if (midTexts.length > 0) uiParts.push(`orta bölümde: "${midTexts.slice(0, 6).join(', ')}"`);
+        if (botTexts.length > 0) uiParts.push(`alt buton/bölüm alanında: "${botTexts.slice(0, 4).join(', ')}"`);
+
+        const menuAndPrice = analyzeShelfUnitPriceAndVisualMenu(cleanText);
+        if (menuAndPrice.speechSummary) {
+            uiParts.push(menuAndPrice.speechSummary);
+        }
+
+        const summary = uiParts.length > 0
+            ? `Erişilemeyen Ekran ve Buton Yerleşimi: ${uiParts.join('; ')} yazıyor.`
+            : (cleanText ? `Ekranda okunan metin: ${cleanText.replace(/\s+/g, ' ')}.` : 'Ekranda okunabilir metin bulunamadı.');
+
+        return {
+            topTexts,
+            midTexts,
+            botTexts,
+            speechText: summary,
+            fullText: `📱 Erişilemeyen Uygulama / Ekran Kurtarıcısı Raporu:\n${summary}`
+        };
+    }
+    window.analyzeUnlabelledScreenAndUiRegions = analyzeUnlabelledScreenAndUiRegions;
+
+    /**
      * iPhone Görüntü Betimleyici'den Daha Detaylı, Doğal Türkçe Hikâye Betimleme Motoru.
      * Ortam ışığını, arka planı, kişilerin duruşunu, bakış yönünü, kıyafet rengini/desenini,
      * çevredeki eşyaların konumunu ve fotoğraftaki yazıları sıcak bir dille anlatır.
@@ -4697,6 +5121,12 @@
                 return `${idx + 1}. kişi (${posWord}, üzerinde ${torso.colorName} tonlarında kıyafet var)`;
             });
             sentences.push(`Toplam ${people.length} kişi var — ${personItems.join(', ')}.`);
+        }
+
+        // Özçekim / Kişisel Bakım ve Görüntülü Görüşme Modundaysa tıraş/sakal simetrisi, saç ve arka plan raporunu ekle
+        if (state.mode === 'portrait') {
+            const grooming = analyzePersonalGroomingAndVideoCallReadiness(capCanvas, metrics, verifiedPreds);
+            sentences.push(grooming.speechText);
         }
 
         // 3. Yapay Zekanın Beyninde Doğrulanmış Diğer Eşyalar
@@ -5004,6 +5434,13 @@
             }
         }
 
+        // 6. Market Rafı Birim Fiyat ("Kilosu/Litresi X TL"), "2 Al 1 Öde" İndirim Kampanyası ve Görsel QR Menü Listesi
+        const menuAndPrice = analyzeShelfUnitPriceAndVisualMenu(text);
+        if (menuAndPrice.speechSummary) {
+            speechNotes.push(menuAndPrice.speechSummary);
+            reportLines.push(menuAndPrice.reportSummary);
+        }
+
         return {
             speechNotes,
             reportLines,
@@ -5167,9 +5604,37 @@
                     return;
                 }
 
-                // ÖZEL MOD 13: GIDA PAKET İÇERİĞİ, ALERJEN VE SON TÜKETİM TARİHİ DENETÇİSİ (SIFIR HALÜSİNASYON)
+                // ÖZEL MOD 7: EVDEN ÇIKIŞ VE GECE GÜVENLİK TARAMASI (AÇIK IŞIK, AÇIK TV VE ARALIK KAPI/PENCERE KONTROLÜ)
+                if (state.mode === 'light_meter') {
+                    const exitScan = analyzeHomeExitSecurityScan(capCanvas, metrics, preds);
+                    const textSuffix = cleanText ? `\n\nOkunan Yazı:\n${cleanText}` : '';
+                    showDetectedResult('🏠 Evden Çıkış Güvenlik, Aydınlatma ve Aralık Pencere/Kapı Raporu', `${exitScan.fullText}${textSuffix}`);
+                    announceGuidance(exitScan.speechText, {
+                        force: true,
+                        bannerState: exitScan.isAllSecureAndDark ? 'centered' : 'warning'
+                    });
+                    return;
+                }
+
+                // ÖZEL MOD 3: WHATSAPP WEB, BİLGİSAYAR EKRANI VE RESTORAN/KAFE GÖRSEL QR MENÜ OKUYUCU
+                if (state.mode === 'qr_screen' && cleanText) {
+                    const menuScan = analyzeShelfUnitPriceAndVisualMenu( verifiedMultilineText || cleanText );
+                    const screenUi = analyzeUnlabelledScreenAndUiRegions(capCanvas, cleanText, collectedLines);
+                    const qrMenuSpeech = menuScan.speechSummary
+                        ? `Restoran ve Kafe Görsel Menü Okuyucu: ${menuScan.speechSummary}`
+                        : screenUi.speechText;
+                    showDetectedResult(
+                        '🍽️💻 Görsel QR Menü ve Ekran İçeriği Raporu',
+                        `${menuScan.reportSummary ? menuScan.reportSummary + '\n\n' : ''}${screenUi.fullText}\n\nTam Okunan Metin:\n${cleanText}`
+                    );
+                    announceGuidance(qrMenuSpeech, { force: true, bannerState: 'centered' });
+                    return;
+                }
+
+                // ÖZEL MOD 13: GIDA PAKET İÇERİĞİ, ALERJEN, SKT VE MARKET BİRİM FİYAT / İNDİRİM KARŞILAŞTIRICI
                 if (state.mode === 'food_freshness') {
                     const pkg = parseFoodAllergensAndIngredients(cleanText);
+                    const unitAndMenu = analyzeShelfUnitPriceAndVisualMenu(verifiedMultilineText || cleanText);
                     const surfaceMsg = `Paket Rengi: ${metrics.centerColor.name}.`;
                     const freeFromMsg = (pkg.freeFromNotes && pkg.freeFromNotes.length > 0)
                         ? `Doğrulanan Güvenli İbare: ${pkg.freeFromNotes.join(', ')}.`
@@ -5179,16 +5644,20 @@
                         ? `DİKKAT ALERJİ UYARISI: Pakette ${pkg.allergens.join(', ')} bulundu!`
                         : (hasFullIngredientsHeader
                             ? 'Okunan içindekiler listesinde bilinen bir alerji maddesine rastlanmadı; ancak ciddi alerjiniz varsa tüketmeden önce bir yakınınıza da teyit ettirin.'
-                            : 'DİKKAT: Paketin İçindekiler listesi bu açıdan tam okunamadı! Alerjiniz varsa bu ürüne güvenmeyin; lütfen paketin arka yüzündeki İçindekiler bölümünü yakından okutun.');
-                    const foodReport = `${surfaceMsg}\n${freeFromMsg}\n${allergenMsg}\n${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}\n\nPakette Okunan Yazı:\n${cleanText || 'Paket yazısı algılanmadı.'}`.trim();
+                            : (unitAndMenu.speechSummary
+                                ? 'Raf etiketi veya menü fiyat analizi tamamlandı.'
+                                : 'DİKKAT: Paketin İçindekiler listesi bu açıdan tam okunamadı! Alerjiniz varsa bu ürüne güvenmeyin; lütfen paketin arka yüzündeki İçindekiler bölümünü yakından okutun.'));
+                    const unitPriceSpeech = unitAndMenu.speechSummary ? ` ${unitAndMenu.speechSummary}` : '';
+                    const unitPriceReport = unitAndMenu.reportSummary ? `\n${unitAndMenu.reportSummary}` : '';
+                    const foodReport = `${surfaceMsg}\n${freeFromMsg}\n${allergenMsg}${unitPriceReport}\n${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}\n\nPakette veya Etikette Okunan Yazı:\n${cleanText || 'Paket yazısı algılanmadı.'}`.trim();
 
                     if (pkg.sktInfo.sktStatus === 'EXPIRED') {
                         radar.playDangerAlarm();
                     }
-                    showDetectedResult('Gıda Paketi İçindekiler, Alerjen ve SKT Raporu', foodReport);
-                    announceGuidance(`${surfaceMsg} ${freeFromMsg} ${allergenMsg} ${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}`, {
+                    showDetectedResult('Gıda Paketi Alerjen, SKT ve Birim Fiyat / İndirim Raporu', foodReport);
+                    announceGuidance(`${surfaceMsg} ${freeFromMsg} ${allergenMsg}${unitPriceSpeech} ${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}`, {
                         force: true,
-                        bannerState: (pkg.sktInfo.sktStatus === 'EXPIRED' || pkg.allergens.length > 0 || !hasFullIngredientsHeader) ? 'warning' : 'centered'
+                        bannerState: (pkg.sktInfo.sktStatus === 'EXPIRED' || pkg.allergens.length > 0 || (!hasFullIngredientsHeader && !unitAndMenu.speechSummary)) ? 'warning' : 'centered'
                     });
                     return;
                 }
@@ -5290,10 +5759,10 @@
                     return;
                 }
 
-                // ÖZEL MOD 16: POS CİHAZI TUTARI DOĞRULAYICI VE TEK TUŞLA IBAN KOPYALAYICI
+                // ÖZEL MOD 16: POS CİHAZI TUTARI, DOKUNMATİK KİOSK / SIRA ALMA REHBERİ VE TEK TUŞLA IBAN KOPYALAYICI
                 if (state.mode === 'pos_iban_reader') {
-                    const posIban = processPosAmountAndIbanText(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText);
-                    showDetectedResult('💳 POS Cihazı Tutarı ve IBAN Raporu', posIban.fullText);
+                    const posIban = processPosAmountAndIbanText(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText, collectedLines, capCanvas, metrics);
+                    showDetectedResult('💳 POS Cihazı, Dokunmatik Kiosk Rehberi ve IBAN Raporu', posIban.fullText);
                     announceGuidance(posIban.speechText, { force: true, bannerState: 'centered' });
                     return;
                 }
@@ -8872,7 +9341,129 @@
         };
     }
 
-    function processPosAmountAndIbanText(cleanText, pass1Text = '', pass2Text = '') {
+    /**
+     * Mod 16: Düz Cam Dokunmatik POS, Hastane Sıra Alma ve Kurum Kiosk Ekranı Bölge & Parmak Yönlendiricisi
+     */
+    state.lastKioskTouchGuideSpeech = '';
+
+    function analyzeTouchscreenKioskAndPosLayout(cleanText, collectedLines = [], capCanvas = null, metrics = null) {
+        const text = String(cleanText || '').trim();
+        const w = capCanvas ? capCanvas.width : 480;
+        const h = capCanvas ? capCanvas.height : 640;
+
+        const kioskSectionRules = [
+            { label: 'Poliklinik / Muayene Sırası', regex: /POL[İI]KL[İI]N[İI]K|MUAYENE|DOKTOR|HEK[İI]M/i },
+            { label: 'Kan Alma / Laboratuvar Sırası', regex: /KAN\s*ALMA|LABORATUVAR|TAHL[İI]L|NUMUNE/i },
+            { label: 'Radyoloji / Röntgen / MR Sırası', regex: /RADYOLOJ[İI]|R[ÖO]NTGEN|TOMOGRAF[İI]|ULTRASON|\bMR\b/i },
+            { label: 'Randevulu Hasta / Randevulu İşlem', regex: /RANDEVULU/i },
+            { label: 'Randevusuz Sıra Alma', regex: /RANDEVUSUZ|GENEL\s*SIRA/i },
+            { label: 'Danışma / Hasta Kayıt / Gişe', regex: /DANIŞMA|DANISMA|HASTA\s*KAYIT|KAYIT|G[İI]ŞE|GISE/i },
+            { label: 'Öncelikli / Engelli / 65 Yaş Sırası', regex: /[ÖO]NCEL[İI]KL[İI]|ENGELL[İI]|65\s*YAŞ|GAZ[İI]/i },
+            { label: 'Fatura / Vezneler / Ödeme İşlemi', regex: /FATURA|VEZNE|TAHS[İI]LAT/i },
+            { label: 'Yeşil Giriş / Onay Bölgesi', regex: /\bONAY(?:LA)?\b|\bG[İI]R[İI]Ş\b|\bTAMAM\b|\bDEVAM\b|\bEVET\b/i },
+            { label: 'Kırmızı İptal / Geri Bölgesi', regex: /\b[İI]PTAL\b|\bGER[İI]\b|\bÇIKIŞ\b|\bHAYIR\b/i },
+            { label: 'Temassız / Kart Okutma Alanı', regex: /TEMASSIZ|KARTI\s*OKUT|YAKLAŞTIR/i }
+        ];
+
+        const regionHits = [];
+        if (Array.isArray(collectedLines) && collectedLines.length > 0) {
+            for (const ln of collectedLines) {
+                const rawLn = String(ln.text || '').replace(/\s+/g, ' ').trim();
+                if (!rawLn) continue;
+                const cx = (ln.bbox && typeof ln.bbox.x0 === 'number' && typeof ln.bbox.x1 === 'number')
+                    ? ((ln.bbox.x0 + ln.bbox.x1) * 0.5) / Math.max(1, w)
+                    : 0.5;
+                const cy = (ln.bbox && typeof ln.bbox.y0 === 'number' && typeof ln.bbox.y1 === 'number')
+                    ? ((ln.bbox.y0 + ln.bbox.y1) * 0.5) / Math.max(1, h)
+                    : 0.5;
+
+                const hZone = cx < 0.36 ? 'Sol' : (cx > 0.64 ? 'Sağ' : 'Orta');
+                const vZone = cy < 0.34 ? 'Üst' : (cy > 0.66 ? 'Alt' : 'Orta');
+                const zoneDesc = (hZone === 'Orta' && vZone === 'Orta') ? 'Ekranın Tam Ortasında' : `Ekranın ${vZone} ${hZone} Bölümünde`;
+
+                for (const rule of kioskSectionRules) {
+                    if (rule.regex.test(rawLn) && !regionHits.some(r => r.label === rule.label)) {
+                        regionHits.push({ label: rule.label, zoneDesc, rawText: rawLn });
+                    }
+                }
+            }
+        }
+
+        if (regionHits.length === 0 && text) {
+            for (const rule of kioskSectionRules) {
+                if (rule.regex.test(text)) {
+                    let defaultZone = 'Ekranın Orta Bölümünde';
+                    if (/ONAY|GİRİŞ|TAMAM/i.test(rule.label)) defaultZone = 'Ekranın Sağ Alt Köşesinde';
+                    else if (/İPTAL|GERİ/i.test(rule.label)) defaultZone = 'Ekranın Sol Alt Köşesinde';
+                    regionHits.push({ label: rule.label, zoneDesc: defaultZone, rawText: rule.label });
+                }
+            }
+        }
+
+        // Dokunmatik Tuş Takımı (1-9 Rakam Dizilimi) Kontrolü
+        const digitTokens = text.match(/\b[0-9]\b/g) || [];
+        const uniqueDigits = [...new Set(digitTokens)];
+        const hasTouchKeypad = uniqueDigits.length >= 4 || /TUŞLAYIN|NUMARA\s*GİR|TC\s*KİMLİK/i.test(text);
+
+        // Kullanıcının parmağı ekranda görünüyorsa parmak konumunu da söyle
+        let fingerHint = '';
+        if (metrics && metrics.imageData) {
+            const fingerCheck = detectSignatureBoxAndPenTip(metrics, w, h);
+            if (fingerCheck && fingerCheck.penTip) {
+                const fx = fingerCheck.penTip.x / Math.max(1, w);
+                const fy = fingerCheck.penTip.y / Math.max(1, h);
+                const fh = fx < 0.36 ? 'sol' : (fx > 0.64 ? 'sağ' : 'orta');
+                const fv = fy < 0.35 ? 'üst' : (fy > 0.65 ? 'alt' : 'orta');
+                fingerHint = ` Parmağınız şu an dokunmatik ekranın ${fv} ${fh} bölgesinde görünüyor.`;
+            }
+        }
+
+        const guideParts = [];
+        if (regionHits.length > 0) {
+            const mappedStr = regionHits.map(r => `${r.label}: ${r.zoneDesc}`).join('; ');
+            guideParts.push(`Dokunmatik Kiosk ve Sıra Alma Ekranı Rehberi: ${mappedStr}.`);
+        }
+        if (hasTouchKeypad) {
+            guideParts.push('Düz Dokunmatik Rakam Dizilimi: Ekranın orta-alt kısmında 3x3 dokunmatik rakam alanı bulunuyor; üst satırda soldan sağa 1-2-3, orta satırda 4-5-6, alt satırda 7-8-9, en alt ortada 0 yer alır. Sol alt köşede Kırmızı İptal, sağ alt köşede Yeşil Onay düğmesi bulunur.');
+        }
+        if (fingerHint) {
+            guideParts.push(fingerHint.trim());
+        }
+
+        const fullGuideSpeech = guideParts.join(' ');
+        const kioskEl = document.getElementById('kiosk-touch-guidance');
+        if (kioskEl && fullGuideSpeech) {
+            kioskEl.textContent = fullGuideSpeech;
+        }
+        if (fullGuideSpeech) {
+            state.lastKioskTouchGuideSpeech = fullGuideSpeech;
+        }
+
+        return {
+            regionHits,
+            hasTouchKeypad,
+            fingerHint: fingerHint.trim(),
+            speechText: fullGuideSpeech
+        };
+    }
+    window.analyzeTouchscreenKioskAndPosLayout = analyzeTouchscreenKioskAndPosLayout;
+
+    function speakTouchscreenKioskGuideNow() {
+        if (state.lastKioskTouchGuideSpeech) {
+            announceGuidance(state.lastKioskTouchGuideSpeech, { force: true, bannerState: 'centered' });
+            return;
+        }
+        const defaultTouchGuide = 'Düz Cam Dokunmatik POS ve Hastane/Kurum Sıra Alma Kiosk Rehberi: '
+            + 'Yeni nesil düz cam dokunmatik ekranlarda üst kısımda ödenecek tutar veya kurum başlığı yazar. '
+            + 'Hastane ve sıra alma kiosklarında seçenek düğmeleri ekranın ortasında yukarıdan aşağıya geniş kutular halinde dizilir. '
+            + 'Dokunmatik rakam ekranlarında ise orta bölümde üst satırda 1, 2, 3; orta satırda 4, 5, 6; alt satırda 7, 8, 9 ve en alt ortada 0 bulunur. '
+            + 'Ekranın sol alt köşesi Kırmızı İptal/Geri, sağ alt köşesi ise Yeşil Onay/Giriş alanıdır. Kamerayı ekrana tutup Şimdi Oku düğmesine basarak ekrandaki seçeneklerin tam yerini dinleyebilirsiniz.';
+        const kioskEl = document.getElementById('kiosk-touch-guidance');
+        if (kioskEl) kioskEl.textContent = defaultTouchGuide;
+        announceGuidance(defaultTouchGuide, { force: true, bannerState: 'centered' });
+    }
+
+    function processPosAmountAndIbanText(cleanText, pass1Text = '', pass2Text = '', collectedLines = [], capCanvas = null, metrics = null) {
         const text = String(cleanText || '');
         const compactNoSpaces = text.toUpperCase().replace(/[\s\-.,]/g, '');
         const ibanRegex = /TR[0-9OISB]{24}/g;
@@ -8943,10 +9534,16 @@
             }
         }
 
+        // Dokunmatik Kiosk / Sıra Alma Ekranı ve Parmak Bölgesi Rehberi
+        const kioskGuide = analyzeTouchscreenKioskAndPosLayout(text, collectedLines, capCanvas, metrics);
+        if (kioskGuide && kioskGuide.speechText) {
+            speechParts.push(kioskGuide.speechText);
+        }
+
         if (speechParts.length === 0) {
             const msg = text
                 ? `POS tutarı veya IBAN net seçilemedi. Okunan yazı: ${text.replace(/\s+/g, ' ')}`
-                : 'Ekranda henüz POS tutarı veya TR ile başlayan IBAN algılanmadı. Lütfen kamerayı ekrana dik tutup tekrar okutun.';
+                : 'Ekranda henüz POS tutarı, dokunmatik kiosk seçeneği veya TR ile başlayan IBAN algılanmadı. Lütfen kamerayı ekrana dik tutup tekrar okutun.';
             return { speechText: msg, fullText: msg };
         }
 
@@ -9008,7 +9605,7 @@
         }
     }
 
-    function saveItemMemoryEntry(noteText, colorTag = '') {
+    function saveItemMemoryEntry(noteText, colorTag = '', visualSignature = null) {
         const clean = String(noteText || '').trim();
         if (!clean || clean.length < 3) {
             if (!clean && state.deletedItemMemoryBackup) {
@@ -9030,6 +9627,7 @@
             id: Date.now(),
             text: clean,
             colorTag: colorTag || '',
+            visualSignature: Array.isArray(visualSignature) ? visualSignature : null,
             dateStr: new Date().toLocaleDateString('tr-TR')
         };
         state.itemMemories.unshift(entry);
@@ -9037,7 +9635,7 @@
         saveItemMemoriesToStorage();
         const inp = document.getElementById('memory-note-input');
         if (inp) inp.value = '';
-        announceGuidance(`Hafızaya kaydedildi: "${clean}". İstediğiniz zaman bu eşyayı sorabilirsiniz.`, {
+        announceGuidance(`Hafızaya kaydedildi: "${clean}". İstediğiniz zaman bu eşyayı sorabilir veya kameraya gösterip tanımasını isteyebilirsiniz.`, {
             force: true,
             bannerState: 'centered'
         });
@@ -9207,12 +9805,17 @@
             return 'qibla_compass';
         }
 
-        // 4. POS Tutarı ve IBAN Kopyalama Senaryosu
-        if (/(?:\biban\b|pos\s*cihaz|pos\s*ekran|kredi\s*kart|ödeme\s*tutar|fiş\s*tutar)/u.test(q)) {
+        // 4. POS Tutarı, Dokunmatik Kiosk / Sıra Alma Rehberi ve IBAN Kopyalama Senaryosu
+        if (/(?:\biban\b|pos\s*cihaz|pos\s*ekran|kredi\s*kart|ödeme\s*tutar|fiş\s*tutar|kiosk|sıra\s*alma|dokunmatik\s*ekran|hastane\s*sıra)/u.test(q)) {
             if (/kopyala/u.test(q) && state.lastDetectedIban) {
                 setMode('pos_iban_reader', { silentAnnouncement: true });
                 copyDetectedIbanToClipboard();
                 return 'pos_iban_copy';
+            }
+            if (/(?:kiosk|sıra\s*alma|dokunmatik\s*ekran|hastane\s*sıra)/u.test(q)) {
+                setMode('pos_iban_reader', { silentAnnouncement: true });
+                speakTouchscreenKioskGuideNow();
+                return 'pos_kiosk_guide';
             }
             setMode('pos_iban_reader');
             return 'pos_iban_reader';
@@ -9235,19 +9838,24 @@
             return 'medicine_skt';
         }
 
-        // 7. Eşyamı Nereye Koydum (Sorma veya Kaydetme) & Kavanoz Senaryosu
-        if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum|kavanoz|eşya\s*konum|kayıtlı\s*eşya|\b(?:koydum|bıraktım|sakladım|astım)\b)/u.test(q)) {
+        // 7. Eşyamı Nereye Koydum (Sorma veya Kaydetme) & Görsel Kavanoz / Derin Dondurucu Poşeti Hafızası Senaryosu
+        if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum|kavanoz|dondurucu|poşet|eşya\s*konum|kayıtlı\s*eşya|\b(?:koydum|bıraktım|sakladım|astım|olarak\s*kaydet)\b)/u.test(q)) {
             if (/kayıtlı\s*eşya/u.test(q)) {
                 setMode('item_memory', { silentAnnouncement: true });
                 speakAllSavedItemMemories();
                 return 'item_memory';
+            }
+            if (/(?:bu\s*kavanoz\s*ne|bu\s*poşet\s*ne|içinde\s*ne\s*var|kavanozu\s*tanı|eşyamı\s*tanı)/u.test(q)) {
+                setMode('item_memory', { silentAnnouncement: true });
+                recognizeVisibleJarFromMemory();
+                return 'item_memory_recognize';
             }
             if (/(?:nereye\s*koydum|neredeydi|\bnerede\b|bulamıyorum)/u.test(q)) {
                 setMode('item_memory', { silentAnnouncement: true });
                 searchItemMemoryByQuery(raw);
                 return 'item_memory_search';
             }
-            if (/\b(?:koydum|bıraktım|sakladım|astım)\b/u.test(q)) {
+            if (/\b(?:koydum|bıraktım|sakladım|astım|olarak\s*kaydet)\b/u.test(q)) {
                 setMode('item_memory', { silentAnnouncement: true });
                 saveItemMemoryEntry(raw);
                 return 'item_memory_save';
@@ -9298,8 +9906,19 @@
             return 'tv_subtitle_score';
         }
 
-        // 11. Çorap Eşleştirici, Kombin ve Leke Kontrolü Senaryosu
-        if (/(?:çorap|çoraplarım|leke\s*var\s*mı|kıyafet\s*uyum|kombin)/u.test(q)) {
+        // 11. Çorap Eşleştirici, Kombin, Leke, Ters/Düz ve Renkli Çamaşır Ayıklama Senaryosu
+        if (/(?:çorap|çoraplarım|leke\s*var\s*mı|kıyafet\s*uyum|kombin|ters\s*mi|düz\s*mü|dikiş|çamaşır\s*ayıkla|renkli\s*çamaşır|beyaz\s*çamaşır)/u.test(q)) {
+            if (/(?:çamaşır\s*ayıkla|renkli\s*çamaşır|beyaz\s*çamaşır)/u.test(q) && !state.laundrySortLiveActive) {
+                setMode('sock_outfit_check', { silentAnnouncement: true });
+                toggleLaundrySortingLiveMode();
+                return 'sock_laundry_sort';
+            }
+            if (/(?:ters\s*mi|düz\s*mü|dikiş)/u.test(q)) {
+                setMode('sock_outfit_check', { silentAnnouncement: true });
+                state.sockSubMode = 'inside_out';
+                captureAndDescribePhoto(false);
+                return 'sock_inside_out';
+            }
             setMode('sock_outfit_check');
             return 'sock_outfit_check';
         }
@@ -9326,7 +9945,7 @@
             return 'exam_reader';
         }
 
-        // 14. İmza, Bardak/Sıvı, Derece Ayarlama/Kapı/Asansör/Kombi/Klima, Gıda Alerjen, Lamba/Işık, Düşen Eşya, Özçekim, WhatsApp QR
+        // 14. İmza, Bardak/Sıvı, Derece Ayarlama/Kapı/Asansör/Kombi/Klima, Gıda Alerjen/Birim Fiyat, Lamba/Işık/Evden Çıkış, Düşen Eşya, Özçekim/Tıraş/Görüntülü Görüşme, WhatsApp QR/Görsel Menü
         if (/(?:imza|kalem\s*yönlendir)/u.test(q)) { setMode('signature_pen'); return 'signature_pen'; }
         if (/(?:bardak|kupa|şişe\s*bul|çay\s*bardağı)/u.test(q)) { setMode('liquid_level'); return 'liquid_level'; }
         if (/(?:derece|dereceye|sıcaklık|sıcaklığı|klima|klimayı|kombi|kombiyi|termostat|kapı\s*numara|asansör|çamaşır\s*makine|bulaşık\s*makine|fırını\s*\d|fırın\s*derece)/u.test(q)) {
@@ -9339,11 +9958,11 @@
             setMode('door_elevator_lcd');
             return 'door_elevator_lcd';
         }
-        if (/(?:alerjen|gluten|laktoz|içindekiler|gıda\s*paket)/u.test(q)) { setMode('food_freshness'); return 'food_freshness'; }
-        if (/(?:lamba\s*açık|ışık\s*açık|pencere\s*ne\s*tarafta)/u.test(q)) { setMode('light_meter'); return 'light_meter'; }
-        if (/(?:yere\s*düşen|düşen\s*eşya|modem\s*ışığı)/u.test(q)) { setMode('anomaly_led'); return 'anomaly_led'; }
-        if (/(?:özçekim|selfie|vesikalık)/u.test(q)) { setMode('portrait'); return 'portrait'; }
-        if (/(?:karekod|qr\s*kod|whatsapp\s*web)/u.test(q)) { setMode('qr_screen'); return 'qr_screen'; }
+        if (/(?:alerjen|gluten|laktoz|içindekiler|gıda\s*paket|birim\s*fiyat|kilosu\s*kaç|2\s*al\s*1|indirim\s*karşılaştır)/u.test(q)) { setMode('food_freshness'); return 'food_freshness'; }
+        if (/(?:lamba\s*açık|ışık\s*açık|pencere\s*ne\s*tarafta|evden\s*çıkış|açık\s*kalan\s*ışık|pencere\s*açık\s*mı|kapı\s*aralık)/u.test(q)) { setMode('light_meter'); return 'light_meter'; }
+        if (/(?:yere\s*düşen|düşen\s*eşya|düşen\s*anahtar|düşen\s*para|düşen\s*yüzük|modem\s*ışığı)/u.test(q)) { setMode('anomaly_led'); return 'anomaly_led'; }
+        if (/(?:özçekim|selfie|vesikalık|tıraş|sakal|görüntülü\s*görüşme|saçım\s*nasıl|ayna\s*karşı)/u.test(q)) { setMode('portrait'); return 'portrait'; }
+        if (/(?:karekod|qr\s*kod|whatsapp\s*web|qr\s*menü|restoran\s*menü|kafe\s*menü)/u.test(q)) { setMode('qr_screen'); return 'qr_screen'; }
 
         // Varsayılan: Etrafımda Ne Var & Evrak Okuyucu
         setMode('explorer');
@@ -9446,30 +10065,149 @@
         el.tDistance.textContent = `${state.itemMemories.length} Eşya Kayıtlı`;
     }
 
+    /**
+     * Mod 17: Kişiselleştirilmiş "Kendi Eşyamı Bul ve Tanı" (Görsel Kavanoz, İlaç Kutusu ve Derin Dondurucu Poşeti Parmak İzi Motoru)
+     * Nesnenin üst/kapak bölgesi, orta gövdesi ve alt bölgesinin CIELAB (L*, a*, b*) renk dağılımını ve yüzey doku enerjisini
+     * 13 boyutlu sayısal bir görsel imzaya (fingerprint) dönüştürür.
+     */
+    function computeVisualObjectFingerprint(sourceCanvas, metrics = null) {
+        let imgData = (metrics && metrics.imageData) ? metrics.imageData : null;
+        let w = sourceCanvas ? sourceCanvas.width : (imgData ? imgData.width : 0);
+        let h = sourceCanvas ? sourceCanvas.height : (imgData ? imgData.height : 0);
+        if (!imgData && sourceCanvas && typeof sourceCanvas.getContext === 'function' && w > 0 && h > 0) {
+            try {
+                imgData = sourceCanvas.getContext('2d').getImageData(0, 0, w, h);
+            } catch (_) {}
+        }
+        if (!imgData || !imgData.data || w < 8 || h < 8) return null;
+
+        const data = imgData.data;
+        const zones = [
+            // Üst Kapak / Poşet Ağzı Bölgesi
+            [0.25, 0.12, 0.50, 0.24],
+            // Orta Sol Gövde / Etiket Bölgesi
+            [0.18, 0.36, 0.32, 0.30],
+            // Orta Sağ Gövde / Etiket Bölgesi
+            [0.50, 0.36, 0.32, 0.30],
+            // Alt Taban / İçerik Bölgesi
+            [0.25, 0.66, 0.50, 0.22]
+        ];
+
+        const vector = [];
+        let edgeSum = 0, edgeCnt = 0;
+
+        for (const [rx, ry, rw, rh] of zones) {
+            const x0 = Math.max(1, Math.floor(rx * w));
+            const y0 = Math.max(1, Math.floor(ry * h));
+            const x1 = Math.min(w - 2, Math.floor((rx + rw) * w));
+            const y1 = Math.min(h - 2, Math.floor((ry + rh) * h));
+            const step = Math.max(1, Math.floor(Math.min(x1 - x0, y1 - y0) / 10));
+
+            let sumL = 0, sumA = 0, sumB = 0, cnt = 0;
+            for (let y = y0; y <= y1; y += step) {
+                for (let x = x0; x <= x1; x += step) {
+                    const idx = (y * w + x) * 4;
+                    const lab = rgbToLab(data[idx], data[idx + 1], data[idx + 2]);
+                    sumL += lab.L;
+                    sumA += lab.a;
+                    sumB += lab.b;
+                    cnt++;
+
+                    const idxR = (y * w + (x + 1)) * 4;
+                    const idxD = ((y + 1) * w + x) * 4;
+                    edgeSum += Math.abs(data[idxR] - data[idx]) + Math.abs(data[idxD] - data[idx]);
+                    edgeCnt++;
+                }
+            }
+            vector.push(
+                Number((sumL / Math.max(1, cnt)).toFixed(1)),
+                Number((sumA / Math.max(1, cnt)).toFixed(1)),
+                Number((sumB / Math.max(1, cnt)).toFixed(1))
+            );
+        }
+        const edgeDensity = Number((edgeSum / Math.max(1, edgeCnt)).toFixed(1));
+        vector.push(edgeDensity);
+        return vector;
+    }
+    window.computeVisualObjectFingerprint = computeVisualObjectFingerprint;
+
+    function matchVisualObjectFingerprint(liveSig, savedMemories = []) {
+        if (!Array.isArray(liveSig) || liveSig.length < 12 || !Array.isArray(savedMemories)) return null;
+        let bestEntry = null;
+        let bestDist = Infinity;
+
+        for (const item of savedMemories) {
+            if (!item || !Array.isArray(item.visualSignature) || item.visualSignature.length < 12) continue;
+            const sig = item.visualSignature;
+            let sqSum = 0;
+            for (let i = 0; i < 12; i++) {
+                const diff = (liveSig[i] || 0) - (sig[i] || 0);
+                // Renk kanallarına (a*, b*) parlaklıktan (L*) daha yüksek ağırlık ver ki oda ışığı değişse bile kavanozun rengini/içeriğini tanısın
+                const weight = (i % 3 === 0) ? 0.55 : 1.35;
+                sqSum += (diff * diff) * weight;
+            }
+            const texDiff = (liveSig[12] || 0) - (sig[12] || 0);
+            sqSum += (texDiff * texDiff) * 0.25;
+            const dist = Math.sqrt(sqSum / 13);
+            if (dist < bestDist) {
+                bestDist = dist;
+                bestEntry = item;
+            }
+        }
+
+        if (!bestEntry || bestDist > 26) return null;
+        const confidencePct = Math.max(55, Math.min(99, Math.round(100 - bestDist * 1.6)));
+        return {
+            entry: bestEntry,
+            distance: Number(bestDist.toFixed(2)),
+            confidencePct
+        };
+    }
+    window.matchVisualObjectFingerprint = matchVisualObjectFingerprint;
+
     function tagVisibleJarInCamera() {
         const inp = document.getElementById('memory-note-input');
         const label = inp ? inp.value.trim() : '';
         if (!label) {
-            announceGuidance('Kavanozu etiketlemek için önce kutuya kavanozun içinde ne olduğunu yazın (Örn: Ihlamur veya Kaya Tuzu).', { force: true, bannerState: 'warning' });
+            announceGuidance('Kavanozu veya derin dondurucu poşetini kaydetmek için önce kutuya içinde ne olduğunu yazın ya da söyleyin (Örneğin: Kuru Fasulye, Nane veya Kaya Tuzu).', { force: true, bannerState: 'warning' });
             return;
         }
         if (!state.isRunning || !state.lastMetrics || !state.lastMetrics.centerColor) {
-            announceGuidance('Kavanozun gerçek kapak veya yüzey rengini kaydedebilmem için lütfen önce Kamerayı Başlat düğmesine basın ve kamerayı kavanoza tutun.', { force: true, bannerState: 'warning' });
+            announceGuidance('Kavanozun veya poşetin görsel parmak izini ve rengini kaydedebilmem için lütfen önce Kamerayı Başlat düğmesine basın ve kamerayı nesneye tutun.', { force: true, bannerState: 'warning' });
             return;
         }
         const col = state.lastMetrics.centerColor.name;
-        saveItemMemoryEntry(`Etiketlenen Kavanoz/Kutu (${col}): ${label}`, col);
+        const visualSig = computeVisualObjectFingerprint(el.analysisCanvas, state.lastMetrics);
+        saveItemMemoryEntry(`Etiketlenen Kavanoz/Poşet (${col}): ${label}`, col, visualSig);
+    }
+
+    function recognizeVisibleJarFromMemory() {
+        if (!state.isRunning && (!state.lastMetrics || !state.lastMetrics.imageData)) {
+            announceGuidance('Bu kavanozu veya poşeti tanımam için lütfen önce kamerayı başlatıp nesneye tutun.', { force: true, bannerState: 'warning' });
+            return;
+        }
+        const result = matchOrDescribeJarAndMemoryItem(el.analysisCanvas, state.lastMetrics, '');
+        showDetectedResult('🔍 Kişisel Kavanoz / Poşet Hafızası Tanıma Sonucu', result.fullText);
+        announceGuidance(result.speechText, { force: true, bannerState: 'centered' });
     }
 
     function matchOrDescribeJarAndMemoryItem(capCanvas, metrics, cleanText) {
         const col = (metrics && metrics.centerColor) ? metrics.centerColor.name : '';
+        const liveSig = computeVisualObjectFingerprint(capCanvas, metrics);
+        const visualMatch = liveSig ? matchVisualObjectFingerprint(liveSig, state.itemMemories) : null;
         const jarMemories = state.itemMemories.filter(m => m.colorTag && m.colorTag === col);
         const ocrNote = cleanText ? `Üzerinde okunan yazı: ${cleanText.replace(/\s+/g, ' ')}.` : 'Üzerinde okunabilir bir etiket yazısı görünmüyor.';
-        const jarNote = jarMemories.length > 0
-            ? `Görünen yüzeyin rengi ${col}. Hafızanızda ${col} renkli kavanoz/kutu için "${jarMemories[0].text}" kaydı bulunuyor; ancak üzerinde yazı yoksa aynı renkteki kavanozları (örneğin tuz ile şekeri) karıştırmamak için lütfen kokusunu veya dokusunu da kontrol edin.`
-            : `Görünen kavanoz veya kutunun rengi: ${col}.`;
+
+        let jarNote = '';
+        if (visualMatch && visualMatch.entry) {
+            jarNote = `Kişisel Nesne Hafızası Eşleşmesi (Yüzde ${visualMatch.confidencePct} görsel uyum): Bu kavanoz veya poşet daha önce kaydettiğiniz "${visualMatch.entry.text}" kaydıyla eşleşiyor!`;
+        } else if (jarMemories.length > 0) {
+            jarNote = `Görünen yüzeyin rengi ${col}. Hafızanızda ${col} renkli kavanoz/poşet için "${jarMemories[0].text}" kaydı bulunuyor; ancak üzerinde yazı yoksa aynı renkteki kavanozları karıştırmamak için lütfen kokusunu veya dokusunu da kontrol edin.`;
+        } else {
+            jarNote = `Görünen kavanoz, poşet veya kutunun rengi: ${col || 'Bilinmiyor'}. Hafızanızda bu görsel imzayla eşleşen bir kavanoz kaydı bulunamadı.`;
+        }
         const combined = `${jarNote} ${ocrNote}`.trim();
-        return { speechText: combined, fullText: combined };
+        return { speechText: combined, fullText: combined, visualMatch };
     }
 
     // --- MOD 19: TELEVİZYON ALTYAZI OKUYUCU VE CANLI MAÇ SKORU SPİKERİ ---
@@ -9614,14 +10352,169 @@
         }
     }
 
-    // --- MOD 20: ÇORAP EŞLEŞTİRİCİ, KIYAFET KOMBİN UYUMU VE LEKE KONTROLÜ ---
+    // --- MOD 19: ÇORAP EŞLEŞTİRİCİ, KIYAFET KOMBİN/LEKE, TERS/DÜZ (DİKİŞ/ETİKET) VE RENKLİ ÇAMAŞIR AYIKLAMA ASİSTANI ---
+    state.laundrySortLiveActive = false;
+    state.lastLaundrySpokenCategory = '';
+    state.lastLaundrySpokenAt = 0;
+
+    /**
+     * Çamaşır Makinesi Öncesi Kıyafet Renk Ayıklama Sınıflandırıcısı:
+     * - "Beyaz - Açık Renk" (Beyaz, Krem, Bej, Açık Gri)
+     * - "Koyu Renk" (Siyah, Lacivert, Koyu Gri, Kahverengi)
+     * - "Canlı Renk (Boyayabilir)" (Kırmızı, Bordo, Turuncu, Sarı, Yeşil, Mavi, Mor, Pembe)
+     */
+    function classifyLaundrySortingCategory(colorInfo, r = 128, g = 128, b = 128) {
+        const name = (colorInfo && colorInfo.name) ? colorInfo.name : classifyColorCIELAB(r, g, b).name;
+        const lab = rgbToLab(r, g, b);
+        const chroma = Math.hypot(lab.a, lab.b);
+
+        if (/Beyaz|Krem|Bej/i.test(name) || (lab.L >= 76 && chroma <= 16)) {
+            return {
+                category: 'Beyaz - Açık Renk',
+                shortBadge: '⚪ Beyaz - Açık Renk',
+                warning: 'Beyaz ve açık renklilerle yıkanabilir.'
+            };
+        }
+        if (/Kırmızı|Bordo|Turuncu|Pembe|Mor|Eflatun|Sarı|Yeşil|Mavi|Turkuaz/i.test(name) || chroma >= 22) {
+            return {
+                category: 'Canlı Renk (Boyayabilir)',
+                shortBadge: '🔴 Canlı Renk (Boyayabilir)',
+                warning: 'Dikkat: Canlı renkli kumaş; beyazların arasına karışmamalıdır, boyama yapabilir!'
+            };
+        }
+        if (/Siyah|Lacivert|Kahverengi|Koyu| Haki/i.test(name) || lab.L <= 38) {
+            return {
+                category: 'Koyu Renk',
+                shortBadge: '⚫ Koyu Renk',
+                warning: 'Koyu ve siyah çamaşırlarla yıkanmalıdır; beyazların arasına atmayın.'
+            };
+        }
+        return {
+            category: 'Açık / Orta Renk (Renkliler)',
+            shortBadge: '🧺 Renkli Çamaşır',
+            warning: 'Renkli çamaşırlarla birlikte yıkanabilir.'
+        };
+    }
+    window.classifyLaundrySortingCategory = classifyLaundrySortingCategory;
+
+    /**
+     * Kıyafet Ters mi Düz mü Giyilmiş (İç Yıkama/Beden Etiketi veya Kabarık İç Dikiş İzi Dışarıda mı?) Denetçisi
+     */
+    function analyzeGarmentInsideOutAndLaundryGroup(capCanvas, metrics, cleanText = '') {
+        const ctx = capCanvas.getContext('2d');
+        const w = capCanvas.width;
+        const h = capCanvas.height;
+        const centerSample = sampleRegionRgbAndContrast(ctx, w * 0.25, h * 0.25, w * 0.50, h * 0.50);
+        const laundryInfo = classifyLaundrySortingCategory(centerSample.colorInfo, centerSample.r, centerSample.g, centerSample.b);
+
+        // 1. İç Yıkama / Beden Etiketi Yazısı Kontrolü (%100 Pamuk, Cotton, Polyester, 30°C, Made in, S/M/L/XL, Yıkama)
+        const hasCareTagText = /(?:%\s*\d{1,3}|PAMUK|COTTON|POLYESTER|VİSKON|VISCOSE|ELASTAN|YIKAMA|WASH|MADE\s*IN|TÜRKİYE|TURKEY|\b(?:XS|XL|XXL|30\s*°?\s*C|40\s*°?\s*C)\b|BEDEN|SIZE)/i.test(cleanText || '');
+
+        // 2. Koyu/Renkli Kumaş Üzerinde Parlak Beyaz İç Etiket Dikdörtgeni (Yaka veya Yan Dikiş Bölgesinde) Kontrolü
+        const collarPatch = sampleRegionRgbAndContrast(ctx, w * 0.36, h * 0.10, w * 0.28, h * 0.16);
+        const bodyLum = 0.299 * centerSample.r + 0.587 * centerSample.g + 0.114 * centerSample.b;
+        const collarLum = 0.299 * collarPatch.r + 0.587 * collarPatch.g + 0.114 * collarPatch.b;
+        const hasExposedWhiteTagPatch = (collarLum - bodyLum >= 58 && collarLum >= 175 && bodyLum <= 130);
+
+        // 3. Kumaş Boyunca Uzanan Kabarık İç Dikiş / Overlok Hattı (Yüksek Doğrusal Kenar Kontrastı) Kontrolü
+        let maxSeamLineContrast = 0;
+        if (metrics && metrics.gray && metrics.gw && metrics.gh) {
+            const { gray, gw, gh } = metrics;
+            for (let gy = Math.floor(gh * 0.22); gy < Math.floor(gh * 0.78); gy++) {
+                let rowGrad = 0;
+                for (let gx = Math.floor(gw * 0.20); gx < Math.floor(gw * 0.80); gx++) {
+                    rowGrad += Math.abs(gray[(gy + 1) * gw + gx] - gray[(gy - 1) * gw + gx]);
+                }
+                const avgRowGrad = rowGrad / Math.max(1, gw * 0.60);
+                if (avgRowGrad > maxSeamLineContrast) maxSeamLineContrast = avgRowGrad;
+            }
+        }
+        const hasExposedSeamRidge = (maxSeamLineContrast >= 36 && centerSample.stdDev < 28);
+
+        const isInsideOut = hasCareTagText || hasExposedWhiteTagPatch || hasExposedSeamRidge;
+        let insideOutReason = 'Düz (Dikiş veya İç Etiket Görünmüyor)';
+        let insideOutSpeech = 'Ters/Düz Kontrolü: Kıyafetiniz DÜZ görünüyor; dışarıda kalan bir iç yıkama etiketi veya ters overlok dikişi algılanmadı.';
+
+        if (hasCareTagText) {
+            insideOutReason = '⚠️ TERS OLABİLİR (İç Yıkama/Beden Etiketi Dışarıda)';
+            insideOutSpeech = 'DİKKAT TERS KIYAFET UYARISI: Kıyafetin üzerinde iç yıkama veya beden etiketi yazısı okundu; kıyafetiniz TERS dönmüş olabilir!';
+        } else if (hasExposedWhiteTagPatch) {
+            insideOutReason = '⚠️ TERS OLABİLİR (Yaka/Yan Beyaz İç Etiket Görünüyor)';
+            insideOutSpeech = 'DİKKAT TERS KIYAFET UYARISI: Yaka veya üst kısımda kumaş renginden çok farklı parlak beyaz bir iç etiket parçası görünüyor; kıyafetiniz TERS giyilmiş olabilir!';
+        } else if (hasExposedSeamRidge) {
+            insideOutReason = '⚠️ TERS OLABİLİR (Belirgin İç Dikiş İzi Algılandı)';
+            insideOutSpeech = 'DİKKAT TERS KIYAFET UYARISI: Kumaş yüzeyinde belirgin bir iç overlok/dikiş şeridi algılandı; kıyafetin düz tarafında olduğunuzu elinizle kontrol edin.';
+        }
+
+        const insideOutEl = document.getElementById('outfit-insideout-result');
+        if (insideOutEl) {
+            insideOutEl.textContent = `${insideOutReason} • Çamaşır: ${laundryInfo.category}`;
+        }
+
+        return {
+            isInsideOut,
+            insideOutReason,
+            insideOutSpeech,
+            laundryCategory: laundryInfo.category,
+            laundrySpeech: `Çamaşır Ayıklama Grubu: ${laundryInfo.category} (${centerSample.colorInfo.name}). ${laundryInfo.warning}`
+        };
+    }
+    window.analyzeGarmentInsideOutAndLaundryGroup = analyzeGarmentInsideOutAndLaundryGroup;
+
+    function toggleLaundrySortingLiveMode() {
+        state.laundrySortLiveActive = !state.laundrySortLiveActive;
+        state.lastLaundrySpokenCategory = '';
+        const btn = document.getElementById('btn-laundry-sort-toggle');
+        if (btn) {
+            btn.classList.toggle('active-toggle', state.laundrySortLiveActive);
+            btn.setAttribute('aria-pressed', state.laundrySortLiveActive ? 'true' : 'false');
+            btn.textContent = `🧺 Seri Çamaşır Ayıklama: ${state.laundrySortLiveActive ? 'Açık' : 'Kapalı'}`;
+        }
+        if (state.laundrySortLiveActive && !state.isRunning) {
+            startCamera();
+        }
+        announceGuidance(
+            state.laundrySortLiveActive
+                ? 'Seri renkli çamaşır ayıklama asistanı açıldı. Telefonu sabitleyip kıyafetleri tek tek kameranın önünden geçirin; hiçbir tuşa basmanıza gerek kalmadan Beyaz - Açık Renk, Koyu Renk veya Canlı Renk (Boyayabilir) olarak anında söyleyeceğim.'
+                : 'Seri çamaşır ayıklama modu kapatıldı.',
+            { force: true, bannerState: 'centered' }
+        );
+    }
+
     function handleSockAndOutfitLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
-        const col = metrics.centerColor ? metrics.centerColor.name : 'Bilinmiyor';
+        const colInfo = metrics.centerColor || { name: 'Bilinmiyor', r: 128, g: 128, b: 128 };
+        const col = colInfo.name || 'Bilinmiyor';
         const pat = metrics.patternType || 'Düz';
+
+        if (state.laundrySortLiveActive) {
+            const cR = typeof colInfo.r === 'number' ? colInfo.r : Math.round(metrics.avgBrightness || 128);
+            const cG = typeof colInfo.g === 'number' ? colInfo.g : Math.round(metrics.avgBrightness || 128);
+            const cB = typeof colInfo.b === 'number' ? colInfo.b : Math.round(metrics.avgBrightness || 128);
+            const laundry = classifyLaundrySortingCategory(colInfo, cR, cG, cB);
+            el.tPosition.textContent = `${laundry.shortBadge} (${col})`;
+            el.tDistance.textContent = 'Seri Çamaşır Ayıklama Açık';
+            const insideOutEl = document.getElementById('outfit-insideout-result');
+            if (insideOutEl) {
+                insideOutEl.textContent = `${laundry.shortBadge} — ${col}`;
+            }
+            const now = performance.now();
+            const isDifferentGroup = `${laundry.category}_${col}` !== state.lastLaundrySpokenCategory;
+            if (isDifferentGroup || (now - state.lastLaundrySpokenAt > 2600)) {
+                state.lastLaundrySpokenCategory = `${laundry.category}_${col}`;
+                state.lastLaundrySpokenAt = now;
+                announceGuidance(`${laundry.category}: ${col}.`, {
+                    force: isDifferentGroup,
+                    bannerState: laundry.category.includes('Canlı') ? 'warning' : 'centered',
+                    minIntervalMs: 1400
+                });
+            }
+            return;
+        }
+
         el.tPosition.textContent = `Görünen Renk: ${col}`;
         el.tDistance.textContent = `Desen: ${pat}`;
         if (col && col !== 'Bilinmiyor') {
-            announceGuidance(`Görünen kumaş rengi: ${col}, desen: ${pat}. İki çorabı karşılaştırmak veya kıyafet leke kontrolü için Boşluk tuşuna basın.`, {
+            announceGuidance(`Görünen kumaş rengi: ${col}, desen: ${pat}. İki çorabı karşılaştırmak, leke veya ters/düz kontrolü yapmak için Boşluk tuşuna basın.`, {
                 bannerState: 'normal'
             });
         }
@@ -9690,24 +10583,27 @@
         const sockEl = document.getElementById('sock-match-result');
         const stainEl = document.getElementById('outfit-stain-result');
 
+        // Ters / Düz (Dikiş ve İç Etiket) + Çamaşır Ayıklama Analizi
+        const insideOutAndLaundry = analyzeGarmentInsideOutAndLaundryGroup(capCanvas, metrics, cleanText);
+
         // İki çorap yan yana karşılaştırılırken ortadaki masa boşluğunu (midStrip) leke sanmamak için her iki parçanın kendi iç yüzey homojenliğini denetle!
-        const isTwoPieceComparison = !isSingleUniformSurface && state.sockSubMode !== 'outfit';
+        const isTwoPieceComparison = !isSingleUniformSurface && state.sockSubMode !== 'outfit' && state.sockSubMode !== 'inside_out';
         const hasStainOrSpot = isTwoPieceComparison
             ? ((leftCore.outlierRatio >= 0.08 && leftCore.stdDev >= 20) || (rightCore.outlierRatio >= 0.08 && rightCore.stdDev >= 20))
             : (centerSample.outlierRatio >= 0.08 && centerSample.stdDev >= 20);
         const refColorName = isTwoPieceComparison ? leftCore.colorInfo.name : centerSample.colorInfo.name;
         const stainDetail = hasStainOrSpot
-            ? `Merkez renk: ${refColorName}. Dikkat: Kumaş yüzeyinde ana renkten belirgin şekilde ayrılan bir renk farkı, desen veya leke izi algılandı; giymeden önce elinizle veya yakınınızla kontrol edebilirsiniz.`
-            : `Merkez renk: ${refColorName}, yüzey homojen ve temiz görünüyor.`;
+            ? `Merkez renk: ${refColorName}. Dikkat: Kumaş yüzeyinde ana renkten belirgin şekilde ayrılan bir renk farkı, desen veya çay/yemek lekesi izi algılandı; giymeden önce elinizle veya yakınınızla kontrol edebilirsiniz.`
+            : `Merkez renk: ${refColorName}, yüzey homojen ve lekesiz görünüyor.`;
         const stainShortBadge = hasStainOrSpot
             ? `${refColorName} (Farklı Leke/Desen İzi Var)`
             : `${refColorName} (Homojen / Temiz)`;
 
-        if (isSingleUniformSurface || state.sockSubMode === 'outfit') {
-            const singleMsg = state.sockSubMode === 'outfit'
-                ? `Kıyafet ve Leke Analizi: ${stainDetail}`
-                : `Tek Parça Yüzey: Kamerada yan yana iki ayrı çorap ayırt edilemedi; tamamı ${centerSample.colorInfo.name} tek bir yüzey görünüyor. ${stainDetail} İki çorabı karşılaştırmak için aralarında biraz boşluk bırakarak yan yana koyun.`;
-            if (sockEl && state.sockSubMode !== 'outfit') sockEl.textContent = `TEK YÜZEY (${centerSample.colorInfo.name})`;
+        if (isSingleUniformSurface || state.sockSubMode === 'outfit' || state.sockSubMode === 'inside_out') {
+            const singleMsg = (state.sockSubMode === 'outfit' || state.sockSubMode === 'inside_out')
+                ? `Kıyafet, Leke ve Ters/Düz Analizi: ${stainDetail} ${insideOutAndLaundry.insideOutSpeech} ${insideOutAndLaundry.laundrySpeech}`
+                : `Tek Parça Yüzey: Kamerada yan yana iki ayrı çorap ayırt edilemedi; tamamı ${centerSample.colorInfo.name} tek bir yüzey görünüyor. ${stainDetail} ${insideOutAndLaundry.insideOutSpeech} ${insideOutAndLaundry.laundrySpeech} İki çorabı karşılaştırmak için aralarında biraz boşluk bırakarak yan yana koyun.`;
+            if (sockEl && state.sockSubMode !== 'outfit' && state.sockSubMode !== 'inside_out') sockEl.textContent = `TEK YÜZEY (${centerSample.colorInfo.name})`;
             if (stainEl) stainEl.textContent = stainShortBadge;
             const speech = `${singleMsg} ${cleanText ? 'Etiket yazısı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
             return {
@@ -9723,7 +10619,7 @@
             ? `Çorap ve Kıyafet Eşleşmesi: Sol taraftaki parça (${leftHalf.colorInfo.name}) ile sağ taraftaki parça (${rightHalf.colorInfo.name}) aynı renkte ve birbiriyle eşleşiyor.`
             : `Farklı Renk: Sol taraftaki parça ${leftHalf.colorInfo.name}, sağ taraftaki parça ise ${rightHalf.colorInfo.name}; birbirinden farklı.`;
 
-        const stainMsg = stainDetail;
+        const stainMsg = `${stainDetail} ${insideOutAndLaundry.insideOutSpeech} ${insideOutAndLaundry.laundrySpeech}`;
 
         if (sockEl) sockEl.textContent = isPairMatch ? `EŞLEŞTİ (${leftHalf.colorInfo.name})` : `FARKLI (${leftHalf.colorInfo.name} / ${rightHalf.colorInfo.name})`;
         if (stainEl) stainEl.textContent = stainShortBadge;
@@ -10987,11 +11883,11 @@
             ]
         },
         'qr_screen': {
-            title: '3. Bölüm: WhatsApp Web ve Bilgisayar Ekranı Hizalama',
-            summary: 'Bilgisayar ekranındaki karekodu (QR) veya ekran penceresini ortalamanız için sesli yönlendirme yapar ve 15 saniye sabit tutma sayacı sunar.',
+            title: '3. Bölüm: WhatsApp Web, Görsel QR Menü ve Ekran Hizalama',
+            summary: 'Bilgisayar ekranındaki karekodu (QR) ortalamanız için sesli yönlendirme yapar, 15 saniye sabit tutma sayacı sunar ve restoran/kafe görsel menülerini temiz bir sesli yemek-fiyat listesine dönüştürür.',
             steps: [
-                '1. Adım: Telefonun arka kamerasını bilgisayar ekranının ortasına hafifçe yaklaştırıp yaklaşık iki karış (30–35 santimetre) kendinize doğru geri çekin.',
-                '2. Adım: Sesli yön komutlarını (biraz sola, sağa, yukarı) takip ederek ekranı ortalayın.',
+                '1. Adım: Telefonun arka kamerasını bilgisayar ekranının veya görsel menünün ortasına hafifçe yaklaştırıp yaklaşık iki karış (30–35 santimetre) kendinize doğru geri çekin.',
+                '2. Adım: Sesli yön komutlarını (biraz sola, sağa, yukarı) takip ederek ekranı ortalayın; görsel menüyü sesli yemek ve fiyat listesi olarak dinlemek için ekrana çift dokunun.',
                 '3. Adım: WhatsApp Web eşleştirmesi için 15 Saniye Sabit Tutma Sesi düğmesine basıp geri sayım bitene kadar elinizi sabit tutun.'
             ],
             warnings: [
@@ -11000,12 +11896,12 @@
             ]
         },
         'portrait': {
-            title: '4. Bölüm: Özçekim ve Fotoğraf Çekim Yardımcısı',
-            summary: 'Ön veya arka kamerada yüzünüzün kadrajın tam ortasında olup olmadığını ve ışık durumunu seslendirerek düzgün fotoğraf çekmenizi sağlar.',
+            title: '4. Bölüm: Ayna Karşısında Kişisel Bakım, Tıraş ve Görüntülü Görüşme Kadraj Asistanı',
+            summary: 'Ön veya arka kamerada yüzünüzün tam ortalanıp ortalanmadığını, tıraş/sakal simetrisini, saç ve baş üstü kadraj boşluğunu ve görüntülü görüşme (Zoom/WhatsApp) öncesinde arka planınızın nasıl göründüğünü betimler.',
             steps: [
                 '1. Adım: Telefonu yüzünüzün karşısında kol mesafesinde (yaklaşık 40–50 santimetre) dik tutun.',
                 '2. Adım: Uygulamanın başınızı hafif sağa, sola veya aşağı eğmeniz yönündeki sesli komutlarını dinleyerek yüzünüzü ortalayın.',
-                '3. Adım: Hizalama tamamlandığında 3-2-1 sesli geri sayımıyla fotoğraf otomatik olarak çekilir.'
+                '3. Adım: Hizalama tamamlandığında fotoğraf çekilir ve sakal/tıraş simetrisi, saç düzeni ve arka plan raporu seslendirilir.'
             ],
             warnings: [
                 'Arkanızda doğrudan güneş veya güçlü pencere ışığı varsa yüzünüz karanlık (ters ışıkta) çıkabilir; uygulama ters ışık uyarısı verirse yüzünüzü ışığa doğru dönün.'
@@ -11025,10 +11921,10 @@
             ]
         },
         'anomaly_led': {
-            title: '6. Bölüm: Yere Düşen Eşyayı Bulma & Cihaz Işığı Kontrolü',
-            summary: 'Zemine düşen küçük eşyaların (anahtar, bozuk para, kapak) yerini ve modem veya şarj aleti gibi cihazların durum ışıklarının yanıp yanmadığını bildirir.',
+            title: '6. Bölüm: Düşen Eşya (Anahtar/Para/Yüzük/Hap) Saat Yönlü Radarı & Cihaz Işığı Kontrolü',
+            summary: 'Zemine düşen küçük eşyaların (anahtar, bozuk para, yüzük, ilaç hapı) yerini saat yönü ve santimetre mesafesiyle ("Saat 2 yönünde, 30 santimetre ileride") bildirir; ayrıca modem veya şarj aleti durum ışıklarını kontrol eder.',
             steps: [
-                '1. Adım: Yere düşen eşya için telefonu bel hizasından yere doğru yaklaşık 45 derece açıyla tutarak zemini yavaşça sağdan sola tarayın.',
+                '1. Adım: Yere düşen eşya için telefonu bel hizasından yere doğru yaklaşık 45 derece açıyla tutarak zemini yavaşça sağdan sola tarayın; uygulama saat yönünü ve santimetre mesafesini seslendirecektir.',
                 '2. Adım: Cihaz ışığı kontrolü için kamerayı modemin veya şarj aletinin ışık bölümüne bir karış (15 santimetre) mesafeden tutun.'
             ],
             warnings: [
@@ -11037,11 +11933,11 @@
             ]
         },
         'light_meter': {
-            title: '7. Bölüm: Aydınlatma Kontrolü ve Işık Kaynağı Yönlendirici',
-            summary: 'Odadaki lambanın veya pencerenin açık olup olmadığını ve ışık şiddetini yükselen ve alçalan ses tonuyla bildirir.',
+            title: '7. Bölüm: Evden Çıkış Denetimi (Açık Işık, TV ve Kapı/Pencere Kontrolcüsü)',
+            summary: 'Odada telefonu döndürdüğünüzde açık kalan lambayı, televizyon ekranını veya aralık kalmış pencere/balkon kapısı ışık sızıntısını tek seferde raporlar ve ses tonuyla ışık kaynağına yönlendirir.',
             steps: [
-                '1. Adım: Kamerayı başlatıp telefonu odanın tavanına, lambaya veya pencere yönüne doğru yavaşça çevirin.',
-                '2. Adım: Işık kaynağına yaklaştıkça ses sinyalinin tizleştiğini (yükseldiğini), karanlığa döndükçe kalınlaştığını dinleyin.'
+                '1. Adım: Evden çıkmadan veya gece yatmadan önce kamerayı başlatıp olduğunuz yerde telefonu 360 derece yavaşça döndürün.',
+                '2. Adım: Açık kalan tavan lambası, ekran veya aralık kapı/pencere sızıntısını detaylı dinlemek için ekrana çift dokunun veya Boşluk tuşuna basın.'
             ],
             warnings: [
                 'Lambanın açık olup olmadığını kontrol ederken elinizi asla sıcak ampule değdirmeyin; yalnızca uzaktan telefon kamerasıyla kontrol edin.'
@@ -11108,11 +12004,11 @@
             ]
         },
         'food_freshness': {
-            title: '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve SKT Okuyucu',
-            summary: 'Gıda paketlerinin üzerindeki son tüketim tarihini (STT/TETT) ve içindekiler listesindeki alerjen uyarılarını (gluten, laktoz, yer fıstığı, soya vb.) okur.',
+            title: '13. Bölüm: Gıda İçindekiler, Alerjen, SKT ve Market Birim Fiyat Karşılaştırıcı',
+            summary: 'Gıda paketlerinin son tüketim tarihini (STT/TETT) ve alerjen uyarılarını okur; ayrıca market raflarındaki "2 Al 1 Öde" ve gramaj etiketlerini analiz edip gerçek kilogram/litre birim fiyatını hesaplar.',
             steps: [
-                '1. Adım: Gıda paketini bir elinizde tutun, diğer elinizle telefonu paketten yaklaşık bir karış (15–20 santimetre) uzakta tutarak ekrana çift dokunun.',
-                '2. Adım: İçindekiler yazısı paketin arka veya yan yüzündeyse paketi çevirip tekrar çift dokunarak okutun.'
+                '1. Adım: Gıda paketini veya market raf etiketini yaklaşık bir karış (15–20 santimetre) uzakta tutarak ekrana çift dokunun.',
+                '2. Adım: İçindekiler yazısı paketin arka yüzündeyse paketi çevirip tekrar çift dokunarak okutun; raf etiketlerinde gerçek kilogram/litre fiyatını dinleyin.'
             ],
             warnings: [
                 'Gıda ve Alerji Uyarısı: Paketi açılmış, şişmiş, kokusu değişmiş veya tarihi silinmiş gıdaları tüketmeyin. Ciddi gıda alerjiniz varsa ambalaj kıvrımları nedeniyle okunamayan kısımlar olabileceğini unutmayın ve şüphede kaldığınız ürünü tüketmeyin.'
@@ -11141,25 +12037,25 @@
             ]
         },
         'pos_iban_reader': {
-            title: '16. Bölüm: POS Cihazı Tutarı Doğrulayıcı ve IBAN Kopyalayıcı',
-            summary: 'Ödeme yapmadan önce POS cihazı ekranında yazan çekilecek TL tutarını seslendirir ve kağıt veya ekran üzerindeki 26 haneli TR IBAN numarasını doğrulayıp panoya kopyalar.',
+            title: '16. Bölüm: POS Cihazı, Dokunmatik Kiosk / Sıra Alma Rehberi ve IBAN Kopyalayıcı',
+            summary: 'Ödeme yapmadan önce POS cihazı ekranında yazan çekilecek TL tutarını okur, düz cam dokunmatik sıra alma/kiosk ekranlarındaki bölümlerin ekran konumunu (Üst, Orta, Sol Alt, Sağ Alt) tarif eder ve 26 haneli TR IBAN numarasını panoya kopyalar.',
             steps: [
-                '1. Adım: Kartınızı POS cihazına yaklaştırmadan önce telefonu POS ekranının bir karış (15 santimetre) üzerine tutup POS Tutarını ve IBAN\'ı Şimdi Oku düğmesine basın.',
-                '2. Adım: Uygulama ekrandaki tutarı okuduğunda kasadaki görevlinin söylediği tutarla aynı olup olmadığını kontrol edin.'
+                '1. Adım: Kartınızı POS cihazına yaklaştırmadan önce telefonu POS ekranının bir karış (15 santimetre) üzerine tutup POS Tutarını, Kiosk Ekranını ve IBAN\'ı Oku düğmesine basın.',
+                '2. Adım: Hastane veya kurum sıra alma kiosklarında Dokunmatik Kiosk / Sıra Alma Bölümlerini Yönlendir düğmesine basarak hangi bölümün ekranın neresinde olduğunu dinleyin.'
             ],
             warnings: [
                 'Ödeme Güvenliği Uyarısı: POS ekranı ışıktan parlıyorsa veya tutar net okunamadıysa kartınızı okutmayın; cihazı hafif eğerek tekrar okutun. İşlem sırasında kamerayı tuş takımına tutmayın.'
             ]
         },
         'item_memory': {
-            title: '17. Bölüm: Sesli Eşya Konum Kaydı ve Kavanoz Etiketleyici',
-            summary: 'Evde nereye koyduğunuzu unutmamak için eşyalarınızın yerini sesli kaydeder; sorduğunuzda hangi çekmecede veya rafta olduğunu söyler ve kavanozları etiketler.',
+            title: '17. Bölüm: Kişiselleştirilmiş Kendi Eşyamı Bul ve Tanı (Görsel Kavanoz & Derin Dondurucu Hafızası)',
+            summary: 'Birbirinin aynısı olan kavanozları veya derin dondurucu poşetlerini kamerayla gösterip kendi notunuzla görsel hafızaya kaydeder; tekrar kameraya tuttuğunuzda içinde ne olduğunu (tuz, şeker, kuru fasulye vb.) tanır ve eşyalarınızın evdeki yerini hatırlatır.',
             steps: [
-                '1. Adım: Bir eşyayı kaldırdığınızda Sesle Eşya Yeri Kaydet düğmesine basıp örneğin "Yedek anahtarı koridordaki üst çekmeceye koydum" deyin.',
-                '2. Adım: Aradığınızda Sesle Eşya Yeri Sor düğmesine basıp "Yedek anahtar nerede?" diye sorun.'
+                '1. Adım: Bir kavanozu veya poşeti kaydetmek için kutuya adını yazın (veya sesle söyleyin) ve Kameradaki Kavanozu / Poşeti Görsel Hafızaya Kaydet düğmesine basın.',
+                '2. Adım: Daha sonra kavanozun içinde ne olduğunu öğrenmek için kameraya tutup Kameradaki Kavanozu / Poşeti Şimdi Tanı düğmesine basın.'
             ],
             warnings: [
-                'Eşyanın yerini değiştirdiğinizde eski kaydın sizi yanıltmaması için yeni yerini tekrar sesli olarak kaydedin.'
+                'Eşyanın yerini veya kavanozun içindeki malzemeyi değiştirdiğinizde eski kaydın sizi yanıltmaması için yeni içeriği tekrar kaydedin.'
             ]
         },
         'tv_subtitle_score': {
@@ -11174,14 +12070,14 @@
             ]
         },
         'sock_outfit_check': {
-            title: '19. Bölüm: Çorap Eşleştirici, Kıyafet Uyumu ve Leke Kontrolü',
-            summary: 'İki çorabın aynı çift olup olmadığını, alt-üst kıyafetlerinizin renk uyumunu ve kumaş üzerinde belirgin bir leke bulunup bulunmadığını bildirir.',
+            title: '19. Bölüm: Kıyafet Kombin, Leke, Ters/Düz (Dikiş/Etiket) ve Renkli Çamaşır Ayıklama Asistanı',
+            summary: 'İki çorabın aynı çift olup olmadığını, kıyafet üzerinde leke bulunup bulunmadığını, kıyafetin ters mi düz mü giyildiğini (dikiş/iç etiket kontrolü) ve çamaşır makinesine atmadan önce kıyafetlerin Beyaz, Koyu veya Canlı Renk (Boyayabilir) grubunu bildirir.',
             steps: [
-                '1. Adım: İki çorabı düz bir zemine birbirine değmeden yan yana (aralarında 3–4 parmak boşluk bırakarak) koyun.',
-                '2. Adım: Telefonu yaklaşık bir buçuk karış (25 santimetre) yukarıdan tutup İki Çorabı Karşılaştır düğmesine basın; leke kontrolü için kıyafeti düz serip Kıyafet Uyumu & Leke Kontrolü düğmesine basın.'
+                '1. Adım: İki çorabı yan yana koyup İki Çorabı Karşılaştır düğmesine; leke ve kombin için Kıyafet Uyumu & Leke Kontrolü düğmesine; ters/düz kontrolü için Kıyafet Ters mi Düz mü düğmesine basın.',
+                '2. Adım: Çamaşır ayıklarken Seri Renkli Çamaşır Ayıklama düğmesini açın ve hiç tuşa basmadan kıyafetleri tek tek kameranın önünden geçirerek sesli uyarıları dinleyin.'
             ],
             warnings: [
-                'Koyu lacivert ile siyah çorapların doğru ayırt edilebilmesi için ölçümü aydınlık bir odada veya telefon feneri açıkken yapın.'
+                'Koyu lacivert ile siyah kumaşların doğru ayırt edilebilmesi için ölçümü aydınlık bir odada veya telefon feneri açıkken yapın.'
             ]
         },
         'where_am_i': {
@@ -11392,6 +12288,15 @@
                 degBtn.classList.remove('active-toggle');
                 degBtn.setAttribute('aria-pressed', 'false');
                 degBtn.textContent = '▶️ Canlı Derece Takibini Başlat (Tuşa Bastıkça Söyler)';
+            }
+        }
+        if (prevMode === 'sock_outfit_check' && newMode !== 'sock_outfit_check' && state.laundrySortLiveActive) {
+            state.laundrySortLiveActive = false;
+            const lBtn = document.getElementById('btn-laundry-sort-toggle');
+            if (lBtn) {
+                lBtn.classList.remove('active-toggle');
+                lBtn.setAttribute('aria-pressed', 'false');
+                lBtn.textContent = '🧺 Seri Renkli Çamaşır Ayıklama: Kapalı';
             }
         }
         if (prevMode === 'song_finder' && newMode !== 'song_finder') {
@@ -11807,9 +12712,11 @@
     const btnPosScanNow = document.getElementById('btn-pos-scan-now');
     const btnCopyIban = document.getElementById('btn-copy-iban');
     const btnSpeakPosAmount = document.getElementById('btn-speak-pos-amount');
+    const btnKioskTouchGuide = document.getElementById('btn-kiosk-touch-guide');
     if (btnPosScanNow) btnPosScanNow.addEventListener('click', () => captureAndDescribePhoto(false));
     if (btnCopyIban) btnCopyIban.addEventListener('click', copyDetectedIbanToClipboard);
     if (btnSpeakPosAmount) btnSpeakPosAmount.addEventListener('click', speakDetectedPosAmount);
+    if (btnKioskTouchGuide) btnKioskTouchGuide.addEventListener('click', speakTouchscreenKioskGuideNow);
 
     const memoryNoteInput = document.getElementById('memory-note-input');
     const btnMemorySaveText = document.getElementById('btn-memory-save-text');
@@ -11819,6 +12726,7 @@
     const btnMemoryReadAll = document.getElementById('btn-memory-read-all');
     const btnMemoryDeleteLast = document.getElementById('btn-memory-delete-last');
     const btnMemoryTagJar = document.getElementById('btn-memory-tag-jar');
+    const btnMemoryRecognizeJar = document.getElementById('btn-memory-recognize-jar');
 
     if (btnMemorySaveText && memoryNoteInput) {
         btnMemorySaveText.addEventListener('click', () => saveItemMemoryEntry(memoryNoteInput.value));
@@ -11843,6 +12751,7 @@
     if (btnMemoryReadAll) btnMemoryReadAll.addEventListener('click', speakAllSavedItemMemories);
     if (btnMemoryDeleteLast) btnMemoryDeleteLast.addEventListener('click', deleteLastItemMemoryEntry);
     if (btnMemoryTagJar) btnMemoryTagJar.addEventListener('click', tagVisibleJarInCamera);
+    if (btnMemoryRecognizeJar) btnMemoryRecognizeJar.addEventListener('click', recognizeVisibleJarFromMemory);
 
     const btnTvAutoToggle = document.getElementById('btn-tv-auto-toggle');
     const btnTvReadNow = document.getElementById('btn-tv-read-now');
@@ -11895,6 +12804,8 @@
 
     const btnSockCompare = document.getElementById('btn-sock-compare');
     const btnOutfitStain = document.getElementById('btn-outfit-stain');
+    const btnOutfitInsideOut = document.getElementById('btn-outfit-inside-out');
+    const btnLaundrySortToggle = document.getElementById('btn-laundry-sort-toggle');
     if (btnSockCompare) {
         btnSockCompare.addEventListener('click', () => {
             state.sockSubMode = 'sock';
@@ -11907,6 +12818,23 @@
             captureAndDescribePhoto(false);
         });
     }
+    if (btnOutfitInsideOut) {
+        btnOutfitInsideOut.addEventListener('click', () => {
+            state.sockSubMode = 'inside_out';
+            captureAndDescribePhoto(false);
+        });
+    }
+    if (btnLaundrySortToggle) {
+        btnLaundrySortToggle.addEventListener('click', toggleLaundrySortingLiveMode);
+    }
+
+    window.receiveAccessibilityScreenRescueFromAndroid = function (dataUrl, layoutHint) {
+        if (!dataUrl || typeof dataUrl !== 'string') return;
+        if (layoutHint) {
+            announceGuidance(`Erişilemeyen Uygulama Ekran Kurtarıcısı analiz ediyor: ${layoutHint}`, { force: true, bannerState: 'centered' });
+        }
+        loadImageDataUrlAndAnalyze(dataUrl, 'Erişilemeyen Uygulama Ekran Kurtarıcısı');
+    };
 
     const btnWhereAmINow = document.getElementById('btn-where-am-i-now');
     const btnWhereWhatsapp = document.getElementById('btn-where-whatsapp');

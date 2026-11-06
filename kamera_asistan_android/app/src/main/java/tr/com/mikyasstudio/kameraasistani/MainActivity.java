@@ -478,6 +478,27 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         attemptDeliverSharedMedia(12);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        deliverPendingAccessibilityRescueScreen();
+    }
+
+    private void deliverPendingAccessibilityRescueScreen() {
+        final String rescueDataUrl = MikyasOverlayAccessibilityService.latestCapturedScreenDataUrl;
+        final String rescueSummary = MikyasOverlayAccessibilityService.latestCapturedScreenSummary;
+        if (rescueDataUrl == null || webView == null) return;
+        MikyasOverlayAccessibilityService.latestCapturedScreenDataUrl = null;
+        MikyasOverlayAccessibilityService.latestCapturedScreenSummary = null;
+
+        webView.postDelayed(() -> {
+            if (webView == null) return;
+            String safeSummary = (rescueSummary != null ? rescueSummary : "").replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+            String js = "if (typeof window.receiveAccessibilityScreenRescueFromAndroid === 'function') { window.receiveAccessibilityScreenRescueFromAndroid('" + rescueDataUrl + "', '" + safeSummary + "'); }";
+            webView.evaluateJavascript(js, null);
+        }, 400);
+    }
+
     private void attemptDeliverSharedMedia(final int retriesLeft) {
         if (webView == null || retriesLeft <= 0) return;
         if (pendingSharedImageDataUrl == null && pendingSharedVideoJsCall == null) return;
