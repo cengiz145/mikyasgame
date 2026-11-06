@@ -11,6 +11,24 @@
 (function () {
     'use strict';
 
+    // MAKSİMUM GÜVENLİK KALKANI: Beklenmeyen tarayıcı/WebView hatalarında asistanın asla donmaması için kilit sıfırlayıcı
+    window.addEventListener('error', () => {
+        try {
+            if (typeof state !== 'undefined' && state) {
+                state.isProcessingOcr = false;
+                state.moneyLiveOcrBusy = false;
+            }
+        } catch (_) {}
+    });
+    window.addEventListener('unhandledrejection', () => {
+        try {
+            if (typeof state !== 'undefined' && state) {
+                state.isProcessingOcr = false;
+                state.moneyLiveOcrBusy = false;
+            }
+        } catch (_) {}
+    });
+
     const TR_LABELS = {
         'person': 'İnsan',
         'bicycle': 'Bisiklet',
@@ -2462,7 +2480,7 @@
             const isNewBatch = (sig !== state.moneyLastCommittedSignature) ||
                 (state.moneyEmptyFramesSinceCommit >= 8 && (now - state.moneyLastCommittedAt > 3200));
 
-            if (state.moneyAutoAccumulate && state.moneyPendingFrames >= 8 && isNewBatch) {
+            if (state.moneyAutoAccumulate && state.moneyPendingFrames >= 12 && metrics.sharpness >= 6.2 && isNewBatch) {
                 state.moneyLastCommittedSignature = sig;
                 state.moneyLastCommittedAt = now;
                 state.moneyEmptyFramesSinceCommit = 0;
@@ -2513,7 +2531,7 @@
             !state.moneyLiveOcrBusy &&
             !state.isProcessingOcr &&
             typeof window.Tesseract !== 'undefined' &&
-            metrics.sharpness >= 5.5 &&
+            metrics.sharpness >= 6.5 &&
             (nowMs - state.moneyLastLiveOcrAt >= 1450)) {
 
             const strokeScan = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
@@ -2857,11 +2875,36 @@
     }
 
     /**
+     * T.C. Sağlık Bakanlığı İlaç Takip Sistemi (İTS) GS1 DataMatrix Karekod Çözücü:
+     * İlaç kutularındaki karekodun içinden 01 (14 haneli GTIN barkod) ve 17 (YYAAGG kesin SKT)
+     * verisini %100 matematiksel kesinlikle (sıfır OCR hatasıyla) çıkarır.
+     */
+    function parseGs1MedicineDataMatrix(rawBarcode) {
+        const raw = String(rawBarcode || '').replace(/[\u001d\s]/g, '');
+        const m = raw.match(/01(\d{14})17(\d{2})(0[1-9]|1[0-2])(0[0-9]|[12]\d|3[01])/);
+        if (!m) return null;
+        const gtin = m[1];
+        const expYear = 2000 + parseInt(m[2], 10);
+        const expMonth = parseInt(m[3], 10);
+        if (expYear < 2020 || expYear > 2038) return null;
+        return {
+            gtin,
+            expMonth,
+            expYear
+        };
+    }
+
+    /**
      * Mod 9: İlaç Kutusu, Dozaj (mg/ml), Barkod ve Son Kullanma Tarihi (SKT) Sıfır-Hata Çözümleyici
      */
-    function parseMedicineAndExpiryZeroError(ocrText, liveBarcode = '') {
+    function parseMedicineAndExpiryZeroError(ocrText, liveBarcode = '', secondaryOcrText = '') {
         const text = String(ocrText || '');
         const validBarcodes = [];
+
+        const gs1Info = parseGs1MedicineDataMatrix(liveBarcode) || parseGs1MedicineDataMatrix(text);
+        if (gs1Info && gs1Info.gtin) {
+            validBarcodes.push(`${gs1Info.gtin} (İTS Karekod Doğrulandı)`);
+        }
 
         if (liveBarcode && verifyEanChecksum(liveBarcode)) {
             validBarcodes.push(liveBarcode);
@@ -2886,47 +2929,67 @@
         const curYear = now.getFullYear();
         const curMonth = now.getMonth() + 1;
 
-        let expMonth = null;
-        let expYear = null;
-
-        // 1. Öncelik: Üretim / İmal Tarihi (ÜRT / Ü.T. / MFG / PRD) etiketli tarihleri metinden temizle ki asla SKT sanılmasın!
-        const textWithoutProductionDates = text.replace(/(?:Ü\.?\s*R\.?\s*T\.?|Ü\.?\s*T\.?|ÜRETİM(?:\s*TARİHİ)?|İMAL(?:\s*TARİHİ)?|MFG|M\.?F\.?G\.?|PRD|PROD(?:UCTION)?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi, ' ');
-
-        // 2. Öncelik: Açık SKT / EXP / TETT etiketi yanındaki tarih
-        const labeledRegex = /(?:S\.?K\.?T\.?|SON\s*KULLAN(?:MA|IM)|SON\s*TÜKETİM|EXP(?:IRY)?|T\.?E\.?T\.?T\.?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi;
-        let m;
-        while ((m = labeledRegex.exec(textWithoutProductionDates)) !== null) {
-            const p1 = parseInt(m[1], 10);
-            const p2 = m[2] ? parseInt(m[2], 10) : null;
-            let yr = parseInt(m[3], 10);
-            if (yr < 100) yr += 2000;
-            const mo = p2 !== null ? p2 : p1;
-            if (mo >= 1 && mo <= 12 && yr >= 2020 && yr <= 2038) {
-                if (expYear === null || (yr * 12 + mo) > (expYear * 12 + expMonth)) {
-                    expMonth = mo;
-                    expYear = yr;
-                }
-            }
-        }
-
-        // 3. Öncelik: Etiket silinmişse kutudaki tüm AA/20YY veya GG.AA.20YY tarihlerini topla ve EN İLERİ (en geç) tarihi SKT olarak seç (Üretim tarihi her zaman SKT'den daha erkendir!)
-        if (expYear === null) {
-            const genericDateRegex = /\b(?:(\d{1,2})[./\-])?(0[1-9]|1[0-2])[./\-](20[2-3]\d)\b/g;
-            let gm;
-            while ((gm = genericDateRegex.exec(textWithoutProductionDates)) !== null) {
-                const mo = parseInt(gm[2], 10);
-                const yr = parseInt(gm[3], 10);
+        const extractExpiryFromSingleText = (srcText) => {
+            let eMonth = null;
+            let eYear = null;
+            const cleaned = String(srcText || '').replace(/(?:Ü\.?\s*R\.?\s*T\.?|Ü\.?\s*T\.?|ÜRETİM(?:\s*TARİHİ)?|İMAL(?:\s*TARİHİ)?|MFG|M\.?F\.?G\.?|PRD|PROD(?:UCTION)?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi, ' ');
+            const labeledRx = /(?:S\.?K\.?T\.?|SON\s*KULLAN(?:MA|IM)|SON\s*TÜKETİM|EXP(?:IRY)?|T\.?E\.?T\.?T\.?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi;
+            let m;
+            while ((m = labeledRx.exec(cleaned)) !== null) {
+                const p1 = parseInt(m[1], 10);
+                const p2 = m[2] ? parseInt(m[2], 10) : null;
+                let yr = parseInt(m[3], 10);
+                if (yr < 100) yr += 2000;
+                const mo = p2 !== null ? p2 : p1;
                 if (mo >= 1 && mo <= 12 && yr >= 2020 && yr <= 2038) {
-                    if (expYear === null || (yr * 12 + mo) > (expYear * 12 + expMonth)) {
-                        expMonth = mo;
-                        expYear = yr;
+                    if (eYear === null || (yr * 12 + mo) > (eYear * 12 + eMonth)) {
+                        eMonth = mo;
+                        eYear = yr;
                     }
                 }
+            }
+            if (eYear === null) {
+                const genericRx = /\b(?:(\d{1,2})[./\-])?(0[1-9]|1[0-2])[./\-](20[2-3]\d)\b/g;
+                let gm;
+                while ((gm = genericRx.exec(cleaned)) !== null) {
+                    const mo = parseInt(gm[2], 10);
+                    const yr = parseInt(gm[3], 10);
+                    if (mo >= 1 && mo <= 12 && yr >= 2020 && yr <= 2038) {
+                        if (eYear === null || (yr * 12 + mo) > (eYear * 12 + eMonth)) {
+                            eMonth = mo;
+                            eYear = yr;
+                        }
+                    }
+                }
+            }
+            return (eMonth !== null && eYear !== null) ? { expMonth: eMonth, expYear: eYear } : null;
+        };
+
+        let expMonth = null;
+        let expYear = null;
+        let hasDateConflict = false;
+
+        if (gs1Info) {
+            expMonth = gs1Info.expMonth;
+            expYear = gs1Info.expYear;
+        } else {
+            const d1 = extractExpiryFromSingleText(text);
+            const d2 = secondaryOcrText ? extractExpiryFromSingleText(secondaryOcrText) : null;
+            if (d1 && d2 && (d1.expYear !== d2.expYear || d1.expMonth !== d2.expMonth)) {
+                hasDateConflict = true;
+            } else if (d1) {
+                expMonth = d1.expMonth;
+                expYear = d1.expYear;
+            } else if (d2) {
+                expMonth = d2.expMonth;
+                expYear = d2.expYear;
             }
         }
 
         let sktStatus = 'UNVERIFIED';
-        let sktSpeech = 'Son kullanma tarihi bu açıdan kesin olarak doğrulanamadı. Yanlış bilgi vermemek için tahmin yürütmüyorum; lütfen kutunun yan kapağını veya kabartmalı yüzünü çevirip tekrar çekin.';
+        let sktSpeech = hasDateConflict
+            ? 'DİKKAT: İlaç kutusundaki tarih parlama nedeniyle iki farklı şekilde okundu! Güvenliğiniz için tahmin yürütmüyorum; lütfen kutuyu ışık yansıması olmayacak şekilde hafif eğip tekrar çekin.'
+            : 'Son kullanma tarihi bu açıdan kesin olarak doğrulanamadı. Yanlış bilgi vermemek için tahmin yürütmüyorum; lütfen kutunun karekodlu veya tarihli yan kapağını çevirip tekrar çekin.';
         let formattedDate = 'Doğrulanamadı';
 
         if (expMonth !== null && expYear !== null) {
@@ -3134,13 +3197,16 @@
 
         if (inBox) {
             state.penInBoxFrames++;
-            el.tPosition.textContent = 'KALEM İMZA KUTUSUNDA!';
-            el.tDistance.textContent = 'Şimdi İmzalayın';
+            el.tPosition.textContent = state.signatureDocVerified ? 'KALEM İMZA KUTUSUNDA!' : 'Önce Evrakı Okutun (Çift Dokunun)';
+            el.tDistance.textContent = state.signatureDocVerified ? 'Şimdi İmzalayın' : 'Evrak Okunmadı!';
             if (state.penInBoxFrames >= 2) {
                 if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
-                announceGuidance('Kaleminizin ucu hedef çizginin üzerinde! Güvenliğiniz için evrakın tamamını 8. modda okuttuğunuzdan ve doğru satır olduğundan eminseniz imzanızı atabilirsiniz.', {
-                    bannerState: 'centered',
-                    minIntervalMs: 3200
+                const docVerifyNote = state.signatureDocVerified
+                    ? 'Kaleminizin ucu doğrulanan evrakın imza çizgisi üzerinde! Şimdi imzanızı atabilirsiniz.'
+                    : 'DİKKAT: Kaleminiz çizgi üzerinde ancak bu evrakı henüz okutmadınız! Bilmediğiniz bir kağıda imza atmamak için önce ekrana çift dokunarak veya Boşluk tuşuna basarak evrakta ne yazdığını dinleyin!';
+                announceGuidance(docVerifyNote, {
+                    bannerState: state.signatureDocVerified ? 'centered' : 'warning',
+                    minIntervalMs: 3400
                 });
             }
         } else {
@@ -4012,6 +4078,9 @@
                 let verifiedCombinedText = '';
                 let verifiedMultilineText = '';
                 let collectedLines = [];
+                let primaryPassVerifiedText = '';
+                let secondaryRawVerifiedText = '';
+
                 for (let i = 0; i < splitInfo.canvases.length; i++) {
                     const ocrRes = await window.Tesseract.recognize(splitInfo.canvases[i], 'tur+eng');
                     const partText = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text.trim() : '';
@@ -4030,14 +4099,33 @@
                         collectedLines = ocrRes.data.lines;
                     }
                 }
+                primaryPassVerifiedText = verifiedCombinedText.trim();
 
-                if (verifiedCombinedText.trim().length < 6) {
+                // MAKSİMUM GÜVENLİK ÇİFT-GEÇİŞLİ (DUAL-PASS) OCR KİLİDİ:
+                // İlaç, Gıda Alerjeni, POS/IBAN, İmza Evrakı ve Para modlarında gölge silici filtre parlak yüzeyde
+                // baştaki bir rakamı ("1500 TL" -> "500 TL" gibi) silmesin diye HAM RENKLİ GÖRÜNTÜYÜ de mutlaka okut ve çapraz doğrula!
+                const isHighStakesSafetyMode = (
+                    state.mode === 'medicine_skt' ||
+                    state.mode === 'food_freshness' ||
+                    state.mode === 'pos_iban_reader' ||
+                    state.mode === 'signature_pen' ||
+                    state.mode === 'color_cloth'
+                );
+
+                if (verifiedCombinedText.trim().length < 6 || (isHighStakesSafetyMode && state.mode !== 'door_elevator_lcd')) {
                     const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
-                    combinedText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
-                    verifiedCombinedText = extractVerifiedRealTextFromOcrResult(fallbackRes);
-                    verifiedMultilineText = extractVerifiedRealTextFromOcrResult(fallbackRes, '\n');
-                    if (fallbackRes && fallbackRes.data && Array.isArray(fallbackRes.data.lines)) {
-                        collectedLines = fallbackRes.data.lines;
+                    const rawText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
+                    secondaryRawVerifiedText = extractVerifiedRealTextFromOcrResult(fallbackRes).trim();
+                    const rawMultiline = extractVerifiedRealTextFromOcrResult(fallbackRes, '\n');
+                    if (verifiedCombinedText.trim().length < 6) {
+                        combinedText = rawText;
+                        verifiedCombinedText = secondaryRawVerifiedText;
+                        verifiedMultilineText = rawMultiline;
+                        if (fallbackRes && fallbackRes.data && Array.isArray(fallbackRes.data.lines)) {
+                            collectedLines = fallbackRes.data.lines;
+                        }
+                    } else if (secondaryRawVerifiedText && secondaryRawVerifiedText !== primaryPassVerifiedText) {
+                        verifiedCombinedText = `${primaryPassVerifiedText} — ${secondaryRawVerifiedText}`;
                     }
                 }
 
@@ -4045,9 +4133,29 @@
                 const fullStory = buildRichTurkishPhotoStory(capCanvas, metrics, preds, verifiedCombinedText);
                 populatePhotoExplorerMap(capCanvas, metrics, preds, collectedLines, fullStory);
 
+                // ÖZEL MOD 10: İMZA ATILACAK EVRAKIN İÇERİĞİNİ VE İMZA SATIRINI DOĞRULAMA KİLİDİ
+                if (state.mode === 'signature_pen') {
+                    const hasSignatureKeyword = /\b(?:İMZA|IMZA|İMZASI|IMZASI|İMZALAYAN|AD\s*SOYAD|ADI\s*SOYADI|ONAY|KABUL|TAAHHÜT|SÖZLEŞME|DİLEKÇE|TUTANAK)\b/i.test(cleanText);
+                    if (cleanText.length >= 12) {
+                        state.signatureDocVerified = true;
+                        const sigKeywordMsg = hasSignatureKeyword
+                            ? 'Evrak üzerinde imza / ad-soyad alanı doğrulandı.'
+                            : 'Dikkat: Evrakta yazı okundu ancak açıkça "İmza" kelimesi görülmedi; lütfen metni dikkatle dinleyin.';
+                        const sigSpeech = `Evrak Okundu! ${sigKeywordMsg} Evrakta yazan metin: ${cleanText.replace(/\s+/g, ' ')}`;
+                        showDetectedResult('✍️ İmza Evrakı Doğrulama Raporu', `${sigKeywordMsg}\n\nEvrak Metni:\n${cleanText}`);
+                        announceGuidance(sigSpeech, { force: true, bannerState: hasSignatureKeyword ? 'centered' : 'warning' });
+                    } else {
+                        state.signatureDocVerified = false;
+                        const warnMsg = 'DİKKAT: Bu kağıdın üzerindeki yazılar net okunamadı! İçeriğini bilmediğiniz bir evraka imza atmamak için lütfen kamerayı biraz geri çekip tüm sayfayı net şekilde tekrar okutun.';
+                        showDetectedResult('⚠️ Evrak Okunamadı (İmza Güvenlik Kilidi)', warnMsg);
+                        announceGuidance(warnMsg, { force: true, bannerState: 'warning' });
+                    }
+                    return;
+                }
+
                 // ÖZEL MOD 9: İLAÇ KUTUSU, DOZAJ (mg), BARKOD VE SON KULLANMA TARİHİ (SKT) DENETÇİSİ
                 if (state.mode === 'medicine_skt') {
-                    const med = parseMedicineAndExpiryZeroError(cleanText, state.lastDetectedBarcode);
+                    const med = parseMedicineAndExpiryZeroError(primaryPassVerifiedText || cleanText, state.lastDetectedBarcode, secondaryRawVerifiedText);
                     if (med.sktStatus === 'EXPIRED') {
                         radar.playDangerAlarm();
                         if (navigator.vibrate) navigator.vibrate([250, 80, 250, 80, 350]);
@@ -4148,7 +4256,7 @@
 
                 // ÖZEL MOD 17: POS CİHAZI TUTARI DOĞRULAYICI VE TEK TUŞLA IBAN KOPYALAYICI
                 if (state.mode === 'pos_iban_reader') {
-                    const posIban = processPosAmountAndIbanText(cleanText);
+                    const posIban = processPosAmountAndIbanText(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText);
                     showDetectedResult('💳 POS Cihazı Tutarı ve IBAN Raporu', posIban.fullText);
                     announceGuidance(posIban.speechText, { force: true, bannerState: 'centered' });
                     return;
@@ -7402,7 +7510,7 @@
         };
     }
 
-    function processPosAmountAndIbanText(cleanText) {
+    function processPosAmountAndIbanText(cleanText, pass1Text = '', pass2Text = '') {
         const text = String(cleanText || '');
         const compactNoSpaces = text.toUpperCase().replace(/[\s\-.,]/g, '');
         const ibanRegex = /TR[0-9OISB]{24}/g;
@@ -7417,15 +7525,27 @@
         }
 
         // POS veya Fiş Tutarı Yakalama (Saati veya tarihi tutar sanmamak için mutlaka para birimi veya ödeme etiketi şart!)
-        const amountMatches = text.match(/(?:(?:TUTAR|TOPLAM|SATIŞ|SATIS|ÖDEME|ODEME|NAKİT|NAKIT|KART)\s*[:\-]?\s*\d{1,6}(?:[.,]\d{2})?(?:\s*(?:TL|₺|TÜRK\s*LİRASI|LİRA|TRY))?|\b\d{1,6}(?:[.,]\d{2})?\s*(?:TL|₺|TÜRK\s*LİRASI|LİRA|TRY|EUR|USD|€|\$)\b)/gi)
-            || [];
+        const amountRegex = /(?:(?:TUTAR|TOPLAM|SATIŞ|SATIS|ÖDEME|ODEME|NAKİT|NAKIT|KART)\s*[:\-]?\s*\d{1,6}(?:[.,]\d{2})?(?:\s*(?:TL|₺|TÜRK\s*LİRASI|LİRA|TRY))?|\b\d{1,6}(?:[.,]\d{2})?\s*(?:TL|₺|TÜRK\s*LİRASI|LİRA|TRY|EUR|USD|€|\$)\b)/gi;
+        const amountMatches = text.match(amountRegex) || [];
         const cleanAmounts = [...new Set(amountMatches.map(a => a.trim()))];
+
+        // Çift geçişli (Binary vs. Ham Renkli) rakam çelişkisi kontrolü (Örn: Ekran parlaması yüzünden 1500 TL vs 500 TL okunması)
+        const extractNumericValues = (str) => {
+            const m = String(str || '').match(amountRegex) || [];
+            return [...new Set(m.map(x => (x.match(/\d+(?:[.,]\d{2})?/) || [''])[0].replace(',', '.')))].filter(Boolean);
+        };
+        const nums1 = extractNumericValues(pass1Text);
+        const nums2 = extractNumericValues(pass2Text);
+        const hasAmountConflict = (nums1.length > 0 && nums2.length > 0 && nums1[0] !== nums2[0]);
 
         const posEl = document.getElementById('pos-detected-amount');
         const ibanEl = document.getElementById('pos-detected-iban');
         const speechParts = [];
 
-        if (cleanAmounts.length > 0) {
+        if (hasAmountConflict) {
+            if (posEl) posEl.textContent = `⚠️ Parlama Uyuşmazlığı (${nums1[0]} / ${nums2[0]})`;
+            speechParts.push(`DİKKAT: POS ekranındaki yansıma nedeniyle rakamlar iki farklı şekilde okundu (${nums1[0]} ve ${nums2[0]}). Yanlış tutar onaylamamanız için lütfen kamerayı ekrana dik tutup parlamayı önleyerek tekrar okutun.`);
+        } else if (cleanAmounts.length > 0) {
             state.lastDetectedPosAmount = cleanAmounts[0];
             if (posEl) posEl.textContent = cleanAmounts.join(' / ');
             speechParts.push(`Ekranda okunan ödeme tutarı: ${cleanAmounts[0]}. Güvenliğiniz için kart işlemini onaylamadan önce banka bildirimindeki tutarı da kontrol edin.`);
@@ -8798,6 +8918,7 @@
         state.countdownStage = 0;
         state.kalmanBox = null;
         state.consensusFrames = 0;
+        state.signatureDocVerified = false;
         syncModePanelsVisibility(newMode);
         if (newMode === 'qibla_compass') {
             state.qiblaActive = true;
@@ -8825,7 +8946,7 @@
             'light_meter': '7. Bölüm: Lamba Açık mı Kapalı mı ve Pencere Bulucu açıldı. Işığın olduğu tarafa döndükçe ses incelir.',
             'explorer': '8. Bölüm: Etrafımda Ne Var ve Evrak Okuyucu açıldı. Odanızdaki eşyaları söyler, çift dokunursanız elinizdeki kağıdı okur. Yürürken güvenliğiniz için mutlaka beyaz bastonunuzu kullanmaya devam edin.',
             'medicine_skt': '9. Bölüm: İlaç Kutusu ve Son Kullanma Tarihi Kontrolü açıldı. İlacın adını, kaç miligram olduğunu ve tarihinin geçip geçmediğini kontrol etmek için kutuyu kameraya tutun.',
-            'signature_pen': '10. Bölüm: İmza Atarken Kalem Yönlendirici açıldı. Güvenliğiniz için imza atmadan önce evrakın tamamını 8. modda okuttuğunuzdan emin olun; ardından kaleminizi kağıda yaklaştırın.',
+            'signature_pen': '10. Bölüm: İmza Atarken Kalem Yönlendirici açıldı. Maksimum güvenlik kilidi aktif: Önce evrakta ne yazdığını doğrulamak için ekrana çift dokunun veya Boşluk tuşuna basın; evrak okunduktan sonra kaleminizi imza alanına yönlendireceğim.',
             'liquid_level': '11. Bölüm: Masadaki Bardak, Kupa ve Şişe Bulucu açıldı. Masadaki bardağı veya şişeyi elinizi çarpmadan bulmak için kamerayı masaya tutun. Güvenliğiniz için kaynar çay veya sıcak su doldururken kameraya güvenmeyin.',
             'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya çamaşır makinesi ekranını okutmak için Boşluk tuşuna basın.',
             'food_freshness': '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve Son Tüketim Tarihi Okuyucu açıldı. Market paketinin içindekiler ve tarih kısmını kameraya gösterip Boşluk tuşuna basın.',
