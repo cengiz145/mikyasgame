@@ -10,8 +10,8 @@ android {
         applicationId "tr.com.mikyasstudio.erisilebilirkamera"
         minSdk 24
         targetSdk 36
-        versionCode 49
-        versionName "48.1.0"
+        versionCode 50
+        versionName "48.2.0"
     }
 
     signingConfigs {

@@ -1,7 +1,7 @@
 {
   "name": "Erişilebilir Kamera Uygulaması",
   "short_name": "Erişilebilir Kamera",
-  "description": "Görme engelliler için Sesli Kamera, Sınav ve Belge Okuyucu, Sesli Kıble ve Namaz Vakti Rehberi, Madeni ve Kağıt Para Sayacı, Müzik Tanıma ve 22 Günlük Yaşam Asistanı.",
+  "description": "Görme engelliler için Sesli Kamera, Sınav ve Belge Okuyucu, Sesli Kıble ve Namaz Vakti Rehberi, Cihazlara Sinyal Göndermeden Yalnızca Kamerayla Ekran Okuyup Yol Gösteren Derece ve Elle Ayarlama Rehberi, Madeni ve Kağıt Para Sayacı, Müzik Tanıma ve 22 Günlük Yaşam Asistanı.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#090d16",
