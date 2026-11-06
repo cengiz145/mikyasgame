@@ -83,7 +83,9 @@
         'scissors': 'Makas',
         'teddy bear': 'Oyuncak',
         'hair drier': 'Saç Kurutma Makinesi',
-        'toothbrush': 'Diş Fırçası'
+        'toothbrush': 'Diş Fırçası',
+        'door_table': 'Masa / Çalışma Masası',
+        'screen_qr': 'Bilgisayar Ekranı / Karekod'
     };
 
     const TURKISH_COLOR_PALETTE_RGB = [
@@ -339,7 +341,7 @@
      * Telefonun sınav kağıdı üzerine düşen gölgesini 2B İntegral Görüntü
      * (I(x,y) < μ_yerel * 0.87) formülüyle tamamen temizler.
      */
-    function applyBradleyRothShadowRemoval(sourceCanvas) {
+    function applyBradleyRothShadowRemoval(sourceCanvas, customRatio = 0.87) {
         const w = sourceCanvas.width;
         const h = sourceCanvas.height;
         const outCanvas = document.createElement('canvas');
@@ -366,7 +368,7 @@
         }
 
         const s = Math.max(12, Math.floor(w / 18));
-        const tRatio = 0.87;
+        const tRatio = (typeof customRatio === 'number' && customRatio > 0.5 && customRatio < 0.99) ? customRatio : 0.87;
 
         for (let y = 0; y < h; y++) {
             const y1 = Math.max(0, y - s);
@@ -469,14 +471,15 @@
 
         let text = rawText
             .replace(/\r\n/g, '\n')
-            // Yuvarlak içindeki A-E Unicode karakterlerini standartlaştır
+            // Yuvarlak içindeki A-E Unicode ve bozuk daire (@, ©) şık karakterlerini standartlaştır
             .replace(/[Ⓐⓐ]/g, ' A) ')
             .replace(/[Ⓑⓑ]/g, ' B) ')
-            .replace(/[Ⓒⓒ]/g, ' C) ')
+            .replace(/[Ⓒⓒ©]/g, ' C) ')
             .replace(/[Ⓓⓓ]/g, ' D) ')
             .replace(/[Ⓔⓔ]/g, ' E) ')
-            // Sadece parantezli A), (A) veya satır başındaki A., A- şıklarını standartlaştır (cümle ortası noktalı kısaltmaları bozma!)
-            .replace(/(^|\s)\(?([A-Ea-e])\)\s+/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `)
+            .replace(/(^|\s)@\)\s*/gm, '$1A) ')
+            // Sadece parantezli A), (A) veya satır başındaki A., A- şıklarını standartlaştır (boşluksuz a)5 dahil)
+            .replace(/(^|\s)\(?([A-Ea-e])\)\s*(?=\S)/gm, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `)
             .replace(/(^|\n)\s*([A-Ea-e])[\.\-]\s+/g, (m, p1, letter) => `${p1}${letter.toUpperCase()}) `);
 
         // Soru numaralarından ("1.", "2.", "Soru 1") aday bloklara böl;
@@ -815,6 +818,46 @@
 
     const radar = new AudioRadarEngine();
 
+    async function copyTextUniversal(text, label = 'MikyasKamera') {
+        const clean = String(text || '');
+        if (!clean) return false;
+        if (window.AndroidSongBridge && typeof window.AndroidSongBridge.copyToClipboard === 'function') {
+            try {
+                if (window.AndroidSongBridge.copyToClipboard(label, clean)) return true;
+            } catch (_) {}
+        }
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            try {
+                await navigator.clipboard.writeText(clean);
+                return true;
+            } catch (_) {}
+        }
+        try {
+            const ta = document.createElement('textarea');
+            ta.value = clean;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            const ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            return Boolean(ok);
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function openExternalUrlUniversal(urlStr) {
+        if (!urlStr) return;
+        if (window.AndroidSongBridge && typeof window.AndroidSongBridge.openExternalUrl === 'function') {
+            try {
+                if (window.AndroidSongBridge.openExternalUrl(urlStr)) return;
+            } catch (_) {}
+        }
+        window.open(urlStr, '_blank', 'noopener');
+    }
+
     function announceGuidance(text, options = {}) {
         const {
             force = false,
@@ -848,20 +891,31 @@
             }, 25);
         }
 
+        let spokeViaWebSpeech = false;
         if ('speechSynthesis' in window) {
             try {
-                if (force) {
-                    window.speechSynthesis.cancel();
-                } else if (window.speechSynthesis.speaking) {
-                    return;
+                const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+                const hasNativeBridge = Boolean(window.AndroidSongBridge && typeof window.AndroidSongBridge.speakNativeTurkish === 'function');
+                if (!hasNativeBridge || (Array.isArray(voices) && voices.length > 0)) {
+                    if (force) {
+                        window.speechSynthesis.cancel();
+                    } else if (window.speechSynthesis.speaking) {
+                        return;
+                    }
+                    const utter = new SpeechSynthesisUtterance(text);
+                    utter.lang = 'tr-TR';
+                    utter.rate = 1.12;
+                    const trVoice = Array.isArray(voices) ? voices.find(v => v.lang && v.lang.toLowerCase().startsWith('tr')) : null;
+                    if (trVoice) utter.voice = trVoice;
+                    window.speechSynthesis.speak(utter);
+                    spokeViaWebSpeech = true;
                 }
-                const utter = new SpeechSynthesisUtterance(text);
-                utter.lang = 'tr-TR';
-                utter.rate = 1.12;
-                const voices = window.speechSynthesis.getVoices();
-                const trVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('tr'));
-                if (trVoice) utter.voice = trVoice;
-                window.speechSynthesis.speak(utter);
+            } catch (_) {}
+        }
+
+        if (!spokeViaWebSpeech && window.AndroidSongBridge && typeof window.AndroidSongBridge.speakNativeTurkish === 'function') {
+            try {
+                window.AndroidSongBridge.speakNativeTurkish(text, Boolean(force));
             } catch (_) {}
         }
     }
@@ -1340,12 +1394,22 @@
                             data: code.data,
                             bbox: [minX, minY, Math.max(12, maxX - minX), Math.max(12, maxY - minY)]
                         };
+                        if (code.data) {
+                            state.lastDetectedBarcode = code.data;
+                        }
                     }
                 }
             }
 
             let predictions = [];
-            if (state.cocoModel && state.mode !== 'light_meter') {
+            const nonObjectModes = new Set([
+                'light_meter', 'color_cloth', 'anomaly_led', 'signature_pen',
+                'door_elevator_lcd', 'pos_iban_reader', 'sock_outfit_check',
+                'song_finder', 'cooking_guide'
+            ]);
+            const shouldDetectObjects = state.cocoModel &&
+                (!nonObjectModes.has(state.mode) || (state.targetFilter !== 'auto' && state.targetFilter !== 'screen_qr'));
+            if (shouldDetectObjects) {
                 try {
                     const rawPreds = await state.cocoModel.detect(el.analysisCanvas, 8, 0.58);
                     predictions = verifyPredictionsInAiBrain(rawPreds, anW, anH, true);
@@ -1452,6 +1516,8 @@
 
         if (metrics.avgBrightness < 32 && state.flashMode === 'auto') {
             tryEnableHardwareTorch(true);
+        } else if (metrics.avgBrightness > 180 && state.flashMode === 'auto') {
+            tryEnableHardwareTorch(false);
         }
 
         if (metrics.avgBrightness < 30 && state.mode !== 'anomaly_led') {
@@ -1786,7 +1852,8 @@
         try {
             localStorage.setItem(MONEY_WALLET_STORAGE_KEY, JSON.stringify({
                 totalKurus: state.moneyTotalKurus,
-                ledger: state.moneyLedger.slice(-50)
+                ledger: state.moneyLedger.slice(-50),
+                seenSerials: state.moneySeenSerialNumbers ? Array.from(state.moneySeenSerialNumbers).slice(-100) : []
             }));
         } catch (_) {}
     }
@@ -1799,6 +1866,11 @@
             if (parsed && Array.isArray(parsed.ledger)) {
                 state.moneyLedger = parsed.ledger;
                 state.moneyTotalKurus = state.moneyLedger.reduce((acc, item) => acc + (Number(item.kurus) || 0), 0);
+            }
+            if (parsed && Array.isArray(parsed.seenSerials) && state.moneySeenSerialNumbers) {
+                parsed.seenSerials.forEach(s => {
+                    if (s) state.moneySeenSerialNumbers.add(String(s));
+                });
             }
         } catch (_) {}
         updateMoneyCounterUI();
@@ -1829,7 +1901,7 @@
         }
     }
 
-    function addMoneyToRunningTotal(kurus, label, items = null, source = 'auto') {
+    function addMoneyToRunningTotal(kurus, label, items = null, source = 'auto', serialNumber = '') {
         const cleanKurus = Math.round(Number(kurus) || 0);
         if (cleanKurus <= 0) return;
 
@@ -1843,6 +1915,7 @@
             label: label || formatTurkishKurusTotal(cleanKurus),
             items: Array.isArray(items) ? items : [{ valueKurus: cleanKurus, label: label || formatTurkishKurusTotal(cleanKurus), count: 1 }],
             source,
+            serialNumber: serialNumber || '',
             addedAt: Date.now()
         });
 
@@ -1891,6 +1964,10 @@
         const removed = state.moneyLedger.pop();
         state.moneyTotalKurus = Math.max(0, state.moneyTotalKurus - (Number(removed.kurus) || 0));
         state.moneyLastCommittedSignature = '';
+        state.moneyLastLiveBanknoteSig = '';
+        if (removed && removed.serialNumber && state.moneySeenSerialNumbers) {
+            state.moneySeenSerialNumbers.delete(removed.serialNumber);
+        }
         saveMoneyLedgerToStorage();
         updateMoneyCounterUI();
 
@@ -1907,6 +1984,7 @@
         state.moneyPendingSignature = '';
         state.moneyPendingFrames = 0;
         state.moneyLastCommittedSignature = '';
+        state.moneyLastLiveBanknoteSig = '';
         state.moneyEmptyFramesSinceCommit = 0;
         if (state.moneySeenSerialNumbers) {
             state.moneySeenSerialNumbers.clear();
@@ -2383,8 +2461,8 @@
                 }
             }
 
-            // Tek para varsa ve OCR rakamı net okuduysa çapraz doğrulama
-            if (analyzedCoins.length === 1 && upperOcr.length > 0) {
+            // Tek para varsa, çift halkalı (1 TL / 50 Kr) değilse ve OCR rakamı net okuduysa çapraz doğrulama
+            if (analyzedCoins.length === 1 && !isBiMetallic && upperOcr.length > 0) {
                 if (/\b50\b/.test(upperOcr)) {
                     valueKurus = 50; name = '50 Kuruş'; shortLabel = '50 Kr'; isBiMetallic = true;
                 } else if (/\b25\b/.test(upperOcr)) {
@@ -2600,7 +2678,8 @@
                                 noteInfo.kurus,
                                 `${noteInfo.label} (Kağıt Para)`,
                                 noteInfo.items,
-                                'live_banknote'
+                                'live_banknote',
+                                noteInfo.serialNumber || ''
                             );
                         }
                     })
@@ -2931,8 +3010,8 @@
         const extractExpiryFromSingleText = (srcText) => {
             let eMonth = null;
             let eYear = null;
-            const cleaned = String(srcText || '').replace(/(?:Ü\.?\s*R\.?\s*T\.?|Ü\.?\s*T\.?|ÜRETİM(?:\s*TARİHİ)?|İMAL(?:\s*TARİHİ)?|MFG|M\.?F\.?G\.?|PRD|PROD(?:UCTION)?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi, ' ');
-            const labeledRx = /(?:S\.?K\.?T\.?|SON\s*KULLAN(?:MA|IM)|SON\s*TÜKETİM|EXP(?:IRY)?|T\.?E\.?T\.?T\.?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi;
+            const cleaned = String(srcText || '').replace(/(?:[ÜU]\.?\s*R\.?\s*T\.?|[ÜU]\.?R\.?T\.?|[ÜU]\.?\s*T\.?|[ÜU]RET[İI]M(?:\s*TAR[İI]H[İI])?|[İI]MAL(?:\s*TAR[İI]H[İI])?|MFG|M\.?F\.?G\.?|PRD|P\.?\s*D\.?|PROD(?:UCTION)?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi, ' ');
+            const labeledRx = /(?:S\.?K\.?T\.?|SON\s*KULLAN(?:MA|IM)|SON\s*T[ÜU]KET[İI]M|EXP(?:IRY)?|T\.?E\.?T\.?T\.?|B\.?\s*B\.?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi;
             let m;
             while ((m = labeledRx.exec(cleaned)) !== null) {
                 const p1 = parseInt(m[1], 10);
@@ -3309,15 +3388,22 @@
         const textCheck = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
         const hasPanelOrDigits = Boolean(textCheck && textCheck.hasTextLikely);
         const panelBox = [anW * 0.20, anH * 0.20, anW * 0.60, anH * 0.60];
+        const isPosMode = state.mode === 'pos_iban_reader';
+        const boxLabel = isPosMode ? 'POS Ekranı / Fiş / IBAN Alanı' : 'Kapı No / Asansör / LCD Ekran';
 
-        drawTargetBox(ovCtx, panelBox, scaleX, scaleY, hasPanelOrDigits ? '#22c55e' : '#38bdf8', 'Kapı No / Asansör / LCD Ekran');
+        drawTargetBox(ovCtx, panelBox, scaleX, scaleY, hasPanelOrDigits ? '#22c55e' : '#38bdf8', boxLabel);
 
-        el.tPosition.textContent = hasPanelOrDigits ? 'Rakam / Panel Algılandı' : 'Panel Aranıyor';
+        el.tPosition.textContent = hasPanelOrDigits ? 'Rakam / Yazı Algılandı' : (isPosMode ? 'POS / IBAN Aranıyor' : 'Panel Aranıyor');
         el.tDistance.textContent = (hasPanelOrDigits && metrics.sharpness >= 6.8) ? 'Net (Okumaya Hazır)' : 'Hizalayın ve Sabitleyin';
         radar.updateRadar(0, 0, hasPanelOrDigits);
 
         if (hasPanelOrDigits && metrics.sharpness >= 6.8 && state.autoCaptureEnabled && !state.isProcessingOcr) {
-            handleAutoCaptureCountdown('Panel ve rakamlar netlendi, okunuyor!');
+            handleAutoCaptureCountdown(isPosMode ? 'POS ekranı veya IBAN yazısı netlendi, okunuyor!' : 'Panel ve rakamlar netlendi, okunuyor!');
+        } else if (isPosMode) {
+            announceGuidance('POS cihazı tutarı ve IBAN okuyucu modundasınız. Çekilecek tutarı veya faturadaki TR IBAN numarasını okutmak için kamerayı ekrana tutup Boşluk tuşuna basın veya ekrana çift dokunun.', {
+                bannerState: hasPanelOrDigits ? 'centered' : 'normal',
+                minIntervalMs: 3600
+            });
         } else {
             announceGuidance('Kapı numarası, asansör kat tuşları veya çamaşır/klima dijital ekranı modundasınız. Rakamları okutmak için kamerayı panele tutup Boşluk tuşuna basın veya ekrana çift dokunun.', {
                 bannerState: hasPanelOrDigits ? 'centered' : 'normal',
@@ -3396,15 +3482,16 @@
         });
 
         const allergenRules = [
-            { name: 'Gluten / Buğday', regex: /\b(?:GLUTEN|BUĞDAY|ÇAVDAR|ARPA|YULAF)\b/i },
-            { name: 'Süt / Laktoz', regex: /\b(?:LAKTOZ|SÜT\s*TOZU|PEYNİR\s*ALTI\s*SUYU|KAZEİN|TEREYAĞ)\b/i },
-            { name: 'Yer Fıstığı', regex: /YER\s*FISTIĞ/i },
-            { name: 'Kuruyemiş (Fındık/Badem/Ceviz/Antep Fıstığı)', regex: /FINDIK|BADEM|CEVİZ|ANTEP\s*FISTIĞ|KAJU/i },
-            { name: 'Soya Lesitini / Soya', regex: /\bSOYA\b/i },
-            { name: 'Yumurta', regex: /\bYUMURTA\b/i },
-            { name: 'Susam', regex: /\bSUSAM\b/i },
-            { name: 'Kükürt Dioksit / Sülfit', regex: /KÜKÜRT|SÜLFİT|E220/i },
-            { name: 'Domuz Katkısı / Alkol / Karmin (E120) Uyarısı', regex: /\b(?:DOMUZ|LARD|ALKOL|ETANOL|KARMİN|E120)\b/i }
+            { name: 'Gluten / Buğday', regex: /(?:^|[^\p{L}])(?:GLUTEN|BUĞDAY|BUGDAY|ÇAVDAR|CAVDAR|ARPA|YULAF)(?=$|[^\p{L}])/iu },
+            { name: 'Süt / Laktoz', regex: /(?:^|[^\p{L}])(?:LAKTOZ|SÜT|SUT|PEYNİR|PEYNIR|YOĞURT|YOGURT|KREMA|KAZEİN|KAZEIN|TEREYAĞ|TEREYAGI|TEREYAĞI)(?=$|[^\p{L}])/iu },
+            { name: 'Yer Fıstığı', regex: /YER\s*FISTI[ĞG]/i },
+            { name: 'Kuruyemiş (Fındık/Badem/Ceviz/Antep Fıstığı)', regex: /FINDIK|BADEM|CEV[İI]Z|ANTEP\s*FISTI[ĞG]|KAJU/i },
+            { name: 'Soya Lesitini / Soya', regex: /(?:^|[^\p{L}])SOYA(?=$|[^\p{L}])/iu },
+            { name: 'Yumurta', regex: /(?:^|[^\p{L}])YUMURTA(?=$|[^\p{L}])/iu },
+            { name: 'Balık / Deniz Ürünü', regex: /(?:^|[^\p{L}])(?:BALIK|TON\s*BALIĞI|SOMON|KARİDES|KALAMAR)(?=$|[^\p{L}])/iu },
+            { name: 'Susam', regex: /(?:^|[^\p{L}])(?:SUSAM|TAHİN|TAHIN)(?=$|[^\p{L}])/iu },
+            { name: 'Kükürt Dioksit / Sülfit', regex: /KÜKÜRT|KUKURT|SÜLFİT|SULFIT|E220/i },
+            { name: 'Domuz Katkısı / Alkol / Karmin (E120) Uyarısı', regex: /(?:^|[^\p{L}])(?:DOMUZ|LARD|ALKOL|ETANOL|KARMİN|KARMIN|E120)(?=$|[^\p{L}])/iu }
         ];
 
         allergenRules.forEach(rule => {
@@ -3425,22 +3512,30 @@
         const roiBox = [anW * 0.25, anH * 0.25, anW * 0.50, anH * 0.50];
         const colName = metrics.centerColor ? metrics.centerColor.name : 'Bilinmiyor';
         const verifiedObjs = Array.isArray(predictions) ? predictions : [];
+        const isCalorieMode = state.mode === 'step_calorie_guide';
 
-        drawTargetBox(ovCtx, roiBox, scaleX, scaleY, '#22c55e', 'Gıda Paketi / Etiket Okuma Alanı');
+        drawTargetBox(ovCtx, roiBox, scaleX, scaleY, '#22c55e', isCalorieMode ? 'Besin / Kalori Tablosu Alanı' : 'Gıda Paketi / Etiket Okuma Alanı');
 
         el.tPosition.textContent = verifiedObjs.length > 0
             ? `${TR_LABELS[verifiedObjs[0].class] || verifiedObjs[0].class}`
-            : 'Paket / Etiket Alanı';
-        el.tDistance.textContent = `Merkez Renk: ${colName}`;
+            : (isCalorieMode ? `Adım: ${state.dailySteps || 0}` : 'Paket / Etiket Alanı');
+        el.tDistance.textContent = isCalorieMode ? `Alınan: ${state.dailyCalorieIntake || 0} kcal` : `Merkez Renk: ${colName}`;
 
         const objPhrase = verifiedObjs.length > 0
             ? `Önünüzde ${TR_LABELS[verifiedObjs[0].class] || verifiedObjs[0].class} görünüyor. `
             : '';
 
-        announceGuidance(`${objPhrase}Merkez rengi ${colName}. Paketin üzerindeki içindekiler yazısını, alerji yapan maddeleri ve son tüketim tarihini okutmak için Boşluk tuşuna basın veya ekrana çift dokunun.`, {
-            bannerState: 'centered',
-            minIntervalMs: 3800
-        });
+        if (isCalorieMode) {
+            announceGuidance(`${objPhrase}Adım sayacı ve kalori rehberi modundasınız. Paketli ürünün kalori ve besin değerleri tablosunu okutmak için Boşluk tuşuna basın veya yemek adını kutudan sorgulayın.`, {
+                bannerState: 'centered',
+                minIntervalMs: 3800
+            });
+        } else {
+            announceGuidance(`${objPhrase}Merkez rengi ${colName}. Paketin üzerindeki içindekiler yazısını, alerji yapan maddeleri ve son tüketim tarihini okutmak için Boşluk tuşuna basın veya ekrana çift dokunun.`, {
+                bannerState: 'centered',
+                minIntervalMs: 3800
+            });
+        }
     }
 
     /**
@@ -3991,7 +4086,6 @@
                 navigator.vibrate(25);
                 state.lastExplorerVibrateAt = now;
             }
-            radar.playLightMeterTone(patch.avgLum, (nx - 0.5) * 1.4);
             announceGuidance(hitDescription, {
                 force: true,
                 updateBanner: false,
@@ -4088,13 +4182,13 @@
                     if (partText) {
                         combinedText += (combinedText ? '\n\n' : '') + partText;
                     }
-                    if (partVerified) {
+                    if (partVerified && verifiedCombinedText !== partVerified && !verifiedCombinedText.endsWith(partVerified)) {
                         verifiedCombinedText += (verifiedCombinedText ? ' — ' : '') + partVerified;
                     }
-                    if (partMultiline) {
+                    if (partMultiline && verifiedMultilineText !== partMultiline) {
                         verifiedMultilineText += (verifiedMultilineText ? '\n\n' : '') + partMultiline;
                     }
-                    if (ocrRes && ocrRes.data && Array.isArray(ocrRes.data.lines) && !splitInfo.isTwoColumn) {
+                    if (ocrRes && ocrRes.data && Array.isArray(ocrRes.data.lines) && !splitInfo.isTwoColumn && (collectedLines.length === 0 || i === 0)) {
                         collectedLines = ocrRes.data.lines;
                     }
                 }
@@ -4111,7 +4205,7 @@
                     state.mode === 'color_cloth'
                 );
 
-                if (verifiedCombinedText.trim().length < 6 || (isHighStakesSafetyMode && state.mode !== 'door_elevator_lcd')) {
+                if (state.mode !== 'door_elevator_lcd' && (verifiedCombinedText.trim().length < 6 || isHighStakesSafetyMode)) {
                     const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
                     const rawText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
                     secondaryRawVerifiedText = extractVerifiedRealTextFromOcrResult(fallbackRes).trim();
@@ -4134,7 +4228,7 @@
 
                 // ÖZEL MOD 10: İMZA ATILACAK EVRAKIN İÇERİĞİNİ VE İMZA SATIRINI DOĞRULAMA KİLİDİ
                 if (state.mode === 'signature_pen') {
-                    const hasSignatureKeyword = /\b(?:İMZA|IMZA|İMZASI|IMZASI|İMZALAYAN|AD\s*SOYAD|ADI\s*SOYADI|ONAY|KABUL|TAAHHÜT|SÖZLEŞME|DİLEKÇE|TUTANAK)\b/i.test(cleanText);
+                    const hasSignatureKeyword = /(?:^|[^\p{L}])(?:İMZA|IMZA|İMZASI|IMZASI|İMZALAYAN|AD\s*SOYAD|ADI\s*SOYADI|ONAY|KABUL|TAAHHÜT|SÖZLEŞME|DİLEKÇE|TUTANAK)(?=$|[^\p{L}])/iu.test(cleanText);
                     if (cleanText.length >= 12) {
                         state.signatureDocVerified = true;
                         const sigKeywordMsg = hasSignatureKeyword
@@ -4155,6 +4249,7 @@
                 // ÖZEL MOD 9: İLAÇ KUTUSU, DOZAJ (mg), BARKOD VE SON KULLANMA TARİHİ (SKT) DENETÇİSİ
                 if (state.mode === 'medicine_skt') {
                     const med = parseMedicineAndExpiryZeroError(primaryPassVerifiedText || cleanText, state.lastDetectedBarcode, secondaryRawVerifiedText);
+                    state.lastDetectedBarcode = '';
                     if (med.sktStatus === 'EXPIRED') {
                         radar.playDangerAlarm();
                         if (navigator.vibrate) navigator.vibrate([250, 80, 250, 80, 350]);
@@ -4357,7 +4452,7 @@
                     }
 
                     const fullAddedLabel = combinedLabels.join(' + ');
-                    addMoneyToRunningTotal(combinedKurus, fullAddedLabel, combinedItems, 'ocr_money');
+                    addMoneyToRunningTotal(combinedKurus, fullAddedLabel, combinedItems, 'ocr_money', banknoteDetails ? (banknoteDetails.serialNumber || '') : '');
                     const totalFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
                     const breakdown = computeMoneyBreakdownSummary();
                     showDetectedResult(
@@ -4371,11 +4466,19 @@
                     ? parseExamQuestionsAndOptions(verifiedMultilineText.trim())
                     : [];
                 if (state.mode === 'exam_reader') {
-                    state.examQuestions = parsedQuestions;
-                    state.currentExamIndex = 0;
                     if (parsedQuestions.length > 0) {
-                        updateExamRemoteUI();
+                        state.examQuestions = parsedQuestions;
+                    } else {
+                        state.examQuestions = [{
+                            number: 1,
+                            stem: cleanText
+                                ? `Bu sayfada şıklı soru algılanmadı. Okunan düz metin: ${cleanText.replace(/\s+/g, ' ')}`
+                                : 'Bu görüntüde okunabilir bir sınav sorusu veya şık bulunamadı.',
+                            options: { A: '', B: '', C: '', D: '', E: '' }
+                        }];
                     }
+                    state.currentExamIndex = 0;
+                    updateExamRemoteUI();
                 }
 
                 const firstQ = (state.mode === 'exam_reader' && state.examQuestions.length > 0) ? state.examQuestions[0] : null;
@@ -4695,15 +4798,24 @@
             if (conf < 65) continue;
 
             const raw = String(ln.text || '').replace(/\s+/g, ' ').trim();
-            if (raw.length < 3) continue;
+            if (!raw) continue;
 
-            // Gerçek harf veya rakam oranı kontrolü (yaprak/duvar dokusundan çıkan "| \ / _ ~" çöplerini reddet)
-            const alphaNumMatches = raw.match(/[\p{L}\p{N}]/gu) || [];
-            const alphaRatio = alphaNumMatches.length / raw.length;
-            if (alphaNumMatches.length < 3 || alphaRatio < 0.68) continue;
+            // Kısa kapı numaraları ("5", "12"), kağıt para kupürleri ("5", "10", "20", "50", "100", "200")
+            // ve kısa sınav şıkları ("A) 5", "B) -2") yüksek güven skorluysa elenmesin!
+            const isShortValidNumber = /^\d{1,3}$/.test(raw) && conf >= 70;
+            const isShortExamOption = /^(?:[\(\[]?[A-Ea-e][\)\]\.\-:]\s*\S+)/.test(raw) && conf >= 65;
 
-            // En az bir anlamlı (2+ harfli) kelime veya 2+ haneli sayı içermeli
-            if (!/[\p{L}]{2,}|\d{2,}/u.test(raw)) continue;
+            if (!isShortValidNumber && !isShortExamOption) {
+                if (raw.length < 3) continue;
+
+                // Gerçek harf veya rakam oranı kontrolü (yaprak/duvar dokusundan çıkan "| \ / _ ~" çöplerini reddet)
+                const alphaNumMatches = raw.match(/[\p{L}\p{N}]/gu) || [];
+                const alphaRatio = alphaNumMatches.length / raw.length;
+                if (alphaNumMatches.length < 3 || alphaRatio < 0.65) continue;
+
+                // En az bir anlamlı (2+ harfli) kelime veya 1+ haneli sayı içermeli
+                if (!/[\p{L}]{2,}|\d{1,}/u.test(raw)) continue;
+            }
 
             verifiedLines.push(raw);
         }
@@ -5125,6 +5237,8 @@
             } finally {
                 state.isProcessingOcr = false;
             }
+        } else {
+            showDetectedResult(`🎬 ${sourceLabel} (${durationSec} sn) — Gerçek Zaman Sıralı Video Analizi`, initialVideoStory);
         }
     }
 
@@ -5357,6 +5471,17 @@
 
     function stopCamera() {
         state.isRunning = false;
+        if (state.whatsappHoldTimer) {
+            clearInterval(state.whatsappHoldTimer);
+            state.whatsappHoldTimer = null;
+        }
+        if (state.tvAutoReaderTimer) {
+            clearInterval(state.tvAutoReaderTimer);
+            state.tvAutoReaderTimer = null;
+            if (el.btnTvToggleAuto) {
+                el.btnTvToggleAuto.textContent = '▶️ Otomatik Altyazı Spikerini Başlat';
+            }
+        }
         if (state.videoStream) {
             state.videoStream.getTracks().forEach(t => t.stop());
             state.videoStream = null;
@@ -5706,14 +5831,21 @@
             );
         }
 
+        // Mobil veri santrali (CGNAT) IP adresleri gerçek ilden ratusan km uzaktaki bölge müdürlüğünü (İstanbul/Ankara/İzmir)
+        // gösterebildiği için IP konumunu Kıble pusulasında otomatik "doğrulanmış" kabul etme; sadece kaba ön bilgi olarak tut!
         fetch('https://ipwho.is/')
             .then(r => r.json())
             .then(data => {
-                if (!state.qiblaLocationVerified && data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
-                    state.userLat = data.latitude;
-                    state.userLon = data.longitude;
-                    const city = data.city || 'Otomatik Konum';
-                    updateQiblaTargetDisplay(city);
+                if (!state.qiblaLocationVerified && !state.userLat && data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+                    state.ipHintCity = data.city || '';
+                    if (el.qiblaCitySelect && state.ipHintCity) {
+                        for (let i = 0; i < el.qiblaCitySelect.options.length; i++) {
+                            if (el.qiblaCitySelect.options[i].text.toLocaleLowerCase('tr-TR').startsWith(state.ipHintCity.toLocaleLowerCase('tr-TR'))) {
+                                el.qiblaCitySelect.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
                 }
             })
             .catch(() => {});
@@ -6411,7 +6543,23 @@
     async function toggleSongListening() {
         radar.init();
         if (state.songListening) {
+            const currentWords = el.songHeardWords ? el.songHeardWords.textContent.replace(/^"|"$/g, '').trim() : '';
+            const midiSnapshot = [...state.detectedMidiNotes];
+            const notesSnapshot = [...state.detectedNotes];
             stopSongListening();
+            if (currentWords && !currentWords.includes('dinliyorum') && currentWords.length >= 2) {
+                searchSongByLyricsOrQuery(currentWords);
+                return;
+            }
+            const humMatch = matchMelodyBySemitoneContour(midiSnapshot);
+            if (humMatch) {
+                if (el.songHeardWords) {
+                    el.songHeardWords.textContent = `Mırıldanan Melodi: ${notesSnapshot.slice(-6).join(' → ')}`;
+                }
+                searchSongByLyricsOrQuery(`${humMatch.song.artist} ${humMatch.song.title}`, humMatch.confidencePct);
+                return;
+            }
+            announceGuidance('Şarkı ve melodi dinleme durduruldu.', { force: true });
             return;
         }
 
@@ -6419,6 +6567,9 @@
         if ('speechSynthesis' in window) {
             try { window.speechSynthesis.cancel(); } catch (_) {}
         }
+
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const useAndroidNativeVoiceOnly = (!state.songTunerActive && !SpeechRec && window.AndroidSongBridge && typeof window.AndroidSongBridge.startNativeVoiceLyricsCapture === 'function');
 
         state.songListening = true;
         state.detectedNotes = [];
@@ -6436,6 +6587,11 @@
         }
         if (el.songHeardWords) {
             el.songHeardWords.textContent = 'Çalan şarkıyı, sözlerinizi veya mırıldanmanızı dinliyorum...';
+        }
+
+        if (useAndroidNativeVoiceOnly) {
+            window.AndroidSongBridge.startNativeVoiceLyricsCapture();
+            return;
         }
 
         // 1. Canlı Mikrofon Nota (Melodi), Akort (Cent), Makam ve Ritim (BPM) Analizörü
@@ -6530,7 +6686,6 @@
         if (state.songTunerActive) return;
 
         // 2. Web Speech API veya Android Native Sesli Şarkı Sözü Yakalayıcıyı Başlat
-        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRec) {
             try {
                 const rec = new SpeechRec();
@@ -6903,6 +7058,11 @@
         const cacheKey = normalizeTurkishPhonetic(query);
         if (cacheKey && songQueryCache.has(cacheKey)) {
             const cached = songQueryCache.get(cacheKey);
+            if (state.songAutoRadarEnabled && state.lastFoundSong &&
+                state.lastFoundSong.title === cached.foundTrack.title &&
+                state.lastFoundSong.artist === cached.foundTrack.artist) {
+                return;
+            }
             state.songAlternatives = cached.alternatives;
             applyFoundSongToUI(cached.foundTrack, cached.alternatives, melodyConfidencePct);
             return;
@@ -6983,7 +7143,8 @@
                 }
                 if (idx === 0 && !foundTrack) {
                     foundTrack = cand;
-                } else if (idx === 0 && foundTrack && cand.lyrics.length > (foundTrack.lyrics || '').length) {
+                } else if (idx === 0 && foundTrack && cand.lyrics.length > (foundTrack.lyrics || '').length &&
+                           computeTrigramSimilarity(foundTrack.title, cand.title) >= 0.45) {
                     foundTrack.lyrics = cand.lyrics;
                 } else {
                     alternativeCandidates.push(cand);
@@ -7296,12 +7457,12 @@
                     bannerState: 'centered',
                     minIntervalMs: 3800
                 });
-                if (state.autoCaptureEnabled && !state.isProcessingOcr) {
-                    captureAndDescribePhoto(true);
-                }
+                const isReadyForBusOcr = metrics.sharpness >= 6.8 && !state.isProcessingOcr;
+                handleAutoCaptureCountdown(isReadyForBusOcr);
                 return;
             }
         }
+        state.countdownStage = 0;
         el.tPosition.textContent = 'Yol Taranıyor';
         el.tDistance.textContent = state.busTargetStop ? `Durak: ${state.busTargetStop.name}` : 'Otobüs Bekleniyor';
         announceGuidance('Kamerayı durağa yaklaşan otobüs yönüne tutun; araç göründüğünde hat numarasını sesli okuyacağım.', {
@@ -7313,7 +7474,7 @@
     function processBusRouteOcrResult(cleanText, preds) {
         const upper = String(cleanText || '').toUpperCase();
         const hasBus = Array.isArray(preds) && preds.some(p => p.class === 'bus');
-        const hasBusContextWords = /\b(?:HAT|OTOBÜS|OTOBUS|MİNİBÜS|MINIBUS|DOLMUŞ|DOLMUS|DURAK|DURAĞI|İETT|IETT|EGO|ESHOT|METRO|METROBÜS|TRAMVAY|PERON)\b/.test(upper);
+        const hasBusContextWords = /(?:^|[^\p{L}])(?:HAT|OTOBÜS|OTOBUS|MİNİBÜS|MINIBUS|DOLMUŞ|DOLMUS|DURAK|DURAĞI|İETT|IETT|EGO|ESHOT|METRO|METROBÜS|TRAMVAY|PERON)(?=$|[^\p{L}])/iu.test(upper);
         const alphaNumRouteMatches = (hasBus || hasBusContextWords)
             ? (upper.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [])
             : [];
@@ -7471,10 +7632,19 @@
         const inp = document.getElementById('bus-dest-input');
         const customName = (inp && inp.value.trim()) ? inp.value.trim() : 'Kayıtlı Favori Durağım';
         state.busTargetStop = { name: customName, lat: state.userLat, lon: state.userLon };
+        state.busStopAlert300Fired = false;
+        state.busStopAlert60Fired = false;
+        const badgeEl = document.getElementById('bus-stop-badge');
+        if (badgeEl) badgeEl.textContent = `Hedef: ${customName}`;
         try {
             localStorage.setItem('mikyas_saved_bus_stop', JSON.stringify(state.busTargetStop));
+            const existingIdx = POPULAR_STOP_LANDMARKS.findIndex(x => x.name === customName);
+            if (existingIdx >= 0) POPULAR_STOP_LANDMARKS[existingIdx] = state.busTargetStop;
+            else POPULAR_STOP_LANDMARKS.unshift(state.busTargetStop);
         } catch (_) {}
-        announceGuidance(`Şu an bulunduğunuz konum "${customName}" olarak kaydedildi.`, { force: true, bannerState: 'centered' });
+        if (state.busStopWatchTimer) clearInterval(state.busStopWatchTimer);
+        state.busStopWatchTimer = setInterval(() => checkBusDestinationDistance(false), 7000);
+        announceGuidance(`Şu an bulunduğunuz konum "${customName}" olarak kaydedildi ve durak yaklaşma alarmı aktif edildi.`, { force: true, bannerState: 'centered' });
     }
 
     function cancelBusStopAlarm() {
@@ -7532,40 +7702,55 @@
             }
         }
 
-        // POS veya Fiş Tutarı Yakalama (Saati veya tarihi tutar sanmamak için mutlaka para birimi veya ödeme etiketi şart!)
-        const amountRegex = /(?:(?:TUTAR|TOPLAM|SATIŞ|SATIS|ÖDEME|ODEME|NAKİT|NAKIT|KART)\s*[:\-]?\s*\d{1,6}(?:[.,]\d{2})?(?:\s*(?:TL|₺|TÜRK\s*LİRASI|LİRA|TRY))?|\b\d{1,6}(?:[.,]\d{2})?\s*(?:TL|₺|TÜRK\s*LİRASI|LİRA|TRY|EUR|USD|€|\$)\b)/gi;
+        // POS veya Fiş Tutarı Yakalama (Binlik ayırıcı "1.250,00 TL" dahil, ₺/€/$ sembollerinde \b hatası olmadan!)
+        const amountNumberPattern = '(?:\\d{1,3}(?:[.\\s]\\d{3})+(?:,\\d{2})?|\\d{1,6}(?:[.,]\\d{2})?)';
+        const amountRegex = new RegExp(
+            `(?:(?:GENEL\\s*TOPLAM|TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS|ÖDEME|ODEME|NAKİT|NAKIT|KART)\\s*[:\\-*]?\\s*${amountNumberPattern}(?:\\s*(?:TL|₺|TÜRK\\s*LİRASI|LİRA|TRY|EUR|USD|€|\\$))?|\\b${amountNumberPattern}\\s*(?:TL|₺|TÜRK\\s*LİRASI|LİRA|TRY|EUR|USD|€|\\$)(?=$|[^\\p{L}\\p{N}]))`,
+            'giu'
+        );
         const amountMatches = text.match(amountRegex) || [];
-        const cleanAmounts = [...new Set(amountMatches.map(a => a.trim()))];
+        // Öncelik: İçinde TOPLAM / TUTAR / ÖDENECEK / SATIŞ geçen satırları en başa al ki üstteki tekil ürün veya KDV satırını toplam sanmasın!
+        const sortedMatches = [...new Set(amountMatches.map(a => a.trim()))].sort((a, b) => {
+            const aHasTotal = /(?:TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS)/i.test(a) ? 1 : 0;
+            const bHasTotal = /(?:TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS)/i.test(b) ? 1 : 0;
+            return bHasTotal - aHasTotal;
+        });
+        const cleanAmounts = sortedMatches;
 
         // Çift geçişli (Binary vs. Ham Renkli) rakam çelişkisi kontrolü (Örn: Ekran parlaması yüzünden 1500 TL vs 500 TL okunması)
-        const extractNumericValues = (str) => {
+        const extractPrimaryTotalValue = (str) => {
             const m = String(str || '').match(amountRegex) || [];
-            return [...new Set(m.map(x => (x.match(/\d+(?:[.,]\d{2})?/) || [''])[0].replace(',', '.')))].filter(Boolean);
+            if (m.length === 0) return '';
+            const prioritized = [...m].sort((a, b) => {
+                const aPri = /(?:TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS)/i.test(a) ? 1 : 0;
+                const bPri = /(?:TOPLAM|TUTAR|ÖDENECEK|ODENECEK|SATIŞ|SATIS)/i.test(b) ? 1 : 0;
+                return bPri - aPri;
+            });
+            const numRaw = (prioritized[0].match(new RegExp(amountNumberPattern)) || [''])[0];
+            return numRaw.replace(/\s+/g, '');
         };
-        const nums1 = extractNumericValues(pass1Text);
-        const nums2 = extractNumericValues(pass2Text);
-        const hasAmountConflict = (nums1.length > 0 && nums2.length > 0 && nums1[0] !== nums2[0]);
+        const total1 = extractPrimaryTotalValue(pass1Text);
+        const total2 = extractPrimaryTotalValue(pass2Text);
+        const hasAmountConflict = Boolean(total1 && total2 && total1 !== total2);
 
         const posEl = document.getElementById('pos-detected-amount');
         const ibanEl = document.getElementById('pos-detected-iban');
         const speechParts = [];
 
         if (hasAmountConflict) {
-            if (posEl) posEl.textContent = `⚠️ Parlama Uyuşmazlığı (${nums1[0]} / ${nums2[0]})`;
-            speechParts.push(`DİKKAT: POS ekranındaki yansıma nedeniyle rakamlar iki farklı şekilde okundu (${nums1[0]} ve ${nums2[0]}). Yanlış tutar onaylamamanız için lütfen kamerayı ekrana dik tutup parlamayı önleyerek tekrar okutun.`);
+            if (posEl) posEl.textContent = `⚠️ Parlama Uyuşmazlığı (${total1} / ${total2})`;
+            speechParts.push(`DİKKAT: POS ekranındaki yansıma nedeniyle rakamlar iki farklı şekilde okundu (${total1} ve ${total2}). Yanlış tutar onaylamamanız için lütfen kamerayı ekrana dik tutup parlamayı önleyerek tekrar okutun.`);
         } else if (cleanAmounts.length > 0) {
             state.lastDetectedPosAmount = cleanAmounts[0];
             if (posEl) posEl.textContent = cleanAmounts.join(' / ');
-            speechParts.push(`Ekranda okunan ödeme tutarı: ${cleanAmounts[0]}. Güvenliğiniz için kart işlemini onaylamadan önce banka bildirimindeki tutarı da kontrol edin.`);
+            speechParts.push(`Ekranda okunan ödeme tutarı: ${cleanAmounts[0]}. Güvenliğiniz için kart işlemini onaylamadan önce bildirimdeki tutarı da kontrol edin.`);
         }
 
         if (foundIbanObj) {
             if (foundIbanObj.isValidChecksum) {
                 state.lastDetectedIban = foundIbanObj.formatted;
                 if (ibanEl) ibanEl.textContent = `${foundIbanObj.formatted} (Mod-97 Doğrulandı)`;
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(foundIbanObj.iban).catch(() => {});
-                }
+                copyTextUniversal(foundIbanObj.iban, 'IBAN');
                 speechParts.push(`Doğrulanmış 26 haneli IBAN numarası bulundu ve telefonunuzun panosuna kopyalandı: ${foundIbanObj.formatted}. Para göndermeden önce alıcı adını mutlaka kontrol edin.`);
             } else {
                 if (ibanEl) ibanEl.textContent = '⚠️ IBAN Rakamı Net Değil (Kopyalanmadı)';
@@ -7592,11 +7777,7 @@
             return;
         }
         const raw = state.lastDetectedIban.replace(/\s+/g, '');
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            try {
-                await navigator.clipboard.writeText(raw);
-            } catch (_) {}
-        }
+        await copyTextUniversal(raw, 'IBAN');
         announceGuidance(`IBAN numarası panoya kopyalandı: ${state.lastDetectedIban}`, { force: true, bannerState: 'centered' });
     }
 
@@ -7694,18 +7875,63 @@
         announceGuidance(`Toplam ${state.itemMemories.length} kayıtlı eşyanız var. ${allText}`, { force: true, bannerState: 'centered' });
     }
 
-    function startVoiceItemMemoryCapture(modeType = 'save') {
-        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRec) {
-            announceGuidance('Tarayıcınız doğrudan ses tanımayı desteklemiyor, lütfen eşya adını kutuya yazın.', { force: true, bannerState: 'warning' });
+    function deleteLastItemMemoryEntry() {
+        if (!state.itemMemories || state.itemMemories.length === 0) {
+            announceGuidance('Hafıza defterinizde silinecek kayıtlı bir eşya bulunmuyor.', { force: true, bannerState: 'warning' });
             return;
         }
-        const promptMsg = modeType === 'save'
-            ? 'Şimdi eşyanızı nereye koyduğunuzu söyleyin, örneğin: Yedek anahtarı vestiyerin üst çekmecesine koydum.'
-            : 'Şimdi aradığınız eşyanın adını söyleyin, örneğin: Yedek anahtar nerede?';
-        announceGuidance(promptMsg, { force: true });
+        const removed = state.itemMemories.shift();
+        saveItemMemoriesToStorage();
+        announceGuidance(`Son kaydedilen eşya hafızadan silindi: "${removed.text}". Kalan kayıt sayısı: ${state.itemMemories.length}.`, {
+            force: true,
+            bannerState: 'centered'
+        });
+    }
 
-        setTimeout(() => {
+    window.receiveNativeVoiceCaptureFromAndroid = function (purpose, spokenText) {
+        const clean = String(spokenText || '').trim();
+        if (!clean) return;
+        if (purpose === 'save') {
+            saveItemMemoryEntry(clean);
+        } else if (purpose === 'bus_dest') {
+            const inp = document.getElementById('bus-dest-input');
+            if (inp) inp.value = clean;
+            setBusDestinationStopAlarm(clean);
+        } else if (purpose === 'calorie') {
+            const inp = document.getElementById('calorie-food-input');
+            if (inp) inp.value = clean;
+            calculateAndSpeakFoodCalories(clean);
+        } else if (purpose === 'cooking') {
+            const inp = document.getElementById('cooking-ingredient-input');
+            if (inp) inp.value = clean;
+            findRecipeByIngredientsOrName(clean);
+        } else {
+            searchItemMemoryByQuery(clean);
+        }
+    };
+
+    function startVoiceItemMemoryCapture(modeType = 'save') {
+        const promptMap = {
+            'save': 'Şimdi eşyanızı nereye koyduğunuzu söyleyin, örneğin: Yedek anahtarı vestiyerin üst çekmecesine koydum.',
+            'bus_dest': 'Şimdi ineceğiniz durağın veya semtin adını söyleyin, örneğin: Kadıköy İskele veya Kızılay.',
+            'calorie': 'Şimdi yediğiniz veya merak ettiğiniz yemeğin adını söyleyin, örneğin: Mercimek çorbası veya 1 bardak süt.',
+            'cooking': 'Evde hangi malzemeler var veya hangi yemeği yapmak istiyorsunuz? Şimdi söyleyin.',
+            'ask': 'Şimdi aradığınız eşyanın adını söyleyin, örneğin: Yedek anahtar nerede?'
+        };
+        const promptMsg = promptMap[modeType] || promptMap['ask'];
+
+        if (window.AndroidSongBridge && typeof window.AndroidSongBridge.startNativeVoiceCaptureForMode === 'function') {
+            window.AndroidSongBridge.startNativeVoiceCaptureForMode(modeType, promptMsg);
+            return;
+        }
+
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {
+            announceGuidance('Tarayıcınız doğrudan ses tanımayı desteklemiyor, lütfen kutuya yazın.', { force: true, bannerState: 'warning' });
+            return;
+        }
+
+        const launchRec = () => {
             try {
                 const rec = new SpeechRec();
                 rec.lang = 'tr-TR';
@@ -7714,20 +7940,15 @@
                 rec.onresult = (ev) => {
                     const transcript = (ev.results && ev.results[0] && ev.results[0][0]) ? ev.results[0][0].transcript : '';
                     if (transcript) {
-                        if (modeType === 'save') {
-                            saveItemMemoryEntry(transcript);
-                        } else if (modeType === 'bus_dest') {
-                            const inp = document.getElementById('bus-dest-input');
-                            if (inp) inp.value = transcript;
-                            setBusDestinationStopAlarm(transcript);
-                        } else {
-                            searchItemMemoryByQuery(transcript);
-                        }
+                        window.receiveNativeVoiceCaptureFromAndroid(modeType, transcript);
                     }
                 };
                 rec.start();
             } catch (_) {}
-        }, 1600);
+        };
+
+        announceGuidance(promptMsg, { force: true });
+        setTimeout(launchRec, 2400);
     }
 
     function handleItemMemoryLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
@@ -7931,11 +8152,20 @@
         const centerSample = sampleRegionRgbAndContrast(ctx, w * 0.25, h * 0.25, w * 0.5, h * 0.5);
         const sockEl = document.getElementById('sock-match-result');
         const stainEl = document.getElementById('outfit-stain-result');
+        const hasStainOrSpot = centerSample.outlierRatio >= 0.08 && centerSample.stdDev >= 20;
+        const stainDetail = hasStainOrSpot
+            ? `Merkez renk: ${centerSample.colorInfo.name}. Dikkat: Kumaş yüzeyinde ana renkten belirgin şekilde ayrılan bir renk farkı, desen veya leke izi algılandı; giymeden önce elinizle veya yakınınızla kontrol edebilirsiniz.`
+            : `Merkez renk: ${centerSample.colorInfo.name}, yüzey homojen ve temiz görünüyor.`;
+        const stainShortBadge = hasStainOrSpot
+            ? `${centerSample.colorInfo.name} (Farklı Leke/Desen İzi Var)`
+            : `${centerSample.colorInfo.name} (Homojen / Temiz)`;
 
-        if (isSingleUniformSurface) {
-            const singleMsg = `Tek Parça Yüzey: Kamerada yan yana iki ayrı çorap ayırt edilemedi; tamamı ${centerSample.colorInfo.name} tek bir yüzey görünüyor. İki çorabı karşılaştırmak için aralarında biraz boşluk bırakarak yan yana koyun.`;
-            if (sockEl) sockEl.textContent = `TEK YÜZEY (${centerSample.colorInfo.name})`;
-            if (stainEl) stainEl.textContent = `Merkez Renk: ${centerSample.colorInfo.name}`;
+        if (isSingleUniformSurface || state.sockSubMode === 'outfit') {
+            const singleMsg = state.sockSubMode === 'outfit'
+                ? `Kıyafet ve Leke Analizi: ${stainDetail}`
+                : `Tek Parça Yüzey: Kamerada yan yana iki ayrı çorap ayırt edilemedi; tamamı ${centerSample.colorInfo.name} tek bir yüzey görünüyor. ${stainDetail} İki çorabı karşılaştırmak için aralarında biraz boşluk bırakarak yan yana koyun.`;
+            if (sockEl && state.sockSubMode !== 'outfit') sockEl.textContent = `TEK YÜZEY (${centerSample.colorInfo.name})`;
+            if (stainEl) stainEl.textContent = stainShortBadge;
             const speech = `${singleMsg} ${cleanText ? 'Etiket yazısı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
             return {
                 speechText: speech,
@@ -7950,10 +8180,10 @@
             ? `Çorap ve Kıyafet Eşleşmesi: Sol taraftaki parça (${leftHalf.colorInfo.name}) ile sağ taraftaki parça (${rightHalf.colorInfo.name}) aynı renkte ve birbiriyle eşleşiyor.`
             : `Farklı Renk: Sol taraftaki parça ${leftHalf.colorInfo.name}, sağ taraftaki parça ise ${rightHalf.colorInfo.name}; birbirinden farklı.`;
 
-        const stainMsg = `Merkez bölge rengi: ${centerSample.colorInfo.name}.`;
+        const stainMsg = stainDetail;
 
         if (sockEl) sockEl.textContent = isPairMatch ? `EŞLEŞTİ (${leftHalf.colorInfo.name})` : `FARKLI (${leftHalf.colorInfo.name} / ${rightHalf.colorInfo.name})`;
-        if (stainEl) stainEl.textContent = `Merkez Renk: ${centerSample.colorInfo.name}`;
+        if (stainEl) stainEl.textContent = stainShortBadge;
 
         const speech = `${sockMsg} ${stainMsg} ${cleanText ? 'Etiket yazısı: ' + cleanText.replace(/\s+/g, ' ') : ''}`;
         return {
@@ -8007,13 +8237,16 @@
         announceGuidance(fullSpeech, { force: true, bannerState: 'centered' });
     }
 
-    function shareWhereAmIOnWhatsapp() {
+    async function shareWhereAmIOnWhatsapp() {
+        if (!state.lastWhereAmISummary) {
+            await announceWhereAmIFullAddressAndSignboard('', []);
+        }
         const mapLink = (state.userLat && state.userLon)
             ? `https://maps.google.com/?q=${state.userLat},${state.userLon}`
             : '';
         const textToShare = `${state.lastWhereAmISummary || 'Şu an bulunduğum konum:'} ${mapLink ? '\nHarita Konumum: ' + mapLink : ''}`.trim();
         const waUrl = `https://wa.me/?text=${encodeURIComponent(textToShare)}`;
-        window.open(waUrl, '_blank', 'noopener');
+        openExternalUrlUniversal(waUrl);
         announceGuidance('Açık adresiniz, tabela tarifiniz ve harita konumunuz WhatsApp üzerinden gönderilmek üzere hazırlandı.', {
             force: true,
             bannerState: 'centered'
@@ -8036,12 +8269,13 @@
         { keys: ['simit', 'gevrek', 'poğaça'], name: '1 Adet Susamlı Simit', kcal: 275, benefit: 'Susamındaki sağlıklı yağlar ve tahılıyla kahvaltının en güzel keyfidir.' },
         { keys: ['yumurta', 'haşlanmış yumurta', 'omlet', 'menemen'], name: 'Yumurta / Menemen', kcal: 155, benefit: 'En kaliteli protein ve B12 kaynağıdır, hafızayı ve kasları güçlendirir.' },
         { keys: ['peynir', 'beyaz peynir', 'kaşar', 'zeytin'], name: 'Kahvaltılık Peynir ve Zeytin Porsiyonu', kcal: 120, benefit: 'Kalsiyum ve sağlıklı E vitamini ile kemiklerinizi korur.' },
-        { keys: ['köfte', 'ızgara köfte', 'et', 'kebap', 'tavuk', 'balık'], name: '1 Porsiyon Et / Tavuk / Balık / Köfte', kcal: 260, benefit: 'Yüksek protein değeriyle dokuları yeniler ve enerji verir.' },
+        { keys: ['köfte', 'ızgara köfte', 'dana eti', 'kırmızı et', 'kuşbaşı et', 'kebap', 'tavuk', 'balık'], name: '1 Porsiyon Et / Tavuk / Balık / Köfte', kcal: 260, benefit: 'Yüksek protein değeriyle dokuları yeniler ve enerji verir.' },
         { keys: ['makarna', 'mantı', 'börek'], name: '1 Porsiyon Makarna / Börek / Mantı', kcal: 290, benefit: 'Mutluluk hormonu salgılanmasına yardımcı olan doyurucu bir öğündür.' },
+        { keys: ['süt', '1 bardak süt', 'tam yağlı süt', 'keçi sütü'], name: '1 Su Bardağı Süt (200 ml)', kcal: 122, benefit: '6.8 gram kaliteli protein ve bol kalsiyum içerir; kemik sağlığını güçlendirir ve rahat bir uyku sağlar.' },
         { keys: ['salata', 'çoban salata', 'yeşillik', 'cacık', 'yoğurt', 'ayran'], name: '1 Kase Yoğurt / Ayran / Taze Salata', kcal: 95, benefit: 'Ferahlatıcıdır, vitamin ve probiyotik desteğiyle vücudu yeniler.' },
         { keys: ['elma', 'muz', 'portakal', 'mandalina', 'çilek', 'karpuz', 'meyve'], name: '1 Porsiyon Taze Meyve', kcal: 75, benefit: 'Doğal C vitamini ve antioksidan deposudur, cilde ve bağışıklığa çok iyi gelir.' },
         { keys: ['çay', 'türk kahvesi', 'kahve', 'ıhlamur', 'bitki çayı'], name: 'Şekersiz Çay / Türk Kahvesi', kcal: 5, benefit: 'Zihni açar, yorgunluğu alır ve neredeyse hiç kalorisi yoktur.' },
-        { keys: ['su', 'içme suyu', 'maden suyu', 'soda'], name: 'Su / Doğal Maden Suyu', kcal: 0, benefit: '0 kaloridir; vücudunuzun su ve mineral dengesini korur.' },
+        { keys: ['içme suyu', 'maden suyu', 'soda'], name: 'Su / Doğal Maden Suyu', kcal: 0, benefit: '0 kaloridir; vücudunuzun su ve mineral dengesini korur.' },
         { keys: ['baklava', 'sütlaç', 'tatlı', 'çikolata', 'kek', 'pasta', 'dondurma'], name: '1 Porsiyon Tatlı / Çikolata Keyfi', kcal: 250, benefit: 'Ruhu tatlandırır ve moral verir! Küçük bir yürüyüşle enerjisi keyfe dönüşür.' },
         { keys: ['ekmek', 'tam buğday', 'tost'], name: '1 Dilim Ekmek / Tost', kcal: 85, benefit: 'B vitaminleri içerir ve öğünlerinize doyuruculuk katar.' }
     ];
@@ -8153,12 +8387,25 @@
             announceGuidance('Lütfen yediğiniz veya merak ettiğiniz yemeğin adını yazın ya da Yemeği Sesle Söyle düğmesine basın.', { force: true, bannerState: 'warning' });
             return;
         }
+        // "1 adet elma" içindeki "et" veya "1 su bardağı süt" içindeki "su" hecesinin yanlış eşleşmesini önlemek için tam kelime sınırı kontrolü:
+        const qClean = q.replace(/\b(?:\d+|bir|iki|üç|yarım|adet|tane|porsiyon|tabak|kase|bardak|su\s+bardağı|çay\s+bardağı|dilim|kaşık)\b/gu, ' ').replace(/\s+/g, ' ').trim() || q;
         let matched = null;
         for (const item of TURKISH_FOOD_NUTRITION_DB) {
-            if (item.keys.some(k => q.includes(k) || k.includes(q))) {
+            const hasKeyMatch = item.keys.some(k => {
+                const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const wordRegex = new RegExp(`(?:^|[^\\p{L}])${escaped}(?=$|[^\\p{L}])`, 'iu');
+                return wordRegex.test(qClean) || wordRegex.test(q);
+            });
+            if (hasKeyMatch) {
                 matched = item;
                 break;
             }
+        }
+        if (!matched && /^(?:su|1\s*bardak\s*su|bir\s*bardak\s*su)$/iu.test(q)) {
+            matched = TURKISH_FOOD_NUTRITION_DB.find(x => x.kcal === 0);
+        }
+        if (!matched && /(?:^|[^\p{L}])et(?=$|[^\p{L}])/iu.test(qClean)) {
+            matched = TURKISH_FOOD_NUTRITION_DB.find(x => x.kcal === 260);
         }
         const lastFoodEl = document.getElementById('calorie-last-food');
         const inp = document.getElementById('calorie-food-input');
@@ -8751,9 +8998,9 @@
         if (speakNow) {
             const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex];
             const catDesc = state.selectedCookingCategory === 'ocaksiz'
-                ? 'Ocaksız Yapılabilecek Türk Yemekleri kategorisi açıldı. Bu bölümdeki 14 yemek ve tatlının hiçbirinde ocak veya ateş kullanılmaz; yanma ve taşma tehlikesi sıfırdır.'
+                ? 'Ocaksız Yapılabilecek Türk Yemekleri kategorisi açıldı. Bu bölümdeki 14 yemek ve tatlının hiçbirinde ocak veya ateş kullanılmaz.'
                 : (state.selectedCookingCategory === 'ocakli'
-                    ? 'Ocak Kullanılan Geleneksel Türk Yemekleri kategorisi açıldı. Bu bölümdeki 13 yemekte 4 katmanlı yanma ve taşma koruma kalkanımız devrededir.'
+                    ? 'Ocak Kullanılan Geleneksel Türk Yemekleri kategorisi açıldı. Bu bölümdeki 13 yemekte tam bardak, kaşık ve dakika ölçüleri adım adım sesli anlatılır.'
                     : 'Tüm Türk Yemekleri (toplam 27 tarif) listelendi.');
             announceGuidance(`${catDesc} Şu an seçili yemek: ${rec ? rec.title : ''}.`, {
                 force: true,
@@ -8838,16 +9085,22 @@
             });
             return;
         }
-        const words = q.split(/[\s,;.]+/).filter(w => w.length >= 3);
+        const recipeStopwords = new Set([
+            'var', 'yok', 'ile', 'bir', 'iki', 'evde', 'olan', 'yemek', 'tarif', 'tarifi',
+            'nasıl', 'yapılır', 'tuz', 'su', 'yağ', 'sıvı', 'kaşık', 'bardak', 'adet', 'için'
+        ]);
+        const words = q.split(/[\s,;.]+/).filter(w => w.length >= 3 && !recipeStopwords.has(w));
         let bestIdx = -1;
         let bestScore = 0;
 
         BLIND_ACCESSIBLE_RECIPES.forEach((rec, idx) => {
-            const hay = `${rec.title} ${rec.keywords.join(' ')} ${rec.ingredients}`.toLocaleLowerCase('tr-TR');
+            const titleHay = `${rec.title} ${rec.keywords.join(' ')}`.toLocaleLowerCase('tr-TR');
+            const ingHay = rec.ingredients.toLocaleLowerCase('tr-TR');
             let score = 0;
-            if (hay.includes(q)) score += 5;
+            if (titleHay.includes(q)) score += 8;
             words.forEach(w => {
-                if (hay.includes(w)) score += 2;
+                if (titleHay.includes(w)) score += 4;
+                else if (ingHay.includes(w)) score += 2;
             });
             if (score > bestScore) {
                 bestScore = score;
@@ -8922,11 +9175,38 @@
     }
 
     function setMode(newMode) {
+        const prevMode = state.mode;
         state.mode = newMode;
         state.countdownStage = 0;
         state.kalmanBox = null;
         state.consensusFrames = 0;
         state.signatureDocVerified = false;
+        state.lastDetectedBarcode = '';
+        state.sockSubMode = 'sock';
+
+        if (prevMode === 'qr_screen' && newMode !== 'qr_screen' && state.whatsappHoldTimer) {
+            clearInterval(state.whatsappHoldTimer);
+            state.whatsappHoldTimer = null;
+        }
+        if (prevMode === 'tv_subtitle_score' && newMode !== 'tv_subtitle_score' && state.tvAutoReaderTimer) {
+            clearInterval(state.tvAutoReaderTimer);
+            state.tvAutoReaderTimer = null;
+            state.tvAutoReaderActive = false;
+            const tvBtn = document.getElementById('btn-tv-auto-toggle');
+            if (tvBtn) {
+                tvBtn.classList.remove('active-toggle');
+                tvBtn.setAttribute('aria-pressed', 'false');
+                tvBtn.textContent = '▶️ Otomatik TV Altyazı & Skor Spikerini Başlat';
+            }
+        }
+        if (prevMode === 'song_finder' && newMode !== 'song_finder') {
+            stopSongPreviewPlayback();
+        }
+        const nonCameraModes = new Set(['qibla_compass', 'song_finder', 'step_calorie_guide', 'cooking_guide']);
+        if (nonCameraModes.has(newMode) && state.flashMode === 'auto') {
+            tryEnableHardwareTorch(false);
+        }
+
         syncModePanelsVisibility(newMode);
         if (newMode === 'qibla_compass') {
             state.qiblaActive = true;
@@ -8994,8 +9274,10 @@
     // =========================================================================
     // 7. OLAY DİNLEYİCİLERİ, KIBLE SENSÖRÜ, SINAV KUMANDASI VE KLAVYE KISAYOLLARI
     // =========================================================================
+    state.hasAbsoluteOrientationEvent = false;
     window.addEventListener('deviceorientationabsolute', (ev) => {
         if (typeof ev.alpha === 'number') {
+            state.hasAbsoluteOrientationEvent = true;
             const decl = (state.userLat && state.userLon)
                 ? calculateMagneticDeclination(state.userLat, state.userLon)
                 : 5.5;
@@ -9010,10 +9292,14 @@
             state.tiltRoll = Math.round(ev.gamma);
             state.tiltPitch = Math.round(ev.beta);
         }
+        if (state.hasAbsoluteOrientationEvent) return;
         // SADECE Gerçek Mutlak Manyetik Kuzey (iOS webkitCompassHeading veya absolute === true) kabul edilir!
         if (typeof ev.webkitCompassHeading === 'number') {
             const acc = typeof ev.webkitCompassAccuracy === 'number' ? ev.webkitCompassAccuracy : 10;
-            handleCompassHeadingEvent(ev.webkitCompassHeading, acc);
+            const decl = (state.userLat && state.userLon)
+                ? calculateMagneticDeclination(state.userLat, state.userLon)
+                : 5.5;
+            handleCompassHeadingEvent((ev.webkitCompassHeading + decl) % 360, acc);
         } else if (typeof ev.alpha === 'number' && ev.absolute === true) {
             const decl = (state.userLat && state.userLon)
                 ? calculateMagneticDeclination(state.userLat, state.userLon)
@@ -9077,14 +9363,17 @@
         });
     }
     if (el.photoExplorerCanvas) {
-        el.photoExplorerCanvas.addEventListener('pointerdown', handlePhotoExplorerPointerEvent);
-        el.photoExplorerCanvas.addEventListener('pointermove', (ev) => {
-            if (ev.buttons > 0 || ev.pointerType === 'touch') {
-                handlePhotoExplorerPointerEvent(ev);
-            }
-        });
-        el.photoExplorerCanvas.addEventListener('touchstart', handlePhotoExplorerPointerEvent, { passive: false });
-        el.photoExplorerCanvas.addEventListener('touchmove', handlePhotoExplorerPointerEvent, { passive: false });
+        if ('PointerEvent' in window) {
+            el.photoExplorerCanvas.addEventListener('pointerdown', handlePhotoExplorerPointerEvent);
+            el.photoExplorerCanvas.addEventListener('pointermove', (ev) => {
+                if (ev.buttons > 0 || ev.pointerType === 'touch') {
+                    handlePhotoExplorerPointerEvent(ev);
+                }
+            });
+        } else {
+            el.photoExplorerCanvas.addEventListener('touchstart', handlePhotoExplorerPointerEvent, { passive: false });
+            el.photoExplorerCanvas.addEventListener('touchmove', handlePhotoExplorerPointerEvent, { passive: false });
+        }
     }
     el.btnWhatsappHold.addEventListener('click', startWhatsapp15SecAudioHold);
     el.btnRepeat.addEventListener('click', () => announceGuidance(state.lastSpeechText, { force: true }));
@@ -9270,6 +9559,7 @@
     const btnMemoryVoiceAsk = document.getElementById('btn-memory-voice-ask');
     const btnMemorySearchText = document.getElementById('btn-memory-search-text');
     const btnMemoryReadAll = document.getElementById('btn-memory-read-all');
+    const btnMemoryDeleteLast = document.getElementById('btn-memory-delete-last');
     const btnMemoryTagJar = document.getElementById('btn-memory-tag-jar');
 
     if (btnMemorySaveText && memoryNoteInput) {
@@ -9281,6 +9571,7 @@
         btnMemorySearchText.addEventListener('click', () => searchItemMemoryByQuery(memoryNoteInput.value));
     }
     if (btnMemoryReadAll) btnMemoryReadAll.addEventListener('click', speakAllSavedItemMemories);
+    if (btnMemoryDeleteLast) btnMemoryDeleteLast.addEventListener('click', deleteLastItemMemoryEntry);
     if (btnMemoryTagJar) btnMemoryTagJar.addEventListener('click', tagVisibleJarInCamera);
 
     const btnTvAutoToggle = document.getElementById('btn-tv-auto-toggle');
@@ -9290,8 +9581,18 @@
 
     const btnSockCompare = document.getElementById('btn-sock-compare');
     const btnOutfitStain = document.getElementById('btn-outfit-stain');
-    if (btnSockCompare) btnSockCompare.addEventListener('click', () => captureAndDescribePhoto(false));
-    if (btnOutfitStain) btnOutfitStain.addEventListener('click', () => captureAndDescribePhoto(false));
+    if (btnSockCompare) {
+        btnSockCompare.addEventListener('click', () => {
+            state.sockSubMode = 'sock';
+            captureAndDescribePhoto(false);
+        });
+    }
+    if (btnOutfitStain) {
+        btnOutfitStain.addEventListener('click', () => {
+            state.sockSubMode = 'outfit';
+            captureAndDescribePhoto(false);
+        });
+    }
 
     const btnWhereAmINow = document.getElementById('btn-where-am-i-now');
     const btnWhereWhatsapp = document.getElementById('btn-where-whatsapp');
@@ -9318,25 +9619,7 @@
         });
     }
     if (btnCalorieVoice) {
-        btnCalorieVoice.addEventListener('click', () => {
-            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRec) {
-                announceGuidance('Lütfen yemeğin adını kutuya yazın.', { force: true });
-                return;
-            }
-            announceGuidance('Şimdi yediğiniz veya merak ettiğiniz yemeğin adını söyleyin, örneğin: Mercimek çorbası veya 1 simit.', { force: true });
-            setTimeout(() => {
-                try {
-                    const rec = new SpeechRec();
-                    rec.lang = 'tr-TR';
-                    rec.onresult = (ev) => {
-                        const t = (ev.results && ev.results[0] && ev.results[0][0]) ? ev.results[0][0].transcript : '';
-                        if (t) calculateAndSpeakFoodCalories(t);
-                    };
-                    rec.start();
-                } catch (_) {}
-            }, 1500);
-        });
+        btnCalorieVoice.addEventListener('click', () => startVoiceItemMemoryCapture('calorie'));
     }
 
     // 23. Erişilebilir Yemek Yapma Rehberi ve Konuşan Aşçı Düğmeleri
@@ -9356,9 +9639,6 @@
     const btnCookingPrev = document.getElementById('btn-cooking-prev');
     const btnCookingCurrent = document.getElementById('btn-cooking-current');
     const btnCookingNext = document.getElementById('btn-cooking-next');
-    const btnCookingTimer = document.getElementById('btn-cooking-timer');
-    const btnCookingCheckDoneness = document.getElementById('btn-cooking-check-doneness');
-    const btnCookingSafetyTips = document.getElementById('btn-cooking-safety-tips');
 
     if (cookingRecipeSelect) {
         cookingRecipeSelect.addEventListener('change', () => {
@@ -9375,28 +9655,7 @@
         });
     }
     if (btnCookingVoice) {
-        btnCookingVoice.addEventListener('click', () => {
-            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRec) {
-                announceGuidance('Lütfen evdeki malzemeleri veya yemek adını kutuya yazın.', { force: true });
-                return;
-            }
-            announceGuidance('Evde hangi malzemeler var veya hangi yemeği yapmak istiyorsunuz? Şimdi söyleyin, örneğin: Patates ve kıyma var ya da pirinç pilavı.', { force: true });
-            setTimeout(() => {
-                try {
-                    const rec = new SpeechRec();
-                    rec.lang = 'tr-TR';
-                    rec.onresult = (ev) => {
-                        const t = (ev.results && ev.results[0] && ev.results[0][0]) ? ev.results[0][0].transcript : '';
-                        if (t) {
-                            if (cookingIngredientInput) cookingIngredientInput.value = t;
-                            findRecipeByIngredientsOrName(t);
-                        }
-                    };
-                    rec.start();
-                } catch (_) {}
-            }, 1600);
-        });
+        btnCookingVoice.addEventListener('click', () => startVoiceItemMemoryCapture('cooking'));
     }
     if (btnCookingIngredients) btnCookingIngredients.addEventListener('click', speakCookingIngredients);
     if (btnCookingPrev) btnCookingPrev.addEventListener('click', () => stepCookingInstruction(-1));
@@ -9422,14 +9681,21 @@
 
     el.btnCopyResult.addEventListener('click', async () => {
         const txt = el.resultText.textContent || '';
-        if (txt && navigator.clipboard) {
-            await navigator.clipboard.writeText(txt);
+        if (txt) {
+            await copyTextUniversal(txt, 'Kamera Asistanı Raporu');
             announceGuidance('Rapor panoya kopyalandı.', { force: true });
         }
     });
 
     el.btnDownloadPhoto.addEventListener('click', () => {
         if (!state.lastCapturedDataUrl) return;
+        if (window.AndroidSongBridge && typeof window.AndroidSongBridge.saveBase64PhotoToGallery === 'function') {
+            const ok = window.AndroidSongBridge.saveBase64PhotoToGallery(state.lastCapturedDataUrl);
+            if (ok) {
+                announceGuidance('Fotoğraf telefonunuzun galerisine kaydedildi.', { force: true });
+                return;
+            }
+        }
         const a = document.createElement('a');
         a.href = state.lastCapturedDataUrl;
         a.download = `mikyas-kamera-${Date.now()}.jpg`;
@@ -9457,19 +9723,36 @@
         else if (key === 'g') setMode('food_freshness');
         else if (key === 'p') setMode('social_presence');
         else if (key === 'h') {
-            setMode('song_finder');
-            toggleSongListening();
+            if (state.mode !== 'song_finder') {
+                setMode('song_finder');
+            } else {
+                toggleSongListening();
+            }
         }
         else if (key === 'k') startQiblaCompassSensor();
         else if (key === 'v') speakPrayerTimesAndSolarValidation();
         else if (key === 's') speakCurrentQuestionStem();
         else if (key === 'a') speakSingleOption('A');
-        else if (key === 'b') speakSingleOption('B');
+        else if (key === 'b') {
+            if (state.mode === 'exam_reader') {
+                speakSingleOption('B');
+            } else if (el.btnSpeakStory) {
+                el.btnSpeakStory.click();
+            }
+        }
         else if (key === 'c') speakSingleOption('C');
         else if (key === 'd') speakSingleOption('D');
         else if (key === 'e') speakSingleOption('E');
-        else if (ev.key === 'ArrowLeft') el.btnExamPrev.click();
-        else if (ev.key === 'ArrowRight') el.btnExamNext.click();
+        else if (ev.key === 'ArrowLeft') {
+            if (state.mode === 'song_finder') stepLyricLine(-1);
+            else if (state.mode === 'cooking_guide') stepCookingInstruction(-1);
+            else el.btnExamPrev.click();
+        }
+        else if (ev.key === 'ArrowRight') {
+            if (state.mode === 'song_finder') stepLyricLine(1);
+            else if (state.mode === 'cooking_guide') stepCookingInstruction(1);
+            else el.btnExamNext.click();
+        }
         else if (key === 'r') el.btnToggleRadar.click();
         else if (key === 'o') el.btnToggleAuto.click();
         else if (key === 'f' && !el.btnToggleFlash.disabled) el.btnToggleFlash.click();
@@ -9502,6 +9785,21 @@
     });
 
     window.addEventListener('load', () => {
+        if (window.AndroidSongBridge) {
+            const backHome = document.getElementById('header-back-home-link');
+            const apkDl = document.getElementById('header-apk-download-link');
+            if (backHome) backHome.hidden = true;
+            if (apkDl) apkDl.hidden = true;
+        }
+        try {
+            const savedStopRaw = localStorage.getItem('mikyas_saved_bus_stop');
+            if (savedStopRaw) {
+                const parsedStop = JSON.parse(savedStopRaw);
+                if (parsedStop && parsedStop.name && typeof parsedStop.lat === 'number' && typeof parsedStop.lon === 'number') {
+                    POPULAR_STOP_LANDMARKS.unshift(parsedStop);
+                }
+            }
+        } catch (_) {}
         loadMoneyLedgerFromStorage();
         loadItemMemoriesFromStorage();
         loadStepCalorieFromStorage();

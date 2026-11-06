@@ -2,14 +2,22 @@ package tr.com.mikyasstudio.kameraasistani;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.WindowManager;
@@ -32,18 +40,25 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     private static final int REQ_PERMS = 1001;
     private static final int REQ_FILE_CHOOSER = 1002;
     private static final int REQ_VOICE_SONG = 1003;
+    private static final int REQ_VOICE_GENERIC = 1004;
     private static final String LIVE_APP_URL = "https://cengiz145.github.io/mikyasgame/kamera_asistan/";
     private static final String LOCAL_FALLBACK_URL = "file:///android_asset/www/index.html";
     private WebView webView;
     private ValueCallback<Uri[]> filePathCallback;
     private String pendingSharedImageDataUrl = null;
     private String pendingSharedVideoJsCall = null;
+    private String pendingVoicePurpose = "song";
+    private TextToSpeech nativeTts;
+    private boolean nativeTtsReady = false;
+    private long lastVolumeUpTime = 0;
     private long lastVolumeDownTime = 0;
 
     @Override
@@ -51,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        nativeTts = new TextToSpeech(this, this);
         extractSharedImageIfPresent(getIntent());
 
         webView = new WebView(this);
@@ -74,6 +90,36 @@ public class MainActivity extends AppCompatActivity {
         webView.addJavascriptInterface(new AndroidSongBridge(), "AndroidSongBridge");
 
         webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (request == null || request.getUrl() == null) return false;
+                Uri uri = request.getUrl();
+                String scheme = uri.getScheme() != null ? uri.getScheme().toLowerCase(Locale.ROOT) : "";
+                String host = uri.getHost() != null ? uri.getHost().toLowerCase(Locale.ROOT) : "";
+                String urlStr = uri.toString();
+
+                if ("file".equals(scheme)) {
+                    if (urlStr.endsWith("/android_asset/index.html") || urlStr.endsWith(".apk")) {
+                        return true;
+                    }
+                    return false;
+                }
+                if (("https".equals(scheme) || "http".equals(scheme)) && host.contains("cengiz145.github.io")) {
+                    if (urlStr.endsWith(".apk") || !uri.getPath().contains("kamera_asistan")) {
+                        return true;
+                    }
+                    return false;
+                }
+                try {
+                    Intent extIntent = new Intent(Intent.ACTION_VIEW, uri);
+                    extIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(extIntent);
+                    return true;
+                } catch (Exception ignored) {
+                    return true;
+                }
+            }
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
@@ -133,6 +179,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS && nativeTts != null) {
+            nativeTts.setLanguage(new Locale("tr", "TR"));
+            nativeTts.setSpeechRate(1.1f);
+            nativeTtsReady = true;
+        }
+    }
+
     public class AndroidSongBridge {
         @JavascriptInterface
         public void startNativeVoiceLyricsCapture() {
@@ -145,6 +200,95 @@ public class MainActivity extends AppCompatActivity {
                     startActivityForResult(intent, REQ_VOICE_SONG);
                 } catch (Exception ignored) {}
             });
+        }
+
+        @JavascriptInterface
+        public void startNativeVoiceCaptureForMode(final String purpose, final String promptText) {
+            runOnUiThread(() -> {
+                try {
+                    pendingVoicePurpose = purpose != null ? purpose : "generic";
+                    Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "tr-TR");
+                    intent.putExtra(RecognizerIntent.EXTRA_PROMPT, promptText != null ? promptText : "Lütfen konuşun...");
+                    startActivityForResult(intent, REQ_VOICE_GENERIC);
+                } catch (Exception ignored) {}
+            });
+        }
+
+        @JavascriptInterface
+        public void speakNativeTurkish(final String text, final boolean flush) {
+            if (text == null || text.trim().isEmpty()) return;
+            if (nativeTtsReady && nativeTts != null) {
+                nativeTts.speak(
+                    text,
+                    flush ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD,
+                    null,
+                    "mikyas_native_tts"
+                );
+            }
+        }
+
+        @JavascriptInterface
+        public void stopNativeSpeech() {
+            if (nativeTtsReady && nativeTts != null) {
+                try { nativeTts.stop(); } catch (Exception ignored) {}
+            }
+        }
+
+        @JavascriptInterface
+        public boolean copyToClipboard(final String label, final String text) {
+            if (text == null) return false;
+            try {
+                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                if (cm != null) {
+                    ClipData clip = ClipData.newPlainText(label != null ? label : "MikyasKamera", text);
+                    cm.setPrimaryClip(clip);
+                    return true;
+                }
+            } catch (Exception ignored) {}
+            return false;
+        }
+
+        @JavascriptInterface
+        public boolean openExternalUrl(final String urlStr) {
+            if (urlStr == null || urlStr.trim().isEmpty()) return false;
+            try {
+                Intent extIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlStr.trim()));
+                extIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(extIntent);
+                return true;
+            } catch (Exception ignored) {
+                return false;
+            }
+        }
+
+        @JavascriptInterface
+        public boolean saveBase64PhotoToGallery(final String dataUrl) {
+            if (dataUrl == null || !dataUrl.contains(",")) return false;
+            try {
+                String base64Part = dataUrl.substring(dataUrl.indexOf(',') + 1);
+                byte[] bytes = Base64.decode(base64Part, Base64.DEFAULT);
+                if (bytes == null || bytes.length == 0) return false;
+
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DISPLAY_NAME, "mikyas_kamera_" + System.currentTimeMillis() + ".jpg");
+                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/ErisilebilirKamera");
+                }
+                Uri uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                if (uri != null) {
+                    try (OutputStream os = getContentResolver().openOutputStream(uri)) {
+                        if (os != null) {
+                            os.write(bytes);
+                            os.flush();
+                            return true;
+                        }
+                    }
+                }
+            } catch (Exception ignored) {}
+            return false;
         }
 
         @JavascriptInterface
@@ -271,21 +415,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deliverPendingSharedImageToWebView() {
-        if (pendingSharedImageDataUrl != null && webView != null) {
-            final String payload = pendingSharedImageDataUrl;
-            pendingSharedImageDataUrl = null;
-            webView.postDelayed(() -> {
-                String js = "if (typeof window.receiveSharedPhotoFromAndroid === 'function') { window.receiveSharedPhotoFromAndroid('" + payload + "'); }";
-                webView.evaluateJavascript(js, null);
-            }, 600);
-        }
-        if (pendingSharedVideoJsCall != null && webView != null) {
-            final String jsCall = pendingSharedVideoJsCall;
-            pendingSharedVideoJsCall = null;
-            webView.postDelayed(() -> {
-                webView.evaluateJavascript(jsCall, null);
-            }, 700);
-        }
+        attemptDeliverSharedMedia(12);
+    }
+
+    private void attemptDeliverSharedMedia(final int retriesLeft) {
+        if (webView == null || retriesLeft <= 0) return;
+        if (pendingSharedImageDataUrl == null && pendingSharedVideoJsCall == null) return;
+
+        webView.postDelayed(() -> {
+            if (webView == null) return;
+            webView.evaluateJavascript(
+                "(typeof window.receiveSharedPhotoFromAndroid === 'function' && typeof window.receiveSharedVideoFramesFromAndroid === 'function')",
+                value -> {
+                    if ("true".equals(value)) {
+                        if (pendingSharedImageDataUrl != null) {
+                            final String payload = pendingSharedImageDataUrl;
+                            pendingSharedImageDataUrl = null;
+                            String js = "window.receiveSharedPhotoFromAndroid('" + payload + "');";
+                            webView.evaluateJavascript(js, null);
+                        }
+                        if (pendingSharedVideoJsCall != null) {
+                            final String jsCall = pendingSharedVideoJsCall;
+                            pendingSharedVideoJsCall = null;
+                            webView.evaluateJavascript(jsCall, null);
+                        }
+                    } else {
+                        attemptDeliverSharedMedia(retriesLeft - 1);
+                    }
+                }
+            );
+        }, 450);
     }
 
     @Override
@@ -305,9 +464,19 @@ public class MainActivity extends AppCompatActivity {
         } else if (requestCode == REQ_VOICE_SONG && resultCode == Activity.RESULT_OK && data != null) {
             ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             if (matches != null && !matches.isEmpty() && webView != null) {
-                String spoken = matches.get(0).replace("'", "\\'").replace("\n", " ");
+                String spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
                 webView.evaluateJavascript(
                     "if (typeof window.receiveRecognizedSongWordsFromAndroid === 'function') { window.receiveRecognizedSongWordsFromAndroid('" + spoken + "'); }",
+                    null
+                );
+            }
+        } else if (requestCode == REQ_VOICE_GENERIC && resultCode == Activity.RESULT_OK && data != null) {
+            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            if (matches != null && !matches.isEmpty() && webView != null) {
+                String spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+                String safePurpose = (pendingVoicePurpose != null ? pendingVoicePurpose : "generic").replace("'", "");
+                webView.evaluateJavascript(
+                    "if (typeof window.receiveNativeVoiceCaptureFromAndroid === 'function') { window.receiveNativeVoiceCaptureFromAndroid('" + safePurpose + "', '" + spoken + "'); }",
                     null
                 );
             }
@@ -328,18 +497,40 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Ses Açma Tuşu: Anında Fotoğraf / Sınav Kağıdı Çek ve Betimle (Space Kısayolu)
+        // Ses Açma Tuşu: Tek basışta telefonun sesini normal açar; hızlı çift basışta Fotoğraf / Sınav Kağıdı Çeker (Space Kısayolu)
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'Space', key: ' '}));", null);
-            return true;
+            long now = System.currentTimeMillis();
+            if (now - lastVolumeUpTime < 450) {
+                lastVolumeUpTime = 0;
+                webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'Space', key: ' '}));", null);
+                return true;
+            }
+            lastVolumeUpTime = now;
+            return super.onKeyDown(keyCode, event);
         }
-        // Ses Kısma Tuşu: Tek veya çift basışta Son Söyleneni Tekrar Oku (T Kısayolu - Galeri/Flaş tetiklemez)
+        // Ses Kısma Tuşu: Tek basışta telefonun sesini normal kısar; hızlı çift basışta Son Söyleneni Tekrar Okur (T Kısayolu)
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'KeyT', key: 't'}));", null);
-            lastVolumeDownTime = System.currentTimeMillis();
-            return true;
+            long now = System.currentTimeMillis();
+            if (now - lastVolumeDownTime < 450) {
+                lastVolumeDownTime = 0;
+                webView.evaluateJavascript("window.dispatchEvent(new KeyboardEvent('keydown', {code: 'KeyT', key: 't'}));", null);
+                return true;
+            }
+            lastVolumeDownTime = now;
+            return super.onKeyDown(keyCode, event);
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (nativeTts != null) {
+            try {
+                nativeTts.stop();
+                nativeTts.shutdown();
+            } catch (Exception ignored) {}
+        }
+        super.onDestroy();
     }
 
     @Override

@@ -29,9 +29,9 @@
 
     <header class="app-header" role="banner">
         <div class="header-top">
-            <a href="../index.html" class="back-btn" aria-label="Mikyas Studio Ana Sayfasına Dön">← Ana Sayfa</a>
+            <a id="header-back-home-link" href="../index.html" class="back-btn" aria-label="Mikyas Studio Ana Sayfasına Dön">← Ana Sayfa</a>
             <h1>Erişilebilir Kamera Uygulaması</h1>
-            <a href="MikyasKameraAsistani.apk" download="MikyasKameraAsistani.apk" class="apk-download-btn" aria-label="Android Telefonlar İçin Erişilebilir Kamera Uygulaması APK Dosyasını İndir">
+            <a id="header-apk-download-link" href="MikyasKameraAsistani.apk" download="MikyasKameraAsistani.apk" class="apk-download-btn" aria-label="Android Telefonlar İçin Erişilebilir Kamera Uygulaması APK Dosyasını İndir">
                 📱 Telefona İndir (Android APK)
             </a>
             <span id="ai-status-badge" class="status-badge" role="status">Sesli Asistan Hazırlanıyor...</span>
@@ -259,6 +259,23 @@
                 </button>
                 <button type="button" id="btn-song-read-lyrics" class="secondary-btn" disabled aria-label="Bulunan Şarkının Sözlerini Sesli Oku">
                     📜 Şarkı Sözlerini Oku
+                </button>
+                <button type="button" id="btn-song-tuner" class="secondary-btn" aria-pressed="false" aria-label="Sesli Enstrüman Akort ve Türk Müziği Makam Bulucuyu Aç veya Kapat">
+                    🎸 Sesli Enstrüman Akort &amp; Makam: Kapalı
+                </button>
+                <button type="button" id="btn-song-history" class="secondary-btn" aria-label="Daha Önce Bulduğunuz Şarkılar Defterini Sesli Dinle">
+                    📒 Bulduğum Şarkılar Defteri
+                </button>
+            </div>
+            <div class="exam-nav-row" role="group" aria-label="Mısra Mısra Şarkı Sözü Gezinme Kontrolleri" style="margin-top: 0.45rem;">
+                <button type="button" id="btn-lyric-prev" class="secondary-btn" disabled aria-label="Önceki Mısrayı Sesli Oku">
+                    ⬅️ Önceki Mısra
+                </button>
+                <button type="button" id="btn-lyric-current" class="secondary-btn" disabled aria-label="Şu Anki Mısrayı Tekrar Sesli Oku">
+                    🎤 Bu Mısrayı Oku
+                </button>
+                <button type="button" id="btn-lyric-next" class="secondary-btn" disabled aria-label="Sonraki Mısrayı Sesli Oku">
+                    Sonraki Mısra ➡️
                 </button>
             </div>
             <div class="exam-nav-row" style="align-items:center; gap: 0.6rem; margin-top: 0.6rem;">
@@ -559,6 +576,9 @@
                 <button type="button" id="btn-memory-tag-jar" class="secondary-btn" aria-label="Kameranın Önündeki Kavanozu veya Kutuyu Yazılan İsimle Etiketle">
                     🏷️ Kameradaki Kavanozu Etiketle
                 </button>
+                <button type="button" id="btn-memory-delete-last" class="secondary-btn" aria-label="Hafızaya Eklenen Son Eşya Kaydını Sil">
+                    🗑️ Son Kaydı Sil
+                </button>
             </div>
             <div id="item-memory-list-box" class="telemetry-item" style="margin-top: 0.4rem;">
                 <span class="t-label">Kayıtlı Eşyalarınız ve Yerleri:</span>
@@ -858,7 +878,7 @@
                 <li><strong>Sınav Kağıdı Okurken:</strong> Telefonu kağıdın biraz yukarısında düz tutun. Elinizin gölgesi kağıda düşse bile sistem gölgeyi siler, şıkları birbirine karıştırmaz. Çekimden sonra <code>A, B, C, D, E</code> düğmelerine basarak istediğiniz şıkkı tek tek dinleyebilirsiniz.</li>
                 <li><strong>Kıbleyi Bulurken:</strong> Telefonu avucunuzun içinde yere düz tutarak kendi etrafınızda yavaşça dönün. Eğer çevrede mıknatıs veya demir varsa sistem yanılmamak için sizi uyarır ve Güneşin yönüne göre de Kıbleyi tarif eder.</li>
                 <li><strong>İlaç Tarihi ve Yiyecek Kontrolü:</strong> İlaç kutusunu okuttuğunuzda son kullanma tarihi geçmişse acil uyarı sesi çalar. Yiyecek paketlerinde ise alerji yapan maddeleri (gluten, süt, fıstık vb.) hemen ayıklayıp söyler.</li>
-                <li><strong>İmza Atarken ve Çay Doldururken:</strong> İmza modunda kaleminizi kağıda yaklaştırın; nereye götüreceğinizi santim santim söyler. Çay/su doldurma modunda ise bardağı karşısına koyun; bardak doldukça ses incelir ve taşmadan önce "Durdurun!" der.</li>
+                <li><strong>İmza Atarken ve Masada Bardak Ararken:</strong> İmza modunda önce kağıtta ne yazdığını çift dokunarak okutun, ardından kaleminizi kağıda yaklaştırın; nereye götüreceğinizi santim santim söyler. Bardak bulucu modunda ise masadaki bardağı veya şişeyi elinizi çarpmadan bulmanızı sağlar (güvenliğiniz için kaynar çay veya sıcak su doldururken kameraya güvenmeyin).</li>
                 <li><strong>Kulaklıksız Hoparlör ve Titreşim Dili:</strong> Bu uygulama kulaklık olmadan, doğrudan telefonun kendi hoparlörü ve avuç içi titreşimiyle kullanılmak üzere tasarlanmıştır. Sola dönmeniz gerektiğinde <strong>çift tok ses (tık-tık)</strong>, sağa dönmeniz gerektiğinde <strong>tek ince ses (biip)</strong>, tam ortaladığınızda ise <strong>üçlü onay melodisi ve titreşim</strong> verir.</li>
                 <li><strong>Klavye Kısayolları:</strong> <code>1</code>–<code>9</code> ve <code>0, U, I, G, P</code> (14 moddan birini seçer), <code>Boşluk</code> (Çeker ve okur), <code>K</code> (Kıbleyi başlatır), <code>V</code> (Namaz vakitlerini okur), <code>S, A, B, C, D, E</code> (Soruyu ve şıkları tek tek okur), <code>T</code> (Son cümleyi tekrarlar).</li>
             </ul>

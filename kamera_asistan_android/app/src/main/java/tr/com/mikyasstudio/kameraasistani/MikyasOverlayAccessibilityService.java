@@ -11,11 +11,11 @@ import android.view.KeyEvent;
 import android.view.accessibility.AccessibilityEvent;
 import androidx.annotation.NonNull;
 import java.util.Locale;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * WhatsApp "Cihaz Bağla" veya Banka QR ekranları açıkken arka planda ekranı
+ * WhatsApp "Cihaz Bağla" veya Bilgisayar Karekod (QR) ekranları açıkken arka planda ekranı
  * analiz edip bilgisayar ekranının konumunu Türkçe sesle söyleyen Erişilebilirlik Servisi.
  * Ses Açma tuşuna çift basıldığında 15 saniyelik canlı ekran hizalama taramasını başlatır.
  */
@@ -25,7 +25,7 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
     private boolean liveScanActive = false;
     private long lastVolUpPress = 0;
     private long lastSpokenTime = 0;
-    private final Executor executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Override
     public void onCreate() {
@@ -162,6 +162,8 @@ public class MikyasOverlayAccessibilityService extends AccessibilityService impl
 
     @Override
     public void onDestroy() {
+        liveScanActive = false;
+        executor.shutdownNow();
         if (tts != null) {
             tts.stop();
             tts.shutdown();
