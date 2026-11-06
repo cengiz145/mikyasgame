@@ -1779,11 +1779,12 @@
     }
 
     function handleAutoCaptureCountdown(note = '') {
+        const cleanNote = (typeof note === 'string' && note.trim()) ? `${note.trim()} ` : '';
         const now = performance.now();
         if (state.countdownStage === 0) {
             state.countdownStage = 3;
             state.lastCountdownTick = now;
-            announceGuidance(`${note} Sabit tutun: 3`, { force: true, bannerState: 'centered' });
+            announceGuidance(`${cleanNote}Sabit tutun: 3`, { force: true, bannerState: 'centered' });
         } else if (now - state.lastCountdownTick >= 1050) {
             state.countdownStage--;
             state.lastCountdownTick = now;
@@ -3519,7 +3520,7 @@
         el.tPosition.textContent = verifiedObjs.length > 0
             ? `${TR_LABELS[verifiedObjs[0].class] || verifiedObjs[0].class}`
             : (isCalorieMode ? `Adım: ${state.dailySteps || 0}` : 'Paket / Etiket Alanı');
-        el.tDistance.textContent = isCalorieMode ? `Alınan: ${state.dailyCalorieIntake || 0} kcal` : `Merkez Renk: ${colName}`;
+        el.tDistance.textContent = isCalorieMode ? `Alınan: ${state.dailyIntakeKcal || 0} kcal` : `Merkez Renk: ${colName}`;
 
         const objPhrase = verifiedObjs.length > 0
             ? `Önünüzde ${TR_LABELS[verifiedObjs[0].class] || verifiedObjs[0].class} görünüyor. `
@@ -6802,6 +6803,13 @@
             if (el.songHeardWords) el.songHeardWords.textContent = `"${clean}"`;
             if (el.songSearchInput) el.songSearchInput.value = clean;
             searchSongByLyricsOrQuery(clean);
+        } else {
+            if (el.songHeardWords) {
+                el.songHeardWords.textContent = 'Ses algılanamadı veya dinleme iptal edildi. Tekrar denemek için düğmeye basın.';
+            }
+            if (!state.songAutoRadarEnabled) {
+                announceGuidance('Ses algılanamadı veya dinleme penceresi kapatıldı.', { force: true, bannerState: 'warning' });
+            }
         }
     };
 
@@ -6847,7 +6855,8 @@
             const textReport = `📒 Bulduğunuz Şarkılar Defteri (${list.length} Şarkı):\n\n` +
                 list.map((item, idx) => `${idx + 1}. ${item.title} — ${item.artist} (${item.album}) [Saat ${item.savedAt}]`).join('\n');
             showDetectedResult('📒 Bulduğum Şarkılar Defteri', textReport);
-            renderSongAlternatives(list.slice(0, 5), 'Kayıtlı Şarkılarınızdan Tek Dokunuşla Dinleyin:');
+            state.songAlternatives = list.slice(0, 5);
+            renderSongAlternatives(state.songAlternatives, 'Kayıtlı Şarkılarınızdan Tek Dokunuşla Dinleyin:');
             announceGuidance(`Şarkı defterinizde toplam ${list.length} şarkı kayıtlı: ${summaryItems.join(', ')}.`, {
                 force: true,
                 bannerState: 'centered'
@@ -7453,12 +7462,16 @@
             el.tPosition.textContent = busPred.class === 'bus' ? 'Otobüs Yaklaşıyor!' : 'Araç Göründü';
             el.tDistance.textContent = 'Hat Okunuyor...';
             if (busPred.class === 'bus') {
-                announceGuidance('Karşıdan otobüs veya minibüs yaklaşıyor! Hat numarasını okumak için kamerayı aracın ön camına doğru sabit tutun veya Boşluk tuşuna basın.', {
-                    bannerState: 'centered',
-                    minIntervalMs: 3800
-                });
                 const isReadyForBusOcr = metrics.sharpness >= 6.8 && !state.isProcessingOcr;
-                handleAutoCaptureCountdown(isReadyForBusOcr);
+                if (state.autoCaptureEnabled && isReadyForBusOcr) {
+                    handleAutoCaptureCountdown('Yaklaşan otobüs netlendi, hat numarası okunuyor!');
+                } else {
+                    state.countdownStage = 0;
+                    announceGuidance('Karşıdan otobüs veya minibüs yaklaşıyor! Hat numarasını okumak için kamerayı aracın ön camına doğru sabit tutun veya Boşluk tuşuna basın.', {
+                        bannerState: 'centered',
+                        minIntervalMs: 3800
+                    });
+                }
                 return;
             }
         }
@@ -7890,7 +7903,10 @@
 
     window.receiveNativeVoiceCaptureFromAndroid = function (purpose, spokenText) {
         const clean = String(spokenText || '').trim();
-        if (!clean) return;
+        if (!clean) {
+            announceGuidance('Ses algılanamadı veya konuşma penceresi kapatıldı.', { force: true, bannerState: 'warning' });
+            return;
+        }
         if (purpose === 'save') {
             saveItemMemoryEntry(clean);
         } else if (purpose === 'bus_dest') {
@@ -8280,9 +8296,14 @@
         { keys: ['ekmek', 'tam buğday', 'tost'], name: '1 Dilim Ekmek / Tost', kcal: 85, benefit: 'B vitaminleri içerir ve öğünlerinize doyuruculuk katar.' }
     ];
 
+    function getLocalTodayDateKey() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
     function loadStepCalorieFromStorage() {
         try {
-            const todayKey = new Date().toISOString().slice(0, 10);
+            const todayKey = getLocalTodayDateKey();
             const raw = localStorage.getItem(STEP_CALORIE_STORAGE_KEY);
             if (raw) {
                 const parsed = JSON.parse(raw);
@@ -8297,7 +8318,7 @@
 
     function saveStepCalorieToStorage() {
         try {
-            const todayKey = new Date().toISOString().slice(0, 10);
+            const todayKey = getLocalTodayDateKey();
             localStorage.setItem(STEP_CALORIE_STORAGE_KEY, JSON.stringify({
                 date: todayKey,
                 steps: state.dailySteps,
@@ -9184,7 +9205,7 @@
         state.lastDetectedBarcode = '';
         state.sockSubMode = 'sock';
 
-        if (prevMode === 'qr_screen' && newMode !== 'qr_screen' && state.whatsappHoldTimer) {
+        if (newMode !== 'qr_screen' && state.whatsappHoldTimer) {
             clearInterval(state.whatsappHoldTimer);
             state.whatsappHoldTimer = null;
         }

@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
@@ -198,7 +200,14 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "tr-TR");
                     intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Çalan şarkının sözlerini dinletin veya hatırladığınız birkaç kelimesini söyleyin...");
                     startActivityForResult(intent, REQ_VOICE_SONG);
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    if (webView != null) {
+                        webView.evaluateJavascript(
+                            "if (typeof window.receiveRecognizedSongWordsFromAndroid === 'function') { window.receiveRecognizedSongWordsFromAndroid(''); }",
+                            null
+                        );
+                    }
+                }
             });
         }
 
@@ -212,7 +221,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "tr-TR");
                     intent.putExtra(RecognizerIntent.EXTRA_PROMPT, promptText != null ? promptText : "Lütfen konuşun...");
                     startActivityForResult(intent, REQ_VOICE_GENERIC);
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    if (webView != null) {
+                        String safePurpose = (pendingVoicePurpose != null ? pendingVoicePurpose : "generic").replace("'", "");
+                        webView.evaluateJavascript(
+                            "if (typeof window.receiveNativeVoiceCaptureFromAndroid === 'function') { window.receiveNativeVoiceCaptureFromAndroid('" + safePurpose + "', ''); }",
+                            null
+                        );
+                    }
+                }
             });
         }
 
@@ -295,17 +312,15 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         public boolean launchGoogleHumToSearch() {
             try {
                 Intent googleMusicIntent = new Intent("com.google.android.googlequicksearchbox.MUSIC_SEARCH");
-                if (googleMusicIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(googleMusicIntent);
-                    return true;
-                }
+                googleMusicIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(googleMusicIntent);
+                return true;
             } catch (Exception ignored) {}
             try {
                 Intent stdMusicIntent = new Intent("android.intent.action.MUSIC_SEARCH");
-                if (stdMusicIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(stdMusicIntent);
-                    return true;
-                }
+                stdMusicIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(stdMusicIntent);
+                return true;
             } catch (Exception ignored) {}
             return false;
         }
@@ -327,34 +342,61 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
         if (mediaUri == null) return;
 
         if (intent.getType().startsWith("image/")) {
-            try (InputStream is = getContentResolver().openInputStream(mediaUri)) {
-                if (is != null) {
-                    Bitmap rawBmp = BitmapFactory.decodeStream(is);
-                    if (rawBmp != null) {
-                        int w = rawBmp.getWidth();
-                        int h = rawBmp.getHeight();
-                        int maxDim = 1280;
-                        Bitmap targetBmp = rawBmp;
-                        if (w > maxDim || h > maxDim) {
-                            float scale = Math.min((float) maxDim / w, (float) maxDim / h);
-                            targetBmp = Bitmap.createScaledBitmap(
-                                rawBmp,
-                                Math.max(1, Math.round(w * scale)),
-                                Math.max(1, Math.round(h * scale)),
-                                true
-                            );
-                            if (targetBmp != rawBmp) {
-                                rawBmp.recycle();
-                            }
-                        }
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        targetBmp.compress(Bitmap.CompressFormat.JPEG, 88, bos);
-                        targetBmp.recycle();
-                        String base64 = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
-                        pendingSharedImageDataUrl = "data:image/jpeg;base64," + base64;
+            final Uri imageUri = mediaUri;
+            new Thread(() -> {
+                int rotationDegrees = 0;
+                try (InputStream exifStream = getContentResolver().openInputStream(imageUri)) {
+                    if (exifStream != null) {
+                        ExifInterface exif = new ExifInterface(exifStream);
+                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                        if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationDegrees = 90;
+                        else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationDegrees = 180;
+                        else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationDegrees = 270;
                     }
-                }
-            } catch (Exception ignored) {}
+                } catch (Exception ignored) {}
+
+                try (InputStream is = getContentResolver().openInputStream(imageUri)) {
+                    if (is != null) {
+                        Bitmap rawBmp = BitmapFactory.decodeStream(is);
+                        if (rawBmp != null) {
+                            if (rotationDegrees != 0) {
+                                Matrix matrix = new Matrix();
+                                matrix.postRotate(rotationDegrees);
+                                Bitmap rotatedBmp = Bitmap.createBitmap(rawBmp, 0, 0, rawBmp.getWidth(), rawBmp.getHeight(), matrix, true);
+                                if (rotatedBmp != rawBmp) {
+                                    rawBmp.recycle();
+                                    rawBmp = rotatedBmp;
+                                }
+                            }
+                            int w = rawBmp.getWidth();
+                            int h = rawBmp.getHeight();
+                            int maxDim = 1280;
+                            Bitmap targetBmp = rawBmp;
+                            if (w > maxDim || h > maxDim) {
+                                float scale = Math.min((float) maxDim / w, (float) maxDim / h);
+                                targetBmp = Bitmap.createScaledBitmap(
+                                    rawBmp,
+                                    Math.max(1, Math.round(w * scale)),
+                                    Math.max(1, Math.round(h * scale)),
+                                    true
+                                );
+                                if (targetBmp != rawBmp) {
+                                    rawBmp.recycle();
+                                }
+                            }
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            targetBmp.compress(Bitmap.CompressFormat.JPEG, 88, bos);
+                            targetBmp.recycle();
+                            String base64 = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+                            final String dataUrl = "data:image/jpeg;base64," + base64;
+                            runOnUiThread(() -> {
+                                pendingSharedImageDataUrl = dataUrl;
+                                deliverPendingSharedImageToWebView();
+                            });
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }).start();
         } else if (intent.getType().startsWith("video/")) {
             final Uri videoUri = mediaUri;
             new Thread(() -> {
@@ -461,19 +503,29 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
             filePathCallback.onReceiveValue(results);
             filePathCallback = null;
-        } else if (requestCode == REQ_VOICE_SONG && resultCode == Activity.RESULT_OK && data != null) {
-            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if (matches != null && !matches.isEmpty() && webView != null) {
-                String spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+        } else if (requestCode == REQ_VOICE_SONG) {
+            String spoken = "";
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                if (matches != null && !matches.isEmpty() && matches.get(0) != null) {
+                    spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+                }
+            }
+            if (webView != null) {
                 webView.evaluateJavascript(
                     "if (typeof window.receiveRecognizedSongWordsFromAndroid === 'function') { window.receiveRecognizedSongWordsFromAndroid('" + spoken + "'); }",
                     null
                 );
             }
-        } else if (requestCode == REQ_VOICE_GENERIC && resultCode == Activity.RESULT_OK && data != null) {
-            ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if (matches != null && !matches.isEmpty() && webView != null) {
-                String spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+        } else if (requestCode == REQ_VOICE_GENERIC) {
+            String spoken = "";
+            if (resultCode == Activity.RESULT_OK && data != null) {
+                ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                if (matches != null && !matches.isEmpty() && matches.get(0) != null) {
+                    spoken = matches.get(0).replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+                }
+            }
+            if (webView != null) {
                 String safePurpose = (pendingVoicePurpose != null ? pendingVoicePurpose : "generic").replace("'", "");
                 webView.evaluateJavascript(
                     "if (typeof window.receiveNativeVoiceCaptureFromAndroid === 'function') { window.receiveNativeVoiceCaptureFromAndroid('" + safePurpose + "', '" + spoken + "'); }",
