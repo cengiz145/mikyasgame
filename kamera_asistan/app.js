@@ -2102,6 +2102,9 @@
         radar.playQrSuccessSound();
         if (navigator.vibrate) navigator.vibrate([70, 40, 110]);
 
+        if (serialNumber && state.moneySeenSerialNumbers) {
+            state.moneySeenSerialNumbers.add(serialNumber);
+        }
         state.moneyTotalKurus += cleanKurus;
         state.moneyLedger.push({
             kurus: cleanKurus,
@@ -2151,6 +2154,20 @@
 
     function undoLastAddedMoney() {
         if (state.moneyLedger.length === 0) {
+            if (state.moneyBackupBeforeReset && state.moneyBackupBeforeReset.totalKurus > 0) {
+                state.moneyTotalKurus = state.moneyBackupBeforeReset.totalKurus;
+                state.moneyLedger = state.moneyBackupBeforeReset.ledger.slice();
+                state.moneySeenSerialNumbers = new Set(state.moneyBackupBeforeReset.serials || []);
+                state.moneyBackupBeforeReset = null;
+                saveMoneyLedgerToStorage();
+                updateMoneyCounterUI();
+                const restoredFormatted = formatTurkishKurusTotal(state.moneyTotalKurus);
+                announceGuidance(`Sıfırlanan ${restoredFormatted} toplam paranız ve tüm para dökümünüz geri yüklendi.`, {
+                    force: true,
+                    bannerState: 'centered'
+                });
+                return;
+            }
             announceGuidance('Geri alınacak bir para yok, sayaç şu an boş.', { force: true, bannerState: 'warning' });
             return;
         }
@@ -2172,6 +2189,14 @@
     }
 
     function resetMoneyCounter() {
+        const prevTotalKurus = state.moneyTotalKurus;
+        if (prevTotalKurus > 0 || state.moneyLedger.length > 0) {
+            state.moneyBackupBeforeReset = {
+                totalKurus: state.moneyTotalKurus,
+                ledger: state.moneyLedger.slice(),
+                serials: Array.from(state.moneySeenSerialNumbers || [])
+            };
+        }
         state.moneyTotalKurus = 0;
         state.moneyLedger = [];
         state.moneyPendingSignature = '';
@@ -2185,7 +2210,10 @@
         saveMoneyLedgerToStorage();
         updateMoneyCounterUI();
 
-        announceGuidance('Para sayacı ve seri numarası hafızası sıfırlandı. Şimdi elinizdeki paraları baştan saymaya başlayabilirsiniz.', {
+        const undoHint = prevTotalKurus > 0
+            ? ` Eğer yanlışlıkla sıfırladıysanız Son Parayı Geri Al düğmesine basarak ${formatTurkishKurusTotal(prevTotalKurus)} toplamınızı geri getirebilirsiniz.`
+            : '';
+        announceGuidance(`Para sayacı ve seri numarası hafızası sıfırlandı.${undoHint} Şimdi elinizdeki paraları baştan saymaya başlayabilirsiniz.`, {
             force: true,
             bannerState: 'centered'
         });
@@ -5914,14 +5942,38 @@
 
     function populate81ProvincesSelect() {
         if (!el.qiblaCitySelect) return;
-        el.qiblaCitySelect.innerHTML = '<option value="">-- Şehir Seçin (Veya GPS Otomatik Bulur) --</option>';
-        TURKEY_81_PROVINCES.forEach(([name, lat, lon]) => {
-            const bearing = calculateQiblaBearing(lat, lon);
-            const opt = document.createElement('option');
-            opt.value = `${lat},${lon},${name}`;
-            opt.textContent = `${name} (Kıble: ${bearing}°)`;
-            el.qiblaCitySelect.appendChild(opt);
-        });
+        let savedVal = el.qiblaCitySelect.value || '';
+        if (!savedVal) {
+            try { savedVal = localStorage.getItem('mikyas_saved_qibla_city') || ''; } catch (_) {}
+        }
+        const alreadyPopulated = Boolean(el.qiblaCitySelect.children && el.qiblaCitySelect.children.length >= 81);
+        if (!alreadyPopulated) {
+            el.qiblaCitySelect.innerHTML = '<option value="">-- Şehir Seçin (Veya GPS Otomatik Bulur) --</option>';
+            TURKEY_81_PROVINCES.forEach(([name, lat, lon]) => {
+                const bearing = calculateQiblaBearing(lat, lon);
+                const opt = document.createElement('option');
+                opt.value = `${lat},${lon},${name}`;
+                opt.textContent = `${name} (Kıble: ${bearing}°)`;
+                el.qiblaCitySelect.appendChild(opt);
+            });
+        }
+        if (savedVal) {
+            el.qiblaCitySelect.value = savedVal;
+            if (!state.qiblaLocationVerified) {
+                const parts = savedVal.split(',');
+                if (parts.length >= 2) {
+                    const lat = parseFloat(parts[0]);
+                    const lon = parseFloat(parts[1]);
+                    const cityName = parts[2] || 'Kayıtlı İl';
+                    if (!isNaN(lat) && !isNaN(lon)) {
+                        state.userLat = lat;
+                        state.userLon = lon;
+                        state.locationSource = 'city_select';
+                        updateQiblaTargetDisplay(`${cityName} (81 İl Listesi)`);
+                    }
+                }
+            }
+        }
     }
 
     function calculateQiblaBearing(latDeg, lonDeg) {
@@ -8563,6 +8615,9 @@
             state.tvAutoReaderTimer = null;
         }
         if (state.tvAutoReaderActive) {
+            if (!state.isRunning) {
+                startCamera();
+            }
             announceGuidance('Otomatik televizyon altyazı ve maç skoru spikeri başlatıldı. Telefonu televizyona doğru tutun; yeni altyazı çıktıkça sesli okuyacağım.', {
                 force: true,
                 bannerState: 'centered'
@@ -9666,6 +9721,77 @@
         });
     }
 
+    function stopCookingStepTimer(speakStopped = false) {
+        if (state.cookingTimerInterval) {
+            clearInterval(state.cookingTimerInterval);
+            state.cookingTimerInterval = null;
+        }
+        state.cookingTimerRemainingSec = 0;
+        const btn = document.getElementById('btn-cooking-timer');
+        if (btn) {
+            btn.classList.remove('active-toggle');
+            btn.setAttribute('aria-pressed', 'false');
+            btn.textContent = '⏲️ Adım Süresini Başlat';
+        }
+        if (speakStopped) {
+            announceGuidance('Konuşan mutfak saati durduruldu.', { force: true });
+        }
+    }
+
+    function toggleCookingStepTimer() {
+        if (state.cookingTimerInterval) {
+            stopCookingStepTimer(true);
+            return;
+        }
+        const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
+        if (!rec) return;
+        const stepObj = rec.steps[state.currentCookingStepIndex] || rec.steps[0];
+        const minutes = (stepObj && stepObj.timerMinutes && stepObj.timerMinutes > 0) ? stepObj.timerMinutes : 5;
+        state.cookingTotalStepSec = Math.round(minutes * 60);
+        state.cookingTimerRemainingSec = state.cookingTotalStepSec;
+
+        const btn = document.getElementById('btn-cooking-timer');
+        const badgeEl = document.getElementById('cooking-status-badge');
+        if (btn) {
+            btn.classList.add('active-toggle');
+            btn.setAttribute('aria-pressed', 'true');
+            btn.textContent = `⏹️ Mutfak Saati: ${minutes}:00`;
+        }
+        announceGuidance(`Konuşan mutfak saati ${minutes} dakika olarak başlatıldı (${rec.title}, ${state.currentCookingStepIndex + 1}. adım). Sürenin yarısında, son 1 dakikada ve süre bittiğinde size sesli haber vereceğim.`, {
+            force: true,
+            bannerState: 'centered'
+        });
+
+        state.cookingTimerInterval = setInterval(() => {
+            state.cookingTimerRemainingSec = Math.max(0, state.cookingTimerRemainingSec - 1);
+            const remMin = Math.floor(state.cookingTimerRemainingSec / 60);
+            const remSec = state.cookingTimerRemainingSec % 60;
+            const timeLabel = `${remMin}:${String(remSec).padStart(2, '0')}`;
+            if (btn) btn.textContent = `⏹️ Mutfak Saati: ${timeLabel}`;
+            if (badgeEl) badgeEl.textContent = `⏲️ Kalan Süre: ${timeLabel}`;
+
+            if (state.cookingTimerRemainingSec <= 0) {
+                stopCookingStepTimer(false);
+                radar.playQrSuccessSound();
+                if (navigator.vibrate) navigator.vibrate([250, 100, 250, 100, 350]);
+                announceGuidance(`Süre doldu! ${rec.title} tarifinin ${state.currentCookingStepIndex + 1}. adım süresi (${minutes} dakika) tamamlandı. Lütfen yemeğinizi veya ocağınızı kontrol edin.`, {
+                    force: true,
+                    bannerState: 'warning'
+                });
+            } else if (state.cookingTimerRemainingSec === 60 && state.cookingTotalStepSec >= 120) {
+                announceGuidance(`Mutfak saati uyarısı: ${state.currentCookingStepIndex + 1}. adımın bitmesine son 1 dakika kaldı.`, {
+                    force: true,
+                    bannerState: 'centered'
+                });
+            } else if (state.cookingTotalStepSec >= 240 && state.cookingTimerRemainingSec === Math.floor(state.cookingTotalStepSec / 2)) {
+                announceGuidance(`Mutfak saati bilgisi: Sürenin yarısı tamamlandı, kalan süre ${remMin} dakika.`, {
+                    force: true,
+                    bannerState: 'normal'
+                });
+            }
+        }, 1000);
+    }
+
     function stepCookingInstruction(delta) {
         const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
         if (!rec) return;
@@ -10021,6 +10147,7 @@
         el.qiblaCitySelect.addEventListener('change', () => {
             const parts = el.qiblaCitySelect.value.split(',');
             if (parts.length >= 2) {
+                try { localStorage.setItem('mikyas_saved_qibla_city', el.qiblaCitySelect.value); } catch (_) {}
                 state.userLat = parseFloat(parts[0]);
                 state.userLon = parseFloat(parts[1]);
                 state.locationSource = 'city_select';
@@ -10190,6 +10317,18 @@
 
     if (btnMemorySaveText && memoryNoteInput) {
         btnMemorySaveText.addEventListener('click', () => saveItemMemoryEntry(memoryNoteInput.value));
+        memoryNoteInput.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                const val = (memoryNoteInput.value || '').trim();
+                const isQuestionOrShortQuery = /\?|(?:\b(?:nerede|nereye|neredeydi|hangi)\b)/i.test(val) || val.split(/\s+/).filter(Boolean).length <= 2;
+                if (isQuestionOrShortQuery) {
+                    searchItemMemoryByQuery(val);
+                } else {
+                    saveItemMemoryEntry(val);
+                }
+            }
+        });
     }
     if (btnMemoryVoiceSave) btnMemoryVoiceSave.addEventListener('click', () => startVoiceItemMemoryCapture('save'));
     if (btnMemoryVoiceAsk) btnMemoryVoiceAsk.addEventListener('click', () => startVoiceItemMemoryCapture('ask'));
@@ -10265,6 +10404,7 @@
     const btnCookingPrev = document.getElementById('btn-cooking-prev');
     const btnCookingCurrent = document.getElementById('btn-cooking-current');
     const btnCookingNext = document.getElementById('btn-cooking-next');
+    const btnCookingTimer = document.getElementById('btn-cooking-timer');
 
     if (cookingRecipeSelect) {
         cookingRecipeSelect.addEventListener('change', () => {
@@ -10287,11 +10427,14 @@
     if (btnCookingPrev) btnCookingPrev.addEventListener('click', () => stepCookingInstruction(-1));
     if (btnCookingCurrent) btnCookingCurrent.addEventListener('click', () => stepCookingInstruction(0));
     if (btnCookingNext) btnCookingNext.addEventListener('click', () => stepCookingInstruction(1));
+    if (btnCookingTimer) btnCookingTimer.addEventListener('click', toggleCookingStepTimer);
 
     el.touchZone.addEventListener('click', () => {
         const now = performance.now();
         if (now - state.lastTouchTime < 420) {
-            if (state.mode === 'social_presence' && state.isRunning) {
+            if (!state.isRunning) {
+                startCamera();
+            } else if (state.mode === 'social_presence') {
                 announceGuidance(state.lastSpeechText || 'Odada henüz doğrulanmış bir kişi algılanmadı.', {
                     force: true,
                     bannerState: 'centered'
@@ -10365,7 +10508,9 @@
         else if (key === 'a') speakSingleOption('A');
         else if (key === 'b') {
             const curQ = state.examQuestions && state.examQuestions[state.currentExamIndex || 0];
-            if (state.mode === 'exam_reader' || (el.examRemotePanel && !el.examRemotePanel.hidden && curQ && curQ.options && curQ.options.B)) {
+            if (state.mode === 'bus_stop_tracker') {
+                saveCurrentGpsAsBusStop();
+            } else if (state.mode === 'exam_reader' || (el.examRemotePanel && !el.examRemotePanel.hidden && curQ && curQ.options && curQ.options.B)) {
                 speakSingleOption('B');
             } else if (el.btnSpeakStory) {
                 el.btnSpeakStory.click();
@@ -10387,7 +10532,13 @@
         else if (key === 'r') el.btnToggleRadar.click();
         else if (key === 'o') el.btnToggleAuto.click();
         else if (key === 'f' && !el.btnToggleFlash.disabled) el.btnToggleFlash.click();
-        else if (key === 'w') startWhatsapp15SecAudioHold();
+        else if (key === 'w') {
+            if (state.mode === 'where_am_i') {
+                announceWhereAmIFullAddressAndSignboard('', []);
+            } else {
+                startWhatsapp15SecAudioHold();
+            }
+        }
         else if (key === 'm' && el.photoFileInput) el.photoFileInput.click();
         else if (key === 't') el.btnRepeat.click();
         else if (key === 'n') speakHowMuchMoneyIHave();
