@@ -2672,9 +2672,9 @@
                 el.tDistance.textContent = 'Yerde Eşya Bulundu';
                 radar.updateRadar(align.offsetX, align.offsetY, align.isCentered);
 
-                announceGuidance(align.sentence, {
+                announceGuidance(`${align.sentence} (Güvenlik uyarısı: Kırık cam veya kesici bir cisim olma ihtimaline karşı elinizi yerde doğrudan süpürerek gezdirmeyin).`, {
                     bannerState: align.isCentered ? 'centered' : 'normal',
-                    minIntervalMs: 2300
+                    minIntervalMs: 2800
                 });
                 return;
             }
@@ -3138,9 +3138,9 @@
             el.tDistance.textContent = 'Şimdi İmzalayın';
             if (state.penInBoxFrames >= 2) {
                 if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
-                announceGuidance('DURUN! Kaleminizin ucu tam imza kutusunun içinde! Elinizi kaydırmadan şimdi imzanızı atabilirsiniz.', {
+                announceGuidance('Kaleminizin ucu hedef çizginin üzerinde! Güvenliğiniz için evrakın tamamını 8. modda okuttuğunuzdan ve doğru satır olduğundan eminseniz imzanızı atabilirsiniz.', {
                     bannerState: 'centered',
-                    minIntervalMs: 2800
+                    minIntervalMs: 3200
                 });
             }
         } else {
@@ -3169,9 +3169,9 @@
             state.liquidLevelHistory = [];
             el.tPosition.textContent = 'Bardak / Şişe Aranıyor';
             el.tDistance.textContent = 'Kadrajda Bardak Yok';
-            announceGuidance('Bardağı, kupayı veya şişeyi kameranın karşısına tutun; algılandığında yerini ve üst-alt kısım rengini söyleyeceğim.', {
+            announceGuidance('Masadaki bardağı, kupayı veya şişeyi bulmak için kamerayı masaya tutun. Güvenliğiniz için kaynar çay veya sıcak su doldururken kameraya güvenmeyin.', {
                 bannerState: 'warning',
-                minIntervalMs: 3800
+                minIntervalMs: 4200
             });
             return;
         }
@@ -4055,10 +4055,11 @@
                     const dosageLine = med.dosages.length > 0 ? `İlaç Miktarı/Formu: ${med.dosages.join(', ')}.` : 'Miligram bilgisi bu yüzde görünmüyor.';
                     const usageLine = med.usageInstructions.length > 0 ? `Eczane Kullanım Tarifi: ${med.usageInstructions.join(', ')}.` : '';
                     const barcodeLine = med.barcodes.length > 0 ? `Doğrulanmış Barkod: ${med.barcodes.join(', ')}.` : '';
-                    const medReport = `${med.sktSpeech}\n${dosageLine}\n${usageLine}\n${barcodeLine}\n\nKutuda Okunan Yazı:\n${cleanText || 'Yazı okunamadı.'}`.trim();
+                    const safetyDisclaimer = 'Sağlık Uyarısı: İlaç kutularındaki soğuk damga kabartma tarihler kamerada eksik çıkabilir; ilacı içmeden önce adını ve dozunu eczane etiketiyle veya yakınınızla mutlaka teyit edin.';
+                    const medReport = `${med.sktSpeech}\n${dosageLine}\n${usageLine}\n${barcodeLine}\n${safetyDisclaimer}\n\nKutuda Okunan Yazı:\n${cleanText || 'Yazı okunamadı.'}`.trim();
 
                     showDetectedResult('İlaç Kutusu ve Son Kullanma Tarihi Raporu', medReport);
-                    announceGuidance(`${med.sktSpeech} ${dosageLine} ${usageLine} ${cleanText ? 'Kutu üzerindeki yazı: ' + cleanText.replace(/\s+/g, ' ') : ''}`, {
+                    announceGuidance(`${med.sktSpeech} ${dosageLine} ${usageLine} ${cleanText ? 'Kutu üzerindeki yazı: ' + cleanText.replace(/\s+/g, ' ') + '.' : ''} ${safetyDisclaimer}`, {
                         force: true,
                         bannerState: med.sktStatus === 'EXPIRED' ? 'warning' : 'centered'
                     });
@@ -4072,9 +4073,12 @@
                     const freeFromMsg = (pkg.freeFromNotes && pkg.freeFromNotes.length > 0)
                         ? `Doğrulanan Güvenli İbare: ${pkg.freeFromNotes.join(', ')}.`
                         : '';
+                    const hasFullIngredientsHeader = /(?:İÇİNDEKİLER|ICINDEKILER|İÇİNDEKİ|ALERJEN|ALLERGEN|İÇERİR|ICERIR)/i.test(cleanText) && cleanText.length >= 25;
                     const allergenMsg = pkg.allergens.length > 0
                         ? `DİKKAT ALERJİ UYARISI: Pakette ${pkg.allergens.join(', ')} bulundu!`
-                        : (cleanText ? 'Okunan paket yazısında bilinen bir alerji maddesine rastlanmadı.' : 'Paket üzerinde okunabilir içindekiler yazısı algılanmadı.');
+                        : (hasFullIngredientsHeader
+                            ? 'Okunan içindekiler listesinde bilinen bir alerji maddesine rastlanmadı; ancak ciddi alerjiniz varsa tüketmeden önce bir yakınınıza da teyit ettirin.'
+                            : 'DİKKAT: Paketin İçindekiler listesi bu açıdan tam okunamadı! Alerjiniz varsa bu ürüne güvenmeyin; lütfen paketin arka yüzündeki İçindekiler bölümünü yakından okutun.');
                     const foodReport = `${surfaceMsg}\n${freeFromMsg}\n${allergenMsg}\n${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}\n\nPakette Okunan Yazı:\n${cleanText || 'Paket yazısı algılanmadı.'}`.trim();
 
                     if (pkg.sktInfo.sktStatus === 'EXPIRED') {
@@ -4083,7 +4087,7 @@
                     showDetectedResult('Gıda Paketi İçindekiler, Alerjen ve SKT Raporu', foodReport);
                     announceGuidance(`${surfaceMsg} ${freeFromMsg} ${allergenMsg} ${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}`, {
                         force: true,
-                        bannerState: pkg.sktInfo.sktStatus === 'EXPIRED' ? 'warning' : 'centered'
+                        bannerState: (pkg.sktInfo.sktStatus === 'EXPIRED' || pkg.allergens.length > 0 || !hasFullIngredientsHeader) ? 'warning' : 'centered'
                     });
                     return;
                 }
@@ -7192,15 +7196,16 @@
 
     function processBusRouteOcrResult(cleanText, preds) {
         const upper = String(cleanText || '').toUpperCase();
-        const hasVehicle = Array.isArray(preds) && preds.some(p => p.class === 'bus' || p.class === 'truck' || p.class === 'car');
+        const hasBus = Array.isArray(preds) && preds.some(p => p.class === 'bus');
         const hasBusContextWords = /\b(?:HAT|OTOBÜS|OTOBUS|MİNİBÜS|MINIBUS|DOLMUŞ|DOLMUS|DURAK|DURAĞI|İETT|IETT|EGO|ESHOT|METRO|METROBÜS|TRAMVAY|PERON)\b/.test(upper);
-        const alphaNumRouteMatches = upper.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [];
-        const pureNumMatches = (hasVehicle || hasBusContextWords)
+        const alphaNumRouteMatches = (hasBus || hasBusContextWords)
+            ? (upper.match(/\b(?:\d{1,3}[A-ZÇĞİÖŞÜ]{1,3}|[A-Z]{1,2}\d{1,3})\b/g) || [])
+            : [];
+        const pureNumMatches = (hasBus || hasBusContextWords)
             ? (upper.match(/\b[1-9]\d{0,3}\b/g) || [])
             : [];
         const routeMatches = [...alphaNumRouteMatches, ...pureNumMatches];
         const filteredRoutes = [...new Set(routeMatches)].filter(tok => tok.length >= 2 && tok !== '2026' && tok !== '2025');
-        const hasBus = Array.isArray(preds) && preds.some(p => p.class === 'bus');
         const badgeEl = document.getElementById('bus-seen-number');
 
         if (filteredRoutes.length > 0) {
@@ -7208,15 +7213,15 @@
             state.lastSeenBusRoute = topRoute;
             if (badgeEl) badgeEl.textContent = `${topRoute} Numaralı Hat`;
             if (navigator.vibrate) navigator.vibrate([180, 70, 220]);
-            const speech = `Dikkat! Yaklaşan otobüs veya durak tabelasında okunan hat numarası: ${topRoute}. ${cleanText.replace(/\s+/g, ' ').slice(0, 120)}`;
+            const speech = `Yaklaşan otobüs veya durak tabelasında okunan hat numarası: ${topRoute}. Güvenliğiniz için kaldırımdan inmeyin ve binmeden önce şoföre hattı teyit ettirin. ${cleanText.replace(/\s+/g, ' ').slice(0, 100)}`;
             return {
                 speechText: speech,
-                fullText: `Okunan Hat Numarası: ${topRoute}\nAraç Algılandı mı: ${hasBus ? 'Evet (Otobüs/Minibüs)' : 'Tabela / Ön Yazı'}\n\nTam Okunan Metin:\n${cleanText}`
+                fullText: `Okunan Hat Numarası: ${topRoute}\nAraç Algılandı mı: ${hasBus ? 'Evet (Otobüs/Minibüs)' : 'Durak Tabelası / Hat Yazısı'}\nGüvenlik Notu: Binmeden önce şoföre hattı teyit ettirin.\n\nTam Okunan Metin:\n${cleanText}`
             };
         }
         const fallbackSpeech = hasBus
-            ? 'Otobüs algılandı ancak ön tabeladaki hat numarası tam seçilemedi, lütfen biraz daha yaklaşınca tekrar okutun.'
-            : (cleanText ? `Kamerada otobüs görünmüyor; okunan yazı: ${cleanText.replace(/\s+/g, ' ')}` : 'Henüz yaklaşan bir otobüs veya hat numarası algılanmadı.');
+            ? 'Otobüs algılandı ancak ön tabeladaki hat numarası tam seçilemedi, lütfen kaldırımda güvenli şekilde bekleyip araç yaklaşınca tekrar okutun.'
+            : (cleanText ? `Kamerada henüz otobüs görünmüyor; okunan yazı: ${cleanText.replace(/\s+/g, ' ')}` : 'Henüz yaklaşan bir otobüs veya hat numarası algılanmadı.');
         return {
             speechText: fallbackSpeech,
             fullText: fallbackSpeech
@@ -7241,17 +7246,13 @@
                 break;
             }
         }
-        if (!target && typeof TURKEY_81_PROVINCES !== 'undefined') {
-            for (const c of TURKEY_81_PROVINCES) {
-                if (c[0].toLocaleLowerCase('tr-TR').includes(qLower)) {
-                    target = { name: `${c[0]} Merkez`, lat: c[1], lon: c[2] };
-                    break;
-                }
-            }
-        }
+        // Önce gerçek sokak/cadde/durak araması (Nominatim) yap ki "Ankara Caddesi" yazıldığında 400 km uzaktaki Ankara il merkezini seçmesin!
         if (!target) {
             try {
-                const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=tr&limit=1&q=${encodeURIComponent(q)}`;
+                const viewboxParam = (state.userLat && state.userLon)
+                    ? `&viewbox=${(state.userLon - 0.45).toFixed(4)},${(state.userLat + 0.45).toFixed(4)},${(state.userLon + 0.45).toFixed(4)},${(state.userLat - 0.45).toFixed(4)}`
+                    : '';
+                const url = `https://nominatim.openstreetmap.org/search?format=json&countrycodes=tr&limit=1${viewboxParam}&q=${encodeURIComponent(q)}`;
                 const res = await fetch(url, { headers: { 'Accept-Language': 'tr' } });
                 if (res.ok) {
                     const arr = await res.json();
@@ -7264,6 +7265,14 @@
                     }
                 }
             } catch (_) {}
+        }
+        if (!target && typeof TURKEY_81_PROVINCES !== 'undefined') {
+            for (const c of TURKEY_81_PROVINCES) {
+                if (c[0].toLocaleLowerCase('tr-TR') === qLower || c[0].toLocaleLowerCase('tr-TR').includes(qLower)) {
+                    target = { name: `${c[0]} Merkez`, lat: c[1], lon: c[2] };
+                    break;
+                }
+            }
         }
 
         if (!target) {
@@ -7419,16 +7428,21 @@
         if (cleanAmounts.length > 0) {
             state.lastDetectedPosAmount = cleanAmounts[0];
             if (posEl) posEl.textContent = cleanAmounts.join(' / ');
-            speechParts.push(`Ekranda okunan ödeme tutarı: ${cleanAmounts[0]}.`);
+            speechParts.push(`Ekranda okunan ödeme tutarı: ${cleanAmounts[0]}. Güvenliğiniz için kart işlemini onaylamadan önce banka bildirimindeki tutarı da kontrol edin.`);
         }
 
         if (foundIbanObj) {
-            state.lastDetectedIban = foundIbanObj.formatted;
-            if (ibanEl) ibanEl.textContent = `${foundIbanObj.formatted} ${foundIbanObj.isValidChecksum ? '(Doğrulandı)' : '(Kontrol Edin)'}`;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(foundIbanObj.iban).catch(() => {});
+            if (foundIbanObj.isValidChecksum) {
+                state.lastDetectedIban = foundIbanObj.formatted;
+                if (ibanEl) ibanEl.textContent = `${foundIbanObj.formatted} (Mod-97 Doğrulandı)`;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(foundIbanObj.iban).catch(() => {});
+                }
+                speechParts.push(`Doğrulanmış 26 haneli IBAN numarası bulundu ve telefonunuzun panosuna kopyalandı: ${foundIbanObj.formatted}. Para göndermeden önce alıcı adını mutlaka kontrol edin.`);
+            } else {
+                if (ibanEl) ibanEl.textContent = '⚠️ IBAN Rakamı Net Değil (Kopyalanmadı)';
+                speechParts.push('DİKKAT: TR ile başlayan bir IBAN algılandı ancak rakamlardan biri net okunamadığı için yanlış hesaba para gitmemesi adına panoya kopyalanmadı! Lütfen kamerayı yaklaştırıp tekrar okutun.');
             }
-            speechParts.push(`26 haneli IBAN numarası bulundu ve telefonunuzun panosuna otomatik kopyalandı: ${foundIbanObj.formatted}.`);
         }
 
         if (speechParts.length === 0) {
@@ -8324,7 +8338,7 @@
                     timerMinutes: 20
                 },
                 {
-                    text: '4. Adım (Kıvam ve Güvenli Blender): Önce ocağı tamamen kapatın! El blenderını tencerenin tabanına dik oturtup sıcak çorbanın dışarı sıçramaması için çalıştırmadan önce tamamen sıvının içine daldırın ve 1 dakika çekin.',
+                    text: '4. Adım (Güvenli Kıvam): Ocağı tamamen kapatın! Kaynar çorbanın sıçrayıp elinizi yakmaması için sıcakken elektrikli blender kullanmayın; çorbayı tel süzgeçten geçirin veya ılıdıktan sonra karıştırarak servis yapın.',
                     timerMinutes: 1
                 }
             ]
@@ -8809,12 +8823,12 @@
             'color_cloth': `5. Bölüm: Canlı Para Sayma, Biriktirme ve Kıyafet Rengi Tanıma açıldı. Elinizdeki demir ve kağıt paraları gösterdikçe bir yandan toplarım; istediğiniz an Ne Kadar Param Var düğmesine veya N tuşuna basarak toplam kaç paranız olduğunu dinleyebilirsiniz.${state.moneyTotalKurus > 0 ? ' Şu an sayaçta ' + formatTurkishKurusTotal(state.moneyTotalKurus) + ' kayıtlı.' : ''}`,
             'anomaly_led': '6. Bölüm: Yere Düşen Eşyayı Bulma ve Cihaz Işığı Kontrolü açıldı. Kamerayı yere veya modemin, şarj aletinin ışığına tutun.',
             'light_meter': '7. Bölüm: Lamba Açık mı Kapalı mı ve Pencere Bulucu açıldı. Işığın olduğu tarafa döndükçe ses incelir.',
-            'explorer': '8. Bölüm: Etrafımda Ne Var ve Evrak Okuyucu açıldı. Odanızdaki eşyaları söyler, çift dokunursanız elinizdeki kağıdı okur.',
+            'explorer': '8. Bölüm: Etrafımda Ne Var ve Evrak Okuyucu açıldı. Odanızdaki eşyaları söyler, çift dokunursanız elinizdeki kağıdı okur. Yürürken güvenliğiniz için mutlaka beyaz bastonunuzu kullanmaya devam edin.',
             'medicine_skt': '9. Bölüm: İlaç Kutusu ve Son Kullanma Tarihi Kontrolü açıldı. İlacın adını, kaç miligram olduğunu ve tarihinin geçip geçmediğini kontrol etmek için kutuyu kameraya tutun.',
-            'signature_pen': '10. Bölüm: İmza Atarken Kalem Yönlendirici açıldı. Evrakı masaya koyup kaleminizi kağıda yaklaştırın; kalemi nereye götüreceğinizi söyleyeceğim.',
-            'liquid_level': '11. Bölüm: Bardağa Çay ve Su Doldurma Yardımcısı açıldı. Bardağı kameranın karşısına koyup doldurmaya başlayın; taşmadan önce durmanızı söyleyeceğim.',
+            'signature_pen': '10. Bölüm: İmza Atarken Kalem Yönlendirici açıldı. Güvenliğiniz için imza atmadan önce evrakın tamamını 8. modda okuttuğunuzdan emin olun; ardından kaleminizi kağıda yaklaştırın.',
+            'liquid_level': '11. Bölüm: Masadaki Bardak, Kupa ve Şişe Bulucu açıldı. Masadaki bardağı veya şişeyi elinizi çarpmadan bulmak için kamerayı masaya tutun. Güvenliğiniz için kaynar çay veya sıcak su doldururken kameraya güvenmeyin.',
             'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya çamaşır makinesi ekranını okutmak için Boşluk tuşuna basın.',
-            'food_freshness': '13. Bölüm: Yiyecek Küflü mü ve Paket İçeriği Okuyucu açıldı. Ekmeği, meyveyi veya market paketini kameraya gösterin.',
+            'food_freshness': '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve Son Tüketim Tarihi Okuyucu açıldı. Market paketinin içindekiler ve tarih kısmını kameraya gösterip Boşluk tuşuna basın.',
             'social_presence': '14. Bölüm: Odada Kim Var ve Bana Bakıyor mu Yardımcısı açıldı. Kulaklık gerekmez; odadakiler duymasın diye karşınızdaki kişi size baktığında telefon avucunuzda çift titrer. Sesli söylemesini isterseniz ekrana çift dokunun veya T tuşuna basın.',
             'song_finder': '15. Bölüm: Bu Çalan Hangi Şarkı? Sesli Şarkı, Melodi ve Söz Bulucu açıldı; mikrofon otomatik olarak dinlemeye başlıyor.',
             'bus_stop_tracker': '16. Bölüm: Otobüs Numarası Yakalayıcı ve İneceğim Durağa Geldim mi Alarmı açıldı. Durakta yaklaşan otobüsün hat numarasını okumak için kamerayı yola tutun veya otobüsteyseniz aşağıdan ineceğiniz durağın alarmını kurun.',
