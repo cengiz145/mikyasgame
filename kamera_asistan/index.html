@@ -710,8 +710,19 @@
                 <span id="cooking-status-badge" class="status-badge ready">Mutfak Şefiniz Hazır</span>
             </div>
             <p class="exam-remote-hint">
-                Tüm tarifler görme engelli aşçılar için <strong>tam bardak/kaşık ölçüsüyle, kokuya, tencere sesine ve dakikaya göre</strong> hazırlanmıştır. İstediğiniz yemeği seçin veya evdeki malzemeleri söyleyin; adım adım birlikte pişirelim:
+                Yemek tariflerimiz iki ayrı kategoride sunulmaktadır: Hiç ateş/ocak yakmadan hazırlayabileceğiniz <strong>🥗 Ocaksız Türk Yemekleri</strong> ve 4 katmanlı yanma/taşma korumalı <strong>🔥 Ocaklı Türk Yemekleri</strong>. Kategori seçin veya evdeki malzemeleri söyleyin:
             </p>
+            <div class="exam-nav-row" role="group" aria-label="Yemek Tarifi Kategorisi Seçimi">
+                <button type="button" id="btn-cook-cat-ocaksiz" class="secondary-btn cook-cat-btn active-toggle" data-cook-cat="ocaksiz" aria-pressed="true" aria-label="Ocaksız Yapılabilecek Türk Yemekleri Kategorisi (Ateşsiz, Yanma ve Taşma Tehlikesi Olmayan 14 Yemek)">
+                    🥗 Ocaksız Yapılabilecek Türk Yemekleri (14 Tarif)
+                </button>
+                <button type="button" id="btn-cook-cat-ocakli" class="secondary-btn cook-cat-btn" data-cook-cat="ocakli" aria-pressed="false" aria-label="Ocak Kullanılan Geleneksel Türk Yemekleri Kategorisi (Yanma ve Taşma Korumalı 13 Yemek)">
+                    🔥 Ocak Kullanılan Türk Yemekleri (13 Tarif)
+                </button>
+                <button type="button" id="btn-cook-cat-all" class="secondary-btn cook-cat-btn" data-cook-cat="all" aria-pressed="false" aria-label="Tüm Türk Yemeklerini Birlikte Göster (Toplam 27 Tarif)">
+                    🌟 Tüm Yemekler (27 Tarif)
+                </button>
+            </div>
             <div class="exam-nav-row" style="align-items:center; gap: 0.6rem;">
                 <label for="cooking-recipe-select" style="font-weight:700;">Yemek Seçin:</label>
                 <select id="cooking-recipe-select" aria-label="Adım adım yapmak istediğiniz yemeği listeden seçin" style="flex:1; min-width: 210px; padding: 0.65rem 0.85rem; border-radius: 10px; border: 2px solid #475569; background: #0f172a; color: #f8fafc; font-size: 1rem;"></select>

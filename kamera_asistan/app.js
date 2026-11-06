@@ -8132,6 +8132,7 @@
     // --- MOD 23: ERİŞİLEBİLİR YEMEK YAPMA REHBERİ, KONUŞAN AŞÇI VE OCAK/PİŞMİŞLİK DENETÇİSİ ---
     state.selectedRecipeIndex = 0;
     state.currentCookingStepIndex = 0;
+    state.selectedCookingCategory = 'ocaksiz'; // 'ocaksiz' | 'ocakli' | 'all'
     state.cookingTimerInterval = null;
     state.cookingTimerRemainingSec = 0;
     state.cookingTotalStepSec = 0;
@@ -8144,9 +8145,237 @@
     state.prevCookingCenterBrightness = 0;
 
     const BLIND_ACCESSIBLE_RECIPES = [
+        // =====================================================================
+        // KATEGORİ 1: 🥗 OCAKSIZ / ATEŞSİZ YAPILABİLECEK TÜRK YEMEKLERİ (14 TARİF)
+        // (Hiç ocak veya fırın yakmadan, %100 yanma ve taşma tehlikesiz!)
+        // =====================================================================
+        {
+            id: 'antakya_kisir',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Antakya & Adana Usulü Tam Ölçülü Kısır',
+            keywords: ['kısır', 'bulgur', 'ince bulgur', 'nar ekşisi', 'marul', 'ocaksız'],
+            ingredients: '2 su bardağı ince köftelik bulgur, 1 buçuk su bardağı sıcak su (kettle veya termos suyu), 1 yemek kaşığı domates salçası, 1 yemek kaşığı biber salçası, yarım çay bardağı zeytinyağı, 3 yemek kaşığı nar ekşisi, 1 limonun suyu, 5 dal taze soğan, yarım demet maydanoz, 1 tatlı kaşığı tuz, 1 tatlı kaşığı kuru nane ve kimyon.',
+            steps: [
+                {
+                    text: '1. Adım (Ocaksız Bulgur Demleme): Geniş ve derin bir yoğurma kabına 2 su bardağı ince bulguru ve 1 tatlı kaşığı tuzu koyun. Üzerine 1 buçuk su bardağı sıcak içme suyunu gezdirip kaşıkla bir kez karıştırın ve kabın ağzını düz bir tabakla kapatıp bulgurlar şişene kadar 10 dakika bekletin.',
+                    timerMinutes: 10
+                },
+                {
+                    text: '2. Adım (Salça ve Baharatla Yoğurma): Kabaran bulgurun üzerine 1 yemek kaşığı domates salçası, 1 yemek kaşığı biber salçası, kuru nane ve kimyonu ekleyin. Elinizle veya kaşık sırtıyla 3 dakika boyunca bulgur taneleri salçayı tamamen emip yumuşayana kadar karıştırın.',
+                    timerMinutes: 3
+                },
+                {
+                    text: '3. Adım (Yeşillik, Zeytinyağı ve Nar Ekşisi): İnce doğranmış taze soğan, maydanoz, yarım çay bardağı zeytinyağı, 3 yemek kaşığı nar ekşisi ve 1 limon suyunu ekleyip harmanlayın. Hiç ocak yakmadan efsane kısırınız hazır!',
+                    timerMinutes: 0
+                }
+            ]
+        },
+        {
+            id: 'etsiz_cig_kofte',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Adıyaman & Urfa Usulü Pratik Etsiz Çiğ Köfte',
+            keywords: ['çiğ köfte', 'bulgur', 'isot', 'nar ekşisi', 'dürüm', 'ocaksız'],
+            ingredients: '2 su bardağı esmer ince bulgur, 1 su bardağı sıcak su, 2 yemek kaşığı domates salçası, 1 yemek kaşığı biber salçası, 3 yemek kaşığı isot, yarım çay bardağı zeytinyağı, 3 yemek kaşığı nar ekşisi, 1 adet rendelenmiş soğan (suyu sıkılmış), 2 diş ezilmiş sarımsak, 1 tatlı kaşığı tuz ve kimyon.',
+            steps: [
+                {
+                    text: '1. Adım (Bulguru Yumuşatma): 2 su bardağı ince bulguru derin kaba alıp 1 su bardağı sıcak suyla ıslatın ve üzerini kapatıp 10 dakika yumuşamaya bırakın.',
+                    timerMinutes: 10
+                },
+                {
+                    text: '2. Adım (Dokunarak Kıvam Yoğurma): Şişen bulgura salçaları, isotu, suyu sıkılmış rendelenmiş soğanı, sarımsağı ve baharatları ekleyin. Avuç içinizle bastırarak (veya el blenderı/mutfak robotuyla) 10 dakika yoğurun. Bulgur taneleri elinizin altında eriyip macun gibi birbirini tuttuğunda zeytinyağı ve nar ekşisini ekleyip 2 dakika daha yoğurun ve avucunuzda sıkarak şekil verin.',
+                    timerMinutes: 10
+                }
+            ]
+        },
+        {
+            id: 'antalya_tahinli_piyaz',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Antalya Usulü Tahinli Piyaz (Hazır Haşlanmış Fasulye ile)',
+            keywords: ['piyaz', 'fasulye', 'tahin', 'kuru fasulye', 'soğan', 'ocaksız'],
+            ingredients: '1 kavanoz (veya 2 su bardağı hazır haşlanmış) kuru fasulye, 1 adet kuru soğan, 1 adet domates, yarım demet maydanoz. Tahinli sosu için: 3 yemek kaşığı tahin, 2 yemek kaşığı üzüm sirkesi, 1 limonun suyu, 1 diş ezilmiş sarımsak, yarım çay bardağı ılık su, 3 yemek kaşığı zeytinyağı, 1 çay kaşığı tuz ve kimyon.',
+            steps: [
+                {
+                    text: '1. Adım (Tahinli Sosu Açma): Derin bir kasede 3 yemek kaşığı tahin, 1 limon suyu, 2 yemek kaşığı sirke, ezilmiş sarımsak, tuz, kimyon ve yarım çay bardağı suyu çatalla 2 dakika çırpın; tahin başta katılaşıp hemen ardından boza kıvamında pürüzsüz bir sosa dönüşecektir.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '2. Adım (Fasulye ile Buluşturma): Süzülmüş hazır haşlanmış fasulyeleri servis tabağına alın, üzerine piyazlık doğranmış soğan ve domatesi ekleyin. Hazırladığınız tahinli sosu ve 3 yemek kaşığı zeytinyağını üzerine gezdirin. Çok doyurucu ve tamamen ocaksız Antalya piyazınız hazır!',
+                    timerMinutes: 0
+                }
+            ]
+        },
+        {
+            id: 'antep_gavurdagi_salatasi',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Antep Usulü Bol Cevizli ve Nar Ekşili Gavurdağı Salatası',
+            keywords: ['gavurdağı', 'salata', 'ceviz', 'domates', 'nar ekşisi', 'ocaksız'],
+            ingredients: '3 adet olgun domates, 1 adet salatalık, 1 adet kuru soğan, 2 adet yeşil biber, 1 su bardağı iri kırılmış ceviz içi, yarım demet maydanoz, 3 yemek kaşığı nar ekşisi, 4 yemek kaşığı sızma zeytinyağı, 1 tatlı kaşığı kuru nane ve sumak, 1 çay kaşığı tuz.',
+            steps: [
+                {
+                    text: '1. Adım (Tavla Zarı Doğrama): Domates, salatalık, biber ve soğanı elinizle hissederek küçük küpler halinde doğrayıp derin bir kaseye alın. Soğanların üzerine 1 tatlı kaşığı sumak serpip elinizle hafifçe ovun.',
+                    timerMinutes: 0
+                },
+                {
+                    text: '2. Adım (Ceviz ve Sos): Üzerine 1 su bardağı kırılmış cevizi, zeytinyağını, nar ekşisini ve kuru naneyi ekleyip karıştırın. Yanında taze ekmekle başlı başına bir öğün olan Gavurdağı salatanız hazır!',
+                    timerMinutes: 0
+                }
+            ]
+        },
+        {
+            id: 'soguk_ayran_asi_corbasi',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Erzurum / Doğu Usulü Soğuk Ayran Aşı Çorbası (Pişirmeden)',
+            keywords: ['ayran aşı', 'soğuk çorba', 'yoğurt', 'nohut', 'buğday', 'ayran', 'ocaksız'],
+            ingredients: '2 su bardağı yoğurt, 1 buçuk su bardağı soğuk su, 1 su bardağı hazır haşlanmış nohut (konserve), 1 su bardağı hazır haşlanmış buğday veya mısır, 1 adet rendelenmiş salatalık, 1 tatlı kaşığı kuru nane, yarım demet ince kıyılmış dereotu, 1 tatlı kaşığı tuz, 2 yemek kaşığı zeytinyağı.',
+            steps: [
+                {
+                    text: '1. Adım (Yoğurdu Çırpma): Derin bir kasede 2 su bardağı yoğurdu ve 1 tatlı kaşığı tuzu çatal veya çırpıcıyla pürüzsüz olana kadar 1 dakika çırpın, ardından 1 buçuk su bardağı soğuk suyu ekleyip koyu bir ayran kıvamına getirin.',
+                    timerMinutes: 1
+                },
+                {
+                    text: '2. Adım (Bakliyat ve Nane Ekleme): Süzülmüş hazır nohut ve buğdayı, rendelenmiş salatalığı, dereotunu ve kuru naneyi ekleyip karıştırın. Üzerine 2 yemek kaşığı zeytinyağı gezdirin. Hiç ocak açmadan besleyici soğuk çorbanız hazır!',
+                    timerMinutes: 0
+                }
+            ]
+        },
+        {
+            id: 'sarimsakli_yogurtlu_semizotu',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Sarımsaklı Süzme Yoğurtlu Semizotu Salatası (veya Cacık)',
+            keywords: ['semizotu', 'yoğurt', 'cacık', 'salatalık', 'sarımsak', 'ocaksız'],
+            ingredients: 'Yarım demet taze semizotu (veya 2 adet salatalık), 2 su bardağı süzme veya normal yoğurt, 2 diş ezilmiş sarımsak, yarım su bardağı kırılmış ceviz veya haşlanmış mısır, 2 yemek kaşığı zeytinyağı, 1 çay kaşığı tuz ve kuru nane.',
+            steps: [
+                {
+                    text: '1. Adım (Ayıklama ve Yıkama): Semizotunun yapraklarını ve körpe dallarını elinizle koparıp süzgeçte bol suyla yıkayın ve iyice süzün (cacık yapıyorsanız salatalıkları küp doğrayın veya rendeleyin).',
+                    timerMinutes: 0
+                },
+                {
+                    text: '2. Adım (Sarımsaklı Yoğurtla Harmanlama): Derin kasede yoğurt, ezilmiş sarımsak, tuz ve zeytinyağını karıştırıp semizotlarıyla buluşturun. Üzerine ceviz ve nane serpin. Ferahlatıcı ve sağlıklı öğününüz hazır!',
+                    timerMinutes: 0
+                }
+            ]
+        },
+        {
+            id: 'cevizli_haydari_ve_acili_ezme',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Cevizli Haydari ve Lokanta Usulü Acılı Ezme İkilisi',
+            keywords: ['haydari', 'meze', 'ezme', 'acılı ezme', 'süzme yoğurt', 'beyaz peynir', 'ocaksız'],
+            ingredients: 'Haydari için: 1 buçuk su bardağı süzme yoğurt, 1 dilim (50 gr) ezilmiş beyaz peynir, yarım çay bardağı dövülmüş ceviz, 1 diş sarımsak, 1 tatlı kaşığı kuru nane, dereotu, 2 yemek kaşığı zeytinyağı.',
+            steps: [
+                {
+                    text: '1. Adım (Peynir ve Yoğurdu Ezme): Bir kasede 1 dilim beyaz peyniri çatalla iyice ezin. Üzerine süzme yoğurdu, ezilmiş sarımsağı, cevizi, kuru naneyi, ince kıyılmış dereotunu ve zeytinyağını ekleyip 2 dakika boyunca krema kıvamına gelene kadar karıştırın.',
+                    timerMinutes: 2
+                }
+            ]
+        },
+        {
+            id: 'koz_patlican_biber_salatasi',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Közlenmiş Patlıcan ve Kırmızı Biberli Yoğurtlu Soğuk Meze',
+            keywords: ['patlıcan', 'köz patlıcan', 'köz biber', 'yoğurtlu patlıcan', 'babagannuş', 'ocaksız'],
+            ingredients: '1 kavanoz hazır közlenmiş patlıcan ve közlenmiş kırmızı biber, 1 buçuk su bardağı süzme yoğurt, 2 diş ezilmiş sarımsak, 3 yemek kaşığı zeytinyağı, yarım limon suyu, 1 çay kaşığı tuz.',
+            steps: [
+                {
+                    text: '1. Adım (Karıştırma): Kavanozdaki hazır közlenmiş patlıcan ve kırmızı biberleri süzüp doğrayın. Sarımsaklı süzme yoğurt, zeytinyağı ve tuz ile karıştırın. Ocak başında patlıcan közleme zahmeti olmadan nefis köz patlıcan mezesi hazır!',
+                    timerMinutes: 0
+                }
+            ]
+        },
+        {
+            id: 'cigden_havuc_lahana_tarator',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Çiğden Rendelenmiş Cevizli Havuç ve Mor Lahana Tarator',
+            keywords: ['tarator', 'havuç', 'havuç tarator', 'lahana', 'yoğurt', 'ocaksız'],
+            ingredients: '3 adet orta boy havuç (veya çeyrek mor lahana), 2 su bardağı süzme yoğurt, 2 diş sarımsak, yarım su bardağı kırılmış ceviz içi, 2 yemek kaşığı zeytinyağı, 1 çay kaşığı tuz.',
+            steps: [
+                {
+                    text: '1. Adım (Rendeleme ve Yoğurtlama): Havuçları (veya mor lahanayı) derin bir kaseye rendeleyin. Hiç yağda sotelemeden doğrudan sarımsaklı yoğurt, ceviz içi, zeytinyağı ve tuz ile harmanlayın. Hem vitaminleri kaybolmaz hem de hiç ocak kullanmadan 3 dakikada hazır olur!',
+                    timerMinutes: 3
+                }
+            ]
+        },
+        {
+            id: 'akdeniz_ton_balikli_peynirli_salata',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Zeytinyağlı Beyaz Peynirli veya Ton Balıklı Doyurucu Salata Kasesi',
+            keywords: ['ton balığı', 'beyaz peynir', 'akdeniz salatası', 'mısır', 'zeytin', 'salata', 'ocaksız'],
+            ingredients: 'Yarım demet kıvırcık marul veya roka, 1 kutu konserve mısır, 100 gram küp doğranmış beyaz peynir (veya 1 kutu ton balığı), 10 adet çekirdeksiz zeytin, 1 adet domates, 1 adet salatalık, 3 yemek kaşığı zeytinyağı, 1 limonun suyu.',
+            steps: [
+                {
+                    text: '1. Adım (Elinizle Kopararak Hazırlama): Yıkanmış marul ve roka yapraklarını bıçak bile kullanmadan elinizle lokmalık parçalara koparıp derin kaseye atın. Üzerine süzülmüş mısır, çekirdeksiz zeytin, beyaz peynir (veya ton balığı), zeytinyağı ve limon suyunu ekleyip karıştırın.',
+                    timerMinutes: 0
+                }
+            ]
+        },
+        {
+            id: 'ezine_peynirli_cevizli_durum_kahvalti',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız] Tahin-Pekmezli, Cevizli ve Ezine Peynirli Anadolu Kahvaltı Dürümü',
+            keywords: ['kahvaltı', 'dürüm', 'peynir', 'tahin', 'pekmez', 'zeytin', 'domates', 'ocaksız'],
+            ingredients: '2 adet lavaş veya yarım ekmek, 2 dilim Ezine beyaz peyniri, 1 adet domates, 1 adet salatalık, 5 yaprak taze nane veya fesleğen, 1 yemek kaşığı zeytinyağı ve kekik. Tatlı kase için: 2 yemek kaşığı tahin, 2 yemek kaşığı üzüm/keçiboynuzu pekmezi ve ceviz.',
+            steps: [
+                {
+                    text: '1. Adım (Sıcak Ocak Açmadan Zengin Kahvaltı): Lavaşın ortasına beyaz peyniri çatalla ezip yayın, üzerine dilimlenmiş domates, salatalık, taze nane, kekik ve zeytinyağı gezdirip sıkıca dürüm yapın. Yanında bir kasede yarı yarıya tahin ve pekmezi karıştırıp cevizle tüketin!',
+                    timerMinutes: 0
+                }
+            ]
+        },
+        {
+            id: 'ocaksiz_biskuvili_mozaik_pasta',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız Tatlı] Pişirmeden Soğuk Sütle Yapılan Anne Usulü Bisküvili Mozaik Pasta',
+            keywords: ['mozaik pasta', 'pasta', 'bisküvi', 'tatlı', 'kakao', 'çikolata', 'ocaksız'],
+            ingredients: '2 paket (yaklaşık 350 gram) petibör bisküvi, 1 su bardağı soğuk süt, 3 yemek kaşığı kakao, 3 yemek kaşığı pudra şekeri (veya toz şeker), 3 yemek kaşığı sıvı yağ (veya oda sıcaklığında yumuşamış tereyağı), yarım su bardağı kırılmış ceviz veya fındık.',
+            steps: [
+                {
+                    text: '1. Adım (Ocaksız Çikolata Sosu): Derin bir yoğurma kabında 1 su bardağı soğuk süt, 3 yemek kaşığı kakao, 3 yemek kaşığı şeker ve 3 yemek kaşığı yağı hiç ocak açmadan tel çırpıcıyla şeker eriyene kadar 2 dakika çırpın.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '2. Adım (Bisküvileri Elinizle Kırma): 2 paket petibör bisküviyi elinizle dörde-beşe kırarak sosun içine atın, yarım su bardağı cevizi ekleyin ve bisküvileri ezmeden kaşıkla alttan üste karıştırın.',
+                    timerMinutes: 0
+                },
+                {
+                    text: '3. Adım (Şekil Verme ve Soğutma): Karışımı streç filme veya derin bir kaseye bastırarak yerleştirin, buzdolabında veya dondurucuda 45 dakika dinlendirip dilimleyerek servis yapın!',
+                    timerMinutes: 45
+                }
+            ]
+        },
+        {
+            id: 'ocaksiz_meyveli_yogurtlu_parfe',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız Tatlı] Muzlu, Ballı, Cevizli ve Bisküvili Soğuk Kuplar (Magnolia Tadında)',
+            keywords: ['magnolia', 'parfe', 'muz', 'tatlı', 'yoğurt', 'bal', 'yulaf', 'ocaksız'],
+            ingredients: '1 buçuk su bardağı süzme yoğurt (veya labne + krema), 2 yemek kaşığı süzme bal veya pekmez, 2 adet olgun muz, 10 adet ufalanmış petibör veya burçak bisküvi, yarım su bardağı ceviz veya fındık, yarım çay kaşığı tarçın.',
+            steps: [
+                {
+                    text: '1. Adım (Kat Kat Kuplara Dizme): Süzme yoğurdu 2 yemek kaşığı bal ve tarçınla çırpın. Kaselerin en altına elinizle ufaladığınız bisküvileri, ortasına dilimlenmiş muzları, üzerine ballı süzme yoğurt kremasını ve en üste cevizleri serpiştirin. Hiç pişirmeden 5 dakikada enfes tatlı!',
+                    timerMinutes: 5
+                }
+            ]
+        },
+        {
+            id: 'tahinli_cevizli_enerji_toplari',
+            category: 'ocaksiz',
+            title: '🥗 [Ocaksız Tatlı] Tahinli, Pekmezli ve Cevizli Atom Enerji Topları (Pişirmeden)',
+            keywords: ['enerji topu', 'atom', 'tahin', 'pekmez', 'yulaf', 'bisküvi', 'hindistan cevizi', 'ocaksız'],
+            ingredients: '1 paket ufalanmış petibör bisküvi (veya 1 buçuk su bardağı ince yulaf ezmesi), 4 yemek kaşığı tahin, 4 yemek kaşığı üzüm veya dut pekmezi, yarım su bardağı dövülmüş ceviz, 2 yemek kaşığı kakao, dışını bulamak için Hindistan cevizi.',
+            steps: [
+                {
+                    text: '1. Adım (Yoğurup Yuvarlama): Ufalanmış bisküvi veya yulafı, 4 yemek kaşığı tahin, 4 yemek kaşığı pekmez, kakao ve cevizle bir kapta elinizle 3 dakika yoğurun. Ceviz büyüklüğünde parçalar koparıp avuç içinizde yuvarlayın ve Hindistan cevizine bulayın. Çayın ve kahvenin yanına pişirmeden lokum gibi ikramlık!',
+                    timerMinutes: 3
+                }
+            ]
+        },
+
+        // =====================================================================
+        // KATEGORİ 2: 🔥 OCAK KULLANILAN GELENEKSEL TÜRK YEMEKLERİ (13 TARİF)
+        // (4 Katmanlı Yanma ve Taşma Koruma Kalkanı + Konuşan Tencere Saati ile)
+        // =====================================================================
         {
             id: 'mercimek_corbasi',
-            title: 'Lokanta Usulü Süzme Mercimek Çorbası (4 Kişilik)',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Lokanta Usulü Süzme Mercimek Çorbası (Taşma Korumalı)',
             keywords: ['mercimek', 'çorba', 'kırmızı mercimek', 'soğan', 'havuç', 'patates'],
             ingredients: '1 su bardağı kırmızı mercimek, 1 adet orta boy kuru soğan (dörde bölünmüş), 1 yemek kaşığı un, 1 yemek kaşığı tereyağı, 2 yemek kaşığı sıvı yağ, 1 tatlı kaşığı tuz, yarım çay kaşığı karabiber ve zerdeçal, 6 su bardağı sıcak su.',
             steps: [
@@ -8155,22 +8384,40 @@
                     timerMinutes: 0
                 },
                 {
-                    text: '2. Adım (Kokuya ve Sese Göre Kavurma): Derin tencereye 2 yemek kaşığı sıvı yağ ve 1 yemek kaşığı tereyağı koyup orta ateşi açın. İri doğranmış 1 soğanı ekleyin. Yağdan "cızır cızır" ses gelmeye başladıktan sonra tahta kaşıkla 3 dakika çevirin; tatlımsı kavrulmuş soğan kokusu burnunuza geldiğinde 1 yemek kaşığı unu ekleyip 1 dakika daha karıştırın.',
+                    text: '2. Adım (Soğuk Tava & Kokuya Göre Kavurma): Derin tencereye 2 yemek kaşığı sıvı yağ, 1 yemek kaşığı tereyağı ve iri doğranmış 1 soğanı soğukken koyup orta-kısık ateşi açın. Yağdan "cızır cızır" ses gelmeye başladıktan sonra tahta kaşıkla 3 dakika çevirin; tatlımsı soğan kokusu geldiğinde 1 yemek kaşığı unu ekleyip 1 dakika daha karıştırın.',
                     timerMinutes: 3
                 },
                 {
-                    text: '3. Adım (Su Ekleme ve Kaynatma): Yıkanmış mercimeği, 1 tatlı kaşığı tuzu ve 6 su bardağı suyu tencereye dikkatlice ekleyin. Kapağı hafif aralık bırakın. Fokurdama sesini duyduktan sonra ocağı kısığa alıp mercimekler tamamen yumuşayana kadar 20 dakika pişirin.',
+                    text: '3. Adım (Tahta Kaşık Köprüsüyle Taşmadan Kaynatma): Yıkanmış mercimeği, 1 tatlı kaşığı tuzu ve 6 su bardağı suyu ekleyin. Tencerenin taşmaması için ağzına yatay bir tahta kaşık koyup kapağı hafif aralık bırakın. Fokurdama sesini duyunca ocağı en kısığa alıp 20 dakika pişirin.',
                     timerMinutes: 20
                 },
                 {
-                    text: '4. Adım (Kıvam ve Servis): Ocağı kapatın. El blenderını tencerenin tabanına dik oturtup dışarı sıçramaması için çalıştırmadan önce tamamen sıvının içine daldırın ve 1 dakika pürüzsüz olana kadar çekin. Mis gibi çorbanız servise hazır, ellerinize sağlık!',
+                    text: '4. Adım (Kıvam ve Güvenli Blender): Önce ocağı tamamen kapatın! El blenderını tencerenin tabanına dik oturtup sıcak çorbanın dışarı sıçramaması için çalıştırmadan önce tamamen sıvının içine daldırın ve 1 dakika çekin.',
                     timerMinutes: 1
                 }
             ]
         },
         {
+            id: 'sehrive_tarhana_corbasi',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Şifa Deposu Domatesli Arpa Şehriye (veya Tarhana) Çorbası',
+            keywords: ['şehriye çorbası', 'tarhana', 'tarhana çorbası', 'domates çorbası', 'çorba'],
+            ingredients: '1 çay bardağı arpa şehriye (veya 4 yemek kaşığı toz tarhana), 1 yemek kaşığı tereyağı, 1 yemek kaşığı domates salçası, 1 tatlı kaşığı kuru nane, 1 tatlı kaşığı tuz, 5 buçuk su bardağı su.',
+            steps: [
+                {
+                    text: '1. Adım (Salça ve Nane Kokusu): Tencereye 1 yemek kaşığı tereyağı, 1 yemek kaşığı salça ve 1 tatlı kaşığı kuru naneyi koyup kısık ateşte kokusu çıkana kadar 2 dakika karıştırın.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '2. Adım (Su ve Şehriye): 5 buçuk su bardağı suyu ve tuzu ekleyin. Su kaynayıp fokurdama sesi duyulunca 1 çay bardağı arpa şehriyeyi ekleyin, dibine yapışmaması için 1 kez karıştırıp kısık ateşte 12 dakika pişirin.',
+                    timerMinutes: 12
+                }
+            ]
+        },
+        {
             id: 'tereyagli_pirinc_pilavi',
-            title: 'Tane Tane Tereyağlı Şehriyeli Pirinç Pilavı',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Tane Tane Tereyağlı Şehriyeli Pirinç Pilavı',
             keywords: ['pilav', 'pirinç', 'pirinç pilavı', 'şehriye', 'tereyağı'],
             ingredients: '2 su bardağı baldo pirinç, 2 yemek kaşığı arpa şehriye, 2 dolu yemek kaşığı tereyağı, 1 yemek kaşığı sıvı yağ, 3 su bardağı sıcak su (1 bardak pirince 1 buçuk bardak su ölçüsü), 1 buçuk tatlı kaşığı tuz.',
             steps: [
@@ -8179,184 +8426,266 @@
                     timerMinutes: 15
                 },
                 {
-                    text: '2. Adım (Şehriyeyi Kokusundan Anlama): Pilav tenceresine 1 yemek kaşığı sıvı yağ ve 2 yemek kaşığı tereyağını koyup orta ateşi açın. 2 yemek kaşığı arpa şehriyeyi ekleyin. Sürekli karıştırırken yaklaşık 2 dakika sonra fındıksı, kavruk ve sıcak bir koku burnunuza gelecek ve şehriyeler kaşığa daha sert çarpmaya başlayacak; işte tam o an şehriyeler altın rengi olmuştur.',
+                    text: '2. Adım (Şehriyeyi Kokusundan Anlama): Pilav tenceresine 1 yemek kaşığı sıvı yağ ve 2 yemek kaşığı tereyağını koyup orta-kısık ateşi açın. 2 yemek kaşığı arpa şehriyeyi ekleyin. Sürekli karıştırırken yaklaşık 2 dakika sonra fındıksı kavruk bir koku burnunuza gelecek ve şehriyeler kaşığa daha sert çarpmaya başlayacak.',
                     timerMinutes: 2
                 },
                 {
-                    text: '3. Adım (Kaşık Direnciyle Pirinç Kavurma): Süzülmüş pirinçleri ekleyin. Kırmadan alttan üste doğru 3-4 dakika kavurun. Başta yumuşak dönen kaşık, pirinçler kavrulup şeffaflaştıkça birbirine tutunup kaşığa hafif ağırlaşarak direnç göstermeye başlayacak ve tıkır tıkır ses çıkaracaktır.',
+                    text: '3. Adım (Kaşık Direnciyle Pirinç Kavurma): Süzülmüş pirinçleri ekleyin. Kırmadan alttan üste doğru 3-4 dakika kavurun. Pirinçler kavruldukça kaşığa hafif ağırlaşarak direnç göstermeye ve tıkır tıkır ses çıkarmaya başlayacaktır.',
                     timerMinutes: 4
                 },
                 {
-                    text: '4. Adım (Pişirme ve Göz Göz Olma Sesi): 3 su bardağı sıcak suyu ve 1 buçuk tatlı kaşığı tuzu ekleyip sadece bir kez karıştırın, kapağı kapatın. Kaynama fokurtusunu duyunca ocağı en kısık ateşe alın. 12 dakika pişirin; tencereden gelen fokurtu sesi kesilip sadece ince bir "çıtır-pıtır" yağ sesi kaldığında suyunu tamamen çekmiş demektir.',
+                    text: '4. Adım (Kısık Ateşte Pişirme): 3 su bardağı sıcak suyu ve 1 buçuk tatlı kaşığı tuzu ekleyip sadece bir kez karıştırın, kapağı kapatın. Kaynama fokurtusunu duyunca ocağı en kısık ateşe alın ve 12 dakika pişirin.',
                     timerMinutes: 12
                 },
                 {
-                    text: '5. Adım (Demlendirme): Ocağı kapatın, kapağın altına temiz bir kağıt havlu veya bez koyup kapağı kapatın ve 10 dakika hiç açmadan dinlendirin. Tane tane pilavınız hazır!',
+                    text: '5. Adım (Demlendirme): Ocağı kapatın, kapağın altına temiz bir kağıt havlu koyup 10 dakika hiç açmadan dinlendirin.',
                     timerMinutes: 10
                 }
             ]
         },
         {
-            id: 'anne_usulu_kuru_fasulye',
-            title: 'Anne Usulü Lokum Gibi Kuru Fasulye',
-            keywords: ['kuru fasulye', 'fasulye', 'salça', 'soğan', 'etli kuru fasulye'],
-            ingredients: '2 su bardağı haşlanmış kuru fasulye, 1 adet orta boy kuru soğan, 1 yemek kaşığı domates salçası, 1 tatlı kaşığı biber salçası, 2 yemek kaşığı tereyağı, 3 buçuk su bardağı sıcak su, 1 tatlı kaşığı tuz, yarım çay kaşığı kimyon (gazını alır).',
+            id: 'meyhane_usulu_bulgur_pilavi',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Sebzeli Meyhane Usulü Bulgur Pilavı (Lapa Olmayan Tam Ölçü)',
+            keywords: ['bulgur pilavı', 'bulgur', 'pilav', 'meyhane pilavı'],
+            ingredients: '2 su bardağı pilavlık kalın bulgur, 1 adet kuru soğan, 2 adet yeşil biber, 2 adet rendelenmiş domates, 1 yemek kaşığı salça, 2 yemek kaşığı tereyağı, 3 buçuk su bardağı sıcak su, 1 tatlı kaşığı tuz ve kuru nane.',
             steps: [
                 {
-                    text: '1. Adım (Soğan ve Salça Kokusu): Tencereye 2 yemek kaşığı tereyağını alıp eritin. Küp doğranmış soğanı ekleyip cızırtı sesiyle birlikte 4 dakika yumuşayana kadar kavurun. Ardından 1 yemek kaşığı domates ve 1 tatlı kaşığı biber salçasını ekleyip salçanın ekşi çiğ kokusu gidip tatlı kavruk kokusu çıkana kadar 2 dakika karıştırın.',
+                    text: '1. Adım (Sebze ve Salça Kavurma): Tencerede tereyağı, doğranmış soğan ve biberi orta-kısık ateşte 3 dakika kavurun. Salçayı ve rendelenmiş domatesi ekleyip 2 dakika daha çevirin.',
+                    timerMinutes: 5
+                },
+                {
+                    text: '2. Adım (Bulgur ve Kısık Ateş): 2 su bardağı bulguru, tuzu, naneyi ve 3 buçuk su bardağı sıcak suyu ekleyip karıştırın. Kaynayınca en kısık ateşe alıp suyunu çekene kadar 15 dakika pişirin.',
+                    timerMinutes: 15
+                }
+            ]
+        },
+        {
+            id: 'anne_usulu_kuru_fasulye',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Anne Usulü Lokum Gibi Kuru Fasulye',
+            keywords: ['kuru fasulye', 'fasulye', 'salça', 'soğan', 'etli kuru fasulye'],
+            ingredients: '2 su bardağı haşlanmış kuru fasulye, 1 adet orta boy kuru soğan, 1 yemek kaşığı domates salçası, 1 tatlı kaşığı biber salçası, 2 yemek kaşığı tereyağı, 3 buçuk su bardağı sıcak su, 1 tatlı kaşığı tuz, yarım çay kaşığı kimyon.',
+            steps: [
+                {
+                    text: '1. Adım (Soğan ve Salça Kokusu): Tencereye 2 yemek kaşığı tereyağı ve küp doğranmış soğanı soğukken koyup orta-kısık ateşte cızırtı sesiyle birlikte 4 dakika kavurun. Ardından salçaları ekleyip kokusu çıkana kadar 2 dakika karıştırın.',
                     timerMinutes: 6
                 },
                 {
-                    text: '2. Adım (Fasulye ve Su): 2 su bardağı haşlanmış kuru fasulyeyi ekleyip 1 dakika salçayla harmanlayın. Üzerine 3 buçuk su bardağı sıcak su, 1 tatlı kaşığı tuz ve yarım çay kaşığı kimyon ekleyin.',
+                    text: '2. Adım (Fasulye ve Su): 2 su bardağı haşlanmış kuru fasulyeyi, 3 buçuk su bardağı sıcak suyu, 1 tatlı kaşığı tuzu ve kimyonu ekleyin.',
                     timerMinutes: 2
                 },
                 {
-                    text: '3. Adım (Özleşme): Tencerenin kapağını kapatın, kaynama sesini duyunca kısık ateşe alın ve suyu koyulaşıp özleşene kadar 25 dakika pişirin. Lokum gibi kuru fasulyeniz hazır!',
+                    text: '3. Adım (Kısık Ateşte Özleşme): Tencerenin kapağını hafif aralık bırakın, kaynama sesini duyunca en kısık ateşe alın ve 25 dakika pişirin.',
                     timerMinutes: 25
                 }
             ]
         },
         {
             id: 'tam_kivaminda_menemen',
-            title: 'Tam Kıvamında Sulu ve Ekmek Banmalık Menemen',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Tam Kıvamında Sulu ve Ekmek Banmalık Menemen',
             keywords: ['menemen', 'yumurta', 'domates', 'biber', 'kahvaltı'],
-            ingredients: '3 adet orta boy olgun domates (rendelenmiş veya küp doğranmış), 2 adet yeşil biber, 3 adet yumurta, 2 yemek kaşığı tereyağı veya zeytinyağı, 1 çay kaşığı tuz, yarım çay kaşığı pul biber.',
+            ingredients: '3 adet orta boy olgun domates, 2 adet yeşil biber, 3 adet yumurta, 2 yemek kaşığı tereyağı veya zeytinyağı, 1 çay kaşığı tuz, yarım çay kaşığı pul biber.',
             steps: [
                 {
-                    text: '1. Adım (Biber Kokusu Çıkana Kadar): Geniş tavaya 2 yemek kaşığı yağı ve ince doğranmış 2 yeşil biberi soğukken koyup orta ateşi açın (böylece yağ sıçramaz). Biberlerin cızırtısı ve mis gibi köz/biber kokusu yükselene kadar 3 dakika karıştırın.',
+                    text: '1. Adım (Soğuk Tavada Sıçratmadan Biber Soteleme): Geniş tavaya 2 yemek kaşığı yağı ve doğranmış 2 yeşil biberi soğukken koyup orta-kısık ateşi açın. Biber kokusu yükselene kadar 3 dakika karıştırın.',
                     timerMinutes: 3
                 },
                 {
-                    text: '2. Adım (Domatesin Suyunu Çekmesi): Doğranmış veya rendelenmiş 3 domatesi ve 1 çay kaşığı tuzu ekleyin. Domatesler başta sulu bir fokurtu sesi çıkarır; yaklaşık 6 dakika sonra fokurtu sesi toklaşır ve kaşık tavada iz bırakacak kadar koyulaşır.',
+                    text: '2. Adım (Domatesin Suyunu Çekmesi): Doğranmış 3 domatesi ve 1 çay kaşığı tuzu ekleyin. Fokurtu sesi toklaşıp koyulaşana kadar 6 dakika pişirin.',
                     timerMinutes: 6
                 },
                 {
-                    text: '3. Adım (Yumurtaları Kırma ve 90 Saniye Kuralı): 3 yumurtayı ayrı bir kaseye kırıp kabuk kaçmadığından emin olduktan sonra tavaya dökün. Kaşığın tersiyle hafifçe karıştırıp sadece 1 buçuk dakika (90 saniye) pişirin ve hemen ocağı kapatın ki menemeni kurutmasın. Ekmek banmalık menemeniniz hazır!',
+                    text: '3. Adım (Yumurtaları Kırma ve 90 Saniye Kuralı): 3 yumurtayı ayrı bir kaseye kırıp kontrol ettikten sonra tavaya dökün. Hafifçe karıştırıp 90 saniye pişirin ve hemen ocağı kapatın.',
                     timerMinutes: 2
                 }
             ]
         },
         {
             id: 'sulu_patatesli_izmir_kofte',
-            title: 'Tencerede veya Fırında Sulu Patatesli İzmir Köfte',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Tencerede Sulu Patatesli İzmir Köfte (Kızartma Yağı Sıçramadan)',
             keywords: ['köfte', 'kıyma', 'patates', 'izmir köfte', 'et'],
-            ingredients: '400 gram kıyma, 1 adet rendelenmiş soğan, 3 yemek kaşığı galeta unu veya ufalanmış ekmek içi, 1 diş sarımsak, 1 çay kaşığı kimyon, 1 çay kaşığı karabiber, 1 tatlı kaşığı tuz. Sebzesi için: 3 adet patates, 1 yemek kaşığı salça, 2 su bardağı sıcak su.',
+            ingredients: '400 gram kıyma, 1 adet rendelenmiş soğan, 3 yemek kaşığı galeta unu, 1 diş sarımsak, 1 çay kaşığı kimyon ve karabiber, 1 tatlı kaşığı tuz. Sebzesi için: 3 adet patates, 1 yemek kaşığı salça, 2 su bardağı sıcak su.',
             steps: [
                 {
-                    text: '1. Adım (Dokunarak Köfte Yoğurma): Derin bir kapta 400 gram kıyma, rendelenmiş soğan, 3 yemek kaşığı galeta unu, tuz ve kimyonu elinizle 6-7 dakika yoğurun. Kıymanın elinize yapışmayı bırakıp oyun hamuru gibi tek parça toparlandığını hissettiğinizde kıvamı tamamdır. Ceviz büyüklüğünde parçalar koparıp avuç içinizde parmak boyunda yuvarlayın.',
+                    text: '1. Adım (Dokunarak Köfte Yoğurma): Derin bir kapta kıyma, rendelenmiş soğan, galeta unu, tuz ve kimyonu elinizle 7 dakika yoğurun. Ceviz büyüklüğünde parçalar koparıp parmak boyunda yuvarlayın.',
                     timerMinutes: 7
                 },
                 {
-                    text: '2. Adım (Geniş Tencerede Dizme): 3 adet patatesi elma dilimi doğrayın. Geniş yayvan bir tencerenin tabanına bir patates bir köfte olacak şekilde yan yana çember halinde dizin.',
+                    text: '2. Adım (Geniş Tencerede Dizme): 3 adet patatesi elma dilimi doğrayın. Geniş yayvan bir tencerenin tabanına bir patates bir köfte olacak şekilde yan yana dizin.',
                     timerMinutes: 0
                 },
                 {
-                    text: '3. Adım (Salçalı Sos ve Pişirme): 1 yemek kaşığı salçayı 2 su bardağı sıcak su ve 3 yemek kaşığı zeytinyağı ile bir kasede çatal yardımıyla eritip köftelerin üzerine gezdirin. Kapağı kapatıp kısık ateşte patateslerin üzerine çatal batırdığınızda kolayca girene kadar 28 dakika pişirin.',
+                    text: '3. Adım (Salçalı Sos ve Pişirme): 1 yemek kaşığı salçayı 2 su bardağı sıcak su ve 3 yemek kaşığı zeytinyağı ile eritip köftelerin üzerine gezdirin. Kapağı kapatıp kısık ateşte 28 dakika pişirin.',
                     timerMinutes: 28
                 }
             ]
         },
         {
+            id: 'kizartmadan_tencerede_patlican_oturtma',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Kızgın Yağda Kızartmadan Tencerede Güvenli Kıymalı Patlıcan Oturtma / Karnıyarık',
+            keywords: ['karnıyarık', 'patlıcan', 'oturtma', 'musakka', 'kıyma'],
+            ingredients: '3 adet kemer patlıcan (alacalı soyulup halka doğranmış), 250 gram kıyma, 1 adet kuru soğan, 2 adet yeşil biber, 2 adet domates, 1 yemek kaşığı salça, 3 yemek kaşığı zeytinyağı, 1 buçuk su bardağı sıcak su, 1 tatlı kaşığı tuz.',
+            steps: [
+                {
+                    text: '1. Adım (Kıymalı Harç): Tencerede 250 gram kıymayı, doğranmış soğan ve biberle birlikte orta-kısık ateşte 6 dakika suyunu çekene kadar kavurun, salçayı ve tuzu ekleyip karıştırın.',
+                    timerMinutes: 6
+                },
+                {
+                    text: '2. Adım (Kızartmadan Dizme ve Buharda Pişirme): Halka doğranmış patlıcanları ve dilimlenmiş domatesleri kıymanın üzerine yayın. 3 yemek kaşığı zeytinyağı ve 1 buçuk su bardağı sıcak suyu gezdirip kapağı kapatın; kısık ateşte patlıcanlar pamuk gibi olana kadar 25 dakika pişirin.',
+                    timerMinutes: 25
+                }
+            ]
+        },
+        {
             id: 'firinda_soslu_tavuk_patates',
-            title: 'Yumuşacık Fırında (veya Tencerede) Soslu Tavuk ve Patates',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Tencerede (veya Fırında) Yumuşacık Soslu Tavuk ve Patates',
             keywords: ['tavuk', 'patates', 'fırında tavuk', 'baget', 'tavuk göğsü'],
             ingredients: '600 gram kuşbaşı veya baget tavuk eti, 3 adet patates, 2 yemek kaşığı yoğurt, 3 yemek kaşığı zeytinyağı, 1 tatlı kaşığı domates salçası, 1 tatlı kaşığı kekik, 1 tatlı kaşığı tuz.',
             steps: [
                 {
-                    text: '1. Adım (Elinizle Soslama): Derin bir kapta 2 yemek kaşığı yoğurt, 3 yemek kaşığı zeytinyağı, 1 tatlı kaşığı salça, tuz ve kekiği karıştırın. Tavukları ve iri doğranmış patatesleri içine atıp her yerine sos değecek şekilde elinizle harmanlayın.',
+                    text: '1. Adım (Elinizle Soslama): Derin bir kapta yoğurt, zeytinyağı, salça, tuz ve kekiği karıştırın. Tavukları ve iri doğranmış patatesleri içine atıp elinizle harmanlayın.',
                     timerMinutes: 0
                 },
                 {
-                    text: '2. Adım (Pişirme): Malzemeleri fırın tepsisine veya geniş kapaklı bir tencereye yayın. Fırında 200 derecede 35 dakika; tencerede ise yarım su bardağı su ilavesiyle kısık ateşte 30 dakika pişirin. Mis gibi kekik kokusu mutfağı sardığında yemeğiniz hazırdır!',
+                    text: '2. Adım (Pişirme): Geniş kapaklı bir tencereye alıp yarım su bardağı su ilavesiyle kısık ateşte 30 dakika pişirin.',
                     timerMinutes: 30
                 }
             ]
         },
         {
             id: 'salcali_soslu_makarna',
-            title: 'Süzmeden Tam Ölçülü Salçalı ve Peynirli Demleme Makarna (Yanma Riski Sıfır!)',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Kaynar Su Süzmeden Tam Ölçülü Salçalı Demleme Makarna',
             keywords: ['makarna', 'spagetti', 'peynir', 'salçalı makarna', 'burgu makarna'],
-            ingredients: 'Yarım paket (250 gram / yaklaşık 3 su bardağı) burgu veya kalem makarna, 1 yemek kaşığı tereyağı, 2 yemek kaşığı sıvı yağ, 1 dolu yemek kaşığı domates salçası, 1 tatlı kaşığı kuru nane veya kekik, 1 tatlı kaşığı tuz, tam 3 su bardağı sıcak su.',
+            ingredients: 'Yarım paket (3 su bardağı) burgu veya kalem makarna, 1 yemek kaşığı tereyağı, 2 yemek kaşığı sıvı yağ, 1 dolu yemek kaşığı domates salçası, 1 tatlı kaşığı kuru nane, 1 tatlı kaşığı tuz, tam 3 su bardağı sıcak su.',
             steps: [
                 {
-                    text: '1. Adım (Güvenli Demleme Yöntemi - Kaynar Su Süzme Tehlikesi Yok!): Görme engelli aşçılar için kaynar makarna suyunu lavaboda süzmek yerine çok daha lezzetli olan "demleme makarna" yöntemini kullanıyoruz. Tencereye yağları ve 1 yemek kaşığı salçayı koyup kokusu çıkana kadar 2 dakika kavurun.',
+                    text: '1. Adım (Salça Kavurma): Tencereye yağları ve 1 yemek kaşığı salçayı koyup orta-kısık ateşte kokusu çıkana kadar 2 dakika kavurun.',
                     timerMinutes: 2
                 },
                 {
-                    text: '2. Adım (Tam Ölçü Su ve Makarna): 3 su bardağı kuru makarnayı, 1 tatlı kaşığı tuzu, naneyi ve tam 3 su bardağı sıcak suyu tencereye ekleyin. Karıştırıp kapağını kapatın.',
+                    text: '2. Adım (Bire Bir Su Ölçüsü): 3 su bardağı kuru makarnayı, 1 tatlı kaşığı tuzu, naneyi ve tam 3 su bardağı sıcak suyu ekleyip karıştırın.',
                     timerMinutes: 0
                 },
                 {
-                    text: '3. Adım (11 Dakika Kısık Ateş): Kaynama sesini duyunca ocağı kısığa alın ve arada bir karıştırarak 11 dakika pişirin. Makarna tüm soslu suyu içine çekip lokum gibi pişecektir; hiç süzmenize gerek kalmadan doğrudan tabağa alabilirsiniz!',
+                    text: '3. Adım (11 Dakika Kısık Ateş): Kaynama sesini duyunca ocağı en kısığa alın ve 11 dakika pişirin. Hiç süzmeden tüm sosunu çekmiş makarnanız hazır!',
                     timerMinutes: 11
                 }
             ]
         },
         {
             id: 'zeytinyagli_taze_fasulye',
-            title: 'Susuz Kendi Buharında Pişen Zeytinyağlı Taze Fasulye',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Susuz Kendi Buharında Pişen Zeytinyağlı Taze Fasulye',
             keywords: ['taze fasulye', 'zeytinyağlı', 'domates', 'fasulye'],
-            ingredients: 'Yarım kilo taze fasulye (uçları kırılıp ikiye bölünmüş), 2 adet orta boy kuru soğan, 3 adet olgun domates, yarım çay bardağı zeytinyağı, 1 tatlı kaşığı toz şeker, 1 tatlı kaşığı tuz, yarım su bardağı sıcak su.',
+            ingredients: 'Yarım kilo taze fasulye, 2 adet orta boy kuru soğan, 3 adet olgun domates, yarım çay bardağı zeytinyağı, 1 tatlı kaşığı toz şeker, 1 tatlı kaşığı tuz, yarım su bardağı sıcak su.',
             steps: [
                 {
-                    text: '1. Adım (Çiğden Kat Kat Dizme): Tencerenin en altına doğranmış soğanları, onun üzerine yıkanmış taze fasulyeleri, en üste ise küp doğranmış domatesleri yayın. Üzerine 1 tatlı kaşığı tuz, 1 tatlı kaşığı şeker, yarım çay bardağı zeytinyağı ve yarım su bardağı su gezdirin.',
+                    text: '1. Adım (Çiğden Kat Kat Dizme): Tencerenin en altına doğranmış soğanları, üzerine yıkanmış taze fasulyeleri, en üste küp doğranmış domatesleri yayın. Tuz, şeker, zeytinyağı ve yarım su bardağı su gezdirin.',
                     timerMinutes: 0
                 },
                 {
-                    text: '2. Adım (Kısık Ateşte 35 Dakika): Tencerenin kapağını kapatın, ilk 5 dakika orta ateşte fokurdama sesini duyduktan sonra en kısık ateşe alın ve 35 dakika pişirin. Çatalla kontrol ettiğinizde fasulyeler yumuşacıksa altını kapatıp soğumaya bırakın.',
+                    text: '2. Adım (Kısık Ateşte 35 Dakika): Kapağı kapatın, kaynama sesini duyduktan sonra en kısık ateşe alın ve 35 dakika pişirin.',
                     timerMinutes: 35
                 }
             ]
         },
         {
             id: 'kabaran_anne_keki',
-            title: '3-2-1 Bardak Ölçülü Garantili Kabaran Anne Keki (Cevizli & Tarçınlı)',
-            keywords: ['kek', 'tatlı', 'yumurta', 'ceviz', 'tarçın', 'anne keki', 'pasta'],
+            category: 'ocakli',
+            title: '🔥 [Fırın / Tencere] 3-2-1 Bardak Ölçülü Garantili Kabaran Anne Keki',
+            keywords: ['kek', 'tatlı', 'yumurta', 'ceviz', 'tarçın', 'anne keki'],
             ingredients: '3 adet yumurta, 1 su bardağı toz şeker, 1 su bardağı süt, yarım su bardağı sıvı yağ, 2 buçuk su bardağı un, 1 paket kabartma tozu, 1 paket vanilya, 1 tatlı kaşığı tarçın, yarım su bardağı kırılmış ceviz.',
             steps: [
                 {
-                    text: '1. Adım (Şeker Eriyene Kadar Çırpma): Derin çırpma kabına 3 yumurta ve 1 su bardağı şekeri koyun. Çırpma teli veya mikserle 4 dakika çırpın; kabın dibinde şeker tanelerinin çıtırtı sesi kesilip karışım köpük köpük olduğunda 1 su bardağı süt ve yarım su bardağı sıvı yağı ekleyin.',
+                    text: '1. Adım (Şeker Eriyene Kadar Çırpma): Derin çırpma kabında 3 yumurta ve 1 su bardağı şekeri 4 dakika çırpın; ardından 1 su bardağı süt ve yarım su bardağı sıvı yağı ekleyin.',
                     timerMinutes: 4
                 },
                 {
-                    text: '2. Adım (Un, Tarçın ve Ceviz): 2 buçuk su bardağı unu, 1 paket kabartma tozunu, vanilyayı, 1 tatlı kaşığı tarçını ve cevizi ekleyip 1 dakika daha karıştırın. Tereyağı ile yağlanmış kek kalıbına veya tepsiye dökün.',
+                    text: '2. Adım (Un, Tarçın ve Ceviz): 2 buçuk su bardağı unu, kabartma tozunu, vanilyayı, tarçını ve cevizi ekleyip 1 dakika karıştırın ve yağlanmış kalıba dökün.',
                     timerMinutes: 1
                 },
                 {
-                    text: '3. Adım (Kürdan ve Koku Testi): 180 derece fırında 35 dakika pişirin. 30. dakikadan itibaren evi mis gibi vanilya ve tarçın kokusu saracaktır. 35. dakikada kekin ortasına bir kürdan batırıp çıkarın; kürdanı dudağınıza veya parmak ucunuza dokundurduğunuzda ıslak hamur gelmiyorsa kekiniz mükemmel pişmiştir!',
+                    text: '3. Adım (Kürdan ve Koku Testi): 180 derece fırında 35 dakika pişirin.',
                     timerMinutes: 35
                 }
             ]
         },
         {
             id: 'tavsan_kani_cay_ve_turk_kahvesi',
-            title: 'Tavşan Kanı Türk Çayı ve Bol Köpüklü Türk Kahvesi Ölçüsü',
+            category: 'ocakli',
+            title: '🔥 [Ocaklı] Tavşan Kanı Türk Çayı ve Bol Köpüklü Türk Kahvesi Ölçüsü',
             keywords: ['çay', 'kahve', 'türk kahvesi', 'demleme', 'içecek'],
-            ingredients: 'Çay için: Her 1 su bardağı sıcak suya 1 tatlı kaşığı kuru çay. Türk Kahvesi için (1 Fincan): 1 kahve fincanı soğuk su, 2 çay kaşığı tepeleme Türk kahvesi, isteğe göre 1 veya 2 çay kaşığı şeker.',
+            ingredients: 'Çay için: Her 1 su bardağı sıcak suya 1 tatlı kaşığı kuru çay. Türk Kahvesi için (1 Fincan): 1 kahve fincanı soğuk su, 2 çay kaşığı tepeleme Türk kahvesi, isteğe göre şeker.',
             steps: [
                 {
-                    text: '1. Adım (Türk Kahvesi Sesli Köpük Takibi): Cezveye her fincan için 1 fincan soğuk su ve 2 çay kaşığı tepeleme kahve koyup ocağı açmadan önce 15 saniye iyice karıştırın. En kısık ateşe koyun ve bir daha karıştırmayın. Yaklaşık 2 buçuk dakika sonra cezvenin kenarlarından hafif bir "fısır-fısır" kabarma sesi duyacaksınız; tam kaynamadan hemen önce ocağı kapatıp fincana yavaşça dökün.',
+                    text: '1. Adım (Türk Kahvesi Sesli Köpük Takibi): Cezveye 1 fincan soğuk su ve 2 çay kaşığı kahve koyup ocağı açmadan önce 15 saniye karıştırın. En kısık ateşe koyun. Yaklaşık 2 buçuk dakika sonra cezveden hafif bir "fısır-fısır" kabarma sesi duyduğunuzda taşmadan hemen önce ocağı kapatın.',
                     timerMinutes: 3
                 },
                 {
-                    text: '2. Adım (Tavşan Kanı Çay Demleme): Alt çaydanlıkta su kaynadığında, üst demliğe 4 yemek kaşığı kuru çay koyup üzerine 3 su bardağı kaynar suyu yavaşça gezdirin. Altını kısığa alıp 15 dakika demlendirin. Çayınız hazır!',
+                    text: '2. Adım (Tavşan Kanı Çay Demleme): Üst demliğe 4 yemek kaşığı kuru çay koyup üzerine 3 su bardağı kaynar suyu yavaşça gezdirin ve kısık ateşte 15 dakika demlendirin.',
                     timerMinutes: 15
                 }
             ]
         }
     ];
 
-    function populateCookingRecipesSelect() {
+    function populateCookingRecipesSelect(categoryFilter = state.selectedCookingCategory) {
         const sel = document.getElementById('cooking-recipe-select');
         if (!sel) return;
         sel.innerHTML = '';
+
+        let firstMatchingIdx = -1;
+        let visibleCount = 0;
+
         BLIND_ACCESSIBLE_RECIPES.forEach((rec, idx) => {
+            if (categoryFilter !== 'all' && rec.category !== categoryFilter) return;
+            if (firstMatchingIdx === -1) firstMatchingIdx = idx;
+            visibleCount++;
             const opt = document.createElement('option');
             opt.value = String(idx);
-            opt.textContent = `${idx + 1}. ${rec.title}`;
+            opt.textContent = `${visibleCount}. ${rec.title}`;
             sel.appendChild(opt);
         });
+
+        if (firstMatchingIdx !== -1) {
+            const currentRec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex];
+            if (!currentRec || (categoryFilter !== 'all' && currentRec.category !== categoryFilter)) {
+                state.selectedRecipeIndex = firstMatchingIdx;
+                state.currentCookingStepIndex = 0;
+            }
+            sel.value = String(state.selectedRecipeIndex);
+        }
         updateCookingGuideUI();
+    }
+
+    function filterCookingRecipesByCategory(catId, speakNow = true) {
+        state.selectedCookingCategory = catId || 'all';
+        const catBtns = document.querySelectorAll('.cook-cat-btn');
+        catBtns.forEach(btn => {
+            const isSel = btn.getAttribute('data-cook-cat') === state.selectedCookingCategory;
+            btn.classList.toggle('active-toggle', isSel);
+            btn.setAttribute('aria-pressed', isSel ? 'true' : 'false');
+        });
+        populateCookingRecipesSelect(state.selectedCookingCategory);
+
+        if (speakNow) {
+            const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex];
+            const catDesc = state.selectedCookingCategory === 'ocaksiz'
+                ? 'Ocaksız Yapılabilecek Türk Yemekleri kategorisi açıldı. Bu bölümdeki 14 yemek ve tatlının hiçbirinde ocak veya ateş kullanılmaz; yanma ve taşma tehlikesi sıfırdır.'
+                : (state.selectedCookingCategory === 'ocakli'
+                    ? 'Ocak Kullanılan Geleneksel Türk Yemekleri kategorisi açıldı. Bu bölümdeki 13 yemekte 4 katmanlı yanma ve taşma koruma kalkanımız devrededir.'
+                    : 'Tüm Türk Yemekleri (toplam 27 tarif) listelendi.');
+            announceGuidance(`${catDesc} Şu an seçili yemek: ${rec ? rec.title : ''}.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        }
     }
 
     function updateCookingGuideUI() {
@@ -8407,28 +8736,40 @@
     function stepCookingInstruction(delta) {
         const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
         if (!rec) return;
+        const isStoveRecipe = rec.category === 'ocakli';
         if (delta < 0 && state.currentCookingStepIndex <= 0) {
             announceGuidance(`İlk adımdasınız. ${rec.steps[0].text}`, { force: true });
             return;
         }
         if (delta > 0 && state.currentCookingStepIndex >= rec.steps.length - 1) {
-            startStoveOffReminderWatch();
-            announceGuidance(`Tebrikler, ${rec.title} tarifinin son adımındasınız! Yemeğiniz hazır. Güvenliğiniz için lütfen şimdi ocağın ve fırının düğmesini tamamen kapatın ve Ocağı Kapattım düğmesine dokunun!`, {
-                force: true,
-                bannerState: 'centered'
-            });
+            if (isStoveRecipe) {
+                startStoveOffReminderWatch();
+                announceGuidance(`Tebrikler, ${rec.title} tarifinin son adımındasınız! Yemeğiniz hazır. Güvenliğiniz için lütfen şimdi ocağın ve fırının düğmesini tamamen kapatın ve Ocağı Kapattım düğmesine dokunun!`, {
+                    force: true,
+                    bannerState: 'centered'
+                });
+            } else {
+                announceGuidance(`Tebrikler, ${rec.title} tarifinin son adımındasınız! Bu yemekte hiç ocak veya ateş kullanmadığımız için yanma ve taşma riski sıfırdır. Ellerinize sağlık, afiyet olsun!`, {
+                    force: true,
+                    bannerState: 'centered'
+                });
+            }
             return;
         }
         state.currentCookingStepIndex = Math.max(0, Math.min(rec.steps.length - 1, state.currentCookingStepIndex + delta));
         updateCookingGuideUI();
         const stepObj = rec.steps[state.currentCookingStepIndex];
-        const safetyHint = stepObj.timerMinutes >= 10
-            ? ' Taşmayı önlemek için tencerenin ağzına yatay bir tahta kaşık koyup kapağı hafif aralık bırakmayı ve kaynayınca ocağı en kısığa almayı unutmayın.'
-            : (stepObj.timerMinutes > 0
-                ? ' Dibinin tutmaması ve yanmaması için ocağı orta-kısık ateşte tutun ve her 40 saniyede bir tahta kaşıkla karıştırın.'
-                : '');
+        const safetyHint = isStoveRecipe
+            ? (stepObj.timerMinutes >= 10
+                ? ' Taşmayı önlemek için tencerenin ağzına yatay bir tahta kaşık koyup kapağı hafif aralık bırakmayı ve kaynayınca ocağı en kısığa almayı unutmayın.'
+                : (stepObj.timerMinutes > 0
+                    ? ' Dibinin tutmaması ve yanmaması için ocağı orta-kısık ateşte tutun ve her 40 saniyede bir tahta kaşıkla karıştırın.'
+                    : ''))
+            : '';
         const timerHint = stepObj.timerMinutes > 0
-            ? ` Bu adımın pişme süresi ${stepObj.timerMinutes} dakikadır; Konuşan Tencere Saatini Başlat düğmesine basarak yanma ve taşma hatırlatmalı sayacı başlatabilirsiniz.`
+            ? (isStoveRecipe
+                ? ` Bu adımın pişme süresi ${stepObj.timerMinutes} dakikadır; Konuşan Tencere Saatini Başlat düğmesine basarak yanma ve taşma hatırlatmalı sayacı başlatabilirsiniz.`
+                : ` Bu adımın dinlenme veya karıştırma süresi ${stepObj.timerMinutes} dakikadır; Konuşan Saati Başlat düğmesine basarak sesli sayacı başlatabilirsiniz.`)
             : '';
         announceGuidance(`${stepObj.text}${safetyHint}${timerHint}`, {
             force: true,
@@ -8593,6 +8934,7 @@
         }
 
         const rec = BLIND_ACCESSIBLE_RECIPES[state.selectedRecipeIndex] || BLIND_ACCESSIBLE_RECIPES[0];
+        const isStoveRecipe = rec && rec.category === 'ocakli';
         const stepObj = rec ? rec.steps[state.currentCookingStepIndex] : null;
         const minutes = (stepObj && stepObj.timerMinutes > 0) ? stepObj.timerMinutes : 3;
         state.cookingTimerRemainingSec = minutes * 60;
@@ -8600,18 +8942,25 @@
         state.stoveConfirmedOff = false;
 
         if (timerBtn) {
-            timerBtn.textContent = '⏹️ Konuşan Tencere Saatini Durdur';
+            timerBtn.textContent = '⏹️ Konuşan Mutfak Saatini Durdur';
         }
         if (badgeEl) {
-            badgeEl.textContent = `⏱️ Pişiyor: ${minutes} dk`;
+            badgeEl.textContent = isStoveRecipe ? `⏱️ Pişiyor: ${minutes} dk` : `⏱️ Hazırlanıyor: ${minutes} dk`;
         }
         if (timerEl) {
             timerEl.textContent = `Kalan Süre: ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}`;
         }
-        announceGuidance(`${minutes} dakikalık yanma ve taşma korumalı tencere saati başlatıldı! Pişme sırasında dibinin tutmaması için ne zaman karıştıracağınızı ve ocağı kısacağınızı size adım adım hatırlatacağım.`, {
-            force: true,
-            bannerState: 'centered'
-        });
+        if (isStoveRecipe) {
+            announceGuidance(`${minutes} dakikalık yanma ve taşma korumalı tencere saati başlatıldı! Pişme sırasında dibinin tutmaması için ne zaman karıştıracağınızı ve ocağı kısacağınızı size adım adım hatırlatacağım.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        } else {
+            announceGuidance(`${minutes} dakikalık ocaksız hazırlama ve dinlendirme saati başlatıldı! Süre dolduğunda size sesli haber vereceğim.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        }
 
         state.cookingTimerInterval = setInterval(() => {
             state.cookingTimerRemainingSec--;
@@ -8626,44 +8975,55 @@
                 state.cookingTimerInterval = null;
                 radar.playLockedChime();
                 if (navigator.vibrate) navigator.vibrate([300, 100, 300, 100, 400]);
-                if (timerEl) timerEl.textContent = 'SÜRE DOLDU! Ocağı kontrol edin!';
-                if (badgeEl) badgeEl.textContent = '✅ Pişme Süresi Doldu!';
                 updateCookingGuideUI();
-                startStoveOffReminderWatch();
-                announceGuidance('DİKKAT SÜRE DOLDU! Yemeğinizin yanmaması için lütfen şimdi ocağı kapatın veya kısın! Eğer pişirme bittiyse Ocağı Kapattım düğmesine dokunun.', {
-                    force: true,
-                    bannerState: 'centered'
-                });
+                if (isStoveRecipe) {
+                    if (timerEl) timerEl.textContent = 'SÜRE DOLDU! Ocağı kontrol edin!';
+                    if (badgeEl) badgeEl.textContent = '✅ Pişme Süresi Doldu!';
+                    startStoveOffReminderWatch();
+                    announceGuidance('DİKKAT SÜRE DOLDU! Yemeğinizin yanmaması için lütfen şimdi ocağı kapatın veya kısın! Eğer pişirme bittiyse Ocağı Kapattım düğmesine dokunun.', {
+                        force: true,
+                        bannerState: 'centered'
+                    });
+                } else {
+                    if (timerEl) timerEl.textContent = 'SÜRE DOLDU! Bir sonraki adıma geçebilirsiniz.';
+                    if (badgeEl) badgeEl.textContent = '✅ Süre Tamamlandı!';
+                    announceGuidance('Süre tamamlandı! Ocaksız tarifinizin bu adımı hazır, şimdi Sonraki Adım düğmesine basabilirsiniz.', {
+                        force: true,
+                        bannerState: 'centered'
+                    });
+                }
                 return;
             }
 
-            // YANMA VE TAŞMA ÖNLEYİCİ OTOMATİK ARA HATIRLATICILAR:
-            // 1) Kısa kavurma adımlarında (<= 7 dk) her 45 saniyede bir "Dibinin tutmaması için karıştır" uyarısı
-            if (minutes <= 7 && elapsedSec > 0 && elapsedSec % 45 === 0 && state.cookingTimerRemainingSec > 20) {
-                announceGuidance(`Yanma önleyici hatırlatma: Dibinin tutmaması için şimdi tahta kaşıkla tencereyi kenarlardan ortaya doğru bir kez karıştırın. Kalan süre ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}.`, {
-                    force: true,
-                    bannerState: 'normal'
-                });
-                return;
-            }
+            // YANMA VE TAŞMA ÖNLEYİCİ OTOMATİK ARA HATIRLATICILAR (Sadece Ocaklı Yemeklerde):
+            if (isStoveRecipe) {
+                // 1) Kısa kavurma adımlarında (<= 7 dk) her 45 saniyede bir "Dibinin tutmaması için karıştır" uyarısı
+                if (minutes <= 7 && elapsedSec > 0 && elapsedSec % 45 === 0 && state.cookingTimerRemainingSec > 20) {
+                    announceGuidance(`Yanma önleyici hatırlatma: Dibinin tutmaması için şimdi tahta kaşıkla tencereyi kenarlardan ortaya doğru bir kez karıştırın. Kalan süre ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}.`, {
+                        force: true,
+                        bannerState: 'normal'
+                    });
+                    return;
+                }
 
-            // 2) Uzun kaynama adımlarında (>= 8 dk) 90. saniyede "Taşmaması için altını en kısığa al ve tahta kaşık koy" uyarısı
-            if (minutes >= 8 && elapsedSec === 90) {
-                announceGuidance('Taşma önleyici hatırlatma: Tencere kaynamaya başladıysa taşmaması için ocağın düğmesini şimdi en kısık konuma çevirin ve tencerenin ağzına yatay bir tahta kaşık koyup kapağı hafif aralık bırakın.', {
-                    force: true,
-                    bannerState: 'warning'
-                });
-                return;
+                // 2) Uzun kaynama adımlarında (>= 8 dk) 90. saniyede "Taşmaması için altını en kısığa al ve tahta kaşık koy" uyarısı
+                if (minutes >= 8 && elapsedSec === 90) {
+                    announceGuidance('Taşma önleyici hatırlatma: Tencere kaynamaya başladıysa taşmaması için ocağın düğmesini şimdi en kısık konuma çevirin ve tencerenin ağzına yatay bir tahta kaşık koyup kapağı hafif aralık bırakın.', {
+                        force: true,
+                        bannerState: 'warning'
+                    });
+                    return;
+                }
             }
 
             if (state.cookingTimerRemainingSec === 30) {
-                announceGuidance('Pişme süresinin bitmesine son 30 saniye kaldı, ocağın başına geçebilirsiniz.', { force: true });
+                announceGuidance(isStoveRecipe ? 'Pişme süresinin bitmesine son 30 saniye kaldı, ocağın başına geçebilirsiniz.' : 'Sürenin bitmesine son 30 saniye kaldı.', { force: true });
             } else if (state.cookingTimerRemainingSec <= 5 && state.cookingTimerRemainingSec > 0) {
                 announceGuidance(String(state.cookingTimerRemainingSec), { force: true });
             } else if (state.cookingTimerRemainingSec % 60 === 0) {
                 const remMin = Math.round(state.cookingTimerRemainingSec / 60);
-                const stirNote = (remMin % 3 === 0) ? ' Suyunu ve ateşin kısık olduğunu kontrol edin.' : '';
-                announceGuidance(`Tencere saati bilgisi: Pişmenin tamamlanmasına ${remMin} dakika kaldı.${stirNote}`, { force: true });
+                const stirNote = (isStoveRecipe && remMin % 3 === 0) ? ' Suyunu ve ateşin kısık olduğunu kontrol edin.' : '';
+                announceGuidance(`Mutfak saati bilgisi: Sürenin tamamlanmasına ${remMin} dakika kaldı.${stirNote}`, { force: true });
             }
         }, 1000);
     }
@@ -8695,14 +9055,18 @@
         });
 
         if (bestIdx >= 0 && bestScore > 0) {
-            selectCookingRecipe(bestIdx, false);
             const rec = BLIND_ACCESSIBLE_RECIPES[bestIdx];
-            announceGuidance(`Söylediğiniz malzemelere en uygun yemek bulundu: ${rec.title}! Gerekli malzemeler: ${rec.ingredients} Şimdi 1. adımdan başlıyoruz: ${rec.steps[0].text}`, {
+            if (state.selectedCookingCategory !== 'all' && state.selectedCookingCategory !== rec.category) {
+                filterCookingRecipesByCategory(rec.category, false);
+            }
+            selectCookingRecipe(bestIdx, false);
+            const catLabel = rec.category === 'ocaksiz' ? 'Ocaksız Yapılabilecek Türk Yemekleri kategorisinden' : 'Ocak Kullanılan Türk Yemekleri kategorisinden';
+            announceGuidance(`Söylediğiniz malzemelere en uygun yemek ${catLabel} bulundu: ${rec.title}! Gerekli malzemeler: ${rec.ingredients} Şimdi 1. adımdan başlıyoruz: ${rec.steps[0].text}`, {
                 force: true,
                 bannerState: 'centered'
             });
         } else {
-            announceGuidance(`"${queryText}" için tam eşleşen bir tarif bulunamadı, ancak listedeki 10 erişilebilir Türk yemeğinden dilediğinizi seçebilirsiniz.`, {
+            announceGuidance(`"${queryText}" için tam eşleşen bir tarif bulunamadı, ancak 14 ocaksız ve 13 ocaklı olmak üzere toplam 27 erişilebilir Türk yemeğinden dilediğinizi seçebilirsiniz.`, {
                 force: true,
                 bannerState: 'warning'
             });
@@ -9315,6 +9679,14 @@
     }
 
     // 23. Erişilebilir Yemek Yapma Rehberi ve Konuşan Aşçı Düğmeleri
+    const cookCatBtns = document.querySelectorAll('.cook-cat-btn');
+    if (cookCatBtns && cookCatBtns.length > 0) {
+        cookCatBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterCookingRecipesByCategory(btn.getAttribute('data-cook-cat') || 'all', true);
+            });
+        });
+    }
     const cookingRecipeSelect = document.getElementById('cooking-recipe-select');
     const cookingIngredientInput = document.getElementById('cooking-ingredient-input');
     const btnCookingFind = document.getElementById('btn-cooking-find');
