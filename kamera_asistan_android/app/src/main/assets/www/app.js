@@ -961,6 +961,7 @@
         const gray = new Float32Array(gw * gh);
 
         let maxLum = 0, maxLumX = width / 2, maxLumY = height / 2;
+        let maxLedScore = 0, maxLedPeak = 0, ledCandX = width / 2, ledCandY = height / 2;
 
         for (let gy = 0; gy < gh; gy++) {
             const y = gy * step;
@@ -982,6 +983,16 @@
                     maxLum = lum;
                     maxLumX = x;
                     maxLumY = y;
+                }
+
+                const peakCh = Math.max(r, g, b);
+                const minCh = Math.min(r, g, b);
+                const ledScore = Math.max(lum, peakCh * 0.96 + (peakCh - minCh) * 0.15);
+                if (ledScore > maxLedScore) {
+                    maxLedScore = ledScore;
+                    maxLedPeak = peakCh;
+                    ledCandX = x;
+                    ledCandY = y;
                 }
             }
         }
@@ -1118,7 +1129,7 @@
 
         for (let cy = 1; cy < gridN - 1; cy++) {
             for (let cx = 1; cx < gridN - 1; cx++) {
-                const z = Math.abs(cellMeans[cy * gridN + cx] - gridMean) / Math.max(4.5, gridStd);
+                const z = Math.abs(cellMeans[cy * gridN + cx] - gridMean) / Math.max(3.0, gridStd);
                 if (z > 2.9) anomalyCount++;
                 if (z > maxZScore) {
                     maxZScore = z;
@@ -1130,7 +1141,7 @@
 
         const isSurfacePatterned = gridStd > 34 || anomalyCount > 4;
         let floorAnomaly = null;
-        if (!isSurfacePatterned && maxZScore >= 3.65 && anomalyCellX >= 0) {
+        if (!isSurfacePatterned && maxZScore >= 3.20 && anomalyCellX >= 0) {
             const ax = (anomalyCellX / gridN) * width;
             const ay = (anomalyCellY / gridN) * height;
             const aw = width / gridN;
@@ -1142,40 +1153,54 @@
         }
 
         let ledSource = null;
-        if (maxLum >= 244 && avgBrightness < 145) {
-            let ringR = 0, ringG = 0, ringB = 0, rCnt = 0;
-            const rad = 10;
-            for (let dy = -rad; dy <= rad; dy += 4) {
-                for (let dx = -rad; dx <= rad; dx += 4) {
-                    if (dx === 0 && dy === 0) continue;
-                    const rx = Math.min(width - 1, Math.max(0, Math.floor(maxLumX + dx)));
-                    const ry = Math.min(height - 1, Math.max(0, Math.floor(maxLumY + dy)));
+        if (maxLedPeak >= 238 && avgBrightness < 145) {
+            let coreR = 0, coreG = 0, coreB = 0, cCnt = 0;
+            let surLum = 0, surPeak = 0, surBrightCnt = 0, sCnt = 0;
+            for (let dy = -22; dy <= 22; dy += 2) {
+                for (let dx = -22; dx <= 22; dx += 2) {
+                    const dist = Math.hypot(dx, dy);
+                    const rx = Math.min(width - 1, Math.max(0, Math.floor(ledCandX + dx)));
+                    const ry = Math.min(height - 1, Math.max(0, Math.floor(ledCandY + dy)));
                     const rIdx = (ry * width + rx) * 4;
-                    ringR += data[rIdx];
-                    ringG += data[rIdx + 1];
-                    ringB += data[rIdx + 2];
-                    rCnt++;
+                    const pr = data[rIdx], pg = data[rIdx + 1], pb = data[rIdx + 2];
+                    const pPeak = Math.max(pr, pg, pb);
+                    const pLum = 0.299 * pr + 0.587 * pg + 0.114 * pb;
+
+                    if (dist <= 10 && pPeak >= 110) {
+                        coreR += pr;
+                        coreG += pg;
+                        coreB += pb;
+                        cCnt++;
+                    } else if (dist >= 14 && dist <= 22) {
+                        surLum += pLum;
+                        surPeak += pPeak;
+                        if (pPeak >= 165) surBrightCnt++;
+                        sCnt++;
+                    }
                 }
             }
-            ringR /= Math.max(1, rCnt);
-            ringG /= Math.max(1, rCnt);
-            ringB /= Math.max(1, rCnt);
+            coreR /= Math.max(1, cCnt);
+            coreG /= Math.max(1, cCnt);
+            coreB /= Math.max(1, cCnt);
+            surLum /= Math.max(1, sCnt);
+            surPeak /= Math.max(1, sCnt);
+            const surBrightRatio = surBrightCnt / Math.max(1, sCnt);
 
-            const prominenceRatio = maxLum / Math.max(12, avgBrightness);
+            const prominenceRatio = maxLedPeak / Math.max(12, Math.max(avgBrightness, surPeak));
             let ledColorName = '';
-            if (ringR > ringG * 1.38 && ringR > ringB * 1.38 && ringR >= 130) ledColorName = 'Kırmızı';
-            else if (ringG > ringR * 1.28 && ringG > ringB * 1.20 && ringG >= 120) ledColorName = 'Yeşil';
-            else if (ringB > ringR * 1.35 && ringB > ringG * 1.20 && ringB >= 130) ledColorName = 'Mavi';
-            else if (ringR > 185 && ringG > 110 && ringB < 85) ledColorName = 'Turuncu / Kehribar';
-            else if (avgBrightness < 85 && prominenceRatio >= 3.4) ledColorName = 'Beyaz / Sarı';
+            if (coreR > coreG * 1.35 && coreR > coreB * 1.35 && coreR >= 130) ledColorName = 'Kırmızı';
+            else if (coreG > coreR * 1.25 && coreG > coreB * 1.20 && coreG >= 120) ledColorName = 'Yeşil';
+            else if (coreB > coreR * 1.30 && coreB > coreG * 1.18 && coreB >= 130) ledColorName = 'Mavi';
+            else if (coreR >= 180 && coreG >= 95 && coreB < 85 && coreR >= coreG * 1.15) ledColorName = 'Turuncu / Kehribar';
+            else if (maxLum >= 242 && avgBrightness < 85 && (maxLum / Math.max(12, Math.max(avgBrightness, surLum))) >= 2.8) ledColorName = 'Beyaz / Sarı';
 
-            if (ledColorName && prominenceRatio >= 2.35) {
+            if (ledColorName && prominenceRatio >= 1.85 && surLum < 125 && surBrightRatio <= 0.12) {
                 ledSource = {
-                    x: maxLumX,
-                    y: maxLumY,
-                    bbox: [Math.max(0, maxLumX - 22), Math.max(0, maxLumY - 22), 44, 44],
+                    x: ledCandX,
+                    y: ledCandY,
+                    bbox: [Math.max(0, ledCandX - 22), Math.max(0, ledCandY - 22), 44, 44],
                     colorName: ledColorName,
-                    peakLum: maxLum
+                    peakLum: maxLedPeak
                 };
             }
         }
@@ -1183,7 +1208,7 @@
         state.ledHistory.push({
             t: performance.now(),
             active: Boolean(ledSource),
-            lum: maxLum
+            lum: maxLedPeak
         });
         if (state.ledHistory.length > 45) state.ledHistory.shift();
 
@@ -1477,9 +1502,10 @@
     state.lastLiveAutoOcrAt = 0;
     state.lastLiveSpokenText = '';
     state.lastLiveSpokenAt = 0;
+    state.isLiveBgOcrBusy = false;
 
     function triggerUniversalLiveOcrIfSteady(metrics, predictions) {
-        if (!state.isRunning || state.isProcessingOcr || typeof window.Tesseract === 'undefined') return;
+        if (!state.isRunning || state.isProcessingOcr || state.isLiveBgOcrBusy || state.moneyLiveOcrBusy || state.countdownStage > 0 || typeof window.Tesseract === 'undefined') return;
         if (state.mode === 'light_meter' || state.mode === 'qibla_compass' || state.mode === 'song_finder') return;
         if (!metrics || metrics.sharpness < 6.0 || metrics.avgBrightness < 38) return;
 
@@ -1490,13 +1516,13 @@
         if (!strokeCheck || !strokeCheck.hasTextLikely) return;
 
         state.lastLiveAutoOcrAt = now;
-        state.isProcessingOcr = true;
+        state.isLiveBgOcrBusy = true;
         const targetCanvas = strokeCheck.ocrCanvas || el.analysisCanvas;
 
         Promise.resolve()
             .then(() => window.Tesseract.recognize(targetCanvas, 'tur+eng'))
             .then((ocrRes) => {
-                if (!state.isRunning) return;
+                if (!state.isRunning || state.isProcessingOcr) return;
                 const liveText = extractVerifiedRealTextFromOcrResult(ocrRes).trim();
                 if (!liveText || liveText.length < 2) return;
 
@@ -1507,6 +1533,14 @@
 
                 state.lastLiveSpokenText = liveText;
                 state.lastLiveSpokenAt = tNow;
+
+                const centerColName = metrics.centerColor ? metrics.centerColor.name : '';
+                const liveBanknote = detectTurkishBanknoteDetailsFromText(liveText, centerColName);
+                if (liveBanknote && !liveBanknote.partialOnly) {
+                    showDetectedResult('💵 Canlı Kamerada Kağıt Para Okundu', `${liveBanknote.label}\nOkunan Metin: ${liveText}`);
+                    announceGuidance(`Kamerada ${liveBanknote.label} kağıt para algılandı.`, { force: true, bannerState: 'centered' });
+                    return;
+                }
 
                 if (state.mode === 'bus_stop_tracker') {
                     const busRep = processBusRouteOcrResult(liveText, predictions);
@@ -1527,7 +1561,7 @@
             })
             .catch(() => {})
             .finally(() => {
-                state.isProcessingOcr = false;
+                state.isLiveBgOcrBusy = false;
             });
     }
 
@@ -2882,6 +2916,8 @@
                 });
                 return;
             }
+        } else {
+            updateKalmanTracker(null, '', 3);
         }
 
         el.tPosition.textContent = 'Yerde Eşya Görünmüyor';
@@ -3266,10 +3302,13 @@
         let sigBox = null;
 
         if ((metrics.avgBrightness || 0) >= 105) {
-            for (let gy = Math.floor(gh * 0.35); gy < Math.floor(gh * 0.82); gy += 2) {
+            for (let gy = Math.floor(gh * 0.35); gy < Math.floor(gh * 0.82); gy++) {
                 let horizEdgeRun = 0;
                 for (let gx = Math.floor(gw * 0.20); gx < Math.floor(gw * 0.80); gx++) {
-                    const dy = Math.abs(gray[(gy + 1) * gw + gx] - gray[(gy - 1) * gw + gx]);
+                    const gCurr = gray[gy * gw + gx];
+                    const gPrev = gray[(gy - 1) * gw + gx];
+                    const gNext = gray[(gy + 1) * gw + gx];
+                    const dy = Math.max(Math.abs(gNext - gPrev), Math.abs(gCurr - gPrev), Math.abs(gNext - gCurr));
                     const dx = Math.abs(gray[gy * gw + (gx + 1)] - gray[gy * gw + (gx - 1)]);
                     if (dy > 26 && dy > dx * 1.4) horizEdgeRun += dy;
                 }
@@ -3755,7 +3794,7 @@
         if (typeof window.Tesseract === 'undefined') return null;
 
         let sawBanknoteWordsWithoutNumber = false;
-        const hasBanknoteWords = (txt) => /TÜRK|TURK|LİRA|LIRA|MERKEZ|BANKA|CUMHURİYET|CUMHURIYET/i.test(txt || '');
+        const hasBanknoteWords = (txt) => /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|MERKEZ\s*BANK|CUMHUR[İI]YET\s*MERKEZ/i.test(txt || '');
 
         // 1. Düz (0°) kontrol et (Sadece gerçek OCR doğrulamasından geçen temiz metinleri kullan)
         const res0 = await window.Tesseract.recognize(sourceCanvas, 'tur+eng');
@@ -3812,7 +3851,7 @@
         const isPurple = /MOR|EFLATUN/.test(colorUpper);
         const isOrangeYellow = /TURUNCU|SARI|HARDAL/.test(colorUpper);
 
-        const hasExplicitMoneyWord = /TÜRK|TURK|LİRA|LIRA|MERKEZ|BANKA|CUMHURİYET|CUMHURIYET|İKİ\s*YÜZ|IKI\s*YUZ|\bYÜZ\s*TÜRK|\bELLİ\s*TÜRK|\bYİRMİ\s*TÜRK/.test(clean);
+        const hasExplicitMoneyWord = /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|MERKEZ\s*BANK|CUMHUR[İI]YET\s*MERKEZ|İKİ\s*YÜZ|IKI\s*YUZ|\bYÜZ\s*(?:TÜRK|LİRA)|\bELLİ\s*(?:TÜRK|LİRA)|\bYİRMİ\s*(?:TÜRK|LİRA)|\bON\s*(?:TÜRK|LİRA)|\bBEŞ\s*(?:TÜRK|LİRA)/.test(clean);
 
         // Arka yüz portre isimlerinden kesin kupür tespiti (Kullanıcıya asla söylenmez, sadece iç doğrulama!)
         const hasYunusEmre = /YUNUS\s*EMRE|SEVVELİM|SEVELIM/.test(clean);
@@ -4644,7 +4683,8 @@
                 // ÖZEL MOD 5 (PARA SAYMA VE TÜM GENEL MODLAR): ÇEKİLEN FOTOĞRAFTA KAĞIT PARA VEYA DEMİR PARA VARSA OTOMATİK TOPLAMA EKLE
                 const centerColName = metrics.centerColor ? metrics.centerColor.name : '';
                 let banknoteDetails = detectTurkishBanknoteDetailsFromText(cleanText, centerColName);
-                if (!banknoteDetails && state.mode === 'color_cloth') {
+                const hasBanknoteWordsInText = /L[İI]RASI\b|T[ÜU]RK\s*L[İI]RA|MERKEZ\s*BANK|CUMHUR[İI]YET\s*MERKEZ/i.test(cleanText || '');
+                if (!banknoteDetails && (state.mode === 'color_cloth' || hasBanknoteWordsInText)) {
                     const rotatedCheck = await recognizeBanknoteMultiOrientation(capCanvas, centerColName);
                     if (rotatedCheck && rotatedCheck.partialOnly) {
                         announceGuidance('Kağıt parayı algıladım ancak rakam kısmı parmağınızın altında veya ekranın dışında kalmış. Lütfen parayı düzeltip kenarından tutarak tekrar gösterin.', {
@@ -4725,6 +4765,7 @@
                 const hasOptions = hasDetectedExamOptions && firstQ && (firstQ.options.A || firstQ.options.B || firstQ.options.C);
 
                 if (hasOptions) {
+                    if (el.examRemotePanel) el.examRemotePanel.hidden = false;
                     const colNote = splitInfo.isTwoColumn ? 'Yan yana iki sütunlu test kağıdı birbirine karışmadan ayrıldı.' : '';
                     const finalReport = `${colNote}\nToplam ${state.examQuestions.length} soru bulundu.\n\nSoru ${firstQ.number}: ${firstQ.stem}\n` +
                         ['A', 'B', 'C', 'D', 'E']
@@ -7905,7 +7946,7 @@
         if (distM <= 320 && !state.busStopAlert300Fired) {
             state.busStopAlert300Fired = true;
             if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
-            announceGuidance(`Hazırlanın! İneceğiniz ${state.busTargetStop.name} durağına ${distM} metre kaldı. Kapıya doğru hazırlanabilirsiniz.`, {
+            announceGuidance(`Hazırlanın, durağa YAKLAŞTINIZ! İneceğiniz ${state.busTargetStop.name} durağına ${distM} metre kaldı. Şimdi inme düğmesine basın ve kapıya doğru hazırlanın.`, {
                 force: true,
                 bannerState: 'warning'
             });
@@ -7914,7 +7955,9 @@
         if (distM > 150 && state.busStopAlert60Fired) {
             // Kullanıcı kaydettiği duraktan uzaklaştığında (veya başka yerden durağa yaklaşırken) varış alarmını otomatik hazırla
             state.busStopAlert60Fired = false;
-            if (distM > 380) state.busStopAlert300Fired = false;
+        }
+        if (distM > 380 && state.busStopAlert300Fired) {
+            state.busStopAlert300Fired = false;
         }
         if (speakImmediately) {
             announceGuidance(`Hedef durağınız: ${state.busTargetStop.name}. Şu an kalan mesafe: ${distFormatted}. Durağa 300 metre ve 50 metre kala size sesli ve titreşimli haber vereceğim.`, {
@@ -9001,11 +9044,15 @@
             category: 'ocaksiz',
             title: '🥗 [Ocaksız] Cevizli Haydari ve Lokanta Usulü Acılı Ezme İkilisi',
             keywords: ['haydari', 'meze', 'ezme', 'acılı ezme', 'süzme yoğurt', 'beyaz peynir', 'ocaksız'],
-            ingredients: 'Haydari için: 1 buçuk su bardağı süzme yoğurt, 1 dilim (50 gr) ezilmiş beyaz peynir, yarım çay bardağı dövülmüş ceviz, 1 diş sarımsak, 1 tatlı kaşığı kuru nane, dereotu, 2 yemek kaşığı zeytinyağı.',
+            ingredients: 'Haydari için: 1 buçuk su bardağı süzme yoğurt, 1 dilim (50 gr) ezilmiş beyaz peynir, yarım çay bardağı dövülmüş ceviz, 1 diş sarımsak, 1 tatlı kaşığı kuru nane, dereotu, 2 yemek kaşığı zeytinyağı. Acılı Ezme için: 2 adet rendelenmiş domates, 1 tatlı kaşığı biber salçası, 1 tatlı kaşığı nar ekşisi, pul biber, kuru nane ve zeytinyağı.',
             steps: [
                 {
-                    text: '1. Adım (Peynir ve Yoğurdu Ezme): Bir kasede 1 dilim beyaz peyniri çatalla iyice ezin. Üzerine süzme yoğurdu, ezilmiş sarımsağı, cevizi, kuru naneyi, ince kıyılmış dereotunu ve zeytinyağını ekleyip 2 dakika boyunca krema kıvamına gelene kadar karıştırın.',
+                    text: '1. Adım (Cevizli Haydari Hazırlığı): Bir kasede 1 dilim beyaz peyniri çatalla iyice ezin. Üzerine süzme yoğurdu, ezilmiş sarımsağı, cevizi, kuru naneyi, ince kıyılmış dereotunu ve zeytinyağını ekleyip 2 dakika boyunca krema kıvamına gelene kadar karıştırın.',
                     timerMinutes: 2
+                },
+                {
+                    text: '2. Adım (Lokanta Usulü Acılı Ezme Hazırlığı): İkinci bir kasede rendelenmiş domatesin fazla suyunu süzün; içine 1 tatlı kaşığı biber salçası, nar ekşisi, pul biber, kuru nane ve zeytinyağı ekleyip kaşıkla 1 dakika özdeşleşene kadar karıştırın.',
+                    timerMinutes: 1
                 }
             ]
         },
@@ -9017,8 +9064,12 @@
             ingredients: '1 kavanoz hazır közlenmiş patlıcan ve közlenmiş kırmızı biber, 1 buçuk su bardağı süzme yoğurt, 2 diş ezilmiş sarımsak, 3 yemek kaşığı zeytinyağı, yarım limon suyu, 1 çay kaşığı tuz.',
             steps: [
                 {
-                    text: '1. Adım (Karıştırma): Kavanozdaki hazır közlenmiş patlıcan ve kırmızı biberleri süzüp doğrayın. Sarımsaklı süzme yoğurt, zeytinyağı ve tuz ile karıştırın. Ocak başında patlıcan közleme zahmeti olmadan nefis köz patlıcan mezesi hazır!',
-                    timerMinutes: 0
+                    text: '1. Adım (Köz Sebzeleri Süzme): Kavanozdaki hazır közlenmiş patlıcan ve kırmızı biberleri süzgece alıp fazla suyunu süzün ve derin bir kaseye aktarın.',
+                    timerMinutes: 1
+                },
+                {
+                    text: '2. Adım (Sarımsaklı Yoğurtla Harmanlama): Üzerine sarımsaklı süzme yoğurt, zeytinyağı, limon suyu ve tuzu ekleyip 2 dakika karıştırın. Ocak başında patlıcan közleme zahmeti olmadan nefis köz patlıcan mezesi hazır!',
+                    timerMinutes: 2
                 }
             ]
         },
@@ -9030,8 +9081,12 @@
             ingredients: '3 adet orta boy havuç (veya çeyrek mor lahana), 2 su bardağı süzme yoğurt, 2 diş sarımsak, yarım su bardağı kırılmış ceviz içi, 2 yemek kaşığı zeytinyağı, 1 çay kaşığı tuz.',
             steps: [
                 {
-                    text: '1. Adım (Rendeleme ve Yoğurtlama): Havuçları (veya mor lahanayı) derin bir kaseye rendeleyin. Hiç yağda sotelemeden doğrudan sarımsaklı yoğurt, ceviz içi, zeytinyağı ve tuz ile harmanlayın. Hem vitaminleri kaybolmaz hem de hiç ocak kullanmadan 3 dakikada hazır olur!',
-                    timerMinutes: 3
+                    text: '1. Adım (Sebzeleri Rendeleme): Havuçları (veya mor lahanayı) derin bir kaseye rendeleyin ve üzerine 1 çay kaşığı tuz serpip elinizle hafifçe ovun.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '2. Adım (Cevizli Yoğurtlama): Hiç yağda sotelemeden doğrudan sarımsaklı süzme yoğurt, kırılmış ceviz içi ve zeytinyağı ile 1 dakika harmanlayın. Hem vitaminleri kaybolmaz hem de hiç ocak kullanmadan hazır olur!',
+                    timerMinutes: 1
                 }
             ]
         },
@@ -9043,8 +9098,12 @@
             ingredients: 'Yarım demet kıvırcık marul veya roka, 1 kutu konserve mısır, 100 gram küp doğranmış beyaz peynir (veya 1 kutu ton balığı), 10 adet çekirdeksiz zeytin, 1 adet domates, 1 adet salatalık, 3 yemek kaşığı zeytinyağı, 1 limonun suyu.',
             steps: [
                 {
-                    text: '1. Adım (Elinizle Kopararak Hazırlama): Yıkanmış marul ve roka yapraklarını bıçak bile kullanmadan elinizle lokmalık parçalara koparıp derin kaseye atın. Üzerine süzülmüş mısır, çekirdeksiz zeytin, beyaz peynir (veya ton balığı), zeytinyağı ve limon suyunu ekleyip karıştırın.',
-                    timerMinutes: 0
+                    text: '1. Adım (Yeşillikleri Elinizle Koparma): Yıkanmış marul ve roka yapraklarını bıçak bile kullanmadan elinizle lokmalık parçalara koparıp derin salata kasesine atın.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '2. Adım (Peynir/Ton Balığı ve Sos Ekleme): Üzerine süzülmüş mısır, çekirdeksiz zeytin, beyaz peynir (veya ton balığı), zeytinyağı ve limon suyunu ekleyip 1 dakika alttan üste karıştırın.',
+                    timerMinutes: 1
                 }
             ]
         },
@@ -9056,8 +9115,12 @@
             ingredients: '2 adet lavaş veya yarım ekmek, 2 dilim Ezine beyaz peyniri, 1 adet domates, 1 adet salatalık, 5 yaprak taze nane veya fesleğen, 1 yemek kaşığı zeytinyağı ve kekik. Tatlı kase için: 2 yemek kaşığı tahin, 2 yemek kaşığı üzüm/keçiboynuzu pekmezi ve ceviz.',
             steps: [
                 {
-                    text: '1. Adım (Sıcak Ocak Açmadan Zengin Kahvaltı): Lavaşın ortasına beyaz peyniri çatalla ezip yayın, üzerine dilimlenmiş domates, salatalık, taze nane, kekik ve zeytinyağı gezdirip sıkıca dürüm yapın. Yanında bir kasede yarı yarıya tahin ve pekmezi karıştırıp cevizle tüketin!',
-                    timerMinutes: 0
+                    text: '1. Adım (Ezine Peynirli Dürüm Sarma): Lavaşın ortasına beyaz peyniri çatalla ezip yayın, üzerine dilimlenmiş domates, salatalık, taze nane, kekik ve zeytinyağı gezdirip sıkıca dürüm yapın.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '2. Adım (Tahin-Pekmez Atom Kasesi): Yanında küçük bir kasede 2 yemek kaşığı tahin ve 2 yemek kaşığı pekmezi karıştırıp üzerine kırılmış ceviz içi ekleyerek servis yapın.',
+                    timerMinutes: 1
                 }
             ]
         },
@@ -9090,8 +9153,12 @@
             ingredients: '1 buçuk su bardağı süzme yoğurt (veya labne + krema), 2 yemek kaşığı süzme bal veya pekmez, 2 adet olgun muz, 10 adet ufalanmış petibör veya burçak bisküvi, yarım su bardağı ceviz veya fındık, yarım çay kaşığı tarçın.',
             steps: [
                 {
-                    text: '1. Adım (Kat Kat Kuplara Dizme): Süzme yoğurdu 2 yemek kaşığı bal ve tarçınla çırpın. Kaselerin en altına elinizle ufaladığınız bisküvileri, ortasına dilimlenmiş muzları, üzerine ballı süzme yoğurt kremasını ve en üste cevizleri serpiştirin. Hiç pişirmeden 5 dakikada enfes tatlı!',
-                    timerMinutes: 5
+                    text: '1. Adım (Ballı Krema Hazırlığı): Süzme yoğurdu 2 yemek kaşığı bal ve yarım çay kaşığı tarçınla pürüzsüz olana kadar 2 dakika çırpın.',
+                    timerMinutes: 2
+                },
+                {
+                    text: '2. Adım (Kat Kat Kuplara Dizme): Kaselerin en altına elinizle ufaladığınız bisküvileri, ortasına dilimlenmiş muzları, üzerine ballı süzme yoğurt kremasını ve en üste cevizleri serpiştirin. Hiç pişirmeden 3 dakikada enfes tatlı!',
+                    timerMinutes: 3
                 }
             ]
         },
@@ -9103,8 +9170,12 @@
             ingredients: '1 paket ufalanmış petibör bisküvi (veya 1 buçuk su bardağı ince yulaf ezmesi), 4 yemek kaşığı tahin, 4 yemek kaşığı üzüm veya dut pekmezi, yarım su bardağı dövülmüş ceviz, 2 yemek kaşığı kakao, dışını bulamak için Hindistan cevizi.',
             steps: [
                 {
-                    text: '1. Adım (Yoğurup Yuvarlama): Ufalanmış bisküvi veya yulafı, 4 yemek kaşığı tahin, 4 yemek kaşığı pekmez, kakao ve cevizle bir kapta elinizle 3 dakika yoğurun. Ceviz büyüklüğünde parçalar koparıp avuç içinizde yuvarlayın ve Hindistan cevizine bulayın. Çayın ve kahvenin yanına pişirmeden lokum gibi ikramlık!',
+                    text: '1. Adım (Harcı Yoğurma): Ufalanmış bisküvi veya yulafı, 4 yemek kaşığı tahin, 4 yemek kaşığı pekmez, kakao ve cevizle derin bir kapta elinizle 3 dakika yoğurun.',
                     timerMinutes: 3
+                },
+                {
+                    text: '2. Adım (Yuvarlama ve Hindistan Cevizine Bulama): Harçtan ceviz büyüklüğünde parçalar koparıp avuç içinizde yuvarlayın ve Hindistan cevizine bulayın. Çayın ve kahvenin yanına pişirmeden lokum gibi ikramlık!',
+                    timerMinutes: 2
                 }
             ]
         },
@@ -10161,7 +10232,8 @@
         else if (key === 's') speakCurrentQuestionStem();
         else if (key === 'a') speakSingleOption('A');
         else if (key === 'b') {
-            if (state.mode === 'exam_reader') {
+            const curQ = state.examQuestions && state.examQuestions[state.currentExamIndex || 0];
+            if (state.mode === 'exam_reader' || (el.examRemotePanel && !el.examRemotePanel.hidden && curQ && curQ.options && curQ.options.B)) {
                 speakSingleOption('B');
             } else if (el.btnSpeakStory) {
                 el.btnSpeakStory.click();
