@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
@@ -184,15 +185,30 @@ public class MainActivity extends AppCompatActivity {
         if (intent.getType().startsWith("image/")) {
             try (InputStream is = getContentResolver().openInputStream(mediaUri)) {
                 if (is != null) {
-                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                    byte[] data = new byte[8192];
-                    int nRead;
-                    while ((nRead = is.read(data, 0, data.length)) != -1) {
-                        buffer.write(data, 0, nRead);
+                    Bitmap rawBmp = BitmapFactory.decodeStream(is);
+                    if (rawBmp != null) {
+                        int w = rawBmp.getWidth();
+                        int h = rawBmp.getHeight();
+                        int maxDim = 1280;
+                        Bitmap targetBmp = rawBmp;
+                        if (w > maxDim || h > maxDim) {
+                            float scale = Math.min((float) maxDim / w, (float) maxDim / h);
+                            targetBmp = Bitmap.createScaledBitmap(
+                                rawBmp,
+                                Math.max(1, Math.round(w * scale)),
+                                Math.max(1, Math.round(h * scale)),
+                                true
+                            );
+                            if (targetBmp != rawBmp) {
+                                rawBmp.recycle();
+                            }
+                        }
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        targetBmp.compress(Bitmap.CompressFormat.JPEG, 88, bos);
+                        targetBmp.recycle();
+                        String base64 = Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP);
+                        pendingSharedImageDataUrl = "data:image/jpeg;base64," + base64;
                     }
-                    buffer.flush();
-                    String base64 = Base64.encodeToString(buffer.toByteArray(), Base64.NO_WRAP);
-                    pendingSharedImageDataUrl = "data:" + intent.getType() + ";base64," + base64;
                 }
             } catch (Exception ignored) {}
         } else if (intent.getType().startsWith("video/")) {

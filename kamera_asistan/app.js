@@ -2303,6 +2303,8 @@
         }
 
         // 6. Çoklu Para Varsa Milimetrik Çap Kalibrasyonu (Darphane Standartları: 1 TL = 26.15mm, 50 Kr = 23.85mm)
+        // GÜVENLİK KİLİDİ: Sadece gerçekten çift halkalı (bi-metalik) 1 TL veya 50 Kuruş referans parası varsa
+        // milimetre/piksel kalibrasyonu yap! İki adet küçük kuruşu (örn. iki 10 Kr) asla en büyüğü 1 TL imiş gibi ölçekleme!
         let refMmPerPx = null;
         const oneTlRef = analyzedCoins.find(c => c.deltaBRingCore >= 3.2 && c.ringB >= 7.5);
         const fiftyKrRef = analyzedCoins.find(c => c.deltaBRingCore <= -3.2 && c.coreB >= 7.5);
@@ -2310,9 +2312,6 @@
             refMmPerPx = 26.15 / (oneTlRef.radius * 2);
         } else if (fiftyKrRef) {
             refMmPerPx = 23.85 / (fiftyKrRef.radius * 2);
-        } else if (analyzedCoins.length >= 2) {
-            const maxRad = Math.max(...analyzedCoins.map(c => c.radius));
-            refMmPerPx = 26.15 / (maxRad * 2);
         }
 
         const classifiedCoins = analyzedCoins.map(c => {
@@ -4232,14 +4231,17 @@
                         ? `Doğrulanmış Cihaz / Kombi Markası: ${verifiedBrands.join(', ')}.`
                         : 'Cihazın üzerindeki marka yazısı bu açıdan harf harf okunamadı; yanlış servis çağırmamanız için markayı kesinlikle tahmin etmiyorum.';
 
-                    const degMatches = cleanText.match(/\b\d{1,4}\s*(?:°\s*C|derece|bar|devir|dk|dakika|kat|daire|no)\b/gi) || [];
-                    const numTokens = cleanText.match(/\b(?:E\d{1,2}|F\d{1,2}|\d{1,4})\b/g) || [];
+                    const degMatches = cleanText.match(/\b\d{1,4}(?:[.,]\d)?\s*(?:°\s*C|derece|bar|devir|dk|dakika|kat|daire|no)\b/gi) || [];
+                    const errMatches = cleanText.match(/\b(?:E|F|ERR|HATA)\s*[-:]?\s*\d{1,3}\b/gi) || [];
+                    const numTokens = cleanText.match(/\b\d{1,4}\b/g) || [];
+                    const errLine = errMatches.length > 0 ? `Algılanan Arıza Kodu: ${[...new Set(errMatches)].join(', ')}. ` : '';
                     const summaryNums = degMatches.length > 0
-                        ? `Okunan Değerler: ${degMatches.join(', ')}.`
-                        : (numTokens.length > 0 ? `Okunan Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : 'Rakam algılanamadı.');
-                    const panelReport = `${brandLine}\n${summaryNums}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`;
+                        ? `${errLine}Birimli Değerler: ${degMatches.join(', ')}.`
+                        : (numTokens.length > 0 ? `${errLine}Okunan Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : (errLine || 'Rakam algılanamadı.'));
+                    const boilerSafetyNote = 'Güvenlik uyarısı: Kombi su basıncı veya gaz vanası gibi kritik müdahalelerde kameradaki rakama tek başına güvenmeyin; mutlaka gören bir yakınınıza veya yetkili servise kontrol ettirin.';
+                    const panelReport = `${brandLine}\n${summaryNums}\n\n⚠️ ${boilerSafetyNote}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`;
                     showDetectedResult('Kapı Numarası, Asansör & Kombi / Makine Ekranı Raporu', panelReport);
-                    announceGuidance(`${brandLine} ${summaryNums} ${cleanText.replace(/\s+/g, ' ')}`, {
+                    announceGuidance(`${brandLine} ${summaryNums} ${cleanText.replace(/\s+/g, ' ')}. ${boilerSafetyNote}`, {
                         force: true,
                         bannerState: 'centered'
                     });
@@ -5285,8 +5287,14 @@
     async function initAiModel() {
         if ('BarcodeDetector' in window) {
             try {
-                state.barcodeDetector = new window.BarcodeDetector({ formats: ['qr_code', 'ean_13', 'code_128'] });
-            } catch (_) {}
+                state.barcodeDetector = new window.BarcodeDetector({
+                    formats: ['qr_code', 'data_matrix', 'ean_13', 'ean_8', 'code_128', 'upc_a', 'upc_e']
+                });
+            } catch (_) {
+                try {
+                    state.barcodeDetector = new window.BarcodeDetector({ formats: ['qr_code', 'ean_13', 'code_128'] });
+                } catch (_2) {}
+            }
         }
         try {
             if (typeof window.cocoSsd !== 'undefined' && !state.cocoModel) {
@@ -9480,6 +9488,16 @@
                 });
             }
             else captureAndDescribePhoto(false);
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            if ('speechSynthesis' in window) {
+                try { window.speechSynthesis.cancel(); } catch (_) {}
+            }
+            state.isProcessingOcr = false;
+            state.isDetectingObjects = false;
         }
     });
 
