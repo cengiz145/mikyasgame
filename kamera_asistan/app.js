@@ -611,7 +611,9 @@
         const q = state.examQuestions[state.currentExamIndex];
         if (!q) return;
         const optCount = ['A', 'B', 'C', 'D', 'E'].filter(k => Boolean(q.options[k])).length;
-        const msg = `Soru ${q.number}: ${q.stem || 'Soru metni okunamadı.'}. Toplam ${optCount} şık ayrıştırıldı. Şıkları tek tek dinlemek için A, B, C, D, E düğmelerine dokunun.`;
+        const msg = optCount > 0
+            ? `Soru ${q.number}: ${q.stem || 'Soru metni okunamadı.'}. Toplam ${optCount} şık ayrıştırıldı. Şıkları tek tek dinlemek için A, B, C, D, E düğmelerine dokunun.`
+            : `${q.stem || 'Soru metni okunamadı.'}`;
         announceGuidance(msg, { force: true, bannerState: 'centered' });
     }
 
@@ -4941,7 +4943,9 @@
                 const hasOptions = hasDetectedExamOptions && firstQ && (firstQ.options.A || firstQ.options.B || firstQ.options.C);
 
                 if (hasOptions) {
-                    if (el.examRemotePanel) el.examRemotePanel.hidden = false;
+                    if (el.examRemotePanel) {
+                        el.examRemotePanel.hidden = (state.mode !== 'exam_reader');
+                    }
                     const colNote = splitInfo.isTwoColumn ? 'Yan yana iki sütunlu test kağıdı birbirine karışmadan ayrıldı.' : '';
                     const finalReport = `${colNote}\nToplam ${state.examQuestions.length} soru bulundu.\n\nSoru ${firstQ.number}: ${firstQ.stem}\n` +
                         ['A', 'B', 'C', 'D', 'E']
@@ -4949,7 +4953,11 @@
                             .map(k => `${k}) ${firstQ.options[k]}`)
                             .join('\n') + `\n\n--- Sahne Betimlemesi ---\n${fullStory}`;
                     showDetectedResult('Sınav Sorusu ve Şıklar', finalReport.trim());
-                    speakCurrentQuestionStem();
+                    if (state.mode === 'exam_reader') {
+                        speakCurrentQuestionStem();
+                    } else {
+                        speakEntireQuestionAndOptions();
+                    }
                 } else {
                     const universalInsights = buildUniversalSmartInsights(cleanText, primaryPassVerifiedText, secondaryRawVerifiedText);
                     if (Array.isArray(preds) && preds.some(p => p.class === 'bus') && cleanText) {
@@ -8010,24 +8018,34 @@
         });
         let visibleCount = 0;
         let firstVisibleMode = null;
+        let activeModeIsVisible = false;
         el.modeButtons.forEach(btn => {
             const btnCat = btn.getAttribute('data-category') || 'all';
+            const btnMode = btn.getAttribute('data-mode');
             const show = (catId === 'all' || btnCat === catId);
             btn.hidden = !show;
             btn.style.display = show ? '' : 'none';
             if (show) {
                 visibleCount++;
                 if (!firstVisibleMode) {
-                    firstVisibleMode = btn.getAttribute('data-mode');
+                    firstVisibleMode = btnMode;
+                }
+                if (btnMode === state.mode) {
+                    activeModeIsVisible = true;
                 }
             }
         });
         const label = LIFE_CATEGORY_LABELS[catId] || 'Seçili Kategori';
+        if (!activeModeIsVisible && firstVisibleMode) {
+            setMode(firstVisibleMode);
+            return;
+        }
         announceGuidance(`${label} açıldı. Bu bölümde ${visibleCount} özellik listeleniyor.`, {
             force: true,
             bannerState: 'normal'
         });
     }
+    window.filterModesByLifeCategory = filterModesByLifeCategory;
 
     // --- MOD 16: OTOBÜS NUMARASI YAKALAYICI VE DURAĞA YAKLAŞMA ALARMI ---
     state.busTargetStop = null;
@@ -10370,6 +10388,19 @@
 
         el.modeButtons.forEach(btn => {
             const isMatch = btn.getAttribute('data-mode') === newMode;
+            if (isMatch && btn.hidden) {
+                el.modeButtons.forEach(b => {
+                    b.hidden = false;
+                    b.style.display = '';
+                });
+                if (el.categoryTabs) {
+                    el.categoryTabs.forEach(tab => {
+                        const isAll = tab.getAttribute('data-category') === 'all';
+                        tab.classList.toggle('active-toggle', isAll);
+                        tab.setAttribute('aria-pressed', isAll ? 'true' : 'false');
+                    });
+                }
+            }
             btn.classList.toggle('active', isMatch);
             btn.setAttribute('aria-checked', isMatch ? 'true' : 'false');
         });
