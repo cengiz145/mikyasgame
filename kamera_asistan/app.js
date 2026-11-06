@@ -222,7 +222,13 @@
         lastUserInteractionAt: performance.now(),
         deletedItemMemoryBackup: null,
         stepCalorieBackupBeforeReset: null,
-        activeScenarioPreset: ''
+        activeScenarioPreset: '',
+        degreeLiveTrackingActive: false,
+        degreeLiveTimer: null,
+        targetApplianceDegree: null,
+        lastDetectedDegree: null,
+        lastSpokenDegreeValue: null,
+        lastSpokenDegreeAt: 0
     };
 
     const el = {
@@ -256,6 +262,7 @@
         whereAmIPanel: document.getElementById('where-am-i-panel'),
         stepCaloriePanel: document.getElementById('step-calorie-panel'),
         cookingGuidePanel: document.getElementById('cooking-guide-panel'),
+        applianceDegreePanel: document.getElementById('appliance-degree-panel'),
         scenarioPresetBtns: document.querySelectorAll('.scenario-preset-btn'),
         categoryTabs: document.querySelectorAll('.category-tab'),
         modeButtons: document.querySelectorAll('.mode-card'),
@@ -1505,7 +1512,7 @@
 
     function checkCameraIdleSleep(nowMs) {
         if (!state.isRunning) return false;
-        if (state.tvAutoReaderActive || state.busTargetStop || state.whatsappHoldTimer) return false;
+        if (state.tvAutoReaderActive || state.degreeLiveTrackingActive || state.busTargetStop || state.whatsappHoldTimer) return false;
         const elapsed = (nowMs || performance.now()) - (state.lastUserInteractionAt || 0);
         if (elapsed >= CAMERA_IDLE_SLEEP_MS) {
             tryEnableHardwareTorch(false);
@@ -1656,24 +1663,51 @@
             'portrait', 'qr_screen', 'step_calorie_guide', 'cooking_guide'
         ]);
         if (liveOcrExcludedModes.has(state.mode)) return;
-        if (!metrics || metrics.sharpness < 6.0 || metrics.avgBrightness < 38) return;
+        const isDegreeLcdMode = state.mode === 'door_elevator_lcd';
+        const minBright = isDegreeLcdMode ? 14 : 38;
+        const minSharp = isDegreeLcdMode ? 5.2 : 6.0;
+        if (!metrics || metrics.sharpness < minSharp || metrics.avgBrightness < minBright) return;
 
         const now = performance.now();
-        if (now - (state.lastLiveAutoOcrAt || 0) < 3400) return;
+        const pollIntervalMs = isDegreeLcdMode ? 1450 : 3400;
+        if (now - (state.lastLiveAutoOcrAt || 0) < pollIntervalMs) return;
 
         const strokeCheck = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
         if (!strokeCheck || !strokeCheck.hasTextLikely) return;
 
         state.lastLiveAutoOcrAt = now;
         state.isLiveBgOcrBusy = true;
-        const targetCanvas = strokeCheck.ocrCanvas || el.analysisCanvas;
+        const rawTargetCanvas = strokeCheck.ocrCanvas || el.analysisCanvas;
+        const targetCanvas = isDegreeLcdMode ? preprocess7SegmentAndPanelCanvas(rawTargetCanvas) : rawTargetCanvas;
 
         Promise.resolve()
             .then(() => window.Tesseract.recognize(targetCanvas, 'tur+eng'))
             .then((ocrRes) => {
                 if (!state.isRunning || state.isProcessingOcr) return;
                 const liveText = extractVerifiedRealTextFromOcrResult(ocrRes).trim();
-                if (!liveText || liveText.length < 2) return;
+                if (!liveText || liveText.length < 1) return;
+
+                if (isDegreeLcdMode) {
+                    const degInfo = processApplianceDegreeAndBuildGuidance(liveText, true);
+                    if (degInfo && degInfo.detectedDegree !== null) {
+                        const degChanged = state.lastSpokenDegreeValue !== degInfo.detectedDegree;
+                        const tDeg = performance.now();
+                        const needsReminder = state.targetApplianceDegree !== null &&
+                            degInfo.detectedDegree !== state.targetApplianceDegree &&
+                            (tDeg - (state.lastSpokenDegreeAt || 0) >= 5500);
+                        if (degChanged || needsReminder) {
+                            state.lastSpokenDegreeValue = degInfo.detectedDegree;
+                            state.lastSpokenDegreeAt = tDeg;
+                            showDetectedResult('🌡️ Canlı Cihaz / Kombi / Klima Derece Takibi', degInfo.reportText);
+                            announceGuidance(degInfo.speechText, {
+                                force: true,
+                                bannerState: degInfo.targetReached ? 'centered' : 'normal'
+                            });
+                        }
+                        return;
+                    }
+                }
+                if (liveText.length < 2) return;
 
                 const tNow = performance.now();
                 const isSameAsLast = state.lastLiveSpokenText &&
@@ -1802,13 +1836,13 @@
             return;
         }
 
-        if (metrics.avgBrightness < 32 && state.flashMode === 'auto') {
+        if (metrics.avgBrightness < 32 && state.flashMode === 'auto' && state.mode !== 'door_elevator_lcd') {
             tryEnableHardwareTorch(true);
         } else if (metrics.avgBrightness > 180 && state.flashMode === 'auto') {
             tryEnableHardwareTorch(false);
         }
 
-        if (metrics.avgBrightness < 30 && state.mode !== 'anomaly_led') {
+        if (metrics.avgBrightness < 30 && state.mode !== 'anomaly_led' && !(state.mode === 'door_elevator_lcd' && metrics.avgBrightness >= 12)) {
             el.tPosition.textContent = 'Ortam Karanlık';
             el.tDistance.textContent = 'Işık Yetersiz';
             announceGuidance('Ortam çok karanlık, lütfen ışığı veya flaş düğmesini açın.', {
@@ -3674,11 +3708,48 @@
 
     /**
      * Mod 12: Kapı Numarası, Asansör Kat Tuşları ve 7-Segment Beyaz Eşya Dijital Ekran Köprüleyici
+     * Hem açık zeminli koyu LCD rakamları hem de karanlık zeminde parlayan (yeşil/kırmızı/mavi/beyaz)
+     * 7-segment kombi, klima ve fırın LED ekranlarını otomatik algılar ve kopuk segmentleri birleştirir.
      */
     function preprocess7SegmentAndPanelCanvas(sourceCanvas) {
         const w = sourceCanvas.width;
         const h = sourceCanvas.height;
-        const bin = applyBradleyRothShadowRemoval(sourceCanvas, 0.86);
+        let workCanvas = sourceCanvas;
+        try {
+            const srcCtx = sourceCanvas.getContext('2d');
+            const srcImg = srcCtx.getImageData(0, 0, w, h);
+            const sData = srcImg.data;
+            const x0 = Math.floor(w * 0.20), x1 = Math.floor(w * 0.80);
+            const y0 = Math.floor(h * 0.20), y1 = Math.floor(h * 0.80);
+            let lumSum = 0, lumCnt = 0;
+            for (let y = y0; y < y1; y += 2) {
+                for (let x = x0; x < x1; x += 2) {
+                    const idx = (y * w + x) * 4;
+                    lumSum += 0.299 * sData[idx] + 0.587 * sData[idx + 1] + 0.114 * sData[idx + 2];
+                    lumCnt++;
+                }
+            }
+            const centerAvgLum = lumCnt > 0 ? (lumSum / lumCnt) : 140;
+            // Karanlık zeminde parlayan ışıklı LED/LCD ekranlarda (kombi/klima/fırın) renkleri ters çevirerek rakamları koyulaştır
+            if (centerAvgLum < 105) {
+                const invCanvas = document.createElement('canvas');
+                invCanvas.width = w;
+                invCanvas.height = h;
+                const invCtx = invCanvas.getContext('2d');
+                const invImg = invCtx.createImageData(w, h);
+                const iData = invImg.data;
+                for (let i = 0; i < sData.length; i += 4) {
+                    iData[i] = 255 - sData[i];
+                    iData[i + 1] = 255 - sData[i + 1];
+                    iData[i + 2] = 255 - sData[i + 2];
+                    iData[i + 3] = 255;
+                }
+                invCtx.putImageData(invImg, 0, 0);
+                workCanvas = invCanvas;
+            }
+        } catch (_) {}
+
+        const bin = applyBradleyRothShadowRemoval(workCanvas, 0.86);
         const data = bin.binaryData;
         const outCanvas = document.createElement('canvas');
         outCanvas.width = w;
@@ -3711,28 +3782,425 @@
         return outCanvas;
     }
 
+    function extractApplianceDegreeAndTelemetry(ocrText) {
+        const raw = String(ocrText || '').trim();
+        if (!raw) {
+            return {
+                detectedDegree: null,
+                spinSpeed: '',
+                pressureBar: '',
+                errorCodes: [],
+                isDoorContext: false
+            };
+        }
+
+        const hasExplicitApplianceOrDegreeWord = /(?:°\s*[CF]?|℃|\bDERECE\b|\bSICAKLIK\b|\bISI\b|\bKOMB[İI]\b|\bKL[İI]MA\b|\bTERMOSTAT\b|\bFIRIN\b|\bÇAMAŞIR\b|\bBULAŞIK\b|\bDEV[İI]R\b|\bRPM\b|\bBAR\b|\bECO\b|\bPROGRAM\b)/i.test(raw);
+        const hasDoorOrFloorWord = /\b(?:DA[İI]RE|KAT|APARTMAN|APT|BLOK|NO|KAPI|AV\.|DR\.|PROF\.|MÜH\.|ZİL)\b/i.test(raw);
+        const isDoorContext = hasDoorOrFloorWord && !hasExplicitApplianceOrDegreeWord && state.targetApplianceDegree === null && !state.degreeLiveTrackingActive;
+
+        const errMatches = raw.match(/\b(?:E|F|ERR|HATA)\s*[-:]?\s*\d{1,3}\b/gi) || [];
+        const errorCodes = [...new Set(errMatches.map(e => e.replace(/\s+/g, '').toUpperCase()))];
+
+        let pressureBar = '';
+        const barMatch = raw.match(/\b(\d(?:[.,]\d)?)\s*bar\b/i);
+        if (barMatch) {
+            pressureBar = `${barMatch[1].replace(',', '.')} bar`;
+        }
+
+        let spinSpeed = '';
+        const explicitSpinMatch = raw.match(/\b(400|600|800|1000|1200|1400|1600)\s*(?:dev[iı]r|rpm)?\b/i);
+        if (explicitSpinMatch) {
+            spinSpeed = `${explicitSpinMatch[1]} devir`;
+        }
+
+        let detectedDegree = null;
+
+        // 1. Açıkça derece sembolü (°C, °, derece, sıcaklık) içeren ifadeler
+        const explicitDegMatch = raw.match(/(?:^|[^\d])(\d{2,3}(?:[.,]5)?)\s*(?:°\s*[CFc]?|℃|derece)\b/i) ||
+            raw.match(/\b(?:sıcaklık|ısı|derece|set|temp)\s*[:.]?\s*(\d{2,3}(?:[.,]5)?)\b/i) ||
+            raw.match(/\b(\d{2,3})\s*[°oO0]?\s*C\b/);
+        if (explicitDegMatch) {
+            const val = parseFloat(explicitDegMatch[1].replace(',', '.'));
+            if (val >= 14 && val <= 260) {
+                detectedDegree = val;
+            }
+        }
+
+        // 2. 7-Segment kombi/klima/çamaşır makinesi/fırın ekranlarında birim yazmadan tek başına duran sıcaklık rakamları (Örn: "24", "45", "60", "180")
+        if (detectedDegree === null && !isDoorContext) {
+            let cleanedForNums = raw
+                .replace(/\b(?:E|F|ERR|HATA)\s*[-:]?\s*\d{1,3}\b/gi, ' ')
+                .replace(/\b\d(?:[.,]\d)?\s*bar\b/gi, ' ')
+                .replace(/\b\d{1,2}\s*:\s*\d{2}\b/g, ' ')
+                .replace(/\b\d{1,3}\s*(?:dk|dakika|saat|sn)\b/gi, ' ');
+
+            const tokens = cleanedForNums.match(/\b\d{2,3}(?:[.,]5)?\b/g) || [];
+            for (const tok of tokens) {
+                const val = parseFloat(tok.replace(',', '.'));
+                if (val === 400 || val === 600 || val === 800 || val === 1000 || val === 1200 || val === 1400 || val === 1600) {
+                    continue;
+                }
+                const isAcKombiWasherRange = (val >= 15 && val <= 95);
+                const isOvenRange = (val >= 100 && val <= 260 && val % 5 === 0);
+                if (isAcKombiWasherRange || isOvenRange) {
+                    detectedDegree = val;
+                    break;
+                }
+            }
+        }
+
+        return {
+            detectedDegree,
+            spinSpeed,
+            pressureBar,
+            errorCodes,
+            isDoorContext
+        };
+    }
+
+    function processApplianceDegreeAndBuildGuidance(cleanText, isLiveTick = false) {
+        const telemetry = extractApplianceDegreeAndTelemetry(cleanText);
+        const deg = telemetry.detectedDegree;
+        const curEl = document.getElementById('degree-current-display');
+        const targetEl = document.getElementById('degree-target-display');
+        const extraEl = document.getElementById('degree-extra-display');
+        const badgeEl = document.getElementById('appliance-degree-badge');
+
+        const extraParts = [];
+        if (telemetry.spinSpeed) extraParts.push(`Devir: ${telemetry.spinSpeed}`);
+        if (telemetry.pressureBar) extraParts.push(`Su Basıncı: ${telemetry.pressureBar}`);
+        if (telemetry.errorCodes.length > 0) extraParts.push(`Arıza Kodu: ${telemetry.errorCodes.join(', ')}`);
+        if (extraEl && extraParts.length > 0) {
+            extraEl.textContent = extraParts.join(' • ');
+        }
+
+        if (deg === null) {
+            return {
+                detectedDegree: null,
+                targetReached: false,
+                speechText: '',
+                reportText: '',
+                telemetry
+            };
+        }
+
+        if (curEl) {
+            curEl.textContent = `${deg} °C`;
+        }
+
+        let changeNote = '';
+        if (state.lastDetectedDegree !== null && state.lastDetectedDegree !== deg) {
+            if (deg > state.lastDetectedDegree) {
+                radar.playPannedTone(660, 0, 0.09, 'sine', 0.20);
+                changeNote = ` (${state.lastDetectedDegree} dereceden ${deg} dereceye yükseldi.)`;
+            } else {
+                radar.playPannedTone(420, 0, 0.09, 'sine', 0.20);
+                changeNote = ` (${state.lastDetectedDegree} dereceden ${deg} dereceye düştü.)`;
+            }
+        }
+        state.lastDetectedDegree = deg;
+
+        const target = state.targetApplianceDegree;
+        let speechText = '';
+        let statusLine = '';
+        let targetReached = false;
+
+        if (typeof target === 'number' && !isNaN(target)) {
+            const diff = Number((target - deg).toFixed(1));
+            if (Math.abs(diff) < 0.05) {
+                targetReached = true;
+                radar.playQrSuccessSound();
+                if (navigator.vibrate) navigator.vibrate([150, 70, 220]);
+                statusLine = `✅ Hedefe Ulaşıldı: ${deg} °C`;
+                if (badgeEl) badgeEl.textContent = statusLine;
+                if (targetEl) targetEl.textContent = `${target} °C (Hedefe Ulaşıldı!)`;
+                speechText = `Tamamlandı! Ekranda ${deg} derece yazıyor. Hedeflediğiniz ${target} dereceye ulaştınız; ayar tuşuna basmayı bırakabilirsiniz.`;
+            } else if (diff > 0) {
+                statusLine = `🔼 +${diff} °C Artırın (Şu an: ${deg} °C -> Hedef: ${target} °C)`;
+                if (badgeEl) badgeEl.textContent = `🔼 +${diff}°C Artırın (Şu an: ${deg}°C)`;
+                if (targetEl) targetEl.textContent = `${target} °C (${diff} derece daha artırın)`;
+                speechText = `Ekranda şu an ${deg} derece yazıyor.${changeNote} Hedeflediğiniz ${target} dereceye ulaşmak için artırma tuşuna basarak ${diff} derece daha yükseltin.`;
+            } else {
+                const over = Math.abs(diff);
+                statusLine = `🔽 -${over} °C Azaltın (Şu an: ${deg} °C -> Hedef: ${target} °C)`;
+                if (badgeEl) badgeEl.textContent = `🔽 -${over}°C Azaltın (Şu an: ${deg}°C)`;
+                if (targetEl) targetEl.textContent = `${target} °C (${over} derece azaltın)`;
+                speechText = `Ekranda şu an ${deg} derece yazıyor.${changeNote} Hedeflediğiniz ${target} dereceyi ${over} derece geçtiniz; azaltma tuşuna basarak ${over} derece düşürün.`;
+            }
+        } else {
+            statusLine = `🌡️ Okunan Sıcaklık: ${deg} °C`;
+            if (badgeEl) badgeEl.textContent = `🌡️ Okunan: ${deg} °C`;
+            speechText = isLiveTick
+                ? `Ekranda ${deg} derece yazıyor.${changeNote}`
+                : `Ekranda şu an ${deg} derece yazıyor.${changeNote} Belirli bir sıcaklığa ayarlamak isterseniz panelden hedef derece seçebilir veya Hedef Dereceyi Sesle Söyle düğmesine basabilirsiniz.`;
+        }
+
+        if (extraParts.length > 0) {
+            speechText += ` Ek ekran bilgisi: ${extraParts.join(', ')}.`;
+        }
+
+        const reportText = `Okunan Derece: ${deg} °C\nHedef Derece: ${target !== null ? target + ' °C' : 'Seçilmedi'}\nDurum: ${statusLine}${extraParts.length > 0 ? '\nEk Bilgiler: ' + extraParts.join(' • ') : ''}`;
+        return {
+            detectedDegree: deg,
+            targetReached,
+            speechText: speechText.replace(/\s+/g, ' ').trim(),
+            reportText,
+            telemetry
+        };
+    }
+
+    function setTargetApplianceDegree(degVal, options = {}) {
+        const num = parseFloat(String(degVal || '').replace(',', '.'));
+        if (isNaN(num) || num < 10 || num > 260) {
+            announceGuidance('Lütfen 16 ile 250 derece arasında geçerli bir hedef sıcaklık değeri girin veya söyleyin. Örneğin: Klima için 24, kombi için 45, çamaşır makinesi için 40, fırın için 180 derece.', {
+                force: true,
+                bannerState: 'warning'
+            });
+            return false;
+        }
+        state.targetApplianceDegree = num;
+        const inp = document.getElementById('degree-target-input');
+        if (inp) inp.value = String(num);
+        const targetEl = document.getElementById('degree-target-display');
+        if (targetEl) targetEl.textContent = `${num} °C (Takip Ediliyor)`;
+        const badgeEl = document.getElementById('appliance-degree-badge');
+        if (badgeEl) badgeEl.textContent = `🎯 Hedef: ${num} °C`;
+
+        const presetBtns = document.querySelectorAll('.degree-preset-btn');
+        presetBtns.forEach(btn => {
+            const bDeg = parseFloat(btn.getAttribute('data-deg') || '');
+            const isMatch = bDeg === num;
+            btn.classList.toggle('active-toggle', isMatch);
+            btn.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+        });
+
+        if (!options.silent) {
+            let currentComparison = '';
+            if (state.lastDetectedDegree !== null) {
+                const diff = Number((num - state.lastDetectedDegree).toFixed(1));
+                if (Math.abs(diff) < 0.05) {
+                    currentComparison = ` Ekranda zaten ${state.lastDetectedDegree} derece yazıyor; hedef sıcaklıktasınız.`;
+                } else if (diff > 0) {
+                    currentComparison = ` Son okunan ekran değeri ${state.lastDetectedDegree} dereceydi; hedefe ulaşmak için ${diff} derece artırmanız gerekiyor.`;
+                } else {
+                    currentComparison = ` Son okunan ekran değeri ${state.lastDetectedDegree} dereceydi; hedefe ulaşmak için ${Math.abs(diff)} derece azaltmanız gerekiyor.`;
+                }
+            }
+            const prefix = options.fromVoice
+                ? `12. Bölüm: Sesli Derece Ayarlama Rehberi açıldı ve hedef sıcaklık ${num} derece olarak ayarlandı.`
+                : `Hedef sıcaklık ${num} derece olarak ayarlandı.`;
+            announceGuidance(`${prefix}${currentComparison} Kamerayı cihazın ekranına tutun ve artı veya eksi tuşlarına basın; ekrandaki dereceyi okuyarak ${num} dereceye ulaşana kadar sizi adım adım yönlendireceğim.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+        }
+        return true;
+    }
+
+    function clearTargetApplianceDegree(silent = false) {
+        state.targetApplianceDegree = null;
+        const inp = document.getElementById('degree-target-input');
+        if (inp) inp.value = '';
+        const targetEl = document.getElementById('degree-target-display');
+        if (targetEl) targetEl.textContent = 'Henüz hedef seçilmedi (Sadece okunan dereceyi söyler)';
+        const badgeEl = document.getElementById('appliance-degree-badge');
+        if (badgeEl) {
+            badgeEl.textContent = state.degreeLiveTrackingActive ? 'Canlı Derece Takibi Açık' : 'Derece Rehberi Hazır';
+        }
+        const presetBtns = document.querySelectorAll('.degree-preset-btn');
+        presetBtns.forEach(btn => {
+            btn.classList.remove('active-toggle');
+            btn.setAttribute('aria-pressed', 'false');
+        });
+        if (!silent) {
+            announceGuidance('Hedef derece kaldırıldı. Kamerayı ekrana tuttuğunuzda yalnızca o an ekranda yazan derece seslendirilecektir.', {
+                force: true
+            });
+        }
+    }
+
+    function parseSpokenDegreeFromText(text) {
+        const clean = String(text || '').toLocaleLowerCase('tr-TR').trim();
+        if (!clean) return null;
+        const explicitMatch = clean.match(/\b(\d{2,3}(?:[.,]5)?)\s*(?:derece|dereceye|°|c\b)/iu) ||
+            clean.match(/\b(\d{2,3}(?:[.,]5)?)\b/u);
+        if (explicitMatch) {
+            const val = parseFloat(explicitMatch[1].replace(',', '.'));
+            if (val >= 14 && val <= 260) return val;
+        }
+        const wordNums = [
+            { rx: /(?:^|[^\p{L}\p{N}])yüz\s*seksen(?=$|[^\p{L}\p{N}])/u, val: 180 },
+            { rx: /(?:^|[^\p{L}\p{N}])iki\s*yüz\s*elli(?=$|[^\p{L}\p{N}])/u, val: 250 },
+            { rx: /(?:^|[^\p{L}\p{N}])iki\s*yüz\s*yirmi(?=$|[^\p{L}\p{N}])/u, val: 220 },
+            { rx: /(?:^|[^\p{L}\p{N}])iki\s*yüz(?=$|[^\p{L}\p{N}])/u, val: 200 },
+            { rx: /(?:^|[^\p{L}\p{N}])yüz\s*doksan(?=$|[^\p{L}\p{N}])/u, val: 190 },
+            { rx: /(?:^|[^\p{L}\p{N}])yüz\s*yetmiş\s*beş(?=$|[^\p{L}\p{N}])/u, val: 175 },
+            { rx: /(?:^|[^\p{L}\p{N}])yüz\s*yetmiş(?=$|[^\p{L}\p{N}])/u, val: 170 },
+            { rx: /(?:^|[^\p{L}\p{N}])yüz\s*altmış(?=$|[^\p{L}\p{N}])/u, val: 160 },
+            { rx: /(?:^|[^\p{L}\p{N}])yüz\s*elli(?=$|[^\p{L}\p{N}])/u, val: 150 },
+            { rx: /(?:^|[^\p{L}\p{N}])doksan(?=$|[^\p{L}\p{N}])/u, val: 90 },
+            { rx: /(?:^|[^\p{L}\p{N}])seksen(?=$|[^\p{L}\p{N}])/u, val: 80 },
+            { rx: /(?:^|[^\p{L}\p{N}])yetmiş(?=$|[^\p{L}\p{N}])/u, val: 70 },
+            { rx: /(?:^|[^\p{L}\p{N}])altmış\s*beş(?=$|[^\p{L}\p{N}])/u, val: 65 },
+            { rx: /(?:^|[^\p{L}\p{N}])altmış(?=$|[^\p{L}\p{N}])/u, val: 60 },
+            { rx: /(?:^|[^\p{L}\p{N}])elli\s*beş(?=$|[^\p{L}\p{N}])/u, val: 55 },
+            { rx: /(?:^|[^\p{L}\p{N}])elli(?=$|[^\p{L}\p{N}])/u, val: 50 },
+            { rx: /(?:^|[^\p{L}\p{N}])kırk\s*beş(?=$|[^\p{L}\p{N}])/u, val: 45 },
+            { rx: /(?:^|[^\p{L}\p{N}])kırk\s*iki(?=$|[^\p{L}\p{N}])/u, val: 42 },
+            { rx: /(?:^|[^\p{L}\p{N}])kırk(?=$|[^\p{L}\p{N}])/u, val: 40 },
+            { rx: /(?:^|[^\p{L}\p{N}])otuz\s*sekiz(?=$|[^\p{L}\p{N}])/u, val: 38 },
+            { rx: /(?:^|[^\p{L}\p{N}])otuz\s*altı(?=$|[^\p{L}\p{N}])/u, val: 36 },
+            { rx: /(?:^|[^\p{L}\p{N}])otuz\s*beş(?=$|[^\p{L}\p{N}])/u, val: 35 },
+            { rx: /(?:^|[^\p{L}\p{N}])otuz(?=$|[^\p{L}\p{N}])/u, val: 30 },
+            { rx: /(?:^|[^\p{L}\p{N}])yirmi\s*sekiz(?=$|[^\p{L}\p{N}])/u, val: 28 },
+            { rx: /(?:^|[^\p{L}\p{N}])yirmi\s*yedi(?=$|[^\p{L}\p{N}])/u, val: 27 },
+            { rx: /(?:^|[^\p{L}\p{N}])yirmi\s*altı(?=$|[^\p{L}\p{N}])/u, val: 26 },
+            { rx: /(?:^|[^\p{L}\p{N}])yirmi\s*beş(?=$|[^\p{L}\p{N}])/u, val: 25 },
+            { rx: /(?:^|[^\p{L}\p{N}])yirmi\s*dört(?=$|[^\p{L}\p{N}])/u, val: 24 },
+            { rx: /(?:^|[^\p{L}\p{N}])yirmi\s*üç(?=$|[^\p{L}\p{N}])/u, val: 23 },
+            { rx: /(?:^|[^\p{L}\p{N}])yirmi\s*iki(?=$|[^\p{L}\p{N}])/u, val: 22 },
+            { rx: /(?:^|[^\p{L}\p{N}])yirmi\s*bir(?=$|[^\p{L}\p{N}])/u, val: 21 },
+            { rx: /(?:^|[^\p{L}\p{N}])yirmi(?=$|[^\p{L}\p{N}])/u, val: 20 },
+            { rx: /(?:^|[^\p{L}\p{N}])on\s*sekiz(?=$|[^\p{L}\p{N}])/u, val: 18 },
+            { rx: /(?:^|[^\p{L}\p{N}])on\s*altı(?=$|[^\p{L}\p{N}])/u, val: 16 }
+        ];
+        for (const item of wordNums) {
+            if (item.rx.test(clean)) return item.val;
+        }
+        return null;
+    }
+
+    function toggleApplianceDegreeLiveTracking() {
+        state.degreeLiveTrackingActive = !state.degreeLiveTrackingActive;
+        const btn = document.getElementById('btn-degree-live-toggle');
+        const badge = document.getElementById('appliance-degree-badge');
+        if (btn) {
+            btn.classList.toggle('active-toggle', state.degreeLiveTrackingActive);
+            btn.setAttribute('aria-pressed', state.degreeLiveTrackingActive ? 'true' : 'false');
+            btn.textContent = state.degreeLiveTrackingActive
+                ? '⏹️ Canlı Derece Takibini Durdur'
+                : '▶️ Canlı Derece Takibini Başlat (Tuşa Bastıkça Söyler)';
+        }
+        if (badge) {
+            badge.textContent = state.degreeLiveTrackingActive
+                ? (state.targetApplianceDegree !== null ? `Canlı Takip (Hedef: ${state.targetApplianceDegree}°C)` : 'Canlı Derece Takibi Açık')
+                : 'Derece Rehberi Hazır';
+        }
+        if (state.degreeLiveTimer) {
+            clearInterval(state.degreeLiveTimer);
+            state.degreeLiveTimer = null;
+        }
+        if (state.degreeLiveTrackingActive) {
+            if (!state.isRunning) {
+                startCamera();
+            }
+            const targetHint = state.targetApplianceDegree !== null
+                ? ` Hedef dereceniz ${state.targetApplianceDegree} derece.`
+                : '';
+            announceGuidance(`Canlı sesli derece takibi başlatıldı.${targetHint} Kamerayı kombi, klima, fırın veya çamaşır makinesi ekranına tutun ve cihazın artı veya eksi tuşuna basın; ekrandaki derece değiştikçe anında seslendirilecektir.`, {
+                force: true,
+                bannerState: 'centered'
+            });
+            state.degreeLiveTimer = setInterval(() => {
+                if (state.isRunning && state.mode === 'door_elevator_lcd' && !state.isProcessingOcr) {
+                    readApplianceDegreeNow(true);
+                }
+            }, 1800);
+        } else {
+            announceGuidance('Canlı sesli derece takibi durduruldu.', { force: true });
+        }
+    }
+
+    async function readApplianceDegreeNow(isAutoTick = false) {
+        if (!state.isRunning && !isAutoTick) {
+            await startCamera();
+        }
+        if (!state.isRunning || !el.video.videoWidth || typeof window.Tesseract === 'undefined' || state.isProcessingOcr) {
+            if (!isAutoTick && !state.isRunning) {
+                announceGuidance('Ekrandaki dereceyi okumak için önce kamerayı başlatın ve kombi, klima veya makine ekranına doğru tutun.', {
+                    force: true,
+                    bannerState: 'warning'
+                });
+            }
+            return null;
+        }
+        state.isProcessingOcr = true;
+        try {
+            const c = document.createElement('canvas');
+            c.width = el.video.videoWidth;
+            c.height = el.video.videoHeight;
+            c.getContext('2d').drawImage(el.video, 0, 0);
+
+            const preCanvas = preprocess7SegmentAndPanelCanvas(c);
+            const ocrRes = await window.Tesseract.recognize(preCanvas, 'tur+eng');
+            let text = extractVerifiedRealTextFromOcrResult(ocrRes).trim();
+
+            let parsed = processApplianceDegreeAndBuildGuidance(text, isAutoTick);
+            if (parsed.detectedDegree === null) {
+                const rawRes = await window.Tesseract.recognize(c, 'tur+eng');
+                const rawText = extractVerifiedRealTextFromOcrResult(rawRes).trim();
+                if (rawText) {
+                    text = text ? `${text} ${rawText}` : rawText;
+                    parsed = processApplianceDegreeAndBuildGuidance(text, isAutoTick);
+                }
+            }
+
+            if (parsed.detectedDegree !== null) {
+                const nowMs = performance.now();
+                const changed = state.lastSpokenDegreeValue !== parsed.detectedDegree;
+                const reminderDue = state.targetApplianceDegree !== null &&
+                    parsed.detectedDegree !== state.targetApplianceDegree &&
+                    (nowMs - (state.lastSpokenDegreeAt || 0) >= 5000);
+                if (!isAutoTick || changed || reminderDue) {
+                    state.lastSpokenDegreeValue = parsed.detectedDegree;
+                    state.lastSpokenDegreeAt = nowMs;
+                    showDetectedResult('🌡️ Kombi, Klima ve Makine Derece Ayarlama Raporu', parsed.reportText);
+                    announceGuidance(parsed.speechText, {
+                        force: true,
+                        bannerState: parsed.targetReached ? 'centered' : 'normal'
+                    });
+                }
+                return parsed;
+            } else if (!isAutoTick) {
+                const fallbackMsg = text
+                    ? `Ekranda derece rakamı net seçilemedi. Okunan yazı: ${text.replace(/\s+/g, ' ')}. Lütfen kamerayı dijital ekranın 15-20 santimetre önüne dik ve sabit tutarak tekrar deneyin.`
+                    : 'Ekrandaki derece rakamı henüz okunamadı. Parlamayı önlemek için telefonu ekrana çok hafif açıyla, 15-20 santimetre mesafede sabit tutarak tekrar deneyin.';
+                showDetectedResult('🌡️ Derece Ekranı Okuma Durumu', fallbackMsg);
+                announceGuidance(fallbackMsg, { force: true, bannerState: 'warning' });
+            }
+            return parsed;
+        } catch (_) {
+            return null;
+        } finally {
+            state.isProcessingOcr = false;
+        }
+    }
+
     function handleDoorElevatorLcdLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
         const textCheck = detectTextStrokeBandAndCropCanvas(el.analysisCanvas, metrics);
         const hasPanelOrDigits = Boolean(textCheck && textCheck.hasTextLikely);
         const panelBox = [anW * 0.20, anH * 0.20, anW * 0.60, anH * 0.60];
         const isPosMode = state.mode === 'pos_iban_reader';
-        const boxLabel = isPosMode ? 'POS Ekranı / Fiş / IBAN Alanı' : 'Kapı No / Asansör / LCD Ekran';
+        const boxLabel = isPosMode ? 'POS Ekranı / Fiş / IBAN Alanı' : 'Derece Ekranı / Kapı No / Asansör';
 
         drawTargetBox(ovCtx, panelBox, scaleX, scaleY, hasPanelOrDigits ? '#22c55e' : '#38bdf8', boxLabel);
 
-        el.tPosition.textContent = hasPanelOrDigits ? 'Rakam / Yazı Algılandı' : (isPosMode ? 'POS / IBAN Aranıyor' : 'Panel Aranıyor');
-        el.tDistance.textContent = (hasPanelOrDigits && metrics.sharpness >= 6.8) ? 'Net (Okumaya Hazır)' : 'Hizalayın ve Sabitleyin';
+        el.tPosition.textContent = hasPanelOrDigits ? 'Rakam / Yazı Algılandı' : (isPosMode ? 'POS / IBAN Aranıyor' : 'Ekran / Panel Aranıyor');
+        el.tDistance.textContent = (hasPanelOrDigits && metrics.sharpness >= 6.2) ? 'Net (Okumaya Hazır)' : 'Hizalayın ve Sabitleyin';
         radar.updateRadar(0, 0, hasPanelOrDigits);
 
-        if (hasPanelOrDigits && metrics.sharpness >= 6.8 && state.autoCaptureEnabled && !state.isProcessingOcr) {
+        if (hasPanelOrDigits && metrics.sharpness >= 6.8 && state.autoCaptureEnabled && !state.isProcessingOcr && !state.degreeLiveTrackingActive) {
             handleAutoCaptureCountdown(isPosMode ? 'POS ekranı veya IBAN yazısı netlendi, okunuyor!' : 'Panel ve rakamlar netlendi, okunuyor!');
         } else if (isPosMode) {
             announceGuidance('POS cihazı tutarı ve IBAN okuyucu modundasınız. Çekilecek tutarı veya faturadaki TR IBAN numarasını okutmak için kamerayı ekrana tutup Boşluk tuşuna basın veya ekrana çift dokunun.', {
                 bannerState: hasPanelOrDigits ? 'centered' : 'normal',
                 minIntervalMs: 3600
             });
-        } else {
-            announceGuidance('Kapı numarası, asansör kat tuşları veya çamaşır/klima dijital ekranı modundasınız. Rakamları okutmak için kamerayı panele tutup Boşluk tuşuna basın veya ekrana çift dokunun.', {
+        } else if (!state.degreeLiveTrackingActive) {
+            const targetReminder = state.targetApplianceDegree !== null
+                ? ` Hedef dereceniz ${state.targetApplianceDegree} derece.`
+                : '';
+            announceGuidance(`Sesli derece ayarlama, kombi, klima ve kapı ekranı modundasınız.${targetReminder} Kamerayı cihazın ekranına tuttuğunuzda yazan derece otomatik okunur; dilerseniz Boşluk tuşuna da basabilirsiniz.`, {
                 bannerState: hasPanelOrDigits ? 'centered' : 'normal',
                 minIntervalMs: 3600
             });
@@ -4587,7 +5055,8 @@
                         state.mode === 'color_cloth'
                     );
 
-                    if (state.mode !== 'door_elevator_lcd' && (verifiedCombinedText.trim().length < 6 || isHighStakesSafetyMode)) {
+                    if ((state.mode !== 'door_elevator_lcd' && (verifiedCombinedText.trim().length < 6 || isHighStakesSafetyMode)) ||
+                        (state.mode === 'door_elevator_lcd' && verifiedCombinedText.trim().length < 2)) {
                         const fallbackRes = await window.Tesseract.recognize(capCanvas, 'tur+eng');
                         const rawText = (fallbackRes && fallbackRes.data && fallbackRes.data.text) ? fallbackRes.data.text.trim() : '';
                         secondaryRawVerifiedText = extractVerifiedRealTextFromOcrResult(fallbackRes).trim();
@@ -4734,6 +5203,15 @@
                             ? `Okunan Ekran / Kapı / Cihaz Yazısı: ${cleanText.replace(/\s+/g, ' ')}.`
                             : 'Bu açıdan henüz yazı veya rakam okunamadı.');
 
+                    const degCoach = processApplianceDegreeAndBuildGuidance(cleanText, false);
+                    if (verifiedBrands.length > 0) {
+                        const extraEl = document.getElementById('degree-extra-display');
+                        if (extraEl) {
+                            const prevExtra = extraEl.textContent && extraEl.textContent !== 'Devir, su basıncı veya arıza kodu varsa burada görünür' ? ` • ${extraEl.textContent}` : '';
+                            extraEl.textContent = `Marka: ${verifiedBrands.join(', ')}${prevExtra}`;
+                        }
+                    }
+
                     const degMatches = cleanText.match(/\b\d{1,4}(?:[.,]\d)?\s*(?:°\s*C|derece|bar|devir|dk|dakika|kat|daire|no)\b/gi) || [];
                     const errMatches = cleanText.match(/\b(?:E|F|ERR|HATA)\s*[-:]?\s*\d{1,3}\b/gi) || [];
                     const numTokens = cleanText.match(/\b\d{1,4}\b/g) || [];
@@ -4742,11 +5220,14 @@
                         ? `${errLine}Birimli Değerler: ${degMatches.join(', ')}.`
                         : (numTokens.length > 0 ? `${errLine}Okunan Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : (errLine || ''));
                     const boilerSafetyNote = 'Güvenlik uyarısı: Kombi su basıncı veya gaz vanası gibi kritik müdahalelerde kameradaki rakama tek başına güvenmeyin; mutlaka gören bir yakınınıza veya yetkili servise kontrol ettirin.';
-                    const panelReport = `${brandLine}\n${summaryNums}\n\n⚠️ ${boilerSafetyNote}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`.trim();
-                    showDetectedResult('Kapı Numarası, Asansör & Kombi / Makine Ekranı Raporu', panelReport);
+                    const coachReportSection = (degCoach && degCoach.detectedDegree !== null) ? `${degCoach.reportText}\n\n` : '';
+                    const panelReport = `${coachReportSection}${brandLine}\n${summaryNums}\n\n⚠️ ${boilerSafetyNote}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`.trim();
+                    showDetectedResult('Sesli Derece Ayarlama, Kombi, Klima ve Makine Ekranı Raporu', panelReport);
+
+                    const coachSpeechPrefix = (degCoach && degCoach.detectedDegree !== null) ? `${degCoach.speechText} ` : '';
                     const spokenPanel = verifiedBrands.length > 0
-                        ? `${brandLine} ${summaryNums} ${cleanText.replace(/\s+/g, ' ')}. ${boilerSafetyNote}`
-                        : `${brandLine} ${summaryNums} ${boilerSafetyNote}`;
+                        ? `${coachSpeechPrefix}${brandLine} ${summaryNums} ${cleanText.replace(/\s+/g, ' ')}. ${boilerSafetyNote}`
+                        : `${coachSpeechPrefix}${brandLine} ${summaryNums} ${boilerSafetyNote}`;
                     announceGuidance(spokenPanel.replace(/\s+/g, ' ').trim(), {
                         force: true,
                         bannerState: 'centered'
@@ -5985,6 +6466,19 @@
                 tvBtn.classList.remove('active-toggle');
                 tvBtn.setAttribute('aria-pressed', 'false');
                 tvBtn.textContent = '▶️ Otomatik TV Altyazı & Skor Spikerini Başlat';
+            }
+        }
+        if (state.degreeLiveTimer || state.degreeLiveTrackingActive) {
+            if (state.degreeLiveTimer) {
+                clearInterval(state.degreeLiveTimer);
+                state.degreeLiveTimer = null;
+            }
+            state.degreeLiveTrackingActive = false;
+            const degBtn = document.getElementById('btn-degree-live-toggle');
+            if (degBtn) {
+                degBtn.classList.remove('active-toggle');
+                degBtn.setAttribute('aria-pressed', 'false');
+                degBtn.textContent = '▶️ Canlı Derece Takibini Başlat (Tuşa Bastıkça Söyler)';
             }
         }
         if (state.videoStream) {
@@ -8785,10 +9279,19 @@
             return 'exam_reader';
         }
 
-        // 14. İmza, Bardak/Sıvı, Kapı/Asansör/Kombi, Gıda Alerjen, Lamba/Işık, Düşen Eşya, Özçekim, WhatsApp QR
+        // 14. İmza, Bardak/Sıvı, Derece Ayarlama/Kapı/Asansör/Kombi/Klima, Gıda Alerjen, Lamba/Işık, Düşen Eşya, Özçekim, WhatsApp QR
         if (/(?:imza|kalem\s*yönlendir)/u.test(q)) { setMode('signature_pen'); return 'signature_pen'; }
         if (/(?:bardak|kupa|şişe\s*bul|çay\s*bardağı)/u.test(q)) { setMode('liquid_level'); return 'liquid_level'; }
-        if (/(?:kapı\s*numara|asansör|kombi|çamaşır\s*makine)/u.test(q)) { setMode('door_elevator_lcd'); return 'door_elevator_lcd'; }
+        if (/(?:derece|dereceye|sıcaklık|sıcaklığı|klima|klimayı|kombi|kombiyi|termostat|kapı\s*numara|asansör|çamaşır\s*makine|bulaşık\s*makine|fırını\s*\d|fırın\s*derece)/u.test(q)) {
+            const spokenDeg = parseSpokenDegreeFromText(q);
+            if (spokenDeg !== null) {
+                setMode('door_elevator_lcd', { silentAnnouncement: true });
+                setTargetApplianceDegree(spokenDeg, { fromVoice: true });
+                return 'door_elevator_lcd';
+            }
+            setMode('door_elevator_lcd');
+            return 'door_elevator_lcd';
+        }
         if (/(?:alerjen|gluten|laktoz|içindekiler|gıda\s*paket)/u.test(q)) { setMode('food_freshness'); return 'food_freshness'; }
         if (/(?:lamba\s*açık|ışık\s*açık|pencere\s*ne\s*tarafta)/u.test(q)) { setMode('light_meter'); return 'light_meter'; }
         if (/(?:yere\s*düşen|düşen\s*eşya|modem\s*ışığı)/u.test(q)) { setMode('anomaly_led'); return 'anomaly_led'; }
@@ -8825,6 +9328,16 @@
             const inp = document.getElementById('cooking-ingredient-input');
             if (inp) inp.value = clean;
             findRecipeByIngredientsOrName(clean);
+        } else if (purpose === 'degree_target') {
+            const parsedDeg = parseSpokenDegreeFromText(clean);
+            if (parsedDeg !== null) {
+                setTargetApplianceDegree(parsedDeg, { fromVoice: false });
+            } else {
+                announceGuidance(`"${clean}" ifadesinde geçerli bir derece sayısı algılanamadı. Lütfen 24 derece, 45 derece veya 180 derece gibi hedef sıcaklığı söyleyin.`, {
+                    force: true,
+                    bannerState: 'warning'
+                });
+            }
         } else {
             searchItemMemoryByQuery(clean);
         }
@@ -8832,11 +9345,12 @@
 
     function startVoiceItemMemoryCapture(modeType = 'save') {
         const promptMap = {
-            'smart_intent': 'Şimdi ne yapmak istediğinizi söyleyin. Örneğin: Elimde kaç lira var, Bu ilacın tarihi geçmiş mi, Kadıköy durağına alarm kur, Anahtarım nerede veya Mercimek çorbası tarifi.',
+            'smart_intent': 'Şimdi ne yapmak istediğinizi söyleyin. Örneğin: Klimayı 24 dereceye ayarla, Kombiyi 45 derece yap, Elimde kaç lira var, Bu ilacın tarihi geçmiş mi veya Mercimek çorbası tarifi.',
             'save': 'Şimdi eşyanızı nereye koyduğunuzu söyleyin, örneğin: Yedek anahtarı vestiyerin üst çekmecesine koydum.',
             'bus_dest': 'Şimdi ineceğiniz durağın veya semtin adını söyleyin, örneğin: Kadıköy İskele veya Kızılay.',
             'calorie': 'Şimdi yediğiniz veya merak ettiğiniz yemeğin adını söyleyin, örneğin: Mercimek çorbası veya 1 bardak süt.',
             'cooking': 'Evde hangi malzemeler var veya hangi yemeği yapmak istiyorsunuz? Şimdi söyleyin.',
+            'degree_target': 'Cihazı kaç dereceye ayarlamak istiyorsunuz? Şimdi söyleyin. Örneğin: 24 derece, 45 derece veya 180 derece.',
             'ask': 'Şimdi aradığınız eşyanın adını söyleyin, örneğin: Yedek anahtar nerede?'
         };
         const promptMsg = promptMap[modeType] || promptMap['ask'];
@@ -10373,6 +10887,9 @@
         if (el.cookingGuidePanel) {
             el.cookingGuidePanel.hidden = (activeMode !== 'cooking_guide');
         }
+        if (el.applianceDegreePanel) {
+            el.applianceDegreePanel.hidden = (activeMode !== 'door_elevator_lcd');
+        }
         if (el.targetFilterSection) {
             el.targetFilterSection.hidden = (activeMode === 'qibla_compass' || activeMode === 'song_finder' || activeMode === 'item_memory' || activeMode === 'step_calorie_guide' || activeMode === 'cooking_guide');
         }
@@ -10433,6 +10950,19 @@
                 tvBtn.classList.remove('active-toggle');
                 tvBtn.setAttribute('aria-pressed', 'false');
                 tvBtn.textContent = '▶️ Otomatik TV Altyazı & Skor Spikerini Başlat';
+            }
+        }
+        if (prevMode === 'door_elevator_lcd' && newMode !== 'door_elevator_lcd' && (state.degreeLiveTimer || state.degreeLiveTrackingActive)) {
+            if (state.degreeLiveTimer) {
+                clearInterval(state.degreeLiveTimer);
+                state.degreeLiveTimer = null;
+            }
+            state.degreeLiveTrackingActive = false;
+            const degBtn = document.getElementById('btn-degree-live-toggle');
+            if (degBtn) {
+                degBtn.classList.remove('active-toggle');
+                degBtn.setAttribute('aria-pressed', 'false');
+                degBtn.textContent = '▶️ Canlı Derece Takibini Başlat (Tuşa Bastıkça Söyler)';
             }
         }
         if (prevMode === 'song_finder' && newMode !== 'song_finder') {
@@ -10496,7 +11026,7 @@
             'medicine_skt': '9. Bölüm: İlaç Kutusu ve Son Kullanma Tarihi Kontrolü açıldı. İlacın adını, miligram bilgisini ve son kullanma tarihini kontrol etmek için kutuyu kameraya tutun.',
             'signature_pen': '10. Bölüm: İmza Alanı ve Kalem Yönlendirici açıldı. Güvenliğiniz için önce belgedeki metni doğrulamak üzere ekrana çift dokunun veya Boşluk tuşuna basın; belge okunduktan sonra kaleminizi imza alanına yönlendireceğim.',
             'liquid_level': '11. Bölüm: Masadaki Bardak, Kupa ve Şişe Bulucu açıldı. Masadaki bardağı veya şişeyi güvenli şekilde tespit etmek için kamerayı masaya yöneltin. Güvenliğiniz için kaynar sıvı doldururken yalnızca kamera yönlendirmesine güvenmeyin.',
-            'door_elevator_lcd': '12. Bölüm: Kapı Numarası, Asansör Tuşu ve Makine Ekranı Okuyucu açıldı. Kapı numarasını, asansör tuşlarını veya dijital makine ekranını okutmak için Boşluk tuşuna basın.',
+            'door_elevator_lcd': '12. Bölüm: Sesli Derece Ayarlama, Kombi, Klima ve Makine Ekranı Okuyucu açıldı. Kombi, klima, fırın veya çamaşır makinesi derecesini ayarlamak için hedef derece seçebilir ve kamerayı ekrana tutarak artı veya eksi tuşuna bastıkça canlı sesli yönlendirme alabilirsiniz.',
             'food_freshness': '13. Bölüm: Paketli Gıda İçindekiler, Alerjen ve Son Tüketim Tarihi Okuyucu açıldı. Ürün paketinin içindekiler ve tarih kısmını kameraya gösterip Boşluk tuşuna basın.',
             'song_finder': '14. Bölüm: Sesli Müzik, Melodi ve Şarkı Sözü Tanıma açıldı; mikrofon otomatik olarak dinlemeye başlıyor.',
             'bus_stop_tracker': '15. Bölüm: Otobüs Hat Numarası Okuyucu ve Durak Yaklaşma Bildirimi açıldı. Durağa yaklaşan aracın hat numarasını okumak için kamerayı yola yöneltin veya araç içindeyseniz hedef durağınız için yaklaşma bildirimini etkinleştirin.',
@@ -10885,6 +11415,37 @@
     const btnTvReadNow = document.getElementById('btn-tv-read-now');
     if (btnTvAutoToggle) btnTvAutoToggle.addEventListener('click', toggleTvAutoSubtitleSpeaker);
     if (btnTvReadNow) btnTvReadNow.addEventListener('click', () => readTvScreenNow(false));
+
+    // 12. Bölüm: Canlı Sesli Derece Ayarlama (Kombi, Klima, Çamaşır Makinesi, Fırın) Düğmeleri
+    const btnDegreeLiveToggle = document.getElementById('btn-degree-live-toggle');
+    const btnDegreeReadNow = document.getElementById('btn-degree-read-now');
+    const btnDegreeVoiceTarget = document.getElementById('btn-degree-voice-target');
+    const btnDegreeClearTarget = document.getElementById('btn-degree-clear-target');
+    const degreeTargetInput = document.getElementById('degree-target-input');
+    const btnDegreeSetTarget = document.getElementById('btn-degree-set-target');
+    const degreePresetBtns = document.querySelectorAll('.degree-preset-btn');
+
+    if (btnDegreeLiveToggle) btnDegreeLiveToggle.addEventListener('click', toggleApplianceDegreeLiveTracking);
+    if (btnDegreeReadNow) btnDegreeReadNow.addEventListener('click', () => readApplianceDegreeNow(false));
+    if (btnDegreeVoiceTarget) btnDegreeVoiceTarget.addEventListener('click', () => startVoiceItemMemoryCapture('degree_target'));
+    if (btnDegreeClearTarget) btnDegreeClearTarget.addEventListener('click', () => clearTargetApplianceDegree(false));
+    if (btnDegreeSetTarget && degreeTargetInput) {
+        btnDegreeSetTarget.addEventListener('click', () => setTargetApplianceDegree(degreeTargetInput.value));
+        degreeTargetInput.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter') {
+                ev.preventDefault();
+                setTargetApplianceDegree(degreeTargetInput.value);
+            }
+        });
+    }
+    if (degreePresetBtns && degreePresetBtns.length > 0) {
+        degreePresetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const degVal = btn.getAttribute('data-deg');
+                if (degVal) setTargetApplianceDegree(degVal);
+            });
+        });
+    }
 
     const btnSockCompare = document.getElementById('btn-sock-compare');
     const btnOutfitStain = document.getElementById('btn-outfit-stain');
