@@ -2500,17 +2500,7 @@
             return;
         }
 
-        // 2) Parayı kameraya sıfır yapıştırma / aşırı bulanık tutma uyarısı
-        if (metrics.sharpness < 3.8 && metrics.contrast < 15) {
-            if (el.moneyLiveSeen) {
-                el.moneyLiveSeen.textContent = '⚠️ Çok Yakın / Bulanık Tutuş';
-            }
-            announceGuidance('Parayı kameraya çok yakın tutuyorsunuz, net görünmüyor. Lütfen elinizi telefondan bir karış kadar uzaklaştırıp sabit tutun.', {
-                bannerState: 'warning',
-                minIntervalMs: 3800
-            });
-            return;
-        }
+        // Düz renkli kıyafet / kumaşlarda (düşük doku ve kontrast) "Parayı yakın tutuyorsunuz" diyerek renk okumayı KESİNLİKLE engelleme; doğrudan kumaşın rengini söylemeye devam et.
 
         // Kameranın önünde yazı/rakam dokusu olan net bir yüzey (kağıt para) varsa arka planda otomatik tanı ve cüzdana ekle!
         const nowMs = performance.now();
@@ -2894,32 +2884,38 @@
         let expMonth = null;
         let expYear = null;
 
-        // 1. Öncelik: Açık SKT / EXP etiketi yanındaki tarih
-        const labeledRegex = /(?:S\.?K\.?T\.?|SON\s*KULLAN(?:MA|IM)|EXP(?:IRY)?|T\.?E\.?T\.?T\.?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi;
-        let m = labeledRegex.exec(text);
-        if (m) {
+        // 1. Öncelik: Üretim / İmal Tarihi (ÜRT / Ü.T. / MFG / PRD) etiketli tarihleri metinden temizle ki asla SKT sanılmasın!
+        const textWithoutProductionDates = text.replace(/(?:Ü\.?\s*R\.?\s*T\.?|Ü\.?\s*T\.?|ÜRETİM(?:\s*TARİHİ)?|İMAL(?:\s*TARİHİ)?|MFG|M\.?F\.?G\.?|PRD|PROD(?:UCTION)?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi, ' ');
+
+        // 2. Öncelik: Açık SKT / EXP / TETT etiketi yanındaki tarih
+        const labeledRegex = /(?:S\.?K\.?T\.?|SON\s*KULLAN(?:MA|IM)|SON\s*TÜKETİM|EXP(?:IRY)?|T\.?E\.?T\.?T\.?)[\s:.\-]*(\d{1,2})[\s./\-](?:(\d{1,2})[\s./\-])?(20[2-3]\d|\d{2})\b/gi;
+        let m;
+        while ((m = labeledRegex.exec(textWithoutProductionDates)) !== null) {
             const p1 = parseInt(m[1], 10);
             const p2 = m[2] ? parseInt(m[2], 10) : null;
             let yr = parseInt(m[3], 10);
             if (yr < 100) yr += 2000;
             const mo = p2 !== null ? p2 : p1;
             if (mo >= 1 && mo <= 12 && yr >= 2020 && yr <= 2038) {
-                expMonth = mo;
-                expYear = yr;
+                if (expYear === null || (yr * 12 + mo) > (expYear * 12 + expMonth)) {
+                    expMonth = mo;
+                    expYear = yr;
+                }
             }
         }
 
-        // 2. Öncelik: Etiket silinmişse AA/20YY veya GG.AA.20YY formatı
+        // 3. Öncelik: Etiket silinmişse kutudaki tüm AA/20YY veya GG.AA.20YY tarihlerini topla ve EN İLERİ (en geç) tarihi SKT olarak seç (Üretim tarihi her zaman SKT'den daha erkendir!)
         if (expYear === null) {
             const genericDateRegex = /\b(?:(\d{1,2})[./\-])?(0[1-9]|1[0-2])[./\-](20[2-3]\d)\b/g;
             let gm;
-            while ((gm = genericDateRegex.exec(text)) !== null) {
+            while ((gm = genericDateRegex.exec(textWithoutProductionDates)) !== null) {
                 const mo = parseInt(gm[2], 10);
                 const yr = parseInt(gm[3], 10);
                 if (mo >= 1 && mo <= 12 && yr >= 2020 && yr <= 2038) {
-                    expMonth = mo;
-                    expYear = yr;
-                    break;
+                    if (expYear === null || (yr * 12 + mo) > (expYear * 12 + expMonth)) {
+                        expMonth = mo;
+                        expYear = yr;
+                    }
                 }
             }
         }
@@ -3310,21 +3306,39 @@
         const text = String(ocrText || '');
         const upper = text.toUpperCase();
         const detectedAllergens = [];
+        const freeFromNotes = [];
+
+        // Önce "İÇERMEZ / -SİZ / -SUZ / YOKTUR" ifadelerini tespit et ve metinden çıkar ki "GLUTENSİZ" veya "DOMUZ KATKISI İÇERMEZ" yazısı yanlışlıkla alerji alarmı tetiklemesin!
+        const negationPatterns = [
+            { label: 'Glutensiz (Gluten İçermez)', regex: /GLUTENS[İI]Z|GLUTEN\s*[İI]ÇERMEZ|GLUTEN\s*YOKTUR|GLUTEN[\s\-]*FREE/gi },
+            { label: 'Laktozsuz (Laktoz İçermez)', regex: /LAKTOZSUZ|LAKTOZ\s*[İI]ÇERMEZ|SÜT\s*ÜRÜNÜ\s*[İI]ÇERMEZ|LACTOSE[\s\-]*FREE/gi },
+            { label: 'Domuz Yağı ve Katkısı İçermez', regex: /DOMUZ\s*(?:YAĞI|ETİ|KATKISI|ÜRÜNÜ|ÜRÜNLERİ)?\s*(?:VE\s*(?:KATKISI|KATKILARI|TÜREVLERİ)\s*)?(?:[İI]ÇERMEZ|YOKTUR)/gi },
+            { label: 'Alkolsüz (Alkol İçermez)', regex: /ALKOLSÜZ|ALKOL\s*[İI]ÇERMEZ|ALKOL\s*YOKTUR|ALCOHOL[\s\-]*FREE/gi },
+            { label: 'Yumurtasız (Yumurta İçermez)', regex: /YUMURTASIZ|YUMURTA\s*[İI]ÇERMEZ/gi }
+        ];
+
+        let cleanedForAllergens = upper;
+        negationPatterns.forEach(np => {
+            if (np.regex.test(cleanedForAllergens)) {
+                freeFromNotes.push(np.label);
+                cleanedForAllergens = cleanedForAllergens.replace(np.regex, ' ');
+            }
+        });
 
         const allergenRules = [
-            { name: 'Gluten / Buğday', regex: /GLUTEN|BUĞDAY|ÇAVDAR|ARPA|YULAF/i },
-            { name: 'Süt / Laktoz', regex: /LAKTOZ|SÜT\s*TOZU|PEYNİR\s*ALTI\s*SUYU|KAZEİN|TEREYAĞ/i },
+            { name: 'Gluten / Buğday', regex: /\b(?:GLUTEN|BUĞDAY|ÇAVDAR|ARPA|YULAF)\b/i },
+            { name: 'Süt / Laktoz', regex: /\b(?:LAKTOZ|SÜT\s*TOZU|PEYNİR\s*ALTI\s*SUYU|KAZEİN|TEREYAĞ)\b/i },
             { name: 'Yer Fıstığı', regex: /YER\s*FISTIĞ/i },
             { name: 'Kuruyemiş (Fındık/Badem/Ceviz/Antep Fıstığı)', regex: /FINDIK|BADEM|CEVİZ|ANTEP\s*FISTIĞ|KAJU/i },
             { name: 'Soya Lesitini / Soya', regex: /\bSOYA\b/i },
-            { name: 'Yumurta', regex: /YUMURTA/i },
-            { name: 'Susam', regex: /SUSAM/i },
+            { name: 'Yumurta', regex: /\bYUMURTA\b/i },
+            { name: 'Susam', regex: /\bSUSAM\b/i },
             { name: 'Kükürt Dioksit / Sülfit', regex: /KÜKÜRT|SÜLFİT|E220/i },
-            { name: 'Domuz Katkısı / Alkol / Karmin (E120) Uyarısı', regex: /DOMUZ|LARD|ALKOL|ETANOL|KARMİN|\bE120\b/i }
+            { name: 'Domuz Katkısı / Alkol / Karmin (E120) Uyarısı', regex: /\b(?:DOMUZ|LARD|ALKOL|ETANOL|KARMİN|E120)\b/i }
         ];
 
         allergenRules.forEach(rule => {
-            if (rule.regex.test(upper)) {
+            if (rule.regex.test(cleanedForAllergens)) {
                 detectedAllergens.push(rule.name);
             }
         });
@@ -3332,6 +3346,7 @@
         const sktInfo = parseMedicineAndExpiryZeroError(text);
         return {
             allergens: detectedAllergens,
+            freeFromNotes,
             sktInfo
         };
     }
@@ -3984,7 +3999,7 @@
             try {
                 const binObj = applyBradleyRothShadowRemoval(capCanvas);
                 const splitInfo = (state.mode === 'door_elevator_lcd')
-                    ? { isTwoColumn: false, canvases: [preprocess7SegmentAndPanelCanvas(capCanvas)] }
+                    ? { isTwoColumn: false, canvases: [capCanvas, preprocess7SegmentAndPanelCanvas(capCanvas)] }
                     : splitExamColumnsIfTwoColumn(binObj);
 
                 let combinedText = '';
@@ -4048,32 +4063,65 @@
                 if (state.mode === 'food_freshness') {
                     const pkg = parseFoodAllergensAndIngredients(cleanText);
                     const surfaceMsg = `Paket Rengi: ${metrics.centerColor.name}.`;
+                    const freeFromMsg = (pkg.freeFromNotes && pkg.freeFromNotes.length > 0)
+                        ? `Doğrulanan Güvenli İbare: ${pkg.freeFromNotes.join(', ')}.`
+                        : '';
                     const allergenMsg = pkg.allergens.length > 0
                         ? `DİKKAT ALERJİ UYARISI: Pakette ${pkg.allergens.join(', ')} bulundu!`
                         : (cleanText ? 'Okunan paket yazısında bilinen bir alerji maddesine rastlanmadı.' : 'Paket üzerinde okunabilir içindekiler yazısı algılanmadı.');
-                    const foodReport = `${surfaceMsg}\n${allergenMsg}\n${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}\n\nPakette Okunan Yazı:\n${cleanText || 'Paket yazısı algılanmadı.'}`.trim();
+                    const foodReport = `${surfaceMsg}\n${freeFromMsg}\n${allergenMsg}\n${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}\n\nPakette Okunan Yazı:\n${cleanText || 'Paket yazısı algılanmadı.'}`.trim();
 
                     if (pkg.sktInfo.sktStatus === 'EXPIRED') {
                         radar.playDangerAlarm();
                     }
                     showDetectedResult('Gıda Paketi İçindekiler, Alerjen ve SKT Raporu', foodReport);
-                    announceGuidance(`${surfaceMsg} ${allergenMsg} ${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}`, {
+                    announceGuidance(`${surfaceMsg} ${freeFromMsg} ${allergenMsg} ${pkg.sktInfo.formattedDate !== 'Doğrulanamadı' ? pkg.sktInfo.sktSpeech : ''}`, {
                         force: true,
                         bannerState: pkg.sktInfo.sktStatus === 'EXPIRED' ? 'warning' : 'centered'
                     });
                     return;
                 }
 
-                // ÖZEL MOD 12: KAPI NUMARASI, ASANSÖR TUŞ PANELİ VE MAKİNE EKRANI OKUYUCU
+                // ÖZEL MOD 12: KAPI NUMARASI, ASANSÖR TUŞ PANELİ, KOMBİ / BEYAZ EŞYA MARKASI VE MAKİNE EKRANI OKUYUCU
                 if (state.mode === 'door_elevator_lcd') {
-                    const degMatches = cleanText.match(/\b\d{1,4}\s*(?:°\s*C|derece|devir|dk|dakika|kat|daire|no)\b/gi) || [];
+                    const brandRules = [
+                        { name: 'DemirDöküm', regex: /\bDEM[İI]R\s*D[ÖO]K[ÜU]M\b/i },
+                        { name: 'Vaillant', regex: /\bVAILLANT\b/i },
+                        { name: 'Baymak', regex: /\bBAYMAK\b/i },
+                        { name: 'E.C.A.', regex: /\bE\.?\s*C\.?\s*A\.?\b/i },
+                        { name: 'Buderus', regex: /\bBUDERUS\b/i },
+                        { name: 'Bosch', regex: /\bBOSCH\b/i },
+                        { name: 'Viessmann', regex: /\bVIESSMANN\b/i },
+                        { name: 'Alarko', regex: /\bALARKO\b/i },
+                        { name: 'Ferroli', regex: /\bFERROLI\b/i },
+                        { name: 'Protherm', regex: /\bPROTHERM\b/i },
+                        { name: 'Warmhaus', regex: /\bWARMHAUS\b/i },
+                        { name: 'Airfel', regex: /\bAIRFEL\b/i },
+                        { name: 'Daikin', regex: /\bDAIKIN\b/i },
+                        { name: 'Arçelik', regex: /\bAR[ÇC]EL[İI]K\b/i },
+                        { name: 'Beko', regex: /\bBEKO\b/i },
+                        { name: 'Vestel', regex: /\bVESTEL\b/i },
+                        { name: 'Profilo', regex: /\bPROF[İI]LO\b/i },
+                        { name: 'Siemens', regex: /\bSIEMENS\b/i },
+                        { name: 'Altus', regex: /\bALTUS\b/i },
+                        { name: 'Regal', regex: /\bREGAL\b/i },
+                        { name: 'Grundig', regex: /\bGRUNDIG\b/i },
+                        { name: 'Samsung', regex: /\bSAMSUNG\b/i },
+                        { name: 'LG', regex: /\bLG\b/ }
+                    ];
+                    const verifiedBrands = brandRules.filter(b => b.regex.test(cleanText)).map(b => b.name);
+                    const brandLine = verifiedBrands.length > 0
+                        ? `Doğrulanmış Cihaz / Kombi Markası: ${verifiedBrands.join(', ')}.`
+                        : 'Cihazın üzerindeki marka yazısı bu açıdan harf harf okunamadı; yanlış servis çağırmamanız için markayı kesinlikle tahmin etmiyorum.';
+
+                    const degMatches = cleanText.match(/\b\d{1,4}\s*(?:°\s*C|derece|bar|devir|dk|dakika|kat|daire|no)\b/gi) || [];
                     const numTokens = cleanText.match(/\b(?:E\d{1,2}|F\d{1,2}|\d{1,4})\b/g) || [];
                     const summaryNums = degMatches.length > 0
                         ? `Okunan Değerler: ${degMatches.join(', ')}.`
                         : (numTokens.length > 0 ? `Okunan Numara / Tuşlar: ${[...new Set(numTokens)].slice(0, 8).join(', ')}.` : 'Rakam algılanamadı.');
-                    const panelReport = `${summaryNums}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`;
-                    showDetectedResult('Kapı Numarası, Asansör & Makine Ekranı Raporu', panelReport);
-                    announceGuidance(`${summaryNums} ${cleanText.replace(/\s+/g, ' ')}`, {
+                    const panelReport = `${brandLine}\n${summaryNums}\n\nEkran veya Kapı Yazısı:\n${cleanText || 'Rakam veya yazı okunamadı.'}`;
+                    showDetectedResult('Kapı Numarası, Asansör & Kombi / Makine Ekranı Raporu', panelReport);
+                    announceGuidance(`${brandLine} ${summaryNums} ${cleanText.replace(/\s+/g, ' ')}`, {
                         force: true,
                         bannerState: 'centered'
                     });
@@ -4720,7 +4768,7 @@
                     count: curr.personCount || 1,
                     info: curr.primaryPersonInfo,
                     allInfos: curr.allPersonInfos || [curr.primaryPersonInfo],
-                    objects: curr.preds.filter(p => p.class !== 'person' && (p.score || 0) >= 0.52).map(p => TR_LABELS[p.class] || p.class)
+                    objects: curr.preds.filter(p => p.class !== 'person').map(p => TR_LABELS[p.class] || p.class)
                 });
             }
             if (i > 0) {
@@ -4762,10 +4810,6 @@
                 narrativeEvents.push('Kişi adım adım kameraya doğru yaklaşıyor.');
             } else if (areaRatio <= 0.74) {
                 narrativeEvents.push('Kişi kameradan uzaklaşıp arka plana doğru gidiyor.');
-            } else if (dy >= 0.14) {
-                narrativeEvents.push('Kişi eğiliyor veya aşağı doğru oturuyor.');
-            } else if (dy <= -0.14) {
-                narrativeEvents.push('Kişi bulunduğu yerden doğrulup ayağa kalkıyor.');
             }
 
             // Video sırasında eline yeni bir eşya aldı mı veya masaya bir şey koydu mu?
@@ -4825,7 +4869,7 @@
                     // Ana arayüz ve ses motorunun takılmaması için Event-Loop'a nefes aldır
                     await new Promise(r => setTimeout(r, 0));
                     const rawPreds = await state.cocoModel.detect(f.canvas, 10, 0.58);
-                    preds = rawPreds.filter(p => (p.score || 0) >= 0.58);
+                    preds = verifyPredictionsInAiBrain(rawPreds, f.canvas.width, f.canvas.height, false);
                     lastDetectedPreds = preds;
                 } catch (_) {
                     preds = [];
@@ -4843,7 +4887,7 @@
                 descText: ''
             };
             frameEntry.descText = buildSingleKeyframeCompactSummary(frameEntry);
-            const score = preds.length * 25 + metrics.sharpnessScore;
+            const score = preds.length * 25 + (metrics.sharpness || 0);
             if (score > bestFrameScore) {
                 bestFrameScore = score;
                 bestFrameIdx = i;
@@ -9509,7 +9553,14 @@
     el.touchZone.addEventListener('click', () => {
         const now = performance.now();
         if (now - state.lastTouchTime < 420) {
-            captureAndDescribePhoto(false);
+            if (state.mode === 'social_presence' && state.isRunning) {
+                announceGuidance(state.lastSpeechText || 'Odada henüz doğrulanmış bir kişi algılanmadı.', {
+                    force: true,
+                    bannerState: 'centered'
+                });
+            } else {
+                captureAndDescribePhoto(false);
+            }
             state.lastTouchTime = 0;
         } else {
             state.lastTouchTime = now;
@@ -9577,6 +9628,12 @@
         else if (ev.code === 'Space') {
             ev.preventDefault();
             if (!state.isRunning) startCamera();
+            else if (state.mode === 'social_presence') {
+                announceGuidance(state.lastSpeechText || 'Odada henüz doğrulanmış bir kişi algılanmadı.', {
+                    force: true,
+                    bannerState: 'centered'
+                });
+            }
             else captureAndDescribePhoto(false);
         }
     });
