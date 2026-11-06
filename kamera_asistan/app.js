@@ -8833,88 +8833,32 @@
                 clearInterval(state.boilBurnAudioTimer);
                 state.boilBurnAudioTimer = null;
             }
-            if (state.boilBurnAudioStream) {
-                try { state.boilBurnAudioStream.getTracks().forEach(t => t.stop()); } catch (_) {}
-                state.boilBurnAudioStream = null;
-            }
             if (btn) {
                 btn.classList.remove('active-toggle');
                 btn.setAttribute('aria-pressed', 'false');
-                btn.textContent = '🚨 Canlı Taşma & Yanma Nöbetçisi: Kapalı';
+                btn.textContent = '👁️ Kamera Taşma & Yanma Nöbetçisi: Kapalı';
             }
-            announceGuidance('Canlı taşma ve yanma nöbetçisi kapatıldı.', { force: true });
+            announceGuidance('Kamera ile görsel taşma ve yanma nöbetçisi kapatıldı.', { force: true });
             return;
         }
 
         state.boilBurnGuardActive = true;
+        if (!state.isRunning) {
+            await startCamera();
+        }
         if (btn) {
             btn.classList.add('active-toggle');
             btn.setAttribute('aria-pressed', 'true');
-            btn.textContent = '🛡️ Canlı Taşma & Yanma Nöbetçisi: AÇIK (Dinliyor)';
+            btn.textContent = '👁️ Kamera Taşma & Yanma Nöbetçisi: AÇIK (%100 Görsel)';
         }
         if (donenessEl) {
-            donenessEl.textContent = '🛡️ Taşma & Yanma Nöbetçisi Aktif';
+            donenessEl.textContent = '👁️ Kamera Görüntüsü Yüzde (%) İle İzleniyor';
         }
 
-        announceGuidance('Canlı Taşma ve Yanma Nöbetçisi açıldı! Tencereden aşırı fokurdama, taşma kabarması veya sert yağ yanma cızırtısı gelirse anında sesli alarm verip ocağı kısmanızı söyleyeceğim.', {
+        announceGuidance('Kamera ile Görsel Taşma ve Yanma Nöbetçisi açıldı! Ortam sesi dinlemez; yüzde yüz sadece kameranın gördüğü beyaz köpük yüzdesine, altın sarısı kızarma yüzdesine, koyu kararma yüzdesine ve ocak alevi yüzdesine göre yorum yapar.', {
             force: true,
             bannerState: 'centered'
         });
-
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-                state.boilBurnAudioStream = stream;
-                const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                const audioCtx = radar.ctx || (AudioCtx ? new AudioCtx() : null);
-                if (audioCtx) {
-                    const src = audioCtx.createMediaStreamSource(stream);
-                    const analyser = audioCtx.createAnalyser();
-                    analyser.fftSize = 1024;
-                    src.connect(analyser);
-                    const freqData = new Uint8Array(analyser.frequencyBinCount);
-
-                    state.boilBurnAudioTimer = setInterval(() => {
-                        if (!state.boilBurnGuardActive) return;
-                        if (window.speechSynthesis && window.speechSynthesis.speaking) return;
-
-                        analyser.getByteFrequencyData(freqData);
-                        // 150Hz - 650Hz arası şiddetli fokurdama / kaynama enerjisi
-                        let boilBubbleEnergy = 0;
-                        for (let i = 4; i < 18; i++) boilBubbleEnergy += freqData[i];
-                        boilBubbleEnergy /= 14;
-
-                        // 2500Hz - 7500Hz arası şiddetli kızgın yağ sıçrama / yanma cızırtısı enerjisi
-                        let sizzleBurnEnergy = 0;
-                        for (let i = 55; i < 165; i++) sizzleBurnEnergy += freqData[i];
-                        sizzleBurnEnergy /= 110;
-
-                        const now = performance.now();
-                        if (now - state.lastBoilBurnAlertAt < 8500) return;
-
-                        if (sizzleBurnEnergy > 118 && sizzleBurnEnergy > boilBubbleEnergy * 0.72) {
-                            state.lastBoilBurnAlertAt = now;
-                            radar.playDangerAlarm();
-                            if (navigator.vibrate) navigator.vibrate([300, 80, 300, 80, 350]);
-                            if (donenessEl) donenessEl.textContent = '🚨 AŞIRI CIZIRTI / YANMA RİSKİ!';
-                            announceGuidance('DİKKAT YANMA VE SIÇRAMA UYARISI! Tavadan çok şiddetli kızgın yağ cızırtısı geliyor! Yemeğin dibinin yanmaması için ocağı hemen en kısığa çevirin ve tahta kaşıkla karıştırın!', {
-                                force: true,
-                                bannerState: 'warning'
-                            });
-                        } else if (boilBubbleEnergy > 152) {
-                            state.lastBoilBurnAlertAt = now;
-                            radar.playDangerAlarm();
-                            if (navigator.vibrate) navigator.vibrate([250, 90, 250]);
-                            if (donenessEl) donenessEl.textContent = '🚨 ŞİDDETLİ FOKURDAMA / TAŞMA RİSKİ!';
-                            announceGuidance('DİKKAT TAŞMA TEHLİKESİ! Tencereden çok güçlü fokurdama sesi geliyor! Taşmaması için hemen ocağı en kısığa alın ve tencere kapağını aralayın!', {
-                                force: true,
-                                bannerState: 'warning'
-                            });
-                        }
-                    }, 900);
-                }
-            } catch (_) {}
-        }
     }
 
     function toggleCookingStepTimer() {
@@ -9079,7 +9023,7 @@
             '2 (Üstten 4 Parmak Boşluk Kuralı): Tencereye veya cezveye su koyarken işaret parmağınızın ikinci boğumuyla tencerenin üst kenarını kontrol edin; en üstten en az 3-4 parmak boşluk bırakın. ' +
             '3 (Soğuk Tava & Orta-Kısık Ateş Kuralı): Soğanı, salçayı ve şehriyeyi asla harlı ateşte kavurmayın; malzemeyi soğuk tavaya koyup ocağı orta-kısık ateşe ayarlayın, böylece ne yağ sıçrar ne de dibi yanar. ' +
             '4 (Tencere Sapı ve Merkez Kilidi): Ocağı yakmadan önce tencerenin ızgaranın tam ortasında oturduğunu iki elinizle kontrol edin ve sapını mutlaka tezgahın içine doğru çevirin ki eliniz çarpmasın. ' +
-            '5 (Canlı Taşma ve Yanma Nöbetçisi): Ekrandaki Canlı Taşma ve Yanma Nöbetçisi düğmesini açarsanız mikrofon ve kamera tencerenizi dinler; aşırı fokurdama, köpük yükselmesi veya yanma cızırtısı duyduğu anda sizi alarm ile uyarır. ' +
+            '5 (Yüzde Yüz Kamera Görüşlü Nöbetçi): Kamera Taşma ve Yanma Nöbetçisi ortam sesi dinlemez; yüzde yüz sadece kameranın gördüğü beyaz köpük yüzdesini, altın sarısı kızarma yüzdesini, koyu yanık yüzdesini ve ocak alevi yüzdesini analiz ederek yorum yapar. ' +
             '6 (Ocağı Kapattım Güvenlik Onayı): Yemek bittiğinde siz Ocağı Kapattım düğmesine basana kadar uygulama ocağı açık unutmamanız için size sesli hatırlatma yapar.';
         showDetectedResult('🛡️ Yanma ve Taşma Önleyici 6 Altın Mutfak Kuralı', tips);
         announceGuidance(tips, { force: true, bannerState: 'centered' });
@@ -9094,6 +9038,7 @@
 
         let blueFlamePixels = 0;
         let orangeFlameGlowPixels = 0;
+        let whiteFoamPixels = 0;
         let goldenBrownPixels = 0;
         let darkBurntPixels = 0;
         let total = 0;
@@ -9109,6 +9054,10 @@
             if (r > 215 && g > 85 && g < 185 && b < 70 && (r - b) > 140) {
                 orangeFlameGlowPixels++;
             }
+            // Beyaz kaynama köpüğü / süt-çorba-makarna kabarması
+            if (r > 218 && g > 218 && b > 212 && Math.abs(r - b) < 22) {
+                whiteFoamPixels++;
+            }
             // Altın sarısı / karamelize kızarmış yemek tonu (pilav şehriyesi, kek üstü, köfte, börek)
             if (r >= 135 && r <= 225 && g >= 75 && g <= 165 && b >= 20 && b <= 95 && (r - g) >= 30 && (g - b) >= 25) {
                 goldenBrownPixels++;
@@ -9119,37 +9068,41 @@
             }
         }
 
-        const blueRatio = blueFlamePixels / Math.max(1, total);
-        const orangeRatio = orangeFlameGlowPixels / Math.max(1, total);
-        const goldenRatio = goldenBrownPixels / Math.max(1, total);
-        const burntRatio = darkBurntPixels / Math.max(1, total);
+        const bluePct = Math.round((blueFlamePixels / Math.max(1, total)) * 100);
+        const orangePct = Math.round((orangeFlameGlowPixels / Math.max(1, total)) * 100);
+        const foamPct = Math.round((whiteFoamPixels / Math.max(1, total)) * 100);
+        const goldenPct = Math.round((goldenBrownPixels / Math.max(1, total)) * 100);
+        const burntPct = Math.round((darkBurntPixels / Math.max(1, total)) * 100);
+        const brightPct = Math.round(((metrics && metrics.avgBrightness ? metrics.avgBrightness : 120) / 255) * 100);
 
-        const hasFlame = blueRatio > 0.008 || orangeRatio > 0.012;
+        const hasFlame = bluePct >= 1 || orangePct >= 1;
         const flameMsg = hasFlame
-            ? (blueRatio >= orangeRatio
-                ? 'Ocak Ateşi Kontrolü: Ocak AÇIK, mavi doğalgaz alevi net olarak yanıyor.'
-                : 'Ocak Ateşi Kontrolü: Ocak veya fırın rezistansı AÇIK, turuncu-kırmızı ateş/kor algılandı.')
-            : 'Ocak Ateşi Kontrolü: Görüntüde açık bir mavi veya turuncu ocak alevi görünmüyor.';
+            ? (bluePct >= orangePct
+                ? `Ocak Alevi: Görüntüde yüzde ${bluePct} oranında mavi doğalgaz alevi görünüyor (Ocak AÇIK).`
+                : `Ocak Ateşi: Görüntüde yüzde ${orangePct} oranında turuncu-kırmızı ateş/rezistans koru görünüyor (Ocak AÇIK).`)
+            : 'Ocak Alevi: Görüntüde yüzde 0 ocak alevi var (Açık ateş görünmüyor).';
 
         const colName = (metrics && metrics.centerColor) ? metrics.centerColor.name : 'Normal';
-        let donenessMsg = '';
+        let donenessMsg = `Kameranın Yüzde Yüz Gördüğü Görsel Oranlar: Merkezdeki baskın renk ${colName}, ortam aydınlığı yüzde ${brightPct}, beyaz köpük/açık yüzey oranı yüzde ${foamPct}, altın sarısı kızarmışlık oranı yüzde ${goldenPct}, koyu kararma/yanık oranı yüzde ${burntPct}.`;
         let isBurntRisk = false;
 
-        if (burntRatio > 0.32 && metrics.avgBrightness > 45) {
-            donenessMsg = `DİKKAT YANMA UYARISI: Yemeğin veya tavanın orta kısmında koyu kararma (%${Math.round(burntRatio * 100)}) algılandı! Lütfen hemen ocağı kısın veya karıştırın!`;
+        if (burntPct >= 32 && (metrics ? metrics.avgBrightness > 45 : true)) {
+            donenessMsg += ` DİKKAT: Görüntünün yüzde ${burntPct} kadarı çok koyu/kararmış görünüyor; yanma riskine karşı ocağı kısın veya karıştırın!`;
             isBurntRisk = true;
-        } else if (goldenRatio > 0.18) {
-            donenessMsg = `Pişmişlik ve Kızarmışlık: Harika görünüyor! Yiyecek altın sarısı / kızarmış kıvama (%${Math.round(goldenRatio * 100)} karamelize ton, ${colName}) ulaşmış.`;
+        } else if (foamPct >= 42) {
+            donenessMsg += ` DİKKAT: Görüntünün yüzde ${foamPct} kadarı parlak beyaz köpükle kaplı; taşma riskine karşı ocağı kısın!`;
+        } else if (goldenPct >= 18) {
+            donenessMsg += ` Yiyecek yüzde ${goldenPct} oranında altın sarısı kızarmış kıvama ulaşmış.`;
         } else {
-            donenessMsg = `Yüzey ve Renk Durumu: Merkezdeki renk ${colName}. Yiyecek henüz açık renkte / pişme aşamasında, yanık izi yok.`;
+            donenessMsg += ' Yiyecek yüzeyinde yanık veya taşma köpüğü görünmüyor.';
         }
 
         const statusEl = document.getElementById('cooking-doneness-display');
         if (statusEl) {
-            statusEl.textContent = `${hasFlame ? '🔥 Ocak Açık' : 'Ocak Alevi Yok'} | ${isBurntRisk ? '⚠️ Kararma/Yanık Riski' : (goldenRatio > 0.18 ? '✅ Altın Sarısı Kızarmış' : colName)}`;
+            statusEl.textContent = `Renk: ${colName} | Köpük: %${foamPct} | Kızarma: %${goldenPct} | Kararma: %${burntPct} | Alev: %${Math.max(bluePct, orangePct)}`;
         }
 
-        const speech = `${flameMsg} ${donenessMsg} ${cleanText ? 'Okunan paket/fırın yazısı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
+        const speech = `${flameMsg} ${donenessMsg} ${cleanText ? 'Kamerada okunan yazı: ' + cleanText.replace(/\s+/g, ' ') : ''}`.trim();
         return {
             speechText: speech,
             fullText: `${flameMsg}\n${donenessMsg}\n\nOkunan Yazı / Derece:\n${cleanText || 'Yazı yok.'}`,
@@ -9159,16 +9112,18 @@
 
     function handleCookingGuideLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics, predictions) {
         const col = metrics.centerColor ? metrics.centerColor.name : 'Bilinmiyor';
-        el.tPosition.textContent = `Tencere / Ocak Rengi: ${col}`;
+        el.tPosition.textContent = `Kamera Merkez Rengi: ${col}`;
         el.tDistance.textContent = state.cookingTimerInterval
             ? `Sayaç: ${formatMinutesSecondsTurkish(state.cookingTimerRemainingSec)}`
-            : (state.boilBurnGuardActive ? 'Taşma & Yanma Nöbetçisi Açık' : 'Aşçı Rehberi Hazır');
+            : (state.boilBurnGuardActive ? 'Kamera Nöbetçisi Açık (%100 Görsel)' : 'Aşçı Rehberi Hazır');
 
-        // Canlı Kamera ile Köpük Taşması ve Yanma/Kararma Tespiti
+        // Sadece Kameranın Gördüğü Görüntüden Yüzde (%) Hesabı
         if (metrics && metrics.imageData) {
             const d = metrics.imageData.data;
             let whiteFoamCount = 0;
+            let goldenBrownCount = 0;
             let darkCharCount = 0;
+            let flameCount = 0;
             let samples = 0;
             for (let i = 0; i < d.length; i += 32) {
                 const r = d[i], g = d[i + 1], b = d[i + 2];
@@ -9176,32 +9131,54 @@
                 if (r > 218 && g > 218 && b > 212 && Math.abs(r - b) < 22) {
                     whiteFoamCount++;
                 }
+                if (r >= 135 && r <= 225 && g >= 75 && g <= 165 && b >= 20 && b <= 95 && (r - g) >= 30 && (g - b) >= 25) {
+                    goldenBrownCount++;
+                }
                 if (r < 32 && g < 28 && b < 26) {
                     darkCharCount++;
                 }
+                if ((b > 175 && g > 110 && r < 120 && (b - r) > 65) || (r > 215 && g > 85 && g < 185 && b < 70 && (r - b) > 140)) {
+                    flameCount++;
+                }
             }
-            const foamRatio = whiteFoamCount / Math.max(1, samples);
-            const charRatio = darkCharCount / Math.max(1, samples);
+            const foamPct = Math.round((whiteFoamCount / Math.max(1, samples)) * 100);
+            const goldenPct = Math.round((goldenBrownCount / Math.max(1, samples)) * 100);
+            const charPct = Math.round((darkCharCount / Math.max(1, samples)) * 100);
+            const flamePct = Math.round((flameCount / Math.max(1, samples)) * 100);
             const brightJump = metrics.avgBrightness - (state.prevCookingCenterBrightness || metrics.avgBrightness);
             state.prevCookingCenterBrightness = metrics.avgBrightness;
 
+            const statusEl = document.getElementById('cooking-doneness-display');
+            if (statusEl) {
+                statusEl.textContent = `Renk: ${col} | Köpük: %${foamPct} | Kızarma: %${goldenPct} | Kararma: %${charPct} | Alev: %${flamePct}`;
+            }
+
             const now = performance.now();
-            if (state.boilBurnGuardActive && (now - state.lastBoilBurnAlertAt > 7500)) {
-                if (foamRatio > 0.42 && brightJump > 6) {
+            if (state.boilBurnGuardActive && (now - state.lastBoilBurnAlertAt > 8000)) {
+                if (foamPct >= 42 && brightJump > 5) {
                     state.lastBoilBurnAlertAt = now;
                     radar.playDangerAlarm();
                     if (navigator.vibrate) navigator.vibrate([300, 80, 300]);
-                    announceGuidance('ACİL TAŞMA TEHLİKESİ! Kamerada hızla yükselen beyaz köpük algılandı! Yemek taşmak üzere, hemen ocağı kısın veya tencereyi kenara çekin!', {
+                    announceGuidance(`KAMERA GÖRSEL UYARISI: Kameranın gördüğü alanın yüzde ${foamPct} kadarı parlak beyaz köpükle kaplandı! Köpük yükseliyor olabilir, lütfen ocağı kontrol edin.`, {
                         force: true,
                         bannerState: 'warning'
                     });
-                } else if (charRatio > 0.38 && metrics.avgBrightness > 45) {
+                } else if (charPct >= 38 && metrics.avgBrightness > 45) {
                     state.lastBoilBurnAlertAt = now;
                     radar.playDangerAlarm();
                     if (navigator.vibrate) navigator.vibrate([300, 80, 300]);
-                    announceGuidance('ACİL YANMA TEHLİKESİ! Kamerada koyu kararma algılandı! Yemek yanmasın diye hemen ocağı kapatın ve karıştırın!', {
+                    announceGuidance(`KAMERA GÖRSEL UYARISI: Kameranın gördüğü alanın yüzde ${charPct} kadarı çok koyu siyah-kahverengi görünüyor! Kararma riskine karşı kontrol edin.`, {
                         force: true,
                         bannerState: 'warning'
+                    });
+                } else if (now - state.lastBoilBurnAlertAt > 14000) {
+                    state.lastBoilBurnAlertAt = now;
+                    const objList = (predictions && predictions.length > 0)
+                        ? ` Tanınan nesne: ${translateClass(predictions[0].class)} (yüzde ${Math.round(predictions[0].score * 100)} güven).`
+                        : '';
+                    announceGuidance(`Kamera görüntüsü: Merkez rengi ${col}, beyaz köpük yüzde ${foamPct}, altın sarısı kızarma yüzde ${goldenPct}, koyu kararma yüzde ${charPct}, ocak alevi yüzde ${flamePct}.${objList}`, {
+                        force: false,
+                        bannerState: 'normal'
                     });
                 }
             }
