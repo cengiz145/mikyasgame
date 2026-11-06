@@ -1630,7 +1630,12 @@
 
     function triggerUniversalLiveOcrIfSteady(metrics, predictions) {
         if (!state.isRunning || state.isProcessingOcr || state.isLiveBgOcrBusy || state.moneyLiveOcrBusy || state.countdownStage > 0 || typeof window.Tesseract === 'undefined') return;
-        if (state.mode === 'light_meter' || state.mode === 'qibla_compass' || state.mode === 'song_finder') return;
+        const liveOcrExcludedModes = new Set([
+            'light_meter', 'qibla_compass', 'song_finder',
+            'social_presence', 'color_cloth', 'signature_pen',
+            'portrait', 'qr_screen', 'step_calorie_guide', 'cooking_guide'
+        ]);
+        if (liveOcrExcludedModes.has(state.mode)) return;
         if (!metrics || metrics.sharpness < 6.0 || metrics.avgBrightness < 38) return;
 
         const now = performance.now();
@@ -8875,9 +8880,19 @@
             ovCtx.strokeRect(x * scaleX, y * scaleY, w * scaleX, h * scaleY);
             el.tPosition.textContent = 'TV Ekranı Hizalandı';
             el.tDistance.textContent = state.tvAutoReaderActive ? 'Canlı Spiker Açık' : 'Okumaya Hazır';
+            if (!state.tvAutoReaderActive) {
+                announceGuidance('Televizyon ekranı hizalandı. Altyazı ve maç skorunu okumak için Boşluk tuşuna basın veya Otomatik TV Spikerini başlatın.', {
+                    bannerState: 'centered'
+                });
+            }
         } else {
             el.tPosition.textContent = 'TV Ekranına Tutun';
             el.tDistance.textContent = 'Altyazı & Skor';
+            if (!state.tvAutoReaderActive) {
+                announceGuidance('Telefonu televizyon ekranına doğru tutun.', {
+                    bannerState: 'normal'
+                });
+            }
         }
     }
 
@@ -8996,8 +9011,14 @@
     // --- MOD 20: ÇORAP EŞLEŞTİRİCİ, KIYAFET KOMBİN UYUMU VE LEKE KONTROLÜ ---
     function handleSockAndOutfitLiveMode(anW, anH, scaleX, scaleY, ovCtx, metrics) {
         const col = metrics.centerColor ? metrics.centerColor.name : 'Bilinmiyor';
+        const pat = metrics.patternType || 'Düz';
         el.tPosition.textContent = `Görünen Renk: ${col}`;
-        el.tDistance.textContent = `Desen: ${metrics.patternType || 'Düz'}`;
+        el.tDistance.textContent = `Desen: ${pat}`;
+        if (col && col !== 'Bilinmiyor') {
+            announceGuidance(`Görünen kumaş rengi: ${col}, desen: ${pat}. İki çorabı karşılaştırmak veya kıyafet leke kontrolü için Boşluk tuşuna basın.`, {
+                bannerState: 'normal'
+            });
+        }
     }
 
     function sampleRegionRgbAndContrast(ctx, x0, y0, w, h) {
@@ -10094,6 +10115,9 @@
 
     function selectCookingRecipe(index, speakNow = true) {
         const idx = Math.max(0, Math.min(BLIND_ACCESSIBLE_RECIPES.length - 1, Number(index) || 0));
+        if (idx !== state.selectedRecipeIndex && state.cookingTimerInterval) {
+            stopCookingStepTimer(false);
+        }
         state.selectedRecipeIndex = idx;
         state.currentCookingStepIndex = 0;
         const sel = document.getElementById('cooking-recipe-select');
@@ -10963,7 +10987,10 @@
             }
         }
         else if (key === 'k') startQiblaCompassSensor();
-        else if (key === 'v') speakPrayerTimesAndSolarValidation();
+        else if (key === 'v') {
+            if (state.mode !== 'qibla_compass') setMode('qibla_compass');
+            speakPrayerTimesAndSolarValidation();
+        }
         else if (key === 's' && state.mode === 'exam_reader') speakCurrentQuestionStem();
         else if (key === 'a' && state.mode === 'exam_reader') speakSingleOption('A');
         else if (key === 'b') {
@@ -11004,7 +11031,7 @@
         else if (key === 'y') cycleSpeechRate();
         else if (key === 'j') startVoiceItemMemoryCapture('smart_intent');
         else if (key === 'n') speakHowMuchMoneyIHave();
-        else if (key === 'z' || ev.key === '+') addCurrentlyVisibleMoneyManually();
+        else if ((key === 'z' || ev.key === '+') && state.mode === 'color_cloth') addCurrentlyVisibleMoneyManually();
         else if (ev.code === 'Space') {
             ev.preventDefault();
             if (!state.isRunning) {
